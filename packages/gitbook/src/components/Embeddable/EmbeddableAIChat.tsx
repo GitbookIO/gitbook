@@ -10,8 +10,9 @@ import {
 } from '@/components/AIChat';
 import { useLanguage } from '@/intl/client';
 import * as api from '@gitbook/api';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useTrackEvent } from '../Insights';
+import { LinkContext, type LinkContextType } from '../primitives';
 import {
     EmbeddableFrame,
     EmbeddableFrameBody,
@@ -63,6 +64,14 @@ export function EmbeddableAIChat(props: EmbeddableAIChatProps) {
     }, [trackEvent]);
 
     const tabsRef = React.useRef<HTMLDivElement>(null);
+    const hasDocsTab = configuration.tabs.includes('docs');
+    const linkContext: LinkContextType = useMemo(
+        () =>
+            hasDocsTab
+                ? { externalTarget: '_blank' }
+                : { isExternal: () => true, externalTarget: '_blank' },
+        [hasDocsTab]
+    );
 
     return (
         <EmbeddableFrame>
@@ -94,12 +103,14 @@ export function EmbeddableAIChat(props: EmbeddableAIChatProps) {
                     </EmbeddableFrameButtons>
                 </EmbeddableFrameHeader>
                 <EmbeddableFrameBody>
-                    <AIChatBody
-                        chatController={chatController}
-                        chat={chat}
-                        suggestions={configuration.suggestions}
-                        greeting={configuration.greeting}
-                    />
+                    <LinkContext value={linkContext}>
+                        <AIChatBody
+                            chatController={chatController}
+                            chat={chat}
+                            suggestions={configuration.suggestions}
+                            greeting={configuration.greeting}
+                        />
+                    </LinkContext>
                 </EmbeddableFrameBody>
             </EmbeddableFrameMain>
         </EmbeddableFrame>

@@ -4,7 +4,6 @@ import NextLink, { type LinkProps as NextLinkProps } from 'next/link';
 import React from 'react';
 
 import { tcls } from '@/lib/tailwind';
-import { SiteExternalLinksTarget } from '@gitbook/api';
 import { type TrackEventInput, useTrackEvent } from '../Insights';
 import { NavigationStatusContext } from '../hooks';
 import { isExternalLink } from '../utils/link';
@@ -34,13 +33,18 @@ export type LinkProps = Omit<BaseLinkProps, 'href'> &
         classNames?: DesignTokenName[];
     };
 
+type LinkTarget = '_blank' | '_self';
+
+export type LinkContextType = {
+    externalTarget: LinkTarget;
+    isExternal?: ((href: string) => boolean) | undefined;
+};
+
 /**
  * Context to configure the default behavior of links.
  */
-export const LinkSettingsContext = React.createContext<{
-    externalLinksTarget: SiteExternalLinksTarget;
-}>({
-    externalLinksTarget: SiteExternalLinksTarget.Self,
+export const LinkContext = React.createContext<LinkContextType>({
+    externalTarget: '_self',
 });
 
 /**
@@ -49,18 +53,23 @@ export const LinkSettingsContext = React.createContext<{
 function getTargetProps(
     props: Pick<LinkProps, 'href' | 'rel' | 'target'>,
     context: {
-        externalLinksTarget: SiteExternalLinksTarget;
+        externalTarget: LinkTarget;
         isExternal: boolean;
     }
 ) {
     const target =
         props.target ??
-        (context.isExternal && context.externalLinksTarget === SiteExternalLinksTarget.Blank
-            ? '_blank'
-            : undefined);
+        (context.isExternal && context.externalTarget === '_blank' ? '_blank' : undefined);
     // Automatically set rel if target is _blank, or use the specified rel.
     const rel = props.rel ?? (target === '_blank' ? 'noopener noreferrer' : undefined);
     return { target, rel };
+}
+
+/**
+ * Check if the link is external with the origin.
+ */
+function defaultCheckIsExternalLink(href: string) {
+    return isExternalLink(href, typeof window !== 'undefined' ? window.location.origin : undefined);
 }
 
 /**
@@ -69,41 +78,45 @@ function getTargetProps(
  */
 export function Link(props: LinkProps) {
     const { ref, href, prefetch, children, insights, classNames, className, ...domProps } = props;
-    const { externalLinksTarget } = React.useContext(LinkSettingsContext);
+    const { externalTarget, isExternal: checkIsExternalClientSide = defaultCheckIsExternalLink } =
+        React.useContext(LinkContext);
     const { onNavigationClick } = React.useContext(NavigationStatusContext);
     const trackEvent = useTrackEvent();
     const forwardedClassNames = useClassnames(classNames || []);
     const isExternal = isExternalLink(href);
-    const { target, rel } = getTargetProps(props, { externalLinksTarget, isExternal });
+    const { target, rel } = getTargetProps(props, { externalTarget, isExternal });
 
     const onClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
-        const isExternalWithOrigin = isExternalLink(href, window.location.origin);
         // Only trigger navigation context for internal links in the same window without modifier keys (i.e. open in new tab).
         if (!isExternal && target !== '_blank' && !event.ctrlKey && !event.metaKey) {
             onNavigationClick(href);
         }
 
+        const isExternalOnClient = checkIsExternalClientSide(href);
+
         if (insights) {
-            trackEvent(insights, undefined, { immediate: isExternalWithOrigin });
+            trackEvent(insights, undefined, { immediate: isExternalOnClient });
         }
 
         const isInIframe = window.self !== window.top;
 
         // When the page is embedded in an iframe
         // for security reasons other urls cannot be opened.
-        if (isInIframe && isExternalWithOrigin) {
-            event.preventDefault();
-            window.open(href, '_blank', 'noopener noreferrer');
+        if (isInIframe) {
+            if (isExternalOnClient || event.ctrlKey || event.metaKey) {
+                event.preventDefault();
+                window.open(toNonEmbedLink(href), '_blank', 'noopener noreferrer');
+            }
         } else if (isExternal && !event.ctrlKey && !event.metaKey) {
             // The external logic server-side is limited
             // so we use the client-side logic to determine the real target
             // by default the target is "_self".
             const { target = '_self' } = getTargetProps(props, {
-                externalLinksTarget,
-                isExternal: isExternalWithOrigin,
+                externalTarget,
+                isExternal: isExternalOnClient,
             });
             event.preventDefault();
-            window.open(href, target, rel);
+            window.open(target === '_blank' ? toNonEmbedLink(href) : href, target, rel);
         }
 
         domProps.onClick?.(event);
@@ -143,6 +156,13 @@ export function Link(props: LinkProps) {
             {children}
         </NextLink>
     );
+}
+
+/**
+ * Remove "~gitbook/embed/page" or "~gitbook/embed" at the end of the link.
+ */
+function toNonEmbedLink(href: string) {
+    return href.replace(/~gitbook\/embed(?:\/page)?$/, '');
 }
 
 /**
