@@ -31,3 +31,12 @@ export function isCookiesTrackingDisabled() {
 
     return undefined;
 }
+
+/**
+ * Return true if cookies are accepted.
+ * Return false if cookies are rejected or unknown.
+ */
+export function hasApprovedCookies() {
+    const state = getBrowserCookie(GRANTED_COOKIE);
+    return state === 'yes';
+}

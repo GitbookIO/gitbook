@@ -68,14 +68,10 @@ export async function SiteLayout(props: {
                 </SpaceLayout>
             </AIContextProvider>
 
-            {scripts.length > 0 ? (
-                <>
-                    <LoadIntegrations />
-                    {scripts.map(({ script }) => (
-                        <script key={script} async src={script} />
-                    ))}
-                </>
-            ) : null}
+            <LoadIntegrations />
+            {scripts.length > 0
+                ? scripts.map(({ script }) => <script key={script} async src={script} />)
+                : null}
 
             {scripts.some((script) => script.cookies) || customization.privacyPolicy.url ? (
                 <React.Suspense fallback={null}>
