@@ -1,13 +1,23 @@
 'use client';
+import { clearAdaptiveVisitorClaimsCache } from '@/components/Adaptive/AdaptiveVisitorContextProvider';
 import { tString, useLanguage } from '@/intl/client';
 import { useAI, useAIChatController, useAIChatState } from '../AI';
 import { useSetSearchState } from '../Search';
 import { Button, type ButtonProps, Input } from '../primitives';
 
+type ClaimInput = {
+    key: string;
+    value: string | number | boolean | null;
+};
+
 export function InlineActionButton(
-    props: { action: 'ask' | 'search'; query?: string } & { buttonProps: ButtonProps } // TODO: Type this properly: Pick<api.DocumentInlineButton, 'action' | 'query'> & { buttonProps: ButtonProps }
+    props: {
+        action: 'ask' | 'search' | 'set-claim';
+        query?: string;
+        claims?: ClaimInput[];
+    } & { buttonProps: ButtonProps } // TODO: Type this properly: Pick<api.DocumentInlineButton, 'action' | 'query'> & { buttonProps: ButtonProps }
 ) {
-    const { action, query, buttonProps } = props;
+    const { action, query, claims, buttonProps } = props;
 
     const { assistants } = useAI();
     const chatController = useAIChatController();
@@ -32,10 +42,32 @@ export function InlineActionButton(
         }
     };
 
+    const handleSetClaimAction = () => {
+        if (!claims?.length) {
+            return;
+        }
+
+        const mergedClaims: Record<string, string | number | boolean | null> = {};
+        for (const claim of claims) {
+            mergedClaims[claim.key] = claim.value;
+        }
+
+        document.cookie = `gitbook-visitor-public=${encodeURIComponent(
+            JSON.stringify(mergedClaims)
+        )}; path=/; SameSite=Lax`;
+
+        clearAdaptiveVisitorClaimsCache();
+        window.location.reload();
+    };
+
     const icon =
         action === 'ask' && buttonProps.icon === 'gitbook-assistant' && assistants.length > 0
             ? assistants[0]?.icon
             : buttonProps.icon;
+
+    if (action === 'set-claim') {
+        return <Button {...buttonProps} onClick={handleSetClaimAction} />;
+    }
 
     if (!query) {
         return (

@@ -14,6 +14,10 @@ const adaptiveVisitorReaderCache = new Map<
     ReturnType<typeof createResourceReader<AdaptiveVisitorClaims | null>>
 >();
 
+export function clearAdaptiveVisitorClaimsCache() {
+    adaptiveVisitorReaderCache.clear();
+}
+
 function createResourceReader<T>(promise: Promise<T>) {
     let result: T | null | undefined;
 

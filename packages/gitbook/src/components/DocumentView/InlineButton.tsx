@@ -17,11 +17,15 @@ export function InlineButton(props: InlineProps<api.DocumentInlineButton>) {
     };
 
     const ButtonImplementation = () => {
-        if ('action' in inline.data && 'query' in inline.data.action) {
+        if ('action' in inline.data) {
+            const actionData = inline.data.action;
+
             return (
                 <InlineActionButton
-                    action={inline.data.action.action}
-                    query={inline.data.action.query ?? ''}
+                    action={actionData.action}
+                    query={actionData.query ?? ''}
+                    // @ts-expect-error -- Temporary override until `set-claim` is available in @gitbook/api.
+                    claims={actionData.claims}
                     buttonProps={buttonProps}
                 />
             );
