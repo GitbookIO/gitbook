@@ -7,6 +7,7 @@ import { hasFullWidthBlock, hasMoreThan, hasTopLevelBlock, isNodeEmpty } from '@
 import type { AncestorRevisionPage } from '@/lib/pages';
 import { tcls } from '@/lib/tailwind';
 import { DocumentView, DocumentViewSkeleton } from '../DocumentView';
+import { InlineActionButton } from '../DocumentView/InlineActionButton';
 import { TrackPageViewEvent } from '../Insights';
 import { PageFeedbackForm } from '../PageFeedback';
 import { CurrentPageProvider } from '../hooks/useCurrentPage';
@@ -81,6 +82,21 @@ export function PageBody(props: {
                     pageHasToc ? 'page-has-toc' : 'page-no-toc'
                 )}
             >
+                <div>
+                    Special button:
+                    <InlineActionButton
+                        action="set-claim"
+                        claims={[
+                            {
+                                key: 'format',
+                                value: ['docker', 'helm', 'generic', 'maven'][
+                                    Math.floor(Math.random() * 4)
+                                ] as string,
+                            },
+                        ]}
+                        buttonProps={{ label: 'Ask' }}
+                    />
+                </div>
                 <PreservePageLayout siteWidthWide={siteWidthWide} pageHasToc={pageHasToc} />
                 {page.cover && page.layout.cover && page.layout.coverSize === 'hero' ? (
                     <PageCover as="hero" page={page} cover={page.cover} context={context} />
