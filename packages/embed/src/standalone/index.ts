@@ -193,5 +193,3 @@ const precalls = (window.GitBook as GitBookStandalone | undefined)?.q ?? [];
 // @ts-expect-error - GitBook is not defined in the global scope
 window.GitBook = GitBook;
 precalls.forEach((call) => GitBook(...call));
-
-GitBook('configure', {});
