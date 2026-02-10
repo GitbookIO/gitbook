@@ -36,7 +36,7 @@ export function isCookiesTrackingDisabled() {
  * Return true if cookies are accepted.
  * Return false if cookies are rejected or unknown.
  */
-export function hasGrantedCookies() {
+export function hasApprovedCookies() {
     const state = getBrowserCookie(GRANTED_COOKIE);
     return state === 'yes';
 }

@@ -88,7 +88,7 @@ export type GitBookGlobal = {
      * Whether the user has granted cookie consent.
      * Returns true if cookies are granted, false if rejected or unknown.
      */
-    hasGrantedCookies: () => boolean;
+    hasApprovedCookies: () => boolean;
 };
 
 declare global {
