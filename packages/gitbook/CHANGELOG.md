@@ -1,5 +1,47 @@
 # gitbook
 
+## 0.22.0
+
+### Minor Changes
+
+- e00d1c5: Support code themes customization
+- f294818: Serve a markdown version of the page when the "Accept" header contains "text/markdown".
+
+### Patch Changes
+
+- 9d6457f: OpenAPI styling tweaks
+- d738e11: Prevent form submission during IME composition
+- 1e53376: Add sidesheet component, use it for TOC and AIChat
+- f7f6f9d: Set <html lang> based on translated language
+- 89de966: Support social links
+- b53cb1d: Align styling of PageLinkItem and PageDocumentItem
+- 27a34b7: Support `defaultExpanded` in Expandable block
+- a5ef44a: Better conditional display of page actions
+- 07c02eb: Header & TOC tweaks
+- 29e2b22: Fix ordered list item index calculation
+- f6cf62a: Standardise toggle chevrons across the app
+- b57561d: Fix rendering of images in reusable content from an external space with the new dereferencing in the API.
+- e172b25: Grow InlineActionButton to take available width on line
+- 7a11861: Add support for custom cookie banner registration
+- 8f32f4f: Better handle huge section groups
+- 0aa34cc: Fix Embed options in React
+- Updated dependencies [e00d1c5]
+- Updated dependencies [96e24a1]
+- Updated dependencies [4e2d863]
+- Updated dependencies [d3f6c38]
+- Updated dependencies [3ba9e46]
+- Updated dependencies [717ad0b]
+- Updated dependencies [6f1db32]
+- Updated dependencies [7a11861]
+- Updated dependencies [0aa34cc]
+- Updated dependencies [48ca21e]
+  - @gitbook/react-openapi@1.5.7
+  - @gitbook/embed@0.2.1
+  - @gitbook/openapi-parser@3.0.8
+  - @gitbook/icons@0.4.3
+  - @gitbook/browser-types@0.1.4
+  - @gitbook/react-contentkit@0.7.12
+
 ## 0.21.3
 
 ### Patch Changes

@@ -1,5 +1,12 @@
 # @gitbook/react-contentkit
 
+## 0.7.12
+
+### Patch Changes
+
+- Updated dependencies [6f1db32]
+  - @gitbook/icons@0.4.3
+
 ## 0.7.11
 
 ### Patch Changes
