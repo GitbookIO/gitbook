@@ -4,9 +4,10 @@ import type { CustomizationThemeMode, SiteExternalLinksTarget } from '@gitbook/a
 import { ThemeProvider } from 'next-themes';
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
 import type React from 'react';
+import { useMemo } from 'react';
 import { SearchContextProvider } from '../Search';
 import { useClearRouterCache } from '../hooks/useClearRouterCache';
-import { LinkSettingsContext } from '../primitives';
+import { LinkContext, type LinkContextType } from '../primitives';
 
 /**
  * Client component context providers for the site layout.
@@ -21,6 +22,15 @@ export function SiteLayoutClientContexts(props: {
 
     useClearRouterCache(contextId);
 
+    const linkContext: LinkContextType = useMemo(
+        () => ({
+            externalTarget: { self: '_self' as const, blank: '_blank' as const }[
+                externalLinksTarget
+            ],
+        }),
+        [externalLinksTarget]
+    );
+
     return (
         <ThemeProvider
             attribute="class"
@@ -29,9 +39,9 @@ export function SiteLayoutClientContexts(props: {
             forcedTheme={forcedTheme}
         >
             <NuqsAdapter>
-                <LinkSettingsContext.Provider value={{ externalLinksTarget }}>
+                <LinkContext.Provider value={linkContext}>
                     <SearchContextProvider>{children}</SearchContextProvider>
-                </LinkSettingsContext.Provider>
+                </LinkContext.Provider>
             </NuqsAdapter>
         </ThemeProvider>
     );
