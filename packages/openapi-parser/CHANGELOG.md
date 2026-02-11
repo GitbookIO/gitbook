@@ -1,5 +1,11 @@
 # @gitbook/openapi-parser
 
+## 3.0.8
+
+### Patch Changes
+
+- d3f6c38: Update scalar dependencies.
+
 ## 3.0.7
 
 ### Patch Changes

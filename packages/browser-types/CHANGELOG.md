@@ -1,5 +1,13 @@
 # @gitbook/browser-types
 
+## 0.1.4
+
+### Patch Changes
+
+- 7a11861: Add support for custom cookie banner registration
+- Updated dependencies [6f1db32]
+  - @gitbook/icons@0.4.3
+
 ## 0.1.3
 
 ### Patch Changes

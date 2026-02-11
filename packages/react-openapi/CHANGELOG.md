@@ -1,5 +1,17 @@
 # @gitbook/react-openapi
 
+## 1.5.7
+
+### Patch Changes
+
+- e00d1c5: Support code themes customization
+- 4e2d863: Fix OpenAPI example not showing
+- 3ba9e46: Improve OpenAPI server URL validation
+- 717ad0b: Fix Scalar Try it button justification
+- 48ca21e: Add OpenAPI 3.1 nullable array support
+- Updated dependencies [d3f6c38]
+  - @gitbook/openapi-parser@3.0.8
+
 ## 1.5.6
 
 ### Patch Changes
