@@ -11,6 +11,7 @@ import {
 const STORAGE_KEY = 'gitbook_toolbar_closed';
 const SESSION_STORAGE_KEY = 'gitbook_toolbar_session_closed';
 const SESSION_MINIFIED_KEY = 'gitbook_toolbar_minified';
+const VISIBILITY_HINT_DISMISSED_KEY = 'gitbook_toolbar_hint_dismissed';
 
 type SessionHideReason = 'session' | 'persistent';
 
@@ -55,6 +56,20 @@ export const getStoredMinified = (): boolean | undefined => {
  */
 export const setStoredMinified = (value: boolean) => {
     setSessionStorageItem(SESSION_MINIFIED_KEY, value);
+};
+
+/**
+ * Check whether the user has dismissed the "only you can see this" hint.
+ */
+export const getVisibilityHintDismissed = (): boolean => {
+    return getSessionStorageItem(VISIBILITY_HINT_DISMISSED_KEY, false);
+};
+
+/**
+ * Persist that the user dismissed the visibility hint for the current session.
+ */
+export const setVisibilityHintDismissed = () => {
+    setSessionStorageItem(VISIBILITY_HINT_DISMISSED_KEY, true);
 };
 
 interface UseToolbarVisibilityOptions {

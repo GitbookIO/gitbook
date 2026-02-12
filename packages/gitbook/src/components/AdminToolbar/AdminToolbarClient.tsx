@@ -1,10 +1,9 @@
 'use client';
 import { Icon } from '@gitbook/icons';
-import { MotionConfig } from 'motion/react';
+import { MotionConfig, motion } from 'motion/react';
 import { useCheckForContentUpdate } from '../AutoRefreshContent';
 import { useVisitorSession } from '../Insights';
 import { useCurrentPagePath } from '../hooks';
-import { DateRelative } from '../primitives';
 import { HideToolbarButton } from './HideToolbarButton';
 import { IframeWrapper } from './IframeWrapper';
 import { RefreshContentButton } from './RefreshContentButton';
@@ -14,7 +13,6 @@ import {
     ToolbarButton,
     ToolbarButtonGroup,
     type ToolbarButtonProps,
-    ToolbarSeparator,
     ToolbarSubtitle,
     ToolbarTitle,
 } from './Toolbar';
@@ -22,6 +20,7 @@ import {
     type ToolbarControlsContextValue,
     ToolbarControlsProvider,
 } from './ToolbarControlsContext';
+import { ToolbarDate } from './ToolbarDate';
 import type { AdminToolbarClientProps, AdminToolbarContext } from './types';
 import { useToolbarVisibility } from './utils';
 
@@ -132,7 +131,7 @@ function ChangeRequestToolbar(props: ToolbarViewProps) {
     });
 
     return (
-        <Toolbar minified={minified} onMinifiedChange={onMinifiedChange} label="Site preview">
+        <Toolbar minified={minified} onMinifiedChange={onMinifiedChange}>
             <ToolbarBody>
                 <ToolbarTitle
                     prefix={`Change #${changeRequest.number}:`}
@@ -141,13 +140,12 @@ function ChangeRequestToolbar(props: ToolbarViewProps) {
                 <ToolbarSubtitle
                     subtitle={
                         <>
-                            <DateRelative value={changeRequest.updatedAt} /> by {author}
+                            <ToolbarDate value={changeRequest.updatedAt} />{' '}
+                            <motion.span layout="position">by {author}</motion.span>
                         </>
                     }
                 />
             </ToolbarBody>
-
-            <ToolbarSeparator />
 
             <ToolbarActions>
                 {/* Refresh to retrieve latest changes */}
@@ -207,18 +205,11 @@ function RevisionToolbar(props: ToolbarViewProps) {
     const gitProvider = isGitHub ? 'GitHub' : 'GitLab';
 
     return (
-        <Toolbar minified={minified} onMinifiedChange={onMinifiedChange} label="Site preview">
+        <Toolbar minified={minified} onMinifiedChange={onMinifiedChange}>
             <ToolbarBody>
-                <ToolbarTitle prefix="Site version" suffix={context.site.title} />
-                <ToolbarSubtitle
-                    subtitle={
-                        <>
-                            Created <DateRelative value={revision.createdAt} />
-                        </>
-                    }
-                />
+                <ToolbarTitle prefix="Prior version of " suffix={context.site.title} />
+                <ToolbarSubtitle subtitle={<ToolbarDate value={revision.createdAt} />} />
             </ToolbarBody>
-            <ToolbarSeparator />
             <ToolbarActions>
                 {/* Open commit in Git client */}
                 <ToolbarButton
@@ -280,22 +271,11 @@ function AuthenticatedUserToolbar(props: ToolbarViewProps) {
     });
 
     return (
-        <Toolbar
-            minified={minified}
-            onMinifiedChange={onMinifiedChange}
-            label="Only visible to your GitBook organization"
-        >
+        <Toolbar minified={minified} onMinifiedChange={onMinifiedChange}>
             <ToolbarBody>
                 <ToolbarTitle suffix={context.site.title} />
-                <ToolbarSubtitle
-                    subtitle={
-                        <>
-                            Updated <DateRelative value={revision.createdAt} />
-                        </>
-                    }
-                />
+                <ToolbarSubtitle subtitle={<ToolbarDate value={revision.createdAt} />} />
             </ToolbarBody>
-            <ToolbarSeparator />
             <ToolbarActions>
                 {/* Refresh to retrieve latest changes */}
                 {updated ? <RefreshContentButton refreshForUpdates={refreshForUpdates} /> : null}
@@ -305,18 +285,18 @@ function AuthenticatedUserToolbar(props: ToolbarViewProps) {
 
                 {/* Open site in GitBook */}
                 <ToolbarButton
-                    title="Open site in GitBook"
+                    title="View site configuration"
                     href={getToolbarHref({
                         href: site.urls.app,
                         siteId: site.id,
                         buttonId: 'site',
                     })}
-                    icon="gears"
+                    icon="folder-gear"
                 />
 
                 {/* Customize in GitBook */}
                 <ToolbarButton
-                    title="Customize in GitBook"
+                    title="Customize site"
                     href={getToolbarHref({
                         href: `${site.urls.app}/customization/general`,
                         siteId: site.id,
@@ -327,7 +307,7 @@ function AuthenticatedUserToolbar(props: ToolbarViewProps) {
 
                 {/* Open insights in GitBook */}
                 <ToolbarButton
-                    title="Open insights in GitBook"
+                    title="Open insights"
                     href={getToolbarHref({
                         href: `${site.urls.app}/insights`,
                         siteId: site.id,
@@ -361,13 +341,13 @@ function EditPageButton(props: {
 
     return (
         <ToolbarButton
-            title="Edit in GitBook"
+            title="Edit this page"
             href={getToolbarHref({
                 href: `${href}${pagePath.startsWith('/') ? pagePath.slice(1) : pagePath}`,
                 siteId,
                 buttonId: 'edit',
             })}
-            icon="pencil"
+            icon="pen-to-square"
             motionValues={motionValues}
         />
     );
