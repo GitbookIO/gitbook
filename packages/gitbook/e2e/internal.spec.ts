@@ -508,6 +508,72 @@ const testCases: TestsCase[] = [
         ],
     },
     {
+        name: 'Language Site (Navigation when switching language variant)',
+        contentBaseURL: 'https://gitbook-open-e2e-sites.gitbook.io/yjs/',
+        tests: [
+            {
+                name: 'Should resolve to the same page in the new language variant when switching language variant (Source English -> Target Dutch)',
+                url: 'yjs/ecosystem/connection-provider',
+                screenshot: false,
+                run: async (page) => {
+                    const spaceDropdown = page
+                        .locator('[data-testid="space-dropdown-button"]')
+                        .locator('visible=true');
+                    await spaceDropdown.click();
+
+                    const variantSelectionDropdown = page.locator(
+                        'css=[data-testid="dropdown-menu"]'
+                    );
+                    // Click the dutch language variant in the dropdown
+                    await variantSelectionDropdown
+                        .getByRole('menuitem', {
+                            name: 'Yjs (NL)',
+                        })
+                        .click();
+
+                    // It should keep the current page path, i.e "ecosysteem/connection-provider" when navigating to the NL variant
+                    await page.waitForURL((url) =>
+                        url.pathname.includes('nl/ecosysteem/connection-provider')
+                    );
+                    // Verify we are on the correct page by checking the h1
+                    await expect(
+                        page.getByRole('heading', { level: 1, name: 'Connectieprovider' })
+                    ).toBeVisible();
+                },
+            },
+            {
+                name: 'Should resolve to the same page in the new language variant when switching language variant (Source Dutch -> Target Finnish)',
+                url: 'yjs/nl/ecosysteem/connection-provider',
+                screenshot: false,
+                run: async (page) => {
+                    const spaceDropdown = page
+                        .locator('[data-testid="space-dropdown-button"]')
+                        .locator('visible=true');
+                    await spaceDropdown.click();
+
+                    const variantSelectionDropdown = page.locator(
+                        'css=[data-testid="dropdown-menu"]'
+                    );
+                    // Click the finnish language variant in the dropdown
+                    await variantSelectionDropdown
+                        .getByRole('menuitem', {
+                            name: 'Yjs (FI)',
+                        })
+                        .click();
+
+                    // It should keep the current page path, i.e "ecosysteem/connection-provider" when navigating to the FI variant
+                    await page.waitForURL((url) =>
+                        url.pathname.includes('fi/ekosysteemi/connection-provider')
+                    );
+                    // Verify we are on the correct page by checking the h1
+                    await expect(
+                        page.getByRole('heading', { level: 1, name: 'Yhteysvälittäjä' })
+                    ).toBeVisible();
+                },
+            },
+        ],
+    },
+    {
         name: 'GitBook Site (Sections and Section Groups)',
         contentBaseURL: 'https://gitbook-open-e2e-sites.gitbook.io/sections/',
         tests: [
