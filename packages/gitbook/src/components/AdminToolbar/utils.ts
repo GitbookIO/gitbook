@@ -11,6 +11,8 @@ import {
 const STORAGE_KEY = 'gitbook_toolbar_closed';
 const SESSION_STORAGE_KEY = 'gitbook_toolbar_session_closed';
 const SESSION_MINIFIED_KEY = 'gitbook_toolbar_minified';
+const SESSION_POSITION_KEY = 'gitbook_toolbar_position';
+const VISIBILITY_HINT_DISMISSED_KEY = 'gitbook_toolbar_hint_dismissed';
 
 type SessionHideReason = 'session' | 'persistent';
 
@@ -55,6 +57,35 @@ export const getStoredMinified = (): boolean | undefined => {
  */
 export const setStoredMinified = (value: boolean) => {
     setSessionStorageItem(SESSION_MINIFIED_KEY, value);
+};
+
+/**
+ * Retrieve the last drag position from session storage. Returns `null` when no position has been
+ * stored, meaning the toolbar should use its default center-bottom placement.
+ */
+export const getStoredPosition = (): { x: number; y: number } | null => {
+    return getSessionStorageItem<{ x: number; y: number } | null>(SESSION_POSITION_KEY, null);
+};
+
+/**
+ * Persist the current drag position for the ongoing session.
+ */
+export const setStoredPosition = (position: { x: number; y: number }) => {
+    setSessionStorageItem(SESSION_POSITION_KEY, position);
+};
+
+/**
+ * Check whether the user has dismissed the "only you can see this" hint.
+ */
+export const getVisibilityHintDismissed = (): boolean => {
+    return getLocalStorageItem(VISIBILITY_HINT_DISMISSED_KEY, false);
+};
+
+/**
+ * Persist that the user dismissed the visibility hint.
+ */
+export const setVisibilityHintDismissed = () => {
+    setLocalStorageItem(VISIBILITY_HINT_DISMISSED_KEY, true);
 };
 
 interface UseToolbarVisibilityOptions {

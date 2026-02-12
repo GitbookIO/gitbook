@@ -4,7 +4,6 @@ import { MotionConfig } from 'motion/react';
 import { useCheckForContentUpdate } from '../AutoRefreshContent';
 import { useVisitorSession } from '../Insights';
 import { useCurrentPagePath } from '../hooks';
-import { DateRelative } from '../primitives';
 import { HideToolbarButton } from './HideToolbarButton';
 import { IframeWrapper } from './IframeWrapper';
 import { RefreshContentButton } from './RefreshContentButton';
@@ -22,6 +21,7 @@ import {
     type ToolbarControlsContextValue,
     ToolbarControlsProvider,
 } from './ToolbarControlsContext';
+import { ToolbarDate } from './ToolbarDate';
 import type { AdminToolbarClientProps, AdminToolbarContext } from './types';
 import { useToolbarVisibility } from './utils';
 
@@ -132,7 +132,7 @@ function ChangeRequestToolbar(props: ToolbarViewProps) {
     });
 
     return (
-        <Toolbar minified={minified} onMinifiedChange={onMinifiedChange} label="Site preview">
+        <Toolbar minified={minified} onMinifiedChange={onMinifiedChange}>
             <ToolbarBody>
                 <ToolbarTitle
                     prefix={`Change #${changeRequest.number}:`}
@@ -141,7 +141,7 @@ function ChangeRequestToolbar(props: ToolbarViewProps) {
                 <ToolbarSubtitle
                     subtitle={
                         <>
-                            <DateRelative value={changeRequest.updatedAt} /> by {author}
+                            <ToolbarDate value={changeRequest.updatedAt} /> by {author}
                         </>
                     }
                 />
@@ -207,13 +207,13 @@ function RevisionToolbar(props: ToolbarViewProps) {
     const gitProvider = isGitHub ? 'GitHub' : 'GitLab';
 
     return (
-        <Toolbar minified={minified} onMinifiedChange={onMinifiedChange} label="Site preview">
+        <Toolbar minified={minified} onMinifiedChange={onMinifiedChange}>
             <ToolbarBody>
                 <ToolbarTitle prefix="Site version" suffix={context.site.title} />
                 <ToolbarSubtitle
                     subtitle={
                         <>
-                            Created <DateRelative value={revision.createdAt} />
+                            Created <ToolbarDate value={revision.createdAt} />
                         </>
                     }
                 />
@@ -280,20 +280,10 @@ function AuthenticatedUserToolbar(props: ToolbarViewProps) {
     });
 
     return (
-        <Toolbar
-            minified={minified}
-            onMinifiedChange={onMinifiedChange}
-            label="Only visible to your GitBook organization"
-        >
+        <Toolbar minified={minified} onMinifiedChange={onMinifiedChange}>
             <ToolbarBody>
                 <ToolbarTitle suffix={context.site.title} />
-                <ToolbarSubtitle
-                    subtitle={
-                        <>
-                            Updated <DateRelative value={revision.createdAt} />
-                        </>
-                    }
-                />
+                <ToolbarSubtitle subtitle={<ToolbarDate value={revision.createdAt} />} />
             </ToolbarBody>
             <ToolbarSeparator />
             <ToolbarActions>
@@ -305,13 +295,13 @@ function AuthenticatedUserToolbar(props: ToolbarViewProps) {
 
                 {/* Open site in GitBook */}
                 <ToolbarButton
-                    title="Open site in GitBook"
+                    title="View site configuration"
                     href={getToolbarHref({
                         href: site.urls.app,
                         siteId: site.id,
                         buttonId: 'site',
                     })}
-                    icon="gears"
+                    icon="folder-gear"
                 />
 
                 {/* Customize in GitBook */}
@@ -361,13 +351,13 @@ function EditPageButton(props: {
 
     return (
         <ToolbarButton
-            title="Edit in GitBook"
+            title="Edit this page"
             href={getToolbarHref({
                 href: `${href}${pagePath.startsWith('/') ? pagePath.slice(1) : pagePath}`,
                 siteId,
                 buttonId: 'edit',
             })}
-            icon="pencil"
+            icon="pen-to-square"
             motionValues={motionValues}
         />
     );
