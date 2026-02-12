@@ -9,6 +9,7 @@ import {
 import React, { isValidElement } from 'react';
 import { AnimatedLogo } from './AnimatedLogo';
 import { useToolbarControls } from './ToolbarControlsContext';
+import { ToolbarVisibilityHint } from './ToolbarVisibilityHint';
 
 import { tcls } from '@/lib/tailwind';
 import { Icon, type IconName, IconStyle } from '@gitbook/icons';
@@ -19,21 +20,30 @@ import { useMagnificationEffect } from './useMagnificationEffect';
 const DURATION_LOGO_APPEARANCE = 2000;
 const DELAY_BETWEEN_LOGO_AND_CONTENT = 100;
 
+const PILL_STYLE = {
+    '--toolbar-bg': '#1f1d1b',
+    borderRadius: '100px', // Set on `style` so Framer Motion can correct for distortions
+    zIndex: 1, // Ensure pill stacks above the peek label sibling
+} as React.CSSProperties;
+
 interface ToolbarProps {
-    label: React.ReactNode;
     children: React.ReactNode;
     minified: boolean;
     onMinifiedChange: (value: boolean) => void;
 }
 
 export function Toolbar(props: ToolbarProps) {
-    const { children, label, minified, onMinifiedChange } = props;
+    const { children, minified, onMinifiedChange } = props;
     const controls = useToolbarControls();
     const [isReady, setIsReady] = React.useState(false);
     const autoExpandTriggeredRef = React.useRef(false);
 
     const shouldAutoExpand = Boolean(controls?.shouldAutoExpand);
     const [shouldAnimateLogo, setShouldAnimateLogo] = React.useState(shouldAutoExpand);
+
+    // Track when the pill's layout animation finishes so the hint label
+    // only appears once the toolbar is fully expanded.
+    const [showHint, setShowHint] = React.useState(!minified);
 
     // Wait for page to be ready, then show the toolbar
     React.useEffect(() => {
@@ -82,6 +92,10 @@ export function Toolbar(props: ToolbarProps) {
             // Any manual expansion should stop the logo animation so the icon stays in its
             // “settled” state once the toolbar is open.
             setShouldAnimateLogo(false);
+        } else {
+            // Hide the hint immediately when minimizing — it will reappear
+            // once the next expand animation completes.
+            setShowHint(false);
         }
     }, [minified]);
 
@@ -91,47 +105,57 @@ export function Toolbar(props: ToolbarProps) {
     }
 
     return (
-        <Tooltip label={label}>
-            <motion.div className="-translate-x-1/2 fixed bottom-5 left-1/2 z-40 w-auto max-w-xl transform px-4">
-                <AnimatePresence mode="wait">
+        <motion.div className="-translate-x-1/2 fixed bottom-5 left-1/2 z-40 w-auto max-w-xl transform px-4">
+            <ToolbarVisibilityHint show={showHint} />
+
+            <AnimatePresence mode="wait">
+                <motion.div
+                    onClick={() => {
+                        if (minified) {
+                            setShouldAnimateLogo(false);
+                            onMinifiedChange(false);
+                        }
+                    }}
+                    layout
+                    onLayoutAnimationComplete={() => {
+                        if (!minified) {
+                            setShowHint(true);
+                        }
+                    }}
+                    transition={toolbarEasings.spring}
+                    className={tcls(
+                        minified ? 'cursor-pointer' : 'pr-2 pl-3.5',
+                        'relative',
+                        'flex',
+                        'items-center',
+                        'justify-center',
+                        'min-h-11',
+                        'min-w-12',
+                        'h-12',
+                        'py-2',
+                        'origin-center',
+                        'border-[0.5px] border-neutral-5 border-solid dark:border-neutral-8',
+                        'bg-[var(--toolbar-bg)]'
+                    )}
+                    style={PILL_STYLE}
+                >
+                    {/* Logo — double-click to minimize */}
                     <motion.div
-                        onClick={() => {
-                            if (minified) {
-                                setShouldAnimateLogo(false);
-                                onMinifiedChange(false);
-                            }
-                        }}
                         layout
-                        transition={toolbarEasings.spring}
-                        className={tcls(
-                            minified ? 'cursor-pointer px-2' : 'pr-2 pl-3.5',
-                            'flex',
-                            'items-center',
-                            'justify-center',
-                            'min-h-11',
-                            'min-w-12',
-                            'h-12',
-                            'py-2',
-                            'backdrop-blur-sm',
-                            'origin-center',
-                            'border-[0.5px] border-neutral-5 border-solid dark:border-neutral-8',
-                            'bg-[linear-gradient(45deg,rgba(39,39,39,0.8)_100%,rgba(39,39,39,0.4)_80%)]',
-                            'dark:bg-[linear-gradient(45deg,rgba(39,39,39,0.5)_100%,rgba(39,39,39,0.3)_80%)]'
-                        )}
-                        style={{
-                            borderRadius: '100px', // This is set on `style` so Framer Motion can correct for distortions
+                        onDoubleClick={(e) => {
+                            if (minified) return;
+                            e.stopPropagation();
+                            window.getSelection()?.removeAllRanges();
+                            onMinifiedChange(true);
                         }}
                     >
-                        {/* Logo with stroke segments animation in blue-tints */}
-                        <motion.div layout>
-                            <AnimatedLogo shouldAnimate={shouldAnimateLogo} />
-                        </motion.div>
-
-                        {!minified ? children : null}
+                        <AnimatedLogo shouldAnimate={shouldAnimateLogo} />
                     </motion.div>
-                </AnimatePresence>
-            </motion.div>
-        </Tooltip>
+
+                    {!minified ? children : null}
+                </motion.div>
+            </AnimatePresence>
+        </motion.div>
     );
 }
 
@@ -198,62 +222,51 @@ export const ToolbarButton = React.forwardRef<HTMLDivElement, ToolbarButtonProps
     } = props;
     const reduceMotion = useReducedMotion();
 
+    const anchor = (
+        <motion.a
+            href={href}
+            onClick={onClick}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={
+                reduceMotion
+                    ? undefined
+                    : {
+                          scale: motionValues?.scale,
+                          x: motionValues?.x,
+                          transformOrigin: 'bottom center',
+                          zIndex: motionValues?.scale ? 10 : 'auto',
+                          ...style,
+                      }
+            }
+            transition={{
+                type: 'spring',
+                stiffness: 400,
+                damping: 30,
+            }}
+            className={tcls(
+                'toolbar-button',
+                className,
+                'relative flex size-8 cursor-pointer items-center justify-center gap-1 truncate rounded-full text-sm transition-colors',
+                'text-tint-7 hover:text-tint-1',
+                'dark:text-tint-12',
+                disabled ? 'cursor-not-allowed opacity-50' : '',
+                'bg-[var(--toolbar-bg)]',
+                'hover:bg-[color-mix(in_srgb,var(--toolbar-bg)_90%,white)]'
+            )}
+        >
+            <Icon
+                icon={icon}
+                iconStyle={IconStyle.Solid}
+                className={tcls('size-3.5 shrink-0 group-hover:scale-110', iconClassName)}
+            />
+        </motion.a>
+    );
+
     return (
         <motion.div variants={toolbarEasings.staggeringChild} className="relative" ref={ref}>
             {children ? children : null}
-            <Tooltip label={title}>
-                <motion.a
-                    href={href}
-                    onClick={onClick}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={
-                        reduceMotion
-                            ? undefined
-                            : {
-                                  scale: motionValues?.scale,
-                                  x: motionValues?.x,
-                                  transformOrigin: 'bottom center',
-                                  zIndex: motionValues?.scale ? 10 : 'auto',
-                                  ...style,
-                              }
-                    }
-                    transition={{
-                        type: 'spring',
-                        stiffness: 400,
-                        damping: 30,
-                    }}
-                    className={tcls(
-                        'toolbar-button',
-                        className,
-                        'flex',
-                        'relative',
-                        'items-center',
-                        'justify-center',
-                        'gap-1',
-                        'text-sm',
-                        'rounded-full',
-                        'truncate',
-                        'text-tint-1',
-                        'dark:text-tint-12',
-                        'cursor-pointer',
-                        'transition-colors',
-                        'size-8',
-                        disabled ? 'cursor-not-allowed opacity-50' : '',
-                        'border border-[rgba(256,_256,_256,_0.06)] border-solid',
-                        'bg-[linear-gradient(45deg,rgba(51,53,57,1)_0%,rgba(50,52,56,1)_100%)]'
-                    )}
-                >
-                    <Icon
-                        icon={icon}
-                        iconStyle={IconStyle.Solid}
-                        className={tcls(
-                            'size-4 shrink-0 group-hover:scale-110 group-hover:text-tint-3',
-                            iconClassName
-                        )}
-                    />
-                </motion.a>
-            </Tooltip>
+            {title ? <Tooltip label={title}>{anchor}</Tooltip> : anchor}
         </motion.div>
     );
 });
@@ -339,7 +352,7 @@ export function ToolbarSubtitle(props: { subtitle: React.ReactNode }) {
     return (
         <motion.span
             {...getCopyVariants(1)}
-            className="text-neutral-1/80 text-xxs dark:text-neutral-12/80"
+            className="inline-flex items-center gap-1 text-neutral-1/80 text-xxs dark:text-neutral-12/80"
         >
             {props.subtitle}
         </motion.span>
