@@ -126,7 +126,7 @@ export function Header(props: {
                                     ? [
                                           '@2xl:grow-[0.8]',
                                           '@4xl:basis-40',
-                                          '@2xl:max-w-[40%]',
+                                          '@2xl:max-w-[50%]',
                                           '@4xl:max-w-lg',
                                           'lg:@2xl:ml-[max(calc((100%-18rem-48rem)/2),1.5rem)]', // container (100%) - sidebar (18rem) - content (48rem)
                                           'not-chat-open:xl:ml-[max(calc((100%-18rem-48rem-14rem-3rem)/2),1.5rem)]', // container (100%) - sidebar (18rem) - content (48rem) - outline (14rem) - margin (3rem)
