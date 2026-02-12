@@ -88,6 +88,7 @@ export type GitBookGlobal = {
      * Indicates whether cookies tracking is disabled for the current user.
      * Returns `true` when tracking is disabled, `false` when tracking is enabled,
      * and `undefined` when the tracking preference is unknown or not yet determined.
+     */
     isCookiesTrackingDisabled: () => boolean | undefined;
 };
 
