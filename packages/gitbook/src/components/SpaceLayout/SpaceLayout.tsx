@@ -151,7 +151,11 @@ export function SpaceLayout(props: SpaceLayoutProps) {
                                     'grow-0',
                                     'dark:shadow-light/1',
                                     'text-base/tight',
-                                    'items-center'
+                                    'items-center',
+                                    // On bold themes also color the TOC header so the logo looks correct.
+                                    'theme-bold:bg-header-background',
+                                    'theme-bold:m-[-1.5rem_-1px_-0.5rem_-2rem]',
+                                    'theme-bold:p-[1rem_0_1rem_2rem]'
                                 )}
                             >
                                 <HeaderLogo context={context} />
