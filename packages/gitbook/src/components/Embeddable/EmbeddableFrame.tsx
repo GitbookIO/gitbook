@@ -68,11 +68,18 @@ export function EmbeddableFrameHeaderMain(props: {
 
 export function EmbeddableFrameBody(props: {
     children: React.ReactNode;
+    className?: ClassValue;
 }) {
-    const { children } = props;
+    const { children, className } = props;
 
     return (
-        <div className={tcls('flex w-full flex-1 flex-col overflow-hidden', CONTAINER_STYLE)}>
+        <div
+            className={tcls(
+                'flex w-full flex-1 flex-col overflow-hidden',
+                CONTAINER_STYLE,
+                className
+            )}
+        >
             {children}
         </div>
     );
