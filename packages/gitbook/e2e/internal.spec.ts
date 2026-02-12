@@ -513,7 +513,7 @@ const testCases: TestsCase[] = [
         tests: [
             {
                 name: 'Should resolve to the same page in the new language variant when switching language variant (Source English -> Target Dutch)',
-                url: 'yjs/ecosystem/connection-provider',
+                url: 'ecosystem/connection-provider',
                 screenshot: false,
                 run: async (page) => {
                     const spaceDropdown = page
@@ -543,7 +543,7 @@ const testCases: TestsCase[] = [
             },
             {
                 name: 'Should resolve to the same page in the new language variant when switching language variant (Source Dutch -> Target Finnish)',
-                url: 'yjs/nl/ecosysteem/connection-provider',
+                url: 'nl/ecosysteem/connection-provider',
                 screenshot: false,
                 run: async (page) => {
                     const spaceDropdown = page
