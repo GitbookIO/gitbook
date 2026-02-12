@@ -21,6 +21,7 @@ export type ButtonProps = {
     children?: React.ReactNode;
     active?: boolean;
     tooltipProps?: TooltipProps;
+    truncate?: boolean;
 } & LinkInsightsProps &
     React.HTMLAttributes<HTMLElement>;
 
@@ -115,6 +116,7 @@ export const Button = React.forwardRef<
             trailing,
             disabled,
             tooltipProps,
+            truncate = true,
             ...rest
         },
         ref
@@ -166,7 +168,14 @@ export const Button = React.forwardRef<
             <>
                 {iconElement}
                 {iconOnly || (!children && !label) ? null : (
-                    <span className="button-content truncate">{children ?? label}</span>
+                    <span
+                        className={tcls(
+                            'button-content',
+                            truncate ? 'truncate' : 'whitespace-normal text-start'
+                        )}
+                    >
+                        {children ?? label}
+                    </span>
                 )}
             </>
         );
