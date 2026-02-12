@@ -85,10 +85,11 @@ export type GitBookGlobal = {
     registerCookieBanner: (handler: GitBookCookieBannerHandler) => void;
 
     /**
-     * Whether the user has granted cookie consent.
-     * Returns true if cookies are granted, false if rejected or unknown.
+     * Indicates whether cookies tracking is disabled for the current user.
+     * Returns `true` when tracking is disabled, `false` when tracking is enabled,
+     * and `undefined` when the tracking preference is unknown or not yet determined.
      */
-    hasApprovedCookies: () => boolean;
+    isCookiesTrackingDisabled: () => boolean | undefined;
 };
 
 declare global {
