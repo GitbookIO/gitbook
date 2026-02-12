@@ -224,7 +224,7 @@ export function AIChatBody(props: {
         <>
             <ScrollContainer
                 className="shrink grow basis-80 animate-fade-in-slow [container-type:size]"
-                contentClassName="p-4 gutter-stable flex flex-col gap-4"
+                contentClassName="p-4 embed:px-0 gutter-stable flex flex-col gap-4"
                 orientation="vertical"
                 trailing={{ fade: false, button: true }}
                 active={`#message-group-${chat.messages.filter((message) => message.role === 'user').length - 1}`}
@@ -272,7 +272,7 @@ export function AIChatBody(props: {
                 )}
             </ScrollContainer>
 
-            <div className="flex flex-col gap-2 px-4 pb-4">
+            <div className="flex flex-col gap-2 not-embed:px-4 pb-4">
                 {/* Display an error banner when something went wrong. */}
                 {chat.error ? <AIChatError chatController={chatController} /> : null}
 
