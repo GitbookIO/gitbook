@@ -36,36 +36,29 @@ export function HideToolbarButton(props: HideToolbarButtonProps) {
     const [open, setOpen] = React.useState(false);
     const [closing, setClosing] = React.useState(false);
     const controls = useToolbarControls();
-    const closingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const closingTimeoutRef = useRef(0);
 
     const ref = useRef<HTMLDivElement>(null);
     const buttonRef = useRef<HTMLDivElement>(null);
 
-    const close = React.useCallback(() => {
+    const closeArcMenu = React.useCallback(() => {
         if (!open || closing) return;
         setClosing(true);
 
         // Clear any existing timeout
-        if (closingTimeoutRef.current) {
-            clearTimeout(closingTimeoutRef.current);
-        }
+        window.clearTimeout(closingTimeoutRef.current);
 
         // Wait for the exit animation to complete before unmounting
         const totalDuration = ARC_PARAMS.durationSeconds * 1000 + 3 * ARC_PARAMS.staggerMs;
-        closingTimeoutRef.current = setTimeout(() => {
+        closingTimeoutRef.current = window.setTimeout(() => {
             setOpen(false);
             setClosing(false);
-            closingTimeoutRef.current = null;
         }, totalDuration);
     }, [open, closing]);
 
     // Clean up timeout on unmount
     React.useEffect(() => {
-        return () => {
-            if (closingTimeoutRef.current) {
-                clearTimeout(closingTimeoutRef.current);
-            }
-        };
+        return () => window.clearTimeout(closingTimeoutRef.current);
     }, []);
 
     const handleClickOutsideArcMenu = (event: Event) => {
@@ -73,7 +66,7 @@ export function HideToolbarButton(props: HideToolbarButtonProps) {
         if (buttonRef.current?.contains(event.target as Node)) {
             return;
         }
-        close();
+        closeArcMenu();
     };
     // @ts-expect-error wrong type for ref
     useOnClickOutside(ref, handleClickOutsideArcMenu);
@@ -82,7 +75,7 @@ export function HideToolbarButton(props: HideToolbarButtonProps) {
     React.useEffect(() => {
         if (!open) return;
 
-        const handleClose = () => close();
+        const handleClose = () => closeArcMenu();
         window.addEventListener('scroll', handleClose, { passive: true });
         window.addEventListener('resize', handleClose, { passive: true });
 
@@ -90,7 +83,7 @@ export function HideToolbarButton(props: HideToolbarButtonProps) {
             window.removeEventListener('scroll', handleClose);
             window.removeEventListener('resize', handleClose);
         };
-    }, [open, close]);
+    }, [open, closeArcMenu]);
 
     const items = [
         controls?.minimize
@@ -136,7 +129,7 @@ export function HideToolbarButton(props: HideToolbarButtonProps) {
             }
             onClick={() => {
                 if (open || closing) {
-                    close();
+                    closeArcMenu();
                 } else {
                     setOpen(true);
                 }
@@ -174,7 +167,7 @@ export function HideToolbarButton(props: HideToolbarButtonProps) {
                                 closing={closing}
                                 {...item}
                                 onClick={() => {
-                                    close();
+                                    closeArcMenu();
                                     item.onClick?.();
                                 }}
                             />

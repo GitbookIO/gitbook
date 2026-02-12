@@ -313,10 +313,6 @@ function ToolbarButtonWrapper(props: {
     });
 }
 
-export function ToolbarSeparator() {
-    return <div className="h-5 w-px bg-tint-1/3" />;
-}
-
 export function ToolbarTitle(props: { prefix?: string; suffix: string }) {
     return (
         <div className="flex items-center gap-1 text-xs ">
@@ -341,7 +337,7 @@ function ToolbarTitleSuffix(props: { title: string }) {
     return (
         <motion.span
             {...getCopyVariants(1)}
-            className="max-w-[20ch] truncate text-neutral-1 dark:text-neutral-12"
+            className="max-w-[20ch] truncate font-bold text-neutral-1 dark:text-neutral-12"
         >
             {props.title}
         </motion.span>

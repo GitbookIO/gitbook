@@ -17,6 +17,7 @@ export function ToolbarDate(props: { value: string }) {
     const { value } = props;
     const language = useLanguage();
     const [formatIndex, setFormatIndex] = React.useState(0);
+    const [hovered, setHovered] = React.useState(false);
 
     const format = DATE_FORMATS[formatIndex] as DateFormat;
 
@@ -33,22 +34,39 @@ export function ToolbarDate(props: { value: string }) {
     }, [format, language.locale, value]);
 
     return (
-        <div className="inline-flex items-center gap-1">
+        <motion.div
+            className="inline-flex items-center gap-1"
+            onMouseEnter={() => setHovered(true)}
+            onMouseLeave={() => setHovered(false)}
+        >
             {/* Vertical dots indicating cycleable formats */}
-            <div className="flex flex-col items-center gap-[1px]">
-                {DATE_FORMATS.map((fmt, i) => (
-                    <motion.span
-                        key={fmt}
-                        animate={{
-                            opacity: i === formatIndex ? 1 : 0.3,
-                            scale: i === formatIndex ? 1 : 0.75,
-                        }}
+            <AnimatePresence>
+                {hovered && (
+                    <motion.div
+                        initial={{ width: 0, opacity: 0 }}
+                        animate={{ width: 'auto', opacity: 1 }}
+                        exit={{ width: 0, opacity: 0 }}
                         transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-                        className="block size-[3px] rounded-full bg-current"
-                    />
-                ))}
-            </div>
-            <time
+                        className="overflow-hidden"
+                    >
+                        <div className="flex flex-col items-center gap-[1px]">
+                            {DATE_FORMATS.map((fmt, i) => (
+                                <motion.span
+                                    key={fmt}
+                                    animate={{
+                                        opacity: i === formatIndex ? 1 : 0.3,
+                                        scale: i === formatIndex ? 1 : 0.75,
+                                    }}
+                                    transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+                                    className="block size-[3px] rounded-full bg-current"
+                                />
+                            ))}
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+            <motion.time
+                layout="position"
                 data-visual-test="transparent"
                 suppressHydrationWarning={true}
                 dateTime={value}
@@ -56,7 +74,8 @@ export function ToolbarDate(props: { value: string }) {
                     e.stopPropagation();
                     setFormatIndex((i) => (i + 1) % DATE_FORMATS.length);
                 }}
-                className="relative inline-flex min-w-24 cursor-pointer select-none overflow-hidden font-semibold transition-colors hover:text-white" // `text-white` is used insead of dark-mode adapting values because the date is always in a dark-tinted toolbar
+                transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+                className="relative inline-flex cursor-pointer select-none overflow-hidden font-semibold transition-colors hover:text-white" // `text-white` is used insead of dark-mode adapting values because the date is always in a dark-tinted toolbar
             >
                 <AnimatePresence mode="popLayout" initial={false}>
                     <motion.span
@@ -69,7 +88,7 @@ export function ToolbarDate(props: { value: string }) {
                         {formatted}
                     </motion.span>
                 </AnimatePresence>
-            </time>
-        </div>
+            </motion.time>
+        </motion.div>
     );
 }

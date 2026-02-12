@@ -1,6 +1,6 @@
 'use client';
 import { Icon } from '@gitbook/icons';
-import { MotionConfig } from 'motion/react';
+import { MotionConfig, motion } from 'motion/react';
 import { useCheckForContentUpdate } from '../AutoRefreshContent';
 import { useVisitorSession } from '../Insights';
 import { useCurrentPagePath } from '../hooks';
@@ -13,7 +13,6 @@ import {
     ToolbarButton,
     ToolbarButtonGroup,
     type ToolbarButtonProps,
-    ToolbarSeparator,
     ToolbarSubtitle,
     ToolbarTitle,
 } from './Toolbar';
@@ -141,13 +140,12 @@ function ChangeRequestToolbar(props: ToolbarViewProps) {
                 <ToolbarSubtitle
                     subtitle={
                         <>
-                            <ToolbarDate value={changeRequest.updatedAt} /> by {author}
+                            <ToolbarDate value={changeRequest.updatedAt} />{' '}
+                            <motion.span layout="position">by {author}</motion.span>
                         </>
                     }
                 />
             </ToolbarBody>
-
-            <ToolbarSeparator />
 
             <ToolbarActions>
                 {/* Refresh to retrieve latest changes */}
@@ -209,16 +207,9 @@ function RevisionToolbar(props: ToolbarViewProps) {
     return (
         <Toolbar minified={minified} onMinifiedChange={onMinifiedChange}>
             <ToolbarBody>
-                <ToolbarTitle prefix="Site version" suffix={context.site.title} />
-                <ToolbarSubtitle
-                    subtitle={
-                        <>
-                            Created <ToolbarDate value={revision.createdAt} />
-                        </>
-                    }
-                />
+                <ToolbarTitle prefix="Prior version of " suffix={context.site.title} />
+                <ToolbarSubtitle subtitle={<ToolbarDate value={revision.createdAt} />} />
             </ToolbarBody>
-            <ToolbarSeparator />
             <ToolbarActions>
                 {/* Open commit in Git client */}
                 <ToolbarButton
@@ -285,7 +276,6 @@ function AuthenticatedUserToolbar(props: ToolbarViewProps) {
                 <ToolbarTitle suffix={context.site.title} />
                 <ToolbarSubtitle subtitle={<ToolbarDate value={revision.createdAt} />} />
             </ToolbarBody>
-            <ToolbarSeparator />
             <ToolbarActions>
                 {/* Refresh to retrieve latest changes */}
                 {updated ? <RefreshContentButton refreshForUpdates={refreshForUpdates} /> : null}
