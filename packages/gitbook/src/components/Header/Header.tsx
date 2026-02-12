@@ -63,9 +63,9 @@ export function Header(props: {
         >
             <div
                 className={tcls(
-                    'theme-bold:bg-header-background',
-                    'theme-bold:shadow-[0px_1px_0px]',
-                    'theme-bold:shadow-tint-12/2'
+                    'site-header:theme-bold:bg-header-background',
+                    'site-header:theme-bold:shadow-[0px_1px_0px]',
+                    'site-header:theme-bold:shadow-tint-12/2'
                 )}
             >
                 <div className="transition-all duration-300 lg:chat-open:pr-80 xl:chat-open:pr-96">
@@ -100,9 +100,9 @@ export function Header(props: {
                                 className={tcls(
                                     '-ml-2',
                                     'text-tint-strong',
-                                    'theme-bold:text-header-link',
+                                    'site-header:theme-bold:text-header-link',
                                     'hover:bg-tint-hover',
-                                    'hover:theme-bold:bg-header-link/3',
+                                    'hover:site-header:theme-bold:bg-header-link/3',
                                     variants.generic.length > 1
                                         ? 'lg:hidden'
                                         : 'page-no-toc:hidden lg:hidden'
@@ -191,7 +191,7 @@ export function Header(props: {
                                             ) ?? siteSpace
                                         }
                                         siteSpaces={variants.translations}
-                                        className="flex! theme-bold:text-header-link hover:theme-bold:bg-header-link/3"
+                                        className="flex! site-header:theme-bold:text-header-link hover:site-header:theme-bold:bg-header-link/3"
                                     />
                                 ) : null}
                             </HeaderLinks>
