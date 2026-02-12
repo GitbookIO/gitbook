@@ -604,12 +604,12 @@ const config: Config = {
             addVariant('site-header', 'body:has(#site-header:not(.mobile-only)) &');
             addVariant('site-header-sections', [
                 'body:has(#site-header:not(.mobile-only) #sections) &',
-                // 'body:has(.page-no-toc):has(#site-header:not(.mobile-only) #variants) &',
             ]);
             addVariant(
                 'announcement',
                 'html:not(.announcement-hidden):has(#announcement-banner) &'
             );
+            addVariant('embed', 'html.embed &');
 
             addVariant('hydrated', 'html.hydrated:not(.route-change) &');
 

@@ -52,6 +52,7 @@ export async function TableOfContents(props: {
                     'border-tint-subtle',
 
                     'lg:flex!',
+                    'embed:lg:page-no-toc:hidden!',
                     'lg:animate-none!',
                     'lg:sticky',
                     'lg:mr-12',
@@ -72,10 +73,13 @@ export async function TableOfContents(props: {
                     'lg:site-header-sections:announcement:h-[calc(100vh-6.75rem-4.25rem)]',
 
                     // Client-side dynamic positioning (CSS vars applied by script)
-                    'lg:[html[style*="--toc-top-offset"]_&]:top-(--toc-top-offset)!',
-                    'lg:[html[style*="--toc-height"]_&]:h-(--toc-height)!',
-                    'lg:page-no-toc:[html[style*="--outline-top-offset"]_&]:top-(--outline-top-offset)!',
-                    'lg:page-no-toc:[html[style*="--outline-height"]_&]:top-(--outline-height)!',
+                    'lg:not-embed:[html[style*="--toc-top-offset"]_&]:top-(--toc-top-offset)!',
+                    'lg:not-embed:[html[style*="--toc-height"]_&]:h-(--toc-height)!',
+                    'lg:page-no-toc:not-embed:[html[style*="--outline-top-offset"]_&]:top-(--outline-top-offset)!',
+                    'lg:page-no-toc:not-embed:[html[style*="--outline-height"]_&]:top-(--outline-height)!',
+
+                    'embed:top-0',
+                    'embed:h-full',
 
                     'pt-6 pb-4',
                     'supports-[-webkit-touch-callout]:pb-[env(safe-area-inset-bottom)]', // Override bottom padding on iOS since we have a transparent bottom bar

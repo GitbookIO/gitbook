@@ -29,7 +29,7 @@ export async function EmbeddableRootLayout({
     children,
 }: React.PropsWithChildren<EmbeddableRootLayoutProps>) {
     return (
-        <CustomizationRootLayout context={context}>
+        <CustomizationRootLayout context={context} htmlClassName="embed">
             <SiteLayoutClientContexts
                 forcedTheme={
                     context.customization.themes.toggeable
