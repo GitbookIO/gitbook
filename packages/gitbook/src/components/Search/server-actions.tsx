@@ -3,7 +3,7 @@
 import type { GitBookBaseContext, GitBookSiteContext } from '@/lib/context';
 import { resolvePageId } from '@/lib/pages';
 import { fetchServerActionSiteContext, getServerActionBaseContext } from '@/lib/server-actions';
-import { findSiteSpaceBy } from '@/lib/sites';
+import { findSiteSpaceBy, getSiteSectionTitle } from '@/lib/sites';
 import { filterOutNullable } from '@/lib/typescript';
 import type {
     Revision,
@@ -350,6 +350,7 @@ async function transformSitePageResult(
 ): Promise<OrderedComputedResult[]> {
     const { pageItem, spaceItem, spaceURL, siteSection, siteSectionGroup, siteSpace } = args;
     const { linker } = context;
+    const currentLanguage = siteSpace?.space.language;
 
     const page: ComputedPageResult = {
         type: 'page',
@@ -367,7 +368,7 @@ async function transformSitePageResult(
             },
             siteSection && {
                 icon: siteSection?.icon as IconName,
-                label: siteSection.title,
+                label: getSiteSectionTitle(siteSection, currentLanguage),
             },
             (siteSection?.siteSpaces?.filter(
                 // If a space is the only one in its langauge, it's a translation variant and we don't want to show it.

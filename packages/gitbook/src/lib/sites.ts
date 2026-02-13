@@ -1,5 +1,12 @@
 import type { GitBookSiteContext } from '@/lib/context';
-import type { SiteSection, SiteSectionGroup, SiteSpace, SiteStructure } from '@gitbook/api';
+import { filterOutNullable } from '@/lib/typescript';
+import {
+    type SiteSection,
+    type SiteSectionGroup,
+    type SiteSpace,
+    type SiteStructure,
+    TranslationLanguage,
+} from '@gitbook/api';
 import { joinPath } from './paths';
 import { flattenSectionsFromGroup } from './utils';
 
@@ -176,4 +183,43 @@ function findSiteSpaceByIdInSiteSpaces(
     predicate: (siteSpace: SiteSpace) => boolean
 ): SiteSpace | null {
     return siteSpaces.find(predicate) ?? null;
+}
+
+/**
+ * Check if a siteSection has variants with multiple languages.
+ */
+function hasMultipleLanguagesInVariants(siteSection: SiteSection): boolean {
+    if (!siteSection.siteSpaces || siteSection.siteSpaces.length < 2) {
+        return false;
+    }
+
+    const languages = new Set(
+        siteSection.siteSpaces.map((space) => space.space.language).filter(filterOutNullable)
+    );
+
+    return languages.size > 1;
+}
+
+/**
+ * Get the appropriate title for a siteSection.
+ * Uses localizedTitle if the section has variants with multiple languages, otherwise uses title.
+ */
+export function getSiteSectionTitle(
+    siteSection: SiteSection,
+    currentLanguage: TranslationLanguage | undefined
+): string {
+    const hasMultipleLanguages = hasMultipleLanguagesInVariants(siteSection);
+
+    if (hasMultipleLanguages && siteSection.localizedTitle) {
+        // Use localizedTitle if available and section has multiple languages
+        if (currentLanguage && siteSection.localizedTitle[currentLanguage]) {
+            return siteSection.localizedTitle[currentLanguage];
+        }
+        // Fallback to 'en' if current language not found, or to title if 'en' not available
+        if (siteSection.localizedTitle[TranslationLanguage.En]) {
+            return siteSection.localizedTitle[TranslationLanguage.En];
+        }
+    }
+
+    return siteSection.title;
 }
