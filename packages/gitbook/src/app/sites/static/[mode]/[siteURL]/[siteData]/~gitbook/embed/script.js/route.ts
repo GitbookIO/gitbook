@@ -24,10 +24,21 @@ export async function GET(
 (function () {
   const w = window;
   const gb = w.GitBook;
+
+  function getScriptToken() {
+    const script = document.currentScript;
+    if (!script) {
+      return null;
+    }
+    return script.getAttribute('data-jwt-token');
+  }
+
+  const token = getScriptToken()
   const initOptions = window.gitbookSettings || ${JSON.stringify(initOptions)};
+  const initFrameOptions = token ? { visitor: { token } } : undefined;
 
   if (typeof gb === "function") {
-    gb('init', initOptions);
+    gb('init', initOptions, initFrameOptions);
   } else {
     var d = document;
 
@@ -40,7 +51,7 @@ export async function GET(
     };
     w.GitBook = g;
 
-    g('init', initOptions);
+    g('init', initOptions, initFrameOptions);
 
     const load = function () {
       const style = document.createElement('link');
