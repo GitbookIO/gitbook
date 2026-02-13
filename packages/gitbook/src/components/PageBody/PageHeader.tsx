@@ -12,6 +12,7 @@ import {
 } from '../PageActions/PageActionsDropdown';
 import { PageIcon } from '../PageIcon';
 import { StyledLink } from '../primitives';
+import { PageTags } from './PageTags';
 
 export async function PageHeader(props: {
     context: GitBookSiteContext;
@@ -128,16 +129,19 @@ export async function PageHeader(props: {
                         'leading-tight',
                         'font-bold',
                         'flex',
+                        'flex-wrap',
                         'items-center',
-                        'gap-[.5em]',
+                        'gap-y-2',
                         'grow',
                         'text-pretty',
                         'clear-right',
-                        'xs:clear-none'
+                        'xs:clear-none',
+                        '[&>[data-tag]:first-of-type]:ml-4' // we replaced the gap with margins, as we dont want tags rendered in 1 container since the UX of having multiple tags wrap one by one is much better than having to wrap them all at once at a much larger viewport.
                     )}
                 >
-                    <PageIcon page={page} style={['text-tint-subtle ', 'shrink-0']} />
+                    <PageIcon page={page} style={['text-tint-subtle ', 'shrink-0', 'mr-[.5em]']} />
                     {page.title}
+                    <PageTags page={page} revision={revision} />
                 </h1>
             ) : null}
             {page.description && page.layout.description ? (
