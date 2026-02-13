@@ -1,5 +1,11 @@
 # @gitbook/embed
 
+## 0.2.2
+
+### Patch Changes
+
+- b4b471f: Fix unexpected error thrown when using the embed in standalone mode
+
 ## 0.2.1
 
 ### Patch Changes
