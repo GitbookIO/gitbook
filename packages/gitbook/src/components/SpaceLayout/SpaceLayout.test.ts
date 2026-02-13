@@ -98,16 +98,15 @@ describe('categorizeVariants', () => {
         ]);
     });
 
-    it('keeps one-per-language translations when there are more than 1 language and an undefined language', () => {
+    it('treats undefined language as English when mixed with translated spaces', () => {
         const ctx = makeContext(englishA, [englishA, frenchA, undefinedLanguage]);
 
         const result = categorizeVariants(ctx);
 
-        expect(result.generic.map((s) => s.id)).toEqual(['en-a']);
+        expect(result.generic.map((s) => s.id)).toEqual(['en-a', 'undefined']);
         expect(result.translations.map((s) => ({ id: s.id, title: s.title }))).toEqual([
             { id: 'en-a', title: 'Docs EN A' },
             { id: 'fr-a', title: 'Docs FR A' },
-            { id: 'undefined', title: 'Docs in Undefined Language' },
         ]);
     });
 
@@ -139,11 +138,10 @@ describe('categorizeVariants', () => {
 
         const result = categorizeVariants(ctx);
 
-        expect(result.generic.map((s) => s.id)).toEqual(['en-a', 'en-b']);
+        expect(result.generic.map((s) => s.id)).toEqual(['en-a', 'en-b', 'undefined']);
         expect(result.translations.map((s) => ({ id: s.id, title: s.title }))).toEqual([
             { id: 'en-a', title: languages.en.language },
             { id: 'fr-a', title: languages.fr.language },
-            { id: 'undefined', title: 'Docs in Undefined Language' },
             { id: 'unsupported', title: 'Docs in Unsupported Language' },
         ]);
     });
