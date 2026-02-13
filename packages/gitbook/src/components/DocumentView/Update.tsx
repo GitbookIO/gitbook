@@ -1,7 +1,9 @@
 import { formatDateFull, formatDateShort, formatNumericDate } from '@/components/utils/dates';
+import { getRevisionTags, resolveBlockTags } from '@/lib/tags';
 import { tcls } from '@/lib/tailwind';
 import type { DocumentBlockUpdate, DocumentBlockUpdates } from '@gitbook/api';
 import { assert } from 'ts-essentials';
+import { Tag } from '../Tag';
 import type { BlockProps } from './Block';
 import { Blocks } from './Blocks';
 
@@ -35,13 +37,12 @@ export function Update(props: BlockProps<DocumentBlockUpdate>) {
         short: formatDateShort(parsedDate),
     }[dateFormat];
 
+    // Resolve tags from the block data using revision-level tag definitions
+    const revisionTags = getRevisionTags(contextProps.context.contentContext?.revision);
+    const resolvedTags = resolveBlockTags(block.data.tags, revisionTags);
+
     return (
-        <div
-            className={tcls(
-                'relative flex flex-col gap-2 md:flex-row md:gap-4 lg:gap-12 xl:gap-20',
-                style
-            )}
-        >
+        <div className={tcls('relative flex flex-col gap-2 md:flex-row md:gap-4 lg:gap-8', style)}>
             <div
                 className={tcls(
                     // Date is only sticky on larger screens when we use flex-row layout, with 0px fallback to prevent flicker and flaky tests before JS sets the variable
@@ -55,6 +56,13 @@ export function Update(props: BlockProps<DocumentBlockUpdate>) {
                 >
                     {displayDate}
                 </time>
+                {resolvedTags.length > 0 ? (
+                    <div className="mt-2 flex flex-wrap gap-1.5">
+                        {resolvedTags.map((tag) => (
+                            <Tag key={tag.slug} label={tag.label} />
+                        ))}
+                    </div>
+                ) : null}
             </div>
             <Blocks
                 {...contextProps}
