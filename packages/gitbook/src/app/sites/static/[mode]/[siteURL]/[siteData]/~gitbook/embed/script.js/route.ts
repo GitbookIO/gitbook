@@ -25,15 +25,16 @@ export async function GET(
   const w = window;
   const gb = w.GitBook;
 
-  function getScriptToken() {
+  function getScriptSearchParams() {
     const script = document.currentScript;
-    if (!script) {
-      return null;
-    }
-    return script.getAttribute('data-jwt-token');
+    if (!script) return new URLSearchParams();
+
+    const url = new URL(script.src);
+    return url.searchParams;
   }
 
-  const token = getScriptToken()
+  const searchParams = getScriptSearchParams()
+  const token = searchParams.get('jwt_token');
   const initOptions = window.gitbookSettings || ${JSON.stringify(initOptions)};
   const initFrameOptions = token ? { visitor: { token } } : undefined;
 
