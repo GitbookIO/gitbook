@@ -1,5 +1,16 @@
 # gitbook
 
+## 0.22.1
+
+### Patch Changes
+
+- 5f66860: Use isCookiesTrackingDisabled for cookie consent integrations
+- 426aabe: Fix TOC header logo on bold themes
+- Updated dependencies [b4b471f]
+- Updated dependencies [5f66860]
+  - @gitbook/embed@0.2.2
+  - @gitbook/browser-types@0.1.5
+
 ## 0.22.0
 
 ### Minor Changes
