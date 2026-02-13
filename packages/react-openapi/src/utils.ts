@@ -2,7 +2,11 @@ import type { AnyObject, OpenAPIV3, OpenAPIV3_1 } from '@gitbook/openapi-parser'
 import type { OpenAPIUniversalContext } from './context';
 import { stringifyOpenAPI } from './stringifyOpenAPI';
 import { tString } from './translate';
-import type { OpenAPICustomSecurityScheme, OpenAPIOperationData } from './types';
+import type {
+    OpenAPICustomSecurityScheme,
+    OpenAPIOperationData,
+    OpenAPISecurityScope,
+} from './types';
 
 export function checkIsReference(input: unknown): input is OpenAPIV3.ReferenceObject {
     return typeof input === 'object' && !!input && '$ref' in input;
@@ -327,6 +331,7 @@ export type OperationSecurityInfo = {
     key: string;
     label: string;
     schemes: OpenAPICustomSecurityScheme[];
+    scopeAlternatives: OpenAPISecurityScope[][];
 };
 
 /**
@@ -345,18 +350,61 @@ export function extractOperationSecurityInfo(args: {
             key,
             label: key,
             schemes: [security],
+            scopeAlternatives: security.scopes?.length ? [security.scopes] : [],
         }));
     }
 
-    return securityRequirement.map((requirement, idx) => {
-        const schemeKeys = Object.keys(requirement);
+    const grouped = new Map<string, OperationSecurityInfo>();
 
-        return {
-            key: `security-${idx}`,
-            label: schemeKeys.join(' & '),
-            schemes: schemeKeys
-                .map((schemeKey) => securitiesMap.get(schemeKey))
-                .filter((s): s is OpenAPICustomSecurityScheme => s !== undefined),
-        };
+    securityRequirement.forEach((requirement) => {
+        const schemeKeys = Object.keys(requirement);
+        const label = schemeKeys.join(' & ');
+        const existing = grouped.get(label);
+        const schemes = schemeKeys
+            .map((schemeKey) => securitiesMap.get(schemeKey))
+            .filter((s): s is OpenAPICustomSecurityScheme => s !== undefined);
+        const scopesForRequirement = schemeKeys.flatMap((schemeKey) =>
+            resolveRequiredScopesForScheme(securitiesMap.get(schemeKey), requirement[schemeKey])
+        );
+
+        if (existing) {
+            existing.scopeAlternatives.push(scopesForRequirement);
+            if (!existing.schemes.length && schemes.length) {
+                existing.schemes = schemes;
+            }
+        } else {
+            grouped.set(label, {
+                key: `security-${grouped.size}`,
+                label,
+                schemes,
+                scopeAlternatives: [scopesForRequirement],
+            });
+        }
     });
+
+    return Array.from(grouped.values());
+}
+
+function resolveRequiredScopesForScheme(
+    security: OpenAPICustomSecurityScheme | undefined,
+    operationScopes: string[] | undefined
+): OpenAPISecurityScope[] {
+    if (!security || !operationScopes?.length) {
+        return [];
+    }
+
+    if (security.type === 'oauth2') {
+        const flows = security.flows ? Object.entries(security.flows) : [];
+        const resolved = flows.flatMap(([_, flow]) => {
+            return Object.entries(flow.scopes ?? {}).filter(([scope]) =>
+                operationScopes.includes(scope)
+            );
+        });
+
+        if (resolved.length) {
+            return resolved;
+        }
+    }
+
+    return operationScopes.map((scope) => [scope, undefined]);
 }
