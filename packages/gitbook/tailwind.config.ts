@@ -678,6 +678,11 @@ const config: Config = {
             addVariant('page-api-block', 'body:has(.openapi-block) &');
 
             /**
+             * Variant when the page contains an Updates block.
+             */
+            addVariant('page-updates-block', 'body:has(.updates-block) &');
+
+            /**
              * Variant when the page is displayed in print mode.
              */
             addVariant('print-mode', 'body:has(.print-mode) &');
