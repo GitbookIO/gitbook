@@ -43,9 +43,7 @@ export function categorizeVariants(context: GitBookSiteContext) {
         translationVariants = variantLanguages
             // Get the first space of each language.
             .map((variantLanguage) =>
-                translationVariants.find(
-                    (space) => toNormalizedLanguage(space) === variantLanguage
-                )
+                translationVariants.find((space) => toNormalizedLanguage(space) === variantLanguage)
             )
             // Filter out unmatched languages.
             .filter((space) => space !== undefined)
