@@ -106,9 +106,10 @@ export async function TableOfContents(props: {
                 {header}
                 <div // The actual sidebar, either shown with a filled bg or transparent.
                     className={tcls(
-                        innerHeader
-                            ? '-ms-5'
-                            : 'page-has-toc:-ms-5 xl:not-layout-full:page-no-toc:-ms-5',
+                        '-ms-5',
+                        !innerHeader
+                            ? 'xl:not-layout-full:page-no-toc:-ms-5 page-no-toc:ms-0'
+                            : null,
                         'relative flex min-h-0 grow flex-col border-tint-subtle',
 
                         'sidebar-filled:bg-tint-subtle',
