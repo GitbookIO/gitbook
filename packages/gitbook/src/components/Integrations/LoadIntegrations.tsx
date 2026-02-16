@@ -1,6 +1,7 @@
 'use client';
 
 import { isCookiesTrackingDisabled, setCookiesTracking } from '@/components/Insights';
+import { isAIUserAgent } from '@/lib/browser';
 import type {
     GitBookGlobal,
     GitBookIntegrationEvent,
@@ -86,6 +87,11 @@ if (typeof window !== 'undefined') {
             };
         },
         registerCookieBanner: (handler) => {
+            // Do not register cookie banner for AI UserAgents (crawlers, AI-assisted browsers)
+            if (isAIUserAgent()) {
+                return;
+            }
+
             customCookieBannerStore.setState((state) => ({
                 ...state,
                 hasCustomCookieBanner: true,
