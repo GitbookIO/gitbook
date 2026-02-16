@@ -22,7 +22,7 @@ const AI_USER_AGENT_PATTERNS = [
     'Perplexity-User',
     'ChatGLM-Spider/1.0',
     'Cohere-ai/1.0',
-    'Phindbot.1.0',
+    'PhindBot/1.0',
     'PoeBot',
     'Tongyibot/1.0',
     'Yanbaobot/1.0',
@@ -54,11 +54,6 @@ const AI_USER_AGENT_PATTERNS = [
     'LinerBot',
     'MistralAI-User',
     'PanguBot',
-    'cohere-ai/1.0',
-    'anthropic-ai/1.0',
-    'Bytespider/1.0',
-    'TongyiBot/1.0',
-    'YanbaoBot/1.0',
 ];
 
 /**
