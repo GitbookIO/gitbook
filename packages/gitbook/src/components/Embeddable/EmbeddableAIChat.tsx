@@ -10,7 +10,7 @@ import {
 } from '@/components/AIChat';
 import { useLanguage } from '@/intl/client';
 import * as api from '@gitbook/api';
-import React, { useMemo } from 'react';
+import React, { use, useMemo } from 'react';
 import { useTrackEvent } from '../Insights';
 import { LinkContext, type LinkContextType } from '../primitives';
 import {
@@ -65,12 +65,18 @@ export function EmbeddableAIChat(props: EmbeddableAIChatProps) {
 
     const tabsRef = React.useRef<HTMLDivElement>(null);
     const hasDocsTab = configuration.tabs.includes('docs');
+    const currentLinkContext = use(LinkContext);
     const linkContext: LinkContextType = useMemo(
         () =>
             hasDocsTab
-                ? { externalTarget: '_blank' }
-                : { isExternal: () => true, externalTarget: '_blank' },
-        [hasDocsTab]
+                ? { ...currentLinkContext, externalTarget: '_blank' }
+                : {
+                      ...currentLinkContext,
+                      isExternalClient: () => true,
+                      isExternalServer: () => true,
+                      externalTarget: '_blank',
+                  },
+        [hasDocsTab, currentLinkContext]
     );
 
     return (

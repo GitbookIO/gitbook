@@ -38,6 +38,7 @@ export async function EmbeddableRootLayout({
                 }
                 externalLinksTarget={context.customization.externalLinks.target}
                 contextId={context.contextId}
+                proxyOrigin={context.site.proxy?.origin}
             >
                 <AIContextProvider
                     aiMode={context.customization.ai.mode}
