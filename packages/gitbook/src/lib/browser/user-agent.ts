@@ -56,14 +56,23 @@ const AI_USER_AGENT_PATTERNS = [
     'PanguBot',
 ];
 
+let cachedIsAIUserAgent: boolean | undefined;
+
 /**
  * Returns true if the current User-Agent appears to be an AI crawler or AI-assisted browser.
  * Used to hide cookie banners and avoid showing consent UI to non-human viewers.
+ * The result is cached globally since the user-agent never changes during a session.
  */
 export function isAIUserAgent(): boolean {
+    if (cachedIsAIUserAgent !== undefined) {
+        return cachedIsAIUserAgent;
+    }
     if (typeof navigator === 'undefined' || !navigator.userAgent) {
         return false;
     }
     const ua = navigator.userAgent.toLowerCase();
-    return AI_USER_AGENT_PATTERNS.some((pattern) => ua.includes(pattern.toLowerCase()));
+    cachedIsAIUserAgent = AI_USER_AGENT_PATTERNS.some((pattern) =>
+        ua.includes(pattern.toLowerCase())
+    );
+    return cachedIsAIUserAgent;
 }
