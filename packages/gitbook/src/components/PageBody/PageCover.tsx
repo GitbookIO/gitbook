@@ -103,6 +103,9 @@ export async function PageCover(props: {
                                     '2xl:not-layout-full:rounded-corners:rounded-b-xl',
                                 ]
                               : [
+                                    // In layout-wide, extend cover to account for outline sidebar on the right
+                                    '2xl:layout-wide:-mr-[min(calc((100vw-96rem)/2+2rem),19rem)]',
+
                                     // Round the bottom left corner once the sidebar is shown next to it
                                     'lg:rounded-corners:rounded-bl-xl',
                                     'lg:circular-corners:rounded-bl-3xl',
