@@ -1,6 +1,10 @@
 import { type JwtPayload, jwtDecode } from 'jwt-decode';
 import { type NextRequest, NextResponse } from 'next/server';
 import hash from 'object-hash';
+import {
+    getVisitorTokenForOAuthProtectedResource,
+    isOAuthProtectedResourceRequest,
+} from './oauth-protected';
 
 const VISITOR_AUTH_PARAM = 'jwt_token';
 const VISITOR_PARAM_PREFIX = 'visitor.';
@@ -74,6 +78,11 @@ export type VisitorTokenLookup =
           source: 'gitbook-visitor-cookie';
           token: string;
       }
+    | {
+          /** A visitor token provided by an OAuth client for protected resource (e.g MCP client). */
+          source: 'oauth-protected';
+          token: string;
+      }
     /** Not visitor token was found */
     | undefined;
 
@@ -85,12 +94,14 @@ export type VisitorTokenLookup =
  */
 export function getVisitorData({
     cookies,
+    headers,
     url,
 }: {
     cookies: RequestCookies;
+    headers: Headers;
     url: URL | NextRequest['nextUrl'];
 }): VisitorDataLookup {
-    const visitorToken = getVisitorToken({ cookies, url });
+    const visitorToken = getVisitorToken({ cookies, headers, url });
     const unsignedClaims = getVisitorUnsignedClaims({ cookies, url });
     const visitorParamsCookie = getResponseCookieForVisitorParams(unsignedClaims.fromVisitorParams);
 
@@ -107,11 +118,18 @@ export function getVisitorData({
  */
 export function getVisitorToken({
     cookies,
+    headers,
     url,
 }: {
     cookies: RequestCookies;
+    headers: Headers;
     url: URL | NextRequest['nextUrl'];
 }): VisitorTokenLookup {
+    if (isOAuthProtectedResourceRequest(url)) {
+        const mcpVisitorToken = getVisitorTokenForOAuthProtectedResource({ url, headers });
+        return mcpVisitorToken ? { source: 'oauth-protected', token: mcpVisitorToken } : undefined;
+    }
+
     const fromUrl = url.searchParams.get(VISITOR_AUTH_PARAM);
 
     // Allow the empty string to come through
@@ -451,6 +469,7 @@ export function getVisitorAuthCookieMaxAge(decoded: JwtPayload): number {
 export function serveVisitorClaimsDataRequest(request: NextRequest, siteRequestURL: URL) {
     const { visitorToken, unsignedClaims } = getVisitorData({
         cookies: request.cookies.getAll(),
+        headers: request.headers,
         url: siteRequestURL,
     });
 

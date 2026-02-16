@@ -13,7 +13,11 @@ import {
 describe('getVisitorAuthToken', () => {
     it('should return the token from the query parameters', () => {
         expect(
-            getVisitorToken({ cookies: [], url: new URL('https://example.com?jwt_token=123') })
+            getVisitorToken({
+                cookies: [],
+                headers: new Headers(),
+                url: new URL('https://example.com?jwt_token=123'),
+            })
         ).toEqual({ source: 'url', token: '123' });
     });
 
@@ -25,6 +29,7 @@ describe('getVisitorAuthToken', () => {
                     value: getVisitorAuthCookieValue('/', '123'),
                 },
             ],
+            headers: new Headers(),
             url: new URL('https://example.com'),
         });
         assertVisitorAuthCookieValue(visitorAuth);
@@ -39,6 +44,7 @@ describe('getVisitorAuthToken', () => {
                     value: getVisitorAuthCookieValue('/', '123'),
                 },
             ],
+            headers: new Headers(),
             url: new URL('https://example.com/hello/world'),
         });
         assertVisitorAuthCookieValue(visitorAuth);
@@ -56,6 +62,7 @@ describe('getVisitorAuthToken', () => {
                     value: getVisitorAuthCookieValue('/hello/', '123'),
                 },
             ],
+            headers: new Headers(),
             url: new URL('https://example.com/hello/world'),
         });
         assertVisitorAuthCookieValue(visitorAuth);
@@ -70,6 +77,7 @@ describe('getVisitorAuthToken', () => {
                     value: getVisitorAuthCookieValue('/hello/v/space1/', '123'),
                 },
             ],
+            headers: new Headers(),
             url: new URL('https://example.com/hello/v/space1/cool'),
         });
         assertVisitorAuthCookieValue(visitorAuth);
@@ -80,6 +88,7 @@ describe('getVisitorAuthToken', () => {
         expect(
             getVisitorToken({
                 cookies: [],
+                headers: new Headers(),
                 url: new URL('https://example.com'),
             })
         ).toBeUndefined();
@@ -98,10 +107,53 @@ describe('getVisitorAuthToken', () => {
                     value: getVisitorAuthCookieValue('/hello/v/space1/', 'gotcha'),
                 },
             ],
+            headers: new Headers(),
             url: new URL('https://example.com/hello/space1/cool'),
         });
         assertVisitorAuthCookieValue(visitorAuth);
         expect(visitorAuth.token).toEqual('gotcha');
+    });
+
+    describe('MCP', () => {
+        it('should return token for MCP request when included in the auth header', () => {
+            expect(
+                getVisitorToken({
+                    cookies: [],
+                    headers: new Headers({
+                        Authorization: 'Bearer token-in-header',
+                    }),
+                    url: new URL('https://docs.acme.org/~gitbook/mcp'),
+                })
+            ).toEqual({
+                source: 'oauth-protected',
+                token: 'token-in-header',
+            });
+        });
+
+        it('should return token for MCP request when included in the URL', () => {
+            expect(
+                getVisitorToken({
+                    cookies: [],
+                    headers: new Headers(),
+                    url: new URL('https://docs.acme.org/~gitbook/mcp?access_token=token-in-query'),
+                })
+            ).toEqual({
+                source: 'oauth-protected',
+                token: 'token-in-query',
+            });
+        });
+
+        it('should not return token if not an MCP request and token in header and/or access_token query param', () => {
+            expect(
+                getVisitorToken({
+                    cookies: [],
+                    headers: new Headers({
+                        Authorization: 'Bearer token-in-header',
+                    }),
+                    url: new URL('https://docs.acme.org/?access_token=token-in-query'),
+                })
+            ).toBeUndefined();
+        });
     });
 });
 
