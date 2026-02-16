@@ -22,6 +22,30 @@ const testCases: TestsCase[] = [
                 },
             },
             {
+                name: 'should not show built-in banner when UserAgent is AI',
+                url: getCustomizationURL({
+                    privacyPolicy: {
+                        url: 'https://policies.gitbook.com/privacy/cookies',
+                    },
+                }),
+                screenshot: false,
+                run: async (page) => {
+                    // Override navigator.userAgent to simulate AI crawler (affects isAIUserAgent())
+                    await page.addInitScript(() => {
+                        Object.defineProperty(navigator, 'userAgent', {
+                            get: () =>
+                                'Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko); compatible; ChatGPT-User/1.0; +https://openai.com/bot',
+                            configurable: true,
+                        });
+                    });
+                    await page.reload();
+
+                    // Check that built-in banner is not visible for AI UserAgent
+                    const dialog = page.getByTestId('cookies-dialog');
+                    await expect(dialog).not.toBeVisible({ timeout: 5000 });
+                },
+            },
+            {
                 name: 'should not show built-in banner when custom banner is registered',
                 url: getCustomizationURL({
                     privacyPolicy: {
