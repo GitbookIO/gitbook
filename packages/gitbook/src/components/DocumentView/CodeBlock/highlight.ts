@@ -53,9 +53,6 @@ export type RenderedInline = {
     body: React.ReactNode;
 };
 
-const isSafari =
-    typeof navigator !== 'undefined' && /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-
 // Merge bundled Shiki themes with our custom themes so both are available to the highlighter
 const { getSingletonHighlighter } = createSingletonShorthands(
     createdBundledHighlighter<any, any>({
@@ -94,12 +91,8 @@ export async function highlight(
 ): Promise<HighlightTheme> {
     const langName = getBlockLang(block);
 
-    if (!langName || (isSafari && ['powershell', 'cpp'].includes(langName))) {
-        // Fallback to plain highlighting if
-        // - language is not found
-        // - TEMP : language is PowerShell or C++ and browser is Safari:
-        //   RegExp#[Symbol.search] throws TypeError when `lastIndex` isn’t writable
-        //   Fixed in upcoming Safari 18.6, remove when it'll be released - RND-7772
+    if (!langName) {
+        // Fallback to plain highlighting if language is not found
         return plainHighlight(block, inlines, options);
     }
 
