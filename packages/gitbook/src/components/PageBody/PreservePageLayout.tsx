@@ -3,12 +3,12 @@ import * as React from 'react';
 
 /**
  * This component preserves the layout of the page while loading a new one.
- * This approach is needed as page layout (full width block) is done using CSS (`body:has(.full-width)`),
+ * This approach is needed as page layout is done using CSS (`body:has(.layout-wide)`),
  * which becomes false while transitioning between the 2 page states:
  *
- * 1. Page 1 with full width block: `body:has(.layout-wide)` is true
+ * 1. Page 1 with wide layout: `body:has(.layout-wide)` is true
  * 2. Loading skeleton while transitioning to page 2: `body:has(.layout-wide)` is false
- * 3. Page 2 with full width block: `body:has(.layout-wide)` is true
+ * 3. Page 2 with wide layout: `body:has(.layout-wide)` is true
  *
  * This component ensures that the layout is preserved while transitioning between the 2 page states (in step 2).
  * It also preserves the page TOC state (page-has-toc/page-no-toc) to prevent logo sizing issues during navigation.

@@ -57,12 +57,18 @@ export async function TableOfContents(props: {
                     'lg:mr-12',
                     'lg:z-0',
 
-                    !innerHeader
+                    // We shrink down the sidebar to a narrow fixed element in a few limited cases:
+                    !innerHeader // Only if there's no innerHeader (no variant picker or search) — otherwise we show it as normal.
                         ? [
-                              'lg:layout-full:fixed',
-                              'lg:max-3xl:layout-full:w-12',
-                              'lg:layout-full:left-5',
-                              'lg:layout-full:z-30',
+                              // Layout-full means the page is made wide and the TOC is hidden, so the sidebar contains only a trademark.
+                              // We remove the empty sidebar so content can stretch wide.
+                              'layout-full:lg:fixed',
+                              'layout-full:lg:max-3xl:w-12',
+                              'layout-full:lg:left-5',
+                              'layout-full:lg:z-30',
+
+                              // In other cases the TOC gets hidden but the content is normal width. Since the page outline sidebar only appears on xl: and up,
+                              // the TOC causes a big empty space to the left of the content. We shrink it down between lg: and xl: to prevent this imbalance.
                               'page-no-toc:lg:max-xl:fixed',
                               'page-no-toc:lg:max-xl:w-12',
                               'page-no-toc:lg:max-xl:left-5',
@@ -106,9 +112,9 @@ export async function TableOfContents(props: {
                 {header}
                 <div // The actual sidebar, either shown with a filled bg or transparent.
                     className={tcls(
-                        '-ms-5',
+                        '-ms-5', // By default we shift the sidebar to the left to compensate for the PagesList padding.
                         !innerHeader
-                            ? 'xl:not-layout-full:page-no-toc:-ms-5 page-no-toc:ms-0'
+                            ? 'xl:not-layout-full:page-no-toc:-ms-5 page-no-toc:ms-0' // In some specific cases (see above) we undo this shift.
                             : null,
                         'relative flex min-h-0 grow flex-col border-tint-subtle',
 
@@ -148,6 +154,7 @@ export async function TableOfContents(props: {
                     </ScrollContainer>
                     {withTrademark && customization.trademark.enabled ? (
                         <>
+                            {/* Normal trademark shown when there's a TOC */}
                             <Trademark
                                 context={context}
                                 placement={SiteInsightsTrademarkPlacement.Sidebar}
@@ -159,6 +166,8 @@ export async function TableOfContents(props: {
                                 )}
                                 truncate={false}
                             />
+
+                            {/* IconOnly trademark shown when there's no TOC */}
                             <Trademark
                                 context={context}
                                 placement={SiteInsightsTrademarkPlacement.Sidebar}

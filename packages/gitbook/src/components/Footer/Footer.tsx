@@ -6,7 +6,7 @@ import { partition } from '@/lib/arrays';
 import { tcls } from '@/lib/tailwind';
 
 import { ThemeToggler } from '../ThemeToggler';
-import { CONTAINER_LAYOUT, CONTENT_LAYOUT } from '../layout';
+import { CONTAINER_STYLE, CONTENT_STYLE } from '../layout';
 import { FooterLinksGroup } from './FooterLinksGroup';
 import { SocialLink } from './SocialLink';
 
@@ -38,7 +38,7 @@ export function Footer(props: { context: GitBookSiteContext }) {
             <div className="motion-safe:transition-[padding] motion-safe:duration-300 lg:chat-open:pr-80 xl:chat-open:pr-96">
                 <div
                     className={tcls(
-                        CONTAINER_LAYOUT,
+                        CONTAINER_STYLE,
                         'px-4',
                         'py-8',
                         '@4xl:py-12',
@@ -48,7 +48,7 @@ export function Footer(props: { context: GitBookSiteContext }) {
                 >
                     <div
                         className={tcls(
-                            CONTENT_LAYOUT,
+                            CONTENT_STYLE,
                             'flex @xs:grid @4xl:max-w-none! flex-col justify-between gap-12',
                             'grid-cols-[auto_auto]',
                             '@4xl:grid-cols-[18rem_minmax(auto,48rem)_auto]',

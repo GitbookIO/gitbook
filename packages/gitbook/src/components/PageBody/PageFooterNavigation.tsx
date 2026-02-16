@@ -7,7 +7,7 @@ import { resolvePrevNextPages } from '@/lib/pages';
 import { tcls } from '@/lib/tailwind';
 
 import type { GitBookSiteContext } from '@/lib/context';
-import { CONTENT_LAYOUT } from '../layout';
+import { CONTENT_STYLE } from '../layout';
 import { Link, type LinkInsightsProps } from '../primitives';
 
 /**
@@ -29,7 +29,7 @@ export async function PageFooterNavigation(props: {
     return (
         <div
             className={tcls(
-                CONTENT_LAYOUT,
+                CONTENT_STYLE,
                 'flex',
                 'flex-col',
                 'md:flex-row',

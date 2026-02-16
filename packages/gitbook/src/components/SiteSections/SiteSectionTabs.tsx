@@ -8,7 +8,7 @@ import { Button, Link, ToggleChevron } from '@/components/primitives';
 import { tcls } from '@/lib/tailwind';
 import { findSectionInGroup } from '@/lib/utils';
 import { useIsMobile } from '../hooks/useIsMobile';
-import { CONTAINER_LAYOUT } from '../layout';
+import { CONTAINER_STYLE } from '../layout';
 import { ScrollContainer } from '../primitives/ScrollContainer';
 import { SectionIcon } from './SectionIcon';
 import type {
@@ -59,7 +59,7 @@ export function SiteSectionTabs(props: {
     return structure.length > 0 ? (
         <NavigationMenu.Root
             className={tcls(
-                CONTAINER_LAYOUT,
+                CONTAINER_STYLE,
                 'relative z-10 flex w-full flex-nowrap items-end',
                 'page-default-width:2xl:px-[calc((100%-1536px+4rem)/2)]',
                 className

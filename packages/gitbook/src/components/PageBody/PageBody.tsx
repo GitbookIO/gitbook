@@ -10,7 +10,7 @@ import { DocumentView, DocumentViewSkeleton } from '../DocumentView';
 import { TrackPageViewEvent } from '../Insights';
 import { PageFeedbackForm } from '../PageFeedback';
 import { CurrentPageProvider } from '../hooks/useCurrentPage';
-import { CONTENT_LAYOUT } from '../layout';
+import { CONTENT_STYLE } from '../layout';
 import { DateRelative, SuspenseLoadedHint } from '../primitives';
 import OptionalSuspense from './OptionalSuspense';
 import { PageBodyBlankslate } from './PageBodyBlankslate';
@@ -55,6 +55,8 @@ export function PageBody(props: {
           )
         : false;
 
+    // Determine if content should use wide layout (2-column or 1-column instead of 3-column)
+    // This happens when: (1) document has full-width blocks, OR (2) page layout is explicitly set to 'wide'
     const wideContent = document ? hasFullWidthBlock(document) : false;
     const wideLayout = wideContent || page.layout.width === 'wide';
     const language = getSpaceLanguage(context);
@@ -65,6 +67,10 @@ export function PageBody(props: {
             (page) => page.type !== 'document' || (page.type === 'document' && !page.hidden)
         ).length > 0;
 
+    // These flags determine the final layout mode via CSS variants:
+    // - layout-default: wideLayout=false → 3-column (TOC + Content + Outline)
+    // - layout-wide: wideLayout=true + pageHasToc=true → 2-column (TOC + Content)
+    // - layout-full: wideLayout=true + pageHasToc=false → 1-column (Content only)
     const pageHasToc = page.layout.tableOfContents && hasVisibleTOCItems;
     const pageHasOutline = page.layout.outline;
 
@@ -77,7 +83,7 @@ export function PageBody(props: {
                     // Allow words to break if they are too long.
                     'break-anywhere',
                     '@container',
-                    CONTENT_LAYOUT,
+                    CONTENT_STYLE,
                     pageHasToc ? 'page-has-toc' : 'page-no-toc',
                     pageHasOutline ? 'page-has-outline' : 'page-no-outline',
                     wideLayout ? 'layout-wide' : 'layout-default'
@@ -124,7 +130,7 @@ export function PageBody(props: {
                 {page.layout.metadata ? (
                     <div
                         className={tcls(
-                            CONTENT_LAYOUT,
+                            CONTENT_STYLE,
                             'mt-6 flex flex-row flex-wrap items-center gap-4 text-tint contrast-more:text-tint-strong'
                         )}
                     >
@@ -140,8 +146,14 @@ export function PageBody(props: {
                         {withPageFeedback ? (
                             <PageFeedbackForm
                                 className={
+                                    // Hide feedback form when outline is visible on desktop, but show it:
+                                    // - In layout-full when viewport is narrow (< 3xl)
+                                    // - In layout-wide when chat is open and viewport is narrow (< 2416px)
+                                    // - In layout-wide when viewport is narrow (< 4xl)
+                                    // - On xl screens when outline is hidden
+                                    // - On xl screens when chat is open and viewport is narrow (< 3xl)
                                     page.layout.outline
-                                        ? 'layout-full:max-[1768px]:flex layout-wide:chat-open:max-[2416px]:flex layout-wide:max-4xl:flex xl:hidden xl:max-3xl:chat-open:flex'
+                                        ? 'layout-full:max-3xl:flex layout-wide:chat-open:max-[2416px]:flex layout-wide:max-4xl:flex xl:hidden xl:max-3xl:chat-open:flex'
                                         : ''
                                 }
                                 pageId={page.id}

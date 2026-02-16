@@ -2,6 +2,7 @@ import type { DocumentBlock, JSONDocument } from '@gitbook/api';
 
 import { type ClassValue, tcls } from '@/lib/tailwind';
 
+import { CONTENT_STYLE } from '../layout';
 import { Block } from './Block';
 import type { DocumentContextProps } from './DocumentView';
 import { isBlockOffscreen } from './utils';
@@ -70,10 +71,8 @@ export function UnwrappedBlocks<TBlock extends DocumentBlock>(props: UnwrappedBl
                 key={node.key || `${node.type}-${index}`}
                 block={node}
                 style={[
-                    'mx-auto w-full decoration-primary/6',
-                    node.data && 'fullWidth' in node.data && node.data.fullWidth // If a block is set to full width, it can be wider than the page container.
-                        ? 'max-w-6xl'
-                        : 'max-w-3xl not-layout-default:max-w-full',
+                    CONTENT_STYLE,
+                    'decoration-primary/6',
                     !LIST_BLOCKS.includes(node.type) && 'print:break-inside-avoid',
                     blockStyle,
                 ]}

@@ -22,7 +22,7 @@ import { InsightsProvider, VisitorSessionProvider } from '../Insights';
 import { SearchContainer } from '../Search';
 import { SiteSectionList, encodeClientSiteSections } from '../SiteSections';
 import { CurrentContentProvider } from '../hooks';
-import { CONTAINER_LAYOUT } from '../layout';
+import { CONTAINER_STYLE } from '../layout';
 import { NavigationLoader } from '../primitives/NavigationLoader';
 import { SpaceLayoutContextProvider } from './SpaceLayoutContext';
 import { categorizeVariants } from './categorizeVariants';
@@ -121,6 +121,7 @@ export function SpaceLayout(props: SpaceLayoutProps) {
             <NavigationLoader />
             {customization.ai?.mode === CustomizationAIMode.Assistant ? <AIChat /> : null}
 
+            {/* Chat panel shifts content left when open */}
             <div className="motion-safe:transition-all motion-safe:duration-300 lg:chat-open:mr-80 xl:chat-open:mr-96">
                 <div
                     className={tcls(
@@ -128,7 +129,7 @@ export function SpaceLayout(props: SpaceLayoutProps) {
                         'flex-col',
                         'lg:flex-row',
                         'lg:justify-center',
-                        CONTAINER_LAYOUT,
+                        CONTAINER_STYLE,
                         'transition-[max-width] duration-300',
 
                         // Ensure the footer is display below the viewport even if the content is not enough

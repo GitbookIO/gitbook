@@ -672,9 +672,14 @@ const config: Config = {
 
             /**
              * Layout mode variants for controlling the page structure.
+             * These variants are applied via body:has() selectors, allowing CSS to respond to layout state.
+             *
              * - layout-default: 3-column layout (TOC + Content + Outline)
              * - layout-wide: 2-column layout (TOC + Content || Content + Outline)
              * - layout-full: 1-column layout (Content only)
+             *
+             * The layout classes are applied consistently through CONTENT_STYLE in layout.ts and preserved on the
+             * <header> element during navigation (see PreservePageLayout component).
              */
             addVariant('layout-default', 'body:has(.layout-default) &');
             addVariant('layout-wide', 'body:has(.layout-wide):has(.page-has-toc) & ');

@@ -1,6 +1,6 @@
 import type { GitBookSiteContext } from '@/lib/context';
 
-import { CONTAINER_LAYOUT, HEADER_HEIGHT_DESKTOP } from '@/components/layout';
+import { CONTAINER_STYLE, HEADER_HEIGHT_DESKTOP } from '@/components/layout';
 import { getSpaceLanguage, t } from '@/intl/server';
 import { tcls } from '@/lib/tailwind';
 import type { SiteSpace } from '@gitbook/api';
@@ -81,7 +81,7 @@ export function Header(props: {
                             'py-3',
                             'min-h-16',
                             'sm:h-16',
-                            CONTAINER_LAYOUT,
+                            CONTAINER_STYLE,
                             'transition-[max-width] duration-300',
                             '@container/header'
                         )}

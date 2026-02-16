@@ -50,10 +50,14 @@ export function PageAside(props: {
                 'xl:max-3xl:chat-open:hidden',
                 'mr-0',
 
+                // In layout-wide mode (2-column), hide outline when viewport is too narrow
+                // or when chat is open and viewport is narrow, to prevent layout overflow
                 'layout-wide:-mr-68',
                 'layout-wide:max-4xl:hidden',
                 'layout-wide:chat-open:max-[2416px]:hidden',
 
+                // In layout-full mode (1-column, no TOC), position outline as a fixed sidebar on the right
+                // Hide it on narrow viewports (< 3xl) to prevent overlap with content
                 'layout-full:max-3xl:hidden',
                 'layout-full:w-56',
                 'layout-full:fixed',

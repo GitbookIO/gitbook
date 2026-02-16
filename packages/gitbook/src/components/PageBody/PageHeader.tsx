@@ -11,7 +11,7 @@ import {
     type PageActionsDropdownURLs,
 } from '../PageActions/PageActionsDropdown';
 import { PageIcon } from '../PageIcon';
-import { CONTENT_LAYOUT } from '../layout';
+import { CONTENT_STYLE } from '../layout';
 import { StyledLink } from '../primitives';
 
 export async function PageHeader(props: {
@@ -53,7 +53,7 @@ export async function PageHeader(props: {
     return (
         <header
             className={tcls(
-                CONTENT_LAYOUT,
+                CONTENT_STYLE,
                 'mb-6',
                 'space-y-3',
                 hasAncestors ? 'page-has-ancestors' : 'page-no-ancestors'
