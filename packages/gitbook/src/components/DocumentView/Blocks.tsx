@@ -47,25 +47,6 @@ type UnwrappedBlocksProps<TBlock extends DocumentBlock> = DocumentContextProps &
     isOffscreen?: boolean;
 };
 
-/* Blocks that can be full width are automatically expanded on full-width pages.
- * Ideally we'd rely on the block type to determine if it can be full width, but
- * the block's `fullWidth` property does not differentiate between `undefined` and `false`.
- * So instead we hardcode a list of blocks that can be full width. */
-const FULL_WIDTH_BLOCKS: DocumentBlock['type'][] = [
-    'table',
-    'tabs',
-    'integration',
-    'openapi-operation',
-    'openapi-schemas',
-    'openapi-webhook',
-    'images',
-    'embed',
-    'columns',
-    'code',
-    'content-ref',
-    'hint',
-];
-
 const LIST_BLOCKS: DocumentBlock['type'][] = ['list-ordered', 'list-tasks', 'list-unordered'];
 
 /**
@@ -89,12 +70,11 @@ export function UnwrappedBlocks<TBlock extends DocumentBlock>(props: UnwrappedBl
                 key={node.key || `${node.type}-${index}`}
                 block={node}
                 style={[
-                    'mx-auto page-width-wide:mx-0 w-full decoration-primary/6',
-                    node.data && 'fullWidth' in node.data && node.data.fullWidth
-                        ? 'max-w-screen-xl'
-                        : 'max-w-3xl',
+                    'mx-auto w-full decoration-primary/6',
+                    node.data && 'fullWidth' in node.data && node.data.fullWidth // If a block is set to full width, it can be wider than the page container.
+                        ? 'max-w-6xl'
+                        : 'max-w-3xl not-layout-default:max-w-full',
                     !LIST_BLOCKS.includes(node.type) && 'print:break-inside-avoid',
-                    FULL_WIDTH_BLOCKS.includes(node.type) && 'page-width-wide:max-w-full',
                     blockStyle,
                 ]}
                 isEstimatedOffscreen={isOffscreen}

@@ -9,7 +9,6 @@ import type React from 'react';
 import { Footer } from '@/components/Footer';
 import { Header, HeaderLogo } from '@/components/Header';
 import { TableOfContents } from '@/components/TableOfContents';
-import { CONTAINER_STYLE } from '@/components/layout';
 import type { VisitorAuthClaims } from '@/lib/adaptive';
 import { GITBOOK_APP_URL } from '@/lib/env';
 import { tcls } from '@/lib/tailwind';
@@ -23,6 +22,7 @@ import { InsightsProvider, VisitorSessionProvider } from '../Insights';
 import { SearchContainer } from '../Search';
 import { SiteSectionList, encodeClientSiteSections } from '../SiteSections';
 import { CurrentContentProvider } from '../hooks';
+import { CONTAINER_LAYOUT } from '../layout';
 import { NavigationLoader } from '../primitives/NavigationLoader';
 import { SpaceLayoutContextProvider } from './SpaceLayoutContext';
 import { categorizeVariants } from './categorizeVariants';
@@ -128,8 +128,7 @@ export function SpaceLayout(props: SpaceLayoutProps) {
                         'flex-col',
                         'lg:flex-row',
                         'lg:justify-center',
-                        CONTAINER_STYLE,
-                        'site-width-wide:max-w-screen-4xl',
+                        CONTAINER_LAYOUT,
                         'transition-[max-width] duration-300',
 
                         // Ensure the footer is display below the viewport even if the content is not enough

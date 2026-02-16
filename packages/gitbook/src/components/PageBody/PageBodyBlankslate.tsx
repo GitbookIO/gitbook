@@ -10,6 +10,7 @@ import { resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
 import { PageIcon } from '../PageIcon';
+import { CONTENT_LAYOUT } from '../layout';
 
 /**
  * Blankslate when the page has no document or the document is empty.
@@ -76,15 +77,12 @@ export async function PageBodyBlankslate(props: {
     return (
         <div
             className={tcls(
+                CONTENT_LAYOUT,
                 'grid',
-                'max-w-3xl',
-                'page-width-wide:max-w-screen-2xl',
-                'w-full',
-                'mx-auto',
                 'gap-4',
                 'grid-cols-1',
                 'sm:grid-cols-2',
-                'md:page-width-wide:grid-cols-3'
+                'md:not-layout-default:grid-cols-3'
             )}
         >
             {pageElements}

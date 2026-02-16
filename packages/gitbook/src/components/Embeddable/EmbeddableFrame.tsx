@@ -1,6 +1,6 @@
 import { type ClassValue, tcls } from '@/lib/tailwind';
 import React from 'react';
-import { CONTAINER_STYLE } from '../layout';
+import { CONTAINER_LAYOUT } from '../layout';
 
 export type EmbeddableFrameProps = React.ComponentProps<'div'> & {
     children: React.ReactNode;
@@ -49,7 +49,7 @@ export function EmbeddableFrameHeader(props: {
         <div
             className={tcls(
                 'relative z-10 flex w-full not-hydrated:animate-blur-in-slow select-none items-center gap-2 py-2.5 text-tint-strong',
-                CONTAINER_STYLE,
+                CONTAINER_LAYOUT,
                 className
             )}
         >
@@ -76,7 +76,7 @@ export function EmbeddableFrameBody(props: {
         <div
             className={tcls(
                 'flex w-full flex-1 flex-col overflow-hidden',
-                CONTAINER_STYLE,
+                CONTAINER_LAYOUT,
                 className
             )}
         >

@@ -6,7 +6,7 @@ import type { ResolvedContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 import { type CustomizationAnnouncement, SiteInsightsLinkPosition } from '@gitbook/api';
 import { Icon, type IconName } from '@gitbook/icons';
-import { CONTAINER_STYLE } from '../layout';
+import { CONTAINER_LAYOUT } from '../layout';
 import { Button, Link } from '../primitives';
 import { LinkStyles } from '../primitives/styles';
 import { ANNOUNCEMENT_CSS_CLASS, ANNOUNCEMENT_STORAGE_KEY } from './constants';
@@ -35,7 +35,7 @@ export function AnnouncementBanner(props: {
             data-nosnippet=""
         >
             <div className="transition-all duration-300 lg:chat-open:pr-80 xl:chat-open:pr-96">
-                <div className={tcls('relative', CONTAINER_STYLE)}>
+                <div className={tcls('relative', CONTAINER_LAYOUT)}>
                     <Tag
                         href={contentRef?.href ?? ''}
                         className={tcls(

@@ -43,7 +43,7 @@ export function ScrollSectionsList({ sections }: { sections: DocumentSection[] }
 
     return (
         <ul
-            className="relative flex flex-col border-tint-subtle sidebar-list-line:border-l pb-5 xl:max-2xl:page-api-block:mt-0 xl:max-2xl:page-api-block:p-2"
+            className="relative flex flex-col border-tint-subtle sidebar-list-line:border-l pb-5"
             ref={scrollContainerRef}
         >
             {sections.map((section) => (
