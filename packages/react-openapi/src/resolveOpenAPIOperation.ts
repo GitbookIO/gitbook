@@ -121,12 +121,12 @@ function getServers(
     path: string,
     operation: OpenAPIV3.OperationObject
 ): OpenAPIV3.ServerObject[] {
-    if (operation.servers?.length) {
+    if ('servers' in operation && operation.servers) {
         return operation.servers;
     }
 
     const pathObject = getPathObject(schema, path);
-    if (pathObject?.servers?.length) {
+    if (pathObject && 'servers' in pathObject && pathObject.servers) {
         return pathObject.servers;
     }
 
