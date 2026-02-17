@@ -37,7 +37,7 @@ export async function resolveOpenAPIOperation(
         };
     }
 
-    const servers = 'servers' in schema ? (schema.servers ?? []) : [];
+    const servers = getServers(schema, path, operation);
     const schemaSecurity = Array.isArray(schema.security)
         ? schema.security
         : schema.security
@@ -110,6 +110,27 @@ function getPathObjectParameter(
         return pathObject.parameters;
     }
     return null;
+}
+
+/**
+ * Resolve servers for an operation following OpenAPI precedence rules.
+ * Per the spec, only the lowest-level servers array is used: operation > path > root.
+ */
+function getServers(
+    schema: OpenAPIV3.Document | OpenAPIV3_1.Document,
+    path: string,
+    operation: OpenAPIV3.OperationObject
+): OpenAPIV3.ServerObject[] {
+    if (operation.servers?.length) {
+        return operation.servers;
+    }
+
+    const pathObject = getPathObject(schema, path);
+    if (pathObject?.servers?.length) {
+        return pathObject.servers;
+    }
+
+    return 'servers' in schema ? (schema.servers ?? []) : [];
 }
 
 /**
