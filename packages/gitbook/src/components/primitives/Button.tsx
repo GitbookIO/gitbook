@@ -50,8 +50,8 @@ export const variantClasses = {
         'hover:not-disabled:text-tint-strong',
         'focus-visible:bg-tint-hover',
         'focus-visible:text-tint-strong',
-        'data-[state=open]:bg-tint-hover',
-        'data-[state=open]:text-tint-strong',
+        'aria-expanded:bg-tint-hover',
+        'aria-expanded:text-tint-strong',
         'contrast-more:bg-tint-subtle',
         'disabled:text-tint/8',
         'disabled:bg-transparent',
@@ -90,7 +90,7 @@ export const variantClasses = {
 
 export const activeClasses = {
     primary: 'bg-primary-solid-hover',
-    blank: 'bg-primary-active contrast-more:bg-primary-12 contrast-more:text-contrast-primary-12 disabled:bg-primary-active text-primary-strong font-medium hover:text-primary-strong disabled:text-primary-strong hover:bg-primary-active focus-visible:bg-primary-active focus-visible:text-primary-strong data-[state=open]:bg-primary-active data-[state=open]:text-primary-strong',
+    blank: 'bg-primary-active contrast-more:bg-primary-12 contrast-more:text-contrast-primary-12 disabled:bg-primary-active text-primary-strong font-medium hover:text-primary-strong disabled:text-primary-strong hover:bg-primary-active focus-visible:bg-primary-active focus-visible:text-primary-strong aria-expanded:bg-primary-active aria-expanded:text-primary-strong',
     secondary: 'bg-tint-active disabled:bg-tint-active',
     header: 'bg-header-link/3',
 };
