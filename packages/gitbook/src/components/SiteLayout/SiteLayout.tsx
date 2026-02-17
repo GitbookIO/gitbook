@@ -53,6 +53,7 @@ export async function SiteLayout(props: {
                 (customization.themes.toggeable ? undefined : customization.themes.default)
             }
             externalLinksTarget={customization.externalLinks.target}
+            proxyOrigin={context.site.proxy?.origin}
         >
             <AIContextProvider
                 aiMode={customization.ai?.mode}

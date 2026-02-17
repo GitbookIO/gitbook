@@ -4,6 +4,7 @@
  * @type {import('next').NextConfig}
  */
 const nextConfig = {
+    deploymentId: process.env.GITHUB_SHA || Date.now().toString(), // Needed because we use a custom deployment method i.e. https://vercel.com/docs/skew-protection#custom-deployment-id
     experimental: {
         // This is needed to throw "forbidden" when the api token expired during revalidation
         authInterrupts: true,

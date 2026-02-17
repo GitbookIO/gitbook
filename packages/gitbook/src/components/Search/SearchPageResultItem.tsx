@@ -55,7 +55,6 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
                         'font-normal',
                         'uppercase',
                         'leading-snug',
-                        'tracking-wider',
                         'mb-1',
                         'flex',
                         'flex-wrap',
