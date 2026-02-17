@@ -1,4 +1,4 @@
-import type { Site } from '@gitbook/api';
+import type { PublishedContentRedirect } from '@gitbook/api';
 import { type NextRequest, NextResponse } from 'next/server';
 import { GITBOOK_SITES_OAUTH_SERVER_URL, GITBOOK_URL } from './env';
 
@@ -26,10 +26,10 @@ const OAUTH_PROTECTED_RESOURCES: OAuthProtectedResource[] = [
  */
 export function handleUnauthedOAuthProtectedResourceRequest(args: {
     siteRequestURL: URL;
-    siteId: Site['id'];
+    siteURLData: Extract<PublishedContentRedirect, { target: 'external' }>;
     urlMode: 'url' | 'url-host';
 }) {
-    const { siteRequestURL, urlMode, siteId } = args;
+    const { siteRequestURL, urlMode, siteURLData } = args;
 
     // When the request is for the protected resource metadata return the info relative to the site.
     if (isOAuthProtectedResourceMetadataRequest(siteRequestURL)) {
@@ -40,7 +40,7 @@ export function handleUnauthedOAuthProtectedResourceRequest(args: {
 
         const protectedResourceMetadata = {
             resource: resourceUrl.toString().replace(OAUTH_PROTECTED_RESOURCE_METADATA_PATH, ''),
-            authorization_servers: [`${GITBOOK_SITES_OAUTH_SERVER_URL}/${siteId}`],
+            authorization_servers: [`${GITBOOK_SITES_OAUTH_SERVER_URL}/${siteURLData.site}`],
         };
         return NextResponse.json(protectedResourceMetadata);
     }

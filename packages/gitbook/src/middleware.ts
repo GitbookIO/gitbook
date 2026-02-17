@@ -236,7 +236,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
             ) {
                 return handleUnauthedOAuthProtectedResourceRequest({
                     siteRequestURL,
-                    siteId: siteURLData.site,
+                    siteURLData,
                     urlMode: mode,
                 });
             }

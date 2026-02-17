@@ -16,7 +16,11 @@ describe('OAuth protected resources flow', () => {
 
             const res = handleUnauthedOAuthProtectedResourceRequest({
                 siteRequestURL: url,
-                siteId: 'site_123',
+                siteURLData: {
+                    target: 'external',
+                    redirect: 'https://login.acme.org/oauth2',
+                    site: 'site_123',
+                },
                 urlMode: 'url-host',
             });
 
@@ -25,7 +29,7 @@ describe('OAuth protected resources flow', () => {
 
             const json = await res.json();
             expect(json).toEqual({
-                resource: url.toString(),
+                resource: 'https://docs.acme.org/~gitbook/mcp',
                 authorization_servers: ['https://sites.gitbook.com/oauth2/v1/site_123/'],
             });
         });
@@ -35,7 +39,11 @@ describe('OAuth protected resources flow', () => {
 
             const res = handleUnauthedOAuthProtectedResourceRequest({
                 siteRequestURL: url,
-                siteId: 'site_123',
+                siteURLData: {
+                    target: 'external',
+                    redirect: 'https://login.acme.org/oauth2',
+                    site: 'site_123',
+                },
                 urlMode: 'url-host',
             });
 
