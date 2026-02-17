@@ -30,7 +30,7 @@ describe('OAuth protected resources flow', () => {
             const json = await res.json();
             expect(json).toEqual({
                 resource: 'https://docs.acme.org/~gitbook/mcp',
-                authorization_servers: ['https://sites.gitbook.com/oauth2/v1/site_123/'],
+                authorization_servers: ['https://sites.gitbook.com/oauth2/v1/site_123'],
             });
         });
 
