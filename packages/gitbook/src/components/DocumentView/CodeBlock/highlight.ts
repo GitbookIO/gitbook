@@ -290,7 +290,7 @@ function matchTokenAndInlines(
     return result;
 }
 
-function getPlainCodeBlock(
+export function getPlainCodeBlock(
     code: DocumentBlockCode,
     inlines?: InlineIndexed[],
     options?: {

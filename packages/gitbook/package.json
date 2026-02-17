@@ -46,9 +46,11 @@
         "mdast-util-gfm": "^3.1.0",
         "mdast-util-to-markdown": "^2.1.2",
         "memoizee": "^0.4.17",
+        "mermaid": "^11.12.3",
         "micromark-extension-frontmatter": "^2.0.0",
         "micromark-extension-gfm": "^3.0.0",
         "motion": "^12.23.24",
+        "negotiator": "^1.0.0",
         "next": "15.4.11",
         "next-themes": "^0.4.6",
         "nuqs": "^2.2.3",
@@ -77,8 +79,7 @@
         "usehooks-ts": "catalog:",
         "warn-once": "^0.1.1",
         "zod": "^3",
-        "zustand": "^5.0.3",
-        "negotiator": "^1.0.0"
+        "zustand": "^5.0.3"
     },
     "devDependencies": {
         "@argos-ci/playwright": "^5.0.9",
