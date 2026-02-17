@@ -40,7 +40,7 @@ export function handleUnauthedOAuthProtectedResourceRequest(args: {
 
         const protectedResourceMetadata = {
             resource: resourceUrl.toString().replace(OAUTH_PROTECTED_RESOURCE_METADATA_PATH, ''),
-            authorization_servers: [`${GITBOOK_SITES_OAUTH_SERVER_URL}/${siteURLData.site}`],
+            authorization_servers: [`${GITBOOK_SITES_OAUTH_SERVER_URL}/${siteURLData.site}/`],
         };
         return NextResponse.json(protectedResourceMetadata);
     }
