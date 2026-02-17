@@ -33,9 +33,14 @@ export function handleUnauthedOAuthProtectedResourceRequest(args: {
 
     // When the request is for the protected resource metadata return the info relative to the site.
     if (isOAuthProtectedResourceMetadataRequest(siteRequestURL)) {
+        const resourceUrl =
+            urlMode === 'url-host'
+                ? siteRequestURL
+                : new URL(`/url/${siteRequestURL.host}${siteRequestURL.pathname}`, GITBOOK_URL);
+
         const protectedResourceMetadata = {
-            resource: siteRequestURL.toString(),
-            authorization_servers: [`${GITBOOK_SITES_OAUTH_SERVER_URL}/${siteId}/`],
+            resource: resourceUrl.toString().replace(OAUTH_PROTECTED_RESOURCE_METADATA_PATH, ''),
+            authorization_servers: [`${GITBOOK_SITES_OAUTH_SERVER_URL}/${siteId}`],
         };
         return NextResponse.json(protectedResourceMetadata);
     }

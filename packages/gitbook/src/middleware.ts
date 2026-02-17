@@ -13,7 +13,11 @@ import {
     normalizeURL,
     throwIfDataError,
 } from '@/lib/data';
-import { isGitBookAssetsHostURL, isGitBookHostURL } from '@/lib/env';
+import {
+    GITBOOK_SITES_OAUTH_SERVER_URL,
+    isGitBookAssetsHostURL,
+    isGitBookHostURL,
+} from '@/lib/env';
 import { getImageResizingContextId } from '@/lib/images';
 import { MiddlewareHeaders } from '@/lib/middleware';
 import { removeLeadingSlash, removeTrailingSlash } from '@/lib/paths';
@@ -28,6 +32,10 @@ import {
 import { serveResizedImage } from '@/routes/image';
 import { cookies } from 'next/headers';
 import type { SiteURLData } from './lib/context';
+import {
+    handleUnauthedOAuthProtectedResourceRequest,
+    isOAuthProtectedResourceRequest,
+} from './lib/oauth-protected';
 import { serveProxyAnalyticsEvent } from './lib/tracking';
 export const config = {
     matcher: [
@@ -160,11 +168,25 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         return serveVisitorClaimsDataRequest(request, siteRequestURL);
     }
 
+    // Handler that forwards redirections from upstream auth provider during a site's OAuth /authorize session
+    // back to the site's OAuth server.
+    const siteOAuthAuthorizeMatch = new URLPattern({
+        pathname: '*/~gitbook/oauth2/v1/:siteId/authorize',
+    }).exec(siteRequestURL.toString());
+    if (siteOAuthAuthorizeMatch) {
+        const siteOAuthAuthorizeURL = new URL(
+            `/oauth2/v1/${siteOAuthAuthorizeMatch.pathname.groups.siteId}/authorize?${siteOAuthAuthorizeMatch.search.input}`,
+            GITBOOK_SITES_OAUTH_SERVER_URL
+        );
+        return NextResponse.redirect(siteOAuthAuthorizeURL.toString());
+    }
+
     //
     // Detect and extract the visitor authentication token from the request
     //
     const { visitorToken, unsignedClaims, visitorParamsCookie } = getVisitorData({
         cookies: request.cookies.getAll(),
+        headers: request.headers,
         url: siteRequestURL,
     });
 
@@ -203,6 +225,22 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         // Handle redirects
         //
         if ('redirect' in siteURLData) {
+            /**
+             * When it is an unauthenticated request to an OAuth protected resources (like MCP) in an authenticated sites
+             * we handle it through an OAuth Protected Resource flow (RFC 9728).
+             */
+            if (
+                siteURLData.target === 'external' &&
+                !visitorToken &&
+                isOAuthProtectedResourceRequest(siteRequestURL)
+            ) {
+                return handleUnauthedOAuthProtectedResourceRequest({
+                    siteRequestURL,
+                    siteId: siteURLData.site,
+                    urlMode: mode,
+                });
+            }
+
             // When it is a server action, we cannot just return a redirect response as it may cause CORS issues on redirect.
             // For these cases, we return a 303 response with an `X-Action-Redirect` header that the client can handle.
             // This is what server actions do when returning a redirect response.
