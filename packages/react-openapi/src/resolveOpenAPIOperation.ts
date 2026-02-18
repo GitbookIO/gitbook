@@ -50,7 +50,7 @@ export async function resolveOpenAPIOperation(
     const flatSecurities = flattenSecurities(security);
 
     // Resolve securities
-    const securities: OpenAPIOperationData['securities'] = [];
+    const securitiesMap = new Map<string, OpenAPIOperationData['securities'][number][1]>();
     for (const entry of flatSecurities) {
         const [securityKey, operationScopes] = Object.entries(entry)[0] ?? [];
         if (securityKey) {
@@ -59,14 +59,13 @@ export async function resolveOpenAPIOperation(
                 securityScheme,
                 operationScopes,
             });
-            securities.push([
-                securityKey,
-                {
-                    ...securityScheme,
-                    required: !isOptionalSecurity,
-                    scopes,
-                },
-            ]);
+            const existing = securitiesMap.get(securityKey);
+            const mergedScopes = mergeSecurityScopes(existing?.scopes ?? null, scopes);
+            securitiesMap.set(securityKey, {
+                ...securityScheme,
+                required: !isOptionalSecurity,
+                scopes: mergedScopes,
+            });
         }
     }
 
@@ -75,7 +74,7 @@ export async function resolveOpenAPIOperation(
         operation: { ...operation, security },
         method,
         path,
-        securities,
+        securities: Array.from(securitiesMap.entries()),
         'x-codeSamples':
             typeof schema['x-codeSamples'] === 'boolean' ? schema['x-codeSamples'] : undefined,
         'x-hideTryItPanel':
@@ -195,6 +194,31 @@ function resolveSecurityScopes({
     }
 
     return operationScopes.map((scope) => [scope, undefined]);
+}
+
+function mergeSecurityScopes(
+    existing: OpenAPISecurityScope[] | null,
+    incoming: OpenAPISecurityScope[] | null
+): OpenAPISecurityScope[] | null {
+    if (!existing?.length) {
+        return incoming;
+    }
+    if (!incoming?.length) {
+        return existing;
+    }
+
+    const seen = new Set<string>();
+    const merged: OpenAPISecurityScope[] = [];
+
+    for (const scope of [...existing, ...incoming]) {
+        if (seen.has(scope[0])) {
+            continue;
+        }
+        seen.add(scope[0]);
+        merged.push(scope);
+    }
+
+    return merged;
 }
 
 /**
