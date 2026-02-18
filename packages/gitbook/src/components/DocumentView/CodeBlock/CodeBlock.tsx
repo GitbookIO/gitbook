@@ -12,6 +12,7 @@ import type { BlockProps } from '../Block';
 import { Blocks } from '../Blocks';
 import { ClientCodeBlock } from './ClientCodeBlock';
 import { CodeBlockRenderer } from './CodeBlockRenderer';
+import { MermaidCodeBlock } from './MermaidCodeBlock';
 import { type RenderedInline, getInlines, highlight } from './highlight';
 
 /**
@@ -33,6 +34,7 @@ export async function CodeBlock(
         themes: providedThemes,
     } = props;
     const inlines = getInlines(block);
+    const isMermaid = block.data.syntax?.toLowerCase() === 'mermaid';
 
     let hasInlineExpression = false;
 
@@ -74,7 +76,7 @@ export async function CodeBlock(
             ? context.contentContext.customization.styling.codeTheme[themeKey]
             : undefined);
 
-    if (!isEstimatedOffscreen && !hasInlineExpression && !block.data.expandable) {
+    if (!isMermaid && !isEstimatedOffscreen && !hasInlineExpression && !block.data.expandable) {
         // In v2, we render the code block server-side
         const theme = await highlight(block, richInlines, {
             themes: themes,
@@ -92,16 +94,22 @@ export async function CodeBlock(
           }
         : {};
 
+    const clientProps = {
+        block,
+        style,
+        inlines: richInlines,
+        inlineExprVariables: variables,
+        mode: context.mode,
+        themes,
+    };
+
     return (
         <React.Suspense fallback={null}>
-            <ClientCodeBlock
-                block={block}
-                style={style}
-                inlines={richInlines}
-                inlineExprVariables={variables}
-                mode={context.mode}
-                themes={themes}
-            />
+            {isMermaid ? (
+                <MermaidCodeBlock {...clientProps} />
+            ) : (
+                <ClientCodeBlock {...clientProps} />
+            )}
         </React.Suspense>
     );
 }
