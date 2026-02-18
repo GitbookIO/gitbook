@@ -38,7 +38,7 @@ export const ja = {
     available_items: '利用可能なアイテム',
     required_scopes: '必須スコープ',
     required_scopes_description: 'このエンドポイントには次のスコープが必要です：',
-    available_scopes: '利用可能なスコープ：',
+
     properties: 'プロパティ',
     or: 'または',
     and: 'かつ',
