@@ -1,10 +1,6 @@
 import { type JwtPayload, jwtDecode } from 'jwt-decode';
 import { type NextRequest, NextResponse } from 'next/server';
 import hash from 'object-hash';
-import {
-    getVisitorTokenForOAuthProtectedResource,
-    isOAuthProtectedResourceRequest,
-} from './oauth-protected';
 
 const VISITOR_AUTH_PARAM = 'jwt_token';
 const VISITOR_PARAM_PREFIX = 'visitor.';
@@ -80,7 +76,7 @@ export type VisitorTokenLookup =
       }
     | {
           /** A visitor token provided by an OAuth client for protected resource (e.g MCP client). */
-          source: 'oauth-protected';
+          source: 'visitor-oauth-protected';
           token: string;
       }
     /** Not visitor token was found */
@@ -125,9 +121,9 @@ export function getVisitorToken({
     headers: Headers;
     url: URL | NextRequest['nextUrl'];
 }): VisitorTokenLookup {
-    if (isOAuthProtectedResourceRequest(url)) {
-        const mcpVisitorToken = getVisitorTokenForOAuthProtectedResource({ url, headers });
-        return mcpVisitorToken ? { source: 'oauth-protected', token: mcpVisitorToken } : undefined;
+    const mcpVisitorToken = getVisitorTokenForOAuthProtectedResource({ url, headers });
+    if (mcpVisitorToken) {
+        return { source: 'visitor-oauth-protected', token: mcpVisitorToken };
     }
 
     const fromUrl = url.searchParams.get(VISITOR_AUTH_PARAM);
@@ -413,6 +409,31 @@ function getVisitorAuthTokenFromCookies(
 
     // couldn't find any token for the current URL
     return undefined;
+}
+
+/**
+ * Return a visitor token provided by a OAuth client for a protected resource (e.g MCP request).
+ */
+export function getVisitorTokenForOAuthProtectedResource(args: {
+    url: URL | NextRequest['nextUrl'];
+    headers: Headers;
+}) {
+    const { url, headers } = args;
+
+    // Check first if it is included in the headers otherwise fallback to query param.
+    const fromAuthHeader = headers.get('Authorization');
+    if (fromAuthHeader) {
+        const match = fromAuthHeader.match(/^Bearer\s+(.+)$/i);
+        if (match) {
+            const token = match[1]?.trim();
+            if (token) {
+                return token;
+            }
+        }
+    }
+
+    const fromAccessTokenParam = url.searchParams.get('access_token');
+    return fromAccessTokenParam;
 }
 
 /**

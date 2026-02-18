@@ -138,28 +138,3 @@ function getOAuthProtectedResourceMetadataPath(endpoint: string) {
     const normalizedEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
     return `${OAUTH_PROTECTED_RESOURCE_METADATA_PATH}${normalizedEndpoint}`;
 }
-
-/**
- * Return a visitor token provided by a OAuth client for a protected resource (e.g MCP request).
- */
-export function getVisitorTokenForOAuthProtectedResource(args: {
-    url: URL | NextRequest['nextUrl'];
-    headers: Headers;
-}) {
-    const { url, headers } = args;
-
-    // Check first if it is included in the headers otherwise fallback to query param.
-    const fromAuthHeader = headers.get('Authorization');
-    if (fromAuthHeader) {
-        const match = fromAuthHeader.match(/^Bearer\s+(.+)$/i);
-        if (match) {
-            const token = match[1]?.trim();
-            if (token) {
-                return token;
-            }
-        }
-    }
-
-    const fromAccessTokenParam = url.searchParams.get('access_token');
-    return fromAccessTokenParam;
-}

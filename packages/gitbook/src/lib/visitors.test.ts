@@ -125,7 +125,7 @@ describe('getVisitorAuthToken', () => {
                     url: new URL('https://docs.acme.org/~gitbook/mcp'),
                 })
             ).toEqual({
-                source: 'oauth-protected',
+                source: 'visitor-oauth-protected',
                 token: 'token-in-header',
             });
         });
@@ -138,21 +138,9 @@ describe('getVisitorAuthToken', () => {
                     url: new URL('https://docs.acme.org/~gitbook/mcp?access_token=token-in-query'),
                 })
             ).toEqual({
-                source: 'oauth-protected',
+                source: 'visitor-oauth-protected',
                 token: 'token-in-query',
             });
-        });
-
-        it('should not return token if not an MCP request and token in header and/or access_token query param', () => {
-            expect(
-                getVisitorToken({
-                    cookies: [],
-                    headers: new Headers({
-                        Authorization: 'Bearer token-in-header',
-                    }),
-                    url: new URL('https://docs.acme.org/?access_token=token-in-query'),
-                })
-            ).toBeUndefined();
         });
     });
 });
