@@ -24,6 +24,7 @@ export function Heading(props: BlockProps<DocumentBlockHeading>) {
             className={tcls(
                 textStyle.textSize,
                 'heading',
+                'pdf-heading',
                 'flex',
                 'items-baseline',
                 'scroll-mt-(--content-scroll-margin)',
@@ -32,6 +33,7 @@ export function Heading(props: BlockProps<DocumentBlockHeading>) {
                 style,
                 textStyle.marginTop
             )}
+            data-pdf-heading
         >
             <HashLinkButton
                 id={id}

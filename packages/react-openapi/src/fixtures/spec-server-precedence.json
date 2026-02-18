@@ -1,0 +1,44 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Server Precedence Test",
+        "version": "1.0.0"
+    },
+    "servers": [{ "url": "https://root.example.com" }],
+    "paths": {
+        "/root-only": {
+            "get": {
+                "operationId": "rootOnly",
+                "responses": { "200": { "description": "OK" } }
+            }
+        },
+        "/path-override": {
+            "servers": [{ "url": "https://path.example.com" }],
+            "get": {
+                "operationId": "pathOverride",
+                "responses": { "200": { "description": "OK" } }
+            }
+        },
+        "/operation-override": {
+            "servers": [{ "url": "https://path.example.com" }],
+            "get": {
+                "operationId": "operationOverride",
+                "servers": [{ "url": "https://operation.example.com" }],
+                "responses": { "200": { "description": "OK" } }
+            }
+        },
+        "/operation-skip-path": {
+            "get": {
+                "operationId": "operationSkipPath",
+                "servers": [{ "url": "https://operation.example.com" }],
+                "responses": { "200": { "description": "OK" } }
+            }
+        },
+        "/no-servers": {
+            "get": {
+                "operationId": "noServers",
+                "responses": { "200": { "description": "OK" } }
+            }
+        }
+    }
+}

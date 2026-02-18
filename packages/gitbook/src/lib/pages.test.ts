@@ -30,6 +30,7 @@ describe('resolveFirstDocument', () => {
                         path: 'product-knowledge',
                         slug: 'product-knowledge',
                         pages: [],
+                        tags: [],
                         layout: {
                             cover: true,
                             coverSize: RevisionPageLayoutOptionsCoverSize.Full,
@@ -40,6 +41,7 @@ describe('resolveFirstDocument', () => {
                             pagination: true,
                             width: RevisionPageLayoutOptionsWidth.Default,
                             metadata: true,
+                            tags: true,
                         },
                     },
                 ],
@@ -80,6 +82,7 @@ describe('resolveFirstDocument', () => {
                 path: 'product-knowledge',
                 slug: 'product-knowledge',
                 pages: [],
+                tags: [],
                 layout: {
                     cover: true,
                     coverSize: RevisionPageLayoutOptionsCoverSize.Full,
@@ -90,6 +93,7 @@ describe('resolveFirstDocument', () => {
                     pagination: true,
                     width: RevisionPageLayoutOptionsWidth.Default,
                     metadata: true,
+                    tags: true,
                 },
             },
         ];
@@ -123,6 +127,7 @@ describe('resolvePagePath', () => {
                 path: 'sales',
                 slug: 'sales',
                 pages: [],
+                tags: [],
                 layout: {
                     cover: true,
                     coverSize: RevisionPageLayoutOptionsCoverSize.Full,
@@ -133,6 +138,7 @@ describe('resolvePagePath', () => {
                     pagination: true,
                     width: RevisionPageLayoutOptionsWidth.Default,
                     metadata: true,
+                    tags: true,
                 },
             },
         ];
@@ -196,6 +202,7 @@ describe('resolvePagePath', () => {
                         path: 'product-knowledge',
                         slug: 'product-knowledge',
                         pages: [],
+                        tags: [],
                         layout: {
                             cover: true,
                             coverSize: RevisionPageLayoutOptionsCoverSize.Full,
@@ -206,6 +213,7 @@ describe('resolvePagePath', () => {
                             pagination: true,
                             width: RevisionPageLayoutOptionsWidth.Default,
                             metadata: true,
+                            tags: true,
                         },
                     },
                 ],

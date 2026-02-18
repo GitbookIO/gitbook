@@ -15,7 +15,6 @@ export function Expandable(props: BlockProps<DocumentBlockExpandable>) {
 
     const title = getNodeFragmentByType(block, 'expandable-title');
     const body = getNodeFragmentByType(block, 'expandable-body');
-    // @ts-expect-error should be removed once we update the API
     const isDefaultExpanded = block.data.defaultExpanded ?? false;
 
     const titleParagraph = title?.nodes[0];
