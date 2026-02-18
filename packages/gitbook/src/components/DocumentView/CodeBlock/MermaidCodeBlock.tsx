@@ -8,6 +8,9 @@ import { tcls } from '@/lib/tailwind';
 import { type ClientBlockProps, ClientCodeBlock } from './ClientCodeBlock';
 import { getPlainCodeBlock } from './highlight';
 
+/**
+ * Used to render a Mermaid diagram from a CodeBlock.
+ */
 export function MermaidCodeBlock(props: ClientBlockProps) {
     const { block, style } = props;
     const source = getPlainCodeBlock(block);
@@ -78,7 +81,13 @@ async function renderMermaidDiagram(args: {
     darkMode: boolean;
 }) {
     const { container, source, id, darkMode } = args;
-    const { default: mermaid } = await import('mermaid');
+    const [{ default: mermaid }, { default: zenuml }] = await Promise.all([
+        import('mermaid'),
+        import('@mermaid-js/mermaid-zenuml'),
+    ]);
+
+    await mermaid.registerExternalDiagrams([zenuml]);
+
     mermaid.initialize({
         startOnLoad: false,
         securityLevel: 'strict',
