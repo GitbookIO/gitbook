@@ -1,6 +1,10 @@
 'use client';
 
-import { isCookiesTrackingDisabled, setCookiesTracking } from '@/components/Insights';
+import {
+    isCookiesTrackingDisabled,
+    isGlobalPrivacyControlEnabled,
+    setCookiesTracking,
+} from '@/components/Insights';
 import { isAIUserAgent } from '@/lib/browser';
 import type {
     GitBookGlobal,
@@ -109,6 +113,7 @@ if (typeof window !== 'undefined') {
             });
         },
         isCookiesTrackingDisabled: isCookiesTrackingDisabled,
+        isGlobalPrivacyControlEnabled: isGlobalPrivacyControlEnabled,
     };
     window.GitBook = gitbookGlobal;
 }
