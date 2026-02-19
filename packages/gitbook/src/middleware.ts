@@ -13,11 +13,7 @@ import {
     normalizeURL,
     throwIfDataError,
 } from '@/lib/data';
-import {
-    GITBOOK_SITES_OAUTH_SERVER_URL,
-    isGitBookAssetsHostURL,
-    isGitBookHostURL,
-} from '@/lib/env';
+import { GITBOOK_OAUTH_SERVER_URL, isGitBookAssetsHostURL, isGitBookHostURL } from '@/lib/env';
 import { getImageResizingContextId } from '@/lib/images';
 import { MiddlewareHeaders } from '@/lib/middleware';
 import { removeLeadingSlash, removeTrailingSlash } from '@/lib/paths';
@@ -171,14 +167,20 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
 
     // Handler that forwards redirections from upstream auth provider during a site's OAuth /authorize session
     // back to the site's OAuth server.
+    const oauthServerURL = new URL(GITBOOK_OAUTH_SERVER_URL);
     const siteOAuthAuthorizeMatch = new URLPattern({
-        pathname: '*/~gitbook/oauth2/v1/:siteId/authorize',
+        pathname: `*/~gitbook/${oauthServerURL.pathname.substring(1)}/:siteId/authorize`,
     }).exec(siteRequestURL.toString());
+
     if (siteOAuthAuthorizeMatch) {
-        const siteOAuthAuthorizeURL = new URL(
-            `/oauth2/v1/${siteOAuthAuthorizeMatch.pathname.groups.siteId}/authorize?${siteOAuthAuthorizeMatch.search.input}`,
-            GITBOOK_SITES_OAUTH_SERVER_URL
-        );
+        const siteId = siteOAuthAuthorizeMatch.pathname.groups.siteId;
+        const siteOAuthAuthorizeURL = new URL(oauthServerURL);
+        siteOAuthAuthorizeURL.pathname += `/${siteId}/authorize`;
+        siteOAuthAuthorizeURL.search = siteOAuthAuthorizeMatch.search.input.replace('?', '');
+        console.log('Redirecting to site OAuth server for authorization', {
+            siteOAuthAuthorizeURL: siteOAuthAuthorizeURL.toString(),
+        });
+        // `${oauthServerURL}/${siteId}/authorize?${siteOAuthAuthorizeMatch.search.input}`,
         return NextResponse.redirect(siteOAuthAuthorizeURL.toString());
     }
 

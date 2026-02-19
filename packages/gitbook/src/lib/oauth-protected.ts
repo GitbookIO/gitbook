@@ -1,6 +1,6 @@
 import type { PublishedContentRedirect } from '@gitbook/api';
 import { type NextRequest, NextResponse } from 'next/server';
-import { GITBOOK_SITES_OAUTH_SERVER_URL, GITBOOK_URL } from './env';
+import { GITBOOK_OAUTH_SERVER_URL, GITBOOK_URL } from './env';
 
 type OAuthProtectedResource = {
     /** Endpoint of the protected resource */
@@ -40,7 +40,7 @@ export function handleUnauthedOAuthProtectedResourceRequest(args: {
 
         const protectedResourceMetadata = {
             resource: resourceUrl.toString().replace(OAUTH_PROTECTED_RESOURCE_METADATA_PATH, ''),
-            authorization_servers: [`${GITBOOK_SITES_OAUTH_SERVER_URL}/${siteURLData.site}`],
+            authorization_servers: [`${GITBOOK_OAUTH_SERVER_URL}/${siteURLData.site}`],
         };
         return NextResponse.json(protectedResourceMetadata);
     }

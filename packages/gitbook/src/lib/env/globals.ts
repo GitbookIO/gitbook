@@ -61,8 +61,8 @@ export const GITBOOK_USER_AGENT = process.env.GITBOOK_USER_AGENT || 'GitBook-Ope
 /**
  * URL to the GitBook sites OAuth server.
  */
-export const GITBOOK_SITES_OAUTH_SERVER_URL =
-    process.env.GITBOOK_SITES_OAUTH_SERVER_URL || 'https://sites.gitbook.com/oauth2/v1';
+export const GITBOOK_OAUTH_SERVER_URL =
+    process.env.GITBOOK_OAUTH_SERVER_URL || 'https://sites.gitbook.com/oauth2/v1';
 
 /**
  * Whether to disable tracking of events into site insights.

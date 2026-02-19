@@ -130,6 +130,42 @@ describe('getVisitorAuthToken', () => {
             });
         });
 
+        it('should return undefined for malformced auth header', () => {
+            expect(
+                getVisitorToken({
+                    cookies: [],
+                    headers: new Headers({
+                        Authorization: 'Bearer ',
+                    }),
+                    url: new URL('https://docs.acme.org/~gitbook/mcp'),
+                })
+            ).toBeUndefined();
+        });
+
+        it('should return undefined for empty auth header', () => {
+            expect(
+                getVisitorToken({
+                    cookies: [],
+                    headers: new Headers({
+                        Authorization: ' ',
+                    }),
+                    url: new URL('https://docs.acme.org/~gitbook/mcp'),
+                })
+            ).toBeUndefined();
+        });
+
+        it('should return undefined for auth header with different scheme', () => {
+            expect(
+                getVisitorToken({
+                    cookies: [],
+                    headers: new Headers({
+                        Authorization: 'Basic dXNlcjpwYXNz',
+                    }),
+                    url: new URL('https://docs.acme.org/~gitbook/mcp'),
+                })
+            ).toBeUndefined();
+        });
+
         it('should return token for MCP request when included in the URL', () => {
             expect(
                 getVisitorToken({

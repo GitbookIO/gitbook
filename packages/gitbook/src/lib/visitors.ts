@@ -422,18 +422,10 @@ export function getVisitorTokenForOAuthProtectedResource(args: {
 
     // Check first if it is included in the headers otherwise fallback to query param.
     const fromAuthHeader = headers.get('Authorization');
-    if (fromAuthHeader) {
-        const match = fromAuthHeader.match(/^Bearer\s+(.+)$/i);
-        if (match) {
-            const token = match[1]?.trim();
-            if (token) {
-                return token;
-            }
-        }
-    }
+    const [authScheme, ...authParamsParts] = fromAuthHeader?.split(' ') || [];
+    const authToken = authParamsParts.at(0)?.trim();
 
-    const fromAccessTokenParam = url.searchParams.get('access_token');
-    return fromAccessTokenParam;
+    return authScheme === 'Bearer' && authToken ? authToken : url.searchParams.get('access_token');
 }
 
 /**
