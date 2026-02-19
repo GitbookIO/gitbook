@@ -2,7 +2,14 @@
 import { tcls } from '@/lib/tailwind';
 import { Icon } from '@gitbook/icons';
 import { Fragment } from 'react';
-import { Button, HoverCard, HoverCardRoot, HoverCardTrigger, StyledLink } from '../../primitives';
+import {
+    Button,
+    HoverCard,
+    HoverCardRoot,
+    HoverCardTrigger,
+    StyledLink,
+    useResolvedHref,
+} from '../../primitives';
 
 export function InlineLinkTooltip(props: {
     isSamePage: boolean;
@@ -18,6 +25,8 @@ export function InlineLinkTooltip(props: {
     children: React.ReactNode;
 }) {
     const { isSamePage, isExternal, openInNewTabLabel, target, breadcrumbs, children } = props;
+    const resolvedHref = useResolvedHref(target.href);
+    const targetText = target.href === target.text ? resolvedHref : target.text;
 
     return (
         <HoverCardRoot>
@@ -69,7 +78,7 @@ export function InlineLinkTooltip(props: {
                                     {target.icon}
                                 </div>
                             ) : null}
-                            <h5 className="font-semibold">{target.text}</h5>
+                            <h5 className="font-semibold">{targetText}</h5>
                         </div>
                     </div>
                     {!isSamePage && target.href ? (
