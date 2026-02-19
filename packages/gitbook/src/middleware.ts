@@ -177,10 +177,6 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         const siteOAuthAuthorizeURL = new URL(oauthServerURL);
         siteOAuthAuthorizeURL.pathname += `/${siteId}/authorize`;
         siteOAuthAuthorizeURL.search = siteOAuthAuthorizeMatch.search.input.replace('?', '');
-        console.log('Redirecting to site OAuth server for authorization', {
-            siteOAuthAuthorizeURL: siteOAuthAuthorizeURL.toString(),
-        });
-        // `${oauthServerURL}/${siteId}/authorize?${siteOAuthAuthorizeMatch.search.input}`,
         return NextResponse.redirect(siteOAuthAuthorizeURL.toString());
     }
 
