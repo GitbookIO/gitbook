@@ -38,7 +38,7 @@ export const pt_br = {
     available_items: 'Itens disponíveis',
     required_scopes: 'Scopes obrigatórios',
     required_scopes_description: 'Este endpoint requer os seguintes scopes:',
-    available_scopes: 'Scopes disponíveis:',
+
     properties: 'Propriedades',
     or: 'ou',
     and: 'e',

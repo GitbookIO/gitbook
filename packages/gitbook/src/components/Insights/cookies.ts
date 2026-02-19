@@ -31,3 +31,22 @@ export function isCookiesTrackingDisabled() {
 
     return undefined;
 }
+
+let cachedIsGlobalPrivacyControlEnabled: boolean | undefined;
+/**
+ * Get the global privacy control settings of the user.
+ * Return `true` if global privacy control is enabled
+ *
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/Navigator/globalPrivacyControl
+ */
+export function isGlobalPrivacyControlEnabled(): boolean {
+    if (cachedIsGlobalPrivacyControlEnabled !== undefined) {
+        return cachedIsGlobalPrivacyControlEnabled;
+    }
+    if (typeof navigator === 'undefined' || !('globalPrivacyControl' in navigator)) {
+        cachedIsGlobalPrivacyControlEnabled = false;
+        return false;
+    }
+    cachedIsGlobalPrivacyControlEnabled = Boolean(navigator.globalPrivacyControl);
+    return cachedIsGlobalPrivacyControlEnabled;
+}

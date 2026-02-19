@@ -38,7 +38,7 @@ export const nl = {
     available_items: 'Beschikbare items',
     required_scopes: 'Vereiste scopes',
     required_scopes_description: 'Dit endpoint vereist de volgende scopes:',
-    available_scopes: 'Beschikbare scopes:',
+
     properties: 'Eigenschappen',
     or: 'of',
     and: 'en',
