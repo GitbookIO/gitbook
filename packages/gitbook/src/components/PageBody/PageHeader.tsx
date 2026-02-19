@@ -12,6 +12,7 @@ import {
 } from '../PageActions/PageActionsDropdown';
 import { PageIcon } from '../PageIcon';
 import { StyledLink } from '../primitives';
+import { PageTags } from './PageTags';
 
 export async function PageHeader(props: {
     context: GitBookSiteContext;
@@ -119,6 +120,7 @@ export async function PageHeader(props: {
                     </ol>
                 </nav>
             )}
+            <PageTags page={page} revision={revision} />
             {page.layout.title ? (
                 <h1
                     className={tcls(
