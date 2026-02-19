@@ -127,6 +127,7 @@ async function fetchGlobalVisitor({
             credentials: 'include', // Make sure to send/receive cookies.
             cache: 'no-cache',
             mode: 'cors', // Need to use cors as we are on a different domain.
+            signal: AbortSignal.timeout(500),
         });
 
         const visitor = (await resp.json()) as VisitorResponse;
