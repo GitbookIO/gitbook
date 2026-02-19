@@ -4,37 +4,47 @@ import { createStore, useStore } from 'zustand';
 
 import { getBrowserCookie } from '@/lib/browser';
 
+import type { MaybePromise } from 'p-map';
 import React from 'react';
 import { isCookiesTrackingDisabled } from './cookies';
 import { generateRandomId } from './utils';
 
 const VISITORID_COOKIE = '__session';
 
-type SessionVisitorResponse = {
+/**
+ * Visitor state when the visitor is not a signed-in GitBook user.
+ */
+type AnyVisitorResponse = {
+    /**
+     * A random identifier for the visitor. Resets if the user clears their cookies.
+     */
     deviceId: string;
     userId?: undefined;
     organizationId?: undefined;
 };
 
-type SessionUserResponse = SessionVisitorResponse & {
+/**
+ * Visitor state when the visitor is also a signed-in GitBook user.
+ */
+type VisitorUserResponse = AnyVisitorResponse & {
     userId: string;
     organizationId: string;
 };
 
-export type SessionResponse = SessionVisitorResponse | SessionUserResponse;
+export type VisitorResponse = AnyVisitorResponse | VisitorUserResponse;
 
-const visitorSessionStore = createStore<{
-    session: SessionResponse | null;
-    pendingSession: Promise<SessionResponse> | null;
+const visitorStore = createStore<{
+    visitor: VisitorResponse | null;
+    pendingVisitor: Promise<VisitorResponse> | null;
 }>(() => ({
-    session: null,
-    pendingSession: null,
+    visitor: null,
+    pendingVisitor: null,
 }));
 
 /**
- * Fetch, synchronize the visitor sesion with GitBook.
+ * Fetch, synchronize the visitor with GitBook.
  */
-export function VisitorSessionProvider(
+export function VisitorProvider(
     props: React.PropsWithChildren<{
         appURL: string;
         visitorCookieTrackingEnabled: boolean;
@@ -43,15 +53,15 @@ export function VisitorSessionProvider(
     const { appURL, visitorCookieTrackingEnabled, children } = props;
 
     React.useEffect(() => {
-        const state = visitorSessionStore.getState();
-        if (state.pendingSession || state.session) {
+        const state = visitorStore.getState();
+        if (state.pendingVisitor || state.visitor) {
             return;
         }
 
-        const pendingSession = fetchSession({ appURL, visitorCookieTrackingEnabled });
-        visitorSessionStore.setState({ pendingSession, session: null });
-        pendingSession.then((session) => {
-            visitorSessionStore.setState({ pendingSession: null, session });
+        const pendingVisitor = fetchGlobalVisitor({ appURL, visitorCookieTrackingEnabled });
+        visitorStore.setState({ pendingVisitor, visitor: null });
+        pendingVisitor.then((visitor) => {
+            visitorStore.setState({ pendingVisitor: null, visitor });
         });
     }, [appURL, visitorCookieTrackingEnabled]);
 
@@ -61,29 +71,46 @@ export function VisitorSessionProvider(
 /**
  * Hook to get the current visitor session.
  */
-export function useVisitorSession() {
-    return useStore(visitorSessionStore, (state) => state.session);
+export function useVisitor() {
+    return useStore(visitorStore, (state) => state.visitor);
+}
+
+/**
+ * Get the current visitor ID.
+ */
+export function getVisitor(): MaybePromise<VisitorResponse> {
+    const state = visitorStore.getState();
+    if (state.visitor) {
+        return state.visitor;
+    }
+    if (state.pendingVisitor) {
+        return state.pendingVisitor;
+    }
+
+    return {
+        deviceId: getProposedVisitorId(),
+    };
 }
 
 /**
  * Propose a visitor identifier to the GitBook.com server and get the devideId back.
  */
-async function fetchSession({
+async function fetchGlobalVisitor({
     appURL,
     visitorCookieTrackingEnabled,
 }: {
     appURL: string;
     visitorCookieTrackingEnabled: boolean;
-}): Promise<SessionResponse> {
+}): Promise<VisitorResponse> {
     const withoutCookies = isCookiesTrackingDisabled();
 
     if (withoutCookies || !visitorCookieTrackingEnabled) {
         return {
-            deviceId: generateRandomId(),
+            deviceId: getProposedVisitorId(),
         };
     }
 
-    const { existing, proposedId } = getSessionCookie();
+    const { existing, proposedId } = getVisitorFromCookies();
 
     if (existing) {
         // If the cookie already exists, we'll just use that. Avoids a server request.
@@ -102,8 +129,8 @@ async function fetchSession({
             mode: 'cors', // Need to use cors as we are on a different domain.
         });
 
-        const session = (await resp.json()) as SessionResponse;
-        return session;
+        const visitor = (await resp.json()) as VisitorResponse;
+        return visitor;
     } catch (error) {
         console.error('Failed to fetch visitor session ID', error);
         return {
@@ -112,19 +139,28 @@ async function fetchSession({
     }
 }
 
-function getSessionCookie(): { existing: SessionResponse | null; proposedId: string } {
-    const proposed = generateRandomId();
+/**
+ * Extract the current visitor from the cookies.
+ */
+function getVisitorFromCookies(): { existing: VisitorResponse | null; proposedId: string } {
+    const proposedId = getProposedVisitorId();
     const value = getBrowserCookie(VISITORID_COOKIE);
     if (!(value && typeof value === 'string')) {
-        return { existing: null, proposedId: proposed };
+        return { existing: null, proposedId };
     }
 
     try {
-        const parsed = JSON.parse(value) as SessionResponse;
-        return { existing: parsed, proposedId: proposed };
+        const parsed = JSON.parse(value) as VisitorResponse;
+        return { existing: parsed, proposedId };
     } catch {
         // Ignore legacy __session cookie format
         // and we'll renew it with the server using the previous one as a proposed ID
-        return { existing: null, proposedId: proposed };
+        return { existing: null, proposedId };
     }
+}
+
+let proposedIdCache: string | null = null;
+function getProposedVisitorId(): string {
+    proposedIdCache ??= generateRandomId();
+    return proposedIdCache;
 }
