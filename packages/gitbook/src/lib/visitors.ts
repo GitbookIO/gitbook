@@ -74,6 +74,11 @@ export type VisitorTokenLookup =
           source: 'gitbook-visitor-cookie';
           token: string;
       }
+    | {
+          /** A visitor token provided by an OAuth client for protected resource (e.g MCP client). */
+          source: 'visitor-oauth-protected';
+          token: string;
+      }
     /** Not visitor token was found */
     | undefined;
 
@@ -85,12 +90,14 @@ export type VisitorTokenLookup =
  */
 export function getVisitorData({
     cookies,
+    headers,
     url,
 }: {
     cookies: RequestCookies;
+    headers: Headers;
     url: URL | NextRequest['nextUrl'];
 }): VisitorDataLookup {
-    const visitorToken = getVisitorToken({ cookies, url });
+    const visitorToken = getVisitorToken({ cookies, headers, url });
     const unsignedClaims = getVisitorUnsignedClaims({ cookies, url });
     const visitorParamsCookie = getResponseCookieForVisitorParams(unsignedClaims.fromVisitorParams);
 
@@ -107,11 +114,18 @@ export function getVisitorData({
  */
 export function getVisitorToken({
     cookies,
+    headers,
     url,
 }: {
     cookies: RequestCookies;
+    headers: Headers;
     url: URL | NextRequest['nextUrl'];
 }): VisitorTokenLookup {
+    const mcpVisitorToken = getVisitorTokenForOAuthProtectedResource({ url, headers });
+    if (mcpVisitorToken) {
+        return { source: 'visitor-oauth-protected', token: mcpVisitorToken };
+    }
+
     const fromUrl = url.searchParams.get(VISITOR_AUTH_PARAM);
 
     // Allow the empty string to come through
@@ -398,6 +412,23 @@ function getVisitorAuthTokenFromCookies(
 }
 
 /**
+ * Return a visitor token provided by a OAuth client for a protected resource (e.g MCP request).
+ */
+export function getVisitorTokenForOAuthProtectedResource(args: {
+    url: URL | NextRequest['nextUrl'];
+    headers: Headers;
+}) {
+    const { url, headers } = args;
+
+    // Check first if it is included in the headers otherwise fallback to query param.
+    const fromAuthHeader = headers.get('Authorization');
+    const [authScheme, ...authParamsParts] = fromAuthHeader?.split(' ') || [];
+    const authToken = authParamsParts.at(0)?.trim();
+
+    return authScheme === 'Bearer' && authToken ? authToken : url.searchParams.get('access_token');
+}
+
+/**
  * Return the value of a custom visitor cookie that can be set by third party backends
  * when they authenticate their users off flow to relay information in the form of claims
  * about the visitor.
@@ -451,6 +482,7 @@ export function getVisitorAuthCookieMaxAge(decoded: JwtPayload): number {
 export function serveVisitorClaimsDataRequest(request: NextRequest, siteRequestURL: URL) {
     const { visitorToken, unsignedClaims } = getVisitorData({
         cookies: request.cookies.getAll(),
+        headers: request.headers,
         url: siteRequestURL,
     });
 
