@@ -264,7 +264,6 @@ export function AIChatProvider(props: {
 
             let toolToExecute: AIStreamResponseToolCallPending | null = null;
             try {
-                const session = getSession();
                 const integrationTools = integrationsAssistantTools.getState().tools;
                 const stream = await streamAIChatResponse({
                     message: input.message,
@@ -272,7 +271,7 @@ export function AIChatProvider(props: {
                     messageContext: messageContextRef.current,
                     previousResponseId: globalState.getState().responseId ?? undefined,
                     session: {
-                        sessionId: session.id,
+                        sessionId: getSession().id,
                         visitorId: (await getVisitor()).deviceId,
                     },
                     tools: integrationTools.map((tool) => ({
