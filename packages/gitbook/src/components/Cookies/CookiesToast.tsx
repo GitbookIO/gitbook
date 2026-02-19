@@ -8,7 +8,11 @@ import { tcls } from '@/lib/tailwind';
 
 import { useCustomCookieBanner, useIntegrationsLoaded } from '@/components/Integrations';
 import { isAIUserAgent } from '@/lib/browser';
-import { isCookiesTrackingDisabled, setCookiesTracking } from '../Insights';
+import {
+    isCookiesTrackingDisabled,
+    isGlobalPrivacyControlEnabled,
+    setCookiesTracking,
+} from '../Insights';
 
 /**
  * Toast to accept or reject the use of cookies.
@@ -20,8 +24,15 @@ export function CookiesToast(props: { privacyPolicy?: string }) {
     const integrationsLoaded = useIntegrationsLoaded();
     const { hasCustomCookieBanner } = useCustomCookieBanner();
     const isAI = isAIUserAgent();
+    const hasGlobalPrivacyControl = isGlobalPrivacyControlEnabled();
 
     React.useEffect(() => {
+        // If global privacy control is enabled, reject cookies
+        if (hasGlobalPrivacyControl && !isCookiesTrackingDisabled()) {
+            setCookiesTracking(false);
+            return;
+        }
+
         // Always wait for integrations to load, and if a custom banner is registered, hide the built-in banner
         if (!integrationsLoaded || hasCustomCookieBanner || isAI) {
             setShow(false);
@@ -29,7 +40,7 @@ export function CookiesToast(props: { privacyPolicy?: string }) {
         }
 
         setShow(isCookiesTrackingDisabled() === undefined);
-    }, [hasCustomCookieBanner, integrationsLoaded, isAI]);
+    }, [hasCustomCookieBanner, integrationsLoaded, isAI, hasGlobalPrivacyControl]);
 
     if (!show) {
         return null;

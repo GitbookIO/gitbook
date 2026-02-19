@@ -36,6 +36,7 @@ import {
     handleUnauthedOAuthProtectedResourceRequest,
     isOAuthProtectedResourceRequest,
 } from './lib/oauth-protected';
+import { getPreviewRequestIdentifier } from './lib/preview';
 import { serveProxyAnalyticsEvent } from './lib/tracking';
 export const config = {
     matcher: [
@@ -365,7 +366,9 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
                     httpOnly: true,
                     sameSite: 'lax',
                     maxAge: 10 * 60, // 10 minutes
-                    path: '/url/preview', // Only send the cookie to preview routes
+                    // Only send the cookie to preview routes and scope it to the specific site
+                    // to avoid conflicts between different sites previews potentially opened at the same time.
+                    path: `/url/preview/${getPreviewRequestIdentifier(siteRequestURL)}`,
                 },
             });
         }
