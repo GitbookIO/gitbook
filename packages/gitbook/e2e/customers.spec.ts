@@ -232,7 +232,6 @@ const testCases: TestsCase[] = [
     {
         name: 'run-ai-docs.nvidia.com',
         contentBaseURL: 'https://run-ai-docs.nvidia.com',
-        skip: process.env.ARGOS_BUILD_NAME !== 'customers-v2',
         tests: [
             { name: 'Home', url: '/' },
             { name: 'OG Image', url: '/~gitbook/ogimage/h17zQIFwy3MaafVNmItO', mode: 'image' },
