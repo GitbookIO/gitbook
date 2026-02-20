@@ -1,6 +1,7 @@
 'use client';
 
 import type { CustomizationThemeMode, SiteExternalLinksTarget } from '@gitbook/api';
+import { MotionConfig, useReducedMotion } from 'motion/react';
 import { ThemeProvider } from 'next-themes';
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
 import type React from 'react';
@@ -50,9 +51,22 @@ export function SiteLayoutClientContexts(props: {
         >
             <NuqsAdapter>
                 <LinkContext.Provider value={linkContext}>
-                    <SearchContextProvider>{children}</SearchContextProvider>
+                    <SearchContextProvider>
+                        <ReducedMotionProvider>{children}</ReducedMotionProvider>
+                    </SearchContextProvider>
                 </LinkContext.Provider>
             </NuqsAdapter>
         </ThemeProvider>
     );
+}
+
+const reducedMotionTransition = { duration: 0 };
+
+function ReducedMotionProvider(props: { children: React.ReactNode }) {
+    const { children } = props;
+    const shouldReduceMotion = useReducedMotion();
+    if (shouldReduceMotion) {
+        return <MotionConfig transition={reducedMotionTransition}>{children}</MotionConfig>;
+    }
+    return children;
 }

@@ -151,7 +151,7 @@ test.describe('PDF export', () => {
         const printBtn = page.getByTestId('print-button');
         await expect(printBtn).toBeVisible();
 
-        await argosScreenshot(page, 'pdf - gb-docs - single page', {
+        await argosScreenshot(page, 'pdf - gb-docs - single-page', {
             viewports: ['macbook-13'],
             argosCSS: `
                             /* Hide Intercom */
