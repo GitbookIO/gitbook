@@ -29,7 +29,7 @@ test.describe('PDF export', () => {
         const printBtn = page.getByTestId('print-button');
         await expect(printBtn).toBeVisible();
 
-        await argosScreenshot(page, 'pdf - all pages', {
+        await argosScreenshot(page, 'pdf - e2e - all pages', {
             viewports: ['macbook-13'],
             argosCSS: `
                             /* Hide Intercom */
@@ -67,7 +67,7 @@ test.describe('PDF export', () => {
         const printBtn = page.getByTestId('print-button');
         await expect(printBtn).toBeVisible();
 
-        await argosScreenshot(page, 'pdf - all pages', {
+        await argosScreenshot(page, 'pdf - gb-docs - all pages', {
             viewports: ['macbook-13'],
             argosCSS: `
                             /* Hide Intercom */
@@ -109,7 +109,7 @@ test.describe('PDF export', () => {
         const printBtn = page.getByTestId('print-button');
         await expect(printBtn).toBeVisible();
 
-        await argosScreenshot(page, 'pdf - all pages', {
+        await argosScreenshot(page, 'pdf - e2e - single-page', {
             viewports: ['macbook-13'],
             argosCSS: `
                             /* Hide Intercom */
@@ -151,7 +151,7 @@ test.describe('PDF export', () => {
         const printBtn = page.getByTestId('print-button');
         await expect(printBtn).toBeVisible();
 
-        await argosScreenshot(page, 'pdf - all pages', {
+        await argosScreenshot(page, 'pdf - gb-docs - single page', {
             viewports: ['macbook-13'],
             argosCSS: `
                             /* Hide Intercom */

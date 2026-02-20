@@ -74,6 +74,7 @@ const searchTestCases: Test[] = [
         }),
         screenshot: false,
         run: async (page) => {
+            await waitForCookiesDialog(page);
             const searchInput = page.getByTestId('search-input');
             await searchInput.focus();
             await expect(page.getByTestId('search-results')).toHaveCount(0); // No pop-up yet because there's no recommended questions.
@@ -99,6 +100,7 @@ const searchTestCases: Test[] = [
         }),
         screenshot: false,
         run: async (page) => {
+            await waitForCookiesDialog(page);
             await page.keyboard.press('ControlOrMeta+K');
             await expect(page.getByTestId('search-input')).toBeFocused();
         },
@@ -111,6 +113,7 @@ const searchTestCases: Test[] = [
             },
         })}&q=`,
         run: async (page) => {
+            await waitForCookiesDialog(page);
             await expect(page.getByTestId('search-results')).toHaveCount(0); // No pop-up yet because there's no recommended questions.
         },
     },
@@ -122,6 +125,7 @@ const searchTestCases: Test[] = [
             },
         })}&q=gitbook`,
         run: async (page) => {
+            await waitForCookiesDialog(page);
             await expect(page.getByTestId('search-input')).toBeFocused();
             await expect(page.getByTestId('search-input')).toHaveValue('gitbook');
             await expect(page.getByTestId('search-results')).toBeVisible();
@@ -135,6 +139,7 @@ const searchTestCases: Test[] = [
             },
         })}&q=gitbook`,
         run: async (page) => {
+            await waitForCookiesDialog(page);
             await expect(page.getByTestId('search-input')).toBeFocused();
             await expect(page.getByTestId('search-input')).toHaveValue('gitbook');
             await expect(page.getByTestId('search-results')).toBeVisible();
@@ -148,6 +153,7 @@ const searchTestCases: Test[] = [
             },
         }),
         run: async (page) => {
+            await waitForCookiesDialog(page);
             const searchInput = page.locator('css=[data-testid="search-input"]');
 
             // Focus search input, expecting recommended questions
@@ -183,6 +189,7 @@ const searchTestCases: Test[] = [
             },
         }),
         run: async (page) => {
+            await waitForCookiesDialog(page);
             await page.keyboard.press('ControlOrMeta+I');
             await expect(page.getByTestId('ai-chat')).toBeVisible();
             await expect(page.getByTestId('ai-chat-input')).toBeFocused();
@@ -199,6 +206,7 @@ const searchTestCases: Test[] = [
         }),
         screenshot: false,
         run: async (page) => {
+            await waitForCookiesDialog(page);
             await page.getByTestId('ai-chat-button').click();
             await expect(page.getByTestId('ai-chat')).toBeVisible();
             await expect(page.getByTestId('ai-chat-input')).toBeFocused();
@@ -214,6 +222,7 @@ const searchTestCases: Test[] = [
             },
         })}&ask=`,
         run: async (page) => {
+            await waitForCookiesDialog(page);
             await expect(page.getByTestId('search-input')).not.toBeFocused();
             await expect(page.getByTestId('search-input')).toBeEmpty();
             await expect(page.getByTestId('ai-chat')).toBeVisible();
@@ -230,6 +239,7 @@ const searchTestCases: Test[] = [
             },
         })}&ask=${encodeURIComponent(AI_PROMPT)}`,
         run: async (page) => {
+            await waitForCookiesDialog(page);
             await expect(page.getByTestId('search-input')).not.toBeFocused();
             await expect(page.getByTestId('search-input')).not.toHaveValue('What is GitBook?');
             await expect(page.getByTestId('ai-chat')).toBeVisible();
@@ -258,6 +268,7 @@ const testCases: TestsCase[] = [
                 name: 'No variants dropdown',
                 url: '',
                 run: async (page) => {
+                    await waitForCookiesDialog(page);
                     await expect(page.locator('[data-testid="space-dropdown-button"]')).toHaveCount(
                         0
                     );
@@ -340,15 +351,18 @@ const testCases: TestsCase[] = [
             {
                 name: 'Default variant',
                 url: '',
+                run: waitForCookiesDialog,
             },
             {
                 name: 'RFC variant',
                 url: 'rfcs',
+                run: waitForCookiesDialog,
             },
             {
                 name: 'Customized variant titles are displayed',
                 url: '',
                 run: async (page) => {
+                    await waitForCookiesDialog(page);
                     const spaceDropdown = page
                         .locator('[data-testid="space-dropdown-button"]')
                         .locator('visible=true');
@@ -376,6 +390,7 @@ const testCases: TestsCase[] = [
                 name: 'Switch variant with alternate link in metadata',
                 url: 'rfcs',
                 run: async (page) => {
+                    await waitForCookiesDialog(page);
                     const spaceDropdown = page
                         .locator('[data-testid="space-dropdown-button"]')
                         .locator('visible=true');
@@ -580,11 +595,13 @@ const testCases: TestsCase[] = [
             {
                 name: 'Site with sections and section groups',
                 url: '',
+                run: waitForCookiesDialog,
             },
             {
                 name: 'Section group dropdown',
                 url: '',
                 run: async (page) => {
+                    await waitForCookiesDialog(page);
                     await page.getByRole('button', { name: 'Test Section Group 1' }).hover();
                     await expect(page.getByRole('link', { name: /Section B/ })).toBeVisible();
                 },
@@ -594,6 +611,7 @@ const testCases: TestsCase[] = [
                 url: '',
                 screenshot: false,
                 run: async (page) => {
+                    await waitForCookiesDialog(page);
                     const sectionGroupDropdown = await page.getByText('Test Section Group 1');
                     await sectionGroupDropdown.hover();
                     await page.getByText('Section B').click();
@@ -905,26 +923,31 @@ const testCases: TestsCase[] = [
                 name: 'Lists',
                 url: 'blocks/lists',
                 fullPage: true,
+                run: waitForCookiesDialog,
             },
             {
                 name: 'Code',
                 url: 'blocks/code',
                 fullPage: true,
+                run: waitForCookiesDialog,
             },
             {
                 name: 'Cards',
                 url: 'blocks/cards',
                 fullPage: true,
+                run: waitForCookiesDialog,
             },
             {
                 name: 'Updates',
                 url: 'blocks/updates',
                 fullPage: true,
+                run: waitForCookiesDialog,
             },
             {
                 name: 'Math',
                 url: 'blocks/math',
                 run: async (page) => {
+                    await waitForCookiesDialog(page);
                     await page.waitForFunction(() => {
                         const fonts = Array.from(document.fonts.values());
                         const mjxFonts = fonts.filter(
@@ -941,21 +964,25 @@ const testCases: TestsCase[] = [
                 name: 'Files',
                 url: 'blocks/files',
                 fullPage: true,
+                run: waitForCookiesDialog,
             },
             {
                 name: 'Embeds',
                 url: 'blocks/embeds',
                 fullPage: true,
+                run: waitForCookiesDialog,
             },
             {
                 name: 'Page links',
                 url: 'blocks/page-links',
                 fullPage: true,
+                run: waitForCookiesDialog,
             },
             {
                 name: 'Annotations',
                 url: 'blocks/annotations',
                 run: async (page) => {
+                    await waitForCookiesDialog(page);
                     await page.waitForSelector('[data-testid="annotation-button"]');
                     await page.click('[data-testid="annotation-button"]');
                 },
@@ -963,8 +990,13 @@ const testCases: TestsCase[] = [
             {
                 name: 'Stepper',
                 url: 'blocks/stepper',
+                run: waitForCookiesDialog,
             },
-            { name: 'Columns', url: 'blocks/columns' },
+            {
+                name: 'Columns',
+                url: 'blocks/columns',
+                run: waitForCookiesDialog,
+            },
         ],
     },
     {
@@ -992,7 +1024,10 @@ const testCases: TestsCase[] = [
                         toggeable: false,
                     },
                 })}`,
-                run: waitForCookiesDialog,
+                run: async (page) => {
+                    await waitForCookiesDialog(page);
+                    await waitForCoverImages(page);
+                },
             },
             {
                 name: 'With hero cover',
