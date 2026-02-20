@@ -19,7 +19,7 @@ export function getDefaultServerURL(servers: OpenAPIV3.ServerObject[]): string {
 export function interpolateServerURL(server: OpenAPIV3.ServerObject) {
     const parts = parseServerURL(server?.url ?? '');
 
-    return parts
+    const url = parts
         .map((part) => {
             if (part.kind === 'text') {
                 return part.text;
@@ -27,6 +27,9 @@ export function interpolateServerURL(server: OpenAPIV3.ServerObject) {
             return server.variables?.[part.name]?.default ?? `{${part.name}}`;
         })
         .join('');
+
+    // Remove trailing slash to avoid double slashes when concatenated with paths
+    return url.endsWith('/') ? url.slice(0, -1) : url;
 }
 
 function parseServerURL(url: string) {
