@@ -1,3 +1,10 @@
+
+
+            [Code généré](https://github.com/github-linguist/linguist/blob/main/docs/overrides.md#generated-code) dans la documentation Linguist
+
+            [AUTOTITLE](/repositories/working-with-files/managing-files/creating-new-files)
+
+
 import type { ContentKitAction, RequestRenderIntegrationUI } from '@gitbook/api';
 import * as React from 'react';
 
