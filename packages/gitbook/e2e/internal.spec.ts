@@ -351,18 +351,15 @@ const testCases: TestsCase[] = [
             {
                 name: 'Default variant',
                 url: '',
-                run: waitForCookiesDialog,
             },
             {
                 name: 'RFC variant',
                 url: 'rfcs',
-                run: waitForCookiesDialog,
             },
             {
                 name: 'Customized variant titles are displayed',
                 url: '',
                 run: async (page) => {
-                    await waitForCookiesDialog(page);
                     const spaceDropdown = page
                         .locator('[data-testid="space-dropdown-button"]')
                         .locator('visible=true');
@@ -390,7 +387,6 @@ const testCases: TestsCase[] = [
                 name: 'Switch variant with alternate link in metadata',
                 url: 'rfcs',
                 run: async (page) => {
-                    await waitForCookiesDialog(page);
                     const spaceDropdown = page
                         .locator('[data-testid="space-dropdown-button"]')
                         .locator('visible=true');
@@ -1026,7 +1022,7 @@ const testCases: TestsCase[] = [
                 })}`,
                 run: async (page) => {
                     await waitForCookiesDialog(page);
-                    await waitForCoverImages(page);
+                    await waitForCoverImages(page, { darkMode: true });
                 },
             },
             {

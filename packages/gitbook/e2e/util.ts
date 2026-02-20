@@ -155,9 +155,12 @@ export async function waitForNotFound(_page: Page, response: Response | null) {
     expect(response?.status()).toBe(404);
 }
 
-export async function waitForCoverImages(page: Page) {
+export async function waitForCoverImages(page: Page, options?: { darkMode?: boolean }) {
+    const selector = options?.darkMode
+        ? 'img[alt="Page cover"].dark:inline'
+        : 'img[alt="Page cover"]:not(.dark:inline)';
     // Wait for cover images to exist (not the shimmer placeholder)
-    await expect(page.locator('img[alt="Page cover"]').first()).toBeVisible({
+    await expect(page.locator(selector)).toBeVisible({
         timeout: 10_000,
     });
 }
