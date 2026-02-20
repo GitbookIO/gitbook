@@ -18,9 +18,17 @@ export function Table(props: BlockProps<DocumentBlockTable>) {
     const { block, ancestorBlocks, document } = props;
     const isOffscreen = isBlockOffscreen({ block, ancestorBlocks, document });
 
-    const records: TableRecordKV[] = Object.entries(block.data.records).sort((a, b) => {
-        return a[1].orderIndex.localeCompare(b[1].orderIndex);
-    });
+    const records: TableRecordKV[] = Object.entries(block.data.records).sort(
+        ([aKey, aValue], [bKey, bValue]) => {
+            const orderComparison = aValue.orderIndex.localeCompare(bValue.orderIndex);
+
+            if (orderComparison !== 0) {
+                return orderComparison;
+            }
+
+            return aKey.localeCompare(bKey);
+        }
+    );
 
     switch (block.data.view.type) {
         case 'cards':
