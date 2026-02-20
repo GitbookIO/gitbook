@@ -185,7 +185,7 @@ jobs:
                   BASE_URL: ${{ needs.deploy-v2-vercel.outputs.deployment-url }}
                   SITE_BASE_URL: ${{ needs.deploy-v2-vercel.outputs.deployment-url }}/url/
                   ARGOS_TOKEN: ${{ secrets.ARGOS_TOKEN }}
-                  ARGOS_BUILD_NAME: 'customers-v2'
+                  ARGOS_BUILD_NAME: 'customers-v2-vercel'
     visual-testing-customers-v2-cloudflare:
         runs-on: ubuntu-latest
         name: Visual Testing Customers v2 (Cloudflare)
@@ -209,7 +209,7 @@ jobs:
                   BASE_URL: ${{ needs.deploy-v2-cloudflare.outputs.deployment-url }}
                   SITE_BASE_URL: ${{ needs.deploy-v2-cloudflare.outputs.deployment-url }}/url/
                   ARGOS_TOKEN: ${{ secrets.ARGOS_TOKEN }}
-                  ARGOS_BUILD_NAME: 'customers-v2'
+                  ARGOS_BUILD_NAME: 'customers-v2-cloudflare'
     browserless-testing-v2-vercel:
         runs-on: ubuntu-latest
         name: Browserless Testing v2 (Vercel)
