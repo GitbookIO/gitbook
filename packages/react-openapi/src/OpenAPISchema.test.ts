@@ -235,8 +235,8 @@ describe('getSchemaAlternatives', () => {
 
         const result = getSchemaAlternatives(schema);
         expect(result).toBeDefined();
-        // Boolean required values should not cause a crash
-        expect(Array.isArray(result?.schemas[0]?.required)).toBe(false);
+        // Boolean required values should not cause a crash, result is an empty array
+        expect(result?.schemas[0]?.required).toEqual([]);
     });
 
     describe('safe merging with allOf', () => {
