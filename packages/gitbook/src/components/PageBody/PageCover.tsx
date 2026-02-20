@@ -7,6 +7,7 @@ import { type ResolvedContentRef, resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
 import { assert } from 'ts-essentials';
+import { CONTENT_STYLE } from '../layout';
 import { PageCoverImage } from './PageCoverImage';
 import { getCoverHeight } from './coverHeight';
 import defaultPageCoverSVG from './default-page-cover.svg';
@@ -85,7 +86,8 @@ export async function PageCover(props: {
                 'overflow-hidden',
                 // Negative margin to balance the container padding
                 '-mx-4',
-                'transition-all',
+
+                // Full-width cover: extend to edges, disregard TOC where possible
                 as === 'full'
                     ? [
                           'sm:-mx-6',
@@ -93,12 +95,17 @@ export async function PageCover(props: {
                           !page.layout.tableOfContents &&
                           context.customization.header.preset !== 'none'
                               ? [
-                                    'xl:-ml-76',
+                                    'xl:-ml-76', // Account for TOC width
+                                    'xl:layout-full:-mx-8', // In layout-full (no TOC), extend to screen edges
+                                    'xl:layout-full:w-screen',
                                     // Round the bottom corners once the page is wider than the image
-                                    '2xl:circular-corners:rounded-b-3xl 2xl:rounded-corners:rounded-b-xl',
+                                    '2xl:not-layout-full:circular-corners:rounded-b-3xl',
+                                    '2xl:not-layout-full:rounded-corners:rounded-b-xl',
                                 ]
                               : [
-                                    'lg:-ml-12',
+                                    // In layout-wide, extend cover to account for outline sidebar on the right
+                                    '2xl:layout-wide:-mr-[min(calc((100vw-96rem)/2+2rem),19rem)]',
+
                                     // Round the bottom left corner once the sidebar is shown next to it
                                     'lg:rounded-corners:rounded-bl-xl',
                                     'lg:circular-corners:rounded-bl-3xl',
@@ -108,12 +115,13 @@ export async function PageCover(props: {
                                 ],
                       ]
                     : [
-                          'sm:mx-auto',
-                          'max-w-3xl ',
-                          'page-width-wide:max-w-screen-2xl',
+                          // Regular cover: size regularly along with other content
+                          CONTENT_STYLE,
+                          'max-sm:-mx-4',
                           'sm:rounded-corners:rounded-xl',
                           'sm:circular-corners:rounded-3xl',
                           'mb-8',
+                          'max-sm:w-screen',
                           'max-sm:-mt-8',
                       ]
             )}

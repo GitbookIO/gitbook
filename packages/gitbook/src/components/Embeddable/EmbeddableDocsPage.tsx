@@ -52,7 +52,7 @@ export async function EmbeddableDocsPage(
             <EmbeddableFrameMain data-testid="embed-docs-page">
                 <div className="relative flex flex-col border-tint-subtle border-b theme-bold:bg-header-background">
                     <EmbeddableFrameHeader className="theme-bold:text-header-link">
-                        <HeaderMobileMenu className="-ml-2 page-no-toc:hidden theme-bold:text-header-link hover:theme-bold:bg-header-link/3 hover:theme-bold:text-header-link lg:hidden" />
+                        <HeaderMobileMenu className="-ml-2 layout-wide:hidden theme-bold:text-header-link hover:theme-bold:bg-header-link/3 hover:theme-bold:text-header-link lg:hidden" />
                         <EmbeddableFrameHeaderMain>
                             <EmbeddableFrameTitle>{context.site.title}</EmbeddableFrameTitle>
                         </EmbeddableFrameHeaderMain>

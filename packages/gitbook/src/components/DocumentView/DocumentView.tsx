@@ -93,7 +93,7 @@ export function DocumentViewSkeleton(props: { document: JSONDocument; blockStyle
                     style={[
                         'mx-auto w-full decoration-primary/6',
                         block.data && 'fullWidth' in block.data && block.data.fullWidth
-                            ? 'max-w-screen-xl'
+                            ? 'max-w-6xl'
                             : 'max-w-3xl',
                         blockStyle,
                     ]}

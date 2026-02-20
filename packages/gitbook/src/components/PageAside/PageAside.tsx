@@ -1,16 +1,13 @@
 import type { GitBookSiteContext } from '@/lib/context';
+import { getDocumentSections } from '@/lib/document-sections';
+import { tcls } from '@/lib/tailwind';
 import {
     type JSONDocument,
     type RevisionPageDocument,
     SiteAdsStatus,
     SiteInsightsAdPlacement,
 } from '@gitbook/api';
-import { Icon } from '@gitbook/icons';
 import React from 'react';
-
-import { getSpaceLanguage, t } from '@/intl/server';
-import { getDocumentSections } from '@/lib/document-sections';
-import { tcls } from '@/lib/tailwind';
 
 import { Ad } from '../Ads';
 import { PageFeedbackForm } from '../PageFeedback';
@@ -37,35 +34,36 @@ export function PageAside(props: {
                 'group/aside',
                 'order-last',
                 'hidden',
-                'max-w-0',
                 'pt-8',
                 'pb-4',
-                'opacity-0',
+                'ml-12',
 
                 'xl:flex',
 
                 'overflow-hidden',
 
-                'xl:max-w-56',
-                'xl:opacity-11',
-                'xl:ml-12',
-
-                'xl:max-3xl:chat-open:hidden',
-                'xl:max-3xl:chat-open:max-w-0',
-                'xl:max-3xl:chat-open:opacity-0',
-                'xl:max-3xl:chat-open:ml-0',
-
-                'hydrated:starting:ml-0',
-                'hydrated:starting:max-w-0',
-                'hydrated:starting:opacity-0',
-
-                'transition-[margin,max-width,opacity,display] duration-300',
-                'transition-discrete',
-
                 'basis-56',
                 'grow-0',
                 'shrink-0',
                 'break-anywhere', // To prevent long words in headings from breaking the layout
+
+                'xl:max-3xl:chat-open:hidden',
+                'mr-0',
+
+                // In layout-wide mode (2-column), hide outline when viewport is too narrow
+                // or when chat is open and viewport is narrow, to prevent layout overflow
+                'layout-wide:-mr-68',
+                'layout-wide:max-4xl:hidden',
+                'layout-wide:chat-open:max-[2416px]:hidden',
+
+                // In layout-full mode (1-column, no TOC), position outline as a fixed sidebar on the right
+                // Hide it on narrow viewports (< 3xl) to prevent overlap with content
+                'layout-full:max-3xl:hidden',
+                'layout-full:w-56',
+                'layout-full:fixed',
+                'layout-full:right-4',
+                'layout-full:h-full',
+                'layout-full:z-30',
 
                 'text-tint',
                 'contrast-more:text-tint-strong',
@@ -85,39 +83,12 @@ export function PageAside(props: {
 
                 // Client-side dynamic positioning (CSS vars applied by script)
                 'lg:[html[style*="--outline-top-offset"]_&]:top-(--outline-top-offset)!',
-                'lg:[html[style*="--outline-height"]_&]:max-h-(--outline-height)!',
-
-                // When in api page mode, we display it as an overlay on non-large resolutions
-                'xl:max-2xl:page-api-block:z-10',
-                'xl:max-2xl:page-api-block:fixed',
-                'xl:max-2xl:page-api-block:right-8',
-                'xl:max-2xl:page-api-block:w-60',
-                'xl:max-2xl:page-api-block:max-w-60',
-                'xl:max-2xl:page-api-block:pb-8',
-                'xl:max-2xl:page-api-block:pt-10',
-                'xl:max-2xl:[body:has(.openapi-block):has(.page-has-ancestors)_&]:pt-6.5'
+                'lg:[html[style*="--outline-height"]_&]:max-h-(--outline-height)!'
             )}
         >
             <div
-                className={tcls(
-                    'flex flex-col',
-                    'min-w-56 shrink-0',
-                    'overflow-hidden',
-                    'w-full',
-                    'xl:max-2xl:rounded-corners:page-api-block:rounded-md',
-                    'xl:max-2xl:circular-corners:page-api-block:rounded-xl',
-                    'xl:max-2xl:page-api-block:border',
-                    'xl:max-2xl:page-api-block:border-tint',
-                    'xl:max-2xl:page-api-block:bg-tint/9',
-                    'xl:max-2xl:page-api-block:backdrop-blur-lg',
-                    'xl:max-2xl:contrast-more:page-api-block:bg-tint',
-                    'xl:max-2xl:page-api-block:hover:shadow-lg',
-                    'xl:max-2xl:page-api-block:hover:shadow-tint-12/1',
-                    'xl:max-2xl:dark:page-api-block:hover:shadow-tint-1/1',
-                    'xl:max-2xl:page-api-block:not-hover:*:hidden'
-                )}
+                className={tcls('flex flex-col', 'min-w-56 shrink-0', 'overflow-hidden', 'w-full')}
             >
-                <PageAsideHeader context={context} />
                 {page.layout.outline ? (
                     <div className="flex shrink flex-col overflow-hidden">
                         {document ? (
@@ -133,34 +104,6 @@ export function PageAside(props: {
                 ) : null}
             </div>
         </aside>
-    );
-}
-
-function PageAsideHeader(props: { context: GitBookSiteContext }) {
-    const { context } = props;
-    const language = getSpaceLanguage(context);
-
-    return (
-        <div
-            className={tcls(
-                'hidden',
-                'xl:max-2xl:page-api-block:flex!',
-                'text-xs',
-                'tracking-wide',
-                'font-semibold',
-                'uppercase',
-                'px-2',
-                'py-1.5',
-
-                'flex-row',
-                'items-center',
-                'gap-2'
-            )}
-        >
-            <Icon icon="block-quote" className={tcls('size-3')} />
-            {t(language, 'on_this_page')}
-            <Icon icon="chevron-down" className={tcls('size-3', 'opacity-6', 'ml-auto')} />
-        </div>
     );
 }
 
@@ -187,7 +130,7 @@ function PageAsideActions(props: {
             className={tcls(
                 'flex flex-col gap-3',
                 'border-tint-subtle border-t first:border-none',
-                'sidebar-list-default:px-3 pt-5 first:pt-0 xl:max-2xl:page-api-block:p-5',
+                'sidebar-list-default:px-3 pt-5 first:pt-0',
                 'empty:hidden'
             )}
         >
@@ -208,8 +151,7 @@ async function PageAsideFooter(props: { context: GitBookSiteContext }) {
         <div
             className={tcls(
                 'sticky bottom-0 z-10 mt-auto flex flex-col',
-                'bg-tint-base theme-gradient-tint:bg-gradient-tint theme-gradient:bg-gradient-primary theme-muted:bg-tint-subtle [html.sidebar-filled.theme-bold.tint_&]:bg-tint-subtle',
-                'border-tint-subtle xl:max-2xl:page-api-block:border-t xl:max-2xl:page-api-block:p-2',
+                'border-tint-subtle',
                 'pt-4'
             )}
         >

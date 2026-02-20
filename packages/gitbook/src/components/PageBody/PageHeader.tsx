@@ -11,6 +11,7 @@ import {
     type PageActionsDropdownURLs,
 } from '../PageActions/PageActionsDropdown';
 import { PageIcon } from '../PageIcon';
+import { CONTENT_STYLE } from '../layout';
 import { StyledLink } from '../primitives';
 import { PageTags } from './PageTags';
 
@@ -53,13 +54,9 @@ export async function PageHeader(props: {
     return (
         <header
             className={tcls(
-                'max-w-3xl',
-                'page-width-wide:max-w-screen-2xl',
-                'mx-auto',
+                CONTENT_STYLE,
                 'mb-6',
                 'space-y-3',
-                'page-api-block:ml-0',
-                'page-api-block:max-w-full',
                 hasAncestors ? 'page-has-ancestors' : 'page-no-ancestors'
             )}
         >
@@ -68,10 +65,7 @@ export async function PageHeader(props: {
                     siteTitle={context.site.title}
                     urls={getPageActionsURLs({ context, page, withRSSFeed })}
                     actions={context.customization.pageActions}
-                    className={tcls(
-                        'float-right ml-4 xl:max-2xl:page-api-block:mr-62',
-                        hasAncestors ? '-my-1.5' : '-mt-3 xs:mt-2'
-                    )}
+                    className={tcls('float-right ml-4', hasAncestors ? '-my-1.5' : '-mt-3 xs:mt-2')}
                 />
             ) : null}
 
