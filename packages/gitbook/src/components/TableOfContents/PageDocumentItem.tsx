@@ -1,12 +1,12 @@
 'use client';
 
 import { tcls } from '@/lib/tailwind';
-import type { ClientTOCPageDocument } from './encodeClientTableOfContents';
-
 import { SiteInsightsLinkPosition } from '@gitbook/api';
+import { Tag } from '../Tag';
 import { PagesList } from './PagesList';
 import { TOCPageIcon } from './TOCPageIcon';
 import { ToggleableLinkItem } from './ToggleableLinkItem';
+import type { ClientTOCPageDocument } from './encodeClientTableOfContents';
 
 export function PageDocumentItem(props: { page: ClientTOCPageDocument }) {
     const { page } = props;
@@ -40,7 +40,10 @@ export function PageDocumentItem(props: { page: ClientTOCPageDocument }) {
                 }
             >
                 <TOCPageIcon page={page} />
-                {page.title}
+                <span className="flex items-center gap-2">
+                    {page.title}
+                    {page.primaryTag ? <Tag label={page.primaryTag.label} /> : null}
+                </span>
             </ToggleableLinkItem>
         </li>
     );
