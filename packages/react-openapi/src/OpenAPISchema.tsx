@@ -1108,17 +1108,15 @@ function mergeRequiredFields(
     const ancestorRequired = Array.isArray(latestAncestor?.required)
         ? latestAncestor.required
         : undefined;
-    const schemaRequired =
-        !checkIsReference(schemaOrRef) && Array.isArray(schemaOrRef.required)
-            ? schemaOrRef.required
-            : undefined;
-
-    if (!ancestorRequired && !schemaRequired) {
-        return undefined;
-    }
 
     if (checkIsReference(schemaOrRef)) {
         return ancestorRequired;
+    }
+
+    const schemaRequired = Array.isArray(schemaOrRef.required) ? schemaOrRef.required : undefined;
+
+    if (!ancestorRequired && !schemaRequired) {
+        return undefined;
     }
 
     return Array.from(new Set([...(ancestorRequired || []), ...(schemaRequired || [])]));
