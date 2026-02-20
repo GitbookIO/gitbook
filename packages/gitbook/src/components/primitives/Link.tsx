@@ -1,6 +1,7 @@
 'use client';
 
 import NextLink, { type LinkProps as NextLinkProps } from 'next/link';
+import { usePathname } from 'next/navigation';
 import React from 'react';
 
 import { tcls } from '@/lib/tailwind';
@@ -87,16 +88,18 @@ export function Link(props: LinkProps) {
     const { onNavigationClick } = React.useContext(NavigationStatusContext);
     const trackEvent = useTrackEvent();
     const forwardedClassNames = useClassnames(classNames || []);
-    const isExternal = isExternalServer(href);
+    const resolvedHref = useResolvedHref(href);
+
+    const isExternal = isExternalServer(resolvedHref);
     const { target, rel } = getTargetProps(props, { externalTarget, isExternal });
 
     const onClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
         // Only trigger navigation context for internal links in the same window without modifier keys (i.e. open in new tab).
         if (!isExternal && target !== '_blank' && !event.ctrlKey && !event.metaKey) {
-            onNavigationClick(href);
+            onNavigationClick(resolvedHref);
         }
 
-        const isExternalOnClient = isExternalClient(href);
+        const isExternalOnClient = isExternalClient(resolvedHref);
 
         if (insights) {
             trackEvent(insights, undefined, { immediate: isExternalOnClient });
@@ -109,7 +112,7 @@ export function Link(props: LinkProps) {
         if (isInIframe) {
             if (isExternalOnClient || event.ctrlKey || event.metaKey) {
                 event.preventDefault();
-                window.open(toNonEmbedLink(href), '_blank', 'noopener noreferrer');
+                window.open(toNonEmbedLink(resolvedHref), '_blank', 'noopener noreferrer');
             }
         } else if (isExternal && !event.ctrlKey && !event.metaKey) {
             // The external logic server-side is limited
@@ -120,7 +123,11 @@ export function Link(props: LinkProps) {
                 isExternal: isExternalOnClient,
             });
             event.preventDefault();
-            window.open(target === '_blank' ? toNonEmbedLink(href) : href, target, rel);
+            window.open(
+                target === '_blank' ? toNonEmbedLink(resolvedHref) : resolvedHref,
+                target,
+                rel
+            );
         }
 
         domProps.onClick?.(event);
@@ -134,7 +141,7 @@ export function Link(props: LinkProps) {
                 ref={ref}
                 className={tcls(...forwardedClassNames, className)}
                 {...domProps}
-                href={href}
+                href={resolvedHref}
                 onClick={onClick}
                 target={target}
                 rel={rel}
@@ -151,7 +158,7 @@ export function Link(props: LinkProps) {
     return (
         <NextLink
             ref={ref}
-            href={href}
+            href={resolvedHref}
             prefetch={_prefetch}
             className={tcls(...forwardedClassNames, className)}
             {...domProps}
@@ -160,6 +167,32 @@ export function Link(props: LinkProps) {
             {children}
         </NextLink>
     );
+}
+
+/**
+ * Resolve a href by interpolating `{location.href}` and `{location.pathname}`.
+ */
+export function useResolvedHref(href: string) {
+    const pathname = usePathname();
+    const [resolvedHref, setResolvedHref] = React.useState(href);
+
+    React.useEffect(() => {
+        setResolvedHref(
+            resolveHrefTemplate(href, {
+                'location.href': window.location.href,
+                'location.pathname': pathname ?? window.location.pathname,
+            })
+        );
+    }, [href, pathname]);
+
+    return resolvedHref;
+}
+
+/**
+ * Interpolate template variables in the format {variable}.
+ */
+function resolveHrefTemplate(href: string, variables: Record<string, string>): string {
+    return href.replace(/{([^}]+)}/g, (_, key) => variables[key] ?? `{${key}}`);
 }
 
 /**
