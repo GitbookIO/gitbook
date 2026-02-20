@@ -591,13 +591,11 @@ const testCases: TestsCase[] = [
             {
                 name: 'Site with sections and section groups',
                 url: '',
-                run: waitForCookiesDialog,
             },
             {
                 name: 'Section group dropdown',
                 url: '',
                 run: async (page) => {
-                    await waitForCookiesDialog(page);
                     await page.getByRole('button', { name: 'Test Section Group 1' }).hover();
                     await expect(page.getByRole('link', { name: /Section B/ })).toBeVisible();
                 },
@@ -607,7 +605,6 @@ const testCases: TestsCase[] = [
                 url: '',
                 screenshot: false,
                 run: async (page) => {
-                    await waitForCookiesDialog(page);
                     const sectionGroupDropdown = await page.getByText('Test Section Group 1');
                     await sectionGroupDropdown.hover();
                     await page.getByText('Section B').click();
