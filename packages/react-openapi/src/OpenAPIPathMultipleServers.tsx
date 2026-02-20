@@ -7,7 +7,7 @@ import { OpenAPITooltip } from './OpenAPITooltip';
 import type { OpenAPIClientContext } from './context';
 import { formatPath } from './formatPath';
 import type { OpenAPIServerWithCustomProperties } from './types';
-import { getDefaultServerURL } from './util/server';
+import { getDefaultServerURL, interpolateServerURL } from './util/server';
 import { createStateKey } from './utils';
 
 export const serversStateKey = createStateKey('servers');
@@ -29,11 +29,14 @@ export function OpenAPIPathMultipleServers(
         .filter(
             (server): server is OpenAPIServerWithCustomProperties & { url: string } => !!server.url
         )
-        .map((server) => ({
-            key: server.url,
-            label: server.url,
-            description: server.description,
-        }));
+        .map((server) => {
+            const url = interpolateServerURL(server);
+            return {
+                key: url,
+                label: url,
+                description: server.description,
+            };
+        });
 
     return (
         <OpenAPIPathItem
