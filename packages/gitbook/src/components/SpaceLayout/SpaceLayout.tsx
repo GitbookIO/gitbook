@@ -19,7 +19,7 @@ import { AIChat } from '../AIChat';
 import { AdaptiveVisitorContextProvider } from '../Adaptive';
 import { Announcement } from '../Announcement';
 import { SpacesDropdown, TranslationsDropdown } from '../Header/SpacesDropdown';
-import { InsightsProvider, VisitorSessionProvider } from '../Insights';
+import { InsightsProvider, VisitorProvider } from '../Insights';
 import { SearchContainer } from '../Search';
 import { SiteSectionList, encodeClientSiteSections } from '../SiteSections';
 import { CurrentContentProvider } from '../hooks';
@@ -78,7 +78,7 @@ export function SpaceLayoutServerContext(props: SpaceLayoutProps) {
                     revisionId={context.revisionId}
                     visitorAuthClaims={visitorAuthClaims}
                 >
-                    <VisitorSessionProvider
+                    <VisitorProvider
                         appURL={GITBOOK_APP_URL}
                         visitorCookieTrackingEnabled={customization.insights?.trackingCookie}
                     >
@@ -87,7 +87,7 @@ export function SpaceLayoutServerContext(props: SpaceLayoutProps) {
                                 {children}
                             </AIChatProvider>
                         </InsightsProvider>
-                    </VisitorSessionProvider>
+                    </VisitorProvider>
                 </CurrentContentProvider>
             </AdaptiveVisitorContextProvider>
         </SpaceLayoutContextProvider>

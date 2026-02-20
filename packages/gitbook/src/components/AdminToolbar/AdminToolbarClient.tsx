@@ -2,7 +2,7 @@
 import { Icon } from '@gitbook/icons';
 import { MotionConfig, motion } from 'motion/react';
 import { useCheckForContentUpdate } from '../AutoRefreshContent';
-import { useVisitorSession } from '../Insights';
+import { useVisitor } from '../Insights';
 import { useCurrentPagePath } from '../hooks';
 import { HideToolbarButton } from './HideToolbarButton';
 import { IframeWrapper } from './IframeWrapper';
@@ -40,7 +40,7 @@ export function AdminToolbarClient(props: AdminToolbarClientProps) {
         onToggleMinify,
     });
 
-    const visitorSession = useVisitorSession();
+    const visitor = useVisitor();
 
     const toolbarControls: ToolbarControlsContextValue = {
         minimize,
@@ -80,7 +80,7 @@ export function AdminToolbarClient(props: AdminToolbarClientProps) {
     }
 
     // If the user is authenticated and part of the organization owning this site, show the authenticated user toolbar
-    if (visitorSession?.organizationId === context.organizationId) {
+    if (visitor?.organizationId === context.organizationId) {
         return (
             <ToolbarControlsWrapper value={toolbarControls}>
                 <AuthenticatedUserToolbar
