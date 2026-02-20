@@ -2114,6 +2114,8 @@ const testCases: TestsCase[] = [
                 name: 'Switch between tabs',
                 url: '',
                 run: async (page) => {
+                    await page.clock.install({ time: new Date('2024-02-02T08:00:00') });
+                    await page.clock.runFor(1);
                     await expect(page.locator('#gitbook-widget-window')).toBeVisible();
                     const iframe = page.frameLocator('#gitbook-widget-iframe');
                     await iframe.getByTestId('embed-tab-docs').click(); // Switch to docs tab
