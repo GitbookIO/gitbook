@@ -1105,15 +1105,19 @@ function mergeRequiredFields(
     schemaOrRef: OpenAPIV3.SchemaObject | OpenAPIV3.ReferenceObject,
     latestAncestor: OpenAPIV3.SchemaObject | undefined
 ) {
-    if (!schemaOrRef.required && !latestAncestor?.required) {
+    const ancestorRequired = Array.isArray(latestAncestor?.required)
+        ? latestAncestor.required
+        : undefined;
+
+    if (checkIsReference(schemaOrRef)) {
+        return ancestorRequired;
+    }
+
+    const schemaRequired = Array.isArray(schemaOrRef.required) ? schemaOrRef.required : undefined;
+
+    if (!ancestorRequired && !schemaRequired) {
         return undefined;
     }
 
-    if (checkIsReference(schemaOrRef)) {
-        return latestAncestor?.required;
-    }
-
-    return Array.from(
-        new Set([...(latestAncestor?.required || []), ...(schemaOrRef.required || [])])
-    );
+    return Array.from(new Set([...(ancestorRequired || []), ...(schemaRequired || [])]));
 }
