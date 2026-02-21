@@ -1,5 +1,12 @@
 # @gitbook/browser-types
 
+## 0.1.5
+
+### Patch Changes
+
+- 5f66860: Use isCookiesTrackingDisabled for cookie consent integrations
+- 2e495cb: Add Global Privacy Control (GPC) support
+
 ## 0.1.4
 
 ### Patch Changes

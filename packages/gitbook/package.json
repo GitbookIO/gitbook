@@ -1,6 +1,6 @@
 {
     "name": "gitbook",
-    "version": "0.22.0",
+    "version": "0.22.1",
     "private": true,
     "dependencies": {
         "@cloudflare/workers-types": "^4.20251011.0",

@@ -1,5 +1,27 @@
 # gitbook
 
+## 0.22.1
+
+### Patch Changes
+
+- 9d5e397: Remove code syntax highlighting patch for Safari
+- 5f66860: Use isCookiesTrackingDisabled for cookie consent integrations
+- 426aabe: Fix TOC header logo on bold themes
+- ae30a57: Integrate Ask AI with upcoming insights by passing visitor session IDs.
+- e31a8f4: Hide cookie banner for AI user agents
+- 2e495cb: Add Global Privacy Control (GPC) support
+- Updated dependencies [1a7ef78]
+- Updated dependencies [93eea0b]
+- Updated dependencies [b4b471f]
+- Updated dependencies [5f66860]
+- Updated dependencies [2ebb18d]
+- Updated dependencies [11d9b80]
+- Updated dependencies [2e495cb]
+- Updated dependencies [f517035]
+  - @gitbook/react-openapi@1.5.8
+  - @gitbook/embed@0.2.2
+  - @gitbook/browser-types@0.1.5
+
 ## 0.22.0
 
 ### Minor Changes
