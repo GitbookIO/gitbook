@@ -14,11 +14,7 @@ import type { GitBookStandalone } from '@gitbook/embed';
 import { expect } from '@playwright/test';
 import jwt from 'jsonwebtoken';
 
-import {
-    VISITOR_TOKEN_COOKIE,
-    getVisitorAuthCookieName,
-    getVisitorAuthCookieValue,
-} from '@/lib/visitors';
+import { VISITOR_TOKEN_COOKIE } from '@/lib/visitors';
 
 import { getSiteAPIToken } from '../tests/utils';
 import {
@@ -1640,33 +1636,36 @@ const testCases: TestsCase[] = [
         name: 'Visitor Auth - Site (redirects to fallback/auth URL)',
         contentBaseURL: 'https://gitbook-open-e2e-sites.gitbook.io/va-site-redirects-fallback/',
         tests: [
-            {
-                name: 'Redirect to fallback on invalid token pulled from cookie',
-                url: '',
-                screenshot: false,
-                cookies: (() => {
-                    const basePath = '/va-site-redirects-fallback/';
-                    const invalidToken = jwt.sign(
-                        {
-                            name: 'gitbook-open-tests',
-                        },
-                        'invalidKey',
-                        {
-                            expiresIn: '24h',
-                        }
-                    );
-                    return [
-                        {
-                            name: getVisitorAuthCookieName(basePath),
-                            value: getVisitorAuthCookieValue(basePath, invalidToken),
-                            httpOnly: true,
-                        },
-                    ];
-                })(),
-                run: async (page) => {
-                    await expect(page).toHaveURL(/https:\/\/www.google.com/);
-                },
-            },
+            // This test does not work on Playwright
+            // Error: page.goto: net::ERR_ABORTED; maybe frame was detached?
+            // @see https://github.com/microsoft/playwright/issues/34889
+            // {
+            //     name: 'Redirect to fallback on invalid token pulled from cookie',
+            //     url: '',
+            //     screenshot: false,
+            //     cookies: (() => {
+            //         const basePath = '/va-site-redirects-fallback/';
+            //         const invalidToken = jwt.sign(
+            //             {
+            //                 name: 'gitbook-open-tests',
+            //             },
+            //             'invalidKey',
+            //             {
+            //                 expiresIn: '24h',
+            //             }
+            //         );
+            //         return [
+            //             {
+            //                 name: getVisitorAuthCookieName(basePath),
+            //                 value: getVisitorAuthCookieValue(basePath, invalidToken),
+            //                 httpOnly: true,
+            //             },
+            //         ];
+            //     })(),
+            //     run: async (page) => {
+            //         await expect(page).toHaveURL(/https:\/\/www.google.com/);
+            //     },
+            // },
             {
                 name: 'Show error message when invalid token is passed to url',
                 screenshot: false,

@@ -83,8 +83,8 @@
         "zustand": "^5.0.3"
     },
     "devDependencies": {
-        "@argos-ci/playwright": "^5.0.9",
-        "@playwright/test": "^1.54.2",
+        "@argos-ci/playwright": "^6.4.2",
+        "@playwright/test": "^1.58.2",
         "@scalar/api-client-react": "catalog:",
         "@tailwindcss/postcss": "^4.1.11",
         "@types/js-cookie": "^3.0.6",
