@@ -3,7 +3,7 @@ import { throwIfDataError } from '@/lib/data';
 import type { GitBookLinker } from '@/lib/links';
 import { joinPath } from '@/lib/paths';
 import { type FlatPageEntry, getIndexablePages } from '@/lib/sitemap';
-import { getSiteStructureSections } from '@/lib/sites';
+import { getSiteSectionTitle, getSiteStructureSections } from '@/lib/sites';
 import type { SiteSection, SiteSpace } from '@gitbook/api';
 import assertNever from 'assert-never';
 import type { ListItem, Paragraph, Root, RootContent } from 'mdast';
@@ -89,6 +89,7 @@ async function getNodesFromSections(
         withMarkdownPages: boolean;
     }
 ): Promise<RootContent[]> {
+    const currentLanguage = context.siteSpace.space.language;
     const all = await Promise.all(
         siteSections.map(async (siteSection): Promise<RootContent[]> => {
             const siteSpaceNodes = await getNodesFromSiteSpaces(context, siteSection.siteSpaces, {
@@ -99,7 +100,9 @@ async function getNodesFromSections(
                 {
                     type: 'heading',
                     depth: 2,
-                    children: [{ type: 'text', value: siteSection.title }],
+                    children: [
+                        { type: 'text', value: getSiteSectionTitle(siteSection, currentLanguage) },
+                    ],
                 },
                 ...siteSpaceNodes,
             ];
