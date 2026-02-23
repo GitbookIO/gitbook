@@ -252,7 +252,7 @@ export async function searchSiteContent({
                 searchResults.map((resultItem) => {
                     // @ts-expect-error - will be added to the API soon
                     if (resultItem.type === 'record') {
-                        return {
+                        const result: ComputedRecordResult = {
                             type: 'record',
                             id: resultItem.id,
                             title: resultItem.title,
@@ -260,7 +260,8 @@ export async function searchSiteContent({
                             body: resultItem.description,
                             // @ts-expect-error - will be added to the API soon
                             href: resultItem.url,
-                        } satisfies ComputedRecordResult;
+                        };
+                        return result;
                     }
 
                     const found = findSiteSpaceBy(
