@@ -57,7 +57,7 @@ export const SearchSectionResultItem = React.forwardRef(function SearchSectionRe
     );
 });
 
-function highlightQueryInBody(body: string, query: string) {
+export function highlightQueryInBody(body: string, query: string) {
     const idx = body.toLocaleLowerCase().indexOf(query.toLocaleLowerCase());
 
     // Ensure the query to be highlighted is visible in the body.
