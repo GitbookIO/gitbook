@@ -30,7 +30,7 @@ export async function TableOfContents(props: {
             <SideSheet
                 side="left"
                 data-testid="table-of-contents"
-                id="table-of-contents"
+                data-gb-table-of-contents
                 toggleClass="navigation-open"
                 withOverlay={true}
                 withCloseButton={true}

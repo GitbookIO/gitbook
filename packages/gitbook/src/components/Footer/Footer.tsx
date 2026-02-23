@@ -28,7 +28,7 @@ export function Footer(props: { context: GitBookSiteContext }) {
 
     return (
         <footer
-            id="site-footer"
+            data-gb-site-footer
             className={tcls(
                 'border-tint-subtle border-t',
                 // If the footer only contains a mode toggle, we only show it on smaller screens

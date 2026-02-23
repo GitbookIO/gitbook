@@ -35,7 +35,7 @@ export function Header(props: {
 
     return (
         <header
-            id="site-header"
+            data-gb-site-header
             className={tcls(
                 'flex',
                 'flex-col',
@@ -70,7 +70,7 @@ export function Header(props: {
             >
                 <div className="transition-all duration-300 lg:chat-open:pr-80 xl:chat-open:pr-96">
                     <div
-                        id="header-content"
+                        data-gb-header-content
                         className={tcls(
                             'gap-4',
                             'lg:gap-6',

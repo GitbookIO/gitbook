@@ -92,7 +92,7 @@ export function SiteSectionTabs(props: {
                         !children ? 'pr-4 sm:pr-6 md:pr-8' : 'pr-4'
                     )}
                     aria-label="Sections"
-                    id="sections"
+                    data-gb-sections
                 >
                     {structure.map((structureItem) => {
                         const { id, title, icon } = structureItem;

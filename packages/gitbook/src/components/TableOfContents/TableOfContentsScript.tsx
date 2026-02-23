@@ -12,10 +12,10 @@ export function TableOfContentsScript() {
         // Calculate and set TOC dimensions
         const updateTocLayout = () => {
             // Get key elements
-            const header = document.getElementById('site-header');
-            const banner = document.getElementById('announcement-banner');
-            const footer = document.getElementById('site-footer');
-            const pageCover = document.getElementById('page-cover');
+            const header = document.querySelector<HTMLElement>('[data-gb-site-header]');
+            const banner = document.querySelector<HTMLElement>('[data-gb-announcement-banner]');
+            const footer = document.querySelector<HTMLElement>('[data-gb-site-footer]');
+            const pageCover = document.querySelector<HTMLElement>('[data-gb-page-cover]');
 
             // Set sticky top position based on header
             const headerHeight = header?.offsetHeight ?? 0;

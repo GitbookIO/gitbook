@@ -79,7 +79,7 @@ export async function PageCover(props: {
 
     return (
         <div
-            id="page-cover"
+            data-gb-page-cover
             data-full={String(as === 'full')}
             className={tcls(
                 'overflow-hidden',

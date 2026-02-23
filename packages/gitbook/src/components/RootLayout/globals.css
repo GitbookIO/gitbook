@@ -292,7 +292,7 @@ html.dark {
     color-scheme: dark light;
 }
 
-html.announcement-hidden #announcement-banner {
+html.announcement-hidden [data-gb-announcement-banner] {
     @apply hidden;
 }
 

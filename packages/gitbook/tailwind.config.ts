@@ -600,14 +600,17 @@ const config: Config = {
             /**
              * Variant when a header is displayed.
              */
-            addVariant('site-header-none', 'body:not(:has(#site-header:not(.mobile-only))) &');
-            addVariant('site-header', 'body:has(#site-header:not(.mobile-only)) &');
+            addVariant(
+                'site-header-none',
+                'body:not(:has([data-gb-site-header]:not(.mobile-only))) &'
+            );
+            addVariant('site-header', 'body:has([data-gb-site-header]:not(.mobile-only)) &');
             addVariant('site-header-sections', [
-                'body:has(#site-header:not(.mobile-only) #sections) &',
+                'body:has([data-gb-site-header]:not(.mobile-only) [data-gb-sections]) &',
             ]);
             addVariant(
                 'announcement',
-                'html:not(.announcement-hidden):has(#announcement-banner) &'
+                'html:not(.announcement-hidden):has([data-gb-announcement-banner]) &'
             );
             addVariant('embed', 'html.embed &');
 
