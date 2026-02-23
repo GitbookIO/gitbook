@@ -32,17 +32,33 @@ async function handler(
                     );
 
                     return {
-                        content: results.flatMap((spaceResult) => {
+                        content: results.flatMap((result) => {
+                            // @ts-expect-error - soon updated in the API
+                            if (result.type === 'record') {
+                                return {
+                                    type: 'text',
+                                    text: [
+                                        `Title: ${result.title}`,
+                                        // @ts-expect-error - soon updated in the API
+                                        `Link: ${result.href}`,
+                                        // @ts-expect-error - soon updated in the API
+                                        result.description ? `Content: ${result.description}` : '',
+                                    ]
+                                        .filter(Boolean)
+                                        .join('\n'),
+                                };
+                            }
+
                             const found = findSiteSpaceBy(
                                 context.structure,
-                                (siteSpace) => siteSpace.space.id === spaceResult.id
+                                (siteSpace) => siteSpace.space.id === result.id
                             );
                             const spaceURL = found?.siteSpace.urls.published;
                             if (!spaceURL) {
                                 return [];
                             }
 
-                            return spaceResult.pages.map((pageResult) => {
+                            return result.pages.map((pageResult) => {
                                 const pageURL = linker.toAbsoluteURL(
                                     linker.toLinkForContent(
                                         joinPathWithBaseURL(spaceURL, pageResult.path)
