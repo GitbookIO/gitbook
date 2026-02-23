@@ -106,6 +106,10 @@ function getIframe() {
         widgetWindow.appendChild(widgetIframe);
 
         _frame = client.createFrame(widgetIframe);
+        _frame.on('close', () => {
+            widgetWindow.classList.add('hidden');
+            widgetButton.classList.remove('open');
+        });
     }
     return { iframe: widgetIframe, frame: _frame };
 }

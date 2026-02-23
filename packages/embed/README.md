@@ -50,7 +50,8 @@ GitBook('configure', {
     ],
     greeting: { title: 'Welcome!', subtitle: 'How can I help?' },
     suggestions: ['What is GitBook?', 'How do I get started?'],
-    tools: [/* ... */]
+    tools: [/* ... */],
+    closeButton: true,
 });
 ```
 
@@ -100,7 +101,8 @@ frame.configure({
     ],
     greeting: { title: 'Welcome!', subtitle: 'How can I help?' },
     suggestions: ['What is GitBook?', 'How do I get started?'],
-    tools: [/* ... */]
+    tools: [/* ... */],
+    closeButton: true
 });
 
 // Listen to events
@@ -133,6 +135,7 @@ import { GitBookProvider, GitBookFrame } from '@gitbook/embed/react';
             }
         ]}
         tools={[/* ... */]}
+        closeButton
     />
 </GitBookProvider>
 ```
@@ -223,14 +226,48 @@ Available in: Standalone script, NPM package, React components
 Override which tabs are displayed. Defaults to your site's configuration.
 
 - **Type**: `('assistant' | 'docs')[]`
-- **Options**:
-  - `['assistant', 'docs']` - Show both tabs
-  - `['assistant']` - Show only the assistant tab
-  - `['docs']` - Show only the docs tab
 
 ```javascript
 tabs: ['assistant', 'docs']
 ```
+
+### `closeButton`
+
+Available in: Standalone script, NPM package, React components
+
+Display a close (`x`) button in the embed sidebar.
+
+- **Type**: `boolean`
+- **Default**: `false`
+
+```javascript
+closeButton: true
+```
+
+Behavior:
+- When clicked, the embed sends a `close` event to the parent page.
+- In the standalone script, this event is handled automatically and the widget closes.
+- In custom iframe integrations (NPM package), you must listen for the `close` event and decide how to hide/collapse your UI.
+- In React, this works automatically when using the standard widget flow. If you build custom frame wiring, handle `close` the same way as the NPM package.
+
+NPM package example:
+
+```typescript
+const frame = gitbook.createFrame(iframe);
+
+frame.configure({
+    closeButton: true
+});
+
+const unsubscribe = frame.on('close', () => {
+    // Hide your modal/drawer/container
+    container.classList.add('hidden');
+});
+```
+
+Notes:
+- The close button is rendered in the same sidebar area as tabs/actions.
+- If your UI hides that sidebar or doesn't render it, the button will not be visible.
 
 ### `actions`
 

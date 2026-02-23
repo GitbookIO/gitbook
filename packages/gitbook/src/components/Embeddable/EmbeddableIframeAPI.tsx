@@ -1,7 +1,6 @@
 'use client';
 
 import type { GitBookEmbeddableConfiguration, ParentToFrameMessage } from '@gitbook/embed';
-import { createChannel } from 'bidc';
 import React, { useEffect, useRef } from 'react';
 
 import { useAI, useAIChatController } from '@/components/AI';
@@ -10,6 +9,7 @@ import { useRouter } from 'next/navigation';
 import { createStore, useStore } from 'zustand';
 import { integrationsAssistantTools } from '../Integrations';
 import { Button } from '../primitives';
+import { getChannel } from './channel';
 
 const embeddableConfiguration = createStore<GitBookEmbeddableConfiguration>(() => ({
     tabs: [],
@@ -50,12 +50,10 @@ export function EmbeddableIframeAPI(props: {
     }, [chatController]);
 
     React.useEffect(() => {
-        if (window.parent === window) {
+        const channel = getChannel();
+        if (!channel) {
             return;
         }
-
-        log('[gitbook] create channel with parent window');
-        const channel = createChannel();
 
         channel.receive((payload) => {
             const { baseURL, router, chatController } = refs.current;
@@ -91,11 +89,6 @@ export function EmbeddableIframeAPI(props: {
                 }
             }
         });
-
-        return () => {
-            log('[gitbook] cleanup');
-            channel.cleanup();
-        };
     }, []);
 
     return null;
@@ -204,7 +197,7 @@ export function EmbeddableIframeTabs(props: {
     }, [tabs, baseURL, router, active]);
 
     return tabs.length > 1 || actions.length > 0 ? (
-        <div className="flex flex-col gap-2" ref={ref}>
+        <div className="flex flex-col items-center gap-2" ref={ref}>
             {tabs.map((tab) => (
                 <Button
                     key={tab.key}
@@ -226,4 +219,33 @@ export function EmbeddableIframeTabs(props: {
             ))}
         </div>
     ) : null;
+}
+
+export function EmbeddableIframeCloseButton() {
+    const { closeButton } = useEmbeddableConfiguration();
+
+    if (!closeButton) {
+        return null;
+    }
+
+    return (
+        <div className="flex flex-1 flex-col justify-end">
+            <Button
+                label="Close"
+                variant="blank"
+                size="large"
+                icon="xmark"
+                className="not-hydrated:animate-blur-in-slow [&_.button-leading-icon]:size-5"
+                iconOnly
+                onClick={() => {
+                    getChannel()?.send({ type: 'close' });
+                }}
+                tooltipProps={{
+                    contentProps: {
+                        side: 'right',
+                    },
+                }}
+            />
+        </div>
+    );
 }
