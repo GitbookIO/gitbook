@@ -62,7 +62,7 @@ const SOCIAL_PLATFORMS: Record<SiteSocialAccountPlatform, SocialPlatformData> = 
     [SiteSocialAccountPlatform.Reddit]: {
         label: 'Reddit',
         icon: 'reddit',
-        href: 'https://reddit.com/@$handle',
+        href: 'https://reddit.com/$handle',
     },
     [SiteSocialAccountPlatform.Bluesky]: {
         label: 'Bluesky',
