@@ -60,7 +60,7 @@ export interface ComputedRecordResult {
     type: 'record';
     id: string;
     title: string;
-    body: string;
+    description: string;
     href: string;
 }
 
