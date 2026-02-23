@@ -33,15 +33,12 @@ async function handler(
 
                     return {
                         content: results.flatMap((result) => {
-                            // @ts-expect-error - soon updated in the API
                             if (result.type === 'record') {
                                 return {
                                     type: 'text',
                                     text: [
                                         `Title: ${result.title}`,
-                                        // @ts-expect-error - soon updated in the API
-                                        `Link: ${result.href}`,
-                                        // @ts-expect-error - soon updated in the API
+                                        `Link: ${result.url}`,
                                         result.description ? `Content: ${result.description}` : '',
                                     ]
                                         .filter(Boolean)

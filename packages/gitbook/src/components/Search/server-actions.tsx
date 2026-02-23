@@ -60,7 +60,7 @@ export interface ComputedRecordResult {
     type: 'record';
     id: string;
     title: string;
-    description: string;
+    description: string | undefined;
     href: string;
 }
 
@@ -250,15 +250,12 @@ export async function searchSiteContent({
         return (
             await Promise.all(
                 searchResults.map((resultItem) => {
-                    // @ts-expect-error - will be added to the API soon
                     if (resultItem.type === 'record') {
                         const result: ComputedRecordResult = {
                             type: 'record',
                             id: resultItem.id,
                             title: resultItem.title,
-                            // @ts-expect-error - will be added to the API soon
-                            body: resultItem.description,
-                            // @ts-expect-error - will be added to the API soon
+                            description: resultItem.description,
                             href: resultItem.url,
                         };
                         return result;
