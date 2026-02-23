@@ -22,5 +22,5 @@ export function InlineExpressionValue(props: {
         [expression, evaluateInlineExpression]
     );
 
-    return <>{result}</>;
+    return <span className="inline-block whitespace-nowrap break-normal">{result}</span>;
 }
