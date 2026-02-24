@@ -25,6 +25,7 @@ import {
 } from './EmbeddableFrame';
 import {
     EmbeddableIframeButtons,
+    EmbeddableIframeCloseButton,
     EmbeddableIframeTabs,
     useEmbeddableConfiguration,
 } from './EmbeddableIframeAPI';
@@ -89,6 +90,7 @@ export function EmbeddableAIChat(props: EmbeddableAIChatProps) {
                     siteTitle={siteTitle}
                 />
                 <EmbeddableIframeButtons />
+                <EmbeddableIframeCloseButton />
             </EmbeddableFrameSidebar>
             <EmbeddableFrameMain data-testid="ai-chat">
                 <EmbeddableFrameHeader>

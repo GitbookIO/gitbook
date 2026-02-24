@@ -1,6 +1,7 @@
 import { type ClassValue, tcls } from '@/lib/tailwind';
 import React from 'react';
 import { CONTAINER_STYLE } from '../layout';
+import { Button } from '../primitives';
 
 export type EmbeddableFrameProps = React.ComponentProps<'div'> & {
     children: React.ReactNode;
@@ -91,6 +92,10 @@ export function EmbeddableFrameTitle(props: {
     const { children } = props;
 
     return <div className="font-bold">{children}</div>;
+}
+
+export function EmbeddableFrameClose() {
+    return <Button iconOnly icon="x" className="absolute top-1 right-1" />;
 }
 
 export function EmbeddableFrameSubtitle(props: {

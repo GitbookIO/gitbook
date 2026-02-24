@@ -18,7 +18,11 @@ import {
     EmbeddableFrameSidebar,
     EmbeddableFrameTitle,
 } from './EmbeddableFrame';
-import { EmbeddableIframeButtons, EmbeddableIframeTabs } from './EmbeddableIframeAPI';
+import {
+    EmbeddableIframeButtons,
+    EmbeddableIframeCloseButton,
+    EmbeddableIframeTabs,
+} from './EmbeddableIframeAPI';
 
 export const dynamic = 'force-static';
 
@@ -48,6 +52,7 @@ export async function EmbeddableDocsPage(
                     siteTitle={context.site.title}
                 />
                 <EmbeddableIframeButtons />
+                <EmbeddableIframeCloseButton />
             </EmbeddableFrameSidebar>
             <EmbeddableFrameMain data-testid="embed-docs-page">
                 <div className="relative flex flex-col border-tint-subtle border-b theme-bold:bg-header-background">
