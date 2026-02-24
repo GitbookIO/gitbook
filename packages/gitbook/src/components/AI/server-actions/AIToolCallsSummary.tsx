@@ -1,5 +1,6 @@
 import { HighlightQuery } from '@/components/Search/HighlightQuery';
 import { Link, StyledLink } from '@/components/primitives';
+import { Favicon } from '@/components/utils';
 import { getSpaceLanguage } from '@/intl/server';
 import { t } from '@/intl/translate';
 import type { GitBookSiteContext } from '@/lib/context';
@@ -209,13 +210,16 @@ async function DescriptionForSearchToolCall(props: {
                             const resultKey = (() => {
                                 switch (result.type) {
                                     case 'page':
-                                        return result.pageId;
+                                        return `${result.spaceId}/${result.pageId}`;
                                     case 'record':
                                         return result.recordId;
                                     default:
                                         assertNever(result);
                                 }
                             })();
+
+                            const iconClassName = 'mt-1 size-3 shrink-0 text-tint-subtle';
+                            const icon = <Icon icon="memo" className={iconClassName} />;
 
                             return (
                                 <li
@@ -229,10 +233,11 @@ async function DescriptionForSearchToolCall(props: {
                                         href={result.href}
                                         className="flex items-start gap-2 circular-corners:rounded-2xl rounded-corners:rounded-md px-3 py-2 transition-colors hover:bg-primary-hover"
                                     >
-                                        <Icon
-                                            icon="memo"
-                                            className="mt-1 size-3 shrink-0 text-tint-subtle"
-                                        />
+                                        {result.type === 'record' ? (
+                                            <Favicon url={result.href} className={iconClassName} />
+                                        ) : (
+                                            icon
+                                        )}
                                         <div className="flex flex-col gap-1 text-tint">
                                             <h3 className="line-clamp-2 font-medium text-sm text-tint">
                                                 <HighlightQuery
