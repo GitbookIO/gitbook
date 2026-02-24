@@ -24,7 +24,7 @@ import { type PDFSearchParams, getPDFSearchParams } from './urls';
 
 import { PDFPrintControls } from './PDFPrintControls';
 import { PageControlButtons } from './PageControlButtons';
-import { createPDFLinker } from './linker';
+import { createPDFLinker, getPagePDFContainerId } from './linker';
 import './pdf.css';
 import { sanitizeGitBookAppURL } from '@/lib/app';
 import { getPageDocument } from '@/lib/data';
@@ -310,14 +310,4 @@ function selectPages(
         return flattenPage(page, 0);
     });
     return limitTo(allPages);
-}
-
-/**
- * Create the HTML ID for the container of a page or a given anchor in it.
- */
-function getPagePDFContainerId(
-    page: RevisionPageDocument | RevisionPageGroup,
-    anchor?: string
-): string {
-    return `pdf-page-${page.id}${anchor ? `-${anchor}` : ''}`;
 }

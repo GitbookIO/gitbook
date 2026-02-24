@@ -1,10 +1,16 @@
-import type { Revision } from '@gitbook/api';
+import type { Revision, RevisionPageDocument, RevisionPageGroup } from '@gitbook/api';
 import { RevisionPageType } from '@gitbook/api';
 
 import type { GitBookLinker } from '@/lib/links';
 
-function getPagePDFContainerId(page: Revision['pages'][number], anchor?: string): string {
-    return `page-${page.id}` + (anchor ? `-${anchor}` : '');
+/**
+ * Create the HTML ID for the container of a page or a given anchor in it.
+ */
+export function getPagePDFContainerId(
+    page: RevisionPageDocument | RevisionPageGroup,
+    anchor?: string
+): string {
+    return `page-${page.id}${anchor ? `-${anchor}` : ''}`;
 }
 
 export function createPDFLinker(
