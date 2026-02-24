@@ -10,6 +10,7 @@ import { tcls } from '@/lib/tailwind';
 import { Button, Loading } from '../primitives';
 import { SearchPageResultItem } from './SearchPageResultItem';
 import { SearchQuestionResultItem } from './SearchQuestionResultItem';
+import { SearchRecordResultItem } from './SearchRecordResultItem';
 import { SearchSectionResultItem } from './SearchSectionResultItem';
 import type { OrderedComputedResult } from './server-actions';
 
@@ -196,6 +197,20 @@ export const SearchResults = React.forwardRef(function SearchResults(
                                 case 'section': {
                                     return (
                                         <SearchSectionResultItem
+                                            ref={(ref) => {
+                                                refs.current[index] = ref;
+                                            }}
+                                            key={item.id}
+                                            query={query}
+                                            item={item}
+                                            active={index === cursor}
+                                            {...resultItemProps}
+                                        />
+                                    );
+                                }
+                                case 'record': {
+                                    return (
+                                        <SearchRecordResultItem
                                             ref={(ref) => {
                                                 refs.current[index] = ref;
                                             }}
