@@ -72,7 +72,6 @@ export function PageBody(props: {
     // - layout-wide: wideLayout=true + pageHasToc=true → 2-column (TOC + Content)
     // - layout-full: wideLayout=true + pageHasToc=false → 1-column (Content only)
     const pageHasToc = page.layout.tableOfContents && hasVisibleTOCItems;
-    const pageHasOutline = page.layout.outline;
 
     return (
         <CurrentPageProvider page={{ spaceId: context.space.id, pageId: page.id }}>
@@ -80,12 +79,11 @@ export function PageBody(props: {
                 className={tcls(
                     'relative min-w-0 flex-1',
                     'py-8',
-                    // Allow words to break if they are too long.
-                    'break-anywhere',
+                    'layout-full:lg:max-xl:pb-20', // Add padding to prevent overlap of minimised trademark
+                    'break-anywhere', // Allow words to break if they are too long.
                     '@container',
                     CONTENT_STYLE,
                     pageHasToc ? 'page-has-toc' : 'page-no-toc',
-                    pageHasOutline ? 'page-has-outline' : 'page-no-outline',
                     wideLayout ? 'layout-wide' : 'layout-default'
                 )}
             >

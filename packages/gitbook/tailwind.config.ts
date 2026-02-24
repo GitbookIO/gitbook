@@ -473,18 +473,18 @@ const config: Config = {
                 },
                 enterFromRight: {
                     from: { opacity: '0', transform: 'translateX(50%)', display: 'none' },
-                    to: { opacity: '1', transform: 'translateX(0)', display: 'inherit' },
+                    to: { opacity: '1', transform: 'translateX(0)', display: 'revert' },
                 },
                 enterFromLeft: {
                     from: { opacity: '0', transform: 'translateX(-50%)', display: 'none' },
-                    to: { opacity: '1', transform: 'translateX(0)', display: 'inherit' },
+                    to: { opacity: '1', transform: 'translateX(0)', display: 'revert' },
                 },
                 exitToRight: {
-                    from: { opacity: '1', transform: 'translateX(0)', display: 'inherit' },
+                    from: { opacity: '1', transform: 'translateX(0)', display: 'revert' },
                     to: { opacity: '0', transform: 'translateX(50%)', display: 'none' },
                 },
                 exitToLeft: {
-                    from: { opacity: '1', transform: 'translateX(0)', display: 'inherit' },
+                    from: { opacity: '1', transform: 'translateX(0)', display: 'revert' },
                     to: { opacity: '0', transform: 'translateX(-50%)', display: 'none' },
                 },
                 scaleIn: {
@@ -690,6 +690,8 @@ const config: Config = {
 
             addVariant('page-no-toc', 'body:has(.page-no-toc) &');
             addVariant('page-has-toc', 'body:has(.page-has-toc) &');
+            addVariant('page-has-outline', 'body:has([data-gb-page-outline]) &');
+            addVariant('page-no-outline', 'body:not(:has([data-gb-page-outline])) &');
 
             /**
              * Variant when the page contains an Updates block.

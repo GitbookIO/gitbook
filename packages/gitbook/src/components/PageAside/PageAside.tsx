@@ -9,9 +9,12 @@ import {
 } from '@gitbook/api';
 import React from 'react';
 
+import { Icon } from '@gitbook/icons';
 import { Ad } from '../Ads';
 import { PageFeedbackForm } from '../PageFeedback';
 import { ThemeToggler } from '../ThemeToggler';
+import { SideSheet } from '../primitives/SideSheet';
+import { PageAsideCloseButton } from './PageAsideButton';
 import { ScrollSectionsList } from './ScrollSectionsList';
 
 /**
@@ -29,45 +32,17 @@ export function PageAside(props: {
     const { customization, site } = context;
 
     return (
-        <aside
+        <SideSheet
+            side="right"
+            toggleClass="outline-open"
+            withOverlay={true}
+            withCloseButton={true}
             className={tcls(
                 'group/aside',
                 'order-last',
-                'hidden',
-                'pt-8',
-                'pb-4',
-                'ml-12',
 
-                'xl:flex',
-
-                'overflow-hidden',
-
-                'basis-56',
-                'grow-0',
-                'shrink-0',
-                'break-anywhere', // To prevent long words in headings from breaking the layout
-
-                'xl:max-3xl:chat-open:hidden',
-                'mr-0',
-
-                // In layout-wide mode (2-column), hide outline when viewport is too narrow
-                // or when chat is open and viewport is narrow, to prevent layout overflow
-                'layout-wide:-mr-68',
-                'layout-wide:max-4xl:hidden',
-                'layout-wide:chat-open:max-[2416px]:hidden',
-
-                // In layout-full mode (1-column, no TOC), position outline as a fixed sidebar on the right
-                // Hide it on narrow viewports (< 3xl) to prevent overlap with content
-                'layout-full:max-3xl:hidden',
-                'layout-full:w-56',
-                'layout-full:fixed',
-                'layout-full:right-4',
-                'layout-full:h-full',
-                'layout-full:z-30',
-
-                'text-tint',
-                'contrast-more:text-tint-strong',
-                'sticky',
+                'xl:sticky',
+                'w-64',
 
                 // Without header
                 'lg:top-0',
@@ -83,27 +58,70 @@ export function PageAside(props: {
 
                 // Client-side dynamic positioning (CSS vars applied by script)
                 'lg:[html[style*="--outline-top-offset"]_&]:top-(--outline-top-offset)!',
-                'lg:[html[style*="--outline-height"]_&]:max-h-(--outline-height)!'
+                'lg:[html[style*="--outline-height"]_&]:max-h-(--outline-height)!',
+
+                'layout-default:max-xl:border-l',
+                'layout-wide:max-4xl:border-l',
+                'border-tint-subtle',
+
+                'p-4',
+                'pt-8',
+                'ml-4',
+
+                'break-anywhere', // To prevent long words in headings from breaking the layout
+
+                'lg:z-10',
+                'layout-default:xl:not-chat-open:pr-0',
+                'layout-default:xl:not-chat-open:pl-8',
+                'layout-default:xl:not-chat-open:flex!',
+                'layout-default:xl:not-chat-open:animate-none!',
+                'layout-default:3xl:flex!',
+                'layout-default:3xl:animate-none!',
+
+                // In layout-wide mode (2-column), hide outline when viewport is too narrow
+                // or when chat is open and viewport is narrow, to prevent layout overflow
+                'layout-wide:xl:-mr-68',
+                'layout-wide:4xl:not-chat-open:flex!',
+                'layout-wide:4xl:not-chat-open:animate-none!',
+                'layout-wide:min-[150rem]:animate-none!',
+                'layout-wide:min-[150rem]:flex!',
+                // 'layout-wide:chat-open:max-[2416px]:hidden',
+
+                // In layout-full mode (1-column, no TOC), position outline as a fixed sidebar on the right
+                // Hide it on narrow viewports (< 3xl) to prevent overlap with content
+                'layout-full:3xl:flex!',
+                'layout-full:3xl:animate-none!',
+                'layout-full:3xl:fixed',
+
+                'bg-tint-base',
+                'text-tint',
+                'contrast-more:text-tint-strong'
             )}
         >
-            <div
-                className={tcls('flex flex-col', 'min-w-56 shrink-0', 'overflow-hidden', 'w-full')}
-            >
+            <div className="flex h-full w-full shrink-0 flex-col overflow-hidden">
                 {page.layout.outline ? (
-                    <div className="flex shrink flex-col overflow-hidden">
-                        {document ? (
-                            <React.Suspense fallback={null}>
-                                <PageAsideSections document={document} context={context} />
-                            </React.Suspense>
-                        ) : null}
-                        <PageAsideActions page={page} withPageFeedback={withPageFeedback} />
-                    </div>
+                    <>
+                        <div className="mb-2 flex page-no-outline:hidden items-center justify-between">
+                            <h6 className="flex items-center gap-1 font-semibold text-tint text-xs uppercase leading-wider">
+                                <Icon icon="block-quote" className="size-3" /> On this page
+                            </h6>
+                            <PageAsideCloseButton />
+                        </div>
+                        <div className="flex shrink flex-col overflow-hidden">
+                            {document ? (
+                                <React.Suspense fallback={null}>
+                                    <PageAsideSections document={document} context={context} />
+                                </React.Suspense>
+                            ) : null}
+                            <PageAsideActions page={page} withPageFeedback={withPageFeedback} />
+                        </div>
+                    </>
                 ) : null}
                 {customization.themes.toggeable || site.ads ? (
                     <PageAsideFooter context={context} />
                 ) : null}
             </div>
-        </aside>
+        </SideSheet>
     );
 }
 
@@ -113,7 +131,7 @@ async function PageAsideSections(props: { document: JSONDocument; context: GitBo
     const sections = await getDocumentSections(context, document);
 
     return sections.length > 1 ? (
-        <div className="overflow-y-auto">
+        <div data-gb-page-outline className="overflow-y-auto">
             <ScrollSectionsList sections={sections} />
         </div>
     ) : null;

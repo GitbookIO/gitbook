@@ -10,6 +10,7 @@ import {
     PageActionsDropdown,
     type PageActionsDropdownURLs,
 } from '../PageActions/PageActionsDropdown';
+import { PageAsideToggleButton } from '../PageAside/PageAsideButton';
 import { PageIcon } from '../PageIcon';
 import { CONTENT_STYLE } from '../layout';
 import { StyledLink } from '../primitives';
@@ -60,14 +61,21 @@ export async function PageHeader(props: {
                 hasAncestors ? 'page-has-ancestors' : 'page-no-ancestors'
             )}
         >
-            {hasPageActions ? (
-                <PageActionsDropdown
-                    siteTitle={context.site.title}
-                    urls={getPageActionsURLs({ context, page, withRSSFeed })}
-                    actions={context.customization.pageActions}
-                    className={tcls('float-right ml-4', hasAncestors ? '-my-1.5' : '-mt-3 xs:mt-2')}
-                />
-            ) : null}
+            <div
+                className={tcls(
+                    'float-right ml-4 flex gap-2',
+                    hasAncestors ? '-my-1.5' : '-mt-3 xs:mt-2'
+                )}
+            >
+                {hasPageActions ? (
+                    <PageActionsDropdown
+                        siteTitle={context.site.title}
+                        urls={getPageActionsURLs({ context, page, withRSSFeed })}
+                        actions={context.customization.pageActions}
+                    />
+                ) : null}
+                <PageAsideToggleButton />
+            </div>
 
             {hasAncestors && (
                 <nav aria-label="Breadcrumb">
