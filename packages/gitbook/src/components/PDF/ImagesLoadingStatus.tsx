@@ -11,7 +11,10 @@ export function ImagesLoadingStatus(props: {
     const { language } = props;
     const state = useImagesLoadingState();
     return (
-        <p className="text-right text-slate-500 text-xs">
+        <p
+            className="text-right text-slate-500 text-xs"
+            aria-busy={state.status !== 'ready' ? true : undefined}
+        >
             {(() => {
                 switch (state.status) {
                     case 'pending':
