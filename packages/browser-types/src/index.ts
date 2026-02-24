@@ -90,6 +90,12 @@ export type GitBookGlobal = {
      * and `undefined` when the tracking preference is unknown or not yet determined.
      */
     isCookiesTrackingDisabled: () => boolean | undefined;
+
+    /**
+     * Indicates whether global privacy control is enabled for the current user.
+     * Returns `true` when global privacy control is enabled, `false` when it is disabled.
+     */
+    isGlobalPrivacyControlEnabled: () => boolean;
 };
 
 declare global {

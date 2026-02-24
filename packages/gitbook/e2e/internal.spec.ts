@@ -14,11 +14,7 @@ import type { GitBookStandalone } from '@gitbook/embed';
 import { expect } from '@playwright/test';
 import jwt from 'jsonwebtoken';
 
-import {
-    VISITOR_TOKEN_COOKIE,
-    getVisitorAuthCookieName,
-    getVisitorAuthCookieValue,
-} from '@/lib/visitors';
+import { VISITOR_TOKEN_COOKIE } from '@/lib/visitors';
 
 import { getSiteAPIToken } from '../tests/utils';
 import {
@@ -34,6 +30,7 @@ import {
     getCustomizationURL,
     headerLinks,
     runTestCases,
+    setTimeToMorning,
     waitForCookiesDialog,
     waitForCoverImages,
     waitForNotFound,
@@ -74,6 +71,7 @@ const searchTestCases: Test[] = [
         }),
         screenshot: false,
         run: async (page) => {
+            await waitForCookiesDialog(page);
             const searchInput = page.getByTestId('search-input');
             await searchInput.focus();
             await expect(page.getByTestId('search-results')).toHaveCount(0); // No pop-up yet because there's no recommended questions.
@@ -99,6 +97,7 @@ const searchTestCases: Test[] = [
         }),
         screenshot: false,
         run: async (page) => {
+            await waitForCookiesDialog(page);
             await page.keyboard.press('ControlOrMeta+K');
             await expect(page.getByTestId('search-input')).toBeFocused();
         },
@@ -111,6 +110,7 @@ const searchTestCases: Test[] = [
             },
         })}&q=`,
         run: async (page) => {
+            await waitForCookiesDialog(page);
             await expect(page.getByTestId('search-results')).toHaveCount(0); // No pop-up yet because there's no recommended questions.
         },
     },
@@ -122,6 +122,7 @@ const searchTestCases: Test[] = [
             },
         })}&q=gitbook`,
         run: async (page) => {
+            await waitForCookiesDialog(page);
             await expect(page.getByTestId('search-input')).toBeFocused();
             await expect(page.getByTestId('search-input')).toHaveValue('gitbook');
             await expect(page.getByTestId('search-results')).toBeVisible();
@@ -135,6 +136,7 @@ const searchTestCases: Test[] = [
             },
         })}&q=gitbook`,
         run: async (page) => {
+            await waitForCookiesDialog(page);
             await expect(page.getByTestId('search-input')).toBeFocused();
             await expect(page.getByTestId('search-input')).toHaveValue('gitbook');
             await expect(page.getByTestId('search-results')).toBeVisible();
@@ -148,6 +150,7 @@ const searchTestCases: Test[] = [
             },
         }),
         run: async (page) => {
+            await waitForCookiesDialog(page);
             const searchInput = page.locator('css=[data-testid="search-input"]');
 
             // Focus search input, expecting recommended questions
@@ -183,6 +186,7 @@ const searchTestCases: Test[] = [
             },
         }),
         run: async (page) => {
+            await waitForCookiesDialog(page);
             await page.keyboard.press('ControlOrMeta+I');
             await expect(page.getByTestId('ai-chat')).toBeVisible();
             await expect(page.getByTestId('ai-chat-input')).toBeFocused();
@@ -199,6 +203,7 @@ const searchTestCases: Test[] = [
         }),
         screenshot: false,
         run: async (page) => {
+            await waitForCookiesDialog(page);
             await page.getByTestId('ai-chat-button').click();
             await expect(page.getByTestId('ai-chat')).toBeVisible();
             await expect(page.getByTestId('ai-chat-input')).toBeFocused();
@@ -214,6 +219,7 @@ const searchTestCases: Test[] = [
             },
         })}&ask=`,
         run: async (page) => {
+            await waitForCookiesDialog(page);
             await expect(page.getByTestId('search-input')).not.toBeFocused();
             await expect(page.getByTestId('search-input')).toBeEmpty();
             await expect(page.getByTestId('ai-chat')).toBeVisible();
@@ -230,6 +236,7 @@ const searchTestCases: Test[] = [
             },
         })}&ask=${encodeURIComponent(AI_PROMPT)}`,
         run: async (page) => {
+            await waitForCookiesDialog(page);
             await expect(page.getByTestId('search-input')).not.toBeFocused();
             await expect(page.getByTestId('search-input')).not.toHaveValue('What is GitBook?');
             await expect(page.getByTestId('ai-chat')).toBeVisible();
@@ -258,6 +265,7 @@ const testCases: TestsCase[] = [
                 name: 'No variants dropdown',
                 url: '',
                 run: async (page) => {
+                    await waitForCookiesDialog(page);
                     await expect(page.locator('[data-testid="space-dropdown-button"]')).toHaveCount(
                         0
                     );
@@ -905,26 +913,31 @@ const testCases: TestsCase[] = [
                 name: 'Lists',
                 url: 'blocks/lists',
                 fullPage: true,
+                run: waitForCookiesDialog,
             },
             {
                 name: 'Code',
                 url: 'blocks/code',
                 fullPage: true,
+                run: waitForCookiesDialog,
             },
             {
                 name: 'Cards',
                 url: 'blocks/cards',
                 fullPage: true,
+                run: waitForCookiesDialog,
             },
             {
                 name: 'Updates',
                 url: 'blocks/updates',
                 fullPage: true,
+                run: waitForCookiesDialog,
             },
             {
                 name: 'Math',
                 url: 'blocks/math',
                 run: async (page) => {
+                    await waitForCookiesDialog(page);
                     await page.waitForFunction(() => {
                         const fonts = Array.from(document.fonts.values());
                         const mjxFonts = fonts.filter(
@@ -941,21 +954,25 @@ const testCases: TestsCase[] = [
                 name: 'Files',
                 url: 'blocks/files',
                 fullPage: true,
+                run: waitForCookiesDialog,
             },
             {
                 name: 'Embeds',
                 url: 'blocks/embeds',
                 fullPage: true,
+                run: waitForCookiesDialog,
             },
             {
                 name: 'Page links',
                 url: 'blocks/page-links',
                 fullPage: true,
+                run: waitForCookiesDialog,
             },
             {
                 name: 'Annotations',
                 url: 'blocks/annotations',
                 run: async (page) => {
+                    await waitForCookiesDialog(page);
                     await page.waitForSelector('[data-testid="annotation-button"]');
                     await page.click('[data-testid="annotation-button"]');
                 },
@@ -963,8 +980,13 @@ const testCases: TestsCase[] = [
             {
                 name: 'Stepper',
                 url: 'blocks/stepper',
+                run: waitForCookiesDialog,
             },
-            { name: 'Columns', url: 'blocks/columns' },
+            {
+                name: 'Columns',
+                url: 'blocks/columns',
+                run: waitForCookiesDialog,
+            },
         ],
     },
     {
@@ -992,7 +1014,10 @@ const testCases: TestsCase[] = [
                         toggeable: false,
                     },
                 })}`,
-                run: waitForCookiesDialog,
+                run: async (page) => {
+                    await waitForCookiesDialog(page);
+                    await waitForCoverImages(page, { darkMode: true });
+                },
             },
             {
                 name: 'With hero cover',
@@ -1611,33 +1636,36 @@ const testCases: TestsCase[] = [
         name: 'Visitor Auth - Site (redirects to fallback/auth URL)',
         contentBaseURL: 'https://gitbook-open-e2e-sites.gitbook.io/va-site-redirects-fallback/',
         tests: [
-            {
-                name: 'Redirect to fallback on invalid token pulled from cookie',
-                url: '',
-                screenshot: false,
-                cookies: (() => {
-                    const basePath = '/va-site-redirects-fallback/';
-                    const invalidToken = jwt.sign(
-                        {
-                            name: 'gitbook-open-tests',
-                        },
-                        'invalidKey',
-                        {
-                            expiresIn: '24h',
-                        }
-                    );
-                    return [
-                        {
-                            name: getVisitorAuthCookieName(basePath),
-                            value: getVisitorAuthCookieValue(basePath, invalidToken),
-                            httpOnly: true,
-                        },
-                    ];
-                })(),
-                run: async (page) => {
-                    await expect(page).toHaveURL(/https:\/\/www.google.com/);
-                },
-            },
+            // This test does not work on Playwright
+            // Error: page.goto: net::ERR_ABORTED; maybe frame was detached?
+            // @see https://github.com/microsoft/playwright/issues/34889
+            // {
+            //     name: 'Redirect to fallback on invalid token pulled from cookie',
+            //     url: '',
+            //     screenshot: false,
+            //     cookies: (() => {
+            //         const basePath = '/va-site-redirects-fallback/';
+            //         const invalidToken = jwt.sign(
+            //             {
+            //                 name: 'gitbook-open-tests',
+            //             },
+            //             'invalidKey',
+            //             {
+            //                 expiresIn: '24h',
+            //             }
+            //         );
+            //         return [
+            //             {
+            //                 name: getVisitorAuthCookieName(basePath),
+            //                 value: getVisitorAuthCookieValue(basePath, invalidToken),
+            //                 httpOnly: true,
+            //             },
+            //         ];
+            //     })(),
+            //     run: async (page) => {
+            //         await expect(page).toHaveURL(/https:\/\/www.google.com/);
+            //     },
+            // },
             {
                 name: 'Show error message when invalid token is passed to url',
                 screenshot: false,
@@ -2086,6 +2114,8 @@ const testCases: TestsCase[] = [
                 name: 'Switch between tabs',
                 url: '',
                 run: async (page) => {
+                    await setTimeToMorning(page);
+                    await page.reload();
                     await expect(page.locator('#gitbook-widget-window')).toBeVisible();
                     const iframe = page.frameLocator('#gitbook-widget-iframe');
                     await iframe.getByTestId('embed-tab-docs').click(); // Switch to docs tab

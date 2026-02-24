@@ -30,7 +30,7 @@ export function AnnouncementBanner(props: {
 
     return (
         <div
-            id="announcement-banner"
+            data-gb-announcement-banner
             className="theme-bold:bg-header-background pt-4 pb-2"
             data-nosnippet=""
         >

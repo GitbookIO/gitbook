@@ -9,6 +9,7 @@ import {
     AIModel,
     type AIToolCallResult,
     type AIToolDefinition,
+    type SiteInsightsSession,
 } from '@gitbook/api';
 import { streamRenderAIMessage } from './api';
 import type { RenderAIMessageOptions } from './types';
@@ -22,6 +23,7 @@ export async function* streamAIChatResponse({
     previousResponseId,
     toolCall,
     tools,
+    session,
     options,
 }: {
     message?: string;
@@ -29,6 +31,7 @@ export async function* streamAIChatResponse({
     previousResponseId?: string;
     toolCall?: AIToolCallResult;
     tools?: AIToolDefinition[];
+    session: SiteInsightsSession;
     options?: RenderAIMessageOptions;
 }) {
     const { stream } = await traceErrorOnly('AI.streamAIChatResponse', async () => {
@@ -57,6 +60,7 @@ export async function* streamAIChatResponse({
                 previousResponseId,
                 toolCall,
                 tools,
+                session,
             }
         );
 

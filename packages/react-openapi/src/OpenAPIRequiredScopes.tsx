@@ -63,17 +63,13 @@ export function OpenAPIRequiredScopes(props: {
 export function OpenAPISchemaScopes(props: {
     scopes: OpenAPISecurityScope[];
     context: OpenAPIClientContext;
-    isOAuth2?: boolean;
 }) {
-    const { scopes, context, isOAuth2 } = props;
+    const { scopes, context } = props;
 
     return (
         <div className="openapi-securities-scopes openapi-markdown">
             <div className="openapi-required-scopes-description">
-                {t(
-                    context.translation,
-                    isOAuth2 ? 'available_scopes' : 'required_scopes_description'
-                )}
+                {t(context.translation, 'required_scopes_description')}
             </div>
             <ul>
                 {scopes.map((scope) => (

@@ -11,7 +11,8 @@ import {
 } from '@gitbook/api';
 import type { IconName } from '@gitbook/icons';
 import * as React from 'react';
-import { useTrackEvent } from '../Insights';
+import { getVisitor, useTrackEvent } from '../Insights';
+import { getSession } from '../Insights/sessions';
 import { integrationsAssistantTools } from '../Integrations';
 import { useSetSearchState } from '../Search';
 import { type RenderAIMessageOptions, streamAIChatResponse } from './server-actions';
@@ -269,6 +270,10 @@ export function AIChatProvider(props: {
                     toolCall: input.toolCall,
                     messageContext: messageContextRef.current,
                     previousResponseId: globalState.getState().responseId ?? undefined,
+                    session: {
+                        sessionId: getSession().id,
+                        visitorId: (await getVisitor()).deviceId,
+                    },
                     tools: integrationTools.map((tool) => ({
                         name: tool.name,
                         description: tool.description,

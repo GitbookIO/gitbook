@@ -164,7 +164,7 @@ export interface GitBookDataFetcher {
             | { mode: 'specific'; siteSpaceIds: string[] };
         /** Cache bust to ensure the search results are fresh when the space is updated. */
         cacheBust?: string;
-    }): Promise<DataFetcherResponse<api.SearchSpaceResult[]>>;
+    }): Promise<DataFetcherResponse<Array<api.SearchSpaceResult | api.SearchRecordResult>>>;
 
     /**
      * Render an integration UI.

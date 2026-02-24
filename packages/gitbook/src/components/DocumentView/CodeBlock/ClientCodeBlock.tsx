@@ -16,7 +16,7 @@ import { CodeBlockRenderer } from './CodeBlockRenderer';
 import type { HighlightTheme, RenderedInline } from './highlight';
 import { plainHighlight } from './plain-highlight';
 
-type ClientBlockProps = Pick<BlockProps<DocumentBlockCode>, 'block' | 'style'> & {
+export type ClientBlockProps = Pick<BlockProps<DocumentBlockCode>, 'block' | 'style'> & {
     inlines: RenderedInline[];
     inlineExprVariables: InlineExpressionVariables;
     mode: BlockProps<DocumentBlockCode>['context']['mode'];

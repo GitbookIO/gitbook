@@ -77,7 +77,7 @@ export async function AdCoverRendering({
                         'shadow-md',
                         'max-h-32',
                         'group-hover/ad:max-h-16',
-                        'transition-all'
+                        'motion-safe:transition-all'
                     )}
                 />
             </div>
@@ -93,7 +93,7 @@ export async function AdCoverRendering({
                         'opacity-0',
                         'group-hover/ad:h-16',
                         'group-hover/ad:opacity-10',
-                        'transition-all'
+                        'motion-safe:transition-all'
                     )}
                 >
                     {ad.description}

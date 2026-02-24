@@ -1,7 +1,7 @@
 import type { OpenAPIV3 } from '@gitbook/openapi-parser';
 import { OpenAPIDisclosure } from './OpenAPIDisclosure';
 import { OpenAPISchemaPresentation } from './OpenAPISchema';
-import { OpenAPISchemaProperties } from './OpenAPISchemaServer';
+import { OpenAPIRootSchema, OpenAPISchemaProperties } from './OpenAPISchemaServer';
 import type { OpenAPIClientContext } from './context';
 import { tString } from './translate';
 import { parameterToProperty, resolveDescription } from './utils';
@@ -64,17 +64,21 @@ export function OpenAPIResponse(props: {
             ) : null}
             {mediaType?.schema && (
                 <div className="openapi-responsebody">
-                    <OpenAPISchemaProperties
-                        id={`response-${context.blockKey}`}
-                        properties={[
-                            {
-                                schema: mediaType.schema,
-                                propertyName: tString(context.translation, 'response'),
-                                required: null,
-                            },
-                        ]}
-                        context={context}
-                    />
+                    {headers.length > 0 ? (
+                        <OpenAPISchemaProperties
+                            id={`response-${context.blockKey}`}
+                            properties={[
+                                {
+                                    schema: mediaType.schema,
+                                    propertyName: tString(context.translation, 'response'),
+                                    required: null,
+                                },
+                            ]}
+                            context={context}
+                        />
+                    ) : (
+                        <OpenAPIRootSchema schema={mediaType.schema} context={context} />
+                    )}
                 </div>
             )}
         </div>

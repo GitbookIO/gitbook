@@ -245,7 +245,7 @@ export function SideSheetOverlay(props: { className?: ClassValue; onClick?: () =
     return (
         // biome-ignore lint/a11y/useKeyWithClickEvents: global escape key handler is used to close the modal sheet
         <div
-            id="side-sheet-overlay"
+            data-gb-side-sheet-overlay
             onClick={() => {
                 onClick?.();
             }}

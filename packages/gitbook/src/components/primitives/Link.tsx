@@ -37,7 +37,8 @@ type LinkTarget = '_blank' | '_self';
 
 export type LinkContextType = {
     externalTarget: LinkTarget;
-    isExternal?: ((href: string) => boolean) | undefined;
+    isExternalServer?: ((href: string) => boolean) | undefined;
+    isExternalClient?: ((href: string) => boolean) | undefined;
 };
 
 /**
@@ -68,8 +69,8 @@ function getTargetProps(
 /**
  * Check if the link is external with the origin.
  */
-function defaultCheckIsExternalLink(href: string) {
-    return isExternalLink(href, typeof window !== 'undefined' ? window.location.origin : undefined);
+function defaultIsExternalClient(href: string) {
+    return isExternalLink(href, window.location.origin);
 }
 
 /**
@@ -78,12 +79,15 @@ function defaultCheckIsExternalLink(href: string) {
  */
 export function Link(props: LinkProps) {
     const { ref, href, prefetch, children, insights, classNames, className, ...domProps } = props;
-    const { externalTarget, isExternal: checkIsExternalClientSide = defaultCheckIsExternalLink } =
-        React.useContext(LinkContext);
+    const {
+        externalTarget,
+        isExternalClient = defaultIsExternalClient,
+        isExternalServer = isExternalLink,
+    } = React.useContext(LinkContext);
     const { onNavigationClick } = React.useContext(NavigationStatusContext);
     const trackEvent = useTrackEvent();
     const forwardedClassNames = useClassnames(classNames || []);
-    const isExternal = isExternalLink(href);
+    const isExternal = isExternalServer(href);
     const { target, rel } = getTargetProps(props, { externalTarget, isExternal });
 
     const onClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
@@ -92,7 +96,7 @@ export function Link(props: LinkProps) {
             onNavigationClick(href);
         }
 
-        const isExternalOnClient = checkIsExternalClientSide(href);
+        const isExternalOnClient = isExternalClient(href);
 
         if (insights) {
             trackEvent(insights, undefined, { immediate: isExternalOnClient });

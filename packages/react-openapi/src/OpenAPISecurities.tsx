@@ -3,7 +3,7 @@ import { Fragment } from 'react';
 import { InteractiveSection } from './InteractiveSection';
 import { Markdown } from './Markdown';
 import { OpenAPICopyButton } from './OpenAPICopyButton';
-import { OpenAPIRequiredScopes, OpenAPISchemaScopes } from './OpenAPIRequiredScopes';
+import { OpenAPIRequiredScopes } from './OpenAPIRequiredScopes';
 import { OpenAPISchemaName } from './OpenAPISchemaName';
 import type { OpenAPIClientContext } from './context';
 import { t } from './translate';
@@ -176,8 +176,6 @@ function OpenAPISchemaOAuth2Item(props: {
         return null;
     }
 
-    const scopes = !security.scopes?.length && flow.scopes ? Object.entries(flow.scopes) : [];
-
     const description = resolveDescription(security);
 
     return (
@@ -230,9 +228,6 @@ function OpenAPISchemaOAuth2Item(props: {
                             {flow.refreshUrl}
                         </OpenAPICopyButton>
                     </span>
-                ) : null}
-                {scopes.length ? (
-                    <OpenAPISchemaScopes scopes={scopes} context={context} isOAuth2 />
                 ) : null}
             </div>
         </div>

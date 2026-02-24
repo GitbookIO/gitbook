@@ -1,5 +1,6 @@
 import type { DocumentBlockHint } from '@gitbook/api';
 import { Icon, type IconName } from '@gitbook/icons';
+import { validateIconName } from '@gitbook/icons/icons';
 
 import { type ClassValue, tcls } from '@/lib/tailwind';
 
@@ -17,6 +18,10 @@ export function Hint({
     ...contextProps
 }: BlockProps<DocumentBlockHint>) {
     const hintStyle = HINT_STYLES[block.data.style] ?? HINT_STYLES.info;
+
+    const customIcon = block.data.icon;
+    const icon = customIcon && validateIconName(customIcon) ? customIcon : hintStyle.icon;
+
     const firstNode = block.nodes[0]!;
     const firstLine = getBlockTextStyle(firstNode);
     const hasHeading = isHeadingBlock(firstNode);
@@ -57,10 +62,7 @@ export function Hint({
                     hintStyle.iconColor
                 )}
             >
-                <Icon
-                    icon={hintStyle.icon}
-                    className={tcls('size-[1.2em]', 'mt-px', firstLine.lineHeight)}
-                />
+                <Icon icon={icon} className={tcls('size-[1.2em]', 'mt-px', firstLine.lineHeight)} />
             </div>
             {hasHeading ? (
                 <Block

@@ -185,6 +185,60 @@ describe('getSchemaAlternatives', () => {
         });
     });
 
+    it('should handle non-standard boolean required values without throwing', () => {
+        // Some specs (e.g. Trustly) use `"required": true` on properties
+        // instead of the standard `string[]` format. This should not throw.
+        const schema = {
+            allOf: [
+                {
+                    type: 'object',
+                    properties: {
+                        name: { type: 'string' },
+                    },
+                    required: true as any,
+                },
+                {
+                    type: 'object',
+                    properties: {
+                        email: { type: 'string' },
+                    },
+                    required: ['email'],
+                },
+            ],
+        } as any;
+
+        const result = getSchemaAlternatives(schema);
+        expect(result).toBeDefined();
+        // The boolean `required: true` should be ignored, only the valid array is kept
+        expect(result?.schemas[0]?.required).toEqual(['email']);
+    });
+
+    it('should handle boolean required on both schemas without throwing', () => {
+        const schema = {
+            allOf: [
+                {
+                    type: 'object',
+                    properties: {
+                        name: { type: 'string' },
+                    },
+                    required: true as any,
+                },
+                {
+                    type: 'object',
+                    properties: {
+                        email: { type: 'string' },
+                    },
+                    required: false as any,
+                },
+            ],
+        } as any;
+
+        const result = getSchemaAlternatives(schema);
+        expect(result).toBeDefined();
+        // Boolean required values should not cause a crash, result is an empty array
+        expect(result?.schemas[0]?.required).toEqual([]);
+    });
+
     describe('safe merging with allOf', () => {
         it('should merge objects with safe extensions', () => {
             expect(
