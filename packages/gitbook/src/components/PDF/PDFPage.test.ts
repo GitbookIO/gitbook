@@ -92,7 +92,10 @@ describe('createPDFLinker', () => {
 
         expect(
             linker.toPathForPage({
-                pages: [createDocumentPage('included', ''), createGroupPage('outside-group', 'outside')],
+                pages: [
+                    createDocumentPage('included', ''),
+                    createGroupPage('outside-group', 'outside'),
+                ],
                 page: createGroupPage('outside-group', 'outside'),
             })
         ).toBe('#');
