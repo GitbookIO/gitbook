@@ -77,6 +77,23 @@ async function getSectionsFromNodes(
                 }
                 continue;
             }
+            case 'columns':
+            case 'tabs': {
+                const nestedSections = await Promise.all(
+                    block.nodes
+                        .filter((child) =>
+                            block.type === 'columns'
+                                ? child.type === 'column'
+                                : child.type === 'tabs-item'
+                        )
+                        .map(async (child) => getSectionsFromNodes(child.nodes, context, depth))
+                );
+
+                for (const childSections of nestedSections) {
+                    sections.push(...childSections);
+                }
+                continue;
+            }
             case 'swagger':
             case 'openapi-operation': {
                 const id = block.meta?.id;
