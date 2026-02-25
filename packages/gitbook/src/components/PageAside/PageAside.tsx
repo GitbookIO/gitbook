@@ -59,7 +59,7 @@ export function PageAside(props: {
                 'hydrated:starting:max-w-0',
                 'hydrated:starting:opacity-0',
 
-                'transition-[margin,max-width,opacity,display] duration-300',
+                'transition-[margin,max-width,opacity,display] duration-300 motion-reduce:transition-none',
                 'transition-discrete',
 
                 'basis-56',

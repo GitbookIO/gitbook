@@ -86,6 +86,7 @@ export async function PageCover(props: {
                 // Negative margin to balance the container padding
                 '-mx-4',
                 'transition-all',
+                'motion-reduce:transition-none',
                 as === 'full'
                     ? [
                           'sm:-mx-6',

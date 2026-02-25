@@ -35,7 +35,7 @@ export function Footer(props: { context: GitBookSiteContext }) {
                 mobileOnly ? 'xl:hidden' : null
             )}
         >
-            <div className="motion-safe:transition-[padding] motion-safe:duration-300 lg:chat-open:pr-80 xl:chat-open:pr-96">
+            <div className="transition-[padding] duration-300 motion-reduce:transition-none lg:chat-open:pr-80 xl:chat-open:pr-96">
                 <div
                     className={tcls(
                         CONTAINER_STYLE,

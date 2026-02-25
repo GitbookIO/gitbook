@@ -68,7 +68,7 @@ export function Header(props: {
                     'site-header:theme-bold:shadow-tint-12/2'
                 )}
             >
-                <div className="transition-all duration-300 lg:chat-open:pr-80 xl:chat-open:pr-96">
+                <div className="transition-all duration-300 motion-reduce:transition-none lg:chat-open:pr-80 xl:chat-open:pr-96">
                     <div
                         data-gb-header-content
                         className={tcls(
@@ -82,7 +82,7 @@ export function Header(props: {
                             'min-h-16',
                             'sm:h-16',
                             CONTAINER_STYLE,
-                            'transition-[max-width] duration-300',
+                            'transition-[max-width] duration-300 motion-reduce:transition-none',
                             '@container/header'
                         )}
                     >
@@ -120,7 +120,7 @@ export function Header(props: {
                                 'justify-self-end',
                                 'items-center',
                                 'gap-2',
-                                'transition-[margin] duration-300',
+                                'transition-[margin] duration-300 motion-reduce:transition-none',
                                 'search' in customization.styling &&
                                     customization.styling.search === 'prominent'
                                     ? [
@@ -201,7 +201,7 @@ export function Header(props: {
             </div>
 
             {visibleSections && withSections ? (
-                <div className="transition-[padding] duration-300 lg:chat-open:pr-80 xl:chat-open:pr-96">
+                <div className="transition-[padding] duration-300 motion-reduce:transition-none lg:chat-open:pr-80 xl:chat-open:pr-96">
                     <SiteSectionTabs sections={encodeClientSiteSections(context, visibleSections)}>
                         {variants.translations.length > 1 ? (
                             <TranslationsDropdown

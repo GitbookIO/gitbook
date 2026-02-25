@@ -121,7 +121,7 @@ export function SpaceLayout(props: SpaceLayoutProps) {
             <NavigationLoader />
             {customization.ai?.mode === CustomizationAIMode.Assistant ? <AIChat /> : null}
 
-            <div className="motion-safe:transition-all motion-safe:duration-300 lg:chat-open:mr-80 xl:chat-open:mr-96">
+            <div className="transition-all duration-300 motion-reduce:transition-none lg:chat-open:mr-80 xl:chat-open:mr-96">
                 <div
                     className={tcls(
                         'flex',
@@ -130,7 +130,7 @@ export function SpaceLayout(props: SpaceLayoutProps) {
                         'lg:justify-center',
                         CONTAINER_STYLE,
                         'site-width-wide:max-w-screen-4xl',
-                        'transition-[max-width] duration-300',
+                        'transition-[max-width] duration-300 motion-reduce:transition-none',
 
                         // Ensure the footer is display below the viewport even if the content is not enough
                         withFooter && [
