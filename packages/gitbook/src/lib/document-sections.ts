@@ -66,6 +66,7 @@ async function getSectionsFromNodes(
                 });
                 continue;
             }
+            case 'columns':
             case 'stepper': {
                 const stepNodes = await Promise.all(
                     block.nodes.map(async (step) =>
@@ -74,19 +75,6 @@ async function getSectionsFromNodes(
                 );
                 for (const stepSections of stepNodes) {
                     sections.push(...stepSections);
-                }
-                continue;
-            }
-            case 'columns':
-            case 'tabs': {
-                const nestedSections = await Promise.all(
-                    block.nodes.map(async (child) =>
-                        getSectionsFromNodes(child.nodes, context, depth)
-                    )
-                );
-
-                for (const childSections of nestedSections) {
-                    sections.push(...childSections);
                 }
                 continue;
             }
