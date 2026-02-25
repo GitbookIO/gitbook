@@ -6,12 +6,13 @@ import { softTagFilter } from '@opennextjs/cloudflare/overrides/tag-cache/tag-ca
 const originalTagCache = doShardedTagCache({
     baseShardSize: 12,
     regionalCache: true,
-    regionalCacheTtlSec: 60 * 5 /* 5 minutes */,
+    // We can set a long TTL for the regional cache, as we invalidate it on update
+    regionalCacheTtlSec: 24 * 60 * 60, // 1 day
     // Because we invalidate the Cache API on update, we can safely set this to true
     regionalCacheDangerouslyPersistMissingTags: true,
     shardReplication: {
         numberOfSoftReplicas: 2,
-        numberOfHardReplicas: 1,
+        numberOfHardReplicas: 2,
         regionalReplication: {
             defaultRegion: 'enam',
         },
