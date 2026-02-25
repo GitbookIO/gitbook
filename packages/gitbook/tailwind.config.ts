@@ -473,18 +473,18 @@ const config: Config = {
                 },
                 enterFromRight: {
                     from: { opacity: '0', transform: 'translateX(50%)', display: 'none' },
-                    to: { opacity: '1', transform: 'translateX(0)', display: 'inherit' },
+                    to: { opacity: '1', transform: 'translateX(0)', display: 'revert' },
                 },
                 enterFromLeft: {
                     from: { opacity: '0', transform: 'translateX(-50%)', display: 'none' },
-                    to: { opacity: '1', transform: 'translateX(0)', display: 'inherit' },
+                    to: { opacity: '1', transform: 'translateX(0)', display: 'revert' },
                 },
                 exitToRight: {
-                    from: { opacity: '1', transform: 'translateX(0)', display: 'inherit' },
+                    from: { opacity: '1', transform: 'translateX(0)', display: 'revert' },
                     to: { opacity: '0', transform: 'translateX(50%)', display: 'none' },
                 },
                 exitToLeft: {
-                    from: { opacity: '1', transform: 'translateX(0)', display: 'inherit' },
+                    from: { opacity: '1', transform: 'translateX(0)', display: 'revert' },
                     to: { opacity: '0', transform: 'translateX(-50%)', display: 'none' },
                 },
                 scaleIn: {
@@ -559,6 +559,18 @@ const config: Config = {
                     lg: '1.125em',
                     xl: '1.25em',
                     '2xl': '1.5em',
+                },
+            },
+            width: {
+                screen: {
+                    xs: '480px',
+                    sm: '640px',
+                    md: '768px',
+                    lg: '1024px',
+                    xl: '1280px',
+                    '2xl': '1536px',
+                    '3xl': '1920px',
+                    '4xl': '2144px',
                 },
             },
         },
@@ -662,23 +674,24 @@ const config: Config = {
             }
 
             /**
-             * Variant when the page contains a block that will be rendered in full-width mode.
+             * Layout mode variants for controlling the page structure.
+             * These variants are applied via body:has() selectors, allowing CSS to respond to layout state.
+             *
+             * - layout-default: 3-column layout (TOC + Content + Outline)
+             * - layout-wide: 2-column layout (TOC + Content || Content + Outline)
+             * - layout-full: 1-column layout (Content only)
+             *
+             * The layout classes are applied consistently through CONTENT_STYLE in layout.ts and preserved on the
+             * <header> element during navigation (see PreservePageLayout component).
              */
-            addVariant('site-width-wide', 'body:has(.site-width-wide) &');
-            addVariant('site-width-default', 'body:has(.site-width-default) &');
-            addVariant('page-width-wide', 'body:has(.page-width-wide) &');
+            addVariant('layout-default', 'body:has(.layout-default) &');
+            addVariant('layout-wide', 'body:has(.layout-wide):has(.page-has-toc) & ');
+            addVariant('layout-full', 'body:has(.layout-wide):has(.page-no-toc) &');
 
-            /**
-             * Variant when the page is configured to hide the table of content.
-             * `page.layout.tableOfContents` is set to false.
-             */
             addVariant('page-no-toc', 'body:has(.page-no-toc) &');
             addVariant('page-has-toc', 'body:has(.page-has-toc) &');
-
-            /**
-             * Variant when the page contains an OpenAPI block.
-             */
-            addVariant('page-api-block', 'body:has(.openapi-block) &');
+            addVariant('page-has-outline', 'body:has([data-gb-page-outline]) &');
+            addVariant('page-no-outline', 'body:not(:has([data-gb-page-outline])) &');
 
             /**
              * Variant when the page contains an Updates block.

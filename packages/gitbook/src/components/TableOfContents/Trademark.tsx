@@ -4,17 +4,19 @@ import { getSpaceLanguage, tString } from '@/intl/server';
 import { tcls } from '@/lib/tailwind';
 
 import type { GitBookSpaceContext } from '@/lib/context';
-import { Button } from '../primitives';
+import { Button, type ButtonProps } from '../primitives';
 
 /**
  * Trademark link to the GitBook.
  */
-export function Trademark(props: {
-    context: GitBookSpaceContext;
-    placement: SiteInsightsTrademarkPlacement;
-    className?: string;
-}) {
-    const { context, placement, className } = props;
+export function Trademark(
+    props: {
+        context: GitBookSpaceContext;
+        placement: SiteInsightsTrademarkPlacement;
+        className?: string;
+    } & ButtonProps
+) {
+    const { context, placement, className, ...buttonProps } = props;
     const { space } = context;
     const language = getSpaceLanguage(context);
 
@@ -34,13 +36,8 @@ export function Trademark(props: {
                 'font-semibold',
                 'text-tint',
 
-                'flex',
-                'flex-row',
                 'items-center',
-                'px-5',
-                'py-4',
                 'gap-3',
-                'whitespace-normal',
 
                 'bg-transparent',
                 'depth-subtle:shadow-none',
@@ -54,6 +51,7 @@ export function Trademark(props: {
                 type: 'trademark_click',
                 placement,
             }}
+            {...buttonProps}
         />
     );
 }

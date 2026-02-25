@@ -91,7 +91,7 @@ export const variantClasses = {
 export const activeClasses = {
     primary: 'bg-primary-solid-hover',
     blank: 'bg-primary-active contrast-more:bg-primary-12 contrast-more:text-contrast-primary-12 disabled:bg-primary-active text-primary-strong font-medium hover:text-primary-strong disabled:text-primary-strong hover:bg-primary-active focus-visible:bg-primary-active focus-visible:text-primary-strong aria-expanded:bg-primary-active aria-expanded:text-primary-strong',
-    secondary: 'bg-tint-active disabled:bg-tint-active',
+    secondary: 'bg-tint-active!',
     header: 'bg-header-link/3',
 };
 

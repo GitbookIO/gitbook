@@ -43,7 +43,7 @@ export function InlineActionButton(
                 inline
                 label={buttonProps.label as string}
                 sizing="medium"
-                className="inline-flex max-w-full grow"
+                className="inline-flex max-w-3xl grow" // Limit input to a reasonable width
                 submitButton={{
                     label: tString(language, action === 'ask' ? 'send' : 'search'),
                 }}
