@@ -30,7 +30,8 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
                 type: 'search_open_result',
                 query,
                 result: {
-                    recordId: item.id,
+                    pageId: item.pageId,
+                    spaceId: item.spaceId,
                 },
             }}
             aria-label={tString(language, 'search_page_result_title', item.title)}

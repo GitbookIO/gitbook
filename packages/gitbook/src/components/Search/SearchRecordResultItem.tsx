@@ -33,14 +33,13 @@ export const SearchRecordResultItem = React.forwardRef(function SearchRecordResu
                     fallback={<Icon icon="memo" className="size-4" />}
                 />
             }
-            // insights={{
-            //     type: 'search_open_result',
-            //     query,
-            //     result: {
-            //         pageId: item.pageId,
-            //         spaceId: item.spaceId,
-            //     },
-            // }}
+            insights={{
+                type: 'search_open_result',
+                query,
+                result: {
+                    recordId: item.id,
+                },
+            }}
             aria-label={tString(language, 'search_page_result_title', item.title)}
             {...rest}
         >
