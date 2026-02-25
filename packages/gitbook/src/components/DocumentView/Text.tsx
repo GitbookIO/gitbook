@@ -101,9 +101,7 @@ function Code(props: MarkedLeafProps<DocumentMarkCode>) {
                 // Text size is proportional to the font-size of the parent element
                 'text-[.875em]',
                 // We ensure that the code is not making the parent bigger, especially in headings
-                'leading-[calc(max(1.20em,1.25rem))]',
-                // Ensure that inline code does not break into multiple lines
-                'inline-flex whitespace-nowrap break-normal'
+                'leading-[calc(max(1.20em,1.25rem))]'
             )}
         >
             {props.children}
