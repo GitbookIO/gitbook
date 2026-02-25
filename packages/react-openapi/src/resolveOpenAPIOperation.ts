@@ -82,6 +82,8 @@ export async function resolveOpenAPIOperation(
             typeof schema['x-hideTryItPanel'] === 'boolean'
                 ? schema['x-hideTryItPanel']
                 : undefined,
+        'x-enable-proxy':
+            typeof schema['x-enable-proxy'] === 'boolean' ? schema['x-enable-proxy'] : undefined,
     };
 }
 

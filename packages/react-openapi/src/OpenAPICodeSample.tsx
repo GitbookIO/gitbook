@@ -243,6 +243,7 @@ function OpenAPICodeSampleFooter(props: {
             {!hideTryItPanel && hasValidHost && (
                 <ScalarApiButton
                     context={getOpenAPIClientContext(context)}
+                    withProxy={Boolean(data['x-enable-proxy'])}
                     method={method}
                     path={path}
                     securities={securities}
