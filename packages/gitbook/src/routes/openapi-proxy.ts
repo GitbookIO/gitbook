@@ -4,6 +4,7 @@ import { isIP } from 'node:net';
 import { type NextRequest, NextResponse } from 'next/server';
 
 const MAX_REDIRECTS = 10;
+const FETCH_TIMEOUT_MS = 30_000;
 const REDIRECT_STATUSES = new Set([301, 302, 303, 307, 308]);
 
 /** Headers that should not be forwarded from the incoming request to the target */
@@ -53,15 +54,24 @@ function isPrivateIPv4(ip: string): boolean {
         (a === 169 && b === 254) || // 169.254.0.0/16
         (a === 172 && b >= 16 && b <= 31) || // 172.16.0.0/12
         (a === 192 && b === 168) || // 192.168.0.0/16
-        (a === 100 && b >= 64 && b <= 127) // 100.64.0.0/10
+        (a === 100 && b >= 64 && b <= 127) || // 100.64.0.0/10
+        a >= 224 // 224.0.0.0/4 multicast + 240.0.0.0/4 reserved + 255.255.255.255 broadcast
     );
 }
 
 /**
  * Check if an IPv6 address is in a private/reserved range.
+ * Also handles IPv4-mapped IPv6 addresses (::ffff:x.x.x.x).
  */
 function isPrivateIPv6(ip: string): boolean {
     const lower = ip.toLowerCase();
+
+    // IPv4-mapped IPv6 (::ffff:127.0.0.1) — extract and check the IPv4 part
+    const v4MappedMatch = lower.match(/^::ffff:(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})$/);
+    if (v4MappedMatch?.[1]) {
+        return isPrivateIPv4(v4MappedMatch[1]);
+    }
+
     return (
         lower === '::1' ||
         lower === '::' ||
@@ -75,7 +85,10 @@ function isPrivateIPv6(ip: string): boolean {
  * Check if an IP address (v4 or v6) is in a private/reserved range.
  */
 function isPrivateIP(ip: string): boolean {
-    return isIP(ip) === 4 ? isPrivateIPv4(ip) : isPrivateIPv6(ip);
+    const version = isIP(ip);
+    if (version === 4) return isPrivateIPv4(ip);
+    if (version === 6) return isPrivateIPv6(ip);
+    return false;
 }
 
 /**
@@ -130,7 +143,10 @@ export async function handleOpenAPIProxyRequest(request: NextRequest): Promise<R
         );
     }
 
-    // SSRF protection: block requests to private/internal addresses
+    // SSRF protection: block requests to private/internal addresses.
+    // Note: DNS is resolved here then again inside fetch(), so a DNS rebinding attack
+    // (returning a public IP first, then a private IP) could theoretically bypass this.
+    // Mitigating this fully would require controlling DNS at the socket level.
     if (await isBlockedHost(parsedUrl.hostname)) {
         return NextResponse.json(
             { error: 'Forbidden: access to private addresses is not allowed' },
@@ -160,11 +176,15 @@ export async function handleOpenAPIProxyRequest(request: NextRequest): Promise<R
 
     forwardedHeaders.set('host', parsedUrl.host);
 
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+
     try {
         const response = await fetchWithRedirectValidation(targetUrl, {
             method: request.method,
             headers: forwardedHeaders,
             body: request.body,
+            signal: controller.signal,
             // @ts-ignore - duplex is required for streaming request bodies
             duplex: 'half',
         });
@@ -174,7 +194,11 @@ export async function handleOpenAPIProxyRequest(request: NextRequest): Promise<R
         for (const [key, value] of response.headers.entries()) {
             const lower = key.toLowerCase();
             if (!RESPONSE_HEADERS_TO_STRIP.has(lower) && !lower.startsWith('access-control-')) {
-                responseHeaders.set(key, value);
+                if (lower === 'set-cookie') {
+                    responseHeaders.append(key, value);
+                } else {
+                    responseHeaders.set(key, value);
+                }
             }
         }
 
@@ -189,11 +213,10 @@ export async function handleOpenAPIProxyRequest(request: NextRequest): Promise<R
             headers: responseHeaders,
         });
     } catch (error) {
-        const message = error instanceof Error ? error.message : 'Unknown error';
-        return NextResponse.json(
-            { error: `Failed to fetch from target URL: ${message}` },
-            { status: 502 }
-        );
+        console.error('[openapi-proxy] upstream fetch failed:', error);
+        return NextResponse.json({ error: 'Failed to fetch from target URL' }, { status: 502 });
+    } finally {
+        clearTimeout(timeout);
     }
 }
 
@@ -232,9 +255,15 @@ async function fetchWithRedirectValidation(
     const redirectHeaders = new Headers(options.headers);
     redirectHeaders.set('host', redirectUrl.host);
 
-    const redirectOptions: RequestInit & { duplex?: string } = preserveMethod
-        ? { ...options, headers: redirectHeaders }
-        : { ...options, method: 'GET', body: undefined, headers: redirectHeaders };
+    let redirectOptions: RequestInit & { duplex?: string };
+    if (preserveMethod) {
+        if (options.body instanceof ReadableStream) {
+            throw new Error('Cannot follow 307/308 redirect with a streaming request body');
+        }
+        redirectOptions = { ...options, headers: redirectHeaders };
+    } else {
+        redirectOptions = { ...options, method: 'GET', body: undefined, headers: redirectHeaders };
+    }
 
     return fetchWithRedirectValidation(redirectUrl.toString(), redirectOptions, remaining - 1);
 }

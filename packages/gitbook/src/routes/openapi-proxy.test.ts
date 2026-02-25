@@ -56,6 +56,16 @@ describe('isBlockedHost', () => {
         expect(await isBlockedHost('::1')).toBe(true);
     });
 
+    it('blocks multicast range (224.0.0.0/4)', async () => {
+        expect(await isBlockedHost('224.0.0.1')).toBe(true);
+        expect(await isBlockedHost('239.255.255.255')).toBe(true);
+    });
+
+    it('blocks reserved range (240.0.0.0/4) and broadcast', async () => {
+        expect(await isBlockedHost('240.0.0.1')).toBe(true);
+        expect(await isBlockedHost('255.255.255.255')).toBe(true);
+    });
+
     it('allows public IPs', async () => {
         expect(await isBlockedHost('93.184.215.14')).toBe(false);
     });
@@ -68,6 +78,17 @@ describe('isBlockedHost', () => {
     it('blocks when DNS resolution fails', async () => {
         mockDnsLookup.mockRejectedValueOnce(new Error('ENOTFOUND'));
         expect(await isBlockedHost('nonexistent.invalid')).toBe(true);
+    });
+
+    it('blocks IPv4-mapped IPv6 addresses with private IPv4', async () => {
+        expect(await isBlockedHost('::ffff:127.0.0.1')).toBe(true);
+        expect(await isBlockedHost('::ffff:10.0.0.1')).toBe(true);
+        expect(await isBlockedHost('::ffff:192.168.1.1')).toBe(true);
+        expect(await isBlockedHost('::ffff:169.254.169.254')).toBe(true);
+    });
+
+    it('allows IPv4-mapped IPv6 addresses with public IPv4', async () => {
+        expect(await isBlockedHost('::ffff:93.184.215.14')).toBe(false);
     });
 });
 
@@ -276,7 +297,7 @@ describe('handleOpenAPIProxyRequest', () => {
 
         expect(res.status).toBe(502);
         const body = (await res.json()) as { error: string };
-        expect(body.error).toBe('Failed to fetch from target URL: Connection refused');
+        expect(body.error).toBe('Failed to fetch from target URL');
     });
 
     it('forwards upstream error responses transparently', async () => {
