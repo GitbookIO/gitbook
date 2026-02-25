@@ -80,13 +80,9 @@ async function getSectionsFromNodes(
             case 'columns':
             case 'tabs': {
                 const nestedSections = await Promise.all(
-                    block.nodes
-                        .filter((child) =>
-                            block.type === 'columns'
-                                ? child.type === 'column'
-                                : child.type === 'tabs-item'
-                        )
-                        .map(async (child) => getSectionsFromNodes(child.nodes, context, depth))
+                    block.nodes.map(async (child) =>
+                        getSectionsFromNodes(child.nodes, context, depth)
+                    )
                 );
 
                 for (const childSections of nestedSections) {

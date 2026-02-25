@@ -1,6 +1,7 @@
 import { describe, expect, it, mock } from 'bun:test';
 import type { GitBookAnyContext } from '@/lib/context';
 import type { JSONDocument } from '@gitbook/api';
+import { type ReactNode, isValidElement } from 'react';
 
 mock.module('./openapi/resolveOpenAPIOperationBlock', () => ({
     resolveOpenAPIOperationBlock: async () => ({ data: null }),
@@ -20,6 +21,26 @@ const context = {
     },
 } as unknown as GitBookAnyContext;
 
+function reactNodeToText(node: ReactNode): string {
+    if (node == null || typeof node === 'boolean') {
+        return '';
+    }
+
+    if (typeof node === 'string' || typeof node === 'number') {
+        return String(node);
+    }
+
+    if (Array.isArray(node)) {
+        return node.map((child) => reactNodeToText(child)).join('');
+    }
+
+    if (isValidElement<{ children?: ReactNode }>(node)) {
+        return reactNodeToText(node.props.children);
+    }
+
+    return '';
+}
+
 describe('getDocumentSections', () => {
     it('extracts headings inside columns', async () => {
         const document: JSONDocument = {
@@ -28,11 +49,14 @@ describe('getDocumentSections', () => {
             nodes: [
                 {
                     object: 'block',
+                    // @ts-expect-error columns is missing from top-level blocks, fixed in the next API update
                     type: 'columns',
                     data: {},
+                    isVoid: false,
                     nodes: [
                         {
                             object: 'block',
+                            // @ts-expect-error columns is missing from top-level blocks, fixed in the next API update
                             type: 'column',
                             data: {},
                             nodes: [
@@ -79,7 +103,15 @@ describe('getDocumentSections', () => {
             ],
         };
 
-        await expect(getDocumentSections(context, document)).resolves.toMatchObject([
+        const sections = await getDocumentSections(context, document);
+
+        expect(
+            sections.map((section) => ({
+                id: section.id,
+                depth: section.depth,
+                title: reactNodeToText(section.title),
+            }))
+        ).toEqual([
             {
                 id: 'h1-in-column',
                 depth: 1,
@@ -133,7 +165,15 @@ describe('getDocumentSections', () => {
             ],
         };
 
-        await expect(getDocumentSections(context, document)).resolves.toMatchObject([
+        const sections = await getDocumentSections(context, document);
+
+        expect(
+            sections.map((section) => ({
+                id: section.id,
+                depth: section.depth,
+                title: reactNodeToText(section.title),
+            }))
+        ).toEqual([
             {
                 id: 'h1-in-tab',
                 depth: 1,
