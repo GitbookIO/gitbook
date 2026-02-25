@@ -364,7 +364,7 @@ describe('handleOpenAPIProxyRequest', () => {
 
         expect(res.status).toBe(502);
         const body = (await res.json()) as { error: string };
-        expect(body.error).toContain('private address');
+        expect(body.error).toBe('Failed to fetch from target URL');
     });
 });
 
