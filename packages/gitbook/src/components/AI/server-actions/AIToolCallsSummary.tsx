@@ -232,6 +232,24 @@ async function DescriptionForSearchToolCall(props: {
                                     <Link
                                         href={result.href}
                                         className="flex items-start gap-2 circular-corners:rounded-2xl rounded-corners:rounded-md px-3 py-2 transition-colors hover:bg-primary-hover"
+                                        insights={
+                                            result.type === 'record'
+                                                ? {
+                                                      type: 'search_open_result',
+                                                      query: toolCall.query,
+                                                      result: {
+                                                          recordId: result.recordId,
+                                                      },
+                                                  }
+                                                : {
+                                                      type: 'search_open_result',
+                                                      query: toolCall.query,
+                                                      result: {
+                                                          spaceId: result.spaceId,
+                                                          pageId: result.pageId,
+                                                      },
+                                                  }
+                                        }
                                     >
                                         {result.type === 'record' ? (
                                             <Favicon url={result.href} className={iconClassName} />
