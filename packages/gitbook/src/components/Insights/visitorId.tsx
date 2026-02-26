@@ -33,6 +33,12 @@ type VisitorUserResponse = AnyVisitorResponse & {
 
 export type VisitorResponse = AnyVisitorResponse | VisitorUserResponse;
 
+function isSignedInVisitor(
+    visitor: VisitorResponse | null | undefined
+): visitor is VisitorUserResponse {
+    return Boolean(visitor?.userId && visitor.organizationId);
+}
+
 const visitorStore = createStore<{
     visitor: VisitorResponse | null;
     pendingVisitor: Promise<VisitorResponse> | null;
@@ -112,8 +118,9 @@ async function fetchGlobalVisitor({
 
     const { existing, proposedId } = getVisitorFromCookies();
 
-    if (existing) {
-        // If the cookie already exists, we'll just use that. Avoids a server request.
+    if (isSignedInVisitor(existing)) {
+        // If we already have a signed-in visitor in cookies, we can skip the server request.
+        // This is the common case when users navigate between pages.
         return existing;
     }
 
@@ -122,22 +129,51 @@ async function fetchGlobalVisitor({
     url.searchParams.set('proposed', proposedId);
 
     try {
-        const resp = await fetch(url, {
-            method: 'GET', // Use GET to play nicely with SameSite cookies.
-            credentials: 'include', // Make sure to send/receive cookies.
-            cache: 'no-cache',
-            mode: 'cors', // Need to use cors as we are on a different domain.
-            signal: AbortSignal.timeout(500),
-        });
+        const visitor = await fetchGlobalVisitorWithRetry(url);
 
-        const visitor = (await resp.json()) as VisitorResponse;
+        // When cookie tracking is disabled we still allow a signed-in session to be detected,
+        // but otherwise we preserve the no-cookie behavior by returning an anonymous visitor.
+        if (!visitorCookieTrackingEnabled && !isSignedInVisitor(visitor)) {
+            return {
+                deviceId: proposedId,
+            };
+        }
+
         return visitor;
     } catch (error) {
         console.error('Failed to fetch visitor session ID', error);
+        if (existing) {
+            return existing;
+        }
         return {
             deviceId: proposedId,
         };
     }
+}
+
+async function fetchGlobalVisitorWithRetry(url: URL): Promise<VisitorResponse> {
+    let lastError: unknown;
+    for (const timeoutMs of [1000, 2500]) {
+        try {
+            const resp = await fetch(url, {
+                method: 'GET', // Use GET to play nicely with SameSite cookies.
+                credentials: 'include', // Make sure to send/receive cookies.
+                cache: 'no-cache',
+                mode: 'cors', // Need to use cors as we are on a different domain.
+                signal: AbortSignal.timeout(timeoutMs),
+            });
+
+            if (!resp.ok) {
+                throw new Error(`Unexpected __session response: ${resp.status}`);
+            }
+
+            return (await resp.json()) as VisitorResponse;
+        } catch (error) {
+            lastError = error;
+        }
+    }
+
+    throw lastError;
 }
 
 /**
