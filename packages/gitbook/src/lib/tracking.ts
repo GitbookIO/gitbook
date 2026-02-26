@@ -85,14 +85,13 @@ export async function serveProxyAnalyticsEvent(req: Request) {
     });
 }
 
-
 function getRealIp(headers: Headers): string | null {
     // We start first with the cloudflare headers
     if (headers.has('cf-connecting-ip')) {
         return headers.get('cf-connecting-ip');
     }
 
-    // then we check the vercel one 
+    // then we check the vercel one
     if (headers.has('x-real-ip')) {
         return headers.get('x-real-ip');
     }
