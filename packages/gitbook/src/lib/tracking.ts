@@ -69,7 +69,7 @@ export async function serveProxyAnalyticsEvent(req: Request) {
 
     // We make the request to the public API URL to ensure the request is properly enriched by the router..
     const url = new URL(`${GITBOOK_API_PUBLIC_URL}/v1/orgs/${org}/sites/${site}/insights/events`);
-    const result = await fetch(url.toString(), {
+    return await fetch(url.toString(), {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -83,11 +83,6 @@ export async function serveProxyAnalyticsEvent(req: Request) {
             events: filteredEvents,
         }),
     });
-    //TODO: remove that, just for testing once deployed to ensure we have the correct IP
-    return new Response(result.body, {
-        status: result.status,
-        headers: { 'content-type': 'application/json', 'x-visitor-ip': realIp || '', ...result.headers },
-    })
 }
 
 
