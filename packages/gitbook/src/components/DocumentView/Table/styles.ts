@@ -23,4 +23,4 @@ export const RecordCardStyles = [
     'before:relative',
 ] as ClassValue;
 
-export const RecordCardLinkStyles = ['hover:before:ring-primary'] as ClassValue;
+export const RecordCardLinkStyles = ['hover:before:ring-primary-hover'] as ClassValue;
