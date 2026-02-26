@@ -24,21 +24,83 @@ export function shouldTrackEvents(headers?: Awaited<ReturnType<typeof nextHeader
 }
 
 /**
+ * A server-side insight event input where session/location are optional.
+ * Missing fields are filled with sensible defaults.
+ */
+export type ServerInsightsEventInput = api.SiteInsightsEvent extends infer E
+    ? E extends api.SiteInsightsEventBase
+        ? Omit<E, 'session' | 'location' | 'timestamp'> & {
+              session?: Partial<api.SiteInsightsEventSession>;
+              location?: Partial<api.SiteInsightsEventLocation>;
+              timestamp?: string;
+          }
+        : never
+    : never;
+
+const defaultSession: api.SiteInsightsEventSession = {
+    sessionId: '',
+    visitorId: '',
+    userAgent: '',
+    language: null,
+    cookies: {},
+    referrer: null,
+};
+
+const defaultLocation: api.SiteInsightsEventLocation = {
+    url: '',
+    siteSection: null,
+    siteSpace: null,
+    siteShareKey: null,
+    space: null,
+    revision: null,
+    page: null,
+};
+
+/**
+ * Post insight events to the GitBook API.
+ * Can be used from server-side code (e.g. MCP route handlers) to track events directly.
+ */
+export async function postInsightsEvents(args: {
+    organizationId: string;
+    siteId: string;
+    events: ServerInsightsEventInput[];
+    /** Optional request to extract geolocation headers from. */
+    request?: Request;
+}) {
+    if (GITBOOK_DISABLE_TRACKING) {
+        return;
+    }
+
+    const { organizationId, siteId, events, request } = args;
+
+    const geolocation = request ? extractGeolocation(request) : {};
+
+    const fullEvents: api.SiteInsightsEvent[] = events.map((event) => ({
+        ...event,
+        session: { ...defaultSession, ...event.session },
+        location: { ...defaultLocation, ...event.location },
+        timestamp: event.timestamp ?? new Date().toISOString(),
+    })) as api.SiteInsightsEvent[];
+
+    const url = new URL(
+        `${GITBOOK_API_PUBLIC_URL}/v1/orgs/${organizationId}/sites/${siteId}/insights/events`
+    );
+
+    return await fetch(url.toString(), {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            ...geolocation,
+        },
+        body: JSON.stringify({ events: fullEvents }),
+    });
+}
+
+/**
  * Serve as a proxy to the analytics endpoint, forwarding the request body and required parameters.
  */
 export async function serveProxyAnalyticsEvent(req: Request) {
     const requestURL = new URL(req.url);
-
-    // Fill geolocation data from request headers either from OpenNext or Vercel
-    const country =
-        req.headers.get('x-open-next-country') || req.headers.get('x-vercel-ip-country');
-    const latitude =
-        req.headers.get('x-open-next-latitude') || req.headers.get('x-vercel-ip-latitude');
-    const longitude =
-        req.headers.get('x-open-next-longitude') || req.headers.get('x-vercel-ip-longitude');
-    // OpenNext doesn't provide continent info, we add it manually in our custom worker
-    const continent =
-        req.headers.get('x-open-next-continent') || req.headers.get('x-vercel-ip-continent');
 
     const org = requestURL.searchParams.get('o');
     const site = requestURL.searchParams.get('s');
@@ -65,19 +127,31 @@ export async function serveProxyAnalyticsEvent(req: Request) {
         });
     }
 
-    // We make the request to the public API URL to ensure the request is properly enriched by the router..
-    const url = new URL(`${GITBOOK_API_PUBLIC_URL}/v1/orgs/${org}/sites/${site}/insights/events`);
-    return await fetch(url.toString(), {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            ...(country ? { 'x-location-country': country } : {}),
-            ...(latitude ? { 'x-location-latitude': latitude } : {}),
-            ...(longitude ? { 'x-location-longitude': longitude } : {}),
-            ...(continent ? { 'x-location-continent': continent } : {}),
-        },
-        body: JSON.stringify({
-            events: filteredEvents,
-        }),
+    return await postInsightsEvents({
+        organizationId: org,
+        siteId: site,
+        events: filteredEvents,
+        request: req,
     });
+}
+
+/**
+ * Extract geolocation headers from a request (Vercel/OpenNext).
+ */
+function extractGeolocation(req: Request): Record<string, string> {
+    const country =
+        req.headers.get('x-open-next-country') || req.headers.get('x-vercel-ip-country');
+    const latitude =
+        req.headers.get('x-open-next-latitude') || req.headers.get('x-vercel-ip-latitude');
+    const longitude =
+        req.headers.get('x-open-next-longitude') || req.headers.get('x-vercel-ip-longitude');
+    const continent =
+        req.headers.get('x-open-next-continent') || req.headers.get('x-vercel-ip-continent');
+
+    return {
+        ...(country ? { 'x-location-country': country } : {}),
+        ...(latitude ? { 'x-location-latitude': latitude } : {}),
+        ...(longitude ? { 'x-location-longitude': longitude } : {}),
+        ...(continent ? { 'x-location-continent': continent } : {}),
+    };
 }
