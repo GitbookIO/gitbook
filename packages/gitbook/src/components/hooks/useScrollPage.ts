@@ -27,6 +27,13 @@ export function useScrollPage() {
             return;
         }
 
+        // On initial load `previousHash` can be undefined,
+        // but if the URL contains a fragment (hash),
+        // we don't override native anchor scrolling
+        if (!previousHash && window.location.hash) {
+            return;
+        }
+
         window.scrollTo(0, 0);
     }, [hash, previousHash]);
 }
