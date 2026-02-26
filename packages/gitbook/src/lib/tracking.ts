@@ -77,7 +77,7 @@ export async function serveProxyAnalyticsEvent(req: Request) {
             ...(latitude ? { 'x-location-latitude': latitude } : {}),
             ...(longitude ? { 'x-location-longitude': longitude } : {}),
             ...(continent ? { 'x-location-continent': continent } : {}),
-            ...(realIp ? { 'x-gbo-ip': realIp } : {}),
+            ...(realIp ? { 'x-forwarded-for': realIp } : {}),
         },
         body: JSON.stringify({
             events: filteredEvents,
