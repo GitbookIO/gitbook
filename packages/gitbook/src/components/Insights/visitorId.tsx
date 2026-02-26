@@ -133,7 +133,7 @@ async function fetchGlobalVisitor({
 
         // When cookie tracking is disabled we still allow a signed-in session to be detected,
         // but otherwise we preserve the no-cookie behavior by returning an anonymous visitor.
-        if (!visitorCookieTrackingEnabled && !isSignedInVisitor(visitor)) {
+        if (!isSignedInVisitor(visitor)) {
             return {
                 deviceId: proposedId,
             };
