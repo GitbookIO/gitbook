@@ -133,10 +133,11 @@ export async function encodeClientTableOfContents(
  * - only 1 tag can be primary for available-space reasons.
  * */
 function resolvePrimaryTag(
-    pageTags: RevisionPageTag[],
+    pageTags: RevisionPageTag[] | undefined,
     context: GitBookSiteContext
 ): RevisionTag | undefined {
-    if (pageTags.length === 0) {
+    // TODO: simplify once new API lands as `tags` will always be defined.
+    if (!pageTags || pageTags.length === 0) {
         return undefined;
     }
 

@@ -8,7 +8,8 @@ import { Tag } from '../Tag';
 export function PageTags(props: { page: RevisionPageDocument; revision: Revision }) {
     const { page, revision } = props;
 
-    if (page.tags.length === 0) {
+    const pageTags = page.tags; // TODO: simplify once new API lands as `tags` will always be defined.
+    if (!pageTags || pageTags.length === 0) {
         return null;
     }
 
@@ -16,7 +17,7 @@ export function PageTags(props: { page: RevisionPageDocument; revision: Revision
 
     return (
         <div className="flex flex-wrap gap-1.5">
-            {page.tags.map((tagRef) => {
+            {pageTags.map((tagRef) => {
                 const resolved = resolveTag(tagRef.tag.tag, revisionTags);
                 if (!resolved) {
                     return null;
