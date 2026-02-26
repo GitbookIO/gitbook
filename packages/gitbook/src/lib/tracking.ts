@@ -65,6 +65,8 @@ export async function serveProxyAnalyticsEvent(req: Request) {
         });
     }
 
+    const realIp = getRealIp(req.headers);
+
     // We make the request to the public API URL to ensure the request is properly enriched by the router..
     const url = new URL(`${GITBOOK_API_PUBLIC_URL}/v1/orgs/${org}/sites/${site}/insights/events`);
     return await fetch(url.toString(), {
@@ -75,9 +77,37 @@ export async function serveProxyAnalyticsEvent(req: Request) {
             ...(latitude ? { 'x-location-latitude': latitude } : {}),
             ...(longitude ? { 'x-location-longitude': longitude } : {}),
             ...(continent ? { 'x-location-continent': continent } : {}),
+            ...(realIp ? { 'x-real-ip': realIp } : {}),
         },
         body: JSON.stringify({
             events: filteredEvents,
         }),
     });
+}
+
+
+function getRealIp(headers: Headers): string | null {
+    // We start first with the cloudflare headers
+    if (headers.has('cf-connecting-ip')) {
+        return headers.get('cf-connecting-ip');
+    }
+
+    // then we check the vercel one 
+    if (headers.has('x-real-ip')) {
+        return headers.get('x-real-ip');
+    }
+
+    if (headers.has('x-forwarded-for')) {
+        return headers.get('x-forwarded-for');
+    }
+
+    if (headers.has('x-vercel-forwarded-for')) {
+        return headers.get('x-vercel-forwarded-for');
+    }
+
+    if (headers.has('x-vercel-proxied-for')) {
+        return headers.get('x-vercel-proxied-for');
+    }
+
+    return null;
 }
