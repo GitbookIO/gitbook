@@ -67,10 +67,18 @@ function setVisitorUpdatedAt(deviceId: string, updatedAt: number) {
 
 export type VisitorResponse = AnyVisitorResponse | VisitorUserResponse;
 
-function isSignedInVisitor(
-    visitor: VisitorResponse | null | undefined
-): visitor is VisitorUserResponse {
-    return Boolean(visitor?.userId && visitor.organizationId);
+function isVisitor(value: unknown): value is VisitorResponse {
+    return Boolean(
+        value &&
+            typeof value === 'object' &&
+            'deviceId' in value &&
+            typeof value.deviceId === 'string' &&
+            value.deviceId
+    );
+}
+
+function isSignedInVisitor(value: unknown): value is VisitorUserResponse {
+    return Boolean(isVisitor(value) && value?.userId && value.organizationId);
 }
 
 const visitorStore = createStore<{
@@ -93,15 +101,7 @@ export function VisitorProvider(
     const { appURL, visitorCookieTrackingEnabled, children } = props;
 
     React.useEffect(() => {
-        const state = visitorStore.getState();
-        if (state.pendingVisitor || state.visitor) {
-            return;
-        }
-
-        const result = getGlobalVisitor({
-            appURL,
-            visitorCookieTrackingEnabled,
-        });
+        const result = getGlobalVisitor({ appURL, visitorCookieTrackingEnabled });
         visitorStore.setState(result);
 
         if (result.pendingVisitor) {
@@ -110,7 +110,8 @@ export function VisitorProvider(
                     visitorStore.setState({ pendingVisitor: null, visitor });
                 })
                 .catch(() => {
-                    visitorStore.setState({ pendingVisitor: null, visitor: null });
+                    // Preserve any existing visitor state; only clear the pending flag on failure.
+                    visitorStore.setState({ pendingVisitor: null });
                 });
         }
     }, [appURL, visitorCookieTrackingEnabled]);
@@ -143,7 +144,7 @@ export function getVisitor(): MaybePromise<VisitorResponse> {
 }
 
 /**
- * Propose a visitor identifier to the GitBook.com server and get the devideId back.
+ * Propose a visitor identifier to the GitBook.com server and get the deviceId back.
  */
 function getGlobalVisitor({
     appURL,
@@ -221,7 +222,13 @@ async function fetchGlobalVisitorWithRetry(url: URL): Promise<VisitorResponse> {
                 throw new Error(`Unexpected __session response: ${resp.status}`);
             }
 
-            return (await resp.json()) as VisitorResponse;
+            const result = await resp.json();
+
+            if (!isVisitor(result)) {
+                throw new Error(`Unexpected __session format: ${JSON.stringify(result)}`);
+            }
+
+            return result;
         } catch (error) {
             lastError = error;
         }
