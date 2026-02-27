@@ -1,6 +1,7 @@
 import type * as api from '@gitbook/api';
 import type { headers as nextHeaders } from 'next/headers';
-import { GITBOOK_API_PUBLIC_URL, GITBOOK_DISABLE_TRACKING } from './env';
+import { apiClient } from './data/api';
+import { GITBOOK_DISABLE_TRACKING } from './env';
 
 /**
  * Return true if events should be tracked on the site.
@@ -79,6 +80,7 @@ export async function trackServerInsightsEvents(args: {
 
     const { organizationId, siteId, events, request } = args;
 
+    const api = apiClient();
     const geolocation = extractGeolocation(request);
     const requestSession = extractSessionFromRequest(request);
 
@@ -89,18 +91,12 @@ export async function trackServerInsightsEvents(args: {
         timestamp: event.timestamp ?? new Date().toISOString(),
     })) as api.SiteInsightsEvent[];
 
-    const url = new URL(
-        `${GITBOOK_API_PUBLIC_URL}/v1/orgs/${organizationId}/sites/${siteId}/insights/events`
+    return await api.orgs.trackEventsInSiteById(
+        organizationId,
+        siteId,
+        { events: fullEvents },
+        { headers: geolocation }
     );
-
-    return await fetch(url.toString(), {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            ...geolocation,
-        },
-        body: JSON.stringify({ events: fullEvents }),
-    });
 }
 
 /**

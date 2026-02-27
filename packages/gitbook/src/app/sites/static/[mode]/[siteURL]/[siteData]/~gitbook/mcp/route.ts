@@ -1,4 +1,4 @@
-import type { SiteInsightsDisplayContext } from '@gitbook/api';
+import { SiteInsightsDisplayContext } from '@gitbook/api';
 
 import { type RouteLayoutParams, getStaticSiteContext } from '@/app/utils';
 import { throwIfDataError } from '@/lib/data';
@@ -43,8 +43,7 @@ async function handler(
                                 type: 'search_type_query',
                                 query,
                                 location: {
-                                    //!!TODO: Update this when we API is bumped
-                                    displayContext: 'mcp' as SiteInsightsDisplayContext,
+                                    displayContext: SiteInsightsDisplayContext.Mcp,
                                 },
                             },
                         ],
