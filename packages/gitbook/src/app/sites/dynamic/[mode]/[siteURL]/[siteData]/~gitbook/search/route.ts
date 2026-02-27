@@ -34,65 +34,71 @@ export async function POST(
     }
 
     const [searchResults, { structure }] = await Promise.all([
-        throwIfDataError(
-            context.dataFetcher.searchSiteContent({
-                organizationId: context.organizationId,
-                siteId: context.site.id,
-                query,
-                scope,
-            })
-        ),
-        throwIfDataError(
-            context.dataFetcher.getPublishedContentSite({
-                organizationId: context.organizationId,
-                siteId: context.site.id,
-                siteShareKey: context.shareKey,
-            })
-        ),
+        (async () => {
+            const start = performance.now();
+            const result = await throwIfDataError(
+                context.dataFetcher.searchSiteContent({
+                    organizationId: context.organizationId,
+                    siteId: context.site.id,
+                    query,
+                    scope,
+                })
+            );
+            console.log(`searchSiteContent took ${performance.now() - start}ms`);
+            return result;
+        })(),
+        (async () => {
+            const start = performance.now();
+            const result = await throwIfDataError(
+                context.dataFetcher.getPublishedContentSite({
+                    organizationId: context.organizationId,
+                    siteId: context.site.id,
+                    siteShareKey: context.shareKey,
+                })
+            );
+            console.log(`getPublishedContentSite took ${performance.now() - start}ms`);
+            return result;
+        })(),
     ]);
 
-    const results = (
-        await Promise.all(
-            searchResults.map((resultItem) => {
-                if (resultItem.type === 'record') {
-                    const result: OrderedComputedResult = {
-                        type: 'record',
-                        id: resultItem.id,
-                        title: resultItem.title,
-                        description: resultItem.description,
-                        href: resultItem.url,
-                    };
-                    return result;
-                }
+    const results = searchResults
+        .map((resultItem) => {
+            if (resultItem.type === 'record') {
+                const result: OrderedComputedResult = {
+                    type: 'record',
+                    id: resultItem.id,
+                    title: resultItem.title,
+                    description: resultItem.description,
+                    href: resultItem.url,
+                };
+                return result;
+            }
 
-                const found = findSiteSpaceBy(
-                    structure,
-                    (siteSpace) => siteSpace.space.id === resultItem.id
-                );
-                const siteSection = found?.siteSection;
-                const siteSectionGroup = found?.siteSectionGroup;
+            const found = findSiteSpaceBy(
+                structure,
+                (siteSpace) => siteSpace.space.id === resultItem.id
+            );
+            const siteSection = found?.siteSection;
+            const siteSectionGroup = found?.siteSectionGroup;
 
-                return Promise.all(
-                    resultItem.pages.map((pageItem) =>
-                        transformSitePageResult(context, {
-                            pageItem,
-                            spaceItem: resultItem,
-                            siteSpace: found?.siteSpace,
-                            space: found?.siteSpace.space,
-                            spaceURL: found?.siteSpace.urls.published,
-                            siteSection: siteSection ?? undefined,
-                            siteSectionGroup: (siteSectionGroup as SiteSectionGroup) ?? undefined,
-                        })
-                    )
-                );
-            })
-        )
-    ).flat(2);
+            return resultItem.pages.map((pageItem) =>
+                transformSitePageResult(context, {
+                    pageItem,
+                    spaceItem: resultItem,
+                    siteSpace: found?.siteSpace,
+                    space: found?.siteSpace.space,
+                    spaceURL: found?.siteSpace.urls.published,
+                    siteSection: siteSection ?? undefined,
+                    siteSectionGroup: (siteSectionGroup as SiteSectionGroup) ?? undefined,
+                })
+            );
+        })
+        .flat(2);
 
     return NextResponse.json(results);
 }
 
-async function transformSitePageResult(
+function transformSitePageResult(
     context: GitBookBaseContext,
     args: {
         pageItem: SearchPageResult;
@@ -103,7 +109,7 @@ async function transformSitePageResult(
         siteSection?: SiteSection;
         siteSectionGroup?: SiteSectionGroup;
     }
-): Promise<OrderedComputedResult[]> {
+): OrderedComputedResult[] {
     const { pageItem, spaceItem, spaceURL, siteSection, siteSectionGroup, siteSpace } = args;
     const { linker } = context;
 
@@ -141,10 +147,10 @@ async function transformSitePageResult(
         ].filter((item) => item !== undefined),
     };
 
-    const pageSections = await Promise.all(
+    const pageSections =
         pageItem.sections
             ?.filter((section) => section.title || section.body)
-            .map<Promise<ComputedSectionResult>>(async (section) => ({
+            .map<ComputedSectionResult>((section) => ({
                 type: 'section',
                 id: `${page.id}/${section.id}`,
                 title: section.title,
@@ -154,8 +160,7 @@ async function transformSitePageResult(
                 body: section.body,
                 pageId: pageItem.id,
                 spaceId: spaceItem.id,
-            })) ?? []
-    );
+            })) ?? [];
 
     return [page, ...pageSections];
 }
