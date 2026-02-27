@@ -195,7 +195,7 @@ export function useSearchResults(props: {
                 }
                 setResultsState({ results: [], fetching: false, error: true });
             }
-        }, 350);
+        }, 100);
 
         return () => {
             cancelled = true;
