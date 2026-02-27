@@ -1,0 +1,161 @@
+import { type RouteLayoutParams, getDynamicSiteContext } from '@/app/utils';
+import type {
+    ComputedPageResult,
+    ComputedSectionResult,
+    OrderedComputedResult,
+    SearchSiteContentRequest,
+} from '@/components/Search/search-types';
+import type { GitBookBaseContext } from '@/lib/context';
+import { throwIfDataError } from '@/lib/data';
+import { joinPathWithBaseURL } from '@/lib/paths';
+import { findSiteSpaceBy } from '@/lib/sites';
+import type {
+    SearchPageResult,
+    SearchSpaceResult,
+    SiteSection,
+    SiteSectionGroup,
+    SiteSpace,
+    Space,
+} from '@gitbook/api';
+import type { IconName } from '@gitbook/icons';
+import { type NextRequest, NextResponse } from 'next/server';
+
+export async function POST(
+    request: NextRequest,
+    { params }: { params: Promise<RouteLayoutParams> }
+) {
+    const { context } = await getDynamicSiteContext(await params);
+
+    const body = (await request.json()) as SearchSiteContentRequest;
+    const { query, scope } = body;
+
+    if (query.length <= 1) {
+        return NextResponse.json([]);
+    }
+
+    const [searchResults, { structure }] = await Promise.all([
+        throwIfDataError(
+            context.dataFetcher.searchSiteContent({
+                organizationId: context.organizationId,
+                siteId: context.site.id,
+                query,
+                scope,
+            })
+        ),
+        throwIfDataError(
+            context.dataFetcher.getPublishedContentSite({
+                organizationId: context.organizationId,
+                siteId: context.site.id,
+                siteShareKey: context.shareKey,
+            })
+        ),
+    ]);
+
+    const results = (
+        await Promise.all(
+            searchResults.map((resultItem) => {
+                if (resultItem.type === 'record') {
+                    const result: OrderedComputedResult = {
+                        type: 'record',
+                        id: resultItem.id,
+                        title: resultItem.title,
+                        description: resultItem.description,
+                        href: resultItem.url,
+                    };
+                    return result;
+                }
+
+                const found = findSiteSpaceBy(
+                    structure,
+                    (siteSpace) => siteSpace.space.id === resultItem.id
+                );
+                const siteSection = found?.siteSection;
+                const siteSectionGroup = found?.siteSectionGroup;
+
+                return Promise.all(
+                    resultItem.pages.map((pageItem) =>
+                        transformSitePageResult(context, {
+                            pageItem,
+                            spaceItem: resultItem,
+                            siteSpace: found?.siteSpace,
+                            space: found?.siteSpace.space,
+                            spaceURL: found?.siteSpace.urls.published,
+                            siteSection: siteSection ?? undefined,
+                            siteSectionGroup: (siteSectionGroup as SiteSectionGroup) ?? undefined,
+                        })
+                    )
+                );
+            })
+        )
+    ).flat(2);
+
+    return NextResponse.json(results);
+}
+
+async function transformSitePageResult(
+    context: GitBookBaseContext,
+    args: {
+        pageItem: SearchPageResult;
+        spaceItem: SearchSpaceResult;
+        space?: Space;
+        siteSpace?: SiteSpace;
+        spaceURL?: string;
+        siteSection?: SiteSection;
+        siteSectionGroup?: SiteSectionGroup;
+    }
+): Promise<OrderedComputedResult[]> {
+    const { pageItem, spaceItem, spaceURL, siteSection, siteSectionGroup, siteSpace } = args;
+    const { linker } = context;
+
+    const page: ComputedPageResult = {
+        type: 'page',
+        id: `${spaceItem.id}/${pageItem.id}`,
+        title: pageItem.title,
+        href: spaceURL
+            ? linker.toLinkForContent(joinPathWithBaseURL(spaceURL, pageItem.path))
+            : linker.toPathInSpace(pageItem.path),
+        pageId: pageItem.id,
+        spaceId: spaceItem.id,
+        breadcrumbs: [
+            siteSectionGroup && {
+                icon: siteSectionGroup?.icon as IconName,
+                label: siteSectionGroup.title,
+            },
+            siteSection && {
+                icon: siteSection?.icon as IconName,
+                label: siteSection.title,
+            },
+            (siteSection?.siteSpaces?.filter(
+                (space) =>
+                    siteSection?.siteSpaces?.filter(
+                        (s) => s.space.language === space.space.language
+                    ).length > 1
+            ).length ?? 0) > 1 && siteSpace
+                ? {
+                      label: siteSpace.title,
+                  }
+                : undefined,
+            ...pageItem.ancestors.map((ancestor) => ({
+                label: ancestor.title,
+            })),
+        ].filter((item) => item !== undefined),
+    };
+
+    const pageSections = await Promise.all(
+        pageItem.sections
+            ?.filter((section) => section.title || section.body)
+            .map<Promise<ComputedSectionResult>>(async (section) => ({
+                type: 'section',
+                id: `${page.id}/${section.id}`,
+                title: section.title,
+                href: spaceURL
+                    ? linker.toLinkForContent(joinPathWithBaseURL(spaceURL, section.path))
+                    : linker.toPathInSpace(pageItem.path),
+                body: section.body,
+                pageId: pageItem.id,
+                spaceId: spaceItem.id,
+            })) ?? []
+    );
+
+    return [page, ...pageSections];
+}

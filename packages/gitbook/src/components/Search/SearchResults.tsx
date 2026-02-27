@@ -12,7 +12,7 @@ import { SearchPageResultItem } from './SearchPageResultItem';
 import { SearchQuestionResultItem } from './SearchQuestionResultItem';
 import { SearchRecordResultItem } from './SearchRecordResultItem';
 import { SearchSectionResultItem } from './SearchSectionResultItem';
-import type { OrderedComputedResult } from './server-actions';
+import type { OrderedComputedResult } from './search-types';
 
 export interface SearchResultsRef {
     select(): void;
