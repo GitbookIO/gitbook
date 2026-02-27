@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'bun:test';
-import type { OpenAPIV3 } from '@gitbook/openapi-parser';
+import { type OpenAPIV3, parseOpenAPI } from '@gitbook/openapi-parser';
 import { getSchemaAlternatives } from './OpenAPISchema';
+import { dereferenceFilesystem } from './dereference';
 
 describe('getSchemaAlternatives', () => {
     it('should flatten oneOf', () => {
@@ -517,6 +518,209 @@ describe('getSchemaAlternatives', () => {
             expect(result?.schemas[0]?.required).toContain('name');
             expect(result?.schemas[0]?.required).toContain('key');
             expect(result?.schemas[0]?.required).toContain('labelArgbColor');
+        });
+    });
+
+    describe('circular oneOf with discriminator and allOf', () => {
+        it('should handle variants that reference the parent via allOf', () => {
+            const pet: OpenAPIV3.SchemaObject = {
+                type: 'object',
+                description: 'A pet in the store',
+                discriminator: {
+                    propertyName: 'petType',
+                    mapping: {
+                        dog: '#/components/schemas/Dog',
+                        cat: '#/components/schemas/Cat',
+                    },
+                },
+                oneOf: [],
+                properties: {
+                    name: { type: 'string' },
+                    petType: { type: 'string' },
+                },
+                required: ['petType'],
+            };
+
+            const dog: OpenAPIV3.SchemaObject = {
+                title: 'Dog',
+                allOf: [pet, { type: 'object', properties: { barkVolume: { type: 'number' } } }],
+            };
+
+            const cat: OpenAPIV3.SchemaObject = {
+                title: 'Cat',
+                allOf: [pet],
+                properties: { huntingSkill: { type: 'string' } },
+            };
+
+            pet.oneOf = [dog, cat];
+
+            const result = getSchemaAlternatives(pet);
+
+            expect(result?.type).toBe('oneOf');
+            expect(result?.schemas).toHaveLength(2);
+
+            const dogVariant = result?.schemas[0];
+            expect(dogVariant?.title).toBe('Dog');
+            expect(dogVariant?.properties).toHaveProperty('name');
+            expect(dogVariant?.properties).toHaveProperty('petType');
+            expect(dogVariant?.properties).toHaveProperty('barkVolume');
+            expect(dogVariant).not.toHaveProperty('oneOf');
+            expect(dogVariant).not.toHaveProperty('discriminator');
+            expect(dogVariant).not.toHaveProperty('description');
+
+            const catVariant = result?.schemas[1];
+            expect(catVariant?.title).toBe('Cat');
+            expect(catVariant?.properties).toHaveProperty('name');
+            expect(catVariant?.properties).toHaveProperty('petType');
+            expect(catVariant?.properties).toHaveProperty('huntingSkill');
+
+            // Original schema must not be mutated
+            expect(Object.keys(pet.properties ?? {})).toHaveLength(2);
+            expect(pet.properties).not.toHaveProperty('barkVolume');
+            expect(pet.properties).not.toHaveProperty('huntingSkill');
+        });
+
+        it('should handle dereferenced copies (different object, shared property refs)', () => {
+            // After @scalar/openapi-parser dereference, $ref entries become new objects
+            // with shallow-copied properties from the original (not the same JS reference).
+            const pet: OpenAPIV3.SchemaObject = {
+                type: 'object',
+                description: 'A pet in the store',
+                discriminator: {
+                    propertyName: 'petType',
+                    mapping: {
+                        dog: '#/components/schemas/Dog',
+                        cat: '#/components/schemas/Cat',
+                    },
+                },
+                oneOf: [],
+                properties: {
+                    name: { type: 'string' },
+                    petType: { type: 'string' },
+                },
+                required: ['petType'],
+            };
+
+            // Simulate dereference: $ref is replaced with a NEW object that has
+            // the same property values (shared references) as the original.
+            const petCopyForDog = { ...pet };
+            const petCopyForCat = { ...pet };
+
+            const dog: OpenAPIV3.SchemaObject = {
+                title: 'Dog',
+                allOf: [
+                    petCopyForDog,
+                    { type: 'object', properties: { barkVolume: { type: 'number' } } },
+                ],
+            };
+
+            const cat: OpenAPIV3.SchemaObject = {
+                title: 'Cat',
+                allOf: [petCopyForCat],
+                properties: { huntingSkill: { type: 'string' } },
+            };
+
+            pet.oneOf = [dog, cat];
+
+            const result = getSchemaAlternatives(pet);
+
+            expect(result?.type).toBe('oneOf');
+            expect(result?.schemas).toHaveLength(2);
+
+            const dogVariant = result?.schemas[0];
+            expect(dogVariant?.title).toBe('Dog');
+            expect(dogVariant?.properties).toHaveProperty('name');
+            expect(dogVariant?.properties).toHaveProperty('petType');
+            expect(dogVariant?.properties).toHaveProperty('barkVolume');
+            expect(dogVariant).not.toHaveProperty('oneOf');
+            expect(dogVariant).not.toHaveProperty('discriminator');
+            expect(dogVariant).not.toHaveProperty('description');
+
+            const catVariant = result?.schemas[1];
+            expect(catVariant?.title).toBe('Cat');
+            expect(catVariant?.properties).toHaveProperty('name');
+            expect(catVariant?.properties).toHaveProperty('petType');
+            expect(catVariant?.properties).toHaveProperty('huntingSkill');
+            expect(catVariant).not.toHaveProperty('oneOf');
+            expect(catVariant).not.toHaveProperty('discriminator');
+            expect(catVariant).not.toHaveProperty('description');
+        });
+    });
+
+    describe('integration: parse + dereference + getSchemaAlternatives', () => {
+        it('should resolve polymorphic oneOf variants from a real spec', async () => {
+            const spec = JSON.stringify({
+                openapi: '3.0.1',
+                info: { title: 'PetStore', version: '1.0' },
+                paths: {},
+                components: {
+                    schemas: {
+                        Pet: {
+                            type: 'object',
+                            description: 'A pet in the store',
+                            discriminator: {
+                                propertyName: 'petType',
+                                mapping: {
+                                    dog: '#/components/schemas/Dog',
+                                    cat: '#/components/schemas/Cat',
+                                },
+                            },
+                            oneOf: [
+                                { $ref: '#/components/schemas/Dog' },
+                                { $ref: '#/components/schemas/Cat' },
+                            ],
+                            properties: {
+                                name: { type: 'string' },
+                                petType: { type: 'string' },
+                            },
+                            required: ['petType'],
+                        },
+                        Dog: {
+                            allOf: [
+                                { $ref: '#/components/schemas/Pet' },
+                                {
+                                    type: 'object',
+                                    properties: { barkVolume: { type: 'number' } },
+                                },
+                            ],
+                        },
+                        Cat: {
+                            allOf: [{ $ref: '#/components/schemas/Pet' }],
+                            properties: { huntingSkill: { type: 'string' } },
+                        },
+                    },
+                },
+            });
+
+            const { filesystem } = await parseOpenAPI({
+                value: spec,
+                rootURL: 'memory://spec.json',
+            });
+            const doc = await dereferenceFilesystem(filesystem);
+            const pet = doc.components?.schemas?.Pet as OpenAPIV3.SchemaObject;
+
+            const result = getSchemaAlternatives(pet);
+
+            expect(result?.type).toBe('oneOf');
+            expect(result?.schemas).toHaveLength(2);
+
+            const dogVariant = result?.schemas[0];
+            expect(dogVariant?.title).toBe('Dog');
+            expect(dogVariant?.properties).toHaveProperty('name');
+            expect(dogVariant?.properties).toHaveProperty('petType');
+            expect(dogVariant?.properties).toHaveProperty('barkVolume');
+            expect(dogVariant).not.toHaveProperty('oneOf');
+            expect(dogVariant).not.toHaveProperty('discriminator');
+            expect(dogVariant).not.toHaveProperty('description');
+
+            const catVariant = result?.schemas[1];
+            expect(catVariant?.title).toBe('Cat');
+            expect(catVariant?.properties).toHaveProperty('name');
+            expect(catVariant?.properties).toHaveProperty('petType');
+            expect(catVariant?.properties).toHaveProperty('huntingSkill');
+            expect(catVariant).not.toHaveProperty('oneOf');
+            expect(catVariant).not.toHaveProperty('discriminator');
+            expect(catVariant).not.toHaveProperty('description');
         });
     });
 });
