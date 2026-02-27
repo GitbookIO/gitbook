@@ -37,15 +37,6 @@ export type ServerInsightsEventInput = api.SiteInsightsEvent extends infer E
         : never
     : never;
 
-const defaultSession: api.SiteInsightsEventSession = {
-    sessionId: '',
-    visitorId: '',
-    userAgent: '',
-    language: null,
-    cookies: {},
-    referrer: null,
-};
-
 const defaultLocation: api.SiteInsightsEventLocation = {
     url: '',
     siteSection: null,
@@ -57,15 +48,30 @@ const defaultLocation: api.SiteInsightsEventLocation = {
 };
 
 /**
- * Post insight events to the GitBook API.
- * Can be used from server-side code (e.g. MCP route handlers) to track events directly.
+ * Extract a full session object from a request.
+ * Generates new sessionId/visitorId and extracts headers.
  */
-export async function postInsightsEvents(args: {
+function extractSessionFromRequest(request: Request): api.SiteInsightsEventSession {
+    return {
+        sessionId: crypto.randomUUID(),
+        visitorId: crypto.randomUUID(),
+        userAgent: request.headers.get('user-agent') ?? '',
+        language: request.headers.get('accept-language')?.split(',')[0] ?? null,
+        cookies: {},
+        referrer: request.headers.get('referer') ?? null,
+    };
+}
+
+/**
+ * Track insight events server-side via the GitBook API.
+ * Session info (userAgent, IDs) and location URL are automatically extracted from the request.
+ * Event-level overrides take precedence.
+ */
+export async function trackServerInsightsEvents(args: {
     organizationId: string;
     siteId: string;
     events: ServerInsightsEventInput[];
-    /** Optional request to extract geolocation headers from. */
-    request?: Request;
+    request: Request;
 }) {
     if (GITBOOK_DISABLE_TRACKING) {
         return;
@@ -73,12 +79,13 @@ export async function postInsightsEvents(args: {
 
     const { organizationId, siteId, events, request } = args;
 
-    const geolocation = request ? extractGeolocation(request) : {};
+    const geolocation = extractGeolocation(request);
+    const requestSession = extractSessionFromRequest(request);
 
     const fullEvents: api.SiteInsightsEvent[] = events.map((event) => ({
         ...event,
-        session: { ...defaultSession, ...event.session },
-        location: { ...defaultLocation, ...event.location },
+        session: { ...requestSession, ...event.session },
+        location: { ...defaultLocation, url: request.url, ...event.location },
         timestamp: event.timestamp ?? new Date().toISOString(),
     })) as api.SiteInsightsEvent[];
 
@@ -127,7 +134,7 @@ export async function serveProxyAnalyticsEvent(req: Request) {
         });
     }
 
-    return await postInsightsEvents({
+    return await trackServerInsightsEvents({
         organizationId: org,
         siteId: site,
         events: filteredEvents,

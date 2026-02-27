@@ -4,7 +4,7 @@ import { type RouteLayoutParams, getStaticSiteContext } from '@/app/utils';
 import { throwIfDataError } from '@/lib/data';
 import { joinPathWithBaseURL } from '@/lib/paths';
 import { findSiteSpaceBy } from '@/lib/sites';
-import { postInsightsEvents } from '@/lib/tracking';
+import { trackServerInsightsEvents } from '@/lib/tracking';
 import { createMcpHandler } from 'mcp-handler';
 import type { NextRequest } from 'next/server';
 import { z } from 'zod';
@@ -15,8 +15,6 @@ async function handler(
 ) {
     const { context } = await getStaticSiteContext(await params);
     const { dataFetcher, linker, site } = context;
-
-    const url = context.linker.toAbsoluteURL(context.linker.toPathInSite('~gitbook/mcp'));
 
     const mcpHandler = createMcpHandler(
         (server) => {
@@ -37,18 +35,14 @@ async function handler(
                     );
 
                     // Track the search event server-side
-                    postInsightsEvents({
+                    trackServerInsightsEvents({
                         organizationId: context.organizationId,
                         siteId: site.id,
                         events: [
                             {
                                 type: 'search_type_query',
                                 query,
-                                session: {
-                                    userAgent: nextRequest.headers.get('user-agent') ?? '',
-                                },
                                 location: {
-                                    url,
                                     //!!TODO: Update this when we API is bumped
                                     displayContext: 'mcp' as SiteInsightsDisplayContext,
                                 },
@@ -119,7 +113,9 @@ async function handler(
     );
 
     // Next.js request.url is the original URL and not the rewritten one from the middleware
-    const requestURL = new URL(url);
+    const requestURL = new URL(
+        context.linker.toAbsoluteURL(context.linker.toPathInSite('~gitbook/mcp'))
+    );
     requestURL.search = nextRequest.nextUrl.search;
 
     const request = new Request(requestURL, nextRequest);
