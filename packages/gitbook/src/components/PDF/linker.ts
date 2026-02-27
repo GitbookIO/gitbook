@@ -2,6 +2,8 @@ import type { Revision, RevisionPageDocument, RevisionPageGroup } from '@gitbook
 import { RevisionPageType } from '@gitbook/api';
 
 import type { GitBookLinker } from '@/lib/links';
+import { getPagePath } from '@/lib/pages';
+import { withTrailingSlash } from '@/lib/paths';
 
 /**
  * Create the HTML ID for the container of a page or a given anchor in it.
@@ -32,7 +34,8 @@ export function getPagePDFContainerId(
  */
 export function createPDFLinker(
     baseLinker: GitBookLinker,
-    pages: Array<{ page: Revision['pages'][number] }>
+    pages: Array<{ page: Revision['pages'][number] }>,
+    publishedSpaceURL?: string
 ): GitBookLinker {
     return {
         ...baseLinker,
@@ -45,6 +48,16 @@ export function createPDFLinker(
             }
 
             // For pages that are not embedded in this PDF export, keep links on the published site.
+            if (publishedSpaceURL) {
+                const pagePath = getPagePath(input.pages, input.page);
+                const pageURL = new URL(pagePath, withTrailingSlash(publishedSpaceURL));
+                if (input.anchor) {
+                    pageURL.hash = input.anchor;
+                }
+
+                return pageURL.toString();
+            }
+
             return baseLinker.toAbsoluteURL(baseLinker.toPathForPage(input));
         },
     };
