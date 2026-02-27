@@ -184,6 +184,83 @@ describe('#resolveOpenAPIOperation', () => {
         });
     });
 
+    describe('x-enable-proxy', () => {
+        it('should extract x-enable-proxy when set to true', async () => {
+            const filesystem = await loadFixture({
+                openapi: '3.1.0',
+                info: { title: 'Test', version: '1.0' },
+                'x-enable-proxy': true,
+                paths: {
+                    '/test': {
+                        get: { responses: { '200': { description: 'OK' } } },
+                    },
+                },
+            });
+            const resolved = await resolveOpenAPIOperation(filesystem, {
+                method: 'get',
+                path: '/test',
+            });
+
+            expect(resolved?.['x-enable-proxy']).toBe(true);
+        });
+
+        it('should extract x-enable-proxy when set to false', async () => {
+            const filesystem = await loadFixture({
+                openapi: '3.1.0',
+                info: { title: 'Test', version: '1.0' },
+                'x-enable-proxy': false,
+                paths: {
+                    '/test': {
+                        get: { responses: { '200': { description: 'OK' } } },
+                    },
+                },
+            });
+            const resolved = await resolveOpenAPIOperation(filesystem, {
+                method: 'get',
+                path: '/test',
+            });
+
+            expect(resolved?.['x-enable-proxy']).toBe(false);
+        });
+
+        it('should return undefined when x-enable-proxy is not set', async () => {
+            const filesystem = await loadFixture({
+                openapi: '3.1.0',
+                info: { title: 'Test', version: '1.0' },
+                paths: {
+                    '/test': {
+                        get: { responses: { '200': { description: 'OK' } } },
+                    },
+                },
+            });
+            const resolved = await resolveOpenAPIOperation(filesystem, {
+                method: 'get',
+                path: '/test',
+            });
+
+            expect(resolved?.['x-enable-proxy']).toBeUndefined();
+        });
+
+        it('should ignore x-enable-proxy when not a boolean', async () => {
+            const filesystem = await loadFixture({
+                openapi: '3.1.0',
+                info: { title: 'Test', version: '1.0' },
+                'x-enable-proxy': 'yes',
+                paths: {
+                    '/test': {
+                        get: { responses: { '200': { description: 'OK' } } },
+                    },
+                },
+            });
+            const resolved = await resolveOpenAPIOperation(filesystem, {
+                method: 'get',
+                path: '/test',
+            });
+
+            expect(resolved?.['x-enable-proxy']).toBeUndefined();
+        });
+    });
+
     describe('server precedence', () => {
         it('should use root-level servers when no path or operation servers are defined', async () => {
             const filesystem = await loadFixture(serverPrecedenceSpec);

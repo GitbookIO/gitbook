@@ -18,6 +18,12 @@ export interface OpenAPICustomSpecProperties {
     'x-hideTryItPanel'?: boolean;
 
     /**
+     * If `true`, the Scalar API client will proxy requests through the server
+     * to avoid CORS issues.
+     */
+    'x-enable-proxy'?: boolean;
+
+    /**
      * Description in HTML format.
      */
     'x-gitbook-description-html'?: string;

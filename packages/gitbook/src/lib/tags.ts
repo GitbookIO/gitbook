@@ -4,7 +4,6 @@ import type { ContentRefTag, Revision, RevisionTag } from '@gitbook/api';
  * Get the tags defined on a revision.
  */
 export function getRevisionTags(revision: Revision | undefined): RevisionTag[] {
-    // TODO: simplify once new API lands as `tags` will always be defined.
     return revision?.tags ?? [];
 }
 
