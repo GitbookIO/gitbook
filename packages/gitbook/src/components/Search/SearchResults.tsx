@@ -123,7 +123,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
         <div className={tcls('min-h-full')}>
             {children}
             {results.length === 0 ? (
-                query ? (
+                fetching ? null : query ? (
                     noResults
                 ) : (
                     <div className="empty" />
