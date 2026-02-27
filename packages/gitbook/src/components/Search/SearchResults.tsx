@@ -77,13 +77,6 @@ export const SearchResults = React.forwardRef(function SearchResults(
 
     const { assistants } = useAI();
 
-    if (fetching) {
-        return (
-            <div className={tcls('flex', 'items-center', 'justify-center', 'py-8', 'h-full')}>
-                <Loading className={tcls('w-6', 'text-tint/6')} />
-            </div>
-        );
-    }
     if (error) {
         return (
             <div
@@ -227,9 +220,16 @@ export const SearchResults = React.forwardRef(function SearchResults(
                             }
                         })}
                     </div>
-                    {!results.some((result) => result.type !== 'question') && noResults}
+                    {!fetching && !results.some((result) => result.type !== 'question')
+                        ? noResults
+                        : null}
                 </>
             )}
+            {fetching ? (
+                <div className={tcls('flex', 'items-center', 'justify-center', 'py-4')}>
+                    <Loading className={tcls('w-6', 'text-tint/6')} />
+                </div>
+            ) : null}
         </div>
     );
 });
