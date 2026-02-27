@@ -5,6 +5,7 @@ import { throwIfDataError } from '@/lib/data';
 import { joinPathWithBaseURL } from '@/lib/paths';
 import { findSiteSpaceBy } from '@/lib/sites';
 import { trackServerInsightsEvents } from '@/lib/tracking';
+import { waitUntil } from '@/lib/waitUntil';
 import { createMcpHandler } from 'mcp-handler';
 import type { NextRequest } from 'next/server';
 import { z } from 'zod';
@@ -35,20 +36,22 @@ async function handler(
                     );
 
                     // Track the search event server-side
-                    trackServerInsightsEvents({
-                        organizationId: context.organizationId,
-                        siteId: site.id,
-                        events: [
-                            {
-                                type: 'search_type_query',
-                                query,
-                                location: {
-                                    displayContext: SiteInsightsDisplayContext.Mcp,
+                    waitUntil(
+                        trackServerInsightsEvents({
+                            organizationId: context.organizationId,
+                            siteId: site.id,
+                            events: [
+                                {
+                                    type: 'search_type_query',
+                                    query,
+                                    location: {
+                                        displayContext: SiteInsightsDisplayContext.Mcp,
+                                    },
                                 },
-                            },
-                        ],
-                        request: nextRequest,
-                    });
+                            ],
+                            request: nextRequest,
+                        })
+                    );
 
                     return {
                         content: results.flatMap((result) => {
