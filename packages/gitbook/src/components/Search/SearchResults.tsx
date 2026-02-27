@@ -226,7 +226,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
                 </>
             )}
             {fetching ? (
-                <div className={tcls('flex', 'items-center', 'justify-center', 'py-4')}>
+                <div className={tcls('flex', 'items-center', 'justify-center', 'py-6')}>
                     <Loading className={tcls('w-6', 'text-tint/6')} />
                 </div>
             ) : null}
