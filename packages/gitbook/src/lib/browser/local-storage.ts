@@ -66,7 +66,7 @@ export function setLocalStorageItem(key: string, value: unknown) {
 }
 
 /**
- * Set an item in local storage safely.
+ * Remove an item from local storage safely.
  */
 export function removeLocalStorageItem(key: string) {
     removeStorage(typeof localStorage !== 'undefined' ? localStorage : undefined, key);

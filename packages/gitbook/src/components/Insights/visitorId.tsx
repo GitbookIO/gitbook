@@ -193,10 +193,6 @@ function getGlobalVisitor({
     const { existing, proposedId } = getVisitorFromCookies();
 
     if (existing) {
-        if (isSignedInVisitor(existing)) {
-            return { visitor: existing, pendingVisitor: null };
-        }
-
         // Revalidate in background if stale.
         const updatedAt = getVisitorUpdatedAt(existing.deviceId);
         const isStale = !updatedAt || updatedAt < Date.now() - STALE_TIME_MS;
