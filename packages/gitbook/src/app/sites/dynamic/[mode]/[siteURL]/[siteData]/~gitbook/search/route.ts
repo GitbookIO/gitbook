@@ -33,6 +33,9 @@ export async function POST(request: NextRequest) {
         return NextResponse.json([]);
     }
 
+    let queryTime: number = 0;
+    const start = performance.now();
+
     const [searchResults, { structure }] = await Promise.all([
         (async () => {
             const start = performance.now();
@@ -60,6 +63,8 @@ export async function POST(request: NextRequest) {
             return result;
         })(),
     ]);
+
+    queryTime = performance.now() - start;
 
     const results = searchResults
         .map((resultItem) => {
@@ -95,7 +100,11 @@ export async function POST(request: NextRequest) {
         })
         .flat(2);
 
-    return NextResponse.json(results);
+    return NextResponse.json(results, {
+        headers: {
+            'x-query-time': queryTime.toString(),
+        }
+    });
 }
 
 function transformSitePageResult(
