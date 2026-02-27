@@ -49,14 +49,12 @@ describe('getDocumentSections', () => {
             nodes: [
                 {
                     object: 'block',
-                    // @ts-expect-error columns is missing from top-level blocks, fixed in the next API update
                     type: 'columns',
                     data: {},
                     isVoid: false,
                     nodes: [
                         {
                             object: 'block',
-                            // @ts-expect-error columns is missing from top-level blocks, fixed in the next API update
                             type: 'column',
                             data: {},
                             nodes: [
