@@ -168,7 +168,23 @@ function getGlobalVisitor({
         url.searchParams.set('proposed', proposedId);
 
         try {
-            const visitor = await fetchGlobalVisitorWithRetry(url);
+            const resp = await fetch(url, {
+                method: 'GET', // Use GET to play nicely with SameSite cookies.
+                credentials: 'include', // Make sure to send/receive cookies.
+                cache: 'no-cache',
+                mode: 'cors', // Need to use cors as we are on a different domain.
+                signal: AbortSignal.timeout(500),
+            });
+
+            if (!resp.ok) {
+                throw new Error(`Unexpected __session response: ${resp.status}`);
+            }
+
+            const visitor = await resp.json();
+
+            if (!isVisitor(visitor)) {
+                throw new Error(`Unexpected __session format: ${JSON.stringify(visitor)}`);
+            }
 
             // When cookie tracking is disabled we still allow a signed-in session to be detected,
             // but otherwise we preserve the no-cookie behavior by returning an anonymous visitor.
@@ -200,37 +216,6 @@ function getGlobalVisitor({
     }
 
     return { visitor: null, pendingVisitor: fetchGlobalVisitor() };
-}
-
-async function fetchGlobalVisitorWithRetry(url: URL): Promise<VisitorResponse> {
-    let lastError: unknown;
-    for (const timeoutMs of [1000, 2500]) {
-        try {
-            const resp = await fetch(url, {
-                method: 'GET', // Use GET to play nicely with SameSite cookies.
-                credentials: 'include', // Make sure to send/receive cookies.
-                cache: 'no-cache',
-                mode: 'cors', // Need to use cors as we are on a different domain.
-                signal: AbortSignal.timeout(timeoutMs),
-            });
-
-            if (!resp.ok) {
-                throw new Error(`Unexpected __session response: ${resp.status}`);
-            }
-
-            const result = await resp.json();
-
-            if (!isVisitor(result)) {
-                throw new Error(`Unexpected __session format: ${JSON.stringify(result)}`);
-            }
-
-            return result;
-        } catch (error) {
-            lastError = error;
-        }
-    }
-
-    throw lastError;
 }
 
 /**
