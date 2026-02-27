@@ -1,4 +1,3 @@
-import { type RouteLayoutParams, getDynamicSiteContext } from '@/app/utils';
 import type {
     ComputedPageResult,
     ComputedSectionResult,
@@ -7,7 +6,9 @@ import type {
 } from '@/components/Search/search-types';
 import type { GitBookBaseContext } from '@/lib/context';
 import { throwIfDataError } from '@/lib/data';
+import { getSiteURLDataFromMiddleware } from '@/lib/middleware';
 import { joinPathWithBaseURL } from '@/lib/paths';
+import { getServerActionBaseContext } from '@/lib/server-actions';
 import { findSiteSpaceBy } from '@/lib/sites';
 import type {
     SearchPageResult,
@@ -20,12 +21,11 @@ import type {
 import type { IconName } from '@gitbook/icons';
 import { type NextRequest, NextResponse } from 'next/server';
 
-export async function POST(
-    request: NextRequest,
-    { params }: { params: Promise<RouteLayoutParams> }
-) {
-    const { context } = await getDynamicSiteContext(await params);
-
+export async function POST(request: NextRequest) {
+    const [context, { organization, site, shareKey }] = await Promise.all([
+        getServerActionBaseContext(),
+        getSiteURLDataFromMiddleware(),
+    ]);
     const body = (await request.json()) as SearchSiteContentRequest;
     const { query, scope } = body;
 
@@ -38,8 +38,8 @@ export async function POST(
             const start = performance.now();
             const result = await throwIfDataError(
                 context.dataFetcher.searchSiteContent({
-                    organizationId: context.organizationId,
-                    siteId: context.site.id,
+                    organizationId: organization,
+                    siteId: site,
                     query,
                     scope,
                 })
@@ -51,9 +51,9 @@ export async function POST(
             const start = performance.now();
             const result = await throwIfDataError(
                 context.dataFetcher.getPublishedContentSite({
-                    organizationId: context.organizationId,
-                    siteId: context.site.id,
-                    siteShareKey: context.shareKey,
+                    organizationId: organization,
+                    siteId: site,
+                    siteShareKey: shareKey,
                 })
             );
             console.log(`getPublishedContentSite took ${performance.now() - start}ms`);

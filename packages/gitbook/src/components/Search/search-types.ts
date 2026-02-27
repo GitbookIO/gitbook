@@ -45,6 +45,4 @@ export type SearchSiteContentScope =
 export interface SearchSiteContentRequest {
     query: string;
     scope: SearchSiteContentScope;
-    /** Current page path, used for context. */
-    path: string;
 }

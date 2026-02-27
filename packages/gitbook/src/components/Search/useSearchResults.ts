@@ -235,7 +235,6 @@ async function fetchSearchResults(
         body: JSON.stringify({
             query,
             scope,
-            path: window.location.pathname,
         }),
         signal,
     });
