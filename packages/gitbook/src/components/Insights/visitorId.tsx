@@ -2,7 +2,12 @@
 
 import { createStore, useStore } from 'zustand';
 
-import { getBrowserCookie } from '@/lib/browser';
+import {
+    getBrowserCookie,
+    getLocalStorageItem,
+    removeLocalStorageItem,
+    setLocalStorageItem,
+} from '@/lib/browser';
 
 import type { MaybePromise } from 'p-map';
 import React from 'react';
@@ -10,6 +15,7 @@ import { isCookiesTrackingDisabled } from './cookies';
 import { generateRandomId } from './utils';
 
 const VISITORID_COOKIE = '__session';
+const VISITOR_UPDATED_AT_STORAGE_KEY = '__session_updated';
 
 /**
  * Visitor state when the visitor is not a signed-in GitBook user.
@@ -26,10 +32,38 @@ type AnyVisitorResponse = {
 /**
  * Visitor state when the visitor is also a signed-in GitBook user.
  */
-type VisitorUserResponse = AnyVisitorResponse & {
+type VisitorUserResponse = Pick<AnyVisitorResponse, 'deviceId'> & {
     userId: string;
     organizationId: string;
 };
+
+/**
+ * Time while a cookie is considered valid before revalidating it.
+ */
+const STALE_TIME_MS = 60 * 60 * 1000;
+
+function getVisitorUpdatedAt(deviceId: string): number | null {
+    const value = getLocalStorageItem<{ deviceId: string; updatedAt: number } | null>(
+        VISITOR_UPDATED_AT_STORAGE_KEY,
+        null
+    );
+    if (!value) {
+        return null;
+    }
+    if (value.deviceId !== deviceId) {
+        clearVisitorUpdatedAt();
+        return null;
+    }
+    return value.updatedAt;
+}
+
+function clearVisitorUpdatedAt() {
+    removeLocalStorageItem(VISITOR_UPDATED_AT_STORAGE_KEY);
+}
+
+function setVisitorUpdatedAt(deviceId: string, updatedAt: number) {
+    setLocalStorageItem(VISITOR_UPDATED_AT_STORAGE_KEY, { deviceId, updatedAt });
+}
 
 export type VisitorResponse = AnyVisitorResponse | VisitorUserResponse;
 
@@ -64,11 +98,21 @@ export function VisitorProvider(
             return;
         }
 
-        const pendingVisitor = fetchGlobalVisitor({ appURL, visitorCookieTrackingEnabled });
-        visitorStore.setState({ pendingVisitor, visitor: null });
-        pendingVisitor.then((visitor) => {
-            visitorStore.setState({ pendingVisitor: null, visitor });
+        const result = getGlobalVisitor({
+            appURL,
+            visitorCookieTrackingEnabled,
         });
+        visitorStore.setState(result);
+
+        if (result.pendingVisitor) {
+            result.pendingVisitor
+                .then((visitor) => {
+                    visitorStore.setState({ pendingVisitor: null, visitor });
+                })
+                .catch(() => {
+                    visitorStore.setState({ pendingVisitor: null, visitor: null });
+                });
+        }
     }, [appURL, visitorCookieTrackingEnabled]);
 
     return <>{children}</>;
@@ -101,54 +145,64 @@ export function getVisitor(): MaybePromise<VisitorResponse> {
 /**
  * Propose a visitor identifier to the GitBook.com server and get the devideId back.
  */
-async function fetchGlobalVisitor({
+function getGlobalVisitor({
     appURL,
     visitorCookieTrackingEnabled,
 }: {
     appURL: string;
     visitorCookieTrackingEnabled: boolean;
-}): Promise<VisitorResponse> {
+}): {
+    visitor: VisitorResponse | null;
+    pendingVisitor: Promise<VisitorResponse> | null;
+} {
     const withoutCookies = isCookiesTrackingDisabled();
 
     if (withoutCookies || !visitorCookieTrackingEnabled) {
-        return {
-            deviceId: getProposedVisitorId(),
-        };
+        return { visitor: { deviceId: getProposedVisitorId() }, pendingVisitor: null };
     }
+
+    const fetchGlobalVisitor = async () => {
+        const url = new URL(appURL);
+        url.pathname = '/__session/2/';
+        url.searchParams.set('proposed', proposedId);
+
+        try {
+            const visitor = await fetchGlobalVisitorWithRetry(url);
+
+            // When cookie tracking is disabled we still allow a signed-in session to be detected,
+            // but otherwise we preserve the no-cookie behavior by returning an anonymous visitor.
+            if (!isSignedInVisitor(visitor)) {
+                clearVisitorUpdatedAt();
+                return { deviceId: proposedId };
+            }
+
+            setVisitorUpdatedAt(visitor.deviceId, Date.now());
+
+            return visitor;
+        } catch (error) {
+            clearVisitorUpdatedAt();
+            console.error('Failed to fetch visitor session ID', error);
+            if (existing) {
+                return existing;
+            }
+            return { deviceId: proposedId };
+        }
+    };
 
     const { existing, proposedId } = getVisitorFromCookies();
 
-    if (isSignedInVisitor(existing)) {
-        // If we already have a signed-in visitor in cookies, we can skip the server request.
-        // This is the common case when users navigate between pages.
-        return existing;
-    }
-
-    const url = new URL(appURL);
-    url.pathname = '/__session/2/';
-    url.searchParams.set('proposed', proposedId);
-
-    try {
-        const visitor = await fetchGlobalVisitorWithRetry(url);
-
-        // When cookie tracking is disabled we still allow a signed-in session to be detected,
-        // but otherwise we preserve the no-cookie behavior by returning an anonymous visitor.
-        if (!isSignedInVisitor(visitor)) {
-            return {
-                deviceId: proposedId,
-            };
+    if (existing) {
+        if (isSignedInVisitor(existing)) {
+            return { visitor: existing, pendingVisitor: null };
         }
 
-        return visitor;
-    } catch (error) {
-        console.error('Failed to fetch visitor session ID', error);
-        if (existing) {
-            return existing;
-        }
-        return {
-            deviceId: proposedId,
-        };
+        // Revalidate in background if stale.
+        const updatedAt = getVisitorUpdatedAt(existing.deviceId);
+        const isStale = !updatedAt || updatedAt < Date.now() - STALE_TIME_MS;
+        return { visitor: existing, pendingVisitor: isStale ? fetchGlobalVisitor() : null };
     }
+
+    return { visitor: null, pendingVisitor: fetchGlobalVisitor() };
 }
 
 async function fetchGlobalVisitorWithRetry(url: URL): Promise<VisitorResponse> {
