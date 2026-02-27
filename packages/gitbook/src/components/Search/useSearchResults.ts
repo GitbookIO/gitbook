@@ -139,13 +139,14 @@ export function useSearchResults(props: {
             error: false,
         });
         let cancelled = false;
+        const abortController = new AbortController();
         const timeout = setTimeout(async () => {
             try {
                 const results = await (() => {
                     const fetchSearch = (
                         scope: Parameters<typeof fetchSearchResults>[1]
                     ): Promise<OrderedComputedResult[]> =>
-                        fetchSearchResults(searchURL, scope, query);
+                        fetchSearchResults(searchURL, scope, query, abortController.signal);
 
                     switch (scope) {
                         case 'all':
@@ -199,6 +200,7 @@ export function useSearchResults(props: {
         return () => {
             cancelled = true;
             clearTimeout(timeout);
+            abortController.abort();
         };
     }, [
         query,
@@ -224,7 +226,8 @@ async function fetchSearchResults(
         | { mode: 'all' }
         | { mode: 'current'; siteSpaceId: string }
         | { mode: 'specific'; siteSpaceIds: string[] },
-    query: string
+    query: string,
+    signal?: AbortSignal
 ): Promise<OrderedComputedResult[]> {
     const response = await fetch(searchURL, {
         method: 'POST',
@@ -234,6 +237,7 @@ async function fetchSearchResults(
             scope,
             path: window.location.pathname,
         }),
+        signal,
     });
 
     if (!response.ok) {
