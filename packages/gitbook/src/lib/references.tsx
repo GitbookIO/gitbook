@@ -347,7 +347,7 @@ export async function resolveContentRef(
         }
 
         default:
-            assertNever(contentRef);
+            assertNever(contentRef as never);
     }
 }
 
