@@ -1,6 +1,6 @@
 {
     "name": "gitbook",
-    "version": "0.21.3",
+    "version": "0.22.1",
     "private": true,
     "dependencies": {
         "@cloudflare/workers-types": "^4.20251011.0",
@@ -17,6 +17,7 @@
         "@gitbook/react-contentkit": "workspace:*",
         "@gitbook/react-math": "workspace:*",
         "@gitbook/react-openapi": "workspace:*",
+        "@mermaid-js/mermaid-zenuml": "^0.2.2",
         "@modelcontextprotocol/sdk": "1.17.5",
         "@opennextjs/aws": "^3.8.5",
         "@opennextjs/cloudflare": "^1.14.4",
@@ -46,9 +47,11 @@
         "mdast-util-gfm": "^3.1.0",
         "mdast-util-to-markdown": "^2.1.2",
         "memoizee": "^0.4.17",
+        "mermaid": "^11.12.3",
         "micromark-extension-frontmatter": "^2.0.0",
         "micromark-extension-gfm": "^3.0.0",
         "motion": "^12.23.24",
+        "negotiator": "^1.0.0",
         "next": "15.4.11",
         "next-themes": "^0.4.6",
         "nuqs": "^2.2.3",
@@ -77,12 +80,11 @@
         "usehooks-ts": "catalog:",
         "warn-once": "^0.1.1",
         "zod": "^3",
-        "zustand": "^5.0.3",
-        "negotiator": "^1.0.0"
+        "zustand": "^5.0.3"
     },
     "devDependencies": {
-        "@argos-ci/playwright": "^5.0.9",
-        "@playwright/test": "^1.54.2",
+        "@argos-ci/playwright": "^6.4.2",
+        "@playwright/test": "^1.58.2",
         "@scalar/api-client-react": "catalog:",
         "@tailwindcss/postcss": "^4.1.11",
         "@types/js-cookie": "^3.0.6",
@@ -105,7 +107,7 @@
         "tailwindcss": "^4.1.11",
         "ts-essentials": "^10.0.1",
         "typescript": "catalog:",
-        "vercel": "^39.3.0",
+        "vercel": "^50.15.1",
         "wrangler": "^4.43.0",
         "rss-parser": "^3.13.0"
     },
@@ -120,7 +122,7 @@
         "dev:cloudflare": "wrangler dev --port 8771 --env preview",
         "dev:cf:middleware": "wrangler dev --port 8771 --inspector-port 9230 --env dev --config ./openNext/customWorkers/middlewareWrangler.jsonc",
         "dev:cf:server": "wrangler dev --port 8772 --env dev --config ./openNext/customWorkers/defaultWrangler.jsonc",
-        "e2e": "playwright test e2e/internal.spec.ts e2e/pdf.spec.ts --project=chromium",
+        "e2e": "playwright test e2e/internal.spec.ts e2e/cookie-banner.spec.ts e2e/pdf.spec.ts --project=chromium",
         "e2e-customers": "playwright test e2e/customers.spec.ts --project=chromium",
         "unit": "bun test {src,packages} --preload ./tests/preload-bun.ts",
         "e2e-browserless": "bun test ./tests/",

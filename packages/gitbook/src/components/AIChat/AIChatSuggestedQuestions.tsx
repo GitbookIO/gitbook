@@ -20,11 +20,12 @@ export default function AIChatSuggestedQuestions(props: {
 
     return (
         <div
-            className="flex flex-col items-start gap-2 self-start"
+            className="flex max-w-full max-w-full flex-col items-start gap-2 self-start"
             data-testid="ai-chat-suggested-questions"
         >
             {suggestions.map((question, index) => (
                 <Button
+                    truncate={false}
                     data-testid="ai-chat-suggested-question"
                     key={question}
                     variant="blank"

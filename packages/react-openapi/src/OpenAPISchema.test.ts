@@ -185,6 +185,60 @@ describe('getSchemaAlternatives', () => {
         });
     });
 
+    it('should handle non-standard boolean required values without throwing', () => {
+        // Some specs (e.g. Trustly) use `"required": true` on properties
+        // instead of the standard `string[]` format. This should not throw.
+        const schema = {
+            allOf: [
+                {
+                    type: 'object',
+                    properties: {
+                        name: { type: 'string' },
+                    },
+                    required: true as any,
+                },
+                {
+                    type: 'object',
+                    properties: {
+                        email: { type: 'string' },
+                    },
+                    required: ['email'],
+                },
+            ],
+        } as any;
+
+        const result = getSchemaAlternatives(schema);
+        expect(result).toBeDefined();
+        // The boolean `required: true` should be ignored, only the valid array is kept
+        expect(result?.schemas[0]?.required).toEqual(['email']);
+    });
+
+    it('should handle boolean required on both schemas without throwing', () => {
+        const schema = {
+            allOf: [
+                {
+                    type: 'object',
+                    properties: {
+                        name: { type: 'string' },
+                    },
+                    required: true as any,
+                },
+                {
+                    type: 'object',
+                    properties: {
+                        email: { type: 'string' },
+                    },
+                    required: false as any,
+                },
+            ],
+        } as any;
+
+        const result = getSchemaAlternatives(schema);
+        expect(result).toBeDefined();
+        // Boolean required values should not cause a crash, result is an empty array
+        expect(result?.schemas[0]?.required).toEqual([]);
+    });
+
     describe('safe merging with allOf', () => {
         it('should merge objects with safe extensions', () => {
             expect(
@@ -381,6 +435,88 @@ describe('getSchemaAlternatives', () => {
                     },
                 ],
             });
+        });
+
+        it('should merge nested allOf with parent properties', () => {
+            const result = getSchemaAlternatives({
+                allOf: [
+                    {
+                        type: 'object',
+                        allOf: [
+                            {
+                                type: 'object',
+                                allOf: [
+                                    {
+                                        type: 'object',
+                                        properties: {
+                                            id: {
+                                                type: 'integer',
+                                                format: 'int32',
+                                            },
+                                        },
+                                        required: ['id'],
+                                        additionalProperties: false,
+                                    },
+                                ],
+                                properties: {
+                                    name: {
+                                        type: 'string',
+                                    },
+                                },
+                                required: ['name'],
+                                additionalProperties: false,
+                            },
+                        ],
+                        properties: {
+                            key: {
+                                type: 'string',
+                            },
+                        },
+                        required: ['key'],
+                        additionalProperties: false,
+                    },
+                ],
+                properties: {
+                    labelArgbColor: {
+                        type: 'integer',
+                        format: 'int32',
+                    },
+                },
+                required: ['labelArgbColor'],
+            });
+
+            expect(result).toMatchObject({
+                type: 'allOf',
+                schemas: [
+                    {
+                        type: 'object',
+                        properties: {
+                            id: {
+                                type: 'integer',
+                                format: 'int32',
+                            },
+                            name: {
+                                type: 'string',
+                            },
+                            key: {
+                                type: 'string',
+                            },
+                            labelArgbColor: {
+                                type: 'integer',
+                                format: 'int32',
+                            },
+                        },
+                        additionalProperties: false,
+                    },
+                ],
+            });
+
+            // Check that all required fields are present (order doesn't matter)
+            expect(result?.schemas[0]?.required).toHaveLength(4);
+            expect(result?.schemas[0]?.required).toContain('id');
+            expect(result?.schemas[0]?.required).toContain('name');
+            expect(result?.schemas[0]?.required).toContain('key');
+            expect(result?.schemas[0]?.required).toContain('labelArgbColor');
         });
     });
 });

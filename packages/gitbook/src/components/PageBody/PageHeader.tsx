@@ -12,6 +12,7 @@ import {
 } from '../PageActions/PageActionsDropdown';
 import { PageIcon } from '../PageIcon';
 import { StyledLink } from '../primitives';
+import { PageTags } from './PageTags';
 
 export async function PageHeader(props: {
     context: GitBookSiteContext;
@@ -32,17 +33,19 @@ export async function PageHeader(props: {
         withRSSFeed,
     ].some(Boolean);
 
-    /* When title and description are hidden, only display the page actions if there are any. */
+    // When title and description are hidden,
+    // only display the page actions if the page contains an update block.
     if (!page.layout.title && !page.layout.description) {
         if (!hasPageActions) {
             return null;
         }
+
         return (
             <PageActionsDropdown
                 siteTitle={context.site.title}
                 urls={getPageActionsURLs({ context, page, withRSSFeed })}
                 actions={context.customization.pageActions}
-                className="absolute top-8 right-0"
+                className="absolute top-8 right-0 page-updates-block:flex hidden"
             />
         );
     }
@@ -117,6 +120,7 @@ export async function PageHeader(props: {
                     </ol>
                 </nav>
             )}
+            <PageTags page={page} revision={revision} />
             {page.layout.title ? (
                 <h1
                     className={tcls(

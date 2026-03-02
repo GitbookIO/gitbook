@@ -214,7 +214,7 @@ function OpenAPICodeSampleFooter(props: {
     const { specUrl } = context;
     const hideTryItPanel = data['x-hideTryItPanel'] || data.operation['x-hideTryItPanel'];
     const hasMultipleMediaTypes =
-        renderers.length > 1 || renderers.some((renderer) => renderer.examples.length > 0);
+        renderers.length >= 2 || renderers.some((renderer) => renderer.examples.length >= 2);
 
     // Check if any server has a host that can be used in an HTTP request
     const hasValidHost = hasValidServerHost(servers);
@@ -243,6 +243,7 @@ function OpenAPICodeSampleFooter(props: {
             {!hideTryItPanel && hasValidHost && (
                 <ScalarApiButton
                     context={getOpenAPIClientContext(context)}
+                    withProxy={Boolean(data['x-enable-proxy'])}
                     method={method}
                     path={path}
                     securities={securities}

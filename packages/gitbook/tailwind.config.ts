@@ -600,16 +600,19 @@ const config: Config = {
             /**
              * Variant when a header is displayed.
              */
-            addVariant('site-header-none', 'body:not(:has(#site-header:not(.mobile-only))) &');
-            addVariant('site-header', 'body:has(#site-header:not(.mobile-only)) &');
+            addVariant(
+                'site-header-none',
+                'body:not(:has([data-gb-site-header]:not(.mobile-only))) &'
+            );
+            addVariant('site-header', 'body:has([data-gb-site-header]:not(.mobile-only)) &');
             addVariant('site-header-sections', [
-                'body:has(#site-header:not(.mobile-only) #sections) &',
-                // 'body:has(.page-no-toc):has(#site-header:not(.mobile-only) #variants) &',
+                'body:has([data-gb-site-header]:not(.mobile-only) [data-gb-sections]) &',
             ]);
             addVariant(
                 'announcement',
-                'html:not(.announcement-hidden):has(#announcement-banner) &'
+                'html:not(.announcement-hidden):has([data-gb-announcement-banner]) &'
             );
+            addVariant('embed', 'html.embed &');
 
             addVariant('hydrated', 'html.hydrated:not(.route-change) &');
 
@@ -676,6 +679,11 @@ const config: Config = {
              * Variant when the page contains an OpenAPI block.
              */
             addVariant('page-api-block', 'body:has(.openapi-block) &');
+
+            /**
+             * Variant when the page contains an Updates block.
+             */
+            addVariant('page-updates-block', 'body:has(.updates-block) &');
 
             /**
              * Variant when the page is displayed in print mode.

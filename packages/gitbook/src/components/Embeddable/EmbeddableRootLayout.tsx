@@ -29,7 +29,7 @@ export async function EmbeddableRootLayout({
     children,
 }: React.PropsWithChildren<EmbeddableRootLayoutProps>) {
     return (
-        <CustomizationRootLayout context={context}>
+        <CustomizationRootLayout context={context} htmlClassName="embed">
             <SiteLayoutClientContexts
                 forcedTheme={
                     context.customization.themes.toggeable
@@ -38,6 +38,7 @@ export async function EmbeddableRootLayout({
                 }
                 externalLinksTarget={context.customization.externalLinks.target}
                 contextId={context.contextId}
+                proxyOrigin={context.site.proxy?.origin}
             >
                 <AIContextProvider
                     aiMode={context.customization.ai.mode}

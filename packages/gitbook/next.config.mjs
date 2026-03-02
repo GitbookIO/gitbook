@@ -4,6 +4,7 @@
  * @type {import('next').NextConfig}
  */
 const nextConfig = {
+    deploymentId: process.env.GITHUB_SHA || Date.now().toString(), // Needed because we use a custom deployment method i.e. https://vercel.com/docs/skew-protection#custom-deployment-id
     experimental: {
         // This is needed to throw "forbidden" when the api token expired during revalidation
         authInterrupts: true,
@@ -25,6 +26,7 @@ const nextConfig = {
         // GitBook envs
         GITBOOK_API_URL: process.env.GITBOOK_API_URL,
         GITBOOK_APP_URL: process.env.GITBOOK_APP_URL,
+        GITBOOK_OAUTH_SERVER_URL: process.env.GITBOOK_OAUTH_SERVER_URL,
         GITBOOK_INTEGRATIONS_HOST: process.env.GITBOOK_INTEGRATIONS_HOST,
         GITBOOK_IMAGE_RESIZE_URL: process.env.GITBOOK_IMAGE_RESIZE_URL,
         GITBOOK_ICONS_URL: process.env.GITBOOK_ICONS_URL,

@@ -1,5 +1,27 @@
 # @gitbook/react-openapi
 
+## 1.5.8
+
+### Patch Changes
+
+- 1a7ef78: Handle non-array required field in OpenAPI schema to fix TypeError with specs using boolean required values
+- 93eea0b: Strip trailing slash from OpenAPI server URLs to avoid double slashes in rendered paths
+- 2ebb18d: Make OpenAPI Response structure clearer
+- 11d9b80: Use precedence for OpenAPI servers
+- f517035: Remove available scopes list from OAuth2 endpoints when no scopes are required
+
+## 1.5.7
+
+### Patch Changes
+
+- e00d1c5: Support code themes customization
+- 4e2d863: Fix OpenAPI example not showing
+- 3ba9e46: Improve OpenAPI server URL validation
+- 717ad0b: Fix Scalar Try it button justification
+- 48ca21e: Add OpenAPI 3.1 nullable array support
+- Updated dependencies [d3f6c38]
+  - @gitbook/openapi-parser@3.0.8
+
 ## 1.5.6
 
 ### Patch Changes

@@ -53,6 +53,7 @@ export async function SiteLayout(props: {
                 (customization.themes.toggeable ? undefined : customization.themes.default)
             }
             externalLinksTarget={customization.externalLinks.target}
+            proxyOrigin={context.site.proxy?.origin}
         >
             <AIContextProvider
                 aiMode={customization.ai?.mode}
@@ -68,14 +69,10 @@ export async function SiteLayout(props: {
                 </SpaceLayout>
             </AIContextProvider>
 
-            {scripts.length > 0 ? (
-                <>
-                    <LoadIntegrations />
-                    {scripts.map(({ script }) => (
-                        <script key={script} async src={script} />
-                    ))}
-                </>
-            ) : null}
+            <LoadIntegrations />
+            {scripts.length > 0
+                ? scripts.map(({ script }) => <script key={script} async src={script} />)
+                : null}
 
             {scripts.some((script) => script.cookies) || customization.privacyPolicy.url ? (
                 <React.Suspense fallback={null}>

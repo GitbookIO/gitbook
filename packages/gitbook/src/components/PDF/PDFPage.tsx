@@ -1,10 +1,8 @@
 import type { GitBookSiteContext, GitBookSpaceContext } from '@/lib/context';
-import type { GitBookLinker } from '@/lib/links';
 import {
     type Revision,
     type RevisionPageDocument,
     type RevisionPageGroup,
-    RevisionPageType,
     type SiteCustomizationSettings,
     SiteInsightsTrademarkPlacement,
     type Space,
@@ -26,6 +24,7 @@ import { type PDFSearchParams, getPDFSearchParams } from './urls';
 
 import { PDFPrintControls } from './PDFPrintControls';
 import { PageControlButtons } from './PageControlButtons';
+import { createPDFLinker, getPagePDFContainerId } from './linker';
 import './pdf.css';
 import { sanitizeGitBookAppURL } from '@/lib/app';
 import { getPageDocument } from '@/lib/data';
@@ -67,20 +66,7 @@ export async function PDFPage(props: {
     );
 
     // Build a linker that create anchor links for the pages rendered in the PDF page.
-    const linker: GitBookLinker = {
-        ...baseContext.linker,
-        toPathForPage(input) {
-            if (pages.some((p) => p.page.id === input.page.id)) {
-                return `#${getPagePDFContainerId(input.page, input.anchor)}`;
-            }
-            if (input.page.type === RevisionPageType.Group) {
-                return '#';
-            }
-
-            // Use an absolute URL to the page
-            return input.page.urls.app;
-        },
-    };
+    const linker = createPDFLinker(baseContext.linker, pages);
 
     const context: GitBookSpaceContext = {
         ...baseContext,
@@ -324,14 +310,4 @@ function selectPages(
         return flattenPage(page, 0);
     });
     return limitTo(allPages);
-}
-
-/**
- * Create the HTML ID for the container of a page or a given anchor in it.
- */
-function getPagePDFContainerId(
-    page: RevisionPageDocument | RevisionPageGroup,
-    anchor?: string
-): string {
-    return `pdf-page-${page.id}${anchor ? `-${anchor}` : ''}`;
 }

@@ -79,13 +79,14 @@ export async function PageCover(props: {
 
     return (
         <div
-            id="page-cover"
+            data-gb-page-cover
             data-full={String(as === 'full')}
             className={tcls(
                 'overflow-hidden',
                 // Negative margin to balance the container padding
                 '-mx-4',
                 'transition-all',
+                'motion-reduce:transition-none',
                 as === 'full'
                     ? [
                           'sm:-mx-6',

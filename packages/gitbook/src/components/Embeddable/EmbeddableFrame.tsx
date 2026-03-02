@@ -1,5 +1,7 @@
-import { tcls } from '@/lib/tailwind';
+import { type ClassValue, tcls } from '@/lib/tailwind';
 import React from 'react';
+import { CONTAINER_STYLE } from '../layout';
+import { Button } from '../primitives';
 
 export type EmbeddableFrameProps = React.ComponentProps<'div'> & {
     children: React.ReactNode;
@@ -40,11 +42,18 @@ export function EmbeddableFrameMain(props: React.ComponentProps<'div'>) {
 
 export function EmbeddableFrameHeader(props: {
     children: React.ReactNode;
+    className?: ClassValue;
 }) {
-    const { children } = props;
+    const { children, className } = props;
 
     return (
-        <div className="relative z-10 flex not-hydrated:animate-blur-in-slow select-none items-center gap-2 px-4 py-2.5 text-tint-strong">
+        <div
+            className={tcls(
+                'relative z-10 flex w-full not-hydrated:animate-blur-in-slow select-none items-center gap-2 py-2.5 text-tint-strong',
+                CONTAINER_STYLE,
+                className
+            )}
+        >
             {children}
         </div>
     );
@@ -60,10 +69,21 @@ export function EmbeddableFrameHeaderMain(props: {
 
 export function EmbeddableFrameBody(props: {
     children: React.ReactNode;
+    className?: ClassValue;
 }) {
-    const { children } = props;
+    const { children, className } = props;
 
-    return <div className="flex flex-1 flex-col overflow-hidden">{children}</div>;
+    return (
+        <div
+            className={tcls(
+                'flex w-full flex-1 flex-col overflow-hidden',
+                CONTAINER_STYLE,
+                className
+            )}
+        >
+            {children}
+        </div>
+    );
 }
 
 export function EmbeddableFrameTitle(props: {
@@ -72,6 +92,10 @@ export function EmbeddableFrameTitle(props: {
     const { children } = props;
 
     return <div className="font-bold">{children}</div>;
+}
+
+export function EmbeddableFrameClose() {
+    return <Button iconOnly icon="x" className="absolute top-1 right-1" />;
 }
 
 export function EmbeddableFrameSubtitle(props: {
@@ -96,7 +120,7 @@ export function EmbeddableFrameSidebar(props: { children: React.ReactNode }) {
     const { children } = props;
 
     return (
-        <div className="flex w-15 shrink-0 origin-top not-hydrated:animate-blur-in-slow flex-col gap-2 overflow-hidden border-tint-solid/3 border-r bg-tint-solid/1 p-2 transition-all transition-discrete duration-300 empty:hidden empty:w-0 empty:px-0">
+        <div className="flex w-15 shrink-0 origin-top not-hydrated:animate-blur-in-slow flex-col gap-2 overflow-hidden border-tint-solid/3 border-r bg-tint-solid/1 p-2 transition-all transition-discrete duration-300 empty:hidden empty:w-0 empty:px-0 motion-reduce:transition-none">
             {children}
         </div>
     );

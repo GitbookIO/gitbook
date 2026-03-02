@@ -18,6 +18,14 @@ export async function GET(
 <html>
     <head>
         <meta name="color-scheme" content="light dark">
+        <style type="text/css">
+          .control {
+            display: none;
+          }
+          .custom-trigger .control {
+            display: inline-flex;
+          }
+        </style>
     </head>
     <body>
         <svg style="position: absolute; bottom: 6rem; right: 4rem;" width="719" height="644" viewBox="0 0 719 644" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -105,17 +113,29 @@ export async function GET(
                 <line x1="658.186" y1="444" x2="635.471" y2="444" stroke="#A4A7B0" stroke-width="8" stroke-linecap="round"/>
             </g>
         </svg>
+        <button type="button" class="control" onclick="window.GitBook('open')">Open</button>
+        <button type="button" class="control" onclick="window.GitBook('close')">Close</button>
     </body>
     <script src="${context.linker.toAbsoluteURL(context.linker.toPathInSite('~gitbook/embed/script.js'))}"></script>
     <script>
-    window.GitBook('configure', {
-        suggestions: [
-            'Help me get started',
-            'What can I ask you?',
-            'Show me tips and tricks',
-        ],
-    });
-        window.GitBook('open');
+        const useCustomTrigger = new URLSearchParams(window.location.search).get('trigger') === 'custom';
+        window.GitBook('configure', {
+            suggestions: [
+                'Help me get started',
+                'What can I ask you?',
+                'Show me tips and tricks',
+            ],
+            tabs: ['assistant', 'docs'],
+            closeButton: useCustomTrigger
+        });
+
+        if (useCustomTrigger) {
+          document.body.classList.add('custom-trigger');
+          window.GitBook('hide');
+        } else {
+            window.GitBook('open');
+        }
+
     </script>
 </html>
 `,

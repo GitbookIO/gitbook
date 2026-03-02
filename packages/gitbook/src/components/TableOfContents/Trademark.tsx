@@ -1,5 +1,4 @@
 import type { SiteInsightsTrademarkPlacement } from '@gitbook/api';
-import { Icon } from '@gitbook/icons';
 
 import { getSpaceLanguage, tString } from '@/intl/server';
 import { tcls } from '@/lib/tailwind';
@@ -49,7 +48,7 @@ export function Trademark(props: {
 
                 className
             )}
-            icon={<Icon icon="gitbook" className="size-5 shrink-0" />}
+            icon="gitbook"
             label={tString(language, 'powered_by_gitbook')}
             insights={{
                 type: 'trademark_click',

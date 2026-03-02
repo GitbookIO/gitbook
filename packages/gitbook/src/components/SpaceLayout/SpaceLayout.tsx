@@ -19,7 +19,7 @@ import { AIChat } from '../AIChat';
 import { AdaptiveVisitorContextProvider } from '../Adaptive';
 import { Announcement } from '../Announcement';
 import { SpacesDropdown, TranslationsDropdown } from '../Header/SpacesDropdown';
-import { InsightsProvider, VisitorSessionProvider } from '../Insights';
+import { InsightsProvider, VisitorProvider } from '../Insights';
 import { SearchContainer } from '../Search';
 import { SiteSectionList, encodeClientSiteSections } from '../SiteSections';
 import { CurrentContentProvider } from '../hooks';
@@ -78,7 +78,7 @@ export function SpaceLayoutServerContext(props: SpaceLayoutProps) {
                     revisionId={context.revisionId}
                     visitorAuthClaims={visitorAuthClaims}
                 >
-                    <VisitorSessionProvider
+                    <VisitorProvider
                         appURL={GITBOOK_APP_URL}
                         visitorCookieTrackingEnabled={customization.insights?.trackingCookie}
                     >
@@ -87,7 +87,7 @@ export function SpaceLayoutServerContext(props: SpaceLayoutProps) {
                                 {children}
                             </AIChatProvider>
                         </InsightsProvider>
-                    </VisitorSessionProvider>
+                    </VisitorProvider>
                 </CurrentContentProvider>
             </AdaptiveVisitorContextProvider>
         </SpaceLayoutContextProvider>
@@ -121,7 +121,7 @@ export function SpaceLayout(props: SpaceLayoutProps) {
             <NavigationLoader />
             {customization.ai?.mode === CustomizationAIMode.Assistant ? <AIChat /> : null}
 
-            <div className="motion-safe:transition-all motion-safe:duration-300 lg:chat-open:mr-80 xl:chat-open:mr-96">
+            <div className="transition-all duration-300 motion-reduce:transition-none lg:chat-open:mr-80 xl:chat-open:mr-96">
                 <div
                     className={tcls(
                         'flex',
@@ -130,7 +130,7 @@ export function SpaceLayout(props: SpaceLayoutProps) {
                         'lg:justify-center',
                         CONTAINER_STYLE,
                         'site-width-wide:max-w-screen-4xl',
-                        'transition-[max-width] duration-300',
+                        'transition-[max-width] duration-300 motion-reduce:transition-none',
 
                         // Ensure the footer is display below the viewport even if the content is not enough
                         withFooter && [
@@ -151,7 +151,11 @@ export function SpaceLayout(props: SpaceLayoutProps) {
                                     'grow-0',
                                     'dark:shadow-light/1',
                                     'text-base/tight',
-                                    'items-center'
+                                    'items-center',
+                                    // On bold themes also color the TOC header so the logo looks correct.
+                                    'site-header:theme-bold:bg-header-background',
+                                    'site-header:theme-bold:m-[-1.5rem_-1px_-0.5rem_-2rem]',
+                                    'site-header:theme-bold:p-[1rem_0_1rem_2rem]'
                                 )}
                             >
                                 <HeaderLogo context={context} />

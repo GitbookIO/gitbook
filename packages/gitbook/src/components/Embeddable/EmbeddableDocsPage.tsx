@@ -18,7 +18,11 @@ import {
     EmbeddableFrameSidebar,
     EmbeddableFrameTitle,
 } from './EmbeddableFrame';
-import { EmbeddableIframeButtons, EmbeddableIframeTabs } from './EmbeddableIframeAPI';
+import {
+    EmbeddableIframeButtons,
+    EmbeddableIframeCloseButton,
+    EmbeddableIframeTabs,
+} from './EmbeddableIframeAPI';
 
 export const dynamic = 'force-static';
 
@@ -48,11 +52,12 @@ export async function EmbeddableDocsPage(
                     siteTitle={context.site.title}
                 />
                 <EmbeddableIframeButtons />
+                <EmbeddableIframeCloseButton />
             </EmbeddableFrameSidebar>
             <EmbeddableFrameMain data-testid="embed-docs-page">
-                <div className="relative flex not-hydrated:animate-blur-in-slow flex-col">
-                    <EmbeddableFrameHeader>
-                        <HeaderMobileMenu className="-ml-2 page-no-toc:hidden" />
+                <div className="relative flex flex-col border-tint-subtle border-b theme-bold:bg-header-background">
+                    <EmbeddableFrameHeader className="theme-bold:text-header-link">
+                        <HeaderMobileMenu className="-ml-2 page-no-toc:hidden theme-bold:text-header-link hover:theme-bold:bg-header-link/3 hover:theme-bold:text-header-link lg:hidden" />
                         <EmbeddableFrameHeaderMain>
                             <EmbeddableFrameTitle>{context.site.title}</EmbeddableFrameTitle>
                         </EmbeddableFrameHeaderMain>
@@ -69,7 +74,7 @@ export async function EmbeddableDocsPage(
                     </EmbeddableFrameHeader>
                     {context.sections ? (
                         <SiteSectionTabs
-                            className="-mt-2 border-tint-subtle border-b"
+                            className="not-theme-bold:-mt-2 theme-bold:bg-tint-base"
                             sections={encodeClientSiteSections(context, context.sections)}
                         />
                     ) : null}
@@ -77,9 +82,9 @@ export async function EmbeddableDocsPage(
                 <EmbeddableFrameBody>
                     <ScrollContainer
                         orientation="vertical"
-                        className="not-hydrated:animate-blur-in-slow"
-                        contentClassName="p-4"
-                        leading={{ fade: !context.sections, button: true }}
+                        className="-mx-4 not-hydrated:animate-blur-in-slow"
+                        contentClassName="flex-row px-4"
+                        leading={{ fade: false, button: true }}
                         trailing={{ fade: false, button: true }}
                     >
                         <TableOfContents context={context} withTrademark={false} />

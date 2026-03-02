@@ -67,6 +67,11 @@ export type GitBookEmbeddableConfiguration = {
 
     /** Tools to be provided to the assistant. */
     tools: GitBookToolDefinition[];
+
+    /**
+     * Display a close button inside the assistant.
+     */
+    closeButton?: boolean;
 };
 
 /**

@@ -1,3 +1,5 @@
+import { withTrailingSlash } from '@/lib/paths';
+
 /**
  * Check if a link is external, compared to an origin.
  */
@@ -22,7 +24,21 @@ export function isExternalLink(href: string, origin: string | null = null) {
         return true;
     }
 
-    // If the url points to the same origin, we consider it internal
+    // If the url points to the same origin, we consider it internal,
+    // a proxy origin can be "gitbook.com/docs", so we also check the pathname.
     const parsed = new URL(href);
-    return parsed.origin !== origin;
+    const originUrl = new URL(origin);
+
+    // Compare origins exactly first
+    if (parsed.origin !== originUrl.origin) {
+        return true;
+    }
+
+    // Compare pathname exactly
+    if (parsed.pathname === originUrl.pathname) {
+        return false;
+    }
+
+    // Then compare the pathname by adding "/" to ensure we don't match "gitbook.com/docs-x"
+    return !parsed.pathname.startsWith(withTrailingSlash(originUrl.pathname));
 }

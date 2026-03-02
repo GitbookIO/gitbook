@@ -30,11 +30,11 @@ export function AnnouncementBanner(props: {
 
     return (
         <div
-            id="announcement-banner"
+            data-gb-announcement-banner
             className="theme-bold:bg-header-background pt-4 pb-2"
             data-nosnippet=""
         >
-            <div className="transition-all duration-300 lg:chat-open:pr-80 xl:chat-open:pr-96">
+            <div className="transition-all duration-300 motion-reduce:transition-none lg:chat-open:pr-80 xl:chat-open:pr-96">
                 <div className={tcls('relative', CONTAINER_STYLE)}>
                     <Tag
                         href={contentRef?.href ?? ''}

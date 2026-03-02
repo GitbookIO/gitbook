@@ -10,8 +10,9 @@ import {
 } from '@/components/AIChat';
 import { useLanguage } from '@/intl/client';
 import * as api from '@gitbook/api';
-import React from 'react';
+import React, { use, useMemo } from 'react';
 import { useTrackEvent } from '../Insights';
+import { LinkContext, type LinkContextType } from '../primitives';
 import {
     EmbeddableFrame,
     EmbeddableFrameBody,
@@ -24,6 +25,7 @@ import {
 } from './EmbeddableFrame';
 import {
     EmbeddableIframeButtons,
+    EmbeddableIframeCloseButton,
     EmbeddableIframeTabs,
     useEmbeddableConfiguration,
 } from './EmbeddableIframeAPI';
@@ -63,6 +65,20 @@ export function EmbeddableAIChat(props: EmbeddableAIChatProps) {
     }, [trackEvent]);
 
     const tabsRef = React.useRef<HTMLDivElement>(null);
+    const hasDocsTab = configuration.tabs.includes('docs');
+    const currentLinkContext = use(LinkContext);
+    const linkContext: LinkContextType = useMemo(
+        () =>
+            hasDocsTab
+                ? { ...currentLinkContext, externalTarget: '_blank' }
+                : {
+                      ...currentLinkContext,
+                      isExternalClient: () => true,
+                      isExternalServer: () => true,
+                      externalTarget: '_blank',
+                  },
+        [hasDocsTab, currentLinkContext]
+    );
 
     return (
         <EmbeddableFrame>
@@ -74,6 +90,7 @@ export function EmbeddableAIChat(props: EmbeddableAIChatProps) {
                     siteTitle={siteTitle}
                 />
                 <EmbeddableIframeButtons />
+                <EmbeddableIframeCloseButton />
             </EmbeddableFrameSidebar>
             <EmbeddableFrameMain data-testid="ai-chat">
                 <EmbeddableFrameHeader>
@@ -94,12 +111,14 @@ export function EmbeddableAIChat(props: EmbeddableAIChatProps) {
                     </EmbeddableFrameButtons>
                 </EmbeddableFrameHeader>
                 <EmbeddableFrameBody>
-                    <AIChatBody
-                        chatController={chatController}
-                        chat={chat}
-                        suggestions={configuration.suggestions}
-                        greeting={configuration.greeting}
-                    />
+                    <LinkContext value={linkContext}>
+                        <AIChatBody
+                            chatController={chatController}
+                            chat={chat}
+                            suggestions={configuration.suggestions}
+                            greeting={configuration.greeting}
+                        />
+                    </LinkContext>
                 </EmbeddableFrameBody>
             </EmbeddableFrameMain>
         </EmbeddableFrame>

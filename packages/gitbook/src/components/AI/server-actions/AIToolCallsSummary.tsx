@@ -1,5 +1,6 @@
 import { HighlightQuery } from '@/components/Search/HighlightQuery';
 import { Link, StyledLink } from '@/components/primitives';
+import { Favicon } from '@/components/utils';
 import { getSpaceLanguage } from '@/intl/server';
 import { t } from '@/intl/translate';
 import type { GitBookSiteContext } from '@/lib/context';
@@ -15,6 +16,7 @@ import type {
     ContentRef,
 } from '@gitbook/api';
 import { Icon, type IconName } from '@gitbook/icons';
+import assertNever from 'assert-never';
 import type * as React from 'react';
 
 /**
@@ -138,25 +140,37 @@ async function DescriptionForSearchToolCall(props: {
     // Resolve all hrefs for search results in parallel
     const searchResultsWithHrefs = await Promise.all(
         toolCall.results.map(async (result) => {
-            const resolved = await resolveContentRef(
-                result.anchor
-                    ? {
-                          kind: 'anchor',
-                          page: result.pageId,
-                          space: result.spaceId,
-                          anchor: result.anchor,
-                      }
-                    : {
-                          kind: 'page',
-                          page: result.pageId,
-                          space: result.spaceId,
-                      },
-                context
-            );
-            return {
-                ...result,
-                href: resolved?.href || '#',
-            };
+            switch (result.type) {
+                case 'page': {
+                    const resolved = await resolveContentRef(
+                        result.anchor
+                            ? {
+                                  kind: 'anchor',
+                                  page: result.pageId,
+                                  space: result.spaceId,
+                                  anchor: result.anchor,
+                              }
+                            : {
+                                  kind: 'page',
+                                  page: result.pageId,
+                                  space: result.spaceId,
+                              },
+                        context
+                    );
+
+                    return {
+                        ...result,
+                        href: resolved?.href || '#',
+                    };
+                }
+                case 'record':
+                    return {
+                        ...result,
+                        href: result.url ?? '#',
+                    };
+                default:
+                    assertNever(result);
+            }
         })
     );
 
@@ -192,45 +206,80 @@ async function DescriptionForSearchToolCall(props: {
             {hasResults ? (
                 <div className="hide-scrollbar mt-4 max-h-0 overflow-y-auto circular-corners:rounded-2xl rounded-corners:rounded-lg border border-tint-subtle p-2 opacity-0 transition-all transition-discrete duration-500 group-open:max-h-96 group-open:opacity-11">
                     <ol className="space-y-1">
-                        {searchResultsWithHrefs.map((result, index) => (
-                            <li
-                                key={`${result.pageId}-${index}`}
-                                className="animate-fade-in-slow"
-                                style={{
-                                    animationDelay: `${index * 25}ms`,
-                                }}
-                            >
-                                <Link
-                                    href={result.href}
-                                    className="flex items-start gap-2 circular-corners:rounded-2xl rounded-corners:rounded-md px-3 py-2 transition-colors hover:bg-primary-hover"
+                        {searchResultsWithHrefs.map((result, index) => {
+                            const resultKey = (() => {
+                                switch (result.type) {
+                                    case 'page':
+                                        return `${result.spaceId}/${result.pageId}`;
+                                    case 'record':
+                                        return result.recordId;
+                                    default:
+                                        assertNever(result);
+                                }
+                            })();
+
+                            const iconClassName = 'mt-1 size-3 shrink-0 text-tint-subtle';
+                            const icon = <Icon icon="memo" className={iconClassName} />;
+
+                            return (
+                                <li
+                                    key={`${resultKey}-${index}`}
+                                    className="animate-fade-in-slow"
+                                    style={{
+                                        animationDelay: `${index * 25}ms`,
+                                    }}
                                 >
-                                    <Icon
-                                        icon="memo"
-                                        className="mt-1 size-3 shrink-0 text-tint-subtle"
-                                    />
-                                    <div className="flex flex-col gap-1 text-tint">
-                                        <h3 className="line-clamp-2 font-medium text-sm text-tint">
-                                            <HighlightQuery
-                                                query={toolCall.query}
-                                                text={result.title}
-                                            />
-                                        </h3>
-                                        {result.description && (
-                                            <p className="line-clamp-2 text-tint-subtle text-xs">
+                                    <Link
+                                        href={result.href}
+                                        className="flex items-start gap-2 circular-corners:rounded-2xl rounded-corners:rounded-md px-3 py-2 transition-colors hover:bg-primary-hover"
+                                        insights={
+                                            result.type === 'record'
+                                                ? {
+                                                      type: 'search_open_result',
+                                                      query: toolCall.query,
+                                                      result: {
+                                                          recordId: result.recordId,
+                                                      },
+                                                  }
+                                                : {
+                                                      type: 'search_open_result',
+                                                      query: toolCall.query,
+                                                      result: {
+                                                          spaceId: result.spaceId,
+                                                          pageId: result.pageId,
+                                                      },
+                                                  }
+                                        }
+                                    >
+                                        {result.type === 'record' ? (
+                                            <Favicon url={result.href} className={iconClassName} />
+                                        ) : (
+                                            icon
+                                        )}
+                                        <div className="flex flex-col gap-1 text-tint">
+                                            <h3 className="line-clamp-2 font-medium text-sm text-tint">
                                                 <HighlightQuery
                                                     query={toolCall.query}
-                                                    text={result.description}
+                                                    text={result.title}
                                                 />
-                                            </p>
-                                        )}
-                                    </div>
-                                    <Icon
-                                        icon="chevron-right"
-                                        className="ml-auto size-3 shrink-0 self-center"
-                                    />
-                                </Link>
-                            </li>
-                        ))}
+                                            </h3>
+                                            {result.description && (
+                                                <p className="line-clamp-2 text-tint-subtle text-xs">
+                                                    <HighlightQuery
+                                                        query={toolCall.query}
+                                                        text={result.description}
+                                                    />
+                                                </p>
+                                            )}
+                                        </div>
+                                        <Icon
+                                            icon="chevron-right"
+                                            className="ml-auto size-3 shrink-0 self-center"
+                                        />
+                                    </Link>
+                                </li>
+                            );
+                        })}
                     </ol>
                 </div>
             ) : null}

@@ -110,16 +110,13 @@ export function OpenAPISchemaScopes(props: {
     isOAuth2?: boolean;
     hideDescription?: boolean;
 }) {
-    const { scopes, context, isOAuth2, hideDescription } = props;
+    const { scopes, context, hideDescription } = props;
 
     return (
         <div className="openapi-securities-scopes openapi-markdown">
             {!hideDescription ? (
                 <div className="openapi-required-scopes-description">
-                    {t(
-                        context.translation,
-                        isOAuth2 ? 'available_scopes' : 'required_scopes_description'
-                    )}
+                    {t(context.translation, 'required_scopes_description')}
                 </div>
             ) : null}
             <ul>

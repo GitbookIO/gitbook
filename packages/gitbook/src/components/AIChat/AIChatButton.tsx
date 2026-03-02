@@ -18,7 +18,7 @@ export function AIChatButton(props: {
 }) {
     const { assistant, showLabel = true, withShortcut = true } = props;
     const language = useLanguage();
-    const isMobile = useIsMobile(MOBILE_BREAKPOINT, '#header-content');
+    const isMobile = useIsMobile(MOBILE_BREAKPOINT, '[data-gb-header-content]');
 
     return (
         <Button

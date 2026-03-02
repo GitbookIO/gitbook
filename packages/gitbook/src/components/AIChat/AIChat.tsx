@@ -87,7 +87,7 @@ export function AIChat() {
         >
             <EmbeddableFrame className="relative shrink-0 border-tint-subtle border-l to-tint-base">
                 <EmbeddableFrameMain data-testid="ai-chat">
-                    <EmbeddableFrameHeader>
+                    <EmbeddableFrameHeader className="not-embed:px-4">
                         <AIChatDynamicIcon trademark={config.trademark} />
                         <EmbeddableFrameHeaderMain>
                             <EmbeddableFrameTitle>
@@ -106,7 +106,7 @@ export function AIChat() {
                             />
                         </EmbeddableFrameButtons>
                     </EmbeddableFrameHeader>
-                    <EmbeddableFrameBody>
+                    <EmbeddableFrameBody className="not-embed:px-4">
                         <AIChatBody
                             chatController={chatController}
                             chat={chat}
@@ -224,7 +224,7 @@ export function AIChatBody(props: {
         <>
             <ScrollContainer
                 className="shrink grow basis-80 animate-fade-in-slow [container-type:size]"
-                contentClassName="p-4 gutter-stable flex flex-col gap-4"
+                contentClassName="py-4 gutter-stable flex flex-col gap-4"
                 orientation="vertical"
                 trailing={{ fade: false, button: true }}
                 active={`#message-group-${chat.messages.filter((message) => message.role === 'user').length - 1}`}
@@ -272,7 +272,7 @@ export function AIChatBody(props: {
                 )}
             </ScrollContainer>
 
-            <div className="flex flex-col gap-2 px-4 pb-4">
+            <div className="flex flex-col gap-2 pb-4">
                 {/* Display an error banner when something went wrong. */}
                 {chat.error ? <AIChatError chatController={chatController} /> : null}
 

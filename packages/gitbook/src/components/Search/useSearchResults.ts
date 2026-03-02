@@ -134,7 +134,11 @@ export function useSearchResults(props: {
                 clearTimeout(timeout);
             };
         }
-        setResultsState((prev) => ({ results: prev.results, fetching: true, error: false }));
+        setResultsState({
+            results: withAI ? withAskTriggers([], query, assistants) : [],
+            fetching: true,
+            error: false,
+        });
         let cancelled = false;
         const timeout = setTimeout(async () => {
             try {

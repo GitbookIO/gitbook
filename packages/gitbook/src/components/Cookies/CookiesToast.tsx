@@ -6,7 +6,13 @@ import { useLanguage } from '@/intl/client';
 import { t, tString } from '@/intl/translate';
 import { tcls } from '@/lib/tailwind';
 
-import { isCookiesTrackingDisabled, setCookiesTracking } from '../Insights';
+import { useCustomCookieBanner, useIntegrationsLoaded } from '@/components/Integrations';
+import { isAIUserAgent } from '@/lib/browser';
+import {
+    isCookiesTrackingDisabled,
+    isGlobalPrivacyControlEnabled,
+    setCookiesTracking,
+} from '../Insights';
 
 /**
  * Toast to accept or reject the use of cookies.
@@ -15,10 +21,26 @@ export function CookiesToast(props: { privacyPolicy?: string }) {
     const { privacyPolicy = 'https://policies.gitbook.com/privacy/cookies' } = props;
     const [show, setShow] = React.useState(false);
     const language = useLanguage();
+    const integrationsLoaded = useIntegrationsLoaded();
+    const { hasCustomCookieBanner } = useCustomCookieBanner();
+    const isAI = isAIUserAgent();
+    const hasGlobalPrivacyControl = isGlobalPrivacyControlEnabled();
 
     React.useEffect(() => {
+        // If global privacy control is enabled, reject cookies
+        if (hasGlobalPrivacyControl && !isCookiesTrackingDisabled()) {
+            setCookiesTracking(false);
+            return;
+        }
+
+        // Always wait for integrations to load, and if a custom banner is registered, hide the built-in banner
+        if (!integrationsLoaded || hasCustomCookieBanner || isAI) {
+            setShow(false);
+            return;
+        }
+
         setShow(isCookiesTrackingDisabled() === undefined);
-    }, []);
+    }, [hasCustomCookieBanner, integrationsLoaded, isAI, hasGlobalPrivacyControl]);
 
     if (!show) {
         return null;
@@ -61,6 +83,7 @@ export function CookiesToast(props: { privacyPolicy?: string }) {
                 'lg:chat-open:mr-80',
                 'xl:chat-open:mr-100',
                 'transition-all',
+                'motion-reduce:transition-none',
                 'duration-300',
                 'text-sm'
             )}

@@ -27,7 +27,10 @@ import { traceErrorOnly } from '@/lib/tracing';
 import type { IconName } from '@gitbook/icons';
 import { DocumentView } from '../DocumentView';
 
-export type OrderedComputedResult = ComputedPageResult | ComputedSectionResult;
+export type OrderedComputedResult =
+    | ComputedPageResult
+    | ComputedSectionResult
+    | ComputedRecordResult;
 
 export interface ComputedSectionResult {
     type: 'section';
@@ -51,6 +54,14 @@ export interface ComputedPageResult {
     spaceId: string;
 
     breadcrumbs?: Array<{ icon?: IconName; label: string }>;
+}
+
+export interface ComputedRecordResult {
+    type: 'record';
+    id: string;
+    title: string;
+    description: string | undefined;
+    href: string;
 }
 
 export interface AskAnswerSource {
@@ -238,19 +249,30 @@ export async function searchSiteContent({
 
         return (
             await Promise.all(
-                searchResults.map((spaceItem) => {
+                searchResults.map((resultItem) => {
+                    if (resultItem.type === 'record') {
+                        const result: ComputedRecordResult = {
+                            type: 'record',
+                            id: resultItem.id,
+                            title: resultItem.title,
+                            description: resultItem.description,
+                            href: resultItem.url,
+                        };
+                        return result;
+                    }
+
                     const found = findSiteSpaceBy(
                         structure,
-                        (siteSpace) => siteSpace.space.id === spaceItem.id
+                        (siteSpace) => siteSpace.space.id === resultItem.id
                     );
                     const siteSection = found?.siteSection;
                     const siteSectionGroup = found?.siteSectionGroup;
 
                     return Promise.all(
-                        spaceItem.pages.map((pageItem) =>
+                        resultItem.pages.map((pageItem) =>
                             transformSitePageResult(context, {
                                 pageItem,
-                                spaceItem,
+                                spaceItem: resultItem,
                                 siteSpace: found?.siteSpace,
                                 space: found?.siteSpace.space,
                                 spaceURL: found?.siteSpace.urls.published,

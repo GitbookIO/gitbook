@@ -3,6 +3,7 @@ import type { Server } from 'bun';
 import { createFileSystem } from './filesystem';
 
 async function serveFixture(fixture: string) {
+    //@ts-ignore - Typescript fail for some reason here, but not locally.
     return new Response(await Bun.file(new URL(`./fixtures/${fixture}`, import.meta.url)).bytes(), {
         headers: { 'Content-Type': 'application/yaml' },
     });

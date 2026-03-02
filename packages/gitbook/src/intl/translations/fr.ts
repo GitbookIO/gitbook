@@ -29,7 +29,7 @@ export const fr = {
     search_scope_variant_current_description: 'Seulement la variante actuelle',
     search_scope_variant_all: 'Tout le contenu',
     search_scope_variant_all_description: 'Chaque variante disponible',
-    ask: 'Poser une question',
+    ask: 'Une question ?',
     search_ask: 'Demander « ${1} »',
     search_ask_description: 'Trouvez la réponse avec ${1}',
     search_ask_sources: 'Sources',

@@ -35,7 +35,7 @@ export function Header(props: {
 
     return (
         <header
-            id="site-header"
+            data-gb-site-header
             className={tcls(
                 'flex',
                 'flex-col',
@@ -63,14 +63,14 @@ export function Header(props: {
         >
             <div
                 className={tcls(
-                    'theme-bold:bg-header-background',
-                    'theme-bold:shadow-[0px_1px_0px]',
-                    'theme-bold:shadow-tint-12/2'
+                    'site-header:theme-bold:bg-header-background',
+                    'site-header:theme-bold:shadow-[0px_1px_0px]',
+                    'site-header:theme-bold:shadow-tint-12/2'
                 )}
             >
-                <div className="transition-all duration-300 lg:chat-open:pr-80 xl:chat-open:pr-96">
+                <div className="transition-all duration-300 motion-reduce:transition-none lg:chat-open:pr-80 xl:chat-open:pr-96">
                     <div
-                        id="header-content"
+                        data-gb-header-content
                         className={tcls(
                             'gap-4',
                             'lg:gap-6',
@@ -82,7 +82,7 @@ export function Header(props: {
                             'min-h-16',
                             'sm:h-16',
                             CONTAINER_STYLE,
-                            'transition-[max-width] duration-300',
+                            'transition-[max-width] duration-300 motion-reduce:transition-none',
                             '@container/header'
                         )}
                     >
@@ -100,9 +100,9 @@ export function Header(props: {
                                 className={tcls(
                                     '-ml-2',
                                     'text-tint-strong',
-                                    'theme-bold:text-header-link',
+                                    'site-header:theme-bold:text-header-link',
                                     'hover:bg-tint-hover',
-                                    'hover:theme-bold:bg-header-link/3',
+                                    'hover:site-header:theme-bold:bg-header-link/3',
                                     variants.generic.length > 1
                                         ? 'lg:hidden'
                                         : 'page-no-toc:hidden lg:hidden'
@@ -120,13 +120,13 @@ export function Header(props: {
                                 'justify-self-end',
                                 'items-center',
                                 'gap-2',
-                                'transition-[margin] duration-300',
+                                'transition-[margin] duration-300 motion-reduce:transition-none',
                                 'search' in customization.styling &&
                                     customization.styling.search === 'prominent'
                                     ? [
                                           '@2xl:grow-[0.8]',
                                           '@4xl:basis-40',
-                                          '@2xl:max-w-[40%]',
+                                          '@2xl:max-w-[50%]',
                                           '@4xl:max-w-lg',
                                           'lg:@2xl:ml-[max(calc((100%-18rem-48rem)/2),1.5rem)]', // container (100%) - sidebar (18rem) - content (48rem)
                                           'not-chat-open:xl:ml-[max(calc((100%-18rem-48rem-14rem-3rem)/2),1.5rem)]', // container (100%) - sidebar (18rem) - content (48rem) - outline (14rem) - margin (3rem)
@@ -191,7 +191,7 @@ export function Header(props: {
                                             ) ?? siteSpace
                                         }
                                         siteSpaces={variants.translations}
-                                        className="flex! theme-bold:text-header-link hover:theme-bold:bg-header-link/3"
+                                        className="flex! site-header:theme-bold:text-header-link hover:site-header:theme-bold:bg-header-link/3 focus-visible:site-header:theme-bold:bg-header-link/3 aria-expanded:site-header:theme-bold:bg-header-link/5"
                                     />
                                 ) : null}
                             </HeaderLinks>
@@ -201,7 +201,7 @@ export function Header(props: {
             </div>
 
             {visibleSections && withSections ? (
-                <div className="transition-[padding] duration-300 lg:chat-open:pr-80 xl:chat-open:pr-96">
+                <div className="transition-[padding] duration-300 motion-reduce:transition-none lg:chat-open:pr-80 xl:chat-open:pr-96">
                     <SiteSectionTabs sections={encodeClientSiteSections(context, visibleSections)}>
                         {variants.translations.length > 1 ? (
                             <TranslationsDropdown

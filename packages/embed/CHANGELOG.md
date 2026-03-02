@@ -1,5 +1,20 @@
 # @gitbook/embed
 
+## 0.2.2
+
+### Patch Changes
+
+- b4b471f: Fix unexpected error thrown when using the embed in standalone mode
+
+## 0.2.1
+
+### Patch Changes
+
+- 96e24a1: Fix signed JWT token usage
+- 0aa34cc: Fix Embed options in React
+- Updated dependencies [6f1db32]
+  - @gitbook/icons@0.4.3
+
 ## 0.2.0
 
 ### Minor Changes

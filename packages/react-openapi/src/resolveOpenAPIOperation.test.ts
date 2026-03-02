@@ -1,7 +1,16 @@
 import { describe, expect, it } from 'bun:test';
 
 import { parseOpenAPI, traverse } from '@gitbook/openapi-parser';
+import serverPrecedenceSpec from './fixtures/spec-server-precedence.json';
 import { resolveOpenAPIOperation } from './resolveOpenAPIOperation';
+
+async function loadFixture(spec: object) {
+    const { filesystem } = await parseOpenAPI({
+        value: JSON.stringify(spec),
+        rootURL: 'memory://spec.json',
+    });
+    return filesystem;
+}
 
 async function fetchFilesystem(url: string) {
     const response = await fetch(url);
@@ -172,6 +181,135 @@ describe('#resolveOpenAPIOperation', () => {
                     },
                 },
             },
+        });
+    });
+
+    describe('x-enable-proxy', () => {
+        it('should extract x-enable-proxy when set to true', async () => {
+            const filesystem = await loadFixture({
+                openapi: '3.1.0',
+                info: { title: 'Test', version: '1.0' },
+                'x-enable-proxy': true,
+                paths: {
+                    '/test': {
+                        get: { responses: { '200': { description: 'OK' } } },
+                    },
+                },
+            });
+            const resolved = await resolveOpenAPIOperation(filesystem, {
+                method: 'get',
+                path: '/test',
+            });
+
+            expect(resolved?.['x-enable-proxy']).toBe(true);
+        });
+
+        it('should extract x-enable-proxy when set to false', async () => {
+            const filesystem = await loadFixture({
+                openapi: '3.1.0',
+                info: { title: 'Test', version: '1.0' },
+                'x-enable-proxy': false,
+                paths: {
+                    '/test': {
+                        get: { responses: { '200': { description: 'OK' } } },
+                    },
+                },
+            });
+            const resolved = await resolveOpenAPIOperation(filesystem, {
+                method: 'get',
+                path: '/test',
+            });
+
+            expect(resolved?.['x-enable-proxy']).toBe(false);
+        });
+
+        it('should return undefined when x-enable-proxy is not set', async () => {
+            const filesystem = await loadFixture({
+                openapi: '3.1.0',
+                info: { title: 'Test', version: '1.0' },
+                paths: {
+                    '/test': {
+                        get: { responses: { '200': { description: 'OK' } } },
+                    },
+                },
+            });
+            const resolved = await resolveOpenAPIOperation(filesystem, {
+                method: 'get',
+                path: '/test',
+            });
+
+            expect(resolved?.['x-enable-proxy']).toBeUndefined();
+        });
+
+        it('should ignore x-enable-proxy when not a boolean', async () => {
+            const filesystem = await loadFixture({
+                openapi: '3.1.0',
+                info: { title: 'Test', version: '1.0' },
+                'x-enable-proxy': 'yes',
+                paths: {
+                    '/test': {
+                        get: { responses: { '200': { description: 'OK' } } },
+                    },
+                },
+            });
+            const resolved = await resolveOpenAPIOperation(filesystem, {
+                method: 'get',
+                path: '/test',
+            });
+
+            expect(resolved?.['x-enable-proxy']).toBeUndefined();
+        });
+    });
+
+    describe('server precedence', () => {
+        it('should use root-level servers when no path or operation servers are defined', async () => {
+            const filesystem = await loadFixture(serverPrecedenceSpec);
+            const resolved = await resolveOpenAPIOperation(filesystem, {
+                method: 'get',
+                path: '/root-only',
+            });
+
+            expect(resolved?.servers).toEqual([{ url: 'https://root.example.com' }]);
+        });
+
+        it('should use path-level servers over root-level servers', async () => {
+            const filesystem = await loadFixture(serverPrecedenceSpec);
+            const resolved = await resolveOpenAPIOperation(filesystem, {
+                method: 'get',
+                path: '/path-override',
+            });
+
+            expect(resolved?.servers).toEqual([{ url: 'https://path.example.com' }]);
+        });
+
+        it('should use operation-level servers over path and root-level servers', async () => {
+            const filesystem = await loadFixture(serverPrecedenceSpec);
+            const resolved = await resolveOpenAPIOperation(filesystem, {
+                method: 'get',
+                path: '/operation-override',
+            });
+
+            expect(resolved?.servers).toEqual([{ url: 'https://operation.example.com' }]);
+        });
+
+        it('should use operation-level servers over root-level when no path servers exist', async () => {
+            const filesystem = await loadFixture(serverPrecedenceSpec);
+            const resolved = await resolveOpenAPIOperation(filesystem, {
+                method: 'get',
+                path: '/operation-skip-path',
+            });
+
+            expect(resolved?.servers).toEqual([{ url: 'https://operation.example.com' }]);
+        });
+
+        it('should fallback to root-level servers for endpoints without overrides', async () => {
+            const filesystem = await loadFixture(serverPrecedenceSpec);
+            const resolved = await resolveOpenAPIOperation(filesystem, {
+                method: 'get',
+                path: '/no-servers',
+            });
+
+            expect(resolved?.servers).toEqual([{ url: 'https://root.example.com' }]);
         });
     });
 });

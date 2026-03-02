@@ -1,8 +1,9 @@
 import type { GitBookSiteContext } from '@/lib/context';
 import { getPagePaths, hasPageVisibleDescendant } from '@/lib/pages';
 import { resolveContentRef } from '@/lib/references';
+import { getRevisionTags, resolveTag } from '@/lib/tags';
 import { removeUndefined } from '@/lib/typescript';
-import type { ContentRef, RevisionPage } from '@gitbook/api';
+import type { ContentRef, RevisionPage, RevisionPageTag, RevisionTag } from '@gitbook/api';
 import assertNever from 'assert-never';
 
 export type ClientTOCPageLink = {
@@ -24,6 +25,7 @@ export type ClientTOCPageDocument = {
     icon?: string;
     pathnames: string[];
     descendants?: ClientTOCPage[];
+    primaryTag?: RevisionTag;
 };
 
 export type ClientTOCPageGroup = {
@@ -69,6 +71,8 @@ export async function encodeClientTableOfContents(
                     ? await encodeClientTableOfContents(context, rootPages, page.pages)
                     : undefined;
 
+                const primaryTag = resolvePrimaryTag(page.tags, context);
+
                 result.push(
                     removeUndefined({
                         id: page.id,
@@ -78,6 +82,7 @@ export async function encodeClientTableOfContents(
                         icon: page.icon,
                         pathnames: getPagePaths(rootPages, page),
                         descendants,
+                        primaryTag,
                         type: 'document',
                     })
                 );
@@ -121,4 +126,26 @@ export async function encodeClientTableOfContents(
     }
 
     return result;
+}
+
+/**
+ * Tags attached to a page can also get a `primary` prop which, when set, is the tag that gets shown in the TOC.
+ * - only 1 tag can be primary for available-space reasons.
+ * */
+function resolvePrimaryTag(
+    pageTags: RevisionPageTag[] | undefined,
+    context: GitBookSiteContext
+): RevisionTag | undefined {
+    // TODO: simplify once new API lands as `tags` will always be defined.
+    if (!pageTags || pageTags.length === 0) {
+        return undefined;
+    }
+
+    const primary = pageTags.find((t) => t.primary);
+    if (!primary) {
+        return undefined;
+    }
+
+    const revisionTags = getRevisionTags(context.revision);
+    return resolveTag(primary.tag.tag, revisionTags);
 }

@@ -106,6 +106,10 @@ function getIframe() {
         widgetWindow.appendChild(widgetIframe);
 
         _frame = client.createFrame(widgetIframe);
+        _frame.on('close', () => {
+            widgetWindow.classList.add('hidden');
+            widgetButton.classList.remove('open');
+        });
     }
     return { iframe: widgetIframe, frame: _frame };
 }
@@ -193,5 +197,3 @@ const precalls = (window.GitBook as GitBookStandalone | undefined)?.q ?? [];
 // @ts-expect-error - GitBook is not defined in the global scope
 window.GitBook = GitBook;
 precalls.forEach((call) => GitBook(...call));
-
-GitBook('configure', {});

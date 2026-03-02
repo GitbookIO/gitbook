@@ -10,6 +10,7 @@ import { tcls } from '@/lib/tailwind';
 import { Button, Loading } from '../primitives';
 import { SearchPageResultItem } from './SearchPageResultItem';
 import { SearchQuestionResultItem } from './SearchQuestionResultItem';
+import { SearchRecordResultItem } from './SearchRecordResultItem';
 import { SearchSectionResultItem } from './SearchSectionResultItem';
 import type { OrderedComputedResult } from './server-actions';
 
@@ -76,13 +77,6 @@ export const SearchResults = React.forwardRef(function SearchResults(
 
     const { assistants } = useAI();
 
-    if (fetching) {
-        return (
-            <div className={tcls('flex', 'items-center', 'justify-center', 'py-8', 'h-full')}>
-                <Loading className={tcls('w-6', 'text-tint/6')} />
-            </div>
-        );
-    }
     if (error) {
         return (
             <div
@@ -129,7 +123,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
         <div className={tcls('min-h-full')}>
             {children}
             {results.length === 0 ? (
-                query ? (
+                fetching ? null : query ? (
                     noResults
                 ) : (
                     <div className="empty" />
@@ -207,14 +201,35 @@ export const SearchResults = React.forwardRef(function SearchResults(
                                         />
                                     );
                                 }
+                                case 'record': {
+                                    return (
+                                        <SearchRecordResultItem
+                                            ref={(ref) => {
+                                                refs.current[index] = ref;
+                                            }}
+                                            key={item.id}
+                                            query={query}
+                                            item={item}
+                                            active={index === cursor}
+                                            {...resultItemProps}
+                                        />
+                                    );
+                                }
                                 default:
                                     assertNever(item);
                             }
                         })}
                     </div>
-                    {!results.some((result) => result.type !== 'question') && noResults}
+                    {!fetching && !results.some((result) => result.type !== 'question')
+                        ? noResults
+                        : null}
                 </>
             )}
+            {fetching ? (
+                <div className={tcls('flex', 'items-center', 'justify-center', 'py-6')}>
+                    <Loading className={tcls('w-6', 'text-tint/6')} />
+                </div>
+            ) : null}
         </div>
     );
 });
