@@ -3,8 +3,8 @@ import { tString } from '@/intl/translate';
 import { tcls } from '@/lib/tailwind';
 import { AIMessageRole } from '@gitbook/api';
 import type { AIChatController, AIChatState } from '../AI';
-import { AIChatToolConfirmations } from './AIChatToolConfirmations';
 import { AIResponseFeedback } from './AIResponseFeedback';
+import { AIUITools } from './AIUITools';
 import { AIChatFollowupSuggestions } from './AiChatFollowupSuggestions';
 
 export function AIChatMessages(props: {
@@ -96,14 +96,14 @@ export function AIChatMessages(props: {
                                     !chat.error &&
                                     chat.query &&
                                     chat.responseId &&
-                                    chat.pendingTools.length === 0 ? (
+                                    chat.ui.length === 0 ? (
                                         <AIResponseFeedback
                                             responseId={chat.responseId}
                                             query={chat.query}
                                             className="-ml-1 -mt-4"
                                         />
                                     ) : null}
-                                    <AIChatToolConfirmations chat={chat} />
+                                    <AIUITools chat={chat} />
                                     <AIChatFollowupSuggestions
                                         chat={chat}
                                         chatController={chatController}

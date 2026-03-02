@@ -8,6 +8,7 @@ import {
 import type { VisitorAuthClaims } from '@/lib/adaptive';
 import type { GitBookSiteContext } from '@/lib/context';
 import { SiteInsightsTrademarkPlacement } from '@gitbook/api';
+import { OperatingSystemClassScript } from '../RootLayout/OperatingSystemClassScript';
 import { SpaceLayoutServerContext } from '../SpaceLayout';
 import { Trademark } from '../TableOfContents/Trademark';
 import { NavigationLoader } from '../primitives/NavigationLoader';
@@ -71,6 +72,7 @@ export async function EmbeddableRootLayout({
                         <EmbeddableIframeAPI
                             baseURL={context.linker.toPathInSite('~gitbook/embed/')}
                         />
+                        <OperatingSystemClassScript />
                     </SpaceLayoutServerContext>
                 </AIContextProvider>
             </SiteLayoutClientContexts>

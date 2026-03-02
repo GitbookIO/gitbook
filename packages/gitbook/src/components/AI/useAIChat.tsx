@@ -9,34 +9,18 @@ import {
     type AIStreamResponseToolCallPending,
     type AIToolCallResult,
 } from '@gitbook/api';
-import type { IconName } from '@gitbook/icons';
 import * as React from 'react';
 import { getVisitor, useTrackEvent } from '../Insights';
 import { getSession } from '../Insights/sessions';
-import { integrationsAssistantTools } from '../Integrations';
 import { useSetSearchState } from '../Search';
 import { type RenderAIMessageOptions, streamAIChatResponse } from './server-actions';
+import { type AIChatUIComponent, getTools } from './tools';
 import { useAIMessageContextRef } from './useAIMessageContext';
 
 export type AIChatMessage = {
     role: AIMessageRole;
     content: React.ReactNode;
     query?: string;
-};
-
-export type AIChatPendingTool = {
-    icon?: IconName;
-    label: string;
-
-    /**
-     * Confirm the tool call by calling this function.
-     */
-    confirm: () => Promise<void>;
-
-    /**
-     * Tool call result to cancel it.
-     */
-    cancelToolCall: AIToolCallResult;
 };
 
 export type AIChatState = {
@@ -71,9 +55,9 @@ export type AIChatState = {
     followUpSuggestions: string[];
 
     /**
-     * Tools that are pending confirmation to be executed.
+     * UI components to be displayed in the chat.
      */
-    pendingTools: AIChatPendingTool[];
+    ui: AIChatUIComponent[];
 
     /**
      * If true, the session is in progress.
@@ -127,7 +111,7 @@ const globalState = zustand.create<AIChatState>(() => {
         messages: [],
         query: null,
         followUpSuggestions: [],
-        pendingTools: [],
+        ui: [],
         loading: false,
         error: false,
         initialQuery: null,
@@ -213,7 +197,7 @@ export function AIChatProvider(props: {
                 return {
                     ...state,
                     followUpSuggestions: [],
-                    pendingTools: [],
+                    ui: [],
                     loading: true,
                     error: false,
                     messages: [
@@ -228,10 +212,10 @@ export function AIChatProvider(props: {
 
             // Execute a tool call
             const executeToolCall = async (event: AIStreamResponseToolCallPending) => {
-                const integrationTools = integrationsAssistantTools.getState().tools;
+                const integrationTools = getTools();
                 const toolDef = integrationTools.find((tool) => tool.name === event.toolCall.tool);
 
-                if (!toolDef) {
+                if (!toolDef || !('execute' in toolDef)) {
                     throw new Error(`Tool ${event.toolCall.tool} not found`);
                 }
 
@@ -264,7 +248,7 @@ export function AIChatProvider(props: {
 
             let toolToExecute: AIStreamResponseToolCallPending | null = null;
             try {
-                const integrationTools = integrationsAssistantTools.getState().tools;
+                const tools = getTools();
                 const stream = await streamAIChatResponse({
                     message: input.message,
                     toolCall: input.toolCall,
@@ -274,7 +258,7 @@ export function AIChatProvider(props: {
                         sessionId: getSession().id,
                         visitorId: (await getVisitor()).deviceId,
                     },
-                    tools: integrationTools.map((tool) => ({
+                    tools: tools.map((tool) => ({
                         name: tool.name,
                         description: tool.description,
                         inputSchema: tool.inputSchema,
@@ -320,46 +304,85 @@ export function AIChatProvider(props: {
                             break;
                         }
                         case 'response_tool_call_pending': {
-                            const toolDef = integrationTools.find(
-                                (tool) => tool.name === event.toolCall.tool
-                            );
+                            const toolDef = tools.find((tool) => tool.name === event.toolCall.tool);
                             if (!toolDef) {
                                 throw new Error(`Tool ${event.toolCall.tool} not found`);
                             }
 
-                            const confirmation = toolDef.confirmation;
+                            if ('createUI' in toolDef) {
+                                globalState.setState((state) => ({
+                                    ...state,
+                                    ui: [
+                                        ...state.ui,
+                                        toolDef.createUI({
+                                            context: {
+                                                toolCall: event.toolCall,
+                                                toolCallId: event.toolCallId,
+                                            },
+                                            input: event.toolCall.input,
+                                            send: async (result) => {
+                                                await streamResponse({
+                                                    toolCall: {
+                                                        tool: event.toolCall.tool,
+                                                        toolCallId: event.toolCallId,
+                                                        output: result.output,
+                                                        summary: result.summary,
+                                                    },
+                                                });
+                                            },
+                                        }),
+                                    ],
+                                }));
+                                break;
+                            }
+
+                            const confirmation = 'confirmation' in toolDef && toolDef.confirmation;
                             if (confirmation) {
                                 globalState.setState((state) => ({
                                     ...state,
-                                    pendingTools: [
-                                        ...state.pendingTools,
+                                    ui: [
+                                        ...state.ui,
                                         {
-                                            icon: confirmation.icon,
-                                            label: confirmation.label,
-                                            cancelToolCall: {
-                                                tool: event.toolCall.tool,
+                                            name: 'confirm',
+                                            context: {
+                                                toolCall: event.toolCall,
                                                 toolCallId: event.toolCallId,
-                                                output: {
-                                                    cancelled: 'User did not confirm the tool call',
-                                                },
-                                                summary: {
-                                                    icon: 'forward',
-                                                    text: tString(
-                                                        language,
-                                                        'tool_call_skipped',
-                                                        confirmation.label
-                                                    ),
-                                                },
                                             },
-                                            confirm: async () => {
-                                                await executeToolCall(event);
+                                            label: confirmation.label,
+                                            props: {
+                                                icon: confirmation.icon,
+                                                onConfirm: async () => {
+                                                    await executeToolCall(event);
+                                                },
+                                                onCancel: async () => {
+                                                    streamResponse({
+                                                        message: input.message,
+                                                        toolCall: {
+                                                            tool: event.toolCall.tool,
+                                                            toolCallId: event.toolCallId,
+                                                            output: {
+                                                                cancelled:
+                                                                    'User explicitely cancelled the tool call.',
+                                                            },
+                                                            summary: {
+                                                                icon: 'forward',
+                                                                text: tString(
+                                                                    language,
+                                                                    'tool_call_skipped',
+                                                                    confirmation.label
+                                                                ),
+                                                            },
+                                                        },
+                                                    });
+                                                },
                                             },
                                         },
                                     ],
                                 }));
-                            } else {
-                                toolToExecute = event;
+                                break;
                             }
+
+                            toolToExecute = event;
                             break;
                         }
                     }
@@ -408,7 +431,7 @@ export function AIChatProvider(props: {
     // Post a message to the AI chat
     const onPostMessage = React.useCallback(
         async (input: { message: string }) => {
-            const { query, messages, pendingTools } = globalState.getState();
+            const { query, messages, ui } = globalState.getState();
 
             // For first message, update the ask parameter in URL
             if (messages.length === 0) {
@@ -453,15 +476,33 @@ export function AIChatProvider(props: {
                 };
             });
 
-            const pendingTool = pendingTools[0];
+            const pendingUiComponent = ui[0];
             streamResponse({
                 message: input.message,
                 // If we had a pending tool call, we need to send it as being cancelled
                 // otherwise the AI will fail to process the message
-                ...(pendingTool ? { toolCall: pendingTool.cancelToolCall } : {}),
+                ...(pendingUiComponent
+                    ? {
+                          toolCall: {
+                              tool: pendingUiComponent.context.toolCall.tool,
+                              toolCallId: pendingUiComponent.context.toolCallId,
+                              output: {
+                                  cancelled: 'User skipped the answer to the tool call.',
+                              },
+                              summary: {
+                                  icon: 'forward',
+                                  text: tString(
+                                      language,
+                                      'tool_call_skipped',
+                                      pendingUiComponent.label
+                                  ),
+                              },
+                          },
+                      }
+                    : {}),
             });
         },
-        [setSearchState, trackEvent, streamResponse]
+        [setSearchState, trackEvent, streamResponse, language]
     );
 
     // Clear the conversation and reset ask parameter
@@ -472,7 +513,7 @@ export function AIChatProvider(props: {
             messages: [],
             query: null,
             followUpSuggestions: [],
-            pendingTools: [],
+            ui: [],
             responseId: null,
             error: false,
             initialQuery: null,

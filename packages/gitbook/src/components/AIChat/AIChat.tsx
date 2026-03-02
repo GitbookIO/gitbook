@@ -142,7 +142,7 @@ export function AIChatDynamicIcon(props: {
                           ? 'working'
                           : 'thinking'
                       : chat.messages.length > 0
-                        ? chat.pendingTools.length > 0
+                        ? chat.ui.length > 0
                             ? 'confirm'
                             : 'done'
                         : 'default'
