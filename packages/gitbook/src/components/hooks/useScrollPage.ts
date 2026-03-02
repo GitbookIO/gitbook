@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React from 'react';
 
 import { usePathname } from 'next/navigation';
 import { useHash } from './useHash';
@@ -9,7 +9,7 @@ import { usePrevious } from './usePrevious';
 /**
  * Handles scroll behavior when the URL hash changes during client-side navigation.
  */
-export function useScrollPage() {
+function useScrollPage() {
     const hash = useHash();
     const pathname = usePathname();
     const previous = usePrevious({ pathname, hash });
@@ -32,12 +32,20 @@ export function useScrollPage() {
 }
 
 /**
+ * Handles scroll behavior when the URL hash changes during client-side navigation.
+ */
+export function ScrollPage() {
+    useScrollPage();
+    return null;
+}
+
+/**
  * Scroll to the hash if present.
  */
 export function useScrollToHash() {
     const hash = useHash();
 
-    useEffect(() => {
+    React.useEffect(() => {
         if (hash) {
             scrollToHash(hash);
         }
@@ -57,9 +65,4 @@ function scrollToHash(hash: string) {
         return true;
     }
     return false;
-}
-
-export function ScrollPage() {
-    useScrollPage();
-    return null;
 }
