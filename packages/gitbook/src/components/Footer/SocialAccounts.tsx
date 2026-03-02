@@ -4,7 +4,7 @@ import {
     SiteSocialAccountPlatform,
 } from '@gitbook/api';
 import type { IconName } from '@gitbook/icons';
-import { Button } from '../primitives';
+import { Button, type ButtonProps, DropdownMenuItem } from '../primitives';
 
 type SocialPlatformData = {
     label: string;
@@ -86,8 +86,10 @@ const SOCIAL_PLATFORMS: Record<SiteSocialAccountPlatform, SocialPlatformData> = 
     },
 };
 
-export function SocialLink(props: { account: SiteSocialAccount; target: SiteExternalLinksTarget }) {
-    const { account, target } = props;
+export function SocialAccountButton(
+    props: { account: SiteSocialAccount; target: SiteExternalLinksTarget } & ButtonProps
+) {
+    const { account, target, ...rest } = props;
     const platform = SOCIAL_PLATFORMS[account.platform];
 
     return (
@@ -99,6 +101,23 @@ export function SocialLink(props: { account: SiteSocialAccount; target: SiteExte
             variant="blank"
             size="large"
             target={target}
+            {...rest}
         />
+    );
+}
+
+export function SocialAccountLink(props: {
+    account: SiteSocialAccount;
+}) {
+    const { account } = props;
+    const platform = SOCIAL_PLATFORMS[account.platform];
+
+    return (
+        <DropdownMenuItem
+            href={platform.href.replace('$handle', account.handle)}
+            leadingIcon={platform.icon}
+        >
+            {platform.label}
+        </DropdownMenuItem>
     );
 }
