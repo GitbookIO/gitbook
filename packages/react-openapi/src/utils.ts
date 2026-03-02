@@ -357,7 +357,10 @@ export function extractOperationSecurityInfo(args: {
     const grouped = new Map<string, OperationSecurityInfo>();
 
     securityRequirement.forEach((requirement) => {
-        const schemeKeys = Object.keys(requirement);
+        const schemeKeys = Object.keys(requirement).sort();
+        if (schemeKeys.length === 0) {
+            return;
+        }
         const label = schemeKeys.join(' & ');
         const existing = grouped.get(label);
         const schemes = schemeKeys
