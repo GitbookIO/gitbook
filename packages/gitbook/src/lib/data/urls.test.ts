@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test';
 
-import { getURLLookupAlternatives, normalizeURL } from './urls';
+import { getURLLookupAlternatives, normalizeURL, decodeURLPath } from './urls';
 
 describe('getURLLookupAlternatives', () => {
     it('should return all URLs up to the root', () => {
@@ -406,3 +406,72 @@ describe('normalizeURL', () => {
         );
     });
 });
+
+describe('decodeURLPath', () => {
+    it('should decode encoded path components', () => {
+        const url = new URL('https://docs.mycompany.com/helloworld/tes%74');
+        const result = decodeURLPath(url);
+        expect(result.pathname).toBe('/helloworld/test');
+        expect(result.toString()).toBe('https://docs.mycompany.com/helloworld/test');
+    });
+
+    it('should handle multiple levels of encoding', () => {
+        // Double encoded: %2574 = %74 (letter t)
+        const url = new URL('https://docs.mycompany.com/helloworld/tes%74');
+        const result = decodeURLPath(url);
+        expect(result.pathname).toBe('/helloworld/test');
+        
+        // Triple encoded: %252574 = %2574 = %74 (letter t)
+        const url2 = new URL('https://docs.mycompany.com/helloworld/tes%74');
+        const result2 = decodeURLPath(url2);
+        expect(result2.pathname).toBe('/helloworld/test');
+    });
+
+    it('should throw an error for invalid characters in the path', () => {
+        expect(() => {
+            decodeURLPath(new URL('https://docs.mycompany.com/hello:world'));
+        }).toThrow('URL path contains invalid characters');
+        
+        expect(() => {
+            decodeURLPath(new URL('https://docs.mycompany.com/hello%3Btest'));
+        }).toThrow('URL path contains invalid characters');
+        
+        expect(() => {
+            decodeURLPath(new URL('https://docs.mycompany.com/hello%40anchor'));
+        }).toThrow('URL path contains invalid characters');
+
+        //TODO: should we also throw for spaces? Maybe make an exception for spaces only?
+        expect(() => {
+            decodeURLPath(new URL('https://docs.mycompany.com/hello%20world'));
+        }).toThrow();
+    });
+
+    it('should limit decoding iterations for nested % encodings to prevent DoS', () => {
+        // 4 levels of encoding should throw an error
+        // %25252525 = %252525 = %2525 = %25 = %
+        const url = new URL('https://docs.mycompany.com/%25252525');
+        expect(() => {
+            decodeURLPath(url);
+        }).toThrow('URL path is malformed');
+
+        const deepUrl = new URL('https://docs.mycompany.com/%2525252525252525');
+        expect(() => {
+            decodeURLPath(deepUrl);
+        }).toThrow('URL path is malformed');
+    });
+
+    // TODO: should we do that actually?
+    it('should throw an error if the encoded path contains /', () => {
+        expect(() => {
+            decodeURLPath(new URL('https://docs.mycompany.com/hello%2Fworld'));
+        }).toThrow('URL path contains invalid characters');
+    });
+
+    it('should not decode search params or hash fragments', () => {
+        const url = new URL('https://docs.mycompany.com/helloworld/tes%74?query=%74est#sec%74ion');
+        const result = decodeURLPath(url);
+        expect(result.pathname).toBe('/helloworld/test');
+        expect(result.search).toBe('?query=%74est');
+        expect(result.hash).toBe('#sec%74ion');
+    });
+})

@@ -8,6 +8,7 @@ import { getContentSecurityPolicy } from '@/lib/csp';
 import { validateSerializedCustomization } from '@/lib/customization';
 import {
     DataFetcherError,
+    decodeURLPath,
     getVisitorAuthBasePath,
     lookupPublishedContentByUrl,
     normalizeURL,
@@ -50,6 +51,12 @@ export async function middleware(request: NextRequest) {
         const normalized = normalizeURL(requestURL);
         if (normalized.toString() !== requestURL.toString()) {
             return NextResponse.redirect(normalized.toString());
+        }
+
+        // If the URL path is encoded, decode it and redirect to the decoded URL
+        const decoded = decodeURLPath(requestURL);
+        if (decoded.toString() !== requestURL.toString()) {
+            return NextResponse.redirect(decoded.toString());
         }
 
         // Reject malicious requests
