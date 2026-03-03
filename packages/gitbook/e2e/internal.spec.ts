@@ -1043,6 +1043,11 @@ const testCases: TestsCase[] = [
                 },
             },
             {
+                name: 'With repositioned cover',
+                url: 'page-options/page-with-repositioned-cover',
+                run: waitForCookiesDialog,
+            },
+            {
                 name: 'With icon',
                 url: 'page-options/page-with-icon',
                 run: waitForCookiesDialog,
