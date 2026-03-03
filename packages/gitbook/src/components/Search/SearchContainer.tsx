@@ -17,7 +17,6 @@ import { SearchAskProvider } from './SearchAskContext';
 import { SearchInput } from './SearchInput';
 import { SearchResults, type SearchResultsRef } from './SearchResults';
 import { SearchScopeControl } from './SearchScopeControl';
-import { useLocalSearchResults } from './useLocalSearchResults';
 import { useSearchState, useSetSearchState } from './useSearch';
 import { useSearchResults } from './useSearchResults';
 import { useSearchResultsCursor } from './useSearchResultsCursor';
@@ -206,7 +205,7 @@ export function SearchContainer({
         [siteSpaces, siteSpace.space.language]
     );
 
-    const { results, fetching, error } = useSearchResults({
+    const { results, fetching, error, localResults } = useSearchResults({
         disabled: !(state?.query || withAI),
         query: normalizedQuery,
         siteSpaceId: siteSpace.id,
@@ -215,13 +214,9 @@ export function SearchContainer({
         withAI,
         suggestions: config.suggestions,
         searchURL,
+        siteBasePath
     });
 
-    const { results: localResults } = useLocalSearchResults({
-        query: normalizedQuery,
-        siteBasePath: siteBasePath,
-        disabled: !(state?.query && withAI), // We only want to use local search when there is no query and no AI, as a fallback
-    });
 
     const searchValue = state?.query ?? (withSearchAI || !withAI ? state?.ask : null) ?? '';
 
