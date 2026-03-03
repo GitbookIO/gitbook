@@ -20,6 +20,7 @@ import { SearchScopeControl } from './SearchScopeControl';
 import { useSearchState, useSetSearchState } from './useSearch';
 import { useSearchResults } from './useSearchResults';
 import { useSearchResultsCursor } from './useSearchResultsCursor';
+import { useLocalSearchResults } from './useLocalSearchResults';
 
 interface SearchContainerProps {
     /** The current site space. */
@@ -213,6 +214,15 @@ export function SearchContainer({
         suggestions: config.suggestions,
         searchURL,
     });
+
+    const {results: localResults} = useLocalSearchResults({
+        query: normalizedQuery,
+        siteBasePath: "http://localhost:3000/url/test-va-adaptive.gitbook-x-dev-nicolas.firebaseapp.com/test-va-adaptive-docs",
+        disabled: Boolean(state?.query) || withAI, // We only want to use local search when there is no query and no AI, as a fallback
+    })
+
+    console.log('Local search results', localResults);
+
     const searchValue = state?.query ?? (withSearchAI || !withAI ? state?.ask : null) ?? '';
 
     const { cursor, moveBy: moveCursorBy } = useSearchResultsCursor({
