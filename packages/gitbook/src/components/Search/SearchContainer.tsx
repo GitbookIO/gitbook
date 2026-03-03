@@ -11,16 +11,17 @@ import { AIChatButton } from '../AIChat';
 import { useTrackEvent } from '../Insights';
 import { useIsMobile } from '../hooks/useIsMobile';
 import { Popover, useBodyLoaded } from '../primitives';
+import { LocalSearchResults } from './LocalSearchResults';
 import { SearchAskAnswer } from './SearchAskAnswer';
 import { useSearchAskState } from './SearchAskContext';
 import { SearchAskProvider } from './SearchAskContext';
 import { SearchInput } from './SearchInput';
 import { SearchResults, type SearchResultsRef } from './SearchResults';
 import { SearchScopeControl } from './SearchScopeControl';
+import { useLocalSearchResults } from './useLocalSearchResults';
 import { useSearchState, useSetSearchState } from './useSearch';
 import { useSearchResults } from './useSearchResults';
 import { useSearchResultsCursor } from './useSearchResultsCursor';
-import { useLocalSearchResults } from './useLocalSearchResults';
 
 interface SearchContainerProps {
     /** The current site space. */
@@ -47,6 +48,7 @@ interface SearchContainerProps {
 
     /** URL for the search API route, e.g. from linker.toPathInSpace('~gitbook/search'). */
     searchURL: string;
+    siteBasePath: string;
 }
 
 /**
@@ -63,6 +65,7 @@ export function SearchContainer({
     viewport,
     siteSpaces,
     searchURL,
+    siteBasePath,
 }: SearchContainerProps) {
     const { assistants, config } = useAI();
 
@@ -215,13 +218,11 @@ export function SearchContainer({
         searchURL,
     });
 
-    const {results: localResults} = useLocalSearchResults({
+    const { results: localResults } = useLocalSearchResults({
         query: normalizedQuery,
-        siteBasePath: "http://localhost:3000/url/test-va-adaptive.gitbook-x-dev-nicolas.firebaseapp.com/test-va-adaptive-docs",
-        disabled: Boolean(state?.query) || withAI, // We only want to use local search when there is no query and no AI, as a fallback
-    })
-
-    console.log('Local search results', localResults);
+        siteBasePath: siteBasePath,
+        disabled: !(state?.query && withAI), // We only want to use local search when there is no query and no AI, as a fallback
+    });
 
     const searchValue = state?.query ?? (withSearchAI || !withAI ? state?.ask : null) ?? '';
 
@@ -250,6 +251,12 @@ export function SearchContainer({
                     state?.query || withAI ? (
                         <React.Suspense fallback={null}>
                             <div className="scroll-py-2 overflow-y-scroll p-2">
+                                {localResults.length > 0 && !showAsk ? (
+                                    <LocalSearchResults
+                                        results={localResults}
+                                        fetching={fetching}
+                                    />
+                                ) : null}
                                 {state !== null && !showAsk ? (
                                     <SearchResults
                                         ref={resultsRef}

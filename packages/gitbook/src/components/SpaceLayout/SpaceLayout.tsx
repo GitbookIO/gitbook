@@ -200,6 +200,7 @@ export function SpaceLayout(props: SpaceLayoutProps) {
                                                 section={visibleSections?.current}
                                                 siteSpace={siteSpace}
                                                 siteSpaces={visibleSiteSpaces}
+                                                siteBasePath={context.linker.siteBasePath}
                                                 viewport="desktop"
                                                 searchURL={context.linker.toPathInSpace(
                                                     '~gitbook/search'
