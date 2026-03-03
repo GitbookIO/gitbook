@@ -3,6 +3,7 @@ import {
     type CustomizationContentLink,
     type CustomizationHeaderItem,
     SiteInsightsLinkPosition,
+    type SiteSocialAccount,
 } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
 import type React from 'react';
@@ -10,8 +11,14 @@ import type React from 'react';
 import { resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
+import { SocialAccountLink } from '../Footer/SocialAccounts';
 import { ToggleChevron } from '../primitives';
-import { DropdownMenu, DropdownMenuItem, DropdownSubMenu } from '../primitives/DropdownMenu';
+import {
+    DropdownMenu,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownSubMenu,
+} from '../primitives/DropdownMenu';
 import styles from './headerLinks.module.css';
 
 /**
@@ -20,9 +27,10 @@ import styles from './headerLinks.module.css';
 export function HeaderLinkMore(props: {
     label: React.ReactNode;
     links: CustomizationHeaderItem[];
+    socialAccounts: SiteSocialAccount[];
     context: GitBookSiteContext;
 }) {
-    const { label, links, context } = props;
+    const { label, links, context, socialAccounts } = props;
 
     const renderButton = (
         <button
@@ -56,6 +64,13 @@ export function HeaderLinkMore(props: {
             >
                 {links.map((link, index) => (
                     <MoreMenuLink key={index} link={link} context={context} />
+                ))}
+                {socialAccounts.length > 0 && <DropdownMenuSeparator />}
+                {socialAccounts.map((account) => (
+                    <SocialAccountLink
+                        key={`${account.platform}-${account.handle}`}
+                        account={account}
+                    />
                 ))}
             </DropdownMenu>
         </div>
