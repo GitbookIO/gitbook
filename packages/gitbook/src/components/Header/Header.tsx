@@ -162,6 +162,7 @@ export function Header(props: {
                                 }
                                 siteSpace={siteSpace}
                                 siteSpaces={visibleSiteSpaces}
+                                siteBasePath={context.linker.siteBasePath}
                                 viewport={!withTopHeader ? 'mobile' : undefined}
                                 searchURL={context.linker.toPathInSpace('~gitbook/search')}
                             />
