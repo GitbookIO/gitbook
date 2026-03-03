@@ -52,7 +52,7 @@ async function getOrBuildIndex(siteBasePath: string): Promise<Document<IndexPage
     }
 
     pendingFetch = (async () => {
-        const url = `${siteBasePath}/~gitbook/index`;
+        const url = `${siteBasePath}~gitbook/index`;
         const response = await fetch(url);
         if (!response.ok) {
             throw new Error(`Failed to fetch search index: ${response.status}`);
@@ -66,7 +66,7 @@ async function getOrBuildIndex(siteBasePath: string): Promise<Document<IndexPage
                 index: ['title', 'description'],
                 store: ['id', 'title', 'url', 'icon', 'description'],
             },
-            tokenize: 'tolerant',
+            tokenize: 'bidirectional',
             encoder: "Normalize"
             
         });
