@@ -48,6 +48,8 @@ export async function getStaticSiteContext(params: RouteLayoutParams) {
     return {
         context,
         visitorAuthClaims: getVisitorAuthClaimsFromToken(decoded),
+        //TODO: remove, just for easier testing
+        token: siteURLData.apiToken,
     };
 }
 
