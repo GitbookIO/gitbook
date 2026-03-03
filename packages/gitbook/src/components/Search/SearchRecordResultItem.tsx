@@ -4,7 +4,7 @@ import React from 'react';
 import { Favicon } from '../utils';
 import { HighlightQuery } from './HighlightQuery';
 import { SearchResultItem } from './SearchResultItem';
-import type { ComputedRecordResult } from './server-actions';
+import type { ComputedRecordResult } from './search-types';
 
 export const SearchRecordResultItem = React.forwardRef(function SearchRecordResultItem(
     props: {

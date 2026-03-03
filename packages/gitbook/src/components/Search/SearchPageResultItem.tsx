@@ -5,7 +5,7 @@ import React from 'react';
 import { Tooltip } from '../primitives';
 import { HighlightQuery } from './HighlightQuery';
 import { SearchResultItem } from './SearchResultItem';
-import type { ComputedPageResult } from './server-actions';
+import type { ComputedPageResult } from './search-types';
 
 export const SearchPageResultItem = React.forwardRef(function SearchPageResultItem(
     props: {

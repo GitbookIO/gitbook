@@ -3,11 +3,8 @@ import React from 'react';
 
 import { assert } from 'ts-essentials';
 
-import {
-    type OrderedComputedResult,
-    searchSiteContent,
-    streamRecommendedQuestions,
-} from './server-actions';
+import type { OrderedComputedResult } from './search-types';
+import { streamRecommendedQuestions } from './server-actions';
 
 import { type Assistant, useAI } from '@/components/AI';
 import assertNever from 'assert-never';
@@ -36,8 +33,10 @@ export function useSearchResults(props: {
     scope: SearchScope;
     withAI: boolean;
     suggestions?: string[];
+    /** URL for the search API route (e.g. from linker.toPathInSpace('~gitbook/search')). */
+    searchURL: string;
 }) {
-    const { disabled, query, siteSpaceId, siteSpaceIds, scope, suggestions } = props;
+    const { disabled, query, siteSpaceId, siteSpaceIds, scope, suggestions, searchURL } = props;
 
     const trackEvent = useTrackEvent();
 
@@ -140,26 +139,28 @@ export function useSearchResults(props: {
             error: false,
         });
         let cancelled = false;
+        const abortController = new AbortController();
         const timeout = setTimeout(async () => {
             try {
                 const results = await (() => {
+                    const fetchSearch = (
+                        scope: Parameters<typeof fetchSearchResults>[1]
+                    ): Promise<OrderedComputedResult[]> =>
+                        fetchSearchResults(searchURL, scope, query, abortController.signal);
+
                     switch (scope) {
                         case 'all':
                             // Search all content on the site
-                            return searchSiteContent({ query, mode: 'all' });
+                            return fetchSearch({ mode: 'all' });
                         case 'default':
                             // Search the current section's variant + matched/default variant for other sections
-                            return searchSiteContent({ query, mode: 'current', siteSpaceId });
+                            return fetchSearch({ mode: 'current', siteSpaceId });
                         case 'extended':
                             // Search all variants of the current section
-                            return searchSiteContent({ query, mode: 'specific', siteSpaceIds });
+                            return fetchSearch({ mode: 'specific', siteSpaceIds });
                         case 'current':
                             // Search only the current section's current variant
-                            return searchSiteContent({
-                                query,
-                                mode: 'specific',
-                                siteSpaceIds: [siteSpaceId],
-                            });
+                            return fetchSearch({ mode: 'specific', siteSpaceIds: [siteSpaceId] });
                         default:
                             assertNever(scope);
                     }
@@ -199,10 +200,50 @@ export function useSearchResults(props: {
         return () => {
             cancelled = true;
             clearTimeout(timeout);
+            abortController.abort();
         };
-    }, [query, scope, trackEvent, withAI, siteSpaceId, siteSpaceIds, disabled, suggestions]);
+    }, [
+        query,
+        scope,
+        trackEvent,
+        withAI,
+        siteSpaceId,
+        siteSpaceIds,
+        disabled,
+        suggestions,
+        searchURL,
+    ]);
 
     return resultsState;
+}
+
+/**
+ * Fetch search results from the search API route.
+ */
+async function fetchSearchResults(
+    searchURL: string,
+    scope:
+        | { mode: 'all' }
+        | { mode: 'current'; siteSpaceId: string }
+        | { mode: 'specific'; siteSpaceIds: string[] },
+    query: string,
+    signal?: AbortSignal
+): Promise<OrderedComputedResult[]> {
+    const response = await fetch(searchURL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            query,
+            scope,
+        }),
+        signal,
+    });
+
+    if (!response.ok) {
+        throw new Error(`Search request failed: ${response.status}`);
+    }
+
+    return response.json() as Promise<OrderedComputedResult[]>;
 }
 
 /**

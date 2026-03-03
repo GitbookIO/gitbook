@@ -662,7 +662,8 @@ function encodePathInSiteContent(
             // as they only depend on the site structure / pages.
             return { pathname, routeType: 'static' };
         case '~gitbook/pdf':
-            // PDF routes are always dynamic as they depend on the search params.
+        case '~gitbook/search':
+            // PDF and search routes are always dynamic as they depend on the request.
             return { pathname, routeType: 'dynamic' };
         default: {
             // If the pathname is a markdown file or the request is accepting markdown,
