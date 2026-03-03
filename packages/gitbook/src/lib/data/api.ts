@@ -167,6 +167,21 @@ export function createDataFetcher(
                 pageId: params.pageId,
             });
         },
+
+        listSpacePageMetaLinks(params) {
+            return listSpacePageMetaLinks(input, {
+                spaceId: params.spaceId,
+                pageId: params.pageId,
+            });
+        },
+
+        listChangeRequestPageMetaLinks(params) {
+            return listChangeRequestPageMetaLinks(input, {
+                spaceId: params.spaceId,
+                changeRequestId: params.changeRequestId,
+                pageId: params.pageId,
+            });
+        },
     };
 }
 
@@ -743,6 +758,64 @@ const listRevisionPageMetaLinks = cache(
                     const res = await api.spaces.listRevisionPageMetaLinks(
                         params.spaceId,
                         params.revisionId,
+                        params.pageId,
+                        {
+                            ...noCacheFetchOptions,
+                        }
+                    );
+                    cacheTag(...getCacheTagsFromResponse(res));
+                    cacheLife('days');
+                    return res.data;
+                }
+            );
+        });
+    }
+);
+
+/**
+ * List all the meta links for a given page in a space.
+ */
+const listSpacePageMetaLinks = cache(
+    async (input: DataFetcherInput, params: { spaceId: string; pageId: string }) => {
+        'use cache';
+        return wrapCacheDataFetcherError(async () => {
+            return trace(
+                `listSpacePageMetaLinks(${params.spaceId}, ${params.pageId})`,
+                async () => {
+                    const api = apiClient(input);
+                    const res = await api.spaces.listSpacePageMetaLinks(
+                        params.spaceId,
+                        params.pageId,
+                        {
+                            ...noCacheFetchOptions,
+                        }
+                    );
+                    cacheTag(...getCacheTagsFromResponse(res));
+                    cacheLife('days');
+                    return res.data;
+                }
+            );
+        });
+    }
+);
+
+/**
+ * List all the meta links for a given page in a change request.
+ */
+const listChangeRequestPageMetaLinks = cache(
+    async (
+        input: DataFetcherInput,
+        params: { spaceId: string; changeRequestId: string; pageId: string }
+    ) => {
+        'use cache';
+        return wrapCacheDataFetcherError(async () => {
+            return trace(
+                `listChangeRequestPageMetaLinks(${params.spaceId}, ${params.changeRequestId}, ${params.pageId})`,
+                async () => {
+                    const api = apiClient(input);
+                    const res = await api.spaces.listChangeRequestPageMetaLinks(
+                        params.spaceId,
+                        params.changeRequestId,
                         params.pageId,
                         {
                             ...noCacheFetchOptions,
