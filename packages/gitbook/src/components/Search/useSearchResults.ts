@@ -11,11 +11,14 @@ import assertNever from 'assert-never';
 import { useTrackEvent } from '../Insights';
 import { isQuestion } from './isQuestion';
 import type { SearchScope } from './useSearch';
+import { type LocalPageResult, useLocalSearchResults } from './useLocalSearchResults';
 
 export type ResultType =
     | OrderedComputedResult
     | { type: 'question'; id: string; query: string; assistant: Assistant }
     | { type: 'recommended-question'; id: string; question: string };
+
+export type { LocalPageResult };
 
 /**
  * We cache the recommended questions globally to avoid calling the API multiple times
@@ -35,10 +38,17 @@ export function useSearchResults(props: {
     suggestions?: string[];
     /** URL for the search API route (e.g. from linker.toPathInSpace('~gitbook/search')). */
     searchURL: string;
+    siteBasePath: string;
 }) {
-    const { disabled, query, siteSpaceId, siteSpaceIds, scope, suggestions, searchURL } = props;
+    const { disabled, query, siteSpaceId, siteSpaceIds, scope, suggestions, searchURL, siteBasePath } = props;
 
     const trackEvent = useTrackEvent();
+
+    const { results: localResults } = useLocalSearchResults({
+        query,
+        siteBasePath,
+        disabled,
+    });
 
     const [resultsState, setResultsState] = React.useState<{
         results: ResultType[];
@@ -214,7 +224,7 @@ export function useSearchResults(props: {
         searchURL,
     ]);
 
-    return resultsState;
+    return { ...resultsState, localResults };
 }
 
 /**
