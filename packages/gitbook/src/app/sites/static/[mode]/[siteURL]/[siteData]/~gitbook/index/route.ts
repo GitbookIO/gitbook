@@ -15,7 +15,7 @@ interface RawIndexPage {
 }
 
 export const revalidate = 86400; // 1 day
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-static';
 
 /**
  * Maximum number of pages to include in the index for non-default spaces.
@@ -80,6 +80,8 @@ export async function GET(
     return new Response(JSON.stringify({ pages }), {
         headers: {
             'Content-Type': 'application/json',
+            // Cache for 5 minutes on the client, 1 day on the CDN, and allow serving stale content while revalidating for 1 day
+            'Cache-Control': 'public, max-age=300, s-maxage=86400, stale-while-revalidate=86400',
         },
     });
 }
