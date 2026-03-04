@@ -58,9 +58,7 @@ export async function EmbeddableRootLayout({
                         <NavigationLoader />
                         <div className="fixed inset-0 flex flex-col">
                             {children}
-                            <EmbeddableTrademark
-                                trademark={context.customization.trademark.enabled}
-                            >
+                            context.customization.trademark.enabled ? <IfEmbeddableTrademark>
                                 <Trademark
                                     className="rounded-none! border-x-0 border-t border-b-0 bg-tint-solid/1 depth-flat:bg-tint-solid/1 px-4 py-2.5 text-tint/8"
                                     context={context}

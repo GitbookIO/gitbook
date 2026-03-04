@@ -3,12 +3,11 @@
 import type React from 'react';
 import { useEmbeddableConfiguration } from './EmbeddableIframeAPI';
 
-export function EmbeddableTrademark(props: {
-    trademark: boolean;
+export function IfEmbeddableTrademark(props: {
     children: React.ReactNode;
 }) {
-    const { trademark, children } = props;
+    const { children } = props;
     const embedTrademarkEnabled = useEmbeddableConfiguration((state) => state.trademark ?? true);
 
-    return trademark && embedTrademarkEnabled ? <>{children}</> : null;
+    return embedTrademarkEnabled ? children : null;
 }
