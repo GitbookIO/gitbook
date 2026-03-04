@@ -3,6 +3,7 @@
 import { tcls } from '@/lib/tailwind';
 import { Icon } from '@gitbook/icons';
 import { Emoji } from '../primitives/Emoji/Emoji';
+import { Link } from '../primitives/Link';
 import type { LocalPageResult } from './useLocalSearchResults';
 
 /**
@@ -50,7 +51,7 @@ function LocalSearchResultCard({
     fetching: boolean;
 }) {
     return (
-        <a
+        <Link
             href={result.pathname}
             className={tcls(
                 'group',
@@ -85,6 +86,6 @@ function LocalSearchResultCard({
             {result.description ? (
                 <p className="line-clamp-2 text-xs leading-snug">{result.description}</p>
             ) : null}
-        </a>
+        </Link>
     );
 }
