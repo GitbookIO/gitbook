@@ -1,5 +1,22 @@
 # gitbook
 
+## 0.22.2
+
+### Patch Changes
+
+- e074283: Add server-side proxy for Scalar API client to bypass CORS
+- afa868e: Show "Ask Assistant" search result immediately
+- 0803db0: Track opening of search results for records and in the assistant.
+- cb71511: Wrap tracking call with waitUntil
+- 4a6f91a: Show social accounts in header
+- 370b731: Docs Embed: Make trademark optional
+- afa476c: Add server-side insight event tracking for MCP route
+- Updated dependencies [e074283]
+- Updated dependencies [370b731]
+  - @gitbook/openapi-parser@3.0.9
+  - @gitbook/react-openapi@1.5.9
+  - @gitbook/embed@0.3.0
+
 ## 0.22.1
 
 ### Patch Changes
