@@ -159,7 +159,11 @@ const GitBook = (...args: StandaloneCalls) => {
             const settings = args[1];
 
             // If trademark is disabled, change the (branded) icon to the sparkle icon
-            if (settings.trademark === false && frameConfiguration.button.icon === 'assistant') {
+            if (
+                settings.trademark === false &&
+                !settings.button?.icon &&
+                frameConfiguration.button.icon === 'assistant'
+            ) {
                 settings.button = {
                     label: frameConfiguration.button.label,
                     icon: 'sparkle',
