@@ -215,9 +215,8 @@ export function SearchContainer({
         withAI,
         suggestions: config.suggestions,
         searchURL,
-        siteBasePath
+        siteBasePath,
     });
-
 
     const searchValue = state?.query ?? (withSearchAI || !withAI ? state?.ask : null) ?? '';
 

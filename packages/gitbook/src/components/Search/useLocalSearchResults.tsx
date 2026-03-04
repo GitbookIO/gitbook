@@ -7,7 +7,7 @@ import React from 'react';
 interface RawIndexPage {
     id: string;
     title: string;
-    url: string;
+    pathname: string;
     icon?: string;
     description?: string;
 }
@@ -17,7 +17,7 @@ interface IndexPage {
     [key: string]: DocumentValue | DocumentValue[];
     id: string;
     title: string;
-    url: string;
+    pathname: string;
     icon: string | null;
     description: string | null;
 }
@@ -27,7 +27,7 @@ export interface LocalPageResult {
     type: 'local-page';
     id: string;
     title: string;
-    url: string;
+    pathname: string;
     icon?: string;
     description?: string;
 }
@@ -64,18 +64,17 @@ async function getOrBuildIndex(siteBasePath: string): Promise<Document<IndexPage
             document: {
                 id: 'id',
                 index: ['title', 'description'],
-                store: ['id', 'title', 'url', 'icon', 'description'],
+                store: ['id', 'title', 'pathname', 'icon', 'description'],
             },
             tokenize: 'bidirectional',
-            encoder: "Normalize"
-            
+            encoder: 'Normalize',
         });
 
         for (const page of data.pages) {
             index.add({
                 id: page.id,
                 title: page.title,
-                url: page.url,
+                pathname: `${siteBasePath}${page.pathname}`,
                 icon: page.icon ?? null,
                 description: page.description ?? null,
             });
@@ -164,7 +163,7 @@ export function useLocalSearchResults(props: {
                         type: 'local-page',
                         id: doc.id,
                         title: doc.title,
-                        url: doc.url as string,
+                        pathname: doc.pathname as string,
                         icon: doc.icon ?? undefined,
                         description: doc.description ?? undefined,
                     });
