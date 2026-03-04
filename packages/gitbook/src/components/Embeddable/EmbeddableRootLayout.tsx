@@ -12,6 +12,7 @@ import { SpaceLayoutServerContext } from '../SpaceLayout';
 import { Trademark } from '../TableOfContents/Trademark';
 import { NavigationLoader } from '../primitives/NavigationLoader';
 import { EmbeddableIframeAPI } from './EmbeddableIframeAPI';
+import { EmbeddableTrademark } from './EmbeddableTrademark';
 
 type EmbeddableRootLayoutProps = {
     context: GitBookSiteContext;
@@ -57,13 +58,15 @@ export async function EmbeddableRootLayout({
                         <NavigationLoader />
                         <div className="fixed inset-0 flex flex-col">
                             {children}
-                            {context.customization.trademark.enabled ? (
+                            <EmbeddableTrademark
+                                trademark={context.customization.trademark.enabled}
+                            >
                                 <Trademark
                                     className="rounded-none! border-x-0 border-t border-b-0 bg-tint-solid/1 depth-flat:bg-tint-solid/1 px-4 py-2.5 text-tint/8"
                                     context={context}
                                     placement={SiteInsightsTrademarkPlacement.Embed}
                                 />
-                            ) : null}
+                            </EmbeddableTrademark>
                         </div>
                         <EmbeddableIframeAPI
                             baseURL={context.linker.toPathInSite('~gitbook/embed/')}
