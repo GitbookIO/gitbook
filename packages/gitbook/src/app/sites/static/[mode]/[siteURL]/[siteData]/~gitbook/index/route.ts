@@ -17,6 +17,12 @@ interface RawIndexPage {
 export const revalidate = 86400; // 1 day
 export const dynamic = 'force-dynamic';
 
+/**
+ * Maximum number of pages to include in the index for non-default spaces.
+ * Pages from the default space are always included regardless of this limit.
+ */
+const ADDITIONAL_PAGES_LIMIT = 1000;
+
 export async function GET(
     _request: NextRequest,
     { params }: { params: Promise<RouteLayoutParams> }
@@ -39,15 +45,26 @@ export async function GET(
 
     const seen = new Set<string>();
     const pages: RawIndexPage[] = [];
+    let additionalPagesCount = 0;
+
+    const defaultSiteSpace = visibleSpaces.find((ss) => ss.default);
 
     for (let i = 0; i < visibleSpaces.length; i++) {
         const siteSpace = visibleSpaces[i]!;
         const revision = revisions[i]!;
         const forkedLinker = linker.withOtherSiteSpace({ spaceBasePath: siteSpace.path });
+        const isDefaultSpace = siteSpace.id === defaultSiteSpace?.id;
 
         for (const { page } of getIndexablePages(revision.pages)) {
             if (seen.has(page.id)) continue;
             seen.add(page.id);
+
+            if (!isDefaultSpace) {
+                if (additionalPagesCount >= ADDITIONAL_PAGES_LIMIT) {
+                    break;
+                }
+                additionalPagesCount++;
+            }
 
             pages.push({
                 id: page.id,
