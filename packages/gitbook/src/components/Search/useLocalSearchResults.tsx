@@ -8,6 +8,8 @@ interface RawIndexPage {
     id: string;
     title: string;
     pathname: string;
+    /** BCP-47 language code emitted by the index route, absent when no language is set. */
+    lang?: string;
     icon?: string;
     emoji?: string;
     description?: string;
@@ -41,13 +43,39 @@ type LocalSearchState = {
     error: boolean;
 };
 
-// Module-level singletons — one site per session
-let cachedIndex: Document<IndexPage> | null = null;
-let pendingFetch: Promise<Document<IndexPage>> | null = null;
+// Module-level singletons — one Document per language per session.
+// Keys are the page's `lang` value, or `''` when no language is set.
+const cachedIndexes = new Map<string, Document<IndexPage>>();
+let pendingFetch: Promise<Map<string, Document<IndexPage>>> | null = null;
 
-async function getOrBuildIndex(indexURL: string): Promise<Document<IndexPage>> {
-    if (cachedIndex) {
-        return cachedIndex;
+function buildLangIndex(pages: RawIndexPage[]): Document<IndexPage> {
+    const index = new Document<IndexPage>({
+        document: {
+            id: 'id',
+            index: ['title', 'description'],
+            store: ['id', 'title', 'pathname', 'icon', 'description'],
+        },
+        tokenize: 'bidirectional',
+        encoder: 'Normalize',
+    });
+
+    for (const page of pages) {
+        index.add({
+            id: page.id,
+            title: page.title,
+            pathname: page.pathname,
+            icon: page.icon ?? null,
+            emoji: page.emoji ?? null,
+            description: page.description ?? null,
+        });
+    }
+
+    return index;
+}
+
+async function getOrBuildIndexes(indexURL: string): Promise<Map<string, Document<IndexPage>>> {
+    if (cachedIndexes.size > 0) {
+        return cachedIndexes;
     }
 
     if (pendingFetch) {
@@ -62,29 +90,24 @@ async function getOrBuildIndex(indexURL: string): Promise<Document<IndexPage>> {
 
         const data: { pages: RawIndexPage[] } = await response.json();
 
-        const index = new Document<IndexPage>({
-            document: {
-                id: 'id',
-                index: ['title', 'description'],
-                store: ['id', 'title', 'pathname', 'icon', 'description'],
-            },
-            tokenize: 'bidirectional',
-            encoder: 'Normalize',
-        });
-
+        // Group pages by their `lang` value (empty string for pages without one)
+        const pagesByLang = new Map<string, RawIndexPage[]>();
         for (const page of data.pages) {
-            index.add({
-                id: page.id,
-                title: page.title,
-                pathname: page.pathname,
-                icon: page.icon ?? null,
-                emoji: page.emoji ?? null,
-                description: page.description ?? null,
-            });
+            const key = page.lang ?? '';
+            const bucket = pagesByLang.get(key);
+            if (bucket) {
+                bucket.push(page);
+            } else {
+                pagesByLang.set(key, [page]);
+            }
         }
 
-        cachedIndex = index;
-        return index;
+        // Build one FlexSearch Document per language group
+        for (const [lang, pages] of pagesByLang) {
+            cachedIndexes.set(lang, buildLangIndex(pages));
+        }
+
+        return cachedIndexes;
     })();
 
     // Clear pendingFetch on error so a retry is possible
@@ -99,9 +122,12 @@ async function getOrBuildIndex(indexURL: string): Promise<Document<IndexPage>> {
 export function useLocalSearchResults(props: {
     query: string;
     indexURL: string;
+    /** BCP-47 language code of the current site space. When provided, only results
+     * from pages with a matching language are returned. */
+    lang?: string;
     disabled?: boolean;
 }): LocalSearchState {
-    const { query, indexURL, disabled = false } = props;
+    const { query, indexURL, lang, disabled = false } = props;
 
     const [state, setState] = React.useState<LocalSearchState>({
         results: [],
@@ -109,12 +135,12 @@ export function useLocalSearchResults(props: {
         error: false,
     });
 
-    // Track whether the index is loaded so the search effect re-runs after load
-    const [indexReady, setIndexReady] = React.useState(!!cachedIndex);
+    // Track whether the indexes are loaded so the search effect re-runs after load
+    const [indexReady, setIndexReady] = React.useState(cachedIndexes.size > 0);
 
-    // Load the index once
+    // Load the indexes once
     React.useEffect(() => {
-        if (cachedIndex) {
+        if (cachedIndexes.size > 0) {
             setIndexReady(true);
             return;
         }
@@ -122,7 +148,7 @@ export function useLocalSearchResults(props: {
         let cancelled = false;
         setState((prev) => ({ ...prev, fetching: true, error: false }));
 
-        getOrBuildIndex(indexURL)
+        getOrBuildIndexes(indexURL)
             .then(() => {
                 if (!cancelled) {
                     setIndexReady(true);
@@ -140,9 +166,14 @@ export function useLocalSearchResults(props: {
         };
     }, [indexURL]);
 
-    // Perform instant local search whenever query or index readiness changes
+    // Perform instant local search whenever query, lang, or index readiness changes
     React.useEffect(() => {
-        if (disabled || !indexReady || !cachedIndex) {
+        // Resolve the per-language index to query. When `lang` is not set we fall
+        // back to the `''` bucket (pages with no language tag).
+        const langKey = lang ?? '';
+        const index = cachedIndexes.get(langKey);
+
+        if (disabled || !indexReady || !index) {
             return;
         }
 
@@ -151,7 +182,7 @@ export function useLocalSearchResults(props: {
             return;
         }
 
-        const rawResults = cachedIndex.search(query, { enrich: true, limit: 10 });
+        const rawResults = index.search(query, { enrich: true, limit: 10 });
 
         // Flatten and deduplicate results across fields (flexsearch returns one array per indexed field)
         const seen = new Set<string>();
@@ -176,7 +207,7 @@ export function useLocalSearchResults(props: {
         }
 
         setState({ results, fetching: false, error: false });
-    }, [query, indexReady, disabled]);
+    }, [query, lang, indexReady, disabled]);
 
     return state;
 }

@@ -217,6 +217,7 @@ export function SearchContainer({
         suggestions: config.suggestions,
         searchURL,
         indexURL,
+        lang: siteSpace.space.language,
     });
 
     const searchValue = state?.query ?? (withSearchAI || !withAI ? state?.ask : null) ?? '';

@@ -40,15 +40,27 @@ export function useSearchResults(props: {
     searchURL: string;
     /** URL for the local index JSON (e.g. from linker.toPathInSite('~gitbook/index')). */
     indexURL: string;
+    /** BCP-47 language code of the current site space, used to filter local search results. */
+    lang?: string;
 }) {
-    const { disabled, query, siteSpaceId, siteSpaceIds, scope, suggestions, searchURL, indexURL } =
-        props;
+    const {
+        disabled,
+        query,
+        siteSpaceId,
+        siteSpaceIds,
+        scope,
+        suggestions,
+        searchURL,
+        indexURL,
+        lang,
+    } = props;
 
     const trackEvent = useTrackEvent();
 
     const { results: localResults } = useLocalSearchResults({
         query,
         indexURL,
+        lang,
         disabled,
     });
 
