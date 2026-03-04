@@ -38,24 +38,17 @@ export function useSearchResults(props: {
     suggestions?: string[];
     /** URL for the search API route (e.g. from linker.toPathInSpace('~gitbook/search')). */
     searchURL: string;
-    siteBasePath: string;
+    /** URL for the local index JSON (e.g. from linker.toPathInSite('~gitbook/index')). */
+    indexURL: string;
 }) {
-    const {
-        disabled,
-        query,
-        siteSpaceId,
-        siteSpaceIds,
-        scope,
-        suggestions,
-        searchURL,
-        siteBasePath,
-    } = props;
+    const { disabled, query, siteSpaceId, siteSpaceIds, scope, suggestions, searchURL, indexURL } =
+        props;
 
     const trackEvent = useTrackEvent();
 
     const { results: localResults } = useLocalSearchResults({
         query,
-        siteBasePath,
+        indexURL,
         disabled,
     });
 

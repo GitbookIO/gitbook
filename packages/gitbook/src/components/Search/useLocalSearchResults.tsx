@@ -9,6 +9,7 @@ interface RawIndexPage {
     title: string;
     pathname: string;
     icon?: string;
+    emoji?: string;
     description?: string;
 }
 
@@ -19,6 +20,7 @@ interface IndexPage {
     title: string;
     pathname: string;
     icon: string | null;
+    emoji: string | null;
     description: string | null;
 }
 
@@ -42,7 +44,7 @@ type LocalSearchState = {
 let cachedIndex: Document<IndexPage> | null = null;
 let pendingFetch: Promise<Document<IndexPage>> | null = null;
 
-async function getOrBuildIndex(siteBasePath: string): Promise<Document<IndexPage>> {
+async function getOrBuildIndex(indexURL: string): Promise<Document<IndexPage>> {
     if (cachedIndex) {
         return cachedIndex;
     }
@@ -52,8 +54,7 @@ async function getOrBuildIndex(siteBasePath: string): Promise<Document<IndexPage
     }
 
     pendingFetch = (async () => {
-        const url = `${siteBasePath}~gitbook/index`;
-        const response = await fetch(url);
+        const response = await fetch(indexURL);
         if (!response.ok) {
             throw new Error(`Failed to fetch search index: ${response.status}`);
         }
@@ -74,8 +75,9 @@ async function getOrBuildIndex(siteBasePath: string): Promise<Document<IndexPage
             index.add({
                 id: page.id,
                 title: page.title,
-                pathname: `${siteBasePath}${page.pathname}`,
+                pathname: page.pathname,
                 icon: page.icon ?? null,
+                emoji: page.emoji ?? null,
                 description: page.description ?? null,
             });
         }
@@ -86,7 +88,7 @@ async function getOrBuildIndex(siteBasePath: string): Promise<Document<IndexPage
 
     // Clear pendingFetch on error so a retry is possible
     pendingFetch.catch(() => {
-        console.error('Error fetching/building search index for siteBasePath', siteBasePath);
+        console.error('Error fetching/building search index', indexURL);
         pendingFetch = null;
     });
 
@@ -95,10 +97,10 @@ async function getOrBuildIndex(siteBasePath: string): Promise<Document<IndexPage
 
 export function useLocalSearchResults(props: {
     query: string;
-    siteBasePath: string;
+    indexURL: string;
     disabled?: boolean;
 }): LocalSearchState {
-    const { query, siteBasePath, disabled = false } = props;
+    const { query, indexURL, disabled = false } = props;
 
     const [state, setState] = React.useState<LocalSearchState>({
         results: [],
@@ -119,7 +121,7 @@ export function useLocalSearchResults(props: {
         let cancelled = false;
         setState((prev) => ({ ...prev, fetching: true, error: false }));
 
-        getOrBuildIndex(siteBasePath)
+        getOrBuildIndex(indexURL)
             .then(() => {
                 if (!cancelled) {
                     setIndexReady(true);
@@ -135,7 +137,7 @@ export function useLocalSearchResults(props: {
         return () => {
             cancelled = true;
         };
-    }, [siteBasePath]);
+    }, [indexURL]);
 
     // Perform instant local search whenever query or index readiness changes
     React.useEffect(() => {
