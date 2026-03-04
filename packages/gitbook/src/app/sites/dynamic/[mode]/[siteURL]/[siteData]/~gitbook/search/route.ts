@@ -170,6 +170,7 @@ function transformSitePageResult(
                 body: section.body,
                 pageId: pageItem.id,
                 spaceId: spaceItem.id,
+                // @ts-expect-error - score will be added in the next API client version
                 score: section.score,
             })) ?? [];
 
