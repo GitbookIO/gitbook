@@ -31,6 +31,7 @@ export interface LocalPageResult {
     title: string;
     pathname: string;
     icon?: string;
+    emoji?: string;
     description?: string;
 }
 
@@ -167,6 +168,7 @@ export function useLocalSearchResults(props: {
                         title: doc.title,
                         pathname: doc.pathname as string,
                         icon: doc.icon ?? undefined,
+                        emoji: doc.emoji ?? undefined,
                         description: doc.description ?? undefined,
                     });
                 }

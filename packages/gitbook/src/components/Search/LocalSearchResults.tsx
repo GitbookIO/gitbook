@@ -1,7 +1,7 @@
 'use client';
 
 import { tcls } from '@/lib/tailwind';
-import { Icon } from '@gitbook/icons';
+import { Icon, type IconName } from '@gitbook/icons';
 import { Emoji } from '../primitives/Emoji/Emoji';
 import { Link } from '../primitives/Link';
 import type { LocalPageResult } from './useLocalSearchResults';
@@ -71,9 +71,13 @@ function LocalSearchResultCard({
             )}
         >
             <div className={tcls('flex', 'flex-row', 'items-center', 'gap-1.5', 'min-w-0')}>
-                {result.icon ? (
+                {result.emoji ? (
                     <span className="size-4 shrink-0 text-tint-subtle">
-                        <Emoji code={result.icon} style="text-base leading-none" />
+                        <Emoji code={result.emoji} style="text-base leading-none" />
+                    </span>
+                ) : result.icon ? (
+                    <span className="size-4 shrink-0 text-tint-subtle">
+                        <Icon icon={result.icon as IconName} className="size-4" />
                     </span>
                 ) : null}
                 <p className="grow truncate font-semibold text-sm text-tint-strong leading-snug">
