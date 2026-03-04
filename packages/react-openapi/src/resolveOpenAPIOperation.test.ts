@@ -303,6 +303,29 @@ describe('#resolveOpenAPIOperation', () => {
             expect(resolved?.['x-enable-proxy']).toBe(true);
             expect(resolved?.operation['x-enable-proxy']).toBe(false);
         });
+
+        it('should allow operation-level true to override spec-level false', async () => {
+            const filesystem = await loadFixture({
+                openapi: '3.1.0',
+                info: { title: 'Test', version: '1.0' },
+                'x-enable-proxy': false,
+                paths: {
+                    '/test': {
+                        get: {
+                            'x-enable-proxy': true,
+                            responses: { '200': { description: 'OK' } },
+                        },
+                    },
+                },
+            });
+            const resolved = await resolveOpenAPIOperation(filesystem, {
+                method: 'get',
+                path: '/test',
+            });
+
+            expect(resolved?.['x-enable-proxy']).toBe(false);
+            expect(resolved?.operation['x-enable-proxy']).toBe(true);
+        });
     });
 
     describe('server precedence', () => {
