@@ -10,8 +10,8 @@ import { type Assistant, useAI } from '@/components/AI';
 import assertNever from 'assert-never';
 import { useTrackEvent } from '../Insights';
 import { isQuestion } from './isQuestion';
-import type { SearchScope } from './useSearch';
 import { type LocalPageResult, useLocalSearchResults } from './useLocalSearchResults';
+import type { SearchScope } from './useSearch';
 
 export type ResultType =
     | OrderedComputedResult
@@ -40,7 +40,16 @@ export function useSearchResults(props: {
     searchURL: string;
     siteBasePath: string;
 }) {
-    const { disabled, query, siteSpaceId, siteSpaceIds, scope, suggestions, searchURL, siteBasePath } = props;
+    const {
+        disabled,
+        query,
+        siteSpaceId,
+        siteSpaceIds,
+        scope,
+        suggestions,
+        searchURL,
+        siteBasePath,
+    } = props;
 
     const trackEvent = useTrackEvent();
 

@@ -1,6 +1,7 @@
 'use client';
 
 import { tcls } from '@/lib/tailwind';
+import { Icon } from '@gitbook/icons';
 import { Emoji } from '../primitives/Emoji/Emoji';
 import type { LocalPageResult } from './useLocalSearchResults';
 
@@ -50,32 +51,39 @@ function LocalSearchResultCard({
 }) {
     return (
         <a
-            href={result.url}
+            href={result.pathname}
             className={tcls(
+                'group',
                 'flex',
                 'flex-col',
                 'gap-1',
                 'p-3',
                 'rounded-corners:rounded-lg',
                 'circular-corners:rounded-2xl',
+                'text-tint',
                 'bg-tint-subtle',
                 'hover:bg-tint',
-                'transition-all',
-                'duration-300',
+                'hover:text-tint-strong',
+                'transition-colors',
                 'cursor-pointer',
                 fetching ? ['basis-[calc(50%-4px)]', 'min-w-0'] : ['w-40', 'shrink-0']
             )}
         >
             <div className={tcls('flex', 'flex-row', 'items-center', 'gap-1.5', 'min-w-0')}>
                 {result.icon ? (
-                    <Emoji code={result.icon} style="shrink-0 text-base leading-none" />
+                    <span className="size-4 shrink-0 text-tint-subtle">
+                        <Emoji code={result.icon} style="text-base leading-none" />
+                    </span>
                 ) : null}
-                <p className="truncate font-semibold text-sm text-tint-strong leading-snug">
+                <p className="grow truncate font-semibold text-sm text-tint-strong leading-snug">
                     {result.title}
                 </p>
+                <span className="ml-auto shrink-0 text-tint-subtle">
+                    <Icon icon="chevron-right" className="size-3" />
+                </span>
             </div>
             {result.description ? (
-                <p className="line-clamp-2 text-tint text-xs leading-snug">{result.description}</p>
+                <p className="line-clamp-2 text-xs leading-snug">{result.description}</p>
             ) : null}
         </a>
     );
