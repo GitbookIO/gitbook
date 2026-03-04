@@ -201,7 +201,7 @@ export function SpaceLayout(props: SpaceLayoutProps) {
                                                 siteSpace={siteSpace}
                                                 siteSpaces={visibleSiteSpaces}
                                                 indexURL={context.linker.toPathInSite(
-                                                    '~gitbook/index'
+                                                    '~gitbook/site-index'
                                                 )}
                                                 viewport="desktop"
                                                 searchURL={context.linker.toPathInSpace(
