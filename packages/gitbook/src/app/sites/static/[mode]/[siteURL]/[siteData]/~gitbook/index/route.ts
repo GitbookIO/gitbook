@@ -1,31 +1,68 @@
 import type { NextRequest } from 'next/server';
 
 import { type RouteLayoutParams, getStaticSiteContext } from '@/app/utils';
+import { throwIfDataError } from '@/lib/data';
+import { getIndexablePages } from '@/lib/sitemap';
+import { listAllSiteSpaces } from '@/lib/sites';
+
+interface RawIndexPage {
+    id: string;
+    title: string;
+    pathname: string;
+    icon?: string;
+    emoji?: string;
+    description?: string;
+}
 
 export const revalidate = 86400; // 1 day
+export const dynamic = 'force-dynamic';
 
 export async function GET(
-    request: NextRequest,
+    _request: NextRequest,
     { params }: { params: Promise<RouteLayoutParams> }
 ) {
-    const { context, token, visitorAuthClaims } = await getStaticSiteContext(await params);
-    const { organizationId, site } = context;
-    console.log('Fetching static index for site', site.id, token);
-    // TODO: Obviously switch to real API client 
-    const result = await fetch(`http://localhost:6100/v1/orgs/${organizationId}/sites/${site.id}/index`, {
-        headers: {
-            Authorization: `Bearer ${token}`,
+    const { context } = await getStaticSiteContext(await params);
+    const { dataFetcher, linker, structure } = context;
+
+    const visibleSpaces = listAllSiteSpaces(structure).filter((ss) => !ss.hidden);
+
+    const revisions = await Promise.all(
+        visibleSpaces.map((ss) =>
+            throwIfDataError(
+                dataFetcher.getRevision({
+                    spaceId: ss.space.id,
+                    revisionId: ss.space.revision,
+                })
+            )
+        )
+    );
+
+    const seen = new Set<string>();
+    const pages: RawIndexPage[] = [];
+
+    for (let i = 0; i < visibleSpaces.length; i++) {
+        const siteSpace = visibleSpaces[i]!;
+        const revision = revisions[i]!;
+        const forkedLinker = linker.withOtherSiteSpace({ spaceBasePath: siteSpace.path });
+
+        for (const { page } of getIndexablePages(revision.pages)) {
+            if (seen.has(page.id)) continue;
+            seen.add(page.id);
+
+            pages.push({
+                id: page.id,
+                title: page.title,
+                pathname: forkedLinker.toPathForPage({ pages: revision.pages, page }),
+                icon: page.icon ?? undefined,
+                emoji: page.emoji ?? undefined,
+                description: page.description ?? undefined,
+            });
         }
-    });
-    if (!result.ok) {
-        return new Response('Error fetching index', { status: 500 });
     }
-    const index = await result.json();
-    console.log('Fetched index for site', site.id, JSON.stringify(index).length, 'bytes', visitorAuthClaims, result.headers);
-    return new Response(JSON.stringify(index), {
+
+    return new Response(JSON.stringify({ pages }), {
         headers: {
             'Content-Type': 'application/json',
-            'Cache-Control': 'public, max-age=3600',
         },
     });
 }

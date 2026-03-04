@@ -46,7 +46,8 @@ interface SearchContainerProps {
 
     /** URL for the search API route, e.g. from linker.toPathInSpace('~gitbook/search'). */
     searchURL: string;
-    siteBasePath: string;
+    /** URL for the local index JSON, e.g. from linker.toPathInSite('~gitbook/index'). */
+    indexURL: string;
 }
 
 /**
@@ -63,7 +64,7 @@ export function SearchContainer({
     viewport,
     siteSpaces,
     searchURL,
-    siteBasePath,
+    indexURL,
 }: SearchContainerProps) {
     const { assistants, config } = useAI();
 
@@ -214,7 +215,7 @@ export function SearchContainer({
         withAI,
         suggestions: config.suggestions,
         searchURL,
-        siteBasePath,
+        indexURL,
     });
 
     const searchValue = state?.query ?? (withSearchAI || !withAI ? state?.ask : null) ?? '';
