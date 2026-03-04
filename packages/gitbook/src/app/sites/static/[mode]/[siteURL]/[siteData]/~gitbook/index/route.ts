@@ -3,7 +3,7 @@ import type { NextRequest } from 'next/server';
 import { type RouteLayoutParams, getStaticSiteContext } from '@/app/utils';
 import { throwIfDataError } from '@/lib/data';
 import { getIndexablePages } from '@/lib/sitemap';
-import { listAllSiteSpaces } from '@/lib/sites';
+import { getFallbackSiteSpacePath, listAllSiteSpaces } from '@/lib/sites';
 
 interface RawIndexPage {
     id: string;
@@ -44,7 +44,7 @@ export async function GET(
     for (let i = 0; i < visibleSpaces.length; i++) {
         const siteSpace = visibleSpaces[i]!;
         const revision = revisions[i]!;
-        const forkedLinker = linker.withOtherSiteSpace({ spaceBasePath: siteSpace.path });
+        const forkedLinker = linker.withOtherSiteSpace({ spaceBasePath: getFallbackSiteSpacePath(context, siteSpace) });
 
         for (const { page } of getIndexablePages(revision.pages)) {
             if (seen.has(page.id)) continue;
