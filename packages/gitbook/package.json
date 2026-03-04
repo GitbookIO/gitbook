@@ -37,6 +37,7 @@
         "direction": "^2.0.1",
         "event-iterator": "^2.0.0",
         "feed": "^5.1.0",
+        "flexsearch": "^0.8.212",
         "image-size": "^2.0.2",
         "js-cookie": "^3.0.5",
         "jsontoxml": "^1.0.1",
@@ -107,7 +108,7 @@
         "tailwindcss": "^4.1.11",
         "ts-essentials": "^10.0.1",
         "typescript": "catalog:",
-        "vercel": "^50.15.1",
+        "vercel": "catalog:",
         "wrangler": "^4.43.0",
         "rss-parser": "^3.13.0"
     },

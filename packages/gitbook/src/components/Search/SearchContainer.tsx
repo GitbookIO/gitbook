@@ -10,6 +10,7 @@ import { AIChatButton } from '../AIChat';
 import { useTrackEvent } from '../Insights';
 import { useIsMobile } from '../hooks/useIsMobile';
 import { Popover, useBodyLoaded } from '../primitives';
+import { LocalSearchResults } from './LocalSearchResults';
 import { SearchAskAnswer } from './SearchAskAnswer';
 import { useSearchAskState } from './SearchAskContext';
 import { SearchAskProvider } from './SearchAskContext';
@@ -45,6 +46,8 @@ interface SearchContainerProps {
 
     /** URL for the search API route, e.g. from linker.toPathInSpace('~gitbook/search'). */
     searchURL: string;
+    /** URL for the local index JSON, e.g. from linker.toPathInSite('~gitbook/index'). */
+    indexURL: string;
 }
 
 /**
@@ -61,6 +64,7 @@ export function SearchContainer({
     viewport,
     siteSpaces,
     searchURL,
+    indexURL,
 }: SearchContainerProps) {
     const { assistants, config } = useAI();
 
@@ -202,7 +206,7 @@ export function SearchContainer({
         [siteSpaces, siteSpace.space.language]
     );
 
-    const { results, fetching, error } = useSearchResults({
+    const { results, fetching, error, localResults } = useSearchResults({
         disabled: !(state?.query || withAI),
         query: normalizedQuery,
         siteSpaceId: siteSpace.id,
@@ -211,7 +215,10 @@ export function SearchContainer({
         withAI,
         suggestions: config.suggestions,
         searchURL,
+        indexURL,
+        lang: siteSpace.space.language,
     });
+
     const searchValue = state?.query ?? (withSearchAI || !withAI ? state?.ask : null) ?? '';
 
     const { cursor, moveBy: moveCursorBy } = useSearchResultsCursor({
@@ -239,6 +246,12 @@ export function SearchContainer({
                     state?.query || withAI ? (
                         <React.Suspense fallback={null}>
                             <div className="scroll-py-2 overflow-y-scroll p-2">
+                                {localResults.length > 0 && !showAsk ? (
+                                    <LocalSearchResults
+                                        results={localResults}
+                                        fetching={fetching}
+                                    />
+                                ) : null}
                                 {state !== null && !showAsk ? (
                                     <SearchResults
                                         ref={resultsRef}

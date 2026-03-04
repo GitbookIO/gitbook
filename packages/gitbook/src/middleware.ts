@@ -448,7 +448,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
 
         // When we use adaptive content, we want to ensure that the cache is not used at all on the client side.
         // Vercel already set this header, this is needed in OpenNext.
-        if (siteURLData.contextId) {
+        if (siteURLData.contextId && !siteRequestURL.pathname.endsWith('~gitbook/index')) {
             response.headers.set('cache-control', 'public, max-age=0, must-revalidate');
         }
 
@@ -658,6 +658,7 @@ function encodePathInSiteContent(
         case 'robots.txt':
         case '~gitbook/embed/script.js':
         case '~gitbook/embed/demo':
+        case '~gitbook/site-index':
             // LLMs.txt, sitemap, sitemap-pages and robots.txt are always static
             // as they only depend on the site structure / pages.
             return { pathname, routeType: 'static' };
