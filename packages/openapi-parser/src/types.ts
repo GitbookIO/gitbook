@@ -70,6 +70,12 @@ export interface OpenAPICustomOperationProperties {
     };
 
     /**
+     * If `true`, the Scalar API client will proxy requests through the server
+     * to avoid CORS issues.
+     */
+    'x-enable-proxy'?: boolean;
+
+    /**
      * Stability of the operation.
      * @enum 'experimental' | 'alpha' | 'beta'
      */
