@@ -36,7 +36,7 @@ import { getPreviewRequestIdentifier } from './lib/preview';
 import { serveProxyAnalyticsEvent } from './lib/tracking';
 export const config = {
     matcher: [
-        '/((?!_next/static|_next/image|~gitbook/static|~gitbook/revalidate|~gitbook/monitoring|~scalar/proxy).*)',
+        '/((?!_next/static|_next/image|~gitbook/static|~gitbook/revalidate|~gitbook/monitoring).*)',
     ],
 };
 
@@ -663,6 +663,7 @@ function encodePathInSiteContent(
             return { pathname, routeType: 'static' };
         case '~gitbook/pdf':
         case '~gitbook/search':
+        case '~scalar/proxy':
             // PDF and search routes are always dynamic as they depend on the request.
             return { pathname, routeType: 'dynamic' };
         default: {

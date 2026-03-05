@@ -53,6 +53,7 @@ export function ScalarApiButton(props: {
                         <ScalarModal
                             controllerRef={controllerRef}
                             withProxy={withProxy}
+                            proxyUrl={context.proxyUrl}
                             method={method}
                             path={path}
                             securities={securities}
@@ -73,9 +74,11 @@ function ScalarModal(props: {
     servers: OpenAPIOperationData['servers'];
     specUrl: string;
     withProxy: boolean;
+    proxyUrl?: string;
     controllerRef: React.Ref<ScalarModalControllerRef>;
 }) {
-    const { method, path, securities, servers, specUrl, withProxy, controllerRef } = props;
+    const { method, path, securities, servers, specUrl, withProxy, proxyUrl, controllerRef } =
+        props;
 
     const getPrefillInputContextData = useOpenAPIPrefillContext();
     const prefillInputContext = getPrefillInputContextData();
@@ -90,7 +93,7 @@ function ScalarModal(props: {
             configuration={{
                 url: specUrl,
                 ...prefillConfig,
-                proxyUrl: withProxy ? '/~scalar/proxy' : undefined,
+                proxyUrl: withProxy ? proxyUrl : undefined,
             }}
             initialRequest={{ method: toScalarHttpMethod(method), path }}
         >

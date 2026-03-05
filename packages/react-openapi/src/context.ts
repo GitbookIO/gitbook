@@ -35,6 +35,11 @@ export interface OpenAPIClientContext {
     id?: string;
 
     /**
+     * The URL for the Scalar proxy endpoint.
+     */
+    proxyUrl?: string;
+
+    /**
      * Mark the context as a client context.
      */
     $$isClientContext$$: true;
@@ -97,6 +102,7 @@ export function getOpenAPIClientContext(context: OpenAPIUniversalContext): OpenA
         defaultInteractiveOpened: context.defaultInteractiveOpened,
         blockKey: context.blockKey,
         id: context.id,
+        proxyUrl: context.proxyUrl,
         $$isClientContext$$: true,
     };
 }
