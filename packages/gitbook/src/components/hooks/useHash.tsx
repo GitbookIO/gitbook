@@ -27,7 +27,16 @@ function getHash(): string | null {
     if (typeof window === 'undefined') {
         return null;
     }
-    return window.location.hash.slice(1);
+
+    const hash = window.location.hash.slice(1);
+
+    // We ignore text fragments (i.e. :~:text=) because they are not a classic hash navigation
+    // and we don't want to trigger scroll or other side effects on them.
+    if (hash.startsWith(':~:text=')) {
+        return null;
+    }
+
+    return hash || null;
 }
 
 export const NavigationStatusProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
