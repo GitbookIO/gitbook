@@ -3,8 +3,8 @@ import type {
     AIToolCallResult,
     AIToolDefinition,
 } from '@gitbook/api';
-import z from 'zod';
-import type { ZodObject } from 'zod';
+import type { ZodType, z } from 'zod';
+import { zodToJsonSchema } from 'zod-to-json-schema';
 
 type AIUIToolContext = Pick<AIStreamResponseToolCallPending, 'toolCall' | 'toolCallId'>;
 
@@ -37,8 +37,8 @@ export type GetAIControlProps<T extends AIControlDefinition> = AIControlFromDef<
 
 export function createAIControl<
     Name extends string,
-    InputSchema extends ZodObject,
-    OutputSchema extends ZodObject,
+    InputSchema extends ZodType<Record<string, unknown>>,
+    OutputSchema extends ZodType<Record<string, unknown>>,
 >(def: {
     name: Name;
     description: string;
@@ -49,7 +49,7 @@ export function createAIControl<
     return {
         name: `ui--${def.name}`,
         description: def.description,
-        inputSchema: z.toJSONSchema(def.inputSchema) as AIToolDefinition['inputSchema'],
+        inputSchema: zodToJsonSchema(def.inputSchema as any) as AIToolDefinition['inputSchema'],
         createControl: ({ context, input, send }) => {
             const props: AIControlProps<z.infer<InputSchema>, z.infer<OutputSchema>> = {
                 ...input,

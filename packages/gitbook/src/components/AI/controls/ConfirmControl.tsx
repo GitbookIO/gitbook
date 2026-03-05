@@ -1,7 +1,7 @@
 'use client';
 
 import { Button } from '@/components/primitives';
-import z from 'zod';
+import { z } from 'zod';
 import { AIToolContainer } from './common';
 import { type GetAIControlProps, createAIControl } from './helpers';
 

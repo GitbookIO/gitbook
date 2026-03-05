@@ -3,7 +3,7 @@
 import { Button, Input } from '@/components/primitives';
 import { tcls } from '@/lib/tailwind';
 import * as React from 'react';
-import z from 'zod';
+import { z } from 'zod';
 import { AIToolContainer } from './common';
 import { type GetAIControlProps, createAIControl } from './helpers';
 
@@ -65,9 +65,8 @@ function SingleChoiceControl(props: GetAIControlProps<typeof SingleChoiceControl
 
     return (
         <AIToolContainer className="flex w-full flex-col gap-2">
-            <p className="text-sm text-tint">{prompt}</p>
-
-            <div className="flex flex-col gap-1">
+            <div className="no-scrollbar flex flex-1 flex-col gap-1 overflow-auto">
+                <p className="mb-1 font-semibold text-sm">{prompt}</p>
                 {options.map((option) => {
                     const isSelected = selectedId === option.id;
                     return (
@@ -85,12 +84,32 @@ function SingleChoiceControl(props: GetAIControlProps<typeof SingleChoiceControl
                                     : 'border-tint bg-tint-base hover:bg-tint-subtle'
                             )}
                         >
-                            <p className="font-medium text-sm">{option.label}</p>
-                            {option.description ? (
-                                <p className="mt-0.5 text-sm text-tint-subtle">
-                                    {option.description}
-                                </p>
-                            ) : null}
+                            <div className="flex items-center gap-3">
+                                <span
+                                    aria-hidden
+                                    className={tcls(
+                                        'mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full border transition-colors',
+                                        isSelected
+                                            ? 'border-primary-original'
+                                            : 'border-tint-subtle'
+                                    )}
+                                >
+                                    <span
+                                        className={tcls(
+                                            'size-2.5 rounded-full transition-colors',
+                                            isSelected ? 'bg-primary-original' : 'bg-transparent'
+                                        )}
+                                    />
+                                </span>
+                                <span className="min-w-0">
+                                    <p className="font-medium text-sm">{option.label}</p>
+                                    {option.description ? (
+                                        <p className="mt-0.5 text-sm text-tint-subtle">
+                                            {option.description}
+                                        </p>
+                                    ) : null}
+                                </span>
+                            </div>
                         </button>
                     );
                 })}
@@ -109,24 +128,48 @@ function SingleChoiceControl(props: GetAIControlProps<typeof SingleChoiceControl
                                 : 'border-tint bg-tint-base hover:bg-tint-subtle'
                         )}
                     >
-                        <p className="font-medium text-sm">Other</p>
+                        <div className="flex items-center gap-3">
+                            <span
+                                aria-hidden
+                                className={tcls(
+                                    'mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full border transition-colors',
+                                    selectedId === OTHER_OPTION_ID
+                                        ? 'border-primary-original'
+                                        : 'border-tint-subtle'
+                                )}
+                            >
+                                <span
+                                    className={tcls(
+                                        'size-2.5 rounded-full transition-colors',
+                                        selectedId === OTHER_OPTION_ID
+                                            ? 'bg-primary-original'
+                                            : 'bg-transparent'
+                                    )}
+                                />
+                            </span>
+                            <div className="flex flex-1 flex-col gap-1">
+                                <p className="font-medium text-sm">Other</p>
+                                {allowOther && selectedId === OTHER_OPTION_ID ? (
+                                    <Input
+                                        label="Enter your answer"
+                                        value={otherInput}
+                                        onValueChange={setOtherInput}
+                                        data-testid="ai-chat-tool-single-choice-other-input"
+                                        autoFocus
+                                        className="w-full"
+                                        sizing="small"
+                                    />
+                                ) : null}
+                            </div>
+                        </div>
                     </button>
                 ) : null}
             </div>
 
-            {allowOther && selectedId === OTHER_OPTION_ID ? (
-                <Input
-                    label="Enter your answer"
-                    value={otherInput}
-                    onValueChange={setOtherInput}
-                    data-testid="ai-chat-tool-single-choice-other-input"
-                />
-            ) : null}
-
             <Button
                 data-testid="ai-chat-tool-single-choice-submit"
                 variant="primary"
-                label="Submit"
+                label="Submit answer"
                 disabled={!canSubmit}
                 onClick={() => {
                     if (!canSubmit || !selectedId) {

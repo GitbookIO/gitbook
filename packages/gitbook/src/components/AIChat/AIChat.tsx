@@ -225,7 +225,7 @@ export function AIChatBody(props: {
     return (
         <>
             <ScrollContainer
-                className="shrink grow basis-80 animate-fade-in-slow [container-type:size]"
+                className="min-h-[20%] shrink grow animate-fade-in-slow [container-type:size]"
                 contentClassName="py-4 gutter-stable flex flex-col gap-4"
                 orientation="vertical"
                 trailing={{ fade: false, button: true }}
@@ -274,7 +274,7 @@ export function AIChatBody(props: {
                 )}
             </ScrollContainer>
 
-            <div className="flex flex-col gap-2 pb-4">
+            <div className="flex min-h-0 flex-col gap-2 pb-4">
                 {/* Display an error banner when something went wrong. */}
                 {chat.error ? <AIChatError chatController={chatController} /> : null}
 
