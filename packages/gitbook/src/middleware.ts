@@ -455,6 +455,13 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         return writeResponseCookies(response, cookies);
     };
 
+    if (siteRequestURL.pathname.endsWith('/~gitbook/mcp')) {
+        const token = siteRequestURL.searchParams.get('apiToken');
+        if (token) {
+            return withAPIToken(token);
+        }
+    }
+
     // For https://preview/<siteURL> requests,
     if (siteRequestURL.hostname === 'preview') {
         // Do not track page views for preview requests
