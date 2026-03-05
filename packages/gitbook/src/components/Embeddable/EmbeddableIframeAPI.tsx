@@ -17,6 +17,7 @@ const embeddableConfiguration = createStore<GitBookEmbeddableConfiguration>(() =
     greeting: { title: '', subtitle: '' },
     suggestions: [],
     tools: [],
+    trademark: true,
 }));
 
 // biome-ignore lint/suspicious/noExplicitAny: expected

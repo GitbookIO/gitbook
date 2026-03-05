@@ -1,5 +1,11 @@
 # @gitbook/embed
 
+## 0.3.0
+
+### Minor Changes
+
+- 370b731: Docs Embed: Make trademark optional
+
 ## 0.2.2
 
 ### Patch Changes

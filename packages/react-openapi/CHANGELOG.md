@@ -1,5 +1,13 @@
 # @gitbook/react-openapi
 
+## 1.5.9
+
+### Patch Changes
+
+- e074283: Add server-side proxy for Scalar API client to bypass CORS
+- Updated dependencies [e074283]
+  - @gitbook/openapi-parser@3.0.9
+
 ## 1.5.8
 
 ### Patch Changes

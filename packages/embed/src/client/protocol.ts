@@ -69,6 +69,11 @@ export type GitBookEmbeddableConfiguration = {
     tools: GitBookToolDefinition[];
 
     /**
+     * Display GitBook branding in the embed.
+     */
+    trademark?: boolean;
+
+    /**
      * Display a close button inside the assistant.
      */
     closeButton?: boolean;
