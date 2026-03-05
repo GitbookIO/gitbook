@@ -91,13 +91,19 @@ export async function trackServerInsightsEvents(args: {
         timestamp: event.timestamp ?? new Date().toISOString(),
     })) as api.SiteInsightsEvent[];
 
-    const realIp = getRealIp(request.headers);
+    const xForwardedFor = getXForwardedFor(request.headers);
 
     return await api.orgs.trackEventsInSiteById(
         organizationId,
         siteId,
         { events: fullEvents },
-        { headers: { ...geolocation, ...(realIp ? { 'x-forwarded-for': realIp } : {}) } }
+        {
+            headers: {
+                ...geolocation,
+                // We just forward the x-forwarded-for header as is.
+                ...(xForwardedFor ? { 'x-forwarded-for': xForwardedFor } : {}),
+            },
+        }
     );
 }
 
@@ -144,8 +150,7 @@ export async function serveProxyAnalyticsEvent(req: Request) {
  * Extract the real IP address of the client from the request headers, accounting for various proxies and CDNs.
  */
 
-
-function getRealIp(headers: Headers): string | null {
+function getXForwardedFor(headers: Headers): string | null {
     // We start first with the cloudflare headers
     if (headers.has('cf-connecting-ip')) {
         return headers.get('cf-connecting-ip');
