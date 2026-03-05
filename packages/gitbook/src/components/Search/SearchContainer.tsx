@@ -42,6 +42,9 @@ interface SearchContainerProps {
     style: CustomizationSearchStyle;
     className?: string;
     viewport?: 'desktop' | 'mobile';
+
+    /** URL for the search API route, e.g. from linker.toPathInSpace('~gitbook/search'). */
+    searchURL: string;
 }
 
 /**
@@ -57,6 +60,7 @@ export function SearchContainer({
     className,
     viewport,
     siteSpaces,
+    searchURL,
 }: SearchContainerProps) {
     const { assistants, config } = useAI();
 
@@ -206,6 +210,7 @@ export function SearchContainer({
         scope: state?.scope ?? 'default',
         withAI,
         suggestions: config.suggestions,
+        searchURL,
     });
     const searchValue = state?.query ?? (withSearchAI || !withAI ? state?.ask : null) ?? '';
 

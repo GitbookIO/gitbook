@@ -87,7 +87,9 @@ export async function TableOfContents(props: {
                     'lg:page-no-toc:pr-0',
                     'max-lg:pl-8',
 
+                    'flex',
                     'flex-col',
+                    'min-h-0',
                     'gap-4',
                     className
                 )}

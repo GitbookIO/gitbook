@@ -69,6 +69,7 @@ export function createGitBookFrame(iframe: HTMLIFrameElement): GitBookFrameClien
         greeting: { title: '', subtitle: '' },
         suggestions: [],
         tools: [],
+        trademark: true,
     };
 
     return {

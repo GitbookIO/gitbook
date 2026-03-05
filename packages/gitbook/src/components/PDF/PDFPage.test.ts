@@ -63,12 +63,16 @@ describe('createPDFLinker', () => {
 
     it('keeps links to non-exported pages on the published domain', () => {
         const baseLinker = createLinker({
-            host: 'docs.vectra.ai',
-            siteBasePath: '/',
-            spaceBasePath: '/deployment',
+            host: 'open-2v.gitbook.com',
+            siteBasePath: '/~space/HJ1ltuWFvsArFWtevnRn~gitbook/pdf',
+            spaceBasePath: '/~space/HJ1ltuWFvsArFWtevnRn~gitbook/pdf',
         });
 
-        const linker = createPDFLinker(baseLinker, [{ page: createDocumentPage('included', '') }]);
+        const linker = createPDFLinker(
+            baseLinker,
+            [{ page: createDocumentPage('included', '') }],
+            'https://docs.vectra.ai/deployment/'
+        );
 
         expect(
             linker.toPathForPage({
@@ -79,6 +83,31 @@ describe('createPDFLinker', () => {
                 page: createDocumentPage('outside', 'respond'),
             })
         ).toBe('https://docs.vectra.ai/deployment/respond');
+    });
+
+    it('preserves anchors for non-exported pages on the published domain', () => {
+        const baseLinker = createLinker({
+            host: 'open-2v.gitbook.com',
+            siteBasePath: '/~space/HJ1ltuWFvsArFWtevnRn~gitbook/pdf',
+            spaceBasePath: '/~space/HJ1ltuWFvsArFWtevnRn~gitbook/pdf',
+        });
+
+        const linker = createPDFLinker(
+            baseLinker,
+            [{ page: createDocumentPage('included', '') }],
+            'https://docs.vectra.ai/deployment/'
+        );
+
+        expect(
+            linker.toPathForPage({
+                pages: [
+                    createDocumentPage('included', ''),
+                    createDocumentPage('outside', 'respond'),
+                ],
+                page: createDocumentPage('outside', 'respond'),
+                anchor: 'faq',
+            })
+        ).toBe('https://docs.vectra.ai/deployment/respond#faq');
     });
 
     it('returns a local placeholder link for group pages not included in the PDF export', () => {

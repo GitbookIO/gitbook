@@ -59,7 +59,7 @@ export function Update(props: BlockProps<DocumentBlockUpdate>) {
                 {resolvedTags.length > 0 ? (
                     <div className="mt-2 flex flex-wrap gap-1.5">
                         {resolvedTags.map((tag) => (
-                            <Tag key={tag.slug} label={tag.label} />
+                            <Tag key={tag.slug} tag={tag} />
                         ))}
                     </div>
                 ) : null}

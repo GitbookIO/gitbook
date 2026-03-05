@@ -269,6 +269,19 @@ Notes:
 - The close button is rendered in the same sidebar area as tabs/actions.
 - If your UI hides that sidebar or doesn't render it, the button will not be visible.
 
+### `trademark`
+
+Available in: Standalone script, NPM package, React components
+
+Display GitBook branding in the embed. Defaults to true.
+
+- **Type**: `boolean`
+- **Default**: `true`
+
+```javascript
+trademark: true
+```
+
 ### `actions`
 
 Available in: Standalone script, NPM package, React components

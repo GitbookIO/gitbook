@@ -65,6 +65,7 @@ let frameConfiguration: GitBookEmbeddableConfiguration & StandaloneConfiguration
     suggestions: [],
     tools: [],
     tabs: ['assistant', 'docs'],
+    trademark: true,
 };
 
 const widgetButton = document.createElement('button');
@@ -156,6 +157,19 @@ const GitBook = (...args: StandaloneCalls) => {
             break;
         case 'configure': {
             const settings = args[1];
+
+            // If trademark is disabled, change the (branded) icon to the sparkle icon
+            if (
+                settings.trademark === false &&
+                !settings.button?.icon &&
+                frameConfiguration.button.icon === 'assistant'
+            ) {
+                settings.button = {
+                    label: frameConfiguration.button.label,
+                    icon: 'sparkle',
+                };
+            }
+
             frameConfiguration = {
                 ...frameConfiguration,
                 ...settings,

@@ -41,9 +41,9 @@ type EmbeddableAIChatProps = {
 export function EmbeddableAIChat(props: EmbeddableAIChatProps) {
     const { baseURL, siteTitle } = props;
     const chat = useAIChatState();
-    const { config } = useAI();
+    const { config: siteConfig } = useAI();
     const chatController = useAIChatController();
-    const configuration = useEmbeddableConfiguration();
+    const embedConfig = useEmbeddableConfiguration();
     const language = useLanguage();
 
     React.useEffect(() => {
@@ -65,7 +65,8 @@ export function EmbeddableAIChat(props: EmbeddableAIChatProps) {
     }, [trackEvent]);
 
     const tabsRef = React.useRef<HTMLDivElement>(null);
-    const hasDocsTab = configuration.tabs.includes('docs');
+    const hasDocsTab = embedConfig.tabs.includes('docs');
+    const trademark = siteConfig.trademark && (embedConfig.trademark ?? true);
     const currentLinkContext = use(LinkContext);
     const linkContext: LinkContextType = useMemo(
         () =>
@@ -95,14 +96,11 @@ export function EmbeddableAIChat(props: EmbeddableAIChatProps) {
             <EmbeddableFrameMain data-testid="ai-chat">
                 <EmbeddableFrameHeader>
                     {!tabsRef.current ? (
-                        <AIChatDynamicIcon
-                            className="animate-blur-in-slow"
-                            trademark={config.trademark}
-                        />
+                        <AIChatDynamicIcon className="animate-blur-in-slow" trademark={trademark} />
                     ) : null}
                     <EmbeddableFrameHeaderMain>
                         <EmbeddableFrameTitle>
-                            {getAIChatName(language, config.trademark)}
+                            {getAIChatName(language, trademark)}
                         </EmbeddableFrameTitle>
                         <AIChatSubtitle chat={chat} />
                     </EmbeddableFrameHeaderMain>
@@ -115,8 +113,9 @@ export function EmbeddableAIChat(props: EmbeddableAIChatProps) {
                         <AIChatBody
                             chatController={chatController}
                             chat={chat}
-                            suggestions={configuration.suggestions}
-                            greeting={configuration.greeting}
+                            suggestions={embedConfig.suggestions}
+                            greeting={embedConfig.greeting}
+                            trademark={trademark}
                         />
                     </LinkContext>
                 </EmbeddableFrameBody>

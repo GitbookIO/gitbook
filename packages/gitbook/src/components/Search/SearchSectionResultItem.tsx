@@ -3,7 +3,7 @@ import React from 'react';
 import { tString, useLanguage } from '@/intl/client';
 import { HighlightQuery } from './HighlightQuery';
 import { SearchResultItem } from './SearchResultItem';
-import type { ComputedSectionResult } from './server-actions';
+import type { ComputedSectionResult } from './search-types';
 
 export const SearchSectionResultItem = React.forwardRef(function SearchSectionResultItem(
     props: {

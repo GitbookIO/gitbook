@@ -2,38 +2,67 @@
 
 import React from 'react';
 
+import { usePathname } from 'next/navigation';
 import { useHash } from './useHash';
 import { usePrevious } from './usePrevious';
 
 /**
- * Scroll the page to the hash or reset scroll to the top.
- * Only triggered while navigating in the app, not for initial load.
+ * Handles scroll behavior when the URL hash changes during client-side navigation.
  */
-export function useScrollPage() {
+function useScrollPage() {
     const hash = useHash();
-    const previousHash = usePrevious(hash);
+    const pathname = usePathname();
+    const previous = usePrevious({ pathname, hash });
 
     React.useEffect(() => {
-        if (hash) {
-            if (previousHash !== undefined && previousHash !== hash) {
-                const element = document.getElementById(hash);
-                if (element) {
-                    element.scrollIntoView({
-                        block: 'start',
-                        behavior: 'smooth',
-                    });
-                }
-            }
+        // Never scroll on initial rendering to avoid blocking:
+        // • Native browser hash scrolling
+        // • Scroll-to-text fragments (undetectable)
+        if (previous === undefined || (previous.hash === hash && previous.pathname === pathname)) {
             return;
         }
 
-        // On initial load `previousHash` can be undefined,
-        // but if the URL contains a fragment (hash),
-        // we don't override native anchor scrolling
-        if (!previousHash && window.location.hash) {
+        if (hash) {
+            scrollToHash(hash);
             return;
         }
 
         window.scrollTo(0, 0);
-    }, [hash, previousHash]);
+    }, [hash, pathname, previous]);
+}
+
+/**
+ * Handles scroll behavior when the URL hash changes during client-side navigation.
+ */
+export function ScrollPage() {
+    useScrollPage();
+    return null;
+}
+
+/**
+ * Scroll to the hash if present.
+ */
+export function useScrollToHash() {
+    const hash = useHash();
+
+    React.useEffect(() => {
+        if (hash) {
+            scrollToHash(hash);
+        }
+    }, [hash]);
+}
+
+/**
+ * Scroll to a hash, if scroll didn't work, return false.
+ */
+function scrollToHash(hash: string) {
+    const element = document.getElementById(hash);
+    if (element) {
+        element.scrollIntoView({
+            block: 'start',
+            behavior: 'smooth',
+        });
+        return true;
+    }
+    return false;
 }

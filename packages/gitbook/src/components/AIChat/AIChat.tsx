@@ -111,6 +111,7 @@ export function AIChat() {
                             chatController={chatController}
                             chat={chat}
                             suggestions={config.suggestions}
+                            trademark={config.trademark}
                         />
                     </EmbeddableFrameBody>
                 </EmbeddableFrameMain>
@@ -199,13 +200,13 @@ export function AIChatBody(props: {
     chat: AIChatState;
     welcomeMessage?: string;
     suggestions?: string[];
+    trademark?: boolean;
     greeting?: {
         title: string;
         subtitle: string;
     };
 }) {
-    const { chatController, chat, suggestions, greeting } = props;
-    const { trademark } = useAI().config;
+    const { chatController, chat, suggestions, greeting, trademark } = props;
 
     const language = useLanguage();
     const now = useNow(60 * 60 * 1000); // Refresh every hour for greeting

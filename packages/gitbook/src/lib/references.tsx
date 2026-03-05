@@ -30,6 +30,7 @@ import { getGitBookAppHref } from './app';
 import { getBlockById, getBlockTitle } from './document';
 import { resolvePageId } from './pages';
 import { findSiteSpaceBy, getFallbackSiteSpacePath } from './sites';
+import { getRevisionTags, resolveTag } from './tags';
 import type { ClassValue } from './tailwind';
 import { filterOutNullable } from './typescript';
 
@@ -343,6 +344,24 @@ export async function resolveContentRef(
                 text: contentRef.spec,
                 active: false,
                 openAPIFilesystem: openAPISpecVersionContent.filesystem as Filesystem,
+            };
+        }
+
+        case 'tag': {
+            if (isContentRefInDifferentSpace(contentRef, context)) {
+                return resolveContentRefInSpace(contentRef.space, context, contentRef, options);
+            }
+
+            const tag = resolveTag(contentRef.tag, getRevisionTags(revision));
+            if (!tag) {
+                return null;
+            }
+
+            return {
+                href: linker.toPathInSpace(''),
+                text: tag.label,
+                active: false,
+                space,
             };
         }
 

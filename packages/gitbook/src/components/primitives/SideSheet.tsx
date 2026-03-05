@@ -207,7 +207,6 @@ export function SideSheet(
                     'fixed inset-y-0 z-41', // Above the side sheet overlay on z-40
                     side === 'left' ? 'left-0' : 'right-0',
                     withCloseButton ? 'max-w-[calc(100%-4rem)]' : 'max-w-[calc(100%-3rem)]',
-                    shouldHide ? 'hidden' : '',
                     isOpen
                         ? side === 'left'
                             ? 'hydrated:animate-enter-from-left'
@@ -223,6 +222,10 @@ export function SideSheet(
                 aria-expanded={isOpen}
                 aria-modal={isModal}
                 {...rest}
+                style={{
+                    ...rest.style,
+                    display: shouldHide ? 'none' : rest.style?.display,
+                }}
             >
                 {children}
                 {withCloseButton ? (

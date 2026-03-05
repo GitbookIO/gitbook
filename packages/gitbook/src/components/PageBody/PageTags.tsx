@@ -22,7 +22,7 @@ export function PageTags(props: { page: RevisionPageDocument; revision: Revision
                 if (!resolved) {
                     return null;
                 }
-                return <Tag key={resolved.slug} label={resolved.label} />;
+                return <Tag key={resolved.slug} tag={resolved} />;
             })}
         </div>
     );

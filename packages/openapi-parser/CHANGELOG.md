@@ -1,5 +1,11 @@
 # @gitbook/openapi-parser
 
+## 3.0.9
+
+### Patch Changes
+
+- e074283: Add server-side proxy for Scalar API client to bypass CORS
+
 ## 3.0.8
 
 ### Patch Changes
