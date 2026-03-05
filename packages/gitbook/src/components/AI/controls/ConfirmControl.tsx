@@ -5,6 +5,10 @@ import { z } from 'zod';
 import { AIToolContainer } from './common';
 import { type GetAIControlProps, createAIControl } from './helpers';
 
+export const ConfirmControlOutputSchema = z.object({
+    result: z.enum(['confirmed', 'cancelled']),
+});
+
 export const ConfirmControlDef = createAIControl({
     name: 'confirm',
     description:
@@ -16,9 +20,7 @@ export const ConfirmControlDef = createAIControl({
             .describe('Icon to be shown in the confirm button (any Fontawesome icon name).'),
         label: z.string().describe('Label to be shown in the confirm button.'),
     }),
-    outputSchema: z.object({
-        result: z.enum(['confirmed', 'cancelled']),
-    }),
+    outputSchema: ConfirmControlOutputSchema,
     render: (props) => {
         return <ConfirmControl {...props} />;
     },
