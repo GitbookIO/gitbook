@@ -19,6 +19,7 @@ export const SingleChoiceControlOutputSchema = z.object({
 
 export const SingleChoiceControlDef = createAIControl({
     name: 'single-choice',
+    exposeAsTool: true,
     description:
         'Use this control when you need the user to choose exactly one option from a predefined list.',
     inputSchema: z.object({

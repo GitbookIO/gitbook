@@ -18,6 +18,7 @@ type AIControlDefinition<
         input: Input;
         send: (result: Pick<AIToolCallResult, 'output' | 'summary'>) => Promise<void>;
     }) => AIControl<Name, Input, Output>;
+    exposeAsTool: boolean;
 };
 
 type AIControlProps<Input = Record<string, unknown>, Output = Record<string, unknown>> = Input & {
@@ -45,6 +46,10 @@ export function createAIControl<
     inputSchema: InputSchema;
     outputSchema: OutputSchema;
     render: (props: AIControlProps<z.infer<InputSchema>, z.infer<OutputSchema>>) => React.ReactNode;
+    /**
+     * Indicates if the control should be exposed as a tool or not.
+     */
+    exposeAsTool: boolean;
 }): AIControlDefinition<Name, z.infer<InputSchema>, z.infer<OutputSchema>> {
     return {
         name: `ui--${def.name}`,
@@ -70,5 +75,6 @@ export function createAIControl<
                 render: () => def.render(props),
             };
         },
+        exposeAsTool: def.exposeAsTool,
     };
 }

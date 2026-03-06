@@ -9,15 +9,13 @@ import {
     type AIStreamResponseToolCallPending,
     type AIToolCallResult,
 } from '@gitbook/api';
+import assertNever from 'assert-never';
 import * as React from 'react';
 import { getVisitor, useTrackEvent } from '../Insights';
 import { getSession } from '../Insights/sessions';
 import { useSetSearchState } from '../Search';
 import type { AnyAIControl } from './controls';
-import {
-    SingleChoiceControlDef,
-    SingleChoiceControlOutputSchema,
-} from './controls/SingleChoiceControl';
+import { ConfirmControlDef, ConfirmControlOutputSchema } from './controls/ConfirmControl';
 import { type RenderAIMessageOptions, streamAIChatResponse } from './server-actions';
 import { getTools } from './tools';
 import { useAIMessageContextRef } from './useAIMessageContext';
@@ -343,47 +341,43 @@ export function AIChatProvider(props: {
                             if (confirmation) {
                                 globalState.setState((state) => ({
                                     ...state,
-                                    control: SingleChoiceControlDef.createControl({
+                                    control: ConfirmControlDef.createControl({
                                         context: {
                                             toolCall: event.toolCall,
                                             toolCallId: event.toolCallId,
                                         },
                                         input: {
-                                            prompt: confirmation.label,
-                                            options: [
-                                                {
-                                                    id: 'yes',
-                                                    label: 'Yes',
-                                                },
-                                                {
-                                                    id: 'no',
-                                                    label: 'No',
-                                                },
-                                            ],
-                                            allowOther: false,
+                                            label: confirmation.label,
+                                            icon: confirmation.icon,
                                         },
                                         send: async (result) => {
-                                            const output = SingleChoiceControlOutputSchema.parse(
+                                            const output = ConfirmControlOutputSchema.parse(
                                                 result.output
                                             );
-                                            if (output.id === 'yes') {
-                                                await executeToolCall(event);
-                                            } else {
-                                                await streamResponse({
-                                                    toolCall: {
-                                                        tool: event.toolCall.tool,
-                                                        toolCallId: event.toolCallId,
-                                                        output: { cancelled: true },
-                                                        summary: {
-                                                            icon: 'forward',
-                                                            text: tString(
-                                                                language,
-                                                                'tool_call_skipped',
-                                                                confirmation.label
-                                                            ),
+                                            switch (output.result) {
+                                                case 'cancelled': {
+                                                    await streamResponse({
+                                                        toolCall: {
+                                                            tool: event.toolCall.tool,
+                                                            toolCallId: event.toolCallId,
+                                                            output: { cancelled: true },
+                                                            summary: {
+                                                                icon: 'forward',
+                                                                text: tString(
+                                                                    language,
+                                                                    'tool_call_skipped',
+                                                                    confirmation.label
+                                                                ),
+                                                            },
                                                         },
-                                                    },
-                                                });
+                                                    });
+                                                    break;
+                                                }
+                                                case 'confirmed':
+                                                    await executeToolCall(event);
+                                                    break;
+                                                default:
+                                                    assertNever(output.result);
                                             }
                                         },
                                     }),
