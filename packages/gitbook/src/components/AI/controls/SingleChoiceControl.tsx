@@ -9,14 +9,23 @@ import { type GetAIControlProps, createAIControl } from './helpers';
 
 const OTHER_OPTION_ID = '$other';
 
+export const SingleChoiceControlOutputSchema = z.object({
+    id: z.string().describe('The identifier of the option selected by the user.'),
+    input: z
+        .string()
+        .optional()
+        .describe('The custom text entered by the user when "Other" is enabled and selected.'),
+});
+
 export const SingleChoiceControlDef = createAIControl({
     name: 'single-choice',
-    description: 'Render a question where the user must select exactly one option from a list.',
+    description:
+        'Use this control when you need the user to choose exactly one option from a predefined list.',
     inputSchema: z.object({
         prompt: z
             .string()
             .describe(
-                'The question or instruction displayed to the user explaining what they must choose.'
+                'Provide the question or instruction that tells the user what single choice they need to make.'
             ),
         options: z
             .array(
@@ -25,30 +34,31 @@ export const SingleChoiceControlDef = createAIControl({
                         id: z
                             .string()
                             .describe(
-                                'Unique stable identifier for the option. This value is returned when the option is selected.'
+                                'Provide a unique, stable identifier for this option. This is the value returned to the agent when the user selects it.'
                             ),
-                        label: z.string().describe('Short text label displayed for the option.'),
+                        label: z
+                            .string()
+                            .describe('Provide the short label the user sees for this option.'),
                         description: z
                             .string()
                             .optional()
                             .describe(
-                                'Optional longer explanation or additional context shown under the option label.'
+                                'Optionally provide supporting details to help the user understand this option.'
                             ),
                     })
-                    .describe('A selectable option presented to the user.')
+                    .describe('Define one selectable option the user can pick.')
             )
-            .describe('List of selectable options. The user must choose exactly one.'),
+            .describe(
+                'Provide the list of options the user can choose from. The user must select exactly one.'
+            ),
         allowOther: z
             .boolean()
             .optional()
             .describe(
-                'If true, an additional "Other" option is displayed allowing the user to enter a custom text response.'
+                'Set to true to let the user select an "Other" option and enter a custom text response.'
             ),
     }),
-    outputSchema: z.object({
-        id: z.string(),
-        input: z.string().optional(),
-    }),
+    outputSchema: SingleChoiceControlOutputSchema,
     render: (props) => {
         return <SingleChoiceControl {...props} />;
     },
