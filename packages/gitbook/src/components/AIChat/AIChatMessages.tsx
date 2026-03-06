@@ -3,7 +3,6 @@ import { tString } from '@/intl/translate';
 import { tcls } from '@/lib/tailwind';
 import { AIMessageRole } from '@gitbook/api';
 import type { AIChatController, AIChatState } from '../AI';
-import { AIChatToolConfirmations } from './AIChatToolConfirmations';
 import { AIResponseFeedback } from './AIResponseFeedback';
 import { AIChatFollowupSuggestions } from './AiChatFollowupSuggestions';
 
@@ -67,7 +66,6 @@ export function AIChatMessages(props: {
                                 'break-words',
                                 'group/message',
                                 'animate-blur-in-slow',
-                                isLastMessage ? 'basis-full' : '',
                                 message.role === AIMessageRole.User
                                     ? 'max-w-[80%] origin-top-right self-end circular-corners:rounded-2xl rounded-corners:rounded-md bg-tint px-4 py-2'
                                     : 'origin-top-left text-tint-strong'
@@ -96,14 +94,13 @@ export function AIChatMessages(props: {
                                     !chat.error &&
                                     chat.query &&
                                     chat.responseId &&
-                                    chat.pendingTools.length === 0 ? (
+                                    chat.control ? (
                                         <AIResponseFeedback
                                             responseId={chat.responseId}
                                             query={chat.query}
                                             className="-ml-1 -mt-4"
                                         />
                                     ) : null}
-                                    <AIChatToolConfirmations chat={chat} />
                                     <AIChatFollowupSuggestions
                                         chat={chat}
                                         chatController={chatController}

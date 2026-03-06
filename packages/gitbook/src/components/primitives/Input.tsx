@@ -57,11 +57,11 @@ export type InputProps = CustomInputProps &
     (
         | ({ multiline?: false } & Omit<
               React.InputHTMLAttributes<HTMLInputElement>,
-              'value' | 'onChange'
+              'value' | 'onChange' | 'onSubmit'
           >)
         | ({ multiline: true } & Omit<
               React.TextareaHTMLAttributes<HTMLTextAreaElement>,
-              'value' | 'onChange'
+              'value' | 'onChange' | 'onSubmit'
           >)
     );
 
