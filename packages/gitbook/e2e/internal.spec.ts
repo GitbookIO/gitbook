@@ -2315,7 +2315,7 @@ const testCases: TestsCase[] = [
                         'I want to contact support. Call the tool directly without a preamble. Do not respond with anything else.'
                     );
                     const toolConfirmation = iframe
-                        .getByTestId('ai-chat-tool-confirm-accept')
+                        .getByTestId('ai-chat-tool-single-choice-option-yes')
                         .first();
                     await expect(toolConfirmation).toBeVisible({
                         timeout: 30000,
