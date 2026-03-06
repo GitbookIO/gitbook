@@ -28,6 +28,7 @@ import { useNow } from '../hooks';
 import { Button } from '../primitives';
 import { ScrollContainer } from '../primitives/ScrollContainer';
 import { SideSheet } from '../primitives/SideSheet';
+import { AIChatControl } from './AIChatControl';
 import { AIChatControlButton } from './AIChatControlButton';
 import { AIChatIcon } from './AIChatIcon';
 import { AIChatInput } from './AIChatInput';
@@ -142,7 +143,7 @@ export function AIChatDynamicIcon(props: {
                           ? 'working'
                           : 'thinking'
                       : chat.messages.length > 0
-                        ? chat.pendingTools.length > 0
+                        ? chat.control
                             ? 'confirm'
                             : 'done'
                         : 'default'
@@ -224,7 +225,7 @@ export function AIChatBody(props: {
     return (
         <>
             <ScrollContainer
-                className="shrink grow basis-80 animate-fade-in-slow [container-type:size]"
+                className="min-h-[20%] shrink grow animate-fade-in-slow [container-type:size]"
                 contentClassName="py-4 gutter-stable flex flex-col gap-4"
                 orientation="vertical"
                 trailing={{ fade: false, button: true }}
@@ -273,17 +274,21 @@ export function AIChatBody(props: {
                 )}
             </ScrollContainer>
 
-            <div className="flex flex-col gap-2 pb-4">
+            <div className="flex min-h-0 flex-col gap-2 pb-4">
                 {/* Display an error banner when something went wrong. */}
                 {chat.error ? <AIChatError chatController={chatController} /> : null}
 
-                <AIChatInput
-                    loading={chat.loading}
-                    disabled={chat.loading || chat.error}
-                    onSubmit={(value) => {
-                        chatController.postMessage({ message: value });
-                    }}
-                />
+                {chat.control ? (
+                    <AIChatControl control={chat.control} />
+                ) : (
+                    <AIChatInput
+                        loading={chat.loading}
+                        disabled={chat.loading || chat.error}
+                        onSubmit={(value) => {
+                            chatController.postMessage({ message: value });
+                        }}
+                    />
+                )}
             </div>
         </>
     );
