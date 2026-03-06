@@ -12,6 +12,7 @@ import { Heading } from '../Heading';
 import './style.css';
 import { DEFAULT_LOCALE, getSpaceLocale } from '@/intl/server';
 import type { GitBookAnyContext } from '@/lib/context';
+import { buildSignedProxyUrl } from '@/lib/openapi/proxy-token';
 import type {
     AnyOpenAPIOperationsBlock,
     OpenAPISchemasBlock,
@@ -36,7 +37,9 @@ export function getOpenAPIContext(args: {
 
     return {
         specUrl,
-        proxyUrl,
+        resolveProxyUrl: proxyUrl
+            ? (allowedHosts: string[]) => buildSignedProxyUrl(proxyUrl, allowedHosts)
+            : undefined,
         icons: {
             chevronDown: <Icon icon="chevron-down" />,
             chevronRight: <Icon icon="chevron-right" />,

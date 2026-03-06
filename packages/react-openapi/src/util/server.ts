@@ -65,6 +65,39 @@ export function hasValidServerHost(servers: OpenAPIV3.ServerObject[]): boolean {
 }
 
 /**
+ * Get the unique hostnames from a list of servers (using default variable values).
+ * Used to build the allowlist for the OpenAPI proxy.
+ */
+export function getAllServerHosts(servers: OpenAPIV3.ServerObject[]): string[] {
+    const hosts = new Set<string>();
+
+    for (const server of servers) {
+        const url = interpolateServerURL(server);
+        const hostname = extractHostname(url);
+        if (hostname) {
+            hosts.add(hostname);
+        }
+    }
+
+    return Array.from(hosts);
+}
+
+/**
+ * Extract the hostname from a URL string, handling both full URLs and bare hostnames.
+ */
+function extractHostname(url: string): string | null {
+    try {
+        return new URL(url).hostname;
+    } catch {
+        // Bare hostname (no protocol) — validate it looks like a domain
+        if (isValidServerHost(url)) {
+            return url;
+        }
+        return null;
+    }
+}
+
+/**
  * Check if the server host/URL is valid for making direct HTTP requests.
  * Accepts both full URLs (with protocol) and hostnames (without protocol).
  */
