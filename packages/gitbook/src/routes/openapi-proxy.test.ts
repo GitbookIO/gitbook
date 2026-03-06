@@ -98,7 +98,9 @@ describe('handleOpenAPIProxyRequest', () => {
     });
 
     it('returns 400 when scalar_url is missing', async () => {
-        const res = await handleOpenAPIProxyRequest(createRequest('http://localhost/~scalar/proxy'));
+        const res = await handleOpenAPIProxyRequest(
+            createRequest('http://localhost/~scalar/proxy')
+        );
         await expectJsonError(res, 400, 'Missing required query parameter: scalar_url');
     });
 
