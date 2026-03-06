@@ -30,7 +30,7 @@ export const ConfirmControlDef = createAIControl({
 function ConfirmControl(props: GetAIControlProps<typeof ConfirmControlDef>) {
     const { label, icon, onSubmit } = props;
     return (
-        <AIToolContainer className="flex w-full flex-col gap-1">
+        <AIToolContainer className="flex w-full flex-col gap-2">
             <Button
                 data-testid="ai-chat-tool-confirm-cancel"
                 onClick={() => {
