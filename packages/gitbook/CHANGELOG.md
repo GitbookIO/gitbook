@@ -1,5 +1,16 @@
 # gitbook
 
+## 0.22.3
+
+### Patch Changes
+
+- eceec6f: Move ~scalar/proxy route to site route group
+- d666212: Add support for localized site section titles
+- Updated dependencies [8ab419a]
+- Updated dependencies [eceec6f]
+  - @gitbook/openapi-parser@3.0.10
+  - @gitbook/react-openapi@1.5.10
+
 ## 0.22.2
 
 ### Patch Changes

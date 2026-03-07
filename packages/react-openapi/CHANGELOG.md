@@ -1,5 +1,14 @@
 # @gitbook/react-openapi
 
+## 1.5.10
+
+### Patch Changes
+
+- 8ab419a: Support x-enable-proxy at operation level
+- eceec6f: Move ~scalar/proxy route to site route group
+- Updated dependencies [8ab419a]
+  - @gitbook/openapi-parser@3.0.10
+
 ## 1.5.9
 
 ### Patch Changes
