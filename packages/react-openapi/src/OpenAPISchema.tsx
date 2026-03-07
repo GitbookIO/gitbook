@@ -428,7 +428,10 @@ function OpenAPISchemaAlternativeSeparator(props: {
 /**
  * Render a circular reference to a schema.
  */
-function OpenAPISchemaCircularRef(props: { id: string; schema: OpenAPIV3.SchemaObject }) {
+function OpenAPISchemaCircularRef(props: {
+    id: string;
+    schema: OpenAPIV3.SchemaObject;
+}) {
     const { id, schema } = props;
 
     return (
@@ -1004,7 +1007,7 @@ function flattenSchema(
         return [{ ...schema, ...(required ? { required } : {}) }];
     }
 
-    // if a schema has allOf that can be safely merged, merge it
+    // If a schema has allOf that can be safely merged, merge it.
     if (
         (alternativeType === 'oneOf' || alternativeType === 'anyOf') &&
         schema.allOf &&
@@ -1016,24 +1019,21 @@ function flattenSchema(
         );
 
         if (allOfSchemas.length > 0) {
+            // Circular allOf: a variant references its parent (e.g. Dog allOf: [Pet, ...])
+            if (allOfSchemas.some((s) => isAncestorOrCopy(s, ancestors))) {
+                return flattenCircularAllOf(schema, allOfSchemas, ancestors, latestAncestor);
+            }
+
             const merged = mergeAlternatives('allOf', allOfSchemas);
-            if (merged && merged.length > 0) {
-                // Only merge if all schemas were successfully merged into one (safe to merge)
-                if (merged.length === 1) {
-                    return merged.map((s) => {
-                        const required = mergeRequiredFields(s, latestAncestor);
-                        const result: OpenAPIV3.SchemaObject = {
-                            ...s,
-                            ...(required ? { required } : {}),
-                        };
-
-                        if (schema.title && !s.title) {
-                            result.title = schema.title;
-                        }
-
-                        return result;
-                    });
-                }
+            if (merged?.length === 1) {
+                return merged.map((s) => {
+                    const required = mergeRequiredFields(s, latestAncestor);
+                    return {
+                        ...s,
+                        ...(required ? { required } : {}),
+                        ...(schema.title && !s.title ? { title: schema.title } : {}),
+                    };
+                });
             }
         }
     }
@@ -1046,6 +1046,95 @@ function flattenSchema(
             ...(required ? { required } : {}),
         },
     ];
+}
+
+/**
+ * Flatten a circular allOf by stripping ancestor fields and merging the rest.
+ */
+function flattenCircularAllOf(
+    schema: OpenAPIV3.SchemaObject,
+    allOfSchemas: OpenAPIV3.SchemaObject[],
+    ancestors: Set<OpenAPIV3.SchemaObject>,
+    latestAncestor: OpenAPIV3.SchemaObject | undefined
+): OpenAPIV3.SchemaObject[] {
+    const cleanSchemas = allOfSchemas.map((s) =>
+        isAncestorOrCopy(s, ancestors) ? stripAncestorFields(s, ancestors) : s
+    );
+
+    const { allOf: _, oneOf: _1, anyOf: _2, discriminator: _3, ...ownProps } = schema;
+    let merged = mergeSchemas(cleanSchemas);
+    merged = mergeTwoSchemas(merged, ownProps);
+
+    const required = mergeRequiredFields(merged, latestAncestor);
+    return [
+        {
+            ...merged,
+            ...(required ? { required } : {}),
+            ...(schema.title ? { title: schema.title } : {}),
+        },
+    ];
+}
+
+/**
+ * Check if a schema is an ancestor or a structurally matching copy of one.
+ */
+function isAncestorOrCopy(
+    schema: OpenAPIV3.SchemaObject,
+    ancestors: Set<OpenAPIV3.SchemaObject>
+): boolean {
+    if (ancestors.has(schema)) {
+        return true;
+    }
+    const discriminatorName = schema.discriminator?.propertyName;
+    if (!discriminatorName) {
+        return false;
+    }
+    for (const ancestor of Array.from(ancestors)) {
+        if (ancestor.discriminator?.propertyName === discriminatorName) {
+            return true;
+        }
+    }
+    return false;
+}
+
+const polymorphicFields = new Set([
+    'oneOf',
+    'anyOf',
+    'discriminator',
+    'description',
+    'x-gitbook-description-html',
+]);
+
+/**
+ * Strip polymorphic fields from an ancestor schema, preserving non-circular allOf composition.
+ */
+function stripAncestorFields(
+    schema: OpenAPIV3.SchemaObject,
+    ancestors: Set<OpenAPIV3.SchemaObject>
+): OpenAPIV3.SchemaObject {
+    let base: OpenAPIV3.SchemaObject = schema;
+
+    // Merge non-circular allOf entries so composition properties aren't lost
+    if (Array.isArray(schema.allOf)) {
+        const safeAllOf = schema.allOf.filter(
+            (s): s is OpenAPIV3.SchemaObject =>
+                !checkIsReference(s) && !isAncestorOrCopy(s, ancestors)
+        );
+        if (safeAllOf.length > 0) {
+            base = mergeSchemas([schema, ...safeAllOf]);
+        }
+    }
+
+    const clean = Object.fromEntries(
+        Object.entries(base).filter(([key]) => !polymorphicFields.has(key) && key !== 'allOf')
+    ) as OpenAPIV3.SchemaObject;
+    if (clean.properties) {
+        clean.properties = { ...clean.properties };
+    }
+    if (Array.isArray(clean.required)) {
+        clean.required = [...clean.required];
+    }
+    return clean;
 }
 
 /**
@@ -1095,7 +1184,7 @@ function mergeSchemas(schemas: OpenAPIV3.SchemaObject[]): OpenAPIV3.SchemaObject
         return firstSchema;
     }
     // Start with first schema and merge the rest into it
-    return schemas.reduce((acc, schema) => mergeTwoSchemas(acc, schema), firstSchema);
+    return schemas.slice(1).reduce((acc, schema) => mergeTwoSchemas(acc, schema), firstSchema);
 }
 
 /**
