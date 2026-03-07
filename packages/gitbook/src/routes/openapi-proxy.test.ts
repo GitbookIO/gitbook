@@ -113,7 +113,7 @@ describe('handleOpenAPIProxyRequest', () => {
     it('returns 403 when token is invalid', async () => {
         const res = await handleOpenAPIProxyRequest(
             createRequest(
-                'http://localhost/~scalar/proxy?scalar_url=https://api.example.com&allowed_host=api.example.com&token=bad-token'
+                'http://localhost/~scalar/proxy?scalar_url=https://api.example.com&allowed_origin=api.example.com&token=bad-token'
             )
         );
         await expectJsonError(res, 403, 'Invalid proxy authorization token');
@@ -124,7 +124,7 @@ describe('handleOpenAPIProxyRequest', () => {
         const res = await handleOpenAPIProxyRequest(
             createRequest(`${signed}&scalar_url=${encodeURIComponent('https://evil.com/hack')}`)
         );
-        await expectJsonError(res, 403, 'Target URL host is not in the allowed list');
+        await expectJsonError(res, 403, 'Target URL is not in the allowed origins');
     });
 
     it('returns 403 for private IPs even with valid token', async () => {
