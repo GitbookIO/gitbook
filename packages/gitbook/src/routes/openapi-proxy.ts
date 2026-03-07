@@ -1,6 +1,8 @@
 import { lookup } from 'node:dns/promises';
 import { isIP } from 'node:net';
 
+import { isAllowedByOrigins, verifyProxyRequest } from '@/lib/openapi/proxy-token';
+
 import { type NextRequest, NextResponse } from 'next/server';
 
 const MAX_REDIRECTS = 10;
@@ -126,6 +128,14 @@ export async function handleOpenAPIProxyRequest(request: NextRequest): Promise<R
         );
     }
 
+    // Host allowlist: verify the signed token and check the target URL is allowed.
+    // This prevents the proxy from being used as an open proxy for arbitrary URLs.
+    const verification = verifyProxyRequest(request.nextUrl.searchParams, targetUrl);
+    if (!verification.allowed) {
+        return NextResponse.json({ error: verification.reason }, { status: 403 });
+    }
+    const { allowedOrigins } = verification;
+
     let parsedUrl: URL;
     try {
         parsedUrl = new URL(targetUrl);
@@ -180,14 +190,18 @@ export async function handleOpenAPIProxyRequest(request: NextRequest): Promise<R
     const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
 
     try {
-        const response = await fetchWithRedirectValidation(targetUrl, {
-            method: request.method,
-            headers: forwardedHeaders,
-            body: request.body,
-            signal: controller.signal,
-            // @ts-ignore - duplex is required for streaming request bodies
-            duplex: 'half',
-        });
+        const response = await fetchWithRedirectValidation(
+            targetUrl,
+            {
+                method: request.method,
+                headers: forwardedHeaders,
+                body: request.body,
+                signal: controller.signal,
+                // @ts-ignore - duplex is required for streaming request bodies
+                duplex: 'half',
+            },
+            allowedOrigins
+        );
 
         // Build response headers, stripping transport headers and upstream CORS headers
         const responseHeaders = new Headers();
@@ -227,6 +241,7 @@ export async function handleOpenAPIProxyRequest(request: NextRequest): Promise<R
 async function fetchWithRedirectValidation(
     url: string,
     options: RequestInit & { duplex?: string },
+    allowedOrigins: string[],
     remaining = MAX_REDIRECTS
 ): Promise<Response> {
     const response = await fetch(url, { ...options, redirect: 'manual' });
@@ -250,6 +265,11 @@ async function fetchWithRedirectValidation(
         throw new Error('Redirect to private address is not allowed');
     }
 
+    // Check redirect target is within the allowed hosts (host + path prefix)
+    if (!isAllowedByOrigins(redirectUrl.toString(), allowedOrigins)) {
+        throw new Error('Redirect to a non-allowed host is not allowed');
+    }
+
     // 307/308 preserve method and body; others convert to GET
     const preserveMethod = response.status === 307 || response.status === 308;
     const redirectHeaders = new Headers(options.headers);
@@ -265,7 +285,12 @@ async function fetchWithRedirectValidation(
         redirectOptions = { ...options, method: 'GET', body: undefined, headers: redirectHeaders };
     }
 
-    return fetchWithRedirectValidation(redirectUrl.toString(), redirectOptions, remaining - 1);
+    return fetchWithRedirectValidation(
+        redirectUrl.toString(),
+        redirectOptions,
+        allowedOrigins,
+        remaining - 1
+    );
 }
 
 export function handleOpenAPIProxyOptions() {
