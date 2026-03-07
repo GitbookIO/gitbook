@@ -1,6 +1,5 @@
 import { describe, expect, it, mock } from 'bun:test';
 
-mock.module('server-only', () => ({}));
 mock.module('@/lib/env/globals', () => ({ GITBOOK_SECRET: 'test-secret-key' }));
 
 const { buildSignedProxyUrl, verifyProxyRequest } = await import('./proxy-token');

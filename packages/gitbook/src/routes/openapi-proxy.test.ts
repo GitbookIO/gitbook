@@ -2,7 +2,6 @@ import { afterEach, beforeEach, describe, expect, it, mock } from 'bun:test';
 
 const mockDnsLookup = mock(() => Promise.resolve([{ address: '93.184.215.14', family: 4 }]));
 mock.module('node:dns/promises', () => ({ lookup: mockDnsLookup }));
-mock.module('server-only', () => ({}));
 mock.module('@/lib/env/globals', () => ({ GITBOOK_SECRET: 'test-secret-key' }));
 
 import { NextRequest } from 'next/server';
