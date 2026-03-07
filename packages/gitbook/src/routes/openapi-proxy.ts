@@ -1,7 +1,7 @@
 import { lookup } from 'node:dns/promises';
 import { isIP } from 'node:net';
 
-import { verifyProxyRequest } from '@/lib/openapi/proxy-token';
+import { isAllowedByOrigins, verifyProxyRequest } from '@/lib/openapi/proxy-token';
 
 import { type NextRequest, NextResponse } from 'next/server';
 
@@ -134,7 +134,7 @@ export async function handleOpenAPIProxyRequest(request: NextRequest): Promise<R
     if (!verification.allowed) {
         return NextResponse.json({ error: verification.reason }, { status: 403 });
     }
-    const { allowedHosts } = verification;
+    const { allowedOrigins } = verification;
 
     let parsedUrl: URL;
     try {
@@ -200,7 +200,7 @@ export async function handleOpenAPIProxyRequest(request: NextRequest): Promise<R
                 // @ts-ignore - duplex is required for streaming request bodies
                 duplex: 'half',
             },
-            allowedHosts
+            allowedOrigins
         );
 
         // Build response headers, stripping transport headers and upstream CORS headers
@@ -241,7 +241,7 @@ export async function handleOpenAPIProxyRequest(request: NextRequest): Promise<R
 async function fetchWithRedirectValidation(
     url: string,
     options: RequestInit & { duplex?: string },
-    allowedHosts: string[],
+    allowedOrigins: string[],
     remaining = MAX_REDIRECTS
 ): Promise<Response> {
     const response = await fetch(url, { ...options, redirect: 'manual' });
@@ -265,8 +265,8 @@ async function fetchWithRedirectValidation(
         throw new Error('Redirect to private address is not allowed');
     }
 
-    // Check redirect target is within the allowed hosts
-    if (!allowedHosts.includes(redirectUrl.hostname)) {
+    // Check redirect target is within the allowed hosts (host + path prefix)
+    if (!isAllowedByOrigins(redirectUrl.toString(), allowedOrigins)) {
         throw new Error('Redirect to a non-allowed host is not allowed');
     }
 
@@ -288,7 +288,7 @@ async function fetchWithRedirectValidation(
     return fetchWithRedirectValidation(
         redirectUrl.toString(),
         redirectOptions,
-        allowedHosts,
+        allowedOrigins,
         remaining - 1
     );
 }

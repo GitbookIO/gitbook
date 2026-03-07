@@ -9,13 +9,13 @@ describe('buildSignedProxyUrl', () => {
         expect(buildSignedProxyUrl('http://localhost/proxy', [])).toBeNull();
     });
 
-    it('builds a URL with allowed_host and token params', () => {
+    it('builds a URL with allowed_origin and token params', () => {
         const result = buildSignedProxyUrl('http://localhost/proxy', ['api.example.com']);
         expect(result).not.toBeNull();
 
         // biome-ignore lint/style/noNonNullAssertion: test assertion
         const url = new URL(result!);
-        expect(url.searchParams.getAll('allowed_host')).toEqual(['api.example.com']);
+        expect(url.searchParams.getAll('allowed_origin')).toEqual(['api.example.com']);
         expect(url.searchParams.get('token')).toBeTruthy();
     });
 
@@ -34,7 +34,10 @@ describe('buildSignedProxyUrl', () => {
         ]);
         // biome-ignore lint/style/noNonNullAssertion: test assertion
         const url = new URL(result!);
-        expect(url.searchParams.getAll('allowed_host')).toEqual(['a.example.com', 'b.example.com']);
+        expect(url.searchParams.getAll('allowed_origin')).toEqual([
+            'a.example.com',
+            'b.example.com',
+        ]);
     });
 });
 
@@ -50,7 +53,7 @@ describe('verifyProxyRequest', () => {
 
     it('rejects when token is invalid', () => {
         const params = new URLSearchParams();
-        params.set('allowed_host', 'api.example.com');
+        params.set('allowed_origin', 'api.example.com');
         params.set('token', 'invalid-token');
         const result = verifyProxyRequest(params, 'https://api.example.com/v1/users');
         expect(result.allowed).toBe(false);
@@ -59,14 +62,14 @@ describe('verifyProxyRequest', () => {
         }
     });
 
-    it('rejects when target host is not in the allowed list', () => {
+    it('rejects when target is not in the allowed origins', () => {
         // biome-ignore lint/style/noNonNullAssertion: test assertion
         const signed = buildSignedProxyUrl('http://localhost/proxy', ['api.example.com'])!;
         const params = new URL(signed).searchParams;
         const result = verifyProxyRequest(params, 'https://evil.com/hack');
         expect(result.allowed).toBe(false);
         if (!result.allowed) {
-            expect(result.reason).toBe('Target URL host is not in the allowed list');
+            expect(result.reason).toBe('Target URL is not in the allowed origins');
         }
     });
 
@@ -77,7 +80,7 @@ describe('verifyProxyRequest', () => {
         const result = verifyProxyRequest(params, 'https://api.example.com/v1/users');
         expect(result.allowed).toBe(true);
         if (result.allowed) {
-            expect(result.allowedHosts).toEqual(['api.example.com']);
+            expect(result.allowedOrigins).toEqual(['api.example.com']);
         }
     });
 
@@ -105,14 +108,23 @@ describe('verifyProxyRequest', () => {
         const signed = buildSignedProxyUrl('http://localhost/proxy', ['api.example.com'])!;
         const url = new URL(signed);
 
-        // Tamper with the allowed hosts but keep the original token
-        url.searchParams.delete('allowed_host');
-        url.searchParams.append('allowed_host', 'evil.com');
+        // Tamper with the allowed origins but keep the original token
+        url.searchParams.delete('allowed_origin');
+        url.searchParams.append('allowed_origin', 'evil.com');
 
         const result = verifyProxyRequest(url.searchParams, 'https://evil.com/hack');
         expect(result.allowed).toBe(false);
         if (!result.allowed) {
             expect(result.reason).toBe('Invalid proxy authorization token');
         }
+    });
+
+    it('checks path prefix when origin includes a path', () => {
+        // biome-ignore lint/style/noNonNullAssertion: test assertion
+        const signed = buildSignedProxyUrl('http://localhost/proxy', ['api.example.com/v1'])!;
+        const params = new URL(signed).searchParams;
+
+        expect(verifyProxyRequest(params, 'https://api.example.com/v1/users').allowed).toBe(true);
+        expect(verifyProxyRequest(params, 'https://api.example.com/v2/users').allowed).toBe(false);
     });
 });

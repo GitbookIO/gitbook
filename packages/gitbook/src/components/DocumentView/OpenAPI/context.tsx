@@ -38,7 +38,7 @@ export function getOpenAPIContext(args: {
     return {
         specUrl,
         resolveProxyUrl: proxyUrl
-            ? (allowedHosts: string[]) => buildSignedProxyUrl(proxyUrl, allowedHosts)
+            ? (allowedOrigins: string[]) => buildSignedProxyUrl(proxyUrl, allowedOrigins)
             : undefined,
         icons: {
             chevronDown: <Icon icon="chevron-down" />,

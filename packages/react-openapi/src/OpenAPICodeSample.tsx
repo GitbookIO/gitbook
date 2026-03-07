@@ -11,7 +11,12 @@ import { generateMediaTypeExamples, generateSchemaExample } from './generateSche
 import { stringifyOpenAPI } from './stringifyOpenAPI';
 import type { OpenAPIOperationData } from './types';
 import { mergeHeaders } from './util/headers';
-import { getAllServerHosts, getDefaultServerURL, hasValidServerHost } from './util/server';
+import {
+    extractOrigin,
+    getAllServerOrigins,
+    getDefaultServerURL,
+    hasValidServerHost,
+} from './util/server';
 import {
     resolvePrefillCodePlaceholderFromSecurityScheme,
     resolveURLWithPrefillCodePlaceholdersFromServer,
@@ -267,14 +272,16 @@ function resolveScalarClientContext(
     const clientContext = getOpenAPIClientContext(context);
 
     if (context.resolveProxyUrl) {
-        // Collect all possible hostnames from spec servers + the spec URL itself
-        const hosts = getAllServerHosts(servers);
-        try {
-            hosts.push(new URL(specUrl).hostname);
-        } catch {
-            // specUrl might not be a valid absolute URL
+        // Collect all possible host+path entries from spec servers
+        const origins = getAllServerOrigins(servers);
+
+        // Add the spec URL so the proxy can resolve it
+        const specOrigin = extractOrigin(specUrl);
+        if (specOrigin) {
+            origins.push(specOrigin);
         }
-        clientContext.proxyUrl = context.resolveProxyUrl(hosts) ?? undefined;
+
+        clientContext.proxyUrl = context.resolveProxyUrl(origins) ?? undefined;
     }
 
     return clientContext;

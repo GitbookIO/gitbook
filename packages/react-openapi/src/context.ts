@@ -72,10 +72,10 @@ export interface OpenAPIContext
     specUrl: string;
 
     /**
-     * Build a signed proxy URL that restricts the proxy to specific hostnames.
-     * Called at render time (server-side) with the server hosts for an operation.
+     * Build a signed proxy URL that restricts the proxy to specific origins.
+     * Called at render time (server-side) with the server origins for an operation.
      */
-    resolveProxyUrl?: (allowedHosts: string[]) => string | null;
+    resolveProxyUrl?: (allowedOrigins: string[]) => string | null;
 }
 
 export type OpenAPIUniversalContext = OpenAPIClientContext | OpenAPIContext;

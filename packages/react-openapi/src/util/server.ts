@@ -65,36 +65,34 @@ export function hasValidServerHost(servers: OpenAPIV3.ServerObject[]): boolean {
 }
 
 /**
- * Get the unique hostnames from a list of servers (using default variable values).
+ * Get the unique host+path entries from a list of servers (using default variable values).
  * Used to build the allowlist for the OpenAPI proxy.
+ * Returns entries like "api.example.com/v1" (without protocol or trailing slash).
  */
-export function getAllServerHosts(servers: OpenAPIV3.ServerObject[]): string[] {
-    const hosts = new Set<string>();
+export function getAllServerOrigins(servers: OpenAPIV3.ServerObject[]): string[] {
+    const origins = new Set<string>();
 
     for (const server of servers) {
         const url = interpolateServerURL(server);
-        const hostname = extractHostname(url);
-        if (hostname) {
-            hosts.add(hostname);
+        const origin = extractOrigin(url);
+        if (origin) {
+            origins.add(origin);
         }
     }
 
-    return Array.from(hosts);
+    return Array.from(origins);
 }
 
 /**
- * Extract the hostname from a URL string, handling both full URLs and bare hostnames.
+ * Extract the host and path from a URL string by stripping the protocol and trailing slash.
+ * e.g. "https://api.example.com/v1/" → "api.example.com/v1"
  */
-function extractHostname(url: string): string | null {
-    try {
-        return new URL(url).hostname;
-    } catch {
-        // Bare hostname (no protocol) — validate it looks like a domain
-        if (isValidServerHost(url)) {
-            return url;
-        }
+export function extractOrigin(url: string): string | null {
+    const stripped = url.replace(/^https?:\/\//, '').replace(/\/+$/, '');
+    if (!stripped) {
         return null;
     }
+    return stripped;
 }
 
 /**
