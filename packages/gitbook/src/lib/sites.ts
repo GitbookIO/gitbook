@@ -1,5 +1,11 @@
 import type { GitBookSiteContext } from '@/lib/context';
-import type { SiteSection, SiteSectionGroup, SiteSpace, SiteStructure } from '@gitbook/api';
+import type {
+    SiteSection,
+    SiteSectionGroup,
+    SiteSpace,
+    SiteStructure,
+    TranslationLanguage,
+} from '@gitbook/api';
 import { joinPath } from './paths';
 import { flattenSectionsFromGroup } from './utils';
 
@@ -176,4 +182,23 @@ function findSiteSpaceByIdInSiteSpaces(
     predicate: (siteSpace: SiteSpace) => boolean
 ): SiteSpace | null {
     return siteSpaces.find(predicate) ?? null;
+}
+
+/**
+ * Get the appropriate title for a siteSection.
+ * Uses localizedTitle if available and current language is provided, otherwise uses title.
+ */
+export function getSiteSectionTitle(
+    siteSection: SiteSection,
+    currentLanguage: TranslationLanguage | undefined
+): string {
+    if (
+        siteSection.localizedTitle &&
+        currentLanguage &&
+        siteSection.localizedTitle[currentLanguage]
+    ) {
+        return siteSection.localizedTitle[currentLanguage];
+    }
+
+    return siteSection.title;
 }
