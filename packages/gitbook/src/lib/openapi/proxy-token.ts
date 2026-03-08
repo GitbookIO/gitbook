@@ -46,7 +46,8 @@ export function buildSignedProxyUrl(baseProxyUrl: string, allowedOrigins: string
     }
     params.set('token', signature);
 
-    return `${baseProxyUrl}?${params.toString()}`;
+    const separator = baseProxyUrl.includes('?') ? '&' : '?';
+    return `${baseProxyUrl}${separator}${params.toString()}`;
 }
 
 /**
