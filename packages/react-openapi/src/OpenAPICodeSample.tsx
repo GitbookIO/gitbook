@@ -11,7 +11,12 @@ import { generateMediaTypeExamples, generateSchemaExample } from './generateSche
 import { stringifyOpenAPI } from './stringifyOpenAPI';
 import type { OpenAPIOperationData } from './types';
 import { mergeHeaders } from './util/headers';
-import { getDefaultServerURL, hasValidServerHost } from './util/server';
+import {
+    extractOrigin,
+    getAllServerOrigins,
+    getDefaultServerURL,
+    hasValidServerHost,
+} from './util/server';
 import {
     resolvePrefillCodePlaceholderFromSecurityScheme,
     resolveURLWithPrefillCodePlaceholdersFromServer,
@@ -242,7 +247,7 @@ function OpenAPICodeSampleFooter(props: {
             )}
             {!hideTryItPanel && hasValidHost && (
                 <ScalarApiButton
-                    context={getOpenAPIClientContext(context)}
+                    context={resolveScalarClientContext(context, servers, specUrl)}
                     withProxy={Boolean(data.operation['x-enable-proxy'] ?? data['x-enable-proxy'])}
                     method={method}
                     path={path}
@@ -253,6 +258,33 @@ function OpenAPICodeSampleFooter(props: {
             )}
         </div>
     );
+}
+
+/**
+ * Build the client context for ScalarApiButton, resolving the signed proxy URL
+ * with the allowed server hosts for SSRF protection.
+ */
+function resolveScalarClientContext(
+    context: OpenAPIContext,
+    servers: OpenAPIOperationData['servers'],
+    specUrl: string
+) {
+    const clientContext = getOpenAPIClientContext(context);
+
+    if (context.resolveProxyUrl) {
+        // Collect all possible host+path entries from spec servers
+        const origins = getAllServerOrigins(servers);
+
+        // Add the spec URL so the proxy can resolve it
+        const specOrigin = extractOrigin(specUrl);
+        if (specOrigin) {
+            origins.push(specOrigin);
+        }
+
+        clientContext.proxyUrl = context.resolveProxyUrl(origins) ?? undefined;
+    }
+
+    return clientContext;
 }
 
 /**

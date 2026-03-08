@@ -45,7 +45,8 @@ export interface OpenAPIClientContext {
     $$isClientContext$$: true;
 }
 
-export interface OpenAPIContext extends Omit<OpenAPIClientContext, '$$isClientContext$$'> {
+export interface OpenAPIContext
+    extends Omit<OpenAPIClientContext, '$$isClientContext$$' | 'proxyUrl'> {
     /**
      * Render a code block.
      */
@@ -69,6 +70,12 @@ export interface OpenAPIContext extends Omit<OpenAPIClientContext, '$$isClientCo
      * Specification URL.
      */
     specUrl: string;
+
+    /**
+     * Build a signed proxy URL that restricts the proxy to specific origins.
+     * Called at render time (server-side) with the server origins for an operation.
+     */
+    resolveProxyUrl?: (allowedOrigins: string[]) => string | null;
 }
 
 export type OpenAPIUniversalContext = OpenAPIClientContext | OpenAPIContext;
@@ -102,7 +109,7 @@ export function getOpenAPIClientContext(context: OpenAPIUniversalContext): OpenA
         defaultInteractiveOpened: context.defaultInteractiveOpened,
         blockKey: context.blockKey,
         id: context.id,
-        proxyUrl: context.proxyUrl,
+        proxyUrl: '$$isClientContext$$' in context ? context.proxyUrl : undefined,
         $$isClientContext$$: true,
     };
 }
