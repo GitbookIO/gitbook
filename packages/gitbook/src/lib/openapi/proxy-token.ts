@@ -40,14 +40,13 @@ export function buildSignedProxyUrl(baseProxyUrl: string, allowedOrigins: string
         return null;
     }
 
-    const params = new URLSearchParams();
+    const url = new URL(baseProxyUrl);
     for (const origin of origins) {
-        params.append('allowed_origin', origin);
+        url.searchParams.append('allowed_origin', origin);
     }
-    params.set('token', signature);
+    url.searchParams.set('token', signature);
 
-    const separator = baseProxyUrl.includes('?') ? '&' : '?';
-    return `${baseProxyUrl}${separator}${params.toString()}`;
+    return url.toString();
 }
 
 /**
