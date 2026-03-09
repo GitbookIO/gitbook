@@ -501,4 +501,29 @@ describe('decodeURLPath', () => {
         expect(result.search).toBe('?query=%74est');
         expect(result.hash).toBe('#sec%74ion');
     });
+
+    it('should not apply the path length limit to a jwt_token query param', () => {
+        // A massive fake JWT token (header.payload.signature, all base64url)
+        const fakeJwt = `${'a'.repeat(500)}.${'b'.repeat(500)}.${'c'.repeat(500)}`;
+        const url = new URL(`https://docs.mycompany.com/short-path?jwt_token=${fakeJwt}`);
+        // The path itself is well within the limit; only the query param is huge.
+        expect(url.pathname.length).toBeLessThan(2048);
+        const result = decodeURLPath(url);
+        expect(result.pathname).toBe('/short-path');
+        // The query string must pass through untouched.
+        expect(result.searchParams.get('jwt_token')).toBe(fakeJwt);
+    });
+
+    it('should not affect rison-encoded query params', () => {
+        // Rison uses characters such as '(', ')', '!', "'" and ':' that are
+        // valid inside query strings but would be rejected if found in the path.
+        const risonValue = "(id:!(1,2,3),name:'hello world',flag:!t)";
+        const url = new URL(
+            `https://docs.mycompany.com/some-page?filter=${encodeURIComponent(risonValue)}`
+        );
+        const result = decodeURLPath(url);
+        expect(result.pathname).toBe('/some-page');
+        // The rison param must survive decodeURLPath intact.
+        expect(result.searchParams.get('filter')).toBe(risonValue);
+    });
 });
