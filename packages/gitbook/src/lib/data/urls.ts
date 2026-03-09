@@ -135,7 +135,26 @@ export function normalizeURL(url: URL) {
  * "%" itself is excluded because it could be multiple encoding.
  */
 function containInvalidURLCharacters(segment: string): boolean {
-    const invalidCharacters = [':', '/', '?', '#', '[', ']', '@', '!', '$', '&', "'", '(', ')', '*', '+', ',', ';', '='];
+    const invalidCharacters = [
+        ':',
+        '/',
+        '?',
+        '#',
+        '[',
+        ']',
+        '@',
+        '!',
+        '$',
+        '&',
+        "'",
+        '(',
+        ')',
+        '*',
+        '+',
+        ',',
+        ';',
+        '=',
+    ];
     return invalidCharacters.some((char) => segment.includes(char));
 }
 
@@ -143,31 +162,51 @@ function containInvalidURLCharacters(segment: string): boolean {
  * Decode the url path component, we redirect URLs with encoded path components
  * so that we don't end up with multiple URLs for the same content (especially important because of caching).
  * If after decoding the path contains invalid characters, we throw an error.
- * We limit the number of decoding iterations to avoid potential DoS attacks with double-encoding.
+ * We limit the number of decoding passes to 2 to prevent DoS attacks via deeply-nested
+ * percent-encoding. Legitimate URLs are at most singly encoded; double-encoding covers
+ * any reasonable proxy behaviour.
  */
-export function decodeURLPath(url: URL, i = 0): URL {
-    const decoded = new URL(url);
-    decoded.pathname = url.pathname.split('/').map(segment => {
-        const result = decodeURIComponent(segment)
-        if (containInvalidURLCharacters(result)) {
-            throw new DataFetcherError(`URL path contains invalid characters: ${url.toString()}`, 400);
+export function decodeURLPath(url: URL): URL {
+    // Reject excessively long paths up-front to bound per-request work.
+    if (url.pathname.length > 2048) {
+        throw new DataFetcherError(`URL path is too long: ${url.toString()}`, 400);
+    }
+
+    let current = url;
+
+    for (let i = 0; i < 2; i++) {
+        const decoded = new URL(current);
+        decoded.pathname = current.pathname
+            .split('/')
+            .map((segment) => {
+                const result = decodeURIComponent(segment);
+                if (containInvalidURLCharacters(result)) {
+                    throw new DataFetcherError(
+                        `URL path contains invalid characters: ${url.toString()}`,
+                        400
+                    );
+                }
+                return result;
+            })
+            .join('/');
+
+        if (decoded.pathname === current.pathname) {
+            // Path is stable: the URL parser has re-encoded the decoded characters
+            // back to their percent-encoded form (e.g. space → %20). This is the
+            // canonical representation — decoding is complete.
+            return decoded;
         }
-        return result;
-    }).join('/');
-    let result = decoded;
-    if(decoded.pathname !== url.pathname) {
-        result = normalizeURL(decoded);
+
+        current = normalizeURL(decoded);
+
+        if (!current.pathname.includes('%')) {
+            // No remaining encoded characters – decoding is complete.
+            return current;
+        }
     }
-    //TODO: Do we want to allow more than 3 iterations? Maybe even only 1?
-    // We limit to 3 iterations of decoding to avoid potential DoS attacks with double-encoding
-    if(result.pathname.includes('%') && i < 3) {
-        return decodeURLPath(result, i + 1);
-    }
-    // If we are over 3 iterations and still have encoded characters, we consider the URL invalid
-    if(result.pathname.includes('%') && i >= 3) {
-        throw new DataFetcherError(`URL path is malformed: ${url.toString()}`, 400);
-    }
-    return result;
+
+    // Still has encoded characters after the maximum number of decoding passes.
+    throw new DataFetcherError(`URL path is malformed: ${url.toString()}`, 400);
 }
 
 /**
