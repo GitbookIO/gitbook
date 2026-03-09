@@ -1,4 +1,5 @@
 import { isProxyRootRequest } from '../proxy';
+import { DataFetcherError } from './errors';
 
 /**
  * For a given GitBook URL, return a list of alternative URLs that could be matched against to lookup the content.
@@ -125,6 +126,93 @@ export function normalizeURL(url: URL) {
     const result = new URL(url);
     result.pathname = url.pathname.replace(/\/{2,}/g, '/').replace(/\/$/, '');
     return result;
+}
+
+/**
+ * This function checks if a decoded URL path segment contains characters that are not allowed
+ * in GitBook content paths. These characters are valid in generic RFC 3986 URL paths, but are
+ * rejected here as an application-level constraint for GitBook routing and security.
+ * https://developer.mozilla.org/en-US/docs/Glossary/Percent-encoding
+ * "%" itself is excluded because it could be part of percent-encoding and may require decoding.
+ */
+function containsInvalidURLCharacters(segment: string): boolean {
+    const invalidCharacters = [
+        ':',
+        '/',
+        '?',
+        '#',
+        '[',
+        ']',
+        '@',
+        '!',
+        '$',
+        '&',
+        "'",
+        '(',
+        ')',
+        '*',
+        '+',
+        ',',
+        ';',
+        '=',
+    ];
+    return invalidCharacters.some((char) => segment.includes(char));
+}
+
+/**
+ * Decode the url path component, we redirect URLs with encoded path components
+ * so that we don't end up with multiple URLs for the same content (especially important because of caching).
+ * If after decoding the path contains invalid characters, we throw an error.
+ * We limit the number of decoding passes to 2 to prevent DoS attacks via deeply-nested
+ * percent-encoding. Legitimate URLs are at most singly encoded; double-encoding covers
+ * any reasonable proxy behaviour.
+ */
+export function decodeURLPath(url: URL): URL {
+    // Reject excessively long paths up-front to bound per-request work.
+    if (url.pathname.length > 2048) {
+        throw new DataFetcherError(`URL path is too long: ${url.pathname}`, 400);
+    }
+
+    let current = url;
+
+    for (let i = 0; i < 2; i++) {
+        const decoded = new URL(current);
+        decoded.pathname = current.pathname
+            .split('/')
+            .map((segment) => {
+                let result: string;
+                try {
+                    result = decodeURIComponent(segment);
+                } catch {
+                    throw new DataFetcherError(`URL path is malformed: ${url.pathname}`, 400);
+                }
+                if (containsInvalidURLCharacters(result)) {
+                    throw new DataFetcherError(
+                        `URL path contains invalid characters: ${url.pathname}`,
+                        400
+                    );
+                }
+                return result;
+            })
+            .join('/');
+
+        if (decoded.pathname === current.pathname) {
+            // Path is stable: the URL parser has re-encoded the decoded characters
+            // back to their percent-encoded form (e.g. space → %20). This is the
+            // canonical representation — decoding is complete.
+            return decoded;
+        }
+
+        current = normalizeURL(decoded);
+
+        if (!current.pathname.includes('%')) {
+            // No remaining encoded characters – decoding is complete.
+            return current;
+        }
+    }
+
+    // Still has encoded characters after the maximum number of decoding passes.
+    throw new DataFetcherError(`URL path is malformed: ${url.pathname}`, 400);
 }
 
 /**
