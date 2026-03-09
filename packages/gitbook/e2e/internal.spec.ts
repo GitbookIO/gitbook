@@ -991,6 +991,11 @@ const testCases: TestsCase[] = [
                 url: 'blocks/columns',
                 run: waitForCookiesDialog,
             },
+            {
+                name: 'Mermaid',
+                url: 'blocks/mermaid',
+                run: waitForCookiesDialog,
+            },
         ],
     },
     {
