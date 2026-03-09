@@ -340,10 +340,13 @@ export async function resolveContentRef(
                 return null;
             }
             return {
-                href: openAPISpecVersionContent.url,
+                // @ts-expect-error - Backward compatibility: `urls.source` replaces `url` in the next API version
+                href: openAPISpecVersionContent.urls?.source ?? openAPISpecVersionContent.url,
                 text: contentRef.spec,
                 active: false,
                 openAPIFilesystem: openAPISpecVersionContent.filesystem as Filesystem,
+                // @ts-expect-error - Public URL is not yet supported in the API
+                publicURL: openAPISpecVersionContent.urls?.public,
             };
         }
 
