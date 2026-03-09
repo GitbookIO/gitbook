@@ -428,6 +428,23 @@ describe('decodeURLPath', () => {
         }).toThrow('URL path is malformed');
     });
 
+    it('should throw for malformed percent-encoding in the path', () => {
+        // Invalid hex digits in percent-encoding
+        expect(() => {
+            decodeURLPath(new URL('https://docs.mycompany.com/helloworld/%ZZ'));
+        }).toThrow('URL path is malformed');
+
+        // Incomplete or invalid UTF-8 sequence
+        expect(() => {
+            decodeURLPath(new URL('https://docs.mycompany.com/helloworld/%E0%A4%A'));
+        }).toThrow('URL path is malformed');
+
+        // Trailing '%' without two following hex digits
+        expect(() => {
+            decodeURLPath(new URL('https://docs.mycompany.com/helloworld/trailing%'));
+        }).toThrow('URL path is malformed');
+    });
+
     it('should throw an error for invalid characters in the path', () => {
         expect(() => {
             decodeURLPath(new URL('https://docs.mycompany.com/hello:world'));

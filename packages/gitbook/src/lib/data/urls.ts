@@ -129,12 +129,13 @@ export function normalizeURL(url: URL) {
 }
 
 /**
- * This function checks if the URL path contains invalid characters that should not be present in a valid URL path.
- * If such characters are found, it indicates that the URL is malformed or potentially malicious and should be rejected.
+ * This function checks if a decoded URL path segment contains characters that are not allowed
+ * in GitBook content paths. These characters are valid in generic RFC 3986 URL paths, but are
+ * rejected here as an application-level constraint for GitBook routing and security.
  * https://developer.mozilla.org/en-US/docs/Glossary/Percent-encoding
- * "%" itself is excluded because it could be multiple encoding.
+ * "%" itself is excluded because it could be part of percent-encoding and may require decoding.
  */
-function containInvalidURLCharacters(segment: string): boolean {
+function containsInvalidURLCharacters(segment: string): boolean {
     const invalidCharacters = [
         ':',
         '/',
@@ -169,7 +170,7 @@ function containInvalidURLCharacters(segment: string): boolean {
 export function decodeURLPath(url: URL): URL {
     // Reject excessively long paths up-front to bound per-request work.
     if (url.pathname.length > 2048) {
-        throw new DataFetcherError(`URL path is too long: ${url.toString()}`, 400);
+        throw new DataFetcherError(`URL path is too long: ${url.pathname}`, 400);
     }
 
     let current = url;
@@ -179,10 +180,15 @@ export function decodeURLPath(url: URL): URL {
         decoded.pathname = current.pathname
             .split('/')
             .map((segment) => {
-                const result = decodeURIComponent(segment);
-                if (containInvalidURLCharacters(result)) {
+                let result: string;
+                try {
+                    result = decodeURIComponent(segment);
+                } catch {
+                    throw new DataFetcherError(`URL path is malformed: ${url.pathname}`, 400);
+                }
+                if (containsInvalidURLCharacters(result)) {
                     throw new DataFetcherError(
-                        `URL path contains invalid characters: ${url.toString()}`,
+                        `URL path contains invalid characters: ${url.pathname}`,
                         400
                     );
                 }
@@ -206,7 +212,7 @@ export function decodeURLPath(url: URL): URL {
     }
 
     // Still has encoded characters after the maximum number of decoding passes.
-    throw new DataFetcherError(`URL path is malformed: ${url.toString()}`, 400);
+    throw new DataFetcherError(`URL path is malformed: ${url.pathname}`, 400);
 }
 
 /**
