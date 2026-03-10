@@ -1,3 +1,4 @@
+import { backgroundColorToStyle, textColorToStyle } from '@/components/DocumentView/utils/colors';
 import { Emoji } from '@/components/primitives';
 import { tcls } from '@/lib/tailwind';
 import type { RevisionTag } from '@gitbook/api';
@@ -8,13 +9,17 @@ import { Icon, type IconName } from '@gitbook/icons';
  */
 export function Tag(props: { tag: RevisionTag; className?: string }) {
     const { tag, className } = props;
+    const hasColor = tag.color !== 'default';
 
     return (
         <span
             data-tag=""
             title={tag.label}
             className={tcls(
-                'inline-flex items-center gap-1 rounded-full bg-tint-5 px-2 py-1 font-medium text-tint-strong text-xs leading-normal contrast-more:ring-1 contrast-more:ring-tint',
+                'inline-flex items-center gap-1 rounded-full px-2 py-1 font-medium text-xs leading-normal contrast-more:ring-1 contrast-more:ring-tint',
+                hasColor
+                    ? [backgroundColorToStyle[tag.color], textColorToStyle[tag.color]]
+                    : 'bg-tint-5 text-tint-strong',
                 className
             )}
         >
