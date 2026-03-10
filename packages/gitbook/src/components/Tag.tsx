@@ -1,5 +1,5 @@
-import { backgroundColorToStyle, textColorToStyle } from '@/components/DocumentView/utils/colors';
 import { Emoji } from '@/components/primitives';
+import { backgroundColorToStyle, textColorToStyle } from '@/lib/colors';
 import { tcls } from '@/lib/tailwind';
 import type { RevisionTag } from '@gitbook/api';
 import { Icon, type IconName } from '@gitbook/icons';
