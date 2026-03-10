@@ -12,8 +12,8 @@ import type {
 } from '@gitbook/api';
 import React from 'react';
 
+import { backgroundColorToStyle, textColorToStyle } from '@/lib/colors';
 import { tcls } from '@/lib/tailwind';
-import { backgroundColorToStyle, textColorToStyle } from './utils/colors';
 
 export function Text(props: { text: DocumentText }) {
     const { text } = props;
