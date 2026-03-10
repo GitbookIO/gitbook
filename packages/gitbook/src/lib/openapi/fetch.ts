@@ -50,10 +50,20 @@ export async function fetchOpenAPIFilesystem(
         throw new OpenAPIParseError(result.error.message, { code: result.error.code });
     }
 
+    const publicURL = (() => {
+        // For new OpenAPI refs, use the explicit publicURL (null when spec is private).
+        if (ref.kind === 'openapi' && resolved.openapi) {
+            return resolved.openapi.publicURL;
+        }
+
+        // For legacy "swagger" refs, the href is the public spec URL itself.
+        return resolved.href;
+    })();
+
     return {
         filesystem: result,
         specUrl: resolved.href,
-        publicURL: resolved.openapi?.publicURL ?? null,
+        publicURL,
     };
 }
 
