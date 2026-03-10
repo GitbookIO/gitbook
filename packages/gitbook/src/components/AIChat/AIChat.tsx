@@ -92,7 +92,7 @@ export function AIChat() {
                         <AIChatDynamicIcon trademark={config.trademark} />
                         <EmbeddableFrameHeaderMain>
                             <EmbeddableFrameTitle>
-                                {getAIChatName(language, config.trademark)}
+                                {config.assistantName ?? getAIChatName(language, config.trademark)}
                             </EmbeddableFrameTitle>
                             <AIChatSubtitle chat={chat} />
                         </EmbeddableFrameHeaderMain>

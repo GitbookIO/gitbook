@@ -27,6 +27,7 @@ export function GitBookFrame(props: GitBookFrameProps) {
         tabs = ['assistant', 'docs'],
         trademark = true,
         closeButton = false,
+        assistantName,
     } = props;
 
     const frameRef = useRef<HTMLIFrameElement>(null);
@@ -50,8 +51,19 @@ export function GitBookFrame(props: GitBookFrameProps) {
             tools,
             closeButton,
             trademark,
+            assistantName,
         });
-    }, [gitbookFrame, actions, greeting, suggestions, tools, tabs, closeButton, trademark]);
+    }, [
+        gitbookFrame,
+        actions,
+        greeting,
+        suggestions,
+        tools,
+        tabs,
+        closeButton,
+        trademark,
+        assistantName,
+    ]);
 
     return (
         <iframe
