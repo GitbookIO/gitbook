@@ -38,6 +38,8 @@ export type FetchOpenAPIFilesystemResult =
           error?: undefined;
           filesystem: Filesystem<OpenAPIV3xDocument> | null;
           specUrl: string | null;
+          /** Public URL of the OpenAPI spec, used as the spec URL for Scalar's "Test it" modal */
+          publicURL: string | null;
       }
     | FetchOpenAPIFilesystemError;
 
@@ -48,13 +50,14 @@ type FetchOpenAPIFilesystemError = {
     error: OpenAPIParseError;
     filesystem?: undefined;
     specUrl?: undefined;
+    publicURL?: undefined;
 };
 
 /**
  * Resolved OpenAPI block result.
  */
 export type ResolveOpenAPIBlockResult<T> =
-    | { error?: undefined; data: T | null; specUrl: string | null }
+    | { error?: undefined; data: T | null; specUrl: string | null; publicURL: string | null }
     | ResolveOpenAPIBlockError;
 
 /**
@@ -64,4 +67,5 @@ type ResolveOpenAPIBlockError = {
     error: OpenAPIParseError;
     data?: undefined;
     specUrl?: undefined;
+    publicURL?: undefined;
 };

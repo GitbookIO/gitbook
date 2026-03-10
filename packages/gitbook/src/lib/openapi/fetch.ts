@@ -33,14 +33,14 @@ export async function fetchOpenAPIFilesystem(
     const resolved = ref ? await resolveContentRef(ref, context) : null;
 
     if (!resolved) {
-        return { filesystem: null, specUrl: null };
+        return { filesystem: null, specUrl: null, publicURL: null };
     }
 
     const result = await (() => {
         // If the reference is a new OpenAPI reference, we return it.
         if (ref.kind === 'openapi') {
-            assert(resolved.openAPIFilesystem);
-            return resolved.openAPIFilesystem;
+            assert(resolved.openapi?.filesystem);
+            return resolved.openapi.filesystem;
         }
         // For legacy blocks ("swagger"), we need to fetch the file system.
         return fetchFilesystem(resolved.href, context.space.id);
@@ -50,7 +50,11 @@ export async function fetchOpenAPIFilesystem(
         throw new OpenAPIParseError(result.error.message, { code: result.error.code });
     }
 
-    return { filesystem: result, specUrl: resolved.href };
+    return {
+        filesystem: result,
+        specUrl: resolved.href,
+        publicURL: resolved.openapi?.publicURL ?? null,
+    };
 }
 
 /**

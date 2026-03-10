@@ -67,9 +67,10 @@ export interface OpenAPIContext
     renderDocument: (props: { document: object }) => React.ReactNode;
 
     /**
-     * Specification URL.
+     * Public specification URL, used by Scalar's "Test it" modal.
+     * When null, the "Test it" button is hidden.
      */
-    specUrl: string;
+    specUrl: string | null;
 
     /**
      * Build a signed proxy URL that restricts the proxy to specific origins.

@@ -245,7 +245,7 @@ function OpenAPICodeSampleFooter(props: {
             ) : (
                 <span />
             )}
-            {!hideTryItPanel && hasValidHost && (
+            {!hideTryItPanel && hasValidHost && specUrl && (
                 <ScalarApiButton
                     context={resolveScalarClientContext(context, servers, specUrl)}
                     withProxy={Boolean(data.operation['x-enable-proxy'] ?? data['x-enable-proxy'])}
