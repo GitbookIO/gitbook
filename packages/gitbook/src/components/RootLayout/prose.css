@@ -266,6 +266,9 @@
       color: var(--tw-prose-code);
       font-weight: var(--font-weight-normal);
       font-size: 0.875em;
+      white-space: nowrap;
+      word-break: normal;
+      overflow-wrap: normal;
     }
   
     & code::before {
@@ -336,6 +339,7 @@
       font-size: inherit;
       font-family: inherit;
       line-height: inherit;
+      white-space: pre;
     }
   
     & pre code::before {
