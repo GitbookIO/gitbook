@@ -42,3 +42,10 @@ export function isExternalLink(href: string, origin: string | null = null) {
     // Then compare the pathname by adding "/" to ensure we don't match "gitbook.com/docs-x"
     return !parsed.pathname.startsWith(withTrailingSlash(originUrl.pathname));
 }
+
+/**
+ * Remove "~gitbook/embed/page" or "~gitbook/embed" in the link.
+ */
+export function toNonEmbedLink(href: string) {
+    return href.replace(/~gitbook\/embed(\/page)?\/?/, '');
+}
