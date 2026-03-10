@@ -6,7 +6,7 @@ import React from 'react';
 import { tcls } from '@/lib/tailwind';
 import { type TrackEventInput, useTrackEvent } from '../Insights';
 import { NavigationStatusContext } from '../hooks';
-import { isExternalLink } from '../utils/link';
+import { isExternalLink, toNonEmbedLink } from '../utils/link';
 import { type DesignTokenName, useClassnames } from './StyleProvider';
 
 // Props from Next, which includes NextLinkProps and all the things anchor elements support.
@@ -160,13 +160,6 @@ export function Link(props: LinkProps) {
             {children}
         </NextLink>
     );
-}
-
-/**
- * Remove "~gitbook/embed/page" or "~gitbook/embed" at the end of the link.
- */
-function toNonEmbedLink(href: string) {
-    return href.replace(/~gitbook\/embed(?:\/page)?$/, '');
 }
 
 /**

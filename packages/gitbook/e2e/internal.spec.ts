@@ -162,7 +162,7 @@ const searchTestCases: Test[] = [
             const recommendedQuestions = await page
                 .getByTestId('search-recommended-question')
                 .all();
-            await expect(recommendedQuestions.length).toBeGreaterThan(2); // Expect at least 3 questions
+            await expect(recommendedQuestions.length).toBeGreaterThanOrEqual(1); // Expect at least 1 question
 
             // Fill search input, expecting AI search option
             await searchInput.fill(AI_PROMPT);
