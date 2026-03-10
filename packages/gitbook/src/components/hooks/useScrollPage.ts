@@ -6,6 +6,25 @@ import { usePathname } from 'next/navigation';
 import { useHash } from './useHash';
 import { usePrevious } from './usePrevious';
 
+const SCROLL_PAGE_INITIAL_LOAD_KEY = '__gitbookScrollPageInitialLoadHandled';
+
+type ScrollPageWindow = Window & {
+    [SCROLL_PAGE_INITIAL_LOAD_KEY]?: boolean;
+};
+
+/**
+ * Check if it's an initial page load outside of React tree.
+ */
+function isInitialPageLoad() {
+    const scrollPageWindow = window as ScrollPageWindow;
+    if (scrollPageWindow[SCROLL_PAGE_INITIAL_LOAD_KEY]) {
+        return false;
+    }
+
+    scrollPageWindow[SCROLL_PAGE_INITIAL_LOAD_KEY] = true;
+    return true;
+}
+
 /**
  * Handles scroll behavior when the URL hash changes during client-side navigation.
  */
@@ -18,7 +37,13 @@ function useScrollPage() {
         // Never scroll on initial rendering to avoid blocking:
         // • Native browser hash scrolling
         // • Scroll-to-text fragments (undetectable)
-        if (previous === undefined || (previous.hash === hash && previous.pathname === pathname)) {
+        if (previous === undefined) {
+            // If previous is undefined, we rely on a check outside React tree,
+            // sections are remounting everything so we can't rely on React.
+            if (isInitialPageLoad()) {
+                return;
+            }
+        } else if (previous.hash === hash && previous.pathname === pathname) {
             return;
         }
 
