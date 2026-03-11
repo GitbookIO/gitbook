@@ -112,6 +112,8 @@ export async function resolveContentRefInDocument(
         }
     }
 
+    console.log('resolveContentRefInDocument', contentRef, context, options);
+
     return resolveContentRef(contentRef, context, options);
 }
 
