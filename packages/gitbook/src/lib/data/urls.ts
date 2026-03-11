@@ -186,12 +186,13 @@ export function decodeURLPath(url: URL): URL {
                 } catch {
                     throw new DataFetcherError(`URL path is malformed: ${url.pathname}`, 400);
                 }
-                if (containsInvalidURLCharacters(result)) {
-                    throw new DataFetcherError(
-                        `URL path contains invalid characters: ${url.pathname}`,
-                        400
-                    );
-                }
+                // TODO: We should reenable this at one point, we just need to be more careful with what's allowed or not.
+                // if (containsInvalidURLCharacters(result)) {
+                //     throw new DataFetcherError(
+                //         `URL path contains invalid characters: ${url.pathname}`,
+                //         400
+                //     );
+                // }
                 return result;
             })
             .join('/');
