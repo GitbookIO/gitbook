@@ -771,7 +771,7 @@ const testCases: TestsCase[] = [
                     const searchParams = new URLSearchParams();
                     searchParams.set('token', data.apiToken);
 
-                    return `preview/${data.site}/?${searchParams.toString()}`;
+                    return `${data.site}/?${searchParams.toString()}`;
                 },
                 screenshot: false,
                 run: async (page) => {
@@ -786,7 +786,7 @@ const testCases: TestsCase[] = [
                     const searchParams = new URLSearchParams();
                     searchParams.set('token', data.apiToken);
 
-                    return `preview/${data.site}/?${searchParams.toString()}`;
+                    return `${data.site}/?${searchParams.toString()}`;
                 },
                 screenshot: false,
                 run: async (page) => {
