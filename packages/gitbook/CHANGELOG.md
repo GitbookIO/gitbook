@@ -1,5 +1,24 @@
 # gitbook
 
+## 0.22.3
+
+### Patch Changes
+
+- f182680: Add backward compatibility for OpenAPI spec content URL
+- bdc6cd9: Use OpenAPI publicURL as Scalar specUrl
+- b3875a1: Refactor embeddable context to merge local & site properties in one unified way
+- eceec6f: Move ~scalar/proxy route to site route group
+- 887c3f8: Add token verification on OpenAPI proxy
+- d666212: Add support for localized site section titles
+- Updated dependencies [b3875a1]
+- Updated dependencies [bdc6cd9]
+- Updated dependencies [8ab419a]
+- Updated dependencies [eceec6f]
+- Updated dependencies [887c3f8]
+  - @gitbook/embed@0.4.0
+  - @gitbook/react-openapi@1.5.10
+  - @gitbook/openapi-parser@3.0.10
+
 ## 0.22.2
 
 ### Patch Changes
