@@ -135,29 +135,29 @@ export function normalizeURL(url: URL) {
  * https://developer.mozilla.org/en-US/docs/Glossary/Percent-encoding
  * "%" itself is excluded because it could be part of percent-encoding and may require decoding.
  */
-function containsInvalidURLCharacters(segment: string): boolean {
-    const invalidCharacters = [
-        ':',
-        '/',
-        '?',
-        '#',
-        '[',
-        ']',
-        '@',
-        '!',
-        '$',
-        '&',
-        "'",
-        '(',
-        ')',
-        '*',
-        '+',
-        ',',
-        ';',
-        '=',
-    ];
-    return invalidCharacters.some((char) => segment.includes(char));
-}
+// function containsInvalidURLCharacters(segment: string): boolean {
+//     const invalidCharacters = [
+//         ':',
+//         '/',
+//         '?',
+//         '#',
+//         '[',
+//         ']',
+//         '@',
+//         '!',
+//         '$',
+//         '&',
+//         "'",
+//         '(',
+//         ')',
+//         '*',
+//         '+',
+//         ',',
+//         ';',
+//         '=',
+//     ];
+//     return invalidCharacters.some((char) => segment.includes(char));
+// }
 
 /**
  * Decode the url path component, we redirect URLs with encoded path components
@@ -186,12 +186,13 @@ export function decodeURLPath(url: URL): URL {
                 } catch {
                     throw new DataFetcherError(`URL path is malformed: ${url.pathname}`, 400);
                 }
-                if (containsInvalidURLCharacters(result)) {
-                    throw new DataFetcherError(
-                        `URL path contains invalid characters: ${url.pathname}`,
-                        400
-                    );
-                }
+                // TODO: We should reenable this at one point, we just need to be more careful with what's allowed or not.
+                // if (containsInvalidURLCharacters(result)) {
+                //     throw new DataFetcherError(
+                //         `URL path contains invalid characters: ${url.pathname}`,
+                //         400
+                //     );
+                // }
                 return result;
             })
             .join('/');
