@@ -1,5 +1,4 @@
 import { GitBookAPI } from '@gitbook/api';
-import { assert } from 'ts-essentials';
 
 /**
  * Get the base URL of the deployment to test.
@@ -23,15 +22,6 @@ function getSiteBaseURL() {
     }
 
     return siteBaseUrl;
-}
-
-/**
- * Get the base URL of the deployment preview route to test.
- */
-function getSitePreviewBaseURL() {
-    const previewBaseUrl = process.env.SITE_PREVIEW_BASE_URL;
-    assert(previewBaseUrl, 'SITE_PREVIEW_BASE_URL is not set');
-    return previewBaseUrl;
 }
 
 /**
@@ -59,7 +49,11 @@ export function getTestURL(urlRest: string): string {
  * Get the URL to load a site preview on the deployment being tested.
  */
 export function getTestPreviewURL(urlRest: string): string {
-    const url = new URL(urlRest, getSitePreviewBaseURL());
+    const gitbookPreviewURL = new URL(getGitBookPreviewURL(urlRest));
+    const url = new URL(
+        gitbookPreviewURL.href.replace(`${gitbookPreviewURL.protocol}//`, ''),
+        getSiteBaseURL()
+    );
     return url.toString();
 }
 
