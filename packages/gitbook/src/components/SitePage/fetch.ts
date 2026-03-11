@@ -57,7 +57,7 @@ async function resolvePage(context: GitBookSiteContext, params: PagePathParams |
         // Duplicated the regex pattern from SiteRedirectSourcePath API type.
         const SITE_REDIRECT_SOURCE_PATH_REGEX =
             /^\/(?:[A-Za-z0-9\-._~]|%[0-9A-Fa-f]{2})+(?:\/(?:[A-Za-z0-9\-._~]|%[0-9A-Fa-f]{2})+)*$/;
-        const redirectPathname = withLeadingSlash(rawPathname);
+        const redirectPathname = withLeadingSlash(getSiteRedirectPathnameParam(params));
         // If a page can't be found, we try with the API, in case we have a redirect at site level.
         if (SITE_REDIRECT_SOURCE_PATH_REGEX.test(redirectPathname)) {
             const redirectSources = new Set<string>([
@@ -121,4 +121,32 @@ export function getPathnameParam(params: PagePathParams): string {
     }
 
     return pathname.map((part) => decodeURIComponent(part)).join('/');
+}
+
+/**
+ * Build the site redirect source path from route params.
+ * Page resolution uses decoded params, but site redirect lookup must keep
+ * reserved characters percent-encoded to match the SiteRedirectSourcePath API contract.
+ */
+export function getSiteRedirectPathnameParam(params: PagePathParams): string {
+    const { pathname } = params;
+
+    if (!pathname) {
+        return '';
+    }
+
+    if (typeof pathname === 'string') {
+        const trimmed = pathname.startsWith('/') ? pathname.slice(1) : pathname;
+        return trimmed.split('/').map(encodeSiteRedirectPathSegment).join('/');
+    }
+
+    return pathname.map(encodeSiteRedirectPathSegment).join('/');
+}
+
+function encodeSiteRedirectPathSegment(part: string): string {
+    try {
+        return encodeURIComponent(decodeURIComponent(part));
+    } catch {
+        return encodeURIComponent(part);
+    }
 }
