@@ -1,5 +1,11 @@
 # @gitbook/embed
 
+## 0.4.0
+
+### Minor Changes
+
+- b3875a1: Support `assistantName` property to override Assistant name
+
 ## 0.3.0
 
 ### Minor Changes
