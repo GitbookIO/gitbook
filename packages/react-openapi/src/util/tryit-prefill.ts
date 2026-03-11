@@ -34,14 +34,16 @@ export function resolveTryItPrefillForOperation(args: {
     } = args;
 
     const resolveTryItPrefillExpression = prefillInputContext
-        ? (expr: string) => {
+        ? (() => {
               const runtime = new ExpressionRuntime();
-              const parts = parseTemplate(expr);
-              if (!parts.length) {
-                  return undefined;
-              }
-              return runtime.evaluateTemplate(expr, prefillInputContext);
-          }
+              return (expr: string) => {
+                  const parts = parseTemplate(expr);
+                  if (!parts.length) {
+                      return undefined;
+                  }
+                  return runtime.evaluateTemplate(expr, prefillInputContext);
+              };
+          })()
         : undefined;
 
     const prefillAuth = securities
@@ -52,7 +54,10 @@ export function resolveTryItPrefillForOperation(args: {
         : undefined;
 
     const prefillServers = servers
-        ? resolveTryItPrefillServersForOperationServers({ servers, resolveTryItPrefillExpression })
+        ? resolveTryItPrefillServersForOperationServers({
+              servers,
+              resolveTryItPrefillExpression,
+          })
         : [];
 
     return {
@@ -72,9 +77,12 @@ function resolveTryItPrefillAuthForOperationSecurities(args: {
     const prefillAuthConfig: ApiClientConfiguration['authentication']['securitySchemes'] = {};
 
     for (const [schemeName, security] of Object.values(securities)) {
-        const tryitPrefillAuthValue = security[PREFILL_CUSTOM_PROPERTY]
-            ? resolveTryItPrefillExpression?.(security[PREFILL_CUSTOM_PROPERTY])
-            : (security['x-gitbook-token-placeholder'] ?? undefined);
+        const tryitPrefillAuthValue =
+            (security[PREFILL_CUSTOM_PROPERTY]
+                ? resolveTryItPrefillExpression?.(security[PREFILL_CUSTOM_PROPERTY])
+                : undefined) ??
+            security['x-gitbook-token-placeholder'] ??
+            undefined;
 
         if (!tryitPrefillAuthValue) {
             continue;
@@ -265,5 +273,7 @@ function templatePartsToExpression(parts: ReturnType<typeof parseTemplate>) {
 }
 
 function toPrefillCodePlaceholder(expression: string, defaultValue?: string) {
-    return `$$__X-GITBOOK-PREFILL[(${expression})${defaultValue ? ` ?? '${defaultValue}'` : ''}]__$$`;
+    return `$$__X-GITBOOK-PREFILL[(${expression})${
+        defaultValue ? ` ?? '${defaultValue}'` : ''
+    }]__$$`;
 }

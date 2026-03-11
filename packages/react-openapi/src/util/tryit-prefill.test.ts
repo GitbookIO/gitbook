@@ -190,6 +190,72 @@ describe('resolveTryItPrefillForOperation', () => {
             });
         });
 
+        it('should fall back to x-gitbook-token-placeholder when x-gitbook-prefill exists but prefillInputContext is null', () => {
+            const operation: OpenAPIOperationData = {
+                path: '/users',
+                method: 'GET',
+                operation: { summary: 'List users' },
+                servers: [{ url: 'https://api.example.com' }],
+                securities: [
+                    [
+                        'basicAuth',
+                        {
+                            type: 'http',
+                            scheme: 'basic',
+                            'x-gitbook-prefill': '{{ visitor.claims.basicAuth }}',
+                            'x-gitbook-token-placeholder': 'admin:secret123',
+                        },
+                    ],
+                ],
+            };
+
+            const result = resolveTryItPrefillForOperation({
+                operation,
+                prefillInputContext: null,
+            });
+
+            expect(result).toEqual({
+                authentication: {
+                    securitySchemes: {
+                        basicAuth: { username: 'admin', password: 'secret123' },
+                    },
+                },
+            });
+        });
+
+        it('should fall back to x-gitbook-token-placeholder when x-gitbook-prefill expression resolves to undefined', () => {
+            const operation: OpenAPIOperationData = {
+                path: '/users',
+                method: 'GET',
+                operation: { summary: 'List users' },
+                servers: [{ url: 'https://api.example.com' }],
+                securities: [
+                    [
+                        'bearerAuth',
+                        {
+                            type: 'http',
+                            scheme: 'bearer',
+                            'x-gitbook-prefill': '{{ visitor.claims.missing }}',
+                            'x-gitbook-token-placeholder': 'fallback-token',
+                        },
+                    ],
+                ],
+            };
+
+            const result = resolveTryItPrefillForOperation({
+                operation,
+                prefillInputContext: { visitor: { claims: {} } },
+            });
+
+            expect(result).toEqual({
+                authentication: {
+                    securitySchemes: {
+                        bearerAuth: { token: 'fallback-token' },
+                    },
+                },
+            });
+        });
+
         it('should return empty object if no visitor data matches prefill expression', () => {
             const operation: OpenAPIOperationData = {
                 path: '/orgs/<orgId>/spaces',
@@ -239,7 +305,9 @@ describe('resolveTryItPrefillForOperation', () => {
 
             const prefillInputContext: PrefillInputContextData = {
                 visitor: {
-                    claims: { api: { endpointUrl: 'https://api.gitbook-staging.com/v1/' } },
+                    claims: {
+                        api: { endpointUrl: 'https://api.gitbook-staging.com/v1/' },
+                    },
                 },
             };
 
@@ -286,7 +354,9 @@ describe('resolveTryItPrefillForOperation', () => {
             // Override env
             const overrideEnvResult = resolveTryItPrefillForOperation({
                 operation,
-                prefillInputContext: { visitor: { claims: { api: { env: 'staging' } } } },
+                prefillInputContext: {
+                    visitor: { claims: { api: { env: 'staging' } } },
+                },
             });
             expect(overrideEnvResult).toEqual({
                 servers: [
@@ -304,7 +374,9 @@ describe('resolveTryItPrefillForOperation', () => {
             // Override version
             const overrideVersionResult = resolveTryItPrefillForOperation({
                 operation,
-                prefillInputContext: { visitor: { claims: { api: { version: 'v2' } } } },
+                prefillInputContext: {
+                    visitor: { claims: { api: { version: 'v2' } } },
+                },
             });
             expect(overrideVersionResult).toEqual({
                 servers: [
@@ -539,7 +611,10 @@ describe('resolveURLWithPrefillCodePlaceholdersFromServer', () => {
         const result = resolveURLWithPrefillCodePlaceholdersFromServer({
             url: 'https://{region}.example.com',
             variables: {
-                region: { default: 'us-east-1', 'x-gitbook-prefill': '{{ user.region }}' },
+                region: {
+                    default: 'us-east-1',
+                    'x-gitbook-prefill': '{{ user.region }}',
+                },
             },
         });
 
@@ -564,7 +639,10 @@ describe('resolveURLWithPrefillCodePlaceholdersFromServer', () => {
             url: 'https://{region}.example.com/{version}',
             'x-gitbook-prefill': '{{ user.baseUrl }}',
             variables: {
-                region: { default: 'us-east-1', 'x-gitbook-prefill': '{{ user.region }}' },
+                region: {
+                    default: 'us-east-1',
+                    'x-gitbook-prefill': '{{ user.region }}',
+                },
                 version: { default: 'v1' },
             },
         });
