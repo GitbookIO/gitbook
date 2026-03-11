@@ -26,7 +26,7 @@ inputs:
     description: 'Commit message to associate with the deployment'
     required: true
 outputs:
-    deployment-url: 
+    deployment-url:
       description: "Deployment URL"
       value: ${{ steps.upload_middleware.outputs.deployment-url }}
 runs:
@@ -53,6 +53,7 @@ runs:
             GITBOOK_API_PUBLIC_URL: ${{ inputs.opItem }}/GITBOOK_API_PUBLIC_URL
             GITBOOK_API_TOKEN: ${{ inputs.opItem }}/GITBOOK_API_TOKEN
             GITBOOK_OAUTH_SERVER_URL: ${{ inputs.opItem }}/GITBOOK_OAUTH_SERVER_URL
+            GITBOOK_PREVIEW_BASE_URL: ${{ inputs.opItem }}/GITBOOK_PREVIEW_BASE_URL
             GITBOOK_INTEGRATIONS_HOST: ${{ inputs.opItem }}/GITBOOK_INTEGRATIONS_HOST
             GITBOOK_IMAGE_RESIZE_SIGNING_KEY: ${{ inputs.opItem }}/GITBOOK_IMAGE_RESIZE_SIGNING_KEY
             GITBOOK_IMAGE_RESIZE_URL: ${{ inputs.opItem }}/GITBOOK_IMAGE_RESIZE_URL
@@ -108,7 +109,7 @@ runs:
               wranglerVersion: '4.43.0'
               environment: ${{ inputs.environment }}
               command: ${{ format('versions upload --tag {0} --message "{1}"', inputs.commitTag, inputs.commitMessage) }} --config ./packages/gitbook/openNext/customWorkers/middlewareWrangler.jsonc
-        
+
         - name: Extract middleware version worker ID
           shell: bash
           id: extract_middleware_version_id
