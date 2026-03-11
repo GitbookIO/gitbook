@@ -38,7 +38,7 @@ import {
     handleUnauthedOAuthProtectedResourceRequest,
     isOAuthProtectedResourceRequest,
 } from './lib/oauth-protected';
-import { getPreviewRequestIdentifier } from './lib/preview';
+import { getPreviewRequestIdentifier, isPreviewRequest } from './lib/preview';
 import { serveProxyAnalyticsEvent } from './lib/tracking';
 export const config = {
     matcher: [
@@ -144,6 +144,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
     }
 
     const { url: siteRequestURL, mode } = match;
+    const isPreview = isPreviewRequest(siteRequestURL);
     const imagesContextId = getImageResizingContextId(siteRequestURL);
     /**
      * Serve image resizing requests (all requests containing `/~gitbook/image`).
@@ -324,8 +325,6 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
             );
         }
 
-        const isPreviewRequest = siteRequestURL.toString().startsWith(GITBOOK_PREVIEW_BASE_URL);
-
         //
         // Render and serve the content
         //
@@ -381,7 +380,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
                     maxAge: 10 * 60, // 10 minutes
                     // Only send the cookie to preview routes and scope it to the specific site
                     // to avoid conflicts between different sites previews potentially opened at the same time.
-                    path: isPreviewRequest
+                    path: isPreview
                         ? siteURLData.siteBasePath
                         : `/url/preview/${getPreviewRequestIdentifier(siteRequestURL)}`,
                 },
@@ -400,7 +399,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
                     httpOnly: true,
                     sameSite: 'lax',
                     maxAge: 10 * 60, // 10 minutes
-                    path: isPreviewRequest ? siteURLData.siteBasePath : '/url/preview', // Only send the cookie to preview routes
+                    path: isPreview ? siteURLData.siteBasePath : '/url/preview', // Only send the cookie to preview routes
                 },
             });
         }

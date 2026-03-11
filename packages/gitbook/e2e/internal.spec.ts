@@ -796,8 +796,7 @@ const testCases: TestsCase[] = [
                     const sectionTabLinks = sectionTabs.getByRole('link');
                     for (const link of await sectionTabLinks.all()) {
                         const href = await link.getAttribute('href');
-                        console.log({ href });
-                        // expect(href).toMatch(/^\/preview\/site_p4Xo4\/?/);
+                        expect(href).toMatch(/^\/preview\/site_p4Xo4\/?/);
                     }
                 },
             },
