@@ -66,7 +66,7 @@ export function EmbeddableAIChat(props: EmbeddableAIChatProps) {
 
     const tabsRef = React.useRef<HTMLDivElement>(null);
     const hasDocsTab = embedConfig.tabs.includes('docs');
-    const trademark = siteConfig.trademark && (embedConfig.trademark ?? true);
+    const trademark = siteConfig.trademark;
     const currentLinkContext = use(LinkContext);
     const linkContext: LinkContextType = useMemo(
         () =>
@@ -100,7 +100,7 @@ export function EmbeddableAIChat(props: EmbeddableAIChatProps) {
                     ) : null}
                     <EmbeddableFrameHeaderMain>
                         <EmbeddableFrameTitle>
-                            {getAIChatName(language, trademark)}
+                            {siteConfig.assistantName ?? getAIChatName(language, trademark)}
                         </EmbeddableFrameTitle>
                         <AIChatSubtitle chat={chat} />
                     </EmbeddableFrameHeaderMain>
@@ -113,8 +113,8 @@ export function EmbeddableAIChat(props: EmbeddableAIChatProps) {
                         <AIChatBody
                             chatController={chatController}
                             chat={chat}
-                            suggestions={embedConfig.suggestions}
-                            greeting={embedConfig.greeting}
+                            suggestions={siteConfig.suggestions}
+                            greeting={siteConfig.greeting}
                             trademark={trademark}
                         />
                     </LinkContext>
