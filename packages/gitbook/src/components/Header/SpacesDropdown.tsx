@@ -2,7 +2,7 @@ import type { SiteSpace } from '@gitbook/api';
 import { useMemo } from 'react';
 
 import type { GitBookSiteContext } from '@/lib/context';
-import { getSiteSpaceURL } from '@/lib/sites';
+import { getLocalizedTitle, getSiteSpaceURL } from '@/lib/sites';
 import { tcls } from '@/lib/tailwind';
 import { Button, type ButtonProps, ToggleChevron } from '../primitives';
 import { DropdownMenu } from '../primitives/DropdownMenu';
@@ -24,6 +24,7 @@ export function SpacesDropdown(props: {
     icon?: ButtonProps['icon'];
 }) {
     const { context, siteSpace, siteSpaces, className, variant = 'secondary', icon } = props;
+    const currentLanguage = context.siteSpace.space.language;
 
     return (
         <DropdownMenu
@@ -40,14 +41,16 @@ export function SpacesDropdown(props: {
                     trailing={<ToggleChevron />}
                     className={tcls('bg-tint-base', className)}
                 >
-                    <span className="button-content">{siteSpace.title}</span>
+                    <span className="button-content">
+                        {getLocalizedTitle(siteSpace, currentLanguage)}
+                    </span>
                 </Button>
             }
         >
             <SpacesDropdownMenuItems
                 slimSpaces={siteSpaces.map((siteSp) => ({
                     id: siteSp.id,
-                    title: siteSp.title,
+                    title: getLocalizedTitle(siteSp, currentLanguage),
                     url: getSiteSpaceURL(context, siteSp),
                     isActive: siteSp.id === siteSpace.id,
                     spaceId: siteSp.space.id,
@@ -67,7 +70,8 @@ export function TranslationsDropdown(props: {
     const { context, siteSpace, siteSpaces, className } = props;
 
     // Memoize the emoji check to avoid repeated regex execution
-    const hasEmojiPrefix = useMemo(() => startsWithEmoji(siteSpace.title), [siteSpace.title]);
+    const title = getLocalizedTitle(siteSpace, context.siteSpace.space.language);
+    const hasEmojiPrefix = useMemo(() => startsWithEmoji(title), [title]);
 
     return (
         <SpacesDropdown
