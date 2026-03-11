@@ -109,7 +109,6 @@ async function resolvePage(context: GitBookSiteContext, params: PagePathParams |
 
 /**
  * Transform a pathname into a candidate source for site redirect matching.
- * For example, a pathname like "Section/Variant/Page" will be transformed into "/section/variant/page" to match the normalized source stored in the API.
  * We also encode each segment to handle special characters in redirects.
  */
 function toSiteRedirectSourceCandidate(pathname: string): string {
