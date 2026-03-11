@@ -72,6 +72,7 @@ function encodeChildren(
     children: (SiteSection | SiteSectionGroup)[]
 ): (ClientSiteSection | ClientSiteSectionGroup)[] {
     const clientChildren: (ClientSiteSection | ClientSiteSectionGroup)[] = [];
+    const currentLanguage = context.siteSpace.space.language;
 
     for (const child of children) {
         switch (child.object) {
@@ -87,7 +88,6 @@ function encodeChildren(
                     continue;
                 }
 
-                const currentLanguage = context.siteSpace.space.language;
                 clientChildren.push({
                     id: child.id,
                     title: getLocalizedTitle(child, currentLanguage),
