@@ -135,29 +135,29 @@ export function normalizeURL(url: URL) {
  * https://developer.mozilla.org/en-US/docs/Glossary/Percent-encoding
  * "%" itself is excluded because it could be part of percent-encoding and may require decoding.
  */
-function containsInvalidURLCharacters(segment: string): boolean {
-    const invalidCharacters = [
-        ':',
-        '/',
-        '?',
-        '#',
-        '[',
-        ']',
-        '@',
-        '!',
-        '$',
-        '&',
-        "'",
-        '(',
-        ')',
-        '*',
-        '+',
-        ',',
-        ';',
-        '=',
-    ];
-    return invalidCharacters.some((char) => segment.includes(char));
-}
+// function containsInvalidURLCharacters(segment: string): boolean {
+//     const invalidCharacters = [
+//         ':',
+//         '/',
+//         '?',
+//         '#',
+//         '[',
+//         ']',
+//         '@',
+//         '!',
+//         '$',
+//         '&',
+//         "'",
+//         '(',
+//         ')',
+//         '*',
+//         '+',
+//         ',',
+//         ';',
+//         '=',
+//     ];
+//     return invalidCharacters.some((char) => segment.includes(char));
+// }
 
 /**
  * Decode the url path component, we redirect URLs with encoded path components
