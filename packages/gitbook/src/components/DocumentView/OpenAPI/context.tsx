@@ -24,7 +24,7 @@ import type {
  */
 export function getOpenAPIContext(args: {
     props: BlockProps<AnyOpenAPIOperationsBlock | OpenAPISchemasBlock | OpenAPIWebhookBlock>;
-    specUrl: string;
+    specUrl: string | null;
     context: GitBookAnyContext | undefined;
 }): OpenAPIContextInput {
     const { props, specUrl, context } = args;

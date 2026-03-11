@@ -1,5 +1,16 @@
 # @gitbook/react-openapi
 
+## 1.5.10
+
+### Patch Changes
+
+- bdc6cd9: Use OpenAPI publicURL as Scalar specUrl
+- 8ab419a: Support x-enable-proxy at operation level
+- eceec6f: Move ~scalar/proxy route to site route group
+- 887c3f8: Add token verification on OpenAPI proxy
+- Updated dependencies [8ab419a]
+  - @gitbook/openapi-parser@3.0.10
+
 ## 1.5.9
 
 ### Patch Changes

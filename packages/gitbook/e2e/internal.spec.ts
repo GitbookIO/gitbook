@@ -1383,10 +1383,18 @@ const testCases: TestsCase[] = [
         contentBaseURL: 'https://gitbook-open-e2e-sites.gitbook.io/gitbook-doc/',
         tests: [
             {
-                name: 'Redirect to SSO page',
+                name: 'Basic redirect',
                 url: 'a/redirect/to/sso',
                 run: async (page) => {
                     await expect(page.locator('h1')).toHaveText('SSO');
+                },
+                screenshot: false,
+            },
+            {
+                name: 'Complex wildcard with special characters',
+                url: 'foo/bar/baz/123456789-welcome-to-gitbook-%22%20target=%22_blank',
+                run: async (page) => {
+                    await expect(page.locator('h1')).toHaveText('SEO');
                 },
                 screenshot: false,
             },

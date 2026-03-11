@@ -58,12 +58,17 @@ export interface ResolvedContentRef {
         context: GitBookSpaceContext;
         revisionReusableContent: RevisionReusableContent;
     };
-    /** Resolve OpenAPI spec filesystem. */
-    openAPIFilesystem?: Filesystem;
     /**
      * Space that the content ref belongs to (if applicable).
      */
     space?: Space;
+    /** Resolved OpenAPI spec, if the reference is an OpenAPI spec. */
+    openapi?: {
+        /** OpenAPI spec filesystem. */
+        filesystem: Filesystem;
+        /** Public URL of the OpenAPI spec */
+        publicURL: string | null;
+    };
 }
 
 export interface ResolveContentRefOptions {
@@ -340,13 +345,13 @@ export async function resolveContentRef(
                 return null;
             }
             return {
-                // @ts-expect-error - Backward compatibility: `urls.source` replaces `url` in the next API version
-                href: openAPISpecVersionContent.urls?.source ?? openAPISpecVersionContent.url,
+                href: openAPISpecVersionContent.urls.source,
                 text: contentRef.spec,
                 active: false,
-                openAPIFilesystem: openAPISpecVersionContent.filesystem as Filesystem,
-                // @ts-expect-error - Public URL is not yet supported in the API
-                publicURL: openAPISpecVersionContent.urls?.public,
+                openapi: {
+                    filesystem: openAPISpecVersionContent.filesystem as Filesystem,
+                    publicURL: openAPISpecVersionContent.urls.public,
+                },
             };
         }
 

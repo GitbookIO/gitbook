@@ -17,6 +17,7 @@ export type AIConfig = {
     aiMode: CustomizationAIMode;
     suggestions?: string[];
     trademark: boolean;
+    assistantName?: string;
     greeting?: {
         title: string;
         subtitle: string;
@@ -54,10 +55,10 @@ export type Assistant = Omit<GitBookAssistant, 'icon'> & {
 const AIContext = React.createContext<AIConfig | null>(null);
 
 export function AIContextProvider(props: React.PropsWithChildren<AIConfig>): React.ReactElement {
-    const { aiMode, trademark, suggestions, greeting, children } = props;
+    const { aiMode, trademark, suggestions, greeting, assistantName, children } = props;
     const value = React.useMemo(
-        () => ({ aiMode, trademark, suggestions, greeting }),
-        [aiMode, trademark, suggestions, greeting]
+        () => ({ aiMode, trademark, suggestions, greeting, assistantName }),
+        [aiMode, trademark, suggestions, greeting, assistantName]
     );
     return <AIContext.Provider value={value}>{children}</AIContext.Provider>;
 }
@@ -91,7 +92,7 @@ export function useAI(): AIContext {
     if (config.aiMode === CustomizationAIMode.Assistant) {
         assistants.push({
             id: 'gitbook-assistant',
-            label: getAIChatName(language, config.trademark),
+            label: config.assistantName ?? getAIChatName(language, config.trademark),
             icon: (
                 <AIChatIcon
                     state={chat.loading ? 'thinking' : 'default'}

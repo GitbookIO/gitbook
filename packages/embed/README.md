@@ -49,6 +49,7 @@ GitBook('configure', {
         }
     ],
     greeting: { title: 'Welcome!', subtitle: 'How can I help?' },
+    assistantName: 'Support Assistant',
     suggestions: ['What is GitBook?', 'How do I get started?'],
     tools: [/* ... */],
     closeButton: true,
@@ -100,6 +101,7 @@ frame.configure({
         }
     ],
     greeting: { title: 'Welcome!', subtitle: 'How can I help?' },
+    assistantName: 'Support Assistant',
     suggestions: ['What is GitBook?', 'How do I get started?'],
     tools: [/* ... */],
     closeButton: true
@@ -126,6 +128,7 @@ import { GitBookProvider, GitBookFrame } from '@gitbook/embed/react';
         }}
         tabs={['assistant', 'docs']}
         greeting={{ title: 'Welcome!', subtitle: 'How can I help?' }}
+        assistantName="Support Assistant"
         suggestions={['What is GitBook?', 'How do I get started?']}
         actions={[
             {
@@ -326,6 +329,18 @@ greeting: {
     title: 'Welcome!',
     subtitle: 'How can I help you today?'
 }
+```
+
+### `assistantName`
+
+Available in: Standalone script, NPM package, React components
+
+Override the assistant name displayed in the chat header and assistant entry points (for example, sidebar tabs and action labels). This name will be limited to 32 characters to prevent text overflow.
+
+- **Type**: `string`
+
+```javascript
+assistantName: 'Support Assistant'
 ```
 
 ### `suggestions`

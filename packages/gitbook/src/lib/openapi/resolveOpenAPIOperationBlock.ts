@@ -37,14 +37,14 @@ async function resolveOpenAPIOperationBlockNoCache(
     const { context, block } = args;
 
     if (!block.data.path || !block.data.method) {
-        return { data: null, specUrl: null };
+        return { data: null, specUrl: null, publicURL: null };
     }
 
     try {
-        const { filesystem, specUrl } = await fetchOpenAPIFilesystem({ block, context });
+        const { filesystem, specUrl, publicURL } = await fetchOpenAPIFilesystem({ block, context });
 
         if (!filesystem) {
-            return { data: null, specUrl: null };
+            return { data: null, specUrl: null, publicURL: null };
         }
 
         const data = await resolveOpenAPIOperation(filesystem, {
@@ -52,7 +52,7 @@ async function resolveOpenAPIOperationBlockNoCache(
             method: block.data.method,
         });
 
-        return { data, specUrl };
+        return { data, specUrl, publicURL };
     } catch (error) {
         if (error instanceof OpenAPIParseError) {
             return { error };
