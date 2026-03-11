@@ -14,7 +14,7 @@ export function isPreviewRequest(requestURL: URL): boolean {
 export function getPreviewRequestIdentifier(requestURL: URL): string {
     if (requestURL.toString().startsWith(GITBOOK_PREVIEW_BASE_URL)) {
         const siteIdentifier = requestURL.pathname.split('/').filter(Boolean)[1];
-        assert(siteIdentifier, 'Site identifier is missing in the preview URL');
+        assert(siteIdentifier, 'Expected site identifier in preview URL');
         return siteIdentifier;
     }
 

@@ -14,12 +14,7 @@ import {
     normalizeURL,
     throwIfDataError,
 } from '@/lib/data';
-import {
-    GITBOOK_OAUTH_SERVER_URL,
-    GITBOOK_PREVIEW_BASE_URL,
-    isGitBookAssetsHostURL,
-    isGitBookHostURL,
-} from '@/lib/env';
+import { GITBOOK_OAUTH_SERVER_URL, isGitBookAssetsHostURL, isGitBookHostURL } from '@/lib/env';
 import { getImageResizingContextId } from '@/lib/images';
 import { MiddlewareHeaders } from '@/lib/middleware';
 import { removeLeadingSlash, removeTrailingSlash } from '@/lib/paths';
@@ -471,29 +466,15 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         return writeResponseCookies(response, cookies);
     };
 
-    if (siteRequestURL.toString().startsWith(GITBOOK_PREVIEW_BASE_URL)) {
+    // For preview requests like:
+    // - https://preview/<siteURL> requests, TODO: Remove support for this format later
+    // - https://sites.gitbook.com/preview/<siteID> requests,
+    if (isPreview) {
         // Do not track page views for preview requests
         request.headers.set('x-gitbook-disable-tracking', 'true');
         return serveWithQueryAPIToken(
             // We scope the API token to the site ID.
-            siteRequestURL.pathname
-                .split('/')
-                .filter(Boolean)
-                .slice(0, 2)
-                .join('/'),
-            request,
-            withAPIToken
-        );
-    }
-
-    // For https://preview/<siteURL> requests,
-    if (siteRequestURL.hostname === 'preview') {
-        // Do not track page views for preview requests
-        request.headers.set('x-gitbook-disable-tracking', 'true');
-
-        return serveWithQueryAPIToken(
-            // We scope the API token to the site ID.
-            `${siteRequestURL.hostname}/${requestURL.pathname.slice(1).split('/')[0]}`,
+            ['preview', getPreviewRequestIdentifier(siteRequestURL)].join('/'),
             request,
             withAPIToken
         );
