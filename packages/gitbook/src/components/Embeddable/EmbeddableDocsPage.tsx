@@ -2,9 +2,12 @@ import { type PagePathParams, getSitePageData } from '@/components/SitePage';
 import type { GitBookSiteContext } from '@/lib/context';
 import { SiteInsightsDisplayContext } from '@gitbook/api';
 import type { Metadata } from 'next';
+import { HeaderLogo } from '../Header';
 import { HeaderMobileMenu } from '../Header/HeaderMobileMenu';
+import { SpacesDropdown, TranslationsDropdown } from '../Header/SpacesDropdown';
 import { PageBody } from '../PageBody';
 import { SiteSectionTabs, encodeClientSiteSections } from '../SiteSections';
+import { categorizeVariants } from '../SpaceLayout/categorizeVariants';
 import { TableOfContents } from '../TableOfContents';
 import { ScrollContainer } from '../primitives/ScrollContainer';
 import { EmbeddableDocsPageControlButtons } from './EmbeddableDocsPageControlButtons';
@@ -43,6 +46,8 @@ export async function EmbeddableDocsPage(
         pageParams,
     });
 
+    const variants = categorizeVariants(context);
+
     return (
         <EmbeddableFrame className="site-background">
             <EmbeddableFrameSidebar>
@@ -76,7 +81,20 @@ export async function EmbeddableDocsPage(
                         <SiteSectionTabs
                             className="not-theme-bold:-mt-2 theme-bold:bg-tint-base"
                             sections={encodeClientSiteSections(context, context.sections)}
-                        />
+                        >
+                            {variants.translations.length > 1 ? (
+                                <TranslationsDropdown
+                                    context={context}
+                                    siteSpace={
+                                        variants.translations.find(
+                                            (space) => space.id === context.siteSpace.id
+                                        ) ?? context.siteSpace
+                                    }
+                                    siteSpaces={variants.translations}
+                                    className="my-1.5 ml-2 self-start"
+                                />
+                            ) : null}
+                        </SiteSectionTabs>
                     ) : null}
                 </div>
                 <EmbeddableFrameBody>
@@ -87,7 +105,41 @@ export async function EmbeddableDocsPage(
                         leading={{ fade: false, button: true }}
                         trailing={{ fade: false, button: true }}
                     >
-                        <TableOfContents context={context} withTrademark={false} />
+                        <TableOfContents
+                            context={context}
+                            withTrademark={false}
+                            header={
+                                <div className="theme-bold:m-[-1.5rem_-1px_-0.5rem_-2rem] flex grow-0 items-center theme-bold:bg-header-background theme-bold:p-[1rem_0_1rem_2rem] pr-4 text-base/tight dark:shadow-light/1">
+                                    <HeaderLogo context={context} />
+                                    {variants.translations.length > 1 ? (
+                                        <TranslationsDropdown
+                                            context={context}
+                                            siteSpace={
+                                                variants.translations.find(
+                                                    (space) => space.id === context.siteSpace.id
+                                                ) ?? context.siteSpace
+                                            }
+                                            siteSpaces={variants.translations}
+                                            className="ml-auto py-2"
+                                        />
+                                    ) : null}
+                                </div>
+                            }
+                            innerHeader={
+                                variants.generic.length > 1 ? (
+                                    <div className="my-5 sidebar-default:mt-2 flex flex-col gap-2 px-5 empty:hidden">
+                                        {variants.generic.length > 1 ? (
+                                            <SpacesDropdown
+                                                context={context}
+                                                siteSpace={context.siteSpace}
+                                                siteSpaces={variants.generic}
+                                                className="w-full px-3"
+                                            />
+                                        ) : null}
+                                    </div>
+                                ) : null
+                            }
+                        />
                         <PageBody
                             context={context}
                             page={page}
