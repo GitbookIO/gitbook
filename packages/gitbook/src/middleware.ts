@@ -14,7 +14,12 @@ import {
     normalizeURL,
     throwIfDataError,
 } from '@/lib/data';
-import { GITBOOK_OAUTH_SERVER_URL, isGitBookAssetsHostURL, isGitBookHostURL } from '@/lib/env';
+import {
+    GITBOOK_OAUTH_SERVER_URL,
+    GITBOOK_PREVIEW_BASE_URL,
+    isGitBookAssetsHostURL,
+    isGitBookHostURL,
+} from '@/lib/env';
 import { getImageResizingContextId } from '@/lib/images';
 import { MiddlewareHeaders } from '@/lib/middleware';
 import { removeLeadingSlash, removeTrailingSlash } from '@/lib/paths';
@@ -319,6 +324,8 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
             );
         }
 
+        const isPreviewRequest = siteRequestURL.toString().startsWith(GITBOOK_PREVIEW_BASE_URL);
+
         //
         // Render and serve the content
         //
@@ -340,6 +347,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
             changeRequest: siteURLData.changeRequest,
             revision: siteURLData.revision,
             shareKey: siteURLData.shareKey,
+            preview: siteURLData.preview,
             apiToken: siteURLData.apiToken,
             imagesContextId: imagesContextId,
             contextId: siteURLData.contextId,
@@ -373,7 +381,9 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
                     maxAge: 10 * 60, // 10 minutes
                     // Only send the cookie to preview routes and scope it to the specific site
                     // to avoid conflicts between different sites previews potentially opened at the same time.
-                    path: `/url/preview/${getPreviewRequestIdentifier(siteRequestURL)}`,
+                    path: isPreviewRequest
+                        ? siteURLData.siteBasePath
+                        : `/url/preview/${getPreviewRequestIdentifier(siteRequestURL)}`,
                 },
             });
         }
@@ -390,7 +400,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
                     httpOnly: true,
                     sameSite: 'lax',
                     maxAge: 10 * 60, // 10 minutes
-                    path: '/url/preview', // Only send the cookie to preview routes
+                    path: isPreviewRequest ? siteURLData.siteBasePath : '/url/preview', // Only send the cookie to preview routes
                 },
             });
         }
@@ -461,6 +471,21 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
 
         return writeResponseCookies(response, cookies);
     };
+
+    if (siteRequestURL.toString().startsWith(GITBOOK_PREVIEW_BASE_URL)) {
+        // Do not track page views for preview requests
+        request.headers.set('x-gitbook-disable-tracking', 'true');
+        return serveWithQueryAPIToken(
+            // We scope the API token to the site ID.
+            siteRequestURL.pathname
+                .split('/')
+                .filter(Boolean)
+                .slice(0, 2)
+                .join('/'),
+            request,
+            withAPIToken
+        );
+    }
 
     // For https://preview/<siteURL> requests,
     if (siteRequestURL.hostname === 'preview') {

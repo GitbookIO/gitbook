@@ -26,7 +26,12 @@ import deepMerge from 'deepmerge';
 import rison from 'rison';
 import type { DeepPartial } from 'ts-essentials';
 
-import { getContentTestURL, getTestURL } from '../tests/utils';
+import {
+    getContentTestURL,
+    getGitBookPreviewURL,
+    getTestPreviewURL,
+    getTestURL,
+} from '../tests/utils';
 
 export interface Test {
     name: string;
@@ -75,6 +80,7 @@ export type TestsCase = {
     skip?: boolean;
     tests: Array<Test>;
     contentBaseURL?: string;
+    preview?: boolean;
 };
 
 export const allLocales: CustomizationLocale[] = [
@@ -188,11 +194,13 @@ export function runTestCases(testCases: TestsCase[]) {
                 testFn(testEntry.name, async ({ page, context }) => {
                     const testEntryPathname =
                         typeof testEntry.url === 'function' ? await testEntry.url() : testEntry.url;
-                    const url = testCase.contentBaseURL
-                        ? getContentTestURL(
-                              new URL(testEntryPathname, testCase.contentBaseURL).toString()
-                          )
-                        : getTestURL(testEntryPathname);
+                    const url = testCase.preview
+                        ? getTestPreviewURL(testEntryPathname)
+                        : testCase.contentBaseURL
+                          ? getContentTestURL(
+                                new URL(testEntryPathname, testCase.contentBaseURL).toString()
+                            )
+                          : getTestURL(testEntryPathname);
 
                     if (testEntry.cookies) {
                         await context.addCookies(
@@ -204,6 +212,10 @@ export function runTestCases(testCases: TestsCase[]) {
                         );
                     }
 
+                    const previewRequestURL = testCase.preview
+                        ? getGitBookPreviewURL(testEntryPathname)
+                        : null;
+
                     // Set the header to disable the Vercel toolbar
                     // But only on the main document as it'd cause CORS issues on other resources
                     await page.route('**/*', async (route, request) => {
@@ -212,10 +224,20 @@ export function runTestCases(testCases: TestsCase[]) {
                                 headers: {
                                     ...request.headers(),
                                     'x-vercel-skip-toolbar': '1',
+                                    ...(previewRequestURL
+                                        ? { 'x-gitbook-url': previewRequestURL }
+                                        : {}),
                                 },
                             });
                         } else {
-                            await route.continue();
+                            await route.continue({
+                                headers: {
+                                    ...request.headers(),
+                                    ...(previewRequestURL
+                                        ? { 'x-gitbook-url': previewRequestURL }
+                                        : {}),
+                                },
+                            });
                         }
                     });
 

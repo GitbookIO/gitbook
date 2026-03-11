@@ -45,6 +45,7 @@ export type SiteURLData = Pick<
     | 'siteBasePath'
     | 'basePath'
     | 'contextId'
+    | 'preview'
 > & {
     /**
      * Identifier used for image resizing.

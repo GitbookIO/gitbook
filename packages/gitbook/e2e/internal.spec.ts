@@ -757,6 +757,52 @@ const testCases: TestsCase[] = [
         ],
     },
     {
+        name: 'Site Previews',
+        skip: process.env.ARGOS_BUILD_NAME !== 'v2-vercel',
+        preview: true,
+        tests: [
+            {
+                name: 'Main content',
+                url: async () => {
+                    const data = await getSiteAPIToken(
+                        'https://gitbook.gitbook.io/test-gitbook-open/'
+                    );
+
+                    const searchParams = new URLSearchParams();
+                    searchParams.set('token', data.apiToken);
+
+                    return `preview/${data.site}/?${searchParams.toString()}`;
+                },
+                screenshot: false,
+                run: async (page) => {
+                    await expect(page.locator('[data-testid="table-of-contents"]')).toBeVisible();
+                },
+            },
+            {
+                name: 'With sections',
+                url: async () => {
+                    const data = await getSiteAPIToken('https://gitbook.com/docs');
+
+                    const searchParams = new URLSearchParams();
+                    searchParams.set('token', data.apiToken);
+
+                    return `preview/${data.site}/?${searchParams.toString()}`;
+                },
+                screenshot: false,
+                run: async (page) => {
+                    const sectionTabs = page.getByLabel('Sections');
+                    await expect(sectionTabs).toBeVisible();
+
+                    const sectionTabLinks = sectionTabs.getByRole('link');
+                    for (const link of await sectionTabLinks.all()) {
+                        const href = await link.getAttribute('href');
+                        expect(href).toMatch(/^\/preview\/site_p4Xo4\/?/);
+                    }
+                },
+            },
+        ],
+    },
+    {
         name: 'Site subdirectory (proxy)',
         skip: process.env.ARGOS_BUILD_NAME !== 'v2-vercel',
         contentBaseURL: 'https://nextjs-gbo-proxy.vercel.app/documentation/',
