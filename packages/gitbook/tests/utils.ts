@@ -67,9 +67,7 @@ export function getTestPreviewURL(urlRest: string): string {
  * Get the upstream GitBook preview URL for a preview route.
  */
 export function getGitBookPreviewURL(urlRest: string): string {
-    const gitbookPreviewBaseURL = process.env.GITBOOK_PREVIEW_BASE_URL;
-    assert(gitbookPreviewBaseURL, 'GITBOOK_PREVIEW_BASE_URL is not set');
-    const url = new URL(urlRest, gitbookPreviewBaseURL);
+    const url = new URL(urlRest, 'https://sites.gitbook.com/preview/');
     return url.toString();
 }
 
