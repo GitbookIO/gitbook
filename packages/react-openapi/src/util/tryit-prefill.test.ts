@@ -118,6 +118,78 @@ describe('resolveTryItPrefillForOperation', () => {
             });
         });
 
+        it('should use x-gitbook-token-placeholder as fallback for basic auth in try-it', () => {
+            const operation: OpenAPIOperationData = {
+                path: '/users',
+                method: 'GET',
+                operation: { summary: 'List users' },
+                servers: [{ url: 'https://api.example.com' }],
+                securities: [
+                    [
+                        'basicAuth',
+                        {
+                            type: 'http',
+                            scheme: 'basic',
+                            'x-gitbook-token-placeholder': 'admin:secret123',
+                        },
+                    ],
+                ],
+            };
+
+            const prefillInputContext: PrefillInputContextData = {
+                visitor: { claims: {} },
+            };
+
+            const result = resolveTryItPrefillForOperation({
+                operation,
+                prefillInputContext,
+            });
+
+            expect(result).toEqual({
+                authentication: {
+                    securitySchemes: {
+                        basicAuth: { username: 'admin', password: 'secret123' },
+                    },
+                },
+            });
+        });
+
+        it('should use x-gitbook-token-placeholder as fallback for bearer auth in try-it', () => {
+            const operation: OpenAPIOperationData = {
+                path: '/users',
+                method: 'GET',
+                operation: { summary: 'List users' },
+                servers: [{ url: 'https://api.example.com' }],
+                securities: [
+                    [
+                        'bearerAuth',
+                        {
+                            type: 'http',
+                            scheme: 'bearer',
+                            'x-gitbook-token-placeholder': 'my-default-token',
+                        },
+                    ],
+                ],
+            };
+
+            const prefillInputContext: PrefillInputContextData = {
+                visitor: { claims: {} },
+            };
+
+            const result = resolveTryItPrefillForOperation({
+                operation,
+                prefillInputContext,
+            });
+
+            expect(result).toEqual({
+                authentication: {
+                    securitySchemes: {
+                        bearerAuth: { token: 'my-default-token' },
+                    },
+                },
+            });
+        });
+
         it('should return empty object if no visitor data matches prefill expression', () => {
             const operation: OpenAPIOperationData = {
                 path: '/orgs/<orgId>/spaces',
