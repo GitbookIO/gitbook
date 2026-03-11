@@ -4,6 +4,7 @@ import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import rison from 'rison';
 
+import type { SiteURLData } from '@/lib/context';
 import { getContentSecurityPolicy } from '@/lib/csp';
 import { validateSerializedCustomization } from '@/lib/customization';
 import {
@@ -14,10 +15,20 @@ import {
     normalizeURL,
     throwIfDataError,
 } from '@/lib/data';
-import { GITBOOK_OAUTH_SERVER_URL, isGitBookAssetsHostURL, isGitBookHostURL } from '@/lib/env';
+import {
+    GITBOOK_OAUTH_SERVER_URL,
+    GITBOOK_PREVIEW_BASE_URL,
+    isGitBookAssetsHostURL,
+    isGitBookHostURL,
+} from '@/lib/env';
 import { getImageResizingContextId } from '@/lib/images';
 import { MiddlewareHeaders } from '@/lib/middleware';
+import {
+    handleUnauthedOAuthProtectedResourceRequest,
+    isOAuthProtectedResourceRequest,
+} from '@/lib/oauth-protected';
 import { removeLeadingSlash, removeTrailingSlash } from '@/lib/paths';
+import { getPreviewRequestIdentifier, isPreviewRequest } from '@/lib/preview';
 import {
     type ResponseCookies,
     getPathScopedCookieName,
@@ -27,13 +38,8 @@ import {
     serveVisitorClaimsDataRequest,
 } from '@/lib/visitors';
 import { serveResizedImage } from '@/routes/image';
+import assertNever from 'assert-never';
 import { cookies } from 'next/headers';
-import type { SiteURLData } from './lib/context';
-import {
-    handleUnauthedOAuthProtectedResourceRequest,
-    isOAuthProtectedResourceRequest,
-} from './lib/oauth-protected';
-import { getPreviewRequestIdentifier, isPreviewRequest } from './lib/preview';
 import { serveProxyAnalyticsEvent } from './lib/tracking';
 export const config = {
     matcher: [
@@ -139,7 +145,6 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
     }
 
     const { url: siteRequestURL, mode } = match;
-    const isPreview = isPreviewRequest(siteRequestURL);
     const imagesContextId = getImageResizingContextId(siteRequestURL);
     /**
      * Serve image resizing requests (all requests containing `/~gitbook/image`).
@@ -366,20 +371,32 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
             routeType = 'dynamic';
             // We need to encode the customization headers, otherwise it will fail for some customization values containing non ASCII chars on vercel.
             requestHeaders.set(MiddlewareHeaders.Customization, encodeURIComponent(customization));
-            cookies.push({
-                name: MiddlewareHeaders.Customization,
-                value: encodeURIComponent(customization),
-                options: {
-                    httpOnly: true,
-                    sameSite: 'lax',
-                    maxAge: 10 * 60, // 10 minutes
-                    // Only send the cookie to preview routes and scope it to the specific site
-                    // to avoid conflicts between different sites previews potentially opened at the same time.
-                    path: isPreview
-                        ? siteURLData.siteBasePath
-                        : `/url/preview/${getPreviewRequestIdentifier(siteRequestURL)}`,
-                },
-            });
+            if (siteURLData.preview) {
+                cookies.push({
+                    name: MiddlewareHeaders.Customization,
+                    value: encodeURIComponent(customization),
+                    options: {
+                        httpOnly: true,
+                        sameSite: 'lax',
+                        maxAge: 10 * 60, // 10 minutes
+                        // Only send the cookie to preview routes and scope it to the specific site
+                        // to avoid conflicts between different sites previews potentially opened at the same time.
+                        path: (() => {
+                            switch (mode) {
+                                case 'url':
+                                    // TODO: Remove support for 'preview' hostnames later.
+                                    return siteRequestURL.hostname === 'preview'
+                                        ? `/url/${siteRequestURL.hostname}/${getPreviewRequestIdentifier(siteRequestURL)}`
+                                        : `/url/${GITBOOK_PREVIEW_BASE_URL}/${getPreviewRequestIdentifier(siteRequestURL)}`;
+                                case 'url-host':
+                                    return siteURLData.siteBasePath;
+                                default:
+                                    assertNever(mode);
+                            }
+                        })(),
+                    },
+                });
+            }
         }
         const theme =
             siteRequestURL.searchParams.get('theme') ??
@@ -394,7 +411,20 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
                     httpOnly: true,
                     sameSite: 'lax',
                     maxAge: 10 * 60, // 10 minutes
-                    path: isPreview ? siteURLData.siteBasePath : '/url/preview', // Only send the cookie to preview routes
+                    // Only send the cookie to preview routes
+                    path: (() => {
+                        switch (mode) {
+                            case 'url':
+                                // TODO: Remove support for 'preview' hostnames later.
+                                return siteRequestURL.hostname === 'preview'
+                                    ? `/url/${siteRequestURL.hostname}/${getPreviewRequestIdentifier(siteRequestURL)}`
+                                    : `/url/${GITBOOK_PREVIEW_BASE_URL}/${getPreviewRequestIdentifier(siteRequestURL)}`;
+                            case 'url-host':
+                                return siteURLData.siteBasePath;
+                            default:
+                                assertNever(mode);
+                        }
+                    })(),
                 },
             });
         }
@@ -468,8 +498,8 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
 
     // For preview requests like:
     // - https://preview/<siteURL> requests, TODO: Remove support for this format later
-    // - https://sites.gitbook.com/preview/<siteID> requests,
-    if (isPreview) {
+    // - https://<GITBOOK_PREVIEW_BASE_URL>/<siteID> requests (ex: https://sites.gitbook.com/preview/site_id/path)
+    if (isPreviewRequest(siteRequestURL)) {
         // Do not track page views for preview requests
         request.headers.set('x-gitbook-disable-tracking', 'true');
         return serveWithQueryAPIToken(
