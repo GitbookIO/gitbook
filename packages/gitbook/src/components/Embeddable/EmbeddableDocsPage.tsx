@@ -2,7 +2,6 @@ import { type PagePathParams, getSitePageData } from '@/components/SitePage';
 import type { GitBookSiteContext } from '@/lib/context';
 import { SiteInsightsDisplayContext } from '@gitbook/api';
 import type { Metadata } from 'next';
-import { HeaderLogo } from '../Header';
 import { HeaderMobileMenu } from '../Header/HeaderMobileMenu';
 import { SpacesDropdown, TranslationsDropdown } from '../Header/SpacesDropdown';
 import { PageBody } from '../PageBody';
@@ -109,21 +108,18 @@ export async function EmbeddableDocsPage(
                             context={context}
                             withTrademark={false}
                             header={
-                                <div className="theme-bold:m-[-1.5rem_-1px_-0.5rem_-2rem] flex grow-0 items-center theme-bold:bg-header-background theme-bold:p-[1rem_0_1rem_2rem] pr-4 text-base/tight dark:shadow-light/1">
-                                    <HeaderLogo context={context} />
-                                    {variants.translations.length > 1 ? (
-                                        <TranslationsDropdown
-                                            context={context}
-                                            siteSpace={
-                                                variants.translations.find(
-                                                    (space) => space.id === context.siteSpace.id
-                                                ) ?? context.siteSpace
-                                            }
-                                            siteSpaces={variants.translations}
-                                            className="ml-auto py-2"
-                                        />
-                                    ) : null}
-                                </div>
+                                !context.sections && variants.translations.length > 1 ? (
+                                    <TranslationsDropdown
+                                        context={context}
+                                        siteSpace={
+                                            variants.translations.find(
+                                                (space) => space.id === context.siteSpace.id
+                                            ) ?? context.siteSpace
+                                        }
+                                        siteSpaces={variants.translations}
+                                        className="max-md:[&_.button-content]:block"
+                                    />
+                                ) : null
                             }
                             innerHeader={
                                 variants.generic.length > 1 ? (
