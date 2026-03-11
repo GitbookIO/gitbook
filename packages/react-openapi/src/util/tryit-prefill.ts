@@ -77,12 +77,11 @@ function resolveTryItPrefillAuthForOperationSecurities(args: {
     const prefillAuthConfig: ApiClientConfiguration['authentication']['securitySchemes'] = {};
 
     for (const [schemeName, security] of Object.values(securities)) {
+        const resolvedPrefill = security[PREFILL_CUSTOM_PROPERTY]
+            ? resolveTryItPrefillExpression?.(security[PREFILL_CUSTOM_PROPERTY])
+            : undefined;
         const tryitPrefillAuthValue =
-            (security[PREFILL_CUSTOM_PROPERTY]
-                ? resolveTryItPrefillExpression?.(security[PREFILL_CUSTOM_PROPERTY])
-                : undefined) ??
-            security['x-gitbook-token-placeholder'] ??
-            undefined;
+            resolvedPrefill || security['x-gitbook-token-placeholder'] || undefined;
 
         if (!tryitPrefillAuthValue) {
             continue;
