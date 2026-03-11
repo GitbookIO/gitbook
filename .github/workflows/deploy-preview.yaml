@@ -161,7 +161,7 @@ jobs:
               env:
                   BASE_URL: ${{ needs.deploy-v2-cloudflare.outputs.deployment-url }}
                   SITE_BASE_URL: ${{ needs.deploy-v2-cloudflare.outputs.deployment-url }}/url/
-                  SITE_PREVIEW_BASE_URL: ${{ needs.deploy-v2-vercel.outputs.deployment-url }}/preview/
+                  SITE_PREVIEW_BASE_URL: ${{ needs.deploy-v2-cloudflare.outputs.deployment-url }}/preview/
                   ARGOS_TOKEN: ${{ secrets.ARGOS_TOKEN }}
                   ARGOS_BUILD_NAME: v2-cloudflare
     visual-testing-customers-v2:
