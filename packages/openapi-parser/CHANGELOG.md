@@ -1,5 +1,11 @@
 # @gitbook/openapi-parser
 
+## 3.0.10
+
+### Patch Changes
+
+- 8ab419a: Support x-enable-proxy at operation level
+
 ## 3.0.9
 
 ### Patch Changes

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test';
 
-import { getURLLookupAlternatives, normalizeURL } from './urls';
+import { decodeURLPath, getURLLookupAlternatives, normalizeURL } from './urls';
 
 describe('getURLLookupAlternatives', () => {
     it('should return all URLs up to the root', () => {
@@ -404,5 +404,126 @@ describe('normalizeURL', () => {
         expect(normalizeURL(new URL('https://docs.mycompany.com//hello//there'))).toEqual(
             new URL('https://docs.mycompany.com/hello/there')
         );
+    });
+});
+
+describe('decodeURLPath', () => {
+    it('should decode encoded path components', () => {
+        const url = new URL('https://docs.mycompany.com/helloworld/tes%74');
+        const result = decodeURLPath(url);
+        expect(result.pathname).toBe('/helloworld/test');
+        expect(result.toString()).toBe('https://docs.mycompany.com/helloworld/test');
+    });
+
+    it('should handle multiple levels of encoding', () => {
+        // Double encoded: tes%2574 → tes%74 → test
+        // %2574 decodes as: %25 → %, leaving %74, which then decodes to t
+        const url = new URL('https://docs.mycompany.com/helloworld/tes%2574');
+        const result = decodeURLPath(url);
+        expect(result.pathname).toBe('/helloworld/test');
+
+        // Triple encoding (tes%252574) exceeds the 2-pass limit and is rejected
+        expect(() => {
+            decodeURLPath(new URL('https://docs.mycompany.com/helloworld/tes%252574'));
+        }).toThrow('URL path is malformed');
+    });
+
+    it('should throw for malformed percent-encoding in the path', () => {
+        // Invalid hex digits in percent-encoding
+        expect(() => {
+            decodeURLPath(new URL('https://docs.mycompany.com/helloworld/%ZZ'));
+        }).toThrow('URL path is malformed');
+
+        // Incomplete or invalid UTF-8 sequence
+        expect(() => {
+            decodeURLPath(new URL('https://docs.mycompany.com/helloworld/%E0%A4%A'));
+        }).toThrow('URL path is malformed');
+
+        // Trailing '%' without two following hex digits
+        expect(() => {
+            decodeURLPath(new URL('https://docs.mycompany.com/helloworld/trailing%'));
+        }).toThrow('URL path is malformed');
+    });
+
+    it.skip('should throw an error for invalid characters in the path', () => {
+        expect(() => {
+            decodeURLPath(new URL('https://docs.mycompany.com/hello:world'));
+        }).toThrow('URL path contains invalid characters');
+
+        expect(() => {
+            decodeURLPath(new URL('https://docs.mycompany.com/hello%3Btest'));
+        }).toThrow('URL path contains invalid characters');
+
+        expect(() => {
+            decodeURLPath(new URL('https://docs.mycompany.com/hello%40anchor'));
+        }).toThrow('URL path contains invalid characters');
+
+        // %20 (space) re-encodes to %20 after decoding, so the path is stable
+        // and considered fully decoded — it should not throw.
+        expect(decodeURLPath(new URL('https://docs.mycompany.com/hello%20world')).pathname).toBe(
+            '/hello%20world'
+        );
+    });
+
+    it('should limit decoding iterations for nested % encodings to prevent DoS', () => {
+        // 3+ levels of encoding exceed the 2-pass limit and should throw.
+        // %25252525 needs 4 passes: %25252525 → %252525 → %2525 → %25 → %
+        const url = new URL('https://docs.mycompany.com/%25252525');
+        expect(() => {
+            decodeURLPath(url);
+        }).toThrow('URL path is malformed');
+
+        const deepUrl = new URL('https://docs.mycompany.com/%2525252525252525');
+        expect(() => {
+            decodeURLPath(deepUrl);
+        }).toThrow('URL path is malformed');
+    });
+
+    it('should throw for URL paths exceeding 2048 characters', () => {
+        const longPath = '/a'.repeat(1025); // 2050 chars
+        const url = new URL(`https://docs.mycompany.com${longPath}`);
+        expect(() => {
+            decodeURLPath(url);
+        }).toThrow('URL path is too long');
+    });
+
+    // TODO: should we do that actually?
+    it.skip('should throw an error if the encoded path contains /', () => {
+        expect(() => {
+            decodeURLPath(new URL('https://docs.mycompany.com/hello%2Fworld'));
+        }).toThrow('URL path contains invalid characters');
+    });
+
+    it('should not decode search params or hash fragments', () => {
+        const url = new URL('https://docs.mycompany.com/helloworld/tes%74?query=%74est#sec%74ion');
+        const result = decodeURLPath(url);
+        expect(result.pathname).toBe('/helloworld/test');
+        expect(result.search).toBe('?query=%74est');
+        expect(result.hash).toBe('#sec%74ion');
+    });
+
+    it('should not apply the path length limit to a jwt_token query param', () => {
+        // A massive fake JWT token (header.payload.signature, all base64url)
+        const fakeJwt = `${'a'.repeat(500)}.${'b'.repeat(500)}.${'c'.repeat(500)}`;
+        const url = new URL(`https://docs.mycompany.com/short-path?jwt_token=${fakeJwt}`);
+        // The path itself is well within the limit; only the query param is huge.
+        expect(url.pathname.length).toBeLessThan(2048);
+        const result = decodeURLPath(url);
+        expect(result.pathname).toBe('/short-path');
+        // The query string must pass through untouched.
+        expect(result.searchParams.get('jwt_token')).toBe(fakeJwt);
+    });
+
+    it('should not affect rison-encoded query params', () => {
+        // Rison uses characters such as '(', ')', '!', "'" and ':' that are
+        // valid inside query strings but would be rejected if found in the path.
+        const risonValue = "(id:!(1,2,3),name:'hello world',flag:!t)";
+        const url = new URL(
+            `https://docs.mycompany.com/some-page?filter=${encodeURIComponent(risonValue)}`
+        );
+        const result = decodeURLPath(url);
+        expect(result.pathname).toBe('/some-page');
+        // The rison param must survive decodeURLPath intact.
+        expect(result.searchParams.get('filter')).toBe(risonValue);
     });
 });

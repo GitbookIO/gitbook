@@ -12,6 +12,7 @@ import { Heading } from '../Heading';
 import './style.css';
 import { DEFAULT_LOCALE, getSpaceLocale } from '@/intl/server';
 import type { GitBookAnyContext } from '@/lib/context';
+import { buildSignedProxyUrl } from '@/lib/openapi/proxy-token';
 import type {
     AnyOpenAPIOperationsBlock,
     OpenAPISchemasBlock,
@@ -23,7 +24,7 @@ import type {
  */
 export function getOpenAPIContext(args: {
     props: BlockProps<AnyOpenAPIOperationsBlock | OpenAPISchemasBlock | OpenAPIWebhookBlock>;
-    specUrl: string;
+    specUrl: string | null;
     context: GitBookAnyContext | undefined;
 }): OpenAPIContextInput {
     const { props, specUrl, context } = args;
@@ -32,11 +33,15 @@ export function getOpenAPIContext(args: {
     const customizationLocale = context ? getSpaceLocale(context) : DEFAULT_LOCALE;
     const locale = checkIsValidLocale(customizationLocale) ? customizationLocale : DEFAULT_LOCALE;
 
-    const proxyUrl = context ? context.linker.toPathInSite('~scalar/proxy') : undefined;
+    const proxyUrl = context
+        ? context.linker.toAbsoluteURL(context.linker.toPathInSite('~scalar/proxy'))
+        : undefined;
 
     return {
         specUrl,
-        proxyUrl,
+        resolveProxyUrl: proxyUrl
+            ? (allowedOrigins: string[]) => buildSignedProxyUrl(proxyUrl, allowedOrigins)
+            : undefined,
         icons: {
             chevronDown: <Icon icon="chevron-down" />,
             chevronRight: <Icon icon="chevron-right" />,

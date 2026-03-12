@@ -1,6 +1,7 @@
 'use client';
 
 import { t, useLanguage } from '@/intl/client';
+import { getLocalizedTitle } from '@/lib/sites';
 import { CustomizationSearchStyle, type SiteSection, type SiteSpace } from '@gitbook/api';
 import { useRouter } from 'next/navigation';
 import React, { useRef } from 'react';
@@ -256,7 +257,10 @@ export function SearchContainer({
                                 <div className="border-tint-subtle border-t bg-tint-subtle px-4 py-1.5">
                                     <SearchScopeControl
                                         section={section}
-                                        spaceTitle={siteSpace.title}
+                                        spaceTitle={getLocalizedTitle(
+                                            siteSpace,
+                                            siteSpace.space.language
+                                        )}
                                         withVariants={withVariants}
                                         withSiteVariants={withSiteVariants}
                                         withSections={withSections}

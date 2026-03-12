@@ -1,5 +1,12 @@
 import type { GitBookSiteContext } from '@/lib/context';
-import type { SiteSection, SiteSectionGroup, SiteSpace, SiteStructure } from '@gitbook/api';
+import type {
+    LocalizedString,
+    SiteSection,
+    SiteSectionGroup,
+    SiteSpace,
+    SiteStructure,
+    TranslationLanguage,
+} from '@gitbook/api';
 import { joinPath } from './paths';
 import { flattenSectionsFromGroup } from './utils';
 
@@ -176,4 +183,37 @@ function findSiteSpaceByIdInSiteSpaces(
     predicate: (siteSpace: SiteSpace) => boolean
 ): SiteSpace | null {
     return siteSpaces.find(predicate) ?? null;
+}
+
+/**
+ * Get the localized title for a site entity (SiteSection, SiteSectionGroup, or SiteSpace).
+ */
+export function getLocalizedTitle(
+    entity: { title: string; localizedTitle?: LocalizedString },
+    currentLanguage: TranslationLanguage | undefined
+): string {
+    return getLocalizedField(entity.localizedTitle, currentLanguage) ?? entity.title;
+}
+
+/**
+ * Get the localized description for a site entity.
+ */
+export function getLocalizedDescription(
+    entity: { description?: string; localizedDescription?: LocalizedString },
+    currentLanguage: TranslationLanguage | undefined
+): string | undefined {
+    return getLocalizedField(entity.localizedDescription, currentLanguage) ?? entity.description;
+}
+
+/**
+ * Get a localized field value for the given language.
+ */
+function getLocalizedField(
+    localizedField: LocalizedString | undefined,
+    currentLanguage: TranslationLanguage | undefined
+): string | undefined {
+    if (localizedField && currentLanguage && localizedField[currentLanguage]) {
+        return localizedField[currentLanguage];
+    }
+    return undefined;
 }

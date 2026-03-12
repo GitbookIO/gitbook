@@ -1,4 +1,3 @@
-import { AIContextProvider } from '@/components/AI';
 import { CustomizationRootLayout } from '@/components/RootLayout';
 import {
     SiteLayoutClientContexts,
@@ -11,6 +10,7 @@ import { SiteInsightsTrademarkPlacement } from '@gitbook/api';
 import { SpaceLayoutServerContext } from '../SpaceLayout';
 import { Trademark } from '../TableOfContents/Trademark';
 import { NavigationLoader } from '../primitives/NavigationLoader';
+import { EmbeddableAIContextProvider } from './EmbeddableAIContextProvider';
 import { EmbeddableIframeAPI } from './EmbeddableIframeAPI';
 import { IfEmbeddableTrademark } from './EmbeddableTrademark';
 
@@ -41,7 +41,7 @@ export async function EmbeddableRootLayout({
                 contextId={context.contextId}
                 proxyOrigin={context.site.proxy?.origin}
             >
-                <AIContextProvider
+                <EmbeddableAIContextProvider
                     aiMode={context.customization.ai.mode}
                     suggestions={context.customization.ai.suggestions}
                     trademark={context.customization.trademark.enabled}
@@ -72,7 +72,7 @@ export async function EmbeddableRootLayout({
                             baseURL={context.linker.toPathInSite('~gitbook/embed/')}
                         />
                     </SpaceLayoutServerContext>
-                </AIContextProvider>
+                </EmbeddableAIContextProvider>
             </SiteLayoutClientContexts>
         </CustomizationRootLayout>
     );

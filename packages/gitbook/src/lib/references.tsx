@@ -29,7 +29,7 @@ import { PageIcon } from '@/components/PageIcon';
 import { getGitBookAppHref } from './app';
 import { getBlockById, getBlockTitle } from './document';
 import { resolvePageId } from './pages';
-import { findSiteSpaceBy, getFallbackSiteSpacePath } from './sites';
+import { findSiteSpaceBy, getFallbackSiteSpacePath, getLocalizedTitle } from './sites';
 import { getRevisionTags, resolveTag } from './tags';
 import type { ClassValue } from './tailwind';
 import { filterOutNullable } from './typescript';
@@ -58,12 +58,17 @@ export interface ResolvedContentRef {
         context: GitBookSpaceContext;
         revisionReusableContent: RevisionReusableContent;
     };
-    /** Resolve OpenAPI spec filesystem. */
-    openAPIFilesystem?: Filesystem;
     /**
      * Space that the content ref belongs to (if applicable).
      */
     space?: Space;
+    /** Resolved OpenAPI spec, if the reference is an OpenAPI spec. */
+    openapi?: {
+        /** OpenAPI spec filesystem. */
+        filesystem: Filesystem;
+        /** Public URL of the OpenAPI spec */
+        publicURL: string | null;
+    };
 }
 
 export interface ResolveContentRefOptions {
@@ -340,10 +345,13 @@ export async function resolveContentRef(
                 return null;
             }
             return {
-                href: openAPISpecVersionContent.url,
+                href: openAPISpecVersionContent.urls.source,
                 text: contentRef.spec,
                 active: false,
-                openAPIFilesystem: openAPISpecVersionContent.filesystem as Filesystem,
+                openapi: {
+                    filesystem: openAPISpecVersionContent.filesystem as Filesystem,
+                    publicURL: openAPISpecVersionContent.urls.public,
+                },
             };
         }
 
@@ -480,15 +488,18 @@ async function resolveContentRefInSpace(
     // Prefer the variant title when available, then the section title, then fallback to the space title.
     const ancestorLabel = (() => {
         if ('site' in context) {
+            const currentLanguage = context.siteSpace.space.language;
             const foundSiteSpace = findSiteSpaceBy(
                 context.structure,
                 (siteSpace) => siteSpace.space.id === spaceId
             );
-            return (
-                foundSiteSpace?.siteSpace.title ??
-                foundSiteSpace?.siteSection?.title ??
-                ctx.spaceContext.space.title
-            );
+            if (foundSiteSpace?.siteSpace) {
+                return getLocalizedTitle(foundSiteSpace.siteSpace, currentLanguage);
+            }
+            if (foundSiteSpace?.siteSection) {
+                return getLocalizedTitle(foundSiteSpace.siteSection, currentLanguage);
+            }
+            return ctx.spaceContext.space.title;
         }
 
         return ctx.spaceContext.space.title;

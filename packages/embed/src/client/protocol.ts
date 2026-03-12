@@ -62,6 +62,12 @@ export type GitBookEmbeddableConfiguration = {
         subtitle: string;
     };
 
+    /**
+     * Override the assistant name displayed in the UI.
+     * Limited to 32 characters.
+     */
+    assistantName?: string;
+
     /** Suggestions of questions to be displayed in the welcome page. */
     suggestions: string[];
 

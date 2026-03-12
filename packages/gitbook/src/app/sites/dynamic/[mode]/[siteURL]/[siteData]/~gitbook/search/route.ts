@@ -9,7 +9,7 @@ import { throwIfDataError } from '@/lib/data';
 import { getSiteURLDataFromMiddleware } from '@/lib/middleware';
 import { joinPathWithBaseURL } from '@/lib/paths';
 import { getServerActionBaseContext } from '@/lib/server-actions';
-import { findSiteSpaceBy } from '@/lib/sites';
+import { findSiteSpaceBy, getLocalizedTitle } from '@/lib/sites';
 import type {
     SearchPageResult,
     SearchSpaceResult,
@@ -121,6 +121,7 @@ function transformSitePageResult(
 ): OrderedComputedResult[] {
     const { pageItem, spaceItem, spaceURL, siteSection, siteSectionGroup, siteSpace } = args;
     const { linker } = context;
+    const currentLanguage = siteSpace?.space.language;
 
     const page: ComputedPageResult = {
         type: 'page',
@@ -135,11 +136,11 @@ function transformSitePageResult(
         breadcrumbs: [
             siteSectionGroup && {
                 icon: siteSectionGroup?.icon as IconName,
-                label: siteSectionGroup.title,
+                label: getLocalizedTitle(siteSectionGroup, currentLanguage),
             },
             siteSection && {
                 icon: siteSection?.icon as IconName,
-                label: siteSection.title,
+                label: getLocalizedTitle(siteSection, currentLanguage),
             },
             (siteSection?.siteSpaces?.filter(
                 (space) =>
@@ -148,7 +149,7 @@ function transformSitePageResult(
                     ).length > 1
             ).length ?? 0) > 1 && siteSpace
                 ? {
-                      label: siteSpace.title,
+                      label: getLocalizedTitle(siteSpace, currentLanguage),
                   }
                 : undefined,
             ...pageItem.ancestors.map((ancestor) => ({
