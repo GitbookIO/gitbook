@@ -1,13 +1,46 @@
+import { SiteInsightsDisplayContext } from '@gitbook/api';
+
 import type { GitBookSiteContext } from '@/lib/context';
 import { getDataOrNull } from '@/lib/data';
 import { getMarkdownForPage } from '@/lib/markdownPage';
+import { resolvePagePathDocumentOrGroup } from '@/lib/pages';
+import { trackServerInsightsEvents } from '@/lib/tracking';
+import { waitUntil } from '@/lib/waitUntil';
 
 /**
  * Serve a markdown version of a page.
  * Returns a 404 if the page is not found.
  */
-export async function servePageMarkdown(context: GitBookSiteContext, pagePath: string) {
+export async function servePageMarkdown(
+    context: GitBookSiteContext,
+    pagePath: string,
+    request: Request
+) {
     try {
+        const pageLookup = resolvePagePathDocumentOrGroup(context.revision.pages, pagePath);
+
+        waitUntil(
+            trackServerInsightsEvents({
+                organizationId: context.organizationId,
+                siteId: context.site.id,
+                events: [
+                    {
+                        type: 'page_view',
+                        location: {
+                            displayContext: SiteInsightsDisplayContext.Mcp,
+                            ...(pageLookup
+                                ? {
+                                      page: pageLookup.page.id,
+                                      space: context.space.id,
+                                  }
+                                : {}),
+                        },
+                    },
+                ],
+                request,
+            })
+        );
+
         const result = await getDataOrNull(getMarkdownForPage(context, pagePath));
         if (!result) {
             return new Response('Page not found', {
