@@ -3,7 +3,7 @@ import { throwIfDataError } from '@/lib/data';
 import type { GitBookLinker } from '@/lib/links';
 import { joinPath } from '@/lib/paths';
 import { type FlatPageEntry, getIndexablePages } from '@/lib/sitemap';
-import { getSiteSectionTitle, getSiteStructureSections } from '@/lib/sites';
+import { getLocalizedTitle, getSiteStructureSections } from '@/lib/sites';
 import type { SiteSection, SiteSpace } from '@gitbook/api';
 import assertNever from 'assert-never';
 import type { ListItem, Paragraph, Root, RootContent } from 'mdast';
@@ -101,7 +101,7 @@ async function getNodesFromSections(
                     type: 'heading',
                     depth: 2,
                     children: [
-                        { type: 'text', value: getSiteSectionTitle(siteSection, currentLanguage) },
+                        { type: 'text', value: getLocalizedTitle(siteSection, currentLanguage) },
                     ],
                 },
                 ...siteSpaceNodes,
@@ -152,7 +152,12 @@ async function getNodesFromSiteSpaces(
                 nodes.push({
                     type: 'heading',
                     depth: 2,
-                    children: [{ type: 'text', value: siteSpace.title }],
+                    children: [
+                        {
+                            type: 'text',
+                            value: getLocalizedTitle(siteSpace, context.siteSpace.space.language),
+                        },
+                    ],
                 });
             }
 

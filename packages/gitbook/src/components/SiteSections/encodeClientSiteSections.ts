@@ -1,5 +1,10 @@
 import type { GitBookSiteContext, SiteSections } from '@/lib/context';
-import { getSectionURL, getSiteSectionTitle, getSiteSpaceURL } from '@/lib/sites';
+import {
+    getLocalizedDescription,
+    getLocalizedTitle,
+    getSectionURL,
+    getSiteSpaceURL,
+} from '@/lib/sites';
 import type { SiteSection, SiteSectionGroup, SiteSpace } from '@gitbook/api';
 import assertNever from 'assert-never';
 
@@ -24,6 +29,7 @@ export type ClientSiteSectionGroup = Pick<SiteSectionGroup, 'id' | 'title' | 'ic
  */
 export function encodeClientSiteSections(context: GitBookSiteContext, sections: SiteSections) {
     const { list, current } = sections;
+    const currentLanguage = context.siteSpace.space.language;
 
     const clientSections: (ClientSiteSection | ClientSiteSectionGroup)[] = [];
 
@@ -39,7 +45,7 @@ export function encodeClientSiteSections(context: GitBookSiteContext, sections: 
 
                 clientSections.push({
                     id: item.id,
-                    title: item.title,
+                    title: getLocalizedTitle(item, currentLanguage),
                     icon: item.icon,
                     object: item.object,
                     children,
@@ -66,6 +72,7 @@ function encodeChildren(
     children: (SiteSection | SiteSectionGroup)[]
 ): (ClientSiteSection | ClientSiteSectionGroup)[] {
     const clientChildren: (ClientSiteSection | ClientSiteSectionGroup)[] = [];
+    const currentLanguage = context.siteSpace.space.language;
 
     for (const child of children) {
         switch (child.object) {
@@ -83,7 +90,7 @@ function encodeChildren(
 
                 clientChildren.push({
                     id: child.id,
-                    title: child.title,
+                    title: getLocalizedTitle(child, currentLanguage),
                     icon: child.icon,
                     object: child.object,
                     children: nestedChildren,
@@ -102,8 +109,8 @@ function encodeSection(context: GitBookSiteContext, section: SiteSection) {
     const currentLanguage = context.siteSpace.space.language;
     return {
         id: section.id,
-        title: getSiteSectionTitle(section, currentLanguage),
-        description: section.description,
+        title: getLocalizedTitle(section, currentLanguage),
+        description: getLocalizedDescription(section, currentLanguage),
         icon: section.icon,
         object: section.object,
         url: findBestTargetURL(context, section),
