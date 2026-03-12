@@ -46,18 +46,6 @@ export function getTestURL(urlRest: string): string {
 }
 
 /**
- * Get the URL to load a site preview on the deployment being tested.
- */
-export function getTestPreviewURL(urlRest: string): string {
-    const gitbookPreviewURL = new URL(getGitBookPreviewURL(urlRest));
-    const url = new URL(
-        gitbookPreviewURL.href.replace(`${gitbookPreviewURL.protocol}//`, ''),
-        getSiteBaseURL()
-    );
-    return url.toString();
-}
-
-/**
  * Get the upstream GitBook preview URL for a preview route.
  */
 export function getGitBookPreviewURL(urlRest: string): string {
