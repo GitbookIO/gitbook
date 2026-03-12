@@ -45,7 +45,7 @@
         // Run end-to-end tests for customers
         "e2e-customers": {
             "dependsOn": ["^e2e-customers"],
-            "env": ["BASE_URL", "SITE_BASE_URL"
+            "env": ["BASE_URL", "SITE_BASE_URL"]
         },
         // Start the package in development mode for v2
         "dev": {
