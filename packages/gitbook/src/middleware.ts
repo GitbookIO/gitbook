@@ -15,12 +15,7 @@ import {
     normalizeURL,
     throwIfDataError,
 } from '@/lib/data';
-import {
-    GITBOOK_OAUTH_SERVER_URL,
-    GITBOOK_PREVIEW_BASE_URL,
-    isGitBookAssetsHostURL,
-    isGitBookHostURL,
-} from '@/lib/env';
+import { GITBOOK_OAUTH_SERVER_URL, isGitBookAssetsHostURL, isGitBookHostURL } from '@/lib/env';
 import { getImageResizingContextId } from '@/lib/images';
 import { MiddlewareHeaders } from '@/lib/middleware';
 import {
@@ -28,7 +23,11 @@ import {
     isOAuthProtectedResourceRequest,
 } from '@/lib/oauth-protected';
 import { removeLeadingSlash, removeTrailingSlash } from '@/lib/paths';
-import { getPreviewRequestIdentifier, isPreviewRequest } from '@/lib/preview';
+import {
+    getPreviewCookieResponse,
+    getPreviewRequestIdentifier,
+    isPreviewRequest,
+} from '@/lib/preview';
 import {
     type ResponseCookies,
     getPathScopedCookieName,
@@ -38,7 +37,6 @@ import {
     serveVisitorClaimsDataRequest,
 } from '@/lib/visitors';
 import { serveResizedImage } from '@/routes/image';
-import assertNever from 'assert-never';
 import { cookies } from 'next/headers';
 import { serveProxyAnalyticsEvent } from './lib/tracking';
 export const config = {
@@ -372,30 +370,15 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
             // We need to encode the customization headers, otherwise it will fail for some customization values containing non ASCII chars on vercel.
             requestHeaders.set(MiddlewareHeaders.Customization, encodeURIComponent(customization));
             if (siteURLData.preview) {
-                cookies.push({
-                    name: MiddlewareHeaders.Customization,
-                    value: encodeURIComponent(customization),
-                    options: {
-                        httpOnly: true,
-                        sameSite: 'lax',
-                        maxAge: 10 * 60, // 10 minutes
-                        // Only send the cookie to preview routes and scope it to the specific site
-                        // to avoid conflicts between different sites previews potentially opened at the same time.
-                        path: (() => {
-                            switch (mode) {
-                                case 'url':
-                                    // TODO: Remove support for 'preview' hostnames later.
-                                    return siteRequestURL.hostname === 'preview'
-                                        ? `/url/${siteRequestURL.hostname}/${getPreviewRequestIdentifier(siteRequestURL)}`
-                                        : `/url/${GITBOOK_PREVIEW_BASE_URL}/${getPreviewRequestIdentifier(siteRequestURL)}`;
-                                case 'url-host':
-                                    return siteURLData.siteBasePath;
-                                default:
-                                    assertNever(mode);
-                            }
-                        })(),
-                    },
-                });
+                cookies.push(
+                    getPreviewCookieResponse({
+                        name: MiddlewareHeaders.Customization,
+                        value: encodeURIComponent(customization),
+                        mode,
+                        siteRequestURL,
+                        siteURLData,
+                    })
+                );
             }
         }
         const theme =
@@ -404,29 +387,17 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         if (theme === CustomizationThemeMode.Dark || theme === CustomizationThemeMode.Light) {
             routeType = 'dynamic';
             requestHeaders.set(MiddlewareHeaders.Theme, theme);
-            cookies.push({
-                name: MiddlewareHeaders.Theme,
-                value: theme,
-                options: {
-                    httpOnly: true,
-                    sameSite: 'lax',
-                    maxAge: 10 * 60, // 10 minutes
-                    // Only send the cookie to preview routes
-                    path: (() => {
-                        switch (mode) {
-                            case 'url':
-                                // TODO: Remove support for 'preview' hostnames later.
-                                return siteRequestURL.hostname === 'preview'
-                                    ? `/url/${siteRequestURL.hostname}/${getPreviewRequestIdentifier(siteRequestURL)}`
-                                    : `/url/${GITBOOK_PREVIEW_BASE_URL}/${getPreviewRequestIdentifier(siteRequestURL)}`;
-                            case 'url-host':
-                                return siteURLData.siteBasePath;
-                            default:
-                                assertNever(mode);
-                        }
-                    })(),
-                },
-            });
+            if (siteURLData.preview) {
+                cookies.push(
+                    getPreviewCookieResponse({
+                        name: MiddlewareHeaders.Theme,
+                        value: theme,
+                        mode,
+                        siteRequestURL,
+                        siteURLData,
+                    })
+                );
+            }
         }
 
         // We support forcing dynamic routes by setting a `gitbook-dynamic-route` cookie
