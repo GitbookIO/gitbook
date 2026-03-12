@@ -41,14 +41,14 @@ export const CodeBlockRenderer = forwardRef(function CodeBlockRenderer(
             ref={ref}
             aria-busy={ariaBusy}
             className={tcls(
-                'group/codeblock shiki grid shrink grid-flow-col overflow-hidden',
+                'group/codeblock shiki relative flex shrink flex-col overflow-hidden print:overflow-visible',
                 style
             )}
             /* Sets the code theme's mode (light or dark) for the site's theme mode (light or dark).
              * Used to style UI elements (scrollbars, form controls) correctly and apply the right default to "plain" code blocks. */
             data-color-scheme={`${theme.themes.light.type} ${theme.themes.dark.type}`}
         >
-            <div className="flex items-center justify-start gap-2 text-sm [grid-area:1/1]">
+            <div className="flex items-center justify-start gap-2 text-sm">
                 {title ? (
                     <div
                         className="relative top-px z-20 inline-flex items-center justify-center circular-corners:rounded-t-xl rounded-corners:rounded-t-lg straight-corners:rounded-t-xs border border-tint-subtle border-b-0 bg-tint-subtle theme-bold-tint:bg-tint-base theme-muted:bg-tint-base px-3 py-2 text-tint text-xs leading-none tracking-wide contrast-more:border-tint contrast-more:bg-tint-base [html.theme-bold.sidebar-filled_&]:bg-tint-base"
@@ -65,11 +65,11 @@ export const CodeBlockRenderer = forwardRef(function CodeBlockRenderer(
             </div>
             <CopyCodeButton
                 codeId={codeId}
-                style="z-2 mt-2 mr-2 self-start justify-self-end leading-none opacity-0 backdrop-blur-md [grid-area:2/1] group-hover/codeblock:opacity-11"
+                style="absolute top-1 right-1 z-2 self-start justify-self-end leading-none opacity-0 backdrop-blur-md group-hover/codeblock:opacity-11"
             />
             <pre
                 className={tcls(
-                    'relative overflow-auto border border-tint-subtle bg-tint-subtle theme-bold-tint:bg-tint-base theme-muted:bg-tint-base p-2 text-tint-strong [grid-area:2/1] contrast-more:border-tint contrast-more:bg-tint-base',
+                    'relative overflow-auto border border-tint-subtle bg-tint-subtle theme-bold-tint:bg-tint-base theme-muted:bg-tint-base p-2 text-tint-strong contrast-more:border-tint contrast-more:bg-tint-base print:overflow-visible',
                     'circular-corners:rounded-2xl rounded-corners:rounded-xl straight-corners:rounded-xs depth-subtle:shadow-xs',
                     title && 'rounded-ss-none!'
                 )}
@@ -83,7 +83,7 @@ export const CodeBlockRenderer = forwardRef(function CodeBlockRenderer(
                 <code
                     id={codeId}
                     className={tcls(
-                        'inline-grid max-h-full min-w-full grid-cols-[auto_1fr] [count-reset:line] print:whitespace-pre-wrap',
+                        'block max-h-full w-fit [counter-reset:line] print:whitespace-pre-wrap',
                         withWrap && 'whitespace-pre-wrap',
                         '[[aria-expanded=false]_&]:mask-b-from-50%'
                     )}
