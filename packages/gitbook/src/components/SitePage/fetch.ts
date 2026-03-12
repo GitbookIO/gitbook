@@ -1,6 +1,11 @@
 import type { GitBookSiteContext } from '@/lib/context';
 import { redirect } from 'next/navigation';
 
+import {
+    SITE_REDIRECT_SOURCE_PATH_MAX_LENGTH,
+    SITE_REDIRECT_SOURCE_PATH_PATTERN,
+} from '@gitbook/api';
+
 import { getDataOrNull } from '@/lib/data';
 import { resolvePageId, resolvePagePath } from '@/lib/pages';
 import { withLeadingSlash } from '@/lib/paths';
@@ -53,10 +58,9 @@ async function resolvePage(context: GitBookSiteContext, params: PagePathParams |
 
     // We don't test path that are too long as GitBook doesn't support them and will return a 404 anyway.
     // API has a limit of less than 512 characters for the source path, so we use the same limit here.
-    if (rawPathname.length < 512) {
+    if (rawPathname.length < SITE_REDIRECT_SOURCE_PATH_MAX_LENGTH) {
         // Duplicated the regex pattern from SiteRedirectSourcePath API type.
-        const SITE_REDIRECT_SOURCE_PATH_REGEX =
-            /^\/(?!\*)(?!.*\*.+)(?:[A-Za-z0-9\-._~]|%[0-9A-Fa-f]{2})+(?:\/(?:[A-Za-z0-9\-._~]|%[0-9A-Fa-f]{2})+)*(?:\/\*|\*)?$/;
+        const SITE_REDIRECT_SOURCE_PATH_REGEX = new RegExp(SITE_REDIRECT_SOURCE_PATH_PATTERN);
         const redirectPathname = withLeadingSlash(rawPathname);
         // If a page can't be found, we try with the API, in case we have a redirect at site level.
         const redirectSources = new Set(
