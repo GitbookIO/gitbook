@@ -65,6 +65,12 @@ export const GITBOOK_OAUTH_SERVER_URL =
     process.env.GITBOOK_OAUTH_SERVER_URL || 'https://sites.gitbook.com/oauth2/v1';
 
 /**
+ * Base URL for GitBook preview requests.
+ */
+export const GITBOOK_PREVIEW_BASE_URL =
+    process.env.GITBOOK_PREVIEW_BASE_URL || 'https://sites.gitbook.com/preview/';
+
+/**
  * Whether to disable tracking of events into site insights.
  * This is used to disable tracking in development mode.
  */

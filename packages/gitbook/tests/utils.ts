@@ -46,6 +46,14 @@ export function getTestURL(urlRest: string): string {
 }
 
 /**
+ * Get the upstream GitBook preview URL for a preview route.
+ */
+export function getGitBookPreviewURL(urlRest: string): string {
+    const url = new URL(urlRest, 'https://sites.gitbook.com/preview/');
+    return url.href.replace(`${url.protocol}//`, '');
+}
+
+/**
  * Get an API token for a site by its URL.
  */
 export async function getSiteAPIToken(url: string) {
