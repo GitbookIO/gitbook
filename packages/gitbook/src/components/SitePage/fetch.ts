@@ -78,7 +78,7 @@ async function resolvePage(context: GitBookSiteContext, params: PagePathParams |
         for (const source of redirectSources) {
             // We try to resolve the site redirect
             const resolvedSiteRedirect =
-                source.length < 512 &&
+                source.length < SITE_REDIRECT_SOURCE_PATH_MAX_LENGTH &&
                 (await getDataOrNull(
                     context.dataFetcher.getSiteRedirectBySource({
                         organizationId,
