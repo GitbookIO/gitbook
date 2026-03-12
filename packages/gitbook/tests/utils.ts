@@ -62,7 +62,7 @@ export function getTestPreviewURL(urlRest: string): string {
  */
 export function getGitBookPreviewURL(urlRest: string): string {
     const url = new URL(urlRest, 'https://sites.gitbook.com/preview/');
-    return url.toString();
+    return url.href.replace(`${url.protocol}//`, '');
 }
 
 /**

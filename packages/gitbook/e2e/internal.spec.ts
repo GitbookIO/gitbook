@@ -16,7 +16,7 @@ import jwt from 'jsonwebtoken';
 
 import { VISITOR_TOKEN_COOKIE } from '@/lib/visitors';
 
-import { getSiteAPIToken } from '../tests/utils';
+import { getGitBookPreviewURL, getSiteAPIToken } from '../tests/utils';
 import {
     type Test,
     type TestsCase,
@@ -754,12 +754,55 @@ const testCases: TestsCase[] = [
                     }
                 },
             },
+            {
+                name: 'With customization cookie',
+                url: async () => {
+                    const data = await getSiteAPIToken(
+                        'https://gitbook.gitbook.io/test-gitbook-open/'
+                    );
+
+                    const searchParams = new URLSearchParams();
+                    searchParams.set('token', data.apiToken);
+
+                    return `url/preview/${data.site}/?${searchParams.toString()}`;
+                },
+                screenshot: false,
+                run: async (page) => {
+                    await expect(page.locator('[data-testid="table-of-contents"]')).toBeVisible();
+                    // Trademark exists by default
+                    await expect(page.getByTestId('gb-trademark')).toHaveCount(1);
+
+                    // Go to another page with the customization query to disable the trademark
+                    const pageBlocks = new URL(page.url());
+                    pageBlocks.pathname = `${pageBlocks.pathname.replace(/\/$/, '')}/blocks`;
+                    pageBlocks.search = getCustomizationURL({
+                        trademark: {
+                            enabled: false,
+                        },
+                    }).slice(1);
+                    await page.goto(pageBlocks.toString());
+                    // No trademark because customization is disabled
+                    await expect(page.getByTestId('gb-trademark')).toHaveCount(0);
+                    await expect(
+                        page.getByRole('heading', { level: 1, name: 'Blocks' })
+                    ).toBeVisible();
+
+                    const pageBlocksCode = new URL(page.url());
+                    pageBlocksCode.pathname = `${pageBlocksCode.pathname.replace(/\/$/, '')}/code`;
+                    pageBlocksCode.search = '';
+                    await page.goto(pageBlocksCode.toString());
+                    // The trademark should not be visible because the cookie is still set,
+                    await expect(page.getByTestId('gb-trademark')).toHaveCount(0);
+                    await expect(
+                        page.getByRole('heading', { level: 1, name: 'Code' })
+                    ).toBeVisible();
+                },
+            },
         ],
     },
     {
         name: 'Site Previews',
         skip: process.env.ARGOS_BUILD_NAME !== 'v2-vercel',
-        preview: true,
         tests: [
             {
                 name: 'Main content',
@@ -771,7 +814,7 @@ const testCases: TestsCase[] = [
                     const searchParams = new URLSearchParams();
                     searchParams.set('token', data.apiToken);
 
-                    return `${data.site}/?${searchParams.toString()}`;
+                    return `url/${getGitBookPreviewURL(`${data.site}/?${searchParams.toString()}`)}`;
                 },
                 screenshot: false,
                 run: async (page) => {
@@ -786,7 +829,7 @@ const testCases: TestsCase[] = [
                     const searchParams = new URLSearchParams();
                     searchParams.set('token', data.apiToken);
 
-                    return `${data.site}/?${searchParams.toString()}`;
+                    return `url/${getGitBookPreviewURL(`${data.site}/?${searchParams.toString()}`)}`;
                 },
                 screenshot: false,
                 run: async (page) => {
@@ -798,6 +841,50 @@ const testCases: TestsCase[] = [
                         const href = await link.getAttribute('href');
                         expect(href?.includes('/preview/site_p4Xo4')).toBeTruthy();
                     }
+                },
+            },
+            {
+                name: 'With customization cookie',
+                url: async () => {
+                    const data = await getSiteAPIToken(
+                        'https://gitbook.gitbook.io/test-gitbook-open/'
+                    );
+
+                    const searchParams = new URLSearchParams();
+                    searchParams.set('token', data.apiToken);
+
+                    return `url/${getGitBookPreviewURL(`${data.site}/?${searchParams.toString()}`)}`;
+                },
+                screenshot: false,
+                run: async (page) => {
+                    await expect(page.locator('[data-testid="table-of-contents"]')).toBeVisible();
+                    // Trademark exists by default
+                    await expect(page.getByTestId('gb-trademark')).toHaveCount(1);
+
+                    // Go to another page with the customization query to disable the trademark
+                    const pageBlocks = new URL(page.url());
+                    pageBlocks.pathname = `${pageBlocks.pathname.replace(/\/$/, '')}/blocks`;
+                    pageBlocks.search = getCustomizationURL({
+                        trademark: {
+                            enabled: false,
+                        },
+                    }).slice(1);
+                    await page.goto(pageBlocks.toString());
+                    // No trademark because customization is disabled
+                    await expect(page.getByTestId('gb-trademark')).toHaveCount(0);
+                    await expect(
+                        page.getByRole('heading', { level: 1, name: 'Blocks' })
+                    ).toBeVisible();
+
+                    const pageBlocksCode = new URL(page.url());
+                    pageBlocksCode.pathname = `${pageBlocksCode.pathname.replace(/\/$/, '')}/code`;
+                    pageBlocksCode.search = '';
+                    await page.goto(pageBlocksCode.toString());
+                    // The trademark should not be visible because the cookie is still set,
+                    await expect(page.getByTestId('gb-trademark')).toHaveCount(0);
+                    await expect(
+                        page.getByRole('heading', { level: 1, name: 'Code' })
+                    ).toBeVisible();
                 },
             },
         ],
