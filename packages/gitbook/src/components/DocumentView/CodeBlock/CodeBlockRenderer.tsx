@@ -65,7 +65,7 @@ export const CodeBlockRenderer = forwardRef(function CodeBlockRenderer(
             </div>
             <CopyCodeButton
                 codeId={codeId}
-                style="absolute top-1 right-1 z-2 self-start justify-self-end leading-none opacity-0 backdrop-blur-md group-hover/codeblock:opacity-11"
+                style="absolute top-2 right-2 z-2 self-start justify-self-end leading-none opacity-0 backdrop-blur-md group-hover/codeblock:opacity-11"
             />
             <pre
                 className={tcls(
@@ -83,7 +83,7 @@ export const CodeBlockRenderer = forwardRef(function CodeBlockRenderer(
                 <code
                     id={codeId}
                     className={tcls(
-                        'block max-h-full w-fit [counter-reset:line] print:whitespace-pre-wrap',
+                        'table max-h-full w-fit [counter-reset:line] print:max-h-none print:whitespace-pre-wrap',
                         withWrap && 'whitespace-pre-wrap',
                         '[[aria-expanded=false]_&]:mask-b-from-50%'
                     )}

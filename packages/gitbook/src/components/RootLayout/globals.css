@@ -319,7 +319,7 @@ html.dark .shiki span {
 }
 
 .highlight-line {
-    @apply min-w-min text-tint-strong flex bg-tint-subtle theme-muted:bg-tint-base theme-bold-tint:bg-tint-base relative hover:invert-5 hover:z-1 rounded-sm;
+    @apply min-w-min text-tint-strong table-row bg-tint-subtle theme-muted:bg-tint-base theme-bold-tint:bg-tint-base relative hover:invert-5 hover:z-1 rounded-sm;
     @apply only:hover:ring-transparent;
     @apply [counter-increment:line];
 
@@ -345,7 +345,7 @@ html.dark .shiki span {
 }
 
 .highlight-line-number {
-    @apply text-sm text-tint text-right pr-3.5 bg-tint-subtle theme-muted:bg-tint-base theme-bold-tint:bg-tint-base rounded-l pl-2 sticky -left-2 mask-r-from-80% shrink-0;
+    @apply table-cell whitespace-nowrap text-sm text-tint pr-4 pl-2 text-right bg-tint-subtle theme-muted:bg-tint-base theme-bold-tint:bg-tint-base rounded-l sticky -left-2;
     @apply before:content-[counter(line)] not-contrast-more:before:opacity-6;
 
     .highlighted & {
@@ -354,5 +354,5 @@ html.dark .shiki span {
 }
 
 .highlight-line-content {
-    @apply ml-3 block text-sm;
+    @apply table-cell text-sm;
 }
