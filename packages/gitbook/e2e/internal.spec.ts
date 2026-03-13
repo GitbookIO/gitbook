@@ -709,6 +709,26 @@ const testCases: TestsCase[] = [
                     await expect(page.locator('[data-testid="print-button"]')).toBeVisible();
                 },
             },
+            {
+                name: 'Show error when missing token',
+                url: async () => {
+                    const data = await getSiteAPIToken(
+                        'https://gitbook.gitbook.io/test-gitbook-open/'
+                    );
+
+                    // Intentionally not setting the token to test error handling when the token is missing
+                    const searchParams = new URLSearchParams();
+                    searchParams.set('limit', '10');
+
+                    return `~space/${data.space}/~gitbook/pdf?${searchParams.toString()}`;
+                },
+                screenshot: false,
+                run: async (page, response) => {
+                    expect(response).not.toBeNull();
+                    expect(response?.status()).toBe(400);
+                    await expect(page.getByText('Missing API token')).toBeVisible();
+                },
+            },
         ],
     },
     {
@@ -885,6 +905,24 @@ const testCases: TestsCase[] = [
                     await expect(
                         page.getByRole('heading', { level: 1, name: 'Code' })
                     ).toBeVisible();
+                },
+            },
+            {
+                name: 'Redirect to app for authentication when missing token',
+                url: async () => {
+                    const data = await getSiteAPIToken('https://gitbook.com/docs');
+
+                    const searchParams = new URLSearchParams();
+                    // Intentionally not setting the token to test redirection for authentication
+
+                    return `url/${getGitBookPreviewURL(`${data.site}/?${searchParams.toString()}`)}`;
+                },
+                screenshot: false,
+                run: async (page) => {
+                    await page.waitForURL(
+                        (url) =>
+                            url.host === 'app.gitbook.com' && url.pathname.includes('/preview/auth')
+                    );
                 },
             },
         ],
