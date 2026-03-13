@@ -58,6 +58,14 @@ export function listAllSiteSpaces(siteStructure: SiteStructure) {
 }
 
 /**
+ * Check if a space is part of a site structure by scanning every site section
+ * and all the siteSpaces associated with each section.
+ */
+export function isSpaceInSiteStructure(siteStructure: SiteStructure, spaceId: string): boolean {
+    return !!findSiteSpaceBy(siteStructure, (siteSpace) => siteSpace.space.id === spaceId);
+}
+
+/**
  * Find a site space by its spaceId in a site structure.
  */
 export function findSiteSpaceBy(

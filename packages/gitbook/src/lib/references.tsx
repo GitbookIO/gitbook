@@ -29,7 +29,12 @@ import { PageIcon } from '@/components/PageIcon';
 import { getGitBookAppHref } from './app';
 import { getBlockById, getBlockTitle } from './document';
 import { resolvePageId } from './pages';
-import { findSiteSpaceBy, getFallbackSiteSpacePath, getLocalizedTitle } from './sites';
+import {
+    findSiteSpaceBy,
+    getFallbackSiteSpacePath,
+    getLocalizedTitle,
+    isSpaceInSiteStructure,
+} from './sites';
 import { getRevisionTags, resolveTag } from './tags';
 import type { ClassValue } from './tailwind';
 import { filterOutNullable } from './typescript';
@@ -163,6 +168,14 @@ export async function resolveContentRef(
         case 'anchor':
         case 'page': {
             if (isContentRefInDifferentSpace(contentRef, context)) {
+                // Only resolve cross-space page/anchor refs when the target space
+                // is part of the current site's structure.
+                if (
+                    'site' in context &&
+                    !isSpaceInSiteStructure(context.structure, contentRef.space)
+                ) {
+                    return null;
+                }
                 return resolveContentRefInSpace(contentRef.space, context, contentRef, options);
             }
 
