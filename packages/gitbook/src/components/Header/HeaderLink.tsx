@@ -1,3 +1,4 @@
+import { isSiteAuthLoginHref } from '@/lib/auth-login-link';
 import type { GitBookSiteContext } from '@/lib/context';
 import {
     type ContentRef,
@@ -7,6 +8,7 @@ import {
     SiteInsightsLinkPosition,
 } from '@gitbook/api';
 import assertNever from 'assert-never';
+import type React from 'react';
 
 import { resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
@@ -17,6 +19,11 @@ import {
     DropdownMenu,
     DropdownMenuItem,
 } from '../primitives/DropdownMenu';
+import {
+    SiteAuthLoginButton,
+    SiteAuthLoginDropdownMenuItem,
+    SiteAuthLoginLink,
+} from '../primitives/SiteAuthLoginLink';
 
 export async function HeaderLink(props: {
     context: GitBookSiteContext;
@@ -44,6 +51,7 @@ export async function HeaderLink(props: {
                             title={link.title}
                             isDropdown
                             href={target?.href}
+                            isSiteAuthLoginHref={isSiteAuthLoginHref(context.linker, target.href)}
                         />
                     )
                 }
@@ -68,6 +76,7 @@ export async function HeaderLink(props: {
             title={link.title}
             isDropdown={false}
             href={target?.href}
+            isSiteAuthLoginHref={target ? isSiteAuthLoginHref(context.linker, target.href) : false}
         />
     );
 }
@@ -79,6 +88,7 @@ export type HeaderLinkNavItemProps = {
     title: string;
     href?: string;
     isDropdown: boolean;
+    isSiteAuthLoginHref: boolean;
 } & DropdownButtonProps<HTMLElement>;
 
 function HeaderLinkNavItem(props: HeaderLinkNavItemProps) {
@@ -99,7 +109,16 @@ function HeaderItemButton(
         linkStyle: 'button-secondary' | 'button-primary';
     }
 ) {
-    const { linkTarget, linkStyle, headerPreset, title, href, isDropdown, ...rest } = props;
+    const {
+        linkTarget,
+        linkStyle,
+        headerPreset,
+        title,
+        href,
+        isDropdown,
+        isSiteAuthLoginHref,
+        ...rest
+    } = props;
     const variant = (() => {
         switch (linkStyle) {
             case 'button-secondary':
@@ -110,21 +129,25 @@ function HeaderItemButton(
                 assertNever(linkStyle);
         }
     })();
-    return (
-        <Button
-            href={href}
-            variant={variant}
-            size="medium"
-            insights={{
-                type: 'link_click',
-                link: {
-                    target: linkTarget,
-                    position: SiteInsightsLinkPosition.Header,
-                },
-            }}
-            label={title}
-            {...rest}
-        />
+    const sharedProps: React.ComponentProps<typeof Button> = {
+        href,
+        variant,
+        size: 'medium' as const,
+        insights: {
+            type: 'link_click' as const,
+            link: {
+                target: linkTarget,
+                position: SiteInsightsLinkPosition.Header,
+            },
+        },
+        label: title,
+        ...rest,
+    };
+
+    return isSiteAuthLoginHref ? (
+        <SiteAuthLoginButton {...sharedProps} />
+    ) : (
+        <Button {...sharedProps} />
     );
 }
 
@@ -154,20 +177,28 @@ function getHeaderLinkClassName(_props: { headerPreset: CustomizationHeaderPrese
 }
 
 function HeaderItemLink(props: Omit<HeaderLinkNavItemProps, 'linkStyle'>) {
-    const { linkTarget, headerPreset, title, isDropdown, href, ...rest } = props;
-    return (
-        <Link
-            href={href ?? '#'}
-            className={getHeaderLinkClassName({ headerPreset })}
-            insights={{
-                type: 'link_click',
-                link: {
-                    target: linkTarget,
-                    position: SiteInsightsLinkPosition.Header,
-                },
-            }}
-            {...rest}
-        >
+    const { linkTarget, headerPreset, title, isDropdown, href, isSiteAuthLoginHref, ...rest } =
+        props;
+    const sharedProps = {
+        href: href ?? '#',
+        className: getHeaderLinkClassName({ headerPreset }),
+        insights: {
+            type: 'link_click' as const,
+            link: {
+                target: linkTarget,
+                position: SiteInsightsLinkPosition.Header,
+            },
+        },
+        ...rest,
+    };
+
+    return isSiteAuthLoginHref ? (
+        <SiteAuthLoginLink {...sharedProps}>
+            {title}
+            {isDropdown ? <ToggleChevron /> : null}
+        </SiteAuthLoginLink>
+    ) : (
+        <Link {...sharedProps}>
             {title}
             {isDropdown ? <ToggleChevron /> : null}
         </Link>
@@ -204,18 +235,20 @@ async function SubHeaderLink(props: {
         return null;
     }
 
-    return (
-        <DropdownMenuItem
-            href={target.href}
-            insights={{
-                type: 'link_click',
-                link: {
-                    target: link.to,
-                    position: SiteInsightsLinkPosition.Header,
-                },
-            }}
-        >
-            {link.title}
-        </DropdownMenuItem>
+    const sharedProps = {
+        href: target.href,
+        insights: {
+            type: 'link_click' as const,
+            link: {
+                target: link.to,
+                position: SiteInsightsLinkPosition.Header,
+            },
+        },
+    };
+
+    return isSiteAuthLoginHref(context.linker, target.href) ? (
+        <SiteAuthLoginDropdownMenuItem {...sharedProps}>{link.title}</SiteAuthLoginDropdownMenuItem>
+    ) : (
+        <DropdownMenuItem {...sharedProps}>{link.title}</DropdownMenuItem>
     );
 }
