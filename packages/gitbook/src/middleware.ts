@@ -476,7 +476,8 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         return serveWithQueryAPIToken({
             // We scope the API token to the site ID.
             scopePath: ['preview', getPreviewRequestIdentifier(siteRequestURL)].join('/'),
-            requestURL: mode === 'url-host' ? siteRequestURL : requestURL,
+            // We keep the original request URL when using using `url` mode
+            requestURL: mode === 'url' ? requestURL : siteRequestURL,
             requestCookies: request.cookies,
             serve: withAPIToken,
         });

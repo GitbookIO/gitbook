@@ -909,7 +909,6 @@ const testCases: TestsCase[] = [
             },
             {
                 name: 'Redirect to app for authentication when missing token',
-                only: true,
                 url: async () => {
                     const data = await getSiteAPIToken('https://gitbook.com/docs');
 
