@@ -1,6 +1,6 @@
 import type { GitBookSiteContext } from '@/lib/context';
 import type {
-    LocalizedString,
+    LocalizedTitle,
     SiteSection,
     SiteSectionGroup,
     SiteSpace,
@@ -189,7 +189,7 @@ function findSiteSpaceByIdInSiteSpaces(
  * Get the localized title for a site entity (SiteSection, SiteSectionGroup, or SiteSpace).
  */
 export function getLocalizedTitle(
-    entity: { title: string; localizedTitle?: LocalizedString },
+    entity: { title: string; localizedTitle?: LocalizedTitle },
     currentLanguage: TranslationLanguage | undefined
 ): string {
     return getLocalizedField(entity.localizedTitle, currentLanguage) ?? entity.title;
@@ -199,7 +199,7 @@ export function getLocalizedTitle(
  * Get the localized description for a site entity.
  */
 export function getLocalizedDescription(
-    entity: { description?: string; localizedDescription?: LocalizedString },
+    entity: { description?: string; localizedDescription?: LocalizedTitle },
     currentLanguage: TranslationLanguage | undefined
 ): string | undefined {
     return getLocalizedField(entity.localizedDescription, currentLanguage) ?? entity.description;
@@ -209,7 +209,7 @@ export function getLocalizedDescription(
  * Get a localized field value for the given language.
  */
 function getLocalizedField(
-    localizedField: LocalizedString | undefined,
+    localizedField: LocalizedTitle | undefined,
     currentLanguage: TranslationLanguage | undefined
 ): string | undefined {
     if (localizedField && currentLanguage && localizedField[currentLanguage]) {
