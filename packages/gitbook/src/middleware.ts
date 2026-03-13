@@ -473,12 +473,13 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
     if (isPreviewRequest(siteRequestURL)) {
         // Do not track page views for preview requests
         request.headers.set('x-gitbook-disable-tracking', 'true');
-        return serveWithQueryAPIToken(
+        return serveWithQueryAPIToken({
             // We scope the API token to the site ID.
-            ['preview', getPreviewRequestIdentifier(siteRequestURL)].join('/'),
-            request,
-            withAPIToken
-        );
+            scopePath: ['preview', getPreviewRequestIdentifier(siteRequestURL)].join('/'),
+            requestURL: mode === 'url-host' ? siteRequestURL : requestURL,
+            requestCookies: request.cookies,
+            serve: withAPIToken,
+        });
     }
 
     return withAPIToken(null);
@@ -493,18 +494,22 @@ async function serveSpacePDFRoutes(requestURL: URL, request: NextRequest) {
         return null;
     }
 
-    return serveWithQueryAPIToken(
-        pathnameParts.slice(0, 2).join('/'),
-        request,
-        async (apiToken) => {
+    return serveWithQueryAPIToken({
+        scopePath: pathnameParts.slice(0, 2).join('/'),
+        requestURL,
+        requestCookies: request.cookies,
+        serve: async (apiToken) => {
+            if (!apiToken) {
+                throw new DataFetcherError('Missing API token', 400);
+            }
             // Handle the rest with the router default logic
             return NextResponse.next({
                 headers: {
                     [MiddlewareHeaders.APIToken]: apiToken,
                 },
             });
-        }
-    );
+        },
+    });
 }
 
 /**
@@ -524,21 +529,23 @@ function serveErrorResponse(error: Error) {
 /**
  * Server a response with an API token obtained from the query params.
  */
-async function serveWithQueryAPIToken(
-    scopePath: string,
-    request: NextRequest,
-    serve: (apiToken: string) => Promise<NextResponse>
-) {
+async function serveWithQueryAPIToken(input: {
+    scopePath: string;
+    requestURL: URL;
+    requestCookies: NextRequest['cookies'];
+    serve: (apiToken: string | null) => Promise<NextResponse>;
+}) {
+    const { scopePath, requestURL, requestCookies, serve } = input;
     // We store the API token in a cookie that is scoped to the specific route
     // to avoid errors when multiple previews are opened in different tabs.
     const cookieName = getPathScopedCookieName('gitbook-api-token', scopePath);
 
     // Extract a potential GitBook API token passed in the request
     // If found, we redirect to the same URL but with the token in the cookie
-    const queryAPIToken = request.nextUrl.searchParams.get('token');
+    const queryAPIToken = requestURL.searchParams.get('token');
     if (queryAPIToken) {
-        request.nextUrl.searchParams.delete('token');
-        return writeResponseCookies(NextResponse.redirect(request.nextUrl.toString()), [
+        requestURL.searchParams.delete('token');
+        return writeResponseCookies(NextResponse.redirect(requestURL.toString()), [
             {
                 name: cookieName,
                 value: queryAPIToken,
@@ -552,12 +559,9 @@ async function serveWithQueryAPIToken(
         ]);
     }
 
-    const apiToken = request.cookies.get(cookieName)?.value;
-    if (!apiToken) {
-        throw new DataFetcherError('Missing API token', 400);
-    }
+    const apiToken = requestCookies.get(cookieName)?.value;
 
-    return serve(apiToken);
+    return serve(apiToken ?? null);
 }
 
 /**
