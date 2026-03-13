@@ -476,7 +476,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         return serveWithQueryAPIToken({
             // We scope the API token to the site ID.
             scopePath: ['preview', getPreviewRequestIdentifier(siteRequestURL)].join('/'),
-            // We keep the original request URL when using using `url` mode
+            // We keep the original request URL when using `url` mode
             requestURL: mode === 'url' ? requestURL : siteRequestURL,
             requestCookies: request.cookies,
             serve: withAPIToken,
@@ -528,7 +528,7 @@ function serveErrorResponse(error: Error) {
 }
 
 /**
- * Server a response with an API token obtained from the query params.
+ * Serve a response with an API token obtained from the query params.
  */
 async function serveWithQueryAPIToken(input: {
     scopePath: string;
