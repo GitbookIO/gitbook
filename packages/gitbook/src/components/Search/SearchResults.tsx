@@ -8,11 +8,13 @@ import { t, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
 
 import { Button, Loading } from '../primitives';
+import { SearchLocalPageResultItem } from './SearchLocalPageResultItem';
 import { SearchPageResultItem } from './SearchPageResultItem';
 import { SearchQuestionResultItem } from './SearchQuestionResultItem';
 import { SearchRecordResultItem } from './SearchRecordResultItem';
 import { SearchSectionResultItem } from './SearchSectionResultItem';
 import type { OrderedComputedResult } from './search-types';
+import type { LocalPageResult } from './useLocalSearchResults';
 
 export interface SearchResultsRef {
     select(): void;
@@ -20,6 +22,7 @@ export interface SearchResultsRef {
 
 type ResultType =
     | OrderedComputedResult
+    | LocalPageResult
     | { type: 'question'; id: string; query: string; assistant: Assistant }
     | { type: 'recommended-question'; id: string; question: string };
 
@@ -144,6 +147,20 @@ export const SearchResults = React.forwardRef(function SearchResults(
                                 id: `${id}-${index}`,
                             };
                             switch (item.type) {
+                                case 'local-page': {
+                                    return (
+                                        <SearchLocalPageResultItem
+                                            ref={(ref) => {
+                                                refs.current[index] = ref;
+                                            }}
+                                            key={item.id}
+                                            query={query}
+                                            item={item}
+                                            active={index === cursor}
+                                            {...resultItemProps}
+                                        />
+                                    );
+                                }
                                 case 'page': {
                                     return (
                                         <SearchPageResultItem

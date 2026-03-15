@@ -11,7 +11,6 @@ import { AIChatButton } from '../AIChat';
 import { useTrackEvent } from '../Insights';
 import { useIsMobile } from '../hooks/useIsMobile';
 import { Popover, useBodyLoaded } from '../primitives';
-import { LocalSearchResults } from './LocalSearchResults';
 import { SearchAskAnswer } from './SearchAskAnswer';
 import { useSearchAskState } from './SearchAskContext';
 import { SearchAskProvider } from './SearchAskContext';
@@ -207,7 +206,7 @@ export function SearchContainer({
         [siteSpaces, siteSpace.space.language]
     );
 
-    const { results, fetching, error, localResults } = useSearchResults({
+    const { results, fetching, error } = useSearchResults({
         disabled: !(state?.query || withAI),
         query: normalizedQuery,
         siteSpaceId: siteSpace.id,
@@ -247,12 +246,6 @@ export function SearchContainer({
                     state?.query || withAI ? (
                         <React.Suspense fallback={null}>
                             <div className="scroll-py-2 overflow-y-scroll p-2">
-                                {localResults.length > 0 && !showAsk ? (
-                                    <LocalSearchResults
-                                        results={localResults}
-                                        fetching={fetching}
-                                    />
-                                ) : null}
                                 {state !== null && !showAsk ? (
                                     <SearchResults
                                         ref={resultsRef}

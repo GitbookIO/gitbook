@@ -44,7 +44,9 @@ export async function GET(
     for (let i = 0; i < visibleSpaces.length; i++) {
         const siteSpace = visibleSpaces[i]!;
         const revision = revisions[i]!;
-        const forkedLinker = linker.withOtherSiteSpace({ spaceBasePath: getFallbackSiteSpacePath(context, siteSpace) });
+        const forkedLinker = linker.withOtherSiteSpace({
+            spaceBasePath: getFallbackSiteSpacePath(context, siteSpace),
+        });
 
         for (const { page } of getIndexablePages(revision.pages)) {
             if (seen.has(page.id)) continue;

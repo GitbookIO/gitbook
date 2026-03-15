@@ -10,11 +10,13 @@ import { type Assistant, useAI } from '@/components/AI';
 import assertNever from 'assert-never';
 import { useTrackEvent } from '../Insights';
 import { isQuestion } from './isQuestion';
+import { reciprocalRankFusion } from './reciprocalRankFusion';
 import { type LocalPageResult, useLocalSearchResults } from './useLocalSearchResults';
 import type { SearchScope } from './useSearch';
 
 export type ResultType =
     | OrderedComputedResult
+    | LocalPageResult
     | { type: 'question'; id: string; query: string; assistant: Assistant }
     | { type: 'recommended-question'; id: string; question: string };
 
@@ -64,8 +66,8 @@ export function useSearchResults(props: {
         disabled,
     });
 
-    const [resultsState, setResultsState] = React.useState<{
-        results: ResultType[];
+    const [remoteState, setRemoteState] = React.useState<{
+        results: OrderedComputedResult[];
         fetching: boolean;
         error: boolean;
     }>({ results: [], fetching: false, error: false });
@@ -79,7 +81,7 @@ export function useSearchResults(props: {
         }
         if (!query) {
             if (!withAI) {
-                setResultsState({ results: [], fetching: false, error: false });
+                setRemoteState({ results: [], fetching: false, error: false });
                 return;
             }
 
@@ -89,11 +91,12 @@ export function useSearchResults(props: {
                     results,
                     `Cached recommended questions should be set for site-space ${siteSpaceId}`
                 );
-                setResultsState({ results, fetching: false, error: false });
+                // Recommended questions are stored as ResultType[] already
+                setRemoteState({ results: [], fetching: false, error: false });
                 return;
             }
 
-            setResultsState({ results: [], fetching: false, error: false });
+            setRemoteState({ results: [], fetching: false, error: false });
 
             let cancelled = false;
 
@@ -106,15 +109,7 @@ export function useSearchResults(props: {
                 suggestions.forEach((question) => {
                     questions.add(question);
                 });
-                setResultsState({
-                    results: suggestions.map((question, index) => ({
-                        type: 'recommended-question',
-                        id: `recommended-question-${index}`,
-                        question,
-                    })),
-                    fetching: false,
-                    error: false,
-                });
+                setRemoteState({ results: [], fetching: false, error: false });
                 return;
             }
 
@@ -143,11 +138,8 @@ export function useSearchResults(props: {
                     cachedRecommendedQuestions.set(siteSpaceId, recommendedQuestions);
 
                     if (!cancelled) {
-                        setResultsState({
-                            results: [...recommendedQuestions],
-                            fetching: false,
-                            error: false,
-                        });
+                        // Recommended questions are handled via a separate path below
+                        setRemoteState({ results: [], fetching: false, error: false });
                     }
                 }
             }, 100);
@@ -157,8 +149,8 @@ export function useSearchResults(props: {
                 clearTimeout(timeout);
             };
         }
-        setResultsState({
-            results: withAI ? withAskTriggers([], query, assistants) : [],
+        setRemoteState({
+            results: [],
             fetching: true,
             error: false,
         });
@@ -198,15 +190,11 @@ export function useSearchResults(props: {
                     // One time when this one returns undefined is when it cannot find the server action and returns the html from the page.
                     // In that case, we want to avoid being stuck in a loading state, but it is an error.
                     // We could potentially try to force reload the page here, but i'm not 100% sure it would be a better experience.
-                    setResultsState({ results: [], fetching: false, error: true });
+                    setRemoteState({ results: [], fetching: false, error: true });
                     return;
                 }
 
-                const aiEnrichedResults = withAI
-                    ? withAskTriggers(results, query, assistants)
-                    : results;
-
-                setResultsState({ results: aiEnrichedResults, fetching: false, error: false });
+                setRemoteState({ results, fetching: false, error: false });
 
                 trackEvent({
                     type: 'search_type_query',
@@ -217,7 +205,7 @@ export function useSearchResults(props: {
                 if (cancelled) {
                     return;
                 }
-                setResultsState({ results: [], fetching: false, error: true });
+                setRemoteState({ results: [], fetching: false, error: true });
             }
         }, 350);
 
@@ -238,7 +226,29 @@ export function useSearchResults(props: {
         searchURL,
     ]);
 
-    return { ...resultsState, localResults };
+    // Merge local and remote results using Reciprocal Rank Fusion.
+    // Re-runs immediately whenever either result set changes.
+    const results = React.useMemo<ResultType[]>(() => {
+        if (!query) {
+            // No query: show recommended questions (AI-only path) or nothing.
+            if (withAI && cachedRecommendedQuestions.has(siteSpaceId)) {
+                return cachedRecommendedQuestions.get(siteSpaceId) ?? [];
+            }
+            if (suggestions && suggestions.length > 0) {
+                return suggestions.map((question, index) => ({
+                    type: 'recommended-question' as const,
+                    id: `recommended-question-${index}`,
+                    question,
+                }));
+            }
+            return [];
+        }
+
+        const merged = reciprocalRankFusion(localResults, remoteState.results);
+        return withAI ? withAskTriggers(merged, query, assistants) : merged;
+    }, [localResults, remoteState.results, query, withAI, assistants, siteSpaceId, suggestions]);
+
+    return { results, fetching: remoteState.fetching, error: remoteState.error };
 }
 
 /**
