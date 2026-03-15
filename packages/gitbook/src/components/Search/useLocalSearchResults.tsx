@@ -3,6 +3,12 @@
 import { Document, type DocumentValue } from 'flexsearch';
 import React from 'react';
 
+interface Breadcrumb {
+    label: string;
+    icon?: string;
+    emoji?: string;
+}
+
 /** Raw entry from the `~gitbook/index` JSON response */
 interface RawIndexPage {
     id: string;
@@ -13,6 +19,7 @@ interface RawIndexPage {
     icon?: string;
     emoji?: string;
     description?: string;
+    breadcrumbs?: Breadcrumb[];
 }
 
 /** FlexSearch-compatible document type — satisfies DocumentData via explicit index signature */
@@ -20,9 +27,6 @@ interface IndexPage {
     [key: string]: DocumentValue | DocumentValue[];
     id: string;
     title: string;
-    pathname: string;
-    icon: string | null;
-    emoji: string | null;
     description: string | null;
 }
 
@@ -35,6 +39,7 @@ export interface LocalPageResult {
     icon?: string;
     emoji?: string;
     description?: string;
+    breadcrumbs?: Breadcrumb[];
 }
 
 type LocalSearchState = {
@@ -46,6 +51,14 @@ type LocalSearchState = {
 // Module-level singletons — one Document per language per session.
 // Keys are the page's `lang` value, or `''` when no language is set.
 const cachedIndexes = new Map<string, Document<IndexPage>>();
+
+// Side-map for data that doesn't belong in the FlexSearch index.
+// Keyed by page id, shared across all language groups.
+const cachedPageData = new Map<
+    string,
+    { pathname: string; icon?: string; emoji?: string; breadcrumbs?: Breadcrumb[] }
+>();
+
 let pendingFetch: Promise<Map<string, Document<IndexPage>>> | null = null;
 
 function buildLangIndex(pages: RawIndexPage[]): Document<IndexPage> {
@@ -53,7 +66,7 @@ function buildLangIndex(pages: RawIndexPage[]): Document<IndexPage> {
         document: {
             id: 'id',
             index: ['title', 'description'],
-            store: ['id', 'title', 'pathname', 'icon', 'description'],
+            store: ['id', 'title', 'description'],
         },
         tokenize: 'bidirectional',
         encoder: 'Normalize',
@@ -63,10 +76,14 @@ function buildLangIndex(pages: RawIndexPage[]): Document<IndexPage> {
         index.add({
             id: page.id,
             title: page.title,
-            pathname: page.pathname,
-            icon: page.icon ?? null,
-            emoji: page.emoji ?? null,
             description: page.description ?? null,
+        });
+
+        cachedPageData.set(page.id, {
+            pathname: page.pathname,
+            icon: page.icon,
+            emoji: page.emoji,
+            breadcrumbs: page.breadcrumbs?.length ? page.breadcrumbs : undefined,
         });
     }
 
@@ -193,14 +210,16 @@ export function useLocalSearchResults(props: {
                 const doc = (item as { id: string; doc: IndexPage }).doc;
                 if (!seen.has(doc.id)) {
                     seen.add(doc.id);
+                    const extra = cachedPageData.get(doc.id);
                     results.push({
                         type: 'local-page',
                         id: doc.id,
                         title: doc.title,
-                        pathname: doc.pathname as string,
-                        icon: doc.icon ?? undefined,
-                        emoji: doc.emoji ?? undefined,
-                        description: doc.description ?? undefined,
+                        pathname: extra?.pathname ?? '',
+                        icon: extra?.icon,
+                        emoji: extra?.emoji,
+                        description: (doc.description as string | null) ?? undefined,
+                        breadcrumbs: extra?.breadcrumbs,
                     });
                 }
             }

@@ -8,7 +8,6 @@ import { t, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
 
 import { Button, Loading } from '../primitives';
-import { SearchLocalPageResultItem } from './SearchLocalPageResultItem';
 import { SearchPageResultItem } from './SearchPageResultItem';
 import { SearchQuestionResultItem } from './SearchQuestionResultItem';
 import { SearchRecordResultItem } from './SearchRecordResultItem';
@@ -147,20 +146,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
                                 id: `${id}-${index}`,
                             };
                             switch (item.type) {
-                                case 'local-page': {
-                                    return (
-                                        <SearchLocalPageResultItem
-                                            ref={(ref) => {
-                                                refs.current[index] = ref;
-                                            }}
-                                            key={item.id}
-                                            query={query}
-                                            item={item}
-                                            active={index === cursor}
-                                            {...resultItemProps}
-                                        />
-                                    );
-                                }
+                                case 'local-page':
                                 case 'page': {
                                     return (
                                         <SearchPageResultItem
