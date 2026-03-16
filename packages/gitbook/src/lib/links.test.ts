@@ -20,7 +20,7 @@ const siteGitBookIO = createLinker({
 });
 
 const preview = createLinker({
-    host: 'preview',
+    host: 'sites.gitbook.com/preview',
     spaceBasePath: '/site_abc/section/space/',
     siteBasePath: '/site_abc/',
 });
