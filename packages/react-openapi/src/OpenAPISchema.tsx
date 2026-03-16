@@ -75,15 +75,28 @@ function OpenAPISchemaProperty(
     const circularRefs = new Map(parentCircularRefs);
     circularRefs.set(schema, id);
 
-    const properties = getSchemaProperties(schema, discriminator, discriminatorValue);
-
     const ancestors = new Set(circularRefs.keys());
     const alternatives = getSchemaAlternatives(schema, ancestors);
 
-    const header = <OpenAPISchemaPresentation id={id} context={context} property={property} />;
+    // When allOf fully merges into a single schema, use it directly
+    // instead of rendering as "allOf" with one child.
+    const mergedAllOfSchema =
+        alternatives?.type === 'allOf' && alternatives.schemas.length === 1
+            ? alternatives.schemas[0]
+            : undefined;
+    const effectiveSchema = mergedAllOfSchema ?? schema;
+    const effectiveProperty = mergedAllOfSchema
+        ? { ...property, schema: mergedAllOfSchema }
+        : property;
+
+    const properties = getSchemaProperties(effectiveSchema, discriminator, discriminatorValue);
+
+    const header = (
+        <OpenAPISchemaPresentation id={id} context={context} property={effectiveProperty} />
+    );
     const content = (() => {
-        // For oneOf/anyOf, show alternatives. For allOf, merge properties instead
-        if (alternatives?.schemas && alternatives.schemas.length > 0) {
+        // For oneOf/anyOf/allOf with multiple schemas, show alternatives
+        if (!mergedAllOfSchema && alternatives?.schemas && alternatives.schemas.length > 0) {
             return (
                 <OpenAPISchemaAlternatives
                     alternatives={alternatives}
@@ -114,7 +127,9 @@ function OpenAPISchemaProperty(
             <OpenAPIDisclosure
                 icon={context.icons.plus}
                 header={header}
-                label={(isExpanded) => getDisclosureLabel({ schema, isExpanded, context })}
+                label={(isExpanded) =>
+                    getDisclosureLabel({ schema: effectiveSchema, isExpanded, context })
+                }
             >
                 {content}
             </OpenAPIDisclosure>
@@ -191,16 +206,24 @@ function OpenAPIRootSchema(props: {
     } = props;
 
     const id = useId();
-    const properties = getSchemaProperties(schema);
-    const description = resolveDescription(schema);
     const ancestors = new Set(parentCircularRefs.keys());
     const alternatives = getSchemaAlternatives(schema, ancestors);
+
+    // When allOf fully merges into a single schema, use it directly
+    const mergedAllOfSchema =
+        alternatives?.type === 'allOf' && alternatives.schemas.length === 1
+            ? alternatives.schemas[0]
+            : undefined;
+    const effectiveSchema = mergedAllOfSchema ?? schema;
+
+    const properties = getSchemaProperties(effectiveSchema);
+    const description = resolveDescription(effectiveSchema);
 
     const circularRefs = new Map(parentCircularRefs);
     circularRefs.set(schema, id);
 
-    // Handle root-level oneOf/anyOf (allOf is handled by merging properties in getSchemaProperties)
-    if (alternatives?.schemas && alternatives.schemas.length > 0) {
+    // Handle root-level oneOf/anyOf/allOf with multiple schemas
+    if (!mergedAllOfSchema && alternatives?.schemas && alternatives.schemas.length > 0) {
         return (
             <>
                 {description ? (
@@ -830,15 +853,14 @@ const safeExtensions = [
 function isSafeToMerge(schema: OpenAPIV3.SchemaObject): boolean {
     const keys = Object.keys(schema);
 
-    const coreProperties = ['type', 'properties', 'required', 'nullable'];
+    const safeProperties = ['type', 'properties', 'required', 'nullable'];
 
-    const coreKeys = keys.filter((key) => coreProperties.includes(key));
     const unknownKeys = keys.filter(
         (key) =>
-            !coreProperties.includes(key) && !safeExtensions.includes(key) && !key.startsWith('x-')
+            !safeProperties.includes(key) && !safeExtensions.includes(key) && !key.startsWith('x-')
     );
 
-    return coreKeys.length > 0 && unknownKeys.length === 0;
+    return unknownKeys.length === 0;
 }
 
 /**
@@ -867,7 +889,8 @@ function mergeAlternatives(
                     return acc;
                 }
 
-                acc.push(schemaOrRef);
+                // Clone to avoid mutating shared schema objects from $ref dereferencing
+                acc.push({ ...schemaOrRef });
                 return acc;
             }, []);
         }
@@ -890,7 +913,11 @@ function mergeAlternatives(
                     }
                 }
 
-                if (latest && latest.type === 'object' && schemaOrRef.type === 'object') {
+                if (
+                    latest &&
+                    latest.type === 'object' &&
+                    (!schemaOrRef.type || schemaOrRef.type === 'object')
+                ) {
                     const keys = Object.keys(schemaOrRef);
 
                     if (isSafeToMerge(schemaOrRef)) {
@@ -930,7 +957,8 @@ function mergeAlternatives(
                     }
                 }
 
-                acc.push(schemaOrRef);
+                // Clone to avoid mutating shared schema objects from $ref dereferencing
+                acc.push({ ...schemaOrRef });
                 return acc;
             }, []);
         }
