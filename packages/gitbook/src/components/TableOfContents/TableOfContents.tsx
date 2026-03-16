@@ -56,24 +56,10 @@ export async function TableOfContents(props: {
                     'lg:mr-12',
                     'lg:z-0',
 
-                    // We shrink down the sidebar to a narrow fixed element in a few limited cases:
-                    !innerHeader // Only if there's no innerHeader (no variant picker or search) — otherwise we show it as normal.
-                        ? [
-                              // Layout-full means the page is made wide and the TOC is hidden, so the sidebar contains only a trademark.
-                              // We remove the empty sidebar so content can stretch wide.
-                              'layout-full:lg:fixed',
-                              'layout-full:lg:max-3xl:w-12',
-                              'layout-full:lg:left-5',
-                              'layout-full:lg:z-30',
-
-                              // In other cases the TOC gets hidden but the content is normal width. Since the page outline sidebar only appears on xl: and up,
-                              // the TOC causes a big empty space to the left of the content. We shrink it down between lg: and xl: to prevent this imbalance.
-                              'page-no-toc:lg:max-xl:fixed',
-                              'page-no-toc:lg:max-xl:w-12',
-                              'page-no-toc:lg:max-xl:left-5',
-                              'page-no-toc:lg:max-xl:z-30',
-                          ]
-                        : null,
+                    'layout-full:lg:fixed',
+                    'layout-full:lg:max-3xl:w-12',
+                    'layout-full:lg:left-5',
+                    'layout-full:lg:z-30',
 
                     // Server-side static positioning
                     'lg:top-0',
@@ -100,7 +86,7 @@ export async function TableOfContents(props: {
 
                     'pt-6 pb-4',
                     'supports-[-webkit-touch-callout]:pb-[env(safe-area-inset-bottom)]', // Override bottom padding on iOS since we have a transparent bottom bar
-                    'lg:max-3xl:sidebar-filled:page-has-toc:pr-6',
+                    'lg:max-3xl:sidebar-filled:not-layout-full:pr-6',
                     'max-lg:pl-8',
 
                     'flex',
@@ -114,9 +100,7 @@ export async function TableOfContents(props: {
                 <div // The actual sidebar, either shown with a filled bg or transparent.
                     className={tcls(
                         '-ms-5', // By default we shift the sidebar to the left to compensate for the PagesList padding.
-                        !innerHeader
-                            ? 'xl:not-layout-full:page-no-toc:-ms-5 page-no-toc:ms-0' // In some specific cases (see above) we undo this shift.
-                            : null,
+                        'layout-full:ms-0',
                         'relative flex min-h-0 grow flex-col border-tint-subtle',
 
                         'sidebar-filled:bg-tint-subtle',
@@ -160,10 +144,7 @@ export async function TableOfContents(props: {
                                 context={context}
                                 placement={SiteInsightsTrademarkPlacement.Sidebar}
                                 className={tcls(
-                                    'm-2 mt-auto page-has-toc:sidebar-default:mr-4 px-4 py-3.5',
-                                    !innerHeader
-                                        ? 'max-3xl:layout-full:hidden lg:max-xl:page-no-toc:hidden'
-                                        : null
+                                    'm-2 mt-auto px-4 py-3.5 layout-full:lg:max-3xl:hidden'
                                 )}
                                 truncate={false}
                             />
@@ -173,10 +154,7 @@ export async function TableOfContents(props: {
                                 context={context}
                                 placement={SiteInsightsTrademarkPlacement.Sidebar}
                                 className={tcls(
-                                    'mb-2 self-start bg-tint-base depth-flat:bg-tint-base',
-                                    innerHeader
-                                        ? 'hidden'
-                                        : '3xl:hidden page-has-toc:hidden xl:not-layout-full:hidden'
+                                    'mb-2 3xl:hidden not-layout-full:hidden self-start bg-tint-base depth-flat:bg-tint-base'
                                 )}
                                 iconOnly={true}
                             />

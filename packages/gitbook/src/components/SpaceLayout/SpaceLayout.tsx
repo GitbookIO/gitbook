@@ -132,8 +132,9 @@ export function SpaceLayout(props: SpaceLayoutProps) {
                         CONTAINER_STYLE,
                         'transition-[max-width] duration-300',
 
-                        variants.generic.length > 1 ? 'has-variants' : 'no-variants',
-                        variants.translations.length > 1 ? 'has-translations' : 'no-translations',
+                        !withTopHeader || variants.generic.length > 1
+                            ? 'has-sidebar'
+                            : 'no-sidebar',
 
                         // Ensure the footer is display below the viewport even if the content is not enough
                         withFooter && [

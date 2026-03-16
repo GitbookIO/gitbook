@@ -94,7 +94,7 @@ export function PageAside(props: {
                 'layout-full:3xl:animate-none!',
                 'layout-full:3xl:fixed',
 
-                'hydrated:bg-tint-base', // Only add a background once the element is positioned correctly to prevent overlapping the page cover
+                'hydrated:site-background', // Only add a background once the element is positioned correctly to prevent overlapping the page cover
                 'text-tint',
                 'contrast-more:text-tint-strong'
             )}

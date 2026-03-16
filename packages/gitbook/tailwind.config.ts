@@ -678,18 +678,25 @@ const config: Config = {
              * These variants are applied via body:has() selectors, allowing CSS to respond to layout state.
              *
              * - layout-default: 3-column layout (TOC + Content + Outline)
-             * - layout-wide: 2-column layout (TOC + Content || Content + Outline)
+             * - layout-wide: 2-column layout (TOC + Content)
              * - layout-full: 1-column layout (Content only)
              *
              * The layout classes are applied consistently through CONTENT_STYLE in layout.ts and preserved on the
              * <header> element during navigation (see PreservePageLayout component).
              */
             addVariant('layout-default', 'body:has(.layout-default) &');
-            addVariant('layout-wide', 'body:has(.layout-wide):has(.page-has-toc) & ');
-            addVariant('layout-full', 'body:has(.layout-wide):has(.page-no-toc) &');
+            addVariant('layout-wide', 'body:has(.layout-wide):has(.page-has-toc, .has-sidebar) & ');
+            addVariant(
+                'layout-full',
+                'body:has(.layout-wide):has(.page-no-toc):has(.no-sidebar) &'
+            );
 
             addVariant('page-no-toc', 'body:has(.page-no-toc) &');
             addVariant('page-has-toc', 'body:has(.page-has-toc) &');
+
+            addVariant('has-sidebar', 'body:has(.page-has-toc, .has-sidebar) &');
+            addVariant('no-sidebar', 'body:has(.page-no-toc):has(.no-sidebar) &');
+
             addVariant('page-has-outline', 'body:has([data-gb-page-outline]) &');
             addVariant('page-no-outline', 'body:not(:has([data-gb-page-outline])) &');
 
