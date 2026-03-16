@@ -73,6 +73,7 @@ export function ScrollSectionsList({ sections }: { sections: DocumentSection[] }
                             'px-3',
 
                             'transition-all',
+                            'motion-reduce:transition-none',
                             'duration-200',
 
                             'rounded-md',

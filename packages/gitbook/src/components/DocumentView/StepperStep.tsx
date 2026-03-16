@@ -48,7 +48,7 @@ export function StepperStep(props: BlockProps<DocumentBlockStepperStep>) {
                 {...contextProps}
                 nodes={block.nodes}
                 ancestorBlocks={[...ancestorBlocks, block]}
-                style={['flex-1 pb-6 [&>*+*]:mt-5', marginAdjustClassName]}
+                style={['min-w-0 flex-1 pb-6 [&>*+*]:mt-5', marginAdjustClassName]}
             />
         </div>
     );

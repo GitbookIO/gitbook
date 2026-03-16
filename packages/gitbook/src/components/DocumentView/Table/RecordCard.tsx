@@ -133,9 +133,7 @@ export async function RecordCard(
                     'gap-3',
                     'p-4',
                     'text-sm',
-                    target
-                        ? ['transition-colors', 'text-tint', 'group-hover:text-tint-strong']
-                        : ['text-tint-strong']
+                    'text-tint-strong'
                 )}
             >
                 {view.columns.map((column) => {
@@ -172,7 +170,7 @@ export async function RecordCard(
             // We don't use `Link` directly here because we could end up in a situation where
             // a link is rendered inside a link, which is not allowed in HTML.
             // It causes an hydration error in React.
-            <LinkBox href={target.href} classNames={['RecordCardStyles']}>
+            <LinkBox href={target.href} classNames={['RecordCardStyles', 'RecordCardLinkStyles']}>
                 <LinkOverlay
                     href={target.href}
                     insights={{

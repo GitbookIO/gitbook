@@ -1,6 +1,7 @@
 import { type ClassValue, tcls } from '@/lib/tailwind';
 import React from 'react';
 import { CONTAINER_STYLE } from '../layout';
+import { Button } from '../primitives';
 
 export type EmbeddableFrameProps = React.ComponentProps<'div'> & {
     children: React.ReactNode;
@@ -93,6 +94,10 @@ export function EmbeddableFrameTitle(props: {
     return <div className="font-bold">{children}</div>;
 }
 
+export function EmbeddableFrameClose() {
+    return <Button iconOnly icon="x" className="absolute top-1 right-1" />;
+}
+
 export function EmbeddableFrameSubtitle(props: {
     children: React.ReactNode;
     className?: string;
@@ -115,7 +120,7 @@ export function EmbeddableFrameSidebar(props: { children: React.ReactNode }) {
     const { children } = props;
 
     return (
-        <div className="flex w-15 shrink-0 origin-top not-hydrated:animate-blur-in-slow flex-col gap-2 overflow-hidden border-tint-solid/3 border-r bg-tint-solid/1 p-2 transition-all transition-discrete duration-300 empty:hidden empty:w-0 empty:px-0">
+        <div className="flex w-15 shrink-0 origin-top not-hydrated:animate-blur-in-slow flex-col gap-2 overflow-hidden border-tint-solid/3 border-r bg-tint-solid/1 p-2 transition-all transition-discrete duration-300 empty:hidden empty:w-0 empty:px-0 motion-reduce:transition-none">
             {children}
         </div>
     );

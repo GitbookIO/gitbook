@@ -25,6 +25,7 @@ import {
 } from './EmbeddableFrame';
 import {
     EmbeddableIframeButtons,
+    EmbeddableIframeCloseButton,
     EmbeddableIframeTabs,
     useEmbeddableConfiguration,
 } from './EmbeddableIframeAPI';
@@ -40,9 +41,9 @@ type EmbeddableAIChatProps = {
 export function EmbeddableAIChat(props: EmbeddableAIChatProps) {
     const { baseURL, siteTitle } = props;
     const chat = useAIChatState();
-    const { config } = useAI();
+    const { config: siteConfig } = useAI();
     const chatController = useAIChatController();
-    const configuration = useEmbeddableConfiguration();
+    const embedConfig = useEmbeddableConfiguration();
     const language = useLanguage();
 
     React.useEffect(() => {
@@ -64,7 +65,8 @@ export function EmbeddableAIChat(props: EmbeddableAIChatProps) {
     }, [trackEvent]);
 
     const tabsRef = React.useRef<HTMLDivElement>(null);
-    const hasDocsTab = configuration.tabs.includes('docs');
+    const hasDocsTab = embedConfig.tabs.includes('docs');
+    const trademark = siteConfig.trademark;
     const currentLinkContext = use(LinkContext);
     const linkContext: LinkContextType = useMemo(
         () =>
@@ -89,18 +91,16 @@ export function EmbeddableAIChat(props: EmbeddableAIChatProps) {
                     siteTitle={siteTitle}
                 />
                 <EmbeddableIframeButtons />
+                <EmbeddableIframeCloseButton />
             </EmbeddableFrameSidebar>
             <EmbeddableFrameMain data-testid="ai-chat">
                 <EmbeddableFrameHeader>
                     {!tabsRef.current ? (
-                        <AIChatDynamicIcon
-                            className="animate-blur-in-slow"
-                            trademark={config.trademark}
-                        />
+                        <AIChatDynamicIcon className="animate-blur-in-slow" trademark={trademark} />
                     ) : null}
                     <EmbeddableFrameHeaderMain>
                         <EmbeddableFrameTitle>
-                            {getAIChatName(language, config.trademark)}
+                            {siteConfig.assistantName ?? getAIChatName(language, trademark)}
                         </EmbeddableFrameTitle>
                         <AIChatSubtitle chat={chat} />
                     </EmbeddableFrameHeaderMain>
@@ -113,8 +113,9 @@ export function EmbeddableAIChat(props: EmbeddableAIChatProps) {
                         <AIChatBody
                             chatController={chatController}
                             chat={chat}
-                            suggestions={configuration.suggestions}
-                            greeting={configuration.greeting}
+                            suggestions={siteConfig.suggestions}
+                            greeting={siteConfig.greeting}
+                            trademark={trademark}
                         />
                     </LinkContext>
                 </EmbeddableFrameBody>

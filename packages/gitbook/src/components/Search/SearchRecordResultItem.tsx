@@ -1,9 +1,10 @@
 import { tString, useLanguage } from '@/intl/client';
 import { Icon } from '@gitbook/icons';
 import React from 'react';
+import { Favicon } from '../utils';
 import { HighlightQuery } from './HighlightQuery';
 import { SearchResultItem } from './SearchResultItem';
-import type { ComputedRecordResult } from './server-actions';
+import type { ComputedRecordResult } from './search-types';
 
 export const SearchRecordResultItem = React.forwardRef(function SearchRecordResultItem(
     props: {
@@ -17,7 +18,6 @@ export const SearchRecordResultItem = React.forwardRef(function SearchRecordResu
     const language = useLanguage();
 
     const domain = getDomain(item.href);
-    const faviconURL = domain ? getFaviconURL(domain) : null;
 
     return (
         <SearchResultItem
@@ -27,20 +27,19 @@ export const SearchRecordResultItem = React.forwardRef(function SearchRecordResu
             data-testid="search-record-result"
             action={tString(language, 'view')}
             leadingIcon={
-                faviconURL ? (
-                    <img src={faviconURL} alt="Favicon" className="size-4" />
-                ) : (
-                    <Icon icon="memo" className="size-4" />
-                )
+                <Favicon
+                    url={item.href}
+                    className="size-4"
+                    fallback={<Icon icon="memo" className="size-4" />}
+                />
             }
-            // insights={{
-            //     type: 'search_open_result',
-            //     query,
-            //     result: {
-            //         pageId: item.pageId,
-            //         spaceId: item.spaceId,
-            //     },
-            // }}
+            insights={{
+                type: 'search_open_result',
+                query,
+                result: {
+                    recordId: item.id,
+                },
+            }}
             aria-label={tString(language, 'search_page_result_title', item.title)}
             {...rest}
         >
@@ -66,14 +65,4 @@ function getDomain(input: string) {
     } catch {
         return null;
     }
-}
-
-/**
- * Use Google to get the favicon of a URL.
- */
-function getFaviconURL(domain: string) {
-    const result = new URL('https://www.google.com/s2/favicons');
-    result.searchParams.set('domain', domain);
-    result.searchParams.set('sz', '64');
-    return result.toString();
 }

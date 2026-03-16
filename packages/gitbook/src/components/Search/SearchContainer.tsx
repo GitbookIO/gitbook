@@ -1,6 +1,7 @@
 'use client';
 
 import { t, useLanguage } from '@/intl/client';
+import { getLocalizedTitle } from '@/lib/sites';
 import { CustomizationSearchStyle, type SiteSection, type SiteSpace } from '@gitbook/api';
 import { useRouter } from 'next/navigation';
 import React, { useRef } from 'react';
@@ -42,6 +43,9 @@ interface SearchContainerProps {
     style: CustomizationSearchStyle;
     className?: string;
     viewport?: 'desktop' | 'mobile';
+
+    /** URL for the search API route, e.g. from linker.toPathInSpace('~gitbook/search'). */
+    searchURL: string;
 }
 
 /**
@@ -57,6 +61,7 @@ export function SearchContainer({
     className,
     viewport,
     siteSpaces,
+    searchURL,
 }: SearchContainerProps) {
     const { assistants, config } = useAI();
 
@@ -206,6 +211,7 @@ export function SearchContainer({
         scope: state?.scope ?? 'default',
         withAI,
         suggestions: config.suggestions,
+        searchURL,
     });
     const searchValue = state?.query ?? (withSearchAI || !withAI ? state?.ask : null) ?? '';
 
@@ -251,7 +257,10 @@ export function SearchContainer({
                                 <div className="border-tint-subtle border-t bg-tint-subtle px-4 py-1.5">
                                     <SearchScopeControl
                                         section={section}
-                                        spaceTitle={siteSpace.title}
+                                        spaceTitle={getLocalizedTitle(
+                                            siteSpace,
+                                            siteSpace.space.language
+                                        )}
                                         withVariants={withVariants}
                                         withSiteVariants={withSiteVariants}
                                         withSections={withSections}

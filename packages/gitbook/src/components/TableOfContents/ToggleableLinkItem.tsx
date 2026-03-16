@@ -13,9 +13,11 @@ export function ToggleableLinkItem(
         pathnames: string[];
         children: React.ReactNode;
         descendants: React.ReactNode;
+        icon?: React.ReactNode;
+        tag?: React.ReactNode;
     } & LinkInsightsProps
 ) {
-    const { href, children, descendants, pathnames, insights } = props;
+    const { href, children, descendants, pathnames, insights, icon, tag } = props;
 
     const currentPagePath = useCurrentPagePath();
     const isActive = pathnames.some((pathname) => pathname === currentPagePath);
@@ -43,7 +45,15 @@ export function ToggleableLinkItem(
     if (!descendants) {
         return (
             <LinkItem href={href} insights={insights} isActive={isActive}>
-                {children}
+                {icon}
+                {tag ? (
+                    <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2">
+                        {children}
+                        <div className="flex shrink-0 items-center">{tag}</div>
+                    </div>
+                ) : (
+                    children
+                )}
             </LinkItem>
         );
     }
@@ -58,8 +68,21 @@ export function ToggleableLinkItem(
                         isActive={isActive}
                         onActiveClick={() => handleToggle(!isOpen)}
                     >
-                        {children}
-                        {toggler}
+                        {icon}
+                        {tag ? (
+                            <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2">
+                                {children}
+                                <div className="flex shrink-0 items-center">
+                                    {tag}
+                                    {toggler}
+                                </div>
+                            </div>
+                        ) : (
+                            <>
+                                {children}
+                                {toggler}
+                            </>
+                        )}
                     </LinkItem>
                     {descendants}
                 </>

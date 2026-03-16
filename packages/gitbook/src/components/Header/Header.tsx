@@ -4,6 +4,7 @@ import { CONTAINER_STYLE, HEADER_HEIGHT_DESKTOP } from '@/components/layout';
 import { getSpaceLanguage, t } from '@/intl/server';
 import { tcls } from '@/lib/tailwind';
 import type { SiteSpace } from '@gitbook/api';
+import { SocialAccountButton } from '../Footer/SocialAccounts';
 import { SearchContainer } from '../Search';
 import { SiteSectionTabs, encodeClientSiteSections } from '../SiteSections';
 import { HeaderLink } from './HeaderLink';
@@ -31,6 +32,10 @@ export function Header(props: {
         visibleSections &&
             (visibleSections.list.length > 1 || // Show section tabs if there are at least 2 sections or at least 1 section group
                 visibleSections.list.some((s) => s.object === 'site-section-group'))
+    );
+
+    const headerSocialAccounts = customization.socialAccounts.filter(
+        (account) => account.display.header === true
     );
 
     return (
@@ -68,7 +73,7 @@ export function Header(props: {
                     'site-header:theme-bold:shadow-tint-12/2'
                 )}
             >
-                <div className="transition-all duration-300 lg:chat-open:pr-80 xl:chat-open:pr-96">
+                <div className="transition-all duration-300 motion-reduce:transition-none lg:chat-open:pr-80 xl:chat-open:pr-96">
                     <div
                         data-gb-header-content
                         className={tcls(
@@ -82,7 +87,7 @@ export function Header(props: {
                             'min-h-16',
                             'sm:h-16',
                             CONTAINER_STYLE,
-                            'transition-[max-width] duration-300',
+                            'transition-[max-width] duration-300 motion-reduce:transition-none',
                             '@container/header'
                         )}
                     >
@@ -120,7 +125,7 @@ export function Header(props: {
                                 'justify-self-end',
                                 'items-center',
                                 'gap-2',
-                                'transition-[margin] duration-300',
+                                'transition-[margin] duration-300 motion-reduce:transition-none',
                                 'search' in customization.styling &&
                                     customization.styling.search === 'prominent'
                                     ? [
@@ -158,29 +163,45 @@ export function Header(props: {
                                 siteSpace={siteSpace}
                                 siteSpaces={visibleSiteSpaces}
                                 viewport={!withTopHeader ? 'mobile' : undefined}
+                                searchURL={context.linker.toPathInSpace('~gitbook/search')}
                             />
                         </div>
 
                         {customization.header.links.length > 0 ||
+                        headerSocialAccounts.length > 0 ||
                         (!withSections && variants.translations.length > 1) ? (
                             <HeaderLinks>
-                                {customization.header.links.length > 0 ? (
-                                    <>
-                                        {customization.header.links.map((link) => {
+                                {customization.header.links.map((link) => {
+                                    return (
+                                        <HeaderLink
+                                            key={link.title}
+                                            link={link}
+                                            context={context}
+                                        />
+                                    );
+                                })}
+                                {headerSocialAccounts.length > 0 ? (
+                                    <div className="flex items-center gap-1">
+                                        {headerSocialAccounts.map((account) => {
                                             return (
-                                                <HeaderLink
-                                                    key={link.title}
-                                                    link={link}
-                                                    context={context}
+                                                <SocialAccountButton
+                                                    key={`${account.platform}-${account.handle}`}
+                                                    account={account}
+                                                    target={customization.externalLinks.target}
+                                                    className="p-2 theme-bold:text-header-link hover:site-header:theme-bold:bg-header-link/3 hover:theme-bold:text-header-link focus-visible:site-header:theme-bold:bg-header-link/3"
                                                 />
                                             );
                                         })}
-                                        <HeaderLinkMore
-                                            label={t(getSpaceLanguage(context), 'more')}
-                                            links={customization.header.links}
-                                            context={context}
-                                        />
-                                    </>
+                                    </div>
+                                ) : null}
+                                {customization.header.links.length > 0 ||
+                                headerSocialAccounts.length > 0 ? (
+                                    <HeaderLinkMore
+                                        label={t(getSpaceLanguage(context), 'more')}
+                                        links={customization.header.links}
+                                        socialAccounts={headerSocialAccounts}
+                                        context={context}
+                                    />
                                 ) : null}
                                 {!withSections && variants.translations.length > 1 ? (
                                     <TranslationsDropdown
@@ -201,7 +222,7 @@ export function Header(props: {
             </div>
 
             {visibleSections && withSections ? (
-                <div className="transition-[padding] duration-300 lg:chat-open:pr-80 xl:chat-open:pr-96">
+                <div className="transition-[padding] duration-300 motion-reduce:transition-none lg:chat-open:pr-80 xl:chat-open:pr-96">
                     <SiteSectionTabs sections={encodeClientSiteSections(context, visibleSections)}>
                         {variants.translations.length > 1 ? (
                             <TranslationsDropdown

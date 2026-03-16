@@ -8,7 +8,7 @@ import { tcls } from '@/lib/tailwind';
 import { ThemeToggler } from '../ThemeToggler';
 import { CONTAINER_STYLE, CONTENT_STYLE } from '../layout';
 import { FooterLinksGroup } from './FooterLinksGroup';
-import { SocialLink } from './SocialLink';
+import { SocialAccountButton } from './SocialAccounts';
 
 const FOOTER_COLUMNS = 4;
 
@@ -35,7 +35,7 @@ export function Footer(props: { context: GitBookSiteContext }) {
                 mobileOnly ? 'xl:hidden' : null
             )}
         >
-            <div className="motion-safe:transition-[padding] motion-safe:duration-300 lg:chat-open:pr-80 xl:chat-open:pr-96">
+            <div className="transition-[padding] duration-300 motion-reduce:transition-none lg:chat-open:pr-80 xl:chat-open:pr-96">
                 <div
                     className={tcls(
                         CONTAINER_STYLE,
@@ -136,7 +136,7 @@ export function Footer(props: { context: GitBookSiteContext }) {
                             socialLinks.length > 0 ? (
                                 <div className="col-span-full flex w-full grow items-center justify-center gap-2">
                                     {socialLinks.map((account) => (
-                                        <SocialLink
+                                        <SocialAccountButton
                                             key={`${account.platform}-${account.handle}`}
                                             account={account}
                                             target={customization.externalLinks.target}

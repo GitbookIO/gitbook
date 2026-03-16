@@ -4,10 +4,12 @@ import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import rison from 'rison';
 
+import type { SiteURLData } from '@/lib/context';
 import { getContentSecurityPolicy } from '@/lib/csp';
 import { validateSerializedCustomization } from '@/lib/customization';
 import {
     DataFetcherError,
+    decodeURLPath,
     getVisitorAuthBasePath,
     lookupPublishedContentByUrl,
     normalizeURL,
@@ -16,7 +18,16 @@ import {
 import { GITBOOK_OAUTH_SERVER_URL, isGitBookAssetsHostURL, isGitBookHostURL } from '@/lib/env';
 import { getImageResizingContextId } from '@/lib/images';
 import { MiddlewareHeaders } from '@/lib/middleware';
+import {
+    handleUnauthedOAuthProtectedResourceRequest,
+    isOAuthProtectedResourceRequest,
+} from '@/lib/oauth-protected';
 import { removeLeadingSlash, removeTrailingSlash } from '@/lib/paths';
+import {
+    getPreviewCookieResponse,
+    getPreviewRequestIdentifier,
+    isPreviewRequest,
+} from '@/lib/preview';
 import {
     type ResponseCookies,
     getPathScopedCookieName,
@@ -27,12 +38,6 @@ import {
 } from '@/lib/visitors';
 import { serveResizedImage } from '@/routes/image';
 import { cookies } from 'next/headers';
-import type { SiteURLData } from './lib/context';
-import {
-    handleUnauthedOAuthProtectedResourceRequest,
-    isOAuthProtectedResourceRequest,
-} from './lib/oauth-protected';
-import { getPreviewRequestIdentifier } from './lib/preview';
 import { serveProxyAnalyticsEvent } from './lib/tracking';
 export const config = {
     matcher: [
@@ -50,6 +55,12 @@ export async function middleware(request: NextRequest) {
         const normalized = normalizeURL(requestURL);
         if (normalized.toString() !== requestURL.toString()) {
             return NextResponse.redirect(normalized.toString());
+        }
+
+        // If the URL path is encoded, decode it and redirect to the decoded URL
+        const decoded = decodeURLPath(requestURL);
+        if (decoded.toString() !== requestURL.toString()) {
+            return NextResponse.redirect(decoded.toString());
         }
 
         // Reject malicious requests
@@ -333,6 +344,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
             changeRequest: siteURLData.changeRequest,
             revision: siteURLData.revision,
             shareKey: siteURLData.shareKey,
+            preview: siteURLData.preview,
             apiToken: siteURLData.apiToken,
             imagesContextId: imagesContextId,
             contextId: siteURLData.contextId,
@@ -357,18 +369,17 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
             routeType = 'dynamic';
             // We need to encode the customization headers, otherwise it will fail for some customization values containing non ASCII chars on vercel.
             requestHeaders.set(MiddlewareHeaders.Customization, encodeURIComponent(customization));
-            cookies.push({
-                name: MiddlewareHeaders.Customization,
-                value: encodeURIComponent(customization),
-                options: {
-                    httpOnly: true,
-                    sameSite: 'lax',
-                    maxAge: 10 * 60, // 10 minutes
-                    // Only send the cookie to preview routes and scope it to the specific site
-                    // to avoid conflicts between different sites previews potentially opened at the same time.
-                    path: `/url/preview/${getPreviewRequestIdentifier(siteRequestURL)}`,
-                },
-            });
+            if (siteURLData.preview) {
+                cookies.push(
+                    getPreviewCookieResponse({
+                        name: MiddlewareHeaders.Customization,
+                        value: encodeURIComponent(customization),
+                        mode,
+                        siteRequestURL,
+                        siteURLData,
+                    })
+                );
+            }
         }
         const theme =
             siteRequestURL.searchParams.get('theme') ??
@@ -376,16 +387,17 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         if (theme === CustomizationThemeMode.Dark || theme === CustomizationThemeMode.Light) {
             routeType = 'dynamic';
             requestHeaders.set(MiddlewareHeaders.Theme, theme);
-            cookies.push({
-                name: MiddlewareHeaders.Theme,
-                value: theme,
-                options: {
-                    httpOnly: true,
-                    sameSite: 'lax',
-                    maxAge: 10 * 60, // 10 minutes
-                    path: '/url/preview', // Only send the cookie to preview routes
-                },
-            });
+            if (siteURLData.preview) {
+                cookies.push(
+                    getPreviewCookieResponse({
+                        name: MiddlewareHeaders.Theme,
+                        value: theme,
+                        mode,
+                        siteRequestURL,
+                        siteURLData,
+                    })
+                );
+            }
         }
 
         // We support forcing dynamic routes by setting a `gitbook-dynamic-route` cookie
@@ -455,17 +467,20 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         return writeResponseCookies(response, cookies);
     };
 
-    // For https://preview/<siteURL> requests,
-    if (siteRequestURL.hostname === 'preview') {
+    // For preview requests like:
+    // - https://preview/<siteURL> requests, TODO: Remove support for this format later
+    // - https://<GITBOOK_PREVIEW_BASE_URL>/<siteID> requests (ex: https://sites.gitbook.com/preview/site_id/path)
+    if (isPreviewRequest(siteRequestURL)) {
         // Do not track page views for preview requests
         request.headers.set('x-gitbook-disable-tracking', 'true');
-
-        return serveWithQueryAPIToken(
+        return serveWithQueryAPIToken({
             // We scope the API token to the site ID.
-            `${siteRequestURL.hostname}/${requestURL.pathname.slice(1).split('/')[0]}`,
-            request,
-            withAPIToken
-        );
+            scopePath: ['preview', getPreviewRequestIdentifier(siteRequestURL)].join('/'),
+            // We keep the original request URL when using `url` mode
+            requestURL: mode === 'url' ? requestURL : siteRequestURL,
+            requestCookies: request.cookies,
+            serve: withAPIToken,
+        });
     }
 
     return withAPIToken(null);
@@ -480,18 +495,22 @@ async function serveSpacePDFRoutes(requestURL: URL, request: NextRequest) {
         return null;
     }
 
-    return serveWithQueryAPIToken(
-        pathnameParts.slice(0, 2).join('/'),
-        request,
-        async (apiToken) => {
+    return serveWithQueryAPIToken({
+        scopePath: pathnameParts.slice(0, 2).join('/'),
+        requestURL,
+        requestCookies: request.cookies,
+        serve: async (apiToken) => {
+            if (!apiToken) {
+                throw new DataFetcherError('Missing API token', 400);
+            }
             // Handle the rest with the router default logic
             return NextResponse.next({
                 headers: {
                     [MiddlewareHeaders.APIToken]: apiToken,
                 },
             });
-        }
-    );
+        },
+    });
 }
 
 /**
@@ -509,23 +528,25 @@ function serveErrorResponse(error: Error) {
 }
 
 /**
- * Server a response with an API token obtained from the query params.
+ * Serve a response with an API token obtained from the query params.
  */
-async function serveWithQueryAPIToken(
-    scopePath: string,
-    request: NextRequest,
-    serve: (apiToken: string) => Promise<NextResponse>
-) {
+async function serveWithQueryAPIToken(input: {
+    scopePath: string;
+    requestURL: URL;
+    requestCookies: NextRequest['cookies'];
+    serve: (apiToken: string | null) => Promise<NextResponse>;
+}) {
+    const { scopePath, requestURL, requestCookies, serve } = input;
     // We store the API token in a cookie that is scoped to the specific route
     // to avoid errors when multiple previews are opened in different tabs.
     const cookieName = getPathScopedCookieName('gitbook-api-token', scopePath);
 
     // Extract a potential GitBook API token passed in the request
     // If found, we redirect to the same URL but with the token in the cookie
-    const queryAPIToken = request.nextUrl.searchParams.get('token');
+    const queryAPIToken = requestURL.searchParams.get('token');
     if (queryAPIToken) {
-        request.nextUrl.searchParams.delete('token');
-        return writeResponseCookies(NextResponse.redirect(request.nextUrl.toString()), [
+        requestURL.searchParams.delete('token');
+        return writeResponseCookies(NextResponse.redirect(requestURL.toString()), [
             {
                 name: cookieName,
                 value: queryAPIToken,
@@ -539,12 +560,9 @@ async function serveWithQueryAPIToken(
         ]);
     }
 
-    const apiToken = request.cookies.get(cookieName)?.value;
-    if (!apiToken) {
-        throw new DataFetcherError('Missing API token', 400);
-    }
+    const apiToken = requestCookies.get(cookieName)?.value;
 
-    return serve(apiToken);
+    return serve(apiToken ?? null);
 }
 
 /**
@@ -662,7 +680,9 @@ function encodePathInSiteContent(
             // as they only depend on the site structure / pages.
             return { pathname, routeType: 'static' };
         case '~gitbook/pdf':
-            // PDF routes are always dynamic as they depend on the search params.
+        case '~gitbook/search':
+        case '~scalar/proxy':
+            // PDF and search routes are always dynamic as they depend on the request.
             return { pathname, routeType: 'dynamic' };
         default: {
             // If the pathname is a markdown file or the request is accepting markdown,

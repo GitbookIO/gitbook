@@ -1,5 +1,65 @@
 # gitbook
 
+## 0.22.3
+
+### Patch Changes
+
+- f182680: Add backward compatibility for OpenAPI spec content URL
+- bdc6cd9: Use OpenAPI publicURL as Scalar specUrl
+- b3875a1: Refactor embeddable context to merge local & site properties in one unified way
+- eceec6f: Move ~scalar/proxy route to site route group
+- 887c3f8: Add token verification on OpenAPI proxy
+- d666212: Add support for localized site section titles
+- Updated dependencies [b3875a1]
+- Updated dependencies [bdc6cd9]
+- Updated dependencies [8ab419a]
+- Updated dependencies [eceec6f]
+- Updated dependencies [887c3f8]
+  - @gitbook/embed@0.4.0
+  - @gitbook/react-openapi@1.5.10
+  - @gitbook/openapi-parser@3.0.10
+
+## 0.22.2
+
+### Patch Changes
+
+- e074283: Add server-side proxy for Scalar API client to bypass CORS
+- afa868e: Show "Ask Assistant" search result immediately
+- 0803db0: Track opening of search results for records and in the assistant.
+- cb71511: Wrap tracking call with waitUntil
+- 4a6f91a: Show social accounts in header
+- 370b731: Docs Embed: Make trademark optional
+- afa476c: Add server-side insight event tracking for MCP route
+- Updated dependencies [e074283]
+- Updated dependencies [370b731]
+  - @gitbook/openapi-parser@3.0.9
+  - @gitbook/react-openapi@1.5.9
+  - @gitbook/embed@0.3.0
+
+## 0.22.1
+
+### Patch Changes
+
+- 9d5e397: Remove code syntax highlighting patch for Safari
+- 3d8e89c: Show favicon for record search results in the assistant.
+- 5f66860: Use isCookiesTrackingDisabled for cookie consent integrations
+- 426aabe: Fix TOC header logo on bold themes
+- ae30a57: Integrate Ask AI with upcoming insights by passing visitor session IDs.
+- f7c251e: Update Reddit social account rendering
+- e31a8f4: Hide cookie banner for AI user agents
+- 2e495cb: Add Global Privacy Control (GPC) support
+- Updated dependencies [1a7ef78]
+- Updated dependencies [93eea0b]
+- Updated dependencies [b4b471f]
+- Updated dependencies [5f66860]
+- Updated dependencies [2ebb18d]
+- Updated dependencies [11d9b80]
+- Updated dependencies [2e495cb]
+- Updated dependencies [f517035]
+  - @gitbook/react-openapi@1.5.8
+  - @gitbook/embed@0.2.2
+  - @gitbook/browser-types@0.1.5
+
 ## 0.22.0
 
 ### Minor Changes

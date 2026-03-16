@@ -38,12 +38,10 @@ export function PageDocumentItem(props: { page: ClientTOCPageDocument }) {
                         />
                     ) : null
                 }
+                icon={<TOCPageIcon page={page} />}
+                tag={page.primaryTag ? <Tag tag={page.primaryTag} /> : null}
             >
-                <TOCPageIcon page={page} />
-                <span className="flex items-center gap-2">
-                    {page.title}
-                    {page.primaryTag ? <Tag label={page.primaryTag.label} /> : null}
-                </span>
+                {page.title}
             </ToggleableLinkItem>
         </li>
     );

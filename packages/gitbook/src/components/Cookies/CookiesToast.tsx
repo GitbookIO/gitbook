@@ -82,7 +82,8 @@ export function CookiesToast(props: { privacyPolicy?: string }) {
                 'sm:left-auto',
                 'lg:chat-open:mr-80',
                 'xl:chat-open:mr-100',
-                'motion-safe:transition-all',
+                'transition-all',
+                'motion-reduce:transition-none',
                 'duration-300',
                 'text-sm'
             )}

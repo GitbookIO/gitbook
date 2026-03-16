@@ -1,4 +1,3 @@
-import { AIContextProvider } from '@/components/AI';
 import { CustomizationRootLayout } from '@/components/RootLayout';
 import {
     SiteLayoutClientContexts,
@@ -11,7 +10,9 @@ import { SiteInsightsTrademarkPlacement } from '@gitbook/api';
 import { SpaceLayoutServerContext } from '../SpaceLayout';
 import { Trademark } from '../TableOfContents/Trademark';
 import { NavigationLoader } from '../primitives/NavigationLoader';
+import { EmbeddableAIContextProvider } from './EmbeddableAIContextProvider';
 import { EmbeddableIframeAPI } from './EmbeddableIframeAPI';
+import { IfEmbeddableTrademark } from './EmbeddableTrademark';
 
 type EmbeddableRootLayoutProps = {
     context: GitBookSiteContext;
@@ -40,7 +41,7 @@ export async function EmbeddableRootLayout({
                 contextId={context.contextId}
                 proxyOrigin={context.site.proxy?.origin}
             >
-                <AIContextProvider
+                <EmbeddableAIContextProvider
                     aiMode={context.customization.ai.mode}
                     suggestions={context.customization.ai.suggestions}
                     trademark={context.customization.trademark.enabled}
@@ -58,18 +59,20 @@ export async function EmbeddableRootLayout({
                         <div className="fixed inset-0 flex flex-col">
                             {children}
                             {context.customization.trademark.enabled ? (
-                                <Trademark
-                                    className="rounded-none! border-x-0 border-t border-b-0 bg-tint-solid/1 depth-flat:bg-tint-solid/1 px-4 py-2.5 text-tint/8"
-                                    context={context}
-                                    placement={SiteInsightsTrademarkPlacement.Embed}
-                                />
+                                <IfEmbeddableTrademark>
+                                    <Trademark
+                                        className="rounded-none! border-x-0 border-t border-b-0 bg-tint-solid/1 depth-flat:bg-tint-solid/1 px-4 py-2.5 text-tint/8"
+                                        context={context}
+                                        placement={SiteInsightsTrademarkPlacement.Embed}
+                                    />
+                                </IfEmbeddableTrademark>
                             ) : null}
                         </div>
                         <EmbeddableIframeAPI
                             baseURL={context.linker.toPathInSite('~gitbook/embed/')}
                         />
                     </SpaceLayoutServerContext>
-                </AIContextProvider>
+                </EmbeddableAIContextProvider>
             </SiteLayoutClientContexts>
         </CustomizationRootLayout>
     );

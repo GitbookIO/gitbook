@@ -27,6 +27,7 @@ export function Trademark(
 
     return (
         <Button
+            data-testid="gb-trademark"
             target="_blank"
             variant="secondary"
             size="large"

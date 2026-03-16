@@ -21,6 +21,6 @@ export const RecordCardStyles = [
     'before:ring-tint-12/2',
     'before:z-10',
     'before:relative',
-
-    'hover:before:ring-tint-12/5',
 ] as ClassValue;
+
+export const RecordCardLinkStyles = ['hover:before:ring-primary-hover'] as ClassValue;

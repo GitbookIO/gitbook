@@ -1,6 +1,6 @@
 {
     "name": "gitbook",
-    "version": "0.22.0",
+    "version": "0.22.3",
     "private": true,
     "dependencies": {
         "@cloudflare/workers-types": "^4.20251011.0",
@@ -63,6 +63,7 @@
         "react": "catalog:",
         "react-dom": "catalog:",
         "react-hotkeys-hook": "^4.4.1",
+        "rehype-raw": "^7.0.0",
         "rehype-sanitize": "^6.0.0",
         "rehype-stringify": "^10.0.1",
         "remark-gfm": "^4.0.1",
@@ -80,6 +81,7 @@
         "usehooks-ts": "catalog:",
         "warn-once": "^0.1.1",
         "zod": "^3",
+        "zod-to-json-schema": "^3.25.1",
         "zustand": "^5.0.3"
     },
     "devDependencies": {

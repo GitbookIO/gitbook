@@ -1,7 +1,11 @@
+import { SiteInsightsDisplayContext } from '@gitbook/api';
+
 import { type RouteLayoutParams, getStaticSiteContext } from '@/app/utils';
 import { throwIfDataError } from '@/lib/data';
 import { joinPathWithBaseURL } from '@/lib/paths';
 import { findSiteSpaceBy } from '@/lib/sites';
+import { trackServerInsightsEvents } from '@/lib/tracking';
+import { waitUntil } from '@/lib/waitUntil';
 import { createMcpHandler } from 'mcp-handler';
 import type { NextRequest } from 'next/server';
 import { z } from 'zod';
@@ -28,6 +32,24 @@ async function handler(
                             siteId: site.id,
                             query,
                             scope: { mode: 'all' },
+                        })
+                    );
+
+                    // Track the search event server-side
+                    waitUntil(
+                        trackServerInsightsEvents({
+                            organizationId: context.organizationId,
+                            siteId: site.id,
+                            events: [
+                                {
+                                    type: 'search_type_query',
+                                    query,
+                                    location: {
+                                        displayContext: SiteInsightsDisplayContext.Mcp,
+                                    },
+                                },
+                            ],
+                            request: nextRequest,
                         })
                     );
 

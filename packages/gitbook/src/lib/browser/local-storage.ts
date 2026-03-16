@@ -66,6 +66,13 @@ export function setLocalStorageItem(key: string, value: unknown) {
 }
 
 /**
+ * Remove an item from local storage safely.
+ */
+export function removeLocalStorageItem(key: string) {
+    removeStorage(typeof localStorage !== 'undefined' ? localStorage : undefined, key);
+}
+
+/**
  * Get an item from session storage safely.
  */
 export function getSessionStorageItem<T>(key: string, defaultValue: T): T {

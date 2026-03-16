@@ -1,5 +1,34 @@
 # @gitbook/react-openapi
 
+## 1.5.10
+
+### Patch Changes
+
+- bdc6cd9: Use OpenAPI publicURL as Scalar specUrl
+- 8ab419a: Support x-enable-proxy at operation level
+- eceec6f: Move ~scalar/proxy route to site route group
+- 887c3f8: Add token verification on OpenAPI proxy
+- Updated dependencies [8ab419a]
+  - @gitbook/openapi-parser@3.0.10
+
+## 1.5.9
+
+### Patch Changes
+
+- e074283: Add server-side proxy for Scalar API client to bypass CORS
+- Updated dependencies [e074283]
+  - @gitbook/openapi-parser@3.0.9
+
+## 1.5.8
+
+### Patch Changes
+
+- 1a7ef78: Handle non-array required field in OpenAPI schema to fix TypeError with specs using boolean required values
+- 93eea0b: Strip trailing slash from OpenAPI server URLs to avoid double slashes in rendered paths
+- 2ebb18d: Make OpenAPI Response structure clearer
+- 11d9b80: Use precedence for OpenAPI servers
+- f517035: Remove available scopes list from OAuth2 endpoints when no scopes are required
+
 ## 1.5.7
 
 ### Patch Changes

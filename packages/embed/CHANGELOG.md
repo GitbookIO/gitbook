@@ -1,5 +1,23 @@
 # @gitbook/embed
 
+## 0.4.0
+
+### Minor Changes
+
+- b3875a1: Support `assistantName` property to override Assistant name
+
+## 0.3.0
+
+### Minor Changes
+
+- 370b731: Docs Embed: Make trademark optional
+
+## 0.2.2
+
+### Patch Changes
+
+- b4b471f: Fix unexpected error thrown when using the embed in standalone mode
+
 ## 0.2.1
 
 ### Patch Changes
