@@ -1,7 +1,10 @@
+import { isSiteAuthLoginHref } from '@/lib/auth-login-link';
 import { resolveContentRefFallback, resolveContentRefInDocument } from '@/lib/references';
 import * as api from '@gitbook/api';
 import type { IconName } from '@gitbook/icons';
+import type React from 'react';
 import { Button, type ButtonProps } from '../primitives';
+import { SiteAuthLoginButton } from '../primitives/SiteAuthLoginLink';
 import type { InlineProps } from './Inline';
 import { InlineActionButton } from './InlineActionButton';
 import { NotFoundRefHoverCard } from './NotFoundRefHoverCard';
@@ -58,21 +61,27 @@ export async function InlineLinkButton(
     const href =
         resolved?.href ??
         (inline.data.ref ? resolveContentRefFallback(inline.data.ref)?.href : undefined);
+    const sharedProps: React.ComponentProps<typeof Button> = {
+        ...buttonProps,
+        insights: {
+            type: 'link_click' as const,
+            link: {
+                target: inline.data.ref,
+                position: api.SiteInsightsLinkPosition.Content,
+            },
+        },
+        href,
+        disabled: href === undefined,
+    };
 
-    const button = (
-        <Button
-            {...buttonProps}
-            insights={{
-                type: 'link_click',
-                link: {
-                    target: inline.data.ref,
-                    position: api.SiteInsightsLinkPosition.Content,
-                },
-            }}
-            href={href}
-            disabled={href === undefined}
-        />
-    );
+    const button =
+        href &&
+        context.contentContext &&
+        isSiteAuthLoginHref(context.contentContext.linker, href) ? (
+            <SiteAuthLoginButton {...sharedProps} />
+        ) : (
+            <Button {...sharedProps} />
+        );
 
     if (inline.data.ref && !resolved) {
         return <NotFoundRefHoverCard context={context}>{button}</NotFoundRefHoverCard>;
