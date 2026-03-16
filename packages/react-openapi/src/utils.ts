@@ -306,7 +306,7 @@ export function getSchemaTitle(
 
             // Only add the title if it's an object (no need for the title of a string, number, etc.)
             if (type === 'object' && schema.title) {
-                type += ` · ${schema.title.replaceAll(' ', '')}`;
+                type += ` · ${schema.title}`;
             }
         }
     }
