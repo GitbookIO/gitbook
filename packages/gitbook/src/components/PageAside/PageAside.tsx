@@ -61,7 +61,7 @@ export function PageAside(props: {
                 'lg:[html[style*="--outline-height"]_&]:max-h-(--outline-height)!',
 
                 'layout-default:max-xl:border-l',
-                'layout-wide:max-4xl:border-l',
+                'layout-wide:max-3xl:border-l',
                 'border-tint-subtle',
 
                 'p-4',
@@ -81,19 +81,20 @@ export function PageAside(props: {
                 // In layout-wide mode (2-column), hide outline when viewport is too narrow
                 // or when chat is open and viewport is narrow, to prevent layout overflow
                 'layout-wide:xl:-mr-68',
-                'layout-wide:4xl:not-chat-open:flex!',
-                'layout-wide:4xl:not-chat-open:animate-none!',
-                'layout-wide:min-[150rem]:animate-none!',
-                'layout-wide:min-[150rem]:flex!',
+                'layout-wide:3xl:not-chat-open:flex!',
+                'layout-wide:3xl:not-chat-open:animate-none!',
+                // 'layout-wide:min-[150rem]:animate-none!',
+                // 'layout-wide:min-[150rem]:flex!',
                 // 'layout-wide:chat-open:max-[2416px]:hidden',
 
                 // In layout-full mode (1-column, no TOC), position outline as a fixed sidebar on the right
                 // Hide it on narrow viewports (< 3xl) to prevent overlap with content
+                'layout-full:xl:max-3xl:-mr-68',
                 'layout-full:3xl:flex!',
                 'layout-full:3xl:animate-none!',
                 'layout-full:3xl:fixed',
 
-                'bg-tint-base',
+                'hydrated:bg-tint-base', // Only add a background once the element is positioned correctly to prevent overlapping the page cover
                 'text-tint',
                 'contrast-more:text-tint-strong'
             )}
@@ -101,7 +102,7 @@ export function PageAside(props: {
             <div className="flex h-full w-full shrink-0 flex-col overflow-hidden">
                 {page.layout.outline ? (
                     <>
-                        <div className="mb-2 flex page-no-outline:hidden items-center justify-between">
+                        <div className="mb-3 ml-3 flex page-no-outline:hidden items-center justify-between">
                             <h6 className="flex items-center gap-1 font-semibold text-tint text-xs uppercase leading-wider">
                                 <Icon icon="block-quote" className="size-3" /> On this page
                             </h6>

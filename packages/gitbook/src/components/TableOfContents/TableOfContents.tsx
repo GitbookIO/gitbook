@@ -44,7 +44,6 @@ export async function TableOfContents(props: {
                     'w-4/5',
                     'md:w-1/2',
                     'lg:w-72',
-                    'lg:page-no-toc:w-58',
 
                     'max-lg:not-sidebar-filled:bg-tint-base',
                     'max-lg:not-sidebar-filled:border-r',

@@ -12,7 +12,7 @@ import {
 } from '../PageActions/PageActionsDropdown';
 import { PageAsideToggleButton } from '../PageAside/PageAsideButton';
 import { PageIcon } from '../PageIcon';
-import { CONTENT_STYLE } from '../layout';
+import { CONTENT_STYLE, CONTENT_STYLE_REDUCED } from '../layout';
 import { StyledLink } from '../primitives';
 import { PageTags } from './PageTags';
 
@@ -37,20 +37,20 @@ export async function PageHeader(props: {
 
     // When title and description are hidden,
     // only display the page actions if the page contains an update block.
-    if (!page.layout.title && !page.layout.description) {
-        if (!hasPageActions) {
-            return null;
-        }
+    // if (!page.layout.title && !page.layout.description) {
+    //     if (!hasPageActions) {
+    //         return null;
+    //     }
 
-        return (
-            <PageActionsDropdown
-                siteTitle={context.site.title}
-                urls={getPageActionsURLs({ context, page, withRSSFeed })}
-                actions={context.customization.pageActions}
-                className="absolute top-8 right-0 page-updates-block:flex hidden"
-            />
-        );
-    }
+    //     return (
+    //         <PageActionsDropdown
+    //             siteTitle={context.site.title}
+    //             urls={getPageActionsURLs({ context, page, withRSSFeed })}
+    //             actions={context.customization.pageActions}
+    //             className="absolute top-8 right-0 page-updates-block:flex hidden"
+    //         />
+    //     );
+    // }
 
     return (
         <header
@@ -145,7 +145,9 @@ export async function PageHeader(props: {
                 </h1>
             ) : null}
             {page.description && page.layout.description ? (
-                <p className={tcls('text-lg', 'text-tint', 'clear-both')}>{page.description}</p>
+                <p className={tcls(CONTENT_STYLE_REDUCED, 'text-lg', 'text-tint', 'clear-both')}>
+                    {page.description}
+                </p>
             ) : null}
         </header>
     );

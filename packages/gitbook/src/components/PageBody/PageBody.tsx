@@ -106,7 +106,7 @@ export function PageBody(props: {
                         <SuspenseLoadedHint />
                         <DocumentView
                             document={document}
-                            style="flex flex-col [&>*+*]:mt-5"
+                            style="clear-both flex flex-col [&>*+*]:mt-5"
                             context={{
                                 mode: 'default',
                                 contentContext: {

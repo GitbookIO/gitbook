@@ -92,19 +92,23 @@ export async function PageCover(props: {
                     ? [
                           'sm:-mx-6',
                           'md:-mx-8',
-                          !page.layout.tableOfContents &&
-                          context.customization.header.preset !== 'none'
-                              ? [
-                                    'xl:-ml-76', // Account for TOC width
-                                    'xl:layout-full:-mx-8', // In layout-full (no TOC), extend to screen edges
-                                    'xl:layout-full:w-screen',
-                                    // Round the bottom corners once the page is wider than the image
-                                    '2xl:not-layout-full:circular-corners:rounded-b-3xl',
-                                    '2xl:not-layout-full:rounded-corners:rounded-b-xl',
-                                ]
+                          !page.layout.tableOfContents
+                              ? context.customization.header.preset !== 'none'
+                                  ? [
+                                        'xl:layout-full:-mx-[max(calc((100vw-90rem)/2+2rem),2rem)]', // Cover full screen width
+                                    ]
+                                  : [
+                                        'lg:page-no-toc:-ml-92', // Account for TOC width
+                                        'xl:layout-full:-ml-[max(calc((100vw-90rem)/2+23rem),23rem)]', // Cover full screen width
+                                        'xl:layout-full:-mr-[max(calc((100vw-90rem)/2+2rem),2rem)]',
+
+                                        // // Round the bottom corners once the page is wider than the image
+                                        '2xl:not-layout-full:circular-corners:rounded-b-3xl',
+                                        '2xl:not-layout-full:rounded-corners:rounded-b-xl',
+                                    ]
                               : [
                                     // In layout-wide, extend cover to account for outline sidebar on the right
-                                    '2xl:layout-wide:-mr-[min(calc((100vw-96rem)/2+2rem),19rem)]',
+                                    '2xl:layout-wide:-mr-[min(calc((100vw-90rem)/2+2rem),19rem)]',
 
                                     // Round the bottom left corner once the sidebar is shown next to it
                                     'lg:rounded-corners:rounded-bl-xl',

@@ -32,6 +32,8 @@ export const CONTENT_STYLE: ClassValue = [
     'w-full',
 ];
 
+export const CONTENT_STYLE_REDUCED: ClassValue = ['max-w-3xl', 'w-full'];
+
 /**
  * Height of the page cover.
  */
