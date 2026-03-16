@@ -14,7 +14,7 @@ import { waitUntil } from '@/lib/waitUntil';
 export async function servePageMarkdown(
     request: Request,
     context: GitBookSiteContext,
-    pagePath: string,
+    pagePath: string
 ) {
     try {
         const pageLookup = resolvePagePathDocumentOrGroup(context.revision.pages, pagePath);

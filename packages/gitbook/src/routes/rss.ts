@@ -6,7 +6,11 @@ import { resolvePagePathDocumentOrGroup } from '@/lib/pages';
 import { joinPath } from '@/lib/paths';
 import { trackServerInsightsEvents } from '@/lib/tracking';
 import { waitUntil } from '@/lib/waitUntil';
-import { type RevisionPageDocument, RevisionPageType, SiteInsightsDisplayContext } from '@gitbook/api';
+import {
+    type RevisionPageDocument,
+    RevisionPageType,
+    SiteInsightsDisplayContext,
+} from '@gitbook/api';
 import { Feed } from 'feed';
 
 /**

@@ -6,7 +6,13 @@ import { getIndexablePages } from '@/lib/sitemap';
 import { getSiteStructureSections } from '@/lib/sites';
 import { trackServerInsightsEvents } from '@/lib/tracking';
 import { waitUntil } from '@/lib/waitUntil';
-import { SiteInsightsDisplayContext, SiteInsightsLLMSVariant, type RevisionPageDocument, type SiteSection, type SiteSpace } from '@gitbook/api';
+import {
+    type RevisionPageDocument,
+    SiteInsightsDisplayContext,
+    SiteInsightsLLMSVariant,
+    type SiteSection,
+    type SiteSpace,
+} from '@gitbook/api';
 import assertNever from 'assert-never';
 import type { Paragraph } from 'mdast';
 import { pMapIterable } from 'p-map';

@@ -1,9 +1,6 @@
-import { SiteInsightsDisplayContext, SiteInsightsLLMSVariant } from '@gitbook/api';
 import type { NextRequest } from 'next/server';
 
 import { type RouteLayoutParams, getStaticSiteContext } from '@/app/utils';
-import { trackServerInsightsEvents } from '@/lib/tracking';
-import { waitUntil } from '@/lib/waitUntil';
 import { serveLLMsTxt } from '@/routes/llms';
 
 export const dynamic = 'force-static';

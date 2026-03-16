@@ -6,7 +6,12 @@ import { type FlatPageEntry, getIndexablePages } from '@/lib/sitemap';
 import { getLocalizedTitle, getSiteStructureSections } from '@/lib/sites';
 import { trackServerInsightsEvents } from '@/lib/tracking';
 import { waitUntil } from '@/lib/waitUntil';
-import { SiteInsightsDisplayContext, SiteInsightsLLMSVariant, type SiteSection, type SiteSpace } from '@gitbook/api';
+import {
+    SiteInsightsDisplayContext,
+    SiteInsightsLLMSVariant,
+    type SiteSection,
+    type SiteSpace,
+} from '@gitbook/api';
 import assertNever from 'assert-never';
 import type { ListItem, Paragraph, Root, RootContent } from 'mdast';
 import { toMarkdown } from 'mdast-util-to-markdown';
@@ -31,7 +36,6 @@ export async function serveLLMsTxt(
     if (!checkIsRootSiteContext(context)) {
         return new Response('llms.txt is only served from the root of the site', { status: 404 });
     }
-
 
     waitUntil(
         trackServerInsightsEvents({
