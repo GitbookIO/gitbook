@@ -23,7 +23,7 @@ export async function PageCover(props: {
     cover: RevisionPageDocumentCover;
     context: GitBookSiteContext;
 }) {
-    const { as, page, cover, context } = props;
+    const { as, cover, context } = props;
     const height = getCoverHeight(cover);
 
     const [resolved, resolvedDark] = await Promise.all([
