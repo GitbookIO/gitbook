@@ -1,4 +1,3 @@
-import type { OpenAPISchema } from '@gitbook/openapi-parser';
 import clsx from 'classnames';
 import { OpenAPIExample } from '../OpenAPIExample';
 import { OpenAPIRootSchema } from '../OpenAPISchemaServer';
@@ -11,20 +10,22 @@ import {
 import { t } from '../translate';
 import { getExampleFromSchema } from '../util/example';
 import { OpenAPISchemaItem } from './OpenAPISchemaItem';
+import type { OpenAPISchemasData } from './resolveOpenAPISchemas';
 
 /**
  * OpenAPI Schemas component.
  */
 export function OpenAPISchemas(props: {
     className?: string;
-    schemas: OpenAPISchema[];
+    data: OpenAPISchemasData;
     context: OpenAPIContextInput;
     /**
      * Whether to show the schema directly if there is only one.
      */
     grouped?: boolean;
 }) {
-    const { schemas, context: contextInput, grouped, className } = props;
+    const { data, context: contextInput, grouped, className } = props;
+    const { schemas } = data;
 
     const firstSchema = schemas[0];
 

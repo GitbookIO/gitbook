@@ -115,6 +115,7 @@ function OpenAPISchemaProperty(
                 icon={context.icons.plus}
                 header={header}
                 label={(isExpanded) => getDisclosureLabel({ schema, isExpanded, context })}
+                defaultExpanded={context.expandAllModelSections}
             >
                 {content}
             </OpenAPIDisclosure>
@@ -385,6 +386,7 @@ function OpenAPISchemaAlternative(props: {
             icon={context.icons.plus}
             header={<OpenAPISchemaPresentation property={{ schema }} context={context} />}
             label={(isExpanded) => getDisclosureLabel({ schema, isExpanded, context })}
+            defaultExpanded={context.expandAllModelSections}
         >
             <OpenAPISchemaProperties
                 properties={properties}
