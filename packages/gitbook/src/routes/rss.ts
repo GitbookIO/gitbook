@@ -4,7 +4,9 @@ import { getPageDocument } from '@/lib/data/pages';
 import { getBlocksByType, getNodeText, isHeadingBlock } from '@/lib/document';
 import { resolvePagePathDocumentOrGroup } from '@/lib/pages';
 import { joinPath } from '@/lib/paths';
-import { type RevisionPageDocument, RevisionPageType } from '@gitbook/api';
+import { trackServerInsightsEvents } from '@/lib/tracking';
+import { waitUntil } from '@/lib/waitUntil';
+import { type RevisionPageDocument, RevisionPageType, SiteInsightsDisplayContext } from '@gitbook/api';
 import { Feed } from 'feed';
 
 /**
@@ -19,6 +21,7 @@ export function getPageRSSURL(context: GitBookSiteContext, page: RevisionPageDoc
  * Generate an RSS feed from Updates blocks in a page.
  */
 export async function servePageRSS(
+    request: Request,
     context: GitBookSiteContext,
     inputPagePath: string
 ): Promise<Response> {
@@ -30,6 +33,22 @@ export async function servePageRSS(
     if (pageLookup.page.type !== RevisionPageType.Document) {
         return notFoundResponse('Page is not a document');
     }
+
+    waitUntil(
+        trackServerInsightsEvents({
+            organizationId: context.organizationId,
+            siteId: context.site.id,
+            events: [
+                {
+                    type: 'rss_request',
+                    location: {
+                        displayContext: SiteInsightsDisplayContext.Server,
+                    },
+                },
+            ],
+            request,
+        })
+    );
 
     const { page } = pageLookup;
     const document = await getPageDocument(context, page);

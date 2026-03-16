@@ -11,11 +11,27 @@ import type { NextRequest } from 'next/server';
 import { z } from 'zod';
 
 async function handler(
-    nextRequest: NextRequest,
+    request: NextRequest,
     { params }: { params: Promise<RouteLayoutParams> }
 ) {
     const { context } = await getStaticSiteContext(await params);
     const { dataFetcher, linker, site } = context;
+
+    waitUntil(
+        trackServerInsightsEvents({
+            organizationId: context.organizationId,
+            siteId: context.site.id,
+            events: [
+                {
+                    type: 'mcp_request',
+                    location: {
+                        displayContext: SiteInsightsDisplayContext.Server,
+                    },
+                },
+            ],
+            request,
+        })
+    );
 
     const mcpHandler = createMcpHandler(
         (server) => {
@@ -49,7 +65,7 @@ async function handler(
                                     },
                                 },
                             ],
-                            request: nextRequest,
+                            request,
                         })
                     );
 
@@ -118,10 +134,9 @@ async function handler(
     const requestURL = new URL(
         context.linker.toAbsoluteURL(context.linker.toPathInSite('~gitbook/mcp'))
     );
-    requestURL.search = nextRequest.nextUrl.search;
+    requestURL.search = request.nextUrl.search;
 
-    const request = new Request(requestURL, nextRequest);
-    return mcpHandler(request);
+    return mcpHandler(new Request(requestURL, request));
 }
 
 export { handler as GET, handler as POST };

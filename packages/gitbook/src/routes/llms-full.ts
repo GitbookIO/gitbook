@@ -4,7 +4,9 @@ import { fromPageMarkdown, toPageMarkdown } from '@/lib/markdownPage';
 import { joinPath } from '@/lib/paths';
 import { getIndexablePages } from '@/lib/sitemap';
 import { getSiteStructureSections } from '@/lib/sites';
-import type { RevisionPageDocument, SiteSection, SiteSpace } from '@gitbook/api';
+import { trackServerInsightsEvents } from '@/lib/tracking';
+import { waitUntil } from '@/lib/waitUntil';
+import { SiteInsightsDisplayContext, SiteInsightsLLMSVariant, type RevisionPageDocument, type SiteSection, type SiteSpace } from '@gitbook/api';
 import assertNever from 'assert-never';
 import type { Paragraph } from 'mdast';
 import { pMapIterable } from 'p-map';
@@ -20,10 +22,27 @@ const DEFAULT_PAGE_LIMIT = 100;
  * Generate a llms-full.txt file for the site.
  * As the result can be large, we stream it as we generate it.
  */
-export async function serveLLMsFullTxt(context: GitBookSiteContext, page = 0) {
+export async function serveLLMsFullTxt(request: Request, context: GitBookSiteContext, page = 0) {
     if (!checkIsRootSiteContext(context)) {
         return new Response('llms.txt is only served from the root of the site', { status: 404 });
     }
+
+    waitUntil(
+        trackServerInsightsEvents({
+            organizationId: context.organizationId,
+            siteId: context.site.id,
+            events: [
+                {
+                    type: 'llms_request',
+                    llmsVariant: SiteInsightsLLMSVariant.Full,
+                    location: {
+                        displayContext: SiteInsightsDisplayContext.Server,
+                    },
+                },
+            ],
+            request,
+        })
+    );
 
     const offset = page * DEFAULT_PAGE_LIMIT;
 

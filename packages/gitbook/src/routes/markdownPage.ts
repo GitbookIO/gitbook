@@ -12,9 +12,9 @@ import { waitUntil } from '@/lib/waitUntil';
  * Returns a 404 if the page is not found.
  */
 export async function servePageMarkdown(
+    request: Request,
     context: GitBookSiteContext,
     pagePath: string,
-    request: Request
 ) {
     try {
         const pageLookup = resolvePagePathDocumentOrGroup(context.revision.pages, pagePath);
@@ -25,9 +25,9 @@ export async function servePageMarkdown(
                 siteId: context.site.id,
                 events: [
                     {
-                        type: 'page_view',
+                        type: 'page_markdown_request',
                         location: {
-                            displayContext: SiteInsightsDisplayContext.Mcp,
+                            displayContext: SiteInsightsDisplayContext.Server,
                             ...(pageLookup
                                 ? {
                                       page: pageLookup.page.id,

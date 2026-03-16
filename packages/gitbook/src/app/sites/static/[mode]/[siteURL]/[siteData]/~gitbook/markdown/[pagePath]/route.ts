@@ -7,5 +7,5 @@ export const dynamic = 'force-static';
 export async function GET(request: NextRequest, { params }: { params: Promise<RouteParams> }) {
     const { context } = await getStaticSiteContext(await params);
     const pathname = getPagePathFromParams(await params);
-    return servePageMarkdown(context, pathname, request);
+    return servePageMarkdown(request, context, pathname);
 }

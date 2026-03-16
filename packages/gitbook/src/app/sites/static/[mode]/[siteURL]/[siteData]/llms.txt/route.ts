@@ -1,4 +1,4 @@
-import { SiteInsightsDisplayContext } from '@gitbook/api';
+import { SiteInsightsDisplayContext, SiteInsightsLLMSVariant } from '@gitbook/api';
 import type { NextRequest } from 'next/server';
 
 import { type RouteLayoutParams, getStaticSiteContext } from '@/app/utils';
@@ -14,21 +14,5 @@ export async function GET(
 ) {
     const { context } = await getStaticSiteContext(await params);
 
-    waitUntil(
-        trackServerInsightsEvents({
-            organizationId: context.organizationId,
-            siteId: context.site.id,
-            events: [
-                {
-                    type: 'page_view',
-                    location: {
-                        displayContext: SiteInsightsDisplayContext.Mcp,
-                    },
-                },
-            ],
-            request,
-        })
-    );
-
-    return serveLLMsTxt(context, { withMarkdownPages: true });
+    return serveLLMsTxt(request, context, { withMarkdownPages: true });
 }
