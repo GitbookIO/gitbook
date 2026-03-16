@@ -10,7 +10,7 @@ import { InlineActionButton } from './InlineActionButton';
 import { NotFoundRefHoverCard } from './NotFoundRefHoverCard';
 
 export function InlineButton(props: InlineProps<api.DocumentInlineButton>) {
-    const { inline } = props;
+    const { inline, context } = props;
 
     const buttonProps: ButtonProps = {
         label: inline.data.label,
@@ -20,7 +20,8 @@ export function InlineButton(props: InlineProps<api.DocumentInlineButton>) {
     };
 
     const ButtonImplementation = () => {
-        if ('action' in inline.data && 'query' in inline.data.action) {
+        // In print/PDF mode, skip interactive action buttons (AI/search providers are not mounted).
+        if (context.mode !== 'print' && 'action' in inline.data && 'query' in inline.data.action) {
             return (
                 <InlineActionButton
                     action={inline.data.action.action}
