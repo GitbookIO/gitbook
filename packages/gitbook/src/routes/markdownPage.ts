@@ -1,7 +1,7 @@
 import { SiteInsightsDisplayContext } from '@gitbook/api';
 
 import type { GitBookSiteContext } from '@/lib/context';
-import { getDataOrNull } from '@/lib/data';
+import { DataFetcherError, getExposableError } from '@/lib/data';
 import { getMarkdownForPage } from '@/lib/markdownPage';
 import { resolvePagePathDocumentOrGroup } from '@/lib/pages';
 import { trackServerInsightsEvents } from '@/lib/tracking';
@@ -18,6 +18,9 @@ export async function servePageMarkdown(
 ) {
     try {
         const pageLookup = resolvePagePathDocumentOrGroup(context.revision.pages, pagePath);
+        if (!pageLookup) {
+            throw new DataFetcherError(`Page "${pagePath}" not found`, 404);
+        }
 
         waitUntil(
             trackServerInsightsEvents({
@@ -41,26 +44,18 @@ export async function servePageMarkdown(
             })
         );
 
-        const result = await getDataOrNull(getMarkdownForPage(context, pagePath));
-        if (!result) {
-            return new Response('Page not found', {
-                status: 404,
-                headers: {
-                    'Content-Type': 'text/plain; charset=utf-8',
-                },
-            });
-        }
+        const markdown = await getMarkdownForPage(context, pageLookup);
 
-        return new Response(result, {
+        return new Response(markdown, {
             headers: {
                 'Content-Type': 'text/markdown; charset=utf-8',
                 'X-Robots-Tag': 'noindex',
             },
         });
     } catch (error) {
-        console.error('Error serving markdown page:', error);
-        return new Response('Internal Server Error', {
-            status: 500,
+        const exposable = getExposableError(error);
+        return new Response(exposable.message, {
+            status: exposable.code,
             headers: {
                 'Content-Type': 'text/plain; charset=utf-8',
             },
