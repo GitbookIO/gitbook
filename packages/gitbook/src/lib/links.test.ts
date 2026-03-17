@@ -20,9 +20,9 @@ const siteGitBookIO = createLinker({
 });
 
 const preview = createLinker({
-    host: 'sites.gitbook.com/preview',
-    spaceBasePath: '/site_abc/section/space/',
-    siteBasePath: '/site_abc/',
+    host: 'sites.gitbook.com',
+    spaceBasePath: '/preview/site_abc/section/space/',
+    siteBasePath: '/preview/site_abc/',
 });
 
 describe('toPathInSpace', () => {
@@ -156,11 +156,11 @@ describe('linkerForPublishedURL', () => {
         it('should rewrite links that belongs to the published site to be part of the preview site', () => {
             const previewLinker = linkerForPublishedURL(preview, 'https://docs.company.com/');
             expect(previewLinker.toLinkForContent('https://docs.company.com/some/path')).toBe(
-                '/site_abc/some/path'
+                '/preview/site_abc/some/path'
             );
             expect(
                 previewLinker.toLinkForContent('https://docs.company.com/section/variant/some/path')
-            ).toBe('/site_abc/section/variant/some/path');
+            ).toBe('/preview/site_abc/section/variant/some/path');
             expect(previewLinker.toLinkForContent('https://www.google.com')).toBe(
                 'https://www.google.com'
             );
@@ -175,12 +175,12 @@ describe('linkerForPublishedURL', () => {
             );
             expect(
                 previewLinker.toLinkForContent('https://org.gitbook.io/sitename/some/path')
-            ).toBe('/site_abc/some/path');
+            ).toBe('/preview/site_abc/some/path');
             expect(
                 previewLinker.toLinkForContent(
                     'https://org.gitbook.io/sitename/section/variant/some/path'
                 )
-            ).toBe('/site_abc/section/variant/some/path');
+            ).toBe('/preview/site_abc/section/variant/some/path');
             expect(previewLinker.toLinkForContent('https://www.google.com')).toBe(
                 'https://www.google.com'
             );
@@ -190,7 +190,7 @@ describe('linkerForPublishedURL', () => {
     it('should should preserve hash and search', () => {
         const previewLinker = linkerForPublishedURL(preview, 'https://docs.company.com/');
         expect(previewLinker.toLinkForContent('https://docs.company.com/some/path?a=b#c')).toBe(
-            '/site_abc/some/path?a=b#c'
+            '/preview/site_abc/some/path?a=b#c'
         );
     });
 });
