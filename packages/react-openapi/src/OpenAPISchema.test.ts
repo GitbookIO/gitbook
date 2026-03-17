@@ -414,6 +414,56 @@ describe('getSchemaAlternatives', () => {
             });
         });
 
+        it('should preserve parent metadata when flattening allOf inside oneOf alternative', () => {
+            const result = getSchemaAlternatives({
+                oneOf: [
+                    {
+                        title: 'Option A',
+                        description: 'First option',
+                        'x-custom': 'custom-value',
+                        allOf: [
+                            {
+                                type: 'object',
+                                properties: {
+                                    name: { type: 'string' },
+                                },
+                                required: ['name'],
+                            },
+                            {
+                                type: 'object',
+                                properties: {
+                                    age: { type: 'integer' },
+                                },
+                            },
+                        ],
+                    },
+                    {
+                        type: 'string',
+                    },
+                ],
+            });
+
+            expect(result).toEqual({
+                type: 'oneOf',
+                schemas: [
+                    {
+                        title: 'Option A',
+                        description: 'First option',
+                        'x-custom': 'custom-value',
+                        type: 'object',
+                        properties: {
+                            name: { type: 'string' },
+                            age: { type: 'integer' },
+                        },
+                        required: ['name'],
+                    },
+                    {
+                        type: 'string',
+                    },
+                ],
+            });
+        });
+
         it('should merge annotation-only schema with multiple safe extensions', () => {
             expect(
                 getSchemaAlternatives({
@@ -445,6 +495,49 @@ describe('getSchemaAlternatives', () => {
                         description: 'Overridden description',
                         title: 'Overridden title',
                         deprecated: true,
+                    },
+                ],
+            });
+        });
+
+        it('should preserve parent metadata when flattening allOf inside anyOf alternative', () => {
+            const result = getSchemaAlternatives({
+                anyOf: [
+                    {
+                        title: 'Variant B',
+                        description: 'A variant with extensions',
+                        'x-deprecated-reason': 'use v2',
+                        allOf: [
+                            {
+                                type: 'object',
+                                properties: {
+                                    id: { type: 'string' },
+                                },
+                            },
+                            {
+                                type: 'object',
+                                properties: {
+                                    value: { type: 'number' },
+                                },
+                            },
+                        ],
+                    },
+                ],
+            });
+
+            expect(result).toEqual({
+                type: 'anyOf',
+                schemas: [
+                    {
+                        title: 'Variant B',
+                        description: 'A variant with extensions',
+                        'x-deprecated-reason': 'use v2',
+                        type: 'object',
+                        properties: {
+                            id: { type: 'string' },
+                            value: { type: 'number' },
+                        },
+                        required: [],
                     },
                 ],
             });
