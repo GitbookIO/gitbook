@@ -1,3 +1,4 @@
+import { isSiteAuthLoginHref } from '@/lib/auth-login-link';
 import type { GitBookSiteContext } from '@/lib/context';
 import {
     type CustomizationContentLink,
@@ -19,6 +20,7 @@ import {
     DropdownMenuSeparator,
     DropdownSubMenu,
 } from '../primitives/DropdownMenu';
+import { SiteAuthLoginDropdownMenuItem } from '../primitives/SiteAuthLoginLink';
 import styles from './headerLinks.module.css';
 
 /**
@@ -84,6 +86,18 @@ async function MoreMenuLink(props: {
     const { context, link } = props;
 
     const target = link.to ? await resolveContentRef(link.to, context) : null;
+    const sharedProps = {
+        href: target?.href,
+        insights: link.to
+            ? {
+                  type: 'link_click' as const,
+                  link: {
+                      target: link.to,
+                      position: SiteInsightsLinkPosition.Header,
+                  },
+              }
+            : undefined,
+    };
 
     return 'links' in link && link.links.length > 0 ? (
         <DropdownSubMenu label={link.title}>
@@ -91,22 +105,11 @@ async function MoreMenuLink(props: {
                 return <MoreMenuLink key={index} {...props} link={subLink} />;
             })}
         </DropdownSubMenu>
-    ) : (
-        <DropdownMenuItem
-            href={target?.href}
-            insights={
-                link.to
-                    ? {
-                          type: 'link_click',
-                          link: {
-                              target: link.to,
-                              position: SiteInsightsLinkPosition.Header,
-                          },
-                      }
-                    : undefined
-            }
-        >
+    ) : isSiteAuthLoginHref(context.linker, target?.href) && sharedProps.href ? (
+        <SiteAuthLoginDropdownMenuItem {...sharedProps} href={sharedProps.href}>
             {link.title}
-        </DropdownMenuItem>
+        </SiteAuthLoginDropdownMenuItem>
+    ) : (
+        <DropdownMenuItem {...sharedProps}>{link.title}</DropdownMenuItem>
     );
 }
