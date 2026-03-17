@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test';
 import type { OpenAPIV3 } from '@gitbook/openapi-parser';
-import { getSchemaAlternatives } from './OpenAPISchema';
+import { getSchemaAlternatives, getSchemaProperties } from './OpenAPISchema';
 
 describe('getSchemaAlternatives', () => {
     it('should flatten oneOf', () => {
@@ -611,5 +611,87 @@ describe('getSchemaAlternatives', () => {
             expect(result?.schemas[0]?.required).toContain('key');
             expect(result?.schemas[0]?.required).toContain('labelArgbColor');
         });
+    });
+});
+
+describe('getSchemaProperties', () => {
+    it('should merge required fields from allOf schemas', () => {
+        const schema: OpenAPIV3.SchemaObject = {
+            allOf: [
+                {
+                    type: 'object',
+                    properties: { id: { type: 'integer' } },
+                    required: ['id'],
+                },
+                {
+                    type: 'object',
+                    properties: { name: { type: 'string' } },
+                    required: ['name'],
+                },
+            ],
+        };
+
+        const result = getSchemaProperties(schema);
+        expect(result?.find((p) => p.propertyName === 'id')?.required).toBe(true);
+        expect(result?.find((p) => p.propertyName === 'name')?.required).toBe(true);
+    });
+
+    it('should deep-merge overlapping properties from allOf schemas', () => {
+        const schema: OpenAPIV3.SchemaObject = {
+            allOf: [
+                {
+                    type: 'object',
+                    properties: {
+                        tags: {
+                            type: 'array',
+                            items: {
+                                type: 'object',
+                                properties: {
+                                    color: { type: 'string' },
+                                    category: {
+                                        type: 'object',
+                                        properties: { icon: { type: 'string' } },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                {
+                    type: 'object',
+                    properties: {
+                        tags: {
+                            type: 'array',
+                            items: {
+                                type: 'object',
+                                properties: {
+                                    id: { type: 'integer' },
+                                    category: {
+                                        type: 'object',
+                                        properties: { name: { type: 'string' } },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+            ],
+        };
+
+        const result = getSchemaProperties(schema);
+        const tagItemProps =
+            (
+                result?.find((p) => p.propertyName === 'tags')?.schema
+                    ?.items as OpenAPIV3.SchemaObject
+            )?.properties ?? {};
+
+        // Array items merged from both branches
+        expect(tagItemProps).toHaveProperty('id');
+        expect(tagItemProps).toHaveProperty('color');
+
+        // Nested object properties also deep-merged
+        const categoryProps = (tagItemProps.category as OpenAPIV3.SchemaObject)?.properties ?? {};
+        expect(categoryProps).toHaveProperty('name');
+        expect(categoryProps).toHaveProperty('icon');
     });
 });

@@ -623,7 +623,7 @@ function processSchemaProperties(
 }
 
 /**
- * Merge properties into a result array, with later properties overriding earlier ones.
+ * Merge properties into a result array, deep-merging overlapping schemas.
  */
 function mergeProperties(
     result: OpenAPISchemaPropertyEntry[],
@@ -632,7 +632,15 @@ function mergeProperties(
     for (const prop of newProperties) {
         const existingIndex = result.findIndex((p) => p.propertyName === prop.propertyName);
         if (existingIndex >= 0) {
-            result[existingIndex] = prop;
+            const existing = result[existingIndex];
+            if (existing) {
+                result[existingIndex] = {
+                    ...existing,
+                    ...prop,
+                    schema: deepMergeSchemas(existing.schema, prop.schema),
+                    required: prop.required ?? existing.required,
+                };
+            }
         } else {
             result.push(prop);
         }
@@ -640,9 +648,57 @@ function mergeProperties(
 }
 
 /**
+ * Deep-merge two schemas by combining their properties recursively.
+ * schema2 takes precedence for metadata and property order.
+ */
+function deepMergeSchemas(
+    schema1: OpenAPIV3.SchemaObject,
+    schema2: OpenAPIV3.SchemaObject
+): OpenAPIV3.SchemaObject {
+    // If both schemas have properties, merge them
+    if (schema1.properties && schema2.properties) {
+        // Start with schema2's properties, then deep-merge schema1's on top
+        const mergedProperties = schema2.properties;
+
+        for (const [key, value] of Object.entries(schema1.properties)) {
+            const existing = mergedProperties[key];
+            if (existing && !checkIsReference(existing) && !checkIsReference(value)) {
+                mergedProperties[key] = deepMergeSchemas(value, existing);
+            } else if (!existing) {
+                mergedProperties[key] = value;
+            }
+        }
+
+        return {
+            ...schema1,
+            ...schema2,
+            properties: mergedProperties,
+        };
+    }
+
+    // If both schemas are arrays with object items, recursively merge the items
+    if (
+        schema1.type === 'array' &&
+        schema2.type === 'array' &&
+        schema1.items &&
+        schema2.items &&
+        !checkIsReference(schema1.items) &&
+        !checkIsReference(schema2.items)
+    ) {
+        return {
+            ...schema1,
+            ...schema2,
+            items: deepMergeSchemas(schema1.items, schema2.items),
+        };
+    }
+
+    return { ...schema1, ...schema2 };
+}
+
+/**
  * Get the sub-properties of a schema.
  */
-function getSchemaProperties(
+export function getSchemaProperties(
     schema: OpenAPIV3.SchemaObject,
     discriminator?: OpenAPIV3.DiscriminatorObject | undefined,
     discriminatorValue?: string | undefined
