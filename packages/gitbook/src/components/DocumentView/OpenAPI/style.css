@@ -233,7 +233,7 @@
 }
 
 .openapi-schema-type {
-    @apply text-tint select-text text-[0.813rem] font-mono [word-spacing:-0.25rem];
+    @apply text-tint select-text text-[0.813rem] font-mono [word-spacing:-0.25rem] whitespace-normal;
 }
 
 .openapi-schema-type:only-child {
