@@ -1020,18 +1020,14 @@ function flattenSchema(
             if (merged && merged.length > 0) {
                 // Only merge if all schemas were successfully merged into one (safe to merge)
                 if (merged.length === 1) {
+                    // Merge the parent schema's own fields (title, description, etc.)
+                    // onto the merged result, so the parent's overrides take precedence.
+                    const { allOf: _, ...schemaWithoutAllOf } = schema;
+
                     return merged.map((s) => {
-                        const required = mergeRequiredFields(s, latestAncestor);
-                        const result: OpenAPIV3.SchemaObject = {
-                            ...s,
-                            ...(required ? { required } : {}),
-                        };
-
-                        if (schema.title && !s.title) {
-                            result.title = schema.title;
-                        }
-
-                        return result;
+                        const result = mergeTwoSchemas(s, schemaWithoutAllOf);
+                        const required = mergeRequiredFields(result, latestAncestor);
+                        return { ...result, ...(required ? { required } : {}) };
                     });
                 }
             }

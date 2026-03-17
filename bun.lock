@@ -349,7 +349,7 @@
     "react-dom": "catalog:",
   },
   "catalog": {
-    "@gitbook/api": "0.169.0",
+    "@gitbook/api": "0.172.0",
     "@scalar/api-client-react": "^1.3.46",
     "@tsconfig/node20": "^20.1.6",
     "@tsconfig/strictest": "^2.0.6",
@@ -746,7 +746,7 @@
 
     "@fortawesome/fontawesome-svg-core": ["@fortawesome/fontawesome-svg-core@7.1.0", "", { "dependencies": { "@fortawesome/fontawesome-common-types": "7.1.0" } }, "sha512-fNxRUk1KhjSbnbuBxlWSnBLKLBNun52ZBTcs22H/xEEzM6Ap81ZFTQ4bZBxVQGQgVY0xugKGoRcCbaKjLQ3XZA=="],
 
-    "@gitbook/api": ["@gitbook/api@0.169.0", "", { "dependencies": { "event-iterator": "^2.0.0", "eventsource-parser": "^3.0.0" } }, "sha512-kzJT8P5HCnqeYG3kFmBfvKMjQhTuUVmNV5Wvyh87QnoOA3odwh2C3qONpTmBA6cNE3ymDnxs8SJT9FG/qquRZQ=="],
+    "@gitbook/api": ["@gitbook/api@0.172.0", "", { "dependencies": { "event-iterator": "^2.0.0", "eventsource-parser": "^3.0.0" } }, "sha512-EoOhOt4cZpwZKPaQ0E5jb3Ea4Fvmi11at5Y/62cFy5ahyB3355jfKp0HPxe1bGsKfm421RkaM4Ico0vtVZwQ6Q=="],
 
     "@gitbook/browser-types": ["@gitbook/browser-types@workspace:packages/browser-types"],
 
