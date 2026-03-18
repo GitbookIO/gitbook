@@ -747,6 +747,8 @@ function encodePathInSiteContent(
                     events: [
                         {
                             type: 'page_markdown_request',
+                            // TODO: track pageId / spaceId when possible
+                            // We don't do it at the moment as we can't easily extract it from the URL.
                             location: {
                                 displayContext: SiteInsightsDisplayContext.Server,
                             },
