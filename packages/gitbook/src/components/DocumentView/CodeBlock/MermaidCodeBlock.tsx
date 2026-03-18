@@ -18,7 +18,7 @@ export function MermaidCodeBlock(props: ClientBlockProps) {
     const source = getPlainCodeBlock(block);
     const wrapperRef = useRef<HTMLDivElement>(null);
     const diagramRef = useRef<HTMLDivElement>(null);
-    const panzoomRef = useRef<ReturnType<typeof Panzoom> | null>(null);
+    const [panZoom, setPanZoom] = useState<ReturnType<typeof Panzoom> | null>(null);
     const [error, setError] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const { resolvedTheme } = useTheme();
@@ -45,7 +45,11 @@ export function MermaidCodeBlock(props: ClientBlockProps) {
         })
             .then(() => {
                 if (!cancelled) {
-                    cleanupPanZoom = initPanzoom({ container, wrapper, panzoomRef });
+                    cleanupPanZoom = initPanzoom({
+                        container,
+                        wrapper,
+                        onInit: setPanZoom,
+                    });
                 }
             })
             .catch(() => {
@@ -62,7 +66,7 @@ export function MermaidCodeBlock(props: ClientBlockProps) {
         return () => {
             cancelled = true;
             cleanupPanZoom?.();
-            panzoomRef.current = null;
+            setPanZoom(null);
         };
     }, [source, id, darkMode]);
 
@@ -90,9 +94,7 @@ export function MermaidCodeBlock(props: ClientBlockProps) {
                     <Loading className="h-8 w-8" />
                 </div>
             ) : null}
-            {!isLoading && panzoomRef.current ? (
-                <MermaidPanZoomControls panZoom={panzoomRef.current} />
-            ) : null}
+            {!isLoading && panZoom ? <MermaidPanZoomControls panZoom={panZoom} /> : null}
         </div>
     );
 }
@@ -129,9 +131,9 @@ async function renderMermaidDiagram(args: {
 function initPanzoom(args: {
     container: HTMLElement;
     wrapper: HTMLElement;
-    panzoomRef: React.MutableRefObject<ReturnType<typeof Panzoom> | null>;
+    onInit: (instance: ReturnType<typeof Panzoom> | null) => void;
 }): () => void {
-    const { container, wrapper, panzoomRef } = args;
+    const { container, wrapper, onInit } = args;
 
     const instance = Panzoom(container, {
         maxScale: 5,
@@ -141,13 +143,14 @@ function initPanzoom(args: {
         panOnlyWhenZoomed: true,
     });
 
-    panzoomRef.current = instance;
+    onInit(instance);
 
     wrapper.addEventListener('wheel', instance.zoomWithWheel, { passive: false });
 
     return () => {
         wrapper.removeEventListener('wheel', instance.zoomWithWheel);
         instance.destroy();
+        onInit(null);
     };
 }
 
