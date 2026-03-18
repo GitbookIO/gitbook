@@ -139,7 +139,6 @@ function initPanzoom(args: {
         contain: 'outside',
         cursor: 'grab',
         panOnlyWhenZoomed: true,
-        touchAction: 'auto',
     });
 
     panzoomRef.current = instance;
