@@ -468,7 +468,6 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
     };
 
     // For preview requests like:
-    // - https://preview/<siteURL> requests, TODO: Remove support for this format later
     // - https://<GITBOOK_PREVIEW_BASE_URL>/<siteID> requests (ex: https://sites.gitbook.com/preview/site_id/path)
     if (isPreviewRequest(siteRequestURL)) {
         // Do not track page views for preview requests
@@ -681,8 +680,9 @@ function encodePathInSiteContent(
             return { pathname, routeType: 'static' };
         case '~gitbook/pdf':
         case '~gitbook/search':
+        case '~gitbook/auth/login':
         case '~scalar/proxy':
-            // PDF and search routes are always dynamic as they depend on the request.
+            // PDF, search and auth routes are always dynamic as they depend on the request.
             return { pathname, routeType: 'dynamic' };
         default: {
             // If the pathname is a markdown file or the request is accepting markdown,
