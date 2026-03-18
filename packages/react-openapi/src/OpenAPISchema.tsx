@@ -653,17 +653,23 @@ function mergeProperties(
  */
 function deepMergeSchemas(
     schema1: OpenAPIV3.SchemaObject,
-    schema2: OpenAPIV3.SchemaObject
+    schema2: OpenAPIV3.SchemaObject,
+    seen: WeakSet<OpenAPIV3.SchemaObject> = new WeakSet()
 ): OpenAPIV3.SchemaObject {
-    // If both schemas have properties, merge them
+    if (seen.has(schema1) || seen.has(schema2)) {
+        return { ...schema1, ...schema2 };
+    }
+    seen.add(schema1);
+    seen.add(schema2);
+
     if (schema1.properties && schema2.properties) {
-        // Start with schema2's properties, then deep-merge schema1's on top
-        const mergedProperties = schema2.properties;
+        const mergedProperties: Record<string, OpenAPIV3.SchemaObject | OpenAPIV3.ReferenceObject> =
+            { ...schema2.properties };
 
         for (const [key, value] of Object.entries(schema1.properties)) {
             const existing = mergedProperties[key];
             if (existing && !checkIsReference(existing) && !checkIsReference(value)) {
-                mergedProperties[key] = deepMergeSchemas(value, existing);
+                mergedProperties[key] = deepMergeSchemas(value, existing, seen);
             } else if (!existing) {
                 mergedProperties[key] = value;
             }
@@ -676,7 +682,6 @@ function deepMergeSchemas(
         };
     }
 
-    // If both schemas are arrays with object items, recursively merge the items
     if (
         schema1.type === 'array' &&
         schema2.type === 'array' &&
@@ -688,7 +693,7 @@ function deepMergeSchemas(
         return {
             ...schema1,
             ...schema2,
-            items: deepMergeSchemas(schema1.items, schema2.items),
+            items: deepMergeSchemas(schema1.items, schema2.items, seen),
         };
     }
 
