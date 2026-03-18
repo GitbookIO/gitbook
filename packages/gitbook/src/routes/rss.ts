@@ -20,7 +20,6 @@ export function getPageRSSURL(context: GitBookSiteContext, page: RevisionPageDoc
  * Generate an RSS feed from Updates blocks in a page.
  */
 export async function servePageRSS(
-    _request: Request,
     context: GitBookSiteContext,
     inputPagePath: string
 ): Promise<Response> {

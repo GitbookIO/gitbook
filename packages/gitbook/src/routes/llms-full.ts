@@ -20,7 +20,7 @@ const DEFAULT_PAGE_LIMIT = 100;
  * Generate a llms-full.txt file for the site.
  * As the result can be large, we stream it as we generate it.
  */
-export async function serveLLMsFullTxt(_request: Request, context: GitBookSiteContext, page = 0) {
+export async function serveLLMsFullTxt(context: GitBookSiteContext, page = 0) {
     if (!checkIsRootSiteContext(context)) {
         return new Response('llms.txt is only served from the root of the site', { status: 404 });
     }

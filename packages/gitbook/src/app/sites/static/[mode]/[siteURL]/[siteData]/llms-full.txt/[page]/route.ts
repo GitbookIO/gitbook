@@ -6,7 +6,7 @@ import { serveLLMsFullTxt } from '@/routes/llms-full';
 export const dynamic = 'force-static';
 
 export async function GET(
-    request: NextRequest,
+    _request: NextRequest,
     { params }: { params: Promise<RouteLayoutParams & { page: string }> }
 ) {
     const awaitedParams = await params;
@@ -16,5 +16,5 @@ export async function GET(
         return new Response('Invalid page', { status: 400 });
     }
     const { context } = await getStaticSiteContext(awaitedParams);
-    return serveLLMsFullTxt(request, context, page);
+    return serveLLMsFullTxt(context, page);
 }

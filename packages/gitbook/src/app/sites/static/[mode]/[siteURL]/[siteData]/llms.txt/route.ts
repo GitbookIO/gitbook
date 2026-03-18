@@ -6,10 +6,10 @@ import { serveLLMsTxt } from '@/routes/llms';
 export const dynamic = 'force-static';
 
 export async function GET(
-    request: NextRequest,
+    _request: NextRequest,
     { params }: { params: Promise<RouteLayoutParams> }
 ) {
     const { context } = await getStaticSiteContext(await params);
 
-    return serveLLMsTxt(request, context, { withMarkdownPages: true });
+    return serveLLMsTxt(context, { withMarkdownPages: true });
 }

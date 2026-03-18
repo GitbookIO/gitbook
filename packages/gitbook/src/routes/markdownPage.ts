@@ -7,11 +7,7 @@ import { resolvePagePathDocumentOrGroup } from '@/lib/pages';
  * Serve a markdown version of a page.
  * Returns a 404 if the page is not found.
  */
-export async function servePageMarkdown(
-    _request: Request,
-    context: GitBookSiteContext,
-    pagePath: string
-) {
+export async function servePageMarkdown(context: GitBookSiteContext, pagePath: string) {
     try {
         const pageLookup = resolvePagePathDocumentOrGroup(context.revision.pages, pagePath);
         if (!pageLookup) {

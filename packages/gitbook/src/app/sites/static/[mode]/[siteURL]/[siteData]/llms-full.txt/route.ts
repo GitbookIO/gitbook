@@ -6,9 +6,9 @@ import { serveLLMsFullTxt } from '@/routes/llms-full';
 export const dynamic = 'force-static';
 
 export async function GET(
-    request: NextRequest,
+    _request: NextRequest,
     { params }: { params: Promise<RouteLayoutParams> }
 ) {
     const { context } = await getStaticSiteContext(await params);
-    return serveLLMsFullTxt(request, context);
+    return serveLLMsFullTxt(context);
 }

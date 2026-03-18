@@ -13,7 +13,6 @@ import { toMarkdown } from 'mdast-util-to-markdown';
  * Generate a llms.txt file for the site.
  */
 export async function serveLLMsTxt(
-    _request: Request,
     context: GitBookSiteContext,
     {
         withMarkdownPages = false,
