@@ -5,7 +5,9 @@ import { useEffect, useId, useMemo, useRef, useState } from 'react';
 
 import { Loading } from '@/components/primitives/Loading';
 import { tcls } from '@/lib/tailwind';
+import Panzoom from '@panzoom/panzoom';
 import { type ClientBlockProps, ClientCodeBlock } from './ClientCodeBlock';
+import { MermaidPanZoomControls } from './MermaidPanZoomControls';
 import { getPlainCodeBlock } from './highlight';
 
 /**
@@ -14,7 +16,9 @@ import { getPlainCodeBlock } from './highlight';
 export function MermaidCodeBlock(props: ClientBlockProps) {
     const { block, style } = props;
     const source = getPlainCodeBlock(block);
+    const wrapperRef = useRef<HTMLDivElement>(null);
     const diagramRef = useRef<HTMLDivElement>(null);
+    const panzoomRef = useRef<ReturnType<typeof Panzoom> | null>(null);
     const [error, setError] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const { resolvedTheme } = useTheme();
@@ -23,11 +27,13 @@ export function MermaidCodeBlock(props: ClientBlockProps) {
 
     useEffect(() => {
         const container = diagramRef.current;
-        if (!container) {
+        const wrapper = wrapperRef.current;
+        if (!container || !wrapper) {
             return;
         }
 
         let cancelled = false;
+        let cleanupPanZoom: (() => void) | undefined;
         setError(false);
         setIsLoading(true);
 
@@ -37,6 +43,11 @@ export function MermaidCodeBlock(props: ClientBlockProps) {
             id,
             darkMode,
         })
+            .then(() => {
+                if (!cancelled) {
+                    cleanupPanZoom = initPanzoom({ container, wrapper, panzoomRef });
+                }
+            })
             .catch(() => {
                 if (!cancelled) {
                     setError(true);
@@ -50,6 +61,8 @@ export function MermaidCodeBlock(props: ClientBlockProps) {
 
         return () => {
             cancelled = true;
+            cleanupPanZoom?.();
+            panzoomRef.current = null;
         };
     }, [source, id, darkMode]);
 
@@ -59,7 +72,14 @@ export function MermaidCodeBlock(props: ClientBlockProps) {
 
     return (
         <div className={tcls('relative', style)} contentEditable={false}>
-            <div className={isLoading ? 'invisible absolute inset-x-0' : undefined}>
+            <div
+                ref={wrapperRef}
+                className={
+                    isLoading
+                        ? 'invisible absolute inset-x-0 overflow-hidden'
+                        : 'cursor-grab overflow-hidden active:cursor-grabbing'
+                }
+            >
                 <div
                     ref={diagramRef}
                     className="overflow-auto p-2 [&_svg]:h-auto [&_svg]:max-w-full"
@@ -69,6 +89,9 @@ export function MermaidCodeBlock(props: ClientBlockProps) {
                 <div className="flex h-24 items-center justify-center text-tint">
                     <Loading className="h-8 w-8" />
                 </div>
+            ) : null}
+            {!isLoading && panzoomRef.current ? (
+                <MermaidPanZoomControls panZoom={panzoomRef.current} />
             ) : null}
         </div>
     );
@@ -98,6 +121,35 @@ async function renderMermaidDiagram(args: {
     const { svg, bindFunctions } = await mermaid.render(`mermaid-diagram-${id}`, source, container);
     container.innerHTML = svg;
     bindFunctions?.(container);
+}
+
+/**
+ * Initialize panzoom on the diagram container.
+ */
+function initPanzoom(args: {
+    container: HTMLElement;
+    wrapper: HTMLElement;
+    panzoomRef: React.MutableRefObject<ReturnType<typeof Panzoom> | null>;
+}): () => void {
+    const { container, wrapper, panzoomRef } = args;
+
+    const instance = Panzoom(container, {
+        maxScale: 5,
+        minScale: 0.5,
+        contain: 'outside',
+        cursor: 'grab',
+        panOnlyWhenZoomed: true,
+        touchAction: 'auto',
+    });
+
+    panzoomRef.current = instance;
+
+    wrapper.addEventListener('wheel', instance.zoomWithWheel, { passive: false });
+
+    return () => {
+        wrapper.removeEventListener('wheel', instance.zoomWithWheel);
+        instance.destroy();
+    };
 }
 
 function useSafeId() {
