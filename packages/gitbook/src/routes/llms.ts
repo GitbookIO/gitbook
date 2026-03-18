@@ -4,14 +4,7 @@ import type { GitBookLinker } from '@/lib/links';
 import { joinPath } from '@/lib/paths';
 import { type FlatPageEntry, getIndexablePages } from '@/lib/sitemap';
 import { getLocalizedTitle, getSiteStructureSections } from '@/lib/sites';
-import { trackServerInsightsEvents } from '@/lib/tracking';
-import { waitUntil } from '@/lib/waitUntil';
-import {
-    SiteInsightsDisplayContext,
-    SiteInsightsLLMSVariant,
-    type SiteSection,
-    type SiteSpace,
-} from '@gitbook/api';
+import type { SiteSection, SiteSpace } from '@gitbook/api';
 import assertNever from 'assert-never';
 import type { ListItem, Paragraph, Root, RootContent } from 'mdast';
 import { toMarkdown } from 'mdast-util-to-markdown';
@@ -20,7 +13,7 @@ import { toMarkdown } from 'mdast-util-to-markdown';
  * Generate a llms.txt file for the site.
  */
 export async function serveLLMsTxt(
-    request: Request,
+    _request: Request,
     context: GitBookSiteContext,
     {
         withMarkdownPages = false,
@@ -36,23 +29,6 @@ export async function serveLLMsTxt(
     if (!checkIsRootSiteContext(context)) {
         return new Response('llms.txt is only served from the root of the site', { status: 404 });
     }
-
-    waitUntil(
-        trackServerInsightsEvents({
-            organizationId: context.organizationId,
-            siteId: context.site.id,
-            events: [
-                {
-                    type: 'llms_request',
-                    llmsVariant: SiteInsightsLLMSVariant.Standard,
-                    location: {
-                        displayContext: SiteInsightsDisplayContext.Server,
-                    },
-                },
-            ],
-            request,
-        })
-    );
 
     const tree: Root = {
         type: 'root',
