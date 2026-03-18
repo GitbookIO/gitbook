@@ -59,7 +59,7 @@ export async function ignoreDataThrownError<T>(promise: Promise<T>): Promise<T |
     try {
         return await promise;
     } catch (error) {
-        getExposableError(error as Error);
+        console.warn('ignored Data error', getExposableError(error as Error));
         return null;
     }
 }
