@@ -8,7 +8,7 @@ import {
 
 export type AncestorRevisionPage = RevisionPageDocument | RevisionPageGroup;
 
-type ResolvedPagePath<Page extends RevisionPageDocument | RevisionPageGroup> = {
+export type ResolvedPagePath<Page extends RevisionPageDocument | RevisionPageGroup> = {
     page: Page;
     ancestors: AncestorRevisionPage[];
 };

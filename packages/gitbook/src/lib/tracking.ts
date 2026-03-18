@@ -2,6 +2,7 @@ import type * as api from '@gitbook/api';
 import type { headers as nextHeaders } from 'next/headers';
 import { apiClient } from './data/api';
 import { GITBOOK_DISABLE_TRACKING } from './env';
+import { getLogger } from './logger';
 
 /**
  * Return true if events should be tracked on the site.
@@ -74,6 +75,12 @@ export async function trackServerInsightsEvents(args: {
     events: ServerInsightsEventInput[];
     request: Request;
 }) {
+    const logger = getLogger().subLogger('tracking');
+
+    logger.info(
+        `Tracking ${args.events.length} events for site ${args.siteId} (enabled=${!GITBOOK_DISABLE_TRACKING})`
+    );
+
     if (GITBOOK_DISABLE_TRACKING) {
         return;
     }
