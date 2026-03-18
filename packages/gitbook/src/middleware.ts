@@ -668,6 +668,14 @@ function encodePathInSiteContent(
         return {
             pathname: `~gitbook/rss/${encodePagePath(rssMatch[2])}`,
             routeType: 'static',
+            events: [
+                {
+                    type: 'rss_request',
+                    location: {
+                        displayContext: SiteInsightsDisplayContext.Server,
+                    },
+                },
+            ],
         };
     }
 
