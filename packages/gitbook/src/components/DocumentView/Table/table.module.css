@@ -9,9 +9,10 @@
 }
 
 /* Apply styles to the Table if scrollbar exists */
-.tableWrapper {
+.tableScrollArea {
     animation: detect-scroll linear;
     animation-timeline: scroll(self x);
+    overscroll-behavior-x: none;
 
     --border-radius-if-can-scroll: var(--can-scroll) 0.375rem;
     --border-radius-if-cant-scroll: 0;
@@ -21,7 +22,24 @@
     --border-width-if-cant-scroll: 0;
     border-width: var(--border-width-if-can-scroll, var(--border-width-if-cant-scroll));
 
-    @apply relative grid w-full overflow-x-auto overflow-y-hidden mx-auto border-tint-subtle;
+    @apply w-full min-w-0 overflow-x-auto overflow-y-hidden border-tint-subtle;
+}
+
+.tableWrapper {
+    @apply relative grid w-full min-w-0 mx-auto;
+}
+
+.stickyTableRoot {
+    @apply relative flex w-full min-w-0 max-w-full flex-col;
+}
+
+.stickyHeaderLayer {
+    top: var(--toc-top-offset, var(--outline-top-offset, 0px));
+    @apply sticky z-10 w-full min-w-0 max-w-full overflow-hidden -mx-px px-px;
+}
+
+.stickyHeaderTable {
+    transform: translateX(var(--table-sticky-scroll-left, 0px));
 }
 
 .columnHeader {
@@ -34,6 +52,31 @@
 
 .rowGroup {
     @apply flex flex-col border rounded-lg bg-tint border-tint-subtle mb-1;
+}
+
+.stickyHeaderRowGroup {
+    @apply mb-0 rounded-b-none border-t border-l border-r;
+}
+
+.stickyTableRoot[data-scrollable='false'] .stickyHeaderRowGroup {
+    @apply mb-1 rounded-b-lg;
+}
+
+.stickyTableRoot[data-scrollable='true'] {
+    @apply rounded-lg border border-tint-subtle;
+}
+
+.stickyTableRoot[data-scrollable='true'] .tableScrollArea {
+    border-width: 0;
+    border-radius: 0;
+}
+
+.stickyTableRoot[data-scrollable='true'] .stickyHeaderRowGroup {
+    border-top-width: 0;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    border-left-width: 0;
+    border-right-width: 0;
 }
 
 .cell {

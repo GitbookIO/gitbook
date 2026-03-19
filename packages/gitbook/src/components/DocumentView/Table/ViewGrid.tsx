@@ -3,7 +3,9 @@ import type { DocumentTableViewGrid } from '@gitbook/api';
 import { tcls } from '@/lib/tailwind';
 
 import { RecordRow } from './RecordRow';
+import { StickyViewGrid } from './StickyViewGrid';
 import type { TableViewProps } from './Table';
+import { hasVisibleHeader } from './layout';
 import styles from './table.module.css';
 import { getColumnAlignment } from './utils';
 
@@ -20,72 +22,110 @@ export function ViewGrid(props: TableViewProps<DocumentTableViewGrid>) {
     const autoSizedColumns = view.columns.filter((column) => !columnWidths?.[column]);
     const fixedColumns = view.columns.filter((column) => columnWidths?.[column]);
 
+    const withHeader = hasVisibleHeader(block, view);
+    const withStickyHeader = withHeader && view.stickyHeader === true && context.mode !== 'print';
     const tableWidth = autoSizedColumns.length > 0 ? 'w-full' : 'w-fit';
 
-    /* Only show the header when configured and not empty */
-    const withHeader =
-        !view.hideHeader &&
-        view.columns.some(
-            (columnId) => (block.data.definition[columnId]?.title.trim().length ?? 0) > 0
+    const renderHeader = (className?: string) => (
+        <div role="rowgroup" className={tcls(tableWidth, styles.rowGroup, className)}>
+            <div role="row" className={tcls('flex', 'w-full')}>
+                {view.columns.map((column) => {
+                    const definition = block.data.definition[column];
+                    if (!definition) {
+                        return null;
+                    }
+
+                    return (
+                        <div
+                            key={column}
+                            role="columnheader"
+                            className={tcls(styles.columnHeader, getColumnAlignment(definition))}
+                            style={{
+                                width: getColumnWidth({
+                                    column,
+                                    columnWidths,
+                                    autoSizedColumns,
+                                    fixedColumns,
+                                }),
+                                minWidth: columnWidths?.[column] || '100px',
+                            }}
+                            title={definition.title}
+                        >
+                            {definition.title}
+                        </div>
+                    );
+                })}
+            </div>
+        </div>
+    );
+
+    const stickyHeader = (
+        <div className={tcls(tableWidth, styles.rowGroup, styles.stickyHeaderRowGroup)}>
+            <div className={tcls('flex', 'w-full')}>
+                {view.columns.map((column) => {
+                    const definition = block.data.definition[column];
+                    if (!definition) {
+                        return null;
+                    }
+
+                    return (
+                        <div
+                            key={column}
+                            className={tcls(styles.columnHeader, getColumnAlignment(definition))}
+                            style={{
+                                width: getColumnWidth({
+                                    column,
+                                    columnWidths,
+                                    autoSizedColumns,
+                                    fixedColumns,
+                                }),
+                                minWidth: columnWidths?.[column] || '100px',
+                            }}
+                            title={definition.title}
+                        >
+                            {definition.title}
+                        </div>
+                    );
+                })}
+            </div>
+        </div>
+    );
+
+    const body = (
+        <div role="rowgroup" className={tcls('flex', 'flex-col', tableWidth, '[&>*+*]:border-t')}>
+            {records.map((record) => (
+                <RecordRow
+                    key={record[0]}
+                    record={record}
+                    autoSizedColumns={autoSizedColumns}
+                    fixedColumns={fixedColumns}
+                    {...props}
+                />
+            ))}
+        </div>
+    );
+
+    if (withStickyHeader) {
+        return (
+            <StickyViewGrid
+                className={tcls(style, styles.tableWrapper)}
+                header={stickyHeader}
+                table={
+                    <>
+                        {renderHeader('sr-only')}
+                        {body}
+                    </>
+                }
+            />
         );
+    }
 
     return (
         <div className={tcls(style, styles.tableWrapper)}>
-            {/* Table */}
-            <div role="table" className={tcls('flex', 'flex-col')}>
-                {/* Header */}
-                {withHeader && (
-                    <div
-                        role="rowgroup"
-                        className={tcls(
-                            tableWidth,
-                            styles.rowGroup,
-                            'straight-corners:rounded-none',
-                            'circular-corners:rounded-xl'
-                        )}
-                    >
-                        <div role="row" className={tcls('flex', 'w-full')}>
-                            {view.columns.map((column) => {
-                                const definition = block.data.definition[column]!;
-                                return (
-                                    <div
-                                        key={column}
-                                        role="columnheader"
-                                        className={tcls(
-                                            styles.columnHeader,
-                                            getColumnAlignment(definition)
-                                        )}
-                                        style={{
-                                            width: getColumnWidth({
-                                                column,
-                                                columnWidths,
-                                                autoSizedColumns,
-                                                fixedColumns,
-                                            }),
-                                            minWidth: columnWidths?.[column] || '100px',
-                                        }}
-                                        title={definition.title}
-                                    >
-                                        {definition.title}
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    </div>
-                )}
-                <div
-                    role="rowgroup"
-                    className={tcls('flex', 'flex-col', tableWidth, '[&>*+*]:border-t')}
-                >
-                    {records.map((record) => (
-                        <RecordRow
-                            key={record[0]}
-                            record={record}
-                            autoSizedColumns={autoSizedColumns}
-                            fixedColumns={fixedColumns}
-                            {...props}
-                        />
-                    ))}
+            <div className={styles.tableScrollArea}>
+                <div role="table" className={tcls('flex', 'flex-col', 'w-fit')}>
+                    {withHeader ? renderHeader() : null}
+                    {body}
                 </div>
             </div>
         </div>
