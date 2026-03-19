@@ -13,10 +13,9 @@ import { getContentSecurityPolicy } from '@/lib/csp';
 import { validateSerializedCustomization } from '@/lib/customization';
 import {
     DataFetcherError,
-    decodeURLPath,
     getVisitorAuthBasePath,
     lookupPublishedContentByUrl,
-    normalizeURL,
+    normalizeRequestURL,
     throwIfDataError,
 } from '@/lib/data';
 import { GITBOOK_OAUTH_SERVER_URL, isGitBookAssetsHostURL, isGitBookHostURL } from '@/lib/env';
@@ -59,18 +58,6 @@ type URLWithMode = { url: URL; mode: 'url' | 'url-host' };
 export async function middleware(request: NextRequest) {
     try {
         const requestURL = new URL(request.url);
-
-        // Redirect to normalize the URL
-        const normalized = normalizeURL(requestURL);
-        if (normalized.toString() !== requestURL.toString()) {
-            return NextResponse.redirect(normalized.toString());
-        }
-
-        // If the URL path is encoded, decode it and redirect to the decoded URL
-        const decoded = decodeURLPath(requestURL);
-        if (decoded.toString() !== requestURL.toString()) {
-            return NextResponse.redirect(decoded.toString());
-        }
 
         // Reject malicious requests
         const rejectResponse = await validateServerActionRequest(request);
@@ -152,6 +139,13 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
     }
 
     const { url: siteRequestURL, mode } = match;
+
+    // Normalize URL after extracting the URL from the request to make sure the client is redirected to the proper one
+    const normalizationResponse = normalizeRequestURL(siteRequestURL);
+    if (normalizationResponse) {
+        return normalizationResponse;
+    }
+
     const imagesContextId = getImageResizingContextId(siteRequestURL);
     /**
      * Serve image resizing requests (all requests containing `/~gitbook/image`).
