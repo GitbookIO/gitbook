@@ -145,7 +145,7 @@ export function normalizeURL(url: URL) {
 
     // Reject excessively long paths up-front to bound per-request work.
     if (url.pathname.length > 2048) {
-        throw new DataFetcherError(`URL path is too long.`, 400);
+        throw new DataFetcherError('URL path is too long.', 400);
     }
 
     result.pathname = url.pathname.replace(/\/{2,}/g, '/').replace(/\/$/, '');
@@ -191,7 +191,7 @@ export function normalizeURL(url: URL) {
  * percent-encoding. Legitimate URLs are at most singly encoded; double-encoding covers
  * any reasonable proxy behaviour.
  */
-export function decodeURLPath(url: URL): URL {
+function decodeURLPath(url: URL): URL {
     let current = url;
 
     for (let i = 0; i < 2; i++) {

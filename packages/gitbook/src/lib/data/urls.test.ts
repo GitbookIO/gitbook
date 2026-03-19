@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test';
 
-import { decodeURLPath, getURLLookupAlternatives, normalizeURL } from './urls';
+import { getURLLookupAlternatives, normalizeURL } from './urls';
 
 describe('getURLLookupAlternatives', () => {
     it('should return all URLs up to the root', () => {
@@ -415,10 +415,10 @@ describe('normalizeURL', () => {
     });
 });
 
-describe('decodeURLPath', () => {
+describe('normalizeURL with encoded paths', () => {
     it('should decode encoded path components', () => {
         const url = new URL('https://docs.mycompany.com/helloworld/tes%74');
-        const result = decodeURLPath(url);
+        const result = normalizeURL(url);
         expect(result.pathname).toBe('/helloworld/test');
         expect(result.toString()).toBe('https://docs.mycompany.com/helloworld/test');
     });
@@ -427,11 +427,11 @@ describe('decodeURLPath', () => {
         // Double encoded: tes%2574 → tes%74 → test
         // %2574 decodes as: %25 → %, leaving %74, which then decodes to t
         const url = new URL('https://docs.mycompany.com/helloworld/tes%2574');
-        const result = decodeURLPath(url);
+        const result = normalizeURL(url);
         expect(result.pathname).toBe('/helloworld/test');
 
         // Triple encoding is also normalized through the nested normalizeURL flow.
-        const tripleEncoded = decodeURLPath(
+        const tripleEncoded = normalizeURL(
             new URL('https://docs.mycompany.com/helloworld/tes%252574')
         );
         expect(tripleEncoded.pathname).toBe('/helloworld/test');
@@ -440,36 +440,36 @@ describe('decodeURLPath', () => {
     it('should throw for malformed percent-encoding in the path', () => {
         // Invalid hex digits in percent-encoding
         expect(() => {
-            decodeURLPath(new URL('https://docs.mycompany.com/helloworld/%ZZ'));
+            normalizeURL(new URL('https://docs.mycompany.com/helloworld/%ZZ'));
         }).toThrow('URL path is malformed');
 
         // Incomplete or invalid UTF-8 sequence
         expect(() => {
-            decodeURLPath(new URL('https://docs.mycompany.com/helloworld/%E0%A4%A'));
+            normalizeURL(new URL('https://docs.mycompany.com/helloworld/%E0%A4%A'));
         }).toThrow('URL path is malformed');
 
         // Trailing '%' without two following hex digits
         expect(() => {
-            decodeURLPath(new URL('https://docs.mycompany.com/helloworld/trailing%'));
+            normalizeURL(new URL('https://docs.mycompany.com/helloworld/trailing%'));
         }).toThrow('URL path is malformed');
     });
 
     it.skip('should throw an error for invalid characters in the path', () => {
         expect(() => {
-            decodeURLPath(new URL('https://docs.mycompany.com/hello:world'));
+            normalizeURL(new URL('https://docs.mycompany.com/hello:world'));
         }).toThrow('URL path contains invalid characters');
 
         expect(() => {
-            decodeURLPath(new URL('https://docs.mycompany.com/hello%3Btest'));
+            normalizeURL(new URL('https://docs.mycompany.com/hello%3Btest'));
         }).toThrow('URL path contains invalid characters');
 
         expect(() => {
-            decodeURLPath(new URL('https://docs.mycompany.com/hello%40anchor'));
+            normalizeURL(new URL('https://docs.mycompany.com/hello%40anchor'));
         }).toThrow('URL path contains invalid characters');
 
         // %20 (space) re-encodes to %20 after decoding, so the path is stable
         // and considered fully decoded — it should not throw.
-        expect(decodeURLPath(new URL('https://docs.mycompany.com/hello%20world')).pathname).toBe(
+        expect(normalizeURL(new URL('https://docs.mycompany.com/hello%20world')).pathname).toBe(
             '/hello%20world'
         );
     });
@@ -479,32 +479,25 @@ describe('decodeURLPath', () => {
         // %25252525 needs 4 passes: %25252525 → %252525 → %2525 → %25 → %
         const url = new URL('https://docs.mycompany.com/%25252525');
         expect(() => {
-            decodeURLPath(url);
+            normalizeURL(url);
         }).toThrow('URL path is malformed');
 
         const deepUrl = new URL('https://docs.mycompany.com/%2525252525252525');
         expect(() => {
-            decodeURLPath(deepUrl);
+            normalizeURL(deepUrl);
         }).toThrow('URL path is malformed');
-    });
-
-    it('should not enforce the normalizeURL path length limit itself', () => {
-        const longPath = '/a'.repeat(1025); // 2050 chars
-        const url = new URL(`https://docs.mycompany.com${longPath}`);
-        const result = decodeURLPath(url);
-        expect(result.pathname).toBe(longPath);
     });
 
     // TODO: should we do that actually?
     it.skip('should throw an error if the encoded path contains /', () => {
         expect(() => {
-            decodeURLPath(new URL('https://docs.mycompany.com/hello%2Fworld'));
+            normalizeURL(new URL('https://docs.mycompany.com/hello%2Fworld'));
         }).toThrow('URL path contains invalid characters');
     });
 
     it('should not decode search params or hash fragments', () => {
         const url = new URL('https://docs.mycompany.com/helloworld/tes%74?query=%74est#sec%74ion');
-        const result = decodeURLPath(url);
+        const result = normalizeURL(url);
         expect(result.pathname).toBe('/helloworld/test');
         expect(result.search).toBe('?query=%74est');
         expect(result.hash).toBe('#sec%74ion');
@@ -516,7 +509,7 @@ describe('decodeURLPath', () => {
         const url = new URL(`https://docs.mycompany.com/short-path?jwt_token=${fakeJwt}`);
         // The path itself is well within the limit; only the query param is huge.
         expect(url.pathname.length).toBeLessThan(2048);
-        const result = decodeURLPath(url);
+        const result = normalizeURL(url);
         expect(result.pathname).toBe('/short-path');
         // The query string must pass through untouched.
         expect(result.searchParams.get('jwt_token')).toBe(fakeJwt);
@@ -529,9 +522,9 @@ describe('decodeURLPath', () => {
         const url = new URL(
             `https://docs.mycompany.com/some-page?filter=${encodeURIComponent(risonValue)}`
         );
-        const result = decodeURLPath(url);
+        const result = normalizeURL(url);
         expect(result.pathname).toBe('/some-page');
-        // The rison param must survive decodeURLPath intact.
+        // The rison param must survive normalizeURL intact.
         expect(result.searchParams.get('filter')).toBe(risonValue);
     });
 });
