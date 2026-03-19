@@ -10,7 +10,10 @@ import { createMcpHandler } from 'mcp-handler';
 import type { NextRequest } from 'next/server';
 import { z } from 'zod';
 
-async function handler(rawRequest: NextRequest, { params }: { params: Promise<RouteLayoutParams> }) {
+async function handler(
+    rawRequest: NextRequest,
+    { params }: { params: Promise<RouteLayoutParams> }
+) {
     const { context } = await getStaticSiteContext(await params);
     const { dataFetcher, linker, site } = context;
 

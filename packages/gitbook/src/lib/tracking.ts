@@ -53,7 +53,9 @@ const defaultLocation: api.SiteInsightsEventLocation = {
  * Extract a full session object from a request.
  * Generates new sessionId/visitorId and extracts headers.
  */
-function extractSessionFromRequest(request: Pick<Request, 'headers'>): api.SiteInsightsEventSession {
+function extractSessionFromRequest(
+    request: Pick<Request, 'headers'>
+): api.SiteInsightsEventSession {
     return {
         sessionId: crypto.randomUUID(),
         visitorId: crypto.randomUUID(),
