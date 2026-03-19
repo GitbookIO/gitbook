@@ -69,7 +69,6 @@ function extractSessionFromRequest(
 /**
  * Track insight events server-side via the GitBook API.
  * Session info (userAgent, IDs) and location URL are automatically extracted from the request.
- * The tracked URL can be overridden explicitly when the original request URL differs from the content URL.
  * Event-level overrides take precedence.
  */
 export async function trackServerInsightsEvents(args: {
