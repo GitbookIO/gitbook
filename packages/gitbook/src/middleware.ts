@@ -433,7 +433,10 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
                     organizationId: siteURLData.organization,
                     siteId: siteURLData.site,
                     events,
-                    request,
+                    request: {
+                        url: siteRequestURL.toString(),
+                        headers: requestHeaders,
+                    },
                 })
             );
         }
