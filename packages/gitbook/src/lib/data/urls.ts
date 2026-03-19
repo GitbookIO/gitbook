@@ -153,37 +153,6 @@ export function normalizeURL(url: URL) {
 }
 
 /**
- * This function checks if a decoded URL path segment contains characters that are not allowed
- * in GitBook content paths. These characters are valid in generic RFC 3986 URL paths, but are
- * rejected here as an application-level constraint for GitBook routing and security.
- * https://developer.mozilla.org/en-US/docs/Glossary/Percent-encoding
- * "%" itself is excluded because it could be part of percent-encoding and may require decoding.
- */
-// function containsInvalidURLCharacters(segment: string): boolean {
-//     const invalidCharacters = [
-//         ':',
-//         '/',
-//         '?',
-//         '#',
-//         '[',
-//         ']',
-//         '@',
-//         '!',
-//         '$',
-//         '&',
-//         "'",
-//         '(',
-//         ')',
-//         '*',
-//         '+',
-//         ',',
-//         ';',
-//         '=',
-//     ];
-//     return invalidCharacters.some((char) => segment.includes(char));
-// }
-
-/**
  * Decode the url path component, we redirect URLs with encoded path components
  * so that we don't end up with multiple URLs for the same content (especially important because of caching).
  * If after decoding the path contains invalid characters, we throw an error.
