@@ -1,5 +1,5 @@
 import { isProxyRootRequest } from '../proxy';
-import { DataFetcherError } from './errors';
+import { DataFetcherError, getExposableError } from './errors';
 
 /**
  * For a given GitBook URL, return a list of alternative URLs that could be matched against to lookup the content.
@@ -119,13 +119,37 @@ export function getURLLookupAlternatives(input: URL) {
 }
 
 /**
+ * Normalize the URL in a request and redirect if the normalized URL is different from the original one.
+ */
+export function normalizeRequestURL(url: URL): Response | null {
+    try {
+        const normalizedURL = normalizeURL(url);
+
+        if (normalizedURL.toString() !== url.toString()) {
+            return Response.redirect(normalizedURL.toString(), 302);
+        }
+
+        return null;
+    } catch (error) {
+        const sanitized = getExposableError(error);
+        return new Response(sanitized.message, { status: sanitized.code });
+    }
+}
+
+/**
  * Normalize a URL to remove duplicate slashes and trailing slashes
  * and transform the pathname to lowercase.
  */
 export function normalizeURL(url: URL) {
     const result = new URL(url);
+
+    // Reject excessively long paths up-front to bound per-request work.
+    if (url.pathname.length > 2048) {
+        throw new DataFetcherError(`URL path is too long.`, 400);
+    }
+
     result.pathname = url.pathname.replace(/\/{2,}/g, '/').replace(/\/$/, '');
-    return result;
+    return decodeURLPath(result);
 }
 
 /**
@@ -168,11 +192,6 @@ export function normalizeURL(url: URL) {
  * any reasonable proxy behaviour.
  */
 export function decodeURLPath(url: URL): URL {
-    // Reject excessively long paths up-front to bound per-request work.
-    if (url.pathname.length > 2048) {
-        throw new DataFetcherError(`URL path is too long: ${url.pathname}`, 400);
-    }
-
     let current = url;
 
     for (let i = 0; i < 2; i++) {
