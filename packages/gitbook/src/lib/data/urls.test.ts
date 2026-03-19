@@ -405,6 +405,14 @@ describe('normalizeURL', () => {
             new URL('https://docs.mycompany.com/hello/there')
         );
     });
+
+    it('should throw for URL paths exceeding 2048 characters', () => {
+        const longPath = '/a'.repeat(1025); // 2050 chars
+        const url = new URL(`https://docs.mycompany.com${longPath}`);
+        expect(() => {
+            normalizeURL(url);
+        }).toThrow('URL path is too long');
+    });
 });
 
 describe('decodeURLPath', () => {
@@ -422,10 +430,11 @@ describe('decodeURLPath', () => {
         const result = decodeURLPath(url);
         expect(result.pathname).toBe('/helloworld/test');
 
-        // Triple encoding (tes%252574) exceeds the 2-pass limit and is rejected
-        expect(() => {
-            decodeURLPath(new URL('https://docs.mycompany.com/helloworld/tes%252574'));
-        }).toThrow('URL path is malformed');
+        // Triple encoding is also normalized through the nested normalizeURL flow.
+        const tripleEncoded = decodeURLPath(
+            new URL('https://docs.mycompany.com/helloworld/tes%252574')
+        );
+        expect(tripleEncoded.pathname).toBe('/helloworld/test');
     });
 
     it('should throw for malformed percent-encoding in the path', () => {
@@ -479,12 +488,11 @@ describe('decodeURLPath', () => {
         }).toThrow('URL path is malformed');
     });
 
-    it('should throw for URL paths exceeding 2048 characters', () => {
+    it('should not enforce the normalizeURL path length limit itself', () => {
         const longPath = '/a'.repeat(1025); // 2050 chars
         const url = new URL(`https://docs.mycompany.com${longPath}`);
-        expect(() => {
-            decodeURLPath(url);
-        }).toThrow('URL path is too long');
+        const result = decodeURLPath(url);
+        expect(result.pathname).toBe(longPath);
     });
 
     // TODO: should we do that actually?
