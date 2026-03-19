@@ -52,7 +52,7 @@ function getPDFRoutePath(params: SpacePDFRouteParams) {
         path += `/~/revisions/${params.revisionId}`;
     }
 
-    path += '~gitbook/pdf';
+    path += '/~gitbook/pdf';
 
     return path;
 }
