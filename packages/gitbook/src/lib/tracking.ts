@@ -53,7 +53,7 @@ const defaultLocation: api.SiteInsightsEventLocation = {
  * Extract a full session object from a request.
  * Generates new sessionId/visitorId and extracts headers.
  */
-function extractSessionFromRequest(request: Request): api.SiteInsightsEventSession {
+function extractSessionFromRequest(request: Pick<Request, 'headers'>): api.SiteInsightsEventSession {
     return {
         sessionId: crypto.randomUUID(),
         visitorId: crypto.randomUUID(),
@@ -67,34 +67,34 @@ function extractSessionFromRequest(request: Request): api.SiteInsightsEventSessi
 /**
  * Track insight events server-side via the GitBook API.
  * Session info (userAgent, IDs) and location URL are automatically extracted from the request.
+ * The tracked URL can be overridden explicitly when the original request URL differs from the content URL.
  * Event-level overrides take precedence.
  */
 export async function trackServerInsightsEvents(args: {
     organizationId: string;
     siteId: string;
     events: ServerInsightsEventInput[];
-    request: Request;
+    request: Pick<Request, 'headers' | 'url'>;
 }) {
+    const { organizationId, siteId, events, request } = args;
     const logger = getLogger().subLogger('tracking');
-
     logger.info(
-        `Tracking ${args.events.length} events for site ${args.siteId} (enabled=${!GITBOOK_DISABLE_TRACKING})`
+        `Tracking ${args.events.length} events at ${request.url} for site ${args.siteId} (enabled=${!GITBOOK_DISABLE_TRACKING})`
     );
 
     if (GITBOOK_DISABLE_TRACKING) {
         return;
     }
 
-    const { organizationId, siteId, events, request } = args;
-
     const api = apiClient();
     const geolocation = extractGeolocation(request);
     const requestSession = extractSessionFromRequest(request);
+    const locationURL = request.url;
 
     const fullEvents: api.SiteInsightsEvent[] = events.map((event) => ({
         ...event,
         session: { ...requestSession, ...event.session },
-        location: { ...defaultLocation, url: request.url, ...event.location },
+        location: { ...defaultLocation, url: locationURL, ...event.location },
         timestamp: event.timestamp ?? new Date().toISOString(),
     })) as api.SiteInsightsEvent[];
 
@@ -186,7 +186,7 @@ function getXForwardedFor(headers: Headers): string | null {
 /**
  * Extract geolocation headers from a request (Vercel/OpenNext).
  */
-function extractGeolocation(req: Request): Record<string, string> {
+function extractGeolocation(req: Pick<Request, 'headers'>): Record<string, string> {
     const country =
         req.headers.get('x-open-next-country') || req.headers.get('x-vercel-ip-country');
     const latitude =
