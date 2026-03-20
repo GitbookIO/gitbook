@@ -4,7 +4,7 @@ import React from 'react';
 
 const SpaceLayoutContext = React.createContext({
     basePath: '',
-    adaptiveAuthLoginHref: null as string | null,
+    siteAdaptiveAuthLoginHref: null as string | null,
 });
 
 /**
@@ -13,14 +13,14 @@ const SpaceLayoutContext = React.createContext({
 export function SpaceLayoutContextProvider(
     props: React.PropsWithChildren<{
         basePath: string;
-        adaptiveAuthLoginHref?: string | null;
+        siteAdaptiveAuthLoginHref?: string | null;
     }>
 ) {
-    const { basePath, adaptiveAuthLoginHref = null, children } = props;
+    const { basePath, siteAdaptiveAuthLoginHref = null, children } = props;
 
     const value = React.useMemo(
-        () => ({ basePath, adaptiveAuthLoginHref }),
-        [basePath, adaptiveAuthLoginHref]
+        () => ({ basePath, siteAdaptiveAuthLoginHref }),
+        [basePath, siteAdaptiveAuthLoginHref]
     );
 
     return <SpaceLayoutContext.Provider value={value}>{children}</SpaceLayoutContext.Provider>;
@@ -40,10 +40,10 @@ export function useSpaceBasePath() {
 /**
  * Return the site auth login path when adaptive content with login fallback is configured.
  */
-export function useSpaceAdaptiveAuthLoginHref() {
+export function useSiteAdaptiveAuthLoginHref() {
     const context = React.useContext(SpaceLayoutContext);
     if (!context) {
         throw new Error('SpaceLayoutContext not found');
     }
-    return context.adaptiveAuthLoginHref;
+    return context.siteAdaptiveAuthLoginHref;
 }

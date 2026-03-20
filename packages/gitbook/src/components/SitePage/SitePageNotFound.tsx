@@ -6,7 +6,7 @@ import { tcls } from '@/lib/tailwind';
 import { SiteInsightsDisplayContext } from '@gitbook/api';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
-import { useSpaceAdaptiveAuthLoginHref, useSpaceBasePath } from '../SpaceLayout/SpaceLayoutContext';
+import { useSiteAdaptiveAuthLoginHref, useSpaceBasePath } from '../SpaceLayout/SpaceLayoutContext';
 import { CurrentPageProvider } from '../hooks';
 import { SuspenseLoadedHint } from '../primitives';
 import { SiteAuthLoginButton } from '../primitives/SiteAuthLoginLink';
@@ -16,7 +16,7 @@ import { SiteAuthLoginButton } from '../primitives/SiteAuthLoginLink';
  */
 export function SitePageNotFound() {
     const basePath = useSpaceBasePath();
-    const adaptiveAuthLoginHref = useSpaceAdaptiveAuthLoginHref();
+    const adaptiveAuthLoginHref = useSiteAdaptiveAuthLoginHref();
     const language = useLanguage();
     const router = useRouter();
     const searchParams = useSearchParams();
