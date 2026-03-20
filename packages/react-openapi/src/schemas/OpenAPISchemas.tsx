@@ -39,7 +39,7 @@ export function OpenAPISchemas(props: {
     if (schemas.length === 1 && !grouped) {
         const title = `The ${firstSchema.name} object`;
         return (
-            <div className={clsx('openapi-schemas', className)}>
+            <div className={clsx('openapi-schemas openapi-schemas-single', className)}>
                 <div className="openapi-summary" id={context.id}>
                     {context.renderHeading({
                         title,
