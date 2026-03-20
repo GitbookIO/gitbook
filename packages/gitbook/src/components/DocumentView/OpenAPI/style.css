@@ -4,12 +4,9 @@
 /* Layout Components */
 .openapi-operation,
 .openapi-schemas,
-.openapi-webhook {
-    @apply flex-1 flex flex-col gap-8 mb-14 min-w-0;
-}
-
+.openapi-webhook,
 .openapi-schemas {
-    @apply flex flex-col mb-14 gap-0 flex-1;
+    @apply flex-1 flex flex-col gap-6 mb-14 min-w-0;
 }
 
 .openapi-schemas-title {
