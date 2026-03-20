@@ -1388,7 +1388,7 @@ const testCases: TestsCase[] = [
                     ).toBeVisible();
                     const url = page.url();
                     expect(url.includes('shared-space-uno')).toBeTruthy(); // same uno site
-                    expect(url.endsWith('/shared/')).toBeTruthy(); // correct page
+                    expect(url.endsWith('/shared')).toBeTruthy(); // correct page
                 },
                 screenshot: false,
             },
@@ -1408,7 +1408,7 @@ const testCases: TestsCase[] = [
                     ).toBeVisible();
                     const url = page.url();
                     expect(url.includes('shared-space-dos')).toBeTruthy(); // same dos site
-                    expect(url.endsWith('/shared/')).toBeTruthy(); // correct page
+                    expect(url.endsWith('/shared')).toBeTruthy(); // correct page
                 },
                 screenshot: false,
             },
