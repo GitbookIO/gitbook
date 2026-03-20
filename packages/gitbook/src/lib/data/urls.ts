@@ -1,5 +1,5 @@
 import { isProxyRootRequest } from '../proxy';
-import { DataFetcherError } from './errors';
+import { DataFetcherError, getExposableError } from './errors';
 
 /**
  * For a given GitBook URL, return a list of alternative URLs that could be matched against to lookup the content.
@@ -119,45 +119,38 @@ export function getURLLookupAlternatives(input: URL) {
 }
 
 /**
+ * Normalize the URL in a request and redirect if the normalized URL is different from the original one.
+ */
+export function normalizeRequestURL(url: URL): Response | null {
+    try {
+        const normalizedURL = normalizeURL(url);
+
+        if (normalizedURL.toString() !== url.toString()) {
+            return Response.redirect(normalizedURL.toString(), 302);
+        }
+
+        return null;
+    } catch (error) {
+        const sanitized = getExposableError(error);
+        return new Response(sanitized.message, { status: sanitized.code });
+    }
+}
+
+/**
  * Normalize a URL to remove duplicate slashes and trailing slashes
  * and transform the pathname to lowercase.
  */
 export function normalizeURL(url: URL) {
     const result = new URL(url);
-    result.pathname = url.pathname.replace(/\/{2,}/g, '/').replace(/\/$/, '');
-    return result;
-}
 
-/**
- * This function checks if a decoded URL path segment contains characters that are not allowed
- * in GitBook content paths. These characters are valid in generic RFC 3986 URL paths, but are
- * rejected here as an application-level constraint for GitBook routing and security.
- * https://developer.mozilla.org/en-US/docs/Glossary/Percent-encoding
- * "%" itself is excluded because it could be part of percent-encoding and may require decoding.
- */
-// function containsInvalidURLCharacters(segment: string): boolean {
-//     const invalidCharacters = [
-//         ':',
-//         '/',
-//         '?',
-//         '#',
-//         '[',
-//         ']',
-//         '@',
-//         '!',
-//         '$',
-//         '&',
-//         "'",
-//         '(',
-//         ')',
-//         '*',
-//         '+',
-//         ',',
-//         ';',
-//         '=',
-//     ];
-//     return invalidCharacters.some((char) => segment.includes(char));
-// }
+    // Reject excessively long paths up-front to bound per-request work.
+    if (url.pathname.length > 2048) {
+        throw new DataFetcherError('URL path is too long.', 400);
+    }
+
+    result.pathname = url.pathname.replace(/\/{2,}/g, '/').replace(/\/$/, '');
+    return decodeURLPath(result);
+}
 
 /**
  * Decode the url path component, we redirect URLs with encoded path components
@@ -167,12 +160,7 @@ export function normalizeURL(url: URL) {
  * percent-encoding. Legitimate URLs are at most singly encoded; double-encoding covers
  * any reasonable proxy behaviour.
  */
-export function decodeURLPath(url: URL): URL {
-    // Reject excessively long paths up-front to bound per-request work.
-    if (url.pathname.length > 2048) {
-        throw new DataFetcherError(`URL path is too long: ${url.pathname}`, 400);
-    }
-
+function decodeURLPath(url: URL): URL {
     let current = url;
 
     for (let i = 0; i < 2; i++) {

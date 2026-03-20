@@ -345,7 +345,7 @@ html.dark .shiki span {
 }
 
 .highlight-line-number {
-    @apply table-cell whitespace-nowrap text-sm text-tint pr-4 pl-2 text-right bg-tint-subtle theme-muted:bg-tint-base theme-bold-tint:bg-tint-base rounded-l sticky -left-2;
+    @apply table-cell whitespace-nowrap w-0 text-sm text-tint pl-4 pr-2 text-right bg-tint-subtle theme-muted:bg-tint-base theme-bold-tint:bg-tint-base sticky -left-2;
     @apply before:content-[counter(line)] not-contrast-more:before:opacity-6;
 
     .highlighted & {
@@ -353,6 +353,11 @@ html.dark .shiki span {
     }
 }
 
+
 .highlight-line-content {
-    @apply table-cell text-sm;
+    @apply table-cell text-sm px-4;
+
+    .highlight-line-number + & {
+        @apply pl-2;
+    }
 }

@@ -10,9 +10,19 @@ import { createMcpHandler } from 'mcp-handler';
 import type { NextRequest } from 'next/server';
 import { z } from 'zod';
 
-async function handler(request: NextRequest, { params }: { params: Promise<RouteLayoutParams> }) {
+async function handler(
+    rawRequest: NextRequest,
+    { params }: { params: Promise<RouteLayoutParams> }
+) {
     const { context } = await getStaticSiteContext(await params);
     const { dataFetcher, linker, site } = context;
+
+    // Next.js request.url is the original URL and not the rewritten one from the middleware
+    const requestURL = new URL(
+        context.linker.toAbsoluteURL(context.linker.toPathInSite('~gitbook/mcp'))
+    );
+    requestURL.search = rawRequest.nextUrl.search;
+    const request = new Request(requestURL, rawRequest);
 
     waitUntil(
         trackServerInsightsEvents({
@@ -127,13 +137,7 @@ async function handler(request: NextRequest, { params }: { params: Promise<Route
         }
     );
 
-    // Next.js request.url is the original URL and not the rewritten one from the middleware
-    const requestURL = new URL(
-        context.linker.toAbsoluteURL(context.linker.toPathInSite('~gitbook/mcp'))
-    );
-    requestURL.search = request.nextUrl.search;
-
-    return mcpHandler(new Request(requestURL, request));
+    return mcpHandler(request);
 }
 
 export { handler as GET, handler as POST };
