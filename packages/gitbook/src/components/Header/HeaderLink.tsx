@@ -13,17 +13,17 @@ import type React from 'react';
 import { resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
+import {
+    SiteAuthLoginButton,
+    SiteAuthLoginDropdownMenuItem,
+    SiteAuthLoginLink,
+} from '../SiteAuth/SiteAuthLoginLink';
 import { Button, Link, ToggleChevron } from '../primitives';
 import {
     type DropdownButtonProps,
     DropdownMenu,
     DropdownMenuItem,
 } from '../primitives/DropdownMenu';
-import {
-    SiteAuthLoginButton,
-    SiteAuthLoginDropdownMenuItem,
-    SiteAuthLoginLink,
-} from '../primitives/SiteAuthLoginLink';
 
 export async function HeaderLink(props: {
     context: GitBookSiteContext;

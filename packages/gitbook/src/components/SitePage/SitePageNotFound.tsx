@@ -6,10 +6,10 @@ import { tcls } from '@/lib/tailwind';
 import { SiteInsightsDisplayContext } from '@gitbook/api';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
+import { SiteAuthLoginButton } from '../SiteAuth/SiteAuthLoginLink';
 import { useSiteAdaptiveAuthLoginHref, useSpaceBasePath } from '../SpaceLayout/SpaceLayoutContext';
 import { CurrentPageProvider } from '../hooks';
 import { SuspenseLoadedHint } from '../primitives';
-import { SiteAuthLoginButton } from '../primitives/SiteAuthLoginLink';
 
 /**
  * Component that displays a "page not found" message.
