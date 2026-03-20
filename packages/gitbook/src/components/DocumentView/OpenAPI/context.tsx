@@ -75,12 +75,7 @@ export function getOpenAPIContext(args: {
                 ancestorBlocks={props.ancestorBlocks}
                 isEstimatedOffscreen={props.isEstimatedOffscreen}
                 context={props.context}
-                style={tcls([
-                    headingProps.deprecated ? 'line-through' : undefined,
-                    headingProps.deprecated || !!headingProps.stability
-                        ? '[&>div]:pt-0'
-                        : undefined,
-                ])}
+                style={tcls(headingProps.deprecated ? 'line-through' : undefined)}
                 block={{
                     object: 'block',
                     key: `${block.key}-heading`,

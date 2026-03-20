@@ -61,7 +61,7 @@ export function OpenAPISchemas(props: {
                     </div>
                     <div className="openapi-column-preview">
                         <div className="openapi-column-preview-body">
-                            <div className="openapi-panel">
+                            <div className="openapi-panel" data-follow-color-scheme="true">
                                 <h4 className="openapi-panel-heading">{title}</h4>
                                 <div className="openapi-panel-body">
                                     <OpenAPIExample
