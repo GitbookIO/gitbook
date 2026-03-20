@@ -31,9 +31,10 @@ export function getOpenAPIContext(args: {
     const customizationLocale = context ? getSpaceLocale(context) : DEFAULT_LOCALE;
     const locale = checkIsValidLocale(customizationLocale) ? customizationLocale : DEFAULT_LOCALE;
 
-    const proxyUrl = context
-        ? context.linker.toAbsoluteURL(context.linker.toPathInSite('~scalar/proxy'))
-        : undefined;
+    const proxyUrl =
+        context && props.context.mode !== 'print'
+            ? context.linker.toAbsoluteURL(context.linker.toPathInSite('~scalar/proxy'))
+            : undefined;
 
     return {
         specUrl,
