@@ -7,9 +7,10 @@ import { Emoji } from '../primitives/Emoji/Emoji';
 import { HighlightQuery } from './HighlightQuery';
 import { SearchResultItem } from './SearchResultItem';
 import type { ComputedPageResult } from './search-types';
+import type { MergedPageResult } from './reciprocalRankFusion';
 import type { LocalPageResult } from './useLocalSearchResults';
 
-type PageItem = ComputedPageResult | LocalPageResult;
+type PageItem = ComputedPageResult | LocalPageResult | MergedPageResult;
 
 export const SearchPageResultItem = React.forwardRef(function SearchPageResultItem(
     props: {
@@ -24,13 +25,16 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
 
     const href = 'href' in item ? item.href : item.pathname;
 
+    const emoji = 'emoji' in item ? item.emoji : undefined;
+    const icon = 'icon' in item ? item.icon : undefined;
+
     const leadingIcon =
-        item.type === 'local-page' && item.emoji ? (
+        emoji ? (
             <span className="flex size-4 shrink-0 items-center justify-center">
-                <Emoji code={item.emoji} style="text-base leading-none" />
+                <Emoji code={emoji} style="text-base leading-none" />
             </span>
-        ) : item.type === 'local-page' && item.icon ? (
-            <Icon icon={item.icon as IconName} className="size-4" />
+        ) : icon ? (
+            <Icon icon={icon as IconName} className="size-4" />
         ) : (
             <Icon icon="memo" className="size-4" />
         );

@@ -10,19 +10,20 @@ import { type Assistant, useAI } from '@/components/AI';
 import assertNever from 'assert-never';
 import { useTrackEvent } from '../Insights';
 import { isQuestion } from './isQuestion';
-import { getResultKey, reciprocalRankFusion } from './reciprocalRankFusion';
+import { type MergedPageResult, getResultKey, reciprocalRankFusion } from './reciprocalRankFusion';
 import { type LocalPageResult, useLocalSearchResults } from './useLocalSearchResults';
 import type { SearchScope } from './useSearch';
 
 export type ResultType =
     | OrderedComputedResult
     | LocalPageResult
+    | MergedPageResult
     | { type: 'question'; id: string; query: string; assistant: Assistant }
     | { type: 'recommended-question'; id: string; question: string };
 
-export type { LocalPageResult };
+export type { LocalPageResult, MergedPageResult };
 
-type MergeableResult = LocalPageResult | OrderedComputedResult;
+type MergeableResult = LocalPageResult | OrderedComputedResult | MergedPageResult;
 
 /**
  * Append-only merge: local results first, then remote results that aren't
