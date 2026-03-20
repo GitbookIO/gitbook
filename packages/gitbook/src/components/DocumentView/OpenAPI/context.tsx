@@ -2,8 +2,6 @@ import type { JSONDocument } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
 import { type OpenAPIContextInput, checkIsValidLocale } from '@gitbook/react-openapi';
 
-import { tcls } from '@/lib/tailwind';
-
 import type { BlockProps } from '../Block';
 import { PlainCodeBlock } from '../CodeBlock';
 import { DocumentView } from '../DocumentView';
@@ -75,7 +73,7 @@ export function getOpenAPIContext(args: {
                 ancestorBlocks={props.ancestorBlocks}
                 isEstimatedOffscreen={props.isEstimatedOffscreen}
                 context={props.context}
-                style={tcls(headingProps.deprecated ? 'line-through' : undefined)}
+                style={headingProps.deprecated ? 'line-through' : undefined}
                 block={{
                     object: 'block',
                     key: `${block.key}-heading`,

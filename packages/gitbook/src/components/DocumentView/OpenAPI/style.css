@@ -10,7 +10,7 @@
 }
 
 .openapi-schemas:not(.openapi-schemas-single) {
-    @apply flex flex-col mb-14 gap-0 flex-1;
+    @apply gap-0;
 }
 
 .openapi-schemas-title {
