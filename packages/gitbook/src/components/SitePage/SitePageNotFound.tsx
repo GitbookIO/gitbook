@@ -6,15 +6,17 @@ import { tcls } from '@/lib/tailwind';
 import { SiteInsightsDisplayContext } from '@gitbook/api';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
-import { useSpaceBasePath } from '../SpaceLayout/SpaceLayoutContext';
+import { useSpaceAdaptiveAuthLoginHref, useSpaceBasePath } from '../SpaceLayout/SpaceLayoutContext';
 import { CurrentPageProvider } from '../hooks';
 import { SuspenseLoadedHint } from '../primitives';
+import { SiteAuthLoginButton } from '../primitives/SiteAuthLoginLink';
 
 /**
  * Component that displays a "page not found" message.
  */
 export function SitePageNotFound() {
     const basePath = useSpaceBasePath();
+    const adaptiveAuthLoginHref = useSpaceAdaptiveAuthLoginHref();
     const language = useLanguage();
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -49,9 +51,24 @@ export function SitePageNotFound() {
             >
                 <div className={tcls('max-w-80')}>
                     <h2 className={tcls('text-2xl', 'font-semibold', 'mb-2')}>
-                        {t(language, 'notfound_title')}
+                        {t(
+                            language,
+                            adaptiveAuthLoginHref ? 'notfound_adaptive_title' : 'notfound_title'
+                        )}
                     </h2>
-                    <p className={tcls('text-base', 'mb-4')}>{t(language, 'notfound')}</p>
+                    <p className={tcls('text-base', 'mb-4')}>
+                        {t(language, adaptiveAuthLoginHref ? 'notfound_adaptive' : 'notfound')}
+                    </p>
+                    {adaptiveAuthLoginHref ? (
+                        <SiteAuthLoginButton
+                            href={adaptiveAuthLoginHref}
+                            variant="primary"
+                            size="medium"
+                            label={t(language, 'notfound_adaptive_login')}
+                        >
+                            {t(language, 'notfound_adaptive_login')}
+                        </SiteAuthLoginButton>
+                    ) : null}
                 </div>
                 <SuspenseLoadedHint />
 
