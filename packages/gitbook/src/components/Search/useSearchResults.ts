@@ -10,7 +10,7 @@ import { type Assistant, useAI } from '@/components/AI';
 import assertNever from 'assert-never';
 import { useTrackEvent } from '../Insights';
 import { isQuestion } from './isQuestion';
-import { reciprocalRankFusion } from './reciprocalRankFusion';
+import { getResultKey, reciprocalRankFusion } from './reciprocalRankFusion';
 import { type LocalPageResult, useLocalSearchResults } from './useLocalSearchResults';
 import type { SearchScope } from './useSearch';
 
@@ -21,6 +21,87 @@ export type ResultType =
     | { type: 'recommended-question'; id: string; question: string };
 
 export type { LocalPageResult };
+
+type MergeableResult = LocalPageResult | OrderedComputedResult;
+
+/**
+ * Append-only merge: keep all previous results unchanged and append any new
+ * items from a fresh RRF run at the end.
+ * Used once the user has interacted with the list (scroll / keyboard / pointer)
+ * so that already-visible items never jump to a different position.
+ */
+function appendMerge(
+    localResults: LocalPageResult[],
+    remoteResults: OrderedComputedResult[],
+    previousResults: MergeableResult[]
+): MergeableResult[] {
+    const prevKeys = new Set(previousResults.map(getResultKey));
+    const fresh = reciprocalRankFusion(localResults, remoteResults);
+    const newItems = fresh.filter((item) => !prevKeys.has(getResultKey(item)));
+    return [...previousResults, ...newItems];
+}
+
+/**
+ * Stable-visible merge: run a full RRF but keep the relative order of items
+ * that are currently visible in the scroll viewport. Items below the fold are
+ * still freely re-ranked by RRF.
+ *
+ * The slot-filling algorithm:
+ *  1. Partition the RRF output into "visible" and "non-visible" buckets.
+ *  2. Sort the visible bucket by each item's position in `previousResults`.
+ *  3. Walk the RRF output: every slot that held a visible item is filled from
+ *     the sorted visible bucket; every other slot is filled from the non-visible
+ *     bucket (preserving RRF order for that half).
+ */
+function stableVisibleMerge(
+    localResults: LocalPageResult[],
+    remoteResults: OrderedComputedResult[],
+    visibleIds: ReadonlySet<string>,
+    previousResults: MergeableResult[]
+): MergeableResult[] {
+    const rrfResult = reciprocalRankFusion(localResults, remoteResults);
+
+    if (visibleIds.size === 0 || previousResults.length === 0) {
+        return rrfResult;
+    }
+
+    const prevIndexMap = new Map<string, number>(
+        previousResults.map((item, i) => [getResultKey(item), i])
+    );
+
+    const visibleInRRF: MergeableResult[] = [];
+    const nonVisibleInRRF: MergeableResult[] = [];
+
+    for (const item of rrfResult) {
+        if (visibleIds.has(getResultKey(item))) {
+            visibleInRRF.push(item);
+        } else {
+            nonVisibleInRRF.push(item);
+        }
+    }
+
+    // Sort visible items by their previous display position
+    visibleInRRF.sort((a, b) => {
+        const ia = prevIndexMap.get(getResultKey(a)) ?? Number.POSITIVE_INFINITY;
+        const ib = prevIndexMap.get(getResultKey(b)) ?? Number.POSITIVE_INFINITY;
+        return ia - ib;
+    });
+
+    // Fill RRF-shaped slots: visible → stable-sorted visible; non-visible → RRF order
+    const result: MergeableResult[] = [];
+    let vi = 0;
+    let ni = 0;
+
+    for (const item of rrfResult) {
+        if (visibleIds.has(getResultKey(item))) {
+            result.push(visibleInRRF[vi++]!);
+        } else {
+            result.push(nonVisibleInRRF[ni++]!);
+        }
+    }
+
+    return result;
+}
 
 /**
  * We cache the recommended questions globally to avoid calling the API multiple times
@@ -74,6 +155,39 @@ export function useSearchResults(props: {
 
     const { assistants } = useAI();
     const withAI = assistants.length > 0;
+
+    // --- Interaction / visibility tracking (refs → no extra renders) ---
+
+    /** True once the user has scrolled, moved the keyboard cursor, or hovered over results. */
+    const hasInteractedRef = React.useRef(false);
+    /** Keys of result items currently visible in the scroll viewport. */
+    const visibleIdsRef = React.useRef<ReadonlySet<string>>(new Set());
+    /**
+     * The last merged result list together with the query it was computed for.
+     * Storing the query lets us detect when the query has changed and discard
+     * stale data synchronously inside the useMemo, even before the reset effect
+     * has fired.
+     */
+    const previousResultsRef = React.useRef<{ query: string; results: MergeableResult[] }>({
+        query: '',
+        results: [],
+    });
+
+    // Reset interaction state whenever the query changes.
+    React.useEffect(() => {
+        hasInteractedRef.current = false;
+        visibleIdsRef.current = new Set();
+    }, [query]);
+
+    /** Call when the user scrolls, navigates with arrow keys, or hovers the list. */
+    const setInteracted = React.useCallback(() => {
+        hasInteractedRef.current = true;
+    }, []);
+
+    /** Update the set of result keys that are currently visible in the viewport. */
+    const onVisibilityChange = React.useCallback((ids: ReadonlySet<string>) => {
+        visibleIdsRef.current = ids;
+    }, []);
 
     React.useEffect(() => {
         if (disabled) {
@@ -226,7 +340,7 @@ export function useSearchResults(props: {
         searchURL,
     ]);
 
-    // Merge local and remote results using Reciprocal Rank Fusion.
+    // Merge local and remote results.
     // Re-runs immediately whenever either result set changes.
     const results = React.useMemo<ResultType[]>(() => {
         if (!query) {
@@ -244,11 +358,42 @@ export function useSearchResults(props: {
             return [];
         }
 
-        const merged = reciprocalRankFusion(localResults, remoteState.results);
+        // Treat previousResults as empty if they belong to a different query.
+        // This is a synchronous guard that complements the reset useEffect above.
+        const previous =
+            previousResultsRef.current.query === query ? previousResultsRef.current.results : [];
+
+        let merged: MergeableResult[];
+        if (hasInteractedRef.current && previous.length > 0) {
+            // User has interacted: append new items, never reorder existing ones.
+            merged = appendMerge(localResults, remoteState.results, previous);
+        } else if (!hasInteractedRef.current && previous.length > 0) {
+            // User hasn't interacted: keep visible items in their current order,
+            // allow below-the-fold items to be freely re-ranked by RRF.
+            merged = stableVisibleMerge(
+                localResults,
+                remoteState.results,
+                visibleIdsRef.current,
+                previous
+            );
+        } else {
+            // First render for this query: plain RRF with no stability constraints.
+            merged = reciprocalRankFusion(localResults, remoteState.results);
+        }
+
+        // Store for the next merge cycle (written during render; safe for refs).
+        previousResultsRef.current = { query, results: merged };
+
         return withAI ? withAskTriggers(merged, query, assistants) : merged;
     }, [localResults, remoteState.results, query, withAI, assistants, siteSpaceId, suggestions]);
 
-    return { results, fetching: remoteState.fetching, error: remoteState.error };
+    return {
+        results,
+        fetching: remoteState.fetching,
+        error: remoteState.error,
+        setInteracted,
+        onVisibilityChange,
+    };
 }
 
 /**

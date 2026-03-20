@@ -5,6 +5,24 @@ import type { LocalPageResult } from './useLocalSearchResults';
 const RRF_K = 60;
 
 /**
+ * Derive a stable deduplication key for any result type.
+ * Pages from both local and remote share the same `page:` namespace so they
+ * can be deduplicated against each other.
+ */
+export function getResultKey(result: LocalPageResult | OrderedComputedResult): string {
+    switch (result.type) {
+        case 'local-page':
+            return `page:${result.id}`;
+        case 'page':
+            return `page:${result.pageId}`;
+        case 'section':
+            return `section:${result.id}`;
+        case 'record':
+            return `record:${result.id}`;
+    }
+}
+
+/**
  * Merge local (FlexSearch) and remote (API) search results using
  * Reciprocal Rank Fusion (RRF).
  *
@@ -31,7 +49,7 @@ export function reciprocalRankFusion(
     // Process local results first (1-indexed rank)
     localResults.forEach((result, index) => {
         const rank = index + 1;
-        const key = `page:${result.id}`;
+        const key = getResultKey(result);
         const contribution = 1 / (RRF_K + rank);
 
         const existing = scoreMap.get(key);
@@ -48,12 +66,7 @@ export function reciprocalRankFusion(
         const contribution = 1 / (RRF_K + rank);
 
         // Determine the dedup key — pages match via pageId
-        const key =
-            result.type === 'page'
-                ? `page:${result.pageId}`
-                : result.type === 'section'
-                  ? `section:${result.id}`
-                  : `record:${result.id}`;
+        const key = getResultKey(result);
 
         const existing = scoreMap.get(key);
         if (existing) {

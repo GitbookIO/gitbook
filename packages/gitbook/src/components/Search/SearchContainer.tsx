@@ -206,7 +206,7 @@ export function SearchContainer({
         [siteSpaces, siteSpace.space.language]
     );
 
-    const { results, fetching, error } = useSearchResults({
+    const { results, fetching, error, setInteracted, onVisibilityChange } = useSearchResults({
         disabled: !(state?.query || withAI),
         query: normalizedQuery,
         siteSpaceId: siteSpace.id,
@@ -221,6 +221,8 @@ export function SearchContainer({
 
     const searchValue = state?.query ?? (withSearchAI || !withAI ? state?.ask : null) ?? '';
 
+    const scrollContainerRef = React.useRef<HTMLDivElement>(null);
+
     const { cursor, moveBy: moveCursorBy } = useSearchResultsCursor({
         query: normalizedQuery,
         results,
@@ -228,9 +230,11 @@ export function SearchContainer({
     const onKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
         if (event.key === 'ArrowUp') {
             event.preventDefault();
+            setInteracted();
             moveCursorBy(-1);
         } else if (event.key === 'ArrowDown') {
             event.preventDefault();
+            setInteracted();
             moveCursorBy(1);
         } else if (event.key === 'Enter') {
             event.preventDefault();
@@ -245,7 +249,11 @@ export function SearchContainer({
                     // Only show content if there's a query or Ask is enabled
                     state?.query || withAI ? (
                         <React.Suspense fallback={null}>
-                            <div className="scroll-py-2 overflow-y-scroll p-2">
+                            <div
+                                ref={scrollContainerRef}
+                                className="scroll-py-2 overflow-y-scroll p-2"
+                                onScroll={setInteracted}
+                            >
                                 {state !== null && !showAsk ? (
                                     <SearchResults
                                         ref={resultsRef}
@@ -255,6 +263,8 @@ export function SearchContainer({
                                         results={results}
                                         cursor={cursor}
                                         error={error}
+                                        scrollContainerRef={scrollContainerRef}
+                                        onVisibilityChange={onVisibilityChange}
                                     />
                                 ) : null}
                                 {showAsk ? <SearchAskAnswer query={normalizedAsk} /> : null}
