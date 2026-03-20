@@ -45,7 +45,7 @@ export function OpenAPIWebhookExample(props: {
     })();
 
     return (
-        <div className="openapi-panel">
+        <div className="openapi-panel" data-follow-color-scheme="true">
             <h4 className="openapi-panel-heading">Payload</h4>
             <div className="openapi-panel-body">
                 <OpenAPIMediaTypeContent
