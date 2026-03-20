@@ -381,6 +381,39 @@ describe('getSchemaAlternatives', () => {
             });
         });
 
+        it('should merge annotation-only schema into object schema', () => {
+            expect(
+                getSchemaAlternatives({
+                    allOf: [
+                        {
+                            type: 'object',
+                            properties: {
+                                id: { type: 'string' },
+                                name: { type: 'string' },
+                            },
+                            required: ['id'],
+                        },
+                        {
+                            description: 'Overridden description',
+                        } as any,
+                    ],
+                })
+            ).toEqual({
+                type: 'allOf',
+                schemas: [
+                    {
+                        type: 'object',
+                        properties: {
+                            id: { type: 'string' },
+                            name: { type: 'string' },
+                        },
+                        required: ['id'],
+                        description: 'Overridden description',
+                    },
+                ],
+            });
+        });
+
         it('should preserve parent metadata when flattening allOf inside oneOf alternative', () => {
             const result = getSchemaAlternatives({
                 oneOf: [
@@ -426,6 +459,42 @@ describe('getSchemaAlternatives', () => {
                     },
                     {
                         type: 'string',
+                    },
+                ],
+            });
+        });
+
+        it('should merge annotation-only schema with multiple safe extensions', () => {
+            expect(
+                getSchemaAlternatives({
+                    allOf: [
+                        {
+                            type: 'object',
+                            properties: {
+                                id: { type: 'string' },
+                            },
+                            required: ['id'],
+                            description: 'Original description',
+                        },
+                        {
+                            description: 'Overridden description',
+                            title: 'Overridden title',
+                            deprecated: true,
+                        } as any,
+                    ],
+                })
+            ).toEqual({
+                type: 'allOf',
+                schemas: [
+                    {
+                        type: 'object',
+                        properties: {
+                            id: { type: 'string' },
+                        },
+                        required: ['id'],
+                        description: 'Overridden description',
+                        title: 'Overridden title',
+                        deprecated: true,
                     },
                 ],
             });
