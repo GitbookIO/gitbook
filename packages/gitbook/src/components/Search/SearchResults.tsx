@@ -109,8 +109,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
                     const result = results[index];
                     if (
                         !result ||
-                        result.type === 'question' ||
-                        result.type === 'recommended-question'
+                        result.type !== 'local-page'
                     ) {
                         continue;
                     }

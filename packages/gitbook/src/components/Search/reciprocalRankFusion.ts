@@ -16,7 +16,7 @@ export function getResultKey(result: LocalPageResult | OrderedComputedResult): s
         case 'page':
             return `page:${result.pageId}`;
         case 'section':
-            return `section:${result.id}`;
+            return `section:${result.pageId}`;
         case 'record':
             return `record:${result.id}`;
     }
