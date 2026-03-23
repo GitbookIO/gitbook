@@ -59,7 +59,7 @@ export async function ignoreDataThrownError<T>(promise: Promise<T>): Promise<T |
     try {
         return await promise;
     } catch (error) {
-        getExposableError(error as Error);
+        console.warn('ignored Data error', getExposableError(error as Error));
         return null;
     }
 }
@@ -78,6 +78,7 @@ export async function ignoreAllThrownError<T>(promise: Promise<T>): Promise<T | 
 
 /**
  * Wrap an async execution to handle errors and return a DataFetcherResponse.
+ * This function should not throw.
  */
 export async function wrapDataFetcherError<T>(
     fn: () => Promise<T>
@@ -178,8 +179,9 @@ export function extractCacheControl(error: GitBookAPIError) {
 
 /**
  * Get a data fetcher exposable error from a JS error.
+ * This function should never throw, even if the error is not in the expected format. In that case, it should return a generic error with code 500.
  */
-export function getExposableError(error: Error): DataFetcherErrorData {
+export function getExposableError(error: unknown): DataFetcherErrorData {
     if (error instanceof GitBookAPIError) {
         const cache = extractCacheControl(error);
 
@@ -197,5 +199,10 @@ export function getExposableError(error: Error): DataFetcherErrorData {
         };
     }
 
-    throw error;
+    console.warn('An unexpected error occurred', error);
+
+    return {
+        code: 500,
+        message: 'An unexpected error occurred',
+    };
 }

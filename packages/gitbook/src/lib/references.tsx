@@ -458,63 +458,68 @@ async function resolveContentRefInSpace(
     contentRef: ContentRef,
     options: ResolveContentRefOptions = {}
 ) {
-    const ctx = await createContextForSpace(spaceId, {
-        ...context,
-        shareKey: (() => {
-            // If the space is found in the current site, we use the current share key to generate links.
-            if ('site' in context) {
-                return findSiteSpaceBy(
-                    context.structure,
-                    (siteSpace) => siteSpace.space.id === spaceId
-                )
-                    ? context.shareKey
-                    : undefined;
-            }
+    try {
+        const ctx = await createContextForSpace(spaceId, {
+            ...context,
+            shareKey: (() => {
+                // If the space is found in the current site, we use the current share key to generate links.
+                if ('site' in context) {
+                    return findSiteSpaceBy(
+                        context.structure,
+                        (siteSpace) => siteSpace.space.id === spaceId
+                    )
+                        ? context.shareKey
+                        : undefined;
+                }
 
-            return context.space.id === spaceId ? context.shareKey : undefined;
-        })(),
-    });
+                return context.space.id === spaceId ? context.shareKey : undefined;
+            })(),
+        });
 
-    if (!ctx) {
-        return null;
-    }
-
-    const resolved = await resolveContentRef(contentRef, ctx.spaceContext, options);
-
-    if (!resolved) {
-        return null;
-    }
-
-    // Prefer the variant title when available, then the section title, then fallback to the space title.
-    const ancestorLabel = (() => {
-        if ('site' in context) {
-            const currentLanguage = context.siteSpace.space.language;
-            const foundSiteSpace = findSiteSpaceBy(
-                context.structure,
-                (siteSpace) => siteSpace.space.id === spaceId
-            );
-            if (foundSiteSpace?.siteSpace) {
-                return getLocalizedTitle(foundSiteSpace.siteSpace, currentLanguage);
-            }
-            if (foundSiteSpace?.siteSection) {
-                return getLocalizedTitle(foundSiteSpace.siteSection, currentLanguage);
-            }
-            return ctx.spaceContext.space.title;
+        if (!ctx) {
+            return null;
         }
 
-        return ctx.spaceContext.space.title;
-    })();
+        const resolved = await resolveContentRef(contentRef, ctx.spaceContext, options);
 
-    return {
-        ...resolved,
-        ancestors: [
-            {
-                label: ancestorLabel,
-                href: ctx.baseURL.toString(),
-            },
-            ...(resolved.ancestors ?? []),
-        ].filter(filterOutNullable),
-    };
+        if (!resolved) {
+            return null;
+        }
+
+        // Prefer the variant title when available, then the section title, then fallback to the space title.
+        const ancestorLabel = (() => {
+            if ('site' in context) {
+                const currentLanguage = context.siteSpace.space.language;
+                const foundSiteSpace = findSiteSpaceBy(
+                    context.structure,
+                    (siteSpace) => siteSpace.space.id === spaceId
+                );
+                if (foundSiteSpace?.siteSpace) {
+                    return getLocalizedTitle(foundSiteSpace.siteSpace, currentLanguage);
+                }
+                if (foundSiteSpace?.siteSection) {
+                    return getLocalizedTitle(foundSiteSpace.siteSection, currentLanguage);
+                }
+                return ctx.spaceContext.space.title;
+            }
+
+            return ctx.spaceContext.space.title;
+        })();
+
+        return {
+            ...resolved,
+            ancestors: [
+                {
+                    label: ancestorLabel,
+                    href: ctx.baseURL.toString(),
+                },
+                ...(resolved.ancestors ?? []),
+            ].filter(filterOutNullable),
+        };
+    } catch (error) {
+        console.warn(`Error resolving content ref in space ${spaceId}:`, error);
+        return null;
+    }
 }
 
 /**

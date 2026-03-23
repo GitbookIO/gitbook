@@ -16,7 +16,7 @@ import jwt from 'jsonwebtoken';
 
 import { VISITOR_TOKEN_COOKIE } from '@/lib/visitors';
 
-import { getSiteAPIToken } from '../tests/utils';
+import { getGitBookPreviewURL, getSiteAPIToken } from '../tests/utils';
 import {
     type Test,
     type TestsCase,
@@ -709,10 +709,30 @@ const testCases: TestsCase[] = [
                     await expect(page.locator('[data-testid="print-button"]')).toBeVisible();
                 },
             },
+            {
+                name: 'Show error when missing token',
+                url: async () => {
+                    const data = await getSiteAPIToken(
+                        'https://gitbook.gitbook.io/test-gitbook-open/'
+                    );
+
+                    // Intentionally not setting the token to test error handling when the token is missing
+                    const searchParams = new URLSearchParams();
+                    searchParams.set('limit', '10');
+
+                    return `~space/${data.space}/~gitbook/pdf?${searchParams.toString()}`;
+                },
+                screenshot: false,
+                run: async (page, response) => {
+                    expect(response).not.toBeNull();
+                    expect(response?.status()).toBe(400);
+                    await expect(page.getByText('Missing API token')).toBeVisible();
+                },
+            },
         ],
     },
     {
-        name: 'Site Preview',
+        name: 'Site Previews',
         skip: process.env.ARGOS_BUILD_NAME !== 'v2-vercel',
         tests: [
             {
@@ -725,7 +745,7 @@ const testCases: TestsCase[] = [
                     const searchParams = new URLSearchParams();
                     searchParams.set('token', data.apiToken);
 
-                    return `url/preview/${data.site}/?${searchParams.toString()}`;
+                    return `url/${getGitBookPreviewURL(`${data.site}/?${searchParams.toString()}`)}`;
                 },
                 screenshot: false,
                 run: async (page) => {
@@ -740,7 +760,7 @@ const testCases: TestsCase[] = [
                     const searchParams = new URLSearchParams();
                     searchParams.set('token', data.apiToken);
 
-                    return `url/preview/${data.site}/?${searchParams.toString()}`;
+                    return `url/${getGitBookPreviewURL(`${data.site}/?${searchParams.toString()}`)}`;
                 },
                 screenshot: false,
                 run: async (page) => {
@@ -750,8 +770,70 @@ const testCases: TestsCase[] = [
                     const sectionTabLinks = sectionTabs.getByRole('link');
                     for (const link of await sectionTabLinks.all()) {
                         const href = await link.getAttribute('href');
-                        expect(href).toMatch(/^\/url\/preview\/site_p4Xo4\/?/);
+                        expect(href?.includes('/preview/site_p4Xo4')).toBeTruthy();
                     }
+                },
+            },
+            {
+                name: 'With customization cookie',
+                url: async () => {
+                    const data = await getSiteAPIToken(
+                        'https://gitbook.gitbook.io/test-gitbook-open/'
+                    );
+
+                    const searchParams = new URLSearchParams();
+                    searchParams.set('token', data.apiToken);
+
+                    return `url/${getGitBookPreviewURL(`${data.site}/?${searchParams.toString()}`)}`;
+                },
+                screenshot: false,
+                run: async (page) => {
+                    await expect(page.locator('[data-testid="table-of-contents"]')).toBeVisible();
+                    // Trademark exists by default
+                    await expect(page.getByTestId('gb-trademark')).toHaveCount(1);
+
+                    // Go to another page with the customization query to disable the trademark
+                    const pageBlocks = new URL(page.url());
+                    pageBlocks.pathname = `${pageBlocks.pathname.replace(/\/$/, '')}/blocks`;
+                    pageBlocks.search = getCustomizationURL({
+                        trademark: {
+                            enabled: false,
+                        },
+                    }).slice(1);
+                    await page.goto(pageBlocks.toString());
+                    // No trademark because customization is disabled
+                    await expect(page.getByTestId('gb-trademark')).toHaveCount(0);
+                    await expect(
+                        page.getByRole('heading', { level: 1, name: 'Blocks' })
+                    ).toBeVisible();
+
+                    const pageBlocksCode = new URL(page.url());
+                    pageBlocksCode.pathname = `${pageBlocksCode.pathname.replace(/\/$/, '')}/code`;
+                    pageBlocksCode.search = '';
+                    await page.goto(pageBlocksCode.toString());
+                    // The trademark should not be visible because the cookie is still set,
+                    await expect(page.getByTestId('gb-trademark')).toHaveCount(0);
+                    await expect(
+                        page.getByRole('heading', { level: 1, name: 'Code' })
+                    ).toBeVisible();
+                },
+            },
+            {
+                name: 'Redirect to app for authentication when missing token',
+                url: async () => {
+                    const data = await getSiteAPIToken('https://gitbook.com/docs');
+
+                    const searchParams = new URLSearchParams();
+                    // Intentionally not setting the token to test redirection for authentication
+
+                    return `url/${getGitBookPreviewURL(`${data.site}/?${searchParams.toString()}`)}`;
+                },
+                screenshot: false,
+                run: async (page) => {
+                    await page.waitForURL(
+                        (url) =>
+                            url.host === 'app.gitbook.com' && url.pathname.includes('/preview/auth')
+                    );
                 },
             },
         ],
@@ -1306,7 +1388,7 @@ const testCases: TestsCase[] = [
                     ).toBeVisible();
                     const url = page.url();
                     expect(url.includes('shared-space-uno')).toBeTruthy(); // same uno site
-                    expect(url.endsWith('/shared/')).toBeTruthy(); // correct page
+                    expect(url.endsWith('/shared')).toBeTruthy(); // correct page
                 },
                 screenshot: false,
             },
@@ -1326,7 +1408,7 @@ const testCases: TestsCase[] = [
                     ).toBeVisible();
                     const url = page.url();
                     expect(url.includes('shared-space-dos')).toBeTruthy(); // same dos site
-                    expect(url.endsWith('/shared/')).toBeTruthy(); // correct page
+                    expect(url.endsWith('/shared')).toBeTruthy(); // correct page
                 },
                 screenshot: false,
             },
