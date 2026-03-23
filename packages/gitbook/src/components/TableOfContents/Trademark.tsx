@@ -22,6 +22,9 @@ export function Trademark(props: {
     url.searchParams.set('utm_source', 'content');
     url.searchParams.set('utm_medium', 'trademark');
     url.searchParams.set('utm_campaign', space.id);
+    if ('site' in context) {
+        url.searchParams.set('utm_content', context.site.id);
+    }
 
     return (
         <Button
