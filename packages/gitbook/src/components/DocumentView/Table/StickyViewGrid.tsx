@@ -87,7 +87,7 @@ export function StickyViewGrid({ className, header, children }: StickyViewGridPr
                 <div
                     className={tcls(
                         '-mx-px sticky z-10 w-full min-w-0 max-w-full overflow-hidden px-px',
-                        '[top:calc(var(--toc-top-offset,var(--outline-top-offset,0px))+8px)]'
+                        '[top:var(--toc-top-offset,var(--outline-top-offset,0px))]'
                     )}
                     onWheel={onStickyHeaderWheel}
                 >
