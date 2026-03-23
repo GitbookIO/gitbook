@@ -5,7 +5,6 @@ import { tcls } from '@/lib/tailwind';
 import { RecordRow } from './RecordRow';
 import type { TableViewProps } from './Table';
 import { getColumnWidth, getViewGridLayout } from './layout';
-import styles from './table.module.css';
 import { getColumnAlignment } from './utils';
 
 export function ViewGridHeader(
@@ -19,7 +18,14 @@ export function ViewGridHeader(
     });
 
     return (
-        <div role="rowgroup" className={tcls(tableWidth, styles.rowGroup, className)}>
+        <div
+            role="rowgroup"
+            className={tcls(
+                tableWidth,
+                'mb-1 flex flex-col rounded-lg border border-tint-subtle bg-tint',
+                className
+            )}
+        >
             <div role="row" className={tcls('flex', 'w-full')}>
                 {view.columns.map((column) => {
                     const definition = block.data.definition[column];
@@ -31,7 +37,10 @@ export function ViewGridHeader(
                         <div
                             key={column}
                             role="columnheader"
-                            className={tcls(styles.columnHeader, getColumnAlignment(definition))}
+                            className={tcls(
+                                'px-3 py-2 font-medium text-sm text-tint-strong',
+                                getColumnAlignment(definition)
+                            )}
                             style={{
                                 width: getColumnWidth({
                                     column,

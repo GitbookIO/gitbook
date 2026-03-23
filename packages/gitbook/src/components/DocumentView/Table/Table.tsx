@@ -51,12 +51,20 @@ export function Table(props: BlockProps<DocumentBlockTable>) {
             if (withStickyHeader) {
                 return (
                     <StickyViewGrid
-                        className={tcls(style, styles.tableWrapper)}
+                        className={tcls(style, 'relative mx-auto grid w-full min-w-0')}
                         header={
                             <div aria-hidden="true">
                                 <ViewGridHeader
                                     {...gridProps}
-                                    className={styles.stickyHeaderRowGroup}
+                                    className={tcls(
+                                        'mb-0 rounded-b-none border-t border-r border-l',
+                                        'group-data-[scrollable=false]/table:mb-1',
+                                        'group-data-[scrollable=false]/table:rounded-b-lg',
+                                        'group-data-[scrollable=true]/table:border-t-0',
+                                        'group-data-[scrollable=true]/table:border-r-0',
+                                        'group-data-[scrollable=true]/table:border-l-0',
+                                        'group-data-[scrollable=true]/table:rounded-t-none'
+                                    )}
                                 />
                             </div>
                         }
@@ -67,8 +75,13 @@ export function Table(props: BlockProps<DocumentBlockTable>) {
             }
 
             return (
-                <div className={tcls(style, styles.tableWrapper)}>
-                    <div className={styles.tableScrollArea}>
+                <div className={tcls(style, 'relative mx-auto grid w-full min-w-0')}>
+                    <div
+                        className={tcls(
+                            styles.tableScrollArea,
+                            'w-full min-w-0 overflow-x-auto overflow-y-hidden border-tint-subtle'
+                        )}
+                    >
                         <ViewGrid {...gridProps} />
                     </div>
                 </div>
