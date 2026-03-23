@@ -13,6 +13,7 @@ import { resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
 import { SocialAccountLink } from '../Footer/SocialAccounts';
+import { SiteAuthLoginDropdownMenuItem } from '../SiteAuth/SiteAuthLoginLink';
 import { ToggleChevron } from '../primitives';
 import {
     DropdownMenu,
@@ -20,7 +21,6 @@ import {
     DropdownMenuSeparator,
     DropdownSubMenu,
 } from '../primitives/DropdownMenu';
-import { SiteAuthLoginDropdownMenuItem } from '../primitives/SiteAuthLoginLink';
 import styles from './headerLinks.module.css';
 
 /**

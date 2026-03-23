@@ -70,6 +70,10 @@ export const de = {
     notfound_link:
         'Dieser Link verweist auf eine Seite, die entfernt wurde oder nicht mehr existiert.',
     notfound: 'Die gesuchte Seite existiert nicht.',
+    notfound_adaptive_title: 'Seite nicht verfügbar',
+    notfound_adaptive:
+        'Diese Seite existiert möglicherweise, aber du musst dich eventuell anmelden, um darauf zuzugreifen.',
+    notfound_adaptive_login: 'Anmelden',
     unexpected_error_title: 'Ein Fehler ist aufgetreten',
     unexpected_error:
         'Entschuldigung, ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.',
