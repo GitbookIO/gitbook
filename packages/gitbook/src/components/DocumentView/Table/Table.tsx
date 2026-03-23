@@ -56,10 +56,12 @@ export function Table(props: BlockProps<DocumentBlockTable>) {
                     <StickyViewGrid
                         className={tcls(style, styles.tableWrapper)}
                         header={
-                            <ViewGridHeader
-                                {...gridProps}
-                                className={styles.stickyHeaderRowGroup}
-                            />
+                            <div aria-hidden="true">
+                                <ViewGridHeader
+                                    {...gridProps}
+                                    className={styles.stickyHeaderRowGroup}
+                                />
+                            </div>
                         }
                     >
                         <ViewGrid {...gridProps} headerClassName="sr-only" />
