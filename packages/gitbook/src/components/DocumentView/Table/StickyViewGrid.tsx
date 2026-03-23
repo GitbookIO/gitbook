@@ -7,10 +7,10 @@ import styles from './table.module.css';
 interface StickyViewGridProps {
     className?: string;
     header: ReactNode;
-    table: ReactNode;
+    children: ReactNode;
 }
 
-export function StickyViewGrid({ className, header, table }: StickyViewGridProps) {
+export function StickyViewGrid({ className, header, children }: StickyViewGridProps) {
     const rootRef = useRef<HTMLDivElement>(null);
     const bodyScrollRef = useRef<HTMLDivElement>(null);
     const bodyTableRef = useRef<HTMLDivElement>(null);
@@ -85,12 +85,8 @@ export function StickyViewGrid({ className, header, table }: StickyViewGridProps
                     className={styles.tableScrollArea}
                     onScroll={syncStickyLayout}
                 >
-                    <div
-                        ref={bodyTableRef}
-                        role="table"
-                        className={tcls('flex', 'flex-col', 'w-fit')}
-                    >
-                        {table}
+                    <div ref={bodyTableRef} className={tcls('flex', 'flex-col', 'w-fit')}>
+                        {children}
                     </div>
                 </div>
             </div>

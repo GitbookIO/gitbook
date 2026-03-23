@@ -4,7 +4,7 @@ import { tcls } from '@/lib/tailwind';
 
 import { RecordColumnValue } from './RecordColumnValue';
 import type { TableRecordKV, TableViewProps } from './Table';
-import { getColumnWidth } from './ViewGrid';
+import { getColumnWidth } from './layout';
 import styles from './table.module.css';
 import { getColumnVerticalAlignment } from './utils';
 
