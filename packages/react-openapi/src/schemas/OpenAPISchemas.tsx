@@ -39,7 +39,7 @@ export function OpenAPISchemas(props: {
     if (schemas.length === 1 && !grouped) {
         const title = `The ${firstSchema.name} object`;
         return (
-            <div className={clsx('openapi-schemas', className)}>
+            <div className={clsx('openapi-schemas openapi-schemas-single', className)}>
                 <div className="openapi-summary" id={context.id}>
                     {context.renderHeading({
                         title,
@@ -61,7 +61,7 @@ export function OpenAPISchemas(props: {
                     </div>
                     <div className="openapi-column-preview">
                         <div className="openapi-column-preview-body">
-                            <div className="openapi-panel">
+                            <div className="openapi-panel" data-follow-color-scheme="true">
                                 <h4 className="openapi-panel-heading">{title}</h4>
                                 <div className="openapi-panel-body">
                                     <OpenAPIExample

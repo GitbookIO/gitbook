@@ -1,6 +1,7 @@
 import type { GitBookSiteContext } from '@/lib/context';
-import { getDataOrNull } from '@/lib/data';
+import { DataFetcherError, getExposableError } from '@/lib/data';
 import { getMarkdownForPage } from '@/lib/markdownPage';
+import { resolvePagePathDocumentOrGroup } from '@/lib/pages';
 
 /**
  * Serve a markdown version of a page.
@@ -8,26 +9,23 @@ import { getMarkdownForPage } from '@/lib/markdownPage';
  */
 export async function servePageMarkdown(context: GitBookSiteContext, pagePath: string) {
     try {
-        const result = await getDataOrNull(getMarkdownForPage(context, pagePath));
-        if (!result) {
-            return new Response('Page not found', {
-                status: 404,
-                headers: {
-                    'Content-Type': 'text/plain; charset=utf-8',
-                },
-            });
+        const pageLookup = resolvePagePathDocumentOrGroup(context.revision.pages, pagePath);
+        if (!pageLookup) {
+            throw new DataFetcherError(`Page "${pagePath}" not found`, 404);
         }
 
-        return new Response(result, {
+        const markdown = await getMarkdownForPage(context, pageLookup);
+
+        return new Response(markdown, {
             headers: {
                 'Content-Type': 'text/markdown; charset=utf-8',
                 'X-Robots-Tag': 'noindex',
             },
         });
     } catch (error) {
-        console.error('Error serving markdown page:', error);
-        return new Response('Internal Server Error', {
-            status: 500,
+        const exposable = getExposableError(error);
+        return new Response(exposable.message, {
+            status: exposable.code,
             headers: {
                 'Content-Type': 'text/plain; charset=utf-8',
             },

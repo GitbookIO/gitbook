@@ -25,6 +25,7 @@ export function Trademark(props: {
 
     return (
         <Button
+            data-testid="gb-trademark"
             target="_blank"
             variant="secondary"
             size="large"

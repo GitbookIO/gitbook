@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test';
 import type { OpenAPIV3 } from '@gitbook/openapi-parser';
-import { getSchemaAlternatives } from './OpenAPISchema';
+import { getSchemaAlternatives, getSchemaProperties } from './OpenAPISchema';
 
 describe('getSchemaAlternatives', () => {
     it('should flatten oneOf', () => {
@@ -381,6 +381,168 @@ describe('getSchemaAlternatives', () => {
             });
         });
 
+        it('should merge annotation-only schema into object schema', () => {
+            expect(
+                getSchemaAlternatives({
+                    allOf: [
+                        {
+                            type: 'object',
+                            properties: {
+                                id: { type: 'string' },
+                                name: { type: 'string' },
+                            },
+                            required: ['id'],
+                        },
+                        {
+                            description: 'Overridden description',
+                        } as any,
+                    ],
+                })
+            ).toEqual({
+                type: 'allOf',
+                schemas: [
+                    {
+                        type: 'object',
+                        properties: {
+                            id: { type: 'string' },
+                            name: { type: 'string' },
+                        },
+                        required: ['id'],
+                        description: 'Overridden description',
+                    },
+                ],
+            });
+        });
+
+        it('should preserve parent metadata when flattening allOf inside oneOf alternative', () => {
+            const result = getSchemaAlternatives({
+                oneOf: [
+                    {
+                        title: 'Option A',
+                        description: 'First option',
+                        'x-custom': 'custom-value',
+                        allOf: [
+                            {
+                                type: 'object',
+                                properties: {
+                                    name: { type: 'string' },
+                                },
+                                required: ['name'],
+                            },
+                            {
+                                type: 'object',
+                                properties: {
+                                    age: { type: 'integer' },
+                                },
+                            },
+                        ],
+                    },
+                    {
+                        type: 'string',
+                    },
+                ],
+            });
+
+            expect(result).toEqual({
+                type: 'oneOf',
+                schemas: [
+                    {
+                        title: 'Option A',
+                        description: 'First option',
+                        'x-custom': 'custom-value',
+                        type: 'object',
+                        properties: {
+                            name: { type: 'string' },
+                            age: { type: 'integer' },
+                        },
+                        required: ['name'],
+                    },
+                    {
+                        type: 'string',
+                    },
+                ],
+            });
+        });
+
+        it('should merge annotation-only schema with multiple safe extensions', () => {
+            expect(
+                getSchemaAlternatives({
+                    allOf: [
+                        {
+                            type: 'object',
+                            properties: {
+                                id: { type: 'string' },
+                            },
+                            required: ['id'],
+                            description: 'Original description',
+                        },
+                        {
+                            description: 'Overridden description',
+                            title: 'Overridden title',
+                            deprecated: true,
+                        } as any,
+                    ],
+                })
+            ).toEqual({
+                type: 'allOf',
+                schemas: [
+                    {
+                        type: 'object',
+                        properties: {
+                            id: { type: 'string' },
+                        },
+                        required: ['id'],
+                        description: 'Overridden description',
+                        title: 'Overridden title',
+                        deprecated: true,
+                    },
+                ],
+            });
+        });
+
+        it('should preserve parent metadata when flattening allOf inside anyOf alternative', () => {
+            const result = getSchemaAlternatives({
+                anyOf: [
+                    {
+                        title: 'Variant B',
+                        description: 'A variant with extensions',
+                        'x-deprecated-reason': 'use v2',
+                        allOf: [
+                            {
+                                type: 'object',
+                                properties: {
+                                    id: { type: 'string' },
+                                },
+                            },
+                            {
+                                type: 'object',
+                                properties: {
+                                    value: { type: 'number' },
+                                },
+                            },
+                        ],
+                    },
+                ],
+            });
+
+            expect(result).toEqual({
+                type: 'anyOf',
+                schemas: [
+                    {
+                        title: 'Variant B',
+                        description: 'A variant with extensions',
+                        'x-deprecated-reason': 'use v2',
+                        type: 'object',
+                        properties: {
+                            id: { type: 'string' },
+                            value: { type: 'number' },
+                        },
+                        required: [],
+                    },
+                ],
+            });
+        });
+
         it('should NOT merge objects with unsafe properties', () => {
             expect(
                 getSchemaAlternatives({
@@ -518,5 +680,87 @@ describe('getSchemaAlternatives', () => {
             expect(result?.schemas[0]?.required).toContain('key');
             expect(result?.schemas[0]?.required).toContain('labelArgbColor');
         });
+    });
+});
+
+describe('getSchemaProperties', () => {
+    it('should merge required fields from allOf schemas', () => {
+        const schema: OpenAPIV3.SchemaObject = {
+            allOf: [
+                {
+                    type: 'object',
+                    properties: { id: { type: 'integer' } },
+                    required: ['id'],
+                },
+                {
+                    type: 'object',
+                    properties: { name: { type: 'string' } },
+                    required: ['name'],
+                },
+            ],
+        };
+
+        const result = getSchemaProperties(schema);
+        expect(result?.find((p) => p.propertyName === 'id')?.required).toBe(true);
+        expect(result?.find((p) => p.propertyName === 'name')?.required).toBe(true);
+    });
+
+    it('should deep-merge overlapping properties from allOf schemas', () => {
+        const schema: OpenAPIV3.SchemaObject = {
+            allOf: [
+                {
+                    type: 'object',
+                    properties: {
+                        tags: {
+                            type: 'array',
+                            items: {
+                                type: 'object',
+                                properties: {
+                                    color: { type: 'string' },
+                                    category: {
+                                        type: 'object',
+                                        properties: { icon: { type: 'string' } },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                {
+                    type: 'object',
+                    properties: {
+                        tags: {
+                            type: 'array',
+                            items: {
+                                type: 'object',
+                                properties: {
+                                    id: { type: 'integer' },
+                                    category: {
+                                        type: 'object',
+                                        properties: { name: { type: 'string' } },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+            ],
+        };
+
+        const result = getSchemaProperties(schema);
+        const tagItemProps =
+            (
+                result?.find((p) => p.propertyName === 'tags')?.schema
+                    ?.items as OpenAPIV3.SchemaObject
+            )?.properties ?? {};
+
+        // Array items merged from both branches
+        expect(tagItemProps).toHaveProperty('id');
+        expect(tagItemProps).toHaveProperty('color');
+
+        // Nested object properties also deep-merged
+        const categoryProps = (tagItemProps.category as OpenAPIV3.SchemaObject)?.properties ?? {};
+        expect(categoryProps).toHaveProperty('name');
+        expect(categoryProps).toHaveProperty('icon');
     });
 });

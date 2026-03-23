@@ -5,7 +5,7 @@ import {
     throwIfDataError,
 } from '@/lib/data';
 import { getLogger } from '@/lib/logger';
-import { getSiteStructureSections } from '@/lib/sites';
+import { getLocalizedTitle, getSiteStructureSections } from '@/lib/sites';
 import type {
     ChangeRequest,
     PublishedSiteContent,
@@ -45,6 +45,7 @@ export type SiteURLData = Pick<
     | 'siteBasePath'
     | 'basePath'
     | 'contextId'
+    | 'preview'
 > & {
     /**
      * Identifier used for image resizing.
@@ -257,13 +258,6 @@ export async function fetchSiteContextByIds(
             fetchSpaceContextByIds(baseContext, ids),
         ]);
 
-    // override the title with the customization title
-    // TODO: remove this hack once we have a proper way to handle site customizations
-    const site = {
-        ...orgSite,
-        ...(customizations.site?.title ? { title: customizations.site.title } : {}),
-    };
-
     const sections = ids.siteSection
         ? parseSiteSectionsAndGroups(siteStructure, ids.siteSection)
         : null;
@@ -335,6 +329,23 @@ export async function fetchSiteContextByIds(
 
         return customizations.site;
     })();
+
+    // override the title with the customization title
+    // TODO: remove this hack once we have a proper way to handle site customizations
+    const site = {
+        ...orgSite,
+        ...(customizations.site?.title
+            ? {
+                  title: getLocalizedTitle(
+                      {
+                          title: customizations.site.title,
+                          localizedTitle: customizations.site.localizedTitle,
+                      },
+                      siteSpace.space.language
+                  ),
+              }
+            : {}),
+    };
 
     return {
         ...spaceContext,
