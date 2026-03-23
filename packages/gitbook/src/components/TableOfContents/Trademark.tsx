@@ -3,14 +3,14 @@ import type { SiteInsightsTrademarkPlacement } from '@gitbook/api';
 import { getSpaceLanguage, tString } from '@/intl/server';
 import { tcls } from '@/lib/tailwind';
 
-import type { GitBookSpaceContext } from '@/lib/context';
+import type { GitBookAnyContext } from '@/lib/context';
 import { Button } from '../primitives';
 
 /**
  * Trademark link to the GitBook.
  */
 export function Trademark(props: {
-    context: GitBookSpaceContext;
+    context: GitBookAnyContext;
     placement: SiteInsightsTrademarkPlacement;
     className?: string;
 }) {
@@ -22,6 +22,9 @@ export function Trademark(props: {
     url.searchParams.set('utm_source', 'content');
     url.searchParams.set('utm_medium', 'trademark');
     url.searchParams.set('utm_campaign', space.id);
+    if ('site' in context) {
+        url.searchParams.set('utm_content', context.site.id);
+    }
 
     return (
         <Button
