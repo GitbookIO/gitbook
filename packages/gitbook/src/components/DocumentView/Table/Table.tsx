@@ -46,10 +46,7 @@ export function Table(props: BlockProps<DocumentBlockTable>) {
             };
             const withHeader = hasVisibleHeader(block, block.data.view);
             const withStickyHeader =
-                withHeader &&
-                context.mode !== 'print' &&
-                'stickyHeader' in block.data.view &&
-                block.data.view.stickyHeader === true;
+                withHeader && context.mode !== 'print' && block.data.view.stickyHeader === true;
 
             if (withStickyHeader) {
                 return (
