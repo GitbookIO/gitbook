@@ -68,7 +68,10 @@ export function AIChatMessages(props: {
                                 'animate-blur-in-slow',
                                 message.role === AIMessageRole.User
                                     ? 'max-w-[80%] origin-top-right self-end circular-corners:rounded-2xl rounded-corners:rounded-md bg-tint px-4 py-2'
-                                    : 'origin-top-left text-tint-strong'
+                                    : 'origin-top-left text-tint-strong',
+                                isLastMessage && message.role === AIMessageRole.Assistant
+                                    ? 'grow'
+                                    : ''
                             )}
                             style={{
                                 animationDelay: `${Math.min(originalIndex * 0.1, 0.6)}s`,
@@ -94,7 +97,7 @@ export function AIChatMessages(props: {
                                     !chat.error &&
                                     chat.query &&
                                     chat.responseId &&
-                                    chat.control ? (
+                                    !chat.control ? (
                                         <AIResponseFeedback
                                             responseId={chat.responseId}
                                             query={chat.query}

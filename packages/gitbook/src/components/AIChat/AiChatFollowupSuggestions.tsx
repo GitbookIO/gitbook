@@ -15,7 +15,7 @@ export function AIChatFollowupSuggestions(props: {
     }
 
     return (
-        <div className="flex grow flex-col">
+        <div className="mt-auto flex grow flex-col">
             <div
                 className="sticky bottom-0 mt-auto flex max-w-full flex-col items-start gap-2"
                 data-testid="ai-chat-followup-suggestions"
