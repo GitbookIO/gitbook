@@ -13,10 +13,11 @@ interface StickyViewGridProps {
 
 export function StickyViewGrid({ className, header, children }: StickyViewGridProps) {
     const rootRef = useRef<HTMLDivElement>(null);
+    const stickyHeaderRef = useRef<HTMLDivElement>(null);
     const bodyScrollRef = useRef<HTMLDivElement>(null);
     const bodyTableRef = useRef<HTMLDivElement>(null);
 
-    const onStickyHeaderWheel = useCallback((event: React.WheelEvent<HTMLDivElement>) => {
+    const onStickyHeaderWheel = useCallback((event: WheelEvent) => {
         const bodyScrollElement = bodyScrollRef.current;
         if (!bodyScrollElement) {
             return;
@@ -30,6 +31,19 @@ export function StickyViewGrid({ className, header, children }: StickyViewGridPr
         bodyScrollElement.scrollLeft += horizontalDelta;
         event.preventDefault();
     }, []);
+
+    useEffect(() => {
+        const stickyHeaderElement = stickyHeaderRef.current;
+        if (!stickyHeaderElement) {
+            return;
+        }
+
+        stickyHeaderElement.addEventListener('wheel', onStickyHeaderWheel, { passive: false });
+
+        return () => {
+            stickyHeaderElement.removeEventListener('wheel', onStickyHeaderWheel);
+        };
+    }, [onStickyHeaderWheel]);
 
     const syncStickyLayout = useCallback(() => {
         const rootElement = rootRef.current;
@@ -85,11 +99,11 @@ export function StickyViewGrid({ className, header, children }: StickyViewGridPr
                 data-scrollable="false"
             >
                 <div
+                    ref={stickyHeaderRef}
                     className={tcls(
-                        '-mx-px sticky z-10 w-full min-w-0 max-w-full overflow-hidden px-px',
+                        '-mx-px sticky z-10 w-full min-w-0 max-w-full overflow-hidden rounded-t-[inherit] px-px',
                         '[top:var(--toc-top-offset,var(--outline-top-offset,0px))]'
                     )}
-                    onWheel={onStickyHeaderWheel}
                 >
                     <div
                         className={tcls(

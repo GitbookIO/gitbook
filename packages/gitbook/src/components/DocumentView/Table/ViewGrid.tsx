@@ -7,9 +7,11 @@ import type { TableViewProps } from './Table';
 import { getColumnWidth, getViewGridLayout } from './layout';
 import { getColumnAlignment } from './utils';
 
-export function ViewGridHeader(
-    props: TableViewProps<DocumentTableViewGrid> & { className?: string }
-) {
+interface ViewGridHeaderProps extends TableViewProps<DocumentTableViewGrid> {
+    className?: string;
+}
+
+export function ViewGridHeader(props: ViewGridHeaderProps) {
     const { block, view, context, className } = props;
     const { tableWidth, columnWidths, autoSizedColumns, fixedColumns } = getViewGridLayout({
         block,
@@ -61,13 +63,9 @@ export function ViewGridHeader(
     );
 }
 
-export interface ViewGridProps extends TableViewProps<DocumentTableViewGrid> {
-    headerClassName?: string;
-}
-
-export function ViewGrid(props: ViewGridProps) {
-    const { block, view, records, context, headerClassName } = props;
-    const { withHeader, tableWidth, autoSizedColumns, fixedColumns } = getViewGridLayout({
+export function ViewGrid(props: TableViewProps<DocumentTableViewGrid>) {
+    const { block, view, records, context } = props;
+    const { tableWidth, autoSizedColumns, fixedColumns } = getViewGridLayout({
         block,
         view,
         mode: context.mode,
@@ -89,7 +87,6 @@ export function ViewGrid(props: ViewGridProps) {
 
     return (
         <div role="table" className={tcls('flex', 'flex-col', 'w-fit')}>
-            {withHeader ? <ViewGridHeader {...props} className={headerClassName} /> : null}
             {body}
         </div>
     );

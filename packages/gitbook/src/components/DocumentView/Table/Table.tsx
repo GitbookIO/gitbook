@@ -53,23 +53,21 @@ export function Table(props: BlockProps<DocumentBlockTable>) {
                     <StickyViewGrid
                         className={tcls(style, 'relative mx-auto grid w-full min-w-0')}
                         header={
-                            <div aria-hidden="true">
-                                <ViewGridHeader
-                                    {...gridProps}
-                                    className={tcls(
-                                        'mb-0 rounded-b-none border-t border-r border-l',
-                                        'group-data-[scrollable=false]/table:mb-1',
-                                        'group-data-[scrollable=false]/table:rounded-b-lg',
-                                        'group-data-[scrollable=true]/table:border-t-0',
-                                        'group-data-[scrollable=true]/table:border-r-0',
-                                        'group-data-[scrollable=true]/table:border-l-0',
-                                        'group-data-[scrollable=true]/table:rounded-t-none'
-                                    )}
-                                />
-                            </div>
+                            <ViewGridHeader
+                                {...gridProps}
+                                className={tcls(
+                                    'mb-0 rounded-b-none border-t border-r border-l',
+                                    'group-data-[scrollable=false]/table:mb-1',
+                                    'group-data-[scrollable=false]/table:rounded-b-lg',
+                                    'group-data-[scrollable=true]/table:border-t-0',
+                                    'group-data-[scrollable=true]/table:border-r-0',
+                                    'group-data-[scrollable=true]/table:border-l-0',
+                                    'group-data-[scrollable=true]/table:rounded-t-none'
+                                )}
+                            />
                         }
                     >
-                        <ViewGrid {...gridProps} headerClassName="sr-only" />
+                        <ViewGrid {...gridProps} />
                     </StickyViewGrid>
                 );
             }
@@ -82,7 +80,10 @@ export function Table(props: BlockProps<DocumentBlockTable>) {
                             'w-full min-w-0 overflow-x-auto overflow-y-hidden border-tint-subtle'
                         )}
                     >
-                        <ViewGrid {...gridProps} />
+                        <div className={tcls('flex', 'flex-col', 'w-fit')}>
+                            {withHeader ? <ViewGridHeader {...gridProps} /> : null}
+                            <ViewGrid {...gridProps} />
+                        </div>
                     </div>
                 </div>
             );
