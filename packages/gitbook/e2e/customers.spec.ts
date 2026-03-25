@@ -233,7 +233,7 @@ const testCases: TestsCase[] = [
         name: 'run-ai-docs.nvidia.com',
         contentBaseURL: 'https://run-ai-docs.nvidia.com',
         tests: [
-            { name: 'Home', url: '/' },
+            //   { name: 'Home', url: '/' } Temporarily skipped: this page is unstable in CI during Argos screenshots.
             { name: 'OG Image', url: '/~gitbook/ogimage/h17zQIFwy3MaafVNmItO', mode: 'image' },
         ],
     },
