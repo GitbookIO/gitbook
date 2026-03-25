@@ -9,6 +9,7 @@ import { getColumnAlignment } from './utils';
 
 interface ViewGridHeaderProps extends TableViewProps<DocumentTableViewGrid> {
     className?: string;
+    tableClassName?: string;
 }
 
 interface ViewGridProps extends TableViewProps<DocumentTableViewGrid> {
@@ -16,7 +17,7 @@ interface ViewGridProps extends TableViewProps<DocumentTableViewGrid> {
 }
 
 export function ViewGridHeader(props: ViewGridHeaderProps) {
-    const { block, view, context, className } = props;
+    const { block, view, context, className, tableClassName } = props;
     const { tableWidth, columnWidths, autoSizedColumns, fixedColumns } = getViewGridLayout({
         block,
         view,
@@ -27,7 +28,7 @@ export function ViewGridHeader(props: ViewGridHeaderProps) {
         <div
             role="rowgroup"
             className={tcls(
-                tableWidth,
+                tableClassName ?? tableWidth,
                 'mb-1 flex flex-col rounded-lg border border-tint-subtle bg-tint',
                 className
             )}
@@ -76,7 +77,10 @@ export function ViewGrid(props: ViewGridProps) {
     });
 
     const body = (
-        <div role="rowgroup" className={tcls('flex', 'flex-col', tableWidth, '[&>*+*]:border-t')}>
+        <div
+            role="rowgroup"
+            className={tcls('flex', 'flex-col', tableClassName ?? tableWidth, '[&>*+*]:border-t')}
+        >
             {records.map((record) => (
                 <RecordRow
                     key={record[0]}
@@ -90,7 +94,7 @@ export function ViewGrid(props: ViewGridProps) {
     );
 
     return (
-        <div role="table" className={tcls('flex', 'flex-col', tableClassName ?? 'w-fit')}>
+        <div role="table" className={tcls('flex', 'flex-col', tableClassName ?? tableWidth)}>
             {body}
         </div>
     );
