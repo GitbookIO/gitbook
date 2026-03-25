@@ -6,10 +6,16 @@ import { type ReactNode, useCallback, useEffect, useLayoutEffect, useRef } from 
 interface StickyViewGridProps {
     className?: string;
     header: ReactNode;
+    tableClassName?: string;
     children: ReactNode;
 }
 
-export function StickyViewGrid({ className, header, children }: StickyViewGridProps) {
+export function StickyViewGrid({
+    className,
+    header,
+    tableClassName,
+    children,
+}: StickyViewGridProps) {
     const rootRef = useRef<HTMLDivElement>(null);
     const stickyHeaderRef = useRef<HTMLDivElement>(null);
     const bodyScrollRef = useRef<HTMLDivElement>(null);
@@ -114,7 +120,7 @@ export function StickyViewGrid({ className, header, children }: StickyViewGridPr
                         className={tcls(
                             'flex',
                             'flex-col',
-                            'w-fit',
+                            tableClassName ?? 'w-fit',
                             '[transform:translateX(var(--table-sticky-scroll-left,0px))]'
                         )}
                         style={{ width: 'var(--table-sticky-table-width)' }}
@@ -132,7 +138,10 @@ export function StickyViewGrid({ className, header, children }: StickyViewGridPr
                         'group-data-[scrollable=true]/table:rounded-none'
                     )}
                 >
-                    <div ref={bodyTableRef} className={tcls('flex', 'flex-col', 'w-fit')}>
+                    <div
+                        ref={bodyTableRef}
+                        className={tcls('flex', 'flex-col', tableClassName ?? 'w-fit')}
+                    >
                         {children}
                     </div>
                 </div>
