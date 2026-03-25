@@ -118,6 +118,7 @@ export function OpenAPIResponses(props: {
         <StaticSection header={t(context.translation, 'responses')} className="openapi-responses">
             <OpenAPIDisclosureGroup
                 icon={context.icons.chevronRight}
+                allowsMultipleExpanded={expandAll}
                 expandedKeys={expandedKeys}
                 onExpandedChange={(keys) => {
                     const key = keys.values().next().value ?? null;
