@@ -11,6 +11,10 @@ interface ViewGridHeaderProps extends TableViewProps<DocumentTableViewGrid> {
     className?: string;
 }
 
+interface ViewGridProps extends TableViewProps<DocumentTableViewGrid> {
+    tableClassName?: string;
+}
+
 export function ViewGridHeader(props: ViewGridHeaderProps) {
     const { block, view, context, className } = props;
     const { tableWidth, columnWidths, autoSizedColumns, fixedColumns } = getViewGridLayout({
@@ -63,8 +67,8 @@ export function ViewGridHeader(props: ViewGridHeaderProps) {
     );
 }
 
-export function ViewGrid(props: TableViewProps<DocumentTableViewGrid>) {
-    const { block, view, records, context } = props;
+export function ViewGrid(props: ViewGridProps) {
+    const { block, view, records, context, tableClassName } = props;
     const { tableWidth, autoSizedColumns, fixedColumns } = getViewGridLayout({
         block,
         view,
@@ -86,7 +90,7 @@ export function ViewGrid(props: TableViewProps<DocumentTableViewGrid>) {
     );
 
     return (
-        <div role="table" className={tcls('flex', 'flex-col', 'w-fit')}>
+        <div role="table" className={tcls('flex', 'flex-col', tableClassName ?? 'w-fit')}>
             {body}
         </div>
     );

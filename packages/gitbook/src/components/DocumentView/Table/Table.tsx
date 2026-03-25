@@ -8,7 +8,7 @@ import { isBlockOffscreen } from '../utils';
 import { StickyViewGrid } from './StickyViewGrid';
 import { ViewCards } from './ViewCards';
 import { ViewGrid, ViewGridHeader } from './ViewGrid';
-import { hasVisibleHeader } from './layout';
+import { getViewGridLayout, hasVisibleHeader } from './layout';
 
 export type TableRecordKV = [string, DocumentTableRecord];
 
@@ -43,6 +43,13 @@ export function Table(props: BlockProps<DocumentBlockTable>) {
                 isOffscreen,
                 records,
             };
+            const { tableWidth } = getViewGridLayout({
+                block,
+                view: block.data.view,
+                mode: context.mode,
+            });
+            const tableContainerClassName =
+                tableWidth === 'w-full' ? 'min-w-full w-fit' : tableWidth;
             const withHeader = hasVisibleHeader(block, block.data.view);
             const withStickyHeader =
                 withHeader && context.mode !== 'print' && block.data.view.stickyHeader === true;
@@ -51,6 +58,7 @@ export function Table(props: BlockProps<DocumentBlockTable>) {
                 return (
                     <StickyViewGrid
                         className={tcls(style, 'relative mx-auto grid w-full min-w-0')}
+                        tableClassName={tableContainerClassName}
                         header={
                             <ViewGridHeader
                                 {...gridProps}
@@ -77,9 +85,14 @@ export function Table(props: BlockProps<DocumentBlockTable>) {
                             'w-full min-w-0 overflow-x-auto overflow-y-hidden overscroll-x-none border-tint-subtle '
                         )}
                     >
-                        <div className={tcls('flex', 'flex-col', 'w-fit')}>
-                            {withHeader ? <ViewGridHeader {...gridProps} /> : null}
-                            <ViewGrid {...gridProps} />
+                        <div className={tcls('flex', 'flex-col', tableContainerClassName)}>
+                            {withHeader ? (
+                                <ViewGridHeader
+                                    {...gridProps}
+                                    className={tableContainerClassName}
+                                />
+                            ) : null}
+                            <ViewGrid {...gridProps} tableClassName={tableContainerClassName} />
                         </div>
                     </div>
                 </div>
