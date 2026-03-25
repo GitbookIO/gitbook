@@ -62,6 +62,7 @@ export function Table(props: BlockProps<DocumentBlockTable>) {
                         header={
                             <ViewGridHeader
                                 {...gridProps}
+                                tableClassName={tableContainerClassName}
                                 className={tcls(
                                     'mb-0 rounded-b-none border-t border-r border-l',
                                     'group-data-[scrollable=false]/table:mb-1',
@@ -73,7 +74,7 @@ export function Table(props: BlockProps<DocumentBlockTable>) {
                             />
                         }
                     >
-                        <ViewGrid {...gridProps} />
+                        <ViewGrid {...gridProps} tableClassName={tableContainerClassName} />
                     </StickyViewGrid>
                 );
             }
@@ -89,6 +90,7 @@ export function Table(props: BlockProps<DocumentBlockTable>) {
                             {withHeader ? (
                                 <ViewGridHeader
                                     {...gridProps}
+                                    tableClassName={tableContainerClassName}
                                     className={tableContainerClassName}
                                 />
                             ) : null}
