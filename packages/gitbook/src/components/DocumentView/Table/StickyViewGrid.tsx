@@ -93,7 +93,7 @@ export function StickyViewGrid({ className, header, children }: StickyViewGridPr
             <div
                 ref={rootRef}
                 className={tcls(
-                    'group/table relative flex w-full min-w-0 max-w-full flex-col rounded-t-none rounded-b-lg border-tint-subtle',
+                    'group/table relative flex w-full min-w-0 max-w-full flex-col rounded-lg border-tint-subtle',
                     'data-[scrollable=true]:border'
                 )}
                 data-scrollable="false"
@@ -101,7 +101,7 @@ export function StickyViewGrid({ className, header, children }: StickyViewGridPr
                 <div
                     ref={stickyHeaderRef}
                     className={tcls(
-                        '-mx-px sticky z-10 w-full min-w-0 max-w-full overflow-hidden rounded-t-none px-px',
+                        '-mx-px sticky z-10 w-full min-w-0 max-w-full overflow-hidden rounded-t-[inherit] px-px',
                         '[top:var(--toc-top-offset,var(--outline-top-offset,0px))]'
                     )}
                 >
@@ -123,6 +123,7 @@ export function StickyViewGrid({ className, header, children }: StickyViewGridPr
                     className={tcls(
                         styles.tableScrollArea,
                         'w-full min-w-0 overflow-x-auto overflow-y-hidden border-tint-subtle',
+                        'group-data-[scrollable=true]/table:mx-px',
                         'group-data-[scrollable=true]/table:border-0',
                         'group-data-[scrollable=true]/table:rounded-none'
                     )}

@@ -56,8 +56,9 @@ export function Table(props: BlockProps<DocumentBlockTable>) {
                             <ViewGridHeader
                                 {...gridProps}
                                 className={tcls(
-                                    'mb-0 rounded-t-none rounded-b-none border-t border-r border-l',
+                                    'mb-0 rounded-b-none border-t border-r border-l',
                                     'group-data-[scrollable=false]/table:mb-1',
+                                    'group-data-[scrollable=false]/table:rounded-b-lg',
                                     'group-data-[scrollable=true]/table:border-t-0',
                                     'group-data-[scrollable=true]/table:border-r-0',
                                     'group-data-[scrollable=true]/table:border-l-0'
