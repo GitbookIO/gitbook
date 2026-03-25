@@ -3,8 +3,8 @@ import { resolveContentRefFallback, resolveContentRefInDocument } from '@/lib/re
 import * as api from '@gitbook/api';
 import type { IconName } from '@gitbook/icons';
 import type React from 'react';
+import { SiteAuthLoginButton } from '../SiteAuth/SiteAuthLoginLink';
 import { Button, type ButtonProps } from '../primitives';
-import { SiteAuthLoginButton } from '../primitives/SiteAuthLoginLink';
 import type { InlineProps } from './Inline';
 import { InlineActionButton } from './InlineActionButton';
 import { NotFoundRefHoverCard } from './NotFoundRefHoverCard';

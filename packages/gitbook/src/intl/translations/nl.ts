@@ -71,6 +71,10 @@ export const nl: TranslationLanguage = {
     notfound_title: 'Pagina niet gevonden',
     notfound_link: 'Deze link verwijst naar een pagina die is verwijderd of niet meer bestaat.',
     notfound: 'De pagina die je zoekt, bestaat niet.',
+    notfound_adaptive_title: 'Pagina niet beschikbaar',
+    notfound_adaptive:
+        'Deze pagina bestaat mogelijk, maar je moet mogelijk inloggen om toegang te krijgen.',
+    notfound_adaptive_login: 'Inloggen',
     unexpected_error_title: 'Er is een fout opgetreden',
     unexpected_error: 'Sorry, er is een onverwachte fout opgetreden. Probeer het later opnieuw.',
     unexpected_error_retry: 'Opnieuw proberen',

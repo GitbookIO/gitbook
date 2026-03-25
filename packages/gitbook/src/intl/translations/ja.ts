@@ -71,6 +71,10 @@ export const ja: TranslationLanguage = {
     notfound_title: 'ページが見つかりません',
     notfound_link: 'このリンクは、削除されたか、もはや存在しないページを指しています。',
     notfound: 'お探しのページは存在しません。',
+    notfound_adaptive_title: 'ページにアクセスできません',
+    notfound_adaptive:
+        'このページは存在する可能性がありますが、アクセスするにはログインが必要な場合があります。',
+    notfound_adaptive_login: 'ログイン',
     unexpected_error_title: 'エラーが発生しました',
     unexpected_error: '申し訳ありません、予期せぬエラーが発生しました。もう一度お試しください。',
     unexpected_error_retry: '再試行',

@@ -226,7 +226,7 @@ export function AIChatBody(props: {
         <>
             <ScrollContainer
                 className="min-h-[20%] shrink grow animate-fade-in-slow [container-type:size]"
-                contentClassName="py-4 gutter-stable flex flex-col gap-4"
+                contentClassName="py-4 gutter-stable flex flex-col gap-4 [scroll-behavior:smooth]"
                 orientation="vertical"
                 trailing={{ fade: false, button: true }}
                 active={`#message-group-${chat.messages.filter((message) => message.role === 'user').length - 1}`}

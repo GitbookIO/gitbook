@@ -51,6 +51,10 @@ export function SpaceLayoutServerContext(props: SpaceLayoutProps) {
         props;
 
     const { customization } = context;
+    const siteAdaptiveAuthLoginHref =
+        context.site.adaptiveContent?.enabled && context.site.urls.login
+            ? context.linker.toPathInSite('~gitbook/auth/login')
+            : null;
 
     const eventUrl = new URL(
         context.linker.toAbsoluteURL(context.linker.toPathInSite('/~gitbook/__evt'))
@@ -63,7 +67,10 @@ export function SpaceLayoutServerContext(props: SpaceLayoutProps) {
     );
 
     return (
-        <SpaceLayoutContextProvider basePath={context.linker.toPathInSpace('')}>
+        <SpaceLayoutContextProvider
+            basePath={context.linker.toPathInSpace('')}
+            siteAdaptiveAuthLoginHref={siteAdaptiveAuthLoginHref}
+        >
             <AdaptiveVisitorContextProvider
                 contextId={context.contextId}
                 visitorClaimsURL={getVisitorClaimsUrl}
