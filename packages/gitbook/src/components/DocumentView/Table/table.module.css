@@ -1,7 +1,5 @@
 @reference "../../RootLayout/globals.css";
 
 .tableScrollArea {
-    animation: detect-scroll linear;
-    animation-timeline: scroll(self x);
     overscroll-behavior-x: none;
 }

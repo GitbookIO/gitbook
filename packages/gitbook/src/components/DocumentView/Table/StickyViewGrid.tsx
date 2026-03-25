@@ -73,15 +73,22 @@ export function StickyViewGrid({ className, header, children }: StickyViewGridPr
     useScrollListener(syncStickyLayout, bodyScrollRef);
 
     useEffect(() => {
-        const elements = [bodyScrollRef.current, bodyTableRef.current].filter(
-            (element): element is HTMLDivElement => Boolean(element)
-        );
-        if (elements.length === 0) {
+        const bodyScrollElement = bodyScrollRef.current;
+        const bodyTableElement = bodyTableRef.current;
+
+        if (!bodyScrollElement && !bodyTableElement) {
             return;
         }
 
         const resizeObserver = new ResizeObserver(syncStickyLayout);
-        elements.forEach((element) => resizeObserver.observe(element));
+
+        if (bodyScrollElement) {
+            resizeObserver.observe(bodyScrollElement);
+        }
+
+        if (bodyTableElement) {
+            resizeObserver.observe(bodyTableElement);
+        }
 
         return () => {
             resizeObserver.disconnect();
