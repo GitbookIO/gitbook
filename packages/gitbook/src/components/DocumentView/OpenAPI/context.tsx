@@ -24,8 +24,10 @@ export function getOpenAPIContext(args: {
     props: BlockProps<AnyOpenAPIOperationsBlock | OpenAPISchemasBlock | OpenAPIWebhookBlock>;
     specUrl: string | null;
     context: GitBookAnyContext | undefined;
+    expandAllResponses?: boolean;
+    expandAllModelSections?: boolean;
 }): OpenAPIContextInput {
-    const { props, specUrl, context } = args;
+    const { props, specUrl, context, expandAllResponses, expandAllModelSections } = args;
     const { block } = props;
 
     const customizationLocale = context ? getSpaceLocale(context) : DEFAULT_LOCALE;
@@ -91,7 +93,8 @@ export function getOpenAPIContext(args: {
                 }}
             />
         ),
-        defaultInteractiveOpened: props.context.mode === 'print',
+        expandAllResponses: expandAllResponses || props.context.mode === 'print',
+        expandAllModelSections: expandAllModelSections || props.context.mode === 'print',
         id: block.meta?.id,
         blockKey: block.key,
         locale,
