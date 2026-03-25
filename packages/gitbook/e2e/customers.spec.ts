@@ -1,5 +1,18 @@
 import { type TestsCase, runTestCases, waitForCookiesDialog } from './util';
 
+const ONE_HOUR_IN_MS = 60 * 60 * 1000;
+
+const CLOSED_ONETRUST_COOKIE_BANNER = [
+    {
+        name: '__gitbook_cookie_granted',
+        value: 'no',
+    },
+    {
+        name: 'OptanonAlertBoxClosed',
+        value: new Date(Date.now() - ONE_HOUR_IN_MS).toISOString(),
+    },
+];
+
 /** A list of test cases to run on the customers' docs sites. */
 const testCases: TestsCase[] = [
     {
@@ -233,7 +246,11 @@ const testCases: TestsCase[] = [
         name: 'run-ai-docs.nvidia.com',
         contentBaseURL: 'https://run-ai-docs.nvidia.com',
         tests: [
-            //   { name: 'Home', url: '/' } Temporarily skipped: this page is unstable in CI during Argos screenshots.
+            {
+                name: 'Home',
+                url: '/',
+                cookies: CLOSED_ONETRUST_COOKIE_BANNER,
+            },
             { name: 'OG Image', url: '/~gitbook/ogimage/h17zQIFwy3MaafVNmItO', mode: 'image' },
         ],
     },
