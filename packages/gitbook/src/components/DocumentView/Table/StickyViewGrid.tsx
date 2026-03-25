@@ -3,8 +3,6 @@ import { useScrollListener } from '@/components/hooks/useScrollListener';
 import { tcls } from '@/lib/tailwind';
 import { type ReactNode, useCallback, useEffect, useLayoutEffect, useRef } from 'react';
 
-import styles from './table.module.css';
-
 interface StickyViewGridProps {
     className?: string;
     header: ReactNode;
@@ -128,8 +126,7 @@ export function StickyViewGrid({ className, header, children }: StickyViewGridPr
                 <div
                     ref={bodyScrollRef}
                     className={tcls(
-                        styles.tableScrollArea,
-                        'w-full min-w-0 overflow-x-auto overflow-y-hidden border-tint-subtle',
+                        'w-full min-w-0 overflow-x-auto overflow-y-hidden overscroll-x-none border-tint-subtle',
                         'group-data-[scrollable=true]/table:mx-px',
                         'group-data-[scrollable=true]/table:border-0',
                         'group-data-[scrollable=true]/table:rounded-none'

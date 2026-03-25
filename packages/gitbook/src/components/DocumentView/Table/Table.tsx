@@ -9,7 +9,6 @@ import { StickyViewGrid } from './StickyViewGrid';
 import { ViewCards } from './ViewCards';
 import { ViewGrid, ViewGridHeader } from './ViewGrid';
 import { hasVisibleHeader } from './layout';
-import styles from './table.module.css';
 
 export type TableRecordKV = [string, DocumentTableRecord];
 
@@ -75,8 +74,7 @@ export function Table(props: BlockProps<DocumentBlockTable>) {
                 <div className={tcls(style, 'relative mx-auto grid w-full min-w-0')}>
                     <div
                         className={tcls(
-                            styles.tableScrollArea,
-                            'w-full min-w-0 overflow-x-auto overflow-y-hidden border-tint-subtle'
+                            'w-full min-w-0 overflow-x-auto overflow-y-hidden overscroll-x-none border-tint-subtle '
                         )}
                     >
                         <div className={tcls('flex', 'flex-col', 'w-fit')}>
