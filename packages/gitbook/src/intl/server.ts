@@ -11,13 +11,12 @@ export const DEFAULT_LOCALE = 'en' satisfies TranslationLocale;
  * Get the locale to use for a space.
  */
 export function getSpaceLocale(context: GitBookAnyContext): TranslationLocale {
-    const { space } = context;
     const customization = 'site' in context ? context.customization : null;
 
     // If the language is configured in the space, use it in priority
-    if (space.language) {
-        if (checkIsValidLocale(space.language)) {
-            return space.language;
+    if (context.locale) {
+        if (checkIsValidLocale(context.locale)) {
+            return context.locale;
         }
         return DEFAULT_LOCALE;
     }
