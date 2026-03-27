@@ -43,6 +43,14 @@ export async function resolveOpenAPIWebhook(
         operation,
         method,
         name,
+        'x-expandAllResponses':
+            typeof schema['x-expandAllResponses'] === 'boolean'
+                ? schema['x-expandAllResponses']
+                : undefined,
+        'x-expandAllModelSections':
+            typeof schema['x-expandAllModelSections'] === 'boolean'
+                ? schema['x-expandAllModelSections']
+                : undefined,
     };
 }
 

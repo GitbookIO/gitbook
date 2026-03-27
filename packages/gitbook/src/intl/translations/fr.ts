@@ -68,6 +68,10 @@ export const fr = {
     notfound_title: 'Page introuvable',
     notfound_link: "Ce lien pointe vers une page qui a été supprimée ou n'existe plus.",
     notfound: 'La page que vous cherchez n’existe pas.',
+    notfound_adaptive_title: 'Page inaccessible',
+    notfound_adaptive:
+        'Cette page existe peut-être, mais vous devez peut-être vous connecter pour y accéder.',
+    notfound_adaptive_login: 'Se connecter',
     unexpected_error_title: 'Erreur inattendue',
     unexpected_error: 'Désolé, une erreur est survenue. Veuillez réessayer plus tard.',
     unexpected_error_retry: 'Réessayer',

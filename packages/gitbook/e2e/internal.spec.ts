@@ -732,95 +732,6 @@ const testCases: TestsCase[] = [
         ],
     },
     {
-        name: 'Site Preview',
-        skip: process.env.ARGOS_BUILD_NAME !== 'v2-vercel',
-        tests: [
-            {
-                name: 'Main content',
-                url: async () => {
-                    const data = await getSiteAPIToken(
-                        'https://gitbook.gitbook.io/test-gitbook-open/'
-                    );
-
-                    const searchParams = new URLSearchParams();
-                    searchParams.set('token', data.apiToken);
-
-                    return `url/preview/${data.site}/?${searchParams.toString()}`;
-                },
-                screenshot: false,
-                run: async (page) => {
-                    await expect(page.locator('[data-testid="table-of-contents"]')).toBeVisible();
-                },
-            },
-            {
-                name: 'With sections',
-                url: async () => {
-                    const data = await getSiteAPIToken('https://gitbook.com/docs');
-
-                    const searchParams = new URLSearchParams();
-                    searchParams.set('token', data.apiToken);
-
-                    return `url/preview/${data.site}/?${searchParams.toString()}`;
-                },
-                screenshot: false,
-                run: async (page) => {
-                    const sectionTabs = page.getByLabel('Sections');
-                    await expect(sectionTabs).toBeVisible();
-
-                    const sectionTabLinks = sectionTabs.getByRole('link');
-                    for (const link of await sectionTabLinks.all()) {
-                        const href = await link.getAttribute('href');
-                        expect(href).toMatch(/^\/url\/preview\/site_p4Xo4\/?/);
-                    }
-                },
-            },
-            {
-                name: 'With customization cookie',
-                url: async () => {
-                    const data = await getSiteAPIToken(
-                        'https://gitbook.gitbook.io/test-gitbook-open/'
-                    );
-
-                    const searchParams = new URLSearchParams();
-                    searchParams.set('token', data.apiToken);
-
-                    return `url/preview/${data.site}/?${searchParams.toString()}`;
-                },
-                screenshot: false,
-                run: async (page) => {
-                    await expect(page.locator('[data-testid="table-of-contents"]')).toBeVisible();
-                    // Trademark exists by default
-                    await expect(page.getByTestId('gb-trademark')).toHaveCount(1);
-
-                    // Go to another page with the customization query to disable the trademark
-                    const pageBlocks = new URL(page.url());
-                    pageBlocks.pathname = `${pageBlocks.pathname.replace(/\/$/, '')}/blocks`;
-                    pageBlocks.search = getCustomizationURL({
-                        trademark: {
-                            enabled: false,
-                        },
-                    }).slice(1);
-                    await page.goto(pageBlocks.toString());
-                    // No trademark because customization is disabled
-                    await expect(page.getByTestId('gb-trademark')).toHaveCount(0);
-                    await expect(
-                        page.getByRole('heading', { level: 1, name: 'Blocks' })
-                    ).toBeVisible();
-
-                    const pageBlocksCode = new URL(page.url());
-                    pageBlocksCode.pathname = `${pageBlocksCode.pathname.replace(/\/$/, '')}/code`;
-                    pageBlocksCode.search = '';
-                    await page.goto(pageBlocksCode.toString());
-                    // The trademark should not be visible because the cookie is still set,
-                    await expect(page.getByTestId('gb-trademark')).toHaveCount(0);
-                    await expect(
-                        page.getByRole('heading', { level: 1, name: 'Code' })
-                    ).toBeVisible();
-                },
-            },
-        ],
-    },
-    {
         name: 'Site Previews',
         skip: process.env.ARGOS_BUILD_NAME !== 'v2-vercel',
         tests: [
@@ -1477,7 +1388,7 @@ const testCases: TestsCase[] = [
                     ).toBeVisible();
                     const url = page.url();
                     expect(url.includes('shared-space-uno')).toBeTruthy(); // same uno site
-                    expect(url.endsWith('/shared/')).toBeTruthy(); // correct page
+                    expect(url.endsWith('/shared')).toBeTruthy(); // correct page
                 },
                 screenshot: false,
             },
@@ -1497,7 +1408,7 @@ const testCases: TestsCase[] = [
                     ).toBeVisible();
                     const url = page.url();
                     expect(url.includes('shared-space-dos')).toBeTruthy(); // same dos site
-                    expect(url.endsWith('/shared/')).toBeTruthy(); // correct page
+                    expect(url.endsWith('/shared')).toBeTruthy(); // correct page
                 },
                 screenshot: false,
             },

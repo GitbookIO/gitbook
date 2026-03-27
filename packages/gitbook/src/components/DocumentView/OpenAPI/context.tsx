@@ -2,8 +2,6 @@ import type { JSONDocument } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
 import { type OpenAPIContextInput, checkIsValidLocale } from '@gitbook/react-openapi';
 
-import { tcls } from '@/lib/tailwind';
-
 import type { BlockProps } from '../Block';
 import { PlainCodeBlock } from '../CodeBlock';
 import { DocumentView } from '../DocumentView';
@@ -26,16 +24,19 @@ export function getOpenAPIContext(args: {
     props: BlockProps<AnyOpenAPIOperationsBlock | OpenAPISchemasBlock | OpenAPIWebhookBlock>;
     specUrl: string | null;
     context: GitBookAnyContext | undefined;
+    expandAllResponses?: boolean;
+    expandAllModelSections?: boolean;
 }): OpenAPIContextInput {
-    const { props, specUrl, context } = args;
+    const { props, specUrl, context, expandAllResponses, expandAllModelSections } = args;
     const { block } = props;
 
     const customizationLocale = context ? getSpaceLocale(context) : DEFAULT_LOCALE;
     const locale = checkIsValidLocale(customizationLocale) ? customizationLocale : DEFAULT_LOCALE;
 
-    const proxyUrl = context
-        ? context.linker.toAbsoluteURL(context.linker.toPathInSite('~scalar/proxy'))
-        : undefined;
+    const proxyUrl =
+        context && props.context.mode !== 'print'
+            ? context.linker.toAbsoluteURL(context.linker.toPathInSite('~scalar/proxy'))
+            : undefined;
 
     return {
         specUrl,
@@ -75,12 +76,7 @@ export function getOpenAPIContext(args: {
                 ancestorBlocks={props.ancestorBlocks}
                 isEstimatedOffscreen={props.isEstimatedOffscreen}
                 context={props.context}
-                style={tcls([
-                    headingProps.deprecated ? 'line-through' : undefined,
-                    headingProps.deprecated || !!headingProps.stability
-                        ? '[&>div]:pt-0'
-                        : undefined,
-                ])}
+                style={headingProps.deprecated ? 'line-through' : undefined}
                 block={{
                     object: 'block',
                     key: `${block.key}-heading`,
@@ -97,7 +93,8 @@ export function getOpenAPIContext(args: {
                 }}
             />
         ),
-        defaultInteractiveOpened: props.context.mode === 'print',
+        expandAllResponses: expandAllResponses || props.context.mode === 'print',
+        expandAllModelSections: expandAllModelSections || props.context.mode === 'print',
         id: block.meta?.id,
         blockKey: block.key,
         locale,

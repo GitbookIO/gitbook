@@ -1,4 +1,8 @@
-import { CustomizationThemeMode } from '@gitbook/api';
+import {
+    CustomizationThemeMode,
+    SiteInsightsDisplayContext,
+    SiteInsightsLLMSVariant,
+} from '@gitbook/api';
 import Negotiator from 'negotiator';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
@@ -9,10 +13,9 @@ import { getContentSecurityPolicy } from '@/lib/csp';
 import { validateSerializedCustomization } from '@/lib/customization';
 import {
     DataFetcherError,
-    decodeURLPath,
     getVisitorAuthBasePath,
     lookupPublishedContentByUrl,
-    normalizeURL,
+    normalizeRequestURL,
     throwIfDataError,
 } from '@/lib/data';
 import { GITBOOK_OAUTH_SERVER_URL, isGitBookAssetsHostURL, isGitBookHostURL } from '@/lib/env';
@@ -36,9 +39,14 @@ import {
     normalizeVisitorURL,
     serveVisitorClaimsDataRequest,
 } from '@/lib/visitors';
+import { waitUntil } from '@/lib/waitUntil';
 import { serveResizedImage } from '@/routes/image';
 import { cookies } from 'next/headers';
-import { serveProxyAnalyticsEvent } from './lib/tracking';
+import {
+    type ServerInsightsEventInput,
+    serveProxyAnalyticsEvent,
+    trackServerInsightsEvents,
+} from './lib/tracking';
 export const config = {
     matcher: [
         '/((?!_next/static|_next/image|~gitbook/static|~gitbook/revalidate|~gitbook/monitoring|~scalar/proxy).*)',
@@ -50,18 +58,6 @@ type URLWithMode = { url: URL; mode: 'url' | 'url-host' };
 export async function middleware(request: NextRequest) {
     try {
         const requestURL = new URL(request.url);
-
-        // Redirect to normalize the URL
-        const normalized = normalizeURL(requestURL);
-        if (normalized.toString() !== requestURL.toString()) {
-            return NextResponse.redirect(normalized.toString());
-        }
-
-        // If the URL path is encoded, decode it and redirect to the decoded URL
-        const decoded = decodeURLPath(requestURL);
-        if (decoded.toString() !== requestURL.toString()) {
-            return NextResponse.redirect(decoded.toString());
-        }
 
         // Reject malicious requests
         const rejectResponse = await validateServerActionRequest(request);
@@ -143,6 +139,13 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
     }
 
     const { url: siteRequestURL, mode } = match;
+
+    // Normalize URL after extracting the URL from the request to make sure the client is redirected to the proper one
+    const normalizationResponse = normalizeRequestURL(siteRequestURL);
+    if (normalizationResponse) {
+        return normalizationResponse;
+    }
+
     const imagesContextId = getImageResizingContextId(siteRequestURL);
     /**
      * Serve image resizing requests (all requests containing `/~gitbook/image`).
@@ -411,11 +414,26 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         requestHeaders.set('origin', request.nextUrl.origin);
 
         const siteURLWithoutProtocol = `${siteCanonicalURL.host}${siteURLData.basePath}`;
-        const { pathname, routeType: routeTypeFromPathname } = encodePathInSiteContent(
-            siteURLData.pathname,
-            request
-        );
+        const {
+            pathname,
+            routeType: routeTypeFromPathname,
+            events,
+        } = encodePathInSiteContent(siteURLData.pathname, request);
         routeType = routeTypeFromPathname ?? routeType;
+
+        if (events && events.length > 0) {
+            waitUntil(
+                trackServerInsightsEvents({
+                    organizationId: siteURLData.organization,
+                    siteId: siteURLData.site,
+                    events,
+                    request: {
+                        url: siteRequestURL.toString(),
+                        headers: requestHeaders,
+                    },
+                })
+            );
+        }
 
         const route = [
             'sites',
@@ -468,7 +486,6 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
     };
 
     // For preview requests like:
-    // - https://preview/<siteURL> requests, TODO: Remove support for this format later
     // - https://<GITBOOK_PREVIEW_BASE_URL>/<siteID> requests (ex: https://sites.gitbook.com/preview/site_id/path)
     if (isPreviewRequest(siteRequestURL)) {
         // Do not track page views for preview requests
@@ -634,6 +651,7 @@ function encodePathInSiteContent(
 ): {
     pathname: string;
     routeType?: 'static' | 'dynamic';
+    events?: ServerInsightsEventInput[] | undefined;
 } {
     const pathname = removeLeadingSlash(removeTrailingSlash(rawPathname));
 
@@ -647,12 +665,32 @@ function encodePathInSiteContent(
         return {
             pathname: `~gitbook/rss/${encodePagePath(rssMatch[2])}`,
             routeType: 'static',
+            events: [
+                {
+                    type: 'rss_request',
+                    location: {
+                        displayContext: SiteInsightsDisplayContext.Server,
+                    },
+                },
+            ],
         };
     }
 
     // We skip encoding for paginated llms-full.txt pages (i.e. llms-full.txt/100)
     if (pathname.match(LLMS_FULL_PATH_REGEX)) {
-        return { pathname, routeType: 'static' };
+        return {
+            pathname,
+            routeType: 'static',
+            events: [
+                {
+                    type: 'llms_request',
+                    llmsVariant: SiteInsightsLLMSVariant.Full,
+                    location: {
+                        displayContext: SiteInsightsDisplayContext.Server,
+                    },
+                },
+            ],
+        };
     }
 
     // If the pathname is an embedded page
@@ -668,16 +706,32 @@ function encodePathInSiteContent(
         case '~gitbook/embed/assistant':
         case '~gitbook/icon':
             return { pathname };
-        case '~gitbook/mcp':
+        // LLMs.txt, sitemap, sitemap-pages and robots.txt are always static
+        // as they only depend on the site structure / pages.
         case 'llms.txt':
         case 'llms-full.txt':
+            return {
+                pathname,
+                routeType: 'static',
+                events: [
+                    {
+                        type: 'llms_request',
+                        llmsVariant:
+                            pathname === 'llms.txt'
+                                ? SiteInsightsLLMSVariant.Standard
+                                : SiteInsightsLLMSVariant.Full,
+                        location: {
+                            displayContext: SiteInsightsDisplayContext.Server,
+                        },
+                    },
+                ],
+            };
+        case '~gitbook/mcp':
         case 'sitemap.xml':
         case 'sitemap-pages.xml':
         case 'robots.txt':
         case '~gitbook/embed/script.js':
         case '~gitbook/embed/demo':
-            // LLMs.txt, sitemap, sitemap-pages and robots.txt are always static
-            // as they only depend on the site structure / pages.
             return { pathname, routeType: 'static' };
         case '~gitbook/pdf':
         case '~gitbook/search':
@@ -694,6 +748,16 @@ function encodePathInSiteContent(
                     pathname: `~gitbook/markdown/${encodePagePath(pagePathWithoutMD)}`,
                     // The markdown content is always static and doesn't depend on the dynamic parameter (customization, theme, etc)
                     routeType: 'static',
+                    events: [
+                        {
+                            type: 'page_markdown_request',
+                            // TODO: track pageId / spaceId when possible
+                            // We don't do it at the moment as we can't easily extract it from the URL.
+                            location: {
+                                displayContext: SiteInsightsDisplayContext.Server,
+                            },
+                        },
+                    ],
                 };
             }
             return { pathname: encodePagePath(pathname) };

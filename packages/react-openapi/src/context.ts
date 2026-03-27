@@ -19,10 +19,16 @@ export interface OpenAPIClientContext {
     };
 
     /**
-     * Force all sections to be opened by default.
+     * If `true`, all response sections will be expanded by default.
      * @default false
      */
-    defaultInteractiveOpened?: boolean;
+    expandAllResponses?: boolean;
+
+    /**
+     * If `true`, all model/schema sections will be expanded by default.
+     * @default false
+     */
+    expandAllModelSections?: boolean;
 
     /**
      * The key of the block
@@ -107,7 +113,8 @@ export function getOpenAPIClientContext(context: OpenAPIUniversalContext): OpenA
     return {
         translation: context.translation,
         icons: context.icons,
-        defaultInteractiveOpened: context.defaultInteractiveOpened,
+        expandAllResponses: context.expandAllResponses,
+        expandAllModelSections: context.expandAllModelSections,
         blockKey: context.blockKey,
         id: context.id,
         proxyUrl: '$$isClientContext$$' in context ? context.proxyUrl : undefined,

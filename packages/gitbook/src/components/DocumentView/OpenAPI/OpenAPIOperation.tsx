@@ -50,6 +50,10 @@ async function OpenAPIOperationBody(props: BlockProps<AnyOpenAPIOperationsBlock>
                 props,
                 specUrl: publicURL,
                 context: context.contentContext,
+                expandAllResponses:
+                    data.operation['x-expandAllResponses'] ?? data['x-expandAllResponses'],
+                expandAllModelSections:
+                    data.operation['x-expandAllModelSections'] ?? data['x-expandAllModelSections'],
             })}
             className="openapi-block"
         />

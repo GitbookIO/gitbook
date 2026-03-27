@@ -63,43 +63,45 @@ export const CodeBlockRenderer = forwardRef(function CodeBlockRenderer(
                     </div>
                 ) : null}
             </div>
-            <CopyCodeButton
-                codeId={codeId}
-                style="absolute top-2 right-2 z-2 self-start justify-self-end leading-none opacity-0 backdrop-blur-md group-hover/codeblock:opacity-11"
-            />
-            <pre
-                className={tcls(
-                    'relative overflow-auto border border-tint-subtle bg-tint-subtle theme-bold-tint:bg-tint-base theme-muted:bg-tint-base p-2 text-tint-strong contrast-more:border-tint contrast-more:bg-tint-base print:overflow-visible',
-                    'circular-corners:rounded-2xl rounded-corners:rounded-xl straight-corners:rounded-xs depth-subtle:shadow-xs',
-                    title && 'rounded-ss-none!'
-                )}
-                style={{
-                    backgroundColor: bg?.color,
-                    ...bg?.vars,
-                    color: fg?.color,
-                    ...fg?.vars,
-                }}
-            >
-                <code
-                    id={codeId}
+            <div className="relative">
+                <CopyCodeButton
+                    codeId={codeId}
+                    style="absolute top-2 right-2 z-2 self-start justify-self-end font-sans leading-none opacity-0 backdrop-blur-md group-hover/codeblock:opacity-11"
+                />
+                <pre
                     className={tcls(
-                        'table max-h-full w-fit [counter-reset:line] print:max-h-none print:whitespace-pre-wrap',
-                        withWrap && 'whitespace-pre-wrap',
-                        '[[aria-expanded=false]_&]:mask-b-from-50%'
+                        'relative overflow-auto border border-tint-subtle bg-tint-subtle theme-bold-tint:bg-tint-base theme-muted:bg-tint-base py-2 text-tint-strong contrast-more:border-tint contrast-more:bg-tint-base print:overflow-visible',
+                        'circular-corners:rounded-2xl rounded-corners:rounded-xl straight-corners:rounded-xs depth-subtle:shadow-xs',
+                        title && 'rounded-ss-none!'
                     )}
+                    style={{
+                        backgroundColor: bg?.color,
+                        ...bg?.vars,
+                        color: fg?.color,
+                        ...fg?.vars,
+                    }}
                 >
-                    {theme.lines.map((line, index) => (
-                        <CodeHighlightLine
-                            bg={bg}
-                            fg={fg}
-                            key={index}
-                            line={line}
-                            isLast={index === theme.lines.length - 1}
-                            withLineNumbers={withLineNumbers}
-                        />
-                    ))}
-                </code>
-            </pre>
+                    <code
+                        id={codeId}
+                        className={tcls(
+                            'table max-h-full w-fit min-w-full [counter-reset:line] print:max-h-none print:whitespace-pre-wrap',
+                            withWrap && 'whitespace-pre-wrap',
+                            '[[aria-expanded=false]_&]:mask-b-from-50%'
+                        )}
+                    >
+                        {theme.lines.map((line, index) => (
+                            <CodeHighlightLine
+                                bg={bg}
+                                fg={fg}
+                                key={index}
+                                line={line}
+                                isLast={index === theme.lines.length - 1}
+                                withLineNumbers={withLineNumbers}
+                            />
+                        ))}
+                    </code>
+                </pre>
+            </div>
         </div>
     );
 });

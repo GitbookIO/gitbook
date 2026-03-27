@@ -71,6 +71,10 @@ export const es: TranslationLanguage = {
     notfound_title: 'Página no encontrada',
     notfound_link: 'Este enlace apunta a una página que ha sido eliminada o ya no existe.',
     notfound: 'La página que buscas no existe.',
+    notfound_adaptive_title: 'Página no disponible',
+    notfound_adaptive:
+        'Esta página puede existir, pero es posible que debas iniciar sesión para acceder.',
+    notfound_adaptive_login: 'Iniciar sesión',
     unexpected_error_title: 'Ocurrió un error',
     unexpected_error:
         'Lo sentimos, ha ocurrido un error inesperado. Por favor, intenta de nuevo más tarde.',

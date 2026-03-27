@@ -75,15 +75,28 @@ function OpenAPISchemaProperty(
     const circularRefs = new Map(parentCircularRefs);
     circularRefs.set(schema, id);
 
-    const properties = getSchemaProperties(schema, discriminator, discriminatorValue);
-
     const ancestors = new Set(circularRefs.keys());
     const alternatives = getSchemaAlternatives(schema, ancestors);
 
-    const header = <OpenAPISchemaPresentation id={id} context={context} property={property} />;
+    // When allOf fully merges into a single schema, use it directly
+    // instead of rendering as "allOf" with one child.
+    const mergedAllOfSchema =
+        alternatives?.type === 'allOf' && alternatives.schemas.length === 1
+            ? alternatives.schemas[0]
+            : undefined;
+    const effectiveSchema = mergedAllOfSchema ?? schema;
+    const effectiveProperty = mergedAllOfSchema
+        ? { ...property, schema: mergedAllOfSchema }
+        : property;
+
+    const properties = getSchemaProperties(effectiveSchema, discriminator, discriminatorValue);
+
+    const header = (
+        <OpenAPISchemaPresentation id={id} context={context} property={effectiveProperty} />
+    );
     const content = (() => {
-        // For oneOf/anyOf, show alternatives. For allOf, merge properties instead
-        if (alternatives?.schemas && alternatives.schemas.length > 0) {
+        // For oneOf/anyOf/allOf with multiple schemas, show alternatives
+        if (!mergedAllOfSchema && alternatives?.schemas && alternatives.schemas.length > 0) {
             return (
                 <OpenAPISchemaAlternatives
                     alternatives={alternatives}
@@ -114,7 +127,10 @@ function OpenAPISchemaProperty(
             <OpenAPIDisclosure
                 icon={context.icons.plus}
                 header={header}
-                label={(isExpanded) => getDisclosureLabel({ schema, isExpanded, context })}
+                label={(isExpanded) =>
+                    getDisclosureLabel({ schema: effectiveSchema, isExpanded, context })
+                }
+                defaultExpanded={context.expandAllModelSections}
             >
                 {content}
             </OpenAPIDisclosure>
@@ -191,16 +207,24 @@ function OpenAPIRootSchema(props: {
     } = props;
 
     const id = useId();
-    const properties = getSchemaProperties(schema);
-    const description = resolveDescription(schema);
     const ancestors = new Set(parentCircularRefs.keys());
     const alternatives = getSchemaAlternatives(schema, ancestors);
+
+    // When allOf fully merges into a single schema, use it directly
+    const mergedAllOfSchema =
+        alternatives?.type === 'allOf' && alternatives.schemas.length === 1
+            ? alternatives.schemas[0]
+            : undefined;
+    const effectiveSchema = mergedAllOfSchema ?? schema;
+
+    const properties = getSchemaProperties(effectiveSchema);
+    const description = resolveDescription(effectiveSchema);
 
     const circularRefs = new Map(parentCircularRefs);
     circularRefs.set(schema, id);
 
-    // Handle root-level oneOf/anyOf (allOf is handled by merging properties in getSchemaProperties)
-    if (alternatives?.schemas && alternatives.schemas.length > 0) {
+    // Handle root-level oneOf/anyOf/allOf with multiple schemas
+    if (!mergedAllOfSchema && alternatives?.schemas && alternatives.schemas.length > 0) {
         return (
             <>
                 {description ? (
@@ -385,6 +409,7 @@ function OpenAPISchemaAlternative(props: {
             icon={context.icons.plus}
             header={<OpenAPISchemaPresentation property={{ schema }} context={context} />}
             label={(isExpanded) => getDisclosureLabel({ schema, isExpanded, context })}
+            defaultExpanded={context.expandAllModelSections}
         >
             <OpenAPISchemaProperties
                 properties={properties}
@@ -623,7 +648,7 @@ function processSchemaProperties(
 }
 
 /**
- * Merge properties into a result array, with later properties overriding earlier ones.
+ * Merge properties into a result array, deep-merging overlapping schemas.
  */
 function mergeProperties(
     result: OpenAPISchemaPropertyEntry[],
@@ -632,7 +657,15 @@ function mergeProperties(
     for (const prop of newProperties) {
         const existingIndex = result.findIndex((p) => p.propertyName === prop.propertyName);
         if (existingIndex >= 0) {
-            result[existingIndex] = prop;
+            const existing = result[existingIndex];
+            if (existing) {
+                result[existingIndex] = {
+                    ...existing,
+                    ...prop,
+                    schema: deepMergeSchemas(existing.schema, prop.schema),
+                    required: prop.required ?? existing.required,
+                };
+            }
         } else {
             result.push(prop);
         }
@@ -640,9 +673,62 @@ function mergeProperties(
 }
 
 /**
+ * Deep-merge two schemas by combining their properties recursively.
+ * schema2 takes precedence for metadata and property order.
+ */
+function deepMergeSchemas(
+    schema1: OpenAPIV3.SchemaObject,
+    schema2: OpenAPIV3.SchemaObject,
+    seen: WeakSet<OpenAPIV3.SchemaObject> = new WeakSet()
+): OpenAPIV3.SchemaObject {
+    if (seen.has(schema1) || seen.has(schema2)) {
+        return { ...schema1, ...schema2 };
+    }
+    seen.add(schema1);
+    seen.add(schema2);
+
+    if (schema1.properties && schema2.properties) {
+        const mergedProperties: Record<string, OpenAPIV3.SchemaObject | OpenAPIV3.ReferenceObject> =
+            { ...schema2.properties };
+
+        for (const [key, value] of Object.entries(schema1.properties)) {
+            const existing = mergedProperties[key];
+            if (existing && !checkIsReference(existing) && !checkIsReference(value)) {
+                mergedProperties[key] = deepMergeSchemas(value, existing, seen);
+            } else if (!existing) {
+                mergedProperties[key] = value;
+            }
+        }
+
+        return {
+            ...schema1,
+            ...schema2,
+            properties: mergedProperties,
+        };
+    }
+
+    if (
+        schema1.type === 'array' &&
+        schema2.type === 'array' &&
+        schema1.items &&
+        schema2.items &&
+        !checkIsReference(schema1.items) &&
+        !checkIsReference(schema2.items)
+    ) {
+        return {
+            ...schema1,
+            ...schema2,
+            items: deepMergeSchemas(schema1.items, schema2.items, seen),
+        };
+    }
+
+    return { ...schema1, ...schema2 };
+}
+
+/**
  * Get the sub-properties of a schema.
  */
-function getSchemaProperties(
+export function getSchemaProperties(
     schema: OpenAPIV3.SchemaObject,
     discriminator?: OpenAPIV3.DiscriminatorObject | undefined,
     discriminatorValue?: string | undefined
@@ -830,15 +916,14 @@ const safeExtensions = [
 function isSafeToMerge(schema: OpenAPIV3.SchemaObject): boolean {
     const keys = Object.keys(schema);
 
-    const coreProperties = ['type', 'properties', 'required', 'nullable'];
+    const safeProperties = ['type', 'properties', 'required', 'nullable'];
 
-    const coreKeys = keys.filter((key) => coreProperties.includes(key));
     const unknownKeys = keys.filter(
         (key) =>
-            !coreProperties.includes(key) && !safeExtensions.includes(key) && !key.startsWith('x-')
+            !safeProperties.includes(key) && !safeExtensions.includes(key) && !key.startsWith('x-')
     );
 
-    return coreKeys.length > 0 && unknownKeys.length === 0;
+    return unknownKeys.length === 0;
 }
 
 /**
@@ -867,7 +952,8 @@ function mergeAlternatives(
                     return acc;
                 }
 
-                acc.push(schemaOrRef);
+                // Clone to avoid mutating shared schema objects from $ref dereferencing
+                acc.push({ ...schemaOrRef });
                 return acc;
             }, []);
         }
@@ -890,7 +976,11 @@ function mergeAlternatives(
                     }
                 }
 
-                if (latest && latest.type === 'object' && schemaOrRef.type === 'object') {
+                if (
+                    latest &&
+                    latest.type === 'object' &&
+                    (!schemaOrRef.type || schemaOrRef.type === 'object')
+                ) {
                     const keys = Object.keys(schemaOrRef);
 
                     if (isSafeToMerge(schemaOrRef)) {
@@ -930,7 +1020,8 @@ function mergeAlternatives(
                     }
                 }
 
-                acc.push(schemaOrRef);
+                // Clone to avoid mutating shared schema objects from $ref dereferencing
+                acc.push({ ...schemaOrRef });
                 return acc;
             }, []);
         }

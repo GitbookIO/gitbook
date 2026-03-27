@@ -2,6 +2,7 @@ import type * as api from '@gitbook/api';
 import type { headers as nextHeaders } from 'next/headers';
 import { apiClient } from './data/api';
 import { GITBOOK_DISABLE_TRACKING } from './env';
+import { getLogger } from './logger';
 
 /**
  * Return true if events should be tracked on the site.
@@ -52,7 +53,9 @@ const defaultLocation: api.SiteInsightsEventLocation = {
  * Extract a full session object from a request.
  * Generates new sessionId/visitorId and extracts headers.
  */
-function extractSessionFromRequest(request: Request): api.SiteInsightsEventSession {
+function extractSessionFromRequest(
+    request: Pick<Request, 'headers'>
+): api.SiteInsightsEventSession {
     return {
         sessionId: crypto.randomUUID(),
         visitorId: crypto.randomUUID(),
@@ -72,22 +75,27 @@ export async function trackServerInsightsEvents(args: {
     organizationId: string;
     siteId: string;
     events: ServerInsightsEventInput[];
-    request: Request;
+    request: Pick<Request, 'headers' | 'url'>;
 }) {
+    const { organizationId, siteId, events, request } = args;
+    const logger = getLogger().subLogger('tracking');
+    logger.info(
+        `Tracking ${args.events.length} events at ${request.url} for site ${args.siteId} (enabled=${!GITBOOK_DISABLE_TRACKING})`
+    );
+
     if (GITBOOK_DISABLE_TRACKING) {
         return;
     }
 
-    const { organizationId, siteId, events, request } = args;
-
     const api = apiClient();
     const geolocation = extractGeolocation(request);
     const requestSession = extractSessionFromRequest(request);
+    const locationURL = request.url;
 
     const fullEvents: api.SiteInsightsEvent[] = events.map((event) => ({
         ...event,
         session: { ...requestSession, ...event.session },
-        location: { ...defaultLocation, url: request.url, ...event.location },
+        location: { ...defaultLocation, url: locationURL, ...event.location },
         timestamp: event.timestamp ?? new Date().toISOString(),
     })) as api.SiteInsightsEvent[];
 
@@ -179,7 +187,7 @@ function getXForwardedFor(headers: Headers): string | null {
 /**
  * Extract geolocation headers from a request (Vercel/OpenNext).
  */
-function extractGeolocation(req: Request): Record<string, string> {
+function extractGeolocation(req: Pick<Request, 'headers'>): Record<string, string> {
     const country =
         req.headers.get('x-open-next-country') || req.headers.get('x-vercel-ip-country');
     const latitude =
