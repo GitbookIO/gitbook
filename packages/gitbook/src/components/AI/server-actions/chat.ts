@@ -9,6 +9,7 @@ import {
     AIModel,
     type AIToolCallResult,
     type AIToolDefinition,
+    SiteCoreChannelType,
     type SiteInsightsSession,
 } from '@gitbook/api';
 import { streamRenderAIMessage } from './api';
@@ -61,6 +62,11 @@ export async function* streamAIChatResponse({
                 toolCall,
                 tools,
                 session,
+                channel: {
+                    type: options?.asEmbeddable
+                        ? SiteCoreChannelType.Embed
+                        : SiteCoreChannelType.Site,
+                },
             }
         );
 
