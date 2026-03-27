@@ -21,6 +21,11 @@ import type {
 import type { IconName } from '@gitbook/icons';
 import { type NextRequest, NextResponse } from 'next/server';
 
+type SearchResultGroup = {
+    score: number;
+    items: OrderedComputedResult[];
+};
+
 export async function POST(request: NextRequest) {
     const [context, { organization, site, shareKey }] = await Promise.all([
         getServerActionBaseContext(),
@@ -58,7 +63,7 @@ export async function POST(request: NextRequest) {
     ]);
 
     const results = searchResults
-        .map((resultItem) => {
+        .flatMap((resultItem): SearchResultGroup[] => {
             if (resultItem.type === 'record') {
                 const result: OrderedComputedResult = {
                     type: 'record',
@@ -66,8 +71,14 @@ export async function POST(request: NextRequest) {
                     title: resultItem.title,
                     description: resultItem.description,
                     href: resultItem.url,
+                    score: resultItem.score,
                 };
-                return result;
+                return [
+                    {
+                        score: resultItem.score,
+                        items: [result],
+                    },
+                ];
             }
 
             const found = findSiteSpaceBy(
@@ -77,8 +88,9 @@ export async function POST(request: NextRequest) {
             const siteSection = found?.siteSection;
             const siteSectionGroup = found?.siteSectionGroup;
 
-            return resultItem.pages.map((pageItem) =>
-                transformSitePageResult(context, {
+            return resultItem.pages.map((pageItem) => ({
+                score: pageItem.score,
+                items: transformSitePageResult(context, {
                     pageItem,
                     spaceItem: resultItem,
                     siteSpace: found?.siteSpace,
@@ -86,10 +98,11 @@ export async function POST(request: NextRequest) {
                     spaceURL: found?.siteSpace.urls.published,
                     siteSection: siteSection ?? undefined,
                     siteSectionGroup: (siteSectionGroup as SiteSectionGroup) ?? undefined,
-                })
-            );
+                }),
+            }));
         })
-        .flat(2);
+        .sort((a, b) => b.score - a.score)
+        .flatMap((group) => group.items);
 
     return NextResponse.json(results);
 }
@@ -119,6 +132,7 @@ function transformSitePageResult(
             : linker.toPathInSpace(pageItem.path),
         pageId: pageItem.id,
         spaceId: spaceItem.id,
+        score: pageItem.score,
         breadcrumbs: [
             siteSectionGroup && {
                 icon: siteSectionGroup?.icon as IconName,
@@ -157,6 +171,7 @@ function transformSitePageResult(
                 body: section.body,
                 pageId: pageItem.id,
                 spaceId: spaceItem.id,
+                score: section.score,
             })) ?? [];
 
     return [page, ...pageSections];
