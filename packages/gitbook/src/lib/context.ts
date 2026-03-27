@@ -19,6 +19,7 @@ import type {
     SiteSpace,
     SiteStructure,
     Space,
+    TranslationLanguage,
 } from '@gitbook/api';
 import assertNever from 'assert-never';
 import { notFound } from 'next/navigation';
@@ -78,6 +79,11 @@ export type GitBookBaseContext = {
      * Image resizer to resize images.
      */
     imageResizer?: ImageResizer;
+
+    /**
+     * Translation language of the space.
+     */
+    locale?: TranslationLanguage;
 };
 
 /**
@@ -423,6 +429,7 @@ export async function fetchSpaceContextByIds(
     return {
         ...baseContext,
         organizationId: space.organization,
+        locale: space.language,
         space,
         revision,
         revisionId,

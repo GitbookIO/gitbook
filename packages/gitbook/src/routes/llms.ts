@@ -89,7 +89,7 @@ async function getNodesFromSections(
         withMarkdownPages: boolean;
     }
 ): Promise<RootContent[]> {
-    const currentLanguage = context.siteSpace.space.language;
+    const currentLanguage = context.locale;
     const all = await Promise.all(
         siteSections.map(async (siteSection): Promise<RootContent[]> => {
             const siteSpaceNodes = await getNodesFromSiteSpaces(context, siteSection.siteSpaces, {
@@ -155,7 +155,7 @@ async function getNodesFromSiteSpaces(
                     children: [
                         {
                             type: 'text',
-                            value: getLocalizedTitle(siteSpace, context.siteSpace.space.language),
+                            value: getLocalizedTitle(siteSpace, context.locale),
                         },
                     ],
                 });

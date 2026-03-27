@@ -126,7 +126,7 @@ export async function generateSitePageViewport(context: GitBookSiteContext): Pro
  */
 function getSiteStructureTitle(context: GitBookSiteContext): string | null {
     const { visibleSections: sections, siteSpace, visibleSiteSpaces: siteSpaces } = context;
-    const currentLanguage = siteSpace.space.language;
+    const currentLanguage = context.locale;
 
     const title = [];
     if (

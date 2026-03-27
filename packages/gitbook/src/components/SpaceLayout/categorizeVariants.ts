@@ -9,7 +9,7 @@ export function categorizeVariants(context: GitBookSiteContext) {
     const normalizeLanguage = (language: string | undefined) =>
         language === undefined ? languages.en.locale : language;
 
-    const currentLanguage = normalizeLanguage(siteSpace.space.language);
+    const currentLanguage = normalizeLanguage(context.locale);
 
     // Get all languages of the variants.
     const variantLanguages = [
