@@ -8,6 +8,7 @@ import {
 import { resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
+import { getLocalizedTitle } from '@/lib/sites';
 import { Link } from '../primitives';
 
 export function FooterLinksGroup(props: {
@@ -15,10 +16,11 @@ export function FooterLinksGroup(props: {
     context: GitBookAnyContext;
 }) {
     const { group, context } = props;
+    const title = getLocalizedTitle(group, context.locale);
 
     return (
         <nav className="flex flex-col gap-4 text-sm">
-            <h4 className="font-semibold">{group.title}</h4>
+            <h4 className="font-semibold">{title}</h4>
             <ul className="flex flex-col items-start gap-4">
                 {group.links.map((link, index) => {
                     return (
@@ -34,6 +36,7 @@ export function FooterLinksGroup(props: {
 
 async function FooterLink(props: { link: CustomizationContentLink; context: GitBookAnyContext }) {
     const { link, context } = props;
+    const title = getLocalizedTitle(link, context.locale);
     const resolved = await resolveContentRef(link.to, context);
 
     return (
@@ -62,7 +65,7 @@ async function FooterLink(props: { link: CustomizationContentLink; context: GitB
                 },
             }}
         >
-            {link.title}
+            {title}
         </Link>
     );
 }
