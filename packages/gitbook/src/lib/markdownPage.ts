@@ -1,9 +1,15 @@
 import type { GitBookSiteContext } from '@/lib/context';
-import { DataFetcherError } from '@/lib/data';
+import { DataFetcherError, throwIfDataError } from '@/lib/data';
 import type { ResolvedPagePath } from '@/lib/pages';
 import { getIndexablePages } from '@/lib/sitemap';
+import { getFallbackSiteSpacePath } from '@/lib/sites';
 import { getMarkdownForPagesTree } from '@/routes/llms';
-import { type RevisionPageDocument, type RevisionPageGroup, RevisionPageType } from '@gitbook/api';
+import {
+    type RevisionPageDocument,
+    type RevisionPageGroup,
+    RevisionPageType,
+    type SiteSpace,
+} from '@gitbook/api';
 import type { Root } from 'mdast';
 import { fromMarkdown } from 'mdast-util-from-markdown';
 import { frontmatterFromMarkdown } from 'mdast-util-frontmatter';
@@ -56,6 +62,55 @@ export async function getMarkdownForPage(
     // Handle empty document pages which have children
     if (isEmptyMarkdownPage(tree) && page.pages.length > 0) {
         return servePageGroup(context, page);
+    }
+
+    return toPageMarkdown(tree);
+}
+
+/**
+ * Get markdown for a page that belongs to a different site space than the current context.
+ */
+export async function getMarkdownForPageInSpace(
+    context: GitBookSiteContext,
+    siteSpace: SiteSpace,
+    page: RevisionPageDocument | RevisionPageGroup
+): Promise<string> {
+    const { dataFetcher } = context;
+    const spaceBasePath = getFallbackSiteSpacePath(context, siteSpace);
+    const linker = context.linker.withOtherSiteSpace({
+        spaceBasePath,
+    });
+
+    // Handle group pages (pages with no content that list their children)
+    if (page.type === RevisionPageType.Group) {
+        const siteSpaceUrl = siteSpace.urls.published;
+        if (!siteSpaceUrl) {
+            return `# ${page.title}\n\nThis page is not published.`;
+        }
+        return renderGroupPageMarkdown({ siteSpaceUrl, linker, page });
+    }
+
+    const rawMarkdown = await throwIfDataError(
+        dataFetcher.getRevisionPageMarkdown({
+            spaceId: siteSpace.space.id,
+            revisionId: siteSpace.space.revision,
+            pageId: page.id,
+        })
+    );
+
+    const tree = fromPageMarkdown({
+        linker,
+        markdown: rawMarkdown,
+        pagePath: page.path,
+    });
+
+    // Handle empty document pages which have children (same as getMarkdownForPage)
+    if (isEmptyMarkdownPage(tree) && page.pages.length > 0) {
+        const siteSpaceUrl = siteSpace.urls.published;
+        if (!siteSpaceUrl) {
+            return `# ${page.title}\n\nThis page is not published.`;
+        }
+        return renderGroupPageMarkdown({ siteSpaceUrl, linker, page });
     }
 
     return toPageMarkdown(tree);
@@ -136,9 +191,25 @@ async function servePageGroup(
         throw new DataFetcherError(`Page "${page.title}" is not published`, 404);
     }
 
+    return renderGroupPageMarkdown({
+        siteSpaceUrl,
+        linker: context.linker,
+        page,
+    });
+}
+
+/**
+ * Render markdown for a group page with explicit parameters.
+ * Use this when rendering a group page from a different space than the current context.
+ */
+async function renderGroupPageMarkdown(args: {
+    siteSpaceUrl: string;
+    linker: GitBookLinker;
+    page: RevisionPageDocument | RevisionPageGroup;
+}): Promise<string> {
+    const { siteSpaceUrl, linker, page } = args;
     const indexablePages = getIndexablePages(page.pages);
 
-    // Create a markdown tree with the page title as heading and a list of child pages
     const markdownTree: Root = {
         type: 'root',
         children: [
@@ -149,7 +220,7 @@ async function servePageGroup(
             },
             ...(await getMarkdownForPagesTree(indexablePages, {
                 siteSpaceUrl,
-                linker: context.linker,
+                linker,
                 withMarkdownPages: true,
             })),
         ],

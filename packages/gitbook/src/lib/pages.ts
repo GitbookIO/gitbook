@@ -254,24 +254,51 @@ function flattenPages(
 }
 
 /**
+ * Check if a URL matches a base URL and return the remaining path if it does.
+ */
+export function matchPagePath(
+    url: string,
+    baseURL: string
+): { matches: true; pagePath: string; baseLength: number } | { matches: false } {
+    let urlPath: string;
+    try {
+        urlPath = removeTrailingSlash(new URL(url).pathname);
+    } catch {
+        urlPath = removeTrailingSlash(url);
+    }
+
+    let basePath: string;
+    try {
+        basePath = removeTrailingSlash(new URL(baseURL).pathname);
+    } catch {
+        return { matches: false };
+    }
+
+    if (urlPath.startsWith(`${basePath}/`) || urlPath === basePath) {
+        const pagePath = removeLeadingSlash(urlPath.slice(basePath.length));
+        return { matches: true, pagePath, baseLength: basePath.length };
+    }
+
+    return { matches: false };
+}
+
+/**
  * Extract the page path based on the base URL.
  */
 export function extractPagePath(url: string, baseURL: string | undefined): string {
-    let pathname: string;
-    try {
-        const parsed = new URL(url);
-        pathname = parsed.pathname;
-    } catch {
-        pathname = url;
+    if (baseURL) {
+        const result = matchPagePath(url, baseURL);
+        if (result.matches) {
+            return result.pagePath;
+        }
     }
 
-    if (baseURL) {
-        try {
-            const basePath = removeTrailingSlash(new URL(baseURL).pathname);
-            if (pathname.startsWith(`${basePath}/`) || pathname === basePath) {
-                pathname = pathname.slice(basePath.length);
-            }
-        } catch {}
+    // No base URL or no match - just extract and clean the pathname
+    let pathname: string;
+    try {
+        pathname = new URL(url).pathname;
+    } catch {
+        pathname = url;
     }
 
     return removeLeadingSlash(removeTrailingSlash(pathname));
