@@ -10,6 +10,7 @@ import { Icon } from '@gitbook/icons';
 import type React from 'react';
 
 import { resolveContentRef } from '@/lib/references';
+import { getLocalizedTitle } from '@/lib/sites';
 import { tcls } from '@/lib/tailwind';
 
 import { SocialAccountLink } from '../Footer/SocialAccounts';
@@ -85,6 +86,7 @@ async function MoreMenuLink(props: {
 }) {
     const { context, link } = props;
 
+    const title = getLocalizedTitle(link, context.locale);
     const target = link.to ? await resolveContentRef(link.to, context) : null;
     const sharedProps = {
         href: target?.href,
@@ -100,16 +102,16 @@ async function MoreMenuLink(props: {
     };
 
     return 'links' in link && link.links.length > 0 ? (
-        <DropdownSubMenu label={link.title}>
+        <DropdownSubMenu label={title}>
             {link.links.map((subLink, index) => {
                 return <MoreMenuLink key={index} {...props} link={subLink} />;
             })}
         </DropdownSubMenu>
     ) : isSiteAuthLoginHref(context.linker, target?.href) && sharedProps.href ? (
         <SiteAuthLoginDropdownMenuItem {...sharedProps} href={sharedProps.href}>
-            {link.title}
+            {title}
         </SiteAuthLoginDropdownMenuItem>
     ) : (
-        <DropdownMenuItem {...sharedProps}>{link.title}</DropdownMenuItem>
+        <DropdownMenuItem {...sharedProps}>{title}</DropdownMenuItem>
     );
 }
