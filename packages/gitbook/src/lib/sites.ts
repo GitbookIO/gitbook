@@ -206,6 +206,16 @@ export function getLocalizedDescription(
 }
 
 /**
+ * Get the localized message for an entity with a message/localizedMessage pair.
+ */
+export function getLocalizedMessage(
+    entity: { message: string; localizedMessage?: LocalizedString },
+    currentLanguage: TranslationLanguage | undefined
+): string {
+    return getLocalizedField(entity.localizedMessage, currentLanguage) ?? entity.message;
+}
+
+/**
  * Get a localized field value for the given language.
  */
 function getLocalizedField(
