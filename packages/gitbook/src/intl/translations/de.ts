@@ -141,7 +141,7 @@ export const de = {
     connect_mcp_to: 'Mit ${1} verbinden',
     install_mcp_on: 'Dieses MCP in ${1} verwenden',
     connect_with_mcp: 'Mit MCP verbinden',
-    copy_mcp_url: 'Dieses MCP zu einem kompatiblen Client hinzufügen',
+    copy_mcp_url: 'Dieses MCP zu jedem kompatiblen Client hinzufügen',
     copy_mcp_install_command: 'Dieses MCP in ${1} verwenden',
     press_to_confirm: 'Drücke ${1} zum Bestätigen',
     tool_call_skipped: 'Übersprungen "${1}"',

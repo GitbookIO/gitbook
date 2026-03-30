@@ -140,7 +140,7 @@ export const no: TranslationLanguage = {
     connect_mcp_to: 'Koble til ${1}',
     install_mcp_on: 'Bruk denne MCP i ${1}',
     connect_with_mcp: 'Koble til MCP',
-    copy_mcp_url: 'Legg til denne MCP i en kompatibel klient',
+    copy_mcp_url: 'Legg til denne MCP i enhver kompatibel klient',
     copy_mcp_install_command: 'Bruk denne MCP i ${1}',
     press_to_confirm: 'Trykk ${1} for å bekrefte',
     tool_call_skipped: 'Hoppet over "${1}"',

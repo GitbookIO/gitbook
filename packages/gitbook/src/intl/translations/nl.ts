@@ -140,7 +140,7 @@ export const nl: TranslationLanguage = {
     connect_mcp_to: 'Verbind met ${1}',
     install_mcp_on: 'Gebruik deze MCP in ${1}',
     connect_with_mcp: 'Verbind met MCP',
-    copy_mcp_url: 'Voeg deze MCP toe aan een compatibele client',
+    copy_mcp_url: 'Voeg deze MCP toe aan elke compatibele client',
     copy_mcp_install_command: 'Gebruik deze MCP in ${1}',
     press_to_confirm: 'Druk op ${1} om te bevestigen',
     tool_call_skipped: '"${1}" overgeslagen',
