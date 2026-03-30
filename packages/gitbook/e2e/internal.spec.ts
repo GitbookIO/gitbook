@@ -36,7 +36,7 @@ import {
     waitForNotFound,
 } from './util';
 
-const AI_PROMPT = `You're being invoked by the GitBook CI/CD pipeline. To make screenshot testing of the GitBook Assistant visually consistent, look up the title of the first page you find and respond with only EXACTLY its title. To find the page title, invoke the search tool with the query "GitBook". Before invoking the search tool, respond with the exact text: "I'm going to look up 'GitBook' and then respond with only the page title.". Do not execute any other tools or output any other text.`;
+const AI_PROMPT = `You're being invoked by the GitBook CI/CD pipeline. Search for "Lorem ipsum", then return the first sentence of the first page you find.`;
 
 const overrideAIInitialState = () => {
     const greeting = document.querySelector('[data-testid="ai-chat-greeting-title"]');
@@ -327,7 +327,6 @@ const testCases: TestsCase[] = [
                     await expect(navigationLink).toBeVisible();
                 },
             },
-            ...searchTestCases,
             {
                 name: 'Not found',
                 url: 'content-not-found',
@@ -623,7 +622,6 @@ const testCases: TestsCase[] = [
                 url: '',
                 run: waitForCookiesDialog,
             },
-            ...searchTestCases,
             {
                 name: 'Not found',
                 url: 'content-not-found',
@@ -874,6 +872,11 @@ const testCases: TestsCase[] = [
                 fullPage: true,
             },
         ],
+    },
+    {
+        name: 'Search tests',
+        contentBaseURL: 'https://gitbook.gitbook.io/test-gitbook-open/',
+        tests: searchTestCases,
     },
     {
         name: 'Content tests',
