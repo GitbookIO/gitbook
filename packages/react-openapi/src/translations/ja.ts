@@ -5,7 +5,7 @@ export const ja = {
     stability_experimental: '実験的',
     stability_alpha: 'アルファ',
     stability_beta: 'ベータ',
-    discriminator: '識別子',
+    discriminator: 'ディスクリミネーター',
     copy_to_clipboard: 'クリップボードにコピー',
     copied: 'コピー済み',
     no_content: 'コンテンツなし',
@@ -41,6 +41,6 @@ export const ja = {
 
     properties: 'プロパティ',
     or: 'または',
-    and: 'かつ',
+    and: 'および',
     possible_values: '可能な値',
 };
