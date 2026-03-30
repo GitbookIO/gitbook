@@ -7,7 +7,7 @@ import type {
     SiteStructure,
     TranslationLanguage,
 } from '@gitbook/api';
-import { matchPagePath } from './pages';
+import { extractPagePath } from './pages';
 import { joinPath } from './paths';
 import { flattenSectionsFromGroup } from './utils';
 
@@ -58,35 +58,26 @@ export function listAllSiteSpaces(siteStructure: SiteStructure) {
     });
 }
 
-type SiteSpaceMatch = {
-    siteSpace: SiteSpace;
-    pagePath: string;
-    baseLength: number;
-};
 /**
- * Find the site space matching a URL or path, returning the most specific match.
+ * Find the site space matching a URL.
  */
 export function findSiteSpaceByUrl(
     siteStructure: SiteStructure,
     url: string
 ): { siteSpace: SiteSpace; pagePath: string } | null {
-    const allSiteSpaces = listAllSiteSpaces(siteStructure);
+    const siteSpaces = listAllSiteSpaces(siteStructure);
 
-    let bestMatch: SiteSpaceMatch | null = null;
-
-    for (const siteSpace of allSiteSpaces) {
+    for (const siteSpace of siteSpaces) {
         const publishedUrl = siteSpace.urls.published;
         if (!publishedUrl) continue;
 
-        const result = matchPagePath(url, publishedUrl);
-        if (!result.matches) continue;
-
-        if (!bestMatch || result.baseLength > bestMatch.baseLength) {
-            bestMatch = { siteSpace, pagePath: result.pagePath, baseLength: result.baseLength };
+        const pagePath = extractPagePath(url, publishedUrl);
+        if (pagePath !== undefined) {
+            return { siteSpace, pagePath };
         }
     }
 
-    return bestMatch;
+    return null;
 }
 
 /**

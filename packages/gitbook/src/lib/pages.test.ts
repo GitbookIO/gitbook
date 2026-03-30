@@ -27,14 +27,12 @@ describe('extractPagePath', () => {
         );
     });
 
-    it('handles path with leading slash', () => {
-        expect(extractPagePath('/api/getting-started', baseURL)).toBe('getting-started');
+    it('returns undefined when URL does not match base', () => {
+        expect(extractPagePath('https://other.com/page', baseURL)).toBeUndefined();
     });
 
-    it('handles trailing slashes', () => {
-        expect(extractPagePath('https://docs.example.com/api/getting-started/', baseURL)).toBe(
-            'getting-started'
-        );
+    it('returns empty string for root URL', () => {
+        expect(extractPagePath('https://docs.example.com/api/', baseURL)).toBe('');
     });
 });
 

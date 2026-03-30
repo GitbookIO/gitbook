@@ -2,9 +2,9 @@ import { SiteInsightsDisplayContext } from '@gitbook/api';
 
 import { type RouteLayoutParams, getStaticSiteContext } from '@/app/utils';
 import { getDataOrNull, getExposableError, throwIfDataError } from '@/lib/data';
-import { getMarkdownForPage, getMarkdownForPageInSpace } from '@/lib/markdownPage';
-import { matchPagePath, resolveFirstDocument, resolvePagePathDocumentOrGroup } from '@/lib/pages';
-import { joinPathWithBaseURL, removeLeadingSlash, removeTrailingSlash } from '@/lib/paths';
+import { getMarkdownForPageInSpace } from '@/lib/markdownPage';
+import { resolveFirstDocument } from '@/lib/pages';
+import { joinPathWithBaseURL } from '@/lib/paths';
 import { findSiteSpaceBy, findSiteSpaceByUrl } from '@/lib/sites';
 import { trackServerInsightsEvents } from '@/lib/tracking';
 import { waitUntil } from '@/lib/waitUntil';
@@ -132,96 +132,53 @@ async function handler(
             const siteUrl = context.siteSpace.urls.published ?? 'https://docs.example.com';
             server.tool(
                 'getPage',
-                `Fetch the full markdown content of a specific documentation page from ${site.title}. Use this when you have a page URL and want to read its content. Accepts full URLs (e.g. ${siteUrl}/getting-started) or relative paths (e.g. getting-started).`,
+                `Fetch the full markdown content of a specific documentation page from ${site.title}. Use this when you have a page URL and want to read its content. Accepts full URLs (e.g. ${siteUrl}/getting-started). Since searchDocumentation returns partial content, use getPage to retrieve the complete page when you need more details. The content includes links you can follow to navigate to related pages.`,
                 {
-                    url: z.string().describe('The URL or path of the page to fetch'),
+                    url: z.string().describe('The URL of the page to fetch'),
                 },
                 async ({ url }) => {
                     try {
-                        // Fast path: try the current space first
-                        const currentSpaceUrl = context.siteSpace.urls.published;
-                        if (currentSpaceUrl) {
-                            const localMatch = matchPagePath(url, currentSpaceUrl);
-                            if (localMatch.matches) {
-                                const pageLookup = resolvePagePathDocumentOrGroup(
-                                    context.revision.pages,
-                                    localMatch.pagePath
-                                );
-
-                                if (pageLookup) {
-                                    const markdown = await getMarkdownForPage(context, pageLookup);
-                                    return {
-                                        content: [{ type: 'text', text: markdown }],
-                                    };
-                                }
-                            }
-                        }
-
-                        // Multi-space fallback, find the site space the URL belongs to
                         const match = findSiteSpaceByUrl(context.structure, url);
-                        if (match) {
-                            // Handle empty path (root URL of another space)
-                            if (!match.pagePath) {
-                                const revision = await getDataOrNull(
-                                    dataFetcher.getRevision({
-                                        spaceId: match.siteSpace.space.id,
-                                        revisionId: match.siteSpace.space.revision,
-                                    })
-                                );
-                                if (revision) {
-                                    const firstDoc = resolveFirstDocument(revision.pages, []);
-                                    if (firstDoc) {
-                                        const markdown = await getMarkdownForPageInSpace(
-                                            context,
-                                            match.siteSpace,
-                                            firstDoc.page
-                                        );
-                                        return {
-                                            content: [{ type: 'text', text: markdown }],
-                                        };
-                                    }
-                                }
-                            } else {
-                                const page = await getDataOrNull(
-                                    dataFetcher.getRevisionPageByPath({
-                                        spaceId: match.siteSpace.space.id,
-                                        revisionId: match.siteSpace.space.revision,
-                                        path: match.pagePath,
-                                    })
-                                );
-
-                                if (page) {
-                                    const markdown = await getMarkdownForPageInSpace(
-                                        context,
-                                        match.siteSpace,
-                                        page
-                                    );
-                                    return {
-                                        content: [{ type: 'text', text: markdown }],
-                                    };
-                                }
-                            }
-                        }
-
-                        // Relative path fallback, treat as a path in the current space
-                        let pathToResolve: string;
-                        try {
-                            pathToResolve = new URL(url).pathname;
-                        } catch {
-                            pathToResolve = url;
-                        }
-                        const normalizedPath = removeLeadingSlash(
-                            removeTrailingSlash(pathToResolve)
-                        );
-                        const relativeLookup = resolvePagePathDocumentOrGroup(
-                            context.revision.pages,
-                            normalizedPath
-                        );
-                        if (relativeLookup) {
-                            const markdown = await getMarkdownForPage(context, relativeLookup);
+                        if (!match) {
                             return {
-                                content: [{ type: 'text', text: markdown }],
+                                content: [{ type: 'text', text: `Page not found: "${url}"` }],
+                                isError: true,
                             };
+                        }
+
+                        // Handle empty path (root URL) - fetch first document
+                        if (!match.pagePath) {
+                            const revision = await getDataOrNull(
+                                dataFetcher.getRevision({
+                                    spaceId: match.siteSpace.space.id,
+                                    revisionId: match.siteSpace.space.revision,
+                                })
+                            );
+                            const firstDoc = revision && resolveFirstDocument(revision.pages, []);
+                            if (firstDoc) {
+                                const markdown = await getMarkdownForPageInSpace(
+                                    context,
+                                    match.siteSpace,
+                                    firstDoc.page
+                                );
+                                return { content: [{ type: 'text', text: markdown }] };
+                            }
+                        } else {
+                            const page = await getDataOrNull(
+                                dataFetcher.getRevisionPageByPath({
+                                    spaceId: match.siteSpace.space.id,
+                                    revisionId: match.siteSpace.space.revision,
+                                    path: match.pagePath,
+                                })
+                            );
+                            if (page) {
+                                const markdown = await getMarkdownForPageInSpace(
+                                    context,
+                                    match.siteSpace,
+                                    page
+                                );
+                                return { content: [{ type: 'text', text: markdown }] };
+                            }
                         }
 
                         return {

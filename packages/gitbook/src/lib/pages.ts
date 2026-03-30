@@ -254,52 +254,38 @@ function flattenPages(
 }
 
 /**
- * Check if a URL matches a base URL and return the remaining path if it does.
+ * Extract the page path from a URL relative to a base URL.
+ * Returns the path segment after the base, or undefined if the URL doesn't match.
  */
-export function matchPagePath(
-    url: string,
-    baseURL: string
-): { matches: true; pagePath: string; baseLength: number } | { matches: false } {
-    let urlPath: string;
-    try {
-        urlPath = removeTrailingSlash(new URL(url).pathname);
-    } catch {
-        urlPath = removeTrailingSlash(url);
-    }
+export function extractPagePath(url: string, baseURL: string): string | undefined {
+    const urlPath = getURLPathname(url);
+    const basePath = getURLPathname(baseURL);
 
-    let basePath: string;
-    try {
-        basePath = removeTrailingSlash(new URL(baseURL).pathname);
-    } catch {
-        return { matches: false };
+    if (!urlPath || !basePath) {
+        return undefined;
     }
 
     if (urlPath.startsWith(`${basePath}/`) || urlPath === basePath) {
-        const pagePath = removeLeadingSlash(urlPath.slice(basePath.length));
-        return { matches: true, pagePath, baseLength: basePath.length };
+        return removeLeadingSlash(urlPath.slice(basePath.length));
     }
-
-    return { matches: false };
 }
 
 /**
- * Extract the page path based on the base URL.
+ * Parse a URL, trying to add https:// if missing and return its pathname
  */
-export function extractPagePath(url: string, baseURL: string | undefined): string {
-    if (baseURL) {
-        const result = matchPagePath(url, baseURL);
-        if (result.matches) {
-            return result.pagePath;
+function getURLPathname(url: string): string | undefined {
+    const urlToParse = (() => {
+        if (URL.canParse(url)) {
+            return url;
         }
+        if (URL.canParse(`https://${url}`)) {
+            return `https://${url}`;
+        }
+    })();
+
+    if (!urlToParse) {
+        return;
     }
 
-    // No base URL or no match - just extract and clean the pathname
-    let pathname: string;
-    try {
-        pathname = new URL(url).pathname;
-    } catch {
-        pathname = url;
-    }
-
-    return removeLeadingSlash(removeTrailingSlash(pathname));
+    return removeTrailingSlash(new URL(urlToParse).pathname);
 }
