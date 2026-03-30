@@ -129,9 +129,10 @@ async function handler(
                 }
             );
 
+            const siteUrl = context.siteSpace.urls.published ?? 'https://docs.example.com';
             server.tool(
                 'getPage',
-                `Fetch the full markdown content of a specific documentation page from ${site.title}. Use this when you have a page URL and want to read its content. Accepts full URLs (e.g. https://docs.example.com/getting-started) or relative paths (e.g. getting-started).`,
+                `Fetch the full markdown content of a specific documentation page from ${site.title}. Use this when you have a page URL and want to read its content. Accepts full URLs (e.g. ${siteUrl}/getting-started) or relative paths (e.g. getting-started).`,
                 {
                     url: z.string().describe('The URL or path of the page to fetch'),
                 },
