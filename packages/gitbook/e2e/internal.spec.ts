@@ -2230,7 +2230,7 @@ const testCases: TestsCase[] = [
                 run: async (page) => {
                     await page.evaluate(() => {
                         const GitBook = window.GitBook as unknown as GitBookStandalone;
-                        GitBook('navigateToPage', '/getting-started/quickstart');
+                        GitBook('navigateToPage', '/text-page');
                     });
                     await expect(page.locator('#gitbook-widget-window')).toBeVisible();
                     const iframe = page.frameLocator('#gitbook-widget-iframe');
@@ -2239,7 +2239,7 @@ const testCases: TestsCase[] = [
                     });
                     await expect(iframe.owner()).toHaveAttribute(
                         'src',
-                        expect.stringContaining('getting-started/quickstart')
+                        expect.stringContaining('text-page')
                     );
                 },
             },
@@ -2300,7 +2300,7 @@ const testCases: TestsCase[] = [
                                     onClick: () => {
                                         const GitBook =
                                             window.GitBook as unknown as GitBookStandalone;
-                                        GitBook('navigateToPage', '/getting-started/quickstart');
+                                        GitBook('navigateToPage', '/text-page');
                                     },
                                 },
                                 {
@@ -2341,7 +2341,7 @@ const testCases: TestsCase[] = [
                     await expect(iframe.getByTestId('embed-docs-page')).toBeVisible();
                     await expect(iframe.owner()).toHaveAttribute(
                         'src',
-                        expect.stringContaining('getting-started/quickstart')
+                        expect.stringContaining('text-page')
                     );
 
                     await expect(actions.nth(1)).toHaveAccessibleName('Open external link');
