@@ -272,6 +272,54 @@ export function ActionOpenMCP(props: {
 }
 
 /**
+ * Action to copy the MCP install command for a CLI-based provider.
+ */
+export function ActionCopyMCPCommand(props: {
+    siteTitle: string;
+    mcpURL: string;
+    provider: 'claude-code' | 'codex';
+    type: PageActionType;
+}) {
+    const { siteTitle, provider, mcpURL, type } = props;
+    const language = useLanguage();
+
+    const slug =
+        siteTitle
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/^-|-$/g, '') || 'docs';
+
+    const providerInfo = React.useMemo<{ label: string; icon: IconName; command: string }>(() => {
+        switch (provider) {
+            case 'claude-code':
+                return {
+                    label: 'Claude Code',
+                    icon: 'claude',
+                    command: `claude mcp add ${slug} --scope user --transport http ${mcpURL}`,
+                };
+            case 'codex':
+                return {
+                    label: 'Codex',
+                    icon: 'chatgpt',
+                    command: `codex mcp add ${slug} --url ${mcpURL}`,
+                };
+            default:
+                assertNever(provider);
+        }
+    }, [provider, slug, mcpURL]);
+
+    return (
+        <CopyToClipboard
+            type={type}
+            data={providerInfo.command}
+            label={tString(language, 'connect_mcp_to', providerInfo.label)}
+            description={tString(language, 'copy_mcp_install_command', providerInfo.label)}
+            icon={providerInfo.icon}
+        />
+    );
+}
+
+/**
  * Action to view the page as a PDF.
  */
 export function ActionViewAsPDF(props: { url: string; type: PageActionType }) {

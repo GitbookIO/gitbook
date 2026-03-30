@@ -8,6 +8,7 @@ import React, { useRef } from 'react';
 import { useAI } from '../AI';
 import { ToggleChevron } from '../primitives';
 import {
+    ActionCopyMCPCommand,
     ActionCopyMCPURL,
     ActionCopyMarkdown,
     ActionOpenAssistant,
@@ -117,6 +118,18 @@ function getPageDropdownActions(props: PageActionsDropdownProps): React.ReactNod
                 <ActionCopyMCPURL mcpURL={urls.mcp} type="dropdown-menu-item" />
                 <ActionOpenMCP
                     provider="vscode"
+                    mcpURL={urls.mcp}
+                    siteTitle={siteTitle}
+                    type="dropdown-menu-item"
+                />
+                <ActionCopyMCPCommand
+                    provider="claude-code"
+                    mcpURL={urls.mcp}
+                    siteTitle={siteTitle}
+                    type="dropdown-menu-item"
+                />
+                <ActionCopyMCPCommand
+                    provider="codex"
                     mcpURL={urls.mcp}
                     siteTitle={siteTitle}
                     type="dropdown-menu-item"
