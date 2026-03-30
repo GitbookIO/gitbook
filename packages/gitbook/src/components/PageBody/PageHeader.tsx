@@ -185,7 +185,7 @@ function getPageActionsURLs({
             : undefined,
         mcp:
             context.site.visibility !== SiteVisibility.VisitorAuth
-                ? context.linker.toAbsoluteURL(context.linker.toPathInSpace('~gitbook/mcp'))
+                ? context.linker.toAbsoluteURL(context.linker.toPathInSite('~gitbook/mcp'))
                 : undefined,
     };
 }
