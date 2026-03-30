@@ -117,7 +117,11 @@ export async function generateSitePageViewport(context: GitBookSiteContext): Pro
             ? customization.themes.default === CustomizationThemeMode.Dark
                 ? 'dark light'
                 : 'light dark'
-            : customization.themes.default,
+            : customization.themes.default === CustomizationThemeMode.Dark
+              ? 'dark'
+              : customization.themes.default === CustomizationThemeMode.Light
+                ? 'light'
+                : 'light dark', // 'system' → let browser decide based on OS preference
     };
 }
 

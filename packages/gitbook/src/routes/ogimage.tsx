@@ -1,4 +1,4 @@
-import { CustomizationHeaderPreset } from '@gitbook/api';
+import { CustomizationDefaultThemeMode, CustomizationHeaderPreset } from '@gitbook/api';
 import { colorContrast } from '@gitbook/colors';
 import { direction } from 'direction';
 import { imageSize } from 'image-size';
@@ -58,7 +58,10 @@ export async function serveOGImage(baseContext: GitBookSiteContext, params: Page
             boldText: `${site.title} ${pageTitle}`,
         });
 
-    const theme = customization.themes.default;
+    const theme =
+        customization.themes.default === CustomizationDefaultThemeMode.System
+            ? 'light'
+            : customization.themes.default;
     const useLightTheme = theme === 'light';
 
     // We have no access to CSS variables, so we'll have to hardcode some values

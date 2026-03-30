@@ -52,6 +52,7 @@ export async function SiteLayout(props: {
                 forcedTheme ??
                 (customization.themes.toggeable ? undefined : customization.themes.default)
             }
+            defaultTheme={customization.themes.default}
             externalLinksTarget={customization.externalLinks.target}
             proxyOrigin={context.site.proxy?.origin}
         >
@@ -94,7 +95,11 @@ export async function generateSiteLayoutViewport(context: GitBookSiteContext): P
             ? customization.themes.default === CustomizationThemeMode.Dark
                 ? 'dark light'
                 : 'light dark'
-            : customization.themes.default,
+            : customization.themes.default === CustomizationThemeMode.Dark
+              ? 'dark'
+              : customization.themes.default === CustomizationThemeMode.Light
+                ? 'light'
+                : 'light dark', // 'system' → let browser decide based on OS preference
         width: 'device-width',
         initialScale: 1,
         maximumScale: 1,

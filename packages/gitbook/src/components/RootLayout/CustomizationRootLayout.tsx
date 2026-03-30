@@ -1,4 +1,5 @@
 import {
+    type CustomizationDefaultThemeMode,
     CustomizationIconsStyle,
     CustomizationSidebarBackgroundStyle,
     CustomizationSidebarListStyle,
@@ -61,7 +62,7 @@ export async function CustomizationRootLayout(props: {
     htmlClassName?: string;
     /** The class name to apply to the body element. */
     bodyClassName?: string;
-    forcedTheme?: CustomizationThemeMode | null;
+    forcedTheme?: CustomizationDefaultThemeMode | null;
     context: GitBookAnyContext;
     children: React.ReactNode;
 }) {
