@@ -867,7 +867,7 @@ const testCases: TestsCase[] = [
         ],
     },
     {
-        name: 'Search tests',
+        name: 'Search & AI',
         contentBaseURL: 'https://gitbook.gitbook.io/test-gitbook-open/',
         tests: searchTestCases,
     },
@@ -2155,7 +2155,7 @@ const testCases: TestsCase[] = [
     },
     {
         name: 'Docs Embed - Basic',
-        contentBaseURL: 'https://gitbook.com/docs/~gitbook/embed/demo/',
+        contentBaseURL: 'https://gitbook.gitbook.io/test-gitbook-open/~gitbook/embed/demo/',
         tests: [
             {
                 name: 'Standalone UX',
@@ -2202,7 +2202,7 @@ const testCases: TestsCase[] = [
     },
     {
         name: 'Docs Embed - Assistant + Docs',
-        contentBaseURL: 'https://gitbook.com/docs/~gitbook/embed/demo/',
+        contentBaseURL: 'https://gitbook.gitbook.io/test-gitbook-open/~gitbook/embed/demo/',
         skip: process.env.ARGOS_BUILD_NAME !== 'v2-vercel',
         tests: [
             {
@@ -2425,6 +2425,12 @@ const testCases: TestsCase[] = [
                 name: 'Docs only',
                 url: '',
                 run: async (page) => {
+                    await page.evaluate(() => {
+                        const GitBook = window.GitBook as unknown as GitBookStandalone;
+                        GitBook('configure', {
+                            tabs: ['docs'],
+                        });
+                    });
                     await expect(page.locator('#gitbook-widget-window')).toBeVisible();
                     const iframe = page.frameLocator('#gitbook-widget-iframe');
                     await expect(iframe.getByTestId('embed-docs-page')).toBeVisible({
@@ -2436,6 +2442,12 @@ const testCases: TestsCase[] = [
                 name: 'Table of contents',
                 url: '',
                 run: async (page) => {
+                    await page.evaluate(() => {
+                        const GitBook = window.GitBook as unknown as GitBookStandalone;
+                        GitBook('configure', {
+                            tabs: ['docs'],
+                        });
+                    });
                     await expect(page.locator('#gitbook-widget-window')).toBeVisible();
                     const iframe = page.frameLocator('#gitbook-widget-iframe');
                     await expect(iframe.getByTestId('embed-docs-page')).toBeVisible({
@@ -2451,6 +2463,12 @@ const testCases: TestsCase[] = [
                 name: 'Open in new tab',
                 url: '',
                 run: async (page) => {
+                    await page.evaluate(() => {
+                        const GitBook = window.GitBook as unknown as GitBookStandalone;
+                        GitBook('configure', {
+                            tabs: ['docs'],
+                        });
+                    });
                     await expect(page.locator('#gitbook-widget-window')).toBeVisible();
                     const iframe = page.frameLocator('#gitbook-widget-iframe');
                     await expect(iframe.getByTestId('embed-docs-page')).toBeVisible({
