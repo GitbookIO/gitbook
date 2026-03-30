@@ -5,6 +5,7 @@ import {
     type RevisionPageGroup,
     RevisionPageType,
 } from '@gitbook/api';
+import { removeLeadingSlash, removeTrailingSlash } from './paths';
 
 export type AncestorRevisionPage = RevisionPageDocument | RevisionPageGroup;
 
@@ -250,4 +251,28 @@ function flattenPages(
     }
 
     return result;
+}
+
+/**
+ * Extract the page path based on the base URL.
+ */
+export function extractPagePath(url: string, baseURL: string | undefined): string {
+    let pathname: string;
+    try {
+        const parsed = new URL(url);
+        pathname = parsed.pathname;
+    } catch {
+        pathname = url;
+    }
+
+    if (baseURL) {
+        try {
+            const basePath = removeTrailingSlash(new URL(baseURL).pathname);
+            if (pathname.startsWith(`${basePath}/`) || pathname === basePath) {
+                pathname = pathname.slice(basePath.length);
+            }
+        } catch {}
+    }
+
+    return removeLeadingSlash(removeTrailingSlash(pathname));
 }

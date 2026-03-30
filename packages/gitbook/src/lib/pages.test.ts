@@ -5,7 +5,38 @@ import {
     RevisionPageLayoutOptionsWidth,
 } from '@gitbook/api';
 
-import { resolveFirstDocument, resolvePagePath, resolvePagePathDocumentOrGroup } from './pages';
+import {
+    extractPagePath,
+    resolveFirstDocument,
+    resolvePagePath,
+    resolvePagePathDocumentOrGroup,
+} from './pages';
+
+describe('extractPagePath', () => {
+    const baseURL = 'https://docs.example.com/api/';
+
+    it('extracts path from full URL', () => {
+        expect(extractPagePath('https://docs.example.com/api/getting-started', baseURL)).toBe(
+            'getting-started'
+        );
+    });
+
+    it('extracts nested path from full URL', () => {
+        expect(extractPagePath('https://docs.example.com/api/guides/installation', baseURL)).toBe(
+            'guides/installation'
+        );
+    });
+
+    it('handles path with leading slash', () => {
+        expect(extractPagePath('/api/getting-started', baseURL)).toBe('getting-started');
+    });
+
+    it('handles trailing slashes', () => {
+        expect(extractPagePath('https://docs.example.com/api/getting-started/', baseURL)).toBe(
+            'getting-started'
+        );
+    });
+});
 
 describe('resolveFirstDocument', () => {
     it('should go into the first group', () => {

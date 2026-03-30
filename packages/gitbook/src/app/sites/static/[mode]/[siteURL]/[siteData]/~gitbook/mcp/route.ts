@@ -1,7 +1,9 @@
 import { SiteInsightsDisplayContext } from '@gitbook/api';
 
 import { type RouteLayoutParams, getStaticSiteContext } from '@/app/utils';
-import { throwIfDataError } from '@/lib/data';
+import { getExposableError, throwIfDataError } from '@/lib/data';
+import { getMarkdownForPage } from '@/lib/markdownPage';
+import { extractPagePath, resolvePagePathDocumentOrGroup } from '@/lib/pages';
 import { joinPathWithBaseURL } from '@/lib/paths';
 import { findSiteSpaceBy } from '@/lib/sites';
 import { trackServerInsightsEvents } from '@/lib/tracking';
@@ -124,6 +126,56 @@ async function handler(
                             });
                         }),
                     };
+                }
+            );
+
+            server.tool(
+                'getPage',
+                `Fetch the full markdown content of a specific documentation page from ${site.title}. Use this when you have a page URL and want to read its content. Accepts full URLs (e.g. https://docs.example.com/getting-started) or relative paths (e.g. getting-started).`,
+                {
+                    url: z.string().describe('The URL or path of the page to fetch'),
+                },
+                async ({ url }) => {
+                    const pagePath = extractPagePath(url, context.siteSpace.urls.published);
+                    const pageLookup = resolvePagePathDocumentOrGroup(
+                        context.revision.pages,
+                        pagePath
+                    );
+
+                    if (!pageLookup) {
+                        return {
+                            content: [
+                                {
+                                    type: 'text',
+                                    text: `Page not found: "${url}"`,
+                                },
+                            ],
+                            isError: true,
+                        };
+                    }
+
+                    try {
+                        const markdown = await getMarkdownForPage(context, pageLookup);
+                        return {
+                            content: [
+                                {
+                                    type: 'text',
+                                    text: markdown,
+                                },
+                            ],
+                        };
+                    } catch (error) {
+                        const exposable = getExposableError(error);
+                        return {
+                            content: [
+                                {
+                                    type: 'text',
+                                    text: exposable.message,
+                                },
+                            ],
+                            isError: true,
+                        };
+                    }
                 }
             );
         },
