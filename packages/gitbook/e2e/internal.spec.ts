@@ -69,7 +69,6 @@ const searchTestCases: Test[] = [
                 mode: CustomizationAIMode.None,
             },
         }),
-        screenshot: false,
         run: async (page) => {
             await waitForCookiesDialog(page);
             const searchInput = page.getByTestId('search-input');
@@ -95,7 +94,6 @@ const searchTestCases: Test[] = [
                 mode: CustomizationAIMode.None,
             },
         }),
-        screenshot: false,
         run: async (page) => {
             await waitForCookiesDialog(page);
             await page.keyboard.press('ControlOrMeta+K');
@@ -149,7 +147,6 @@ const searchTestCases: Test[] = [
                 mode: CustomizationAIMode.Assistant,
             },
         }),
-        screenshot: false,
         run: async (page) => {
             await waitForCookiesDialog(page);
             const searchInput = page.locator('css=[data-testid="search-input"]');
@@ -186,7 +183,6 @@ const searchTestCases: Test[] = [
                 mode: CustomizationAIMode.Assistant,
             },
         }),
-        screenshot: false,
         run: async (page) => {
             await waitForCookiesDialog(page);
             await page.keyboard.press('ControlOrMeta+I');
@@ -203,7 +199,6 @@ const searchTestCases: Test[] = [
                 mode: CustomizationAIMode.Assistant,
             },
         }),
-        screenshot: false,
         run: async (page) => {
             await waitForCookiesDialog(page);
             await page.getByTestId('ai-chat-button').click();
@@ -220,7 +215,6 @@ const searchTestCases: Test[] = [
                 mode: CustomizationAIMode.Assistant,
             },
         })}&ask=`,
-        screenshot: false,
         run: async (page) => {
             await waitForCookiesDialog(page);
             await expect(page.getByTestId('search-input')).not.toBeFocused();
@@ -238,7 +232,6 @@ const searchTestCases: Test[] = [
                 mode: CustomizationAIMode.Assistant,
             },
         })}&ask=${encodeURIComponent(AI_PROMPT)}`,
-        screenshot: false,
         run: async (page) => {
             await waitForCookiesDialog(page);
             await expect(page.getByTestId('search-input')).not.toBeFocused();
