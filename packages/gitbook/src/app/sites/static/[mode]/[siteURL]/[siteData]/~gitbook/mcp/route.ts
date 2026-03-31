@@ -1,9 +1,11 @@
 import { SiteInsightsDisplayContext } from '@gitbook/api';
 
 import { type RouteLayoutParams, getStaticSiteContext } from '@/app/utils';
-import { throwIfDataError } from '@/lib/data';
+import { getExposableError, throwIfDataError } from '@/lib/data';
+import { getMarkdownForPageInSpace } from '@/lib/markdownPage';
+import { resolvePagePath } from '@/lib/pages';
 import { joinPathWithBaseURL } from '@/lib/paths';
-import { findSiteSpaceBy } from '@/lib/sites';
+import { findSiteSpaceBy, findSiteSpaceByUrl } from '@/lib/sites';
 import { trackServerInsightsEvents } from '@/lib/tracking';
 import { waitUntil } from '@/lib/waitUntil';
 import { createMcpHandler } from 'mcp-handler';
@@ -124,6 +126,89 @@ async function handler(
                             });
                         }),
                     };
+                }
+            );
+
+            const siteUrl = context.siteSpace.urls.published;
+            server.tool(
+                'getPage',
+                `Fetch the full markdown content of a specific documentation page from ${site.title}. Use this when you have a page URL and want to read its content. Accepts full URLs (e.g. ${siteUrl}/getting-started). Since \`searchDocumentation\` returns partial content, use \`getPage\` to retrieve the complete page when you need more details. The content includes links you can follow to navigate to related pages.`,
+                {
+                    url: z
+                        .string()
+                        .describe('The URL of the page to fetch')
+                        .transform((value, ctx) => {
+                            if (URL.canParse(value)) {
+                                return value;
+                            }
+                            if (URL.canParse(`https://${value}`)) {
+                                return `https://${value}`;
+                            }
+                            ctx.addIssue({
+                                code: z.ZodIssueCode.custom,
+                                message: `"${value}" is not a valid URL. Expected a full URL like ${siteUrl}/getting-started`,
+                            });
+                            return z.NEVER;
+                        }),
+                },
+                async ({ url }) => {
+                    try {
+                        const match = findSiteSpaceByUrl(context.structure, url);
+                        if (!match) {
+                            return {
+                                content: [{ type: 'text', text: `Page not found: "${url}"` }],
+                                isError: true,
+                            };
+                        }
+
+                        const revision = await throwIfDataError(
+                            dataFetcher.getRevision({
+                                spaceId: match.siteSpace.space.id,
+                                revisionId: match.siteSpace.space.revision,
+                            })
+                        );
+
+                        const resolved = resolvePagePath(revision.pages, match.pagePath ?? '');
+                        if (!resolved) {
+                            return {
+                                content: [{ type: 'text', text: `Page not found: "${url}"` }],
+                                isError: true,
+                            };
+                        }
+
+                        const markdown = await getMarkdownForPageInSpace(
+                            context,
+                            match.siteSpace,
+                            resolved.page
+                        );
+
+                        waitUntil(
+                            trackServerInsightsEvents({
+                                organizationId: context.organizationId,
+                                siteId: site.id,
+                                events: [
+                                    {
+                                        type: 'page_view',
+                                        location: {
+                                            displayContext: SiteInsightsDisplayContext.Mcp,
+                                            page: resolved.page.id,
+                                            space: match.siteSpace.space.id,
+                                            revision: match.siteSpace.space.revision,
+                                        },
+                                    },
+                                ],
+                                request,
+                            })
+                        );
+
+                        return { content: [{ type: 'text', text: markdown }] };
+                    } catch (error) {
+                        const exposable = getExposableError(error);
+                        return {
+                            content: [{ type: 'text', text: exposable.message }],
+                            isError: true,
+                        };
+                    }
                 }
             );
         },

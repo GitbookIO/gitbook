@@ -7,6 +7,7 @@ import type {
     SiteStructure,
     TranslationLanguage,
 } from '@gitbook/api';
+import { extractPagePath } from './pages';
 import { joinPath } from './paths';
 import { flattenSectionsFromGroup } from './utils';
 
@@ -55,6 +56,35 @@ export function listAllSiteSpaces(siteStructure: SiteStructure) {
             .filter((subSection): subSection is SiteSection => subSection.object === 'site-section')
             .flatMap((subSection) => subSection.siteSpaces);
     });
+}
+
+type SiteSpaceMatch = { siteSpace: SiteSpace; pagePath: string; baseLength: number };
+
+/**
+ * Find the site space matching a URL.
+ */
+export function findSiteSpaceByUrl(
+    siteStructure: SiteStructure,
+    url: string
+): SiteSpaceMatch | null {
+    const siteSpaces = listAllSiteSpaces(siteStructure);
+
+    let bestMatch: SiteSpaceMatch | null = null;
+
+    for (const siteSpace of siteSpaces) {
+        const publishedUrl = siteSpace.urls.published;
+        if (!publishedUrl) continue;
+
+        const pagePath = extractPagePath(url, publishedUrl);
+        if (pagePath !== undefined) {
+            const baseLength = publishedUrl.length;
+            if (!bestMatch || baseLength > bestMatch.baseLength) {
+                bestMatch = { siteSpace, pagePath, baseLength };
+            }
+        }
+    }
+
+    return bestMatch;
 }
 
 /**
