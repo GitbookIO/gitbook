@@ -231,7 +231,7 @@
       },
       "dependencies": {
         "@fortawesome/fontawesome-svg-core": "^7.1.0",
-        "@gitbook/fontawesome-pro": "1.0.16",
+        "@gitbook/fontawesome-pro": "1.0.23",
       },
       "devDependencies": {
         "@types/react": "catalog:",
@@ -762,7 +762,7 @@
 
     "@gitbook/expr": ["@gitbook/expr@workspace:packages/expr"],
 
-    "@gitbook/fontawesome-pro": ["@gitbook/fontawesome-pro@1.0.16", "", { "dependencies": { "@fortawesome/fontawesome-common-types": "^7.1.0" } }, "sha512-jypE3FpC5U7lealzpGVq1Jie5Ay5jYv/UkOLxPhOpffjCd98A+Ex08M6GyINMDO7KCBaF5p8pbdl693hf0DwNg=="],
+    "@gitbook/fontawesome-pro": ["@gitbook/fontawesome-pro@1.0.23", "", { "dependencies": { "@fortawesome/fontawesome-common-types": "^7.2.0" } }, "sha512-igxgeuZvZIDghZhju8vAV3GjznwOUU2RHMGxGLxwf6QhL4soTJIveD+84C6EGQRieX8O1H6b4TOac3Hhom+Jcg=="],
 
     "@gitbook/fonts": ["@gitbook/fonts@workspace:packages/fonts"],
 
@@ -4085,6 +4085,8 @@
     "@floating-ui/react/@floating-ui/react-dom": ["@floating-ui/react-dom@2.1.7", "", { "dependencies": { "@floating-ui/dom": "^1.7.5" }, "peerDependencies": { "react": ">=16.8.0", "react-dom": ">=16.8.0" } }, "sha512-0tLRojf/1Go2JgEVm+3Frg9A3IW8bJgKgdO0BN5RkF//ufuz2joZM63Npau2ff3J6lUVYgDSNzNkR+aH3IVfjg=="],
 
     "@floating-ui/vue/@floating-ui/dom": ["@floating-ui/dom@1.7.4", "", { "dependencies": { "@floating-ui/core": "^1.7.3", "@floating-ui/utils": "^0.2.10" } }, "sha512-OOchDgh4F2CchOX94cRVqhvy7b3AFb+/rQXyswmzmGakRfkMgoWVjfnLWkRirfLEfuD4ysVW16eXzwt3jHIzKA=="],
+
+    "@gitbook/fontawesome-pro/@fortawesome/fontawesome-common-types": ["@fortawesome/fontawesome-common-types@7.2.0", "", {}, "sha512-IpR0bER9FY25p+e7BmFH25MZKEwFHTfRAfhOyJubgiDnoJNsSvJ7nigLraHtp4VOG/cy8D7uiV0dLkHOne5Fhw=="],
 
     "@headlessui/react/@floating-ui/react": ["@floating-ui/react@0.26.28", "", { "dependencies": { "@floating-ui/react-dom": "^2.1.2", "@floating-ui/utils": "^0.2.8", "tabbable": "^6.0.0" }, "peerDependencies": { "react": ">=16.8.0", "react-dom": ">=16.8.0" } }, "sha512-yORQuuAtVpiRjpMhdc0wJj06b9JFjrYF4qp96j++v2NBpbi6SEGF7donUJ3TMieerQ6qVkAv1tgr7L4r5roTqw=="],
 
