@@ -37,6 +37,7 @@ export async function EmbeddableRootLayout({
                         ? undefined
                         : context.customization.themes.default
                 }
+                defaultTheme={context.customization.themes.default}
                 externalLinksTarget={context.customization.externalLinks.target}
                 contextId={context.contextId}
                 proxyOrigin={context.site.proxy?.origin}

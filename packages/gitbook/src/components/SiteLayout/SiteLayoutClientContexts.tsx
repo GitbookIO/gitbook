@@ -1,6 +1,6 @@
 'use client';
 
-import type { CustomizationThemeMode, SiteExternalLinksTarget } from '@gitbook/api';
+import type { CustomizationDefaultThemeMode, SiteExternalLinksTarget } from '@gitbook/api';
 import { MotionConfig, useReducedMotion } from 'motion/react';
 import { ThemeProvider } from 'next-themes';
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
@@ -15,13 +15,15 @@ import { isExternalLink } from '../utils/link';
  * Client component context providers for the site layout.
  */
 export function SiteLayoutClientContexts(props: {
-    forcedTheme: CustomizationThemeMode | undefined;
+    forcedTheme: CustomizationDefaultThemeMode | undefined;
+    defaultTheme: CustomizationDefaultThemeMode | undefined;
     externalLinksTarget: SiteExternalLinksTarget;
     contextId: string | undefined;
     proxyOrigin: string | undefined;
     children: React.ReactNode;
 }) {
-    const { children, forcedTheme, externalLinksTarget, contextId, proxyOrigin } = props;
+    const { children, forcedTheme, defaultTheme, externalLinksTarget, contextId, proxyOrigin } =
+        props;
 
     useClearRouterCache(contextId);
 
@@ -48,6 +50,7 @@ export function SiteLayoutClientContexts(props: {
             disableTransitionOnChange
             enableSystem
             forcedTheme={forcedTheme}
+            defaultTheme={defaultTheme}
         >
             <NuqsAdapter>
                 <LinkContext.Provider value={linkContext}>
