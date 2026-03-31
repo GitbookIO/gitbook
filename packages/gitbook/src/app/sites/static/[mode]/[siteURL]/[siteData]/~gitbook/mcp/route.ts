@@ -132,9 +132,24 @@ async function handler(
             const siteUrl = context.siteSpace.urls.published;
             server.tool(
                 'getPage',
-                `Fetch the full markdown content of a specific documentation page ferom ${site.title}. Use this when you have a page URL and want to read its content. Accepts full URLs (e.g. ${siteUrl}/getting-started). Since searchDocumentation returns partial content, use getPage to retrieve the complete page when you need more details. The content includes links you can follow to navigate to related pages.`,
+                `Fetch the full markdown content of a specific documentation page from ${site.title}. Use this when you have a page URL and want to read its content. Accepts full URLs (e.g. ${siteUrl}/getting-started). Since \`searchDocumentation\` returns partial content, use \`getPage\` to retrieve the complete page when you need more details. The content includes links you can follow to navigate to related pages.`,
                 {
-                    url: z.string().describe('The URL of the page to fetch'),
+                    url: z
+                        .string()
+                        .describe('The URL of the page to fetch')
+                        .transform((value, ctx) => {
+                            if (URL.canParse(value)) {
+                                return value;
+                            }
+                            if (URL.canParse(`https://${value}`)) {
+                                return `https://${value}`;
+                            }
+                            ctx.addIssue({
+                                code: z.ZodIssueCode.custom,
+                                message: `"${value}" is not a valid URL. Expected a full URL like ${siteUrl}/getting-started`,
+                            });
+                            return z.NEVER;
+                        }),
                 },
                 async ({ url }) => {
                     try {

@@ -58,14 +58,18 @@ export function listAllSiteSpaces(siteStructure: SiteStructure) {
     });
 }
 
+type SiteSpaceMatch = { siteSpace: SiteSpace; pagePath: string; baseLength: number };
+
 /**
  * Find the site space matching a URL.
  */
 export function findSiteSpaceByUrl(
     siteStructure: SiteStructure,
     url: string
-): { siteSpace: SiteSpace; pagePath: string } | null {
+): SiteSpaceMatch | null {
     const siteSpaces = listAllSiteSpaces(siteStructure);
+
+    let bestMatch: SiteSpaceMatch | null = null;
 
     for (const siteSpace of siteSpaces) {
         const publishedUrl = siteSpace.urls.published;
@@ -73,11 +77,14 @@ export function findSiteSpaceByUrl(
 
         const pagePath = extractPagePath(url, publishedUrl);
         if (pagePath !== undefined) {
-            return { siteSpace, pagePath };
+            const baseLength = publishedUrl.length;
+            if (!bestMatch || baseLength > bestMatch.baseLength) {
+                bestMatch = { siteSpace, pagePath, baseLength };
+            }
         }
     }
 
-    return null;
+    return bestMatch;
 }
 
 /**

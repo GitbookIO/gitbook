@@ -271,21 +271,12 @@ export function extractPagePath(url: string, baseURL: string): string | undefine
 }
 
 /**
- * Parse a URL, trying to add https:// if missing and return its pathname
+ * Parse a URL and return its pathname.
  */
 function getURLPathname(url: string): string | undefined {
-    const urlToParse = (() => {
-        if (URL.canParse(url)) {
-            return url;
-        }
-        if (URL.canParse(`https://${url}`)) {
-            return `https://${url}`;
-        }
-    })();
-
-    if (!urlToParse) {
-        return;
+    if (!URL.canParse(url)) {
+        return undefined;
     }
 
-    return removeTrailingSlash(new URL(urlToParse).pathname);
+    return removeTrailingSlash(new URL(url).pathname);
 }
