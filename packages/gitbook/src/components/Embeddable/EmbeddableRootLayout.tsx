@@ -6,7 +6,7 @@ import {
 } from '@/components/SiteLayout';
 import type { VisitorAuthClaims } from '@/lib/adaptive';
 import type { GitBookSiteContext } from '@/lib/context';
-import { SiteInsightsTrademarkPlacement } from '@gitbook/api';
+import { CustomizationDefaultThemeMode, SiteInsightsTrademarkPlacement } from '@gitbook/api';
 import { SpaceLayoutServerContext } from '../SpaceLayout';
 import { Trademark } from '../TableOfContents/Trademark';
 import { NavigationLoader } from '../primitives/NavigationLoader';
@@ -33,7 +33,8 @@ export async function EmbeddableRootLayout({
         <CustomizationRootLayout context={context} htmlClassName="embed">
             <SiteLayoutClientContexts
                 forcedTheme={
-                    context.customization.themes.toggeable
+                    context.customization.themes.toggeable ||
+                    context.customization.themes.default === CustomizationDefaultThemeMode.System
                         ? undefined
                         : context.customization.themes.default
                 }
