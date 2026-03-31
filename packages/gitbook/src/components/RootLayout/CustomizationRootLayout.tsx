@@ -1,9 +1,8 @@
 import {
-    type CustomizationDefaultThemeMode,
+    CustomizationDefaultThemeMode,
     CustomizationIconsStyle,
     CustomizationSidebarBackgroundStyle,
     CustomizationSidebarListStyle,
-    CustomizationThemeMode,
     type CustomizationThemedColor,
     type CustomizationTint,
     type SiteCustomizationSettings,
@@ -109,7 +108,7 @@ export async function CustomizationRootLayout(props: {
                     : null,
 
                 // Set the dark/light class statically to avoid flashing and make it work when JS is disabled
-                (forcedTheme ?? customization.themes.default) === CustomizationThemeMode.Dark
+                (forcedTheme ?? customization.themes.default) === CustomizationDefaultThemeMode.Dark
                     ? 'dark'
                     : '',
                 htmlClassName
