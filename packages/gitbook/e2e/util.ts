@@ -340,7 +340,7 @@ export function getCustomizationURL(partial: DeepPartial<SiteCustomizationSettin
             groups: [],
         },
         themes: {
-            default: CustomizationDefaultThemeMode.Light,
+            default: CustomizationDefaultThemeMode.System,
             toggeable: true,
         },
         pdf: {

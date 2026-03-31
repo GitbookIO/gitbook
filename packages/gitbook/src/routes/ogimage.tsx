@@ -58,10 +58,7 @@ export async function serveOGImage(baseContext: GitBookSiteContext, params: Page
             boldText: `${site.title} ${pageTitle}`,
         });
 
-    const theme =
-        customization.themes.default === CustomizationDefaultThemeMode.System
-            ? 'light'
-            : customization.themes.default;
+    const theme = getTheme(customization);
     const useLightTheme = theme === 'light';
 
     // We have no access to CSS variables, so we'll have to hardcode some values
@@ -347,4 +344,15 @@ function transformText(text: string) {
     }
 
     return '';
+}
+
+type Theme = CustomizationDefaultThemeMode.Dark | CustomizationDefaultThemeMode.Light;
+
+function getTheme(customization: GitBookSiteContext['customization']): Theme {
+    // If the theme is system, we use the light theme
+    if (customization.themes.default === CustomizationDefaultThemeMode.System) {
+        return CustomizationDefaultThemeMode.Light;
+    }
+
+    return customization.themes.default;
 }
