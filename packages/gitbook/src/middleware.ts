@@ -727,6 +727,7 @@ function encodePathInSiteContent(
                 ],
             };
         case '~gitbook/mcp':
+        case '~gitbook/mcp/auth':
         case 'sitemap.xml':
         case 'sitemap-pages.xml':
         case 'robots.txt':

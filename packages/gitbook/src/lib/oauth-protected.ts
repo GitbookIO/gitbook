@@ -18,6 +18,7 @@ const OAUTH_PROTECTED_RESOURCE_METADATA_PATH = '/.well-known/oauth-protected-res
  * List of OAuth protected resources.
  */
 const OAUTH_PROTECTED_RESOURCES: OAuthProtectedResource[] = [
+    { endpoint: '/~gitbook/mcp/auth', realm: 'mcp' },
     { endpoint: '/~gitbook/mcp', realm: 'mcp' },
 ];
 

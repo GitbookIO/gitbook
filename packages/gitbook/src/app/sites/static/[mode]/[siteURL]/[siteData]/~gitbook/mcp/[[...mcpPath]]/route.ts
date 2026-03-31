@@ -9,20 +9,28 @@ import { findSiteSpaceBy, findSiteSpaceByUrl } from '@/lib/sites';
 import { trackServerInsightsEvents } from '@/lib/tracking';
 import { waitUntil } from '@/lib/waitUntil';
 import { createMcpHandler } from 'mcp-handler';
+import { notFound } from 'next/navigation';
 import type { NextRequest } from 'next/server';
 import { z } from 'zod';
 
-async function handler(
-    rawRequest: NextRequest,
-    { params }: { params: Promise<RouteLayoutParams> }
-) {
-    const { context } = await getStaticSiteContext(await params);
+type McpRouteParams = RouteLayoutParams & {
+    mcpPath?: string[];
+};
+
+async function handler(rawRequest: NextRequest, { params }: { params: Promise<McpRouteParams> }) {
+    const routeParams = await params;
+    const pathSuffix = routeParams.mcpPath?.join('/');
+
+    if (pathSuffix && pathSuffix !== 'auth') {
+        notFound();
+    }
+
+    const endpoint = pathSuffix === 'auth' ? '~gitbook/mcp/auth' : '~gitbook/mcp';
+    const { context } = await getStaticSiteContext(routeParams);
     const { dataFetcher, linker, site } = context;
 
     // Next.js request.url is the original URL and not the rewritten one from the middleware
-    const requestURL = new URL(
-        context.linker.toAbsoluteURL(context.linker.toPathInSite('~gitbook/mcp'))
-    );
+    const requestURL = new URL(context.linker.toAbsoluteURL(context.linker.toPathInSite(endpoint)));
     requestURL.search = rawRequest.nextUrl.search;
     const request = new Request(requestURL, rawRequest);
 
@@ -60,7 +68,6 @@ async function handler(
                         })
                     );
 
-                    // Track the search event server-side
                     waitUntil(
                         trackServerInsightsEvents({
                             organizationId: context.organizationId,
@@ -214,8 +221,7 @@ async function handler(
         },
         {},
         {
-            basePath: context.linker.toPathInSite('~gitbook/'),
-            streamableHttpEndpoint: '/mcp',
+            streamableHttpEndpoint: context.linker.toPathInSite(endpoint),
             maxDuration: 60,
             verboseLogs: true,
             disableSse: true,
