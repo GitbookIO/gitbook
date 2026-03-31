@@ -3,6 +3,7 @@ import {
     CustomizationBackground,
     CustomizationCorners,
     CustomizationDefaultMonospaceFont,
+    CustomizationDefaultThemeMode,
     CustomizationDepth,
     CustomizationHeaderPreset,
     CustomizationIconsStyle,
@@ -1096,7 +1097,7 @@ const testCases: TestsCase[] = [
                 name: 'With cover for dark mode',
                 url: `page-options/page-with-dark-cover${getCustomizationURL({
                     themes: {
-                        default: Default.Dark,
+                        default: CustomizationDefaultThemeMode.Dark,
                         toggeable: false,
                     },
                 })}`,
