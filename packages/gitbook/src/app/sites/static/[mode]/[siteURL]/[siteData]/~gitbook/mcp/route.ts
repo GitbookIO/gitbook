@@ -129,10 +129,10 @@ async function handler(
                 }
             );
 
-            const siteUrl = context.siteSpace.urls.published ?? 'https://docs.example.com';
+            const siteUrl = context.siteSpace.urls.published;
             server.tool(
                 'getPage',
-                `Fetch the full markdown content of a specific documentation page from ${site.title}. Use this when you have a page URL and want to read its content. Accepts full URLs (e.g. ${siteUrl}/getting-started). Since searchDocumentation returns partial content, use getPage to retrieve the complete page when you need more details. The content includes links you can follow to navigate to related pages.`,
+                `Fetch the full markdown content of a specific documentation page ferom ${site.title}. Use this when you have a page URL and want to read its content. Accepts full URLs (e.g. ${siteUrl}/getting-started). Since searchDocumentation returns partial content, use getPage to retrieve the complete page when you need more details. The content includes links you can follow to navigate to related pages.`,
                 {
                     url: z.string().describe('The URL of the page to fetch'),
                 },
