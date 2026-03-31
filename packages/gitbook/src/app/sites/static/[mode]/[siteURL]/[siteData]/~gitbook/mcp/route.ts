@@ -1,9 +1,9 @@
 import { SiteInsightsDisplayContext } from '@gitbook/api';
 
 import { type RouteLayoutParams, getStaticSiteContext } from '@/app/utils';
-import { getDataOrNull, getExposableError, throwIfDataError } from '@/lib/data';
+import { getExposableError, throwIfDataError } from '@/lib/data';
 import { getMarkdownForPageInSpace } from '@/lib/markdownPage';
-import { resolveFirstDocument } from '@/lib/pages';
+import { resolvePagePath } from '@/lib/pages';
 import { joinPathWithBaseURL } from '@/lib/paths';
 import { findSiteSpaceBy, findSiteSpaceByUrl } from '@/lib/sites';
 import { trackServerInsightsEvents } from '@/lib/tracking';
@@ -146,45 +146,27 @@ async function handler(
                             };
                         }
 
-                        // Handle empty path (root URL) - fetch first document
-                        if (!match.pagePath) {
-                            const revision = await getDataOrNull(
-                                dataFetcher.getRevision({
-                                    spaceId: match.siteSpace.space.id,
-                                    revisionId: match.siteSpace.space.revision,
-                                })
-                            );
-                            const firstDoc = revision && resolveFirstDocument(revision.pages, []);
-                            if (firstDoc) {
-                                const markdown = await getMarkdownForPageInSpace(
-                                    context,
-                                    match.siteSpace,
-                                    firstDoc.page
-                                );
-                                return { content: [{ type: 'text', text: markdown }] };
-                            }
-                        } else {
-                            const page = await getDataOrNull(
-                                dataFetcher.getRevisionPageByPath({
-                                    spaceId: match.siteSpace.space.id,
-                                    revisionId: match.siteSpace.space.revision,
-                                    path: match.pagePath,
-                                })
-                            );
-                            if (page) {
-                                const markdown = await getMarkdownForPageInSpace(
-                                    context,
-                                    match.siteSpace,
-                                    page
-                                );
-                                return { content: [{ type: 'text', text: markdown }] };
-                            }
+                        const revision = await throwIfDataError(
+                            dataFetcher.getRevision({
+                                spaceId: match.siteSpace.space.id,
+                                revisionId: match.siteSpace.space.revision,
+                            })
+                        );
+
+                        const resolved = resolvePagePath(revision.pages, match.pagePath ?? '');
+                        if (!resolved) {
+                            return {
+                                content: [{ type: 'text', text: `Page not found: "${url}"` }],
+                                isError: true,
+                            };
                         }
 
-                        return {
-                            content: [{ type: 'text', text: `Page not found: "${url}"` }],
-                            isError: true,
-                        };
+                        const markdown = await getMarkdownForPageInSpace(
+                            context,
+                            match.siteSpace,
+                            resolved.page
+                        );
+                        return { content: [{ type: 'text', text: markdown }] };
                     } catch (error) {
                         const exposable = getExposableError(error);
                         return {

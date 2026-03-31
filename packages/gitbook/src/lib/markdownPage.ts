@@ -85,7 +85,7 @@ export async function getMarkdownForPageInSpace(
     if (page.type === RevisionPageType.Group) {
         const siteSpaceUrl = siteSpace.urls.published;
         if (!siteSpaceUrl) {
-            return `# ${page.title}\n\nThis page is not published.`;
+            throw new DataFetcherError(`Page "${page.title}" is not published`, 404);
         }
         return renderGroupPageMarkdown({ siteSpaceUrl, linker, page });
     }
@@ -108,7 +108,7 @@ export async function getMarkdownForPageInSpace(
     if (isEmptyMarkdownPage(tree) && page.pages.length > 0) {
         const siteSpaceUrl = siteSpace.urls.published;
         if (!siteSpaceUrl) {
-            return `# ${page.title}\n\nThis page is not published.`;
+            throw new DataFetcherError(`Page "${page.title}" is not published`, 404);
         }
         return renderGroupPageMarkdown({ siteSpaceUrl, linker, page });
     }
