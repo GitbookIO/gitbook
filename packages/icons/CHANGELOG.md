@@ -1,5 +1,11 @@
 # @gitbook/icons
 
+## 0.4.6
+
+### Patch Changes
+
+- ab17ff4: Update missing CustomIconName
+
 ## 0.4.5
 
 ### Patch Changes
