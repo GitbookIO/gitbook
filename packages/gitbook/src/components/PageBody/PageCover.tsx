@@ -94,22 +94,22 @@ export async function PageCover(props: {
                           'md:-mx-8',
 
                           // If there's no sidebar, extend the cover
-                          'layout-default:page-no-toc:lg:-ml-92',
-                          'not-layout-full:2xl:circular-corners:rounded-b-3xl',
-                          'not-layout-full:2xl:rounded-corners:rounded-b-xl',
+                          'page-no-toc:lg:-ml-92',
+                          //   'not-layout-full:2xl:circular-corners:rounded-b-3xl',
+                          //   'not-layout-full:2xl:rounded-corners:rounded-b-xl',
 
                           // In layout-wide, extend cover to account for outline sidebar on the right
                           'layout-wide:2xl:-mr-[min(calc((100vw-90rem)/2+2rem),18rem)]',
 
                           // In layout-full, extend cover to full screen width
-                          'layout-full:xl:-mx-[max(calc((100vw-90rem)/2+2rem),2rem)]',
+                          'layout-wide:no-sidebar:xl:-mx-[max(calc((100vw-90rem)/2+2rem),2rem)]',
 
                           // Round the bottom left corner once the sidebar is shown next to it
-                          'not-layout-full:lg:rounded-corners:rounded-bl-xl',
-                          'not-layout-full:lg:circular-corners:rounded-bl-3xl',
+                          //   'not-layout-full:lg:rounded-corners:rounded-bl-xl',
+                          //   'not-layout-full:lg:circular-corners:rounded-bl-3xl',
                           // Round the bottom right corner once the page is wider than the image
-                          'not-layout-full:2xl:rounded-corners:rounded-br-xl',
-                          'not-layout-full:2xl:circular-corners:rounded-br-3xl',
+                          //   'not-layout-full:2xl:rounded-corners:rounded-br-xl',
+                          //   'not-layout-full:2xl:circular-corners:rounded-br-3xl',
                       ]
                     : [
                           // Regular cover: size regularly along with other content

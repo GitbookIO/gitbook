@@ -50,16 +50,16 @@ export async function TableOfContents(props: {
                     'border-tint-subtle',
 
                     'lg:flex!',
-                    'embed:lg:layout-full:hidden!',
+                    'embed:lg:layout-wide:no-sidebar:hidden!',
                     'lg:animate-none!',
                     'lg:sticky',
                     'lg:mr-12',
                     'lg:z-0',
 
-                    'layout-full:lg:fixed',
-                    'layout-full:lg:max-3xl:w-12',
-                    'layout-full:lg:left-5',
-                    'layout-full:lg:z-30',
+                    'layout-wide:no-sidebar:lg:fixed',
+                    'layout-wide:no-sidebar:lg:max-3xl:w-12',
+                    'layout-wide:no-sidebar:lg:left-5',
+                    'layout-wide:no-sidebar:lg:z-30',
 
                     // Server-side static positioning
                     'lg:top-0',
@@ -86,7 +86,7 @@ export async function TableOfContents(props: {
 
                     'pt-6 pb-4',
                     'supports-[-webkit-touch-callout]:pb-[env(safe-area-inset-bottom)]', // Override bottom padding on iOS since we have a transparent bottom bar
-                    'lg:max-3xl:sidebar-filled:not-layout-full:pr-6',
+                    'lg:max-3xl:sidebar-filled:layout-default:pr-6',
                     'max-lg:pl-8',
 
                     'flex',
@@ -100,7 +100,7 @@ export async function TableOfContents(props: {
                 <div // The actual sidebar, either shown with a filled bg or transparent.
                     className={tcls(
                         '-ms-5', // By default we shift the sidebar to the left to compensate for the PagesList padding.
-                        'layout-full:ms-0',
+                        'layout-wide:no-sidebar:ms-0',
                         'relative flex min-h-0 grow flex-col border-tint-subtle',
 
                         'sidebar-filled:bg-tint-subtle',
@@ -144,7 +144,7 @@ export async function TableOfContents(props: {
                                 context={context}
                                 placement={SiteInsightsTrademarkPlacement.Sidebar}
                                 className={tcls(
-                                    'm-2 mt-auto px-4 py-3.5 layout-full:lg:max-3xl:hidden'
+                                    'm-2 mt-auto px-4 py-3.5 layout-wide:no-sidebar:lg:max-3xl:hidden'
                                 )}
                                 truncate={false}
                             />
@@ -154,7 +154,7 @@ export async function TableOfContents(props: {
                                 context={context}
                                 placement={SiteInsightsTrademarkPlacement.Sidebar}
                                 className={tcls(
-                                    'mb-2 3xl:hidden not-layout-full:hidden self-start bg-tint-base depth-flat:bg-tint-base'
+                                    'mb-2 3xl:hidden layout-default:hidden self-start bg-tint-base depth-flat:bg-tint-base has-sidebar:hidden'
                                 )}
                                 iconOnly={true}
                             />

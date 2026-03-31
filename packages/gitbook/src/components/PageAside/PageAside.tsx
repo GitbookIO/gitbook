@@ -83,16 +83,6 @@ export function PageAside(props: {
                 'layout-wide:xl:-mr-68',
                 'layout-wide:3xl:not-chat-open:flex!',
                 'layout-wide:3xl:not-chat-open:animate-none!',
-                // 'layout-wide:min-[150rem]:animate-none!',
-                // 'layout-wide:min-[150rem]:flex!',
-                // 'layout-wide:chat-open:max-[2416px]:hidden',
-
-                // In layout-full mode (1-column, no TOC), position outline as a fixed sidebar on the right
-                // Hide it on narrow viewports (< 3xl) to prevent overlap with content
-                'layout-full:xl:max-3xl:-mr-68',
-                'layout-full:3xl:flex!',
-                'layout-full:3xl:animate-none!',
-                'layout-full:3xl:fixed',
 
                 'hydrated:site-background', // Only add a background once the element is positioned correctly to prevent overlapping the page cover
                 'text-tint',

@@ -685,11 +685,7 @@ const config: Config = {
              * <header> element during navigation (see PreservePageLayout component).
              */
             addVariant('layout-default', 'body:has(.layout-default) &');
-            addVariant('layout-wide', 'body:has(.layout-wide):has(.page-has-toc, .has-sidebar) & ');
-            addVariant(
-                'layout-full',
-                'body:has(.layout-wide):has(.page-no-toc):has(.no-sidebar) &'
-            );
+            addVariant('layout-wide', 'body:has(.layout-wide) & ');
 
             addVariant('page-no-toc', 'body:has(.page-no-toc) &');
             addVariant('page-has-toc', 'body:has(.page-has-toc) &');

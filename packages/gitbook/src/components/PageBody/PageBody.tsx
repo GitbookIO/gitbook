@@ -79,7 +79,7 @@ export function PageBody(props: {
                 className={tcls(
                     'relative min-w-0 flex-1',
                     'py-8',
-                    'layout-full:lg:max-xl:pb-20', // Add padding to prevent overlap of minimised trademark
+                    'layout-wide:no-sidebar:lg:max-xl:pb-20', // Add padding to prevent overlap of minimised trademark
                     'break-anywhere', // Allow words to break if they are too long.
                     '@container',
                     CONTENT_STYLE,

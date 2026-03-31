@@ -27,7 +27,6 @@ export const CONTAINER_STYLE: ClassValue = [
 export const CONTENT_STYLE: ClassValue = [
     'max-w-3xl',
     'layout-wide:max-w-6xl',
-    'layout-full:max-w-6xl',
     'mx-auto',
     'w-full',
 ];
