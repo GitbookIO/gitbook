@@ -6,6 +6,7 @@ import {
     CustomizationCorners,
     CustomizationDefaultFont,
     CustomizationDefaultMonospaceFont,
+    CustomizationDefaultThemeMode,
     CustomizationDepth,
     type CustomizationHeaderItem,
     CustomizationHeaderPreset,
@@ -340,7 +341,7 @@ export function getCustomizationURL(partial: DeepPartial<SiteCustomizationSettin
             groups: [],
         },
         themes: {
-            default: CustomizationThemeMode.Light,
+            default: CustomizationDefaultThemeMode.Light,
             toggeable: true,
         },
         pdf: {
