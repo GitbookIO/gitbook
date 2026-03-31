@@ -7,7 +7,7 @@
       "devDependencies": {
         "@biomejs/biome": "^1.9.4",
         "@changesets/cli": "^2.30.0",
-        "turbo": "^2.8.16",
+        "turbo": "^2.9.1",
         "vercel": "50.37.3",
       },
     },
@@ -230,7 +230,7 @@
         "gitbook-icons": "./bin/gitbook-icons.js",
       },
       "dependencies": {
-        "@fortawesome/fontawesome-svg-core": "^7.1.0",
+        "@fortawesome/fontawesome-svg-core": "^7.2.0",
         "@gitbook/fontawesome-pro": "1.0.23",
       },
       "devDependencies": {
@@ -744,9 +744,9 @@
 
     "@formatjs/intl-localematcher": ["@formatjs/intl-localematcher@0.5.10", "", { "dependencies": { "tslib": "2" } }, "sha512-af3qATX+m4Rnd9+wHcjJ4w2ijq+rAVP3CCinJQvFv1kgSu1W6jypUmvleJxcewdxmutM8dmIRZFxO/IQBZmP2Q=="],
 
-    "@fortawesome/fontawesome-common-types": ["@fortawesome/fontawesome-common-types@7.1.0", "", {}, "sha512-l/BQM7fYntsCI//du+6sEnHOP6a74UixFyOYUyz2DLMXKx+6DEhfR3F2NYGE45XH1JJuIamacb4IZs9S0ZOWLA=="],
+    "@fortawesome/fontawesome-common-types": ["@fortawesome/fontawesome-common-types@7.2.0", "", {}, "sha512-IpR0bER9FY25p+e7BmFH25MZKEwFHTfRAfhOyJubgiDnoJNsSvJ7nigLraHtp4VOG/cy8D7uiV0dLkHOne5Fhw=="],
 
-    "@fortawesome/fontawesome-svg-core": ["@fortawesome/fontawesome-svg-core@7.1.0", "", { "dependencies": { "@fortawesome/fontawesome-common-types": "7.1.0" } }, "sha512-fNxRUk1KhjSbnbuBxlWSnBLKLBNun52ZBTcs22H/xEEzM6Ap81ZFTQ4bZBxVQGQgVY0xugKGoRcCbaKjLQ3XZA=="],
+    "@fortawesome/fontawesome-svg-core": ["@fortawesome/fontawesome-svg-core@7.2.0", "", { "dependencies": { "@fortawesome/fontawesome-common-types": "7.2.0" } }, "sha512-6639htZMjEkwskf3J+e6/iar+4cTNM9qhoWuRfj9F3eJD6r7iCzV1SWnQr2Mdv0QT0suuqU8BoJCZUyCtP9R4Q=="],
 
     "@gitbook/api": ["@gitbook/api@0.174.0", "", { "dependencies": { "event-iterator": "^2.0.0", "eventsource-parser": "^3.0.0" } }, "sha512-+IUEXq7N5EbRzDVMO3LkM/NcH6YZtRqotTQRWGWx6mTRgGdI0hhRSEGUY2ohcohDFCmBdFoimqvdWiqRvWJ0Dw=="],
 
@@ -4085,8 +4085,6 @@
     "@floating-ui/react/@floating-ui/react-dom": ["@floating-ui/react-dom@2.1.7", "", { "dependencies": { "@floating-ui/dom": "^1.7.5" }, "peerDependencies": { "react": ">=16.8.0", "react-dom": ">=16.8.0" } }, "sha512-0tLRojf/1Go2JgEVm+3Frg9A3IW8bJgKgdO0BN5RkF//ufuz2joZM63Npau2ff3J6lUVYgDSNzNkR+aH3IVfjg=="],
 
     "@floating-ui/vue/@floating-ui/dom": ["@floating-ui/dom@1.7.4", "", { "dependencies": { "@floating-ui/core": "^1.7.3", "@floating-ui/utils": "^0.2.10" } }, "sha512-OOchDgh4F2CchOX94cRVqhvy7b3AFb+/rQXyswmzmGakRfkMgoWVjfnLWkRirfLEfuD4ysVW16eXzwt3jHIzKA=="],
-
-    "@gitbook/fontawesome-pro/@fortawesome/fontawesome-common-types": ["@fortawesome/fontawesome-common-types@7.2.0", "", {}, "sha512-IpR0bER9FY25p+e7BmFH25MZKEwFHTfRAfhOyJubgiDnoJNsSvJ7nigLraHtp4VOG/cy8D7uiV0dLkHOne5Fhw=="],
 
     "@headlessui/react/@floating-ui/react": ["@floating-ui/react@0.26.28", "", { "dependencies": { "@floating-ui/react-dom": "^2.1.2", "@floating-ui/utils": "^0.2.8", "tabbable": "^6.0.0" }, "peerDependencies": { "react": ">=16.8.0", "react-dom": ">=16.8.0" } }, "sha512-yORQuuAtVpiRjpMhdc0wJj06b9JFjrYF4qp96j++v2NBpbi6SEGF7donUJ3TMieerQ6qVkAv1tgr7L4r5roTqw=="],
 
