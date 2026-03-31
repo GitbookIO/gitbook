@@ -1,5 +1,11 @@
 # @gitbook/icons
 
+## 0.4.4
+
+### Patch Changes
+
+- ccd21e4: Update fontawesome-pro to 1.0.23
+
 ## 0.4.3
 
 ### Patch Changes

@@ -1,6 +1,6 @@
 {
     "name": "@gitbook/react-contentkit",
-    "version": "0.7.12",
+    "version": "0.7.13",
     "type": "module",
     "exports": {
         ".": {

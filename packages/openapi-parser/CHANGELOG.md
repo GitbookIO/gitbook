@@ -1,5 +1,11 @@
 # @gitbook/openapi-parser
 
+## 3.0.11
+
+### Patch Changes
+
+- c56b569: Support expand-all options for OpenAPI
+
 ## 3.0.10
 
 ### Patch Changes
