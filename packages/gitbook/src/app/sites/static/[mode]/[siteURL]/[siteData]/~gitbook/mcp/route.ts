@@ -181,6 +181,26 @@ async function handler(
                             match.siteSpace,
                             resolved.page
                         );
+
+                        waitUntil(
+                            trackServerInsightsEvents({
+                                organizationId: context.organizationId,
+                                siteId: site.id,
+                                events: [
+                                    {
+                                        type: 'page_view',
+                                        location: {
+                                            displayContext: SiteInsightsDisplayContext.Mcp,
+                                            page: resolved.page.id,
+                                            space: match.siteSpace.space.id,
+                                            revision: match.siteSpace.space.revision,
+                                        },
+                                    },
+                                ],
+                                request,
+                            })
+                        );
+
                         return { content: [{ type: 'text', text: markdown }] };
                     } catch (error) {
                         const exposable = getExposableError(error);
