@@ -1,5 +1,5 @@
 import type { GitBookSiteContext } from '@/lib/context';
-import { CustomizationThemeMode } from '@gitbook/api';
+import { CustomizationDefaultThemeMode } from '@gitbook/api';
 import type { Metadata, Viewport } from 'next';
 import React from 'react';
 import * as ReactDOM from 'react-dom';
@@ -22,7 +22,7 @@ import { SiteLayoutClientContexts } from './SiteLayoutClientContexts';
  */
 export async function SiteLayout(props: {
     context: GitBookSiteContext;
-    forcedTheme?: CustomizationThemeMode | null;
+    forcedTheme?: CustomizationDefaultThemeMode | null;
     withTracking: boolean;
     visitorAuthClaims: VisitorAuthClaims;
     children: React.ReactNode;
@@ -92,12 +92,12 @@ export async function generateSiteLayoutViewport(context: GitBookSiteContext): P
     const { customization } = context;
     return {
         colorScheme: customization.themes.toggeable
-            ? customization.themes.default === CustomizationThemeMode.Dark
+            ? customization.themes.default === CustomizationDefaultThemeMode.Dark
                 ? 'dark light'
                 : 'light dark'
-            : customization.themes.default === CustomizationThemeMode.Dark
+            : customization.themes.default === CustomizationDefaultThemeMode.Dark
               ? 'dark'
-              : customization.themes.default === CustomizationThemeMode.Light
+              : customization.themes.default === CustomizationDefaultThemeMode.Light
                 ? 'light'
                 : 'light dark', // 'system' → let browser decide based on OS preference
         width: 'device-width',
@@ -189,7 +189,9 @@ export async function generateSiteLayoutMetadata(context: GitBookSiteContext): P
             capable: true,
             title: site.title,
             statusBarStyle:
-                customization.themes.default === CustomizationThemeMode.Dark ? 'black' : 'default',
+                customization.themes.default === CustomizationDefaultThemeMode.Dark
+                    ? 'black'
+                    : 'default',
         },
         robots: (await isSiteIndexable(context)) ? 'index, follow' : 'noindex, nofollow',
     };
