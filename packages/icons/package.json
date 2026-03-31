@@ -14,7 +14,7 @@
         }
     },
     "sideEffects": false,
-    "version": "0.4.3",
+    "version": "0.4.4",
     "dependencies": {
         "@fortawesome/fontawesome-svg-core": "^7.1.0",
         "@gitbook/fontawesome-pro": "1.0.23"
