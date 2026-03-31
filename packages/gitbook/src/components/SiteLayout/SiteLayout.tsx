@@ -50,10 +50,7 @@ export async function SiteLayout(props: {
             contextId={context.contextId}
             forcedTheme={
                 forcedTheme ??
-                (customization.themes.toggeable ||
-                customization.themes.default === CustomizationDefaultThemeMode.System
-                    ? undefined
-                    : customization.themes.default)
+                (customization.themes.toggeable ? undefined : customization.themes.default)
             }
             defaultTheme={customization.themes.default}
             externalLinksTarget={customization.externalLinks.target}
