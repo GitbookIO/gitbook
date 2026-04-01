@@ -79,57 +79,59 @@ export async function PageCover(props: {
     assert(light, 'Light image should be defined');
 
     return (
-        <div
-            data-gb-page-cover
-            data-full={String(as === 'full')}
-            className={tcls(
-                'overflow-hidden',
-                // Negative margin to balance the container padding
-                '-mx-4',
+        <div className="">
+            <div
+                data-gb-page-cover
+                data-full={String(as === 'full')}
+                className={tcls(
+                    'overflow-hidden',
+                    // Negative margin to balance the container padding
+                    '-mx-4',
 
-                // Full-width cover: extend to edges, disregard TOC where possible
-                as === 'full'
-                    ? [
-                          'sm:-mx-6',
-                          'md:-mx-8',
+                    // Full-width cover: extend to edges, disregard TOC where possible
+                    as === 'full'
+                        ? [
+                              'sm:-mx-6',
+                              'md:-mx-8',
 
-                          // If there's no sidebar, extend the cover
-                          'layout-default:page-no-toc:lg:-ml-92',
+                              // Extend the full-width cover
+                              'layout-default:page-no-toc:lg:-ml-92', // Extend into the left sidebar if there's no TOC...
+                              'layout-wide:2xl:-mr-72', // ...and to the right if there's no outline.
+                              'layout-wide:page-no-toc:2xl:-mx-[max(calc((100vw-90rem)/2+2rem),2rem)]', // Span full width if the page content is centered.
+                              'layout-wide:has-sidebar:page-no-toc:lg:-ml-[max(calc((100vw-90rem)/2+23rem),23rem)]', // If there's still a sidebar, we have to factor it in too.
 
-                          'layout-wide:2xl:-mr-72',
-                          'layout-wide:page-no-toc:2xl:-ml-72',
-                          'layout-wide:has-sidebar:page-no-toc:lg:-ml-156',
-
-                          'layout-wide:3xl:circular-corners:rounded-b-3xl',
-                          'layout-wide:3xl:rounded-corners:rounded-b-xl',
-
-                          // Round the bottom left corner once the sidebar is shown next to it
-                          //   'not-layout-full:lg:rounded-corners:rounded-bl-xl',
-                          //   'not-layout-full:lg:circular-corners:rounded-bl-3xl',
-                          // Round the bottom right corner once the page is wider than the image
-                          //   'not-layout-full:2xl:rounded-corners:rounded-br-xl',
-                          //   'not-layout-full:2xl:circular-corners:rounded-br-3xl',
-                      ]
-                    : [
-                          // Regular cover: size regularly along with other content
-                          CONTENT_STYLE,
-                          'max-sm:-mx-4',
-                          'sm:rounded-corners:rounded-xl',
-                          'sm:circular-corners:rounded-3xl',
-                          'mb-8',
-                          'max-sm:w-screen',
-                          'max-sm:-mt-8',
-                      ]
-            )}
-        >
-            <PageCoverImage
-                imgs={{
-                    light,
-                    dark,
-                }}
-                y={cover.yPos}
-                height={height}
-            />
+                              // Corner rounding:
+                              // Round the bottom corners for wide layouts
+                              'layout-wide:3xl:circular-corners:rounded-b-3xl',
+                              'layout-wide:3xl:rounded-corners:rounded-b-xl',
+                              // Round the bottom left corner once the sidebar is shown next to it
+                              'has-sidebar:lg:rounded-corners:rounded-bl-xl',
+                              'has-sidebar:lg:circular-corners:rounded-bl-3xl',
+                              // Round the bottom right corner once the page is wider than the image
+                              '2xl:rounded-corners:rounded-b-xl',
+                              '2xl:circular-corners:rounded-b-3xl',
+                          ]
+                        : [
+                              // Regular cover: size regularly along with other content
+                              CONTENT_STYLE,
+                              'max-sm:-mx-4',
+                              'sm:rounded-corners:rounded-xl',
+                              'sm:circular-corners:rounded-3xl',
+                              'mb-8',
+                              'max-sm:w-screen',
+                              'max-sm:-mt-8',
+                          ]
+                )}
+            >
+                <PageCoverImage
+                    imgs={{
+                        light,
+                        dark,
+                    }}
+                    y={cover.yPos}
+                    height={height}
+                />
+            </div>
         </div>
     );
 }

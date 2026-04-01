@@ -67,10 +67,6 @@ export function PageBody(props: {
             (page) => page.type !== 'document' || (page.type === 'document' && !page.hidden)
         ).length > 0;
 
-    // These flags determine the final layout mode via CSS variants:
-    // - layout-default: wideLayout=false → 3-column (TOC + Content + Outline)
-    // - layout-wide: wideLayout=true + pageHasToc=true → 2-column (TOC + Content)
-    // - layout-full: wideLayout=true + pageHasToc=false → 1-column (Content only)
     const pageHasToc = page.layout.tableOfContents && hasVisibleTOCItems;
 
     return (
@@ -144,14 +140,9 @@ export function PageBody(props: {
                         {withPageFeedback ? (
                             <PageFeedbackForm
                                 className={
-                                    // Hide feedback form when outline is visible on desktop, but show it:
-                                    // - In layout-full when viewport is narrow (< 3xl)
-                                    // - In layout-wide when chat is open and viewport is narrow (< 2416px)
-                                    // - In layout-wide when viewport is narrow (< 4xl)
-                                    // - On xl screens when outline is hidden
-                                    // - On xl screens when chat is open and viewport is narrow (< 3xl)
+                                    // Hide feedback form when outline is visible on desktop, but show it in some special cases
                                     page.layout.outline
-                                        ? 'layout-full:max-3xl:flex layout-wide:chat-open:max-[2416px]:flex layout-wide:max-4xl:flex xl:hidden xl:max-3xl:chat-open:flex'
+                                        ? 'layout-wide:chat-open:max-[2416px]:flex layout-wide:max-3xl:flex xl:hidden xl:max-3xl:chat-open:flex'
                                         : ''
                                 }
                                 pageId={page.id}

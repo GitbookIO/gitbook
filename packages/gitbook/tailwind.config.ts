@@ -677,29 +677,22 @@ const config: Config = {
              * Layout mode variants for controlling the page structure.
              * These variants are applied via body:has() selectors, allowing CSS to respond to layout state.
              *
-             * - layout-default: 3-column layout (TOC + Content + Outline)
-             * - layout-wide: 2-column layout (TOC + Content)
-             * - layout-full: 1-column layout (Content only)
-             *
              * The layout classes are applied consistently through CONTENT_STYLE in layout.ts and preserved on the
              * <header> element during navigation (see PreservePageLayout component).
              */
             addVariant('layout-default', 'body:has(.layout-default) &');
             addVariant('layout-wide', 'body:has(.layout-wide) & ');
 
+            /**
+             * TOC, Sidebar, Outline variants
+             */
             addVariant('page-no-toc', 'body:has(.page-no-toc) &');
             addVariant('page-has-toc', 'body:has(.page-has-toc) &');
-
+            /* The left sidebar is shown when the TOC is visible or the page needs a sidebar, for the variant dropdown or if there's no header configured */
             addVariant('has-sidebar', 'body:has(.page-has-toc, .has-sidebar) &');
             addVariant('no-sidebar', 'body:has(.page-no-toc):has(.no-sidebar) &');
-
             addVariant('page-has-outline', 'body:has([data-gb-page-outline]) &');
             addVariant('page-no-outline', 'body:not(:has([data-gb-page-outline])) &');
-
-            /**
-             * Variant when the page contains an Updates block.
-             */
-            addVariant('page-updates-block', 'body:has(.updates-block) &');
 
             /**
              * Variant when the page is displayed in print mode.

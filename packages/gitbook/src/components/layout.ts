@@ -20,9 +20,8 @@ export const CONTAINER_STYLE: ClassValue = [
  * Style for the content container, sets the max width of the content area. Adapts between normal, wide and full width layouts.
  *
  * Layout modes:
- * - layout-default: 3-column layout (TOC + Content + Outline) → max-w-3xl
- * - layout-wide: 2-column layout (TOC + Content OR Content + Outline) → max-w-6xl
- * - layout-full: 1-column layout (Content only) → max-w-6xl
+ * - layout-default → max-w-3xl
+ * - layout-wide → max-w-6xl
  */
 export const CONTENT_STYLE: ClassValue = [
     'max-w-3xl',
