@@ -1,6 +1,6 @@
 {
     "name": "gitbook",
-    "version": "0.22.3",
+    "version": "0.23.2",
     "private": true,
     "dependencies": {
         "@cloudflare/workers-types": "^4.20251011.0",
@@ -21,6 +21,7 @@
         "@modelcontextprotocol/sdk": "1.17.5",
         "@opennextjs/aws": "^3.8.5",
         "@opennextjs/cloudflare": "^1.14.4",
+        "@panzoom/panzoom": "^4.6.1",
         "@radix-ui/react-checkbox": "^1.0.4",
         "@radix-ui/react-dropdown-menu": "^2.1.12",
         "@radix-ui/react-hover-card": "^1.1.15",
@@ -109,7 +110,7 @@
         "tailwindcss": "^4.1.11",
         "ts-essentials": "^10.0.1",
         "typescript": "catalog:",
-        "vercel": "^50.15.1",
+        "vercel": "50.37.3",
         "wrangler": "^4.43.0",
         "rss-parser": "^3.13.0"
     },

@@ -6,6 +6,7 @@ import { getDataOrNull } from './data';
 import { getNodeReactText } from './document';
 import { resolveOpenAPIOperationBlock } from './openapi/resolveOpenAPIOperationBlock';
 import { resolveOpenAPISchemasBlock } from './openapi/resolveOpenAPISchemasBlock';
+import { resolveOpenAPIWebhookBlock } from './openapi/resolveOpenAPIWebhookBlock';
 import { resolveContentRef } from './references';
 
 export interface DocumentSection {
@@ -95,6 +96,25 @@ async function getSectionsFromNodes(
                         title: operation.operation.summary || operation.path,
                         depth: 1,
                         deprecated: operation.operation.deprecated,
+                    });
+                }
+                continue;
+            }
+            case 'openapi-webhook': {
+                const id = block.meta?.id;
+                if (!id) {
+                    continue;
+                }
+                const { data: webhook } = await resolveOpenAPIWebhookBlock({
+                    block,
+                    context,
+                });
+                if (webhook) {
+                    sections.push({
+                        id,
+                        title: webhook.operation.summary || webhook.name,
+                        depth: 1,
+                        deprecated: webhook.operation.deprecated,
                     });
                 }
                 continue;

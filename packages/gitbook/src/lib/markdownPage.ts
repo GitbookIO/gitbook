@@ -1,9 +1,15 @@
 import type { GitBookSiteContext } from '@/lib/context';
-import type { DataFetcherResponse } from '@/lib/data';
-import { resolvePagePathDocumentOrGroup } from '@/lib/pages';
+import { DataFetcherError, throwIfDataError } from '@/lib/data';
+import type { ResolvedPagePath } from '@/lib/pages';
 import { getIndexablePages } from '@/lib/sitemap';
+import { getFallbackSiteSpacePath } from '@/lib/sites';
 import { getMarkdownForPagesTree } from '@/routes/llms';
-import { type RevisionPageDocument, type RevisionPageGroup, RevisionPageType } from '@gitbook/api';
+import {
+    type RevisionPageDocument,
+    type RevisionPageGroup,
+    RevisionPageType,
+    type SiteSpace,
+} from '@gitbook/api';
 import type { Root } from 'mdast';
 import { fromMarkdown } from 'mdast-util-from-markdown';
 import { frontmatterFromMarkdown } from 'mdast-util-frontmatter';
@@ -14,37 +20,22 @@ import { gfm } from 'micromark-extension-gfm';
 import { remove } from 'unist-util-remove';
 import { type GitBookLinker, relativeToAbsoluteLinks } from './links';
 
-type MarkdownResult = DataFetcherResponse<string>;
-
 /**
  * Generate a markdown version of a page.
  * Handles both regular document pages and group pages (pages with child pages).
  */
 export async function getMarkdownForPage(
     context: GitBookSiteContext,
-    pagePath: string
-): Promise<MarkdownResult> {
-    const pageLookup = resolvePagePathDocumentOrGroup(context.revision.pages, pagePath);
-
-    if (!pageLookup) {
-        return {
-            error: {
-                message: `Page "${pagePath}" not found`,
-                code: 404,
-            },
-        };
-    }
-
+    pageLookup: ResolvedPagePath<RevisionPageDocument | RevisionPageGroup>
+): Promise<string> {
     const { page } = pageLookup;
 
     // Only handle documents and groups
     if (page.type !== RevisionPageType.Document && page.type !== RevisionPageType.Group) {
-        return {
-            error: {
-                message: `Page "${pagePath}" is not a document or group`,
-                code: 400,
-            },
-        };
+        throw new DataFetcherError(
+            `Page "${pageLookup.page.title}" is not a document or group`,
+            400
+        );
     }
 
     // Handle group pages
@@ -59,12 +50,7 @@ export async function getMarkdownForPage(
     });
 
     if (error) {
-        return {
-            error: {
-                message: 'An error occurred while fetching the markdown for this page',
-                code: 500,
-            },
-        };
+        throw error;
     }
 
     const tree = fromPageMarkdown({
@@ -78,7 +64,56 @@ export async function getMarkdownForPage(
         return servePageGroup(context, page);
     }
 
-    return { data: toPageMarkdown(tree) };
+    return toPageMarkdown(tree);
+}
+
+/**
+ * Get markdown for a page that belongs to a different site space than the current context.
+ */
+export async function getMarkdownForPageInSpace(
+    context: GitBookSiteContext,
+    siteSpace: SiteSpace,
+    page: RevisionPageDocument | RevisionPageGroup
+): Promise<string> {
+    const { dataFetcher } = context;
+    const spaceBasePath = getFallbackSiteSpacePath(context, siteSpace);
+    const linker = context.linker.withOtherSiteSpace({
+        spaceBasePath,
+    });
+
+    // Handle group pages (pages with no content that list their children)
+    if (page.type === RevisionPageType.Group) {
+        const siteSpaceUrl = siteSpace.urls.published;
+        if (!siteSpaceUrl) {
+            throw new DataFetcherError(`Page "${page.title}" is not published`, 404);
+        }
+        return renderGroupPageMarkdown({ siteSpaceUrl, linker, page });
+    }
+
+    const rawMarkdown = await throwIfDataError(
+        dataFetcher.getRevisionPageMarkdown({
+            spaceId: siteSpace.space.id,
+            revisionId: siteSpace.space.revision,
+            pageId: page.id,
+        })
+    );
+
+    const tree = fromPageMarkdown({
+        linker,
+        markdown: rawMarkdown,
+        pagePath: page.path,
+    });
+
+    // Handle empty document pages which have children (same as getMarkdownForPage)
+    if (isEmptyMarkdownPage(tree) && page.pages.length > 0) {
+        const siteSpaceUrl = siteSpace.urls.published;
+        if (!siteSpaceUrl) {
+            throw new DataFetcherError(`Page "${page.title}" is not published`, 404);
+        }
+        return renderGroupPageMarkdown({ siteSpaceUrl, linker, page });
+    }
+
+    return toPageMarkdown(tree);
 }
 
 /**
@@ -150,20 +185,31 @@ function isEmptyMarkdownPage(tree: Root): boolean {
 async function servePageGroup(
     context: GitBookSiteContext,
     page: RevisionPageDocument | RevisionPageGroup
-): Promise<MarkdownResult> {
+): Promise<string> {
     const siteSpaceUrl = context.space.urls.published;
     if (!siteSpaceUrl) {
-        return {
-            error: {
-                message: `Page "${page.title}" is not published`,
-                code: 404,
-            },
-        };
+        throw new DataFetcherError(`Page "${page.title}" is not published`, 404);
     }
 
+    return renderGroupPageMarkdown({
+        siteSpaceUrl,
+        linker: context.linker,
+        page,
+    });
+}
+
+/**
+ * Render markdown for a group page with explicit parameters.
+ * Use this when rendering a group page from a different space than the current context.
+ */
+async function renderGroupPageMarkdown(args: {
+    siteSpaceUrl: string;
+    linker: GitBookLinker;
+    page: RevisionPageDocument | RevisionPageGroup;
+}): Promise<string> {
+    const { siteSpaceUrl, linker, page } = args;
     const indexablePages = getIndexablePages(page.pages);
 
-    // Create a markdown tree with the page title as heading and a list of child pages
     const markdownTree: Root = {
         type: 'root',
         children: [
@@ -174,15 +220,13 @@ async function servePageGroup(
             },
             ...(await getMarkdownForPagesTree(indexablePages, {
                 siteSpaceUrl,
-                linker: context.linker,
+                linker,
                 withMarkdownPages: true,
             })),
         ],
     };
 
-    return {
-        data: toMarkdown(markdownTree, {
-            bullet: '-',
-        }),
-    };
+    return toMarkdown(markdownTree, {
+        bullet: '-',
+    });
 }

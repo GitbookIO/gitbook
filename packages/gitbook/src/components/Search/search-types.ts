@@ -5,37 +5,31 @@ export type OrderedComputedResult =
     | ComputedSectionResult
     | ComputedRecordResult;
 
-export interface ComputedSectionResult {
+export type BaseComputedResult = {
+    id: string;
+    title: string;
+    href: string;
+    score: number;
+};
+
+export type ComputedSectionResult = BaseComputedResult & {
     type: 'section';
-    id: string;
-    title: string;
     body: string;
-    href: string;
-
     pageId: string;
     spaceId: string;
-}
+};
 
-export interface ComputedPageResult {
+export type ComputedPageResult = BaseComputedResult & {
     type: 'page';
-    id: string;
-    title: string;
-
-    href: string;
-
     pageId: string;
     spaceId: string;
-
     breadcrumbs?: Array<{ icon?: IconName; label: string }>;
-}
+};
 
-export interface ComputedRecordResult {
+export type ComputedRecordResult = BaseComputedResult & {
     type: 'record';
-    id: string;
-    title: string;
     description: string | undefined;
-    href: string;
-}
+};
 
 export type SearchSiteContentScope =
     | { mode: 'all' }

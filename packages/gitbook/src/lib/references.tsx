@@ -489,7 +489,7 @@ async function resolveContentRefInSpace(
         // Prefer the variant title when available, then the section title, then fallback to the space title.
         const ancestorLabel = (() => {
             if ('site' in context) {
-                const currentLanguage = context.siteSpace.space.language;
+                const currentLanguage = context.locale;
                 const foundSiteSpace = findSiteSpaceBy(
                     context.structure,
                     (siteSpace) => siteSpace.space.id === spaceId

@@ -107,11 +107,19 @@ export function OpenAPIResponses(props: {
 
     const state = useResponseExamplesState(context.blockKey, groups[0]?.key);
 
+    const expandAll = context.expandAllResponses;
+    const expandedKeys = expandAll
+        ? new Set(groups.map((g) => g.key))
+        : state.key
+          ? new Set([state.key])
+          : new Set<string>();
+
     return (
         <StaticSection header={t(context.translation, 'responses')} className="openapi-responses">
             <OpenAPIDisclosureGroup
                 icon={context.icons.chevronRight}
-                expandedKeys={state.key ? new Set([state.key]) : new Set()}
+                allowsMultipleExpanded={expandAll}
+                expandedKeys={expandedKeys}
                 onExpandedChange={(keys) => {
                     const key = keys.values().next().value ?? null;
                     state.setKey(key);
