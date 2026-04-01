@@ -51,7 +51,6 @@ export function PageAsideCloseButton() {
             size="small"
             iconOnly
             variant="blank"
-            className="layout-wide:3xl:hidden max-lg:hidden layout-default:xl:hidden page-api-block:2xl:hidden"
             onClick={() => {
                 document.body.classList.toggle(globalClassName);
             }}

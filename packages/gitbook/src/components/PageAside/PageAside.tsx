@@ -102,7 +102,7 @@ export function PageAside(props: {
             <div className="flex h-full w-full shrink-0 flex-col overflow-hidden">
                 {page.layout.outline ? (
                     <>
-                        <div className="mb-3 ml-3 flex page-no-outline:hidden items-center justify-between">
+                        <div className="mb-3 ml-3 flex layout-wide:3xl:hidden page-no-outline:hidden items-center justify-between max-lg:hidden layout-default:xl:hidden page-api-block:2xl:hidden">
                             <h6 className="flex items-center gap-1 font-semibold text-tint text-xs uppercase leading-wider">
                                 <Icon icon="block-quote" className="size-3" />{' '}
                                 {t(language, 'on_this_page')}
