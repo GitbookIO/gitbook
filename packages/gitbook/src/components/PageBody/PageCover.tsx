@@ -92,6 +92,7 @@ export async function PageCover(props: {
                     ? [
                           'sm:-mx-6',
                           'md:-mx-8',
+                          'lg:-ml-12',
 
                           // Extend the full-width cover
                           'layout-default:page-no-toc:lg:-ml-92', // Extend into the left sidebar if there's no TOC...

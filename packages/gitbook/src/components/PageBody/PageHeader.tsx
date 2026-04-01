@@ -35,6 +35,10 @@ export async function PageHeader(props: {
         withRSSFeed,
     ].some(Boolean);
 
+    if (!page.layout.title && !page.layout.description && !hasPageActions) {
+        return null;
+    }
+
     return (
         <header
             className={tcls(
