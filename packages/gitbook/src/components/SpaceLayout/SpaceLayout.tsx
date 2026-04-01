@@ -158,7 +158,6 @@ export function SpaceLayout(props: SpaceLayoutProps) {
                             <div
                                 className={tcls(
                                     'pr-4',
-                                    'mb-4',
                                     'flex',
                                     withTopHeader ? 'lg:hidden' : '',
                                     'grow-0',
@@ -167,7 +166,7 @@ export function SpaceLayout(props: SpaceLayoutProps) {
                                     'items-center',
                                     // On bold themes also color the TOC header so the logo looks correct.
                                     'site-header:theme-bold:bg-header-background',
-                                    'site-header:theme-bold:m-[-1.5rem_-1px_0.5rem_-2rem]',
+                                    'site-header:theme-bold:m-[-1.5rem_-1px_-0.5rem_-2rem]',
                                     'site-header:theme-bold:p-[1rem_0_1rem_2rem]'
                                 )}
                             >

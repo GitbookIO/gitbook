@@ -473,18 +473,18 @@ const config: Config = {
                 },
                 enterFromRight: {
                     from: { opacity: '0', transform: 'translateX(50%)', display: 'none' },
-                    to: { opacity: '1', transform: 'translateX(0)', display: 'revert' },
+                    to: { opacity: '1', transform: 'translateX(0)', display: 'flex' },
                 },
                 enterFromLeft: {
                     from: { opacity: '0', transform: 'translateX(-50%)', display: 'none' },
-                    to: { opacity: '1', transform: 'translateX(0)', display: 'revert' },
+                    to: { opacity: '1', transform: 'translateX(0)', display: 'flex' },
                 },
                 exitToRight: {
-                    from: { opacity: '1', transform: 'translateX(0)', display: 'revert' },
+                    from: { opacity: '1', transform: 'translateX(0)', display: 'flex' },
                     to: { opacity: '0', transform: 'translateX(50%)', display: 'none' },
                 },
                 exitToLeft: {
-                    from: { opacity: '1', transform: 'translateX(0)', display: 'revert' },
+                    from: { opacity: '1', transform: 'translateX(0)', display: 'flex' },
                     to: { opacity: '0', transform: 'translateX(-50%)', display: 'none' },
                 },
                 scaleIn: {
