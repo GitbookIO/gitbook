@@ -3,11 +3,11 @@ import {
     CustomizationBackground,
     CustomizationCorners,
     CustomizationDefaultMonospaceFont,
+    CustomizationDefaultThemeMode,
     CustomizationDepth,
     CustomizationHeaderPreset,
     CustomizationIconsStyle,
     CustomizationSidebarListStyle,
-    CustomizationThemeMode,
     SiteSocialAccountPlatform,
 } from '@gitbook/api';
 import type { GitBookStandalone } from '@gitbook/embed';
@@ -1097,7 +1097,7 @@ const testCases: TestsCase[] = [
                 name: 'With cover for dark mode',
                 url: `page-options/page-with-dark-cover${getCustomizationURL({
                     themes: {
-                        default: CustomizationThemeMode.Dark,
+                        default: CustomizationDefaultThemeMode.Dark,
                         toggeable: false,
                     },
                 })}`,

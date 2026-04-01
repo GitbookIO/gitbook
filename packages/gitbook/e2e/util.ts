@@ -6,6 +6,7 @@ import {
     CustomizationCorners,
     CustomizationDefaultFont,
     CustomizationDefaultMonospaceFont,
+    CustomizationDefaultThemeMode,
     CustomizationDepth,
     type CustomizationHeaderItem,
     CustomizationHeaderPreset,
@@ -16,7 +17,6 @@ import {
     CustomizationSidebarBackgroundStyle,
     CustomizationSidebarListStyle,
     CustomizationTheme,
-    CustomizationThemeMode,
     type CustomizationThemedColor,
     type SiteCustomizationSettings,
     SiteExternalLinksTarget,
@@ -84,9 +84,9 @@ export const allLocales: CustomizationLocale[] = [
     CustomizationLocale.Zh,
 ];
 
-export const allThemeModes: CustomizationThemeMode[] = [
-    CustomizationThemeMode.Light,
-    CustomizationThemeMode.Dark,
+export const allThemeModes: CustomizationDefaultThemeMode[] = [
+    CustomizationDefaultThemeMode.Light,
+    CustomizationDefaultThemeMode.Dark,
 ];
 
 export const allTintColors: Array<{
@@ -340,7 +340,7 @@ export function getCustomizationURL(partial: DeepPartial<SiteCustomizationSettin
             groups: [],
         },
         themes: {
-            default: CustomizationThemeMode.Light,
+            default: CustomizationDefaultThemeMode.System,
             toggeable: true,
         },
         pdf: {
