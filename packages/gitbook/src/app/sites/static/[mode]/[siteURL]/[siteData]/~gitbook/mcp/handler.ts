@@ -12,20 +12,12 @@ import { createMcpHandler } from 'mcp-handler';
 import type { NextRequest } from 'next/server';
 import { z } from 'zod';
 
-type McpRouteParams = RouteLayoutParams & {
-    mcpPath?: string[];
-};
-
-async function handler(rawRequest: NextRequest, { params }: { params: Promise<McpRouteParams> }) {
-    const routeParams = await params;
-    const pathSuffix = routeParams.mcpPath?.join('/');
-
-    if (pathSuffix && pathSuffix !== 'auth') {
-        return new Response('Not Found', { status: 404 });
-    }
-
-    const endpoint = pathSuffix === 'auth' ? '~gitbook/mcp/auth' : '~gitbook/mcp';
-    const { context } = await getStaticSiteContext(routeParams);
+export async function handleMcpRequest(
+    rawRequest: NextRequest,
+    params: RouteLayoutParams,
+    endpoint: '~gitbook/mcp' | '~gitbook/mcp/auth'
+) {
+    const { context } = await getStaticSiteContext(params);
     const { dataFetcher, linker, site } = context;
 
     // Next.js request.url is the original URL and not the rewritten one from the middleware
@@ -229,5 +221,3 @@ async function handler(rawRequest: NextRequest, { params }: { params: Promise<Mc
 
     return mcpHandler(request);
 }
-
-export { handler as GET, handler as POST };
