@@ -111,7 +111,7 @@ export async function TableOfContents(props: {
 
                         'sidebar-filled:rounded-2xl',
                         'straight-corners:rounded-none',
-                        '[html.sidebar-filled.circular-corners_&]:not-layout-default:rounded-4xl'
+                        '[html.sidebar-filled.circular-corners_&]:layout-wide:rounded-4xl'
                     )}
                 >
                     {innerHeader}

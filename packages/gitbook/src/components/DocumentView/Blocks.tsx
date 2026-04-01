@@ -48,8 +48,6 @@ type UnwrappedBlocksProps<TBlock extends DocumentBlock> = DocumentContextProps &
     isOffscreen?: boolean;
 };
 
-const LIST_BLOCKS: DocumentBlock['type'][] = ['list-ordered', 'list-tasks', 'list-unordered'];
-
 /* Blocks that can be full width are automatically expanded on full-width pages.
  * Ideally we'd rely on the block type to determine if it can be full width, but
  * the block's `fullWidth` property does not differentiate between `undefined` and `false`.
@@ -68,6 +66,8 @@ const FULL_WIDTH_BLOCKS: DocumentBlock['type'][] = [
     'content-ref',
     'divider',
 ];
+
+const LIST_BLOCKS: DocumentBlock['type'][] = ['list-ordered', 'list-tasks', 'list-unordered'];
 
 /**
  * Renders a list of blocks without a wrapper element.

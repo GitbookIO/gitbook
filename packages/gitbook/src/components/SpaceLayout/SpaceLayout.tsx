@@ -144,11 +144,12 @@ export function SpaceLayout(props: SpaceLayoutProps) {
                             : 'no-sidebar',
 
                         // Ensure the footer is display below the viewport even if the content is not enough
-                        withFooter && [
-                            'site-header:min-h-[calc(100vh-64px)]',
-                            'site-header-sections:min-h-[calc(100vh-108px)]',
-                        ],
-                        withTopHeader ? null : 'lg:min-h-screen'
+                        withTopHeader
+                            ? [
+                                  'site-header:min-h-[calc(100vh-65px)]',
+                                  'site-header-sections:min-h-[calc(100vh-109px)]',
+                              ]
+                            : 'lg:min-h-screen'
                     )}
                 >
                     <TableOfContents

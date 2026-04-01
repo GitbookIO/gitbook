@@ -74,9 +74,9 @@ export function PageBody(props: {
             <main
                 className={tcls(
                     'relative min-w-0 flex-1',
+                    'break-anywhere', // Allow words to break if they are too long.
                     'py-8',
                     'layout-wide:no-sidebar:lg:max-xl:pb-20', // Add padding to prevent overlap of minimised trademark
-                    'break-anywhere', // Allow words to break if they are too long.
                     '@container',
                     CONTENT_STYLE,
                     pageHasToc ? 'page-has-toc' : 'page-no-toc',
