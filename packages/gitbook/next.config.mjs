@@ -18,6 +18,8 @@ const nextConfig = {
 
         // Since content is fully static, we don't want to fetch on hover again
         optimisticClientCache: false,
+        // Disable splitting the RSC in like 5 chunks
+        prefetchInlining: true,
     },
 
     env: {
