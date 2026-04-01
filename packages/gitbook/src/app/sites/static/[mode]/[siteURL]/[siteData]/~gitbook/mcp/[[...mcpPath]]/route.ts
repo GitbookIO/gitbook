@@ -9,7 +9,6 @@ import { findSiteSpaceBy, findSiteSpaceByUrl } from '@/lib/sites';
 import { trackServerInsightsEvents } from '@/lib/tracking';
 import { waitUntil } from '@/lib/waitUntil';
 import { createMcpHandler } from 'mcp-handler';
-import { notFound } from 'next/navigation';
 import type { NextRequest } from 'next/server';
 import { z } from 'zod';
 
@@ -22,7 +21,7 @@ async function handler(rawRequest: NextRequest, { params }: { params: Promise<Mc
     const pathSuffix = routeParams.mcpPath?.join('/');
 
     if (pathSuffix && pathSuffix !== 'auth') {
-        notFound();
+        return new Response('Not Found', { status: 404 });
     }
 
     const endpoint = pathSuffix === 'auth' ? '~gitbook/mcp/auth' : '~gitbook/mcp';
