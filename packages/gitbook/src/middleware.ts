@@ -726,14 +726,14 @@ function encodePathInSiteContent(
                     },
                 ],
             };
-        case '~gitbook/mcp':
-        case '~gitbook/mcp/auth':
         case 'sitemap.xml':
         case 'sitemap-pages.xml':
         case 'robots.txt':
         case '~gitbook/embed/script.js':
         case '~gitbook/embed/demo':
             return { pathname, routeType: 'static' };
+        case '~gitbook/mcp':
+        case '~gitbook/mcp/auth':
         case '~gitbook/pdf':
         case '~gitbook/search':
         case '~gitbook/auth/login':

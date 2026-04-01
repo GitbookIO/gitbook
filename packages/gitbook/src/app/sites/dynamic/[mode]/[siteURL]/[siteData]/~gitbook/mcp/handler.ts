@@ -1,6 +1,6 @@
 import { SiteInsightsDisplayContext } from '@gitbook/api';
 
-import { type RouteLayoutParams, getStaticSiteContext } from '@/app/utils';
+import { type RouteLayoutParams, getDynamicSiteContext } from '@/app/utils';
 import { getExposableError, throwIfDataError } from '@/lib/data';
 import { getMarkdownForPageInSpace } from '@/lib/markdownPage';
 import { resolvePagePath } from '@/lib/pages';
@@ -17,7 +17,7 @@ export async function handleMcpRequest(
     params: RouteLayoutParams,
     endpoint: '~gitbook/mcp' | '~gitbook/mcp/auth'
 ) {
-    const { context } = await getStaticSiteContext(params);
+    const { context } = await getDynamicSiteContext(params);
     const { dataFetcher, linker, site } = context;
 
     // Next.js request.url is the original URL and not the rewritten one from the middleware
