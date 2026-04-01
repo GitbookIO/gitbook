@@ -1,3 +1,4 @@
+import { getSpaceLanguage, t } from '@/intl/server';
 import type { GitBookSiteContext } from '@/lib/context';
 import { getDocumentSections } from '@/lib/document-sections';
 import { tcls } from '@/lib/tailwind';
@@ -30,6 +31,7 @@ export function PageAside(props: {
 }) {
     const { page, document, withPageFeedback, context } = props;
     const { customization, site } = context;
+    const language = getSpaceLanguage(context);
 
     return (
         <SideSheet
@@ -102,7 +104,8 @@ export function PageAside(props: {
                     <>
                         <div className="mb-3 ml-3 flex page-no-outline:hidden items-center justify-between">
                             <h6 className="flex items-center gap-1 font-semibold text-tint text-xs uppercase leading-wider">
-                                <Icon icon="block-quote" className="size-3" /> On this page
+                                <Icon icon="block-quote" className="size-3" />{' '}
+                                {t(language, 'on_this_page')}
                             </h6>
                             <PageAsideCloseButton />
                         </div>
