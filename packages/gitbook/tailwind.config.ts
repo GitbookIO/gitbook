@@ -695,6 +695,11 @@ const config: Config = {
             addVariant('page-no-outline', 'body:not(:has([data-gb-page-outline])) &');
 
             /**
+             * Variant when the page contains an OpenAPI block.
+             */
+            addVariant('page-api-block', 'body:has(.openapi-block) &');
+
+            /**
              * Variant when the page is displayed in print mode.
              */
             addVariant('print-mode', 'body:has(.print-mode) &');

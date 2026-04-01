@@ -91,13 +91,7 @@ export function UnwrappedBlocks<TBlock extends DocumentBlock>(props: UnwrappedBl
                 block={node}
                 style={[
                     'decoration-primary/6',
-                    // node.data && 'fullWidth' in node.data && node.data.fullWidth
-                    //     ? 'layout-default:max-w-6xl'
-                    //     : '',
                     FULL_WIDTH_BLOCKS.includes(node.type) ? CONTENT_STYLE : CONTENT_STYLE_REDUCED,
-                    // FULL_WIDTH_BLOCKS.includes(node.type) // If a block is set to full width, it can be wider than the page container.
-                    //     ? ''
-                    //     : 'mx-0 layout-full:max-w-3xl layout-wide:max-w-3xl max-w-3xl',
 
                     !LIST_BLOCKS.includes(node.type) && 'print:break-inside-avoid',
                     blockStyle,

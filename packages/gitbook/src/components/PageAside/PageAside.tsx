@@ -78,11 +78,19 @@ export function PageAside(props: {
                 'layout-default:3xl:flex!',
                 'layout-default:3xl:animate-none!',
 
-                // In layout-wide mode (2-column), hide outline when viewport is too narrow
+                // In layout-wide mode, hide outline when viewport is too narrow
                 // or when chat is open and viewport is narrow, to prevent layout overflow
                 'layout-wide:xl:-mr-68',
                 'layout-wide:3xl:not-chat-open:flex!',
                 'layout-wide:3xl:not-chat-open:animate-none!',
+
+                // Show outline if page has OpenAPI block
+                // TODO: remove this in favour of a nicer, more immediately accessible solution in the future.
+                'page-api-block:2xl:max-3xl:-mr-[max(calc((100vw-90rem)/2),0rem)]',
+                'page-api-block:2xl:flex!',
+                'page-api-block:2xl:animate-none!',
+                'page-api-block:2xl:border-l-0',
+                'page-api-block:2xl:pl-8',
 
                 'hydrated:site-background', // Only add a background once the element is positioned correctly to prevent overlapping the page cover
                 'text-tint',

@@ -27,7 +27,7 @@ export function PageAsideToggleButton() {
                 onClick={() => {
                     document.body.classList.toggle(globalClassName);
                 }}
-                className="layout-default:hidden layout-wide:3xl:hidden page-no-outline:hidden layout-wide:max-xl:hidden"
+                className="layout-default:hidden layout-wide:3xl:hidden page-no-outline:hidden layout-wide:max-xl:hidden page-api-block:2xl:hidden"
             />
             <Button
                 icon="block-quote"
@@ -51,7 +51,7 @@ export function PageAsideCloseButton() {
             size="small"
             iconOnly
             variant="blank"
-            className="layout-wide:3xl:hidden max-lg:hidden layout-default:xl:hidden"
+            className="layout-wide:3xl:hidden max-lg:hidden layout-default:xl:hidden page-api-block:2xl:hidden"
             onClick={() => {
                 document.body.classList.toggle(globalClassName);
             }}
