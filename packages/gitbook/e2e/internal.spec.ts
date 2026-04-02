@@ -781,7 +781,7 @@ const testCases: TestsCase[] = [
                 run: async (page) => {
                     await expect(page.locator('[data-testid="table-of-contents"]')).toBeVisible();
                     // Trademark exists by default
-                    await expect(page.getByTestId('gb-trademark').count()).toBeGreaterThanOrEqual(
+                    expect(await page.getByTestId('gb-trademark').count()).toBeGreaterThanOrEqual(
                         1
                     );
 
