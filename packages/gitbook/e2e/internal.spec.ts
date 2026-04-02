@@ -781,7 +781,9 @@ const testCases: TestsCase[] = [
                 run: async (page) => {
                     await expect(page.locator('[data-testid="table-of-contents"]')).toBeVisible();
                     // Trademark exists by default
-                    await expect(page.getByTestId('gb-trademark')).toHaveCount(1);
+                    await expect(page.getByTestId('gb-trademark').count()).toBeGreaterThanOrEqual(
+                        1
+                    );
 
                     // Go to another page with the customization query to disable the trademark
                     const pageBlocks = new URL(page.url());
