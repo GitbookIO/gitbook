@@ -215,8 +215,10 @@ function MultiChoiceControl(props: GetAIControlProps<typeof MultiChoiceControlDe
 
                     onSubmit({
                         ids: selectedIds,
-                        labels: selectedIds.map(
-                            (id) => options.find((option) => option.id === id)?.label || ''
+                        labels: selectedIds.map((id) =>
+                            id === OTHER_OPTION_ID
+                                ? 'Other'
+                                : options.find((option) => option.id === id)?.label || ''
                         ),
                         input: hasOtherSelected ? otherInput.trim() : undefined,
                     });

@@ -73,7 +73,7 @@ export function AIChatInput(props: {
                       }
                     : undefined
             }
-            disabled={disabled || loading}
+            disabled={disabled || loading || chat.control !== null}
             aria-busy={loading}
             ref={inputRef}
             trailing={
