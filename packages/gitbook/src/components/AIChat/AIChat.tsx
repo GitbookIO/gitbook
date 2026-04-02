@@ -163,17 +163,26 @@ export function AIChatSubtitle(props: {
 
     return (
         <EmbeddableFrameSubtitle
-            className={tcls('relative', chat.loading ? 'h-3 opacity-11' : 'h-0 opacity-0')}
+            className={tcls(
+                'relative',
+                chat.loading || chat.control ? 'h-3 opacity-11' : 'h-0 opacity-0'
+            )}
         >
             <span
                 className={tcls(
                     'absolute left-0',
                     chat.loading
                         ? chat.messages[chat.messages.length - 1]?.content
-                            ? 'animate-blur-in-slow'
+                            ? 'animate-blur-in-display-slow'
                             : 'hidden'
-                        : 'animate-blur-out-slow'
+                        : 'animate-blur-out-display-slow'
                 )}
+                style={{
+                    animationDelay:
+                        chat.messages[chat.messages.length - 1]?.content && !chat.control
+                            ? '.3s'
+                            : undefined,
+                }}
             >
                 {t(language, 'ai_chat_working')}
             </span>
@@ -182,12 +191,27 @@ export function AIChatSubtitle(props: {
                     'absolute left-0',
                     chat.loading
                         ? chat.messages[chat.messages.length - 1]?.content
-                            ? 'animate-blur-out-slow'
-                            : 'animate-blur-in-slow'
+                            ? 'animate-blur-out-display-slow'
+                            : 'animate-blur-in-display-slow'
                         : 'hidden'
                 )}
+                style={{
+                    animationDelay:
+                        chat.messages[chat.messages.length - 1]?.content || chat.control
+                            ? undefined
+                            : '.3s',
+                }}
             >
                 {t(language, 'ai_chat_thinking')}
+            </span>
+            <span
+                className={tcls(
+                    'absolute left-0',
+                    chat.control ? 'animate-blur-in-display-slow' : 'animate-blur-out-display-slow'
+                )}
+                style={{ animationDelay: chat.control ? '.3s' : undefined }}
+            >
+                {t(language, 'ai_chat_waiting')}
             </span>
         </EmbeddableFrameSubtitle>
     );
@@ -233,27 +257,27 @@ export function AIChatBody(props: {
             >
                 {isEmpty ? (
                     <div className="flex grow flex-col">
-                        <div className="my-auto flex flex-row items-center gap-4 pb-6 [@container(min-height:400px)]:flex-col">
+                        <div className="my-auto flex flex-row items-center gap-4 pb-6 [@container(min-height:440px)]:flex-col">
                             <div
-                                className="flex size-16 shrink-0 animate-scale-in items-center justify-center rounded-full bg-primary-solid/1 [@container(min-height:400px)]:size-32"
+                                className="flex size-16 shrink-0 animate-scale-in items-center justify-center rounded-full bg-primary-solid/1 [@container(min-height:440px)]:size-32"
                                 style={{ animationDelay: '.3s' }}
                             >
                                 <AIChatIcon
                                     state="intro"
                                     trademark={trademark}
-                                    className="size-8 text-primary [@container(min-height:400px)]:size-16"
+                                    className="size-8 text-primary [@container(min-height:440px)]:size-16"
                                 />
                             </div>
-                            <div className="flex flex-col items-start gap-1 [@container(min-height:400px)]:items-center">
+                            <div className="flex flex-col items-start gap-1 [@container(min-height:440px)]:items-center">
                                 <h5
-                                    className="animate-blur-in-slow font-bold text-lg text-tint-strong leading-tight [@container(min-height:400px)]:text-center"
+                                    className="animate-blur-in-slow font-bold text-lg text-tint-strong leading-tight [@container(min-height:440px)]:text-center"
                                     style={{ animationDelay: '.5s' }}
                                     data-testid="ai-chat-greeting-title"
                                 >
                                     {greeting?.title || timeGreeting}
                                 </h5>
                                 <p
-                                    className="animate-blur-in-slow text-tint leading-tight [@container(min-height:400px)]:text-center"
+                                    className="animate-blur-in-slow text-tint leading-tight [@container(min-height:440px)]:text-center"
                                     style={{ animationDelay: '.6s' }}
                                     data-testid="ai-chat-greeting-subtitle"
                                 >
@@ -274,21 +298,18 @@ export function AIChatBody(props: {
                 )}
             </ScrollContainer>
 
-            <div className="flex min-h-0 flex-col gap-2 pb-4">
+            <div className="flex max-h-3/4 min-h-0 flex-col gap-2 pb-4">
                 {/* Display an error banner when something went wrong. */}
                 {chat.error ? <AIChatError chatController={chatController} /> : null}
 
-                {chat.control ? (
-                    <AIChatControl control={chat.control} />
-                ) : (
-                    <AIChatInput
-                        loading={chat.loading}
-                        disabled={chat.loading || chat.error}
-                        onSubmit={(value) => {
-                            chatController.postMessage({ message: value });
-                        }}
-                    />
-                )}
+                {chat.control ? <AIChatControl control={chat.control} /> : null}
+                <AIChatInput
+                    loading={chat.loading}
+                    disabled={chat.loading || chat.error}
+                    onSubmit={(value) => {
+                        chatController.postMessage({ message: value });
+                    }}
+                />
             </div>
         </>
     );

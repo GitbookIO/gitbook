@@ -108,6 +108,7 @@ export const es: TranslationLanguage = {
     ai_chat_clear_conversation: 'Limpiar conversación',
     ai_chat_thinking: 'Pensando...',
     ai_chat_working: 'Trabajando...',
+    ai_chat_waiting: 'Esperando tu respuesta…',
     ai_chat_context_badge: 'IA',
     ai_chat_error: 'Algo salió mal.',
     ai_chat_hold_message_1: 'Pensándolo bien…',
@@ -146,6 +147,7 @@ export const es: TranslationLanguage = {
     copy_mcp_install_command: 'Usar este MCP en ${1}',
     press_to_confirm: 'Presiona ${1} para confirmar',
     tool_call_skipped: 'Omitido "${1}"',
+    ai_control_submitted_answer: 'Respuesta enviada',
     scroll_back: 'Desplazar hacia atrás',
     scroll_further: 'Desplazar más',
     hint_info: 'Información',
@@ -154,4 +156,7 @@ export const es: TranslationLanguage = {
     hint_success: 'Éxito',
     download: 'Descargar',
     open: 'Abrir',
+    form_other_prompt: 'Escribe tu respuesta...',
+    form_other_field: 'Otro...',
+    cancel: 'Cancelar',
 };
