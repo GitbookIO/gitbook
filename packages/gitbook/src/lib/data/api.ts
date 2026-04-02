@@ -21,7 +21,7 @@ interface DataFetcherInput {
 }
 
 /**
- * Options to pass to the `fetch` call to disable the Next data-cache when wrapped in `use cache`.
+ * Options to pass to the `fetch` call to disable the Next data-cache when wrapped in `use cache: remote`.
  */
 export const noCacheFetchOptions: Partial<RequestInit> = {
     next: {
@@ -208,7 +208,7 @@ function cacheLifeFromResponse(
 }
 
 const getUserById = cache(async (input: DataFetcherInput, params: { userId: string }) => {
-    'use cache';
+    'use cache: remote';
     return wrapCacheDataFetcherError(async () => {
         return trace(`getUserById(${params.userId})`, async () => {
             const api = apiClient(input);
@@ -224,7 +224,7 @@ const getUserById = cache(async (input: DataFetcherInput, params: { userId: stri
 
 const getSpace = cache(
     async (input: DataFetcherInput, params: { spaceId: string; shareKey: string | undefined }) => {
-        'use cache';
+        'use cache: remote';
         cacheTag(
             getCacheTag({
                 tag: 'space',
@@ -254,7 +254,7 @@ const getSpace = cache(
 
 const getChangeRequest = cache(
     async (input: DataFetcherInput, params: { spaceId: string; changeRequestId: string }) => {
-        'use cache';
+        'use cache: remote';
         cacheTag(
             getCacheTag({
                 tag: 'change-request',
@@ -286,7 +286,7 @@ const getChangeRequest = cache(
 
 const getRevision = cache(
     async (input: DataFetcherInput, params: { spaceId: string; revisionId: string }) => {
-        'use cache';
+        'use cache: remote';
         return wrapCacheDataFetcherError(async () => {
             return trace(`getRevision(${params.spaceId}, ${params.revisionId})`, async () => {
                 const api = apiClient(input);
@@ -313,7 +313,7 @@ const getRevisionPageMarkdown = cache(
         input: DataFetcherInput,
         params: { spaceId: string; revisionId: string; pageId: string }
     ) => {
-        'use cache';
+        'use cache: remote';
         return wrapCacheDataFetcherError(async () => {
             return trace(
                 `getRevisionPageMarkdown(${params.spaceId}, ${params.revisionId}, ${params.pageId})`,
@@ -352,7 +352,7 @@ const getRevisionPageDocument = cache(
         input: DataFetcherInput,
         params: { spaceId: string; revisionId: string; pageId: string }
     ) => {
-        'use cache';
+        'use cache: remote';
         return wrapCacheDataFetcherError(async () => {
             return trace(
                 `getRevisionPageDocument(${params.spaceId}, ${params.revisionId}, ${params.pageId})`,
@@ -386,7 +386,7 @@ const getRevisionReusableContentDocument = cache(
         input: DataFetcherInput,
         params: { spaceId: string; revisionId: string; reusableContentId: string }
     ) => {
-        'use cache';
+        'use cache: remote';
         return wrapCacheDataFetcherError(async () => {
             return trace(
                 `getRevisionReusableContentDocument(${params.spaceId}, ${params.revisionId}, ${params.reusableContentId})`,
@@ -419,7 +419,7 @@ const getRevisionPageByPath = cache(
         input: DataFetcherInput,
         params: { spaceId: string; revisionId: string; path: string }
     ) => {
-        'use cache';
+        'use cache: remote';
         return wrapCacheDataFetcherError(async () => {
             return trace(
                 `getRevisionPageByPath(${params.spaceId}, ${params.revisionId}, ${params.path})`,
@@ -446,7 +446,7 @@ const getRevisionPageByPath = cache(
 
 const getDocument = cache(
     async (input: DataFetcherInput, params: { spaceId: string; documentId: string }) => {
-        'use cache';
+        'use cache: remote';
         return wrapCacheDataFetcherError(async () => {
             return trace(`getDocument(${params.spaceId}, ${params.documentId})`, async () => {
                 const api = apiClient(input);
@@ -476,7 +476,7 @@ const getComputedDocument = cache(
             seed: string;
         }
     ) => {
-        'use cache';
+        'use cache: remote';
         cacheTag(
             ...getComputedContentSourceCacheTags(
                 {
@@ -514,7 +514,7 @@ const getComputedDocument = cache(
 
 const getLatestOpenAPISpecVersionContent = cache(
     async (input: DataFetcherInput, params: { organizationId: string; slug: string }) => {
-        'use cache';
+        'use cache: remote';
         cacheTag(
             getCacheTag({
                 tag: 'openapi',
@@ -550,7 +550,7 @@ const getPublishedContentSite = cache(
         params: { organizationId: string; siteId: string; siteShareKey: string | undefined },
         _apiVersion: string
     ) => {
-        'use cache';
+        'use cache: remote';
         cacheTag(
             getCacheTag({
                 tag: 'site',
@@ -592,7 +592,7 @@ const getSiteRedirectBySource = cache(
             source: string;
         }
     ) => {
-        'use cache';
+        'use cache: remote';
         cacheTag(
             getCacheTag({
                 tag: 'site',
@@ -627,7 +627,7 @@ const getSiteRedirectBySource = cache(
 
 const getEmbedByUrl = cache(
     async (input: DataFetcherInput, params: { spaceId: string; url: string }) => {
-        'use cache';
+        'use cache: remote';
         cacheTag(
             getCacheTag({
                 tag: 'space',
@@ -660,7 +660,7 @@ const searchSiteContent = cache(
         input: DataFetcherInput,
         params: Parameters<GitBookDataFetcher['searchSiteContent']>[0]
     ) => {
-        'use cache';
+        'use cache: remote';
         cacheTag(
             getCacheTag({
                 tag: 'site',
@@ -700,7 +700,7 @@ const renderIntegrationUi = cache(
         input: DataFetcherInput,
         params: { integrationName: string; request: RenderIntegrationUI }
     ) => {
-        'use cache';
+        'use cache: remote';
         cacheTag(
             getCacheTag({
                 tag: 'integration',
@@ -734,7 +734,7 @@ const listRevisionPageMetaLinks = cache(
         input: DataFetcherInput,
         params: { spaceId: string; revisionId: string; pageId: string }
     ) => {
-        'use cache';
+        'use cache: remote';
         return wrapCacheDataFetcherError(async () => {
             return trace(
                 `listRevisionPageMetaLinks(${params.spaceId}, ${params.revisionId}, ${params.pageId})`,
