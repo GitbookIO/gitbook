@@ -257,27 +257,27 @@ export function AIChatBody(props: {
             >
                 {isEmpty ? (
                     <div className="flex grow flex-col">
-                        <div className="my-auto flex flex-row items-center gap-4 pb-6 [@container(min-height:440px)]:flex-col">
+                        <div className="my-auto flex flex-row items-center gap-4 pb-6 [@container(min-height:400px)]:flex-col">
                             <div
-                                className="flex size-16 shrink-0 animate-scale-in items-center justify-center rounded-full bg-primary-solid/1 [@container(min-height:440px)]:size-32"
+                                className="flex size-16 shrink-0 animate-scale-in items-center justify-center rounded-full bg-primary-solid/1 [@container(min-height:400px)]:size-32"
                                 style={{ animationDelay: '.3s' }}
                             >
                                 <AIChatIcon
                                     state="intro"
                                     trademark={trademark}
-                                    className="size-8 text-primary [@container(min-height:440px)]:size-16"
+                                    className="size-8 text-primary [@container(min-height:400px)]:size-16"
                                 />
                             </div>
-                            <div className="flex flex-col items-start gap-1 [@container(min-height:440px)]:items-center">
+                            <div className="flex flex-col items-start gap-1 [@container(min-height:400px)]:items-center">
                                 <h5
-                                    className="animate-blur-in-slow font-bold text-lg text-tint-strong leading-tight [@container(min-height:440px)]:text-center"
+                                    className="animate-blur-in-slow font-bold text-lg text-tint-strong leading-tight [@container(min-height:400px)]:text-center"
                                     style={{ animationDelay: '.5s' }}
                                     data-testid="ai-chat-greeting-title"
                                 >
                                     {greeting?.title || timeGreeting}
                                 </h5>
                                 <p
-                                    className="animate-blur-in-slow text-tint leading-tight [@container(min-height:440px)]:text-center"
+                                    className="animate-blur-in-slow text-tint leading-tight [@container(min-height:400px)]:text-center"
                                     style={{ animationDelay: '.6s' }}
                                     data-testid="ai-chat-greeting-subtitle"
                                 >
