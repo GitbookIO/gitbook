@@ -40,18 +40,11 @@ export async function PageHeader(props: {
     }
 
     return (
-        <header
-            className={tcls(
-                CONTENT_STYLE,
-                'mb-6',
-                'space-y-3',
-                hasAncestors ? 'page-has-ancestors' : 'page-no-ancestors'
-            )}
-        >
+        <header className={tcls(CONTENT_STYLE, 'mb-6', 'space-y-3')}>
             <div
                 className={tcls(
                     'float-right ml-4 flex gap-2',
-                    hasAncestors ? '-my-1.5' : '-mt-3 xs:mt-2'
+                    hasAncestors ? 'sm:-my-1.5' : '-mt-3 xs:mt-2'
                 )}
             >
                 {hasPageActions ? (
@@ -66,7 +59,7 @@ export async function PageHeader(props: {
 
             {hasAncestors && (
                 <nav aria-label="Breadcrumb">
-                    <ol className={tcls('flex', 'flex-wrap', 'items-center', 'gap-2', 'text-tint')}>
+                    <ol className="clear-right flex flex-wrap items-center gap-2 text-tint sm:clear-none">
                         {ancestors.map((breadcrumb, index) => {
                             const href = linker.toPathForPage({
                                 pages: revision.pages,
