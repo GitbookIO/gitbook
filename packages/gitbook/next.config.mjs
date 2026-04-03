@@ -1,10 +1,12 @@
 // @ts-check
 
+const deploymentId = process.env.GITHUB_SHA || Date.now().toString(); // Needed because we use a custom deployment method i.e. https://vercel.com/docs/skew-protection#custom-deployment-id
+
 /**
  * @type {import('next').NextConfig}
  */
 const nextConfig = {
-    deploymentId: process.env.GITHUB_SHA || Date.now().toString(), // Needed because we use a custom deployment method i.e. https://vercel.com/docs/skew-protection#custom-deployment-id
+    deploymentId: deploymentId.slice(0, 32), // Vercel's deployment ID has a max length of 32 characters
     experimental: {
         // This is needed to throw "forbidden" when the api token expired during revalidation
         authInterrupts: true,
