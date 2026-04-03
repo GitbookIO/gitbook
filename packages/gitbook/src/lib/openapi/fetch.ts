@@ -83,7 +83,7 @@ async function fetchFilesystem(
           };
       }
 > {
-    'use cache';
+    'use cache: remote';
     try {
         cacheTag(getCacheTag({ tag: 'space', space: spaceId }));
         return await fetchFilesystemNoCache(url);
