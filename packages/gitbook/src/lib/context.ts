@@ -355,6 +355,7 @@ export async function fetchSiteContextByIds(
 
     return {
         ...spaceContext,
+        locale: siteSpace.space.language ?? spaceContext.locale,
         linker: site.urls.published
             ? linkerForPublishedURL(spaceContext.linker, site.urls.published)
             : spaceContext.linker,
