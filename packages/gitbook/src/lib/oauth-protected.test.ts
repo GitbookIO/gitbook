@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'bun:test';
 
 import {
+    createOAuthProtectedResourceMetadataResponse,
     createOAuthProtectedResourceUnauthResponse,
     handleUnauthedOAuthProtectedResourceRequest,
     isOAuthProtectedResourceMetadataRequest,
@@ -77,6 +78,29 @@ describe('OAuth protected resources flow', () => {
             );
             expect(res.headers.get('Content-Type')).toBe('text/plain; charset=utf-8');
             expect(res.headers.get('Cache-Control')).toBe('no-store');
+        });
+    });
+
+    describe('createOAuthProtectedResourceMetadataResponse', () => {
+        it('returns PRM JSON for the requested metadata URL', async () => {
+            const url = new URL(
+                'https://docs.acme.org/.well-known/oauth-protected-resource/~gitbook/mcp/auth'
+            );
+
+            const res = createOAuthProtectedResourceMetadataResponse({
+                siteRequestURL: url,
+                siteId: 'site_123',
+                urlMode: 'url-host',
+            });
+
+            expect(res.status).toBe(200);
+            expect(res.headers.get('Content-Type')).toContain('application/json');
+
+            const json = await res.json();
+            expect(json).toEqual({
+                resource: 'https://docs.acme.org/~gitbook/mcp/auth',
+                authorization_servers: ['https://sites.gitbook.com/oauth2/v1/site_123'],
+            });
         });
     });
 

@@ -23,6 +23,28 @@ const OAUTH_PROTECTED_RESOURCES: OAuthProtectedResource[] = [
 ];
 
 /**
+ * Create a response for an OAuth protected resource metadata request.
+ */
+export function createOAuthProtectedResourceMetadataResponse(args: {
+    siteRequestURL: URL;
+    siteId: string;
+    urlMode: 'url' | 'url-host';
+}) {
+    const { siteRequestURL, urlMode, siteId } = args;
+
+    const resourceUrl =
+        urlMode === 'url-host'
+            ? siteRequestURL
+            : new URL(`/url/${siteRequestURL.host}${siteRequestURL.pathname}`, GITBOOK_URL);
+
+    const protectedResourceMetadata = {
+        resource: resourceUrl.toString().replace(OAUTH_PROTECTED_RESOURCE_METADATA_PATH, ''),
+        authorization_servers: [`${GITBOOK_OAUTH_SERVER_URL}/${siteId}`],
+    };
+    return NextResponse.json(protectedResourceMetadata);
+}
+
+/**
  * Handle an authenticated request for an OAuth protected resource.
  */
 export function handleUnauthedOAuthProtectedResourceRequest(args: {
@@ -34,16 +56,11 @@ export function handleUnauthedOAuthProtectedResourceRequest(args: {
 
     // When the request is for the protected resource metadata return the info relative to the site.
     if (isOAuthProtectedResourceMetadataRequest(siteRequestURL)) {
-        const resourceUrl =
-            urlMode === 'url-host'
-                ? siteRequestURL
-                : new URL(`/url/${siteRequestURL.host}${siteRequestURL.pathname}`, GITBOOK_URL);
-
-        const protectedResourceMetadata = {
-            resource: resourceUrl.toString().replace(OAUTH_PROTECTED_RESOURCE_METADATA_PATH, ''),
-            authorization_servers: [`${GITBOOK_OAUTH_SERVER_URL}/${siteURLData.site}`],
-        };
-        return NextResponse.json(protectedResourceMetadata);
+        return createOAuthProtectedResourceMetadataResponse({
+            siteRequestURL,
+            siteId: siteURLData.site,
+            urlMode,
+        });
     }
 
     // Otherwise return a 401 WWW-Authenticate pointing to the PRM doc to tell client where to auth.
