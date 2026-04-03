@@ -106,6 +106,7 @@ export const ja: TranslationLanguage = {
     ai_chat_clear_conversation: '会話をクリア',
     ai_chat_thinking: '考え中...',
     ai_chat_working: '作業中...',
+    ai_chat_waiting: '回答をお待ちしています…',
     ai_chat_context_badge: 'AI',
     ai_chat_error: '何らかのエラーが発生しました。',
     ai_chat_hold_message_1: '考え中…',
@@ -144,6 +145,7 @@ export const ja: TranslationLanguage = {
     copy_mcp_install_command: '${1} でこのMCPを使用',
     press_to_confirm: '確認するには${1}を押してください',
     tool_call_skipped: '"${1}" をスキップしました',
+    ai_control_submitted_answer: '回答を送信しました',
     scroll_back: '前にスクロール',
     scroll_further: '先にスクロール',
     hint_info: '情報',
@@ -152,4 +154,7 @@ export const ja: TranslationLanguage = {
     hint_success: '成功',
     download: 'ダウンロード',
     open: '開く',
+    form_other_prompt: '回答を入力...',
+    form_other_field: 'その他...',
+    cancel: 'キャンセル',
 };
