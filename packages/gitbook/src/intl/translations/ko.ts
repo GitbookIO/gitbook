@@ -105,6 +105,7 @@ export const ko: TranslationLanguage = {
     ai_chat_clear_conversation: '대화 지우기',
     ai_chat_thinking: '생각 중...',
     ai_chat_working: '작업 중...',
+    ai_chat_waiting: '답변을 기다리는 중…',
     ai_chat_context_badge: 'AI',
     ai_chat_error: '문제가 발생했습니다.',
     ai_chat_hold_message_1: '생각하고 있습니다…',
@@ -143,6 +144,7 @@ export const ko: TranslationLanguage = {
     copy_mcp_install_command: '${1}에서 이 MCP 사용',
     press_to_confirm: '확인하려면 ${1} 누르기',
     tool_call_skipped: '"${1}" 건너뜀',
+    ai_control_submitted_answer: '답변을 제출했습니다',
     scroll_back: '뒤로 스크롤',
     scroll_further: '더 스크롤',
     hint_info: '정보',
@@ -151,4 +153,7 @@ export const ko: TranslationLanguage = {
     hint_success: '성공',
     download: '다운로드',
     open: '열기',
+    form_other_prompt: '답변을 입력하세요...',
+    form_other_field: '기타...',
+    cancel: '취소',
 };

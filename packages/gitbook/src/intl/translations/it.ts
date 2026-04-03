@@ -107,6 +107,7 @@ export const it: TranslationLanguage = {
     ai_chat_clear_conversation: 'Cancella conversazione',
     ai_chat_thinking: 'Sto pensando...',
     ai_chat_working: 'Sto lavorando...',
+    ai_chat_waiting: 'In attesa della tua risposta…',
     ai_chat_context_badge: 'IA',
     ai_chat_error: 'Qualcosa è andato storto.',
     ai_chat_hold_message_1: 'Ci sto pensando…',
@@ -145,6 +146,7 @@ export const it: TranslationLanguage = {
     copy_mcp_install_command: 'Usa questo MCP in ${1}',
     press_to_confirm: 'Premi ${1} per confermare',
     tool_call_skipped: 'Saltato "${1}"',
+    ai_control_submitted_answer: 'Risposta inviata',
     scroll_back: 'Scorri indietro',
     scroll_further: 'Scorri avanti',
     hint_info: 'Informazione',
@@ -153,4 +155,7 @@ export const it: TranslationLanguage = {
     hint_success: 'Successo',
     download: 'Scarica',
     open: 'Apri',
+    form_other_prompt: 'Inserisci la tua risposta...',
+    form_other_field: 'Altro...',
+    cancel: 'Annulla',
 };

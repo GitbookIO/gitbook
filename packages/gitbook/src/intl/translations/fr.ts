@@ -103,6 +103,7 @@ export const fr = {
     ai_chat_clear_conversation: 'Réinitialiser la conversation',
     ai_chat_thinking: 'Réflexion en cours…',
     ai_chat_working: 'Traitement en cours…',
+    ai_chat_waiting: 'En attente de votre réponse…',
     ai_chat_context_badge: 'IA',
     ai_chat_error: 'Une erreur est survenue.',
     ai_chat_hold_message_1: 'Je réfléchis…',
@@ -141,6 +142,7 @@ export const fr = {
     copy_mcp_install_command: 'Utiliser ce MCP dans ${1}',
     press_to_confirm: 'Appuyez sur ${1} pour confirmer',
     tool_call_skipped: 'Ignoré "${1}"',
+    ai_control_submitted_answer: 'Réponse envoyée',
     scroll_back: "Défiler vers l'arrière",
     scroll_further: 'Défiler plus loin',
     hint_info: 'Information',
@@ -149,4 +151,7 @@ export const fr = {
     hint_success: 'Succès',
     download: 'Télécharger',
     open: 'Ouvrir',
+    form_other_prompt: 'Saisissez votre réponse...',
+    form_other_field: 'Autre...',
+    cancel: 'Annuler',
 };

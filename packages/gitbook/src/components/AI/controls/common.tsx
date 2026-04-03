@@ -6,10 +6,10 @@ export function AIToolContainer(props: ComponentPropsWithRef<'div'>) {
         <div
             {...props}
             className={tcls(
-                'min-h-0 animate-present-slow circular-corners:rounded-3xl rounded-corners:rounded-xl border border-tint bg-tint-subtle p-2',
+                'min-h-0 shrink grow-0 animate-blur-in circular-corners:rounded-3xl rounded-corners:rounded-xl border border-tint bg-tint-base p-2',
                 props.className
             )}
-            style={{ animationDelay: '0.5s', ...props.style }}
+            style={{ animationDelay: '0.3s', ...props.style }}
         />
     );
 }

@@ -1,4 +1,5 @@
 import { t, tString, useLanguage } from '@/intl/client';
+import { tcls } from '@/lib/tailwind';
 import { Icon } from '@gitbook/icons';
 import { useEffect, useRef } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
@@ -58,7 +59,10 @@ export function AIChatInput(props: {
                 size: 'small',
                 label: tString(language, 'send'),
             }}
-            className="animate-blur-in-slow bg-tint-base/9 backdrop-blur-lg contrast-more:bg-tint-base"
+            className={tcls(
+                chat.control ? 'animate-blur-out-display' : 'animate-blur-in-slow',
+                'bg-tint-base/9 backdrop-blur-lg contrast-more:bg-tint-base'
+            )}
             rows={1}
             maxLength={2048}
             keyboardShortcut={
@@ -69,7 +73,7 @@ export function AIChatInput(props: {
                       }
                     : undefined
             }
-            disabled={disabled || loading}
+            disabled={disabled || loading || chat.control !== null}
             aria-busy={loading}
             ref={inputRef}
             trailing={
