@@ -640,6 +640,10 @@ const RSS_PATH_REGEX = /^((\S+)\/)?rss\.xml$/;
 const MARKDOWN_PATH_REGEX = /\.md$/;
 const LLMS_FULL_PATH_REGEX = /^llms-full\.txt\/\d+$/;
 const EMBED_PAGE_PATH_REGEX = /^~gitbook\/embed\/page(\/(\S*))?$/;
+const PATH_ALIASES: Record<string, string> = {
+    'sitemap.md': 'llms.txt',
+    '.well-known/sitemap.md': 'llms.txt',
+};
 
 /**
  * Encode path in a site content.
@@ -653,7 +657,7 @@ function encodePathInSiteContent(
     routeType?: 'static' | 'dynamic';
     events?: ServerInsightsEventInput[] | undefined;
 } {
-    const pathname = removeLeadingSlash(removeTrailingSlash(rawPathname));
+    let pathname = removeLeadingSlash(removeTrailingSlash(rawPathname));
 
     if (pathname.match(/^~gitbook\/ogimage\/\S+$/)) {
         return { pathname };
@@ -701,6 +705,7 @@ function encodePathInSiteContent(
         };
     }
 
+    pathname = PATH_ALIASES[pathname] || pathname;
     switch (pathname) {
         case '~gitbook/embed':
         case '~gitbook/embed/assistant':
