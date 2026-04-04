@@ -32,7 +32,7 @@ export async function servePageMarkdown(context: GitBookSiteContext, pagePath: s
 
 function generateNotFoundMarkdown(context: GitBookSiteContext, pagePath: string) {
     const similarPages = getSimilarPages(context.revision.pages, pagePath, 5);
-    const indexUrl = context.linker.toAbsoluteURL(context.linker.toPathInSite('llms.txt'));
+    const sitemapUrl = context.linker.toAbsoluteURL(context.linker.toPathInSite('sitemap.md'));
     const fullContentUrl = context.linker.toAbsoluteURL(
         context.linker.toPathInSite('llms-full.txt')
     );
@@ -46,7 +46,7 @@ ${similarPages.map((page) => `- [${page.title}](${context.linker.toAbsoluteURL(c
 
 ## How to find the correct page
 
-1. **Browse the full index**: [/llms.txt](${indexUrl}) - Complete documentation index
+1. **Browse the full index**: [/sitemap.md](${sitemapUrl}) - Complete documentation index
 2. **View the full content**: [/llms-full.txt](${fullContentUrl}) - Full content export
 
 ## Tips for requesting documentation
