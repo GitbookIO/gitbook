@@ -3,10 +3,10 @@ import {
     SiteInsightsDisplayContext,
     SiteInsightsLLMSVariant,
 } from '@gitbook/api';
-import Negotiator from 'negotiator';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import rison from 'rison';
+import { shouldServeMarkdown } from '@vercel/agent-readability'
 
 import type { SiteURLData } from '@/lib/context';
 import { getContentSecurityPolicy } from '@/lib/csp';
@@ -740,9 +740,9 @@ function encodePathInSiteContent(
             // PDF, search and auth routes are always dynamic as they depend on the request.
             return { pathname, routeType: 'dynamic' };
         default: {
-            // If the pathname is a markdown file or the request is accepting markdown,
+            // If the pathname is a markdown file or the request is ing markdown,
             // we rewrite it to ~gitbook/markdown/:pathname
-            if (pathname.match(MARKDOWN_PATH_REGEX) || isMarkdownPreferred(request)) {
+            if (pathname.match(MARKDOWN_PATH_REGEX) || shouldServeMarkdown(request).serve) {
                 const pagePathWithoutMD = pathname.replace(MARKDOWN_PATH_REGEX, '');
                 return {
                     pathname: `~gitbook/markdown/${encodePagePath(pagePathWithoutMD)}`,
@@ -796,17 +796,4 @@ async function writeResponseCookies<R extends NextResponse>(
     });
 
     return response;
-}
-
-const MARKDOWN_MEDIA_TYPES = ['text/markdown'];
-
-/**
- * Test if a request is requesting a markdown version of the page.
- */
-function isMarkdownPreferred(request: Request): boolean {
-    const negotiator = new Negotiator({
-        headers: Object.fromEntries(request.headers.entries()),
-    });
-    const mediaTypes = negotiator.mediaTypes();
-    return MARKDOWN_MEDIA_TYPES.some((mediaType) => mediaTypes.includes(mediaType));
 }
