@@ -3,10 +3,10 @@ import {
     SiteInsightsDisplayContext,
     SiteInsightsLLMSVariant,
 } from '@gitbook/api';
+import { shouldServeMarkdown } from '@vercel/agent-readability';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import rison from 'rison';
-import { shouldServeMarkdown } from '@vercel/agent-readability'
 
 import type { SiteURLData } from '@/lib/context';
 import { getContentSecurityPolicy } from '@/lib/csp';
