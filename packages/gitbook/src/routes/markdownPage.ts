@@ -39,7 +39,9 @@ function generateNotFoundMarkdown(context: GitBookSiteContext, pagePath: string)
 
     return `# Page Not Found
 
-The URL \`${pagePath}\` does not exist. Similar pages:
+The URL \`${pagePath}\` does not exist.
+
+You might be looking for one of these pages:
 ${similarPages.map((page) => `- [${page.title}](${context.linker.toAbsoluteURL(context.linker.toPathInSpace(page.path))}.md)`).join('\n')}
 
 ## How to find the correct page
