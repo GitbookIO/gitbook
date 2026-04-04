@@ -151,6 +151,7 @@
         "js-cookie": "^3.0.5",
         "jsontoxml": "^1.0.1",
         "jwt-decode": "^4.0.0",
+        "leven": "^4.1.0",
         "mcp-handler": "^1.0.2",
         "mdast-util-from-markdown": "^2.0.2",
         "mdast-util-frontmatter": "^2.0.1",
@@ -2614,7 +2615,7 @@
 
     "layout-base": ["layout-base@1.0.2", "", {}, "sha512-8h2oVEZNktL4BH2JCOI90iD1yXwL6iNW7KcCKT2QZgQJR2vbqDsldCTPRU9NifTCqHZci57XvQQ15YTu+sTYPg=="],
 
-    "leven": ["leven@4.0.0", "", {}, "sha512-puehA3YKku3osqPlNuzGDUHq8WpwXupUg1V6NXdV38G+gr+gkBwFC8g1b/+YcIvp8gnqVIus+eJCH/eGsRmJNw=="],
+    "leven": ["leven@4.1.0", "", {}, "sha512-KZ9W9nWDT7rF7Dazg8xyLHGLrmpgq2nVNFUckhqdW3szVP6YhCpp/RAnpmVExA9JvrMynjwSLVrEj3AepHR6ew=="],
 
     "lightningcss": ["lightningcss@1.30.1", "", { "dependencies": { "detect-libc": "^2.0.3" }, "optionalDependencies": { "lightningcss-darwin-arm64": "1.30.1", "lightningcss-darwin-x64": "1.30.1", "lightningcss-freebsd-x64": "1.30.1", "lightningcss-linux-arm-gnueabihf": "1.30.1", "lightningcss-linux-arm64-gnu": "1.30.1", "lightningcss-linux-arm64-musl": "1.30.1", "lightningcss-linux-x64-gnu": "1.30.1", "lightningcss-linux-x64-musl": "1.30.1", "lightningcss-win32-arm64-msvc": "1.30.1", "lightningcss-win32-x64-msvc": "1.30.1" } }, "sha512-xi6IyHML+c9+Q3W0S4fCQJOym42pyurFiJUHEcEyHS0CeKzia4yZDEsLlqOFykxOdHpNy0NmvVO31vcSqAxJCg=="],
 
@@ -4362,6 +4363,8 @@
 
     "@scalar/object-utils/@scalar/helpers": ["@scalar/helpers@0.1.1", "", {}, "sha512-eJjuCI5djqU0adTwrHvpDf0xuwNRpwZinCfJ03QjnmIFBM9Ch0u3tn/0EZOhcVNbdEyJ+3yvSVy1dCmmvgtpvQ=="],
 
+    "@scalar/openapi-parser/leven": ["leven@4.0.0", "", {}, "sha512-puehA3YKku3osqPlNuzGDUHq8WpwXupUg1V6NXdV38G+gr+gkBwFC8g1b/+YcIvp8gnqVIus+eJCH/eGsRmJNw=="],
+
     "@scalar/openapi-types/zod": ["zod@4.1.11", "", {}, "sha512-WPsqwxITS2tzx1bzhIKsEs19ABD5vmCVa4xBo2tq/SrV4RNZtfws1EnCWQXM6yh8bD08a1idvkB5MZSBiZsjwg=="],
 
     "@scalar/postman-to-openapi/@scalar/helpers": ["@scalar/helpers@0.0.12", "", {}, "sha512-4NDmHShyi1hrVRsJCdRZT/FIpy+/5PFbVbQLRYX/pjpu5cYqHBj9s6n5RI6gGDXEBHAIFi63g9FC6Isgr66l1Q=="],
@@ -5420,6 +5423,8 @@
 
     "@scalar/api-client/@scalar/openapi-parser/@scalar/openapi-upgrader": ["@scalar/openapi-upgrader@0.1.3", "", { "dependencies": { "@scalar/openapi-types": "0.5.0" } }, "sha512-iROhcgy3vge6zsviPtoTLHale0nYt1PLhuMmJweQwJ0U23ZYyYhV5xgHtAd0OBEXuqT6rjYbJFvKOJZmJOwpNQ=="],
 
+    "@scalar/api-client/@scalar/openapi-parser/leven": ["leven@4.0.0", "", {}, "sha512-puehA3YKku3osqPlNuzGDUHq8WpwXupUg1V6NXdV38G+gr+gkBwFC8g1b/+YcIvp8gnqVIus+eJCH/eGsRmJNw=="],
+
     "@scalar/api-client/@scalar/workspace-store/@scalar/openapi-upgrader": ["@scalar/openapi-upgrader@0.1.3", "", { "dependencies": { "@scalar/openapi-types": "0.5.0" } }, "sha512-iROhcgy3vge6zsviPtoTLHale0nYt1PLhuMmJweQwJ0U23ZYyYhV5xgHtAd0OBEXuqT6rjYbJFvKOJZmJOwpNQ=="],
 
     "@scalar/components/@scalar/oas-utils/@scalar/json-magic": ["@scalar/json-magic@0.6.1", "", { "dependencies": { "@scalar/helpers": "0.0.12", "yaml": "2.8.0" } }, "sha512-HJMPY5dUU3EXVS4EkjAFXo+uCrby/YFu/gljKDQnhYWRy5zQ0sJWrOEDcHS8nLoJRCIRD5tiVpCxnUnSb6OoAQ=="],
@@ -5453,6 +5458,8 @@
     "@scalar/import/@scalar/openapi-parser/@scalar/openapi-types": ["@scalar/openapi-types@0.5.0", "", { "dependencies": { "zod": "4.1.11" } }, "sha512-HJBcLa+/mPP+3TCcQngj/iW5UqynRosOQdEETXjmdy6Ngw8wBjwIcT6C86J5jufJ6sI8++HYnt+e7pAvp5FO6A=="],
 
     "@scalar/import/@scalar/openapi-parser/@scalar/openapi-upgrader": ["@scalar/openapi-upgrader@0.1.3", "", { "dependencies": { "@scalar/openapi-types": "0.5.0" } }, "sha512-iROhcgy3vge6zsviPtoTLHale0nYt1PLhuMmJweQwJ0U23ZYyYhV5xgHtAd0OBEXuqT6rjYbJFvKOJZmJOwpNQ=="],
+
+    "@scalar/import/@scalar/openapi-parser/leven": ["leven@4.0.0", "", {}, "sha512-puehA3YKku3osqPlNuzGDUHq8WpwXupUg1V6NXdV38G+gr+gkBwFC8g1b/+YcIvp8gnqVIus+eJCH/eGsRmJNw=="],
 
     "@scalar/postman-to-openapi/@scalar/oas-utils/@scalar/json-magic": ["@scalar/json-magic@0.6.1", "", { "dependencies": { "@scalar/helpers": "0.0.12", "yaml": "2.8.0" } }, "sha512-HJMPY5dUU3EXVS4EkjAFXo+uCrby/YFu/gljKDQnhYWRy5zQ0sJWrOEDcHS8nLoJRCIRD5tiVpCxnUnSb6OoAQ=="],
 

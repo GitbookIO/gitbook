@@ -1,8 +1,7 @@
 import type { GitBookSiteContext } from '@/lib/context';
 import { getExposableError } from '@/lib/data';
 import { getMarkdownForPage } from '@/lib/markdownPage';
-import { resolvePagePathDocumentOrGroup } from '@/lib/pages';
-import { generateNotFoundMarkdown } from '@vercel/agent-readability';
+import { getSimilarPages, resolvePagePathDocumentOrGroup } from '@/lib/pages';
 
 /**
  * Serve a markdown version of a page.
@@ -13,12 +12,7 @@ export async function servePageMarkdown(context: GitBookSiteContext, pagePath: s
         const pageLookup = resolvePagePathDocumentOrGroup(context.revision.pages, pagePath);
         if (!pageLookup) {
             // Generates a markdown body for missing pages. Return this with a 200 status (not 404) because agents discard 404 response bodies.
-            const md = generateNotFoundMarkdown(pagePath, {
-                sitemapUrl: context.linker.toAbsoluteURL(context.linker.toPathInSite('sitemap.xml')),
-                indexUrl: context.linker.toAbsoluteURL(context.linker.toPathInSite('llms.txt')),
-                fullContentUrl: context.linker.toAbsoluteURL(context.linker.toPathInSite('llms-full.txt')),
-                baseUrl: context.linker.toAbsoluteURL(context.linker.toPathInSpace('')),
-            });
+            const md = generateNotFoundMarkdown(context, pagePath);
             // Return as 200 so agents read the body
             return serveMarkdown(md);
         }
@@ -34,6 +28,31 @@ export async function servePageMarkdown(context: GitBookSiteContext, pagePath: s
             },
         });
     }
+}
+
+function generateNotFoundMarkdown(context: GitBookSiteContext, pagePath: string) {
+    const similarPages = getSimilarPages(context.revision.pages, pagePath, 5);
+    const sitemapUrl = context.linker.toAbsoluteURL(context.linker.toPathInSite('sitemap.xml'));
+    const indexUrl = context.linker.toAbsoluteURL(context.linker.toPathInSite('llms.txt'));
+    const fullContentUrl = context.linker.toAbsoluteURL(
+        context.linker.toPathInSite('llms-full.txt')
+    );
+
+    return `# Page Not Found
+
+The URL \`${pagePath}\` does not exist. Similar pages:
+${similarPages.map((page) => `- [${page.title}](${context.linker.toAbsoluteURL(context.linker.toPathInSpace(page.path))}.md)`).join('\n')}
+
+## How to find the correct page
+
+1. **Browse the sitemap**: [/sitemap.xml](${sitemapUrl}) - A structured index of all pages
+2. **Browse the full index**: [/llms.txt](${indexUrl}) - Complete documentation index
+3. **View the full content**: [/llms-full.txt](${fullContentUrl}) - Full content export
+
+## Tips for requesting documentation
+
+- For markdown responses, append \`.md\` to URLs (e.g., \`${context.linker.toPathInSpace(similarPages[0]?.path ?? 'docs/example')}.md\`)
+- Use \`Accept: text/markdown\` header for content negotiation`;
 }
 
 function serveMarkdown(markdown: string) {
