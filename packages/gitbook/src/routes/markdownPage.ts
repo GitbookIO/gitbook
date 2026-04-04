@@ -45,9 +45,8 @@ ${similarPages.map((page) => `- [${page.title}](${context.linker.toAbsoluteURL(c
 
 ## How to find the correct page
 
-1. **Browse the sitemap**: [/sitemap.xml](${sitemapUrl}) - A structured index of all pages
-2. **Browse the full index**: [/llms.txt](${indexUrl}) - Complete documentation index
-3. **View the full content**: [/llms-full.txt](${fullContentUrl}) - Full content export
+1. **Browse the full index**: [/llms.txt](${indexUrl}) - Complete documentation index
+2. **View the full content**: [/llms-full.txt](${fullContentUrl}) - Full content export
 
 ## Tips for requesting documentation
 
