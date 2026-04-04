@@ -32,7 +32,6 @@ export async function servePageMarkdown(context: GitBookSiteContext, pagePath: s
 
 function generateNotFoundMarkdown(context: GitBookSiteContext, pagePath: string) {
     const similarPages = getSimilarPages(context.revision.pages, pagePath, 5);
-    const sitemapUrl = context.linker.toAbsoluteURL(context.linker.toPathInSite('sitemap.xml'));
     const indexUrl = context.linker.toAbsoluteURL(context.linker.toPathInSite('llms.txt'));
     const fullContentUrl = context.linker.toAbsoluteURL(
         context.linker.toPathInSite('llms-full.txt')
