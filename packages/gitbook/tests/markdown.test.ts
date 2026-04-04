@@ -36,5 +36,5 @@ it('should should return a 200 for a page not found', async () => {
     expect(response.status).toBe(200);
     expect(response.headers.get('content-type')).toContain('text/markdown');
     expect(response.headers.get('x-robots-tag')).toBe('noindex');
-    expect(await response.text()).toContain('# Page not found');
+    expect(await response.text()).toContain('# Page Not Found');
 });

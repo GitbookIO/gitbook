@@ -13,8 +13,10 @@ export async function servePageMarkdown(context: GitBookSiteContext, pagePath: s
         const pageLookup = resolvePagePathDocumentOrGroup(context.revision.pages, pagePath);
         if (!pageLookup) {
             // Generates a markdown body for missing pages. Return this with a 200 status (not 404) because agents discard 404 response bodies.
-
             const md = generateNotFoundMarkdown(pagePath, {
+                sitemapUrl: context.linker.toAbsoluteURL(context.linker.toPathInSite('sitemap.xml')),
+                indexUrl: context.linker.toAbsoluteURL(context.linker.toPathInSite('llms.txt')),
+                fullContentUrl: context.linker.toAbsoluteURL(context.linker.toPathInSite('llms-full.txt')),
                 baseUrl: context.linker.toAbsoluteURL(context.linker.toPathInSpace('')),
             });
             // Return as 200 so agents read the body
