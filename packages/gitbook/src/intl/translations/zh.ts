@@ -103,6 +103,7 @@ export const zh: TranslationLanguage = {
     ai_chat_clear_conversation: '清空对话',
     ai_chat_thinking: '思考中...',
     ai_chat_working: '工作中...',
+    ai_chat_waiting: '正在等待您的回答…',
     ai_chat_context_badge: 'AI',
     ai_chat_error: '出了些问题。',
     ai_chat_hold_message_1: '正在思考…',
@@ -140,6 +141,7 @@ export const zh: TranslationLanguage = {
     copy_mcp_install_command: '在 ${1} 中使用此 MCP',
     press_to_confirm: '按 ${1} 确认',
     tool_call_skipped: '已跳过 "${1}"',
+    ai_control_submitted_answer: '已提交回答',
     scroll_back: '向后滚动',
     scroll_further: '向前滚动',
     hint_info: '信息',
@@ -148,4 +150,7 @@ export const zh: TranslationLanguage = {
     hint_success: '成功',
     download: '下载',
     open: '打开',
+    form_other_prompt: '请输入您的回答...',
+    form_other_field: '其他...',
+    cancel: '取消',
 };

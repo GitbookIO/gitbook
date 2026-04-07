@@ -7,6 +7,7 @@ import {
 
 import {
     extractPagePath,
+    getSimilarPages,
     resolveFirstDocument,
     resolvePagePath,
     resolvePagePathDocumentOrGroup,
@@ -292,3 +293,74 @@ describe('resolvePagePath', () => {
         });
     });
 });
+
+describe('getSimilarPages', () => {
+    it('returns the closest matches for a typoed path', () => {
+        const pages: RevisionPage[] = [
+            createDocumentPage('install', 'guides/installation'),
+            createDocumentPage('config', 'guides/configuration'),
+            createDocumentPage('auth', 'api/authentication'),
+        ];
+
+        expect(getSimilarPages(pages, 'guides/installtion', 2).map((page) => page.id)).toEqual([
+            'install',
+            'config',
+        ]);
+    });
+
+    it('prefers pages with the same path hierarchy', () => {
+        const pages: RevisionPage[] = [
+            createDocumentPage('api-auth', 'api/reference/authentication'),
+            createDocumentPage('guide-auth', 'guides/authentication'),
+            createDocumentPage('api-errors', 'api/reference/errors'),
+        ];
+
+        expect(
+            getSimilarPages(pages, 'api/reference/authentcation', 1).map((page) => page.id)
+        ).toEqual(['api-auth']);
+    });
+
+    it('ignores hidden pages', () => {
+        const pages: RevisionPage[] = [
+            createDocumentPage('hidden', 'private-api', true),
+            createDocumentPage('versioned', 'private-api-v2'),
+            createDocumentPage('public', 'public-api'),
+        ];
+
+        const similar = getSimilarPages(pages, 'privte-api', 2);
+
+        expect(similar.map((page) => page.id)).toEqual(['versioned', 'public']);
+        expect(similar.some((page) => page.id === 'hidden')).toBe(false);
+    });
+});
+
+function createDocumentPage(id: string, path: string, hidden = false): RevisionPage {
+    const slug = path.split('/').at(-1) ?? path;
+
+    return {
+        id,
+        title: path,
+        kind: 'sheet',
+        type: 'document',
+        hidden,
+        urls: {
+            app: `https://app.gitbook.com/s/fvBF1lEt2CVd4RTffSOk/${path}`,
+        },
+        path,
+        slug,
+        pages: [],
+        tags: [],
+        layout: {
+            cover: true,
+            coverSize: RevisionPageLayoutOptionsCoverSize.Full,
+            title: true,
+            description: true,
+            tableOfContents: true,
+            outline: true,
+            pagination: true,
+            width: RevisionPageLayoutOptionsWidth.Default,
+            metadata: true,
+            tags: true,
+        },
+    };
+}

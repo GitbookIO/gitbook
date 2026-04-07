@@ -105,6 +105,7 @@ export const ru = {
     ai_chat_clear_conversation: 'Очистить диалог',
     ai_chat_thinking: 'Думает…',
     ai_chat_working: 'Работает…',
+    ai_chat_waiting: 'Ожидание вашего ответа…',
     ai_chat_context_badge: 'ИИ',
     ai_chat_error: 'Что-то пошло не так.',
     ai_chat_hold_message_1: 'Обдумываю…',
@@ -143,6 +144,7 @@ export const ru = {
     copy_mcp_install_command: 'Использовать этот MCP в ${1}',
     press_to_confirm: 'Нажмите ${1} для подтверждения',
     tool_call_skipped: 'Пропущен "${1}"',
+    ai_control_submitted_answer: 'Ответ отправлен',
     scroll_back: 'Прокрутить назад',
     scroll_further: 'Прокрутить дальше',
     hint_info: 'Информация',
@@ -151,4 +153,7 @@ export const ru = {
     hint_success: 'Успех',
     download: 'Скачать',
     open: 'Открыть',
+    form_other_prompt: 'Введите ответ...',
+    form_other_field: 'Другое...',
+    cancel: 'Отмена',
 };

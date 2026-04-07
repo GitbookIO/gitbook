@@ -27,3 +27,14 @@ it('should expose a markdown page with the accept header', async () => {
     expect(response.headers.get('x-robots-tag')).toBe('noindex');
     expect(await response.text()).toContain('# Text page');
 });
+
+it('should should return a 200 for a page not found', async () => {
+    const response = await fetch(
+        getContentTestURL('https://gitbook.gitbook.io/test-gitbook-open/missing-page.md')
+    );
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get('content-type')).toContain('text/markdown');
+    expect(response.headers.get('x-robots-tag')).toBe('noindex');
+    expect(await response.text()).toContain('# Page Not Found');
+});
