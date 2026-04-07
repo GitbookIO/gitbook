@@ -1,12 +1,13 @@
 // @ts-check
 
-const deploymentId = process.env.GITHUB_SHA || Date.now().toString(); // Needed because we use a custom deployment method i.e. https://vercel.com/docs/skew-protection#custom-deployment-id
+// We don't use the deployment ID yet on 2c, we need to remove it because of https://github.com/opennextjs/opennextjs-aws/issues/1136
+const deploymentId = process.env.GITBOOK_RUNTIME === "cloudflare" ? undefined : (process.env.GITHUB_SHA || Date.now().toString()); // Needed because we use a custom deployment method i.e. https://vercel.com/docs/skew-protection#custom-deployment-id
 
 /**
  * @type {import('next').NextConfig}
  */
 const nextConfig = {
-    deploymentId: deploymentId.slice(0, 32), // Vercel's deployment ID has a max length of 32 characters
+    deploymentId: deploymentId?.slice(0, 32), // Vercel's deployment ID has a max length of 32 characters
     experimental: {
         // This is needed to throw "forbidden" when the api token expired during revalidation
         authInterrupts: true,
