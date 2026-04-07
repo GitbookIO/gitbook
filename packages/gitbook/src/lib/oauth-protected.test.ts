@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'bun:test';
 
 import {
+    createOAuthProtectedResourceMetadataResponse,
     createOAuthProtectedResourceUnauthResponse,
     handleUnauthedOAuthProtectedResourceRequest,
     isOAuthProtectedResourceMetadataRequest,
@@ -34,6 +35,30 @@ describe('OAuth protected resources flow', () => {
             });
         });
 
+        it('returns PRM JSON for the authenticated MCP resource metadata request', async () => {
+            const url = new URL(
+                'https://docs.acme.org/.well-known/oauth-protected-resource/~gitbook/mcp/auth'
+            );
+
+            const res = handleUnauthedOAuthProtectedResourceRequest({
+                siteRequestURL: url,
+                siteURLData: {
+                    target: 'external',
+                    redirect: 'https://login.acme.org/oauth2',
+                    site: 'site_123',
+                },
+                urlMode: 'url-host',
+            });
+
+            expect(res.status).toBe(200);
+
+            const json = await res.json();
+            expect(json).toEqual({
+                resource: 'https://docs.acme.org/~gitbook/mcp/auth',
+                authorization_servers: ['https://sites.gitbook.com/oauth2/v1/site_123'],
+            });
+        });
+
         it('returns the 401 unauth response for the protected resource itself', () => {
             const url = new URL('https://docs.acme.org/~gitbook/mcp');
 
@@ -56,8 +81,38 @@ describe('OAuth protected resources flow', () => {
         });
     });
 
+    describe('createOAuthProtectedResourceMetadataResponse', () => {
+        it('returns PRM JSON for the requested metadata URL', async () => {
+            const url = new URL(
+                'https://docs.acme.org/.well-known/oauth-protected-resource/~gitbook/mcp/auth'
+            );
+
+            const res = createOAuthProtectedResourceMetadataResponse({
+                siteRequestURL: url,
+                siteId: 'site_123',
+                urlMode: 'url-host',
+            });
+
+            expect(res.status).toBe(200);
+            expect(res.headers.get('Content-Type')).toContain('application/json');
+
+            const json = await res.json();
+            expect(json).toEqual({
+                resource: 'https://docs.acme.org/~gitbook/mcp/auth',
+                authorization_servers: ['https://sites.gitbook.com/oauth2/v1/site_123'],
+            });
+        });
+    });
+
     describe('createMcpUnauthenticatedResponse', () => {
         it.each([
+            {
+                scenario: 'custom domain auth endpoint (with realm)',
+                input: 'https://docs.acme.org/~gitbook/mcp/auth',
+                expectedResourceMetadataUrl:
+                    'https://docs.acme.org/.well-known/oauth-protected-resource/~gitbook/mcp/auth',
+                expectedRealm: 'mcp',
+            },
             {
                 scenario: 'custom domain (with realm)',
                 input: 'https://docs.acme.org/~gitbook/mcp',
@@ -117,6 +172,11 @@ describe('OAuth protected resources flow', () => {
     describe('isOAuthProtectedResourceRequest', () => {
         it.each([
             {
+                scenario: 'should match a protected auth endpoint',
+                input: 'https://docs.acme.org/~gitbook/mcp/auth',
+                expected: true,
+            },
+            {
                 scenario: 'should match a protected endpoint',
                 input: 'https://docs.acme.org/~gitbook/mcp',
                 expected: true,
@@ -142,6 +202,12 @@ describe('OAuth protected resources flow', () => {
                 expected: false,
             },
             {
+                scenario:
+                    'should also match auth metadata doc path (protected resource & PR metadata)',
+                input: 'https://docs.acme.org/.well-known/oauth-protected-resource/~gitbook/mcp/auth',
+                expected: true,
+            },
+            {
                 scenario: 'should also match metadata doc path (protected resource & PR metadata)',
                 input: 'https://docs.acme.org/.well-known/oauth-protected-resource/~gitbook/mcp',
                 expected: true,
@@ -154,6 +220,11 @@ describe('OAuth protected resources flow', () => {
 
     describe('isOAuthProtectedResourceMetadataRequest', () => {
         it.each([
+            {
+                scenario: 'should match metadata doc for the authenticated resource',
+                input: 'https://docs.acme.org/.well-known/oauth-protected-resource/~gitbook/mcp/auth',
+                expected: true,
+            },
             {
                 scenario: 'should match metadata doc for the resource',
                 input: 'https://docs.acme.org/.well-known/oauth-protected-resource/~gitbook/mcp',
