@@ -1,3 +1,5 @@
+import { tString } from '@/intl/translate';
+import type { TranslationLanguage } from '@/intl/translations/types';
 import type {
     AIStreamResponseToolCallPending,
     AIToolCallResult,
@@ -16,6 +18,7 @@ type AIControlDefinition<
     createControl: (args: {
         context: AIUIToolContext;
         input: Input;
+        language: TranslationLanguage;
         send: (result: Pick<AIToolCallResult, 'output' | 'summary'>) => Promise<void>;
     }) => AIControl<Name, Input, Output>;
     exposeAsTool: boolean;
@@ -55,15 +58,15 @@ export function createAIControl<
         name: `ui--${def.name}`,
         description: def.description,
         inputSchema: zodToJsonSchema(def.inputSchema as any) as AIToolDefinition['inputSchema'],
-        createControl: ({ context, input, send }) => {
+        createControl: ({ context, input, language, send }) => {
             const props: AIControlProps<z.infer<InputSchema>, z.infer<OutputSchema>> = {
                 ...input,
                 onSubmit: async (output) => {
                     await send({
                         output,
                         summary: {
-                            icon: 'check',
-                            text: 'Submitted',
+                            icon: 'comment-check',
+                            text: tString(language, 'ai_control_submitted_answer'),
                         },
                     });
                 },

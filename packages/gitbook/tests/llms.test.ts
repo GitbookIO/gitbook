@@ -26,6 +26,26 @@ describe('llms.txt', () => {
         expect(response.headers.get('content-type')).toContain('text/markdown');
         expect(await response.text()).toContain('# E2E Tests GitBook Open');
     });
+
+    it('should expose llms.txt from sitemap.md', async () => {
+        const response = await fetch(
+            getContentTestURL('https://gitbook.gitbook.io/test-gitbook-open/sitemap.md')
+        );
+
+        expect(response.status).toBe(200);
+        expect(response.headers.get('content-type')).toContain('text/markdown');
+        expect(await response.text()).toContain('# E2E Tests GitBook Open');
+    });
+
+    it('should expose llms.txt from .well-known/sitemap.md', async () => {
+        const response = await fetch(
+            getContentTestURL('https://gitbook.gitbook.io/test-gitbook-open/.well-known/sitemap.md')
+        );
+
+        expect(response.status).toBe(200);
+        expect(response.headers.get('content-type')).toContain('text/markdown');
+        expect(await response.text()).toContain('# E2E Tests GitBook Open');
+    });
 });
 
 describe('llms-full.txt', () => {

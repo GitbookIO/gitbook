@@ -1,7 +1,8 @@
 import { ConfirmControlDef } from './ConfirmControl';
+import { MultiChoiceControlDef } from './MultiChoiceControl';
 import { SingleChoiceControlDef } from './SingleChoiceControl';
 
-const CONTROLS = [SingleChoiceControlDef, ConfirmControlDef];
+const CONTROLS = [SingleChoiceControlDef, MultiChoiceControlDef, ConfirmControlDef];
 
 export type AnyAIControlTool = (typeof CONTROLS)[number];
 export type AnyAIControl = ReturnType<AnyAIControlTool['createControl']>;

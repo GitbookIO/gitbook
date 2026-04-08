@@ -1,6 +1,6 @@
 import { SiteInsightsDisplayContext } from '@gitbook/api';
 
-import { type RouteLayoutParams, getStaticSiteContext } from '@/app/utils';
+import { type RouteLayoutParams, getDynamicSiteContext } from '@/app/utils';
 import { getExposableError, throwIfDataError } from '@/lib/data';
 import { getMarkdownForPageInSpace } from '@/lib/markdownPage';
 import { resolvePagePath } from '@/lib/pages';
@@ -12,17 +12,16 @@ import { createMcpHandler } from 'mcp-handler';
 import type { NextRequest } from 'next/server';
 import { z } from 'zod';
 
-async function handler(
+export async function handleMcpRequest(
     rawRequest: NextRequest,
-    { params }: { params: Promise<RouteLayoutParams> }
+    params: RouteLayoutParams,
+    endpoint: '~gitbook/mcp' | '~gitbook/mcp/auth'
 ) {
-    const { context } = await getStaticSiteContext(await params);
+    const { context } = await getDynamicSiteContext(params);
     const { dataFetcher, linker, site } = context;
 
     // Next.js request.url is the original URL and not the rewritten one from the middleware
-    const requestURL = new URL(
-        context.linker.toAbsoluteURL(context.linker.toPathInSite('~gitbook/mcp'))
-    );
+    const requestURL = new URL(context.linker.toAbsoluteURL(context.linker.toPathInSite(endpoint)));
     requestURL.search = rawRequest.nextUrl.search;
     const request = new Request(requestURL, rawRequest);
 
@@ -60,7 +59,6 @@ async function handler(
                         })
                     );
 
-                    // Track the search event server-side
                     waitUntil(
                         trackServerInsightsEvents({
                             organizationId: context.organizationId,
@@ -214,8 +212,7 @@ async function handler(
         },
         {},
         {
-            basePath: context.linker.toPathInSite('~gitbook/'),
-            streamableHttpEndpoint: '/mcp',
+            streamableHttpEndpoint: context.linker.toPathInSite(endpoint),
             maxDuration: 60,
             verboseLogs: true,
             disableSse: true,
@@ -224,5 +221,3 @@ async function handler(
 
     return mcpHandler(request);
 }
-
-export { handler as GET, handler as POST };

@@ -107,6 +107,7 @@ export const de = {
     ai_chat_clear_conversation: 'Unterhaltung löschen',
     ai_chat_thinking: 'Denke nach...',
     ai_chat_working: 'Arbeite...',
+    ai_chat_waiting: 'Warte auf Ihre Antwort…',
     ai_chat_context_badge: 'KI',
     ai_chat_error: 'Etwas ist schief gelaufen.',
     ai_chat_hold_message_1: 'Ich denke nach…',
@@ -145,6 +146,7 @@ export const de = {
     copy_mcp_install_command: 'Dieses MCP in ${1} verwenden',
     press_to_confirm: 'Drücke ${1} zum Bestätigen',
     tool_call_skipped: 'Übersprungen "${1}"',
+    ai_control_submitted_answer: 'Antwort übermittelt',
     scroll_back: 'Zurück scrollen',
     scroll_further: 'Weiter scrollen',
     hint_info: 'Information',
@@ -153,4 +155,7 @@ export const de = {
     hint_success: 'Erfolg',
     download: 'Herunterladen',
     open: 'Öffnen',
+    form_other_prompt: 'Geben Sie Ihre Antwort ein...',
+    form_other_field: 'Sonstiges...',
+    cancel: 'Abbrechen',
 };
