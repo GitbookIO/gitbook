@@ -8,14 +8,6 @@
 
     --gitbook-widget-radius: .5rem;
     --gitbook-widget-text-size: 1rem;
-    --gitbook-widget-text-color: #656973;
-    --gitbook-widget-border-color: #e5e5e5;
-
-    --gitbook-widget-background-translucent: rgba(255, 255, 255, 0.9);
-    --gitbook-widget-background-translucent-hover: rgba(250, 250, 250, 0.9);
-    --gitbook-widget-background-solid: #FFFFFF;
-    --gitbook-widget-background-solid-hover: #FBFBFB;
-
     --gitbook-widget-icon-size: 1.25rem;
 
     --gitbook-widget-window-width: 28rem; /* 448px */
@@ -29,16 +21,22 @@
     --gitbook-widget-easing-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-@media (prefers-color-scheme: dark) {
-    :root {
-        --gitbook-widget-text-color: #FFFFFF;
-        --gitbook-widget-border-color: #202020;
-        --gitbook-widget-background-translucent: rgba(15, 15, 15, 0.9);
-        --gitbook-widget-background-translucent-hover: rgba(20, 20, 20, 0.9);
-        --gitbook-widget-background-solid: #f0f0f0;
+#gitbook-widget-button,
+#gitbook-widget-window {
+    --gitbook-widget-text-color: light-dark(#656973, #FFFFFF);
+    --gitbook-widget-border-color: light-dark(#e5e5e5, #202020);
+    --gitbook-widget-background-translucent: light-dark(rgba(255, 255, 255, 0.9), rgba(15, 15, 15, 0.9));
+    --gitbook-widget-background-translucent-hover: light-dark(rgba(250, 250, 250, 0.9), rgba(20, 20, 20, 0.9));
+    --gitbook-widget-background-solid: light-dark(#FFFFFF, #f0f0f0);
+    --gitbook-widget-background-solid-hover: light-dark(#FBFBFB, #f0f0f0);
+
+    &[data-color-scheme=light] {
+        color-scheme: light;
+    }
+    &[data-color-scheme=dark] {
+        color-scheme: dark;
     }
 }
-
 * {
     box-sizing: border-box;
 }

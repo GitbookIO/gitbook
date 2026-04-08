@@ -32,6 +32,16 @@ window.GitBook('show');
 
 The standalone script provides a global `GitBook` function. See the [API Reference](#api-reference) section for all available methods.
 
+### Color mode behavior and override
+
+- If the site's Customization settings enforce a single mode (`light` or `dark`), the embed always uses that mode.
+- If the site supports both light and dark, the embed uses the page's `color-scheme` when defined or the browser/OS preference as a fallback.
+- You can also force the standalone widget to a specific mode (if the site supports it) by setting `data-color-scheme` on the button and/or window elements.
+
+Supported values:
+- `light`
+- `dark`
+
 ### Example: Configuring the widget
 
 ```javascript
