@@ -21,7 +21,7 @@ async function main() {
     await fs.mkdir(outputFolder, { recursive: true });
 
     // Copy the assets from
-    // source/sprites to outputFolder/sprites
+    // source/sprites-full to outputFolder/sprites
     // source/svgs to outputFolder/svgs
     await Promise.all([
         ...stylesToCopy.map((style) => {
@@ -34,10 +34,10 @@ async function main() {
             }
         }),
         ...stylesToCopy.map((style) => {
-            const spritePath = path.join(source, `sprites/${style}.svg`);
+            const spritePath = path.join(source, `sprites-full/${style}.svg`);
             if (existsSync(spritePath)) {
                 return fs.cp(
-                    path.join(source, `sprites/${style}.svg`),
+                    path.join(source, `sprites-full/${style}.svg`),
                     path.join(outputFolder, 'sprites', `${style}.svg`)
                 );
             }
