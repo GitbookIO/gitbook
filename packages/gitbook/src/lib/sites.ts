@@ -39,6 +39,16 @@ export function getSiteStructureSections(
         : [];
 }
 
+/**
+ * Filter site spaces to only include those matching the given locale
+ */
+export function filterSiteSpacesByLocale(
+    siteSpaces: SiteSpace[],
+    locale: TranslationLanguage | undefined
+): SiteSpace[] {
+    return siteSpaces.filter((siteSpace) => siteSpace.space.language === locale);
+}
+
 /*
  * Gets all site spaces, in a site structure and overrides the title
  */
