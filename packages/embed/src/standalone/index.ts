@@ -86,26 +86,18 @@ widgetWindow.classList.add('hidden');
 document.body.appendChild(widgetButton);
 document.body.appendChild(widgetWindow);
 
+/** Resolved `color-scheme` from the iframe element (incl. inheritance from `#gitbook-widget-window`). */
+function colorSchemeFromIframe(): 'light' | 'dark' | undefined {
+    if (!widgetIframe) return undefined;
+    const v = getComputedStyle(widgetIframe).colorScheme.trim().toLowerCase();
+    return v === 'dark' || v === 'light' ? v : undefined;
+}
+
 function pushColorSchemeToFrame() {
     if (!_frame) return;
 
-    // Manual override via configure always wins.
-    const desired =
-        frameConfiguration.colorScheme ??
-        (widgetIframe
-            ? ((() => {
-                  const declared = getComputedStyle(widgetIframe).colorScheme.trim().toLowerCase();
-                  if (declared === 'dark') return 'dark';
-                  if (declared === 'light') return 'light';
-                  // If the iframe element doesn't have an explicit scheme, don't force anything.
-                  // The embedded content can rely on `forcedTheme` or system theme.
-                  return undefined;
-              })() as 'light' | 'dark' | undefined)
-            : undefined);
-
-    if (desired === lastPushedColorScheme) {
-        return;
-    }
+    const desired = frameConfiguration.colorScheme ?? colorSchemeFromIframe();
+    if (desired === lastPushedColorScheme) return;
     lastPushedColorScheme = desired;
 
     _frame.configure({
@@ -114,23 +106,22 @@ function pushColorSchemeToFrame() {
     });
 }
 
-// Watch for host theme changes and push them down into the iframe.
-// This does not mutate the host/widget styling; it only re-configures the frame content.
-if (typeof MutationObserver !== 'undefined') {
-    const observer = new MutationObserver(() => pushColorSchemeToFrame());
-    observer.observe(document.documentElement, {
+/** Re-push when the host page or widget chrome changes theme (class/style) or OS preference changes. */
+function installHostThemeBridge() {
+    const onChange = () => pushColorSchemeToFrame();
+    window.matchMedia?.('(prefers-color-scheme: dark)')?.addEventListener?.('change', onChange);
+
+    if (typeof MutationObserver === 'undefined') return;
+    const observer = new MutationObserver(onChange);
+    const opts: MutationObserverInit = {
         attributes: true,
         attributeFilter: ['class', 'style'],
-    });
-    // Safari needs an explicit watch on the widget container when `color-scheme`
-    // is overridden there (e.g. `#gitbook-widget-window { color-scheme: dark; }`).
-    observer.observe(widgetWindow, { attributes: true, attributeFilter: ['class', 'style'] });
+    };
+    observer.observe(document.documentElement, opts);
+    // Safari: `color-scheme` on `#gitbook-widget-window` does not always surface on `<html>`.
+    observer.observe(widgetWindow, opts);
 }
-{
-    const mql = window.matchMedia?.('(prefers-color-scheme: dark)');
-    const handler = () => pushColorSchemeToFrame();
-    mql?.addEventListener?.('change', handler);
-}
+installHostThemeBridge();
 
 function getClient() {
     if (!_client) {
@@ -238,9 +229,7 @@ const GitBook = (...args: StandaloneCalls) => {
                 }
             }
 
-            getIframe().frame.configure({
-                ...frameConfiguration,
-            });
+            getIframe();
             pushColorSchemeToFrame();
             break;
         }
