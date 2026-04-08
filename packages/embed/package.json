@@ -32,7 +32,7 @@
     "scripts": {
         "build": "bun run build-lib && bun run build-standalone",
         "build-lib": "tsdown",
-        "build-standalone": "bun build src/standalone/index.ts --bundle --minify --outdir=standalone",
+        "build-standalone": "bun run ./scripts/build-standalone.ts",
         "clean": "rm -rf ./dist",
         "unit": "bun test",
         "typecheck": "tsc --noEmit",

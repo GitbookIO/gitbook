@@ -83,6 +83,11 @@ export type GitBookEmbeddableConfiguration = {
      * Display a close button inside the assistant.
      */
     closeButton?: boolean;
+
+    /**
+     * Force the embed to render in a specific color-scheme.
+     */
+    colorScheme?: 'light' | 'dark';
 };
 
 /**

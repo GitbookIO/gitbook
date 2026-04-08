@@ -55,6 +55,7 @@ let widgetIframe: HTMLIFrameElement | undefined;
 let _client: GitBookClient | undefined;
 let _frame: GitBookFrameClient | undefined;
 let frameOptions: GetFrameURLOptions | undefined;
+let lastPushedColorScheme: 'light' | 'dark' | undefined;
 let frameConfiguration: GitBookEmbeddableConfiguration & StandaloneConfiguration = {
     button: {
         label: 'Ask',
@@ -85,6 +86,52 @@ widgetWindow.classList.add('hidden');
 document.body.appendChild(widgetButton);
 document.body.appendChild(widgetWindow);
 
+function pushColorSchemeToFrame() {
+    if (!_frame) return;
+
+    // Manual override via configure always wins.
+    const desired =
+        frameConfiguration.colorScheme ??
+        (widgetIframe
+            ? ((() => {
+                  const declared = getComputedStyle(widgetIframe).colorScheme.trim().toLowerCase();
+                  if (declared === 'dark') return 'dark';
+                  if (declared === 'light') return 'light';
+                  // If the iframe element doesn't have an explicit scheme, don't force anything.
+                  // The embedded content can rely on `forcedTheme` or system theme.
+                  return undefined;
+              })() as 'light' | 'dark' | undefined)
+            : undefined);
+
+    if (desired === lastPushedColorScheme) {
+        return;
+    }
+    lastPushedColorScheme = desired;
+
+    _frame.configure({
+        ...frameConfiguration,
+        colorScheme: desired,
+    });
+}
+
+// Watch for host theme changes and push them down into the iframe.
+// This does not mutate the host/widget styling; it only re-configures the frame content.
+if (typeof MutationObserver !== 'undefined') {
+    const observer = new MutationObserver(() => pushColorSchemeToFrame());
+    observer.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ['class', 'style'],
+    });
+    // Safari needs an explicit watch on the widget container when `color-scheme`
+    // is overridden there (e.g. `#gitbook-widget-window { color-scheme: dark; }`).
+    observer.observe(widgetWindow, { attributes: true, attributeFilter: ['class', 'style'] });
+}
+{
+    const mql = window.matchMedia?.('(prefers-color-scheme: dark)');
+    const handler = () => pushColorSchemeToFrame();
+    mql?.addEventListener?.('change', handler);
+}
+
 function getClient() {
     if (!_client) {
         throw new Error(
@@ -99,6 +146,7 @@ function getIframe() {
         const client = getClient();
 
         widgetIframe?.remove();
+        lastPushedColorScheme = undefined;
         widgetIframe = document.createElement('iframe');
         widgetIframe.id = 'gitbook-widget-iframe';
         widgetIframe.src = client.getFrameURL({
@@ -111,6 +159,8 @@ function getIframe() {
             widgetWindow.classList.add('hidden');
             widgetButton.classList.remove('open');
         });
+
+        pushColorSchemeToFrame();
     }
     return { iframe: widgetIframe, frame: _frame };
 }
@@ -191,6 +241,7 @@ const GitBook = (...args: StandaloneCalls) => {
             getIframe().frame.configure({
                 ...frameConfiguration,
             });
+            pushColorSchemeToFrame();
             break;
         }
         case 'clearChat':

@@ -32,16 +32,6 @@ window.GitBook('show');
 
 The standalone script provides a global `GitBook` function. See the [API Reference](#api-reference) section for all available methods.
 
-### Color mode behavior and override
-
-- If the site's Customization settings enforce a single mode (`light` or `dark`), the embed always uses that mode.
-- If the site supports both light and dark, the embed uses the page's `color-scheme` when defined or the browser/OS preference as a fallback.
-- You can also force the standalone widget to a specific mode (if the site supports it) by setting `data-color-scheme` on the button and/or window elements.
-
-Supported values:
-- `light`
-- `dark`
-
 ### Example: Configuring the widget
 
 ```javascript
@@ -294,6 +284,44 @@ Display GitBook branding in the embed. Defaults to true.
 ```javascript
 trademark: true
 ```
+
+### Theming and `color-scheme` (CSS-first)
+
+The embed supports both site-controlled theming and CSS-driven theming.
+
+Precedence (highest → lowest):
+
+- **Site mode / forced theme**: if the GitBook site does not support multiple themes, the embed is forced to the site’s default theme.
+- **Visitor preference**: if the site supports multiple themes and the visitor has previously selected a theme on the site, that preference is remembered.
+- **Browser/OS default**: otherwise the embed follows the browser/OS preference (`prefers-color-scheme`).
+
+You can also drive the embed theme from CSS by setting `color-scheme` on the iframe element (or a parent it inherits from). When the iframe resolves to an explicit `color-scheme: light` or `color-scheme: dark`, that value is propagated into the embedded content so it renders consistently.
+
+Standalone widget example:
+
+```css
+/* Force the GitBook widget iframe to render in dark mode */
+#gitbook-widget-iframe {
+  color-scheme: dark;
+}
+```
+
+### `colorScheme`
+
+Available in: Standalone script, NPM package, React components
+
+Force the embed to render in a specific color scheme.
+
+- **Type**: `'light' | 'dark'`
+- **Default**: `undefined` (follow site/visitor preference/system)
+
+```javascript
+GitBook('configure', {
+    colorScheme: 'dark'
+});
+```
+
+To clear an override, omit `colorScheme` (or set it to `undefined` in JS) in a subsequent `configure` call.
 
 ### `actions`
 

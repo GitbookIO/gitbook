@@ -5,6 +5,7 @@ import React, { useEffect, useRef } from 'react';
 
 import { useAI, useAIChatController } from '@/components/AI';
 import { CustomizationAIMode } from '@gitbook/api';
+import { useTheme } from 'next-themes';
 import { useRouter } from 'next/navigation';
 import { createStore, useStore } from 'zustand';
 import { integrationsAssistantTools } from '../Integrations';
@@ -36,11 +37,12 @@ export function EmbeddableIframeAPI(props: {
 
     const router = useRouter();
     const chatController = useAIChatController();
+    const { setTheme } = useTheme();
 
     // Live ref to avoid adding them as dependencies
-    const refs = useRef({ router, chatController, baseURL });
+    const refs = useRef({ router, chatController, baseURL, setTheme });
     useEffect(() => {
-        refs.current = { router, chatController, baseURL };
+        refs.current = { router, chatController, baseURL, setTheme };
     });
 
     React.useEffect(() => {
@@ -57,7 +59,7 @@ export function EmbeddableIframeAPI(props: {
         }
 
         channel.receive((payload) => {
-            const { baseURL, router, chatController } = refs.current;
+            const { baseURL, router, chatController, setTheme } = refs.current;
             const message = payload as ParentToFrameMessage;
 
             log('[gitbook] received message', message);
@@ -78,6 +80,15 @@ export function EmbeddableIframeAPI(props: {
                     integrationsAssistantTools.setState({
                         tools: message.settings.tools,
                     });
+
+                    if (Object.prototype.hasOwnProperty.call(message.settings, 'colorScheme')) {
+                        const colorScheme = message.settings.colorScheme;
+                        if (!colorScheme) {
+                            setTheme('system');
+                        } else {
+                            setTheme(colorScheme);
+                        }
+                    }
                     break;
                 }
                 case 'navigateToPage': {
@@ -99,7 +110,6 @@ export function EmbeddableIframeAPI(props: {
  * Hook to get the configuration from the parent window.
  */
 export function useEmbeddableConfiguration<T = GitBookEmbeddableConfiguration>(
-    // @ts-expect-error - This is a workaround to allow the function to be optional.
     fn: (state: GitBookEmbeddableConfiguration) => T = (state) => state
 ) {
     return useStore(embeddableConfiguration, fn);
