@@ -12,7 +12,7 @@ type EmbeddableAIContextProviderProps = PropsWithChildren<AIConfig>;
  */
 export function EmbeddableAIContextProvider(props: EmbeddableAIContextProviderProps) {
     const { aiMode, suggestions, greeting, trademark, children } = props;
-    const embedConfig = useEmbeddableConfiguration();
+    const embedConfig = useEmbeddableConfiguration((state) => state);
 
     return (
         <AIContextProvider

@@ -43,7 +43,7 @@ export function EmbeddableAIChat(props: EmbeddableAIChatProps) {
     const chat = useAIChatState();
     const { config: siteConfig } = useAI();
     const chatController = useAIChatController();
-    const embedConfig = useEmbeddableConfiguration();
+    const embedConfig = useEmbeddableConfiguration((state) => state);
     const language = useLanguage();
 
     React.useEffect(() => {

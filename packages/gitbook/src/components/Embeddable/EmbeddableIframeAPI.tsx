@@ -106,13 +106,11 @@ export function EmbeddableIframeAPI(props: {
     return null;
 }
 
-/**
- * Hook to get the configuration from the parent window.
- */
-export function useEmbeddableConfiguration<T = GitBookEmbeddableConfiguration>(
-    fn: (state: GitBookEmbeddableConfiguration) => T = (state) => state
-) {
-    return useStore(embeddableConfiguration, fn);
+/** Subscribe to embed configuration from the parent (Zustand). */
+export function useEmbeddableConfiguration<T>(
+    selector: (state: GitBookEmbeddableConfiguration) => T,
+): T {
+    return useStore(embeddableConfiguration, selector);
 }
 
 /**
@@ -161,7 +159,7 @@ export function EmbeddableIframeTabs(props: {
     siteTitle: string;
 }) {
     const { ref, active = 'assistant', baseURL, siteTitle } = props;
-    const { tabs: configuredTabs, actions } = useEmbeddableConfiguration();
+    const { tabs: configuredTabs, actions } = useEmbeddableConfiguration((state) => state);
 
     const { assistants, config } = useAI();
 
@@ -233,7 +231,7 @@ export function EmbeddableIframeTabs(props: {
 }
 
 export function EmbeddableIframeCloseButton() {
-    const { closeButton } = useEmbeddableConfiguration();
+    const { closeButton } = useEmbeddableConfiguration((state) => state);
 
     if (!closeButton) {
         return null;
