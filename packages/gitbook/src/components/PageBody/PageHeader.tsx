@@ -44,7 +44,7 @@ export async function PageHeader(props: {
             <div
                 className={tcls(
                     'float-right ml-4 flex gap-2',
-                    hasAncestors ? 'sm:-my-1.5' : '-mt-3 xs:mt-2'
+                    hasAncestors ? '-my-0.5' : '-mt-3 xs:mt-2'
                 )}
             >
                 {hasPageActions ? (
@@ -58,34 +58,33 @@ export async function PageHeader(props: {
             </div>
 
             {hasAncestors && (
-                <nav aria-label="Breadcrumb">
-                    <ol className="clear-right flex flex-wrap items-center gap-2 text-tint sm:clear-none">
+                <nav aria-label="Breadcrumb" className="text-tint leading-snug">
+                    <ol className="inline">
                         {ancestors.map((breadcrumb, index) => {
                             const href = linker.toPathForPage({
                                 pages: revision.pages,
                                 page: breadcrumb,
                             });
                             return (
-                                <li key={breadcrumb.id} className="flex items-center gap-2">
+                                <li key={breadcrumb.id} className="inline">
                                     <StyledLink
                                         href={href}
                                         className={tcls(
+                                            'inline',
                                             'no-underline',
                                             'hover:underline',
                                             'text-xs',
                                             'tracking-wide',
                                             'font-semibold',
                                             'uppercase',
-                                            'flex',
                                             'items-center',
-                                            'gap-1.5',
                                             'contrast-more:underline',
                                             'contrast-more:decoration-current'
                                         )}
                                     >
                                         <PageIcon
                                             page={breadcrumb}
-                                            style="flex size-4 items-center justify-center text-base leading-none"
+                                            style="mr-1 inline size-3.5 shrink-0"
                                         />
                                         {breadcrumb.title}
                                     </StyledLink>
@@ -93,7 +92,7 @@ export async function PageHeader(props: {
                                         <Icon
                                             aria-hidden
                                             icon="chevron-right"
-                                            className="size-3 text-tint-subtle"
+                                            className="mx-2 inline-flex size-2 text-tint-subtle"
                                         />
                                     )}
                                 </li>
