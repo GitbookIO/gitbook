@@ -3,7 +3,7 @@ import { throwIfDataError } from '@/lib/data';
 import type { GitBookLinker } from '@/lib/links';
 import { joinPath } from '@/lib/paths';
 import { type FlatPageEntry, getIndexablePages } from '@/lib/sitemap';
-import { getLocalizedTitle, getSiteStructureSections } from '@/lib/sites';
+import { filterSiteSpacesByLocale, getLocalizedTitle, getSiteStructureSections } from '@/lib/sites';
 import type { SiteSection, SiteSpace } from '@gitbook/api';
 import assertNever from 'assert-never';
 import type { ListItem, Paragraph, Root, RootContent } from 'mdast';
@@ -131,8 +131,10 @@ async function getNodesFromSiteSpaces(
 ): Promise<RootContent[]> {
     const { dataFetcher, linker } = context;
 
+    const filteredSiteSpaces = filterSiteSpacesByLocale(siteSpaces, context.locale);
+
     const all = await Promise.all(
-        siteSpaces.map(async (siteSpace): Promise<RootContent[]> => {
+        filteredSiteSpaces.map(async (siteSpace): Promise<RootContent[]> => {
             const siteSpaceUrl = siteSpace.urls.published;
             if (!siteSpaceUrl) {
                 return [];
