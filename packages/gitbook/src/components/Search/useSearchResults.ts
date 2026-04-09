@@ -8,6 +8,7 @@ import { streamRecommendedQuestions } from './server-actions';
 
 import { type Assistant, useAI } from '@/components/AI';
 import assertNever from 'assert-never';
+import { useEventCallback } from 'usehooks-ts';
 import { useTrackEvent } from '../Insights';
 import { isQuestion } from './isQuestion';
 import type { SearchScope } from './useSearch';
@@ -47,6 +48,7 @@ export function useSearchResults(props: {
     }>({ results: [], fetching: false, error: false });
 
     const { assistants } = useAI();
+    const getAssistants = useEventCallback(() => assistants);
     const withAI = assistants.length > 0;
 
     React.useEffect(() => {
@@ -134,7 +136,7 @@ export function useSearchResults(props: {
             };
         }
         setResultsState({
-            results: withAI ? withAskTriggers([], query, assistants) : [],
+            results: withAI ? withAskTriggers([], query, getAssistants()) : [],
             fetching: true,
             error: false,
         });
@@ -179,7 +181,7 @@ export function useSearchResults(props: {
                 }
 
                 const aiEnrichedResults = withAI
-                    ? withAskTriggers(results, query, assistants)
+                    ? withAskTriggers(results, query, getAssistants())
                     : results;
 
                 setResultsState({ results: aiEnrichedResults, fetching: false, error: false });
@@ -195,7 +197,7 @@ export function useSearchResults(props: {
                 }
                 setResultsState({ results: [], fetching: false, error: true });
             }
-        }, 350);
+        }, 200);
 
         return () => {
             cancelled = true;
@@ -212,6 +214,7 @@ export function useSearchResults(props: {
         disabled,
         suggestions,
         searchURL,
+        getAssistants,
     ]);
 
     return resultsState;
