@@ -1,7 +1,10 @@
 // @ts-check
 
 // We don't use the deployment ID yet on 2c, we need to remove it because of https://github.com/opennextjs/opennextjs-aws/issues/1136
-const deploymentId = process.env.GITBOOK_RUNTIME === "cloudflare" ? undefined : (process.env.GITHUB_SHA || Date.now().toString()); // Needed because we use a custom deployment method i.e. https://vercel.com/docs/skew-protection#custom-deployment-id
+const deploymentId =
+    process.env.GITBOOK_RUNTIME === 'cloudflare'
+        ? undefined
+        : process.env.GITHUB_SHA || Date.now().toString(); // Needed because we use a custom deployment method i.e. https://vercel.com/docs/skew-protection#custom-deployment-id
 
 /**
  * @type {import('next').NextConfig}

@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
 
         body.tags.forEach((tag) => {
             logger.log(`Revalidating tag: ${tag}`);
-            revalidateTag(tag, {expire: 0}); // Force revalidation without waiting for the next scheduled revalidation
+            revalidateTag(tag, { expire: 0 }); // Force revalidation without waiting for the next scheduled revalidation
         });
 
         return NextResponse.json({
