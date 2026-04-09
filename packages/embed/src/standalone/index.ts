@@ -229,7 +229,11 @@ const GitBook = (...args: StandaloneCalls) => {
                 }
             }
 
-            getIframe();
+            const { frame } = getIframe();
+            // Always propagate configuration updates, even when color-scheme doesn't change.
+            frame.configure({
+                ...frameConfiguration,
+            });
             pushColorSchemeToFrame();
             break;
         }

@@ -108,7 +108,7 @@ export function EmbeddableIframeAPI(props: {
 
 /** Subscribe to embed configuration from the parent (Zustand). */
 export function useEmbeddableConfiguration<T>(
-    selector: (state: GitBookEmbeddableConfiguration) => T,
+    selector: (state: GitBookEmbeddableConfiguration) => T
 ): T {
     return useStore(embeddableConfiguration, selector);
 }
