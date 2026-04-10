@@ -25,6 +25,7 @@ describe('autocomplete', () => {
         description: 'An array of string',
         items: SymbolString(),
     });
+    const visitorClaimsKeyPropStrinSymbol = SymbolString({ name: 'key' });
     const symbols = {
         visitor: SymbolObject({
             name: 'visitor',
@@ -33,7 +34,7 @@ describe('autocomplete', () => {
                     name: 'claims',
                     description: 'The claims contained in the visitor JWT token',
                     properties: {
-                        key: SymbolString({ name: 'key' }),
+                        key: visitorClaimsKeyPropStrinSymbol,
                         flags: SymbolObject({
                             name: 'flags',
                             properties: {
@@ -168,8 +169,12 @@ describe('autocomplete', () => {
                         childrenRefs: [
                             'visitor.claims.key.length',
                             'visitor.claims.key.at',
+                            'visitor.claims.key.startsWith',
                             'visitor.claims.key.endsWith',
                             'visitor.claims.key.includes',
+                            'visitor.claims.key.toLowerCase',
+                            'visitor.claims.key.toUpperCase',
+                            'visitor.claims.key.trim',
                         ],
                     },
                 },
@@ -227,8 +232,12 @@ describe('autocomplete', () => {
                         childrenRefs: [
                             'visitor.claims.role.length',
                             'visitor.claims.role.at',
+                            'visitor.claims.role.startsWith',
                             'visitor.claims.role.endsWith',
                             'visitor.claims.role.includes',
+                            'visitor.claims.role.toLowerCase',
+                            'visitor.claims.role.toUpperCase',
+                            'visitor.claims.role.trim',
                         ],
                     },
                 },
@@ -246,11 +255,45 @@ describe('autocomplete', () => {
                         childrenRefs: [
                             'visitor.claims.key.length',
                             'visitor.claims.key.at',
+                            'visitor.claims.key.startsWith',
                             'visitor.claims.key.endsWith',
                             'visitor.claims.key.includes',
+                            'visitor.claims.key.toLowerCase',
+                            'visitor.claims.key.toUpperCase',
+                            'visitor.claims.key.trim',
                         ],
                     },
                 },
+            ],
+        },
+        {
+            expressionWithCursor: 'visitor.claims.key.<cur>',
+            expectedSuggestions: [
+                {
+                    type: 'symbol',
+                    symbol: {
+                        definition: SymbolNumber({
+                            name: 'length',
+                            description:
+                                'The length data property of a String value contains the length of the string in UTF-16 code units.',
+                            link: 'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/length',
+                        }),
+                        ref: 'visitor.claims.key.length',
+                        parentRef: 'visitor.claims.key',
+                        childrenRefs: [],
+                    },
+                },
+                ...visitorClaimsKeyPropStrinSymbol.methods.map<AutocompleteSymbolSuggestion>(
+                    (method) => ({
+                        type: 'symbol',
+                        symbol: {
+                            definition: method,
+                            ref: `visitor.claims.key.${method.name}`,
+                            parentRef: 'visitor.claims.key',
+                            childrenRefs: [],
+                        },
+                    })
+                ),
             ],
         },
         {
