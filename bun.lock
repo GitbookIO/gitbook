@@ -162,7 +162,7 @@
         "micromark-extension-frontmatter": "^2.0.0",
         "micromark-extension-gfm": "^3.0.0",
         "motion": "^12.23.24",
-        "next": "16.2.3",
+        "next": "^16.2.3",
         "next-themes": "^0.4.6",
         "nuqs": "^2.2.3",
         "object-hash": "^3.0.0",
@@ -341,6 +341,7 @@
   },
   "patchedDependencies": {
     "decode-named-character-reference@1.0.2": "patches/decode-named-character-reference@1.0.2.patch",
+    "next@16.2.3": "patches/next@16.2.3.patch",
   },
   "overrides": {
     "@codemirror/state": "6.4.1",
