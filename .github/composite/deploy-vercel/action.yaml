@@ -63,7 +63,7 @@ runs:
             GITBOOK_ASSETS_PREFIX: ${{ inputs.opItem }}/GITBOOK_ASSETS_PREFIX
             GITBOOK_FONTS_URL: ${{ inputs.opItem }}/GITBOOK_FONTS_URL
         - name: Build Project Artifacts
-          run: bun run vercel build --target=${{ inputs.environment }} --token=${{ inputs.vercelToken }}
+          run: bun run vercel build --target=${{ inputs.environment }} --token=${{ inputs.vercelToken }} --build-env GITBOOK_HEAD_SHA=${{ inputs.headSha }} --build-env GITBOOK_RUNTIME=vercel
           shell: bash
           env:
             VERCEL_ORG_ID: ${{ inputs.vercelOrg }}
