@@ -22,7 +22,9 @@ import { GITBOOK_OAUTH_SERVER_URL, isGitBookAssetsHostURL, isGitBookHostURL } fr
 import { getImageResizingContextId } from '@/lib/images';
 import { MiddlewareHeaders } from '@/lib/middleware';
 import {
+    createOAuthProtectedResourceMetadataResponse,
     handleUnauthedOAuthProtectedResourceRequest,
+    isOAuthProtectedResourceMetadataRequest,
     isOAuthProtectedResourceRequest,
 } from '@/lib/oauth-protected';
 import { removeLeadingSlash, removeTrailingSlash } from '@/lib/paths';
@@ -291,6 +293,16 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
             }
 
             return createRedirectResponse(siteURLData.redirect);
+        }
+
+        // Handles OAuth protected resource metadata for non-VA adaptive content sites.
+        // If the requested URL resolved directly to a site, synthesize the metadata response immediately.
+        if (isOAuthProtectedResourceMetadataRequest(siteRequestURL)) {
+            return createOAuthProtectedResourceMetadataResponse({
+                siteRequestURL,
+                siteId: siteURLData.site,
+                urlMode: mode,
+            });
         }
 
         cookies.push(
@@ -731,13 +743,14 @@ function encodePathInSiteContent(
                     },
                 ],
             };
-        case '~gitbook/mcp':
         case 'sitemap.xml':
         case 'sitemap-pages.xml':
         case 'robots.txt':
         case '~gitbook/embed/script.js':
         case '~gitbook/embed/demo':
             return { pathname, routeType: 'static' };
+        case '~gitbook/mcp':
+        case '~gitbook/mcp/auth':
         case '~gitbook/pdf':
         case '~gitbook/search':
         case '~gitbook/auth/login':

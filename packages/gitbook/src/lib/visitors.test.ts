@@ -130,6 +130,21 @@ describe('getVisitorAuthToken', () => {
             });
         });
 
+        it('should return token for authenticated MCP request when included in the auth header', () => {
+            expect(
+                getVisitorToken({
+                    cookies: [],
+                    headers: new Headers({
+                        Authorization: 'Bearer token-in-header',
+                    }),
+                    url: new URL('https://docs.acme.org/~gitbook/mcp/auth'),
+                })
+            ).toEqual({
+                source: 'visitor-oauth-protected',
+                token: 'token-in-header',
+            });
+        });
+
         it('should return undefined for malformced auth header', () => {
             expect(
                 getVisitorToken({
@@ -172,6 +187,21 @@ describe('getVisitorAuthToken', () => {
                     cookies: [],
                     headers: new Headers(),
                     url: new URL('https://docs.acme.org/~gitbook/mcp?access_token=token-in-query'),
+                })
+            ).toEqual({
+                source: 'visitor-oauth-protected',
+                token: 'token-in-query',
+            });
+        });
+
+        it('should return token for authenticated MCP request when included in the URL', () => {
+            expect(
+                getVisitorToken({
+                    cookies: [],
+                    headers: new Headers(),
+                    url: new URL(
+                        'https://docs.acme.org/~gitbook/mcp/auth?access_token=token-in-query'
+                    ),
                 })
             ).toEqual({
                 source: 'visitor-oauth-protected',

@@ -3,7 +3,7 @@ import { throwIfDataError } from '@/lib/data';
 import { fromPageMarkdown, toPageMarkdown } from '@/lib/markdownPage';
 import { joinPath } from '@/lib/paths';
 import { getIndexablePages } from '@/lib/sitemap';
-import { getSiteStructureSections } from '@/lib/sites';
+import { filterSiteSpacesByLocale, getSiteStructureSections } from '@/lib/sites';
 import type { RevisionPageDocument, SiteSection, SiteSpace } from '@gitbook/api';
 import assertNever from 'assert-never';
 import type { Paragraph } from 'mdast';
@@ -118,7 +118,9 @@ export async function streamMarkdownFromSiteSpaces(
     const allPages: Array<{ page: RevisionPageDocument; siteSpace: SiteSpace; basePath: string }> =
         [];
 
-    for (const siteSpace of siteSpaces) {
+    const filteredSiteSpaces = filterSiteSpacesByLocale(siteSpaces, context.locale);
+
+    for (const siteSpace of filteredSiteSpaces) {
         const siteSpaceUrl = siteSpace.urls.published;
         if (!siteSpaceUrl) {
             continue;

@@ -35,6 +35,19 @@ describe('extractPagePath', () => {
     it('returns empty string for root URL', () => {
         expect(extractPagePath('https://docs.example.com/api/', baseURL)).toBe('');
     });
+
+    it('extracts path when base URL is at the root of the domain', () => {
+        expect(
+            extractPagePath(
+                'https://docs.example.com/merchant-account/user-management/sso',
+                'https://docs.example.com/'
+            )
+        ).toBe('merchant-account/user-management/sso');
+    });
+
+    it('returns empty string when URL equals root base URL', () => {
+        expect(extractPagePath('https://docs.example.com/', 'https://docs.example.com/')).toBe('');
+    });
 });
 
 describe('resolveFirstDocument', () => {
