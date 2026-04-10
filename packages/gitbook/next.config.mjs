@@ -4,10 +4,7 @@
 const deploymentId =
     process.env.GITBOOK_RUNTIME === 'cloudflare'
         ? undefined
-        : // GITHUB_SHA is the commit SHA of the main branch inside a PR, we want it to be unique inside each PR, otherwise Vercel may fail deployment (maybe only in Next 16???)
-          process.env.GITHUB_HEAD_REF
-          ? Date.now().toString()
-          : process.env.GITHUB_SHA || Date.now().toString(); // Needed because we use a custom deployment method i.e. https://vercel.com/docs/skew-protection#custom-deployment-id
+        : process.env.GITBOOK_HEAD_SHA || process.env.GITHUB_SHA || Date.now().toString(); // Needed because we use a custom deployment method i.e. https://vercel.com/docs/skew-protection#custom-deployment-id
 
 /**
  * @type {import('next').NextConfig}
@@ -32,7 +29,7 @@ const nextConfig = {
     },
 
     env: {
-        BUILD_VERSION: (process.env.GITHUB_SHA ?? '').slice(0, 7),
+        BUILD_VERSION: (process.env.GITBOOK_HEAD_SHA ?? process.env.GITHUB_SHA ?? '').slice(0, 7),
 
         // GitBook envs
         GITBOOK_API_URL: process.env.GITBOOK_API_URL,
