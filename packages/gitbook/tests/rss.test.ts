@@ -11,7 +11,7 @@ it('should expose a RSS feed for a page with updates', async () => {
 
     expect(feed.title).toBe('Updates | E2E Tests GitBook Open');
     expect(feed.items.length).toBe(4);
-}, 10000);
+});
 
 it('should not expose a RSS feed for a page without updates', async () => {
     const feedURL = getContentTestURL(

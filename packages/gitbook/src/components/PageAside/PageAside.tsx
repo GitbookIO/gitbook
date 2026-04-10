@@ -37,8 +37,8 @@ export function PageAside(props: {
         <SideSheet
             side="right"
             toggleClass="outline-open"
-            withOverlay={true}
-            withCloseButton={true}
+            withOverlay
+            withCloseButton
             className={tcls(
                 'group/aside',
                 'order-last',

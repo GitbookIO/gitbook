@@ -783,7 +783,7 @@ const testCases: TestsCase[] = [
                     // Trademark exists by default
                     expect(await page.getByTestId('gb-trademark').count()).toBeGreaterThanOrEqual(
                         1
-                    );
+                    ); // We output 2 trademark buttons that are quite different, and can only determine which one is appropriate based on screen size / CSS. So our check needs to be more lenient than "exactly 1".
 
                     // Go to another page with the customization query to disable the trademark
                     const pageBlocks = new URL(page.url());
