@@ -62,8 +62,18 @@ runs:
             GITBOOK_IMAGE_RESIZE_MODE: ${{ inputs.opItem }}/GITBOOK_IMAGE_RESIZE_MODE
             GITBOOK_ASSETS_PREFIX: ${{ inputs.opItem }}/GITBOOK_ASSETS_PREFIX
             GITBOOK_FONTS_URL: ${{ inputs.opItem }}/GITBOOK_FONTS_URL
+        - name: Inject build env vars
+          if: ${{ inputs.environment == 'preview' }}
+          shell: bash
+          run: |
+            echo "headSha input: ${{ inputs.headSha }}"
+            echo "environment input: ${{ inputs.environment }}"
+            echo "GITBOOK_HEAD_SHA=${{ inputs.headSha }}" >> .vercel/.env.${{ inputs.environment }}.local
+            echo "GITBOOK_RUNTIME=vercel" >> .vercel/.env.${{ inputs.environment }}.local
+            echo "--- .vercel/.env.${{ inputs.environment }}.local after inject ---"
+            cat .vercel/.env.${{ inputs.environment }}.local
         - name: Build Project Artifacts
-          run: bun run vercel build --target=${{ inputs.environment }} --token=${{ inputs.vercelToken }} --build-env GITBOOK_HEAD_SHA=${{ inputs.headSha }} --build-env GITBOOK_RUNTIME=vercel
+          run: bun run vercel build --target=${{ inputs.environment }} --token=${{ inputs.vercelToken }}
           shell: bash
           env:
             VERCEL_ORG_ID: ${{ inputs.vercelOrg }}
