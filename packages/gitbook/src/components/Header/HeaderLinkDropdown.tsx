@@ -195,10 +195,10 @@ function HeaderItemDropdown(
         title: string;
     } & DropdownButtonProps<HTMLElement>
 ) {
-    const { headerPreset, title, ...rest } = props;
+    const { headerPreset, title, className, ...rest } = props;
     return (
         <span
-            className={tcls(getHeaderLinkClassName({ headerPreset }), 'cursor-default')}
+            className={tcls(getHeaderLinkClassName({ headerPreset }), 'cursor-default', className)}
             {...rest}
         >
             {title}
