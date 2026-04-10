@@ -66,9 +66,9 @@ runs:
           if: ${{ inputs.environment == 'preview' }}
           shell: bash
           run: |
-            echo "headSha input: ${{ inputs.headSha }}"
-            echo "environment input: ${{ inputs.environment }}"
-            echo "GITBOOK_HEAD_SHA=${{ inputs.headSha }}" >> .vercel/.env.${{ inputs.environment }}.local
+            HEAD_SHA=$(git rev-parse HEAD)
+            echo "resolved HEAD_SHA: $HEAD_SHA"
+            echo "GITBOOK_HEAD_SHA=$HEAD_SHA" >> .vercel/.env.${{ inputs.environment }}.local
             echo "GITBOOK_RUNTIME=vercel" >> .vercel/.env.${{ inputs.environment }}.local
             echo "--- .vercel/.env.${{ inputs.environment }}.local after inject ---"
             cat .vercel/.env.${{ inputs.environment }}.local
