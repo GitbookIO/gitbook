@@ -161,8 +161,16 @@ function getHeaderLinkClassName(_props: { headerPreset: CustomizationHeaderPrese
 }
 
 function HeaderItemLink(props: Omit<HeaderLinkNavItemProps, 'linkStyle'>) {
-    const { linkTarget, headerPreset, title, isDropdown, href, isSiteAuthLoginHref,className, ...rest } =
-        props;
+    const {
+        linkTarget,
+        headerPreset,
+        title,
+        isDropdown,
+        href,
+        isSiteAuthLoginHref,
+        className,
+        ...rest
+    } = props;
     const sharedProps = {
         href: href ?? '#',
         className: tcls(getHeaderLinkClassName({ headerPreset }), className),
