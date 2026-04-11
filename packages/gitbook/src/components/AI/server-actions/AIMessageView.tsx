@@ -19,24 +19,27 @@ export function AIMessageView(
     return message.steps.length > 0 ? (
         <div className="flex flex-col gap-2">
             {message.steps.map((step, index) => {
+                const hasContent = Boolean(step.content && step.content.nodes.length > 0);
                 return (
                     <div
                         key={index}
                         className={tcls(
                             'flex flex-col gap-2',
-                            step.content.nodes.length > 0 ? 'has-content' : ''
+                            hasContent ? 'has-content' : ''
                         )}
                     >
-                        <DocumentView
-                            document={step.content}
-                            context={{
-                                mode: 'default',
-                                contentContext: context,
-                                wrapBlocksInSuspense: false,
-                                withLinkPreviews,
-                            }}
-                            style="ai-response-document mt-2 space-y-4 *:origin-top-left *:animate-blur-in-slow empty:hidden"
-                        />
+                        {step.content ? (
+                            <DocumentView
+                                document={step.content}
+                                context={{
+                                    mode: 'default',
+                                    contentContext: context,
+                                    wrapBlocksInSuspense: false,
+                                    withLinkPreviews,
+                                }}
+                                style="ai-response-document mt-2 space-y-4 *:origin-top-left *:animate-blur-in-slow empty:hidden"
+                            />
+                        ) : null}
 
                         {withToolCalls && step.toolCalls && step.toolCalls.length > 0 ? (
                             <AIToolCallsSummary toolCalls={step.toolCalls} context={context} />
