@@ -4,7 +4,15 @@ import type React from 'react';
 interface AIChatIconProps extends React.SVGProps<SVGSVGElement> {
     className?: string;
     size?: number;
-    state?: 'default' | 'intro' | 'thinking' | 'working' | 'done' | 'error' | 'confirm';
+    state?:
+        | 'default'
+        | 'intro'
+        | 'thinking'
+        | 'working'
+        | 'answering'
+        | 'done'
+        | 'error'
+        | 'confirm';
     trademark?: boolean;
 }
 
@@ -26,6 +34,7 @@ export function AIChatIcon({
                         intro: 'spin 2s forwards cubic-bezier(0.16,1,0.3,1)',
                         thinking: 'spin 2s infinite forwards cubic-bezier(0.16,1,0.3,1)',
                         working: 'spin 2s infinite forwards cubic-bezier(0.16,1,0.3,1)',
+                        answering: 'spin 2s infinite forwards cubic-bezier(0.16,1,0.3,1)',
                         done: '',
                         confirm: '',
                         default: '',
@@ -43,7 +52,7 @@ export function AIChatIcon({
             viewBox="0 0 16 16"
             preserveAspectRatio="xMaxYMid meet"
             className={className}
-            aria-busy={state === 'thinking'}
+            aria-busy={['thinking', 'working', 'answering'].includes(state)}
             overflow="visible"
             {...props}
             fill="none"
@@ -64,6 +73,7 @@ export function AIChatIcon({
                         intro: 'fadeIn .5s .5s backwards, spin 2s .5s forwards cubic-bezier(0.43,1.54,0.64,1)',
                         thinking: 'spin 2s 1s infinite forwards cubic-bezier(0.16,1,0.3,1)',
                         working: 'spin 2s 1s infinite forwards cubic-bezier(0.16,1,0.3,1)',
+                        answering: 'spin 2s 1s infinite forwards cubic-bezier(0.16,1,0.3,1)',
                         done: '',
                         confirm: '',
                         default: '',
@@ -125,6 +135,7 @@ export function AIChatIcon({
                         intro: '',
                         thinking: '',
                         working: '',
+                        answering: '',
                         done: '',
                         confirm: 'bounceSmall 1s infinite both',
                         default: '',
@@ -147,6 +158,7 @@ export function AIChatIcon({
                         intro: 'fadeIn 2s forwards',
                         thinking: '',
                         working: '',
+                        answering: '',
                         done: '',
                         confirm: '',
                         default: '',
@@ -187,6 +199,7 @@ export function AIChatIcon({
                             intro: 'pathEnter 1.5s both ease-out',
                             thinking: 'pathLoading 2s infinite both',
                             working: 'pathLoading 2s infinite both',
+                            answering: 'pathLoading 2s infinite both',
                             done: 'pathEnter 1s forwards ease',
                             confirm: '',
                             default: '',
@@ -201,7 +214,15 @@ export function AIChatIcon({
 
 interface AISearchIconProps extends React.SVGProps<SVGSVGElement> {
     className?: string;
-    state?: 'default' | 'intro' | 'thinking' | 'working' | 'done' | 'error' | 'confirm';
+    state?:
+        | 'default'
+        | 'intro'
+        | 'thinking'
+        | 'working'
+        | 'answering'
+        | 'done'
+        | 'error'
+        | 'confirm';
 }
 
 export function AISearchIcon({ className = 'size-4', state = 'default' }: AISearchIconProps) {
@@ -214,6 +235,7 @@ export function AISearchIcon({ className = 'size-4', state = 'default' }: AISear
                     thinking:
                         'fadeIn 1s both, orbit 1s orbit 2s 1s infinite forwards linear ease-out,',
                     working: '',
+                    answering: '',
                     done: '',
                     confirm: '',
                     default: '',

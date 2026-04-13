@@ -8,6 +8,7 @@ import React from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import {
     type AIChatController,
+    type AIChatResponsePhase,
     type AIChatState,
     useAI,
     useAIChatController,
@@ -130,24 +131,13 @@ export function AIChatDynamicIcon(props: {
 }) {
     const { trademark, className } = props;
     const chat = useAIChatState();
+    const status = getAIChatStatus(chat);
 
     return (
         <AIChatIcon
             className={tcls('size-5 text-tint', className)}
             trademark={trademark}
-            state={
-                chat.error
-                    ? 'error'
-                    : chat.loading
-                      ? chat.messages[chat.messages.length - 1]?.content
-                          ? 'working'
-                          : 'thinking'
-                      : chat.messages.length > 0
-                        ? chat.control
-                            ? 'confirm'
-                            : 'done'
-                        : 'default'
-            }
+            state={status}
         />
     );
 }
@@ -160,61 +150,81 @@ export function AIChatSubtitle(props: {
 }) {
     const { chat } = props;
     const language = useLanguage();
+    const status = getAIChatStatus(chat);
+    const subtitleKey =
+        status === 'thinking'
+            ? 'ai_chat_thinking'
+            : status === 'working'
+              ? 'ai_chat_working'
+              : status === 'answering'
+                ? 'ai_chat_answering'
+                : status === 'confirm'
+                  ? 'ai_chat_waiting'
+                  : null;
 
     return (
         <EmbeddableFrameSubtitle
-            className={tcls(
-                'relative',
-                chat.loading || chat.control ? 'h-3 opacity-11' : 'h-0 opacity-0'
-            )}
+            className={tcls('relative', subtitleKey ? 'h-3 opacity-11' : 'h-0 opacity-0')}
         >
-            <span
-                className={tcls(
-                    'absolute left-0',
-                    chat.loading
-                        ? chat.messages[chat.messages.length - 1]?.content
+            {(
+                [
+                    ['thinking', 'ai_chat_thinking'],
+                    ['working', 'ai_chat_working'],
+                    ['answering', 'ai_chat_answering'],
+                    ['confirm', 'ai_chat_waiting'],
+                ] as const
+            ).map(([candidateStatus, key]) => (
+                <span
+                    key={candidateStatus}
+                    className={tcls(
+                        'absolute left-0',
+                        status === candidateStatus
                             ? 'animate-blur-in-display-slow'
-                            : 'hidden'
-                        : 'animate-blur-out-display-slow'
-                )}
-                style={{
-                    animationDelay:
-                        chat.messages[chat.messages.length - 1]?.content && !chat.control
-                            ? '.3s'
-                            : undefined,
-                }}
-            >
-                {t(language, 'ai_chat_working')}
-            </span>
-            <span
-                className={tcls(
-                    'absolute left-0',
-                    chat.loading
-                        ? chat.messages[chat.messages.length - 1]?.content
-                            ? 'animate-blur-out-display-slow'
-                            : 'animate-blur-in-display-slow'
-                        : 'hidden'
-                )}
-                style={{
-                    animationDelay:
-                        chat.messages[chat.messages.length - 1]?.content || chat.control
-                            ? undefined
-                            : '.3s',
-                }}
-            >
-                {t(language, 'ai_chat_thinking')}
-            </span>
-            <span
-                className={tcls(
-                    'absolute left-0',
-                    chat.control ? 'animate-blur-in-display-slow' : 'animate-blur-out-display-slow'
-                )}
-                style={{ animationDelay: chat.control ? '.3s' : undefined }}
-            >
-                {t(language, 'ai_chat_waiting')}
-            </span>
+                            : 'animate-blur-out-display-slow'
+                    )}
+                    style={{
+                        animationDelay: status === candidateStatus ? '.3s' : undefined,
+                    }}
+                >
+                    {subtitleKey ? t(language, key) : null}
+                </span>
+            ))}
         </EmbeddableFrameSubtitle>
     );
+}
+
+function getAIChatStatus(chat: AIChatState) {
+    if (chat.error) {
+        return 'error' as const;
+    }
+
+    if (chat.control) {
+        return 'confirm' as const;
+    }
+
+    if (chat.loading) {
+        return getStreamingStatus(chat.phase);
+    }
+
+    if (chat.messages.length > 0) {
+        return 'done' as const;
+    }
+
+    return 'default' as const;
+}
+
+function getStreamingStatus(phase: AIChatResponsePhase) {
+    switch (phase) {
+        case 'commentary':
+            return 'working' as const;
+        case 'final_answer':
+            return 'answering' as const;
+        case 'thinking':
+        case null:
+            return 'thinking' as const;
+        default:
+            return 'thinking' as const;
+    }
 }
 
 /**

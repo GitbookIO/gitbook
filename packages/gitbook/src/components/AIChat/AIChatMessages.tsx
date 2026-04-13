@@ -11,6 +11,7 @@ export function AIChatMessages(props: {
     chatController: AIChatController;
 }) {
     const { chat, chatController } = props;
+    const showLoadingShim = chat.loading && chat.phase !== 'final_answer';
 
     // Group messages: user messages start a new group, all following messages until next user message belong to that group
     type Message = (typeof chat.messages)[0];
@@ -82,8 +83,10 @@ export function AIChatMessages(props: {
                             {isLastMessage && message.role === AIMessageRole.Assistant ? (
                                 <div
                                     className={tcls(
-                                        'flex w-full shrink-0 flex-col gap-2 starting:opacity-0 transition-all transition-discrete duration-500',
-                                        chat.loading ? '' : 'hidden opacity-0'
+                                        'flex w-full shrink-0 flex-col gap-2 overflow-hidden starting:opacity-0 transition-all transition-discrete duration-300',
+                                        showLoadingShim
+                                            ? 'max-h-48 opacity-11'
+                                            : 'pointer-events-none max-h-0 opacity-0'
                                     )}
                                 >
                                     <HoldMessage className={message.content ? 'hidden' : ''} />

@@ -26,6 +26,8 @@ export type AIChatMessage = {
     query?: string;
 };
 
+export type AIChatResponsePhase = 'thinking' | 'commentary' | 'final_answer' | null;
+
 export type AIChatState = {
     /**
      * If true, the chat is open.
@@ -66,6 +68,11 @@ export type AIChatState = {
      * If true, the session is in progress.
      */
     loading: boolean;
+
+    /**
+     * Phase of the current assistant response while streaming.
+     */
+    phase: AIChatResponsePhase;
 
     /**
      * Set to true when an error occurred while communicating with the server. When
@@ -116,6 +123,7 @@ const globalState = zustand.create<AIChatState>(() => {
         followUpSuggestions: [],
         control: null,
         loading: false,
+        phase: null,
         error: false,
         initialQuery: null,
     };
@@ -202,6 +210,7 @@ export function AIChatProvider(props: {
                     followUpSuggestions: [],
                     control: null,
                     loading: true,
+                    phase: 'thinking',
                     error: false,
                     messages: [
                         ...state.messages,
@@ -286,6 +295,27 @@ export function AIChatProvider(props: {
                     const event = data.event;
 
                     switch (event.type) {
+                        case 'response_reasoning': {
+                            globalState.setState((state) => ({
+                                ...state,
+                                phase: 'commentary',
+                            }));
+                            break;
+                        }
+                        case 'response_document': {
+                            globalState.setState((state) => ({
+                                ...state,
+                                phase: 'final_answer',
+                            }));
+                            break;
+                        }
+                        case 'response_tool_call': {
+                            globalState.setState((state) => ({
+                                ...state,
+                                phase: state.phase === 'final_answer' ? state.phase : 'commentary',
+                            }));
+                            break;
+                        }
                         case 'response_finish': {
                             globalState.setState((state) => ({
                                 ...state,
@@ -312,6 +342,11 @@ export function AIChatProvider(props: {
                             if (!toolDef) {
                                 throw new Error(`Tool ${event.toolCall.tool} not found`);
                             }
+
+                            globalState.setState((state) => ({
+                                ...state,
+                                phase: state.phase === 'final_answer' ? state.phase : 'commentary',
+                            }));
 
                             if ('createControl' in toolDef) {
                                 globalState.setState((state) => ({
@@ -420,6 +455,7 @@ export function AIChatProvider(props: {
                 globalState.setState((state) => ({
                     ...state,
                     loading: false,
+                    phase: null,
                     error: true,
                 }));
             }
@@ -480,6 +516,7 @@ export function AIChatProvider(props: {
                     query: input.message,
                     followUpSuggestions: [],
                     loading: true,
+                    phase: 'thinking',
                     error: false,
                     initialQuery: state.initialQuery ?? input.message,
                 };
@@ -495,6 +532,7 @@ export function AIChatProvider(props: {
         globalState.setState((state) => ({
             opened: state.opened,
             loading: false,
+            phase: null,
             messages: [],
             query: null,
             followUpSuggestions: [],
