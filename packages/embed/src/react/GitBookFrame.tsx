@@ -77,7 +77,7 @@ export function GitBookFrame(props: GitBookFrameProps) {
             width="100%"
             height="100%"
             className={className}
-            style={{ colorScheme: colorScheme ?? 'inherit' }}
+            style={colorScheme ? { colorScheme } : undefined}
         />
     );
 }

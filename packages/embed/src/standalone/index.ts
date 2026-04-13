@@ -101,7 +101,9 @@ function getIframe() {
         widgetIframe?.remove();
         widgetIframe = document.createElement('iframe');
         widgetIframe.id = 'gitbook-widget-iframe';
-        widgetIframe.style.colorScheme = frameOptions?.colorScheme ?? 'inherit';
+        if (frameOptions?.colorScheme) {
+            widgetIframe.style.colorScheme = frameOptions.colorScheme;
+        }
         widgetIframe.src = client.getFrameURL({
             ...frameOptions,
         });
