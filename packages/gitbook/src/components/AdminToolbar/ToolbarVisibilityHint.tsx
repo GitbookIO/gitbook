@@ -30,7 +30,7 @@ export function ToolbarVisibilityHint(props: ToolbarVisibilityHintProps) {
                 stiffness: 300,
                 damping: 25,
             }}
-            className="-translate-x-1/2 pointer-events-none absolute bottom-full left-1/2 flex items-center gap-1.5 rounded-t-xl border border-[#eaeaea] border-b-0 border-solid bg-white px-3 py-0.5"
+            className="-translate-x-1/2 pointer-events-none absolute bottom-[calc(100%+2px)] left-1/2 flex items-center gap-1.5 rounded-lg border border-[#eaeaea] border-solid bg-white py-1 pr-1 pl-2"
         >
             <span className="whitespace-nowrap text-[11px] text-neutral-9">
                 This toolbar appears only when signed in to GitBook.
