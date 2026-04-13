@@ -34,7 +34,7 @@ describe('autocomplete', () => {
                     name: 'claims',
                     description: 'The claims contained in the visitor JWT token',
                     properties: {
-                        key: visitorClaimsKeyPropStrinSymbol,
+                        key: visitorClaimsKeyPropStringSymbol,
                         flags: SymbolObject({
                             name: 'flags',
                             properties: {
@@ -283,7 +283,7 @@ describe('autocomplete', () => {
                         childrenRefs: [],
                     },
                 },
-                ...visitorClaimsKeyPropStrinSymbol.methods.map<AutocompleteSymbolSuggestion>(
+                ...visitorClaimsKeyPropStringSymbol.methods.map<AutocompleteSymbolSuggestion>(
                     (method) => ({
                         type: 'symbol',
                         symbol: {
