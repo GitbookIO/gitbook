@@ -25,7 +25,7 @@ describe('autocomplete', () => {
         description: 'An array of string',
         items: SymbolString(),
     });
-    const visitorClaimsKeyPropStrinSymbol = SymbolString({ name: 'key' });
+    const visitorClaimsKeyPropStringSymbol = SymbolString({ name: 'key' });
     const symbols = {
         visitor: SymbolObject({
             name: 'visitor',
