@@ -27,7 +27,7 @@ export function PageAsideToggleButton() {
                 onClick={() => {
                     document.body.classList.toggle(globalClassName);
                 }}
-                className="layout-default:hidden layout-wide:3xl:hidden page-no-outline:hidden layout-wide:max-xl:hidden page-api-block:2xl:hidden"
+                className="layout-default:hidden layout-wide:3xl:hidden page-no-outline:hidden layout-wide:max-xl:hidden page-api-block:min-[96rem]:hidden"
             />
             <Button
                 icon="block-quote"

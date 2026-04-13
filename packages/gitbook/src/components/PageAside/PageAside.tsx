@@ -88,11 +88,11 @@ export function PageAside(props: {
 
                 // Show outline if page has OpenAPI block
                 // TODO: remove this in favour of a nicer, more immediately accessible solution in the future.
-                'page-api-block:2xl:max-3xl:-mr-[max(calc((100vw-90rem)/2),0rem)]',
-                'page-api-block:2xl:flex!',
-                'page-api-block:2xl:animate-none!',
-                'page-api-block:2xl:border-l-0',
-                'page-api-block:2xl:pl-8',
+                'page-api-block:min-[96rem]:max-3xl:-mr-[max(calc((100vw-90rem)/2),0rem)]',
+                'page-api-block:min-[96rem]:flex!',
+                'page-api-block:min-[96rem]:animate-none!',
+                'page-api-block:min-[96rem]:border-l-0',
+                'page-api-block:min-[96rem]:pl-8',
 
                 'hydrated:site-background', // Only add a background once the element is positioned correctly to prevent overlapping the page cover
                 'text-tint',
@@ -102,7 +102,7 @@ export function PageAside(props: {
             <div className="flex h-full w-full shrink-0 flex-col overflow-hidden">
                 {page.layout.outline ? (
                     <>
-                        <div className="mb-3 ml-3 flex layout-wide:3xl:hidden page-no-outline:hidden items-center justify-between max-lg:hidden layout-default:xl:hidden page-api-block:2xl:hidden">
+                        <div className="mb-3 ml-3 flex layout-wide:3xl:hidden page-no-outline:hidden items-center justify-between max-lg:hidden layout-default:xl:hidden page-api-block:min-[96rem]:hidden">
                             <h6 className="flex items-center gap-1 font-semibold text-tint text-xs uppercase leading-wider">
                                 <Icon icon="block-quote" className="size-3" />{' '}
                                 {t(language, 'on_this_page')}
