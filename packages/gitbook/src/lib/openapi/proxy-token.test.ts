@@ -1,4 +1,6 @@
-import { describe, expect, it, mock } from 'bun:test';
+import { afterAll, describe, expect, it, mock } from 'bun:test';
+
+afterAll(() => mock.restore());
 
 mock.module('@/lib/env/globals', () => ({ GITBOOK_SECRET: 'test-secret-key' }));
 

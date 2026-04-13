@@ -1,4 +1,6 @@
-import { afterEach, beforeEach, describe, expect, it, mock } from 'bun:test';
+import { afterAll, afterEach, beforeEach, describe, expect, it, mock } from 'bun:test';
+
+afterAll(() => mock.restore());
 
 const mockDnsLookup = mock(() => Promise.resolve([{ address: '93.184.215.14', family: 4 }]));
 mock.module('node:dns/promises', () => ({ lookup: mockDnsLookup }));
