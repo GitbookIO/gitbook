@@ -7,6 +7,7 @@ import { type ResolvedContentRef, resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
 import { assert } from 'ts-essentials';
+import { CONTENT_STYLE } from '../layout';
 import { PageCoverImage } from './PageCoverImage';
 import { getCoverHeight } from './coverHeight';
 import defaultPageCoverSVG from './default-page-cover.svg';
@@ -22,7 +23,7 @@ export async function PageCover(props: {
     cover: RevisionPageDocumentCover;
     context: GitBookSiteContext;
 }) {
-    const { as, page, cover, context } = props;
+    const { as, cover, context } = props;
     const height = getCoverHeight(cover);
 
     const [resolved, resolvedDark] = await Promise.all([
@@ -85,36 +86,37 @@ export async function PageCover(props: {
                 'overflow-hidden',
                 // Negative margin to balance the container padding
                 '-mx-4',
-                'transition-all',
-                'motion-reduce:transition-none',
+
+                // Full-width cover: extend to edges, disregard TOC where possible
                 as === 'full'
                     ? [
                           'sm:-mx-6',
                           'md:-mx-8',
-                          !page.layout.tableOfContents &&
-                          context.customization.header.preset !== 'none'
-                              ? [
-                                    'xl:-ml-76',
-                                    // Round the bottom corners once the page is wider than the image
-                                    '2xl:circular-corners:rounded-b-3xl 2xl:rounded-corners:rounded-b-xl',
-                                ]
-                              : [
-                                    'lg:-ml-12',
-                                    // Round the bottom left corner once the sidebar is shown next to it
-                                    'lg:rounded-corners:rounded-bl-xl',
-                                    'lg:circular-corners:rounded-bl-3xl',
-                                    // Round the bottom right corner once the page is wider than the image
-                                    '2xl:rounded-corners:rounded-br-xl',
-                                    '2xl:circular-corners:rounded-br-3xl',
-                                ],
+                          'lg:-ml-12',
+
+                          // Extend the full-width cover
+                          'layout-default:page-no-toc:lg:-ml-92', // Extend into the left sidebar if there's no TOC...
+                          'layout-wide:2xl:-mr-[clamp(2rem,calc((100vw-90rem)/2+2rem),18rem)]', // ...and to the right if there's no outline.
+                          'layout-wide:page-no-toc:2xl:-mx-[max(calc((100vw-90rem)/2+2rem),2rem)]', // Span full width if the page content is centered.
+                          'layout-wide:has-sidebar:page-no-toc:lg:-ml-[max(calc((100vw-90rem)/2+23rem),23rem)]', // If there's still a sidebar, we have to factor it in too.
+
+                          // Corner rounding: we round once the page is wide enough to have space around the cover.
+                          'layout-default:2xl:rounded-corners:rounded-b-xl',
+                          'layout-default:2xl:circular-corners:rounded-b-3xl',
+                          'layout-wide:3xl:circular-corners:rounded-b-3xl',
+                          'layout-wide:3xl:rounded-corners:rounded-b-xl',
+                          // Round the bottom left corner once the sidebar is shown next to it
+                          'has-sidebar:lg:rounded-corners:rounded-bl-xl',
+                          'has-sidebar:lg:circular-corners:rounded-bl-3xl',
                       ]
                     : [
-                          'sm:mx-auto',
-                          'max-w-3xl ',
-                          'page-width-wide:max-w-screen-2xl',
+                          // Regular cover: size regularly along with other content
+                          CONTENT_STYLE,
+                          'max-sm:-mx-4',
                           'sm:rounded-corners:rounded-xl',
                           'sm:circular-corners:rounded-3xl',
                           'mb-8',
+                          'max-sm:w-screen',
                           'max-sm:-mt-8',
                       ]
             )}
