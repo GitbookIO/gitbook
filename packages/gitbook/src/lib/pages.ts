@@ -413,11 +413,12 @@ export function extractPagePath(url: string, baseURL: string): string | undefine
     const urlPath = getURLPathname(url);
     const basePath = getURLPathname(baseURL);
 
-    if (!urlPath || !basePath) {
+    if (urlPath === undefined || basePath === undefined) {
         return undefined;
     }
 
-    if (urlPath.startsWith(`${basePath}/`) || urlPath === basePath) {
+    // When basePath is empty, the site is at the root of the domain, so any path matches
+    if (basePath === '' || urlPath.startsWith(`${basePath}/`) || urlPath === basePath) {
         return removeLeadingSlash(urlPath.slice(basePath.length));
     }
 }
