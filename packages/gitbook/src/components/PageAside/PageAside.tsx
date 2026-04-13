@@ -88,11 +88,11 @@ export function PageAside(props: {
 
                 // Show outline if page has OpenAPI block
                 // TODO: remove this in favour of a nicer, more immediately accessible solution in the future.
-                'page-api-block:min-[96rem]:max-3xl:-mr-[max(calc((100vw-90rem)/2),0rem)]',
-                'page-api-block:min-[96rem]:flex!',
-                'page-api-block:min-[96rem]:animate-none!',
-                'page-api-block:min-[96rem]:border-l-0',
-                'page-api-block:min-[96rem]:pl-8',
+                'page-api-block:page-has-outline:min-[96rem]:max-3xl:-mr-[max(calc((100vw-90rem)/2),0rem)]',
+                'page-api-block:page-has-outline:min-[96rem]:flex!',
+                'page-api-block:page-has-outline:min-[96rem]:animate-none!',
+                'page-api-block:page-has-outline:min-[96rem]:border-l-0',
+                'page-api-block:page-has-outline:min-[96rem]:pl-8',
 
                 'hydrated:site-background', // Only add a background once the element is positioned correctly to prevent overlapping the page cover
                 'text-tint',
