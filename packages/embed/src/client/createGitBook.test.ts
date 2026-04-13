@@ -35,4 +35,17 @@ describe('createGitBook.getFrameURL', () => {
         expect(url.searchParams.get('visitor.count')).toBe('3');
         expect(url.searchParams.get('visitor.enabled')).toBe('false');
     });
+
+    it('adds an explicit color scheme override when requested', () => {
+        const client = createGitBook({ siteURL: 'https://example.com/docs/' });
+
+        const url = new URL(
+            client.getFrameURL({
+                colorScheme: 'dark',
+            })
+        );
+
+        expect(url.pathname).toBe('/docs/~gitbook/embed');
+        expect(url.searchParams.get('theme')).toBe('dark');
+    });
 });

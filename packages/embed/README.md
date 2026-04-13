@@ -72,6 +72,7 @@ const gitbook = createGitBook({
 // Create an iframe and get its URL
 const iframe = document.createElement('iframe');
 iframe.src = gitbook.getFrameURL({
+    colorScheme: 'dark', // Optional: force the embed to render in dark mode
     visitor: {
         token: 'your-jwt-token', // Optional: for Adaptive Content or Authenticated Access
         unsignedClaims: { // Optional: custom claims for dynamic expressions
@@ -122,6 +123,7 @@ import { GitBookProvider, GitBookFrame } from '@gitbook/embed/react';
 
 <GitBookProvider siteURL="https://docs.company.com">
     <GitBookFrame
+        colorScheme="dark"
         visitor={{
             token: 'your-jwt-token', // Optional: for Adaptive Content or Authenticated Access
             unsignedClaims: { userId: '123' } // Optional: custom claims for dynamic expressions
@@ -150,7 +152,7 @@ import { useGitBook } from '@gitbook/embed/react';
 
 function MyComponent() {
     const gitbook = useGitBook();
-    const frameURL = gitbook.getFrameURL({ visitor: { token: '...' } });
+    const frameURL = gitbook.getFrameURL({ colorScheme: 'dark', visitor: { token: '...' } });
     // ...
 }
 ```
@@ -178,7 +180,7 @@ function MyComponent() {
 
 ### Standalone Script
 
-- `GitBook('init', options: { siteURL: string }, frameOptions?: { visitor?: {...} })` - Initialize widget
+- `GitBook('init', options: { siteURL: string }, frameOptions?: { colorScheme?: 'light' | 'dark', visitor?: {...} })` - Initialize widget
 - `GitBook('show')` - Show widget button
 - `GitBook('hide')` - Hide widget button
 - `GitBook('open')` - Open widget window
@@ -195,7 +197,7 @@ function MyComponent() {
 
 **Client Factory:**
 - `createGitBook(options: { siteURL: string })` → `GitBookClient`
-- `client.getFrameURL(options?: { visitor?: {...} })` → `string`
+- `client.getFrameURL(options?: { colorScheme?: 'light' | 'dark', visitor?: {...} })` → `string`
 - `client.createFrame(iframe: HTMLIFrameElement)` → `GitBookFrameClient`
 
 **Frame Client:**
@@ -455,6 +457,24 @@ visitor: {
         role: 'admin'
     }
 }
+```
+
+### `colorScheme`
+
+Available in: Standalone script (via `init`), NPM package (via `getFrameURL()`), React components (as prop)
+
+Override the embed's color scheme. When omitted, the embed follows the iframe's CSS `color-scheme`, which lets it inherit the parent page or browser preference.
+
+**Note**: This is not a configuration option but rather a parameter when initializing the frame or creating the frame URL.
+
+**Standalone script**: Pass as the second argument to `GitBook('init', options, frameOptions)`
+**NPM package**: Pass to `getFrameURL({ colorScheme: 'dark' })`
+**React components**: Pass as the `colorScheme` prop on `<GitBookFrame>`
+
+- **Type**: `'light' | 'dark'`
+
+```javascript
+colorScheme: 'dark'
 ```
 
 ### `button`
