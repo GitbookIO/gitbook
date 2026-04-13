@@ -23,10 +23,7 @@ export function AIMessageView(
                 return (
                     <div
                         key={index}
-                        className={tcls(
-                            'flex flex-col gap-2',
-                            hasContent ? 'has-content' : ''
-                        )}
+                        className={tcls('flex flex-col gap-2', hasContent ? 'has-content' : '')}
                     >
                         {step.content ? (
                             <DocumentView
