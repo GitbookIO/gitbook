@@ -9,7 +9,7 @@ import { ToggleChevron } from '../primitives';
 
 import { PagesList } from './PagesList';
 import { TOCPageIcon } from './TOCPageIcon';
-import { ToggleableLinkItemStyles } from './styles';
+import { ToCButtonItemStyles } from './styles';
 
 export function PageGroupItem(props: { page: ClientTOCPageGroup; isFirst?: boolean }) {
     const { page, isFirst } = props;
@@ -48,10 +48,10 @@ export function PageGroupItem(props: { page: ClientTOCPageGroup; isFirst?: boole
                     aria-expanded={hasDescendants ? isOpen : undefined}
                     onClick={handleToggle}
                     className={tcls(
-                        ToggleableLinkItemStyles,
+                        ToCButtonItemStyles,
                         'toc-group min-h-8 w-full border-0 text-left',
                         'font-semibold text-xs uppercase tracking-wide',
-                        'appearance-none text-tint-strong',
+                        'appearance-none',
                         '[&_.toc-group-chevron]:transition-opacity',
                         'hover:[&_.toc-group-chevron]:opacity-11',
                         'focus-visible:[&_.toc-group-chevron]:opacity-11',
