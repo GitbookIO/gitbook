@@ -1,3 +1,4 @@
+import { languages } from '@/intl/translations';
 import type { GitBookSiteContext } from '@/lib/context';
 import type {
     LocalizedString,
@@ -40,13 +41,36 @@ export function getSiteStructureSections(
 }
 
 /**
+ * Normalize a space language to a locale string.
+ * Spaces without an explicit language are treated as English, matching runtime defaults.
+ */
+export function normalizeLanguage(language: string | undefined): string {
+    return language === undefined ? languages.en.locale : language;
+}
+
+/**
+ * Return the distinct normalized languages across a set of site spaces.
+ */
+export function getSiteSpaceLanguages(siteSpaces: SiteSpace[]): string[] {
+    return [...new Set(siteSpaces.map((space) => normalizeLanguage(space.space.language)))];
+}
+
+/**
  * Filter site spaces to only include those matching the given locale
  */
 export function filterSiteSpacesByLocale(
     siteSpaces: SiteSpace[],
     locale: TranslationLanguage | undefined
 ): SiteSpace[] {
-    return siteSpaces.filter((siteSpace) => siteSpace.space.language === locale);
+    const variantLanguages = getSiteSpaceLanguages(siteSpaces);
+    if (variantLanguages.length <= 1) {
+        return siteSpaces;
+    }
+
+    const normalizedLocale = normalizeLanguage(locale);
+    return siteSpaces.filter(
+        (siteSpace) => normalizeLanguage(siteSpace.space.language) === normalizedLocale
+    );
 }
 
 /*
