@@ -52,7 +52,7 @@ export function AIChatMessages(props: {
                 key={groupIndex}
                 id={`message-group-${groupIndex}`}
                 className={tcls(
-                    'flex flex-col gap-2 pt-2',
+                    'flex flex-col gap-6 pt-2',
                     isLastGroup ? 'shrink-0 basis-full' : '',
 
                     'transition-discrete'
@@ -61,17 +61,18 @@ export function AIChatMessages(props: {
             >
                 {group.map(({ message, originalIndex }, indexInGroup) => {
                     const isLastMessage = originalIndex === chat.messages.length - 1;
-                    const hasCommentary = message.steps.some(
-                        (step) => step.phase === AIMessageStepPhase.Commentary
-                    );
-                    const hasFinalAnswer =
-                        message.steps[message.steps.length - 1]?.phase ===
-                        AIMessageStepPhase.FinalAnswer;
-
                     const toolCount = message.steps.reduce(
                         (count, step) => count + (step.toolCalls?.length ?? 0),
                         0
                     );
+                    const hasCommentary =
+                        message.steps.some(
+                            (step) => step.phase === AIMessageStepPhase.Commentary
+                        ) || toolCount > 0;
+                    const hasFinalAnswer =
+                        message.steps.some(
+                            (step) => step.phase === AIMessageStepPhase.FinalAnswer
+                        ) || !isLastMessage;
 
                     return (
                         <Collapsible
@@ -85,7 +86,7 @@ export function AIChatMessages(props: {
                             }
                             id={`message-${originalIndex}`}
                             className={tcls(
-                                'flex flex-col gap-6',
+                                'flex flex-col gap-4',
                                 'break-words',
                                 'group/message',
                                 'animate-blur-in-slow',
@@ -95,30 +96,23 @@ export function AIChatMessages(props: {
                                 isLastMessage && message.role === AIMessageRole.Assistant
                                     ? 'grow'
                                     : ''
-
-                                // message.role === AIMessageRole.Assistant && hasFinalAnswer
-                                //     ? '[&_.phase-commentary]:text-tint'
-                                //     : ''
                             )}
                             style={{
                                 animationDelay: `${Math.min(originalIndex * 0.1, 0.6)}s`,
                             }}
                         >
-                            {message.role === AIMessageRole.Assistant && indexInGroup === 1 ? (
+                            {message.role === AIMessageRole.Assistant &&
+                            hasCommentary &&
+                            hasFinalAnswer ? (
                                 <CollapsibleTrigger>
                                     <Button
                                         variant="blank"
                                         size="small"
                                         label="View activity"
-                                        className={tcls(
-                                            '-m-2.5 group/dropdown mt-4 self-start',
-                                            hasCommentary && hasFinalAnswer
-                                                ? 'animate-blur-in-display-slow'
-                                                : 'hidden'
-                                        )}
+                                        className="-m-2.5 group/dropdown animate-blur-in-display-slow self-start"
                                     >
                                         <div className="flex items-center gap-2">
-                                            {`Explored ${toolCount > 0 ? 'with' : ''} ${toolCount} tool${toolCount === 1 ? '' : 's'}`}
+                                            {`Explored ${toolCount > 0 ? `with ${toolCount} tool${toolCount === 1 ? '' : 's'}` : 'briefly'}`}
                                             <ToggleChevron orientation="right-to-down" />
                                         </div>
                                     </Button>

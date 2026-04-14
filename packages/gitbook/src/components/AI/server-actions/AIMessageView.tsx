@@ -1,7 +1,7 @@
 import { CollapsibleContent } from '@/components/primitives';
 import type { GitBookSiteContext } from '@/lib/context';
 import { tcls } from '@/lib/tailwind';
-import { type AIMessage, AIMessageRole, AIMessageStepPhase } from '@gitbook/api';
+import { type AIMessage, AIMessageStepPhase } from '@gitbook/api';
 import { DocumentView } from '../../DocumentView';
 import { AIToolCallsSummary } from './AIToolCallsSummary';
 import type { RenderAIMessageOptions } from './types';
@@ -29,11 +29,7 @@ export function AIMessageView(
                         key={index}
                         className={tcls(
                             'flex flex-col gap-2 border-tint-subtle',
-                            hasContent ? 'has-content' : '',
-                            message.role === AIMessageRole.Assistant &&
-                                step.phase === AIMessageStepPhase.FinalAnswer
-                                ? 'group-data-[state=open]/collapsible:mt-4 group-data-[state=open]/collapsible:border-tint-subtle group-data-[state=open]/collapsible:border-t group-data-[state=open]/collapsible:pt-4'
-                                : ''
+                            hasContent ? 'has-content' : ''
                         )}
                     >
                         {step.content ? (
