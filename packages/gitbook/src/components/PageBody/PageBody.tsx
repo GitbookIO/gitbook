@@ -11,14 +11,7 @@ import { TrackPageViewEvent } from '../Insights';
 import { PageFeedbackForm } from '../PageFeedback';
 import { CurrentPageProvider } from '../hooks/useCurrentPage';
 import { CONTENT_STYLE } from '../layout';
-import {
-    Button,
-    Collapsible,
-    CollapsibleContent,
-    CollapsibleTrigger,
-    DateRelative,
-    SuspenseLoadedHint,
-} from '../primitives';
+import { DateRelative, SuspenseLoadedHint } from '../primitives';
 import OptionalSuspense from './OptionalSuspense';
 import { PageBodyBlankslate } from './PageBodyBlankslate';
 import { PageCover } from './PageCover';
@@ -101,25 +94,6 @@ export function PageBody(props: {
                     ancestors={ancestors}
                     withRSSFeed={contentHasUpdates}
                 />
-                <Collapsible defaultOpen={true}>
-                    <CollapsibleTrigger>
-                        <Button label="Test" />
-                    </CollapsibleTrigger>
-                    <CollapsibleContent>
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent in sapien
-                        elit. Aliquam dapibus velit nisl, vel placerat est elementum ac. Quisque
-                        volutpat orci est, vitae facilisis lacus pretium dignissim. Aliquam porta
-                        imperdiet lorem ut pellentesque. Nunc sem mi, cursus eget blandit in,
-                        placerat non neque. Donec interdum sapien diam, id auctor risus placerat
-                        vitae. Nullam molestie sem eu ligula tincidunt scelerisque. In volutpat
-                        ligula mauris, sed placerat dolor egestas quis. Proin tellus arcu, imperdiet
-                        et dapibus in, fringilla sed risus. Donec lobortis congue velit. Suspendisse
-                        sed semper sapien. Aliquam sit amet fermentum tellus, sit amet cursus
-                        libero. Maecenas id dictum lacus, in congue velit. Sed suscipit interdum
-                        sapien vel consectetur. Nullam id tortor at eros faucibus elementum. Sed
-                        tincidunt bibendum mi, vitae vehicula eros fringilla ac.{' '}
-                    </CollapsibleContent>
-                </Collapsible>
                 {document && !isNodeEmpty(document) ? (
                     <OptionalSuspense
                         staticRoute={staticRoute}
