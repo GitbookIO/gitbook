@@ -113,8 +113,8 @@ function LinkItem(
             insights={insights}
             aria-current={isActive ? 'page' : undefined}
             classNames={[
-                'ToggleableLinkItemStyles',
-                ...(isActive ? ['ToggleableLinkItemActiveStyles' as const] : []),
+                'ToCLinkItemStyles',
+                ...(isActive ? ['ToCLinkItemActiveStyles' as const] : []),
             ]}
             onClick={handleClick}
         >

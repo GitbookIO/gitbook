@@ -2,10 +2,7 @@
 import type { ClassValue } from '@/lib/tailwind';
 
 import { RecordCardLinkStyles, RecordCardStyles } from '../DocumentView/Table/styles';
-import {
-    ToggleableLinkItemActiveStyles,
-    ToggleableLinkItemStyles,
-} from '../TableOfContents/styles';
+import { ToCLinkItemActiveStyles, ToCLinkItemStyles } from '../TableOfContents/styles';
 import { ButtonStyles, CardStyles, LinkStyles } from './styles';
 
 const styles = {
@@ -14,8 +11,8 @@ const styles = {
     ButtonStyles,
     RecordCardStyles,
     RecordCardLinkStyles,
-    ToggleableLinkItemStyles,
-    ToggleableLinkItemActiveStyles,
+    ToCLinkItemStyles,
+    ToCLinkItemActiveStyles,
 };
 
 export type DesignTokenName = keyof typeof styles;
