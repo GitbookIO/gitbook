@@ -17,13 +17,21 @@ import { isExternalLink } from '../utils/link';
 export function SiteLayoutClientContexts(props: {
     forcedTheme: CustomizationDefaultThemeMode | undefined;
     defaultTheme: CustomizationDefaultThemeMode | undefined;
+    themeStorageKey?: string;
     externalLinksTarget: SiteExternalLinksTarget;
     contextId: string | undefined;
     proxyOrigin: string | undefined;
     children: React.ReactNode;
 }) {
-    const { children, forcedTheme, defaultTheme, externalLinksTarget, contextId, proxyOrigin } =
-        props;
+    const {
+        children,
+        forcedTheme,
+        defaultTheme,
+        themeStorageKey,
+        externalLinksTarget,
+        contextId,
+        proxyOrigin,
+    } = props;
 
     useClearRouterCache(contextId);
 
@@ -51,6 +59,7 @@ export function SiteLayoutClientContexts(props: {
             enableSystem
             forcedTheme={forcedTheme}
             defaultTheme={defaultTheme}
+            storageKey={themeStorageKey}
         >
             <NuqsAdapter>
                 <LinkContext.Provider value={linkContext}>
