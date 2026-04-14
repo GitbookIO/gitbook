@@ -39,9 +39,7 @@ export async function streamRenderAIMessage(
 
             if (message.steps[stepIndex]) {
                 message.steps = [...message.steps];
-                // @ts-expect-error
                 message.steps[stepIndex] = { ...message.steps[stepIndex] };
-                // @ts-expect-error
                 callback(message.steps[stepIndex]);
             } else {
                 message.steps = [
