@@ -1,20 +1,17 @@
 import { languages } from '@/intl/translations';
 import type { GitBookSiteContext } from '@/lib/context';
+import { getSiteSpaceLanguages, normalizeLanguage } from '@/lib/sites';
 
 /**
  * Categorize the variants of the space into generic and translation variants.
  */
 export function categorizeVariants(context: GitBookSiteContext) {
     const { siteSpace, visibleSiteSpaces: siteSpaces } = context;
-    const normalizeLanguage = (language: string | undefined) =>
-        language === undefined ? languages.en.locale : language;
 
     const currentLanguage = normalizeLanguage(context.locale);
 
     // Get all languages of the variants.
-    const variantLanguages = [
-        ...new Set(siteSpaces.map((space) => normalizeLanguage(space.space.language))),
-    ];
+    const variantLanguages = getSiteSpaceLanguages(siteSpaces);
 
     // We show the language picker when there are at least 2 distinct languages.
     // Spaces without an explicit language are treated as English, matching runtime defaults.
