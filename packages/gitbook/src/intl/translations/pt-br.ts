@@ -106,7 +106,7 @@ export const pt_br = {
     ai_chat_clear_conversation: 'Limpar conversa',
     ai_chat_thinking: 'Pensando...',
     ai_chat_working: 'Trabalhando...',
-    ai_chat_answering: 'Respondendo...',
+    ai_chat_exploring: 'Explorando...',
     ai_chat_waiting: 'Aguardando sua resposta…',
     ai_chat_commentary: 'Comentário',
     ai_chat_context_badge: 'IA',

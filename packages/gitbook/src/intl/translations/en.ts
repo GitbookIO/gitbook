@@ -103,7 +103,7 @@ export const en = {
     ai_chat_clear_conversation: 'Clear conversation',
     ai_chat_thinking: 'Thinking…',
     ai_chat_working: 'Working…',
-    ai_chat_answering: 'Answering…',
+    ai_chat_exploring: 'Exploring…',
     ai_chat_waiting: 'Waiting for your answer…',
     ai_chat_commentary: 'Commentary',
     ai_chat_context_badge: 'AI',

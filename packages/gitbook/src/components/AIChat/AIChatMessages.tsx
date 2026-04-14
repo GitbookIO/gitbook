@@ -1,8 +1,16 @@
 import { useLanguage } from '@/intl/client';
 import { tString } from '@/intl/translate';
 import { tcls } from '@/lib/tailwind';
-import { AIMessageRole } from '@gitbook/api';
-import type { AIChatController, AIChatState } from '../AI';
+import { AIMessageRole, AIMessageStepPhase } from '@gitbook/api';
+import {
+    type AIChatController,
+    type AIChatMessage,
+    type AIChatState,
+    getAIChatStatus,
+} from '../AI';
+import { ToggleChevron } from '../primitives';
+import { Button } from '../primitives/Button';
+import { Collapsible, CollapsibleTrigger } from '../primitives/Collapsible';
 import { AIResponseFeedback } from './AIResponseFeedback';
 import { AIChatFollowupSuggestions } from './AiChatFollowupSuggestions';
 
@@ -11,11 +19,11 @@ export function AIChatMessages(props: {
     chatController: AIChatController;
 }) {
     const { chat, chatController } = props;
-    const showLoadingShim = chat.loading && chat.phase !== 'final_answer';
+    const status = getAIChatStatus(chat);
+    const showLoadingShim = chat.loading && status !== 'working' && status !== 'done';
 
     // Group messages: user messages start a new group, all following messages until next user message belong to that group
-    type Message = (typeof chat.messages)[0];
-    type MessageGroup = { message: Message; originalIndex: number };
+    type MessageGroup = { message: AIChatMessage; originalIndex: number };
     const messageGroups: Array<Array<MessageGroup>> = [];
     let currentGroup: Array<MessageGroup> = [];
 
@@ -51,10 +59,24 @@ export function AIChatMessages(props: {
                 )}
                 style={{ animationDelay: '.2s' }}
             >
-                {group.map(({ message, originalIndex }) => {
+                {group.map(({ message, originalIndex }, indexInGroup) => {
                     const isLastMessage = originalIndex === chat.messages.length - 1;
+                    const hasCommentary = message.steps.some(
+                        (step) => step.phase === AIMessageStepPhase.Commentary
+                    );
+                    const hasFinalAnswer =
+                        message.steps[message.steps.length - 1]?.phase ===
+                        AIMessageStepPhase.FinalAnswer;
+
+                    const toolCount = message.steps.reduce(
+                        (count, step) => count + (step.toolCalls?.length ?? 0),
+                        0
+                    );
+
                     return (
-                        <div
+                        <Collapsible
+                            open={!hasFinalAnswer}
+                            disabled={!hasFinalAnswer}
                             key={originalIndex}
                             data-testid={
                                 message.role === AIMessageRole.User
@@ -73,11 +95,36 @@ export function AIChatMessages(props: {
                                 isLastMessage && message.role === AIMessageRole.Assistant
                                     ? 'grow'
                                     : ''
+
+                                // message.role === AIMessageRole.Assistant && hasFinalAnswer
+                                //     ? '[&_.phase-commentary]:text-tint'
+                                //     : ''
                             )}
                             style={{
                                 animationDelay: `${Math.min(originalIndex * 0.1, 0.6)}s`,
                             }}
                         >
+                            {message.role === AIMessageRole.Assistant && indexInGroup === 1 ? (
+                                <CollapsibleTrigger>
+                                    <Button
+                                        variant="blank"
+                                        size="small"
+                                        label="View activity"
+                                        className={tcls(
+                                            '-m-2.5 group/dropdown mt-4 self-start',
+                                            hasCommentary && hasFinalAnswer
+                                                ? 'animate-blur-in-display-slow'
+                                                : 'hidden'
+                                        )}
+                                    >
+                                        <div className="flex items-center gap-2">
+                                            {`Explored ${toolCount > 0 ? 'with' : ''} ${toolCount} tool${toolCount === 1 ? '' : 's'}`}
+                                            <ToggleChevron orientation="right-to-down" />
+                                        </div>
+                                    </Button>
+                                </CollapsibleTrigger>
+                            ) : null}
+
                             {message.content}
 
                             {isLastMessage && message.role === AIMessageRole.Assistant ? (
@@ -113,7 +160,7 @@ export function AIChatMessages(props: {
                                     />
                                 </>
                             ) : null}
-                        </div>
+                        </Collapsible>
                     );
                 })}
             </div>

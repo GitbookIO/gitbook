@@ -103,7 +103,7 @@ export const fr = {
     ai_chat_clear_conversation: 'Réinitialiser la conversation',
     ai_chat_thinking: 'Réflexion en cours…',
     ai_chat_working: 'Traitement en cours…',
-    ai_chat_answering: 'Réponse en cours…',
+    ai_chat_exploring: 'Exploration en cours…',
     ai_chat_waiting: 'En attente de votre réponse…',
     ai_chat_commentary: 'Commentaire',
     ai_chat_context_badge: 'IA',

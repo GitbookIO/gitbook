@@ -107,7 +107,7 @@ export const it: TranslationLanguage = {
     ai_chat_clear_conversation: 'Cancella conversazione',
     ai_chat_thinking: 'Sto pensando...',
     ai_chat_working: 'Sto lavorando...',
-    ai_chat_answering: 'Sto rispondendo...',
+    ai_chat_exploring: 'Esplorando...',
     ai_chat_waiting: 'In attesa della tua risposta…',
     ai_chat_commentary: 'Commento',
     ai_chat_context_badge: 'IA',

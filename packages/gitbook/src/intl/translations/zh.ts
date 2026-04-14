@@ -103,7 +103,7 @@ export const zh: TranslationLanguage = {
     ai_chat_clear_conversation: '清空对话',
     ai_chat_thinking: '思考中...',
     ai_chat_working: '工作中...',
-    ai_chat_answering: '回答中...',
+    ai_chat_exploring: '探索中...',
     ai_chat_waiting: '正在等待您的回答…',
     ai_chat_commentary: '评论',
     ai_chat_context_badge: 'AI',

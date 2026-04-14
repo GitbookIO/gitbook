@@ -65,7 +65,14 @@ export async function streamRenderAIMessage(
         return parseResponse<{
             content: React.ReactNode;
             event: AIStreamResponse;
+            steps: AIMessageStep[];
         }>(rawStream, async (event) => {
+            if ('stepIndex' in event && 'phase' in event) {
+                updateProcessingMessageStep(event.stepIndex, (step) => {
+                    step.phase = event.phase;
+                });
+            }
+
             switch (event.type) {
                 /**
                  * The agent is processing a tool call in a new message.
@@ -112,6 +119,7 @@ export async function streamRenderAIMessage(
 
             return {
                 event,
+                steps: message.steps,
                 content: (
                     <AIMessageView message={message} context={await promiseContext} {...options} />
                 ),

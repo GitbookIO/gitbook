@@ -6,6 +6,8 @@ import { useLanguage } from '@/intl/client';
 import { tString } from '@/intl/translate';
 import {
     AIMessageRole,
+    type AIMessageStep,
+    AIMessageStepPhase,
     type AIStreamResponseToolCallPending,
     type AIToolCallResult,
 } from '@gitbook/api';
@@ -24,9 +26,17 @@ export type AIChatMessage = {
     role: AIMessageRole;
     content: React.ReactNode;
     query?: string;
+    steps: AIMessageStep[];
 };
 
-export type AIChatResponsePhase = 'thinking' | 'commentary' | 'final_answer' | null;
+export type AIChatStatus =
+    | 'default'
+    | 'thinking'
+    | 'exploring'
+    | 'working'
+    | 'done'
+    | 'error'
+    | 'confirm';
 
 export type AIChatState = {
     /**
@@ -68,11 +78,6 @@ export type AIChatState = {
      * If true, the session is in progress.
      */
     loading: boolean;
-
-    /**
-     * Phase of the current assistant response while streaming.
-     */
-    phase: AIChatResponsePhase;
 
     /**
      * Set to true when an error occurred while communicating with the server. When
@@ -123,7 +128,6 @@ const globalState = zustand.create<AIChatState>(() => {
         followUpSuggestions: [],
         control: null,
         loading: false,
-        phase: null,
         error: false,
         initialQuery: null,
     };
@@ -210,13 +214,13 @@ export function AIChatProvider(props: {
                     followUpSuggestions: [],
                     control: null,
                     loading: true,
-                    phase: 'thinking',
                     error: false,
                     messages: [
                         ...state.messages,
                         {
                             role: AIMessageRole.Assistant,
                             content: null, // Placeholder for streaming response
+                            steps: [],
                         },
                     ],
                 };
@@ -295,27 +299,6 @@ export function AIChatProvider(props: {
                     const event = data.event;
 
                     switch (event.type) {
-                        case 'response_reasoning': {
-                            globalState.setState((state) => ({
-                                ...state,
-                                phase: 'commentary',
-                            }));
-                            break;
-                        }
-                        case 'response_document': {
-                            globalState.setState((state) => ({
-                                ...state,
-                                phase: 'final_answer',
-                            }));
-                            break;
-                        }
-                        case 'response_tool_call': {
-                            globalState.setState((state) => ({
-                                ...state,
-                                phase: state.phase === 'final_answer' ? state.phase : 'commentary',
-                            }));
-                            break;
-                        }
                         case 'response_finish': {
                             globalState.setState((state) => ({
                                 ...state,
@@ -342,11 +325,6 @@ export function AIChatProvider(props: {
                             if (!toolDef) {
                                 throw new Error(`Tool ${event.toolCall.tool} not found`);
                             }
-
-                            globalState.setState((state) => ({
-                                ...state,
-                                phase: state.phase === 'final_answer' ? state.phase : 'commentary',
-                            }));
 
                             if ('createControl' in toolDef) {
                                 globalState.setState((state) => ({
@@ -435,6 +413,7 @@ export function AIChatProvider(props: {
                             {
                                 role: AIMessageRole.Assistant,
                                 content: data.content,
+                                steps: data.steps,
                             },
                         ],
                     }));
@@ -455,7 +434,6 @@ export function AIChatProvider(props: {
                 globalState.setState((state) => ({
                     ...state,
                     loading: false,
-                    phase: null,
                     error: true,
                 }));
             }
@@ -511,12 +489,12 @@ export function AIChatProvider(props: {
                             role: AIMessageRole.User,
                             content: input.message,
                             query: input.message,
+                            steps: [],
                         },
                     ],
                     query: input.message,
                     followUpSuggestions: [],
                     loading: true,
-                    phase: 'thinking',
                     error: false,
                     initialQuery: state.initialQuery ?? input.message,
                 };
@@ -532,7 +510,6 @@ export function AIChatProvider(props: {
         globalState.setState((state) => ({
             opened: state.opened,
             loading: false,
-            phase: null,
             messages: [],
             query: null,
             followUpSuggestions: [],
@@ -597,4 +574,44 @@ export function useAIChatController(): AIChatController {
         throw new Error('useAIChatController must be used within an AIChatProvider');
     }
     return controller;
+}
+
+export function getAIChatStatus(chat: AIChatState): AIChatStatus {
+    if (chat.error) {
+        return 'error';
+    }
+
+    if (chat.control) {
+        return 'confirm';
+    }
+
+    if (chat.loading) {
+        const latestMessage = getLatestAssistantMessage(chat.messages);
+        const phase = latestMessage?.steps[latestMessage.steps.length - 1]?.phase;
+        switch (phase) {
+            case AIMessageStepPhase.Commentary:
+                return 'exploring';
+            case AIMessageStepPhase.FinalAnswer:
+                return 'working';
+            default:
+                return 'thinking';
+        }
+    }
+
+    if (chat.messages.length > 0) {
+        return 'done';
+    }
+
+    return 'default';
+}
+
+function getLatestAssistantMessage(messages: AIChatMessage[]) {
+    for (let index = messages.length - 1; index >= 0; index--) {
+        const message = messages[index];
+        if (message?.role === AIMessageRole.Assistant) {
+            return message;
+        }
+    }
+
+    return null;
 }

@@ -105,7 +105,7 @@ export const ko: TranslationLanguage = {
     ai_chat_clear_conversation: '대화 지우기',
     ai_chat_thinking: '생각 중...',
     ai_chat_working: '작업 중...',
-    ai_chat_answering: '답변 중...',
+    ai_chat_exploring: '탐색 중...',
     ai_chat_waiting: '답변을 기다리는 중…',
     ai_chat_commentary: '해설',
     ai_chat_context_badge: 'AI',

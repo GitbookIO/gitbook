@@ -106,7 +106,7 @@ export const no: TranslationLanguage = {
     ai_chat_clear_conversation: 'Tøm samtale',
     ai_chat_thinking: 'Tenker...',
     ai_chat_working: 'Arbeider...',
-    ai_chat_answering: 'Svarer...',
+    ai_chat_exploring: 'Utforsker...',
     ai_chat_waiting: 'Venter på svaret ditt…',
     ai_chat_commentary: 'Kommentar',
     ai_chat_context_badge: 'AI',

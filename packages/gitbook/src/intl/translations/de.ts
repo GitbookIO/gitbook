@@ -107,7 +107,7 @@ export const de = {
     ai_chat_clear_conversation: 'Unterhaltung löschen',
     ai_chat_thinking: 'Denke nach...',
     ai_chat_working: 'Arbeite...',
-    ai_chat_answering: 'Antworte...',
+    ai_chat_exploring: 'Erkunde...',
     ai_chat_waiting: 'Warte auf Ihre Antwort…',
     ai_chat_commentary: 'Kommentar',
     ai_chat_context_badge: 'KI',

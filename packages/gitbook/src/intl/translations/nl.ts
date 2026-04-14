@@ -106,7 +106,7 @@ export const nl: TranslationLanguage = {
     ai_chat_clear_conversation: 'Gesprek wissen',
     ai_chat_thinking: 'Denkt na...',
     ai_chat_working: 'Werkt...',
-    ai_chat_answering: 'Antwoordt...',
+    ai_chat_exploring: 'Verkent...',
     ai_chat_waiting: 'Wacht op je antwoord…',
     ai_chat_commentary: 'Commentaar',
     ai_chat_context_badge: 'AI',

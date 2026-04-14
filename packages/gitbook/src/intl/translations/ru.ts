@@ -105,7 +105,7 @@ export const ru = {
     ai_chat_clear_conversation: 'Очистить диалог',
     ai_chat_thinking: 'Думает…',
     ai_chat_working: 'Работает…',
-    ai_chat_answering: 'Отвечает…',
+    ai_chat_exploring: 'Изучает…',
     ai_chat_waiting: 'Ожидание вашего ответа…',
     ai_chat_commentary: 'Комментарий',
     ai_chat_context_badge: 'ИИ',

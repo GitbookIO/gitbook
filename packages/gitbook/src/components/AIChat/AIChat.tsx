@@ -8,8 +8,8 @@ import React from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import {
     type AIChatController,
-    type AIChatResponsePhase,
     type AIChatState,
+    getAIChatStatus,
     useAI,
     useAIChatController,
     useAIChatState,
@@ -108,7 +108,7 @@ export function AIChat() {
                             />
                         </EmbeddableFrameButtons>
                     </EmbeddableFrameHeader>
-                    <EmbeddableFrameBody className="not-embed:px-4">
+                    <EmbeddableFrameBody className="not-embed:px-0">
                         <AIChatBody
                             chatController={chatController}
                             chat={chat}
@@ -154,10 +154,10 @@ export function AIChatSubtitle(props: {
     const subtitleKey =
         status === 'thinking'
             ? 'ai_chat_thinking'
-            : status === 'working'
-              ? 'ai_chat_working'
-              : status === 'answering'
-                ? 'ai_chat_answering'
+            : status === 'exploring'
+              ? 'ai_chat_exploring'
+              : status === 'working'
+                ? 'ai_chat_working'
                 : status === 'confirm'
                   ? 'ai_chat_waiting'
                   : null;
@@ -169,8 +169,8 @@ export function AIChatSubtitle(props: {
             {(
                 [
                     ['thinking', 'ai_chat_thinking'],
+                    ['exploring', 'ai_chat_exploring'],
                     ['working', 'ai_chat_working'],
-                    ['answering', 'ai_chat_answering'],
                     ['confirm', 'ai_chat_waiting'],
                 ] as const
             ).map(([candidateStatus, key]) => (
@@ -191,40 +191,6 @@ export function AIChatSubtitle(props: {
             ))}
         </EmbeddableFrameSubtitle>
     );
-}
-
-function getAIChatStatus(chat: AIChatState) {
-    if (chat.error) {
-        return 'error' as const;
-    }
-
-    if (chat.control) {
-        return 'confirm' as const;
-    }
-
-    if (chat.loading) {
-        return getStreamingStatus(chat.phase);
-    }
-
-    if (chat.messages.length > 0) {
-        return 'done' as const;
-    }
-
-    return 'default' as const;
-}
-
-function getStreamingStatus(phase: AIChatResponsePhase) {
-    switch (phase) {
-        case 'commentary':
-            return 'working' as const;
-        case 'final_answer':
-            return 'answering' as const;
-        case 'thinking':
-        case null:
-            return 'thinking' as const;
-        default:
-            return 'thinking' as const;
-    }
 }
 
 /**
@@ -260,7 +226,7 @@ export function AIChatBody(props: {
         <>
             <ScrollContainer
                 className="min-h-[20%] shrink grow animate-fade-in-slow [container-type:size]"
-                contentClassName="py-4 gutter-stable flex flex-col gap-4 [scroll-behavior:smooth]"
+                contentClassName="py-4 gutter-stable flex flex-col gap-4 not-embed:px-4 [scroll-behavior:smooth]"
                 orientation="vertical"
                 trailing={{ fade: false, button: true }}
                 active={`#message-group-${chat.messages.filter((message) => message.role === 'user').length - 1}`}
@@ -308,7 +274,7 @@ export function AIChatBody(props: {
                 )}
             </ScrollContainer>
 
-            <div className="flex max-h-3/4 min-h-0 flex-col gap-2 pb-4">
+            <div className="flex max-h-3/4 min-h-0 flex-col gap-2 not-embed:px-4 pb-4">
                 {/* Display an error banner when something went wrong. */}
                 {chat.error ? <AIChatError chatController={chatController} /> : null}
 
