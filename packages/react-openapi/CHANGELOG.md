@@ -1,5 +1,12 @@
 # @gitbook/react-openapi
 
+## 1.5.12
+
+### Patch Changes
+
+- Updated dependencies [8242f18]
+  - @gitbook/expr@1.2.5
+
 ## 1.5.11
 
 ### Patch Changes
