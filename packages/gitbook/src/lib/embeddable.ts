@@ -3,6 +3,7 @@ import type { GitBookSiteContext } from '@/lib/context';
 import type { GitBookLinker } from '@/lib/links';
 import { getPagePath } from '@/lib/pages';
 import { joinPath } from '@/lib/paths';
+import { CustomizationDefaultThemeMode, type SiteCustomizationSettings } from '@gitbook/api';
 
 /**
  * Get the context for the embeddable static routes.
@@ -66,5 +67,37 @@ export function getEmbeddableLinker(linker: GitBookLinker): GitBookLinker {
             // If the link is relative, assume it's a section link and append the embed path
             return joinPath(result, '~gitbook/embed/page');
         },
+    };
+}
+
+/**
+ * Resolve theme behavior for docs embeds.
+ * Embeds should follow the parent frame's color-scheme by default,
+ * while still allowing an explicit override for multi-theme sites.
+ */
+export function resolveEmbeddableTheme(
+    customization: Pick<SiteCustomizationSettings, 'themes'>,
+    forcedTheme?: CustomizationDefaultThemeMode | null
+) {
+    if (!customization.themes.toggeable) {
+        return {
+            htmlTheme: customization.themes.default,
+            defaultTheme: customization.themes.default,
+            forcedTheme: customization.themes.default,
+        };
+    }
+
+    if (forcedTheme) {
+        return {
+            htmlTheme: forcedTheme,
+            defaultTheme: forcedTheme,
+            forcedTheme,
+        };
+    }
+
+    return {
+        htmlTheme: CustomizationDefaultThemeMode.System,
+        defaultTheme: CustomizationDefaultThemeMode.System,
+        forcedTheme: undefined,
     };
 }
