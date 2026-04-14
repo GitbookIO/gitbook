@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'bun:test';
 import { CustomizationDefaultThemeMode, type SiteCustomizationSettings } from '@gitbook/api';
 import { resolveEmbeddableTheme } from './embeddable';
-import { getEmbeddableLinker } from './embeddable-linker';
+import {
+    getEmbeddableLinker,
+    toEmbeddableLinkForPublishedContent,
+} from './embeddable-linker';
 import { createLinker } from './links';
 
 describe('getEmbeddableLinker', () => {
@@ -21,6 +24,36 @@ describe('getEmbeddableLinker', () => {
         expect(otherSpaceEmbeddableLinker.toPathInSpace('some/path')).toBe(
             '/section/variant/~gitbook/embed/page/some/path'
         );
+    });
+
+    it('toLinkForContent should keep current-space links inside the embed namespace', () => {
+        const root = createLinker({
+            host: 'docs.company.com',
+            spaceBasePath: '/api/js',
+            siteBasePath: '/',
+        });
+
+        const embeddableLinker = getEmbeddableLinker(root);
+
+        expect(
+            embeddableLinker.toLinkForContent('https://docs.company.com/api/js/getting-started')
+        ).toBe('/api/js/~gitbook/embed/page/getting-started');
+    });
+
+    it('toEmbeddableLinkForPublishedContent should insert the embed path before the page slug', () => {
+        const root = createLinker({
+            host: 'docs.company.com',
+            spaceBasePath: '/api/js',
+            siteBasePath: '/',
+        });
+
+        expect(
+            toEmbeddableLinkForPublishedContent(
+                root,
+                'https://docs.company.com/api/python',
+                'getting-started'
+            )
+        ).toBe('/api/python/~gitbook/embed/page/getting-started');
     });
 });
 

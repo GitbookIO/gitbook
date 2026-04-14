@@ -5,7 +5,10 @@ import type {
     SearchSiteContentRequest,
 } from '@/components/Search/search-types';
 import { throwIfDataError } from '@/lib/data';
-import { getEmbeddableLinker } from '@/lib/embeddable-linker';
+import {
+    getEmbeddableLinker,
+    toEmbeddableLinkForPublishedContent,
+} from '@/lib/embeddable-linker';
 import { getSiteURLDataFromMiddleware } from '@/lib/middleware';
 import { joinPathWithBaseURL } from '@/lib/paths';
 import { getServerActionBaseContext } from '@/lib/server-actions';
@@ -76,6 +79,7 @@ export async function POST(request: NextRequest) {
             return resultItem.pages.map((pageItem) => ({
                 score: pageItem.score,
                 items: transformSitePageResult({
+                    asEmbeddable: Boolean(asEmbeddable),
                     linker: context.linker,
                     pageItem,
                     spaceItem: resultItem,
@@ -92,6 +96,7 @@ export async function POST(request: NextRequest) {
 }
 
 function transformSitePageResult(args: {
+    asEmbeddable: boolean;
     linker: Awaited<ReturnType<typeof getServerActionBaseContext>>['linker'];
     pageItem: SearchPageResult;
     spaceItem: SearchSpaceResult;
@@ -99,7 +104,8 @@ function transformSitePageResult(args: {
     siteSection?: SiteSection;
     siteSectionGroup?: SiteSectionGroup | null;
 }): OrderedComputedResult[] {
-    const { pageItem, spaceItem, siteSection, siteSectionGroup, siteSpace, linker } = args;
+    const { asEmbeddable, pageItem, spaceItem, siteSection, siteSectionGroup, siteSpace, linker } =
+        args;
     const currentLanguage = siteSpace?.space.language;
     const spaceURL = siteSpace?.urls.published;
     const breadcrumbs: NonNullable<ComputedPageResult['breadcrumbs']> = [];
@@ -143,7 +149,9 @@ function transformSitePageResult(args: {
         id: `${spaceItem.id}/${pageItem.id}`,
         title: pageItem.title,
         href: spaceURL
-            ? linker.toLinkForContent(joinPathWithBaseURL(spaceURL, pageItem.path))
+            ? asEmbeddable
+                ? toEmbeddableLinkForPublishedContent(linker, spaceURL, pageItem.path)
+                : linker.toLinkForContent(joinPathWithBaseURL(spaceURL, pageItem.path))
             : linker.toPathInSpace(pageItem.path),
         pageId: pageItem.id,
         spaceId: spaceItem.id,
@@ -159,7 +167,9 @@ function transformSitePageResult(args: {
                 id: `${page.id}/${section.id}`,
                 title: section.title,
                 href: spaceURL
-                    ? linker.toLinkForContent(joinPathWithBaseURL(spaceURL, section.path))
+                    ? asEmbeddable
+                        ? toEmbeddableLinkForPublishedContent(linker, spaceURL, section.path)
+                        : linker.toLinkForContent(joinPathWithBaseURL(spaceURL, section.path))
                     : linker.toPathInSpace(pageItem.path),
                 body: section.body,
                 pageId: pageItem.id,

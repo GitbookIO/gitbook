@@ -15,7 +15,10 @@ import { createStreamableValue } from 'ai/rsc';
 import type * as React from 'react';
 
 import { throwIfDataError } from '@/lib/data';
-import { getEmbeddableLinker } from '@/lib/embeddable-linker';
+import {
+    getEmbeddableLinker,
+    toEmbeddableLinkForPublishedContent,
+} from '@/lib/embeddable-linker';
 import { getSiteURLDataFromMiddleware } from '@/lib/middleware';
 import { joinPathWithBaseURL } from '@/lib/paths';
 import { traceErrorOnly } from '@/lib/tracing';
@@ -113,7 +116,11 @@ export async function streamAskQuestion({
                     }, new Map<string, RevisionPage[]>());
                 });
                 responseStream.update(
-                    await transformAnswer(context, { answer: chunk.answer, spacePages: pages })
+                    await transformAnswer(context, {
+                        answer: chunk.answer,
+                        asEmbeddable: Boolean(asEmbeddable),
+                        spacePages: pages,
+                    })
                 );
             }
         })()
@@ -172,9 +179,11 @@ async function transformAnswer(
     context: GitBookSiteContext,
     {
         answer,
+        asEmbeddable,
         spacePages,
     }: {
         answer: SearchAIAnswer;
+        asEmbeddable: boolean;
         spacePages: Map<string, RevisionPage[]>;
     }
 ): Promise<AskAnswerResult> {
@@ -204,7 +213,15 @@ async function transformAnswer(
                 const spaceURL = found?.siteSpace.urls.published;
 
                 const href = spaceURL
-                    ? context.linker.toLinkForContent(joinPathWithBaseURL(spaceURL, page.page.path))
+                    ? asEmbeddable
+                        ? toEmbeddableLinkForPublishedContent(
+                              context.linker,
+                              spaceURL,
+                              page.page.path
+                          )
+                        : context.linker.toLinkForContent(
+                              joinPathWithBaseURL(spaceURL, page.page.path)
+                          )
                     : context.linker.toPathForPage({
                           pages,
                           page: page.page,

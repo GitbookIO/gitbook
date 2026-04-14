@@ -36,20 +36,22 @@ export function useSearchController(props: SearchBaseProps) {
     const withSearchAI = assistants.filter((assistant) => assistant.mode === 'search').length > 0;
 
     // Handle initial ask state on page load, once assistants are ready.
-    // Empty ask values are just cleared chat state, not an intent to reopen the assistant.
-    const initialAsk = state?.ask?.trim() ?? '';
-    const initialRef = React.useRef(initialAsk.length === 0);
+    // `ask=` should still bootstrap the assistant on the docs site, so we must
+    // distinguish between `null` (no ask param) and an empty string.
+    const initialAsk = state?.ask ?? null;
+    const handledInitialAskRef = React.useRef<string | null | undefined>(undefined);
     React.useEffect(() => {
-        if (initialRef.current) return;
+        if (asEmbeddable) return;
         if (assistants.length === 0) return;
-        if (initialAsk.length === 0) return;
+        if (initialAsk === null) return;
+        if (handledInitialAskRef.current === initialAsk) return;
 
         // For simplicity we're only triggering the first assistant.
         if (isLoaded) {
-            assistants[0]?.open(initialAsk);
-            initialRef.current = true;
+            assistants[0]?.open(initialAsk || undefined);
+            handledInitialAskRef.current = initialAsk;
         }
-    }, [assistants.length, assistants, initialAsk, isLoaded]);
+    }, [asEmbeddable, assistants.length, assistants, initialAsk, isLoaded]);
 
     const onClose = React.useCallback(
         async (to?: string) => {
