@@ -64,7 +64,7 @@ export function createGitBookFrame(iframe: HTMLIFrameElement): GitBookFrameClien
     const events = new Map<string, Array<(...args: any[]) => void>>();
 
     const configuration: GitBookEmbeddableConfiguration = {
-        tabs: ['assistant', 'docs'],
+        tabs: ['assistant', 'search', 'docs'],
         actions: [],
         greeting: { title: '', subtitle: '' },
         suggestions: [],

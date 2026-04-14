@@ -15,6 +15,7 @@ import { createStreamableValue } from 'ai/rsc';
 import type * as React from 'react';
 
 import { throwIfDataError } from '@/lib/data';
+import { getEmbeddableLinker } from '@/lib/embeddable-linker';
 import { getSiteURLDataFromMiddleware } from '@/lib/middleware';
 import { joinPathWithBaseURL } from '@/lib/paths';
 import { traceErrorOnly } from '@/lib/tracing';
@@ -37,15 +38,20 @@ export interface AskAnswerResult {
  * Server action to ask a question in a space.
  */
 export async function streamAskQuestion({
+    asEmbeddable,
     question,
 }: {
+    asEmbeddable?: boolean;
     question: string;
 }) {
     return traceErrorOnly('Search.streamAskQuestion', async () => {
         const responseStream = createStreamableValue<AskAnswerResult | undefined>();
 
         (async () => {
-            const context = await fetchServerActionSiteContext(await getServerActionBaseContext());
+            let context = await fetchServerActionSiteContext(await getServerActionBaseContext());
+            if (asEmbeddable) {
+                context = { ...context, linker: getEmbeddableLinker(context.linker) };
+            }
 
             const apiClient = await context.dataFetcher.api();
 
@@ -198,7 +204,7 @@ async function transformAnswer(
                 const spaceURL = found?.siteSpace.urls.published;
 
                 const href = spaceURL
-                    ? joinPathWithBaseURL(spaceURL, page.page.path)
+                    ? context.linker.toLinkForContent(joinPathWithBaseURL(spaceURL, page.page.path))
                     : context.linker.toPathForPage({
                           pages,
                           page: page.page,

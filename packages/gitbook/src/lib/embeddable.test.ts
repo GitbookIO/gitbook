@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'bun:test';
 import { CustomizationDefaultThemeMode, type SiteCustomizationSettings } from '@gitbook/api';
-import { getEmbeddableLinker, resolveEmbeddableTheme } from './embeddable';
+import { resolveEmbeddableTheme } from './embeddable';
+import { getEmbeddableLinker } from './embeddable-linker';
 import { createLinker } from './links';
 
 describe('getEmbeddableLinker', () => {

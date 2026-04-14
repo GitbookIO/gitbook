@@ -1,5 +1,5 @@
 'use server';
-import { getEmbeddableLinker } from '@/lib/embeddable';
+import { getEmbeddableLinker } from '@/lib/embeddable-linker';
 import { getSiteURLDataFromMiddleware } from '@/lib/middleware';
 import { getServerActionBaseContext } from '@/lib/server-actions';
 import { traceErrorOnly } from '@/lib/tracing';
