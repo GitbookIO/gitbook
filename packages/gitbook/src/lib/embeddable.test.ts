@@ -1,10 +1,7 @@
 import { describe, expect, it } from 'bun:test';
 import { CustomizationDefaultThemeMode, type SiteCustomizationSettings } from '@gitbook/api';
 import { resolveEmbeddableTheme } from './embeddable';
-import {
-    getEmbeddableLinker,
-    toEmbeddableLinkForPublishedContent,
-} from './embeddable-linker';
+import { getEmbeddableLinker, toEmbeddableLinkForPublishedContent } from './embeddable-linker';
 import { createLinker } from './links';
 
 describe('getEmbeddableLinker', () => {

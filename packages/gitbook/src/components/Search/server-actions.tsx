@@ -15,10 +15,7 @@ import { createStreamableValue } from 'ai/rsc';
 import type * as React from 'react';
 
 import { throwIfDataError } from '@/lib/data';
-import {
-    getEmbeddableLinker,
-    toEmbeddableLinkForPublishedContent,
-} from '@/lib/embeddable-linker';
+import { getEmbeddableLinker, toEmbeddableLinkForPublishedContent } from '@/lib/embeddable-linker';
 import { getSiteURLDataFromMiddleware } from '@/lib/middleware';
 import { joinPathWithBaseURL } from '@/lib/paths';
 import { traceErrorOnly } from '@/lib/tracing';

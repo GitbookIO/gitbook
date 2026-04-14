@@ -5,10 +5,7 @@ import type {
     SearchSiteContentRequest,
 } from '@/components/Search/search-types';
 import { throwIfDataError } from '@/lib/data';
-import {
-    getEmbeddableLinker,
-    toEmbeddableLinkForPublishedContent,
-} from '@/lib/embeddable-linker';
+import { getEmbeddableLinker, toEmbeddableLinkForPublishedContent } from '@/lib/embeddable-linker';
 import { getSiteURLDataFromMiddleware } from '@/lib/middleware';
 import { joinPathWithBaseURL } from '@/lib/paths';
 import { getServerActionBaseContext } from '@/lib/server-actions';
