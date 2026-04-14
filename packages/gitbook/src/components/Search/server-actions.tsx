@@ -15,7 +15,7 @@ import { createStreamableValue } from 'ai/rsc';
 import type * as React from 'react';
 
 import { throwIfDataError } from '@/lib/data';
-import { getEmbeddableLinker, toEmbeddableLinkForPublishedContent } from '@/lib/embeddable-linker';
+import { toEmbeddableLinkForPublishedContent } from '@/lib/embeddable-linker';
 import { getSiteURLDataFromMiddleware } from '@/lib/middleware';
 import { joinPathWithBaseURL } from '@/lib/paths';
 import { traceErrorOnly } from '@/lib/tracing';
@@ -48,10 +48,9 @@ export async function streamAskQuestion({
         const responseStream = createStreamableValue<AskAnswerResult | undefined>();
 
         (async () => {
-            let context = await fetchServerActionSiteContext(await getServerActionBaseContext());
-            if (asEmbeddable) {
-                context = { ...context, linker: getEmbeddableLinker(context.linker) };
-            }
+            const context = await fetchServerActionSiteContext(
+                await getServerActionBaseContext({ isEmbeddable: asEmbeddable })
+            );
 
             const apiClient = await context.dataFetcher.api();
 
@@ -209,20 +208,24 @@ async function transformAnswer(
                 );
                 const spaceURL = found?.siteSpace.urls.published;
 
-                const href = spaceURL
-                    ? asEmbeddable
-                        ? toEmbeddableLinkForPublishedContent(
-                              context.linker,
-                              spaceURL,
-                              page.page.path
-                          )
-                        : context.linker.toLinkForContent(
-                              joinPathWithBaseURL(spaceURL, page.page.path)
-                          )
-                    : context.linker.toPathForPage({
-                          pages,
-                          page: page.page,
-                      });
+                let href = context.linker.toPathForPage({
+                    pages,
+                    page: page.page,
+                });
+
+                if (spaceURL) {
+                    if (asEmbeddable) {
+                        href = toEmbeddableLinkForPublishedContent(
+                            context.linker,
+                            spaceURL,
+                            page.page.path
+                        );
+                    } else {
+                        href = context.linker.toLinkForContent(
+                            joinPathWithBaseURL(spaceURL, page.page.path)
+                        );
+                    }
+                }
 
                 return {
                     id: source.page,

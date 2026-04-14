@@ -5,7 +5,7 @@ import type {
     SearchSiteContentRequest,
 } from '@/components/Search/search-types';
 import { throwIfDataError } from '@/lib/data';
-import { getEmbeddableLinker, toEmbeddableLinkForPublishedContent } from '@/lib/embeddable-linker';
+import { toEmbeddableLinkForPublishedContent } from '@/lib/embeddable-linker';
 import { getSiteURLDataFromMiddleware } from '@/lib/middleware';
 import { joinPathWithBaseURL } from '@/lib/paths';
 import { getServerActionBaseContext } from '@/lib/server-actions';
@@ -21,15 +21,11 @@ import type { IconName } from '@gitbook/icons';
 import { type NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
-    let [context, siteURLData] = await Promise.all([
-        getServerActionBaseContext(),
+    const { asEmbeddable, query, scope } = (await request.json()) as SearchSiteContentRequest;
+    const [context, siteURLData] = await Promise.all([
+        getServerActionBaseContext({ isEmbeddable: asEmbeddable }),
         getSiteURLDataFromMiddleware(),
     ]);
-    const { asEmbeddable, query, scope } = (await request.json()) as SearchSiteContentRequest;
-
-    if (asEmbeddable) {
-        context = { ...context, linker: getEmbeddableLinker(context.linker) };
-    }
 
     if (query.length <= 1) {
         return NextResponse.json([]);
@@ -141,15 +137,17 @@ function transformSitePageResult(args: {
         }))
     );
 
+    const pageHref = !spaceURL
+        ? linker.toPathInSpace(pageItem.path)
+        : asEmbeddable
+          ? toEmbeddableLinkForPublishedContent(linker, spaceURL, pageItem.path)
+          : linker.toLinkForContent(joinPathWithBaseURL(spaceURL, pageItem.path));
+
     const page: ComputedPageResult = {
         type: 'page',
         id: `${spaceItem.id}/${pageItem.id}`,
         title: pageItem.title,
-        href: spaceURL
-            ? asEmbeddable
-                ? toEmbeddableLinkForPublishedContent(linker, spaceURL, pageItem.path)
-                : linker.toLinkForContent(joinPathWithBaseURL(spaceURL, pageItem.path))
-            : linker.toPathInSpace(pageItem.path),
+        href: pageHref,
         pageId: pageItem.id,
         spaceId: spaceItem.id,
         score: pageItem.score,
@@ -159,20 +157,34 @@ function transformSitePageResult(args: {
     const pageSections =
         pageItem.sections
             ?.filter((section) => section.title || section.body)
-            .map<ComputedSectionResult>((section) => ({
-                type: 'section',
-                id: `${page.id}/${section.id}`,
-                title: section.title,
-                href: spaceURL
-                    ? asEmbeddable
-                        ? toEmbeddableLinkForPublishedContent(linker, spaceURL, section.path)
-                        : linker.toLinkForContent(joinPathWithBaseURL(spaceURL, section.path))
-                    : linker.toPathInSpace(pageItem.path),
-                body: section.body,
-                pageId: pageItem.id,
-                spaceId: spaceItem.id,
-                score: section.score,
-            })) ?? [];
+            .map<ComputedSectionResult>((section) => {
+                let sectionHref = linker.toPathInSpace(pageItem.path);
+
+                if (spaceURL) {
+                    if (asEmbeddable) {
+                        sectionHref = toEmbeddableLinkForPublishedContent(
+                            linker,
+                            spaceURL,
+                            section.path
+                        );
+                    } else {
+                        sectionHref = linker.toLinkForContent(
+                            joinPathWithBaseURL(spaceURL, section.path)
+                        );
+                    }
+                }
+
+                return {
+                    type: 'section',
+                    id: `${page.id}/${section.id}`,
+                    title: section.title,
+                    href: sectionHref,
+                    body: section.body,
+                    pageId: pageItem.id,
+                    spaceId: spaceItem.id,
+                    score: section.score,
+                };
+            }) ?? [];
 
     return [page, ...pageSections];
 }

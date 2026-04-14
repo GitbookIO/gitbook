@@ -34,7 +34,7 @@ export function getEmbeddableLinker(linker: GitBookLinker): GitBookLinker {
             const pagePath = getPagePath(pages, page);
             const embedPagePath = joinPath('~gitbook/embed/page', pagePath);
 
-            return linker.toPathInSpace(embedPagePath) + (anchor ? `#${anchor}` : '');
+            return `${linker.toPathInSpace(embedPagePath)}${anchor ? `#${anchor}` : ''}`;
         },
 
         withOtherSiteSpace(override: { spaceBasePath: string }): GitBookLinker {

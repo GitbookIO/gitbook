@@ -12,6 +12,85 @@ import { useSearchState, useSetSearchState } from './useSearch';
 import { useSearchResults } from './useSearchResults';
 import { useSearchResultsCursor } from './useSearchResultsCursor';
 
+function useInitialAskBootstrap(props: {
+    asEmbeddable?: boolean;
+    assistants: ReturnType<typeof useAI>['assistants'];
+    initialAsk: string | null;
+    isLoaded: boolean;
+}) {
+    const { asEmbeddable, assistants, initialAsk, isLoaded } = props;
+    const handledInitialAskRef = React.useRef<string | null | undefined>(undefined);
+
+    React.useEffect(() => {
+        if (asEmbeddable) return;
+        if (assistants.length === 0) return;
+        if (initialAsk === null) return;
+        if (handledInitialAskRef.current === initialAsk) return;
+
+        // For simplicity we're only triggering the first assistant.
+        if (isLoaded) {
+            assistants[0]?.open(initialAsk || undefined);
+            handledInitialAskRef.current = initialAsk;
+        }
+    }, [asEmbeddable, assistants, initialAsk, isLoaded]);
+}
+
+function useFilteredSiteSpaceIds(props: {
+    siteSpaces: SearchBaseProps['siteSpaces'];
+    language: string | null | undefined;
+}) {
+    const { siteSpaces, language } = props;
+
+    return React.useMemo(
+        () =>
+            siteSpaces.reduce((acc: string[], siteSpace) => {
+                if (
+                    !language ||
+                    !siteSpace.space.language ||
+                    siteSpace.space.language === language
+                ) {
+                    acc.push(siteSpace.id);
+                }
+
+                return acc;
+            }, []),
+        [siteSpaces, language]
+    );
+}
+
+function useSearchKeyboardNavigation(props: {
+    query: string;
+    results: ReturnType<typeof useSearchResults>['results'];
+    resultsRef: React.RefObject<SearchResultsRef | null>;
+}) {
+    const { query, results, resultsRef } = props;
+    const { cursor, moveBy: moveCursorBy } = useSearchResultsCursor({
+        query,
+        results,
+    });
+
+    const onInputKeyDown = React.useCallback(
+        (event: React.KeyboardEvent<HTMLInputElement>) => {
+            if (event.key === 'ArrowUp') {
+                event.preventDefault();
+                moveCursorBy(-1);
+            } else if (event.key === 'ArrowDown') {
+                event.preventDefault();
+                moveCursorBy(1);
+            } else if (event.key === 'Enter') {
+                event.preventDefault();
+                resultsRef.current?.select();
+            }
+        },
+        [moveCursorBy, resultsRef]
+    );
+
+    return {
+        cursor,
+        onInputKeyDown,
+    };
+}
+
 export function useSearchController(props: SearchBaseProps) {
     const {
         asEmbeddable,
@@ -39,19 +118,7 @@ export function useSearchController(props: SearchBaseProps) {
     // `ask=` should still bootstrap the assistant on the docs site, so we must
     // distinguish between `null` (no ask param) and an empty string.
     const initialAsk = state?.ask ?? null;
-    const handledInitialAskRef = React.useRef<string | null | undefined>(undefined);
-    React.useEffect(() => {
-        if (asEmbeddable) return;
-        if (assistants.length === 0) return;
-        if (initialAsk === null) return;
-        if (handledInitialAskRef.current === initialAsk) return;
-
-        // For simplicity we're only triggering the first assistant.
-        if (isLoaded) {
-            assistants[0]?.open(initialAsk || undefined);
-            handledInitialAskRef.current = initialAsk;
-        }
-    }, [asEmbeddable, assistants.length, assistants, initialAsk, isLoaded]);
+    useInitialAskBootstrap({ asEmbeddable, assistants, initialAsk, isLoaded });
 
     const onClose = React.useCallback(
         async (to?: string) => {
@@ -106,21 +173,10 @@ export function useSearchController(props: SearchBaseProps) {
 
     // If searching all variants of the current section (the "extended" scope),
     // filter by language if the language is set for both the current and the target site space.
-    const siteSpaceIds = React.useMemo(
-        () =>
-            siteSpaces.reduce((acc: string[], ss) => {
-                if (
-                    !siteSpace.space.language ||
-                    !ss.space.language ||
-                    ss.space.language === siteSpace.space.language
-                ) {
-                    acc.push(ss.id);
-                }
-
-                return acc;
-            }, []),
-        [siteSpaces, siteSpace.space.language]
-    );
+    const siteSpaceIds = useFilteredSiteSpaceIds({
+        siteSpaces,
+        language: siteSpace.space.language,
+    });
 
     const { results, fetching, error } = useSearchResults({
         asEmbeddable,
@@ -136,26 +192,11 @@ export function useSearchController(props: SearchBaseProps) {
     const searchValue = state?.query ?? (withSearchAI || !withAI ? state?.ask : null) ?? '';
     const searchResultsId = `search-results-${React.useId()}`;
 
-    const { cursor, moveBy: moveCursorBy } = useSearchResultsCursor({
+    const { cursor, onInputKeyDown } = useSearchKeyboardNavigation({
         query: normalizedQuery,
         results,
+        resultsRef,
     });
-
-    const onInputKeyDown = React.useCallback(
-        (event: React.KeyboardEvent<HTMLInputElement>) => {
-            if (event.key === 'ArrowUp') {
-                event.preventDefault();
-                moveCursorBy(-1);
-            } else if (event.key === 'ArrowDown') {
-                event.preventDefault();
-                moveCursorBy(1);
-            } else if (event.key === 'Enter') {
-                event.preventDefault();
-                resultsRef.current?.select();
-            }
-        },
-        [moveCursorBy]
-    );
 
     return {
         assistants,
