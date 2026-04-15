@@ -6,7 +6,6 @@ import {
     SiteInsightsLinkPosition,
     type SiteSocialAccount,
 } from '@gitbook/api';
-import { Icon } from '@gitbook/icons';
 import type React from 'react';
 
 import { resolveContentRef } from '@/lib/references';
@@ -15,13 +14,12 @@ import { tcls } from '@/lib/tailwind';
 
 import { SocialAccountLink } from '../Footer/SocialAccounts';
 import { SiteAuthLoginDropdownMenuItem } from '../SiteAuth/SiteAuthLoginLink';
-import { ToggleChevron } from '../primitives';
 import {
-    DropdownMenu,
     DropdownMenuItem,
     DropdownMenuSeparator,
     DropdownSubMenu,
 } from '../primitives/DropdownMenu';
+import { HeaderLinkMoreDropdown } from './HeaderLinkMoreClient';
 import styles from './headerLinks.module.css';
 
 /**
@@ -35,32 +33,11 @@ export function HeaderLinkMore(props: {
 }) {
     const { label, links, context, socialAccounts } = props;
 
-    const renderButton = (
-        <button
-            type="button"
-            className={tcls(
-                'text-tint',
-                'hover:text-primary',
-                'dark:hover:text-primary',
-                'theme-bold:text-header-link',
-                'theme-bold:hover:text-header-link/8',
-                'flex',
-                'gap-1',
-                'items-center'
-            )}
-        >
-            <span className="sr-only">{label}</span>
-            <Icon icon="ellipsis" className={tcls('size-4')} />
-            <ToggleChevron />
-        </button>
-    );
-
     return (
         <div className={`${styles.linkEllipsis} z-20 items-center`}>
-            <DropdownMenu
-                button={renderButton}
-                openOnHover={true}
-                className={tcls(
+            <HeaderLinkMoreDropdown
+                label={label}
+                dropdownClassName={tcls(
                     'max-md:right-0 max-md:left-auto',
                     context.customization.styling.search === 'prominent' && 'right-0 left-auto'
                 )}
@@ -75,7 +52,7 @@ export function HeaderLinkMore(props: {
                         account={account}
                     />
                 ))}
-            </DropdownMenu>
+            </HeaderLinkMoreDropdown>
         </div>
     );
 }
