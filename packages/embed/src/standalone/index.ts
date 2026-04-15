@@ -64,7 +64,7 @@ let frameConfiguration: GitBookEmbeddableConfiguration & StandaloneConfiguration
     greeting: { title: '', subtitle: '' },
     suggestions: [],
     tools: [],
-    tabs: ['assistant', 'docs'],
+    tabs: ['assistant', 'search', 'docs'],
     trademark: true,
 };
 
@@ -101,6 +101,9 @@ function getIframe() {
         widgetIframe?.remove();
         widgetIframe = document.createElement('iframe');
         widgetIframe.id = 'gitbook-widget-iframe';
+        if (frameOptions?.colorScheme) {
+            widgetIframe.style.colorScheme = frameOptions.colorScheme;
+        }
         widgetIframe.src = client.getFrameURL({
             ...frameOptions,
         });

@@ -27,17 +27,26 @@ export type ResultType =
 const cachedRecommendedQuestions: Map<string, ResultType[]> = new Map();
 
 export function useSearchResults(props: {
+    asEmbeddable?: boolean;
     disabled: boolean;
     query: string;
     siteSpaceId: string;
     siteSpaceIds: string[];
     scope: SearchScope;
-    withAI: boolean;
     suggestions?: string[];
     /** URL for the search API route (e.g. from linker.toPathInSpace('~gitbook/search')). */
     searchURL: string;
 }) {
-    const { disabled, query, siteSpaceId, siteSpaceIds, scope, suggestions, searchURL } = props;
+    const {
+        asEmbeddable,
+        disabled,
+        query,
+        siteSpaceId,
+        siteSpaceIds,
+        scope,
+        suggestions,
+        searchURL,
+    } = props;
 
     const trackEvent = useTrackEvent();
 
@@ -148,7 +157,13 @@ export function useSearchResults(props: {
                     const fetchSearch = (
                         scope: Parameters<typeof fetchSearchResults>[1]
                     ): Promise<OrderedComputedResult[]> =>
-                        fetchSearchResults(searchURL, scope, query, abortController.signal);
+                        fetchSearchResults(
+                            searchURL,
+                            scope,
+                            query,
+                            abortController.signal,
+                            asEmbeddable
+                        );
 
                     switch (scope) {
                         case 'all':
@@ -214,6 +229,7 @@ export function useSearchResults(props: {
         disabled,
         suggestions,
         searchURL,
+        asEmbeddable,
         getAssistants,
     ]);
 
@@ -230,12 +246,14 @@ async function fetchSearchResults(
         | { mode: 'current'; siteSpaceId: string }
         | { mode: 'specific'; siteSpaceIds: string[] },
     query: string,
-    signal?: AbortSignal
+    signal?: AbortSignal,
+    asEmbeddable?: boolean
 ): Promise<OrderedComputedResult[]> {
     const response = await fetch(searchURL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+            asEmbeddable,
             query,
             scope,
         }),

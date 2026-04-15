@@ -19,7 +19,7 @@ import { AdaptiveVisitorContextProvider } from '../Adaptive';
 import { Announcement } from '../Announcement';
 import { SpacesDropdown, TranslationsDropdown } from '../Header/SpacesDropdown';
 import { InsightsProvider, VisitorProvider } from '../Insights';
-import { SearchContainer } from '../Search';
+import { SearchContainer, getSearchBaseProps } from '../Search';
 import { SiteSectionList, encodeClientSiteSections } from '../SiteSections';
 import { CurrentContentProvider } from '../hooks';
 import { CONTAINER_STYLE } from '../layout';
@@ -106,7 +106,8 @@ export function SpaceLayoutServerContext(props: SpaceLayoutProps) {
  */
 export function SpaceLayout(props: SpaceLayoutProps) {
     const { context, children } = props;
-    const { siteSpace, customization, visibleSections, visibleSiteSpaces } = context;
+    const { siteSpace, customization, visibleSections } = context;
+    const searchProps = getSearchBaseProps(context);
 
     const withTopHeader = customization.header.preset !== CustomizationHeaderPreset.None;
 
@@ -199,23 +200,9 @@ export function SpaceLayout(props: SpaceLayoutProps) {
                                     {!withTopHeader && (
                                         <div className="flex gap-2 max-lg:hidden">
                                             <SearchContainer
+                                                {...searchProps}
                                                 style={CustomizationSearchStyle.Subtle}
-                                                withVariants={variants.generic.length > 1}
-                                                withSiteVariants={
-                                                    visibleSections?.list.some(
-                                                        (s) =>
-                                                            s.object === 'site-section' &&
-                                                            s.siteSpaces.length > 1
-                                                    ) ?? false
-                                                }
-                                                withSections={withSections}
-                                                section={visibleSections?.current}
-                                                siteSpace={siteSpace}
-                                                siteSpaces={visibleSiteSpaces}
                                                 viewport="desktop"
-                                                searchURL={context.linker.toPathInSpace(
-                                                    '~gitbook/search'
-                                                )}
                                             />
                                         </div>
                                     )}

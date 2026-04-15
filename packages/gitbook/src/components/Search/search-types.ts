@@ -37,6 +37,7 @@ export type SearchSiteContentScope =
     | { mode: 'specific'; siteSpaceIds: string[] };
 
 export interface SearchSiteContentRequest {
+    asEmbeddable?: boolean;
     query: string;
     scope: SearchSiteContentScope;
 }
