@@ -69,11 +69,9 @@ export async function streamRenderAIMessage(
                  * A new step started (phase update).
                  */
                 case 'response_step_start': {
-                    if ('stepIndex' in event && 'phase' in event) {
-                        updateProcessingMessageStep(event.stepIndex, (step) => {
-                            step.phase = event.phase;
-                        });
-                    }
+                    updateProcessingMessageStep(event.stepIndex, (step) => {
+                        step.phase = event.phase;
+                    });
                     break;
                 }
 

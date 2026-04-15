@@ -30,7 +30,7 @@ export type AIChatMessage = {
 };
 
 export type AIChatMessageActivity = {
-    currentPhase: AIMessageStepPhase | null;
+    currentPhase?: AIMessageStepPhase;
     toolCount: number;
     hasCommentary: boolean;
     hasFinalAnswer: boolean;
@@ -654,7 +654,7 @@ function updateAIChatMessageActivity(
 
 function getDefaultAIChatMessageActivity(): AIChatMessageActivity {
     return {
-        currentPhase: null,
+        currentPhase: undefined,
         toolCount: 0,
         hasCommentary: false,
         hasFinalAnswer: false,
