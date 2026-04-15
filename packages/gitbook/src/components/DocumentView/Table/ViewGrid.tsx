@@ -32,7 +32,8 @@ export function ViewGridHeader(props: ViewGridHeaderProps) {
             role="rowgroup"
             className={tcls(
                 tableClassName ?? tableWidth,
-                'mb-1 flex flex-col overflow-hidden rounded-lg border border-tint-subtle bg-tint',
+                'mb-1 flex flex-col rounded-lg border border-tint-subtle bg-tint',
+                isTranslatedStickyHeader || !stickyFirstColumn ? 'overflow-hidden' : undefined,
                 className
             )}
         >
