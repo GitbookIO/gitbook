@@ -1,10 +1,21 @@
 // @ts-check
 
 // We don't use the deployment ID yet on 2c, we need to remove it because of https://github.com/opennextjs/opennextjs-aws/issues/1136
-const deploymentId =
+let deploymentId =
     process.env.GITBOOK_RUNTIME === 'cloudflare'
         ? undefined
         : process.env.GITBOOK_HEAD_SHA || process.env.GITHUB_SHA || Date.now().toString(); // Needed because we use a custom deployment method i.e. https://vercel.com/docs/skew-protection#custom-deployment-id
+
+const { VERCEL_TARGET_ENV } = process.env;
+
+// Because preview, staging and prod shares the same SHA, the deployment will fail if we don't prefix it with the environment name.
+if (VERCEL_TARGET_ENV === 'preview') {
+    deploymentId = `t-${deploymentId}`;
+} else if (VERCEL_TARGET_ENV === 'staging') {
+    deploymentId = `s-${deploymentId}`;
+} else if (VERCEL_TARGET_ENV === 'production') {
+    deploymentId = `p-${deploymentId}`;
+}
 
 /**
  * @type {import('next').NextConfig}
