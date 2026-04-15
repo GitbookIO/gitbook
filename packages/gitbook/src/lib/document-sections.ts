@@ -79,6 +79,17 @@ async function getSectionsFromNodes(
                 }
                 continue;
             }
+            case 'updates': {
+                const updateNodes = await Promise.all(
+                    block.nodes.map(async (update) =>
+                        getSectionsFromNodes(update.nodes as DocumentBlock[], context, depth)
+                    )
+                );
+                for (const updateSections of updateNodes) {
+                    sections.push(...updateSections);
+                }
+                continue;
+            }
             case 'swagger':
             case 'openapi-operation': {
                 const id = block.meta?.id;
