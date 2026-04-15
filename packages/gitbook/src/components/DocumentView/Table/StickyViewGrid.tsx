@@ -101,17 +101,41 @@ export function StickyViewGrid({
         };
     }, [syncStickyLayout]);
 
+    const resolvedTableClassName = tableClassName ?? 'w-fit';
+
+    if (!stickyHeader) {
+        return (
+            <div className={className}>
+                <div
+                    ref={rootRef}
+                    className="group/table relative flex w-full min-w-0 max-w-full flex-col rounded-lg border-tint-subtle"
+                    data-scrollable="false"
+                >
+                    <div
+                        ref={bodyScrollRef}
+                        className="w-full min-w-0 overflow-x-auto overflow-y-hidden overscroll-x-none border-tint-subtle"
+                    >
+                        <div
+                            ref={bodyTableRef}
+                            className={tcls('flex', 'flex-col', resolvedTableClassName)}
+                        >
+                            {header}
+                            {children}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className={className}>
             <div
                 ref={rootRef}
-                className={tcls(
-                    'group/table relative flex w-full min-w-0 max-w-full flex-col rounded-lg border-tint-subtle',
-                    stickyHeader ? 'data-[scrollable=true]:border' : undefined
-                )}
+                className="group/table relative flex w-full min-w-0 max-w-full flex-col rounded-lg border-tint-subtle data-[scrollable=true]:border"
                 data-scrollable="false"
             >
-                {stickyHeader && header ? (
+                {header ? (
                     <div
                         ref={stickyHeaderRef}
                         className={tcls(
@@ -123,7 +147,9 @@ export function StickyViewGrid({
                             className={tcls(
                                 'flex',
                                 'flex-col',
-                                tableClassName ?? 'w-fit',
+                                resolvedTableClassName,
+                                // The sticky header is rendered outside the scroll container, so it
+                                // needs to mirror the body's horizontal scroll position.
                                 '[transform:translateX(var(--table-sticky-scroll-left,0px))]'
                             )}
                             style={{ width: 'var(--table-sticky-table-width)' }}
@@ -135,22 +161,12 @@ export function StickyViewGrid({
 
                 <div
                     ref={bodyScrollRef}
-                    className={tcls(
-                        'w-full min-w-0 overflow-x-auto overflow-y-hidden overscroll-x-none border-tint-subtle',
-                        stickyHeader
-                            ? [
-                                  'group-data-[scrollable=true]/table:mx-px',
-                                  'group-data-[scrollable=true]/table:border-0',
-                                  'group-data-[scrollable=true]/table:rounded-none',
-                              ]
-                            : undefined
-                    )}
+                    className="w-full min-w-0 overflow-x-auto overflow-y-hidden overscroll-x-none border-tint-subtle group-data-[scrollable=true]/table:mx-px group-data-[scrollable=true]/table:border-0 group-data-[scrollable=true]/table:rounded-none"
                 >
                     <div
                         ref={bodyTableRef}
-                        className={tcls('flex', 'flex-col', tableClassName ?? 'w-fit')}
+                        className={tcls('flex', 'flex-col', resolvedTableClassName)}
                     >
-                        {!stickyHeader ? header : null}
                         {children}
                     </div>
                 </div>
