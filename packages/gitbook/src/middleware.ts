@@ -721,6 +721,7 @@ function encodePathInSiteContent(
     switch (pathname) {
         case '~gitbook/embed':
         case '~gitbook/embed/assistant':
+        case '~gitbook/embed/search':
         case '~gitbook/icon':
             return { pathname };
         // LLMs.txt, sitemap, sitemap-pages and robots.txt are always static

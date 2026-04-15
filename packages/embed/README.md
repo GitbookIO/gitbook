@@ -2,8 +2,9 @@
 
 Embed your GitBook docs in your product or website.
 
-The Docs Embed can contain two tabs:
+The Docs Embed can contain three tabs:
 - **Assistant**: The [GitBook Assistant](https://gitbook.com/docs/publishing-documentation/gitbook-ai-assistant) - an AI-powered chat interface to help users find answers
+- **Search**: A search-focused surface for quickly finding pages and asking scoped questions
 - **Docs**: A browser for navigating your documentation site
 
 The embed is set up automatically based on your site's configuration. You can optionally customize and override the configuration with custom actions, tools, suggested questions, [Authenticated Access](https://gitbook.com/docs/publishing-documentation/authenticated-access), and more. See the [Configuration](#configuration) section for all available options.
@@ -40,7 +41,7 @@ GitBook('configure', {
         label: 'Ask',
         icon: 'assistant' // 'assistant' | 'sparkle' | 'help' | 'book'
     },
-    tabs: ['assistant', 'docs'],
+    tabs: ['assistant', 'search', 'docs'],
     actions: [
         {
             icon: 'circle-question',
@@ -93,7 +94,7 @@ frame.clearChat();
 
 // Configure the embed (see Configuration section for all options)
 frame.configure({
-    tabs: ['assistant', 'docs'],
+    tabs: ['assistant', 'search', 'docs'],
     actions: [
         {
             icon: 'circle-question',
@@ -128,7 +129,7 @@ import { GitBookProvider, GitBookFrame } from '@gitbook/embed/react';
             token: 'your-jwt-token', // Optional: for Adaptive Content or Authenticated Access
             unsignedClaims: { userId: '123' } // Optional: custom claims for dynamic expressions
         }}
-        tabs={['assistant', 'docs']}
+        tabs={['assistant', 'search', 'docs']}
         greeting={{ title: 'Welcome!', subtitle: 'How can I help?' }}
         assistantName="Support Assistant"
         suggestions={['What is GitBook?', 'How do I get started?']}
@@ -230,10 +231,10 @@ Available in: Standalone script, NPM package, React components
 
 Override which tabs are displayed. Defaults to your site's configuration.
 
-- **Type**: `('assistant' | 'docs')[]`
+- **Type**: `('assistant' | 'search' | 'docs')[]`
 
 ```javascript
-tabs: ['assistant', 'docs']
+tabs: ['assistant', 'search', 'docs']
 ```
 
 ### `closeButton`
