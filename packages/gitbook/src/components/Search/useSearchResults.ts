@@ -11,7 +11,7 @@ import assertNever from 'assert-never';
 import { useEventCallback } from 'usehooks-ts';
 import { useTrackEvent } from '../Insights';
 import { isQuestion } from './isQuestion';
-import { type MergedPageResult, getResultKey, reciprocalRankFusion } from './reciprocalRankFusion';
+import { type MergedPageResult, reciprocalRankFusion } from './reciprocalRankFusion';
 import { type LocalPageResult, useLocalSearchResults } from './useLocalSearchResults';
 import type { SearchScope } from './useSearch';
 
@@ -23,53 +23,6 @@ export type ResultType =
     | { type: 'recommended-question'; id: string; question: string };
 
 export type { LocalPageResult, MergedPageResult };
-
-type MergeableResult = LocalPageResult | OrderedComputedResult | MergedPageResult;
-
-/**
- * Append-only merge: local results first, then remote results that aren't
- * already covered by local.
- * Used once the user has interacted with the list (scroll / keyboard / pointer)
- * so that already-visible items never jump to a different position.
- */
-function appendMerge(
-    localResults: LocalPageResult[],
-    remoteResults: OrderedComputedResult[]
-): MergeableResult[] {
-    const localKeys = new Set(localResults.map(getResultKey));
-    const remoteOnly = remoteResults.filter((item) => !localKeys.has(getResultKey(item)));
-    return [...localResults, ...remoteOnly];
-}
-
-/**
- * Stable-visible merge: visible items are kept in the order they appear in
- * `visibleIds` (insertion order), followed by non-visible items ranked by RRF.
- */
-function stableVisibleMerge(
-    localResults: LocalPageResult[],
-    remoteResults: OrderedComputedResult[],
-    visibleIds: ReadonlySet<string>
-): MergeableResult[] {
-    const rrfResult = reciprocalRankFusion(localResults, remoteResults);
-
-    if (visibleIds.size === 0) {
-        return rrfResult;
-    }
-
-    const rrfByKey = new Map<string, MergeableResult>(
-        rrfResult.map((item) => [getResultKey(item), item])
-    );
-
-    const visible: MergeableResult[] = [];
-    for (const id of visibleIds) {
-        const item = rrfByKey.get(id);
-        if (item) visible.push(item);
-    }
-
-    const nonVisible = rrfResult.filter((item) => !visibleIds.has(getResultKey(item)));
-
-    return [...visible, ...nonVisible];
-}
 
 /**
  * We cache the recommended questions globally to avoid calling the API multiple times
@@ -125,29 +78,6 @@ export function useSearchResults(props: {
     const { assistants } = useAI();
     const getAssistants = useEventCallback(() => assistants);
     const withAI = assistants.length > 0;
-
-    // --- Interaction / visibility tracking (refs → no extra renders) ---
-
-    /** True once the user has scrolled, moved the keyboard cursor, or hovered over results. */
-    const hasInteractedRef = React.useRef(false);
-    /** Keys of result items currently visible in the scroll viewport. */
-    const visibleIdsRef = React.useRef<ReadonlySet<string>>(new Set());
-
-    // Reset interaction state whenever the query changes.
-    React.useEffect(() => {
-        hasInteractedRef.current = false;
-        visibleIdsRef.current = new Set();
-    }, [query]);
-
-    /** Call when the user scrolls, navigates with arrow keys, or hovers the list. */
-    const setInteracted = React.useCallback(() => {
-        hasInteractedRef.current = true;
-    }, []);
-
-    /** Update the set of result keys that are currently visible in the viewport. */
-    const onVisibilityChange = React.useCallback((ids: ReadonlySet<string>) => {
-        visibleIdsRef.current = ids;
-    }, []);
 
     React.useEffect(() => {
         if (disabled) {
@@ -326,18 +256,7 @@ export function useSearchResults(props: {
             return [];
         }
 
-        let merged: MergeableResult[];
-        if (hasInteractedRef.current) {
-            // User has interacted: append new items, never reorder existing ones.
-            merged = appendMerge(localResults, remoteState.results);
-        } else if (!hasInteractedRef.current) {
-            // User hasn't interacted: keep visible items in local order,
-            // allow below-the-fold items to be freely re-ranked by RRF.
-            merged = stableVisibleMerge(localResults, remoteState.results, visibleIdsRef.current);
-        } else {
-            // First render for this query: plain RRF with no stability constraints.
-            merged = reciprocalRankFusion(localResults, remoteState.results);
-        }
+        const merged = reciprocalRankFusion(localResults, remoteState.results);
 
         return withAI ? withAskTriggers(merged, query, assistants) : merged;
     }, [localResults, remoteState.results, query, withAI, assistants, siteSpaceId, suggestions]);
@@ -346,8 +265,6 @@ export function useSearchResults(props: {
         results,
         fetching: remoteState.fetching,
         error: remoteState.error,
-        setInteracted,
-        onVisibilityChange,
     };
 }
 

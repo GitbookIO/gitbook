@@ -12,7 +12,6 @@ import { SearchPageResultItem } from './SearchPageResultItem';
 import { SearchQuestionResultItem } from './SearchQuestionResultItem';
 import { SearchRecordResultItem } from './SearchRecordResultItem';
 import { SearchSectionResultItem } from './SearchSectionResultItem';
-import { getResultKey } from './reciprocalRankFusion';
 import type { OrderedComputedResult } from './search-types';
 import type { LocalPageResult } from './useLocalSearchResults';
 
@@ -41,10 +40,6 @@ export const SearchResults = React.forwardRef(function SearchResults(
         fetching: boolean;
         cursor: number | null;
         error: boolean;
-        /** Ref to the scroll container — used as the IntersectionObserver root. */
-        scrollContainerRef?: React.RefObject<HTMLElement | null>;
-        /** Called whenever the set of visible result keys changes. */
-        onVisibilityChange?: (ids: ReadonlySet<string>) => void;
     },
     ref: React.Ref<SearchResultsRef>
 ) {
@@ -56,8 +51,6 @@ export const SearchResults = React.forwardRef(function SearchResults(
         fetching,
         cursor,
         error,
-        scrollContainerRef,
-        onVisibilityChange,
     } = props;
 
     const language = useLanguage();
@@ -91,49 +84,6 @@ export const SearchResults = React.forwardRef(function SearchResults(
         }),
         [select]
     );
-
-    // Observe which result items are visible in the scroll viewport.
-    React.useEffect(() => {
-        if (!onVisibilityChange) {
-            return;
-        }
-
-        const root = scrollContainerRef?.current ?? null;
-        const visibleKeys = new Set<string>();
-
-        const observer = new IntersectionObserver(
-            (entries) => {
-                for (const entry of entries) {
-                    const index = refs.current.indexOf(entry.target as HTMLAnchorElement);
-                    if (index === -1) continue;
-                    const result = results[index];
-                    if (!result || result.type !== 'local-page') {
-                        continue;
-                    }
-                    const key = getResultKey(result);
-                    if (entry.isIntersecting) {
-                        visibleKeys.add(key);
-                    } else {
-                        visibleKeys.delete(key);
-                    }
-                }
-                onVisibilityChange(new Set(visibleKeys));
-            },
-            { root, threshold: 0.5 }
-        );
-
-        const observed: HTMLAnchorElement[] = [];
-        for (const el of refs.current) {
-            if (el) {
-                observer.observe(el);
-                observed.push(el);
-            }
-        }
-
-        return () => {
-            observer.disconnect();
-        };
-    }, [results, scrollContainerRef, onVisibilityChange]);
 
     const { assistants } = useAI();
 
