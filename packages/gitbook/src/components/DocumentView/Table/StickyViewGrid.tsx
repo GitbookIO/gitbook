@@ -161,7 +161,7 @@ export function StickyViewGrid({
 
                 <div
                     ref={bodyScrollRef}
-                    className="w-full min-w-0 overflow-x-auto overflow-y-hidden overscroll-x-none border-tint-subtle group-data-[scrollable=true]/table:mx-px group-data-[scrollable=true]/table:border-0 group-data-[scrollable=true]/table:rounded-none"
+                    className="w-full min-w-0 overflow-x-auto overflow-y-hidden overscroll-x-none border-tint-subtle group-data-[scrollable=true]/table:mx-px group-data-[scrollable=true]/table:rounded-none group-data-[scrollable=true]/table:border-0"
                 >
                     <div
                         ref={bodyTableRef}
