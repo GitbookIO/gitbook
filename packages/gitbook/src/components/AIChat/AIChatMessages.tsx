@@ -59,7 +59,7 @@ export function AIChatMessages(props: {
                 )}
                 style={{ animationDelay: '.2s' }}
             >
-                {group.map(({ message, originalIndex }, indexInGroup) => {
+                {group.map(({ message, originalIndex }) => {
                     const isLastMessage = originalIndex === chat.messages.length - 1;
                     const toolCount = message.steps.reduce(
                         (count, step) => count + (step.toolCalls?.length ?? 0),
