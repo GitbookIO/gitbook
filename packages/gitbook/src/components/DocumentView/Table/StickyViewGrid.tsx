@@ -11,10 +11,38 @@ interface StickyViewGridProps {
     children: ReactNode;
 }
 
-export function StickyViewGrid({
+export function StickyViewGrid(props: StickyViewGridProps) {
+    if (!props.stickyHeader) {
+        return <DefaultHeaderScrollGrid {...props} />;
+    }
+    return <StickyHeaderOverlayScrollGrid {...props} />;
+}
+
+function DefaultHeaderScrollGrid({
     className,
     header,
-    stickyHeader = false,
+    tableClassName,
+    children,
+}: StickyViewGridProps) {
+    const resolvedTableClassName = tableClassName ?? 'w-fit';
+
+    return (
+        <div className={className}>
+            <div className="group/table relative flex w-full min-w-0 max-w-full flex-col rounded-lg border-tint-subtle">
+                <div className="w-full min-w-0 overflow-x-auto overflow-y-hidden overscroll-x-none border-tint-subtle">
+                    <div className={tcls('flex', 'flex-col', resolvedTableClassName)}>
+                        {header}
+                        {children}
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+function StickyHeaderOverlayScrollGrid({
+    className,
+    header,
     tableClassName,
     children,
 }: StickyViewGridProps) {
@@ -102,31 +130,6 @@ export function StickyViewGrid({
     }, [syncStickyLayout]);
 
     const resolvedTableClassName = tableClassName ?? 'w-fit';
-
-    if (!stickyHeader) {
-        return (
-            <div className={className}>
-                <div
-                    ref={rootRef}
-                    className="group/table relative flex w-full min-w-0 max-w-full flex-col rounded-lg border-tint-subtle"
-                    data-scrollable="false"
-                >
-                    <div
-                        ref={bodyScrollRef}
-                        className="w-full min-w-0 overflow-x-auto overflow-y-hidden overscroll-x-none border-tint-subtle"
-                    >
-                        <div
-                            ref={bodyTableRef}
-                            className={tcls('flex', 'flex-col', resolvedTableClassName)}
-                        >
-                            {header}
-                            {children}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        );
-    }
 
     return (
         <div className={className}>

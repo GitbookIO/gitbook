@@ -24,7 +24,7 @@ export function ViewGridHeader(props: ViewGridHeaderProps) {
         mode: context.mode,
     });
     const stickyFirstColumn = context.mode !== 'print' && view.stickyFirstColumn === true;
-    const isTranslatedStickyHeader = context.mode !== 'print' && view.stickyHeader === true;
+    const withStickyHeader = context.mode !== 'print' && view.stickyHeader === true;
     const firstVisibleColumn = view.columns[0];
 
     return (
@@ -33,7 +33,7 @@ export function ViewGridHeader(props: ViewGridHeaderProps) {
             className={tcls(
                 tableClassName ?? tableWidth,
                 'mb-1 flex flex-col rounded-lg border border-tint-subtle bg-tint',
-                isTranslatedStickyHeader || !stickyFirstColumn ? 'overflow-hidden' : undefined,
+                withStickyHeader || !stickyFirstColumn ? 'overflow-hidden' : undefined,
                 className
             )}
         >
@@ -51,7 +51,7 @@ export function ViewGridHeader(props: ViewGridHeaderProps) {
                             className={tcls(
                                 'relative px-3 py-2 font-medium text-sm text-tint-strong',
                                 stickyFirstColumn && column === firstVisibleColumn
-                                    ? isTranslatedStickyHeader
+                                    ? withStickyHeader
                                         ? 'z-20 bg-tint'
                                         : 'sticky left-0 z-20 bg-tint'
                                     : undefined,
@@ -66,7 +66,7 @@ export function ViewGridHeader(props: ViewGridHeaderProps) {
                                 }),
                                 minWidth: columnWidths?.[column] || '100px',
                                 left:
-                                    isTranslatedStickyHeader &&
+                                    withStickyHeader &&
                                     stickyFirstColumn &&
                                     column === firstVisibleColumn
                                         ? 'calc(-1 * var(--table-sticky-scroll-left, 0px))'
