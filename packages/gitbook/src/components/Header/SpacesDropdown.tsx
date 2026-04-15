@@ -24,7 +24,7 @@ export function SpacesDropdown(props: {
     icon?: ButtonProps['icon'];
 }) {
     const { context, siteSpace, siteSpaces, className, variant = 'secondary', icon } = props;
-    const currentLanguage = context.siteSpace.space.language;
+    const currentLanguage = context.locale;
 
     return (
         <DropdownMenu
@@ -70,7 +70,7 @@ export function TranslationsDropdown(props: {
     const { context, siteSpace, siteSpaces, className } = props;
 
     // Memoize the emoji check to avoid repeated regex execution
-    const title = getLocalizedTitle(siteSpace, context.siteSpace.space.language);
+    const title = getLocalizedTitle(siteSpace, context.locale);
     const hasEmojiPrefix = useMemo(() => startsWithEmoji(title), [title]);
 
     return (

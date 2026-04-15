@@ -6,6 +6,8 @@ import {
 } from '@/components/SiteLayout';
 import type { VisitorAuthClaims } from '@/lib/adaptive';
 import type { GitBookSiteContext } from '@/lib/context';
+import { resolveEmbeddableTheme } from '@/lib/embeddable';
+import type { CustomizationDefaultThemeMode } from '@gitbook/api';
 import { SiteInsightsTrademarkPlacement } from '@gitbook/api';
 import { SpaceLayoutServerContext } from '../SpaceLayout';
 import { Trademark } from '../TableOfContents/Trademark';
@@ -18,6 +20,7 @@ type EmbeddableRootLayoutProps = {
     context: GitBookSiteContext;
     withTracking: boolean;
     visitorAuthClaims: VisitorAuthClaims;
+    forcedTheme?: CustomizationDefaultThemeMode | null;
 };
 
 /**
@@ -27,16 +30,22 @@ export async function EmbeddableRootLayout({
     context,
     withTracking,
     visitorAuthClaims,
+    forcedTheme,
     children,
 }: React.PropsWithChildren<EmbeddableRootLayoutProps>) {
+    const theme = resolveEmbeddableTheme(context.customization, forcedTheme);
+
     return (
-        <CustomizationRootLayout context={context} htmlClassName="embed">
+        <CustomizationRootLayout
+            context={context}
+            htmlClassName="embed"
+            forcedTheme={theme.htmlTheme}
+        >
             <SiteLayoutClientContexts
-                forcedTheme={
-                    context.customization.themes.toggeable
-                        ? undefined
-                        : context.customization.themes.default
-                }
+                forcedTheme={theme.forcedTheme}
+                defaultTheme={theme.defaultTheme}
+                // Keep embed theme separate from site so it does not reuse the full site's saved theme and vice versa.
+                themeStorageKey={`gitbook-theme-embed:${context.site.id}`}
                 externalLinksTarget={context.customization.externalLinks.target}
                 contextId={context.contextId}
                 proxyOrigin={context.site.proxy?.origin}

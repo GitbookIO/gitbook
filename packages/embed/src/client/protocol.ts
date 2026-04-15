@@ -45,7 +45,7 @@ export type GitBookEmbeddableActionDefinition = {
  */
 export type GitBookEmbeddableConfiguration = {
     /** Tabs to display in the embed (if enabled on the site). */
-    tabs: ('assistant' | 'docs')[];
+    tabs: ('assistant' | 'docs' | 'search')[];
 
     /** Additional buttons to be displayed in the header of the GitBook embed. */
     actions: GitBookEmbeddableActionDefinition[];

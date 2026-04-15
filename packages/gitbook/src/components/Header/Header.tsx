@@ -5,7 +5,7 @@ import { getSpaceLanguage, t } from '@/intl/server';
 import { tcls } from '@/lib/tailwind';
 import type { SiteSpace } from '@gitbook/api';
 import { SocialAccountButton } from '../Footer/SocialAccounts';
-import { SearchContainer } from '../Search';
+import { SearchContainer, getSearchBaseProps } from '../Search';
 import { SiteSectionTabs, encodeClientSiteSections } from '../SiteSections';
 import { HeaderLink } from './HeaderLink';
 import { HeaderLinkMore } from './HeaderLinkMore';
@@ -26,7 +26,8 @@ export function Header(props: {
     };
 }) {
     const { context, withTopHeader, variants } = props;
-    const { siteSpace, visibleSiteSpaces, visibleSections, customization } = context;
+    const { siteSpace, visibleSections, customization } = context;
+    const searchProps = getSearchBaseProps(context);
 
     const withSections = Boolean(
         visibleSections &&
@@ -110,7 +111,7 @@ export function Header(props: {
                                     'hover:site-header:theme-bold:bg-header-link/3',
                                     variants.generic.length > 1
                                         ? 'lg:hidden'
-                                        : 'page-no-toc:hidden lg:hidden'
+                                        : 'no-sidebar:hidden lg:hidden'
                                 )}
                             />
                             <HeaderLogo context={context} />
@@ -143,28 +144,9 @@ export function Header(props: {
                             )}
                         >
                             <SearchContainer
+                                {...searchProps}
                                 style={customization.styling.search}
-                                withVariants={variants.generic.length > 1}
-                                withSiteVariants={
-                                    visibleSections?.list.some(
-                                        (s) =>
-                                            s.object === 'site-section' && s.siteSpaces.length > 1
-                                    ) ?? false
-                                }
-                                withSections={
-                                    visibleSections ? visibleSections.list.length > 1 : false
-                                }
-                                section={
-                                    visibleSections
-                                        ? // Client-encode to avoid a serialization issue that was causing the language selector to disappear
-                                          encodeClientSiteSections(context, visibleSections).current
-                                        : undefined
-                                }
-                                siteSpace={siteSpace}
-                                siteSpaces={visibleSiteSpaces}
-                                indexURL={context.linker.toPathInSite('~gitbook/site-index')}
                                 viewport={!withTopHeader ? 'mobile' : undefined}
-                                searchURL={context.linker.toPathInSpace('~gitbook/search')}
                             />
                         </div>
 

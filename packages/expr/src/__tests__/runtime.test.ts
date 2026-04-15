@@ -55,10 +55,52 @@ describe('ExpressionRuntime', () => {
                 expectedResult: true,
             },
             {
+                scenario: 'array includes',
+                condition: 'reviews.includes("approved")',
+                inputs: { reviews: ['pending', 'approved'] },
+                expectedResult: true,
+            },
+            {
                 scenario: 'array map',
                 condition: '[1, 2, 3].map(n => n * x)',
                 inputs: { x: 2 },
                 expectedResult: [2, 4, 6],
+            },
+            {
+                scenario: 'string startsWith',
+                condition: 'user.role.startsWith("ad")',
+                inputs: { user: { role: 'admin' } },
+                expectedResult: true,
+            },
+            {
+                scenario: 'string endsWith',
+                condition: 'user.role.endsWith("min")',
+                inputs: { user: { role: 'admin' } },
+                expectedResult: true,
+            },
+            {
+                scenario: 'string includes',
+                condition: 'user.role.includes("dm")',
+                inputs: { user: { role: 'admin' } },
+                expectedResult: true,
+            },
+            {
+                scenario: 'string toLowerCase',
+                condition: 'user.role.toLowerCase() === "admin"',
+                inputs: { user: { role: 'ADMIN' } },
+                expectedResult: true,
+            },
+            {
+                scenario: 'string toUpperCase',
+                condition: 'user.role.toUpperCase() === "ADMIN"',
+                inputs: { user: { role: 'admin' } },
+                expectedResult: true,
+            },
+            {
+                scenario: 'string trim',
+                condition: 'user.role.trim() === "admin"',
+                inputs: { user: { role: '  admin  ' } },
+                expectedResult: true,
             },
         ])(
             'should properly evaluate/safeEvaluate a valid conditional expression: $scenario',

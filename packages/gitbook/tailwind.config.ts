@@ -323,9 +323,13 @@ const config: Config = {
                 appear: 'appear 200ms ease both allow-discrete',
 
                 blurIn: 'blurIn 200ms ease-out both',
-                'blurIn-slow': 'blurIn 500ms ease-out both',
+                blurInSlow: 'blurIn 500ms ease-out both',
                 blurOut: 'blurOut 200ms ease-in both',
-                'blurOut-slow': 'blurOut 500ms ease-in both',
+                blurOutSlow: 'blurOut 500ms ease-in both',
+                blurInDisplay: 'blurInDisplay 200ms ease-out both',
+                blurInDisplaySlow: 'blurInDisplay 500ms ease-out both',
+                blurOutDisplay: 'blurOutDisplay 200ms ease-in both',
+                blurOutDisplaySlow: 'blurOutDisplay 500ms ease-in both',
 
                 enterFromLeft: 'enterFromLeft 300ms cubic-bezier(0.83, 0, 0.17, 1) both',
                 enterFromRight: 'enterFromRight 300ms cubic-bezier(0.83, 0, 0.17, 1) both',
@@ -473,18 +477,18 @@ const config: Config = {
                 },
                 enterFromRight: {
                     from: { opacity: '0', transform: 'translateX(50%)', display: 'none' },
-                    to: { opacity: '1', transform: 'translateX(0)', display: 'inherit' },
+                    to: { opacity: '1', transform: 'translateX(0)', display: 'flex' },
                 },
                 enterFromLeft: {
                     from: { opacity: '0', transform: 'translateX(-50%)', display: 'none' },
-                    to: { opacity: '1', transform: 'translateX(0)', display: 'inherit' },
+                    to: { opacity: '1', transform: 'translateX(0)', display: 'flex' },
                 },
                 exitToRight: {
-                    from: { opacity: '1', transform: 'translateX(0)', display: 'inherit' },
+                    from: { opacity: '1', transform: 'translateX(0)', display: 'flex' },
                     to: { opacity: '0', transform: 'translateX(50%)', display: 'none' },
                 },
                 exitToLeft: {
-                    from: { opacity: '1', transform: 'translateX(0)', display: 'inherit' },
+                    from: { opacity: '1', transform: 'translateX(0)', display: 'flex' },
                     to: { opacity: '0', transform: 'translateX(-50%)', display: 'none' },
                 },
                 scaleIn: {
@@ -496,12 +500,38 @@ const config: Config = {
                     to: { opacity: '0', transform: 'rotateX(-10deg) scale(0.95)' },
                 },
                 blurIn: {
-                    '0%': { filter: 'blur(6px)', opacity: '0', transform: 'scale(0.95)' },
-                    '100%': { filter: 'blur(0px)', opacity: '1', transform: 'scale(1)' },
+                    from: { filter: 'blur(6px)', opacity: '0', transform: 'scale(0.95)' },
+                    to: { filter: 'blur(0px)', opacity: '1', transform: 'scale(1)' },
                 },
                 blurOut: {
                     from: { filter: 'blur(0px)', opacity: '1', transform: 'scale(1)' },
-                    to: { filter: 'blur(16px)', opacity: '0', transform: 'scale(0.95)' },
+                    to: { filter: 'blur(6px)', opacity: '0', transform: 'scale(0.95)' },
+                },
+                blurInDisplay: {
+                    from: {
+                        filter: 'blur(6px)',
+                        opacity: '0',
+                        transform: 'scale(0.95)',
+                        display: 'none',
+                    },
+                    to: {
+                        filter: 'blur(0px)',
+                        opacity: '1',
+                        transform: 'scale(1)',
+                    },
+                },
+                blurOutDisplay: {
+                    from: {
+                        filter: 'blur(0px)',
+                        opacity: '1',
+                        transform: 'scale(1)',
+                    },
+                    to: {
+                        filter: 'blur(6px)',
+                        opacity: '0',
+                        transform: 'scale(0.95)',
+                        display: 'none',
+                    },
                 },
                 fadeOut: {
                     from: { opacity: '1' },
@@ -561,6 +591,18 @@ const config: Config = {
                     '2xl': '1.5em',
                 },
             },
+            width: {
+                screen: {
+                    xs: '480px',
+                    sm: '640px',
+                    md: '768px',
+                    lg: '1024px',
+                    xl: '1280px',
+                    '2xl': '1440px',
+                    '3xl': '1920px',
+                    '4xl': '2144px',
+                },
+            },
         },
         opacity: opacity(),
         screens: {
@@ -569,7 +611,7 @@ const config: Config = {
             md: '768px',
             lg: '1024px',
             xl: '1280px',
-            '2xl': '1536px',
+            '2xl': '1440px',
             '3xl': '1920px',
             '4xl': '2144px',
         },
@@ -662,28 +704,30 @@ const config: Config = {
             }
 
             /**
-             * Variant when the page contains a block that will be rendered in full-width mode.
+             * Layout mode variants for controlling the page structure.
+             * These variants are applied via body:has() selectors, allowing CSS to respond to layout state.
+             *
+             * The layout classes are applied consistently through CONTENT_STYLE in layout.ts and preserved on the
+             * <header> element during navigation (see PreservePageLayout component).
              */
-            addVariant('site-width-wide', 'body:has(.site-width-wide) &');
-            addVariant('site-width-default', 'body:has(.site-width-default) &');
-            addVariant('page-width-wide', 'body:has(.page-width-wide) &');
+            addVariant('layout-default', 'body:has(.layout-default) &');
+            addVariant('layout-wide', 'body:has(.layout-wide) & ');
 
             /**
-             * Variant when the page is configured to hide the table of content.
-             * `page.layout.tableOfContents` is set to false.
+             * TOC, Sidebar, Outline variants
              */
             addVariant('page-no-toc', 'body:has(.page-no-toc) &');
             addVariant('page-has-toc', 'body:has(.page-has-toc) &');
+            /* The left sidebar is shown when the TOC is visible or the page needs a sidebar, for the variant dropdown or if there's no header configured */
+            addVariant('has-sidebar', 'body:has(.page-has-toc, .has-sidebar) &');
+            addVariant('no-sidebar', 'body:has(.page-no-toc):has(.no-sidebar) &');
+            addVariant('page-has-outline', 'body:has([data-gb-page-outline]) &');
+            addVariant('page-no-outline', 'body:not(:has([data-gb-page-outline])) &');
 
             /**
              * Variant when the page contains an OpenAPI block.
              */
             addVariant('page-api-block', 'body:has(.openapi-block) &');
-
-            /**
-             * Variant when the page contains an Updates block.
-             */
-            addVariant('page-updates-block', 'body:has(.updates-block) &');
 
             /**
              * Variant when the page is displayed in print mode.

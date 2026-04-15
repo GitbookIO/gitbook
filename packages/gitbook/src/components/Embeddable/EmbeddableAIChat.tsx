@@ -10,9 +10,9 @@ import {
 } from '@/components/AIChat';
 import { useLanguage } from '@/intl/client';
 import * as api from '@gitbook/api';
-import React, { use, useMemo } from 'react';
+import React from 'react';
 import { useTrackEvent } from '../Insights';
-import { LinkContext, type LinkContextType } from '../primitives';
+import { LinkContext } from '../primitives';
 import {
     EmbeddableFrame,
     EmbeddableFrameBody,
@@ -27,7 +27,7 @@ import {
     EmbeddableIframeButtons,
     EmbeddableIframeCloseButton,
     EmbeddableIframeTabs,
-    useEmbeddableConfiguration,
+    useEmbeddableLinkContext,
 } from './EmbeddableIframeAPI';
 
 type EmbeddableAIChatProps = {
@@ -43,7 +43,6 @@ export function EmbeddableAIChat(props: EmbeddableAIChatProps) {
     const chat = useAIChatState();
     const { config: siteConfig } = useAI();
     const chatController = useAIChatController();
-    const embedConfig = useEmbeddableConfiguration();
     const language = useLanguage();
 
     React.useEffect(() => {
@@ -65,21 +64,8 @@ export function EmbeddableAIChat(props: EmbeddableAIChatProps) {
     }, [trackEvent]);
 
     const tabsRef = React.useRef<HTMLDivElement>(null);
-    const hasDocsTab = embedConfig.tabs.includes('docs');
     const trademark = siteConfig.trademark;
-    const currentLinkContext = use(LinkContext);
-    const linkContext: LinkContextType = useMemo(
-        () =>
-            hasDocsTab
-                ? { ...currentLinkContext, externalTarget: '_blank' }
-                : {
-                      ...currentLinkContext,
-                      isExternalClient: () => true,
-                      isExternalServer: () => true,
-                      externalTarget: '_blank',
-                  },
-        [hasDocsTab, currentLinkContext]
-    );
+    const { linkContext } = useEmbeddableLinkContext();
 
     return (
         <EmbeddableFrame>

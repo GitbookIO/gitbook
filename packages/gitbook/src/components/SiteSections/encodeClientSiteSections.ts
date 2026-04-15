@@ -29,7 +29,7 @@ export type ClientSiteSectionGroup = Pick<SiteSectionGroup, 'id' | 'title' | 'ic
  */
 export function encodeClientSiteSections(context: GitBookSiteContext, sections: SiteSections) {
     const { list, current } = sections;
-    const currentLanguage = context.siteSpace.space.language;
+    const currentLanguage = context.locale;
 
     const clientSections: (ClientSiteSection | ClientSiteSectionGroup)[] = [];
 
@@ -72,7 +72,7 @@ function encodeChildren(
     children: (SiteSection | SiteSectionGroup)[]
 ): (ClientSiteSection | ClientSiteSectionGroup)[] {
     const clientChildren: (ClientSiteSection | ClientSiteSectionGroup)[] = [];
-    const currentLanguage = context.siteSpace.space.language;
+    const currentLanguage = context.locale;
 
     for (const child of children) {
         switch (child.object) {
@@ -106,7 +106,7 @@ function encodeChildren(
 }
 
 function encodeSection(context: GitBookSiteContext, section: SiteSection) {
-    const currentLanguage = context.siteSpace.space.language;
+    const currentLanguage = context.locale;
     return {
         id: section.id,
         title: getLocalizedTitle(section, currentLanguage),

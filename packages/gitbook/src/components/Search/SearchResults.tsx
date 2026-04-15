@@ -107,10 +107,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
                     const index = refs.current.indexOf(entry.target as HTMLAnchorElement);
                     if (index === -1) continue;
                     const result = results[index];
-                    if (
-                        !result ||
-                        result.type !== 'local-page'
-                    ) {
+                    if (!result || result.type !== 'local-page') {
                         continue;
                     }
                     const key = getResultKey(result);

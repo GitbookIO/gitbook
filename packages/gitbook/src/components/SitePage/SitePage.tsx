@@ -1,8 +1,8 @@
 import type { GitBookSiteContext } from '@/lib/context';
 import { getDataOrNull, getPageDocument } from '@/lib/data';
 import {
+    CustomizationDefaultThemeMode,
     CustomizationHeaderPreset,
-    CustomizationThemeMode,
     type RevisionPageDocument,
     SiteInsightsDisplayContext,
     type TranslationLanguage,
@@ -114,10 +114,14 @@ export async function generateSitePageViewport(context: GitBookSiteContext): Pro
 
     return {
         colorScheme: customization.themes.toggeable
-            ? customization.themes.default === CustomizationThemeMode.Dark
+            ? customization.themes.default === CustomizationDefaultThemeMode.Dark
                 ? 'dark light'
                 : 'light dark'
-            : customization.themes.default,
+            : customization.themes.default === CustomizationDefaultThemeMode.Dark
+              ? 'dark'
+              : customization.themes.default === CustomizationDefaultThemeMode.Light
+                ? 'light'
+                : 'light dark', // 'system' → let browser decide based on OS preference
     };
 }
 
@@ -126,7 +130,7 @@ export async function generateSitePageViewport(context: GitBookSiteContext): Pro
  */
 function getSiteStructureTitle(context: GitBookSiteContext): string | null {
     const { visibleSections: sections, siteSpace, visibleSiteSpaces: siteSpaces } = context;
-    const currentLanguage = siteSpace.space.language;
+    const currentLanguage = context.locale;
 
     const title = [];
     if (

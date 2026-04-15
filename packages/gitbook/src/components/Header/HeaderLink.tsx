@@ -11,19 +11,19 @@ import assertNever from 'assert-never';
 import type React from 'react';
 
 import { resolveContentRef } from '@/lib/references';
+import { getLocalizedTitle } from '@/lib/sites';
 import { tcls } from '@/lib/tailwind';
-
+import {
+    SiteAuthLoginButton,
+    SiteAuthLoginDropdownMenuItem,
+    SiteAuthLoginLink,
+} from '../SiteAuth/SiteAuthLoginLink';
 import { Button, Link, ToggleChevron } from '../primitives';
 import {
     type DropdownButtonProps,
     DropdownMenu,
     DropdownMenuItem,
 } from '../primitives/DropdownMenu';
-import {
-    SiteAuthLoginButton,
-    SiteAuthLoginDropdownMenuItem,
-    SiteAuthLoginLink,
-} from '../primitives/SiteAuthLoginLink';
 
 export async function HeaderLink(props: {
     context: GitBookSiteContext;
@@ -35,6 +35,7 @@ export async function HeaderLink(props: {
     const target = link.to ? await resolveContentRef(link.to, context) : null;
     const headerPreset = customization.header.preset;
     const linkStyle = link.style ?? 'link';
+    const title = getLocalizedTitle(link, context.locale);
 
     if (link.links && link.links.length > 0) {
         return (
@@ -42,13 +43,13 @@ export async function HeaderLink(props: {
                 className={`shrink ${customization.styling.search === 'prominent' ? 'right-0 left-auto' : null}`}
                 button={
                     !target || !link.to ? (
-                        <HeaderItemDropdown headerPreset={headerPreset} title={link.title} />
+                        <HeaderItemDropdown headerPreset={headerPreset} title={title} />
                     ) : (
                         <HeaderLinkNavItem
                             linkTarget={link.to}
                             linkStyle={linkStyle}
                             headerPreset={headerPreset}
-                            title={link.title}
+                            title={title}
                             isDropdown
                             href={target?.href}
                             isSiteAuthLoginHref={isSiteAuthLoginHref(context.linker, target.href)}
@@ -73,7 +74,7 @@ export async function HeaderLink(props: {
             linkTarget={link.to}
             linkStyle={linkStyle}
             headerPreset={headerPreset}
-            title={link.title}
+            title={title}
             isDropdown={false}
             href={target?.href}
             isSiteAuthLoginHref={target ? isSiteAuthLoginHref(context.linker, target.href) : false}
@@ -235,6 +236,7 @@ async function SubHeaderLink(props: {
         return null;
     }
 
+    const title = getLocalizedTitle(link, context.locale);
     const sharedProps = {
         href: target.href,
         insights: {
@@ -247,8 +249,8 @@ async function SubHeaderLink(props: {
     };
 
     return isSiteAuthLoginHref(context.linker, target.href) ? (
-        <SiteAuthLoginDropdownMenuItem {...sharedProps}>{link.title}</SiteAuthLoginDropdownMenuItem>
+        <SiteAuthLoginDropdownMenuItem {...sharedProps}>{title}</SiteAuthLoginDropdownMenuItem>
     ) : (
-        <DropdownMenuItem {...sharedProps}>{link.title}</DropdownMenuItem>
+        <DropdownMenuItem {...sharedProps}>{title}</DropdownMenuItem>
     );
 }

@@ -9,7 +9,6 @@ import type React from 'react';
 import { Footer } from '@/components/Footer';
 import { Header, HeaderLogo } from '@/components/Header';
 import { TableOfContents } from '@/components/TableOfContents';
-import { CONTAINER_STYLE } from '@/components/layout';
 import type { VisitorAuthClaims } from '@/lib/adaptive';
 import { GITBOOK_APP_URL } from '@/lib/env';
 import { tcls } from '@/lib/tailwind';
@@ -20,9 +19,10 @@ import { AdaptiveVisitorContextProvider } from '../Adaptive';
 import { Announcement } from '../Announcement';
 import { SpacesDropdown, TranslationsDropdown } from '../Header/SpacesDropdown';
 import { InsightsProvider, VisitorProvider } from '../Insights';
-import { SearchContainer } from '../Search';
+import { SearchContainer, getSearchBaseProps } from '../Search';
 import { SiteSectionList, encodeClientSiteSections } from '../SiteSections';
 import { CurrentContentProvider } from '../hooks';
+import { CONTAINER_STYLE } from '../layout';
 import { NavigationLoader } from '../primitives/NavigationLoader';
 import { SpaceLayoutContextProvider } from './SpaceLayoutContext';
 import { categorizeVariants } from './categorizeVariants';
@@ -51,6 +51,10 @@ export function SpaceLayoutServerContext(props: SpaceLayoutProps) {
         props;
 
     const { customization } = context;
+    const siteAdaptiveAuthLoginHref =
+        context.site.adaptiveContent?.enabled && context.site.urls.login
+            ? context.linker.toPathInSite('~gitbook/auth/login')
+            : null;
 
     const eventUrl = new URL(
         context.linker.toAbsoluteURL(context.linker.toPathInSite('/~gitbook/__evt'))
@@ -63,7 +67,10 @@ export function SpaceLayoutServerContext(props: SpaceLayoutProps) {
     );
 
     return (
-        <SpaceLayoutContextProvider basePath={context.linker.toPathInSpace('')}>
+        <SpaceLayoutContextProvider
+            basePath={context.linker.toPathInSpace('')}
+            siteAdaptiveAuthLoginHref={siteAdaptiveAuthLoginHref}
+        >
             <AdaptiveVisitorContextProvider
                 contextId={context.contextId}
                 visitorClaimsURL={getVisitorClaimsUrl}
@@ -99,7 +106,8 @@ export function SpaceLayoutServerContext(props: SpaceLayoutProps) {
  */
 export function SpaceLayout(props: SpaceLayoutProps) {
     const { context, children } = props;
-    const { siteSpace, customization, visibleSections, visibleSiteSpaces } = context;
+    const { siteSpace, customization, visibleSections } = context;
+    const searchProps = getSearchBaseProps(context);
 
     const withTopHeader = customization.header.preset !== CustomizationHeaderPreset.None;
 
@@ -121,7 +129,8 @@ export function SpaceLayout(props: SpaceLayoutProps) {
             <NavigationLoader />
             {customization.ai?.mode === CustomizationAIMode.Assistant ? <AIChat /> : null}
 
-            <div className="transition-all duration-300 motion-reduce:transition-none lg:chat-open:mr-80 xl:chat-open:mr-96">
+            {/* Chat panel shifts content left when open */}
+            <div className="motion-safe:transition-all motion-safe:duration-300 lg:chat-open:mr-80 xl:chat-open:mr-96">
                 <div
                     className={tcls(
                         'flex',
@@ -129,15 +138,19 @@ export function SpaceLayout(props: SpaceLayoutProps) {
                         'lg:flex-row',
                         'lg:justify-center',
                         CONTAINER_STYLE,
-                        'site-width-wide:max-w-screen-4xl',
-                        'transition-[max-width] duration-300 motion-reduce:transition-none',
+                        'transition-[max-width] duration-300',
+
+                        !withTopHeader || variants.generic.length > 1
+                            ? 'has-sidebar'
+                            : 'no-sidebar',
 
                         // Ensure the footer is display below the viewport even if the content is not enough
-                        withFooter && [
-                            'site-header:min-h-[calc(100vh-64px)]',
-                            'site-header-sections:min-h-[calc(100vh-108px)]',
-                        ],
-                        withTopHeader ? null : 'lg:min-h-screen'
+                        withTopHeader
+                            ? [
+                                  'site-header:min-h-[calc(100vh-65px)]',
+                                  'site-header-sections:min-h-[calc(100vh-109px)]',
+                              ]
+                            : 'lg:min-h-screen'
                     )}
                 >
                     <TableOfContents
@@ -187,26 +200,9 @@ export function SpaceLayout(props: SpaceLayoutProps) {
                                     {!withTopHeader && (
                                         <div className="flex gap-2 max-lg:hidden">
                                             <SearchContainer
+                                                {...searchProps}
                                                 style={CustomizationSearchStyle.Subtle}
-                                                withVariants={variants.generic.length > 1}
-                                                withSiteVariants={
-                                                    visibleSections?.list.some(
-                                                        (s) =>
-                                                            s.object === 'site-section' &&
-                                                            s.siteSpaces.length > 1
-                                                    ) ?? false
-                                                }
-                                                withSections={withSections}
-                                                section={visibleSections?.current}
-                                                siteSpace={siteSpace}
-                                                siteSpaces={visibleSiteSpaces}
-                                                indexURL={context.linker.toPathInSite(
-                                                    '~gitbook/site-index'
-                                                )}
                                                 viewport="desktop"
-                                                searchURL={context.linker.toPathInSpace(
-                                                    '~gitbook/search'
-                                                )}
                                             />
                                         </div>
                                     )}

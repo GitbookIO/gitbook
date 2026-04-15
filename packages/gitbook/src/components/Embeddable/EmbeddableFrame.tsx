@@ -30,11 +30,13 @@ export const EmbeddableFrame = React.forwardRef<HTMLDivElement, EmbeddableFrameP
     }
 );
 
-export function EmbeddableFrameMain(props: React.ComponentProps<'div'>) {
-    const { children, ...rest } = props;
+export function EmbeddableFrameMain(
+    props: React.ComponentProps<'div'> & { className?: ClassValue }
+) {
+    const { children, className, ...rest } = props;
 
     return (
-        <div className="flex flex-1 flex-col overflow-hidden" {...rest}>
+        <div className={tcls('flex flex-1 flex-col overflow-hidden', className)} {...rest}>
             {children}
         </div>
     );

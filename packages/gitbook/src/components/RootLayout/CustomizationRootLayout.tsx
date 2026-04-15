@@ -1,8 +1,8 @@
 import {
+    CustomizationDefaultThemeMode,
     CustomizationIconsStyle,
     CustomizationSidebarBackgroundStyle,
     CustomizationSidebarListStyle,
-    CustomizationThemeMode,
     type CustomizationThemedColor,
     type CustomizationTint,
     type SiteCustomizationSettings,
@@ -23,7 +23,7 @@ import * as ReactDOM from 'react-dom';
 
 import { type FontData, getFontData } from '@/fonts';
 import { fontNotoColorEmoji, fonts } from '@/fonts/default';
-import { getSpaceLanguage, getSpaceLocale } from '@/intl/server';
+import { getContentLocale, getSpaceLanguage } from '@/intl/server';
 import { getAssetURL } from '@/lib/assets';
 import { tcls } from '@/lib/tailwind';
 
@@ -61,7 +61,7 @@ export async function CustomizationRootLayout(props: {
     htmlClassName?: string;
     /** The class name to apply to the body element. */
     bodyClassName?: string;
-    forcedTheme?: CustomizationThemeMode | null;
+    forcedTheme?: CustomizationDefaultThemeMode | null;
     context: GitBookAnyContext;
     children: React.ReactNode;
 }) {
@@ -69,7 +69,7 @@ export async function CustomizationRootLayout(props: {
     const customization =
         'customization' in context ? context.customization : defaultCustomization();
 
-    const locale = getSpaceLocale(context);
+    const locale = getContentLocale(context);
     const language = getSpaceLanguage(context);
     const tintColor = getTintColor(customization);
     const mixColor = getTintMixColor(customization.styling.primaryColor, tintColor);
@@ -108,7 +108,7 @@ export async function CustomizationRootLayout(props: {
                     : null,
 
                 // Set the dark/light class statically to avoid flashing and make it work when JS is disabled
-                (forcedTheme ?? customization.themes.default) === CustomizationThemeMode.Dark
+                (forcedTheme ?? customization.themes.default) === CustomizationDefaultThemeMode.Dark
                     ? 'dark'
                     : '',
                 htmlClassName

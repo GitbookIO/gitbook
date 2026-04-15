@@ -83,6 +83,14 @@ export async function resolveOpenAPIOperation(
                 : undefined,
         'x-enable-proxy':
             typeof schema['x-enable-proxy'] === 'boolean' ? schema['x-enable-proxy'] : undefined,
+        'x-expandAllResponses':
+            typeof schema['x-expandAllResponses'] === 'boolean'
+                ? schema['x-expandAllResponses']
+                : undefined,
+        'x-expandAllModelSections':
+            typeof schema['x-expandAllModelSections'] === 'boolean'
+                ? schema['x-expandAllModelSections']
+                : undefined,
     };
 }
 

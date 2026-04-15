@@ -1,5 +1,70 @@
 # gitbook
 
+## 0.24.0
+
+### Minor Changes
+
+- 50653ab: Redirect sitemap.md and .well-known/sitemap.md to llms.txt.
+- 50653ab: Improve AI agent detection and readability by outputting 200 for page not found.
+
+### Patch Changes
+
+- 126d4b7: Improve Assistant form controls
+- Updated dependencies [8242f18]
+  - @gitbook/expr@1.2.5
+  - @gitbook/react-openapi@1.5.12
+
+## 0.23.2
+
+### Patch Changes
+
+- Updated dependencies [ab17ff4]
+  - @gitbook/icons@0.4.6
+  - @gitbook/react-contentkit@0.7.15
+
+## 0.23.1
+
+### Patch Changes
+
+- Updated dependencies [3c141f0]
+  - @gitbook/icons@0.4.5
+  - @gitbook/react-contentkit@0.7.14
+
+## 0.23.0
+
+### Minor Changes
+
+- 8e5a2aa: Pan and zoom controls for mermaid diagrams
+
+### Patch Changes
+
+- b77c4fc: Add getPage MCP tool
+- 31e77d4: Track new events for site analytics.
+- f884477: Associate questions asked in the embeddable assistant to the proper channel.
+- deabce9: Sort results by score to mix records and pages.
+- 4909044: Add Claude Code and Codex connect actions
+- da648ca: Fix regressions in Assistant UX
+- 3ce7e52: Fix Variant dropdown not showing in GitBook embed
+- 7f4e644: Small OpenAPI Improvements
+- 4787b7e: Use localized titles/descriptions for site entities
+- 7ab6351: Import site redirect patterns from @gitbook/api
+- b40465e: Fix normalization of URL causing invalid redirections.
+- b5d6f2e: Fix translation quality across 11 locales
+- 3151864: Track events from the proper server URL.
+- 16bfafe: Add option to sticky header row in tables
+- 7c2823c: Fix full width header alignment
+- c4a2604: Fix PDF export crash when page contains an OpenAPI block
+- c56b569: Support expand-all options for OpenAPI
+- Updated dependencies [7f4e644]
+- Updated dependencies [b5d6f2e]
+- Updated dependencies [9dd2db6]
+- Updated dependencies [c56b569]
+- Updated dependencies [ccd21e4]
+  - @gitbook/react-openapi@1.5.11
+  - @gitbook/openapi-parser@3.0.11
+  - @gitbook/icons@0.4.4
+  - @gitbook/react-contentkit@0.7.13
+
 ## 0.22.3
 
 ### Patch Changes

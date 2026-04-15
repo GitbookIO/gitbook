@@ -8,16 +8,32 @@ type TranslationLocale = keyof typeof languages;
 export const DEFAULT_LOCALE = 'en' satisfies TranslationLocale;
 
 /**
+ * Get the locale to use for the HTML lang attribute.
+ * This returns the actual content language even if we don't have UI translations for it.
+ */
+export function getContentLocale(context: GitBookAnyContext): string {
+    if (context.locale) {
+        return context.locale;
+    }
+
+    const customization = 'site' in context ? context.customization : null;
+    if (customization) {
+        return customization.internationalization.locale;
+    }
+
+    return DEFAULT_LOCALE;
+}
+
+/**
  * Get the locale to use for a space.
  */
 export function getSpaceLocale(context: GitBookAnyContext): TranslationLocale {
-    const { space } = context;
     const customization = 'site' in context ? context.customization : null;
 
     // If the language is configured in the space, use it in priority
-    if (space.language) {
-        if (checkIsValidLocale(space.language)) {
-            return space.language;
+    if (context.locale) {
+        if (checkIsValidLocale(context.locale)) {
+            return context.locale;
         }
         return DEFAULT_LOCALE;
     }

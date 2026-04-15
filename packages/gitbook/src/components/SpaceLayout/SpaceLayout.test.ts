@@ -12,6 +12,7 @@ type FakeSiteSpace = {
 function makeContext(current: FakeSiteSpace, all: FakeSiteSpace[]) {
     return {
         // Only the properties used by categorizeVariants are required for these tests
+        locale: current.space.language,
         siteSpace: current,
         siteSpaces: all,
         visibleSiteSpaces: all,
@@ -47,6 +48,51 @@ const unsupportedLanguage = {
     id: 'unsupported',
     title: 'Docs in Unsupported Language',
     space: { language: 'xx' as TranslationLanguage },
+};
+const version20En = {
+    id: 'v20-en',
+    title: 'v20',
+    space: { language: TranslationLanguage.En },
+};
+const version20Fr = {
+    id: 'v20-fr',
+    title: 'v20',
+    space: { language: TranslationLanguage.Fr },
+};
+const version20It = {
+    id: 'v20-it',
+    title: 'v20',
+    space: { language: TranslationLanguage.It },
+};
+const version19En = {
+    id: 'v19-en',
+    title: 'v19',
+    space: { language: TranslationLanguage.En },
+};
+const version19Fr = {
+    id: 'v19-fr',
+    title: 'v19',
+    space: { language: TranslationLanguage.Fr },
+};
+const version19It = {
+    id: 'v19-it',
+    title: 'v19',
+    space: { language: TranslationLanguage.It },
+};
+const version15En = {
+    id: 'v15-en',
+    title: 'v15',
+    space: { language: TranslationLanguage.En },
+};
+const version15Fr = {
+    id: 'v15-fr',
+    title: 'v15',
+    space: { language: TranslationLanguage.Fr },
+};
+const version15It = {
+    id: 'v15-it',
+    title: 'v15',
+    space: { language: TranslationLanguage.It },
 };
 
 describe('categorizeVariants', () => {
@@ -123,6 +169,29 @@ describe('categorizeVariants', () => {
         expect(result.translations.map((s) => ({ id: s.id, title: s.title }))).toEqual([
             { id: 'en-a', title: languages.en.language },
             { id: 'fr-a', title: languages.fr.language },
+        ]);
+    });
+
+    it('prefers the space with the same title when switching languages', () => {
+        const ctx = makeContext(version15It, [
+            version20En,
+            version20Fr,
+            version20It,
+            version19En,
+            version19Fr,
+            version19It,
+            version15En,
+            version15Fr,
+            version15It,
+        ]);
+
+        const result = categorizeVariants(ctx);
+
+        expect(result.generic.map((s) => s.id)).toEqual(['v20-it', 'v19-it', 'v15-it']);
+        expect(result.translations.map((s) => ({ id: s.id, title: s.title }))).toEqual([
+            { id: 'v15-en', title: languages.en.language },
+            { id: 'v15-fr', title: languages.fr.language },
+            { id: 'v15-it', title: languages.it.language },
         ]);
     });
 

@@ -1,6 +1,8 @@
 'use client';
 
 import { Button, Input } from '@/components/primitives';
+import { ScrollContainer } from '@/components/primitives/ScrollContainer';
+import { tString, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
 import * as React from 'react';
 import { z } from 'zod';
@@ -11,6 +13,7 @@ const OTHER_OPTION_ID = '$other';
 
 export const SingleChoiceControlOutputSchema = z.object({
     id: z.string().describe('The identifier of the option selected by the user.'),
+    label: z.string().describe('The label of the option selected by the user.'),
     input: z
         .string()
         .optional()
@@ -21,7 +24,7 @@ export const SingleChoiceControlDef = createAIControl({
     name: 'single-choice',
     exposeAsTool: true,
     description:
-        'Use this control when you need the user to choose exactly one option from a predefined list.',
+        'Use this control whenever you need the user to choose exactly one option from a predefined list. Important: NEVER write an "Other" choice yourself to the `options` array, pass the `allowOther` property as `true` to add it automatically instead.',
     inputSchema: z.object({
         prompt: z
             .string()
@@ -44,7 +47,7 @@ export const SingleChoiceControlDef = createAIControl({
                             .string()
                             .optional()
                             .describe(
-                                'Optionally provide supporting details to help the user understand this option.'
+                                'Optionally provide supporting details to help the user understand this option. Keep it concise and do not repeat the label.'
                             ),
                     })
                     .describe('Define one selectable option the user can pick.')
@@ -70,14 +73,16 @@ function SingleChoiceControl(props: GetAIControlProps<typeof SingleChoiceControl
     const [selectedId, setSelectedId] = React.useState<string | null>(null);
     const [otherInput, setOtherInput] = React.useState('');
 
+    const language = useLanguage();
+
     const canSubmit =
         selectedId !== null &&
         (selectedId !== OTHER_OPTION_ID || (allowOther && otherInput.trim().length > 0));
 
     return (
         <AIToolContainer className="flex w-full flex-col gap-2">
-            <div className="no-scrollbar flex flex-1 flex-col gap-1 overflow-auto">
-                <p className="mb-1 font-semibold text-sm">{prompt}</p>
+            <p className="px-2 pt-1 font-semibold text-sm">{prompt}</p>
+            <ScrollContainer orientation="vertical" contentClassName="flex flex-col gap-2">
                 {options.map((option) => {
                     const isSelected = selectedId === option.id;
                     return (
@@ -89,17 +94,18 @@ function SingleChoiceControl(props: GetAIControlProps<typeof SingleChoiceControl
                                 setSelectedId(option.id);
                             }}
                             className={tcls(
-                                'circular-corners:rounded-3xl rounded-corners:rounded-xl border px-3 py-2 text-left transition-colors',
+                                'text-left transition-colors',
+                                'circular-corners:rounded-3xl rounded-corners:rounded-xl px-2 py-1 text-left transition-colors',
                                 isSelected
-                                    ? 'border-primary-original bg-primary-subtle text-tint-strong'
-                                    : 'border-tint bg-tint-base hover:bg-tint-subtle'
+                                    ? 'bg-primary text-tint-strong contrast-more:bg-primary-active'
+                                    : 'hover:bg-tint contrast-more:hover:bg-tint-hover'
                             )}
                         >
-                            <div className="flex items-center gap-3">
+                            <div className="flex items-center gap-2">
                                 <span
                                     aria-hidden
                                     className={tcls(
-                                        'mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full border transition-colors',
+                                        'mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full border bg-tint-base transition-colors',
                                         isSelected
                                             ? 'border-primary-original'
                                             : 'border-tint-subtle'
@@ -115,7 +121,7 @@ function SingleChoiceControl(props: GetAIControlProps<typeof SingleChoiceControl
                                 <span className="min-w-0">
                                     <p className="font-medium text-sm">{option.label}</p>
                                     {option.description ? (
-                                        <p className="mt-0.5 text-sm text-tint-subtle">
+                                        <p className="mt-0.5 text-tint-subtle text-xs">
                                             {option.description}
                                         </p>
                                     ) : null}
@@ -129,58 +135,58 @@ function SingleChoiceControl(props: GetAIControlProps<typeof SingleChoiceControl
                     <button
                         type="button"
                         data-testid="ai-chat-tool-single-choice-option-other"
+                        tabIndex={-1} // The input is already focusable, so prevent focus on the wrapper button
                         onClick={() => {
                             setSelectedId(OTHER_OPTION_ID);
                         }}
-                        className={tcls(
-                            'circular-corners:rounded-3xl rounded-corners:rounded-xl border px-3 py-2 text-left transition-colors',
-                            selectedId === OTHER_OPTION_ID
-                                ? 'border-primary-original bg-primary-subtle text-tint-strong'
-                                : 'border-tint bg-tint-base hover:bg-tint-subtle'
-                        )}
                     >
-                        <div className="flex items-center gap-3">
-                            <span
-                                aria-hidden
-                                className={tcls(
-                                    'mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full border transition-colors',
-                                    selectedId === OTHER_OPTION_ID
-                                        ? 'border-primary-original'
-                                        : 'border-tint-subtle'
-                                )}
-                            >
+                        <Input
+                            label={tString(language, 'form_other_prompt')}
+                            value={otherInput}
+                            onValueChange={setOtherInput}
+                            data-testid="ai-chat-tool-single-choice-other-input"
+                            placeholder={tString(
+                                language,
+                                selectedId === OTHER_OPTION_ID
+                                    ? 'form_other_prompt'
+                                    : 'form_other_field'
+                            )}
+                            className={tcls(
+                                'grow gap-2 border-0 px-2 ring-inset **:placeholder:text-tint',
+                                selectedId === OTHER_OPTION_ID
+                                    ? 'bg-primary text-tint-strong hover:bg-primary contrast-more:bg-primary-active'
+                                    : 'hover:not-focus-within:bg-tint contrast-more:hover:bg-tint-hover'
+                            )}
+                            sizing="small"
+                            leading={
                                 <span
+                                    aria-hidden
                                     className={tcls(
-                                        'size-2.5 rounded-full transition-colors',
+                                        'mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full border bg-tint-base transition-colors',
                                         selectedId === OTHER_OPTION_ID
-                                            ? 'bg-primary-original'
-                                            : 'bg-transparent'
+                                            ? 'border-primary-original'
+                                            : 'border-tint-subtle'
                                     )}
-                                />
-                            </span>
-                            <div className="flex flex-1 flex-col gap-1">
-                                <p className="font-medium text-sm">Other</p>
-                                {allowOther && selectedId === OTHER_OPTION_ID ? (
-                                    <Input
-                                        label="Enter your answer"
-                                        value={otherInput}
-                                        onValueChange={setOtherInput}
-                                        data-testid="ai-chat-tool-single-choice-other-input"
-                                        autoFocus
-                                        className="w-full"
-                                        sizing="small"
+                                >
+                                    <span
+                                        className={tcls(
+                                            'size-2.5 rounded-full transition-colors',
+                                            selectedId === OTHER_OPTION_ID
+                                                ? 'bg-primary-original'
+                                                : 'bg-transparent'
+                                        )}
                                     />
-                                ) : null}
-                            </div>
-                        </div>
+                                </span>
+                            }
+                        />
                     </button>
                 ) : null}
-            </div>
+            </ScrollContainer>
 
             <Button
                 data-testid="ai-chat-tool-single-choice-submit"
                 variant="primary"
-                label="Submit answer"
+                label={tString(language, 'submit')}
                 disabled={!canSubmit}
                 onClick={() => {
                     if (!canSubmit || !selectedId) {
@@ -190,12 +196,16 @@ function SingleChoiceControl(props: GetAIControlProps<typeof SingleChoiceControl
                     if (selectedId === OTHER_OPTION_ID) {
                         onSubmit({
                             id: OTHER_OPTION_ID,
+                            label: 'Other',
                             input: otherInput.trim(),
                         });
                         return;
                     }
 
-                    onSubmit({ id: selectedId });
+                    onSubmit({
+                        id: selectedId,
+                        label: options.find((option) => option.id === selectedId)?.label || '',
+                    });
                 }}
             />
         </AIToolContainer>

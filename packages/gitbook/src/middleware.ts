@@ -3,7 +3,7 @@ import {
     SiteInsightsDisplayContext,
     SiteInsightsLLMSVariant,
 } from '@gitbook/api';
-import Negotiator from 'negotiator';
+import { shouldServeMarkdown } from '@vercel/agent-readability';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import rison from 'rison';
@@ -22,7 +22,9 @@ import { GITBOOK_OAUTH_SERVER_URL, isGitBookAssetsHostURL, isGitBookHostURL } fr
 import { getImageResizingContextId } from '@/lib/images';
 import { MiddlewareHeaders } from '@/lib/middleware';
 import {
+    createOAuthProtectedResourceMetadataResponse,
     handleUnauthedOAuthProtectedResourceRequest,
+    isOAuthProtectedResourceMetadataRequest,
     isOAuthProtectedResourceRequest,
 } from '@/lib/oauth-protected';
 import { removeLeadingSlash, removeTrailingSlash } from '@/lib/paths';
@@ -291,6 +293,16 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
             }
 
             return createRedirectResponse(siteURLData.redirect);
+        }
+
+        // Handles OAuth protected resource metadata for non-VA adaptive content sites.
+        // If the requested URL resolved directly to a site, synthesize the metadata response immediately.
+        if (isOAuthProtectedResourceMetadataRequest(siteRequestURL)) {
+            return createOAuthProtectedResourceMetadataResponse({
+                siteRequestURL,
+                siteId: siteURLData.site,
+                urlMode: mode,
+            });
         }
 
         cookies.push(
@@ -640,6 +652,10 @@ const RSS_PATH_REGEX = /^((\S+)\/)?rss\.xml$/;
 const MARKDOWN_PATH_REGEX = /\.md$/;
 const LLMS_FULL_PATH_REGEX = /^llms-full\.txt\/\d+$/;
 const EMBED_PAGE_PATH_REGEX = /^~gitbook\/embed\/page(\/(\S*))?$/;
+const PATH_ALIASES: Record<string, string> = {
+    'sitemap.md': 'llms.txt',
+    '.well-known/sitemap.md': 'llms.txt',
+};
 
 /**
  * Encode path in a site content.
@@ -653,7 +669,7 @@ function encodePathInSiteContent(
     routeType?: 'static' | 'dynamic';
     events?: ServerInsightsEventInput[] | undefined;
 } {
-    const pathname = removeLeadingSlash(removeTrailingSlash(rawPathname));
+    let pathname = removeLeadingSlash(removeTrailingSlash(rawPathname));
 
     if (pathname.match(/^~gitbook\/ogimage\/\S+$/)) {
         return { pathname };
@@ -701,9 +717,11 @@ function encodePathInSiteContent(
         };
     }
 
+    pathname = PATH_ALIASES[pathname] || pathname;
     switch (pathname) {
         case '~gitbook/embed':
         case '~gitbook/embed/assistant':
+        case '~gitbook/embed/search':
         case '~gitbook/icon':
             return { pathname };
         // LLMs.txt, sitemap, sitemap-pages and robots.txt are always static
@@ -726,7 +744,6 @@ function encodePathInSiteContent(
                     },
                 ],
             };
-        case '~gitbook/mcp':
         case 'sitemap.xml':
         case 'sitemap-pages.xml':
         case 'robots.txt':
@@ -736,6 +753,8 @@ function encodePathInSiteContent(
             // LLMs.txt, sitemap, sitemap-pages and robots.txt are always static
             // as they only depend on the site structure / pages.
             return { pathname, routeType: 'static' };
+        case '~gitbook/mcp':
+        case '~gitbook/mcp/auth':
         case '~gitbook/pdf':
         case '~gitbook/search':
         case '~gitbook/auth/login':
@@ -743,9 +762,9 @@ function encodePathInSiteContent(
             // PDF, search and auth routes are always dynamic as they depend on the request.
             return { pathname, routeType: 'dynamic' };
         default: {
-            // If the pathname is a markdown file or the request is accepting markdown,
+            // If the pathname is a markdown file or the request is ing markdown,
             // we rewrite it to ~gitbook/markdown/:pathname
-            if (pathname.match(MARKDOWN_PATH_REGEX) || isMarkdownPreferred(request)) {
+            if (pathname.match(MARKDOWN_PATH_REGEX) || shouldServeMarkdown(request).serve) {
                 const pagePathWithoutMD = pathname.replace(MARKDOWN_PATH_REGEX, '');
                 return {
                     pathname: `~gitbook/markdown/${encodePagePath(pagePathWithoutMD)}`,
@@ -799,17 +818,4 @@ async function writeResponseCookies<R extends NextResponse>(
     });
 
     return response;
-}
-
-const MARKDOWN_MEDIA_TYPES = ['text/markdown'];
-
-/**
- * Test if a request is requesting a markdown version of the page.
- */
-function isMarkdownPreferred(request: Request): boolean {
-    const negotiator = new Negotiator({
-        headers: Object.fromEntries(request.headers.entries()),
-    });
-    const mediaTypes = negotiator.mediaTypes();
-    return MARKDOWN_MEDIA_TYPES.some((mediaType) => mediaTypes.includes(mediaType));
 }

@@ -6,9 +6,9 @@
     },
     "devDependencies": {
         "@biomejs/biome": "^1.9.4",
-        "@changesets/cli": "^2.29.8",
-        "turbo": "^2.8.10",
-        "vercel": "catalog:"
+        "@changesets/cli": "^2.30.0",
+        "turbo": "^2.9.6",
+        "vercel": "50.37.3"
     },
     "packageManager": "bun@1.3.7",
     "overrides": {
@@ -17,7 +17,8 @@
         "@types/react-dom": "catalog:",
         "react": "catalog:",
         "react-dom": "catalog:",
-        "esbuild": "0.24.2"
+        "esbuild": "0.24.2",
+        "axios": "1.8.4"
     },
     "private": true,
     "scripts": {
@@ -41,7 +42,7 @@
         "catalog": {
             "@tsconfig/strictest": "^2.0.6",
             "@tsconfig/node20": "^20.1.6",
-            "@gitbook/api": "0.172.0",
+            "@gitbook/api": "0.175.0",
             "@scalar/api-client-react": "^1.3.46",
             "@types/react": "^19.0.0",
             "@types/react-dom": "^19.0.0",

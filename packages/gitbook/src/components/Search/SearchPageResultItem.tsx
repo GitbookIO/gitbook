@@ -6,8 +6,8 @@ import { Tooltip } from '../primitives';
 import { Emoji } from '../primitives/Emoji/Emoji';
 import { HighlightQuery } from './HighlightQuery';
 import { SearchResultItem } from './SearchResultItem';
-import type { ComputedPageResult } from './search-types';
 import type { MergedPageResult } from './reciprocalRankFusion';
+import type { ComputedPageResult } from './search-types';
 import type { LocalPageResult } from './useLocalSearchResults';
 
 type PageItem = ComputedPageResult | LocalPageResult | MergedPageResult;
@@ -28,16 +28,15 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
     const emoji = 'emoji' in item ? item.emoji : undefined;
     const icon = 'icon' in item ? item.icon : undefined;
 
-    const leadingIcon =
-        emoji ? (
-            <span className="flex size-4 shrink-0 items-center justify-center">
-                <Emoji code={emoji} style="text-base leading-none" />
-            </span>
-        ) : icon ? (
-            <Icon icon={icon as IconName} className="size-4" />
-        ) : (
-            <Icon icon="memo" className="size-4" />
-        );
+    const leadingIcon = emoji ? (
+        <span className="flex size-4 shrink-0 items-center justify-center">
+            <Emoji code={emoji} style="text-base leading-none" />
+        </span>
+    ) : icon ? (
+        <Icon icon={icon as IconName} className="size-4" />
+    ) : (
+        <Icon icon="memo" className="size-4" />
+    );
 
     const insights =
         item.type === 'page'

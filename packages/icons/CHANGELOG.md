@@ -1,5 +1,23 @@
 # @gitbook/icons
 
+## 0.4.6
+
+### Patch Changes
+
+- ab17ff4: Update missing CustomIconName
+
+## 0.4.5
+
+### Patch Changes
+
+- 3c141f0: Bump fontawesome to 7.2.0
+
+## 0.4.4
+
+### Patch Changes
+
+- ccd21e4: Update fontawesome-pro to 1.0.23
+
 ## 0.4.3
 
 ### Patch Changes

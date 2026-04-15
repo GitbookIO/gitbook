@@ -8,6 +8,7 @@ import { streamRecommendedQuestions } from './server-actions';
 
 import { type Assistant, useAI } from '@/components/AI';
 import assertNever from 'assert-never';
+import { useEventCallback } from 'usehooks-ts';
 import { useTrackEvent } from '../Insights';
 import { isQuestion } from './isQuestion';
 import { type MergedPageResult, getResultKey, reciprocalRankFusion } from './reciprocalRankFusion';
@@ -79,12 +80,12 @@ function stableVisibleMerge(
 const cachedRecommendedQuestions: Map<string, ResultType[]> = new Map();
 
 export function useSearchResults(props: {
+    asEmbeddable?: boolean;
     disabled: boolean;
     query: string;
     siteSpaceId: string;
     siteSpaceIds: string[];
     scope: SearchScope;
-    withAI: boolean;
     suggestions?: string[];
     /** URL for the search API route (e.g. from linker.toPathInSpace('~gitbook/search')). */
     searchURL: string;
@@ -94,6 +95,7 @@ export function useSearchResults(props: {
     lang?: string;
 }) {
     const {
+        asEmbeddable,
         disabled,
         query,
         siteSpaceId,
@@ -121,6 +123,7 @@ export function useSearchResults(props: {
     }>({ results: [], fetching: false, error: false });
 
     const { assistants } = useAI();
+    const getAssistants = useEventCallback(() => assistants);
     const withAI = assistants.length > 0;
 
     // --- Interaction / visibility tracking (refs → no extra renders) ---
@@ -233,7 +236,13 @@ export function useSearchResults(props: {
                     const fetchSearch = (
                         scope: Parameters<typeof fetchSearchResults>[1]
                     ): Promise<OrderedComputedResult[]> =>
-                        fetchSearchResults(searchURL, scope, query, abortController.signal);
+                        fetchSearchResults(
+                            searchURL,
+                            scope,
+                            query,
+                            abortController.signal,
+                            asEmbeddable
+                        );
 
                     switch (scope) {
                         case 'all':
@@ -278,7 +287,7 @@ export function useSearchResults(props: {
                 }
                 setRemoteState({ results: [], fetching: false, error: true });
             }
-        }, 350);
+        }, 200);
 
         return () => {
             cancelled = true;
@@ -295,6 +304,8 @@ export function useSearchResults(props: {
         disabled,
         suggestions,
         searchURL,
+        asEmbeddable,
+        getAssistants,
     ]);
 
     // Merge local and remote results.
@@ -322,11 +333,7 @@ export function useSearchResults(props: {
         } else if (!hasInteractedRef.current) {
             // User hasn't interacted: keep visible items in local order,
             // allow below-the-fold items to be freely re-ranked by RRF.
-            merged = stableVisibleMerge(
-                localResults,
-                remoteState.results,
-                visibleIdsRef.current
-            );
+            merged = stableVisibleMerge(localResults, remoteState.results, visibleIdsRef.current);
         } else {
             // First render for this query: plain RRF with no stability constraints.
             merged = reciprocalRankFusion(localResults, remoteState.results);
@@ -354,12 +361,14 @@ async function fetchSearchResults(
         | { mode: 'current'; siteSpaceId: string }
         | { mode: 'specific'; siteSpaceIds: string[] },
     query: string,
-    signal?: AbortSignal
+    signal?: AbortSignal,
+    asEmbeddable?: boolean
 ): Promise<OrderedComputedResult[]> {
     const response = await fetch(searchURL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+            asEmbeddable,
             query,
             scope,
         }),
