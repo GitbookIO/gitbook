@@ -1,6 +1,6 @@
 import { GitBookAPIError } from '@gitbook/api';
 import { parse as parseCacheControl } from '@tusbar/cache-control';
-import { unstable_cacheLife as cacheLife } from 'next/cache';
+import { cacheLife } from 'next/cache';
 import type { DataFetcherErrorData, DataFetcherResponse } from './types';
 
 export class DataFetcherError extends Error {

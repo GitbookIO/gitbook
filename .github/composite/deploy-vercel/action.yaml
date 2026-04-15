@@ -19,6 +19,9 @@ inputs:
   environment:
     description: 'Environment to deploy to'
     required: true
+  headSha:
+    description: 'Git ref to deploy, used for the deploymentId'
+    required: false
 outputs:
     deployment-url:
       description: "Deployment URL"
@@ -59,6 +62,16 @@ runs:
             GITBOOK_IMAGE_RESIZE_MODE: ${{ inputs.opItem }}/GITBOOK_IMAGE_RESIZE_MODE
             GITBOOK_ASSETS_PREFIX: ${{ inputs.opItem }}/GITBOOK_ASSETS_PREFIX
             GITBOOK_FONTS_URL: ${{ inputs.opItem }}/GITBOOK_FONTS_URL
+        - name: Inject build env vars
+          if: ${{ inputs.environment == 'preview' }}
+          shell: bash
+          run: |
+            HEAD_SHA=$(git rev-parse HEAD)
+            echo "resolved HEAD_SHA: $HEAD_SHA"
+            echo "GITBOOK_HEAD_SHA=$HEAD_SHA" >> .vercel/.env.${{ inputs.environment }}.local
+            echo "GITBOOK_RUNTIME=vercel" >> .vercel/.env.${{ inputs.environment }}.local
+            echo "--- .vercel/.env.${{ inputs.environment }}.local after inject ---"
+            cat .vercel/.env.${{ inputs.environment }}.local
         - name: Build Project Artifacts
           run: bun run vercel build --target=${{ inputs.environment }} --token=${{ inputs.vercelToken }}
           shell: bash
@@ -66,6 +79,7 @@ runs:
             VERCEL_ORG_ID: ${{ inputs.vercelOrg }}
             VERCEL_PROJECT_ID: ${{ inputs.vercelProject }}
             GITBOOK_RUNTIME: vercel
+            GITBOOK_HEAD_SHA: ${{ inputs.headSha }}
         - name: Deploy Project Artifacts to Vercel
           id: deploy
           shell: bash

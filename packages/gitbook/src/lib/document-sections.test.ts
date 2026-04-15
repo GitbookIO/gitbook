@@ -122,4 +122,86 @@ describe('getDocumentSections', () => {
             },
         ]);
     });
+
+    it('extracts headings inside updates blocks', async () => {
+        const document: JSONDocument = {
+            object: 'document',
+            data: { schemaVersion: 2 },
+            nodes: [
+                {
+                    object: 'block',
+                    type: 'updates',
+                    data: { format: 'full' },
+                    isVoid: false,
+                    nodes: [
+                        {
+                            object: 'block',
+                            type: 'update',
+                            data: { date: '2026-04-08' },
+                            isVoid: false,
+                            nodes: [
+                                {
+                                    object: 'block',
+                                    type: 'heading-1',
+                                    data: {},
+                                    meta: { id: 'h1-in-update' },
+                                    nodes: [
+                                        {
+                                            object: 'text',
+                                            leaves: [
+                                                {
+                                                    object: 'leaf',
+                                                    text: 'Heading 1 in update',
+                                                    marks: [],
+                                                },
+                                            ],
+                                        },
+                                    ],
+                                },
+                                {
+                                    object: 'block',
+                                    type: 'heading-2',
+                                    data: {},
+                                    meta: { id: 'h2-in-update' },
+                                    nodes: [
+                                        {
+                                            object: 'text',
+                                            leaves: [
+                                                {
+                                                    object: 'leaf',
+                                                    text: 'Heading 2 in update',
+                                                    marks: [],
+                                                },
+                                            ],
+                                        },
+                                    ],
+                                },
+                            ],
+                        },
+                    ],
+                },
+            ],
+        };
+
+        const sections = await getDocumentSections(context, document);
+
+        expect(
+            sections.map((section) => ({
+                id: section.id,
+                depth: section.depth,
+                title: reactNodeToText(section.title),
+            }))
+        ).toEqual([
+            {
+                id: 'h1-in-update',
+                depth: 1,
+                title: 'Heading 1 in update',
+            },
+            {
+                id: 'h2-in-update',
+                depth: 2,
+                title: 'Heading 2 in update',
+            },
+        ]);
+    });
 });
