@@ -8,7 +8,7 @@ import {
 import { DataFetcherError, noCacheFetchOptions } from '@/lib/data';
 import { resolveContentRef } from '@/lib/references';
 import { getCacheTag } from '@gitbook/cache-tags';
-import { unstable_cacheLife as cacheLife, unstable_cacheTag as cacheTag } from 'next/cache';
+import { cacheLife, cacheTag } from 'next/cache';
 import { assert } from 'ts-essentials';
 import { enrichFilesystem } from './enrich';
 import type {
@@ -83,7 +83,7 @@ async function fetchFilesystem(
           };
       }
 > {
-    'use cache';
+    'use cache: remote';
     try {
         cacheTag(getCacheTag({ tag: 'space', space: spaceId }));
         return await fetchFilesystemNoCache(url);

@@ -1,8 +1,7 @@
 import { type RouteLayoutParams, getDynamicSiteContext, getStaticSiteContext } from '@/app/utils';
 import type { GitBookSiteContext } from '@/lib/context';
-import type { GitBookLinker } from '@/lib/links';
-import { getPagePath } from '@/lib/pages';
-import { joinPath } from '@/lib/paths';
+import { CustomizationDefaultThemeMode, type SiteCustomizationSettings } from '@gitbook/api';
+import { getEmbeddableLinker } from './embeddable-linker';
 
 /**
  * Get the context for the embeddable static routes.
@@ -36,35 +35,36 @@ export async function getEmbeddableDynamicContext(params: RouteLayoutParams) {
     };
 }
 
+export { getEmbeddableLinker } from './embeddable-linker';
+
 /**
- * Get a linker to generate links in the embeddable context.
+ * Resolve theme behavior for docs embeds.
+ * Embeds should follow the parent frame's color-scheme by default,
+ * while still allowing an explicit override for multi-theme sites.
  */
-export function getEmbeddableLinker(linker: GitBookLinker): GitBookLinker {
+export function resolveEmbeddableTheme(
+    customization: Pick<SiteCustomizationSettings, 'themes'>,
+    forcedTheme?: CustomizationDefaultThemeMode | null
+) {
+    if (!customization.themes.toggeable) {
+        return {
+            htmlTheme: customization.themes.default,
+            defaultTheme: customization.themes.default,
+            forcedTheme: customization.themes.default,
+        };
+    }
+
+    if (forcedTheme) {
+        return {
+            htmlTheme: forcedTheme,
+            defaultTheme: forcedTheme,
+            forcedTheme,
+        };
+    }
+
     return {
-        ...linker,
-        toPathForPage({ pages, page, anchor }) {
-            const pagePath = getPagePath(pages, page);
-            const embedPagePath = joinPath('~gitbook/embed/page', pagePath);
-
-            return linker.toPathInSpace(embedPagePath) + (anchor ? `#${anchor}` : '');
-        },
-
-        withOtherSiteSpace(override: { spaceBasePath: string }): GitBookLinker {
-            return linker.withOtherSiteSpace({
-                // We make sure that links in the other site space will be shown in the embeddeable view.
-                spaceBasePath: joinPath(override.spaceBasePath, '~gitbook/embed/page'),
-            });
-        },
-
-        toLinkForContent(rawURL: string): string {
-            const result = linker.toLinkForContent(rawURL);
-            // If the link is not relative or already an embed, return it as is
-            if (result.includes('~gitbook/embed') || !result.startsWith('/')) {
-                return result;
-            }
-
-            // If the link is relative, assume it's a section link and append the embed path
-            return joinPath(result, '~gitbook/embed/page');
-        },
+        htmlTheme: CustomizationDefaultThemeMode.System,
+        defaultTheme: CustomizationDefaultThemeMode.System,
+        forcedTheme: undefined,
     };
 }

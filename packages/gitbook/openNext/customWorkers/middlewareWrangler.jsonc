@@ -1,7 +1,7 @@
 {
     "main": "middleware.js",
     "name": "gitbook-open-v2",
-    "compatibility_date": "2025-04-14",
+    "compatibility_date": "2026-04-02",
     "keep_names": false,
     "compatibility_flags": [
         "nodejs_compat",
