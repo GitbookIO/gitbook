@@ -68,7 +68,7 @@ function buildLangIndex(pages: RawIndexPage[]): Document<IndexPage> {
             index: ['title', 'description'],
             store: ['id', 'title', 'description'],
         },
-        tokenize: 'tolerant',
+        tokenize: 'full',
         encoder: 'Normalize',
     });
 
