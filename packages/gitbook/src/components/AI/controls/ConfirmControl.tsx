@@ -1,6 +1,7 @@
 'use client';
 
 import { Button } from '@/components/primitives';
+import { tString, useLanguage } from '@/intl/client';
 import { z } from 'zod';
 import { AIToolContainer } from './common';
 import { type GetAIControlProps, createAIControl } from './helpers';
@@ -29,6 +30,7 @@ export const ConfirmControlDef = createAIControl({
 
 function ConfirmControl(props: GetAIControlProps<typeof ConfirmControlDef>) {
     const { label, icon, onSubmit } = props;
+    const language = useLanguage();
     return (
         <AIToolContainer className="flex w-full flex-col gap-2">
             <Button
@@ -36,17 +38,18 @@ function ConfirmControl(props: GetAIControlProps<typeof ConfirmControlDef>) {
                 onClick={() => {
                     onSubmit({ result: 'cancelled' });
                 }}
-                variant="secondary"
+                truncate={false}
+                variant="blank"
                 icon="xmark"
-                label="Cancel"
+                label={tString(language, 'cancel')}
             />
             <Button
                 data-testid="ai-chat-tool-confirm-accept"
                 onClick={() => {
                     onSubmit({ result: 'confirmed' });
                 }}
-                className="flex-1"
                 variant="primary"
+                truncate={false}
                 icon={icon}
                 label={label}
             />

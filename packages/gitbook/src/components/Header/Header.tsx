@@ -110,7 +110,7 @@ export function Header(props: {
                                     'hover:site-header:theme-bold:bg-header-link/3',
                                     variants.generic.length > 1
                                         ? 'lg:hidden'
-                                        : 'page-no-toc:hidden lg:hidden'
+                                        : 'no-sidebar:hidden lg:hidden'
                                 )}
                             />
                             <HeaderLogo context={context} />

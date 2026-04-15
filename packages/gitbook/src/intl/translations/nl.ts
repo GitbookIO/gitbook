@@ -106,6 +106,7 @@ export const nl: TranslationLanguage = {
     ai_chat_clear_conversation: 'Gesprek wissen',
     ai_chat_thinking: 'Denkt na...',
     ai_chat_working: 'Werkt...',
+    ai_chat_waiting: 'Wacht op je antwoord…',
     ai_chat_context_badge: 'AI',
     ai_chat_error: 'Er is iets misgegaan.',
     ai_chat_hold_message_1: 'Even nadenken…',
@@ -144,6 +145,7 @@ export const nl: TranslationLanguage = {
     copy_mcp_install_command: 'Gebruik deze MCP in ${1}',
     press_to_confirm: 'Druk op ${1} om te bevestigen',
     tool_call_skipped: '"${1}" overgeslagen',
+    ai_control_submitted_answer: 'Antwoord verzonden',
     scroll_back: 'Terug scrollen',
     scroll_further: 'Verder scrollen',
     hint_info: 'Informatie',
@@ -152,4 +154,7 @@ export const nl: TranslationLanguage = {
     hint_success: 'Succes',
     download: 'Downloaden',
     open: 'Openen',
+    form_other_prompt: 'Voer je antwoord in...',
+    form_other_field: 'Anders...',
+    cancel: 'Annuleren',
 };

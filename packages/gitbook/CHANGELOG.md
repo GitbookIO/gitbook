@@ -1,5 +1,19 @@
 # gitbook
 
+## 0.24.0
+
+### Minor Changes
+
+- 50653ab: Redirect sitemap.md and .well-known/sitemap.md to llms.txt.
+- 50653ab: Improve AI agent detection and readability by outputting 200 for page not found.
+
+### Patch Changes
+
+- 126d4b7: Improve Assistant form controls
+- Updated dependencies [8242f18]
+  - @gitbook/expr@1.2.5
+  - @gitbook/react-openapi@1.5.12
+
 ## 0.23.2
 
 ### Patch Changes

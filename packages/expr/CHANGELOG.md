@@ -1,5 +1,11 @@
 # @gitbook/expr
 
+## 1.2.5
+
+### Patch Changes
+
+- 8242f18: Extend gitbook/expr std lib with some additional methods
+
 ## 1.2.4
 
 ### Patch Changes

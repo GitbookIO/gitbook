@@ -1,5 +1,6 @@
 import { SkeletonHeading, SkeletonParagraph } from '@/components/primitives';
 import { tcls } from '@/lib/tailwind';
+import { CONTENT_STYLE } from '../layout';
 
 /**
  * Placeholder when loading a page.
@@ -19,7 +20,7 @@ export function SitePageSkeleton() {
                 'lg:items-start'
             )}
         >
-            <div className={tcls('flex-1', 'max-w-3xl', 'mx-auto', 'site-width-wide:mx-0')}>
+            <div className={tcls('flex-1', CONTENT_STYLE)}>
                 <SkeletonHeading style={tcls('mb-8')} />
                 <SkeletonParagraph style={tcls('mb-4')} />
             </div>

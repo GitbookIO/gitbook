@@ -163,17 +163,26 @@ export function AIChatSubtitle(props: {
 
     return (
         <EmbeddableFrameSubtitle
-            className={tcls('relative', chat.loading ? 'h-3 opacity-11' : 'h-0 opacity-0')}
+            className={tcls(
+                'relative',
+                chat.loading || chat.control ? 'h-3 opacity-11' : 'h-0 opacity-0'
+            )}
         >
             <span
                 className={tcls(
                     'absolute left-0',
                     chat.loading
                         ? chat.messages[chat.messages.length - 1]?.content
-                            ? 'animate-blur-in-slow'
+                            ? 'animate-blur-in-display-slow'
                             : 'hidden'
-                        : 'animate-blur-out-slow'
+                        : 'animate-blur-out-display-slow'
                 )}
+                style={{
+                    animationDelay:
+                        chat.messages[chat.messages.length - 1]?.content && !chat.control
+                            ? '.3s'
+                            : undefined,
+                }}
             >
                 {t(language, 'ai_chat_working')}
             </span>
@@ -182,12 +191,27 @@ export function AIChatSubtitle(props: {
                     'absolute left-0',
                     chat.loading
                         ? chat.messages[chat.messages.length - 1]?.content
-                            ? 'animate-blur-out-slow'
-                            : 'animate-blur-in-slow'
+                            ? 'animate-blur-out-display-slow'
+                            : 'animate-blur-in-display-slow'
                         : 'hidden'
                 )}
+                style={{
+                    animationDelay:
+                        chat.messages[chat.messages.length - 1]?.content || chat.control
+                            ? undefined
+                            : '.3s',
+                }}
             >
                 {t(language, 'ai_chat_thinking')}
+            </span>
+            <span
+                className={tcls(
+                    'absolute left-0',
+                    chat.control ? 'animate-blur-in-display-slow' : 'animate-blur-out-display-slow'
+                )}
+                style={{ animationDelay: chat.control ? '.3s' : undefined }}
+            >
+                {t(language, 'ai_chat_waiting')}
             </span>
         </EmbeddableFrameSubtitle>
     );
@@ -274,21 +298,18 @@ export function AIChatBody(props: {
                 )}
             </ScrollContainer>
 
-            <div className="flex min-h-0 flex-col gap-2 pb-4">
+            <div className="flex max-h-3/4 min-h-0 flex-col gap-2 pb-4">
                 {/* Display an error banner when something went wrong. */}
                 {chat.error ? <AIChatError chatController={chatController} /> : null}
 
-                {chat.control ? (
-                    <AIChatControl control={chat.control} />
-                ) : (
-                    <AIChatInput
-                        loading={chat.loading}
-                        disabled={chat.loading || chat.error}
-                        onSubmit={(value) => {
-                            chatController.postMessage({ message: value });
-                        }}
-                    />
-                )}
+                {chat.control ? <AIChatControl control={chat.control} /> : null}
+                <AIChatInput
+                    loading={chat.loading}
+                    disabled={chat.loading || chat.error}
+                    onSubmit={(value) => {
+                        chatController.postMessage({ message: value });
+                    }}
+                />
             </div>
         </>
     );

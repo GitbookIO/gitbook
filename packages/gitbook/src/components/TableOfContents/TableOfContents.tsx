@@ -44,19 +44,21 @@ export async function TableOfContents(props: {
                     'w-4/5',
                     'md:w-1/2',
                     'lg:w-72',
-                    'basis-72',
-                    'lg:page-no-toc:basis-56',
 
                     'max-lg:not-sidebar-filled:bg-tint-base',
                     'max-lg:not-sidebar-filled:border-r',
                     'border-tint-subtle',
 
                     'lg:flex!',
-                    'embed:lg:page-no-toc:hidden!',
                     'lg:animate-none!',
                     'lg:sticky',
                     'lg:mr-12',
-                    'lg:z-0!',
+                    'lg:z-0',
+
+                    'layout-wide:no-sidebar:lg:fixed',
+                    'layout-wide:no-sidebar:lg:max-3xl:w-12',
+                    'layout-wide:no-sidebar:lg:left-5',
+                    'layout-wide:no-sidebar:lg:z-30',
 
                     // Server-side static positioning
                     'lg:top-0',
@@ -73,18 +75,14 @@ export async function TableOfContents(props: {
                     'lg:site-header-sections:announcement:h-[calc(100vh-6.75rem-4.25rem)]',
 
                     // Client-side dynamic positioning (CSS vars applied by script)
-                    'lg:not-embed:[html[style*="--toc-top-offset"]_&]:top-(--toc-top-offset)!',
-                    'lg:not-embed:[html[style*="--toc-height"]_&]:h-(--toc-height)!',
-                    'lg:page-no-toc:not-embed:[html[style*="--outline-top-offset"]_&]:top-(--outline-top-offset)!',
-                    'lg:page-no-toc:not-embed:[html[style*="--outline-height"]_&]:top-(--outline-height)!',
-
-                    'embed:top-0',
-                    'embed:h-full',
+                    'lg:[html[style*="--toc-top-offset"]_&]:top-(--toc-top-offset)!',
+                    'lg:[html[style*="--toc-height"]_&]:h-(--toc-height)!',
+                    'lg:page-no-toc:[html[style*="--outline-top-offset"]_&]:top-(--outline-top-offset)!',
+                    'lg:page-no-toc:[html[style*="--outline-height"]_&]:h-(--outline-height)!',
 
                     'pt-6 pb-4',
                     'supports-[-webkit-touch-callout]:pb-[env(safe-area-inset-bottom)]', // Override bottom padding on iOS since we have a transparent bottom bar
-                    'lg:sidebar-filled:pr-6',
-                    'lg:page-no-toc:pr-0',
+                    'lg:max-3xl:sidebar-filled:layout-default:pr-6',
                     'max-lg:pl-8',
 
                     'flex',
@@ -97,7 +95,8 @@ export async function TableOfContents(props: {
                 {header}
                 <div // The actual sidebar, either shown with a filled bg or transparent.
                     className={tcls(
-                        '-ms-5',
+                        '-ms-5', // By default we shift the sidebar to the left to compensate for the PagesList padding.
+                        'layout-wide:no-sidebar:ms-0',
                         'relative flex min-h-0 grow flex-col border-tint-subtle',
 
                         'sidebar-filled:bg-tint-subtle',
@@ -107,12 +106,12 @@ export async function TableOfContents(props: {
                         '[html.sidebar-filled.theme-bold.tint_&]:bg-tint-base',
                         '[html.sidebar-filled.theme-gradient_&]:border',
                         'max-lg:sidebar-filled:border',
-                        'page-no-toc:bg-transparent!',
-                        'page-no-toc:border-none!',
+                        'lg:page-no-toc:bg-transparent!',
+                        'lg:page-no-toc:border-none!',
 
                         'sidebar-filled:rounded-2xl',
                         'straight-corners:rounded-none',
-                        'page-has-toc:[html.sidebar-filled.circular-corners_&]:rounded-4xl'
+                        '[html.sidebar-filled.circular-corners_&]:layout-wide:rounded-4xl'
                     )}
                 >
                     {innerHeader}
@@ -135,11 +134,27 @@ export async function TableOfContents(props: {
                         />
                     </ScrollContainer>
                     {withTrademark && customization.trademark.enabled ? (
-                        <Trademark
-                            context={context}
-                            placement={SiteInsightsTrademarkPlacement.Sidebar}
-                            className="m-2 mt-auto sidebar-default:mr-4"
-                        />
+                        <>
+                            {/* Normal trademark shown when there's a TOC */}
+                            <Trademark
+                                context={context}
+                                placement={SiteInsightsTrademarkPlacement.Sidebar}
+                                className={tcls(
+                                    'm-2 mt-auto px-4 py-3.5 layout-wide:no-sidebar:lg:max-3xl:hidden'
+                                )}
+                                truncate={false}
+                            />
+
+                            {/* IconOnly trademark shown when there's no TOC */}
+                            <Trademark
+                                context={context}
+                                placement={SiteInsightsTrademarkPlacement.Sidebar}
+                                className={tcls(
+                                    'mb-2 3xl:hidden layout-default:hidden self-start bg-tint-base depth-flat:bg-tint-base has-sidebar:hidden'
+                                )}
+                                iconOnly={true}
+                            />
+                        </>
                     ) : null}
                 </div>
             </SideSheet>

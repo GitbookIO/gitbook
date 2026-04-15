@@ -106,6 +106,7 @@ export const no: TranslationLanguage = {
     ai_chat_clear_conversation: 'Tøm samtale',
     ai_chat_thinking: 'Tenker...',
     ai_chat_working: 'Arbeider...',
+    ai_chat_waiting: 'Venter på svaret ditt…',
     ai_chat_context_badge: 'AI',
     ai_chat_error: 'Noe gikk galt.',
     ai_chat_hold_message_1: 'Tenker det gjennom…',
@@ -144,6 +145,7 @@ export const no: TranslationLanguage = {
     copy_mcp_install_command: 'Bruk denne MCP i ${1}',
     press_to_confirm: 'Trykk ${1} for å bekrefte',
     tool_call_skipped: 'Hoppet over "${1}"',
+    ai_control_submitted_answer: 'Svar sendt',
     scroll_back: 'Rull tilbake',
     scroll_further: 'Rull videre',
     hint_info: 'Informasjon',
@@ -152,4 +154,7 @@ export const no: TranslationLanguage = {
     hint_success: 'Suksess',
     download: 'Last ned',
     open: 'Åpne',
+    form_other_prompt: 'Skriv inn svaret ditt...',
+    form_other_field: 'Annet...',
+    cancel: 'Avbryt',
 };

@@ -1,6 +1,9 @@
-import { describe, expect, it, mock } from 'bun:test';
+import { afterAll, describe, expect, it, mock } from 'bun:test';
 
-mock.module('@/lib/env/globals', () => ({ GITBOOK_SECRET: 'test-secret-key' }));
+afterAll(() => mock.restore());
+
+const realGlobals = await import('@/lib/env/globals');
+mock.module('@/lib/env/globals', () => ({ ...realGlobals, GITBOOK_SECRET: 'test-secret-key' }));
 
 const { buildSignedProxyUrl, verifyProxyRequest } = await import('./proxy-token');
 

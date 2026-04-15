@@ -198,6 +198,7 @@
     :root {
         @apply leading-relaxed;
         interpolate-size: allow-keywords; /* Opt-in for modern browsers to interpolate "auto" values in transitions/animations. */
+        overflow-x: hidden; /* We never want horizontal scroll of the whole page, it looks buggy and we should never have overflow anyway */
     }
     
     /* Modern browsers with `scrollbar-*` support */

@@ -224,7 +224,7 @@ export function AIChatProvider(props: {
 
                 try {
                     const result = await toolDef.execute(event.toolCall.input);
-                    streamResponse({
+                    await streamResponse({
                         toolCall: {
                             tool: event.toolCall.tool,
                             toolCallId: event.toolCallId,
@@ -233,7 +233,7 @@ export function AIChatProvider(props: {
                         },
                     });
                 } catch (error) {
-                    streamResponse({
+                    await streamResponse({
                         toolCall: {
                             tool: event.toolCall.tool,
                             toolCallId: event.toolCallId,
@@ -322,6 +322,7 @@ export function AIChatProvider(props: {
                                             toolCallId: event.toolCallId,
                                         },
                                         input: event.toolCall.input as any,
+                                        language,
                                         send: async (result) => {
                                             await streamResponse({
                                                 toolCall: {
@@ -350,6 +351,7 @@ export function AIChatProvider(props: {
                                             label: confirmation.label,
                                             icon: confirmation.icon,
                                         },
+                                        language,
                                         send: async (result) => {
                                             const output = ConfirmControlOutputSchema.parse(
                                                 result.output
@@ -406,13 +408,13 @@ export function AIChatProvider(props: {
                 // Execute the tool call if it doesn't require confirmation
                 if (toolToExecute) {
                     await executeToolCall(toolToExecute);
+                } else {
+                    globalState.setState((state) => ({
+                        ...state,
+                        loading: false,
+                        error: false,
+                    }));
                 }
-
-                globalState.setState((state) => ({
-                    ...state,
-                    loading: false,
-                    error: false,
-                }));
             } catch (error) {
                 console.error('Error streaming AI response', error);
                 globalState.setState((state) => ({

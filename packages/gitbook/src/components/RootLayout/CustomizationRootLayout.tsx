@@ -23,7 +23,7 @@ import * as ReactDOM from 'react-dom';
 
 import { type FontData, getFontData } from '@/fonts';
 import { fontNotoColorEmoji, fonts } from '@/fonts/default';
-import { getSpaceLanguage, getSpaceLocale } from '@/intl/server';
+import { getContentLocale, getSpaceLanguage } from '@/intl/server';
 import { getAssetURL } from '@/lib/assets';
 import { tcls } from '@/lib/tailwind';
 
@@ -69,7 +69,7 @@ export async function CustomizationRootLayout(props: {
     const customization =
         'customization' in context ? context.customization : defaultCustomization();
 
-    const locale = getSpaceLocale(context);
+    const locale = getContentLocale(context);
     const language = getSpaceLanguage(context);
     const tintColor = getTintColor(customization);
     const mixColor = getTintMixColor(customization.styling.primaryColor, tintColor);

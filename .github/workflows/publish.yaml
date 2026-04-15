@@ -26,9 +26,10 @@ jobs:
               with:
                   node-version: 22
                   registry-url: 'https://registry.npmjs.org'
-            # Ensure npm 11.5.1 or later is installed
             - name: Update npm
-              run: npm install -g npm@latest
+              run: |
+                  corepack enable npm
+                  corepack install -g npm@latest
             - name: Setup Bun
               uses: ./.github/composite/setup-bun
             - name: Install dependencies
@@ -45,4 +46,3 @@ jobs:
                   # Using a PAT instead of GITHUB_TOKEN because we need to run workflows when releases are created
                   # https://github.com/orgs/community/discussions/26875#discussioncomment-3253761
                   GITHUB_TOKEN: ${{ secrets.GH_PERSONAL_TOKEN }}
-

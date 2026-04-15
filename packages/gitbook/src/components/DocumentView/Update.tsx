@@ -1,7 +1,12 @@
-import { formatDateFull, formatDateShort, formatNumericDate } from '@/components/utils/dates';
+import {
+    getFullDateFormatter,
+    getNumericDateFormatter,
+    getShortDateFormatter,
+} from '@/components/utils/dates';
 import { getRevisionTags, resolveBlockTags } from '@/lib/tags';
 import { tcls } from '@/lib/tailwind';
-import type { DocumentBlockUpdate, DocumentBlockUpdates } from '@gitbook/api';
+import type { DocumentBlockUpdate, DocumentBlockUpdates, TranslationLanguage } from '@gitbook/api';
+import { assertNever } from 'assert-never';
 import { assert } from 'ts-essentials';
 import { Tag } from '../Tag';
 import type { BlockProps } from './Block';
@@ -31,11 +36,7 @@ export function Update(props: BlockProps<DocumentBlockUpdate>) {
 
     // Then get the format from the parent Updates block and use that format
     const dateFormat = parentUpdates.data?.format ?? 'full';
-    const displayDate = {
-        numeric: formatNumericDate(parsedDate),
-        full: formatDateFull(parsedDate),
-        short: formatDateShort(parsedDate),
-    }[dateFormat];
+    const dateFormatter = getDateFormatter(dateFormat, contextProps.context.contentContext?.locale);
 
     // Resolve tags from the block data using revision-level tag definitions
     const revisionTags = getRevisionTags(contextProps.context.contentContext?.revision);
@@ -54,7 +55,7 @@ export function Update(props: BlockProps<DocumentBlockUpdate>) {
                     dateTime={date}
                     className="inline-flex items-center font-medium text-neutral-10 text-sm tracking-wide"
                 >
-                    {displayDate}
+                    {dateFormatter.format(parsedDate)}
                 </time>
                 {resolvedTags.length > 0 ? (
                     <div className="mt-2 flex flex-wrap gap-1.5">
@@ -72,6 +73,22 @@ export function Update(props: BlockProps<DocumentBlockUpdate>) {
             />
         </div>
     );
+}
+
+function getDateFormatter(
+    format: 'numeric' | 'full' | 'short',
+    locale: TranslationLanguage | undefined
+) {
+    switch (format) {
+        case 'short':
+            return getShortDateFormatter(locale);
+        case 'numeric':
+            return getNumericDateFormatter(locale);
+        case 'full':
+            return getFullDateFormatter(locale);
+        default:
+            assertNever(format);
+    }
 }
 
 /**
