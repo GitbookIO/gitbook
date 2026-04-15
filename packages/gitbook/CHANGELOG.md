@@ -1,5 +1,23 @@
 # gitbook
 
+## 0.25.0
+
+### Minor Changes
+
+- 88c38fa: Add Search tab to Docs Embed, refactor search
+- 709964f: Rework page layout
+
+### Patch Changes
+
+- 789c2fa: Adjust empty TOC logic and layout
+- 8d2a95b: Docs Embed: Better support light/dark mode overrides
+- 7fd381c: Hide empty sidebar on OpenAPI pages
+- 723e579: Fix rendering multi-expandable block in a column
+- 68c842b: Translations dropdown should show language spaces that best matches the current space title
+- Updated dependencies [8d2a95b]
+- Updated dependencies [88c38fa]
+  - @gitbook/embed@0.5.0
+
 ## 0.24.0
 
 ### Minor Changes
