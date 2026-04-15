@@ -11,7 +11,6 @@ import { Button, Loading } from '../primitives';
 import { SearchPageResultItem } from './SearchPageResultItem';
 import { SearchQuestionResultItem } from './SearchQuestionResultItem';
 import { SearchRecordResultItem } from './SearchRecordResultItem';
-import { SearchSectionResultItem } from './SearchSectionResultItem';
 import type { OrderedComputedResult } from './search-types';
 import type { LocalPageResult } from './useLocalSearchResults';
 
@@ -43,15 +42,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
     },
     ref: React.Ref<SearchResultsRef>
 ) {
-    const {
-        children,
-        id,
-        query,
-        results,
-        fetching,
-        cursor,
-        error,
-    } = props;
+    const { children, id, query, results, fetching, cursor, error } = props;
 
     const language = useLanguage();
 
@@ -194,20 +185,6 @@ export const SearchResults = React.forwardRef(function SearchResults(
                                             active={index === cursor}
                                             assistant={assistants[0]!}
                                             recommended
-                                            {...resultItemProps}
-                                        />
-                                    );
-                                }
-                                case 'section': {
-                                    return (
-                                        <SearchSectionResultItem
-                                            ref={(ref) => {
-                                                refs.current[index] = ref;
-                                            }}
-                                            key={item.id}
-                                            query={query}
-                                            item={item}
-                                            active={index === cursor}
                                             {...resultItemProps}
                                         />
                                     );

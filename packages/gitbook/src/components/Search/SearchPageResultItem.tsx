@@ -23,7 +23,13 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
     const { query, item, active, ...rest } = props;
     const language = useLanguage();
 
-    const href = 'href' in item ? item.href : item.pathname;
+    const bestSection = item.type === 'page' ? item.bestSection : undefined;
+    const href = (() => {
+        if (item.type !== 'page' || !item.bestSection || item.bestSection.score <= item.score) {
+            return 'href' in item ? item.href : item.pathname;
+        }
+        return item.bestSection.href;
+    })();
 
     const emoji = 'emoji' in item ? item.emoji : undefined;
     const icon = 'icon' in item ? item.icon : undefined;
@@ -66,7 +72,11 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
             <p className="line-clamp-2 font-semibold text-base text-tint-strong leading-snug">
                 <HighlightQuery query={query} text={item.title} />
             </p>
-            {'description' in item && item.description ? (
+            {bestSection?.body ? (
+                <p className="line-clamp-1 text-sm leading-snug">
+                    <HighlightQuery query={query} text={bestSection.body} />
+                </p>
+            ) : 'description' in item && item.description ? (
                 <p className="line-clamp-1 text-sm leading-snug">
                     <HighlightQuery query={query} text={item.description} />
                 </p>

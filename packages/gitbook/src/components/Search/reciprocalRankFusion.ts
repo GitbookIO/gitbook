@@ -30,8 +30,6 @@ export function getResultKey(
             return `page:${result.id}`;
         case 'page':
             return `page:${result.pageId}`;
-        case 'section':
-            return `section:${result.pageId}`;
         case 'record':
             return `record:${result.id}`;
     }

@@ -186,5 +186,19 @@ function transformSitePageResult(args: {
                 };
             }) ?? [];
 
-    return [page, ...pageSections];
+    // Find the best-scoring section to use as a body preview on the page result.
+    const bestSection = pageSections.reduce<ComputedSectionResult | undefined>(
+        (best, section) => (!best || section.score > best.score ? section : best),
+        undefined
+    );
+    if (bestSection) {
+        page.bestSection = {
+            href: bestSection.href,
+            title: bestSection.title,
+            body: bestSection.body,
+            score: bestSection.score,
+        };
+    }
+
+    return [page];
 }
