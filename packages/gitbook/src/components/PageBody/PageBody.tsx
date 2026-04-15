@@ -64,7 +64,11 @@ export function PageBody(props: {
 
     const hasVisibleTOCItems =
         context.revision.pages.filter(
-            (page) => page.type !== 'document' || (page.type === 'document' && !page.hidden)
+            (page) =>
+                page.type === 'link' ||
+                page.type === 'computed' ||
+                (page.type === 'group' && !page.hidden) ||
+                (page.type === 'document' && !page.hidden)
         ).length > 0;
 
     const pageHasToc = page.layout.tableOfContents && hasVisibleTOCItems;
