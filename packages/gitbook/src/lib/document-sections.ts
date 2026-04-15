@@ -68,9 +68,7 @@ async function getSectionsFromNodes(
                 continue;
             }
             case 'columns':
-            case 'stepper':
-            case 'updates':
-            case 'update': {
+            case 'stepper': {
                 const stepNodes = await Promise.all(
                     block.nodes.map(async (step) =>
                         getSectionsFromNodes(step.nodes, context, depth)
@@ -78,6 +76,17 @@ async function getSectionsFromNodes(
                 );
                 for (const stepSections of stepNodes) {
                     sections.push(...stepSections);
+                }
+                continue;
+            }
+            case 'updates': {
+                const updateNodes = await Promise.all(
+                    block.nodes.map(async (update) =>
+                        getSectionsFromNodes(update.nodes as DocumentBlock[], context, depth)
+                    )
+                );
+                for (const updateSections of updateNodes) {
+                    sections.push(...updateSections);
                 }
                 continue;
             }
