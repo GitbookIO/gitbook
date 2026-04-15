@@ -68,7 +68,7 @@ function buildLangIndex(pages: RawIndexPage[]): Document<IndexPage> {
             index: ['title', 'description'],
             store: ['id', 'title', 'description'],
         },
-        tokenize: 'bidirectional',
+        tokenize: 'tolerant',
         encoder: 'Normalize',
     });
 
@@ -199,7 +199,7 @@ export function useLocalSearchResults(props: {
             return;
         }
 
-        const rawResults = index.search(query, { enrich: true, limit: 10 });
+        const rawResults = index.search(query, { enrich: true, limit: 10, suggest: true });
 
         // Flatten and deduplicate results across fields (flexsearch returns one array per indexed field)
         const seen = new Set<string>();
