@@ -56,12 +56,13 @@ export function Details(props: {
                 'border-tint-subtle',
                 //all
                 'mt-0!',
+                'mb-0',
                 //select first child
                 'first:mt-5!',
                 'first:rounded-t-lg',
                 //select first in group
-                '[:not(&)_+&]:mt-5!',
-                '[:not(&)_+&]:rounded-t-lg',
+                '[:not(&)_+_&]:mt-5!',
+                '[:not(&)_+_&]:rounded-t-lg',
                 //select last in group
                 '[&:not(:has(+_&))]:mb-5',
                 '[&:not(:has(+_&))]:rounded-b-lg',
