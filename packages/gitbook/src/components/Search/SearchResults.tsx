@@ -3,7 +3,7 @@
 import assertNever from 'assert-never';
 import React from 'react';
 
-import { type Assistant, useAI } from '@/components/AI';
+import { useAI } from '@/components/AI';
 import { t, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
 
@@ -21,14 +21,12 @@ export interface SearchResultsRef {
 type ResultType =
     | OrderedComputedResult
     | LocalPageResult
-    | { type: 'question'; id: string; query: string; assistant: Assistant }
     | { type: 'recommended-question'; id: string; question: string };
 
 /**
  * Fetch the results of the keyboard navigable elements to display for a query:
  *   - Recommended questions if no query is provided.
  *   - Search results if a query is provided.
- *      - If withAI is true, add a question result.
  */
 export const SearchResults = React.forwardRef(function SearchResults(
     props: {
@@ -160,20 +158,6 @@ export const SearchResults = React.forwardRef(function SearchResults(
                                         />
                                     );
                                 }
-                                case 'question': {
-                                    return (
-                                        <SearchQuestionResultItem
-                                            ref={(ref) => {
-                                                refs.current[index] = ref;
-                                            }}
-                                            key={item.id}
-                                            question={query}
-                                            active={index === cursor}
-                                            assistant={item.assistant}
-                                            {...resultItemProps}
-                                        />
-                                    );
-                                }
                                 case 'recommended-question': {
                                     return (
                                         <SearchQuestionResultItem
@@ -208,9 +192,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
                             }
                         })}
                     </div>
-                    {!fetching && !results.some((result) => result.type !== 'question')
-                        ? noResults
-                        : null}
+                    {!fetching && results.length === 0 ? noResults : null}
                 </>
             )}
             {fetching ? (

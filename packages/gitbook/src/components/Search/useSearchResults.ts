@@ -6,11 +6,9 @@ import { assert } from 'ts-essentials';
 import type { OrderedComputedResult } from './search-types';
 import { streamRecommendedQuestions } from './server-actions';
 
-import { type Assistant, useAI } from '@/components/AI';
+import { useAI } from '@/components/AI';
 import assertNever from 'assert-never';
-import { useEventCallback } from 'usehooks-ts';
 import { useTrackEvent } from '../Insights';
-import { isQuestion } from './isQuestion';
 import { type MergedPageResult, reciprocalRankFusion } from './reciprocalRankFusion';
 import { type LocalPageResult, useLocalSearchResults } from './useLocalSearchResults';
 import type { SearchScope } from './useSearch';
@@ -19,7 +17,6 @@ export type ResultType =
     | OrderedComputedResult
     | LocalPageResult
     | MergedPageResult
-    | { type: 'question'; id: string; query: string; assistant: Assistant }
     | { type: 'recommended-question'; id: string; question: string };
 
 export type { LocalPageResult, MergedPageResult };
@@ -76,7 +73,6 @@ export function useSearchResults(props: {
     }>({ results: [], fetching: false, error: false });
 
     const { assistants } = useAI();
-    const getAssistants = useEventCallback(() => assistants);
     const withAI = assistants.length > 0;
 
     React.useEffect(() => {
@@ -235,7 +231,6 @@ export function useSearchResults(props: {
         suggestions,
         searchURL,
         asEmbeddable,
-        getAssistants,
     ]);
 
     // Merge local and remote results.
@@ -258,8 +253,8 @@ export function useSearchResults(props: {
 
         const merged = reciprocalRankFusion(localResults, remoteState.results);
 
-        return withAI ? withAskTriggers(merged, query, assistants) : merged;
-    }, [localResults, remoteState.results, query, withAI, assistants, siteSpaceId, suggestions]);
+        return merged;
+    }, [localResults, remoteState.results, query, withAI, siteSpaceId, suggestions]);
 
     return {
         results,
@@ -299,30 +294,4 @@ async function fetchSearchResults(
     return response.json() as Promise<OrderedComputedResult[]>;
 }
 
-/**
- * Add a "Ask <question>" item at the top of the results list.
- */
-function withAskTriggers(
-    results: ResultType[],
-    query: string,
-    assistants: Assistant[]
-): ResultType[] {
-    const without = results.filter((result) => result.type !== 'question');
 
-    if (query.length === 0) {
-        return without;
-    }
-
-    const queryIsQuestion = isQuestion(query);
-
-    return [
-        ...(queryIsQuestion ? [] : (without ?? [])),
-        ...assistants.map((assistant, index) => ({
-            type: 'question' as const,
-            id: `question-${index}`,
-            query,
-            assistant,
-        })),
-        ...(!queryIsQuestion ? [] : (without ?? [])),
-    ];
-}
