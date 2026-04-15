@@ -6,8 +6,8 @@ import { useLanguage } from '@/intl/client';
 import { tString } from '@/intl/translate';
 import {
     AIMessageRole,
-    type AIMessageStep,
     AIMessageStepPhase,
+    type AIStreamResponse,
     type AIStreamResponseToolCallPending,
     type AIToolCallResult,
 } from '@gitbook/api';
@@ -26,7 +26,14 @@ export type AIChatMessage = {
     role: AIMessageRole;
     content: React.ReactNode;
     query?: string;
-    steps: AIMessageStep[];
+    activity?: AIChatMessageActivity;
+};
+
+export type AIChatMessageActivity = {
+    currentPhase: AIMessageStepPhase | null;
+    toolCount: number;
+    hasCommentary: boolean;
+    hasFinalAnswer: boolean;
 };
 
 export type AIChatStatus =
@@ -220,7 +227,7 @@ export function AIChatProvider(props: {
                         {
                             role: AIMessageRole.Assistant,
                             content: null, // Placeholder for streaming response
-                            steps: [],
+                            activity: getDefaultAIChatMessageActivity(),
                         },
                     ],
                 };
@@ -413,7 +420,11 @@ export function AIChatProvider(props: {
                             {
                                 role: AIMessageRole.Assistant,
                                 content: data.content,
-                                steps: data.steps,
+                                activity: updateAIChatMessageActivity(
+                                    state.messages[state.messages.length - 1]?.activity ??
+                                        getDefaultAIChatMessageActivity(),
+                                    event
+                                ),
                             },
                         ],
                     }));
@@ -489,7 +500,6 @@ export function AIChatProvider(props: {
                             role: AIMessageRole.User,
                             content: input.message,
                             query: input.message,
-                            steps: [],
                         },
                     ],
                     query: input.message,
@@ -587,7 +597,7 @@ export function getAIChatStatus(chat: AIChatState): AIChatStatus {
 
     if (chat.loading) {
         const latestMessage = getLatestAssistantMessage(chat.messages);
-        const phase = latestMessage?.steps[latestMessage.steps.length - 1]?.phase;
+        const phase = latestMessage?.activity?.currentPhase;
         switch (phase) {
             case AIMessageStepPhase.Commentary:
                 return 'exploring';
@@ -614,4 +624,39 @@ function getLatestAssistantMessage(messages: AIChatMessage[]) {
     }
 
     return null;
+}
+
+function updateAIChatMessageActivity(
+    activity: AIChatMessageActivity,
+    event: AIStreamResponse
+): AIChatMessageActivity {
+    switch (event.type) {
+        case 'response_step_start': {
+            return {
+                ...activity,
+                currentPhase: event.phase,
+                hasCommentary:
+                    activity.hasCommentary || event.phase === AIMessageStepPhase.Commentary,
+                hasFinalAnswer:
+                    activity.hasFinalAnswer || event.phase === AIMessageStepPhase.FinalAnswer,
+            };
+        }
+        case 'response_tool_call': {
+            return {
+                ...activity,
+                toolCount: activity.toolCount + 1,
+            };
+        }
+        default:
+            return activity;
+    }
+}
+
+function getDefaultAIChatMessageActivity(): AIChatMessageActivity {
+    return {
+        currentPhase: null,
+        toolCount: 0,
+        hasCommentary: false,
+        hasFinalAnswer: false,
+    };
 }

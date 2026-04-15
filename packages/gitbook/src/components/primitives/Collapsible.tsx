@@ -9,20 +9,25 @@ export function Collapsible(
         children: React.ReactNode;
     } & RadixCollapsible.CollapsibleProps
 ) {
-    const { children, open, defaultOpen, className, ...rest } = props;
+    const { children, open, defaultOpen, onOpenChange, className, ...rest } = props;
 
     useEffect(() => {
-        setOpenState(props.open);
-    }, [props.open]);
+        if (open !== undefined) {
+            setOpenState(open);
+        }
+    }, [open]);
 
-    const [openState, setOpenState] = useState(open);
+    const [openState, setOpenState] = useState<boolean>(open ?? defaultOpen ?? false);
 
     return (
         <RadixCollapsible.Root
             {...rest}
             className={tcls('group/collapsible', className)}
             open={openState}
-            onOpenChange={setOpenState}
+            onOpenChange={(nextOpen) => {
+                setOpenState(nextOpen);
+                onOpenChange?.(nextOpen);
+            }}
         >
             {children}
         </RadixCollapsible.Root>

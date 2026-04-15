@@ -1,7 +1,7 @@
 import { useLanguage } from '@/intl/client';
 import { t, tString } from '@/intl/translate';
 import { tcls } from '@/lib/tailwind';
-import { AIMessageRole, AIMessageStepPhase } from '@gitbook/api';
+import { AIMessageRole } from '@gitbook/api';
 import {
     type AIChatController,
     type AIChatMessage,
@@ -63,18 +63,11 @@ export function AIChatMessages(props: {
             >
                 {group.map(({ message, originalIndex }) => {
                     const isLastMessage = originalIndex === chat.messages.length - 1;
-                    const toolCount = message.steps.reduce(
-                        (count, step) => count + (step.toolCalls?.length ?? 0),
-                        0
-                    );
+                    const toolCount = message.activity?.toolCount ?? 0;
                     const hasCommentary =
-                        message.steps.some(
-                            (step) => step.phase === AIMessageStepPhase.Commentary
-                        ) || toolCount > 0;
+                        (message.activity?.hasCommentary ?? false) || toolCount > 0;
                     const hasFinalAnswer =
-                        message.steps.some(
-                            (step) => step.phase === AIMessageStepPhase.FinalAnswer
-                        ) || !isLastMessage;
+                        (message.activity?.hasFinalAnswer ?? false) || !isLastMessage;
 
                     return (
                         <Collapsible

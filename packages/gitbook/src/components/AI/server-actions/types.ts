@@ -1,4 +1,4 @@
-import type { AIMessageStep, AIStreamResponse } from '@gitbook/api';
+import type { AIStreamResponse } from '@gitbook/api';
 
 /**
  * Stream when rendering an AI message.
@@ -6,7 +6,6 @@ import type { AIMessageStep, AIStreamResponse } from '@gitbook/api';
 export type AIMessageRenderStream = AsyncIterable<{
     content: React.ReactNode;
     event: AIStreamResponse;
-    steps: AIMessageStep[];
 }>;
 
 /**
