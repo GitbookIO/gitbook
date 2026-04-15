@@ -1,9 +1,9 @@
 'use client';
 
+import type { Assistant } from '@/components/AI';
 import { tString, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
 import { Icon, type IconName } from '@gitbook/icons';
-import type { Assistant } from '@/components/AI';
 import { Link } from '../primitives/Link';
 import { useSearchLink } from './useSearch';
 
@@ -32,7 +32,7 @@ export function SearchAskBar(props: { query: string; assistant: Assistant }) {
             {...linkProps}
             className={tcls(
                 'flex items-center gap-3 px-4 py-1.5',
-                'border-t border-tint-subtle bg-tint-subtle',
+                'border-tint-subtle border-t bg-tint-subtle',
                 'text-sm text-tint',
                 'hover:bg-tint-hover hover:text-tint-strong',
                 'transition-colors',

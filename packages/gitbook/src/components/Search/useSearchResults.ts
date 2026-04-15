@@ -293,5 +293,3 @@ async function fetchSearchResults(
 
     return response.json() as Promise<OrderedComputedResult[]>;
 }
-
-
