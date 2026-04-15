@@ -73,11 +73,11 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
                 <HighlightQuery query={query} text={item.title} />
             </p>
             {bestSection?.body ? (
-                <p className="line-clamp-1 text-sm leading-snug">
+                <p className="line-clamp-1 text-xs leading-snug">
                     <HighlightQuery query={query} text={bestSection.body} />
                 </p>
             ) : 'description' in item && item.description ? (
-                <p className="line-clamp-1 text-sm leading-snug">
+                <p className="line-clamp-1 text-xs leading-snug">
                     <HighlightQuery query={query} text={item.description} />
                 </p>
             ) : null}
@@ -149,6 +149,6 @@ const Breadcrumbs = (props: {
                   ...crumbs.slice(-1),
               ]
             : crumbs,
-        'text-tint/7 contrast-more:text-tint group-[.is-active]:text-tint mb-1 text-xs uppercase leading-snug'
+        'text-tint/7 contrast-more:text-tint group-[.is-active]:text-tint mb-1 text-xxs uppercase leading-snug'
     );
 };
