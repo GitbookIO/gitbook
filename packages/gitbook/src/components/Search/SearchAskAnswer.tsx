@@ -31,8 +31,8 @@ export type SearchAskState =
 /**
  * Fetch and render the answers to a question.
  */
-export function SearchAskAnswer(props: { query: string }) {
-    const { query } = props;
+export function SearchAskAnswer(props: { query: string; asEmbeddable?: boolean }) {
+    const { query, asEmbeddable } = props;
 
     const language = useLanguage();
     const trackEvent = useTrackEvent();
@@ -49,7 +49,7 @@ export function SearchAskAnswer(props: { query: string }) {
                 query,
             });
 
-            const { stream } = await streamAskQuestion({ question: query });
+            const { stream } = await streamAskQuestion({ question: query, asEmbeddable });
             for await (const chunk of readStreamableValue(stream)) {
                 if (cancelled) {
                     return;
@@ -74,7 +74,7 @@ export function SearchAskAnswer(props: { query: string }) {
                 cancelled = true;
             }
         };
-    }, [query, setAskState, trackEvent]);
+    }, [asEmbeddable, query, setAskState, trackEvent]);
 
     React.useEffect(() => {
         return () => {

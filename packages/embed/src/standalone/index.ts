@@ -64,7 +64,7 @@ let frameConfiguration: GitBookEmbeddableConfiguration & StandaloneConfiguration
     greeting: { title: '', subtitle: '' },
     suggestions: [],
     tools: [],
-    tabs: ['assistant', 'docs'],
+    tabs: ['assistant', 'search', 'docs'],
     trademark: true,
 };
 
