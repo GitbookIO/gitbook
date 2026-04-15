@@ -16,10 +16,9 @@ export function AIMessageView(
     }
 ) {
     const { message, context, withToolCalls = true, withLinkPreviews = true } = props;
-    // const language = getSpaceLanguage(context);
 
     return message.steps.length > 0 ? (
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col space-y-2">
             {message.steps.map((step, index) => {
                 const hasContent = Boolean(step.content && step.content.nodes.length > 0);
                 const Tag =
@@ -28,7 +27,7 @@ export function AIMessageView(
                     <Tag
                         key={index}
                         className={tcls(
-                            'flex flex-col gap-2 border-tint-subtle',
+                            'flex flex-col space-y-2 border-tint-subtle',
                             hasContent ? 'has-content' : ''
                         )}
                     >

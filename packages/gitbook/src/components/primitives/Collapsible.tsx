@@ -34,11 +34,7 @@ export function CollapsibleTrigger(
         children: React.ReactNode;
     } & RadixCollapsible.CollapsibleTriggerProps
 ) {
-    return (
-        <RadixCollapsible.Trigger asChild {...props}>
-            {props.children}
-        </RadixCollapsible.Trigger>
-    );
+    return <RadixCollapsible.Trigger {...props}>{props.children}</RadixCollapsible.Trigger>;
 }
 
 export function CollapsibleContent(

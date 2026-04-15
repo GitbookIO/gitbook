@@ -1,5 +1,5 @@
 import { useLanguage } from '@/intl/client';
-import { tString } from '@/intl/translate';
+import { t, tString } from '@/intl/translate';
 import { tcls } from '@/lib/tailwind';
 import { AIMessageRole, AIMessageStepPhase } from '@gitbook/api';
 import {
@@ -45,6 +45,8 @@ export function AIChatMessages(props: {
         messageGroups.push(currentGroup);
     }
 
+    const language = useLanguage();
+
     return messageGroups.map((group, groupIndex) => {
         const isLastGroup = group === messageGroups[messageGroups.length - 1];
         return (
@@ -52,7 +54,7 @@ export function AIChatMessages(props: {
                 key={groupIndex}
                 id={`message-group-${groupIndex}`}
                 className={tcls(
-                    'flex flex-col gap-6 pt-2',
+                    'flex flex-col gap-2 pt-2',
                     isLastGroup ? 'shrink-0 basis-full' : '',
 
                     'transition-discrete'
@@ -86,12 +88,12 @@ export function AIChatMessages(props: {
                             }
                             id={`message-${originalIndex}`}
                             className={tcls(
-                                'flex flex-col gap-4',
+                                'flex flex-col gap-2',
                                 'break-words',
                                 'group/message',
                                 'animate-blur-in-slow',
                                 message.role === AIMessageRole.User
-                                    ? 'max-w-[80%] origin-top-right self-end circular-corners:rounded-2xl rounded-corners:rounded-md bg-tint px-4 py-2'
+                                    ? 'mb-4 max-w-[80%] origin-top-right self-end circular-corners:rounded-2xl rounded-corners:rounded-md bg-tint px-4 py-2'
                                     : 'origin-top-left text-tint-strong',
                                 isLastMessage && message.role === AIMessageRole.Assistant
                                     ? 'grow'
@@ -104,15 +106,27 @@ export function AIChatMessages(props: {
                             {message.role === AIMessageRole.Assistant &&
                             hasCommentary &&
                             hasFinalAnswer ? (
-                                <CollapsibleTrigger>
+                                <CollapsibleTrigger asChild>
                                     <Button
                                         variant="blank"
                                         size="small"
-                                        label="View activity"
-                                        className="-m-2.5 group/dropdown animate-blur-in-display-slow self-start"
+                                        label={tString(language, 'ai_chat_view_activity')}
+                                        className="-mx-3 -my-1.5 group/dropdown animate-blur-in-display-slow self-start"
                                     >
                                         <div className="flex items-center gap-2">
-                                            {`Explored ${toolCount > 0 ? `with ${toolCount} tool${toolCount === 1 ? '' : 's'}` : 'briefly'}`}
+                                            {toolCount > 0
+                                                ? t(
+                                                      language,
+                                                      'ai_chat_explored_with',
+                                                      tString(
+                                                          language,
+                                                          toolCount === 1
+                                                              ? 'tool_count'
+                                                              : 'tool_count_plural',
+                                                          toolCount.toString()
+                                                      )
+                                                  )
+                                                : t(language, 'ai_chat_explored')}
                                             <ToggleChevron orientation="right-to-down" />
                                         </div>
                                     </Button>
@@ -124,7 +138,7 @@ export function AIChatMessages(props: {
                             {isLastMessage && message.role === AIMessageRole.Assistant ? (
                                 <div
                                     className={tcls(
-                                        'flex w-full shrink-0 flex-col gap-2 overflow-hidden starting:opacity-0 transition-all transition-discrete duration-300',
+                                        'mt-4 flex w-full shrink-0 flex-col gap-2 overflow-hidden starting:opacity-0 transition-all transition-discrete duration-300',
                                         showLoadingShim
                                             ? 'max-h-48 opacity-11'
                                             : 'pointer-events-none max-h-0 opacity-0'
@@ -145,7 +159,7 @@ export function AIChatMessages(props: {
                                         <AIResponseFeedback
                                             responseId={chat.responseId}
                                             query={chat.query}
-                                            className="-ml-1 -mt-4"
+                                            className="-ml-1.5 -mt-4 mb-2"
                                         />
                                     ) : null}
                                     <AIChatFollowupSuggestions
