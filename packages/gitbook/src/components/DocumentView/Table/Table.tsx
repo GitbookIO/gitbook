@@ -74,8 +74,7 @@ export function Table(props: BlockProps<DocumentBlockTable>) {
                                                   'group-data-[scrollable=false]/table:mb-1',
                                                   'group-data-[scrollable=false]/table:rounded-b-lg',
                                                   'group-data-[scrollable=true]/table:border-t-0',
-                                                  'group-data-[scrollable=true]/table:border-r-0',
-                                                  'group-data-[scrollable=true]/table:border-l-0',
+                                                  'group-data-[scrollable=true]/table:border-x-0',
                                               ]
                                             : undefined
                                     )}
