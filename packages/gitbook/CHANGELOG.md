@@ -1,5 +1,11 @@
 # gitbook
 
+## 0.25.1
+
+### Patch Changes
+
+- aa1fc24: Add support for sticky first column in tables
+
 ## 0.25.0
 
 ### Minor Changes
