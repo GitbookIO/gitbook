@@ -331,16 +331,14 @@ export function getResponseCookiesForAuthLogout(visitorAuthScopePath: string): R
         {
             name: getPathScopedCookieName(VISITOR_TOKEN_COOKIE, visitorAuthScopePath),
             value: '',
+            options: {
+                httpOnly: true,
+                sameSite: process.env.NODE_ENV === 'production' ? 'none' : undefined,
+                secure: process.env.NODE_ENV === 'production',
+                maxAge: 0,
+            },
         },
-    ].map((cookie) => ({
-        ...cookie,
-        options: {
-            httpOnly: true,
-            sameSite: process.env.NODE_ENV === 'production' ? 'none' : undefined,
-            secure: process.env.NODE_ENV === 'production',
-            maxAge: 0,
-        },
-    }));
+    ];
 }
 
 /**

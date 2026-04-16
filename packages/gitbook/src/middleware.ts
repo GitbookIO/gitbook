@@ -9,6 +9,7 @@ import { NextResponse } from 'next/server';
 import rison from 'rison';
 
 import type { SiteURLData } from '@/lib/context';
+import { writeResponseCookies } from '@/lib/cookies';
 import { getContentSecurityPolicy } from '@/lib/csp';
 import { validateSerializedCustomization } from '@/lib/customization';
 import {
@@ -43,7 +44,6 @@ import {
 } from '@/lib/visitors';
 import { waitUntil } from '@/lib/waitUntil';
 import { serveResizedImage } from '@/routes/image';
-import { cookies } from 'next/headers';
 import {
     type ServerInsightsEventInput,
     serveProxyAnalyticsEvent,
@@ -305,12 +305,15 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
             });
         }
 
-        cookies.push(
-            ...getResponseCookiesForVisitorAuth(
-                getVisitorAuthBasePath(siteRequestURL, siteURLData),
-                visitorToken
-            )
-        );
+        const normalizedSitePathname = removeLeadingSlash(removeTrailingSlash(siteURLData.pathname));
+        if (normalizedSitePathname !== '~gitbook/auth/logout') {
+            cookies.push(
+                ...getResponseCookiesForVisitorAuth(
+                    getVisitorAuthBasePath(siteRequestURL, siteURLData),
+                    visitorToken
+                )
+            );
+        }
 
         // We use the host/origin from the canonical URL to ensure the links are
         // correctly generated when the site is proxied. e.g. https://proxy.gitbook.com/site/siteId/...
@@ -755,6 +758,7 @@ function encodePathInSiteContent(
         case '~gitbook/pdf':
         case '~gitbook/search':
         case '~gitbook/auth/login':
+        case '~gitbook/auth/logout':
         case '~scalar/proxy':
             // PDF, search and auth routes are always dynamic as they depend on the request.
             return { pathname, routeType: 'dynamic' };
@@ -797,22 +801,4 @@ function appendQueryParams(url: URL, from: URLSearchParams) {
     }
 
     return url;
-}
-
-/**
- * Write the cookies to a response.
- */
-async function writeResponseCookies<R extends NextResponse>(
-    response: R,
-    cookiesToSet: ResponseCookies
-): Promise<R> {
-    const cookiesFn = await cookies();
-    cookiesToSet.forEach((cookie) => {
-        // response.cookies.set(cookie.name, cookie.value, cookie.options);
-        // For some reason we have to use the cookies function instead of response.cookies.set
-        // Without it, it breaks the ai assistant server actions (it thinks it is a static route).
-        cookiesFn.set(cookie.name, cookie.value, cookie.options);
-    });
-
-    return response;
 }
