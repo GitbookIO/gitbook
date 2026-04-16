@@ -1,12 +1,17 @@
 'use client';
 import type { ComponentPropsWithRef } from 'react';
 
-export function ScrollToTopButton(props: ComponentPropsWithRef<'button'>) {
+export function ScrollToTopButton(props: Omit<ComponentPropsWithRef<'button'>, 'type'>) {
     return (
         <button
             {...props}
-            onClick={() => {
-                window.scrollTo({ top: 0, behavior: 'smooth' });
+            type="button"
+            onClick={(event) => {
+                props.onClick?.(event);
+
+                if (!event.isDefaultPrevented()) {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
             }}
         />
     );
