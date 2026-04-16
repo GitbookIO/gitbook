@@ -66,6 +66,16 @@ export async function streamRenderAIMessage(
         }>(rawStream, async (event) => {
             switch (event.type) {
                 /**
+                 * A new step started (phase update).
+                 */
+                case 'response_step_start': {
+                    updateProcessingMessageStep(event.stepIndex, (step) => {
+                        step.phase = event.phase;
+                    });
+                    break;
+                }
+
+                /**
                  * The agent is processing a tool call in a new message.
                  */
                 case 'response_tool_call': {

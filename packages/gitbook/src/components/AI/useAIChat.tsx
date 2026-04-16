@@ -6,6 +6,8 @@ import { useLanguage } from '@/intl/client';
 import { tString } from '@/intl/translate';
 import {
     AIMessageRole,
+    AIMessageStepPhase,
+    type AIStreamResponse,
     type AIStreamResponseToolCallPending,
     type AIToolCallResult,
 } from '@gitbook/api';
@@ -24,7 +26,24 @@ export type AIChatMessage = {
     role: AIMessageRole;
     content: React.ReactNode;
     query?: string;
+    activity?: AIChatMessageActivity;
 };
+
+export type AIChatMessageActivity = {
+    currentPhase?: AIMessageStepPhase;
+    toolCount: number;
+    hasCommentary: boolean;
+    hasFinalAnswer: boolean;
+};
+
+export type AIChatStatus =
+    | 'default'
+    | 'thinking'
+    | 'exploring'
+    | 'working'
+    | 'done'
+    | 'error'
+    | 'confirm';
 
 export type AIChatState = {
     /**
@@ -208,6 +227,7 @@ export function AIChatProvider(props: {
                         {
                             role: AIMessageRole.Assistant,
                             content: null, // Placeholder for streaming response
+                            activity: getDefaultAIChatMessageActivity(),
                         },
                     ],
                 };
@@ -400,6 +420,11 @@ export function AIChatProvider(props: {
                             {
                                 role: AIMessageRole.Assistant,
                                 content: data.content,
+                                activity: updateAIChatMessageActivity(
+                                    state.messages[state.messages.length - 1]?.activity ??
+                                        getDefaultAIChatMessageActivity(),
+                                    event
+                                ),
                             },
                         ],
                     }));
@@ -559,4 +584,79 @@ export function useAIChatController(): AIChatController {
         throw new Error('useAIChatController must be used within an AIChatProvider');
     }
     return controller;
+}
+
+export function getAIChatStatus(chat: AIChatState): AIChatStatus {
+    if (chat.error) {
+        return 'error';
+    }
+
+    if (chat.control) {
+        return 'confirm';
+    }
+
+    if (chat.loading) {
+        const latestMessage = getLatestAssistantMessage(chat.messages);
+        const phase = latestMessage?.activity?.currentPhase;
+        switch (phase) {
+            case AIMessageStepPhase.Commentary:
+                return 'exploring';
+            case AIMessageStepPhase.FinalAnswer:
+                return 'working';
+            default:
+                return 'thinking';
+        }
+    }
+
+    if (chat.messages.length > 0) {
+        return 'done';
+    }
+
+    return 'default';
+}
+
+function getLatestAssistantMessage(messages: AIChatMessage[]) {
+    for (let index = messages.length - 1; index >= 0; index--) {
+        const message = messages[index];
+        if (message?.role === AIMessageRole.Assistant) {
+            return message;
+        }
+    }
+
+    return null;
+}
+
+function updateAIChatMessageActivity(
+    activity: AIChatMessageActivity,
+    event: AIStreamResponse
+): AIChatMessageActivity {
+    switch (event.type) {
+        case 'response_step_start': {
+            return {
+                ...activity,
+                currentPhase: event.phase,
+                hasCommentary:
+                    activity.hasCommentary || event.phase === AIMessageStepPhase.Commentary,
+                hasFinalAnswer:
+                    activity.hasFinalAnswer || event.phase === AIMessageStepPhase.FinalAnswer,
+            };
+        }
+        case 'response_tool_call': {
+            return {
+                ...activity,
+                toolCount: activity.toolCount + 1,
+            };
+        }
+        default:
+            return activity;
+    }
+}
+
+function getDefaultAIChatMessageActivity(): AIChatMessageActivity {
+    return {
+        currentPhase: undefined,
+        toolCount: 0,
+        hasCommentary: false,
+        hasFinalAnswer: false,
+    };
 }
