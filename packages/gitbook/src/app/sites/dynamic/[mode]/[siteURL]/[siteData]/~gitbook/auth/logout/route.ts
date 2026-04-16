@@ -3,9 +3,9 @@ import {
     getDynamicSiteContext,
     getSiteURLDataFromParams,
 } from '@/app/utils';
-import { writeResponseCookies } from '@/lib/cookies';
 import { getVisitorAuthBasePath } from '@/lib/data';
-import { getResponseCookiesForAuthLogout } from '@/lib/visitors';
+import { getVisitorAuthCookieName } from '@/lib/visitors';
+import { cookies } from 'next/headers';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
@@ -17,18 +17,20 @@ export async function GET(
     { params }: { params: Promise<RouteLayoutParams> }
 ) {
     const resolvedParams = await params;
-    const [{ context }, siteURLData] = await Promise.all([
+    const [{ context }, siteURLData, cookieStore] = await Promise.all([
         getDynamicSiteContext(resolvedParams),
         getSiteURLDataFromParams(resolvedParams),
+        cookies(),
     ]);
 
-    return writeResponseCookies(
-        // TODO: Redirect to the site root for now. Once the API supports it,
-        // optionally redirect to a logoutURL (e.g when needing to logout from upstream auth too)
-        // when defined in visitor auth settings.
-        NextResponse.redirect(context.linker.toAbsoluteURL(context.linker.toPathInSite(''))),
-        getResponseCookiesForAuthLogout(
+    cookieStore.delete(
+        getVisitorAuthCookieName(
             getVisitorAuthBasePath(new URL(request.nextUrl.toString()), siteURLData)
         )
     );
+
+    // TODO: Redirect to the site root for now. Once the API supports it,
+    // optionally redirect to a logoutURL (e.g when needing to logout from upstream auth too)
+    // when defined in visitor auth settings.
+    return NextResponse.redirect(context.linker.toAbsoluteURL(context.linker.toPathInSite('')));
 }

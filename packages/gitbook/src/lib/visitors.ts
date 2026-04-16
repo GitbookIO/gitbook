@@ -324,24 +324,6 @@ export function getResponseCookiesForVisitorAuth(
 }
 
 /**
- * Return the cookies to expire for a logout response.
- */
-export function getResponseCookiesForAuthLogout(visitorAuthScopePath: string): ResponseCookies {
-    return [
-        {
-            name: getPathScopedCookieName(VISITOR_TOKEN_COOKIE, visitorAuthScopePath),
-            value: '',
-            options: {
-                httpOnly: true,
-                sameSite: process.env.NODE_ENV === 'production' ? 'none' : undefined,
-                secure: process.env.NODE_ENV === 'production',
-                maxAge: 0,
-            },
-        },
-    ];
-}
-
-/**
  * Get the name of the visitor authentication cookie for a given base path.
  *
  * NOTE: The cookie names are unique per base path to avoid conflicts between

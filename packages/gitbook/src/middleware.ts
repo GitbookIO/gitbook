@@ -4,12 +4,12 @@ import {
     SiteInsightsLLMSVariant,
 } from '@gitbook/api';
 import { shouldServeMarkdown } from '@vercel/agent-readability';
+import { cookies } from 'next/headers';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import rison from 'rison';
 
 import type { SiteURLData } from '@/lib/context';
-import { writeResponseCookies } from '@/lib/cookies';
 import { getContentSecurityPolicy } from '@/lib/csp';
 import { validateSerializedCustomization } from '@/lib/customization';
 import {
@@ -803,4 +803,22 @@ function appendQueryParams(url: URL, from: URLSearchParams) {
     }
 
     return url;
+}
+
+/**
+ * Write the cookies to a response.
+ */
+async function writeResponseCookies<R extends NextResponse>(
+    response: R,
+    cookiesToSet: ResponseCookies
+): Promise<R> {
+    const cookiesFn = await cookies();
+    cookiesToSet.forEach((cookie) => {
+        // response.cookies.set(cookie.name, cookie.value, cookie.options);
+        // For some reason we have to use the cookies function instead of response.cookies.set
+        // Without it, it breaks the ai assistant server actions (it thinks it is a static route).
+        cookiesFn.set(cookie.name, cookie.value, cookie.options);
+    });
+
+    return response;
 }
