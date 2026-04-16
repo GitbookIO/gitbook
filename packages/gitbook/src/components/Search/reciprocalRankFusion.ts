@@ -179,6 +179,8 @@ export function reciprocalRankFusion(
 
     if (queryWords.length > 0) {
         for (const entry of scoreMap.values()) {
+            // Only apply the bonus to page or local-page results
+            if (entry.result.type === 'record') continue;
             const title = entry.result.title?.toLowerCase() ?? '';
             const titleWords = title.split(/\s+/).filter((w) => w.length > 0);
             for (const word of queryWords) {
