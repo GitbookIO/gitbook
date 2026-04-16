@@ -251,7 +251,7 @@ export function useSearchResults(props: {
             return [];
         }
 
-        const merged = reciprocalRankFusion(localResults, remoteState.results);
+        const merged = reciprocalRankFusion(localResults, remoteState.results, query);
 
         return merged;
     }, [localResults, remoteState.results, query, withAI, siteSpaceId, suggestions]);
