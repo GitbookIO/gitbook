@@ -12,10 +12,10 @@ interface StickyViewGridProps {
 }
 
 export function StickyViewGrid(props: StickyViewGridProps) {
-    if (!props.stickyHeader) {
-        return <DefaultHeaderScrollGrid {...props} />;
+    if (props.stickyHeader) {
+        return <StickyHeaderOverlayScrollGrid {...props} />;
     }
-    return <StickyHeaderOverlayScrollGrid {...props} />;
+    return <DefaultHeaderScrollGrid {...props} />;
 }
 
 function DefaultHeaderScrollGrid({
