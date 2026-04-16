@@ -305,7 +305,9 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
             });
         }
 
-        const normalizedSitePathname = removeLeadingSlash(removeTrailingSlash(siteURLData.pathname));
+        const normalizedSitePathname = removeLeadingSlash(
+            removeTrailingSlash(siteURLData.pathname)
+        );
         if (normalizedSitePathname !== '~gitbook/auth/logout') {
             cookies.push(
                 ...getResponseCookiesForVisitorAuth(
