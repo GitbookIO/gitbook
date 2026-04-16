@@ -4,6 +4,7 @@ import {
     SiteInsightsLLMSVariant,
 } from '@gitbook/api';
 import { shouldServeMarkdown } from '@vercel/agent-readability';
+import { cookies } from 'next/headers';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import rison from 'rison';
@@ -43,7 +44,6 @@ import {
 } from '@/lib/visitors';
 import { waitUntil } from '@/lib/waitUntil';
 import { serveResizedImage } from '@/routes/image';
-import { cookies } from 'next/headers';
 import {
     type ServerInsightsEventInput,
     serveProxyAnalyticsEvent,
@@ -305,12 +305,17 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
             });
         }
 
-        cookies.push(
-            ...getResponseCookiesForVisitorAuth(
-                getVisitorAuthBasePath(siteRequestURL, siteURLData),
-                visitorToken
-            )
+        const normalizedSitePathname = removeLeadingSlash(
+            removeTrailingSlash(siteURLData.pathname)
         );
+        if (normalizedSitePathname !== '~gitbook/auth/logout') {
+            cookies.push(
+                ...getResponseCookiesForVisitorAuth(
+                    getVisitorAuthBasePath(siteRequestURL, siteURLData),
+                    visitorToken
+                )
+            );
+        }
 
         // We use the host/origin from the canonical URL to ensure the links are
         // correctly generated when the site is proxied. e.g. https://proxy.gitbook.com/site/siteId/...
@@ -755,6 +760,7 @@ function encodePathInSiteContent(
         case '~gitbook/pdf':
         case '~gitbook/search':
         case '~gitbook/auth/login':
+        case '~gitbook/auth/logout':
         case '~scalar/proxy':
             // PDF, search and auth routes are always dynamic as they depend on the request.
             return { pathname, routeType: 'dynamic' };
