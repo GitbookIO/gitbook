@@ -24,7 +24,8 @@ export async function GET(
 
     return writeResponseCookies(
         // TODO: Redirect to the site root for now. Once the API supports it,
-        // optionally redirect to the logoutURL defined in visitor auth settings.
+        // optionally redirect to a logoutURL (e.g when needing to logout from upstream auth too)
+        // when defined in visitor auth settings.
         NextResponse.redirect(context.linker.toAbsoluteURL(context.linker.toPathInSite(''))),
         getResponseCookiesForAuthLogout(
             getVisitorAuthBasePath(new URL(request.nextUrl.toString()), siteURLData)
