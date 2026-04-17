@@ -9,10 +9,14 @@ function createLocalURL(href: string) {
 }
 
 function toEmbeddablePath(pathname: string, contentPath: string) {
-    const normalizedPath = stripEmbeddablePath(pathname);
+    const normalizedPath = removeEmbeddablePath(pathname);
     return contentPath
         ? joinPath(normalizedPath, EMBED_PAGE_PATH, contentPath)
         : joinPath(normalizedPath, EMBED_PAGE_PATH);
+}
+
+function removeEmbeddablePath(pathname: string) {
+    return stripEmbeddablePath(pathname).replace(/\/~gitbook\/embed\/page\/?/, '/');
 }
 
 function stripEmbeddablePath(pathname: string) {

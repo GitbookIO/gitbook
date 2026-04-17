@@ -71,10 +71,10 @@ describe('getEmbeddableLinker', () => {
         ).toBe('/docs/~gitbook/embed/page/nested/page-path');
     });
 
-    it('toEmbeddableLinkForPublishedContent should support space root links for embeddable linkers', () => {
+    it('toEmbeddableLinkForPublishedContent should place section paths before the embed path', () => {
         const root = createLinker({
             host: 'docs.company.com',
-            spaceBasePath: '/docs/current',
+            spaceBasePath: '/docs',
             siteBasePath: '/',
         });
 
@@ -83,10 +83,28 @@ describe('getEmbeddableLinker', () => {
         expect(
             toEmbeddableLinkForPublishedContent(
                 embeddableLinker,
-                'https://docs.company.com/docs/other-section/variant',
+                'https://docs.company.com/docs/guides',
                 ''
             )
-        ).toBe('/docs/other-section/variant/~gitbook/embed/page');
+        ).toBe('/docs/guides/~gitbook/embed/page');
+    });
+
+    it('toEmbeddableLinkForPublishedContent should keep page slugs after the embed path in other sections', () => {
+        const root = createLinker({
+            host: 'docs.company.com',
+            spaceBasePath: '/docs',
+            siteBasePath: '/',
+        });
+
+        const embeddableLinker = getEmbeddableLinker(root);
+
+        expect(
+            toEmbeddableLinkForPublishedContent(
+                embeddableLinker,
+                'https://docs.company.com/docs/guides',
+                'getting-started'
+            )
+        ).toBe('/docs/guides/~gitbook/embed/page/getting-started');
     });
 });
 
