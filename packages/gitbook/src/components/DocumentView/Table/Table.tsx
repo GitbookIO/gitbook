@@ -53,25 +53,33 @@ export function Table(props: BlockProps<DocumentBlockTable>) {
             const withHeader = hasVisibleHeader(block, block.data.view);
             const withStickyHeader =
                 withHeader && context.mode !== 'print' && block.data.view.stickyHeader === true;
+            const withStickyFirstColumn =
+                context.mode !== 'print' && block.data.view.stickyFirstColumn === true;
 
-            if (withStickyHeader) {
+            if (withStickyHeader || withStickyFirstColumn) {
                 return (
                     <StickyViewGrid
                         className={tcls(style, 'relative mx-auto grid w-full min-w-0')}
+                        stickyHeader={withStickyHeader}
                         tableClassName={tableContainerClassName}
                         header={
-                            <ViewGridHeader
-                                {...gridProps}
-                                tableClassName={tableContainerClassName}
-                                className={tcls(
-                                    'mb-0 rounded-b-none border-t border-r border-l',
-                                    'group-data-[scrollable=false]/table:mb-1',
-                                    'group-data-[scrollable=false]/table:rounded-b-lg',
-                                    'group-data-[scrollable=true]/table:border-t-0',
-                                    'group-data-[scrollable=true]/table:border-r-0',
-                                    'group-data-[scrollable=true]/table:border-l-0'
-                                )}
-                            />
+                            withHeader ? (
+                                <ViewGridHeader
+                                    {...gridProps}
+                                    tableClassName={tableContainerClassName}
+                                    className={tcls(
+                                        withStickyHeader
+                                            ? [
+                                                  'mb-0 border-t border-r border-l',
+                                                  'group-data-[scrollable=false]/table:mb-1',
+                                                  'group-data-[scrollable=false]/table:rounded-b-lg',
+                                                  'group-data-[scrollable=true]/table:border-t-0',
+                                                  'group-data-[scrollable=true]/table:border-x-0',
+                                              ]
+                                            : undefined
+                                    )}
+                                />
+                            ) : undefined
                         }
                     >
                         <ViewGrid {...gridProps} tableClassName={tableContainerClassName} />

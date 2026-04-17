@@ -17,6 +17,7 @@ import { ThemeToggler } from '../ThemeToggler';
 import { SideSheet } from '../primitives/SideSheet';
 import { PageAsideCloseButton } from './PageAsideButton';
 import { ScrollSectionsList } from './ScrollSectionsList';
+import { ScrollToTopButton } from './ScrollToTopButton';
 
 /**
  * Aside listing the headings in the document.
@@ -102,12 +103,12 @@ export function PageAside(props: {
             <div className="flex h-full w-full shrink-0 flex-col overflow-hidden">
                 {page.layout.outline ? (
                     <>
-                        <div className="mb-3 ml-3 flex layout-wide:3xl:hidden page-no-outline:hidden items-center justify-between max-lg:hidden layout-default:xl:hidden page-api-block:min-[96rem]:hidden">
-                            <h6 className="flex items-center gap-1 font-semibold text-tint text-xs uppercase leading-wider">
+                        <div className="mb-3 ml-3 flex page-no-outline:hidden items-center justify-between max-lg:hidden">
+                            <ScrollToTopButton className="flex cursor-pointer items-center gap-1 font-semibold text-tint text-xs uppercase leading-wider">
                                 <Icon icon="block-quote" className="size-3" />{' '}
                                 {t(language, 'on_this_page')}
-                            </h6>
-                            <PageAsideCloseButton />
+                            </ScrollToTopButton>
+                            <PageAsideCloseButton className="layout-wide:3xl:hidden layout-default:xl:hidden page-api-block:min-[96rem]:hidden" />
                         </div>
                         <div className="flex shrink flex-col overflow-hidden">
                             {document ? (
