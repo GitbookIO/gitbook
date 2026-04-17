@@ -2,7 +2,7 @@ import { tString, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
 import { Icon, type IconName } from '@gitbook/icons';
 import React from 'react';
-import { Tooltip } from '../primitives';
+import { SkeletonParagraph, Tooltip } from '../primitives';
 import { Emoji } from '../primitives/Emoji/Emoji';
 import { HighlightQuery } from './HighlightQuery';
 import { SearchResultItem } from './SearchResultItem';
@@ -17,10 +17,11 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
         query: string;
         item: PageItem;
         active: boolean;
+        style?: React.CSSProperties;
     },
     ref: React.Ref<HTMLAnchorElement>
 ) {
-    const { query, item, active, ...rest } = props;
+    const { query, item, active, style, ...rest } = props;
     const language = useLanguage();
 
     const bestSection = item.type === 'page' ? item.bestSection : undefined;
@@ -61,26 +62,59 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
             ref={ref}
             href={href}
             active={active}
+            key={item.type === 'page' ? item.pageId : item.id}
             data-testid="search-page-result"
             action={tString(language, 'view')}
             leadingIcon={leadingIcon}
             insights={insights}
             aria-label={tString(language, 'search_page_result_title', item.title)}
+            className="animate-blur-in-height"
+            style={{
+                ...style,
+            }}
             {...rest}
         >
             <Breadcrumbs breadcrumbs={item.breadcrumbs} />
             <p className="line-clamp-1 font-semibold text-base text-tint-strong leading-snug">
                 <HighlightQuery query={query} text={item.title} />
             </p>
-            {bestSection?.body ? (
-                <p className="line-clamp-1 text-sm">
-                    <HighlightQuery query={query} text={bestSection.body} />
-                </p>
-            ) : 'description' in item && item.description ? (
-                <p className="line-clamp-1 text-sm">
-                    <HighlightQuery query={query} text={item.description} />
-                </p>
-            ) : null}
+            <div className="relative h-5 w-full">
+                {bestSection?.body ? (
+                    <p
+                        className="absolute inset-0 line-clamp-1 origin-left animate-blur-in text-sm"
+                        style={{ animationDelay: style?.animationDelay }}
+                    >
+                        <HighlightQuery
+                            query={query}
+                            text={`${bestSection.title ? `${bestSection.title} · ` : ''}${bestSection.body}`}
+                        />
+                    </p>
+                ) : null}
+
+                {'description' in item && item.description ? (
+                    <p
+                        className={tcls(
+                            'absolute inset-0 line-clamp-1 origin-left text-sm',
+                            bestSection?.body ? 'animate-blur-out' : ''
+                        )}
+                        style={{ animationDelay: style?.animationDelay }}
+                    >
+                        <HighlightQuery query={query} text={item.description} />
+                    </p>
+                ) : null}
+
+                {item.type === 'local-page' ? (
+                    <SkeletonParagraph
+                        size="small"
+                        lines={1}
+                        className={tcls(
+                            'absolute inset-0 origin-left',
+                            bestSection?.body || item.description ? 'animate-blur-out' : ''
+                        )}
+                        style={{ animationDelay: style?.animationDelay }}
+                    />
+                ) : null}
+            </div>
         </SearchResultItem>
     );
 });

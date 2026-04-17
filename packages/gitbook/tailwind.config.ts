@@ -320,7 +320,7 @@ const config: Config = {
                 'fadeIn-slow': 'fadeIn 500ms ease both',
                 fadeOut: 'fadeOut 200ms ease both',
                 'fadeOut-slow': 'fadeOut 500ms ease both',
-                appear: 'appear 200ms ease both allow-discrete',
+                appear: 'fadeIn 1ms ease both',
 
                 blurIn: 'blurIn 200ms ease-out both',
                 blurInSlow: 'blurIn 500ms ease-out both',
@@ -330,6 +330,11 @@ const config: Config = {
                 blurInDisplaySlow: 'blurInDisplay 500ms ease-out both',
                 blurOutDisplay: 'blurOutDisplay 200ms ease-in both',
                 blurOutDisplaySlow: 'blurOutDisplay 500ms ease-in both',
+
+                blurInHeight: 'heightIn 200ms ease-out both, blurIn 200ms 100ms ease-out both',
+                blurInHeightSlow: 'heightIn 500ms ease-out both, blurIn 500ms 300ms ease-out both',
+                blurOutHeight: 'blurOut 200ms ease-in both, heightOut 200ms 200ms ease-in both',
+                blurOutHeightSlow: 'blurOut 500ms ease-in both, heightOut 500ms 500ms ease-in both',
 
                 enterFromLeft: 'enterFromLeft 300ms cubic-bezier(0.83, 0, 0.17, 1) both',
                 enterFromRight: 'enterFromRight 300ms cubic-bezier(0.83, 0, 0.17, 1) both',
@@ -540,16 +545,26 @@ const config: Config = {
                 heightIn: {
                     from: {
                         height: '0',
-                        opacity: '0',
+                        paddingTop: '0',
+                        paddingBottom: '0',
                         marginTop: '0',
                         marginBottom: '0',
                         gap: '0',
+                        overflow: 'hidden',
                     },
-                    to: { height: 'max-content', opacity: '1' },
+                    to: { height: 'max-content' },
                 },
                 heightOut: {
-                    from: { height: 'max-content', opacity: '1' },
-                    to: { height: '0', opacity: '0', marginTop: '0', marginBottom: '0', gap: '0' },
+                    from: { height: 'max-content' },
+                    to: {
+                        height: '0',
+                        paddingTop: '0',
+                        paddingBottom: '0',
+                        marginTop: '0',
+                        marginBottom: '0',
+                        gap: '0',
+                        overflow: 'hidden',
+                    },
                 },
                 crawl: {
                     '0%': {

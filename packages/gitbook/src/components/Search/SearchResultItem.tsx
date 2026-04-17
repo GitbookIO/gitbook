@@ -13,6 +13,7 @@ export const SearchResultItem = React.forwardRef(function SearchResultItem(
         className?: string;
         size?: 'small' | 'medium';
         leadingIcon?: React.ReactNode;
+        disabled?: boolean;
     } & LinkInsightsProps &
         Omit<React.ComponentProps<typeof Link>, keyof LinkInsightsProps>,
     ref: React.Ref<HTMLAnchorElement>
@@ -25,13 +26,15 @@ export const SearchResultItem = React.forwardRef(function SearchResultItem(
         leadingIcon,
         size = 'medium',
         action,
+        disabled,
         ...rest
     } = props;
 
     return (
         <Link
             ref={ref}
-            href={href}
+            href={href ?? '#'}
+            aria-disabled={disabled}
             className={tcls(
                 'flex',
                 'items-center',
@@ -41,8 +44,7 @@ export const SearchResultItem = React.forwardRef(function SearchResultItem(
                 'pr-2',
                 'py-2',
                 'text-tint',
-                'hover:bg-tint',
-                'hover:text-tint-strong',
+                disabled ? ['pointer-events-none'] : ['hover:bg-tint', 'hover:text-tint-strong'],
                 'group',
                 'transition-colors',
                 'rounded-corners:rounded-md',
@@ -63,7 +65,7 @@ export const SearchResultItem = React.forwardRef(function SearchResultItem(
                 )}
             </div>
             <div className="grow">{children}</div>
-            {active ? (
+            {disabled ? null : active ? (
                 <Button
                     label={action}
                     iconOnly

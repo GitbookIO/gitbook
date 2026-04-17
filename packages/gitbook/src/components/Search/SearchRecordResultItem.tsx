@@ -11,10 +11,11 @@ export const SearchRecordResultItem = React.forwardRef(function SearchRecordResu
         query: string;
         item: ComputedRecordResult;
         active: boolean;
+        style?: React.CSSProperties;
     },
     ref: React.Ref<HTMLAnchorElement>
 ) {
-    const { query, item, active, ...rest } = props;
+    const { query, item, active, style, ...rest } = props;
     const language = useLanguage();
 
     const domain = getDomain(item.href);
@@ -41,6 +42,8 @@ export const SearchRecordResultItem = React.forwardRef(function SearchRecordResu
                 },
             }}
             aria-label={tString(language, 'search_page_result_title', item.title)}
+            className="animate-blur-in-height"
+            style={{ ...style }}
             {...rest}
         >
             <p className="line-clamp-2 font-semibold text-base text-tint-strong leading-snug">

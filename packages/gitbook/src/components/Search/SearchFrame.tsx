@@ -66,7 +66,22 @@ export function SearchFrame(props: {
                         <EmbeddableFrameHeader className="p-3 pb-0">{input}</EmbeddableFrameHeader>
                     ) : null}
                     <React.Suspense fallback={null}>
-                        <ScrollContainer orientation="vertical" contentClassName="p-3">
+                        <ScrollContainer
+                            orientation="vertical"
+                            contentClassName="gutter-stable p-3"
+                        >
+                            <div
+                                className={tcls(
+                                    'pointer-events-none absolute inset-x-0 top-0 z-50 h-0.5 overflow-hidden',
+                                    fetching ? 'block' : 'hidden animate-fade-out-slow'
+                                )}
+                            >
+                                <div
+                                    className={tcls(
+                                        'h-full w-full origin-left animate-crawl bg-primary-solid theme-bold:bg-header-link'
+                                    )}
+                                />
+                            </div>
                             {showAsk ? (
                                 <SearchAskAnswer query={askQuery} asEmbeddable={asEmbeddable} />
                             ) : (

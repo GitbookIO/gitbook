@@ -7,10 +7,11 @@ import { useAI } from '@/components/AI';
 import { t, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
 
-import { Button, Loading } from '../primitives';
+import { Button, SkeletonParagraph, SkeletonSmall } from '../primitives';
 import { SearchPageResultItem } from './SearchPageResultItem';
 import { SearchQuestionResultItem } from './SearchQuestionResultItem';
 import { SearchRecordResultItem } from './SearchRecordResultItem';
+import { SearchResultItem } from './SearchResultItem';
 import type { OrderedComputedResult } from './search-types';
 import type { LocalPageResult } from './useLocalSearchResults';
 
@@ -78,7 +79,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
 
     if (error) {
         return (
-            <div
+            <output
                 className={tcls(
                     'flex',
                     'flex-col',
@@ -99,27 +100,28 @@ export const SearchResults = React.forwardRef(function SearchResults(
                 >
                     {t(language, 'unexpected_error_retry')}
                 </Button>
-            </div>
+            </output>
         );
     }
 
     const noResults = (
-        <div
+        <output
             className={tcls(
                 'flex',
                 'items-center',
                 'justify-center',
                 'text-center',
                 'py-8',
-                'h-full'
+                'h-full',
+                'animate-blur-in-slow'
             )}
         >
             {t(language, 'search_no_results_for', query)}
-        </div>
+        </output>
     );
 
     return (
-        <div className={tcls('min-h-full')}>
+        <output className="h-screen" aria-busy={fetching}>
             {children}
             {results.length === 0 ? (
                 fetching ? null : query ? (
@@ -131,7 +133,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
                 <>
                     <div
                         data-testid="search-results"
-                        className="flex flex-col gap-y-1"
+                        className="flex flex-col space-y-1"
                         id={id}
                         role="listbox"
                         aria-live="polite"
@@ -150,11 +152,14 @@ export const SearchResults = React.forwardRef(function SearchResults(
                                             ref={(ref) => {
                                                 refs.current[index] = ref;
                                             }}
-                                            key={item.id}
                                             query={query}
                                             item={item}
                                             active={index === cursor}
                                             {...resultItemProps}
+                                            key={item.type === 'page' ? item.pageId : item.id}
+                                            style={{
+                                                animationDelay: `${index * 25}ms,${100 + index * 25}ms`,
+                                            }}
                                         />
                                     );
                                 }
@@ -183,6 +188,9 @@ export const SearchResults = React.forwardRef(function SearchResults(
                                             query={query}
                                             item={item}
                                             active={index === cursor}
+                                            style={{
+                                                animationDelay: `${index * 25}ms,${100 + index * 25}ms`,
+                                            }}
                                             {...resultItemProps}
                                         />
                                     );
@@ -195,11 +203,34 @@ export const SearchResults = React.forwardRef(function SearchResults(
                     {!fetching && results.length === 0 ? noResults : null}
                 </>
             )}
-            {fetching ? (
-                <div className={tcls('flex', 'items-center', 'justify-center', 'py-6')}>
-                    <Loading className={tcls('w-6', 'text-tint/6')} />
-                </div>
-            ) : null}
-        </div>
+            {fetching && <SearchResultsSkeleton items={Math.max(3, 5 - results.length)} />}
+        </output>
     );
 });
+
+const SearchResultsSkeleton = (props: { items: number }) => {
+    const { items } = props;
+
+    return (
+        <>
+            {Array.from({ length: items }).map((_, index) => (
+                <SearchResultItem
+                    key={index}
+                    active={false}
+                    href="#"
+                    action=""
+                    disabled
+                    data-testid="search-page-result"
+                    leadingIcon={
+                        <SkeletonSmall
+                            className="size-4"
+                            style={{ animationDelay: `${index * 0.3}s` }}
+                        />
+                    }
+                >
+                    <SkeletonParagraph size="small" start={index * 3} />
+                </SearchResultItem>
+            ))}
+        </>
+    );
+};

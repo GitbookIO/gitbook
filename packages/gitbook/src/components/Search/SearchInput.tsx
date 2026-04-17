@@ -106,7 +106,7 @@ export const SearchInput = React.forwardRef<HTMLDivElement, SearchInputProps>(
                     }
                     trailing={
                         value && resultsCount > 0 ? (
-                            <div className="mr-2 text-sm text-tint-subtle">
+                            <div className="mr-2 animate-blur-in text-sm text-tint-subtle">
                                 {t(language, 'search_results_count', resultsCount.toString())}
                             </div>
                         ) : undefined
