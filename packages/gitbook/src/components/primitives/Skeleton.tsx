@@ -109,44 +109,23 @@ export function SkeletonSmall(
 /**
  * Placeholder when loading an Update block
  */
-export function SkeletonUpdate(props: { id?: string; style?: ClassValue }) {
-    const { id, style } = props;
+export function SkeletonUpdate(props: { id?: string; className?: ClassValue }) {
+    const { id, className } = props;
     return (
         <div
             id={id}
             role="status"
             aria-busy
-            className={tcls('flex flex-col gap-2 md:flex-row md:gap-4 lg:gap-12 xl:gap-20', style)}
+            className={tcls(
+                'flex flex-col gap-2 md:flex-row md:gap-4 lg:gap-12 xl:gap-20',
+                className
+            )}
         >
-            <SkeletonSmall id={id} style={['w-48', style]} />
+            <SkeletonSmall id={id} className={tcls('w-48', className)} />
             <LoadingPane tile={96} delay={0} style={['rounded-md', 'w-full']} />
         </div>
     );
 }
-
-// function LoadingSkeleton() {
-//     return (
-//         <div className="flex flex-wrap gap-2">
-//             {Array.from({ length: 7 }).map((_, index) => (
-//                 <LoadingItem key={index} index={index} />
-//             ))}
-//         </div>
-//     );
-// }
-
-// function LoadingItem(props: { index: number }) {
-//     const { index, ...rest } = props;
-//     return (
-//         <div
-//             {...rest}
-//             className="h-4 animate-[blurIn_500ms_ease-out_both,pulse_1.5s_infinite] circular-corners:rounded-2xl rounded-corners:rounded-md bg-tint-solid/2"
-//             style={{
-//                 width: `calc(${(4 - (index % 4)) * 8 + 14}% - 4px)`,
-//                 animationDelay: `${index * 0.1}s`,
-//             }}
-//         />
-//     );
-// }
 
 function LoadingItem(props: React.ComponentProps<'div'>): React.ReactNode {
     const { className, ...rest } = props;
