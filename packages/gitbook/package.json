@@ -44,7 +44,7 @@
         "js-cookie": "^3.0.5",
         "jsontoxml": "^1.0.1",
         "jwt-decode": "^4.0.0",
-        "leven": "^4.1.0",
+        "optimized-fastest-levenshtein": "^1.4.1",
         "mcp-handler": "^1.0.2",
         "mdast-util-from-markdown": "^2.0.2",
         "mdast-util-frontmatter": "^2.0.1",

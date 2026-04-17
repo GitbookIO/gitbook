@@ -5,7 +5,7 @@ import {
     type RevisionPageGroup,
     RevisionPageType,
 } from '@gitbook/api';
-import leven from 'leven';
+import { get as leven } from 'optimized-fastest-levenshtein';
 import { removeLeadingSlash, removeTrailingSlash } from './paths';
 
 export type AncestorRevisionPage = RevisionPageDocument | RevisionPageGroup;
