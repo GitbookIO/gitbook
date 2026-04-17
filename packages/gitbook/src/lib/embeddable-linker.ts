@@ -9,7 +9,10 @@ function createLocalURL(href: string) {
 }
 
 function toEmbeddablePath(pathname: string, contentPath: string) {
-    return joinPath(stripEmbeddablePath(pathname), EMBED_PAGE_PATH, contentPath);
+    const normalizedPath = stripEmbeddablePath(pathname);
+    return contentPath
+        ? joinPath(normalizedPath, EMBED_PAGE_PATH, contentPath)
+        : joinPath(normalizedPath, EMBED_PAGE_PATH);
 }
 
 function stripEmbeddablePath(pathname: string) {

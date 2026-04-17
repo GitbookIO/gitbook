@@ -70,6 +70,24 @@ describe('getEmbeddableLinker', () => {
             )
         ).toBe('/docs/~gitbook/embed/page/nested/page-path');
     });
+
+    it('toEmbeddableLinkForPublishedContent should support space root links for embeddable linkers', () => {
+        const root = createLinker({
+            host: 'docs.company.com',
+            spaceBasePath: '/docs/current',
+            siteBasePath: '/',
+        });
+
+        const embeddableLinker = getEmbeddableLinker(root);
+
+        expect(
+            toEmbeddableLinkForPublishedContent(
+                embeddableLinker,
+                'https://docs.company.com/docs/other-section/variant',
+                ''
+            )
+        ).toBe('/docs/other-section/variant/~gitbook/embed/page');
+    });
 });
 
 describe('resolveEmbeddableTheme', () => {
