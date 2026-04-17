@@ -37,8 +37,9 @@ export const SearchResultItem = React.forwardRef(function SearchResultItem(
                 'items-center',
                 'gap-3',
                 'group',
-                'px-4',
-                size === 'small' ? 'py-1.5' : 'py-3',
+                'pl-3',
+                'pr-2',
+                'py-2',
                 'text-tint',
                 'hover:bg-tint',
                 'hover:text-tint-strong',
@@ -67,11 +68,12 @@ export const SearchResultItem = React.forwardRef(function SearchResultItem(
                     label={action}
                     iconOnly
                     variant="primary"
-                    size="small"
+                    size="xsmall"
                     icon="arrow-turn-down-left"
+                    className="size-7"
                 />
             ) : (
-                <div className="flex size-9 shrink-0 items-center justify-center text-tint-subtle">
+                <div className="flex size-7 shrink-0 items-center justify-center text-tint-subtle">
                     <Icon icon="chevron-right" className="size-3" />
                 </div>
             )}

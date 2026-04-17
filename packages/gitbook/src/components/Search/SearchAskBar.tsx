@@ -31,12 +31,11 @@ export function SearchAskBar(props: { query: string; assistant: Assistant }) {
         <Link
             {...linkProps}
             className={tcls(
-                'flex items-center gap-3 px-4 py-1.5',
-                'border-tint-subtle border-t bg-tint-subtle',
+                'flex items-center gap-3 px-6 py-2.5',
+                'border-tint-subtle border-t bg-tint-base',
                 'text-sm text-tint',
-                'hover:bg-tint-hover hover:text-tint-strong',
-                'transition-colors',
-                'rounded-corners:rounded-b-md'
+                'hover:bg-tint hover:text-tint-strong',
+                'transition-colors'
             )}
         >
             <div className="size-4 shrink-0 text-tint-subtle">
@@ -47,11 +46,9 @@ export function SearchAskBar(props: { query: string; assistant: Assistant }) {
                 )}
             </div>
             <span className="truncate">
-                {tString(language, 'ask', '')}{' '}
-                <span className="font-medium text-tint-strong">{assistant.label}</span>{' '}
-                <span className="text-tint-subtle">"{query}"</span>
+                {`${tString(language, 'ask', '')} ${assistant.label} "${query}"`}
             </span>
-            <Icon icon="chevron-right" className="ml-auto size-3 shrink-0 text-tint-subtle" />
+            <Icon icon="chevron-right" className="mr-4 ml-auto size-3 text-tint-subtle" />
         </Link>
     );
 }

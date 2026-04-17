@@ -9,6 +9,8 @@ import {
     EmbeddableFrameMain,
     EmbeddableFrameSidebar,
 } from '../Embeddable/EmbeddableFrame';
+import { Tooltip } from '../primitives';
+import { KeyboardShortcut } from '../primitives/KeyboardShortcut';
 import { ScrollContainer } from '../primitives/ScrollContainer';
 import { SearchAskAnswer } from './SearchAskAnswer';
 import { SearchAskBar } from './SearchAskBar';
@@ -89,8 +91,9 @@ export function SearchFrame(props: {
                               ))
                             : null}
                         {scopeControl && !showAsk ? (
-                            <div className="border-tint-subtle border-t bg-tint-subtle px-4 py-1.5">
+                            <div className="flex gap-2 border-tint-subtle border-t bg-tint-subtle px-4 py-1.5">
                                 {scopeControl}
+                                <SearchFrameKeyboardHints />
                             </div>
                         ) : null}
                     </React.Suspense>
@@ -99,3 +102,31 @@ export function SearchFrame(props: {
         </SearchAskProvider>
     );
 }
+
+const SearchFrameKeyboardHints = () => {
+    return (
+        <div className="@container/keyboard-hint flex w-full items-center justify-end">
+            {/* Compact view */}
+            <div className="flex @max-[6rem]/keyboard-hint:hidden @min-[12rem]/keyboard-hint:hidden items-center gap-2">
+                <Tooltip label="Navigate">
+                    <div>
+                        <KeyboardShortcut className="bg-tint-base" keys={['up', 'down']} />
+                    </div>
+                </Tooltip>
+                /
+                <Tooltip label="Close">
+                    <div>
+                        <KeyboardShortcut className="bg-tint-base" keys={['esc']} />
+                    </div>
+                </Tooltip>
+            </div>
+            {/* Normal view */}
+            <div className="flex @max-[12rem]/keyboard-hint:hidden items-center gap-2">
+                <KeyboardShortcut className="bg-tint-base" keys={['up', 'down']} />
+                Navigate
+                <KeyboardShortcut className="ml-1 bg-tint-base" keys={['esc']} />
+                Close
+            </div>
+        </div>
+    );
+};

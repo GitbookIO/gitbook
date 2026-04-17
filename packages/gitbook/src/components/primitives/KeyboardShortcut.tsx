@@ -14,7 +14,7 @@ export function KeyboardShortcut(props: KeyboardShortcutProps) {
     return (
         <div
             className={tcls(
-                'shortcut hidden justify-end gap-0.5 whitespace-nowrap text-tint text-xs [font-feature-settings:"calt","case"] contrast-more:text-tint-strong md:flex'
+                'shortcut flex pointer-none:hidden justify-end gap-0.5 whitespace-nowrap text-tint text-xs [font-feature-settings:"calt","case"] contrast-more:text-tint-strong'
             )}
         >
             {keys.map((key, index) => {
@@ -32,6 +32,14 @@ export function KeyboardShortcut(props: KeyboardShortcutProps) {
 
                     case 'enter':
                         element = <Icon icon="arrow-turn-down-left" className="size-[.9em]" />;
+                        break;
+
+                    case 'up':
+                        element = <Icon icon="arrow-up" className="size-[.9em]" />;
+                        break;
+
+                    case 'down':
+                        element = <Icon icon="arrow-down" className="size-[.9em]" />;
                         break;
                 }
                 return (

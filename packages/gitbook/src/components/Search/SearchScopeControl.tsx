@@ -31,7 +31,7 @@ export function SearchScopeControl(props: SearchScopeControlProps) {
     const variantScopeIsExtended = ['extended', 'all'].includes(state.scope);
 
     return (
-        <div className="flex items-center gap-1">
+        <div className="flex items-center">
             <SearchScopeTitle />
             {withSections ? (
                 <SearchScopeSectionControl isExtended={sectionScopeIsExtended} {...props} />

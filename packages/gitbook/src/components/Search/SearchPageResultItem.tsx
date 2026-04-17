@@ -41,7 +41,7 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
     ) : icon ? (
         <Icon icon={icon as IconName} className="size-4" />
     ) : (
-        <Icon icon="memo" className="size-4" />
+        <Icon icon="file-lines" className="size-4" />
     );
 
     const insights =
@@ -69,15 +69,15 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
             {...rest}
         >
             <Breadcrumbs breadcrumbs={item.breadcrumbs} />
-            <p className="line-clamp-2 font-semibold text-base text-tint-strong leading-snug">
+            <p className="line-clamp-1 font-semibold text-base text-tint-strong leading-snug">
                 <HighlightQuery query={query} text={item.title} />
             </p>
             {bestSection?.body ? (
-                <p className="line-clamp-1 text-xs leading-snug">
+                <p className="line-clamp-1 text-sm">
                     <HighlightQuery query={query} text={bestSection.body} />
                 </p>
             ) : 'description' in item && item.description ? (
-                <p className="line-clamp-1 text-xs leading-snug">
+                <p className="line-clamp-1 text-sm">
                     <HighlightQuery query={query} text={item.description} />
                 </p>
             ) : null}
@@ -149,6 +149,6 @@ const Breadcrumbs = (props: {
                   ...crumbs.slice(-1),
               ]
             : crumbs,
-        'text-tint/7 contrast-more:text-tint group-[.is-active]:text-tint mb-1 text-xxs uppercase leading-snug'
+        'text-tint/7 contrast-more:text-tint group-[.is-active]:text-tint text-xs'
     );
 };

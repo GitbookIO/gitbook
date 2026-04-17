@@ -156,6 +156,8 @@ export function SearchContainer({
                     isOpen={state?.open ?? false}
                     className={className}
                     onFocus={open}
+                    resultsCount={results.length}
+                    fetching={fetching}
                 >
                     <SearchLiveResultsAnnouncer
                         count={results.length}

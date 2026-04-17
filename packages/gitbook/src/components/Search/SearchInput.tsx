@@ -1,7 +1,7 @@
 'use client';
 import React, { useEffect, useRef } from 'react';
 
-import { tString, useLanguage } from '@/intl/client';
+import { t, tString, useLanguage } from '@/intl/client';
 import { Icon } from '@gitbook/icons';
 import { Input } from '../primitives';
 
@@ -17,6 +17,8 @@ interface SearchInputProps {
     className?: string;
     children?: React.ReactNode;
     mode?: 'header' | 'frame';
+    resultsCount: number;
+    fetching: boolean;
 }
 
 /**
@@ -34,6 +36,8 @@ export const SearchInput = React.forwardRef<HTMLDivElement, SearchInputProps>(
             className,
             children,
             mode = 'header',
+            resultsCount,
+            fetching,
             ...rest
         } = props;
         const inputRef = useRef<HTMLInputElement>(null);
@@ -100,14 +104,12 @@ export const SearchInput = React.forwardRef<HTMLDivElement, SearchInputProps>(
                                       'site-header:theme-bold:text-header-link site-header:theme-bold:hover:bg-header-link/3',
                               }
                     }
-                    keyboardShortcut={
-                        isFrame
-                            ? undefined
-                            : {
-                                  className:
-                                      'site-header:theme-bold:border-header-link/4 site-header:theme-bold:bg-header-background site-header:theme-bold:text-header-link',
-                                  keys: isOpen ? ['esc'] : ['mod', 'k'],
-                              }
+                    trailing={
+                        value && resultsCount > 0 ? (
+                            <div className="mr-2 text-sm text-tint-subtle">
+                                {t(language, 'search_results_count', resultsCount.toString())}
+                            </div>
+                        ) : undefined
                     }
                     {...rest}
                     type="text"
