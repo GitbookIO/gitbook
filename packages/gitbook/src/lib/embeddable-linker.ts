@@ -2,12 +2,18 @@ import type { GitBookLinker } from '@/lib/links';
 import { getPagePath } from '@/lib/pages';
 import { joinPath, joinPathWithBaseURL } from '@/lib/paths';
 
+const EMBED_PAGE_PATH = '~gitbook/embed/page';
+
 function createLocalURL(href: string) {
     return new URL(href, 'https://gitbook.local');
 }
 
 function toEmbeddablePath(pathname: string, contentPath: string) {
-    return joinPath(pathname, '~gitbook/embed/page', contentPath);
+    return joinPath(stripEmbeddablePath(pathname), EMBED_PAGE_PATH, contentPath);
+}
+
+function stripEmbeddablePath(pathname: string) {
+    return pathname.replace(/\/~gitbook\/embed\/page\/?$/, '');
 }
 
 export function toEmbeddableLinkForPublishedContent(
@@ -32,7 +38,7 @@ export function getEmbeddableLinker(linker: GitBookLinker): GitBookLinker {
         ...linker,
         toPathForPage({ pages, page, anchor }) {
             const pagePath = getPagePath(pages, page);
-            const embedPagePath = joinPath('~gitbook/embed/page', pagePath);
+            const embedPagePath = joinPath(EMBED_PAGE_PATH, pagePath);
 
             return `${linker.toPathInSpace(embedPagePath)}${anchor ? `#${anchor}` : ''}`;
         },
@@ -40,7 +46,7 @@ export function getEmbeddableLinker(linker: GitBookLinker): GitBookLinker {
         withOtherSiteSpace(override: { spaceBasePath: string }): GitBookLinker {
             return linker.withOtherSiteSpace({
                 // We make sure that links in the other site space will be shown in the embeddable view.
-                spaceBasePath: joinPath(override.spaceBasePath, '~gitbook/embed/page'),
+                spaceBasePath: joinPath(override.spaceBasePath, EMBED_PAGE_PATH),
             });
         },
 
@@ -54,7 +60,7 @@ export function getEmbeddableLinker(linker: GitBookLinker): GitBookLinker {
             const url = createLocalURL(result);
             if (url.pathname.startsWith(linker.spaceBasePath)) {
                 const contentPath = url.pathname.slice(linker.spaceBasePath.length);
-                return `${linker.toPathInSpace(joinPath('~gitbook/embed/page', contentPath))}${url.search}${url.hash}`;
+                return `${linker.toPathInSpace(joinPath(EMBED_PAGE_PATH, contentPath))}${url.search}${url.hash}`;
             }
 
             return result;

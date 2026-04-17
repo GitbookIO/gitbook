@@ -52,6 +52,24 @@ describe('getEmbeddableLinker', () => {
             )
         ).toBe('/api/python/~gitbook/embed/page/getting-started');
     });
+
+    it('toEmbeddableLinkForPublishedContent should not duplicate the embed path for embeddable linkers', () => {
+        const root = createLinker({
+            host: 'docs.company.com',
+            spaceBasePath: '/docs',
+            siteBasePath: '/',
+        });
+
+        const embeddableLinker = getEmbeddableLinker(root);
+
+        expect(
+            toEmbeddableLinkForPublishedContent(
+                embeddableLinker,
+                'https://docs.company.com/docs',
+                'nested/page-path'
+            )
+        ).toBe('/docs/~gitbook/embed/page/nested/page-path');
+    });
 });
 
 describe('resolveEmbeddableTheme', () => {
