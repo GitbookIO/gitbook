@@ -1,7 +1,7 @@
 'use client';
 
 import assertNever from 'assert-never';
-import { AnimatePresence, motion, usePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import React from 'react';
 
 import { useAI } from '@/components/AI';
@@ -20,12 +20,25 @@ export interface SearchResultsRef {
     select(): void;
 }
 
-const MotionResultWrapper = motion.div;
-
 type ResultType =
     | OrderedComputedResult
     | LocalPageResult
     | { type: 'recommended-question'; id: string; question: string };
+
+function getResultKey(item: ResultType): string {
+    switch (item.type) {
+        case 'local-page':
+            return `page:${item.id}`;
+        case 'page':
+            return `page:${item.pageId}`;
+        case 'record':
+            return `record:${item.id}`;
+        case 'recommended-question':
+            return `question:${item.id}`;
+        default:
+            return assertNever(item);
+    }
+}
 
 /**
  * Fetch the results of the keyboard navigable elements to display for a query:
@@ -48,8 +61,22 @@ export const SearchResults = React.forwardRef(function SearchResults(
     const { children, id, query, results, fetching, cursor, error, onResultSelect } = props;
 
     const language = useLanguage();
+    const shouldAnimateResults = !query || fetching;
+    const seenResultKeys = React.useRef(new Set<string>());
+    const lastQuery = React.useRef(query);
+
+    if (lastQuery.current !== query) {
+        lastQuery.current = query;
+        seenResultKeys.current.clear();
+    }
 
     const refs = React.useRef<(null | HTMLAnchorElement)[]>([]);
+
+    React.useEffect(() => {
+        for (const item of results) {
+            seenResultKeys.current.add(getResultKey(item));
+        }
+    }, [results]);
 
     // Scroll to the active result.
     React.useEffect(() => {
@@ -60,6 +87,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
         refs.current[cursor]?.scrollIntoView({
             block: 'nearest',
             inline: 'nearest',
+            behavior: 'instant',
         });
     }, [cursor]);
 
@@ -80,6 +108,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
     );
 
     const { assistants } = useAI();
+    const primaryAssistant = assistants[0];
 
     if (error) {
         return (
@@ -135,128 +164,102 @@ export const SearchResults = React.forwardRef(function SearchResults(
                 )
             ) : (
                 <>
-                    <div
-                        data-testid="search-results"
-                        className="flex flex-col space-y-1"
-                        id={id}
-                        role="listbox"
-                        aria-live="polite"
-                    >
+                    <div data-testid="search-results" className="flex flex-col space-y-1" id={id}>
                         <AnimatePresence initial={false} mode="popLayout">
                             {results.map((item, index) => {
+                                const itemKey = getResultKey(item);
+                                const shouldAnimateItem =
+                                    shouldAnimateResults || !seenResultKeys.current.has(itemKey);
                                 const resultItemProps = {
                                     'aria-posinset': index + 1,
                                     'aria-setsize': results.length,
-                                    id: `${id}-${index}`,
                                     onClickCapture: () => onResultSelect?.(),
                                 };
                                 switch (item.type) {
                                     case 'local-page':
                                     case 'page': {
                                         return (
-                                            <PresenceLayoutItem
-                                                key={item.type === 'page' ? item.pageId : item.id}
-                                                render={(presenceProps) => (
-                                                    <MotionResultWrapper
-                                                        layout="position"
-                                                        className={tcls(
-                                                            presenceProps.isPresent
-                                                                ? ''
-                                                                : 'animate-blur-out-height'
-                                                        )}
+                                            <motion.div
+                                                layout="position"
+                                                transition={{
+                                                    duration: 0.3,
+                                                    ease: 'circInOut',
+                                                }}
+                                                key={itemKey}
+                                            >
+                                                <div
+                                                    className={
+                                                        shouldAnimateItem
+                                                            ? 'animate-blur-in-height'
+                                                            : undefined
+                                                    }
+                                                    style={{
+                                                        animationDelay: `${100 + index * 25}ms,${200 + index * 25}ms`,
+                                                    }}
+                                                >
+                                                    <SearchPageResultItem
+                                                        ref={(ref) => {
+                                                            refs.current[index] = ref;
+                                                        }}
+                                                        query={query}
+                                                        item={item}
+                                                        active={index === cursor}
                                                         style={{
-                                                            animationDelay: '0s,0s',
+                                                            animationDelay: `${100 + index * 25}ms,${200 + index * 25}ms`,
                                                         }}
-                                                        transition={{
-                                                            duration: 0.2,
-                                                            ease: 'easeOut',
-                                                        }}
-                                                        {...presenceProps.motionProps}
-                                                    >
-                                                        <SearchPageResultItem
-                                                            ref={(ref) => {
-                                                                refs.current[index] = ref;
-                                                            }}
-                                                            query={query}
-                                                            item={item}
-                                                            active={index === cursor}
-                                                            {...resultItemProps}
-                                                            style={{
-                                                                animationDelay: `${100 + index * 25}ms,${200 + index * 25}ms`,
-                                                            }}
-                                                        />
-                                                    </MotionResultWrapper>
-                                                )}
-                                            />
+                                                        {...resultItemProps}
+                                                    />
+                                                </div>
+                                            </motion.div>
                                         );
                                     }
                                     case 'recommended-question': {
+                                        if (!primaryAssistant) {
+                                            return null;
+                                        }
                                         return (
-                                            <PresenceLayoutItem
-                                                key={item.id}
-                                                render={(presenceProps) => (
-                                                    <MotionResultWrapper
-                                                        layout="position"
-                                                        className={tcls(
-                                                            presenceProps.isPresent
-                                                                ? ''
-                                                                : 'animate-blur-out-height'
-                                                        )}
-                                                        style={{
-                                                            animationDelay: '0s,0s',
-                                                        }}
-                                                        {...presenceProps.motionProps}
-                                                    >
-                                                        <SearchQuestionResultItem
-                                                            ref={(ref) => {
-                                                                refs.current[index] = ref;
-                                                            }}
-                                                            question={item.question}
-                                                            active={index === cursor}
-                                                            assistant={assistants[0]!}
-                                                            recommended
-                                                            {...resultItemProps}
-                                                            style={{
-                                                                animationDelay: `${100 + index * 25}ms,${200 + index * 25}ms`,
-                                                            }}
-                                                        />
-                                                    </MotionResultWrapper>
-                                                )}
-                                            />
+                                            <motion.div
+                                                className={
+                                                    shouldAnimateItem
+                                                        ? 'animate-blur-in'
+                                                        : undefined
+                                                }
+                                                style={
+                                                    shouldAnimateItem
+                                                        ? {
+                                                              animationDelay: `${100 + index * 25}ms,${200 + index * 25}ms`,
+                                                          }
+                                                        : undefined
+                                                }
+                                                key={itemKey}
+                                            >
+                                                <SearchQuestionResultItem
+                                                    ref={(ref) => {
+                                                        refs.current[index] = ref;
+                                                    }}
+                                                    question={item.question}
+                                                    active={index === cursor}
+                                                    assistant={primaryAssistant}
+                                                    recommended
+                                                    {...resultItemProps}
+                                                />
+                                            </motion.div>
                                         );
                                     }
                                     case 'record': {
                                         return (
-                                            <PresenceLayoutItem
-                                                key={item.id}
-                                                render={(presenceProps) => (
-                                                    <MotionResultWrapper
-                                                        layout="position"
-                                                        className={tcls(
-                                                            presenceProps.isPresent
-                                                                ? ''
-                                                                : 'animate-blur-out-height'
-                                                        )}
-                                                        style={{
-                                                            animationDelay: '0s,0s',
-                                                            animationDuration: '0s,0s',
-                                                        }}
-                                                        {...presenceProps.motionProps}
-                                                    >
-                                                        <SearchRecordResultItem
-                                                            ref={(ref) => {
-                                                                refs.current[index] = ref;
-                                                            }}
-                                                            query={query}
-                                                            item={item}
-                                                            active={index === cursor}
-                                                            style={{
-                                                                animationDelay: `${100 + index * 25}ms,${100 + index * 25}ms`,
-                                                            }}
-                                                            {...resultItemProps}
-                                                        />
-                                                    </MotionResultWrapper>
-                                                )}
+                                            <SearchRecordResultItem
+                                                ref={(ref) => {
+                                                    refs.current[index] = ref;
+                                                }}
+                                                key={itemKey}
+                                                query={query}
+                                                item={item}
+                                                active={index === cursor}
+                                                style={{
+                                                    animationDelay: `${100 + index * 25}ms,${100 + index * 25}ms`,
+                                                }}
+                                                {...resultItemProps}
                                             />
                                         );
                                     }
@@ -274,42 +277,15 @@ export const SearchResults = React.forwardRef(function SearchResults(
     );
 });
 
-function PresenceLayoutItem(props: {
-    render: (presence: {
-        isPresent: boolean;
-        motionProps: {
-            onAnimationEndCapture?: React.AnimationEventHandler;
-        };
-    }) => React.ReactNode;
-}) {
-    const [isPresent, safeToRemove] = usePresence();
-
-    React.useEffect(() => {
-        if (isPresent) return;
-        const timeout = window.setTimeout(() => safeToRemove?.(), 250);
-        return () => window.clearTimeout(timeout);
-    }, [isPresent, safeToRemove]);
-
-    return props.render({
-        isPresent,
-        motionProps: {
-            onAnimationEndCapture: (event) => {
-                if (!isPresent && event.currentTarget === event.target) {
-                    safeToRemove?.();
-                }
-            },
-        },
-    });
-}
-
 const SearchResultsSkeleton = (props: { items: number }) => {
     const { items } = props;
+    const skeletonKeys = Array.from({ length: items }, (_, index) => `skeleton:${index}`);
 
     return (
         <>
-            {Array.from({ length: items }).map((_, index) => (
+            {skeletonKeys.map((key, index) => (
                 <SearchResultItem
-                    key={index}
+                    key={key}
                     active={false}
                     href="#"
                     action=""
