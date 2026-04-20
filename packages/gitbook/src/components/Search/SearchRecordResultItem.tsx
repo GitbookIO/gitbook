@@ -42,7 +42,6 @@ export const SearchRecordResultItem = React.forwardRef(function SearchRecordResu
                 },
             }}
             aria-label={tString(language, 'search_page_result_title', item.title)}
-            className="animate-blur-in-height"
             style={{ ...style }}
             {...rest}
         >

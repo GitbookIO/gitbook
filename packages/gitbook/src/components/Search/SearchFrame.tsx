@@ -75,12 +75,17 @@ export function SearchFrame(props: {
                             <div
                                 className={tcls(
                                     'pointer-events-none absolute inset-x-0 top-0 z-50 h-0.5 overflow-hidden',
-                                    fetching ? 'block' : 'hidden animate-fade-out-slow'
+                                    fetching
+                                        ? 'block animate-fade-in'
+                                        : 'hidden animate-fade-out-slow'
                                 )}
+                                style={{
+                                    animationDelay: fetching ? '2s' : undefined,
+                                }}
                             >
                                 <div
                                     className={tcls(
-                                        'h-full w-full origin-left animate-crawl bg-primary-solid theme-bold:bg-header-link'
+                                        'h-full w-full origin-left animate-crawl bg-primary-solid'
                                     )}
                                 />
                             </div>

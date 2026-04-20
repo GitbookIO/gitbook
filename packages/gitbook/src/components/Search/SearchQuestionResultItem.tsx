@@ -38,7 +38,6 @@ export const SearchQuestionResultItem = React.forwardRef(function SearchQuestion
             )}
             active={active}
             leadingIcon={recommended ? 'search' : assistant.icon}
-            className="animate-blur-in"
             style={style}
             {...rest}
         >

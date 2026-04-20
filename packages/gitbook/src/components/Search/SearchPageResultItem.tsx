@@ -62,13 +62,11 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
             ref={ref}
             href={href}
             active={active}
-            key={item.type === 'page' ? item.pageId : item.id}
             data-testid="search-page-result"
             action={tString(language, 'view')}
             leadingIcon={leadingIcon}
             insights={insights}
             aria-label={tString(language, 'search_page_result_title', item.title)}
-            className="animate-blur-in-height"
             style={{
                 ...style,
             }}
