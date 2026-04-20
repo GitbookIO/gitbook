@@ -29,5 +29,5 @@ export async function serveRobotsTxt(context: GitBookSiteContext) {
           ]
         : ['User-agent: *', 'Content-Signal: ai-train=no, search=no, ai-input=no', 'Disallow: /'];
 
-    return new Response(lines.join('\n'), { headers: { 'Content-Type': 'text/plain' } });
+    return new Response(`${lines.join('\n')}\n`, { headers: { 'Content-Type': 'text/plain' } });
 }
