@@ -21,6 +21,7 @@ interface RawIndexPage {
     id: string;
     title: string;
     pathname: string;
+    siteSpaceId: string;
     lang?: string;
     icon?: string;
     emoji?: string;
@@ -141,6 +142,7 @@ export async function GET(
                 id: page.id,
                 title: page.title,
                 pathname: forkedLinker.toPathForPage({ pages: revision.pages, page }),
+                siteSpaceId: siteSpace.id,
                 lang,
                 icon: page.icon ?? undefined,
                 emoji: page.emoji ?? undefined,

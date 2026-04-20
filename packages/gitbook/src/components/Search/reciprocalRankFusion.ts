@@ -1,7 +1,7 @@
 import type { ComputedPageResult, OrderedComputedResult } from './search-types';
 import type { LocalPageResult } from './useLocalSearchResults';
 
-/** 
+/**
  * Jaro-Winkler similarity between two strings, in the range [0, 1].
  * Higher is more similar. 1 means an exact match.
  * https://en.wikipedia.org/wiki/Jaro%E2%80%93Winkler_distance
