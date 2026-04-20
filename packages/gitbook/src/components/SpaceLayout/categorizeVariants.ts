@@ -6,7 +6,13 @@ import { getSiteSpaceLanguages, normalizeLanguage } from '@/lib/sites';
  * Categorize the variants of the space into generic and translation variants.
  */
 export function categorizeVariants(context: GitBookSiteContext) {
-    const { siteSpace, visibleSiteSpaces: siteSpaces } = context;
+    const { siteSpace } = context;
+
+    // By default, variants only include visible spaces.
+    // If all variants in the current section are hidden, we still show the selector in-place
+    // by falling back to all section variants.
+    const siteSpaces =
+        context.visibleSiteSpaces.length > 0 ? context.visibleSiteSpaces : context.siteSpaces;
 
     const currentLanguage = normalizeLanguage(context.locale);
 
