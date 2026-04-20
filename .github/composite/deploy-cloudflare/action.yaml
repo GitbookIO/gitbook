@@ -64,6 +64,7 @@ runs:
           run: bun run turbo build:cloudflare
           env:
             GITBOOK_RUNTIME: cloudflare
+            GITBOOK_BLOCK_SEARCH_INDEXATION: ${{ inputs.environment == 'preview' && 'true' || '' }}
           shell: bash
 
         - name: Upload the DO worker

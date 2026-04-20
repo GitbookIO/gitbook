@@ -8,7 +8,7 @@ export async function serveRobotsTxt(context: GitBookSiteContext) {
     const { linker } = context;
 
     const isRoot = checkIsRootSiteContext(context);
-    const isIndexable = await isSiteIndexable(context);
+    const isIndexable = isSiteIndexable(context);
 
     const sitemapPath = linker.toPathInSpace(isRoot ? '/sitemap.xml' : '/sitemap-pages.xml');
     const sitemapUrl = linker.toAbsoluteURL(sitemapPath);

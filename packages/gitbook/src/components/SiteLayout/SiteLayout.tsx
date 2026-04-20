@@ -193,6 +193,6 @@ export async function generateSiteLayoutMetadata(context: GitBookSiteContext): P
                     ? 'black'
                     : 'default',
         },
-        robots: (await isSiteIndexable(context)) ? 'index, follow' : 'noindex, nofollow',
+        robots: isSiteIndexable(context) ? 'index, follow' : 'noindex, nofollow',
     };
 }

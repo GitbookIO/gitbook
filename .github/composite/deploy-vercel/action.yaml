@@ -70,6 +70,7 @@ runs:
             echo "resolved HEAD_SHA: $HEAD_SHA"
             echo "GITBOOK_HEAD_SHA=$HEAD_SHA" >> .vercel/.env.${{ inputs.environment }}.local
             echo "GITBOOK_RUNTIME=vercel" >> .vercel/.env.${{ inputs.environment }}.local
+            echo "GITBOOK_BLOCK_SEARCH_INDEXATION=true" >> .vercel/.env.${{ inputs.environment }}.local
             echo "--- .vercel/.env.${{ inputs.environment }}.local after inject ---"
             cat .vercel/.env.${{ inputs.environment }}.local
         - name: Build Project Artifacts
