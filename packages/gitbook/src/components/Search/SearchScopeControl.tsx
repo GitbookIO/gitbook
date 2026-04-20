@@ -22,7 +22,7 @@ export function SearchScopeControl(props: SearchScopeControlProps) {
 
     const state = useSearchState();
 
-    if (!state) {
+    if (!state?.open) {
         return null;
     }
 

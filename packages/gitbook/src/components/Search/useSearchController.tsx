@@ -62,8 +62,9 @@ function useSearchKeyboardNavigation(props: {
     query: string;
     results: ReturnType<typeof useSearchResults>['results'];
     resultsRef: React.RefObject<SearchResultsRef | null>;
+    abort: () => void;
 }) {
-    const { query, results, resultsRef } = props;
+    const { query, results, resultsRef, abort } = props;
     const { cursor, moveBy: moveCursorBy } = useSearchResultsCursor({
         query,
         results,
@@ -79,10 +80,12 @@ function useSearchKeyboardNavigation(props: {
                 moveCursorBy(1);
             } else if (event.key === 'Enter') {
                 event.preventDefault();
+                // Stop any in-flight search request: the user is navigating away.
+                abort();
                 resultsRef.current?.select();
             }
         },
-        [moveCursorBy, resultsRef]
+        [moveCursorBy, resultsRef, abort]
     );
 
     return {
@@ -179,7 +182,7 @@ export function useSearchController(props: SearchBaseProps) {
         language: siteSpace.space.language,
     });
 
-    const { results, fetching, error } = useSearchResults({
+    const { results, fetching, error, abort } = useSearchResults({
         asEmbeddable,
         disabled: !(state?.query || withAI),
         query: normalizedQuery,
@@ -199,6 +202,7 @@ export function useSearchController(props: SearchBaseProps) {
         query: normalizedQuery,
         results,
         resultsRef,
+        abort,
     });
 
     return {
@@ -207,6 +211,7 @@ export function useSearchController(props: SearchBaseProps) {
         cursor,
         error,
         fetching,
+        abort,
         open: onOpen,
         close: onClose,
         query: normalizedQuery,

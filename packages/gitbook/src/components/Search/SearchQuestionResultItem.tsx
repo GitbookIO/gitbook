@@ -11,10 +11,11 @@ export const SearchQuestionResultItem = React.forwardRef(function SearchQuestion
         active: boolean;
         recommended?: boolean;
         assistant: Assistant;
+        style?: React.CSSProperties;
     },
     ref: React.Ref<HTMLAnchorElement>
 ) {
-    const { question, recommended = false, active, assistant, ...rest } = props;
+    const { question, recommended = false, active, assistant, style, ...rest } = props;
     const language = useLanguage();
     const getLinkProp = useSearchLink();
 
@@ -37,6 +38,8 @@ export const SearchQuestionResultItem = React.forwardRef(function SearchQuestion
             )}
             active={active}
             leadingIcon={recommended ? 'search' : assistant.icon}
+            className="animate-blur-in"
+            style={style}
             {...rest}
         >
             {recommended ? (

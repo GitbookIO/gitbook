@@ -72,11 +72,20 @@ export function useSearchResults(props: {
         error: boolean;
     }>({ results: [], fetching: false, error: false });
 
+    // Track the current in-flight fetch so it can be aborted imperatively (e.g. when
+    // the user navigates away by pressing Enter on a result). We also remember the
+    // query that was aborted so the effect doesn't immediately re-fetch the same query.
+    const abortRef = React.useRef<(() => void) | null>(null);
+    const abortedQueryRef = React.useRef<string | null>(null);
+
     const { assistants } = useAI();
     const withAI = assistants.length > 0;
 
     React.useEffect(() => {
         if (disabled) {
+            return;
+        }
+        if (abortedQueryRef.current === query) {
             return;
         }
         if (!query) {
@@ -215,10 +224,17 @@ export function useSearchResults(props: {
             }
         }, 200);
 
+        abortRef.current = () => {
+            cancelled = true;
+            clearTimeout(timeout);
+            abortController.abort();
+        };
+
         return () => {
             cancelled = true;
             clearTimeout(timeout);
             abortController.abort();
+            abortRef.current = null;
         };
     }, [
         query,
@@ -232,6 +248,20 @@ export function useSearchResults(props: {
         searchURL,
         asEmbeddable,
     ]);
+
+    // Reset the aborted-query marker whenever the query changes so future queries can fetch again.
+    React.useEffect(() => {
+        if (abortedQueryRef.current !== null && abortedQueryRef.current !== query) {
+            abortedQueryRef.current = null;
+        }
+    }, [query]);
+
+    const abort = React.useCallback(() => {
+        abortRef.current?.();
+        abortRef.current = null;
+        abortedQueryRef.current = query;
+        setRemoteState((prev) => (prev.fetching ? { ...prev, fetching: false } : prev));
+    }, [query]);
 
     // Merge local and remote results.
     // Re-runs immediately whenever either result set changes.
@@ -260,6 +290,7 @@ export function useSearchResults(props: {
         results,
         fetching: remoteState.fetching,
         error: remoteState.error,
+        abort,
     };
 }
 

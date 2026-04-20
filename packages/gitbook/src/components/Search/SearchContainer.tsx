@@ -33,6 +33,7 @@ export function SearchContainer({
     const {
         assistants,
         askQuery,
+        abort,
         close,
         cursor,
         error,
@@ -106,6 +107,7 @@ export function SearchContainer({
                             results={results}
                             resultsId={resultsId}
                             resultsRef={resultsRef}
+                            onResultSelect={abort}
                             showAsk={showAsk}
                             scopeControl={
                                 searchProps.withVariants || searchProps.withSections ? (

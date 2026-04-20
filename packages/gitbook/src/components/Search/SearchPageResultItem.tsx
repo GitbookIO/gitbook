@@ -78,7 +78,15 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
             <p className="line-clamp-1 font-semibold text-base text-tint-strong leading-snug">
                 <HighlightQuery query={query} text={item.title} />
             </p>
-            <div className="relative h-5 w-full">
+            <div
+                className={tcls(
+                    'relative h-5 w-full transition-[height] duration-300',
+                    item.type === 'local-page' && !bestSection?.body && !item.description
+                        ? '[[aria-busy=false]_&]:h-0'
+                        : ''
+                )}
+                style={{ transitionDelay: style?.animationDelay }}
+            >
                 {bestSection?.body ? (
                     <p
                         className="absolute inset-0 line-clamp-1 origin-left animate-blur-in text-sm"
@@ -109,7 +117,9 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
                         lines={1}
                         className={tcls(
                             'absolute inset-0 origin-left',
-                            bestSection?.body || item.description ? 'animate-blur-out' : ''
+                            bestSection?.body || item.description
+                                ? 'animate-blur-out'
+                                : '[[aria-busy=false]_&]:animate-blur-out'
                         )}
                         style={{ animationDelay: style?.animationDelay }}
                     />

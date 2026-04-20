@@ -38,10 +38,11 @@ export const SearchResults = React.forwardRef(function SearchResults(
         fetching: boolean;
         cursor: number | null;
         error: boolean;
+        onResultSelect?: () => void;
     },
     ref: React.Ref<SearchResultsRef>
 ) {
-    const { children, id, query, results, fetching, cursor, error } = props;
+    const { children, id, query, results, fetching, cursor, error, onResultSelect } = props;
 
     const language = useLanguage();
 
@@ -121,7 +122,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
     );
 
     return (
-        <output className="h-screen" aria-busy={fetching}>
+        <output aria-busy={fetching}>
             {children}
             {results.length === 0 ? (
                 fetching ? null : query ? (
@@ -143,6 +144,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
                                 'aria-posinset': index + 1,
                                 'aria-setsize': results.length,
                                 id: `${id}-${index}`,
+                                onClickCapture: () => onResultSelect?.(),
                             };
                             switch (item.type) {
                                 case 'local-page':
@@ -175,6 +177,9 @@ export const SearchResults = React.forwardRef(function SearchResults(
                                             assistant={assistants[0]!}
                                             recommended
                                             {...resultItemProps}
+                                            style={{
+                                                animationDelay: `${index * 25}ms,${100 + index * 25}ms`,
+                                            }}
                                         />
                                     );
                                 }

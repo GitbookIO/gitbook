@@ -28,6 +28,7 @@ export function SearchFrame(props: {
     results: ResultType[];
     resultsId: string;
     resultsRef: React.Ref<SearchResultsRef>;
+    onResultSelect?: () => void;
     scopeControl?: React.ReactNode;
     showAsk: boolean;
     sidebar?: React.ReactNode;
@@ -47,6 +48,7 @@ export function SearchFrame(props: {
         results,
         resultsId,
         resultsRef,
+        onResultSelect,
         scopeControl,
         showAsk,
         sidebar,
@@ -93,6 +95,7 @@ export function SearchFrame(props: {
                                     results={results}
                                     cursor={cursor}
                                     error={error}
+                                    onResultSelect={onResultSelect}
                                 />
                             )}
                         </ScrollContainer>
@@ -120,7 +123,7 @@ export function SearchFrame(props: {
 
 const SearchFrameKeyboardHints = () => {
     return (
-        <div className="@container/keyboard-hint flex w-full items-center justify-end">
+        <div className="@container/keyboard-hint flex pointer-none:hidden w-full items-center justify-end">
             {/* Compact view */}
             <div className="flex @max-[6rem]/keyboard-hint:hidden @min-[12rem]/keyboard-hint:hidden items-center gap-2">
                 <Tooltip label="Navigate">

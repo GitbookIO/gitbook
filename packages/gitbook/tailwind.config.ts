@@ -322,26 +322,27 @@ const config: Config = {
                 'fadeOut-slow': 'fadeOut 500ms ease both',
                 appear: 'fadeIn 1ms ease both',
 
-                blurIn: 'blurIn 200ms ease-out both',
-                blurInSlow: 'blurIn 500ms ease-out both',
-                blurOut: 'blurOut 200ms ease-in both',
-                blurOutSlow: 'blurOut 500ms ease-in both',
-                blurInDisplay: 'blurInDisplay 200ms ease-out both',
-                blurInDisplaySlow: 'blurInDisplay 500ms ease-out both',
-                blurOutDisplay: 'blurOutDisplay 200ms ease-in both',
-                blurOutDisplaySlow: 'blurOutDisplay 500ms ease-in both',
+                blurIn: 'blurIn 200ms both',
+                blurInSlow: 'blurIn 500ms both',
+                blurOut: 'blurOut 200ms both',
+                blurOutSlow: 'blurOut 500ms both',
+                blurInDisplay: 'blurInDisplay 200ms both',
+                blurInDisplaySlow: 'blurInDisplay 500ms both',
+                blurOutDisplay: 'blurOutDisplay 200ms both',
+                blurOutDisplaySlow: 'blurOutDisplay 500ms both',
 
-                blurInHeight: 'heightIn 200ms ease-out both, blurIn 200ms 100ms ease-out both',
-                blurInHeightSlow: 'heightIn 500ms ease-out both, blurIn 500ms 300ms ease-out both',
-                blurOutHeight: 'blurOut 200ms ease-in both, heightOut 200ms 200ms ease-in both',
-                blurOutHeightSlow: 'blurOut 500ms ease-in both, heightOut 500ms 500ms ease-in both',
+                blurInHeight: 'heightIn 200ms ease-out both, blurIn 200ms 100ms both',
+                blurInHeightSlow: 'heightIn 500ms ease-out both, blurIn 500ms 300ms both',
+                blurOutHeight: 'blurOut 200ms both, heightOut 200ms 100ms ease-out both',
+                blurOutHeightSlow: 'blurOut 500ms both, heightOut 500ms 300ms ease-out both',
 
                 enterFromLeft: 'enterFromLeft 300ms cubic-bezier(0.83, 0, 0.17, 1) both',
                 enterFromRight: 'enterFromRight 300ms cubic-bezier(0.83, 0, 0.17, 1) both',
                 exitToLeft: 'exitToLeft 300ms cubic-bezier(0.83, 0, 0.17, 1) both',
                 exitToRight: 'exitToRight 300ms cubic-bezier(0.83, 0, 0.17, 1) both',
 
-                heightIn: 'heightIn 200ms ease both',
+                heightIn: 'heightIn 500ms ease both',
+                heightOut: 'heightOut 500ms ease both',
                 crawl: 'crawl 2s ease-in-out infinite',
             },
             keyframes: {
@@ -505,28 +506,28 @@ const config: Config = {
                     to: { opacity: '0', transform: 'rotateX(-10deg) scale(0.95)' },
                 },
                 blurIn: {
-                    from: { filter: 'blur(6px)', opacity: '0', transform: 'scale(0.95)' },
-                    to: { filter: 'blur(0px)', opacity: '1', transform: 'scale(1)' },
+                    '0%': { filter: 'blur(6px)', opacity: '0', transform: 'scale(0.95)' },
+                    '100%': { filter: 'blur(0px)', opacity: '1', transform: 'scale(1)' },
                 },
                 blurOut: {
-                    from: { filter: 'blur(0px)', opacity: '1', transform: 'scale(1)' },
-                    to: { filter: 'blur(6px)', opacity: '0', transform: 'scale(0.95)' },
+                    '0%': { filter: 'blur(0px)', opacity: '1', transform: 'scale(1)' },
+                    '100%': { filter: 'blur(6px)', opacity: '0', transform: 'scale(0.95)' },
                 },
                 blurInDisplay: {
-                    from: {
+                    '0%': {
                         filter: 'blur(6px)',
                         opacity: '0',
                         transform: 'scale(0.95)',
                         display: 'none',
                     },
-                    to: {
+                    '100%': {
                         filter: 'blur(0px)',
                         opacity: '1',
                         transform: 'scale(1)',
                     },
                 },
                 blurOutDisplay: {
-                    from: {
+                    '0%': {
                         filter: 'blur(0px)',
                         opacity: '1',
                         transform: 'scale(1)',
@@ -563,7 +564,6 @@ const config: Config = {
                         marginTop: '0',
                         marginBottom: '0',
                         gap: '0',
-                        overflow: 'hidden',
                     },
                 },
                 crawl: {
@@ -627,6 +627,28 @@ const config: Config = {
                     '3xl': '1920px',
                     '4xl': '2144px',
                 },
+            },
+            animationDuration: {
+                '100': '100ms',
+                '200': '200ms',
+                '300': '300ms',
+                '500': '500ms',
+                '1000': '1000ms',
+                '1500': '1500ms',
+                '2000': '2000ms',
+                '2500': '2500ms',
+                '3000': '3000ms',
+            },
+            animationDelay: {
+                '100': '100ms',
+                '200': '200ms',
+                '300': '300ms',
+                '500': '500ms',
+                '1000': '1000ms',
+                '1500': '1500ms',
+                '2000': '2000ms',
+                '2500': '2500ms',
+                '3000': '3000ms',
             },
         },
         opacity: opacity(),
