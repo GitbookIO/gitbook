@@ -21,7 +21,8 @@
     "env": {
         "preview": {
             "vars": {
-                "IS_PREVIEW": "true"
+                "IS_PREVIEW": "true",
+                "GITBOOK_BLOCK_SEARCH_INDEXATION": "true"
             },
             "r2_buckets": [
                 {
