@@ -17,7 +17,7 @@ describe('robots.txt', () => {
     it('declares deny content signals for share link sites', async () => {
         const response = await fetch(
             getContentTestURL(
-                `https://gitbook-open-e2e-sites.gitbook.io/api-multi-versions-share-links/8tNo6MeXg7CkFMzSSz81/robots.txt`
+                'https://gitbook-open-e2e-sites.gitbook.io/api-multi-versions-share-links/8tNo6MeXg7CkFMzSSz81/robots.txt'
             )
         );
 
