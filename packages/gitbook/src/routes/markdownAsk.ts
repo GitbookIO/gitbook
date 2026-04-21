@@ -1,9 +1,9 @@
 import type { GitBookSiteContext } from '@/lib/context';
 import { throwIfDataError } from '@/lib/data';
+import { linkerWithMarkdownPages } from '@/lib/links';
 import { fromPageMarkdown, toPageMarkdown } from '@/lib/markdownPage';
 import {
     resolvePageId,
-    resolvePagePathDocumentOrGroup,
 } from '@/lib/pages';
 import { findSiteSpaceBy, getFallbackSiteSpacePath } from '@/lib/sites';
 import { filterOutNullable } from '@/lib/typescript';
@@ -29,9 +29,6 @@ export async function serveAskMarkdown(
         if (!question) {
             return `Append a question to the URL in the \`?ask=<question>\` search parameter to get a complete answer and associated sources.`;
         }
-
-
-        // const pageLookup = resolvePagePathDocumentOrGroup(context.revision.pages, pagePath);
 
         const apiClient = await context.dataFetcher.api();
         const stream = apiClient.orgs.streamAskInSite(
@@ -62,7 +59,10 @@ export async function serveAskMarkdown(
             return `We couldn't answer this question.`
         }
 
-        const answerMarkdown = toPageMarkdown(await fromPageMarkdown(context, {
+        const answerMarkdown = toPageMarkdown(await fromPageMarkdown({
+            ...context,
+            linker: linkerWithMarkdownPages(context.linker)
+        }, {
             markdown: latestAnswer.answer.markdown,
             pagePath,
         }));

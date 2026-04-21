@@ -228,6 +228,19 @@ export function linkerWithAbsoluteURLs(linker: GitBookLinker): GitBookLinker {
     };
 }
 
+/**
+ * Create a new linker that resolves pages to their markdown version.
+ */
+export function linkerWithMarkdownPages(linker: GitBookLinker): GitBookLinker {
+    return {
+        ...linker,
+        toPathForPage: (input) => {
+            return  linker.toPathInSpace(input.page.path) + '.md' + (input.anchor ? `#${input.anchor}` : '');
+        },
+    };
+}
+
+
 function joinPaths(prefix: string, path: string): string {
     const prefixPath = prefix.endsWith('/') ? prefix : `${prefix}/`;
     const suffixPath = path.startsWith('/') ? path.slice(1) : path;
