@@ -100,7 +100,11 @@ export async function streamAskQuestion({
                 // Get the pages for all spaces referenced by this answer.
                 const pages = await Promise.all(
                     spaces.map(async (space) => {
-                        const revision = await spacePromises.get(space);
+                        const revision = await spacePromises.get(space)?.catch(() => {
+                            // If fetching the revision fails, we can skip the pages for this space.
+                            // We don't want a failure, otherwise it will break the entire answer.
+                            return null;
+                        });
                         return { space, pages: revision?.pages };
                     })
                 ).then((results) => {
