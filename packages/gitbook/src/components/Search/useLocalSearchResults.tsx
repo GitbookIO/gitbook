@@ -212,9 +212,13 @@ export function useLocalSearchResults(props: {
             enrich: true,
             limit: 5,
             suggest: true,
-            ...(filterSiteSpaceIds ? { tag: {
-                siteSpaceId: filterSiteSpaceIds,
-            } } : {}),
+            ...(filterSiteSpaceIds
+                ? {
+                      tag: {
+                          siteSpaceId: filterSiteSpaceIds,
+                      },
+                  }
+                : {}),
         });
 
         // Flatten and deduplicate results across fields (flexsearch returns one array per indexed field)

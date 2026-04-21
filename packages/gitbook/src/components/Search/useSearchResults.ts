@@ -65,8 +65,6 @@ export function useSearchResults(props: {
                 return [siteSpaceId];
             case 'extended':
                 return siteSpaceIds;
-            case 'default':
-            case 'all':
             default:
                 return undefined;
         }
