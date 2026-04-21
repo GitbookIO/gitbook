@@ -774,15 +774,23 @@ function encodePathInSiteContent(
             // we rewrite it to ~gitbook/markdown/:pathname
             if (pathname.match(MARKDOWN_PATH_REGEX) || shouldServeMarkdown(request).serve) {
                 const pagePathWithoutMD = pathname.replace(MARKDOWN_PATH_REGEX, '');
+                const ask = new URL(request.url).searchParams.get('ask');
                 return {
-                    pathname: `~gitbook/markdown/${encodePagePath(pagePathWithoutMD)}`,
-                    // The markdown content is always static and doesn't depend on the dynamic parameter (customization, theme, etc)
+                    pathname: `~gitbook/${typeof ask === 'string' ? 'markdown-ask' : 'markdown'}/${encodePagePath(pagePathWithoutMD)}`,
                     routeType: 'static',
-                    events: [
+                    // TODO: track pageId / spaceId when possible
+                    // We don't do it at the moment as we can't easily extract it from the URL.
+                    events: ask ? [
+                        {
+                            type: 'ask_question',
+                            query: ask,
+                            location: {
+                                displayContext: SiteInsightsDisplayContext.Server,
+                            },
+                        }
+                    ]: [
                         {
                             type: 'page_markdown_request',
-                            // TODO: track pageId / spaceId when possible
-                            // We don't do it at the moment as we can't easily extract it from the URL.
                             location: {
                                 displayContext: SiteInsightsDisplayContext.Server,
                             },

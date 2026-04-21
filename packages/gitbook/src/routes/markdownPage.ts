@@ -1,33 +1,25 @@
 import type { GitBookSiteContext } from '@/lib/context';
 import { getExposableError } from '@/lib/data';
 import { getMarkdownForPage } from '@/lib/markdownPage';
-import { getSimilarPages, resolvePagePathDocumentOrGroup } from '@/lib/pages';
+import {
+    getSimilarPages,
+    resolvePagePathDocumentOrGroup,
+} from '@/lib/pages';
 
 /**
  * Serve a markdown version of a page.
  * Returns a 404 if the page is not found.
  */
 export async function servePageMarkdown(context: GitBookSiteContext, pagePath: string) {
-    try {
+    return serveMarkdown(async () => {
         const pageLookup = resolvePagePathDocumentOrGroup(context.revision.pages, pagePath);
         if (!pageLookup) {
-            // Generates a markdown body for missing pages. Return this with a 200 status (not 404) because agents discard 404 response bodies.
-            const md = generateNotFoundMarkdown(context, pagePath);
-            // Return as 200 so agents read the body
-            return serveMarkdown(md);
+            // Generates a markdown body for missing pages. Return this with a 200 status (not 404) because agents discard 404 response bodies.=
+            return generateNotFoundMarkdown(context, pagePath);
         }
 
-        const markdown = await getMarkdownForPage(context, pageLookup);
-        return serveMarkdown(markdown);
-    } catch (error) {
-        const exposable = getExposableError(error);
-        return new Response(exposable.message, {
-            status: exposable.code,
-            headers: {
-                'Content-Type': 'text/plain; charset=utf-8',
-            },
-        });
-    }
+        return await getMarkdownForPage(context, pageLookup);
+    });
 }
 
 function generateNotFoundMarkdown(context: GitBookSiteContext, pagePath: string) {
@@ -46,8 +38,9 @@ ${similarPages.map((page) => `- [${page.title}](${context.linker.toAbsoluteURL(c
 
 ## How to find the correct page
 
-1. **Browse the full index**: [/sitemap.md](${sitemapUrl}) - Complete documentation index
-2. **View the full content**: [/llms-full.txt](${fullContentUrl}) - Full content export
+1. **Ask a question**: ${context.linker.toPathInSite('sitemap.md')}?ask=<question> - Complete answer with sources
+2. **Browse the full index**: [${context.linker.toPathInSite('sitemap.md')}](${sitemapUrl}) - Complete documentation index
+3. **View the full content**: [${context.linker.toPathInSite('llms-full.txt')}](${fullContentUrl}) - Full content export
 
 ## Tips for requesting documentation
 
@@ -55,11 +48,25 @@ ${similarPages.map((page) => `- [${page.title}](${context.linker.toAbsoluteURL(c
 - Use \`Accept: text/markdown\` header for content negotiation`;
 }
 
-function serveMarkdown(markdown: string) {
-    return new Response(markdown, {
-        headers: {
-            'Content-Type': 'text/markdown; charset=utf-8',
-            'X-Robots-Tag': 'noindex',
-        },
-    });
+/**
+ * Return a markdown content.
+ */
+export async function serveMarkdown(fn: () => Promise<string>) {
+    try {
+        const markdown = await fn();
+        return new Response(markdown, {
+            headers: {
+                'Content-Type': 'text/markdown; charset=utf-8',
+                'X-Robots-Tag': 'noindex',
+            },
+        });
+    } catch (error) {
+        const exposable = getExposableError(error);
+        return new Response(exposable.message, {
+            status: exposable.code,
+            headers: {
+                'Content-Type': 'text/plain; charset=utf-8',
+            },
+        });
+    }
 }
