@@ -2,6 +2,8 @@ import { type RouteParams, getPagePathFromParams, getStaticSiteContext } from '@
 import { serveAskMarkdown } from '@/routes/markdownAsk';
 import type { NextRequest } from 'next/server';
 
+export const dynamic = 'force-static';
+
 export async function GET(rawRequest: NextRequest, { params }: { params: Promise<RouteParams> }) {
     const { context } = await getStaticSiteContext(await params);
     const pagePath = getPagePathFromParams(await params);
