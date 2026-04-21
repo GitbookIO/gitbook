@@ -16,6 +16,7 @@ import type * as React from 'react';
 
 import { throwIfDataError } from '@/lib/data';
 import { toEmbeddableLinkForPublishedContent } from '@/lib/embeddable-linker';
+import { getLogger } from '@/lib/logger';
 import { getSiteURLDataFromMiddleware } from '@/lib/middleware';
 import { joinPathWithBaseURL } from '@/lib/paths';
 import { traceErrorOnly } from '@/lib/tracing';
@@ -100,9 +101,13 @@ export async function streamAskQuestion({
                 // Get the pages for all spaces referenced by this answer.
                 const pages = await Promise.all(
                     spaces.map(async (space) => {
-                        const revision = await spacePromises.get(space)?.catch(() => {
+                        const revision = await spacePromises.get(space)?.catch((e) => {
                             // If fetching the revision fails, we can skip the pages for this space.
                             // We don't want a failure, otherwise it will break the entire answer.
+                            getLogger().warn(
+                                `Failed to fetch revision for space ${space} while streaming an answer. Skipping pages for this space.`,
+                                e
+                            );
                             return null;
                         });
                         return { space, pages: revision?.pages };
