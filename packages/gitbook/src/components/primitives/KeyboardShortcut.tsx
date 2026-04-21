@@ -14,7 +14,7 @@ export function KeyboardShortcut(props: KeyboardShortcutProps) {
     return (
         <div
             className={tcls(
-                'shortcut flex pointer-none:hidden justify-end gap-0.5 whitespace-nowrap text-tint text-xs [font-feature-settings:"calt","case"] contrast-more:text-tint-strong'
+                'shortcut flex not-pointer-fine:hidden justify-end gap-0.5 whitespace-nowrap text-tint text-xs [font-feature-settings:"calt","case"] contrast-more:text-tint-strong'
             )}
         >
             {keys.map((key, index) => {

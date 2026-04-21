@@ -62,6 +62,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
 
     const language = useLanguage();
     const shouldAnimateResults = !query || fetching;
+    const previousCursor = React.useRef<number | null>(cursor);
     const seenResultKeys = React.useRef(new Set<string>());
     const lastQuery = React.useRef(query);
 
@@ -89,6 +90,11 @@ export const SearchResults = React.forwardRef(function SearchResults(
             inline: 'nearest',
             behavior: 'instant',
         });
+    }, [cursor]);
+
+    const shouldDisableLayoutAnimation = previousCursor.current !== cursor;
+    React.useEffect(() => {
+        previousCursor.current = cursor;
     }, [cursor]);
 
     const select = React.useCallback(() => {
@@ -181,10 +187,11 @@ export const SearchResults = React.forwardRef(function SearchResults(
                                         return (
                                             <motion.div
                                                 layout="position"
-                                                transition={{
-                                                    duration: 0.3,
-                                                    ease: 'circInOut',
-                                                }}
+                                                transition={
+                                                    shouldDisableLayoutAnimation
+                                                        ? { layout: { duration: 0 } }
+                                                        : { duration: 0.3, ease: 'circInOut' }
+                                                }
                                                 key={itemKey}
                                             >
                                                 <div
@@ -194,7 +201,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
                                                             : undefined
                                                     }
                                                     style={{
-                                                        animationDelay: `${100 + index * 25}ms,${200 + index * 25}ms`,
+                                                        animationDelay: `${index * 25}ms,${100 + index * 25}ms`,
                                                     }}
                                                 >
                                                     <SearchPageResultItem
@@ -205,7 +212,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
                                                         item={item}
                                                         active={index === cursor}
                                                         style={{
-                                                            animationDelay: `${100 + index * 25}ms,${200 + index * 25}ms`,
+                                                            animationDelay: `${index * 25}ms,${100 + index * 25}ms`,
                                                         }}
                                                         {...resultItemProps}
                                                     />
@@ -227,7 +234,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
                                                 style={
                                                     shouldAnimateItem
                                                         ? {
-                                                              animationDelay: `${100 + index * 25}ms,${200 + index * 25}ms`,
+                                                              animationDelay: `${index * 25}ms,${100 + index * 25}ms`,
                                                           }
                                                         : undefined
                                                 }
@@ -241,6 +248,9 @@ export const SearchResults = React.forwardRef(function SearchResults(
                                                     active={index === cursor}
                                                     assistant={primaryAssistant}
                                                     recommended
+                                                    style={{
+                                                        animationDelay: `${index * 25}ms,${100 + index * 25}ms`,
+                                                    }}
                                                     {...resultItemProps}
                                                 />
                                             </motion.div>
@@ -248,19 +258,40 @@ export const SearchResults = React.forwardRef(function SearchResults(
                                     }
                                     case 'record': {
                                         return (
-                                            <SearchRecordResultItem
-                                                ref={(ref) => {
-                                                    refs.current[index] = ref;
-                                                }}
+                                            <motion.div
+                                                layout="position"
+                                                transition={
+                                                    shouldDisableLayoutAnimation
+                                                        ? { layout: { duration: 0 } }
+                                                        : { duration: 0.3, ease: 'circInOut' }
+                                                }
                                                 key={itemKey}
-                                                query={query}
-                                                item={item}
-                                                active={index === cursor}
-                                                style={{
-                                                    animationDelay: `${100 + index * 25}ms,${100 + index * 25}ms`,
-                                                }}
-                                                {...resultItemProps}
-                                            />
+                                            >
+                                                <div
+                                                    className={
+                                                        shouldAnimateItem
+                                                            ? 'animate-blur-in-height'
+                                                            : undefined
+                                                    }
+                                                    style={{
+                                                        animationDelay: `${index * 25}ms,${100 + index * 25}ms`,
+                                                    }}
+                                                >
+                                                    <SearchRecordResultItem
+                                                        ref={(ref) => {
+                                                            refs.current[index] = ref;
+                                                        }}
+                                                        key={itemKey}
+                                                        query={query}
+                                                        item={item}
+                                                        active={index === cursor}
+                                                        style={{
+                                                            animationDelay: `${index * 25}ms,${100 + index * 25}ms`,
+                                                        }}
+                                                        {...resultItemProps}
+                                                    />
+                                                </div>
+                                            </motion.div>
                                         );
                                     }
                                     default:

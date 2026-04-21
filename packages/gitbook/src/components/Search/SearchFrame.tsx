@@ -128,7 +128,7 @@ export function SearchFrame(props: {
 
 const SearchFrameKeyboardHints = () => {
     return (
-        <div className="@container/keyboard-hint flex pointer-none:hidden w-full items-center justify-end">
+        <div className="@container/keyboard-hint flex not-pointer-fine:hidden w-full items-center justify-end">
             {/* Compact view */}
             <div className="flex @max-[6rem]/keyboard-hint:hidden @min-[12rem]/keyboard-hint:hidden items-center gap-2">
                 <Tooltip label="Navigate">
