@@ -107,6 +107,7 @@ describe('resolveStringContentRef', () => {
             },
         },
     ])('parses $label', ({ input, expected }) => {
+        // @ts-expect-error
         expect(resolveStringContentRef(input)).toEqual(expected);
     });
 
