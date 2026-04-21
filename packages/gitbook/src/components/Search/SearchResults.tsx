@@ -160,7 +160,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
     );
 
     return (
-        <output className="min-h-full" aria-busy={fetching}>
+        <output className={tcls('min-h-full', query ? 'mb-[100%]' : '')} aria-busy={fetching}>
             {children}
             {results.length === 0 ? (
                 fetching ? null : query ? (
