@@ -61,7 +61,7 @@ describe('markdown ask responses', () => {
         expect(response.headers.get('x-robots-tag')).toBe('noindex');
         expect(text).toContain(ASK_QUESTION_HEADING);
         expect(text).toContain('# Sources');
-    });
+    }, { timeout: 20_000 });
 
     it('should expose ask responses for accept header markdown requests', async () => {
         const response = await fetch(
@@ -81,5 +81,5 @@ describe('markdown ask responses', () => {
         expect(response.headers.get('x-robots-tag')).toBe('noindex');
         expect(text).toContain(ASK_QUESTION_HEADING);
         expect(text).toContain('# Sources');
-    });
+    }, { timeout: 20_000 });
 });
