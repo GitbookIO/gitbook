@@ -62,8 +62,7 @@ export async function serveAskMarkdown(
             return `We couldn't answer this question.`
         }
 
-        const answerMarkdown = toPageMarkdown(fromPageMarkdown({
-            linker: context.linker,
+        const answerMarkdown = toPageMarkdown(await fromPageMarkdown(context, {
             markdown: latestAnswer.answer.markdown,
             pagePath,
         }));

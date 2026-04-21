@@ -238,34 +238,3 @@ function joinPaths(prefix: string, path: string): string {
 function removeTrailingSlash(path: string): string {
     return path.endsWith('/') ? path.slice(0, -1) : path;
 }
-
-/**
- * Re-writes the URL of every relative <a> link so it is expressed from the site-root.
- */
-export function relativeToAbsoluteLinks(
-    linker: GitBookLinker,
-    tree: Root,
-    currentPagePath: string
-): Root {
-    const currentDir = path.posix.dirname(currentPagePath);
-
-    visit(tree, 'link', (node: Link) => {
-        const original = node.url;
-
-        // Skip anchors, mailto:, http(s):, protocol-like, or already-rooted paths
-        if (checkIsExternalURL(original) || checkIsAnchor(original) || original.startsWith('/')) {
-            return;
-        }
-
-        // Resolve against the current page’s directory and strip any leading “/” or "../"
-        // Sometimes the path can be "../" if we are on the default section
-        // but it means we are just at the root of the site.
-        const pathInPage = path.posix
-            .normalize(path.posix.join(currentDir, original))
-            .replace(/^[\/\.]+/, '');
-
-        node.url = linker.toAbsoluteURL(linker.toPathInSpace(pathInPage));
-    });
-
-    return tree;
-}
