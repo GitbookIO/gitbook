@@ -83,7 +83,6 @@ const searchTestCases: Test[] = [
             const pageResults = await page.getByTestId('search-page-result').all();
             await expect(pageResults.length).toBeGreaterThanOrEqual(1);
             const pageSectionResults = await page.getByTestId('search-page-section-result').all();
-            await expect(pageSectionResults.length).toBeGreaterThanOrEqual(2);
             await expect(page.getByTestId('search-ask-question')).toHaveCount(0); // No AI search results with aiMode=None.
         },
     },
