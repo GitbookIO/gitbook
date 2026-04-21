@@ -81,6 +81,7 @@ export function EmbeddableSearch(props: EmbeddableSearchProps) {
                         mode="frame"
                         resultsCount={results.length}
                         fetching={fetching}
+                        showAsk={showAsk}
                     >
                         <SearchLiveResultsAnnouncer
                             count={results.length}

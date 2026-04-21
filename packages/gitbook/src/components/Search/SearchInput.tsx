@@ -3,6 +3,7 @@ import React, { useEffect, useRef } from 'react';
 
 import { t, tString, useLanguage } from '@/intl/client';
 import { Icon } from '@gitbook/icons';
+import { AISearchIcon } from '../AIChat';
 import { Input } from '../primitives';
 
 interface SearchInputProps {
@@ -19,6 +20,7 @@ interface SearchInputProps {
     mode?: 'header' | 'frame';
     resultsCount: number;
     fetching: boolean;
+    showAsk: boolean;
 }
 
 /**
@@ -38,6 +40,7 @@ export const SearchInput = React.forwardRef<HTMLDivElement, SearchInputProps>(
             mode = 'header',
             resultsCount,
             fetching,
+            showAsk,
             ...rest
         } = props;
         const inputRef = useRef<HTMLInputElement>(null);
@@ -46,17 +49,27 @@ export const SearchInput = React.forwardRef<HTMLDivElement, SearchInputProps>(
         const language = useLanguage();
 
         useEffect(() => {
-            if (isOpen) {
-                if (document.activeElement !== inputRef.current) {
-                    // Refocus the input and move the caret to the end – do this only once to avoid scroll jumps on every keystroke
-                    inputRef.current?.focus({ preventScroll: true });
-                    // Place cursor at the end of the input
-                    inputRef.current?.setSelectionRange(value.length, value.length);
-                }
-            } else {
+            if (!isOpen) {
                 inputRef.current?.blur();
+                return;
             }
-        }, [isOpen, value]);
+
+            const focusInput = () => {
+                if (document.activeElement !== inputRef.current) {
+                    inputRef.current?.focus({ preventScroll: true });
+                }
+
+                inputRef.current?.setSelectionRange(value.length, value.length);
+            };
+
+            if (!isFrame) {
+                focusInput();
+                return;
+            }
+
+            const timeout = window.setTimeout(focusInput, 150);
+            return () => window.clearTimeout(timeout);
+        }, [isFrame, isOpen, value]);
 
         return (
             <div
@@ -80,14 +93,18 @@ export const SearchInput = React.forwardRef<HTMLDivElement, SearchInputProps>(
                     onFocus={onFocus}
                     onKeyDown={onKeyDown}
                     leading={
-                        <Icon
-                            icon="search"
-                            className={
-                                isFrame
-                                    ? 'size-text-lg shrink-0 text-tint-subtle'
-                                    : 'size-text-lg shrink-0 site-header:theme-bold:text-header-link/8 text-tint'
-                            }
-                        />
+                        showAsk ? (
+                            <AISearchIcon />
+                        ) : (
+                            <Icon
+                                icon="search"
+                                className={
+                                    isFrame
+                                        ? 'size-text-lg shrink-0 text-tint-subtle'
+                                        : 'size-text-lg shrink-0 site-header:theme-bold:text-header-link/8 text-tint'
+                                }
+                            />
+                        )
                     }
                     onValueChange={onChange}
                     value={value}
@@ -105,11 +122,14 @@ export const SearchInput = React.forwardRef<HTMLDivElement, SearchInputProps>(
                               }
                     }
                     trailing={
-                        value && resultsCount > 0 ? (
+                        !showAsk && value && resultsCount > 0 ? (
                             <div className="mr-2 animate-blur-in text-sm text-tint-subtle">
                                 {t(language, 'search_results_count', resultsCount.toString())}
                             </div>
                         ) : undefined
+                    }
+                    keyboardShortcut={
+                        !value && !isFrame && !isOpen ? { keys: ['mod', 'k'] } : undefined
                     }
                     {...rest}
                     type="text"

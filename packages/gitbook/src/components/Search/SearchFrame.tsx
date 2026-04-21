@@ -113,12 +113,16 @@ export function SearchFrame(props: {
                                   />
                               ))
                             : null}
-                        {scopeControl && !showAsk ? (
-                            <div className="flex gap-2 border-tint-subtle border-t bg-tint-subtle px-4 py-1.5">
-                                {scopeControl}
-                                <SearchFrameKeyboardHints />
-                            </div>
-                        ) : null}
+                        <div
+                            className={tcls(
+                                'flex gap-2 border-tint-subtle border-t bg-tint-subtle px-4 py-1.5',
+                                !scopeControl ? 'not-pointer-fine:hidden' : '',
+                                showAsk ? 'hidden' : ''
+                            )}
+                        >
+                            {scopeControl && !showAsk ? scopeControl : null}
+                            <SearchFrameKeyboardHints />
+                        </div>
                     </React.Suspense>
                 </EmbeddableFrameMain>
             </EmbeddableFrame>
@@ -128,7 +132,7 @@ export function SearchFrame(props: {
 
 const SearchFrameKeyboardHints = () => {
     return (
-        <div className="@container/keyboard-hint flex not-pointer-fine:hidden w-full items-center justify-end">
+        <div className="@container/keyboard-hint flex not-pointer-fine:hidden w-full items-center justify-end py-1.5">
             {/* Compact view */}
             <div className="flex @max-[6rem]/keyboard-hint:hidden @min-[12rem]/keyboard-hint:hidden items-center gap-2">
                 <Tooltip label="Navigate">

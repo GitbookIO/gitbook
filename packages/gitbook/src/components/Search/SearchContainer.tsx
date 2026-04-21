@@ -1,11 +1,14 @@
 'use client';
 
+import { t, useLanguage } from '@/intl/client';
 import { CustomizationSearchStyle } from '@gitbook/api';
 import React, { useRef } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { AIChatButton } from '../AIChat';
 import { useIsMobile } from '../hooks/useIsMobile';
-import { Popover } from '../primitives';
+import { Button, Popover } from '../primitives';
+import { KeyboardShortcut } from '../primitives/KeyboardShortcut';
+import { SideSheet } from '../primitives/SideSheet';
 import { SearchFrame } from './SearchFrame';
 import { SearchInput } from './SearchInput';
 import { SearchLiveResultsAnnouncer } from './SearchLiveResultsAnnouncer';
@@ -29,7 +32,8 @@ export function SearchContainer({
     ...searchProps
 }: SearchContainerProps) {
     const searchInputRef = useRef<HTMLDivElement>(null);
-    const isMobile = useIsMobile();
+    const language = useLanguage();
+    const usesSideSheet = useIsMobile(768);
     const {
         assistants,
         askQuery,
@@ -89,84 +93,150 @@ export function SearchContainer({
         };
     }, [close]);
 
-    const visible = viewport === 'desktop' ? !isMobile : viewport === 'mobile' ? isMobile : true;
+    const visible =
+        viewport === 'desktop' ? !usesSideSheet : viewport === 'mobile' ? usesSideSheet : true;
     const searchResultsActiveDescendant = cursor !== null ? `${resultsId}-${cursor}` : undefined;
+    const isSearchOpen = Boolean(visible && (state?.open ?? false));
+    const shouldShowSearchFrame = usesSideSheet ? isSearchOpen : Boolean(state?.query || withAI);
+    const scopeControlNode =
+        searchProps.withVariants || searchProps.withSections ? (
+            <SearchScopeControl {...scopeControl} />
+        ) : null;
+
+    const frameInput = (
+        <SearchInput
+            aria-activedescendant={searchResultsActiveDescendant}
+            aria-controls={resultsId}
+            onChange={setQuery}
+            onKeyDown={onInputKeyDown}
+            value={searchValue}
+            withAI={withSearchAI}
+            isOpen={isSearchOpen}
+            mode="frame"
+            resultsCount={results.length}
+            fetching={fetching}
+            showAsk={showAsk}
+        >
+            <SearchLiveResultsAnnouncer
+                count={results.length}
+                showing={Boolean(searchValue) && !fetching}
+            />
+        </SearchInput>
+    );
+
+    const searchFrame = shouldShowSearchFrame ? (
+        <SearchFrame
+            askQuery={askQuery}
+            cursor={cursor}
+            error={error}
+            fetching={fetching}
+            input={usesSideSheet ? frameInput : undefined}
+            query={query}
+            results={results}
+            resultsId={resultsId}
+            resultsRef={resultsRef}
+            onResultSelect={abort}
+            showAsk={showAsk}
+            scopeControl={scopeControlNode}
+            className={usesSideSheet ? 'h-full' : undefined}
+        />
+    ) : null;
 
     return (
         <>
-            <Popover
-                content={
-                    // Only show content if there's a query or Ask is enabled
-                    state?.query || withAI ? (
-                        <SearchFrame
-                            askQuery={askQuery}
-                            cursor={cursor}
-                            error={error}
-                            fetching={fetching}
-                            query={query}
-                            results={results}
-                            resultsId={resultsId}
-                            resultsRef={resultsRef}
-                            onResultSelect={abort}
-                            showAsk={showAsk}
-                            scopeControl={
-                                searchProps.withVariants || searchProps.withSections ? (
-                                    <SearchScopeControl {...scopeControl} />
-                                ) : null
-                            }
-                        />
-                    ) : null
-                }
-                rootProps={{
-                    open: Boolean(visible && (state?.open ?? false)),
-                    modal: false,
-                }}
-                contentProps={{
-                    onOpenAutoFocus: (event) => event.preventDefault(),
-                    align: 'start',
-                    className:
-                        '@container flex flex-col overflow-hidden bg-tint-base has-[.empty]:hidden w-128 p-0 max-h-[min(32rem,var(--radix-popover-content-available-height))] max-w-[min(var(--radix-popover-content-available-width),32rem)]',
-                    onInteractOutside: (event) => {
-                        // Don't close if clicking on the search input itself
-                        if (searchInputRef.current?.contains(event.target as Node)) {
-                            event.preventDefault();
-                            return;
-                        }
-                        close();
-                    },
-                    sideOffset: 8,
-                    collisionPadding: {
-                        top: 16,
-                        right: 16,
-                        bottom: 32,
-                        left: 16,
-                    },
-                    hideWhenDetached: true,
-                }}
-                triggerProps={{
-                    asChild: true,
-                }}
-            >
-                <SearchInput
-                    ref={searchInputRef}
-                    aria-activedescendant={searchResultsActiveDescendant}
-                    aria-controls={resultsId}
-                    onChange={setQuery}
-                    onKeyDown={onInputKeyDown}
-                    value={searchValue}
-                    withAI={withSearchAI}
-                    isOpen={state?.open ?? false}
+            {usesSideSheet ? (
+                <Button
+                    data-testid="search-button"
+                    icon="search"
+                    variant="header"
+                    size="medium"
+                    iconOnly
+                    label={
+                        <div className="flex items-center gap-2">
+                            {t(language, withSearchAI ? 'search_or_ask' : 'search')}
+                            <KeyboardShortcut
+                                keys={['mod', 'k']}
+                                className="border-tint-11 text-tint-1"
+                            />
+                        </div>
+                    }
+                    active={isSearchOpen}
+                    onClick={open}
                     className={className}
-                    onFocus={open}
-                    resultsCount={results.length}
-                    fetching={fetching}
+                    aria-expanded={isSearchOpen}
+                    aria-controls={resultsId}
+                />
+            ) : (
+                <Popover
+                    content={searchFrame}
+                    rootProps={{
+                        open: isSearchOpen,
+                        modal: false,
+                    }}
+                    contentProps={{
+                        onOpenAutoFocus: (event) => event.preventDefault(),
+                        align: 'start',
+                        className:
+                            '@container flex flex-col overflow-hidden bg-tint-base has-[.empty]:hidden w-128 p-0 max-h-[min(32rem,var(--radix-popover-content-available-height))] max-w-[min(var(--radix-popover-content-available-width),32rem)]',
+                        onInteractOutside: (event) => {
+                            // Don't close if clicking on the search input itself
+                            if (searchInputRef.current?.contains(event.target as Node)) {
+                                event.preventDefault();
+                                return;
+                            }
+                            close();
+                        },
+                        sideOffset: 8,
+                        collisionPadding: {
+                            top: 16,
+                            right: 16,
+                            bottom: 32,
+                            left: 16,
+                        },
+                        hideWhenDetached: true,
+                    }}
+                    triggerProps={{
+                        asChild: true,
+                    }}
                 >
-                    <SearchLiveResultsAnnouncer
-                        count={results.length}
-                        showing={Boolean(searchValue) && !fetching}
-                    />
-                </SearchInput>
-            </Popover>
+                    <SearchInput
+                        ref={searchInputRef}
+                        aria-activedescendant={searchResultsActiveDescendant}
+                        aria-controls={resultsId}
+                        onChange={setQuery}
+                        onKeyDown={onInputKeyDown}
+                        value={searchValue}
+                        withAI={withSearchAI}
+                        isOpen={isSearchOpen}
+                        className={className}
+                        onFocus={open}
+                        resultsCount={results.length}
+                        fetching={fetching}
+                        showAsk={showAsk}
+                    >
+                        <SearchLiveResultsAnnouncer
+                            count={results.length}
+                            showing={Boolean(searchValue) && !fetching}
+                        />
+                    </SearchInput>
+                </Popover>
+            )}
+            {usesSideSheet ? (
+                <SideSheet
+                    side="right"
+                    open={isSearchOpen}
+                    onOpenChange={(open) => {
+                        if (!open) {
+                            close();
+                        }
+                    }}
+                    withOverlay={true}
+                    withCloseButton={true}
+                    className="mx-auto w-96 border-tint-subtle border-l bg-tint-base"
+                >
+                    {searchFrame}
+                </SideSheet>
+            ) : null}
             {uiAssistants.map((assistant, index) => (
                 <AIChatButton
                     key={assistant.id}
