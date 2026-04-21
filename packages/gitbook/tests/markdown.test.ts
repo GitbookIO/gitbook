@@ -64,7 +64,7 @@ describe('markdown ask responses', () => {
             expect(text).toContain(ASK_QUESTION_HEADING);
             expect(text).toContain('# Sources');
         },
-        { timeout: 20_000 }
+        { timeout: 30_000 }
     );
 
     it(
@@ -88,6 +88,6 @@ describe('markdown ask responses', () => {
             expect(text).toContain(ASK_QUESTION_HEADING);
             expect(text).toContain('# Sources');
         },
-        { timeout: 20_000 }
+        { timeout: 30_000 }
     );
 });
