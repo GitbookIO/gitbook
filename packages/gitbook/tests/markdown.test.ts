@@ -48,38 +48,46 @@ describe('markdown ask responses', () => {
     const ASK_QUESTION = 'How are docs optimized for agents?';
     const ASK_QUESTION_HEADING = `# ${ASK_QUESTION}`;
 
-    it('should expose ask responses for .md requests', async () => {
-        const response = await fetch(
-            getContentTestURL(
-                `https://gitbook.com/docs/getting-started/ai-documentation.md?ask=${encodeURIComponent(ASK_QUESTION)}`
-            )
-        );
-        const text = await response.text();
+    it(
+        'should expose ask responses for .md requests',
+        async () => {
+            const response = await fetch(
+                getContentTestURL(
+                    `https://gitbook.com/docs/getting-started/ai-documentation.md?ask=${encodeURIComponent(ASK_QUESTION)}`
+                )
+            );
+            const text = await response.text();
 
-        expect(response.status).toBe(200);
-        expect(response.headers.get('content-type')).toContain('text/markdown');
-        expect(response.headers.get('x-robots-tag')).toBe('noindex');
-        expect(text).toContain(ASK_QUESTION_HEADING);
-        expect(text).toContain('# Sources');
-    }, { timeout: 20_000 });
+            expect(response.status).toBe(200);
+            expect(response.headers.get('content-type')).toContain('text/markdown');
+            expect(response.headers.get('x-robots-tag')).toBe('noindex');
+            expect(text).toContain(ASK_QUESTION_HEADING);
+            expect(text).toContain('# Sources');
+        },
+        { timeout: 20_000 }
+    );
 
-    it('should expose ask responses for accept header markdown requests', async () => {
-        const response = await fetch(
-            getContentTestURL(
-                `https://gitbook.com/docs/getting-started/ai-documentation?ask=${encodeURIComponent(ASK_QUESTION)}`
-            ),
-            {
-                headers: {
-                    Accept: 'text/markdown',
-                },
-            }
-        );
-        const text = await response.text();
+    it(
+        'should expose ask responses for accept header markdown requests',
+        async () => {
+            const response = await fetch(
+                getContentTestURL(
+                    `https://gitbook.com/docs/getting-started/ai-documentation?ask=${encodeURIComponent(ASK_QUESTION)}`
+                ),
+                {
+                    headers: {
+                        Accept: 'text/markdown',
+                    },
+                }
+            );
+            const text = await response.text();
 
-        expect(response.status).toBe(200);
-        expect(response.headers.get('content-type')).toContain('text/markdown');
-        expect(response.headers.get('x-robots-tag')).toBe('noindex');
-        expect(text).toContain(ASK_QUESTION_HEADING);
-        expect(text).toContain('# Sources');
-    }, { timeout: 20_000 });
+            expect(response.status).toBe(200);
+            expect(response.headers.get('content-type')).toContain('text/markdown');
+            expect(response.headers.get('x-robots-tag')).toBe('noindex');
+            expect(text).toContain(ASK_QUESTION_HEADING);
+            expect(text).toContain('# Sources');
+        },
+        { timeout: 20_000 }
+    );
 });
