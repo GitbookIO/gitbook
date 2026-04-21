@@ -1,9 +1,6 @@
 import { describe, expect, it } from 'bun:test';
 import { getContentTestURL } from './utils';
 
-const ASK_QUESTION = 'How are docs optimized for agents?';
-const ASK_QUESTION_HEADING = `# ${ASK_QUESTION}`;
-
 describe('markdown pages', () => {
     it('should expose a markdown page with the .md extension', async () => {
         const response = await fetch(
@@ -51,6 +48,9 @@ describe('markdown pages', () => {
 });
 
 describe('markdown ask responses', () => {
+    const ASK_QUESTION = 'How are docs optimized for agents?';
+    const ASK_QUESTION_HEADING = `# ${ASK_QUESTION}`;
+
     it('should expose ask responses for .md requests', async () => {
         const response = await fetch(
             getContentTestURL(
@@ -63,7 +63,7 @@ describe('markdown ask responses', () => {
         expect(response.headers.get('content-type')).toContain('text/markdown');
         expect(response.headers.get('x-robots-tag')).toBe('noindex');
         expect(text).toContain(ASK_QUESTION_HEADING);
-        expect(text).toContain('## Sources');
+        expect(text).toContain('# Sources');
     });
 
     it('should expose ask responses for accept header markdown requests', async () => {
@@ -83,6 +83,6 @@ describe('markdown ask responses', () => {
         expect(response.headers.get('content-type')).toContain('text/markdown');
         expect(response.headers.get('x-robots-tag')).toBe('noindex');
         expect(text).toContain(ASK_QUESTION_HEADING);
-        expect(text).toContain('## Sources');
+        expect(text).toContain('# Sources');
     });
 });

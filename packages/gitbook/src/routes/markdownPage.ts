@@ -1,10 +1,7 @@
 import type { GitBookSiteContext } from '@/lib/context';
 import { getExposableError } from '@/lib/data';
 import { getMarkdownForPage } from '@/lib/markdownPage';
-import {
-    getSimilarPages,
-    resolvePagePathDocumentOrGroup,
-} from '@/lib/pages';
+import { getSimilarPages, resolvePagePathDocumentOrGroup } from '@/lib/pages';
 
 /**
  * Serve a markdown version of a page.

@@ -33,7 +33,7 @@ import { findSiteSpaceBy, getFallbackSiteSpacePath, getLocalizedTitle } from './
 import { getRevisionTags, resolveTag } from './tags';
 import type { ClassValue } from './tailwind';
 import { filterOutNullable } from './typescript';
-import { checkIsExternalURL, checkIsHttpURL } from './urls';
+import { checkIsExternalURL } from './urls';
 
 export interface ResolvedContentRef {
     /** Text to render in the content ref */
@@ -606,7 +606,7 @@ const RESOLVERS: {
     };
 } = {
     url: {
-        resolve: ( src) => {
+        resolve: (src) => {
             if (checkIsExternalURL(src)) {
                 return { kind: 'url', url: src };
             }
@@ -620,7 +620,7 @@ const RESOLVERS: {
     page: {
         resolve: (src) => {
             const match = src.match(/^(\/spaces\/([\w-]+))?\/pages\/([\w-]+)$/);
-            if (match && match[3]) {
+            if (match?.[3]) {
                 return {
                     kind: 'page',
                     ...(match[2] ? { space: match[2] } : {}),
@@ -649,7 +649,7 @@ const RESOLVERS: {
             }
 
             const match = src.match(/^((\/spaces\/([\w-]+))?\/pages\/([\w-]+))?#([\w-]+)$/);
-            if (match && match[5]) {
+            if (match?.[5]) {
                 return {
                     kind: 'anchor',
                     ...(match[3] ? { space: match[3] } : {}),
@@ -675,7 +675,7 @@ const RESOLVERS: {
     file: {
         resolve: (src) => {
             const match = src.match(/^(\/spaces\/([\w-]+))?\/files\/([\w-]+)$/);
-            if (match && match[3]) {
+            if (match?.[3]) {
                 return {
                     kind: 'file',
                     file: match[3],
@@ -697,7 +697,7 @@ const RESOLVERS: {
     space: {
         resolve: (src) => {
             const match = src.match(/^\/spaces\/([\w-]+)$/);
-            if (match && match[1]) {
+            if (match?.[1]) {
                 return {
                     kind: 'space',
                     space: match[1],
@@ -712,7 +712,7 @@ const RESOLVERS: {
     collection: {
         resolve: (src) => {
             const match = src.match(/^\/collections\/([\w-]+)$/);
-            if (match && match[1]) {
+            if (match?.[1]) {
                 return {
                     kind: 'collection',
                     collection: match[1],
@@ -727,7 +727,7 @@ const RESOLVERS: {
     user: {
         resolve: (src) => {
             const match = src.match(/^\/users\/([\w-]+)$/);
-            if (match && match[1]) {
+            if (match?.[1]) {
                 return {
                     kind: 'user',
                     user: match[1],
@@ -742,7 +742,7 @@ const RESOLVERS: {
     'reusable-content': {
         resolve: (src) => {
             const match = src.match(/^(\/spaces\/([\w-]+))?\/reusable-content\/([\w-]+)$/);
-            if (match && match[3]) {
+            if (match?.[3]) {
                 return {
                     kind: 'reusable-content',
                     ...(match[2] ? { space: match[2] } : {}),
@@ -764,7 +764,7 @@ const RESOLVERS: {
     tag: {
         resolve: (src) => {
             const match = src.match(/^(\/spaces\/([\w-]+))?\/tags\/([\w-]+)$/);
-            if (match && match[3]) {
+            if (match?.[3]) {
                 return {
                     kind: 'tag',
                     ...(match[2] ? { space: match[2] } : {}),
@@ -786,7 +786,7 @@ const RESOLVERS: {
     openapi: {
         resolve: (src) => {
             const match = src.match(/^\/openapi\/([^/]+)$/);
-            if (match && match[1]) {
+            if (match?.[1]) {
                 return {
                     kind: 'openapi',
                     spec: match[1],

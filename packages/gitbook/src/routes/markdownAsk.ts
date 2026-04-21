@@ -2,23 +2,21 @@ import type { GitBookSiteContext } from '@/lib/context';
 import { throwIfDataError } from '@/lib/data';
 import { linkerWithMarkdownPages } from '@/lib/links';
 import { fromPageMarkdown, toPageMarkdown } from '@/lib/markdownPage';
-import {
-    resolvePageId,
-} from '@/lib/pages';
+import { resolvePageId } from '@/lib/pages';
 import { findSiteSpaceBy, getFallbackSiteSpacePath } from '@/lib/sites';
 import { filterOutNullable } from '@/lib/typescript';
 import { serveMarkdown } from '@/routes/markdownPage';
-import {
-    SearchAIAnswer,
-    type SearchAIAnswerSource,
-} from '@gitbook/api';
+import type { SearchAIAnswer, SearchAIAnswerSource } from '@gitbook/api';
 
 /**
  * Serve an AI answer as markdown for a page.
  */
 export async function serveAskMarkdown(
     context: GitBookSiteContext,
-    { question: rawQuestion, pagePath }: {
+    {
+        question: rawQuestion,
+        pagePath,
+    }: {
         question: string;
         pagePath: string;
     }
@@ -27,7 +25,7 @@ export async function serveAskMarkdown(
         const question = rawQuestion.trim();
 
         if (!question) {
-            return `Append a question to the URL in the \`?ask=<question>\` search parameter to get a complete answer and associated sources.`;
+            return 'You forgot to pass a question in the `?ask=` parameter. Append a question to the URL in the `?ask=<question>` search parameter to get a complete answer and associated sources.';
         }
 
         const apiClient = await context.dataFetcher.api();
@@ -47,7 +45,7 @@ export async function serveAskMarkdown(
             { format: 'markdown' }
         );
 
-        let latestAnswer:SearchAIAnswer | null = null;
+        let latestAnswer: SearchAIAnswer | null = null;
 
         for await (const chunk of stream) {
             if (chunk.type === 'answer') {
@@ -56,28 +54,35 @@ export async function serveAskMarkdown(
         }
 
         if (!latestAnswer || !latestAnswer.answer || !('markdown' in latestAnswer.answer)) {
-            return `We couldn't answer this question.`
+            return `We couldn't answer this question.`;
         }
 
-        const answerMarkdown = toPageMarkdown(await fromPageMarkdown({
-            ...context,
-            linker: linkerWithMarkdownPages(context.linker)
-        }, {
-            markdown: latestAnswer.answer.markdown,
-            pagePath,
-        }));
-        const sourcesMarkdown = await renderAskSourcesMarkdown(context, latestAnswer?.sources ?? []);
+        const answerMarkdown = toPageMarkdown(
+            await fromPageMarkdown(
+                {
+                    ...context,
+                    linker: linkerWithMarkdownPages(context.linker),
+                },
+                {
+                    markdown: latestAnswer.answer.markdown,
+                    pagePath,
+                }
+            )
+        );
+        const sourcesMarkdown = await renderAskSourcesMarkdown(
+            context,
+            latestAnswer?.sources ?? []
+        );
 
         let result = `# ${question}\n\n`;
         result += answerMarkdown.trim();
         result += '\n\n';
 
         if (sourcesMarkdown) {
-            result += `# Sources:\n\n`;
+            result += '# Sources:\n\n';
             result += sourcesMarkdown;
             result += '\n\n';
         }
-
 
         return result;
     });
@@ -101,10 +106,11 @@ async function renderAskSourcesMarkdown(
                     source.space === context.space.id && source.revision === context.revisionId
                         ? context.revision
                         : await throwIfDataError(
-                        context.dataFetcher.getRevision({
-                            spaceId: source.space,
-                            revisionId: source.revision,
-                        }));
+                              context.dataFetcher.getRevision({
+                                  spaceId: source.space,
+                                  revisionId: source.revision,
+                              })
+                          );
                 const resolved = resolvePageId(revision.pages, source.page);
                 if (!resolved) {
                     return null;
@@ -127,7 +133,7 @@ async function renderAskSourcesMarkdown(
             })
         )
     ).filter(filterOutNullable);
-    
+
     if (items.length === 0) {
         return '';
     }

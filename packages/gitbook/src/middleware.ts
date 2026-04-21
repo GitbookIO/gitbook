@@ -780,22 +780,24 @@ function encodePathInSiteContent(
                     routeType: 'static',
                     // TODO: track pageId / spaceId when possible
                     // We don't do it at the moment as we can't easily extract it from the URL.
-                    events: ask ? [
-                        {
-                            type: 'ask_question',
-                            query: ask,
-                            location: {
-                                displayContext: SiteInsightsDisplayContext.Server,
-                            },
-                        }
-                    ]: [
-                        {
-                            type: 'page_markdown_request',
-                            location: {
-                                displayContext: SiteInsightsDisplayContext.Server,
-                            },
-                        },
-                    ],
+                    events: ask
+                        ? [
+                              {
+                                  type: 'ask_question',
+                                  query: ask,
+                                  location: {
+                                      displayContext: SiteInsightsDisplayContext.Server,
+                                  },
+                              },
+                          ]
+                        : [
+                              {
+                                  type: 'page_markdown_request',
+                                  location: {
+                                      displayContext: SiteInsightsDisplayContext.Server,
+                                  },
+                              },
+                          ],
                 };
             }
             return { pathname: encodePagePath(pathname) };

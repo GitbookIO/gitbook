@@ -19,10 +19,10 @@ import { toMarkdown } from 'mdast-util-to-markdown';
 import { frontmatter } from 'micromark-extension-frontmatter';
 import { gfm } from 'micromark-extension-gfm';
 import { remove } from 'unist-util-remove';
-import { type GitBookLinker } from './links';
 import { visit } from 'unist-util-visit';
-import { checkIsAnchor, checkIsExternalURL } from './urls';
+import type { GitBookLinker } from './links';
 import { resolveContentRef, resolveStringContentRef } from './references';
+import { checkIsAnchor, checkIsExternalURL } from './urls';
 
 /**
  * Generate a markdown version of a page.
@@ -235,10 +235,9 @@ async function renderGroupPageMarkdown(args: {
     });
 }
 
-
 /**
  * Re-writes URLs in a markdown content:
- * - 
+ * -
  * - the URL of every relative <a> link so it is expressed from the site-root.
  */
 async function rewriteMarkdownLinks(
@@ -261,14 +260,15 @@ async function rewriteMarkdownLinks(
         const contentRef = resolveStringContentRef(original);
 
         if (contentRef) {
-            pending.push((async () => {
-                const resolved = await resolveContentRef(contentRef, context);
-                if (resolved?.href) {
-                    node.url = resolved.href;
-                }
-            })());
+            pending.push(
+                (async () => {
+                    const resolved = await resolveContentRef(contentRef, context);
+                    if (resolved?.href) {
+                        node.url = resolved.href;
+                    }
+                })()
+            );
         } else {
-
             // Resolve against the current page’s directory and strip any leading “/” or "../"
             // Sometimes the path can be "../" if we are on the default section
             // but it means we are just at the root of the site.

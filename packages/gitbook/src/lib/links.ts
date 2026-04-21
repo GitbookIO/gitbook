@@ -1,11 +1,7 @@
-import path from 'node:path';
 import { getPagePath } from '@/lib/pages';
 import { withLeadingSlash, withTrailingSlash } from '@/lib/paths';
 import type { RevisionPage, RevisionPageDocument, RevisionPageGroup } from '@gitbook/api';
-import type { Link, Root } from 'mdast';
-import { visit } from 'unist-util-visit';
 import warnOnce from 'warn-once';
-import { checkIsAnchor, checkIsExternalURL } from './urls';
 
 /**
  * Generic interface to generate links based on a given context.
@@ -235,11 +231,10 @@ export function linkerWithMarkdownPages(linker: GitBookLinker): GitBookLinker {
     return {
         ...linker,
         toPathForPage: (input) => {
-            return  linker.toPathInSpace(input.page.path) + '.md' + (input.anchor ? `#${input.anchor}` : '');
+            return `${linker.toPathInSpace(input.page.path)}.md${input.anchor ? `#${input.anchor}` : ''}`;
         },
     };
 }
-
 
 function joinPaths(prefix: string, path: string): string {
     const prefixPath = prefix.endsWith('/') ? prefix : `${prefix}/`;
