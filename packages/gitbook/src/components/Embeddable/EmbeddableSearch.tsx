@@ -61,6 +61,7 @@ export function EmbeddableSearch(props: EmbeddableSearchProps) {
                 cursor={cursor}
                 error={error}
                 fetching={fetching}
+                fillHeight={true}
                 query={query}
                 results={results}
                 resultsId={resultsId}

@@ -23,6 +23,7 @@ export function SearchFrame(props: {
     cursor: number | null;
     error: boolean;
     fetching: boolean;
+    fillHeight?: boolean;
     input?: React.ReactNode;
     query: string;
     results: ResultType[];
@@ -43,6 +44,7 @@ export function SearchFrame(props: {
         dataTestId,
         error,
         fetching,
+        fillHeight = false,
         input,
         query,
         results,
@@ -60,68 +62,84 @@ export function SearchFrame(props: {
     return (
         <SearchAskProvider value={searchAsk}>
             <EmbeddableFrame
-                className={tcls('bg-tint-base from-transparent to-transparent', className)}
+                className={tcls(
+                    'min-h-0 bg-tint-base from-transparent to-transparent',
+                    fillHeight ? 'h-full' : '',
+                    className
+                )}
             >
                 {sidebar ? <EmbeddableFrameSidebar>{sidebar}</EmbeddableFrameSidebar> : null}
-                <EmbeddableFrameMain data-testid={dataTestId}>
+                <EmbeddableFrameMain className="min-h-0" data-testid={dataTestId}>
+                    <div
+                        className={tcls(
+                            'pointer-events-none absolute inset-x-0 top-0 z-50 h-0.5 overflow-hidden',
+                            fetching ? 'block animate-fade-in' : 'hidden animate-fade-out-slow'
+                        )}
+                        style={{
+                            animationDelay: fetching ? '2s' : undefined,
+                        }}
+                    >
+                        <div
+                            className={tcls(
+                                'h-full w-full origin-left animate-crawl bg-primary-solid'
+                            )}
+                        />
+                    </div>
                     {input ? (
                         <EmbeddableFrameHeader className="p-3 pb-0">{input}</EmbeddableFrameHeader>
                     ) : null}
                     <React.Suspense fallback={null}>
-                        <ScrollContainer
-                            orientation="vertical"
-                            contentClassName="gutter-stable p-3"
-                        >
-                            <div
-                                className={tcls(
-                                    'pointer-events-none absolute inset-x-0 top-0 z-50 h-0.5 overflow-hidden',
-                                    fetching
-                                        ? 'block animate-fade-in'
-                                        : 'hidden animate-fade-out-slow'
-                                )}
-                                style={{
-                                    animationDelay: fetching ? '2s' : undefined,
-                                }}
-                            >
-                                <div
-                                    className={tcls(
-                                        'h-full w-full origin-left animate-crawl bg-primary-solid'
-                                    )}
-                                />
-                            </div>
-                            {showAsk ? (
-                                <SearchAskAnswer query={askQuery} asEmbeddable={asEmbeddable} />
-                            ) : (
-                                <SearchResults
-                                    ref={resultsRef}
-                                    query={query}
-                                    id={resultsId}
-                                    fetching={fetching}
-                                    results={results}
-                                    cursor={cursor}
-                                    error={error}
-                                    onResultSelect={onResultSelect}
-                                />
-                            )}
-                        </ScrollContainer>
-                        {!showAsk && query && assistants.length > 0
-                            ? assistants.map((assistant) => (
-                                  <SearchAskBar
-                                      key={assistant.id}
-                                      query={query}
-                                      assistant={assistant}
-                                  />
-                              ))
-                            : null}
                         <div
                             className={tcls(
-                                'flex gap-2 border-tint-subtle border-t bg-tint-subtle px-4 py-1.5',
-                                !scopeControl ? 'not-pointer-fine:hidden' : '',
-                                showAsk ? 'hidden' : ''
+                                'flex flex-col overflow-hidden',
+                                fillHeight ? 'min-h-0 flex-1' : ''
                             )}
                         >
-                            {scopeControl && !showAsk ? scopeControl : null}
-                            <SearchFrameKeyboardHints />
+                            <ScrollContainer
+                                orientation="vertical"
+                                className={tcls(fillHeight ? 'min-h-0 flex-1' : '')}
+                                contentClassName={tcls(
+                                    'gutter-stable scroll-py-3 p-3',
+                                    fillHeight ? 'min-h-full' : ''
+                                )}
+                            >
+                                {showAsk ? (
+                                    <SearchAskAnswer query={askQuery} asEmbeddable={asEmbeddable} />
+                                ) : (
+                                    <SearchResults
+                                        ref={resultsRef}
+                                        query={query}
+                                        id={resultsId}
+                                        fetching={fetching}
+                                        results={results}
+                                        cursor={cursor}
+                                        error={error}
+                                        onResultSelect={onResultSelect}
+                                    />
+                                )}
+                            </ScrollContainer>
+                            {!showAsk && query && assistants.length > 0
+                                ? assistants.map((assistant, index) => (
+                                      <SearchAskBar
+                                          key={assistant.id}
+                                          query={query}
+                                          assistant={assistant}
+                                          active={cursor === results.length + index}
+                                          withShortcut={assistant === assistants[0]}
+                                          onSelect={onResultSelect}
+                                      />
+                                  ))
+                                : null}
+                            <div
+                                className={tcls(
+                                    'flex gap-2 border-tint-subtle border-t bg-tint-subtle px-4 py-1.5',
+                                    !scopeControl ? 'not-pointer-fine:hidden' : '',
+                                    showAsk ? 'hidden' : ''
+                                )}
+                            >
+                                {scopeControl && !showAsk ? scopeControl : null}
+                                <SearchFrameKeyboardHints />
+                            </div>
                         </div>
                     </React.Suspense>
                 </EmbeddableFrameMain>

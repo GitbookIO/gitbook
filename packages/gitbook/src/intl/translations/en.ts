@@ -134,6 +134,7 @@ export const en = {
     ai_chat_tools_mcp_tool: 'Called ${1}',
     ai_chat_ask: 'Ask ${1}',
     ai_chat_ask_about_page: 'Ask ${1} about this page',
+    ai_chat_ask_query: 'Ask ${1} "${2}"',
     copy_for_llms: 'Copy for LLMs',
     copy_page_markdown: 'Copy page as Markdown for LLMs',
     copy_page: 'Copy page',

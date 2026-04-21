@@ -30,6 +30,7 @@ export const pt_br = {
     search_scope_variant_all: 'Todo o conteúdo',
     search_scope_variant_all_description: 'Cada variante disponível',
     ask: 'Perguntar',
+    ai_chat_ask_query: 'Perguntar a ${1} "${2}"',
     search_ask: 'Perguntar "${1}"',
     search_ask_description: 'Encontre a resposta com ${1}',
     search_ask_sources: 'Fontes',

@@ -121,12 +121,12 @@ export const SearchResults = React.forwardRef(function SearchResults(
             <output
                 className={tcls(
                     'flex',
+                    'grow',
                     'flex-col',
                     'items-center',
                     'justify-center',
                     'text-center',
                     'py-8',
-                    'h-full',
                     'gap-4'
                 )}
             >
@@ -147,11 +147,11 @@ export const SearchResults = React.forwardRef(function SearchResults(
         <output
             className={tcls(
                 'flex',
+                'grow',
                 'items-center',
                 'justify-center',
                 'text-center',
                 'py-8',
-                'h-full',
                 'animate-blur-in-slow'
             )}
         >
@@ -160,7 +160,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
     );
 
     return (
-        <output className={tcls('min-h-full', query ? 'mb-[100%]' : '')} aria-busy={fetching}>
+        <output className="flex grow flex-col" aria-busy={fetching}>
             {children}
             {results.length === 0 ? (
                 fetching ? null : query ? (
@@ -170,7 +170,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
                 )
             ) : (
                 <>
-                    <div data-testid="search-results" className="flex flex-col space-y-1" id={id}>
+                    <div data-testid="search-results" className="flex flex-col gap-1" id={id}>
                         <AnimatePresence initial={false} mode="popLayout">
                             {results.map((item, index) => {
                                 const itemKey = getResultKey(item);
@@ -303,7 +303,11 @@ export const SearchResults = React.forwardRef(function SearchResults(
                     {!fetching && results.length === 0 ? noResults : null}
                 </>
             )}
-            {fetching && <SearchResultsSkeleton items={Math.max(3, 5 - results.length)} />}
+            {fetching ? (
+                <div className={tcls(results.length > 0 ? 'mt-1' : '', 'flex flex-col gap-1')}>
+                    <SearchResultsSkeleton items={Math.max(3, 5 - results.length)} />
+                </div>
+            ) : null}
         </output>
     );
 });

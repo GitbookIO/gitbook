@@ -63,11 +63,14 @@ function useSearchKeyboardNavigation(props: {
     results: ReturnType<typeof useSearchResults>['results'];
     resultsRef: React.RefObject<SearchResultsRef | null>;
     abort: () => void;
+    askCount: number;
+    onAskSelect: (index: number) => void;
 }) {
-    const { query, results, resultsRef, abort } = props;
+    const { query, results, resultsRef, abort, askCount, onAskSelect } = props;
     const { cursor, moveBy: moveCursorBy } = useSearchResultsCursor({
         query,
-        results,
+        resultCount: results.length,
+        totalCount: results.length + askCount,
     });
 
     const onInputKeyDown = React.useCallback(
@@ -80,12 +83,17 @@ function useSearchKeyboardNavigation(props: {
                 moveCursorBy(1);
             } else if (event.key === 'Enter') {
                 event.preventDefault();
+                if (cursor !== null && cursor >= results.length) {
+                    onAskSelect(cursor - results.length);
+                    return;
+                }
+
                 // Stop any in-flight search request: the user is navigating away.
                 abort();
                 resultsRef.current?.select();
             }
         },
-        [moveCursorBy, resultsRef, abort]
+        [moveCursorBy, cursor, results.length, onAskSelect, resultsRef, abort]
     );
 
     return {
@@ -198,16 +206,41 @@ export function useSearchController(props: SearchBaseProps) {
     const searchValue = state?.query ?? (withSearchAI || !withAI ? state?.ask : null) ?? '';
     const searchResultsId = `search-results-${React.useId()}`;
 
+    const askInAssistant = React.useCallback(
+        (assistantIndex = 0) => {
+            const assistant = assistants[assistantIndex];
+            if (!assistant || !normalizedQuery) {
+                return;
+            }
+
+            abort();
+            assistant.open(normalizedQuery);
+            setSearchState({
+                ask: normalizedQuery,
+                query: null,
+                scope: state?.scope ?? 'default',
+                open: assistant.mode === 'search',
+            });
+        },
+        [abort, assistants, normalizedQuery, setSearchState, state?.scope]
+    );
+
+    const askCount = normalizedQuery && !showAsk ? assistants.length : 0;
+
     const { cursor, onInputKeyDown } = useSearchKeyboardNavigation({
         query: normalizedQuery,
         results,
         resultsRef,
         abort,
+        askCount,
+        onAskSelect: askInAssistant,
     });
 
     return {
         assistants,
         askQuery: normalizedAsk,
+        askCount,
+        askInAssistant,
         cursor,
         error,
         fetching,

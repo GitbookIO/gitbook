@@ -32,6 +32,7 @@ export const ko: TranslationLanguage = {
     search_scope_variant_all: '전체 콘텐츠',
     search_scope_variant_all_description: '사용 가능한 모든 변형',
     ask: '질문',
+    ai_chat_ask_query: '${1}에게 "${2}" 질문하기',
     search_ask: '"${1}" 질문하기',
     search_ask_description: '${1}로 답변 찾기',
     search_ask_sources: '출처',

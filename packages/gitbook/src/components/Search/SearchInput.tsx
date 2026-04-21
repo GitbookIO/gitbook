@@ -129,7 +129,13 @@ export const SearchInput = React.forwardRef<HTMLDivElement, SearchInputProps>(
                         ) : undefined
                     }
                     keyboardShortcut={
-                        !value && !isFrame && !isOpen ? { keys: ['mod', 'k'] } : undefined
+                        !value && !isFrame && !isOpen
+                            ? {
+                                  keys: ['mod', 'k'],
+                                  className:
+                                      'bg-tint-base site-header:theme-bold:bg-header-background',
+                              }
+                            : undefined
                     }
                     {...rest}
                     type="text"

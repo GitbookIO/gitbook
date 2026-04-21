@@ -217,7 +217,7 @@ export function SideSheet(
                     'side-sheet',
                     'fixed inset-y-0 z-41', // Above the side sheet overlay on z-40
                     side === 'left' ? 'left-0' : 'right-0',
-                    withCloseButton ? 'max-w-[calc(100%-4rem)]' : 'max-w-[calc(100%-3rem)]',
+                    withCloseButton ? 'max-w-[calc(100%-4.5rem)]' : 'max-w-[calc(100%-3rem)]',
                     isOpen
                         ? side === 'left'
                             ? 'hydrated:animate-enter-from-left'
@@ -235,7 +235,8 @@ export function SideSheet(
                 {...rest}
                 style={{
                     ...rest.style,
-                    display: shouldHide ? 'none' : rest.style?.display,
+                    visibility: shouldHide ? 'hidden' : rest.style?.visibility,
+                    pointerEvents: shouldHide ? 'none' : rest.style?.pointerEvents,
                 }}
             >
                 {children}

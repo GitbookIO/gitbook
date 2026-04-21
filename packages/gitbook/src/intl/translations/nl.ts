@@ -32,6 +32,7 @@ export const nl: TranslationLanguage = {
     search_scope_variant_all: 'Alle inhoud',
     search_scope_variant_all_description: 'Elke beschikbare variant',
     ask: 'Vragen',
+    ai_chat_ask_query: 'Vraag ${1} "${2}"',
     search_ask: 'Vraag "${1}"',
     search_ask_description: 'Vind het antwoord met ${1}',
     search_ask_sources: 'Bronnen',

@@ -1,18 +1,23 @@
 'use client';
 
 import type { Assistant } from '@/components/AI';
-import { tString, useLanguage } from '@/intl/client';
-import { tcls } from '@/lib/tailwind';
-import { Icon, type IconName } from '@gitbook/icons';
-import { Link } from '../primitives/Link';
+import { t, tString, useLanguage } from '@/intl/client';
+import { KeyboardShortcut } from '../primitives/KeyboardShortcut';
+import { SearchResultItem } from './SearchResultItem';
 import { useSearchLink } from './useSearch';
 
 /**
  * Sticky single-line bar at the bottom of the search frame.
  * Clicking opens the AI assistant with the current query.
  */
-export function SearchAskBar(props: { query: string; assistant: Assistant }) {
-    const { query, assistant } = props;
+export function SearchAskBar(props: {
+    query: string;
+    assistant: Assistant;
+    active?: boolean;
+    withShortcut?: boolean;
+    onSelect?: () => void;
+}) {
+    const { query, assistant, active = false, withShortcut = false, onSelect } = props;
     const language = useLanguage();
     const getSearchLinkProps = useSearchLink();
 
@@ -23,33 +28,27 @@ export function SearchAskBar(props: { query: string; assistant: Assistant }) {
             open: assistant.mode === 'search',
         },
         () => {
+            onSelect?.();
             assistant.open(query);
         }
     );
 
     return (
-        <Link
+        <SearchResultItem
             {...linkProps}
-            className={tcls(
-                'flex items-center gap-3 px-6 py-2.5',
-                'border-tint-subtle border-t bg-tint-base',
-                'text-sm text-tint',
-                'hover:bg-tint hover:text-tint-strong',
-                'transition-colors'
-            )}
-            data-testid="search-ask-question"
+            active={active}
+            action={tString(language, 'ask')}
+            leadingIcon={assistant.icon}
+            className="gutter-stable shrink-0 overflow-y-scroll rounded-none! border-tint-subtle border-t pr-5 pl-6"
         >
-            <div className="size-4 shrink-0 text-tint-subtle">
-                {typeof assistant.icon === 'string' ? (
-                    <Icon icon={assistant.icon as IconName} className="size-4" />
-                ) : (
-                    assistant.icon
-                )}
+            <div className="flex items-center justify-between gap-2">
+                <div className="line-clamp-1">
+                    {t(language, 'ai_chat_ask_query', assistant.label, query)}
+                </div>
+                {withShortcut ? (
+                    <KeyboardShortcut className="bg-tint-base" keys={['mod', 'i']} />
+                ) : null}
             </div>
-            <span className="truncate">
-                {`${tString(language, 'ask', '')} ${assistant.label} "${query}"`}
-            </span>
-            <Icon icon="chevron-right" className="mr-4 ml-auto size-3 text-tint-subtle" />
-        </Link>
+        </SearchResultItem>
     );
 }

@@ -92,7 +92,7 @@ export function SearchAskAnswer(props: { query: string; asEmbeddable?: boolean }
     );
 
     return (
-        <div className="flex min-h-full p-4">
+        <div className="flex grow p-4">
             {askState?.type === 'answer' ? (
                 <React.Suspense fallback={loading}>
                     <TransitionAnswerBody

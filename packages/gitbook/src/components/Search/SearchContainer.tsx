@@ -1,6 +1,7 @@
 'use client';
 
 import { t, useLanguage } from '@/intl/client';
+import { tcls } from '@/lib/tailwind';
 import { CustomizationSearchStyle } from '@gitbook/api';
 import React, { useRef } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
@@ -37,6 +38,8 @@ export function SearchContainer({
     const {
         assistants,
         askQuery,
+        askCount,
+        askInAssistant,
         abort,
         close,
         cursor,
@@ -73,6 +76,10 @@ export function SearchContainer({
         'mod+i',
         (e) => {
             e.preventDefault();
+            if (state?.open && query && askCount > 0) {
+                askInAssistant();
+                return;
+            }
             assistants[0]?.open();
         },
         {
@@ -95,9 +102,13 @@ export function SearchContainer({
 
     const visible =
         viewport === 'desktop' ? !usesSideSheet : viewport === 'mobile' ? usesSideSheet : true;
-    const searchResultsActiveDescendant = cursor !== null ? `${resultsId}-${cursor}` : undefined;
+    const searchResultsActiveDescendant =
+        cursor !== null && cursor < results.length ? `${resultsId}-${cursor}` : undefined;
     const isSearchOpen = Boolean(visible && (state?.open ?? false));
-    const shouldShowSearchFrame = usesSideSheet ? isSearchOpen : Boolean(state?.query || withAI);
+    const shouldFillHeight = Boolean(query || showAsk);
+    const shouldShowSearchFrame = usesSideSheet
+        ? Boolean(state?.open || state?.query || withAI)
+        : Boolean(state?.query || withAI);
     const scopeControlNode =
         searchProps.withVariants || searchProps.withSections ? (
             <SearchScopeControl {...scopeControl} />
@@ -138,7 +149,7 @@ export function SearchContainer({
             onResultSelect={abort}
             showAsk={showAsk}
             scopeControl={scopeControlNode}
-            className={usesSideSheet ? 'h-full' : undefined}
+            fillHeight={usesSideSheet || shouldFillHeight}
         />
     ) : null;
 
@@ -176,8 +187,12 @@ export function SearchContainer({
                     contentProps={{
                         onOpenAutoFocus: (event) => event.preventDefault(),
                         align: 'start',
-                        className:
-                            '@container flex flex-col overflow-hidden bg-tint-base has-[.empty]:hidden w-128 p-0 max-h-[min(32rem,var(--radix-popover-content-available-height))] max-w-[min(var(--radix-popover-content-available-width),32rem)]',
+                        className: tcls(
+                            '@container flex flex-col overflow-hidden bg-tint-base has-[.empty]:hidden w-128 p-0 max-w-[min(var(--radix-popover-content-available-width),32rem)]',
+                            shouldFillHeight
+                                ? 'h-[min(32rem,var(--radix-popover-content-available-height))]'
+                                : 'max-h-[min(32rem,var(--radix-popover-content-available-height))]'
+                        ),
                         onInteractOutside: (event) => {
                             // Don't close if clicking on the search input itself
                             if (searchInputRef.current?.contains(event.target as Node)) {
