@@ -44,7 +44,7 @@ export function PageAsideToggleButton() {
     );
 }
 
-export function PageAsideCloseButton() {
+export function PageAsideCloseButton(props: { className?: string }) {
     return (
         <Button
             icon="xmark"
@@ -54,6 +54,7 @@ export function PageAsideCloseButton() {
             onClick={() => {
                 document.body.classList.toggle(globalClassName);
             }}
+            className={props.className}
         />
     );
 }

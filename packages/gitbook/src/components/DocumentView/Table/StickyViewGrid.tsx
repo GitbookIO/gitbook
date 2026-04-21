@@ -5,12 +5,42 @@ import { type ReactNode, useCallback, useEffect, useLayoutEffect, useRef } from 
 
 interface StickyViewGridProps {
     className?: string;
-    header: ReactNode;
+    header?: ReactNode;
+    stickyHeader?: boolean;
     tableClassName?: string;
     children: ReactNode;
 }
 
-export function StickyViewGrid({
+export function StickyViewGrid(props: StickyViewGridProps) {
+    if (props.stickyHeader) {
+        return <StickyHeaderOverlayScrollGrid {...props} />;
+    }
+    return <DefaultHeaderScrollGrid {...props} />;
+}
+
+function DefaultHeaderScrollGrid({
+    className,
+    header,
+    tableClassName,
+    children,
+}: StickyViewGridProps) {
+    const resolvedTableClassName = tableClassName ?? 'w-fit';
+
+    return (
+        <div className={className}>
+            <div className="group/table relative flex w-full min-w-0 max-w-full flex-col rounded-lg border-tint-subtle">
+                <div className="w-full min-w-0 overflow-x-auto overflow-y-hidden overscroll-x-none border-tint-subtle">
+                    <div className={tcls('flex', 'flex-col', resolvedTableClassName)}>
+                        {header}
+                        {children}
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+function StickyHeaderOverlayScrollGrid({
     className,
     header,
     tableClassName,
@@ -99,48 +129,46 @@ export function StickyViewGrid({
         };
     }, [syncStickyLayout]);
 
+    const resolvedTableClassName = tableClassName ?? 'w-fit';
+
     return (
         <div className={className}>
             <div
                 ref={rootRef}
-                className={tcls(
-                    'group/table relative flex w-full min-w-0 max-w-full flex-col rounded-lg border-tint-subtle',
-                    'data-[scrollable=true]:border'
-                )}
+                className="group/table relative flex w-full min-w-0 max-w-full flex-col rounded-lg border-tint-subtle data-[scrollable=true]:border"
                 data-scrollable="false"
             >
-                <div
-                    ref={stickyHeaderRef}
-                    className={tcls(
-                        '-mx-px sticky z-10 w-full min-w-0 max-w-full overflow-hidden rounded-t-[inherit] px-px',
-                        '[top:var(--toc-top-offset,var(--outline-top-offset,0px))]'
-                    )}
-                >
+                {header ? (
                     <div
+                        ref={stickyHeaderRef}
                         className={tcls(
-                            'flex',
-                            'flex-col',
-                            tableClassName ?? 'w-fit',
-                            '[transform:translateX(var(--table-sticky-scroll-left,0px))]'
+                            'sticky z-20 w-full min-w-0 max-w-full overflow-hidden rounded-t-[inherit]',
+                            '[top:var(--toc-top-offset,var(--outline-top-offset,0px))]'
                         )}
-                        style={{ width: 'var(--table-sticky-table-width)' }}
                     >
-                        {header}
+                        <div
+                            className={tcls(
+                                'flex',
+                                'flex-col',
+                                resolvedTableClassName,
+                                // The sticky header is rendered outside the scroll container, so it
+                                // needs to mirror the body's horizontal scroll position.
+                                '[transform:translateX(var(--table-sticky-scroll-left,0px))]'
+                            )}
+                            style={{ width: 'var(--table-sticky-table-width)' }}
+                        >
+                            {header}
+                        </div>
                     </div>
-                </div>
+                ) : null}
 
                 <div
                     ref={bodyScrollRef}
-                    className={tcls(
-                        'w-full min-w-0 overflow-x-auto overflow-y-hidden overscroll-x-none border-tint-subtle',
-                        'group-data-[scrollable=true]/table:mx-px',
-                        'group-data-[scrollable=true]/table:border-0',
-                        'group-data-[scrollable=true]/table:rounded-none'
-                    )}
+                    className="w-full min-w-0 overflow-x-auto overflow-y-hidden overscroll-x-none border-tint-subtle group-data-[scrollable=true]/table:mx-px group-data-[scrollable=true]/table:rounded-none group-data-[scrollable=true]/table:border-0"
                 >
                     <div
                         ref={bodyTableRef}
-                        className={tcls('flex', 'flex-col', tableClassName ?? 'w-fit')}
+                        className={tcls('flex', 'flex-col', resolvedTableClassName)}
                     >
                         {children}
                     </div>

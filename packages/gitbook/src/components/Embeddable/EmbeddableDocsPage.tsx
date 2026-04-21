@@ -82,7 +82,9 @@ export async function EmbeddableDocsPage(
                     {context.sections ? (
                         <SiteSectionTabs
                             className="not-theme-bold:-mt-2 theme-bold:bg-tint-base"
-                            sections={encodeClientSiteSections(context, context.sections)}
+                            sections={encodeClientSiteSections(context, context.sections, {
+                                asEmbeddable: true,
+                            })}
                         >
                             {variants.translations.length > 1 ? (
                                 <TranslationsDropdown

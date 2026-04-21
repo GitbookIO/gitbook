@@ -23,6 +23,9 @@ export function ViewGridHeader(props: ViewGridHeaderProps) {
         view,
         mode: context.mode,
     });
+    const stickyFirstColumn = context.mode !== 'print' && view.stickyFirstColumn === true;
+    const withStickyHeader = context.mode !== 'print' && view.stickyHeader === true;
+    const firstVisibleColumn = view.columns[0];
 
     return (
         <div
@@ -30,6 +33,7 @@ export function ViewGridHeader(props: ViewGridHeaderProps) {
             className={tcls(
                 tableClassName ?? tableWidth,
                 'mb-1 flex flex-col rounded-lg border border-tint-subtle bg-tint',
+                withStickyHeader || !stickyFirstColumn ? 'overflow-hidden' : undefined,
                 className
             )}
         >
@@ -45,7 +49,12 @@ export function ViewGridHeader(props: ViewGridHeaderProps) {
                             key={column}
                             role="columnheader"
                             className={tcls(
-                                'px-3 py-2 font-medium text-sm text-tint-strong',
+                                'relative px-3 py-2 font-medium text-sm text-tint-strong',
+                                stickyFirstColumn && column === firstVisibleColumn
+                                    ? withStickyHeader
+                                        ? 'z-20 bg-tint'
+                                        : 'sticky left-0 z-20 bg-tint'
+                                    : undefined,
                                 getColumnAlignment(definition)
                             )}
                             style={{
@@ -56,6 +65,12 @@ export function ViewGridHeader(props: ViewGridHeaderProps) {
                                     fixedColumns,
                                 }),
                                 minWidth: columnWidths?.[column] || '100px',
+                                left:
+                                    withStickyHeader &&
+                                    stickyFirstColumn &&
+                                    column === firstVisibleColumn
+                                        ? 'calc(-1 * var(--table-sticky-scroll-left, 0px))'
+                                        : undefined,
                             }}
                             title={definition.title}
                         >

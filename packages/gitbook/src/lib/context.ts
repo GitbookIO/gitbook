@@ -59,6 +59,12 @@ export type SiteURLData = Pick<
      * By knowing it's a fallback, we can redirect to the space base path instead of returning a 404.
      */
     isFallback?: boolean;
+
+    /**
+     * Whether search indexation is blocked for this deployment.
+     * Computed in middleware from GITBOOK_BLOCK_SEARCH_INDEXATION env var and x-gitbook-search-indexation header.
+     */
+    noIndexSearch?: boolean;
 };
 
 /**
@@ -150,6 +156,9 @@ export type GitBookSiteContext = GitBookSpaceContext & {
 
     /** Whether this request is a fallback rendering. */
     isFallback: boolean;
+
+    /** Whether search indexation is blocked for this deployment. */
+    noIndexSearch: boolean;
 };
 
 /**
@@ -229,6 +238,7 @@ export async function fetchSiteContextByURLLookup(
         revision: data.revision,
         contextId: data.contextId,
         isFallback: data.isFallback ?? false,
+        noIndexSearch: data.noIndexSearch ?? false,
     });
 }
 
@@ -248,6 +258,7 @@ export async function fetchSiteContextByIds(
         revision: string | undefined;
         contextId?: string;
         isFallback: boolean;
+        noIndexSearch: boolean;
     }
 ): Promise<GitBookSiteContext> {
     const { dataFetcher } = baseContext;
@@ -371,6 +382,7 @@ export async function fetchSiteContextByIds(
         scripts,
         contextId: ids.contextId,
         isFallback: ids.isFallback,
+        noIndexSearch: ids.noIndexSearch,
     };
 }
 

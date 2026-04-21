@@ -1,6 +1,6 @@
 {
     "name": "gitbook",
-    "version": "0.24.0",
+    "version": "0.25.1",
     "private": true,
     "dependencies": {
         "@cloudflare/workers-types": "^4.20251011.0",
@@ -28,6 +28,7 @@
         "@radix-ui/react-navigation-menu": "^1.2.3",
         "@radix-ui/react-popover": "^1.0.7",
         "@radix-ui/react-tooltip": "^1.1.8",
+        "@radix-ui/react-collapsible": "^1.1.12",
         "@sindresorhus/fnv1a": "^3.1.0",
         "@tailwindcss/container-queries": "^0.1.1",
         "@tusbar/cache-control": "^1.0.2",

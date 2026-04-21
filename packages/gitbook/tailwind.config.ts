@@ -538,8 +538,18 @@ const config: Config = {
                     to: { opacity: '0' },
                 },
                 heightIn: {
-                    from: { height: '0', opacity: '0' },
+                    from: {
+                        height: '0',
+                        opacity: '0',
+                        marginTop: '0',
+                        marginBottom: '0',
+                        gap: '0',
+                    },
                     to: { height: 'max-content', opacity: '1' },
+                },
+                heightOut: {
+                    from: { height: 'max-content', opacity: '1' },
+                    to: { height: '0', opacity: '0', marginTop: '0', marginBottom: '0', gap: '0' },
                 },
                 crawl: {
                     '0%': {

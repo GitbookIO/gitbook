@@ -52,6 +52,60 @@ describe('getEmbeddableLinker', () => {
             )
         ).toBe('/api/python/~gitbook/embed/page/getting-started');
     });
+
+    it('toEmbeddableLinkForPublishedContent should not duplicate the embed path for embeddable linkers', () => {
+        const root = createLinker({
+            host: 'docs.company.com',
+            spaceBasePath: '/docs',
+            siteBasePath: '/',
+        });
+
+        const embeddableLinker = getEmbeddableLinker(root);
+
+        expect(
+            toEmbeddableLinkForPublishedContent(
+                embeddableLinker,
+                'https://docs.company.com/docs',
+                'nested/page-path'
+            )
+        ).toBe('/docs/~gitbook/embed/page/nested/page-path');
+    });
+
+    it('toEmbeddableLinkForPublishedContent should place section paths before the embed path', () => {
+        const root = createLinker({
+            host: 'docs.company.com',
+            spaceBasePath: '/docs',
+            siteBasePath: '/',
+        });
+
+        const embeddableLinker = getEmbeddableLinker(root);
+
+        expect(
+            toEmbeddableLinkForPublishedContent(
+                embeddableLinker,
+                'https://docs.company.com/docs/guides',
+                ''
+            )
+        ).toBe('/docs/guides/~gitbook/embed/page');
+    });
+
+    it('toEmbeddableLinkForPublishedContent should keep page slugs after the embed path in other sections', () => {
+        const root = createLinker({
+            host: 'docs.company.com',
+            spaceBasePath: '/docs',
+            siteBasePath: '/',
+        });
+
+        const embeddableLinker = getEmbeddableLinker(root);
+
+        expect(
+            toEmbeddableLinkForPublishedContent(
+                embeddableLinker,
+                'https://docs.company.com/docs/guides',
+                'getting-started'
+            )
+        ).toBe('/docs/guides/~gitbook/embed/page/getting-started');
+    });
 });
 
 describe('resolveEmbeddableTheme', () => {

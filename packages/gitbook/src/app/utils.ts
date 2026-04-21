@@ -121,7 +121,7 @@ function getModeFromParams(mode: string): RouteParamMode {
 /**
  * Get the decoded site data from the params.
  */
-function getSiteURLDataFromParams(params: RouteLayoutParams): SiteURLData {
+export function getSiteURLDataFromParams(params: RouteLayoutParams): SiteURLData {
     try {
         const decoded = decodeURIComponent(params.siteData);
         return rison.decode(decoded);
