@@ -1,25 +1,37 @@
 import type { GitBookSiteContext } from '@/lib/context';
 import { getExposableError } from '@/lib/data';
+import { linkerWithMarkdownPages } from '@/lib/links';
 import { getMarkdownForPage } from '@/lib/markdownPage';
-import { getSimilarPages, resolvePagePathDocumentOrGroup } from '@/lib/pages';
+import {
+    type ResolvedPagePath,
+    getSimilarPages,
+    resolvePagePathDocumentOrGroup,
+} from '@/lib/pages';
+import type { RevisionPageDocument, RevisionPageGroup } from '@gitbook/api';
 
 /**
  * Serve a markdown version of a page.
  * Returns a 404 if the page is not found.
  */
-export async function servePageMarkdown(context: GitBookSiteContext, pagePath: string) {
+export async function servePageMarkdown(baseContext: GitBookSiteContext, pagePath: string) {
     return serveMarkdown(async () => {
+        const context = {
+            ...baseContext,
+            linker: linkerWithMarkdownPages(baseContext.linker),
+        };
+
         const pageLookup = resolvePagePathDocumentOrGroup(context.revision.pages, pagePath);
         if (!pageLookup) {
             // Generates a markdown body for missing pages. Return this with a 200 status (not 404) because agents discard 404 response bodies.=
-            return generateNotFoundMarkdown(context, pagePath);
+            return renderNotFoundMarkdown(context, pagePath);
         }
 
-        return await getMarkdownForPage(context, pageLookup);
+        const markdownPage = await getMarkdownForPage(context, pageLookup);
+        return `${markdownPage}${renderAskFooter(context, pageLookup)}`;
     });
 }
 
-function generateNotFoundMarkdown(context: GitBookSiteContext, pagePath: string) {
+function renderNotFoundMarkdown(context: GitBookSiteContext, pagePath: string) {
     const similarPages = getSimilarPages(context.revision.pages, pagePath, 5);
     const sitemapUrl = context.linker.toAbsoluteURL(context.linker.toPathInSite('sitemap.md'));
     const fullContentUrl = context.linker.toAbsoluteURL(
@@ -43,6 +55,25 @@ ${similarPages.map((page) => `- [${page.title}](${context.linker.toAbsoluteURL(c
 
 - For markdown responses, append \`.md\` to URLs (e.g., \`${context.linker.toPathInSpace(similarPages[0]?.path ?? 'docs/example')}.md\`)
 - Use \`Accept: text/markdown\` header for content negotiation`;
+}
+
+function renderAskFooter(
+    context: GitBookSiteContext,
+    pageLookup: ResolvedPagePath<RevisionPageDocument | RevisionPageGroup>
+) {
+    if (context.site.id !== 'site_p4Xo4') {
+        return '';
+    }
+
+    return `\n\n---\n\n# Ask questions about the documentation
+
+Tips: If you are looking for an information in the documentation, you can find it by asking a question directly via GET and the \`${context.linker.toAbsoluteURL(
+        context.linker.toPathForPage({
+            page: pageLookup.page,
+            pages: context.revision.pages,
+        })
+    )}?ask=<question>\`.
+`;
 }
 
 /**
