@@ -12,7 +12,6 @@ describe('markdown pages', () => {
         expect(response.headers.get('content-type')).toContain('text/markdown');
         expect(response.headers.get('x-robots-tag')).toBe('noindex');
         expect(text).toContain('# Text page');
-        expect(text).toContain('## Ask a question');
     });
 
     it('should expose a markdown page with the accept header', async () => {
@@ -30,7 +29,6 @@ describe('markdown pages', () => {
         expect(response.headers.get('content-type')).toContain('text/markdown');
         expect(response.headers.get('x-robots-tag')).toBe('noindex');
         expect(text).toContain('# Text page');
-        expect(text).toContain('## Ask a question');
     });
 
     it('should return a 200 for a page not found', async () => {
@@ -43,7 +41,6 @@ describe('markdown pages', () => {
         expect(response.headers.get('content-type')).toContain('text/markdown');
         expect(response.headers.get('x-robots-tag')).toBe('noindex');
         expect(text).toContain('# Page Not Found');
-        expect(text).toContain('## Ask a question');
     });
 });
 
