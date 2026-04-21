@@ -369,6 +369,11 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
             imagesContextId: imagesContextId,
             contextId: siteURLData.contextId,
             isFallback: requestURL.searchParams.get('fallback') === 'true' ? true : undefined,
+            noIndexSearch:
+                Boolean(process.env.GITBOOK_BLOCK_SEARCH_INDEXATION) &&
+                !requestURL.searchParams.has('x-gitbook-search-indexation')
+                    ? true
+                    : undefined,
         };
 
         const requestHeaders = new Headers(request.headers);

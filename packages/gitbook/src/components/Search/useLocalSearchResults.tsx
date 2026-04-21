@@ -14,6 +14,7 @@ interface RawIndexPage {
     id: string;
     title: string;
     pathname: string;
+    siteSpaceId: string;
     /** BCP-47 language code emitted by the index route, absent when no language is set. */
     lang?: string;
     icon?: string;
@@ -28,6 +29,7 @@ interface IndexPage {
     id: string;
     title: string;
     description: string | null;
+    siteSpaceId: string;
 }
 
 /** Result type returned by this hook */
@@ -67,6 +69,7 @@ function buildLangIndex(pages: RawIndexPage[]): Document<IndexPage> {
             id: 'id',
             index: ['title', 'description'],
             store: ['id', 'title', 'description'],
+            tag: 'siteSpaceId',
         },
         tokenize: 'full',
         resolution: 15,
@@ -78,6 +81,7 @@ function buildLangIndex(pages: RawIndexPage[]): Document<IndexPage> {
             id: page.id,
             title: page.title,
             description: page.description ?? null,
+            siteSpaceId: page.siteSpaceId,
         });
 
         cachedPageData.set(page.id, {
@@ -143,9 +147,12 @@ export function useLocalSearchResults(props: {
     /** BCP-47 language code of the current site space. When provided, only results
      * from pages with a matching language are returned. */
     lang?: string;
+    /** When provided, only results from pages belonging to one of these site space IDs
+     * are returned. Uses FlexSearch native tag filtering. Omit for no filtering (all spaces). */
+    filterSiteSpaceIds?: string[];
     disabled?: boolean;
 }): LocalSearchState {
-    const { query, indexURL, lang, disabled = false } = props;
+    const { query, indexURL, lang, filterSiteSpaceIds, disabled = false } = props;
 
     const [state, setState] = React.useState<LocalSearchState>({
         results: [],
@@ -200,7 +207,19 @@ export function useLocalSearchResults(props: {
             return;
         }
 
-        const rawResults = index.search(query, { enrich: true, limit: 5, suggest: true });
+        //@ts-ignore - Typing is wrong here, tags can be arrays when using the `tag` filter option
+        const rawResults = index.search(query, {
+            enrich: true,
+            limit: 5,
+            suggest: true,
+            ...(filterSiteSpaceIds
+                ? {
+                      tag: {
+                          siteSpaceId: filterSiteSpaceIds,
+                      },
+                  }
+                : {}),
+        });
 
         // Flatten and deduplicate results across fields (flexsearch returns one array per indexed field)
         const seen = new Set<string>();
@@ -227,7 +246,7 @@ export function useLocalSearchResults(props: {
         }
 
         setState({ results, fetching: false, error: false });
-    }, [query, lang, indexReady, disabled]);
+    }, [query, lang, filterSiteSpaceIds, indexReady, disabled]);
 
     return state;
 }

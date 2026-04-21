@@ -1,4 +1,5 @@
 import type { GitBookSiteContext, SiteSections } from '@/lib/context';
+import { toEmbeddableLinkForPublishedContent } from '@/lib/embeddable-linker';
 import {
     getLocalizedDescription,
     getLocalizedTitle,
@@ -27,16 +28,21 @@ export type ClientSiteSectionGroup = Pick<SiteSectionGroup, 'id' | 'title' | 'ic
 /**
  * Encode the list of site sections into the data to be rendered in the client.
  */
-export function encodeClientSiteSections(context: GitBookSiteContext, sections: SiteSections) {
+export function encodeClientSiteSections(
+    context: GitBookSiteContext,
+    sections: SiteSections,
+    options?: { asEmbeddable?: boolean }
+) {
     const { list, current } = sections;
     const currentLanguage = context.locale;
+    const asEmbeddable = Boolean(options?.asEmbeddable);
 
     const clientSections: (ClientSiteSection | ClientSiteSectionGroup)[] = [];
 
     for (const item of list) {
         switch (item.object) {
             case 'site-section-group': {
-                const children = encodeChildren(context, item.children);
+                const children = encodeChildren(context, item.children, asEmbeddable);
 
                 // Skip empty groups
                 if (children.length === 0) {
@@ -53,7 +59,7 @@ export function encodeClientSiteSections(context: GitBookSiteContext, sections: 
                 continue;
             }
             case 'site-section': {
-                clientSections.push(encodeSection(context, item));
+                clientSections.push(encodeSection(context, item, asEmbeddable));
                 continue;
             }
             default:
@@ -63,13 +69,14 @@ export function encodeClientSiteSections(context: GitBookSiteContext, sections: 
 
     return {
         list: clientSections,
-        current: encodeSection(context, current),
+        current: encodeSection(context, current, asEmbeddable),
     };
 }
 
 function encodeChildren(
     context: GitBookSiteContext,
-    children: (SiteSection | SiteSectionGroup)[]
+    children: (SiteSection | SiteSectionGroup)[],
+    asEmbeddable: boolean
 ): (ClientSiteSection | ClientSiteSectionGroup)[] {
     const clientChildren: (ClientSiteSection | ClientSiteSectionGroup)[] = [];
     const currentLanguage = context.locale;
@@ -77,11 +84,11 @@ function encodeChildren(
     for (const child of children) {
         switch (child.object) {
             case 'site-section': {
-                clientChildren.push(encodeSection(context, child));
+                clientChildren.push(encodeSection(context, child, asEmbeddable));
                 break;
             }
             case 'site-section-group': {
-                const nestedChildren = encodeChildren(context, child.children);
+                const nestedChildren = encodeChildren(context, child.children, asEmbeddable);
 
                 // Skip empty groups
                 if (nestedChildren.length === 0) {
@@ -105,7 +112,7 @@ function encodeChildren(
     return clientChildren;
 }
 
-function encodeSection(context: GitBookSiteContext, section: SiteSection) {
+function encodeSection(context: GitBookSiteContext, section: SiteSection, asEmbeddable: boolean) {
     const currentLanguage = context.locale;
     return {
         id: section.id,
@@ -113,7 +120,7 @@ function encodeSection(context: GitBookSiteContext, section: SiteSection) {
         description: getLocalizedDescription(section, currentLanguage),
         icon: section.icon,
         object: section.object,
-        url: findBestTargetURL(context, section),
+        url: findBestTargetURL(context, section, asEmbeddable),
     };
 }
 
@@ -125,11 +132,15 @@ function encodeSection(context: GitBookSiteContext, section: SiteSection) {
  * 4. Otherwise, return the default first language match.
  * 5. Otherwise, return the default one.
  */
-function findBestTargetURL(context: GitBookSiteContext, section: SiteSection) {
+function findBestTargetURL(
+    context: GitBookSiteContext,
+    section: SiteSection,
+    asEmbeddable: boolean
+) {
     const { siteSpace: currentSiteSpace } = context;
 
     if (section.siteSpaces.length === 1 || currentSiteSpace.default) {
-        return getSectionURL(context, section);
+        return getTargetURLForSection(context, section, asEmbeddable);
     }
 
     const possibleMatches =
@@ -142,10 +153,34 @@ function findBestTargetURL(context: GitBookSiteContext, section: SiteSection) {
         possibleMatches[0];
 
     if (bestMatch) {
-        return getSiteSpaceURL(context, bestMatch);
+        return getTargetURLForSiteSpace(context, bestMatch, asEmbeddable);
+    }
+
+    return getTargetURLForSection(context, section, asEmbeddable);
+}
+
+function getTargetURLForSection(
+    context: GitBookSiteContext,
+    section: SiteSection,
+    asEmbeddable: boolean
+) {
+    if (asEmbeddable && section.urls.published) {
+        return toEmbeddableLinkForPublishedContent(context.linker, section.urls.published, '');
     }
 
     return getSectionURL(context, section);
+}
+
+function getTargetURLForSiteSpace(
+    context: GitBookSiteContext,
+    siteSpace: SiteSpace,
+    asEmbeddable: boolean
+) {
+    if (asEmbeddable && siteSpace.urls.published) {
+        return toEmbeddableLinkForPublishedContent(context.linker, siteSpace.urls.published, '');
+    }
+
+    return getSiteSpaceURL(context, siteSpace);
 }
 
 /**

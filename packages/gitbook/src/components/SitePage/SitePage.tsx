@@ -228,7 +228,7 @@ export async function generateSitePageMetadata(props: SitePageProps): Promise<Me
             ],
         },
         robots:
-            (await isSiteIndexable(context)) && isPageIndexable(ancestors, page)
+            isSiteIndexable(context) && isPageIndexable(ancestors, page)
                 ? 'index, follow'
                 : 'noindex, nofollow',
     };

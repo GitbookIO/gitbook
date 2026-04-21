@@ -8,7 +8,7 @@ export async function serveRobotsTxt(context: GitBookSiteContext) {
     const { linker } = context;
 
     const isRoot = checkIsRootSiteContext(context);
-    const isIndexable = await isSiteIndexable(context);
+    const isIndexable = isSiteIndexable(context);
 
     const sitemapPath = linker.toPathInSpace(isRoot ? '/sitemap.xml' : '/sitemap-pages.xml');
     const sitemapUrl = linker.toAbsoluteURL(sitemapPath);
@@ -16,6 +16,7 @@ export async function serveRobotsTxt(context: GitBookSiteContext) {
     const lines = isIndexable
         ? [
               'User-agent: *',
+              'Content-Signal: ai-train=yes, search=yes, ai-input=yes',
               // Disallow only internal search
               'Disallow: /*?*q=*',
               'Disallow: /*?*ask=*',
@@ -26,7 +27,7 @@ export async function serveRobotsTxt(context: GitBookSiteContext) {
               'Allow: /',
               `Sitemap: ${sitemapUrl}`,
           ]
-        : ['User-agent: *', 'Disallow: /'];
+        : ['User-agent: *', 'Content-Signal: ai-train=no, search=no, ai-input=no', 'Disallow: /'];
 
-    return new Response(lines.join('\n'), { headers: { 'Content-Type': 'text/plain' } });
+    return new Response(`${lines.join('\n')}\n`, { headers: { 'Content-Type': 'text/plain' } });
 }

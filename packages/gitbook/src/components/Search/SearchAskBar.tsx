@@ -37,6 +37,7 @@ export function SearchAskBar(props: { query: string; assistant: Assistant }) {
                 'hover:bg-tint hover:text-tint-strong',
                 'transition-colors'
             )}
+            data-testid="search-ask-question"
         >
             <div className="size-4 shrink-0 text-tint-subtle">
                 {typeof assistant.icon === 'string' ? (

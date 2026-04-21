@@ -59,11 +59,23 @@ export function useSearchResults(props: {
 
     const trackEvent = useTrackEvent();
 
+    const filterSiteSpaceIds = React.useMemo(() => {
+        switch (scope) {
+            case 'current':
+                return [siteSpaceId];
+            case 'extended':
+                return siteSpaceIds;
+            default:
+                return undefined;
+        }
+    }, [scope, siteSpaceId, siteSpaceIds]);
+
     const { results: localResults } = useLocalSearchResults({
         query,
         indexURL,
         lang,
         disabled,
+        filterSiteSpaceIds,
     });
 
     const [remoteState, setRemoteState] = React.useState<{
