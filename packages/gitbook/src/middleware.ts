@@ -776,7 +776,10 @@ function encodePathInSiteContent(
                 const pagePathWithoutMD = pathname.replace(MARKDOWN_PATH_REGEX, '');
                 const ask = new URL(request.url).searchParams.get('ask');
                 return {
-                    pathname: `~gitbook/${typeof ask === 'string' ? 'markdown-ask' : 'markdown'}/${encodePagePath(pagePathWithoutMD)}`,
+                    pathname:
+                        typeof ask === 'string'
+                            ? `~gitbook/markdown-ask/${encodeURIComponent(ask)}`
+                            : `~gitbook/markdown/${encodePagePath(pagePathWithoutMD)}`,
                     routeType: 'static',
                     // TODO: track pageId / spaceId when possible
                     // We don't do it at the moment as we can't easily extract it from the URL.

@@ -11,16 +11,7 @@ import type { SearchAIAnswer, SearchAIAnswerSource } from '@gitbook/api';
 /**
  * Serve an AI answer as markdown for a page.
  */
-export async function serveAskMarkdown(
-    context: GitBookSiteContext,
-    {
-        question: rawQuestion,
-        pagePath,
-    }: {
-        question: string;
-        pagePath: string;
-    }
-) {
+export async function serveAskMarkdown(context: GitBookSiteContext, rawQuestion: string) {
     return serveMarkdown(async () => {
         const question = rawQuestion.trim();
 
@@ -65,7 +56,7 @@ export async function serveAskMarkdown(
                 },
                 {
                     markdown: latestAnswer.answer.markdown,
-                    pagePath,
+                    pagePath: '',
                 }
             )
         );
