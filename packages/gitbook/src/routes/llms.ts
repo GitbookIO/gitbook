@@ -1,6 +1,6 @@
 import { type GitBookSiteContext, checkIsRootSiteContext } from '@/lib/context';
 import { throwIfDataError } from '@/lib/data';
-import type { GitBookLinker } from '@/lib/links';
+import { type GitBookLinker, linkerWithMarkdownPages } from '@/lib/links';
 import { resolveFirstDocument } from '@/lib/pages';
 import { isRollout } from '@/lib/rollout';
 import { type FlatPageEntry, getIndexablePages } from '@/lib/sitemap';
@@ -13,12 +13,17 @@ import { toMarkdown } from 'mdast-util-to-markdown';
 /**
  * Generate a llms.txt file for the site.
  */
-export async function serveLLMsTxt(context: GitBookSiteContext) {
-    const { site } = context;
+export async function serveLLMsTxt(baseContext: GitBookSiteContext) {
+    const { site } = baseContext;
 
-    if (!checkIsRootSiteContext(context)) {
+    if (!checkIsRootSiteContext(baseContext)) {
         return new Response('llms.txt is only served from the root of the site', { status: 404 });
     }
+
+    const context = {
+        ...baseContext,
+        linker: linkerWithMarkdownPages(baseContext.linker),
+    };
 
     const tree: Root = {
         type: 'root',
