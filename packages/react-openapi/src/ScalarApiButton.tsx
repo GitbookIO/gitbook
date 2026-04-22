@@ -1,11 +1,7 @@
 'use client';
 
-import { ApiClientModalProvider, useApiClientModal } from '@scalar/api-client-react';
-import { Suspense, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
-import { createPortal } from 'react-dom';
-
 import type { OpenAPIV3_1 } from '@gitbook/openapi-parser';
-import { useOpenAPIOperationContext } from './OpenAPIOperationContext';
+import { useApiClient } from '@scalar/api-client-react';
 import { useOpenAPIPrefillContext } from './OpenAPIPrefillContextProvider';
 import type { OpenAPIClientContext } from './context';
 import { t } from './translate';
@@ -25,17 +21,33 @@ export function ScalarApiButton(props: {
     context: OpenAPIClientContext;
 }) {
     const { method, path, securities, servers, specUrl, withProxy, context } = props;
-    const [isOpen, setIsOpen] = useState(false);
-    const controllerRef = useRef<ScalarModalControllerRef>(null);
+
+    const getPrefillInputContextData = useOpenAPIPrefillContext();
+    const prefillInputContext = getPrefillInputContextData();
+
+    const prefillConfig = resolveTryItPrefillForOperation({
+        operation: { securities, servers },
+        prefillInputContext,
+    });
+
+    console.log('prefillConfig', prefillConfig);
+
+    const client = useApiClient({
+        configuration: {
+            url: specUrl,
+            ...prefillConfig,
+            proxyUrl: 'https://proxy.scalar.com',
+            // proxyUrl: withProxy ? context.proxyUrl : undefined,
+        },
+    });
+
+    console.log('rendering');
 
     return (
         <div className="scalar scalar-activate">
             <button
                 className="scalar-activate-button button"
-                onClick={() => {
-                    controllerRef.current?.openClient?.();
-                    setIsOpen(true);
-                }}
+                onClick={() => client?.open({ method, path })}
             >
                 {t(context.translation, 'test_it')}
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 12" fill="currentColor">
@@ -46,101 +58,6 @@ export function ScalarApiButton(props: {
                     />
                 </svg>
             </button>
-
-            {isOpen &&
-                createPortal(
-                    <Suspense fallback={null}>
-                        <ScalarModal
-                            controllerRef={controllerRef}
-                            withProxy={withProxy}
-                            proxyUrl={context.proxyUrl}
-                            method={method}
-                            path={path}
-                            securities={securities}
-                            servers={servers}
-                            specUrl={specUrl}
-                        />
-                    </Suspense>,
-                    document.body
-                )}
         </div>
     );
-}
-
-function ScalarModal(props: {
-    method: OpenAPIV3_1.HttpMethods;
-    path: string;
-    securities: OpenAPIOperationData['securities'];
-    servers: OpenAPIOperationData['servers'];
-    specUrl: string;
-    withProxy: boolean;
-    proxyUrl?: string;
-    controllerRef: React.Ref<ScalarModalControllerRef>;
-}) {
-    const { method, path, securities, servers, specUrl, withProxy, proxyUrl, controllerRef } =
-        props;
-
-    const getPrefillInputContextData = useOpenAPIPrefillContext();
-    const prefillInputContext = getPrefillInputContextData();
-
-    const prefillConfig = resolveTryItPrefillForOperation({
-        operation: { securities, servers },
-        prefillInputContext,
-    });
-
-    return (
-        <ApiClientModalProvider
-            configuration={{
-                url: specUrl,
-                ...prefillConfig,
-                proxyUrl: withProxy ? proxyUrl : undefined,
-            }}
-            initialRequest={{ method: toScalarHttpMethod(method), path }}
-        >
-            <ScalarModalController method={method} path={path} controllerRef={controllerRef} />
-        </ApiClientModalProvider>
-    );
-}
-
-function toScalarHttpMethod<T extends OpenAPIV3_1.HttpMethods>(method: T): Uppercase<T> {
-    return method.toUpperCase() as Uppercase<T>;
-}
-
-type ScalarModalControllerRef = {
-    openClient: (() => void) | undefined;
-};
-
-function ScalarModalController(props: {
-    method: OpenAPIV3_1.HttpMethods;
-    path: string;
-    controllerRef: React.Ref<ScalarModalControllerRef>;
-}) {
-    const { method, path, controllerRef } = props;
-    const client = useApiClientModal();
-    const openScalarClient = client?.open;
-    const { onOpenClient: trackClientOpening } = useOpenAPIOperationContext();
-    const openClient = useMemo(() => {
-        if (openScalarClient) {
-            return () => {
-                openScalarClient({
-                    method: toScalarHttpMethod(method),
-                    path,
-                    _source: 'gitbook',
-                });
-                trackClientOpening({ method, path });
-            };
-        }
-        return null;
-    }, [openScalarClient, method, path, trackClientOpening]);
-    useImperativeHandle(
-        controllerRef,
-        () => ({ openClient: openClient ? () => openClient() : undefined }),
-        [openClient]
-    );
-
-    // Open at mount
-    useEffect(() => {
-        openClient?.();
-    }, [openClient]);
-    return null;
 }
