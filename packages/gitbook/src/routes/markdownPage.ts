@@ -63,10 +63,11 @@ function renderAskFooter(
     pageLookup: ResolvedPagePath<RevisionPageDocument | RevisionPageGroup>
 ) {
     if (
-        isRollout({
+        !isRollout({
             discriminator: context.site.id,
             percentageRollout: 25,
-        })
+        }) &&
+        context.site.id !== 'site_p4Xo4'
     ) {
         return '';
     }
