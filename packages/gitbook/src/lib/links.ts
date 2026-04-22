@@ -183,10 +183,13 @@ export function createLinker(
                 // implementation matches the base linker toPathForPage, but decouples from using `this` to
                 // ensure we always use the updates `toPathInSpace` method.
                 toPathForPage({ pages, page, anchor }) {
-                    return (
-                        newLinker.toPathInSpace(getPagePath(pages, page)) +
-                        (anchor ? `#${anchor}` : '')
-                    );
+                    return newLinker.toPathForPagePath({
+                        path: getPagePath(pages, page),
+                        anchor,
+                    });
+                },
+                toPathForPagePath({ path, anchor }) {
+                    return newLinker.toPathInSpace(path) + (anchor ? `#${anchor}` : '');
                 },
             };
 
