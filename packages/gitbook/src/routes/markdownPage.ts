@@ -57,7 +57,11 @@ If the exact page cannot be found, you can still retrieve the information using 
 Perform an HTTP GET request on the documentation index with the \`ask\` parameter:
 
 \`\`\`
-GET ${context.linker.toAbsoluteURL(context.linker.toPathInSite('sitemap.md'))}?ask=<question>
+GET ${context.linker.toAbsoluteURL(
+        context.linker.toPathForPagePath({
+            path: similarPages[0]?.path ?? 'docs/example',
+        })
+    )}?ask=<question>
 \`\`\`
 
 The question should be specific, self-contained, and written in natural language.
@@ -77,7 +81,11 @@ Use this to access all content at once and perform your own parsing or retrieval
 
 ## Tips for requesting documentation
 
-Prefer \`.md\` URLs for structured content, append \`.md\` to URLs (e.g., \`${context.linker.toPathInSpace(similarPages[0]?.path ?? 'docs/example')}.md\`).
+Prefer \`.md\` URLs for structured content, append \`.md\` to URLs (e.g., \`${context.linker.toPathForPagePath(
+        {
+            path: similarPages[0]?.path ?? 'docs/example',
+        }
+    )}\`).
 
 You may also use \`Accept: text/markdown\` header for content negotiation.
 `;

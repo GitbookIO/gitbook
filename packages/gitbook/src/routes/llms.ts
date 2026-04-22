@@ -200,7 +200,7 @@ function renderAskFooter(context: GitBookSiteContext) {
 
     return `\n\n---\n\n# Agent Instructions: Querying This Documentation
 
-If you need additional information , you can query the documentation dynamically by asking a question.
+If you need additional information, you can query the documentation dynamically by asking a question.
 
 Perform an HTTP GET request on a page URL with the \`ask\` query parameter:
 
