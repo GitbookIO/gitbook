@@ -133,7 +133,7 @@ export const SearchInput = React.forwardRef<HTMLDivElement, SearchInputProps>(
                             ? {
                                   keys: ['mod', 'k'],
                                   className:
-                                      'bg-tint-base site-header:theme-bold:bg-header-background',
+                                      'bg-tint-base site-header:theme-bold:border-header-link/4 site-header:theme-bold:bg-header-background site-header:theme-bold:text-header-link',
                               }
                             : undefined
                     }
