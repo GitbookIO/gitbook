@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'bun:test';
-import { createLinker, linkerForPublishedURL, linkerWithAbsoluteURLs } from './links';
+import {
+    createLinker,
+    linkerForPublishedURL,
+    linkerWithAbsoluteURLs,
+    linkerWithMarkdownPages,
+} from './links';
 
 const root = createLinker({
     host: 'docs.company.com',
@@ -77,6 +82,22 @@ describe('toRelativePathInSite', () => {
     });
 });
 
+describe('toPathForPagePath', () => {
+    it('should return the correct path', () => {
+        expect(root.toPathForPagePath({ path: 'some/path' })).toBe('/some/path');
+        expect(variantInSection.toPathForPagePath({ path: 'some/path' })).toBe(
+            '/section/variant/some/path'
+        );
+    });
+
+    it('should preserve anchors and resolve index pages', () => {
+        expect(root.toPathForPagePath({ path: '', anchor: 'intro' })).toBe('/#intro');
+        expect(variantInSection.toPathForPagePath({ path: '', anchor: 'intro' })).toBe(
+            '/section/variant#intro'
+        );
+    });
+});
+
 describe('toAbsoluteURL', () => {
     it('should return the correct path', () => {
         expect(root.toAbsoluteURL('some/path')).toBe('https://docs.company.com/some/path');
@@ -148,6 +169,42 @@ describe('linker.withOtherSiteSpace', () => {
             spaceBasePath: '/a/b',
         });
         expect(otherSpaceBasePathLinker.toPathInSpace('some/path')).toBe('/sitename/a/b/some/path');
+    });
+
+    it('should resolve toPathForPagePath using the overridden spaceBasePath', () => {
+        const otherSpaceBasePathLinker = root.withOtherSiteSpace({
+            spaceBasePath: '/section/variant',
+        });
+        expect(otherSpaceBasePathLinker.toPathForPagePath({ path: 'some/path' })).toBe(
+            '/section/variant/some/path'
+        );
+        expect(otherSpaceBasePathLinker.toPathForPagePath({ path: '', anchor: 'intro' })).toBe(
+            '/section/variant#intro'
+        );
+    });
+
+    it('should resolve page paths relative to the overridden spaceBasePath', () => {
+        const otherSpaceBasePathLinker = siteGitBookIO.withOtherSiteSpace({
+            spaceBasePath: '/a/b',
+        });
+        expect(otherSpaceBasePathLinker.toPathForPagePath({ path: 'some/path' })).toBe(
+            '/sitename/a/b/some/path'
+        );
+        expect(otherSpaceBasePathLinker.toPathForPagePath({ path: '', anchor: 'intro' })).toBe(
+            '/sitename/a/b#intro'
+        );
+    });
+});
+
+describe('linkerWithMarkdownPages', () => {
+    it('should append .md to page paths and preserve anchors', () => {
+        const markdownLinker = linkerWithMarkdownPages(variantInSection);
+        expect(markdownLinker.toPathForPagePath({ path: 'some/path' })).toBe(
+            '/section/variant/some/path.md'
+        );
+        expect(markdownLinker.toPathForPagePath({ path: 'some/path', anchor: 'intro' })).toBe(
+            '/section/variant/some/path.md#intro'
+        );
     });
 });
 
