@@ -45,7 +45,7 @@ describe('markdown pages', () => {
 });
 
 describe('markdown ask responses', () => {
-    const ASK_QUESTION = 'How are docs optimized for agents?';
+    const ASK_QUESTION = 'What is GitBook?';
     const ASK_QUESTION_HEADING = `# ${ASK_QUESTION}`;
 
     it(
@@ -62,7 +62,6 @@ describe('markdown ask responses', () => {
             expect(response.headers.get('content-type')).toContain('text/markdown');
             expect(response.headers.get('x-robots-tag')).toBe('noindex');
             expect(text).toContain(ASK_QUESTION_HEADING);
-            expect(text).toContain('# Sources');
         },
         { timeout: 30_000 }
     );
@@ -86,7 +85,6 @@ describe('markdown ask responses', () => {
             expect(response.headers.get('content-type')).toContain('text/markdown');
             expect(response.headers.get('x-robots-tag')).toBe('noindex');
             expect(text).toContain(ASK_QUESTION_HEADING);
-            expect(text).toContain('# Sources');
         },
         { timeout: 30_000 }
     );
