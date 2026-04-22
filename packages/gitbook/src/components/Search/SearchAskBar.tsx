@@ -39,6 +39,7 @@ export function SearchAskBar(props: {
             active={active}
             action={tString(language, 'ask')}
             leadingIcon={assistant.icon}
+            data-testid="search-ask-question"
             className="gutter-stable shrink-0 overflow-y-scroll rounded-none! border-tint-subtle border-t pr-5 pl-6"
         >
             <div className="flex items-center justify-between gap-2">

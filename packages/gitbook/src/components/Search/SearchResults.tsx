@@ -304,7 +304,13 @@ export const SearchResults = React.forwardRef(function SearchResults(
                 </>
             )}
             {fetching ? (
-                <div className={tcls(results.length > 0 ? 'mt-1' : '', 'flex flex-col gap-1')}>
+                <div
+                    className={tcls(
+                        results.length > 0 ? 'mt-1' : '',
+                        'flex animate-blur-in flex-col gap-1'
+                    )}
+                    style={{ animationDelay: `${results.length * 25}ms` }}
+                >
                     <SearchResultsSkeleton items={Math.max(3, 5 - results.length)} />
                 </div>
             ) : null}
