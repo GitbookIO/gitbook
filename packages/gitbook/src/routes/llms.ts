@@ -1,7 +1,7 @@
 import { type GitBookSiteContext, checkIsRootSiteContext } from '@/lib/context';
 import { throwIfDataError } from '@/lib/data';
 import type { GitBookLinker } from '@/lib/links';
-import { joinPath } from '@/lib/paths';
+import { resolveFirstDocument } from '@/lib/pages';
 import { isRollout } from '@/lib/rollout';
 import { type FlatPageEntry, getIndexablePages } from '@/lib/sitemap';
 import { filterSiteSpacesByLocale, getLocalizedTitle, getSiteStructureSections } from '@/lib/sites';
@@ -13,17 +13,7 @@ import { toMarkdown } from 'mdast-util-to-markdown';
 /**
  * Generate a llms.txt file for the site.
  */
-export async function serveLLMsTxt(
-    context: GitBookSiteContext,
-    {
-        withMarkdownPages = false,
-    }: {
-        /**
-         * If true, a markdown extension will be added to the page path.
-         */
-        withMarkdownPages?: boolean;
-    } = {}
-) {
+export async function serveLLMsTxt(context: GitBookSiteContext) {
     const { site } = context;
 
     if (!checkIsRootSiteContext(context)) {
@@ -38,7 +28,7 @@ export async function serveLLMsTxt(
                 depth: 1,
                 children: [{ type: 'text', value: site.title }],
             },
-            ...(await getNodesFromSiteStructure(context, { withMarkdownPages })),
+            ...(await getNodesFromSiteStructure(context)),
         ],
     };
 
@@ -58,23 +48,16 @@ export async function serveLLMsTxt(
 /**
  * Get MDAST nodes from site structure.
  */
-async function getNodesFromSiteStructure(
-    context: GitBookSiteContext,
-    options: {
-        withMarkdownPages: boolean;
-    }
-): Promise<RootContent[]> {
+async function getNodesFromSiteStructure(context: GitBookSiteContext): Promise<RootContent[]> {
     switch (context.structure.type) {
         case 'sections':
             return getNodesFromSections(
                 context,
-                getSiteStructureSections(context.structure, { ignoreGroups: true }),
-                { withMarkdownPages: options.withMarkdownPages }
+                getSiteStructureSections(context.structure, { ignoreGroups: true })
             );
         case 'siteSpaces':
             return getNodesFromSiteSpaces(context, context.structure.structure, {
                 heading: true,
-                withMarkdownPages: options.withMarkdownPages,
             });
         default:
             assertNever(context.structure);
@@ -86,17 +69,13 @@ async function getNodesFromSiteStructure(
  */
 async function getNodesFromSections(
     context: GitBookSiteContext,
-    siteSections: SiteSection[],
-    options: {
-        withMarkdownPages: boolean;
-    }
+    siteSections: SiteSection[]
 ): Promise<RootContent[]> {
     const currentLanguage = context.locale;
     const all = await Promise.all(
         siteSections.map(async (siteSection): Promise<RootContent[]> => {
             const siteSpaceNodes = await getNodesFromSiteSpaces(context, siteSection.siteSpaces, {
                 heading: false,
-                withMarkdownPages: options.withMarkdownPages,
             });
             return [
                 {
@@ -124,11 +103,6 @@ async function getNodesFromSiteSpaces(
          * Includes a heading for each site space.
          */
         heading?: boolean;
-
-        /**
-         * If true, a markdown extension will be added to the page path.
-         */
-        withMarkdownPages: boolean;
     }
 ): Promise<RootContent[]> {
     const { dataFetcher, linker } = context;
@@ -166,13 +140,7 @@ async function getNodesFromSiteSpaces(
             }
 
             // Add the pages as a list
-            nodes.push(
-                ...(await getMarkdownForPagesTree(pages, {
-                    siteSpaceUrl,
-                    linker,
-                    withMarkdownPages: options.withMarkdownPages,
-                }))
-            );
+            nodes.push(...(await getMarkdownForPagesTree(pages, linker)));
 
             return nodes;
         })
@@ -185,23 +153,15 @@ async function getNodesFromSiteSpaces(
  */
 export async function getMarkdownForPagesTree(
     pages: FlatPageEntry[],
-    options: {
-        siteSpaceUrl: string;
-        linker: GitBookLinker;
-        withMarkdownPages?: boolean;
-    }
+    linker: GitBookLinker
 ): Promise<RootContent[]> {
-    const { siteSpaceUrl, linker } = options;
-
     const listChildren = await Promise.all(
         pages.map(async ({ page }): Promise<ListItem> => {
-            const pageURL = new URL(siteSpaceUrl);
-            pageURL.pathname = joinPath(pageURL.pathname, page.path);
-            if (options.withMarkdownPages) {
-                pageURL.pathname = `${pageURL.pathname}.md`;
-            }
-
-            const url = linker.toLinkForContent(pageURL.toString());
+            const url = linker.toAbsoluteURL(
+                linker.toPathForPagePath({
+                    path: page.path,
+                })
+            );
             const children: Paragraph['children'] = [
                 {
                     type: 'link',
@@ -245,7 +205,11 @@ If you need additional information , you can query the documentation dynamically
 Perform an HTTP GET request on a page URL with the \`ask\` query parameter:
 
 \`\`\`
-GET ${context.linker.toAbsoluteURL(context.linker.toPathInSite('sitemap.md'))}?ask=<question>
+GET ${context.linker.toAbsoluteURL(
+        context.linker.toPathForPagePath({
+            path: resolveFirstDocument(context.revision.pages, [])?.page.path ?? 'index',
+        })
+    )}?ask=<question>
 \`\`\`
 
 The question should be specific, self-contained, and written in natural language.

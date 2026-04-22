@@ -86,11 +86,7 @@ export async function getMarkdownForPageInSpace(
 
     // Handle group pages (pages with no content that list their children)
     if (page.type === RevisionPageType.Group) {
-        const siteSpaceUrl = siteSpace.urls.published;
-        if (!siteSpaceUrl) {
-            throw new DataFetcherError(`Page "${page.title}" is not published`, 404);
-        }
-        return renderGroupPageMarkdown({ siteSpaceUrl, linker, page });
+        return renderGroupPageMarkdown({ linker, page });
     }
 
     const rawMarkdown = await throwIfDataError(
@@ -108,11 +104,7 @@ export async function getMarkdownForPageInSpace(
 
     // Handle empty document pages which have children (same as getMarkdownForPage)
     if (isEmptyMarkdownPage(tree) && page.pages.length > 0) {
-        const siteSpaceUrl = siteSpace.urls.published;
-        if (!siteSpaceUrl) {
-            throw new DataFetcherError(`Page "${page.title}" is not published`, 404);
-        }
-        return renderGroupPageMarkdown({ siteSpaceUrl, linker, page });
+        return renderGroupPageMarkdown({ linker, page });
     }
 
     return toPageMarkdown(tree);
@@ -190,13 +182,7 @@ async function servePageGroup(
     context: GitBookSiteContext,
     page: RevisionPageDocument | RevisionPageGroup
 ): Promise<string> {
-    const siteSpaceUrl = context.space.urls.published;
-    if (!siteSpaceUrl) {
-        throw new DataFetcherError(`Page "${page.title}" is not published`, 404);
-    }
-
     return renderGroupPageMarkdown({
-        siteSpaceUrl,
         linker: context.linker,
         page,
     });
@@ -207,11 +193,10 @@ async function servePageGroup(
  * Use this when rendering a group page from a different space than the current context.
  */
 async function renderGroupPageMarkdown(args: {
-    siteSpaceUrl: string;
     linker: GitBookLinker;
     page: RevisionPageDocument | RevisionPageGroup;
 }): Promise<string> {
-    const { siteSpaceUrl, linker, page } = args;
+    const { linker, page } = args;
     const indexablePages = getIndexablePages(page.pages);
 
     const markdownTree: Root = {
@@ -222,11 +207,7 @@ async function renderGroupPageMarkdown(args: {
                 depth: 1,
                 children: [{ type: 'text', value: page.title }],
             },
-            ...(await getMarkdownForPagesTree(indexablePages, {
-                siteSpaceUrl,
-                linker,
-                withMarkdownPages: true,
-            })),
+            ...(await getMarkdownForPagesTree(indexablePages, linker)),
         ],
     };
 

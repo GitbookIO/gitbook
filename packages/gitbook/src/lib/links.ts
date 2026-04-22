@@ -42,6 +42,15 @@ export interface GitBookLinker {
     }): string;
 
     /**
+     * Generate an absolute path for a page path in the current content.
+     * The result should NOT be passed to `toPathInSpace`.
+     */
+    toPathForPagePath(input: {
+        path: string;
+        anchor?: string;
+    }): string;
+
+    /**
      * Generate an absolute URL for a given path relative to the host of the current content.
      */
     toAbsoluteURL(absolutePath: string): string;
@@ -130,7 +139,14 @@ export function createLinker(
         },
 
         toPathForPage({ pages, page, anchor }) {
-            return linker.toPathInSpace(getPagePath(pages, page)) + (anchor ? `#${anchor}` : '');
+            return linker.toPathForPagePath({
+                path: getPagePath(pages, page),
+                anchor,
+            });
+        },
+
+        toPathForPagePath({ path, anchor }) {
+            return linker.toPathInSpace(path) + (anchor ? `#${anchor}` : '');
         },
 
         toAbsoluteURL(absolutePath: string): string {
@@ -220,7 +236,7 @@ export function linkerWithAbsoluteURLs(linker: GitBookLinker): GitBookLinker {
         ...linker,
         toPathInSpace: (path) => linker.toAbsoluteURL(linker.toPathInSpace(path)),
         toPathInSite: (path) => linker.toAbsoluteURL(linker.toPathInSite(path)),
-        toPathForPage: (input) => linker.toAbsoluteURL(linker.toPathForPage(input)),
+        toPathForPagePath: (input) => linker.toAbsoluteURL(linker.toPathForPagePath(input)),
     };
 }
 
@@ -228,12 +244,20 @@ export function linkerWithAbsoluteURLs(linker: GitBookLinker): GitBookLinker {
  * Create a new linker that resolves pages to their markdown version.
  */
 export function linkerWithMarkdownPages(linker: GitBookLinker): GitBookLinker {
-    return {
+    const self: GitBookLinker = {
         ...linker,
         toPathForPage: (input) => {
-            return `${linker.toPathInSpace(input.page.path)}.md${input.anchor ? `#${input.anchor}` : ''}`;
+            return self.toPathForPagePath({
+                path: input.page.path,
+                anchor: input.anchor,
+            });
+        },
+        toPathForPagePath: (input) => {
+            return `${linker.toPathInSpace(input.path)}.md${input.anchor ? `#${input.anchor}` : ''}`;
         },
     };
+
+    return self;
 }
 
 function joinPaths(prefix: string, path: string): string {
