@@ -17,7 +17,7 @@ import type { OrderedComputedResult } from './search-types';
 import type { LocalPageResult } from './useLocalSearchResults';
 
 export interface SearchResultsRef {
-    select(): void;
+    select(): boolean;
 }
 
 type ResultType =
@@ -99,10 +99,11 @@ export const SearchResults = React.forwardRef(function SearchResults(
 
     const select = React.useCallback(() => {
         if (cursor === null || !refs.current[cursor]) {
-            return;
+            return false;
         }
 
         refs.current[cursor]?.click();
+        return true;
     }, [cursor]);
 
     React.useImperativeHandle(

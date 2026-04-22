@@ -88,9 +88,10 @@ function useSearchKeyboardNavigation(props: {
                     return;
                 }
 
-                // Stop any in-flight search request: the user is navigating away.
-                abort();
-                resultsRef.current?.select();
+                if (resultsRef.current?.select()) {
+                    // Stop any in-flight search request only when activating a result.
+                    abort();
+                }
             }
         },
         [moveCursorBy, cursor, results.length, onAskSelect, resultsRef, abort]

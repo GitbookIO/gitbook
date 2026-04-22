@@ -57,9 +57,8 @@ export const SearchInput = React.forwardRef<HTMLDivElement, SearchInputProps>(
             const focusInput = () => {
                 if (document.activeElement !== inputRef.current) {
                     inputRef.current?.focus({ preventScroll: true });
+                    inputRef.current?.setSelectionRange(value.length, value.length);
                 }
-
-                inputRef.current?.setSelectionRange(value.length, value.length);
             };
 
             if (!isFrame) {
@@ -69,7 +68,7 @@ export const SearchInput = React.forwardRef<HTMLDivElement, SearchInputProps>(
 
             const timeout = window.setTimeout(focusInput, 150);
             return () => window.clearTimeout(timeout);
-        }, [isFrame, isOpen, value]);
+        }, [isFrame, isOpen, value.length]);
 
         return (
             <div
