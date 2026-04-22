@@ -2,6 +2,7 @@ import { type GitBookSiteContext, checkIsRootSiteContext } from '@/lib/context';
 import { throwIfDataError } from '@/lib/data';
 import type { GitBookLinker } from '@/lib/links';
 import { joinPath } from '@/lib/paths';
+import { isRollout } from '@/lib/rollout';
 import { type FlatPageEntry, getIndexablePages } from '@/lib/sitemap';
 import { filterSiteSpacesByLocale, getLocalizedTitle, getSiteStructureSections } from '@/lib/sites';
 import type { SiteSection, SiteSpace } from '@gitbook/api';
@@ -41,16 +42,17 @@ export async function serveLLMsTxt(
         ],
     };
 
-    return new Response(
-        toMarkdown(tree, {
-            bullet: '-',
-        }),
-        {
-            headers: {
-                'Content-Type': 'text/markdown; charset=utf-8',
-            },
-        }
-    );
+    let output = toMarkdown(tree, {
+        bullet: '-',
+    });
+
+    output += renderAskFooter(context);
+
+    return new Response(output, {
+        headers: {
+            'Content-Type': 'text/markdown; charset=utf-8',
+        },
+    });
 }
 
 /**
@@ -223,4 +225,32 @@ export async function getMarkdownForPagesTree(
         children: listChildren,
     });
     return nodes;
+}
+
+function renderAskFooter(context: GitBookSiteContext) {
+    if (
+        !isRollout({
+            discriminator: context.site.id,
+            percentageRollout: 25,
+        }) &&
+        context.site.id !== 'site_p4Xo4'
+    ) {
+        return '';
+    }
+
+    return `\n\n---\n\n# Agent Instructions: Querying This Documentation
+
+If you need additional information , you can query the documentation dynamically by asking a question.
+
+Perform an HTTP GET request on a page URL with the \`ask\` query parameter:
+
+\`\`\`
+GET ${context.linker.toAbsoluteURL(context.linker.toPathInSite('sitemap.md'))}?ask=<question>
+\`\`\`
+
+The question should be specific, self-contained, and written in natural language.
+The response will contain a direct answer to the question and relevant excerpts and sources from the documentation.
+
+Use this mechanism when the answer is not explicitly present in the current page, you need clarification or additional context, or you want to retrieve related documentation sections.
+`;
 }
