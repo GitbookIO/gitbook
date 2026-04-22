@@ -170,7 +170,13 @@ export const SearchResults = React.forwardRef(function SearchResults(
                 )
             ) : (
                 <>
-                    <div data-testid="search-results" className="flex flex-col gap-1" id={id}>
+                    <div
+                        data-testid="search-results"
+                        className="flex flex-col gap-1"
+                        id={id}
+                        role="listbox"
+                        aria-live="polite"
+                    >
                         <AnimatePresence initial={false} mode="popLayout">
                             {results.map((item, index) => {
                                 const itemKey = getResultKey(item);
@@ -179,6 +185,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
                                 const resultItemProps = {
                                     'aria-posinset': index + 1,
                                     'aria-setsize': results.length,
+                                    id: `${id}-${index}`,
                                     onClickCapture: () => onResultSelect?.(),
                                 };
                                 switch (item.type) {

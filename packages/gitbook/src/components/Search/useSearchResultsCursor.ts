@@ -16,11 +16,18 @@ export function useSearchResultsCursor(props: {
     }, [query]);
 
     React.useEffect(() => {
-        if (resultCount > 0) {
-            // Auto-focus the first result
-            setCursor(0);
+        if (totalCount === 0) {
+            return;
         }
-    }, [resultCount]);
+
+        setCursor((prev) => {
+            if (resultCount > 0) {
+                return 0;
+            }
+
+            return prev ?? 0;
+        });
+    }, [resultCount, totalCount]);
 
     React.useEffect(() => {
         setCursor((prev) => {
