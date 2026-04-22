@@ -194,13 +194,18 @@ async function getMarkdownForPage(
         })
     );
 
-    const tree = fromPageMarkdown({
-        linker: context.linker.fork({
-            spaceBasePath: joinPath(context.linker.siteBasePath, basePath),
-        }),
-        markdown: pageMarkdown,
-        pagePath: page.path,
-    });
+    const tree = await fromPageMarkdown(
+        {
+            ...context,
+            linker: context.linker.fork({
+                spaceBasePath: joinPath(context.linker.siteBasePath, basePath),
+            }),
+        },
+        {
+            markdown: pageMarkdown,
+            pagePath: page.path,
+        }
+    );
 
     if (page.description) {
         // The first node is the page title as a H1, we insert the description as a paragraph

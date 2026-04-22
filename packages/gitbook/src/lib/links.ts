@@ -1,11 +1,7 @@
-import path from 'node:path';
 import { getPagePath } from '@/lib/pages';
 import { withLeadingSlash, withTrailingSlash } from '@/lib/paths';
 import type { RevisionPage, RevisionPageDocument, RevisionPageGroup } from '@gitbook/api';
-import type { Link, Root } from 'mdast';
-import { visit } from 'unist-util-visit';
 import warnOnce from 'warn-once';
-import { checkIsAnchor, checkIsExternalURL } from './urls';
 
 /**
  * Generic interface to generate links based on a given context.
@@ -228,6 +224,18 @@ export function linkerWithAbsoluteURLs(linker: GitBookLinker): GitBookLinker {
     };
 }
 
+/**
+ * Create a new linker that resolves pages to their markdown version.
+ */
+export function linkerWithMarkdownPages(linker: GitBookLinker): GitBookLinker {
+    return {
+        ...linker,
+        toPathForPage: (input) => {
+            return `${linker.toPathInSpace(input.page.path)}.md${input.anchor ? `#${input.anchor}` : ''}`;
+        },
+    };
+}
+
 function joinPaths(prefix: string, path: string): string {
     const prefixPath = prefix.endsWith('/') ? prefix : `${prefix}/`;
     const suffixPath = path.startsWith('/') ? path.slice(1) : path;
@@ -237,35 +245,4 @@ function joinPaths(prefix: string, path: string): string {
 
 function removeTrailingSlash(path: string): string {
     return path.endsWith('/') ? path.slice(0, -1) : path;
-}
-
-/**
- * Re-writes the URL of every relative <a> link so it is expressed from the site-root.
- */
-export function relativeToAbsoluteLinks(
-    linker: GitBookLinker,
-    tree: Root,
-    currentPagePath: string
-): Root {
-    const currentDir = path.posix.dirname(currentPagePath);
-
-    visit(tree, 'link', (node: Link) => {
-        const original = node.url;
-
-        // Skip anchors, mailto:, http(s):, protocol-like, or already-rooted paths
-        if (checkIsExternalURL(original) || checkIsAnchor(original) || original.startsWith('/')) {
-            return;
-        }
-
-        // Resolve against the current page’s directory and strip any leading “/” or "../"
-        // Sometimes the path can be "../" if we are on the default section
-        // but it means we are just at the root of the site.
-        const pathInPage = path.posix
-            .normalize(path.posix.join(currentDir, original))
-            .replace(/^[\/\.]+/, '');
-
-        node.url = linker.toAbsoluteURL(linker.toPathInSpace(pathInPage));
-    });
-
-    return tree;
 }

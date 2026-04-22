@@ -1,4 +1,5 @@
-import type { GitBookSiteContext } from '@/lib/context';
+import path from 'node:path';
+import type { GitBookAnyContext, GitBookSiteContext } from '@/lib/context';
 import { DataFetcherError, throwIfDataError } from '@/lib/data';
 import type { ResolvedPagePath } from '@/lib/pages';
 import { getIndexablePages } from '@/lib/sitemap';
@@ -10,7 +11,7 @@ import {
     RevisionPageType,
     type SiteSpace,
 } from '@gitbook/api';
-import type { Root } from 'mdast';
+import type { Link, Root } from 'mdast';
 import { fromMarkdown } from 'mdast-util-from-markdown';
 import { frontmatterFromMarkdown } from 'mdast-util-frontmatter';
 import { gfmFromMarkdown, gfmToMarkdown } from 'mdast-util-gfm';
@@ -18,7 +19,10 @@ import { toMarkdown } from 'mdast-util-to-markdown';
 import { frontmatter } from 'micromark-extension-frontmatter';
 import { gfm } from 'micromark-extension-gfm';
 import { remove } from 'unist-util-remove';
-import { type GitBookLinker, relativeToAbsoluteLinks } from './links';
+import { visit } from 'unist-util-visit';
+import type { GitBookLinker } from './links';
+import { resolveContentRef, resolveStringContentRef } from './references';
+import { checkIsAnchor, checkIsExternalURL } from './urls';
 
 /**
  * Generate a markdown version of a page.
@@ -53,8 +57,7 @@ export async function getMarkdownForPage(
         throw error;
     }
 
-    const tree = fromPageMarkdown({
-        linker: context.linker,
+    const tree = await fromPageMarkdown(context, {
         markdown: rawMarkdown,
         pagePath: page.path,
     });
@@ -98,8 +101,7 @@ export async function getMarkdownForPageInSpace(
         })
     );
 
-    const tree = fromPageMarkdown({
-        linker,
+    const tree = await fromPageMarkdown(context, {
         markdown: rawMarkdown,
         pagePath: page.path,
     });
@@ -120,11 +122,13 @@ export async function getMarkdownForPageInSpace(
  * Parse markdown from a page, removing frontmatter and rewriting relative links to absolute links.
  * Returns the markdown AST that can be further processed or converted back to markdown using `toPageMarkdown`.
  */
-export function fromPageMarkdown(args: {
-    linker: GitBookLinker;
-    markdown: string;
-    pagePath: string;
-}): Root {
+export async function fromPageMarkdown(
+    context: GitBookAnyContext,
+    args: {
+        markdown: string;
+        pagePath: string;
+    }
+): Promise<Root> {
     const tree = fromMarkdown(args.markdown, {
         extensions: [frontmatter(['yaml']), gfm()],
         mdastExtensions: [frontmatterFromMarkdown(['yaml']), gfmFromMarkdown()],
@@ -133,7 +137,7 @@ export function fromPageMarkdown(args: {
     // Remove frontmatter
     remove(tree, 'yaml');
 
-    relativeToAbsoluteLinks(args.linker, tree, args.pagePath);
+    await rewriteMarkdownLinks(context, tree, args.pagePath);
 
     return tree;
 }
@@ -229,4 +233,56 @@ async function renderGroupPageMarkdown(args: {
     return toMarkdown(markdownTree, {
         bullet: '-',
     });
+}
+
+/**
+ * Re-writes URLs in a markdown content:
+ * -
+ * - the URL of every relative <a> link so it is expressed from the site-root.
+ */
+async function rewriteMarkdownLinks(
+    context: GitBookAnyContext,
+    tree: Root,
+    currentPagePath: string
+): Promise<Root> {
+    const currentDir = path.posix.dirname(currentPagePath);
+
+    const pending: Array<Promise<void>> = [];
+
+    visit(tree, 'link', (node: Link) => {
+        const original = node.url;
+
+        // Skip anchors, mailto:, http(s):, protocol-like
+        if (checkIsExternalURL(original) || checkIsAnchor(original)) {
+            return;
+        }
+
+        const contentRef = resolveStringContentRef(original);
+
+        if (contentRef) {
+            pending.push(
+                (async () => {
+                    const resolved = await resolveContentRef(contentRef, context);
+                    if (resolved?.href) {
+                        node.url = resolved.href;
+                    }
+                })()
+            );
+        } else {
+            // Resolve against the current page’s directory and strip any leading “/” or "../"
+            // Sometimes the path can be "../" if we are on the default section
+            // but it means we are just at the root of the site.
+            const pathInPage = path.posix
+                .normalize(path.posix.join(currentDir, original))
+                .replace(/^[\/\.]+/, '');
+
+            node.url = context.linker.toAbsoluteURL(context.linker.toPathInSpace(pathInPage));
+        }
+    });
+
+    if (pending.length > 0) {
+        await Promise.all(pending);
+    }
+
+    return tree;
 }
