@@ -7,6 +7,7 @@ import {
     getSimilarPages,
     resolvePagePathDocumentOrGroup,
 } from '@/lib/pages';
+import { isRollout } from '@/lib/rollout';
 import type { RevisionPageDocument, RevisionPageGroup } from '@gitbook/api';
 
 /**
@@ -61,18 +62,34 @@ function renderAskFooter(
     context: GitBookSiteContext,
     pageLookup: ResolvedPagePath<RevisionPageDocument | RevisionPageGroup>
 ) {
-    if (context.site.id !== 'site_p4Xo4') {
+    if (
+        isRollout({
+            discriminator: context.site.id,
+            percentageRollout: 25,
+        })
+    ) {
         return '';
     }
 
-    return `\n\n---\n\n# Ask questions about the documentation
+    return `\n\n---\n\n# Agent Instructions: Querying This Documentation
 
-Tips: If you are looking for an information in the documentation, you can find it by asking a question directly via GET and the \`${context.linker.toAbsoluteURL(
+If you need additional information that is not directly available in this page, you can query the documentation dynamically by asking a question.
+
+Perform an HTTP GET request on the current page URL with the \`ask\` query parameter:
+
+\`\`\`
+GET ${context.linker.toAbsoluteURL(
         context.linker.toPathForPage({
             page: pageLookup.page,
             pages: context.revision.pages,
         })
-    )}?ask=<question>\`.
+    )}?ask=<question>
+\`\`\`
+
+The question should be specific, self-contained, and written in natural language.
+The response will contain a direct answer to the question and relevant excerpts and sources from the documentation.
+
+Use this mechanism when the answer is not explicitly present in the current page, you need clarification or additional context, or you want to retrieve related documentation sections.
 `;
 }
 
