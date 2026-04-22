@@ -235,12 +235,20 @@ export function linkerForPublishedURL(linker: GitBookLinker, rawSitePublishedURL
  * Create a new linker that always returns absolute URLs.
  */
 export function linkerWithAbsoluteURLs(linker: GitBookLinker): GitBookLinker {
-    return {
+    const self: GitBookLinker = {
         ...linker,
         toPathInSpace: (path) => linker.toAbsoluteURL(linker.toPathInSpace(path)),
         toPathInSite: (path) => linker.toAbsoluteURL(linker.toPathInSite(path)),
+        toPathForPage: (input) => {
+            return self.toPathForPagePath({
+                path: getPagePath(input.pages, input.page),
+                anchor: input.anchor,
+            });
+        },
         toPathForPagePath: (input) => linker.toAbsoluteURL(linker.toPathForPagePath(input)),
     };
+
+    return self;
 }
 
 /**

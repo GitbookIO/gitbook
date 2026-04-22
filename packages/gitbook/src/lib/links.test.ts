@@ -136,6 +136,33 @@ describe('linkerWithAbsoluteURLs', () => {
         );
         expect(absoluteLinker.toPathInSite('some/path')).toBe('https://docs.company.com/some/path');
     });
+
+    it('should return absolute URLs for toPathForPage', () => {
+        const absoluteLinker = linkerWithAbsoluteURLs(variantInSection);
+        const pages = [
+            {
+                id: 'page-intro',
+                type: 'document',
+                title: 'Intro',
+                path: 'intro',
+                pages: [],
+            },
+            {
+                id: 'page-editor',
+                type: 'document',
+                title: 'Editor',
+                path: 'editor',
+                pages: [],
+            },
+        ] as any;
+
+        expect(
+            absoluteLinker.toPathForPage({
+                pages,
+                page: pages[1],
+            })
+        ).toBe('https://docs.company.com/section/variant/editor');
+    });
 });
 
 describe('linker.withOtherSiteSpace', () => {
