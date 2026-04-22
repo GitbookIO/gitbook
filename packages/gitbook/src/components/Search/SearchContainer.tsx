@@ -245,8 +245,9 @@ export function SearchContainer({
                             close();
                         }
                     }}
-                    withOverlay={true}
-                    withCloseButton={true}
+                    modal
+                    withOverlay
+                    withCloseButton
                     className="mx-auto w-96 border-tint-subtle border-l bg-tint-base"
                 >
                     {searchFrame}

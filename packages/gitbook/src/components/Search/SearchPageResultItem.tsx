@@ -101,7 +101,7 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
                     <p
                         className={tcls(
                             'absolute inset-0 line-clamp-1 origin-left text-sm',
-                            bestSection?.body ? 'animate-blur-out' : ''
+                            bestSection?.body ? 'hidden animate-blur-out' : ''
                         )}
                         style={{ animationDelay: style?.animationDelay }}
                     >
@@ -116,8 +116,8 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
                         className={tcls(
                             'absolute inset-0 origin-left',
                             bestSection?.body || item.description
-                                ? 'animate-blur-out'
-                                : '[[aria-busy=false]_&]:animate-blur-out'
+                                ? 'hidden animate-blur-out'
+                                : '[[aria-busy=false]_&]:hidden [[aria-busy=false]_&]:animate-blur-out'
                         )}
                         style={{ animationDelay: style?.animationDelay }}
                     />

@@ -235,8 +235,7 @@ export function SideSheet(
                 {...rest}
                 style={{
                     ...rest.style,
-                    visibility: shouldHide ? 'hidden' : rest.style?.visibility,
-                    pointerEvents: shouldHide ? 'none' : rest.style?.pointerEvents,
+                    display: shouldHide ? 'none' : rest.style?.display,
                 }}
             >
                 {children}
