@@ -95,7 +95,8 @@ export function PageAside(props: {
                 'page-api-block:page-has-outline:min-[96rem]:border-l-0',
                 'page-api-block:page-has-outline:min-[96rem]:pl-8',
 
-                'hydrated:site-background', // Only add a background once the element is positioned correctly to prevent overlapping the page cover
+                'layout-default:max-xl:site-background',
+                'layout-wide:max-3xl:site-background',
                 'text-tint',
                 'contrast-more:text-tint-strong'
             )}

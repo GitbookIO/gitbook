@@ -10,6 +10,7 @@ interface ImageAttributes {
     width?: number;
     height?: number;
     size?: ImageSize;
+    mask?: 'none' | 'radial';
 }
 
 interface Images {
@@ -53,6 +54,11 @@ export function PageCoverImage(props: PageCoverImageProps) {
                         : `${PAGE_COVER_SIZE.width}/${PAGE_COVER_SIZE.height}`,
                     objectPosition: `50% ${objectPositionY}%`,
                     height, // if no height is passed, no height will be set.
+                    maskComposite: 'intersect',
+                    maskImage:
+                        imgs.light.mask === 'radial'
+                            ? 'radial-gradient(200% 200% at 50% -100%, black 70%, rgba(0,0,0,0.85) 77.5%, rgba(0,0,0,0.6) 85%, rgba(0,0,0,0.1) 96.25%, transparent 100%), linear-gradient(to left, black 60%, rgba(0,0,0,0.8) 75%, rgba(0,0,0,0.1) 95%, transparent 100%), linear-gradient(to right, black 60%, rgba(0,0,0,0.8) 75%, rgba(0,0,0,0.1) 95%, transparent 100%)'
+                            : undefined,
                 }}
             />
             {imgs.dark && (
@@ -69,6 +75,11 @@ export function PageCoverImage(props: PageCoverImageProps) {
                             : `${PAGE_COVER_SIZE.width}/${PAGE_COVER_SIZE.height}`,
                         objectPosition: `50% ${objectPositionY}%`,
                         height, // if no height is passed, no height will be set.
+                        maskComposite: 'intersect',
+                        maskImage:
+                            imgs.dark.mask === 'radial'
+                                ? 'radial-gradient(200% 200% at 50% -100%, black 70%, rgba(0,0,0,0.85) 77.5%, rgba(0,0,0,0.6) 85%, rgba(0,0,0,0.1) 96.25%, transparent 100%), linear-gradient(to left, black 60%, rgba(0,0,0,0.8) 75%, rgba(0,0,0,0.1) 95%, transparent 100%), linear-gradient(to right, black 60%, rgba(0,0,0,0.8) 75%, rgba(0,0,0,0.1) 95%, transparent 100%)'
+                                : undefined,
                     }}
                 />
             )}

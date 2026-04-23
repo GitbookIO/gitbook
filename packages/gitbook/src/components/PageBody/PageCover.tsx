@@ -18,7 +18,7 @@ const defaultPageCover = defaultPageCoverSVG as StaticImageData;
  * Cover for the page.
  */
 export async function PageCover(props: {
-    as: 'hero' | 'full';
+    as: 'hero' | 'full' | 'background';
     page: RevisionPageDocument;
     cover: RevisionPageDocumentCover;
     context: GitBookSiteContext;
@@ -88,7 +88,7 @@ export async function PageCover(props: {
                 '-mx-4',
 
                 // Full-width cover: extend to edges, disregard TOC where possible
-                as === 'full'
+                as === 'full' || as === 'background'
                     ? [
                           'sm:-mx-6',
                           'md:-mx-8',
@@ -109,7 +109,10 @@ export async function PageCover(props: {
                           'has-sidebar:lg:rounded-corners:rounded-bl-xl',
                           'has-sidebar:lg:circular-corners:rounded-bl-3xl',
                       ]
-                    : [
+                    : null,
+
+                as === 'hero'
+                    ? [
                           // Regular cover: size regularly along with other content
                           CONTENT_STYLE,
                           'max-sm:-mx-4',
@@ -119,6 +122,11 @@ export async function PageCover(props: {
                           'max-sm:w-screen',
                           'max-sm:-mt-8',
                       ]
+                    : null,
+
+                as === 'background'
+                    ? ['-z-1 absolute inset-x-0 opacity-7 contrast-more:opacity-5']
+                    : null
             )}
         >
             <PageCoverImage

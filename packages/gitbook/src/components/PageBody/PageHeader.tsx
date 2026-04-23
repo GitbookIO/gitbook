@@ -124,7 +124,14 @@ export async function PageHeader(props: {
                 </h1>
             ) : null}
             {page.description && page.layout.description ? (
-                <p className={tcls(CONTENT_STYLE_REDUCED, 'text-lg', 'text-tint', 'clear-both')}>
+                <p
+                    className={tcls(
+                        CONTENT_STYLE_REDUCED,
+                        'text-lg',
+                        'text-tint contrast-more:text-tint-strong',
+                        'clear-both'
+                    )}
+                >
                     {page.description}
                 </p>
             ) : null}
