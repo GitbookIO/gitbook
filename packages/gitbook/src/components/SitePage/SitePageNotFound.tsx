@@ -6,6 +6,7 @@ import { tcls } from '@/lib/tailwind';
 import { SiteInsightsDisplayContext } from '@gitbook/api';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
+import { PreservePageLayout } from '../PageBody/PreservePageLayout';
 import { SiteAuthLoginButton } from '../SiteAuth/SiteAuthLoginLink';
 import { useSiteAdaptiveAuthLoginHref, useSpaceBasePath } from '../SpaceLayout/SpaceLayoutContext';
 import { CurrentPageProvider } from '../hooks';
@@ -40,6 +41,8 @@ export function SitePageNotFound() {
         <CurrentPageProvider page={null}>
             <div
                 className={tcls(
+                    'layout-default',
+                    'page-has-toc',
                     'flex-1',
                     'flex',
                     'flex-row',
@@ -49,6 +52,7 @@ export function SitePageNotFound() {
                     'min-h-[calc(100vh-64px)] lg:min-h-fit'
                 )}
             >
+                <PreservePageLayout wideLayout={false} pageHasToc={true} />
                 <div className={tcls('max-w-80')}>
                     <h2 className={tcls('text-2xl', 'font-semibold', 'mb-2')}>
                         {t(
