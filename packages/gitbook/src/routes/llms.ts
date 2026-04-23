@@ -2,7 +2,6 @@ import { type GitBookSiteContext, checkIsRootSiteContext } from '@/lib/context';
 import { throwIfDataError } from '@/lib/data';
 import { type GitBookLinker, linkerWithMarkdownPages } from '@/lib/links';
 import { resolveFirstDocument } from '@/lib/pages';
-import { isRollout } from '@/lib/rollout';
 import { type FlatPageEntry, getIndexablePages } from '@/lib/sitemap';
 import { filterSiteSpacesByLocale, getLocalizedTitle, getSiteStructureSections } from '@/lib/sites';
 import type { SiteSection, SiteSpace } from '@gitbook/api';
@@ -193,16 +192,6 @@ export async function getMarkdownForPagesTree(
 }
 
 function renderAskFooter(context: GitBookSiteContext) {
-    if (
-        !isRollout({
-            discriminator: context.site.id,
-            percentageRollout: 25,
-        }) &&
-        context.site.id !== 'site_p4Xo4'
-    ) {
-        return '';
-    }
-
     return `\n\n---\n\n# Agent Instructions: Querying This Documentation
 
 If you need additional information, you can query the documentation dynamically by asking a question.

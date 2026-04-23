@@ -7,7 +7,6 @@ import {
     getSimilarPages,
     resolvePagePathDocumentOrGroup,
 } from '@/lib/pages';
-import { isRollout } from '@/lib/rollout';
 import type { RevisionPageDocument, RevisionPageGroup } from '@gitbook/api';
 
 /**
@@ -95,16 +94,6 @@ function renderAskFooter(
     context: GitBookSiteContext,
     pageLookup: ResolvedPagePath<RevisionPageDocument | RevisionPageGroup>
 ) {
-    if (
-        !isRollout({
-            discriminator: context.site.id,
-            percentageRollout: 25,
-        }) &&
-        context.site.id !== 'site_p4Xo4'
-    ) {
-        return '';
-    }
-
     return `\n\n---\n\n# Agent Instructions: Querying This Documentation
 
 If you need additional information that is not directly available in this page, you can query the documentation dynamically by asking a question.
