@@ -15,7 +15,12 @@ export async function serveAskMarkdown(context: GitBookSiteContext, rawQuestion:
     return serveMarkdown(async () => {
         const question = rawQuestion.trim();
 
-        if (!question) {
+        if (
+            !question ||
+            // Some crawlers just follows the example URL
+            question === '<question>' ||
+            question === '<question'
+        ) {
             return 'You forgot to pass a question in the `?ask=` parameter. Append a question to the URL in the `?ask=<question>` search parameter to get a complete answer and associated sources.';
         }
 
