@@ -82,6 +82,7 @@ export function PageBody(props: {
                     'py-8',
                     'layout-wide:no-sidebar:lg:max-xl:pb-20', // Add padding to prevent overlap of minimised trademark
                     '@container',
+                    'flex flex-col',
                     CONTENT_STYLE,
                     pageHasToc ? 'page-has-toc' : 'page-no-toc',
                     wideLayout ? 'layout-wide' : 'layout-default'
@@ -106,7 +107,7 @@ export function PageBody(props: {
                         <SuspenseLoadedHint />
                         <DocumentView
                             document={document}
-                            style="clear-both flex flex-col [&>*+*]:mt-5"
+                            style="clear-both flex grow flex-col [&>*+*]:mt-5"
                             context={{
                                 mode: 'default',
                                 contentContext: {

@@ -734,6 +734,14 @@ const config: Config = {
             addVariant('page-api-block', 'body:has(.openapi-block) &');
 
             /**
+             * Variant for the page cover type
+             */
+            addVariant(
+                'page-cover-background',
+                'body:has([data-gb-page-cover][data-cover-type="background"]) &'
+            );
+
+            /**
              * Variant when the page is displayed in print mode.
              */
             addVariant('print-mode', 'body:has(.print-mode) &');

@@ -24,10 +24,11 @@ interface PageCoverImageProps {
     y: number;
     // Only if the `height` was customized by the user (and thus defined), we use it to set the cover's height and skip the default behaviour of fixed aspect-ratio.
     height: number | undefined;
+    mask?: 'none' | 'radial';
 }
 
 export function PageCoverImage(props: PageCoverImageProps) {
-    const { imgs, y, height } = props;
+    const { imgs, y, height, mask } = props;
     const { containerRef, objectPositionY, isLoading } = useCoverPosition(imgs, y);
 
     if (isLoading) {
@@ -53,6 +54,11 @@ export function PageCoverImage(props: PageCoverImageProps) {
                         : `${PAGE_COVER_SIZE.width}/${PAGE_COVER_SIZE.height}`,
                     objectPosition: `50% ${objectPositionY}%`,
                     height, // if no height is passed, no height will be set.
+                    maskComposite: 'intersect',
+                    maskImage:
+                        mask === 'radial'
+                            ? 'radial-gradient(200% 200% at 50% -100%, black 70%, rgba(0,0,0,0.85) 77.5%, rgba(0,0,0,0.6) 85%, rgba(0,0,0,0.1) 96.25%, transparent 100%), linear-gradient(to left, black 60%, rgba(0,0,0,0.8) 75%, rgba(0,0,0,0.1) 95%, transparent 100%), linear-gradient(to right, black 60%, rgba(0,0,0,0.8) 75%, rgba(0,0,0,0.1) 95%, transparent 100%)'
+                            : undefined,
                 }}
             />
             {imgs.dark && (
@@ -69,6 +75,11 @@ export function PageCoverImage(props: PageCoverImageProps) {
                             : `${PAGE_COVER_SIZE.width}/${PAGE_COVER_SIZE.height}`,
                         objectPosition: `50% ${objectPositionY}%`,
                         height, // if no height is passed, no height will be set.
+                        maskComposite: 'intersect',
+                        maskImage:
+                            mask === 'radial'
+                                ? 'radial-gradient(200% 200% at 50% -100%, black 70%, rgba(0,0,0,0.85) 77.5%, rgba(0,0,0,0.6) 85%, rgba(0,0,0,0.1) 96.25%, transparent 100%), linear-gradient(to left, black 60%, rgba(0,0,0,0.8) 75%, rgba(0,0,0,0.1) 95%, transparent 100%), linear-gradient(to right, black 60%, rgba(0,0,0,0.8) 75%, rgba(0,0,0,0.1) 95%, transparent 100%)'
+                                : undefined,
                     }}
                 />
             )}

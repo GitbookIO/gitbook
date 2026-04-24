@@ -14,7 +14,14 @@ export function Paragraph(props: BlockProps<DocumentBlockParagraph>) {
         'has-[.button,input]:flex has-[.button,input]:flex-wrap has-[.button,input]:gap-2 has-[.button,input]:items-center';
 
     return (
-        <p className={tcls(inlineButtonStyle, style, getTextAlignment(block.data?.align))}>
+        <p
+            className={tcls(
+                'page-cover-background:[&:not(:has(.button,input))]:text-contrast-cover',
+                inlineButtonStyle,
+                style,
+                getTextAlignment(block.data?.align)
+            )}
+        >
             <Inlines {...contextProps} nodes={block.nodes} ancestorInlines={[]} />
         </p>
     );

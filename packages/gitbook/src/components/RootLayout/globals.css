@@ -199,6 +199,18 @@
         @apply leading-relaxed;
         interpolate-size: allow-keywords; /* Opt-in for modern browsers to interpolate "auto" values in transitions/animations. */
         overflow-x: hidden; /* We never want horizontal scroll of the whole page, it looks buggy and we should never have overflow anyway */
+        --cover-height: 0px;
+        --cover-text-top: rgb(var(--tint-12));
+        --cover-text-bottom: rgb(var(--tint-12));
+    }
+
+    :root:not(.dark):has(
+            [data-gb-page-cover][data-cover-type="background"][data-cover-text-color="white"]
+        ),
+    :root.dark:has(
+            [data-gb-page-cover][data-cover-type="background"][data-cover-text-color="black"]
+        ) {
+        --cover-text-top: rgb(var(--contrast-tint-12));
     }
     
     /* Modern browsers with `scrollbar-*` support */
@@ -279,6 +291,43 @@
     pre {
         /* Don't apply antialiased to `code` and `pre` elements */
         @apply subpixel-antialiased;
+    }
+}
+
+@utility contrast-cover {
+    background-clip: border-box;
+    background-image: linear-gradient(
+        to bottom,
+        var(--cover-text-top) 0,
+        var(--cover-text-top) var(--cover-height),
+        var(--cover-text-bottom) var(--cover-height),
+        var(--cover-text-bottom) 100vh
+    );
+    background-repeat: no-repeat;
+    background-size: 100% 100vh;
+    background-attachment: fixed;
+}
+
+@utility text-contrast-cover {
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+    background-image: linear-gradient(
+        to bottom,
+        var(--cover-text-top) 0,
+        var(--cover-text-top) var(--cover-height),
+        var(--cover-text-bottom) var(--cover-height),
+        var(--cover-text-bottom) 100vh
+    );
+    background-repeat: no-repeat;
+    background-size: 100% 100vh;
+    background-attachment: fixed;
+    background-clip: text;
+    -webkit-background-clip: text;
+    
+    @media (prefers-contrast: more) {
+        color: var(--cover-text-bottom);
+        -webkit-text-fill-color: var(--cover-text-bottom);
+        background-image: none;
     }
 }
 

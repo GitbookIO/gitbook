@@ -24,6 +24,7 @@ export function PageClientLayout({
     useRegisterPageMetadata({ pageMetaLinks });
 
     useStripFallbackQueryParam();
+    useSetCoverHeight();
     return null;
 }
 
@@ -59,4 +60,71 @@ function useRegisterPageMetadata(metadata: {
     React.useEffect(() => {
         currentPageMetadataStore.setState({ metaLinks: pageMetaLinks });
     }, [pageMetaLinks]);
+}
+
+/**
+ * Expose the visible bottom edge of the page cover as a viewport-relative CSS variable.
+ */
+function useSetCoverHeight() {
+    React.useEffect(() => {
+        const root = document.documentElement;
+        let animationFrame: number | null = null;
+
+        const updateCoverHeight = () => {
+            const pageCover = document.querySelector<HTMLElement>('[data-gb-page-cover]');
+            const isBackgroundCover = pageCover?.dataset.coverType === 'background';
+
+            if (!isBackgroundCover) {
+                root.style.setProperty('--cover-height', '0px');
+                return;
+            }
+
+            if (!pageCover) {
+                return;
+            }
+
+            const bottom = pageCover.getBoundingClientRect().bottom;
+            const height = Math.max(Math.min(bottom, window.innerHeight), 0);
+
+            root.style.setProperty('--cover-height', `${height}px`);
+        };
+
+        const scheduleUpdate = () => {
+            if (animationFrame !== null) {
+                return;
+            }
+
+            animationFrame = requestAnimationFrame(() => {
+                animationFrame = null;
+                updateCoverHeight();
+            });
+        };
+
+        scheduleUpdate();
+
+        window.addEventListener('scroll', scheduleUpdate, { passive: true });
+        window.addEventListener('resize', scheduleUpdate, { passive: true });
+
+        const pageCover = document.querySelector<HTMLElement>('[data-gb-page-cover]');
+        const resizeObserver =
+            pageCover && typeof ResizeObserver !== 'undefined'
+                ? new ResizeObserver(() => {
+                      scheduleUpdate();
+                  })
+                : null;
+
+        if (pageCover && resizeObserver) {
+            resizeObserver.observe(pageCover);
+        }
+
+        return () => {
+            if (animationFrame !== null) {
+                cancelAnimationFrame(animationFrame);
+            }
+
+            resizeObserver?.disconnect();
+            window.removeEventListener('scroll', scheduleUpdate);
+            window.removeEventListener('resize', scheduleUpdate);
+        };
+    }, []);
 }

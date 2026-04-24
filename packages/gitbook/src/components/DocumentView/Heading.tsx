@@ -53,6 +53,7 @@ export function Heading(props: BlockProps<DocumentBlockHeading>) {
                     'justify-self-start',
                     'max-w-full',
                     'break-words',
+                    'page-cover-background:text-contrast-cover',
                     getTextAlignment(block.data.align),
                     textStyle.lineHeight
                 )}
