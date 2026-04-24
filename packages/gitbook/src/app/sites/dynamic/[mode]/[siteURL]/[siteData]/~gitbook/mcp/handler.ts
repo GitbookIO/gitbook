@@ -20,6 +20,10 @@ export async function handleMcpRequest(
     const { context } = await getDynamicSiteContext(params);
     const { dataFetcher, linker, site } = context;
 
+    if (!context.customization.pageActions.mcp) {
+        return new Response('Not Found', { status: 404 });
+    }
+
     // Next.js request.url is the original URL and not the rewritten one from the middleware
     const requestURL = new URL(context.linker.toAbsoluteURL(context.linker.toPathInSite(endpoint)));
     requestURL.search = rawRequest.nextUrl.search;

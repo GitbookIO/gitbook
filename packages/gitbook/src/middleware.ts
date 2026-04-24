@@ -777,20 +777,33 @@ function encodePathInSiteContent(
             // we rewrite it to ~gitbook/markdown/:pathname
             if (pathname.match(MARKDOWN_PATH_REGEX) || shouldServeMarkdown(request).serve) {
                 const pagePathWithoutMD = pathname.replace(MARKDOWN_PATH_REGEX, '');
+                const ask = new URL(request.url).searchParams.get('ask');
                 return {
-                    pathname: `~gitbook/markdown/${encodePagePath(pagePathWithoutMD)}`,
-                    // The markdown content is always static and doesn't depend on the dynamic parameter (customization, theme, etc)
+                    pathname:
+                        typeof ask === 'string'
+                            ? `~gitbook/markdown-ask/${encodeURIComponent(ask)}`
+                            : `~gitbook/markdown/${encodePagePath(pagePathWithoutMD)}`,
                     routeType: 'static',
-                    events: [
-                        {
-                            type: 'page_markdown_request',
-                            // TODO: track pageId / spaceId when possible
-                            // We don't do it at the moment as we can't easily extract it from the URL.
-                            location: {
-                                displayContext: SiteInsightsDisplayContext.Server,
-                            },
-                        },
-                    ],
+                    // TODO: track pageId / spaceId when possible
+                    // We don't do it at the moment as we can't easily extract it from the URL.
+                    events: ask
+                        ? [
+                              {
+                                  type: 'ask_question',
+                                  query: ask,
+                                  location: {
+                                      displayContext: SiteInsightsDisplayContext.Server,
+                                  },
+                              },
+                          ]
+                        : [
+                              {
+                                  type: 'page_markdown_request',
+                                  location: {
+                                      displayContext: SiteInsightsDisplayContext.Server,
+                                  },
+                              },
+                          ],
                 };
             }
             return { pathname: encodePagePath(pathname) };

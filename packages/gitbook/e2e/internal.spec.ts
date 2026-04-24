@@ -874,6 +874,7 @@ const testCases: TestsCase[] = [
     {
         name: 'Content tests',
         contentBaseURL: 'https://gitbook.gitbook.io/test-gitbook-open/',
+        fullPage: true,
         tests: [
             {
                 name: 'Text',
