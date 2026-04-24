@@ -152,11 +152,18 @@ export async function GET(
         }
     }
 
+    // We only cache the search index on the client if the site is public or unlisted, to avoid leaking information about private sites.
+    // For private sites, we set `Cache-Control: no-store` to prevent caching at all.
+    const shouldCacheOnClient =
+        context.site.visibility === 'public' || context.site.visibility === 'unlisted';
+
     return new Response(JSON.stringify({ pages }), {
         headers: {
             'Content-Type': 'application/json',
             // Cache for 5 minutes on the client, 1 day on the CDN, and allow serving stale content while revalidating for 1 day
-            'Cache-Control': 'public, max-age=300, s-maxage=86400, stale-while-revalidate=86400',
+            'Cache-Control': shouldCacheOnClient
+                ? 'public, max-age=300, s-maxage=86400, stale-while-revalidate=86400'
+                : 'no-store',
         },
     });
 }
