@@ -75,6 +75,10 @@ export type TestsCase = {
     skip?: boolean;
     tests: Array<Test>;
     contentBaseURL?: string;
+    /**
+     * Whether screenshots in this test case should capture the full scrollable page by default.
+     */
+    fullPage?: boolean;
 };
 
 export const allLocales: CustomizationLocale[] = [
@@ -240,9 +244,9 @@ export function runTestCases(testCases: TestsCase[]) {
                             .intercom-lightweight-app {
                                 display: none !important;
                             }
-                            `,
+                                `,
                                 threshold: screenshotOptions?.threshold ?? undefined,
-                                fullPage: testEntry.fullPage ?? false,
+                                fullPage: testEntry.fullPage ?? testCase.fullPage ?? false,
                                 beforeScreenshot: async ({ runStabilization }) => {
                                     await runStabilization();
                                     if (screenshotOptions?.waitForTOCScrolling !== false) {
