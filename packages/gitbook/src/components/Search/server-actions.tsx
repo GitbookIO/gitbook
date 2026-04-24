@@ -2,7 +2,11 @@
 
 import type { GitBookSiteContext } from '@/lib/context';
 import { resolvePageId } from '@/lib/pages';
-import { fetchServerActionSiteContext, getServerActionBaseContext } from '@/lib/server-actions';
+import {
+    fetchServerActionSiteContext,
+    getServerActionBaseContext,
+    runStreamableServerAction,
+} from '@/lib/server-actions';
 import { findSiteSpaceBy } from '@/lib/sites';
 import { filterOutNullable } from '@/lib/typescript';
 import type {
@@ -11,7 +15,6 @@ import type {
     SearchAIAnswer,
     SearchAIRecommendedQuestionStream,
 } from '@gitbook/api';
-import { createStreamableValue } from 'ai/rsc';
 import type * as React from 'react';
 
 import { throwIfDataError } from '@/lib/data';
@@ -32,6 +35,8 @@ export interface AskAnswerResult {
     body?: React.ReactNode;
     followupQuestions: string[];
     sources: AskAnswerSource[];
+    /** Set when an error occurred mid-stream, after partial content was already delivered. */
+    error?: boolean;
 }
 
 /**
@@ -45,91 +50,86 @@ export async function streamAskQuestion({
     question: string;
 }) {
     return traceErrorOnly('Search.streamAskQuestion', async () => {
-        const responseStream = createStreamableValue<AskAnswerResult | undefined>();
-
-        (async () => {
-            const context = await fetchServerActionSiteContext(
-                await getServerActionBaseContext({ isEmbeddable: asEmbeddable })
-            );
-
-            const apiClient = await context.dataFetcher.api();
-
-            const stream = apiClient.orgs.streamAskInSite(
-                context.organizationId,
-                context.site.id,
-                {
-                    question,
-                    context: {
-                        siteSpaceId: context.siteSpace.id,
-                    },
-                    scope: {
-                        mode: 'default',
-                        currentSiteSpace: context.siteSpace.id,
-                    },
-                },
-                { format: 'document' }
-            );
-
-            const spacePromises = new Map<string, Promise<Revision>>();
-            for await (const chunk of stream) {
-                const answer = chunk.answer;
-
-                // Register the space of each page source into the promise queue.
-                const spaces = answer.sources
-                    .map((source) => {
-                        if (source.type !== 'page') {
-                            return null;
-                        }
-
-                        if (!spacePromises.has(source.space)) {
-                            spacePromises.set(
-                                source.space,
-                                throwIfDataError(
-                                    context.dataFetcher.getRevision({
-                                        spaceId: source.space,
-                                        revisionId: source.revision,
-                                    })
-                                )
-                            );
-                        }
-
-                        return source.space;
-                    })
-                    .filter(filterOutNullable);
-
-                // Get the pages for all spaces referenced by this answer.
-                const pages = await Promise.all(
-                    spaces.map(async (space) => {
-                        const revision = await spacePromises.get(space);
-                        return { space, pages: revision?.pages };
-                    })
-                ).then((results) => {
-                    return results.reduce((map, result) => {
-                        if (result.pages) {
-                            map.set(result.space, result.pages);
-                        }
-                        return map;
-                    }, new Map<string, RevisionPage[]>());
-                });
-                responseStream.update(
-                    await transformAnswer(context, {
-                        answer: chunk.answer,
-                        asEmbeddable: Boolean(asEmbeddable),
-                        spacePages: pages,
-                    })
+        return runStreamableServerAction<AskAnswerResult | undefined>({
+            onError: (_, lastValue) => ({
+                ...(lastValue ?? { followupQuestions: [], sources: [] }),
+                error: true,
+            }),
+            run: async (push) => {
+                const context = await fetchServerActionSiteContext(
+                    await getServerActionBaseContext({ isEmbeddable: asEmbeddable })
                 );
-            }
-        })()
-            .then(() => {
-                responseStream.done();
-            })
-            .catch((error) => {
-                responseStream.error(error);
-            });
 
-        return {
-            stream: responseStream.value,
-        };
+                const apiClient = await context.dataFetcher.api();
+
+                const stream = apiClient.orgs.streamAskInSite(
+                    context.organizationId,
+                    context.site.id,
+                    {
+                        question,
+                        context: {
+                            siteSpaceId: context.siteSpace.id,
+                        },
+                        scope: {
+                            mode: 'default',
+                            currentSiteSpace: context.siteSpace.id,
+                        },
+                    },
+                    { format: 'document' }
+                );
+
+                const spacePromises = new Map<string, Promise<Revision>>();
+                for await (const chunk of stream) {
+                    const answer = chunk.answer;
+
+                    // Register the space of each page source into the promise queue.
+                    const spaces = answer.sources
+                        .map((source) => {
+                            if (source.type !== 'page') {
+                                return null;
+                            }
+
+                            if (!spacePromises.has(source.space)) {
+                                spacePromises.set(
+                                    source.space,
+                                    throwIfDataError(
+                                        context.dataFetcher.getRevision({
+                                            spaceId: source.space,
+                                            revisionId: source.revision,
+                                        })
+                                    )
+                                );
+                            }
+
+                            return source.space;
+                        })
+                        .filter(filterOutNullable);
+
+                    // Get the pages for all spaces referenced by this answer.
+                    const pages = await Promise.all(
+                        spaces.map(async (space) => {
+                            const revision = await spacePromises.get(space);
+                            return { space, pages: revision?.pages };
+                        })
+                    ).then((results) => {
+                        return results.reduce((map, result) => {
+                            if (result.pages) {
+                                map.set(result.space, result.pages);
+                            }
+                            return map;
+                        }, new Map<string, RevisionPage[]>());
+                    });
+
+                    push(
+                        await transformAnswer(context, {
+                            answer: chunk.answer,
+                            asEmbeddable: Boolean(asEmbeddable),
+                            spacePages: pages,
+                        })
+                    );
+                }
+            },
+        });
     });
 }
 
@@ -142,32 +142,25 @@ export async function streamRecommendedQuestions(args: { siteSpaceId?: string })
         const siteURLData = await getSiteURLDataFromMiddleware();
         const context = await getServerActionBaseContext();
 
-        const responseStream = createStreamableValue<
-            SearchAIRecommendedQuestionStream | undefined
-        >();
+        return runStreamableServerAction<SearchAIRecommendedQuestionStream | undefined>({
+            // On mid-stream error, pass the last value through to stop cleanly without a throw.
+            // On pre-stream error, fail() is called so the existing silent catch in the client handles it.
+            onError: (_, lastValue) => lastValue,
+            run: async (push) => {
+                const apiClient = await context.dataFetcher.api();
+                const apiStream = apiClient.orgs.streamRecommendedQuestionsInSite(
+                    siteURLData.organization,
+                    siteURLData.site,
+                    {
+                        siteSpaceId: args.siteSpaceId,
+                    }
+                );
 
-        (async () => {
-            const apiClient = await context.dataFetcher.api();
-            const apiStream = apiClient.orgs.streamRecommendedQuestionsInSite(
-                siteURLData.organization,
-                siteURLData.site,
-                {
-                    siteSpaceId: args.siteSpaceId,
+                for await (const chunk of apiStream) {
+                    push(chunk);
                 }
-            );
-
-            for await (const chunk of apiStream) {
-                responseStream.update(chunk);
-            }
-        })()
-            .then(() => {
-                responseStream.done();
-            })
-            .catch((error) => {
-                responseStream.error(error);
-            });
-
-        return { stream: responseStream.value };
+            },
+        });
     });
 }
 
