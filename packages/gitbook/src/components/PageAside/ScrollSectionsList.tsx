@@ -91,6 +91,7 @@ export function ScrollSectionsList({ sections }: { sections: DocumentSection[] }
                             'sidebar-list-line:border-l-2',
                             'border-transparent',
                             'sidebar-list-line:-left-px',
+                            'xl:page-cover-background:text-contrast-cover',
 
                             section.depth > 1 && [
                                 'subitem',

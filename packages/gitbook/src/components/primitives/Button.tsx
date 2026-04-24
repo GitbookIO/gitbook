@@ -58,7 +58,7 @@ export const variantClasses = {
     ],
     secondary: [
         'bg-tint',
-        'depth-flat:bg-transparent',
+        'depth-flat:bg-tint-base',
         'text-tint',
         'hover:bg-tint-hover',
         'hover:not-disabled:depth-flat:bg-tint-hover',

@@ -58,7 +58,10 @@ export async function PageHeader(props: {
             </div>
 
             {hasAncestors && (
-                <nav aria-label="Breadcrumb" className="text-tint leading-snug">
+                <nav
+                    aria-label="Breadcrumb"
+                    className="page-cover-background:text-contrast-cover text-tint leading-snug page-cover-background:opacity-9"
+                >
                     <ol className="inline">
                         {ancestors.map((breadcrumb, index) => {
                             const href = linker.toPathForPage({
@@ -116,7 +119,8 @@ export async function PageHeader(props: {
                         'grow',
                         'text-pretty',
                         'clear-right',
-                        'xs:clear-none'
+                        'xs:clear-none',
+                        'page-cover-background:text-contrast-cover'
                     )}
                 >
                     <PageIcon page={page} style={['text-tint-subtle ', 'shrink-0']} />
@@ -128,6 +132,7 @@ export async function PageHeader(props: {
                     className={tcls(
                         CONTENT_STYLE_REDUCED,
                         'text-lg',
+                        'page-cover-background:text-contrast-cover',
                         'text-tint contrast-more:text-tint-strong',
                         'clear-both'
                     )}

@@ -98,7 +98,8 @@ export function PageAside(props: {
                 'layout-default:max-xl:site-background',
                 'layout-wide:max-3xl:site-background',
                 'text-tint',
-                'contrast-more:text-tint-strong'
+                'contrast-more:text-tint-strong',
+                'xl:page-cover-background:text-contrast-cover'
             )}
         >
             <div className="flex h-full w-full shrink-0 flex-col overflow-hidden">
