@@ -10,7 +10,7 @@ import React from 'react';
 
 import { AIResponseFeedback, AISearchIcon } from '../AIChat';
 import { HoldMessage } from '../AIChat/AIChatMessages';
-import { useTrackEvent } from '../Insights';
+import { getInsightsSession, useTrackEvent } from '../Insights';
 import { Button, Link } from '../primitives';
 import { useSearchAskContext } from './SearchAskContext';
 import { type AskAnswerResult, type AskAnswerSource, streamAskQuestion } from './server-actions';
@@ -49,7 +49,11 @@ export function SearchAskAnswer(props: { query: string; asEmbeddable?: boolean }
                 query,
             });
 
-            const { stream } = await streamAskQuestion({ question: query, asEmbeddable });
+            const { stream } = await streamAskQuestion({
+                question: query,
+                asEmbeddable,
+                session: await getInsightsSession(),
+            });
             for await (const chunk of readStreamableValue(stream)) {
                 if (cancelled) {
                     return;
