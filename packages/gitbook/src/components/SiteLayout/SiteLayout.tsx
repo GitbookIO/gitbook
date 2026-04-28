@@ -32,6 +32,7 @@ export async function SiteLayout(props: {
     const { customization } = context;
     // Scripts are disabled when tracking is disabled
     const scripts = withTracking ? context.scripts : [];
+    const preloadableScripts = scripts.filter((script) => !script.cookies);
 
     ReactDOM.preconnect(GITBOOK_API_PUBLIC_URL);
     ReactDOM.preconnect(GITBOOK_ICONS_URL);
@@ -39,7 +40,7 @@ export async function SiteLayout(props: {
         ReactDOM.preconnect(GITBOOK_ASSETS_URL);
     }
 
-    scripts.forEach(({ script }) => {
+    preloadableScripts.forEach(({ script }) => {
         ReactDOM.preload(script, {
             as: 'script',
         });
@@ -70,10 +71,7 @@ export async function SiteLayout(props: {
                 </SpaceLayout>
             </AIContextProvider>
 
-            <LoadIntegrations />
-            {scripts.length > 0
-                ? scripts.map(({ script }) => <script key={script} async src={script} />)
-                : null}
+            <LoadIntegrations scripts={scripts} />
 
             {scripts.some((script) => script.cookies) || customization.privacyPolicy.url ? (
                 <React.Suspense fallback={null}>

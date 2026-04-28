@@ -15,6 +15,7 @@ import type {
 import * as React from 'react';
 import * as zustand from 'zustand';
 import type { Assistant } from '../AI';
+import { filterScriptsByConsent, type IntegrationScript } from './scripts';
 
 const events = new Map<GitBookIntegrationEvent, GitBookIntegrationEventCallback[]>();
 
@@ -140,17 +141,75 @@ export function useCustomCookieBanner(): CustomCookieBannerStore {
 }
 
 /**
- * Dispatch the `load` event to all integrations.
+ * Dispatch the `load` event after all eligible integrations have been loaded.
  */
-export function LoadIntegrations() {
+export function LoadIntegrations(props: { scripts: IntegrationScript[] }) {
+    const { scripts } = props;
+    const [hasExplicitCookieConsent, setHasExplicitCookieConsent] = React.useState(false);
+    const loadedScriptsRef = React.useRef(new Set<string>());
+    const hasInitializedRef = React.useRef(false);
+
     React.useEffect(() => {
-        // Only dispatch 'load' event when there are scripts to load
-
-        dispatchGitBookIntegrationEvent('load');
-
-        integrationsStore.setState({ loaded: true });
+        setHasExplicitCookieConsent(isCookiesTrackingDisabled() === false);
     }, []);
+
+    React.useEffect(() => {
+        const eligibleScripts = filterScriptsByConsent(scripts, hasExplicitCookieConsent);
+        const pendingScripts = eligibleScripts.filter(
+            ({ script }) => !loadedScriptsRef.current.has(script)
+        );
+
+        if (pendingScripts.length === 0) {
+            if (!hasInitializedRef.current) {
+                dispatchGitBookIntegrationEvent('load');
+                integrationsStore.setState({ loaded: true });
+                hasInitializedRef.current = true;
+            }
+            return;
+        }
+
+        let cancelled = false;
+
+        Promise.all(
+            pendingScripts.map(({ script }) =>
+                loadIntegrationScript(script).finally(() => {
+                    loadedScriptsRef.current.add(script);
+                })
+            )
+        ).then(() => {
+            if (cancelled) {
+                return;
+            }
+
+            dispatchGitBookIntegrationEvent('load');
+
+            if (!hasInitializedRef.current) {
+                integrationsStore.setState({ loaded: true });
+                hasInitializedRef.current = true;
+            }
+        });
+
+        return () => {
+            cancelled = true;
+        };
+    }, [hasExplicitCookieConsent, scripts]);
+
     return null;
+}
+
+function loadIntegrationScript(src: string): Promise<void> {
+    if (document.querySelector(`script[src="${CSS.escape(src)}"]`)) {
+        return Promise.resolve();
+    }
+
+    return new Promise((resolve) => {
+        const element = document.createElement('script');
+        element.async = true;
+        element.src = src;
+        element.onload = () => resolve();
+        element.onerror = () => resolve();
+        document.body.appendChild(element);
+    });
 }
 
 /**
