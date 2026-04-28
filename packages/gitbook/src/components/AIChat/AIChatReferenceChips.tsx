@@ -29,7 +29,7 @@ export function AIChatReferenceChips(props: {
                         className="inline-flex min-w-0 items-center gap-1.5 circular-corners:rounded-2xl rounded-corners:rounded-sm py-0.5 pr-1 pl-1.5 transition hover:bg-tint"
                     >
                         <Icon icon="code" className="size-3 shrink-0 opacity-7" />
-                        <span className="min-w-0 truncate font-mono">CodeBlock</span>
+                        <span className="min-w-0 truncate font-mono">{ref.label}</span>
                     </button>
                     {onRemove ? (
                         <button

@@ -17,7 +17,7 @@ import { getInsightsSession, useTrackEvent } from '../Insights';
 import { useSetSearchState } from '../Search';
 import type { AnyAIControl } from './controls';
 import { ConfirmControlDef, ConfirmControlOutputSchema } from './controls/ConfirmControl';
-import { type AIChatReference, isSameReference, serializeReferences } from './references';
+import { type AIChatReference, serializeReferences } from './references';
 import { type RenderAIMessageOptions, streamAIChatResponse } from './server-actions';
 import { getTools } from './tools';
 import { useAIMessageContextRef } from './useAIMessageContext';
@@ -561,29 +561,37 @@ export function AIChatProvider(props: {
     }, [setSearchState]);
 
     const onAddReference = React.useCallback((ref: AIChatReference) => {
-        const existing = globalState
-            .getState()
-            .references.find((existingRef) => isSameReference(existingRef, ref));
-        if (existing) {
-            return existing.id;
-        }
-        const id = crypto.randomUUID();
-        globalState.setState((state) => ({
-            ...state,
-            references: [...state.references, { ...ref, id }],
-        }));
-        return id;
+        globalState.setState((state) => {
+            if (state.references.some((existingRef) => existingRef.id === ref.id)) {
+                return state;
+            }
+            return {
+                ...state,
+                references: [...state.references, ref],
+            };
+        });
+        return ref.id;
     }, []);
 
     const onRemoveReference = React.useCallback((id: string) => {
-        globalState.setState((state) => ({
-            ...state,
-            references: state.references.filter((ref) => ref.id !== id),
-        }));
+        globalState.setState((state) => {
+            if (!state.references.some((ref) => ref.id === id)) {
+                return state;
+            }
+            return {
+                ...state,
+                references: state.references.filter((ref) => ref.id !== id),
+            };
+        });
     }, []);
 
     const onClearReferences = React.useCallback(() => {
-        globalState.setState((state) => ({ ...state, references: [] }));
+        globalState.setState((state) => {
+            if (state.references.length === 0) {
+                return state;
+            }
+            return { ...state, references: [] };
+        });
     }, []);
 
     const onEvent = React.useCallback(
