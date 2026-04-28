@@ -1,6 +1,7 @@
 import type { GitBookSiteContext } from '@/lib/context';
 import { resolveContentRef } from '@/lib/references';
 import { AnnouncementBanner } from './AnnouncementBanner';
+import { toAbsoluteContentRefHref } from './utils';
 
 /**
  * Server-side component to resolve content refs and pass down to client-side component
@@ -20,7 +21,10 @@ export async function Announcement(props: {
     }
 
     const resolvedContentRef = customization.announcement?.link
-        ? await resolveContentRef(customization.announcement?.link?.to, context)
+        ? toAbsoluteContentRefHref(
+              await resolveContentRef(customization.announcement?.link?.to, context),
+              context.linker.toAbsoluteURL
+          )
         : null;
 
     return (
