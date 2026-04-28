@@ -52,7 +52,7 @@
         "mdast-util-gfm": "^3.1.0",
         "mdast-util-to-markdown": "^2.1.2",
         "memoizee": "^0.4.17",
-        "mermaid": "^11.12.3",
+        "mermaid": "^11.14.0",
         "micromark-extension-frontmatter": "^2.0.0",
         "micromark-extension-gfm": "^3.0.0",
         "motion": "^12.23.24",
