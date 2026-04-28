@@ -183,13 +183,15 @@ let mermaidLoadPromise: Promise<{
 
 async function loadMermaid() {
     if (!mermaidLoadPromise) {
-        mermaidLoadPromise = Promise.all([
-            import('mermaid'),
-            import('@mermaid-js/mermaid-zenuml'),
-        ]).then(async ([{ default: mermaid }, { default: zenuml }]) => {
-            await mermaid.registerExternalDiagrams([zenuml]);
-            return { mermaid };
-        });
+        mermaidLoadPromise = Promise.all([import('mermaid'), import('@mermaid-js/mermaid-zenuml')])
+            .then(async ([{ default: mermaid }, { default: zenuml }]) => {
+                await mermaid.registerExternalDiagrams([zenuml]);
+                return { mermaid };
+            })
+            .catch((error) => {
+                mermaidLoadPromise = null;
+                throw error;
+            });
     }
 
     return mermaidLoadPromise;
