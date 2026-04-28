@@ -3,14 +3,19 @@ import { tcls } from '@/lib/tailwind';
 import { Icon, type IconName } from '@gitbook/icons';
 import React from 'react';
 import { Tooltip } from '../primitives';
+import { Emoji } from '../primitives/Emoji/Emoji';
 import { HighlightQuery } from './HighlightQuery';
 import { SearchResultItem } from './SearchResultItem';
+import type { MergedPageResult } from './reciprocalRankFusion';
 import type { ComputedPageResult } from './search-types';
+import type { LocalPageResult } from './useLocalSearchResults';
+
+type PageItem = ComputedPageResult | LocalPageResult | MergedPageResult;
 
 export const SearchPageResultItem = React.forwardRef(function SearchPageResultItem(
     props: {
         query: string;
-        item: ComputedPageResult;
+        item: PageItem;
         active: boolean;
     },
     ref: React.Ref<HTMLAnchorElement>
@@ -18,22 +23,48 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
     const { query, item, active, ...rest } = props;
     const language = useLanguage();
 
+    const bestSection = item.type === 'page' ? item.bestSection : undefined;
+    const href = (() => {
+        if (item.type !== 'page' || !item.bestSection || item.bestSection.score <= item.score) {
+            return 'href' in item ? item.href : item.pathname;
+        }
+        return item.bestSection.href;
+    })();
+
+    const emoji = 'emoji' in item ? item.emoji : undefined;
+    const icon = 'icon' in item ? item.icon : undefined;
+
+    const leadingIcon = emoji ? (
+        <span className="flex size-4 shrink-0 items-center justify-center">
+            <Emoji code={emoji} style="text-base leading-none" />
+        </span>
+    ) : icon ? (
+        <Icon icon={icon as IconName} className="size-4" />
+    ) : (
+        <Icon icon="memo" className="size-4" />
+    );
+
+    const insights =
+        item.type === 'page'
+            ? {
+                  type: 'search_open_result' as const,
+                  query,
+                  result: {
+                      pageId: item.pageId,
+                      spaceId: item.spaceId,
+                  },
+              }
+            : undefined;
+
     return (
         <SearchResultItem
             ref={ref}
-            href={item.href}
+            href={href}
             active={active}
             data-testid="search-page-result"
             action={tString(language, 'view')}
-            leadingIcon={<Icon icon="memo" className="size-4" />}
-            insights={{
-                type: 'search_open_result',
-                query,
-                result: {
-                    pageId: item.pageId,
-                    spaceId: item.spaceId,
-                },
-            }}
+            leadingIcon={leadingIcon}
+            insights={insights}
             aria-label={tString(language, 'search_page_result_title', item.title)}
             {...rest}
         >
@@ -41,12 +72,21 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
             <p className="line-clamp-2 font-semibold text-base text-tint-strong leading-snug">
                 <HighlightQuery query={query} text={item.title} />
             </p>
+            {bestSection?.body ? (
+                <p className="line-clamp-1 text-xs leading-snug">
+                    <HighlightQuery query={query} text={bestSection.body} />
+                </p>
+            ) : 'description' in item && item.description ? (
+                <p className="line-clamp-1 text-xs leading-snug">
+                    <HighlightQuery query={query} text={item.description} />
+                </p>
+            ) : null}
         </SearchResultItem>
     );
 });
 
 const Breadcrumbs = (props: {
-    breadcrumbs: ComputedPageResult['breadcrumbs'];
+    breadcrumbs: PageItem['breadcrumbs'];
     withOverflow?: boolean;
 }) => {
     const { breadcrumbs, withOverflow = (breadcrumbs?.length ?? 0) > 4 } = props;
@@ -109,6 +149,6 @@ const Breadcrumbs = (props: {
                   ...crumbs.slice(-1),
               ]
             : crumbs,
-        'text-tint/7 contrast-more:text-tint group-[.is-active]:text-tint mb-1 text-xs uppercase leading-snug'
+        'text-tint/7 contrast-more:text-tint group-[.is-active]:text-tint mb-1 text-xxs uppercase leading-snug'
     );
 };

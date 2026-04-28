@@ -39,6 +39,12 @@ export async function SiteLayout(props: {
         ReactDOM.preconnect(GITBOOK_ASSETS_URL);
     }
 
+    // We also preload the site index
+    ReactDOM.preload(`${context.linker.siteBasePath}~gitbook/site-index`, {
+        as: 'fetch',
+        type: 'application/json',
+    });
+
     scripts.forEach(({ script }) => {
         ReactDOM.preload(script, {
             as: 'script',

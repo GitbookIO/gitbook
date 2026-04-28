@@ -2,6 +2,7 @@
 
 import { type ClassValue, tcls } from '@/lib/tailwind';
 import React from 'react';
+import { useAI } from '../AI';
 import {
     EmbeddableFrame,
     EmbeddableFrameHeader,
@@ -10,10 +11,10 @@ import {
 } from '../Embeddable/EmbeddableFrame';
 import { ScrollContainer } from '../primitives/ScrollContainer';
 import { SearchAskAnswer } from './SearchAskAnswer';
+import { SearchAskBar } from './SearchAskBar';
 import { SearchAskProvider, useSearchAskState } from './SearchAskContext';
 import { SearchResults, type SearchResultsRef } from './SearchResults';
 import type { ResultType } from './useSearchResults';
-
 export function SearchFrame(props: {
     asEmbeddable?: boolean;
     askQuery: string;
@@ -50,6 +51,7 @@ export function SearchFrame(props: {
     } = props;
 
     const searchAsk = useSearchAskState();
+    const { assistants } = useAI();
 
     return (
         <SearchAskProvider value={searchAsk}>
@@ -77,6 +79,15 @@ export function SearchFrame(props: {
                                 />
                             )}
                         </ScrollContainer>
+                        {!showAsk && query && assistants.length > 0
+                            ? assistants.map((assistant) => (
+                                  <SearchAskBar
+                                      key={assistant.id}
+                                      query={query}
+                                      assistant={assistant}
+                                  />
+                              ))
+                            : null}
                         {scopeControl && !showAsk ? (
                             <div className="border-tint-subtle border-t bg-tint-subtle px-4 py-1.5">
                                 {scopeControl}

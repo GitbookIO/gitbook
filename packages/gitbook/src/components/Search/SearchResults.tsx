@@ -3,7 +3,7 @@
 import assertNever from 'assert-never';
 import React from 'react';
 
-import { type Assistant, useAI } from '@/components/AI';
+import { useAI } from '@/components/AI';
 import { t, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
 
@@ -11,8 +11,8 @@ import { Button, Loading } from '../primitives';
 import { SearchPageResultItem } from './SearchPageResultItem';
 import { SearchQuestionResultItem } from './SearchQuestionResultItem';
 import { SearchRecordResultItem } from './SearchRecordResultItem';
-import { SearchSectionResultItem } from './SearchSectionResultItem';
 import type { OrderedComputedResult } from './search-types';
+import type { LocalPageResult } from './useLocalSearchResults';
 
 export interface SearchResultsRef {
     select(): void;
@@ -20,14 +20,13 @@ export interface SearchResultsRef {
 
 type ResultType =
     | OrderedComputedResult
-    | { type: 'question'; id: string; query: string; assistant: Assistant }
+    | LocalPageResult
     | { type: 'recommended-question'; id: string; question: string };
 
 /**
  * Fetch the results of the keyboard navigable elements to display for a query:
  *   - Recommended questions if no query is provided.
  *   - Search results if a query is provided.
- *      - If withAI is true, add a question result.
  */
 export const SearchResults = React.forwardRef(function SearchResults(
     props: {
@@ -144,6 +143,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
                                 id: `${id}-${index}`,
                             };
                             switch (item.type) {
+                                case 'local-page':
                                 case 'page': {
                                     return (
                                         <SearchPageResultItem
@@ -154,20 +154,6 @@ export const SearchResults = React.forwardRef(function SearchResults(
                                             query={query}
                                             item={item}
                                             active={index === cursor}
-                                            {...resultItemProps}
-                                        />
-                                    );
-                                }
-                                case 'question': {
-                                    return (
-                                        <SearchQuestionResultItem
-                                            ref={(ref) => {
-                                                refs.current[index] = ref;
-                                            }}
-                                            key={item.id}
-                                            question={query}
-                                            active={index === cursor}
-                                            assistant={item.assistant}
                                             {...resultItemProps}
                                         />
                                     );
@@ -183,20 +169,6 @@ export const SearchResults = React.forwardRef(function SearchResults(
                                             active={index === cursor}
                                             assistant={assistants[0]!}
                                             recommended
-                                            {...resultItemProps}
-                                        />
-                                    );
-                                }
-                                case 'section': {
-                                    return (
-                                        <SearchSectionResultItem
-                                            ref={(ref) => {
-                                                refs.current[index] = ref;
-                                            }}
-                                            key={item.id}
-                                            query={query}
-                                            item={item}
-                                            active={index === cursor}
                                             {...resultItemProps}
                                         />
                                     );
@@ -220,9 +192,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
                             }
                         })}
                     </div>
-                    {!fetching && !results.some((result) => result.type !== 'question')
-                        ? noResults
-                        : null}
+                    {!fetching && results.length === 0 ? noResults : null}
                 </>
             )}
             {fetching ? (
