@@ -40,6 +40,7 @@
         "direction": "^2.0.1",
         "event-iterator": "^2.0.0",
         "feed": "^5.1.0",
+        "flexsearch": "^0.8.212",
         "image-size": "^2.0.2",
         "js-cookie": "^3.0.5",
         "jsontoxml": "^1.0.1",

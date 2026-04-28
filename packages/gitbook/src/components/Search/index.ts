@@ -5,4 +5,5 @@ export * from './SearchContainer';
 export * from './SearchScopeControl';
 export * from './search-props';
 export * from './useSearch';
+export * from './useLocalSearchResults';
 export * from './useSearchController';

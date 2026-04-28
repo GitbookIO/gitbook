@@ -101,6 +101,7 @@ export function useSearchController(props: SearchBaseProps) {
         withSections,
         siteSpaces,
         searchURL,
+        indexURL,
     } = props;
 
     const { assistants, config } = useAI();
@@ -187,6 +188,8 @@ export function useSearchController(props: SearchBaseProps) {
         scope: state?.scope ?? 'default',
         suggestions: config.suggestions,
         searchURL,
+        indexURL,
+        lang: siteSpace.space.language,
     });
 
     const searchValue = state?.query ?? (withSearchAI || !withAI ? state?.ask : null) ?? '';
