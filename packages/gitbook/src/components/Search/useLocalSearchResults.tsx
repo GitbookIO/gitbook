@@ -84,7 +84,7 @@ function buildLangIndex(pages: RawIndexPage[]): Document<IndexPage> {
             siteSpaceId: page.siteSpaceId,
         });
 
-        cachedPageData.set(page.id, {
+        cachedPageData.set(`${page.siteSpaceId}:${page.id}`, {
             pathname: page.pathname,
             icon: page.icon,
             emoji: page.emoji,
@@ -110,7 +110,7 @@ async function getOrBuildIndexes(indexURL: string): Promise<Map<string, Document
             throw new Error(`Failed to fetch search index: ${response.status}`);
         }
 
-        const data: { pages: RawIndexPage[] } = await response.json();
+        const data: { version: 1; pages: RawIndexPage[] } = await response.json();
 
         // Group pages by their `lang` value (empty string for pages without one)
         const pagesByLang = new Map<string, RawIndexPage[]>();
@@ -228,9 +228,10 @@ export function useLocalSearchResults(props: {
         for (const fieldResult of rawResults) {
             for (const item of fieldResult.result) {
                 const doc = (item as { id: string; doc: IndexPage }).doc;
-                if (!seen.has(doc.id)) {
-                    seen.add(doc.id);
-                    const extra = cachedPageData.get(doc.id);
+                const cacheKey = `${doc.siteSpaceId}:${doc.id}`;
+                if (!seen.has(cacheKey)) {
+                    seen.add(cacheKey);
+                    const extra = cachedPageData.get(cacheKey);
                     results.push({
                         type: 'local-page',
                         id: doc.id,
