@@ -24,17 +24,16 @@ function flattenPages(
             return [];
         }
 
-        return [
-            ...(page.type === 'document' ? [{ page, depth }] : []),
-            ...page.pages.flatMap((child) =>
-                child.type !== 'link' && child.type !== 'computed'
-                    ? flattenPage(child as RevisionPageDocument | RevisionPageGroup, depth + 1, [
-                          ...ancestors,
-                          page,
-                      ])
-                    : []
-            ),
-        ];
+        const children: FlatPageEntry[] = [];
+        for (const child of page.pages) {
+            if (child.type === 'link' || child.type === 'computed') {
+                continue;
+            }
+
+            children.push(...flattenPage(child, depth + 1, [...ancestors, page]));
+        }
+
+        return [...(page.type === 'document' ? [{ page, depth }] : []), ...children];
     };
 
     return rootPages.flatMap((page) =>
