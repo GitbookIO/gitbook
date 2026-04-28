@@ -113,7 +113,7 @@ const testCases: TestsCase[] = [
     {
         name: 'docs.keeper.io',
         contentBaseURL: 'https://docs.keeper.io',
-        tests: [{ name: 'Home', url: '/', run: waitForCookiesDialog }],
+        tests: [{ name: 'Home', url: '/en', run: waitForCookiesDialog }],
     },
     {
         name: 'adiblar.gitbook.io',
@@ -222,11 +222,12 @@ const testCases: TestsCase[] = [
         contentBaseURL: 'https://docs.soniclabs.com',
         tests: [{ name: 'Home', url: '/' }],
     },
-    {
-        name: 'docs.meshchain.ai',
-        contentBaseURL: 'https://docs.meshchain.ai',
-        tests: [{ name: 'Home', url: '/' }],
-    },
+    // This one redirects to binance now
+    // {
+    //     name: 'docs.meshchain.ai',
+    //     contentBaseURL: 'https://docs.meshchain.ai',
+    //     tests: [{ name: 'Home', url: '/' }],
+    // },
     {
         name: 'docs.thousandeyes.com',
         contentBaseURL: 'https://docs.thousandeyes.com',
