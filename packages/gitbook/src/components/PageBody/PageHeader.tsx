@@ -40,7 +40,7 @@ export async function PageHeader(props: {
     }
 
     return (
-        <header className={tcls(CONTENT_STYLE, 'mb-6', 'space-y-3')}>
+        <header className={tcls(CONTENT_STYLE, 'mb-6 space-y-3 after:clear-both after:block')}>
             <div
                 className={tcls(
                     'float-right ml-4 flex gap-2',
