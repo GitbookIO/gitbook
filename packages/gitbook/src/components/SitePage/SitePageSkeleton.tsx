@@ -22,7 +22,7 @@ export function SitePageSkeleton() {
         >
             <div className={tcls('flex-1', CONTENT_STYLE)}>
                 <SkeletonHeading style={tcls('mb-8')} />
-                <SkeletonParagraph style={tcls('mb-4')} />
+                <SkeletonParagraph className={tcls('mb-4')} />
             </div>
         </div>
     );

@@ -1,27 +1,44 @@
 'use client';
 
 import assertNever from 'assert-never';
+import { AnimatePresence, motion } from 'framer-motion';
 import React from 'react';
 
 import { useAI } from '@/components/AI';
 import { t, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
 
-import { Button, Loading } from '../primitives';
+import { Button, SkeletonParagraph, SkeletonSmall } from '../primitives';
 import { SearchPageResultItem } from './SearchPageResultItem';
 import { SearchQuestionResultItem } from './SearchQuestionResultItem';
 import { SearchRecordResultItem } from './SearchRecordResultItem';
+import { SearchResultItem } from './SearchResultItem';
 import type { OrderedComputedResult } from './search-types';
 import type { LocalPageResult } from './useLocalSearchResults';
 
 export interface SearchResultsRef {
-    select(): void;
+    select(): boolean;
 }
 
 type ResultType =
     | OrderedComputedResult
     | LocalPageResult
     | { type: 'recommended-question'; id: string; question: string };
+
+function getResultKey(item: ResultType): string {
+    switch (item.type) {
+        case 'local-page':
+            return `page:${item.id}`;
+        case 'page':
+            return `page:${item.pageId}`;
+        case 'record':
+            return `record:${item.id}`;
+        case 'recommended-question':
+            return `question:${item.id}`;
+        default:
+            return assertNever(item);
+    }
+}
 
 /**
  * Fetch the results of the keyboard navigable elements to display for a query:
@@ -37,14 +54,30 @@ export const SearchResults = React.forwardRef(function SearchResults(
         fetching: boolean;
         cursor: number | null;
         error: boolean;
+        onResultSelect?: () => void;
     },
     ref: React.Ref<SearchResultsRef>
 ) {
-    const { children, id, query, results, fetching, cursor, error } = props;
+    const { children, id, query, results, fetching, cursor, error, onResultSelect } = props;
 
     const language = useLanguage();
+    const shouldAnimateResults = !query || fetching;
+    const previousCursor = React.useRef<number | null>(cursor);
+    const seenResultKeys = React.useRef(new Set<string>());
+    const lastQuery = React.useRef(query);
+
+    if (lastQuery.current !== query) {
+        lastQuery.current = query;
+        seenResultKeys.current.clear();
+    }
 
     const refs = React.useRef<(null | HTMLAnchorElement)[]>([]);
+
+    React.useEffect(() => {
+        for (const item of results) {
+            seenResultKeys.current.add(getResultKey(item));
+        }
+    }, [results]);
 
     // Scroll to the active result.
     React.useEffect(() => {
@@ -55,15 +88,22 @@ export const SearchResults = React.forwardRef(function SearchResults(
         refs.current[cursor]?.scrollIntoView({
             block: 'nearest',
             inline: 'nearest',
+            behavior: 'instant',
         });
+    }, [cursor]);
+
+    const shouldDisableLayoutAnimation = previousCursor.current !== cursor;
+    React.useEffect(() => {
+        previousCursor.current = cursor;
     }, [cursor]);
 
     const select = React.useCallback(() => {
         if (cursor === null || !refs.current[cursor]) {
-            return;
+            return false;
         }
 
         refs.current[cursor]?.click();
+        return true;
     }, [cursor]);
 
     React.useImperativeHandle(
@@ -75,18 +115,19 @@ export const SearchResults = React.forwardRef(function SearchResults(
     );
 
     const { assistants } = useAI();
+    const primaryAssistant = assistants[0];
 
     if (error) {
         return (
-            <div
+            <output
                 className={tcls(
                     'flex',
+                    'grow',
                     'flex-col',
                     'items-center',
                     'justify-center',
                     'text-center',
                     'py-8',
-                    'h-full',
                     'gap-4'
                 )}
             >
@@ -99,27 +140,28 @@ export const SearchResults = React.forwardRef(function SearchResults(
                 >
                     {t(language, 'unexpected_error_retry')}
                 </Button>
-            </div>
+            </output>
         );
     }
 
     const noResults = (
-        <div
+        <output
             className={tcls(
                 'flex',
+                'grow',
                 'items-center',
                 'justify-center',
                 'text-center',
                 'py-8',
-                'h-full'
+                'animate-blur-in-slow'
             )}
         >
             {t(language, 'search_no_results_for', query)}
-        </div>
+        </output>
     );
 
     return (
-        <div className={tcls('min-h-full')}>
+        <output className="flex grow flex-col" aria-busy={fetching}>
             {children}
             {results.length === 0 ? (
                 fetching ? null : query ? (
@@ -131,75 +173,183 @@ export const SearchResults = React.forwardRef(function SearchResults(
                 <>
                     <div
                         data-testid="search-results"
-                        className="flex flex-col gap-y-1"
+                        className="flex flex-col gap-1"
                         id={id}
                         role="listbox"
                         aria-live="polite"
                     >
-                        {results.map((item, index) => {
-                            const resultItemProps = {
-                                'aria-posinset': index + 1,
-                                'aria-setsize': results.length,
-                                id: `${id}-${index}`,
-                            };
-                            switch (item.type) {
-                                case 'local-page':
-                                case 'page': {
-                                    return (
-                                        <SearchPageResultItem
-                                            ref={(ref) => {
-                                                refs.current[index] = ref;
-                                            }}
-                                            key={item.id}
-                                            query={query}
-                                            item={item}
-                                            active={index === cursor}
-                                            {...resultItemProps}
-                                        />
-                                    );
+                        <AnimatePresence initial={false} mode="popLayout">
+                            {results.map((item, index) => {
+                                const itemKey = getResultKey(item);
+                                const shouldAnimateItem =
+                                    shouldAnimateResults || !seenResultKeys.current.has(itemKey);
+                                const resultItemProps = {
+                                    'aria-posinset': index + 1,
+                                    'aria-setsize': results.length,
+                                    id: `${id}-${index}`,
+                                    onClickCapture: () => onResultSelect?.(),
+                                };
+                                switch (item.type) {
+                                    case 'local-page':
+                                    case 'page': {
+                                        return (
+                                            <motion.div
+                                                layout="position"
+                                                transition={
+                                                    shouldDisableLayoutAnimation
+                                                        ? { layout: { duration: 0 } }
+                                                        : { duration: 0.3, ease: 'circInOut' }
+                                                }
+                                                key={itemKey}
+                                            >
+                                                <div
+                                                    className={
+                                                        shouldAnimateItem
+                                                            ? 'animate-blur-in-height'
+                                                            : undefined
+                                                    }
+                                                    style={{
+                                                        animationDelay: `${index * 25}ms,${100 + index * 25}ms`,
+                                                    }}
+                                                >
+                                                    <SearchPageResultItem
+                                                        ref={(ref) => {
+                                                            refs.current[index] = ref;
+                                                        }}
+                                                        query={query}
+                                                        item={item}
+                                                        active={index === cursor}
+                                                        style={{
+                                                            animationDelay: `${index * 25}ms,${100 + index * 25}ms`,
+                                                        }}
+                                                        {...resultItemProps}
+                                                    />
+                                                </div>
+                                            </motion.div>
+                                        );
+                                    }
+                                    case 'recommended-question': {
+                                        if (!primaryAssistant) {
+                                            return null;
+                                        }
+                                        return (
+                                            <motion.div
+                                                className={
+                                                    shouldAnimateItem
+                                                        ? 'animate-blur-in'
+                                                        : undefined
+                                                }
+                                                style={
+                                                    shouldAnimateItem
+                                                        ? {
+                                                              animationDelay: `${index * 25}ms,${100 + index * 25}ms`,
+                                                          }
+                                                        : undefined
+                                                }
+                                                key={itemKey}
+                                            >
+                                                <SearchQuestionResultItem
+                                                    ref={(ref) => {
+                                                        refs.current[index] = ref;
+                                                    }}
+                                                    question={item.question}
+                                                    active={index === cursor}
+                                                    assistant={primaryAssistant}
+                                                    recommended
+                                                    style={{
+                                                        animationDelay: `${index * 25}ms,${100 + index * 25}ms`,
+                                                    }}
+                                                    {...resultItemProps}
+                                                />
+                                            </motion.div>
+                                        );
+                                    }
+                                    case 'record': {
+                                        return (
+                                            <motion.div
+                                                layout="position"
+                                                transition={
+                                                    shouldDisableLayoutAnimation
+                                                        ? { layout: { duration: 0 } }
+                                                        : { duration: 0.3, ease: 'circInOut' }
+                                                }
+                                                key={itemKey}
+                                            >
+                                                <div
+                                                    className={
+                                                        shouldAnimateItem
+                                                            ? 'animate-blur-in-height'
+                                                            : undefined
+                                                    }
+                                                    style={{
+                                                        animationDelay: `${index * 25}ms,${100 + index * 25}ms`,
+                                                    }}
+                                                >
+                                                    <SearchRecordResultItem
+                                                        ref={(ref) => {
+                                                            refs.current[index] = ref;
+                                                        }}
+                                                        key={itemKey}
+                                                        query={query}
+                                                        item={item}
+                                                        active={index === cursor}
+                                                        style={{
+                                                            animationDelay: `${index * 25}ms,${100 + index * 25}ms`,
+                                                        }}
+                                                        {...resultItemProps}
+                                                    />
+                                                </div>
+                                            </motion.div>
+                                        );
+                                    }
+                                    default:
+                                        assertNever(item);
                                 }
-                                case 'recommended-question': {
-                                    return (
-                                        <SearchQuestionResultItem
-                                            ref={(ref) => {
-                                                refs.current[index] = ref;
-                                            }}
-                                            key={item.id}
-                                            question={item.question}
-                                            active={index === cursor}
-                                            assistant={assistants[0]!}
-                                            recommended
-                                            {...resultItemProps}
-                                        />
-                                    );
-                                }
-                                case 'record': {
-                                    return (
-                                        <SearchRecordResultItem
-                                            ref={(ref) => {
-                                                refs.current[index] = ref;
-                                            }}
-                                            key={item.id}
-                                            query={query}
-                                            item={item}
-                                            active={index === cursor}
-                                            {...resultItemProps}
-                                        />
-                                    );
-                                }
-                                default:
-                                    assertNever(item);
-                            }
-                        })}
+                            })}
+                        </AnimatePresence>
                     </div>
                     {!fetching && results.length === 0 ? noResults : null}
                 </>
             )}
             {fetching ? (
-                <div className={tcls('flex', 'items-center', 'justify-center', 'py-6')}>
-                    <Loading className={tcls('w-6', 'text-tint/6')} />
+                <div
+                    className={tcls(
+                        results.length > 0 ? 'mt-1' : '',
+                        'flex animate-blur-in flex-col gap-1'
+                    )}
+                    style={{ animationDelay: `${results.length * 25}ms` }}
+                >
+                    <SearchResultsSkeleton items={Math.max(3, 5 - results.length)} />
                 </div>
             ) : null}
-        </div>
+        </output>
     );
 });
+
+const SearchResultsSkeleton = (props: { items: number }) => {
+    const { items } = props;
+    const skeletonKeys = Array.from({ length: items }, (_, index) => `skeleton:${index}`);
+
+    return (
+        <>
+            {skeletonKeys.map((key, index) => (
+                <SearchResultItem
+                    key={key}
+                    active={false}
+                    href="#"
+                    action=""
+                    disabled
+                    data-testid="search-page-result"
+                    leadingIcon={
+                        <SkeletonSmall
+                            className="size-4"
+                            style={{ animationDelay: `${index * 0.3}s` }}
+                        />
+                    }
+                >
+                    <SkeletonParagraph size="small" start={index * 3} />
+                </SearchResultItem>
+            ))}
+        </>
+    );
+};

@@ -2,6 +2,7 @@ import { tString, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
 import { Icon, type IconName } from '@gitbook/icons';
 import React from 'react';
+import { SkeletonParagraph } from '../primitives';
 import { Tooltip } from '../primitives';
 import { Emoji } from '../primitives/Emoji/Emoji';
 import { HighlightQuery } from './HighlightQuery';
@@ -17,10 +18,11 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
         query: string;
         item: PageItem;
         active: boolean;
+        style?: React.CSSProperties;
     },
     ref: React.Ref<HTMLAnchorElement>
 ) {
-    const { query, item, active, ...rest } = props;
+    const { query, item, active, style, ...rest } = props;
     const language = useLanguage();
 
     const bestSection = item.type === 'page' ? item.bestSection : undefined;
@@ -41,7 +43,7 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
     ) : icon ? (
         <Icon icon={icon as IconName} className="size-4" />
     ) : (
-        <Icon icon="memo" className="size-4" />
+        <Icon icon="file-lines" className="size-4" />
     );
 
     const insights =
@@ -66,21 +68,62 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
             leadingIcon={leadingIcon}
             insights={insights}
             aria-label={tString(language, 'search_page_result_title', item.title)}
+            style={{
+                ...style,
+            }}
             {...rest}
         >
             <Breadcrumbs breadcrumbs={item.breadcrumbs} />
-            <p className="line-clamp-2 font-semibold text-base text-tint-strong leading-snug">
+            <p className="line-clamp-1 font-semibold text-base text-tint-strong leading-snug">
                 <HighlightQuery query={query} text={item.title} />
             </p>
-            {bestSection?.body ? (
-                <p className="line-clamp-1 text-xs leading-snug">
-                    <HighlightQuery query={query} text={bestSection.body} />
-                </p>
-            ) : 'description' in item && item.description ? (
-                <p className="line-clamp-1 text-xs leading-snug">
-                    <HighlightQuery query={query} text={item.description} />
-                </p>
-            ) : null}
+            <div
+                className={tcls(
+                    'relative h-5 w-full transition-[height] duration-300',
+                    item.type === 'local-page' && !bestSection?.body && !item.description
+                        ? '[[aria-busy=false]_&]:h-0'
+                        : ''
+                )}
+                style={{ transitionDelay: style?.animationDelay }}
+            >
+                {bestSection?.body ? (
+                    <p
+                        className="absolute inset-0 line-clamp-1 origin-left animate-blur-in text-sm"
+                        style={{ animationDelay: style?.animationDelay }}
+                    >
+                        <HighlightQuery
+                            query={query}
+                            text={`${bestSection.title ? `${bestSection.title} · ` : ''}${bestSection.body}`}
+                        />
+                    </p>
+                ) : null}
+
+                {'description' in item && item.description ? (
+                    <p
+                        className={tcls(
+                            'absolute inset-0 line-clamp-1 origin-left text-sm',
+                            bestSection?.body ? 'hidden animate-blur-out' : ''
+                        )}
+                        style={{ animationDelay: style?.animationDelay }}
+                    >
+                        <HighlightQuery query={query} text={item.description} />
+                    </p>
+                ) : null}
+
+                {item.type === 'local-page' ? (
+                    <SkeletonParagraph
+                        size="small"
+                        lines={1}
+                        className={tcls(
+                            'absolute inset-0 origin-left',
+                            bestSection?.body || item.description
+                                ? 'hidden animate-blur-out'
+                                : '[[aria-busy=false]_&]:hidden [[aria-busy=false]_&]:animate-blur-out'
+                        )}
+                        style={{ animationDelay: style?.animationDelay }}
+                    />
+                ) : null}
+            </div>
         </SearchResultItem>
     );
 });
@@ -149,6 +192,6 @@ const Breadcrumbs = (props: {
                   ...crumbs.slice(-1),
               ]
             : crumbs,
-        'text-tint/7 contrast-more:text-tint group-[.is-active]:text-tint mb-1 text-xxs uppercase leading-snug'
+        'text-tint/7 contrast-more:text-tint group-[.is-active]:text-tint text-xs'
     );
 };

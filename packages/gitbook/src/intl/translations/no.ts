@@ -32,6 +32,7 @@ export const no: TranslationLanguage = {
     search_scope_variant_all: 'Alt innhold',
     search_scope_variant_all_description: 'Hver tilgjengelig variant',
     ask: 'Spør',
+    ai_chat_ask_query: 'Spør ${1} "${2}"',
     search_ask: 'Spør "${1}"',
     search_ask_description: 'Finn svaret med ${1}',
     search_ask_sources: 'Kilder',

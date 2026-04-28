@@ -32,6 +32,7 @@ export const it: TranslationLanguage = {
     search_scope_variant_all: 'Tutti i contenuti',
     search_scope_variant_all_description: 'Ogni variante disponibile',
     ask: 'Chiedi',
+    ai_chat_ask_query: 'Chiedi a ${1} "${2}"',
     search_ask: 'Chiedi "${1}"',
     search_ask_description: 'Trova la risposta con ${1}',
     search_ask_sources: 'Fonti',

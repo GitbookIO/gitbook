@@ -122,7 +122,7 @@ export function Header(props: {
                                 'flex',
                                 'grow-0',
                                 'shrink-0',
-                                '@2xl:basis-56',
+                                'md:@2xl:basis-56',
                                 'justify-self-end',
                                 'items-center',
                                 'gap-2',
@@ -130,15 +130,15 @@ export function Header(props: {
                                 'search' in customization.styling &&
                                     customization.styling.search === 'prominent'
                                     ? [
-                                          '@2xl:grow-[0.8]',
-                                          '@4xl:basis-40',
-                                          '@2xl:max-w-[50%]',
-                                          '@4xl:max-w-lg',
+                                          'md:@2xl:grow-[0.8]',
+                                          'md:@4xl:basis-40',
+                                          'md:@2xl:max-w-[50%]',
+                                          'md:@4xl:max-w-lg',
                                           'lg:@2xl:ml-[max(calc((100%-18rem-48rem)/2),1.5rem)]', // container (100%) - sidebar (18rem) - content (48rem)
                                           'not-chat-open:xl:ml-[max(calc((100%-18rem-48rem-14rem-3rem)/2),1.5rem)]', // container (100%) - sidebar (18rem) - content (48rem) - outline (14rem) - margin (3rem)
-                                          '@2xl:mr-auto',
+                                          'md:@2xl:mr-auto',
                                           'order-last',
-                                          '@2xl:order-[unset]',
+                                          'md:@2xl:order-[unset]',
                                       ]
                                     : ['order-last']
                             )}

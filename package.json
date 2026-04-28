@@ -55,7 +55,8 @@
             "react-dom": "^19.0.1",
             "tsdown": "^0.15.6",
             "typescript": "^5.5.3",
-            "usehooks-ts": "^3.1.1"
+            "usehooks-ts": "^3.1.1",
+            "vercel": "^50.26.1"
         }
     },
     "patchedDependencies": {

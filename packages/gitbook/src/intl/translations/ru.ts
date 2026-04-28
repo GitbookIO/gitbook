@@ -30,6 +30,7 @@ export const ru = {
     search_scope_variant_all: 'Весь контент',
     search_scope_variant_all_description: 'Каждый доступный вариант',
     ask: 'Спросить',
+    ai_chat_ask_query: 'Спросить у ${1} "${2}"',
     search_ask: 'Спросить "${1}"',
     search_ask_description: 'Найти ответ с помощью ${1}',
     search_ask_sources: 'Источники',

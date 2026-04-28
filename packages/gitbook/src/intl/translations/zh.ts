@@ -32,6 +32,7 @@ export const zh: TranslationLanguage = {
     search_scope_variant_all: '所有内容',
     search_scope_variant_all_description: '每个可用的变体',
     ask: '询问',
+    ai_chat_ask_query: '向${1}询问"${2}"',
     search_ask: '询问"${1}"',
     search_ask_description: '利用${1}找到答案',
     search_ask_sources: '来源',

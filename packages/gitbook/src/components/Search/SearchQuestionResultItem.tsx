@@ -1,7 +1,7 @@
 import React from 'react';
 
 import type { Assistant } from '@/components/AI';
-import { t, tString, useLanguage } from '@/intl/client';
+import { tString, useLanguage } from '@/intl/client';
 import { SearchResultItem } from './SearchResultItem';
 import { useSearchLink } from './useSearch';
 
@@ -11,19 +11,20 @@ export const SearchQuestionResultItem = React.forwardRef(function SearchQuestion
         active: boolean;
         recommended?: boolean;
         assistant: Assistant;
+        style?: React.CSSProperties;
     },
     ref: React.Ref<HTMLAnchorElement>
 ) {
-    const { question, recommended = false, active, assistant, ...rest } = props;
+    const { question, recommended = false, active, assistant, style, ...rest } = props;
     const language = useLanguage();
     const getLinkProp = useSearchLink();
 
     return (
         <SearchResultItem
-            size={recommended ? 'small' : 'medium'}
+            size="small"
             action={tString(language, 'ask', '')}
             ref={ref}
-            data-testid={recommended ? 'search-recommended-question' : 'search-ask-question'}
+            data-testid="search-recommended-question"
             scroll={false}
             {...getLinkProp(
                 {
@@ -36,22 +37,10 @@ export const SearchQuestionResultItem = React.forwardRef(function SearchQuestion
                 }
             )}
             active={active}
-            leadingIcon={recommended ? 'search' : assistant.icon}
-            className={recommended ? 'pr-1.5' : ''}
+            leadingIcon="search"
             {...rest}
         >
-            {recommended ? (
-                question
-            ) : (
-                <>
-                    <div className="font-semibold text-base text-tint-strong leading-tight">
-                        {t(language, 'search_ask', [question])}
-                    </div>
-                    <div className="text-sm text-tint-subtle">
-                        {t(language, 'search_ask_description', assistant.label)}
-                    </div>
-                </>
-            )}
+            {question}
         </SearchResultItem>
     );
 });
