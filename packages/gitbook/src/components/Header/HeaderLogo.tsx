@@ -29,7 +29,7 @@ export async function HeaderLogo(props: HeaderLogoProps) {
     const canUseCompactHeaderLogo =
         customization.updatedAt &&
         !Number.isNaN(Date.parse(customization.updatedAt)) &&
-        Date.parse(customization.updatedAt) < Date.parse(HEADER_COMPACT_LOGO_DATE);
+        Date.parse(customization.updatedAt) >= Date.parse(HEADER_COMPACT_LOGO_DATE);
 
     const primaryLink = customization.header.primaryLink
         ? await resolveContentRef(customization.header.primaryLink, context)
