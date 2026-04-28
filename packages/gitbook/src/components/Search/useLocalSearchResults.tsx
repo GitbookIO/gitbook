@@ -68,7 +68,7 @@ function buildLangIndex(pages: RawIndexPage[]): Document<IndexPage> {
         document: {
             id: 'id',
             index: ['title', 'description'],
-            store: ['id', 'title', 'description'],
+            store: ['id', 'title', 'description', 'siteSpaceId'],
             tag: 'siteSpaceId',
         },
         tokenize: 'full',
