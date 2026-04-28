@@ -10,6 +10,7 @@ import type {
     RevisionPage,
     SearchAIAnswer,
     SearchAIRecommendedQuestionStream,
+    SiteInsightsSession,
 } from '@gitbook/api';
 import { createStreamableValue } from 'ai/rsc';
 import type * as React from 'react';
@@ -40,9 +41,11 @@ export interface AskAnswerResult {
 export async function streamAskQuestion({
     asEmbeddable,
     question,
+    session,
 }: {
     asEmbeddable?: boolean;
     question: string;
+    session: SiteInsightsSession;
 }) {
     return traceErrorOnly('Search.streamAskQuestion', async () => {
         const responseStream = createStreamableValue<AskAnswerResult | undefined>();
@@ -66,6 +69,7 @@ export async function streamAskQuestion({
                         mode: 'default',
                         currentSiteSpace: context.siteSpace.id,
                     },
+                    session,
                 },
                 { format: 'document' }
             );

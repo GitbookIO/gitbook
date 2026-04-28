@@ -1,4 +1,9 @@
-import type { RevisionPage, RevisionPageDocument, RevisionPageGroup } from '@gitbook/api';
+import {
+    type RevisionPage,
+    type RevisionPageDocument,
+    type RevisionPageGroup,
+    SiteVisibility,
+} from '@gitbook/api';
 import type { NextRequest } from 'next/server';
 
 import { type RouteLayoutParams, getStaticSiteContext } from '@/app/utils';
@@ -115,8 +120,9 @@ export async function GET(
         const { siteSection, siteSectionGroup } = sectionInfo ?? {};
 
         for (const { page, ancestors } of getIndexablePagesWithAncestors(revision.pages)) {
-            if (seen.has(page.id)) continue;
-            seen.add(page.id);
+            const cacheKey = `${siteSpace.id}:${page.id}`;
+            if (seen.has(cacheKey)) continue;
+            seen.add(cacheKey);
 
             const breadcrumbs: Breadcrumb[] = [
                 siteSectionGroup
@@ -152,11 +158,26 @@ export async function GET(
         }
     }
 
-    return new Response(JSON.stringify({ pages }), {
-        headers: {
-            'Content-Type': 'application/json',
-            // Cache for 5 minutes on the client, 1 day on the CDN, and allow serving stale content while revalidating for 1 day
-            'Cache-Control': 'public, max-age=300, s-maxage=86400, stale-while-revalidate=86400',
-        },
-    });
+    // We only cache the search index on the client if the site is public or unlisted, to avoid leaking information about private sites.
+    // For private sites, we set `Cache-Control: no-store` to prevent caching at all.
+    const shouldCacheOnClient =
+        context.site.visibility === SiteVisibility.Public ||
+        context.site.visibility === SiteVisibility.Unlisted;
+
+    return new Response(
+        JSON.stringify({
+            // We include a version number in the response to allow future changes to the format without breaking clients that might have cached the old format.
+            version: 1,
+            pages,
+        }),
+        {
+            headers: {
+                'Content-Type': 'application/json',
+                // Cache for 5 minutes on the client, 1 day on the CDN, and allow serving stale content while revalidating for 1 day
+                'Cache-Control': shouldCacheOnClient
+                    ? 'public, max-age=300, s-maxage=86400, stale-while-revalidate=86400'
+                    : 'no-store',
+            },
+        }
+    );
 }

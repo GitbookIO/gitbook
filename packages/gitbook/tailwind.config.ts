@@ -121,12 +121,6 @@ const config: Config = {
                 periwinkle: generateShades('#acc6ee'),
             },
             backgroundColor: {
-                'mark-blue': '#89C6DA4D',
-                'mark-purple': '#DAD4FF4D',
-                'mark-orange': '#FFDCBC4D',
-                'mark-red': '#FFCCCB4D',
-                'mark-yellow': '#FFF0854D',
-                'mark-green': '#91EABF4D',
                 primary: generateVarShades('primary', [
                     ColorCategory.backgrounds,
                     ColorCategory.components,

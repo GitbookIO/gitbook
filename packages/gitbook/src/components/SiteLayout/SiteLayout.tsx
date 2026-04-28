@@ -40,7 +40,6 @@ export async function SiteLayout(props: {
     }
 
     // We also preload the site index
-    //TODO: enable this only for a subset of website first
     ReactDOM.preload(`${context.linker.siteBasePath}~gitbook/site-index`, {
         as: 'fetch',
         type: 'application/json',

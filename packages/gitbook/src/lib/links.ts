@@ -1,11 +1,7 @@
-import path from 'node:path';
 import { getPagePath } from '@/lib/pages';
 import { withLeadingSlash, withTrailingSlash } from '@/lib/paths';
 import type { RevisionPage, RevisionPageDocument, RevisionPageGroup } from '@gitbook/api';
-import type { Link, Root } from 'mdast';
-import { visit } from 'unist-util-visit';
 import warnOnce from 'warn-once';
-import { checkIsAnchor, checkIsExternalURL } from './urls';
 
 /**
  * Generic interface to generate links based on a given context.
@@ -42,6 +38,15 @@ export interface GitBookLinker {
     toPathForPage(input: {
         pages: RevisionPage[];
         page: RevisionPageDocument | RevisionPageGroup;
+        anchor?: string;
+    }): string;
+
+    /**
+     * Generate an absolute path for a page path in the current content.
+     * The result should NOT be passed to `toPathInSpace`.
+     */
+    toPathForPagePath(input: {
+        path: string;
         anchor?: string;
     }): string;
 
@@ -134,7 +139,14 @@ export function createLinker(
         },
 
         toPathForPage({ pages, page, anchor }) {
-            return linker.toPathInSpace(getPagePath(pages, page)) + (anchor ? `#${anchor}` : '');
+            return linker.toPathForPagePath({
+                path: getPagePath(pages, page),
+                anchor,
+            });
+        },
+
+        toPathForPagePath({ path, anchor }) {
+            return linker.toPathInSpace(path) + (anchor ? `#${anchor}` : '');
         },
 
         toAbsoluteURL(absolutePath: string): string {
@@ -171,10 +183,13 @@ export function createLinker(
                 // implementation matches the base linker toPathForPage, but decouples from using `this` to
                 // ensure we always use the updates `toPathInSpace` method.
                 toPathForPage({ pages, page, anchor }) {
-                    return (
-                        newLinker.toPathInSpace(getPagePath(pages, page)) +
-                        (anchor ? `#${anchor}` : '')
-                    );
+                    return newLinker.toPathForPagePath({
+                        path: getPagePath(pages, page),
+                        anchor,
+                    });
+                },
+                toPathForPagePath({ path, anchor }) {
+                    return newLinker.toPathInSpace(path) + (anchor ? `#${anchor}` : '');
                 },
             };
 
@@ -220,12 +235,40 @@ export function linkerForPublishedURL(linker: GitBookLinker, rawSitePublishedURL
  * Create a new linker that always returns absolute URLs.
  */
 export function linkerWithAbsoluteURLs(linker: GitBookLinker): GitBookLinker {
-    return {
+    const self: GitBookLinker = {
         ...linker,
         toPathInSpace: (path) => linker.toAbsoluteURL(linker.toPathInSpace(path)),
         toPathInSite: (path) => linker.toAbsoluteURL(linker.toPathInSite(path)),
-        toPathForPage: (input) => linker.toAbsoluteURL(linker.toPathForPage(input)),
+        toPathForPage: (input) => {
+            return self.toPathForPagePath({
+                path: getPagePath(input.pages, input.page),
+                anchor: input.anchor,
+            });
+        },
+        toPathForPagePath: (input) => linker.toAbsoluteURL(linker.toPathForPagePath(input)),
     };
+
+    return self;
+}
+
+/**
+ * Create a new linker that resolves pages to their markdown version.
+ */
+export function linkerWithMarkdownPages(linker: GitBookLinker): GitBookLinker {
+    const self: GitBookLinker = {
+        ...linker,
+        toPathForPage: (input) => {
+            return self.toPathForPagePath({
+                path: input.page.path,
+                anchor: input.anchor,
+            });
+        },
+        toPathForPagePath: (input) => {
+            return `${linker.toPathInSpace(input.path)}.md${input.anchor ? `#${input.anchor}` : ''}`;
+        },
+    };
+
+    return self;
 }
 
 function joinPaths(prefix: string, path: string): string {
@@ -237,35 +280,4 @@ function joinPaths(prefix: string, path: string): string {
 
 function removeTrailingSlash(path: string): string {
     return path.endsWith('/') ? path.slice(0, -1) : path;
-}
-
-/**
- * Re-writes the URL of every relative <a> link so it is expressed from the site-root.
- */
-export function relativeToAbsoluteLinks(
-    linker: GitBookLinker,
-    tree: Root,
-    currentPagePath: string
-): Root {
-    const currentDir = path.posix.dirname(currentPagePath);
-
-    visit(tree, 'link', (node: Link) => {
-        const original = node.url;
-
-        // Skip anchors, mailto:, http(s):, protocol-like, or already-rooted paths
-        if (checkIsExternalURL(original) || checkIsAnchor(original) || original.startsWith('/')) {
-            return;
-        }
-
-        // Resolve against the current page’s directory and strip any leading “/” or "../"
-        // Sometimes the path can be "../" if we are on the default section
-        // but it means we are just at the root of the site.
-        const pathInPage = path.posix
-            .normalize(path.posix.join(currentDir, original))
-            .replace(/^[\/\.]+/, '');
-
-        node.url = linker.toAbsoluteURL(linker.toPathInSpace(pathInPage));
-    });
-
-    return tree;
 }

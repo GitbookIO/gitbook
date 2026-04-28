@@ -84,10 +84,6 @@ export function useSearchResults(props: {
         error: boolean;
     }>({ results: [], fetching: false, error: false });
 
-    // Track the current in-flight fetch so it can be aborted imperatively
-    // when the user navigates away before the request completes.
-    const abortRef = React.useRef<(() => void) | null>(null);
-
     const { assistants } = useAI();
     const withAI = assistants.length > 0;
 
@@ -231,17 +227,10 @@ export function useSearchResults(props: {
             }
         }, 200);
 
-        abortRef.current = () => {
-            cancelled = true;
-            clearTimeout(timeout);
-            abortController.abort();
-        };
-
         return () => {
             cancelled = true;
             clearTimeout(timeout);
             abortController.abort();
-            abortRef.current = null;
         };
     }, [
         query,
@@ -255,12 +244,6 @@ export function useSearchResults(props: {
         searchURL,
         asEmbeddable,
     ]);
-
-    const abort = React.useCallback(() => {
-        abortRef.current?.();
-        abortRef.current = null;
-        setRemoteState((prev) => (prev.fetching ? { ...prev, fetching: false } : prev));
-    }, []);
 
     // Merge local and remote results.
     // Re-runs immediately whenever either result set changes.
@@ -289,7 +272,6 @@ export function useSearchResults(props: {
         results,
         fetching: remoteState.fetching,
         error: remoteState.error,
-        abort,
     };
 }
 

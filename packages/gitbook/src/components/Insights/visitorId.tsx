@@ -1,5 +1,8 @@
 'use client';
 
+import type { SiteInsightsSession } from '@gitbook/api';
+import type { MaybePromise } from 'p-map';
+import React from 'react';
 import { createStore, useStore } from 'zustand';
 
 import {
@@ -9,9 +12,8 @@ import {
     setLocalStorageItem,
 } from '@/lib/browser';
 
-import type { MaybePromise } from 'p-map';
-import React from 'react';
 import { isCookiesTrackingDisabled } from './cookies';
+import { getSession } from './sessions';
 import { generateRandomId } from './utils';
 
 const VISITORID_COOKIE = '__session';
@@ -124,6 +126,16 @@ export function VisitorProvider(
  */
 export function useVisitor() {
     return useStore(visitorStore, (state) => state.visitor);
+}
+
+/**
+ * Get the visitor session for insights.
+ */
+export async function getInsightsSession(): Promise<SiteInsightsSession> {
+    return {
+        sessionId: getSession().id,
+        visitorId: (await getVisitor()).deviceId,
+    };
 }
 
 /**

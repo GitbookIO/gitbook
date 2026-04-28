@@ -11,5 +11,5 @@ export async function GET(
 ) {
     const { context } = await getStaticSiteContext(await params);
 
-    return serveLLMsTxt(context, { withMarkdownPages: true });
+    return serveLLMsTxt(context);
 }
