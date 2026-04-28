@@ -13,8 +13,7 @@ import {
 } from '@gitbook/api';
 import assertNever from 'assert-never';
 import * as React from 'react';
-import { getVisitor, useTrackEvent } from '../Insights';
-import { getSession } from '../Insights/sessions';
+import { getInsightsSession, useTrackEvent } from '../Insights';
 import { useSetSearchState } from '../Search';
 import type { AnyAIControl } from './controls';
 import { ConfirmControlDef, ConfirmControlOutputSchema } from './controls/ConfirmControl';
@@ -277,10 +276,7 @@ export function AIChatProvider(props: {
                     toolCall: input.toolCall,
                     messageContext: messageContextRef.current,
                     previousResponseId: globalState.getState().responseId ?? undefined,
-                    session: {
-                        sessionId: getSession().id,
-                        visitorId: (await getVisitor()).deviceId,
-                    },
+                    session: await getInsightsSession(),
                     tools: tools.map((tool) => ({
                         name: tool.name,
                         description: tool.description,
