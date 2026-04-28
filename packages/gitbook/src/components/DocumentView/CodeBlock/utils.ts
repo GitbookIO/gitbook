@@ -65,3 +65,31 @@ export function convertCodeStringToBlock(args: {
         nodes: lines,
     };
 }
+
+/**
+ * Compute the code text from the DOM,
+ * ignoring the empty white space we use for empty lines (represented with a class "ew").
+ */
+export function getCodeText(code: HTMLElement): string {
+    let text = '';
+
+    const iterate = (node: Node) => {
+        if (node instanceof HTMLBRElement) {
+            text += '\n';
+        } else if (node instanceof HTMLSpanElement) {
+            if (node.classList.contains('ew')) {
+                text += '\n';
+            } else {
+                text += node.innerText;
+            }
+        } else if (node instanceof HTMLElement) {
+            node.childNodes.forEach(iterate);
+        } else {
+            text += node.textContent;
+        }
+    };
+
+    iterate(code);
+
+    return text;
+}
