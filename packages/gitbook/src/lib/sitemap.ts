@@ -28,11 +28,10 @@ function flattenPages(
             ...(page.type === 'document' ? [{ page, depth }] : []),
             ...page.pages.flatMap((child) =>
                 child.type !== 'link' && child.type !== 'computed'
-                    ? flattenPage(
-                          child as RevisionPageDocument | RevisionPageGroup,
-                          depth + 1,
-                          [...ancestors, page]
-                      )
+                    ? flattenPage(child as RevisionPageDocument | RevisionPageGroup, depth + 1, [
+                          ...ancestors,
+                          page,
+                      ])
                     : []
             ),
         ];
