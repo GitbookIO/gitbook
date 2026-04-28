@@ -110,11 +110,12 @@ const testCases: TestsCase[] = [
         contentBaseURL: 'https://docs.midas.app',
         tests: [{ name: 'Home', url: '/' }],
     },
-    {
-        name: 'docs.keeper.io',
-        contentBaseURL: 'https://docs.keeper.io',
-        tests: [{ name: 'Home', url: '/en', run: waitForCookiesDialog }],
-    },
+    // Disabling for now, one of the image is making the tests timeout
+    // {
+    //     name: 'docs.keeper.io',
+    //     contentBaseURL: 'https://docs.keeper.io',
+    //     tests: [{ name: 'Home', url: '/en', run: waitForCookiesDialog }],
+    // },
     {
         name: 'adiblar.gitbook.io',
         contentBaseURL: 'https://adiblar.gitbook.io',
