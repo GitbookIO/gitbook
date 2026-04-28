@@ -12,12 +12,24 @@ interface HeaderLogoProps {
 }
 
 /**
+ * We previously gave the logo too much height, making it too big to look good.
+ * As a response, many orgs added padding inside their logos to make them look better.
+ * The new logo max-height looks better but might make existing logos look too small.
+ * To avoid disruption, we only use the new (correct) logo height for logos updated after this date.
+ */
+const HEADER_COMPACT_LOGO_DATE = '2026-04-28T00:00:00.000Z';
+
+/**
  * Render the logo for a space using the customization settings.
  */
 
 export async function HeaderLogo(props: HeaderLogoProps) {
     const { context } = props;
     const { customization, linker } = context;
+    const canUseCompactHeaderLogo =
+        customization.updatedAt &&
+        !Number.isNaN(Date.parse(customization.updatedAt)) &&
+        Date.parse(customization.updatedAt) < Date.parse(HEADER_COMPACT_LOGO_DATE);
 
     const primaryLink = customization.header.primaryLink
         ? await resolveContentRef(customization.header.primaryLink, context)
@@ -59,7 +71,7 @@ export async function HeaderLogo(props: HeaderLogoProps) {
                         'max-w-40',
                         'lg:max-w-64',
                         'lg:site-header-none:page-no-toc:max-w-56',
-                        'max-h-8',
+                        canUseCompactHeaderLogo ? 'max-h-8' : 'max-h-10',
                         'h-full',
                         'w-full',
                         'object-contain',
