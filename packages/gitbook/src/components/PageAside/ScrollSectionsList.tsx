@@ -9,9 +9,11 @@ import { useBodyLoaded } from '@/components/primitives';
 import { HEADER_HEIGHT_DESKTOP } from '../layout';
 
 /**
- * The threshold at which we consider a section as intersecting the viewport.
+ * Consider sections active as soon as they enter the reading viewport.
+ * The hook then picks the heading closest to the top, which fixes short final sections
+ * that cannot scroll high enough to reach a larger intersection ratio.
  */
-const SECTION_INTERSECTING_THRESHOLD = 0.9;
+const SECTION_INTERSECTING_THRESHOLD = 0;
 
 /**
  * The offset from the top of the page when scrolling to the active item.
