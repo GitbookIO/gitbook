@@ -240,8 +240,6 @@ async function rewriteMarkdownLinks(
         const isMention = isMentionLike(node);
         const original = node.url;
 
-        console.log('HANDLE', original);
-
         // Skip anchors, mailto:, http(s):, protocol-like
         if (checkIsExternalURL(original) || checkIsAnchor(original)) {
             return;
