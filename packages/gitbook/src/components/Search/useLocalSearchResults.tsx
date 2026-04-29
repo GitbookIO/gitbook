@@ -1,35 +1,11 @@
 'use client';
 
-import { Document, type DocumentValue } from 'flexsearch';
 import React from 'react';
 
 interface Breadcrumb {
     label: string;
     icon?: string;
     emoji?: string;
-}
-
-/** Raw entry from the `~gitbook/index` JSON response */
-interface RawIndexPage {
-    id: string;
-    title: string;
-    pathname: string;
-    siteSpaceId: string;
-    /** BCP-47 language code emitted by the index route, absent when no language is set. */
-    lang?: string;
-    icon?: string;
-    emoji?: string;
-    description?: string;
-    breadcrumbs?: Breadcrumb[];
-}
-
-/** FlexSearch-compatible document type — satisfies DocumentData via explicit index signature */
-interface IndexPage {
-    [key: string]: DocumentValue | DocumentValue[];
-    id: string;
-    title: string;
-    description: string | null;
-    siteSpaceId: string;
 }
 
 /** Result type returned by this hook */
@@ -50,95 +26,47 @@ type LocalSearchState = {
     error: boolean;
 };
 
-// Module-level singletons — one Document per language per session.
-// Keys are the page's `lang` value, or `''` when no language is set.
-const cachedIndexes = new Map<string, Document<IndexPage>>();
+type WorkerOutboundMessage =
+    | { type: 'loaded' }
+    | { type: 'load-error'; message: string }
+    | { type: 'results'; requestId: number; results: LocalPageResult[] }
+    | { type: 'search-error'; requestId: number };
 
-// Side-map for data that doesn't belong in the FlexSearch index.
-// Keyed by page id, shared across all language groups.
-const cachedPageData = new Map<
-    string,
-    { pathname: string; icon?: string; emoji?: string; breadcrumbs?: Breadcrumb[] }
->();
+// Module-level Worker singleton — shared across all mounted hook instances.
+let worker: Worker | null = null;
+let indexState: 'idle' | 'loading' | 'ready' | 'error' = 'idle';
+const indexStateListeners = new Set<() => void>();
+let requestCounter = 0;
+const pendingRequests = new Map<number, (results: LocalPageResult[]) => void>();
 
-let pendingFetch: Promise<Map<string, Document<IndexPage>>> | null = null;
+function getOrStartWorker(indexURL: string): Worker {
+    if (worker) return worker;
 
-function buildLangIndex(pages: RawIndexPage[]): Document<IndexPage> {
-    const index = new Document<IndexPage>({
-        document: {
-            id: 'id',
-            index: ['title', 'description'],
-            store: ['id', 'title', 'description', 'siteSpaceId'],
-            tag: 'siteSpaceId',
-        },
-        tokenize: 'full',
-        resolution: 15,
-        encoder: 'Normalize',
-    });
+    worker = new Worker(new URL('./search.worker.ts', import.meta.url));
 
-    for (const page of pages) {
-        index.add({
-            id: page.id,
-            title: page.title,
-            description: page.description ?? null,
-            siteSpaceId: page.siteSpaceId,
-        });
-
-        cachedPageData.set(`${page.siteSpaceId}:${page.id}`, {
-            pathname: page.pathname,
-            icon: page.icon,
-            emoji: page.emoji,
-            breadcrumbs: page.breadcrumbs?.length ? page.breadcrumbs : undefined,
-        });
-    }
-
-    return index;
-}
-
-async function getOrBuildIndexes(indexURL: string): Promise<Map<string, Document<IndexPage>>> {
-    if (cachedIndexes.size > 0) {
-        return cachedIndexes;
-    }
-
-    if (pendingFetch) {
-        return pendingFetch;
-    }
-
-    pendingFetch = (async () => {
-        const response = await fetch(indexURL);
-        if (!response.ok) {
-            throw new Error(`Failed to fetch search index: ${response.status}`);
-        }
-
-        const data: { version: 1; pages: RawIndexPage[] } = await response.json();
-
-        // Group pages by their `lang` value (empty string for pages without one)
-        const pagesByLang = new Map<string, RawIndexPage[]>();
-        for (const page of data.pages) {
-            const key = page.lang ?? '';
-            const bucket = pagesByLang.get(key);
-            if (bucket) {
-                bucket.push(page);
-            } else {
-                pagesByLang.set(key, [page]);
+    worker.onmessage = (event: MessageEvent<WorkerOutboundMessage>) => {
+        const msg = event.data;
+        if (msg.type === 'loaded') {
+            indexState = 'ready';
+            for (const listener of indexStateListeners) listener();
+        } else if (msg.type === 'load-error') {
+            indexState = 'error';
+            for (const listener of indexStateListeners) listener();
+        } else if (msg.type === 'results') {
+            const cb = pendingRequests.get(msg.requestId);
+            if (cb) {
+                pendingRequests.delete(msg.requestId);
+                cb(msg.results);
             }
+        } else if (msg.type === 'search-error') {
+            pendingRequests.delete(msg.requestId);
         }
+    };
 
-        // Build one FlexSearch Document per language group
-        for (const [lang, pages] of pagesByLang) {
-            cachedIndexes.set(lang, buildLangIndex(pages));
-        }
+    indexState = 'loading';
+    worker.postMessage({ type: 'load', indexURL });
 
-        return cachedIndexes;
-    })();
-
-    // Clear pendingFetch on error so a retry is possible
-    pendingFetch.catch(() => {
-        console.error('Error fetching/building search index', indexURL);
-        pendingFetch = null;
-    });
-
-    return pendingFetch;
+    return worker;
 }
 
 export function useLocalSearchResults(props: {
@@ -160,94 +88,54 @@ export function useLocalSearchResults(props: {
         error: false,
     });
 
-    // Track whether the indexes are loaded so the search effect re-runs after load
-    const [indexReady, setIndexReady] = React.useState(cachedIndexes.size > 0);
+    const [currentIndexState, setCurrentIndexState] = React.useState<typeof indexState>(indexState);
 
-    // Load the indexes once
+    // Start the worker and subscribe to index state changes
     React.useEffect(() => {
-        if (cachedIndexes.size > 0) {
-            setIndexReady(true);
-            return;
-        }
+        if (disabled) return;
 
-        let cancelled = false;
-        setState((prev) => ({ ...prev, fetching: true, error: false }));
+        getOrStartWorker(indexURL);
 
-        getOrBuildIndexes(indexURL)
-            .then(() => {
-                if (!cancelled) {
-                    setIndexReady(true);
-                    setState((prev) => ({ ...prev, fetching: false }));
-                }
-            })
-            .catch(() => {
-                if (!cancelled) {
-                    setState({ results: [], fetching: false, error: true });
-                }
-            });
+        // Sync state in case it changed before this effect ran
+        setCurrentIndexState(indexState);
 
-        return () => {
-            cancelled = true;
+        const listener = () => {
+            setCurrentIndexState(indexState);
+            if (indexState === 'ready') {
+                setState((prev) => ({ ...prev, fetching: false }));
+            } else if (indexState === 'error') {
+                setState({ results: [], fetching: false, error: true });
+            }
         };
-    }, [indexURL]);
 
-    // Perform instant local search whenever query, lang, or index readiness changes
+        indexStateListeners.add(listener);
+        return () => {
+            indexStateListeners.delete(listener);
+        };
+    }, [indexURL, disabled]);
+
+    // Perform search whenever query, lang, filterSiteSpaceIds, or index readiness changes
     React.useEffect(() => {
-        // Resolve the per-language index to query. When `lang` is not set we fall
-        // back to the `''` bucket (pages with no language tag).
-        const langKey = lang ?? '';
-        const index = cachedIndexes.get(langKey);
-
-        if (disabled || !indexReady || !index) {
-            return;
-        }
+        if (disabled || currentIndexState !== 'ready') return;
 
         if (!query) {
             setState({ results: [], fetching: false, error: false });
             return;
         }
 
-        //@ts-ignore - Typing is wrong here, tags can be arrays when using the `tag` filter option
-        const rawResults = index.search(query, {
-            enrich: true,
-            limit: 5,
-            suggest: true,
-            ...(filterSiteSpaceIds
-                ? {
-                      tag: {
-                          siteSpaceId: filterSiteSpaceIds,
-                      },
-                  }
-                : {}),
+        const requestId = ++requestCounter;
+        pendingRequests.set(requestId, (results) => {
+            setState({ results, fetching: false, error: false });
         });
 
-        // Flatten and deduplicate results across fields (flexsearch returns one array per indexed field)
-        const seen = new Set<string>();
-        const results: LocalPageResult[] = [];
+        // biome-ignore lint/style/noNonNullAssertion: worker is always set when indexState is 'ready'
+        worker!.postMessage({ type: 'search', requestId, query, lang, filterSiteSpaceIds });
 
-        for (const fieldResult of rawResults) {
-            for (const item of fieldResult.result) {
-                const doc = (item as { id: string; doc: IndexPage }).doc;
-                const cacheKey = `${doc.siteSpaceId}:${doc.id}`;
-                if (!seen.has(cacheKey)) {
-                    seen.add(cacheKey);
-                    const extra = cachedPageData.get(cacheKey);
-                    results.push({
-                        type: 'local-page',
-                        id: doc.id,
-                        title: doc.title,
-                        pathname: extra?.pathname ?? '',
-                        icon: extra?.icon,
-                        emoji: extra?.emoji,
-                        description: (doc.description as string | null) ?? undefined,
-                        breadcrumbs: extra?.breadcrumbs,
-                    });
-                }
-            }
-        }
-
-        setState({ results, fetching: false, error: false });
-    }, [query, lang, filterSiteSpaceIds, indexReady, disabled]);
+        return () => {
+            // Cancel stale request so its callback doesn't update state
+            pendingRequests.delete(requestId);
+        };
+    }, [query, lang, filterSiteSpaceIds, currentIndexState, disabled]);
 
     return state;
 }
