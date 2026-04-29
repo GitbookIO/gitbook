@@ -27,6 +27,7 @@ import { getContentLocale, getSpaceLanguage } from '@/intl/server';
 import { getAssetURL } from '@/lib/assets';
 import { tcls } from '@/lib/tailwind';
 
+import { IconSpriteDefinitions } from './IconSpriteDefinitions';
 import { RootLayoutClientContexts } from './RootLayoutClientContexts';
 
 import './globals.css';
@@ -76,6 +77,9 @@ export async function CustomizationRootLayout(props: {
     const sidebarStyles = getSidebarStyles(customization);
     const { infoColor, successColor, warningColor, dangerColor } = getSemanticColors(customization);
     const fontData = getFontData(customization.styling.font, 'content');
+    const iconStyle =
+        ('icons' in customization.styling ? apiToIconsStyles[customization.styling.icons] : null) ||
+        IconStyle.Regular;
     // Temporarily add a if here while the cache is being warmed up.
     // We can remove the condition after 14-07-2025.
     const monospaceFontData = customization.styling.monospaceFont
@@ -194,15 +198,14 @@ export async function CustomizationRootLayout(props: {
                             assetsURL: getAssetURL('icons'),
                         },
                     }}
-                    iconStyle={
-                        ('icons' in customization.styling
-                            ? apiToIconsStyles[customization.styling.icons]
-                            : null) || IconStyle.Regular
-                    }
+                    renderMode="symbol"
+                    symbolLoaderURL="/~gitbook/icons/symbol"
+                    iconStyle={iconStyle}
                 >
                     <RootLayoutClientContexts language={language}>
                         {children}
                     </RootLayoutClientContexts>
+                    <IconSpriteDefinitions />
                 </IconsProvider>
             </body>
         </html>

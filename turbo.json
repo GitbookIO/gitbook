@@ -13,7 +13,7 @@
         // Prepare the package for all other tasks
         "generate": {
             "dependsOn": ["^generate"],
-            "outputs": ["dist"]
+            "outputs": ["dist", ".generated/**"]
         },
         // Build the package for publishing
         "build": {
