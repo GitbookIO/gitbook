@@ -3,7 +3,7 @@ import {
     SiteInsightsDisplayContext,
     SiteInsightsLLMSVariant,
 } from '@gitbook/api';
-import { shouldServeMarkdown } from '@vercel/agent-readability';
+import { acceptsMarkdown, isAIAgent } from '@vercel/agent-readability';
 import { cookies } from 'next/headers';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
@@ -500,7 +500,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
 
         // When we use adaptive content, we want to ensure that the cache is not used at all on the client side.
         // Vercel already set this header, this is needed in OpenNext.
-        if (siteURLData.contextId) {
+        if (siteURLData.contextId && !siteRequestURL.pathname.endsWith('~gitbook/site-index')) {
             response.headers.set('cache-control', 'public, max-age=0, must-revalidate');
         }
 
@@ -759,6 +759,9 @@ function encodePathInSiteContent(
         case 'robots.txt':
         case '~gitbook/embed/script.js':
         case '~gitbook/embed/demo':
+        case '~gitbook/site-index':
+            // LLMs.txt, sitemap, sitemap-pages and robots.txt are always static
+            // as they only depend on the site structure / pages.
             return { pathname, routeType: 'static' };
         case '~gitbook/mcp':
         case '~gitbook/mcp/auth':
@@ -772,7 +775,13 @@ function encodePathInSiteContent(
         default: {
             // If the pathname is a markdown file or the request is ing markdown,
             // we rewrite it to ~gitbook/markdown/:pathname
-            if (pathname.match(MARKDOWN_PATH_REGEX) || shouldServeMarkdown(request).serve) {
+            const aiAgentDetection = isAIAgent(request);
+            // Using heuristic detection incorrectly detects some legitimate bot requests as AI agents (e.g. Slackbot)
+            // We don't want to serve markdown for these requests as it can cause issues like breaking slack unfurling.
+            const shouldServeMarkdown =
+                (aiAgentDetection.detected && aiAgentDetection.method !== 'heuristic') ||
+                acceptsMarkdown(request);
+            if (pathname.match(MARKDOWN_PATH_REGEX) || shouldServeMarkdown) {
                 const pagePathWithoutMD = pathname.replace(MARKDOWN_PATH_REGEX, '');
                 const ask = new URL(request.url).searchParams.get('ask');
                 return {

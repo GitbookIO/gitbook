@@ -62,11 +62,15 @@ function useSearchKeyboardNavigation(props: {
     query: string;
     results: ReturnType<typeof useSearchResults>['results'];
     resultsRef: React.RefObject<SearchResultsRef | null>;
+    abort: () => void;
+    askCount: number;
+    onAskSelect: (index: number) => void;
 }) {
-    const { query, results, resultsRef } = props;
+    const { query, results, resultsRef, abort, askCount, onAskSelect } = props;
     const { cursor, moveBy: moveCursorBy } = useSearchResultsCursor({
         query,
-        results,
+        resultCount: results.length,
+        totalCount: results.length + askCount,
     });
 
     const onInputKeyDown = React.useCallback(
@@ -79,10 +83,18 @@ function useSearchKeyboardNavigation(props: {
                 moveCursorBy(1);
             } else if (event.key === 'Enter') {
                 event.preventDefault();
-                resultsRef.current?.select();
+                if (cursor !== null && cursor >= results.length) {
+                    onAskSelect(cursor - results.length);
+                    return;
+                }
+
+                if (resultsRef.current?.select()) {
+                    // Stop any in-flight search request only when activating a result.
+                    abort();
+                }
             }
         },
-        [moveCursorBy, resultsRef]
+        [moveCursorBy, cursor, results.length, onAskSelect, resultsRef, abort]
     );
 
     return {
@@ -101,6 +113,7 @@ export function useSearchController(props: SearchBaseProps) {
         withSections,
         siteSpaces,
         searchURL,
+        indexURL,
     } = props;
 
     const { assistants, config } = useAI();
@@ -178,7 +191,7 @@ export function useSearchController(props: SearchBaseProps) {
         language: siteSpace.space.language,
     });
 
-    const { results, fetching, error } = useSearchResults({
+    const { results, fetching, error, abort } = useSearchResults({
         asEmbeddable,
         disabled: !(state?.query || withAI),
         query: normalizedQuery,
@@ -187,23 +200,52 @@ export function useSearchController(props: SearchBaseProps) {
         scope: state?.scope ?? 'default',
         suggestions: config.suggestions,
         searchURL,
+        indexURL,
+        lang: siteSpace.space.language,
     });
 
     const searchValue = state?.query ?? (withSearchAI || !withAI ? state?.ask : null) ?? '';
     const searchResultsId = `search-results-${React.useId()}`;
 
+    const askInAssistant = React.useCallback(
+        (assistantIndex = 0) => {
+            const assistant = assistants[assistantIndex];
+            if (!assistant || !normalizedQuery) {
+                return;
+            }
+
+            abort();
+            assistant.open(normalizedQuery);
+            setSearchState({
+                ask: normalizedQuery,
+                query: null,
+                scope: state?.scope ?? 'default',
+                open: assistant.mode === 'search',
+            });
+        },
+        [abort, assistants, normalizedQuery, setSearchState, state?.scope]
+    );
+
+    const askCount = normalizedQuery && !showAsk ? assistants.length : 0;
+
     const { cursor, onInputKeyDown } = useSearchKeyboardNavigation({
         query: normalizedQuery,
         results,
         resultsRef,
+        abort,
+        askCount,
+        onAskSelect: askInAssistant,
     });
 
     return {
         assistants,
         askQuery: normalizedAsk,
+        askCount,
+        askInAssistant,
         cursor,
         error,
         fetching,
+        abort,
         open: onOpen,
         close: onClose,
         query: normalizedQuery,

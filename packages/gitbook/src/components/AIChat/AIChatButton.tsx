@@ -6,7 +6,7 @@ import { useIsMobile } from '../hooks/useIsMobile';
 import { Button } from '../primitives';
 import { KeyboardShortcut } from '../primitives/KeyboardShortcut';
 
-const MOBILE_BREAKPOINT = 672; // 42rem, equal to Tailwind's @max-2xl container breakpoint
+const MOBILE_BREAKPOINT = 688; // 43rem, equal to Tailwind's @max-2xl container breakpoint
 
 /**
  * Button to open/close the AI chat.

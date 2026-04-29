@@ -5,7 +5,6 @@ import {
     SkeletonHeading,
     SkeletonImage,
     SkeletonParagraph,
-    SkeletonSmall,
     SkeletonUpdate,
 } from '@/components/primitives';
 import type { ClassValue } from '@/lib/tailwind';
@@ -142,7 +141,7 @@ export function BlockSkeleton(props: { block: DocumentBlock; style: ClassValue }
         case 'file':
             return <SkeletonHeading id={id} style={style} />;
         case 'paragraph':
-            return <SkeletonSmall id={id} style={style} />;
+            return <SkeletonParagraph id={id} className={style} />;
         case 'list-ordered':
         case 'list-unordered':
         case 'list-tasks':
@@ -153,7 +152,7 @@ export function BlockSkeleton(props: { block: DocumentBlock; style: ClassValue }
         case 'tabs':
         case 'stepper-step':
         case 'if':
-            return <SkeletonParagraph id={id} style={style} />;
+            return <SkeletonParagraph id={id} className={style} />;
         case 'expandable':
         case 'table':
         case 'swagger':
@@ -173,7 +172,7 @@ export function BlockSkeleton(props: { block: DocumentBlock; style: ClassValue }
         case 'drawing':
             return <SkeletonImage id={id} style={style} />;
         case 'updates':
-            return <SkeletonUpdate id={id} style={style} />;
+            return <SkeletonUpdate id={id} className={style} />;
         case 'image':
         case 'code-line':
         case 'tabs-item':

@@ -3,9 +3,11 @@
 import { useTheme } from 'next-themes';
 import { useEffect, useId, useMemo, useRef, useState } from 'react';
 
+import { useHasBeenInViewport } from '@/components/hooks/useHasBeenInViewport';
 import { Loading } from '@/components/primitives/Loading';
 import { tcls } from '@/lib/tailwind';
 import Panzoom from '@panzoom/panzoom';
+import type { RenderResult } from 'mermaid';
 import { type ClientBlockProps, ClientCodeBlock } from './ClientCodeBlock';
 import { MermaidPanZoomControls } from './MermaidPanZoomControls';
 import { getPlainCodeBlock } from './highlight';
@@ -14,8 +16,9 @@ import { getPlainCodeBlock } from './highlight';
  * Used to render a Mermaid diagram from a CodeBlock.
  */
 export function MermaidCodeBlock(props: ClientBlockProps) {
-    const { block, style } = props;
+    const { block, mode, style } = props;
     const source = getPlainCodeBlock(block);
+    const rootRef = useRef<HTMLDivElement>(null);
     const wrapperRef = useRef<HTMLDivElement>(null);
     const diagramRef = useRef<HTMLDivElement>(null);
     const [panZoom, setPanZoom] = useState<ReturnType<typeof Panzoom> | null>(null);
@@ -24,8 +27,14 @@ export function MermaidCodeBlock(props: ClientBlockProps) {
     const { resolvedTheme } = useTheme();
     const darkMode = resolvedTheme === 'dark';
     const id = useSafeId();
+    const hasBeenInViewport = useHasBeenInViewport(rootRef, { rootMargin: '800px' });
+    const shouldRender = mode === 'print' || hasBeenInViewport;
 
     useEffect(() => {
+        if (!shouldRender) {
+            return;
+        }
+
         const container = diagramRef.current;
         const wrapper = wrapperRef.current;
         if (!container || !wrapper) {
@@ -36,46 +45,67 @@ export function MermaidCodeBlock(props: ClientBlockProps) {
         let cleanupPanZoom: (() => void) | undefined;
         setError(false);
         setIsLoading(true);
+        setPanZoom(null);
+        container.innerHTML = '';
 
-        renderMermaidDiagram({
-            container,
-            source,
-            id,
-            darkMode,
-        })
-            .then(() => {
-                if (!cancelled) {
+        const cancelScheduledRender = scheduleMermaidWork(() => {
+            enqueueMermaidRender(async () => {
+                if (cancelled) {
+                    return null;
+                }
+
+                return renderMermaidDiagram({
+                    source,
+                    id,
+                    darkMode,
+                });
+            })
+                .then((result) => {
+                    if (!result || cancelled) {
+                        return;
+                    }
+
+                    container.innerHTML = result.svg;
+                    if (container.querySelector('svg')) {
+                        result.bindFunctions?.(container);
+                    }
+
                     cleanupPanZoom = initPanzoom({
                         container,
                         wrapper,
                         onInit: setPanZoom,
                     });
-                }
-            })
-            .catch(() => {
-                if (!cancelled) {
-                    setError(true);
-                }
-            })
-            .finally(() => {
-                if (!cancelled) {
-                    setIsLoading(false);
-                }
-            });
+                })
+                .catch(() => {
+                    if (!cancelled) {
+                        setError(true);
+                    }
+                })
+                .finally(() => {
+                    if (!cancelled) {
+                        setIsLoading(false);
+                    }
+                });
+        });
 
         return () => {
             cancelled = true;
+            cancelScheduledRender();
             cleanupPanZoom?.();
             setPanZoom(null);
         };
-    }, [source, id, darkMode]);
+    }, [source, id, darkMode, shouldRender]);
 
     if (error) {
         return <ClientCodeBlock {...props} />;
     }
 
     return (
-        <div className={tcls('relative', style)} contentEditable={false}>
+        <div
+            ref={rootRef}
+            className={tcls('group/mermaid relative', style)}
+            contentEditable={false}
+        >
             <div
                 ref={wrapperRef}
                 className={
@@ -100,18 +130,12 @@ export function MermaidCodeBlock(props: ClientBlockProps) {
 }
 
 async function renderMermaidDiagram(args: {
-    container: HTMLElement;
     source: string;
     id: string;
     darkMode: boolean;
-}) {
-    const { container, source, id, darkMode } = args;
-    const [{ default: mermaid }, { default: zenuml }] = await Promise.all([
-        import('mermaid'),
-        import('@mermaid-js/mermaid-zenuml'),
-    ]);
-
-    await mermaid.registerExternalDiagrams([zenuml]);
+}): Promise<RenderResult> {
+    const { source, id, darkMode } = args;
+    const { mermaid } = await loadMermaid();
 
     mermaid.initialize({
         startOnLoad: false,
@@ -120,10 +144,114 @@ async function renderMermaidDiagram(args: {
         theme: darkMode ? 'dark' : undefined,
     });
 
-    const { svg, bindFunctions } = await mermaid.render(`mermaid-diagram-${id}`, source, container);
-    container.innerHTML = svg;
-    bindFunctions?.(container);
+    const renderContainer = createMermaidRenderContainer();
+
+    try {
+        return await mermaid.render(`mermaid-diagram-${id}`, source, renderContainer);
+    } finally {
+        renderContainer.remove();
+    }
 }
+
+/**
+ * Mermaid measures labels while rendering, so the temporary render target must be
+ * connected to the document. Keep it fixed and contained so those layout reads do
+ * not walk the visible document flow.
+ */
+function createMermaidRenderContainer() {
+    const container = document.createElement('div');
+
+    container.setAttribute('aria-hidden', 'true');
+    Object.assign(container.style, {
+        contain: 'strict',
+        height: '100vh',
+        isolation: 'isolate',
+        left: '0',
+        overflow: 'hidden',
+        pointerEvents: 'none',
+        position: 'fixed',
+        top: '0',
+        visibility: 'hidden',
+        width: '100vw',
+        zIndex: '-1',
+    });
+
+    document.body.appendChild(container);
+
+    return container;
+}
+
+let mermaidLoadPromise: Promise<{
+    mermaid: typeof import('mermaid')['default'];
+}> | null = null;
+
+async function loadMermaid() {
+    if (!mermaidLoadPromise) {
+        mermaidLoadPromise = Promise.all([import('mermaid'), import('@mermaid-js/mermaid-zenuml')])
+            .then(async ([{ default: mermaid }, { default: zenuml }]) => {
+                await mermaid.registerExternalDiagrams([zenuml]);
+                return { mermaid };
+            })
+            .catch((error) => {
+                mermaidLoadPromise = null;
+                throw error;
+            });
+    }
+
+    return mermaidLoadPromise;
+}
+
+let mermaidRenderQueue = Promise.resolve();
+
+function enqueueMermaidRender<T>(task: () => Promise<T>) {
+    const result = mermaidRenderQueue.then(task, task);
+    mermaidRenderQueue = result.catch(() => {}).then(waitForNextFrame);
+
+    return result;
+}
+
+function waitForNextFrame() {
+    return new Promise<void>((resolve) => {
+        requestAnimationFrame(() => resolve());
+    });
+}
+
+function scheduleMermaidWork(callback: () => void) {
+    const win = window as WindowWithIdleCallback;
+    let cancelled = false;
+
+    if (win.requestIdleCallback && win.cancelIdleCallback) {
+        const handle = win.requestIdleCallback(
+            () => {
+                if (!cancelled) {
+                    callback();
+                }
+            },
+            { timeout: 1500 }
+        );
+
+        return () => {
+            cancelled = true;
+            win.cancelIdleCallback?.(handle);
+        };
+    }
+
+    const handle = window.setTimeout(() => {
+        if (!cancelled) {
+            callback();
+        }
+    });
+
+    return () => {
+        cancelled = true;
+        window.clearTimeout(handle);
+    };
+}
+
+type WindowWithIdleCallback = Window & {
+    requestIdleCallback?: (callback: () => void, options?: { timeout: number }) => number;
+    cancelIdleCallback?: (handle: number) => void;
+};
 
 /**
  * Initialize panzoom on the diagram container.
@@ -138,7 +266,6 @@ function initPanzoom(args: {
     const instance = Panzoom(container, {
         maxScale: 5,
         minScale: 0.5,
-        contain: 'outside',
         cursor: 'grab',
         panOnlyWhenZoomed: true,
     });

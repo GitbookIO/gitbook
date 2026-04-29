@@ -32,6 +32,7 @@ export const ja: TranslationLanguage = {
     search_scope_variant_all: 'すべてのコンテンツ',
     search_scope_variant_all_description: '利用可能なすべてのバリエーション',
     ask: '質問する',
+    ai_chat_ask_query: '"${2}" を ${1} に質問する',
     search_ask: '"${1}" を質問する',
     search_ask_description: '${1}で答えを見つける',
     search_ask_sources: '情報源',
