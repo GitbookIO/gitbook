@@ -12,6 +12,17 @@ describe('llms.txt', () => {
         expect(await response.text()).toContain('# E2E Tests GitBook Open');
     });
 
+    it('should properly format links', async () => {
+        const response = await fetch(
+            getContentTestURL('https://gitbook-open-e2e-sites.gitbook.io/sections/llms.txt')
+        );
+
+        expect(response.status).toBe(200);
+        expect(response.headers.get('content-type')).toContain('text/markdown');
+        expect(await response.text()).toContain('/sections/sections-3/readme.md');
+        expect(await response.text()).toContain('/sections/sections-4/getting-started/quickstart.md');
+    });
+
     it('should expose a llms.txt file with the accept header', async () => {
         const response = await fetch(
             getContentTestURL('https://gitbook.gitbook.io/test-gitbook-open/llms.txt'),
