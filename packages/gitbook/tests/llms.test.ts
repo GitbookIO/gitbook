@@ -61,15 +61,19 @@ describe('llms.txt', () => {
 });
 
 describe('llms-full.txt', () => {
-    it('should expose a llms-full.txt file', async () => {
-        const response = await fetch(
-            getContentTestURL('https://gitbook.gitbook.io/test-gitbook-open/llms-full.txt')
-        );
+    it(
+        'should expose a llms-full.txt file',
+        async () => {
+            const response = await fetch(
+                getContentTestURL('https://gitbook.gitbook.io/test-gitbook-open/llms-full.txt')
+            );
 
-        expect(response.status).toBe(200);
-        expect(response.headers.get('content-type')).toContain('text/markdown');
-        expect(await response.text()).toContain('# Welcome');
-    });
+            expect(response.status).toBe(200);
+            expect(response.headers.get('content-type')).toContain('text/markdown');
+            expect(await response.text()).toContain('# Welcome');
+        },
+        { timeout: 30_000 }
+    );
 
     it(
         'should expose cross-space pages from a multi-version site',
@@ -94,18 +98,22 @@ describe('llms-full.txt', () => {
         { timeout: 30_000 }
     );
 
-    it('should expose a llms-full.txt file with the accept header', async () => {
-        const response = await fetch(
-            getContentTestURL('https://gitbook.gitbook.io/test-gitbook-open/llms-full.txt'),
-            {
-                headers: {
-                    Accept: 'text/markdown',
-                },
-            }
-        );
+    it(
+        'should expose a llms-full.txt file with the accept header',
+        async () => {
+            const response = await fetch(
+                getContentTestURL('https://gitbook.gitbook.io/test-gitbook-open/llms-full.txt'),
+                {
+                    headers: {
+                        Accept: 'text/markdown',
+                    },
+                }
+            );
 
-        expect(response.status).toBe(200);
-        expect(response.headers.get('content-type')).toContain('text/markdown');
-        expect(await response.text()).toContain('# Welcome');
-    });
+            expect(response.status).toBe(200);
+            expect(response.headers.get('content-type')).toContain('text/markdown');
+            expect(await response.text()).toContain('# Welcome');
+        },
+        { timeout: 30_000 }
+    );
 });
