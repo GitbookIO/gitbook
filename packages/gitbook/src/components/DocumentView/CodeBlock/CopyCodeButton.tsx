@@ -6,6 +6,8 @@ import { Button } from '@/components/primitives';
 import { t, useLanguage } from '@/intl/client';
 import { type ClassValue, tcls } from '@/lib/tailwind';
 
+import { getCodeText } from './utils';
+
 /**
  * Client component to copy the code of a code block.
  * To avoid passing large payload to the client, the code is computed from the DOM.
@@ -31,7 +33,8 @@ export function CopyCodeButton(props: { codeId: string; style: ClassValue }) {
     }, [copied]);
 
     const onClick = () => {
-        const element = document.getElementById(codeId);
+        const wrapper = document.getElementById(codeId);
+        const element = wrapper?.querySelector('code');
         if (!element) {
             return;
         }
@@ -51,32 +54,4 @@ export function CopyCodeButton(props: { codeId: string; style: ClassValue }) {
             {t(language, copied ? 'code_copied' : 'code_copy')}
         </Button>
     );
-}
-
-/**
- * Compute the code text from the DOM,
- * ignoring the empty white space we use for empty lines (represented with a class "ew").
- */
-function getCodeText(code: HTMLElement): string {
-    let text = '';
-
-    const iterate = (node: Node) => {
-        if (node instanceof HTMLBRElement) {
-            text += '\n';
-        } else if (node instanceof HTMLSpanElement) {
-            if (node.classList.contains('ew')) {
-                text += '\n';
-            } else {
-                text += node.innerText;
-            }
-        } else if (node instanceof HTMLElement) {
-            node.childNodes.forEach(iterate);
-        } else {
-            text += node.textContent;
-        }
-    };
-
-    iterate(code);
-
-    return text;
 }

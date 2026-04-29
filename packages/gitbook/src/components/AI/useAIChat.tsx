@@ -17,6 +17,7 @@ import { getInsightsSession, useTrackEvent } from '../Insights';
 import { useSetSearchState } from '../Search';
 import type { AnyAIControl } from './controls';
 import { ConfirmControlDef, ConfirmControlOutputSchema } from './controls/ConfirmControl';
+import { type AIChatReference, serializeReferences } from './references';
 import { type RenderAIMessageOptions, streamAIChatResponse } from './server-actions';
 import { getTools } from './tools';
 import { useAIMessageContextRef } from './useAIMessageContext';
@@ -25,6 +26,7 @@ export type AIChatMessage = {
     role: AIMessageRole;
     content: React.ReactNode;
     query?: string;
+    references?: AIChatReference[];
     activity?: AIChatMessageActivity;
 };
 
@@ -91,6 +93,11 @@ export type AIChatState = {
      * display an error alert. Clearing the conversation will reset this flag.
      */
     error: boolean;
+
+    /**
+     * References staged on the next user message.
+     */
+    references: AIChatReference[];
 };
 
 export type AIChatEvent =
@@ -115,6 +122,12 @@ export type AIChatController = {
     postMessage: (input: { message: string }) => void;
     /** Clear the conversation */
     clear: () => void;
+    /** Stage a reference on the next message */
+    addReference: (ref: AIChatReference) => string;
+    /** Remove a staged reference */
+    removeReference: (id: string) => void;
+    /** Clear all staged references */
+    clearReferences: () => void;
     /** Register an event listener */
     on: <T extends AIChatEvent['type']>(
         event: T,
@@ -136,6 +149,7 @@ const globalState = zustand.create<AIChatState>(() => {
         loading: false,
         error: false,
         initialQuery: null,
+        references: [],
     };
 });
 
@@ -211,6 +225,8 @@ export function AIChatProvider(props: {
         async (input: {
             /** Text message to send to the AI backend */
             message?: string;
+            /** User-typed prompt; compared against state.query to abort stale streams */
+            userQuery?: string;
             /** Tool call to send to the AI backend */
             toolCall?: AIToolCallResult;
         }) => {
@@ -294,7 +310,7 @@ export function AIChatProvider(props: {
                 for await (const data of stream) {
                     if (!data) continue;
 
-                    if (input.message && globalState.getState().query !== input.message) {
+                    if (input.userQuery && globalState.getState().query !== input.userQuery) {
                         // Chat was cleared, stop processing the stream
                         break;
                     }
@@ -457,11 +473,18 @@ export function AIChatProvider(props: {
     // Post a message to the AI chat
     const onPostMessage = React.useCallback(
         async (input: { message: string }) => {
-            const { query, messages, control } = globalState.getState();
+            const { query, messages, control, references, loading } = globalState.getState();
 
             if (control) {
                 throw new Error("We can't post a message when a control is active");
             }
+
+            // Ignore duplicates while a previous turn is still streaming
+            if (loading) {
+                return;
+            }
+
+            const wireMessage = `${serializeReferences(references)}${input.message}`;
 
             // For first message, update the ask parameter in URL
             if (messages.length === 0) {
@@ -496,6 +519,7 @@ export function AIChatProvider(props: {
                             role: AIMessageRole.User,
                             content: input.message,
                             query: input.message,
+                            references,
                         },
                     ],
                     query: input.message,
@@ -503,12 +527,13 @@ export function AIChatProvider(props: {
                     loading: true,
                     error: false,
                     initialQuery: state.initialQuery ?? input.message,
+                    references: [],
                 };
             });
 
-            streamResponse({ message: input.message });
+            streamResponse({ message: wireMessage, userQuery: input.message });
         },
-        [setSearchState, trackEvent, streamResponse, language]
+        [setSearchState, trackEvent, streamResponse]
     );
 
     // Clear the conversation and reset ask parameter
@@ -523,6 +548,7 @@ export function AIChatProvider(props: {
             responseId: null,
             error: false,
             initialQuery: null,
+            references: [],
         }));
 
         // Reset ask parameter to empty string (keeps chat open but clears content)
@@ -533,6 +559,40 @@ export function AIChatProvider(props: {
             open: false,
         }));
     }, [setSearchState]);
+
+    const onAddReference = React.useCallback((ref: AIChatReference) => {
+        globalState.setState((state) => {
+            if (state.references.some((existingRef) => existingRef.id === ref.id)) {
+                return state;
+            }
+            return {
+                ...state,
+                references: [...state.references, ref],
+            };
+        });
+        return ref.id;
+    }, []);
+
+    const onRemoveReference = React.useCallback((id: string) => {
+        globalState.setState((state) => {
+            if (!state.references.some((ref) => ref.id === id)) {
+                return state;
+            }
+            return {
+                ...state,
+                references: state.references.filter((ref) => ref.id !== id),
+            };
+        });
+    }, []);
+
+    const onClearReferences = React.useCallback(() => {
+        globalState.setState((state) => {
+            if (state.references.length === 0) {
+                return state;
+            }
+            return { ...state, references: [] };
+        });
+    }, []);
 
     const onEvent = React.useCallback(
         <T extends AIChatEvent['type']>(
@@ -559,9 +619,21 @@ export function AIChatProvider(props: {
             close: onClose,
             clear: onClear,
             postMessage: onPostMessage,
+            addReference: onAddReference,
+            removeReference: onRemoveReference,
+            clearReferences: onClearReferences,
             on: onEvent,
         };
-    }, [onOpen, onClose, onClear, onPostMessage, onEvent]);
+    }, [
+        onOpen,
+        onClose,
+        onClear,
+        onPostMessage,
+        onAddReference,
+        onRemoveReference,
+        onClearReferences,
+        onEvent,
+    ]);
 
     return (
         <AIChatControllerContext.Provider value={controller}>
