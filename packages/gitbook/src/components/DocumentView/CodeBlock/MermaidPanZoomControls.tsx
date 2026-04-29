@@ -18,7 +18,7 @@ export function MermaidPanZoomControls(props: { panZoom: PanzoomObject }) {
     };
 
     return (
-        <div className="pointer-events-none absolute right-3 bottom-3 z-10 grid grid-cols-3 gap-0.5 opacity-0 transition-opacity duration-150 group-focus-within/mermaid:pointer-events-auto group-focus-within/mermaid:opacity-100 group-hover/mermaid:pointer-events-auto group-hover/mermaid:opacity-100 motion-reduce:transition-none">
+        <div className="absolute right-3 bottom-3 z-10 grid grid-cols-3 gap-0.5 opacity-0 transition-opacity duration-150 group-focus-within/mermaid:pointer-events-auto group-focus-within/mermaid:opacity-100 group-hover/mermaid:opacity-100 motion-reduce:transition-none">
             {/* Row 1: empty, pan up, zoom in */}
             <div />
             <Button
@@ -26,7 +26,7 @@ export function MermaidPanZoomControls(props: { panZoom: PanzoomObject }) {
                 icon="chevron-up"
                 onClick={() => panZoom.pan(0, PAN_STEP, { relative: true })}
             />
-            <Button {...btnProps} label="Zoom in" icon="plus" onClick={() => panZoom.zoomIn()} />
+            <Button {...btnProps} icon="plus" onClick={() => panZoom.zoomIn()} />
             {/* Row 2: pan left, reset, pan right */}
             <Button
                 {...btnProps}
