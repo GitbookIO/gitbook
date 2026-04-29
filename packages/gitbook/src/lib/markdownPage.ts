@@ -97,10 +97,16 @@ export async function getMarkdownForPageInSpace(
         })
     );
 
-    const tree = await fromPageMarkdown(context, {
-        markdown: rawMarkdown,
-        pagePath: page.path,
-    });
+    const tree = await fromPageMarkdown(
+        {
+            ...context,
+            linker,
+        },
+        {
+            markdown: rawMarkdown,
+            pagePath: page.path,
+        }
+    );
 
     // Handle empty document pages which have children (same as getMarkdownForPage)
     if (isEmptyMarkdownPage(tree) && page.pages.length > 0) {
@@ -233,6 +239,8 @@ async function rewriteMarkdownLinks(
     visit(tree, 'link', (node: Link) => {
         const original = node.url;
 
+        console.log('HANDLE', original);
+
         // Skip anchors, mailto:, http(s):, protocol-like
         if (checkIsExternalURL(original) || checkIsAnchor(original)) {
             return;
@@ -246,10 +254,35 @@ async function rewriteMarkdownLinks(
                     const resolved = await resolveContentRef(contentRef, context);
                     if (resolved?.href) {
                         node.url = resolved.href;
+                    } else {
+                        // We use an absolute URL so that crawler don't follow it.
+                        node.url = `broken://${original.startsWith('/') ? original.slice(1) : original}`
+                    }
+
+                    if (node.title === 'mention') {
+                        // Replace the text for mentions as otherwise it contains the raw ref
+                        if (resolved) {
+                            node.children = [
+                                {
+                                    type: 'text',
+                                    value: resolved.text,
+                                }
+                            ]
+                        } else {
+                            node.children = [
+                                {
+                                    type: 'text',
+                                    value: 'Broken mention'
+                                }
+                            ]
+                        }
+                        node.title = undefined;
                     }
                 })()
             );
         } else {
+            // DEPRECATED: to be removed once rollout for getRevisionPageMarkdown is done
+            //
             // Resolve against the current page’s directory and strip any leading “/” or "../"
             // Sometimes the path can be "../" if we are on the default section
             // but it means we are just at the root of the site.
