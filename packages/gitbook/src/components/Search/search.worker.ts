@@ -74,14 +74,16 @@ function buildLangIndex(pages: RawIndexPage[]): Document<IndexPage> {
     });
 
     for (const page of pages) {
-        index.addAsync({
-            id: page.id,
-            title: page.title,
-            description: page.description ?? null,
-            siteSpaceId: page.siteSpaceId,
-        }).catch(() => {
-            // Ignore indexing errors for individual pages
-        });
+        index
+            .addAsync({
+                id: page.id,
+                title: page.title,
+                description: page.description ?? null,
+                siteSpaceId: page.siteSpaceId,
+            })
+            .catch(() => {
+                // Ignore indexing errors for individual pages
+            });
 
         cachedPageData.set(`${page.siteSpaceId}:${page.id}`, {
             pathname: page.pathname,
