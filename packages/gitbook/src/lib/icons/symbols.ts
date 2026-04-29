@@ -70,12 +70,15 @@ export async function getIconSymbol(style: string, icon: string, symbolId: strin
         return null;
     }
 
+    const symbol = `<symbol id="${escapeAttribute(symbolId)}" viewBox="${escapeAttribute(entry.viewBox)}" overflow="visible">${entry.markup}</symbol>`;
+
     return {
         style,
         icon,
         symbolId,
         viewBox: entry.viewBox,
         markup: entry.markup,
-        symbol: `<symbol id="${escapeAttribute(symbolId)}" viewBox="${escapeAttribute(entry.viewBox)}" overflow="visible">${entry.markup}</symbol>`,
+        symbol,
+        document: `<svg xmlns="http://www.w3.org/2000/svg"><defs>${symbol}</defs><use href="#${escapeAttribute(symbolId)}"/></svg>`,
     };
 }

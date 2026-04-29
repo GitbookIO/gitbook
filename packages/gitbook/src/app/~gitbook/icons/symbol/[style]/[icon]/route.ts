@@ -23,7 +23,7 @@ export async function GET(
         );
     }
 
-    return new NextResponse(symbol.symbol, {
+    return new NextResponse(symbol.document, {
         headers: {
             'content-type': 'image/svg+xml; charset=utf-8',
             'cache-control': 'public, max-age=31536000, immutable',

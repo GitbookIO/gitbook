@@ -38,6 +38,26 @@ function buildSymbolURL(loaderURL: string, style: string, icon: string): string 
     return `${normalizedLoaderURL}/${encodeURIComponent(style)}/${encodeURIComponent(icon)}`;
 }
 
+function appendSymbolsFromDocument(markup: string): boolean {
+    const parsed = new DOMParser().parseFromString(markup, 'image/svg+xml');
+    const symbols = Array.from(parsed.querySelectorAll('symbol'));
+    if (symbols.length === 0) {
+        return false;
+    }
+
+    const spriteRoot = getSpriteRoot();
+    for (const symbol of symbols) {
+        const symbolId = symbol.getAttribute('id');
+        if (!symbolId || hasSymbol(symbolId)) {
+            continue;
+        }
+
+        spriteRoot.appendChild(document.importNode(symbol, true));
+    }
+
+    return true;
+}
+
 async function loadSymbol(symbolId: string, loaderURL: string, style: string, icon: string) {
     if (hasSymbol(symbolId)) {
         return true;
@@ -61,7 +81,10 @@ async function loadSymbol(symbolId: string, loaderURL: string, style: string, ic
                 return true;
             }
 
-            getSpriteRoot().insertAdjacentHTML('beforeend', symbolMarkup);
+            if (!appendSymbolsFromDocument(symbolMarkup)) {
+                return false;
+            }
+
             return hasSymbol(symbolId);
         })
         .catch(() => false)
