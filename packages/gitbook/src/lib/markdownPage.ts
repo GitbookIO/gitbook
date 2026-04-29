@@ -237,6 +237,7 @@ async function rewriteMarkdownLinks(
     const pending: Array<Promise<void>> = [];
 
     visit(tree, 'link', (node: Link) => {
+        const isMention = isMentionLike(node);
         const original = node.url;
 
         console.log('HANDLE', original);
@@ -259,7 +260,7 @@ async function rewriteMarkdownLinks(
                         node.url = `broken://${original.startsWith('/') ? original.slice(1) : original}`
                     }
 
-                    if (node.title === 'mention') {
+                    if (isMention) {
                         // Replace the text for mentions as otherwise it contains the raw ref
                         if (resolved) {
                             node.children = [
@@ -299,4 +300,16 @@ async function rewriteMarkdownLinks(
     }
 
     return tree;
+}
+
+function isMentionLike(node: Link) {
+    if (node.title === 'mention') {
+        return true;
+    }
+
+    const singleText = node.children.length === 1 && node.children[0]?.type === 'text' ? node.children[0] : null;
+    if (!singleText) {
+        return false;
+    }
+    return singleText?.value === node.url;
 }
