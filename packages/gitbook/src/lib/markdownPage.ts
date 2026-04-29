@@ -1,9 +1,12 @@
 import path from 'node:path';
-import type { GitBookAnyContext, GitBookSiteContext } from '@/lib/context';
+import {
+    type GitBookAnyContext,
+    type GitBookSiteContext,
+    fetchSiteContextForSiteSpace,
+} from '@/lib/context';
 import { DataFetcherError, throwIfDataError } from '@/lib/data';
 import type { ResolvedPagePath } from '@/lib/pages';
 import { getIndexablePages } from '@/lib/sitemap';
-import { getFallbackSiteSpacePath } from '@/lib/sites';
 import { getMarkdownForPagesTree } from '@/routes/llms';
 import {
     type RevisionPageDocument,
@@ -78,39 +81,29 @@ export async function getMarkdownForPageInSpace(
     siteSpace: SiteSpace,
     page: RevisionPageDocument | RevisionPageGroup
 ): Promise<string> {
-    const { dataFetcher } = context;
-    const spaceBasePath = getFallbackSiteSpacePath(context, siteSpace);
-    const linker = context.linker.withOtherSiteSpace({
-        spaceBasePath,
-    });
+    const siteSpaceContext = await fetchSiteContextForSiteSpace(context, siteSpace);
 
     // Handle group pages (pages with no content that list their children)
     if (page.type === RevisionPageType.Group) {
-        return renderGroupPageMarkdown({ linker, page });
+        return renderGroupPageMarkdown({ linker: siteSpaceContext.linker, page });
     }
 
     const rawMarkdown = await throwIfDataError(
-        dataFetcher.getRevisionPageMarkdown({
-            spaceId: siteSpace.space.id,
-            revisionId: siteSpace.space.revision,
+        siteSpaceContext.dataFetcher.getRevisionPageMarkdown({
+            spaceId: siteSpaceContext.space.id,
+            revisionId: siteSpaceContext.revisionId,
             pageId: page.id,
         })
     );
 
-    const tree = await fromPageMarkdown(
-        {
-            ...context,
-            linker,
-        },
-        {
-            markdown: rawMarkdown,
-            pagePath: page.path,
-        }
-    );
+    const tree = await fromPageMarkdown(siteSpaceContext, {
+        markdown: rawMarkdown,
+        pagePath: page.path,
+    });
 
     // Handle empty document pages which have children (same as getMarkdownForPage)
     if (isEmptyMarkdownPage(tree) && page.pages.length > 0) {
-        return renderGroupPageMarkdown({ linker, page });
+        return renderGroupPageMarkdown({ linker: siteSpaceContext.linker, page });
     }
 
     return toPageMarkdown(tree);
@@ -255,7 +248,7 @@ async function rewriteMarkdownLinks(
                         node.url = resolved.href;
                     } else {
                         // We use an absolute URL so that crawler don't follow it.
-                        node.url = `broken://${original.startsWith('/') ? original.slice(1) : original}`
+                        node.url = `broken://${original.startsWith('/') ? original.slice(1) : original}`;
                     }
 
                     if (isMention) {
@@ -265,15 +258,15 @@ async function rewriteMarkdownLinks(
                                 {
                                     type: 'text',
                                     value: resolved.text,
-                                }
-                            ]
+                                },
+                            ];
                         } else {
                             node.children = [
                                 {
                                     type: 'text',
-                                    value: 'Broken mention'
-                                }
-                            ]
+                                    value: 'Broken mention',
+                                },
+                            ];
                         }
                         node.title = undefined;
                     }
@@ -305,7 +298,8 @@ function isMentionLike(node: Link) {
         return true;
     }
 
-    const singleText = node.children.length === 1 && node.children[0]?.type === 'text' ? node.children[0] : null;
+    const singleText =
+        node.children.length === 1 && node.children[0]?.type === 'text' ? node.children[0] : null;
     if (!singleText) {
         return false;
     }

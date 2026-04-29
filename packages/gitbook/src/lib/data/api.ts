@@ -10,9 +10,9 @@ import { getCacheTag, getComputedContentSourceCacheTags } from '@gitbook/cache-t
 import { parse as parseCacheControl } from '@tusbar/cache-control';
 import { cacheLife, cacheTag } from 'next/cache';
 import { cache } from '../cache';
+import { isRollout } from '../rollout';
 import { DataFetcherError, wrapCacheDataFetcherError } from './errors';
 import type { GitBookDataFetcher } from './types';
-import { isRollout } from '../rollout';
 
 interface DataFetcherInput {
     /**
@@ -88,15 +88,17 @@ export function createDataFetcher(
             });
         },
         getRevisionPageMarkdown(params) {
-            if (isRollout({
-                discriminator: params.spaceId,
-                percentageRollout: 20
-            })) {
+            if (
+                isRollout({
+                    discriminator: params.spaceId,
+                    percentageRollout: 20,
+                })
+            ) {
                 return getRevisionPageMarkdown(input, {
                     spaceId: params.spaceId,
                     revisionId: params.revisionId,
                     pageId: params.pageId,
-                }); 
+                });
             }
             return getRevisionPageMarkdownV1(input, {
                 spaceId: params.spaceId,
@@ -355,7 +357,6 @@ const getRevisionPageMarkdownV1 = cache(
     }
 );
 
-
 const getRevisionPageMarkdown = cache(
     async (
         input: DataFetcherInput,
@@ -373,7 +374,7 @@ const getRevisionPageMarkdown = cache(
                         params.pageId,
                         {
                             format: 'markdown',
-                            "format.markdown.refs": 'stable',
+                            'format.markdown.refs': 'stable',
                         },
                         {
                             ...noCacheFetchOptions,

@@ -45,18 +45,14 @@ describe('markdown pages', () => {
 
     it('should rewrite links to markdown URLs', async () => {
         const response = await fetch(
-            getContentTestURL(
-                'https://gitbook.gitbook.io/test-gitbook-open/blocks/links.md'
-            )
+            getContentTestURL('https://gitbook.gitbook.io/test-gitbook-open/blocks/links.md')
         );
         const text = await response.text();
 
         expect(response.status).toBe(200);
         expect(response.headers.get('content-type')).toContain('text/markdown');
         expect(response.headers.get('x-robots-tag')).toBe('noindex');
-        expect(text).toContain(
-            'gitbook.gitbook.io/test-gitbook-open/text-page.md'
-        );
+        expect(text).toContain('gitbook.gitbook.io/test-gitbook-open/text-page.md');
     });
 });
 

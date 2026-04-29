@@ -71,6 +71,29 @@ describe('llms-full.txt', () => {
         expect(await response.text()).toContain('# Welcome');
     });
 
+    it(
+        'should expose cross-space pages from a multi-version site',
+        async () => {
+            const response = await fetch(
+                getContentTestURL(
+                    'https://gitbook-open-e2e-sites.gitbook.io/api-multi-versions-share-links/8tNo6MeXg7CkFMzSSz81/llms-full.txt'
+                )
+            );
+            const text = await response.text();
+
+            expect(response.status).toBe(200);
+            expect(response.headers.get('content-type')).toContain('text/markdown');
+            expect(text).toContain(
+                'gitbook-open-e2e-sites.gitbook.io/api-multi-versions-share-links/8tNo6MeXg7CkFMzSSz81/2.0/quick-start'
+            );
+            expect(text).toContain(
+                'gitbook-open-e2e-sites.gitbook.io/api-multi-versions-share-links/8tNo6MeXg7CkFMzSSz81/3.0/other-page'
+            );
+            expect(text).not.toContain('broken://');
+        },
+        { timeout: 30_000 }
+    );
+
     it('should expose a llms-full.txt file with the accept header', async () => {
         const response = await fetch(
             getContentTestURL('https://gitbook.gitbook.io/test-gitbook-open/llms-full.txt'),
