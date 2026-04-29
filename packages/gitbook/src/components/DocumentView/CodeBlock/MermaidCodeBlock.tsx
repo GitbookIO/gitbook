@@ -101,7 +101,11 @@ export function MermaidCodeBlock(props: ClientBlockProps) {
     }
 
     return (
-        <div ref={rootRef} className={tcls('relative', style)} contentEditable={false}>
+        <div
+            ref={rootRef}
+            className={tcls('group/mermaid relative', style)}
+            contentEditable={false}
+        >
             <div
                 ref={wrapperRef}
                 className={
