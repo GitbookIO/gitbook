@@ -2,6 +2,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import url from 'node:url';
 
+import { allStyles, collectNormalizedIconAssets, createMetricsManifest } from './icon-assets.js';
 import { getKitPath } from './kit.js';
 
 /**
@@ -12,6 +13,7 @@ async function main() {
     const icons = JSON.parse(
         await fs.readFile(path.join(source, 'metadata/icon-families.json'), 'utf8')
     );
+    const normalizedIconAssets = await collectNormalizedIconAssets(source, allStyles);
 
     // Only these families have exceptions
     const potentialOnly = ['brands', 'custom-icons'];
@@ -53,6 +55,7 @@ async function main() {
     await Promise.all([
         writeDataFile('styles-map', JSON.stringify(onlyStyles, null, 2)),
         writeDataFile('icons', JSON.stringify(result, null, 2)),
+        writeDataFile('metrics', JSON.stringify(createMetricsManifest(normalizedIconAssets))),
     ]);
 
     // biome-ignore lint/suspicious/noConsole: We want the CLI to log

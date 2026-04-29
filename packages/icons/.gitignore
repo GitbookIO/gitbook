@@ -1,2 +1,4 @@
 dist/
 src/data/*.json
+!src/data/metrics.json
+public/
