@@ -18,10 +18,14 @@ export default function AIChatSuggestedQuestions(props: {
         tString(language, 'ai_chat_suggested_questions_read_next'),
         tString(language, 'ai_chat_suggested_questions_example'),
     ];
+    const baseSuggestions =
+        configuredSuggestions && configuredSuggestions.length > 0
+            ? configuredSuggestions
+            : defaultSuggestions;
 
     const suggestions = [
         ...recentQueries.filter((entry) => entry.action === 'ask').map((entry) => entry.query),
-        ...(configuredSuggestions ?? defaultSuggestions),
+        ...baseSuggestions,
     ].reduce<string[]>((acc, suggestion) => {
         if (acc.includes(suggestion)) {
             return acc;

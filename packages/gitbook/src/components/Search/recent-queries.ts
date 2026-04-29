@@ -22,6 +22,7 @@ const EMPTY_RECENT_QUERIES_STATE: RecentQueriesState = {};
 
 let globalRecentQueriesState = EMPTY_RECENT_QUERIES_STATE;
 let hasStorageListener = false;
+let hasLoadedRecentQueriesState = false;
 
 function parseRecentSearchQueryEntry(value: unknown): RecentSearchQueryEntry | null {
     if (
@@ -88,6 +89,15 @@ function readRecentQueriesState(): RecentQueriesState {
     return sanitizeState(getLocalStorageItem<unknown>(STORAGE_KEY, {}));
 }
 
+function ensureRecentQueriesStateLoaded() {
+    if (typeof window === 'undefined' || hasLoadedRecentQueriesState) {
+        return;
+    }
+
+    globalRecentQueriesState = readRecentQueriesState();
+    hasLoadedRecentQueriesState = true;
+}
+
 function emitChange() {
     listeners.forEach((listener) => listener());
 }
@@ -97,10 +107,11 @@ function ensureStorageListener() {
         return;
     }
 
-    globalRecentQueriesState = readRecentQueriesState();
+    ensureRecentQueriesStateLoaded();
 
     window.addEventListener('storage', () => {
         globalRecentQueriesState = readRecentQueriesState();
+        hasLoadedRecentQueriesState = true;
         emitChange();
     });
     hasStorageListener = true;
@@ -121,6 +132,8 @@ export function addRecentSearchQuery(
     if (!siteSpaceId || !normalizedQuery) {
         return;
     }
+
+    ensureRecentQueriesStateLoaded();
 
     const nextQueries: RecentSearchQueryEntry[] = [
         {
