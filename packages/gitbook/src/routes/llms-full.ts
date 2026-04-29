@@ -1,9 +1,12 @@
 import { type GitBookSiteContext, checkIsRootSiteContext } from '@/lib/context';
 import { throwIfDataError } from '@/lib/data';
 import { fromPageMarkdown, toPageMarkdown } from '@/lib/markdownPage';
-import { joinPath } from '@/lib/paths';
 import { getIndexablePages } from '@/lib/sitemap';
-import { filterSiteSpacesByLocale, getSiteStructureSections } from '@/lib/sites';
+import {
+    filterSiteSpacesByLocale,
+    getFallbackSiteSpacePath,
+    getSiteStructureSections,
+} from '@/lib/sites';
 import type { RevisionPageDocument, SiteSection, SiteSpace } from '@gitbook/api';
 import assertNever from 'assert-never';
 import type { Paragraph } from 'mdast';
@@ -63,7 +66,6 @@ async function streamMarkdownFromSiteStructure(
                 context,
                 stream,
                 context.structure.structure,
-                '',
                 offset
             );
             return;
@@ -88,7 +90,6 @@ async function streamMarkdownFromSections(
             context,
             stream,
             siteSection.siteSpaces,
-            siteSection.path,
             offset,
             currentPageIndex
         );
@@ -107,7 +108,6 @@ export async function streamMarkdownFromSiteSpaces(
     context: GitBookSiteContext,
     stream: ReadableStreamDefaultController<Uint8Array>,
     siteSpaces: SiteSpace[],
-    basePath: string,
     offset = 0,
     initialPageIndex = 0
 ): Promise<{ currentPageIndex: number; reachedLimit: boolean }> {
@@ -115,8 +115,7 @@ export async function streamMarkdownFromSiteSpaces(
     let totalPagesProcessed = initialPageIndex;
 
     // Collect all pages first
-    const allPages: Array<{ page: RevisionPageDocument; siteSpace: SiteSpace; basePath: string }> =
-        [];
+    const allPages: Array<{ page: RevisionPageDocument; siteSpace: SiteSpace }> = [];
 
     const filteredSiteSpaces = filterSiteSpacesByLocale(siteSpaces, context.locale);
 
@@ -139,7 +138,6 @@ export async function streamMarkdownFromSiteSpaces(
                 allPages.push({
                     page,
                     siteSpace,
-                    basePath,
                 });
             }
         }
@@ -152,8 +150,8 @@ export async function streamMarkdownFromSiteSpaces(
     // Process the pages
     for await (const markdown of pMapIterable(
         pagesToProcess,
-        async ({ page, siteSpace, basePath }) => {
-            return getMarkdownForPage(context, siteSpace, page, basePath);
+        async ({ page, siteSpace }) => {
+            return getMarkdownForPage(context, siteSpace, page);
         },
         {
             concurrency: MAX_CONCURRENCY,
@@ -181,8 +179,7 @@ export async function streamMarkdownFromSiteSpaces(
 async function getMarkdownForPage(
     context: GitBookSiteContext,
     siteSpace: SiteSpace,
-    page: RevisionPageDocument,
-    basePath: string
+    page: RevisionPageDocument
 ): Promise<string> {
     const { dataFetcher } = context;
 
@@ -197,8 +194,8 @@ async function getMarkdownForPage(
     const tree = await fromPageMarkdown(
         {
             ...context,
-            linker: context.linker.fork({
-                spaceBasePath: joinPath(context.linker.siteBasePath, basePath),
+            linker: context.linker.withOtherSiteSpace({
+                spaceBasePath: getFallbackSiteSpacePath(context, siteSpace),
             }),
         },
         {
