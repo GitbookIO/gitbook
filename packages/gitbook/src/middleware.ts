@@ -3,7 +3,7 @@ import {
     SiteInsightsDisplayContext,
     SiteInsightsLLMSVariant,
 } from '@gitbook/api';
-import { shouldServeMarkdown } from '@vercel/agent-readability';
+import { acceptsMarkdown, isAIAgent, shouldServeMarkdown } from '@vercel/agent-readability';
 import { cookies } from 'next/headers';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
@@ -775,7 +775,11 @@ function encodePathInSiteContent(
         default: {
             // If the pathname is a markdown file or the request is ing markdown,
             // we rewrite it to ~gitbook/markdown/:pathname
-            if (pathname.match(MARKDOWN_PATH_REGEX) || shouldServeMarkdown(request).serve) {
+            const aiAgentDetection = isAIAgent(request);
+            // Using heuristic detection incorrectly detects some legitimate bot requests as AI agents (e.g. Slackbot)
+            // We don't want to serve markdown for these requests as it can cause issues like breaking slack unfurling.
+            const shouldServeMarkdown = (aiAgentDetection.detected && aiAgentDetection.method !== "heuristic") || acceptsMarkdown(request);
+            if (pathname.match(MARKDOWN_PATH_REGEX) || shouldServeMarkdown) {
                 const pagePathWithoutMD = pathname.replace(MARKDOWN_PATH_REGEX, '');
                 const ask = new URL(request.url).searchParams.get('ask');
                 return {

@@ -140,7 +140,7 @@
         "@sindresorhus/fnv1a": "^3.1.0",
         "@tailwindcss/container-queries": "^0.1.1",
         "@tusbar/cache-control": "^1.0.2",
-        "@vercel/agent-readability": "^0.2.1",
+        "@vercel/agent-readability": "^0.4.0",
         "ai": "^4.2.2",
         "assert-never": "catalog:",
         "bidc": "catalog:",
@@ -1724,7 +1724,7 @@
 
     "@upsetjs/venn.js": ["@upsetjs/venn.js@2.0.0", "", { "optionalDependencies": { "d3-selection": "^3.0.0", "d3-transition": "^3.0.1" } }, "sha512-WbBhLrooyePuQ1VZxrJjtLvTc4NVfpOyKx0sKqioq9bX1C1m7Jgykkn8gLrtwumBioXIqam8DLxp88Adbue6Hw=="],
 
-    "@vercel/agent-readability": ["@vercel/agent-readability@0.2.1", "", { "peerDependencies": { "next": ">=14" }, "optionalPeers": ["next"], "bin": { "agent-readability": "dist/cli/index.cjs" } }, "sha512-ShT7BzIS/dwKompii8tm5do+NR1g4xL5M3wM7S01xsH6yuYQ7wiTPZEcmHMFLHCsAQg45/mD0hgrufpS3NVunw=="],
+    "@vercel/agent-readability": ["@vercel/agent-readability@0.4.0", "", { "peerDependencies": { "@sveltejs/kit": ">=2", "h3": ">=1.8 <2", "next": ">=14" }, "optionalPeers": ["@sveltejs/kit", "h3", "next"], "bin": { "agent-readability": "dist/cli/index.cjs" } }, "sha512-+qcRxDEbKKJzRlLqsZUnet63kepr8RikEOlT9pVEru/GNkiSinwZEJxyfUhdUpzav8El2v6DZybpyQuvlynAhQ=="],
 
     "@vercel/backends": ["@vercel/backends@0.0.53", "", { "dependencies": { "@vercel/build-utils": "13.12.0", "@vercel/nft": "1.5.0", "execa": "3.2.0", "fs-extra": "11.1.0", "oxc-transform": "0.111.0", "path-to-regexp": "8.3.0", "resolve.exports": "2.0.3", "rolldown": "1.0.0-rc.1", "srvx": "0.8.9", "tsx": "4.21.0", "zod": "3.22.4" }, "peerDependencies": { "typescript": "^4.0.0 || ^5.0.0" } }, "sha512-f8JK9Jatlco6kT/NsLYVR88iqS7oZxUXzXW8TofLmyTT5o+OEXSY2hzAQSjul6r0qz/9yAhtQkMhcHG8Ne01ZQ=="],
 
