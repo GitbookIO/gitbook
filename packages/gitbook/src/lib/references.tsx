@@ -586,7 +586,7 @@ async function createContextForSpace(
 }
 
 /**
- * When the API outputs markdown, it can sometimes format the content-ref into a strings that can be parsed back.
+ * When the API outputs markdown with `format.markdown.refs: stable`, the content refs are formatted this way.
  */
 export function resolveStringContentRef(src: string): ContentRef | null {
     for (const resolver of Object.values(RESOLVERS)) {
