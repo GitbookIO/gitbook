@@ -119,7 +119,7 @@
     },
     "scripts": {
         "generate": "./scripts/generate.sh",
-        "clean": "rm -rf ./.next && rm -rf ./public/~gitbook/static/icon-symbols && rm -rf ./public/~gitbook/static/icons && rm -rf ./public/~gitbook/static/math",
+        "clean": "rm -rf ./.next && rm -rf ./public/~gitbook/static/icons && rm -rf ./public/~gitbook/static/math",
         "dev": "env-cmd --silent -f ../../.env.local next --webpack",
         "build": "next build --webpack",
         "build:local": "GITBOOK_URL=http://localhost:3000 next build --webpack",
