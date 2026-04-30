@@ -5,7 +5,12 @@ import {
     throwIfDataError,
 } from '@/lib/data';
 import { getLogger } from '@/lib/logger';
-import { getLocalizedTitle, getSiteStructureSections } from '@/lib/sites';
+import {
+    findSiteSpaceBy,
+    getFallbackSiteSpacePath,
+    getLocalizedTitle,
+    getSiteStructureSections,
+} from '@/lib/sites';
 import type {
     ChangeRequest,
     PublishedSiteContent,
@@ -383,6 +388,54 @@ export async function fetchSiteContextByIds(
         contextId: ids.contextId,
         isFallback: ids.isFallback,
         noIndexSearch: ids.noIndexSearch,
+    };
+}
+
+/**
+ * Create a site context scoped to a specific site space.
+ * This keeps the site structure from the current context while resolving content
+ * against the target space revision.
+ */
+export async function fetchSiteContextForSiteSpace(
+    baseContext: GitBookSiteContext,
+    siteSpace: SiteSpace
+): Promise<GitBookSiteContext> {
+    const found = findSiteSpaceBy(baseContext.structure, (entry) => entry.id === siteSpace.id);
+
+    if (!found) {
+        throw new Error(`Site space "${siteSpace.id}" not found in site structure`);
+    }
+
+    const spaceContext = await fetchSpaceContextByIds(baseContext, {
+        space: siteSpace.space.id,
+        shareKey: baseContext.shareKey,
+        changeRequest: undefined,
+        revision: siteSpace.space.revision,
+    });
+
+    const siteSpaces =
+        baseContext.structure.type === 'siteSpaces'
+            ? baseContext.structure.structure
+            : (found.siteSection?.siteSpaces ?? baseContext.siteSpaces);
+
+    return {
+        ...baseContext,
+        ...spaceContext,
+        locale: siteSpace.space.language ?? spaceContext.locale,
+        linker: baseContext.linker.withOtherSiteSpace({
+            spaceBasePath: getFallbackSiteSpacePath(baseContext, siteSpace),
+        }),
+        siteSpace,
+        siteSpaces,
+        visibleSiteSpaces: filterHiddenSiteSpaces(siteSpaces),
+        sections:
+            baseContext.sections && found.siteSection
+                ? { ...baseContext.sections, current: found.siteSection }
+                : baseContext.sections,
+        visibleSections:
+            baseContext.visibleSections && found.siteSection
+                ? { ...baseContext.visibleSections, current: found.siteSection }
+                : baseContext.visibleSections,
     };
 }
 

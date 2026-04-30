@@ -1,7 +1,10 @@
-import { type GitBookSiteContext, checkIsRootSiteContext } from '@/lib/context';
+import {
+    type GitBookSiteContext,
+    checkIsRootSiteContext,
+    fetchSiteContextForSiteSpace,
+} from '@/lib/context';
 import { throwIfDataError } from '@/lib/data';
 import { fromPageMarkdown, toPageMarkdown } from '@/lib/markdownPage';
-import { joinPath } from '@/lib/paths';
 import { getIndexablePages } from '@/lib/sitemap';
 import { filterSiteSpacesByLocale, getSiteStructureSections } from '@/lib/sites';
 import type { RevisionPageDocument, SiteSection, SiteSpace } from '@gitbook/api';
@@ -63,7 +66,6 @@ async function streamMarkdownFromSiteStructure(
                 context,
                 stream,
                 context.structure.structure,
-                '',
                 offset
             );
             return;
@@ -88,7 +90,6 @@ async function streamMarkdownFromSections(
             context,
             stream,
             siteSection.siteSpaces,
-            siteSection.path,
             offset,
             currentPageIndex
         );
@@ -107,16 +108,13 @@ export async function streamMarkdownFromSiteSpaces(
     context: GitBookSiteContext,
     stream: ReadableStreamDefaultController<Uint8Array>,
     siteSpaces: SiteSpace[],
-    basePath: string,
     offset = 0,
     initialPageIndex = 0
 ): Promise<{ currentPageIndex: number; reachedLimit: boolean }> {
-    const { dataFetcher } = context;
     let totalPagesProcessed = initialPageIndex;
 
     // Collect all pages first
-    const allPages: Array<{ page: RevisionPageDocument; siteSpace: SiteSpace; basePath: string }> =
-        [];
+    const allPages: Array<{ context: GitBookSiteContext; page: RevisionPageDocument }> = [];
 
     const filteredSiteSpaces = filterSiteSpacesByLocale(siteSpaces, context.locale);
 
@@ -125,21 +123,15 @@ export async function streamMarkdownFromSiteSpaces(
         if (!siteSpaceUrl) {
             continue;
         }
-        const revision = await throwIfDataError(
-            dataFetcher.getRevision({
-                spaceId: siteSpace.space.id,
-                revisionId: siteSpace.space.revision,
-            })
-        );
-        const pages = getIndexablePages(revision.pages);
+        const siteSpaceContext = await fetchSiteContextForSiteSpace(context, siteSpace);
+        const pages = getIndexablePages(siteSpaceContext.revision.pages);
 
         // Add document pages to our collection
         for (const { page } of pages) {
             if (page.type === 'document') {
                 allPages.push({
+                    context: siteSpaceContext,
                     page,
-                    siteSpace,
-                    basePath,
                 });
             }
         }
@@ -152,8 +144,8 @@ export async function streamMarkdownFromSiteSpaces(
     // Process the pages
     for await (const markdown of pMapIterable(
         pagesToProcess,
-        async ({ page, siteSpace, basePath }) => {
-            return getMarkdownForPage(context, siteSpace, page, basePath);
+        async ({ context: siteSpaceContext, page }) => {
+            return getMarkdownForPage(siteSpaceContext, page);
         },
         {
             concurrency: MAX_CONCURRENCY,
@@ -180,32 +172,22 @@ export async function streamMarkdownFromSiteSpaces(
  */
 async function getMarkdownForPage(
     context: GitBookSiteContext,
-    siteSpace: SiteSpace,
-    page: RevisionPageDocument,
-    basePath: string
+    page: RevisionPageDocument
 ): Promise<string> {
     const { dataFetcher } = context;
 
     const pageMarkdown = await throwIfDataError(
         dataFetcher.getRevisionPageMarkdown({
-            spaceId: siteSpace.space.id,
-            revisionId: siteSpace.space.revision,
+            spaceId: context.space.id,
+            revisionId: context.revisionId,
             pageId: page.id,
         })
     );
 
-    const tree = await fromPageMarkdown(
-        {
-            ...context,
-            linker: context.linker.fork({
-                spaceBasePath: joinPath(context.linker.siteBasePath, basePath),
-            }),
-        },
-        {
-            markdown: pageMarkdown,
-            pagePath: page.path,
-        }
-    );
+    const tree = await fromPageMarkdown(context, {
+        markdown: pageMarkdown,
+        pagePath: page.path,
+    });
 
     if (page.description) {
         // The first node is the page title as a H1, we insert the description as a paragraph
