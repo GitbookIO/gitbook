@@ -91,7 +91,7 @@ export function createDataFetcher(
             if (
                 isRollout({
                     discriminator: params.spaceId,
-                    percentageRollout: 20,
+                    percentageRollout: 50,
                 })
             ) {
                 return getRevisionPageMarkdown(input, {
