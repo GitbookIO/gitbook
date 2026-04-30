@@ -40,7 +40,7 @@ describe('Icon', () => {
                 assetsURL="https://icons.example.test"
                 iconStyle={IconStyle.Regular}
                 renderMode="symbol"
-                symbolLoaderURL="/~gitbook/static/icon-symbols"
+                symbolLoaderURL="/~gitbook/icons/symbol"
             >
                 <>
                     <Icon icon="github" />

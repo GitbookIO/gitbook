@@ -1,17 +1,19 @@
 import 'server-only';
 
 import { getAssetURL } from '@/lib/assets';
-import { GITBOOK_RUNTIME } from '@/lib/env';
-import { joinPath } from '@/lib/paths';
+import { GITBOOK_ICONS_TOKEN, GITBOOK_ICONS_URL } from '@/lib/env';
+import { joinPath, joinPathWithBaseURL } from '@/lib/paths';
+
+const ICON_ASSET_VERSION = '2';
+const rawSvgPromises = new Map<string, Promise<string | null>>();
+const svgPattern = /<svg\b([^>]*)>([\s\S]*?)<\/svg>\s*$/i;
+const viewBoxPattern = /\bviewBox="([^"]+)"/i;
+const commentPattern = /<!--[\s\S]*?-->/g;
 
 interface IconSymbolSource {
     viewBox: string;
     markup: string;
 }
-
-const symbolSources = new Map<string, Promise<IconSymbolSource | null>>();
-const symbolPattern = /<symbol\b([^>]*)>([\s\S]*?)<\/symbol>/i;
-const viewBoxPattern = /\bviewBox="([^"]+)"/i;
 
 function escapeAttribute(value: string): string {
     return value
@@ -21,11 +23,49 @@ function escapeAttribute(value: string): string {
         .replaceAll('>', '&gt;');
 }
 
-/**
- * Build the path to a generated static symbol document.
- */
-function getStaticSymbolPath(style: string, icon: string): string {
-    return joinPath('icon-symbols', style, `${icon}.svg`);
+function getIconAssetBaseURL(style: string): string {
+    if (style === 'custom-icons') {
+        return getAssetURL('icons');
+    }
+
+    return GITBOOK_ICONS_URL;
+}
+
+function getIconAssetURL(style: string, icon: string): string {
+    const url = new URL(
+        joinPathWithBaseURL(getIconAssetBaseURL(style), joinPath('svgs', style, `${icon}.svg`))
+    );
+    url.searchParams.set('v', ICON_ASSET_VERSION);
+
+    if (style !== 'custom-icons' && GITBOOK_ICONS_TOKEN) {
+        url.searchParams.set('token', GITBOOK_ICONS_TOKEN);
+    }
+
+    return url.toString();
+}
+
+function parseRawSVG(document: string): IconSymbolSource | null {
+    const svgMatch = document.match(svgPattern);
+    if (!svgMatch) {
+        return null;
+    }
+
+    const svgAttributes = svgMatch[1];
+    const rawMarkup = svgMatch[2];
+    if (!svgAttributes || rawMarkup === undefined) {
+        return null;
+    }
+
+    const viewBoxMatch = svgAttributes.match(viewBoxPattern);
+    const viewBox = viewBoxMatch?.[1];
+    if (!viewBox) {
+        return null;
+    }
+
+    return {
+        viewBox,
+        markup: rawMarkup.replace(commentPattern, '').trim(),
+    };
 }
 
 function buildSymbolMarkup(symbolId: string, viewBox: string, markup: string) {
@@ -36,100 +76,40 @@ function buildSymbolDocument(symbolId: string, symbol: string) {
     return `<svg xmlns="http://www.w3.org/2000/svg"><defs>${symbol}</defs><use href="#${escapeAttribute(symbolId)}"/></svg>`;
 }
 
-function parseSymbolDocument(document: string): IconSymbolSource | null {
-    const symbolMatch = document.match(symbolPattern);
-    if (!symbolMatch) {
-        return null;
-    }
-
-    const symbolAttributes = symbolMatch[1];
-    const rawMarkup = symbolMatch[2];
-    if (!symbolAttributes || rawMarkup === undefined) {
-        return null;
-    }
-
-    const viewBoxMatch = symbolAttributes.match(viewBoxPattern);
-    if (!viewBoxMatch) {
-        return null;
-    }
-    const viewBox = viewBoxMatch[1];
-    if (!viewBox) {
-        return null;
-    }
-
-    return {
-        viewBox,
-        markup: rawMarkup.trim(),
-    };
-}
-
-async function readLocalSymbolDocument(style: string, icon: string): Promise<string | null> {
-    const [{ readFile }, path] = await Promise.all([
-        import('node:fs/promises'),
-        import('node:path'),
-    ]);
-
-    try {
-        return await readFile(
-            path.resolve(
-                process.cwd(),
-                'public',
-                '~gitbook',
-                'static',
-                'icon-symbols',
-                style,
-                `${icon}.svg`
-            ),
-            'utf8'
-        );
-    } catch {
-        return null;
-    }
-}
-
-async function fetchSymbolDocument(style: string, icon: string): Promise<string | null> {
-    try {
-        const response = await fetch(getAssetURL(getStaticSymbolPath(style, icon)));
-        if (!response.ok) {
-            return null;
-        }
-
-        return response.text();
-    } catch {
-        return null;
-    }
-}
-
-async function loadSymbolSource(style: string, icon: string): Promise<IconSymbolSource | null> {
+async function fetchRawSVG(style: string, icon: string): Promise<string | null> {
     const cacheKey = `${style}/${icon}`;
-    const existing = symbolSources.get(cacheKey);
+    const existing = rawSvgPromises.get(cacheKey);
     if (existing) {
         return existing;
     }
 
-    const sourcePromise = (async () => {
-        const document =
-            (GITBOOK_RUNTIME === 'cloudflare'
-                ? null
-                : await readLocalSymbolDocument(style, icon)) ??
-            (await fetchSymbolDocument(style, icon));
-        if (!document) {
-            return null;
-        }
+    const request = fetch(getIconAssetURL(style, icon), {
+        cache: 'force-cache',
+    })
+        .then(async (response) => {
+            if (!response.ok) {
+                return null;
+            }
 
-        return parseSymbolDocument(document);
-    })();
-    symbolSources.set(cacheKey, sourcePromise);
+            return response.text();
+        })
+        .catch(() => null);
 
-    return sourcePromise;
+    rawSvgPromises.set(cacheKey, request);
+    return request;
 }
 
 /**
- * Resolve one icon entry from the generated static symbol assets and serialize it for sprite
- * injection or lazy-loading.
+ * Resolve one icon entry from the raw SVG source and serialize it for sprite injection or
+ * same-origin lazy loading.
  */
 export async function getIconSymbol(style: string, icon: string, symbolId: string) {
-    const source = await loadSymbolSource(style, icon);
+    const rawSVG = await fetchRawSVG(style, icon);
+    if (!rawSVG) {
+        return null;
+    }
+
+    const source = parseRawSVG(rawSVG);
     if (!source) {
         return null;
     }

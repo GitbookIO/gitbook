@@ -199,7 +199,7 @@ export async function CustomizationRootLayout(props: {
                         },
                     }}
                     renderMode="symbol"
-                    symbolLoaderURL="/~gitbook/static/icon-symbols"
+                    symbolLoaderURL="/~gitbook/icons/symbol"
                     iconStyle={iconStyle}
                 >
                     <RootLayoutClientContexts language={language}>

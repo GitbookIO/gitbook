@@ -118,7 +118,6 @@
         "rss-parser": "^3.13.0"
     },
     "scripts": {
-        "generate:icon-symbols": "node ./scripts/generate-icon-symbols.js",
         "generate": "./scripts/generate.sh",
         "clean": "rm -rf ./.next && rm -rf ./public/~gitbook/static/icon-symbols && rm -rf ./public/~gitbook/static/icons && rm -rf ./public/~gitbook/static/math",
         "dev": "env-cmd --silent -f ../../.env.local next --webpack",

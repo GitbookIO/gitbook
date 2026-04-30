@@ -5,7 +5,6 @@ set -o pipefail
 
 # Copy the assets
 gitbook-icons ./public/~gitbook/static/icons custom-icons
-bun run generate:icon-symbols
 gitbook-math ./public/~gitbook/static/math
 cp -r ../embed/standalone/ ./public/~gitbook/static/embed
 
