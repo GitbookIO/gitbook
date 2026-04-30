@@ -433,6 +433,11 @@ export async function waitForIcons(page: Page) {
                 return true;
             }
 
+            const svgSymbol = icon.querySelector('[data-testid="symbol-use"]');
+            if (svgSymbol) {
+                return icon.dataset.gbIIconSymbolState === 'loaded';
+            }
+
             const state = icon.getAttribute('data-argos-state');
 
             if (state === 'pending') {
@@ -441,11 +446,6 @@ export async function waitForIcons(page: Page) {
 
             if (state === 'loaded') {
                 return true;
-            }
-
-            const svgSymbol = icon.querySelector('[data-testid="symbol-use"]');
-            if (svgSymbol) {
-                return icon.dataset.gbIIconSymbolState === 'loaded';
             }
 
             const maskImage = icon.querySelector('[data-testid="mask-image"]');
