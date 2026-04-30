@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import type { IconRenderMode } from './symbols';
 import { IconStyle } from './types';
 
 const version = 2;
@@ -17,10 +18,15 @@ export type IconsContextType = Partial<IconsAssetsLocation> & {
     assetsByStyles?: Record<string, IconsAssetsLocation>;
     /** Current default style for icons */
     iconStyle: IconStyle;
+    /** Rendering strategy for icons */
+    renderMode: IconRenderMode;
+    /** Internal route used to lazily load symbols introduced after hydration */
+    symbolLoaderURL?: string;
 };
 
 const IconsContext = React.createContext<IconsContextType>({
     iconStyle: IconStyle.Regular,
+    renderMode: 'mask',
 });
 
 /**
@@ -34,10 +40,17 @@ export function IconsProvider(props: React.PropsWithChildren<Partial<IconsContex
         assetsURLToken = parent.assetsURLToken,
         iconStyle = parent.iconStyle,
         assetsByStyles = parent.assetsByStyles,
+        renderMode = parent.renderMode,
+        symbolLoaderURL = parent.symbolLoaderURL,
     } = props;
-    const value = React.useMemo(() => {
-        return { assetsURL, assetsURLToken, iconStyle, assetsByStyles };
-    }, [assetsURL, assetsURLToken, iconStyle, assetsByStyles]);
+    const value = {
+        assetsURL,
+        assetsURLToken,
+        iconStyle,
+        assetsByStyles,
+        renderMode,
+        symbolLoaderURL,
+    };
 
     return <IconsContext.Provider value={value}>{children}</IconsContext.Provider>;
 }
