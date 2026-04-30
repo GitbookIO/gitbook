@@ -88,3 +88,11 @@ export function getIconAssetURL(context: IconsContextType, style: string, icon: 
     const iconName = typeof icon === 'string' ? icon : String(icon);
     return getAssetURL(location, `svgs/${style}/${iconName}.svg`);
 }
+
+/**
+ * Get the URL for the sprite document of an icon style.
+ */
+export function getIconSpriteAssetURL(context: IconsContextType, style: string): string {
+    const location = context.assetsByStyles?.[style] ?? context;
+    return getAssetURL(location, `sprites/${style}.svg`);
+}

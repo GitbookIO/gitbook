@@ -4,7 +4,6 @@ export interface RegisteredIconSymbol {
     style: string;
     icon: string;
     symbolId: string;
-    assetURL?: string;
 }
 
 const REGISTERED_SYMBOLS_KEY = Symbol.for('gitbook.icons.registeredSymbols');
@@ -63,8 +62,8 @@ export function registerServerIconSymbol(symbol: RegisteredIconSymbol): void {
 }
 
 /**
- * Start fetching a raw SVG asset during SSR so sprite generation can reuse the in-flight or warm
- * request instead of waiting until the end of the render.
+ * Start fetching a server-side icon asset during SSR so sprite generation can reuse the in-flight
+ * or warm request instead of waiting until the end of the render.
  */
 export function prefetchServerIconAsset(assetURL: string): void {
     if (typeof window !== 'undefined') {

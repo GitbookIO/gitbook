@@ -3,7 +3,7 @@
 import * as React from 'react';
 
 import { IconSymbolLoader } from './IconSymbolLoader';
-import { getIconAssetURL, useIcons } from './IconsProvider';
+import { getIconAssetURL, getIconSpriteAssetURL, useIcons } from './IconsProvider';
 import { getIconStyle } from './getIconStyle';
 import { getIconSymbolId, prefetchServerIconAsset, registerServerIconSymbol } from './symbols';
 import type { IconName, IconStyle } from './types';
@@ -56,14 +56,14 @@ export const Icon = React.forwardRef(function Icon(
     const iconInstanceId = React.useId();
     const symbolId = getIconSymbolId(iconStyle, icon);
     const iconAssetURL = getIconAssetURL(context, iconStyle, icon);
+    const iconSpriteAssetURL = getIconSpriteAssetURL(context, iconStyle);
 
     if (context.renderMode === 'symbol') {
-        prefetchServerIconAsset(iconAssetURL);
+        prefetchServerIconAsset(iconSpriteAssetURL);
         registerServerIconSymbol({
             style: iconStyle,
             icon,
             symbolId,
-            assetURL: iconAssetURL,
         });
 
         return (

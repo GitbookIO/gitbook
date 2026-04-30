@@ -6,8 +6,11 @@ import { joinPath, joinPathWithBaseURL } from '@/lib/paths';
 
 const ICON_ASSET_VERSION = '2';
 const rawSvgPromises = new Map<string, Promise<string | null>>();
+const styleSpritePromises = new Map<string, Promise<Map<string, IconSymbolSource> | null>>();
 const svgPattern = /<svg\b([^>]*)>([\s\S]*?)<\/svg>\s*$/i;
+const symbolPattern = /<symbol\b([^>]*)>([\s\S]*?)<\/symbol>/gi;
 const viewBoxPattern = /\bviewBox="([^"]+)"/i;
+const idPattern = /\bid="([^"]+)"/i;
 const commentPattern = /<!--[\s\S]*?-->/g;
 
 interface IconSymbolSource {
@@ -44,6 +47,19 @@ function getIconAssetURL(style: string, icon: string): string {
     return url.toString();
 }
 
+function getStyleSpriteAssetURL(style: string): string {
+    const url = new URL(
+        joinPathWithBaseURL(getIconAssetBaseURL(style), joinPath('sprites', `${style}.svg`))
+    );
+    url.searchParams.set('v', ICON_ASSET_VERSION);
+
+    if (style !== 'custom-icons' && GITBOOK_ICONS_TOKEN) {
+        url.searchParams.set('token', GITBOOK_ICONS_TOKEN);
+    }
+
+    return url.toString();
+}
+
 function parseRawSVG(document: string): IconSymbolSource | null {
     const svgMatch = document.match(svgPattern);
     if (!svgMatch) {
@@ -66,6 +82,35 @@ function parseRawSVG(document: string): IconSymbolSource | null {
         viewBox,
         markup: rawMarkup.replace(commentPattern, '').trim(),
     };
+}
+
+function parseStyleSprite(document: string): Map<string, IconSymbolSource> | null {
+    const symbols = new Map<string, IconSymbolSource>();
+
+    for (const match of document.matchAll(symbolPattern)) {
+        const symbolAttributes = match[1];
+        const rawMarkup = match[2];
+
+        if (!symbolAttributes || rawMarkup === undefined) {
+            continue;
+        }
+
+        const idMatch = symbolAttributes.match(idPattern);
+        const viewBoxMatch = symbolAttributes.match(viewBoxPattern);
+        const icon = idMatch?.[1];
+        const viewBox = viewBoxMatch?.[1];
+
+        if (!icon || !viewBox) {
+            continue;
+        }
+
+        symbols.set(icon, {
+            viewBox,
+            markup: rawMarkup.replace(commentPattern, '').trim(),
+        });
+    }
+
+    return symbols.size > 0 ? symbols : null;
 }
 
 function buildSymbolMarkup(symbolId: string, viewBox: string, markup: string) {
@@ -99,17 +144,45 @@ async function fetchRawSVG(style: string, icon: string): Promise<string | null> 
     return request;
 }
 
+async function fetchStyleSprite(style: string): Promise<Map<string, IconSymbolSource> | null> {
+    const existing = styleSpritePromises.get(style);
+    if (existing) {
+        return existing;
+    }
+
+    const request = fetch(getStyleSpriteAssetURL(style), {
+        cache: 'force-cache',
+    })
+        .then(async (response) => {
+            if (!response.ok) {
+                return null;
+            }
+
+            return parseStyleSprite(await response.text());
+        })
+        .catch(() => null);
+
+    styleSpritePromises.set(style, request);
+    return request;
+}
+
 /**
  * Resolve one icon entry from the raw SVG source and serialize it for sprite injection or
  * same-origin lazy loading.
  */
 export async function getIconSymbol(style: string, icon: string, symbolId: string) {
-    const rawSVG = await fetchRawSVG(style, icon);
-    if (!rawSVG) {
-        return null;
+    const spriteSymbols = await fetchStyleSprite(style);
+    let source = spriteSymbols?.get(icon) ?? null;
+
+    if (!source) {
+        const rawSVG = await fetchRawSVG(style, icon);
+        if (!rawSVG) {
+            return null;
+        }
+
+        source = parseRawSVG(rawSVG);
     }
 
-    const source = parseRawSVG(rawSVG);
     if (!source) {
         return null;
     }
