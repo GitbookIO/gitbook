@@ -1,36 +1,7 @@
 import 'server-only';
 
+import { loaders } from '../../../.generated/icon-symbol-loaders';
 import type { StyleIconSymbolManifest } from './types';
-
-const loaders = {
-    brands: () =>
-        import('../../../.generated/icon-symbols/brands.json', { with: { type: 'json' } }),
-    'custom-icons': () =>
-        import('../../../.generated/icon-symbols/custom-icons.json', {
-            with: { type: 'json' },
-        }),
-    duotone: () =>
-        import('../../../.generated/icon-symbols/duotone.json', { with: { type: 'json' } }),
-    light: () => import('../../../.generated/icon-symbols/light.json', { with: { type: 'json' } }),
-    regular: () =>
-        import('../../../.generated/icon-symbols/regular.json', { with: { type: 'json' } }),
-    'sharp-duotone-solid': () =>
-        import('../../../.generated/icon-symbols/sharp-duotone-solid.json', {
-            with: { type: 'json' },
-        }),
-    'sharp-light': () =>
-        import('../../../.generated/icon-symbols/sharp-light.json', { with: { type: 'json' } }),
-    'sharp-regular': () =>
-        import('../../../.generated/icon-symbols/sharp-regular.json', {
-            with: { type: 'json' },
-        }),
-    'sharp-solid': () =>
-        import('../../../.generated/icon-symbols/sharp-solid.json', { with: { type: 'json' } }),
-    'sharp-thin': () =>
-        import('../../../.generated/icon-symbols/sharp-thin.json', { with: { type: 'json' } }),
-    solid: () => import('../../../.generated/icon-symbols/solid.json', { with: { type: 'json' } }),
-    thin: () => import('../../../.generated/icon-symbols/thin.json', { with: { type: 'json' } }),
-} satisfies Record<string, () => Promise<{ default: StyleIconSymbolManifest }>>;
 
 type SupportedSymbolStyle = keyof typeof loaders;
 
@@ -56,7 +27,7 @@ export async function getIconStyleManifest(style: string): Promise<StyleIconSymb
     }
 
     const manifestPromise: Promise<StyleIconSymbolManifest> = load().then(
-        (module) => module.default
+        (module) => module.default as StyleIconSymbolManifest
     );
     manifestPromises.set(style, manifestPromise);
 

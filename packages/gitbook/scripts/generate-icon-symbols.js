@@ -5,25 +5,28 @@ const path = require('node:path');
 
 const packageJSONPath = require.resolve('@gitbook/fontawesome-pro/package.json');
 const packageRoot = path.dirname(packageJSONPath);
+const supportedStyles = require('../src/lib/icons/supported-styles.json');
 const outputDirectory = path.resolve(__dirname, '../.generated/icon-symbols');
+const loadersModulePath = path.resolve(__dirname, '../.generated/icon-symbol-loaders.ts');
 const metadataPath = path.join(packageRoot, 'icons', 'metadata', 'icons.json');
 
-const supportedStyles = [
-    'brands',
-    'custom-icons',
-    'duotone',
-    'light',
-    'regular',
-    'sharp-duotone-solid',
-    'sharp-light',
-    'sharp-regular',
-    'sharp-solid',
-    'sharp-thin',
-    'solid',
-    'thin',
-];
-
 const symbolPattern = /<symbol id="([^"]+)" viewBox="([^"]+)">([\s\S]*?)<\/symbol>/g;
+
+function generateLoadersModule(styles) {
+    const entries = styles
+        .map((style) => {
+            return `    ${JSON.stringify(style)}: () =>
+        import('./icon-symbols/${style}.json', { with: { type: 'json' } }),`;
+        })
+        .join('\n');
+
+    return `import type { StyleIconSymbolManifest } from '../src/lib/icons/types';
+
+export const loaders = {
+${entries}
+} satisfies Record<string, () => Promise<{ default: StyleIconSymbolManifest }>>;
+`;
+}
 
 async function main() {
     await fs.rm(outputDirectory, { recursive: true, force: true });
@@ -62,6 +65,8 @@ async function main() {
             );
         })
     );
+
+    await fs.writeFile(loadersModulePath, generateLoadersModule(supportedStyles), 'utf8');
 
     // biome-ignore lint/suspicious/noConsole: CLI output is useful when regenerating manifests.
     console.log(`Generated ${supportedStyles.length} icon symbol manifests in ${outputDirectory}`);
