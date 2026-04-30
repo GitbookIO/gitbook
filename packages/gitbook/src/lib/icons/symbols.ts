@@ -15,6 +15,9 @@ function escapeAttribute(value: string): string {
         .replaceAll('>', '&gt;');
 }
 
+/**
+ * Load and memoize the generated symbol manifest for a Font Awesome style.
+ */
 export async function getIconStyleManifest(style: string): Promise<StyleIconSymbolManifest | null> {
     const load = loaders[style as SupportedSymbolStyle];
     if (!load) {
@@ -34,6 +37,10 @@ export async function getIconStyleManifest(style: string): Promise<StyleIconSymb
     return manifestPromise;
 }
 
+/**
+ * Resolve one icon entry from the generated manifest and serialize it for sprite injection or
+ * lazy-loading through the symbol route.
+ */
 export async function getIconSymbol(style: string, icon: string, symbolId: string) {
     const manifest = await getIconStyleManifest(style);
     const entry = manifest?.[icon];

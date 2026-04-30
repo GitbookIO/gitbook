@@ -12,10 +12,11 @@ function sanitizeSymbolFragment(fragment: string): string {
     return fragment.replace(/[^a-zA-Z0-9_-]/g, '-');
 }
 
-export function getIconSymbolId(prefix: string | undefined, style: string, icon: string): string {
-    const basePrefix = prefix ?? 'gb-icon-';
-
-    return `${sanitizeSymbolFragment(basePrefix)}${sanitizeSymbolFragment(style)}-${sanitizeSymbolFragment(icon)}`;
+/**
+ * Build the DOM id used by both SSR-emitted symbols and the lazy symbol loader.
+ */
+export function getIconSymbolId(style: string, icon: string): string {
+    return `gb-icon-${sanitizeSymbolFragment(style)}-${sanitizeSymbolFragment(icon)}`;
 }
 
 function getRegisteredSymbolsStore(): Map<string, RegisteredIconSymbol> {
@@ -36,6 +37,9 @@ function shouldTrackSymbolRegistrations() {
     return typeof window === 'undefined' || typeof runtime.Bun !== 'undefined';
 }
 
+/**
+ * Record a symbol used during server rendering so the app can emit a deduplicated sprite subset.
+ */
 export function registerServerIconSymbol(symbol: RegisteredIconSymbol): void {
     if (!shouldTrackSymbolRegistrations()) {
         return;
@@ -44,10 +48,16 @@ export function registerServerIconSymbol(symbol: RegisteredIconSymbol): void {
     getRegisteredSymbolsStore().set(`${symbol.style}/${symbol.icon}`, symbol);
 }
 
+/**
+ * Return the currently registered server-rendered symbols in insertion order.
+ */
 export function getRegisteredServerIconSymbols(): RegisteredIconSymbol[] {
     return [...getRegisteredSymbolsStore().values()];
 }
 
+/**
+ * Reset the per-request symbol registry after the sprite subset has been emitted.
+ */
 export function clearRegisteredServerIconSymbols(): void {
     getRegisteredSymbolsStore().clear();
 }

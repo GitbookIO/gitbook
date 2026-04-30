@@ -54,7 +54,7 @@ export const Icon = React.forwardRef(function Icon(
     const [iconStyle, icon] = getIconStyle(propIconStyle, propIcon);
     const maskId = React.useId();
     const iconInstanceId = React.useId();
-    const symbolId = getIconSymbolId(context.symbolIdPrefix, iconStyle, icon);
+    const symbolId = getIconSymbolId(iconStyle, icon);
 
     if (context.renderMode === 'symbol') {
         registerServerIconSymbol({

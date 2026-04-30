@@ -20,8 +20,6 @@ export type IconsContextType = Partial<IconsAssetsLocation> & {
     iconStyle: IconStyle;
     /** Rendering strategy for icons */
     renderMode: IconRenderMode;
-    /** Prefix used for inline SVG symbol ids */
-    symbolIdPrefix?: string;
     /** Internal route used to lazily load symbols introduced after hydration */
     symbolLoaderURL?: string;
 };
@@ -43,7 +41,6 @@ export function IconsProvider(props: React.PropsWithChildren<Partial<IconsContex
         iconStyle = parent.iconStyle,
         assetsByStyles = parent.assetsByStyles,
         renderMode = parent.renderMode,
-        symbolIdPrefix = parent.symbolIdPrefix,
         symbolLoaderURL = parent.symbolLoaderURL,
     } = props;
     const value = {
@@ -52,7 +49,6 @@ export function IconsProvider(props: React.PropsWithChildren<Partial<IconsContex
         iconStyle,
         assetsByStyles,
         renderMode,
-        symbolIdPrefix,
         symbolLoaderURL,
     };
 

@@ -118,6 +118,10 @@ function setIconFallbackState(instanceId: string, failed: boolean) {
     icon.setAttribute('data-gb-icon-symbol-state', failed ? 'failed' : 'loaded');
 }
 
+/**
+ * Ensure a symbol referenced by an inline `<use>` exists after hydration, fetching it from the
+ * internal symbol route only when the SSR sprite did not already include it.
+ */
 export function IconSymbolLoader(props: {
     instanceId: string;
     symbolId: string;
