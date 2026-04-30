@@ -12,6 +12,18 @@ describe('llms.txt', () => {
         expect(await response.text()).toContain('# E2E Tests GitBook Open');
     });
 
+    it('should properly format links', async () => {
+        const response = await fetch(
+            getContentTestURL('https://gitbook-open-e2e-sites.gitbook.io/sections/llms.txt')
+        );
+
+        expect(response.status).toBe(200);
+        expect(response.headers.get('content-type')).toContain('text/markdown');
+        const content = await response.text();
+        expect(content).toContain('/sections/sections-3/readme.md');
+        expect(content).toContain('/sections/sections-4/getting-started/quickstart.md');
+    });
+
     it('should expose a llms.txt file with the accept header', async () => {
         const response = await fetch(
             getContentTestURL('https://gitbook.gitbook.io/test-gitbook-open/llms.txt'),
@@ -49,28 +61,59 @@ describe('llms.txt', () => {
 });
 
 describe('llms-full.txt', () => {
-    it('should expose a llms-full.txt file', async () => {
-        const response = await fetch(
-            getContentTestURL('https://gitbook.gitbook.io/test-gitbook-open/llms-full.txt')
-        );
+    it(
+        'should expose a llms-full.txt file',
+        async () => {
+            const response = await fetch(
+                getContentTestURL('https://gitbook.gitbook.io/test-gitbook-open/llms-full.txt')
+            );
 
-        expect(response.status).toBe(200);
-        expect(response.headers.get('content-type')).toContain('text/markdown');
-        expect(await response.text()).toContain('# Welcome');
-    });
+            expect(response.status).toBe(200);
+            expect(response.headers.get('content-type')).toContain('text/markdown');
+            expect(await response.text()).toContain('# Welcome');
+        },
+        { timeout: 30_000 }
+    );
 
-    it('should expose a llms-full.txt file with the accept header', async () => {
-        const response = await fetch(
-            getContentTestURL('https://gitbook.gitbook.io/test-gitbook-open/llms-full.txt'),
-            {
-                headers: {
-                    Accept: 'text/markdown',
-                },
-            }
-        );
+    it(
+        'should expose cross-space pages from a multi-version site',
+        async () => {
+            const response = await fetch(
+                getContentTestURL(
+                    'https://gitbook-open-e2e-sites.gitbook.io/api-multi-versions-share-links/8tNo6MeXg7CkFMzSSz81/llms-full.txt'
+                )
+            );
+            const text = await response.text();
 
-        expect(response.status).toBe(200);
-        expect(response.headers.get('content-type')).toContain('text/markdown');
-        expect(await response.text()).toContain('# Welcome');
-    });
+            expect(response.status).toBe(200);
+            expect(response.headers.get('content-type')).toContain('text/markdown');
+            expect(text).toContain(
+                'gitbook-open-e2e-sites.gitbook.io/api-multi-versions-share-links/8tNo6MeXg7CkFMzSSz81/2.0/quick-start'
+            );
+            expect(text).toContain(
+                'gitbook-open-e2e-sites.gitbook.io/api-multi-versions-share-links/8tNo6MeXg7CkFMzSSz81/3.0/other-page'
+            );
+            expect(text).not.toContain('broken://');
+        },
+        { timeout: 30_000 }
+    );
+
+    it(
+        'should expose a llms-full.txt file with the accept header',
+        async () => {
+            const response = await fetch(
+                getContentTestURL('https://gitbook.gitbook.io/test-gitbook-open/llms-full.txt'),
+                {
+                    headers: {
+                        Accept: 'text/markdown',
+                    },
+                }
+            );
+
+            expect(response.status).toBe(200);
+            expect(response.headers.get('content-type')).toContain('text/markdown');
+            expect(await response.text()).toContain('# Welcome');
+        },
+        { timeout: 30_000 }
+    );
 });

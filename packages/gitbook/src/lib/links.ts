@@ -257,6 +257,9 @@ export function linkerWithAbsoluteURLs(linker: GitBookLinker): GitBookLinker {
 export function linkerWithMarkdownPages(linker: GitBookLinker): GitBookLinker {
     const self: GitBookLinker = {
         ...linker,
+        fork: (override) => linkerWithMarkdownPages(linker.fork(override)),
+        withOtherSiteSpace: (override) =>
+            linkerWithMarkdownPages(linker.withOtherSiteSpace(override)),
         toPathForPage: (input) => {
             return self.toPathForPagePath({
                 path: input.page.path,

@@ -10,6 +10,7 @@ import { getCacheTag, getComputedContentSourceCacheTags } from '@gitbook/cache-t
 import { parse as parseCacheControl } from '@tusbar/cache-control';
 import { cacheLife, cacheTag } from 'next/cache';
 import { cache } from '../cache';
+import { isRollout } from '../rollout';
 import { DataFetcherError, wrapCacheDataFetcherError } from './errors';
 import type { GitBookDataFetcher } from './types';
 
@@ -87,7 +88,19 @@ export function createDataFetcher(
             });
         },
         getRevisionPageMarkdown(params) {
-            return getRevisionPageMarkdown(input, {
+            if (
+                isRollout({
+                    discriminator: params.spaceId,
+                    percentageRollout: 20,
+                })
+            ) {
+                return getRevisionPageMarkdown(input, {
+                    spaceId: params.spaceId,
+                    revisionId: params.revisionId,
+                    pageId: params.pageId,
+                });
+            }
+            return getRevisionPageMarkdownV1(input, {
                 spaceId: params.spaceId,
                 revisionId: params.revisionId,
                 pageId: params.pageId,
@@ -308,6 +321,42 @@ const getRevision = cache(
     }
 );
 
+const getRevisionPageMarkdownV1 = cache(
+    async (
+        input: DataFetcherInput,
+        params: { spaceId: string; revisionId: string; pageId: string }
+    ) => {
+        'use cache: remote';
+        return wrapCacheDataFetcherError(async () => {
+            return trace(
+                `getRevisionPageMarkdown(${params.spaceId}, ${params.revisionId}, ${params.pageId})`,
+                async () => {
+                    const api = apiClient(input);
+                    const res = await api.spaces.getPageInRevisionById(
+                        params.spaceId,
+                        params.revisionId,
+                        params.pageId,
+                        {
+                            format: 'markdown',
+                        },
+                        {
+                            ...noCacheFetchOptions,
+                        }
+                    );
+
+                    cacheTag(...getCacheTagsFromResponse(res));
+                    cacheLife('max');
+
+                    if (!('markdown' in res.data)) {
+                        throw new DataFetcherError('Page is not a document', 404);
+                    }
+                    return res.data.markdown;
+                }
+            );
+        });
+    }
+);
+
 const getRevisionPageMarkdown = cache(
     async (
         input: DataFetcherInput,
@@ -325,6 +374,7 @@ const getRevisionPageMarkdown = cache(
                         params.pageId,
                         {
                             format: 'markdown',
+                            'format.markdown.refs': 'stable',
                         },
                         {
                             ...noCacheFetchOptions,
