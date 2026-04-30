@@ -1,5 +1,7 @@
+import { useCurrentContent } from '@/components/hooks';
 import { tString, useLanguage } from '@/intl/client';
 import type { AIChatController } from '../AI';
+import { useRecentSearchQueries } from '../Search/recent-queries';
 import { Button } from '../primitives';
 
 export default function AIChatSuggestedQuestions(props: {
@@ -7,16 +9,31 @@ export default function AIChatSuggestedQuestions(props: {
     suggestions?: string[];
 }) {
     const language = useLanguage();
-    const { chatController, suggestions: _suggestions } = props;
+    const { siteSpaceId } = useCurrentContent();
+    const recentQueries = useRecentSearchQueries(siteSpaceId ?? '');
+    const { chatController, suggestions: configuredSuggestions } = props;
 
-    const suggestions =
-        _suggestions && _suggestions.length > 0
-            ? _suggestions
-            : [
-                  tString(language, 'ai_chat_suggested_questions_about_this_page'),
-                  tString(language, 'ai_chat_suggested_questions_read_next'),
-                  tString(language, 'ai_chat_suggested_questions_example'),
-              ];
+    const defaultSuggestions = [
+        tString(language, 'ai_chat_suggested_questions_about_this_page'),
+        tString(language, 'ai_chat_suggested_questions_read_next'),
+        tString(language, 'ai_chat_suggested_questions_example'),
+    ];
+    const baseSuggestions =
+        configuredSuggestions && configuredSuggestions.length > 0
+            ? configuredSuggestions
+            : defaultSuggestions;
+
+    const suggestions = [
+        ...recentQueries.filter((entry) => entry.action === 'ask').map((entry) => entry.query),
+        ...baseSuggestions,
+    ].reduce<string[]>((acc, suggestion) => {
+        if (acc.includes(suggestion)) {
+            return acc;
+        }
+
+        acc.push(suggestion);
+        return acc;
+    }, []);
 
     return (
         <div
