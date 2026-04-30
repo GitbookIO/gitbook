@@ -5,7 +5,7 @@ import * as React from 'react';
 import { IconSymbolLoader } from './IconSymbolLoader';
 import { getIconAssetURL, useIcons } from './IconsProvider';
 import { getIconStyle } from './getIconStyle';
-import { getIconSymbolId, registerServerIconSymbol } from './symbols';
+import { getIconSymbolId, prefetchServerIconAsset, registerServerIconSymbol } from './symbols';
 import type { IconName, IconStyle } from './types';
 
 /**
@@ -55,12 +55,15 @@ export const Icon = React.forwardRef(function Icon(
     const maskId = React.useId();
     const iconInstanceId = React.useId();
     const symbolId = getIconSymbolId(iconStyle, icon);
+    const iconAssetURL = getIconAssetURL(context, iconStyle, icon);
 
     if (context.renderMode === 'symbol') {
+        prefetchServerIconAsset(iconAssetURL);
         registerServerIconSymbol({
             style: iconStyle,
             icon,
             symbolId,
+            assetURL: iconAssetURL,
         });
 
         return (
@@ -111,7 +114,7 @@ export const Icon = React.forwardRef(function Icon(
                 >
                     <image
                         data-testid="mask-image"
-                        href={getIconAssetURL(context, iconStyle, icon)}
+                        href={iconAssetURL}
                         width="100%"
                         height="100%"
                         preserveAspectRatio="xMidYMid meet"

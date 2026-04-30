@@ -4,9 +4,11 @@ export interface RegisteredIconSymbol {
     style: string;
     icon: string;
     symbolId: string;
+    assetURL?: string;
 }
 
 const REGISTERED_SYMBOLS_KEY = Symbol.for('gitbook.icons.registeredSymbols');
+const PREFETCHED_ICON_ASSETS_KEY = Symbol.for('gitbook.icons.prefetchedAssets');
 
 function sanitizeSymbolFragment(fragment: string): string {
     return fragment.replace(/[^a-zA-Z0-9_-]/g, '-');
@@ -31,6 +33,18 @@ function getRegisteredSymbolsStore(): Map<string, RegisteredIconSymbol> {
     return store[REGISTERED_SYMBOLS_KEY];
 }
 
+function getPrefetchedAssetsStore(): Map<string, Promise<void>> {
+    const store = globalThis as typeof globalThis & {
+        [PREFETCHED_ICON_ASSETS_KEY]?: Map<string, Promise<void>>;
+    };
+
+    if (!store[PREFETCHED_ICON_ASSETS_KEY]) {
+        store[PREFETCHED_ICON_ASSETS_KEY] = new Map<string, Promise<void>>();
+    }
+
+    return store[PREFETCHED_ICON_ASSETS_KEY];
+}
+
 function shouldTrackSymbolRegistrations() {
     const runtime = globalThis as typeof globalThis & { Bun?: unknown };
 
@@ -46,6 +60,27 @@ export function registerServerIconSymbol(symbol: RegisteredIconSymbol): void {
     }
 
     getRegisteredSymbolsStore().set(`${symbol.style}/${symbol.icon}`, symbol);
+}
+
+/**
+ * Start fetching a raw SVG asset during SSR so sprite generation can reuse the in-flight or warm
+ * request instead of waiting until the end of the render.
+ */
+export function prefetchServerIconAsset(assetURL: string): void {
+    if (typeof window !== 'undefined') {
+        return;
+    }
+
+    const prefetchedAssets = getPrefetchedAssetsStore();
+    if (prefetchedAssets.has(assetURL)) {
+        return;
+    }
+
+    const request = fetch(assetURL, { cache: 'force-cache' })
+        .then(() => undefined)
+        .catch(() => undefined);
+
+    prefetchedAssets.set(assetURL, request);
 }
 
 /**
