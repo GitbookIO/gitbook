@@ -202,10 +202,10 @@ export async function CustomizationRootLayout(props: {
                     symbolLoaderURL="/~gitbook/icons/symbol"
                     iconStyle={iconStyle}
                 >
+                    <IconSpriteDefinitions />
                     <RootLayoutClientContexts language={language}>
                         {children}
                     </RootLayoutClientContexts>
-                    <IconSpriteDefinitions />
                 </IconsProvider>
             </body>
         </html>
