@@ -443,6 +443,11 @@ export async function waitForIcons(page: Page) {
                 return true;
             }
 
+            const svgSymbol = icon.querySelector('[data-testid="symbol-use"]');
+            if (svgSymbol) {
+                return icon.dataset.gbIIconSymbolState === 'loaded';
+            }
+
             const maskImage = icon.querySelector('[data-testid="mask-image"]');
             if (!maskImage) {
                 throw new Error('No mask-image element');

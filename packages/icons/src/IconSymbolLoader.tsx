@@ -5,6 +5,58 @@ import * as React from 'react';
 const SVG_NAMESPACE = 'http://www.w3.org/2000/svg';
 const pendingSymbolLoads = new Map<string, Promise<boolean>>();
 
+/**
+ * Ensure a symbol referenced by an inline `<use>` exists after hydration, fetching it from the
+ * internal symbol route only when the SSR sprite did not already include it.
+ */
+export function IconSymbolLoader(props: {
+    instanceId: string;
+    symbolId: string;
+    style: string;
+    icon: string;
+    loaderURL: string;
+}) {
+    const { instanceId, symbolId, style, icon, loaderURL } = props;
+
+    React.useEffect(() => {
+        let mounted = true;
+
+        if (hasSymbol(symbolId)) {
+            setIconState(instanceId, true);
+            return;
+        }
+
+        loadSymbol(symbolId, loaderURL, style, icon).then((loaded) => {
+            if (!mounted) {
+                return;
+            }
+
+            setIconState(instanceId, loaded);
+        });
+
+        return () => {
+            mounted = false;
+        };
+    }, [icon, instanceId, loaderURL, style, symbolId]);
+
+    return null;
+}
+
+/**
+ * A root SVG element used to host the loaded symbols as a spritesheet. This is used as a reference point for the `<use>` elements in the icons.
+ */
+function getSpriteRoot(): SVGSVGElement {
+    const existing = document.getElementById('gb-icon-sprite-root');
+    if (existing instanceof SVGSVGElement) {
+        return existing;
+    }
+
+    return createSpriteRoot();
+}
+
+/**
+ * Creates the root SVG element for the spritesheet if it doesn't already exist, and appends it to the document body.
+ */
 function createSpriteRoot(): SVGSVGElement {
     const spriteRoot = document.createElementNS(SVG_NAMESPACE, 'svg');
     spriteRoot.setAttribute('id', 'gb-icon-sprite-root');
@@ -17,15 +69,6 @@ function createSpriteRoot(): SVGSVGElement {
     document.body.prepend(spriteRoot);
 
     return spriteRoot;
-}
-
-function getSpriteRoot(): SVGSVGElement {
-    const existing = document.getElementById('gb-icon-sprite-root');
-    if (existing instanceof SVGSVGElement) {
-        return existing;
-    }
-
-    return createSpriteRoot();
 }
 
 function hasSymbol(symbolId: string): boolean {
@@ -96,7 +139,7 @@ async function loadSymbol(symbolId: string, loaderURL: string, style: string, ic
     return request;
 }
 
-function setIconFallbackState(instanceId: string, failed: boolean) {
+function setIconState(instanceId: string, loaded: boolean) {
     const icon = document.querySelector<SVGSVGElement>(
         `svg[data-gb-icon-instance="${instanceId}"]`
     );
@@ -105,52 +148,8 @@ function setIconFallbackState(instanceId: string, failed: boolean) {
     }
 
     const symbolUse = icon.querySelector<SVGUseElement>('[data-testid="symbol-use"]');
-    const fallback = icon.querySelector<SVGRectElement>('[data-testid="mask-fallback"]');
-
     if (symbolUse) {
-        symbolUse.style.display = failed ? 'none' : '';
+        symbolUse.style.display = loaded ? '' : 'none';
     }
-
-    if (fallback) {
-        fallback.style.display = failed ? 'block' : 'none';
-    }
-
-    icon.setAttribute('data-gb-icon-symbol-state', failed ? 'failed' : 'loaded');
-}
-
-/**
- * Ensure a symbol referenced by an inline `<use>` exists after hydration, fetching it from the
- * internal symbol route only when the SSR sprite did not already include it.
- */
-export function IconSymbolLoader(props: {
-    instanceId: string;
-    symbolId: string;
-    style: string;
-    icon: string;
-    loaderURL: string;
-}) {
-    const { instanceId, symbolId, style, icon, loaderURL } = props;
-
-    React.useEffect(() => {
-        let mounted = true;
-
-        if (hasSymbol(symbolId)) {
-            setIconFallbackState(instanceId, false);
-            return;
-        }
-
-        loadSymbol(symbolId, loaderURL, style, icon).then((loaded) => {
-            if (!mounted) {
-                return;
-            }
-
-            setIconFallbackState(instanceId, !loaded);
-        });
-
-        return () => {
-            mounted = false;
-        };
-    }, [icon, instanceId, loaderURL, style, symbolId]);
-
-    return null;
+    icon.setAttribute('data-gb-icon-symbol-state', loaded ? 'loaded' : 'failed');
 }
