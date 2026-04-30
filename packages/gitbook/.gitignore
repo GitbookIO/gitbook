@@ -32,7 +32,6 @@ screenshots/
 # Generated public files
 /public/~gitbook/static/*
 !/public/~gitbook/static/images
-/.generated/
 
 # cloudflare
 .open-next

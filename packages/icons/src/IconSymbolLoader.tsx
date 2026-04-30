@@ -6,8 +6,8 @@ const SVG_NAMESPACE = 'http://www.w3.org/2000/svg';
 const pendingSymbolLoads = new Map<string, Promise<boolean>>();
 
 /**
- * Ensure a symbol referenced by an inline `<use>` exists after hydration, fetching it from the
- * internal symbol route only when the SSR sprite did not already include it.
+ * Ensure a symbol referenced by an inline `<use>` exists after hydration, fetching a static
+ * symbol document only when the SSR sprite did not already include it.
  */
 export function IconSymbolLoader(props: {
     instanceId: string;
@@ -78,7 +78,7 @@ function hasSymbol(symbolId: string): boolean {
 function buildSymbolURL(loaderURL: string, style: string, icon: string): string {
     const normalizedLoaderURL = loaderURL.endsWith('/') ? loaderURL.slice(0, -1) : loaderURL;
 
-    return `${normalizedLoaderURL}/${encodeURIComponent(style)}/${encodeURIComponent(icon)}`;
+    return `${normalizedLoaderURL}/${encodeURIComponent(style)}/${encodeURIComponent(icon)}.svg`;
 }
 
 function appendSymbolsFromDocument(markup: string): boolean {

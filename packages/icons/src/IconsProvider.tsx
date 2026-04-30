@@ -20,7 +20,7 @@ export type IconsContextType = Partial<IconsAssetsLocation> & {
     iconStyle: IconStyle;
     /** Rendering strategy for icons */
     renderMode: IconRenderMode;
-    /** Internal route used to lazily load symbols introduced after hydration */
+    /** Base URL used to lazily load prebuilt symbol documents introduced after hydration */
     symbolLoaderURL?: string;
 };
 
