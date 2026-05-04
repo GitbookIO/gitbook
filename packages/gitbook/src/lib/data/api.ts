@@ -94,15 +94,17 @@ export function createDataFetcher(
             });
         },
         getRevisionPageDocument(params) {
-            return getRevisionPageDocument(input, {
-                spaceId: params.spaceId,
-                revisionId: params.revisionId,
-                pageId: params.pageId,
-            },
-            // This API version is used only to invalidate the cache on breaking changes.
-            // It doesn't actually have to be linked to the API version
-            "0.180"
-        );
+            return getRevisionPageDocument(
+                input,
+                {
+                    spaceId: params.spaceId,
+                    revisionId: params.revisionId,
+                    pageId: params.pageId,
+                },
+                // This API version is used only to invalidate the cache on breaking changes.
+                // It doesn't actually have to be linked to the API version
+                '0.180'
+            );
         },
         getRevisionReusableContentDocument(params) {
             return getRevisionReusableContentDocument(input, {
