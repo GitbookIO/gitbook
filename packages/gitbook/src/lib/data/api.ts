@@ -87,11 +87,17 @@ export function createDataFetcher(
             });
         },
         getRevisionPageMarkdown(params) {
-            return getRevisionPageMarkdown(input, {
-                spaceId: params.spaceId,
-                revisionId: params.revisionId,
-                pageId: params.pageId,
-            });
+            return getRevisionPageMarkdown(
+                input,
+                {
+                    spaceId: params.spaceId,
+                    revisionId: params.revisionId,
+                    pageId: params.pageId,
+                },
+                // This API version is used only to invalidate the cache on breaking changes.
+                // It doesn't actually have to be linked to the API version
+                '0.180'
+            );
         },
         getRevisionPageDocument(params) {
             return getRevisionPageDocument(
@@ -318,7 +324,9 @@ const getRevision = cache(
 const getRevisionPageMarkdown = cache(
     async (
         input: DataFetcherInput,
-        params: { spaceId: string; revisionId: string; pageId: string }
+        params: { spaceId: string; revisionId: string; pageId: string },
+        // used only to bust the cache
+        _apiVersion: string
     ) => {
         'use cache: remote';
         return wrapCacheDataFetcherError(async () => {
