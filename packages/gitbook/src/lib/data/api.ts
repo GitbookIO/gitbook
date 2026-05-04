@@ -94,9 +94,10 @@ export function createDataFetcher(
                     revisionId: params.revisionId,
                     pageId: params.pageId,
                 },
-                // This API version is used only to invalidate the cache on breaking changes.
-                // It doesn't actually have to be linked to the API version
-                '0.180'
+                // We pass the name of the function to distinguish between cache entries
+                // By default Next only uses the arguments, the filename and the position of the function inside the file
+                // By adding a dummy argument with the function name, we can change the order without breaking anything
+                'getRevisionPageMarkdown'
             );
         },
         getRevisionPageDocument(params) {
@@ -326,7 +327,7 @@ const getRevisionPageMarkdown = cache(
         input: DataFetcherInput,
         params: { spaceId: string; revisionId: string; pageId: string },
         // used only to bust the cache
-        _apiVersion: string
+        _functionName: string
     ) => {
         'use cache: remote';
         return wrapCacheDataFetcherError(async () => {
