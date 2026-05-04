@@ -1,4 +1,3 @@
-import { withRegionalCache } from '@opennextjs/cloudflare/overrides/incremental-cache/regional-cache';
 import { GitbookIncrementalCache } from './incrementalCache';
 
 // export default withRegionalCache(new GitbookIncrementalCache(), {
