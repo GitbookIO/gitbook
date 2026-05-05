@@ -10,7 +10,6 @@ import { getCacheTag, getComputedContentSourceCacheTags } from '@gitbook/cache-t
 import { parse as parseCacheControl } from '@tusbar/cache-control';
 import { cacheLife, cacheTag } from 'next/cache';
 import { cache } from '../cache';
-import { isRollout } from '../rollout';
 import { DataFetcherError, wrapCacheDataFetcherError } from './errors';
 import type { GitBookDataFetcher } from './types';
 
@@ -88,30 +87,25 @@ export function createDataFetcher(
             });
         },
         getRevisionPageMarkdown(params) {
-            if (
-                isRollout({
-                    discriminator: params.spaceId,
-                    percentageRollout: 50,
-                })
-            ) {
-                return getRevisionPageMarkdown(input, {
-                    spaceId: params.spaceId,
-                    revisionId: params.revisionId,
-                    pageId: params.pageId,
-                });
-            }
-            return getRevisionPageMarkdownV1(input, {
+            return getRevisionPageMarkdown(input, {
                 spaceId: params.spaceId,
                 revisionId: params.revisionId,
                 pageId: params.pageId,
             });
         },
         getRevisionPageDocument(params) {
-            return getRevisionPageDocument(input, {
-                spaceId: params.spaceId,
-                revisionId: params.revisionId,
-                pageId: params.pageId,
-            });
+            return getRevisionPageDocument(
+                input,
+                {
+                    spaceId: params.spaceId,
+                    revisionId: params.revisionId,
+                    pageId: params.pageId,
+                },
+                // We pass the name of the function to distinguish between cache entries
+                // By default Next only uses the arguments, the filename and the position of the function inside the file
+                // By adding a dummy argument with the function name, we can change the order without breaking anything
+                'getRevisionPageDocument'
+            );
         },
         getRevisionReusableContentDocument(params) {
             return getRevisionReusableContentDocument(input, {
@@ -321,42 +315,6 @@ const getRevision = cache(
     }
 );
 
-const getRevisionPageMarkdownV1 = cache(
-    async (
-        input: DataFetcherInput,
-        params: { spaceId: string; revisionId: string; pageId: string }
-    ) => {
-        'use cache: remote';
-        return wrapCacheDataFetcherError(async () => {
-            return trace(
-                `getRevisionPageMarkdown(${params.spaceId}, ${params.revisionId}, ${params.pageId})`,
-                async () => {
-                    const api = apiClient(input);
-                    const res = await api.spaces.getPageInRevisionById(
-                        params.spaceId,
-                        params.revisionId,
-                        params.pageId,
-                        {
-                            format: 'markdown',
-                        },
-                        {
-                            ...noCacheFetchOptions,
-                        }
-                    );
-
-                    cacheTag(...getCacheTagsFromResponse(res));
-                    cacheLife('max');
-
-                    if (!('markdown' in res.data)) {
-                        throw new DataFetcherError('Page is not a document', 404);
-                    }
-                    return res.data.markdown;
-                }
-            );
-        });
-    }
-);
-
 const getRevisionPageMarkdown = cache(
     async (
         input: DataFetcherInput,
@@ -400,7 +358,9 @@ const getRevisionPageMarkdown = cache(
 const getRevisionPageDocument = cache(
     async (
         input: DataFetcherInput,
-        params: { spaceId: string; revisionId: string; pageId: string }
+        params: { spaceId: string; revisionId: string; pageId: string },
+        // used only to bust the cache
+        _functionName: string
     ) => {
         'use cache: remote';
         return wrapCacheDataFetcherError(async () => {
