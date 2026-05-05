@@ -73,6 +73,7 @@ export const fr = {
     notfound_adaptive:
         'Cette page existe peut-être, mais vous devez peut-être vous connecter pour y accéder.',
     notfound_adaptive_login: 'Se connecter',
+    notfound_goto_home: "Aller à l'accueil",
     unexpected_error_title: 'Erreur inattendue',
     unexpected_error: 'Désolé, une erreur est survenue. Veuillez réessayer plus tard.',
     unexpected_error_retry: 'Réessayer',

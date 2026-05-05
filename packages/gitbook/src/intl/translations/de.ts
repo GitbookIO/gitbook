@@ -75,6 +75,7 @@ export const de = {
     notfound_adaptive:
         'Diese Seite existiert möglicherweise, aber Sie müssen sich eventuell anmelden, um darauf zuzugreifen.',
     notfound_adaptive_login: 'Anmelden',
+    notfound_goto_home: 'Zur Startseite',
     unexpected_error_title: 'Ein Fehler ist aufgetreten',
     unexpected_error:
         'Entschuldigung, ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.',

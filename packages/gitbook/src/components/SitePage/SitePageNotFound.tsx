@@ -10,7 +10,7 @@ import { PreservePageLayout } from '../PageBody/PreservePageLayout';
 import { SiteAuthLoginButton } from '../SiteAuth/SiteAuthLoginLink';
 import { useSiteAdaptiveAuthLoginHref, useSpaceBasePath } from '../SpaceLayout/SpaceLayoutContext';
 import { CurrentPageProvider } from '../hooks';
-import { SuspenseLoadedHint } from '../primitives';
+import { Button, SuspenseLoadedHint } from '../primitives';
 
 /**
  * Component that displays a "page not found" message.
@@ -63,16 +63,21 @@ export function SitePageNotFound() {
                     <p className={tcls('text-base', 'mb-4')}>
                         {t(language, adaptiveAuthLoginHref ? 'notfound_adaptive' : 'notfound')}
                     </p>
-                    {adaptiveAuthLoginHref ? (
-                        <SiteAuthLoginButton
-                            href={adaptiveAuthLoginHref}
-                            variant="primary"
-                            size="medium"
-                            label={t(language, 'notfound_adaptive_login')}
-                        >
-                            {t(language, 'notfound_adaptive_login')}
-                        </SiteAuthLoginButton>
-                    ) : null}
+                    <div className="flex gap-2">
+                        {adaptiveAuthLoginHref ? (
+                            <SiteAuthLoginButton
+                                href={adaptiveAuthLoginHref}
+                                variant="primary"
+                                size="medium"
+                                label={t(language, 'notfound_adaptive_login')}
+                            >
+                                {t(language, 'notfound_adaptive_login')}
+                            </SiteAuthLoginButton>
+                        ) : null}
+                        <Button href={basePath} variant="secondary">
+                            {t(language, 'notfound_goto_home')}
+                        </Button>
+                    </div>
                 </div>
                 <SuspenseLoadedHint />
 
