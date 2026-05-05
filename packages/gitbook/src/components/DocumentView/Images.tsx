@@ -122,7 +122,11 @@ async function ImageBlock(props: {
                         width: getImageDimension(block.data.width, undefined),
                         height: getImageDimension(block.data.height, 'auto'),
                     }}
-                    style={withFrame ? 'rounded-xl' : undefined}
+                    style={
+                        withFrame
+                            ? 'rounded-xl'
+                            : 'circular-corners:rounded-2xl rounded-corners:rounded-sm'
+                    }
                 />
             </Caption>
         </div>
