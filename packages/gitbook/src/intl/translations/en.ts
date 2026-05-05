@@ -72,6 +72,7 @@ export const en = {
     notfound_adaptive_title: 'Page unavailable',
     notfound_adaptive: 'This page may exist, but you may need to log in to access it.',
     notfound_adaptive_login: 'Log in',
+    notfound_goto_home: 'Go to home',
     unexpected_error_title: 'An error occurred',
     unexpected_error: 'Sorry, an unexpected error has occurred. Please try again later.',
     unexpected_error_retry: 'Try again',

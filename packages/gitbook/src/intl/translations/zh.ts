@@ -73,6 +73,7 @@ export const zh: TranslationLanguage = {
     notfound_adaptive_title: '页面无法访问',
     notfound_adaptive: '该页面可能存在，但您可能需要登录后才能访问。',
     notfound_adaptive_login: '登录',
+    notfound_goto_home: '前往首页',
     unexpected_error_title: '发生错误',
     unexpected_error: '抱歉，发生了意外的错误。请稍后再试。',
     unexpected_error_retry: '重试',

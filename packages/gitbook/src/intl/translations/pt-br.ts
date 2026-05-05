@@ -74,6 +74,7 @@ export const pt_br = {
     notfound_adaptive:
         'Esta página pode existir, mas talvez você precise fazer login para acessá-la.',
     notfound_adaptive_login: 'Fazer login',
+    notfound_goto_home: 'Ir para a página inicial',
     unexpected_error_title: 'Aconteceu um erro',
     unexpected_error:
         'Desculpe, aconteceu um erro inesperado. Por favor, tente novamente mais tarde.',

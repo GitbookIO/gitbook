@@ -76,6 +76,7 @@ export const no: TranslationLanguage = {
     notfound_adaptive_title: 'Siden er ikke tilgjengelig',
     notfound_adaptive: 'Denne siden kan finnes, men du må kanskje logge inn for å få tilgang.',
     notfound_adaptive_login: 'Logg inn',
+    notfound_goto_home: 'Gå til forsiden',
     unexpected_error_title: 'En feil oppstod',
     unexpected_error: 'Beklager, en uventet feil har oppstått. Vennligst prøv igjen senere.',
     unexpected_error_retry: 'Prøv igjen',
