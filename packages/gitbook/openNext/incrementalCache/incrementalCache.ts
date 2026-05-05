@@ -29,7 +29,6 @@ export class GitbookIncrementalCache implements IncrementalCache {
         cacheType?: CacheType
     ): Promise<WithLastModified<CacheValue<CacheType>> | null> {
         const cacheKey = this.getR2Key(key, cacheType);
-        console.log(`[GitbookIncrementalCache] Getting cache for key: ${cacheKey}`, key, cacheType);
 
         const r2 = getCloudflareContext().env[BINDING_NAME];
         if (!r2) throw new Error('No R2 bucket');
