@@ -498,6 +498,11 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         response.headers.set('x-gitbook-route-type', routeType);
         response.headers.set('x-gitbook-route-site', siteURLWithoutProtocol);
 
+        // AI related headers
+        // This one is technically useless, but is used by a bunch of scoring systems 
+        // TODO: test if vercel overrides it or does the same as in Next standalone and keep it as is.
+        response.headers.set('vary', 'rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, accept-encoding, accept');
+
         // When we use adaptive content, we want to ensure that the cache is not used at all on the client side.
         // Vercel already set this header, this is needed in OpenNext.
         if (siteURLData.contextId && !siteRequestURL.pathname.endsWith('~gitbook/site-index')) {
