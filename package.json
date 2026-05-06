@@ -6,8 +6,8 @@
     },
     "devDependencies": {
         "@biomejs/biome": "^1.9.4",
-        "@changesets/cli": "^2.30.0",
-        "turbo": "^2.9.6",
+        "@changesets/cli": "^2.31.0",
+        "turbo": "^2.9.9",
         "vercel": "50.37.3"
     },
     "packageManager": "bun@1.3.7",
