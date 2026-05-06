@@ -29,8 +29,7 @@ describe('markdown serving based on user agent', () => {
     it('should NOT serve markdown to Slackbot (heuristic detection only)', async () => {
         const response = await fetch(getContentTestURL(TEST_PAGE_URL), {
             headers: {
-                'User-Agent':
-                    'Slackbot-LinkExpanding 1.0 (+https://api.slack.com/robots)',
+                'User-Agent': 'Slackbot-LinkExpanding 1.0 (+https://api.slack.com/robots)',
             },
         });
 
