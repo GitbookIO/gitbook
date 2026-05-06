@@ -62,8 +62,6 @@ export async function middleware(request: NextRequest) {
     try {
         const requestURL = new URL(request.url);
 
-        console.log('accepts markdown', acceptsMarkdown(request));
-
         // Reject malicious requests
         const rejectResponse = await validateServerActionRequest(request);
         if (rejectResponse) {
@@ -503,7 +501,6 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
 
         // AI related headers
         // This one is technically useless, but is used by a bunch of scoring systems
-        // TODO: test if vercel overrides it or does the same as in Next standalone and keep it as is.
         response.headers.set(
             'vary',
             'rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, accept-encoding, accept'
