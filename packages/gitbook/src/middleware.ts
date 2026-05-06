@@ -3,7 +3,7 @@ import {
     SiteInsightsDisplayContext,
     SiteInsightsLLMSVariant,
 } from '@gitbook/api';
-import { acceptsMarkdown, isAIAgent } from '@vercel/agent-readability';
+import { isAIAgent } from '@vercel/agent-readability';
 import { cookies } from 'next/headers';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
@@ -49,6 +49,7 @@ import {
     serveProxyAnalyticsEvent,
     trackServerInsightsEvents,
 } from './lib/tracking';
+import Negotiator from 'negotiator';
 export const config = {
     matcher: [
         '/((?!_next/static|_next/image|~gitbook/static|~gitbook/revalidate|~gitbook/monitoring|~scalar/proxy).*)',
@@ -60,6 +61,8 @@ type URLWithMode = { url: URL; mode: 'url' | 'url-host' };
 export async function middleware(request: NextRequest) {
     try {
         const requestURL = new URL(request.url);
+
+        console.log('accepts markdown', acceptsMarkdown(request));
 
         // Reject malicious requests
         const rejectResponse = await validateServerActionRequest(request);
@@ -853,4 +856,21 @@ async function writeResponseCookies<R extends NextResponse>(
     });
 
     return response;
+}
+
+function acceptsMarkdown(request: Request): boolean {
+    const acceptHeader = request.headers.get('accept') || '';
+
+    const negotiator = new Negotiator({ headers: { accept: acceptHeader } });
+    const mediaTypes = negotiator.mediaTypes();
+
+    // Media types are in order of preference, so we check if the client has markdown as one of its favorites,
+    // but text/html and */* should take precedence.
+    const markdownIndex = mediaTypes.findIndex(
+        (type) => type === 'text/markdown' || type === 'text/x-markdown'
+    );
+    if (markdownIndex === -1) return false;
+
+    const htmlIndex = mediaTypes.findIndex((type) => type === 'text/html' || type === '*/*');
+    return htmlIndex === -1 || markdownIndex < htmlIndex;
 }
