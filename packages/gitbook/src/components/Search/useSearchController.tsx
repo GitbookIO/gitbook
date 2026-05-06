@@ -7,6 +7,7 @@ import { useAI } from '../AI';
 import { useTrackEvent } from '../Insights';
 import { useBodyLoaded } from '../primitives';
 import type { SearchResultsRef } from './SearchResults';
+import { addRecentSearchQuery } from './recent-queries';
 import type { SearchBaseProps } from './search-props';
 import { useSearchState, useSetSearchState } from './useSearch';
 import { useSearchResults } from './useSearchResults';
@@ -214,6 +215,10 @@ export function useSearchController(props: SearchBaseProps) {
                 return;
             }
 
+            if (assistant.mode === 'search') {
+                addRecentSearchQuery(siteSpace.id, normalizedQuery, 'ask');
+            }
+
             abort();
             assistant.open(normalizedQuery);
             setSearchState({
@@ -223,7 +228,7 @@ export function useSearchController(props: SearchBaseProps) {
                 open: assistant.mode === 'search',
             });
         },
-        [abort, assistants, normalizedQuery, setSearchState, state?.scope]
+        [abort, assistants, normalizedQuery, setSearchState, siteSpace.id, state?.scope]
     );
 
     const askCount = normalizedQuery && !showAsk ? assistants.length : 0;

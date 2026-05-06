@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import React from 'react';
 
 import { useAI } from '@/components/AI';
+import { useCurrentContent } from '@/components/hooks';
 import { t, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
 
@@ -13,17 +14,12 @@ import { SearchPageResultItem } from './SearchPageResultItem';
 import { SearchQuestionResultItem } from './SearchQuestionResultItem';
 import { SearchRecordResultItem } from './SearchRecordResultItem';
 import { SearchResultItem } from './SearchResultItem';
-import type { OrderedComputedResult } from './search-types';
-import type { LocalPageResult } from './useLocalSearchResults';
+import { addRecentSearchQuery } from './recent-queries';
+import type { ResultType } from './useSearchResults';
 
 export interface SearchResultsRef {
     select(): boolean;
 }
-
-type ResultType =
-    | OrderedComputedResult
-    | LocalPageResult
-    | { type: 'recommended-question'; id: string; question: string };
 
 function getResultKey(item: ResultType): string {
     switch (item.type) {
@@ -61,6 +57,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
     const { children, id, query, results, fetching, cursor, error, onResultSelect } = props;
 
     const language = useLanguage();
+    const { siteSpaceId } = useCurrentContent();
     const shouldAnimateResults = !query || fetching;
     const previousCursor = React.useRef<number | null>(cursor);
     const seenResultKeys = React.useRef(new Set<string>());
@@ -183,11 +180,24 @@ export const SearchResults = React.forwardRef(function SearchResults(
                                 const itemKey = getResultKey(item);
                                 const shouldAnimateItem =
                                     shouldAnimateResults || !seenResultKeys.current.has(itemKey);
+                                const handleResultSelect = () => {
+                                    if (
+                                        query &&
+                                        siteSpaceId &&
+                                        (item.type === 'local-page' ||
+                                            item.type === 'page' ||
+                                            item.type === 'record')
+                                    ) {
+                                        addRecentSearchQuery(siteSpaceId, query, 'search');
+                                    }
+
+                                    onResultSelect?.();
+                                };
                                 const resultItemProps = {
                                     'aria-posinset': index + 1,
                                     'aria-setsize': results.length,
                                     id: `${id}-${index}`,
-                                    onClickCapture: () => onResultSelect?.(),
+                                    onClickCapture: handleResultSelect,
                                 };
                                 switch (item.type) {
                                     case 'local-page':
@@ -253,12 +263,9 @@ export const SearchResults = React.forwardRef(function SearchResults(
                                                         refs.current[index] = ref;
                                                     }}
                                                     question={item.question}
+                                                    action={item.action}
                                                     active={index === cursor}
                                                     assistant={primaryAssistant}
-                                                    recommended
-                                                    style={{
-                                                        animationDelay: `${index * 25}ms,${100 + index * 25}ms`,
-                                                    }}
                                                     {...resultItemProps}
                                                 />
                                             </motion.div>

@@ -1,9 +1,11 @@
 'use client';
 
 import type { Assistant } from '@/components/AI';
+import { useCurrentContent } from '@/components/hooks';
 import { t, tString, useLanguage } from '@/intl/client';
 import { KeyboardShortcut } from '../primitives/KeyboardShortcut';
 import { SearchResultItem } from './SearchResultItem';
+import { addRecentSearchQuery } from './recent-queries';
 import { useSearchLink } from './useSearch';
 
 /**
@@ -19,6 +21,7 @@ export function SearchAskBar(props: {
 }) {
     const { query, assistant, active = false, withShortcut = false, onSelect } = props;
     const language = useLanguage();
+    const { siteSpaceId } = useCurrentContent();
     const getSearchLinkProps = useSearchLink();
 
     const linkProps = getSearchLinkProps(
@@ -28,6 +31,9 @@ export function SearchAskBar(props: {
             open: assistant.mode === 'search',
         },
         () => {
+            if (assistant.mode === 'search' && siteSpaceId) {
+                addRecentSearchQuery(siteSpaceId, query, 'ask');
+            }
             onSelect?.();
             assistant.open(query);
         }
