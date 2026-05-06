@@ -126,6 +126,7 @@ export async function serveMarkdown(fn: () => Promise<string>) {
             headers: {
                 'Content-Type': 'text/markdown; charset=utf-8',
                 'X-Robots-Tag': 'noindex',
+                Vary: 'Accept',
             },
         });
     } catch (error) {
@@ -134,6 +135,7 @@ export async function serveMarkdown(fn: () => Promise<string>) {
             status: exposable.code,
             headers: {
                 'Content-Type': 'text/plain; charset=utf-8',
+                Vary: 'Accept',
             },
         });
     }

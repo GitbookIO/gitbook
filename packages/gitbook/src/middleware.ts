@@ -3,7 +3,7 @@ import {
     SiteInsightsDisplayContext,
     SiteInsightsLLMSVariant,
 } from '@gitbook/api';
-import { acceptsMarkdown, isAIAgent } from '@vercel/agent-readability';
+import { isAIAgent } from '@vercel/agent-readability';
 import { cookies } from 'next/headers';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
@@ -44,6 +44,7 @@ import {
 } from '@/lib/visitors';
 import { waitUntil } from '@/lib/waitUntil';
 import { serveResizedImage } from '@/routes/image';
+import Negotiator from 'negotiator';
 import {
     type ServerInsightsEventInput,
     serveProxyAnalyticsEvent,
@@ -498,6 +499,13 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         response.headers.set('x-gitbook-route-type', routeType);
         response.headers.set('x-gitbook-route-site', siteURLWithoutProtocol);
 
+        // AI related headers
+        // This one is technically useless, but is used by a bunch of scoring systems
+        response.headers.set(
+            'vary',
+            'rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, accept-encoding, accept'
+        );
+
         // When we use adaptive content, we want to ensure that the cache is not used at all on the client side.
         // Vercel already set this header, this is needed in OpenNext.
         if (siteURLData.contextId && !siteRequestURL.pathname.endsWith('~gitbook/site-index')) {
@@ -848,4 +856,21 @@ async function writeResponseCookies<R extends NextResponse>(
     });
 
     return response;
+}
+
+function acceptsMarkdown(request: Request): boolean {
+    const acceptHeader = request.headers.get('accept') || '';
+
+    const negotiator = new Negotiator({ headers: { accept: acceptHeader } });
+    const mediaTypes = negotiator.mediaTypes();
+
+    // Media types are in order of preference, so we check if the client has markdown as one of its favorites,
+    // but text/html and */* should take precedence.
+    const markdownIndex = mediaTypes.findIndex(
+        (type) => type === 'text/markdown' || type === 'text/x-markdown'
+    );
+    if (markdownIndex === -1) return false;
+
+    const htmlIndex = mediaTypes.findIndex((type) => type === 'text/html' || type === '*/*');
+    return htmlIndex === -1 || markdownIndex < htmlIndex;
 }

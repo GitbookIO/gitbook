@@ -105,6 +105,73 @@ describe('markdown pages', () => {
     });
 });
 
+describe('Accept header content negotiation', () => {
+    const PAGE_URL = getContentTestURL(TEST_PAGE_URL);
+
+    it('should NOT serve markdown for Accept: text/html', async () => {
+        const response = await fetch(PAGE_URL, {
+            headers: { Accept: 'text/html' },
+        });
+
+        expect(response.status).toBe(200);
+        expect(response.headers.get('content-type')).toContain('text/html');
+    });
+
+    it('should NOT serve markdown for Accept: */*', async () => {
+        const response = await fetch(PAGE_URL, {
+            headers: { Accept: '*/*' },
+        });
+
+        expect(response.status).toBe(200);
+        expect(response.headers.get('content-type')).toContain('text/html');
+    });
+
+    it('should NOT serve markdown when text/html is preferred over text/markdown (Accept: text/html, text/markdown)', async () => {
+        const response = await fetch(PAGE_URL, {
+            headers: { Accept: 'text/html, text/markdown' },
+        });
+
+        expect(response.status).toBe(200);
+        expect(response.headers.get('content-type')).toContain('text/html');
+    });
+
+    it('should serve markdown when text/markdown is preferred over text/html (Accept: text/markdown, text/html)', async () => {
+        const response = await fetch(PAGE_URL, {
+            headers: { Accept: 'text/markdown, text/html' },
+        });
+
+        expect(response.status).toBe(200);
+        expect(response.headers.get('content-type')).toContain('text/markdown');
+    });
+
+    it('should serve markdown when text/markdown has a higher q-value (Accept: text/html;q=0.9, text/markdown)', async () => {
+        const response = await fetch(PAGE_URL, {
+            headers: { Accept: 'text/html;q=0.9, text/markdown' },
+        });
+
+        expect(response.status).toBe(200);
+        expect(response.headers.get('content-type')).toContain('text/markdown');
+    });
+
+    it('should NOT serve markdown when text/markdown has a lower q-value (Accept: text/html, text/markdown;q=0.9)', async () => {
+        const response = await fetch(PAGE_URL, {
+            headers: { Accept: 'text/html, text/markdown;q=0.9' },
+        });
+
+        expect(response.status).toBe(200);
+        expect(response.headers.get('content-type')).toContain('text/html');
+    });
+
+    it('should serve markdown for Accept: text/x-markdown', async () => {
+        const response = await fetch(PAGE_URL, {
+            headers: { Accept: 'text/x-markdown' },
+        });
+
+        expect(response.status).toBe(200);
+        expect(response.headers.get('content-type')).toContain('text/markdown');
+    });
+});
+
 describe('markdown ask responses', () => {
     const ASK_QUESTION = 'What is GitBook?';
     const ASK_QUESTION_HEADING = `# ${ASK_QUESTION}`;
