@@ -26,10 +26,11 @@ jobs:
               with:
                   node-version: 22
                   registry-url: 'https://registry.npmjs.org'
+            # Keep npm native here. Enabling the npm Corepack shim inside this
+            # Bun-managed repo makes npm resolution go through Corepack, which
+            # rejects packageManager: bun@... during publish.
             - name: Update npm
-              run: |
-                  corepack enable npm
-                  corepack install -g npm@latest
+              run: npm install -g npm@latest
             - name: Setup Bun
               uses: ./.github/composite/setup-bun
             - name: Install dependencies
