@@ -3,9 +3,10 @@ import { tcls } from '@/lib/tailwind';
 import { Icon } from '@gitbook/icons';
 import { useEffect, useRef } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
-import { useAIChatState } from '../AI/useAIChat';
+import { useAIChatController, useAIChatState } from '../AI/useAIChat';
 import { HoverCard, HoverCardRoot, HoverCardTrigger } from '../primitives';
 import { Input } from '../primitives/Input';
+import { AIChatReferenceChips } from './AIChatReferenceChips';
 
 export function AIChatInput(props: {
     disabled?: boolean;
@@ -19,6 +20,7 @@ export function AIChatInput(props: {
 
     const language = useLanguage();
     const chat = useAIChatState();
+    const chatController = useAIChatController();
 
     const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -76,6 +78,13 @@ export function AIChatInput(props: {
             disabled={disabled || loading || chat.control !== null}
             aria-busy={loading}
             ref={inputRef}
+            header={
+                <AIChatReferenceChips
+                    references={chat.references}
+                    onRemove={chatController.removeReference}
+                    disabled={loading || disabled}
+                />
+            }
             trailing={
                 <HoverCardRoot openDelay={500}>
                     <HoverCard

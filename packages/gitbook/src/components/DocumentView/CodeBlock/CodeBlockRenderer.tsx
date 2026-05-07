@@ -6,6 +6,7 @@ import { tcls } from '@/lib/tailwind';
 
 import { AnnotationPopover } from '../Annotation/AnnotationPopover';
 import type { BlockProps } from '../Block';
+import { AskAICodeButton } from './AskAICodeButton';
 import { CopyCodeButton } from './CopyCodeButton';
 import type { HighlightLine, HighlightTheme, HighlightToken } from './highlight';
 
@@ -39,15 +40,24 @@ export const CodeBlockRenderer = forwardRef(function CodeBlockRenderer(
     return (
         <div
             ref={ref}
+            id={codeId}
             aria-busy={ariaBusy}
             className={tcls(
                 'group/codeblock shiki relative flex shrink flex-col overflow-hidden print:overflow-visible',
+                'circular-corners:rounded-2xl rounded-corners:rounded-xl straight-corners:rounded-xs',
+                '[&:has([data-codeblock-focus]:focus)]:ring-2 [&:has([data-codeblock-focus]:focus)]:ring-primary-hover',
                 style
             )}
             /* Sets the code theme's mode (light or dark) for the site's theme mode (light or dark).
              * Used to style UI elements (scrollbars, form controls) correctly and apply the right default to "plain" code blocks. */
             data-color-scheme={`${theme.themes.light.type} ${theme.themes.dark.type}`}
         >
+            <span
+                data-codeblock-focus
+                tabIndex={-1}
+                aria-hidden
+                className="pointer-events-none absolute size-0 outline-none"
+            />
             <div className="flex items-center justify-start gap-2 text-sm">
                 {title ? (
                     <div
@@ -64,10 +74,10 @@ export const CodeBlockRenderer = forwardRef(function CodeBlockRenderer(
                 ) : null}
             </div>
             <div className="relative">
-                <CopyCodeButton
-                    codeId={codeId}
-                    style="absolute top-2 right-2 z-2 self-start justify-self-end font-sans leading-none opacity-0 backdrop-blur-md group-hover/codeblock:opacity-11"
-                />
+                <div className="absolute top-2 right-2 z-2 flex items-start gap-1.5 font-sans leading-none opacity-0 group-hover/codeblock:opacity-11">
+                    <AskAICodeButton codeId={codeId} title={title} style="backdrop-blur-md" />
+                    <CopyCodeButton codeId={codeId} style="backdrop-blur-md" />
+                </div>
                 <pre
                     className={tcls(
                         'relative overflow-auto border border-tint-subtle bg-tint-subtle theme-bold-tint:bg-tint-base theme-muted:bg-tint-base py-2 text-tint-strong contrast-more:border-tint contrast-more:bg-tint-base print:overflow-visible',
@@ -82,7 +92,6 @@ export const CodeBlockRenderer = forwardRef(function CodeBlockRenderer(
                     }}
                 >
                     <code
-                        id={codeId}
                         className={tcls(
                             'table max-h-full w-fit min-w-full [counter-reset:line] print:max-h-none print:whitespace-pre-wrap',
                             withWrap && 'whitespace-pre-wrap',
