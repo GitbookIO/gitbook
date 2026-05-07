@@ -1,6 +1,8 @@
 import {
     CustomizationThemeMode,
+    type PublishedSiteContent,
     SiteInsightsDisplayContext,
+    type SiteInsightsEventLocation,
     SiteInsightsLLMSVariant,
 } from '@gitbook/api';
 import { isAIAgent } from '@vercel/agent-readability';
@@ -441,7 +443,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
             pathname,
             routeType: routeTypeFromPathname,
             events,
-        } = encodePathInSiteContent(siteURLData.pathname, request);
+        } = encodePathInSiteContent(siteURLData, request);
         routeType = routeTypeFromPathname ?? routeType;
 
         if (events && events.length > 0) {
@@ -680,14 +682,23 @@ const PATH_ALIASES: Record<string, string> = {
  * Special paths are not encoded and passed to be handled by the route handlers.
  */
 function encodePathInSiteContent(
-    rawPathname: string,
+    siteURLData: PublishedSiteContent,
     request: Request
 ): {
     pathname: string;
     routeType?: 'static' | 'dynamic';
     events?: ServerInsightsEventInput[] | undefined;
 } {
-    let pathname = removeLeadingSlash(removeTrailingSlash(rawPathname));
+    let pathname = removeLeadingSlash(removeTrailingSlash(siteURLData.pathname));
+
+    const eventLocation: Partial<SiteInsightsEventLocation> = {
+        siteSection: siteURLData.siteSection,
+        siteSpace: siteURLData.siteSpace,
+        siteShareKey: siteURLData.shareKey,
+        space: siteURLData.space,
+        revision: siteURLData.revision,
+        displayContext: SiteInsightsDisplayContext.Server,
+    };
 
     if (pathname.match(/^~gitbook\/ogimage\/\S+$/)) {
         return { pathname };
@@ -702,9 +713,7 @@ function encodePathInSiteContent(
             events: [
                 {
                     type: 'rss_request',
-                    location: {
-                        displayContext: SiteInsightsDisplayContext.Server,
-                    },
+                    location: eventLocation,
                 },
             ],
         };
@@ -720,6 +729,7 @@ function encodePathInSiteContent(
                     type: 'llms_request',
                     llmsVariant: SiteInsightsLLMSVariant.Full,
                     location: {
+                        siteSection: siteURLData.siteSection,
                         displayContext: SiteInsightsDisplayContext.Server,
                     },
                 },
