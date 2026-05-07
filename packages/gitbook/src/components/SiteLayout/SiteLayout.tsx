@@ -10,7 +10,7 @@ import { LoadIntegrations } from '@/components/Integrations';
 import { SpaceLayout } from '@/components/SpaceLayout';
 import type { VisitorAuthClaims } from '@/lib/adaptive';
 import { buildVersion } from '@/lib/build';
-import { GITBOOK_API_PUBLIC_URL, GITBOOK_ASSETS_URL, GITBOOK_ICONS_URL } from '@/lib/env';
+import { GITBOOK_API_PUBLIC_URL, GITBOOK_ASSETS_URL } from '@/lib/env';
 import { getResizedImageURL } from '@/lib/images';
 import { isSiteIndexable } from '@/lib/seo';
 import { AIContextProvider } from '../AI';
@@ -34,7 +34,6 @@ export async function SiteLayout(props: {
     const scripts = withTracking ? context.scripts : [];
 
     ReactDOM.preconnect(GITBOOK_API_PUBLIC_URL);
-    ReactDOM.preconnect(GITBOOK_ICONS_URL);
     if (GITBOOK_ASSETS_URL) {
         ReactDOM.preconnect(GITBOOK_ASSETS_URL);
     }

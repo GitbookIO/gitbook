@@ -2,8 +2,10 @@
 
 import * as React from 'react';
 
-import { getIconAssetURL, useIcons } from './IconsProvider';
+import { IconSymbolLoader } from './IconSymbolLoader';
+import { getIconAssetURL, getIconSpriteAssetURL, useIcons } from './IconsProvider';
 import { getIconStyle } from './getIconStyle';
+import { getIconSymbolId, prefetchServerIconAsset, registerServerIconSymbol } from './symbols';
 import type { IconName, IconStyle } from './types';
 
 /**
@@ -50,8 +52,47 @@ export const Icon = React.forwardRef(function Icon(
     } = props;
 
     const [iconStyle, icon] = getIconStyle(propIconStyle, propIcon);
-    const url = getIconAssetURL(context, iconStyle, icon);
     const maskId = React.useId();
+    const iconInstanceId = React.useId();
+    const symbolId = getIconSymbolId(iconStyle, icon);
+    const iconAssetURL = getIconAssetURL(context, iconStyle, icon);
+    const iconSpriteAssetURL = getIconSpriteAssetURL(context, iconStyle);
+
+    if (context.renderMode === 'symbol') {
+        prefetchServerIconAsset(iconSpriteAssetURL);
+        registerServerIconSymbol({
+            style: iconStyle,
+            icon,
+            symbolId,
+        });
+
+        return (
+            <svg
+                ref={ref}
+                {...rest}
+                viewBox="0 0 512 512"
+                data-gb-icon-instance={iconInstanceId}
+                style={{
+                    overflow: 'visible',
+                    ...(size ? { width: size, height: size } : {}),
+                    ...rest.style,
+                }}
+                className={`gb-icon ${className}`}
+            >
+                <title>{icon}</title>
+                <use data-testid="symbol-use" href={`#${symbolId}`} width="100%" height="100%" />
+                {context.symbolLoaderURL ? (
+                    <IconSymbolLoader
+                        instanceId={iconInstanceId}
+                        symbolId={symbolId}
+                        style={iconStyle}
+                        icon={icon}
+                        loaderURL={context.symbolLoaderURL}
+                    />
+                ) : null}
+            </svg>
+        );
+    }
 
     return (
         <svg
@@ -73,7 +114,7 @@ export const Icon = React.forwardRef(function Icon(
                 >
                     <image
                         data-testid="mask-image"
-                        href={url}
+                        href={iconAssetURL}
                         width="100%"
                         height="100%"
                         preserveAspectRatio="xMidYMid meet"

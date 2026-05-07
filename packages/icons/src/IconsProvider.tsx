@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import type { IconRenderMode } from './symbols';
 import { IconStyle } from './types';
 
 const version = 2;
@@ -17,10 +18,15 @@ export type IconsContextType = Partial<IconsAssetsLocation> & {
     assetsByStyles?: Record<string, IconsAssetsLocation>;
     /** Current default style for icons */
     iconStyle: IconStyle;
+    /** Rendering strategy for icons */
+    renderMode: IconRenderMode;
+    /** Base URL used to lazily load prebuilt symbol documents introduced after hydration */
+    symbolLoaderURL?: string;
 };
 
 const IconsContext = React.createContext<IconsContextType>({
     iconStyle: IconStyle.Regular,
+    renderMode: 'mask',
 });
 
 /**
@@ -34,10 +40,17 @@ export function IconsProvider(props: React.PropsWithChildren<Partial<IconsContex
         assetsURLToken = parent.assetsURLToken,
         iconStyle = parent.iconStyle,
         assetsByStyles = parent.assetsByStyles,
+        renderMode = parent.renderMode,
+        symbolLoaderURL = parent.symbolLoaderURL,
     } = props;
-    const value = React.useMemo(() => {
-        return { assetsURL, assetsURLToken, iconStyle, assetsByStyles };
-    }, [assetsURL, assetsURLToken, iconStyle, assetsByStyles]);
+    const value = {
+        assetsURL,
+        assetsURLToken,
+        iconStyle,
+        assetsByStyles,
+        renderMode,
+        symbolLoaderURL,
+    };
 
     return <IconsContext.Provider value={value}>{children}</IconsContext.Provider>;
 }
@@ -74,4 +87,12 @@ export function getIconAssetURL(context: IconsContextType, style: string, icon: 
     // Ensure icon is always a string to prevent [object Object]
     const iconName = typeof icon === 'string' ? icon : String(icon);
     return getAssetURL(location, `svgs/${style}/${iconName}.svg`);
+}
+
+/**
+ * Get the URL for the sprite document of an icon style.
+ */
+export function getIconSpriteAssetURL(context: IconsContextType, style: string): string {
+    const location = context.assetsByStyles?.[style] ?? context;
+    return getAssetURL(location, `sprites/${style}.svg`);
 }

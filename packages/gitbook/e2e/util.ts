@@ -146,6 +146,11 @@ export const headerLinks: CustomizationHeaderItem[] = [
     },
 ];
 
+type IconURLState = { state: 'pending'; uri: null } | { state: 'loaded'; uri: string };
+type IconStateWindow = Window & {
+    __ICONS_STATES__?: Record<string, IconURLState>;
+};
+
 export async function waitForCookiesDialog(page: Page) {
     const dialog = page.getByTestId('cookies-dialog');
     await expect(dialog).toBeVisible({
@@ -396,11 +401,9 @@ export function getCustomizationURL(partial: DeepPartial<SiteCustomizationSettin
  */
 export async function waitForIcons(page: Page) {
     await page.waitForFunction(() => {
-        const urlStates: Record<
-            string,
-            { state: 'pending'; uri: null } | { state: 'loaded'; uri: string }
-        > = (window as any).__ICONS_STATES__ || {};
-        (window as any).__ICONS_STATES__ = urlStates;
+        const iconWindow = window as IconStateWindow;
+        const urlStates: Record<string, IconURLState> = iconWindow.__ICONS_STATES__ || {};
+        iconWindow.__ICONS_STATES__ = urlStates;
 
         const fetchSvgAsDataUri = async (url: string): Promise<string> => {
             const response = await fetch(url);
@@ -431,6 +434,20 @@ export async function waitForIcons(page: Page) {
             // Ignore icons that are not visible.
             if (!icon.checkVisibility()) {
                 return true;
+            }
+
+            const svgSymbol = icon.querySelector('[data-testid="symbol-use"]');
+            if (svgSymbol) {
+                if (icon.dataset.gbIconSymbolState === 'loaded') {
+                    return true;
+                }
+
+                const href = svgSymbol.getAttribute('href') ?? svgSymbol.getAttribute('xlink:href');
+                if (!href?.startsWith('#')) {
+                    return false;
+                }
+
+                return document.getElementById(href.slice(1)) instanceof SVGElement;
             }
 
             const state = icon.getAttribute('data-argos-state');
