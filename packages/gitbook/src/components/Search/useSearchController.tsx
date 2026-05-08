@@ -81,7 +81,7 @@ function useSearchKeyboardNavigation(props: {
             } else if (event.key === 'ArrowDown') {
                 event.preventDefault();
                 moveCursorBy(1);
-            } else if (event.key === 'Enter') {
+            } else if (event.key === 'Enter' && !event.nativeEvent.isComposing) {
                 event.preventDefault();
                 if (cursor !== null && cursor >= results.length) {
                     onAskSelect(cursor - results.length);
