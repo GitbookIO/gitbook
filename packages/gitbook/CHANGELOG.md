@@ -1,5 +1,20 @@
 # gitbook
 
+## 0.26.0
+
+### Minor Changes
+
+- d3d5150: Add "Content-Signal" to "robots.txt"
+- 7595706: Allow AI agents to ask questions and get the answer in markdown when fetching with `?ask=<question>`.
+- a17ab65: Support variant selector in hidden section
+
+### Patch Changes
+
+- d1a2958: Skip AI questions when it matches the example provided to agents / crawlers.
+- e3aca9e: Fix embeddable search links
+- 4b78672: Fix links to other spaces/sections in the llms.txt.
+- d1a2958: Pass visitor session to Ask AI.
+
 ## 0.25.1
 
 ### Patch Changes
