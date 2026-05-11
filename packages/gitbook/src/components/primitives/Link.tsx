@@ -95,7 +95,14 @@ export function Link(props: LinkProps) {
     const onClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
         // Only trigger navigation context for internal links in the same window without modifier keys (i.e. open in new tab).
         if (!isExternal && target !== '_blank' && !event.ctrlKey && !event.metaKey) {
-            onNavigationClick(href);
+            if (isAnchor) {
+                event.preventDefault();
+                const resolvedHref = resolveAnchorURL(href, window.location);
+                window.history.pushState(null, '', resolvedHref);
+                onNavigationClick(resolvedHref);
+            } else {
+                onNavigationClick(href);
+            }
         }
 
         const isExternalOnClient = isExternalClient(href);
@@ -108,10 +115,7 @@ export function Link(props: LinkProps) {
 
         // When the page is embedded in an iframe
         // for security reasons other urls cannot be opened.
-        if (isAnchor && !isExternal && target !== '_blank' && !event.ctrlKey && !event.metaKey) {
-            event.preventDefault();
-            window.history.pushState(null, '', resolveAnchorURL(href, window.location));
-        } else if (isInIframe) {
+        if (isInIframe) {
             if (isExternalOnClient || event.ctrlKey || event.metaKey) {
                 event.preventDefault();
                 window.open(toNonEmbedLink(href), '_blank', 'noopener noreferrer');
