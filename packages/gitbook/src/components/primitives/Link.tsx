@@ -4,6 +4,7 @@ import NextLink, { type LinkProps as NextLinkProps } from 'next/link';
 import React from 'react';
 
 import { tcls } from '@/lib/tailwind';
+import { checkIsAnchor, resolveAnchorURL } from '@/lib/urls';
 import { type TrackEventInput, useTrackEvent } from '../Insights';
 import { NavigationStatusContext } from '../hooks';
 import { isExternalLink, toNonEmbedLink } from '../utils/link';
@@ -88,6 +89,7 @@ export function Link(props: LinkProps) {
     const trackEvent = useTrackEvent();
     const forwardedClassNames = useClassnames(classNames || []);
     const isExternal = isExternalServer(href);
+    const isAnchor = checkIsAnchor(href);
     const { target, rel } = getTargetProps(props, { externalTarget, isExternal });
 
     const onClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
@@ -106,7 +108,10 @@ export function Link(props: LinkProps) {
 
         // When the page is embedded in an iframe
         // for security reasons other urls cannot be opened.
-        if (isInIframe) {
+        if (isAnchor && !isExternal && target !== '_blank' && !event.ctrlKey && !event.metaKey) {
+            event.preventDefault();
+            window.history.pushState(null, '', resolveAnchorURL(href, window.location));
+        } else if (isInIframe) {
             if (isExternalOnClient || event.ctrlKey || event.metaKey) {
                 event.preventDefault();
                 window.open(toNonEmbedLink(href), '_blank', 'noopener noreferrer');
