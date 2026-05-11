@@ -425,6 +425,35 @@ html.dark .diff-deleted.highlighted > .highlight-line-number {
     background-color: #67100a !important;
 }
 
+/*
+ * +/- prefix on diff lines so the state is conveyed by more than color (WCAG
+ * 1.4.1). The shift this introduces on diff lines vs. non-diff lines is itself
+ * a redundant visual cue — supports color-blind users twice over. `user-select:
+ * none` keeps the marker out of copy-to-clipboard.
+ */
+.highlight-line.diff-added .highlight-line-content::before,
+.highlight-line.diff-deleted .highlight-line-content::before {
+    display: inline-block;
+    width: 1ch;
+    margin-right: 0.5ch;
+    font-weight: 600;
+    user-select: none;
+}
+.highlight-line.diff-added .highlight-line-content::before {
+    content: "+";
+    color: #247758; /* gbx --green-11 light */
+}
+.highlight-line.diff-deleted .highlight-line-content::before {
+    content: "\2212"; /* U+2212 minus sign — visually clearer than a hyphen */
+    color: #de0000; /* gbx --red-11 light */
+}
+html.dark .highlight-line.diff-added .highlight-line-content::before {
+    color: #6ecea5; /* gbx --green-11 dark */
+}
+html.dark .highlight-line.diff-deleted .highlight-line-content::before {
+    color: #ff9080; /* gbx --red-11 dark */
+}
+
 
 .highlight-line-content {
     @apply table-cell text-sm px-4;

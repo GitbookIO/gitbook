@@ -128,6 +128,13 @@ function CodeHighlightLine(props: {
                 line.diff === 'deleted' && 'diff-deleted',
                 line.highlighted && 'highlighted'
             )}
+            aria-label={
+                line.diff === 'added'
+                    ? 'Added line'
+                    : line.diff === 'deleted'
+                      ? 'Removed line'
+                      : undefined
+            }
             style={lineStyle}
         >
             {withLineNumbers && <span className="highlight-line-number" style={lineStyle} />}
