@@ -114,27 +114,23 @@ function CodeHighlightLine(props: {
     withLineNumbers: boolean;
 }) {
     const { line, isLast, withLineNumbers, bg, fg } = props;
+    const lineStyle = {
+        color: fg?.color,
+        ...fg?.vars,
+        backgroundColor: bg?.color,
+        ...bg?.vars,
+    };
     return (
         <span
-            className={tcls('highlight-line', line.highlighted && 'highlighted')}
-            style={{
-                color: fg?.color,
-                ...fg?.vars,
-                backgroundColor: bg?.color,
-                ...bg?.vars,
-            }}
-        >
-            {withLineNumbers && (
-                <span
-                    className="highlight-line-number"
-                    style={{
-                        color: fg?.color,
-                        ...fg?.vars,
-                        backgroundColor: bg?.color,
-                        ...bg?.vars,
-                    }}
-                />
+            className={tcls(
+                'highlight-line',
+                line.diff === 'added' && 'diff-added',
+                line.diff === 'deleted' && 'diff-deleted',
+                line.highlighted && 'highlighted'
             )}
+            style={lineStyle}
+        >
+            {withLineNumbers && <span className="highlight-line-number" style={lineStyle} />}
             <span className="highlight-line-content">
                 <CodeHighlightTokens tokens={line.tokens} />
                 {!isLast && '\n'}

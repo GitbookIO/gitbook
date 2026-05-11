@@ -3,7 +3,14 @@ import type { CustomizationThemedCodeTheme, DocumentBlockCode } from '@gitbook/a
 import { getNodeText } from '@/lib/document';
 import { bundledThemesInfo } from 'shiki/themes';
 import { customThemes } from './customThemes';
-import type { HighlightTheme, HighlightToken, RenderedInline } from './highlight';
+import {
+    type HighlightTheme,
+    type HighlightToken,
+    type RenderedInline,
+    getHighlightTokensText,
+    parseDiffNotation,
+    truncateHighlightTokens,
+} from './highlight';
 
 /**
  * Parse a code block without highlighting it.
@@ -62,9 +69,14 @@ export function plainHighlight(
                 };
             });
 
+            // Detect diff notation against the built tokens (not the raw nodes)
+            // so any evaluated inline expressions are included in the offset math.
+            const notation = parseDiffNotation(getHighlightTokensText(tokens));
+
             return {
                 highlighted: Boolean(lineBlock.data.highlighted),
-                tokens,
+                diff: notation?.diff ?? null,
+                tokens: notation ? truncateHighlightTokens(tokens, notation.markerStart) : tokens,
             };
         }),
     };
