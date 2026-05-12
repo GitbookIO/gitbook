@@ -34,10 +34,113 @@ export type HighlightTheme = {
     lines: HighlightLine[];
 };
 
+export type LineDiffNotation = 'added' | 'deleted';
+
 export type HighlightLine = {
     highlighted: boolean;
+    diff: LineDiffNotation | null;
     tokens: HighlightToken[];
 };
+
+/**
+ * Detects an in-source diff notation marker at the end of a line, e.g.
+ * `// [!code ++]`, `# [!code --]`, `<!-- [!code ++] -->`, `/* [!code --] *​/`.
+ * Mirror of the gitbook-x parser; keep regex byte-for-byte identical.
+ */
+const NOTATION_PATTERN =
+    /[ \t]*(?:(?:\/\/|#|--|;)\s*\[!code\s+(\+\+|--)\]|<!--\s*\[!code\s+(\+\+|--)\]\s*-->|\/\*\s*\[!code\s+(\+\+|--)\]\s*\*\/)\s*$/;
+
+export function parseDiffNotation(
+    line: string
+): { diff: LineDiffNotation; markerStart: number } | null {
+    const match = NOTATION_PATTERN.exec(line);
+    if (!match) {
+        return null;
+    }
+    const variant = match[1] ?? match[2] ?? match[3];
+    return {
+        diff: variant === '++' ? 'added' : 'deleted',
+        markerStart: match.index,
+    };
+}
+
+/**
+ * Truncate a sequence of HighlightTokens so only the first `maxLen` characters
+ * (counted across all tokens, recursing into annotations) remain. Used to strip
+ * trailing diff-notation markers from rendered output.
+ */
+export function truncateHighlightTokens(
+    tokens: HighlightToken[],
+    maxLen: number
+): HighlightToken[] {
+    const out: HighlightToken[] = [];
+    let remaining = maxLen;
+    for (const token of tokens) {
+        if (remaining <= 0) {
+            break;
+        }
+        const len = highlightTokenLength(token);
+        if (len <= remaining) {
+            out.push(token);
+            remaining -= len;
+            continue;
+        }
+        out.push(sliceHighlightToken(token, remaining));
+        remaining = 0;
+    }
+    return out;
+}
+
+function highlightTokenLength(token: HighlightToken): number {
+    switch (token.type) {
+        case 'plain':
+            return token.content.length;
+        case 'shiki':
+            return token.token.content.length;
+        case 'annotation':
+            return token.children.reduce((acc, child) => acc + highlightTokenLength(child), 0);
+    }
+}
+
+/**
+ * Concatenate the text content of a sequence of HighlightTokens, recursing
+ * into annotation children. Mirror of {@link highlightTokenLength}.
+ */
+export function getHighlightTokensText(tokens: HighlightToken[]): string {
+    return tokens
+        .map((token) => {
+            switch (token.type) {
+                case 'plain':
+                    return token.content;
+                case 'shiki':
+                    return token.token.content;
+                case 'annotation':
+                    return getHighlightTokensText(token.children);
+            }
+        })
+        .join('');
+}
+
+function sliceHighlightToken(token: HighlightToken, maxLen: number): HighlightToken {
+    switch (token.type) {
+        case 'plain':
+            return { type: 'plain', content: token.content.slice(0, maxLen) };
+        case 'shiki': {
+            const inner = token.token as ThemedToken & { start?: number; end?: number };
+            const newContent = inner.content.slice(0, maxLen);
+            const newToken: ThemedToken & { start?: number; end?: number } = {
+                ...inner,
+                content: newContent,
+            };
+            if (typeof inner.start === 'number') {
+                newToken.end = inner.start + newContent.length;
+            }
+            return { type: 'shiki', token: newToken };
+        }
+        case 'annotation':
+            return { ...token, children: truncateHighlightTokens(token.children, maxLen) };
+    }
+}
 
 export type HighlightToken =
     | { type: 'plain'; content: string }
@@ -136,6 +239,9 @@ export async function highlight(
             const lineBlock = block.nodes[index];
             const result: HighlightToken[] = [];
 
+            const lineText = tokens.map((token) => token.content).join('');
+            const notation = parseDiffNotation(lineText);
+
             const eatToken = (): PositionedToken | null => {
                 const token = tokens.shift();
                 if (token) {
@@ -152,9 +258,14 @@ export async function highlight(
 
             currentIndex += 1; // for the \n
 
+            const finalTokens = notation
+                ? truncateHighlightTokens(result, notation.markerStart)
+                : result;
+
             return {
                 highlighted: Boolean(lineBlock?.data.highlighted),
-                tokens: result,
+                diff: notation?.diff ?? null,
+                tokens: finalTokens,
             };
         }),
     };
