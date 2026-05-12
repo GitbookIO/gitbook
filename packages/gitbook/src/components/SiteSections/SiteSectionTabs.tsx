@@ -19,7 +19,7 @@ import type {
 
 const SCREEN_OFFSET = 16; // 1rem
 const MAX_ITEMS_PER_COLUMN = 10; // number of items per column
-const GROUP_MASONRY_THRESHOLD = 6; // if a section group has more than this many child groups, it will be shown in a masonry grid
+const GROUP_MASONRY_THRESHOLD = 5; // if a section group has more than this many child groups, it will be shown in a masonry grid
 
 /**
  * A set of navigational links representing site sections for multi-section sites
@@ -41,6 +41,10 @@ export function SiteSectionTabs(props: {
     const [value, setValue] = React.useState<string | undefined>();
 
     const isMobile = useIsMobile(768);
+    const viewportLeft =
+        !isMobile && offset !== null
+            ? `clamp(${SCREEN_OFFSET}px, calc(${offset}px - var(--radix-navigation-menu-viewport-width, 0px)/2), calc(100% - var(--radix-navigation-menu-viewport-width, 0px) - ${SCREEN_OFFSET}px))`
+            : '0px';
 
     React.useEffect(() => {
         const trigger = currentTriggerRef.current;
@@ -151,12 +155,7 @@ export function SiteSectionTabs(props: {
 
             {children}
 
-            <div
-                className="absolute top-full left-0 z-20 flex w-full"
-                style={{
-                    padding: `0 ${SCREEN_OFFSET}px 0 ${SCREEN_OFFSET}px`,
-                }}
-            >
+            <div className="absolute top-full left-0 z-20 flex w-full">
                 <NavigationMenu.Viewport
                     className={tcls(
                         'relative origin-top overflow-auto circular-corners:rounded-3xl rounded-corners:rounded-xl border border-tint bg-tint-base shadow-lg ease-in-out',
@@ -165,10 +164,8 @@ export function SiteSectionTabs(props: {
                         "[&:not([style*='--radix-navigation-menu-viewport-width'])]:hidden" // The viewport width is only calculated once it's triggered, and can take a while. We hide the viewport until it's ready.
                     )}
                     style={{
-                        translate:
-                            !isMobile && offset
-                                ? `clamp(0px, calc(${offset}px - var(--radix-navigation-menu-viewport-width, 0px)/2), calc(100vw - var(--radix-navigation-menu-viewport-width, 0px) - ${SCREEN_OFFSET * 3}px)) 0 0`
-                                : '0 0 0', // TranslateZ is needed to force a stacking context, fixing a rendering bug on Safari
+                        left: viewportLeft,
+                        translate: '0 0 0', // TranslateZ is needed to force a stacking context, fixing a rendering bug on Safari
                         display: offset === null ? 'none' : undefined,
                     }}
                 />
@@ -222,6 +219,8 @@ function SectionGroupTileList(props: {
 
     const hasSections = sections.length > 0;
     const hasGroups = groups.length > 0;
+    const isMasonryLayout = groups.length > GROUP_MASONRY_THRESHOLD;
+    const masonryColumnCount = Math.min(Math.ceil(groups.length / 2), 4);
 
     return (
         <div className="flex flex-col md:flex-row">
@@ -250,14 +249,22 @@ function SectionGroupTileList(props: {
             {hasGroups && (
                 <ul
                     className={tcls(
-                        'grow gap-x-8 space-y-8 p-3',
-                        groups.length > GROUP_MASONRY_THRESHOLD
-                            ? 'w-screen md:columns-[15rem]'
-                            : 'flex flex-col justify-start md:flex-row md:items-start',
+                        'p-3',
+                        isMasonryLayout
+                            ? 'max-md:space-y-8 md:w-[var(--masonry-width)] md:[column-count:var(--masonry-columns)] md:gap-x-8 md:[&>li]:mb-8'
+                            : 'flex grow flex-col justify-start space-y-8 md:flex-row md:items-start md:gap-8 md:space-y-0',
                         hasSections
                             ? 'border-tint-subtle bg-tint-subtle max-md:border-t md:border-l'
                             : ''
                     )}
+                    style={
+                        isMasonryLayout
+                            ? ({
+                                  '--masonry-columns': String(masonryColumnCount),
+                                  '--masonry-width': `calc(${masonryColumnCount} * 15rem + ${Math.max(masonryColumnCount - 1, 0)} * 2rem)`,
+                              } as React.CSSProperties)
+                            : undefined
+                    }
                 >
                     {groups.map((group) => (
                         <SectionGroupTile
