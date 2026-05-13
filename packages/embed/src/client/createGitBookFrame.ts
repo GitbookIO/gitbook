@@ -44,6 +44,16 @@ export function createGitBookFrame(iframe: HTMLIFrameElement): GitBookFrameClien
     if (!iframe.contentWindow) {
         throw new Error('Iframe must have a content window');
     }
+
+    const allowTokens = iframe.allow
+        .split(';')
+        .map((token) => token.trim())
+        .filter(Boolean);
+
+    if (!allowTokens.includes('clipboard-write')) {
+        iframe.allow = [...allowTokens, 'clipboard-write'].join('; ');
+    }
+
     const channel = createChannel(iframe.contentWindow);
 
     channel.receive((message: FrameToParentMessage) => {

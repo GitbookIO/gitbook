@@ -101,6 +101,7 @@ function getIframe() {
         widgetIframe?.remove();
         widgetIframe = document.createElement('iframe');
         widgetIframe.id = 'gitbook-widget-iframe';
+        widgetIframe.allow = 'clipboard-write';
         if (frameOptions?.colorScheme) {
             widgetIframe.style.colorScheme = frameOptions.colorScheme;
         }
