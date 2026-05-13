@@ -21,12 +21,8 @@ const DESKTOP_BREAKPOINT = 768;
 const SCREEN_OFFSET = 16; // 1rem
 const MAX_ITEMS_PER_COLUMN = 10; // number of items per column
 const GROUP_MASONRY_THRESHOLD = 3; // if a section group has more than this many child groups, it will be shown in a masonry grid
-const COLUMN_WIDTH = {
-    rem: '18rem',
-} as const;
-const COLUMN_GAP = {
-    rem: '2rem',
-} as const;
+const COLUMN_WIDTH = '18rem';
+const COLUMN_GAP = '2rem';
 const MAX_MASONRY_COLUMNS = 4;
 
 /**
@@ -70,8 +66,8 @@ export function SiteSectionTabs(props: {
             ref={containerRef}
             style={
                 {
-                    '--site-section-column-width': COLUMN_WIDTH.rem,
-                    '--site-section-column-gap': COLUMN_GAP.rem,
+                    '--site-section-column-width': COLUMN_WIDTH,
+                    '--site-section-column-gap': COLUMN_GAP,
                 } as React.CSSProperties
             }
             value={value}
@@ -185,7 +181,6 @@ export function SiteSectionTabs(props: {
                     style={{
                         left: viewportLeft,
                         translate: '0 0 0', // TranslateZ is needed to force a stacking context, fixing a rendering bug on Safari
-                        display: !isMobile && offset === null ? 'none' : undefined,
                     }}
                 />
             </div>
