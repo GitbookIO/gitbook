@@ -11,13 +11,12 @@ import { renderIntegrationUi } from './server-actions';
 
 export async function IntegrationBlock(props: BlockProps<DocumentBlockIntegration>) {
     const { block, context, style } = props;
-    const { spaceId } = props.block.data
 
     if (!context.contentContext) {
         throw new Error('Expected a content context to render an block');
     }
 
-    if (!context.contentContext.space && !spaceId) {
+    if (!context.contentContext.space && !block.meta?.spaceId) {
         throw new Error('integration block requires a spaceId from the context or API');
     }
 
@@ -29,7 +28,7 @@ export async function IntegrationBlock(props: BlockProps<DocumentBlockIntegratio
             type: 'document',
             // When the block originates from a cross-space reusable content, the server adds a spaceId so the integration is
             // looked up in the correct source space.
-            spaceId: spaceId ?? context.contentContext.space.id,
+            spaceId: block.meta?.spaceId ?? context.contentContext.space.id,
             editable: false,
             theme: 'light', // TODO: how to handle this without moving rendering to the client side?
         },
