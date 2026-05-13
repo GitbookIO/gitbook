@@ -20,18 +20,12 @@ import type {
 const DESKTOP_BREAKPOINT = 768;
 const SCREEN_OFFSET = 16; // 1rem
 const MAX_ITEMS_PER_COLUMN = 10; // number of items per column
-const GROUP_MASONRY_THRESHOLD = 5; // if a section group has more than this many child groups, it will be shown in a masonry grid
+const GROUP_MASONRY_THRESHOLD = 3; // if a section group has more than this many child groups, it will be shown in a masonry grid
 const COLUMN_WIDTH = {
     rem: '18rem',
-    px: 18 * 16,
 } as const;
 const COLUMN_GAP = {
     rem: '2rem',
-    px: 2 * 16,
-} as const;
-const GROUPED_LIST_PADDING = {
-    x: '1.5rem',
-    xPx: 1.5 * 16,
 } as const;
 const MAX_MASONRY_COLUMNS = 4;
 
@@ -54,16 +48,12 @@ export function SiteSectionTabs(props: {
     const [value, setValue] = React.useState<string | undefined>();
 
     const isMobile = useIsMobile(DESKTOP_BREAKPOINT);
-    const containerWidth = useElementWidth(containerRef);
-    const availableDropdownWidth = getAvailableDropdownWidth(containerWidth);
     const offset = useNavigationMenuViewportOffset({
         value,
         isMobile,
         triggerRef: currentTriggerRef,
         containerRef,
     });
-    const { viewportRef, isViewportSized, allowViewportTransitions } =
-        useNavigationMenuViewportAnimation(value);
     const viewportLeft =
         !isMobile && offset !== null
             ? `clamp(0px, calc(${offset - SCREEN_OFFSET}px - var(--radix-navigation-menu-viewport-width, 0px)/2), calc(100% - var(--radix-navigation-menu-viewport-width, 0px)))`
@@ -155,7 +145,6 @@ export function SiteSectionTabs(props: {
                                                 <SectionGroupTileList
                                                     items={structureItem.children}
                                                     currentSection={currentSection}
-                                                    availableWidth={availableDropdownWidth}
                                                 />
                                             </div>
                                         </NavigationMenu.Content>
@@ -187,16 +176,11 @@ export function SiteSectionTabs(props: {
                 style={{ paddingInline: `${SCREEN_OFFSET}px` }}
             >
                 <NavigationMenu.Viewport
-                    ref={viewportRef}
                     className={tcls(
                         'relative origin-[center_top] overflow-hidden circular-corners:rounded-3xl rounded-corners:rounded-xl border border-tint bg-tint-base shadow-lg',
                         '-mt-0.5 h-(--radix-navigation-menu-viewport-height) w-full max-w-full md:w-(--radix-navigation-menu-viewport-width)',
-                        allowViewportTransitions
-                            ? 'ease transition-[left,width,height] duration-300'
-                            : '',
-                        'max-h-[calc(100vh-8rem)] data-[state=closed]:animate-scale-out',
-                        isViewportSized ? 'data-[state=open]:animate-scale-in' : 'opacity-0',
-                        "[&:not([style*='--radix-navigation-menu-viewport-width'])]:hidden" // The viewport width is only calculated once it's triggered, and can take a while. We hide the viewport until it's ready.
+                        'max-h-[calc(100vh-8rem)] data-[state=closed]:animate-scale-out data-[state=open]:animate-scale-in',
+                        'ease has-[&[data-motion]]:transition-[left,width,height] has-[&[data-motion]]:duration-300'
                     )}
                     style={{
                         left: viewportLeft,
@@ -218,9 +202,13 @@ function useNavigationMenuViewportOffset(args: {
     const { value, isMobile, triggerRef, containerRef } = args;
     const [offset, setOffset] = React.useState<number | null>(null);
 
-    React.useEffect(() => {
-        if (!value || isMobile) {
+    React.useLayoutEffect(() => {
+        if (isMobile) {
             setOffset(null);
+            return;
+        }
+
+        if (!value) {
             return;
         }
 
@@ -238,170 +226,6 @@ function useNavigationMenuViewportOffset(args: {
     }, [containerRef, isMobile, triggerRef, value]);
 
     return offset;
-}
-
-function useElementWidth(ref: React.RefObject<HTMLElement | null>) {
-    const [width, setWidth] = React.useState<number | null>(null);
-
-    React.useEffect(() => {
-        const element = ref.current;
-        if (!element) {
-            return;
-        }
-
-        const updateWidth = () => {
-            setWidth(element.getBoundingClientRect().width);
-        };
-
-        updateWidth();
-
-        const observer = new ResizeObserver(updateWidth);
-        observer.observe(element);
-
-        return () => {
-            observer.disconnect();
-        };
-    }, [ref]);
-
-    return width;
-}
-
-function getAvailableDropdownWidth(containerWidth: number | null) {
-    return containerWidth !== null ? Math.max(containerWidth - SCREEN_OFFSET * 2, 0) : null;
-}
-
-function getMaxFittingColumnCount(
-    availableWidth: number | null,
-    columnWidthPx: number,
-    columnGapPx: number,
-    fallback: number
-) {
-    const usableWidth =
-        availableWidth !== null ? Math.max(availableWidth - GROUPED_LIST_PADDING.xPx, 0) : null;
-
-    return usableWidth !== null
-        ? Math.max(1, Math.floor((usableWidth + columnGapPx) / (columnWidthPx + columnGapPx)))
-        : fallback;
-}
-
-function getMasonryLayout(
-    groupCount: number,
-    availableWidth: number | null
-): React.CSSProperties | undefined {
-    if (groupCount <= GROUP_MASONRY_THRESHOLD) {
-        return undefined;
-    }
-
-    const desiredColumnCount = Math.min(Math.ceil(groupCount / 2), MAX_MASONRY_COLUMNS);
-    const maxFittingColumnCount = getMaxFittingColumnCount(
-        availableWidth,
-        COLUMN_WIDTH.px,
-        COLUMN_GAP.px,
-        desiredColumnCount
-    );
-    const columnCount = Math.min(desiredColumnCount, maxFittingColumnCount);
-
-    return {
-        '--masonry-columns': String(columnCount),
-        '--masonry-width': `calc(${columnCount} * var(--site-section-column-width) + ${Math.max(columnCount - 1, 0)} * var(--site-section-column-gap) + ${GROUPED_LIST_PADDING.x})`,
-    } as React.CSSProperties;
-}
-
-function getFlexGroupLayout(
-    groupCount: number,
-    availableWidth: number | null
-): React.CSSProperties | undefined {
-    if (groupCount === 0) {
-        return undefined;
-    }
-
-    const maxFittingColumnCount = getMaxFittingColumnCount(
-        availableWidth,
-        COLUMN_WIDTH.px,
-        COLUMN_GAP.px,
-        groupCount
-    );
-    let columnCount = Math.min(groupCount, maxFittingColumnCount);
-
-    // Avoid layouts like 4 + 1 by balancing across one extra row when possible.
-    if (columnCount > 2 && groupCount > columnCount && groupCount % columnCount === 1) {
-        columnCount -= 1;
-    }
-
-    return {
-        '--grouped-sections-columns': `repeat(${columnCount}, fit-content(var(--site-section-column-width)))`,
-    } as React.CSSProperties;
-}
-
-function useNavigationMenuViewportAnimation(value: string | undefined) {
-    const viewportRef = React.useRef<HTMLDivElement>(null);
-    const previousValueRef = React.useRef<string | undefined>(undefined);
-    const [isViewportSized, setIsViewportSized] = React.useState(false);
-    const [allowViewportTransitions, setAllowViewportTransitions] = React.useState(false);
-
-    React.useEffect(() => {
-        const previousValue = previousValueRef.current;
-        previousValueRef.current = value;
-
-        if (!value) {
-            setIsViewportSized(false);
-            setAllowViewportTransitions(false);
-            return;
-        }
-
-        // When switching between two open items, keep transitions enabled immediately.
-        if (previousValue) {
-            setIsViewportSized(true);
-            setAllowViewportTransitions(true);
-            return;
-        }
-
-        // On a fresh open, wait for Radix to publish real dimensions before showing the viewport.
-        setIsViewportSized(false);
-        setAllowViewportTransitions(false);
-
-        let frameId = 0;
-
-        const waitForViewportSize = () => {
-            const viewport = viewportRef.current;
-            if (!viewport) {
-                frameId = window.requestAnimationFrame(waitForViewportSize);
-                return;
-            }
-
-            if (hasNonZeroViewportSize(viewport)) {
-                setIsViewportSized(true);
-
-                // Enable layout transitions one frame later so the initial mount doesn't tween from 0x0.
-                frameId = window.requestAnimationFrame(() => {
-                    setAllowViewportTransitions(true);
-                });
-                return;
-            }
-
-            frameId = window.requestAnimationFrame(waitForViewportSize);
-        };
-
-        frameId = window.requestAnimationFrame(waitForViewportSize);
-
-        return () => {
-            window.cancelAnimationFrame(frameId);
-        };
-    }, [value]);
-
-    return { viewportRef, isViewportSized, allowViewportTransitions };
-}
-
-function hasNonZeroViewportSize(viewport: HTMLDivElement) {
-    const styles = window.getComputedStyle(viewport);
-    const width = Number.parseFloat(
-        styles.getPropertyValue('--radix-navigation-menu-viewport-width')
-    );
-    const height = Number.parseFloat(
-        styles.getPropertyValue('--radix-navigation-menu-viewport-height')
-    );
-
-    return width > 0 && height > 0;
 }
 
 /**
@@ -440,35 +264,25 @@ const SectionTab = React.forwardRef(function SectionTab(
 function SectionGroupTileList(props: {
     items: (ClientSiteSection | ClientSiteSectionGroup)[];
     currentSection: ClientSiteSection;
-    availableWidth: number | null;
 }) {
-    const { items, currentSection, availableWidth } = props;
-    const isMobile = useIsMobile(DESKTOP_BREAKPOINT);
-    const sectionsRef = React.useRef<HTMLUListElement>(null);
+    const { items, currentSection } = props;
 
     // Separate non-grouped sections from grouped sections
     const sections = items.filter((item) => item.object === 'site-section');
     const groups = items.filter((item) => item.object === 'site-section-group');
-    const sectionsWidth = useElementWidth(sectionsRef);
 
     const hasSections = sections.length > 0;
     const hasGroups = groups.length > 0;
     const isMasonryLayout = groups.length > GROUP_MASONRY_THRESHOLD;
-    const groupedContentMaxWidth =
-        !isMobile && availableWidth !== null && sectionsWidth !== null
-            ? Math.max(availableWidth - sectionsWidth, 0)
-            : availableWidth;
-    const masonryStyle = getMasonryLayout(groups.length, groupedContentMaxWidth);
-    const flexGroupStyle = getFlexGroupLayout(groups.length, groupedContentMaxWidth);
+    const masonryColumnCount = Math.min(Math.ceil(groups.length / 2), MAX_MASONRY_COLUMNS);
 
     return (
         <div className="flex w-full flex-col md:flex-row">
             {/* Non-grouped sections */}
             {hasSections && (
                 <ul
-                    ref={sectionsRef}
                     className={tcls(
-                        'flex w-full shrink-0 grid-flow-row flex-col gap-x-2 gap-y-0.5 self-stretch p-3 md:sticky md:top-0 md:grid md:w-max md:max-w-[var(--site-section-column-width)] md:self-start',
+                        'flex w-full shrink-0 grid-flow-row flex-col gap-x-2 gap-y-0.5 self-stretch p-3 md:sticky md:top-0 md:grid md:w-max md:self-start',
                         hasGroups ? 'bg-tint-base' : ''
                     )}
                     style={{
@@ -489,25 +303,26 @@ function SectionGroupTileList(props: {
             {hasGroups && (
                 <div
                     className={tcls(
-                        'w-full md:min-w-0 md:w-max md:max-w-full',
+                        'w-full md:w-max md:min-w-0 md:max-w-full',
                         hasSections
                             ? 'border-tint-subtle bg-tint-subtle max-md:border-t md:border-l'
                             : ''
                     )}
-                    style={
-                        hasSections && !isMobile && groupedContentMaxWidth !== null
-                            ? { maxWidth: `${groupedContentMaxWidth}px` }
-                            : undefined
-                    }
                 >
                     <ul
                         className={tcls(
                             'p-3',
                             isMasonryLayout
-                                ? 'w-full max-md:space-y-8 md:w-[var(--masonry-width)] md:gap-x-[var(--site-section-column-gap)] md:[column-count:var(--masonry-columns)] md:[&>li]:mb-4'
-                                : 'flex w-full shrink-0 flex-col justify-start space-y-8 md:grid md:w-max md:max-w-full md:gap-[var(--site-section-column-gap)] md:space-y-0 md:[grid-template-columns:var(--grouped-sections-columns)]'
+                                ? 'w-full max-md:space-y-8 md:w-max md:max-w-full md:gap-x-[var(--site-section-column-gap)] md:[column-count:var(--masonry-columns)] md:[&>li]:mb-4'
+                                : 'flex w-full flex-col justify-start space-y-8 md:w-max md:flex-row md:items-start md:gap-[var(--site-section-column-gap)] md:space-y-0'
                         )}
-                        style={isMasonryLayout ? masonryStyle : flexGroupStyle}
+                        style={
+                            isMasonryLayout
+                                ? ({
+                                      '--masonry-columns': String(masonryColumnCount),
+                                  } as React.CSSProperties)
+                                : undefined
+                        }
                     >
                         {groups.map((group) => (
                             <SectionGroupTile
@@ -537,9 +352,7 @@ function SectionGroupTile(props: {
         const { url, icon, title, description } = child;
         const isActive = child.id === currentSection.id;
         return (
-            <li
-                className="group/section-tile flex w-full min-w-0 shrink-0 grow md:max-w-[var(--site-section-column-width)]"
-            >
+            <li className="group/section-tile flex w-full min-w-0 shrink-0 grow md:max-w-[var(--site-section-column-width)]">
                 <Link
                     href={url}
                     className={tcls(
@@ -581,7 +394,7 @@ function SectionGroupTile(props: {
     const { title, icon, children } = child;
 
     return (
-        <li className="flex w-full min-w-0 shrink-0 break-inside-avoid flex-col gap-1">
+        <li className="flex w-full min-w-0 shrink-0 break-inside-avoid flex-col gap-1 md:w-auto">
             <div className="mt-2 mb-1 flex min-w-0 gap-2 px-2.5 font-semibold text-tint-subtle text-xs">
                 {icon && (
                     <SectionIcon className="mt-0.5" isActive={false} icon={icon as IconName} />
