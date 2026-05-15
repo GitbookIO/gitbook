@@ -59,6 +59,10 @@ function getTargetProps(
         isExternal: boolean;
     }
 ) {
+    if (props.href.startsWith('mailto:')) {
+        return {};
+    }
+
     const target =
         props.target ??
         (context.isExternal && context.externalTarget === '_blank' ? '_blank' : undefined);
