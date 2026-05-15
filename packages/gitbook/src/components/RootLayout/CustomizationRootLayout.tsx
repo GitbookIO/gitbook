@@ -70,7 +70,7 @@ export async function CustomizationRootLayout(props: {
         'customization' in context ? context.customization : defaultCustomization();
 
     const locale = getContentLocale(context);
-    const language = getSpaceLanguage(context);
+    const language = await getSpaceLanguage(context);
     const tintColor = getTintColor(customization);
     const mixColor = getTintMixColor(customization.styling.primaryColor, tintColor);
     const sidebarStyles = getSidebarStyles(customization);

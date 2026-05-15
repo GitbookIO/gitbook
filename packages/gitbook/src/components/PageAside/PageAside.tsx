@@ -22,7 +22,7 @@ import { ScrollToTopButton } from './ScrollToTopButton';
 /**
  * Aside listing the headings in the document.
  */
-export function PageAside(props: {
+export async function PageAside(props: {
     page: RevisionPageDocument;
     document: JSONDocument | null;
     context: GitBookSiteContext;
@@ -32,7 +32,7 @@ export function PageAside(props: {
 }) {
     const { page, document, withPageFeedback, context } = props;
     const { customization, site } = context;
-    const language = getSpaceLanguage(context);
+    const language = await getSpaceLanguage(context);
 
     return (
         <SideSheet

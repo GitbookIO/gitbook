@@ -1,7 +1,7 @@
 import { type ContentRef, type DocumentInlineLink, SiteInsightsLinkPosition } from '@gitbook/api';
 
 import { getSpaceLanguage, tString } from '@/intl/server';
-import { type TranslationLanguage, languages } from '@/intl/translations';
+import { type TranslationLanguage, defaultLanguage } from '@/intl/translations';
 import {
     type ResolvedContentRef,
     resolveContentRefFallback,
@@ -60,7 +60,7 @@ export async function InlineLink(props: InlineProps<DocumentInlineLink>) {
     );
 
     if (context.withLinkPreviews) {
-        const language = contentContext ? getSpaceLanguage(contentContext) : languages.en;
+        const language = contentContext ? await getSpaceLanguage(contentContext) : defaultLanguage;
 
         return (
             <InlineLinkTooltipWrapper inline={inline} language={language} resolved={resolved}>
