@@ -1,5 +1,5 @@
 import { getSpaceLanguage, tString } from '@/intl/server';
-import { languages } from '@/intl/translations';
+import { defaultLanguage } from '@/intl/translations';
 import { Icon } from '@gitbook/icons';
 import type { DocumentContextProps } from '../DocumentView';
 import { HoverCard, HoverCardRoot, HoverCardTrigger } from '../primitives';
@@ -7,7 +7,7 @@ import { HoverCard, HoverCardRoot, HoverCardTrigger } from '../primitives';
 /**
  * Hover card displayed for a link not found.
  */
-export function NotFoundRefHoverCard(
+export async function NotFoundRefHoverCard(
     props: DocumentContextProps & {
         children: React.ReactNode;
     }
@@ -16,7 +16,7 @@ export function NotFoundRefHoverCard(
         context: { contentContext },
         children,
     } = props;
-    const language = contentContext ? getSpaceLanguage(contentContext) : languages.en;
+    const language = contentContext ? await getSpaceLanguage(contentContext) : defaultLanguage;
     return (
         <HoverCardRoot>
             <HoverCardTrigger>{children}</HoverCardTrigger>
