@@ -1,5 +1,32 @@
 import React from 'react';
 
+type SectionIntersectionState = {
+    isIntersecting: boolean;
+    top: number;
+};
+
+export function getActiveSectionId(
+    ids: string[],
+    sectionStates: Map<string, SectionIntersectionState>
+) {
+    const visibleSections = ids
+        .map((id) => [id, sectionStates.get(id)] as const)
+        .filter((entry): entry is readonly [string, SectionIntersectionState] => {
+            return Boolean(entry[1]?.isIntersecting);
+        });
+
+    if (visibleSections.length === 0) {
+        return undefined;
+    }
+
+    const firstVisibleBelowTop = visibleSections.find(([, state]) => state.top >= 0);
+    if (firstVisibleBelowTop) {
+        return firstVisibleBelowTop[0];
+    }
+
+    return visibleSections[visibleSections.length - 1]?.[0];
+}
+
 /**
  * Get the current ID being scrolled in the page.
  */
@@ -16,7 +43,7 @@ export function useScrollActiveId(
     } = { enabled: true }
 ) {
     const [activeId, setActiveId] = React.useState<string>(ids[0]!);
-    const sectionsIntersectingMap = React.useRef<Map<string, boolean>>(new Map());
+    const sectionStatesRef = React.useRef<Map<string, SectionIntersectionState>>(new Map());
 
     React.useEffect(() => {
         const defaultActiveId = ids[0];
@@ -31,30 +58,20 @@ export function useScrollActiveId(
         }
 
         const onObserve: IntersectionObserverCallback = (entries) => {
-            /**
-             * We need to keep track of all the sections that are intersecting
-             * the viewport. This is because we want to find the first section
-             * that is visible on the viewport.
-             */
             entries.forEach((entry) => {
                 const sectionId = entry.target.id;
                 if (sectionId) {
-                    sectionsIntersectingMap.current.set(
-                        sectionId,
-                        entry.isIntersecting && entry.intersectionRatio >= threshold
-                    );
+                    sectionStatesRef.current.set(sectionId, {
+                        isIntersecting:
+                            entry.isIntersecting && entry.intersectionRatio >= threshold,
+                        top: entry.boundingClientRect.top,
+                    });
                 }
             });
 
-            /**
-             * Find the first section that is intersecting the viewport (is visible)
-             */
-            const firstActiveSection = Array.from(sectionsIntersectingMap.current.entries()).find(
-                ([, isIntersecting]) => isIntersecting
-            );
-
-            if (firstActiveSection) {
-                setActiveId(firstActiveSection[0]);
+            const nextActiveSection = getActiveSectionId(ids, sectionStatesRef.current);
+            if (nextActiveSection) {
+                setActiveId(nextActiveSection);
             }
         };
 
