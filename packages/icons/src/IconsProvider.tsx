@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import type { InlineIconSource } from './IconSources';
 import { IconStyle } from './types';
 
 const version = 2;
@@ -15,6 +16,8 @@ export interface IconsAssetsLocation {
 export type IconsContextType = Partial<IconsAssetsLocation> & {
     /** Assets location for special styles */
     assetsByStyles?: Record<string, IconsAssetsLocation>;
+    /** Server-resolved SVG sources keyed by style and icon. */
+    iconSources?: Record<string, InlineIconSource>;
     /** Current default style for icons */
     iconStyle: IconStyle;
 };
@@ -34,10 +37,20 @@ export function IconsProvider(props: React.PropsWithChildren<Partial<IconsContex
         assetsURLToken = parent.assetsURLToken,
         iconStyle = parent.iconStyle,
         assetsByStyles = parent.assetsByStyles,
+        iconSources = parent.iconSources,
     } = props;
     const value = React.useMemo(() => {
-        return { assetsURL, assetsURLToken, iconStyle, assetsByStyles };
-    }, [assetsURL, assetsURLToken, iconStyle, assetsByStyles]);
+        return {
+            assetsURL,
+            assetsURLToken,
+            iconStyle,
+            assetsByStyles,
+            iconSources:
+                parent.iconSources && iconSources
+                    ? { ...parent.iconSources, ...iconSources }
+                    : (iconSources ?? parent.iconSources),
+        };
+    }, [assetsURL, assetsURLToken, iconStyle, assetsByStyles, iconSources, parent.iconSources]);
 
     return <IconsContext.Provider value={value}>{children}</IconsContext.Provider>;
 }
