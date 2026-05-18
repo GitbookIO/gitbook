@@ -31,11 +31,16 @@ export async function serveLLMsFullTxt(context: GitBookSiteContext, page = 0) {
     }
 
     const offset = page * DEFAULT_PAGE_LIMIT;
+    const allPages = await getMarkdownPageEntriesFromSiteStructure(context);
+
+    if (allPages.length <= offset) {
+        return new Response('No content found', { status: 404 });
+    }
 
     return new Response(
         new ReadableStream<Uint8Array>({
             async pull(controller) {
-                await streamMarkdownFromSiteStructure(context, controller, offset);
+                await streamMarkdownPageEntries(context, controller, allPages, offset);
                 controller.close();
             },
         }),
@@ -48,43 +53,31 @@ export async function serveLLMsFullTxt(context: GitBookSiteContext, page = 0) {
 }
 
 /**
- * Stream markdown from site structure.
+ * Get the document pages that should be included in the full llms.txt output for a site structure.
  */
-async function streamMarkdownFromSiteStructure(
-    context: GitBookSiteContext,
-    stream: ReadableStreamDefaultController<Uint8Array>,
-    offset: number
-): Promise<void> {
+async function getMarkdownPageEntriesFromSiteStructure(
+    context: GitBookSiteContext
+): Promise<MarkdownPageEntry[]> {
     switch (context.structure.type) {
         case 'sections':
-            return streamMarkdownFromSections(
+            return getMarkdownPageEntriesFromSections(
                 context,
-                stream,
-                getSiteStructureSections(context.structure, { ignoreGroups: true }),
-                offset
+                getSiteStructureSections(context.structure, { ignoreGroups: true })
             );
         case 'siteSpaces':
-            await streamMarkdownFromSiteSpaces(
-                context,
-                stream,
-                context.structure.structure,
-                offset
-            );
-            return;
+            return getMarkdownPageEntriesFromSiteSpaces(context, context.structure.structure);
         default:
             assertNever(context.structure);
     }
 }
 
 /**
- * Stream markdown from site sections.
+ * Get the document pages that should be included in the full llms.txt output for site sections.
  */
-async function streamMarkdownFromSections(
+async function getMarkdownPageEntriesFromSections(
     context: GitBookSiteContext,
-    stream: ReadableStreamDefaultController<Uint8Array>,
-    siteSections: SiteSection[],
-    offset: number
-): Promise<void> {
+    siteSections: SiteSection[]
+): Promise<MarkdownPageEntry[]> {
     const allPages: MarkdownPageEntry[] = [];
 
     for (const siteSection of siteSections) {
@@ -93,26 +86,7 @@ async function streamMarkdownFromSections(
         );
     }
 
-    await streamMarkdownPageEntries(context, stream, allPages, offset);
-}
-
-/**
- * Stream markdown from site spaces.
- */
-export async function streamMarkdownFromSiteSpaces(
-    context: GitBookSiteContext,
-    stream: ReadableStreamDefaultController<Uint8Array>,
-    siteSpaces: SiteSpace[],
-    offset = 0,
-    initialPageIndex = 0
-): Promise<{ currentPageIndex: number; reachedLimit: boolean }> {
-    const allPages = await getMarkdownPageEntriesFromSiteSpaces(context, siteSpaces);
-    const result = await streamMarkdownPageEntries(context, stream, allPages, offset);
-
-    return {
-        currentPageIndex: initialPageIndex + result.currentPageIndex,
-        reachedLimit: result.reachedLimit,
-    };
+    return allPages;
 }
 
 /**

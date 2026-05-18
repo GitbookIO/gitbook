@@ -16,6 +16,7 @@ type TestSiteSpaceContext = {
     space: { id: string };
     revisionId: string;
     revision: { pages: TestPage[] };
+    markdownFetches: string[];
     dataFetcher: {
         getRevisionPageMarkdown: (input: { pageId: string }) => Promise<string>;
     };
@@ -96,27 +97,27 @@ function createPages(spaceId: string, count: number): TestPage[] {
     }));
 }
 
-function createContext(): TestContext {
-    const firstSpacePages = createPages('first-space', 101);
-    const secondSpacePages = createPages('second-space', 1);
+function createSiteSpaceContext(spaceId: string, pageCount: number): TestSiteSpaceContext {
+    const markdownFetches: string[] = [];
 
+    return {
+        space: { id: spaceId },
+        revisionId: `${spaceId}-revision`,
+        revision: { pages: createPages(spaceId, pageCount) },
+        markdownFetches,
+        dataFetcher: {
+            getRevisionPageMarkdown: async ({ pageId }: { pageId: string }) => {
+                markdownFetches.push(pageId);
+                return pageId;
+            },
+        },
+    };
+}
+
+function createContext(pageCounts = { 'first-space': 101, 'second-space': 1 }): TestContext {
     const siteSpaceContexts = {
-        'first-space': {
-            space: { id: 'first-space' },
-            revisionId: 'first-revision',
-            revision: { pages: firstSpacePages },
-            dataFetcher: {
-                getRevisionPageMarkdown: async ({ pageId }: { pageId: string }) => pageId,
-            },
-        },
-        'second-space': {
-            space: { id: 'second-space' },
-            revisionId: 'second-revision',
-            revision: { pages: secondSpacePages },
-            dataFetcher: {
-                getRevisionPageMarkdown: async ({ pageId }: { pageId: string }) => pageId,
-            },
-        },
+        'first-space': createSiteSpaceContext('first-space', pageCounts['first-space']),
+        'second-space': createSiteSpaceContext('second-space', pageCounts['second-space']),
     };
 
     return {
@@ -152,5 +153,35 @@ describe('serveLLMsFullTxt', () => {
         expect(secondResponse.status).toBe(200);
         expect(secondText).toContain('# first-space-page-100');
         expect(secondText).toContain('# second-space-page-0');
+    });
+
+    it('returns 404 when there are no pages to stream', async () => {
+        const response = await serveLLMsFullTxt(
+            createContext({ 'first-space': 0, 'second-space': 0 }) as never
+        );
+
+        expect(response.status).toBe(404);
+        expect(await response.text()).toBe('No content found');
+    });
+
+    it('returns 404 when the requested page has no content', async () => {
+        const response = await serveLLMsFullTxt(createContext() as never, 2);
+
+        expect(response.status).toBe(404);
+        expect(await response.text()).toBe('No content found');
+    });
+
+    it('does not fetch markdown before the response stream is read', async () => {
+        const context = createContext();
+        const response = await serveLLMsFullTxt(context as never);
+
+        expect(response.status).toBe(200);
+        expect(context.siteSpaceContexts['first-space']?.markdownFetches).toHaveLength(0);
+        expect(context.siteSpaceContexts['second-space']?.markdownFetches).toHaveLength(0);
+
+        await response.text();
+
+        expect(context.siteSpaceContexts['first-space']?.markdownFetches).toHaveLength(100);
+        expect(context.siteSpaceContexts['second-space']?.markdownFetches).toHaveLength(0);
     });
 });
