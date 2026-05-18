@@ -116,4 +116,16 @@ describe('llms-full.txt', () => {
         },
         { timeout: 30_000 }
     );
+
+    it(
+        'should return 404 when a llms-full.txt page has no content',
+        async () => {
+            const response = await fetch(
+                getContentTestURL('https://gitbook.gitbook.io/test-gitbook-open/llms-full.txt/999')
+            );
+
+            expect(response.status).toBe(404);
+        },
+        { timeout: 30_000 }
+    );
 });
