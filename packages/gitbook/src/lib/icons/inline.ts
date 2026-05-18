@@ -13,12 +13,12 @@ import { type InlineIconSource, getInlineIconSourceKey } from '@gitbook/icons/Ic
 import { getIconStyle } from '@gitbook/icons/getIconStyle';
 import { validateIconName } from '@gitbook/icons/icons';
 import { type IconName, IconStyle } from '@gitbook/icons/types';
+import { GITBOOK_ICONS_ASSET_VERSION } from '@gitbook/icons/version';
+import pRetry from 'p-retry';
 
 import { getAssetURL } from '@/lib/assets';
 import { GITBOOK_ICONS_TOKEN, GITBOOK_ICONS_URL, GITBOOK_URL } from '@/lib/env';
 import { joinPath, joinPathWithBaseURL } from '@/lib/paths';
-
-const ICON_ASSET_VERSION = '2';
 
 const rawSvgPromises = new Map<string, Promise<InlineIconSource | null>>();
 const svgPattern = /<svg\b([^>]*)>([\s\S]*?)<\/svg>\s*$/i;
@@ -228,20 +228,26 @@ async function getInlineIconSource(
         return existing;
     }
 
-    const request = fetch(getIconAssetURL(style, icon), {
-        cache: 'force-cache',
-    })
-        .then(async (response) => {
-            if (!response.ok) {
-                return null;
-            }
+    try {
+        const request = pRetry(
+            () =>
+                fetch(getIconAssetURL(style, icon), {
+                    cache: 'force-cache',
+                }).then(async (response) => {
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch icon');
+                    }
 
-            return parseRawSVG(await response.text());
-        })
-        .catch(() => null);
-
-    rawSvgPromises.set(cacheKey, request);
-    return request;
+                    return parseRawSVG(await response.text());
+                }),
+            { retries: 3 }
+        );
+        rawSvgPromises.set(cacheKey, request);
+        return await request;
+    } catch {
+        console.warn(`Failed to fetch icon ${icon} with style ${style} after multiple attempts`);
+        return null;
+    }
 }
 
 function parseRawSVG(document: string): InlineIconSource | null {
@@ -274,7 +280,7 @@ function getIconAssetURL(style: string, icon: string): string {
             joinPath('svgs', style, `${icon}.svg`)
         )
     );
-    url.searchParams.set('v', ICON_ASSET_VERSION);
+    url.searchParams.set('v', GITBOOK_ICONS_ASSET_VERSION);
 
     if (style !== 'custom-icons' && GITBOOK_ICONS_TOKEN) {
         url.searchParams.set('token', GITBOOK_ICONS_TOKEN);
@@ -352,14 +358,7 @@ function collectDocumentIconSourceRequests(
 
     const record = node as Record<string, unknown>;
 
-    if (record.type === 'icon') {
-        const data = record.data;
-        if (data && typeof data === 'object') {
-            addIconSourceRequest(requests, (data as Record<string, unknown>).icon, iconStyle);
-        }
-    }
-
-    if (record.type === 'button') {
+    if (record.type === 'icon' || record.type === 'button') {
         const data = record.data;
         if (data && typeof data === 'object') {
             addIconSourceRequest(requests, (data as Record<string, unknown>).icon, iconStyle);

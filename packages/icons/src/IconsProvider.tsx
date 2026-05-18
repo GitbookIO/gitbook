@@ -3,8 +3,7 @@
 import * as React from 'react';
 import type { InlineIconSource } from './IconSources';
 import { IconStyle } from './types';
-
-const version = 2;
+import { GITBOOK_ICONS_ASSET_VERSION } from './version';
 
 export interface IconsAssetsLocation {
     /** Rroot url where the icon assets are served */
@@ -69,7 +68,7 @@ export function getAssetURL(location: Partial<IconsAssetsLocation>, path: string
     if (!location.assetsURL) {
         throw new Error('You first need to pass a assetsURL to <IconsProvider>');
     }
-    const rawUrl = `${location.assetsURL + (location.assetsURL.endsWith('/') ? '' : '/') + path}?v=${version}`;
+    const rawUrl = `${location.assetsURL + (location.assetsURL.endsWith('/') ? '' : '/') + path}?v=${GITBOOK_ICONS_ASSET_VERSION}`;
 
     if (location.assetsURLToken) {
         const url = new URL(rawUrl);

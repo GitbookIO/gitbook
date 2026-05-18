@@ -8,6 +8,7 @@ export default defineConfig([
             'src/types.ts',
             'src/getIconStyle.ts',
             'src/IconSources.ts',
+            'src/version.ts',
         ],
         unbundle: true,
     },

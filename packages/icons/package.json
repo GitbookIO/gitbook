@@ -26,6 +26,11 @@
             "types": "./dist/IconSources.d.ts",
             "development": "./src/IconSources.ts",
             "default": "./dist/IconSources.js"
+        },
+        "./version": {
+            "types": "./dist/version.d.ts",
+            "development": "./src/version.ts",
+            "default": "./dist/version.js"
         }
     },
     "sideEffects": false,
