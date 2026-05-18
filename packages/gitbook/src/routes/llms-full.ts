@@ -19,6 +19,8 @@ const MAX_CONCURRENCY = 100;
 // Default limit for pages per batch
 const DEFAULT_PAGE_LIMIT = 100;
 
+type MarkdownPageEntry = { context: GitBookSiteContext; page: RevisionPageDocument };
+
 /**
  * Generate a llms-full.txt file for the site.
  * As the result can be large, we stream it as we generate it.
@@ -83,22 +85,15 @@ async function streamMarkdownFromSections(
     siteSections: SiteSection[],
     offset: number
 ): Promise<void> {
-    let currentPageIndex = 0;
+    const allPages: MarkdownPageEntry[] = [];
 
     for (const siteSection of siteSections) {
-        const result = await streamMarkdownFromSiteSpaces(
-            context,
-            stream,
-            siteSection.siteSpaces,
-            offset,
-            currentPageIndex
+        allPages.push(
+            ...(await getMarkdownPageEntriesFromSiteSpaces(context, siteSection.siteSpaces))
         );
-        currentPageIndex = result.currentPageIndex;
-
-        if (result.reachedLimit) {
-            break;
-        }
     }
+
+    await streamMarkdownPageEntries(context, stream, allPages, offset);
 }
 
 /**
@@ -111,10 +106,23 @@ export async function streamMarkdownFromSiteSpaces(
     offset = 0,
     initialPageIndex = 0
 ): Promise<{ currentPageIndex: number; reachedLimit: boolean }> {
-    let totalPagesProcessed = initialPageIndex;
+    const allPages = await getMarkdownPageEntriesFromSiteSpaces(context, siteSpaces);
+    const result = await streamMarkdownPageEntries(context, stream, allPages, offset);
 
-    // Collect all pages first
-    const allPages: Array<{ context: GitBookSiteContext; page: RevisionPageDocument }> = [];
+    return {
+        currentPageIndex: initialPageIndex + result.currentPageIndex,
+        reachedLimit: result.reachedLimit,
+    };
+}
+
+/**
+ * Get the document pages that should be included in the full llms.txt output for site spaces.
+ */
+async function getMarkdownPageEntriesFromSiteSpaces(
+    context: GitBookSiteContext,
+    siteSpaces: SiteSpace[]
+): Promise<MarkdownPageEntry[]> {
+    const allPages: MarkdownPageEntry[] = [];
 
     const filteredSiteSpaces = filterSiteSpacesByLocale(siteSpaces, context.locale);
 
@@ -137,9 +145,21 @@ export async function streamMarkdownFromSiteSpaces(
         }
     }
 
+    return allPages;
+}
+
+/**
+ * Stream a single paginated window of markdown page entries.
+ */
+async function streamMarkdownPageEntries(
+    context: GitBookSiteContext,
+    stream: ReadableStreamDefaultController<Uint8Array>,
+    allPages: MarkdownPageEntry[],
+    offset: number
+): Promise<{ currentPageIndex: number; reachedLimit: boolean }> {
     // Apply pagination - skip pages before offset
     const pagesToProcess = allPages.slice(offset, offset + DEFAULT_PAGE_LIMIT);
-    totalPagesProcessed = offset;
+    let totalPagesProcessed = offset;
 
     // Process the pages
     for await (const markdown of pMapIterable(
