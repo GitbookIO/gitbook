@@ -10,7 +10,7 @@ import { filterSiteSpacesByLocale, getSiteStructureSections } from '@/lib/sites'
 import type { RevisionPageDocument, SiteSection, SiteSpace } from '@gitbook/api';
 import assertNever from 'assert-never';
 import type { Paragraph } from 'mdast';
-import { pMapIterable } from 'p-map';
+import pMap, { pMapIterable } from 'p-map';
 
 // We limit the concurrency to 100 to avoid reaching limit with concurrent requests
 // or file descriptor limits.
@@ -78,15 +78,12 @@ async function getMarkdownPageEntriesFromSections(
     context: GitBookSiteContext,
     siteSections: SiteSection[]
 ): Promise<MarkdownPageEntry[]> {
-    const allPages: MarkdownPageEntry[] = [];
-
-    for (const siteSection of siteSections) {
-        allPages.push(
-            ...(await getMarkdownPageEntriesFromSiteSpaces(context, siteSection.siteSpaces))
-        );
-    }
-
-    return allPages;
+    return getMarkdownPageEntriesFromFilteredSiteSpaces(
+        siteSections.flatMap((siteSection) =>
+            filterSiteSpacesByLocale(siteSection.siteSpaces, context.locale)
+        ),
+        context
+    );
 }
 
 /**
@@ -96,30 +93,46 @@ async function getMarkdownPageEntriesFromSiteSpaces(
     context: GitBookSiteContext,
     siteSpaces: SiteSpace[]
 ): Promise<MarkdownPageEntry[]> {
-    const allPages: MarkdownPageEntry[] = [];
+    return getMarkdownPageEntriesFromFilteredSiteSpaces(
+        filterSiteSpacesByLocale(siteSpaces, context.locale),
+        context
+    );
+}
 
-    const filteredSiteSpaces = filterSiteSpacesByLocale(siteSpaces, context.locale);
+/**
+ * Get markdown page entries from already locale-filtered site spaces.
+ */
+async function getMarkdownPageEntriesFromFilteredSiteSpaces(
+    siteSpaces: SiteSpace[],
+    context: GitBookSiteContext
+): Promise<MarkdownPageEntry[]> {
+    const publishedSiteSpaces = siteSpaces.filter((siteSpace) => siteSpace.urls.published);
 
-    for (const siteSpace of filteredSiteSpaces) {
-        const siteSpaceUrl = siteSpace.urls.published;
-        if (!siteSpaceUrl) {
-            continue;
+    const allPages = await pMap(
+        publishedSiteSpaces,
+        async (siteSpace): Promise<MarkdownPageEntry[]> => {
+            const siteSpaceContext = await fetchSiteContextForSiteSpace(context, siteSpace);
+            const pages = getIndexablePages(siteSpaceContext.revision.pages);
+
+            return pages.flatMap(({ page }) => {
+                if (page.type !== 'document') {
+                    return [];
+                }
+
+                return [
+                    {
+                        context: siteSpaceContext,
+                        page,
+                    },
+                ];
+            });
+        },
+        {
+            concurrency: MAX_CONCURRENCY,
         }
-        const siteSpaceContext = await fetchSiteContextForSiteSpace(context, siteSpace);
-        const pages = getIndexablePages(siteSpaceContext.revision.pages);
+    );
 
-        // Add document pages to our collection
-        for (const { page } of pages) {
-            if (page.type === 'document') {
-                allPages.push({
-                    context: siteSpaceContext,
-                    page,
-                });
-            }
-        }
-    }
-
-    return allPages;
+    return allPages.flat();
 }
 
 /**
