@@ -250,7 +250,7 @@ async function getInlineIconSource(
     }
 }
 
-function parseRawSVG(document: string): InlineIconSource | null {
+export function parseRawSVG(document: string): InlineIconSource | null {
     const svgMatch = document.match(svgPattern);
     if (!svgMatch) {
         return null;
