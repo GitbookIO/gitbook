@@ -100,6 +100,10 @@ export async function CustomizationRootLayout(props: {
             iconStyle,
             pages: context.revision.pages,
             tags: context.revision.tags,
+            sections:
+                'sections' in context
+                    ? [...(context.sections?.list ?? []), ...(context.visibleSections?.list ?? [])]
+                    : null,
         }),
     ]);
 

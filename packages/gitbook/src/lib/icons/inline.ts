@@ -6,6 +6,8 @@ import {
     type RevisionPage,
     type RevisionTag,
     type SiteCustomizationSettings,
+    type SiteSection,
+    type SiteSectionGroup,
 } from '@gitbook/api';
 import { type InlineIconSource, getInlineIconSourceKey } from '@gitbook/icons/IconSources';
 import { getIconStyle } from '@gitbook/icons/getIconStyle';
@@ -24,6 +26,9 @@ const viewBoxPattern = /\bviewBox=(["'])(.*?)\1/i;
 const commentPattern = /<!--[\s\S]*?-->/g;
 const scriptPattern = /<script\b[\s\S]*?<\/script>/gi;
 
+/**
+ * A request for an icon whose SVG source should be resolved and provided to the client renderer.
+ */
 export type IconSourceRequest = {
     icon: IconName;
     iconStyle?: IconStyle;
@@ -152,6 +157,9 @@ export function getDefaultInlineIconSourceRequests(iconStyle: IconStyle): IconSo
     ];
 }
 
+/**
+ * Resolve the Font Awesome style configured for a site's customization.
+ */
 export function getCustomizationIconStyle(customization: SiteCustomizationSettings): IconStyle {
     return (
         ('icons' in customization.styling ? apiToIconsStyles[customization.styling.icons] : null) ||
@@ -159,17 +167,22 @@ export function getCustomizationIconStyle(customization: SiteCustomizationSettin
     );
 }
 
+/**
+ * Collect icon source requests from content data that can render icons outside the default UI set.
+ */
 export function getContentInlineIconSourceRequests(input: {
     iconStyle: IconStyle;
     pages?: RevisionPage[];
     document?: JSONDocument | null;
     tags?: RevisionTag[];
+    sections?: (SiteSection | SiteSectionGroup)[] | null;
 }): IconSourceRequest[] {
-    const { iconStyle, pages = [], document = null, tags = [] } = input;
+    const { iconStyle, pages = [], document = null, tags = [], sections = null } = input;
     const requests: IconSourceRequest[] = [];
 
     collectPageIconSourceRequests(pages, iconStyle, requests);
     collectTagIconSourceRequests(tags, iconStyle, requests);
+    collectSiteSectionIconSourceRequests(sections ?? [], iconStyle, requests);
 
     if (document) {
         collectDocumentIconSourceRequests(document, iconStyle, requests);
@@ -310,6 +323,20 @@ function collectTagIconSourceRequests(
     for (const tag of tags) {
         if ('icon' in tag) {
             addIconSourceRequest(requests, tag.icon, iconStyle);
+        }
+    }
+}
+
+function collectSiteSectionIconSourceRequests(
+    sections: (SiteSection | SiteSectionGroup)[],
+    iconStyle: IconStyle,
+    requests: IconSourceRequest[]
+) {
+    for (const section of sections) {
+        addIconSourceRequest(requests, section.icon, iconStyle);
+
+        if (section.object === 'site-section-group') {
+            collectSiteSectionIconSourceRequests(section.children, iconStyle, requests);
         }
     }
 }
