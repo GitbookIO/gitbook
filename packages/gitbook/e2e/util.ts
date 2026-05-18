@@ -396,11 +396,13 @@ export function getCustomizationURL(partial: DeepPartial<SiteCustomizationSettin
  */
 export async function waitForIcons(page: Page) {
     await page.waitForFunction(() => {
-        const urlStates: Record<
+        type IconURLStates = Record<
             string,
             { state: 'pending'; uri: null } | { state: 'loaded'; uri: string }
-        > = (window as any).__ICONS_STATES__ || {};
-        (window as any).__ICONS_STATES__ = urlStates;
+        >;
+        const iconStatesWindow = window as Window & { __ICONS_STATES__?: IconURLStates };
+        const urlStates: IconURLStates = iconStatesWindow.__ICONS_STATES__ || {};
+        iconStatesWindow.__ICONS_STATES__ = urlStates;
 
         const fetchSvgAsDataUri = async (url: string): Promise<string> => {
             const response = await fetch(url);
@@ -445,7 +447,15 @@ export async function waitForIcons(page: Page) {
 
             const maskImage = icon.querySelector('[data-testid="mask-image"]');
             if (!maskImage) {
-                throw new Error('No mask-image element');
+                const inlineContent = icon.querySelector(
+                    'path, circle, ellipse, line, polygon, polyline, rect, g, use'
+                );
+                if (inlineContent) {
+                    icon.setAttribute('data-argos-state', 'loaded');
+                    return true;
+                }
+
+                throw new Error('Icon has no inline SVG content or mask-image element');
             }
 
             const url = maskImage.getAttribute('href');
