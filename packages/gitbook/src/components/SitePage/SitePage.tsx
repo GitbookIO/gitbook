@@ -7,6 +7,7 @@ import {
     SiteInsightsDisplayContext,
     type TranslationLanguage,
 } from '@gitbook/api';
+import { IconsProvider } from '@gitbook/icons';
 import type { Metadata, Viewport } from 'next';
 import { notFound, redirect } from 'next/navigation';
 
@@ -15,6 +16,11 @@ import { PageBody, PageCover } from '@/components/PageBody';
 import { getPagePath } from '@/lib/pages';
 import { isPageIndexable, isSiteIndexable } from '@/lib/seo';
 
+import {
+    getContentInlineIconSourceRequests,
+    getCustomizationIconStyle,
+    getInlineIconSources,
+} from '@/lib/icons/inline';
 import { getResizedImageURL } from '@/lib/images';
 import { resolveContentRef } from '@/lib/references';
 import { getLocalizedTitle } from '@/lib/sites';
@@ -65,47 +71,52 @@ export async function SitePage(props: SitePageProps & { staticRoute: boolean }) 
         withSections,
         withTopHeader,
         pageMetaLinks,
+        iconSources,
     } = await getSitePageData(props);
     const headerOffset = { sectionsHeader: withSections, topHeader: withTopHeader };
 
     return (
-        <PageContextProvider pageId={page.id} spaceId={context.space.id} title={page.title}>
-            {/* Using `contents` makes the children of this div according to its parent — which keeps them in a single flex row with the TOC by default.
+        <IconsProvider iconSources={iconSources}>
+            <PageContextProvider pageId={page.id} spaceId={context.space.id} title={page.title}>
+                {/* Using `contents` makes the children of this div according to its parent — which keeps them in a single flex row with the TOC by default.
             If there's a page cover, we use `flex flex-col` to lay out the PageCover above the PageBody + PageAside instead. */}
-            <div className={withFullPageCover && page.cover ? 'flex grow flex-col' : 'contents'}>
-                {withFullPageCover && page.cover ? (
-                    <PageCover as="full" page={page} cover={page.cover} context={context} />
-                ) : null}
-
                 <div
-                    className={tcls(
-                        withFullPageCover && page.cover ? 'flex grow flex-row' : 'contents',
-                        withSections
-                            ? '[--content-scroll-margin:calc(var(--spacing)*27)]'
-                            : '[--content-scroll-margin:calc(var(--spacing)*16)]'
-                    )}
+                    className={withFullPageCover && page.cover ? 'flex grow flex-col' : 'contents'}
                 >
-                    <PageAside
-                        page={page}
-                        document={document}
-                        withHeaderOffset={headerOffset}
-                        withFullPageCover={withFullPageCover}
-                        withPageFeedback={withPageFeedback}
-                        context={context}
-                    />
-                    <PageBody
-                        context={context}
-                        page={page}
-                        ancestors={ancestors}
-                        document={document}
-                        withPageFeedback={withPageFeedback}
-                        insightsDisplayContext={SiteInsightsDisplayContext.Site}
-                        staticRoute={props.staticRoute}
-                    />
+                    {withFullPageCover && page.cover ? (
+                        <PageCover as="full" page={page} cover={page.cover} context={context} />
+                    ) : null}
+
+                    <div
+                        className={tcls(
+                            withFullPageCover && page.cover ? 'flex grow flex-row' : 'contents',
+                            withSections
+                                ? '[--content-scroll-margin:calc(var(--spacing)*27)]'
+                                : '[--content-scroll-margin:calc(var(--spacing)*16)]'
+                        )}
+                    >
+                        <PageAside
+                            page={page}
+                            document={document}
+                            withHeaderOffset={headerOffset}
+                            withFullPageCover={withFullPageCover}
+                            withPageFeedback={withPageFeedback}
+                            context={context}
+                        />
+                        <PageBody
+                            context={context}
+                            page={page}
+                            ancestors={ancestors}
+                            document={document}
+                            withPageFeedback={withPageFeedback}
+                            insightsDisplayContext={SiteInsightsDisplayContext.Site}
+                            staticRoute={props.staticRoute}
+                        />
+                    </div>
+                    <PageClientLayout pageMetaLinks={pageMetaLinks} />
                 </div>
-                <PageClientLayout pageMetaLinks={pageMetaLinks} />
-            </div>
-        </PageContextProvider>
+            </PageContextProvider>
+        </IconsProvider>
     );
 }
 
@@ -280,6 +291,13 @@ export async function getSitePageData(props: SitePageProps) {
     const withSections = Boolean(visibleSections && visibleSections.list.length > 0);
 
     const document = await getPageDocument(context, page);
+    const iconStyle = getCustomizationIconStyle(customization);
+    const iconSources = await getInlineIconSources(
+        getContentInlineIconSourceRequests({
+            iconStyle,
+            document,
+        })
+    );
 
     return {
         context,
@@ -291,6 +309,7 @@ export async function getSitePageData(props: SitePageProps) {
         withFullPageCover,
         withTopHeader,
         pageMetaLinks,
+        iconSources,
     };
 }
 

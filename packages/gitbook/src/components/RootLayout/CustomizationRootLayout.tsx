@@ -1,6 +1,5 @@
 import {
     CustomizationDefaultThemeMode,
-    CustomizationIconsStyle,
     CustomizationSidebarBackgroundStyle,
     CustomizationSidebarListStyle,
     type CustomizationThemedColor,
@@ -18,7 +17,7 @@ import {
     colorScale,
     hexToRgb,
 } from '@gitbook/colors';
-import { IconStyle, IconsProvider } from '@gitbook/icons';
+import { IconsProvider } from '@gitbook/icons';
 import * as ReactDOM from 'react-dom';
 
 import { type FontData, getFontData } from '@/fonts';
@@ -32,6 +31,12 @@ import { RootLayoutClientContexts } from './RootLayoutClientContexts';
 import './globals.css';
 import type { GitBookAnyContext } from '@/lib/context';
 import { GITBOOK_FONTS_URL, GITBOOK_ICONS_TOKEN, GITBOOK_ICONS_URL } from '@/lib/env';
+import {
+    getContentInlineIconSourceRequests,
+    getCustomizationIconStyle,
+    getDefaultInlineIconSourceRequests,
+    getInlineIconSources,
+} from '@/lib/icons/inline';
 import { defaultCustomization } from '@/lib/utils';
 import { AnnouncementDismissedScript } from '../Announcement';
 import { OperatingSystemClassScript } from './OperatingSystemClassScript';
@@ -88,6 +93,19 @@ export async function CustomizationRootLayout(props: {
     // Preconnect and preload custom fonts if needed
     preloadFont(fontData);
     preloadFont(monospaceFontData);
+    const iconStyle = getCustomizationIconStyle(customization);
+    const iconSources = await getInlineIconSources([
+        ...getDefaultInlineIconSourceRequests(iconStyle),
+        ...getContentInlineIconSourceRequests({
+            iconStyle,
+            pages: context.revision.pages,
+            tags: context.revision.tags,
+            sections:
+                'sections' in context
+                    ? [...(context.sections?.list ?? []), ...(context.visibleSections?.list ?? [])]
+                    : null,
+        }),
+    ]);
 
     return (
         <html
@@ -194,11 +212,8 @@ export async function CustomizationRootLayout(props: {
                             assetsURL: getAssetURL('icons'),
                         },
                     }}
-                    iconStyle={
-                        ('icons' in customization.styling
-                            ? apiToIconsStyles[customization.styling.icons]
-                            : null) || IconStyle.Regular
-                    }
+                    iconSources={iconSources}
+                    iconStyle={iconStyle}
                 >
                     <RootLayoutClientContexts language={language}>
                         {children}
@@ -345,13 +360,3 @@ function generateColorVariable(
         })
         .join('\n');
 }
-
-const apiToIconsStyles: {
-    [key in CustomizationIconsStyle]: IconStyle;
-} = {
-    [CustomizationIconsStyle.Regular]: IconStyle.Regular,
-    [CustomizationIconsStyle.Solid]: IconStyle.Solid,
-    [CustomizationIconsStyle.Duotone]: IconStyle.Duotone,
-    [CustomizationIconsStyle.Thin]: IconStyle.Thin,
-    [CustomizationIconsStyle.Light]: IconStyle.Light,
-};

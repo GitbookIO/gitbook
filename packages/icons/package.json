@@ -11,6 +11,26 @@
             "types": "./dist/icons.d.ts",
             "development": "./src/icons.ts",
             "default": "./dist/icons.js"
+        },
+        "./types": {
+            "types": "./dist/types.d.ts",
+            "development": "./src/types.ts",
+            "default": "./dist/types.js"
+        },
+        "./getIconStyle": {
+            "types": "./dist/getIconStyle.d.ts",
+            "development": "./src/getIconStyle.ts",
+            "default": "./dist/getIconStyle.js"
+        },
+        "./IconSources": {
+            "types": "./dist/IconSources.d.ts",
+            "development": "./src/IconSources.ts",
+            "default": "./dist/IconSources.js"
+        },
+        "./version": {
+            "types": "./dist/version.d.ts",
+            "development": "./src/version.ts",
+            "default": "./dist/version.js"
         }
     },
     "sideEffects": false,
