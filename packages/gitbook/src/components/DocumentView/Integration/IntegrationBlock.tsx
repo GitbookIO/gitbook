@@ -12,8 +12,12 @@ import { renderIntegrationUi } from './server-actions';
 export async function IntegrationBlock(props: BlockProps<DocumentBlockIntegration>) {
     const { block, context, style } = props;
 
-    if (!context.contentContext?.space) {
-        throw new Error('integration block requires a content.spaceId');
+    if (!context.contentContext) {
+        throw new Error('Expected a content context to render an block');
+    }
+
+    if (!context.contentContext.space && !block.meta?.spaceId) {
+        throw new Error('integration block requires a spaceId from the context or API');
     }
 
     const initialInput: RenderIntegrationUI = {
@@ -22,16 +26,28 @@ export async function IntegrationBlock(props: BlockProps<DocumentBlockIntegratio
         action: block.data.action,
         context: {
             type: 'document',
-            spaceId: context.contentContext?.space.id,
+            // When the block originates from a cross-space reusable content, the server adds a spaceId so the integration is
+            // looked up in the correct source space.
+            spaceId: block.meta?.spaceId ?? context.contentContext.space.id,
             editable: false,
             theme: 'light', // TODO: how to handle this without moving rendering to the client side?
         },
     };
 
-    const initialResponse = await fetchSafeIntegrationUI(context.contentContext, {
-        integrationName: block.data.integration,
-        request: initialInput,
-    });
+    const dataFetcher = block.meta?.token
+        ? context.contentContext.dataFetcher.withToken({ apiToken: block.meta.token })
+        : context.contentContext.dataFetcher;
+
+    const initialResponse = await fetchSafeIntegrationUI(
+        {
+            ...context.contentContext,
+            dataFetcher,
+        },
+        {
+            integrationName: block.data.integration,
+            request: initialInput,
+        }
+    );
 
     if (initialResponse.error) {
         if (initialResponse.error.code === 404) {
