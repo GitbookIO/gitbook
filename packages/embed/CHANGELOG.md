@@ -1,5 +1,13 @@
 # @gitbook/embed
 
+## 0.5.1
+
+### Patch Changes
+
+- 37a9453: Allow copying in embed
+- Updated dependencies [47c8ccb]
+  - @gitbook/icons@0.5.0
+
 ## 0.5.0
 
 ### Minor Changes
