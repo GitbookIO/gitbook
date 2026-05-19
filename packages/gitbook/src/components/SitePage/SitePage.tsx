@@ -11,10 +11,12 @@ import { IconsProvider } from '@gitbook/icons';
 import type { Metadata, Viewport } from 'next';
 import { notFound, redirect } from 'next/navigation';
 
+import { UpdatesFilterProvider } from '@/components/DocumentView/UpdatesFilter';
 import { PageAside } from '@/components/PageAside';
 import { PageBody, PageCover } from '@/components/PageBody';
 import { getPagePath } from '@/lib/pages';
 import { isPageIndexable, isSiteIndexable } from '@/lib/seo';
+import { getDocumentUpdateTags } from '@/lib/updates';
 
 import {
     getContentInlineIconSourceRequests,
@@ -74,47 +76,58 @@ export async function SitePage(props: SitePageProps & { staticRoute: boolean }) 
         iconSources,
     } = await getSitePageData(props);
     const headerOffset = { sectionsHeader: withSections, topHeader: withTopHeader };
+    const updateTags = document ? getDocumentUpdateTags(document, context.revision) : [];
+    const content = (
+        <>
+            {/* Using `contents` makes the children of this div according to its parent — which keeps them in a single flex row with the TOC by default.
+            If there's a page cover, we use `flex flex-col` to lay out the PageCover above the PageBody + PageAside instead. */}
+            <div className={withFullPageCover && page.cover ? 'flex grow flex-col' : 'contents'}>
+                {withFullPageCover && page.cover ? (
+                    <PageCover as="full" page={page} cover={page.cover} context={context} />
+                ) : null}
+
+                <div
+                    className={tcls(
+                        withFullPageCover && page.cover ? 'flex grow flex-row' : 'contents',
+                        withSections
+                            ? '[--content-scroll-margin:calc(var(--spacing)*27)]'
+                            : '[--content-scroll-margin:calc(var(--spacing)*16)]'
+                    )}
+                >
+                    <PageAside
+                        page={page}
+                        document={document}
+                        updateTags={updateTags}
+                        withHeaderOffset={headerOffset}
+                        withFullPageCover={withFullPageCover}
+                        withPageFeedback={withPageFeedback}
+                        context={context}
+                    />
+                    <PageBody
+                        context={context}
+                        page={page}
+                        ancestors={ancestors}
+                        document={document}
+                        withPageFeedback={withPageFeedback}
+                        insightsDisplayContext={SiteInsightsDisplayContext.Site}
+                        staticRoute={props.staticRoute}
+                    />
+                </div>
+                <PageClientLayout pageMetaLinks={pageMetaLinks} />
+            </div>
+        </>
+    );
 
     return (
         <IconsProvider iconSources={iconSources}>
             <PageContextProvider pageId={page.id} spaceId={context.space.id} title={page.title}>
-                {/* Using `contents` makes the children of this div according to its parent — which keeps them in a single flex row with the TOC by default.
-            If there's a page cover, we use `flex flex-col` to lay out the PageCover above the PageBody + PageAside instead. */}
-                <div
-                    className={withFullPageCover && page.cover ? 'flex grow flex-col' : 'contents'}
-                >
-                    {withFullPageCover && page.cover ? (
-                        <PageCover as="full" page={page} cover={page.cover} context={context} />
-                    ) : null}
-
-                    <div
-                        className={tcls(
-                            withFullPageCover && page.cover ? 'flex grow flex-row' : 'contents',
-                            withSections
-                                ? '[--content-scroll-margin:calc(var(--spacing)*27)]'
-                                : '[--content-scroll-margin:calc(var(--spacing)*16)]'
-                        )}
-                    >
-                        <PageAside
-                            page={page}
-                            document={document}
-                            withHeaderOffset={headerOffset}
-                            withFullPageCover={withFullPageCover}
-                            withPageFeedback={withPageFeedback}
-                            context={context}
-                        />
-                        <PageBody
-                            context={context}
-                            page={page}
-                            ancestors={ancestors}
-                            document={document}
-                            withPageFeedback={withPageFeedback}
-                            insightsDisplayContext={SiteInsightsDisplayContext.Site}
-                            staticRoute={props.staticRoute}
-                        />
-                    </div>
-                    <PageClientLayout pageMetaLinks={pageMetaLinks} />
-                </div>
+                {updateTags.length > 0 ? (
+                    <UpdatesFilterProvider tagSlugs={updateTags.map((tag) => tag.slug)}>
+                        {content}
+                    </UpdatesFilterProvider>
+                ) : (
+                    content
+                )}
             </PageContextProvider>
         </IconsProvider>
     );

@@ -11,6 +11,7 @@ import { assert } from 'ts-essentials';
 import { Tag } from '../Tag';
 import type { BlockProps } from './Block';
 import { Blocks } from './Blocks';
+import { FilteredUpdate } from './UpdatesFilter';
 
 export function Update(props: BlockProps<DocumentBlockUpdate>) {
     const { block, style, ancestorBlocks, ...contextProps } = props;
@@ -43,7 +44,10 @@ export function Update(props: BlockProps<DocumentBlockUpdate>) {
     const resolvedTags = resolveBlockTags(block.data.tags, revisionTags);
 
     return (
-        <div className={tcls('relative flex flex-col gap-2 md:flex-row md:gap-4 lg:gap-8', style)}>
+        <FilteredUpdate
+            tagSlugs={resolvedTags.map((tag) => tag.slug)}
+            className={tcls('relative flex flex-col gap-2 md:flex-row md:gap-4 lg:gap-8', style)}
+        >
             <div
                 className={tcls(
                     // Date is only sticky on larger screens when we use flex-row layout, with 0px fallback to prevent flicker and flaky tests before JS sets the variable
@@ -71,7 +75,7 @@ export function Update(props: BlockProps<DocumentBlockUpdate>) {
                 ancestorBlocks={[...ancestorBlocks, block]}
                 style="[&>*:first-child]:!pt-0 flex flex-1 flex-col [&>*+*]:mt-5"
             />
-        </div>
+        </FilteredUpdate>
     );
 }
 

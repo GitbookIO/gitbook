@@ -20,6 +20,7 @@ export function useScrollActiveId(
 
     React.useEffect(() => {
         const defaultActiveId = ids[0];
+        sectionsIntersectingMap.current.clear();
         // @ts-expect-error
         setActiveId((activeId) => (ids.indexOf(activeId) !== -1 ? activeId : defaultActiveId));
         if (!enabled) {
