@@ -38,13 +38,16 @@ export async function IntegrationBlock(props: BlockProps<DocumentBlockIntegratio
         ? context.contentContext.dataFetcher.withToken({ apiToken: block.meta.token })
         : context.contentContext.dataFetcher;
 
-    const initialResponse = await fetchSafeIntegrationUI({
-        ...context.contentContext,
-        dataFetcher
-    }, {
-        integrationName: block.data.integration,
-        request: initialInput,
-    });
+    const initialResponse = await fetchSafeIntegrationUI(
+        {
+            ...context.contentContext,
+            dataFetcher,
+        },
+        {
+            integrationName: block.data.integration,
+            request: initialInput,
+        }
+    );
 
     if (initialResponse.error) {
         if (initialResponse.error.code === 404) {
