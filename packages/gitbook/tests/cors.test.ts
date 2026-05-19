@@ -122,9 +122,9 @@ describe('CORS', () => {
         });
     });
 
-    // On a 2-label hostname like `gitbook.com`, the would-be parent is the bare
-    // TLD `com`, so the parent/sibling allow path is blocked and only exact
-    // hostname matches are allowed.
+    // On a 2-label hostname like `gitbook.com`, the registrable domain is the
+    // hostname itself, so subdomains under it share the same registrable domain
+    // and are allowed.
     describe('on a 2-label hostname (gitbook.com)', () => {
         const TEST_URL = getContentTestURL('https://gitbook.com/docs');
 
@@ -139,9 +139,19 @@ describe('CORS', () => {
             expect(response.headers.get('access-control-allow-credentials')).toBe('true');
         });
 
-        it('should NOT allow a subdomain (would-be parent is a bare TLD)', async () => {
+        it('should allow a subdomain (same registrable domain)', async () => {
+            const origin = 'https://docs.gitbook.com';
             const response = await fetch(TEST_URL, {
-                headers: { Origin: 'https://docs.gitbook.com' },
+                headers: { Origin: origin },
+            });
+
+            expect(response.status).toBe(200);
+            expect(response.headers.get('access-control-allow-origin')).toBe(origin);
+        });
+
+        it('should reject a different registrable domain', async () => {
+            const response = await fetch(TEST_URL, {
+                headers: { Origin: 'https://evil.example.com' },
             });
 
             expect(response.status).toBe(200);

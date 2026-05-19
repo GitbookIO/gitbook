@@ -80,6 +80,7 @@
         "shiki": "^3.21.0",
         "tailwind-merge": "^2.2.0",
         "tailwind-shades": "^1.1.2",
+        "tldts": "^7.0.30",
         "unified": "^11.0.5",
         "unist-util-remove": "^4.0.0",
         "unist-util-visit": "^5.0.0",

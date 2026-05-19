@@ -47,6 +47,7 @@ import {
 import { waitUntil } from '@/lib/waitUntil';
 import { serveResizedImage } from '@/routes/image';
 import Negotiator from 'negotiator';
+import { getDomain } from 'tldts';
 import {
     type ServerInsightsEventInput,
     serveProxyAnalyticsEvent,
@@ -512,7 +513,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         // This one is technically useless, but is used by a bunch of scoring systems
         response.headers.set(
             'vary',
-            'rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, accept-encoding, accept, origin'
+            'rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, accept-encoding, accept'
         );
 
         // When we use adaptive content, we want to ensure that the cache is not used at all on the client side.
@@ -876,18 +877,20 @@ async function writeResponseCookies<R extends NextResponse>(
 }
 
 /**
- * Shared parent domains where customer sites are hosted side-by-side on different
+ * Registrable domains where customer sites are hosted side-by-side on different
  * subdomains. For these, parent/sibling-subdomain CORS would let one customer site
  * read another, so only an exact hostname match is allowed.
  */
-const SHARED_PARENT_DOMAINS = new Set(['gitbook.io']);
+const SHARED_REGISTRABLE_DOMAINS = new Set(['gitbook.io']);
 
 /**
  * Get the allowed CORS origin for a request to a site.
  *
- * For a site on a customer domain like `foo.example.com`, requests from `example.com`
- * or any `*.example.com` subdomain are allowed. For sites on a shared GitBook hosting
- * parent (see {@link SHARED_PARENT_DOMAINS}), only the exact hostname is allowed.
+ * For a site on a customer domain like `foo.example.com`, requests from
+ * `example.com` or any `*.example.com` subdomain are allowed. Public-suffix-aware
+ * (via `tldts`) so multi-label suffixes like `co.uk` are handled correctly. For
+ * sites on a shared GitBook hosting domain (see {@link SHARED_REGISTRABLE_DOMAINS}),
+ * only the exact hostname is allowed.
  */
 function getAllowedCORSOrigin(request: NextRequest, siteCanonicalURL: URL): string | null {
     const origin = request.headers.get('origin');
@@ -910,29 +913,20 @@ function getAllowedCORSOrigin(request: NextRequest, siteCanonicalURL: URL): stri
         return origin;
     }
 
-    // For multi-label hostnames, drop the first label to get the parent domain.
-    // e.g. `foo.example.com` -> `example.com`
-    const siteParts = siteHostname.split('.');
-    if (siteParts.length < 2) {
-        return null;
-    }
-    const parentDomain = siteParts.slice(1).join('.');
-
-    // Avoid allowing public suffixes like `com` as parent domains.
-    if (!parentDomain.includes('.')) {
+    // Compare on the registrable domain (eTLD+1) so multi-label public suffixes
+    // like `co.uk` don't allow unrelated registrants to claim each other.
+    const siteRegistrable = getDomain(siteHostname);
+    const originRegistrable = getDomain(originHostname);
+    if (!siteRegistrable || siteRegistrable !== originRegistrable) {
         return null;
     }
 
-    // On shared hosting parents, only exact-match (handled above) is allowed.
-    if (SHARED_PARENT_DOMAINS.has(parentDomain)) {
+    // On shared hosting registrable domains, only exact-match (handled above) is allowed.
+    if (SHARED_REGISTRABLE_DOMAINS.has(siteRegistrable)) {
         return null;
     }
 
-    if (originHostname === parentDomain || originHostname.endsWith(`.${parentDomain}`)) {
-        return origin;
-    }
-
-    return null;
+    return origin;
 }
 
 function acceptsMarkdown(request: Request): boolean {
