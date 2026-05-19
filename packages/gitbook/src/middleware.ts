@@ -501,11 +501,18 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         response.headers.set('x-gitbook-route-type', routeType);
         response.headers.set('x-gitbook-route-site', siteURLWithoutProtocol);
 
+        // Allow cross-origin requests from the same parent domain as the site.
+        const allowedOrigin = getAllowedCORSOrigin(request, siteCanonicalURL);
+        if (allowedOrigin) {
+            response.headers.set('access-control-allow-origin', allowedOrigin);
+            response.headers.set('access-control-allow-credentials', 'true');
+        }
+
         // AI related headers
         // This one is technically useless, but is used by a bunch of scoring systems
         response.headers.set(
             'vary',
-            'rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, accept-encoding, accept'
+            'rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, accept-encoding, accept, origin'
         );
 
         // When we use adaptive content, we want to ensure that the cache is not used at all on the client side.
@@ -866,6 +873,66 @@ async function writeResponseCookies<R extends NextResponse>(
     });
 
     return response;
+}
+
+/**
+ * Shared parent domains where customer sites are hosted side-by-side on different
+ * subdomains. For these, parent/sibling-subdomain CORS would let one customer site
+ * read another, so only an exact hostname match is allowed.
+ */
+const SHARED_PARENT_DOMAINS = new Set(['gitbook.io']);
+
+/**
+ * Get the allowed CORS origin for a request to a site.
+ *
+ * For a site on a customer domain like `foo.example.com`, requests from `example.com`
+ * or any `*.example.com` subdomain are allowed. For sites on a shared GitBook hosting
+ * parent (see {@link SHARED_PARENT_DOMAINS}), only the exact hostname is allowed.
+ */
+function getAllowedCORSOrigin(request: NextRequest, siteCanonicalURL: URL): string | null {
+    const origin = request.headers.get('origin');
+    if (!origin) {
+        return null;
+    }
+
+    let originURL: URL;
+    try {
+        originURL = new URL(origin);
+    } catch {
+        return null;
+    }
+
+    const siteHostname = siteCanonicalURL.hostname.toLowerCase();
+    const originHostname = originURL.hostname.toLowerCase();
+
+    // Exact match is always allowed.
+    if (originHostname === siteHostname) {
+        return origin;
+    }
+
+    // For multi-label hostnames, drop the first label to get the parent domain.
+    // e.g. `foo.example.com` -> `example.com`
+    const siteParts = siteHostname.split('.');
+    if (siteParts.length < 2) {
+        return null;
+    }
+    const parentDomain = siteParts.slice(1).join('.');
+
+    // Avoid allowing public suffixes like `com` as parent domains.
+    if (!parentDomain.includes('.')) {
+        return null;
+    }
+
+    // On shared hosting parents, only exact-match (handled above) is allowed.
+    if (SHARED_PARENT_DOMAINS.has(parentDomain)) {
+        return null;
+    }
+
+    if (originHostname === parentDomain || originHostname.endsWith(`.${parentDomain}`)) {
+        return origin;
+    }
+
+    return null;
 }
 
 function acceptsMarkdown(request: Request): boolean {
