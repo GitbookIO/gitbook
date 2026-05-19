@@ -1,5 +1,20 @@
 # gitbook
 
+## 0.26.1
+
+### Patch Changes
+
+- b70b8fd: Fix llms-full.txt pagination to include pages from all site sections.
+- 6ba5e54: Support isComposing for search
+- 47c8ccb: Render icons as svg markup
+- a9ba996: Fix left/right aligment of images with caption
+- 56aeb19: Fix events tracked from the middleware missing some properties.
+- Updated dependencies [47c8ccb]
+- Updated dependencies [37a9453]
+  - @gitbook/icons@0.5.0
+  - @gitbook/embed@0.5.1
+  - @gitbook/react-contentkit@0.7.16
+
 ## 0.26.0
 
 ### Minor Changes

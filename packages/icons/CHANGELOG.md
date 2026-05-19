@@ -1,5 +1,11 @@
 # @gitbook/icons
 
+## 0.5.0
+
+### Minor Changes
+
+- 47c8ccb: Render icons as svg markup
+
 ## 0.4.6
 
 ### Patch Changes
