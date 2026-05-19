@@ -1,5 +1,6 @@
 import { type GitBookSiteContext, checkIsRootSiteContext } from '@/lib/context';
 import { isSiteIndexable } from '@/lib/seo';
+import { SiteVisibility } from '@gitbook/api';
 
 /**
  * User-agents of AI assistants that fetch pages live in response to a user prompt.
@@ -17,6 +18,7 @@ export async function serveRobotsTxt(context: GitBookSiteContext) {
 
     const isRoot = checkIsRootSiteContext(context);
     const isIndexable = isSiteIndexable(context);
+    const isSitePublic = context.site.visibility === SiteVisibility.Public;
 
     const sitemapPath = linker.toPathInSpace(isRoot ? '/sitemap.xml' : '/sitemap-pages.xml');
     const sitemapUrl = linker.toAbsoluteURL(sitemapPath);
@@ -39,12 +41,15 @@ export async function serveRobotsTxt(context: GitBookSiteContext) {
               // Allow user-triggered AI assistants to read pages even when the
               // site is not indexable, so end-users can pull content into an LLM.
               // Training crawlers and search engines remain blocked.
-              ...AI_USER_AGENTS.flatMap((userAgent) => [
-                  `User-agent: ${userAgent}`,
-                  'Content-Signal: ai-train=no, search=no, ai-input=yes',
-                  'Allow: /',
-                  '',
-              ]),
+              // If site is not public, we don't allow it.
+              ...(isSitePublic
+                  ? AI_USER_AGENTS.flatMap((userAgent) => [
+                        `User-agent: ${userAgent}`,
+                        'Content-Signal: ai-train=no, search=no, ai-input=yes',
+                        'Allow: /',
+                        '',
+                    ])
+                  : []),
               'User-agent: *',
               'Content-Signal: ai-train=no, search=no, ai-input=no',
               'Disallow: /',

@@ -30,7 +30,7 @@ describe('robots.txt', () => {
         expect(content).toContain('Content-Signal: ai-train=no, search=no, ai-input=no');
     });
 
-    it('allows user-triggered AI assistants to read non-indexable sites', async () => {
+    it('disallow user-triggered AI assistants to read non-public sites', async () => {
         const response = await fetch(
             getContentTestURL(
                 'https://gitbook-open-e2e-sites.gitbook.io/api-multi-versions-share-links/8tNo6MeXg7CkFMzSSz81/robots.txt?x-gitbook-search-indexation=1'
@@ -38,11 +38,9 @@ describe('robots.txt', () => {
         );
 
         expect(response.status).toBe(200);
+        expect(response.headers.get('content-type')).toContain('text/plain');
         const content = await response.text();
-        for (const userAgent of ['ChatGPT-User', 'Claude-User', 'Perplexity-User']) {
-            expect(content).toContain(`User-agent: ${userAgent}`);
-        }
-        expect(content).toContain('Content-Signal: ai-train=no, search=no, ai-input=yes');
-        expect(content).toContain('Allow: /\n');
+        expect(content).toContain('Disallow: /\n');
+        expect(content).toContain('Content-Signal: ai-train=no, search=no, ai-input=no');
     });
 });
