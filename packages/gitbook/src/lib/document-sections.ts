@@ -16,7 +16,7 @@ export interface DocumentSection {
     title: ReactNode;
     depth: number;
     deprecated?: boolean;
-    updateTagSlugs?: string[];
+    tags?: string[];
 }
 
 /**
@@ -36,7 +36,7 @@ async function getSectionsFromNodes(
     nodes: DocumentBlock[],
     context: GitBookAnyContext,
     initialDepth = 0,
-    updateTagSlugs?: string[]
+    tags?: string[]
 ): Promise<DocumentSection[]> {
     const sections: DocumentSection[] = [];
     let depth = initialDepth;
@@ -50,7 +50,7 @@ async function getSectionsFromNodes(
                 }
                 depth = 1;
                 const title = getNodeReactText(block);
-                sections.push(withUpdateTags({ id, title, depth: 1 }, updateTagSlugs));
+                sections.push(withTags({ id, title, depth: 1 }, tags));
                 continue;
             }
             case 'heading-2': {
@@ -59,16 +59,14 @@ async function getSectionsFromNodes(
                     continue;
                 }
                 const title = getNodeReactText(block);
-                sections.push(
-                    withUpdateTags({ id, title, depth: depth > 0 ? 2 : 1 }, updateTagSlugs)
-                );
+                sections.push(withTags({ id, title, depth: depth > 0 ? 2 : 1 }, tags));
                 continue;
             }
             case 'columns':
             case 'stepper': {
                 const stepNodes = await Promise.all(
                     block.nodes.map(async (step) =>
-                        getSectionsFromNodes(step.nodes, context, depth, updateTagSlugs)
+                        getSectionsFromNodes(step.nodes, context, depth, tags)
                     )
                 );
                 for (const stepSections of stepNodes) {
@@ -105,7 +103,7 @@ async function getSectionsFromNodes(
                 });
                 if (operation) {
                     sections.push(
-                        withUpdateTags(
+                        withTags(
                             {
                                 id,
                                 tag: operation.method.toUpperCase(),
@@ -113,7 +111,7 @@ async function getSectionsFromNodes(
                                 depth: 1,
                                 deprecated: operation.operation.deprecated,
                             },
-                            updateTagSlugs
+                            tags
                         )
                     );
                 }
@@ -130,14 +128,14 @@ async function getSectionsFromNodes(
                 });
                 if (webhook) {
                     sections.push(
-                        withUpdateTags(
+                        withTags(
                             {
                                 id,
                                 title: webhook.operation.summary || webhook.name,
                                 depth: 1,
                                 deprecated: webhook.operation.deprecated,
                             },
-                            updateTagSlugs
+                            tags
                         )
                     );
                 }
@@ -160,13 +158,13 @@ async function getSectionsFromNodes(
                 const schema = data?.schemas[0];
                 if (schema) {
                     sections.push(
-                        withUpdateTags(
+                        withTags(
                             {
                                 id,
                                 title: `The ${schema.name} object`,
                                 depth: 1,
                             },
-                            updateTagSlugs
+                            tags
                         )
                     );
                 }
@@ -202,7 +200,7 @@ async function getSectionsFromNodes(
                     document.nodes,
                     reusableContent.context,
                     depth,
-                    updateTagSlugs
+                    tags
                 );
                 sections.push(...reusableContentSections);
             }
@@ -212,9 +210,9 @@ async function getSectionsFromNodes(
     return sections;
 }
 
-function withUpdateTags(
-    section: Omit<DocumentSection, 'updateTagSlugs'>,
-    updateTagSlugs: string[] | undefined
+function withTags(
+    section: Omit<DocumentSection, 'tags'>,
+    tags: string[] | undefined
 ): DocumentSection {
-    return updateTagSlugs === undefined ? section : { ...section, updateTagSlugs };
+    return tags === undefined ? section : { ...section, tags };
 }

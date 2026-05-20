@@ -181,11 +181,11 @@ export function FilteredUpdate(props: {
     const { tagSlugs, className, children } = props;
     const { selectedTagSet } = useUpdatesFilter();
 
-    const visible =
+    const isVisible =
         selectedTagSet.size === 0 || tagSlugs.some((tagSlug) => selectedTagSet.has(tagSlug));
 
     return (
-        <div className={className} hidden={!visible} data-gb-update-tags={tagSlugs.join(' ')}>
+        <div className={className} hidden={!isVisible}>
             {children}
         </div>
     );

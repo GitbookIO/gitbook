@@ -27,11 +27,11 @@ export function ScrollSectionsList({ sections }: { sections: DocumentSection[] }
         }
 
         return sections.filter((section) => {
-            if (section.updateTagSlugs === undefined) {
+            if (section.tags === undefined) {
                 return true;
             }
 
-            return section.updateTagSlugs.some((tagSlug) => selectedTagSet.has(tagSlug));
+            return section.tags.some((tagSlug) => selectedTagSet.has(tagSlug));
         });
     }, [sections, selectedTagSet]);
     const ids = React.useMemo(() => visibleSections.map(({ id }) => id), [visibleSections]);

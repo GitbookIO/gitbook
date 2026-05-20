@@ -208,20 +208,20 @@ describe('getDocumentSections', () => {
                 id: section.id,
                 depth: section.depth,
                 title: reactNodeToText(section.title),
-                updateTagSlugs: section.updateTagSlugs,
+                tags: section.tags,
             }))
         ).toEqual([
             {
                 id: 'h1-in-update',
                 depth: 1,
                 title: 'Heading 1 in update',
-                updateTagSlugs: ['improvements'],
+                tags: ['improvements'],
             },
             {
                 id: 'h2-in-update',
                 depth: 2,
                 title: 'Heading 2 in update',
-                updateTagSlugs: ['improvements'],
+                tags: ['improvements'],
             },
         ]);
     });
