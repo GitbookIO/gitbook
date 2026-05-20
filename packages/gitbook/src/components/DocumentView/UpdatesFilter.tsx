@@ -60,10 +60,12 @@ export function UpdatesFilterProvider(props: {
         [searchParams]
     );
 
-    const selectedTags = React.useMemo(
+    const urlSelectedTags = React.useMemo(
         () => sanitizeTags(rawSelectedTags),
         [sanitizeTags, rawSelectedTags]
     );
+    const [selectedTags, setSelectedTags] = React.useState(urlSelectedTags);
+    const selectedTagsRef = React.useRef(selectedTags);
 
     const replaceTags = React.useCallback(
         (nextTags: string[]) => {
@@ -82,10 +84,31 @@ export function UpdatesFilterProvider(props: {
     );
 
     React.useEffect(() => {
-        if (!areTagsEqual(rawSelectedTags, selectedTags)) {
-            replaceTags(selectedTags);
+        if (!areTagsEqual(rawSelectedTags, urlSelectedTags)) {
+            replaceTags(urlSelectedTags);
         }
-    }, [rawSelectedTags, replaceTags, selectedTags]);
+    }, [rawSelectedTags, replaceTags, urlSelectedTags]);
+
+    React.useEffect(() => {
+        if (areTagsEqual(selectedTagsRef.current, urlSelectedTags)) {
+            return;
+        }
+
+        selectedTagsRef.current = urlSelectedTags;
+        setSelectedTags(urlSelectedTags);
+    }, [urlSelectedTags]);
+
+    // Keep tag clicks responsive while the URL update from router.replace is still pending.
+    const updateSelectedTags = React.useCallback(
+        (getNextTags: (currentTags: string[]) => string[]) => {
+            const nextTags = sanitizeTags(getNextTags(selectedTagsRef.current));
+
+            selectedTagsRef.current = nextTags;
+            setSelectedTags(nextTags);
+            replaceTags(nextTags);
+        },
+        [replaceTags, sanitizeTags]
+    );
 
     const toggleTag = React.useCallback(
         (tag: string) => {
@@ -93,18 +116,18 @@ export function UpdatesFilterProvider(props: {
                 return;
             }
 
-            replaceTags(
-                selectedTags.includes(tag)
-                    ? selectedTags.filter((currentTag) => currentTag !== tag)
-                    : [...selectedTags, tag]
+            updateSelectedTags((currentTags) =>
+                currentTags.includes(tag)
+                    ? currentTags.filter((currentTag) => currentTag !== tag)
+                    : [...currentTags, tag]
             );
         },
-        [availableTags, replaceTags, selectedTags]
+        [availableTags, updateSelectedTags]
     );
 
     const clearTags = React.useCallback(() => {
-        replaceTags([]);
-    }, [replaceTags]);
+        updateSelectedTags(() => []);
+    }, [updateSelectedTags]);
 
     const selectedTagSet = React.useMemo(() => new Set(selectedTags), [selectedTags]);
     const value = React.useMemo(
