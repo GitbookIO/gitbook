@@ -21,7 +21,7 @@ interface DataFetcherInput {
 }
 
 /**
- * Options to pass to the `fetch` call to disable the Next data-cache when wrapped in `use cache: remote`.
+ * Options to pass to the `fetch` call to disable the Next data-cache when wrapped in `use cache`.
  */
 export const noCacheFetchOptions: Partial<RequestInit> = {
     next: {
@@ -298,9 +298,10 @@ const getChangeRequest = cache(
     }
 );
 
+// We don't use remote cache on vercel because of the 2Mb limit on cache size that makes some route crash
 const getRevision = cache(
     async (input: DataFetcherInput, params: { spaceId: string; revisionId: string }) => {
-        'use cache: remote';
+        'use cache';
         return wrapCacheDataFetcherError(async () => {
             return trace(`getRevision(${params.spaceId}, ${params.revisionId})`, async () => {
                 const api = apiClient(input);
@@ -531,9 +532,10 @@ const getComputedDocument = cache(
     }
 );
 
+// We don't use remote cache on vercel because of the 2Mb limit on cache size that makes some route crash
 const getLatestOpenAPISpecVersionContent = cache(
     async (input: DataFetcherInput, params: { organizationId: string; slug: string }) => {
-        'use cache: remote';
+        'use cache';
         cacheTag(
             getCacheTag({
                 tag: 'openapi',
@@ -674,12 +676,13 @@ const getEmbedByUrl = cache(
     }
 );
 
+// We don't use remote cache for this one because of the number of potential cache entry causing 429 on vercel runtime cache when revalidating
 const searchSiteContent = cache(
     async (
         input: DataFetcherInput,
         params: Parameters<GitBookDataFetcher['searchSiteContent']>[0]
     ) => {
-        'use cache: remote';
+        'use cache';
         cacheTag(
             getCacheTag({
                 tag: 'site',
