@@ -16,7 +16,7 @@ import { PageAside } from '@/components/PageAside';
 import { PageBody, PageCover } from '@/components/PageBody';
 import { getPagePath } from '@/lib/pages';
 import { isPageIndexable, isSiteIndexable } from '@/lib/seo';
-import { getDocumentUpdateTags } from '@/lib/updates';
+import { getDocumentFilterableTags } from '@/lib/updates';
 
 import {
     getContentInlineIconSourceRequests,
@@ -76,7 +76,7 @@ export async function SitePage(props: SitePageProps & { staticRoute: boolean }) 
         iconSources,
     } = await getSitePageData(props);
     const headerOffset = { sectionsHeader: withSections, topHeader: withTopHeader };
-    const updateTags = document ? getDocumentUpdateTags(document, context.revision) : [];
+    const filterableTags = document ? getDocumentFilterableTags(document, context.revision) : [];
     const content = (
         <>
             {/* Using `contents` makes the children of this div according to its parent — which keeps them in a single flex row with the TOC by default.
@@ -97,7 +97,7 @@ export async function SitePage(props: SitePageProps & { staticRoute: boolean }) 
                     <PageAside
                         page={page}
                         document={document}
-                        updateTags={updateTags}
+                        filterableTags={filterableTags}
                         withHeaderOffset={headerOffset}
                         withFullPageCover={withFullPageCover}
                         withPageFeedback={withPageFeedback}
@@ -121,8 +121,8 @@ export async function SitePage(props: SitePageProps & { staticRoute: boolean }) 
     return (
         <IconsProvider iconSources={iconSources}>
             <PageContextProvider pageId={page.id} spaceId={context.space.id} title={page.title}>
-                {updateTags.length > 0 ? (
-                    <UpdatesFilterProvider tagSlugs={updateTags.map((tag) => tag.slug)}>
+                {filterableTags.length > 0 ? (
+                    <UpdatesFilterProvider tagSlugs={filterableTags.map((tag) => tag.slug)}>
                         {content}
                     </UpdatesFilterProvider>
                 ) : (

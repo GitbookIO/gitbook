@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'bun:test';
 import type { JSONDocument, Revision } from '@gitbook/api';
-import { getDocumentUpdateTags } from './updates';
+import { getDocumentFilterableTags } from './updates';
 
-describe('getDocumentUpdateTags', () => {
+describe('getDocumentFilterableTags', () => {
     it('returns unique update tags in document order', () => {
         const document = createUpdatesDocument([
             ['improvements', 'fixes'],
@@ -18,7 +18,7 @@ describe('getDocumentUpdateTags', () => {
             ],
         } as unknown as Revision;
 
-        expect(getDocumentUpdateTags(document, revision).map((tag) => tag.slug)).toEqual([
+        expect(getDocumentFilterableTags(document, revision).map((tag) => tag.slug)).toEqual([
             'improvements',
             'fixes',
             'new-releases',
@@ -26,7 +26,7 @@ describe('getDocumentUpdateTags', () => {
     });
 });
 
-function createUpdatesDocument(updateTags: string[][]): JSONDocument {
+function createUpdatesDocument(entryTags: string[][]): JSONDocument {
     return {
         object: 'document',
         data: { schemaVersion: 2 },
@@ -36,7 +36,7 @@ function createUpdatesDocument(updateTags: string[][]): JSONDocument {
                 type: 'updates',
                 data: { format: 'full' },
                 isVoid: false,
-                nodes: updateTags.map((tags, index) => ({
+                nodes: entryTags.map((tags, index) => ({
                     object: 'block',
                     type: 'update',
                     data: {

@@ -27,13 +27,13 @@ import { ScrollToTopButton } from './ScrollToTopButton';
 export async function PageAside(props: {
     page: RevisionPageDocument;
     document: JSONDocument | null;
-    updateTags: RevisionTag[];
+    filterableTags: RevisionTag[];
     context: GitBookSiteContext;
     withHeaderOffset: { sectionsHeader: boolean; topHeader: boolean };
     withFullPageCover: boolean;
     withPageFeedback: boolean;
 }) {
-    const { page, document, updateTags, withPageFeedback, context } = props;
+    const { page, document, filterableTags, withPageFeedback, context } = props;
     const { customization, site } = context;
     const language = await getSpaceLanguage(context);
 
@@ -106,16 +106,16 @@ export async function PageAside(props: {
             <div className="flex h-full w-full shrink-0 flex-col overflow-hidden">
                 {page.layout.outline ? (
                     <>
-                        {updateTags.length > 0 ? (
+                        {filterableTags.length > 0 ? (
                             <UpdatesTagFilters
-                                tags={updateTags}
+                                tags={filterableTags}
                                 clearLabel={tString(language, 'clear')}
                             />
                         ) : null}
                         <div
                             className={tcls(
                                 'mb-3 ml-3 flex page-no-outline:hidden items-center justify-between max-lg:hidden',
-                                updateTags.length > 0 && 'mt-4'
+                                filterableTags.length > 0 && 'mt-4'
                             )}
                         >
                             <ScrollToTopButton className="flex cursor-pointer items-center gap-1 font-semibold text-tint text-xs uppercase leading-wider">

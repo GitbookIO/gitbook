@@ -5,7 +5,7 @@ import { getRevisionTags, resolveBlockTags } from './tags';
 /**
  * Get the unique tags used by update entries in a document, preserving document order.
  */
-export function getDocumentUpdateTags(
+export function getDocumentFilterableTags(
     document: JSONDocument,
     revision: Revision | undefined
 ): RevisionTag[] {
