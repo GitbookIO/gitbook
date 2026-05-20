@@ -11,6 +11,7 @@ export const vi: TranslationLanguage = {
     switch_to_system_theme: 'Chuyển sang giao diện hệ thống',
     search: 'Tìm kiếm',
     clear: 'Xóa',
+    tags: 'Thẻ',
     search_back: 'Quay lại kết quả tìm kiếm',
     search_or_ask: 'Hỏi hoặc tìm kiếm',
     search_input_placeholder: 'Tìm kiếm nội dung',

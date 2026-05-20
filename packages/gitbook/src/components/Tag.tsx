@@ -32,7 +32,7 @@ export function Tag(props: { tag: RevisionTag; className?: string }) {
 /**
  * Renders the emoji or icon for a tag, if present.
  */
-function TagIcon(props: { tag: RevisionTag }) {
+export function TagIcon(props: { tag: RevisionTag }) {
     const { tag } = props;
 
     if ('emoji' in tag) {

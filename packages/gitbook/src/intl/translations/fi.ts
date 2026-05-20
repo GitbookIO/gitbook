@@ -11,6 +11,7 @@ export const fi: TranslationLanguage = {
     switch_to_system_theme: 'Vaihda järjestelmän teemaan',
     search: 'Haku',
     clear: 'Tyhjennä',
+    tags: 'Tunnisteet',
     search_back: 'Takaisin hakutuloksiin',
     search_or_ask: 'Kysy tai hae',
     search_input_placeholder: 'Hae sisällöstä',

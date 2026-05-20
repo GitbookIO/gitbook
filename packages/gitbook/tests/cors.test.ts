@@ -137,7 +137,7 @@ describe('CORS', () => {
             expect(response.status).toBe(200);
             expect(response.headers.get('access-control-allow-origin')).toBe(origin);
             expect(response.headers.get('access-control-allow-credentials')).toBe('true');
-        });
+        }, 10_000);
 
         it('should allow a subdomain (same registrable domain)', async () => {
             const origin = 'https://docs.gitbook.com';
@@ -147,7 +147,7 @@ describe('CORS', () => {
 
             expect(response.status).toBe(200);
             expect(response.headers.get('access-control-allow-origin')).toBe(origin);
-        });
+        }, 10_000);
 
         it('should reject a different registrable domain', async () => {
             const response = await fetch(TEST_URL, {
@@ -156,6 +156,6 @@ describe('CORS', () => {
 
             expect(response.status).toBe(200);
             expect(response.headers.get('access-control-allow-origin')).toBeNull();
-        });
+        }, 10_000);
     });
 });

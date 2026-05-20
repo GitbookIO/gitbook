@@ -9,6 +9,7 @@ export const en = {
     switch_to_system_theme: 'Switch to system theme',
     search: 'Search',
     clear: 'Clear',
+    tags: 'Tags',
     search_back: 'Back to search results',
     search_or_ask: 'Ask or search',
     search_input_placeholder: 'Search content',

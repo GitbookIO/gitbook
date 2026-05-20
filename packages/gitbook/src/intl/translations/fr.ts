@@ -9,6 +9,7 @@ export const fr = {
     switch_to_system_theme: 'Utiliser le thème du système',
     search: 'Rechercher',
     clear: 'Effacer',
+    tags: 'Étiquettes',
     search_back: 'Retour aux résultats de recherche',
     search_or_ask: 'Rechercher',
     search_input_placeholder: 'Rechercher dans le contenu',

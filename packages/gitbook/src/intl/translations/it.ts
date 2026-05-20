@@ -11,6 +11,7 @@ export const it: TranslationLanguage = {
     switch_to_system_theme: 'Passa al tema di sistema',
     search: 'Cerca',
     clear: 'Cancella',
+    tags: 'Tag',
     search_back: 'Torna ai risultati di ricerca',
     search_or_ask: 'Chiedi o cerca',
     search_input_placeholder: 'Cerca contenuti',

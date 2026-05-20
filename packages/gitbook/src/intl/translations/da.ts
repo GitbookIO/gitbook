@@ -11,6 +11,7 @@ export const da: TranslationLanguage = {
     switch_to_system_theme: 'Skift til systemtema',
     search: 'Søg',
     clear: 'Ryd',
+    tags: 'Tags',
     search_back: 'Tilbage til søgeresultater',
     search_or_ask: 'Spørg eller søg',
     search_input_placeholder: 'Søg i indhold',

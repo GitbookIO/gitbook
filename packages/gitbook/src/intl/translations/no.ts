@@ -11,6 +11,7 @@ export const no: TranslationLanguage = {
     switch_to_system_theme: 'Bytt til systemtema',
     search: 'Søk',
     clear: 'Tøm',
+    tags: 'Tagger',
     search_back: 'Tilbake til søkeresultater',
     search_or_ask: 'Spør eller søk',
     search_input_placeholder: 'Søk i innhold',

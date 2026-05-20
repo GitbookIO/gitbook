@@ -11,6 +11,7 @@ export const hu: TranslationLanguage = {
     switch_to_system_theme: 'Váltás rendszer témára',
     search: 'Keresés',
     clear: 'Törlés',
+    tags: 'Címkék',
     search_back: 'Vissza a keresési eredményekhez',
     search_or_ask: 'Kérdezés vagy keresés',
     search_input_placeholder: 'Keresés a tartalomban',

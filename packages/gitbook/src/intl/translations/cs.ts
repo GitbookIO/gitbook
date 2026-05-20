@@ -11,6 +11,7 @@ export const cs: TranslationLanguage = {
     switch_to_system_theme: 'Přepnout na systémový motiv',
     search: 'Hledat',
     clear: 'Vymazat',
+    tags: 'Štítky',
     search_back: 'Zpět na výsledky hledání',
     search_or_ask: 'Zeptat se nebo hledat',
     search_input_placeholder: 'Hledat v obsahu',

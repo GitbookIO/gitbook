@@ -11,6 +11,7 @@ export const he: TranslationLanguage = {
     switch_to_system_theme: 'מעבר לערכת הנושא של המערכת',
     search: 'חיפוש',
     clear: 'ניקוי',
+    tags: 'תגיות',
     search_back: 'חזרה לתוצאות החיפוש',
     search_or_ask: 'שאלה או חיפוש',
     search_input_placeholder: 'חיפוש בתוכן',

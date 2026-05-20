@@ -11,6 +11,7 @@ export const et: TranslationLanguage = {
     switch_to_system_theme: 'Lülitu süsteemi teemale',
     search: 'Otsi',
     clear: 'Tühjenda',
+    tags: 'Sildid',
     search_back: 'Tagasi otsingutulemuste juurde',
     search_or_ask: 'Küsi või otsi',
     search_input_placeholder: 'Otsi sisust',

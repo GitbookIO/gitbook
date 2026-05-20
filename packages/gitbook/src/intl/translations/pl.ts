@@ -11,6 +11,7 @@ export const pl: TranslationLanguage = {
     switch_to_system_theme: 'Przełącz na motyw systemowy',
     search: 'Szukaj',
     clear: 'Wyczyść',
+    tags: 'Tagi',
     search_back: 'Wróć do wyników wyszukiwania',
     search_or_ask: 'Zapytaj lub wyszukaj',
     search_input_placeholder: 'Szukaj w treści',

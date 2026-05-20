@@ -11,6 +11,7 @@ export const sk: TranslationLanguage = {
     switch_to_system_theme: 'Prepnúť na systémový motív',
     search: 'Hľadať',
     clear: 'Vymazať',
+    tags: 'Značky',
     search_back: 'Späť na výsledky vyhľadávania',
     search_or_ask: 'Opýtať sa alebo hľadať',
     search_input_placeholder: 'Hľadať v obsahu',

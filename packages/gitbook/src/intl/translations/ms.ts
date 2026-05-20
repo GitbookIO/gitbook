@@ -11,6 +11,7 @@ export const ms: TranslationLanguage = {
     switch_to_system_theme: 'Tukar kepada tema sistem',
     search: 'Cari',
     clear: 'Kosongkan',
+    tags: 'Tag',
     search_back: 'Kembali ke hasil carian',
     search_or_ask: 'Tanya atau cari',
     search_input_placeholder: 'Cari kandungan',
