@@ -11,6 +11,7 @@ export const id: TranslationLanguage = {
     switch_to_system_theme: 'Beralih ke tema sistem',
     search: 'Cari',
     clear: 'Bersihkan',
+    tags: 'Tag',
     search_back: 'Kembali ke hasil pencarian',
     search_or_ask: 'Tanya atau cari',
     search_input_placeholder: 'Cari konten',

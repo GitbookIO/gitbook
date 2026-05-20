@@ -11,6 +11,7 @@ export const sv: TranslationLanguage = {
     switch_to_system_theme: 'Byt till systemtema',
     search: 'Sök',
     clear: 'Rensa',
+    tags: 'Taggar',
     search_back: 'Tillbaka till sökresultat',
     search_or_ask: 'Fråga eller sök',
     search_input_placeholder: 'Sök i innehållet',

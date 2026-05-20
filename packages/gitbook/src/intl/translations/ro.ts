@@ -11,6 +11,7 @@ export const ro: TranslationLanguage = {
     switch_to_system_theme: 'Comută la tema sistemului',
     search: 'Caută',
     clear: 'Șterge',
+    tags: 'Etichete',
     search_back: 'Înapoi la rezultatele căutării',
     search_or_ask: 'Întreabă sau caută',
     search_input_placeholder: 'Caută în conținut',

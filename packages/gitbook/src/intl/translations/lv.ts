@@ -11,6 +11,7 @@ export const lv: TranslationLanguage = {
     switch_to_system_theme: 'Pārslēgt uz sistēmas motīvu',
     search: 'Meklēt',
     clear: 'Notīrīt',
+    tags: 'Birkas',
     search_back: 'Atpakaļ uz meklēšanas rezultātiem',
     search_or_ask: 'Jautāt vai meklēt',
     search_input_placeholder: 'Meklēt saturā',

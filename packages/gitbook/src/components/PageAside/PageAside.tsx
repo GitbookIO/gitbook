@@ -109,6 +109,7 @@ export async function PageAside(props: {
                         {filterableTags.length > 0 ? (
                             <UpdatesTagFilters
                                 tags={filterableTags}
+                                tagsLabel={tString(language, 'tags')}
                                 clearLabel={tString(language, 'clear')}
                             />
                         ) : null}

@@ -14,15 +14,21 @@ export function useScrollActiveId(
         threshold?: number;
         enabled: boolean;
     } = { enabled: true }
-) {
-    const [activeId, setActiveId] = React.useState<string>(ids[0]!);
+): string | undefined {
+    const [activeId, setActiveId] = React.useState<string | undefined>(ids[0]);
     const sectionsIntersectingMap = React.useRef<Map<string, boolean>>(new Map());
 
     React.useEffect(() => {
         const defaultActiveId = ids[0];
         sectionsIntersectingMap.current.clear();
-        // @ts-expect-error
-        setActiveId((activeId) => (ids.indexOf(activeId) !== -1 ? activeId : defaultActiveId));
+        setActiveId((activeId) =>
+            activeId !== undefined && ids.includes(activeId) ? activeId : defaultActiveId
+        );
+
+        if (ids.length === 0) {
+            return;
+        }
+
         if (!enabled) {
             return;
         }

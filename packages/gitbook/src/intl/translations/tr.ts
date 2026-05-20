@@ -11,6 +11,7 @@ export const tr: TranslationLanguage = {
     switch_to_system_theme: 'Sistem temasına geç',
     search: 'Ara',
     clear: 'Temizle',
+    tags: 'Etiketler',
     search_back: 'Arama sonuçlarına geri dön',
     search_or_ask: 'Sor veya ara',
     search_input_placeholder: 'İçerikte ara',

@@ -11,6 +11,7 @@ export const uk: TranslationLanguage = {
     switch_to_system_theme: 'Перемкнути на системну тему',
     search: 'Пошук',
     clear: 'Очистити',
+    tags: 'Теги',
     search_back: 'Назад до результатів пошуку',
     search_or_ask: 'Запитати або шукати',
     search_input_placeholder: 'Шукати вміст',

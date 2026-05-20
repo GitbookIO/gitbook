@@ -11,6 +11,7 @@ export const el: TranslationLanguage = {
     switch_to_system_theme: 'Αλλαγή στο θέμα συστήματος',
     search: 'Αναζήτηση',
     clear: 'Εκκαθάριση',
+    tags: 'Ετικέτες',
     search_back: 'Επιστροφή στα αποτελέσματα αναζήτησης',
     search_or_ask: 'Ρωτήστε ή αναζητήστε',
     search_input_placeholder: 'Αναζήτηση περιεχομένου',

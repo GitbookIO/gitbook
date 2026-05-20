@@ -9,6 +9,7 @@ export const pt_br = {
     switch_to_system_theme: 'Mudar para configuração do sistema',
     search: 'Buscar',
     clear: 'Limpar',
+    tags: 'Tags',
     search_back: 'Voltar aos resultados da busca',
     search_or_ask: 'Perguntar ou buscar',
     search_input_placeholder: 'Buscar conteúdo',

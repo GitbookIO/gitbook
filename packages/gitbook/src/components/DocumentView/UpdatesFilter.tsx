@@ -55,9 +55,14 @@ export function UpdatesFilterProvider(props: {
         [availableTags]
     );
 
+    const rawSelectedTags = React.useMemo(
+        () => searchParams?.getAll(UPDATES_FILTER_SEARCH_PARAM) ?? [],
+        [searchParams]
+    );
+
     const selectedTags = React.useMemo(
-        () => sanitizeTags(searchParams?.getAll(UPDATES_FILTER_SEARCH_PARAM) ?? []),
-        [sanitizeTags, searchParams]
+        () => sanitizeTags(rawSelectedTags),
+        [sanitizeTags, rawSelectedTags]
     );
 
     const replaceTags = React.useCallback(
@@ -75,6 +80,12 @@ export function UpdatesFilterProvider(props: {
         },
         [pathname, router, sanitizeTags, searchParams]
     );
+
+    React.useEffect(() => {
+        if (!areTagsEqual(rawSelectedTags, selectedTags)) {
+            replaceTags(selectedTags);
+        }
+    }, [rawSelectedTags, replaceTags, selectedTags]);
 
     const toggleTag = React.useCallback(
         (tag: string) => {
@@ -115,9 +126,10 @@ export function useUpdatesFilter(): UpdatesFilterContextValue {
 
 export function UpdatesTagFilters(props: {
     tags: RevisionTag[];
+    tagsLabel: string;
     clearLabel: string;
 }) {
-    const { tags, clearLabel } = props;
+    const { tags, tagsLabel, clearLabel } = props;
     const { selectedTagSet, selectedTags, toggleTag, clearTags } = useUpdatesFilter();
     const isFiltering = selectedTags.length > 0;
 
@@ -130,7 +142,7 @@ export function UpdatesTagFilters(props: {
             <div className="mb-3 ml-3 flex items-center justify-between gap-2">
                 <div className="flex items-center gap-1 font-semibold text-tint text-xs uppercase leading-wider">
                     <Icon icon="tags" className="size-3" />
-                    Tags
+                    {tagsLabel}
                 </div>
                 <Button
                     variant="blank"
@@ -171,6 +183,10 @@ export function UpdatesTagFilters(props: {
             </div>
         </div>
     );
+}
+
+function areTagsEqual(left: string[], right: string[]): boolean {
+    return left.length === right.length && left.every((tag, index) => tag === right[index]);
 }
 
 export function FilteredUpdate(props: {

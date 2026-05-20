@@ -9,6 +9,7 @@ export const de = {
     switch_to_system_theme: 'Zum Systemmodus wechseln',
     search: 'Suche',
     clear: 'Löschen',
+    tags: 'Tags',
     search_back: 'Zurück zu den Suchergebnissen',
     search_or_ask: 'Fragen oder Suchen',
     search_input_placeholder: 'Inhalt durchsuchen',

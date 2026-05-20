@@ -11,6 +11,7 @@ export const zh_tw: TranslationLanguage = {
     switch_to_system_theme: '切換至系統主題',
     search: '搜尋',
     clear: '清除',
+    tags: '標籤',
     search_back: '返回搜尋結果',
     search_or_ask: '詢問或搜尋',
     search_input_placeholder: '搜尋內容',
