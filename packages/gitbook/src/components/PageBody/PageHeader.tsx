@@ -166,9 +166,21 @@ function getPageActionsURLs({
                   }).toString()}`
               )
             : undefined,
-        mcp:
-            context.site.visibility !== SiteVisibility.VisitorAuth
-                ? context.linker.toAbsoluteURL(context.linker.toPathInSite('~gitbook/mcp'))
-                : undefined,
+        mcp: getPageActionsMCPURL(context),
     };
+}
+
+/**
+ * Return the MCP URL to be used in the page actions dropdown.
+ */
+function getPageActionsMCPURL(context: GitBookSiteContext) {
+    const useAuthenticatedEndpoint = Boolean(
+        context.site.visibility !== SiteVisibility.VisitorAuth &&
+            context.site.adaptiveContent?.enabled &&
+            context.site.urls.login &&
+            context.isLoggedInVisitor
+    );
+    const endpoint = useAuthenticatedEndpoint ? '~gitbook/mcp/auth' : '~gitbook/mcp';
+
+    return context.linker.toAbsoluteURL(context.linker.toPathInSite(endpoint));
 }
