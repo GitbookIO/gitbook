@@ -378,6 +378,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
                 !requestURL.searchParams.has('x-gitbook-search-indexation')
                     ? true
                     : undefined,
+            isLoggedInVisitor: visitorToken ? true : undefined,
         };
 
         const requestHeaders = new Headers(request.headers);
