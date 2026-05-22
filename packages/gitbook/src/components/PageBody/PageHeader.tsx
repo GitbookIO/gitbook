@@ -27,13 +27,18 @@ export async function PageHeader(props: {
 
     const hasAncestors = ancestors.length > 0;
 
+    // @ts-expect-error available in next API update
+    const pageActionsEnabled = page.layout.pageActions !== false;
+
     // Show page actions if *any* of the actions are enabled
-    const hasPageActions = [
-        ...Object.values(context.customization.pageActions),
-        context.customization.pdf.enabled,
-        context.customization.git.showEditLink,
-        withRSSFeed,
-    ].some(Boolean);
+    const hasPageActions =
+        pageActionsEnabled &&
+        [
+            ...Object.values(context.customization.pageActions),
+            context.customization.pdf.enabled,
+            context.customization.git.showEditLink,
+            withRSSFeed,
+        ].some(Boolean);
 
     if (!page.layout.title && !page.layout.description && !hasPageActions) {
         return null;
