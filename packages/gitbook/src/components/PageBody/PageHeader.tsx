@@ -28,7 +28,7 @@ export async function PageHeader(props: {
     const hasAncestors = ancestors.length > 0;
 
     // @ts-expect-error available in next API update
-    const pageActionsEnabled = page.layout.pageActions !== false;
+    const pageActionsEnabled = page.layout.actions !== false;
 
     // Show page actions if *any* of the actions are enabled
     const hasPageActions =
