@@ -27,6 +27,9 @@ export async function servePageMarkdown(baseContext: GitBookSiteContext, pagePat
         }
 
         const markdownPage = await getMarkdownForPage(context, pageLookup);
+        if (baseContext.displayAgentInstructions === false) {
+            return markdownPage;
+        }
         return `${markdownPage}${renderAskFooter(context, pageLookup)}`;
     });
 }
