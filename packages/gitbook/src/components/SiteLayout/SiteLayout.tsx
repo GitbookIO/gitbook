@@ -108,7 +108,6 @@ export async function generateSiteLayoutViewport(context: GitBookSiteContext): P
                 : 'light dark', // 'system' → let browser decide based on OS preference
         width: 'device-width',
         initialScale: 1,
-        maximumScale: 1,
         viewportFit: 'cover',
     };
 }

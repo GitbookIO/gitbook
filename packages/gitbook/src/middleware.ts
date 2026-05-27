@@ -379,6 +379,10 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
                     ? true
                     : undefined,
             isLoggedInVisitor: visitorToken ? true : undefined,
+            displayAgentInstructions:
+                requestURL.searchParams.get('displayAgentInstructions') === 'false'
+                    ? false
+                    : undefined,
         };
 
         const requestHeaders = new Headers(request.headers);
@@ -485,6 +489,9 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         rewrittenURL.search = request.nextUrl.search;
         if (rewrittenURL.searchParams.has('fallback')) {
             rewrittenURL.searchParams.delete('fallback');
+        }
+        if (rewrittenURL.searchParams.has('displayAgentInstructions')) {
+            rewrittenURL.searchParams.delete('displayAgentInstructions');
         }
 
         const response = NextResponse.rewrite(rewrittenURL, {
