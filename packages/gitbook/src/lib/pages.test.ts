@@ -85,6 +85,7 @@ describe('resolveFirstDocument', () => {
                             width: RevisionPageLayoutOptionsWidth.Default,
                             metadata: true,
                             tags: true,
+                            actions: true,
                         },
                     },
                 ],
@@ -137,6 +138,7 @@ describe('resolveFirstDocument', () => {
                     width: RevisionPageLayoutOptionsWidth.Default,
                     metadata: true,
                     tags: true,
+                    actions: true,
                 },
             },
         ];
@@ -182,6 +184,7 @@ describe('resolvePagePath', () => {
                     width: RevisionPageLayoutOptionsWidth.Default,
                     metadata: true,
                     tags: true,
+                    actions: true,
                 },
             },
         ];
@@ -257,6 +260,7 @@ describe('resolvePagePath', () => {
                             width: RevisionPageLayoutOptionsWidth.Default,
                             metadata: true,
                             tags: true,
+                            actions: true,
                         },
                     },
                 ],
@@ -374,6 +378,7 @@ function createDocumentPage(id: string, path: string, hidden = false): RevisionP
             width: RevisionPageLayoutOptionsWidth.Default,
             metadata: true,
             tags: true,
+            actions: true,
         },
     };
 }

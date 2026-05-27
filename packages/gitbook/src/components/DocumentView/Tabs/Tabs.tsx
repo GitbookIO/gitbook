@@ -1,4 +1,6 @@
 import type { DocumentBlockTabs } from '@gitbook/api';
+import type { IconName } from '@gitbook/icons';
+import { validateIconName } from '@gitbook/icons/icons';
 
 import { tcls } from '@/lib/tailwind';
 
@@ -20,9 +22,13 @@ export function Tabs(props: BlockProps<DocumentBlockTabs>) {
             throw new Error('Tab block is missing a key');
         }
 
+        const icon: IconName | undefined =
+            tab.data.icon && validateIconName(tab.data.icon) ? tab.data.icon : undefined;
+
         return {
             id: tab.meta?.id ?? tab.key,
             title: tab.data.title ?? '',
+            icon,
             body: (
                 <Blocks
                     key={tab.key}
