@@ -69,6 +69,7 @@ export function SearchContainer({
         },
         {
             enableOnFormTags: true,
+            useKey: true,
         }
     );
 
@@ -84,6 +85,7 @@ export function SearchContainer({
         },
         {
             enableOnFormTags: true,
+            useKey: true,
         }
     );
 
