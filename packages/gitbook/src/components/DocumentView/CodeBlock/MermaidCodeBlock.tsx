@@ -1,16 +1,21 @@
 'use client';
 
 import { useTheme } from 'next-themes';
-import { useEffect, useId, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 
 import { useHasBeenInViewport } from '@/components/hooks/useHasBeenInViewport';
 import { Loading } from '@/components/primitives/Loading';
 import { tcls } from '@/lib/tailwind';
 import Panzoom from '@panzoom/panzoom';
 import type { RenderResult } from 'mermaid';
+import { FocusScope, usePreventScroll } from 'react-aria';
 import { type ClientBlockProps, ClientCodeBlock } from './ClientCodeBlock';
 import { MermaidPanZoomControls } from './MermaidPanZoomControls';
 import { getPlainCodeBlock } from './highlight';
+
+/** Duration of the fullscreen dialog enter/exit animation, must match `animate-blur-in/out`. */
+const DIALOG_ANIMATION_MS = 200;
 
 /**
  * Used to render a Mermaid diagram from a CodeBlock.
@@ -19,11 +24,18 @@ export function MermaidCodeBlock(props: ClientBlockProps) {
     const { block, mode, style } = props;
     const source = getPlainCodeBlock(block);
     const rootRef = useRef<HTMLDivElement>(null);
+    const movableRef = useRef<HTMLDivElement>(null);
+    const panelRef = useRef<HTMLDivElement>(null);
     const wrapperRef = useRef<HTMLDivElement>(null);
     const diagramRef = useRef<HTMLDivElement>(null);
     const [panZoom, setPanZoom] = useState<ReturnType<typeof Panzoom> | null>(null);
     const [error, setError] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
+    // `isFullscreen` is the open intent; `isExiting` keeps the dialog mounted while it
+    // animates closed. `isPresent` is true whenever the diagram lives in the dialog.
+    const [isFullscreen, setIsFullscreen] = useState(false);
+    const [isExiting, setIsExiting] = useState(false);
+    const isPresent = isFullscreen || isExiting;
     const { resolvedTheme } = useTheme();
     const darkMode = resolvedTheme === 'dark';
     const id = useSafeId();
@@ -96,27 +108,105 @@ export function MermaidCodeBlock(props: ClientBlockProps) {
         };
     }, [source, id, darkMode, shouldRender]);
 
+    // Lock the page scroll while the dialog is on screen (handles scrollbar width and iOS).
+    usePreventScroll({ isDisabled: !isPresent });
+
+    const openFullscreen = useCallback(() => {
+        // Reserve the inline slot's current height before the diagram is detached, so the
+        // page layout does not jump. Measured here while still inline and un-restyled.
+        const root = rootRef.current;
+        if (root) {
+            root.style.minHeight = `${root.offsetHeight}px`;
+        }
+        setIsExiting(false);
+        setIsFullscreen(true);
+        // Re-center the diagram for the larger view.
+        panZoom?.reset();
+    }, [panZoom]);
+
+    const closeFullscreen = useCallback(() => {
+        setIsFullscreen(false);
+        setIsExiting(true);
+    }, []);
+
+    // Keep the dialog mounted until the exit animation finishes, then unmount it.
+    useEffect(() => {
+        if (!isExiting) {
+            return;
+        }
+
+        const timer = window.setTimeout(() => {
+            setIsExiting(false);
+            panZoom?.reset();
+        }, DIALOG_ANIMATION_MS);
+        return () => window.clearTimeout(timer);
+    }, [isExiting, panZoom]);
+
+    // Allow Escape to close the dialog.
+    useEffect(() => {
+        if (!isFullscreen) {
+            return;
+        }
+
+        const onKeyDown = (event: KeyboardEvent) => {
+            if (event.key === 'Escape') {
+                closeFullscreen();
+            }
+        };
+
+        document.addEventListener('keydown', onKeyDown);
+        return () => document.removeEventListener('keydown', onKeyDown);
+    }, [isFullscreen, closeFullscreen]);
+
+    // Move the live diagram into the fullscreen dialog (and back) without re-rendering it,
+    // so panzoom and the rendered SVG are preserved. Done in the panel's ref callback so it
+    // happens during commit, before FocusScope reads focus. The inline slot's reserved
+    // height (set in openFullscreen) is cleared once the diagram returns to it.
+    const setPanel = useCallback((panel: HTMLDivElement | null) => {
+        panelRef.current = panel;
+        const root = rootRef.current;
+        const movable = movableRef.current;
+        if (!root || !movable) {
+            return;
+        }
+
+        if (panel) {
+            panel.appendChild(movable);
+        } else {
+            root.appendChild(movable);
+            root.style.minHeight = '';
+        }
+    }, []);
+
     if (error) {
         return <ClientCodeBlock {...props} />;
     }
 
-    return (
+    // The live diagram subtree. It is reparented between the inline slot and the
+    // fullscreen dialog, so its markup must not depend on where it currently lives.
+    const diagram = (
         <div
-            ref={rootRef}
-            className={tcls('group/mermaid relative', style)}
-            contentEditable={false}
+            ref={movableRef}
+            className={tcls(
+                'group/mermaid relative',
+                isPresent ? 'flex h-full w-full flex-col' : null
+            )}
         >
             <div
                 ref={wrapperRef}
-                className={
+                className={tcls(
                     isLoading
                         ? 'invisible absolute inset-x-0 overflow-hidden'
-                        : 'cursor-grab overflow-hidden active:cursor-grabbing'
-                }
+                        : 'cursor-grab overflow-hidden active:cursor-grabbing',
+                    isPresent && !isLoading ? 'flex-1' : null
+                )}
             >
                 <div
                     ref={diagramRef}
-                    className="overflow-auto p-2 [&_svg]:h-auto [&_svg]:max-w-full"
+                    className={tcls(
+                        'overflow-auto p-2 [&_svg]:h-auto [&_svg]:max-w-full',
+                        isPresent ? 'h-full [&_svg]:max-h-full' : null
+                    )}
                 />
             </div>
             {isLoading ? (
@@ -124,8 +214,53 @@ export function MermaidCodeBlock(props: ClientBlockProps) {
                     <Loading className="h-8 w-8" />
                 </div>
             ) : null}
-            {!isLoading && panZoom ? <MermaidPanZoomControls panZoom={panZoom} /> : null}
+            {!isLoading && panZoom ? (
+                <MermaidPanZoomControls
+                    panZoom={panZoom}
+                    isFullscreen={isPresent}
+                    onToggleFullscreen={isFullscreen ? closeFullscreen : openFullscreen}
+                />
+            ) : null}
         </div>
+    );
+
+    return (
+        <>
+            {/* Inline slot: keeps the diagram in the document flow until it goes fullscreen. */}
+            <div ref={rootRef} className={tcls('relative', style)} contentEditable={false}>
+                {diagram}
+            </div>
+            {isPresent
+                ? createPortal(
+                      <FocusScope contain restoreFocus>
+                          {/* Backdrop: dims and blurs the page, closes on click. */}
+                          {/* biome-ignore lint/a11y/useKeyWithClickEvents: a global Escape handler closes the dialog. */}
+                          <div
+                              aria-hidden="true"
+                              className={tcls(
+                                  'fixed inset-0 z-40 bg-tint-base/3 backdrop-blur-md dark:bg-tint-base/6',
+                                  isFullscreen ? 'animate-fade-in' : 'animate-fade-out'
+                              )}
+                              onClick={closeFullscreen}
+                          />
+                          {/* Centered panel. The padding area lets clicks fall through to the backdrop. */}
+                          <div className="pointer-events-none fixed inset-0 z-40 flex items-center justify-center p-3 sm:p-5 lg:p-8">
+                              <div
+                                  ref={setPanel}
+                                  role="dialog"
+                                  aria-modal="true"
+                                  aria-label="Mermaid diagram"
+                                  className={tcls(
+                                      'pointer-events-auto relative flex h-full w-full max-w-[110rem] flex-col overflow-hidden rounded-2xl border border-tint-subtle bg-tint-base shadow-2xl',
+                                      isFullscreen ? 'animate-blur-in' : 'animate-blur-out'
+                                  )}
+                              />
+                          </div>
+                      </FocusScope>,
+                      document.body
+                  )
+                : null}
+        </>
     );
 }
 
