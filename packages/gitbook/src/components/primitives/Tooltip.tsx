@@ -46,9 +46,10 @@ export function Tooltip(props: {
               ...contentProps,
               'data-non-interactive': '',
               style: {
+                  ...contentProps?.style,
+                  // Forced last so the non-interactive guarantee can't be overridden.
                   pointerEvents: 'none' as const,
                   userSelect: 'none' as const,
-                  ...contentProps?.style,
               },
           }
         : contentProps;
