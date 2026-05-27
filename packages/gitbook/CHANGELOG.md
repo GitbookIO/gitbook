@@ -1,5 +1,16 @@
 # gitbook
 
+## 0.26.2
+
+### Patch Changes
+
+- 67f31aa: Allow user-triggered AI assistants (ChatGPT-User, Claude-User, Perplexity-User) to read pages on non-indexable sites, so end-users can pull content into an LLM without an MCP connection. Search engines and training crawlers remain blocked.
+- 0c577a0: Allow CORS for the same root domain
+- 51fef84: Remove the date-gated header logo height logic and always apply the compact logo size to prevent size shifts between sections and translations.
+- f405fff: Add icon support in tab items
+- 3697dfe: Add support for hiding page actions from page layout options.
+- 127ef54: Add tag filtering controls for Updates blocks.
+
 ## 0.26.1
 
 ### Patch Changes
