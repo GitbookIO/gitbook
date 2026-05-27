@@ -33,7 +33,7 @@ export function MermaidPanZoomControls(props: {
     return (
         <div
             className={tcls(
-                'absolute right-2 bottom-2 z-10 flex flex-col items-center gap-0.5 rounded-lg border border-tint-subtle bg-tint-base/9 p-0.5 shadow-sm backdrop-blur-md transition-opacity duration-150 group-focus-within/mermaid:pointer-events-auto group-focus-within/mermaid:opacity-100 group-hover/mermaid:opacity-100 motion-reduce:transition-none',
+                'absolute right-2 bottom-2 z-10 flex flex-col items-center gap-0.5 rounded-lg bg-tint-base/5 p-0.5 backdrop-blur-xs transition-opacity duration-150 hover:bg-tint-base/8 group-focus-within/mermaid:pointer-events-auto group-focus-within/mermaid:opacity-100 group-hover/mermaid:opacity-100 motion-reduce:transition-none',
                 // Keep the controls always visible in fullscreen, otherwise only reveal on hover/focus.
                 isFullscreen ? 'opacity-100' : 'opacity-0'
             )}

@@ -1,7 +1,7 @@
 'use client';
 
 import { useTheme } from 'next-themes';
-import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
 import { useHasBeenInViewport } from '@/components/hooks/useHasBeenInViewport';
@@ -24,10 +24,20 @@ export function MermaidCodeBlock(props: ClientBlockProps) {
     const { block, mode, style } = props;
     const source = getPlainCodeBlock(block);
     const rootRef = useRef<HTMLDivElement>(null);
-    const movableRef = useRef<HTMLDivElement>(null);
     const panelRef = useRef<HTMLDivElement>(null);
     const wrapperRef = useRef<HTMLDivElement>(null);
     const diagramRef = useRef<HTMLDivElement>(null);
+    // A stable container that holds the diagram subtree. We portal the diagram into it and
+    // only ever move this plain node between the inline slot and the dialog — never the
+    // React-managed subtree itself — so React stays in control and panzoom/SVG are preserved.
+    const diagramHostRef = useRef<HTMLDivElement | null>(null);
+    if (diagramHostRef.current === null && typeof document !== 'undefined') {
+        const host = document.createElement('div');
+        // `display: contents` so the host adds no box of its own (the diagram becomes a
+        // direct flex child of the dialog panel and can fill it).
+        host.style.display = 'contents';
+        diagramHostRef.current = host;
+    }
     const [panZoom, setPanZoom] = useState<ReturnType<typeof Panzoom> | null>(null);
     const [error, setError] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
@@ -158,22 +168,30 @@ export function MermaidCodeBlock(props: ClientBlockProps) {
         return () => document.removeEventListener('keydown', onKeyDown);
     }, [isFullscreen, closeFullscreen]);
 
-    // Move the live diagram into the fullscreen dialog (and back) without re-rendering it,
-    // so panzoom and the rendered SVG are preserved. Done in the panel's ref callback so it
-    // happens during commit, before FocusScope reads focus. The inline slot's reserved
-    // height (set in openFullscreen) is cleared once the diagram returns to it.
+    // Keep the diagram host in the inline slot on mount (and whenever it isn't in the dialog).
+    useLayoutEffect(() => {
+        const host = diagramHostRef.current;
+        const root = rootRef.current;
+        if (host && root && !host.parentNode) {
+            root.appendChild(host);
+        }
+    }, []);
+
+    // Move the diagram host into the dialog panel (and back) as the panel mounts/unmounts.
+    // Done in the panel's ref callback so it happens during commit, before FocusScope reads
+    // focus. The inline slot's reserved height (set in openFullscreen) is cleared on return.
     const setPanel = useCallback((panel: HTMLDivElement | null) => {
         panelRef.current = panel;
+        const host = diagramHostRef.current;
         const root = rootRef.current;
-        const movable = movableRef.current;
-        if (!root || !movable) {
+        if (!host) {
             return;
         }
 
         if (panel) {
-            panel.appendChild(movable);
-        } else {
-            root.appendChild(movable);
+            panel.appendChild(host);
+        } else if (root) {
+            root.appendChild(host);
             root.style.minHeight = '';
         }
     }, []);
@@ -182,11 +200,10 @@ export function MermaidCodeBlock(props: ClientBlockProps) {
         return <ClientCodeBlock {...props} />;
     }
 
-    // The live diagram subtree. It is reparented between the inline slot and the
-    // fullscreen dialog, so its markup must not depend on where it currently lives.
+    // The live diagram subtree. It is portaled into a stable host that moves between the
+    // inline slot and the dialog, so its markup must not depend on where it currently lives.
     const diagram = (
         <div
-            ref={movableRef}
             className={tcls(
                 'group/mermaid relative',
                 isPresent ? 'flex h-full w-full flex-col' : null
@@ -226,10 +243,9 @@ export function MermaidCodeBlock(props: ClientBlockProps) {
 
     return (
         <>
-            {/* Inline slot: keeps the diagram in the document flow until it goes fullscreen. */}
-            <div ref={rootRef} className={tcls('relative', style)} contentEditable={false}>
-                {diagram}
-            </div>
+            {/* Inline slot: hosts the diagram in the document flow until it goes fullscreen. */}
+            <div ref={rootRef} className={tcls('relative', style)} contentEditable={false} />
+            {diagramHostRef.current ? createPortal(diagram, diagramHostRef.current) : null}
             {isPresent
                 ? createPortal(
                       <FocusScope contain restoreFocus>
