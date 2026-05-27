@@ -1,6 +1,6 @@
 'use client';
 import { useLanguage } from '@/intl/client';
-import { t } from '@/intl/translate';
+import { t, tString } from '@/intl/translate';
 import type { Assistant } from '../AI';
 import { useIsMobile } from '../hooks/useIsMobile';
 import { Button } from '../primitives';
@@ -38,6 +38,7 @@ export function AIChatButton(props: {
                     ) : null}
                 </div>
             }
+            aria-label={tString(language, 'ai_chat_ask', assistant.label)}
             onClick={() => assistant.open()}
         >
             {showLabel ? t(language, 'ask') : null}

@@ -435,6 +435,7 @@ function PageActionWrapper(props: {
                 size="xsmall"
                 variant="secondary"
                 label={label ?? shortLabel}
+                aria-label={shortLabel}
                 className="bg-tint-base"
                 onClick={onClick}
                 href={href}
