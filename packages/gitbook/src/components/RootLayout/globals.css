@@ -170,7 +170,8 @@
 }
 
 @utility elevate-link {
-    & a[href]:not(.link-overlay) {
+    & a[href]:not(.link-overlay),
+    & [data-annotation] {
         position: relative;
         z-index: 20;
     }
