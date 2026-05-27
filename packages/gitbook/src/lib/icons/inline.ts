@@ -358,7 +358,7 @@ function collectDocumentIconSourceRequests(
 
     const record = node as Record<string, unknown>;
 
-    if (record.type === 'icon' || record.type === 'button') {
+    if (record.type === 'icon' || record.type === 'button' || record.type === 'tabs-item') {
         const data = record.data;
         if (data && typeof data === 'object') {
             addIconSourceRequest(requests, (data as Record<string, unknown>).icon, iconStyle);
