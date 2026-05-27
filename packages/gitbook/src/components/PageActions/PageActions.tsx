@@ -86,7 +86,7 @@ function useCopiedStore(stateKey: string) {
 }
 
 /**
- * Cache for the markdown versbion of the page.
+ * Cache for the markdown version of the page.
  */
 const markdownCache = new QuickLRU<string, string>({ maxSize: 10 });
 
@@ -109,7 +109,8 @@ export function ActionCopyMarkdown(props: {
     const fetchMarkdown = async () => {
         setLoading(true);
 
-        const result = await fetch(markdownPageURL).then((res) => res.text());
+        const humanURL = `${markdownPageURL}?displayAgentInstructions=false`;
+        const result = await fetch(humanURL).then((res) => res.text());
         markdownCache.set(markdownPageURL, result);
 
         setLoading(false);
@@ -160,7 +161,7 @@ export function ActionViewAsMarkdown(props: { markdownPageURL: string; type: Pag
             icon="markdown"
             label={tString(language, 'view_page_markdown')}
             description={tString(language, 'view_page_plaintext')}
-            href={markdownPageURL}
+            href={`${markdownPageURL}?displayAgentInstructions=false`}
         />
     );
 }
