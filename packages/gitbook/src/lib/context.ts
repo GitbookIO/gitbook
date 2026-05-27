@@ -75,6 +75,13 @@ export type SiteURLData = Pick<
      * Whether the request included a visitor token.
      */
     isLoggedInVisitor?: boolean;
+
+    /**
+     * Whether to display agent instructions in the markdown output.
+     * When false, agent-facing footers (e.g. "Agent Instructions") are omitted.
+     * Defaults to true when undefined.
+     */
+    displayAgentInstructions?: boolean;
 };
 
 /**
@@ -172,6 +179,9 @@ export type GitBookSiteContext = GitBookSpaceContext & {
 
     /** Whether the request included a visitor token. */
     isLoggedInVisitor: boolean;
+
+    /** Whether to display agent instructions in the markdown output. Defaults to true when undefined. */
+    displayAgentInstructions?: boolean;
 };
 
 /**
@@ -253,6 +263,7 @@ export async function fetchSiteContextByURLLookup(
         isFallback: data.isFallback ?? false,
         noIndexSearch: data.noIndexSearch ?? false,
         isLoggedInVisitor: data.isLoggedInVisitor ?? false,
+        displayAgentInstructions: data.displayAgentInstructions,
     });
 }
 
@@ -274,6 +285,7 @@ export async function fetchSiteContextByIds(
         isFallback: boolean;
         noIndexSearch: boolean;
         isLoggedInVisitor: boolean;
+        displayAgentInstructions?: boolean;
     }
 ): Promise<GitBookSiteContext> {
     const { dataFetcher } = baseContext;
@@ -399,6 +411,7 @@ export async function fetchSiteContextByIds(
         isFallback: ids.isFallback,
         noIndexSearch: ids.noIndexSearch,
         isLoggedInVisitor: ids.isLoggedInVisitor,
+        displayAgentInstructions: ids.displayAgentInstructions,
     };
 }
 
