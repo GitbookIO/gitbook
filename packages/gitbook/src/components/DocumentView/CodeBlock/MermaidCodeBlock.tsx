@@ -222,7 +222,9 @@ export function MermaidCodeBlock(props: ClientBlockProps) {
                     ref={diagramRef}
                     className={tcls(
                         'overflow-auto p-2 [&_svg]:h-auto [&_svg]:max-w-full',
-                        isPresent ? 'h-full [&_svg]:max-h-full' : null
+                        isPresent
+                            ? 'flex h-full items-center justify-center [&_svg]:max-h-full'
+                            : null
                     )}
                 />
             </div>
