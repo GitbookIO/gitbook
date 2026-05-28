@@ -166,4 +166,5 @@ export const ms: TranslationLanguage = {
     form_other_prompt: 'Masukkan jawapan anda...',
     form_other_field: 'Lain-lain...',
     cancel: 'Batal',
+    direct_link_to_heading: 'Pautan terus ke tajuk',
 };

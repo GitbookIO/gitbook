@@ -167,4 +167,5 @@ export const hr: TranslationLanguage = {
     form_other_prompt: 'Unesite svoj odgovor...',
     form_other_field: 'Ostalo...',
     cancel: 'Odustani',
+    direct_link_to_heading: 'Izravna poveznica na naslov',
 };

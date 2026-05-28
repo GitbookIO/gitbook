@@ -165,4 +165,5 @@ export const tr: TranslationLanguage = {
     form_other_prompt: 'Yanıtınızı girin...',
     form_other_field: 'Diğer...',
     cancel: 'İptal',
+    direct_link_to_heading: 'Başlığa doğrudan bağlantı',
 };

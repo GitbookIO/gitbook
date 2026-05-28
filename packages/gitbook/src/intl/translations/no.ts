@@ -166,4 +166,5 @@ export const no: TranslationLanguage = {
     form_other_prompt: 'Skriv inn svaret ditt...',
     form_other_field: 'Annet...',
     cancel: 'Avbryt',
+    direct_link_to_heading: 'Direkte lenke til overskriften',
 };

@@ -166,4 +166,5 @@ export const id: TranslationLanguage = {
     form_other_prompt: 'Masukkan jawaban Anda...',
     form_other_field: 'Lainnya...',
     cancel: 'Batal',
+    direct_link_to_heading: 'Tautan langsung ke judul',
 };

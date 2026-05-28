@@ -165,4 +165,5 @@ export const vi: TranslationLanguage = {
     form_other_prompt: 'Nhập câu trả lời của bạn...',
     form_other_field: 'Khác...',
     cancel: 'Hủy',
+    direct_link_to_heading: 'Liên kết trực tiếp đến tiêu đề',
 };

@@ -164,4 +164,5 @@ export const he: TranslationLanguage = {
     form_other_prompt: 'הזן את תשובתך...',
     form_other_field: 'אחר...',
     cancel: 'ביטול',
+    direct_link_to_heading: 'קישור ישיר לכותרת',
 };

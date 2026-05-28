@@ -166,4 +166,5 @@ export const da: TranslationLanguage = {
     form_other_prompt: 'Indtast dit svar...',
     form_other_field: 'Andet...',
     cancel: 'Annuller',
+    direct_link_to_heading: 'Direkte link til overskriften',
 };

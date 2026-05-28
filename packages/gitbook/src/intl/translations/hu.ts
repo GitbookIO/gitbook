@@ -167,4 +167,5 @@ export const hu: TranslationLanguage = {
     form_other_prompt: 'Adja meg a válaszát...',
     form_other_field: 'Egyéb...',
     cancel: 'Mégse',
+    direct_link_to_heading: 'Közvetlen hivatkozás a címsorra',
 };

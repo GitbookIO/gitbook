@@ -1,5 +1,7 @@
 import type { DocumentBlockHeading } from '@gitbook/api';
 
+import { getSpaceLanguage, tString } from '@/intl/server';
+import { defaultLanguage } from '@/intl/translations';
 import { tcls } from '@/lib/tailwind';
 
 import type { BlockProps } from './Block';
@@ -8,7 +10,7 @@ import { Inlines } from './Inlines';
 import { getBlockTextStyle } from './spacing';
 import { getTextAlignment } from './utils';
 
-export function Heading(props: BlockProps<DocumentBlockHeading>) {
+export async function Heading(props: BlockProps<DocumentBlockHeading>) {
     const { block, style, context, ...rest } = props;
 
     const textStyle = getBlockTextStyle(block);
@@ -17,6 +19,10 @@ export function Heading(props: BlockProps<DocumentBlockHeading>) {
 
     let id = block.meta?.id ?? '';
     id = context.getId ? context.getId(id) : id;
+
+    const language = context.contentContext
+        ? await getSpaceLanguage(context.contentContext)
+        : defaultLanguage;
 
     return (
         <Tag
@@ -39,11 +45,11 @@ export function Heading(props: BlockProps<DocumentBlockHeading>) {
                 id={id}
                 block={block}
                 className={tcls(
-                    '-ml-6 pr-2',
+                    '-ml-6 self-center pr-2',
                     '[.flip-heading-hash_&]:order-last [.flip-heading-hash_&]:ml-1 [.flip-heading-hash_&]:pl-2'
                 )}
                 iconClassName={tcls('size-4')}
-                label="Direct link to heading"
+                label={tString(language, 'direct_link_to_heading')}
             />
 
             <div

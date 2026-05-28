@@ -166,4 +166,5 @@ export const nl: TranslationLanguage = {
     form_other_prompt: 'Voer je antwoord in...',
     form_other_field: 'Anders...',
     cancel: 'Annuleren',
+    direct_link_to_heading: 'Directe link naar kop',
 };

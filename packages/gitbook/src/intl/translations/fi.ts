@@ -166,4 +166,5 @@ export const fi: TranslationLanguage = {
     form_other_prompt: 'Kirjoita vastauksesi...',
     form_other_field: 'Muu...',
     cancel: 'Peruuta',
+    direct_link_to_heading: 'Suora linkki otsikkoon',
 };

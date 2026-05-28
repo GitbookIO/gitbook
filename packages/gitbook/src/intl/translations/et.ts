@@ -165,4 +165,5 @@ export const et: TranslationLanguage = {
     form_other_prompt: 'Sisestage oma vastus...',
     form_other_field: 'Muu...',
     cancel: 'Tühista',
+    direct_link_to_heading: 'Otselink pealkirjale',
 };

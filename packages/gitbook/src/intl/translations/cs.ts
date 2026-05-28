@@ -167,4 +167,5 @@ export const cs: TranslationLanguage = {
     form_other_prompt: 'Zadejte svou odpověď...',
     form_other_field: 'Jiné...',
     cancel: 'Zrušit',
+    direct_link_to_heading: 'Přímý odkaz na nadpis',
 };

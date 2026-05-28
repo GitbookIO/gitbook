@@ -165,4 +165,5 @@ export const hi: TranslationLanguage = {
     form_other_prompt: 'अपना उत्तर दर्ज करें...',
     form_other_field: 'अन्य...',
     cancel: 'रद्द करें',
+    direct_link_to_heading: 'शीर्षक का सीधा लिंक',
 };

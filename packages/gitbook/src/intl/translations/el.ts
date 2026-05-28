@@ -168,4 +168,5 @@ export const el: TranslationLanguage = {
     form_other_prompt: 'Εισαγάγετε την απάντησή σας...',
     form_other_field: 'Άλλο...',
     cancel: 'Ακύρωση',
+    direct_link_to_heading: 'Άμεσος σύνδεσμος προς την επικεφαλίδα',
 };
