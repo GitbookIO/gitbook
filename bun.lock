@@ -175,6 +175,7 @@
         "p-retry": "^8.0.0",
         "quick-lru": "^7.0.1",
         "react": "19.2.4",
+        "react-aria": "^3.44.0",
         "react-dom": "19.2.4",
         "react-hotkeys-hook": "^4.4.1",
         "rehype-raw": "^7.0.0",
