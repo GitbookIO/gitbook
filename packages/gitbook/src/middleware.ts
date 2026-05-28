@@ -250,7 +250,6 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
              */
             if (
                 siteURLData.target === 'external' &&
-                !visitorToken &&
                 isOAuthProtectedResourceRequest(siteRequestURL)
             ) {
                 return handleUnauthedOAuthProtectedResourceRequest({
