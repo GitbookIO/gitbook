@@ -63,7 +63,7 @@ export const CodeBlockRenderer = forwardRef(function CodeBlockRenderer(
                     </div>
                 ) : null}
             </div>
-            <div className="relative">
+            <div className="relative flex min-h-0 flex-col">
                 <CopyCodeButton
                     codeId={codeId}
                     style="absolute top-2 right-2 z-2 self-start justify-self-end font-sans leading-none opacity-0 backdrop-blur-md group-hover/codeblock:opacity-11"
