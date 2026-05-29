@@ -165,4 +165,5 @@ export const uk: TranslationLanguage = {
     form_other_prompt: 'Введіть відповідь...',
     form_other_field: 'Інше...',
     cancel: 'Скасувати',
+    direct_link_to_heading: 'Пряме посилання на заголовок',
 };

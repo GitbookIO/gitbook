@@ -165,4 +165,5 @@ export const ko: TranslationLanguage = {
     form_other_prompt: '답변을 입력하세요...',
     form_other_field: '기타...',
     cancel: '취소',
+    direct_link_to_heading: '제목으로 가는 직접 링크',
 };

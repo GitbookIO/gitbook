@@ -167,4 +167,5 @@ export const bg: TranslationLanguage = {
     form_other_prompt: 'Въведете отговора си...',
     form_other_field: 'Друго...',
     cancel: 'Отказ',
+    direct_link_to_heading: 'Директна връзка към заглавието',
 };

@@ -167,4 +167,5 @@ export const sk: TranslationLanguage = {
     form_other_prompt: 'Zadajte svoju odpoveď...',
     form_other_field: 'Iné...',
     cancel: 'Zrušiť',
+    direct_link_to_heading: 'Priamy odkaz na nadpis',
 };

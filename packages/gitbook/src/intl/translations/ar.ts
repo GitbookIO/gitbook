@@ -165,4 +165,5 @@ export const ar: TranslationLanguage = {
     form_other_prompt: 'أدخل إجابتك...',
     form_other_field: 'أخرى...',
     cancel: 'إلغاء',
+    direct_link_to_heading: 'رابط مباشر إلى العنوان',
 };

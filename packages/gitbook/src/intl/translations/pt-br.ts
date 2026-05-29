@@ -166,4 +166,5 @@ export const pt_br = {
     form_other_prompt: 'Digite sua resposta...',
     form_other_field: 'Outro...',
     cancel: 'Cancelar',
+    direct_link_to_heading: 'Link direto para o título',
 };

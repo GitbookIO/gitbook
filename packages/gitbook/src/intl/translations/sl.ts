@@ -166,4 +166,5 @@ export const sl: TranslationLanguage = {
     form_other_prompt: 'Vnesite svoj odgovor...',
     form_other_field: 'Drugo...',
     cancel: 'Prekliči',
+    direct_link_to_heading: 'Neposredna povezava do naslova',
 };

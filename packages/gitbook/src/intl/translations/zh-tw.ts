@@ -162,4 +162,5 @@ export const zh_tw: TranslationLanguage = {
     form_other_prompt: '輸入您的回答...',
     form_other_field: '其他...',
     cancel: '取消',
+    direct_link_to_heading: '指向標題的直接連結',
 };

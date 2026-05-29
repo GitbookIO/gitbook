@@ -162,4 +162,5 @@ export const yue: TranslationLanguage = {
     form_other_prompt: '輸入你嘅回答...',
     form_other_field: '其他...',
     cancel: '取消',
+    direct_link_to_heading: '指向標題嘅直接連結',
 };

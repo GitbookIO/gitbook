@@ -166,4 +166,5 @@ export const sv: TranslationLanguage = {
     form_other_prompt: 'Ange ditt svar...',
     form_other_field: 'Annat...',
     cancel: 'Avbryt',
+    direct_link_to_heading: 'Direktlänk till rubriken',
 };

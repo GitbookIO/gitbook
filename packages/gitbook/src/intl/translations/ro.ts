@@ -168,4 +168,5 @@ export const ro: TranslationLanguage = {
     form_other_prompt: 'Introdu răspunsul tău...',
     form_other_field: 'Altul...',
     cancel: 'Anulează',
+    direct_link_to_heading: 'Link direct către titlu',
 };

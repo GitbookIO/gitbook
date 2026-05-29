@@ -165,4 +165,5 @@ export const ru = {
     form_other_prompt: 'Введите ответ...',
     form_other_field: 'Другое...',
     cancel: 'Отмена',
+    direct_link_to_heading: 'Прямая ссылка на заголовок',
 };

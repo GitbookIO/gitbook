@@ -166,4 +166,5 @@ export const lt: TranslationLanguage = {
     form_other_prompt: 'Įveskite savo atsakymą...',
     form_other_field: 'Kita...',
     cancel: 'Atšaukti',
+    direct_link_to_heading: 'Tiesioginė nuoroda į antraštę',
 };

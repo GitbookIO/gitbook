@@ -163,4 +163,5 @@ export const th: TranslationLanguage = {
     form_other_prompt: 'ป้อนคำตอบของคุณ...',
     form_other_field: 'อื่น ๆ...',
     cancel: 'ยกเลิก',
+    direct_link_to_heading: 'ลิงก์ตรงไปยังหัวเรื่อง',
 };

@@ -166,4 +166,5 @@ export const ja: TranslationLanguage = {
     form_other_prompt: '回答を入力...',
     form_other_field: 'その他...',
     cancel: 'キャンセル',
+    direct_link_to_heading: '見出しへの直接リンク',
 };

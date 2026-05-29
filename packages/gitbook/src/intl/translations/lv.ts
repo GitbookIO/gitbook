@@ -165,4 +165,5 @@ export const lv: TranslationLanguage = {
     form_other_prompt: 'Ievadiet savu atbildi...',
     form_other_field: 'Cits...',
     cancel: 'Atcelt',
+    direct_link_to_heading: 'Tieša saite uz virsrakstu',
 };

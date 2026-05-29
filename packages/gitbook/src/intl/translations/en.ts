@@ -163,4 +163,5 @@ export const en = {
     form_other_prompt: 'Enter your answer...',
     form_other_field: 'Other...',
     cancel: 'Cancel',
+    direct_link_to_heading: 'Direct link to heading',
 };

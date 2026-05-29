@@ -13,11 +13,11 @@ export const hashLinkButtonWrapperStyles = tcls('relative', 'group/hash');
 export function HashLinkButton(props: {
     id: string;
     block: DocumentBlockTabs | DocumentBlockHeading;
-    label?: string;
+    label: string;
     className?: ClassValue;
     iconClassName?: ClassValue;
 }) {
-    const { id, block, className, iconClassName, label = 'Direct link to block' } = props;
+    const { id, block, className, iconClassName, label } = props;
     const textStyle = getBlockTextStyle(block);
     return (
         <div

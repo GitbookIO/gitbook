@@ -167,4 +167,5 @@ export const it: TranslationLanguage = {
     form_other_prompt: 'Inserisci la tua risposta...',
     form_other_field: 'Altro...',
     cancel: 'Annulla',
+    direct_link_to_heading: 'Link diretto al titolo',
 };
