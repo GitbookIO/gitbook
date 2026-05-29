@@ -101,7 +101,13 @@ function getPathObject(
     schema: OpenAPIV3.Document | OpenAPIV3_1.Document,
     path: string
 ): OpenAPIV3.PathItemObject | OpenAPIV3_1.PathItemObject | null {
-    return schema.paths?.[path] || null;
+    const paths = schema.paths;
+    if (!paths) {
+        return null;
+    }
+    // Match regardless of a trailing slash, which specs may or may not include
+    const alternatePath = path.endsWith('/') ? path.slice(0, -1) : `${path}/`;
+    return paths[path] ?? paths[alternatePath] ?? null;
 }
 
 /**
