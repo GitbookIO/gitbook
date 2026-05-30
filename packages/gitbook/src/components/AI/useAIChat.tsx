@@ -104,7 +104,8 @@ export type AIChatEvent =
     | { type: 'open' }
     | { type: 'postMessage'; message: string }
     | { type: 'clear' }
-    | { type: 'close' };
+    | { type: 'close' }
+    | { type: 'focus' };
 
 type AIChatEventData<T extends AIChatEvent['type']> = Omit<
     Extract<AIChatEvent, { type: T }>,
@@ -128,6 +129,8 @@ export type AIChatController = {
     removeReference: (id: string) => void;
     /** Clear all staged references */
     clearReferences: () => void;
+    /** Focus the chat input */
+    focus: () => void;
     /** Register an event listener */
     on: <T extends AIChatEvent['type']>(
         event: T,
@@ -595,6 +598,10 @@ export function AIChatProvider(props: {
         });
     }, []);
 
+    const onFocus = React.useCallback(() => {
+        notify(eventsRef.current.get('focus'), {});
+    }, []);
+
     const onEvent = React.useCallback(
         <T extends AIChatEvent['type']>(
             event: T,
@@ -623,6 +630,7 @@ export function AIChatProvider(props: {
             addReference: onAddReference,
             removeReference: onRemoveReference,
             clearReferences: onClearReferences,
+            focus: onFocus,
             on: onEvent,
         };
     }, [
@@ -633,6 +641,7 @@ export function AIChatProvider(props: {
         onAddReference,
         onRemoveReference,
         onClearReferences,
+        onFocus,
         onEvent,
     ]);
 

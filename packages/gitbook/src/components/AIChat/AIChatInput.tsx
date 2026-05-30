@@ -36,6 +36,13 @@ export function AIChatInput(props: {
         }
     }, [disabled, loading, chat.opened]);
 
+    // Explicit focus requests (e.g. clicking "Ask" while the chat is already open).
+    useEffect(() => {
+        return chatController.on('focus', () => {
+            inputRef.current?.focus();
+        });
+    }, [chatController]);
+
     useHotkeys(
         'mod+i',
         (e) => {

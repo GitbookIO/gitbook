@@ -40,6 +40,7 @@ export function AskAICodeButton(props: {
             syntax,
         });
         chatController.open();
+        chatController.focus();
     };
 
     return (
