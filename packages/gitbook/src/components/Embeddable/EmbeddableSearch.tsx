@@ -61,6 +61,7 @@ export function EmbeddableSearch(props: EmbeddableSearchProps) {
                 cursor={cursor}
                 error={error}
                 fetching={fetching}
+                fillHeight={true}
                 query={query}
                 results={results}
                 resultsId={resultsId}
@@ -79,6 +80,9 @@ export function EmbeddableSearch(props: EmbeddableSearchProps) {
                         withAI={withSearchAI}
                         isOpen={true}
                         mode="frame"
+                        resultsCount={results.length}
+                        fetching={fetching}
+                        showAsk={showAsk}
                     >
                         <SearchLiveResultsAnnouncer
                             count={results.length}

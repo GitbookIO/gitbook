@@ -1,9 +1,13 @@
 import type { GitBookAnyContext } from '@/lib/context';
-import { type TranslationLanguage, languages } from './translations';
+import {
+    type TranslationLanguage,
+    type TranslationLocale,
+    defaultLanguage,
+    isAvailableLanguage,
+    loadLanguage,
+} from './translations';
 
 export * from './translate';
-
-type TranslationLocale = keyof typeof languages;
 
 export const DEFAULT_LOCALE = 'en' satisfies TranslationLocale;
 
@@ -51,24 +55,16 @@ export function getSpaceLocale(context: GitBookAnyContext): TranslationLocale {
 /**
  * Create the translation context for a space to use in the server components.
  */
-export function getSpaceLanguage(context: GitBookAnyContext): TranslationLanguage {
-    const fallback = languages[DEFAULT_LOCALE];
-
+export async function getSpaceLanguage(context: GitBookAnyContext): Promise<TranslationLanguage> {
     const locale = getSpaceLocale(context);
-
-    let language = fallback;
-    // @ts-ignore
-    if (locale !== DEFAULT_LOCALE && languages[locale]) {
-        // @ts-ignore
-        language = languages[locale];
-    }
+    const language = locale === DEFAULT_LOCALE ? defaultLanguage : await loadLanguage(locale);
 
     return {
-        ...fallback,
-        ...language,
+        ...defaultLanguage,
+        ...(language ?? defaultLanguage),
     };
 }
 
 function checkIsValidLocale(locale: string): locale is TranslationLocale {
-    return locale in languages;
+    return isAvailableLanguage(locale);
 }

@@ -39,6 +39,12 @@ export async function SiteLayout(props: {
         ReactDOM.preconnect(GITBOOK_ASSETS_URL);
     }
 
+    // We also preload the site index
+    ReactDOM.preload(`${context.linker.siteBasePath}~gitbook/site-index`, {
+        as: 'fetch',
+        type: 'application/json',
+    });
+
     scripts.forEach(({ script }) => {
         ReactDOM.preload(script, {
             as: 'script',
@@ -102,7 +108,6 @@ export async function generateSiteLayoutViewport(context: GitBookSiteContext): P
                 : 'light dark', // 'system' → let browser decide based on OS preference
         width: 'device-width',
         initialScale: 1,
-        maximumScale: 1,
         viewportFit: 'cover',
     };
 }

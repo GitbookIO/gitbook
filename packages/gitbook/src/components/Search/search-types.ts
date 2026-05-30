@@ -1,9 +1,6 @@
 import type { IconName } from '@gitbook/icons';
 
-export type OrderedComputedResult =
-    | ComputedPageResult
-    | ComputedSectionResult
-    | ComputedRecordResult;
+export type OrderedComputedResult = ComputedPageResult | ComputedRecordResult;
 
 export type BaseComputedResult = {
     id: string;
@@ -24,6 +21,13 @@ export type ComputedPageResult = BaseComputedResult & {
     pageId: string;
     spaceId: string;
     breadcrumbs?: Array<{ icon?: IconName; label: string }>;
+    /** The highest-scoring section for this page, used as a body snippet preview. */
+    bestSection?: {
+        href: string;
+        title?: string;
+        body?: string;
+        score: number;
+    };
 };
 
 export type ComputedRecordResult = BaseComputedResult & {

@@ -21,7 +21,7 @@ import { PreservePageLayout } from './PreservePageLayout';
 
 const LINK_PREVIEW_MAX_COUNT = 500;
 
-export function PageBody(props: {
+export async function PageBody(props: {
     context: GitBookSiteContext;
     page: RevisionPageDocument;
     ancestors: AncestorRevisionPage[];
@@ -59,7 +59,7 @@ export function PageBody(props: {
     // This happens when: (1) document has full-width blocks, OR (2) page layout is explicitly set to 'wide'
     const wideContent = document ? hasFullWidthBlock(document) : false;
     const wideLayout = wideContent || page.layout.width === 'wide';
-    const language = getSpaceLanguage(context);
+    const language = await getSpaceLanguage(context);
     const updatedAt = page.updatedAt ?? page.createdAt;
 
     const hasVisibleTOCItems =
@@ -106,7 +106,7 @@ export function PageBody(props: {
                         <SuspenseLoadedHint />
                         <DocumentView
                             document={document}
-                            style="clear-both flex flex-col [&>*+*]:mt-5"
+                            style="flex flex-col [&>*+*]:mt-5"
                             context={{
                                 mode: 'default',
                                 contentContext: {

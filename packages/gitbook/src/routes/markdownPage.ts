@@ -27,6 +27,9 @@ export async function servePageMarkdown(baseContext: GitBookSiteContext, pagePat
         }
 
         const markdownPage = await getMarkdownForPage(context, pageLookup);
+        if (baseContext.displayAgentInstructions === false) {
+            return markdownPage;
+        }
         return `${markdownPage}${renderAskFooter(context, pageLookup)}`;
     });
 }
@@ -126,6 +129,7 @@ export async function serveMarkdown(fn: () => Promise<string>) {
             headers: {
                 'Content-Type': 'text/markdown; charset=utf-8',
                 'X-Robots-Tag': 'noindex',
+                Vary: 'Accept',
             },
         });
     } catch (error) {
@@ -134,6 +138,7 @@ export async function serveMarkdown(fn: () => Promise<string>) {
             status: exposable.code,
             headers: {
                 'Content-Type': 'text/plain; charset=utf-8',
+                Vary: 'Accept',
             },
         });
     }

@@ -9,6 +9,7 @@ export const fr = {
     switch_to_system_theme: 'Utiliser le thème du système',
     search: 'Rechercher',
     clear: 'Effacer',
+    tags: 'Étiquettes',
     search_back: 'Retour aux résultats de recherche',
     search_or_ask: 'Rechercher',
     search_input_placeholder: 'Rechercher dans le contenu',
@@ -30,6 +31,7 @@ export const fr = {
     search_scope_variant_all: 'Tout le contenu',
     search_scope_variant_all_description: 'Chaque variante disponible',
     ask: 'Une question ?',
+    ai_chat_ask_query: 'Demander à ${1} « ${2} »',
     search_ask: 'Demander « ${1} »',
     search_ask_description: 'Trouvez la réponse avec ${1}',
     search_ask_sources: 'Sources',
@@ -72,6 +74,7 @@ export const fr = {
     notfound_adaptive:
         'Cette page existe peut-être, mais vous devez peut-être vous connecter pour y accéder.',
     notfound_adaptive_login: 'Se connecter',
+    notfound_goto_home: "Aller à l'accueil",
     unexpected_error_title: 'Erreur inattendue',
     unexpected_error: 'Désolé, une erreur est survenue. Veuillez réessayer plus tard.',
     unexpected_error_retry: 'Réessayer',
@@ -160,4 +163,5 @@ export const fr = {
     form_other_prompt: 'Saisissez votre réponse...',
     form_other_field: 'Autre...',
     cancel: 'Annuler',
+    direct_link_to_heading: 'Lien direct vers le titre',
 };

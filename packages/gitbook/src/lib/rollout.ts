@@ -8,7 +8,7 @@ export function isRollout({
     discriminator: string;
     percentageRollout: number;
 }): boolean {
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env.NODE_ENV === 'development' || process.env.VERCEL_ENV === 'preview') {
         return true;
     }
 

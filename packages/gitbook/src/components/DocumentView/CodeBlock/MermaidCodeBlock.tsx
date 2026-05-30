@@ -1,31 +1,62 @@
 'use client';
 
 import { useTheme } from 'next-themes';
-import { useEffect, useId, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 
+import { useHasBeenInViewport } from '@/components/hooks/useHasBeenInViewport';
 import { Loading } from '@/components/primitives/Loading';
 import { tcls } from '@/lib/tailwind';
 import Panzoom from '@panzoom/panzoom';
+import type { RenderResult } from 'mermaid';
+import { FocusScope, usePreventScroll } from 'react-aria';
 import { type ClientBlockProps, ClientCodeBlock } from './ClientCodeBlock';
 import { MermaidPanZoomControls } from './MermaidPanZoomControls';
 import { getPlainCodeBlock } from './highlight';
+
+/** Duration of the fullscreen dialog enter/exit animation, must match `animate-blur-in/out`. */
+const DIALOG_ANIMATION_MS = 200;
 
 /**
  * Used to render a Mermaid diagram from a CodeBlock.
  */
 export function MermaidCodeBlock(props: ClientBlockProps) {
-    const { block, style } = props;
+    const { block, mode, style } = props;
     const source = getPlainCodeBlock(block);
+    const rootRef = useRef<HTMLDivElement>(null);
+    const panelRef = useRef<HTMLDivElement>(null);
     const wrapperRef = useRef<HTMLDivElement>(null);
     const diagramRef = useRef<HTMLDivElement>(null);
+    // A stable container that holds the diagram subtree. We portal the diagram into it and
+    // only ever move this plain node between the inline slot and the dialog — never the
+    // React-managed subtree itself — so React stays in control and panzoom/SVG are preserved.
+    const diagramHostRef = useRef<HTMLDivElement | null>(null);
+    if (diagramHostRef.current === null && typeof document !== 'undefined') {
+        const host = document.createElement('div');
+        // `display: contents` so the host adds no box of its own (the diagram becomes a
+        // direct flex child of the dialog panel and can fill it).
+        host.style.display = 'contents';
+        diagramHostRef.current = host;
+    }
     const [panZoom, setPanZoom] = useState<ReturnType<typeof Panzoom> | null>(null);
     const [error, setError] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
+    // `isFullscreen` is the open intent; `isExiting` keeps the dialog mounted while it
+    // animates closed. `isPresent` is true whenever the diagram lives in the dialog.
+    const [isFullscreen, setIsFullscreen] = useState(false);
+    const [isExiting, setIsExiting] = useState(false);
+    const isPresent = isFullscreen || isExiting;
     const { resolvedTheme } = useTheme();
     const darkMode = resolvedTheme === 'dark';
     const id = useSafeId();
+    const hasBeenInViewport = useHasBeenInViewport(rootRef, { rootMargin: '800px' });
+    const shouldRender = mode === 'print' || hasBeenInViewport;
 
     useEffect(() => {
+        if (!shouldRender) {
+            return;
+        }
+
         const container = diagramRef.current;
         const wrapper = wrapperRef.current;
         if (!container || !wrapper) {
@@ -36,57 +67,165 @@ export function MermaidCodeBlock(props: ClientBlockProps) {
         let cleanupPanZoom: (() => void) | undefined;
         setError(false);
         setIsLoading(true);
+        setPanZoom(null);
+        container.innerHTML = '';
 
-        renderMermaidDiagram({
-            container,
-            source,
-            id,
-            darkMode,
-        })
-            .then(() => {
-                if (!cancelled) {
+        const cancelScheduledRender = scheduleMermaidWork(() => {
+            enqueueMermaidRender(async () => {
+                if (cancelled) {
+                    return null;
+                }
+
+                return renderMermaidDiagram({
+                    source,
+                    id,
+                    darkMode,
+                });
+            })
+                .then((result) => {
+                    if (!result || cancelled) {
+                        return;
+                    }
+
+                    container.innerHTML = result.svg;
+                    if (container.querySelector('svg')) {
+                        result.bindFunctions?.(container);
+                    }
+
                     cleanupPanZoom = initPanzoom({
                         container,
                         wrapper,
                         onInit: setPanZoom,
                     });
-                }
-            })
-            .catch(() => {
-                if (!cancelled) {
-                    setError(true);
-                }
-            })
-            .finally(() => {
-                if (!cancelled) {
-                    setIsLoading(false);
-                }
-            });
+                })
+                .catch(() => {
+                    if (!cancelled) {
+                        setError(true);
+                    }
+                })
+                .finally(() => {
+                    if (!cancelled) {
+                        setIsLoading(false);
+                    }
+                });
+        });
 
         return () => {
             cancelled = true;
+            cancelScheduledRender();
             cleanupPanZoom?.();
             setPanZoom(null);
         };
-    }, [source, id, darkMode]);
+    }, [source, id, darkMode, shouldRender]);
+
+    // Lock the page scroll while the dialog is on screen (handles scrollbar width and iOS).
+    usePreventScroll({ isDisabled: !isPresent });
+
+    const openFullscreen = useCallback(() => {
+        // Reserve the inline slot's current height before the diagram is detached, so the
+        // page layout does not jump. Measured here while still inline and un-restyled.
+        const root = rootRef.current;
+        if (root) {
+            root.style.minHeight = `${root.offsetHeight}px`;
+        }
+        setIsExiting(false);
+        setIsFullscreen(true);
+        // Re-center the diagram for the larger view.
+        panZoom?.reset();
+    }, [panZoom]);
+
+    const closeFullscreen = useCallback(() => {
+        setIsFullscreen(false);
+        setIsExiting(true);
+    }, []);
+
+    // Keep the dialog mounted until the exit animation finishes, then unmount it.
+    useEffect(() => {
+        if (!isExiting) {
+            return;
+        }
+
+        const timer = window.setTimeout(() => {
+            setIsExiting(false);
+            panZoom?.reset();
+        }, DIALOG_ANIMATION_MS);
+        return () => window.clearTimeout(timer);
+    }, [isExiting, panZoom]);
+
+    // Allow Escape to close the dialog.
+    useEffect(() => {
+        if (!isFullscreen) {
+            return;
+        }
+
+        const onKeyDown = (event: KeyboardEvent) => {
+            if (event.key === 'Escape') {
+                closeFullscreen();
+            }
+        };
+
+        document.addEventListener('keydown', onKeyDown);
+        return () => document.removeEventListener('keydown', onKeyDown);
+    }, [isFullscreen, closeFullscreen]);
+
+    // Keep the diagram host in the inline slot on mount (and whenever it isn't in the dialog).
+    useLayoutEffect(() => {
+        const host = diagramHostRef.current;
+        const root = rootRef.current;
+        if (host && root && !host.parentNode) {
+            root.appendChild(host);
+        }
+    }, []);
+
+    // Move the diagram host into the dialog panel (and back) as the panel mounts/unmounts.
+    // Done in the panel's ref callback so it happens during commit, before FocusScope reads
+    // focus. The inline slot's reserved height (set in openFullscreen) is cleared on return.
+    const setPanel = useCallback((panel: HTMLDivElement | null) => {
+        panelRef.current = panel;
+        const host = diagramHostRef.current;
+        const root = rootRef.current;
+        if (!host) {
+            return;
+        }
+
+        if (panel) {
+            panel.appendChild(host);
+        } else if (root) {
+            root.appendChild(host);
+            root.style.minHeight = '';
+        }
+    }, []);
 
     if (error) {
         return <ClientCodeBlock {...props} />;
     }
 
-    return (
-        <div className={tcls('relative', style)} contentEditable={false}>
+    // The live diagram subtree. It is portaled into a stable host that moves between the
+    // inline slot and the dialog, so its markup must not depend on where it currently lives.
+    const diagram = (
+        <div
+            className={tcls(
+                'group/mermaid relative',
+                isPresent ? 'flex h-full w-full flex-col' : null
+            )}
+        >
             <div
                 ref={wrapperRef}
-                className={
+                className={tcls(
                     isLoading
                         ? 'invisible absolute inset-x-0 overflow-hidden'
-                        : 'cursor-grab overflow-hidden active:cursor-grabbing'
-                }
+                        : 'cursor-grab overflow-hidden active:cursor-grabbing',
+                    isPresent && !isLoading ? 'flex-1' : null
+                )}
             >
                 <div
                     ref={diagramRef}
-                    className="overflow-auto p-2 [&_svg]:h-auto [&_svg]:max-w-full"
+                    className={tcls(
+                        'overflow-auto p-2 [&_svg]:h-auto [&_svg]:max-w-full',
+                        isPresent
+                            ? 'flex h-full items-center justify-center [&_svg]:max-h-full'
+                            : null
+                    )}
                 />
             </div>
             {isLoading ? (
@@ -94,24 +233,62 @@ export function MermaidCodeBlock(props: ClientBlockProps) {
                     <Loading className="h-8 w-8" />
                 </div>
             ) : null}
-            {!isLoading && panZoom ? <MermaidPanZoomControls panZoom={panZoom} /> : null}
+            {!isLoading && panZoom ? (
+                <MermaidPanZoomControls
+                    panZoom={panZoom}
+                    isFullscreen={isPresent}
+                    onToggleFullscreen={isFullscreen ? closeFullscreen : openFullscreen}
+                />
+            ) : null}
         </div>
+    );
+
+    return (
+        <>
+            {/* Inline slot: hosts the diagram in the document flow until it goes fullscreen. */}
+            <div ref={rootRef} className={tcls('relative', style)} contentEditable={false} />
+            {diagramHostRef.current ? createPortal(diagram, diagramHostRef.current) : null}
+            {isPresent
+                ? createPortal(
+                      <FocusScope contain restoreFocus>
+                          {/* Backdrop: dims and blurs the page, closes on click. */}
+                          {/* biome-ignore lint/a11y/useKeyWithClickEvents: a global Escape handler closes the dialog. */}
+                          <div
+                              aria-hidden="true"
+                              className={tcls(
+                                  'fixed inset-0 z-40 bg-tint-base/3 backdrop-blur-md dark:bg-tint-base/6',
+                                  isFullscreen ? 'animate-fade-in' : 'animate-fade-out'
+                              )}
+                              onClick={closeFullscreen}
+                          />
+                          {/* Centered panel. The padding area lets clicks fall through to the backdrop. */}
+                          <div className="pointer-events-none fixed inset-0 z-40 flex items-center justify-center p-3 sm:p-5 lg:p-8">
+                              <div
+                                  ref={setPanel}
+                                  role="dialog"
+                                  aria-modal="true"
+                                  aria-label="Mermaid diagram"
+                                  className={tcls(
+                                      'pointer-events-auto relative flex h-full w-full max-w-[110rem] flex-col overflow-hidden rounded-2xl border border-tint-subtle bg-tint-base shadow-2xl',
+                                      isFullscreen ? 'animate-blur-in' : 'animate-blur-out'
+                                  )}
+                              />
+                          </div>
+                      </FocusScope>,
+                      document.body
+                  )
+                : null}
+        </>
     );
 }
 
 async function renderMermaidDiagram(args: {
-    container: HTMLElement;
     source: string;
     id: string;
     darkMode: boolean;
-}) {
-    const { container, source, id, darkMode } = args;
-    const [{ default: mermaid }, { default: zenuml }] = await Promise.all([
-        import('mermaid'),
-        import('@mermaid-js/mermaid-zenuml'),
-    ]);
-
-    await mermaid.registerExternalDiagrams([zenuml]);
+}): Promise<RenderResult> {
+    const { source, id, darkMode } = args;
+    const { mermaid } = await loadMermaid();
 
     mermaid.initialize({
         startOnLoad: false,
@@ -120,10 +297,114 @@ async function renderMermaidDiagram(args: {
         theme: darkMode ? 'dark' : undefined,
     });
 
-    const { svg, bindFunctions } = await mermaid.render(`mermaid-diagram-${id}`, source, container);
-    container.innerHTML = svg;
-    bindFunctions?.(container);
+    const renderContainer = createMermaidRenderContainer();
+
+    try {
+        return await mermaid.render(`mermaid-diagram-${id}`, source, renderContainer);
+    } finally {
+        renderContainer.remove();
+    }
 }
+
+/**
+ * Mermaid measures labels while rendering, so the temporary render target must be
+ * connected to the document. Keep it fixed and contained so those layout reads do
+ * not walk the visible document flow.
+ */
+function createMermaidRenderContainer() {
+    const container = document.createElement('div');
+
+    container.setAttribute('aria-hidden', 'true');
+    Object.assign(container.style, {
+        contain: 'strict',
+        height: '100vh',
+        isolation: 'isolate',
+        left: '0',
+        overflow: 'hidden',
+        pointerEvents: 'none',
+        position: 'fixed',
+        top: '0',
+        visibility: 'hidden',
+        width: '100vw',
+        zIndex: '-1',
+    });
+
+    document.body.appendChild(container);
+
+    return container;
+}
+
+let mermaidLoadPromise: Promise<{
+    mermaid: typeof import('mermaid')['default'];
+}> | null = null;
+
+async function loadMermaid() {
+    if (!mermaidLoadPromise) {
+        mermaidLoadPromise = Promise.all([import('mermaid'), import('@mermaid-js/mermaid-zenuml')])
+            .then(async ([{ default: mermaid }, { default: zenuml }]) => {
+                await mermaid.registerExternalDiagrams([zenuml]);
+                return { mermaid };
+            })
+            .catch((error) => {
+                mermaidLoadPromise = null;
+                throw error;
+            });
+    }
+
+    return mermaidLoadPromise;
+}
+
+let mermaidRenderQueue = Promise.resolve();
+
+function enqueueMermaidRender<T>(task: () => Promise<T>) {
+    const result = mermaidRenderQueue.then(task, task);
+    mermaidRenderQueue = result.catch(() => {}).then(waitForNextFrame);
+
+    return result;
+}
+
+function waitForNextFrame() {
+    return new Promise<void>((resolve) => {
+        requestAnimationFrame(() => resolve());
+    });
+}
+
+function scheduleMermaidWork(callback: () => void) {
+    const win = window as WindowWithIdleCallback;
+    let cancelled = false;
+
+    if (win.requestIdleCallback && win.cancelIdleCallback) {
+        const handle = win.requestIdleCallback(
+            () => {
+                if (!cancelled) {
+                    callback();
+                }
+            },
+            { timeout: 1500 }
+        );
+
+        return () => {
+            cancelled = true;
+            win.cancelIdleCallback?.(handle);
+        };
+    }
+
+    const handle = window.setTimeout(() => {
+        if (!cancelled) {
+            callback();
+        }
+    });
+
+    return () => {
+        cancelled = true;
+        window.clearTimeout(handle);
+    };
+}
+
+type WindowWithIdleCallback = Window & {
+    requestIdleCallback?: (callback: () => void, options?: { timeout: number }) => number;
+    cancelIdleCallback?: (handle: number) => void;
+};
 
 /**
  * Initialize panzoom on the diagram container.
@@ -138,7 +419,6 @@ function initPanzoom(args: {
     const instance = Panzoom(container, {
         maxScale: 5,
         minScale: 0.5,
-        contain: 'outside',
         cursor: 'grab',
         panOnlyWhenZoomed: true,
     });

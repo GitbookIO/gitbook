@@ -73,7 +73,7 @@ export const CodeBlockRenderer = forwardRef(function CodeBlockRenderer(
                     </div>
                 ) : null}
             </div>
-            <div className="relative">
+            <div className="relative flex min-h-0 flex-col">
                 <div className="absolute top-2 right-2 z-2 flex items-start gap-1.5 font-sans leading-none opacity-0 group-hover/codeblock:opacity-11 has-[button:focus-visible]:opacity-11">
                     <AskAICodeButton
                         codeId={codeId}
@@ -128,27 +128,30 @@ function CodeHighlightLine(props: {
     withLineNumbers: boolean;
 }) {
     const { line, isLast, withLineNumbers, bg, fg } = props;
+    const lineStyle = {
+        color: fg?.color,
+        ...fg?.vars,
+        backgroundColor: bg?.color,
+        ...bg?.vars,
+    };
     return (
         <span
-            className={tcls('highlight-line', line.highlighted && 'highlighted')}
-            style={{
-                color: fg?.color,
-                ...fg?.vars,
-                backgroundColor: bg?.color,
-                ...bg?.vars,
-            }}
-        >
-            {withLineNumbers && (
-                <span
-                    className="highlight-line-number"
-                    style={{
-                        color: fg?.color,
-                        ...fg?.vars,
-                        backgroundColor: bg?.color,
-                        ...bg?.vars,
-                    }}
-                />
+            className={tcls(
+                'highlight-line',
+                line.diff === 'added' && 'diff-added',
+                line.diff === 'deleted' && 'diff-deleted',
+                line.highlighted && 'highlighted'
             )}
+            aria-label={
+                line.diff === 'added'
+                    ? 'Added line'
+                    : line.diff === 'deleted'
+                      ? 'Removed line'
+                      : undefined
+            }
+            style={lineStyle}
+        >
+            {withLineNumbers && <span className="highlight-line-number" style={lineStyle} />}
             <span className="highlight-line-content">
                 <CodeHighlightTokens tokens={line.tokens} />
                 {!isLast && '\n'}

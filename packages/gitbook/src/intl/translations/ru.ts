@@ -9,6 +9,7 @@ export const ru = {
     switch_to_system_theme: 'Переключиться на системную тему',
     search: 'Поиск',
     clear: 'Очистить',
+    tags: 'Теги',
     search_back: 'Вернуться к результатам поиска',
     search_or_ask: 'Найти или спросить',
     search_input_placeholder: 'Поиск по содержимому',
@@ -30,6 +31,7 @@ export const ru = {
     search_scope_variant_all: 'Весь контент',
     search_scope_variant_all_description: 'Каждый доступный вариант',
     ask: 'Спросить',
+    ai_chat_ask_query: 'Спросить у ${1} "${2}"',
     search_ask: 'Спросить "${1}"',
     search_ask_description: 'Найти ответ с помощью ${1}',
     search_ask_sources: 'Источники',
@@ -73,6 +75,7 @@ export const ru = {
     notfound_adaptive:
         'Эта страница может существовать, но для доступа к ней может потребоваться вход.',
     notfound_adaptive_login: 'Войти',
+    notfound_goto_home: 'Перейти на главную',
     unexpected_error_title: 'Произошла ошибка',
     unexpected_error: 'Извините, произошла непредвиденная ошибка. Пожалуйста, попробуйте позже.',
     unexpected_error_retry: 'Попробуйте снова',
@@ -162,4 +165,5 @@ export const ru = {
     form_other_prompt: 'Введите ответ...',
     form_other_field: 'Другое...',
     cancel: 'Отмена',
+    direct_link_to_heading: 'Прямая ссылка на заголовок',
 };

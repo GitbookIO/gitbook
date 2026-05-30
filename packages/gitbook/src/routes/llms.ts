@@ -3,7 +3,12 @@ import { throwIfDataError } from '@/lib/data';
 import { type GitBookLinker, linkerWithMarkdownPages } from '@/lib/links';
 import { resolveFirstDocument } from '@/lib/pages';
 import { type FlatPageEntry, getIndexablePages } from '@/lib/sitemap';
-import { filterSiteSpacesByLocale, getLocalizedTitle, getSiteStructureSections } from '@/lib/sites';
+import {
+    filterSiteSpacesByLocale,
+    getFallbackSiteSpacePath,
+    getLocalizedTitle,
+    getSiteStructureSections,
+} from '@/lib/sites';
 import type { SiteSection, SiteSpace } from '@gitbook/api';
 import assertNever from 'assert-never';
 import type { ListItem, Paragraph, Root, RootContent } from 'mdast';
@@ -143,8 +148,14 @@ async function getNodesFromSiteSpaces(
                 });
             }
 
+            const siteSpaceLinker = linkerWithMarkdownPages(
+                linker.withOtherSiteSpace({
+                    spaceBasePath: getFallbackSiteSpacePath(context, siteSpace),
+                })
+            );
+
             // Add the pages as a list
-            nodes.push(...(await getMarkdownForPagesTree(pages, linker)));
+            nodes.push(...(await getMarkdownForPagesTree(pages, siteSpaceLinker)));
 
             return nodes;
         })

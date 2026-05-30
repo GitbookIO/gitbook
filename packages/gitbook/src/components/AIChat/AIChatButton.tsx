@@ -1,12 +1,12 @@
 'use client';
 import { useLanguage } from '@/intl/client';
-import { t } from '@/intl/translate';
+import { t, tString } from '@/intl/translate';
 import type { Assistant } from '../AI';
 import { useIsMobile } from '../hooks/useIsMobile';
 import { Button } from '../primitives';
 import { KeyboardShortcut } from '../primitives/KeyboardShortcut';
 
-const MOBILE_BREAKPOINT = 672; // 42rem, equal to Tailwind's @max-2xl container breakpoint
+const MOBILE_BREAKPOINT = 688; // 43rem, equal to Tailwind's @max-2xl container breakpoint
 
 /**
  * Button to open/close the AI chat.
@@ -38,6 +38,7 @@ export function AIChatButton(props: {
                     ) : null}
                 </div>
             }
+            aria-label={tString(language, 'ai_chat_ask', assistant.label)}
             onClick={() => assistant.open()}
         >
             {showLabel ? t(language, 'ask') : null}

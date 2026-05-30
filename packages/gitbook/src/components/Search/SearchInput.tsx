@@ -1,8 +1,9 @@
 'use client';
 import React, { useEffect, useRef } from 'react';
 
-import { tString, useLanguage } from '@/intl/client';
+import { t, tString, useLanguage } from '@/intl/client';
 import { Icon } from '@gitbook/icons';
+import { AISearchIcon } from '../AIChat';
 import { Input } from '../primitives';
 
 interface SearchInputProps {
@@ -17,6 +18,9 @@ interface SearchInputProps {
     className?: string;
     children?: React.ReactNode;
     mode?: 'header' | 'frame';
+    resultsCount: number;
+    fetching: boolean;
+    showAsk: boolean;
 }
 
 /**
@@ -34,6 +38,9 @@ export const SearchInput = React.forwardRef<HTMLDivElement, SearchInputProps>(
             className,
             children,
             mode = 'header',
+            resultsCount,
+            fetching,
+            showAsk,
             ...rest
         } = props;
         const inputRef = useRef<HTMLInputElement>(null);
@@ -42,17 +49,26 @@ export const SearchInput = React.forwardRef<HTMLDivElement, SearchInputProps>(
         const language = useLanguage();
 
         useEffect(() => {
-            if (isOpen) {
+            if (!isOpen) {
+                inputRef.current?.blur();
+                return;
+            }
+
+            const focusInput = () => {
                 if (document.activeElement !== inputRef.current) {
-                    // Refocus the input and move the caret to the end – do this only once to avoid scroll jumps on every keystroke
                     inputRef.current?.focus({ preventScroll: true });
-                    // Place cursor at the end of the input
                     inputRef.current?.setSelectionRange(value.length, value.length);
                 }
-            } else {
-                inputRef.current?.blur();
+            };
+
+            if (!isFrame) {
+                focusInput();
+                return;
             }
-        }, [isOpen, value]);
+
+            const timeout = window.setTimeout(focusInput, 150);
+            return () => window.clearTimeout(timeout);
+        }, [isFrame, isOpen, value.length]);
 
         return (
             <div
@@ -76,14 +92,18 @@ export const SearchInput = React.forwardRef<HTMLDivElement, SearchInputProps>(
                     onFocus={onFocus}
                     onKeyDown={onKeyDown}
                     leading={
-                        <Icon
-                            icon="search"
-                            className={
-                                isFrame
-                                    ? 'size-text-lg shrink-0 text-tint-subtle'
-                                    : 'size-text-lg shrink-0 site-header:theme-bold:text-header-link/8 text-tint'
-                            }
-                        />
+                        showAsk ? (
+                            <AISearchIcon />
+                        ) : (
+                            <Icon
+                                icon="search"
+                                className={
+                                    isFrame
+                                        ? 'size-text-lg shrink-0 text-tint-subtle'
+                                        : 'size-text-lg shrink-0 site-header:theme-bold:text-header-link/8 text-tint'
+                                }
+                            />
+                        )
                     }
                     onValueChange={onChange}
                     value={value}
@@ -100,14 +120,21 @@ export const SearchInput = React.forwardRef<HTMLDivElement, SearchInputProps>(
                                       'site-header:theme-bold:text-header-link site-header:theme-bold:hover:bg-header-link/3',
                               }
                     }
+                    trailing={
+                        !showAsk && value && resultsCount > 0 ? (
+                            <div className="mr-2 animate-blur-in text-sm text-tint-subtle">
+                                {t(language, 'search_results_count', resultsCount.toString())}
+                            </div>
+                        ) : undefined
+                    }
                     keyboardShortcut={
-                        isFrame
-                            ? undefined
-                            : {
+                        !value && !isFrame && !isOpen
+                            ? {
+                                  keys: ['mod', 'k'],
                                   className:
-                                      'site-header:theme-bold:border-header-link/4 site-header:theme-bold:bg-header-background site-header:theme-bold:text-header-link',
-                                  keys: isOpen ? ['esc'] : ['mod', 'k'],
+                                      'bg-tint-base site-header:theme-bold:border-header-link/4 site-header:theme-bold:bg-header-background site-header:theme-bold:text-header-link',
                               }
+                            : undefined
                     }
                     {...rest}
                     type="text"

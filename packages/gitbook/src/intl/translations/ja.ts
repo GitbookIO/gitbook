@@ -11,6 +11,7 @@ export const ja: TranslationLanguage = {
     switch_to_system_theme: 'システムのテーマに切り替え',
     search: '検索',
     clear: 'クリア',
+    tags: 'タグ',
     search_back: '検索結果に戻る',
     search_or_ask: '質問または検索',
     search_input_placeholder: 'コンテンツを検索',
@@ -32,6 +33,7 @@ export const ja: TranslationLanguage = {
     search_scope_variant_all: 'すべてのコンテンツ',
     search_scope_variant_all_description: '利用可能なすべてのバリエーション',
     ask: '質問する',
+    ai_chat_ask_query: '"${2}" を ${1} に質問する',
     search_ask: '"${1}" を質問する',
     search_ask_description: '${1}で答えを見つける',
     search_ask_sources: '情報源',
@@ -75,6 +77,7 @@ export const ja: TranslationLanguage = {
     notfound_adaptive:
         'このページは存在する可能性がありますが、アクセスするにはログインが必要な場合があります。',
     notfound_adaptive_login: 'ログイン',
+    notfound_goto_home: 'ホームへ移動',
     unexpected_error_title: 'エラーが発生しました',
     unexpected_error: '申し訳ありません、予期せぬエラーが発生しました。もう一度お試しください。',
     unexpected_error_retry: '再試行',
@@ -163,4 +166,5 @@ export const ja: TranslationLanguage = {
     form_other_prompt: '回答を入力...',
     form_other_field: 'その他...',
     cancel: 'キャンセル',
+    direct_link_to_heading: '見出しへの直接リンク',
 };

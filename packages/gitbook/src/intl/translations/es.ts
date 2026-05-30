@@ -11,6 +11,7 @@ export const es: TranslationLanguage = {
     switch_to_system_theme: 'Cambiar a tema del sistema',
     search: 'Buscar',
     clear: 'Limpiar',
+    tags: 'Etiquetas',
     search_back: 'Volver a los resultados de búsqueda',
     search_or_ask: 'Preguntar o Buscar',
     search_input_placeholder: 'Buscar contenido',
@@ -32,6 +33,7 @@ export const es: TranslationLanguage = {
     search_scope_variant_all: 'Todo el contenido',
     search_scope_variant_all_description: 'Cada variante disponible',
     ask: 'Preguntar',
+    ai_chat_ask_query: 'Preguntar a ${1} "${2}"',
     search_ask: 'Preguntar "${1}"',
     search_ask_description: 'Encuentra la respuesta con ${1}',
     search_ask_sources: 'Fuentes',
@@ -75,6 +77,7 @@ export const es: TranslationLanguage = {
     notfound_adaptive:
         'Esta página puede existir, pero es posible que debas iniciar sesión para acceder.',
     notfound_adaptive_login: 'Iniciar sesión',
+    notfound_goto_home: 'Ir al inicio',
     unexpected_error_title: 'Ocurrió un error',
     unexpected_error:
         'Lo sentimos, ha ocurrido un error inesperado. Por favor, intenta de nuevo más tarde.',
@@ -165,4 +168,5 @@ export const es: TranslationLanguage = {
     form_other_prompt: 'Escribe tu respuesta...',
     form_other_field: 'Otro...',
     cancel: 'Cancelar',
+    direct_link_to_heading: 'Enlace directo al encabezado',
 };
