@@ -498,8 +498,9 @@ export function AIChatProvider(props: {
 
             notify(eventsRef.current.get('postMessage'), { message: input.message });
 
-            if (query === input.message) {
+            if (query === input.message && references.length === 0) {
                 // Return early if the message is the same as the previous message
+                // (unless new references are staged, which change the payload)
                 globalState.setState((state) => ({
                     ...state,
                     opened: true,

@@ -6,7 +6,7 @@ import { Button } from '@/components/primitives';
 import { t, useLanguage } from '@/intl/client';
 import { type ClassValue, tcls } from '@/lib/tailwind';
 
-import { getCodeText } from './utils';
+import { getCodeTextFromId } from './utils';
 
 /**
  * Client component to copy the code of a code block.
@@ -33,13 +33,12 @@ export function CopyCodeButton(props: { codeId: string; style: ClassValue }) {
     }, [copied]);
 
     const onClick = () => {
-        const wrapper = document.getElementById(codeId);
-        const element = wrapper?.querySelector('code');
-        if (!element) {
+        const codeText = getCodeTextFromId(codeId);
+        if (codeText === null) {
             return;
         }
 
-        navigator.clipboard.writeText(getCodeText(element));
+        navigator.clipboard.writeText(codeText);
 
         setCopied(true);
     };

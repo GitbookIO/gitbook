@@ -67,6 +67,15 @@ export function convertCodeStringToBlock(args: {
 }
 
 /**
+ * Resolve the code text of a code block from its wrapper id.
+ * Returns null when the block isn't in the DOM (e.g. not yet hydrated).
+ */
+export function getCodeTextFromId(codeId: string): string | null {
+    const element = document.getElementById(codeId)?.querySelector('code');
+    return element ? getCodeText(element) : null;
+}
+
+/**
  * Compute the code text from the DOM,
  * ignoring the empty white space we use for empty lines (represented with a class "ew").
  */

@@ -74,8 +74,13 @@ export const CodeBlockRenderer = forwardRef(function CodeBlockRenderer(
                 ) : null}
             </div>
             <div className="relative">
-                <div className="absolute top-2 right-2 z-2 flex items-start gap-1.5 font-sans leading-none opacity-0 group-hover/codeblock:opacity-11">
-                    <AskAICodeButton codeId={codeId} title={title} style="backdrop-blur-md" />
+                <div className="absolute top-2 right-2 z-2 flex items-start gap-1.5 font-sans leading-none opacity-0 group-hover/codeblock:opacity-11 has-[button:focus-visible]:opacity-11">
+                    <AskAICodeButton
+                        codeId={codeId}
+                        title={title}
+                        syntax={block.data.syntax}
+                        style="backdrop-blur-md"
+                    />
                     <CopyCodeButton codeId={codeId} style="backdrop-blur-md" />
                 </div>
                 <pre

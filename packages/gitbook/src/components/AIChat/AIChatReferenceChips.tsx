@@ -18,7 +18,7 @@ export function AIChatReferenceChips(props: {
             {references.map((ref) => (
                 <div
                     key={ref.id}
-                    className="group/chip inline-flex max-w-52 items-center gap-1 circular-corners:rounded-2xl rounded-corners:rounded-md straight-corners:rounded-xs border border-tint-subtle bg-tint-base px-0.5 py-0.5 text-tint text-xs leading-none"
+                    className="inline-flex max-w-52 items-center gap-1 circular-corners:rounded-2xl rounded-corners:rounded-md straight-corners:rounded-xs border border-tint-subtle bg-tint-base px-0.5 py-0.5 text-tint text-xs leading-none"
                 >
                     <button
                         type="button"
@@ -34,6 +34,7 @@ export function AIChatReferenceChips(props: {
                     {onRemove ? (
                         <button
                             type="button"
+                            aria-label="Remove"
                             onClick={(event) => {
                                 event.stopPropagation();
                                 onRemove(ref.id);

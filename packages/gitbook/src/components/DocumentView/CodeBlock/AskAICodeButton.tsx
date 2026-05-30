@@ -8,14 +8,15 @@ import { Button } from '@/components/primitives';
 import { t, useLanguage } from '@/intl/client';
 import { type ClassValue, tcls } from '@/lib/tailwind';
 
-import { getCodeText } from './utils';
+import { getCodeTextFromId } from './utils';
 
 export function AskAICodeButton(props: {
     codeId: string;
     title?: string;
+    syntax?: string;
     style: ClassValue;
 }) {
-    const { codeId, title, style } = props;
+    const { codeId, title, syntax, style } = props;
 
     const language = useLanguage();
     const config = useAIConfig();
@@ -26,13 +27,8 @@ export function AskAICodeButton(props: {
     }
 
     const onClick = () => {
-        const wrapper = document.getElementById(codeId);
-        const element = wrapper?.querySelector('code');
-        if (!element) {
-            return;
-        }
-        const codeText = getCodeText(element);
-        if (!codeText.trim()) {
+        const codeText = getCodeTextFromId(codeId);
+        if (!codeText?.trim()) {
             return;
         }
 
@@ -41,6 +37,7 @@ export function AskAICodeButton(props: {
             id: codeId,
             label: title ?? 'Code',
             content: codeText,
+            syntax,
         });
         chatController.open();
     };
