@@ -233,7 +233,8 @@ async function getInlineIconSource(
             () =>
                 fetch(getIconAssetURL(style, icon), {
                     // There is no benefit in caching this in vercel. It just cost tons of money
-                    cache: process.env.GITBOOK_RUNTIME === "cloudflare" ? 'force-cache' : 'no-cache',
+                    cache:
+                        process.env.GITBOOK_RUNTIME === 'cloudflare' ? 'force-cache' : 'no-cache',
                 }).then(async (response) => {
                     if (!response.ok) {
                         throw new Error('Failed to fetch icon');
