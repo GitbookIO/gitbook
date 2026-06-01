@@ -16,6 +16,7 @@ type CodeBlockRendererProps = Pick<BlockProps<DocumentBlockCode>, 'block' | 'sty
     id?: string;
     /**
      * Whether the block is rendered for print/PDF.
+     * When true, the "Ask AI" button is not rendered.
      */
     isPrint?: boolean;
 };
