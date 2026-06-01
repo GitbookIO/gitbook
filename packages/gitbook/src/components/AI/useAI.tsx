@@ -63,7 +63,7 @@ export function AIContextProvider(props: React.PropsWithChildren<AIConfig>): Rea
     return <AIContext.Provider value={value}>{children}</AIContext.Provider>;
 }
 
-function useAIConfig(): AIConfig {
+export function useAIConfig(): AIConfig {
     const ctx = React.useContext(AIContext);
     if (!ctx) {
         throw new Error('useAI must be used within AIContextProvider');

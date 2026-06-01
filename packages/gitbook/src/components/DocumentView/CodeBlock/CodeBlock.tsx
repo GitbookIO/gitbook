@@ -81,7 +81,14 @@ export async function CodeBlock(
         const theme = await highlight(block, richInlines, {
             themes: themes,
         });
-        return <CodeBlockRenderer block={block} style={style} theme={theme} />;
+        return (
+            <CodeBlockRenderer
+                block={block}
+                style={style}
+                theme={theme}
+                isPrint={context.mode === 'print'}
+            />
+        );
     }
 
     const variables = context.contentContext
