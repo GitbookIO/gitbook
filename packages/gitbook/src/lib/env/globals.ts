@@ -112,7 +112,7 @@ export const GITBOOK_IMAGE_RESIZE_SIGNING_KEY =
 export const GITBOOK_IMAGE_RESIZE_MODE = enforceEnum(
     'GITBOOK_IMAGE_RESIZE_MODE',
     process.env.GITBOOK_IMAGE_RESIZE_MODE || 'cdn-cgi',
-    ['cdn-cgi', 'cf-fetch']
+    ['cdn-cgi', 'cf-fetch', 'gitbook-service']
 );
 
 /**
