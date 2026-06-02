@@ -55,7 +55,7 @@ function setDefaultSchemaTitles(filesystem: Filesystem): void {
     const entries = Object.entries(schemas);
 
     for (const [name, schema] of entries) {
-        if (!schema.$ref && !schema.title) {
+        if (schema && typeof schema === 'object' && !schema.$ref && !schema.title) {
             schema.title = name;
         }
     }
