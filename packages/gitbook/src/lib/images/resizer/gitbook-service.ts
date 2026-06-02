@@ -1,9 +1,7 @@
-import { GITBOOK_IMAGE_RESIZE_SIGNING_KEY } from '@/lib/env';
+import { GITBOOK_IMAGE_RESIZE_SIGNING_KEY, GITBOOK_IMAGE_RESIZE_URL } from '@/lib/env';
 import { getLogger } from '@/lib/logger';
 import type { CloudflareImageOptions } from './types';
 import { copyImageResponse } from './utils';
-
-const GITBOOK_IMAGES_SERVICE_URL = 'https://images.gitbook.com/__img/';
 
 function sdbmHash(str: string): number {
     let hash = 0;
@@ -33,10 +31,10 @@ export async function resizeImageWithGitbookServices(
     }
 
     const signature = sdbmHash(`${input}:${GITBOOK_IMAGE_RESIZE_SIGNING_KEY}`).toString(16);
-    const resizeURL = `${GITBOOK_IMAGES_SERVICE_URL}${stringifyOptions({
+    const resizeURL = `${GITBOOK_IMAGE_RESIZE_URL}${stringifyOptions({
         ...resizeOptions,
         signature,
-    })}/${encodeURIComponent(input)}`;
+    })}/${encodeURIComponent(input)}?sig=${signature}`;
 
     const logger = getLogger().subLogger('imageResizing');
     logger.log(`resize image using gitbook-service: ${resizeURL}`);
