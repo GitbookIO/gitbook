@@ -1,38 +1,40 @@
+import memoize from 'memoizee';
+
 /**
  * Format date as MM/DD/YYYY (e.g., "05/11/2025")
  */
-export function formatNumericDate(date: Date): string {
-    return new Intl.DateTimeFormat('en-US', {
+export const getNumericDateFormatter = memoize((locale: Intl.LocalesArgument) => {
+    return new Intl.DateTimeFormat(locale ?? 'en-US', {
         month: '2-digit',
         day: '2-digit',
         year: 'numeric',
         timeZone: 'UTC',
-    }).format(date);
-}
+    });
+});
 
 /**
  * Format date as "Month Day, Year" (e.g., "November 5, 2025")
  */
-export function formatDateFull(date: Date): string {
-    return new Intl.DateTimeFormat('en-US', {
+export const getFullDateFormatter = memoize((locale: Intl.LocalesArgument) => {
+    return new Intl.DateTimeFormat(locale ?? 'en-US', {
         month: 'long',
         day: 'numeric',
         year: 'numeric',
         timeZone: 'UTC',
-    }).format(date);
-}
+    });
+});
 
 /**
  * Format date as "Nov. 5 2025"
  */
-export function formatDateShort(date: Date): string {
-    return new Intl.DateTimeFormat('en-US', {
+export const getShortDateFormatter = memoize((locale: Intl.LocalesArgument) => {
+    return new Intl.DateTimeFormat(locale ?? 'en-US', {
         month: 'short',
         day: 'numeric',
         year: 'numeric',
         timeZone: 'UTC',
-    }).format(date);
-}
+    });
+});
 
 /**
  * Format date with weekday (e.g., "Monday, Nov 5, 2025").

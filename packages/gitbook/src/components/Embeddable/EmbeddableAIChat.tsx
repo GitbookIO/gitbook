@@ -10,9 +10,9 @@ import {
 } from '@/components/AIChat';
 import { useLanguage } from '@/intl/client';
 import * as api from '@gitbook/api';
-import React, { use, useMemo } from 'react';
+import React from 'react';
 import { useTrackEvent } from '../Insights';
-import { LinkContext, type LinkContextType } from '../primitives';
+import { LinkContext } from '../primitives';
 import {
     EmbeddableFrame,
     EmbeddableFrameBody,
@@ -27,7 +27,7 @@ import {
     EmbeddableIframeButtons,
     EmbeddableIframeCloseButton,
     EmbeddableIframeTabs,
-    useEmbeddableConfiguration,
+    useEmbeddableLinkContext,
 } from './EmbeddableIframeAPI';
 
 type EmbeddableAIChatProps = {
@@ -41,9 +41,8 @@ type EmbeddableAIChatProps = {
 export function EmbeddableAIChat(props: EmbeddableAIChatProps) {
     const { baseURL, siteTitle } = props;
     const chat = useAIChatState();
-    const { config } = useAI();
+    const { config: siteConfig } = useAI();
     const chatController = useAIChatController();
-    const configuration = useEmbeddableConfiguration();
     const language = useLanguage();
 
     React.useEffect(() => {
@@ -65,20 +64,8 @@ export function EmbeddableAIChat(props: EmbeddableAIChatProps) {
     }, [trackEvent]);
 
     const tabsRef = React.useRef<HTMLDivElement>(null);
-    const hasDocsTab = configuration.tabs.includes('docs');
-    const currentLinkContext = use(LinkContext);
-    const linkContext: LinkContextType = useMemo(
-        () =>
-            hasDocsTab
-                ? { ...currentLinkContext, externalTarget: '_blank' }
-                : {
-                      ...currentLinkContext,
-                      isExternalClient: () => true,
-                      isExternalServer: () => true,
-                      externalTarget: '_blank',
-                  },
-        [hasDocsTab, currentLinkContext]
-    );
+    const trademark = siteConfig.trademark;
+    const { linkContext } = useEmbeddableLinkContext();
 
     return (
         <EmbeddableFrame>
@@ -95,14 +82,11 @@ export function EmbeddableAIChat(props: EmbeddableAIChatProps) {
             <EmbeddableFrameMain data-testid="ai-chat">
                 <EmbeddableFrameHeader>
                     {!tabsRef.current ? (
-                        <AIChatDynamicIcon
-                            className="animate-blur-in-slow"
-                            trademark={config.trademark}
-                        />
+                        <AIChatDynamicIcon className="animate-blur-in-slow" trademark={trademark} />
                     ) : null}
                     <EmbeddableFrameHeaderMain>
                         <EmbeddableFrameTitle>
-                            {getAIChatName(language, config.trademark)}
+                            {siteConfig.assistantName ?? getAIChatName(language, trademark)}
                         </EmbeddableFrameTitle>
                         <AIChatSubtitle chat={chat} />
                     </EmbeddableFrameHeaderMain>
@@ -115,8 +99,9 @@ export function EmbeddableAIChat(props: EmbeddableAIChatProps) {
                         <AIChatBody
                             chatController={chatController}
                             chat={chat}
-                            suggestions={configuration.suggestions}
-                            greeting={configuration.greeting}
+                            suggestions={siteConfig.suggestions}
+                            greeting={siteConfig.greeting}
+                            trademark={trademark}
                         />
                     </LinkContext>
                 </EmbeddableFrameBody>

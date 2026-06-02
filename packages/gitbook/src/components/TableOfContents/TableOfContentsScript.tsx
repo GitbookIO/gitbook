@@ -42,8 +42,8 @@ export function TableOfContentsScript() {
             }
 
             // Update height
-            root.style.setProperty('--toc-height', `${height}px`);
-            root.style.setProperty('--toc-top-offset', `${offset}px`);
+            root.style.setProperty('--toc-height', `${Math.max(height, 0)}px`);
+            root.style.setProperty('--toc-top-offset', `${Math.max(offset, 0)}px`);
 
             // Subtract visible pageCover (if any)
             if (
@@ -64,8 +64,8 @@ export function TableOfContentsScript() {
                 }
             }
 
-            root.style.setProperty('--outline-height', `${height}px`);
-            root.style.setProperty('--outline-top-offset', `${offset}px`);
+            root.style.setProperty('--outline-height', `${Math.max(height, 0)}px`);
+            root.style.setProperty('--outline-top-offset', `${Math.max(offset, 0)}px`);
         };
 
         // Initial update

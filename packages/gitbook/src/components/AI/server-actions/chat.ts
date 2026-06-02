@@ -1,5 +1,4 @@
 'use server';
-import { getEmbeddableLinker } from '@/lib/embeddable';
 import { getSiteURLDataFromMiddleware } from '@/lib/middleware';
 import { getServerActionBaseContext } from '@/lib/server-actions';
 import { traceErrorOnly } from '@/lib/tracing';
@@ -9,6 +8,7 @@ import {
     AIModel,
     type AIToolCallResult,
     type AIToolDefinition,
+    SiteCoreChannelType,
     type SiteInsightsSession,
 } from '@gitbook/api';
 import { streamRenderAIMessage } from './api';
@@ -35,10 +35,9 @@ export async function* streamAIChatResponse({
     options?: RenderAIMessageOptions;
 }) {
     const { stream } = await traceErrorOnly('AI.streamAIChatResponse', async () => {
-        let context = await getServerActionBaseContext();
-        if (options?.asEmbeddable) {
-            context = { ...context, linker: getEmbeddableLinker(context.linker) };
-        }
+        const context = await getServerActionBaseContext({
+            isEmbeddable: options?.asEmbeddable,
+        });
 
         const siteURLData = await getSiteURLDataFromMiddleware();
 
@@ -61,6 +60,11 @@ export async function* streamAIChatResponse({
                 toolCall,
                 tools,
                 session,
+                channel: {
+                    type: options?.asEmbeddable
+                        ? SiteCoreChannelType.Embed
+                        : SiteCoreChannelType.Site,
+                },
             }
         );
 

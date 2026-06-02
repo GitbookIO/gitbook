@@ -1,9 +1,14 @@
 import { type GitBookSiteContext, checkIsRootSiteContext } from '@/lib/context';
 import { throwIfDataError } from '@/lib/data';
-import type { GitBookLinker } from '@/lib/links';
-import { joinPath } from '@/lib/paths';
+import { type GitBookLinker, linkerWithMarkdownPages } from '@/lib/links';
+import { resolveFirstDocument } from '@/lib/pages';
 import { type FlatPageEntry, getIndexablePages } from '@/lib/sitemap';
-import { getSiteStructureSections } from '@/lib/sites';
+import {
+    filterSiteSpacesByLocale,
+    getFallbackSiteSpacePath,
+    getLocalizedTitle,
+    getSiteStructureSections,
+} from '@/lib/sites';
 import type { SiteSection, SiteSpace } from '@gitbook/api';
 import assertNever from 'assert-never';
 import type { ListItem, Paragraph, Root, RootContent } from 'mdast';
@@ -12,22 +17,17 @@ import { toMarkdown } from 'mdast-util-to-markdown';
 /**
  * Generate a llms.txt file for the site.
  */
-export async function serveLLMsTxt(
-    context: GitBookSiteContext,
-    {
-        withMarkdownPages = false,
-    }: {
-        /**
-         * If true, a markdown extension will be added to the page path.
-         */
-        withMarkdownPages?: boolean;
-    } = {}
-) {
-    const { site } = context;
+export async function serveLLMsTxt(baseContext: GitBookSiteContext) {
+    const { site } = baseContext;
 
-    if (!checkIsRootSiteContext(context)) {
+    if (!checkIsRootSiteContext(baseContext)) {
         return new Response('llms.txt is only served from the root of the site', { status: 404 });
     }
+
+    const context = {
+        ...baseContext,
+        linker: linkerWithMarkdownPages(baseContext.linker),
+    };
 
     const tree: Root = {
         type: 'root',
@@ -37,42 +37,36 @@ export async function serveLLMsTxt(
                 depth: 1,
                 children: [{ type: 'text', value: site.title }],
             },
-            ...(await getNodesFromSiteStructure(context, { withMarkdownPages })),
+            ...(await getNodesFromSiteStructure(context)),
         ],
     };
 
-    return new Response(
-        toMarkdown(tree, {
-            bullet: '-',
-        }),
-        {
-            headers: {
-                'Content-Type': 'text/markdown; charset=utf-8',
-            },
-        }
-    );
+    let output = toMarkdown(tree, {
+        bullet: '-',
+    });
+
+    output += renderAskFooter(context);
+
+    return new Response(output, {
+        headers: {
+            'Content-Type': 'text/markdown; charset=utf-8',
+        },
+    });
 }
 
 /**
  * Get MDAST nodes from site structure.
  */
-async function getNodesFromSiteStructure(
-    context: GitBookSiteContext,
-    options: {
-        withMarkdownPages: boolean;
-    }
-): Promise<RootContent[]> {
+async function getNodesFromSiteStructure(context: GitBookSiteContext): Promise<RootContent[]> {
     switch (context.structure.type) {
         case 'sections':
             return getNodesFromSections(
                 context,
-                getSiteStructureSections(context.structure, { ignoreGroups: true }),
-                { withMarkdownPages: options.withMarkdownPages }
+                getSiteStructureSections(context.structure, { ignoreGroups: true })
             );
         case 'siteSpaces':
             return getNodesFromSiteSpaces(context, context.structure.structure, {
                 heading: true,
-                withMarkdownPages: options.withMarkdownPages,
             });
         default:
             assertNever(context.structure);
@@ -84,22 +78,21 @@ async function getNodesFromSiteStructure(
  */
 async function getNodesFromSections(
     context: GitBookSiteContext,
-    siteSections: SiteSection[],
-    options: {
-        withMarkdownPages: boolean;
-    }
+    siteSections: SiteSection[]
 ): Promise<RootContent[]> {
+    const currentLanguage = context.locale;
     const all = await Promise.all(
         siteSections.map(async (siteSection): Promise<RootContent[]> => {
             const siteSpaceNodes = await getNodesFromSiteSpaces(context, siteSection.siteSpaces, {
                 heading: false,
-                withMarkdownPages: options.withMarkdownPages,
             });
             return [
                 {
                     type: 'heading',
                     depth: 2,
-                    children: [{ type: 'text', value: siteSection.title }],
+                    children: [
+                        { type: 'text', value: getLocalizedTitle(siteSection, currentLanguage) },
+                    ],
                 },
                 ...siteSpaceNodes,
             ];
@@ -119,17 +112,14 @@ async function getNodesFromSiteSpaces(
          * Includes a heading for each site space.
          */
         heading?: boolean;
-
-        /**
-         * If true, a markdown extension will be added to the page path.
-         */
-        withMarkdownPages: boolean;
     }
 ): Promise<RootContent[]> {
     const { dataFetcher, linker } = context;
 
+    const filteredSiteSpaces = filterSiteSpacesByLocale(siteSpaces, context.locale);
+
     const all = await Promise.all(
-        siteSpaces.map(async (siteSpace): Promise<RootContent[]> => {
+        filteredSiteSpaces.map(async (siteSpace): Promise<RootContent[]> => {
             const siteSpaceUrl = siteSpace.urls.published;
             if (!siteSpaceUrl) {
                 return [];
@@ -149,18 +139,23 @@ async function getNodesFromSiteSpaces(
                 nodes.push({
                     type: 'heading',
                     depth: 2,
-                    children: [{ type: 'text', value: siteSpace.title }],
+                    children: [
+                        {
+                            type: 'text',
+                            value: getLocalizedTitle(siteSpace, context.locale),
+                        },
+                    ],
                 });
             }
 
-            // Add the pages as a list
-            nodes.push(
-                ...(await getMarkdownForPagesTree(pages, {
-                    siteSpaceUrl,
-                    linker,
-                    withMarkdownPages: options.withMarkdownPages,
-                }))
+            const siteSpaceLinker = linkerWithMarkdownPages(
+                linker.withOtherSiteSpace({
+                    spaceBasePath: getFallbackSiteSpacePath(context, siteSpace),
+                })
             );
+
+            // Add the pages as a list
+            nodes.push(...(await getMarkdownForPagesTree(pages, siteSpaceLinker)));
 
             return nodes;
         })
@@ -173,23 +168,15 @@ async function getNodesFromSiteSpaces(
  */
 export async function getMarkdownForPagesTree(
     pages: FlatPageEntry[],
-    options: {
-        siteSpaceUrl: string;
-        linker: GitBookLinker;
-        withMarkdownPages?: boolean;
-    }
+    linker: GitBookLinker
 ): Promise<RootContent[]> {
-    const { siteSpaceUrl, linker } = options;
-
     const listChildren = await Promise.all(
         pages.map(async ({ page }): Promise<ListItem> => {
-            const pageURL = new URL(siteSpaceUrl);
-            pageURL.pathname = joinPath(pageURL.pathname, page.path);
-            if (options.withMarkdownPages) {
-                pageURL.pathname = `${pageURL.pathname}.md`;
-            }
-
-            const url = linker.toLinkForContent(pageURL.toString());
+            const url = linker.toAbsoluteURL(
+                linker.toPathForPagePath({
+                    path: page.path,
+                })
+            );
             const children: Paragraph['children'] = [
                 {
                     type: 'link',
@@ -213,4 +200,26 @@ export async function getMarkdownForPagesTree(
         children: listChildren,
     });
     return nodes;
+}
+
+function renderAskFooter(context: GitBookSiteContext) {
+    return `\n\n---\n\n# Agent Instructions: Querying This Documentation
+
+If you need additional information, you can query the documentation dynamically by asking a question.
+
+Perform an HTTP GET request on a page URL with the \`ask\` query parameter:
+
+\`\`\`
+GET ${context.linker.toAbsoluteURL(
+        context.linker.toPathForPagePath({
+            path: resolveFirstDocument(context.revision.pages, [])?.page.path ?? 'index',
+        })
+    )}?ask=<question>
+\`\`\`
+
+The question should be specific, self-contained, and written in natural language.
+The response will contain a direct answer to the question and relevant excerpts and sources from the documentation.
+
+Use this mechanism when the answer is not explicitly present in the current page, you need clarification or additional context, or you want to retrieve related documentation sections.
+`;
 }

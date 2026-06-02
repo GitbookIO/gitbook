@@ -1,23 +1,43 @@
 import type { GitBookAnyContext } from '@/lib/context';
-import { type TranslationLanguage, languages } from './translations';
+import {
+    type TranslationLanguage,
+    type TranslationLocale,
+    defaultLanguage,
+    isAvailableLanguage,
+    loadLanguage,
+} from './translations';
 
 export * from './translate';
 
-type TranslationLocale = keyof typeof languages;
-
 export const DEFAULT_LOCALE = 'en' satisfies TranslationLocale;
+
+/**
+ * Get the locale to use for the HTML lang attribute.
+ * This returns the actual content language even if we don't have UI translations for it.
+ */
+export function getContentLocale(context: GitBookAnyContext): string {
+    if (context.locale) {
+        return context.locale;
+    }
+
+    const customization = 'site' in context ? context.customization : null;
+    if (customization) {
+        return customization.internationalization.locale;
+    }
+
+    return DEFAULT_LOCALE;
+}
 
 /**
  * Get the locale to use for a space.
  */
 export function getSpaceLocale(context: GitBookAnyContext): TranslationLocale {
-    const { space } = context;
     const customization = 'site' in context ? context.customization : null;
 
     // If the language is configured in the space, use it in priority
-    if (space.language) {
-        if (checkIsValidLocale(space.language)) {
-            return space.language;
+    if (context.locale) {
+        if (checkIsValidLocale(context.locale)) {
+            return context.locale;
         }
         return DEFAULT_LOCALE;
     }
@@ -35,24 +55,16 @@ export function getSpaceLocale(context: GitBookAnyContext): TranslationLocale {
 /**
  * Create the translation context for a space to use in the server components.
  */
-export function getSpaceLanguage(context: GitBookAnyContext): TranslationLanguage {
-    const fallback = languages[DEFAULT_LOCALE];
-
+export async function getSpaceLanguage(context: GitBookAnyContext): Promise<TranslationLanguage> {
     const locale = getSpaceLocale(context);
-
-    let language = fallback;
-    // @ts-ignore
-    if (locale !== DEFAULT_LOCALE && languages[locale]) {
-        // @ts-ignore
-        language = languages[locale];
-    }
+    const language = locale === DEFAULT_LOCALE ? defaultLanguage : await loadLanguage(locale);
 
     return {
-        ...fallback,
-        ...language,
+        ...defaultLanguage,
+        ...(language ?? defaultLanguage),
     };
 }
 
 function checkIsValidLocale(locale: string): locale is TranslationLocale {
-    return locale in languages;
+    return isAvailableLanguage(locale);
 }

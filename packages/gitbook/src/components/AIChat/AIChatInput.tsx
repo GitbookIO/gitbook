@@ -1,10 +1,12 @@
 import { t, tString, useLanguage } from '@/intl/client';
+import { tcls } from '@/lib/tailwind';
 import { Icon } from '@gitbook/icons';
 import { useEffect, useRef } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
-import { useAIChatState } from '../AI/useAIChat';
+import { useAIChatController, useAIChatState } from '../AI/useAIChat';
 import { HoverCard, HoverCardRoot, HoverCardTrigger } from '../primitives';
 import { Input } from '../primitives/Input';
+import { AIChatReferenceChips } from './AIChatReferenceChips';
 
 export function AIChatInput(props: {
     disabled?: boolean;
@@ -18,6 +20,7 @@ export function AIChatInput(props: {
 
     const language = useLanguage();
     const chat = useAIChatState();
+    const chatController = useAIChatController();
 
     const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -32,6 +35,13 @@ export function AIChatInput(props: {
             return () => clearTimeout(timeout);
         }
     }, [disabled, loading, chat.opened]);
+
+    // Explicit focus requests (e.g. clicking "Ask" while the chat is already open).
+    useEffect(() => {
+        return chatController.on('focus', () => {
+            inputRef.current?.focus();
+        });
+    }, [chatController]);
 
     useHotkeys(
         'mod+i',
@@ -58,7 +68,10 @@ export function AIChatInput(props: {
                 size: 'small',
                 label: tString(language, 'send'),
             }}
-            className="animate-blur-in-slow bg-tint-base/9 backdrop-blur-lg contrast-more:bg-tint-base"
+            className={tcls(
+                chat.control ? 'animate-blur-out-display' : 'animate-blur-in-slow',
+                'bg-tint-base/9 backdrop-blur-lg contrast-more:bg-tint-base'
+            )}
             rows={1}
             maxLength={2048}
             keyboardShortcut={
@@ -69,9 +82,16 @@ export function AIChatInput(props: {
                       }
                     : undefined
             }
-            disabled={disabled || loading}
+            disabled={disabled || loading || chat.control !== null}
             aria-busy={loading}
             ref={inputRef}
+            header={
+                <AIChatReferenceChips
+                    references={chat.references}
+                    onRemove={chatController.removeReference}
+                    disabled={loading || disabled}
+                />
+            }
             trailing={
                 <HoverCardRoot openDelay={500}>
                     <HoverCard

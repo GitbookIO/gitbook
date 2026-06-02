@@ -1,75 +1,54 @@
+import { getSpaceLanguage, t, tString } from '@/intl/server';
 import type { GitBookSiteContext } from '@/lib/context';
+import { getDocumentSections } from '@/lib/document-sections';
+import { tcls } from '@/lib/tailwind';
 import {
     type JSONDocument,
     type RevisionPageDocument,
+    type RevisionTag,
     SiteAdsStatus,
     SiteInsightsAdPlacement,
 } from '@gitbook/api';
-import { Icon } from '@gitbook/icons';
 import React from 'react';
 
-import { getSpaceLanguage, t } from '@/intl/server';
-import { getDocumentSections } from '@/lib/document-sections';
-import { tcls } from '@/lib/tailwind';
-
+import { Icon } from '@gitbook/icons';
 import { Ad } from '../Ads';
+import { UpdatesTagFilters } from '../DocumentView/UpdatesFilter';
 import { PageFeedbackForm } from '../PageFeedback';
 import { ThemeToggler } from '../ThemeToggler';
+import { SideSheet } from '../primitives/SideSheet';
+import { PageAsideCloseButton } from './PageAsideButton';
 import { ScrollSectionsList } from './ScrollSectionsList';
+import { ScrollToTopButton } from './ScrollToTopButton';
 
 /**
  * Aside listing the headings in the document.
  */
-export function PageAside(props: {
+export async function PageAside(props: {
     page: RevisionPageDocument;
     document: JSONDocument | null;
+    filterableTags: RevisionTag[];
     context: GitBookSiteContext;
     withHeaderOffset: { sectionsHeader: boolean; topHeader: boolean };
     withFullPageCover: boolean;
     withPageFeedback: boolean;
 }) {
-    const { page, document, withPageFeedback, context } = props;
+    const { page, document, filterableTags, withPageFeedback, context } = props;
     const { customization, site } = context;
+    const language = await getSpaceLanguage(context);
 
     return (
-        <aside
+        <SideSheet
+            side="right"
+            toggleClass="outline-open"
+            withOverlay
+            withCloseButton
             className={tcls(
                 'group/aside',
                 'order-last',
-                'hidden',
-                'max-w-0',
-                'pt-8',
-                'pb-4',
-                'opacity-0',
 
-                'xl:flex',
-
-                'overflow-hidden',
-
-                'xl:max-w-56',
-                'xl:opacity-11',
-                'xl:ml-12',
-
-                'xl:max-3xl:chat-open:hidden',
-                'xl:max-3xl:chat-open:max-w-0',
-                'xl:max-3xl:chat-open:opacity-0',
-                'xl:max-3xl:chat-open:ml-0',
-
-                'hydrated:starting:ml-0',
-                'hydrated:starting:max-w-0',
-                'hydrated:starting:opacity-0',
-
-                'transition-[margin,max-width,opacity,display] duration-300 motion-reduce:transition-none',
-                'transition-discrete',
-
-                'basis-56',
-                'grow-0',
-                'shrink-0',
-                'break-anywhere', // To prevent long words in headings from breaking the layout
-
-                'text-tint',
-                'contrast-more:text-tint-strong',
-                'sticky',
+                'xl:sticky',
+                'w-64',
 
                 // Without header
                 'lg:top-0',
@@ -87,80 +66,80 @@ export function PageAside(props: {
                 'lg:[html[style*="--outline-top-offset"]_&]:top-(--outline-top-offset)!',
                 'lg:[html[style*="--outline-height"]_&]:max-h-(--outline-height)!',
 
-                // When in api page mode, we display it as an overlay on non-large resolutions
-                'xl:max-2xl:page-api-block:z-10',
-                'xl:max-2xl:page-api-block:fixed',
-                'xl:max-2xl:page-api-block:right-8',
-                'xl:max-2xl:page-api-block:w-60',
-                'xl:max-2xl:page-api-block:max-w-60',
-                'xl:max-2xl:page-api-block:pb-8',
-                'xl:max-2xl:page-api-block:pt-10',
-                'xl:max-2xl:[body:has(.openapi-block):has(.page-has-ancestors)_&]:pt-6.5'
+                'layout-default:max-xl:border-l',
+                'layout-wide:max-3xl:border-l',
+                'border-tint-subtle',
+
+                'p-4',
+                'pt-8',
+                'ml-4',
+
+                'break-anywhere', // To prevent long words in headings from breaking the layout
+
+                'lg:z-10',
+                'layout-default:xl:not-chat-open:pr-0',
+                'layout-default:xl:not-chat-open:pl-8',
+                'layout-default:xl:not-chat-open:flex!',
+                'layout-default:xl:not-chat-open:animate-none!',
+                'layout-default:3xl:flex!',
+                'layout-default:3xl:animate-none!',
+
+                // In layout-wide mode, hide outline when viewport is too narrow
+                // or when chat is open and viewport is narrow, to prevent layout overflow
+                'layout-wide:xl:-mr-68',
+                'layout-wide:3xl:not-chat-open:flex!',
+                'layout-wide:3xl:not-chat-open:animate-none!',
+
+                // Show outline if page has OpenAPI block
+                // TODO: remove this in favour of a nicer, more immediately accessible solution in the future.
+                'page-api-block:page-has-outline:min-[96rem]:max-3xl:-mr-[max(calc((100vw-90rem)/2),0rem)]',
+                'page-api-block:page-has-outline:min-[96rem]:flex!',
+                'page-api-block:page-has-outline:min-[96rem]:animate-none!',
+                'page-api-block:page-has-outline:min-[96rem]:border-l-0',
+                'page-api-block:page-has-outline:min-[96rem]:pl-8',
+
+                'hydrated:site-background', // Only add a background once the element is positioned correctly to prevent overlapping the page cover
+                'text-tint',
+                'contrast-more:text-tint-strong'
             )}
         >
-            <div
-                className={tcls(
-                    'flex flex-col',
-                    'min-w-56 shrink-0',
-                    'overflow-hidden',
-                    'w-full',
-                    'xl:max-2xl:rounded-corners:page-api-block:rounded-md',
-                    'xl:max-2xl:circular-corners:page-api-block:rounded-xl',
-                    'xl:max-2xl:page-api-block:border',
-                    'xl:max-2xl:page-api-block:border-tint',
-                    'xl:max-2xl:page-api-block:bg-tint/9',
-                    'xl:max-2xl:page-api-block:backdrop-blur-lg',
-                    'xl:max-2xl:contrast-more:page-api-block:bg-tint',
-                    'xl:max-2xl:page-api-block:hover:shadow-lg',
-                    'xl:max-2xl:page-api-block:hover:shadow-tint-12/1',
-                    'xl:max-2xl:dark:page-api-block:hover:shadow-tint-1/1',
-                    'xl:max-2xl:page-api-block:not-hover:*:hidden'
-                )}
-            >
-                <PageAsideHeader context={context} />
+            <div className="flex h-full w-full shrink-0 flex-col overflow-hidden">
                 {page.layout.outline ? (
-                    <div className="flex shrink flex-col overflow-hidden">
-                        {document ? (
-                            <React.Suspense fallback={null}>
-                                <PageAsideSections document={document} context={context} />
-                            </React.Suspense>
+                    <>
+                        {filterableTags.length > 0 ? (
+                            <UpdatesTagFilters
+                                tags={filterableTags}
+                                tagsLabel={tString(language, 'tags')}
+                                clearLabel={tString(language, 'clear')}
+                            />
                         ) : null}
-                        <PageAsideActions page={page} withPageFeedback={withPageFeedback} />
-                    </div>
+                        <div
+                            className={tcls(
+                                'mb-3 ml-3 flex page-no-outline:hidden items-center justify-between max-lg:hidden',
+                                filterableTags.length > 0 && 'mt-4'
+                            )}
+                        >
+                            <ScrollToTopButton className="flex cursor-pointer items-center gap-1 font-semibold text-tint text-xs uppercase leading-wider">
+                                <Icon icon="block-quote" className="size-3" />{' '}
+                                {t(language, 'on_this_page')}
+                            </ScrollToTopButton>
+                            <PageAsideCloseButton className="layout-wide:3xl:hidden layout-default:xl:hidden page-api-block:min-[96rem]:hidden" />
+                        </div>
+                        <div className="flex shrink flex-col overflow-hidden">
+                            {document ? (
+                                <React.Suspense fallback={null}>
+                                    <PageAsideSections document={document} context={context} />
+                                </React.Suspense>
+                            ) : null}
+                            <PageAsideActions page={page} withPageFeedback={withPageFeedback} />
+                        </div>
+                    </>
                 ) : null}
                 {customization.themes.toggeable || site.ads ? (
                     <PageAsideFooter context={context} />
                 ) : null}
             </div>
-        </aside>
-    );
-}
-
-function PageAsideHeader(props: { context: GitBookSiteContext }) {
-    const { context } = props;
-    const language = getSpaceLanguage(context);
-
-    return (
-        <div
-            className={tcls(
-                'hidden',
-                'xl:max-2xl:page-api-block:flex!',
-                'text-xs',
-                'tracking-wide',
-                'font-semibold',
-                'uppercase',
-                'px-2',
-                'py-1.5',
-
-                'flex-row',
-                'items-center',
-                'gap-2'
-            )}
-        >
-            <Icon icon="block-quote" className={tcls('size-3')} />
-            {t(language, 'on_this_page')}
-            <Icon icon="chevron-down" className={tcls('size-3', 'opacity-6', 'ml-auto')} />
-        </div>
+        </SideSheet>
     );
 }
 
@@ -170,7 +149,7 @@ async function PageAsideSections(props: { document: JSONDocument; context: GitBo
     const sections = await getDocumentSections(context, document);
 
     return sections.length > 1 ? (
-        <div className="overflow-y-auto">
+        <div data-gb-page-outline className="overflow-y-auto">
             <ScrollSectionsList sections={sections} />
         </div>
     ) : null;
@@ -187,7 +166,7 @@ function PageAsideActions(props: {
             className={tcls(
                 'flex flex-col gap-3',
                 'border-tint-subtle border-t first:border-none',
-                'sidebar-list-default:px-3 pt-5 first:pt-0 xl:max-2xl:page-api-block:p-5',
+                'sidebar-list-default:px-3 pt-5 first:pt-0',
                 'empty:hidden'
             )}
         >
@@ -208,8 +187,7 @@ async function PageAsideFooter(props: { context: GitBookSiteContext }) {
         <div
             className={tcls(
                 'sticky bottom-0 z-10 mt-auto flex flex-col',
-                'bg-tint-base theme-gradient-tint:bg-gradient-tint theme-gradient:bg-gradient-primary theme-muted:bg-tint-subtle [html.sidebar-filled.theme-bold.tint_&]:bg-tint-subtle',
-                'border-tint-subtle xl:max-2xl:page-api-block:border-t xl:max-2xl:page-api-block:p-2',
+                'border-tint-subtle',
                 'pt-4'
             )}
         >

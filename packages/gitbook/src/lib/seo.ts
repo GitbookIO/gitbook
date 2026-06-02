@@ -1,6 +1,5 @@
 import type { GitBookSiteContext } from '@/lib/context';
 import { type RevisionPageDocument, type RevisionPageGroup, SiteVisibility } from '@gitbook/api';
-import { headers } from 'next/headers';
 
 /**
  * Return true if a page is indexable in search.
@@ -24,13 +23,8 @@ export function isPageIndexable(
 /**
  * Return true if a space should be indexed by search engines.
  */
-export async function isSiteIndexable(context: GitBookSiteContext) {
-    const headersList = await headers();
-
-    if (
-        process.env.GITBOOK_BLOCK_SEARCH_INDEXATION &&
-        !headersList.has('x-gitbook-search-indexation')
-    ) {
+export function isSiteIndexable(context: GitBookSiteContext) {
+    if (context.noIndexSearch) {
         return false;
     }
 

@@ -9,7 +9,7 @@ paths:
         put:
             summary: Update an existing pet
             description: |
-                Social platform
+                Social platform<br>Hello
             operationId: updatePet
             requestBody:
                 description: Update an existent pet in the store

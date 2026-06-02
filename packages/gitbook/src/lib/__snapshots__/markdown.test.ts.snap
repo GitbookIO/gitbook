@@ -1,17 +1,17 @@
-// Bun Snapshot v1, https://goo.gl/fbAQLP
+// Bun Snapshot v1, https://bun.sh/docs/test/snapshots
 
 exports[`parseMarkdown should parse a simple table 1`] = `
 "<h2>Table</h2>
-<table>
-<thead>
-<tr>
-<th>a</th>
-<th align="left">b</th>
-<th align="right">c</th>
-<th align="center">d</th>
-</tr>
-</thead>
-</table>"
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>a</th><th align="left">b</th><th align="right">c</th><th align="center">d</th></tr></thead></table>"
 `;
 
 exports[`parseMarkdown should parse a complex table 1`] = `
@@ -31,116 +31,176 @@ A serialnumbers value governs its order within the given token.id</p>
 <h2>Filtering</h2>
 <p>When filtering there are some restrictions enforced to ensure correctness and scalability.</p>
 <p><strong>The table below defines the restrictions and support for the NFT ownership endpoint</strong></p>
-<table>
-<thead>
-<tr>
-<th>Query Param</th>
-<th>Comparison Operator</th>
-<th>Support</th>
-<th>Description</th>
-<th>Example</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>token.id</td>
-<td>eq</td>
-<td>Y</td>
-<td>Single occurrence only.</td>
-<td>?token.id=X</td>
-</tr>
-<tr>
-<td></td>
-<td>ne</td>
-<td>N</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td>lt(e)</td>
-<td>Y</td>
-<td>Single occurrence only.</td>
-<td>?token.id=lte:X</td>
-</tr>
-<tr>
-<td></td>
-<td>gt(e)</td>
-<td>Y</td>
-<td>Single occurrence only.</td>
-<td>?token.id=gte:X</td>
-</tr>
-<tr>
-<td>serialnumber</td>
-<td>eq</td>
-<td>Y</td>
-<td>Single occurrence only. Requires the presence of a <strong>token.id</strong> query</td>
-<td>?serialnumber=Y</td>
-</tr>
-<tr>
-<td></td>
-<td>ne</td>
-<td>N</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td>lt(e)</td>
-<td>Y</td>
-<td>Single occurrence only. Requires the presence of an <strong>lte</strong> or <strong>eq</strong> <strong>token.id</strong> query</td>
-<td>?token.id=lte:X&#x26;serialnumber=lt:Y</td>
-</tr>
-<tr>
-<td></td>
-<td>gt(e)</td>
-<td>Y</td>
-<td>Single occurrence only. Requires the presence of an <strong>gte</strong> or <strong>eq</strong> <strong>token.id</strong> query</td>
-<td>?token.id=gte:X&#x26;serialnumber=gt:Y</td>
-</tr>
-<tr>
-<td>spender.id</td>
-<td>eq</td>
-<td>Y</td>
-<td></td>
-<td>?spender.id=Z</td>
-</tr>
-<tr>
-<td></td>
-<td>ne</td>
-<td>N</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td>lt(e)</td>
-<td>Y</td>
-<td></td>
-<td>?spender.id=lt:Z</td>
-</tr>
-<tr>
-<td></td>
-<td>gt(e)</td>
-<td>Y</td>
-<td></td>
-<td>?spender.id=gt:Z</td>
-</tr>
-</tbody>
-</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Query Param</th><th>Comparison Operator</th><th>Support</th><th>Description</th><th>Example</th></tr></thead><tbody><tr><td>token.id</td><td>eq</td><td>Y</td><td>Single occurrence only.</td><td>?token.id=X</td></tr><tr><td></td><td>ne</td><td>N</td><td></td><td></td></tr><tr><td></td><td>lt(e)</td><td>Y</td><td>Single occurrence only.</td><td>?token.id=lte:X</td></tr><tr><td></td><td>gt(e)</td><td>Y</td><td>Single occurrence only.</td><td>?token.id=gte:X</td></tr><tr><td>serialnumber</td><td>eq</td><td>Y</td><td>Single occurrence only. Requires the presence of a <strong>token.id</strong> query</td><td>?serialnumber=Y</td></tr><tr><td></td><td>ne</td><td>N</td><td></td><td></td></tr><tr><td></td><td>lt(e)</td><td>Y</td><td>Single occurrence only. Requires the presence of an <strong>lte</strong> or <strong>eq</strong> <strong>token.id</strong> query</td><td>?token.id=lte:X&#x26;serialnumber=lt:Y</td></tr><tr><td></td><td>gt(e)</td><td>Y</td><td>Single occurrence only. Requires the presence of an <strong>gte</strong> or <strong>eq</strong> <strong>token.id</strong> query</td><td>?token.id=gte:X&#x26;serialnumber=gt:Y</td></tr><tr><td>spender.id</td><td>eq</td><td>Y</td><td></td><td>?spender.id=Z</td></tr><tr><td></td><td>ne</td><td>N</td><td></td><td></td></tr><tr><td></td><td>lt(e)</td><td>Y</td><td></td><td>?spender.id=lt:Z</td></tr><tr><td></td><td>gt(e)</td><td>Y</td><td></td><td>?spender.id=gt:Z</td></tr></tbody></table>
 <p>Note: When searching across a range for individual NFTs a <strong>serialnumber</strong> with an additional <strong>token.id</strong> query filter must be provided.
 Both filters must be a single occurrence of <strong>gt(e)</strong> or <strong>lt(e)</strong> which provide a lower and or upper boundary for search.</p>"
 `;
 
 exports[`parseMarkdown should parse html 1`] = `
-"<p>Returns trending events for the given time frame.</p>
+"<div>
+  <div>
+  <div>
+    ID:
+  </div>
+  <div>
+    get_trending_events
+  </div>
+</div>
+  <div>
+  <div>
+<span>
+  <span>
+    
+      
+
+  </span>
+  <span>
+    sports_events_trending
+  </span>
+</span>
+</div>
+</div>
+</div>
+<div>
+  <span>
+    Sports
+</span>
+<span>
+    Personalization
+</span>
+</div>
+<p>Returns trending events for the given time frame.</p>
 <p>The events are sorted by <code>trending score</code>.</p>
+<div>
+  <div>
+    <span>
+      
+        
+
+    </span>
+    <span>
+      Trending score
+    </span>
+  </div>
+  <div>
 <p>To calculate trending score for an event, each bet placed on this event
 contributes a value determined by how recently the bet was placed.</p>
 <p>Recent bets add more value than older ones.</p>
 <p>The normalized value of its score is also assigned to each event as its confidence.</p>
+  </div>
+</div>
+<div>
+  <div>
+    <span>
+      
+        
+
+    </span>
+    <span>
+      Filtering example
+    </span>
+  </div>
+  <div>
 <p>In this example we get all trending events where <code>league</code> is <code>UEFA Champions League</code>.</p>
 <pre><code class="language-bash">$ curl --request GET \\
   --url 'https://api.vaix.ai/api/sports/events/trending?filters=league%3Aeq%3AUEFA%20Champions%20League'
-</code></pre>"
+</code></pre>
+  </div>
+</div>"
 `;

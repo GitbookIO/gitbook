@@ -1,5 +1,18 @@
 import { type TestsCase, runTestCases, waitForCookiesDialog } from './util';
 
+const ONE_HOUR_IN_MS = 60 * 60 * 1000;
+
+const CLOSED_ONETRUST_COOKIE_BANNER = [
+    {
+        name: '__gitbook_cookie_granted',
+        value: 'no',
+    },
+    {
+        name: 'OptanonAlertBoxClosed',
+        value: new Date(Date.now() - ONE_HOUR_IN_MS).toISOString(),
+    },
+];
+
 /** A list of test cases to run on the customers' docs sites. */
 const testCases: TestsCase[] = [
     {
@@ -97,11 +110,12 @@ const testCases: TestsCase[] = [
         contentBaseURL: 'https://docs.midas.app',
         tests: [{ name: 'Home', url: '/' }],
     },
-    {
-        name: 'docs.keeper.io',
-        contentBaseURL: 'https://docs.keeper.io',
-        tests: [{ name: 'Home', url: '/', run: waitForCookiesDialog }],
-    },
+    // Disabling for now, one of the image is making the tests timeout
+    // {
+    //     name: 'docs.keeper.io',
+    //     contentBaseURL: 'https://docs.keeper.io',
+    //     tests: [{ name: 'Home', url: '/en', run: waitForCookiesDialog }],
+    // },
     {
         name: 'adiblar.gitbook.io',
         contentBaseURL: 'https://adiblar.gitbook.io',
@@ -209,11 +223,12 @@ const testCases: TestsCase[] = [
         contentBaseURL: 'https://docs.soniclabs.com',
         tests: [{ name: 'Home', url: '/' }],
     },
-    {
-        name: 'docs.meshchain.ai',
-        contentBaseURL: 'https://docs.meshchain.ai',
-        tests: [{ name: 'Home', url: '/' }],
-    },
+    // This one redirects to binance now
+    // {
+    //     name: 'docs.meshchain.ai',
+    //     contentBaseURL: 'https://docs.meshchain.ai',
+    //     tests: [{ name: 'Home', url: '/' }],
+    // },
     {
         name: 'docs.thousandeyes.com',
         contentBaseURL: 'https://docs.thousandeyes.com',
@@ -233,7 +248,11 @@ const testCases: TestsCase[] = [
         name: 'run-ai-docs.nvidia.com',
         contentBaseURL: 'https://run-ai-docs.nvidia.com',
         tests: [
-            { name: 'Home', url: '/' },
+            {
+                name: 'Home',
+                url: '/',
+                cookies: CLOSED_ONETRUST_COOKIE_BANNER,
+            },
             { name: 'OG Image', url: '/~gitbook/ogimage/h17zQIFwy3MaafVNmItO', mode: 'image' },
         ],
     },

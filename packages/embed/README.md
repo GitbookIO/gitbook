@@ -2,8 +2,9 @@
 
 Embed your GitBook docs in your product or website.
 
-The Docs Embed can contain two tabs:
+The Docs Embed can contain three tabs:
 - **Assistant**: The [GitBook Assistant](https://gitbook.com/docs/publishing-documentation/gitbook-ai-assistant) - an AI-powered chat interface to help users find answers
+- **Search**: A search-focused surface for quickly finding pages and asking scoped questions
 - **Docs**: A browser for navigating your documentation site
 
 The embed is set up automatically based on your site's configuration. You can optionally customize and override the configuration with custom actions, tools, suggested questions, [Authenticated Access](https://gitbook.com/docs/publishing-documentation/authenticated-access), and more. See the [Configuration](#configuration) section for all available options.
@@ -40,7 +41,7 @@ GitBook('configure', {
         label: 'Ask',
         icon: 'assistant' // 'assistant' | 'sparkle' | 'help' | 'book'
     },
-    tabs: ['assistant', 'docs'],
+    tabs: ['assistant', 'search', 'docs'],
     actions: [
         {
             icon: 'circle-question',
@@ -49,6 +50,7 @@ GitBook('configure', {
         }
     ],
     greeting: { title: 'Welcome!', subtitle: 'How can I help?' },
+    assistantName: 'Support Assistant',
     suggestions: ['What is GitBook?', 'How do I get started?'],
     tools: [/* ... */],
     closeButton: true,
@@ -71,6 +73,7 @@ const gitbook = createGitBook({
 // Create an iframe and get its URL
 const iframe = document.createElement('iframe');
 iframe.src = gitbook.getFrameURL({
+    colorScheme: 'dark', // Optional: force the embed to render in dark mode
     visitor: {
         token: 'your-jwt-token', // Optional: for Adaptive Content or Authenticated Access
         unsignedClaims: { // Optional: custom claims for dynamic expressions
@@ -91,7 +94,7 @@ frame.clearChat();
 
 // Configure the embed (see Configuration section for all options)
 frame.configure({
-    tabs: ['assistant', 'docs'],
+    tabs: ['assistant', 'search', 'docs'],
     actions: [
         {
             icon: 'circle-question',
@@ -100,6 +103,7 @@ frame.configure({
         }
     ],
     greeting: { title: 'Welcome!', subtitle: 'How can I help?' },
+    assistantName: 'Support Assistant',
     suggestions: ['What is GitBook?', 'How do I get started?'],
     tools: [/* ... */],
     closeButton: true
@@ -120,12 +124,14 @@ import { GitBookProvider, GitBookFrame } from '@gitbook/embed/react';
 
 <GitBookProvider siteURL="https://docs.company.com">
     <GitBookFrame
+        colorScheme="dark"
         visitor={{
             token: 'your-jwt-token', // Optional: for Adaptive Content or Authenticated Access
             unsignedClaims: { userId: '123' } // Optional: custom claims for dynamic expressions
         }}
-        tabs={['assistant', 'docs']}
+        tabs={['assistant', 'search', 'docs']}
         greeting={{ title: 'Welcome!', subtitle: 'How can I help?' }}
+        assistantName="Support Assistant"
         suggestions={['What is GitBook?', 'How do I get started?']}
         actions={[
             {
@@ -147,7 +153,7 @@ import { useGitBook } from '@gitbook/embed/react';
 
 function MyComponent() {
     const gitbook = useGitBook();
-    const frameURL = gitbook.getFrameURL({ visitor: { token: '...' } });
+    const frameURL = gitbook.getFrameURL({ colorScheme: 'dark', visitor: { token: '...' } });
     // ...
 }
 ```
@@ -175,7 +181,7 @@ function MyComponent() {
 
 ### Standalone Script
 
-- `GitBook('init', options: { siteURL: string }, frameOptions?: { visitor?: {...} })` - Initialize widget
+- `GitBook('init', options: { siteURL: string }, frameOptions?: { colorScheme?: 'light' | 'dark', visitor?: {...} })` - Initialize widget
 - `GitBook('show')` - Show widget button
 - `GitBook('hide')` - Hide widget button
 - `GitBook('open')` - Open widget window
@@ -192,7 +198,7 @@ function MyComponent() {
 
 **Client Factory:**
 - `createGitBook(options: { siteURL: string })` → `GitBookClient`
-- `client.getFrameURL(options?: { visitor?: {...} })` → `string`
+- `client.getFrameURL(options?: { colorScheme?: 'light' | 'dark', visitor?: {...} })` → `string`
 - `client.createFrame(iframe: HTMLIFrameElement)` → `GitBookFrameClient`
 
 **Frame Client:**
@@ -225,10 +231,10 @@ Available in: Standalone script, NPM package, React components
 
 Override which tabs are displayed. Defaults to your site's configuration.
 
-- **Type**: `('assistant' | 'docs')[]`
+- **Type**: `('assistant' | 'search' | 'docs')[]`
 
 ```javascript
-tabs: ['assistant', 'docs']
+tabs: ['assistant', 'search', 'docs']
 ```
 
 ### `closeButton`
@@ -268,6 +274,19 @@ const unsubscribe = frame.on('close', () => {
 Notes:
 - The close button is rendered in the same sidebar area as tabs/actions.
 - If your UI hides that sidebar or doesn't render it, the button will not be visible.
+
+### `trademark`
+
+Available in: Standalone script, NPM package, React components
+
+Display GitBook branding in the embed. Defaults to true.
+
+- **Type**: `boolean`
+- **Default**: `true`
+
+```javascript
+trademark: true
+```
 
 ### `actions`
 
@@ -313,6 +332,18 @@ greeting: {
     title: 'Welcome!',
     subtitle: 'How can I help you today?'
 }
+```
+
+### `assistantName`
+
+Available in: Standalone script, NPM package, React components
+
+Override the assistant name displayed in the chat header and assistant entry points (for example, sidebar tabs and action labels). This name will be limited to 32 characters to prevent text overflow.
+
+- **Type**: `string`
+
+```javascript
+assistantName: 'Support Assistant'
 ```
 
 ### `suggestions`
@@ -427,6 +458,24 @@ visitor: {
         role: 'admin'
     }
 }
+```
+
+### `colorScheme`
+
+Available in: Standalone script (via `init`), NPM package (via `getFrameURL()`), React components (as prop)
+
+Override the embed's color scheme. When omitted, the embed follows the iframe's CSS `color-scheme`, which lets it inherit the parent page or browser preference.
+
+**Note**: This is not a configuration option but rather a parameter when initializing the frame or creating the frame URL.
+
+**Standalone script**: Pass as the second argument to `GitBook('init', options, frameOptions)`
+**NPM package**: Pass to `getFrameURL({ colorScheme: 'dark' })`
+**React components**: Pass as the `colorScheme` prop on `<GitBookFrame>`
+
+- **Type**: `'light' | 'dark'`
+
+```javascript
+colorScheme: 'dark'
 ```
 
 ### `button`

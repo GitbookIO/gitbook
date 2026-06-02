@@ -33,18 +33,18 @@ export function resolveTryItPrefillForOperation(args: {
         prefillInputContext,
     } = args;
 
-    if (!prefillInputContext) {
-        return {};
-    }
-
-    const runtime = new ExpressionRuntime();
-    const resolveTryItPrefillExpression = (expr: string) => {
-        const parts = parseTemplate(expr);
-        if (!parts.length) {
-            return undefined;
-        }
-        return runtime.evaluateTemplate(expr, prefillInputContext);
-    };
+    const resolveTryItPrefillExpression = prefillInputContext
+        ? (() => {
+              const runtime = new ExpressionRuntime();
+              return (expr: string) => {
+                  const parts = parseTemplate(expr);
+                  if (!parts.length) {
+                      return undefined;
+                  }
+                  return runtime.evaluateTemplate(expr, prefillInputContext);
+              };
+          })()
+        : undefined;
 
     const prefillAuth = securities
         ? resolveTryItPrefillAuthForOperationSecurities({
@@ -54,7 +54,10 @@ export function resolveTryItPrefillForOperation(args: {
         : undefined;
 
     const prefillServers = servers
-        ? resolveTryItPrefillServersForOperationServers({ servers, resolveTryItPrefillExpression })
+        ? resolveTryItPrefillServersForOperationServers({
+              servers,
+              resolveTryItPrefillExpression,
+          })
         : [];
 
     return {
@@ -68,15 +71,17 @@ export function resolveTryItPrefillForOperation(args: {
  */
 function resolveTryItPrefillAuthForOperationSecurities(args: {
     securities: OpenAPIOperationData['securities'];
-    resolveTryItPrefillExpression: (expr: string) => string | undefined;
+    resolveTryItPrefillExpression?: (expr: string) => string | undefined;
 }): ApiClientConfiguration['authentication'] | undefined {
     const { securities, resolveTryItPrefillExpression } = args;
     const prefillAuthConfig: ApiClientConfiguration['authentication']['securitySchemes'] = {};
 
     for (const [schemeName, security] of Object.values(securities)) {
-        const tryitPrefillAuthValue = security[PREFILL_CUSTOM_PROPERTY]
-            ? resolveTryItPrefillExpression(security[PREFILL_CUSTOM_PROPERTY])
+        const resolvedPrefill = security[PREFILL_CUSTOM_PROPERTY]
+            ? resolveTryItPrefillExpression?.(security[PREFILL_CUSTOM_PROPERTY])
             : undefined;
+        const tryitPrefillAuthValue =
+            resolvedPrefill || security['x-gitbook-token-placeholder'] || undefined;
 
         if (!tryitPrefillAuthValue) {
             continue;
@@ -120,7 +125,7 @@ function resolveTryItPrefillAuthForOperationSecurities(args: {
  */
 function resolveTryItPrefillServersForOperationServers(args: {
     servers: OpenAPIOperationData['servers'];
-    resolveTryItPrefillExpression: (expr: string) => string | undefined;
+    resolveTryItPrefillExpression?: (expr: string) => string | undefined;
 }): ApiClientConfiguration['servers'] | undefined {
     const { servers, resolveTryItPrefillExpression } = args;
     const resolvedServers: ApiClientConfiguration['servers'] = [];
@@ -128,9 +133,10 @@ function resolveTryItPrefillServersForOperationServers(args: {
     for (const server of servers) {
         // Url-level prefill
         const tryItPrefillServerUrlExpr = server[PREFILL_CUSTOM_PROPERTY];
-        const tryItPrefillServerUrlValue = tryItPrefillServerUrlExpr
-            ? resolveTryItPrefillExpression(tryItPrefillServerUrlExpr)
-            : undefined;
+        const tryItPrefillServerUrlValue =
+            tryItPrefillServerUrlExpr && resolveTryItPrefillExpression
+                ? resolveTryItPrefillExpression(tryItPrefillServerUrlExpr)
+                : undefined;
 
         const variables: { [variable: string]: OpenAPIV3.ServerVariableObject } = server.variables
             ? { ...server.variables }
@@ -143,7 +149,7 @@ function resolveTryItPrefillServersForOperationServers(args: {
                     variable;
 
                 const tryItPrefillVarValue = tryItPrefillVarExpr
-                    ? resolveTryItPrefillExpression(tryItPrefillVarExpr)
+                    ? resolveTryItPrefillExpression?.(tryItPrefillVarExpr)
                     : undefined;
                 variables[varName] = {
                     ...variableProps,
@@ -266,5 +272,7 @@ function templatePartsToExpression(parts: ReturnType<typeof parseTemplate>) {
 }
 
 function toPrefillCodePlaceholder(expression: string, defaultValue?: string) {
-    return `$$__X-GITBOOK-PREFILL[(${expression})${defaultValue ? ` ?? '${defaultValue}'` : ''}]__$$`;
+    return `$$__X-GITBOOK-PREFILL[(${expression})${
+        defaultValue ? ` ?? '${defaultValue}'` : ''
+    }]__$$`;
 }

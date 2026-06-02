@@ -141,6 +141,7 @@ export function ClientCodeBlock(props: ClientBlockProps) {
             style={style}
             theme={theme ?? plainTheme}
             id={codeBlockBodyId}
+            isPrint={mode === 'print'}
         />
     );
 
@@ -193,10 +194,10 @@ function CodeBlockExpandable(props: {
                 <Button
                     icon={<ToggleChevron open={isExpanded} />}
                     size="xsmall"
-                    variant="blank"
+                    variant="secondary"
                     type="button"
                     onClick={() => setIsExpanded(!isExpanded)}
-                    className="pointer-events-auto z-1 my-2 text-primary text-sm opacity-0 focus:opacity-11 group-hover/codeblock-expandable:opacity-11"
+                    className="pointer-events-auto z-1 my-2 bg-tint! text-primary text-sm opacity-0 focus:opacity-11 group-hover/codeblock-expandable:opacity-11"
                     aria-expanded={isExpanded}
                     aria-controls={controls}
                 >

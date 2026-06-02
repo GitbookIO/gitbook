@@ -6,15 +6,18 @@ import { tcls } from '@/lib/tailwind';
 import { SiteInsightsDisplayContext } from '@gitbook/api';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
-import { useSpaceBasePath } from '../SpaceLayout/SpaceLayoutContext';
+import { PreservePageLayout } from '../PageBody/PreservePageLayout';
+import { SiteAuthLoginButton } from '../SiteAuth/SiteAuthLoginLink';
+import { useSiteAdaptiveAuthLoginHref, useSpaceBasePath } from '../SpaceLayout/SpaceLayoutContext';
 import { CurrentPageProvider } from '../hooks';
-import { SuspenseLoadedHint } from '../primitives';
+import { Button, SuspenseLoadedHint } from '../primitives';
 
 /**
  * Component that displays a "page not found" message.
  */
 export function SitePageNotFound() {
     const basePath = useSpaceBasePath();
+    const adaptiveAuthLoginHref = useSiteAdaptiveAuthLoginHref();
     const language = useLanguage();
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -38,6 +41,8 @@ export function SitePageNotFound() {
         <CurrentPageProvider page={null}>
             <div
                 className={tcls(
+                    'layout-default',
+                    'page-has-toc',
                     'flex-1',
                     'flex',
                     'flex-row',
@@ -47,11 +52,32 @@ export function SitePageNotFound() {
                     'min-h-[calc(100vh-64px)] lg:min-h-fit'
                 )}
             >
+                <PreservePageLayout wideLayout={false} pageHasToc={true} />
                 <div className={tcls('max-w-80')}>
                     <h2 className={tcls('text-2xl', 'font-semibold', 'mb-2')}>
-                        {t(language, 'notfound_title')}
+                        {t(
+                            language,
+                            adaptiveAuthLoginHref ? 'notfound_adaptive_title' : 'notfound_title'
+                        )}
                     </h2>
-                    <p className={tcls('text-base', 'mb-4')}>{t(language, 'notfound')}</p>
+                    <p className={tcls('text-base', 'mb-4')}>
+                        {t(language, adaptiveAuthLoginHref ? 'notfound_adaptive' : 'notfound')}
+                    </p>
+                    <div className="flex gap-2">
+                        {adaptiveAuthLoginHref ? (
+                            <SiteAuthLoginButton
+                                href={adaptiveAuthLoginHref}
+                                variant="primary"
+                                size="medium"
+                                label={t(language, 'notfound_adaptive_login')}
+                            >
+                                {t(language, 'notfound_adaptive_login')}
+                            </SiteAuthLoginButton>
+                        ) : null}
+                        <Button href={basePath} variant="secondary">
+                            {t(language, 'notfound_goto_home')}
+                        </Button>
+                    </div>
                 </div>
                 <SuspenseLoadedHint />
 

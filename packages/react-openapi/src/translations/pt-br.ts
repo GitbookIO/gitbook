@@ -16,7 +16,7 @@ export const pt_br = {
     optional: 'Opcional',
     min: 'Mín',
     max: 'Máx',
-    nullable: 'Nulo',
+    nullable: 'Anulável',
     body: 'Corpo',
     payload: 'Carga útil',
     headers: 'Headers',

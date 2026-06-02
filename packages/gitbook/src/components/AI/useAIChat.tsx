@@ -6,38 +6,45 @@ import { useLanguage } from '@/intl/client';
 import { tString } from '@/intl/translate';
 import {
     AIMessageRole,
+    AIMessageStepPhase,
+    type AIStreamResponse,
     type AIStreamResponseToolCallPending,
     type AIToolCallResult,
 } from '@gitbook/api';
-import type { IconName } from '@gitbook/icons';
+import assertNever from 'assert-never';
 import * as React from 'react';
-import { getVisitor, useTrackEvent } from '../Insights';
-import { getSession } from '../Insights/sessions';
-import { integrationsAssistantTools } from '../Integrations';
+import { getInsightsSession, useTrackEvent } from '../Insights';
 import { useSetSearchState } from '../Search';
+import type { AnyAIControl } from './controls';
+import { ConfirmControlDef, ConfirmControlOutputSchema } from './controls/ConfirmControl';
+import { type AIChatReference, serializeReferences } from './references';
 import { type RenderAIMessageOptions, streamAIChatResponse } from './server-actions';
+import { getTools } from './tools';
 import { useAIMessageContextRef } from './useAIMessageContext';
 
 export type AIChatMessage = {
     role: AIMessageRole;
     content: React.ReactNode;
     query?: string;
+    references?: AIChatReference[];
+    activity?: AIChatMessageActivity;
 };
 
-export type AIChatPendingTool = {
-    icon?: IconName;
-    label: string;
-
-    /**
-     * Confirm the tool call by calling this function.
-     */
-    confirm: () => Promise<void>;
-
-    /**
-     * Tool call result to cancel it.
-     */
-    cancelToolCall: AIToolCallResult;
+export type AIChatMessageActivity = {
+    currentPhase?: AIMessageStepPhase;
+    toolCount: number;
+    hasCommentary: boolean;
+    hasFinalAnswer: boolean;
 };
+
+export type AIChatStatus =
+    | 'default'
+    | 'thinking'
+    | 'exploring'
+    | 'working'
+    | 'done'
+    | 'error'
+    | 'confirm';
 
 export type AIChatState = {
     /**
@@ -71,9 +78,9 @@ export type AIChatState = {
     followUpSuggestions: string[];
 
     /**
-     * Tools that are pending confirmation to be executed.
+     * Control to be displayed to the user.
      */
-    pendingTools: AIChatPendingTool[];
+    control: AnyAIControl | null;
 
     /**
      * If true, the session is in progress.
@@ -86,13 +93,19 @@ export type AIChatState = {
      * display an error alert. Clearing the conversation will reset this flag.
      */
     error: boolean;
+
+    /**
+     * References staged on the next user message.
+     */
+    references: AIChatReference[];
 };
 
 export type AIChatEvent =
     | { type: 'open' }
     | { type: 'postMessage'; message: string }
     | { type: 'clear' }
-    | { type: 'close' };
+    | { type: 'close' }
+    | { type: 'focus' };
 
 type AIChatEventData<T extends AIChatEvent['type']> = Omit<
     Extract<AIChatEvent, { type: T }>,
@@ -110,6 +123,14 @@ export type AIChatController = {
     postMessage: (input: { message: string }) => void;
     /** Clear the conversation */
     clear: () => void;
+    /** Stage a reference on the next message */
+    addReference: (ref: AIChatReference) => string;
+    /** Remove a staged reference */
+    removeReference: (id: string) => void;
+    /** Clear all staged references */
+    clearReferences: () => void;
+    /** Focus the chat input */
+    focus: () => void;
     /** Register an event listener */
     on: <T extends AIChatEvent['type']>(
         event: T,
@@ -127,10 +148,11 @@ const globalState = zustand.create<AIChatState>(() => {
         messages: [],
         query: null,
         followUpSuggestions: [],
-        pendingTools: [],
+        control: null,
         loading: false,
         error: false,
         initialQuery: null,
+        references: [],
     };
 });
 
@@ -206,6 +228,8 @@ export function AIChatProvider(props: {
         async (input: {
             /** Text message to send to the AI backend */
             message?: string;
+            /** User-typed prompt; compared against state.query to abort stale streams */
+            userQuery?: string;
             /** Tool call to send to the AI backend */
             toolCall?: AIToolCallResult;
         }) => {
@@ -213,7 +237,7 @@ export function AIChatProvider(props: {
                 return {
                     ...state,
                     followUpSuggestions: [],
-                    pendingTools: [],
+                    control: null,
                     loading: true,
                     error: false,
                     messages: [
@@ -221,6 +245,7 @@ export function AIChatProvider(props: {
                         {
                             role: AIMessageRole.Assistant,
                             content: null, // Placeholder for streaming response
+                            activity: getDefaultAIChatMessageActivity(),
                         },
                     ],
                 };
@@ -228,16 +253,16 @@ export function AIChatProvider(props: {
 
             // Execute a tool call
             const executeToolCall = async (event: AIStreamResponseToolCallPending) => {
-                const integrationTools = integrationsAssistantTools.getState().tools;
-                const toolDef = integrationTools.find((tool) => tool.name === event.toolCall.tool);
+                const tools = getTools();
+                const toolDef = tools.find((tool) => tool.name === event.toolCall.tool);
 
-                if (!toolDef) {
+                if (!toolDef || !('execute' in toolDef)) {
                     throw new Error(`Tool ${event.toolCall.tool} not found`);
                 }
 
                 try {
                     const result = await toolDef.execute(event.toolCall.input);
-                    streamResponse({
+                    await streamResponse({
                         toolCall: {
                             tool: event.toolCall.tool,
                             toolCallId: event.toolCallId,
@@ -246,7 +271,7 @@ export function AIChatProvider(props: {
                         },
                     });
                 } catch (error) {
-                    streamResponse({
+                    await streamResponse({
                         toolCall: {
                             tool: event.toolCall.tool,
                             toolCallId: event.toolCallId,
@@ -264,19 +289,17 @@ export function AIChatProvider(props: {
 
             let toolToExecute: AIStreamResponseToolCallPending | null = null;
             try {
-                const integrationTools = integrationsAssistantTools.getState().tools;
+                const tools = getTools();
                 const stream = await streamAIChatResponse({
                     message: input.message,
                     toolCall: input.toolCall,
                     messageContext: messageContextRef.current,
                     previousResponseId: globalState.getState().responseId ?? undefined,
-                    session: {
-                        sessionId: getSession().id,
-                        visitorId: (await getVisitor()).deviceId,
-                    },
-                    tools: integrationTools.map((tool) => ({
+                    session: await getInsightsSession(),
+                    tools: tools.map((tool) => ({
                         name: tool.name,
                         description: tool.description,
+                        // Issue with the schema generated by Zod and Next.js serialization.
                         inputSchema: tool.inputSchema,
                     })),
                     options: {
@@ -290,7 +313,7 @@ export function AIChatProvider(props: {
                 for await (const data of stream) {
                     if (!data) continue;
 
-                    if (input.message && globalState.getState().query !== input.message) {
+                    if (input.userQuery && globalState.getState().query !== input.userQuery) {
                         // Chat was cleared, stop processing the stream
                         break;
                     }
@@ -320,46 +343,86 @@ export function AIChatProvider(props: {
                             break;
                         }
                         case 'response_tool_call_pending': {
-                            const toolDef = integrationTools.find(
-                                (tool) => tool.name === event.toolCall.tool
-                            );
+                            const toolDef = tools.find((tool) => tool.name === event.toolCall.tool);
                             if (!toolDef) {
                                 throw new Error(`Tool ${event.toolCall.tool} not found`);
                             }
 
-                            const confirmation = toolDef.confirmation;
+                            if ('createControl' in toolDef) {
+                                globalState.setState((state) => ({
+                                    ...state,
+                                    control: toolDef.createControl({
+                                        context: {
+                                            toolCall: event.toolCall,
+                                            toolCallId: event.toolCallId,
+                                        },
+                                        input: event.toolCall.input as any,
+                                        language,
+                                        send: async (result) => {
+                                            await streamResponse({
+                                                toolCall: {
+                                                    tool: event.toolCall.tool,
+                                                    toolCallId: event.toolCallId,
+                                                    output: result.output,
+                                                    summary: result.summary,
+                                                },
+                                            });
+                                        },
+                                    }),
+                                }));
+                                break;
+                            }
+
+                            const confirmation = 'confirmation' in toolDef && toolDef.confirmation;
                             if (confirmation) {
                                 globalState.setState((state) => ({
                                     ...state,
-                                    pendingTools: [
-                                        ...state.pendingTools,
-                                        {
-                                            icon: confirmation.icon,
-                                            label: confirmation.label,
-                                            cancelToolCall: {
-                                                tool: event.toolCall.tool,
-                                                toolCallId: event.toolCallId,
-                                                output: {
-                                                    cancelled: 'User did not confirm the tool call',
-                                                },
-                                                summary: {
-                                                    icon: 'forward',
-                                                    text: tString(
-                                                        language,
-                                                        'tool_call_skipped',
-                                                        confirmation.label
-                                                    ),
-                                                },
-                                            },
-                                            confirm: async () => {
-                                                await executeToolCall(event);
-                                            },
+                                    control: ConfirmControlDef.createControl({
+                                        context: {
+                                            toolCall: event.toolCall,
+                                            toolCallId: event.toolCallId,
                                         },
-                                    ],
+                                        input: {
+                                            label: confirmation.label,
+                                            icon: confirmation.icon,
+                                        },
+                                        language,
+                                        send: async (result) => {
+                                            const output = ConfirmControlOutputSchema.parse(
+                                                result.output
+                                            );
+                                            switch (output.result) {
+                                                case 'cancelled': {
+                                                    await streamResponse({
+                                                        toolCall: {
+                                                            tool: event.toolCall.tool,
+                                                            toolCallId: event.toolCallId,
+                                                            output: { cancelled: true },
+                                                            summary: {
+                                                                icon: 'forward',
+                                                                text: tString(
+                                                                    language,
+                                                                    'tool_call_skipped',
+                                                                    confirmation.label
+                                                                ),
+                                                            },
+                                                        },
+                                                    });
+                                                    break;
+                                                }
+                                                case 'confirmed':
+                                                    await executeToolCall(event);
+                                                    break;
+                                                default:
+                                                    assertNever(output.result);
+                                            }
+                                        },
+                                    }),
                                 }));
-                            } else {
-                                toolToExecute = event;
+                                break;
                             }
+
+                            toolToExecute = event;
                             break;
                         }
                     }
@@ -372,6 +435,11 @@ export function AIChatProvider(props: {
                             {
                                 role: AIMessageRole.Assistant,
                                 content: data.content,
+                                activity: updateAIChatMessageActivity(
+                                    state.messages[state.messages.length - 1]?.activity ??
+                                        getDefaultAIChatMessageActivity(),
+                                    event
+                                ),
                             },
                         ],
                     }));
@@ -380,13 +448,13 @@ export function AIChatProvider(props: {
                 // Execute the tool call if it doesn't require confirmation
                 if (toolToExecute) {
                     await executeToolCall(toolToExecute);
+                } else {
+                    globalState.setState((state) => ({
+                        ...state,
+                        loading: false,
+                        error: false,
+                    }));
                 }
-
-                globalState.setState((state) => ({
-                    ...state,
-                    loading: false,
-                    error: false,
-                }));
             } catch (error) {
                 console.error('Error streaming AI response', error);
                 globalState.setState((state) => ({
@@ -408,7 +476,18 @@ export function AIChatProvider(props: {
     // Post a message to the AI chat
     const onPostMessage = React.useCallback(
         async (input: { message: string }) => {
-            const { query, messages, pendingTools } = globalState.getState();
+            const { query, messages, control, references, loading } = globalState.getState();
+
+            if (control) {
+                throw new Error("We can't post a message when a control is active");
+            }
+
+            // Ignore duplicates while a previous turn is still streaming
+            if (loading) {
+                return;
+            }
+
+            const wireMessage = `${serializeReferences(references)}${input.message}`;
 
             // For first message, update the ask parameter in URL
             if (messages.length === 0) {
@@ -422,8 +501,9 @@ export function AIChatProvider(props: {
 
             notify(eventsRef.current.get('postMessage'), { message: input.message });
 
-            if (query === input.message) {
+            if (query === input.message && references.length === 0) {
                 // Return early if the message is the same as the previous message
+                // (unless new references are staged, which change the payload)
                 globalState.setState((state) => ({
                     ...state,
                     opened: true,
@@ -443,6 +523,7 @@ export function AIChatProvider(props: {
                             role: AIMessageRole.User,
                             content: input.message,
                             query: input.message,
+                            references,
                         },
                     ],
                     query: input.message,
@@ -450,16 +531,11 @@ export function AIChatProvider(props: {
                     loading: true,
                     error: false,
                     initialQuery: state.initialQuery ?? input.message,
+                    references: [],
                 };
             });
 
-            const pendingTool = pendingTools[0];
-            streamResponse({
-                message: input.message,
-                // If we had a pending tool call, we need to send it as being cancelled
-                // otherwise the AI will fail to process the message
-                ...(pendingTool ? { toolCall: pendingTool.cancelToolCall } : {}),
-            });
+            streamResponse({ message: wireMessage, userQuery: input.message });
         },
         [setSearchState, trackEvent, streamResponse]
     );
@@ -472,10 +548,11 @@ export function AIChatProvider(props: {
             messages: [],
             query: null,
             followUpSuggestions: [],
-            pendingTools: [],
+            control: null,
             responseId: null,
             error: false,
             initialQuery: null,
+            references: [],
         }));
 
         // Reset ask parameter to empty string (keeps chat open but clears content)
@@ -486,6 +563,44 @@ export function AIChatProvider(props: {
             open: false,
         }));
     }, [setSearchState]);
+
+    const onAddReference = React.useCallback((ref: AIChatReference) => {
+        globalState.setState((state) => {
+            if (state.references.some((existingRef) => existingRef.id === ref.id)) {
+                return state;
+            }
+            return {
+                ...state,
+                references: [...state.references, ref],
+            };
+        });
+        return ref.id;
+    }, []);
+
+    const onRemoveReference = React.useCallback((id: string) => {
+        globalState.setState((state) => {
+            if (!state.references.some((ref) => ref.id === id)) {
+                return state;
+            }
+            return {
+                ...state,
+                references: state.references.filter((ref) => ref.id !== id),
+            };
+        });
+    }, []);
+
+    const onClearReferences = React.useCallback(() => {
+        globalState.setState((state) => {
+            if (state.references.length === 0) {
+                return state;
+            }
+            return { ...state, references: [] };
+        });
+    }, []);
+
+    const onFocus = React.useCallback(() => {
+        notify(eventsRef.current.get('focus'), {});
+    }, []);
 
     const onEvent = React.useCallback(
         <T extends AIChatEvent['type']>(
@@ -512,9 +627,23 @@ export function AIChatProvider(props: {
             close: onClose,
             clear: onClear,
             postMessage: onPostMessage,
+            addReference: onAddReference,
+            removeReference: onRemoveReference,
+            clearReferences: onClearReferences,
+            focus: onFocus,
             on: onEvent,
         };
-    }, [onOpen, onClose, onClear, onPostMessage, onEvent]);
+    }, [
+        onOpen,
+        onClose,
+        onClear,
+        onPostMessage,
+        onAddReference,
+        onRemoveReference,
+        onClearReferences,
+        onFocus,
+        onEvent,
+    ]);
 
     return (
         <AIChatControllerContext.Provider value={controller}>
@@ -533,4 +662,79 @@ export function useAIChatController(): AIChatController {
         throw new Error('useAIChatController must be used within an AIChatProvider');
     }
     return controller;
+}
+
+export function getAIChatStatus(chat: AIChatState): AIChatStatus {
+    if (chat.error) {
+        return 'error';
+    }
+
+    if (chat.control) {
+        return 'confirm';
+    }
+
+    if (chat.loading) {
+        const latestMessage = getLatestAssistantMessage(chat.messages);
+        const phase = latestMessage?.activity?.currentPhase;
+        switch (phase) {
+            case AIMessageStepPhase.Commentary:
+                return 'exploring';
+            case AIMessageStepPhase.FinalAnswer:
+                return 'working';
+            default:
+                return 'thinking';
+        }
+    }
+
+    if (chat.messages.length > 0) {
+        return 'done';
+    }
+
+    return 'default';
+}
+
+function getLatestAssistantMessage(messages: AIChatMessage[]) {
+    for (let index = messages.length - 1; index >= 0; index--) {
+        const message = messages[index];
+        if (message?.role === AIMessageRole.Assistant) {
+            return message;
+        }
+    }
+
+    return null;
+}
+
+function updateAIChatMessageActivity(
+    activity: AIChatMessageActivity,
+    event: AIStreamResponse
+): AIChatMessageActivity {
+    switch (event.type) {
+        case 'response_step_start': {
+            return {
+                ...activity,
+                currentPhase: event.phase,
+                hasCommentary:
+                    activity.hasCommentary || event.phase === AIMessageStepPhase.Commentary,
+                hasFinalAnswer:
+                    activity.hasFinalAnswer || event.phase === AIMessageStepPhase.FinalAnswer,
+            };
+        }
+        case 'response_tool_call': {
+            return {
+                ...activity,
+                toolCount: activity.toolCount + 1,
+            };
+        }
+        default:
+            return activity;
+    }
+}
+
+function getDefaultAIChatMessageActivity(): AIChatMessageActivity {
+    return {
+        currentPhase: undefined,
+        toolCount: 0,
+        hasCommentary: false,
+        hasFinalAnswer: false,
+    };
 }

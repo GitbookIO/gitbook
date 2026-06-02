@@ -19,10 +19,16 @@ export interface OpenAPIClientContext {
     };
 
     /**
-     * Force all sections to be opened by default.
+     * If `true`, all response sections will be expanded by default.
      * @default false
      */
-    defaultInteractiveOpened?: boolean;
+    expandAllResponses?: boolean;
+
+    /**
+     * If `true`, all model/schema sections will be expanded by default.
+     * @default false
+     */
+    expandAllModelSections?: boolean;
 
     /**
      * The key of the block
@@ -35,12 +41,18 @@ export interface OpenAPIClientContext {
     id?: string;
 
     /**
+     * The URL for the Scalar proxy endpoint.
+     */
+    proxyUrl?: string;
+
+    /**
      * Mark the context as a client context.
      */
     $$isClientContext$$: true;
 }
 
-export interface OpenAPIContext extends Omit<OpenAPIClientContext, '$$isClientContext$$'> {
+export interface OpenAPIContext
+    extends Omit<OpenAPIClientContext, '$$isClientContext$$' | 'proxyUrl'> {
     /**
      * Render a code block.
      */
@@ -61,9 +73,16 @@ export interface OpenAPIContext extends Omit<OpenAPIClientContext, '$$isClientCo
     renderDocument: (props: { document: object }) => React.ReactNode;
 
     /**
-     * Specification URL.
+     * Public specification URL, used by Scalar's "Test it" modal.
+     * When null, the "Test it" button is hidden.
      */
-    specUrl: string;
+    specUrl: string | null;
+
+    /**
+     * Build a signed proxy URL that restricts the proxy to specific origins.
+     * Called at render time (server-side) with the server origins for an operation.
+     */
+    resolveProxyUrl?: (allowedOrigins: string[]) => string | null;
 }
 
 export type OpenAPIUniversalContext = OpenAPIClientContext | OpenAPIContext;
@@ -94,9 +113,11 @@ export function getOpenAPIClientContext(context: OpenAPIUniversalContext): OpenA
     return {
         translation: context.translation,
         icons: context.icons,
-        defaultInteractiveOpened: context.defaultInteractiveOpened,
+        expandAllResponses: context.expandAllResponses,
+        expandAllModelSections: context.expandAllModelSections,
         blockKey: context.blockKey,
         id: context.id,
+        proxyUrl: '$$isClientContext$$' in context ? context.proxyUrl : undefined,
         $$isClientContext$$: true,
     };
 }

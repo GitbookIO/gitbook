@@ -6,7 +6,9 @@ import { getDataOrNull } from './data';
 import { getNodeReactText } from './document';
 import { resolveOpenAPIOperationBlock } from './openapi/resolveOpenAPIOperationBlock';
 import { resolveOpenAPISchemasBlock } from './openapi/resolveOpenAPISchemasBlock';
+import { resolveOpenAPIWebhookBlock } from './openapi/resolveOpenAPIWebhookBlock';
 import { resolveContentRef } from './references';
+import { getRevisionTags, resolveBlockTags } from './tags';
 
 export interface DocumentSection {
     id: string;
@@ -14,6 +16,7 @@ export interface DocumentSection {
     title: ReactNode;
     depth: number;
     deprecated?: boolean;
+    tags?: string[];
 }
 
 /**
@@ -32,7 +35,8 @@ export async function getDocumentSections(
 async function getSectionsFromNodes(
     nodes: DocumentBlock[],
     context: GitBookAnyContext,
-    initialDepth = 0
+    initialDepth = 0,
+    tags?: string[]
 ): Promise<DocumentSection[]> {
     const sections: DocumentSection[] = [];
     let depth = initialDepth;
@@ -46,11 +50,7 @@ async function getSectionsFromNodes(
                 }
                 depth = 1;
                 const title = getNodeReactText(block);
-                sections.push({
-                    id,
-                    title,
-                    depth: 1,
-                });
+                sections.push(withTags({ id, title, depth: 1 }, tags));
                 continue;
             }
             case 'heading-2': {
@@ -59,21 +59,35 @@ async function getSectionsFromNodes(
                     continue;
                 }
                 const title = getNodeReactText(block);
-                sections.push({
-                    id,
-                    title,
-                    depth: depth > 0 ? 2 : 1,
-                });
+                sections.push(withTags({ id, title, depth: depth > 0 ? 2 : 1 }, tags));
                 continue;
             }
+            case 'columns':
             case 'stepper': {
                 const stepNodes = await Promise.all(
                     block.nodes.map(async (step) =>
-                        getSectionsFromNodes(step.nodes, context, depth)
+                        getSectionsFromNodes(step.nodes, context, depth, tags)
                     )
                 );
                 for (const stepSections of stepNodes) {
                     sections.push(...stepSections);
+                }
+                continue;
+            }
+            case 'updates': {
+                const revisionTags = getRevisionTags(context.revision);
+                const updateNodes = await Promise.all(
+                    block.nodes.map(async (update) =>
+                        getSectionsFromNodes(
+                            update.nodes as DocumentBlock[],
+                            context,
+                            depth,
+                            resolveBlockTags(update.data.tags, revisionTags).map((tag) => tag.slug)
+                        )
+                    )
+                );
+                for (const updateSections of updateNodes) {
+                    sections.push(...updateSections);
                 }
                 continue;
             }
@@ -88,13 +102,42 @@ async function getSectionsFromNodes(
                     context,
                 });
                 if (operation) {
-                    sections.push({
-                        id,
-                        tag: operation.method.toUpperCase(),
-                        title: operation.operation.summary || operation.path,
-                        depth: 1,
-                        deprecated: operation.operation.deprecated,
-                    });
+                    sections.push(
+                        withTags(
+                            {
+                                id,
+                                tag: operation.method.toUpperCase(),
+                                title: operation.operation.summary || operation.path,
+                                depth: 1,
+                                deprecated: operation.operation.deprecated,
+                            },
+                            tags
+                        )
+                    );
+                }
+                continue;
+            }
+            case 'openapi-webhook': {
+                const id = block.meta?.id;
+                if (!id) {
+                    continue;
+                }
+                const { data: webhook } = await resolveOpenAPIWebhookBlock({
+                    block,
+                    context,
+                });
+                if (webhook) {
+                    sections.push(
+                        withTags(
+                            {
+                                id,
+                                title: webhook.operation.summary || webhook.name,
+                                depth: 1,
+                                deprecated: webhook.operation.deprecated,
+                            },
+                            tags
+                        )
+                    );
                 }
                 continue;
             }
@@ -114,11 +157,16 @@ async function getSectionsFromNodes(
                 });
                 const schema = data?.schemas[0];
                 if (schema) {
-                    sections.push({
-                        id,
-                        title: `The ${schema.name} object`,
-                        depth: 1,
-                    });
+                    sections.push(
+                        withTags(
+                            {
+                                id,
+                                title: `The ${schema.name} object`,
+                                depth: 1,
+                            },
+                            tags
+                        )
+                    );
                 }
                 continue;
             }
@@ -151,7 +199,8 @@ async function getSectionsFromNodes(
                 const reusableContentSections = await getSectionsFromNodes(
                     document.nodes,
                     reusableContent.context,
-                    depth
+                    depth,
+                    tags
                 );
                 sections.push(...reusableContentSections);
             }
@@ -159,4 +208,11 @@ async function getSectionsFromNodes(
     }
 
     return sections;
+}
+
+function withTags(
+    section: Omit<DocumentSection, 'tags'>,
+    tags: string[] | undefined
+): DocumentSection {
+    return tags === undefined ? section : { ...section, tags };
 }

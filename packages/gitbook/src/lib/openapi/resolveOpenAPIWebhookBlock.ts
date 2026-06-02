@@ -35,14 +35,14 @@ async function baseResolveOpenAPIWebhookBlock(
 ): Promise<ResolveOpenAPIWebhookBlockResult> {
     const { context, block } = args;
     if (!block.data.name || !block.data.method) {
-        return { data: null, specUrl: null };
+        return { data: null, specUrl: null, publicURL: null };
     }
 
     try {
-        const { filesystem, specUrl } = await fetchOpenAPIFilesystem({ block, context });
+        const { filesystem, specUrl, publicURL } = await fetchOpenAPIFilesystem({ block, context });
 
         if (!filesystem) {
-            return { data: null, specUrl: null };
+            return { data: null, specUrl: null, publicURL: null };
         }
 
         const data = await resolveOpenAPIWebhook(filesystem, {
@@ -50,7 +50,7 @@ async function baseResolveOpenAPIWebhookBlock(
             method: block.data.method,
         });
 
-        return { data, specUrl };
+        return { data, specUrl, publicURL };
     } catch (error) {
         if (error instanceof OpenAPIParseError) {
             return { error };

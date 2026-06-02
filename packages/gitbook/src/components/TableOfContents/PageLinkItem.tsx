@@ -18,7 +18,7 @@ export function PageLinkItem(props: { page: ClientTOCPageLink }) {
         <li className="page-link-item flex flex-col [.page-group-item+&]:mt-4">
             <Link
                 href={page.href ?? '#'}
-                classNames={['ToggleableLinkItemStyles']}
+                classNames={['ToCLinkItemStyles']}
                 insights={{
                     type: 'link_click',
                     link: {

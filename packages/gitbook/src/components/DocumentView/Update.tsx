@@ -1,11 +1,17 @@
-import { formatDateFull, formatDateShort, formatNumericDate } from '@/components/utils/dates';
+import {
+    getFullDateFormatter,
+    getNumericDateFormatter,
+    getShortDateFormatter,
+} from '@/components/utils/dates';
 import { getRevisionTags, resolveBlockTags } from '@/lib/tags';
 import { tcls } from '@/lib/tailwind';
-import type { DocumentBlockUpdate, DocumentBlockUpdates } from '@gitbook/api';
+import type { DocumentBlockUpdate, DocumentBlockUpdates, TranslationLanguage } from '@gitbook/api';
+import { assertNever } from 'assert-never';
 import { assert } from 'ts-essentials';
 import { Tag } from '../Tag';
 import type { BlockProps } from './Block';
 import { Blocks } from './Blocks';
+import { FilteredUpdate } from './UpdatesFilter';
 
 export function Update(props: BlockProps<DocumentBlockUpdate>) {
     const { block, style, ancestorBlocks, ...contextProps } = props;
@@ -31,18 +37,17 @@ export function Update(props: BlockProps<DocumentBlockUpdate>) {
 
     // Then get the format from the parent Updates block and use that format
     const dateFormat = parentUpdates.data?.format ?? 'full';
-    const displayDate = {
-        numeric: formatNumericDate(parsedDate),
-        full: formatDateFull(parsedDate),
-        short: formatDateShort(parsedDate),
-    }[dateFormat];
+    const dateFormatter = getDateFormatter(dateFormat, contextProps.context.contentContext?.locale);
 
     // Resolve tags from the block data using revision-level tag definitions
     const revisionTags = getRevisionTags(contextProps.context.contentContext?.revision);
     const resolvedTags = resolveBlockTags(block.data.tags, revisionTags);
 
     return (
-        <div className={tcls('relative flex flex-col gap-2 md:flex-row md:gap-4 lg:gap-8', style)}>
+        <FilteredUpdate
+            tagSlugs={resolvedTags.map((tag) => tag.slug)}
+            className={tcls('relative flex flex-col gap-2 md:flex-row md:gap-4 lg:gap-8', style)}
+        >
             <div
                 className={tcls(
                     // Date is only sticky on larger screens when we use flex-row layout, with 0px fallback to prevent flicker and flaky tests before JS sets the variable
@@ -54,7 +59,7 @@ export function Update(props: BlockProps<DocumentBlockUpdate>) {
                     dateTime={date}
                     className="inline-flex items-center font-medium text-neutral-10 text-sm tracking-wide"
                 >
-                    {displayDate}
+                    {dateFormatter.format(parsedDate)}
                 </time>
                 {resolvedTags.length > 0 ? (
                     <div className="mt-2 flex flex-wrap gap-1.5">
@@ -70,8 +75,24 @@ export function Update(props: BlockProps<DocumentBlockUpdate>) {
                 ancestorBlocks={[...ancestorBlocks, block]}
                 style="[&>*:first-child]:!pt-0 flex flex-1 flex-col [&>*+*]:mt-5"
             />
-        </div>
+        </FilteredUpdate>
     );
+}
+
+function getDateFormatter(
+    format: 'numeric' | 'full' | 'short',
+    locale: TranslationLanguage | undefined
+) {
+    switch (format) {
+        case 'short':
+            return getShortDateFormatter(locale);
+        case 'numeric':
+            return getNumericDateFormatter(locale);
+        case 'full':
+            return getFullDateFormatter(locale);
+        default:
+            assertNever(format);
+    }
 }
 
 /**

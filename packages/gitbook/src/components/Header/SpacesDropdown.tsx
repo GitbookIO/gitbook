@@ -1,12 +1,11 @@
 import type { SiteSpace } from '@gitbook/api';
-import { useMemo } from 'react';
+import type { IconName } from '@gitbook/icons';
 
 import type { GitBookSiteContext } from '@/lib/context';
-import { getSiteSpaceURL } from '@/lib/sites';
+import { getLocalizedTitle, getSiteSpaceURL } from '@/lib/sites';
 import { tcls } from '@/lib/tailwind';
-import { Button, type ButtonProps, ToggleChevron } from '../primitives';
-import { DropdownMenu } from '../primitives/DropdownMenu';
-import { SpacesDropdownMenuItems } from './SpacesDropdownMenuItem';
+import type { ButtonProps } from '../primitives';
+import { SpacesDropdownClient } from './SpacesDropdownClient';
 
 // Memoized regex for checking if a string starts with an emoji
 const EMOJI_REGEX = /^\p{Emoji}/u;
@@ -21,40 +20,34 @@ export function SpacesDropdown(props: {
     siteSpaces: SiteSpace[];
     className?: string;
     variant?: ButtonProps['variant'];
-    icon?: ButtonProps['icon'];
+    icon?: IconName;
 }) {
     const { context, siteSpace, siteSpaces, className, variant = 'secondary', icon } = props;
+    const currentLanguage = context.locale;
+
+    const dropdownClassName = tcls(
+        'group-hover/dropdown:invisible', // Prevent hover from opening the dropdown, as it's annoying in this context
+        'group-focus-within/dropdown:group-hover/dropdown:visible' // When the dropdown is already open, it should remain visible when hovered
+    );
+
+    const slimSpaces = siteSpaces.map((siteSp) => ({
+        id: siteSp.id,
+        title: getLocalizedTitle(siteSp, currentLanguage),
+        url: getSiteSpaceURL(context, siteSp),
+        isActive: siteSp.id === siteSpace.id,
+        spaceId: siteSp.space.id,
+    }));
 
     return (
-        <DropdownMenu
-            className={tcls(
-                'group-hover/dropdown:invisible', // Prevent hover from opening the dropdown, as it's annoying in this context
-                'group-focus-within/dropdown:group-hover/dropdown:visible' // When the dropdown is already open, it should remain visible when hovered
-            )}
-            button={
-                <Button
-                    icon={icon}
-                    data-testid="space-dropdown-button"
-                    size="small"
-                    variant={variant}
-                    trailing={<ToggleChevron />}
-                    className={tcls('bg-tint-base', className)}
-                >
-                    <span className="button-content">{siteSpace.title}</span>
-                </Button>
-            }
-        >
-            <SpacesDropdownMenuItems
-                slimSpaces={siteSpaces.map((siteSp) => ({
-                    id: siteSp.id,
-                    title: siteSp.title,
-                    url: getSiteSpaceURL(context, siteSp),
-                    isActive: siteSp.id === siteSpace.id,
-                    spaceId: siteSp.space.id,
-                }))}
-                curPath={siteSpace.path}
-            />
-        </DropdownMenu>
+        <SpacesDropdownClient
+            title={getLocalizedTitle(siteSpace, currentLanguage)}
+            icon={icon}
+            variant={variant}
+            className={className}
+            dropdownClassName={dropdownClassName}
+            slimSpaces={slimSpaces}
+            curPath={siteSpace.path}
+        />
     );
 }
 
@@ -66,8 +59,8 @@ export function TranslationsDropdown(props: {
 }) {
     const { context, siteSpace, siteSpaces, className } = props;
 
-    // Memoize the emoji check to avoid repeated regex execution
-    const hasEmojiPrefix = useMemo(() => startsWithEmoji(siteSpace.title), [siteSpace.title]);
+    const title = getLocalizedTitle(siteSpace, context.locale);
+    const hasEmojiPrefix = startsWithEmoji(title);
 
     return (
         <SpacesDropdown

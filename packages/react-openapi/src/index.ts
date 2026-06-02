@@ -8,3 +8,4 @@ export * from './resolveOpenAPIWebhook';
 export type { OpenAPIOperationData, OpenAPIWebhookData } from './types';
 export type { OpenAPIContextInput } from './context';
 export { checkIsValidLocale } from './translations';
+export { extractOrigin } from './util/server';

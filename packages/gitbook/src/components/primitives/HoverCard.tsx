@@ -12,10 +12,12 @@ export function HoverCardRoot(props: RadixHoverCard.HoverCardProps) {
     );
 }
 
+// We wrap the Trigger child in a span to avoid react slot seeing a lazy chunk
 export function HoverCardTrigger(props: RadixHoverCard.HoverCardTriggerProps) {
+    const { children, ...rest } = props;
     return (
-        <RadixHoverCard.Trigger asChild {...props}>
-            {props.children}
+        <RadixHoverCard.Trigger asChild {...rest}>
+            <span>{children}</span>
         </RadixHoverCard.Trigger>
     );
 }

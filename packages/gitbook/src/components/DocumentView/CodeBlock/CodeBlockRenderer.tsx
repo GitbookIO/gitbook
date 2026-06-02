@@ -6,6 +6,7 @@ import { tcls } from '@/lib/tailwind';
 
 import { AnnotationPopover } from '../Annotation/AnnotationPopover';
 import type { BlockProps } from '../Block';
+import { AskAICodeButton } from './AskAICodeButton';
 import { CopyCodeButton } from './CopyCodeButton';
 import type { HighlightLine, HighlightTheme, HighlightToken } from './highlight';
 
@@ -13,6 +14,11 @@ type CodeBlockRendererProps = Pick<BlockProps<DocumentBlockCode>, 'block' | 'sty
     theme: HighlightTheme;
     'aria-busy'?: boolean;
     id?: string;
+    /**
+     * Whether the block is rendered for print/PDF.
+     * When true, the "Ask AI" button is not rendered.
+     */
+    isPrint?: boolean;
 };
 
 /**
@@ -22,7 +28,7 @@ export const CodeBlockRenderer = forwardRef(function CodeBlockRenderer(
     props: CodeBlockRendererProps,
     ref: React.ForwardedRef<HTMLDivElement>
 ) {
-    const { block, style, theme, 'aria-busy': ariaBusy } = props;
+    const { block, style, theme, 'aria-busy': ariaBusy, isPrint } = props;
 
     const withLineNumbers = Boolean(block.data.lineNumbers) && block.nodes.length > 1;
     const withWrap = block.data.overflow === 'wrap';
@@ -39,16 +45,25 @@ export const CodeBlockRenderer = forwardRef(function CodeBlockRenderer(
     return (
         <div
             ref={ref}
+            id={codeId}
             aria-busy={ariaBusy}
             className={tcls(
-                'group/codeblock shiki grid shrink grid-flow-col overflow-hidden',
+                'group/codeblock shiki relative flex shrink flex-col overflow-hidden print:overflow-visible',
+                'circular-corners:rounded-2xl rounded-corners:rounded-xl straight-corners:rounded-xs',
+                '[&:has([data-codeblock-focus]:focus)]:ring-2 [&:has([data-codeblock-focus]:focus)]:ring-primary-hover',
                 style
             )}
             /* Sets the code theme's mode (light or dark) for the site's theme mode (light or dark).
              * Used to style UI elements (scrollbars, form controls) correctly and apply the right default to "plain" code blocks. */
             data-color-scheme={`${theme.themes.light.type} ${theme.themes.dark.type}`}
         >
-            <div className="flex items-center justify-start gap-2 text-sm [grid-area:1/1]">
+            <span
+                data-codeblock-focus
+                tabIndex={-1}
+                aria-hidden
+                className="pointer-events-none absolute size-0 outline-none"
+            />
+            <div className="flex items-center justify-start gap-2 text-sm">
                 {title ? (
                     <div
                         className="relative top-px z-20 inline-flex items-center justify-center circular-corners:rounded-t-xl rounded-corners:rounded-t-lg straight-corners:rounded-t-xs border border-tint-subtle border-b-0 bg-tint-subtle theme-bold-tint:bg-tint-base theme-muted:bg-tint-base px-3 py-2 text-tint text-xs leading-none tracking-wide contrast-more:border-tint contrast-more:bg-tint-base [html.theme-bold.sidebar-filled_&]:bg-tint-base"
@@ -63,43 +78,51 @@ export const CodeBlockRenderer = forwardRef(function CodeBlockRenderer(
                     </div>
                 ) : null}
             </div>
-            <CopyCodeButton
-                codeId={codeId}
-                style="z-2 mt-2 mr-2 self-start justify-self-end leading-none opacity-0 backdrop-blur-md [grid-area:2/1] group-hover/codeblock:opacity-11"
-            />
-            <pre
-                className={tcls(
-                    'relative overflow-auto border border-tint-subtle bg-tint-subtle theme-bold-tint:bg-tint-base theme-muted:bg-tint-base p-2 text-tint-strong [grid-area:2/1] contrast-more:border-tint contrast-more:bg-tint-base',
-                    'circular-corners:rounded-2xl rounded-corners:rounded-xl straight-corners:rounded-xs depth-subtle:shadow-xs',
-                    title && 'rounded-ss-none!'
-                )}
-                style={{
-                    backgroundColor: bg?.color,
-                    ...bg?.vars,
-                    color: fg?.color,
-                    ...fg?.vars,
-                }}
-            >
-                <code
-                    id={codeId}
-                    className={tcls(
-                        'inline-grid max-h-full min-w-full grid-cols-[auto_1fr] [count-reset:line] print:whitespace-pre-wrap',
-                        withWrap && 'whitespace-pre-wrap',
-                        '[[aria-expanded=false]_&]:mask-b-from-50%'
-                    )}
-                >
-                    {theme.lines.map((line, index) => (
-                        <CodeHighlightLine
-                            bg={bg}
-                            fg={fg}
-                            key={index}
-                            line={line}
-                            isLast={index === theme.lines.length - 1}
-                            withLineNumbers={withLineNumbers}
+            <div className="relative flex min-h-0 flex-col">
+                <div className="absolute top-2 right-2 z-2 flex items-start gap-1.5 font-sans leading-none opacity-0 group-hover/codeblock:opacity-11 has-[button:focus-visible]:opacity-11">
+                    {!isPrint ? (
+                        <AskAICodeButton
+                            codeId={codeId}
+                            title={title}
+                            syntax={block.data.syntax}
+                            style="backdrop-blur-md"
                         />
-                    ))}
-                </code>
-            </pre>
+                    ) : null}
+                    <CopyCodeButton codeId={codeId} style="backdrop-blur-md" />
+                </div>
+                <pre
+                    className={tcls(
+                        'relative overflow-auto border border-tint-subtle bg-tint-subtle theme-bold-tint:bg-tint-base theme-muted:bg-tint-base py-2 text-tint-strong contrast-more:border-tint contrast-more:bg-tint-base print:overflow-visible',
+                        'circular-corners:rounded-2xl rounded-corners:rounded-xl straight-corners:rounded-xs depth-subtle:shadow-xs',
+                        title && 'rounded-ss-none!'
+                    )}
+                    style={{
+                        backgroundColor: bg?.color,
+                        ...bg?.vars,
+                        color: fg?.color,
+                        ...fg?.vars,
+                    }}
+                >
+                    <code
+                        className={tcls(
+                            'table max-h-full w-fit min-w-full [counter-reset:line] print:max-h-none print:whitespace-pre-wrap',
+                            withWrap && 'whitespace-pre-wrap',
+                            '[[aria-expanded=false]_&]:mask-b-from-50%'
+                        )}
+                    >
+                        {theme.lines.map((line, index) => (
+                            <CodeHighlightLine
+                                bg={bg}
+                                fg={fg}
+                                key={index}
+                                line={line}
+                                isLast={index === theme.lines.length - 1}
+                                withLineNumbers={withLineNumbers}
+                            />
+                        ))}
+                    </code>
+                </pre>
+            </div>
         </div>
     );
 });
@@ -112,27 +135,30 @@ function CodeHighlightLine(props: {
     withLineNumbers: boolean;
 }) {
     const { line, isLast, withLineNumbers, bg, fg } = props;
+    const lineStyle = {
+        color: fg?.color,
+        ...fg?.vars,
+        backgroundColor: bg?.color,
+        ...bg?.vars,
+    };
     return (
         <span
-            className={tcls('highlight-line', line.highlighted && 'highlighted')}
-            style={{
-                color: fg?.color,
-                ...fg?.vars,
-                backgroundColor: bg?.color,
-                ...bg?.vars,
-            }}
-        >
-            {withLineNumbers && (
-                <span
-                    className="highlight-line-number"
-                    style={{
-                        color: fg?.color,
-                        ...fg?.vars,
-                        backgroundColor: bg?.color,
-                        ...bg?.vars,
-                    }}
-                />
+            className={tcls(
+                'highlight-line',
+                line.diff === 'added' && 'diff-added',
+                line.diff === 'deleted' && 'diff-deleted',
+                line.highlighted && 'highlighted'
             )}
+            aria-label={
+                line.diff === 'added'
+                    ? 'Added line'
+                    : line.diff === 'deleted'
+                      ? 'Removed line'
+                      : undefined
+            }
+            style={lineStyle}
+        >
+            {withLineNumbers && <span className="highlight-line-number" style={lineStyle} />}
             <span className="highlight-line-content">
                 <CodeHighlightTokens tokens={line.tokens} />
                 {!isLast && '\n'}

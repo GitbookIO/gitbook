@@ -1,22 +1,41 @@
-import { CustomizationThemeMode } from '@gitbook/api';
-import Negotiator from 'negotiator';
+import {
+    CustomizationThemeMode,
+    type PublishedSiteContent,
+    SiteInsightsDisplayContext,
+    type SiteInsightsEventLocation,
+    SiteInsightsLLMSVariant,
+} from '@gitbook/api';
+import { isAIAgent } from '@vercel/agent-readability';
+import { cookies } from 'next/headers';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import rison from 'rison';
 
+import type { SiteURLData } from '@/lib/context';
 import { getContentSecurityPolicy } from '@/lib/csp';
 import { validateSerializedCustomization } from '@/lib/customization';
 import {
     DataFetcherError,
     getVisitorAuthBasePath,
     lookupPublishedContentByUrl,
-    normalizeURL,
+    normalizeRequestURL,
     throwIfDataError,
 } from '@/lib/data';
 import { GITBOOK_OAUTH_SERVER_URL, isGitBookAssetsHostURL, isGitBookHostURL } from '@/lib/env';
 import { getImageResizingContextId } from '@/lib/images';
 import { MiddlewareHeaders } from '@/lib/middleware';
+import {
+    createOAuthProtectedResourceMetadataResponse,
+    handleUnauthedOAuthProtectedResourceRequest,
+    isOAuthProtectedResourceMetadataRequest,
+    isOAuthProtectedResourceRequest,
+} from '@/lib/oauth-protected';
 import { removeLeadingSlash, removeTrailingSlash } from '@/lib/paths';
+import {
+    getPreviewCookieResponse,
+    getPreviewRequestIdentifier,
+    isPreviewRequest,
+} from '@/lib/preview';
 import {
     type ResponseCookies,
     getPathScopedCookieName,
@@ -25,15 +44,15 @@ import {
     normalizeVisitorURL,
     serveVisitorClaimsDataRequest,
 } from '@/lib/visitors';
+import { waitUntil } from '@/lib/waitUntil';
 import { serveResizedImage } from '@/routes/image';
-import { cookies } from 'next/headers';
-import type { SiteURLData } from './lib/context';
+import Negotiator from 'negotiator';
+import { getDomain } from 'tldts';
 import {
-    handleUnauthedOAuthProtectedResourceRequest,
-    isOAuthProtectedResourceRequest,
-} from './lib/oauth-protected';
-import { getPreviewRequestIdentifier } from './lib/preview';
-import { serveProxyAnalyticsEvent } from './lib/tracking';
+    type ServerInsightsEventInput,
+    serveProxyAnalyticsEvent,
+    trackServerInsightsEvents,
+} from './lib/tracking';
 export const config = {
     matcher: [
         '/((?!_next/static|_next/image|~gitbook/static|~gitbook/revalidate|~gitbook/monitoring|~scalar/proxy).*)',
@@ -45,12 +64,6 @@ type URLWithMode = { url: URL; mode: 'url' | 'url-host' };
 export async function middleware(request: NextRequest) {
     try {
         const requestURL = new URL(request.url);
-
-        // Redirect to normalize the URL
-        const normalized = normalizeURL(requestURL);
-        if (normalized.toString() !== requestURL.toString()) {
-            return NextResponse.redirect(normalized.toString());
-        }
 
         // Reject malicious requests
         const rejectResponse = await validateServerActionRequest(request);
@@ -132,6 +145,13 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
     }
 
     const { url: siteRequestURL, mode } = match;
+
+    // Normalize URL after extracting the URL from the request to make sure the client is redirected to the proper one
+    const normalizationResponse = normalizeRequestURL(siteRequestURL);
+    if (normalizationResponse) {
+        return normalizationResponse;
+    }
+
     const imagesContextId = getImageResizingContextId(siteRequestURL);
     /**
      * Serve image resizing requests (all requests containing `/~gitbook/image`).
@@ -230,7 +250,6 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
              */
             if (
                 siteURLData.target === 'external' &&
-                !visitorToken &&
                 isOAuthProtectedResourceRequest(siteRequestURL)
             ) {
                 return handleUnauthedOAuthProtectedResourceRequest({
@@ -279,12 +298,27 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
             return createRedirectResponse(siteURLData.redirect);
         }
 
-        cookies.push(
-            ...getResponseCookiesForVisitorAuth(
-                getVisitorAuthBasePath(siteRequestURL, siteURLData),
-                visitorToken
-            )
+        // Handles OAuth protected resource metadata for non-VA adaptive content sites.
+        // If the requested URL resolved directly to a site, synthesize the metadata response immediately.
+        if (isOAuthProtectedResourceMetadataRequest(siteRequestURL)) {
+            return createOAuthProtectedResourceMetadataResponse({
+                siteRequestURL,
+                siteId: siteURLData.site,
+                urlMode: mode,
+            });
+        }
+
+        const normalizedSitePathname = removeLeadingSlash(
+            removeTrailingSlash(siteURLData.pathname)
         );
+        if (normalizedSitePathname !== '~gitbook/auth/logout') {
+            cookies.push(
+                ...getResponseCookiesForVisitorAuth(
+                    getVisitorAuthBasePath(siteRequestURL, siteURLData),
+                    visitorToken
+                )
+            );
+        }
 
         // We use the host/origin from the canonical URL to ensure the links are
         // correctly generated when the site is proxied. e.g. https://proxy.gitbook.com/site/siteId/...
@@ -333,10 +367,21 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
             changeRequest: siteURLData.changeRequest,
             revision: siteURLData.revision,
             shareKey: siteURLData.shareKey,
+            preview: siteURLData.preview,
             apiToken: siteURLData.apiToken,
             imagesContextId: imagesContextId,
             contextId: siteURLData.contextId,
             isFallback: requestURL.searchParams.get('fallback') === 'true' ? true : undefined,
+            noIndexSearch:
+                Boolean(process.env.GITBOOK_BLOCK_SEARCH_INDEXATION) &&
+                !requestURL.searchParams.has('x-gitbook-search-indexation')
+                    ? true
+                    : undefined,
+            isLoggedInVisitor: visitorToken ? true : undefined,
+            displayAgentInstructions:
+                requestURL.searchParams.get('displayAgentInstructions') === 'false'
+                    ? false
+                    : undefined,
         };
 
         const requestHeaders = new Headers(request.headers);
@@ -357,18 +402,17 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
             routeType = 'dynamic';
             // We need to encode the customization headers, otherwise it will fail for some customization values containing non ASCII chars on vercel.
             requestHeaders.set(MiddlewareHeaders.Customization, encodeURIComponent(customization));
-            cookies.push({
-                name: MiddlewareHeaders.Customization,
-                value: encodeURIComponent(customization),
-                options: {
-                    httpOnly: true,
-                    sameSite: 'lax',
-                    maxAge: 10 * 60, // 10 minutes
-                    // Only send the cookie to preview routes and scope it to the specific site
-                    // to avoid conflicts between different sites previews potentially opened at the same time.
-                    path: `/url/preview/${getPreviewRequestIdentifier(siteRequestURL)}`,
-                },
-            });
+            if (siteURLData.preview) {
+                cookies.push(
+                    getPreviewCookieResponse({
+                        name: MiddlewareHeaders.Customization,
+                        value: encodeURIComponent(customization),
+                        mode,
+                        siteRequestURL,
+                        siteURLData,
+                    })
+                );
+            }
         }
         const theme =
             siteRequestURL.searchParams.get('theme') ??
@@ -376,16 +420,17 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         if (theme === CustomizationThemeMode.Dark || theme === CustomizationThemeMode.Light) {
             routeType = 'dynamic';
             requestHeaders.set(MiddlewareHeaders.Theme, theme);
-            cookies.push({
-                name: MiddlewareHeaders.Theme,
-                value: theme,
-                options: {
-                    httpOnly: true,
-                    sameSite: 'lax',
-                    maxAge: 10 * 60, // 10 minutes
-                    path: '/url/preview', // Only send the cookie to preview routes
-                },
-            });
+            if (siteURLData.preview) {
+                cookies.push(
+                    getPreviewCookieResponse({
+                        name: MiddlewareHeaders.Theme,
+                        value: theme,
+                        mode,
+                        siteRequestURL,
+                        siteURLData,
+                    })
+                );
+            }
         }
 
         // We support forcing dynamic routes by setting a `gitbook-dynamic-route` cookie
@@ -399,11 +444,26 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         requestHeaders.set('origin', request.nextUrl.origin);
 
         const siteURLWithoutProtocol = `${siteCanonicalURL.host}${siteURLData.basePath}`;
-        const { pathname, routeType: routeTypeFromPathname } = encodePathInSiteContent(
-            siteURLData.pathname,
-            request
-        );
+        const {
+            pathname,
+            routeType: routeTypeFromPathname,
+            events,
+        } = encodePathInSiteContent(siteURLData, request);
         routeType = routeTypeFromPathname ?? routeType;
+
+        if (events && events.length > 0) {
+            waitUntil(
+                trackServerInsightsEvents({
+                    organizationId: siteURLData.organization,
+                    siteId: siteURLData.site,
+                    events,
+                    request: {
+                        url: siteRequestURL.toString(),
+                        headers: requestHeaders,
+                    },
+                })
+            );
+        }
 
         const route = [
             'sites',
@@ -429,6 +489,9 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         if (rewrittenURL.searchParams.has('fallback')) {
             rewrittenURL.searchParams.delete('fallback');
         }
+        if (rewrittenURL.searchParams.has('displayAgentInstructions')) {
+            rewrittenURL.searchParams.delete('displayAgentInstructions');
+        }
 
         const response = NextResponse.rewrite(rewrittenURL, {
             request: {
@@ -446,26 +509,42 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         response.headers.set('x-gitbook-route-type', routeType);
         response.headers.set('x-gitbook-route-site', siteURLWithoutProtocol);
 
+        // Allow cross-origin requests from the same parent domain as the site.
+        const allowedOrigin = getAllowedCORSOrigin(request, siteCanonicalURL);
+        if (allowedOrigin) {
+            response.headers.set('access-control-allow-origin', allowedOrigin);
+            response.headers.set('access-control-allow-credentials', 'true');
+        }
+
+        // AI related headers
+        // This one is technically useless, but is used by a bunch of scoring systems
+        response.headers.set(
+            'vary',
+            'rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, accept-encoding, accept'
+        );
+
         // When we use adaptive content, we want to ensure that the cache is not used at all on the client side.
         // Vercel already set this header, this is needed in OpenNext.
-        if (siteURLData.contextId) {
+        if (siteURLData.contextId && !siteRequestURL.pathname.endsWith('~gitbook/site-index')) {
             response.headers.set('cache-control', 'public, max-age=0, must-revalidate');
         }
 
         return writeResponseCookies(response, cookies);
     };
 
-    // For https://preview/<siteURL> requests,
-    if (siteRequestURL.hostname === 'preview') {
+    // For preview requests like:
+    // - https://<GITBOOK_PREVIEW_BASE_URL>/<siteID> requests (ex: https://sites.gitbook.com/preview/site_id/path)
+    if (isPreviewRequest(siteRequestURL)) {
         // Do not track page views for preview requests
         request.headers.set('x-gitbook-disable-tracking', 'true');
-
-        return serveWithQueryAPIToken(
+        return serveWithQueryAPIToken({
             // We scope the API token to the site ID.
-            `${siteRequestURL.hostname}/${requestURL.pathname.slice(1).split('/')[0]}`,
-            request,
-            withAPIToken
-        );
+            scopePath: ['preview', getPreviewRequestIdentifier(siteRequestURL)].join('/'),
+            // We keep the original request URL when using `url` mode
+            requestURL: mode === 'url' ? requestURL : siteRequestURL,
+            requestCookies: request.cookies,
+            serve: withAPIToken,
+        });
     }
 
     return withAPIToken(null);
@@ -480,18 +559,22 @@ async function serveSpacePDFRoutes(requestURL: URL, request: NextRequest) {
         return null;
     }
 
-    return serveWithQueryAPIToken(
-        pathnameParts.slice(0, 2).join('/'),
-        request,
-        async (apiToken) => {
+    return serveWithQueryAPIToken({
+        scopePath: pathnameParts.slice(0, 2).join('/'),
+        requestURL,
+        requestCookies: request.cookies,
+        serve: async (apiToken) => {
+            if (!apiToken) {
+                throw new DataFetcherError('Missing API token', 400);
+            }
             // Handle the rest with the router default logic
             return NextResponse.next({
                 headers: {
                     [MiddlewareHeaders.APIToken]: apiToken,
                 },
             });
-        }
-    );
+        },
+    });
 }
 
 /**
@@ -509,23 +592,25 @@ function serveErrorResponse(error: Error) {
 }
 
 /**
- * Server a response with an API token obtained from the query params.
+ * Serve a response with an API token obtained from the query params.
  */
-async function serveWithQueryAPIToken(
-    scopePath: string,
-    request: NextRequest,
-    serve: (apiToken: string) => Promise<NextResponse>
-) {
+async function serveWithQueryAPIToken(input: {
+    scopePath: string;
+    requestURL: URL;
+    requestCookies: NextRequest['cookies'];
+    serve: (apiToken: string | null) => Promise<NextResponse>;
+}) {
+    const { scopePath, requestURL, requestCookies, serve } = input;
     // We store the API token in a cookie that is scoped to the specific route
     // to avoid errors when multiple previews are opened in different tabs.
     const cookieName = getPathScopedCookieName('gitbook-api-token', scopePath);
 
     // Extract a potential GitBook API token passed in the request
     // If found, we redirect to the same URL but with the token in the cookie
-    const queryAPIToken = request.nextUrl.searchParams.get('token');
+    const queryAPIToken = requestURL.searchParams.get('token');
     if (queryAPIToken) {
-        request.nextUrl.searchParams.delete('token');
-        return writeResponseCookies(NextResponse.redirect(request.nextUrl.toString()), [
+        requestURL.searchParams.delete('token');
+        return writeResponseCookies(NextResponse.redirect(requestURL.toString()), [
             {
                 name: cookieName,
                 value: queryAPIToken,
@@ -539,12 +624,9 @@ async function serveWithQueryAPIToken(
         ]);
     }
 
-    const apiToken = request.cookies.get(cookieName)?.value;
-    if (!apiToken) {
-        throw new DataFetcherError('Missing API token', 400);
-    }
+    const apiToken = requestCookies.get(cookieName)?.value;
 
-    return serve(apiToken);
+    return serve(apiToken ?? null);
 }
 
 /**
@@ -605,19 +687,33 @@ const RSS_PATH_REGEX = /^((\S+)\/)?rss\.xml$/;
 const MARKDOWN_PATH_REGEX = /\.md$/;
 const LLMS_FULL_PATH_REGEX = /^llms-full\.txt\/\d+$/;
 const EMBED_PAGE_PATH_REGEX = /^~gitbook\/embed\/page(\/(\S*))?$/;
+const PATH_ALIASES: Record<string, string> = {
+    'sitemap.md': 'llms.txt',
+    '.well-known/sitemap.md': 'llms.txt',
+};
 
 /**
  * Encode path in a site content.
  * Special paths are not encoded and passed to be handled by the route handlers.
  */
 function encodePathInSiteContent(
-    rawPathname: string,
+    siteURLData: PublishedSiteContent,
     request: Request
 ): {
     pathname: string;
     routeType?: 'static' | 'dynamic';
+    events?: ServerInsightsEventInput[] | undefined;
 } {
-    const pathname = removeLeadingSlash(removeTrailingSlash(rawPathname));
+    let pathname = removeLeadingSlash(removeTrailingSlash(siteURLData.pathname));
+
+    const eventLocation: Partial<SiteInsightsEventLocation> = {
+        siteSection: siteURLData.siteSection,
+        siteSpace: siteURLData.siteSpace,
+        siteShareKey: siteURLData.shareKey,
+        space: siteURLData.space,
+        revision: siteURLData.revision,
+        displayContext: SiteInsightsDisplayContext.Server,
+    };
 
     if (pathname.match(/^~gitbook\/ogimage\/\S+$/)) {
         return { pathname };
@@ -629,12 +725,31 @@ function encodePathInSiteContent(
         return {
             pathname: `~gitbook/rss/${encodePagePath(rssMatch[2])}`,
             routeType: 'static',
+            events: [
+                {
+                    type: 'rss_request',
+                    location: eventLocation,
+                },
+            ],
         };
     }
 
     // We skip encoding for paginated llms-full.txt pages (i.e. llms-full.txt/100)
     if (pathname.match(LLMS_FULL_PATH_REGEX)) {
-        return { pathname, routeType: 'static' };
+        return {
+            pathname,
+            routeType: 'static',
+            events: [
+                {
+                    type: 'llms_request',
+                    llmsVariant: SiteInsightsLLMSVariant.Full,
+                    location: {
+                        siteSection: siteURLData.siteSection,
+                        displayContext: SiteInsightsDisplayContext.Server,
+                    },
+                },
+            ],
+        };
     }
 
     // If the pathname is an embedded page
@@ -645,34 +760,89 @@ function encodePathInSiteContent(
         };
     }
 
+    pathname = PATH_ALIASES[pathname] || pathname;
     switch (pathname) {
         case '~gitbook/embed':
         case '~gitbook/embed/assistant':
+        case '~gitbook/embed/search':
         case '~gitbook/icon':
             return { pathname };
-        case '~gitbook/mcp':
+        // LLMs.txt, sitemap, sitemap-pages and robots.txt are always static
+        // as they only depend on the site structure / pages.
         case 'llms.txt':
         case 'llms-full.txt':
+            return {
+                pathname,
+                routeType: 'static',
+                events: [
+                    {
+                        type: 'llms_request',
+                        llmsVariant:
+                            pathname === 'llms.txt'
+                                ? SiteInsightsLLMSVariant.Standard
+                                : SiteInsightsLLMSVariant.Full,
+                        location: {
+                            displayContext: SiteInsightsDisplayContext.Server,
+                        },
+                    },
+                ],
+            };
         case 'sitemap.xml':
         case 'sitemap-pages.xml':
         case 'robots.txt':
         case '~gitbook/embed/script.js':
         case '~gitbook/embed/demo':
+        case '~gitbook/site-index':
             // LLMs.txt, sitemap, sitemap-pages and robots.txt are always static
             // as they only depend on the site structure / pages.
             return { pathname, routeType: 'static' };
+        case '~gitbook/mcp':
+        case '~gitbook/mcp/auth':
         case '~gitbook/pdf':
-            // PDF routes are always dynamic as they depend on the search params.
+        case '~gitbook/search':
+        case '~gitbook/auth/login':
+        case '~gitbook/auth/logout':
+        case '~scalar/proxy':
+            // PDF, search and auth routes are always dynamic as they depend on the request.
             return { pathname, routeType: 'dynamic' };
         default: {
-            // If the pathname is a markdown file or the request is accepting markdown,
+            // If the pathname is a markdown file or the request is ing markdown,
             // we rewrite it to ~gitbook/markdown/:pathname
-            if (pathname.match(MARKDOWN_PATH_REGEX) || isMarkdownPreferred(request)) {
+            const aiAgentDetection = isAIAgent(request);
+            // Using heuristic detection incorrectly detects some legitimate bot requests as AI agents (e.g. Slackbot)
+            // We don't want to serve markdown for these requests as it can cause issues like breaking slack unfurling.
+            const shouldServeMarkdown =
+                (aiAgentDetection.detected && aiAgentDetection.method !== 'heuristic') ||
+                acceptsMarkdown(request);
+            if (pathname.match(MARKDOWN_PATH_REGEX) || shouldServeMarkdown) {
                 const pagePathWithoutMD = pathname.replace(MARKDOWN_PATH_REGEX, '');
+                const ask = new URL(request.url).searchParams.get('ask');
                 return {
-                    pathname: `~gitbook/markdown/${encodePagePath(pagePathWithoutMD)}`,
-                    // The markdown content is always static and doesn't depend on the dynamic parameter (customization, theme, etc)
+                    pathname:
+                        typeof ask === 'string'
+                            ? `~gitbook/markdown-ask/${encodeURIComponent(ask)}`
+                            : `~gitbook/markdown/${encodePagePath(pagePathWithoutMD)}`,
                     routeType: 'static',
+                    // TODO: track pageId / spaceId when possible
+                    // We don't do it at the moment as we can't easily extract it from the URL.
+                    events: ask
+                        ? [
+                              {
+                                  type: 'ask_question',
+                                  query: ask,
+                                  location: {
+                                      displayContext: SiteInsightsDisplayContext.Server,
+                                  },
+                              },
+                          ]
+                        : [
+                              {
+                                  type: 'page_markdown_request',
+                                  location: {
+                                      displayContext: SiteInsightsDisplayContext.Server,
+                                  },
+                              },
+                          ],
                 };
             }
             return { pathname: encodePagePath(pathname) };
@@ -713,15 +883,72 @@ async function writeResponseCookies<R extends NextResponse>(
     return response;
 }
 
-const MARKDOWN_MEDIA_TYPES = ['text/markdown'];
+/**
+ * Registrable domains where customer sites are hosted side-by-side on different
+ * subdomains. For these, parent/sibling-subdomain CORS would let one customer site
+ * read another, so only an exact hostname match is allowed.
+ */
+const SHARED_REGISTRABLE_DOMAINS = new Set(['gitbook.io']);
 
 /**
- * Test if a request is requesting a markdown version of the page.
+ * Get the allowed CORS origin for a request to a site.
+ *
+ * For a site on a customer domain like `foo.example.com`, requests from
+ * `example.com` or any `*.example.com` subdomain are allowed. Public-suffix-aware
+ * (via `tldts`) so multi-label suffixes like `co.uk` are handled correctly. For
+ * sites on a shared GitBook hosting domain (see {@link SHARED_REGISTRABLE_DOMAINS}),
+ * only the exact hostname is allowed.
  */
-function isMarkdownPreferred(request: Request): boolean {
-    const negotiator = new Negotiator({
-        headers: Object.fromEntries(request.headers.entries()),
-    });
+function getAllowedCORSOrigin(request: NextRequest, siteCanonicalURL: URL): string | null {
+    const origin = request.headers.get('origin');
+    if (!origin) {
+        return null;
+    }
+
+    let originURL: URL;
+    try {
+        originURL = new URL(origin);
+    } catch {
+        return null;
+    }
+
+    const siteHostname = siteCanonicalURL.hostname.toLowerCase();
+    const originHostname = originURL.hostname.toLowerCase();
+
+    // Exact match is always allowed.
+    if (originHostname === siteHostname) {
+        return origin;
+    }
+
+    // Compare on the registrable domain (eTLD+1) so multi-label public suffixes
+    // like `co.uk` don't allow unrelated registrants to claim each other.
+    const siteRegistrable = getDomain(siteHostname);
+    const originRegistrable = getDomain(originHostname);
+    if (!siteRegistrable || siteRegistrable !== originRegistrable) {
+        return null;
+    }
+
+    // On shared hosting registrable domains, only exact-match (handled above) is allowed.
+    if (SHARED_REGISTRABLE_DOMAINS.has(siteRegistrable)) {
+        return null;
+    }
+
+    return origin;
+}
+
+function acceptsMarkdown(request: Request): boolean {
+    const acceptHeader = request.headers.get('accept') || '';
+
+    const negotiator = new Negotiator({ headers: { accept: acceptHeader } });
     const mediaTypes = negotiator.mediaTypes();
-    return MARKDOWN_MEDIA_TYPES.some((mediaType) => mediaTypes.includes(mediaType));
+
+    // Media types are in order of preference, so we check if the client has markdown as one of its favorites,
+    // but text/html and */* should take precedence.
+    const markdownIndex = mediaTypes.findIndex(
+        (type) => type === 'text/markdown' || type === 'text/x-markdown'
+    );
+    if (markdownIndex === -1) return false;
+
+    const htmlIndex = mediaTypes.findIndex((type) => type === 'text/html' || type === '*/*');
+    return htmlIndex === -1 || markdownIndex < htmlIndex;
 }

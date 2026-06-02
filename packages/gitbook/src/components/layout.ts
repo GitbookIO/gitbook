@@ -6,7 +6,7 @@ import type { ClassValue } from '@/lib/tailwind';
 export const HEADER_HEIGHT_DESKTOP = 64 as const;
 
 /**
- * Style for the container to adapt between normal and full width.
+ * Style for the site container, sets the margins and max width of the UI surrounding the content (header, footer, ...).
  */
 export const CONTAINER_STYLE: ClassValue = [
     'px-4 pl-[max(env(safe-area-inset-left),1rem)] pr-[max(env(safe-area-inset-right),1rem)]',
@@ -15,6 +15,22 @@ export const CONTAINER_STYLE: ClassValue = [
     'max-w-screen-2xl',
     'mx-auto',
 ];
+
+/**
+ * Style for the content container, sets the max width of the content area. Adapts between normal, wide and full width layouts.
+ *
+ * Layout modes:
+ * - layout-default → max-w-3xl
+ * - layout-wide → max-w-6xl
+ */
+export const CONTENT_STYLE: ClassValue = [
+    'max-w-3xl',
+    'layout-wide:max-w-6xl',
+    'mx-auto',
+    'w-full',
+];
+
+export const CONTENT_STYLE_REDUCED: ClassValue = ['max-w-3xl', 'w-full'];
 
 /**
  * Height of the page cover.

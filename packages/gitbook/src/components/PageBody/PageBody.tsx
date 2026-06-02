@@ -10,6 +10,7 @@ import { DocumentView, DocumentViewSkeleton } from '../DocumentView';
 import { TrackPageViewEvent } from '../Insights';
 import { PageFeedbackForm } from '../PageFeedback';
 import { CurrentPageProvider } from '../hooks/useCurrentPage';
+import { CONTENT_STYLE } from '../layout';
 import { DateRelative, SuspenseLoadedHint } from '../primitives';
 import OptionalSuspense from './OptionalSuspense';
 import { PageBodyBlankslate } from './PageBodyBlankslate';
@@ -20,7 +21,7 @@ import { PreservePageLayout } from './PreservePageLayout';
 
 const LINK_PREVIEW_MAX_COUNT = 500;
 
-export function PageBody(props: {
+export async function PageBody(props: {
     context: GitBookSiteContext;
     page: RevisionPageDocument;
     ancestors: AncestorRevisionPage[];
@@ -40,8 +41,6 @@ export function PageBody(props: {
     } = props;
     const { customization } = context;
 
-    const contentFullWidth = document ? hasFullWidthBlock(document) : false;
-
     // Update blocks can only be at the top level of the document, so we optimize the check.
     const contentHasUpdates = document
         ? hasTopLevelBlock(document, (block) => block.type === 'updates')
@@ -55,14 +54,21 @@ export function PageBody(props: {
               LINK_PREVIEW_MAX_COUNT
           )
         : false;
-    const pageWidthWide = page.layout.width === 'wide';
-    const siteWidthWide = pageWidthWide || contentFullWidth;
-    const language = getSpaceLanguage(context);
+
+    // Determine if content should use wide layout (2-column or 1-column instead of 3-column)
+    // This happens when: (1) document has full-width blocks, OR (2) page layout is explicitly set to 'wide'
+    const wideContent = document ? hasFullWidthBlock(document) : false;
+    const wideLayout = wideContent || page.layout.width === 'wide';
+    const language = await getSpaceLanguage(context);
     const updatedAt = page.updatedAt ?? page.createdAt;
 
     const hasVisibleTOCItems =
         context.revision.pages.filter(
-            (page) => page.type !== 'document' || (page.type === 'document' && !page.hidden)
+            (page) =>
+                page.type === 'link' ||
+                page.type === 'computed' ||
+                (page.type === 'group' && !page.hidden) ||
+                (page.type === 'document' && !page.hidden)
         ).length > 0;
 
     const pageHasToc = page.layout.tableOfContents && hasVisibleTOCItems;
@@ -72,16 +78,16 @@ export function PageBody(props: {
             <main
                 className={tcls(
                     'relative min-w-0 flex-1',
-                    'max-w-screen-2xl py-8',
-                    // Allow words to break if they are too long.
-                    'break-anywhere',
+                    'break-anywhere', // Allow words to break if they are too long.
+                    'py-8',
+                    'layout-wide:no-sidebar:lg:max-xl:pb-20', // Add padding to prevent overlap of minimised trademark
                     '@container',
-                    pageWidthWide ? 'page-width-wide 3xl:px-8' : 'page-width-default',
-                    siteWidthWide ? 'site-width-wide' : 'site-width-default',
-                    pageHasToc ? 'page-has-toc' : 'page-no-toc'
+                    CONTENT_STYLE,
+                    pageHasToc ? 'page-has-toc' : 'page-no-toc',
+                    wideLayout ? 'layout-wide' : 'layout-default'
                 )}
             >
-                <PreservePageLayout siteWidthWide={siteWidthWide} pageHasToc={pageHasToc} />
+                <PreservePageLayout wideLayout={wideLayout} pageHasToc={pageHasToc} />
                 {page.cover && page.layout.cover && page.layout.coverSize === 'hero' ? (
                     <PageCover as="hero" page={page} cover={page.cover} context={context} />
                 ) : null}
@@ -95,18 +101,12 @@ export function PageBody(props: {
                 {document && !isNodeEmpty(document) ? (
                     <OptionalSuspense
                         staticRoute={staticRoute}
-                        fallback={
-                            <DocumentViewSkeleton
-                                document={document}
-                                blockStyle="page-api-block:ml-0"
-                            />
-                        }
+                        fallback={<DocumentViewSkeleton document={document} blockStyle="" />}
                     >
                         <SuspenseLoadedHint />
                         <DocumentView
                             document={document}
                             style="flex flex-col [&>*+*]:mt-5"
-                            blockStyle="page-api-block:ml-0"
                             context={{
                                 mode: 'default',
                                 contentContext: {
@@ -125,28 +125,35 @@ export function PageBody(props: {
                     <PageFooterNavigation context={context} page={page} />
                 ) : null}
 
-                {
-                    // TODO: after 25/07/2025, we can chage it to a true check as the cache will be updated
-                    page.layout.metadata !== false ? (
-                        <div className="mx-auto mt-6 page-api-block:ml-0 flex max-w-3xl page-full-width:max-w-screen-2xl flex-row flex-wrap items-center gap-4 text-tint contrast-more:text-tint-strong">
-                            {updatedAt ? (
-                                <p className="mr-auto text-sm ">
-                                    {t(
-                                        language,
-                                        'page_last_modified',
-                                        <DateRelative value={updatedAt} />
-                                    )}
-                                </p>
-                            ) : null}
-                            {withPageFeedback ? (
-                                <PageFeedbackForm
-                                    className={page.layout.outline ? 'xl:hidden' : ''}
-                                    pageId={page.id}
-                                />
-                            ) : null}
-                        </div>
-                    ) : null
-                }
+                {page.layout.metadata ? (
+                    <div
+                        className={tcls(
+                            CONTENT_STYLE,
+                            'mt-6 flex flex-row flex-wrap items-center gap-4 text-tint contrast-more:text-tint-strong'
+                        )}
+                    >
+                        {updatedAt ? (
+                            <p className="mr-auto text-sm ">
+                                {t(
+                                    language,
+                                    'page_last_modified',
+                                    <DateRelative value={updatedAt} />
+                                )}
+                            </p>
+                        ) : null}
+                        {withPageFeedback ? (
+                            <PageFeedbackForm
+                                className={
+                                    // Hide feedback form when outline is visible on desktop, but show it in some special cases
+                                    page.layout.outline
+                                        ? 'layout-wide:chat-open:max-[2416px]:flex layout-wide:max-3xl:flex xl:hidden xl:max-3xl:chat-open:flex'
+                                        : ''
+                                }
+                                pageId={page.id}
+                            />
+                        ) : null}
+                    </div>
+                ) : null}
             </main>
 
             <TrackPageViewEvent displayContext={insightsDisplayContext} />

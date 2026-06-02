@@ -8,7 +8,7 @@ import {
 } from '@gitbook/api';
 import { getCacheTag, getComputedContentSourceCacheTags } from '@gitbook/cache-tags';
 import { parse as parseCacheControl } from '@tusbar/cache-control';
-import { unstable_cacheLife as cacheLife, unstable_cacheTag as cacheTag } from 'next/cache';
+import { cacheLife, cacheTag } from 'next/cache';
 import { cache } from '../cache';
 import { DataFetcherError, wrapCacheDataFetcherError } from './errors';
 import type { GitBookDataFetcher } from './types';
@@ -87,18 +87,32 @@ export function createDataFetcher(
             });
         },
         getRevisionPageMarkdown(params) {
-            return getRevisionPageMarkdown(input, {
-                spaceId: params.spaceId,
-                revisionId: params.revisionId,
-                pageId: params.pageId,
-            });
+            return getRevisionPageMarkdown(
+                input,
+                {
+                    spaceId: params.spaceId,
+                    revisionId: params.revisionId,
+                    pageId: params.pageId,
+                },
+                // We pass the name of the function to distinguish between cache entries
+                // By default Next only uses the arguments, the filename and the position of the function inside the file
+                // By adding a dummy argument with the function name, we can change the order without breaking anything
+                'getRevisionPageMarkdown'
+            );
         },
         getRevisionPageDocument(params) {
-            return getRevisionPageDocument(input, {
-                spaceId: params.spaceId,
-                revisionId: params.revisionId,
-                pageId: params.pageId,
-            });
+            return getRevisionPageDocument(
+                input,
+                {
+                    spaceId: params.spaceId,
+                    revisionId: params.revisionId,
+                    pageId: params.pageId,
+                },
+                // We pass the name of the function to distinguish between cache entries
+                // By default Next only uses the arguments, the filename and the position of the function inside the file
+                // By adding a dummy argument with the function name, we can change the order without breaking anything
+                'getRevisionPageDocument'
+            );
         },
         getRevisionReusableContentDocument(params) {
             return getRevisionReusableContentDocument(input, {
@@ -208,7 +222,7 @@ function cacheLifeFromResponse(
 }
 
 const getUserById = cache(async (input: DataFetcherInput, params: { userId: string }) => {
-    'use cache';
+    'use cache: remote';
     return wrapCacheDataFetcherError(async () => {
         return trace(`getUserById(${params.userId})`, async () => {
             const api = apiClient(input);
@@ -224,7 +238,7 @@ const getUserById = cache(async (input: DataFetcherInput, params: { userId: stri
 
 const getSpace = cache(
     async (input: DataFetcherInput, params: { spaceId: string; shareKey: string | undefined }) => {
-        'use cache';
+        'use cache: remote';
         cacheTag(
             getCacheTag({
                 tag: 'space',
@@ -254,7 +268,7 @@ const getSpace = cache(
 
 const getChangeRequest = cache(
     async (input: DataFetcherInput, params: { spaceId: string; changeRequestId: string }) => {
-        'use cache';
+        'use cache: remote';
         cacheTag(
             getCacheTag({
                 tag: 'change-request',
@@ -284,6 +298,7 @@ const getChangeRequest = cache(
     }
 );
 
+// We don't use remote cache on vercel because of the 2Mb limit on cache size that makes some route crash
 const getRevision = cache(
     async (input: DataFetcherInput, params: { spaceId: string; revisionId: string }) => {
         'use cache';
@@ -311,9 +326,11 @@ const getRevision = cache(
 const getRevisionPageMarkdown = cache(
     async (
         input: DataFetcherInput,
-        params: { spaceId: string; revisionId: string; pageId: string }
+        params: { spaceId: string; revisionId: string; pageId: string },
+        // used only to bust the cache
+        _functionName: string
     ) => {
-        'use cache';
+        'use cache: remote';
         return wrapCacheDataFetcherError(async () => {
             return trace(
                 `getRevisionPageMarkdown(${params.spaceId}, ${params.revisionId}, ${params.pageId})`,
@@ -325,6 +342,7 @@ const getRevisionPageMarkdown = cache(
                         params.pageId,
                         {
                             format: 'markdown',
+                            'format.markdown.refs': 'stable',
                         },
                         {
                             ...noCacheFetchOptions,
@@ -350,9 +368,11 @@ const getRevisionPageMarkdown = cache(
 const getRevisionPageDocument = cache(
     async (
         input: DataFetcherInput,
-        params: { spaceId: string; revisionId: string; pageId: string }
+        params: { spaceId: string; revisionId: string; pageId: string },
+        // used only to bust the cache
+        _functionName: string
     ) => {
-        'use cache';
+        'use cache: remote';
         return wrapCacheDataFetcherError(async () => {
             return trace(
                 `getRevisionPageDocument(${params.spaceId}, ${params.revisionId}, ${params.pageId})`,
@@ -386,7 +406,7 @@ const getRevisionReusableContentDocument = cache(
         input: DataFetcherInput,
         params: { spaceId: string; revisionId: string; reusableContentId: string }
     ) => {
-        'use cache';
+        'use cache: remote';
         return wrapCacheDataFetcherError(async () => {
             return trace(
                 `getRevisionReusableContentDocument(${params.spaceId}, ${params.revisionId}, ${params.reusableContentId})`,
@@ -419,7 +439,7 @@ const getRevisionPageByPath = cache(
         input: DataFetcherInput,
         params: { spaceId: string; revisionId: string; path: string }
     ) => {
-        'use cache';
+        'use cache: remote';
         return wrapCacheDataFetcherError(async () => {
             return trace(
                 `getRevisionPageByPath(${params.spaceId}, ${params.revisionId}, ${params.path})`,
@@ -446,7 +466,7 @@ const getRevisionPageByPath = cache(
 
 const getDocument = cache(
     async (input: DataFetcherInput, params: { spaceId: string; documentId: string }) => {
-        'use cache';
+        'use cache: remote';
         return wrapCacheDataFetcherError(async () => {
             return trace(`getDocument(${params.spaceId}, ${params.documentId})`, async () => {
                 const api = apiClient(input);
@@ -476,7 +496,7 @@ const getComputedDocument = cache(
             seed: string;
         }
     ) => {
-        'use cache';
+        'use cache: remote';
         cacheTag(
             ...getComputedContentSourceCacheTags(
                 {
@@ -512,6 +532,7 @@ const getComputedDocument = cache(
     }
 );
 
+// We don't use remote cache on vercel because of the 2Mb limit on cache size that makes some route crash
 const getLatestOpenAPISpecVersionContent = cache(
     async (input: DataFetcherInput, params: { organizationId: string; slug: string }) => {
         'use cache';
@@ -550,7 +571,7 @@ const getPublishedContentSite = cache(
         params: { organizationId: string; siteId: string; siteShareKey: string | undefined },
         _apiVersion: string
     ) => {
-        'use cache';
+        'use cache: remote';
         cacheTag(
             getCacheTag({
                 tag: 'site',
@@ -592,7 +613,7 @@ const getSiteRedirectBySource = cache(
             source: string;
         }
     ) => {
-        'use cache';
+        'use cache: remote';
         cacheTag(
             getCacheTag({
                 tag: 'site',
@@ -627,7 +648,7 @@ const getSiteRedirectBySource = cache(
 
 const getEmbedByUrl = cache(
     async (input: DataFetcherInput, params: { spaceId: string; url: string }) => {
-        'use cache';
+        'use cache: remote';
         cacheTag(
             getCacheTag({
                 tag: 'space',
@@ -655,6 +676,7 @@ const getEmbedByUrl = cache(
     }
 );
 
+// We don't use remote cache for this one because of the number of potential cache entry causing 429 on vercel runtime cache when revalidating
 const searchSiteContent = cache(
     async (
         input: DataFetcherInput,
@@ -700,7 +722,7 @@ const renderIntegrationUi = cache(
         input: DataFetcherInput,
         params: { integrationName: string; request: RenderIntegrationUI }
     ) => {
-        'use cache';
+        'use cache: remote';
         cacheTag(
             getCacheTag({
                 tag: 'integration',
@@ -734,7 +756,7 @@ const listRevisionPageMetaLinks = cache(
         input: DataFetcherInput,
         params: { spaceId: string; revisionId: string; pageId: string }
     ) => {
-        'use cache';
+        'use cache: remote';
         return wrapCacheDataFetcherError(async () => {
             return trace(
                 `listRevisionPageMetaLinks(${params.spaceId}, ${params.revisionId}, ${params.pageId})`,

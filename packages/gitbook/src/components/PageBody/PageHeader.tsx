@@ -10,7 +10,9 @@ import {
     PageActionsDropdown,
     type PageActionsDropdownURLs,
 } from '../PageActions/PageActionsDropdown';
+import { PageAsideToggleButton } from '../PageAside/PageAsideButton';
 import { PageIcon } from '../PageIcon';
+import { CONTENT_STYLE, CONTENT_STYLE_REDUCED } from '../layout';
 import { StyledLink } from '../primitives';
 import { PageTags } from './PageTags';
 
@@ -25,85 +27,68 @@ export async function PageHeader(props: {
 
     const hasAncestors = ancestors.length > 0;
 
+    const pageActionsEnabled = page.layout.actions !== false;
+
     // Show page actions if *any* of the actions are enabled
-    const hasPageActions = [
-        ...Object.values(context.customization.pageActions),
-        context.customization.pdf.enabled,
-        context.customization.git.showEditLink,
-        withRSSFeed,
-    ].some(Boolean);
+    const hasPageActions =
+        pageActionsEnabled &&
+        [
+            ...Object.values(context.customization.pageActions),
+            context.customization.pdf.enabled,
+            context.customization.git.showEditLink,
+            withRSSFeed,
+        ].some(Boolean);
 
-    // When title and description are hidden,
-    // only display the page actions if the page contains an update block.
-    if (!page.layout.title && !page.layout.description) {
-        if (!hasPageActions) {
-            return null;
-        }
-
-        return (
-            <PageActionsDropdown
-                siteTitle={context.site.title}
-                urls={getPageActionsURLs({ context, page, withRSSFeed })}
-                actions={context.customization.pageActions}
-                className="absolute top-8 right-0 page-updates-block:flex hidden"
-            />
-        );
+    if (!page.layout.title && !page.layout.description && !hasPageActions) {
+        return null;
     }
 
     return (
-        <header
-            className={tcls(
-                'max-w-3xl',
-                'page-width-wide:max-w-screen-2xl',
-                'mx-auto',
-                'mb-6',
-                'space-y-3',
-                'page-api-block:ml-0',
-                'page-api-block:max-w-full',
-                hasAncestors ? 'page-has-ancestors' : 'page-no-ancestors'
-            )}
-        >
-            {hasPageActions ? (
-                <PageActionsDropdown
-                    siteTitle={context.site.title}
-                    urls={getPageActionsURLs({ context, page, withRSSFeed })}
-                    actions={context.customization.pageActions}
-                    className={tcls(
-                        'float-right ml-4 xl:max-2xl:page-api-block:mr-62',
-                        hasAncestors ? '-my-1.5' : '-mt-3 xs:mt-2'
-                    )}
-                />
-            ) : null}
+        <header className={tcls(CONTENT_STYLE, 'mb-6 space-y-3 after:clear-both after:block')}>
+            <div
+                className={tcls(
+                    'float-right ml-4 flex gap-2',
+                    hasAncestors ? '-my-0.5' : '-mt-3 xs:mt-2'
+                )}
+            >
+                {hasPageActions ? (
+                    <PageActionsDropdown
+                        siteTitle={context.site.title}
+                        urls={getPageActionsURLs({ context, page, withRSSFeed })}
+                        actions={context.customization.pageActions}
+                    />
+                ) : null}
+                <PageAsideToggleButton />
+            </div>
 
             {hasAncestors && (
-                <nav aria-label="Breadcrumb">
-                    <ol className={tcls('flex', 'flex-wrap', 'items-center', 'gap-2', 'text-tint')}>
+                <nav aria-label="Breadcrumb" className="text-tint leading-snug">
+                    <ol className="inline">
                         {ancestors.map((breadcrumb, index) => {
                             const href = linker.toPathForPage({
                                 pages: revision.pages,
                                 page: breadcrumb,
                             });
                             return (
-                                <li key={breadcrumb.id} className="flex items-center gap-2">
+                                <li key={breadcrumb.id} className="inline">
                                     <StyledLink
                                         href={href}
                                         className={tcls(
+                                            'inline',
                                             'no-underline',
                                             'hover:underline',
                                             'text-xs',
                                             'tracking-wide',
                                             'font-semibold',
                                             'uppercase',
-                                            'flex',
                                             'items-center',
-                                            'gap-1.5',
                                             'contrast-more:underline',
                                             'contrast-more:decoration-current'
                                         )}
                                     >
                                         <PageIcon
                                             page={breadcrumb}
-                                            style="flex size-4 items-center justify-center text-base leading-none"
+                                            style="mr-1 inline size-3.5 shrink-0"
                                         />
                                         {breadcrumb.title}
                                     </StyledLink>
@@ -111,7 +96,7 @@ export async function PageHeader(props: {
                                         <Icon
                                             aria-hidden
                                             icon="chevron-right"
-                                            className="size-3 text-tint-subtle"
+                                            className="mx-2 inline-flex size-2 text-tint-subtle"
                                         />
                                     )}
                                 </li>
@@ -143,7 +128,9 @@ export async function PageHeader(props: {
                 </h1>
             ) : null}
             {page.description && page.layout.description ? (
-                <p className={tcls('text-lg', 'text-tint', 'clear-both')}>{page.description}</p>
+                <p className={tcls(CONTENT_STYLE_REDUCED, 'text-lg', 'text-tint', 'clear-both')}>
+                    {page.description}
+                </p>
             ) : null}
         </header>
     );
@@ -183,9 +170,21 @@ function getPageActionsURLs({
                   }).toString()}`
               )
             : undefined,
-        mcp:
-            context.site.visibility !== SiteVisibility.VisitorAuth
-                ? context.linker.toAbsoluteURL(context.linker.toPathInSpace('~gitbook/mcp'))
-                : undefined,
+        mcp: getPageActionsMCPURL(context),
     };
+}
+
+/**
+ * Return the MCP URL to be used in the page actions dropdown.
+ */
+function getPageActionsMCPURL(context: GitBookSiteContext) {
+    const useAuthenticatedEndpoint = Boolean(
+        context.site.visibility !== SiteVisibility.VisitorAuth &&
+            context.site.adaptiveContent?.enabled &&
+            context.site.urls.login &&
+            context.isLoggedInVisitor
+    );
+    const endpoint = useAuthenticatedEndpoint ? '~gitbook/mcp/auth' : '~gitbook/mcp';
+
+    return context.linker.toAbsoluteURL(context.linker.toPathInSite(endpoint));
 }

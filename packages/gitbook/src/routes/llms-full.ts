@@ -1,13 +1,16 @@
-import { type GitBookSiteContext, checkIsRootSiteContext } from '@/lib/context';
+import {
+    type GitBookSiteContext,
+    checkIsRootSiteContext,
+    fetchSiteContextForSiteSpace,
+} from '@/lib/context';
 import { throwIfDataError } from '@/lib/data';
 import { fromPageMarkdown, toPageMarkdown } from '@/lib/markdownPage';
-import { joinPath } from '@/lib/paths';
 import { getIndexablePages } from '@/lib/sitemap';
-import { getSiteStructureSections } from '@/lib/sites';
+import { filterSiteSpacesByLocale, getSiteStructureSections } from '@/lib/sites';
 import type { RevisionPageDocument, SiteSection, SiteSpace } from '@gitbook/api';
 import assertNever from 'assert-never';
 import type { Paragraph } from 'mdast';
-import { pMapIterable } from 'p-map';
+import pMap, { pMapIterable } from 'p-map';
 
 // We limit the concurrency to 100 to avoid reaching limit with concurrent requests
 // or file descriptor limits.
@@ -15,6 +18,8 @@ const MAX_CONCURRENCY = 100;
 
 // Default limit for pages per batch
 const DEFAULT_PAGE_LIMIT = 100;
+
+type MarkdownPageEntry = { context: GitBookSiteContext; page: RevisionPageDocument };
 
 /**
  * Generate a llms-full.txt file for the site.
@@ -26,11 +31,16 @@ export async function serveLLMsFullTxt(context: GitBookSiteContext, page = 0) {
     }
 
     const offset = page * DEFAULT_PAGE_LIMIT;
+    const allPages = await getMarkdownPageEntriesFromSiteStructure(context);
+
+    if (allPages.length <= offset) {
+        return new Response('No content found', { status: 404 });
+    }
 
     return new Response(
         new ReadableStream<Uint8Array>({
             async pull(controller) {
-                await streamMarkdownFromSiteStructure(context, controller, offset);
+                await streamMarkdownPageEntries(context, controller, allPages, offset);
                 controller.close();
             },
         }),
@@ -43,115 +53,106 @@ export async function serveLLMsFullTxt(context: GitBookSiteContext, page = 0) {
 }
 
 /**
- * Stream markdown from site structure.
+ * Get the document pages that should be included in the full llms.txt output for a site structure.
  */
-async function streamMarkdownFromSiteStructure(
-    context: GitBookSiteContext,
-    stream: ReadableStreamDefaultController<Uint8Array>,
-    offset: number
-): Promise<void> {
+async function getMarkdownPageEntriesFromSiteStructure(
+    context: GitBookSiteContext
+): Promise<MarkdownPageEntry[]> {
     switch (context.structure.type) {
         case 'sections':
-            return streamMarkdownFromSections(
+            return getMarkdownPageEntriesFromSections(
                 context,
-                stream,
-                getSiteStructureSections(context.structure, { ignoreGroups: true }),
-                offset
+                getSiteStructureSections(context.structure, { ignoreGroups: true })
             );
         case 'siteSpaces':
-            await streamMarkdownFromSiteSpaces(
-                context,
-                stream,
-                context.structure.structure,
-                '',
-                offset
-            );
-            return;
+            return getMarkdownPageEntriesFromSiteSpaces(context, context.structure.structure);
         default:
             assertNever(context.structure);
     }
 }
 
 /**
- * Stream markdown from site sections.
+ * Get the document pages that should be included in the full llms.txt output for site sections.
  */
-async function streamMarkdownFromSections(
+async function getMarkdownPageEntriesFromSections(
     context: GitBookSiteContext,
-    stream: ReadableStreamDefaultController<Uint8Array>,
-    siteSections: SiteSection[],
-    offset: number
-): Promise<void> {
-    let currentPageIndex = 0;
-
-    for (const siteSection of siteSections) {
-        const result = await streamMarkdownFromSiteSpaces(
-            context,
-            stream,
-            siteSection.siteSpaces,
-            siteSection.path,
-            offset,
-            currentPageIndex
-        );
-        currentPageIndex = result.currentPageIndex;
-
-        if (result.reachedLimit) {
-            break;
-        }
-    }
+    siteSections: SiteSection[]
+): Promise<MarkdownPageEntry[]> {
+    return getMarkdownPageEntriesFromFilteredSiteSpaces(
+        siteSections.flatMap((siteSection) =>
+            filterSiteSpacesByLocale(siteSection.siteSpaces, context.locale)
+        ),
+        context
+    );
 }
 
 /**
- * Stream markdown from site spaces.
+ * Get the document pages that should be included in the full llms.txt output for site spaces.
  */
-export async function streamMarkdownFromSiteSpaces(
+async function getMarkdownPageEntriesFromSiteSpaces(
+    context: GitBookSiteContext,
+    siteSpaces: SiteSpace[]
+): Promise<MarkdownPageEntry[]> {
+    return getMarkdownPageEntriesFromFilteredSiteSpaces(
+        filterSiteSpacesByLocale(siteSpaces, context.locale),
+        context
+    );
+}
+
+/**
+ * Get markdown page entries from already locale-filtered site spaces.
+ */
+async function getMarkdownPageEntriesFromFilteredSiteSpaces(
+    siteSpaces: SiteSpace[],
+    context: GitBookSiteContext
+): Promise<MarkdownPageEntry[]> {
+    const publishedSiteSpaces = siteSpaces.filter((siteSpace) => siteSpace.urls.published);
+
+    const allPages = await pMap(
+        publishedSiteSpaces,
+        async (siteSpace): Promise<MarkdownPageEntry[]> => {
+            const siteSpaceContext = await fetchSiteContextForSiteSpace(context, siteSpace);
+            const pages = getIndexablePages(siteSpaceContext.revision.pages);
+
+            return pages.flatMap(({ page }) => {
+                if (page.type !== 'document') {
+                    return [];
+                }
+
+                return [
+                    {
+                        context: siteSpaceContext,
+                        page,
+                    },
+                ];
+            });
+        },
+        {
+            concurrency: MAX_CONCURRENCY,
+        }
+    );
+
+    return allPages.flat();
+}
+
+/**
+ * Stream a single paginated window of markdown page entries.
+ */
+async function streamMarkdownPageEntries(
     context: GitBookSiteContext,
     stream: ReadableStreamDefaultController<Uint8Array>,
-    siteSpaces: SiteSpace[],
-    basePath: string,
-    offset = 0,
-    initialPageIndex = 0
+    allPages: MarkdownPageEntry[],
+    offset: number
 ): Promise<{ currentPageIndex: number; reachedLimit: boolean }> {
-    const { dataFetcher } = context;
-    let totalPagesProcessed = initialPageIndex;
-
-    // Collect all pages first
-    const allPages: Array<{ page: RevisionPageDocument; siteSpace: SiteSpace; basePath: string }> =
-        [];
-
-    for (const siteSpace of siteSpaces) {
-        const siteSpaceUrl = siteSpace.urls.published;
-        if (!siteSpaceUrl) {
-            continue;
-        }
-        const revision = await throwIfDataError(
-            dataFetcher.getRevision({
-                spaceId: siteSpace.space.id,
-                revisionId: siteSpace.space.revision,
-            })
-        );
-        const pages = getIndexablePages(revision.pages);
-
-        // Add document pages to our collection
-        for (const { page } of pages) {
-            if (page.type === 'document') {
-                allPages.push({
-                    page,
-                    siteSpace,
-                    basePath,
-                });
-            }
-        }
-    }
-
     // Apply pagination - skip pages before offset
     const pagesToProcess = allPages.slice(offset, offset + DEFAULT_PAGE_LIMIT);
-    totalPagesProcessed = offset;
+    let totalPagesProcessed = offset;
 
     // Process the pages
     for await (const markdown of pMapIterable(
         pagesToProcess,
-        async ({ page, siteSpace, basePath }) => {
-            return getMarkdownForPage(context, siteSpace, page, basePath);
+        async ({ context: siteSpaceContext, page }) => {
+            return getMarkdownForPage(siteSpaceContext, page);
         },
         {
             concurrency: MAX_CONCURRENCY,
@@ -178,24 +179,19 @@ export async function streamMarkdownFromSiteSpaces(
  */
 async function getMarkdownForPage(
     context: GitBookSiteContext,
-    siteSpace: SiteSpace,
-    page: RevisionPageDocument,
-    basePath: string
+    page: RevisionPageDocument
 ): Promise<string> {
     const { dataFetcher } = context;
 
     const pageMarkdown = await throwIfDataError(
         dataFetcher.getRevisionPageMarkdown({
-            spaceId: siteSpace.space.id,
-            revisionId: siteSpace.space.revision,
+            spaceId: context.space.id,
+            revisionId: context.revisionId,
             pageId: page.id,
         })
     );
 
-    const tree = fromPageMarkdown({
-        linker: context.linker.fork({
-            spaceBasePath: joinPath(context.linker.siteBasePath, basePath),
-        }),
+    const tree = await fromPageMarkdown(context, {
         markdown: pageMarkdown,
         pagePath: page.path,
     });

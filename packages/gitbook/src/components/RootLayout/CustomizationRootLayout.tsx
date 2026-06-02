@@ -1,8 +1,7 @@
 import {
-    CustomizationIconsStyle,
+    CustomizationDefaultThemeMode,
     CustomizationSidebarBackgroundStyle,
     CustomizationSidebarListStyle,
-    CustomizationThemeMode,
     type CustomizationThemedColor,
     type CustomizationTint,
     type SiteCustomizationSettings,
@@ -18,12 +17,12 @@ import {
     colorScale,
     hexToRgb,
 } from '@gitbook/colors';
-import { IconStyle, IconsProvider } from '@gitbook/icons';
+import { IconsProvider } from '@gitbook/icons';
 import * as ReactDOM from 'react-dom';
 
 import { type FontData, getFontData } from '@/fonts';
 import { fontNotoColorEmoji, fonts } from '@/fonts/default';
-import { getSpaceLanguage, getSpaceLocale } from '@/intl/server';
+import { getContentLocale, getSpaceLanguage } from '@/intl/server';
 import { getAssetURL } from '@/lib/assets';
 import { tcls } from '@/lib/tailwind';
 
@@ -32,6 +31,12 @@ import { RootLayoutClientContexts } from './RootLayoutClientContexts';
 import './globals.css';
 import type { GitBookAnyContext } from '@/lib/context';
 import { GITBOOK_FONTS_URL, GITBOOK_ICONS_TOKEN, GITBOOK_ICONS_URL } from '@/lib/env';
+import {
+    getContentInlineIconSourceRequests,
+    getCustomizationIconStyle,
+    getDefaultInlineIconSourceRequests,
+    getInlineIconSources,
+} from '@/lib/icons/inline';
 import { defaultCustomization } from '@/lib/utils';
 import { AnnouncementDismissedScript } from '../Announcement';
 import { OperatingSystemClassScript } from './OperatingSystemClassScript';
@@ -61,7 +66,7 @@ export async function CustomizationRootLayout(props: {
     htmlClassName?: string;
     /** The class name to apply to the body element. */
     bodyClassName?: string;
-    forcedTheme?: CustomizationThemeMode | null;
+    forcedTheme?: CustomizationDefaultThemeMode | null;
     context: GitBookAnyContext;
     children: React.ReactNode;
 }) {
@@ -69,8 +74,8 @@ export async function CustomizationRootLayout(props: {
     const customization =
         'customization' in context ? context.customization : defaultCustomization();
 
-    const locale = getSpaceLocale(context);
-    const language = getSpaceLanguage(context);
+    const locale = getContentLocale(context);
+    const language = await getSpaceLanguage(context);
     const tintColor = getTintColor(customization);
     const mixColor = getTintMixColor(customization.styling.primaryColor, tintColor);
     const sidebarStyles = getSidebarStyles(customization);
@@ -88,6 +93,19 @@ export async function CustomizationRootLayout(props: {
     // Preconnect and preload custom fonts if needed
     preloadFont(fontData);
     preloadFont(monospaceFontData);
+    const iconStyle = getCustomizationIconStyle(customization);
+    const iconSources = await getInlineIconSources([
+        ...getDefaultInlineIconSourceRequests(iconStyle),
+        ...getContentInlineIconSourceRequests({
+            iconStyle,
+            pages: context.revision.pages,
+            tags: context.revision.tags,
+            sections:
+                'sections' in context
+                    ? [...(context.sections?.list ?? []), ...(context.visibleSections?.list ?? [])]
+                    : null,
+        }),
+    ]);
 
     return (
         <html
@@ -108,7 +126,7 @@ export async function CustomizationRootLayout(props: {
                     : null,
 
                 // Set the dark/light class statically to avoid flashing and make it work when JS is disabled
-                (forcedTheme ?? customization.themes.default) === CustomizationThemeMode.Dark
+                (forcedTheme ?? customization.themes.default) === CustomizationDefaultThemeMode.Dark
                     ? 'dark'
                     : '',
                 htmlClassName
@@ -194,11 +212,8 @@ export async function CustomizationRootLayout(props: {
                             assetsURL: getAssetURL('icons'),
                         },
                     }}
-                    iconStyle={
-                        ('icons' in customization.styling
-                            ? apiToIconsStyles[customization.styling.icons]
-                            : null) || IconStyle.Regular
-                    }
+                    iconSources={iconSources}
+                    iconStyle={iconStyle}
                 >
                     <RootLayoutClientContexts language={language}>
                         {children}
@@ -345,13 +360,3 @@ function generateColorVariable(
         })
         .join('\n');
 }
-
-const apiToIconsStyles: {
-    [key in CustomizationIconsStyle]: IconStyle;
-} = {
-    [CustomizationIconsStyle.Regular]: IconStyle.Regular,
-    [CustomizationIconsStyle.Solid]: IconStyle.Solid,
-    [CustomizationIconsStyle.Duotone]: IconStyle.Duotone,
-    [CustomizationIconsStyle.Thin]: IconStyle.Thin,
-    [CustomizationIconsStyle.Light]: IconStyle.Light,
-};

@@ -7,6 +7,7 @@ import { resolvePrevNextPages } from '@/lib/pages';
 import { tcls } from '@/lib/tailwind';
 
 import type { GitBookSiteContext } from '@/lib/context';
+import { CONTENT_STYLE } from '../layout';
 import { Link, type LinkInsightsProps } from '../primitives';
 
 /**
@@ -19,7 +20,7 @@ export async function PageFooterNavigation(props: {
     const { context, page } = props;
     const { revision, linker } = context;
     const { previous, next } = resolvePrevNextPages(revision.pages, page);
-    const language = getSpaceLanguage(context);
+    const language = await getSpaceLanguage(context);
     const previousHref = previous
         ? linker.toPathForPage({ pages: revision.pages, page: previous })
         : '';
@@ -28,14 +29,12 @@ export async function PageFooterNavigation(props: {
     return (
         <div
             className={tcls(
+                CONTENT_STYLE,
                 'flex',
                 'flex-col',
                 'md:flex-row',
                 'mt-6',
                 'gap-2',
-                'max-w-3xl',
-                'page-width-wide:max-w-screen-2xl',
-                'mx-auto',
                 'text-tint'
             )}
         >

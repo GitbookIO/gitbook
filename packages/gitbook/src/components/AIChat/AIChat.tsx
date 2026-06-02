@@ -9,6 +9,7 @@ import { useHotkeys } from 'react-hotkeys-hook';
 import {
     type AIChatController,
     type AIChatState,
+    getAIChatStatus,
     useAI,
     useAIChatController,
     useAIChatState,
@@ -28,6 +29,7 @@ import { useNow } from '../hooks';
 import { Button } from '../primitives';
 import { ScrollContainer } from '../primitives/ScrollContainer';
 import { SideSheet } from '../primitives/SideSheet';
+import { AIChatControl } from './AIChatControl';
 import { AIChatControlButton } from './AIChatControlButton';
 import { AIChatIcon } from './AIChatIcon';
 import { AIChatInput } from './AIChatInput';
@@ -81,6 +83,7 @@ export function AIChat() {
                 }
             }}
             withOverlay={true}
+            data-ai-chat
             className={tcls(
                 'ai-chat mx-auto ml-8 not-hydrated:hidden w-96 transition-[width] duration-300 ease-quint lg:max-xl:w-80'
             )}
@@ -91,7 +94,7 @@ export function AIChat() {
                         <AIChatDynamicIcon trademark={config.trademark} />
                         <EmbeddableFrameHeaderMain>
                             <EmbeddableFrameTitle>
-                                {getAIChatName(language, config.trademark)}
+                                {config.assistantName ?? getAIChatName(language, config.trademark)}
                             </EmbeddableFrameTitle>
                             <AIChatSubtitle chat={chat} />
                         </EmbeddableFrameHeaderMain>
@@ -106,11 +109,12 @@ export function AIChat() {
                             />
                         </EmbeddableFrameButtons>
                     </EmbeddableFrameHeader>
-                    <EmbeddableFrameBody className="not-embed:px-4">
+                    <EmbeddableFrameBody className="not-embed:px-0">
                         <AIChatBody
                             chatController={chatController}
                             chat={chat}
                             suggestions={config.suggestions}
+                            trademark={config.trademark}
                         />
                     </EmbeddableFrameBody>
                 </EmbeddableFrameMain>
@@ -128,24 +132,13 @@ export function AIChatDynamicIcon(props: {
 }) {
     const { trademark, className } = props;
     const chat = useAIChatState();
+    const status = getAIChatStatus(chat);
 
     return (
         <AIChatIcon
             className={tcls('size-5 text-tint', className)}
             trademark={trademark}
-            state={
-                chat.error
-                    ? 'error'
-                    : chat.loading
-                      ? chat.messages[chat.messages.length - 1]?.content
-                          ? 'working'
-                          : 'thinking'
-                      : chat.messages.length > 0
-                        ? chat.pendingTools.length > 0
-                            ? 'confirm'
-                            : 'done'
-                        : 'default'
-            }
+            state={status}
         />
     );
 }
@@ -158,35 +151,45 @@ export function AIChatSubtitle(props: {
 }) {
     const { chat } = props;
     const language = useLanguage();
+    const status = getAIChatStatus(chat);
+    const subtitleKey =
+        status === 'thinking'
+            ? 'ai_chat_thinking'
+            : status === 'exploring'
+              ? 'ai_chat_exploring'
+              : status === 'working'
+                ? 'ai_chat_working'
+                : status === 'confirm'
+                  ? 'ai_chat_waiting'
+                  : null;
 
     return (
         <EmbeddableFrameSubtitle
-            className={tcls('relative', chat.loading ? 'h-3 opacity-11' : 'h-0 opacity-0')}
+            className={tcls('relative', subtitleKey ? 'h-3 opacity-11' : 'h-0 opacity-0')}
         >
-            <span
-                className={tcls(
-                    'absolute left-0',
-                    chat.loading
-                        ? chat.messages[chat.messages.length - 1]?.content
-                            ? 'animate-blur-in-slow'
-                            : 'hidden'
-                        : 'animate-blur-out-slow'
-                )}
-            >
-                {t(language, 'ai_chat_working')}
-            </span>
-            <span
-                className={tcls(
-                    'absolute left-0',
-                    chat.loading
-                        ? chat.messages[chat.messages.length - 1]?.content
-                            ? 'animate-blur-out-slow'
-                            : 'animate-blur-in-slow'
-                        : 'hidden'
-                )}
-            >
-                {t(language, 'ai_chat_thinking')}
-            </span>
+            {(
+                [
+                    ['thinking', 'ai_chat_thinking'],
+                    ['exploring', 'ai_chat_exploring'],
+                    ['working', 'ai_chat_working'],
+                    ['confirm', 'ai_chat_waiting'],
+                ] as const
+            ).map(([candidateStatus, key]) => (
+                <span
+                    key={candidateStatus}
+                    className={tcls(
+                        'absolute left-0',
+                        status === candidateStatus
+                            ? 'animate-blur-in-display-slow'
+                            : 'animate-blur-out-display-slow'
+                    )}
+                    style={{
+                        animationDelay: status === candidateStatus ? '.3s' : undefined,
+                    }}
+                >
+                    {subtitleKey ? t(language, key) : null}
+                </span>
+            ))}
         </EmbeddableFrameSubtitle>
     );
 }
@@ -199,13 +202,13 @@ export function AIChatBody(props: {
     chat: AIChatState;
     welcomeMessage?: string;
     suggestions?: string[];
+    trademark?: boolean;
     greeting?: {
         title: string;
         subtitle: string;
     };
 }) {
-    const { chatController, chat, suggestions, greeting } = props;
-    const { trademark } = useAI().config;
+    const { chatController, chat, suggestions, greeting, trademark } = props;
 
     const language = useLanguage();
     const now = useNow(60 * 60 * 1000); // Refresh every hour for greeting
@@ -223,8 +226,8 @@ export function AIChatBody(props: {
     return (
         <>
             <ScrollContainer
-                className="shrink grow basis-80 animate-fade-in-slow [container-type:size]"
-                contentClassName="py-4 gutter-stable flex flex-col gap-4"
+                className="min-h-[20%] max-w-full shrink grow animate-fade-in-slow [container-type:size]"
+                contentClassName="py-4 gutter-stable flex flex-col gap-4 not-embed:px-4 [scroll-behavior:smooth]"
                 orientation="vertical"
                 trailing={{ fade: false, button: true }}
                 active={`#message-group-${chat.messages.filter((message) => message.role === 'user').length - 1}`}
@@ -272,10 +275,11 @@ export function AIChatBody(props: {
                 )}
             </ScrollContainer>
 
-            <div className="flex flex-col gap-2 pb-4">
+            <div className="flex max-h-3/4 min-h-0 flex-col gap-2 not-embed:px-4 pb-4">
                 {/* Display an error banner when something went wrong. */}
                 {chat.error ? <AIChatError chatController={chatController} /> : null}
 
+                {chat.control ? <AIChatControl control={chat.control} /> : null}
                 <AIChatInput
                     loading={chat.loading}
                     disabled={chat.loading || chat.error}

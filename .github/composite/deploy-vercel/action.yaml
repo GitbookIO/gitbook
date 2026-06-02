@@ -19,8 +19,11 @@ inputs:
   environment:
     description: 'Environment to deploy to'
     required: true
+  headSha:
+    description: 'Git ref to deploy, used for the deploymentId'
+    required: false
 outputs:
-    deployment-url: 
+    deployment-url:
       description: "Deployment URL"
       value: ${{ steps.deploy.outputs.deployment-url }}
 runs:
@@ -52,12 +55,24 @@ runs:
             GITBOOK_API_PUBLIC_URL: ${{ inputs.opItem }}/GITBOOK_API_PUBLIC_URL
             GITBOOK_API_TOKEN: ${{ inputs.opItem }}/GITBOOK_API_TOKEN
             GITBOOK_OAUTH_SERVER_URL: ${{ inputs.opItem }}/GITBOOK_OAUTH_SERVER_URL
+            GITBOOK_PREVIEW_BASE_URL: ${{ inputs.opItem }}/GITBOOK_PREVIEW_BASE_URL
             GITBOOK_INTEGRATIONS_HOST: ${{ inputs.opItem }}/GITBOOK_INTEGRATIONS_HOST
             GITBOOK_IMAGE_RESIZE_SIGNING_KEY: ${{ inputs.opItem }}/GITBOOK_IMAGE_RESIZE_SIGNING_KEY
             GITBOOK_IMAGE_RESIZE_URL: ${{ inputs.opItem }}/GITBOOK_IMAGE_RESIZE_URL
             GITBOOK_IMAGE_RESIZE_MODE: ${{ inputs.opItem }}/GITBOOK_IMAGE_RESIZE_MODE
             GITBOOK_ASSETS_PREFIX: ${{ inputs.opItem }}/GITBOOK_ASSETS_PREFIX
             GITBOOK_FONTS_URL: ${{ inputs.opItem }}/GITBOOK_FONTS_URL
+        - name: Inject build env vars
+          if: ${{ inputs.environment == 'preview' }}
+          shell: bash
+          run: |
+            HEAD_SHA=$(git rev-parse HEAD)
+            echo "resolved HEAD_SHA: $HEAD_SHA"
+            echo "GITBOOK_HEAD_SHA=$HEAD_SHA" >> .vercel/.env.${{ inputs.environment }}.local
+            echo "GITBOOK_RUNTIME=vercel" >> .vercel/.env.${{ inputs.environment }}.local
+            echo "GITBOOK_BLOCK_SEARCH_INDEXATION=true" >> .vercel/.env.${{ inputs.environment }}.local
+            echo "--- .vercel/.env.${{ inputs.environment }}.local after inject ---"
+            cat .vercel/.env.${{ inputs.environment }}.local
         - name: Build Project Artifacts
           run: bun run vercel build --target=${{ inputs.environment }} --token=${{ inputs.vercelToken }}
           shell: bash
@@ -65,6 +80,7 @@ runs:
             VERCEL_ORG_ID: ${{ inputs.vercelOrg }}
             VERCEL_PROJECT_ID: ${{ inputs.vercelProject }}
             GITBOOK_RUNTIME: vercel
+            GITBOOK_HEAD_SHA: ${{ inputs.headSha }}
         - name: Deploy Project Artifacts to Vercel
           id: deploy
           shell: bash

@@ -43,6 +43,7 @@ export function OpenAPIResponse(props: {
                         />
                     }
                     icon={context.icons.plus}
+                    defaultExpanded={context.expandAllModelSections}
                     label={(isExpanded) =>
                         tString(
                             context.translation,

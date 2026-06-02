@@ -57,7 +57,7 @@ export async function PDFPage(props: {
 
     const customization =
         'customization' in baseContext ? baseContext.customization : defaultCustomization();
-    const language = getSpaceLanguage(baseContext);
+    const language = await getSpaceLanguage(baseContext);
 
     // Compute the pages to render
     const { pages, total } = selectPages(baseContext.revision.pages, pdfParams);
@@ -66,7 +66,7 @@ export async function PDFPage(props: {
     );
 
     // Build a linker that create anchor links for the pages rendered in the PDF page.
-    const linker = createPDFLinker(baseContext.linker, pages);
+    const linker = createPDFLinker(baseContext.linker, pages, baseContext.space.urls.published);
 
     const context: GitBookSpaceContext = {
         ...baseContext,

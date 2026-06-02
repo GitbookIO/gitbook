@@ -15,3 +15,4 @@ export * from './HoverCard';
 export * from './DropdownMenu';
 export * from './Input';
 export * from './ToggleChevron';
+export * from './Collapsible';

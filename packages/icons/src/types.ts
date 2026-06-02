@@ -25,6 +25,11 @@ type CustomIconName =
     | 'vscode'
     | 'mcp'
     | 'chatgpt'
-    | 'claude';
+    | 'claude'
+    | 'bytedance'
+    | 'cohere'
+    | 'common-crawl'
+    | 'deepseek'
+    | 'mistral';
 
 export type IconName = BasicIconName | CustomIconName;

@@ -3,22 +3,23 @@ import React from 'react';
 
 import { assert } from 'ts-essentials';
 
-import {
-    type OrderedComputedResult,
-    searchSiteContent,
-    streamRecommendedQuestions,
-} from './server-actions';
+import type { OrderedComputedResult } from './search-types';
+import { streamRecommendedQuestions } from './server-actions';
 
-import { type Assistant, useAI } from '@/components/AI';
+import { useAI } from '@/components/AI';
 import assertNever from 'assert-never';
 import { useTrackEvent } from '../Insights';
-import { isQuestion } from './isQuestion';
+import { type MergedPageResult, reciprocalRankFusion } from './reciprocalRankFusion';
+import { type LocalPageResult, useLocalSearchResults } from './useLocalSearchResults';
 import type { SearchScope } from './useSearch';
 
 export type ResultType =
     | OrderedComputedResult
-    | { type: 'question'; id: string; query: string; assistant: Assistant }
+    | LocalPageResult
+    | MergedPageResult
     | { type: 'recommended-question'; id: string; question: string };
+
+export type { LocalPageResult, MergedPageResult };
 
 /**
  * We cache the recommended questions globally to avoid calling the API multiple times
@@ -29,23 +30,63 @@ export type ResultType =
 const cachedRecommendedQuestions: Map<string, ResultType[]> = new Map();
 
 export function useSearchResults(props: {
+    asEmbeddable?: boolean;
     disabled: boolean;
     query: string;
     siteSpaceId: string;
     siteSpaceIds: string[];
     scope: SearchScope;
-    withAI: boolean;
     suggestions?: string[];
+    /** URL for the search API route (e.g. from linker.toPathInSpace('~gitbook/search')). */
+    searchURL: string;
+    /** URL for the local index JSON (e.g. from linker.toPathInSite('~gitbook/index')). */
+    indexURL: string;
+    /** BCP-47 language code of the current site space, used to filter local search results. */
+    lang?: string;
 }) {
-    const { disabled, query, siteSpaceId, siteSpaceIds, scope, suggestions } = props;
+    const {
+        asEmbeddable,
+        disabled,
+        query,
+        siteSpaceId,
+        siteSpaceIds,
+        scope,
+        suggestions,
+        searchURL,
+        indexURL,
+        lang,
+    } = props;
 
     const trackEvent = useTrackEvent();
 
-    const [resultsState, setResultsState] = React.useState<{
-        results: ResultType[];
+    const filterSiteSpaceIds = React.useMemo(() => {
+        switch (scope) {
+            case 'current':
+                return [siteSpaceId];
+            case 'extended':
+                return siteSpaceIds;
+            default:
+                return undefined;
+        }
+    }, [scope, siteSpaceId, siteSpaceIds]);
+
+    const { results: localResults } = useLocalSearchResults({
+        query,
+        indexURL,
+        lang,
+        disabled,
+        filterSiteSpaceIds,
+    });
+
+    const [remoteState, setRemoteState] = React.useState<{
+        results: OrderedComputedResult[];
         fetching: boolean;
         error: boolean;
     }>({ results: [], fetching: false, error: false });
+
+    // Track the current in-flight fetch so it can be aborted imperatively
+    // when the user navigates away before the request completes.
+    const abortRef = React.useRef<(() => void) | null>(null);
 
     const { assistants } = useAI();
     const withAI = assistants.length > 0;
@@ -56,7 +97,7 @@ export function useSearchResults(props: {
         }
         if (!query) {
             if (!withAI) {
-                setResultsState({ results: [], fetching: false, error: false });
+                setRemoteState({ results: [], fetching: false, error: false });
                 return;
             }
 
@@ -66,11 +107,12 @@ export function useSearchResults(props: {
                     results,
                     `Cached recommended questions should be set for site-space ${siteSpaceId}`
                 );
-                setResultsState({ results, fetching: false, error: false });
+                // Recommended questions are stored as ResultType[] already
+                setRemoteState({ results: [], fetching: false, error: false });
                 return;
             }
 
-            setResultsState({ results: [], fetching: false, error: false });
+            setRemoteState({ results: [], fetching: false, error: false });
 
             let cancelled = false;
 
@@ -83,15 +125,7 @@ export function useSearchResults(props: {
                 suggestions.forEach((question) => {
                     questions.add(question);
                 });
-                setResultsState({
-                    results: suggestions.map((question, index) => ({
-                        type: 'recommended-question',
-                        id: `recommended-question-${index}`,
-                        question,
-                    })),
-                    fetching: false,
-                    error: false,
-                });
+                setRemoteState({ results: [], fetching: false, error: false });
                 return;
             }
 
@@ -120,11 +154,8 @@ export function useSearchResults(props: {
                     cachedRecommendedQuestions.set(siteSpaceId, recommendedQuestions);
 
                     if (!cancelled) {
-                        setResultsState({
-                            results: [...recommendedQuestions],
-                            fetching: false,
-                            error: false,
-                        });
+                        // Recommended questions are handled via a separate path below
+                        setRemoteState({ results: [], fetching: false, error: false });
                     }
                 }
             }, 100);
@@ -134,28 +165,40 @@ export function useSearchResults(props: {
                 clearTimeout(timeout);
             };
         }
-        setResultsState((prev) => ({ results: prev.results, fetching: true, error: false }));
+        setRemoteState({
+            results: [],
+            fetching: true,
+            error: false,
+        });
         let cancelled = false;
+        const abortController = new AbortController();
         const timeout = setTimeout(async () => {
             try {
                 const results = await (() => {
+                    const fetchSearch = (
+                        scope: Parameters<typeof fetchSearchResults>[1]
+                    ): Promise<OrderedComputedResult[]> =>
+                        fetchSearchResults(
+                            searchURL,
+                            scope,
+                            query,
+                            abortController.signal,
+                            asEmbeddable
+                        );
+
                     switch (scope) {
                         case 'all':
                             // Search all content on the site
-                            return searchSiteContent({ query, mode: 'all' });
+                            return fetchSearch({ mode: 'all' });
                         case 'default':
                             // Search the current section's variant + matched/default variant for other sections
-                            return searchSiteContent({ query, mode: 'current', siteSpaceId });
+                            return fetchSearch({ mode: 'current', siteSpaceId });
                         case 'extended':
                             // Search all variants of the current section
-                            return searchSiteContent({ query, mode: 'specific', siteSpaceIds });
+                            return fetchSearch({ mode: 'specific', siteSpaceIds });
                         case 'current':
                             // Search only the current section's current variant
-                            return searchSiteContent({
-                                query,
-                                mode: 'specific',
-                                siteSpaceIds: [siteSpaceId],
-                            });
+                            return fetchSearch({ mode: 'specific', siteSpaceIds: [siteSpaceId] });
                         default:
                             assertNever(scope);
                     }
@@ -169,15 +212,11 @@ export function useSearchResults(props: {
                     // One time when this one returns undefined is when it cannot find the server action and returns the html from the page.
                     // In that case, we want to avoid being stuck in a loading state, but it is an error.
                     // We could potentially try to force reload the page here, but i'm not 100% sure it would be a better experience.
-                    setResultsState({ results: [], fetching: false, error: true });
+                    setRemoteState({ results: [], fetching: false, error: true });
                     return;
                 }
 
-                const aiEnrichedResults = withAI
-                    ? withAskTriggers(results, query, assistants)
-                    : results;
-
-                setResultsState({ results: aiEnrichedResults, fetching: false, error: false });
+                setRemoteState({ results, fetching: false, error: false });
 
                 trackEvent({
                     type: 'search_type_query',
@@ -188,43 +227,99 @@ export function useSearchResults(props: {
                 if (cancelled) {
                     return;
                 }
-                setResultsState({ results: [], fetching: false, error: true });
+                setRemoteState({ results: [], fetching: false, error: true });
             }
-        }, 350);
+        }, 200);
+
+        abortRef.current = () => {
+            cancelled = true;
+            clearTimeout(timeout);
+            abortController.abort();
+        };
 
         return () => {
             cancelled = true;
             clearTimeout(timeout);
+            abortController.abort();
+            abortRef.current = null;
         };
-    }, [query, scope, trackEvent, withAI, siteSpaceId, siteSpaceIds, disabled, suggestions]);
+    }, [
+        query,
+        scope,
+        trackEvent,
+        withAI,
+        siteSpaceId,
+        siteSpaceIds,
+        disabled,
+        suggestions,
+        searchURL,
+        asEmbeddable,
+    ]);
 
-    return resultsState;
+    const abort = React.useCallback(() => {
+        abortRef.current?.();
+        abortRef.current = null;
+        setRemoteState((prev) => (prev.fetching ? { ...prev, fetching: false } : prev));
+    }, []);
+
+    // Merge local and remote results.
+    // Re-runs immediately whenever either result set changes.
+    const results = React.useMemo<ResultType[]>(() => {
+        if (!query) {
+            // No query: show recommended questions (AI-only path) or nothing.
+            if (withAI && cachedRecommendedQuestions.has(siteSpaceId)) {
+                return cachedRecommendedQuestions.get(siteSpaceId) ?? [];
+            }
+            if (suggestions && suggestions.length > 0) {
+                return suggestions.map((question, index) => ({
+                    type: 'recommended-question' as const,
+                    id: `recommended-question-${index}`,
+                    question,
+                }));
+            }
+            return [];
+        }
+
+        const merged = reciprocalRankFusion(localResults, remoteState.results, query);
+
+        return merged;
+    }, [localResults, remoteState.results, query, withAI, siteSpaceId, suggestions]);
+
+    return {
+        results,
+        fetching: remoteState.fetching,
+        error: remoteState.error,
+        abort,
+    };
 }
 
 /**
- * Add a "Ask <question>" item at the top of the results list.
+ * Fetch search results from the search API route.
  */
-function withAskTriggers(
-    results: ResultType[],
+async function fetchSearchResults(
+    searchURL: string,
+    scope:
+        | { mode: 'all' }
+        | { mode: 'current'; siteSpaceId: string }
+        | { mode: 'specific'; siteSpaceIds: string[] },
     query: string,
-    assistants: Assistant[]
-): ResultType[] {
-    const without = results.filter((result) => result.type !== 'question');
+    signal?: AbortSignal,
+    asEmbeddable?: boolean
+): Promise<OrderedComputedResult[]> {
+    const response = await fetch(searchURL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            asEmbeddable,
+            query,
+            scope,
+        }),
+        signal,
+    });
 
-    if (query.length === 0) {
-        return without;
+    if (!response.ok) {
+        throw new Error(`Search request failed: ${response.status}`);
     }
 
-    const queryIsQuestion = isQuestion(query);
-
-    return [
-        ...(queryIsQuestion ? [] : (without ?? [])),
-        ...assistants.map((assistant, index) => ({
-            type: 'question' as const,
-            id: `question-${index}`,
-            query,
-            assistant,
-        })),
-        ...(!queryIsQuestion ? [] : (without ?? [])),
-    ];
+    return response.json() as Promise<OrderedComputedResult[]>;
 }

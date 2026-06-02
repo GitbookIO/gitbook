@@ -23,6 +23,7 @@
             "packages/emoji-codepoints/index.ts",
             "packages/icons/src/data/*.json",
             "packages/gitbook/worker-configuration.d.ts",
+            "gitbook/tsconfig.json",
             "**/*.css"
         ]
     },

@@ -45,7 +45,7 @@ export type GitBookEmbeddableActionDefinition = {
  */
 export type GitBookEmbeddableConfiguration = {
     /** Tabs to display in the embed (if enabled on the site). */
-    tabs: ('assistant' | 'docs')[];
+    tabs: ('assistant' | 'docs' | 'search')[];
 
     /** Additional buttons to be displayed in the header of the GitBook embed. */
     actions: GitBookEmbeddableActionDefinition[];
@@ -62,11 +62,22 @@ export type GitBookEmbeddableConfiguration = {
         subtitle: string;
     };
 
+    /**
+     * Override the assistant name displayed in the UI.
+     * Limited to 32 characters.
+     */
+    assistantName?: string;
+
     /** Suggestions of questions to be displayed in the welcome page. */
     suggestions: string[];
 
     /** Tools to be provided to the assistant. */
     tools: GitBookToolDefinition[];
+
+    /**
+     * Display GitBook branding in the embed.
+     */
+    trademark?: boolean;
 
     /**
      * Display a close button inside the assistant.

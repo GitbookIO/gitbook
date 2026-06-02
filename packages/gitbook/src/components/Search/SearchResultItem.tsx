@@ -13,6 +13,7 @@ export const SearchResultItem = React.forwardRef(function SearchResultItem(
         className?: string;
         size?: 'small' | 'medium';
         leadingIcon?: React.ReactNode;
+        disabled?: boolean;
     } & LinkInsightsProps &
         Omit<React.ComponentProps<typeof Link>, keyof LinkInsightsProps>,
     ref: React.Ref<HTMLAnchorElement>
@@ -25,23 +26,25 @@ export const SearchResultItem = React.forwardRef(function SearchResultItem(
         leadingIcon,
         size = 'medium',
         action,
+        disabled,
         ...rest
     } = props;
 
     return (
         <Link
             ref={ref}
-            href={href}
+            href={href ?? '#'}
+            aria-disabled={disabled}
             className={tcls(
                 'flex',
                 'items-center',
                 'gap-3',
                 'group',
-                'px-4',
-                size === 'small' ? 'py-1.5' : 'py-3',
+                'pl-3',
+                'pr-2',
+                'py-2',
                 'text-tint',
-                'hover:bg-tint',
-                'hover:text-tint-strong',
+                disabled ? ['pointer-events-none'] : ['hover:bg-tint', 'hover:text-tint-strong'],
                 'group',
                 'transition-colors',
                 'rounded-corners:rounded-md',
@@ -62,16 +65,17 @@ export const SearchResultItem = React.forwardRef(function SearchResultItem(
                 )}
             </div>
             <div className="grow">{children}</div>
-            {active ? (
+            {disabled ? null : active ? (
                 <Button
                     label={action}
                     iconOnly
                     variant="primary"
-                    size="small"
+                    size="xsmall"
                     icon="arrow-turn-down-left"
+                    className="size-7"
                 />
             ) : (
-                <div className="flex size-9 shrink-0 items-center justify-center text-tint-subtle">
+                <div className="flex size-7 shrink-0 items-center justify-center text-tint-subtle">
                     <Icon icon="chevron-right" className="size-3" />
                 </div>
             )}

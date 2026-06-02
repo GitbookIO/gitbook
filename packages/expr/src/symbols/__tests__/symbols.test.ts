@@ -255,8 +255,12 @@ describe('ExpressionRuntime', () => {
                 childrenRefs: [
                     'visitor.claims.key.length',
                     'visitor.claims.key.at',
+                    'visitor.claims.key.startsWith',
                     'visitor.claims.key.endsWith',
                     'visitor.claims.key.includes',
+                    'visitor.claims.key.toLowerCase',
+                    'visitor.claims.key.toUpperCase',
+                    'visitor.claims.key.trim',
                 ],
             });
 
@@ -301,8 +305,12 @@ describe('ExpressionRuntime', () => {
                 childrenRefs: [
                     'visitor.claims.flags.FLAG1.length',
                     'visitor.claims.flags.FLAG1.at',
+                    'visitor.claims.flags.FLAG1.startsWith',
                     'visitor.claims.flags.FLAG1.endsWith',
                     'visitor.claims.flags.FLAG1.includes',
+                    'visitor.claims.flags.FLAG1.toLowerCase',
+                    'visitor.claims.flags.FLAG1.toUpperCase',
+                    'visitor.claims.flags.FLAG1.trim',
                 ],
             });
 
@@ -318,8 +326,12 @@ describe('ExpressionRuntime', () => {
                 childrenRefs: [
                     'visitor.claims.flags.FLAG2.length',
                     'visitor.claims.flags.FLAG2.at',
+                    'visitor.claims.flags.FLAG2.startsWith',
                     'visitor.claims.flags.FLAG2.endsWith',
                     'visitor.claims.flags.FLAG2.includes',
+                    'visitor.claims.flags.FLAG2.toLowerCase',
+                    'visitor.claims.flags.FLAG2.toUpperCase',
+                    'visitor.claims.flags.FLAG2.trim',
                 ],
             });
 

@@ -29,9 +29,11 @@ import { PageIcon } from '@/components/PageIcon';
 import { getGitBookAppHref } from './app';
 import { getBlockById, getBlockTitle } from './document';
 import { resolvePageId } from './pages';
-import { findSiteSpaceBy, getFallbackSiteSpacePath } from './sites';
+import { findSiteSpaceBy, getFallbackSiteSpacePath, getLocalizedTitle } from './sites';
+import { getRevisionTags, resolveTag } from './tags';
 import type { ClassValue } from './tailwind';
 import { filterOutNullable } from './typescript';
+import { checkIsExternalURL } from './urls';
 
 export interface ResolvedContentRef {
     /** Text to render in the content ref */
@@ -57,12 +59,17 @@ export interface ResolvedContentRef {
         context: GitBookSpaceContext;
         revisionReusableContent: RevisionReusableContent;
     };
-    /** Resolve OpenAPI spec filesystem. */
-    openAPIFilesystem?: Filesystem;
     /**
      * Space that the content ref belongs to (if applicable).
      */
     space?: Space;
+    /** Resolved OpenAPI spec, if the reference is an OpenAPI spec. */
+    openapi?: {
+        /** OpenAPI spec filesystem. */
+        filesystem: Filesystem;
+        /** Public URL of the OpenAPI spec */
+        publicURL: string | null;
+    };
 }
 
 export interface ResolveContentRefOptions {
@@ -339,10 +346,31 @@ export async function resolveContentRef(
                 return null;
             }
             return {
-                href: openAPISpecVersionContent.url,
+                href: openAPISpecVersionContent.urls.source,
                 text: contentRef.spec,
                 active: false,
-                openAPIFilesystem: openAPISpecVersionContent.filesystem as Filesystem,
+                openapi: {
+                    filesystem: openAPISpecVersionContent.filesystem as Filesystem,
+                    publicURL: openAPISpecVersionContent.urls.public,
+                },
+            };
+        }
+
+        case 'tag': {
+            if (isContentRefInDifferentSpace(contentRef, context)) {
+                return resolveContentRefInSpace(contentRef.space, context, contentRef, options);
+            }
+
+            const tag = resolveTag(contentRef.tag, getRevisionTags(revision));
+            if (!tag) {
+                return null;
+            }
+
+            return {
+                href: linker.toPathInSpace(''),
+                text: tag.label,
+                active: false,
+                space,
             };
         }
 
@@ -431,60 +459,68 @@ async function resolveContentRefInSpace(
     contentRef: ContentRef,
     options: ResolveContentRefOptions = {}
 ) {
-    const ctx = await createContextForSpace(spaceId, {
-        ...context,
-        shareKey: (() => {
-            // If the space is found in the current site, we use the current share key to generate links.
-            if ('site' in context) {
-                return findSiteSpaceBy(
-                    context.structure,
-                    (siteSpace) => siteSpace.space.id === spaceId
-                )
-                    ? context.shareKey
-                    : undefined;
-            }
+    try {
+        const ctx = await createContextForSpace(spaceId, {
+            ...context,
+            shareKey: (() => {
+                // If the space is found in the current site, we use the current share key to generate links.
+                if ('site' in context) {
+                    return findSiteSpaceBy(
+                        context.structure,
+                        (siteSpace) => siteSpace.space.id === spaceId
+                    )
+                        ? context.shareKey
+                        : undefined;
+                }
 
-            return context.space.id === spaceId ? context.shareKey : undefined;
-        })(),
-    });
+                return context.space.id === spaceId ? context.shareKey : undefined;
+            })(),
+        });
 
-    if (!ctx) {
-        return null;
-    }
-
-    const resolved = await resolveContentRef(contentRef, ctx.spaceContext, options);
-
-    if (!resolved) {
-        return null;
-    }
-
-    // Prefer the variant title when available, then the section title, then fallback to the space title.
-    const ancestorLabel = (() => {
-        if ('site' in context) {
-            const foundSiteSpace = findSiteSpaceBy(
-                context.structure,
-                (siteSpace) => siteSpace.space.id === spaceId
-            );
-            return (
-                foundSiteSpace?.siteSpace.title ??
-                foundSiteSpace?.siteSection?.title ??
-                ctx.spaceContext.space.title
-            );
+        if (!ctx) {
+            return null;
         }
 
-        return ctx.spaceContext.space.title;
-    })();
+        const resolved = await resolveContentRef(contentRef, ctx.spaceContext, options);
 
-    return {
-        ...resolved,
-        ancestors: [
-            {
-                label: ancestorLabel,
-                href: ctx.baseURL.toString(),
-            },
-            ...(resolved.ancestors ?? []),
-        ].filter(filterOutNullable),
-    };
+        if (!resolved) {
+            return null;
+        }
+
+        // Prefer the variant title when available, then the section title, then fallback to the space title.
+        const ancestorLabel = (() => {
+            if ('site' in context) {
+                const currentLanguage = context.locale;
+                const foundSiteSpace = findSiteSpaceBy(
+                    context.structure,
+                    (siteSpace) => siteSpace.space.id === spaceId
+                );
+                if (foundSiteSpace?.siteSpace) {
+                    return getLocalizedTitle(foundSiteSpace.siteSpace, currentLanguage);
+                }
+                if (foundSiteSpace?.siteSection) {
+                    return getLocalizedTitle(foundSiteSpace.siteSection, currentLanguage);
+                }
+                return ctx.spaceContext.space.title;
+            }
+
+            return ctx.spaceContext.space.title;
+        })();
+
+        return {
+            ...resolved,
+            ancestors: [
+                {
+                    label: ancestorLabel,
+                    href: ctx.baseURL.toString(),
+                },
+                ...(resolved.ancestors ?? []),
+            ].filter(filterOutNullable),
+        };
+    } catch (error) {
+        console.warn(`Error resolving content ref in space ${spaceId}:`, error);
+        return null;
+    }
 }
 
 /**
@@ -548,3 +584,217 @@ async function createContextForSpace(
         baseURL,
     };
 }
+
+/**
+ * When the API outputs markdown with `format.markdown.refs: stable`, the content refs are formatted this way.
+ */
+export function resolveStringContentRef(src: string): ContentRef | null {
+    for (const resolver of Object.values(RESOLVERS)) {
+        const ref = resolver.resolve(src);
+        if (ref) {
+            return ref;
+        }
+    }
+
+    return null;
+}
+
+const RESOLVERS: {
+    [kind in ContentRef['kind']]: {
+        resolve: (src: string) => Extract<ContentRef, { kind: kind }> | null;
+        format: (ref: Extract<ContentRef, { kind: kind }>) => string;
+    };
+} = {
+    url: {
+        resolve: (src) => {
+            if (checkIsExternalURL(src)) {
+                return { kind: 'url', url: src };
+            }
+            return null;
+        },
+        format: (ref) => {
+            return ref.url;
+        },
+    },
+
+    page: {
+        resolve: (src) => {
+            const match = src.match(/^(\/spaces\/([\w-]+))?\/pages\/([\w-]+)$/);
+            if (match?.[3]) {
+                return {
+                    kind: 'page',
+                    ...(match[2] ? { space: match[2] } : {}),
+                    page: match[3],
+                };
+            }
+
+            return null;
+        },
+        format: (ref) => {
+            const pagePath = `/pages/${ref.page}`;
+            if (ref.space) {
+                return `/spaces/${ref.space}${pagePath}`;
+            }
+            return pagePath;
+        },
+    },
+
+    anchor: {
+        resolve: (src) => {
+            if (src.startsWith('#')) {
+                return {
+                    kind: 'anchor',
+                    anchor: src.slice(1),
+                };
+            }
+
+            const match = src.match(/^((\/spaces\/([\w-]+))?\/pages\/([\w-]+))?#([\w-]+)$/);
+            if (match?.[5]) {
+                return {
+                    kind: 'anchor',
+                    ...(match[3] ? { space: match[3] } : {}),
+                    ...(match[4] ? { page: match[4] } : {}),
+                    anchor: match[5],
+                };
+            }
+
+            return null;
+        },
+        format: (ref) => {
+            const anchorPath = `#${ref.anchor}`;
+            if (!ref.page) {
+                return anchorPath;
+            }
+            if (ref.space && ref.page) {
+                return `/spaces/${ref.space}/pages/${ref.page}${anchorPath}`;
+            }
+            return `/pages/${ref.page}${anchorPath}`;
+        },
+    },
+
+    file: {
+        resolve: (src) => {
+            const match = src.match(/^(\/spaces\/([\w-]+))?\/files\/([\w-]+)$/);
+            if (match?.[3]) {
+                return {
+                    kind: 'file',
+                    file: match[3],
+                    ...(match[2] ? { space: match[2] } : {}),
+                };
+            }
+
+            return null;
+        },
+        format: (ref) => {
+            const filePath = `/files/${ref.file}`;
+            if (ref.space) {
+                return `/spaces/${ref.space}${filePath}`;
+            }
+            return filePath;
+        },
+    },
+
+    space: {
+        resolve: (src) => {
+            const match = src.match(/^\/spaces\/([\w-]+)$/);
+            if (match?.[1]) {
+                return {
+                    kind: 'space',
+                    space: match[1],
+                };
+            }
+
+            return null;
+        },
+        format: (ref) => `/spaces/${ref.space}`,
+    },
+
+    collection: {
+        resolve: (src) => {
+            const match = src.match(/^\/collections\/([\w-]+)$/);
+            if (match?.[1]) {
+                return {
+                    kind: 'collection',
+                    collection: match[1],
+                };
+            }
+
+            return null;
+        },
+        format: (ref) => `/collections/${ref.collection}`,
+    },
+
+    user: {
+        resolve: (src) => {
+            const match = src.match(/^\/users\/([\w-]+)$/);
+            if (match?.[1]) {
+                return {
+                    kind: 'user',
+                    user: match[1],
+                };
+            }
+
+            return null;
+        },
+        format: (ref) => `/users/${ref.user}`,
+    },
+
+    'reusable-content': {
+        resolve: (src) => {
+            const match = src.match(/^(\/spaces\/([\w-]+))?\/reusable-content\/([\w-]+)$/);
+            if (match?.[3]) {
+                return {
+                    kind: 'reusable-content',
+                    ...(match[2] ? { space: match[2] } : {}),
+                    reusableContent: match[3],
+                };
+            }
+
+            return null;
+        },
+        format: (ref) => {
+            const reusableContentPath = `/reusable-content/${ref.reusableContent}`;
+            if (ref.space) {
+                return `/spaces/${ref.space}${reusableContentPath}`;
+            }
+            return reusableContentPath;
+        },
+    },
+
+    tag: {
+        resolve: (src) => {
+            const match = src.match(/^(\/spaces\/([\w-]+))?\/tags\/([\w-]+)$/);
+            if (match?.[3]) {
+                return {
+                    kind: 'tag',
+                    ...(match[2] ? { space: match[2] } : {}),
+                    tag: match[3],
+                };
+            }
+
+            return null;
+        },
+        format: (ref) => {
+            const tagPath = `/tags/${ref.tag}`;
+            if (ref.space) {
+                return `/spaces/${ref.space}${tagPath}`;
+            }
+            return tagPath;
+        },
+    },
+
+    openapi: {
+        resolve: (src) => {
+            const match = src.match(/^\/openapi\/([^/]+)$/);
+            if (match?.[1]) {
+                return {
+                    kind: 'openapi',
+                    spec: match[1],
+                };
+            }
+
+            return null;
+        },
+        format: (ref) => `/openapi/${ref.spec}`,
+    },
+};

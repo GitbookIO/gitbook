@@ -26,7 +26,7 @@ async function OpenAPIOperationBody(props: BlockProps<AnyOpenAPIOperationsBlock>
         return null;
     }
 
-    const { data, specUrl, error } = await resolveOpenAPIOperationBlock({
+    const { data, specUrl, publicURL, error } = await resolveOpenAPIOperationBlock({
         block,
         context: context.contentContext,
     });
@@ -46,7 +46,15 @@ async function OpenAPIOperationBody(props: BlockProps<AnyOpenAPIOperationsBlock>
     return (
         <BaseOpenAPIOperation
             data={data}
-            context={getOpenAPIContext({ props, specUrl, context: context.contentContext })}
+            context={getOpenAPIContext({
+                props,
+                specUrl: publicURL,
+                context: context.contentContext,
+                expandAllResponses:
+                    data.operation['x-expandAllResponses'] ?? data['x-expandAllResponses'],
+                expandAllModelSections:
+                    data.operation['x-expandAllModelSections'] ?? data['x-expandAllModelSections'],
+            })}
             className="openapi-block"
         />
     );

@@ -3,8 +3,13 @@
 import { tString, useLanguage } from '@/intl/client';
 import { setLocalStorageItem } from '@/lib/browser';
 import type { ResolvedContentRef } from '@/lib/references';
+import { getLocalizedMessage, getLocalizedTitle } from '@/lib/sites';
 import { tcls } from '@/lib/tailwind';
-import { type CustomizationAnnouncement, SiteInsightsLinkPosition } from '@gitbook/api';
+import {
+    type CustomizationAnnouncement,
+    SiteInsightsLinkPosition,
+    type TranslationLanguage,
+} from '@gitbook/api';
 import { Icon, type IconName } from '@gitbook/icons';
 import { CONTAINER_STYLE } from '../layout';
 import { Button, Link } from '../primitives';
@@ -16,11 +21,14 @@ import { ANNOUNCEMENT_CSS_CLASS, ANNOUNCEMENT_STORAGE_KEY } from './constants';
  */
 export function AnnouncementBanner(props: {
     announcement: CustomizationAnnouncement;
+    locale: TranslationLanguage | undefined;
     contentRef: ResolvedContentRef | null;
 }) {
-    const { announcement, contentRef } = props;
+    const { announcement, locale, contentRef } = props;
 
     const language = useLanguage();
+    const message = getLocalizedMessage(announcement, locale);
+    const linkTitle = announcement.link ? getLocalizedTitle(announcement.link, locale) : undefined;
 
     const hasLink = announcement.link && contentRef?.href;
     const closeable = announcement.style !== 'danger';
@@ -61,7 +69,7 @@ export function AnnouncementBanner(props: {
                             className={`mt-0.5 mr-3 size-4 shrink-0 ${style.iconColor}`}
                         />
                         <div>
-                            {announcement.message}
+                            {message}
                             {hasLink ? (
                                 <div className={tcls(LinkStyles, style.link, 'ml-1 inline')}>
                                     {contentRef?.icon ? (
@@ -69,9 +77,7 @@ export function AnnouncementBanner(props: {
                                             {contentRef?.icon}
                                         </span>
                                     ) : null}
-                                    {announcement.link?.title && (
-                                        <span className="mr-1">{announcement.link?.title}</span>
-                                    )}
+                                    {linkTitle ? <span className="mr-1">{linkTitle}</span> : null}
                                     <Icon
                                         icon={
                                             announcement.link?.to.kind === 'url'

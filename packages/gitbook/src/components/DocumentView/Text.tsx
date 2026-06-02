@@ -12,8 +12,8 @@ import type {
 } from '@gitbook/api';
 import React from 'react';
 
+import { backgroundColorToStyle, textColorToStyle } from '@/lib/colors';
 import { tcls } from '@/lib/tailwind';
-import { backgroundColorToStyle, textColorToStyle } from './utils/colors';
 
 export function Text(props: { text: DocumentText }) {
     const { text } = props;
@@ -102,7 +102,8 @@ function Code(props: MarkedLeafProps<DocumentMarkCode>) {
                 'text-[.875em]',
                 // We ensure that the code is not making the parent bigger, especially in headings
                 'leading-[calc(max(1.20em,1.25rem))]',
-                'break-all'
+                'break-words',
+                'hyphens-none'
             )}
         >
             {props.children}

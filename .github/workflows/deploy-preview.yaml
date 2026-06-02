@@ -40,6 +40,7 @@ jobs:
                   vercelToken: ${{ secrets.VERCEL_TOKEN }}
                   opItem: op://gitbook-open/2v-preview
                   opServiceAccount: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+                  headSha: ${{ github.event.pull_request.head.sha || github.sha }}
     deploy-v2-cloudflare:
         name: Deploy v2 to Cloudflare Worker (preview)
         runs-on: ubuntu-latest

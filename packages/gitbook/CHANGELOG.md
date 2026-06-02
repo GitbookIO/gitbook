@@ -1,5 +1,171 @@
 # gitbook
 
+## 0.26.2
+
+### Patch Changes
+
+- 67f31aa: Allow user-triggered AI assistants (ChatGPT-User, Claude-User, Perplexity-User) to read pages on non-indexable sites, so end-users can pull content into an LLM without an MCP connection. Search engines and training crawlers remain blocked.
+- 0c577a0: Allow CORS for the same root domain
+- 51fef84: Remove the date-gated header logo height logic and always apply the compact logo size to prevent size shifts between sections and translations.
+- f405fff: Add icon support in tab items
+- 3697dfe: Add support for hiding page actions from page layout options.
+- 127ef54: Add tag filtering controls for Updates blocks.
+
+## 0.26.1
+
+### Patch Changes
+
+- b70b8fd: Fix llms-full.txt pagination to include pages from all site sections.
+- 6ba5e54: Support isComposing for search
+- 47c8ccb: Render icons as svg markup
+- a9ba996: Fix left/right aligment of images with caption
+- 56aeb19: Fix events tracked from the middleware missing some properties.
+- Updated dependencies [47c8ccb]
+- Updated dependencies [37a9453]
+  - @gitbook/icons@0.5.0
+  - @gitbook/embed@0.5.1
+  - @gitbook/react-contentkit@0.7.16
+
+## 0.26.0
+
+### Minor Changes
+
+- d3d5150: Add "Content-Signal" to "robots.txt"
+- 7595706: Allow AI agents to ask questions and get the answer in markdown when fetching with `?ask=<question>`.
+- a17ab65: Support variant selector in hidden section
+
+### Patch Changes
+
+- d1a2958: Skip AI questions when it matches the example provided to agents / crawlers.
+- e3aca9e: Fix embeddable search links
+- 4b78672: Fix links to other spaces/sections in the llms.txt.
+- d1a2958: Pass visitor session to Ask AI.
+
+## 0.25.1
+
+### Patch Changes
+
+- aa1fc24: Add support for sticky first column in tables
+
+## 0.25.0
+
+### Minor Changes
+
+- 88c38fa: Add Search tab to Docs Embed, refactor search
+- 709964f: Rework page layout
+
+### Patch Changes
+
+- 789c2fa: Adjust empty TOC logic and layout
+- 8d2a95b: Docs Embed: Better support light/dark mode overrides
+- 7fd381c: Hide empty sidebar on OpenAPI pages
+- 723e579: Fix rendering multi-expandable block in a column
+- 68c842b: Translations dropdown should show language spaces that best matches the current space title
+- Updated dependencies [8d2a95b]
+- Updated dependencies [88c38fa]
+  - @gitbook/embed@0.5.0
+
+## 0.24.0
+
+### Minor Changes
+
+- 50653ab: Redirect sitemap.md and .well-known/sitemap.md to llms.txt.
+- 50653ab: Improve AI agent detection and readability by outputting 200 for page not found.
+
+### Patch Changes
+
+- 126d4b7: Improve Assistant form controls
+- Updated dependencies [8242f18]
+  - @gitbook/expr@1.2.5
+  - @gitbook/react-openapi@1.5.12
+
+## 0.23.2
+
+### Patch Changes
+
+- Updated dependencies [ab17ff4]
+  - @gitbook/icons@0.4.6
+  - @gitbook/react-contentkit@0.7.15
+
+## 0.23.1
+
+### Patch Changes
+
+- Updated dependencies [3c141f0]
+  - @gitbook/icons@0.4.5
+  - @gitbook/react-contentkit@0.7.14
+
+## 0.23.0
+
+### Minor Changes
+
+- 8e5a2aa: Pan and zoom controls for mermaid diagrams
+
+### Patch Changes
+
+- b77c4fc: Add getPage MCP tool
+- 31e77d4: Track new events for site analytics.
+- f884477: Associate questions asked in the embeddable assistant to the proper channel.
+- deabce9: Sort results by score to mix records and pages.
+- 4909044: Add Claude Code and Codex connect actions
+- da648ca: Fix regressions in Assistant UX
+- 3ce7e52: Fix Variant dropdown not showing in GitBook embed
+- 7f4e644: Small OpenAPI Improvements
+- 4787b7e: Use localized titles/descriptions for site entities
+- 7ab6351: Import site redirect patterns from @gitbook/api
+- b40465e: Fix normalization of URL causing invalid redirections.
+- b5d6f2e: Fix translation quality across 11 locales
+- 3151864: Track events from the proper server URL.
+- 16bfafe: Add option to sticky header row in tables
+- 7c2823c: Fix full width header alignment
+- c4a2604: Fix PDF export crash when page contains an OpenAPI block
+- c56b569: Support expand-all options for OpenAPI
+- Updated dependencies [7f4e644]
+- Updated dependencies [b5d6f2e]
+- Updated dependencies [9dd2db6]
+- Updated dependencies [c56b569]
+- Updated dependencies [ccd21e4]
+  - @gitbook/react-openapi@1.5.11
+  - @gitbook/openapi-parser@3.0.11
+  - @gitbook/icons@0.4.4
+  - @gitbook/react-contentkit@0.7.13
+
+## 0.22.3
+
+### Patch Changes
+
+- f182680: Add backward compatibility for OpenAPI spec content URL
+- bdc6cd9: Use OpenAPI publicURL as Scalar specUrl
+- b3875a1: Refactor embeddable context to merge local & site properties in one unified way
+- eceec6f: Move ~scalar/proxy route to site route group
+- 887c3f8: Add token verification on OpenAPI proxy
+- d666212: Add support for localized site section titles
+- Updated dependencies [b3875a1]
+- Updated dependencies [bdc6cd9]
+- Updated dependencies [8ab419a]
+- Updated dependencies [eceec6f]
+- Updated dependencies [887c3f8]
+  - @gitbook/embed@0.4.0
+  - @gitbook/react-openapi@1.5.10
+  - @gitbook/openapi-parser@3.0.10
+
+## 0.22.2
+
+### Patch Changes
+
+- e074283: Add server-side proxy for Scalar API client to bypass CORS
+- afa868e: Show "Ask Assistant" search result immediately
+- 0803db0: Track opening of search results for records and in the assistant.
+- cb71511: Wrap tracking call with waitUntil
+- 4a6f91a: Show social accounts in header
+- 370b731: Docs Embed: Make trademark optional
+- afa476c: Add server-side insight event tracking for MCP route
+- Updated dependencies [e074283]
+- Updated dependencies [370b731]
+  - @gitbook/openapi-parser@3.0.9
+  - @gitbook/react-openapi@1.5.9
+  - @gitbook/embed@0.3.0
+
 ## 0.22.1
 
 ### Patch Changes

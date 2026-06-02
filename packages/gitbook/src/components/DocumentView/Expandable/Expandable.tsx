@@ -1,6 +1,8 @@
 import type { DocumentBlockExpandable } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
 
+import { getSpaceLanguage, tString } from '@/intl/server';
+import { defaultLanguage } from '@/intl/translations';
 import { getNodeFragmentByType } from '@/lib/document';
 import { tcls } from '@/lib/tailwind';
 
@@ -10,7 +12,7 @@ import { Blocks } from '../Blocks';
 import { Inlines } from '../Inlines';
 import { Details } from './Details';
 
-export function Expandable(props: BlockProps<DocumentBlockExpandable>) {
+export async function Expandable(props: BlockProps<DocumentBlockExpandable>) {
     const { block, style, ancestorBlocks, document, context } = props;
 
     const title = getNodeFragmentByType(block, 'expandable-title');
@@ -25,6 +27,10 @@ export function Expandable(props: BlockProps<DocumentBlockExpandable>) {
 
     let id = block.meta?.id ?? '';
     id = context.getId ? context.getId(id) : id;
+
+    const language = context.contentContext
+        ? await getSpaceLanguage(context.contentContext)
+        : defaultLanguage;
 
     return (
         <Details
@@ -68,7 +74,7 @@ export function Expandable(props: BlockProps<DocumentBlockExpandable>) {
                 />
                 <a
                     href={`#${id}`}
-                    aria-label="Direct link to heading"
+                    aria-label={tString(language, 'direct_link_to_heading')}
                     className={tcls(
                         'absolute',
                         'top-2',

@@ -18,7 +18,7 @@ export function AnnotationPopover(props: { children: React.ReactNode; body: Reac
             arrowProps={{ className: 'fill-tint-1' }}
         >
             <dfn
-                data-testid="annotation-button"
+                data-annotation=""
                 className="cursor-help underline decoration-1 decoration-dotted underline-offset-2"
                 // biome-ignore lint/a11y/noNoninteractiveTabindex: we want to be able to focus the definition to open the tooltip
                 tabIndex={0}

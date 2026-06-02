@@ -23,6 +23,7 @@ export function OpenAPISchemaItem(props: {
             icon={context.icons.plus}
             header={name}
             label={(isExpanded) => getDisclosureLabel({ schema, isExpanded, context })}
+            defaultExpanded={context.expandAllModelSections}
         >
             <Section className="openapi-section-schemas">
                 <SectionBody>

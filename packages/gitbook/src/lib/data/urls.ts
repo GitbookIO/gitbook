@@ -1,4 +1,5 @@
 import { isProxyRootRequest } from '../proxy';
+import { DataFetcherError, getExposableError } from './errors';
 
 /**
  * For a given GitBook URL, return a list of alternative URLs that could be matched against to lookup the content.
@@ -118,13 +119,89 @@ export function getURLLookupAlternatives(input: URL) {
 }
 
 /**
+ * Normalize the URL in a request and redirect if the normalized URL is different from the original one.
+ */
+export function normalizeRequestURL(url: URL): Response | null {
+    try {
+        const normalizedURL = normalizeURL(url);
+
+        if (normalizedURL.toString() !== url.toString()) {
+            return Response.redirect(normalizedURL.toString(), 302);
+        }
+
+        return null;
+    } catch (error) {
+        const sanitized = getExposableError(error);
+        return new Response(sanitized.message, { status: sanitized.code });
+    }
+}
+
+/**
  * Normalize a URL to remove duplicate slashes and trailing slashes
  * and transform the pathname to lowercase.
  */
 export function normalizeURL(url: URL) {
     const result = new URL(url);
+
+    // Reject excessively long paths up-front to bound per-request work.
+    if (url.pathname.length > 2048) {
+        throw new DataFetcherError('URL path is too long.', 400);
+    }
+
     result.pathname = url.pathname.replace(/\/{2,}/g, '/').replace(/\/$/, '');
-    return result;
+    return decodeURLPath(result);
+}
+
+/**
+ * Decode the url path component, we redirect URLs with encoded path components
+ * so that we don't end up with multiple URLs for the same content (especially important because of caching).
+ * If after decoding the path contains invalid characters, we throw an error.
+ * We limit the number of decoding passes to 2 to prevent DoS attacks via deeply-nested
+ * percent-encoding. Legitimate URLs are at most singly encoded; double-encoding covers
+ * any reasonable proxy behaviour.
+ */
+function decodeURLPath(url: URL): URL {
+    let current = url;
+
+    for (let i = 0; i < 2; i++) {
+        const decoded = new URL(current);
+        decoded.pathname = current.pathname
+            .split('/')
+            .map((segment) => {
+                let result: string;
+                try {
+                    result = decodeURIComponent(segment);
+                } catch {
+                    throw new DataFetcherError(`URL path is malformed: ${url.pathname}`, 400);
+                }
+                // TODO: We should reenable this at one point, we just need to be more careful with what's allowed or not.
+                // if (containsInvalidURLCharacters(result)) {
+                //     throw new DataFetcherError(
+                //         `URL path contains invalid characters: ${url.pathname}`,
+                //         400
+                //     );
+                // }
+                return result;
+            })
+            .join('/');
+
+        if (decoded.pathname === current.pathname) {
+            // Path is stable: the URL parser has re-encoded the decoded characters
+            // back to their percent-encoded form (e.g. space → %20). This is the
+            // canonical representation — decoding is complete.
+            return decoded;
+        }
+
+        current = normalizeURL(decoded);
+
+        if (!current.pathname.includes('%')) {
+            // No remaining encoded characters – decoding is complete.
+            return current;
+        }
+    }
+
+    // Still has encoded characters after the maximum number of decoding passes.
+    throw new DataFetcherError(`URL path is malformed: ${url.pathname}`, 400);
 }
 
 /**

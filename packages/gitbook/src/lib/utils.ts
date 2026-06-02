@@ -50,7 +50,7 @@ export function defaultCustomization(): api.SiteCustomizationSettings {
             groups: [],
         },
         themes: {
-            default: api.CustomizationThemeMode.Light,
+            default: api.CustomizationDefaultThemeMode.Light,
             toggeable: true,
         },
         pdf: {

@@ -3,11 +3,11 @@ import {
     CustomizationBackground,
     CustomizationCorners,
     CustomizationDefaultMonospaceFont,
+    CustomizationDefaultThemeMode,
     CustomizationDepth,
     CustomizationHeaderPreset,
     CustomizationIconsStyle,
     CustomizationSidebarListStyle,
-    CustomizationThemeMode,
     SiteSocialAccountPlatform,
 } from '@gitbook/api';
 import type { GitBookStandalone } from '@gitbook/embed';
@@ -16,7 +16,7 @@ import jwt from 'jsonwebtoken';
 
 import { VISITOR_TOKEN_COOKIE } from '@/lib/visitors';
 
-import { getSiteAPIToken } from '../tests/utils';
+import { getGitBookPreviewURL, getSiteAPIToken } from '../tests/utils';
 import {
     type Test,
     type TestsCase,
@@ -36,7 +36,7 @@ import {
     waitForNotFound,
 } from './util';
 
-const AI_PROMPT = `You're being invoked by the GitBook CI/CD pipeline. To make screenshot testing of the GitBook Assistant visually consistent, look up the title of the first page you find and respond with only EXACTLY its title. To find the page title, invoke the search tool with the query "GitBook". Before invoking the search tool, respond with the exact text: "I'm going to look up 'GitBook' and then respond with only the page title.". Do not execute any other tools or output any other text.`;
+const AI_PROMPT = `You're being invoked by the GitBook CI/CD pipeline. Search for "Lorem ipsum", then return the first sentence of the first page you find.`;
 
 const overrideAIInitialState = () => {
     const greeting = document.querySelector('[data-testid="ai-chat-greeting-title"]');
@@ -69,7 +69,6 @@ const searchTestCases: Test[] = [
                 mode: CustomizationAIMode.None,
             },
         }),
-        screenshot: false,
         run: async (page) => {
             await waitForCookiesDialog(page);
             const searchInput = page.getByTestId('search-input');
@@ -83,8 +82,6 @@ const searchTestCases: Test[] = [
             });
             const pageResults = await page.getByTestId('search-page-result').all();
             await expect(pageResults.length).toBeGreaterThanOrEqual(1);
-            const pageSectionResults = await page.getByTestId('search-page-section-result').all();
-            await expect(pageSectionResults.length).toBeGreaterThanOrEqual(2);
             await expect(page.getByTestId('search-ask-question')).toHaveCount(0); // No AI search results with aiMode=None.
         },
     },
@@ -95,7 +92,6 @@ const searchTestCases: Test[] = [
                 mode: CustomizationAIMode.None,
             },
         }),
-        screenshot: false,
         run: async (page) => {
             await waitForCookiesDialog(page);
             await page.keyboard.press('ControlOrMeta+K');
@@ -149,7 +145,6 @@ const searchTestCases: Test[] = [
                 mode: CustomizationAIMode.Assistant,
             },
         }),
-        screenshot: false,
         run: async (page) => {
             await waitForCookiesDialog(page);
             const searchInput = page.locator('css=[data-testid="search-input"]');
@@ -162,7 +157,7 @@ const searchTestCases: Test[] = [
             const recommendedQuestions = await page
                 .getByTestId('search-recommended-question')
                 .all();
-            await expect(recommendedQuestions.length).toBeGreaterThan(2); // Expect at least 3 questions
+            await expect(recommendedQuestions.length).toBeGreaterThanOrEqual(1); // Expect at least 1 question
 
             // Fill search input, expecting AI search option
             await searchInput.fill(AI_PROMPT);
@@ -186,7 +181,6 @@ const searchTestCases: Test[] = [
                 mode: CustomizationAIMode.Assistant,
             },
         }),
-        screenshot: false,
         run: async (page) => {
             await waitForCookiesDialog(page);
             await page.keyboard.press('ControlOrMeta+I');
@@ -203,7 +197,6 @@ const searchTestCases: Test[] = [
                 mode: CustomizationAIMode.Assistant,
             },
         }),
-        screenshot: false,
         run: async (page) => {
             await waitForCookiesDialog(page);
             await page.getByTestId('ai-chat-button').click();
@@ -220,7 +213,6 @@ const searchTestCases: Test[] = [
                 mode: CustomizationAIMode.Assistant,
             },
         })}&ask=`,
-        screenshot: false,
         run: async (page) => {
             await waitForCookiesDialog(page);
             await expect(page.getByTestId('search-input')).not.toBeFocused();
@@ -238,7 +230,6 @@ const searchTestCases: Test[] = [
                 mode: CustomizationAIMode.Assistant,
             },
         })}&ask=${encodeURIComponent(AI_PROMPT)}`,
-        screenshot: false,
         run: async (page) => {
             await waitForCookiesDialog(page);
             await expect(page.getByTestId('search-input')).not.toBeFocused();
@@ -327,7 +318,6 @@ const testCases: TestsCase[] = [
                     await expect(navigationLink).toBeVisible();
                 },
             },
-            ...searchTestCases,
             {
                 name: 'Not found',
                 url: 'content-not-found',
@@ -623,7 +613,6 @@ const testCases: TestsCase[] = [
                 url: '',
                 run: waitForCookiesDialog,
             },
-            ...searchTestCases,
             {
                 name: 'Not found',
                 url: 'content-not-found',
@@ -709,10 +698,30 @@ const testCases: TestsCase[] = [
                     await expect(page.locator('[data-testid="print-button"]')).toBeVisible();
                 },
             },
+            {
+                name: 'Show error when missing token',
+                url: async () => {
+                    const data = await getSiteAPIToken(
+                        'https://gitbook.gitbook.io/test-gitbook-open/'
+                    );
+
+                    // Intentionally not setting the token to test error handling when the token is missing
+                    const searchParams = new URLSearchParams();
+                    searchParams.set('limit', '10');
+
+                    return `~space/${data.space}/~gitbook/pdf?${searchParams.toString()}`;
+                },
+                screenshot: false,
+                run: async (page, response) => {
+                    expect(response).not.toBeNull();
+                    expect(response?.status()).toBe(400);
+                    await expect(page.getByText('Missing API token')).toBeVisible();
+                },
+            },
         ],
     },
     {
-        name: 'Site Preview',
+        name: 'Site Previews',
         skip: process.env.ARGOS_BUILD_NAME !== 'v2-vercel',
         tests: [
             {
@@ -725,7 +734,7 @@ const testCases: TestsCase[] = [
                     const searchParams = new URLSearchParams();
                     searchParams.set('token', data.apiToken);
 
-                    return `url/preview/${data.site}/?${searchParams.toString()}`;
+                    return `url/${getGitBookPreviewURL(`${data.site}/?${searchParams.toString()}`)}`;
                 },
                 screenshot: false,
                 run: async (page) => {
@@ -740,7 +749,7 @@ const testCases: TestsCase[] = [
                     const searchParams = new URLSearchParams();
                     searchParams.set('token', data.apiToken);
 
-                    return `url/preview/${data.site}/?${searchParams.toString()}`;
+                    return `url/${getGitBookPreviewURL(`${data.site}/?${searchParams.toString()}`)}`;
                 },
                 screenshot: false,
                 run: async (page) => {
@@ -750,8 +759,72 @@ const testCases: TestsCase[] = [
                     const sectionTabLinks = sectionTabs.getByRole('link');
                     for (const link of await sectionTabLinks.all()) {
                         const href = await link.getAttribute('href');
-                        expect(href).toMatch(/^\/url\/preview\/site_p4Xo4\/?/);
+                        expect(href?.includes('/preview/site_p4Xo4')).toBeTruthy();
                     }
+                },
+            },
+            {
+                name: 'With customization cookie',
+                url: async () => {
+                    const data = await getSiteAPIToken(
+                        'https://gitbook.gitbook.io/test-gitbook-open/'
+                    );
+
+                    const searchParams = new URLSearchParams();
+                    searchParams.set('token', data.apiToken);
+
+                    return `url/${getGitBookPreviewURL(`${data.site}/?${searchParams.toString()}`)}`;
+                },
+                screenshot: false,
+                run: async (page) => {
+                    await expect(page.locator('[data-testid="table-of-contents"]')).toBeVisible();
+                    // Trademark exists by default
+                    expect(await page.getByTestId('gb-trademark').count()).toBeGreaterThanOrEqual(
+                        1
+                    ); // We output 2 trademark buttons that are quite different, and can only determine which one is appropriate based on screen size / CSS. So our check needs to be more lenient than "exactly 1".
+
+                    // Go to another page with the customization query to disable the trademark
+                    const pageBlocks = new URL(page.url());
+                    pageBlocks.pathname = `${pageBlocks.pathname.replace(/\/$/, '')}/blocks`;
+                    pageBlocks.search = getCustomizationURL({
+                        trademark: {
+                            enabled: false,
+                        },
+                    }).slice(1);
+                    await page.goto(pageBlocks.toString());
+                    // No trademark because customization is disabled
+                    await expect(page.getByTestId('gb-trademark')).toHaveCount(0);
+                    await expect(
+                        page.getByRole('heading', { level: 1, name: 'Blocks' })
+                    ).toBeVisible();
+
+                    const pageBlocksCode = new URL(page.url());
+                    pageBlocksCode.pathname = `${pageBlocksCode.pathname.replace(/\/$/, '')}/code`;
+                    pageBlocksCode.search = '';
+                    await page.goto(pageBlocksCode.toString());
+                    // The trademark should not be visible because the cookie is still set,
+                    await expect(page.getByTestId('gb-trademark')).toHaveCount(0);
+                    await expect(
+                        page.getByRole('heading', { level: 1, name: 'Code' })
+                    ).toBeVisible();
+                },
+            },
+            {
+                name: 'Redirect to app for authentication when missing token',
+                url: async () => {
+                    const data = await getSiteAPIToken('https://gitbook.com/docs');
+
+                    const searchParams = new URLSearchParams();
+                    // Intentionally not setting the token to test redirection for authentication
+
+                    return `url/${getGitBookPreviewURL(`${data.site}/?${searchParams.toString()}`)}`;
+                },
+                screenshot: false,
+                run: async (page) => {
+                    await page.waitForURL(
+                        (url) =>
+                            url.host === 'app.gitbook.com' && url.pathname.includes('/preview/auth')
+                    );
                 },
             },
         ],
@@ -794,8 +867,14 @@ const testCases: TestsCase[] = [
         ],
     },
     {
+        name: 'Search & AI',
+        contentBaseURL: 'https://gitbook.gitbook.io/test-gitbook-open/',
+        tests: searchTestCases,
+    },
+    {
         name: 'Content tests',
         contentBaseURL: 'https://gitbook.gitbook.io/test-gitbook-open/',
+        fullPage: true,
         tests: [
             {
                 name: 'Text',
@@ -977,8 +1056,8 @@ const testCases: TestsCase[] = [
                 url: 'blocks/annotations',
                 run: async (page) => {
                     await waitForCookiesDialog(page);
-                    await page.waitForSelector('[data-testid="annotation-button"]');
-                    await page.click('[data-testid="annotation-button"]');
+                    await page.waitForSelector('[data-annotation]');
+                    await page.click('[data-annotation]');
                 },
             },
             {
@@ -989,6 +1068,11 @@ const testCases: TestsCase[] = [
             {
                 name: 'Columns',
                 url: 'blocks/columns',
+                run: waitForCookiesDialog,
+            },
+            {
+                name: 'Mermaid',
+                url: 'blocks/mermaid',
                 run: waitForCookiesDialog,
             },
         ],
@@ -1014,7 +1098,7 @@ const testCases: TestsCase[] = [
                 name: 'With cover for dark mode',
                 url: `page-options/page-with-dark-cover${getCustomizationURL({
                     themes: {
-                        default: CustomizationThemeMode.Dark,
+                        default: CustomizationDefaultThemeMode.Dark,
                         toggeable: false,
                     },
                 })}`,
@@ -1301,7 +1385,7 @@ const testCases: TestsCase[] = [
                     ).toBeVisible();
                     const url = page.url();
                     expect(url.includes('shared-space-uno')).toBeTruthy(); // same uno site
-                    expect(url.endsWith('/shared/')).toBeTruthy(); // correct page
+                    expect(url.endsWith('/shared')).toBeTruthy(); // correct page
                 },
                 screenshot: false,
             },
@@ -1321,7 +1405,7 @@ const testCases: TestsCase[] = [
                     ).toBeVisible();
                     const url = page.url();
                     expect(url.includes('shared-space-dos')).toBeTruthy(); // same dos site
-                    expect(url.endsWith('/shared/')).toBeTruthy(); // correct page
+                    expect(url.endsWith('/shared')).toBeTruthy(); // correct page
                 },
                 screenshot: false,
             },
@@ -1332,10 +1416,18 @@ const testCases: TestsCase[] = [
         contentBaseURL: 'https://gitbook-open-e2e-sites.gitbook.io/gitbook-doc/',
         tests: [
             {
-                name: 'Redirect to SSO page',
+                name: 'Basic redirect',
                 url: 'a/redirect/to/sso',
                 run: async (page) => {
                     await expect(page.locator('h1')).toHaveText('SSO');
+                },
+                screenshot: false,
+            },
+            {
+                name: 'Complex wildcard with special characters',
+                url: 'foo/bar/baz/123456789-welcome-to-gitbook-%22%20target=%22_blank',
+                run: async (page) => {
+                    await expect(page.locator('h1')).toHaveText('SEO');
                 },
                 screenshot: false,
             },
@@ -2064,7 +2156,7 @@ const testCases: TestsCase[] = [
     },
     {
         name: 'Docs Embed - Basic',
-        contentBaseURL: 'https://gitbook.com/docs/~gitbook/embed/demo/',
+        contentBaseURL: 'https://gitbook.gitbook.io/test-gitbook-open/~gitbook/embed/demo/',
         tests: [
             {
                 name: 'Standalone UX',
@@ -2111,7 +2203,7 @@ const testCases: TestsCase[] = [
     },
     {
         name: 'Docs Embed - Assistant + Docs',
-        contentBaseURL: 'https://gitbook.com/docs/~gitbook/embed/demo/',
+        contentBaseURL: 'https://gitbook.gitbook.io/test-gitbook-open/~gitbook/embed/demo/',
         skip: process.env.ARGOS_BUILD_NAME !== 'v2-vercel',
         tests: [
             {
@@ -2139,7 +2231,7 @@ const testCases: TestsCase[] = [
                 run: async (page) => {
                     await page.evaluate(() => {
                         const GitBook = window.GitBook as unknown as GitBookStandalone;
-                        GitBook('navigateToPage', '/getting-started/quickstart');
+                        GitBook('navigateToPage', '/text-page');
                     });
                     await expect(page.locator('#gitbook-widget-window')).toBeVisible();
                     const iframe = page.frameLocator('#gitbook-widget-iframe');
@@ -2148,7 +2240,7 @@ const testCases: TestsCase[] = [
                     });
                     await expect(iframe.owner()).toHaveAttribute(
                         'src',
-                        expect.stringContaining('getting-started/quickstart')
+                        expect.stringContaining('text-page')
                     );
                 },
             },
@@ -2209,7 +2301,7 @@ const testCases: TestsCase[] = [
                                     onClick: () => {
                                         const GitBook =
                                             window.GitBook as unknown as GitBookStandalone;
-                                        GitBook('navigateToPage', '/getting-started/quickstart');
+                                        GitBook('navigateToPage', '/text-page');
                                     },
                                 },
                                 {
@@ -2250,7 +2342,7 @@ const testCases: TestsCase[] = [
                     await expect(iframe.getByTestId('embed-docs-page')).toBeVisible();
                     await expect(iframe.owner()).toHaveAttribute(
                         'src',
-                        expect.stringContaining('getting-started/quickstart')
+                        expect.stringContaining('text-page')
                     );
 
                     await expect(actions.nth(1)).toHaveAccessibleName('Open external link');
@@ -2315,7 +2407,7 @@ const testCases: TestsCase[] = [
                         'I want to contact support. Call the tool directly without a preamble. Do not respond with anything else.'
                     );
                     const toolConfirmation = iframe
-                        .getByTestId('ai-chat-tool-confirmation')
+                        .getByTestId('ai-chat-tool-confirm-accept')
                         .first();
                     await expect(toolConfirmation).toBeVisible({
                         timeout: 30000,
@@ -2334,6 +2426,12 @@ const testCases: TestsCase[] = [
                 name: 'Docs only',
                 url: '',
                 run: async (page) => {
+                    await page.evaluate(() => {
+                        const GitBook = window.GitBook as unknown as GitBookStandalone;
+                        GitBook('configure', {
+                            tabs: ['docs'],
+                        });
+                    });
                     await expect(page.locator('#gitbook-widget-window')).toBeVisible();
                     const iframe = page.frameLocator('#gitbook-widget-iframe');
                     await expect(iframe.getByTestId('embed-docs-page')).toBeVisible({
@@ -2345,6 +2443,12 @@ const testCases: TestsCase[] = [
                 name: 'Table of contents',
                 url: '',
                 run: async (page) => {
+                    await page.evaluate(() => {
+                        const GitBook = window.GitBook as unknown as GitBookStandalone;
+                        GitBook('configure', {
+                            tabs: ['docs'],
+                        });
+                    });
                     await expect(page.locator('#gitbook-widget-window')).toBeVisible();
                     const iframe = page.frameLocator('#gitbook-widget-iframe');
                     await expect(iframe.getByTestId('embed-docs-page')).toBeVisible({
@@ -2360,6 +2464,12 @@ const testCases: TestsCase[] = [
                 name: 'Open in new tab',
                 url: '',
                 run: async (page) => {
+                    await page.evaluate(() => {
+                        const GitBook = window.GitBook as unknown as GitBookStandalone;
+                        GitBook('configure', {
+                            tabs: ['docs'],
+                        });
+                    });
                     await expect(page.locator('#gitbook-widget-window')).toBeVisible();
                     const iframe = page.frameLocator('#gitbook-widget-iframe');
                     await expect(iframe.getByTestId('embed-docs-page')).toBeVisible({

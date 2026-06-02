@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test';
 
-import { isExternalLink } from './link';
+import { isExternalLink, toNonEmbedLink } from './link';
 
 describe('isExternalLink', () => {
     it('treats anchor links as internal', () => {
@@ -52,5 +52,25 @@ describe('isExternalLink', () => {
                 configurable: true,
             });
         }
+    });
+});
+
+describe('toNonEmbedLink', () => {
+    it('removes "~gitbook/embed" from a path', () => {
+        expect(toNonEmbedLink('/~gitbook/embed/docs')).toBe('/docs');
+        expect(toNonEmbedLink('/docs/~gitbook/embed/other')).toBe('/docs/other');
+        expect(toNonEmbedLink('/docs/~gitbook/embed/page/other')).toBe('/docs/other');
+    });
+
+    it('removes "~gitbook/embed/page" from a path', () => {
+        expect(toNonEmbedLink('/~gitbook/embed/page/docs')).toBe('/docs');
+    });
+
+    it('removes "~gitbook/embed" with trailing slash', () => {
+        expect(toNonEmbedLink('/~gitbook/embed/')).toBe('/');
+    });
+
+    it('keeps links unchanged when no embed prefix exists', () => {
+        expect(toNonEmbedLink('/docs')).toBe('/docs');
     });
 });

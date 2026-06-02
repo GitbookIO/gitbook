@@ -22,3 +22,12 @@ export function checkIsExternalURL(input: string): boolean {
 export function checkIsAnchor(input: string): boolean {
     return input.startsWith('#');
 }
+
+/**
+ * Resolve a hash-only anchor against a location while replacing any existing hash.
+ */
+export function resolveAnchorURL(anchor: string, location: Pick<Location, 'href'>): string {
+    const url = new URL(location.href);
+    url.hash = anchor;
+    return `${url.pathname}${url.search}${url.hash}`;
+}

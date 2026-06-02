@@ -1,5 +1,42 @@
 # @gitbook/react-openapi
 
+## 1.5.12
+
+### Patch Changes
+
+- Updated dependencies [8242f18]
+  - @gitbook/expr@1.2.5
+
+## 1.5.11
+
+### Patch Changes
+
+- 7f4e644: Small OpenAPI Improvements
+- b5d6f2e: Fix translation quality across 11 locales
+- 9dd2db6: Support x-gitbook-token-placeholder as TryIt prefill fallback for HTTP auth (basic and bearer)
+- c56b569: Support expand-all options for OpenAPI
+- Updated dependencies [c56b569]
+  - @gitbook/openapi-parser@3.0.11
+
+## 1.5.10
+
+### Patch Changes
+
+- bdc6cd9: Use OpenAPI publicURL as Scalar specUrl
+- 8ab419a: Support x-enable-proxy at operation level
+- eceec6f: Move ~scalar/proxy route to site route group
+- 887c3f8: Add token verification on OpenAPI proxy
+- Updated dependencies [8ab419a]
+  - @gitbook/openapi-parser@3.0.10
+
+## 1.5.9
+
+### Patch Changes
+
+- e074283: Add server-side proxy for Scalar API client to bypass CORS
+- Updated dependencies [e074283]
+  - @gitbook/openapi-parser@3.0.9
+
 ## 1.5.8
 
 ### Patch Changes

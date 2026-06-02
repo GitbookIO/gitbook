@@ -1,20 +1,23 @@
 import { languages } from '@/intl/translations';
 import type { GitBookSiteContext } from '@/lib/context';
+import { getSiteSpaceLanguages, normalizeLanguage } from '@/lib/sites';
 
 /**
  * Categorize the variants of the space into generic and translation variants.
  */
 export function categorizeVariants(context: GitBookSiteContext) {
-    const { siteSpace, visibleSiteSpaces: siteSpaces } = context;
-    const normalizeLanguage = (language: string | undefined) =>
-        language === undefined ? languages.en.locale : language;
+    const { siteSpace } = context;
 
-    const currentLanguage = normalizeLanguage(siteSpace.space.language);
+    // By default, variants only include visible spaces.
+    // If all variants in the current section are hidden, we still show the selector in-place
+    // by falling back to all section variants.
+    const siteSpaces =
+        context.visibleSiteSpaces.length > 0 ? context.visibleSiteSpaces : context.siteSpaces;
+
+    const currentLanguage = normalizeLanguage(context.locale);
 
     // Get all languages of the variants.
-    const variantLanguages = [
-        ...new Set(siteSpaces.map((space) => normalizeLanguage(space.space.language))),
-    ];
+    const variantLanguages = getSiteSpaceLanguages(siteSpaces);
 
     // We show the language picker when there are at least 2 distinct languages.
     // Spaces without an explicit language are treated as English, matching runtime defaults.
@@ -37,14 +40,23 @@ export function categorizeVariants(context: GitBookSiteContext) {
           )
         : [];
 
+    const findPreferredTranslationVariant = (variantLanguage: string) => {
+        const candidateSiteSpaces = translationVariants.filter(
+            (space) => toNormalizedLanguage(space) === variantLanguage
+        );
+
+        return (
+            candidateSiteSpaces.find((candidate) => candidate.title === siteSpace.title) ??
+            candidateSiteSpaces[0]
+        );
+    };
+
     // If there is exactly 1 variant per language, we will use them as-is.
-    // Otherwise, we will create a translation dropdown with the first space of each language.
+    // Otherwise, we will create a translation dropdown with the space that best matches the
+    // current space title for each language, falling back to the first one.
     if (variantLanguages.length !== translationVariants.length) {
         translationVariants = variantLanguages
-            // Get the first space of each language.
-            .map((variantLanguage) =>
-                translationVariants.find((space) => toNormalizedLanguage(space) === variantLanguage)
-            )
+            .map((variantLanguage) => findPreferredTranslationVariant(variantLanguage))
             // Filter out unmatched languages.
             .filter((space) => space !== undefined)
             // Transform the title to include the language name if we have a translation. Otherwise, use the original title.

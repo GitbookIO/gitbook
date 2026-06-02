@@ -86,7 +86,7 @@ function useCopiedStore(stateKey: string) {
 }
 
 /**
- * Cache for the markdown versbion of the page.
+ * Cache for the markdown version of the page.
  */
 const markdownCache = new QuickLRU<string, string>({ maxSize: 10 });
 
@@ -109,7 +109,8 @@ export function ActionCopyMarkdown(props: {
     const fetchMarkdown = async () => {
         setLoading(true);
 
-        const result = await fetch(markdownPageURL).then((res) => res.text());
+        const humanURL = `${markdownPageURL}?displayAgentInstructions=false`;
+        const result = await fetch(humanURL).then((res) => res.text());
         markdownCache.set(markdownPageURL, result);
 
         setLoading(false);
@@ -160,7 +161,7 @@ export function ActionViewAsMarkdown(props: { markdownPageURL: string; type: Pag
             icon="markdown"
             label={tString(language, 'view_page_markdown')}
             description={tString(language, 'view_page_plaintext')}
-            href={markdownPageURL}
+            href={`${markdownPageURL}?displayAgentInstructions=false`}
         />
     );
 }
@@ -266,6 +267,54 @@ export function ActionOpenMCP(props: {
             href={providerInfo.url}
             label={tString(language, 'connect_mcp_to', providerInfo.label)}
             description={tString(language, 'install_mcp_on', providerInfo.label)}
+            icon={providerInfo.icon}
+        />
+    );
+}
+
+/**
+ * Action to copy the MCP install command for a CLI-based provider.
+ */
+export function ActionCopyMCPCommand(props: {
+    siteTitle: string;
+    mcpURL: string;
+    provider: 'claude-code' | 'codex';
+    type: PageActionType;
+}) {
+    const { siteTitle, provider, mcpURL, type } = props;
+    const language = useLanguage();
+
+    const slug =
+        siteTitle
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/^-|-$/g, '') || 'docs';
+
+    const providerInfo = React.useMemo<{ label: string; icon: IconName; command: string }>(() => {
+        switch (provider) {
+            case 'claude-code':
+                return {
+                    label: 'Claude Code',
+                    icon: 'claude',
+                    command: `claude mcp add ${slug} --scope user --transport http ${mcpURL}`,
+                };
+            case 'codex':
+                return {
+                    label: 'Codex',
+                    icon: 'chatgpt',
+                    command: `codex mcp add ${slug} --url ${mcpURL}`,
+                };
+            default:
+                assertNever(provider);
+        }
+    }, [provider, slug, mcpURL]);
+
+    return (
+        <CopyToClipboard
+            type={type}
+            data={providerInfo.command}
+            label={tString(language, 'connect_mcp_to', providerInfo.label)}
+            description={tString(language, 'copy_mcp_install_command', providerInfo.label)}
             icon={providerInfo.icon}
         />
     );
@@ -387,6 +436,7 @@ function PageActionWrapper(props: {
                 size="xsmall"
                 variant="secondary"
                 label={label ?? shortLabel}
+                aria-label={shortLabel}
                 className="bg-tint-base"
                 onClick={onClick}
                 href={href}

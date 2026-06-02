@@ -6,6 +6,7 @@ import {
     CustomizationCorners,
     CustomizationDefaultFont,
     CustomizationDefaultMonospaceFont,
+    CustomizationDefaultThemeMode,
     CustomizationDepth,
     type CustomizationHeaderItem,
     CustomizationHeaderPreset,
@@ -16,7 +17,6 @@ import {
     CustomizationSidebarBackgroundStyle,
     CustomizationSidebarListStyle,
     CustomizationTheme,
-    CustomizationThemeMode,
     type CustomizationThemedColor,
     type SiteCustomizationSettings,
     SiteExternalLinksTarget,
@@ -75,6 +75,10 @@ export type TestsCase = {
     skip?: boolean;
     tests: Array<Test>;
     contentBaseURL?: string;
+    /**
+     * Whether screenshots in this test case should capture the full scrollable page by default.
+     */
+    fullPage?: boolean;
 };
 
 export const allLocales: CustomizationLocale[] = [
@@ -84,9 +88,9 @@ export const allLocales: CustomizationLocale[] = [
     CustomizationLocale.Zh,
 ];
 
-export const allThemeModes: CustomizationThemeMode[] = [
-    CustomizationThemeMode.Light,
-    CustomizationThemeMode.Dark,
+export const allThemeModes: CustomizationDefaultThemeMode[] = [
+    CustomizationDefaultThemeMode.Light,
+    CustomizationDefaultThemeMode.Dark,
 ];
 
 export const allTintColors: Array<{
@@ -240,9 +244,9 @@ export function runTestCases(testCases: TestsCase[]) {
                             .intercom-lightweight-app {
                                 display: none !important;
                             }
-                            `,
+                                `,
                                 threshold: screenshotOptions?.threshold ?? undefined,
-                                fullPage: testEntry.fullPage ?? false,
+                                fullPage: testEntry.fullPage ?? testCase.fullPage ?? false,
                                 beforeScreenshot: async ({ runStabilization }) => {
                                     await runStabilization();
                                     if (screenshotOptions?.waitForTOCScrolling !== false) {
@@ -340,7 +344,7 @@ export function getCustomizationURL(partial: DeepPartial<SiteCustomizationSettin
             groups: [],
         },
         themes: {
-            default: CustomizationThemeMode.Light,
+            default: CustomizationDefaultThemeMode.System,
             toggeable: true,
         },
         pdf: {
@@ -392,11 +396,13 @@ export function getCustomizationURL(partial: DeepPartial<SiteCustomizationSettin
  */
 export async function waitForIcons(page: Page) {
     await page.waitForFunction(() => {
-        const urlStates: Record<
+        type IconURLStates = Record<
             string,
             { state: 'pending'; uri: null } | { state: 'loaded'; uri: string }
-        > = (window as any).__ICONS_STATES__ || {};
-        (window as any).__ICONS_STATES__ = urlStates;
+        >;
+        const iconStatesWindow = window as Window & { __ICONS_STATES__?: IconURLStates };
+        const urlStates: IconURLStates = iconStatesWindow.__ICONS_STATES__ || {};
+        iconStatesWindow.__ICONS_STATES__ = urlStates;
 
         const fetchSvgAsDataUri = async (url: string): Promise<string> => {
             const response = await fetch(url);
@@ -441,7 +447,15 @@ export async function waitForIcons(page: Page) {
 
             const maskImage = icon.querySelector('[data-testid="mask-image"]');
             if (!maskImage) {
-                throw new Error('No mask-image element');
+                const inlineContent = icon.querySelector(
+                    'path, circle, ellipse, line, polygon, polyline, rect, g, use'
+                );
+                if (inlineContent) {
+                    icon.setAttribute('data-argos-state', 'loaded');
+                    return true;
+                }
+
+                throw new Error('Icon has no inline SVG content or mask-image element');
             }
 
             const url = maskImage.getAttribute('href');

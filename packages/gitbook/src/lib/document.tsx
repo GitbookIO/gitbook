@@ -25,7 +25,11 @@ export function hasFullWidthBlock(document: JSONDocument): boolean {
         if (block.data && 'fullWidth' in block.data && block.data.fullWidth) {
             return true;
         }
-        if (block.type === 'swagger' || block.type === 'openapi-operation') {
+        if (
+            block.type === 'swagger' ||
+            block.type === 'openapi-operation' ||
+            block.type === 'openapi-webhook'
+        ) {
             return true;
         }
         return false;

@@ -121,12 +121,6 @@ const config: Config = {
                 periwinkle: generateShades('#acc6ee'),
             },
             backgroundColor: {
-                'mark-blue': '#89C6DA4D',
-                'mark-purple': '#DAD4FF4D',
-                'mark-orange': '#FFDCBC4D',
-                'mark-red': '#FFCCCB4D',
-                'mark-yellow': '#FFF0854D',
-                'mark-green': '#91EABF4D',
                 primary: generateVarShades('primary', [
                     ColorCategory.backgrounds,
                     ColorCategory.components,
@@ -320,19 +314,29 @@ const config: Config = {
                 'fadeIn-slow': 'fadeIn 500ms ease both',
                 fadeOut: 'fadeOut 200ms ease both',
                 'fadeOut-slow': 'fadeOut 500ms ease both',
-                appear: 'appear 200ms ease both allow-discrete',
+                appear: 'fadeIn 1ms ease both',
 
-                blurIn: 'blurIn 200ms ease-out both',
-                'blurIn-slow': 'blurIn 500ms ease-out both',
-                blurOut: 'blurOut 200ms ease-in both',
-                'blurOut-slow': 'blurOut 500ms ease-in both',
+                blurIn: 'blurIn 200ms both',
+                blurInSlow: 'blurIn 500ms both',
+                blurOut: 'blurOut 200ms both',
+                blurOutSlow: 'blurOut 500ms both',
+                blurInDisplay: 'blurInDisplay 200ms both',
+                blurInDisplaySlow: 'blurInDisplay 500ms both',
+                blurOutDisplay: 'blurOutDisplay 200ms both',
+                blurOutDisplaySlow: 'blurOutDisplay 500ms both',
+
+                blurInHeight: 'heightIn 200ms ease-out both, blurIn 200ms 100ms both',
+                blurInHeightSlow: 'heightIn 500ms ease-out both, blurIn 500ms 300ms both',
+                blurOutHeight: 'blurOut 200ms both, heightOut 200ms 100ms ease-out both',
+                blurOutHeightSlow: 'blurOut 500ms both, heightOut 500ms 300ms ease-out both',
 
                 enterFromLeft: 'enterFromLeft 300ms cubic-bezier(0.83, 0, 0.17, 1) both',
                 enterFromRight: 'enterFromRight 300ms cubic-bezier(0.83, 0, 0.17, 1) both',
                 exitToLeft: 'exitToLeft 300ms cubic-bezier(0.83, 0, 0.17, 1) both',
                 exitToRight: 'exitToRight 300ms cubic-bezier(0.83, 0, 0.17, 1) both',
 
-                heightIn: 'heightIn 200ms ease both',
+                heightIn: 'heightIn 500ms ease both',
+                heightOut: 'heightOut 500ms ease both',
                 crawl: 'crawl 2s ease-in-out infinite',
             },
             keyframes: {
@@ -473,18 +477,18 @@ const config: Config = {
                 },
                 enterFromRight: {
                     from: { opacity: '0', transform: 'translateX(50%)', display: 'none' },
-                    to: { opacity: '1', transform: 'translateX(0)', display: 'inherit' },
+                    to: { opacity: '1', transform: 'translateX(0)', display: 'flex' },
                 },
                 enterFromLeft: {
                     from: { opacity: '0', transform: 'translateX(-50%)', display: 'none' },
-                    to: { opacity: '1', transform: 'translateX(0)', display: 'inherit' },
+                    to: { opacity: '1', transform: 'translateX(0)', display: 'flex' },
                 },
                 exitToRight: {
-                    from: { opacity: '1', transform: 'translateX(0)', display: 'inherit' },
+                    from: { opacity: '1', transform: 'translateX(0)', display: 'flex' },
                     to: { opacity: '0', transform: 'translateX(50%)', display: 'none' },
                 },
                 exitToLeft: {
-                    from: { opacity: '1', transform: 'translateX(0)', display: 'inherit' },
+                    from: { opacity: '1', transform: 'translateX(0)', display: 'flex' },
                     to: { opacity: '0', transform: 'translateX(-50%)', display: 'none' },
                 },
                 scaleIn: {
@@ -500,16 +504,61 @@ const config: Config = {
                     '100%': { filter: 'blur(0px)', opacity: '1', transform: 'scale(1)' },
                 },
                 blurOut: {
-                    from: { filter: 'blur(0px)', opacity: '1', transform: 'scale(1)' },
-                    to: { filter: 'blur(16px)', opacity: '0', transform: 'scale(0.95)' },
+                    '0%': { filter: 'blur(0px)', opacity: '1', transform: 'scale(1)' },
+                    '100%': { filter: 'blur(6px)', opacity: '0', transform: 'scale(0.95)' },
+                },
+                blurInDisplay: {
+                    '0%': {
+                        filter: 'blur(6px)',
+                        opacity: '0',
+                        transform: 'scale(0.95)',
+                        display: 'none',
+                    },
+                    '100%': {
+                        filter: 'blur(0px)',
+                        opacity: '1',
+                        transform: 'scale(1)',
+                    },
+                },
+                blurOutDisplay: {
+                    '0%': {
+                        filter: 'blur(0px)',
+                        opacity: '1',
+                        transform: 'scale(1)',
+                    },
+                    to: {
+                        filter: 'blur(6px)',
+                        opacity: '0',
+                        transform: 'scale(0.95)',
+                        display: 'none',
+                    },
                 },
                 fadeOut: {
                     from: { opacity: '1' },
                     to: { opacity: '0' },
                 },
                 heightIn: {
-                    from: { height: '0', opacity: '0' },
-                    to: { height: 'max-content', opacity: '1' },
+                    from: {
+                        height: '0',
+                        paddingTop: '0',
+                        paddingBottom: '0',
+                        marginTop: '0',
+                        marginBottom: '0',
+                        gap: '0',
+                        overflow: 'hidden',
+                    },
+                    to: { height: 'max-content' },
+                },
+                heightOut: {
+                    from: { height: 'max-content' },
+                    to: {
+                        height: '0',
+                        paddingTop: '0',
+                        paddingBottom: '0',
+                        marginTop: '0',
+                        marginBottom: '0',
+                        gap: '0',
+                    },
                 },
                 crawl: {
                     '0%': {
@@ -561,6 +610,40 @@ const config: Config = {
                     '2xl': '1.5em',
                 },
             },
+            width: {
+                screen: {
+                    xs: '480px',
+                    sm: '640px',
+                    md: '768px',
+                    lg: '1024px',
+                    xl: '1280px',
+                    '2xl': '1440px',
+                    '3xl': '1920px',
+                    '4xl': '2144px',
+                },
+            },
+            animationDuration: {
+                '100': '100ms',
+                '200': '200ms',
+                '300': '300ms',
+                '500': '500ms',
+                '1000': '1000ms',
+                '1500': '1500ms',
+                '2000': '2000ms',
+                '2500': '2500ms',
+                '3000': '3000ms',
+            },
+            animationDelay: {
+                '100': '100ms',
+                '200': '200ms',
+                '300': '300ms',
+                '500': '500ms',
+                '1000': '1000ms',
+                '1500': '1500ms',
+                '2000': '2000ms',
+                '2500': '2500ms',
+                '3000': '3000ms',
+            },
         },
         opacity: opacity(),
         screens: {
@@ -569,7 +652,7 @@ const config: Config = {
             md: '768px',
             lg: '1024px',
             xl: '1280px',
-            '2xl': '1536px',
+            '2xl': '1440px',
             '3xl': '1920px',
             '4xl': '2144px',
         },
@@ -662,28 +745,30 @@ const config: Config = {
             }
 
             /**
-             * Variant when the page contains a block that will be rendered in full-width mode.
+             * Layout mode variants for controlling the page structure.
+             * These variants are applied via body:has() selectors, allowing CSS to respond to layout state.
+             *
+             * The layout classes are applied consistently through CONTENT_STYLE in layout.ts and preserved on the
+             * <header> element during navigation (see PreservePageLayout component).
              */
-            addVariant('site-width-wide', 'body:has(.site-width-wide) &');
-            addVariant('site-width-default', 'body:has(.site-width-default) &');
-            addVariant('page-width-wide', 'body:has(.page-width-wide) &');
+            addVariant('layout-default', 'body:has(.layout-default) &');
+            addVariant('layout-wide', 'body:has(.layout-wide) & ');
 
             /**
-             * Variant when the page is configured to hide the table of content.
-             * `page.layout.tableOfContents` is set to false.
+             * TOC, Sidebar, Outline variants
              */
             addVariant('page-no-toc', 'body:has(.page-no-toc) &');
             addVariant('page-has-toc', 'body:has(.page-has-toc) &');
+            /* The left sidebar is shown when the TOC is visible or the page needs a sidebar, for the variant dropdown or if there's no header configured */
+            addVariant('has-sidebar', 'body:has(.page-has-toc, .has-sidebar) &');
+            addVariant('no-sidebar', 'body:has(.page-no-toc):has(.no-sidebar) &');
+            addVariant('page-has-outline', 'body:has([data-gb-page-outline]) &');
+            addVariant('page-no-outline', 'body:not(:has([data-gb-page-outline])) &');
 
             /**
              * Variant when the page contains an OpenAPI block.
              */
             addVariant('page-api-block', 'body:has(.openapi-block) &');
-
-            /**
-             * Variant when the page contains an Updates block.
-             */
-            addVariant('page-updates-block', 'body:has(.updates-block) &');
 
             /**
              * Variant when the page is displayed in print mode.
