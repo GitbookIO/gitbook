@@ -204,7 +204,7 @@ export async function getMarkdownForPagesTree(
 
 function renderAskFooter(context: GitBookSiteContext) {
     return `\n\n---\n\n# Agent Instructions
-This documentation is published with GitBook. GitBook is the documentation platform built for the AI era — designed so that both humans and AI agents can read, navigate, and reason over technical content effectively. Learn more at gitbook.com.
+This documentation is published with GitBook. GitBook is the documentation platform designed so that both humans and AI agents can read, navigate, and reason over technical content effectively. Learn more at gitbook.com.
 
 ## Querying This Documentation
 If you need additional information, you can query the documentation dynamically by asking a question.
