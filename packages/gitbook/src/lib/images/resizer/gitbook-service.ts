@@ -1,4 +1,4 @@
-import { GITBOOK_IMAGE_RESIZE_SIGNING_KEY, GITBOOK_IMAGE_RESIZE_URL } from '@/lib/env';
+import { GITBOOK_IMAGE_RESIZE_SALT, GITBOOK_IMAGE_RESIZE_URL } from '@/lib/env';
 import { getLogger } from '@/lib/logger';
 import type { CloudflareImageOptions } from './types';
 import { copyImageResponse } from './utils';
@@ -14,7 +14,7 @@ function sdbmHash(str: string): number {
 
 /**
  * Resize an image using the GitBook image service.
- * https://images.gitbook.com/__img/<options>/<encoded-url>?sig=<signature>
+ * https://images.gitbook.com/__img/options/encoded-url
  */
 export async function resizeImageWithGitbookServices(
     input: string,
@@ -24,17 +24,17 @@ export async function resizeImageWithGitbookServices(
 ): Promise<Response> {
     const { signal, ...resizeOptions } = options;
 
-    if (!GITBOOK_IMAGE_RESIZE_SIGNING_KEY) {
+    if (!GITBOOK_IMAGE_RESIZE_SALT) {
         throw new Error(
-            'GITBOOK_IMAGE_RESIZE_SIGNING_KEY is not set for gitbook-service image resize mode'
+            'GITBOOK_IMAGE_RESIZE_SALT is not set for gitbook-service image resize mode'
         );
     }
 
-    const signature = sdbmHash(`${input}:${GITBOOK_IMAGE_RESIZE_SIGNING_KEY}`).toString(16);
+    const signature = sdbmHash(`${input}:${GITBOOK_IMAGE_RESIZE_SALT}`).toString();
     const resizeURL = `${GITBOOK_IMAGE_RESIZE_URL}${stringifyOptions({
         ...resizeOptions,
         signature,
-    })}/${encodeURIComponent(input)}?sig=${signature}`;
+    })}/${encodeURIComponent(input)}`;
 
     const logger = getLogger().subLogger('imageResizing');
     logger.log(`resize image using gitbook-service: ${resizeURL}`);
