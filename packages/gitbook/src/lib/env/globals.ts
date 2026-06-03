@@ -105,6 +105,7 @@ export const GITBOOK_FONTS_URL = process.env.GITBOOK_FONTS_URL || 'https://fonts
 export const GITBOOK_IMAGE_RESIZE_URL = process.env.GITBOOK_IMAGE_RESIZE_URL ?? null;
 export const GITBOOK_IMAGE_RESIZE_SIGNING_KEY =
     process.env.GITBOOK_IMAGE_RESIZE_SIGNING_KEY ?? null;
+export const GITBOOK_IMAGE_RESIZE_SALT = process.env.GITBOOK_IMAGE_RESIZE_SALT ?? null;
 
 /**
  * Mode used for resizing images.
@@ -112,7 +113,7 @@ export const GITBOOK_IMAGE_RESIZE_SIGNING_KEY =
 export const GITBOOK_IMAGE_RESIZE_MODE = enforceEnum(
     'GITBOOK_IMAGE_RESIZE_MODE',
     process.env.GITBOOK_IMAGE_RESIZE_MODE || 'cf-fetch',
-    ['cf-fetch', 'gitbook-service']
+    ['cf-fetch', 'gitbook-service', 'cdn-cgi']
 );
 
 /**

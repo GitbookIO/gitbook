@@ -74,6 +74,7 @@ export async function resizeImage(
         case 'cf-fetch':
             return resizeImageWithCFFetch(input, options);
         case 'gitbook-service':
+        case 'cdn-cgi':
             return resizeImageWithGitbookServices(input, options);
         default:
             assertNever(GITBOOK_IMAGE_RESIZE_MODE);
