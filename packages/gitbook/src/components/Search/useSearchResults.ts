@@ -10,6 +10,7 @@ import { useAI } from '@/components/AI';
 import assertNever from 'assert-never';
 import { useTrackEvent } from '../Insights';
 import { type MergedPageResult, reciprocalRankFusion } from './reciprocalRankFusion';
+import { computeFilterSiteSpaceIds } from './filter';
 import { type LocalPageResult, useLocalSearchResults } from './useLocalSearchResults';
 import type { SearchScope } from './useSearch';
 
@@ -20,6 +21,9 @@ export type ResultType =
     | { type: 'recommended-question'; id: string; question: string };
 
 export type { LocalPageResult, MergedPageResult };
+
+// Small helper extracted for unit testing of scope → local filter mapping
+// computeFilterSiteSpaceIds is imported from './filter' for testability
 
 /**
  * We cache the recommended questions globally to avoid calling the API multiple times
@@ -62,19 +66,10 @@ export function useSearchResults(props: {
 
     const trackEvent = useTrackEvent();
 
-    const filterSiteSpaceIds = React.useMemo(() => {
-        switch (scope) {
-            case 'current':
-                return [siteSpaceId];
-            case 'extended':
-                return siteSpaceIds;
-            default:
-                // Align local filtering with remote behavior when no sections exist:
-                // in "default" scope, remote uses current siteSpaceId; apply the same locally
-                // to avoid showing results from other variants.
-                return withSections ? undefined : [siteSpaceId];
-        }
-    }, [scope, siteSpaceId, siteSpaceIds, withSections]);
+    const filterSiteSpaceIds = React.useMemo(
+        () => computeFilterSiteSpaceIds(scope, siteSpaceId, siteSpaceIds, withSections),
+        [scope, siteSpaceId, siteSpaceIds, withSections]
+    );
 
     const { results: localResults } = useLocalSearchResults({
         query,
