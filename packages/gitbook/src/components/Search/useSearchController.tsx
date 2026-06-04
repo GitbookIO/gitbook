@@ -202,6 +202,7 @@ export function useSearchController(props: SearchBaseProps) {
         searchURL,
         indexURL,
         lang: siteSpace.space.language,
+        withSections,
     });
 
     const searchValue = state?.query ?? (withSearchAI || !withAI ? state?.ask : null) ?? '';
