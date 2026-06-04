@@ -43,6 +43,8 @@ export function useSearchResults(props: {
     indexURL: string;
     /** BCP-47 language code of the current site space, used to filter local search results. */
     lang?: string;
+    /** Whether the site has multiple sections. If false, treat default scope as current for local filtering. */
+    withSections?: boolean;
 }) {
     const {
         asEmbeddable,
@@ -55,6 +57,7 @@ export function useSearchResults(props: {
         searchURL,
         indexURL,
         lang,
+        withSections,
     } = props;
 
     const trackEvent = useTrackEvent();
@@ -66,9 +69,12 @@ export function useSearchResults(props: {
             case 'extended':
                 return siteSpaceIds;
             default:
-                return undefined;
+                // Align local filtering with remote behavior when no sections exist:
+                // in "default" scope, remote uses current siteSpaceId; apply the same locally
+                // to avoid showing results from other variants.
+                return withSections ? undefined : [siteSpaceId];
         }
-    }, [scope, siteSpaceId, siteSpaceIds]);
+    }, [scope, siteSpaceId, siteSpaceIds, withSections]);
 
     const { results: localResults } = useLocalSearchResults({
         query,
