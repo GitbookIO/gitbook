@@ -9,8 +9,8 @@ import { streamRecommendedQuestions } from './server-actions';
 import { useAI } from '@/components/AI';
 import assertNever from 'assert-never';
 import { useTrackEvent } from '../Insights';
-import { type MergedPageResult, reciprocalRankFusion } from './reciprocalRankFusion';
 import { computeFilterSiteSpaceIds } from './filter';
+import { type MergedPageResult, reciprocalRankFusion } from './reciprocalRankFusion';
 import { type LocalPageResult, useLocalSearchResults } from './useLocalSearchResults';
 import type { SearchScope } from './useSearch';
 
