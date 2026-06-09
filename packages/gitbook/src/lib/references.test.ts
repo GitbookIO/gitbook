@@ -1,6 +1,10 @@
+import type { Revision, RevisionPageDocument, Space } from '@gitbook/api';
 import { describe, expect, it } from 'bun:test';
 
-import { resolveStringContentRef } from './references';
+import type { GitBookAnyContext } from '@/lib/context';
+import type { GitBookDataFetcher } from '@/lib/data';
+import { createLinker } from '@/lib/links';
+import { resolveContentRef, resolveStringContentRef } from './references';
 
 describe('resolveStringContentRef', () => {
     it.each([
@@ -134,5 +138,131 @@ describe('resolveStringContentRef', () => {
         },
     ])('returns null for $label', ({ input }) => {
         expect(resolveStringContentRef(input)).toBeNull();
+    });
+});
+
+describe('resolveContentRef', () => {
+    it('resolves a page in a different space using that space\'s page data, not the current context page', async () => {
+        const sharedPageId = 'page-shared';
+
+        const spaceAPage = {
+            object: 'page',
+            id: sharedPageId,
+            type: 'document',
+            kind: 'sheet',
+            title: 'Space A Page',
+            path: 'space-a-page',
+            slug: 'space-a-page',
+            pages: [],
+            tags: [],
+            layout: {},
+            urls: { app: 'https://app.gitbook.com/page' },
+        } as unknown as RevisionPageDocument;
+
+        const spaceBPage = {
+            object: 'page',
+            id: sharedPageId,
+            type: 'document',
+            kind: 'sheet',
+            title: 'Space B Page',
+            path: 'space-b-page',
+            slug: 'space-b-page',
+            pages: [],
+            tags: [],
+            layout: {},
+            urls: { app: 'https://app.gitbook.com/page' },
+        } as unknown as RevisionPageDocument;
+
+        const revisionA = {
+            object: 'revision',
+            id: 'rev-a',
+            type: 'edits',
+            pages: [spaceAPage],
+            files: [],
+            reusableContents: [],
+            tags: [],
+            parents: [],
+            createdAt: '',
+            urls: { app: '' },
+        } as unknown as Revision;
+
+        const revisionB = {
+            object: 'revision',
+            id: 'rev-b',
+            type: 'edits',
+            pages: [spaceBPage],
+            files: [],
+            reusableContents: [],
+            tags: [],
+            parents: [],
+            createdAt: '',
+            urls: { app: '' },
+        } as unknown as Revision;
+
+        const spaceA = {
+            object: 'space',
+            id: 'space-a',
+            title: 'Space A',
+            organization: 'org',
+            revision: 'rev-a',
+            urls: {
+                location: 'https://api.gitbook.com/spaces/space-a',
+                app: 'https://app.gitbook.com/o/org/s/space-a/',
+                published: 'https://space-a.gitbook.io/',
+            },
+        } as unknown as Space;
+
+        const spaceB = {
+            object: 'space',
+            id: 'space-b',
+            title: 'Space B',
+            organization: 'org',
+            revision: 'rev-b',
+            urls: {
+                location: 'https://api.gitbook.com/spaces/space-b',
+                app: 'https://app.gitbook.com/o/org/s/space-b/',
+                published: 'https://space-b.gitbook.io/',
+            },
+        } as unknown as Space;
+
+        const dataFetcher = {
+            getSpace: async ({ spaceId }: { spaceId: string; shareKey: string | undefined }) => {
+                if (spaceId === 'space-b') return { data: spaceB };
+                return { error: { code: 404, message: 'Not found' } };
+            },
+            getRevision: async ({ spaceId }: { spaceId: string; revisionId: string }) => {
+                if (spaceId === 'space-b') return { data: revisionB };
+                return { error: { code: 404, message: 'Not found' } };
+            },
+            getChangeRequest: async () => ({ error: { code: 404, message: 'Not found' } }),
+            withToken: function () {
+                return this;
+            },
+        } as unknown as GitBookDataFetcher;
+
+        const context: GitBookAnyContext = {
+            dataFetcher,
+            linker: createLinker({
+                host: 'docs.example.com',
+                spaceBasePath: '/space-a/',
+                siteBasePath: '/',
+            }),
+            organizationId: 'org',
+            space: spaceA,
+            revision: revisionA,
+            revisionId: 'rev-a',
+            changeRequest: null,
+            shareKey: undefined,
+            // This page (from space A) has the same ID as the target page in space B.
+            // It should NOT contaminate resolution in space B.
+            page: spaceAPage,
+        } as unknown as GitBookAnyContext;
+
+        const result = await resolveContentRef(
+            { kind: 'page', space: 'space-b', page: sharedPageId },
+            context
+        );
+
+        expect(result?.text).toBe('Space B Page');
     });
 });
