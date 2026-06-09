@@ -1,5 +1,5 @@
-import type { Revision, RevisionPageDocument, Space } from '@gitbook/api';
 import { describe, expect, it } from 'bun:test';
+import type { Revision, RevisionPageDocument, Space } from '@gitbook/api';
 
 import type { GitBookAnyContext } from '@/lib/context';
 import type { GitBookDataFetcher } from '@/lib/data';
@@ -142,7 +142,7 @@ describe('resolveStringContentRef', () => {
 });
 
 describe('resolveContentRef', () => {
-    it('resolves a page in a different space using that space\'s page data, not the current context page', async () => {
+    it("resolves a page in a different space using that space's page data, not the current context page", async () => {
         const sharedPageId = 'page-shared';
 
         const spaceAPage = {
