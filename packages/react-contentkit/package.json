@@ -6,6 +6,10 @@
         ".": {
             "types": "./dist/index.d.ts",
             "default": "./dist/index.js"
+        },
+        "./client": {
+            "types": "./dist/client.d.ts",
+            "default": "./dist/client.js"
         }
     },
     "sideEffects": false,
