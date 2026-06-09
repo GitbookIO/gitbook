@@ -232,7 +232,9 @@ async function getInlineIconSource(
         const request = pRetry(
             () =>
                 fetch(getIconAssetURL(style, icon), {
-                    cache: 'force-cache',
+                    // There is no benefit in caching this in Vercel, as we already cache in the Runtime Cache.
+                    cache:
+                        process.env.GITBOOK_RUNTIME === 'cloudflare' ? 'force-cache' : 'no-store',
                 }).then(async (response) => {
                     if (!response.ok) {
                         throw new Error('Failed to fetch icon');
@@ -246,6 +248,9 @@ async function getInlineIconSource(
         return await request;
     } catch {
         console.warn(`Failed to fetch icon ${icon} with style ${style} after multiple attempts`);
+        // We don't want to store failed attempts in the cache. Otherwise it may crash subsequent attempts to fetch the same icon and will crash the entire page
+        // It's very visible in dev, where the map will stay around
+        rawSvgPromises.delete(cacheKey);
         return null;
     }
 }
