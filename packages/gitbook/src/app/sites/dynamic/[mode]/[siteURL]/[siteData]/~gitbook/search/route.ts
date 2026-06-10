@@ -158,7 +158,7 @@ function transformSitePageResult(args: {
         pageItem.sections
             ?.filter((section) => section.title || section.body)
             .map<ComputedSectionResult>((section) => {
-                let sectionHref = linker.toPathInSpace(pageItem.path);
+                let sectionHref = linker.toPathInSpace(section.path);
 
                 if (spaceURL) {
                     if (asEmbeddable) {
