@@ -3,6 +3,11 @@ import React from 'react';
 
 import { assert } from 'ts-essentials';
 
+import {
+    type RecommendedQuestionResult,
+    createRecommendedQuestionResult,
+    getEmptySearchResults,
+} from './empty-search-results';
 import type { OrderedComputedResult } from './search-types';
 import { streamRecommendedQuestions } from './server-actions';
 
@@ -10,6 +15,7 @@ import { useAI } from '@/components/AI';
 import assertNever from 'assert-never';
 import { useTrackEvent } from '../Insights';
 import { computeFilterSiteSpaceIds } from './filter';
+import { useRecentSearchQueries } from './recent-queries';
 import { type MergedPageResult, reciprocalRankFusion } from './reciprocalRankFusion';
 import { type LocalPageResult, useLocalSearchResults } from './useLocalSearchResults';
 import type { SearchScope } from './useSearch';
@@ -18,7 +24,7 @@ export type ResultType =
     | OrderedComputedResult
     | LocalPageResult
     | MergedPageResult
-    | { type: 'recommended-question'; id: string; question: string };
+    | RecommendedQuestionResult;
 
 export type { LocalPageResult, MergedPageResult };
 
@@ -31,7 +37,7 @@ export type { LocalPageResult, MergedPageResult };
  * have different recommended questions for different spaces of the same site.
  * It should not be used outside of an useEffect.
  */
-const cachedRecommendedQuestions: Map<string, ResultType[]> = new Map();
+const cachedRecommendedQuestions: Map<string, RecommendedQuestionResult[]> = new Map();
 
 export function useSearchResults(props: {
     asEmbeddable?: boolean;
@@ -91,6 +97,7 @@ export function useSearchResults(props: {
 
     const { assistants } = useAI();
     const withAI = assistants.length > 0;
+    const recentQueries = useRecentSearchQueries(siteSpaceId);
 
     React.useEffect(() => {
         if (disabled) {
@@ -120,7 +127,7 @@ export function useSearchResults(props: {
             // We currently have a bug where the same question can be returned multiple times.
             // This is a workaround to avoid that.
             const questions = new Set<string>();
-            const recommendedQuestions: ResultType[] = [];
+            const recommendedQuestions: RecommendedQuestionResult[] = [];
 
             if (suggestions && suggestions.length > 0) {
                 suggestions.forEach((question) => {
@@ -147,11 +154,7 @@ export function useSearchResults(props: {
                     }
 
                     questions.add(question);
-                    recommendedQuestions.push({
-                        type: 'recommended-question',
-                        id: question,
-                        question,
-                    });
+                    recommendedQuestions.push(createRecommendedQuestionResult(question, question));
                     cachedRecommendedQuestions.set(siteSpaceId, recommendedQuestions);
 
                     if (!cancelled) {
@@ -267,24 +270,24 @@ export function useSearchResults(props: {
     // Re-runs immediately whenever either result set changes.
     const results = React.useMemo<ResultType[]>(() => {
         if (!query) {
-            // No query: show recommended questions (AI-only path) or nothing.
-            if (withAI && cachedRecommendedQuestions.has(siteSpaceId)) {
-                return cachedRecommendedQuestions.get(siteSpaceId) ?? [];
-            }
-            if (suggestions && suggestions.length > 0) {
-                return suggestions.map((question, index) => ({
-                    type: 'recommended-question' as const,
-                    id: `recommended-question-${index}`,
-                    question,
-                }));
-            }
-            return [];
+            const recommendedQuestions =
+                cachedRecommendedQuestions.get(siteSpaceId) ??
+                suggestions?.map((question, index) =>
+                    createRecommendedQuestionResult(`recommended-question-${index}`, question)
+                ) ??
+                [];
+
+            return getEmptySearchResults({
+                withAI,
+                recentQueries,
+                recommendedQuestions,
+            });
         }
 
         const merged = reciprocalRankFusion(localResults, remoteState.results, query);
 
         return merged;
-    }, [localResults, remoteState.results, query, withAI, siteSpaceId, suggestions]);
+    }, [localResults, remoteState.results, query, withAI, siteSpaceId, suggestions, recentQueries]);
 
     return {
         results,

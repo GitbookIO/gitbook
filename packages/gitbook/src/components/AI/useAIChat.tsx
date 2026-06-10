@@ -2,6 +2,7 @@
 
 import * as zustand from 'zustand';
 
+import { useCurrentContent } from '@/components/hooks';
 import { useLanguage } from '@/intl/client';
 import { tString } from '@/intl/translate';
 import {
@@ -15,6 +16,7 @@ import assertNever from 'assert-never';
 import * as React from 'react';
 import { getInsightsSession, useTrackEvent } from '../Insights';
 import { useSetSearchState } from '../Search';
+import { addRecentSearchQuery } from '../Search/recent-queries';
 import type { AnyAIControl } from './controls';
 import { ConfirmControlDef, ConfirmControlOutputSchema } from './controls/ConfirmControl';
 import { type AIChatReference, serializeReferences } from './references';
@@ -187,6 +189,7 @@ export function AIChatProvider(props: {
     const messageContextRef = useAIMessageContextRef();
     const trackEvent = useTrackEvent();
     const setSearchState = useSetSearchState();
+    const { siteSpaceId } = useCurrentContent();
     const language = useLanguage();
 
     // Event listeners storage
@@ -491,6 +494,10 @@ export function AIChatProvider(props: {
 
             // For first message, update the ask parameter in URL
             if (messages.length === 0) {
+                if (siteSpaceId) {
+                    addRecentSearchQuery(siteSpaceId, input.message, 'ask');
+                }
+
                 setSearchState((prev) => ({
                     ask: input.message,
                     query: prev?.query ?? null,
@@ -537,7 +544,7 @@ export function AIChatProvider(props: {
 
             streamResponse({ message: wireMessage, userQuery: input.message });
         },
-        [setSearchState, trackEvent, streamResponse]
+        [setSearchState, siteSpaceId, trackEvent, streamResponse]
     );
 
     // Clear the conversation and reset ask parameter
