@@ -82,7 +82,7 @@ function useSearchKeyboardNavigation(props: {
             } else if (event.key === 'ArrowDown') {
                 event.preventDefault();
                 moveCursorBy(1);
-            } else if (event.key === 'Enter') {
+            } else if (event.key === 'Enter' && !event.nativeEvent.isComposing) {
                 event.preventDefault();
                 if (cursor !== null && cursor >= results.length) {
                     onAskSelect(cursor - results.length);
@@ -203,6 +203,7 @@ export function useSearchController(props: SearchBaseProps) {
         searchURL,
         indexURL,
         lang: siteSpace.space.language,
+        withSections,
     });
 
     const searchValue = state?.query ?? (withSearchAI || !withAI ? state?.ask : null) ?? '';

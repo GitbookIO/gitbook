@@ -83,6 +83,7 @@ export function AIChat() {
                 }
             }}
             withOverlay={true}
+            data-ai-chat
             className={tcls(
                 'ai-chat mx-auto ml-8 not-hydrated:hidden w-96 transition-[width] duration-300 ease-quint lg:max-xl:w-80'
             )}
@@ -225,7 +226,7 @@ export function AIChatBody(props: {
     return (
         <>
             <ScrollContainer
-                className="min-h-[20%] shrink grow animate-fade-in-slow [container-type:size]"
+                className="min-h-[20%] max-w-full shrink grow animate-fade-in-slow [container-type:size]"
                 contentClassName="py-4 gutter-stable flex flex-col gap-4 not-embed:px-4 [scroll-behavior:smooth]"
                 orientation="vertical"
                 trailing={{ fade: false, button: true }}

@@ -11,6 +11,7 @@ export const no: TranslationLanguage = {
     switch_to_system_theme: 'Bytt til systemtema',
     search: 'Søk',
     clear: 'Tøm',
+    tags: 'Tagger',
     search_back: 'Tilbake til søkeresultater',
     search_or_ask: 'Spør eller søk',
     search_input_placeholder: 'Søk i innhold',
@@ -76,6 +77,7 @@ export const no: TranslationLanguage = {
     notfound_adaptive_title: 'Siden er ikke tilgjengelig',
     notfound_adaptive: 'Denne siden kan finnes, men du må kanskje logge inn for å få tilgang.',
     notfound_adaptive_login: 'Logg inn',
+    notfound_goto_home: 'Gå til forsiden',
     unexpected_error_title: 'En feil oppstod',
     unexpected_error: 'Beklager, en uventet feil har oppstått. Vennligst prøv igjen senere.',
     unexpected_error_retry: 'Prøv igjen',
@@ -164,4 +166,5 @@ export const no: TranslationLanguage = {
     form_other_prompt: 'Skriv inn svaret ditt...',
     form_other_field: 'Annet...',
     cancel: 'Avbryt',
+    direct_link_to_heading: 'Direkte lenke til overskriften',
 };

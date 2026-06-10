@@ -71,13 +71,13 @@ function getDescriptionForToolCall(toolCall: AIToolCall, context: GitBookSiteCon
     }
 }
 
-function DescriptionForPageContentToolCall(props: {
+async function DescriptionForPageContentToolCall(props: {
     toolCall: AIToolCallGetPageContent;
     context: GitBookSiteContext;
 }) {
     const { toolCall, context } = props;
 
-    const language = getSpaceLanguage(context);
+    const language = await getSpaceLanguage(context);
 
     return (
         <p>
@@ -101,13 +101,13 @@ function DescriptionForPageContentToolCall(props: {
     );
 }
 
-function DescriptionForMCPToolCall(props: {
+async function DescriptionForMCPToolCall(props: {
     toolCall: AIToolCallMCP;
     context: GitBookSiteContext;
 }) {
     const { toolCall, context } = props;
 
-    const language = getSpaceLanguage(context);
+    const language = await getSpaceLanguage(context);
 
     return (
         <p>
@@ -135,7 +135,7 @@ async function DescriptionForSearchToolCall(props: {
 }) {
     const { toolCall, context } = props;
 
-    const language = getSpaceLanguage(context);
+    const language = await getSpaceLanguage(context);
 
     // Resolve all hrefs for search results in parallel
     const searchResultsWithHrefs = await Promise.all(
@@ -287,13 +287,13 @@ async function DescriptionForSearchToolCall(props: {
     );
 }
 
-function DescriptionForGetPagesToolCall(props: {
+async function DescriptionForGetPagesToolCall(props: {
     toolCall: AIToolCallGetPages;
     context: GitBookSiteContext;
 }) {
     const { toolCall, context } = props;
 
-    const language = getSpaceLanguage(context);
+    const language = await getSpaceLanguage(context);
 
     return (
         <p>

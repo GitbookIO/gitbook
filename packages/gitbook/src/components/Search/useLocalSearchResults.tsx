@@ -77,12 +77,17 @@ function buildLangIndex(pages: RawIndexPage[]): Document<IndexPage> {
     });
 
     for (const page of pages) {
-        index.add({
-            id: page.id,
-            title: page.title,
-            description: page.description ?? null,
-            siteSpaceId: page.siteSpaceId,
-        });
+        index
+            .addAsync({
+                id: page.id,
+                title: page.title,
+                description: page.description ?? null,
+                siteSpaceId: page.siteSpaceId,
+            })
+            .catch(() => {
+                // We just ignore these errors, it's not worth failing the whole index for a single bad record
+                // And we still have remote search as a fallback for these cases
+            });
 
         cachedPageData.set(`${page.siteSpaceId}:${page.id}`, {
             pathname: page.pathname,

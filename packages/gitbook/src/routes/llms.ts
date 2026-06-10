@@ -3,7 +3,12 @@ import { throwIfDataError } from '@/lib/data';
 import { type GitBookLinker, linkerWithMarkdownPages } from '@/lib/links';
 import { resolveFirstDocument } from '@/lib/pages';
 import { type FlatPageEntry, getIndexablePages } from '@/lib/sitemap';
-import { filterSiteSpacesByLocale, getLocalizedTitle, getSiteStructureSections } from '@/lib/sites';
+import {
+    filterSiteSpacesByLocale,
+    getFallbackSiteSpacePath,
+    getLocalizedTitle,
+    getSiteStructureSections,
+} from '@/lib/sites';
 import type { SiteSection, SiteSpace } from '@gitbook/api';
 import assertNever from 'assert-never';
 import type { ListItem, Paragraph, Root, RootContent } from 'mdast';
@@ -143,8 +148,14 @@ async function getNodesFromSiteSpaces(
                 });
             }
 
+            const siteSpaceLinker = linkerWithMarkdownPages(
+                linker.withOtherSiteSpace({
+                    spaceBasePath: getFallbackSiteSpacePath(context, siteSpace),
+                })
+            );
+
             // Add the pages as a list
-            nodes.push(...(await getMarkdownForPagesTree(pages, linker)));
+            nodes.push(...(await getMarkdownForPagesTree(pages, siteSpaceLinker)));
 
             return nodes;
         })
@@ -192,12 +203,12 @@ export async function getMarkdownForPagesTree(
 }
 
 function renderAskFooter(context: GitBookSiteContext) {
-    return `\n\n---\n\n# Agent Instructions: Querying This Documentation
+    return `\n\n---\n\n# Agent Instructions
+This documentation is published with GitBook. GitBook is the documentation platform designed so that both humans and AI agents can read, navigate, and reason over technical content effectively. Learn more at gitbook.com.
 
+## Querying This Documentation
 If you need additional information, you can query the documentation dynamically by asking a question.
-
 Perform an HTTP GET request on a page URL with the \`ask\` query parameter:
-
 \`\`\`
 GET ${context.linker.toAbsoluteURL(
         context.linker.toPathForPagePath({
@@ -205,10 +216,8 @@ GET ${context.linker.toAbsoluteURL(
         })
     )}?ask=<question>
 \`\`\`
-
 The question should be specific, self-contained, and written in natural language.
 The response will contain a direct answer to the question and relevant excerpts and sources from the documentation.
-
 Use this mechanism when the answer is not explicitly present in the current page, you need clarification or additional context, or you want to retrieve related documentation sections.
 `;
 }

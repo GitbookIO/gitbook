@@ -11,6 +11,7 @@ export const nl: TranslationLanguage = {
     switch_to_system_theme: 'Schakel over naar systeemmodus',
     search: 'Zoeken',
     clear: 'Wissen',
+    tags: 'Tags',
     search_back: 'Terug naar zoekresultaten',
     search_or_ask: 'Zoek of vraag',
     search_input_placeholder: 'Zoek inhoud',
@@ -76,6 +77,7 @@ export const nl: TranslationLanguage = {
     notfound_adaptive:
         'Deze pagina bestaat mogelijk, maar je moet mogelijk inloggen om toegang te krijgen.',
     notfound_adaptive_login: 'Inloggen',
+    notfound_goto_home: 'Ga naar home',
     unexpected_error_title: 'Er is een fout opgetreden',
     unexpected_error: 'Sorry, er is een onverwachte fout opgetreden. Probeer het later opnieuw.',
     unexpected_error_retry: 'Opnieuw proberen',
@@ -164,4 +166,5 @@ export const nl: TranslationLanguage = {
     form_other_prompt: 'Voer je antwoord in...',
     form_other_field: 'Anders...',
     cancel: 'Annuleren',
+    direct_link_to_heading: 'Directe link naar kop',
 };

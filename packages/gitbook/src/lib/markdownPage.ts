@@ -1,9 +1,12 @@
 import path from 'node:path';
-import type { GitBookAnyContext, GitBookSiteContext } from '@/lib/context';
+import {
+    type GitBookAnyContext,
+    type GitBookSiteContext,
+    fetchSiteContextForSiteSpace,
+} from '@/lib/context';
 import { DataFetcherError, throwIfDataError } from '@/lib/data';
 import type { ResolvedPagePath } from '@/lib/pages';
 import { getIndexablePages } from '@/lib/sitemap';
-import { getFallbackSiteSpacePath } from '@/lib/sites';
 import { getMarkdownForPagesTree } from '@/routes/llms';
 import {
     type RevisionPageDocument,
@@ -78,33 +81,29 @@ export async function getMarkdownForPageInSpace(
     siteSpace: SiteSpace,
     page: RevisionPageDocument | RevisionPageGroup
 ): Promise<string> {
-    const { dataFetcher } = context;
-    const spaceBasePath = getFallbackSiteSpacePath(context, siteSpace);
-    const linker = context.linker.withOtherSiteSpace({
-        spaceBasePath,
-    });
+    const siteSpaceContext = await fetchSiteContextForSiteSpace(context, siteSpace);
 
     // Handle group pages (pages with no content that list their children)
     if (page.type === RevisionPageType.Group) {
-        return renderGroupPageMarkdown({ linker, page });
+        return renderGroupPageMarkdown({ linker: siteSpaceContext.linker, page });
     }
 
     const rawMarkdown = await throwIfDataError(
-        dataFetcher.getRevisionPageMarkdown({
-            spaceId: siteSpace.space.id,
-            revisionId: siteSpace.space.revision,
+        siteSpaceContext.dataFetcher.getRevisionPageMarkdown({
+            spaceId: siteSpaceContext.space.id,
+            revisionId: siteSpaceContext.revisionId,
             pageId: page.id,
         })
     );
 
-    const tree = await fromPageMarkdown(context, {
+    const tree = await fromPageMarkdown(siteSpaceContext, {
         markdown: rawMarkdown,
         pagePath: page.path,
     });
 
     // Handle empty document pages which have children (same as getMarkdownForPage)
     if (isEmptyMarkdownPage(tree) && page.pages.length > 0) {
-        return renderGroupPageMarkdown({ linker, page });
+        return renderGroupPageMarkdown({ linker: siteSpaceContext.linker, page });
     }
 
     return toPageMarkdown(tree);
@@ -231,6 +230,7 @@ async function rewriteMarkdownLinks(
     const pending: Array<Promise<void>> = [];
 
     visit(tree, 'link', (node: Link) => {
+        const isMention = isMentionLike(node);
         const original = node.url;
 
         // Skip anchors, mailto:, http(s):, protocol-like
@@ -246,10 +246,35 @@ async function rewriteMarkdownLinks(
                     const resolved = await resolveContentRef(contentRef, context);
                     if (resolved?.href) {
                         node.url = resolved.href;
+                    } else {
+                        // We use an absolute URL so that crawler don't follow it.
+                        node.url = `broken://${original.startsWith('/') ? original.slice(1) : original}`;
+                    }
+
+                    if (isMention) {
+                        // Replace the text for mentions as otherwise it contains the raw ref
+                        if (resolved) {
+                            node.children = [
+                                {
+                                    type: 'text',
+                                    value: resolved.text,
+                                },
+                            ];
+                        } else {
+                            node.children = [
+                                {
+                                    type: 'text',
+                                    value: 'Broken mention',
+                                },
+                            ];
+                        }
+                        node.title = undefined;
                     }
                 })()
             );
         } else {
+            // DEPRECATED: to be removed once rollout for getRevisionPageMarkdown is done
+            //
             // Resolve against the current page’s directory and strip any leading “/” or "../"
             // Sometimes the path can be "../" if we are on the default section
             // but it means we are just at the root of the site.
@@ -266,4 +291,17 @@ async function rewriteMarkdownLinks(
     }
 
     return tree;
+}
+
+function isMentionLike(node: Link) {
+    if (node.title === 'mention') {
+        return true;
+    }
+
+    const singleText =
+        node.children.length === 1 && node.children[0]?.type === 'text' ? node.children[0] : null;
+    if (!singleText) {
+        return false;
+    }
+    return singleText?.value === node.url;
 }

@@ -11,6 +11,7 @@ export const ko: TranslationLanguage = {
     switch_to_system_theme: '시스템 테마로 전환',
     search: '검색',
     clear: '지우기',
+    tags: '태그',
     search_back: '검색 결과로 돌아가기',
     search_or_ask: '질문 또는 검색',
     search_input_placeholder: '콘텐츠 검색',
@@ -75,6 +76,7 @@ export const ko: TranslationLanguage = {
     notfound_adaptive_title: '페이지에 접근할 수 없음',
     notfound_adaptive: '이 페이지는 존재할 수 있지만, 접근하려면 로그인해야 할 수 있습니다.',
     notfound_adaptive_login: '로그인',
+    notfound_goto_home: '홈으로 이동',
     unexpected_error_title: '오류가 발생했습니다',
     unexpected_error: '죄송합니다. 예상치 못한 오류가 발생했습니다. 나중에 다시 시도해 주세요.',
     unexpected_error_retry: '다시 시도',
@@ -163,4 +165,5 @@ export const ko: TranslationLanguage = {
     form_other_prompt: '답변을 입력하세요...',
     form_other_field: '기타...',
     cancel: '취소',
+    direct_link_to_heading: '제목으로 가는 직접 링크',
 };

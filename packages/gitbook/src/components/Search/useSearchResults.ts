@@ -14,6 +14,7 @@ import { streamRecommendedQuestions } from './server-actions';
 import { useAI } from '@/components/AI';
 import assertNever from 'assert-never';
 import { useTrackEvent } from '../Insights';
+import { computeFilterSiteSpaceIds } from './filter';
 import { useRecentSearchQueries } from './recent-queries';
 import { type MergedPageResult, reciprocalRankFusion } from './reciprocalRankFusion';
 import { type LocalPageResult, useLocalSearchResults } from './useLocalSearchResults';
@@ -26,6 +27,9 @@ export type ResultType =
     | RecommendedQuestionResult;
 
 export type { LocalPageResult, MergedPageResult };
+
+// Small helper extracted for unit testing of scope → local filter mapping
+// computeFilterSiteSpaceIds is imported from './filter' for testability
 
 /**
  * We cache the recommended questions globally to avoid calling the API multiple times
@@ -49,6 +53,8 @@ export function useSearchResults(props: {
     indexURL: string;
     /** BCP-47 language code of the current site space, used to filter local search results. */
     lang?: string;
+    /** Whether the site has multiple sections. If false, treat default scope as current for local filtering. */
+    withSections?: boolean;
 }) {
     const {
         asEmbeddable,
@@ -61,20 +67,15 @@ export function useSearchResults(props: {
         searchURL,
         indexURL,
         lang,
+        withSections,
     } = props;
 
     const trackEvent = useTrackEvent();
 
-    const filterSiteSpaceIds = React.useMemo(() => {
-        switch (scope) {
-            case 'current':
-                return [siteSpaceId];
-            case 'extended':
-                return siteSpaceIds;
-            default:
-                return undefined;
-        }
-    }, [scope, siteSpaceId, siteSpaceIds]);
+    const filterSiteSpaceIds = React.useMemo(
+        () => computeFilterSiteSpaceIds(scope, siteSpaceId, siteSpaceIds, withSections),
+        [scope, siteSpaceId, siteSpaceIds, withSections]
+    );
 
     const { results: localResults } = useLocalSearchResults({
         query,

@@ -11,6 +11,7 @@ export const it: TranslationLanguage = {
     switch_to_system_theme: 'Passa al tema di sistema',
     search: 'Cerca',
     clear: 'Cancella',
+    tags: 'Tag',
     search_back: 'Torna ai risultati di ricerca',
     search_or_ask: 'Chiedi o cerca',
     search_input_placeholder: 'Cerca contenuti',
@@ -76,6 +77,7 @@ export const it: TranslationLanguage = {
     notfound_adaptive:
         "Questa pagina potrebbe esistere, ma potrebbe essere necessario effettuare l'accesso per visualizzarla.",
     notfound_adaptive_login: 'Accedi',
+    notfound_goto_home: 'Vai alla home',
     unexpected_error_title: 'Si è verificato un errore',
     unexpected_error: 'Spiacenti, si è verificato un errore imprevisto. Riprova più tardi.',
     unexpected_error_retry: 'Riprova',
@@ -165,4 +167,5 @@ export const it: TranslationLanguage = {
     form_other_prompt: 'Inserisci la tua risposta...',
     form_other_field: 'Altro...',
     cancel: 'Annulla',
+    direct_link_to_heading: 'Link diretto al titolo',
 };

@@ -1,5 +1,46 @@
 # gitbook
 
+## 0.26.2
+
+### Patch Changes
+
+- 67f31aa: Allow user-triggered AI assistants (ChatGPT-User, Claude-User, Perplexity-User) to read pages on non-indexable sites, so end-users can pull content into an LLM without an MCP connection. Search engines and training crawlers remain blocked.
+- 0c577a0: Allow CORS for the same root domain
+- 51fef84: Remove the date-gated header logo height logic and always apply the compact logo size to prevent size shifts between sections and translations.
+- f405fff: Add icon support in tab items
+- 3697dfe: Add support for hiding page actions from page layout options.
+- 127ef54: Add tag filtering controls for Updates blocks.
+
+## 0.26.1
+
+### Patch Changes
+
+- b70b8fd: Fix llms-full.txt pagination to include pages from all site sections.
+- 6ba5e54: Support isComposing for search
+- 47c8ccb: Render icons as svg markup
+- a9ba996: Fix left/right aligment of images with caption
+- 56aeb19: Fix events tracked from the middleware missing some properties.
+- Updated dependencies [47c8ccb]
+- Updated dependencies [37a9453]
+  - @gitbook/icons@0.5.0
+  - @gitbook/embed@0.5.1
+  - @gitbook/react-contentkit@0.7.16
+
+## 0.26.0
+
+### Minor Changes
+
+- d3d5150: Add "Content-Signal" to "robots.txt"
+- 7595706: Allow AI agents to ask questions and get the answer in markdown when fetching with `?ask=<question>`.
+- a17ab65: Support variant selector in hidden section
+
+### Patch Changes
+
+- d1a2958: Skip AI questions when it matches the example provided to agents / crawlers.
+- e3aca9e: Fix embeddable search links
+- 4b78672: Fix links to other spaces/sections in the llms.txt.
+- d1a2958: Pass visitor session to Ask AI.
+
 ## 0.25.1
 
 ### Patch Changes

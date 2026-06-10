@@ -29,4 +29,18 @@ describe('robots.txt', () => {
         expect(content).toContain('Disallow: /\n');
         expect(content).toContain('Content-Signal: ai-train=no, search=no, ai-input=no');
     });
+
+    it('disallow user-triggered AI assistants to read non-public sites', async () => {
+        const response = await fetch(
+            getContentTestURL(
+                'https://gitbook-open-e2e-sites.gitbook.io/api-multi-versions-share-links/8tNo6MeXg7CkFMzSSz81/robots.txt?x-gitbook-search-indexation=1'
+            )
+        );
+
+        expect(response.status).toBe(200);
+        expect(response.headers.get('content-type')).toContain('text/plain');
+        const content = await response.text();
+        expect(content).toContain('Disallow: /\n');
+        expect(content).toContain('Content-Signal: ai-train=no, search=no, ai-input=no');
+    });
 });

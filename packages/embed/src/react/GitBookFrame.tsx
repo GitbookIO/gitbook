@@ -76,6 +76,7 @@ export function GitBookFrame(props: GitBookFrameProps) {
             src={frameURL}
             width="100%"
             height="100%"
+            allow="clipboard-write"
             className={className}
             style={colorScheme ? { colorScheme } : undefined}
         />

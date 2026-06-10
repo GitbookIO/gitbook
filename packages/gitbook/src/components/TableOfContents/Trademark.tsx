@@ -9,7 +9,7 @@ import { Button, type ButtonProps } from '../primitives';
 /**
  * Trademark link to the GitBook.
  */
-export function Trademark(
+export async function Trademark(
     props: {
         context: GitBookAnyContext;
         placement: SiteInsightsTrademarkPlacement;
@@ -18,7 +18,7 @@ export function Trademark(
 ) {
     const { context, placement, className, ...buttonProps } = props;
     const { space } = context;
-    const language = getSpaceLanguage(context);
+    const language = await getSpaceLanguage(context);
 
     const url = new URL('https://www.gitbook.com');
     url.searchParams.set('utm_source', 'content');

@@ -21,7 +21,7 @@ interface DataFetcherInput {
 }
 
 /**
- * Options to pass to the `fetch` call to disable the Next data-cache when wrapped in `use cache: remote`.
+ * Options to pass to the `fetch` call to disable the Next data-cache when wrapped in `use cache`.
  */
 export const noCacheFetchOptions: Partial<RequestInit> = {
     next: {
@@ -87,18 +87,32 @@ export function createDataFetcher(
             });
         },
         getRevisionPageMarkdown(params) {
-            return getRevisionPageMarkdown(input, {
-                spaceId: params.spaceId,
-                revisionId: params.revisionId,
-                pageId: params.pageId,
-            });
+            return getRevisionPageMarkdown(
+                input,
+                {
+                    spaceId: params.spaceId,
+                    revisionId: params.revisionId,
+                    pageId: params.pageId,
+                },
+                // We pass the name of the function to distinguish between cache entries
+                // By default Next only uses the arguments, the filename and the position of the function inside the file
+                // By adding a dummy argument with the function name, we can change the order without breaking anything
+                'getRevisionPageMarkdown'
+            );
         },
         getRevisionPageDocument(params) {
-            return getRevisionPageDocument(input, {
-                spaceId: params.spaceId,
-                revisionId: params.revisionId,
-                pageId: params.pageId,
-            });
+            return getRevisionPageDocument(
+                input,
+                {
+                    spaceId: params.spaceId,
+                    revisionId: params.revisionId,
+                    pageId: params.pageId,
+                },
+                // We pass the name of the function to distinguish between cache entries
+                // By default Next only uses the arguments, the filename and the position of the function inside the file
+                // By adding a dummy argument with the function name, we can change the order without breaking anything
+                'getRevisionPageDocument'
+            );
         },
         getRevisionReusableContentDocument(params) {
             return getRevisionReusableContentDocument(input, {
@@ -284,9 +298,10 @@ const getChangeRequest = cache(
     }
 );
 
+// We don't use remote cache on vercel because of the 2Mb limit on cache size that makes some route crash
 const getRevision = cache(
     async (input: DataFetcherInput, params: { spaceId: string; revisionId: string }) => {
-        'use cache: remote';
+        'use cache';
         return wrapCacheDataFetcherError(async () => {
             return trace(`getRevision(${params.spaceId}, ${params.revisionId})`, async () => {
                 const api = apiClient(input);
@@ -311,7 +326,9 @@ const getRevision = cache(
 const getRevisionPageMarkdown = cache(
     async (
         input: DataFetcherInput,
-        params: { spaceId: string; revisionId: string; pageId: string }
+        params: { spaceId: string; revisionId: string; pageId: string },
+        // used only to bust the cache
+        _functionName: string
     ) => {
         'use cache: remote';
         return wrapCacheDataFetcherError(async () => {
@@ -325,6 +342,7 @@ const getRevisionPageMarkdown = cache(
                         params.pageId,
                         {
                             format: 'markdown',
+                            'format.markdown.refs': 'stable',
                         },
                         {
                             ...noCacheFetchOptions,
@@ -350,7 +368,9 @@ const getRevisionPageMarkdown = cache(
 const getRevisionPageDocument = cache(
     async (
         input: DataFetcherInput,
-        params: { spaceId: string; revisionId: string; pageId: string }
+        params: { spaceId: string; revisionId: string; pageId: string },
+        // used only to bust the cache
+        _functionName: string
     ) => {
         'use cache: remote';
         return wrapCacheDataFetcherError(async () => {
@@ -512,9 +532,10 @@ const getComputedDocument = cache(
     }
 );
 
+// We don't use remote cache on vercel because of the 2Mb limit on cache size that makes some route crash
 const getLatestOpenAPISpecVersionContent = cache(
     async (input: DataFetcherInput, params: { organizationId: string; slug: string }) => {
-        'use cache: remote';
+        'use cache';
         cacheTag(
             getCacheTag({
                 tag: 'openapi',
@@ -655,12 +676,13 @@ const getEmbedByUrl = cache(
     }
 );
 
+// We don't use remote cache for this one because of the number of potential cache entry causing 429 on vercel runtime cache when revalidating
 const searchSiteContent = cache(
     async (
         input: DataFetcherInput,
         params: Parameters<GitBookDataFetcher['searchSiteContent']>[0]
     ) => {
-        'use cache: remote';
+        'use cache';
         cacheTag(
             getCacheTag({
                 tag: 'site',

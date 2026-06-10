@@ -9,6 +9,7 @@ export const pt_br = {
     switch_to_system_theme: 'Mudar para configuração do sistema',
     search: 'Buscar',
     clear: 'Limpar',
+    tags: 'Tags',
     search_back: 'Voltar aos resultados da busca',
     search_or_ask: 'Perguntar ou buscar',
     search_input_placeholder: 'Buscar conteúdo',
@@ -74,6 +75,7 @@ export const pt_br = {
     notfound_adaptive:
         'Esta página pode existir, mas talvez você precise fazer login para acessá-la.',
     notfound_adaptive_login: 'Fazer login',
+    notfound_goto_home: 'Ir para a página inicial',
     unexpected_error_title: 'Aconteceu um erro',
     unexpected_error:
         'Desculpe, aconteceu um erro inesperado. Por favor, tente novamente mais tarde.',
@@ -164,4 +166,5 @@ export const pt_br = {
     form_other_prompt: 'Digite sua resposta...',
     form_other_field: 'Outro...',
     cancel: 'Cancelar',
+    direct_link_to_heading: 'Link direto para o título',
 };

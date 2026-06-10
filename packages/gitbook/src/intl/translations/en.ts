@@ -9,6 +9,7 @@ export const en = {
     switch_to_system_theme: 'Switch to system theme',
     search: 'Search',
     clear: 'Clear',
+    tags: 'Tags',
     search_back: 'Back to search results',
     search_or_ask: 'Ask or search',
     search_input_placeholder: 'Search content',
@@ -72,6 +73,7 @@ export const en = {
     notfound_adaptive_title: 'Page unavailable',
     notfound_adaptive: 'This page may exist, but you may need to log in to access it.',
     notfound_adaptive_login: 'Log in',
+    notfound_goto_home: 'Go to homepage',
     unexpected_error_title: 'An error occurred',
     unexpected_error: 'Sorry, an unexpected error has occurred. Please try again later.',
     unexpected_error_retry: 'Try again',
@@ -161,4 +163,5 @@ export const en = {
     form_other_prompt: 'Enter your answer...',
     form_other_field: 'Other...',
     cancel: 'Cancel',
+    direct_link_to_heading: 'Direct link to heading',
 };

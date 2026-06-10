@@ -3,77 +3,54 @@
 import type { PanzoomObject } from '@panzoom/panzoom';
 
 import { Button } from '@/components/primitives';
-
-const PAN_STEP = 50;
+import { tcls } from '@/lib/tailwind';
 
 /**
- * Navigation and zoom controls for mermaid diagrams, positioned as an overlay.
+ * Zoom and fullscreen controls for mermaid diagrams, grouped into a single vertical
+ * toolbar positioned in the bottom-right corner. Panning is done by dragging the diagram.
  */
-export function MermaidPanZoomControls(props: { panZoom: PanzoomObject }) {
-    const { panZoom } = props;
+export function MermaidPanZoomControls(props: {
+    panZoom: PanzoomObject;
+    isFullscreen: boolean;
+    onToggleFullscreen: () => void;
+}) {
+    const { panZoom, isFullscreen, onToggleFullscreen } = props;
+    const btnProps = {
+        variant: 'secondary' as const,
+        size: 'xsmall' as const,
+        iconOnly: true,
+        className: tcls('p-1 [&_svg]:size-3.5 opacity-90'),
+        // Non-interactive tooltips: the Tooltip primitive makes their popper wrapper
+        // pointer-transparent so it can't steal the hover that reveals these controls.
+        tooltipProps: {
+            rootProps: { disableHoverableContent: true },
+        },
+    };
 
     return (
-        <div className="absolute right-3 bottom-3 z-10 grid grid-cols-3 gap-0.5">
-            {/* Row 1: empty, pan up, zoom in */}
-            <div />
+        <div
+            className={tcls(
+                'absolute right-2 bottom-2 z-10 flex flex-col items-center gap-0.5 rounded-lg transition-opacity duration-150 group-focus-within/mermaid:pointer-events-auto group-focus-within/mermaid:opacity-100 group-hover/mermaid:opacity-100 motion-reduce:transition-none',
+                // Keep the controls always visible in fullscreen, otherwise only reveal on hover/focus.
+                isFullscreen ? 'opacity-100' : 'opacity-0'
+            )}
+        >
+            <Button {...btnProps} icon="plus" label="Zoom in" onClick={() => panZoom.zoomIn()} />
             <Button
-                label="Pan up"
-                icon="chevron-up"
-                variant="secondary"
-                size="xsmall"
-                iconOnly
-                onClick={() => panZoom.pan(0, PAN_STEP, { relative: true })}
-            />
-            <Button
-                label="Zoom in"
-                icon="plus"
-                variant="secondary"
-                size="xsmall"
-                iconOnly
-                onClick={() => panZoom.zoomIn()}
-            />
-            {/* Row 2: pan left, reset, pan right */}
-            <Button
-                label="Pan left"
-                icon="chevron-left"
-                variant="secondary"
-                size="xsmall"
-                iconOnly
-                onClick={() => panZoom.pan(PAN_STEP, 0, { relative: true })}
-            />
-            <Button
+                {...btnProps}
+                icon="arrows-to-dot"
                 label="Reset view"
-                icon="refresh"
-                variant="secondary"
-                size="xsmall"
-                iconOnly
                 onClick={() => panZoom.reset()}
             />
+            <Button {...btnProps} icon="minus" label="Zoom out" onClick={() => panZoom.zoomOut()} />
+
+            <div className="my-0.5 h-px w-4 bg-tint-subtle" />
+
             <Button
-                label="Pan right"
-                icon="chevron-right"
-                variant="secondary"
-                size="xsmall"
-                iconOnly
-                onClick={() => panZoom.pan(-PAN_STEP, 0, { relative: true })}
-            />
-            {/* Row 3: empty, pan down, zoom out */}
-            <div />
-            <Button
-                label="Pan down"
-                icon="chevron-down"
-                variant="secondary"
-                size="xsmall"
-                iconOnly
-                onClick={() => panZoom.pan(0, -PAN_STEP, { relative: true })}
-            />
-            <Button
-                label="Zoom out"
-                icon="minus"
-                variant="secondary"
-                size="xsmall"
-                iconOnly
-                onClick={() => panZoom.zoomOut()}
+                {...btnProps}
+                icon={isFullscreen ? 'compress' : 'expand'}
+                label={isFullscreen ? 'Exit full page' : 'View in full page'}
+                onClick={onToggleFullscreen}
             />
         </div>
     );

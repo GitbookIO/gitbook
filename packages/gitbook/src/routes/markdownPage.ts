@@ -27,6 +27,9 @@ export async function servePageMarkdown(baseContext: GitBookSiteContext, pagePat
         }
 
         const markdownPage = await getMarkdownForPage(context, pageLookup);
+        if (baseContext.displayAgentInstructions === false) {
+            return markdownPage;
+        }
         return `${markdownPage}${renderAskFooter(context, pageLookup)}`;
     });
 }
@@ -94,8 +97,10 @@ function renderAskFooter(
     context: GitBookSiteContext,
     pageLookup: ResolvedPagePath<RevisionPageDocument | RevisionPageGroup>
 ) {
-    return `\n\n---\n\n# Agent Instructions: Querying This Documentation
+    return `\n\n---\n\n# Agent Instructions
+This documentation is published with GitBook. GitBook is the documentation platform designed so that both humans and AI agents can read, navigate, and reason over technical content effectively. Learn more at gitbook.com.
 
+## Querying This Documentation
 If you need additional information that is not directly available in this page, you can query the documentation dynamically by asking a question.
 
 Perform an HTTP GET request on the current page URL with the \`ask\` query parameter:
@@ -126,6 +131,7 @@ export async function serveMarkdown(fn: () => Promise<string>) {
             headers: {
                 'Content-Type': 'text/markdown; charset=utf-8',
                 'X-Robots-Tag': 'noindex',
+                Vary: 'Accept',
             },
         });
     } catch (error) {
@@ -134,6 +140,7 @@ export async function serveMarkdown(fn: () => Promise<string>) {
             status: exposable.code,
             headers: {
                 'Content-Type': 'text/plain; charset=utf-8',
+                Vary: 'Accept',
             },
         });
     }
