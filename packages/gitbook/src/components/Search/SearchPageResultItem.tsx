@@ -26,12 +26,9 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
     const language = useLanguage();
 
     const bestSection = item.type === 'page' ? item.bestSection : undefined;
-    const href = (() => {
-        if (item.type !== 'page' || !item.bestSection || item.bestSection.score <= item.score) {
-            return 'href' in item ? item.href : item.pathname;
-        }
-        return item.bestSection.href;
-    })();
+    // When the section snippet is displayed, link to the section anchor so the
+    // link matches what the user sees.
+    const href = bestSection?.body ? bestSection.href : 'href' in item ? item.href : item.pathname;
 
     const emoji = 'emoji' in item ? item.emoji : undefined;
     const icon = 'icon' in item ? item.icon : undefined;
