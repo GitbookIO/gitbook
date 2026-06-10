@@ -18,7 +18,7 @@ export async function Embed(props: BlockProps<gitbookAPI.DocumentBlockEmbed>) {
         return null;
     }
 
-    ReactDOM.preload('https://cdn.iframe.ly/embed.js', { as: 'script' });
+    ReactDOM.preload('https://iframely.net/embed.js', { as: 'script' });
 
     const embed = await getDataOrNull(
         context.contentContext.dataFetcher.getEmbedByUrl({
@@ -41,7 +41,7 @@ export async function Embed(props: BlockProps<gitbookAPI.DocumentBlockEmbed>) {
                         }}
                         data-visual-test="blackout"
                     />
-                    <Script strategy="lazyOnload" src="https://cdn.iframe.ly/embed.js" />
+                    <Script strategy="lazyOnload" src="https://iframely.net/embed.js" />
                 </>
             ) : embed.type === 'integration' ? (
                 <IntegrationBlock

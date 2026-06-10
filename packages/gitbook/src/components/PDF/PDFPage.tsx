@@ -57,7 +57,7 @@ export async function PDFPage(props: {
 
     const customization =
         'customization' in baseContext ? baseContext.customization : defaultCustomization();
-    const language = getSpaceLanguage(baseContext);
+    const language = await getSpaceLanguage(baseContext);
 
     // Compute the pages to render
     const { pages, total } = selectPages(baseContext.revision.pages, pdfParams);

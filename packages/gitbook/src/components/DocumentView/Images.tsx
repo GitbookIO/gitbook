@@ -5,7 +5,7 @@ import { resolveContentRefInDocument } from '@/lib/references';
 import { type ClassValue, tcls } from '@/lib/tailwind';
 
 import type { BlockProps } from './Block';
-import { Caption } from './Caption';
+import { Caption, type CaptionAlign } from './Caption';
 import type { DocumentContext } from './DocumentView';
 
 export function Images(props: BlockProps<DocumentBlockImages>) {
@@ -52,6 +52,7 @@ export function Images(props: BlockProps<DocumentBlockImages>) {
                         context={context}
                         isEstimatedOffscreen={isEstimatedOffscreen}
                         withFrame={withFrame}
+                        align={align}
                     />
                 ))}
             </div>
@@ -80,8 +81,9 @@ async function ImageBlock(props: {
     siblings: number;
     isEstimatedOffscreen: boolean;
     withFrame?: boolean;
+    align?: CaptionAlign;
 }) {
-    const { document, block, context, isEstimatedOffscreen, withFrame } = props;
+    const { document, block, context, isEstimatedOffscreen, withFrame, align } = props;
 
     const [src, darkSrc] = await Promise.all([
         context.contentContext
@@ -98,7 +100,7 @@ async function ImageBlock(props: {
 
     return (
         <div className={tcls('relative', 'overflow-hidden')}>
-            <Caption {...props} fit>
+            <Caption {...props} fit align={align}>
                 <Image
                     alt={block.data.alt ?? ''}
                     sizes={imageBlockSizes}

@@ -11,6 +11,7 @@ export const nl: TranslationLanguage = {
     switch_to_system_theme: 'Schakel over naar systeemmodus',
     search: 'Zoeken',
     clear: 'Wissen',
+    tags: 'Tags',
     search_back: 'Terug naar zoekresultaten',
     search_or_ask: 'Zoek of vraag',
     search_input_placeholder: 'Zoek inhoud',
@@ -165,4 +166,5 @@ export const nl: TranslationLanguage = {
     form_other_prompt: 'Voer je antwoord in...',
     form_other_field: 'Anders...',
     cancel: 'Annuleren',
+    direct_link_to_heading: 'Directe link naar kop',
 };

@@ -20,7 +20,7 @@ export async function PageFooterNavigation(props: {
     const { context, page } = props;
     const { revision, linker } = context;
     const { previous, next } = resolvePrevNextPages(revision.pages, page);
-    const language = getSpaceLanguage(context);
+    const language = await getSpaceLanguage(context);
     const previousHref = previous
         ? linker.toPathForPage({ pages: revision.pages, page: previous })
         : '';

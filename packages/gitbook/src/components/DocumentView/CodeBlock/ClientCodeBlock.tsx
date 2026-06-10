@@ -141,6 +141,7 @@ export function ClientCodeBlock(props: ClientBlockProps) {
             style={style}
             theme={theme ?? plainTheme}
             id={codeBlockBodyId}
+            isPrint={mode === 'print'}
         />
     );
 

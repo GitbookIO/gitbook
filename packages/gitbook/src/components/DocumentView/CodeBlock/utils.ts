@@ -65,3 +65,40 @@ export function convertCodeStringToBlock(args: {
         nodes: lines,
     };
 }
+
+/**
+ * Resolve the code text of a code block from its wrapper id.
+ * Returns null when the block isn't in the DOM (e.g. not yet hydrated).
+ */
+export function getCodeTextFromId(codeId: string): string | null {
+    const element = document.getElementById(codeId)?.querySelector('code');
+    return element ? getCodeText(element) : null;
+}
+
+/**
+ * Compute the code text from the DOM,
+ * ignoring the empty white space we use for empty lines (represented with a class "ew").
+ */
+export function getCodeText(code: HTMLElement): string {
+    let text = '';
+
+    const iterate = (node: Node) => {
+        if (node instanceof HTMLBRElement) {
+            text += '\n';
+        } else if (node instanceof HTMLSpanElement) {
+            if (node.classList.contains('ew')) {
+                text += '\n';
+            } else {
+                text += node.innerText;
+            }
+        } else if (node instanceof HTMLElement) {
+            node.childNodes.forEach(iterate);
+        } else {
+            text += node.textContent;
+        }
+    };
+
+    iterate(code);
+
+    return text;
+}

@@ -17,7 +17,7 @@ import { TranslationsDropdown } from './SpacesDropdown';
 /**
  * Render the header for the space.
  */
-export function Header(props: {
+export async function Header(props: {
     context: GitBookSiteContext;
     withTopHeader?: boolean;
     variants: {
@@ -28,6 +28,7 @@ export function Header(props: {
     const { context, withTopHeader, variants } = props;
     const { siteSpace, visibleSections, customization } = context;
     const searchProps = getSearchBaseProps(context);
+    const language = await getSpaceLanguage(context);
 
     const withSections = Boolean(
         visibleSections &&
@@ -180,7 +181,7 @@ export function Header(props: {
                                 {customization.header.links.length > 0 ||
                                 headerSocialAccounts.length > 0 ? (
                                     <HeaderLinkMore
-                                        label={t(getSpaceLanguage(context), 'more')}
+                                        label={t(language, 'more')}
                                         links={customization.header.links}
                                         socialAccounts={headerSocialAccounts}
                                         context={context}

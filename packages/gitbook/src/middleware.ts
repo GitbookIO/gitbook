@@ -47,6 +47,7 @@ import {
 import { waitUntil } from '@/lib/waitUntil';
 import { serveResizedImage } from '@/routes/image';
 import Negotiator from 'negotiator';
+import { getDomain } from 'tldts';
 import {
     type ServerInsightsEventInput,
     serveProxyAnalyticsEvent,
@@ -249,7 +250,6 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
              */
             if (
                 siteURLData.target === 'external' &&
-                !visitorToken &&
                 isOAuthProtectedResourceRequest(siteRequestURL)
             ) {
                 return handleUnauthedOAuthProtectedResourceRequest({
@@ -377,6 +377,11 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
                 !requestURL.searchParams.has('x-gitbook-search-indexation')
                     ? true
                     : undefined,
+            isLoggedInVisitor: visitorToken ? true : undefined,
+            displayAgentInstructions:
+                requestURL.searchParams.get('displayAgentInstructions') === 'false'
+                    ? false
+                    : undefined,
         };
 
         const requestHeaders = new Headers(request.headers);
@@ -484,6 +489,9 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         if (rewrittenURL.searchParams.has('fallback')) {
             rewrittenURL.searchParams.delete('fallback');
         }
+        if (rewrittenURL.searchParams.has('displayAgentInstructions')) {
+            rewrittenURL.searchParams.delete('displayAgentInstructions');
+        }
 
         const response = NextResponse.rewrite(rewrittenURL, {
             request: {
@@ -500,6 +508,13 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         // Debug header
         response.headers.set('x-gitbook-route-type', routeType);
         response.headers.set('x-gitbook-route-site', siteURLWithoutProtocol);
+
+        // Allow cross-origin requests from the same parent domain as the site.
+        const allowedOrigin = getAllowedCORSOrigin(request, siteCanonicalURL);
+        if (allowedOrigin) {
+            response.headers.set('access-control-allow-origin', allowedOrigin);
+            response.headers.set('access-control-allow-credentials', 'true');
+        }
 
         // AI related headers
         // This one is technically useless, but is used by a bunch of scoring systems
@@ -866,6 +881,59 @@ async function writeResponseCookies<R extends NextResponse>(
     });
 
     return response;
+}
+
+/**
+ * Registrable domains where customer sites are hosted side-by-side on different
+ * subdomains. For these, parent/sibling-subdomain CORS would let one customer site
+ * read another, so only an exact hostname match is allowed.
+ */
+const SHARED_REGISTRABLE_DOMAINS = new Set(['gitbook.io']);
+
+/**
+ * Get the allowed CORS origin for a request to a site.
+ *
+ * For a site on a customer domain like `foo.example.com`, requests from
+ * `example.com` or any `*.example.com` subdomain are allowed. Public-suffix-aware
+ * (via `tldts`) so multi-label suffixes like `co.uk` are handled correctly. For
+ * sites on a shared GitBook hosting domain (see {@link SHARED_REGISTRABLE_DOMAINS}),
+ * only the exact hostname is allowed.
+ */
+function getAllowedCORSOrigin(request: NextRequest, siteCanonicalURL: URL): string | null {
+    const origin = request.headers.get('origin');
+    if (!origin) {
+        return null;
+    }
+
+    let originURL: URL;
+    try {
+        originURL = new URL(origin);
+    } catch {
+        return null;
+    }
+
+    const siteHostname = siteCanonicalURL.hostname.toLowerCase();
+    const originHostname = originURL.hostname.toLowerCase();
+
+    // Exact match is always allowed.
+    if (originHostname === siteHostname) {
+        return origin;
+    }
+
+    // Compare on the registrable domain (eTLD+1) so multi-label public suffixes
+    // like `co.uk` don't allow unrelated registrants to claim each other.
+    const siteRegistrable = getDomain(siteHostname);
+    const originRegistrable = getDomain(originHostname);
+    if (!siteRegistrable || siteRegistrable !== originRegistrable) {
+        return null;
+    }
+
+    // On shared hosting registrable domains, only exact-match (handled above) is allowed.
+    if (SHARED_REGISTRABLE_DOMAINS.has(siteRegistrable)) {
+        return null;
+    }
+
+    return origin;
 }
 
 function acceptsMarkdown(request: Request): boolean {

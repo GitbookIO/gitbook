@@ -27,13 +27,17 @@ export async function PageHeader(props: {
 
     const hasAncestors = ancestors.length > 0;
 
+    const pageActionsEnabled = page.layout.actions !== false;
+
     // Show page actions if *any* of the actions are enabled
-    const hasPageActions = [
-        ...Object.values(context.customization.pageActions),
-        context.customization.pdf.enabled,
-        context.customization.git.showEditLink,
-        withRSSFeed,
-    ].some(Boolean);
+    const hasPageActions =
+        pageActionsEnabled &&
+        [
+            ...Object.values(context.customization.pageActions),
+            context.customization.pdf.enabled,
+            context.customization.git.showEditLink,
+            withRSSFeed,
+        ].some(Boolean);
 
     if (!page.layout.title && !page.layout.description && !hasPageActions) {
         return null;
@@ -166,9 +170,21 @@ function getPageActionsURLs({
                   }).toString()}`
               )
             : undefined,
-        mcp:
-            context.site.visibility !== SiteVisibility.VisitorAuth
-                ? context.linker.toAbsoluteURL(context.linker.toPathInSite('~gitbook/mcp'))
-                : undefined,
+        mcp: getPageActionsMCPURL(context),
     };
+}
+
+/**
+ * Return the MCP URL to be used in the page actions dropdown.
+ */
+function getPageActionsMCPURL(context: GitBookSiteContext) {
+    const useAuthenticatedEndpoint = Boolean(
+        context.site.visibility !== SiteVisibility.VisitorAuth &&
+            context.site.adaptiveContent?.enabled &&
+            context.site.urls.login &&
+            context.isLoggedInVisitor
+    );
+    const endpoint = useAuthenticatedEndpoint ? '~gitbook/mcp/auth' : '~gitbook/mcp';
+
+    return context.linker.toAbsoluteURL(context.linker.toPathInSite(endpoint));
 }

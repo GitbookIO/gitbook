@@ -11,6 +11,7 @@ export const no: TranslationLanguage = {
     switch_to_system_theme: 'Bytt til systemtema',
     search: 'Søk',
     clear: 'Tøm',
+    tags: 'Tagger',
     search_back: 'Tilbake til søkeresultater',
     search_or_ask: 'Spør eller søk',
     search_input_placeholder: 'Søk i innhold',
@@ -165,4 +166,5 @@ export const no: TranslationLanguage = {
     form_other_prompt: 'Skriv inn svaret ditt...',
     form_other_field: 'Annet...',
     cancel: 'Avbryt',
+    direct_link_to_heading: 'Direkte lenke til overskriften',
 };

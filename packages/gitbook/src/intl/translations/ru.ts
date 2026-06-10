@@ -9,6 +9,7 @@ export const ru = {
     switch_to_system_theme: 'Переключиться на системную тему',
     search: 'Поиск',
     clear: 'Очистить',
+    tags: 'Теги',
     search_back: 'Вернуться к результатам поиска',
     search_or_ask: 'Найти или спросить',
     search_input_placeholder: 'Поиск по содержимому',
@@ -164,4 +165,5 @@ export const ru = {
     form_other_prompt: 'Введите ответ...',
     form_other_field: 'Другое...',
     cancel: 'Отмена',
+    direct_link_to_heading: 'Прямая ссылка на заголовок',
 };

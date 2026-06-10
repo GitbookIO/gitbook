@@ -5,13 +5,13 @@ import { validateIconName } from '@gitbook/icons/icons';
 import { type ClassValue, tcls } from '@/lib/tailwind';
 
 import { getSpaceLanguage, tString } from '@/intl/server';
-import { languages } from '@/intl/translations';
+import { defaultLanguage } from '@/intl/translations';
 import { isHeadingBlock } from '@/lib/document';
 import { Block, type BlockProps } from './Block';
 import { Blocks } from './Blocks';
 import { getBlockTextStyle } from './spacing';
 
-export function Hint({
+export async function Hint({
     block,
     style,
     ancestorBlocks,
@@ -27,8 +27,8 @@ export function Hint({
     const hasHeading = isHeadingBlock(firstNode);
 
     const language = contextProps.context.contentContext
-        ? getSpaceLanguage(contextProps.context.contentContext)
-        : languages.en;
+        ? await getSpaceLanguage(contextProps.context.contentContext)
+        : defaultLanguage;
 
     const label = tString(language, `hint_${block.data.style}`);
 

@@ -1056,8 +1056,8 @@ const testCases: TestsCase[] = [
                 url: 'blocks/annotations',
                 run: async (page) => {
                     await waitForCookiesDialog(page);
-                    await page.waitForSelector('[data-testid="annotation-button"]');
-                    await page.click('[data-testid="annotation-button"]');
+                    await page.waitForSelector('[data-annotation]');
+                    await page.click('[data-annotation]');
                 },
             },
             {

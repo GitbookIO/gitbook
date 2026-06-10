@@ -15,7 +15,7 @@ import { useLanguage } from '@/intl/client';
 import { tString } from '@/intl/translate';
 import { getLocalStorageItem, setLocalStorageItem } from '@/lib/browser';
 import { tcls } from '@/lib/tailwind';
-import { Icon } from '@gitbook/icons';
+import { Icon, type IconName } from '@gitbook/icons';
 import { useRouter } from 'next/navigation';
 
 interface TabsState {
@@ -56,6 +56,7 @@ const TITLES_MAX = 5;
 export interface TabsItem {
     id: string;
     title: string;
+    icon?: IconName;
     body: React.ReactNode;
 }
 
@@ -319,6 +320,7 @@ function TabsDropdownMenu(props: {
                         key={tab.id}
                         onClick={() => onSelect(tab.id)}
                         active={tab.id === activeTabId}
+                        leadingIcon={tab.icon}
                     >
                         {tab.title}
                     </DropdownMenuItem>
@@ -347,7 +349,8 @@ const TabItem = memo(function TabItem(props: {
             id={getTabButtonId(tab.id)}
             onClick={() => onSelect(tab.id)}
         >
-            {tab.title}
+            {tab.icon && <Icon icon={tab.icon} className="size-4 shrink-0" />}
+            <span className="min-w-0 truncate">{tab.title}</span>
         </TabButton>
     );
 });
@@ -411,7 +414,7 @@ function TabButton(
                 {...rest}
                 type="button"
                 className={tcls(
-                    'relative inline-block max-w-full truncate px-3.5 py-2 font-medium text-sm transition-[color]',
+                    'relative inline-flex max-w-full items-center gap-1.5 px-3.5 py-2 font-medium text-sm transition-[color]',
                     props.className
                 )}
             />

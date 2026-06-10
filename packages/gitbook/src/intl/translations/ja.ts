@@ -11,6 +11,7 @@ export const ja: TranslationLanguage = {
     switch_to_system_theme: 'システムのテーマに切り替え',
     search: '検索',
     clear: 'クリア',
+    tags: 'タグ',
     search_back: '検索結果に戻る',
     search_or_ask: '質問または検索',
     search_input_placeholder: 'コンテンツを検索',
@@ -165,4 +166,5 @@ export const ja: TranslationLanguage = {
     form_other_prompt: '回答を入力...',
     form_other_field: 'その他...',
     cancel: 'キャンセル',
+    direct_link_to_heading: '見出しへの直接リンク',
 };

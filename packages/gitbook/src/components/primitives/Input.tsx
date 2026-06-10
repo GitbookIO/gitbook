@@ -13,6 +13,8 @@ type CustomInputProps = {
     inline?: boolean;
     leading?: IconName | React.ReactNode;
     trailing?: React.ReactNode;
+    /** Slot rendered above the input row (multiline only) */
+    header?: React.ReactNode;
     sizing?: 'small' | 'medium' | 'large'; // The `size` prop is already taken by the HTML input element.
     containerRef?: React.RefObject<HTMLDivElement | null>;
     containerStyle?: React.CSSProperties;
@@ -78,6 +80,7 @@ export const Input = React.forwardRef<InputElement, InputProps>((props, passedRe
         inline = false,
         leading,
         trailing,
+        header,
         className,
         clearButton,
         submitButton,
@@ -221,8 +224,8 @@ export const Input = React.forwardRef<InputElement, InputProps>((props, passedRe
                 disabled
                     ? 'cursor-not-allowed border-tint-subtle bg-tint-subtle opacity-7'
                     : [
-                          'depth-subtle:focus-within:-translate-y-px depth-subtle:hover:-translate-y-px depth-subtle:shadow-xs',
-                          'focus-within:border-primary-hover focus-within:depth-subtle:shadow-lg focus-within:shadow-primary-subtle focus-within:ring-2 hover:cursor-text hover:border-tint-hover hover:not-focus-within:bg-tint-subtle depth-subtle:hover:not-focus-within:shadow-md focus-within:hover:border-primary-hover',
+                          'depth-subtle:focus-within:-translate-y-px depth-subtle:hover:not-has-[button:hover]:-translate-y-px depth-subtle:shadow-xs',
+                          'focus-within:border-primary-hover focus-within:depth-subtle:shadow-lg focus-within:shadow-primary-subtle focus-within:ring-2 hover:not-has-[button:hover]:cursor-text hover:not-has-[button:hover]:border-tint-hover hover:not-has-[button:hover]:not-focus-within:bg-tint-subtle depth-subtle:hover:not-has-[button:hover]:not-focus-within:shadow-md focus-within:hover:not-has-[button:hover]:border-primary-hover',
                       ],
                 multiline ? 'flex-col' : 'flex-row',
                 ariaBusy ? 'cursor-progress' : '',
@@ -238,6 +241,7 @@ export const Input = React.forwardRef<InputElement, InputProps>((props, passedRe
             ref={containerRef}
             style={containerStyle}
         >
+            {multiline && header ? <Tag className="empty:hidden">{header}</Tag> : null}
             <Tag
                 className={tcls(
                     'flex shrink grow',

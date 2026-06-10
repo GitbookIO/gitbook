@@ -7,14 +7,22 @@ import {
     SiteInsightsDisplayContext,
     type TranslationLanguage,
 } from '@gitbook/api';
+import { IconsProvider } from '@gitbook/icons';
 import type { Metadata, Viewport } from 'next';
 import { notFound, redirect } from 'next/navigation';
 
+import { UpdatesFilterProvider } from '@/components/DocumentView/UpdatesFilter';
 import { PageAside } from '@/components/PageAside';
 import { PageBody, PageCover } from '@/components/PageBody';
 import { getPagePath } from '@/lib/pages';
 import { isPageIndexable, isSiteIndexable } from '@/lib/seo';
+import { getDocumentFilterableTags } from '@/lib/updates';
 
+import {
+    getContentInlineIconSourceRequests,
+    getCustomizationIconStyle,
+    getInlineIconSources,
+} from '@/lib/icons/inline';
 import { getResizedImageURL } from '@/lib/images';
 import { resolveContentRef } from '@/lib/references';
 import { getLocalizedTitle } from '@/lib/sites';
@@ -65,11 +73,12 @@ export async function SitePage(props: SitePageProps & { staticRoute: boolean }) 
         withSections,
         withTopHeader,
         pageMetaLinks,
+        iconSources,
     } = await getSitePageData(props);
     const headerOffset = { sectionsHeader: withSections, topHeader: withTopHeader };
-
-    return (
-        <PageContextProvider pageId={page.id} spaceId={context.space.id} title={page.title}>
+    const filterableTags = document ? getDocumentFilterableTags(document, context.revision) : [];
+    const content = (
+        <>
             {/* Using `contents` makes the children of this div according to its parent — which keeps them in a single flex row with the TOC by default.
             If there's a page cover, we use `flex flex-col` to lay out the PageCover above the PageBody + PageAside instead. */}
             <div className={withFullPageCover && page.cover ? 'flex grow flex-col' : 'contents'}>
@@ -88,6 +97,7 @@ export async function SitePage(props: SitePageProps & { staticRoute: boolean }) 
                     <PageAside
                         page={page}
                         document={document}
+                        filterableTags={filterableTags}
                         withHeaderOffset={headerOffset}
                         withFullPageCover={withFullPageCover}
                         withPageFeedback={withPageFeedback}
@@ -105,7 +115,21 @@ export async function SitePage(props: SitePageProps & { staticRoute: boolean }) 
                 </div>
                 <PageClientLayout pageMetaLinks={pageMetaLinks} />
             </div>
-        </PageContextProvider>
+        </>
+    );
+
+    return (
+        <IconsProvider iconSources={iconSources}>
+            <PageContextProvider pageId={page.id} spaceId={context.space.id} title={page.title}>
+                {filterableTags.length > 0 ? (
+                    <UpdatesFilterProvider tagSlugs={filterableTags.map((tag) => tag.slug)}>
+                        {content}
+                    </UpdatesFilterProvider>
+                ) : (
+                    content
+                )}
+            </PageContextProvider>
+        </IconsProvider>
     );
 }
 
@@ -280,6 +304,13 @@ export async function getSitePageData(props: SitePageProps) {
     const withSections = Boolean(visibleSections && visibleSections.list.length > 0);
 
     const document = await getPageDocument(context, page);
+    const iconStyle = getCustomizationIconStyle(customization);
+    const iconSources = await getInlineIconSources(
+        getContentInlineIconSourceRequests({
+            iconStyle,
+            document,
+        })
+    );
 
     return {
         context,
@@ -291,6 +322,7 @@ export async function getSitePageData(props: SitePageProps) {
         withFullPageCover,
         withTopHeader,
         pageMetaLinks,
+        iconSources,
     };
 }
 

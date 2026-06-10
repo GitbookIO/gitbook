@@ -29,7 +29,7 @@ export async function File(props: BlockProps<DocumentBlockFile>) {
         return null;
     }
 
-    const language = getSpaceLanguage(context.contentContext);
+    const language = await getSpaceLanguage(context.contentContext);
     const contentType = getSimplifiedContentType(file.contentType);
     const insights = {
         type: 'link_click' as const,

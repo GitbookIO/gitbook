@@ -11,6 +11,7 @@ export const zh: TranslationLanguage = {
     switch_to_system_theme: '切换到系统主题',
     search: '搜索',
     clear: '清除',
+    tags: '标签',
     search_back: '返回搜索结果',
     search_or_ask: '询问或搜索',
     search_input_placeholder: '搜索内容',
@@ -161,4 +162,5 @@ export const zh: TranslationLanguage = {
     form_other_prompt: '请输入您的回答...',
     form_other_field: '其他...',
     cancel: '取消',
+    direct_link_to_heading: '指向标题的直接链接',
 };

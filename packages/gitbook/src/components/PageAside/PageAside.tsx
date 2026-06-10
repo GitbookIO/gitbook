@@ -1,10 +1,11 @@
-import { getSpaceLanguage, t } from '@/intl/server';
+import { getSpaceLanguage, t, tString } from '@/intl/server';
 import type { GitBookSiteContext } from '@/lib/context';
 import { getDocumentSections } from '@/lib/document-sections';
 import { tcls } from '@/lib/tailwind';
 import {
     type JSONDocument,
     type RevisionPageDocument,
+    type RevisionTag,
     SiteAdsStatus,
     SiteInsightsAdPlacement,
 } from '@gitbook/api';
@@ -12,6 +13,7 @@ import React from 'react';
 
 import { Icon } from '@gitbook/icons';
 import { Ad } from '../Ads';
+import { UpdatesTagFilters } from '../DocumentView/UpdatesFilter';
 import { PageFeedbackForm } from '../PageFeedback';
 import { ThemeToggler } from '../ThemeToggler';
 import { SideSheet } from '../primitives/SideSheet';
@@ -22,17 +24,18 @@ import { ScrollToTopButton } from './ScrollToTopButton';
 /**
  * Aside listing the headings in the document.
  */
-export function PageAside(props: {
+export async function PageAside(props: {
     page: RevisionPageDocument;
     document: JSONDocument | null;
+    filterableTags: RevisionTag[];
     context: GitBookSiteContext;
     withHeaderOffset: { sectionsHeader: boolean; topHeader: boolean };
     withFullPageCover: boolean;
     withPageFeedback: boolean;
 }) {
-    const { page, document, withPageFeedback, context } = props;
+    const { page, document, filterableTags, withPageFeedback, context } = props;
     const { customization, site } = context;
-    const language = getSpaceLanguage(context);
+    const language = await getSpaceLanguage(context);
 
     return (
         <SideSheet
@@ -103,7 +106,19 @@ export function PageAside(props: {
             <div className="flex h-full w-full shrink-0 flex-col overflow-hidden">
                 {page.layout.outline ? (
                     <>
-                        <div className="mb-3 ml-3 flex page-no-outline:hidden items-center justify-between max-lg:hidden">
+                        {filterableTags.length > 0 ? (
+                            <UpdatesTagFilters
+                                tags={filterableTags}
+                                tagsLabel={tString(language, 'tags')}
+                                clearLabel={tString(language, 'clear')}
+                            />
+                        ) : null}
+                        <div
+                            className={tcls(
+                                'mb-3 ml-3 flex page-no-outline:hidden items-center justify-between max-lg:hidden',
+                                filterableTags.length > 0 && 'mt-4'
+                            )}
+                        >
                             <ScrollToTopButton className="flex cursor-pointer items-center gap-1 font-semibold text-tint text-xs uppercase leading-wider">
                                 <Icon icon="block-quote" className="size-3" />{' '}
                                 {t(language, 'on_this_page')}

@@ -9,6 +9,7 @@ export const pt_br = {
     switch_to_system_theme: 'Mudar para configuração do sistema',
     search: 'Buscar',
     clear: 'Limpar',
+    tags: 'Tags',
     search_back: 'Voltar aos resultados da busca',
     search_or_ask: 'Perguntar ou buscar',
     search_input_placeholder: 'Buscar conteúdo',
@@ -165,4 +166,5 @@ export const pt_br = {
     form_other_prompt: 'Digite sua resposta...',
     form_other_field: 'Outro...',
     cancel: 'Cancelar',
+    direct_link_to_heading: 'Link direto para o título',
 };
