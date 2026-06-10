@@ -19,18 +19,23 @@ function useInitialAskBootstrap(props: {
     isLoaded: boolean;
 }) {
     const { asEmbeddable, assistants, initialAsk, isLoaded } = props;
-    const handledInitialAskRef = React.useRef<string | null | undefined>(undefined);
+    const hasBootstrappedRef = React.useRef(false);
 
     React.useEffect(() => {
         if (asEmbeddable) return;
+        if (hasBootstrappedRef.current) return;
         if (assistants.length === 0) return;
-        if (initialAsk === null) return;
-        if (handledInitialAskRef.current === initialAsk) return;
+        if (!isLoaded) return;
 
-        // For simplicity we're only triggering the first assistant.
-        if (isLoaded) {
+        // Mark bootstrap as done once assistants and the body are ready, even if
+        // there is no initial ask. Subsequent `ask` changes come from user
+        // interactions (e.g. clicking "Ask with …" in the search bar, which also
+        // calls `assistant.open` directly) and must not re-trigger this effect.
+        hasBootstrappedRef.current = true;
+
+        if (initialAsk !== null) {
+            // For simplicity we're only triggering the first assistant.
             assistants[0]?.open(initialAsk || undefined);
-            handledInitialAskRef.current = initialAsk;
         }
     }, [asEmbeddable, assistants, initialAsk, isLoaded]);
 }
