@@ -44,10 +44,23 @@ interface StoredVisitor {
     updatedAt: number;
 }
 
+interface StoredVisitorRaw {
+    visitor?: unknown;
+    deviceId?: unknown;
+    updatedAt?: unknown;
+}
+
 function getStoredVisitor(): StoredVisitor | null {
-    const value = getLocalStorageItem<StoredVisitor | null>(VISITOR_STORAGE_KEY, null);
-    if (value && isVisitor(value.visitor) && typeof value.updatedAt === 'number') {
-        return value;
+    const value = getLocalStorageItem<StoredVisitorRaw | null>(VISITOR_STORAGE_KEY, null);
+    if (!value || typeof value.updatedAt !== 'number') {
+        return null;
+    }
+    if (isVisitor(value.visitor)) {
+        return { visitor: value.visitor, updatedAt: value.updatedAt };
+    }
+    // Migrate the legacy { deviceId, updatedAt } shape written by older clients.
+    if (typeof value.deviceId === 'string' && value.deviceId) {
+        return { visitor: { deviceId: value.deviceId }, updatedAt: value.updatedAt };
     }
     return null;
 }
@@ -201,7 +214,10 @@ function getGlobalVisitor({
     // Return immediately if we already have a visitor, revalidate in the background only when stale
     const immediate = existing ?? stored?.visitor ?? null;
     if (immediate) {
-        const isStale = !stored || stored.updatedAt < Date.now() - STALE_TIME_MS;
+        const isStale =
+            !stored ||
+            stored.visitor.deviceId !== immediate.deviceId ||
+            stored.updatedAt < Date.now() - STALE_TIME_MS;
         return {
             visitor: immediate,
             pendingVisitor: isStale ? fetchGlobalVisitor() : null,
