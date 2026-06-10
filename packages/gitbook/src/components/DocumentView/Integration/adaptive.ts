@@ -8,7 +8,7 @@ import type {
 type ContentKitElement = ContentKitRootElement | ContentKitDescendantElement | ContentKitStepper;
 
 /**
- * Decide whether an integration block needs to be rendered with Adaptive visitor context.
+ * Decide whether an integration block should expose Adaptive visitor context to webframes.
  */
 export function shouldRenderIntegrationBlockWithAdaptiveVisitorContext(
     output: ContentKitRenderOutput
@@ -17,7 +17,10 @@ export function shouldRenderIntegrationBlockWithAdaptiveVisitorContext(
         return false;
     }
 
-    return doesContentKitElementContainWebframe(output.element);
+    return (
+        output.canAccessVisitorClaims === true &&
+        doesContentKitElementContainWebframe(output.element)
+    );
 }
 
 /**
