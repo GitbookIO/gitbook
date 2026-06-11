@@ -1,3 +1,4 @@
+import { withTrailingSlash } from '@/lib/paths';
 import { isExternalLink } from '../utils/link';
 
 /**
@@ -24,6 +25,39 @@ export function resolveNavigationTarget(
     }
 
     return { href: `${target.pathname}${target.search}${target.hash}`, pathname: target.pathname };
+}
+
+/**
+ * Return a site-relative href if `url` points within the current site, otherwise `null`.
+ *
+ * Unlike a bare same-origin check, this enforces the site base path, so an assistant cannot
+ * navigate the reader to another page on the same host (e.g. a marketing page, or a different
+ * docs site sharing the host such as `gitbook.com/other` or another `/url/...` proxied site).
+ */
+export function toInSiteHref(
+    url: string,
+    linker: { toLinkForContent: (url: string) => string; siteBasePath: string }
+): string | null {
+    if (URL.canParse(url)) {
+        // toLinkForContent returns a site-relative path for in-site URLs (matching host AND site
+        // base path), or the raw absolute URL otherwise.
+        const link = linker.toLinkForContent(url);
+        return URL.canParse(link) ? null : link;
+    }
+
+    // Relative path: it must live under the site base path.
+    let pathname: string;
+    let rest = '';
+    try {
+        const parsed = new URL(url, 'https://navigation.invalid');
+        pathname = parsed.pathname;
+        rest = `${parsed.search}${parsed.hash}`;
+    } catch {
+        return null;
+    }
+    return withTrailingSlash(pathname).startsWith(linker.siteBasePath)
+        ? `${pathname}${rest}`
+        : null;
 }
 
 /**

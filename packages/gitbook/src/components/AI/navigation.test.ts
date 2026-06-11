@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'bun:test';
-import { normalizePathname, resolveNavigationTarget } from './navigation';
+import { normalizePathname, resolveNavigationTarget, toInSiteHref } from './navigation';
 
 const location = {
     href: 'https://docs.example.com/guides/intro',
@@ -32,6 +32,41 @@ describe('resolveNavigationTarget', () => {
     it('rejects a URL pointing to an external site', () => {
         const result = resolveNavigationTarget('https://evil.example.org/phishing', location);
         expect('error' in result).toBe(true);
+    });
+});
+
+describe('toInSiteHref', () => {
+    // A docs site served under `/docs/` on a host shared with other content/sites.
+    const linker = {
+        siteBasePath: '/docs/',
+        toLinkForContent: (url: string) => {
+            const parsed = new URL(url);
+            // Mirrors the real linker: in-site iff same host AND under the site base path.
+            if (parsed.hostname === 'gitbook.com' && parsed.pathname.startsWith('/docs/')) {
+                return parsed.pathname + parsed.search + parsed.hash;
+            }
+            return url;
+        },
+    };
+
+    it('accepts an in-site absolute URL and returns a relative path', () => {
+        expect(toInSiteHref('https://gitbook.com/docs/guides/intro', linker)).toBe(
+            '/docs/guides/intro'
+        );
+    });
+
+    it('accepts an in-site relative path under the site base path', () => {
+        expect(toInSiteHref('/docs/guides/intro?x=1#y', linker)).toBe('/docs/guides/intro?x=1#y');
+    });
+
+    it('rejects another page on the same host but outside the site base path', () => {
+        // The reviewer's case: same host, different site/section.
+        expect(toInSiteHref('https://gitbook.com/pricing', linker)).toBeNull();
+        expect(toInSiteHref('/pricing', linker)).toBeNull();
+    });
+
+    it('rejects an external host', () => {
+        expect(toInSiteHref('https://evil.example.org/docs/guides', linker)).toBeNull();
     });
 });
 
