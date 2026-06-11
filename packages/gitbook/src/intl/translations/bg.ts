@@ -123,9 +123,9 @@ export const bg: TranslationLanguage = {
     ai_chat_context_title: 'Въз основа на вашия контекст',
     ai_chat_context_description:
         'Асистентът използва AI и вашия контекст, за да генерира отговори и да извършва действия.',
-    ai_chat_context_pages_youve_read: 'Страници, които сте прочели',
-    ai_chat_context_info_provided_by_the_site: 'Информация, предоставена от сайта',
-    ai_chat_context_previous_messages: 'Предишни съобщения',
+    ai_chat_context_pages_youve_read: 'Страницата, на която сте в момента',
+    ai_chat_context_info_provided_by_the_site: 'Информация за вас, предоставена от сайта',
+    ai_chat_context_previous_messages: 'Съобщения във вашия разговор',
     ai_chat_context_disclaimer: 'AI отговорите може да съдържат грешки.',
     ai_chat_input_placeholder: 'Попитайте, потърсете или обяснете...',
     send: 'Изпращане',

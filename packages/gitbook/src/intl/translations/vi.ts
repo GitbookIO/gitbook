@@ -121,9 +121,9 @@ export const vi: TranslationLanguage = {
     ai_chat_context_title: 'Dựa trên ngữ cảnh của bạn',
     ai_chat_context_description:
         'Trợ lý sử dụng AI và ngữ cảnh của bạn để tạo câu trả lời và thực hiện hành động.',
-    ai_chat_context_pages_youve_read: 'Các trang bạn đã đọc',
-    ai_chat_context_info_provided_by_the_site: 'Thông tin do trang web cung cấp',
-    ai_chat_context_previous_messages: 'Tin nhắn trước đó',
+    ai_chat_context_pages_youve_read: 'Trang bạn đang ở hiện tại',
+    ai_chat_context_info_provided_by_the_site: 'Thông tin về bạn do trang web cung cấp',
+    ai_chat_context_previous_messages: 'Tin nhắn trong cuộc trò chuyện của bạn',
     ai_chat_context_disclaimer: 'Câu trả lời AI có thể chứa lỗi.',
     ai_chat_input_placeholder: 'Hỏi, tìm kiếm hoặc giải thích...',
     send: 'Gửi',

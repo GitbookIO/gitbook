@@ -122,9 +122,9 @@ export const ms: TranslationLanguage = {
     ai_chat_context_title: 'Berdasarkan konteks anda',
     ai_chat_context_description:
         'Pembantu menggunakan AI dan konteks anda untuk menjana jawapan dan melaksanakan tindakan.',
-    ai_chat_context_pages_youve_read: 'Halaman yang telah anda baca',
-    ai_chat_context_info_provided_by_the_site: 'Maklumat yang disediakan oleh laman',
-    ai_chat_context_previous_messages: 'Mesej sebelumnya',
+    ai_chat_context_pages_youve_read: 'Halaman yang anda berada sekarang',
+    ai_chat_context_info_provided_by_the_site: 'Maklumat tentang anda yang disediakan oleh laman',
+    ai_chat_context_previous_messages: 'Mesej dalam perbualan anda',
     ai_chat_context_disclaimer: 'Jawapan AI mungkin mengandungi kesilapan.',
     ai_chat_input_placeholder: 'Tanya, cari atau jelaskan...',
     send: 'Hantar',

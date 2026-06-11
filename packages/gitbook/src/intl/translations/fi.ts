@@ -122,9 +122,9 @@ export const fi: TranslationLanguage = {
     ai_chat_context_title: 'Kontekstisi perusteella',
     ai_chat_context_description:
         'Avustaja käyttää AI:ta ja kontekstiasi vastausten luomiseen ja toimintojen suorittamiseen.',
-    ai_chat_context_pages_youve_read: 'Lukemasi sivut',
-    ai_chat_context_info_provided_by_the_site: 'Sivuston tarjoamat tiedot',
-    ai_chat_context_previous_messages: 'Aiemmat viestit',
+    ai_chat_context_pages_youve_read: 'Sivu, jolla olet nyt',
+    ai_chat_context_info_provided_by_the_site: 'Sivuston tarjoamat tiedot sinusta',
+    ai_chat_context_previous_messages: 'Viestit keskustelussasi',
     ai_chat_context_disclaimer: 'AI-vastaukset voivat sisältää virheitä.',
     ai_chat_input_placeholder: 'Kysy, hae tai selitä...',
     send: 'Lähetä',

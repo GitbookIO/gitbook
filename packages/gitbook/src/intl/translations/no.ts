@@ -123,9 +123,9 @@ export const no: TranslationLanguage = {
     ai_chat_context_title: 'Basert på din kontekst',
     ai_chat_context_description:
         'Assistenten bruker AI og din kontekst til å generere svar og utføre handlinger.',
-    ai_chat_context_pages_youve_read: 'Sider du har lest',
-    ai_chat_context_info_provided_by_the_site: 'Informasjon gitt av nettstedet',
-    ai_chat_context_previous_messages: 'Tidligere meldinger',
+    ai_chat_context_pages_youve_read: 'Siden du er på nå',
+    ai_chat_context_info_provided_by_the_site: 'Informasjon om deg gitt av nettstedet',
+    ai_chat_context_previous_messages: 'Meldinger i samtalen din',
     ai_chat_context_disclaimer: 'AI-svar kan inneholde feil.',
     ai_chat_input_placeholder: 'Spør, søk eller forklar...',
     send: 'Send',

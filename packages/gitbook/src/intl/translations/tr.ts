@@ -121,9 +121,9 @@ export const tr: TranslationLanguage = {
     ai_chat_context_title: 'Bağlamınıza göre',
     ai_chat_context_description:
         'Asistan, yanıtlar üretmek ve eylemler gerçekleştirmek için AI ve bağlamınızı kullanır.',
-    ai_chat_context_pages_youve_read: 'Okuduğunuz sayfalar',
-    ai_chat_context_info_provided_by_the_site: 'Site tarafından sağlanan bilgiler',
-    ai_chat_context_previous_messages: 'Önceki mesajlar',
+    ai_chat_context_pages_youve_read: 'Şu anda bulunduğunuz sayfa',
+    ai_chat_context_info_provided_by_the_site: 'Site tarafından sağlanan sizinle ilgili bilgiler',
+    ai_chat_context_previous_messages: 'Konuşmanızdaki mesajlar',
     ai_chat_context_disclaimer: 'AI yanıtları hata içerebilir.',
     ai_chat_input_placeholder: 'Sor, ara veya açıkla...',
     send: 'Gönder',

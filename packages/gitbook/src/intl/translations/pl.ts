@@ -122,9 +122,9 @@ export const pl: TranslationLanguage = {
     ai_chat_context_title: 'Na podstawie Twojego kontekstu',
     ai_chat_context_description:
         'Asystent używa AI i Twojego kontekstu do generowania odpowiedzi oraz wykonywania działań.',
-    ai_chat_context_pages_youve_read: 'Strony, które czytałeś',
-    ai_chat_context_info_provided_by_the_site: 'Informacje podane przez stronę',
-    ai_chat_context_previous_messages: 'Poprzednie wiadomości',
+    ai_chat_context_pages_youve_read: 'Strona, na której jesteś teraz',
+    ai_chat_context_info_provided_by_the_site: 'Informacje o Tobie podane przez stronę',
+    ai_chat_context_previous_messages: 'Wiadomości w Twojej rozmowie',
     ai_chat_context_disclaimer: 'Odpowiedzi AI mogą zawierać błędy.',
     ai_chat_input_placeholder: 'Zapytaj, wyszukaj lub wyjaśnij...',
     send: 'Wyślij',

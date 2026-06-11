@@ -124,9 +124,10 @@ export const de = {
     ai_chat_context_title: 'Basierend auf Ihrem Kontext',
     ai_chat_context_description:
         'Der Assistent verwendet KI und Ihren Kontext, um Antworten zu generieren und Aktionen durchzuführen.',
-    ai_chat_context_pages_youve_read: 'Seiten, die Sie gelesen haben',
-    ai_chat_context_info_provided_by_the_site: 'Von der Website bereitgestellte Informationen',
-    ai_chat_context_previous_messages: 'Vorherige Nachrichten',
+    ai_chat_context_pages_youve_read: 'Die Seite, auf der Sie sich gerade befinden',
+    ai_chat_context_info_provided_by_the_site:
+        'Von der Website bereitgestellte Informationen über Sie',
+    ai_chat_context_previous_messages: 'Nachrichten in Ihrem Gespräch',
     ai_chat_context_disclaimer: 'KI-Antworten können Fehler enthalten.',
     ai_chat_input_placeholder: 'Fragen, suchen oder erklären...',
     send: 'Senden',

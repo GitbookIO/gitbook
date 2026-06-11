@@ -122,9 +122,9 @@ export const sl: TranslationLanguage = {
     ai_chat_context_title: 'Na podlagi vašega konteksta',
     ai_chat_context_description:
         'Pomočnik uporablja AI in vaš kontekst za ustvarjanje odgovorov ter izvajanje dejanj.',
-    ai_chat_context_pages_youve_read: 'Strani, ki ste jih prebrali',
-    ai_chat_context_info_provided_by_the_site: 'Informacije, ki jih zagotavlja spletno mesto',
-    ai_chat_context_previous_messages: 'Prejšnja sporočila',
+    ai_chat_context_pages_youve_read: 'Stran, na kateri se trenutno nahajate',
+    ai_chat_context_info_provided_by_the_site: 'Informacije o vas, ki jih zagotavlja spletno mesto',
+    ai_chat_context_previous_messages: 'Sporočila v vašem pogovoru',
     ai_chat_context_disclaimer: 'Odgovori AI lahko vsebujejo napake.',
     ai_chat_input_placeholder: 'Vprašajte, iščite ali razložite...',
     send: 'Pošlji',

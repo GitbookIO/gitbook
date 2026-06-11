@@ -122,9 +122,9 @@ export const ru = {
     ai_chat_context_title: 'На основе вашего контекста',
     ai_chat_context_description:
         'Помощник использует ИИ и ваш контекст для генерации ответов и выполнения действий.',
-    ai_chat_context_pages_youve_read: 'Страницы, которые вы прочитали',
-    ai_chat_context_info_provided_by_the_site: 'Информация, предоставленная сайтом',
-    ai_chat_context_previous_messages: 'Предыдущие сообщения',
+    ai_chat_context_pages_youve_read: 'Страница, на которой вы сейчас находитесь',
+    ai_chat_context_info_provided_by_the_site: 'Информация о вас, предоставленная сайтом',
+    ai_chat_context_previous_messages: 'Сообщения в вашем разговоре',
     ai_chat_context_disclaimer: 'Ответы ИИ могут содержать ошибки.',
     ai_chat_input_placeholder: 'Спросите, найдите или объясните...',
     send: 'Отправить',

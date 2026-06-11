@@ -123,9 +123,9 @@ export const cs: TranslationLanguage = {
     ai_chat_context_title: 'Na základě vašeho kontextu',
     ai_chat_context_description:
         'Asistent používá AI a váš kontext k vytváření odpovědí a provádění akcí.',
-    ai_chat_context_pages_youve_read: 'Stránky, které jste četli',
-    ai_chat_context_info_provided_by_the_site: 'Informace poskytnuté webem',
-    ai_chat_context_previous_messages: 'Předchozí zprávy',
+    ai_chat_context_pages_youve_read: 'Stránka, na které se právě nacházíte',
+    ai_chat_context_info_provided_by_the_site: 'Informace o vás poskytnuté webem',
+    ai_chat_context_previous_messages: 'Zprávy ve vaší konverzaci',
     ai_chat_context_disclaimer: 'Odpovědi AI mohou obsahovat chyby.',
     ai_chat_input_placeholder: 'Zeptejte se, hledejte nebo vysvětlete...',
     send: 'Odeslat',

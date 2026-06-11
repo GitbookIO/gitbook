@@ -121,9 +121,9 @@ export const lv: TranslationLanguage = {
     ai_chat_context_title: 'Pamatojoties uz jūsu kontekstu',
     ai_chat_context_description:
         'Asistents izmanto AI un jūsu kontekstu, lai ģenerētu atbildes un veiktu darbības.',
-    ai_chat_context_pages_youve_read: 'Lapas, kuras esat lasījis',
-    ai_chat_context_info_provided_by_the_site: 'Vietnes sniegtā informācija',
-    ai_chat_context_previous_messages: 'Iepriekšējie ziņojumi',
+    ai_chat_context_pages_youve_read: 'Lapa, kurā pašlaik atrodaties',
+    ai_chat_context_info_provided_by_the_site: 'Vietnes sniegtā informācija par jums',
+    ai_chat_context_previous_messages: 'Ziņojumi jūsų sarunā',
     ai_chat_context_disclaimer: 'AI atbildēs var būt kļūdas.',
     ai_chat_input_placeholder: 'Jautājiet, meklējiet vai skaidrojiet...',
     send: 'Sūtīt',

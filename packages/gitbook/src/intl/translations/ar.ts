@@ -121,9 +121,9 @@ export const ar: TranslationLanguage = {
     ai_chat_context_title: 'استنادا إلى سياقك',
     ai_chat_context_description:
         'يستخدم المساعد الذكاء الاصطناعي وسياقك لإنشاء الإجابات وتنفيذ الإجراءات.',
-    ai_chat_context_pages_youve_read: 'الصفحات التي قرأتها',
-    ai_chat_context_info_provided_by_the_site: 'معلومات يوفرها الموقع',
-    ai_chat_context_previous_messages: 'الرسائل السابقة',
+    ai_chat_context_pages_youve_read: 'الصفحة التي أنت عليها الآن',
+    ai_chat_context_info_provided_by_the_site: 'معلومات عنك يوفرها الموقع',
+    ai_chat_context_previous_messages: 'الرسائل في محادثتك',
     ai_chat_context_disclaimer: 'قد تحتوي إجابات الذكاء الاصطناعي على أخطاء.',
     ai_chat_input_placeholder: 'اسأل أو ابحث أو اشرح...',
     send: 'إرسال',

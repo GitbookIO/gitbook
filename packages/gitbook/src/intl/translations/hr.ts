@@ -123,9 +123,9 @@ export const hr: TranslationLanguage = {
     ai_chat_context_title: 'Na temelju vašeg konteksta',
     ai_chat_context_description:
         'Asistent koristi AI i vaš kontekst za generiranje odgovora i izvođenje radnji.',
-    ai_chat_context_pages_youve_read: 'Stranice koje ste pročitali',
-    ai_chat_context_info_provided_by_the_site: 'Informacije koje pruža web-mjesto',
-    ai_chat_context_previous_messages: 'Prethodne poruke',
+    ai_chat_context_pages_youve_read: 'Stranica na kojoj se trenutno nalazite',
+    ai_chat_context_info_provided_by_the_site: 'Informacije o vama koje pruža web-mjesto',
+    ai_chat_context_previous_messages: 'Poruke u vašem razgovoru',
     ai_chat_context_disclaimer: 'AI odgovori mogu sadržavati pogreške.',
     ai_chat_input_placeholder: 'Pitajte, pretražite ili objasnite...',
     send: 'Pošalji',

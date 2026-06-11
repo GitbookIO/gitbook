@@ -121,10 +121,11 @@ export const hu: TranslationLanguage = {
     ai_chat_hold_message_2: 'Egy pillanat…',
     ai_chat_context_title: 'Az Ön kontextusa alapján',
     ai_chat_context_description:
-        'Az asszisztens AI-t és az Ön kontextusát használja válaszok létrehozásához és műveletek végrehajtásához.',
-    ai_chat_context_pages_youve_read: 'Elolvasott oldalak',
-    ai_chat_context_info_provided_by_the_site: 'A webhely által megadott információk',
-    ai_chat_context_previous_messages: 'Korábbi üzenetek',
+        'Az Asszisztens AI-t és az Ön kontextusát használja válaszok létrehozásához és műveletek végrehajtásához.',
+    ai_chat_context_pages_youve_read: 'Az oldal, amelyen éppen tartózkodik',
+    ai_chat_context_info_provided_by_the_site:
+        'Az Önről szóló, a webhely által megadott információk',
+    ai_chat_context_previous_messages: 'Üzenetek a beszélgetésében',
     ai_chat_context_disclaimer: 'Az AI-válaszok hibákat tartalmazhatnak.',
     ai_chat_input_placeholder: 'Kérdezzen, keressen vagy magyarázzon...',
     send: 'Küldés',
