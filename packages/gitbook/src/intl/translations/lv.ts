@@ -135,6 +135,8 @@ export const lv: TranslationLanguage = {
     searched_for: 'Meklēts ${1}',
     ai_chat_tools_listed_pages: 'Pārlūkoja dokumentāciju',
     ai_chat_tools_read_page: 'Izlasīja lapu ${1}',
+    ai_chat_tools_navigated_to_page: 'Lapa atvērta',
+    ai_chat_tools_navigate_failed: 'Neizdevās atvērt lapu',
     ai_chat_tools_mcp_tool: 'Izsauca ${1}',
     ai_chat_ask: 'Jautāt ${1}',
     ai_chat_ask_about_page: 'Jautāt ${1} par šo lapu',

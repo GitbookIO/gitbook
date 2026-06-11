@@ -137,6 +137,8 @@ export const sk: TranslationLanguage = {
     searched_for: 'Hľadané ${1}',
     ai_chat_tools_listed_pages: 'Prehliadal dokumentáciu',
     ai_chat_tools_read_page: 'Prečítal stránku ${1}',
+    ai_chat_tools_navigated_to_page: 'Stránka otvorená',
+    ai_chat_tools_navigate_failed: 'Stránku sa nepodarilo otvoriť',
     ai_chat_tools_mcp_tool: 'Zavolal ${1}',
     ai_chat_ask: 'Opýtať sa ${1}',
     ai_chat_ask_about_page: 'Opýtať sa ${1} na túto stránku',

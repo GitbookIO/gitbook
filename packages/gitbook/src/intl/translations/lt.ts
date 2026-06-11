@@ -136,6 +136,8 @@ export const lt: TranslationLanguage = {
     searched_for: 'Ieškota ${1}',
     ai_chat_tools_listed_pages: 'Naršyta dokumentacija',
     ai_chat_tools_read_page: 'Perskaitytas puslapis ${1}',
+    ai_chat_tools_navigated_to_page: 'Puslapis atidarytas',
+    ai_chat_tools_navigate_failed: 'Nepavyko atidaryti puslapio',
     ai_chat_tools_mcp_tool: 'Iškviesta ${1}',
     ai_chat_ask: 'Klausti ${1}',
     ai_chat_ask_about_page: 'Klausti ${1} apie šį puslapį',

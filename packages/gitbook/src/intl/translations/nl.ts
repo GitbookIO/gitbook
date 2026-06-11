@@ -137,6 +137,8 @@ export const nl: TranslationLanguage = {
     searched_for: 'Gezocht naar ${1}',
     ai_chat_tools_listed_pages: 'Docs doorzocht',
     ai_chat_tools_read_page: 'Pagina ${1} gelezen',
+    ai_chat_tools_navigated_to_page: 'Pagina geopend',
+    ai_chat_tools_navigate_failed: 'Kan de pagina niet openen',
     ai_chat_tools_mcp_tool: '${1} aangeroepen',
     ai_chat_ask: 'Vraag het aan ${1}',
     ai_chat_ask_about_page: 'Vraag ${1} naar deze pagina',

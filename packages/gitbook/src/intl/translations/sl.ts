@@ -136,6 +136,8 @@ export const sl: TranslationLanguage = {
     searched_for: 'Iskano ${1}',
     ai_chat_tools_listed_pages: 'Prebrskana dokumentacija',
     ai_chat_tools_read_page: 'Prebrana stran ${1}',
+    ai_chat_tools_navigated_to_page: 'Stran odprta',
+    ai_chat_tools_navigate_failed: 'Strani ni bilo mogoče odpreti',
     ai_chat_tools_mcp_tool: 'Poklicano ${1}',
     ai_chat_ask: 'Vprašaj ${1}',
     ai_chat_ask_about_page: 'Vprašaj ${1} o tej strani',

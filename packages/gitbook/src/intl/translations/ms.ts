@@ -136,6 +136,8 @@ export const ms: TranslationLanguage = {
     searched_for: 'Mencari ${1}',
     ai_chat_tools_listed_pages: 'Melayari dokumentasi',
     ai_chat_tools_read_page: 'Membaca halaman ${1}',
+    ai_chat_tools_navigated_to_page: 'Halaman dibuka',
+    ai_chat_tools_navigate_failed: 'Gagal membuka halaman',
     ai_chat_tools_mcp_tool: 'Memanggil ${1}',
     ai_chat_ask: 'Tanya ${1}',
     ai_chat_ask_about_page: 'Tanya ${1} tentang halaman ini',

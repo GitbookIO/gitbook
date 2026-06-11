@@ -134,6 +134,8 @@ export const he: TranslationLanguage = {
     searched_for: 'חיפש ${1}',
     ai_chat_tools_listed_pages: 'עיין בתיעוד',
     ai_chat_tools_read_page: 'קרא את הדף ${1}',
+    ai_chat_tools_navigated_to_page: 'הדף נפתח',
+    ai_chat_tools_navigate_failed: 'פתיחת הדף נכשלה',
     ai_chat_tools_mcp_tool: 'קרא ל-${1}',
     ai_chat_ask: 'שאל את ${1}',
     ai_chat_ask_about_page: 'שאל את ${1} על הדף הזה',

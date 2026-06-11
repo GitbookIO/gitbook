@@ -134,6 +134,8 @@ export const fr = {
     searched_for: 'Recherche : ${1}',
     ai_chat_tools_listed_pages: 'A parcouru la documentation',
     ai_chat_tools_read_page: 'A consulté la page ${1}',
+    ai_chat_tools_navigated_to_page: 'Page ouverte',
+    ai_chat_tools_navigate_failed: "Échec de l'ouverture de la page",
     ai_chat_tools_mcp_tool: 'A appelé ${1}',
     ai_chat_ask: 'Demander à ${1}',
     ai_chat_ask_about_page: 'Demander à ${1} à propos de cette page',

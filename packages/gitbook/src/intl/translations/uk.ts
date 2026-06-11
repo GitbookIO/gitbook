@@ -135,6 +135,8 @@ export const uk: TranslationLanguage = {
     searched_for: 'Шукали ${1}',
     ai_chat_tools_listed_pages: 'Переглянуто документацію',
     ai_chat_tools_read_page: 'Прочитано сторінку ${1}',
+    ai_chat_tools_navigated_to_page: 'Сторінку відкрито',
+    ai_chat_tools_navigate_failed: 'Не вдалося відкрити сторінку',
     ai_chat_tools_mcp_tool: 'Викликано ${1}',
     ai_chat_ask: 'Запитати ${1}',
     ai_chat_ask_about_page: 'Запитати ${1} про цю сторінку',

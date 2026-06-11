@@ -136,6 +136,8 @@ export const fi: TranslationLanguage = {
     searched_for: 'Haettu: ${1}',
     ai_chat_tools_listed_pages: 'Selattiin dokumentaatiota',
     ai_chat_tools_read_page: 'Luettiin sivu ${1}',
+    ai_chat_tools_navigated_to_page: 'Sivu avattu',
+    ai_chat_tools_navigate_failed: 'Sivun avaaminen epäonnistui',
     ai_chat_tools_mcp_tool: 'Kutsuttiin ${1}',
     ai_chat_ask: 'Kysy ${1}',
     ai_chat_ask_about_page: 'Kysy ${1} tältä sivulta',

@@ -135,6 +135,8 @@ export const et: TranslationLanguage = {
     searched_for: 'Otsiti ${1}',
     ai_chat_tools_listed_pages: 'Sirvis dokumentatsiooni',
     ai_chat_tools_read_page: 'Luges lehte ${1}',
+    ai_chat_tools_navigated_to_page: 'Leht avatud',
+    ai_chat_tools_navigate_failed: 'Lehe avamine ebaõnnestus',
     ai_chat_tools_mcp_tool: 'Kutsus ${1}',
     ai_chat_ask: 'Küsi ${1}',
     ai_chat_ask_about_page: 'Küsi ${1} selle lehe kohta',

@@ -136,6 +136,8 @@ export const hu: TranslationLanguage = {
     searched_for: 'Keresve: ${1}',
     ai_chat_tools_listed_pages: 'Dokumentáció böngészve',
     ai_chat_tools_read_page: '${1} oldal elolvasva',
+    ai_chat_tools_navigated_to_page: 'Oldal megnyitva',
+    ai_chat_tools_navigate_failed: 'Az oldal megnyitása sikertelen',
     ai_chat_tools_mcp_tool: '${1} meghívva',
     ai_chat_ask: '${1} kérdezése',
     ai_chat_ask_about_page: '${1} kérdezése erről az oldalról',

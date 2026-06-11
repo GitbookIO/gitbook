@@ -132,6 +132,8 @@ export const zh_tw: TranslationLanguage = {
     searched_for: '已搜尋 ${1}',
     ai_chat_tools_listed_pages: '瀏覽了文件',
     ai_chat_tools_read_page: '已閱讀頁面 ${1}',
+    ai_chat_tools_navigated_to_page: '已開啟頁面',
+    ai_chat_tools_navigate_failed: '無法開啟頁面',
     ai_chat_tools_mcp_tool: '已呼叫 ${1}',
     ai_chat_ask: '詢問 ${1}',
     ai_chat_ask_about_page: '詢問 ${1} 關於此頁面',

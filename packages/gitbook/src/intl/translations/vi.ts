@@ -135,6 +135,8 @@ export const vi: TranslationLanguage = {
     searched_for: 'Đã tìm kiếm ${1}',
     ai_chat_tools_listed_pages: 'Đã duyệt tài liệu',
     ai_chat_tools_read_page: 'Đã đọc trang ${1}',
+    ai_chat_tools_navigated_to_page: 'Đã mở trang',
+    ai_chat_tools_navigate_failed: 'Không thể mở trang',
     ai_chat_tools_mcp_tool: 'Đã gọi ${1}',
     ai_chat_ask: 'Hỏi ${1}',
     ai_chat_ask_about_page: 'Hỏi ${1} về trang này',

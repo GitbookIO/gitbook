@@ -137,6 +137,8 @@ export const ja: TranslationLanguage = {
     searched_for: '${1}を検索しました',
     ai_chat_tools_listed_pages: 'ドキュメントを閲覧',
     ai_chat_tools_read_page: 'ページ ${1} を読みました',
+    ai_chat_tools_navigated_to_page: 'ページを開きました',
+    ai_chat_tools_navigate_failed: 'ページを開けませんでした',
     ai_chat_tools_mcp_tool: '${1} を呼び出しました',
     ai_chat_ask: '${1} に質問する',
     ai_chat_ask_about_page: 'このページについて ${1} に質問する',

@@ -133,6 +133,8 @@ export const th: TranslationLanguage = {
     searched_for: 'ค้นหา ${1}',
     ai_chat_tools_listed_pages: 'เรียกดูเอกสาร',
     ai_chat_tools_read_page: 'อ่านหน้า ${1}',
+    ai_chat_tools_navigated_to_page: 'เปิดหน้าแล้ว',
+    ai_chat_tools_navigate_failed: 'ไม่สามารถเปิดหน้าได้',
     ai_chat_tools_mcp_tool: 'เรียกใช้ ${1}',
     ai_chat_ask: 'ถาม ${1}',
     ai_chat_ask_about_page: 'ถาม ${1} เกี่ยวกับหน้านี้',

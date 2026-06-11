@@ -136,6 +136,8 @@ export const pl: TranslationLanguage = {
     searched_for: 'Wyszukano ${1}',
     ai_chat_tools_listed_pages: 'Przeglądano dokumentację',
     ai_chat_tools_read_page: 'Przeczytano stronę ${1}',
+    ai_chat_tools_navigated_to_page: 'Otwarto stronę',
+    ai_chat_tools_navigate_failed: 'Nie udało się otworzyć strony',
     ai_chat_tools_mcp_tool: 'Wywołano ${1}',
     ai_chat_ask: 'Zapytaj ${1}',
     ai_chat_ask_about_page: 'Zapytaj ${1} o tę stronę',
