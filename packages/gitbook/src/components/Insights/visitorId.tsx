@@ -5,7 +5,12 @@ import type { MaybePromise } from 'p-map';
 import React from 'react';
 import { createStore, useStore } from 'zustand';
 
-import { getBrowserCookie, getLocalStorageItem, setLocalStorageItem } from '@/lib/browser';
+import {
+    getBrowserCookie,
+    getLocalStorageItem,
+    removeLocalStorageItem,
+    setLocalStorageItem,
+} from '@/lib/browser';
 
 import { isCookiesTrackingDisabled } from './cookies';
 import { getSession } from './sessions';
@@ -169,6 +174,8 @@ function getGlobalVisitor({
     const withoutCookies = isCookiesTrackingDisabled();
 
     if (withoutCookies || !visitorCookieTrackingEnabled) {
+        // Consent withdrawn or tracking disabled: stop using AND retaining the stored id.
+        removeLocalStorageItem(VISITOR_STORAGE_KEY);
         return { visitor: { deviceId: getProposedVisitorId() }, pendingVisitor: null };
     }
 
