@@ -122,9 +122,9 @@ export const lt: TranslationLanguage = {
     ai_chat_context_title: 'Pagal jūsų kontekstą',
     ai_chat_context_description:
         'Asistentas naudoja AI ir jūsų kontekstą atsakymams generuoti ir veiksmams atlikti.',
-    ai_chat_context_pages_youve_read: 'Puslapiai, kuriuos skaitėte',
-    ai_chat_context_info_provided_by_the_site: 'Svetainės pateikta informacija',
-    ai_chat_context_previous_messages: 'Ankstesni pranešimai',
+    ai_chat_context_pages_youve_read: 'Puslapis, kuriame šiuo metu esate',
+    ai_chat_context_info_provided_by_the_site: 'Svetainės pateikta informacija apie jus',
+    ai_chat_context_previous_messages: 'Pranešimai jūsų pokalbyje',
     ai_chat_context_disclaimer: 'AI atsakymuose gali būti klaidų.',
     ai_chat_input_placeholder: 'Klauskite, ieškokite arba paaiškinkite...',
     send: 'Siųsti',

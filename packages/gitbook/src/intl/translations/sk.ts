@@ -123,9 +123,9 @@ export const sk: TranslationLanguage = {
     ai_chat_context_title: 'Na základe vášho kontextu',
     ai_chat_context_description:
         'Asistent používa AI a váš kontext na generovanie odpovedí a vykonávanie akcií.',
-    ai_chat_context_pages_youve_read: 'Stránky, ktoré ste čítali',
-    ai_chat_context_info_provided_by_the_site: 'Informácie poskytnuté stránkou',
-    ai_chat_context_previous_messages: 'Predchádzajúce správy',
+    ai_chat_context_pages_youve_read: 'Stránka, na ktorej sa práve nachádzate',
+    ai_chat_context_info_provided_by_the_site: 'Informácie o vás poskytnuté stránkou',
+    ai_chat_context_previous_messages: 'Správy vo vašej konverzácii',
     ai_chat_context_disclaimer: 'Odpovede AI môžu obsahovať chyby.',
     ai_chat_input_placeholder: 'Pýtajte sa, hľadajte alebo vysvetľujte...',
     send: 'Odoslať',

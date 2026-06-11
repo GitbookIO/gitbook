@@ -123,9 +123,9 @@ export const ja: TranslationLanguage = {
     ai_chat_context_title: 'あなたのコンテキストに基づいて',
     ai_chat_context_description:
         'アシスタントはAIとあなたのコンテキストを使用して回答を生成し、アクションを実行します。',
-    ai_chat_context_pages_youve_read: '読んだページ',
-    ai_chat_context_info_provided_by_the_site: 'サイトから提供された情報',
-    ai_chat_context_previous_messages: '以前のメッセージ',
+    ai_chat_context_pages_youve_read: '現在表示中のページ',
+    ai_chat_context_info_provided_by_the_site: 'サイトから提供されるあなたに関する情報',
+    ai_chat_context_previous_messages: '会話内のメッセージ',
     ai_chat_context_disclaimer: 'AIの回答には誤りが含まれる場合があります。',
     ai_chat_input_placeholder: '質問、検索、または説明...',
     send: '送信',

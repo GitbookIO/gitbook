@@ -122,9 +122,9 @@ export const id: TranslationLanguage = {
     ai_chat_context_title: 'Berdasarkan konteks Anda',
     ai_chat_context_description:
         'Asisten menggunakan AI dan konteks Anda untuk menghasilkan jawaban dan melakukan tindakan.',
-    ai_chat_context_pages_youve_read: 'Halaman yang telah Anda baca',
-    ai_chat_context_info_provided_by_the_site: 'Info yang disediakan oleh situs',
-    ai_chat_context_previous_messages: 'Pesan sebelumnya',
+    ai_chat_context_pages_youve_read: 'Halaman tempat Anda berada sekarang',
+    ai_chat_context_info_provided_by_the_site: 'Info tentang Anda yang disediakan oleh situs',
+    ai_chat_context_previous_messages: 'Pesan dalam percakapan Anda',
     ai_chat_context_disclaimer: 'Jawaban AI dapat berisi kesalahan.',
     ai_chat_input_placeholder: 'Tanya, cari, atau jelaskan...',
     send: 'Kirim',

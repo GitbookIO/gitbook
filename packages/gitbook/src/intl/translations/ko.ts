@@ -122,9 +122,9 @@ export const ko: TranslationLanguage = {
     ai_chat_context_title: '현재 컨텍스트 기준',
     ai_chat_context_description:
         '어시스턴트는 AI와 현재 컨텍스트를 사용해 답변을 생성하고 작업을 수행합니다.',
-    ai_chat_context_pages_youve_read: '읽은 페이지',
-    ai_chat_context_info_provided_by_the_site: '사이트에서 제공한 정보',
-    ai_chat_context_previous_messages: '이전 메시지',
+    ai_chat_context_pages_youve_read: '현재 보고 있는 페이지',
+    ai_chat_context_info_provided_by_the_site: '사이트에서 제공하는 회원님에 대한 정보',
+    ai_chat_context_previous_messages: '대화의 메시지',
     ai_chat_context_disclaimer: 'AI 응답에는 오류가 있을 수 있습니다.',
     ai_chat_input_placeholder: '질문, 검색 또는 설명...',
     send: '전송',

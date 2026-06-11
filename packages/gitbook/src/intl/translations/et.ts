@@ -121,9 +121,9 @@ export const et: TranslationLanguage = {
     ai_chat_context_title: 'Teie konteksti põhjal',
     ai_chat_context_description:
         'Assistent kasutab AI-d ja teie konteksti vastuste loomiseks ning toimingute tegemiseks.',
-    ai_chat_context_pages_youve_read: 'Lehed, mida olete lugenud',
-    ai_chat_context_info_provided_by_the_site: 'Saidi pakutud teave',
-    ai_chat_context_previous_messages: 'Eelmised sõnumid',
+    ai_chat_context_pages_youve_read: 'Leht, kus te praegu asute',
+    ai_chat_context_info_provided_by_the_site: 'Saidi pakutud teave teie kohta',
+    ai_chat_context_previous_messages: 'Teie vestluse sõnumid',
     ai_chat_context_disclaimer: 'AI vastused võivad sisaldada vigu.',
     ai_chat_input_placeholder: 'Küsige, otsige või selgitage...',
     send: 'Saada',

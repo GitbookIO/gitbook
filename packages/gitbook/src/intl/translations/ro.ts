@@ -124,9 +124,9 @@ export const ro: TranslationLanguage = {
     ai_chat_context_title: 'Pe baza contextului tău',
     ai_chat_context_description:
         'Asistentul folosește AI și contextul tău pentru a genera răspunsuri și a efectua acțiuni.',
-    ai_chat_context_pages_youve_read: 'Pagini pe care le-ai citit',
-    ai_chat_context_info_provided_by_the_site: 'Informații furnizate de site',
-    ai_chat_context_previous_messages: 'Mesaje anterioare',
+    ai_chat_context_pages_youve_read: 'Pagina pe care te afli acum',
+    ai_chat_context_info_provided_by_the_site: 'Informații despre tine furnizate de site',
+    ai_chat_context_previous_messages: 'Mesaje din conversația ta',
     ai_chat_context_disclaimer: 'Răspunsurile AI pot conține greșeli.',
     ai_chat_input_placeholder: 'Întreabă, caută sau explică...',
     send: 'Trimite',

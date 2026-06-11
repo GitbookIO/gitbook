@@ -123,10 +123,11 @@ export const el: TranslationLanguage = {
     ai_chat_hold_message_2: 'Μια στιγμή…',
     ai_chat_context_title: 'Με βάση το πλαίσιό σας',
     ai_chat_context_description:
-        'Ο βοηθός χρησιμοποιεί AI και το πλαίσιό σας για να δημιουργεί απαντήσεις και να εκτελεί ενέργειες.',
-    ai_chat_context_pages_youve_read: 'Σελίδες που έχετε διαβάσει',
-    ai_chat_context_info_provided_by_the_site: 'Πληροφορίες που παρέχονται από τον ιστότοπο',
-    ai_chat_context_previous_messages: 'Προηγούμενα μηνύματα',
+        'Ο Βοηθός χρησιμοποιεί AI και το πλαίσιό σας για να δημιουργεί απαντήσεις και να εκτελεί ενέργειες.',
+    ai_chat_context_pages_youve_read: 'Η σελίδα στην οποία βρίσκεστε τώρα',
+    ai_chat_context_info_provided_by_the_site:
+        'Πληροφορίες για εσάς που παρέχονται από τον ιστότοπο',
+    ai_chat_context_previous_messages: 'Μηνύματα στη συνομιλία σας',
     ai_chat_context_disclaimer: 'Οι απαντήσεις AI μπορεί να περιέχουν λάθη.',
     ai_chat_input_placeholder: 'Ρωτήστε, αναζητήστε ή εξηγήστε...',
     send: 'Αποστολή',
