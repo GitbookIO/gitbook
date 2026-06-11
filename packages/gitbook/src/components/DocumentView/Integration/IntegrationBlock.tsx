@@ -5,6 +5,8 @@ import { ContentKit, ContentKitOutput } from '@gitbook/react-contentkit';
 
 import type { BlockProps } from '../Block';
 import './contentkit.css';
+import { ContentKitWithAdaptiveVisitorContext } from './ContentKitWithAdaptiveVisitorContext';
+import { shouldRenderIntegrationBlockWithAdaptiveVisitorContext } from './adaptive';
 import { contentKitServerContext } from './contentkit';
 import { fetchSafeIntegrationUI } from './render';
 import { renderIntegrationUi } from './server-actions';
@@ -68,9 +70,15 @@ export async function IntegrationBlock(props: BlockProps<DocumentBlockIntegratio
         return null;
     }
 
+    const ContentKitComponent = shouldRenderIntegrationBlockWithAdaptiveVisitorContext(
+        initialOutput
+    )
+        ? ContentKitWithAdaptiveVisitorContext
+        : ContentKit;
+
     return (
         <div className={tcls(style)}>
-            <ContentKit
+            <ContentKitComponent
                 renderContext={{
                     integrationName: block.data.integration,
                 }}
@@ -80,7 +88,7 @@ export async function IntegrationBlock(props: BlockProps<DocumentBlockIntegratio
                 render={renderIntegrationUi}
             >
                 <ContentKitOutput output={initialOutput} context={contentKitServerContext} />
-            </ContentKit>
+            </ContentKitComponent>
         </div>
     );
 }
