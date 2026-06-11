@@ -74,6 +74,20 @@ export async function serveAskMarkdown(context: GitBookSiteContext, rawQuestion:
         result += answerMarkdown.trim();
         result += '\n\n';
 
+        const followupQuestions = latestAnswer.followupQuestions ?? [];
+        if (followupQuestions.length > 0) {
+            result += '# Suggested Follow-up Questions:\n\n';
+            result +=
+                'If you need more information, consider asking one of these follow-up questions by performing an HTTP GET request on the URL:\n\n';
+            result += followupQuestions
+                .map(
+                    (q) =>
+                        `- [${q}](${context.linker.toAbsoluteURL(context.linker.toPathInSite(''))}?ask=${encodeURIComponent(q)})`
+                )
+                .join('\n');
+            result += '\n\n';
+        }
+
         if (sourcesMarkdown) {
             result += '# Sources:\n\n';
             result += sourcesMarkdown;

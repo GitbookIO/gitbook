@@ -17,8 +17,22 @@ export type ContentKitRenderUpdate = Partial<
     Pick<RequestRenderIntegrationUI, 'action' | 'props' | 'state'>
 >;
 
+export type ContentKitClientContextData = {
+    getVisitorContext?: () =>
+        | Record<string, unknown>
+        | null
+        | undefined
+        | Promise<Record<string, unknown> | null | undefined>;
+};
+
 export interface ContentKitClientContextType {
     security: ContentKitSecurity;
+
+    /**
+     * Client-only contextual data for client-rendered elements such as webframes.
+     * This data must not be included in integration render requests.
+     */
+    clientContext?: ContentKitClientContextData;
 
     /**
      * Current value of the state.
