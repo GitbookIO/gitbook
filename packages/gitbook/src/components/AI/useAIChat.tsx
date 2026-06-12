@@ -193,13 +193,9 @@ export function AIChatProvider(props: {
     const { siteSpaceId } = useCurrentContent();
     const language = useLanguage();
 
-    // Built-in tools exposed to the assistant (e.g. navigating to a page). They are kept in a
-    // ref so the streaming callback can read the latest definitions without being recreated.
+    // Built-in tools exposed to the assistant (e.g. navigating to a page). The tool has a stable
+    // identity, so it can be referenced directly from the streaming callback.
     const navigateToPageTool = useNavigateToPageTool();
-    const builtInToolsRef = React.useRef([navigateToPageTool]);
-    React.useEffect(() => {
-        builtInToolsRef.current = [navigateToPageTool];
-    }, [navigateToPageTool]);
 
     // Event listeners storage
     const eventsRef = React.useRef<Map<AIChatEvent['type'], AIChatEventListener[]>>(new Map());
@@ -265,7 +261,7 @@ export function AIChatProvider(props: {
 
             // Execute a tool call
             const executeToolCall = async (event: AIStreamResponseToolCallPending) => {
-                const tools = getTools(builtInToolsRef.current);
+                const tools = getTools([navigateToPageTool]);
                 const toolDef = tools.find((tool) => tool.name === event.toolCall.tool);
 
                 if (!toolDef || !('execute' in toolDef)) {
@@ -301,7 +297,7 @@ export function AIChatProvider(props: {
 
             let toolToExecute: AIStreamResponseToolCallPending | null = null;
             try {
-                const tools = getTools(builtInToolsRef.current);
+                const tools = getTools([navigateToPageTool]);
                 const stream = await streamAIChatResponse({
                     message: input.message,
                     toolCall: input.toolCall,
@@ -482,6 +478,7 @@ export function AIChatProvider(props: {
             renderMessageOptions?.withToolCalls,
             renderMessageOptions?.asEmbeddable,
             language,
+            navigateToPageTool,
         ]
     );
 
