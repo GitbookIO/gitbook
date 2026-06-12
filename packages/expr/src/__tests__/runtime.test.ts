@@ -195,6 +195,52 @@ describe('ExpressionRuntime', () => {
         );
     });
 
+    describe('getVariables', () => {
+        it.each([
+            {
+                scenario: 'single variable',
+                condition: 'isBetaUser === true',
+                expectedVariables: ['isBetaUser'],
+            },
+            {
+                scenario: 'multiple variables',
+                condition: 'useProductA && !isBetaUser',
+                expectedVariables: ['useProductA', 'isBetaUser'],
+            },
+            {
+                scenario: 'member expression',
+                condition: 'user.role === "admin"',
+                expectedVariables: ['user.role'],
+            },
+            {
+                scenario: 'nested member expression with method call',
+                condition: 'products.includes("productA") && userSegments.alpha',
+                expectedVariables: ['products.includes', 'userSegments.alpha'],
+            },
+        ])(
+            'should return variables used in expression: $scenario',
+            ({ condition, expectedVariables }) => {
+                expect(runtime.getVariables(condition)).toEqual(expectedVariables);
+            }
+        );
+
+        it.each([
+            {
+                scenario: 'invalid syntax',
+                condition: 't}=d',
+            },
+            {
+                scenario: 'non conditional expression',
+                condition: 'const a = 1;',
+            },
+        ])(
+            'should return an empty array for invalid expressions: $scenario',
+            ({ condition }) => {
+                expect(runtime.getVariables(condition)).toEqual([]);
+            }
+        );
+    });
+
     describe.skip('generate', () => {
         it.each([
             {
