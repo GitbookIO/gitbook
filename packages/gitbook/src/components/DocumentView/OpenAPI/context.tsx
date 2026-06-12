@@ -54,6 +54,7 @@ export function getOpenAPIContext(args: {
         renderCodeBlock: (codeProps) => (
             <PlainCodeBlock
                 {...codeProps}
+                mode={props.context.mode}
                 themeKey="openapi"
                 themes={
                     context && 'customization' in context
