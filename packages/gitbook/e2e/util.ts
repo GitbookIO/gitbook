@@ -47,6 +47,16 @@ export interface Test {
      */
     run?: (page: Page, response: Response | null) => Promise<unknown>;
     /**
+     * Re-applied right before every viewport screenshot (after Argos
+     * stabilization), so it survives re-renders triggered by viewport resizing.
+     *
+     * Use this — rather than mutating the DOM once in `run` — to normalize
+     * non-deterministic content (e.g. AI responses). A one-time mutation in `run`
+     * is clobbered when React re-renders on resize (e.g. crossing the mobile
+     * breakpoint), so only the first viewport ends up normalized.
+     */
+    normalizeBeforeScreenshot?: (page: Page) => Promise<void> | void;
+    /**
      * Mode for the test.
      */
     mode?: 'page' | 'image';
@@ -282,6 +292,9 @@ export function runTestCases(testCases: TestsCase[]) {
                                         await waitForTOCScrolling(page);
                                     }
                                     await waitForIcons(page);
+                                    // Re-apply per viewport, last — after any resize-driven
+                                    // re-render — so normalized content survives to capture.
+                                    await testEntry.normalizeBeforeScreenshot?.(page);
                                 },
                             });
                         }

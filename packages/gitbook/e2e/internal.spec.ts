@@ -207,9 +207,9 @@ const searchTestCases: Test[] = [
             // asserting/screenshotting, rather than racing a fixed suggestion count.
             await waitForAIChatResponse(page);
             await expect(page.getByTestId('ai-chat-followup-suggestion').first()).toBeVisible();
-            // Normalize non-deterministic content for visual consistency in screenshots.
-            await page.evaluate(overrideAIResponse);
         },
+        // Re-applied per viewport so the replacement survives resize-driven re-renders.
+        normalizeBeforeScreenshot: (page) => page.evaluate(overrideAIResponse),
     },
     {
         name: 'Ask - AI Mode: Assistant - Keyboard shortcut',
@@ -223,9 +223,9 @@ const searchTestCases: Test[] = [
             await page.keyboard.press('ControlOrMeta+I');
             await expect(page.getByTestId('ai-chat')).toBeVisible();
             await expect(page.getByTestId('ai-chat-input')).toBeFocused();
-            // Override text content for visual consistency in screenshots
-            await page.evaluate(overrideAIInitialState);
         },
+        // Re-applied per viewport so the replacement survives resize-driven re-renders.
+        normalizeBeforeScreenshot: (page) => page.evaluate(overrideAIInitialState),
     },
     {
         name: 'Ask - AI Mode: Assistant - Button',
@@ -239,9 +239,9 @@ const searchTestCases: Test[] = [
             await page.getByTestId('ai-chat-button').click();
             await expect(page.getByTestId('ai-chat')).toBeVisible();
             await expect(page.getByTestId('ai-chat-input')).toBeFocused();
-            // Override text content for visual consistency in screenshots
-            await page.evaluate(overrideAIInitialState);
         },
+        // Re-applied per viewport so the replacement survives resize-driven re-renders.
+        normalizeBeforeScreenshot: (page) => page.evaluate(overrideAIInitialState),
     },
     {
         name: 'Ask - AI Mode: Assistant - URL query (Initial)',
@@ -256,9 +256,9 @@ const searchTestCases: Test[] = [
             await expect(page.getByTestId('search-input')).toBeEmpty();
             await expect(page.getByTestId('ai-chat')).toBeVisible();
             await expect(page.getByTestId('ai-chat-input')).toBeFocused();
-            // Override text content for visual consistency in screenshots
-            await page.evaluate(overrideAIInitialState);
         },
+        // Re-applied per viewport so the replacement survives resize-driven re-renders.
+        normalizeBeforeScreenshot: (page) => page.evaluate(overrideAIInitialState),
     },
     {
         name: 'Ask - AI Mode: Assistant - URL query (Results)',
@@ -278,9 +278,9 @@ const searchTestCases: Test[] = [
             // asserting/screenshotting, rather than racing a fixed suggestion count.
             await waitForAIChatResponse(page);
             await expect(page.getByTestId('ai-chat-followup-suggestion').first()).toBeVisible();
-            // Normalize non-deterministic content for visual consistency in screenshots.
-            await page.evaluate(overrideAIResponse);
         },
+        // Re-applied per viewport so the replacement survives resize-driven re-renders.
+        normalizeBeforeScreenshot: (page) => page.evaluate(overrideAIResponse),
     },
 ];
 
@@ -2259,9 +2259,13 @@ const testCases: TestsCase[] = [
 
                     await iframe.getByTestId('embed-tab-assistant').click(); // Switch to assistant tab
                     await expect(iframe.getByTestId('ai-chat')).toBeVisible();
-
-                    await iframe.owner().evaluate(overrideAIInitialState);
                 },
+                // Runs inside the iframe (not the parent doc) and per viewport.
+                normalizeBeforeScreenshot: (page) =>
+                    page
+                        .frameLocator('#gitbook-widget-iframe')
+                        .locator('body')
+                        .evaluate(overrideAIInitialState),
             },
             {
                 name: 'API - navigateToPage',
@@ -2295,11 +2299,15 @@ const testCases: TestsCase[] = [
                     await expect(iframe.getByTestId('ai-chat-message-user').first()).toHaveText(
                         AI_PROMPT
                     );
-                    // Wait for the full response to settle before normalizing, otherwise
-                    // late stream re-renders clobber the replacements.
+                    // Wait for the full response to settle before normalizing.
                     await waitForAIChatResponse(iframe);
-                    await iframe.owner().evaluate(overrideAIResponse);
                 },
+                // Runs inside the iframe (not the parent doc) and per viewport.
+                normalizeBeforeScreenshot: (page) =>
+                    page
+                        .frameLocator('#gitbook-widget-iframe')
+                        .locator('body')
+                        .evaluate(overrideAIResponse),
             },
             {
                 name: 'Configuration - Suggested questions',
@@ -2325,8 +2333,13 @@ const testCases: TestsCase[] = [
                     await expect(
                         iframe.getByTestId('ai-chat-suggested-question').nth(2)
                     ).toHaveText('What can you do?');
-                    await iframe.owner().evaluate(overrideAIInitialState);
                 },
+                // Runs inside the iframe (not the parent doc) and per viewport.
+                normalizeBeforeScreenshot: (page) =>
+                    page
+                        .frameLocator('#gitbook-widget-iframe')
+                        .locator('body')
+                        .evaluate(overrideAIInitialState),
             },
             {
                 name: 'Configuration - Custom action buttons',
@@ -2410,8 +2423,13 @@ const testCases: TestsCase[] = [
                     await page.locator('#gitbook-widget-button').click();
                     // Wait for the response posted above to settle before normalizing.
                     await waitForAIChatResponse(iframe);
-                    await iframe.owner().evaluate(overrideAIResponse);
                 },
+                // Runs inside the iframe (not the parent doc) and per viewport.
+                normalizeBeforeScreenshot: (page) =>
+                    page
+                        .frameLocator('#gitbook-widget-iframe')
+                        .locator('body')
+                        .evaluate(overrideAIResponse),
             },
             {
                 name: 'Configuration - Custom tools',
@@ -2458,8 +2476,13 @@ const testCases: TestsCase[] = [
                     // The turn settles (aria-busy clears) once the stream pauses on the
                     // confirmation control; wait for that before normalizing.
                     await waitForAIChatResponse(iframe);
-                    await iframe.owner().evaluate(overrideAIResponse);
                 },
+                // Runs inside the iframe (not the parent doc) and per viewport.
+                normalizeBeforeScreenshot: (page) =>
+                    page
+                        .frameLocator('#gitbook-widget-iframe')
+                        .locator('body')
+                        .evaluate(overrideAIResponse),
             },
         ],
     },
