@@ -438,7 +438,7 @@
 
 /* Single code sample (no dropdown): icon next to the language label. */
 .openapi-codesample-label {
-    @apply flex items-center gap-1.5;
+    @apply flex items-center;
 }
 
 .openapi-response-media-types-examples-footer-content {
@@ -633,7 +633,7 @@ body:has(.openapi-select-popover) {
 }
 
 .openapi-select > button > span.react-aria-SelectValue {
-    @apply shrink truncate flex items-center gap-1.5;
+    @apply shrink truncate flex items-center;
 }
 
 .openapi-select > button > .react-aria-SelectValue [slot="description"] {
@@ -662,7 +662,7 @@ body:has(.openapi-select-popover) {
 }
 
 .openapi-select-item {
-    @apply text-sm flex items-center gap-2 cursor-pointer px-1.5 overflow-hidden py-1 text-tint ring-0 border-none rounded straight-corners:rounded-none circular-corners:rounded-md !outline-none;
+    @apply text-sm flex items-center cursor-pointer px-1.5 overflow-hidden py-1 text-tint ring-0 border-none rounded straight-corners:rounded-none circular-corners:rounded-md !outline-none;
     @apply hover:bg-tint-hover hover:theme-gradient:bg-tint-12/1 hover:text-tint-strong contrast-more:hover:ring-1 contrast-more:hover:ring-inset contrast-more:hover:ring-current;
 }
 
@@ -676,7 +676,7 @@ body:has(.openapi-select-popover) {
 }
 
 .openapi-select-item [slot="description"] {
-    @apply text-xs text-tint-subtle whitespace-normal;
+    @apply text-xs text-tint-subtle;
 }
 
 .openapi-select button .openapi-markdown,

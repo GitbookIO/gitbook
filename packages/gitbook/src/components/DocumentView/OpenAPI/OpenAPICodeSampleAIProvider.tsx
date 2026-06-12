@@ -33,7 +33,7 @@ export function OpenAPICodeSampleAIProvider(props: { children: React.ReactNode }
                 <AIChatIcon
                     state="default"
                     trademark={config.trademark}
-                    className="size-4 shrink-0"
+                    className="me-1.5 size-4 shrink-0"
                 />
             ),
             onRewrite: ({ id, code, syntax, label, prompt }) => {

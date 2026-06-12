@@ -72,7 +72,7 @@ export function getOpenAPIContext(args: {
             />
         ),
         getCodeSampleIcon: (sample) => (
-            <Icon icon={getCodeSampleIconName(sample)} className="size-4 shrink-0" />
+            <Icon icon={getCodeSampleIconName(sample)} className="me-1.5 size-4 shrink-0" />
         ),
         renderHeading: (headingProps) => (
             <Heading
