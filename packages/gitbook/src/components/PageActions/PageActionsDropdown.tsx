@@ -18,6 +18,7 @@ import {
     ActionViewAsMarkdown,
     ActionViewAsPDF,
     ActionViewAsRSS,
+    type PageActionAssistantContext,
 } from './PageActions';
 
 export type PageActionsDropdownURLs = {
@@ -37,6 +38,8 @@ interface PageActionsDropdownProps {
     urls: PageActionsDropdownURLs;
     className?: string;
     actions: SiteCustomizationSettings['pageActions'];
+    /** The current page, referenced by the assistant when opened. */
+    page: PageActionAssistantContext;
 }
 
 /**
@@ -78,7 +81,7 @@ export function PageActionsDropdown(props: PageActionsDropdownProps) {
  * Return the list of actions to show in the dropdown menu.
  */
 function getPageDropdownActions(props: PageActionsDropdownProps): React.ReactNode[] {
-    const { siteTitle, urls, actions } = props;
+    const { siteTitle, urls, actions, page } = props;
     const assistants = useAI().assistants.filter(
         (assistant) => assistant.ui === true && assistant.pageAction
     );
@@ -89,6 +92,7 @@ function getPageDropdownActions(props: PageActionsDropdownProps): React.ReactNod
                 key={assistant.label}
                 assistant={assistant}
                 type="dropdown-menu-item"
+                page={page}
             />
         )),
 
@@ -158,7 +162,7 @@ function getPageDropdownActions(props: PageActionsDropdownProps): React.ReactNod
  * A default action shown as a quick-access button beside the dropdown menu
  */
 function usePageDefaultAction(props: PageActionsDropdownProps) {
-    const { urls, actions } = props;
+    const { urls, actions, page } = props;
     const assistants = useAI().assistants.filter(
         (assistant) => assistant.ui === true && assistant.pageAction
     );
@@ -169,7 +173,7 @@ function usePageDefaultAction(props: PageActionsDropdownProps) {
 
     const assistant = assistants[0];
     if (assistant) {
-        return <ActionOpenAssistant assistant={assistant} type="button" />;
+        return <ActionOpenAssistant assistant={assistant} type="button" page={page} />;
     }
 
     if (urls.editOnGit) {

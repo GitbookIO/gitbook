@@ -1,6 +1,14 @@
-import { Icon } from '@gitbook/icons';
+'use client';
 
-import type { AIChatReference } from '../AI/references';
+import { Icon, type IconName } from '@gitbook/icons';
+import assertNever from 'assert-never';
+import { useRouter } from 'next/navigation';
+import { useContext } from 'react';
+
+import { tcls } from '@/lib/tailwind';
+import { normalizePathname, resolveNavigationTarget } from '../AI/navigation';
+import type { AIChatReference, CodeBlockReference, PageReference } from '../AI/references';
+import { NavigationStatusContext } from '../hooks';
 
 export function AIChatReferenceChips(props: {
     references: AIChatReference[];
@@ -8,6 +16,8 @@ export function AIChatReferenceChips(props: {
     disabled?: boolean;
 }) {
     const { references, onRemove, disabled } = props;
+    const router = useRouter();
+    const { onNavigationClick } = useContext(NavigationStatusContext);
 
     if (references.length === 0) {
         return null;
@@ -24,12 +34,19 @@ export function AIChatReferenceChips(props: {
                         type="button"
                         onClick={(event) => {
                             event.stopPropagation();
-                            focusReference(ref);
+                            activateReference(ref, { router, onNavigationClick });
                         }}
                         className="inline-flex min-w-0 items-center gap-1.5 circular-corners:rounded-2xl rounded-corners:rounded-sm py-0.5 pr-1 pl-1.5 transition hover:bg-tint"
                     >
-                        <Icon icon="code" className="size-3 shrink-0 opacity-7" />
-                        <span className="min-w-0 truncate font-mono">{ref.label}</span>
+                        <Icon icon={getReferenceIcon(ref)} className="size-3 shrink-0 opacity-7" />
+                        <span
+                            className={tcls(
+                                'min-w-0 truncate',
+                                ref.type === 'code-block' && 'font-mono'
+                            )}
+                        >
+                            {ref.label}
+                        </span>
                     </button>
                     {onRemove ? (
                         <button
@@ -51,7 +68,68 @@ export function AIChatReferenceChips(props: {
     );
 }
 
-function focusReference(ref: AIChatReference) {
+function getReferenceIcon(ref: AIChatReference): IconName {
+    switch (ref.type) {
+        case 'code-block':
+            return 'code';
+        case 'page':
+            return 'memo';
+        default:
+            assertNever(ref);
+    }
+}
+
+type NavigationHandle = {
+    router: ReturnType<typeof useRouter>;
+    onNavigationClick: (href: string) => void;
+};
+
+/**
+ * Handle a click on a reference chip: jump to the referenced content.
+ */
+function activateReference(ref: AIChatReference, nav: NavigationHandle) {
+    if (ref.type === 'page') {
+        navigateToPageReference(ref, nav);
+        return;
+    }
+
+    focusReference(ref);
+}
+
+/**
+ * A page reference may be clicked from any page. Navigate to it if the reader is elsewhere,
+ * otherwise scroll back to the top of the page they are already on.
+ */
+function navigateToPageReference(
+    ref: PageReference,
+    { router, onNavigationClick }: NavigationHandle
+) {
+    const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    if (!ref.href) {
+        scrollToTop();
+        return;
+    }
+
+    const target = resolveNavigationTarget(ref.href, window.location);
+    if ('error' in target) {
+        scrollToTop();
+        return;
+    }
+
+    if (normalizePathname(window.location.pathname) === normalizePathname(target.pathname)) {
+        scrollToTop();
+        return;
+    }
+
+    onNavigationClick(target.href);
+    router.push(target.href);
+}
+
+/**
+ * A code-block reference points at a block on the current page: scroll it into view and focus it.
+ */
+function focusReference(ref: CodeBlockReference) {
     const candidates = document.querySelectorAll<HTMLElement>(`#${CSS.escape(ref.id)}`);
     const target = Array.from(candidates).find((el) => !el.closest('[data-ai-chat]'));
     if (!target) {
