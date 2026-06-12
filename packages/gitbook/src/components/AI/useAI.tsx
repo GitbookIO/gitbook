@@ -95,7 +95,7 @@ export function useAI(): AIContext {
             label: config.assistantName ?? getAIChatName(language, config.trademark),
             icon: (
                 <AIChatIcon
-                    state={chat.loading ? 'thinking' : 'default'}
+                    state={chat.responding ? 'thinking' : 'default'}
                     trademark={config.trademark}
                     className="size-text-lg"
                 />

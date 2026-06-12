@@ -86,7 +86,23 @@ export type AIChatState = {
     control: AnyAIControl | null;
 
     /**
-     * If true, the session is in progress.
+     * If true, the assistant is actively producing its answer — from the moment a
+     * message is sent until the `response_finish` event. It is cleared at that point
+     * (even though follow-up suggestions may still trickle in) so the input can be
+     * re-enabled. Drives the local "are we still answering" UI: the disabled input,
+     * the loading shim, and the thinking/exploring/working status.
+     */
+    responding: boolean;
+
+    /**
+     * If true, the turn is still in progress overall: from the moment a message is
+     * sent until the stream fully completes, including the follow-up suggestion
+     * phase.
+     *
+     * Unlike `responding` — which clears on `response_finish` — this stays true
+     * until the response is truly settled. It is the global busyness indicator,
+     * surfaced as `aria-busy` on the chat so that assistive tech (and visual tests)
+     * can wait for a complete, stable response.
      */
     loading: boolean;
 
@@ -152,6 +168,7 @@ const globalState = zustand.create<AIChatState>(() => {
         query: null,
         followUpSuggestions: [],
         control: null,
+        responding: false,
         loading: false,
         error: false,
         initialQuery: null,
@@ -246,6 +263,7 @@ export function AIChatProvider(props: {
                     ...state,
                     followUpSuggestions: [],
                     control: null,
+                    responding: true,
                     loading: true,
                     error: false,
                     messages: [
@@ -333,9 +351,9 @@ export function AIChatProvider(props: {
                             globalState.setState((state) => ({
                                 ...state,
                                 responseId: event.response.id ?? null,
-                                // Mark as not loading when the response is finished
+                                // Mark as not responding when the response is finished
                                 // Even if the stream might continue as we receive 'response_followup_suggestion'
-                                loading: false,
+                                responding: false,
                                 error: false,
                             }));
                             break;
@@ -453,12 +471,17 @@ export function AIChatProvider(props: {
                     }));
                 }
 
-                // Execute the tool call if it doesn't require confirmation
+                // Execute the tool call if it doesn't require confirmation.
+                // When a tool call (or control) keeps the turn going, `loading`
+                // stays true: either the recursive `streamResponse` will clear it
+                // when its stream settles, or it is cleared below once the loop ends
+                // (e.g. while waiting on a user confirmation control).
                 if (toolToExecute) {
                     await executeToolCall(toolToExecute);
                 } else {
                     globalState.setState((state) => ({
                         ...state,
+                        responding: false,
                         loading: false,
                         error: false,
                     }));
@@ -467,6 +490,7 @@ export function AIChatProvider(props: {
                 console.error('Error streaming AI response', error);
                 globalState.setState((state) => ({
                     ...state,
+                    responding: false,
                     loading: false,
                     error: true,
                 }));
@@ -485,14 +509,14 @@ export function AIChatProvider(props: {
     // Post a message to the AI chat
     const onPostMessage = React.useCallback(
         async (input: { message: string }) => {
-            const { query, messages, control, references, loading } = globalState.getState();
+            const { query, messages, control, references, responding } = globalState.getState();
 
             if (control) {
                 throw new Error("We can't post a message when a control is active");
             }
 
             // Ignore duplicates while a previous turn is still streaming
-            if (loading) {
+            if (responding) {
                 return;
             }
 
@@ -541,7 +565,7 @@ export function AIChatProvider(props: {
                     ],
                     query: input.message,
                     followUpSuggestions: [],
-                    loading: true,
+                    responding: true,
                     error: false,
                     initialQuery: state.initialQuery ?? input.message,
                     references: [],
@@ -557,6 +581,7 @@ export function AIChatProvider(props: {
     const onClear = React.useCallback(() => {
         globalState.setState((state) => ({
             opened: state.opened,
+            responding: false,
             loading: false,
             messages: [],
             query: null,
@@ -686,7 +711,7 @@ export function getAIChatStatus(chat: AIChatState): AIChatStatus {
         return 'confirm';
     }
 
-    if (chat.loading) {
+    if (chat.responding) {
         const latestMessage = getLatestAssistantMessage(chat.messages);
         const phase = latestMessage?.activity?.currentPhase;
         switch (phase) {

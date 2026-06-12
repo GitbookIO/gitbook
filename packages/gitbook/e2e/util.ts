@@ -21,7 +21,14 @@ import {
     type SiteCustomizationSettings,
     SiteExternalLinksTarget,
 } from '@gitbook/api';
-import { type BrowserContext, type Page, type Response, expect, test } from '@playwright/test';
+import {
+    type BrowserContext,
+    type FrameLocator,
+    type Page,
+    type Response,
+    expect,
+    test,
+} from '@playwright/test';
 import deepMerge from 'deepmerge';
 import rison from 'rison';
 import type { DeepPartial } from 'ts-essentials';
@@ -157,6 +164,28 @@ export async function waitForCookiesDialog(page: Page) {
 export async function waitForNotFound(_page: Page, response: Response | null) {
     expect(response).not.toBeNull();
     expect(response?.status()).toBe(404);
+}
+
+/**
+ * Wait for an AI chat response to be fully settled before asserting or
+ * screenshotting it.
+ *
+ * The chat exposes `aria-busy` on its container (`[data-testid="ai-chat"]`),
+ * which stays true from the moment a message is sent until the stream — including
+ * the follow-up suggestion phase — completes. Gating on it avoids the two main
+ * sources of flakiness: capturing a "thinking" placeholder or a half-streamed
+ * answer, and running the content normalization while React is still re-rendering
+ * (which would clobber the replacements).
+ *
+ * Argos also waits for `aria-busy` to clear during its own stabilization
+ * (`waitForAriaBusy`), so this is both an explicit gate and a backstop.
+ *
+ * Accepts a `Page` or a `FrameLocator` (for the embedded assistant in an iframe).
+ */
+export async function waitForAIChatResponse(scope: Page | FrameLocator) {
+    await expect(scope.getByTestId('ai-chat')).toHaveAttribute('aria-busy', 'false', {
+        timeout: 60_000,
+    });
 }
 
 export async function setTimeToMorning(page: Page) {

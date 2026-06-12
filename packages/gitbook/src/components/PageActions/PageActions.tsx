@@ -30,7 +30,7 @@ export function ActionOpenAssistant(props: { assistant: Assistant; type: PageAct
             label={assistant.label}
             shortLabel={tString(language, 'ask')}
             description={tString(language, 'ai_chat_ask_about_page', assistant.label)}
-            disabled={chat.loading}
+            disabled={chat.responding}
             onClick={() => {
                 assistant.open();
             }}

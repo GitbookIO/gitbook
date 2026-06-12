@@ -31,12 +31,24 @@ import {
     headerLinks,
     runTestCases,
     setTimeToMorning,
+    waitForAIChatResponse,
     waitForCookiesDialog,
     waitForCoverImages,
     waitForNotFound,
 } from './util';
 
-const AI_PROMPT = `You're being invoked by the GitBook CI/CD pipeline. Search for "Lorem ipsum", then return the first sentence of the first page you find.`;
+// Kept as deterministic as possible to reduce visual flakiness: no preamble, a
+// single fixed search, a concise answer, and a fixed number of follow-ups. The
+// model is never perfectly deterministic, so `overrideAIResponse` still
+// normalizes the rendered content below — this prompt just narrows the variance.
+const AI_PROMPT = [
+    "You're being invoked by the GitBook CI/CD pipeline for automated visual testing.",
+    'Follow these instructions exactly and do not deviate:',
+    '1. Do not write any preamble, commentary, or reasoning before acting.',
+    '2. Perform a single search for exactly "Lorem ipsum".',
+    '3. Reply with only the first sentence of the first page you find, and nothing else.',
+    '4. Always end by proposing exactly 3 follow-up suggestions.',
+].join('\n');
 
 const overrideAIInitialState = () => {
     const greeting = document.querySelector('[data-testid="ai-chat-greeting-title"]');
@@ -44,21 +56,45 @@ const overrideAIInitialState = () => {
         greeting.textContent = 'Good morning';
     }
 };
+
+/**
+ * Normalize the non-deterministic content of an AI response before screenshotting,
+ * while preserving the surrounding structure (message bubbles, tool/activity
+ * summary, response container, suggestion buttons) so visual regressions in the
+ * chat chrome are still caught. The actual answer formatting is covered separately
+ * by the deterministic page tests, since the AI response renders through the same
+ * `DocumentView`.
+ *
+ * Must run only once the chat is no longer `aria-busy` (the response has fully
+ * settled), otherwise React re-renders from late stream events will clobber these
+ * mutations. See `waitForAIChatResponse`.
+ */
 const overrideAIResponse = () => {
-    const userMessage = document.querySelector('[data-testid="ai-chat-message-user"]');
-    if (userMessage) {
+    // The user's prompt varies in length; pin it to a fixed string.
+    document.querySelectorAll('[data-testid="ai-chat-message-user"]').forEach((userMessage) => {
         userMessage.textContent = '[Replaced message] Chat message sent by the user';
-    }
-    const assistantMessage = document.querySelectorAll(
-        '[data-testid="ai-chat-message-assistant"] .ai-response-document'
-    );
-    assistantMessage.forEach((message) => {
-        message.innerHTML = '[Replaced message] AI chat response';
     });
-    const suggestions = document.querySelectorAll('[data-testid="ai-chat-followup-suggestion"]');
-    suggestions.forEach((suggestion) => {
-        suggestion.textContent = 'Follow-up suggestion';
+
+    // The assistant's answer text is non-deterministic; replace the rendered
+    // document body while keeping the `.ai-response-document` container.
+    document
+        .querySelectorAll('[data-testid="ai-chat-message-assistant"] .ai-response-document')
+        .forEach((message) => {
+            message.innerHTML = '<p>[Replaced message] AI chat response</p>';
+        });
+
+    // The "Explored with N tools" activity label varies with the number of tool
+    // calls; pin it (the chevron sibling is left intact).
+    document.querySelectorAll('[data-testid="ai-chat-activity-summary"]').forEach((summary) => {
+        summary.textContent = 'Explored';
     });
+
+    // Follow-up suggestion text varies; pin each label.
+    document
+        .querySelectorAll('[data-testid="ai-chat-followup-suggestion"]')
+        .forEach((suggestion) => {
+            suggestion.textContent = 'Follow-up suggestion';
+        });
 };
 
 const searchTestCases: Test[] = [
@@ -167,10 +203,11 @@ const searchTestCases: Test[] = [
             await expect(page.getByTestId('ai-chat')).toBeVisible();
             await expect(page.getByTestId('ai-chat-message-user').first()).toHaveText(AI_PROMPT);
             await expect(page.getByTestId('ai-chat-message-assistant').first()).toBeVisible();
-            await expect(page.getByTestId('ai-chat-followup-suggestion')).toHaveCount(3, {
-                timeout: 60_000,
-            });
-            // Override text content for visual consistency in screenshots
+            // Wait for the full response (incl. follow-up suggestions) to settle before
+            // asserting/screenshotting, rather than racing a fixed suggestion count.
+            await waitForAIChatResponse(page);
+            await expect(page.getByTestId('ai-chat-followup-suggestion').first()).toBeVisible();
+            // Normalize non-deterministic content for visual consistency in screenshots.
             await page.evaluate(overrideAIResponse);
         },
     },
@@ -237,10 +274,11 @@ const searchTestCases: Test[] = [
             await expect(page.getByTestId('ai-chat')).toBeVisible();
             await expect(page.getByTestId('ai-chat-message-user').first()).toHaveText(AI_PROMPT);
             await expect(page.getByTestId('ai-chat-message-assistant').first()).toBeVisible();
-            await expect(page.getByTestId('ai-chat-followup-suggestion')).toHaveCount(3, {
-                timeout: 60_000,
-            });
-            // Override text content for visual consistency in screenshots
+            // Wait for the full response (incl. follow-up suggestions) to settle before
+            // asserting/screenshotting, rather than racing a fixed suggestion count.
+            await waitForAIChatResponse(page);
+            await expect(page.getByTestId('ai-chat-followup-suggestion').first()).toBeVisible();
+            // Normalize non-deterministic content for visual consistency in screenshots.
             await page.evaluate(overrideAIResponse);
         },
     },
@@ -2257,6 +2295,9 @@ const testCases: TestsCase[] = [
                     await expect(iframe.getByTestId('ai-chat-message-user').first()).toHaveText(
                         AI_PROMPT
                     );
+                    // Wait for the full response to settle before normalizing, otherwise
+                    // late stream re-renders clobber the replacements.
+                    await waitForAIChatResponse(iframe);
                     await iframe.owner().evaluate(overrideAIResponse);
                 },
             },
@@ -2367,6 +2408,8 @@ const testCases: TestsCase[] = [
                     await actions.nth(3).click();
                     await expect(page.locator('#gitbook-widget-window')).not.toBeVisible();
                     await page.locator('#gitbook-widget-button').click();
+                    // Wait for the response posted above to settle before normalizing.
+                    await waitForAIChatResponse(iframe);
                     await iframe.owner().evaluate(overrideAIResponse);
                 },
             },
@@ -2412,6 +2455,9 @@ const testCases: TestsCase[] = [
                     await expect(toolConfirmation).toBeVisible({
                         timeout: 30000,
                     });
+                    // The turn settles (aria-busy clears) once the stream pauses on the
+                    // confirmation control; wait for that before normalizing.
+                    await waitForAIChatResponse(iframe);
                     await iframe.owner().evaluate(overrideAIResponse);
                 },
             },
