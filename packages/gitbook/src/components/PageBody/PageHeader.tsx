@@ -2,7 +2,7 @@ import type { GitBookSiteContext } from '@/lib/context';
 import type { AncestorRevisionPage } from '@/lib/pages';
 import { tcls } from '@/lib/tailwind';
 import { getPageRSSURL } from '@/routes/rss';
-import { type RevisionPageDocument, SiteVisibility } from '@gitbook/api';
+import { CustomizationAIMode, type RevisionPageDocument, SiteVisibility } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
 import urlJoin from 'url-join';
 import { getPDFURLSearchParams } from '../PDF';
@@ -33,6 +33,7 @@ export async function PageHeader(props: {
     const hasPageActions =
         pageActionsEnabled &&
         [
+            context.customization.ai.mode === CustomizationAIMode.Assistant,
             context.customization.pageActions.externalAI,
             context.customization.pageActions.markdown,
             context.customization.pageActions.mcp,

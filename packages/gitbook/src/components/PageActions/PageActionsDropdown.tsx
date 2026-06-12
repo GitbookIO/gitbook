@@ -4,7 +4,7 @@ import { Button, ButtonGroup } from '@/components/primitives/Button';
 import { DropdownMenu, DropdownMenuSeparator } from '@/components/primitives/DropdownMenu';
 import { tString, useLanguage } from '@/intl/client';
 import type { GitSyncState, SiteCustomizationSettings } from '@gitbook/api';
-import React, { useRef } from 'react';
+import { type ReactNode, useRef } from 'react';
 import { type Assistant, useAI } from '../AI';
 import { ToggleChevron } from '../primitives';
 import {
@@ -84,7 +84,7 @@ export function PageActionsDropdown(props: PageActionsDropdownProps) {
     );
     const items = getPageActionItems(props.actions);
 
-    let defaultAction: React.ReactNode = null;
+    let defaultAction: ReactNode = null;
     let markdownIsDefault = false;
     if (urls.rss) {
         // The RSS feed is not part of the configurable `items` list: it is only available on the
@@ -109,28 +109,43 @@ export function PageActionsDropdown(props: PageActionsDropdownProps) {
         }
     }
 
-    const dropdownActions: React.ReactNode[] = [
-        ...items.map((type) =>
-            renderDropdownActionsForType(type, {
+    // Build the dropdown menu items, grouped by action type. RSS is appended as its own group
+    // since it is not part of the configurable `items` list.
+    const groups: { key: string; items: ReactNode[] }[] = items
+        .map((type) => ({
+            key: type,
+            items: renderDropdownActionsForType(type, {
                 siteTitle,
                 urls,
                 markdownIsDefault,
                 assistants,
                 page: props.page,
-            })
-        ),
-        urls.rss ? (
-            <React.Fragment key="rss">
-                <DropdownMenuSeparator className="first:hidden" />
-                <ActionViewAsRSS url={urls.rss} type="dropdown-menu-item" />
-            </React.Fragment>
-        ) : null,
-    ].filter(Boolean);
+            }),
+        }))
+        .filter((group) => group.items.length > 0);
 
-    return defaultAction || dropdownActions.length > 0 ? (
+    if (urls.rss) {
+        groups.push({
+            key: 'rss',
+            items: [<ActionViewAsRSS key="rss" url={urls.rss} type="dropdown-menu-item" />],
+        });
+    }
+
+    // Count the actual menu items (not the groups): the dropdown toggle must stay visible when a
+    // single action type still exposes more than one item beyond the default button (e.g. markdown
+    // exposes both "Copy page" and "View as Markdown").
+    const menuItemCount = groups.reduce((total, group) => total + group.items.length, 0);
+
+    // Insert a separator before each group; the leading one is hidden via `first:hidden`.
+    const dropdownActions = groups.flatMap((group) => [
+        <DropdownMenuSeparator key={`separator-${group.key}`} className="first:hidden" />,
+        ...group.items,
+    ]);
+
+    return defaultAction || menuItemCount > 0 ? (
         <ButtonGroup ref={ref} className={props.className}>
             {defaultAction}
-            {!defaultAction || dropdownActions.length > 1 ? (
+            {!defaultAction || menuItemCount > 1 ? (
                 <DropdownMenu
                     align="end"
                     className="!min-w-60 max-w-max"
@@ -213,7 +228,10 @@ function isActionTypeAvailable(
 }
 
 /**
- * Render the action(s) shown in the dropdown menu for a given action type.
+ * Render the list of menu items shown in the dropdown for a given action type.
+ *
+ * Returns a flat array of items (without separators); the caller groups them and inserts the
+ * separators between groups.
  */
 function renderDropdownActionsForType(
     type: CustomizationPageActionType,
@@ -224,104 +242,95 @@ function renderDropdownActionsForType(
         assistants: Assistant[];
         page: PageActionAssistantContext;
     }
-): React.ReactNode {
+): ReactNode[] {
     const { siteTitle, urls, markdownIsDefault, assistants, page } = params;
 
     switch (type) {
         case 'assistant':
-            if (assistants.length === 0) {
-                return null;
-            }
-            return (
-                <React.Fragment key="assistant">
-                    <DropdownMenuSeparator className="first:hidden" />
-                    {assistants.map((assistant) => (
-                        <ActionOpenAssistant
-                            key={assistant.label}
-                            assistant={assistant}
-                            type="dropdown-menu-item"
-                            page={page}
-                        />
-                    ))}
-                </React.Fragment>
-            );
+            return assistants.map((assistant) => (
+                <ActionOpenAssistant
+                    key={`assistant-${assistant.id}`}
+                    assistant={assistant}
+                    type="dropdown-menu-item"
+                    page={page}
+                />
+            ));
         case 'external-ai':
-            return (
-                <React.Fragment key="external-ai">
-                    <DropdownMenuSeparator className="first:hidden" />
-                    <ActionOpenInLLM provider="chatgpt" url={urls.html} type="dropdown-menu-item" />
-                    <ActionOpenInLLM provider="claude" url={urls.html} type="dropdown-menu-item" />
-                </React.Fragment>
-            );
+            return [
+                <ActionOpenInLLM
+                    key="chatgpt"
+                    provider="chatgpt"
+                    url={urls.html}
+                    type="dropdown-menu-item"
+                />,
+                <ActionOpenInLLM
+                    key="claude"
+                    provider="claude"
+                    url={urls.html}
+                    type="dropdown-menu-item"
+                />,
+            ];
         case 'markdown':
-            return (
-                <React.Fragment key="markdown">
-                    <DropdownMenuSeparator className="first:hidden" />
-                    <ActionCopyMarkdown
-                        isDefaultAction={markdownIsDefault}
-                        markdownPageURL={urls.markdown}
-                        type="dropdown-menu-item"
-                    />
-                    <ActionViewAsMarkdown
-                        markdownPageURL={urls.markdown}
-                        type="dropdown-menu-item"
-                    />
-                </React.Fragment>
-            );
+            return [
+                <ActionCopyMarkdown
+                    key="copy-markdown"
+                    isDefaultAction={markdownIsDefault}
+                    markdownPageURL={urls.markdown}
+                    type="dropdown-menu-item"
+                />,
+                <ActionViewAsMarkdown
+                    key="view-markdown"
+                    markdownPageURL={urls.markdown}
+                    type="dropdown-menu-item"
+                />,
+            ];
         case 'mcp':
             if (!urls.mcp) {
-                return null;
+                return [];
             }
-            return (
-                <React.Fragment key="mcp">
-                    <DropdownMenuSeparator className="first:hidden" />
-                    <ActionCopyMCPURL mcpURL={urls.mcp} type="dropdown-menu-item" />
-                    <ActionOpenMCP
-                        provider="vscode"
-                        mcpURL={urls.mcp}
-                        siteTitle={siteTitle}
-                        type="dropdown-menu-item"
-                    />
-                    <ActionCopyMCPCommand
-                        provider="claude-code"
-                        mcpURL={urls.mcp}
-                        siteTitle={siteTitle}
-                        type="dropdown-menu-item"
-                    />
-                    <ActionCopyMCPCommand
-                        provider="codex"
-                        mcpURL={urls.mcp}
-                        siteTitle={siteTitle}
-                        type="dropdown-menu-item"
-                    />
-                </React.Fragment>
-            );
+            return [
+                <ActionCopyMCPURL key="copy-mcp" mcpURL={urls.mcp} type="dropdown-menu-item" />,
+                <ActionOpenMCP
+                    key="mcp-vscode"
+                    provider="vscode"
+                    mcpURL={urls.mcp}
+                    siteTitle={siteTitle}
+                    type="dropdown-menu-item"
+                />,
+                <ActionCopyMCPCommand
+                    key="mcp-claude-code"
+                    provider="claude-code"
+                    mcpURL={urls.mcp}
+                    siteTitle={siteTitle}
+                    type="dropdown-menu-item"
+                />,
+                <ActionCopyMCPCommand
+                    key="mcp-codex"
+                    provider="codex"
+                    mcpURL={urls.mcp}
+                    siteTitle={siteTitle}
+                    type="dropdown-menu-item"
+                />,
+            ];
         case 'git':
             if (!urls.editOnGit) {
-                return null;
+                return [];
             }
-            return (
-                <React.Fragment key="git">
-                    <DropdownMenuSeparator className="first:hidden" />
-                    <ActionOpenEditOnGit
-                        type="dropdown-menu-item"
-                        provider={urls.editOnGit.provider}
-                        url={urls.editOnGit.url}
-                    />
-                </React.Fragment>
-            );
+            return [
+                <ActionOpenEditOnGit
+                    key="edit-git"
+                    type="dropdown-menu-item"
+                    provider={urls.editOnGit.provider}
+                    url={urls.editOnGit.url}
+                />,
+            ];
         case 'pdf':
             if (!urls.pdf) {
-                return null;
+                return [];
             }
-            return (
-                <React.Fragment key="pdf">
-                    <DropdownMenuSeparator className="first:hidden" />
-                    <ActionViewAsPDF url={urls.pdf} type="dropdown-menu-item" />
-                </React.Fragment>
-            );
+            return [<ActionViewAsPDF key="pdf" url={urls.pdf} type="dropdown-menu-item" />];
         default:
-            return null;
+            return [];
     }
 }
 
@@ -336,7 +345,7 @@ function renderDefaultActionForType(
         assistants: Assistant[];
         page: PageActionAssistantContext;
     }
-): React.ReactNode {
+): ReactNode {
     const { urls, assistants, page } = params;
 
     switch (type) {
