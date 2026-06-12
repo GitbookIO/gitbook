@@ -3,8 +3,8 @@
     "configurations": [
         {
             "name": "🚀 Dev server",
-            "runtimeExecutable": "bun",
-            "runtimeArgs": ["dev"],
+            "runtimeExecutable": "sh",
+            "runtimeArgs": ["-c", "bun install && bun dev"],
             "port": 3000,
             "autoPort": false
         }
