@@ -84,25 +84,29 @@ export function PageActionsDropdown(props: PageActionsDropdownProps) {
     );
     const items = getPageActionItems(props.actions);
 
-    // The quick-access button next to the dropdown is the first action of the configured list.
-    // The assistant action is part of `items` (governed by the AI mode setting), so it is no
-    // longer prepended here — otherwise it would render twice.
-    const firstAvailableItem = items.find((type) => isActionTypeAvailable(type, urls, assistants));
-
     let defaultAction: React.ReactNode = null;
     let markdownIsDefault = false;
-    if (firstAvailableItem) {
-        defaultAction = renderDefaultActionForType(firstAvailableItem, {
-            siteTitle,
-            urls,
-            assistants,
-            page: props.page,
-        });
-        markdownIsDefault = firstAvailableItem === 'markdown';
-    } else if (urls.rss) {
-        // The RSS feed is not part of the configurable `items`, so it is only used as a fallback
-        // default when no configured action is available (to keep a button visible).
+    if (urls.rss) {
+        // The RSS feed is not part of the configurable `items` list: it is only available on the
+        // relevant pages (e.g. blog/changelog index). It is promoted as the default action whenever
+        // present, as a contextual override of the configured list.
         defaultAction = <ActionViewAsRSS url={urls.rss} type="button" />;
+    } else {
+        // Otherwise, the quick-access button is the first action of the configured list. The
+        // assistant action is part of `items` (governed by the AI mode setting), so it is no
+        // longer prepended here — otherwise it would render twice.
+        const firstAvailableItem = items.find((type) =>
+            isActionTypeAvailable(type, urls, assistants)
+        );
+        if (firstAvailableItem) {
+            defaultAction = renderDefaultActionForType(firstAvailableItem, {
+                siteTitle,
+                urls,
+                assistants,
+                page: props.page,
+            });
+            markdownIsDefault = firstAvailableItem === 'markdown';
+        }
     }
 
     const dropdownActions: React.ReactNode[] = [
