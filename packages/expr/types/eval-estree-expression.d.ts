@@ -42,6 +42,16 @@ declare module 'eval-estree-expression' {
     ): Promise<any>;
 
     /**
+     * Given an ESTree-compliant AST node, returns a list of variables used in the expression.
+     * @param ast An object representing an ESTree-compliant AST node.
+     * @param options Options for evaluation and compilation.
+     */
+    export function variables<ASTNode>(
+        ast: ASTNode,
+        options?: EvalESTreeExpressionOptions
+    ): string[];
+
+    /**
      * Evaluates an ESTree expression synchronously against a given context.
      * @param expression - An object representing an ESTree-compliant AST node.
      * @param context - An object containing variables and values to be used during evaluation.
