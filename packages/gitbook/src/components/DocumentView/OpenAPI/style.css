@@ -436,6 +436,11 @@
     @apply flex flex-row items-center;
 }
 
+/* Single code sample (no dropdown): icon next to the language label. */
+.openapi-codesample-label {
+    @apply flex items-center gap-1.5;
+}
+
 .openapi-response-media-types-examples-footer-content {
     @apply flex flex-row items-center gap-2.5;
 }
@@ -628,7 +633,7 @@ body:has(.openapi-select-popover) {
 }
 
 .openapi-select > button > span.react-aria-SelectValue {
-    @apply shrink truncate flex items-center;
+    @apply shrink truncate flex items-center gap-1.5;
 }
 
 .openapi-select > button > .react-aria-SelectValue [slot="description"] {
@@ -657,7 +662,7 @@ body:has(.openapi-select-popover) {
 }
 
 .openapi-select-item {
-    @apply text-sm flex items-center cursor-pointer px-1.5 overflow-hidden py-1 text-tint ring-0 border-none rounded straight-corners:rounded-none circular-corners:rounded-md !outline-none;
+    @apply text-sm flex items-center gap-2 cursor-pointer px-1.5 overflow-hidden py-1 text-tint ring-0 border-none rounded straight-corners:rounded-none circular-corners:rounded-md !outline-none;
     @apply hover:bg-tint-hover hover:theme-gradient:bg-tint-12/1 hover:text-tint-strong contrast-more:hover:ring-1 contrast-more:hover:ring-inset contrast-more:hover:ring-current;
 }
 
@@ -665,8 +670,13 @@ body:has(.openapi-select-popover) {
     @apply flex flex-col gap-1 justify-start items-start;
 }
 
+/* The "Custom" AI rewrite option: assistant icon next to a stacked title + description. */
+.openapi-select-item-custom .openapi-select-item-text {
+    @apply flex flex-col min-w-0 gap-0.5;
+}
+
 .openapi-select-item [slot="description"] {
-    @apply text-xs text-tint-subtle;
+    @apply text-xs text-tint-subtle whitespace-normal;
 }
 
 .openapi-select button .openapi-markdown,

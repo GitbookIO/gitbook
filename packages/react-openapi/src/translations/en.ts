@@ -43,4 +43,7 @@ export const en = {
     properties: 'Properties',
     or: 'or',
     and: 'and',
+    code_sample_custom: 'Custom language',
+    code_sample_custom_description: 'Rewrite with ${1}',
+    code_sample_rewrite_prompt: 'Rewrite this in the following language: ',
 };

@@ -73,6 +73,19 @@ export interface OpenAPIContext
     renderDocument: (props: { document: object }) => React.ReactNode;
 
     /**
+     * Render the icon associated with a code sample language, displayed in the
+     * code sample language selector. Optional: when omitted, options render without an icon.
+     */
+    getCodeSampleIcon?: (sample: {
+        /** Identifier of the built-in generator (e.g. `curl`, `javascript`), if any. */
+        id?: string;
+        /** Syntax/language of the sample (e.g. `bash`, `python`). */
+        syntax: string;
+        /** Human-readable label of the sample (e.g. `cURL`). */
+        label: string;
+    }) => React.ReactNode;
+
+    /**
      * Public specification URL, used by Scalar's "Test it" modal.
      * When null, the "Test it" button is hidden.
      */

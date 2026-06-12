@@ -43,4 +43,7 @@ export const de = {
     or: 'oder',
     and: 'und',
     possible_values: 'Mögliche Werte',
+    code_sample_custom: 'Benutzerdefinierte Sprache',
+    code_sample_custom_description: 'Mit ${1} umschreiben',
+    code_sample_rewrite_prompt: 'Schreibe dies in die folgende Sprache um: ',
 };
