@@ -88,7 +88,7 @@ export function AIChat() {
                 'ai-chat mx-auto ml-8 not-hydrated:hidden w-96 transition-[width] duration-300 ease-quint lg:max-xl:w-80'
             )}
         >
-            <EmbeddableFrame className="relative shrink-0 border-tint-subtle border-l to-tint-base">
+            <EmbeddableFrame className="relative w-full shrink-0 border-tint-subtle border-l to-tint-base">
                 <EmbeddableFrameMain data-testid="ai-chat" aria-busy={chat.loading}>
                     <EmbeddableFrameHeader className="not-embed:px-4">
                         <AIChatDynamicIcon trademark={config.trademark} />
