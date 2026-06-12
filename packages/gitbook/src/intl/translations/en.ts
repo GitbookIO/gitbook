@@ -133,6 +133,8 @@ export const en = {
     searched_for: 'Searched for ${1}',
     ai_chat_tools_listed_pages: 'Browsed the docs',
     ai_chat_tools_read_page: 'Read page ${1}',
+    ai_chat_tools_navigated_to_page: 'Opened the page',
+    ai_chat_tools_navigate_failed: 'Failed to open the page',
     ai_chat_tools_mcp_tool: 'Called ${1}',
     ai_chat_ask: 'Ask ${1}',
     ai_chat_ask_about_page: 'Ask ${1} about this page',

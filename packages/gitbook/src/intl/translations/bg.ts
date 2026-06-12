@@ -137,6 +137,8 @@ export const bg: TranslationLanguage = {
     searched_for: 'Търсено ${1}',
     ai_chat_tools_listed_pages: 'Прегледа документацията',
     ai_chat_tools_read_page: 'Прочете страница ${1}',
+    ai_chat_tools_navigated_to_page: 'Страницата е отворена',
+    ai_chat_tools_navigate_failed: 'Страницата не може да бъде отворена',
     ai_chat_tools_mcp_tool: 'Извика ${1}',
     ai_chat_ask: 'Попитайте ${1}',
     ai_chat_ask_about_page: 'Попитайте ${1} за тази страница',

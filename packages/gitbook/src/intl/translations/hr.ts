@@ -137,6 +137,8 @@ export const hr: TranslationLanguage = {
     searched_for: 'Pretraženo ${1}',
     ai_chat_tools_listed_pages: 'Pregledao dokumentaciju',
     ai_chat_tools_read_page: 'Pročitao stranicu ${1}',
+    ai_chat_tools_navigated_to_page: 'Stranica otvorena',
+    ai_chat_tools_navigate_failed: 'Stranicu nije moguće otvoriti',
     ai_chat_tools_mcp_tool: 'Pozvao ${1}',
     ai_chat_ask: 'Pitaj ${1}',
     ai_chat_ask_about_page: 'Pitaj ${1} o ovoj stranici',

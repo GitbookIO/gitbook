@@ -136,6 +136,8 @@ export const ru = {
     searched_for: 'Выполнен поиск ${1}',
     ai_chat_tools_listed_pages: 'Просмотрены документы',
     ai_chat_tools_read_page: 'Прочитана страница ${1}',
+    ai_chat_tools_navigated_to_page: 'Страница открыта',
+    ai_chat_tools_navigate_failed: 'Не удалось открыть страницу',
     ai_chat_tools_mcp_tool: 'Вызван ${1}',
     ai_chat_ask: 'Спросить у ${1}',
     ai_chat_ask_about_page: 'Спросить у ${1} об этой странице',

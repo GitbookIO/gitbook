@@ -139,6 +139,8 @@ export const el: TranslationLanguage = {
     searched_for: 'Αναζήτηση για ${1}',
     ai_chat_tools_listed_pages: 'Περιηγήθηκε στην τεκμηρίωση',
     ai_chat_tools_read_page: 'Διαβάστηκε η σελίδα ${1}',
+    ai_chat_tools_navigated_to_page: 'Άνοιξε η σελίδα',
+    ai_chat_tools_navigate_failed: 'Αποτυχία ανοίγματος της σελίδας',
     ai_chat_tools_mcp_tool: 'Κλήθηκε ${1}',
     ai_chat_ask: 'Ρωτήστε ${1}',
     ai_chat_ask_about_page: 'Ρωτήστε ${1} για αυτήν τη σελίδα',

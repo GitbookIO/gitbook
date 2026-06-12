@@ -136,6 +136,8 @@ export const da: TranslationLanguage = {
     searched_for: 'Søgte efter ${1}',
     ai_chat_tools_listed_pages: 'Gennemså dokumentationen',
     ai_chat_tools_read_page: 'Læste side ${1}',
+    ai_chat_tools_navigated_to_page: 'Åbnede siden',
+    ai_chat_tools_navigate_failed: 'Kunne ikke åbne siden',
     ai_chat_tools_mcp_tool: 'Kaldte ${1}',
     ai_chat_ask: 'Spørg ${1}',
     ai_chat_ask_about_page: 'Spørg ${1} om denne side',

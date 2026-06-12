@@ -135,6 +135,8 @@ export const hi: TranslationLanguage = {
     searched_for: '${1} के लिए खोजा गया',
     ai_chat_tools_listed_pages: 'दस्तावेज़ ब्राउज़ किए',
     ai_chat_tools_read_page: 'पृष्ठ ${1} पढ़ा',
+    ai_chat_tools_navigated_to_page: 'पेज खोला गया',
+    ai_chat_tools_navigate_failed: 'पेज खोलने में विफल',
     ai_chat_tools_mcp_tool: '${1} को कॉल किया',
     ai_chat_ask: '${1} से पूछें',
     ai_chat_ask_about_page: 'इस पृष्ठ के बारे में ${1} से पूछें',

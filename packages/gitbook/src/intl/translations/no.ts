@@ -137,6 +137,8 @@ export const no: TranslationLanguage = {
     searched_for: 'Søkte etter ${1}',
     ai_chat_tools_listed_pages: 'Bladde gjennom docs',
     ai_chat_tools_read_page: 'Leste side ${1}',
+    ai_chat_tools_navigated_to_page: 'Åpnet siden',
+    ai_chat_tools_navigate_failed: 'Kunne ikke åpne siden',
     ai_chat_tools_mcp_tool: 'Kalte ${1}',
     ai_chat_ask: 'Spør ${1}',
     ai_chat_ask_about_page: 'Spør ${1} om denne siden',

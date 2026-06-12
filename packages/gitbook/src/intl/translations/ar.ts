@@ -135,6 +135,8 @@ export const ar: TranslationLanguage = {
     searched_for: 'تم البحث عن ${1}',
     ai_chat_tools_listed_pages: 'تم تصفح الوثائق',
     ai_chat_tools_read_page: 'تمت قراءة الصفحة ${1}',
+    ai_chat_tools_navigated_to_page: 'تم فتح الصفحة',
+    ai_chat_tools_navigate_failed: 'تعذّر فتح الصفحة',
     ai_chat_tools_mcp_tool: 'تم استدعاء ${1}',
     ai_chat_ask: 'اسأل ${1}',
     ai_chat_ask_about_page: 'اسأل ${1} عن هذه الصفحة',

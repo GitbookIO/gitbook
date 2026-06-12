@@ -135,6 +135,8 @@ export const tr: TranslationLanguage = {
     searched_for: '${1} arandı',
     ai_chat_tools_listed_pages: 'Dokümanlara göz atıldı',
     ai_chat_tools_read_page: '${1} sayfası okundu',
+    ai_chat_tools_navigated_to_page: 'Sayfa açıldı',
+    ai_chat_tools_navigate_failed: 'Sayfa açılamadı',
     ai_chat_tools_mcp_tool: '${1} çağrıldı',
     ai_chat_ask: '${1} sor',
     ai_chat_ask_about_page: 'Bu sayfa hakkında ${1} sor',

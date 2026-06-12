@@ -23,6 +23,7 @@ import { type AIChatReference, serializeReferences } from './references';
 import { type RenderAIMessageOptions, streamAIChatResponse } from './server-actions';
 import { getTools } from './tools';
 import { useAIMessageContextRef } from './useAIMessageContext';
+import { useNavigateToPageTool } from './useNavigateToPageTool';
 
 export type AIChatMessage = {
     role: AIMessageRole;
@@ -192,6 +193,10 @@ export function AIChatProvider(props: {
     const { siteSpaceId } = useCurrentContent();
     const language = useLanguage();
 
+    // Built-in tools exposed to the assistant (e.g. navigating to a page). The tool has a stable
+    // identity, so it can be referenced directly from the streaming callback.
+    const navigateToPageTool = useNavigateToPageTool();
+
     // Event listeners storage
     const eventsRef = React.useRef<Map<AIChatEvent['type'], AIChatEventListener[]>>(new Map());
 
@@ -256,7 +261,7 @@ export function AIChatProvider(props: {
 
             // Execute a tool call
             const executeToolCall = async (event: AIStreamResponseToolCallPending) => {
-                const tools = getTools();
+                const tools = getTools([navigateToPageTool]);
                 const toolDef = tools.find((tool) => tool.name === event.toolCall.tool);
 
                 if (!toolDef || !('execute' in toolDef)) {
@@ -292,7 +297,7 @@ export function AIChatProvider(props: {
 
             let toolToExecute: AIStreamResponseToolCallPending | null = null;
             try {
-                const tools = getTools();
+                const tools = getTools([navigateToPageTool]);
                 const stream = await streamAIChatResponse({
                     message: input.message,
                     toolCall: input.toolCall,
@@ -473,6 +478,7 @@ export function AIChatProvider(props: {
             renderMessageOptions?.withToolCalls,
             renderMessageOptions?.asEmbeddable,
             language,
+            navigateToPageTool,
         ]
     );
 
