@@ -52,7 +52,10 @@ export function serializeReferences(refs: AIChatReference[]): string {
 function serializePageReferences(refs: PageReference[]): string {
     const plural = refs.length > 1;
     const list = refs
-        .map((ref) => `- "${ref.label}"${ref.path ? ` (${ref.path})` : ''}`)
+        .map((ref) => {
+            const url = ref.href ?? ref.path;
+            return url ? `- [${ref.label}](${url})` : `- "${ref.label}"`;
+        })
         .join('\n');
     return `The user is referring to the following page${plural ? 's' : ''} they are reading. Answer their question in the context of ${plural ? 'them' : 'it'}:\n\n${list}`;
 }

@@ -6,21 +6,29 @@ describe('serializeReferences', () => {
         expect(serializeReferences([])).toBe('');
     });
 
-    it('serializes a single page reference', () => {
+    it('serializes a single page reference as a markdown link', () => {
         const refs: AIChatReference[] = [
-            { type: 'page', id: 'page-1', label: 'Getting started', path: 'getting-started' },
+            { type: 'page', id: 'page-1', label: 'Getting started', href: '/getting-started' },
         ];
         const result = serializeReferences(refs);
         expect(result).toContain('The user is referring to the following page they are reading');
-        expect(result).toContain('- "Getting started" (getting-started)');
+        expect(result).toContain('- [Getting started](/getting-started)');
         expect(result.endsWith('\n\n---\n\n')).toBe(true);
     });
 
-    it('omits the path when not provided', () => {
+    it('falls back to the path when no href is provided', () => {
+        const refs: AIChatReference[] = [
+            { type: 'page', id: 'page-1', label: 'Overview', path: 'getting-started' },
+        ];
+        const result = serializeReferences(refs);
+        expect(result).toContain('- [Overview](getting-started)');
+    });
+
+    it('renders a quoted label when neither href nor path is provided', () => {
         const refs: AIChatReference[] = [{ type: 'page', id: 'page-1', label: 'Overview' }];
         const result = serializeReferences(refs);
         expect(result).toContain('- "Overview"');
-        expect(result).not.toContain('(');
+        expect(result).not.toContain('](');
     });
 
     it('uses the plural form for multiple pages', () => {
