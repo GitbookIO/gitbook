@@ -33,7 +33,9 @@ export async function PageHeader(props: {
     const hasPageActions =
         pageActionsEnabled &&
         [
-            ...Object.values(context.customization.pageActions),
+            context.customization.pageActions.externalAI,
+            context.customization.pageActions.markdown,
+            context.customization.pageActions.mcp,
             context.customization.pdf.enabled,
             context.customization.git.showEditLink,
             withRSSFeed,
