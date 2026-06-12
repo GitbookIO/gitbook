@@ -1,5 +1,13 @@
 # @gitbook/react-openapi
 
+## 1.5.13
+
+### Patch Changes
+
+- f158064: Match OpenAPI operation paths regardless of trailing slash
+- Updated dependencies [6eabaec]
+  - @gitbook/expr@1.3.0
+
 ## 1.5.12
 
 ### Patch Changes
