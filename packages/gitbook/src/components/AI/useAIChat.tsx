@@ -277,6 +277,16 @@ export function AIChatProvider(props: {
                 };
             });
 
+            // A stream becomes stale once a newer turn (or a clear) has replaced its
+            // query. Because `responding` clears on `response_finish` — before follow-up
+            // suggestions finish streaming — the user can start a new turn while this one
+            // is still wrapping up. A stale stream must not mutate the shared
+            // loading/responding state, which now belongs to the active turn; otherwise
+            // it would make the UI look idle mid-response. (`userQuery` is only set for
+            // user-initiated turns, not tool-call continuations.)
+            const isSuperseded = () =>
+                !!input.userQuery && globalState.getState().query !== input.userQuery;
+
             // Execute a tool call
             const executeToolCall = async (event: AIStreamResponseToolCallPending) => {
                 const tools = getTools([navigateToPageTool]);
@@ -339,8 +349,8 @@ export function AIChatProvider(props: {
                 for await (const data of stream) {
                     if (!data) continue;
 
-                    if (input.userQuery && globalState.getState().query !== input.userQuery) {
-                        // Chat was cleared, stop processing the stream
+                    if (isSuperseded()) {
+                        // Chat was cleared or a newer turn started; stop processing.
                         break;
                     }
 
@@ -471,6 +481,14 @@ export function AIChatProvider(props: {
                     }));
                 }
 
+                // If a newer turn replaced this one while we were finishing (e.g.
+                // streaming follow-up suggestions after `response_finish`), abandon this
+                // stale stream without executing leftover tools or clearing the shared
+                // loading/responding state, which now belongs to the active turn.
+                if (isSuperseded()) {
+                    return;
+                }
+
                 // Execute the tool call if it doesn't require confirmation.
                 // When a tool call (or control) keeps the turn going, `loading`
                 // stays true: either the recursive `streamResponse` will clear it
@@ -488,12 +506,15 @@ export function AIChatProvider(props: {
                 }
             } catch (error) {
                 console.error('Error streaming AI response', error);
-                globalState.setState((state) => ({
-                    ...state,
-                    responding: false,
-                    loading: false,
-                    error: true,
-                }));
+                // Don't surface a stale stream's error onto the active turn.
+                if (!isSuperseded()) {
+                    globalState.setState((state) => ({
+                        ...state,
+                        responding: false,
+                        loading: false,
+                        error: true,
+                    }));
+                }
             }
         },
         [
