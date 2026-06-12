@@ -1,6 +1,7 @@
 import type { GitBookSiteContext } from '@/lib/context';
 import { getExposableError } from '@/lib/data';
 import { linkerWithMarkdownPages } from '@/lib/links';
+import { renderLLMsTxtMarkdownDirective } from '@/lib/llms-directive';
 import { getMarkdownForPage } from '@/lib/markdownPage';
 import {
     type ResolvedPagePath,
@@ -30,7 +31,7 @@ export async function servePageMarkdown(baseContext: GitBookSiteContext, pagePat
         if (baseContext.displayAgentInstructions === false) {
             return markdownPage;
         }
-        return `${markdownPage}${renderAskFooter(context, pageLookup)}`;
+        return `${renderLLMsTxtMarkdownDirective(context, pageLookup.page)}\n\n${markdownPage}${renderAskFooter(context, pageLookup)}`;
     });
 }
 

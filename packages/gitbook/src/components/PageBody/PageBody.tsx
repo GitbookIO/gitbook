@@ -4,6 +4,7 @@ import type { JSONDocument, RevisionPageDocument, SiteInsightsDisplayContext } f
 import { getSpaceLanguage } from '@/intl/server';
 import { t } from '@/intl/translate';
 import { hasFullWidthBlock, hasMoreThan, hasTopLevelBlock, isNodeEmpty } from '@/lib/document';
+import { getLLMsTxtURL, getPageMarkdownURL } from '@/lib/llms-directive';
 import type { AncestorRevisionPage } from '@/lib/pages';
 import { tcls } from '@/lib/tailwind';
 import { DocumentView, DocumentViewSkeleton } from '../DocumentView';
@@ -88,6 +89,7 @@ export async function PageBody(props: {
                 )}
             >
                 <PreservePageLayout wideLayout={wideLayout} pageHasToc={pageHasToc} />
+                <LLMsTxtPageDirective context={context} page={page} />
                 {page.cover && page.layout.cover && page.layout.coverSize === 'hero' ? (
                     <PageCover as="hero" page={page} cover={page.cover} context={context} />
                 ) : null}
@@ -158,5 +160,19 @@ export async function PageBody(props: {
 
             <TrackPageViewEvent displayContext={insightsDisplayContext} />
         </CurrentPageProvider>
+    );
+}
+
+function LLMsTxtPageDirective(props: {
+    context: GitBookSiteContext;
+    page: RevisionPageDocument;
+}) {
+    const { context, page } = props;
+
+    return (
+        <div className="sr-only">
+            For the complete documentation index, see <a href={getLLMsTxtURL(context)}>llms.txt</a>.
+            This page is also available as <a href={getPageMarkdownURL(context, page)}>Markdown</a>.
+        </div>
     );
 }
