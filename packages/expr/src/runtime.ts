@@ -178,8 +178,7 @@ export class ExpressionRuntime {
                 withMembers: true,
                 generate: escodegen.generate,
             });
-            
-        }catch (error) {
+        } catch (error) {
             this.#logger.error(`Error while parsing expression ${expr} to get variables`, error);
             return [];
         }

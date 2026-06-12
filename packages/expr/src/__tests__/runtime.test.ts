@@ -233,12 +233,9 @@ describe('ExpressionRuntime', () => {
                 scenario: 'non conditional expression',
                 condition: 'const a = 1;',
             },
-        ])(
-            'should return an empty array for invalid expressions: $scenario',
-            ({ condition }) => {
-                expect(runtime.getVariables(condition)).toEqual([]);
-            }
-        );
+        ])('should return an empty array for invalid expressions: $scenario', ({ condition }) => {
+            expect(runtime.getVariables(condition)).toEqual([]);
+        });
     });
 
     describe.skip('generate', () => {

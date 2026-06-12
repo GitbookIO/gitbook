@@ -46,7 +46,10 @@ declare module 'eval-estree-expression' {
      * @param ast An object representing an ESTree-compliant AST node.
      * @param options Options for evaluation and compilation.
      */
-    export function variables<ASTNode>(ast: ASTNode, options?: EvalESTreeExpressionOptions): string[];
+    export function variables<ASTNode>(
+        ast: ASTNode,
+        options?: EvalESTreeExpressionOptions
+    ): string[];
 
     /**
      * Evaluates an ESTree expression synchronously against a given context.
