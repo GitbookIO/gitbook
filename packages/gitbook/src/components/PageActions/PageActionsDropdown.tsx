@@ -5,7 +5,7 @@ import { DropdownMenu, DropdownMenuSeparator } from '@/components/primitives/Dro
 import { tString, useLanguage } from '@/intl/client';
 import type { GitSyncState, SiteCustomizationSettings } from '@gitbook/api';
 import React, { useRef } from 'react';
-import { useAI } from '../AI';
+import { type Assistant, useAI } from '../AI';
 import { ToggleChevron } from '../primitives';
 import {
     ActionCopyMCPCommand,
@@ -28,13 +28,17 @@ import {
  * client is updated. Once `CustomizationPageActionType` and `pageActions.items` are part
  * of the API, import the type from `@gitbook/api` and remove the `@ts-expect-error` below.
  */
-type CustomizationPageActionType = 'external-ai' | 'markdown' | 'mcp' | 'git' | 'pdf';
+type CustomizationPageActionType = 'assistant' | 'external-ai' | 'markdown' | 'mcp' | 'git' | 'pdf';
 
 /**
  * Default display order of the built-in page actions, used to derive the ordered list
  * for sites that don't have an explicit `items` configuration (legacy boolean flags).
+ *
+ * The assistant action comes first as it is the default action surfaced as the main button
+ * on the page when the assistant is enabled.
  */
 const DEFAULT_PAGE_ACTION_ORDER: CustomizationPageActionType[] = [
+    'assistant',
     'external-ai',
     'markdown',
     'mcp',
@@ -81,34 +85,35 @@ export function PageActionsDropdown(props: PageActionsDropdownProps) {
     const items = getPageActionItems(props.actions);
 
     // The quick-access button next to the dropdown is the first action of the configured list.
-    // The RSS feed and the AI assistant are not part of the configurable `items`, so they are only
-    // used as a fallback default when no configured action is available (to keep a button visible).
-    const firstAvailableItem = items.find((type) => isActionTypeAvailable(type, urls));
+    // The assistant action is part of `items` (governed by the AI mode setting), so it is no
+    // longer prepended here — otherwise it would render twice.
+    const firstAvailableItem = items.find((type) => isActionTypeAvailable(type, urls, assistants));
 
     let defaultAction: React.ReactNode = null;
     let markdownIsDefault = false;
     if (firstAvailableItem) {
-        defaultAction = renderDefaultActionForType(firstAvailableItem, { siteTitle, urls });
+        defaultAction = renderDefaultActionForType(firstAvailableItem, {
+            siteTitle,
+            urls,
+            assistants,
+            page: props.page,
+        });
         markdownIsDefault = firstAvailableItem === 'markdown';
     } else if (urls.rss) {
+        // The RSS feed is not part of the configurable `items`, so it is only used as a fallback
+        // default when no configured action is available (to keep a button visible).
         defaultAction = <ActionViewAsRSS url={urls.rss} type="button" />;
-    } else if (assistants[0]) {
-        defaultAction = (
-            <ActionOpenAssistant assistant={assistants[0]} type="button" page={props.page} />
-        );
     }
 
     const dropdownActions: React.ReactNode[] = [
-        ...assistants.map((assistant) => (
-            <ActionOpenAssistant
-                key={assistant.label}
-                assistant={assistant}
-                type="dropdown-menu-item"
-                page={props.page}
-            />
-        )),
         ...items.map((type) =>
-            renderDropdownActionsForType(type, { siteTitle, urls, markdownIsDefault })
+            renderDropdownActionsForType(type, {
+                siteTitle,
+                urls,
+                markdownIsDefault,
+                assistants,
+                page: props.page,
+            })
         ),
         urls.rss ? (
             <React.Fragment key="rss">
@@ -166,8 +171,9 @@ function getPageActionItems(
                 return actions.markdown;
             case 'mcp':
                 return actions.mcp;
-            // `git` and `pdf` are not represented by the legacy `pageActions` flags;
-            // they are gated by URL availability at render time.
+            // `assistant` is governed by the AI mode setting, and `git`/`pdf` are not represented
+            // by the legacy `pageActions` flags; all three are gated by availability at render time.
+            case 'assistant':
             case 'git':
             case 'pdf':
                 return true;
@@ -178,13 +184,16 @@ function getPageActionItems(
 }
 
 /**
- * Whether an action type can be rendered given the available URLs.
+ * Whether an action type can be rendered given the available URLs and assistants.
  */
 function isActionTypeAvailable(
     type: CustomizationPageActionType,
-    urls: PageActionsDropdownURLs
+    urls: PageActionsDropdownURLs,
+    assistants: Assistant[]
 ): boolean {
     switch (type) {
+        case 'assistant':
+            return assistants.length > 0;
         case 'external-ai':
         case 'markdown':
             return true;
@@ -204,11 +213,34 @@ function isActionTypeAvailable(
  */
 function renderDropdownActionsForType(
     type: CustomizationPageActionType,
-    params: { siteTitle: string; urls: PageActionsDropdownURLs; markdownIsDefault: boolean }
+    params: {
+        siteTitle: string;
+        urls: PageActionsDropdownURLs;
+        markdownIsDefault: boolean;
+        assistants: Assistant[];
+        page: PageActionAssistantContext;
+    }
 ): React.ReactNode {
-    const { siteTitle, urls, markdownIsDefault } = params;
+    const { siteTitle, urls, markdownIsDefault, assistants, page } = params;
 
     switch (type) {
+        case 'assistant':
+            if (assistants.length === 0) {
+                return null;
+            }
+            return (
+                <React.Fragment key="assistant">
+                    <DropdownMenuSeparator className="first:hidden" />
+                    {assistants.map((assistant) => (
+                        <ActionOpenAssistant
+                            key={assistant.label}
+                            assistant={assistant}
+                            type="dropdown-menu-item"
+                            page={page}
+                        />
+                    ))}
+                </React.Fragment>
+            );
         case 'external-ai':
             return (
                 <React.Fragment key="external-ai">
@@ -294,11 +326,20 @@ function renderDropdownActionsForType(
  */
 function renderDefaultActionForType(
     type: CustomizationPageActionType,
-    params: { siteTitle: string; urls: PageActionsDropdownURLs }
+    params: {
+        siteTitle: string;
+        urls: PageActionsDropdownURLs;
+        assistants: Assistant[];
+        page: PageActionAssistantContext;
+    }
 ): React.ReactNode {
-    const { urls } = params;
+    const { urls, assistants, page } = params;
 
     switch (type) {
+        case 'assistant':
+            return assistants[0] ? (
+                <ActionOpenAssistant assistant={assistants[0]} type="button" page={page} />
+            ) : null;
         case 'external-ai':
             return <ActionOpenInLLM provider="chatgpt" url={urls.html} type="button" />;
         case 'markdown':
