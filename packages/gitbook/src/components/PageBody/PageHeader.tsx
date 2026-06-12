@@ -56,6 +56,12 @@ export async function PageHeader(props: {
                         siteTitle={context.site.title}
                         urls={getPageActionsURLs({ context, page, withRSSFeed })}
                         actions={context.customization.pageActions}
+                        page={{
+                            id: page.id,
+                            title: page.title,
+                            path: page.path,
+                            href: linker.toPathForPage({ pages: revision.pages, page }),
+                        }}
                     />
                 ) : null}
                 <PageAsideToggleButton />
