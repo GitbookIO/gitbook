@@ -1,0 +1,12 @@
+{
+    "version": "0.0.1",
+    "configurations": [
+        {
+            "name": "🚀 Dev server",
+            "runtimeExecutable": "bun",
+            "runtimeArgs": ["dev"],
+            "port": 3000,
+            "autoPort": false
+        }
+    ]
+}
