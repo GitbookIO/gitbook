@@ -1,5 +1,28 @@
 # gitbook
 
+## 0.27.0
+
+### Minor Changes
+
+- aa9d41a: Update llms.txt footer for GitBook sites
+- 4f754a7: Add GitBook information to footer of markdown pages
+- 2ecbdd8: Add a `navigateToPage` assistant tool that lets the AI open a documentation page on the reader's behalf. The page opens instantly (no confirmation) and is pushed to the browser history so the reader can navigate back.
+
+### Patch Changes
+
+- 7036b67: Fix custom assistants (e.g. Kapa, Inkeep) being opened twice when clicking "Ask with …" in the search bar.
+- 2885a13: Fix heading anchor alignment with heading text and translate its accessibility label.
+- b9bb535: Allow Mermaid diagrams to be enlarged into a fullscreen dialog from a control in the bottom-right corner. Clicking outside the dialog, pressing Escape, or using the reduce control returns to the inline view.
+- b116a0a: Fix OpenAPI CodeBlock scroll
+- d83ea4c: Improve a11y of list item collapse/extend toggle
+- 92b6856: Add Ask AI in CodeBlock
+- 7a1236a: Fix search results linking to the page instead of the section anchor when a section snippet is displayed.
+- b9bb535: Make `Tooltip` content non-interactive when `disableHoverableContent` is set, so its portaled popper wrapper no longer steals pointer events (e.g. hover-revealed controls) from the trigger.
+- Updated dependencies [6eabaec]
+- Updated dependencies [f158064]
+  - @gitbook/expr@1.3.0
+  - @gitbook/react-openapi@1.5.13
+
 ## 0.26.2
 
 ### Patch Changes
