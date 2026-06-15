@@ -3,7 +3,11 @@
 import { Button, ButtonGroup } from '@/components/primitives/Button';
 import { DropdownMenu, DropdownMenuSeparator } from '@/components/primitives/DropdownMenu';
 import { tString, useLanguage } from '@/intl/client';
-import type { GitSyncState, SiteCustomizationSettings } from '@gitbook/api';
+import type {
+    CustomizationPageActionType,
+    GitSyncState,
+    SiteCustomizationSettings,
+} from '@gitbook/api';
 import { type ReactNode, useRef } from 'react';
 import { type Assistant, useAI } from '../AI';
 import { ToggleChevron } from '../primitives';
@@ -23,19 +27,15 @@ import {
 
 /**
  * Type of a built-in page action that can be displayed in the page actions menu.
- *
- * TODO: this type is not yet exposed by `@gitbook/api`. We mirror it here until the API
- * client is updated. Once `CustomizationPageActionType` and `pageActions.items` are part
- * of the API, import the type from `@gitbook/api` and remove the `@ts-expect-error` below.
  */
-type CustomizationPageActionType = 'assistant' | 'external-ai' | 'markdown' | 'mcp' | 'git' | 'pdf';
+type PageActionType = `${CustomizationPageActionType}`;
 
 /**
  * Order used to derive the list of actions from the deprecated boolean flags when the API does not
  * provide `items` yet. It matches the order the page actions menu used before the `items` model, so
  * existing sites keep the same dropdown ordering until they are migrated.
  */
-const LEGACY_PAGE_ACTION_ORDER: CustomizationPageActionType[] = [
+const LEGACY_PAGE_ACTION_ORDER: PageActionType[] = [
     'assistant',
     'markdown',
     'external-ai',
@@ -49,11 +49,7 @@ const LEGACY_PAGE_ACTION_ORDER: CustomizationPageActionType[] = [
  * which only ever surfaced the assistant, the Git edit link or the markdown copy as the default
  * action — never ChatGPT, MCP or PDF.
  */
-const LEGACY_DEFAULT_ACTION_PRIORITY: CustomizationPageActionType[] = [
-    'assistant',
-    'git',
-    'markdown',
-];
+const LEGACY_DEFAULT_ACTION_PRIORITY: PageActionType[] = ['assistant', 'git', 'markdown'];
 
 export type PageActionsDropdownURLs = {
     html: string;
@@ -188,10 +184,8 @@ export function PageActionsDropdown(props: PageActionsDropdownProps) {
  */
 function getConfiguredPageActionItems(
     actions: SiteCustomizationSettings['pageActions']
-): CustomizationPageActionType[] | null {
-    // @ts-expect-error - `items` is not yet part of the `@gitbook/api` types. Remove this once it is.
-    const items: CustomizationPageActionType[] | undefined = actions.items;
-    return items ?? null;
+): PageActionType[] | null {
+    return actions.items ?? null;
 }
 
 /**
@@ -200,7 +194,7 @@ function getConfiguredPageActionItems(
  */
 function deriveLegacyPageActionItems(
     actions: SiteCustomizationSettings['pageActions']
-): CustomizationPageActionType[] {
+): PageActionType[] {
     return LEGACY_PAGE_ACTION_ORDER.filter((type) => {
         switch (type) {
             case 'external-ai':
@@ -225,7 +219,7 @@ function deriveLegacyPageActionItems(
  * Whether an action type can be rendered given the available URLs and assistants.
  */
 function isActionTypeAvailable(
-    type: CustomizationPageActionType,
+    type: PageActionType,
     urls: PageActionsDropdownURLs,
     assistants: Assistant[]
 ): boolean {
@@ -253,7 +247,7 @@ function isActionTypeAvailable(
  * separators between groups.
  */
 function renderDropdownActionsForType(
-    type: CustomizationPageActionType,
+    type: PageActionType,
     params: {
         siteTitle: string;
         urls: PageActionsDropdownURLs;
@@ -357,7 +351,7 @@ function renderDropdownActionsForType(
  * Render the action shown as the quick-access default button for a given action type.
  */
 function renderDefaultActionForType(
-    type: CustomizationPageActionType,
+    type: PageActionType,
     params: {
         siteTitle: string;
         urls: PageActionsDropdownURLs;
