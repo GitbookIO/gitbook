@@ -89,7 +89,7 @@ export function AIChat() {
             )}
         >
             <EmbeddableFrame className="relative w-full shrink-0 border-tint-subtle border-l to-tint-base">
-                <EmbeddableFrameMain data-testid="ai-chat">
+                <EmbeddableFrameMain data-testid="ai-chat" aria-busy={chat.loading}>
                     <EmbeddableFrameHeader className="not-embed:px-4">
                         <AIChatDynamicIcon trademark={config.trademark} />
                         <EmbeddableFrameHeaderMain>
@@ -281,8 +281,8 @@ export function AIChatBody(props: {
 
                 {chat.control ? <AIChatControl control={chat.control} /> : null}
                 <AIChatInput
-                    loading={chat.loading}
-                    disabled={chat.loading || chat.error}
+                    responding={chat.responding}
+                    disabled={chat.responding || chat.error}
                     onSubmit={(value) => {
                         chatController.postMessage({ message: value });
                     }}

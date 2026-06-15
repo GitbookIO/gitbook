@@ -46,7 +46,7 @@ export function ActionOpenAssistant(props: {
             label={assistant.label}
             shortLabel={tString(language, 'ask')}
             description={tString(language, 'ai_chat_ask_about_page', assistant.label)}
-            disabled={chat.loading}
+            disabled={chat.responding}
             onClick={() => {
                 // Stage a reference to the current page so the assistant is informed about
                 // the context the user is asking from. Only the sidebar GitBook Assistant
