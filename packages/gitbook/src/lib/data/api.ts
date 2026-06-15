@@ -238,7 +238,7 @@ const getUserById = cache(async (input: DataFetcherInput, params: { userId: stri
 
 const getSpace = cache(
     async (input: DataFetcherInput, params: { spaceId: string; shareKey: string | undefined }) => {
-        'use cache: remote';
+        'use cache';
         cacheTag(
             getCacheTag({
                 tag: 'space',
@@ -439,7 +439,7 @@ const getRevisionPageByPath = cache(
         input: DataFetcherInput,
         params: { spaceId: string; revisionId: string; path: string }
     ) => {
-        'use cache: remote';
+        'use cache';
         return wrapCacheDataFetcherError(async () => {
             return trace(
                 `getRevisionPageByPath(${params.spaceId}, ${params.revisionId}, ${params.path})`,
@@ -571,7 +571,7 @@ const getPublishedContentSite = cache(
         params: { organizationId: string; siteId: string; siteShareKey: string | undefined },
         _apiVersion: string
     ) => {
-        'use cache: remote';
+        'use cache';
         cacheTag(
             getCacheTag({
                 tag: 'site',
