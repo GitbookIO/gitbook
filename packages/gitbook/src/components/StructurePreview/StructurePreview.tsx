@@ -71,6 +71,8 @@ export function StructurePreview(props: { initialSnapshot: StructurePreviewSnaps
                 return;
             }
 
+            //TODO: we should not pass everything here, we should select only some data as a lot of them are GBO specific
+            // Maybe only sections title/icon or something like that. TBD 
             setSnapshot(event.data.payload);
         };
 
