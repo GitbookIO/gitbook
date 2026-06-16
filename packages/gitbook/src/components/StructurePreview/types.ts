@@ -9,8 +9,6 @@ import type {
 
 import type { SiteSections } from '@/lib/context';
 
-export type StructurePreviewViewportMode = 'auto' | 'desktop' | 'mobile';
-
 export type StructurePreviewSnapshot = {
     site: {
         id: string;
@@ -36,7 +34,6 @@ export type StructurePreviewSnapshot = {
             dark: string;
         };
     };
-    viewportMode?: StructurePreviewViewportMode;
 };
 
 export type StructurePreviewMessage = {

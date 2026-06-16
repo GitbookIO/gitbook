@@ -5,9 +5,7 @@ import { CustomizationHeaderPreset, CustomizationSearchStyle } from '@gitbook/ap
 import { Icon, type IconName } from '@gitbook/icons';
 import * as React from 'react';
 
-import { HeaderMobileMenu } from '@/components/Header/HeaderMobileMenu';
 import { SiteSectionTabs } from '@/components/SiteSections';
-import { PagesList } from '@/components/TableOfContents/PagesList';
 import { getLocalizedTitle } from '@/lib/sites';
 import { tcls } from '@/lib/tailwind';
 
@@ -16,26 +14,19 @@ import headerLinksStyles from '../Header/headerLinks.module.css';
 import { CONTAINER_STYLE, HEADER_HEIGHT_DESKTOP } from '../layout';
 import { Button, ToggleChevron } from '../primitives';
 import { DropdownMenu, DropdownMenuItem, DropdownSubMenu } from '../primitives/DropdownMenu';
-import { ScrollContainer } from '../primitives/ScrollContainer';
-import { SideSheet } from '../primitives/SideSheet';
 import {
     SOCIAL_PLATFORM_ICONS,
     encodePreviewSiteSections,
-    encodePreviewTableOfContents,
     getContentRefKey,
     getHeaderSocialAccounts,
     getPreviewVariants,
-    getStructurePreviewViewportMode,
     isStructurePreviewMessage,
 } from './state';
-import type { StructurePreviewSnapshot, StructurePreviewViewportMode } from './types';
+import type { StructurePreviewSnapshot } from './types';
 
 export function StructurePreview(props: { initialSnapshot: StructurePreviewSnapshot }) {
     const { initialSnapshot } = props;
     const [snapshot, setSnapshot] = React.useState(initialSnapshot);
-    const [localMode, setLocalMode] = React.useState<StructurePreviewViewportMode>(
-        getStructurePreviewViewportMode(initialSnapshot.viewportMode)
-    );
 
     React.useEffect(() => {
         const handleMessage = (event: MessageEvent<unknown>) => {
@@ -44,14 +35,11 @@ export function StructurePreview(props: { initialSnapshot: StructurePreviewSnaps
             }
 
             setSnapshot(event.data.payload);
-            setLocalMode(getStructurePreviewViewportMode(event.data.payload.viewportMode));
         };
 
         window.addEventListener('message', handleMessage);
         return () => window.removeEventListener('message', handleMessage);
     }, []);
-
-    const mode = getStructurePreviewViewportMode(localMode);
 
     const preventNavigation = (event: React.MouseEvent<HTMLElement>) => {
         const target = event.target;
@@ -71,51 +59,18 @@ export function StructurePreview(props: { initialSnapshot: StructurePreviewSnaps
     return (
         <div
             data-gb-structure-preview
-            data-viewport-mode={mode}
-            className={tcls(
-                'site-background min-h-screen overflow-hidden',
-                mode === 'mobile' ? 'mx-auto max-w-[420px]' : null,
-                mode === 'desktop' ? 'min-w-[1024px]' : null
-            )}
+            data-viewport-mode="desktop"
+            className="site-background min-h-screen min-w-[1024px] overflow-hidden"
             onClickCapture={preventNavigation}
             onAuxClickCapture={preventNavigation}
         >
-            <StructurePreviewModeToggle mode={mode} onModeChange={setLocalMode} />
-            <StructurePreviewHeader snapshot={snapshot} viewportMode={mode} />
-            <StructurePreviewMobileNavigation snapshot={snapshot} />
+            <StructurePreviewHeader snapshot={snapshot} />
         </div>
     );
 }
 
-function StructurePreviewModeToggle(props: {
-    mode: StructurePreviewViewportMode;
-    onModeChange: (mode: StructurePreviewViewportMode) => void;
-}) {
-    const { mode, onModeChange } = props;
-    return (
-        <div className="fixed top-2 right-2 z-50 flex rounded-md border border-tint-subtle bg-tint-base/9 p-0.5 text-xs shadow-sm backdrop-blur">
-            {(['auto', 'desktop', 'mobile'] as const).map((nextMode) => (
-                <button
-                    key={nextMode}
-                    type="button"
-                    className={tcls(
-                        'rounded-sm px-2 py-1 text-tint capitalize transition-colors hover:bg-tint-hover',
-                        mode === nextMode ? 'bg-primary-active text-primary-strong' : null
-                    )}
-                    onClick={() => onModeChange(nextMode)}
-                >
-                    {nextMode}
-                </button>
-            ))}
-        </div>
-    );
-}
-
-function StructurePreviewHeader(props: {
-    snapshot: StructurePreviewSnapshot;
-    viewportMode: StructurePreviewViewportMode;
-}) {
-    const { snapshot, viewportMode } = props;
+function StructurePreviewHeader(props: { snapshot: StructurePreviewSnapshot }) {
+    const { snapshot } = props;
     const { customization } = snapshot;
     const language = useLanguage();
     const variants = getPreviewVariants(snapshot);
@@ -127,8 +82,6 @@ function StructurePreviewHeader(props: {
             (sections.list.length > 1 ||
                 sections.list.some((section) => section.object === 'site-section-group'))
     );
-    const forceMobile = viewportMode === 'mobile';
-    const forceDesktop = viewportMode === 'desktop';
 
     return (
         <header
@@ -190,16 +143,6 @@ function StructurePreviewHeader(props: {
                                     : null
                             )}
                         >
-                            <HeaderMobileMenu
-                                className={tcls(
-                                    '-ml-2',
-                                    'text-tint-strong',
-                                    'site-header:theme-bold:text-header-link',
-                                    'hover:bg-tint-hover',
-                                    'hover:site-header:theme-bold:bg-header-link/3',
-                                    forceDesktop ? 'hidden' : forceMobile ? 'flex' : 'lg:hidden'
-                                )}
-                            />
                             <StructurePreviewLogo snapshot={snapshot} />
                         </div>
 
@@ -226,21 +169,16 @@ function StructurePreviewHeader(props: {
                                     : ['order-last']
                             )}
                         >
-                            <StructurePreviewSearch
-                                style={customization.styling.search}
-                                mobile={forceMobile}
-                            />
+                            <StructurePreviewSearch style={customization.styling.search} />
                         </div>
 
-                        {(customization.header.links.length > 0 ||
-                            headerSocialAccounts.length > 0 ||
-                            (!withSections && variants.translations.length > 1)) &&
-                        !forceMobile ? (
+                        {customization.header.links.length > 0 ||
+                        headerSocialAccounts.length > 0 ||
+                        (!withSections && variants.translations.length > 1) ? (
                             <div
                                 className={tcls(
                                     headerLinksStyles.containerHeaderlinks,
-                                    '@4xl:[&>.button+.button]:-ml-2 z-20 ml-auto flex min-w-9 shrink grow @7xl:grow-0 items-center justify-end @4xl:gap-x-6 gap-x-4',
-                                    forceMobile ? 'hidden' : null
+                                    '@4xl:[&>.button+.button]:-ml-2 z-20 ml-auto flex min-w-9 shrink grow @7xl:grow-0 items-center justify-end @4xl:gap-x-6 gap-x-4'
                                 )}
                             >
                                 {customization.header.links.map((link, index) => (
@@ -292,7 +230,7 @@ function StructurePreviewHeader(props: {
                 </div>
             </div>
 
-            {sections && withSections && !forceMobile ? (
+            {sections && withSections ? (
                 <div>
                     <SiteSectionTabs sections={sections}>
                         {variants.translations.length > 1 ? (
@@ -383,13 +321,9 @@ function StructurePreviewLogo(props: { snapshot: StructurePreviewSnapshot }) {
     );
 }
 
-function StructurePreviewSearch(props: { style: CustomizationSearchStyle; mobile: boolean }) {
+function StructurePreviewSearch(props: { style: CustomizationSearchStyle }) {
     const language = useLanguage();
     const label = tString(language, 'search');
-
-    if (props.mobile) {
-        return <Button icon="search" variant="header" size="medium" iconOnly label={label} />;
-    }
 
     if (props.style === CustomizationSearchStyle.Prominent) {
         return (
@@ -591,89 +525,5 @@ function StructurePreviewSpacesDropdown(props: {
                 </DropdownMenuItem>
             ))}
         </DropdownMenu>
-    );
-}
-
-function StructurePreviewMobileNavigation(props: { snapshot: StructurePreviewSnapshot }) {
-    const { snapshot } = props;
-    const pages = React.useMemo(() => encodePreviewTableOfContents(snapshot), [snapshot]);
-    const variants = getPreviewVariants(snapshot);
-
-    return (
-        <SideSheet
-            side="left"
-            data-testid="table-of-contents"
-            data-gb-table-of-contents
-            toggleClass="navigation-open"
-            withOverlay={true}
-            withCloseButton={true}
-            className={tcls(
-                'group/table-of-contents',
-                'text-sm',
-                'grow-0',
-                'shrink-0',
-                'w-4/5',
-                'md:w-1/2',
-                'lg:w-72',
-                'max-lg:not-sidebar-filled:bg-tint-base',
-                'max-lg:not-sidebar-filled:border-r',
-                'border-tint-subtle',
-                'pt-6 pb-4',
-                'supports-[-webkit-touch-callout]:pb-[env(safe-area-inset-bottom)]',
-                'max-lg:pl-8',
-                'flex',
-                'flex-col',
-                'min-h-0',
-                'gap-4'
-            )}
-        >
-            <div className="flex grow-0 items-center pr-4 text-base/tight">
-                <StructurePreviewLogo snapshot={snapshot} />
-                {variants.translations.length > 1 ? (
-                    <StructurePreviewSpacesDropdown
-                        snapshot={snapshot}
-                        siteSpace={snapshot.siteSpace}
-                        siteSpaces={variants.translations}
-                        icon="globe"
-                        variant="blank"
-                        className="[&_.button-leading-icon]:block! ml-auto py-2 [&_.button-content]:hidden"
-                    />
-                ) : null}
-            </div>
-            <div
-                className={tcls(
-                    '-ms-5',
-                    'relative flex min-h-0 grow flex-col border-tint-subtle',
-                    'sidebar-filled:bg-tint-subtle',
-                    'theme-muted:bg-tint-subtle',
-                    '[html.sidebar-filled.theme-bold.tint_&]:bg-tint-subtle',
-                    '[html.sidebar-filled.theme-muted_&]:bg-tint-base',
-                    '[html.sidebar-filled.theme-bold.tint_&]:bg-tint-base',
-                    '[html.sidebar-filled.theme-gradient_&]:border',
-                    'max-lg:sidebar-filled:border',
-                    'sidebar-filled:rounded-2xl',
-                    'straight-corners:rounded-none'
-                )}
-            >
-                <ScrollContainer
-                    data-testid="toc-scroll-container"
-                    orientation="vertical"
-                    contentClassName="flex flex-col p-2 gutter-stable"
-                    active="[data-active=true]"
-                    leading={{
-                        fade: true,
-                        button: {
-                            className: '-mt-4',
-                        },
-                    }}
-                >
-                    <PagesList
-                        pages={pages}
-                        isRoot={true}
-                        style="grow border-tint-subtle sidebar-list-line:border-l"
-                    />
-                </ScrollContainer>
-            </div>
-        </SideSheet>
     );
 }

@@ -1,8 +1,5 @@
 import type {
     ContentRef,
-    RevisionPage,
-    RevisionPageTag,
-    RevisionTag,
     SiteCustomizationSettings,
     SiteSection,
     SiteSectionGroup,
@@ -16,15 +13,9 @@ import type {
     ClientSiteSectionGroup,
     ClientSiteSections,
 } from '@/components/SiteSections/encodeClientSiteSections';
-import type { ClientTOCPage } from '@/components/TableOfContents/encodeClientTableOfContents';
 import { getLocalizedDescription, getLocalizedTitle } from '@/lib/sites';
-import { resolveTag } from '@/lib/tags';
 
-import type {
-    StructurePreviewMessage,
-    StructurePreviewSnapshot,
-    StructurePreviewViewportMode,
-} from './types';
+import type { StructurePreviewMessage, StructurePreviewSnapshot } from './types';
 
 export function isStructurePreviewMessage(value: unknown): value is StructurePreviewMessage {
     if (!value || typeof value !== 'object') {
@@ -55,12 +46,6 @@ export function isStructurePreviewSnapshot(value: unknown): value is StructurePr
             Array.isArray(snapshot.revision.pages) &&
             Array.isArray(snapshot.revision.tags)
     );
-}
-
-export function getStructurePreviewViewportMode(
-    mode: StructurePreviewViewportMode | undefined
-): StructurePreviewViewportMode {
-    return mode === 'desktop' || mode === 'mobile' ? mode : 'auto';
 }
 
 export function encodePreviewSiteSections(
@@ -120,101 +105,6 @@ function encodePreviewSection(
         object: section.object,
         url: '#',
     };
-}
-
-export function encodePreviewTableOfContents(snapshot: StructurePreviewSnapshot): ClientTOCPage[] {
-    return encodePreviewPages(
-        snapshot.revision.pages,
-        snapshot.revision.pages,
-        snapshot.revision.tags
-    );
-}
-
-function encodePreviewPages(
-    rootPages: RevisionPage[],
-    pages: RevisionPage[],
-    tags: RevisionTag[]
-): ClientTOCPage[] {
-    return pages.flatMap((page): ClientTOCPage[] => {
-        if (page.type === 'computed' || page.hidden) {
-            return [];
-        }
-
-        switch (page.type) {
-            case 'document': {
-                return [
-                    removeUndefined({
-                        id: page.id,
-                        title: page.linkTitle || page.title,
-                        href: '#',
-                        emoji: page.emoji,
-                        icon: page.icon,
-                        pathnames: [],
-                        descendants: hasVisibleDescendant(page.pages)
-                            ? encodePreviewPages(rootPages, page.pages, tags)
-                            : undefined,
-                        primaryTag: resolvePrimaryPageTag(page.tags, tags),
-                        type: 'document' as const,
-                    }),
-                ];
-            }
-            case 'link': {
-                return [
-                    removeUndefined({
-                        id: page.id,
-                        title: page.title,
-                        href: '#',
-                        emoji: page.emoji,
-                        icon: page.icon,
-                        target: page.target,
-                        type: 'link' as const,
-                    }),
-                ];
-            }
-            case 'group': {
-                return [
-                    removeUndefined({
-                        id: page.id,
-                        title: page.title,
-                        emoji: page.emoji,
-                        icon: page.icon,
-                        descendants: hasVisibleDescendant(page.pages)
-                            ? encodePreviewPages(rootPages, page.pages, tags)
-                            : undefined,
-                        type: 'group' as const,
-                    }),
-                ];
-            }
-            default:
-                assertNever(page);
-        }
-    });
-}
-
-function hasVisibleDescendant(pages: RevisionPage[]) {
-    return pages.some((page) => page.type !== 'computed' && !page.hidden);
-}
-
-function resolvePrimaryPageTag(
-    pageTags: RevisionPageTag[] | undefined,
-    tags: RevisionTag[]
-): RevisionTag | undefined {
-    if (!pageTags || pageTags.length === 0) {
-        return undefined;
-    }
-
-    const primary = pageTags.find((tag) => tag.primary);
-    if (!primary) {
-        return undefined;
-    }
-
-    return resolveTag(primary.tag.tag, tags);
-}
-
-function removeUndefined<T extends Record<string, unknown>>(object: T): T {
-    return Object.fromEntries(
-        Object.entries(object).filter(([, value]) => value !== undefined)
-    ) as T;
 }
 
 export function getPreviewVariants(snapshot: StructurePreviewSnapshot) {
