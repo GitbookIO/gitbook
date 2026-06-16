@@ -1,6 +1,6 @@
 import { type RouteLayoutParams, getDynamicSiteContext } from '@/app/utils';
-import { StructurePreview } from '@/components/StructurePreview';
-import { getStructurePreviewSnapshot } from './snapshot';
+import { StructurePreviewTest } from '@/components/StructurePreview/StructurePreviewTest';
+import { getStructurePreviewSnapshot } from '../snapshot';
 
 type PageProps = {
     params: Promise<RouteLayoutParams>;
@@ -8,5 +8,5 @@ type PageProps = {
 
 export default async function Page(props: PageProps) {
     const { context } = await getDynamicSiteContext(await props.params);
-    return <StructurePreview initialSnapshot={getStructurePreviewSnapshot(context)} />;
+    return <StructurePreviewTest initialSnapshot={getStructurePreviewSnapshot(context)} />;
 }
