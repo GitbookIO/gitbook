@@ -2,11 +2,10 @@
 
 import type { CustomizationContentLink, CustomizationHeaderItem, SiteSpace } from '@gitbook/api';
 import { CustomizationHeaderPreset, CustomizationSearchStyle } from '@gitbook/api';
-import { Icon, type IconName } from '@gitbook/icons';
+import { Icon } from '@gitbook/icons';
 import * as React from 'react';
 
 import { SiteSectionTabs } from '@/components/SiteSections';
-import { getLocalizedTitle } from '@/lib/sites';
 import { tcls } from '@/lib/tailwind';
 
 import { tString, useLanguage } from '@/intl/client';
@@ -27,10 +26,16 @@ import {
     HEADER_LOGO_IMAGE_CLASS,
     HeaderLogoContent,
 } from '../Header/HeaderLogoContent';
+import { SpacesDropdownClient } from '../Header/SpacesDropdownClient';
+import {
+    getSlimSiteSpaces,
+    getSpacesDropdownMenuClassName,
+    getSpacesDropdownTitle,
+    getTranslationsDropdownClassName,
+} from '../Header/SpacesDropdownData';
 import headerLinksStyles from '../Header/headerLinks.module.css';
 import { CONTAINER_STYLE, HEADER_HEIGHT_DESKTOP } from '../layout';
-import { Button, ToggleChevron } from '../primitives';
-import { DropdownMenu, DropdownMenuItem } from '../primitives/DropdownMenu';
+import { Button } from '../primitives';
 import {
     SOCIAL_PLATFORM_ICONS,
     encodePreviewSiteSections,
@@ -227,12 +232,10 @@ function StructurePreviewHeader(props: { snapshot: StructurePreviewSnapshot }) {
                                     />
                                 ) : null}
                                 {!withSections && variants.translations.length > 1 ? (
-                                    <StructurePreviewSpacesDropdown
+                                    <StructurePreviewTranslationsDropdown
                                         snapshot={snapshot}
                                         siteSpace={snapshot.siteSpace}
                                         siteSpaces={variants.translations}
-                                        icon="globe"
-                                        variant="blank"
                                         className="flex! site-header:theme-bold:text-header-link hover:site-header:theme-bold:bg-header-link/3 focus-visible:site-header:theme-bold:bg-header-link/3 aria-expanded:site-header:theme-bold:bg-header-link/5"
                                     />
                                 ) : null}
@@ -246,12 +249,10 @@ function StructurePreviewHeader(props: { snapshot: StructurePreviewSnapshot }) {
                 <div>
                     <SiteSectionTabs sections={sections}>
                         {variants.translations.length > 1 ? (
-                            <StructurePreviewSpacesDropdown
+                            <StructurePreviewTranslationsDropdown
                                 snapshot={snapshot}
                                 siteSpace={snapshot.siteSpace}
                                 siteSpaces={variants.translations}
-                                icon="globe"
-                                variant="blank"
                                 className="my-1.5 ml-2 self-start"
                             />
                         ) : null}
@@ -388,41 +389,31 @@ function StructurePreviewMenuLink(props: {
     );
 }
 
-function StructurePreviewSpacesDropdown(props: {
+function StructurePreviewTranslationsDropdown(props: {
     snapshot: StructurePreviewSnapshot;
     siteSpace: SiteSpace;
     siteSpaces: SiteSpace[];
     className?: string;
-    variant?: React.ComponentProps<typeof Button>['variant'];
-    icon?: IconName;
 }) {
-    const { snapshot, siteSpace, siteSpaces, className, variant = 'secondary', icon } = props;
-    const title = getLocalizedTitle(siteSpace, snapshot.locale);
+    const { snapshot, siteSpace, siteSpaces, className } = props;
+    const title = getSpacesDropdownTitle(siteSpace, snapshot.locale);
+    const slimSpaces = getSlimSiteSpaces({
+        siteSpace,
+        siteSpaces,
+        currentLanguage: snapshot.locale,
+        getURL: () => '',
+    });
 
     return (
-        <DropdownMenu
-            className={tcls(
-                'group-hover/dropdown:invisible',
-                'group-focus-within/dropdown:group-hover/dropdown:visible'
-            )}
-            button={
-                <Button
-                    icon={icon}
-                    data-testid="space-dropdown-button"
-                    size="small"
-                    variant={variant}
-                    trailing={<ToggleChevron />}
-                    className={tcls('bg-tint-base', className)}
-                >
-                    <span className="button-content">{title}</span>
-                </Button>
-            }
-        >
-            {siteSpaces.map((space) => (
-                <DropdownMenuItem key={space.id} active={space.id === siteSpace.id}>
-                    {getLocalizedTitle(space, snapshot.locale)}
-                </DropdownMenuItem>
-            ))}
-        </DropdownMenu>
+        <SpacesDropdownClient
+            title={title}
+            icon="globe"
+            variant="blank"
+            className={getTranslationsDropdownClassName({ title, className })}
+            dropdownClassName={getSpacesDropdownMenuClassName()}
+            slimSpaces={slimSpaces}
+            curPath={siteSpace.path}
+            clickable={false}
+        />
     );
 }
