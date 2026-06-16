@@ -10,6 +10,11 @@ import { getLocalizedTitle } from '@/lib/sites';
 import { tcls } from '@/lib/tailwind';
 
 import { tString, useLanguage } from '@/intl/client';
+import {
+    HEADER_LOGO_CONTAINER_CLASS,
+    HEADER_LOGO_IMAGE_CLASS,
+    HeaderLogoContent,
+} from '../Header/HeaderLogoContent';
 import headerLinksStyles from '../Header/headerLinks.module.css';
 import { CONTAINER_STYLE, HEADER_HEIGHT_DESKTOP } from '../layout';
 import { Button, ToggleChevron } from '../primitives';
@@ -255,69 +260,46 @@ function StructurePreviewLogo(props: { snapshot: StructurePreviewSnapshot }) {
     const { customization } = snapshot;
 
     return (
-        <div className={tcls('group/headerlogo', 'min-w-0', 'shrink', 'flex', 'items-center')}>
-            {customization.header.logo ? (
-                <picture>
-                    {customization.header.logo.dark ? (
-                        <source
-                            srcSet={customization.header.logo.dark}
-                            media="(prefers-color-scheme: dark)"
-                        />
-                    ) : null}
-                    <img
-                        alt="Logo"
-                        src={customization.header.logo.light}
-                        className={tcls(
-                            'block overflow-hidden',
-                            'shrink',
-                            'min-w-0',
-                            'max-w-40',
-                            'lg:max-w-64',
-                            'max-h-8',
-                            'h-full',
-                            'w-full',
-                            'object-contain',
-                            'object-left'
-                        )}
-                    />
-                </picture>
-            ) : (
-                <>
-                    {'emoji' in customization.favicon && customization.favicon.emoji ? (
-                        <span className="text-xl">{customization.favicon.emoji}</span>
-                    ) : (
-                        <picture>
-                            <source
-                                srcSet={snapshot.icons.large.dark}
-                                media="(prefers-color-scheme: dark)"
-                            />
-                            <img
-                                alt=""
-                                src={snapshot.icons.large.light}
-                                className="size-8 object-contain"
-                            />
-                        </picture>
-                    )}
-                    <div
-                        className={tcls(
-                            'text-pretty',
-                            'line-clamp-2',
-                            'tracking-tight',
-                            'max-w-[18ch]',
-                            'lg:max-w-[24ch]',
-                            'font-semibold',
-                            'ms-3',
-                            'text-base/tight',
-                            'lg:text-lg/tight',
-                            'text-tint-strong',
-                            'theme-bold:text-header-link'
-                        )}
-                    >
-                        {snapshot.site.title}
-                    </div>
-                </>
-            )}
+        <div className={HEADER_LOGO_CONTAINER_CLASS}>
+            <HeaderLogoContent
+                logo={
+                    customization.header.logo ? (
+                        <StructurePreviewLogoImage logo={customization.header.logo} />
+                    ) : null
+                }
+                fallbackIcon={<StructurePreviewLogoFallbackIcon snapshot={snapshot} />}
+                title={snapshot.site.title}
+            />
         </div>
+    );
+}
+
+function StructurePreviewLogoImage(props: {
+    logo: NonNullable<StructurePreviewSnapshot['customization']['header']['logo']>;
+}) {
+    const { logo } = props;
+
+    return (
+        <picture>
+            {logo.dark ? <source srcSet={logo.dark} media="(prefers-color-scheme: dark)" /> : null}
+            <img alt="Logo" src={logo.light} className={tcls('block', HEADER_LOGO_IMAGE_CLASS)} />
+        </picture>
+    );
+}
+
+function StructurePreviewLogoFallbackIcon(props: { snapshot: StructurePreviewSnapshot }) {
+    const { snapshot } = props;
+    const { customization } = snapshot;
+
+    if ('emoji' in customization.favicon && customization.favicon.emoji) {
+        return <span className="text-xl">{customization.favicon.emoji}</span>;
+    }
+
+    return (
+        <picture>
+            <source srcSet={snapshot.icons.large.dark} media="(prefers-color-scheme: dark)" />
+            <img alt="" src={snapshot.icons.large.light} className="size-8 object-contain" />
+        </picture>
     );
 }
 
