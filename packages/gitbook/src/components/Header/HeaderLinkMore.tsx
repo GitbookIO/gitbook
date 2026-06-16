@@ -1,25 +1,19 @@
 import { isSiteAuthLoginHref } from '@/lib/auth-login-link';
 import type { GitBookSiteContext } from '@/lib/context';
-import {
-    type CustomizationContentLink,
-    type CustomizationHeaderItem,
-    SiteInsightsLinkPosition,
-    type SiteSocialAccount,
+import type {
+    CustomizationContentLink,
+    CustomizationHeaderItem,
+    SiteSocialAccount,
 } from '@gitbook/api';
 import type React from 'react';
 
 import { resolveContentRef } from '@/lib/references';
-import { getLocalizedTitle } from '@/lib/sites';
-import { tcls } from '@/lib/tailwind';
 
 import { SocialAccountLink } from '../Footer/SocialAccounts';
-import { SiteAuthLoginDropdownMenuItem } from '../SiteAuth/SiteAuthLoginLink';
-import {
-    DropdownMenuItem,
-    DropdownMenuSeparator,
-    DropdownSubMenu,
-} from '../primitives/DropdownMenu';
+import { DropdownMenuSeparator } from '../primitives/DropdownMenu';
+import { HeaderLinkMenuItem, HeaderLinkSubMenu } from './HeaderLinkClient';
 import { HeaderLinkMoreDropdown } from './HeaderLinkMoreClient';
+import { getHeaderLinkMoreDropdownClassName } from './HeaderLinkStyles';
 import styles from './headerLinks.module.css';
 
 /**
@@ -37,9 +31,8 @@ export function HeaderLinkMore(props: {
         <div className={`${styles.linkEllipsis} z-20 items-center`}>
             <HeaderLinkMoreDropdown
                 label={label}
-                dropdownClassName={tcls(
-                    'max-md:right-0 max-md:left-auto',
-                    context.customization.styling.search === 'prominent' && 'right-0 left-auto'
+                dropdownClassName={getHeaderLinkMoreDropdownClassName(
+                    context.customization.styling.search
                 )}
             >
                 {links.map((link, index) => (
@@ -63,32 +56,20 @@ async function MoreMenuLink(props: {
 }) {
     const { context, link } = props;
 
-    const title = getLocalizedTitle(link, context.locale);
     const target = link.to ? await resolveContentRef(link.to, context) : null;
-    const sharedProps = {
-        href: target?.href,
-        insights: link.to
-            ? {
-                  type: 'link_click' as const,
-                  link: {
-                      target: link.to,
-                      position: SiteInsightsLinkPosition.Header,
-                  },
-              }
-            : undefined,
-    };
 
     return 'links' in link && link.links.length > 0 ? (
-        <DropdownSubMenu label={title}>
+        <HeaderLinkSubMenu link={link} locale={context.locale}>
             {link.links.map((subLink, index) => {
                 return <MoreMenuLink key={index} {...props} link={subLink} />;
             })}
-        </DropdownSubMenu>
-    ) : isSiteAuthLoginHref(context.linker, target?.href) && sharedProps.href ? (
-        <SiteAuthLoginDropdownMenuItem {...sharedProps} href={sharedProps.href}>
-            {title}
-        </SiteAuthLoginDropdownMenuItem>
+        </HeaderLinkSubMenu>
     ) : (
-        <DropdownMenuItem {...sharedProps}>{title}</DropdownMenuItem>
+        <HeaderLinkMenuItem
+            link={link}
+            locale={context.locale}
+            href={target?.href}
+            isSiteAuthLoginHref={isSiteAuthLoginHref(context.linker, target?.href)}
+        />
     );
 }

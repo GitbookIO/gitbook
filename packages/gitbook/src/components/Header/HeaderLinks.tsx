@@ -9,7 +9,7 @@ interface HeaderLinksProps {
     style?: ClassValue;
 }
 
-export async function HeaderLinks({ children, style }: HeaderLinksProps) {
+export function HeaderLinks({ children, style }: HeaderLinksProps) {
     return (
         <div
             className={tcls(

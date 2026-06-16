@@ -11,6 +11,18 @@ import { tcls } from '@/lib/tailwind';
 
 import { tString, useLanguage } from '@/intl/client';
 import {
+    HeaderLinkItem,
+    HeaderLinkMenuItem,
+    HeaderLinkSubMenu,
+    SubHeaderLinkItem,
+} from '../Header/HeaderLinkClient';
+import { HeaderLinkMoreDropdown } from '../Header/HeaderLinkMoreClient';
+import {
+    getHeaderLinkDropdownClassName,
+    getHeaderLinkMoreDropdownClassName,
+} from '../Header/HeaderLinkStyles';
+import { HeaderLinks } from '../Header/HeaderLinks';
+import {
     HEADER_LOGO_CONTAINER_CLASS,
     HEADER_LOGO_IMAGE_CLASS,
     HeaderLogoContent,
@@ -18,7 +30,7 @@ import {
 import headerLinksStyles from '../Header/headerLinks.module.css';
 import { CONTAINER_STYLE, HEADER_HEIGHT_DESKTOP } from '../layout';
 import { Button, ToggleChevron } from '../primitives';
-import { DropdownMenu, DropdownMenuItem, DropdownSubMenu } from '../primitives/DropdownMenu';
+import { DropdownMenu, DropdownMenuItem } from '../primitives/DropdownMenu';
 import {
     SOCIAL_PLATFORM_ICONS,
     encodePreviewSiteSections,
@@ -180,12 +192,7 @@ function StructurePreviewHeader(props: { snapshot: StructurePreviewSnapshot }) {
                         {customization.header.links.length > 0 ||
                         headerSocialAccounts.length > 0 ||
                         (!withSections && variants.translations.length > 1) ? (
-                            <div
-                                className={tcls(
-                                    headerLinksStyles.containerHeaderlinks,
-                                    '@4xl:[&>.button+.button]:-ml-2 z-20 ml-auto flex min-w-9 shrink grow @7xl:grow-0 items-center justify-end @4xl:gap-x-6 gap-x-4'
-                                )}
-                            >
+                            <HeaderLinks>
                                 {customization.header.links.map((link, index) => (
                                     <StructurePreviewHeaderLink
                                         key={`${getContentRefKey(link.to)}-${index}`}
@@ -229,7 +236,7 @@ function StructurePreviewHeader(props: { snapshot: StructurePreviewSnapshot }) {
                                         className="flex! site-header:theme-bold:text-header-link hover:site-header:theme-bold:bg-header-link/3 focus-visible:site-header:theme-bold:bg-header-link/3 aria-expanded:site-header:theme-bold:bg-header-link/5"
                                     />
                                 ) : null}
-                            </div>
+                            </HeaderLinks>
                         ) : null}
                     </div>
                 </div>
@@ -324,90 +331,21 @@ function StructurePreviewHeaderLink(props: {
     link: CustomizationHeaderItem;
 }) {
     const { snapshot, link } = props;
-    const title = getLocalizedTitle(link, snapshot.locale);
-    const linkStyle = link.style ?? 'link';
-
-    if (link.links && link.links.length > 0) {
-        return (
-            <DropdownMenu
-                openOnHover
-                className={
-                    snapshot.customization.styling.search === 'prominent'
-                        ? 'right-0 left-auto'
-                        : null
-                }
-                button={
-                    <StructurePreviewHeaderLinkButton
-                        title={title}
-                        linkStyle={linkStyle}
-                        headerPreset={snapshot.customization.header.preset}
-                        trailing={<ToggleChevron />}
-                    />
-                }
-            >
-                {link.links.map((subLink, index) => (
-                    <StructurePreviewMenuLink key={index} link={subLink} snapshot={snapshot} />
-                ))}
-            </DropdownMenu>
-        );
-    }
-
-    if (!link.to) {
-        return null;
-    }
-
     return (
-        <StructurePreviewHeaderLinkButton
-            title={title}
-            linkStyle={linkStyle}
+        <HeaderLinkItem
+            link={link}
+            locale={snapshot.locale}
             headerPreset={snapshot.customization.header.preset}
-        />
-    );
-}
-
-function StructurePreviewHeaderLinkButton(props: {
-    title: string;
-    linkStyle: 'link' | 'button-secondary' | 'button-primary';
-    headerPreset: CustomizationHeaderPreset;
-    trailing?: React.ReactNode;
-}) {
-    const { title, linkStyle, trailing } = props;
-
-    if (linkStyle === 'button-primary' || linkStyle === 'button-secondary') {
-        return (
-            <Button
-                variant={linkStyle === 'button-primary' ? 'primary' : 'header'}
-                size="medium"
-                label={title}
-                trailing={trailing}
-            />
-        );
-    }
-
-    return (
-        <button
-            type="button"
-            className={tcls(
-                'flex items-center gap-1',
-                'shrink',
-                'contrast-more:underline',
-                'truncate',
-                'text-tint',
-                'links-default:hover:text-primary',
-                'links-default:tint:hover:text-tint-strong',
-                'underline-offset-2',
-                'links-accent:hover:underline',
-                'links-accent:underline-offset-4',
-                'links-accent:decoration-primary-subtle',
-                'links-accent:decoration-[3px]',
-                'links-accent:py-0.5',
-                'theme-bold:text-header-link',
-                'hover:theme-bold:text-header-link/7!'
+            href={link.to ? '#' : undefined}
+            hasTarget={Boolean(link.to)}
+            dropdownClassName={getHeaderLinkDropdownClassName(
+                snapshot.customization.styling.search
             )}
         >
-            {title}
-            {trailing}
-        </button>
+            {link.links?.map((subLink, index) => (
+                <SubHeaderLinkItem key={index} link={subLink} locale={snapshot.locale} href="#" />
+            ))}
+        </HeaderLinkItem>
     );
 }
 
@@ -419,36 +357,16 @@ function StructurePreviewMoreMenu(props: {
     const { snapshot, links, label } = props;
     return (
         <div className={`${headerLinksStyles.linkEllipsis} z-20 items-center`}>
-            <DropdownMenu
-                openOnHover
-                className={tcls(
-                    'max-md:right-0 max-md:left-auto',
-                    snapshot.customization.styling.search === 'prominent' && 'right-0 left-auto'
+            <HeaderLinkMoreDropdown
+                label={label}
+                dropdownClassName={getHeaderLinkMoreDropdownClassName(
+                    snapshot.customization.styling.search
                 )}
-                button={
-                    <button
-                        type="button"
-                        className={tcls(
-                            'text-tint',
-                            'hover:text-primary',
-                            'dark:hover:text-primary',
-                            'theme-bold:text-header-link',
-                            'theme-bold:hover:text-header-link/8',
-                            'flex',
-                            'gap-1',
-                            'items-center'
-                        )}
-                    >
-                        <span className="sr-only">{label}</span>
-                        <Icon icon="ellipsis" className="size-4" />
-                        <ToggleChevron />
-                    </button>
-                }
             >
                 {links.map((link, index) => (
                     <StructurePreviewMenuLink key={index} link={link} snapshot={snapshot} />
                 ))}
-            </DropdownMenu>
+            </HeaderLinkMoreDropdown>
         </div>
     );
 }
@@ -458,16 +376,15 @@ function StructurePreviewMenuLink(props: {
     link: CustomizationHeaderItem | CustomizationContentLink;
 }) {
     const { snapshot, link } = props;
-    const title = getLocalizedTitle(link, snapshot.locale);
 
     return 'links' in link && link.links.length > 0 ? (
-        <DropdownSubMenu label={title}>
+        <HeaderLinkSubMenu link={link} locale={snapshot.locale}>
             {link.links.map((subLink, index) => (
                 <StructurePreviewMenuLink key={index} link={subLink} snapshot={snapshot} />
             ))}
-        </DropdownSubMenu>
+        </HeaderLinkSubMenu>
     ) : (
-        <DropdownMenuItem>{title}</DropdownMenuItem>
+        <HeaderLinkMenuItem link={link} locale={snapshot.locale} href={link.to ? '#' : undefined} />
     );
 }
 
