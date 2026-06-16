@@ -1,8 +1,10 @@
 import { describe, expect, it } from 'bun:test';
 
+import { languages } from '@/intl/translations';
 import { defaultCustomization } from '@/lib/utils';
+import { TranslationLanguage } from '@gitbook/api';
 
-import { encodePreviewSiteSections, isStructurePreviewMessage } from './state';
+import { encodePreviewSiteSections, getPreviewVariants, isStructurePreviewMessage } from './state';
 import type { StructurePreviewSnapshot } from './types';
 
 function createSnapshot(
@@ -97,5 +99,62 @@ describe('structure preview state', () => {
         expect(encoded?.current.title).toBe('Guides FR');
         expect(encoded?.current.url).toBe('#');
         expect(encoded?.list[0]?.object).toBe('site-section-group');
+    });
+
+    it('categorizes translation variants like the rendered header', () => {
+        const currentSiteSpace = {
+            id: 'v15-it',
+            title: 'v15',
+            path: '',
+            default: false,
+            hidden: false,
+            urls: {},
+            space: {
+                id: 'space-v15-it',
+                revision: 'revision-v15-it',
+                language: TranslationLanguage.It,
+            },
+        };
+        const siteSpaces = [
+            { id: 'v20-en', title: 'v20', language: TranslationLanguage.En },
+            { id: 'v20-fr', title: 'v20', language: TranslationLanguage.Fr },
+            { id: 'v20-it', title: 'v20', language: TranslationLanguage.It },
+            { id: 'v15-en', title: 'v15', language: TranslationLanguage.En },
+            { id: 'v15-fr', title: 'v15', language: TranslationLanguage.Fr },
+            currentSiteSpace,
+        ].map((siteSpace) =>
+            'space' in siteSpace
+                ? siteSpace
+                : {
+                      id: siteSpace.id,
+                      title: siteSpace.title,
+                      path: '',
+                      default: false,
+                      hidden: false,
+                      urls: {},
+                      space: {
+                          id: `space-${siteSpace.id}`,
+                          revision: `revision-${siteSpace.id}`,
+                          language: siteSpace.language,
+                      },
+                  }
+        );
+        const snapshot = createSnapshot({
+            locale: TranslationLanguage.It,
+            siteSpace: currentSiteSpace,
+            siteSpaces,
+            visibleSiteSpaces: siteSpaces,
+        } as unknown as Partial<StructurePreviewSnapshot>);
+
+        const variants = getPreviewVariants(snapshot);
+
+        expect(variants.generic.map((space) => space.id)).toEqual(['v20-it', 'v15-it']);
+        expect(
+            variants.translations.map((space) => ({ id: space.id, title: space.title }))
+        ).toEqual([
+            { id: 'v15-en', title: languages.en.language },
+            { id: 'v15-fr', title: languages.fr.language },
+            { id: 'v15-it', title: languages.it.language },
+        ]);
     });
 });

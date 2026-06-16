@@ -13,6 +13,7 @@ import type {
     ClientSiteSectionGroup,
     ClientSiteSections,
 } from '@/components/SiteSections/encodeClientSiteSections';
+import { categorizeVariants } from '@/components/SpaceLayout/categorizeVariants';
 import { getLocalizedDescription, getLocalizedTitle } from '@/lib/sites';
 
 import type { StructurePreviewMessage, StructurePreviewSnapshot } from './types';
@@ -108,28 +109,7 @@ function encodePreviewSection(
 }
 
 export function getPreviewVariants(snapshot: StructurePreviewSnapshot) {
-    const siteSpaces =
-        snapshot.visibleSiteSpaces.length > 0 ? snapshot.visibleSiteSpaces : snapshot.siteSpaces;
-    const currentLanguage = snapshot.locale ?? snapshot.siteSpace.space.language ?? 'en';
-    const languages = [...new Set(siteSpaces.map((space) => space.space.language ?? 'en'))];
-    const isMultiLanguage = languages.length > 1;
-
-    return {
-        generic: isMultiLanguage
-            ? siteSpaces.filter(
-                  (space) =>
-                      space.id === snapshot.siteSpace.id ||
-                      (space.space.language ?? 'en') === currentLanguage
-              )
-            : siteSpaces,
-        translations: isMultiLanguage
-            ? siteSpaces.filter(
-                  (space) =>
-                      space.id === snapshot.siteSpace.id ||
-                      (space.space.language ?? 'en') !== currentLanguage
-              )
-            : [],
-    };
+    return categorizeVariants(snapshot);
 }
 
 export function getHeaderSocialAccounts(customization: SiteCustomizationSettings) {

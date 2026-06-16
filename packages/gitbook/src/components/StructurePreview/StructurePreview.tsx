@@ -121,6 +121,9 @@ function StructurePreviewHeader(props: { snapshot: StructurePreviewSnapshot }) {
             (sections.list.length > 1 ||
                 sections.list.some((section) => section.object === 'site-section-group'))
     );
+    const translationSiteSpace =
+        variants.translations.find((space) => space.id === snapshot.siteSpace.id) ??
+        snapshot.siteSpace;
 
     return (
         <HeaderLayout
@@ -186,7 +189,7 @@ function StructurePreviewHeader(props: { snapshot: StructurePreviewSnapshot }) {
                         {!withSections && variants.translations.length > 1 ? (
                             <StructurePreviewTranslationsDropdown
                                 snapshot={snapshot}
-                                siteSpace={snapshot.siteSpace}
+                                siteSpace={translationSiteSpace}
                                 siteSpaces={variants.translations}
                                 className="flex! site-header:theme-bold:text-header-link hover:site-header:theme-bold:bg-header-link/3 focus-visible:site-header:theme-bold:bg-header-link/3 aria-expanded:site-header:theme-bold:bg-header-link/5"
                             />
@@ -201,7 +204,7 @@ function StructurePreviewHeader(props: { snapshot: StructurePreviewSnapshot }) {
                         {variants.translations.length > 1 ? (
                             <StructurePreviewTranslationsDropdown
                                 snapshot={snapshot}
-                                siteSpace={snapshot.siteSpace}
+                                siteSpace={translationSiteSpace}
                                 siteSpaces={variants.translations}
                                 className="my-1.5 ml-2 self-start"
                             />
