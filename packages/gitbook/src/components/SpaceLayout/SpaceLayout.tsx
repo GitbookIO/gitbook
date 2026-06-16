@@ -9,6 +9,10 @@ import type React from 'react';
 import { Footer } from '@/components/Footer';
 import { Header, HeaderLogo } from '@/components/Header';
 import { TableOfContents } from '@/components/TableOfContents';
+import {
+    TABLE_OF_CONTENTS_SPACES_DROPDOWN_CLASS,
+    getTableOfContentsInnerHeaderClassName,
+} from '@/components/TableOfContents/styles';
 import type { VisitorAuthClaims } from '@/lib/adaptive';
 import { GITBOOK_APP_URL } from '@/lib/env';
 import { tcls } from '@/lib/tailwind';
@@ -192,10 +196,9 @@ export function SpaceLayout(props: SpaceLayoutProps) {
                         innerHeader={
                             !withTopHeader || variants.generic.length > 1 ? (
                                 <div
-                                    className={tcls(
-                                        'my-5 sidebar-default:mt-2 flex flex-col gap-2 px-5 empty:hidden',
-                                        variants.generic.length > 1 ? '' : 'max-lg:hidden'
-                                    )}
+                                    className={getTableOfContentsInnerHeaderClassName({
+                                        hideOnMobile: variants.generic.length <= 1,
+                                    })}
                                 >
                                     {!withTopHeader && (
                                         <div className="flex gap-2 max-lg:hidden">
@@ -220,7 +223,7 @@ export function SpaceLayout(props: SpaceLayoutProps) {
                                             context={context}
                                             siteSpace={siteSpace}
                                             siteSpaces={variants.generic}
-                                            className="w-full px-3"
+                                            className={TABLE_OF_CONTENTS_SPACES_DROPDOWN_CLASS}
                                         />
                                     ) : null}
                                 </div>

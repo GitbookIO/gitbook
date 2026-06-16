@@ -6,12 +6,20 @@ import {
     CustomizationHeaderPreset,
     CustomizationSearchStyle,
 } from '@gitbook/api';
+import type { IconName } from '@gitbook/icons';
 import * as React from 'react';
 
 import { SiteSectionTabs } from '@/components/SiteSections';
+import {
+    TABLE_OF_CONTENTS_SPACES_DROPDOWN_CLASS,
+    getTableOfContentsClassName,
+    getTableOfContentsInnerHeaderClassName,
+    getTableOfContentsSidebarClassName,
+} from '@/components/TableOfContents/styles';
 import { Image } from '@/components/utils';
 
 import { tString, useLanguage } from '@/intl/client';
+import { tcls } from '@/lib/tailwind';
 import { AIChatButtonView, AIChatIcon, getAIChatName } from '../AIChat';
 import { HeaderLayout } from '../Header/HeaderLayout';
 import {
@@ -41,7 +49,8 @@ import {
 } from '../Header/SpacesDropdownData';
 import headerLinksStyles from '../Header/headerLinks.module.css';
 import { SearchHeaderInput } from '../Search';
-import { Button } from '../primitives';
+import { CONTAINER_STYLE } from '../layout';
+import { Button, type ButtonProps } from '../primitives';
 import {
     SOCIAL_PLATFORM_ICONS,
     encodePreviewSiteSections,
@@ -93,6 +102,7 @@ export function StructurePreview(props: { initialSnapshot: StructurePreviewSnaps
             onAuxClickCapture={preventNavigation}
         >
             <StructurePreviewHeader snapshot={snapshot} />
+            <StructurePreviewVariantSelector snapshot={snapshot} />
         </div>
     );
 }
@@ -268,6 +278,32 @@ function StructurePreviewSearch() {
     return <SearchHeaderInput interactive={false} />;
 }
 
+function StructurePreviewVariantSelector(props: { snapshot: StructurePreviewSnapshot }) {
+    const { snapshot } = props;
+    const variants = getPreviewVariants(snapshot);
+
+    if (variants.generic.length <= 1) {
+        return null;
+    }
+
+    return (
+        <div className={tcls(CONTAINER_STYLE, 'has-sidebar flex flex-row')}>
+            <div data-gb-table-of-contents className={getTableOfContentsClassName()}>
+                <div className={getTableOfContentsSidebarClassName()}>
+                    <div className={getTableOfContentsInnerHeaderClassName()}>
+                        <StructurePreviewSpacesDropdown
+                            snapshot={snapshot}
+                            siteSpace={snapshot.siteSpace}
+                            siteSpaces={variants.generic}
+                            className={TABLE_OF_CONTENTS_SPACES_DROPDOWN_CLASS}
+                        />
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
+
 function getPreviewAssistants(
     snapshot: StructurePreviewSnapshot,
     language: ReturnType<typeof useLanguage>
@@ -361,6 +397,29 @@ function StructurePreviewTranslationsDropdown(props: {
 }) {
     const { snapshot, siteSpace, siteSpaces, className } = props;
     const title = getSpacesDropdownTitle(siteSpace, snapshot.locale);
+
+    return (
+        <StructurePreviewSpacesDropdown
+            snapshot={snapshot}
+            siteSpace={siteSpace}
+            siteSpaces={siteSpaces}
+            icon="globe"
+            variant="blank"
+            className={getTranslationsDropdownClassName({ title, className })}
+        />
+    );
+}
+
+function StructurePreviewSpacesDropdown(props: {
+    snapshot: StructurePreviewSnapshot;
+    siteSpace: SiteSpace;
+    siteSpaces: SiteSpace[];
+    className?: ButtonProps['className'];
+    icon?: IconName;
+    variant?: ButtonProps['variant'];
+}) {
+    const { snapshot, siteSpace, siteSpaces, className, icon, variant = 'secondary' } = props;
+    const title = getSpacesDropdownTitle(siteSpace, snapshot.locale);
     const slimSpaces = getSlimSiteSpaces({
         siteSpace,
         siteSpaces,
@@ -371,9 +430,9 @@ function StructurePreviewTranslationsDropdown(props: {
     return (
         <SpacesDropdownClient
             title={title}
-            icon="globe"
-            variant="blank"
-            className={getTranslationsDropdownClassName({ title, className })}
+            icon={icon}
+            variant={variant}
+            className={className}
             dropdownClassName={getSpacesDropdownMenuClassName()}
             slimSpaces={slimSpaces}
             curPath={siteSpace.path}
