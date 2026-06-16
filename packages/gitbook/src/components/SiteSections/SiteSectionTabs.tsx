@@ -32,11 +32,13 @@ export function SiteSectionTabs(props: {
     sections: ClientSiteSections;
     className?: string;
     children?: React.ReactNode;
+    disableAnimations?: boolean;
 }) {
     const {
         sections: { list: structure, current: currentSection },
         className,
         children,
+        disableAnimations,
     } = props;
 
     const containerRef = React.useRef<HTMLDivElement>(null);
@@ -130,7 +132,9 @@ export function SiteSectionTabs(props: {
                                         <NavigationMenu.Content
                                             className={tcls([
                                                 'absolute top-0 left-0 w-full md:w-auto',
-                                                'data-[motion=from-start]:*:animate-[enterFromLeft_300ms_ease_both] data-[motion=to-end]:*:animate-[exitToRight_300ms_ease_both] data-[motion=to-start]:*:animate-[exitToLeft_300ms_ease_both] motion-safe:data-[motion=from-end]:*:animate-[enterFromRight_300ms_ease_both]',
+                                                !disableAnimations
+                                                    ? 'data-[motion=from-start]:*:animate-[enterFromLeft_300ms_ease_both] data-[motion=to-end]:*:animate-[exitToRight_300ms_ease_both] data-[motion=to-start]:*:animate-[exitToLeft_300ms_ease_both] motion-safe:data-[motion=from-end]:*:animate-[enterFromRight_300ms_ease_both]'
+                                                    : '',
                                             ])}
                                         >
                                             <div
@@ -175,8 +179,10 @@ export function SiteSectionTabs(props: {
                     className={tcls(
                         'relative origin-[center_top] overflow-hidden circular-corners:rounded-3xl rounded-corners:rounded-xl border border-tint bg-tint-base shadow-lg',
                         '-mt-0.5 h-(--radix-navigation-menu-viewport-height) w-full max-w-full md:w-(--radix-navigation-menu-viewport-width)',
-                        'max-h-[calc(100vh-8rem)] data-[state=closed]:animate-scale-out data-[state=open]:animate-scale-in',
-                        'ease has-[&[data-motion]]:transition-[left,width,height] has-[&[data-motion]]:duration-300'
+                        'max-h-[calc(100vh-8rem)]',
+                        !disableAnimations
+                            ? 'ease has-[&[data-motion]]:transition-[left,width,height] has-[&[data-motion]]:duration-300 data-[state=closed]:animate-scale-out data-[state=open]:animate-scale-in'
+                            : ''
                     )}
                     style={{
                         left: viewportLeft,

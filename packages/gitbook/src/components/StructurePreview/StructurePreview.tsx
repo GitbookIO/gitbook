@@ -186,7 +186,8 @@ function StructurePreviewHeader(props: { snapshot: StructurePreviewSnapshot }) {
             }
             sections={
                 sections && withSections ? (
-                    <SiteSectionTabs sections={sections}>
+                    //TODO: figure out why enabling animations here break the rendering of what's inside the tabs
+                    <SiteSectionTabs sections={sections} disableAnimations>
                         {variants.translations.length > 1 ? (
                             <StructurePreviewTranslationsDropdown
                                 snapshot={snapshot}
