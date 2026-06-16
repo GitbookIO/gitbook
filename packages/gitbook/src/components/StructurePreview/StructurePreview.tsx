@@ -1,13 +1,18 @@
 'use client';
 
 import type { CustomizationContentLink, CustomizationHeaderItem, SiteSpace } from '@gitbook/api';
-import { CustomizationHeaderPreset } from '@gitbook/api';
+import {
+    CustomizationAIMode,
+    CustomizationHeaderPreset,
+    CustomizationSearchStyle,
+} from '@gitbook/api';
 import * as React from 'react';
 
 import { SiteSectionTabs } from '@/components/SiteSections';
 import { tcls } from '@/lib/tailwind';
 
 import { tString, useLanguage } from '@/intl/client';
+import { AIChatButtonView, AIChatIcon, getAIChatName } from '../AIChat';
 import {
     HeaderLinkItem,
     HeaderLinkMenuItem,
@@ -98,6 +103,7 @@ function StructurePreviewHeader(props: { snapshot: StructurePreviewSnapshot }) {
     const variants = getPreviewVariants(snapshot);
     const sections = encodePreviewSiteSections(snapshot);
     const headerSocialAccounts = getHeaderSocialAccounts(customization);
+    const previewAssistants = getPreviewAssistants(snapshot, language);
     const withTopHeader = customization.header.preset !== CustomizationHeaderPreset.None;
     const withSections = Boolean(
         sections &&
@@ -192,6 +198,20 @@ function StructurePreviewHeader(props: { snapshot: StructurePreviewSnapshot }) {
                             )}
                         >
                             <StructurePreviewSearch />
+                            {previewAssistants.map((assistant, index) => (
+                                <AIChatButtonView
+                                    key={assistant.id}
+                                    icon={assistant.icon}
+                                    label={assistant.label}
+                                    withShortcut={index === 0}
+                                    showLabel={
+                                        previewAssistants.length === 1 &&
+                                        customization.styling.search ===
+                                            CustomizationSearchStyle.Prominent
+                                    }
+                                    inert
+                                />
+                            ))}
                         </div>
 
                         {customization.header.links.length > 0 ||
@@ -313,6 +333,29 @@ function StructurePreviewLogoFallbackIcon(props: { snapshot: StructurePreviewSna
 
 function StructurePreviewSearch() {
     return <SearchHeaderInput interactive={false} />;
+}
+
+function getPreviewAssistants(
+    snapshot: StructurePreviewSnapshot,
+    language: ReturnType<typeof useLanguage>
+) {
+    if (snapshot.customization.ai?.mode !== CustomizationAIMode.Assistant) {
+        return [];
+    }
+
+    return [
+        {
+            id: 'gitbook-assistant',
+            label: getAIChatName(language, snapshot.customization.trademark.enabled),
+            icon: (
+                <AIChatIcon
+                    state="default"
+                    trademark={snapshot.customization.trademark.enabled}
+                    className="size-text-lg"
+                />
+            ),
+        },
+    ];
 }
 
 function StructurePreviewHeaderLink(props: {
