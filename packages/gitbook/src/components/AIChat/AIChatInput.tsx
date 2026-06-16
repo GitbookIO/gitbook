@@ -51,6 +51,7 @@ export function AIChatInput(props: {
         },
         {
             enableOnFormTags: true,
+            useKey: true,
         }
     );
 
