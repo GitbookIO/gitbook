@@ -11,6 +11,7 @@ import { Button, Popover } from '../primitives';
 import { KeyboardShortcut } from '../primitives/KeyboardShortcut';
 import { SideSheet } from '../primitives/SideSheet';
 import { SearchFrame } from './SearchFrame';
+import { SearchHeaderInput } from './SearchHeaderInput';
 import { SearchInput } from './SearchInput';
 import { SearchLiveResultsAnnouncer } from './SearchLiveResultsAnnouncer';
 import { SearchScopeControl } from './SearchScopeControl';
@@ -214,10 +215,10 @@ export function SearchContainer({
                         asChild: true,
                     }}
                 >
-                    <SearchInput
+                    <SearchHeaderInput
                         ref={searchInputRef}
-                        aria-activedescendant={searchResultsActiveDescendant}
-                        aria-controls={resultsId}
+                        activeDescendant={searchResultsActiveDescendant}
+                        controls={resultsId}
                         onChange={setQuery}
                         onKeyDown={onInputKeyDown}
                         value={searchValue}
@@ -228,12 +229,7 @@ export function SearchContainer({
                         resultsCount={results.length}
                         fetching={fetching}
                         showAsk={showAsk}
-                    >
-                        <SearchLiveResultsAnnouncer
-                            count={results.length}
-                            showing={Boolean(searchValue) && !fetching}
-                        />
-                    </SearchInput>
+                    />
                 </Popover>
             )}
             {usesSideSheet ? (

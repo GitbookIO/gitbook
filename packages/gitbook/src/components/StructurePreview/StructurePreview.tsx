@@ -1,8 +1,7 @@
 'use client';
 
 import type { CustomizationContentLink, CustomizationHeaderItem, SiteSpace } from '@gitbook/api';
-import { CustomizationHeaderPreset, CustomizationSearchStyle } from '@gitbook/api';
-import { Icon } from '@gitbook/icons';
+import { CustomizationHeaderPreset } from '@gitbook/api';
 import * as React from 'react';
 
 import { SiteSectionTabs } from '@/components/SiteSections';
@@ -34,6 +33,7 @@ import {
     getTranslationsDropdownClassName,
 } from '../Header/SpacesDropdownData';
 import headerLinksStyles from '../Header/headerLinks.module.css';
+import { SearchHeaderInput } from '../Search';
 import { CONTAINER_STYLE, HEADER_HEIGHT_DESKTOP } from '../layout';
 import { Button } from '../primitives';
 import {
@@ -191,7 +191,7 @@ function StructurePreviewHeader(props: { snapshot: StructurePreviewSnapshot }) {
                                     : ['order-last']
                             )}
                         >
-                            <StructurePreviewSearch style={customization.styling.search} />
+                            <StructurePreviewSearch />
                         </div>
 
                         {customization.header.links.length > 0 ||
@@ -311,20 +311,8 @@ function StructurePreviewLogoFallbackIcon(props: { snapshot: StructurePreviewSna
     );
 }
 
-function StructurePreviewSearch(props: { style: CustomizationSearchStyle }) {
-    const language = useLanguage();
-    const label = tString(language, 'search');
-
-    if (props.style === CustomizationSearchStyle.Prominent) {
-        return (
-            <div className="flex min-h-10 w-full items-center gap-2 rounded-md border border-tint-subtle bg-tint-base px-3 text-tint">
-                <Icon icon="search" className="size-4 shrink-0" />
-                <span className="truncate">{label}</span>
-            </div>
-        );
-    }
-
-    return <Button icon="search" variant="header" size="medium" label={label} />;
+function StructurePreviewSearch() {
+    return <SearchHeaderInput interactive={false} />;
 }
 
 function StructurePreviewHeaderLink(props: {
