@@ -13,6 +13,7 @@ import {
     CustomizationIconsStyle,
     CustomizationLinksStyle,
     CustomizationLocale,
+    CustomizationPageActionType,
     CustomizationSearchStyle,
     CustomizationSidebarBackgroundStyle,
     CustomizationSidebarListStyle,
@@ -414,6 +415,11 @@ export function getCustomizationURL(partial: DeepPartial<SiteCustomizationSettin
             externalAI: true,
             markdown: true,
             mcp: true,
+            items: [
+                CustomizationPageActionType.Markdown,
+                CustomizationPageActionType.ExternalAi,
+                CustomizationPageActionType.Mcp,
+            ],
         },
         trademark: {
             enabled: true,

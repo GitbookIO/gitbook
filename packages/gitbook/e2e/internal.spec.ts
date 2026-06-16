@@ -1361,6 +1361,7 @@ const testCases: TestsCase[] = [
                     pageActions: {
                         markdown: false,
                         externalAI: false,
+                        items: [],
                     },
                 }),
                 run: waitForCookiesDialog,
