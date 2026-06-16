@@ -1,4 +1,4 @@
-import type { DocumentBlockTable, DocumentTableRecord } from '@gitbook/api';
+import type { DocumentBlockTable } from '@gitbook/api';
 import assertNever from 'assert-never';
 
 import { tcls } from '@/lib/tailwind';
@@ -9,8 +9,9 @@ import { StickyViewGrid } from './StickyViewGrid';
 import { ViewCards } from './ViewCards';
 import { ViewGrid, ViewGridHeader } from './ViewGrid';
 import { getViewGridLayout, hasVisibleHeader } from './layout';
+import { type TableRecordKV, filterTableRecordsBySearchTerm } from './search';
 
-export type TableRecordKV = [string, DocumentTableRecord];
+export type { TableRecordKV };
 
 export interface TableViewProps<View> extends BlockProps<DocumentBlockTable> {
     view: View;
@@ -22,9 +23,15 @@ export function Table(props: BlockProps<DocumentBlockTable>) {
     const { block, ancestorBlocks, document, context, style } = props;
     const isOffscreen = isBlockOffscreen({ block, ancestorBlocks, document });
 
-    const records: TableRecordKV[] = Object.entries(block.data.records).sort((a, b) => {
-        return a[1].orderIndex.localeCompare(b[1].orderIndex);
-    });
+    const records: TableRecordKV[] = Object.entries(block.data.records).sort((a, b) =>
+        a[1].orderIndex.localeCompare(b[1].orderIndex)
+    );
+
+    const filteredRecords = filterTableRecordsBySearchTerm(
+        block,
+        records,
+        context.tableSearchQuery
+    );
 
     switch (block.data.view.type) {
         case 'cards':
@@ -32,7 +39,7 @@ export function Table(props: BlockProps<DocumentBlockTable>) {
                 <ViewCards
                     view={block.data.view}
                     isOffscreen={isOffscreen}
-                    records={records}
+                    records={filteredRecords}
                     {...props}
                 />
             );
@@ -41,7 +48,7 @@ export function Table(props: BlockProps<DocumentBlockTable>) {
                 ...props,
                 view: block.data.view,
                 isOffscreen,
-                records,
+                records: filteredRecords,
             };
             const { tableWidth } = getViewGridLayout({
                 block,
