@@ -3,7 +3,7 @@ export const ToCItemBaseStyles = [
     'circular-corners:rounded-2xl rounded-md straight-corners:rounded-none p-1.5 pl-3',
     'focus-visible:-outline-offset-2',
     'before:contents[] before:-left-px before:absolute before:inset-y-0',
-    'sidebar-list-line:rounded-l-none! sidebar-list-line:before:w-px [&+div_a]:sidebar-list-default:rounded-l-none [&+div_a]:pl-5 [&+div_a]:sidebar-list-default:before:w-px',
+    'sidebar-list-line:rounded-l-none! sidebar-list-line:before:w-px [&+div_a]:sidebar-list-default:rounded-l-none has-[.openapi-method]:pl-3 [&+div_a]:pl-4 [&+div_a]:sidebar-list-default:before:w-px',
 ];
 
 export const ToCLinkItemStyles = [

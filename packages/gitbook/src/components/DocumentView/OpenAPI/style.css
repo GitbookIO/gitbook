@@ -101,7 +101,7 @@
 /* Method Tags */
 .openapi-method,
 .openapi-statuscode {
-    @apply rounded straight-corners:rounded-none circular-corners:rounded-md uppercase font-mono items-center shrink-0 font-semibold text-[0.813rem] px-1 py-0.5 mr-2 text-tint-12/8 leading-tight align-middle inline-flex ring-1 ring-inset ring-tint-12/1 dark:ring-tint-1/1 whitespace-nowrap;
+    @apply rounded-md straight-corners:rounded-none circular-corners:rounded-lg uppercase font-mono items-center shrink-0 font-semibold text-[0.813rem] px-1 py-0.5 mr-2 text-tint-12/8 leading-tight align-middle inline-flex whitespace-nowrap;
 }
 
 .openapi-method-get,
@@ -130,8 +130,14 @@
 
 .openapi-method-head,
 .openapi-method-options,
-.openapi-method-trace {
+.openapi-method-trace,
+.openapi-method-hook {
     @apply bg-tint;
+}
+
+/* Method badge in the table of contents */
+.toclink .openapi-method {
+    @apply m-0 text-[0.59375rem];
 }
 
 /* URL */

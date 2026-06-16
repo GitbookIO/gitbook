@@ -56,6 +56,7 @@ async function OpenAPIWebhookBody(props: BlockProps<OpenAPIWebhookBlock>) {
                     data.operation['x-expandAllResponses'] ?? data['x-expandAllResponses'],
                 expandAllModelSections:
                     data.operation['x-expandAllModelSections'] ?? data['x-expandAllModelSections'],
+                headless: block.data.headless,
             })}
             className="openapi-block"
         />
