@@ -414,6 +414,7 @@ export function getCustomizationURL(partial: DeepPartial<SiteCustomizationSettin
             externalAI: true,
             markdown: true,
             mcp: true,
+            items: [],
         },
         trademark: {
             enabled: true,
