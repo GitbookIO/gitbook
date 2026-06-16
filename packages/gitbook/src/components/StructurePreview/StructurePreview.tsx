@@ -13,6 +13,7 @@ import { tcls } from '@/lib/tailwind';
 
 import { tString, useLanguage } from '@/intl/client';
 import { AIChatButtonView, AIChatIcon, getAIChatName } from '../AIChat';
+import { HeaderLayout } from '../Header/HeaderLayout';
 import {
     HeaderLinkItem,
     HeaderLinkMenuItem,
@@ -39,7 +40,6 @@ import {
 } from '../Header/SpacesDropdownData';
 import headerLinksStyles from '../Header/headerLinks.module.css';
 import { SearchHeaderInput } from '../Search';
-import { CONTAINER_STYLE, HEADER_HEIGHT_DESKTOP } from '../layout';
 import { Button } from '../primitives';
 import {
     SOCIAL_PLATFORM_ICONS,
@@ -112,161 +112,79 @@ function StructurePreviewHeader(props: { snapshot: StructurePreviewSnapshot }) {
     );
 
     return (
-        <header
-            data-gb-site-header
-            className={tcls(
-                'flex',
-                'flex-col',
-                `h-[${HEADER_HEIGHT_DESKTOP}px]`,
-                'sticky',
-                'top-0',
-                'pt-[env(safe-area-inset-top)]',
-                'z-30',
-                'w-full',
-                'flex-none',
-                'shadow-[0px_1px_0px]',
-                'shadow-tint-12/2',
-                'bg-tint-base/9',
-                'theme-muted:bg-tint-subtle/9',
-                '[html.sidebar-filled.theme-bold.tint_&]:bg-tint-subtle/9',
-                'theme-gradient:bg-gradient-primary',
-                'theme-gradient-tint:bg-gradient-tint',
-                'contrast-more:bg-tint-base',
-                withTopHeader ? null : 'mobile-only lg:hidden',
-                'text-sm',
-                'backdrop-blur-lg'
-            )}
-        >
-            <div
-                className={tcls(
-                    'site-header:theme-bold:bg-header-background',
-                    'site-header:theme-bold:shadow-[0px_1px_0px]',
-                    'site-header:theme-bold:shadow-tint-12/2'
-                )}
-            >
-                <div>
-                    <div
-                        data-gb-header-content
-                        className={tcls(
-                            'gap-4',
-                            'lg:gap-6',
-                            'flex',
-                            'items-center',
-                            'justify-between',
-                            'w-full',
-                            'py-3',
-                            'min-h-16',
-                            'sm:h-16',
-                            CONTAINER_STYLE,
-                            '@container/header'
-                        )}
-                    >
-                        <div
-                            className={tcls(
-                                'flex max-w-full',
-                                'min-w-0 shrink items-center justify-start gap-2 lg:gap-4',
-                                'search' in customization.styling &&
-                                    customization.styling.search === 'prominent'
-                                    ? 'lg:@2xl:basis-72'
-                                    : null
-                            )}
-                        >
-                            <StructurePreviewLogo snapshot={snapshot} />
-                        </div>
-
-                        <div
-                            className={tcls(
-                                'flex',
-                                'grow-0',
-                                'shrink-0',
-                                'md:@2xl:basis-56',
-                                'justify-self-end',
-                                'items-center',
-                                'gap-2',
-                                'search' in customization.styling &&
-                                    customization.styling.search === 'prominent'
-                                    ? [
-                                          'md:@2xl:grow-[0.8]',
-                                          'md:@4xl:basis-40',
-                                          'md:@2xl:max-w-[50%]',
-                                          'md:@4xl:max-w-lg',
-                                          'md:@2xl:mr-auto',
-                                          'order-last',
-                                          'md:@2xl:order-[unset]',
-                                      ]
-                                    : ['order-last']
-                            )}
-                        >
-                            <StructurePreviewSearch />
-                            {previewAssistants.map((assistant, index) => (
-                                <AIChatButtonView
-                                    key={assistant.id}
-                                    icon={assistant.icon}
-                                    label={assistant.label}
-                                    withShortcut={index === 0}
-                                    showLabel={
-                                        previewAssistants.length === 1 &&
-                                        customization.styling.search ===
-                                            CustomizationSearchStyle.Prominent
-                                    }
-                                    inert
-                                />
-                            ))}
-                        </div>
-
-                        {customization.header.links.length > 0 ||
-                        headerSocialAccounts.length > 0 ||
-                        (!withSections && variants.translations.length > 1) ? (
-                            <HeaderLinks>
-                                {customization.header.links.map((link, index) => (
-                                    <StructurePreviewHeaderLink
-                                        key={`${getContentRefKey(link.to)}-${index}`}
-                                        link={link}
-                                        snapshot={snapshot}
-                                    />
-                                ))}
-                                {headerSocialAccounts.length > 0 ? (
-                                    <div className="flex items-center gap-1">
-                                        {headerSocialAccounts.map((account) => {
-                                            const icon = SOCIAL_PLATFORM_ICONS[account.platform];
-                                            return icon ? (
-                                                <Button
-                                                    key={`${account.platform}-${account.handle}`}
-                                                    iconOnly
-                                                    label={account.platform}
-                                                    icon={icon}
-                                                    variant="blank"
-                                                    size="large"
-                                                    className="p-2 theme-bold:text-header-link hover:site-header:theme-bold:bg-header-link/3 hover:theme-bold:text-header-link focus-visible:site-header:theme-bold:bg-header-link/3"
-                                                />
-                                            ) : null;
-                                        })}
-                                    </div>
-                                ) : null}
-                                {customization.header.links.length > 0 ||
-                                headerSocialAccounts.length > 0 ? (
-                                    <StructurePreviewMoreMenu
-                                        label={tString(language, 'more')}
-                                        links={customization.header.links}
-                                        snapshot={snapshot}
-                                    />
-                                ) : null}
-                                {!withSections && variants.translations.length > 1 ? (
-                                    <StructurePreviewTranslationsDropdown
-                                        snapshot={snapshot}
-                                        siteSpace={snapshot.siteSpace}
-                                        siteSpaces={variants.translations}
-                                        className="flex! site-header:theme-bold:text-header-link hover:site-header:theme-bold:bg-header-link/3 focus-visible:site-header:theme-bold:bg-header-link/3 aria-expanded:site-header:theme-bold:bg-header-link/5"
-                                    />
-                                ) : null}
-                            </HeaderLinks>
+        <HeaderLayout
+            withTopHeader={withTopHeader}
+            searchStyle={customization.styling.search}
+            leading={<StructurePreviewLogo snapshot={snapshot} />}
+            search={
+                <>
+                    <StructurePreviewSearch />
+                    {previewAssistants.map((assistant, index) => (
+                        <AIChatButtonView
+                            key={assistant.id}
+                            icon={assistant.icon}
+                            label={assistant.label}
+                            withShortcut={index === 0}
+                            showLabel={
+                                previewAssistants.length === 1 &&
+                                customization.styling.search === CustomizationSearchStyle.Prominent
+                            }
+                            inert
+                        />
+                    ))}
+                </>
+            }
+            links={
+                customization.header.links.length > 0 ||
+                headerSocialAccounts.length > 0 ||
+                (!withSections && variants.translations.length > 1) ? (
+                    <HeaderLinks>
+                        {customization.header.links.map((link, index) => (
+                            <StructurePreviewHeaderLink
+                                key={`${getContentRefKey(link.to)}-${index}`}
+                                link={link}
+                                snapshot={snapshot}
+                            />
+                        ))}
+                        {headerSocialAccounts.length > 0 ? (
+                            <div className="flex items-center gap-1">
+                                {headerSocialAccounts.map((account) => {
+                                    const icon = SOCIAL_PLATFORM_ICONS[account.platform];
+                                    return icon ? (
+                                        <Button
+                                            key={`${account.platform}-${account.handle}`}
+                                            iconOnly
+                                            label={account.platform}
+                                            icon={icon}
+                                            variant="blank"
+                                            size="large"
+                                            className="p-2 theme-bold:text-header-link hover:site-header:theme-bold:bg-header-link/3 hover:theme-bold:text-header-link focus-visible:site-header:theme-bold:bg-header-link/3"
+                                        />
+                                    ) : null;
+                                })}
+                            </div>
                         ) : null}
-                    </div>
-                </div>
-            </div>
-
-            {sections && withSections ? (
-                <div>
+                        {customization.header.links.length > 0 ||
+                        headerSocialAccounts.length > 0 ? (
+                            <StructurePreviewMoreMenu
+                                label={tString(language, 'more')}
+                                links={customization.header.links}
+                                snapshot={snapshot}
+                            />
+                        ) : null}
+                        {!withSections && variants.translations.length > 1 ? (
+                            <StructurePreviewTranslationsDropdown
+                                snapshot={snapshot}
+                                siteSpace={snapshot.siteSpace}
+                                siteSpaces={variants.translations}
+                                className="flex! site-header:theme-bold:text-header-link hover:site-header:theme-bold:bg-header-link/3 focus-visible:site-header:theme-bold:bg-header-link/3 aria-expanded:site-header:theme-bold:bg-header-link/5"
+                            />
+                        ) : null}
+                    </HeaderLinks>
+                ) : null
+            }
+            sections={
+                sections && withSections ? (
                     <SiteSectionTabs sections={sections}>
                         {variants.translations.length > 1 ? (
                             <StructurePreviewTranslationsDropdown
@@ -277,9 +195,9 @@ function StructurePreviewHeader(props: { snapshot: StructurePreviewSnapshot }) {
                             />
                         ) : null}
                     </SiteSectionTabs>
-                </div>
-            ) : null}
-        </header>
+                ) : null
+            }
+        />
     );
 }
 
