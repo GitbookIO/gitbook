@@ -9,7 +9,7 @@ import {
 import * as React from 'react';
 
 import { SiteSectionTabs } from '@/components/SiteSections';
-import { tcls } from '@/lib/tailwind';
+import { Image } from '@/components/utils';
 
 import { tString, useLanguage } from '@/intl/client';
 import { AIChatButtonView, AIChatIcon, getAIChatName } from '../AIChat';
@@ -29,6 +29,7 @@ import { HeaderLinks } from '../Header/HeaderLinks';
 import {
     HEADER_LOGO_CONTAINER_CLASS,
     HEADER_LOGO_IMAGE_CLASS,
+    HEADER_LOGO_IMAGE_SIZES,
     HeaderLogoContent,
 } from '../Header/HeaderLogoContent';
 import { SpacesDropdownClient } from '../Header/SpacesDropdownClient';
@@ -226,10 +227,23 @@ function StructurePreviewLogoImage(props: {
     const { logo } = props;
 
     return (
-        <picture>
-            {logo.dark ? <source srcSet={logo.dark} media="(prefers-color-scheme: dark)" /> : null}
-            <img alt="Logo" src={logo.light} className={tcls('block', HEADER_LOGO_IMAGE_CLASS)} />
-        </picture>
+        <Image
+            alt="Logo"
+            resize={false}
+            sources={{
+                light: {
+                    src: logo.light,
+                },
+                dark: logo.dark
+                    ? {
+                          src: logo.dark,
+                      }
+                    : null,
+            }}
+            sizes={HEADER_LOGO_IMAGE_SIZES}
+            preload
+            style={HEADER_LOGO_IMAGE_CLASS}
+        />
     );
 }
 
