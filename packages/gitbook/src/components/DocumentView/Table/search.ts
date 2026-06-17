@@ -133,10 +133,9 @@ function getTableCellSearchText(
         case 'checkbox': {
             return typeof value === 'boolean' ? `${value}` : '';
         }
-        case 'files':
-        case 'users': {
-            return Array.isArray(value) ? normalizeSearchText(value.join(' ')) : '';
-        }
+        // Reference-like columns (files, users, content-ref, image) render resolved names/text
+        // asynchronously in `RecordColumnValue`. We only have raw ids here, so indexing them would
+        // never match the visible text — leave them out rather than search opaque ids.
         default:
             return '';
     }

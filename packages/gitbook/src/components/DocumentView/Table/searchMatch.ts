@@ -50,10 +50,10 @@ export function recordMatches(
 }
 
 /**
- * Whether a record's searchable text matches the query.
+ * Whether a record's searchable text contains the query.
  *
- * Treats the query as a case-insensitive regex, but falls back to a plain substring match for
- * incomplete patterns the user might type while searching live (e.g. a lone `(`).
+ * Plain case-insensitive substring match: the field is a free-text search, so regex
+ * metacharacters (`.`, `+`, `(`, …) are matched literally rather than treated as patterns.
  */
 export function matchesText(searchText: string, query: string): boolean {
     const trimmed = query.trim();
@@ -61,9 +61,5 @@ export function matchesText(searchText: string, query: string): boolean {
         return true;
     }
 
-    try {
-        return new RegExp(trimmed, 'iu').test(searchText);
-    } catch {
-        return searchText.toLowerCase().includes(trimmed.toLowerCase());
-    }
+    return searchText.toLowerCase().includes(trimmed.toLowerCase());
 }

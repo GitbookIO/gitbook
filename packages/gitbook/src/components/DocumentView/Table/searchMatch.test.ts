@@ -38,9 +38,10 @@ describe('matchesText', () => {
         expect(matchesText('Hello World', 'nope')).toBe(false);
     });
 
-    it('falls back to a substring match for invalid regex patterns', () => {
-        expect(matchesText('a (b) c', '(')).toBe(true);
-        expect(matchesText('abc', '(')).toBe(false);
+    it('matches regex metacharacters literally', () => {
+        expect(matchesText('value a+b here', 'a+b')).toBe(true);
+        expect(matchesText('v1x2', 'v1.2')).toBe(false);
+        expect(matchesText('a (b) c', '(b)')).toBe(true);
     });
 });
 
