@@ -1,5 +1,6 @@
 export * from './schemas';
 export * from './formatOpenAPIMethod';
+export * from './OpenAPIMethodBadge';
 export * from './OpenAPIOperation';
 export * from './OpenAPIWebhook';
 export * from './OpenAPIOperationContext';
