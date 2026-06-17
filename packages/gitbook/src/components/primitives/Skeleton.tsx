@@ -59,7 +59,7 @@ export function SkeletonParagraph(props: {
 /**
  * Placeholder when loading a title.
  */
-export function SkeletonHeading(props: { id?: string; style?: string; animated?: boolean }) {
+export function SkeletonHeading(props: { id?: string; style?: ClassValue; animated?: boolean }) {
     const { id, style, animated = true } = props;
     return <LoadingItem id={id} className={tcls('h-12 max-w-3/4', style)} animated={animated} />;
 }
