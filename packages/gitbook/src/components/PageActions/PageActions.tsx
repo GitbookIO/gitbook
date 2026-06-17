@@ -212,7 +212,6 @@ export function ActionOpenInLLM(props: {
             type={type}
             icon={provider}
             label={tString(language, 'open_in', providerLabel)}
-            shortLabel={providerLabel}
             description={tString(language, 'ai_chat_ask_about_page', providerLabel)}
             href={getLLMURL(provider, url, language)}
         />
