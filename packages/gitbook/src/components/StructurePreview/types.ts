@@ -1,33 +1,73 @@
 import type {
-    RevisionPage,
-    RevisionTag,
-    SiteCustomizationSettings,
-    SiteSpace,
-    SiteStructure,
+    CustomizationAIMode,
+    CustomizationHeaderItem,
+    CustomizationHeaderPreset,
+    CustomizationSearchStyle,
+    SiteSocialAccountPlatform,
     TranslationLanguage,
 } from '@gitbook/api';
 
-import type { SiteSections } from '@/lib/context';
+import type { ClientSiteSections } from '@/components/SiteSections';
+
+export type PreviewHeaderLink = {
+    title: string;
+    style?: CustomizationHeaderItem['style'];
+    hasTarget: boolean;
+    links: PreviewContentLink[];
+};
+
+export type PreviewContentLink = {
+    title: string;
+    hasTarget: boolean;
+};
+
+export type PreviewDropdownSpace = {
+    id: string;
+    title: string;
+    isActive: boolean;
+};
 
 export type StructurePreviewSnapshot = {
     site: {
+        title: string;
+    };
+    locale?: TranslationLanguage;
+    customization: {
+        styling: {
+            search: CustomizationSearchStyle;
+        };
+        favicon: {
+            emoji?: string;
+        };
+        header: {
+            preset: CustomizationHeaderPreset;
+            logo?: {
+                light: string;
+                dark?: string;
+            };
+            links: PreviewHeaderLink[];
+        };
+        ai: {
+            mode: CustomizationAIMode;
+        };
+        trademark: {
+            enabled: boolean;
+        };
+        socialAccounts: {
+            platform: SiteSocialAccountPlatform;
+            handle: string;
+        }[];
+    };
+    siteSpace: {
         id: string;
         title: string;
-        proxyOrigin?: string;
+        path: string;
     };
-    contextId?: string;
-    locale?: TranslationLanguage;
-    customization: SiteCustomizationSettings;
-    structure: SiteStructure;
-    siteSpace: SiteSpace;
-    siteSpaces: SiteSpace[];
-    visibleSiteSpaces: SiteSpace[];
-    sections: SiteSections | null;
-    visibleSections: SiteSections | null;
-    revision: {
-        pages: RevisionPage[];
-        tags: RevisionTag[];
+    variants: {
+        generic: PreviewDropdownSpace[];
+        translations: PreviewDropdownSpace[];
     };
+    sections: ClientSiteSections | null;
     icons: {
         large: {
             light: string;

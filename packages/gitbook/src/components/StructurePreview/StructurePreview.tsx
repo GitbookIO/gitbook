@@ -1,6 +1,6 @@
 'use client';
 
-import type { CustomizationContentLink, CustomizationHeaderItem, SiteSpace } from '@gitbook/api';
+import type { ContentRef, CustomizationContentLink, CustomizationHeaderItem } from '@gitbook/api';
 import {
     CustomizationAIMode,
     CustomizationHeaderPreset,
@@ -40,26 +40,27 @@ import {
     HEADER_LOGO_IMAGE_SIZES,
     HeaderLogoContent,
 } from '../Header/HeaderLogoContent';
-import { SpacesDropdownClient } from '../Header/SpacesDropdownClient';
 import {
-    getSlimSiteSpaces,
     getSpacesDropdownMenuClassName,
-    getSpacesDropdownTitle,
     getTranslationsDropdownClassName,
 } from '../Header/SpacesDropdownData';
 import headerLinksStyles from '../Header/headerLinks.module.css';
 import { SearchHeaderInput } from '../Search';
 import { CONTAINER_STYLE } from '../layout';
-import { Button, type ButtonProps } from '../primitives';
-import {
-    SOCIAL_PLATFORM_ICONS,
-    encodePreviewSiteSections,
-    getContentRefKey,
-    getHeaderSocialAccounts,
-    getPreviewVariants,
-    isStructurePreviewMessage,
-} from './state';
-import type { StructurePreviewSnapshot } from './types';
+import { Button, type ButtonProps, ToggleChevron } from '../primitives';
+import { DropdownMenu, DropdownMenuItem } from '../primitives/DropdownMenu';
+import { SOCIAL_PLATFORM_ICONS, isStructurePreviewMessage } from './state';
+import type {
+    PreviewContentLink,
+    PreviewDropdownSpace,
+    PreviewHeaderLink,
+    StructurePreviewSnapshot,
+} from './types';
+
+const PREVIEW_CONTENT_REF = {
+    kind: 'url',
+    url: '#',
+} as ContentRef;
 
 export function StructurePreview(props: { initialSnapshot: StructurePreviewSnapshot }) {
     const { initialSnapshot } = props;
@@ -71,8 +72,6 @@ export function StructurePreview(props: { initialSnapshot: StructurePreviewSnaps
                 return;
             }
 
-            //TODO: we should not pass everything here, we should select only some data as a lot of them are GBO specific
-            // Maybe only sections title/icon or something like that. TBD
             setSnapshot(event.data.payload);
         };
 
@@ -113,9 +112,8 @@ function StructurePreviewHeader(props: { snapshot: StructurePreviewSnapshot }) {
     const { snapshot } = props;
     const { customization } = snapshot;
     const language = useLanguage();
-    const variants = getPreviewVariants(snapshot);
-    const sections = encodePreviewSiteSections(snapshot);
-    const headerSocialAccounts = getHeaderSocialAccounts(customization);
+    const { variants, sections } = snapshot;
+    const headerSocialAccounts = customization.socialAccounts;
     const previewAssistants = getPreviewAssistants(snapshot, language);
     const withTopHeader = customization.header.preset !== CustomizationHeaderPreset.None;
     const withSections = Boolean(
@@ -123,9 +121,6 @@ function StructurePreviewHeader(props: { snapshot: StructurePreviewSnapshot }) {
             (sections.list.length > 1 ||
                 sections.list.some((section) => section.object === 'site-section-group'))
     );
-    const translationSiteSpace =
-        variants.translations.find((space) => space.id === snapshot.siteSpace.id) ??
-        snapshot.siteSpace;
 
     return (
         <HeaderLayout
@@ -157,7 +152,7 @@ function StructurePreviewHeader(props: { snapshot: StructurePreviewSnapshot }) {
                     <HeaderLinks>
                         {customization.header.links.map((link, index) => (
                             <StructurePreviewHeaderLink
-                                key={`${getContentRefKey(link.to)}-${index}`}
+                                key={`${link.title}-${index}`}
                                 link={link}
                                 snapshot={snapshot}
                             />
@@ -190,8 +185,6 @@ function StructurePreviewHeader(props: { snapshot: StructurePreviewSnapshot }) {
                         ) : null}
                         {!withSections && variants.translations.length > 1 ? (
                             <StructurePreviewTranslationsDropdown
-                                snapshot={snapshot}
-                                siteSpace={translationSiteSpace}
                                 siteSpaces={variants.translations}
                                 className="flex! site-header:theme-bold:text-header-link hover:site-header:theme-bold:bg-header-link/3 focus-visible:site-header:theme-bold:bg-header-link/3 aria-expanded:site-header:theme-bold:bg-header-link/5"
                             />
@@ -205,8 +198,6 @@ function StructurePreviewHeader(props: { snapshot: StructurePreviewSnapshot }) {
                     <SiteSectionTabs sections={sections} disableAnimations>
                         {variants.translations.length > 1 ? (
                             <StructurePreviewTranslationsDropdown
-                                snapshot={snapshot}
-                                siteSpace={translationSiteSpace}
                                 siteSpaces={variants.translations}
                                 className="my-1.5 ml-2 self-start"
                             />
@@ -285,7 +276,7 @@ function StructurePreviewSearch() {
 
 function StructurePreviewVariantSelector(props: { snapshot: StructurePreviewSnapshot }) {
     const { snapshot } = props;
-    const variants = getPreviewVariants(snapshot);
+    const { variants } = snapshot;
 
     if (variants.generic.length <= 1) {
         return null;
@@ -297,8 +288,7 @@ function StructurePreviewVariantSelector(props: { snapshot: StructurePreviewSnap
                 <div className={getTableOfContentsSidebarClassName()}>
                     <div className={getTableOfContentsInnerHeaderClassName()}>
                         <StructurePreviewSpacesDropdown
-                            snapshot={snapshot}
-                            siteSpace={snapshot.siteSpace}
+                            title={snapshot.siteSpace.title}
                             siteSpaces={variants.generic}
                             className={TABLE_OF_CONTENTS_SPACES_DROPDOWN_CLASS}
                         />
@@ -334,22 +324,29 @@ function getPreviewAssistants(
 
 function StructurePreviewHeaderLink(props: {
     snapshot: StructurePreviewSnapshot;
-    link: CustomizationHeaderItem;
+    link: PreviewHeaderLink;
 }) {
     const { snapshot, link } = props;
+    const headerLink = toCustomizationHeaderItem(link);
+
     return (
         <HeaderLinkItem
-            link={link}
+            link={headerLink}
             locale={snapshot.locale}
             headerPreset={snapshot.customization.header.preset}
-            href={link.to ? '#' : undefined}
-            hasTarget={Boolean(link.to)}
+            href={link.hasTarget ? '#' : undefined}
+            hasTarget={link.hasTarget}
             dropdownClassName={getHeaderLinkDropdownClassName(
                 snapshot.customization.styling.search
             )}
         >
-            {link.links?.map((subLink, index) => (
-                <SubHeaderLinkItem key={index} link={subLink} locale={snapshot.locale} href="#" />
+            {link.links.map((subLink, index) => (
+                <SubHeaderLinkItem
+                    key={index}
+                    link={toCustomizationContentLink(subLink)}
+                    locale={snapshot.locale}
+                    href="#"
+                />
             ))}
         </HeaderLinkItem>
     );
@@ -357,7 +354,7 @@ function StructurePreviewHeaderLink(props: {
 
 function StructurePreviewMoreMenu(props: {
     snapshot: StructurePreviewSnapshot;
-    links: CustomizationHeaderItem[];
+    links: PreviewHeaderLink[];
     label: React.ReactNode;
 }) {
     const { snapshot, links, label } = props;
@@ -379,34 +376,65 @@ function StructurePreviewMoreMenu(props: {
 
 function StructurePreviewMenuLink(props: {
     snapshot: StructurePreviewSnapshot;
-    link: CustomizationHeaderItem | CustomizationContentLink;
+    link: PreviewHeaderLink | PreviewContentLink;
 }) {
     const { snapshot, link } = props;
 
-    return 'links' in link && link.links.length > 0 ? (
-        <HeaderLinkSubMenu link={link} locale={snapshot.locale}>
+    return isPreviewHeaderLink(link) && link.links.length > 0 ? (
+        <HeaderLinkSubMenu link={toCustomizationHeaderItem(link)} locale={snapshot.locale}>
             {link.links.map((subLink, index) => (
                 <StructurePreviewMenuLink key={index} link={subLink} snapshot={snapshot} />
             ))}
         </HeaderLinkSubMenu>
     ) : (
-        <HeaderLinkMenuItem link={link} locale={snapshot.locale} href={link.to ? '#' : undefined} />
+        <HeaderLinkMenuItem
+            link={
+                isPreviewHeaderLink(link)
+                    ? toCustomizationHeaderItem(link)
+                    : toCustomizationContentLink(link)
+            }
+            locale={snapshot.locale}
+            href={link.hasTarget ? '#' : undefined}
+        />
     );
 }
 
+function isPreviewHeaderLink(
+    link: PreviewHeaderLink | PreviewContentLink
+): link is PreviewHeaderLink {
+    return 'links' in link;
+}
+
+function toCustomizationHeaderItem(link: PreviewHeaderLink): CustomizationHeaderItem {
+    return {
+        title: link.title,
+        style: link.style,
+        to: link.hasTarget ? PREVIEW_CONTENT_REF : null,
+        links: link.links.map(toCustomizationContentLink),
+    } as CustomizationHeaderItem;
+}
+
+function toCustomizationContentLink(link: PreviewContentLink): CustomizationContentLink {
+    return {
+        title: link.title,
+        to: link.hasTarget ? PREVIEW_CONTENT_REF : undefined,
+    } as CustomizationContentLink;
+}
+
 function StructurePreviewTranslationsDropdown(props: {
-    snapshot: StructurePreviewSnapshot;
-    siteSpace: SiteSpace;
-    siteSpaces: SiteSpace[];
+    siteSpaces: PreviewDropdownSpace[];
     className?: string;
 }) {
-    const { snapshot, siteSpace, siteSpaces, className } = props;
-    const title = getSpacesDropdownTitle(siteSpace, snapshot.locale);
+    const { siteSpaces, className } = props;
+    const title = siteSpaces.find((siteSpace) => siteSpace.isActive)?.title ?? siteSpaces[0]?.title;
+
+    if (!title) {
+        return null;
+    }
 
     return (
         <StructurePreviewSpacesDropdown
-            snapshot={snapshot}
-            siteSpace={siteSpace}
+            title={title}
             siteSpaces={siteSpaces}
             icon="globe"
             variant="blank"
@@ -416,32 +444,35 @@ function StructurePreviewTranslationsDropdown(props: {
 }
 
 function StructurePreviewSpacesDropdown(props: {
-    snapshot: StructurePreviewSnapshot;
-    siteSpace: SiteSpace;
-    siteSpaces: SiteSpace[];
+    title: string;
+    siteSpaces: PreviewDropdownSpace[];
     className?: ButtonProps['className'];
     icon?: IconName;
     variant?: ButtonProps['variant'];
 }) {
-    const { snapshot, siteSpace, siteSpaces, className, icon, variant = 'secondary' } = props;
-    const title = getSpacesDropdownTitle(siteSpace, snapshot.locale);
-    const slimSpaces = getSlimSiteSpaces({
-        siteSpace,
-        siteSpaces,
-        currentLanguage: snapshot.locale,
-        getURL: () => '',
-    });
+    const { title, siteSpaces, className, icon, variant = 'secondary' } = props;
 
     return (
-        <SpacesDropdownClient
-            title={title}
-            icon={icon}
-            variant={variant}
-            className={className}
-            dropdownClassName={getSpacesDropdownMenuClassName()}
-            slimSpaces={slimSpaces}
-            curPath={siteSpace.path}
-            clickable={false}
-        />
+        <DropdownMenu
+            className={getSpacesDropdownMenuClassName()}
+            button={
+                <Button
+                    icon={icon}
+                    data-testid="space-dropdown-button"
+                    size="small"
+                    variant={variant}
+                    trailing={<ToggleChevron />}
+                    className={tcls('bg-tint-base', className)}
+                >
+                    <span className="button-content">{title}</span>
+                </Button>
+            }
+        >
+            {siteSpaces.map((siteSpace) => (
+                <DropdownMenuItem key={siteSpace.id} active={siteSpace.isActive}>
+                    {siteSpace.title}
+                </DropdownMenuItem>
+            ))}
+        </DropdownMenu>
     );
 }

@@ -2,12 +2,12 @@
 
 import * as React from 'react';
 
-import type { SiteSection, SiteSectionGroup } from '@gitbook/api';
+import type { ClientSiteSection, ClientSiteSectionGroup } from '@/components/SiteSections';
 import type { StructurePreviewMessage, StructurePreviewSnapshot } from './types';
 
 type EditableSection = {
     id: string;
-    object: SiteSection['object'] | SiteSectionGroup['object'];
+    object: ClientSiteSection['object'] | ClientSiteSectionGroup['object'];
     title: string;
     depth: number;
 };
@@ -20,14 +20,15 @@ export function StructurePreviewTest(props: { initialSnapshot: StructurePreviewS
     const [siteTitle, setSiteTitle] = React.useState(initialSnapshot.site.title);
     const [sectionTitles, setSectionTitles] = React.useState(() =>
         Object.fromEntries(
-            listEditableSections(initialSnapshot.visibleSections?.list ?? [], initialSnapshot).map(
-                (section) => [getEditableSectionKey(section), section.title]
-            )
+            listEditableSections(initialSnapshot.sections?.list ?? []).map((section) => [
+                getEditableSectionKey(section),
+                section.title,
+            ])
         )
     );
 
     const editableSections = React.useMemo(
-        () => listEditableSections(initialSnapshot.visibleSections?.list ?? [], initialSnapshot),
+        () => listEditableSections(initialSnapshot.sections?.list ?? []),
         [initialSnapshot]
     );
 
@@ -172,8 +173,8 @@ function updateSnapshotTitles(
         }
 
         return {
-            list: updateSectionItems(sections.list, snapshot, input.sectionTitles),
-            current: updateSectionItem(sections.current, snapshot, input.sectionTitles),
+            list: updateSectionItems(sections.list, input.sectionTitles),
+            current: updateSectionItem(sections.current, input.sectionTitles),
         };
     };
 
@@ -184,89 +185,56 @@ function updateSnapshotTitles(
             title: input.siteTitle,
         },
         sections: updateSections(snapshot.sections),
-        visibleSections: updateSections(snapshot.visibleSections),
     };
 }
 
 function updateSectionItems(
-    items: (SiteSection | SiteSectionGroup)[],
-    snapshot: StructurePreviewSnapshot,
+    items: (ClientSiteSection | ClientSiteSectionGroup)[],
     sectionTitles: Record<string, string>
 ) {
-    return items.map((item) => updateSectionItem(item, snapshot, sectionTitles));
+    return items.map((item) => updateSectionItem(item, sectionTitles));
 }
 
-function updateSectionItem<T extends SiteSection | SiteSectionGroup>(
+function updateSectionItem<T extends ClientSiteSection | ClientSiteSectionGroup>(
     item: T,
-    snapshot: StructurePreviewSnapshot,
     sectionTitles: Record<string, string>
 ): T {
     const key = getEditableSectionKey(item);
     const title = sectionTitles[key];
-    const itemWithTitle =
-        typeof title === 'string' ? updateLocalizedTitle(item, snapshot, title) : item;
+    const itemWithTitle = typeof title === 'string' ? { ...item, title } : item;
 
     if (itemWithTitle.object === 'site-section-group') {
         return {
             ...itemWithTitle,
-            children: updateSectionItems(itemWithTitle.children, snapshot, sectionTitles),
+            children: updateSectionItems(itemWithTitle.children, sectionTitles),
         } as T;
     }
 
     return itemWithTitle;
 }
 
-function updateLocalizedTitle<T extends SiteSection | SiteSectionGroup>(
-    item: T,
-    snapshot: StructurePreviewSnapshot,
-    title: string
-): T {
-    if (snapshot.locale) {
-        return {
-            ...item,
-            title,
-            localizedTitle: {
-                ...item.localizedTitle,
-                [snapshot.locale]: title,
-            },
-        };
-    }
-
-    return {
-        ...item,
-        title,
-    };
-}
-
 function listEditableSections(
-    items: (SiteSection | SiteSectionGroup)[],
-    snapshot: StructurePreviewSnapshot,
+    items: (ClientSiteSection | ClientSiteSectionGroup)[],
     depth = 0
 ): EditableSection[] {
     return items.flatMap((item) => {
         const section: EditableSection = {
             id: item.id,
             object: item.object,
-            title: getDisplayTitle(item, snapshot),
+            title: item.title,
             depth,
         };
 
         if (item.object === 'site-section-group') {
-            return [section, ...listEditableSections(item.children, snapshot, depth + 1)];
+            return [section, ...listEditableSections(item.children, depth + 1)];
         }
 
         return [section];
     });
 }
 
-function getDisplayTitle(item: SiteSection | SiteSectionGroup, snapshot: StructurePreviewSnapshot) {
-    return snapshot.locale && item.localizedTitle?.[snapshot.locale]
-        ? item.localizedTitle[snapshot.locale]
-        : item.title;
-}
-
 function getEditableSectionKey(
-    section: Pick<EditableSection, 'id' | 'object'> | SiteSection | SiteSectionGroup
+    section: Pick<EditableSection, 'id' | 'object'> | ClientSiteSection | ClientSiteSectionGroup
 ) {
     return `${section.object}:${section.id}`;
 }

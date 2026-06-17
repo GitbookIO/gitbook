@@ -1,15 +1,14 @@
 import { describe, expect, it } from 'bun:test';
 
+import { getStructurePreviewSnapshot } from '@/app/sites/dynamic/[mode]/[siteURL]/[siteData]/~gitbook/structure/snapshot';
 import { languages } from '@/intl/translations';
+import type { GitBookSiteContext } from '@/lib/context';
 import { defaultCustomization } from '@/lib/utils';
-import { TranslationLanguage } from '@gitbook/api';
+import { SiteSocialAccountPlatform, TranslationLanguage } from '@gitbook/api';
 
-import { encodePreviewSiteSections, getPreviewVariants, isStructurePreviewMessage } from './state';
-import type { StructurePreviewSnapshot } from './types';
+import { isStructurePreviewMessage } from './state';
 
-function createSnapshot(
-    overrides: Partial<StructurePreviewSnapshot> = {}
-): StructurePreviewSnapshot {
+function createContext(overrides: Partial<GitBookSiteContext> = {}): GitBookSiteContext {
     const siteSpace = {
         id: 'site-space-1',
         title: 'Docs',
@@ -29,33 +28,23 @@ function createSnapshot(
             id: 'site-1',
             title: 'Acme Docs',
         },
+        locale: undefined,
         customization: defaultCustomization(),
-        structure: {
-            type: 'siteSpaces',
-            structure: [siteSpace],
-        },
         siteSpace,
         siteSpaces: [siteSpace],
         visibleSiteSpaces: [siteSpace],
         sections: null,
         visibleSections: null,
-        revision: {
-            pages: [],
-            tags: [],
-        },
-        icons: {
-            large: {
-                light: '/~gitbook/icon?size=large&theme=light',
-                dark: '/~gitbook/icon?size=large&theme=dark',
-            },
+        linker: {
+            toPathInSpace: (path: string) => `/space/${path}`,
         },
         ...overrides,
-    } as StructurePreviewSnapshot;
+    } as GitBookSiteContext;
 }
 
 describe('structure preview state', () => {
-    it('validates full snapshot update messages', () => {
-        const snapshot = createSnapshot();
+    it('validates slim snapshot update messages without revision data', () => {
+        const snapshot = getStructurePreviewSnapshot(createContext());
 
         expect(
             isStructurePreviewMessage({
@@ -63,11 +52,15 @@ describe('structure preview state', () => {
                 payload: snapshot,
             })
         ).toBe(true);
+        expect('revision' in snapshot).toBe(false);
+        expect('structure' in snapshot).toBe(false);
+        expect('siteSpaces' in snapshot).toBe(false);
+        expect('visibleSiteSpaces' in snapshot).toBe(false);
         expect(isStructurePreviewMessage({ type: 'gitbook.structure.update' })).toBe(false);
         expect(isStructurePreviewMessage({ type: 'other', payload: snapshot })).toBe(false);
     });
 
-    it('encodes section structures with inert URLs', () => {
+    it('stores pre-encoded section structures with inert URLs', () => {
         const section = {
             object: 'site-section',
             id: 'section-1',
@@ -79,29 +72,29 @@ describe('structure preview state', () => {
             siteSpaces: [],
             urls: {},
         };
-        const snapshot = createSnapshot({
-            locale: 'fr',
-            sections: {
-                list: [
-                    {
-                        object: 'site-section-group',
-                        id: 'group-1',
-                        title: 'Products',
-                        children: [section],
-                    },
-                ],
-                current: section,
-            },
-        } as unknown as Partial<StructurePreviewSnapshot>);
+        const snapshot = getStructurePreviewSnapshot(
+            createContext({
+                locale: TranslationLanguage.Fr,
+                sections: {
+                    list: [
+                        {
+                            object: 'site-section-group',
+                            id: 'group-1',
+                            title: 'Products',
+                            children: [section],
+                        },
+                    ],
+                    current: section,
+                },
+            } as unknown as Partial<GitBookSiteContext>)
+        );
 
-        const encoded = encodePreviewSiteSections(snapshot);
-
-        expect(encoded?.current.title).toBe('Guides FR');
-        expect(encoded?.current.url).toBe('#');
-        expect(encoded?.list[0]?.object).toBe('site-section-group');
+        expect(snapshot.sections?.current.title).toBe('Guides FR');
+        expect(snapshot.sections?.current.url).toBe('#');
+        expect(snapshot.sections?.list[0]?.object).toBe('site-section-group');
     });
 
-    it('categorizes translation variants like the rendered header', () => {
+    it('stores precomputed variant groups with slim translation titles', () => {
         const currentSiteSpace = {
             id: 'v15-it',
             title: 'v15',
@@ -139,22 +132,48 @@ describe('structure preview state', () => {
                       },
                   }
         );
-        const snapshot = createSnapshot({
-            locale: TranslationLanguage.It,
-            siteSpace: currentSiteSpace,
-            siteSpaces,
-            visibleSiteSpaces: siteSpaces,
-        } as unknown as Partial<StructurePreviewSnapshot>);
+        const snapshot = getStructurePreviewSnapshot(
+            createContext({
+                locale: TranslationLanguage.It,
+                siteSpace: currentSiteSpace,
+                siteSpaces,
+                visibleSiteSpaces: siteSpaces,
+            } as Partial<GitBookSiteContext>)
+        );
 
-        const variants = getPreviewVariants(snapshot);
-
-        expect(variants.generic.map((space) => space.id)).toEqual(['v20-it', 'v15-it']);
+        expect(snapshot.variants.generic.map((space) => space.id)).toEqual(['v20-it', 'v15-it']);
         expect(
-            variants.translations.map((space) => ({ id: space.id, title: space.title }))
+            snapshot.variants.translations.map((space) => ({
+                id: space.id,
+                title: space.title,
+                isActive: space.isActive,
+            }))
         ).toEqual([
-            { id: 'v15-en', title: languages.en.language },
-            { id: 'v15-fr', title: languages.fr.language },
-            { id: 'v15-it', title: languages.it.language },
+            { id: 'v15-en', title: languages.en.language, isActive: false },
+            { id: 'v15-fr', title: languages.fr.language, isActive: false },
+            { id: 'v15-it', title: languages.it.language, isActive: true },
+        ]);
+    });
+
+    it('stores only header-visible social account fields', () => {
+        const customization = defaultCustomization();
+        customization.socialAccounts = [
+            {
+                platform: SiteSocialAccountPlatform.Github,
+                handle: 'gitbook',
+                display: { header: true, footer: true },
+            },
+            {
+                platform: SiteSocialAccountPlatform.Discord,
+                handle: 'hidden',
+                display: { header: false, footer: true },
+            },
+        ];
+
+        const snapshot = getStructurePreviewSnapshot(createContext({ customization }));
+
+        expect(snapshot.customization.socialAccounts).toEqual([
+            { platform: SiteSocialAccountPlatform.Github, handle: 'gitbook' },
         ]);
     });
 });
