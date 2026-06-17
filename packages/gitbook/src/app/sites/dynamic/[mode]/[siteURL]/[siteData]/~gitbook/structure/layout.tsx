@@ -17,7 +17,7 @@ export default async function RootLayout({
     const forcedTheme = await getThemeFromMiddleware();
     return (
         <CustomizationRootLayout
-            htmlClassName="sheet-open:gutter-stable"
+            htmlClassName="sheet-open:gutter-stable overflow-hidden site-background"
             bodyClassName="site-background"
             forcedTheme={forcedTheme}
             context={context}

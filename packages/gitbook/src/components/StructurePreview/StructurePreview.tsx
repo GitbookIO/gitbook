@@ -46,8 +46,15 @@ import {
 } from '../Header/SpacesDropdownData';
 import headerLinksStyles from '../Header/headerLinks.module.css';
 import { SearchHeaderInput } from '../Search';
-import { CONTAINER_STYLE } from '../layout';
-import { Button, type ButtonProps, ToggleChevron } from '../primitives';
+import { CONTAINER_STYLE, CONTENT_STYLE } from '../layout';
+import {
+    Button,
+    type ButtonProps,
+    SkeletonHeading,
+    SkeletonImage,
+    SkeletonParagraph,
+    ToggleChevron,
+} from '../primitives';
 import { DropdownMenu, DropdownMenuItem } from '../primitives/DropdownMenu';
 import {
     SOCIAL_PLATFORM_ICONS,
@@ -135,12 +142,21 @@ export function StructurePreview(props: { initialSnapshot: StructurePreviewSnaps
         <div
             data-gb-structure-preview
             data-viewport-mode="desktop"
-            className="site-background min-h-screen min-w-[1024px] overflow-hidden"
             onClickCapture={fakeSectionNavigation}
             onAuxClickCapture={preventNavigation}
         >
             <StructurePreviewHeader snapshot={snapshot} />
-            <StructurePreviewVariantSelector snapshot={snapshot} />
+            <div className={tcls('flex gap-8', CONTAINER_STYLE)}>
+                <StructurePreviewVariantSelector snapshot={snapshot} />
+                <div className={tcls('my-8 flex min-w-xl grow flex-col gap-8', CONTENT_STYLE)}>
+                    <SkeletonHeading animated={false} />
+                    <SkeletonParagraph lines={4} animated={false} />
+                    <SkeletonParagraph lines={5} animated={false} start={4} />
+                    <SkeletonImage animated={false} />
+                    <SkeletonParagraph lines={3} animated={false} start={9} />
+                    <SkeletonParagraph lines={2} animated={false} start={12} />
+                </div>
+            </div>
         </div>
     );
 }
@@ -315,14 +331,10 @@ function StructurePreviewVariantSelector(props: { snapshot: StructurePreviewSnap
     const { snapshot } = props;
     const { variants } = snapshot;
 
-    if (variants.generic.length <= 1) {
-        return null;
-    }
-
     return (
-        <div className={tcls(CONTAINER_STYLE, 'has-sidebar flex flex-row')}>
-            <div data-gb-table-of-contents className={getTableOfContentsClassName()}>
-                <div className={getTableOfContentsSidebarClassName()}>
+        <div data-gb-table-of-contents className={tcls(getTableOfContentsClassName(), 'max-w-xs')}>
+            <div className={getTableOfContentsSidebarClassName()}>
+                {variants.generic.length > 1 ? (
                     <div className={getTableOfContentsInnerHeaderClassName()}>
                         <StructurePreviewSpacesDropdown
                             title={snapshot.siteSpace.title}
@@ -330,6 +342,20 @@ function StructurePreviewVariantSelector(props: { snapshot: StructurePreviewSnap
                             className={TABLE_OF_CONTENTS_SPACES_DROPDOWN_CLASS}
                         />
                     </div>
+                ) : null}
+                <div className="ml-5 flex flex-col gap-6">
+                    {Array.from({ length: 4 }).map((_, group) => (
+                        <div className="flex flex-col gap-2">
+                            {Array.from({ length: [3, 5, 4, 3][group] ?? 0 }).map((_, index) => (
+                                <SkeletonParagraph
+                                    key={index}
+                                    start={group * 5 + index}
+                                    lines={1}
+                                    animated={false}
+                                />
+                            ))}
+                        </div>
+                    ))}
                 </div>
             </div>
         </div>
