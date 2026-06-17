@@ -149,7 +149,9 @@
 }
 
 .openapi-column-preview {
-    @apply flex flex-col flex-1 xl:max-2xl:pt-20 lg:pt-6 sticky self-start max-h-[calc(100vh-var(--toc-top-offset))] top-(--toc-top-offset);
+    /* Shift down by ~2rem so the pinned preview clears the sticky "On this page" /
+    page-actions bar below the header, and leave a 1rem gap at the bottom of the viewport. */
+    @apply flex flex-col flex-1 xl:max-2xl:pt-8 lg:pt-6 sticky self-start max-h-[calc(100vh-var(--toc-top-offset)-3rem)] top-[calc(var(--toc-top-offset)+2rem)];
 }
 
 .openapi-column-preview-body {
