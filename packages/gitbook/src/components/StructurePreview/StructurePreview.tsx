@@ -49,11 +49,16 @@ import { SearchHeaderInput } from '../Search';
 import { CONTAINER_STYLE } from '../layout';
 import { Button, type ButtonProps, ToggleChevron } from '../primitives';
 import { DropdownMenu, DropdownMenuItem } from '../primitives/DropdownMenu';
-import { SOCIAL_PLATFORM_ICONS, isStructurePreviewMessage } from './state';
+import {
+    SOCIAL_PLATFORM_ICONS,
+    isStructurePreviewMessage,
+    selectStructurePreviewSection,
+} from './state';
 import type {
     PreviewContentLink,
     PreviewDropdownSpace,
     PreviewHeaderLink,
+    StructurePreviewNavigationMessage,
     StructurePreviewSnapshot,
 } from './types';
 
@@ -79,19 +84,47 @@ export function StructurePreview(props: { initialSnapshot: StructurePreviewSnaps
         return () => window.removeEventListener('message', handleMessage);
     }, []);
 
+    const postNavigationChange = (sectionId: string) => {
+        const message: StructurePreviewNavigationMessage = {
+            type: 'gitbook.structure.navigate',
+            payload: { sectionId },
+        };
+
+        window.parent.postMessage(message, window.location.origin);
+    };
+
     const preventNavigation = (event: React.MouseEvent<HTMLElement>) => {
         const target = event.target;
         if (!(target instanceof Element)) {
-            return;
+            return null;
         }
 
         const anchor = target.closest('a');
         if (!anchor) {
-            return;
+            return null;
         }
 
         event.preventDefault();
         event.stopPropagation();
+
+        return anchor;
+    };
+
+    const fakeSectionNavigation = (event: React.MouseEvent<HTMLElement>) => {
+        const anchor = preventNavigation(event);
+        const sectionId = anchor?.getAttribute('data-gb-site-section-id');
+        if (!sectionId) {
+            return;
+        }
+
+        setSnapshot((currentSnapshot) => {
+            const nextSnapshot = selectStructurePreviewSection(currentSnapshot, sectionId);
+            if (nextSnapshot !== currentSnapshot) {
+                postNavigationChange(sectionId);
+            }
+
+            return nextSnapshot;
+        });
     };
 
     return (
@@ -99,7 +132,7 @@ export function StructurePreview(props: { initialSnapshot: StructurePreviewSnaps
             data-gb-structure-preview
             data-viewport-mode="desktop"
             className="site-background min-h-screen min-w-[1024px] overflow-hidden"
-            onClickCapture={preventNavigation}
+            onClickCapture={fakeSectionNavigation}
             onAuxClickCapture={preventNavigation}
         >
             <StructurePreviewHeader snapshot={snapshot} />

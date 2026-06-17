@@ -157,6 +157,11 @@ export function SiteSectionTabs(props: {
                                                     ? structureItem.url
                                                     : undefined
                                             }
+                                            sectionId={
+                                                structureItem.object === 'site-section'
+                                                    ? structureItem.id
+                                                    : undefined
+                                            }
                                             isActive={isActive}
                                             title={title}
                                             icon={icon ? (icon as IconName) : undefined}
@@ -233,10 +238,10 @@ function useNavigationMenuViewportOffset(args: {
  * A tab representing a section or section group
  */
 const SectionTab = React.forwardRef(function SectionTab(
-    props: { isActive: boolean; title: string; icon?: IconName; url?: string },
+    props: { isActive: boolean; title: string; icon?: IconName; url?: string; sectionId?: string },
     ref: React.Ref<HTMLAnchorElement>
 ) {
-    const { isActive, title, icon, url, ...rest } = props;
+    const { isActive, title, icon, url, sectionId, ...rest } = props;
     const isGroup = url === undefined;
     return (
         <Button
@@ -248,6 +253,7 @@ const SectionTab = React.forwardRef(function SectionTab(
             label={title}
             trailing={isGroup ? <ToggleChevron /> : null}
             active={isActive}
+            data-gb-site-section-id={sectionId}
             className={tcls(
                 'group/dropdown relative my-1.5 overflow-visible',
                 isActive
@@ -356,6 +362,7 @@ function SectionGroupTile(props: {
             <li className="group/section-tile flex w-full min-w-0 shrink-0 grow md:max-w-[var(--site-section-column-width)]">
                 <Link
                     href={url}
+                    data-gb-site-section-id={child.id}
                     className={tcls(
                         'grow circular-corners:rounded-2xl rounded-corners:rounded-lg px-2.5 py-1.5 transition-colors',
                         isActive

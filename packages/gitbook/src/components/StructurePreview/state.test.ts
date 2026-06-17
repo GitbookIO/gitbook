@@ -3,10 +3,10 @@ import { describe, expect, it } from 'bun:test';
 import { getStructurePreviewSnapshot } from '@/app/sites/dynamic/[mode]/[siteURL]/[siteData]/~gitbook/structure/snapshot';
 import { languages } from '@/intl/translations';
 import type { GitBookSiteContext } from '@/lib/context';
-import { defaultCustomization } from '@/lib/utils';
+import { defaultCustomization, findSectionInGroup } from '@/lib/utils';
 import { SiteSocialAccountPlatform, TranslationLanguage } from '@gitbook/api';
 
-import { isStructurePreviewMessage } from './state';
+import { isStructurePreviewMessage, selectStructurePreviewSection } from './state';
 
 function createContext(overrides: Partial<GitBookSiteContext> = {}): GitBookSiteContext {
     const siteSpace = {
@@ -58,6 +58,12 @@ describe('structure preview state', () => {
         expect('visibleSiteSpaces' in snapshot).toBe(false);
         expect(isStructurePreviewMessage({ type: 'gitbook.structure.update' })).toBe(false);
         expect(isStructurePreviewMessage({ type: 'other', payload: snapshot })).toBe(false);
+        expect(
+            isStructurePreviewMessage({
+                type: 'gitbook.structure.navigate',
+                payload: { sectionId: 'section-1' },
+            })
+        ).toBe(false);
     });
 
     it('stores pre-encoded section structures with inert URLs', () => {
@@ -176,4 +182,81 @@ describe('structure preview state', () => {
             { platform: SiteSocialAccountPlatform.Github, handle: 'gitbook' },
         ]);
     });
+
+    it('selects a top-level section in the local snapshot', () => {
+        const snapshot = createSnapshotWithSections();
+        const nextSnapshot = selectStructurePreviewSection(snapshot, 'reference');
+
+        expect(nextSnapshot).not.toBe(snapshot);
+        expect(nextSnapshot.sections?.current.id).toBe('reference');
+        expect(nextSnapshot.sections?.current.title).toBe('Reference');
+    });
+
+    it('selects a nested section in the local snapshot', () => {
+        const snapshot = createSnapshotWithSections();
+        const nextSnapshot = selectStructurePreviewSection(snapshot, 'api');
+        const currentSection = nextSnapshot.sections?.current;
+        const group = nextSnapshot.sections?.list[1];
+
+        expect(currentSection?.id).toBe('api');
+        expect(group?.object).toBe('site-section-group');
+        if (!currentSection || group?.object !== 'site-section-group') {
+            throw new Error('Expected a nested section inside a section group');
+        }
+
+        expect(findSectionInGroup(group, currentSection.id)?.id).toBe('api');
+    });
+
+    it('keeps the current snapshot when selecting an unknown section', () => {
+        const snapshot = createSnapshotWithSections();
+        const nextSnapshot = selectStructurePreviewSection(snapshot, 'missing');
+
+        expect(nextSnapshot).toBe(snapshot);
+        expect(nextSnapshot.sections?.current.id).toBe('intro');
+    });
+
+    it('keeps snapshots without sections unchanged', () => {
+        const snapshot = getStructurePreviewSnapshot(createContext());
+        const nextSnapshot = selectStructurePreviewSection(snapshot, 'reference');
+
+        expect(nextSnapshot).toBe(snapshot);
+        expect(nextSnapshot.sections).toBeNull();
+    });
 });
+
+function createSnapshotWithSections() {
+    const intro = createSection('intro', 'Intro');
+    const reference = createSection('reference', 'Reference');
+    const api = createSection('api', 'API');
+
+    return getStructurePreviewSnapshot(
+        createContext({
+            sections: {
+                list: [
+                    intro,
+                    {
+                        object: 'site-section-group',
+                        id: 'developers',
+                        title: 'Developers',
+                        children: [api],
+                    },
+                    reference,
+                ],
+                current: intro,
+            },
+        } as unknown as Partial<GitBookSiteContext>)
+    );
+}
+
+function createSection(id: string, title: string) {
+    return {
+        object: 'site-section',
+        id,
+        title,
+        description: '',
+        path: id,
+        default: false,
+        siteSpaces: [],
+        urls: {},
+    };
+}

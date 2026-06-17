@@ -1,6 +1,7 @@
 import type { SiteSocialAccountPlatform } from '@gitbook/api';
 import type { IconName } from '@gitbook/icons';
 
+import type { ClientSiteSection, ClientSiteSectionGroup } from '../SiteSections';
 import type { StructurePreviewMessage, StructurePreviewSnapshot } from './types';
 
 export function isStructurePreviewMessage(value: unknown): value is StructurePreviewMessage {
@@ -37,6 +38,50 @@ export function isStructurePreviewSnapshot(value: unknown): value is StructurePr
             Array.isArray(snapshot.variants.translations) &&
             snapshot.icons?.large
     );
+}
+
+export function selectStructurePreviewSection(
+    snapshot: StructurePreviewSnapshot,
+    sectionId: string
+): StructurePreviewSnapshot {
+    const sections = snapshot.sections;
+    if (!sections || sections.current.id === sectionId) {
+        return snapshot;
+    }
+
+    const selectedSection = findPreviewSection(sections.list, sectionId);
+    if (!selectedSection) {
+        return snapshot;
+    }
+
+    return {
+        ...snapshot,
+        sections: {
+            ...sections,
+            current: selectedSection,
+        },
+    };
+}
+
+function findPreviewSection(
+    items: (ClientSiteSection | ClientSiteSectionGroup)[],
+    sectionId: string
+): ClientSiteSection | null {
+    for (const item of items) {
+        if (item.object === 'site-section') {
+            if (item.id === sectionId) {
+                return item;
+            }
+            continue;
+        }
+
+        const childSection = findPreviewSection(item.children, sectionId);
+        if (childSection) {
+            return childSection;
+        }
+    }
+
+    return null;
 }
 
 export const SOCIAL_PLATFORM_ICONS: Partial<Record<SiteSocialAccountPlatform, IconName>> = {

@@ -80,3 +80,10 @@ export type StructurePreviewMessage = {
     type: 'gitbook.structure.update';
     payload: StructurePreviewSnapshot;
 };
+
+export type StructurePreviewNavigationMessage = {
+    type: 'gitbook.structure.navigate';
+    payload: {
+        sectionId: string;
+    };
+};
