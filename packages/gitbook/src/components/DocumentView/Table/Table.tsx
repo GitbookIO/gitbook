@@ -6,12 +6,23 @@ import { tcls } from '@/lib/tailwind';
 import type { BlockProps } from '../Block';
 import { isBlockOffscreen } from '../utils';
 import { StickyViewGrid } from './StickyViewGrid';
+import { TableSearchEmpty, TableSearchInput, TableSearchProvider } from './TableSearch';
 import { ViewCards } from './ViewCards';
 import { ViewGrid, ViewGridHeader } from './ViewGrid';
 import { getViewGridLayout, hasVisibleHeader } from './layout';
-import { type TableRecordKV, filterTableRecordsBySearchTerm } from './search';
+import {
+    type TableRecordKV,
+    getTableCheckboxColumns,
+    getTableRecordSearchData,
+    getTableSelectColumns,
+} from './search';
 
 export type { TableRecordKV };
+
+/**
+ * Only show the table search once there are enough records that searching is useful.
+ */
+const MIN_RECORDS_FOR_SEARCH = 4;
 
 export interface TableViewProps<View> extends BlockProps<DocumentBlockTable> {
     view: View;
@@ -27,11 +38,36 @@ export function Table(props: BlockProps<DocumentBlockTable>) {
         a[1].orderIndex.localeCompare(b[1].orderIndex)
     );
 
-    const filteredRecords = filterTableRecordsBySearchTerm(
-        block,
-        records,
-        context.tableSearchQuery
+    const showSearch = context.mode !== 'print' && records.length >= MIN_RECORDS_FOR_SEARCH;
+    const searchRecords = showSearch
+        ? records.map(([id, record]) => ({ id, ...getTableRecordSearchData(block, record) }))
+        : [];
+
+    return (
+        <TableSearchProvider records={searchRecords}>
+            <div className={tcls(style, 'flex flex-col gap-3')}>
+                {showSearch ? (
+                    <TableSearchInput
+                        selectColumns={getTableSelectColumns(block)}
+                        checkboxColumns={getTableCheckboxColumns(block)}
+                    />
+                ) : null}
+                <TableView {...props} isOffscreen={isOffscreen} records={records} />
+                <TableSearchEmpty />
+            </div>
+        </TableSearchProvider>
     );
+}
+
+/**
+ * Renders the table itself (grid or cards view) for the given records.
+ */
+function TableView({
+    isOffscreen,
+    records,
+    ...props
+}: BlockProps<DocumentBlockTable> & { isOffscreen: boolean; records: TableRecordKV[] }) {
+    const { block, context, style } = props;
 
     switch (block.data.view.type) {
         case 'cards':
@@ -39,7 +75,7 @@ export function Table(props: BlockProps<DocumentBlockTable>) {
                 <ViewCards
                     view={block.data.view}
                     isOffscreen={isOffscreen}
-                    records={filteredRecords}
+                    records={records}
                     {...props}
                 />
             );
@@ -48,7 +84,7 @@ export function Table(props: BlockProps<DocumentBlockTable>) {
                 ...props,
                 view: block.data.view,
                 isOffscreen,
-                records: filteredRecords,
+                records,
             };
             const { tableWidth } = getViewGridLayout({
                 block,

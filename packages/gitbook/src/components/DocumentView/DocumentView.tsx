@@ -36,11 +36,6 @@ export interface DocumentContext {
      * @default false
      */
     withLinkPreviews?: boolean;
-
-    /**
-     * Optional table row search query.
-     */
-    tableSearchQuery?: string;
 }
 
 export interface DocumentContextProps {
