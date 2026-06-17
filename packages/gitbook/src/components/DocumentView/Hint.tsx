@@ -92,6 +92,11 @@ export async function Hint({
                     'empty:p-0',
                     '-row-end-1',
                     '-col-end-1',
+                    // Allow the grid track to shrink below its content's min-content size so wide
+                    // nested blocks (e.g. code blocks, tables) scroll internally instead of
+                    // overflowing the hint. Without this, the `1fr` column keeps its default
+                    // `min-width: auto` and grows past the hint's width.
+                    'min-w-0',
                     'space-y-3',
                     '[&_.hint]:border',
                     '[&_pre]:border',
