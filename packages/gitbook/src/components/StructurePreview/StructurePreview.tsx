@@ -77,7 +77,11 @@ export function StructurePreview(props: { initialSnapshot: StructurePreviewSnaps
                 return;
             }
 
-            setSnapshot(event.data.payload);
+            const message = event.data;
+            setSnapshot((currentSnapshot) => ({
+                ...currentSnapshot,
+                ...message.payload,
+            }));
         };
 
         window.addEventListener('message', handleMessage);

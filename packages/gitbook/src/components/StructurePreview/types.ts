@@ -76,9 +76,13 @@ export type StructurePreviewSnapshot = {
     };
 };
 
+export type StructurePreviewUpdate = Partial<
+    Pick<StructurePreviewSnapshot, 'sections' | 'siteSpace' | 'variants'>
+>;
+
 export type StructurePreviewMessage = {
     type: 'gitbook.structure.update';
-    payload: StructurePreviewSnapshot;
+    payload: StructurePreviewUpdate;
 };
 
 export type StructurePreviewNavigationMessage = {

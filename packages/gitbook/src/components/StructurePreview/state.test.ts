@@ -6,7 +6,11 @@ import type { GitBookSiteContext } from '@/lib/context';
 import { defaultCustomization, findSectionInGroup } from '@/lib/utils';
 import { SiteSocialAccountPlatform, TranslationLanguage } from '@gitbook/api';
 
-import { isStructurePreviewMessage, selectStructurePreviewSection } from './state';
+import {
+    isStructurePreviewMessage,
+    isStructurePreviewNavigationMessage,
+    selectStructurePreviewSection,
+} from './state';
 
 function createContext(overrides: Partial<GitBookSiteContext> = {}): GitBookSiteContext {
     const siteSpace = {
@@ -43,13 +47,24 @@ function createContext(overrides: Partial<GitBookSiteContext> = {}): GitBookSite
 }
 
 describe('structure preview state', () => {
-    it('validates slim snapshot update messages without revision data', () => {
+    it('validates partial preview update messages without revision data', () => {
         const snapshot = getStructurePreviewSnapshot(createContext());
+        const update = {
+            sections: snapshot.sections,
+            variants: snapshot.variants,
+            siteSpace: snapshot.siteSpace,
+        };
 
         expect(
             isStructurePreviewMessage({
                 type: 'gitbook.structure.update',
-                payload: snapshot,
+                payload: update,
+            })
+        ).toBe(true);
+        expect(
+            isStructurePreviewMessage({
+                type: 'gitbook.structure.update',
+                payload: { sections: snapshot.sections },
             })
         ).toBe(true);
         expect('revision' in snapshot).toBe(false);
@@ -57,10 +72,46 @@ describe('structure preview state', () => {
         expect('siteSpaces' in snapshot).toBe(false);
         expect('visibleSiteSpaces' in snapshot).toBe(false);
         expect(isStructurePreviewMessage({ type: 'gitbook.structure.update' })).toBe(false);
+        expect(
+            isStructurePreviewMessage({
+                type: 'gitbook.structure.update',
+                payload: snapshot,
+            })
+        ).toBe(false);
+        expect(
+            isStructurePreviewMessage({
+                type: 'gitbook.structure.update',
+                payload: { site: snapshot.site },
+            })
+        ).toBe(false);
         expect(isStructurePreviewMessage({ type: 'other', payload: snapshot })).toBe(false);
         expect(
             isStructurePreviewMessage({
                 type: 'gitbook.structure.navigate',
+                payload: { sectionId: 'section-1' },
+            })
+        ).toBe(false);
+    });
+
+    it('validates preview navigation messages', () => {
+        expect(
+            isStructurePreviewNavigationMessage({
+                type: 'gitbook.structure.navigate',
+                payload: { sectionId: 'section-1' },
+            })
+        ).toBe(true);
+        expect(isStructurePreviewNavigationMessage({ type: 'gitbook.structure.navigate' })).toBe(
+            false
+        );
+        expect(
+            isStructurePreviewNavigationMessage({
+                type: 'gitbook.structure.navigate',
+                payload: { sectionId: 1 },
+            })
+        ).toBe(false);
+        expect(
+            isStructurePreviewNavigationMessage({
+                type: 'gitbook.structure.update',
                 payload: { sectionId: 'section-1' },
             })
         ).toBe(false);
