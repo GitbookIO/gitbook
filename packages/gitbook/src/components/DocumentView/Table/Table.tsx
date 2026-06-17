@@ -22,7 +22,7 @@ export type { TableRecordKV };
 /**
  * Only show the table search once there are enough records that searching is useful.
  */
-const MIN_RECORDS_FOR_SEARCH = 4;
+const MIN_RECORDS_FOR_SEARCH = 7;
 
 export interface TableViewProps<View> extends BlockProps<DocumentBlockTable> {
     view: View;
