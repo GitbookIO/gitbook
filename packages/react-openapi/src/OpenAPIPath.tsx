@@ -39,11 +39,7 @@ export function OpenAPIPath(props: OpenAPIPathProps & { context: OpenAPIUniversa
     const defaultServer = getDefaultServerURL(data.servers);
 
     return (
-        <OpenAPIPathItem
-            {...props}
-            value={`${defaultServer}${path}`}
-            context={clientContext}
-        >
+        <OpenAPIPathItem {...props} value={`${defaultServer}${path}`} context={clientContext}>
             {withServer ? <span className="openapi-path-server">{defaultServer}</span> : null}
             {formattedPath}
         </OpenAPIPathItem>
