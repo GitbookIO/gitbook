@@ -33,6 +33,7 @@ export const CodeBlockRenderer = forwardRef(function CodeBlockRenderer(
     const withLineNumbers = Boolean(block.data.lineNumbers) && block.nodes.length > 1;
     const withWrap = block.data.overflow === 'wrap';
     const title = block.data.title;
+    const isSingleLine = theme.lines.length <= 1 && !withWrap;
 
     const id = useId();
     const codeId = props.id || id;
@@ -79,7 +80,12 @@ export const CodeBlockRenderer = forwardRef(function CodeBlockRenderer(
                 ) : null}
             </div>
             <div className="relative flex min-h-0 flex-col">
-                <div className="absolute top-2 right-2 z-2 flex items-start gap-1.5 font-sans leading-none opacity-0 group-hover/codeblock:opacity-11 has-[button:focus-visible]:opacity-11">
+                <div
+                    className={tcls(
+                        'absolute right-2 z-2 flex items-center gap-1.5 font-sans leading-none opacity-0 group-hover/codeblock:opacity-11 has-[button:focus-visible]:opacity-11',
+                        isSingleLine ? 'inset-y-0' : 'top-2'
+                    )}
+                >
                     {!isPrint ? (
                         <AskAICodeButton
                             codeId={codeId}
