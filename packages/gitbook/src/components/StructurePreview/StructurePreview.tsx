@@ -68,6 +68,7 @@ import type {
     StructurePreviewNavigationMessage,
     StructurePreviewSnapshot,
 } from './types';
+import { GITBOOK_APP_URL } from '@/lib/env/globals';
 
 const PREVIEW_CONTENT_REF = {
     kind: 'url',
@@ -80,7 +81,7 @@ export function StructurePreview(props: { initialSnapshot: StructurePreviewSnaps
 
     React.useEffect(() => {
         const handleMessage = (event: MessageEvent<unknown>) => {
-            if (event.source !== window.parent || !isStructurePreviewMessage(event.data)) {
+            if (event.source !== window.parent || event.origin !== GITBOOK_APP_URL || !isStructurePreviewMessage(event.data)) {
                 return;
             }
 
@@ -101,7 +102,7 @@ export function StructurePreview(props: { initialSnapshot: StructurePreviewSnaps
             payload: { sectionId },
         };
 
-        window.parent.postMessage(message, window.location.origin);
+        window.parent.postMessage(message, GITBOOK_APP_URL);
     };
 
     const preventNavigation = (event: React.MouseEvent<HTMLElement>) => {
