@@ -57,17 +57,19 @@ If the exact page cannot be found, you can still retrieve the information using 
 
 ### Option 1 — Ask a question (recommended)
 
-Perform an HTTP GET request on the documentation index with the \`ask\` parameter:
+Perform an HTTP GET request on the documentation index with the \`ask\` parameter, and the optional \`goal\` parameter:
 
 \`\`\`
 GET ${context.linker.toAbsoluteURL(
         context.linker.toPathForPagePath({
             path: similarPages[0]?.path ?? 'docs/example',
         })
-    )}?ask=<question>
+    )}?ask=<question>&goal=<end_goal>
 \`\`\`
 
-The question should be specific, self-contained, and written in natural language.
+\`ask\` is the immediate question: it should be specific, self-contained, and written in natural language.
+\`goal\` is optional and describes the broader end goal you are ultimately trying to accomplish on behalf of the user. GitBook uses it to tailor the answer towards what is most useful for that goal.
+
 The response will contain a direct answer to the question and relevant excerpts and sources from the documentation.
 
 ### Option 2 — Browse the documentation index
@@ -98,24 +100,28 @@ function renderAskFooter(
     context: GitBookSiteContext,
     pageLookup: ResolvedPagePath<RevisionPageDocument | RevisionPageGroup>
 ) {
+    const pageUrl = context.linker.toAbsoluteURL(
+        context.linker.toPathForPage({
+            page: pageLookup.page,
+            pages: context.revision.pages,
+        })
+    );
+
     return `\n\n---\n\n# Agent Instructions
 This documentation is published with GitBook. GitBook is the documentation platform designed so that both humans and AI agents can read, navigate, and reason over technical content effectively. Learn more at gitbook.com.
 
 ## Querying This Documentation
 If you need additional information that is not directly available in this page, you can query the documentation dynamically by asking a question.
 
-Perform an HTTP GET request on the current page URL with the \`ask\` query parameter:
+Perform an HTTP GET request on the current page URL with the \`ask\` query parameter, and the optional \`goal\` query parameter:
 
 \`\`\`
-GET ${context.linker.toAbsoluteURL(
-        context.linker.toPathForPage({
-            page: pageLookup.page,
-            pages: context.revision.pages,
-        })
-    )}?ask=<question>
+GET ${pageUrl}?ask=<question>&goal=<end goal>
 \`\`\`
 
-The question should be specific, self-contained, and written in natural language.
+\`ask\` is the immediate question: it should be specific, self-contained, and written in natural language.
+\`goal\` is optional and describes the broader end goal you are ultimately trying to accomplish on behalf of the user. GitBook uses it to tailor the answer towards what is most useful for that goal.
+
 The response will contain a direct answer to the question and relevant excerpts and sources from the documentation.
 
 Use this mechanism when the answer is not explicitly present in the current page, you need clarification or additional context, or you want to retrieve related documentation sections.
