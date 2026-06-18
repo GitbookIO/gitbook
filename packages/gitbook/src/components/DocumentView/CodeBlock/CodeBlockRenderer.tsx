@@ -98,7 +98,7 @@ export const CodeBlockRenderer = forwardRef(function CodeBlockRenderer(
                 </div>
                 <pre
                     className={tcls(
-                        'relative overflow-auto border border-tint-subtle bg-tint-subtle theme-bold-tint:bg-tint-base theme-muted:bg-tint-base py-2 text-tint-strong contrast-more:border-tint contrast-more:bg-tint-base print:overflow-visible',
+                        'relative overflow-auto border border-tint-subtle bg-tint-subtle theme-bold-tint:bg-tint-base theme-muted:bg-tint-base py-2.5 text-tint-strong contrast-more:border-tint contrast-more:bg-tint-base print:overflow-visible',
                         'circular-corners:rounded-2xl rounded-corners:rounded-xl straight-corners:rounded-xs depth-subtle:shadow-xs',
                         title && 'rounded-ss-none!'
                     )}
