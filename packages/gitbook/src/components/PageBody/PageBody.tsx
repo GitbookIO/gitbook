@@ -106,18 +106,20 @@ export async function PageBody(props: {
                         fallback={<DocumentViewSkeleton document={document} blockStyle="" />}
                     >
                         <SuspenseLoadedHint />
-                        <DocumentView
-                            document={document}
-                            style="flex flex-col [&>*+*]:mt-5"
-                            context={{
-                                mode: 'default',
-                                contentContext: {
-                                    ...context,
-                                    page,
-                                },
-                                withLinkPreviews,
-                            }}
-                        />
+                        <div className="contents" data-content-ref-root="">
+                            <DocumentView
+                                document={document}
+                                style="flex flex-col [&>*+*]:mt-5"
+                                context={{
+                                    mode: 'default',
+                                    contentContext: {
+                                        ...context,
+                                        page,
+                                    },
+                                    withLinkPreviews,
+                                }}
+                            />
+                        </div>
                     </OptionalSuspense>
                 ) : (
                     <PageBodyBlankslate page={page} context={context} />
