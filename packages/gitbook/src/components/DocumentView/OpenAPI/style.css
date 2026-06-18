@@ -149,7 +149,7 @@
 }
 
 .openapi-column-preview {
-    @apply flex flex-col flex-1 sticky self-start max-h-[calc(100vh-var(--toc-top-offset))] scroll-mt-4 top-(calc(var(--toc-top-offset)+0.5rem));
+    @apply flex flex-col flex-1 sticky self-start max-h-[calc(100vh-var(--toc-top-offset))] scroll-mt-4 top-[calc(var(--toc-top-offset)+1.5rem)];
 }
 
 .openapi-column-preview-body {
