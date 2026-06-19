@@ -1,0 +1,220 @@
+'use client';
+
+import { Button, ButtonGroup } from '@/components/primitives/Button';
+import { DropdownMenu, DropdownMenuItem } from '@/components/primitives/DropdownMenu';
+import { ToggleChevron } from '@/components/primitives/ToggleChevron';
+import { tString, useLanguage } from '@/intl/client';
+import { tcls } from '@/lib/tailwind';
+import { Icon, type IconName } from '@gitbook/icons';
+import React from 'react';
+
+const OPEN_IN_AI_PROVIDERS = ['claude', 'chatgpt', 'cursor'] as const;
+type AIProviders = (typeof OPEN_IN_AI_PROVIDERS)[number];
+
+export function PromptClient(props: {
+    contentIcon: IconName | null;
+    description: string;
+    prompt: string;
+    openInAIProviders: boolean;
+}) {
+    const { contentIcon, description, prompt, openInAIProviders } = props;
+    const language = useLanguage();
+    const promptId = React.useId();
+    const [open, setOpen] = React.useState(false);
+    const [headerHasFocus, setHeaderHasFocus] = React.useState(false);
+    return (
+        <>
+            <div className="group/prompt-header relative flex min-h-9 flex-row items-center justify-between gap-4 px-3 py-2">
+                <button
+                    type="button"
+                    aria-controls={promptId}
+                    aria-expanded={open}
+                    aria-label={tString(language, 'view')}
+                    className={tcls(
+                        'absolute inset-0 z-10 cursor-pointer outline-hidden',
+                        'focus-visible:ring-2 focus-visible:ring-primary-hover'
+                    )}
+                    disabled={!prompt}
+                    onBlur={() => setHeaderHasFocus(false)}
+                    onClick={() => setOpen((prev) => !prev)}
+                    onFocus={() => setHeaderHasFocus(true)}
+                />
+                <div className="pointer-events-none relative z-0 flex min-w-0 flex-row items-center gap-2 text-tint-strong">
+                    <PromptDisclosureIcon
+                        contentIcon={contentIcon}
+                        headerHasFocus={headerHasFocus}
+                        open={open}
+                    />
+                    <span className="min-w-0 truncate">{description}</span>
+                </div>
+                <PromptActions prompt={prompt} openInAIProviders={openInAIProviders} />
+            </div>
+            {open ? (
+                <div id={promptId} className="border-tint-subtle border-t bg-tint-base">
+                    <pre className="overflow-auto p-4 text-sm text-tint-strong">
+                        <code className="language-markdown whitespace-pre-wrap font-mono">
+                            {prompt}
+                        </code>
+                    </pre>
+                </div>
+            ) : null}
+        </>
+    );
+}
+
+function PromptDisclosureIcon(props: {
+    contentIcon: IconName | null;
+    headerHasFocus: boolean;
+    open: boolean;
+}) {
+    const { contentIcon, headerHasFocus, open } = props;
+    return (
+        <span className="relative flex size-4 shrink-0 items-center justify-center">
+            {contentIcon ? (
+                <>
+                    <span
+                        className={tcls(
+                            'flex items-center transition-opacity duration-150 group-hover/prompt-header:opacity-0',
+                            headerHasFocus && 'opacity-0'
+                        )}
+                    >
+                        <Icon icon={contentIcon} className="size-4 shrink-0" />
+                    </span>
+                    <span
+                        className={tcls(
+                            'absolute inset-0 flex items-center justify-center text-tint-subtle opacity-0 transition-opacity duration-150 group-hover/prompt-header:opacity-100',
+                            headerHasFocus && 'opacity-100'
+                        )}
+                    >
+                        <ToggleChevron open={open} orientation="right-to-down" className="size-3" />
+                    </span>
+                </>
+            ) : (
+                <ToggleChevron
+                    open={open}
+                    orientation="right-to-down"
+                    className="size-3 text-tint-subtle"
+                />
+            )}
+        </span>
+    );
+}
+
+function PromptActions(props: { prompt: string; openInAIProviders: boolean }) {
+    const { prompt, openInAIProviders } = props;
+
+    return (
+        <ButtonGroup className="relative z-20 shrink-0 overflow-visible">
+            <CopyPromptButton prompt={prompt} />
+            {openInAIProviders ? <OpenPromptDropdown prompt={prompt} /> : null}
+        </ButtonGroup>
+    );
+}
+
+// time in milliseconds to show the "Copied" message after copying a prompt
+const COPIED_MESSAGE_DURATION = 1000;
+
+function CopyPromptButton(props: { prompt: string }) {
+    const { prompt } = props;
+    const language = useLanguage();
+    const [copied, setCopied] = React.useState(false);
+
+    React.useEffect(() => {
+        if (!copied) {
+            return;
+        }
+
+        const timeout = setTimeout(() => {
+            setCopied(false);
+        }, COPIED_MESSAGE_DURATION);
+
+        return () => {
+            clearTimeout(timeout);
+        };
+    }, [copied]);
+
+    return (
+        <Button
+            variant="secondary"
+            size="xsmall"
+            icon={copied ? 'check' : 'copy'}
+            label={copied ? tString(language, 'code_copied') : tString(language, 'prompt_copy')}
+            className="bg-tint-base"
+            disabled={!prompt}
+            onClick={() => {
+                navigator.clipboard.writeText(prompt);
+                setCopied(true);
+            }}
+        />
+    );
+}
+
+function OpenPromptDropdown(props: { prompt: string }) {
+    const { prompt } = props;
+    const language = useLanguage();
+
+    return (
+        <DropdownMenu
+            align="end"
+            className="!min-w-48 max-w-max"
+            button={
+                <Button
+                    icon={<ToggleChevron className="size-text-sm" />}
+                    label={tString(language, 'open')}
+                    iconOnly
+                    size="xsmall"
+                    variant="secondary"
+                    className="bg-tint-base"
+                    disabled={!prompt}
+                />
+            }
+        >
+            {OPEN_IN_AI_PROVIDERS.map((provider) => {
+                const definition = getPromptOpenActionDefinition(provider, prompt);
+
+                return (
+                    <DropdownMenuItem
+                        key={provider}
+                        href={definition.href}
+                        target="_blank"
+                        leadingIcon={definition.icon}
+                    >
+                        {tString(language, 'open_in', definition.label)}
+                    </DropdownMenuItem>
+                );
+            })}
+        </DropdownMenu>
+    );
+}
+
+function getPromptOpenActionDefinition(
+    action: AIProviders,
+    prompt: string
+): { href: string; icon: IconName; label: string } {
+    const encodedPrompt = encodeURIComponent(prompt);
+
+    switch (action) {
+        case 'cursor':
+            return {
+                href: `${CURSOR_PROMPT_URL}?text=${encodedPrompt}`,
+                icon: 'cursor',
+                label: 'Cursor',
+            };
+        case 'claude':
+            return {
+                href: `${CLAUDE_PROMPT_URL}?q=${encodedPrompt}`,
+                icon: 'claude',
+                label: 'Claude',
+            };
+        case 'chatgpt':
+            return {
+                href: `${CHATGPT_PROMPT_URL}?q=${encodedPrompt}`,
+                icon: 'chatgpt',
+                label: 'ChatGPT',
+            };
+    }
+}
+
+const CLAUDE_PROMPT_URL = 'https://claude.ai/new';
+const CHATGPT_PROMPT_URL = 'https://chat.openai.com/';
+const CURSOR_PROMPT_URL = 'https://cursor.com/link/prompt';

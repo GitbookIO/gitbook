@@ -56,6 +56,7 @@ export const hu: TranslationLanguage = {
     annotation_button_label: 'Jegyzet megnyitása',
     code_copied: 'Másolva!',
     code_copy: 'Másolás',
+    prompt_copy: 'Copy prompt',
     code_block_collapsed: 'Mind a(z) ${1} sor megjelenítése',
     code_block_expanded: 'Kevesebb megjelenítése',
     table_of_contents_button_label: 'Tartalomjegyzék megnyitása',

@@ -56,6 +56,7 @@ export const sk: TranslationLanguage = {
     annotation_button_label: 'Otvoriť anotáciu',
     code_copied: 'Skopírované!',
     code_copy: 'Kopírovať',
+    prompt_copy: 'Copy prompt',
     code_block_collapsed: 'Zobraziť všetkých ${1} riadkov',
     code_block_expanded: 'Zobraziť menej',
     table_of_contents_button_label: 'Otvoriť obsah',

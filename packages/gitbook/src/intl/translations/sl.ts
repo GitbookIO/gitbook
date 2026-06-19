@@ -56,6 +56,7 @@ export const sl: TranslationLanguage = {
     annotation_button_label: 'Odpri opombo',
     code_copied: 'Kopirano!',
     code_copy: 'Kopiraj',
+    prompt_copy: 'Copy prompt',
     code_block_collapsed: 'Prikaži vseh ${1} vrstic',
     code_block_expanded: 'Prikaži manj',
     table_of_contents_button_label: 'Odpri kazalo',

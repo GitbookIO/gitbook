@@ -56,6 +56,7 @@ export const bg: TranslationLanguage = {
     annotation_button_label: 'Отваряне на бележка',
     code_copied: 'Копирано!',
     code_copy: 'Копиране',
+    prompt_copy: 'Copy prompt',
     code_block_collapsed: 'Показване на всички ${1} реда',
     code_block_expanded: 'Показване на по-малко',
     table_of_contents_button_label: 'Отваряне на съдържанието',

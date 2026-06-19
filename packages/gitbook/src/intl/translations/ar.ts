@@ -56,6 +56,7 @@ export const ar: TranslationLanguage = {
     annotation_button_label: 'فتح التعليق التوضيحي',
     code_copied: 'تم النسخ!',
     code_copy: 'نسخ',
+    prompt_copy: 'Copy prompt',
     code_block_collapsed: 'عرض كل الأسطر ${1}',
     code_block_expanded: 'عرض أقل',
     table_of_contents_button_label: 'فتح جدول المحتويات',

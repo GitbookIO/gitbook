@@ -56,6 +56,7 @@ export const lt: TranslationLanguage = {
     annotation_button_label: 'Atidaryti pastabą',
     code_copied: 'Nukopijuota!',
     code_copy: 'Kopijuoti',
+    prompt_copy: 'Copy prompt',
     code_block_collapsed: 'Rodyti visas ${1} eilutes',
     code_block_expanded: 'Rodyti mažiau',
     table_of_contents_button_label: 'Atidaryti turinį',

@@ -28,6 +28,8 @@ import { ListItem } from './ListItem';
 import { BlockMath } from './Math';
 import { OpenAPIOperation, OpenAPISchemas, OpenAPIWebhook } from './OpenAPI';
 import { Paragraph } from './Paragraph';
+import { Prompt } from './Prompt';
+import type { PromptBlock } from './Prompt/types';
 import { Quote } from './Quote';
 import { ReusableContent } from './ReusableContent';
 import { Stepper } from './Stepper';
@@ -37,7 +39,9 @@ import { Tabs } from './Tabs';
 import { Update } from './Update';
 import { Updates } from './Updates';
 
-export interface BlockProps<Block extends DocumentBlock> extends DocumentContextProps {
+type SupportedDocumentBlock = DocumentBlock | PromptBlock;
+
+export interface BlockProps<Block extends SupportedDocumentBlock> extends DocumentContextProps {
     block: Block;
     document: JSONDocument;
     ancestorBlocks: DocumentBlock[];
@@ -47,7 +51,7 @@ export interface BlockProps<Block extends DocumentBlock> extends DocumentContext
     style?: ClassValue;
 }
 
-export function Block<T extends DocumentBlock>(props: BlockProps<T>) {
+export function Block<T extends SupportedDocumentBlock>(props: BlockProps<T>) {
     const { block } = props;
 
     const content = (() => {
@@ -111,6 +115,8 @@ export function Block<T extends DocumentBlock>(props: BlockProps<T>) {
                 return <Updates {...props} block={block} />;
             case 'update':
                 return <Update {...props} block={block} />;
+            case 'prompt':
+                return <Prompt {...props} block={block} />;
             case 'if':
                 // If block should be processed by the API.
                 return null;
