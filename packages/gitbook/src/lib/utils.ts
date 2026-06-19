@@ -1,4 +1,5 @@
 import * as api from '@gitbook/api';
+import { CustomizationPageActionType } from '@gitbook/api';
 
 /**
  * Return the default customization settings for a site.
@@ -78,6 +79,11 @@ export function defaultCustomization(): api.SiteCustomizationSettings {
             externalAI: true,
             markdown: true,
             mcp: true,
+            items: [
+                CustomizationPageActionType.Markdown,
+                CustomizationPageActionType.ExternalAi,
+                CustomizationPageActionType.Mcp,
+            ],
         },
         trademark: {
             enabled: true,

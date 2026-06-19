@@ -7,7 +7,7 @@
       "devDependencies": {
         "@biomejs/biome": "^1.9.4",
         "@changesets/cli": "^2.31.0",
-        "turbo": "^2.9.15",
+        "turbo": "^2.9.18",
         "vercel": "50.37.3",
       },
     },
@@ -360,7 +360,7 @@
     "react-dom": "catalog:",
   },
   "catalog": {
-    "@gitbook/api": "0.183.0",
+    "@gitbook/api": "0.184.0",
     "@scalar/api-client-react": "^1.3.46",
     "@tsconfig/node20": "^20.1.6",
     "@tsconfig/strictest": "^2.0.6",
@@ -756,7 +756,7 @@
 
     "@fortawesome/fontawesome-svg-core": ["@fortawesome/fontawesome-svg-core@7.2.0", "", { "dependencies": { "@fortawesome/fontawesome-common-types": "7.2.0" } }, "sha512-6639htZMjEkwskf3J+e6/iar+4cTNM9qhoWuRfj9F3eJD6r7iCzV1SWnQr2Mdv0QT0suuqU8BoJCZUyCtP9R4Q=="],
 
-    "@gitbook/api": ["@gitbook/api@0.183.0", "", { "dependencies": { "event-iterator": "^2.0.0", "eventsource-parser": "^3.0.0" } }, "sha512-0+6VyRH7me5AtzU+mwZVFHDaJudtnHYEcxwQ/qO7p2swj7dOe/dOevfaphgx+pUvhXAg7VVlihETaAW/WsLTzQ=="],
+    "@gitbook/api": ["@gitbook/api@0.184.0", "", { "dependencies": { "event-iterator": "^2.0.0", "eventsource-parser": "^3.0.0" } }, "sha512-yPoQqLLik6IihFcwVVbuEAIyDA7F2q80HprNRuj10m+O2XULlm4+bW5R71r5/GCjDKSf5QfmRXmYh4OopljPKw=="],
 
     "@gitbook/browser-types": ["@gitbook/browser-types@workspace:packages/browser-types"],
 

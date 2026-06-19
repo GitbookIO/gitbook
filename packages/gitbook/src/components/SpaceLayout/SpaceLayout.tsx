@@ -14,7 +14,7 @@ import { GITBOOK_APP_URL } from '@/lib/env';
 import { tcls } from '@/lib/tailwind';
 import { AIChatProvider } from '../AI';
 import type { RenderAIMessageOptions } from '../AI';
-import { AIChat } from '../AIChat';
+import { AIChat, AskAITextSelection } from '../AIChat';
 import { AdaptiveVisitorContextProvider } from '../Adaptive';
 import { Announcement } from '../Announcement';
 import { OpenAPICodeSampleAIProvider } from '../DocumentView/OpenAPI/OpenAPICodeSampleAIProvider';
@@ -130,7 +130,12 @@ export function SpaceLayout(props: SpaceLayoutProps) {
             <Announcement context={context} />
             <Header withTopHeader={withTopHeader} variants={variants} context={context} />
             <NavigationLoader />
-            {customization.ai?.mode === CustomizationAIMode.Assistant ? <AIChat /> : null}
+            {customization.ai?.mode === CustomizationAIMode.Assistant ? (
+                <>
+                    <AIChat />
+                    <AskAITextSelection />
+                </>
+            ) : null}
 
             {/* Chat panel shifts content left when open */}
             <div className="motion-safe:transition-all motion-safe:duration-300 lg:chat-open:mr-80 xl:chat-open:mr-96">

@@ -22,7 +22,7 @@ export function AIChatMessages(props: {
 }) {
     const { chat, chatController } = props;
     const status = getAIChatStatus(chat);
-    const showLoadingShim = chat.loading && status !== 'working' && status !== 'done';
+    const showLoadingShim = chat.responding && status !== 'working' && status !== 'done';
 
     // Group messages: user messages start a new group, all following messages until next user message belong to that group
     type MessageGroup = { message: AIChatMessage; originalIndex: number };
@@ -139,19 +139,21 @@ export function AIChatMessages(props: {
                                     className="-mx-3 -my-1.5 group/dropdown animate-blur-in-display-slow self-start"
                                 >
                                     <div className="flex items-center gap-2">
-                                        {toolCount > 0
-                                            ? t(
-                                                  language,
-                                                  'ai_chat_explored_with',
-                                                  tString(
+                                        <span data-testid="ai-chat-activity-summary">
+                                            {toolCount > 0
+                                                ? t(
                                                       language,
-                                                      toolCount === 1
-                                                          ? 'tool_count'
-                                                          : 'tool_count_plural',
-                                                      toolCount.toString()
+                                                      'ai_chat_explored_with',
+                                                      tString(
+                                                          language,
+                                                          toolCount === 1
+                                                              ? 'tool_count'
+                                                              : 'tool_count_plural',
+                                                          toolCount.toString()
+                                                      )
                                                   )
-                                              )
-                                            : t(language, 'ai_chat_explored')}
+                                                : t(language, 'ai_chat_explored')}
+                                        </span>
                                         <ToggleChevron orientation="right-to-down" />
                                     </div>
                                 </Button>
@@ -184,7 +186,7 @@ export function AIChatMessages(props: {
 
                         {isLastMessage ? (
                             <>
-                                {!chat.loading &&
+                                {!chat.responding &&
                                 !chat.error &&
                                 chat.query &&
                                 chat.responseId &&

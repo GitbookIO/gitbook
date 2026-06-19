@@ -1,6 +1,6 @@
 'use client';
 
-import { useAIChatState } from '@/components/AI';
+import { useAIChatController, useAIChatState } from '@/components/AI';
 import type { Assistant } from '@/components/AI';
 import { Button } from '@/components/primitives/Button';
 import { DropdownMenuItem, useDropdownMenuClose } from '@/components/primitives/DropdownMenu';
@@ -16,11 +16,27 @@ import { createStore, useStore } from 'zustand';
 type PageActionType = 'button' | 'dropdown-menu-item';
 
 /**
+ * Context about the current page, attached to the assistant as a reference when opened.
+ */
+export type PageActionAssistantContext = {
+    id: string;
+    title: string;
+    path?: string;
+    /** Site-relative href of the page, used to navigate back to it from the chip. */
+    href?: string;
+};
+
+/**
  * Action to open the GitBook Assistant.
  */
-export function ActionOpenAssistant(props: { assistant: Assistant; type: PageActionType }) {
-    const { assistant, type } = props;
+export function ActionOpenAssistant(props: {
+    assistant: Assistant;
+    type: PageActionType;
+    page?: PageActionAssistantContext;
+}) {
+    const { assistant, type, page } = props;
     const chat = useAIChatState();
+    const chatController = useAIChatController();
     const language = useLanguage();
 
     return (
@@ -30,8 +46,20 @@ export function ActionOpenAssistant(props: { assistant: Assistant; type: PageAct
             label={assistant.label}
             shortLabel={tString(language, 'ask')}
             description={tString(language, 'ai_chat_ask_about_page', assistant.label)}
-            disabled={chat.loading}
+            disabled={chat.responding}
             onClick={() => {
+                // Stage a reference to the current page so the assistant is informed about
+                // the context the user is asking from. Only the sidebar GitBook Assistant
+                // uses the chat reference system.
+                if (page && assistant.mode === 'sidebar') {
+                    chatController.addReference({
+                        type: 'page',
+                        id: page.id,
+                        label: page.title,
+                        path: page.path,
+                        href: page.href,
+                    });
+                }
                 assistant.open();
             }}
         />

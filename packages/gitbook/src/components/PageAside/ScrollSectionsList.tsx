@@ -7,6 +7,7 @@ import type { DocumentSection } from '@/lib/document-sections';
 import { tcls } from '@/lib/tailwind';
 
 import { useBodyLoaded } from '@/components/primitives';
+import { OpenAPIMethodBadge } from '@gitbook/react-openapi';
 import { HEADER_HEIGHT_DESKTOP } from '../layout';
 
 /**
@@ -141,11 +142,11 @@ export function ScrollSectionsList({ sections }: { sections: DocumentSection[] }
                         )}
                     >
                         {section.tag ? (
-                            <span
-                                className={`-mt-0.5 openapi-method text-xs! openapi-method-${section.tag.toLowerCase()}`}
-                            >
-                                {section.tag}
-                            </span>
+                            <OpenAPIMethodBadge
+                                method={section.tag}
+                                size="small"
+                                className="-mt-0.5"
+                            />
                         ) : null}
 
                         <span

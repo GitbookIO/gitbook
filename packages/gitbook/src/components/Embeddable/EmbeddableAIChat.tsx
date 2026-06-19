@@ -79,7 +79,7 @@ export function EmbeddableAIChat(props: EmbeddableAIChatProps) {
                 <EmbeddableIframeButtons />
                 <EmbeddableIframeCloseButton />
             </EmbeddableFrameSidebar>
-            <EmbeddableFrameMain data-testid="ai-chat">
+            <EmbeddableFrameMain data-testid="ai-chat" aria-busy={chat.loading}>
                 <EmbeddableFrameHeader>
                     {!tabsRef.current ? (
                         <AIChatDynamicIcon className="animate-blur-in-slow" trademark={trademark} />

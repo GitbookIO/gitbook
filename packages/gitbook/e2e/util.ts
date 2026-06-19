@@ -13,6 +13,7 @@ import {
     CustomizationIconsStyle,
     CustomizationLinksStyle,
     CustomizationLocale,
+    CustomizationPageActionType,
     CustomizationSearchStyle,
     CustomizationSidebarBackgroundStyle,
     CustomizationSidebarListStyle,
@@ -21,7 +22,14 @@ import {
     type SiteCustomizationSettings,
     SiteExternalLinksTarget,
 } from '@gitbook/api';
-import { type BrowserContext, type Page, type Response, expect, test } from '@playwright/test';
+import {
+    type BrowserContext,
+    type FrameLocator,
+    type Page,
+    type Response,
+    expect,
+    test,
+} from '@playwright/test';
 import deepMerge from 'deepmerge';
 import rison from 'rison';
 import type { DeepPartial } from 'ts-essentials';
@@ -39,6 +47,16 @@ export interface Test {
      * Test to run
      */
     run?: (page: Page, response: Response | null) => Promise<unknown>;
+    /**
+     * Re-applied right before every viewport screenshot (after Argos
+     * stabilization), so it survives re-renders triggered by viewport resizing.
+     *
+     * Use this — rather than mutating the DOM once in `run` — to normalize
+     * non-deterministic content (e.g. AI responses). A one-time mutation in `run`
+     * is clobbered when React re-renders on resize (e.g. crossing the mobile
+     * breakpoint), so only the first viewport ends up normalized.
+     */
+    normalizeBeforeScreenshot?: (page: Page) => Promise<void> | void;
     /**
      * Mode for the test.
      */
@@ -159,6 +177,28 @@ export async function waitForNotFound(_page: Page, response: Response | null) {
     expect(response?.status()).toBe(404);
 }
 
+/**
+ * Wait for an AI chat response to be fully settled before asserting or
+ * screenshotting it.
+ *
+ * The chat exposes `aria-busy` on its container (`[data-testid="ai-chat"]`),
+ * which stays true from the moment a message is sent until the stream — including
+ * the follow-up suggestion phase — completes. Gating on it avoids the two main
+ * sources of flakiness: capturing a "thinking" placeholder or a half-streamed
+ * answer, and running the content normalization while React is still re-rendering
+ * (which would clobber the replacements).
+ *
+ * Argos also waits for `aria-busy` to clear during its own stabilization
+ * (`waitForAriaBusy`), so this is both an explicit gate and a backstop.
+ *
+ * Accepts a `Page` or a `FrameLocator` (for the embedded assistant in an iframe).
+ */
+export async function waitForAIChatResponse(scope: Page | FrameLocator) {
+    await expect(scope.getByTestId('ai-chat')).toHaveAttribute('aria-busy', 'false', {
+        timeout: 60_000,
+    });
+}
+
 export async function setTimeToMorning(page: Page) {
     const now = new Date();
     now.setHours(8, 0, 0, 0); // 8:00:00.000 AM (local time)
@@ -253,6 +293,9 @@ export function runTestCases(testCases: TestsCase[]) {
                                         await waitForTOCScrolling(page);
                                     }
                                     await waitForIcons(page);
+                                    // Re-apply per viewport, last — after any resize-driven
+                                    // re-render — so normalized content survives to capture.
+                                    await testEntry.normalizeBeforeScreenshot?.(page);
                                 },
                             });
                         }
@@ -372,6 +415,11 @@ export function getCustomizationURL(partial: DeepPartial<SiteCustomizationSettin
             externalAI: true,
             markdown: true,
             mcp: true,
+            items: [
+                CustomizationPageActionType.Markdown,
+                CustomizationPageActionType.ExternalAi,
+                CustomizationPageActionType.Mcp,
+            ],
         },
         trademark: {
             enabled: true,

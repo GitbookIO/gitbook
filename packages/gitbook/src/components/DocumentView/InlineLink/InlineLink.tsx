@@ -151,10 +151,7 @@ function InlineLinkTooltipWrapper(props: {
         <InlineLinkTooltip
             breadcrumbs={breadcrumbs}
             isExternal={isExternal}
-            isSamePage={isSamePage}
-            openInNewTabLabel={tString(language, 'open_in_new_tab')}
             target={{
-                href: resolved.href,
                 text: resolved.text,
                 subText: resolved.subText,
                 icon: resolved.icon,
