@@ -44,8 +44,7 @@ export function AskAIParagraphButton(props: { content: string; className?: Class
             className={tcls(
                 // Sit in the left margin, flush against the paragraph so there is no hover gap.
                 'absolute top-0 right-full z-10 pr-1',
-                // Per-block nudges: `in-[…]` matches an ancestor (tag or class) with no markup
-                // changes elsewhere — add a self-contained rule per block type to clear its gutter.
+                // Per-block nudges (see blockContextOffset above).
                 'in-[.hint]:-top-0.5 in-[.hint]:pr-2',
                 'in-[blockquote]:pr-0',
                 // Hover affordance only: hidden until the paragraph (or the button) is hovered.
@@ -73,7 +72,7 @@ export function AskAIParagraphButton(props: { content: string; className?: Class
                 onMouseDown={(event) => event.preventDefault()}
                 className={tcls(
                     'bg-tint-base',
-                    'in-[.hint.bg-danger]:bg-danger in-[.hint.bg-info]:bg-info in-[.hint.bg-success]:bg-success in-[.hint.bg-warning]:bg-warning opacity-50 hover:opacity-100'
+                    'in-[.hint.bg-danger]:bg-danger in-[.hint.bg-info]:bg-info in-[.hint.bg-success]:bg-success in-[.hint.bg-warning]:bg-warning'
                 )}
             />
         </div>
