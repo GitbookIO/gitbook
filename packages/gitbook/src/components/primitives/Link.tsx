@@ -180,13 +180,10 @@ export function Link(props: LinkProps) {
     );
 }
 
-const ASK_QUERY_PARAM = 'ask';
-const VISITOR_PARAM_PREFIX = 'visitor.';
-
 /**
  * Whether the given href carries query params that have a server-side side effect when fetched:
  *   - `visitor.*` params persist unsigned visitor claims into the `gitbook-visitor-public` cookie.
- *   - `ask` triggers the assistant.
+ *   - `ask` triggers the assistant & `q` the search.
  *
  * NextLink automatically prefetches links (RSC requests) on hover/viewport, which would fire those
  * side effects without any user intent, so such links should not be prefetched.
@@ -195,12 +192,12 @@ function hasSideEffectQueryParams(href: string): boolean {
     const baseURL = typeof window !== 'undefined' ? window.location.origin : 'http://localhost';
     const linkURL = URL.canParse(href) ? new URL(href) : new URL(href, baseURL);
 
-    if (linkURL.searchParams.get(ASK_QUERY_PARAM)) {
+    if (linkURL.searchParams.get('ask') !== null || linkURL.searchParams.get('q') !== null) {
         return true;
     }
 
     for (const key of linkURL.searchParams.keys()) {
-        if (key.startsWith(VISITOR_PARAM_PREFIX)) {
+        if (key.startsWith('visitor.')) {
             return true;
         }
     }
