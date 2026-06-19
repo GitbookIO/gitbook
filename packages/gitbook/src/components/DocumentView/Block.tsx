@@ -29,7 +29,6 @@ import { BlockMath } from './Math';
 import { OpenAPIOperation, OpenAPISchemas, OpenAPIWebhook } from './OpenAPI';
 import { Paragraph } from './Paragraph';
 import { Prompt } from './Prompt';
-import type { PromptBlock } from './Prompt/types';
 import { Quote } from './Quote';
 import { ReusableContent } from './ReusableContent';
 import { Stepper } from './Stepper';
@@ -39,9 +38,7 @@ import { Tabs } from './Tabs';
 import { Update } from './Update';
 import { Updates } from './Updates';
 
-type SupportedDocumentBlock = DocumentBlock | PromptBlock;
-
-export interface BlockProps<Block extends SupportedDocumentBlock> extends DocumentContextProps {
+export interface BlockProps<Block extends DocumentBlock> extends DocumentContextProps {
     block: Block;
     document: JSONDocument;
     ancestorBlocks: DocumentBlock[];
@@ -51,7 +48,7 @@ export interface BlockProps<Block extends SupportedDocumentBlock> extends Docume
     style?: ClassValue;
 }
 
-export function Block<T extends SupportedDocumentBlock>(props: BlockProps<T>) {
+export function Block<T extends DocumentBlock>(props: BlockProps<T>) {
     const { block } = props;
 
     const content = (() => {
@@ -157,6 +154,7 @@ export function BlockSkeleton(props: { block: DocumentBlock; style: ClassValue }
         case 'hint':
         case 'tabs':
         case 'stepper-step':
+        case 'prompt':
         case 'if':
             return <SkeletonParagraph id={id} className={style} />;
         case 'expandable':
