@@ -33,6 +33,7 @@ export const CodeBlockRenderer = forwardRef(function CodeBlockRenderer(
     const withLineNumbers = Boolean(block.data.lineNumbers) && block.nodes.length > 1;
     const withWrap = block.data.overflow === 'wrap';
     const title = block.data.title;
+    const isSingleLine = theme.lines.length <= 1 && !withWrap;
 
     const id = useId();
     const codeId = props.id || id;
@@ -79,7 +80,12 @@ export const CodeBlockRenderer = forwardRef(function CodeBlockRenderer(
                 ) : null}
             </div>
             <div className="relative flex min-h-0 flex-col">
-                <div className="absolute top-2 right-2 z-2 flex items-start gap-1.5 font-sans leading-none opacity-0 group-hover/codeblock:opacity-11 has-[button:focus-visible]:opacity-11">
+                <div
+                    className={tcls(
+                        'absolute right-2 z-2 flex items-center gap-1.5 font-sans leading-none opacity-0 group-hover/codeblock:opacity-11 has-[button:focus-visible]:opacity-11',
+                        isSingleLine ? 'inset-y-0' : 'top-2'
+                    )}
+                >
                     {!isPrint ? (
                         <AskAICodeButton
                             codeId={codeId}
@@ -92,7 +98,7 @@ export const CodeBlockRenderer = forwardRef(function CodeBlockRenderer(
                 </div>
                 <pre
                     className={tcls(
-                        'relative overflow-auto border border-tint-subtle bg-tint-subtle theme-bold-tint:bg-tint-base theme-muted:bg-tint-base py-2 text-tint-strong contrast-more:border-tint contrast-more:bg-tint-base print:overflow-visible',
+                        'relative overflow-auto border border-tint-subtle bg-tint-subtle theme-bold-tint:bg-tint-base theme-muted:bg-tint-base py-2.5 text-tint-strong contrast-more:border-tint contrast-more:bg-tint-base print:overflow-visible',
                         'circular-corners:rounded-2xl rounded-corners:rounded-xl straight-corners:rounded-xs depth-subtle:shadow-xs',
                         title && 'rounded-ss-none!'
                     )}
