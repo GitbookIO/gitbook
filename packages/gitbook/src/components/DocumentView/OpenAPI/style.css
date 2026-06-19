@@ -40,7 +40,7 @@
 
 .openapi-deprecated,
 .openapi-stability {
-    @apply py-0.5 px-1.5 min-w-[1.625rem] font-normal w-fit justify-center items-center ring-1 ring-inset ring-tint bg-tint rounded straight-corners:rounded-none circular-corners:rounded-sm text-sm leading-[calc(max(1.20em,1.25rem))] before:content-none! after:!content-none;
+    @apply py-0.5 px-1.5 min-w-[1.625rem] font-normal w-fit justify-center items-center ring-1 ring-inset ring-tint bg-tint rounded-md straight-corners:rounded-none circular-corners:rounded-lg text-sm leading-[calc(max(1.20em,1.25rem))] before:content-none! after:!content-none;
 }
 
 .openapi-stability-alpha {
@@ -78,7 +78,7 @@
 }
 
 .openapi-markdown code {
-    @apply py-px px-1 min-w-[1.625rem] font-normal w-fit justify-center items-center ring-1 ring-inset ring-tint bg-tint rounded straight-corners:rounded-none circular-corners:rounded-md text-sm leading-[calc(max(1.20em,1.25rem))] before:content-none! after:!content-none;
+    @apply py-px px-1 min-w-[1.625rem] font-normal w-fit justify-center items-center ring-1 ring-inset ring-tint bg-tint rounded-md straight-corners:rounded-none circular-corners:rounded-lg text-sm leading-[calc(max(1.20em,1.25rem))] before:content-none! after:!content-none;
 }
 
 .openapi-markdown pre code {
@@ -160,7 +160,7 @@
 }
 
 .openapi-column-preview {
-    @apply flex flex-col flex-1 xl:max-2xl:pt-20 lg:pt-6 sticky self-start max-h-[calc(100vh-var(--toc-top-offset))] top-(--toc-top-offset);
+    @apply flex flex-col flex-1 sticky self-start max-h-[calc(100vh-var(--toc-top-offset))] scroll-mt-4 top-[calc(var(--toc-top-offset)+1.5rem)];
 }
 
 .openapi-column-preview-body {
@@ -287,11 +287,11 @@
 }
 
 .openapi-schema-enum-value:first-child {
-    @apply rounded-l straight-corners:rounded-none circular-corners:rounded-l-md ml-0;
+    @apply rounded-l-md straight-corners:rounded-none circular-corners:rounded-l-lg ml-0;
 }
 
 .openapi-schema-enum-value:last-child {
-    @apply rounded-r straight-corners:rounded-none circular-corners:rounded-r-md;
+    @apply rounded-r-md straight-corners:rounded-none circular-corners:rounded-r-lg;
 }
 
 /* Schema Description */
@@ -325,7 +325,7 @@
 .openapi-schema-pattern code,
 .openapi-schema-enum-value code,
 .openapi-schema-default code {
-    @apply py-px px-1 min-w-[1.625rem] text-tint-strong font-normal w-fit justify-center items-center ring-1 ring-inset ring-tint-subtle bg-tint rounded straight-corners:rounded-none circular-corners:rounded-md text-xs leading-[calc(max(1.20em,1.25rem))] before:content-none! after:!content-none;
+    @apply py-px px-1 min-w-[1.625rem] text-tint-strong font-normal w-fit justify-center items-center ring-1 ring-inset ring-tint-subtle bg-tint rounded-md straight-corners:rounded-none circular-corners:rounded-lg text-xs leading-[calc(max(1.20em,1.25rem))] before:content-none! after:!content-none;
 }
 
 /* Authentication */
@@ -355,7 +355,7 @@
 }
 
 .openapi-securities-url {
-    @apply ml-0.5 px-0.5 rounded straight-corners:rounded-none circular-corners:rounded-md hover:bg-tint dark:hover:bg-tint-hover transition-colors;
+    @apply ml-0.5 px-0.5 rounded-md straight-corners:rounded-none circular-corners:rounded-lg hover:bg-tint dark:hover:bg-tint-hover transition-colors;
 }
 
 .openapi-securities-body {
@@ -493,7 +493,7 @@
 }
 
 .openapi-path-variable {
-    @apply p-px min-w-[1.625rem] text-tint-strong font-normal w-fit justify-center items-center ring-1 ring-inset ring-tint bg-tint rounded straight-corners:rounded-none circular-corners:rounded-md text-sm leading-none before:content-none! after:!content-none;
+    @apply p-px min-w-[1.625rem] text-tint-strong font-normal w-fit justify-center items-center ring-1 ring-inset ring-tint bg-tint rounded-md straight-corners:rounded-none circular-corners:rounded-lg text-sm leading-none before:content-none! after:!content-none;
 }
 
 .openapi-path-server {
@@ -535,7 +535,7 @@
 .openapi-panel,
 .openapi-codesample,
 .openapi-response-examples {
-    @apply border shrink min-h-32 overflow-hidden rounded-lg straight-corners:rounded-none circular-corners:rounded-xl bg-tint-subtle theme-muted:bg-tint-base theme-bold-tint:bg-tint-base border-tint-subtle depth-subtle:shadow-sm;
+    @apply border shrink min-h-32 overflow-hidden rounded-corners:rounded-xl circular-corners:rounded-2xl straight-corners:rounded-xs bg-tint-subtle theme-muted:bg-tint-base theme-bold-tint:bg-tint-base border-tint-subtle depth-subtle:shadow-sm;
 }
 
 .openapi-response-examples-panel {
@@ -614,7 +614,7 @@ body:has(.openapi-select-popover) {
 }
 
 .openapi-select > button {
-    @apply flex items-center font-normal cursor-pointer *:truncate gap-1.5 p-1.5 border border-tint-subtle text-tint-strong rounded straight-corners:rounded-none circular-corners:rounded-md leading-none;
+    @apply flex items-center font-normal cursor-pointer *:truncate gap-1.5 p-1.5 border border-tint-subtle text-tint-strong rounded-md straight-corners:rounded-none circular-corners:rounded-lg leading-none;
     @apply hover:bg-tint dark:hover:bg-tint-hover transition-all;
 }
 
@@ -647,7 +647,7 @@ body:has(.openapi-select-popover) {
 }
 
 .openapi-select-popover {
-    @apply min-w-32 z-10 max-w-[max(20rem,var(--trigger-width))] overflow-x-hidden max-h-52 overflow-y-auto p-1.5 border border-tint-subtle bg-tint-base backdrop-blur-xl rounded-md straight-corners:rounded-none circular-corners:rounded-xl;
+    @apply min-w-32 z-10 max-w-[max(20rem,var(--trigger-width))] overflow-x-hidden max-h-52 overflow-y-auto p-1.5 border border-tint-subtle bg-tint-base backdrop-blur-xl rounded-corners:rounded-md circular-corners:rounded-xl straight-corners:rounded-none;
     @apply shadow-md shadow-tint-12/1 dark:shadow-tint-1/1;
 }
 
@@ -660,7 +660,7 @@ body:has(.openapi-select-popover) {
 }
 
 .openapi-select-item {
-    @apply text-sm flex items-center cursor-pointer px-1.5 overflow-hidden py-1 text-tint ring-0 border-none rounded straight-corners:rounded-none circular-corners:rounded-md !outline-none;
+    @apply text-sm flex items-center cursor-pointer px-1.5 overflow-hidden py-1 text-tint ring-0 border-none rounded-md straight-corners:rounded-none circular-corners:rounded-lg !outline-none;
     @apply hover:bg-tint-hover hover:theme-gradient:bg-tint-12/1 hover:text-tint-strong contrast-more:hover:ring-1 contrast-more:hover:ring-inset contrast-more:hover:ring-current;
 }
 
@@ -756,7 +756,7 @@ body:has(.openapi-select-popover) {
 }
 
 .openapi-tabs-tab {
-    @apply hover:bg-primary-hover whitespace-nowrap font-mono font-normal tabular-nums hover:text-primary cursor-pointer transition-all relative text-[0.813rem] text-tint px-1 border border-transparent rounded straight-corners:rounded-none circular-corners:rounded-md;
+    @apply hover:bg-primary-hover whitespace-nowrap font-mono font-normal tabular-nums hover:text-primary cursor-pointer transition-all relative text-[0.813rem] text-tint px-1 border border-transparent rounded-md straight-corners:rounded-none circular-corners:rounded-lg;
 }
 
 .openapi-tabs-tab[aria-selected="true"] {
@@ -770,7 +770,7 @@ body:has(.openapi-select-popover) {
 
 /* Disclosure group */
 .openapi-disclosure-group {
-    @apply border-tint-subtle transition-all border-b border-x overflow-auto last:rounded-b-md straight-corners:last:rounded-none circular-corners:last:rounded-b-xl first:rounded-t-md straight-corners:first:rounded-none circular-corners:first:rounded-t-xl first:border-t relative;
+    @apply border-tint-subtle transition-all border-b border-x overflow-auto rounded-corners:last:rounded-b-xl circular-corners:last:rounded-b-2xl straight-corners:last:rounded-b-xs rounded-corners:first:rounded-t-xl circular-corners:first:rounded-t-2xl straight-corners:first:rounded-t-xs first:border-t relative;
 }
 
 .openapi-disclosure-group:has(.openapi-disclosure-group-trigger:hover) {
@@ -823,7 +823,7 @@ body:has(.openapi-select-popover) {
 
 /* Disclosure */
 .openapi-schemas-disclosure {
-    @apply border-t border-x last:border-b border-tint-subtle !ring-0 first:!rounded-t-xl last:!rounded-b-xl !rounded-none;
+    @apply border-t border-x last:border-b border-tint-subtle !ring-0 rounded-corners:first:!rounded-t-xl rounded-corners:last:!rounded-b-xl circular-corners:first:!rounded-t-2xl circular-corners:last:!rounded-b-2xl straight-corners:first:!rounded-t-xs straight-corners:last:!rounded-b-xs !rounded-none;
 }
 
 .openapi-schemas-disclosure > .openapi-disclosure-trigger {
@@ -868,7 +868,7 @@ body:has(.openapi-select-popover) {
         .openapi-schema-alternatives .openapi-disclosure,
         .openapi-schemas-disclosure .openapi-schema.openapi-disclosure
     ) {
-    @apply rounded-md circular-corners:rounded-xl straight-corners:rounded-none;
+    @apply rounded-corners:rounded-md circular-corners:rounded-xl straight-corners:rounded-none;
 }
 
 .openapi-disclosure .openapi-schemas-disclosure .openapi-schema.openapi-disclosure {
@@ -891,7 +891,7 @@ body:has(.openapi-select-popover) {
 }
 
 .openapi-disclosure-trigger-label {
-    @apply absolute right-3 font-sans! mr-px px-2 h-5 justify-end shrink-0 ring-tint-subtle truncate text-tint duration-300 transition-all rounded straight-corners:rounded-none circular-corners:rounded-xl flex flex-row gap-1 items-center text-xs;
+    @apply absolute right-3 font-sans! mr-px px-2 h-5 justify-end shrink-0 ring-tint-subtle truncate text-tint duration-300 transition-all rounded-md straight-corners:rounded-none circular-corners:rounded-xl flex flex-row gap-1 items-center text-xs;
 }
 
 .openapi-disclosure-trigger-label span {
@@ -954,7 +954,7 @@ body:has(.openapi-select-popover) {
 }
 
 .openapi-tooltip {
-    @apply flex items-center gap-1 bg-tint-base border border-tint-subtle text-tint-strong rounded-md straight-corners:rounded-none circular-corners:rounded-lg font-medium px-1.5 py-0.5 shadow-sm text-[13px];
+    @apply flex items-center gap-1 bg-tint-base border border-tint-subtle text-tint-strong rounded-corners:rounded-md circular-corners:rounded-xl straight-corners:rounded-none font-medium px-1.5 py-0.5 shadow-sm text-[13px];
 }
 
 .openapi-tooltip svg {
@@ -1018,7 +1018,7 @@ body:has(.openapi-select-popover) {
 }
 
 .openapi-path-copy-button {
-    @apply p-1 flex rounded-md straight-corners:rounded-none;
+    @apply p-1 flex rounded-lg straight-corners:rounded-none;
     @apply hover:bg-tint dark:hover:bg-tint-hover;
 }
 
@@ -1035,7 +1035,7 @@ body:has(.openapi-select-popover) {
 }
 
 .openapi-required-scopes {
-    @apply border text-base rounded-md straight-corners:rounded-none circular-corners:rounded-md font-medium mx-0;
+    @apply border text-base rounded-corners:rounded-md circular-corners:rounded-xl straight-corners:rounded-none font-medium mx-0;
 }
 
 .openapi-required-scopes .openapi-required-scopes-header {

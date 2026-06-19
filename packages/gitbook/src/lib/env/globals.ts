@@ -85,6 +85,15 @@ export const GITBOOK_INTEGRATIONS_HOST =
     process.env.GITBOOK_INTEGRATIONS_HOST || 'integrations.gitbook.com';
 
 /**
+ * Hostname serving integration-rendered content (e.g. WebFrames), isolated from the
+ * cookie-bearing integrations origin to remediate stored-XSS on the main origin.
+ * Defaults to `GITBOOK_INTEGRATIONS_HOST` until a distinct content origin is configured,
+ * which keeps behavior unchanged.
+ */
+export const GITBOOK_INTEGRATIONS_CONTENT_HOST =
+    process.env.GITBOOK_INTEGRATIONS_CONTENT_HOST || GITBOOK_INTEGRATIONS_HOST;
+
+/**
  * Hostname for fonts.
  */
 export const GITBOOK_FONTS_URL = process.env.GITBOOK_FONTS_URL || 'https://fonts.gitbook.com';

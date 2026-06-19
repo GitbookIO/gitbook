@@ -4,6 +4,7 @@ import { tcls } from '@/lib/tailwind';
 
 import { RecordColumnValue } from './RecordColumnValue';
 import type { TableRecordKV, TableViewProps } from './Table';
+import { TableSearchRecord } from './TableSearch';
 import { getColumnWidth } from './layout';
 import { getColumnVerticalAlignment } from './utils';
 
@@ -14,19 +15,21 @@ export function RecordRow(
         fixedColumns: string[];
     }
 ) {
-    const { view, autoSizedColumns, fixedColumns, block, context } = props;
+    const { view, record, autoSizedColumns, fixedColumns, block, context } = props;
     const stickyFirstColumn = context.mode !== 'print' && view.stickyFirstColumn === true;
     const firstVisibleColumn = view.columns[0];
 
     return (
-        <div
+        <TableSearchRecord
+            role="row"
+            recordId={record[0]}
+            visibleClassName="flex"
             className={tcls(
-                'group/row flex',
+                'group/row',
                 'border-tint-subtle',
                 'transition-colors',
                 'hover:bg-tint-hover'
             )}
-            role="row"
         >
             {view.columns.map((column) => {
                 const columnWidth = getColumnWidth({
@@ -63,6 +66,6 @@ export function RecordRow(
                     </div>
                 );
             })}
-        </div>
+        </TableSearchRecord>
     );
 }
