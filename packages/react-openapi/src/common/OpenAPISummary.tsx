@@ -23,7 +23,10 @@ export function OpenAPISummary(props: {
     })();
 
     return (
-        <div className="openapi-summary" id={operation.summary ? undefined : context.id}>
+        <div
+            className="openapi-summary"
+            id={!context.headless && operation.summary ? undefined : context.id}
+        >
             {(operation.deprecated || operation['x-stability']) && (
                 <div className="openapi-summary-tags">
                     {operation.deprecated && <div className="openapi-deprecated">Deprecated</div>}
@@ -32,7 +35,7 @@ export function OpenAPISummary(props: {
                     )}
                 </div>
             )}
-            {title
+            {!context.headless && title
                 ? context.renderHeading({
                       deprecated: operation.deprecated ?? false,
                       stability: operation['x-stability'],

@@ -101,7 +101,17 @@
 /* Method Tags */
 .openapi-method,
 .openapi-statuscode {
-    @apply rounded-md straight-corners:rounded-none circular-corners:rounded-lg uppercase font-mono items-center shrink-0 font-semibold text-[0.813rem] px-1 py-0.5 mr-2 text-tint-12/8 leading-tight align-middle inline-flex ring-1 ring-inset ring-tint-12/1 dark:ring-tint-1/1 whitespace-nowrap;
+    @apply m-0 h-5 min-w-9 justify-center rounded-md text-xs straight-corners:rounded-none circular-corners:rounded-lg uppercase font-mono items-center shrink-0 font-semibold px-1.5 py-0.5 mr-2 text-tint-12/8 leading-tight align-middle inline-flex whitespace-nowrap;
+}
+
+.openapi-method-small {}
+
+.openapi-method-medium {
+    @apply m-0 px-2.5 py-1 h-6 text-[0.813rem];
+}
+
+.toclink .openapi-method {
+    @apply text-[0.625rem] flex items-center justify-center;
 }
 
 .openapi-method-get,
@@ -130,7 +140,8 @@
 
 .openapi-method-head,
 .openapi-method-options,
-.openapi-method-trace {
+.openapi-method-trace,
+.openapi-method-hook {
     @apply bg-tint;
 }
 
@@ -450,16 +461,12 @@
     @apply max-w-full overflow-hidden shrink pl-0.5 py-0.5;
 }
 
-.openapi-response-examples-header .openapi-select > button .openapi-statuscode {
-    @apply h-full;
-}
-
 .openapi-codesample-header-content {
     @apply flex flex-row items-center justify-between h-fit p-2.5;
 }
 
 .openapi-codesample-header-content .openapi-path {
-    @apply flex items-center font-mono text-[0.813rem] gap-1 h-fit *:truncate overflow-x-auto min-w-0 max-w-full font-normal text-tint-strong;
+    @apply flex items-center font-mono text-[0.813rem] gap-2 h-fit *:truncate overflow-x-auto min-w-0 max-w-full font-normal text-tint-strong;
 }
 
 .openapi-codesample-header-content .openapi-path-title {
@@ -491,10 +498,6 @@
 
 .openapi-path-server {
     @apply text-tint inline;
-}
-
-.openapi-summary .openapi-path .openapi-method {
-    @apply m-0 items-center flex px-2 py-1 h-6;
 }
 
 .openapi-path-title {
