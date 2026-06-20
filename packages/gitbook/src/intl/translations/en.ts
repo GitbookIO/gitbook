@@ -103,6 +103,8 @@ export const en = {
     ai_chat_assistant_greeting_evening: 'Good evening',
     ai_chat_assistant_greeting_night: 'Good night',
     ai_chat_clear_conversation: 'Clear conversation',
+    ai_chat_expand_panel: 'Expand panel',
+    ai_chat_collapse_panel: 'Collapse panel',
     ai_chat_thinking: 'Thinking…',
     ai_chat_working: 'Working…',
     ai_chat_exploring: 'Exploring…',

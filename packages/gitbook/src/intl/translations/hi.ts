@@ -105,6 +105,8 @@ export const hi: TranslationLanguage = {
     ai_chat_assistant_greeting_evening: 'शुभ संध्या',
     ai_chat_assistant_greeting_night: 'शुभ रात्रि',
     ai_chat_clear_conversation: 'बातचीत साफ करें',
+    ai_chat_expand_panel: 'पैनल का विस्तार करें',
+    ai_chat_collapse_panel: 'पैनल को छोटा करें',
     ai_chat_thinking: 'सोच रहा है...',
     ai_chat_working: 'काम कर रहा है...',
     ai_chat_exploring: 'खोज रहा है...',

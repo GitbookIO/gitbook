@@ -107,6 +107,8 @@ export const ja: TranslationLanguage = {
     ai_chat_assistant_greeting_evening: 'こんばんは',
     ai_chat_assistant_greeting_night: 'おやすみなさい',
     ai_chat_clear_conversation: '会話をクリア',
+    ai_chat_expand_panel: 'パネルを広げる',
+    ai_chat_collapse_panel: 'パネルを狭める',
     ai_chat_thinking: '考え中...',
     ai_chat_working: '作業中...',
     ai_chat_exploring: '探索中...',

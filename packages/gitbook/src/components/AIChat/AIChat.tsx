@@ -31,9 +31,11 @@ import { ScrollContainer } from '../primitives/ScrollContainer';
 import { SideSheet } from '../primitives/SideSheet';
 import { AIChatControl } from './AIChatControl';
 import { AIChatControlButton } from './AIChatControlButton';
+import { AIChatExpandButton } from './AIChatExpandButton';
 import { AIChatIcon } from './AIChatIcon';
 import { AIChatInput } from './AIChatInput';
 import { AIChatMessages } from './AIChatMessages';
+import { AIChatResizeHandle } from './AIChatResizeHandle';
 import AIChatSuggestedQuestions from './AIChatSuggestedQuestions';
 
 export function AIChat() {
@@ -85,9 +87,10 @@ export function AIChat() {
             withOverlay={true}
             data-ai-chat
             className={tcls(
-                'ai-chat mx-auto ml-8 not-hydrated:hidden w-96 transition-[width] duration-300 ease-quint lg:max-xl:w-80'
+                'ai-chat mx-auto ml-8 not-hydrated:hidden w-96 transition-[width] duration-300 ease-quint lg:w-(--ai-chat-width)'
             )}
         >
+            <AIChatResizeHandle />
             <EmbeddableFrame className="relative w-full shrink-0 border-tint-subtle border-l to-tint-base">
                 <EmbeddableFrameMain data-testid="ai-chat" aria-busy={chat.loading}>
                     <EmbeddableFrameHeader className="not-embed:px-4">
@@ -100,6 +103,7 @@ export function AIChat() {
                         </EmbeddableFrameHeaderMain>
                         <EmbeddableFrameButtons>
                             <AIChatControlButton />
+                            <AIChatExpandButton />
                             <Button
                                 onClick={() => chatController.close()}
                                 iconOnly

@@ -106,6 +106,8 @@ export const id: TranslationLanguage = {
     ai_chat_assistant_greeting_evening: 'Selamat malam',
     ai_chat_assistant_greeting_night: 'Selamat malam',
     ai_chat_clear_conversation: 'Bersihkan percakapan',
+    ai_chat_expand_panel: 'Perluas panel',
+    ai_chat_collapse_panel: 'Ciutkan panel',
     ai_chat_thinking: 'Berpikir...',
     ai_chat_working: 'Bekerja...',
     ai_chat_exploring: 'Menjelajahi...',

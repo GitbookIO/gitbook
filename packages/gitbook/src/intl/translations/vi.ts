@@ -105,6 +105,8 @@ export const vi: TranslationLanguage = {
     ai_chat_assistant_greeting_evening: 'Chào buổi tối',
     ai_chat_assistant_greeting_night: 'Chúc ngủ ngon',
     ai_chat_clear_conversation: 'Xóa cuộc trò chuyện',
+    ai_chat_expand_panel: 'Mở rộng bảng',
+    ai_chat_collapse_panel: 'Thu gọn bảng',
     ai_chat_thinking: 'Đang suy nghĩ...',
     ai_chat_working: 'Đang làm việc...',
     ai_chat_exploring: 'Đang khám phá...',

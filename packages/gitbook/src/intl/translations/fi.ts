@@ -106,6 +106,8 @@ export const fi: TranslationLanguage = {
     ai_chat_assistant_greeting_evening: 'Hyvää iltaa',
     ai_chat_assistant_greeting_night: 'Hyvää yötä',
     ai_chat_clear_conversation: 'Tyhjennä keskustelu',
+    ai_chat_expand_panel: 'Laajenna paneeli',
+    ai_chat_collapse_panel: 'Pienennä paneeli',
     ai_chat_thinking: 'Ajatellaan...',
     ai_chat_working: 'Työskennellään...',
     ai_chat_exploring: 'Tutkitaan...',

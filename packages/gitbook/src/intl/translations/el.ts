@@ -108,6 +108,8 @@ export const el: TranslationLanguage = {
     ai_chat_assistant_greeting_evening: 'Καλό βράδυ',
     ai_chat_assistant_greeting_night: 'Καληνύχτα',
     ai_chat_clear_conversation: 'Εκκαθάριση συνομιλίας',
+    ai_chat_expand_panel: 'Ανάπτυξη πίνακα',
+    ai_chat_collapse_panel: 'Σύμπτυξη πίνακα',
     ai_chat_thinking: 'Σκέφτομαι...',
     ai_chat_working: 'Εργάζομαι...',
     ai_chat_exploring: 'Εξερευνώ...',

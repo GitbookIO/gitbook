@@ -105,6 +105,8 @@ export const he: TranslationLanguage = {
     ai_chat_assistant_greeting_evening: 'ערב טוב',
     ai_chat_assistant_greeting_night: 'לילה טוב',
     ai_chat_clear_conversation: 'ניקוי השיחה',
+    ai_chat_expand_panel: 'הרחב פאנל',
+    ai_chat_collapse_panel: 'כווץ פאנל',
     ai_chat_thinking: 'חושב...',
     ai_chat_working: 'עובד...',
     ai_chat_exploring: 'בודק...',

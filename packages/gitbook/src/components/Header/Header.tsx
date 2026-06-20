@@ -75,7 +75,7 @@ export async function Header(props: {
                     'site-header:theme-bold:shadow-tint-12/2'
                 )}
             >
-                <div className="transition-all duration-300 motion-reduce:transition-none lg:chat-open:pr-80 xl:chat-open:pr-96">
+                <div className="transition-all duration-300 motion-reduce:transition-none lg:chat-open:pr-(--ai-chat-width)">
                     <div
                         data-gb-header-content
                         className={tcls(
@@ -206,7 +206,7 @@ export async function Header(props: {
             </div>
 
             {visibleSections && withSections ? (
-                <div className="transition-[padding] duration-300 motion-reduce:transition-none lg:chat-open:pr-80 xl:chat-open:pr-96">
+                <div className="transition-[padding] duration-300 motion-reduce:transition-none lg:chat-open:pr-(--ai-chat-width)">
                     <SiteSectionTabs sections={encodeClientSiteSections(context, visibleSections)}>
                         {variants.translations.length > 1 ? (
                             <TranslationsDropdown

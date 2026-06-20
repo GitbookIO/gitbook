@@ -106,6 +106,8 @@ export const ms: TranslationLanguage = {
     ai_chat_assistant_greeting_evening: 'Selamat petang',
     ai_chat_assistant_greeting_night: 'Selamat malam',
     ai_chat_clear_conversation: 'Kosongkan perbualan',
+    ai_chat_expand_panel: 'Kembangkan panel',
+    ai_chat_collapse_panel: 'Kecilkan panel',
     ai_chat_thinking: 'Berfikir...',
     ai_chat_working: 'Bekerja...',
     ai_chat_exploring: 'Meneroka...',

@@ -105,6 +105,8 @@ export const uk: TranslationLanguage = {
     ai_chat_assistant_greeting_evening: 'Добрий вечір',
     ai_chat_assistant_greeting_night: 'Добраніч',
     ai_chat_clear_conversation: 'Очистити розмову',
+    ai_chat_expand_panel: 'Розгорнути панель',
+    ai_chat_collapse_panel: 'Згорнути панель',
     ai_chat_thinking: 'Думаю...',
     ai_chat_working: 'Працюю...',
     ai_chat_exploring: 'Досліджую...',

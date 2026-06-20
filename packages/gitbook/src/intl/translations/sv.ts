@@ -106,6 +106,8 @@ export const sv: TranslationLanguage = {
     ai_chat_assistant_greeting_evening: 'God kväll',
     ai_chat_assistant_greeting_night: 'God natt',
     ai_chat_clear_conversation: 'Rensa konversation',
+    ai_chat_expand_panel: 'Expandera panel',
+    ai_chat_collapse_panel: 'Förminska panel',
     ai_chat_thinking: 'Tänker...',
     ai_chat_working: 'Arbetar...',
     ai_chat_exploring: 'Utforskar...',
