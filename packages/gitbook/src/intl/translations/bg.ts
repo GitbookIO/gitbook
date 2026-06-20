@@ -107,6 +107,8 @@ export const bg: TranslationLanguage = {
     ai_chat_assistant_greeting_evening: 'Добър вечер',
     ai_chat_assistant_greeting_night: 'Лека нощ',
     ai_chat_clear_conversation: 'Изчистване на разговора',
+    ai_chat_expand_panel: 'Разгъване на панела',
+    ai_chat_collapse_panel: 'Свиване на панела',
     ai_chat_thinking: 'Мисля...',
     ai_chat_working: 'Работя...',
     ai_chat_exploring: 'Проучвам...',

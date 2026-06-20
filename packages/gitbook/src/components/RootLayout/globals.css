@@ -211,6 +211,7 @@
         @apply leading-relaxed;
         interpolate-size: allow-keywords; /* Opt-in for modern browsers to interpolate "auto" values in transitions/animations. */
         overflow-x: hidden; /* We never want horizontal scroll of the whole page, it looks buggy and we should never have overflow anyway */
+        --ai-chat-width: 24rem; /* Default AI chat panel width (= AI_CHAT_DEFAULT_WIDTH 384px); overridden client-side from local storage. */
     }
     
     /* Modern browsers with `scrollbar-*` support */
@@ -303,6 +304,15 @@ html {
 }
 html.dark {
     color-scheme: dark light;
+}
+
+/** While the AI chat panel is being resized, suppress transitions */
+html[data-ai-chat-resizing="true"] {
+    cursor: col-resize;
+    user-select: none;
+}
+html[data-ai-chat-resizing="true"] * {
+    transition-duration: 0s !important;
 }
 
 html.announcement-hidden [data-gb-announcement-banner] {

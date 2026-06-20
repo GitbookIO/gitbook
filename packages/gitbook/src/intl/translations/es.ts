@@ -109,6 +109,8 @@ export const es: TranslationLanguage = {
     ai_chat_assistant_greeting_evening: 'Buenas tardes',
     ai_chat_assistant_greeting_night: 'Buenas noches',
     ai_chat_clear_conversation: 'Limpiar conversación',
+    ai_chat_expand_panel: 'Expandir panel',
+    ai_chat_collapse_panel: 'Contraer panel',
     ai_chat_thinking: 'Pensando...',
     ai_chat_working: 'Trabajando...',
     ai_chat_exploring: 'Explorando...',

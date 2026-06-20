@@ -106,6 +106,8 @@ export const pl: TranslationLanguage = {
     ai_chat_assistant_greeting_evening: 'Dobry wieczór',
     ai_chat_assistant_greeting_night: 'Dobranoc',
     ai_chat_clear_conversation: 'Wyczyść rozmowę',
+    ai_chat_expand_panel: 'Rozwiń panel',
+    ai_chat_collapse_panel: 'Zwiń panel',
     ai_chat_thinking: 'Myślę...',
     ai_chat_working: 'Pracuję...',
     ai_chat_exploring: 'Sprawdzam...',

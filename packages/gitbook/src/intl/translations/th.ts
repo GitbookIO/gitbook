@@ -104,6 +104,8 @@ export const th: TranslationLanguage = {
     ai_chat_assistant_greeting_evening: 'สวัสดีตอนเย็น',
     ai_chat_assistant_greeting_night: 'ราตรีสวัสดิ์',
     ai_chat_clear_conversation: 'ล้างการสนทนา',
+    ai_chat_expand_panel: 'ขยายแผง',
+    ai_chat_collapse_panel: 'ย่อแผง',
     ai_chat_thinking: 'กำลังคิด...',
     ai_chat_working: 'กำลังทำงาน...',
     ai_chat_exploring: 'กำลังสำรวจ...',

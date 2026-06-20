@@ -104,6 +104,8 @@ export const zh: TranslationLanguage = {
     ai_chat_assistant_greeting_evening: '晚上好',
     ai_chat_assistant_greeting_night: '晚安',
     ai_chat_clear_conversation: '清空对话',
+    ai_chat_expand_panel: '展开面板',
+    ai_chat_collapse_panel: '收起面板',
     ai_chat_thinking: '思考中...',
     ai_chat_working: '工作中...',
     ai_chat_exploring: '探索中...',

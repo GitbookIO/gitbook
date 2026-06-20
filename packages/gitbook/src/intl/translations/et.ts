@@ -105,6 +105,8 @@ export const et: TranslationLanguage = {
     ai_chat_assistant_greeting_evening: 'Tere õhtust',
     ai_chat_assistant_greeting_night: 'Head ööd',
     ai_chat_clear_conversation: 'Tühjenda vestlus',
+    ai_chat_expand_panel: 'Laienda paneeli',
+    ai_chat_collapse_panel: 'Ahenda paneeli',
     ai_chat_thinking: 'Mõtlen...',
     ai_chat_working: 'Töötan...',
     ai_chat_exploring: 'Uurin...',

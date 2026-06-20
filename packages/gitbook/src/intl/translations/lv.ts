@@ -105,6 +105,8 @@ export const lv: TranslationLanguage = {
     ai_chat_assistant_greeting_evening: 'Labvakar',
     ai_chat_assistant_greeting_night: 'Ar labu nakti',
     ai_chat_clear_conversation: 'Notīrīt sarunu',
+    ai_chat_expand_panel: 'Izvērst paneli',
+    ai_chat_collapse_panel: 'Sakļaut paneli',
     ai_chat_thinking: 'Domāju...',
     ai_chat_working: 'Strādāju...',
     ai_chat_exploring: 'Izpētu...',

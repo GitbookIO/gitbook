@@ -106,6 +106,8 @@ export const da: TranslationLanguage = {
     ai_chat_assistant_greeting_evening: 'Godaften',
     ai_chat_assistant_greeting_night: 'Godnat',
     ai_chat_clear_conversation: 'Ryd samtale',
+    ai_chat_expand_panel: 'Udvid panel',
+    ai_chat_collapse_panel: 'Formindsk panel',
     ai_chat_thinking: 'Tænker...',
     ai_chat_working: 'Arbejder...',
     ai_chat_exploring: 'Udforsker...',

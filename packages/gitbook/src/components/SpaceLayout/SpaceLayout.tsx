@@ -135,7 +135,7 @@ export function SpaceLayout(props: SpaceLayoutProps) {
             ) : null}
 
             {/* Chat panel shifts content left when open */}
-            <div className="motion-safe:transition-all motion-safe:duration-300 lg:chat-open:mr-80 xl:chat-open:mr-96">
+            <div className="motion-safe:transition-all motion-safe:duration-300 lg:chat-open:mr-(--ai-chat-width)">
                 <div
                     className={tcls(
                         'flex',

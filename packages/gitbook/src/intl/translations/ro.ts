@@ -108,6 +108,8 @@ export const ro: TranslationLanguage = {
     ai_chat_assistant_greeting_evening: 'Bună seara',
     ai_chat_assistant_greeting_night: 'Noapte bună',
     ai_chat_clear_conversation: 'Șterge conversația',
+    ai_chat_expand_panel: 'Extinde panoul',
+    ai_chat_collapse_panel: 'Restrânge panoul',
     ai_chat_thinking: 'Se gândește...',
     ai_chat_working: 'Lucrează...',
     ai_chat_exploring: 'Explorează...',

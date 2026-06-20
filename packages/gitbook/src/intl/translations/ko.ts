@@ -106,6 +106,8 @@ export const ko: TranslationLanguage = {
     ai_chat_assistant_greeting_evening: '좋은 저녁입니다',
     ai_chat_assistant_greeting_night: '안녕히 주무세요',
     ai_chat_clear_conversation: '대화 지우기',
+    ai_chat_expand_panel: '패널 확장',
+    ai_chat_collapse_panel: '패널 축소',
     ai_chat_thinking: '생각 중...',
     ai_chat_working: '작업 중...',
     ai_chat_exploring: '탐색 중...',

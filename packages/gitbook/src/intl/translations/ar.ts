@@ -105,6 +105,8 @@ export const ar: TranslationLanguage = {
     ai_chat_assistant_greeting_evening: 'مساء الخير',
     ai_chat_assistant_greeting_night: 'تصبح على خير',
     ai_chat_clear_conversation: 'مسح المحادثة',
+    ai_chat_expand_panel: 'توسيع اللوحة',
+    ai_chat_collapse_panel: 'طي اللوحة',
     ai_chat_thinking: 'جار التفكير...',
     ai_chat_working: 'جار العمل...',
     ai_chat_exploring: 'جار الاستكشاف...',

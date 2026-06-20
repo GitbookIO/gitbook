@@ -108,6 +108,8 @@ export const de = {
     ai_chat_assistant_greeting_evening: 'Guten Abend',
     ai_chat_assistant_greeting_night: 'Gute Nacht',
     ai_chat_clear_conversation: 'Unterhaltung löschen',
+    ai_chat_expand_panel: 'Panel erweitern',
+    ai_chat_collapse_panel: 'Panel reduzieren',
     ai_chat_thinking: 'Denke nach...',
     ai_chat_working: 'Arbeite...',
     ai_chat_exploring: 'Erkunde...',

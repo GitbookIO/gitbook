@@ -107,6 +107,8 @@ export const nl: TranslationLanguage = {
     ai_chat_assistant_greeting_evening: 'Goedenavond',
     ai_chat_assistant_greeting_night: 'Goedenacht',
     ai_chat_clear_conversation: 'Gesprek wissen',
+    ai_chat_expand_panel: 'Paneel uitvouwen',
+    ai_chat_collapse_panel: 'Paneel samenvouwen',
     ai_chat_thinking: 'Denkt na...',
     ai_chat_working: 'Werkt...',
     ai_chat_exploring: 'Verkent...',

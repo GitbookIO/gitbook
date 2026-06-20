@@ -104,6 +104,8 @@ export const fr = {
     ai_chat_assistant_greeting_evening: 'Bonsoir',
     ai_chat_assistant_greeting_night: 'Bonne nuit',
     ai_chat_clear_conversation: 'Réinitialiser la conversation',
+    ai_chat_expand_panel: 'Agrandir le panneau',
+    ai_chat_collapse_panel: 'Réduire le panneau',
     ai_chat_thinking: 'Réflexion en cours…',
     ai_chat_working: 'Traitement en cours…',
     ai_chat_exploring: 'Exploration en cours…',

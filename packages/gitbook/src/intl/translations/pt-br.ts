@@ -107,6 +107,8 @@ export const pt_br = {
     ai_chat_assistant_greeting_evening: 'Boa tarde',
     ai_chat_assistant_greeting_night: 'Boa noite',
     ai_chat_clear_conversation: 'Limpar conversa',
+    ai_chat_expand_panel: 'Expandir painel',
+    ai_chat_collapse_panel: 'Recolher painel',
     ai_chat_thinking: 'Pensando...',
     ai_chat_working: 'Trabalhando...',
     ai_chat_exploring: 'Explorando...',

@@ -107,6 +107,8 @@ export const hr: TranslationLanguage = {
     ai_chat_assistant_greeting_evening: 'Dobra večer',
     ai_chat_assistant_greeting_night: 'Laku noć',
     ai_chat_clear_conversation: 'Očisti razgovor',
+    ai_chat_expand_panel: 'Proširi ploču',
+    ai_chat_collapse_panel: 'Sažmi ploču',
     ai_chat_thinking: 'Razmišljam...',
     ai_chat_working: 'Radim...',
     ai_chat_exploring: 'Istražujem...',

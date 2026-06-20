@@ -106,6 +106,8 @@ export const lt: TranslationLanguage = {
     ai_chat_assistant_greeting_evening: 'Labas vakaras',
     ai_chat_assistant_greeting_night: 'Labanakt',
     ai_chat_clear_conversation: 'Išvalyti pokalbį',
+    ai_chat_expand_panel: 'Išskleisti skydelį',
+    ai_chat_collapse_panel: 'Sutraukti skydelį',
     ai_chat_thinking: 'Galvoju...',
     ai_chat_working: 'Dirbu...',
     ai_chat_exploring: 'Tyrinėju...',

@@ -106,6 +106,8 @@ export const ru = {
     ai_chat_assistant_greeting_evening: 'Добрый вечер',
     ai_chat_assistant_greeting_night: 'Доброй ночи',
     ai_chat_clear_conversation: 'Очистить диалог',
+    ai_chat_expand_panel: 'Развернуть панель',
+    ai_chat_collapse_panel: 'Свернуть панель',
     ai_chat_thinking: 'Думает…',
     ai_chat_working: 'Работает…',
     ai_chat_exploring: 'Изучает…',

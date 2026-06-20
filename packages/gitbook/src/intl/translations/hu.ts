@@ -106,6 +106,8 @@ export const hu: TranslationLanguage = {
     ai_chat_assistant_greeting_evening: 'Jó estét',
     ai_chat_assistant_greeting_night: 'Jó éjszakát',
     ai_chat_clear_conversation: 'Beszélgetés törlése',
+    ai_chat_expand_panel: 'Panel kibontása',
+    ai_chat_collapse_panel: 'Panel összecsukása',
     ai_chat_thinking: 'Gondolkodom...',
     ai_chat_working: 'Dolgozom...',
     ai_chat_exploring: 'Felfedezés...',
