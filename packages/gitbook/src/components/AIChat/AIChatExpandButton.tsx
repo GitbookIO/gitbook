@@ -6,9 +6,7 @@ import { Button } from '../primitives';
 import { useAIChatWidthStore } from './useAIChatWidthStore';
 
 /**
- * Toggle the panel between its default and maximum width. Tracks the live width
- * so the icon and action stay correct when the panel is resized with the drag
- * handle. Desktop only — the panel is a full-screen modal on mobile.
+ * Toggle the panel between its default and maximum width.
  */
 export function AIChatExpandButton() {
     const language = useLanguage();
