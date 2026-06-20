@@ -3,14 +3,12 @@
 import { tString, useLanguage } from '@/intl/client';
 import { Icon } from '@gitbook/icons';
 import { Button } from '../primitives';
-import { useAIChatWidthStore } from './useAIChatWidthStore';
+import { useAIChatWidthStore, useIsAIChatMaxWidth } from './useAIChatWidthStore';
 
-/**
- * Toggle the panel between its default and maximum width.
- */
 export function AIChatExpandButton() {
     const language = useLanguage();
-    const { toggleWidth, isMaxWidth } = useAIChatWidthStore();
+    const toggleWidth = useAIChatWidthStore((state) => state.toggleWidth);
+    const isMaxWidth = useIsAIChatMaxWidth();
 
     return (
         <Button

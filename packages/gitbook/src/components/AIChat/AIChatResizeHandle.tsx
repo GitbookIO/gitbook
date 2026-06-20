@@ -4,26 +4,15 @@ import { tcls } from '@/lib/tailwind';
 import React from 'react';
 import { useAIChatWidthStore } from './useAIChatWidthStore';
 
-/**
- * Set the global flag that suppresses transitions while the panel is being dragged.
- */
 function setResizing(active: boolean) {
-    if (active) {
-        document.documentElement.dataset.aiChatResizing = 'true';
-    } else {
-        document.documentElement.dataset.aiChatResizing = 'false';
-    }
+    document.documentElement.dataset.aiChatResizing = String(active);
 }
 
-/**
- * Drag handle on the panel's left edge to resize the AI chat.
- */
 export function AIChatResizeHandle() {
-    const { width, setWidth } = useAIChatWidthStore();
+    const setWidth = useAIChatWidthStore((state) => state.setWidth);
     const frameRef = React.useRef<number | null>(null);
-    const widthRef = React.useRef(width);
+    const widthRef = React.useRef(0);
 
-    // Re-apply the viewport cap on window resize; clean up on unmount.
     React.useEffect(() => {
         const onResize = () => useAIChatWidthStore.getState().syncWidth();
         window.addEventListener('resize', onResize);
@@ -36,11 +25,6 @@ export function AIChatResizeHandle() {
         };
     }, []);
 
-    const commitWidth = (width: number) => {
-        widthRef.current = setWidth(width);
-    };
-
-    // Release the pointer and stop the resize interaction without committing a new width.
     const stopResizing = (event: React.PointerEvent<HTMLDivElement>) => {
         if (event.currentTarget.hasPointerCapture(event.pointerId)) {
             event.currentTarget.releasePointerCapture(event.pointerId);
@@ -55,6 +39,7 @@ export function AIChatResizeHandle() {
     const handlePointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
         event.preventDefault();
         event.currentTarget.setPointerCapture(event.pointerId);
+        widthRef.current = useAIChatWidthStore.getState().width;
         setResizing(true);
     };
 
@@ -76,7 +61,7 @@ export function AIChatResizeHandle() {
         if (!event.currentTarget.hasPointerCapture(event.pointerId)) {
             return;
         }
-        commitWidth(widthRef.current);
+        setWidth(widthRef.current);
         stopResizing(event);
     };
 
@@ -86,6 +71,7 @@ export function AIChatResizeHandle() {
             onPointerDown={handlePointerDown}
             onPointerMove={handlePointerMove}
             onPointerUp={handlePointerUp}
+            onPointerCancel={stopResizing}
             className={tcls(
                 'group -translate-x-1/2 absolute inset-y-0 left-0 z-10 hidden w-3 cursor-col-resize touch-none lg:flex',
                 'items-stretch justify-center'
