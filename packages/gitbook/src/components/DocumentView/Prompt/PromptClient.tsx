@@ -1,8 +1,12 @@
 'use client';
 
-import { Button, ButtonGroup } from '@/components/primitives/Button';
-import { DropdownMenu, DropdownMenuItem } from '@/components/primitives/DropdownMenu';
-import { ToggleChevron } from '@/components/primitives/ToggleChevron';
+import {
+    Button,
+    ButtonGroup,
+    DropdownMenu,
+    DropdownMenuItem,
+    ToggleChevron,
+} from '@/components/primitives';
 import { tString, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
 import { Icon, type IconName } from '@gitbook/icons';
