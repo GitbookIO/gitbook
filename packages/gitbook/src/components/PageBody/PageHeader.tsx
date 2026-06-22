@@ -2,7 +2,12 @@ import type { GitBookSiteContext } from '@/lib/context';
 import type { AncestorRevisionPage } from '@/lib/pages';
 import { tcls } from '@/lib/tailwind';
 import { getPageRSSURL } from '@/routes/rss';
-import { CustomizationAIMode, type RevisionPageDocument, SiteVisibility } from '@gitbook/api';
+import {
+    CustomizationAIMode,
+    CustomizationPageActionType,
+    type RevisionPageDocument,
+    SiteVisibility,
+} from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
 import urlJoin from 'url-join';
 import { getPDFURLSearchParams } from '../PDF';
@@ -29,18 +34,18 @@ export async function PageHeader(props: {
 
     const pageActionsEnabled = page.layout.actions !== false;
 
-    // Show page actions if *any* of the actions are enabled
-    const hasPageActions =
-        pageActionsEnabled &&
-        [
-            context.customization.ai.mode === CustomizationAIMode.Assistant,
-            context.customization.pageActions.externalAI,
-            context.customization.pageActions.markdown,
-            context.customization.pageActions.mcp,
-            context.customization.pdf.enabled,
-            context.customization.git.showEditLink,
-            withRSSFeed,
-        ].some(Boolean);
+    // Show page actions if *any* of the configured actions are enabled, or if the RSS feed is
+    // available. RSS is contextual (only on update/blog index pages) and is not part of the
+    // configured `items` list, so it is checked separately.
+    const hasConfiguredPageActions = [
+        CustomizationPageActionType.Assistant,
+        CustomizationPageActionType.ExternalAi,
+        CustomizationPageActionType.Markdown,
+        CustomizationPageActionType.Mcp,
+        CustomizationPageActionType.Pdf,
+        CustomizationPageActionType.Git,
+    ].some((type) => isPageActionEnabled(context.customization, type));
+    const hasPageActions = pageActionsEnabled && (hasConfiguredPageActions || withRSSFeed);
 
     if (!page.layout.title && !page.layout.description && !hasPageActions) {
         return null;
@@ -164,13 +169,15 @@ function getPageActionsURLs({
         markdown: `${context.linker.toAbsoluteURL(context.linker.toPathInSpace(page.path))}.md`,
         rss: withRSSFeed ? getPageRSSURL(context, page) : undefined,
         editOnGit:
-            context.customization.git.showEditLink && context.space.gitSync?.url && page.git
+            isPageActionEnabled(context.customization, CustomizationPageActionType.Git) &&
+            context.space.gitSync?.url &&
+            page.git
                 ? {
                       provider: context.space?.gitSync?.installationProvider,
                       url: urlJoin(context.space.gitSync.url, page.git.path),
                   }
                 : undefined,
-        pdf: context.customization.pdf.enabled
+        pdf: isPageActionEnabled(context.customization, CustomizationPageActionType.Pdf)
             ? context.linker.toPathInSpace(
                   `~gitbook/pdf?${getPDFURLSearchParams({
                       page: page.id,
@@ -181,6 +188,37 @@ function getPageActionsURLs({
             : undefined,
         mcp: getPageActionsMCPURL(context),
     };
+}
+
+/**
+ * Whether a given built-in page action is enabled. Uses the configured `items` list when the API
+ * provides it, and falls back to the deprecated boolean flags otherwise (legacy mode), matching the
+ * fallback used by the page actions dropdown.
+ */
+function isPageActionEnabled(
+    customization: GitBookSiteContext['customization'],
+    type: CustomizationPageActionType
+): boolean {
+    const { pageActions } = customization;
+    if (pageActions.items) {
+        return pageActions.items.includes(type);
+    }
+    switch (type) {
+        case CustomizationPageActionType.ExternalAi:
+            return pageActions.externalAI;
+        case CustomizationPageActionType.Markdown:
+            return pageActions.markdown;
+        case CustomizationPageActionType.Mcp:
+            return pageActions.mcp;
+        case CustomizationPageActionType.Pdf:
+            return customization.pdf.enabled;
+        case CustomizationPageActionType.Git:
+            return customization.git.showEditLink;
+        case CustomizationPageActionType.Assistant:
+            return customization.ai.mode === CustomizationAIMode.Assistant;
+        default:
+            return false;
+    }
 }
 
 /**
