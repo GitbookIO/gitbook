@@ -33,7 +33,7 @@ export function AIChatReferenceChips(props: {
                                 ref.type === 'code-block' && 'font-mono'
                             )}
                         >
-                            {ref.label}
+                            {ref.type === 'text' ? ref.content : ref.label}
                         </span>
                     </>
                 );
@@ -55,6 +55,10 @@ export function AIChatReferenceChips(props: {
                             >
                                 {content}
                             </Link>
+                        ) : ref.type === 'text' ? (
+                            // A text selection has no persistent DOM anchor to navigate to, so the
+                            // excerpt is shown as plain (non-interactive) content.
+                            <span className={triggerClassName}>{content}</span>
                         ) : (
                             <button
                                 type="button"
@@ -94,6 +98,8 @@ function getReferenceIcon(ref: AIChatReference): IconName {
             return 'code';
         case 'page':
             return 'memo';
+        case 'text':
+            return 'quote-left';
         default:
             assertNever(ref);
     }

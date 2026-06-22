@@ -73,6 +73,11 @@ export interface OpenAPIContext
     renderDocument: (props: { document: object }) => React.ReactNode;
 
     /**
+     * If `true`, the block omits its own title and description (the page renders them instead).
+     */
+    headless?: boolean;
+
+    /**
      * Public specification URL, used by Scalar's "Test it" modal.
      * When null, the "Test it" button is hidden.
      */
