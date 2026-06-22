@@ -3,6 +3,7 @@ import type { AncestorRevisionPage } from '@/lib/pages';
 import { tcls } from '@/lib/tailwind';
 import { getPageRSSURL } from '@/routes/rss';
 import {
+    CustomizationAIMode,
     CustomizationPageActionType,
     type RevisionPageDocument,
     SiteVisibility,
@@ -33,9 +34,18 @@ export async function PageHeader(props: {
 
     const pageActionsEnabled = page.layout.actions !== false;
 
-    // Show page actions if *any* of the actions are enabled
-    const hasPageActions =
-        pageActionsEnabled && context.customization.pageActions.items.some(Boolean);
+    // Show page actions if *any* of the configured actions are enabled, or if the RSS feed is
+    // available. RSS is contextual (only on update/blog index pages) and is not part of the
+    // configured `items` list, so it is checked separately.
+    const hasConfiguredPageActions = [
+        CustomizationPageActionType.Assistant,
+        CustomizationPageActionType.ExternalAi,
+        CustomizationPageActionType.Markdown,
+        CustomizationPageActionType.Mcp,
+        CustomizationPageActionType.Pdf,
+        CustomizationPageActionType.Git,
+    ].some((type) => isPageActionEnabled(context.customization, type));
+    const hasPageActions = pageActionsEnabled && (hasConfiguredPageActions || withRSSFeed);
 
     if (!page.layout.title && !page.layout.description && !hasPageActions) {
         return null;
@@ -159,7 +169,7 @@ function getPageActionsURLs({
         markdown: `${context.linker.toAbsoluteURL(context.linker.toPathInSpace(page.path))}.md`,
         rss: withRSSFeed ? getPageRSSURL(context, page) : undefined,
         editOnGit:
-            context.customization.pageActions.items.includes(CustomizationPageActionType.Git) &&
+            isPageActionEnabled(context.customization, CustomizationPageActionType.Git) &&
             context.space.gitSync?.url &&
             page.git
                 ? {
@@ -167,7 +177,7 @@ function getPageActionsURLs({
                       url: urlJoin(context.space.gitSync.url, page.git.path),
                   }
                 : undefined,
-        pdf: context.customization.pageActions.items.includes(CustomizationPageActionType.Pdf)
+        pdf: isPageActionEnabled(context.customization, CustomizationPageActionType.Pdf)
             ? context.linker.toPathInSpace(
                   `~gitbook/pdf?${getPDFURLSearchParams({
                       page: page.id,
@@ -178,6 +188,37 @@ function getPageActionsURLs({
             : undefined,
         mcp: getPageActionsMCPURL(context),
     };
+}
+
+/**
+ * Whether a given built-in page action is enabled. Uses the configured `items` list when the API
+ * provides it, and falls back to the deprecated boolean flags otherwise (legacy mode), matching the
+ * fallback used by the page actions dropdown.
+ */
+function isPageActionEnabled(
+    customization: GitBookSiteContext['customization'],
+    type: CustomizationPageActionType
+): boolean {
+    const { pageActions } = customization;
+    if (pageActions.items) {
+        return pageActions.items.includes(type);
+    }
+    switch (type) {
+        case CustomizationPageActionType.ExternalAi:
+            return pageActions.externalAI;
+        case CustomizationPageActionType.Markdown:
+            return pageActions.markdown;
+        case CustomizationPageActionType.Mcp:
+            return pageActions.mcp;
+        case CustomizationPageActionType.Pdf:
+            return customization.pdf.enabled;
+        case CustomizationPageActionType.Git:
+            return customization.git.showEditLink;
+        case CustomizationPageActionType.Assistant:
+            return customization.ai.mode === CustomizationAIMode.Assistant;
+        default:
+            return false;
+    }
 }
 
 /**
