@@ -7,6 +7,7 @@ import {
     DropdownMenuItem,
     ToggleChevron,
 } from '@/components/primitives';
+import { getURLForLLM } from '@/components/utils';
 import { tString, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
 import { Icon, type IconName } from '@gitbook/icons';
@@ -174,12 +175,11 @@ function OpenPromptDropdown(props: { prompt: string }) {
             }
         >
             {OPEN_IN_AI_PROVIDERS.map((provider) => {
-                const definition = getPromptOpenActionDefinition(provider, prompt);
-
+                const definition = getPromptOpenActionDefinition(provider);
                 return (
                     <DropdownMenuItem
                         key={provider}
-                        href={definition.href}
+                        href={getURLForLLM(provider, prompt)}
                         target="_blank"
                         leadingIcon={definition.icon}
                     >
@@ -191,34 +191,22 @@ function OpenPromptDropdown(props: { prompt: string }) {
     );
 }
 
-function getPromptOpenActionDefinition(
-    action: AIProviders,
-    prompt: string
-): { href: string; icon: IconName; label: string } {
-    const encodedPrompt = encodeURIComponent(prompt);
-
+function getPromptOpenActionDefinition(action: AIProviders): { icon: IconName; label: string } {
     switch (action) {
         case 'cursor':
             return {
-                href: `${CURSOR_PROMPT_URL}?text=${encodedPrompt}`,
                 icon: 'cursor',
                 label: 'Cursor',
             };
         case 'claude':
             return {
-                href: `${CLAUDE_PROMPT_URL}?q=${encodedPrompt}`,
                 icon: 'claude',
                 label: 'Claude',
             };
         case 'chatgpt':
             return {
-                href: `${CHATGPT_PROMPT_URL}?q=${encodedPrompt}`,
                 icon: 'chatgpt',
                 label: 'ChatGPT',
             };
     }
 }
-
-const CLAUDE_PROMPT_URL = 'https://claude.ai/new';
-const CHATGPT_PROMPT_URL = 'https://chat.openai.com/';
-const CURSOR_PROMPT_URL = 'https://cursor.com/link/prompt';

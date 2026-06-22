@@ -4,8 +4,8 @@ import { useAIChatController, useAIChatState } from '@/components/AI';
 import type { Assistant } from '@/components/AI';
 import { Button } from '@/components/primitives/Button';
 import { DropdownMenuItem, useDropdownMenuClose } from '@/components/primitives/DropdownMenu';
+import { getURLForLLM } from '@/components/utils';
 import { tString, useLanguage } from '@/intl/client';
-import type { TranslationLanguage } from '@/intl/translations';
 import type { GitSyncState } from '@gitbook/api';
 import { Icon, type IconName, IconStyle } from '@gitbook/icons';
 import assertNever from 'assert-never';
@@ -206,7 +206,7 @@ export function ActionOpenInLLM(props: {
     const language = useLanguage();
 
     const providerLabel = provider === 'chatgpt' ? 'ChatGPT' : 'Claude';
-
+    const prompt = tString(language, 'open_in_llms_pre_prompt', url);
     return (
         <PageActionWrapper
             type={type}
@@ -214,7 +214,7 @@ export function ActionOpenInLLM(props: {
             label={tString(language, 'open_in', providerLabel)}
             shortLabel={providerLabel}
             description={tString(language, 'ai_chat_ask_about_page', providerLabel)}
-            href={getLLMURL(provider, url, language)}
+            href={getURLForLLM(provider, prompt)}
         />
     );
 }
@@ -511,20 +511,4 @@ function PageActionWrapper(props: {
             </div>
         </DropdownMenuItem>
     );
-}
-
-/**
- * Returns the URL to open the page in a LLM with a pre-filled prompt.
- */
-function getLLMURL(provider: 'chatgpt' | 'claude', url: string, language: TranslationLanguage) {
-    const prompt = encodeURIComponent(tString(language, 'open_in_llms_pre_prompt', url));
-
-    switch (provider) {
-        case 'chatgpt':
-            return `https://chat.openai.com/?q=${prompt}`;
-        case 'claude':
-            return `https://claude.ai/new?q=${prompt}`;
-        default:
-            assertNever(provider);
-    }
 }

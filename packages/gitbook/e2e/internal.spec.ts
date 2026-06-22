@@ -1113,6 +1113,11 @@ const testCases: TestsCase[] = [
                 url: 'blocks/mermaid',
                 run: waitForCookiesDialog,
             },
+            {
+                name: 'Prompt',
+                url: 'blocks/prompt',
+                run: waitForCookiesDialog,
+            },
         ],
     },
     {
