@@ -25,7 +25,7 @@ export function Prompt(props: BlockProps<DocumentBlockPrompt>) {
         >
             <PromptClient
                 contentIcon={contentIcon}
-                description={block.data.description ?? ''}
+                description={block.data.description}
                 prompt={getPromptText(block)}
                 openInAIProviders={getOpenInAIProviders(props)}
             />
