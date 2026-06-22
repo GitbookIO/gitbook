@@ -1,4 +1,4 @@
-import { SiteInsightsDisplayContext } from '@gitbook/api';
+import { CustomizationPageActionType, SiteInsightsDisplayContext } from '@gitbook/api';
 
 import { type RouteLayoutParams, getDynamicSiteContext } from '@/app/utils';
 import { getExposableError, throwIfDataError } from '@/lib/data';
@@ -20,7 +20,7 @@ export async function handleMcpRequest(
     const { context } = await getDynamicSiteContext(params);
     const { dataFetcher, linker, site } = context;
 
-    if (!context.customization.pageActions.mcp) {
+    if (!context.customization.pageActions.items.includes(CustomizationPageActionType.Mcp)) {
         return new Response('Not Found', { status: 404 });
     }
 

@@ -2,7 +2,11 @@ import type { GitBookSiteContext } from '@/lib/context';
 import type { AncestorRevisionPage } from '@/lib/pages';
 import { tcls } from '@/lib/tailwind';
 import { getPageRSSURL } from '@/routes/rss';
-import { CustomizationAIMode, type RevisionPageDocument, SiteVisibility } from '@gitbook/api';
+import {
+    CustomizationPageActionType,
+    type RevisionPageDocument,
+    SiteVisibility,
+} from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
 import urlJoin from 'url-join';
 import { getPDFURLSearchParams } from '../PDF';
@@ -31,16 +35,7 @@ export async function PageHeader(props: {
 
     // Show page actions if *any* of the actions are enabled
     const hasPageActions =
-        pageActionsEnabled &&
-        [
-            context.customization.ai.mode === CustomizationAIMode.Assistant,
-            context.customization.pageActions.externalAI,
-            context.customization.pageActions.markdown,
-            context.customization.pageActions.mcp,
-            context.customization.pdf.enabled,
-            context.customization.git.showEditLink,
-            withRSSFeed,
-        ].some(Boolean);
+        pageActionsEnabled && context.customization.pageActions.items.some(Boolean);
 
     if (!page.layout.title && !page.layout.description && !hasPageActions) {
         return null;
@@ -164,13 +159,15 @@ function getPageActionsURLs({
         markdown: `${context.linker.toAbsoluteURL(context.linker.toPathInSpace(page.path))}.md`,
         rss: withRSSFeed ? getPageRSSURL(context, page) : undefined,
         editOnGit:
-            context.customization.git.showEditLink && context.space.gitSync?.url && page.git
+            context.customization.pageActions.items.includes(CustomizationPageActionType.Git) &&
+            context.space.gitSync?.url &&
+            page.git
                 ? {
                       provider: context.space?.gitSync?.installationProvider,
                       url: urlJoin(context.space.gitSync.url, page.git.path),
                   }
                 : undefined,
-        pdf: context.customization.pdf.enabled
+        pdf: context.customization.pageActions.items.includes(CustomizationPageActionType.Pdf)
             ? context.linker.toPathInSpace(
                   `~gitbook/pdf?${getPDFURLSearchParams({
                       page: page.id,
