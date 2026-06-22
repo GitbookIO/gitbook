@@ -56,7 +56,7 @@ export const da: TranslationLanguage = {
     annotation_button_label: 'Åbn kommentar',
     code_copied: 'Kopieret!',
     code_copy: 'Kopiér',
-    prompt_copy: 'Copy prompt',
+    prompt_copy: 'Kopiér prompten',
     code_block_collapsed: 'Vis alle ${1} linjer',
     code_block_expanded: 'Vis mindre',
     table_of_contents_button_label: 'Åbn indholdsfortegnelse',

@@ -56,7 +56,7 @@ export const uk: TranslationLanguage = {
     annotation_button_label: 'Відкрити примітку',
     code_copied: 'Скопійовано!',
     code_copy: 'Копіювати',
-    prompt_copy: 'Copy prompt',
+    prompt_copy: 'Скопіювати промпт',
     code_block_collapsed: 'Показати всі ${1} рядків',
     code_block_expanded: 'Показати менше',
     table_of_contents_button_label: 'Відкрити зміст',

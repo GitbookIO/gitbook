@@ -57,7 +57,7 @@ export const ja: TranslationLanguage = {
     annotation_button_label: '注釈を開く',
     code_copied: 'コピーしました！',
     code_copy: 'コピー',
-    prompt_copy: 'Copy prompt',
+    prompt_copy: 'プロンプトをコピー',
     code_block_collapsed: 'すべての ${1} 行を表示',
     code_block_expanded: '折りたたむ',
     table_of_contents_button_label: '目次を開く',

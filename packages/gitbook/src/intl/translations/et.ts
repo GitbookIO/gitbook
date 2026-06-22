@@ -56,7 +56,7 @@ export const et: TranslationLanguage = {
     annotation_button_label: 'Ava märkus',
     code_copied: 'Kopeeritud!',
     code_copy: 'Kopeeri',
-    prompt_copy: 'Copy prompt',
+    prompt_copy: 'Kopeeri viip',
     code_block_collapsed: 'Kuva kõik ${1} rida',
     code_block_expanded: 'Kuva vähem',
     table_of_contents_button_label: 'Ava sisukord',

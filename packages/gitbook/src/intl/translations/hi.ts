@@ -56,7 +56,7 @@ export const hi: TranslationLanguage = {
     annotation_button_label: 'टिप्पणी खोलें',
     code_copied: 'कॉपी हो गया!',
     code_copy: 'कॉपी करें',
-    prompt_copy: 'Copy prompt',
+    prompt_copy: 'प्रॉम्प्ट कॉपी करें',
     code_block_collapsed: 'सभी ${1} पंक्तियां दिखाएं',
     code_block_expanded: 'कम दिखाएं',
     table_of_contents_button_label: 'सामग्री सूची खोलें',

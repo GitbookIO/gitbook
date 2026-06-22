@@ -57,7 +57,7 @@ export const nl: TranslationLanguage = {
     annotation_button_label: 'Annotatie openen',
     code_copied: 'Gekopieerd!',
     code_copy: 'Kopiëren',
-    prompt_copy: 'Copy prompt',
+    prompt_copy: 'Prompt kopiëren',
     code_block_collapsed: 'Toon alle ${1} regels',
     code_block_expanded: 'Toon minder',
     table_of_contents_button_label: 'Open inhoudsopgave',

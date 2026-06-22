@@ -56,7 +56,7 @@ export const ms: TranslationLanguage = {
     annotation_button_label: 'Buka anotasi',
     code_copied: 'Disalin!',
     code_copy: 'Salin',
-    prompt_copy: 'Copy prompt',
+    prompt_copy: 'Salin gesaan',
     code_block_collapsed: 'Tunjukkan semua ${1} baris',
     code_block_expanded: 'Tunjukkan kurang',
     table_of_contents_button_label: 'Buka jadual kandungan',

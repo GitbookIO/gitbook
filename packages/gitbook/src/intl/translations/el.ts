@@ -56,7 +56,7 @@ export const el: TranslationLanguage = {
     annotation_button_label: 'Άνοιγμα σχολίου',
     code_copied: 'Αντιγράφηκε!',
     code_copy: 'Αντιγραφή',
-    prompt_copy: 'Copy prompt',
+    prompt_copy: 'Αντιγραφή προτροπής',
     code_block_collapsed: 'Εμφάνιση όλων των ${1} γραμμών',
     code_block_expanded: 'Εμφάνιση λιγότερων',
     table_of_contents_button_label: 'Άνοιγμα πίνακα περιεχομένων',

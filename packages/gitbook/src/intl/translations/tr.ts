@@ -56,7 +56,7 @@ export const tr: TranslationLanguage = {
     annotation_button_label: 'Açıklamayı aç',
     code_copied: 'Kopyalandı!',
     code_copy: 'Kopyala',
-    prompt_copy: 'Copy prompt',
+    prompt_copy: 'İstemi kopyala',
     code_block_collapsed: 'Tüm ${1} satırı göster',
     code_block_expanded: 'Daha az göster',
     table_of_contents_button_label: 'İçindekiler tablosunu aç',

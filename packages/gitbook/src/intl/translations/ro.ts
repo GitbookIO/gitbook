@@ -56,7 +56,7 @@ export const ro: TranslationLanguage = {
     annotation_button_label: 'Deschide adnotarea',
     code_copied: 'Copiat!',
     code_copy: 'Copiază',
-    prompt_copy: 'Copy prompt',
+    prompt_copy: 'Copiază promptul',
     code_block_collapsed: 'Afișează toate cele ${1} linii',
     code_block_expanded: 'Afișează mai puțin',
     table_of_contents_button_label: 'Deschide cuprinsul',

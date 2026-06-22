@@ -56,7 +56,7 @@ export const lv: TranslationLanguage = {
     annotation_button_label: 'Atvērt anotāciju',
     code_copied: 'Nokopēts!',
     code_copy: 'Kopēt',
-    prompt_copy: 'Copy prompt',
+    prompt_copy: 'Kopēt uzvedni',
     code_block_collapsed: 'Rādīt visas ${1} rindas',
     code_block_expanded: 'Rādīt mazāk',
     table_of_contents_button_label: 'Atvērt satura rādītāju',

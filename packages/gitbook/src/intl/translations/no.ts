@@ -57,7 +57,7 @@ export const no: TranslationLanguage = {
     annotation_button_label: 'Åpne merknad',
     code_copied: 'Kopiert!',
     code_copy: 'Kopier',
-    prompt_copy: 'Copy prompt',
+    prompt_copy: 'Kopier ledeteksten',
     code_block_collapsed: 'Vis alle ${1} linjer',
     code_block_expanded: 'Vis færre',
     table_of_contents_button_label: 'Åpne innholdsfortegnelse',

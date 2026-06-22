@@ -56,7 +56,7 @@ export const hr: TranslationLanguage = {
     annotation_button_label: 'Otvori bilješku',
     code_copied: 'Kopirano!',
     code_copy: 'Kopiraj',
-    prompt_copy: 'Copy prompt',
+    prompt_copy: 'Kopiraj uputu',
     code_block_collapsed: 'Prikaži svih ${1} redaka',
     code_block_expanded: 'Prikaži manje',
     table_of_contents_button_label: 'Otvori sadržaj',

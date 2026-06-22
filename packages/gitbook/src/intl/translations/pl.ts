@@ -56,7 +56,7 @@ export const pl: TranslationLanguage = {
     annotation_button_label: 'Otwórz adnotację',
     code_copied: 'Skopiowano!',
     code_copy: 'Kopiuj',
-    prompt_copy: 'Copy prompt',
+    prompt_copy: 'Kopiuj prompt',
     code_block_collapsed: 'Pokaż wszystkie ${1} wierszy',
     code_block_expanded: 'Pokaż mniej',
     table_of_contents_button_label: 'Otwórz spis treści',

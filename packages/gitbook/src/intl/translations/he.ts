@@ -56,7 +56,7 @@ export const he: TranslationLanguage = {
     annotation_button_label: 'פתיחת הערה',
     code_copied: 'הועתק!',
     code_copy: 'העתקה',
-    prompt_copy: 'Copy prompt',
+    prompt_copy: 'העתקת ההנחיה',
     code_block_collapsed: 'הצג את כל ${1} השורות',
     code_block_expanded: 'הצג פחות',
     table_of_contents_button_label: 'פתיחת תוכן העניינים',

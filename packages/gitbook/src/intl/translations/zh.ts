@@ -56,7 +56,7 @@ export const zh: TranslationLanguage = {
     annotation_button_label: '打开批注',
     code_copied: '已复制！',
     code_copy: '复制',
-    prompt_copy: 'Copy prompt',
+    prompt_copy: '复制提示词',
     code_block_collapsed: '显示全部 ${1} 行',
     code_block_expanded: '收起',
     table_of_contents_button_label: '打开目录',
