@@ -1,5 +1,26 @@
 # gitbook
 
+## 0.27.1
+
+### Patch Changes
+
+- acf2719: Mark the AI Assistant chat as `aria-busy` while it is generating a response (including the follow-up suggestion phase), so assistive technologies are notified of the in-progress state.
+- 72a1596: Fix the AI assistant panel overflowing its frame when rendering single/multi-choice question forms with long option text.
+- 77c717c: Assistant: group all of a turn's tool calls behind a single "Explored with N tools" expandable instead of rendering a separate single-item expandable for each client-side tool call.
+- c44d822: Trust an optional cookieless integration content host (`GITBOOK_INTEGRATIONS_CONTENT_HOST`) for WebFrame postMessage, in preparation for isolating integration-rendered content onto a separate origin. Defaults to `GITBOOK_INTEGRATIONS_HOST`, so behavior is unchanged until the content host is configured.
+- 7655041: Match keyboard shortcuts by the logical character typed instead of the physical key position, so that ⌘-C no longer opens the Assistant on the Dvorak layout (and other non-QWERTY layouts).
+- af3cda1: Fix wide content (such as code blocks and tables) overflowing the edges of hint blocks instead of scrolling within them.
+- 0ca4952: Remove the external link button from the link tooltip hover card, as its arrow read as clickable even though the preview card isn't interactive.
+- 3ff88ba: Add a Prompt block
+- 251630c: Drive page actions ordering and default action from the new `pageActions.items` list, including the reorderable assistant action
+- ddba803: Add a page reference chip when opening the Assistant from the page action, so the assistant is informed about the page the reader is currently on.
+- f4469b2: Support OpenAPI one-operation-per-page mode
+- 6c967c9: Add a client-side search field to table blocks, with per-column filters for select and checkbox columns
+- 882dfcd: Tidy prompt and add e2e test
+- Updated dependencies [f4469b2]
+- Updated dependencies [88b94b5]
+  - @gitbook/react-openapi@1.5.14
+
 ## 0.27.0
 
 ### Minor Changes

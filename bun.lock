@@ -109,7 +109,7 @@
     },
     "packages/gitbook": {
       "name": "gitbook",
-      "version": "0.27.0",
+      "version": "0.27.1",
       "dependencies": {
         "@cloudflare/workers-types": "^4.20251011.0",
         "@gitbook/api": "catalog:",
@@ -312,7 +312,7 @@
     },
     "packages/react-openapi": {
       "name": "@gitbook/react-openapi",
-      "version": "1.5.13",
+      "version": "1.5.14",
       "dependencies": {
         "@gitbook/expr": "workspace:*",
         "@gitbook/openapi-parser": "workspace:*",
