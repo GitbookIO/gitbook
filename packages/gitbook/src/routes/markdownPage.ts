@@ -116,7 +116,7 @@ If you need additional information that is not directly available in this page, 
 Perform an HTTP GET request on the current page URL with the \`ask\` query parameter, and the optional \`goal\` query parameter:
 
 \`\`\`
-GET ${pageUrl}?ask=<question>&goal=<end goal>
+GET ${pageUrl}?ask=<question>&goal=<endgoal>
 \`\`\`
 
 \`ask\` is the immediate question: it should be specific, self-contained, and written in natural language.
