@@ -48,9 +48,7 @@ export async function serveAskMarkdown(
                 question,
                 context: {
                     siteSpaceId: context.siteSpace.id,
-                    // POC: `goal` is not yet part of the published `@gitbook/api` types.
-                    // The backend reads it from `context.goal`; cast until the client is regenerated + published.
-                    ...(goal ? ({ goal } as { goal: string }) : {}),
+                    goal,
                 },
                 scope: {
                     mode: 'default',
