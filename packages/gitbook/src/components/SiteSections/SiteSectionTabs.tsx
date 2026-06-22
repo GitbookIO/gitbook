@@ -133,12 +133,7 @@ export function SiteSectionTabs(props: {
                                                 'data-[motion=from-start]:*:animate-[enterFromLeft_300ms_ease_both] data-[motion=to-end]:*:animate-[exitToRight_300ms_ease_both] data-[motion=to-start]:*:animate-[exitToLeft_300ms_ease_both] motion-safe:data-[motion=from-end]:*:animate-[enterFromRight_300ms_ease_both]',
                                             ])}
                                         >
-                                            <div
-                                                className={tcls(
-                                                    // Clip here, not on the viewport (see note below).
-                                                    'max-h-[calc(100vh-8rem)] w-full overflow-y-auto overflow-x-hidden circular-corners:rounded-3xl rounded-corners:rounded-xl'
-                                                )}
-                                            >
+                                            <div className="max-h-[calc(100vh-8rem)] w-full overflow-y-auto overflow-x-hidden circular-corners:rounded-3xl rounded-corners:rounded-xl">
                                                 <SectionGroupTileList
                                                     items={structureItem.children}
                                                     currentSection={currentSection}
@@ -174,10 +169,8 @@ export function SiteSectionTabs(props: {
             >
                 <NavigationMenu.Viewport
                     className={tcls(
-                        // No `overflow-hidden` here: this layer is composited (translateZ) and
-                        // animated, and Chromium fails to paint a clipped composited layer's text
-                        // inside an iframe or `overflow-hidden` ancestor (RND-11448). Clipping is
-                        // done on the inner content wrapper instead.
+                        // Note: this layer is composited (translateZ) and animated. Chromium fails to paint a clipped composited layer's text
+                        // inside an iframe or `overflow-hidden` ancestor. Clipping is done on the inner content wrapper instead.
                         'relative origin-[center_top] circular-corners:rounded-3xl rounded-corners:rounded-xl border border-tint bg-tint-base shadow-lg',
                         '-mt-0.5 h-(--radix-navigation-menu-viewport-height) w-full max-w-full md:w-(--radix-navigation-menu-viewport-width)',
                         'max-h-[calc(100vh-8rem)] data-[state=closed]:animate-scale-out data-[state=open]:animate-scale-in',
