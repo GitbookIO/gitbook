@@ -56,6 +56,7 @@ export const sv: TranslationLanguage = {
     annotation_button_label: 'Öppna anteckning',
     code_copied: 'Kopierat!',
     code_copy: 'Kopiera',
+    prompt_copy: 'Kopiera prompten',
     code_block_collapsed: 'Visa alla ${1} rader',
     code_block_expanded: 'Visa mindre',
     table_of_contents_button_label: 'Öppna innehållsförteckning',

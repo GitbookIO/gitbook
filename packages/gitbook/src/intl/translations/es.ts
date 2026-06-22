@@ -57,6 +57,7 @@ export const es: TranslationLanguage = {
     annotation_button_label: 'Abrir anotación',
     code_copied: '¡Copiado!',
     code_copy: 'Copiar',
+    prompt_copy: 'Copiar prompt',
     code_block_collapsed: 'Mostrar las ${1} líneas',
     code_block_expanded: 'Mostrar menos',
     table_of_contents_button_label: 'Abrir índice de contenidos',

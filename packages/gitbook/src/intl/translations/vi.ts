@@ -56,6 +56,7 @@ export const vi: TranslationLanguage = {
     annotation_button_label: 'Mở chú thích',
     code_copied: 'Đã sao chép!',
     code_copy: 'Sao chép',
+    prompt_copy: 'Sao chép lời nhắc',
     code_block_collapsed: 'Hiển thị tất cả ${1} dòng',
     code_block_expanded: 'Hiển thị ít hơn',
     table_of_contents_button_label: 'Mở mục lục',

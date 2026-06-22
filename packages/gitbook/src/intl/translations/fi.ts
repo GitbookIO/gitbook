@@ -56,6 +56,7 @@ export const fi: TranslationLanguage = {
     annotation_button_label: 'Avaa huomautus',
     code_copied: 'Kopioitu!',
     code_copy: 'Kopioi',
+    prompt_copy: 'Kopioi kehote',
     code_block_collapsed: 'Näytä kaikki ${1} riviä',
     code_block_expanded: 'Näytä vähemmän',
     table_of_contents_button_label: 'Avaa sisällysluettelo',

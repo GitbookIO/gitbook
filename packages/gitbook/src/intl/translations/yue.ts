@@ -55,6 +55,7 @@ export const yue: TranslationLanguage = {
     annotation_button_label: '開啟註解',
     code_copied: '已複製！',
     code_copy: '複製',
+    prompt_copy: '複製提示',
     code_block_collapsed: '顯示全部 ${1} 行',
     code_block_expanded: '顯示少啲',
     table_of_contents_button_label: '開啟目錄',

@@ -57,6 +57,7 @@ export const ko: TranslationLanguage = {
     annotation_button_label: '주석 열기',
     code_copied: '복사됨!',
     code_copy: '복사',
+    prompt_copy: '프롬프트 복사',
     code_block_collapsed: '${1}줄 모두 보기',
     code_block_expanded: '간단히 보기',
     table_of_contents_button_label: '목차 열기',

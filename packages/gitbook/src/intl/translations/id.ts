@@ -56,6 +56,7 @@ export const id: TranslationLanguage = {
     annotation_button_label: 'Buka anotasi',
     code_copied: 'Disalin!',
     code_copy: 'Salin',
+    prompt_copy: 'Salin prompt',
     code_block_collapsed: 'Tampilkan semua ${1} baris',
     code_block_expanded: 'Tampilkan lebih sedikit',
     table_of_contents_button_label: 'Buka daftar isi',

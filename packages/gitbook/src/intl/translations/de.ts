@@ -55,6 +55,7 @@ export const de = {
     annotation_button_label: 'Kommentar öffnen',
     code_copied: 'Kopiert!',
     code_copy: 'Kopieren',
+    prompt_copy: 'Prompt kopieren',
     code_block_collapsed: 'Alle ${1} Zeilen anzeigen',
     code_block_expanded: 'Weniger anzeigen',
     table_of_contents_button_label: 'Inhaltsverzeichnis öffnen',

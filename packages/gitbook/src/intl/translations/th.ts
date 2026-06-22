@@ -55,6 +55,7 @@ export const th: TranslationLanguage = {
     annotation_button_label: 'เปิดคำอธิบายประกอบ',
     code_copied: 'คัดลอกแล้ว!',
     code_copy: 'คัดลอก',
+    prompt_copy: 'คัดลอกพรอมต์',
     code_block_collapsed: 'แสดงทั้งหมด ${1} บรรทัด',
     code_block_expanded: 'แสดงน้อยลง',
     table_of_contents_button_label: 'เปิดสารบัญ',
