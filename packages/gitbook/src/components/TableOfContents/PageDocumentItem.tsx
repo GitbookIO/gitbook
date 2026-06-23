@@ -43,7 +43,7 @@ export function PageDocumentItem(props: { page: ClientTOCPageDocument }) {
                 tag={page.primaryTag ? <Tag tag={page.primaryTag} /> : null}
             >
                 {page.openAPIOperation ? (
-                    <span className="flex h-[1lh] shrink-0 items-center self-center">
+                    <span className="flex h-[1lh] w-9 shrink-0 self-baseline">
                         <OpenAPIMethodBadge
                             method={page.openAPIOperation.method}
                             short
