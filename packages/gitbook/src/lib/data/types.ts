@@ -182,4 +182,21 @@ export interface GitBookDataFetcher {
         revisionId: string;
         pageId: string;
     }): Promise<DataFetcherResponse<api.RevisionPageMetaLinks>>;
+
+    /**
+     * List change request meta links.
+     */
+    listChangeRequestPageMetaLinks(params: {
+        spaceId: string;
+        changeRequestId: string;
+        pageId: string;
+    }): Promise<DataFetcherResponse<api.RevisionPageMetaLinks>>;
+
+    /**
+     * List space meta links.
+     */
+    listSpacePageMetaLinks(params: {
+        spaceId: string;
+        pageId: string;
+    }): Promise<DataFetcherResponse<api.RevisionPageMetaLinks>>;
 }
