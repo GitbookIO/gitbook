@@ -222,7 +222,7 @@ function cacheLifeFromResponse(
 }
 
 const getUserById = cache(async (input: DataFetcherInput, params: { userId: string }) => {
-    'use cache: remote';
+    'use cache';
     return wrapCacheDataFetcherError(async () => {
         return trace(`getUserById(${params.userId})`, async () => {
             const api = apiClient(input);
@@ -268,7 +268,7 @@ const getSpace = cache(
 
 const getChangeRequest = cache(
     async (input: DataFetcherInput, params: { spaceId: string; changeRequestId: string }) => {
-        'use cache: remote';
+        'use cache';
         cacheTag(
             getCacheTag({
                 tag: 'change-request',
@@ -330,7 +330,7 @@ const getRevisionPageMarkdown = cache(
         // used only to bust the cache
         _functionName: string
     ) => {
-        'use cache: remote';
+        'use cache';
         return wrapCacheDataFetcherError(async () => {
             return trace(
                 `getRevisionPageMarkdown(${params.spaceId}, ${params.revisionId}, ${params.pageId})`,
@@ -372,7 +372,7 @@ const getRevisionPageDocument = cache(
         // used only to bust the cache
         _functionName: string
     ) => {
-        'use cache: remote';
+        'use cache';
         return wrapCacheDataFetcherError(async () => {
             return trace(
                 `getRevisionPageDocument(${params.spaceId}, ${params.revisionId}, ${params.pageId})`,
@@ -406,7 +406,7 @@ const getRevisionReusableContentDocument = cache(
         input: DataFetcherInput,
         params: { spaceId: string; revisionId: string; reusableContentId: string }
     ) => {
-        'use cache: remote';
+        'use cache';
         return wrapCacheDataFetcherError(async () => {
             return trace(
                 `getRevisionReusableContentDocument(${params.spaceId}, ${params.revisionId}, ${params.reusableContentId})`,
@@ -466,7 +466,7 @@ const getRevisionPageByPath = cache(
 
 const getDocument = cache(
     async (input: DataFetcherInput, params: { spaceId: string; documentId: string }) => {
-        'use cache: remote';
+        'use cache';
         return wrapCacheDataFetcherError(async () => {
             return trace(`getDocument(${params.spaceId}, ${params.documentId})`, async () => {
                 const api = apiClient(input);
@@ -496,7 +496,7 @@ const getComputedDocument = cache(
             seed: string;
         }
     ) => {
-        'use cache: remote';
+        'use cache';
         cacheTag(
             ...getComputedContentSourceCacheTags(
                 {
@@ -613,7 +613,7 @@ const getSiteRedirectBySource = cache(
             source: string;
         }
     ) => {
-        'use cache: remote';
+        'use cache';
         cacheTag(
             getCacheTag({
                 tag: 'site',
@@ -648,7 +648,7 @@ const getSiteRedirectBySource = cache(
 
 const getEmbedByUrl = cache(
     async (input: DataFetcherInput, params: { spaceId: string; url: string }) => {
-        'use cache: remote';
+        'use cache';
         cacheTag(
             getCacheTag({
                 tag: 'space',
@@ -722,7 +722,7 @@ const renderIntegrationUi = cache(
         input: DataFetcherInput,
         params: { integrationName: string; request: RenderIntegrationUI }
     ) => {
-        'use cache: remote';
+        'use cache';
         cacheTag(
             getCacheTag({
                 tag: 'integration',
@@ -756,7 +756,7 @@ const listRevisionPageMetaLinks = cache(
         input: DataFetcherInput,
         params: { spaceId: string; revisionId: string; pageId: string }
     ) => {
-        'use cache: remote';
+        'use cache';
         return wrapCacheDataFetcherError(async () => {
             return trace(
                 `listRevisionPageMetaLinks(${params.spaceId}, ${params.revisionId}, ${params.pageId})`,
