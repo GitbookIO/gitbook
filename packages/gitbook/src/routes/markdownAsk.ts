@@ -9,11 +9,27 @@ import { serveMarkdown } from '@/routes/markdownPage';
 import type { SearchAIAnswer, SearchAIAnswerSource } from '@gitbook/api';
 
 /**
+ * Options to steer the AI answer served as markdown.
+ */
+export interface ServeAskMarkdownOptions {
+    /**
+     * The end goal the calling agent is trying to accomplish on behalf of the user,
+     * passed via the `?goal=` search parameter. Used by the backend to steer the answer.
+     */
+    goal?: string;
+}
+
+/**
  * Serve an AI answer as markdown for a page.
  */
-export async function serveAskMarkdown(context: GitBookSiteContext, rawQuestion: string) {
+export async function serveAskMarkdown(
+    context: GitBookSiteContext,
+    rawQuestion: string,
+    options: ServeAskMarkdownOptions = {}
+) {
     return serveMarkdown(async () => {
         const question = rawQuestion.trim();
+        const goal = options.goal?.trim() || undefined;
 
         if (
             !question ||
@@ -32,6 +48,7 @@ export async function serveAskMarkdown(context: GitBookSiteContext, rawQuestion:
                 question,
                 context: {
                     siteSpaceId: context.siteSpace.id,
+                    goal,
                 },
                 scope: {
                     mode: 'default',
@@ -80,10 +97,12 @@ export async function serveAskMarkdown(context: GitBookSiteContext, rawQuestion:
             result +=
                 'If you need more information, consider asking one of these follow-up questions by performing an HTTP GET request on the URL:\n\n';
             result += followupQuestions
-                .map(
-                    (q) =>
-                        `- [${q}](${context.linker.toAbsoluteURL(context.linker.toPathInSite(''))}?ask=${encodeURIComponent(q)})`
-                )
+                .map((q) => {
+                    const base = `${context.linker.toAbsoluteURL(context.linker.toPathInSite(''))}?ask=${encodeURIComponent(q)}`;
+                    // Carry the goal forward so a multi-step agent keeps its end goal across asks.
+                    const url = goal ? `${base}&goal=${encodeURIComponent(goal)}` : base;
+                    return `- [${q}](${url})`;
+                })
                 .join('\n');
             result += '\n\n';
         }
