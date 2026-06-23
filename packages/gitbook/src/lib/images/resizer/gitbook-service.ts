@@ -52,7 +52,7 @@ export async function resizeImageWithGitbookServices(
     );
 }
 
-function stringifyOptions(options: CloudflareImageOptions & {signature: string}): string {
+function stringifyOptions(options: CloudflareImageOptions & { signature: string }): string {
     return Object.entries({ ...options }).reduce((rest, [key, value]) => {
         return `${rest}${rest ? ',' : ''}${key}=${value}`;
     }, '');
