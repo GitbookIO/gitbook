@@ -1,4 +1,4 @@
-import { GITBOOK_INTEGRATIONS_HOST } from '@/lib/env';
+import { GITBOOK_INTEGRATIONS_CONTENT_HOST, GITBOOK_INTEGRATIONS_HOST } from '@/lib/env';
 import { tcls } from '@/lib/tailwind';
 import type { DocumentBlockIntegration, RenderIntegrationUI } from '@gitbook/api';
 import { ContentKit, ContentKitOutput } from '@gitbook/react-contentkit';
@@ -82,7 +82,16 @@ export async function IntegrationBlock(props: BlockProps<DocumentBlockIntegratio
                 renderContext={{
                     integrationName: block.data.integration,
                 }}
-                security={{ firstPartyDomains: [GITBOOK_INTEGRATIONS_HOST] }}
+                security={{
+                    // Trust both the integrations host and the (cookieless) content host that
+                    // serves rendered WebFrames. `ElementWebframe` gates inbound and outbound
+                    // postMessage on this list, so a WebFrame served from the content host would
+                    // break (no resize/ready/actions) if the content host weren't trusted.
+                    // The hosts are identical until a distinct content origin is configured.
+                    firstPartyDomains: [
+                        ...new Set([GITBOOK_INTEGRATIONS_HOST, GITBOOK_INTEGRATIONS_CONTENT_HOST]),
+                    ],
+                }}
                 initialInput={initialInput}
                 initialOutput={initialOutput}
                 render={renderIntegrationUi}

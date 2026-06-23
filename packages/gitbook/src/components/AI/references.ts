@@ -19,7 +19,13 @@ export type PageReference = BaseAIChatReference & {
     href?: string;
 };
 
-export type AIChatReference = CodeBlockReference | PageReference;
+export type TextReference = BaseAIChatReference & {
+    type: 'text';
+    /** The selected text content. */
+    content: string;
+};
+
+export type AIChatReference = CodeBlockReference | PageReference | TextReference;
 
 /**
  * Serialize the staged references into a preamble prepended to the user's message,
@@ -40,6 +46,11 @@ export function serializeReferences(refs: AIChatReference[]): string {
     const codeRefs = refs.filter((ref): ref is CodeBlockReference => ref.type === 'code-block');
     if (codeRefs.length > 0) {
         sections.push(serializeCodeBlockReferences(codeRefs));
+    }
+
+    const textRefs = refs.filter((ref): ref is TextReference => ref.type === 'text');
+    if (textRefs.length > 0) {
+        sections.push(serializeTextReferences(textRefs));
     }
 
     if (sections.length === 0) {
@@ -64,6 +75,19 @@ function serializeCodeBlockReferences(refs: CodeBlockReference[]): string {
     const plural = refs.length > 1;
     const blocks = refs.map(buildCodeBlockFence).join('\n\n');
     return `The user is referring to the following code block${plural ? 's' : ''} from the page they are reading. Answer their question about ${plural ? 'them' : 'it'}:\n\n${blocks}`;
+}
+
+function serializeTextReferences(refs: TextReference[]): string {
+    const plural = refs.length > 1;
+    const blocks = refs.map((ref) => quoteText(ref.content)).join('\n\n');
+    return `The user is referring to the following excerpt${plural ? 's' : ''} from the page they are reading. Answer their question about ${plural ? 'them' : 'it'}:\n\n${blocks}`;
+}
+
+function quoteText(content: string): string {
+    return content
+        .split('\n')
+        .map((line) => `> ${line}`)
+        .join('\n');
 }
 
 function buildCodeBlockFence(ref: CodeBlockReference): string {

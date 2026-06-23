@@ -4,6 +4,7 @@ import { tcls } from '@/lib/tailwind';
 
 import { RecordCard } from './RecordCard';
 import type { TableViewProps } from './Table';
+import { TableSearchRecord } from './TableSearch';
 
 export function ViewCards(props: TableViewProps<DocumentTableViewCards>) {
     const { block, view, records, style } = props;
@@ -21,7 +22,15 @@ export function ViewCards(props: TableViewProps<DocumentTableViewCards>) {
             )}
         >
             {records.map((record) => {
-                return <RecordCard key={record[0]} {...props} record={record} />;
+                return (
+                    <TableSearchRecord
+                        key={record[0]}
+                        recordId={record[0]}
+                        visibleClassName="contents"
+                    >
+                        <RecordCard {...props} record={record} />
+                    </TableSearchRecord>
+                );
             })}
         </div>
     );

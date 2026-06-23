@@ -1,12 +1,12 @@
 import type { GitBookSiteContext } from '@/lib/context';
 
+import { CONTAINER_STYLE, HEADER_HEIGHT_DESKTOP } from '@/components/layout';
 import { getSpaceLanguage, t } from '@/intl/server';
 import { tcls } from '@/lib/tailwind';
 import type { SiteSpace } from '@gitbook/api';
 import { SocialAccountButton } from '../Footer/SocialAccounts';
 import { SearchContainer, getSearchBaseProps } from '../Search';
 import { SiteSectionTabs, encodeClientSiteSections } from '../SiteSections';
-import { HeaderLayout } from './HeaderLayout';
 import { HeaderLink } from './HeaderLink';
 import { HeaderLinkMore } from './HeaderLinkMore';
 import { HeaderLinks } from './HeaderLinks';
@@ -41,81 +41,172 @@ export async function Header(props: {
     );
 
     return (
-        <HeaderLayout
-            withTopHeader={withTopHeader}
-            searchStyle={customization.styling.search}
-            leading={
-                <>
-                    <HeaderMobileMenu
+        <header
+            data-gb-site-header
+            className={tcls(
+                'flex',
+                'flex-col',
+                `h-[${HEADER_HEIGHT_DESKTOP}px]`,
+                'sticky',
+                'top-0',
+                'pt-[env(safe-area-inset-top)]',
+                'z-30',
+                'w-full',
+                'flex-none',
+                'shadow-[0px_1px_0px]',
+                'shadow-tint-12/2',
+
+                'bg-tint-base/9',
+                'theme-muted:bg-tint-subtle/9',
+                '[html.sidebar-filled.theme-bold.tint_&]:bg-tint-subtle/9',
+                'theme-gradient:bg-gradient-primary',
+                'theme-gradient-tint:bg-gradient-tint',
+                'contrast-more:bg-tint-base',
+
+                withTopHeader ? null : 'mobile-only lg:hidden',
+                'text-sm',
+                'backdrop-blur-lg'
+            )}
+        >
+            <div
+                className={tcls(
+                    'site-header:theme-bold:bg-header-background',
+                    'site-header:theme-bold:shadow-[0px_1px_0px]',
+                    'site-header:theme-bold:shadow-tint-12/2'
+                )}
+            >
+                <div className="transition-all duration-300 motion-reduce:transition-none lg:chat-open:pr-(--ai-chat-width)">
+                    <div
+                        data-gb-header-content
                         className={tcls(
-                            '-ml-2',
-                            'text-tint-strong',
-                            'site-header:theme-bold:text-header-link',
-                            'hover:bg-tint-hover',
-                            'hover:site-header:theme-bold:bg-header-link/3',
-                            variants.generic.length > 1
-                                ? 'lg:hidden'
-                                : 'no-sidebar:hidden lg:hidden'
+                            'gap-4',
+                            'lg:gap-6',
+                            'flex',
+                            'items-center',
+                            'justify-between',
+                            'w-full',
+                            'py-3',
+                            'min-h-16',
+                            'sm:h-16',
+                            CONTAINER_STYLE,
+                            'transition-[max-width] duration-300 motion-reduce:transition-none',
+                            '@container/header'
                         )}
-                    />
-                    <HeaderLogo context={context} />
-                </>
-            }
-            search={
-                <SearchContainer
-                    {...searchProps}
-                    style={customization.styling.search}
-                    viewport={!withTopHeader ? 'mobile' : undefined}
-                />
-            }
-            links={
-                customization.header.links.length > 0 ||
-                headerSocialAccounts.length > 0 ||
-                (!withSections && variants.translations.length > 1) ? (
-                    <HeaderLinks>
-                        {customization.header.links.map((link) => {
-                            return <HeaderLink key={link.title} link={link} context={context} />;
-                        })}
-                        {headerSocialAccounts.length > 0 ? (
-                            <div className="flex items-center gap-1">
-                                {headerSocialAccounts.map((account) => {
+                    >
+                        <div
+                            className={tcls(
+                                'flex max-w-full',
+                                'min-w-0 shrink items-center justify-start gap-2 lg:gap-4',
+                                'search' in customization.styling &&
+                                    customization.styling.search === 'prominent'
+                                    ? 'lg:@2xl:basis-72'
+                                    : null
+                            )}
+                        >
+                            <HeaderMobileMenu
+                                className={tcls(
+                                    '-ml-2',
+                                    'text-tint-strong',
+                                    'site-header:theme-bold:text-header-link',
+                                    'hover:bg-tint-hover',
+                                    'hover:site-header:theme-bold:bg-header-link/3',
+                                    variants.generic.length > 1
+                                        ? 'lg:hidden'
+                                        : 'no-sidebar:hidden lg:hidden'
+                                )}
+                            />
+                            <HeaderLogo context={context} />
+                        </div>
+
+                        <div
+                            className={tcls(
+                                'flex',
+                                'grow-0',
+                                'shrink-0',
+                                'md:@2xl:basis-56',
+                                'justify-self-end',
+                                'items-center',
+                                'gap-2',
+                                'transition-[margin] duration-300 motion-reduce:transition-none',
+                                'search' in customization.styling &&
+                                    customization.styling.search === 'prominent'
+                                    ? [
+                                          'md:@2xl:grow-[0.8]',
+                                          'md:@4xl:basis-40',
+                                          'md:@2xl:max-w-[50%]',
+                                          'md:@4xl:max-w-lg',
+                                          'lg:@2xl:ml-[max(calc((100%-18rem-48rem)/2),1.5rem)]', // container (100%) - sidebar (18rem) - content (48rem)
+                                          'not-chat-open:xl:ml-[max(calc((100%-18rem-48rem-14rem-3rem)/2),1.5rem)]', // container (100%) - sidebar (18rem) - content (48rem) - outline (14rem) - margin (3rem)
+                                          'md:@2xl:mr-auto',
+                                          'order-last',
+                                          'md:@2xl:order-[unset]',
+                                      ]
+                                    : ['order-last']
+                            )}
+                        >
+                            <SearchContainer
+                                {...searchProps}
+                                style={customization.styling.search}
+                                viewport={!withTopHeader ? 'mobile' : undefined}
+                            />
+                        </div>
+
+                        {customization.header.links.length > 0 ||
+                        headerSocialAccounts.length > 0 ||
+                        (!withSections && variants.translations.length > 1) ? (
+                            <HeaderLinks>
+                                {customization.header.links.map((link) => {
                                     return (
-                                        <SocialAccountButton
-                                            key={`${account.platform}-${account.handle}`}
-                                            account={account}
-                                            target={customization.externalLinks.target}
-                                            className="p-2 theme-bold:text-header-link hover:site-header:theme-bold:bg-header-link/3 hover:theme-bold:text-header-link focus-visible:site-header:theme-bold:bg-header-link/3"
+                                        <HeaderLink
+                                            key={link.title}
+                                            link={link}
+                                            context={context}
                                         />
                                     );
                                 })}
-                            </div>
+                                {headerSocialAccounts.length > 0 ? (
+                                    <div className="flex items-center gap-1">
+                                        {headerSocialAccounts.map((account) => {
+                                            return (
+                                                <SocialAccountButton
+                                                    key={`${account.platform}-${account.handle}`}
+                                                    account={account}
+                                                    target={customization.externalLinks.target}
+                                                    className="p-2 theme-bold:text-header-link hover:site-header:theme-bold:bg-header-link/3 hover:theme-bold:text-header-link focus-visible:site-header:theme-bold:bg-header-link/3"
+                                                />
+                                            );
+                                        })}
+                                    </div>
+                                ) : null}
+                                {customization.header.links.length > 0 ||
+                                headerSocialAccounts.length > 0 ? (
+                                    <HeaderLinkMore
+                                        label={t(language, 'more')}
+                                        links={customization.header.links}
+                                        socialAccounts={headerSocialAccounts}
+                                        context={context}
+                                    />
+                                ) : null}
+                                {!withSections && variants.translations.length > 1 ? (
+                                    <TranslationsDropdown
+                                        context={context}
+                                        siteSpace={
+                                            variants.translations.find(
+                                                (space) => space.id === siteSpace.id
+                                            ) ?? siteSpace
+                                        }
+                                        siteSpaces={variants.translations}
+                                        className="flex! site-header:theme-bold:text-header-link hover:site-header:theme-bold:bg-header-link/3 focus-visible:site-header:theme-bold:bg-header-link/3 aria-expanded:site-header:theme-bold:bg-header-link/5"
+                                    />
+                                ) : null}
+                            </HeaderLinks>
                         ) : null}
-                        {customization.header.links.length > 0 ||
-                        headerSocialAccounts.length > 0 ? (
-                            <HeaderLinkMore
-                                label={t(language, 'more')}
-                                links={customization.header.links}
-                                socialAccounts={headerSocialAccounts}
-                                context={context}
-                            />
-                        ) : null}
-                        {!withSections && variants.translations.length > 1 ? (
-                            <TranslationsDropdown
-                                context={context}
-                                siteSpace={
-                                    variants.translations.find(
-                                        (space) => space.id === siteSpace.id
-                                    ) ?? siteSpace
-                                }
-                                siteSpaces={variants.translations}
-                                className="flex! site-header:theme-bold:text-header-link hover:site-header:theme-bold:bg-header-link/3 focus-visible:site-header:theme-bold:bg-header-link/3 aria-expanded:site-header:theme-bold:bg-header-link/5"
-                            />
-                        ) : null}
-                    </HeaderLinks>
-                ) : null
-            }
-            sections={
-                visibleSections && withSections ? (
+                    </div>
+                </div>
+            </div>
+
+            {visibleSections && withSections ? (
+                <div className="transition-[padding] duration-300 motion-reduce:transition-none lg:chat-open:pr-(--ai-chat-width)">
                     <SiteSectionTabs sections={encodeClientSiteSections(context, visibleSections)}>
                         {variants.translations.length > 1 ? (
                             <TranslationsDropdown
@@ -130,8 +221,8 @@ export async function Header(props: {
                             />
                         ) : null}
                     </SiteSectionTabs>
-                ) : null
-            }
-        />
+                </div>
+            ) : null}
+        </header>
     );
 }

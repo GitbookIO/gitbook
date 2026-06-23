@@ -1,5 +1,12 @@
 # @gitbook/react-openapi
 
+## 1.5.14
+
+### Patch Changes
+
+- f4469b2: Support OpenAPI one-operation-per-page mode
+- 88b94b5: Handle circular oneOf with discriminator and allOf in OpenAPI schemas
+
 ## 1.5.13
 
 ### Patch Changes

@@ -54,6 +54,7 @@ async function OpenAPIOperationBody(props: BlockProps<AnyOpenAPIOperationsBlock>
                     data.operation['x-expandAllResponses'] ?? data['x-expandAllResponses'],
                 expandAllModelSections:
                     data.operation['x-expandAllModelSections'] ?? data['x-expandAllModelSections'],
+                headless: block.type === 'openapi-operation' ? block.data.headless : undefined,
             })}
             className="openapi-block"
         />

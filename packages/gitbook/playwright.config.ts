@@ -18,6 +18,16 @@ export default defineConfig({
             use: {
                 ...devices['Desktop Chrome'],
                 channel: 'chrome',
+                launchOptions: {
+                    args: [
+                        // Disable subpixel (LCD) text so glyphs always render with
+                        // grayscale antialiasing — removes the red/blue edge fringing
+                        // that varies between macOS (local) and Linux (CI) runs.
+                        '--disable-lcd-text',
+                        // Disable font hinting so glyph rasterization is platform-independent.
+                        '--font-render-hinting=none',
+                    ],
+                },
             },
         },
     ],

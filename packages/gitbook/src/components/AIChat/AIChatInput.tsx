@@ -13,10 +13,10 @@ export function AIChatInput(props: {
     /**
      * When true, the input is disabled
      */
-    loading: boolean;
+    responding: boolean;
     onSubmit: (value: string) => void;
 }) {
-    const { onSubmit, disabled, loading } = props;
+    const { onSubmit, disabled, responding } = props;
 
     const language = useLanguage();
     const chat = useAIChatState();
@@ -25,7 +25,7 @@ export function AIChatInput(props: {
     const inputRef = useRef<HTMLTextAreaElement>(null);
 
     useEffect(() => {
-        if (chat.opened && !disabled && !loading) {
+        if (chat.opened && !disabled && !responding) {
             // Add a small delay to ensure the input is rendered before focusing
             // This fixes inconsistent focus behaviour across browsers
             const timeout = setTimeout(() => {
@@ -34,7 +34,7 @@ export function AIChatInput(props: {
 
             return () => clearTimeout(timeout);
         }
-    }, [disabled, loading, chat.opened]);
+    }, [disabled, responding, chat.opened]);
 
     // Explicit focus requests (e.g. clicking "Ask" while the chat is already open).
     useEffect(() => {
@@ -51,6 +51,9 @@ export function AIChatInput(props: {
         },
         {
             enableOnFormTags: true,
+            // Match the logical character so Dvorak ⌘-C (physical "I" key) copies
+            // instead of focusing the Assistant input. RND-11340.
+            ignoreEventWhen: (e) => e.key.toLowerCase() !== 'i',
         }
     );
 
@@ -75,21 +78,21 @@ export function AIChatInput(props: {
             rows={1}
             maxLength={2048}
             keyboardShortcut={
-                !disabled && !loading
+                !disabled && !responding
                     ? {
                           keys: ['mod', 'i'],
                           className: 'bg-tint-base group-focus-within/input:hidden',
                       }
                     : undefined
             }
-            disabled={disabled || loading || chat.control !== null}
-            aria-busy={loading}
+            disabled={disabled || responding || chat.control !== null}
+            aria-busy={responding}
             ref={inputRef}
             header={
                 <AIChatReferenceChips
                     references={chat.references}
                     onRemove={chatController.removeReference}
-                    disabled={loading || disabled}
+                    disabled={responding || disabled}
                 />
             }
             trailing={

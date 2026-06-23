@@ -70,6 +70,10 @@ export function SearchContainer({
         },
         {
             enableOnFormTags: true,
+            // Match the logical character typed, not the physical key position, so
+            // non-QWERTY layouts don't trigger the shortcut by position (e.g. on
+            // Dvorak the physical "K"/"I" keys produce other characters). RND-11340.
+            ignoreEventWhen: (e) => e.key.toLowerCase() !== 'k',
         }
     );
 
@@ -85,6 +89,9 @@ export function SearchContainer({
         },
         {
             enableOnFormTags: true,
+            // Match the logical character so Dvorak ⌘-C (physical "I" key) copies
+            // instead of opening the Assistant. RND-11340.
+            ignoreEventWhen: (e) => e.key.toLowerCase() !== 'i',
         }
     );
 

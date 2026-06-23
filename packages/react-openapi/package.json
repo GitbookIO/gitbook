@@ -7,7 +7,7 @@
             "default": "./dist/index.js"
         }
     },
-    "version": "1.5.13",
+    "version": "1.5.14",
     "sideEffects": false,
     "dependencies": {
         "@gitbook/expr": "workspace:*",

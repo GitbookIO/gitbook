@@ -16,6 +16,11 @@ export type OpenAPIPathProps = {
      * @default true
      */
     canCopy?: boolean;
+    /**
+     * The size of the HTTP method badge.
+     * @default 'medium'
+     */
+    methodBadgeSize?: 'small' | 'medium';
 };
 
 /**

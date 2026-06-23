@@ -817,11 +817,18 @@ function encodePathInSiteContent(
                 acceptsMarkdown(request);
             if (pathname.match(MARKDOWN_PATH_REGEX) || shouldServeMarkdown) {
                 const pagePathWithoutMD = pathname.replace(MARKDOWN_PATH_REGEX, '');
-                const ask = new URL(request.url).searchParams.get('ask');
+                const searchParams = new URL(request.url).searchParams;
+                const ask = searchParams.get('ask');
+                // Optional end goal the calling agent is trying to accomplish, used to steer the answer.
+                // It is encoded as a second path segment (the route is statically rendered, so it can't
+                // read query params at runtime — the question is path-encoded for the same reason).
+                const goal = searchParams.get('goal');
                 return {
                     pathname:
                         typeof ask === 'string'
-                            ? `~gitbook/markdown-ask/${encodeURIComponent(ask)}`
+                            ? `~gitbook/markdown-ask/${encodeURIComponent(ask)}${
+                                  typeof goal === 'string' ? `/${encodeURIComponent(goal)}` : ''
+                              }`
                             : `~gitbook/markdown/${encodePagePath(pagePathWithoutMD)}`,
                     routeType: 'static',
                     // TODO: track pageId / spaceId when possible

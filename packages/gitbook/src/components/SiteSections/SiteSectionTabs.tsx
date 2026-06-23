@@ -137,11 +137,7 @@ export function SiteSectionTabs(props: {
                                                     : '',
                                             ])}
                                         >
-                                            <div
-                                                className={tcls(
-                                                    'max-h-[calc(100vh-8rem)] w-full overflow-y-auto overflow-x-hidden'
-                                                )}
-                                            >
+                                            <div className="max-h-[calc(100vh-8rem)] w-full overflow-y-auto overflow-x-hidden circular-corners:rounded-3xl rounded-corners:rounded-xl">
                                                 <SectionGroupTileList
                                                     items={structureItem.children}
                                                     currentSection={currentSection}
@@ -182,7 +178,9 @@ export function SiteSectionTabs(props: {
             >
                 <NavigationMenu.Viewport
                     className={tcls(
-                        'relative origin-[center_top] overflow-hidden circular-corners:rounded-3xl rounded-corners:rounded-xl border border-tint bg-tint-base shadow-lg',
+                        // Note: this layer is composited (translateZ) and animated. Chromium fails to paint a clipped composited layer's text
+                        // inside an iframe or `overflow-hidden` ancestor. Clipping is done on the inner content wrapper instead.
+                        'relative origin-[center_top] circular-corners:rounded-3xl rounded-corners:rounded-xl border border-tint bg-tint-base shadow-lg',
                         '-mt-0.5 h-(--radix-navigation-menu-viewport-height) w-full max-w-full md:w-(--radix-navigation-menu-viewport-width)',
                         'max-h-[calc(100vh-8rem)]',
                         !disableAnimations
