@@ -77,7 +77,10 @@ export const sk: TranslationLanguage = {
     notfound_adaptive:
         'Táto stránka môže existovať, ale na prístup sa možno budete musieť prihlásiť.',
     notfound_adaptive_login: 'Prihlásiť sa',
+    notfound_adaptive_registration_hint:
+        'Registrácia môže byť dostupná v závislosti od organizácie.',
     notfound_goto_home: 'Prejsť na domovskú stránku',
+    notfound_suggestions_title: 'Možno hľadáte',
     unexpected_error_title: 'Vyskytla sa chyba',
     unexpected_error: 'Ľutujeme, vyskytla sa neočakávaná chyba. Skúste to znova neskôr.',
     unexpected_error_retry: 'Skúsiť znova',

@@ -76,7 +76,10 @@ export const et: TranslationLanguage = {
     notfound_adaptive_title: 'Leht pole saadaval',
     notfound_adaptive: 'See leht võib olemas olla, kuid juurdepääsuks võib olla vaja sisse logida.',
     notfound_adaptive_login: 'Logi sisse',
+    notfound_adaptive_registration_hint:
+        'Registreerimine võib olla saadaval olenevalt organisatsioonist.',
     notfound_goto_home: 'Mine avalehele',
+    notfound_suggestions_title: 'Võib-olla otsite',
     unexpected_error_title: 'Ilmnes tõrge',
     unexpected_error: 'Vabandust, ilmnes ootamatu tõrge. Palun proovige hiljem uuesti.',
     unexpected_error_retry: 'Proovi uuesti',

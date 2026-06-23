@@ -77,7 +77,9 @@ export const id: TranslationLanguage = {
     notfound_adaptive:
         'Halaman ini mungkin ada, tetapi Anda mungkin perlu masuk untuk mengaksesnya.',
     notfound_adaptive_login: 'Masuk',
+    notfound_adaptive_registration_hint: 'Pendaftaran mungkin tersedia tergantung pada organisasi.',
     notfound_goto_home: 'Buka beranda',
+    notfound_suggestions_title: 'Mungkin Anda mencari',
     unexpected_error_title: 'Terjadi kesalahan',
     unexpected_error: 'Maaf, terjadi kesalahan yang tidak terduga. Silakan coba lagi nanti.',
     unexpected_error_retry: 'Coba lagi',

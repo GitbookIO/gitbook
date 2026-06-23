@@ -76,7 +76,10 @@ export const sv: TranslationLanguage = {
     notfound_adaptive_title: 'Sidan är inte tillgänglig',
     notfound_adaptive: 'Sidan kan finnas, men du kan behöva logga in för att få åtkomst.',
     notfound_adaptive_login: 'Logga in',
+    notfound_adaptive_registration_hint:
+        'Registrering kan vara tillgänglig beroende på organisationen.',
     notfound_goto_home: 'Gå till startsidan',
+    notfound_suggestions_title: 'Du kanske letar efter',
     unexpected_error_title: 'Ett fel uppstod',
     unexpected_error: 'Tyvärr uppstod ett oväntat fel. Försök igen senare.',
     unexpected_error_retry: 'Försök igen',

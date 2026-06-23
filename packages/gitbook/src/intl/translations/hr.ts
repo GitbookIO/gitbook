@@ -77,7 +77,9 @@ export const hr: TranslationLanguage = {
     notfound_adaptive:
         'Ova stranica možda postoji, ali možda se morate prijaviti da biste joj pristupili.',
     notfound_adaptive_login: 'Prijava',
+    notfound_adaptive_registration_hint: 'Registracija može biti dostupna ovisno o organizaciji.',
     notfound_goto_home: 'Idi na početnu stranicu',
+    notfound_suggestions_title: 'Možda tražite',
     unexpected_error_title: 'Došlo je do pogreške',
     unexpected_error: 'Žao nam je, došlo je do neočekivane pogreške. Pokušajte ponovno kasnije.',
     unexpected_error_retry: 'Pokušaj ponovno',

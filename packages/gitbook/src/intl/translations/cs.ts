@@ -77,7 +77,9 @@ export const cs: TranslationLanguage = {
     notfound_adaptive:
         'Tato stránka může existovat, ale pro přístup se možná budete muset přihlásit.',
     notfound_adaptive_login: 'Přihlásit se',
+    notfound_adaptive_registration_hint: 'Registrace může být dostupná v závislosti na organizaci.',
     notfound_goto_home: 'Přejít na domovskou stránku',
+    notfound_suggestions_title: 'Možná hledáte',
     unexpected_error_title: 'Došlo k chybě',
     unexpected_error: 'Omlouváme se, došlo k neočekávané chybě. Zkuste to prosím znovu později.',
     unexpected_error_retry: 'Zkusit znovu',

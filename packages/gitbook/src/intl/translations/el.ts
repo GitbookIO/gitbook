@@ -77,7 +77,10 @@ export const el: TranslationLanguage = {
     notfound_adaptive:
         'Αυτή η σελίδα μπορεί να υπάρχει, αλλά ίσως χρειαστεί να συνδεθείτε για πρόσβαση.',
     notfound_adaptive_login: 'Σύνδεση',
+    notfound_adaptive_registration_hint:
+        'Η εγγραφή ενδέχεται να είναι διαθέσιμη ανάλογα με τον οργανισμό.',
     notfound_goto_home: 'Μετάβαση στην αρχική σελίδα',
+    notfound_suggestions_title: 'Ίσως αναζητάτε',
     unexpected_error_title: 'Παρουσιάστηκε σφάλμα',
     unexpected_error:
         'Λυπούμαστε, παρουσιάστηκε ένα μη αναμενόμενο σφάλμα. Δοκιμάστε ξανά αργότερα.',

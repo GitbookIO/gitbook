@@ -78,7 +78,10 @@ export const nl: TranslationLanguage = {
     notfound_adaptive:
         'Deze pagina bestaat mogelijk, maar je moet mogelijk inloggen om toegang te krijgen.',
     notfound_adaptive_login: 'Inloggen',
-    notfound_goto_home: 'Ga naar home',
+    notfound_adaptive_registration_hint:
+        'Registratie is mogelijk beschikbaar, afhankelijk van de organisatie.',
+    notfound_goto_home: 'Naar startpagina',
+    notfound_suggestions_title: 'Misschien zoek je',
     unexpected_error_title: 'Er is een fout opgetreden',
     unexpected_error: 'Sorry, er is een onverwachte fout opgetreden. Probeer het later opnieuw.',
     unexpected_error_retry: 'Opnieuw proberen',

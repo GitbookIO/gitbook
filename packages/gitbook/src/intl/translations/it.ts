@@ -78,7 +78,10 @@ export const it: TranslationLanguage = {
     notfound_adaptive:
         "Questa pagina potrebbe esistere, ma potrebbe essere necessario effettuare l'accesso per visualizzarla.",
     notfound_adaptive_login: 'Accedi',
+    notfound_adaptive_registration_hint:
+        "La registrazione potrebbe essere disponibile a seconda dell'organizzazione.",
     notfound_goto_home: 'Vai alla home',
+    notfound_suggestions_title: 'Forse stai cercando',
     unexpected_error_title: 'Si è verificato un errore',
     unexpected_error: 'Spiacenti, si è verificato un errore imprevisto. Riprova più tardi.',
     unexpected_error_retry: 'Riprova',
