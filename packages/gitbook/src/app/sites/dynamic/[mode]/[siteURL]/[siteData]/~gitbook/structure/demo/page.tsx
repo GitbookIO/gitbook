@@ -1,5 +1,6 @@
 import { type RouteLayoutParams, getDynamicSiteContext } from '@/app/utils';
 import { StructurePreview } from '@/components/StructurePreview';
+import { GITBOOK_APP_URL } from '@/lib/env';
 import { getStructurePreviewSnapshot } from '../snapshot';
 
 type PageProps = {
@@ -8,5 +9,10 @@ type PageProps = {
 
 export default async function Page(props: PageProps) {
     const { context } = await getDynamicSiteContext(await props.params);
-    return <StructurePreview initialSnapshot={getStructurePreviewSnapshot(context)} />;
+    return (
+        <StructurePreview
+            initialSnapshot={getStructurePreviewSnapshot(context)}
+            GITBOOK_APP_URL={GITBOOK_APP_URL}
+        />
+    );
 }

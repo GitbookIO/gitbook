@@ -68,20 +68,26 @@ import type {
     StructurePreviewNavigationMessage,
     StructurePreviewSnapshot,
 } from './types';
-import { GITBOOK_APP_URL } from '@/lib/env/globals';
 
 const PREVIEW_CONTENT_REF = {
     kind: 'url',
     url: '#',
 } as ContentRef;
 
-export function StructurePreview(props: { initialSnapshot: StructurePreviewSnapshot }) {
-    const { initialSnapshot } = props;
+export function StructurePreview(props: {
+    initialSnapshot: StructurePreviewSnapshot;
+    GITBOOK_APP_URL: string;
+}) {
+    const { initialSnapshot, GITBOOK_APP_URL } = props;
     const [snapshot, setSnapshot] = React.useState(initialSnapshot);
 
     React.useEffect(() => {
         const handleMessage = (event: MessageEvent<unknown>) => {
-            if (event.source !== window.parent || event.origin !== GITBOOK_APP_URL || !isStructurePreviewMessage(event.data)) {
+            if (
+                event.source !== window.parent ||
+                event.origin !== GITBOOK_APP_URL ||
+                !isStructurePreviewMessage(event.data)
+            ) {
                 return;
             }
 
@@ -346,7 +352,7 @@ function StructurePreviewVariantSelector(props: { snapshot: StructurePreviewSnap
                 ) : null}
                 <div className="ml-5 flex flex-col gap-6">
                     {Array.from({ length: 4 }).map((_, group) => (
-                        <div className="flex flex-col gap-2">
+                        <div className="flex flex-col gap-2" key={group}>
                             {Array.from({ length: [3, 5, 4, 3][group] ?? 0 }).map((_, index) => (
                                 <SkeletonParagraph
                                     key={index}
