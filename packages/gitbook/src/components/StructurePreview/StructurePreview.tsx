@@ -447,7 +447,6 @@ function StructurePreviewHeaderLink(props: {
                     key={index}
                     link={toCustomizationContentLink(subLink)}
                     locale={snapshot.locale}
-                    href="#"
                 />
             ))}
         </HeaderLinkItem>
@@ -504,7 +503,6 @@ function StructurePreviewMenuLink(props: {
                     : toCustomizationContentLink(link)
             }
             locale={snapshot.locale}
-            href={link.hasTarget ? '#' : undefined}
         />
     );
 }

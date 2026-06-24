@@ -76,7 +76,7 @@ export function HeaderLinkItem(props: {
 export function SubHeaderLinkItem(props: {
     link: CustomizationContentLink;
     locale: TranslationLanguage | undefined;
-    href: string;
+    href?: string;
     isSiteAuthLoginHref?: boolean;
 }) {
     return <HeaderLinkMenuItem {...props} />;
