@@ -2,6 +2,10 @@ import type { DocumentBlockTable } from '@gitbook/api';
 
 /**
  * Number of records a grid table needs before the search bar is shown by default.
+ *
+ * Duplicated in `@gitbook/doc-core` (`table/search.ts`) so the editor preview matches this default.
+ * There's no shared module for it — GBO consumes the published `@gitbook/api`, not `doc-core` — so
+ * the two copies must be kept in sync by hand when changing the default behaviour.
  */
 export const MIN_RECORDS_FOR_SEARCH = 7;
 
