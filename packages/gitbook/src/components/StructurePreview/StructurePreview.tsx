@@ -55,7 +55,7 @@ import {
     SkeletonParagraph,
     ToggleChevron,
 } from '../primitives';
-import { DropdownMenu, DropdownMenuItem } from '../primitives/DropdownMenu';
+import { DropdownMenu, DropdownMenuItem, DropdownMenuSeparator } from '../primitives/DropdownMenu';
 import {
     SOCIAL_PLATFORM_ICONS,
     isStructurePreviewMessage,
@@ -73,6 +73,25 @@ const PREVIEW_CONTENT_REF = {
     kind: 'url',
     url: '#',
 } as ContentRef;
+
+const SOCIAL_PLATFORM_LABELS: Partial<
+    Record<StructurePreviewSnapshot['customization']['socialAccounts'][number]['platform'], string>
+> = {
+    twitter: 'X/Twitter',
+    instagram: 'Instagram',
+    facebook: 'Facebook',
+    linkedin: 'LinkedIn',
+    github: 'GitHub',
+    discord: 'Discord',
+    slack: 'Slack',
+    youtube: 'YouTube',
+    tiktok: 'TikTok',
+    reddit: 'Reddit',
+    bluesky: 'Bluesky',
+    mastodon: 'Mastodon',
+    threads: 'Threads',
+    medium: 'Medium',
+};
 
 export function StructurePreview(props: {
     initialSnapshot: StructurePreviewSnapshot;
@@ -240,6 +259,7 @@ function StructurePreviewHeader(props: { snapshot: StructurePreviewSnapshot }) {
                             <StructurePreviewMoreMenu
                                 label={tString(language, 'more')}
                                 links={customization.header.links}
+                                socialAccounts={headerSocialAccounts}
                                 snapshot={snapshot}
                             />
                         ) : null}
@@ -425,9 +445,10 @@ function StructurePreviewHeaderLink(props: {
 function StructurePreviewMoreMenu(props: {
     snapshot: StructurePreviewSnapshot;
     links: PreviewHeaderLink[];
+    socialAccounts: StructurePreviewSnapshot['customization']['socialAccounts'];
     label: React.ReactNode;
 }) {
-    const { snapshot, links, label } = props;
+    const { snapshot, links, socialAccounts, label } = props;
     return (
         <div className={`${headerLinksStyles.linkEllipsis} z-20 items-center`}>
             <HeaderLinkMoreDropdown
@@ -438,6 +459,13 @@ function StructurePreviewMoreMenu(props: {
             >
                 {links.map((link, index) => (
                     <StructurePreviewMenuLink key={index} link={link} snapshot={snapshot} />
+                ))}
+                {socialAccounts.length > 0 && <DropdownMenuSeparator />}
+                {socialAccounts.map((account) => (
+                    <StructurePreviewSocialAccountLink
+                        key={`${account.platform}-${account.handle}`}
+                        account={account}
+                    />
                 ))}
             </HeaderLinkMoreDropdown>
         </div>
@@ -466,6 +494,23 @@ function StructurePreviewMenuLink(props: {
             locale={snapshot.locale}
             href={link.hasTarget ? '#' : undefined}
         />
+    );
+}
+
+function StructurePreviewSocialAccountLink(props: {
+    account: StructurePreviewSnapshot['customization']['socialAccounts'][number];
+}) {
+    const { account } = props;
+    const icon = SOCIAL_PLATFORM_ICONS[account.platform];
+
+    if (!icon) {
+        return null;
+    }
+
+    return (
+        <DropdownMenuItem leadingIcon={icon}>
+            {SOCIAL_PLATFORM_LABELS[account.platform] ?? account.platform}
+        </DropdownMenuItem>
     );
 }
 
