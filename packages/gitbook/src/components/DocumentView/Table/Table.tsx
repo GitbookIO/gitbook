@@ -16,13 +16,9 @@ import {
     getTableRecordSearchData,
     getTableSelectColumns,
 } from './search';
+import { shouldShowTableSearch } from './shouldShowSearch';
 
 export type { TableRecordKV };
-
-/**
- * Only show the table search once there are enough records that searching is useful.
- */
-const MIN_RECORDS_FOR_SEARCH = 7;
 
 export interface TableViewProps<View> extends BlockProps<DocumentBlockTable> {
     view: View;
@@ -38,10 +34,16 @@ export function Table(props: BlockProps<DocumentBlockTable>) {
         a[1].orderIndex.localeCompare(b[1].orderIndex)
     );
 
-    const showSearch =
-        context.mode !== 'print' &&
-        records.length >= MIN_RECORDS_FOR_SEARCH &&
-        block.data.view.type === 'grid'; // Tables only for now
+    // Authors can override the smart default per block with `search: true | false`; `undefined`
+    // keeps the default (search on grid tables with enough rows, off on cards). See the helper.
+    // TODO: read `block.data.search` directly once the published `@gitbook/api` includes the field.
+    const searchOverride = (block.data as { search?: boolean }).search;
+    const showSearch = shouldShowTableSearch({
+        recordCount: records.length,
+        viewType: block.data.view.type,
+        searchOverride,
+        isPrint: context.mode === 'print',
+    });
     const searchRecords = showSearch
         ? records.map(([id, record]) => ({ id, ...getTableRecordSearchData(block, record) }))
         : [];
