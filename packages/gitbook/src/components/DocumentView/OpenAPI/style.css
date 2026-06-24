@@ -101,7 +101,7 @@
 /* Method Tags */
 .openapi-method,
 .openapi-statuscode {
-    @apply m-0 h-5 min-w-9 justify-center rounded-md text-xs straight-corners:rounded-none circular-corners:rounded-lg uppercase font-mono items-center shrink-0 font-semibold px-1.5 py-0.5 mr-2 text-tint-12/8 leading-tight align-middle inline-flex whitespace-nowrap;
+    @apply m-0 h-5 min-w-9 justify-center rounded-md text-xs straight-corners:rounded-none circular-corners:rounded-lg uppercase font-mono items-center shrink-0 font-semibold px-1.5 py-0.5 text-tint-12/8 leading-tight align-middle inline-flex whitespace-nowrap;
 }
 
 .openapi-method-small {}
@@ -164,7 +164,8 @@
 }
 
 .openapi-column-preview-body {
-    @apply flex flex-col shrink overflow-hidden gap-4 print-mode:static;
+    /* overflow-clip + clip-margin so panel box-shadows aren't cut while overflow is still clipped */
+    @apply flex flex-col shrink overflow-clip [overflow-clip-margin:0.75rem] gap-4 print-mode:static;
 }
 
 .openapi-column-preview pre {
@@ -407,7 +408,7 @@
 }
 
 .openapi-response-tab-content {
-    @apply flex items-baseline truncate grow shrink max-w-max basis-full mr-auto;
+    @apply flex items-baseline gap-2 truncate grow shrink max-w-max basis-full mr-auto;
     @apply text-left text-pretty relative leading-tight text-tint select-text;
 }
 
@@ -581,7 +582,7 @@
 }
 
 .openapi-response-examples-statuscode-title {
-    @apply flex items-center;
+    @apply flex items-center gap-2;
 }
 
 .openapi-response-examples-header .openapi-select > button,
@@ -694,11 +695,12 @@ body:has(.openapi-select-popover) {
 
 /* Section Components */
 .openapi-section {
-    @apply flex flex-col overflow-hidden;
+    /* overflow-clip + clip-margin so the centered AND/OR separator badge isn't cut at the outermost alternatives level */
+    @apply flex flex-col overflow-clip [overflow-clip-margin:0.75rem];
 }
 
 .openapi-section-body {
-    @apply flex flex-col shrink overflow-hidden;
+    @apply flex flex-col shrink overflow-clip [overflow-clip-margin:0.75rem];
 }
 
 .openapi-section-header {
