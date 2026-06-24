@@ -2,25 +2,28 @@
 
 import { TrackPageViewEvent } from '@/components/Insights';
 import { t, tString, useLanguage } from '@/intl/client';
-import { removeLeadingSlash, removeTrailingSlash } from '@/lib/paths';
 import { tcls } from '@/lib/tailwind';
 import { SiteInsightsDisplayContext } from '@gitbook/api';
 import { Icon, type IconName } from '@gitbook/icons';
+import leven from 'leven';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useAI } from '../AI';
 import { PreservePageLayout } from '../PageBody/PreservePageLayout';
 import { useSetSearchState } from '../Search';
 import { SiteAuthLoginButton } from '../SiteAuth/SiteAuthLoginLink';
-import { useSiteAdaptiveAuthLoginHref, useSpaceBasePath } from '../SpaceLayout/SpaceLayoutContext';
-import { CurrentPageProvider } from '../hooks';
+import {
+    useSiteAdaptiveAuthLoginHref,
+    useSiteIndexURL,
+    useSpaceBasePath,
+} from '../SpaceLayout/SpaceLayoutContext';
+import { CurrentPageProvider, useCurrentContent } from '../hooks';
 import { Button, Emoji, SkeletonList, StyledLink, SuspenseLoadedHint } from '../primitives';
 import { Input } from '../primitives/Input';
-import { getRelatedPages } from './server-actions';
 
 const RELATED_PAGES_COUNT = 5;
 
-type RelatedPage = Awaited<ReturnType<typeof getRelatedPages>>[number];
+type RelatedPage = { id: string; title: string; href: string; emoji?: string; icon?: string };
 
 /**
  * Component that displays a "page not found" message, with ways to recover: related pages,
@@ -29,6 +32,8 @@ type RelatedPage = Awaited<ReturnType<typeof getRelatedPages>>[number];
 export function SitePageNotFound() {
     const basePath = useSpaceBasePath();
     const adaptiveAuthLoginHref = useSiteAdaptiveAuthLoginHref();
+    const siteIndexURL = useSiteIndexURL();
+    const { siteSpaceId } = useCurrentContent();
     const language = useLanguage();
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -57,10 +62,10 @@ export function SitePageNotFound() {
             return;
         }
 
-        // Otherwise, load the pages most similar to the path that 404'd. The ranking happens
-        // server-side (same `getSimilarPages` as the Markdown 404) so the page tree stays off the client.
+        // Otherwise, rank the site's pages against the path that 404'd. We reuse the search index
+        // (already preloaded and CDN-cached), so this adds no origin request — see getRelatedPages.
         let active = true;
-        getRelatedPages(getRequestedPath(pathname ?? '', basePath)).then(
+        getRelatedPages(siteIndexURL, pathname ?? '', siteSpaceId).then(
             (pages) => {
                 if (active) {
                     setSuggestions(pages);
@@ -75,7 +80,7 @@ export function SitePageNotFound() {
         return () => {
             active = false;
         };
-    }, [basePath, fallback, ask, pathname, router, searchParams]);
+    }, [siteIndexURL, siteSpaceId, fallback, ask, pathname, basePath, router, searchParams]);
 
     const openSearch = (value?: string) => {
         setSearchState((prev) => ({
@@ -224,14 +229,62 @@ function NotFoundSuggestions(props: { suggestions: RelatedPage[] | null }) {
     ) : null;
 }
 
+/** Minimal shape of an entry in the `~gitbook/site-index` response. */
+type IndexPage = {
+    id: string;
+    title: string;
+    pathname: string;
+    siteSpaceId: string;
+    icon?: string;
+    emoji?: string;
+};
+
 /**
- * Resolve the path the visitor tried to reach, relative to the current space.
+ * Return the pages whose path is closest to the one that 404'd.
+ *
+ * Rather than asking the server (which would mean an extra request per 404), this reuses the
+ * search index served at `~gitbook/site-index` — already preloaded and CDN-cached on every page —
+ * so it's a cache hit, not an origin request. The ranking is a lighter, client-side cousin of
+ * `getSimilarPages` (which the Markdown 404 runs server-side from the full page tree).
  */
-function getRequestedPath(pathname: string, basePath: string): string {
-    const normalizedBase = removeTrailingSlash(basePath);
-    const relative =
-        normalizedBase && pathname.startsWith(normalizedBase)
-            ? pathname.slice(normalizedBase.length)
-            : pathname;
-    return removeTrailingSlash(removeLeadingSlash(relative));
+async function getRelatedPages(
+    indexURL: string,
+    requestedPath: string,
+    siteSpaceId: string | null
+): Promise<RelatedPage[]> {
+    const response = await fetch(indexURL);
+    if (!response.ok) {
+        return [];
+    }
+    const { pages } = (await response.json()) as { pages: IndexPage[] };
+
+    return pages
+        .filter((page) => !siteSpaceId || page.siteSpaceId === siteSpaceId)
+        .map((page) => ({ page, score: scorePathSimilarity(requestedPath, page.pathname) }))
+        .sort((a, b) => b.score - a.score)
+        .slice(0, RELATED_PAGES_COUNT)
+        .map(({ page }) => ({
+            id: page.id,
+            title: page.title,
+            href: page.pathname,
+            emoji: page.emoji,
+            icon: page.icon,
+        }));
+}
+
+const normalizePath = (path: string) => path.toLowerCase().replace(/^\/+|\/+$/g, '');
+const lastSegment = (path: string) => path.slice(path.lastIndexOf('/') + 1);
+const similarity = (left: string, right: string) => {
+    const max = Math.max(left.length, right.length);
+    return max === 0 ? 1 : 1 - leven(left, right) / max;
+};
+
+/** Path similarity in [0, 1] — full-path closeness, weighted toward the last segment. */
+function scorePathSimilarity(input: string, candidate: string): number {
+    const a = normalizePath(input);
+    const b = normalizePath(candidate);
+    if (!a || !b) {
+        return 0;
+    }
+    return similarity(a, b) * 0.6 + similarity(lastSegment(a), lastSegment(b)) * 0.4;
 }

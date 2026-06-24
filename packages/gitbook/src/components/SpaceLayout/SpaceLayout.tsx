@@ -70,6 +70,7 @@ export function SpaceLayoutServerContext(props: SpaceLayoutProps) {
         <SpaceLayoutContextProvider
             basePath={context.linker.toPathInSpace('')}
             siteAdaptiveAuthLoginHref={siteAdaptiveAuthLoginHref}
+            siteIndexURL={context.linker.toPathInSite('~gitbook/site-index')}
         >
             <AdaptiveVisitorContextProvider
                 contextId={context.contextId}

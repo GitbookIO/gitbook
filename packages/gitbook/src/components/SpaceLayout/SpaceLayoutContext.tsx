@@ -5,6 +5,7 @@ import React from 'react';
 const SpaceLayoutContext = React.createContext({
     basePath: '',
     siteAdaptiveAuthLoginHref: null as string | null,
+    siteIndexURL: '',
 });
 
 /**
@@ -14,13 +15,14 @@ export function SpaceLayoutContextProvider(
     props: React.PropsWithChildren<{
         basePath: string;
         siteAdaptiveAuthLoginHref?: string | null;
+        siteIndexURL: string;
     }>
 ) {
-    const { basePath, siteAdaptiveAuthLoginHref = null, children } = props;
+    const { basePath, siteAdaptiveAuthLoginHref = null, siteIndexURL, children } = props;
 
     const value = React.useMemo(
-        () => ({ basePath, siteAdaptiveAuthLoginHref }),
-        [basePath, siteAdaptiveAuthLoginHref]
+        () => ({ basePath, siteAdaptiveAuthLoginHref, siteIndexURL }),
+        [basePath, siteAdaptiveAuthLoginHref, siteIndexURL]
     );
 
     return <SpaceLayoutContext.Provider value={value}>{children}</SpaceLayoutContext.Provider>;
@@ -46,4 +48,15 @@ export function useSiteAdaptiveAuthLoginHref() {
         throw new Error('SpaceLayoutContext not found');
     }
     return context.siteAdaptiveAuthLoginHref;
+}
+
+/**
+ * Return the URL of the site search index (`~gitbook/site-index`).
+ */
+export function useSiteIndexURL() {
+    const context = React.useContext(SpaceLayoutContext);
+    if (!context) {
+        throw new Error('SpaceLayoutContext not found');
+    }
+    return context.siteIndexURL;
 }
