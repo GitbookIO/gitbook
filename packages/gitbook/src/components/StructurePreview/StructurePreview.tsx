@@ -9,7 +9,7 @@ import {
 import type { IconName } from '@gitbook/icons';
 import * as React from 'react';
 
-import { SiteSectionTabs } from '@/components/SiteSections';
+import { SiteSectionList, SiteSectionTabs } from '@/components/SiteSections';
 import {
     TABLE_OF_CONTENTS_SPACES_DROPDOWN_CLASS,
     getTableOfContentsClassName,
@@ -356,18 +356,30 @@ function StructurePreviewSearch() {
 
 function StructurePreviewVariantSelector(props: { snapshot: StructurePreviewSnapshot }) {
     const { snapshot } = props;
-    const { variants } = snapshot;
+    const { customization, sections, variants } = snapshot;
+    const withTopHeader = customization.header.preset !== CustomizationHeaderPreset.None;
+    const withSections = Boolean(
+        sections &&
+            (sections.list.length > 1 ||
+                sections.list.some((section) => section.object === 'site-section-group'))
+    );
+    const withSidebarHeader = (!withTopHeader && withSections) || variants.generic.length > 1;
 
     return (
         <div data-gb-table-of-contents className={tcls(getTableOfContentsClassName(), 'max-w-xs')}>
             <div className={getTableOfContentsSidebarClassName()}>
-                {variants.generic.length > 1 ? (
+                {withSidebarHeader ? (
                     <div className={getTableOfContentsInnerHeaderClassName()}>
-                        <StructurePreviewSpacesDropdown
-                            title={snapshot.siteSpace.title}
-                            siteSpaces={variants.generic}
-                            className={TABLE_OF_CONTENTS_SPACES_DROPDOWN_CLASS}
-                        />
+                        {!withTopHeader && withSections && sections ? (
+                            <SiteSectionList className="hidden lg:block" sections={sections} />
+                        ) : null}
+                        {variants.generic.length > 1 ? (
+                            <StructurePreviewSpacesDropdown
+                                title={snapshot.siteSpace.title}
+                                siteSpaces={variants.generic}
+                                className={TABLE_OF_CONTENTS_SPACES_DROPDOWN_CLASS}
+                            />
+                        ) : null}
                     </div>
                 ) : null}
                 <div className="ml-5 flex flex-col gap-6">

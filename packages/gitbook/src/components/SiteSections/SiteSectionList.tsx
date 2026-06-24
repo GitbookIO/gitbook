@@ -82,6 +82,7 @@ export function SiteSectionListItem(props: {
             href={section.url}
             aria-current={isActive && 'page'}
             id={section.id}
+            data-gb-site-section-id={section.id}
             className={tcls(
                 'group/section-link',
                 'flex',
