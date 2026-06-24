@@ -77,7 +77,10 @@ export const bg: TranslationLanguage = {
     notfound_adaptive:
         'Тази страница може да съществува, но може да трябва да влезете, за да я достъпите.',
     notfound_adaptive_login: 'Вход',
+    notfound_adaptive_registration_hint:
+        'Регистрацията може да е възможна в зависимост от организацията.',
     notfound_goto_home: 'Към началната страница',
+    notfound_suggestions_title: 'Може би търсите',
     unexpected_error_title: 'Възникна грешка',
     unexpected_error: 'Съжаляваме, възникна неочаквана грешка. Моля, опитайте отново по-късно.',
     unexpected_error_retry: 'Опитайте отново',

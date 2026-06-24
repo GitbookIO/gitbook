@@ -77,7 +77,10 @@ export const fi: TranslationLanguage = {
     notfound_adaptive:
         'Tämä sivu voi olla olemassa, mutta sen käyttö voi edellyttää kirjautumista.',
     notfound_adaptive_login: 'Kirjaudu sisään',
+    notfound_adaptive_registration_hint:
+        'Rekisteröityminen voi olla mahdollista organisaatiosta riippuen.',
     notfound_goto_home: 'Siirry etusivulle',
+    notfound_suggestions_title: 'Saatat etsiä',
     unexpected_error_title: 'Tapahtui virhe',
     unexpected_error: 'Valitettavasti tapahtui odottamaton virhe. Yritä myöhemmin uudelleen.',
     unexpected_error_retry: 'Yritä uudelleen',

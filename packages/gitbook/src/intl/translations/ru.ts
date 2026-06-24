@@ -76,7 +76,10 @@ export const ru = {
     notfound_adaptive:
         'Эта страница может существовать, но для доступа к ней может потребоваться вход.',
     notfound_adaptive_login: 'Войти',
+    notfound_adaptive_registration_hint:
+        'Регистрация может быть доступна в зависимости от организации.',
     notfound_goto_home: 'Перейти на главную',
+    notfound_suggestions_title: 'Возможно, вы ищете',
     unexpected_error_title: 'Произошла ошибка',
     unexpected_error: 'Извините, произошла непредвиденная ошибка. Пожалуйста, попробуйте позже.',
     unexpected_error_retry: 'Попробуйте снова',

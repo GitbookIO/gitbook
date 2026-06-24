@@ -77,7 +77,10 @@ export const ro: TranslationLanguage = {
     notfound_adaptive:
         'Această pagină poate exista, dar este posibil să trebuiască să te autentifici pentru a o accesa.',
     notfound_adaptive_login: 'Autentificare',
+    notfound_adaptive_registration_hint:
+        'Înregistrarea poate fi disponibilă în funcție de organizație.',
     notfound_goto_home: 'Mergi la pagina principală',
+    notfound_suggestions_title: 'Poate cauți',
     unexpected_error_title: 'A apărut o eroare',
     unexpected_error:
         'Ne pare rău, a apărut o eroare neașteptată. Te rugăm să încerci din nou mai târziu.',

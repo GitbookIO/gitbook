@@ -76,7 +76,10 @@ export const pl: TranslationLanguage = {
     notfound_adaptive_title: 'Strona niedostępna',
     notfound_adaptive: 'Ta strona może istnieć, ale dostęp do niej może wymagać zalogowania.',
     notfound_adaptive_login: 'Zaloguj się',
+    notfound_adaptive_registration_hint:
+        'Rejestracja może być dostępna w zależności od organizacji.',
     notfound_goto_home: 'Przejdź do strony głównej',
+    notfound_suggestions_title: 'Być może szukasz',
     unexpected_error_title: 'Wystąpił błąd',
     unexpected_error: 'Przepraszamy, wystąpił nieoczekiwany błąd. Spróbuj ponownie później.',
     unexpected_error_retry: 'Spróbuj ponownie',

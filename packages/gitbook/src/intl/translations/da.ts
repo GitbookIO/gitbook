@@ -77,7 +77,9 @@ export const da: TranslationLanguage = {
     notfound_adaptive:
         'Denne side findes muligvis, men du skal muligvis logge ind for at få adgang.',
     notfound_adaptive_login: 'Log ind',
+    notfound_adaptive_registration_hint: 'Registrering kan være mulig afhængigt af organisationen.',
     notfound_goto_home: 'Gå til forsiden',
+    notfound_suggestions_title: 'Du leder måske efter',
     unexpected_error_title: 'Der opstod en fejl',
     unexpected_error: 'Beklager, der opstod en uventet fejl. Prøv igen senere.',
     unexpected_error_retry: 'Prøv igen',

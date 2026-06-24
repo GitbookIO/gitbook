@@ -77,7 +77,9 @@ export const ms: TranslationLanguage = {
     notfound_adaptive:
         'Halaman ini mungkin wujud, tetapi anda mungkin perlu log masuk untuk mengaksesnya.',
     notfound_adaptive_login: 'Log masuk',
+    notfound_adaptive_registration_hint: 'Pendaftaran mungkin tersedia bergantung pada organisasi.',
     notfound_goto_home: 'Pergi ke halaman utama',
+    notfound_suggestions_title: 'Mungkin anda mencari',
     unexpected_error_title: 'Ralat berlaku',
     unexpected_error: 'Maaf, ralat yang tidak dijangka berlaku. Sila cuba lagi kemudian.',
     unexpected_error_retry: 'Cuba lagi',

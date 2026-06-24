@@ -77,7 +77,10 @@ export const lt: TranslationLanguage = {
     notfound_adaptive:
         'Šis puslapis gali egzistuoti, bet norint jį pasiekti gali reikėti prisijungti.',
     notfound_adaptive_login: 'Prisijungti',
+    notfound_adaptive_registration_hint:
+        'Registracija gali būti galima priklausomai nuo organizacijos.',
     notfound_goto_home: 'Eiti į pagrindinį puslapį',
+    notfound_suggestions_title: 'Galbūt ieškote',
     unexpected_error_title: 'Įvyko klaida',
     unexpected_error: 'Atsiprašome, įvyko netikėta klaida. Bandykite dar kartą vėliau.',
     unexpected_error_retry: 'Bandyti dar kartą',

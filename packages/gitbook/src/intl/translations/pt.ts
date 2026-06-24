@@ -77,7 +77,10 @@ export const pt: TranslationLanguage = {
     notfound_adaptive:
         'Esta página pode existir, mas talvez tenha de iniciar sessão para lhe aceder.',
     notfound_adaptive_login: 'Iniciar sessão',
+    notfound_adaptive_registration_hint:
+        'O registo pode estar disponível dependendo da organização.',
     notfound_goto_home: 'Ir para a página inicial',
+    notfound_suggestions_title: 'Talvez esteja à procura de',
     unexpected_error_title: 'Ocorreu um erro',
     unexpected_error: 'Lamentamos, ocorreu um erro inesperado. Tente novamente mais tarde.',
     unexpected_error_retry: 'Tentar novamente',
