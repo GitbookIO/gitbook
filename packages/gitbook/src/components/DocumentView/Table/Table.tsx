@@ -36,12 +36,10 @@ export function Table(props: BlockProps<DocumentBlockTable>) {
 
     // Authors can override the smart default per block with `search: true | false`; `undefined`
     // keeps the default (search on grid tables with enough rows, off on cards). See the helper.
-    // TODO: read `block.data.search` directly once the published `@gitbook/api` includes the field.
-    const searchOverride = (block.data as { search?: boolean }).search;
     const showSearch = shouldShowTableSearch({
         recordCount: records.length,
         viewType: block.data.view.type,
-        searchOverride,
+        searchOverride: block.data.search,
         isPrint: context.mode === 'print',
     });
     const searchRecords = showSearch
