@@ -544,7 +544,7 @@
 
 /* The code sample stays at full height; only the response example shrinks/scrolls to fit the viewport */
 .openapi-codesample {
-    @apply shrink-0;
+    @apply shrink-0 max-h-96;
 }
 
 .openapi-response-examples-panel {
