@@ -542,6 +542,11 @@
     @apply border shrink min-h-32 overflow-hidden rounded-corners:rounded-xl circular-corners:rounded-2xl straight-corners:rounded-xs bg-tint-subtle theme-muted:bg-tint-base theme-bold-tint:bg-tint-base border-tint-subtle depth-subtle:shadow-sm;
 }
 
+/* The code sample stays at full height; only the response example shrinks/scrolls to fit the viewport */
+.openapi-codesample {
+    @apply shrink-0;
+}
+
 .openapi-response-examples-panel {
     @apply flex flex-col shrink overflow-hidden;
 }
