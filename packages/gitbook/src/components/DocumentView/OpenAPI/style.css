@@ -160,16 +160,20 @@
 }
 
 .openapi-column-preview {
-    @apply flex flex-col flex-1 sticky self-start max-h-[calc(100vh-var(--toc-top-offset))] scroll-mt-4 top-[calc(var(--toc-top-offset)+1.5rem)];
+    /* Only on the 2-column layout is the preview a sticky pane capped to the viewport so both panels fit
+       (max-height accounts for the top offset + a 1.5rem bottom margin). On mobile (single column) it flows
+       normally, each block bounded by max-h-96, so the response isn't crammed into the viewport. */
+    @apply flex flex-col flex-1 scroll-mt-4 lg:sticky lg:self-start lg:max-h-[calc(100vh-var(--toc-top-offset)-3rem)] lg:top-[calc(var(--toc-top-offset)+1.5rem)];
 }
 
 .openapi-column-preview-body {
-    /* overflow-clip + clip-margin so panel box-shadows aren't cut while overflow is still clipped */
-    @apply flex flex-col shrink overflow-clip [overflow-clip-margin:0.75rem] gap-4 print-mode:static;
+    @apply flex flex-col shrink min-h-0 overflow-clip [overflow-clip-margin:0.75rem] gap-4 print-mode:static;
 }
 
 .openapi-column-preview pre {
-    @apply max-h-96 print-mode:max-h-none;
+    /* On the 2-column sticky layout, let the code block grow to fill the available preview height
+       (bounded by the sticky max-height) instead of a fixed cap, so it doesn't scroll when there's room. */
+    @apply max-h-96 lg:max-h-none print-mode:max-h-none;
 }
 
 /* Schema Structure */
@@ -539,6 +543,11 @@
     @apply border shrink min-h-32 overflow-hidden rounded-corners:rounded-xl circular-corners:rounded-2xl straight-corners:rounded-xs bg-tint-subtle theme-muted:bg-tint-base theme-bold-tint:bg-tint-base border-tint-subtle depth-subtle:shadow-sm;
 }
 
+/* The code sample stays at full height; only the response example shrinks/scrolls to fit the viewport */
+.openapi-codesample {
+    @apply shrink-0 lg:max-h-96;
+}
+
 .openapi-response-examples-panel {
     @apply flex flex-col shrink overflow-hidden;
 }
@@ -565,7 +574,7 @@
 
 .openapi-panel-footer,
 .openapi-codesample-footer {
-    @apply px-3 py-2 pt-2.5 border-t border-tint-subtle text-[0.813rem] text-tint empty:hidden;
+    @apply px-3 py-2 pt-2.5 border-t border-tint-subtle text-[0.813rem] text-tint empty:hidden shrink-0;
 }
 
 .openapi-panel-footer .openapi-markdown {
@@ -669,6 +678,11 @@ body:has(.openapi-select-popover) {
     @apply flex flex-col gap-1 justify-start items-start;
 }
 
+.openapi-select > button > span.react-aria-SelectValue:has(.openapi-statuscode),
+.openapi-select-item:has(.openapi-statuscode) {
+    @apply gap-2;
+}
+
 .openapi-select-item [slot="description"] {
     @apply text-xs text-tint-subtle;
 }
@@ -695,16 +709,18 @@ body:has(.openapi-select-popover) {
 
 /* Section Components */
 .openapi-section {
-    /* overflow-clip + clip-margin so the centered AND/OR separator badge isn't cut at the outermost alternatives level */
-    @apply flex flex-col overflow-clip [overflow-clip-margin:0.75rem];
+    /* min-h-0 so nested sections (e.g. the media-types panel inside a response example) can shrink
+       inside the height-capped preview; otherwise the code/JSON body keeps full height and pushes
+       the footer out of the panel. Headers/footers stay put via their own shrink-0. */
+    @apply flex flex-col min-h-0 overflow-clip [overflow-clip-margin:0.75rem];
 }
 
 .openapi-section-body {
-    @apply flex flex-col shrink overflow-clip [overflow-clip-margin:0.75rem];
+    @apply flex flex-col shrink min-h-0 overflow-clip [overflow-clip-margin:0.75rem];
 }
 
 .openapi-section-header {
-    @apply flex flex-row items-center;
+    @apply flex flex-row items-center shrink-0;
 }
 
 .openapi-section-header-content {
@@ -724,7 +740,7 @@ body:has(.openapi-select-popover) {
 }
 
 .openapi-section-footer {
-    @apply flex flex-row items-center p-2.5 gap-2.5 text-sm text-tint-strong border-t border-tint-subtle;
+    @apply flex flex-row items-center p-2.5 gap-2.5 text-sm text-tint-strong border-t border-tint-subtle shrink-0;
 }
 
 .openapi-section-footer-content {
