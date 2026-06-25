@@ -668,6 +668,11 @@ body:has(.openapi-select-popover) {
     @apply flex flex-col gap-1 justify-start items-start;
 }
 
+.openapi-select > button > span.react-aria-SelectValue:has(.openapi-statuscode),
+.openapi-select-item:has(.openapi-statuscode) {
+    @apply gap-2;
+}
+
 .openapi-select-item [slot="description"] {
     @apply text-xs text-tint-subtle;
 }
@@ -694,12 +699,11 @@ body:has(.openapi-select-popover) {
 
 /* Section Components */
 .openapi-section {
-    /* overflow-clip + clip-margin so the centered AND/OR separator badge isn't cut at the outermost alternatives level */
     @apply flex flex-col overflow-clip [overflow-clip-margin:0.75rem];
 }
 
 .openapi-section-body {
-    @apply flex flex-col shrink overflow-clip [overflow-clip-margin:0.75rem];
+    @apply flex flex-col shrink min-h-0 overflow-clip [overflow-clip-margin:0.75rem];
 }
 
 .openapi-section-header {
