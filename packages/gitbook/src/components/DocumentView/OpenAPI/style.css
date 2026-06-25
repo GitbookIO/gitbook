@@ -160,7 +160,9 @@
 }
 
 .openapi-column-preview {
-    @apply flex flex-col flex-1 sticky self-start max-h-[calc(100vh-var(--toc-top-offset))] scroll-mt-4 top-[calc(var(--toc-top-offset)+1.5rem)];
+    /* max-height accounts for the top offset (toc-top-offset + 1.5rem) plus a 1.5rem bottom margin,
+       so the shrunk code sample + response example both fit within the viewport instead of running past it */
+    @apply flex flex-col flex-1 sticky self-start max-h-[calc(100vh-var(--toc-top-offset)-3rem)] scroll-mt-4 top-[calc(var(--toc-top-offset)+1.5rem)];
 }
 
 .openapi-column-preview-body {
@@ -564,7 +566,7 @@
 
 .openapi-panel-footer,
 .openapi-codesample-footer {
-    @apply px-3 py-2 pt-2.5 border-t border-tint-subtle text-[0.813rem] text-tint empty:hidden;
+    @apply px-3 py-2 pt-2.5 border-t border-tint-subtle text-[0.813rem] text-tint empty:hidden shrink-0;
 }
 
 .openapi-panel-footer .openapi-markdown {
@@ -699,7 +701,10 @@ body:has(.openapi-select-popover) {
 
 /* Section Components */
 .openapi-section {
-    @apply flex flex-col overflow-clip [overflow-clip-margin:0.75rem];
+    /* min-h-0 so nested sections (e.g. the media-types panel inside a response example) can shrink
+       inside the height-capped preview; otherwise the code/JSON body keeps full height and pushes
+       the footer out of the panel. Headers/footers stay put via their own shrink-0. */
+    @apply flex flex-col min-h-0 overflow-clip [overflow-clip-margin:0.75rem];
 }
 
 .openapi-section-body {
@@ -707,7 +712,7 @@ body:has(.openapi-select-popover) {
 }
 
 .openapi-section-header {
-    @apply flex flex-row items-center;
+    @apply flex flex-row items-center shrink-0;
 }
 
 .openapi-section-header-content {
@@ -727,7 +732,7 @@ body:has(.openapi-select-popover) {
 }
 
 .openapi-section-footer {
-    @apply flex flex-row items-center p-2.5 gap-2.5 text-sm text-tint-strong border-t border-tint-subtle;
+    @apply flex flex-row items-center p-2.5 gap-2.5 text-sm text-tint-strong border-t border-tint-subtle shrink-0;
 }
 
 .openapi-section-footer-content {
