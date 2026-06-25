@@ -160,9 +160,10 @@
 }
 
 .openapi-column-preview {
-    /* max-height accounts for the top offset (toc-top-offset + 1.5rem) plus a 1.5rem bottom margin,
-       so the shrunk code sample + response example both fit within the viewport instead of running past it */
-    @apply flex flex-col flex-1 sticky self-start max-h-[calc(100vh-var(--toc-top-offset)-3rem)] scroll-mt-4 top-[calc(var(--toc-top-offset)+1.5rem)];
+    /* Only on the 2-column layout is the preview a sticky pane capped to the viewport so both panels fit
+       (max-height accounts for the top offset + a 1.5rem bottom margin). On mobile (single column) it flows
+       normally, each block bounded by max-h-96, so the response isn't crammed into the viewport. */
+    @apply flex flex-col flex-1 scroll-mt-4 lg:sticky lg:self-start lg:max-h-[calc(100vh-var(--toc-top-offset)-3rem)] lg:top-[calc(var(--toc-top-offset)+1.5rem)];
 }
 
 .openapi-column-preview-body {
