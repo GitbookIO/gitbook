@@ -55,6 +55,7 @@ export const de = {
     annotation_button_label: 'Kommentar öffnen',
     code_copied: 'Kopiert!',
     code_copy: 'Kopieren',
+    prompt_copy: 'Prompt kopieren',
     code_block_collapsed: 'Alle ${1} Zeilen anzeigen',
     code_block_expanded: 'Weniger anzeigen',
     table_of_contents_button_label: 'Inhaltsverzeichnis öffnen',
@@ -76,7 +77,10 @@ export const de = {
     notfound_adaptive:
         'Diese Seite existiert möglicherweise, aber Sie müssen sich eventuell anmelden, um darauf zuzugreifen.',
     notfound_adaptive_login: 'Anmelden',
+    notfound_adaptive_registration_hint:
+        'Die Registrierung ist je nach Organisation möglicherweise verfügbar.',
     notfound_goto_home: 'Zur Startseite',
+    notfound_suggestions_title: 'Vielleicht suchen Sie nach',
     unexpected_error_title: 'Ein Fehler ist aufgetreten',
     unexpected_error:
         'Entschuldigung, ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.',
@@ -108,6 +112,8 @@ export const de = {
     ai_chat_assistant_greeting_evening: 'Guten Abend',
     ai_chat_assistant_greeting_night: 'Gute Nacht',
     ai_chat_clear_conversation: 'Unterhaltung löschen',
+    ai_chat_expand_panel: 'Panel erweitern',
+    ai_chat_collapse_panel: 'Panel reduzieren',
     ai_chat_thinking: 'Denke nach...',
     ai_chat_working: 'Arbeite...',
     ai_chat_exploring: 'Erkunde...',

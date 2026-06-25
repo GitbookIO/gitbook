@@ -56,6 +56,7 @@ export const el: TranslationLanguage = {
     annotation_button_label: 'Άνοιγμα σχολίου',
     code_copied: 'Αντιγράφηκε!',
     code_copy: 'Αντιγραφή',
+    prompt_copy: 'Αντιγραφή προτροπής',
     code_block_collapsed: 'Εμφάνιση όλων των ${1} γραμμών',
     code_block_expanded: 'Εμφάνιση λιγότερων',
     table_of_contents_button_label: 'Άνοιγμα πίνακα περιεχομένων',
@@ -76,7 +77,10 @@ export const el: TranslationLanguage = {
     notfound_adaptive:
         'Αυτή η σελίδα μπορεί να υπάρχει, αλλά ίσως χρειαστεί να συνδεθείτε για πρόσβαση.',
     notfound_adaptive_login: 'Σύνδεση',
+    notfound_adaptive_registration_hint:
+        'Η εγγραφή ενδέχεται να είναι διαθέσιμη ανάλογα με τον οργανισμό.',
     notfound_goto_home: 'Μετάβαση στην αρχική σελίδα',
+    notfound_suggestions_title: 'Ίσως αναζητάτε',
     unexpected_error_title: 'Παρουσιάστηκε σφάλμα',
     unexpected_error:
         'Λυπούμαστε, παρουσιάστηκε ένα μη αναμενόμενο σφάλμα. Δοκιμάστε ξανά αργότερα.',
@@ -108,6 +112,8 @@ export const el: TranslationLanguage = {
     ai_chat_assistant_greeting_evening: 'Καλό βράδυ',
     ai_chat_assistant_greeting_night: 'Καληνύχτα',
     ai_chat_clear_conversation: 'Εκκαθάριση συνομιλίας',
+    ai_chat_expand_panel: 'Ανάπτυξη πίνακα',
+    ai_chat_collapse_panel: 'Σύμπτυξη πίνακα',
     ai_chat_thinking: 'Σκέφτομαι...',
     ai_chat_working: 'Εργάζομαι...',
     ai_chat_exploring: 'Εξερευνώ...',

@@ -57,6 +57,7 @@ export const es: TranslationLanguage = {
     annotation_button_label: 'Abrir anotación',
     code_copied: '¡Copiado!',
     code_copy: 'Copiar',
+    prompt_copy: 'Copiar prompt',
     code_block_collapsed: 'Mostrar las ${1} líneas',
     code_block_expanded: 'Mostrar menos',
     table_of_contents_button_label: 'Abrir índice de contenidos',
@@ -77,7 +78,10 @@ export const es: TranslationLanguage = {
     notfound_adaptive:
         'Esta página puede existir, pero es posible que debas iniciar sesión para acceder.',
     notfound_adaptive_login: 'Iniciar sesión',
+    notfound_adaptive_registration_hint:
+        'El registro puede estar disponible según la organización.',
     notfound_goto_home: 'Ir al inicio',
+    notfound_suggestions_title: 'Quizás estés buscando',
     unexpected_error_title: 'Ocurrió un error',
     unexpected_error:
         'Lo sentimos, ha ocurrido un error inesperado. Por favor, intenta de nuevo más tarde.',
@@ -109,6 +113,8 @@ export const es: TranslationLanguage = {
     ai_chat_assistant_greeting_evening: 'Buenas tardes',
     ai_chat_assistant_greeting_night: 'Buenas noches',
     ai_chat_clear_conversation: 'Limpiar conversación',
+    ai_chat_expand_panel: 'Expandir panel',
+    ai_chat_collapse_panel: 'Contraer panel',
     ai_chat_thinking: 'Pensando...',
     ai_chat_working: 'Trabajando...',
     ai_chat_exploring: 'Explorando...',

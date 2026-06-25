@@ -54,6 +54,27 @@ export function SkeletonParagraph(props: {
     );
 }
 
+export function SkeletonList(props: {
+    items: number;
+    size?: 'xsmall' | 'small' | 'medium';
+    start?: number;
+    className?: ClassValue;
+}) {
+    const { items, size = 'medium', start = 0, className } = props;
+    const itemHeight = size === 'small' ? 'h-4' : 'h-5';
+    return Array.from({ length: items }).map((_, index) => (
+        <li key={index} className={tcls('my-0.5', className)}>
+            <LoadingItem
+                className={tcls('origin-left', itemHeight)}
+                style={{
+                    width: `${(4 - ((index + start) % 4)) * 8 + 62}%`,
+                    animationDelay: `${(index + start) * 0.1}s`,
+                }}
+            />
+        </li>
+    ));
+}
+
 /**
  * Placeholder when loading a title.
  */

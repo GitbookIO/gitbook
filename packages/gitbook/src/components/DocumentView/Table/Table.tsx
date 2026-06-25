@@ -38,7 +38,10 @@ export function Table(props: BlockProps<DocumentBlockTable>) {
         a[1].orderIndex.localeCompare(b[1].orderIndex)
     );
 
-    const showSearch = context.mode !== 'print' && records.length >= MIN_RECORDS_FOR_SEARCH;
+    const showSearch =
+        context.mode !== 'print' &&
+        records.length >= MIN_RECORDS_FOR_SEARCH &&
+        block.data.view.type === 'grid'; // Tables only for now
     const searchRecords = showSearch
         ? records.map(([id, record]) => ({ id, ...getTableRecordSearchData(block, record) }))
         : [];

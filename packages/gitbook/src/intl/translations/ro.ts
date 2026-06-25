@@ -56,6 +56,7 @@ export const ro: TranslationLanguage = {
     annotation_button_label: 'Deschide adnotarea',
     code_copied: 'Copiat!',
     code_copy: 'Copiază',
+    prompt_copy: 'Copiază promptul',
     code_block_collapsed: 'Afișează toate cele ${1} linii',
     code_block_expanded: 'Afișează mai puțin',
     table_of_contents_button_label: 'Deschide cuprinsul',
@@ -76,7 +77,10 @@ export const ro: TranslationLanguage = {
     notfound_adaptive:
         'Această pagină poate exista, dar este posibil să trebuiască să te autentifici pentru a o accesa.',
     notfound_adaptive_login: 'Autentificare',
+    notfound_adaptive_registration_hint:
+        'Înregistrarea poate fi disponibilă în funcție de organizație.',
     notfound_goto_home: 'Mergi la pagina principală',
+    notfound_suggestions_title: 'Poate cauți',
     unexpected_error_title: 'A apărut o eroare',
     unexpected_error:
         'Ne pare rău, a apărut o eroare neașteptată. Te rugăm să încerci din nou mai târziu.',
@@ -108,6 +112,8 @@ export const ro: TranslationLanguage = {
     ai_chat_assistant_greeting_evening: 'Bună seara',
     ai_chat_assistant_greeting_night: 'Noapte bună',
     ai_chat_clear_conversation: 'Șterge conversația',
+    ai_chat_expand_panel: 'Extinde panoul',
+    ai_chat_collapse_panel: 'Restrânge panoul',
     ai_chat_thinking: 'Se gândește...',
     ai_chat_working: 'Lucrează...',
     ai_chat_exploring: 'Explorează...',

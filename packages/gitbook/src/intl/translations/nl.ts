@@ -57,6 +57,7 @@ export const nl: TranslationLanguage = {
     annotation_button_label: 'Annotatie openen',
     code_copied: 'Gekopieerd!',
     code_copy: 'Kopiëren',
+    prompt_copy: 'Prompt kopiëren',
     code_block_collapsed: 'Toon alle ${1} regels',
     code_block_expanded: 'Toon minder',
     table_of_contents_button_label: 'Open inhoudsopgave',
@@ -77,7 +78,10 @@ export const nl: TranslationLanguage = {
     notfound_adaptive:
         'Deze pagina bestaat mogelijk, maar je moet mogelijk inloggen om toegang te krijgen.',
     notfound_adaptive_login: 'Inloggen',
-    notfound_goto_home: 'Ga naar home',
+    notfound_adaptive_registration_hint:
+        'Registratie is mogelijk beschikbaar, afhankelijk van de organisatie.',
+    notfound_goto_home: 'Naar startpagina',
+    notfound_suggestions_title: 'Misschien zoek je',
     unexpected_error_title: 'Er is een fout opgetreden',
     unexpected_error: 'Sorry, er is een onverwachte fout opgetreden. Probeer het later opnieuw.',
     unexpected_error_retry: 'Opnieuw proberen',
@@ -107,6 +111,8 @@ export const nl: TranslationLanguage = {
     ai_chat_assistant_greeting_evening: 'Goedenavond',
     ai_chat_assistant_greeting_night: 'Goedenacht',
     ai_chat_clear_conversation: 'Gesprek wissen',
+    ai_chat_expand_panel: 'Paneel uitvouwen',
+    ai_chat_collapse_panel: 'Paneel samenvouwen',
     ai_chat_thinking: 'Denkt na...',
     ai_chat_working: 'Werkt...',
     ai_chat_exploring: 'Verkent...',

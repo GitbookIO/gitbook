@@ -55,6 +55,7 @@ export const pt_br = {
     annotation_button_label: 'Abrir anotação',
     code_copied: 'Copiado!',
     code_copy: 'Copiar',
+    prompt_copy: 'Copiar prompt',
     code_block_collapsed: 'Mostrar todas as ${1} linhas',
     code_block_expanded: 'Mostrar menos',
     table_of_contents_button_label: 'Abrir o índice',
@@ -75,7 +76,10 @@ export const pt_br = {
     notfound_adaptive:
         'Esta página pode existir, mas talvez você precise fazer login para acessá-la.',
     notfound_adaptive_login: 'Fazer login',
+    notfound_adaptive_registration_hint:
+        'O registro pode estar disponível dependendo da organização.',
     notfound_goto_home: 'Ir para a página inicial',
+    notfound_suggestions_title: 'Você pode estar procurando por',
     unexpected_error_title: 'Aconteceu um erro',
     unexpected_error:
         'Desculpe, aconteceu um erro inesperado. Por favor, tente novamente mais tarde.',
@@ -107,6 +111,8 @@ export const pt_br = {
     ai_chat_assistant_greeting_evening: 'Boa tarde',
     ai_chat_assistant_greeting_night: 'Boa noite',
     ai_chat_clear_conversation: 'Limpar conversa',
+    ai_chat_expand_panel: 'Expandir painel',
+    ai_chat_collapse_panel: 'Recolher painel',
     ai_chat_thinking: 'Pensando...',
     ai_chat_working: 'Trabalhando...',
     ai_chat_exploring: 'Explorando...',

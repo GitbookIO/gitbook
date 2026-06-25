@@ -57,6 +57,7 @@ export const it: TranslationLanguage = {
     annotation_button_label: 'Apri annotazione',
     code_copied: 'Copiato!',
     code_copy: 'Copia',
+    prompt_copy: 'Copia il prompt',
     code_block_collapsed: 'Mostra tutte le ${1} righe',
     code_block_expanded: 'Mostra meno',
     table_of_contents_button_label: 'Apri indice dei contenuti',
@@ -77,7 +78,10 @@ export const it: TranslationLanguage = {
     notfound_adaptive:
         "Questa pagina potrebbe esistere, ma potrebbe essere necessario effettuare l'accesso per visualizzarla.",
     notfound_adaptive_login: 'Accedi',
+    notfound_adaptive_registration_hint:
+        "La registrazione potrebbe essere disponibile a seconda dell'organizzazione.",
     notfound_goto_home: 'Vai alla home',
+    notfound_suggestions_title: 'Forse stai cercando',
     unexpected_error_title: 'Si è verificato un errore',
     unexpected_error: 'Spiacenti, si è verificato un errore imprevisto. Riprova più tardi.',
     unexpected_error_retry: 'Riprova',
@@ -108,6 +112,8 @@ export const it: TranslationLanguage = {
     ai_chat_assistant_greeting_evening: 'Buonasera',
     ai_chat_assistant_greeting_night: 'Buonanotte',
     ai_chat_clear_conversation: 'Cancella conversazione',
+    ai_chat_expand_panel: 'Espandi pannello',
+    ai_chat_collapse_panel: 'Comprimi pannello',
     ai_chat_thinking: 'Sto pensando...',
     ai_chat_working: 'Sto lavorando...',
     ai_chat_exploring: 'Esplorando...',

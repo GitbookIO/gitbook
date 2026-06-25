@@ -56,6 +56,7 @@ export const bg: TranslationLanguage = {
     annotation_button_label: 'Отваряне на бележка',
     code_copied: 'Копирано!',
     code_copy: 'Копиране',
+    prompt_copy: 'Копиране на подканата',
     code_block_collapsed: 'Показване на всички ${1} реда',
     code_block_expanded: 'Показване на по-малко',
     table_of_contents_button_label: 'Отваряне на съдържанието',
@@ -76,7 +77,10 @@ export const bg: TranslationLanguage = {
     notfound_adaptive:
         'Тази страница може да съществува, но може да трябва да влезете, за да я достъпите.',
     notfound_adaptive_login: 'Вход',
+    notfound_adaptive_registration_hint:
+        'Регистрацията може да е възможна в зависимост от организацията.',
     notfound_goto_home: 'Към началната страница',
+    notfound_suggestions_title: 'Може би търсите',
     unexpected_error_title: 'Възникна грешка',
     unexpected_error: 'Съжаляваме, възникна неочаквана грешка. Моля, опитайте отново по-късно.',
     unexpected_error_retry: 'Опитайте отново',
@@ -107,6 +111,8 @@ export const bg: TranslationLanguage = {
     ai_chat_assistant_greeting_evening: 'Добър вечер',
     ai_chat_assistant_greeting_night: 'Лека нощ',
     ai_chat_clear_conversation: 'Изчистване на разговора',
+    ai_chat_expand_panel: 'Разгъване на панела',
+    ai_chat_collapse_panel: 'Свиване на панела',
     ai_chat_thinking: 'Мисля...',
     ai_chat_working: 'Работя...',
     ai_chat_exploring: 'Проучвам...',

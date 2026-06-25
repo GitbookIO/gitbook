@@ -56,6 +56,7 @@ export const lt: TranslationLanguage = {
     annotation_button_label: 'Atidaryti pastabą',
     code_copied: 'Nukopijuota!',
     code_copy: 'Kopijuoti',
+    prompt_copy: 'Kopijuoti raginimą',
     code_block_collapsed: 'Rodyti visas ${1} eilutes',
     code_block_expanded: 'Rodyti mažiau',
     table_of_contents_button_label: 'Atidaryti turinį',
@@ -76,7 +77,10 @@ export const lt: TranslationLanguage = {
     notfound_adaptive:
         'Šis puslapis gali egzistuoti, bet norint jį pasiekti gali reikėti prisijungti.',
     notfound_adaptive_login: 'Prisijungti',
+    notfound_adaptive_registration_hint:
+        'Registracija gali būti galima priklausomai nuo organizacijos.',
     notfound_goto_home: 'Eiti į pagrindinį puslapį',
+    notfound_suggestions_title: 'Galbūt ieškote',
     unexpected_error_title: 'Įvyko klaida',
     unexpected_error: 'Atsiprašome, įvyko netikėta klaida. Bandykite dar kartą vėliau.',
     unexpected_error_retry: 'Bandyti dar kartą',
@@ -106,6 +110,8 @@ export const lt: TranslationLanguage = {
     ai_chat_assistant_greeting_evening: 'Labas vakaras',
     ai_chat_assistant_greeting_night: 'Labanakt',
     ai_chat_clear_conversation: 'Išvalyti pokalbį',
+    ai_chat_expand_panel: 'Išskleisti skydelį',
+    ai_chat_collapse_panel: 'Sutraukti skydelį',
     ai_chat_thinking: 'Galvoju...',
     ai_chat_working: 'Dirbu...',
     ai_chat_exploring: 'Tyrinėju...',

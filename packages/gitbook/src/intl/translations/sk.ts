@@ -56,6 +56,7 @@ export const sk: TranslationLanguage = {
     annotation_button_label: 'Otvoriť anotáciu',
     code_copied: 'Skopírované!',
     code_copy: 'Kopírovať',
+    prompt_copy: 'Kopírovať výzvu',
     code_block_collapsed: 'Zobraziť všetkých ${1} riadkov',
     code_block_expanded: 'Zobraziť menej',
     table_of_contents_button_label: 'Otvoriť obsah',
@@ -76,7 +77,10 @@ export const sk: TranslationLanguage = {
     notfound_adaptive:
         'Táto stránka môže existovať, ale na prístup sa možno budete musieť prihlásiť.',
     notfound_adaptive_login: 'Prihlásiť sa',
+    notfound_adaptive_registration_hint:
+        'Registrácia môže byť dostupná v závislosti od organizácie.',
     notfound_goto_home: 'Prejsť na domovskú stránku',
+    notfound_suggestions_title: 'Možno hľadáte',
     unexpected_error_title: 'Vyskytla sa chyba',
     unexpected_error: 'Ľutujeme, vyskytla sa neočakávaná chyba. Skúste to znova neskôr.',
     unexpected_error_retry: 'Skúsiť znova',
@@ -107,6 +111,8 @@ export const sk: TranslationLanguage = {
     ai_chat_assistant_greeting_evening: 'Dobrý večer',
     ai_chat_assistant_greeting_night: 'Dobrú noc',
     ai_chat_clear_conversation: 'Vymazať konverzáciu',
+    ai_chat_expand_panel: 'Rozbaliť panel',
+    ai_chat_collapse_panel: 'Zbaliť panel',
     ai_chat_thinking: 'Premýšľam...',
     ai_chat_working: 'Pracujem...',
     ai_chat_exploring: 'Skúmam...',

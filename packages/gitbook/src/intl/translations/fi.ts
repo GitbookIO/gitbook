@@ -56,6 +56,7 @@ export const fi: TranslationLanguage = {
     annotation_button_label: 'Avaa huomautus',
     code_copied: 'Kopioitu!',
     code_copy: 'Kopioi',
+    prompt_copy: 'Kopioi kehote',
     code_block_collapsed: 'Näytä kaikki ${1} riviä',
     code_block_expanded: 'Näytä vähemmän',
     table_of_contents_button_label: 'Avaa sisällysluettelo',
@@ -76,7 +77,10 @@ export const fi: TranslationLanguage = {
     notfound_adaptive:
         'Tämä sivu voi olla olemassa, mutta sen käyttö voi edellyttää kirjautumista.',
     notfound_adaptive_login: 'Kirjaudu sisään',
+    notfound_adaptive_registration_hint:
+        'Rekisteröityminen voi olla mahdollista organisaatiosta riippuen.',
     notfound_goto_home: 'Siirry etusivulle',
+    notfound_suggestions_title: 'Saatat etsiä',
     unexpected_error_title: 'Tapahtui virhe',
     unexpected_error: 'Valitettavasti tapahtui odottamaton virhe. Yritä myöhemmin uudelleen.',
     unexpected_error_retry: 'Yritä uudelleen',
@@ -106,6 +110,8 @@ export const fi: TranslationLanguage = {
     ai_chat_assistant_greeting_evening: 'Hyvää iltaa',
     ai_chat_assistant_greeting_night: 'Hyvää yötä',
     ai_chat_clear_conversation: 'Tyhjennä keskustelu',
+    ai_chat_expand_panel: 'Laajenna paneeli',
+    ai_chat_collapse_panel: 'Pienennä paneeli',
     ai_chat_thinking: 'Ajatellaan...',
     ai_chat_working: 'Työskennellään...',
     ai_chat_exploring: 'Tutkitaan...',

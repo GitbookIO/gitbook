@@ -108,6 +108,9 @@ export function ScrollSectionsList({ sections }: { sections: DocumentSection[] }
                             'border-transparent',
                             'sidebar-list-line:-left-px',
 
+                            // The method badge no longer has a right margin, so lay the row out with a gap
+                            section.tag && ['flex', 'items-baseline', 'gap-2'],
+
                             section.depth > 1 && [
                                 'subitem',
                                 'sidebar-list-line:pl-6',
@@ -146,6 +149,7 @@ export function ScrollSectionsList({ sections }: { sections: DocumentSection[] }
                                 method={section.tag}
                                 size="small"
                                 className="-mt-0.5"
+                                short
                             />
                         ) : null}
 

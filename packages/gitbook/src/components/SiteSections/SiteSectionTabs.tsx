@@ -133,11 +133,7 @@ export function SiteSectionTabs(props: {
                                                 'data-[motion=from-start]:*:animate-[enterFromLeft_300ms_ease_both] data-[motion=to-end]:*:animate-[exitToRight_300ms_ease_both] data-[motion=to-start]:*:animate-[exitToLeft_300ms_ease_both] motion-safe:data-[motion=from-end]:*:animate-[enterFromRight_300ms_ease_both]',
                                             ])}
                                         >
-                                            <div
-                                                className={tcls(
-                                                    'max-h-[calc(100vh-8rem)] w-full overflow-y-auto overflow-x-hidden'
-                                                )}
-                                            >
+                                            <div className="max-h-[calc(100vh-8rem)] w-full overflow-y-auto overflow-x-hidden circular-corners:rounded-3xl rounded-corners:rounded-xl">
                                                 <SectionGroupTileList
                                                     items={structureItem.children}
                                                     currentSection={currentSection}
@@ -173,7 +169,9 @@ export function SiteSectionTabs(props: {
             >
                 <NavigationMenu.Viewport
                     className={tcls(
-                        'relative origin-[center_top] overflow-hidden circular-corners:rounded-3xl rounded-corners:rounded-xl border border-tint bg-tint-base shadow-lg',
+                        // Note: this layer is composited (translateZ) and animated. Chromium fails to paint a clipped composited layer's text
+                        // inside an iframe or `overflow-hidden` ancestor. Clipping is done on the inner content wrapper instead.
+                        'relative origin-[center_top] circular-corners:rounded-3xl rounded-corners:rounded-xl border border-tint bg-tint-base shadow-lg',
                         '-mt-0.5 h-(--radix-navigation-menu-viewport-height) w-full max-w-full md:w-(--radix-navigation-menu-viewport-width)',
                         'max-h-[calc(100vh-8rem)] data-[state=closed]:animate-scale-out data-[state=open]:animate-scale-in',
                         'ease has-[&[data-motion]]:transition-[left,width,height] has-[&[data-motion]]:duration-300'

@@ -1,4 +1,4 @@
-import { SiteInsightsDisplayContext } from '@gitbook/api';
+import { CustomizationPageActionType, SiteInsightsDisplayContext } from '@gitbook/api';
 
 import { type RouteLayoutParams, getDynamicSiteContext } from '@/app/utils';
 import { getExposableError, throwIfDataError } from '@/lib/data';
@@ -20,7 +20,14 @@ export async function handleMcpRequest(
     const { context } = await getDynamicSiteContext(params);
     const { dataFetcher, linker, site } = context;
 
-    if (!context.customization.pageActions.mcp) {
+    // Use the configured `items` list when the API provides it, and fall back to the deprecated
+    // `mcp` flag otherwise (legacy mode), since this endpoint is called directly and cannot rely on
+    // any page-rendering fallback.
+    const { pageActions } = context.customization;
+    const isMcpEnabled = pageActions.items
+        ? pageActions.items.includes(CustomizationPageActionType.Mcp)
+        : pageActions.mcp;
+    if (!isMcpEnabled) {
         return new Response('Not Found', { status: 404 });
     }
 

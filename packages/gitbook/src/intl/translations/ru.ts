@@ -55,6 +55,7 @@ export const ru = {
     annotation_button_label: 'Открыть аннотацию',
     code_copied: 'Скопировано!',
     code_copy: 'Копировать',
+    prompt_copy: 'Скопировать промпт',
     code_block_collapsed: 'Показать все ${1} строк',
     code_block_expanded: 'Показать меньше',
     table_of_contents_button_label: 'Открыть оглавление',
@@ -75,7 +76,10 @@ export const ru = {
     notfound_adaptive:
         'Эта страница может существовать, но для доступа к ней может потребоваться вход.',
     notfound_adaptive_login: 'Войти',
+    notfound_adaptive_registration_hint:
+        'Регистрация может быть доступна в зависимости от организации.',
     notfound_goto_home: 'Перейти на главную',
+    notfound_suggestions_title: 'Возможно, вы ищете',
     unexpected_error_title: 'Произошла ошибка',
     unexpected_error: 'Извините, произошла непредвиденная ошибка. Пожалуйста, попробуйте позже.',
     unexpected_error_retry: 'Попробуйте снова',
@@ -106,6 +110,8 @@ export const ru = {
     ai_chat_assistant_greeting_evening: 'Добрый вечер',
     ai_chat_assistant_greeting_night: 'Доброй ночи',
     ai_chat_clear_conversation: 'Очистить диалог',
+    ai_chat_expand_panel: 'Развернуть панель',
+    ai_chat_collapse_panel: 'Свернуть панель',
     ai_chat_thinking: 'Думает…',
     ai_chat_working: 'Работает…',
     ai_chat_exploring: 'Изучает…',
