@@ -170,7 +170,9 @@
 }
 
 .openapi-column-preview pre {
-    @apply max-h-96 print-mode:max-h-none;
+    /* On the 2-column sticky layout, let the code block grow to fill the available preview height
+       (bounded by the sticky max-height) instead of a fixed cap, so it doesn't scroll when there's room. */
+    @apply max-h-96 lg:max-h-none print-mode:max-h-none;
 }
 
 /* Schema Structure */
