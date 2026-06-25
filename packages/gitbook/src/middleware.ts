@@ -215,23 +215,38 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
     request.headers.delete('x-gitbook-disable-tracking');
 
     const withAPIToken = async (apiToken: string | null) => {
-        const siteURLData = await throwIfDataError(
-            lookupPublishedContentByUrl({
-                url: siteRequestURL.toString(),
-                visitorPayload: {
-                    jwtToken: visitorToken?.token ?? undefined,
-                    unsignedClaims,
-                },
-                // When the visitor auth token is pulled from the cookie, set redirectOnError when calling resolvePublishedContentByUrl to allow
-                // redirecting when the token is invalid as we could be dealing with stale token stored in the cookie.
-                // For example when the VA backend signature has changed but the token stored in the cookie is not yet expired.
-                redirectOnError: visitorToken?.source === 'visitor-auth-cookie',
+        const siteURLLookup = await lookupPublishedContentByUrl({
+            url: siteRequestURL.toString(),
+            visitorPayload: {
+                jwtToken: visitorToken?.token ?? undefined,
+                unsignedClaims,
+            },
+            // When the visitor auth token is pulled from the cookie, set redirectOnError when calling resolvePublishedContentByUrl to allow
+            // redirecting when the token is invalid as we could be dealing with stale token stored in the cookie.
+            // For example when the VA backend signature has changed but the token stored in the cookie is not yet expired.
+            redirectOnError: visitorToken?.source === 'visitor-auth-cookie',
 
-                // Use the API token passed in the request, if any
-                // as it could be used for .preview hostnames
-                apiToken,
-            })
-        );
+            // Forward only the shared GitBook visitor session cookie to gitbook-x so
+            // GitBook-owned adaptive claims can be evaluated during published URL resolution.
+            cookieHeader: getGitBookVisitorSessionCookieHeader(request),
+
+            // Use the API token passed in the request, if any
+            // as it could be used for .preview hostnames
+            apiToken,
+        });
+        const siteURLData = throwIfDataError(siteURLLookup);
+        let resolvedCacheControl = siteURLLookup.error
+            ? undefined
+            : siteURLLookup.headers?.cacheControl;
+        const isPersonalizedResolution =
+            resolvedCacheControl
+                ?.toLowerCase()
+                .split(',')
+                .map((directive: string) => directive.trim())
+                .includes('no-store') ?? false;
+        if (!isPersonalizedResolution) {
+            resolvedCacheControl = undefined;
+        }
 
         const cookies: ResponseCookies = visitorParamsCookie
             ? [
@@ -263,8 +278,8 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
             // For these cases, we return a 303 response with an `X-Action-Redirect` header that the client can handle.
             // This is what server actions do when returning a redirect response.
             const isServerAction = request.headers.has('next-action') && request.method === 'POST';
-            const createRedirectResponse = (url: string) =>
-                isServerAction
+            const createRedirectResponse = (url: string) => {
+                const response = isServerAction
                     ? new NextResponse(null, {
                           status: 303,
                           headers: {
@@ -273,6 +288,11 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
                           },
                       })
                     : NextResponse.redirect(url);
+                if (resolvedCacheControl) {
+                    response.headers.set('cache-control', resolvedCacheControl);
+                }
+                return response;
+            };
             // biome-ignore lint/suspicious/noConsole: we want to log the redirect
             console.log('redirect', siteURLData.redirect);
             if (siteURLData.target === 'content') {
@@ -435,7 +455,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
 
         // We support forcing dynamic routes by setting a `gitbook-dynamic-route` cookie
         // This is useful for testing dynamic routes.
-        if (request.cookies.has('gitbook-dynamic-route')) {
+        if (request.cookies.has('gitbook-dynamic-route') || isPersonalizedResolution) {
             routeType = 'dynamic';
         }
 
@@ -528,6 +548,9 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         if (siteURLData.contextId && !siteRequestURL.pathname.endsWith('~gitbook/site-index')) {
             response.headers.set('cache-control', 'public, max-age=0, must-revalidate');
         }
+        if (resolvedCacheControl) {
+            response.headers.set('cache-control', resolvedCacheControl);
+        }
 
         return writeResponseCookies(response, cookies);
     };
@@ -548,6 +571,15 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
     }
 
     return withAPIToken(null);
+}
+
+function getGitBookVisitorSessionCookieHeader(request: NextRequest): string | null {
+    const session = request.cookies.get('__session');
+    if (!session) {
+        return null;
+    }
+
+    return `${session.name}=${session.value}`;
 }
 
 /**

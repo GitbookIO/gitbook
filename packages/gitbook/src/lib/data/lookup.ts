@@ -4,7 +4,7 @@ import { trace } from '@/lib/tracing';
 import type { PublishedSiteContentLookup, SiteVisitorPayload } from '@gitbook/api';
 import { apiClient } from './api';
 import { getExposableError } from './errors';
-import type { DataFetcherResponse } from './types';
+import type { DataFetcherErrorData } from './types';
 import { getURLLookupAlternatives, stripURLSearch } from './urls';
 
 interface LookupPublishedContentByUrlInput {
@@ -12,7 +12,21 @@ interface LookupPublishedContentByUrlInput {
     redirectOnError: boolean;
     apiToken: string | null;
     visitorPayload: SiteVisitorPayload;
+    cookieHeader?: string | null;
 }
+
+type LookupPublishedContentByUrlResponse =
+    | {
+          data: PublishedSiteContentLookup;
+          headers?: {
+              cacheControl?: string;
+          };
+          error?: undefined;
+      }
+    | {
+          error: DataFetcherErrorData;
+          data?: undefined;
+      };
 
 /**
  * Lookup a content by its URL using the GitBook resolvePublishedContentByUrl API endpoint.
@@ -20,7 +34,7 @@ interface LookupPublishedContentByUrlInput {
  */
 export async function lookupPublishedContentByUrl(
     input: LookupPublishedContentByUrlInput
-): Promise<DataFetcherResponse<PublishedSiteContentLookup>> {
+): Promise<LookupPublishedContentByUrlResponse> {
     const lookupURL = new URL(input.url);
     const url = stripURLSearch(lookupURL);
     const lookup = getURLLookupAlternatives(url);
@@ -40,7 +54,16 @@ export async function lookupPublishedContentByUrl(
                             ...(input.visitorPayload ? { visitor: input.visitorPayload } : {}),
                             redirectOnError: input.redirectOnError,
                         },
-                        { signal }
+                        {
+                            signal,
+                            ...(input.cookieHeader
+                                ? {
+                                      headers: {
+                                          cookie: input.cookieHeader,
+                                      },
+                                  }
+                                : {}),
+                        }
                     )
                 )
         );
@@ -82,7 +105,12 @@ export async function lookupPublishedContentByUrl(
                     }
                 }
 
-                return { data };
+                return {
+                    data,
+                    headers: {
+                        cacheControl: callResult.data.headers.get('cache-control') ?? undefined,
+                    },
+                };
             }
 
             return null;
@@ -107,7 +135,12 @@ export async function lookupPublishedContentByUrl(
                 ...(changeRequest ? { changeRequest } : {}),
                 ...(revision ? { revision } : {}),
             };
-            return { data: siteResult };
+            return {
+                data: siteResult,
+                headers: {
+                    cacheControl: callResult.data.headers.get('cache-control') ?? undefined,
+                },
+            };
         }
 
         return null;
@@ -130,5 +163,6 @@ export async function lookupPublishedContentByUrl(
 
     return {
         data: result.data,
+        headers: result.headers,
     };
 }
