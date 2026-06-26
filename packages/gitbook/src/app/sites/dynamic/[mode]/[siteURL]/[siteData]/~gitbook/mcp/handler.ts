@@ -55,6 +55,13 @@ export async function handleMcpRequest(
                 {
                     query: z.string(),
                 },
+                {
+                    title: 'Search documentation',
+                    readOnlyHint: true,
+                    destructiveHint: false,
+                    idempotentHint: true,
+                    openWorldHint: true,
+                },
                 async ({ query }) => {
                     const results = await throwIfDataError(
                         dataFetcher.searchSiteContent({
@@ -154,6 +161,13 @@ export async function handleMcpRequest(
                             });
                             return z.NEVER;
                         }),
+                },
+                {
+                    title: 'Get page content',
+                    readOnlyHint: true,
+                    destructiveHint: false,
+                    idempotentHint: true,
+                    openWorldHint: true,
                 },
                 async ({ url }) => {
                     try {
