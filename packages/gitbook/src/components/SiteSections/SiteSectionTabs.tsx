@@ -32,11 +32,13 @@ export function SiteSectionTabs(props: {
     sections: ClientSiteSections;
     className?: string;
     children?: React.ReactNode;
+    disableAnimations?: boolean;
 }) {
     const {
         sections: { list: structure, current: currentSection },
         className,
         children,
+        disableAnimations,
     } = props;
 
     const containerRef = React.useRef<HTMLDivElement>(null);
@@ -130,7 +132,9 @@ export function SiteSectionTabs(props: {
                                         <NavigationMenu.Content
                                             className={tcls([
                                                 'absolute top-0 left-0 w-full md:w-auto',
-                                                'data-[motion=from-start]:*:animate-[enterFromLeft_300ms_ease_both] data-[motion=to-end]:*:animate-[exitToRight_300ms_ease_both] data-[motion=to-start]:*:animate-[exitToLeft_300ms_ease_both] motion-safe:data-[motion=from-end]:*:animate-[enterFromRight_300ms_ease_both]',
+                                                !disableAnimations
+                                                    ? 'data-[motion=from-start]:*:animate-[enterFromLeft_300ms_ease_both] data-[motion=to-end]:*:animate-[exitToRight_300ms_ease_both] data-[motion=to-start]:*:animate-[exitToLeft_300ms_ease_both] motion-safe:data-[motion=from-end]:*:animate-[enterFromRight_300ms_ease_both]'
+                                                    : '',
                                             ])}
                                         >
                                             <div className="max-h-[calc(100vh-8rem)] w-full overflow-y-auto overflow-x-hidden circular-corners:rounded-3xl rounded-corners:rounded-xl">
@@ -147,6 +151,11 @@ export function SiteSectionTabs(props: {
                                             url={
                                                 structureItem.object === 'site-section'
                                                     ? structureItem.url
+                                                    : undefined
+                                            }
+                                            sectionId={
+                                                structureItem.object === 'site-section'
+                                                    ? structureItem.id
                                                     : undefined
                                             }
                                             isActive={isActive}
@@ -173,8 +182,10 @@ export function SiteSectionTabs(props: {
                         // inside an iframe or `overflow-hidden` ancestor. Clipping is done on the inner content wrapper instead.
                         'relative origin-[center_top] circular-corners:rounded-3xl rounded-corners:rounded-xl border border-tint bg-tint-base shadow-lg',
                         '-mt-0.5 h-(--radix-navigation-menu-viewport-height) w-full max-w-full md:w-(--radix-navigation-menu-viewport-width)',
-                        'max-h-[calc(100vh-8rem)] data-[state=closed]:animate-scale-out data-[state=open]:animate-scale-in',
-                        'ease has-[&[data-motion]]:transition-[left,width,height] has-[&[data-motion]]:duration-300'
+                        'max-h-[calc(100vh-8rem)]',
+                        !disableAnimations
+                            ? 'ease has-[&[data-motion]]:transition-[left,width,height] has-[&[data-motion]]:duration-300 data-[state=closed]:animate-scale-out data-[state=open]:animate-scale-in'
+                            : ''
                     )}
                     style={{
                         left: viewportLeft,
@@ -225,10 +236,10 @@ function useNavigationMenuViewportOffset(args: {
  * A tab representing a section or section group
  */
 const SectionTab = React.forwardRef(function SectionTab(
-    props: { isActive: boolean; title: string; icon?: IconName; url?: string },
+    props: { isActive: boolean; title: string; icon?: IconName; url?: string; sectionId?: string },
     ref: React.Ref<HTMLAnchorElement>
 ) {
-    const { isActive, title, icon, url, ...rest } = props;
+    const { isActive, title, icon, url, sectionId, ...rest } = props;
     const isGroup = url === undefined;
     return (
         <Button
@@ -240,6 +251,7 @@ const SectionTab = React.forwardRef(function SectionTab(
             label={title}
             trailing={isGroup ? <ToggleChevron /> : null}
             active={isActive}
+            data-gb-site-section-id={sectionId}
             className={tcls(
                 'group/dropdown relative my-1.5 overflow-visible',
                 isActive
@@ -348,6 +360,7 @@ function SectionGroupTile(props: {
             <li className="group/section-tile flex w-full min-w-0 shrink-0 grow md:max-w-[var(--site-section-column-width)]">
                 <Link
                     href={url}
+                    data-gb-site-section-id={child.id}
                     className={tcls(
                         'grow circular-corners:rounded-2xl rounded-corners:rounded-lg px-2.5 py-1.5 transition-colors',
                         isActive

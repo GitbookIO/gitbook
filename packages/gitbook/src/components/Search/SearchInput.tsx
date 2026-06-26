@@ -21,6 +21,8 @@ interface SearchInputProps {
     resultsCount: number;
     fetching: boolean;
     showAsk: boolean;
+    readOnly?: boolean;
+    tabIndex?: number;
 }
 
 /**

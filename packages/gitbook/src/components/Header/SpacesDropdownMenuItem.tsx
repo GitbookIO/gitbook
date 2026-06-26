@@ -3,19 +3,16 @@
 import { joinPath } from '@/lib/paths';
 import { useCurrentPageMetadata, useCurrentPagePath } from '../hooks';
 import { DropdownMenuItem } from '../primitives/DropdownMenu';
-
-interface VariantSpace {
-    id: string;
-    title: string;
-    url: string;
-    isActive: boolean;
-    spaceId: string;
-}
+import type { SlimSiteSpace } from './SpacesDropdownData';
 
 /**
  * Return the href for a variant space, taking into account the current page path and metadata.
  */
-function useVariantSpaceHref(variantSpace: VariantSpace, currentSpacePath: string, active = false) {
+function useVariantSpaceHref(
+    variantSpace: SlimSiteSpace,
+    currentSpacePath: string,
+    active = false
+) {
     const currentPathname = useCurrentPagePath();
     const { metaLinks } = useCurrentPageMetadata();
 
@@ -52,7 +49,7 @@ function useVariantSpaceHref(variantSpace: VariantSpace, currentSpacePath: strin
 }
 
 export function SpacesDropdownMenuItem(props: {
-    variantSpace: VariantSpace;
+    variantSpace: SlimSiteSpace;
     active: boolean;
     currentSpacePath: string;
 }) {
@@ -66,22 +63,40 @@ export function SpacesDropdownMenuItem(props: {
     );
 }
 
-export function SpacesDropdownMenuItems(props: {
-    slimSpaces: VariantSpace[];
-    curPath: string;
+function StaticSpacesDropdownMenuItem(props: {
+    variantSpace: SlimSiteSpace;
+    active: boolean;
 }) {
-    const { slimSpaces, curPath } = props;
+    const { variantSpace, active } = props;
+
+    return <DropdownMenuItem active={active}>{variantSpace.title}</DropdownMenuItem>;
+}
+
+export function SpacesDropdownMenuItems(props: {
+    slimSpaces: SlimSiteSpace[];
+    curPath: string;
+    clickable?: boolean;
+}) {
+    const { slimSpaces, curPath, clickable = true } = props;
 
     return (
         <>
-            {slimSpaces.map((space) => (
-                <SpacesDropdownMenuItem
-                    key={space.id}
-                    variantSpace={space}
-                    active={space.isActive}
-                    currentSpacePath={curPath}
-                />
-            ))}
+            {slimSpaces.map((space) =>
+                clickable ? (
+                    <SpacesDropdownMenuItem
+                        key={space.id}
+                        variantSpace={space}
+                        active={space.isActive}
+                        currentSpacePath={curPath}
+                    />
+                ) : (
+                    <StaticSpacesDropdownMenuItem
+                        key={space.id}
+                        variantSpace={space}
+                        active={space.isActive}
+                    />
+                )
+            )}
         </>
     );
 }

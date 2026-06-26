@@ -1,4 +1,5 @@
 export * from './SearchInput';
+export * from './SearchHeaderInput';
 export * from './SearchFrame';
 export * from './SearchLiveResultsAnnouncer';
 export * from './SearchContainer';

@@ -14,8 +14,9 @@ export function SkeletonParagraph(props: {
     start?: number;
     className?: ClassValue;
     style?: React.CSSProperties;
+    animated?: boolean;
 }) {
-    const { lines = 3, id, size = 'medium', start = 0, className, style } = props;
+    const { lines = 3, id, size = 'medium', start = 0, className, style, animated = true } = props;
 
     const lineHeight = size === 'small' ? 'h-5' : 'h-6';
     const itemHeight = size === 'small' ? 'h-3' : 'h-4';
@@ -45,6 +46,7 @@ export function SkeletonParagraph(props: {
                                     flexGrow: ((line + start + item) % 3) + 1,
                                     animationDelay: `${(item + line + start) * 0.1}s`,
                                 }}
+                                animated={animated}
                             />
                         ))}
                     </div>
@@ -78,27 +80,18 @@ export function SkeletonList(props: {
 /**
  * Placeholder when loading a title.
  */
-export function SkeletonHeading(props: { id?: string; style?: ClassValue }) {
-    const { id, style } = props;
-    return (
-        <div id={id} role="status" aria-busy className={tcls(style)}>
-            <LoadingPane tile={12} style={['rounded-md', 'h-[47px]', 'max-w-[calc(48rem-1px)]']} />
-        </div>
-    );
+export function SkeletonHeading(props: { id?: string; style?: ClassValue; animated?: boolean }) {
+    const { id, style, animated = true } = props;
+    return <LoadingItem id={id} className={tcls('h-12 max-w-3/4', style)} animated={animated} />;
 }
 
 /**
  * Placeholder when loading an asset (image, video, etc.)
  */
-export function SkeletonImage(props: { id?: string; style?: ClassValue }) {
-    const { id, style } = props;
+export function SkeletonImage(props: { id?: string; style?: ClassValue; animated?: boolean }) {
+    const { id, style, animated = true } = props;
     return (
-        <div id={id} role="status" aria-busy className={tcls(style)}>
-            <LoadingPane
-                tile={96}
-                style={['rounded-md', 'h-full', 'aspect-video', 'max-w-[calc(48rem-1px)]']}
-            />
-        </div>
+        <LoadingItem id={id} className={tcls('aspect-video w-full', style)} animated={animated} />
     );
 }
 
@@ -120,7 +113,7 @@ export function SkeletonCard(props: { id?: string; style?: ClassValue }) {
  * Placeholder when loading small elements
  */
 export function SkeletonSmall(
-    props: { id?: string; className?: ClassValue } & React.ComponentProps<'div'>
+    props: { id?: string; className?: ClassValue; animated?: boolean } & React.ComponentProps<'div'>
 ) {
     const { id, className, ...rest } = props;
 
@@ -130,7 +123,7 @@ export function SkeletonSmall(
 /**
  * Placeholder when loading an Update block
  */
-export function SkeletonUpdate(props: { id?: string; className?: ClassValue }) {
+export function SkeletonUpdate(props: { id?: string; className?: ClassValue; animated?: boolean }) {
     const { id, className } = props;
     return (
         <div
@@ -148,13 +141,16 @@ export function SkeletonUpdate(props: { id?: string; className?: ClassValue }) {
     );
 }
 
-function LoadingItem(props: React.ComponentProps<'div'>): React.ReactNode {
-    const { className, ...rest } = props;
+function LoadingItem(props: React.ComponentProps<'div'> & { animated?: boolean }): React.ReactNode {
+    const { className, animated = true, ...rest } = props;
 
     return (
         <div
+            role="status"
+            aria-busy={animated}
             className={tcls(
-                'animate-[blurIn_500ms_ease-out_both,pulse_2s_infinite] circular-corners:rounded-2xl rounded-corners:rounded-md bg-tint-solid/2',
+                animated ? 'animate-[blurIn_500ms_ease-out_both,pulse_2s_infinite]' : '',
+                'circular-corners:rounded-2xl rounded-corners:rounded-md bg-tint-solid/2',
                 className
             )}
             {...rest}
