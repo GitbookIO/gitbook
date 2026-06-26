@@ -1,6 +1,5 @@
 import { GitBookAPIError } from '@gitbook/api';
 import { parse as parseCacheControl } from '@tusbar/cache-control';
-import { cacheLife } from 'next/cache';
 import type { DataFetcherErrorData, DataFetcherResponse } from './types';
 
 export class DataFetcherError extends Error {
@@ -90,34 +89,6 @@ export async function wrapDataFetcherError<T>(
             error: getExposableError(error as Error),
         };
     }
-}
-
-/**
- * Wrap an async execution to handle errors and return a DataFetcherResponse.
- * This should be used inside 'use cache' functions.
- */
-export async function wrapCacheDataFetcherError<T>(
-    fn: () => Promise<T>
-): Promise<DataFetcherResponse<T>> {
-    const result = await wrapDataFetcherError(fn);
-    if (result.error) {
-        const cacheValue = result.error.cache;
-        // We only want to cache 404 errors for "long", because that's an "expected" error.
-        if (result.error.code === 404) {
-            cacheLife({
-                stale: 60,
-                revalidate: cacheValue?.maxAge ?? 60 * 60, // 1 hour
-                expire: cacheValue?.staleWhileRevalidate ?? 60 * 60 * 24, // 1 day
-            });
-        } else {
-            cacheLife({
-                stale: 60, // This one is only for the client
-                revalidate: cacheValue?.maxAge ?? 30, // we don't want to cache it for too long, but at least 30 seconds to avoid hammering the API
-                expire: cacheValue?.staleWhileRevalidate ?? 90, // we want to revalidate this error after 90 seconds for sure
-            });
-        }
-    }
-    return result;
 }
 
 /**
