@@ -12,6 +12,18 @@ import { createMcpHandler } from 'mcp-handler';
 import type { NextRequest } from 'next/server';
 import { z } from 'zod';
 
+/**
+ * Fire-and-forget insights tracking for the MCP endpoint. A tracking failure (e.g. a 422 from the
+ * insights API) must never reject into the request lifecycle, or it surfaces as an MCP transport error.
+ */
+function trackMcpEvent(args: Parameters<typeof trackServerInsightsEvents>[0]) {
+    waitUntil(
+        trackServerInsightsEvents(args).catch((error) => {
+            console.error('Failed to track MCP insights event:', error);
+        })
+    );
+}
+
 export async function handleMcpRequest(
     rawRequest: NextRequest,
     params: RouteLayoutParams,
@@ -36,21 +48,19 @@ export async function handleMcpRequest(
     requestURL.search = rawRequest.nextUrl.search;
     const request = new Request(requestURL, rawRequest);
 
-    waitUntil(
-        trackServerInsightsEvents({
-            organizationId: context.organizationId,
-            siteId: context.site.id,
-            events: [
-                {
-                    type: 'mcp_request',
-                    location: {
-                        displayContext: SiteInsightsDisplayContext.Server,
-                    },
+    trackMcpEvent({
+        organizationId: context.organizationId,
+        siteId: context.site.id,
+        events: [
+            {
+                type: 'mcp_request',
+                location: {
+                    displayContext: SiteInsightsDisplayContext.Server,
                 },
-            ],
-            request,
-        })
-    );
+            },
+        ],
+        request,
+    });
 
     const mcpHandler = createMcpHandler(
         (server) => {
@@ -70,22 +80,20 @@ export async function handleMcpRequest(
                         })
                     );
 
-                    waitUntil(
-                        trackServerInsightsEvents({
-                            organizationId: context.organizationId,
-                            siteId: site.id,
-                            events: [
-                                {
-                                    type: 'search_type_query',
-                                    query,
-                                    location: {
-                                        displayContext: SiteInsightsDisplayContext.Mcp,
-                                    },
+                    trackMcpEvent({
+                        organizationId: context.organizationId,
+                        siteId: site.id,
+                        events: [
+                            {
+                                type: 'search_type_query',
+                                query,
+                                location: {
+                                    displayContext: SiteInsightsDisplayContext.Mcp,
                                 },
-                            ],
-                            request,
-                        })
-                    );
+                            },
+                        ],
+                        request,
+                    });
 
                     return {
                         content: results.flatMap((result) => {
@@ -191,24 +199,22 @@ export async function handleMcpRequest(
                             resolved.page
                         );
 
-                        waitUntil(
-                            trackServerInsightsEvents({
-                                organizationId: context.organizationId,
-                                siteId: site.id,
-                                events: [
-                                    {
-                                        type: 'page_view',
-                                        location: {
-                                            displayContext: SiteInsightsDisplayContext.Mcp,
-                                            page: resolved.page.id,
-                                            space: match.siteSpace.space.id,
-                                            revision: match.siteSpace.space.revision,
-                                        },
+                        trackMcpEvent({
+                            organizationId: context.organizationId,
+                            siteId: site.id,
+                            events: [
+                                {
+                                    type: 'page_view',
+                                    location: {
+                                        displayContext: SiteInsightsDisplayContext.Mcp,
+                                        page: resolved.page.id,
+                                        space: match.siteSpace.space.id,
+                                        revision: match.siteSpace.space.revision,
                                     },
-                                ],
-                                request,
-                            })
-                        );
+                                },
+                            ],
+                            request,
+                        });
 
                         return { content: [{ type: 'text', text: markdown }] };
                     } catch (error) {
