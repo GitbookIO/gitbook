@@ -390,9 +390,6 @@ export function getCustomizationURL(partial: DeepPartial<SiteCustomizationSettin
             default: CustomizationDefaultThemeMode.System,
             toggeable: true,
         },
-        pdf: {
-            enabled: true,
-        },
         feedback: {
             enabled: false,
         },
@@ -405,20 +402,16 @@ export function getCustomizationURL(partial: DeepPartial<SiteCustomizationSettin
         advancedCustomization: {
             enabled: true,
         },
-        git: {
-            showEditLink: false,
-        },
         pagination: {
             enabled: true,
         },
         pageActions: {
-            externalAI: true,
-            markdown: true,
-            mcp: true,
             items: [
+                CustomizationPageActionType.Assistant,
                 CustomizationPageActionType.Markdown,
                 CustomizationPageActionType.ExternalAi,
                 CustomizationPageActionType.Mcp,
+                CustomizationPageActionType.Pdf,
             ],
         },
         trademark: {

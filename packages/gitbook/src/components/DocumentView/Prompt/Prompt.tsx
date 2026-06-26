@@ -53,11 +53,7 @@ function getOpenInAIProviders(props: BlockProps<DocumentBlockPrompt>): boolean {
 function isExternalAIPageActionEnabled(
     pageActions: SiteCustomizationSettings['pageActions']
 ): boolean {
-    // Use the configured `items` list when the API provides it, and fall back to the deprecated
-    // `externalAI` flag otherwise (legacy mode).
-    return pageActions.items
-        ? pageActions.items.includes(CustomizationPageActionType.ExternalAi)
-        : pageActions.externalAI;
+    return pageActions.items.includes(CustomizationPageActionType.ExternalAi);
 }
 
 function getPromptText(block: DocumentBlockPrompt): string {
