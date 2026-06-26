@@ -1364,8 +1364,6 @@ const testCases: TestsCase[] = [
                 name: 'Without page actions',
                 url: getCustomizationURL({
                     pageActions: {
-                        markdown: false,
-                        externalAI: false,
                         items: [],
                     },
                 }),

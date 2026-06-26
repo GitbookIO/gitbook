@@ -3,7 +3,6 @@ import type { AncestorRevisionPage } from '@/lib/pages';
 import { tcls } from '@/lib/tailwind';
 import { getPageRSSURL } from '@/routes/rss';
 import {
-    CustomizationAIMode,
     CustomizationPageActionType,
     type RevisionPageDocument,
     SiteVisibility,
@@ -191,9 +190,7 @@ function getPageActionsURLs({
 }
 
 /**
- * Whether a given built-in page action is enabled. Uses the configured `items` list when the API
- * provides it, and falls back to the deprecated boolean flags otherwise (legacy mode), matching the
- * fallback used by the page actions dropdown.
+ * Whether a given built-in page action is enabled.
  */
 function isPageActionEnabled(
     customization: GitBookSiteContext['customization'],
@@ -203,22 +200,7 @@ function isPageActionEnabled(
     if (pageActions.items) {
         return pageActions.items.includes(type);
     }
-    switch (type) {
-        case CustomizationPageActionType.ExternalAi:
-            return pageActions.externalAI;
-        case CustomizationPageActionType.Markdown:
-            return pageActions.markdown;
-        case CustomizationPageActionType.Mcp:
-            return pageActions.mcp;
-        case CustomizationPageActionType.Pdf:
-            return customization.pdf.enabled;
-        case CustomizationPageActionType.Git:
-            return customization.git.showEditLink;
-        case CustomizationPageActionType.Assistant:
-            return customization.ai.mode === CustomizationAIMode.Assistant;
-        default:
-            return false;
-    }
+    return false;
 }
 
 /**

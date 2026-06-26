@@ -20,13 +20,8 @@ export async function handleMcpRequest(
     const { context } = await getDynamicSiteContext(params);
     const { dataFetcher, linker, site } = context;
 
-    // Use the configured `items` list when the API provides it, and fall back to the deprecated
-    // `mcp` flag otherwise (legacy mode), since this endpoint is called directly and cannot rely on
-    // any page-rendering fallback.
     const { pageActions } = context.customization;
-    const isMcpEnabled = pageActions.items
-        ? pageActions.items.includes(CustomizationPageActionType.Mcp)
-        : pageActions.mcp;
+    const isMcpEnabled = pageActions.items.includes(CustomizationPageActionType.Mcp);
     if (!isMcpEnabled) {
         return new Response('Not Found', { status: 404 });
     }
