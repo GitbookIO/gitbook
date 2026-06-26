@@ -18,11 +18,24 @@ export interface TableSelectColumn {
 }
 
 /**
- * List the visible "select" columns of a table along with their options.
+ * All column ids of a table: visible columns first (in view order), then any hidden ones (defined
+ * but not shown). The filter input offers every column, so hidden select/checkbox fields are
+ * filterable too even though they aren't displayed.
+ */
+function getTableColumnIds(block: DocumentBlockTable): string[] {
+    const visible = block.data.view.columns;
+    return [
+        ...visible,
+        ...Object.keys(block.data.definition).filter((id) => !visible.includes(id)),
+    ];
+}
+
+/**
+ * List the "select" columns of a table along with their options, including hidden fields.
  * Used to render the per-column filter dropdowns next to the search input.
  */
 export function getTableSelectColumns(block: DocumentBlockTable): TableSelectColumn[] {
-    return block.data.view.columns.flatMap((column) => {
+    return getTableColumnIds(block).flatMap((column) => {
         const definition = block.data.definition[column];
         if (definition?.type !== 'select') {
             return [];
@@ -40,11 +53,11 @@ export interface TableCheckboxColumn {
 }
 
 /**
- * List the visible "checkbox" columns of a table.
+ * List the "checkbox" columns of a table, including hidden fields.
  * Used to render a filter checkbox per column next to the search input.
  */
 export function getTableCheckboxColumns(block: DocumentBlockTable): TableCheckboxColumn[] {
-    return block.data.view.columns.flatMap((column) => {
+    return getTableColumnIds(block).flatMap((column) => {
         const definition = block.data.definition[column];
         if (definition?.type !== 'checkbox') {
             return [];
@@ -63,10 +76,15 @@ export function getTableRecordSearchData(block: DocumentBlockTable, record: Docu
     const selectValues: Record<string, string[]> = {};
     const checkboxValues: Record<string, boolean> = {};
 
-    for (const column of block.data.view.columns) {
-        const text = getTableCellSearchText(block, record, column);
-        if (text) {
-            searchText.push(text);
+    // Free-text search only covers visible columns; select/checkbox filters also cover hidden
+    // columns, since those are offered in the filter input.
+    const visibleColumns = new Set(block.data.view.columns);
+    for (const column of getTableColumnIds(block)) {
+        if (visibleColumns.has(column)) {
+            const text = getTableCellSearchText(block, record, column);
+            if (text) {
+                searchText.push(text);
+            }
         }
 
         const value = record.values[column];
