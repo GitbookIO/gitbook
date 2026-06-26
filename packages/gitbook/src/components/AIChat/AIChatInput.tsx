@@ -1,7 +1,7 @@
 import { t, tString, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
 import { Icon } from '@gitbook/icons';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { useAIChatController, useAIChatState } from '../AI/useAIChat';
 import { HoverCard, HoverCardRoot, HoverCardTrigger } from '../primitives';
@@ -23,6 +23,16 @@ export function AIChatInput(props: {
     const chatController = useAIChatController();
 
     const inputRef = useRef<HTMLTextAreaElement>(null);
+    const [value, setValue] = useState('');
+
+    // Consume a draft requested via the controller (e.g. "rewrite this code sample"),
+    // pre-filling the input without sending it.
+    useEffect(() => {
+        if (chat.inputDraft != null) {
+            setValue(chat.inputDraft);
+            chatController.setDraft(null);
+        }
+    }, [chat.inputDraft, chatController]);
 
     useEffect(() => {
         if (chat.opened && !disabled && !responding) {
@@ -66,6 +76,8 @@ export function AIChatInput(props: {
             sizing="large"
             label="Assistant chat input"
             placeholder={tString(language, 'ai_chat_input_placeholder')}
+            value={value}
+            onValueChange={setValue}
             onSubmit={(val) => onSubmit(val as string)}
             submitButton={{
                 size: 'small',
