@@ -1,5 +1,13 @@
 # gitbook
 
+## 0.27.2
+
+### Patch Changes
+
+- 36dbdb4: Support an optional `goal` query parameter on the markdown ask interface (`?ask=…&goal=…`), letting agents describe the broader end goal they are working towards so the answer can be steered towards it.
+- 2dc76a2: Fix grouped top-nav section dropdowns rendering empty when the site is embedded in an iframe (visitor-auth embeds, editor preview) or shown in the embeddable view. The dropdown viewport is composited and animated, and a clipped composited layer fails to rasterize its text in Chromium when painted inside a sub compositing root; the rounded-corner clipping is now done on an inner wrapper so the viewport itself is no longer clipped.
+- 9f65133: Improve the 404 page: remove the table of contents sidebar and center the content, suggest related pages (ranked from the already-cached search index, so no extra request per 404), show a search or assistant input depending on the site's AI configuration, and move "Go to homepage" to the bottom as a last resort.
+
 ## 0.27.1
 
 ### Patch Changes
