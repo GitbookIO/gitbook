@@ -4,6 +4,7 @@ import { MotionConfig, motion } from 'motion/react';
 import { useCheckForContentUpdate } from '../AutoRefreshContent';
 import { useVisitor } from '../Insights';
 import { useCurrentPagePath } from '../hooks';
+import { ChangedPagesButton } from './ChangedPagesButton';
 import { HideToolbarButton } from './HideToolbarButton';
 import { IframeWrapper } from './IframeWrapper';
 import { RefreshContentButton } from './RefreshContentButton';
@@ -150,6 +151,8 @@ function ChangeRequestToolbar(props: ToolbarViewProps) {
             <ToolbarActions>
                 {/* Refresh to retrieve latest changes */}
                 {updated ? <RefreshContentButton refreshForUpdates={refreshForUpdates} /> : null}
+                {/* View a popover with quick links to the changed pages */}
+                <ChangedPagesButton changedPages={context.changedPages} />
 
                 {/* Edit in GitBook */}
                 <EditPageButton href={changeRequest.urls.app} siteId={site.id} />
@@ -211,6 +214,9 @@ function RevisionToolbar(props: ToolbarViewProps) {
                 <ToolbarSubtitle subtitle={<ToolbarDate value={revision.createdAt} />} />
             </ToolbarBody>
             <ToolbarActions>
+                {/* View a popover with quick links to the changed pages */}
+                <ChangedPagesButton changedPages={context.changedPages} />
+
                 {/* Open commit in Git client */}
                 <ToolbarButton
                     title={

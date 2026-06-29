@@ -1,5 +1,6 @@
 import type { GitBookSiteContext } from '@/lib/context';
 import { AdminToolbarClient } from './AdminToolbarClient';
+import { getToolbarChangedPages } from './changedPages';
 import type { AdminToolbarContext } from './types';
 
 export interface AdminToolbarProps {
@@ -11,6 +12,7 @@ export interface AdminToolbarProps {
  */
 export async function AdminToolbar(props: AdminToolbarProps) {
     const { context } = props;
+    const changedPages = await getToolbarChangedPages(context);
 
     // Create a minimal context to avoid serializing and passing too many data to the client
     const minimalContext: AdminToolbarContext = {
@@ -57,6 +59,7 @@ export async function AdminToolbar(props: AdminToolbarProps) {
                 published: context.site.urls.published,
             },
         },
+        changedPages,
     };
 
     return <AdminToolbarClient context={minimalContext} />;

@@ -11,6 +11,7 @@ import * as RadixDropdownMenu from '@radix-ui/react-dropdown-menu';
 import { assert } from 'ts-essentials';
 import { Link, type LinkInsightsProps } from '.';
 import { ToggleChevron } from './ToggleChevron';
+import { Tooltip } from './Tooltip';
 
 export type DropdownButtonProps<E extends HTMLElement = HTMLElement> = Omit<
     Partial<DetailedHTMLProps<HTMLAttributes<E>, E>>,
@@ -36,6 +37,8 @@ const DROPDOWN_CONTENT_INNER_CLASS =
 export function DropdownMenu(props: {
     /** Content of the button */
     button: React.ReactNode;
+    /** Tooltip label for the button */
+    buttonTooltip?: React.ReactNode;
     /** Content of the dropdown */
     children: React.ReactNode;
     /** Custom styles */
@@ -52,32 +55,53 @@ export function DropdownMenu(props: {
      * @default "start"
      */
     align?: RadixDropdownMenu.DropdownMenuContentProps['align'];
+    /**
+     * Distance between the trigger and the dropdown.
+     * @default 0
+     */
+    sideOffset?: RadixDropdownMenu.DropdownMenuContentProps['sideOffset'];
 }) {
     const {
         button,
+        buttonTooltip,
         children,
         className,
         openOnHover = false,
         side = 'bottom',
         align = 'start',
+        sideOffset = 0,
     } = props;
     const [hovered, setHovered] = useState(false);
     const [open, setOpen] = useState(false);
 
     const isOpen = openOnHover ? open || hovered : open;
 
+    const trigger = (
+        <RadixDropdownMenu.Trigger
+            asChild
+            onMouseEnter={() => setHovered(true)}
+            onMouseLeave={() => setHovered(false)}
+            onClick={() => (openOnHover ? setOpen(!open) : null)}
+            className="group/dropdown"
+        >
+            {button}
+        </RadixDropdownMenu.Trigger>
+    );
+
     return (
         <DropdownMenuContext.Provider value={{ open: isOpen, setOpen }}>
             <RadixDropdownMenu.Root modal={false} open={isOpen} onOpenChange={setOpen}>
-                <RadixDropdownMenu.Trigger
-                    asChild
-                    onMouseEnter={() => setHovered(true)}
-                    onMouseLeave={() => setHovered(false)}
-                    onClick={() => (openOnHover ? setOpen(!open) : null)}
-                    className="group/dropdown"
-                >
-                    {button}
-                </RadixDropdownMenu.Trigger>
+                {buttonTooltip ? (
+                    <Tooltip
+                        label={buttonTooltip}
+                        pinOnClick={false}
+                        rootProps={{ disableHoverableContent: true }}
+                    >
+                        {trigger}
+                    </Tooltip>
+                ) : (
+                    trigger
+                )}
 
                 <RadixDropdownMenu.Portal>
                     <RadixDropdownMenu.Content
@@ -88,6 +112,7 @@ export function DropdownMenu(props: {
                         onMouseLeave={() => setHovered(false)}
                         align={align}
                         side={side}
+                        sideOffset={sideOffset}
                         className={DROPDOWN_CONTENT_OUTER_CLASS}
                     >
                         <div className={tcls(DROPDOWN_CONTENT_INNER_CLASS, className)}>

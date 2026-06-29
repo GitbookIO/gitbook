@@ -43,6 +43,20 @@ export type MinimalSite = {
     };
 };
 
+export type MinimalChangedPage = {
+    id: string;
+    title: string;
+    path: string;
+    href: string;
+    status: 'created' | 'edited' | 'moved' | 'deleted';
+    action: 'preview' | 'editor';
+};
+
+export type MinimalChangedPages = {
+    pages: MinimalChangedPage[];
+    more: number;
+};
+
 export type AdminToolbarContext = {
     organizationId: string;
     revisionId: string;
@@ -50,6 +64,7 @@ export type AdminToolbarContext = {
     changeRequest: MinimalChangeRequest | null;
     revision: MinimalRevision;
     site: MinimalSite;
+    changedPages: MinimalChangedPages | null;
 };
 
 export interface AdminToolbarClientProps {
