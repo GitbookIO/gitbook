@@ -5,6 +5,7 @@ export const zh = {
     stability_experimental: '实验性',
     stability_alpha: 'Alpha',
     stability_beta: 'Beta',
+    available_in_mcp: '可在 MCP 中使用',
     discriminator: '判别器',
     copy_to_clipboard: '复制到剪贴板',
     copied: '已复制',

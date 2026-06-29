@@ -5,6 +5,7 @@ export const ja = {
     stability_experimental: '実験的',
     stability_alpha: 'アルファ',
     stability_beta: 'ベータ',
+    available_in_mcp: 'MCPで利用可能',
     discriminator: 'ディスクリミネーター',
     copy_to_clipboard: 'クリップボードにコピー',
     copied: 'コピー済み',

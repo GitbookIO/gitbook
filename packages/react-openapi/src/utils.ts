@@ -17,6 +17,18 @@ export function createStateKey(key: string, scope?: string) {
 }
 
 /**
+ * Read the `x-gitbook-mcp-url` extension from any spec object, treating an empty string as unset
+ * so it falls through to the next level when resolving the operation > path > root cascade.
+ */
+export function readMcpUrl(obj: unknown): string | undefined {
+    if (obj && typeof obj === 'object' && 'x-gitbook-mcp-url' in obj) {
+        const value = obj['x-gitbook-mcp-url'];
+        return typeof value === 'string' && value ? value : undefined;
+    }
+    return undefined;
+}
+
+/**
  * Check if an object has a description. Either at the root level or in items.
  */
 function hasDescription(object: AnyObject) {

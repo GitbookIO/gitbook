@@ -5,6 +5,7 @@ export const es = {
     stability_experimental: 'Experimental',
     stability_alpha: 'Alfa',
     stability_beta: 'Beta',
+    available_in_mcp: 'Disponible en el MCP',
     discriminator: 'Discriminador',
     copy_to_clipboard: 'Copiar al portapapeles',
     copied: 'Copiado',
