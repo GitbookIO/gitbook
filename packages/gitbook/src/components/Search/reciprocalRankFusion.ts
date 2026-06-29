@@ -66,6 +66,8 @@ function jaroWinkler(s1: string, s2: string, p = 0.1): number {
 const RRF_K = 60;
 /** Lower k for local results gives them a slightly higher score than remote ones at the same rank. */
 const RRF_K_LOCAL = 50;
+/** Number of remote results that should keep their API order before fusion. */
+const PINNED_REMOTE_RESULTS_COUNT = 3;
 
 /**
  * A page result that was present in both local and remote lists.
@@ -73,11 +75,12 @@ const RRF_K_LOCAL = 50;
  * and remote fields (href, pageId, spaceId, title) override them.
  * Breadcrumbs prefer local (has icon + emoji) and fall back to remote.
  */
-export type MergedPageResult = ComputedPageResult & {
+export type MergedPageResult = Omit<ComputedPageResult, 'breadcrumbs'> & {
     pathname?: string;
     icon?: string;
     emoji?: string;
     description?: string;
+    breadcrumbs?: LocalPageResult['breadcrumbs'] | ComputedPageResult['breadcrumbs'];
 };
 
 /**
@@ -100,16 +103,47 @@ export function getResultKey(
 
 type RRFResult = LocalPageResult | OrderedComputedResult | MergedPageResult;
 
+function mergeLocalPageWithRemotePage(
+    localResult: LocalPageResult,
+    remoteResult: ComputedPageResult
+): MergedPageResult {
+    return {
+        ...localResult,
+        ...remoteResult,
+        // Merge breadcrumbs: prefer local (has icon + emoji), fall back to remote.
+        breadcrumbs: localResult.breadcrumbs ?? remoteResult.breadcrumbs,
+    };
+}
+
+function mergePinnedRemoteResult(
+    result: OrderedComputedResult,
+    localResultsByKey: Map<string, LocalPageResult>
+): RRFResult {
+    if (result.type !== 'page') {
+        return result;
+    }
+
+    const localResult = localResultsByKey.get(getResultKey(result));
+    if (!localResult) {
+        return result;
+    }
+
+    return mergeLocalPageWithRemotePage(localResult, result);
+}
+
 /**
  * Merge local (FlexSearch) and remote (API) search results using
- * Reciprocal Rank Fusion (RRF).
+ * Reciprocal Rank Fusion (RRF), while preserving the API order for the first
+ * three remote results.
  *
  * RRF formula: score(d) = Σ_i  1 / (k + rank_i(d))
  *
- * Pages present in both lists are deep-merged: local fields act as the base
+ * The pinned remote results are excluded from fusion and returned first. Pages
+ * present in both lists are deep-merged: local fields act as the base
  * (preserving description, icon, emoji, pathname) and remote fields override
  * (providing href, pageId, spaceId, title). Breadcrumbs prefer local (has icon
- * + emoji) and fall back to remote. Their rank contributions from both lists are summed.
+ * + emoji) and fall back to remote. In the fused tail, their rank contributions
+ * from both lists are summed.
  *
  * Sections and records have no local equivalent and only accumulate their own
  * rank contribution.
@@ -123,12 +157,22 @@ export function reciprocalRankFusion(
     remoteResults: OrderedComputedResult[],
     query: string
 ): Array<RRFResult> {
+    const localResultsByKey = new Map(localResults.map((result) => [getResultKey(result), result]));
+    const pinnedRemoteResults = remoteResults.slice(0, PINNED_REMOTE_RESULTS_COUNT);
+    const pinnedResultKeys = new Set(pinnedRemoteResults.map((result) => getResultKey(result)));
+    const remainingLocalResults = localResults.filter(
+        (result) => !pinnedResultKeys.has(getResultKey(result))
+    );
+    const remainingRemoteResults = remoteResults
+        .slice(PINNED_REMOTE_RESULTS_COUNT)
+        .filter((result) => !pinnedResultKeys.has(getResultKey(result)));
+
     // Map from dedup key → { result, score }
     const scoreMap = new Map<string, { result: RRFResult; score: number }>();
 
     // Process local results first (1-indexed rank)
     // Using RRF_K_LOCAL (< RRF_K) slightly boosts local scores over remote ones.
-    localResults.forEach((result, index) => {
+    remainingLocalResults.forEach((result, index) => {
         const rank = index + 1;
         const key = getResultKey(result);
         const contribution = 1 / (RRF_K_LOCAL + rank);
@@ -142,7 +186,7 @@ export function reciprocalRankFusion(
     });
 
     // Process remote results, deduplicating against local pages
-    remoteResults.forEach((result, index) => {
+    remainingRemoteResults.forEach((result, index) => {
         const rank = index + 1;
         const contribution = 1 / (RRF_K + rank);
 
@@ -155,12 +199,7 @@ export function reciprocalRankFusion(
             // (href, pageId, spaceId, breadcrumbs, title).
             existing.score += contribution;
             if (existing.result.type === 'local-page' && result.type === 'page') {
-                existing.result = {
-                    ...existing.result,
-                    ...result,
-                    // Merge breadcrumbs: prefer local (has icon + emoji), fall back to remote.
-                    breadcrumbs: existing.result.breadcrumbs ?? result.breadcrumbs,
-                } as MergedPageResult;
+                existing.result = mergeLocalPageWithRemotePage(existing.result, result);
             } else {
                 existing.result = result;
             }
@@ -197,7 +236,12 @@ export function reciprocalRankFusion(
     }
 
     // Sort descending by RRF score
-    return Array.from(scoreMap.values())
+    const fusedResults = Array.from(scoreMap.values())
         .sort((a, b) => b.score - a.score)
         .map(({ result }) => result);
+
+    return [
+        ...pinnedRemoteResults.map((result) => mergePinnedRemoteResult(result, localResultsByKey)),
+        ...fusedResults,
+    ];
 }
