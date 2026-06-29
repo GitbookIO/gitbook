@@ -6,6 +6,7 @@ export const ja = {
     stability_alpha: 'アルファ',
     stability_beta: 'ベータ',
     available_in_mcp: 'MCPで利用可能',
+    copy_url: 'URLをコピー',
     discriminator: 'ディスクリミネーター',
     copy_to_clipboard: 'クリップボードにコピー',
     copied: 'コピー済み',

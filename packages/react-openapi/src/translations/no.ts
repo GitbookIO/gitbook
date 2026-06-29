@@ -6,6 +6,7 @@ export const no = {
     stability_alpha: 'Alfa',
     stability_beta: 'Beta',
     available_in_mcp: 'Tilgjengelig i MCP',
+    copy_url: 'Kopier URL',
     discriminator: 'Diskriminator',
     copy_to_clipboard: 'Kopier til utklippstavle',
     copied: 'Kopiert',

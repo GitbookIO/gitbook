@@ -6,6 +6,7 @@ export const es = {
     stability_alpha: 'Alfa',
     stability_beta: 'Beta',
     available_in_mcp: 'Disponible en el MCP',
+    copy_url: 'Copiar URL',
     discriminator: 'Discriminador',
     copy_to_clipboard: 'Copiar al portapapeles',
     copied: 'Copiado',

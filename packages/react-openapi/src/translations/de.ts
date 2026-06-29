@@ -6,6 +6,7 @@ export const de = {
     stability_alpha: 'Alpha',
     stability_beta: 'Beta',
     available_in_mcp: 'Im MCP verfügbar',
+    copy_url: 'URL kopieren',
     discriminator: 'Diskriminator',
     copy_to_clipboard: 'In die Zwischenablage kopieren',
     copied: 'Kopiert',

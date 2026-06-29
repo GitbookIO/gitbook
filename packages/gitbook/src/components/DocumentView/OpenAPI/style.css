@@ -38,6 +38,11 @@
     @apply pt-0;
 }
 
+/* In headless mode the tags row sits directly above the path; match the operation-level rhythm. */
+.openapi-summary-tags + .openapi-path {
+    @apply mt-3;
+}
+
 .openapi-deprecated,
 .openapi-stability,
 .openapi-mcp {
@@ -45,7 +50,7 @@
 }
 
 .openapi-mcp {
-    @apply inline-flex items-center gap-1 text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-900/6 ring-emerald-500/5;
+    @apply inline-flex items-center gap-1.5 text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-900/6 ring-emerald-500/5;
 }
 
 button.openapi-mcp {

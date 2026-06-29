@@ -1,6 +1,6 @@
 import { OpenAPICopyButton } from '../OpenAPICopyButton';
 import { type OpenAPIContext, getOpenAPIClientContext } from '../context';
-import { t } from '../translate';
+import { t, tString } from '../translate';
 
 export function OpenAPIMcpBadge(props: { url?: string; context: OpenAPIContext }) {
     const { url, context } = props;
@@ -21,6 +21,7 @@ export function OpenAPIMcpBadge(props: { url?: string; context: OpenAPIContext }
             value={url}
             context={getOpenAPIClientContext(context)}
             className="openapi-mcp"
+            label={tString(context.translation, 'copy_url')}
         >
             {content}
         </OpenAPICopyButton>
