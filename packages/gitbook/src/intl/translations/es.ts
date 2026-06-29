@@ -41,6 +41,8 @@ export const es: TranslationLanguage = {
     search_ask_no_answer:
         'No se pudo encontrar una respuesta para su pregunta. Puede intentar reformularla o ser más específico.',
     search_ask_error: 'Algo salió mal. Por favor, inténtalo de nuevo más tarde.',
+    search_partial_error:
+        'No se pudieron cargar algunos resultados. Se muestran los resultados disponibles.',
     on_this_page: 'En esta página',
     next_page: 'Siguiente',
     previous_page: 'Anterior',

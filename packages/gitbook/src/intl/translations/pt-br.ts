@@ -1,4 +1,6 @@
-export const pt_br = {
+import type { TranslationLanguage } from './types';
+
+export const pt_br: TranslationLanguage = {
     locale: 'pt-br',
     language: 'Português (Brasil)',
     flag: '🇧🇷',
@@ -39,6 +41,8 @@ export const pt_br = {
     search_ask_no_answer:
         'Não foi possível encontrar uma resposta para sua pergunta. Você pode tentar reformulá-la ou ser mais específico.',
     search_ask_error: 'Algo deu errado. Por favor, tente novamente mais tarde.',
+    search_partial_error:
+        'Alguns resultados não puderam ser carregados. Mostrando os resultados disponíveis.',
     on_this_page: 'Nesta página',
     next_page: 'Próximo',
     previous_page: 'Anterior',

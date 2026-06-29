@@ -40,6 +40,7 @@ export const vi: TranslationLanguage = {
     search_ask_no_answer:
         'Không tìm thấy câu trả lời cho câu hỏi của bạn. Bạn có thể thử diễn đạt lại hoặc hỏi cụ thể hơn.',
     search_ask_error: 'Đã xảy ra lỗi. Vui lòng thử lại sau.',
+    search_partial_error: 'Không thể tải một số kết quả. Đang hiển thị các kết quả có sẵn.',
     on_this_page: 'Trên trang này',
     next_page: 'Tiếp theo',
     previous_page: 'Trước',

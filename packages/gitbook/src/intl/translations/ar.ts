@@ -40,6 +40,7 @@ export const ar: TranslationLanguage = {
     search_ask_no_answer:
         'تعذر العثور على إجابة لسؤالك. يمكنك محاولة إعادة صياغته أو جعله أكثر تحديدا.',
     search_ask_error: 'حدث خطأ ما. يرجى المحاولة مرة أخرى لاحقا.',
+    search_partial_error: 'تعذر تحميل بعض النتائج. يتم عرض النتائج المتاحة.',
     on_this_page: 'في هذه الصفحة',
     next_page: 'التالي',
     previous_page: 'السابق',

@@ -40,6 +40,7 @@ export const lv: TranslationLanguage = {
     search_ask_no_answer:
         'Neizdevās atrast atbildi uz jūsu jautājumu. Varat mēģināt to pārfrāzēt vai būt konkrētāks.',
     search_ask_error: 'Kaut kas nogāja greizi. Lūdzu, mēģiniet vēlāk vēlreiz.',
+    search_partial_error: 'Dažus rezultātus neizdevās ielādēt. Tiek rādīti pieejamie rezultāti.',
     on_this_page: 'Šajā lapā',
     next_page: 'Nākamā',
     previous_page: 'Iepriekšējā',

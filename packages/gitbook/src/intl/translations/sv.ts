@@ -40,6 +40,7 @@ export const sv: TranslationLanguage = {
     search_ask_no_answer:
         'Det gick inte att hitta ett svar på din fråga. Du kan försöka formulera om den eller vara mer specifik.',
     search_ask_error: 'Något gick fel. Försök igen senare.',
+    search_partial_error: 'Vissa resultat kunde inte läsas in. Visar tillgängliga resultat.',
     on_this_page: 'På den här sidan',
     next_page: 'Nästa',
     previous_page: 'Föregående',

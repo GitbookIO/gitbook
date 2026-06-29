@@ -40,6 +40,8 @@ export const sk: TranslationLanguage = {
     search_ask_no_answer:
         'Na vašu otázku sa nepodarilo nájsť odpoveď. Skúste ju preformulovať alebo byť konkrétnejší.',
     search_ask_error: 'Niečo sa pokazilo. Skúste to znova neskôr.',
+    search_partial_error:
+        'Niektoré výsledky sa nepodarilo načítať. Zobrazujú sa dostupné výsledky.',
     on_this_page: 'Na tejto stránke',
     next_page: 'Ďalej',
     previous_page: 'Predchádzajúca',

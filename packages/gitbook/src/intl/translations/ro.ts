@@ -40,6 +40,8 @@ export const ro: TranslationLanguage = {
     search_ask_no_answer:
         'Nu s-a putut găsi un răspuns la întrebarea ta. Poți încerca să o reformulezi sau să fii mai specific.',
     search_ask_error: 'Ceva nu a mers bine. Te rugăm să încerci din nou mai târziu.',
+    search_partial_error:
+        'Unele rezultate nu au putut fi încărcate. Se afișează rezultatele disponibile.',
     on_this_page: 'Pe această pagină',
     next_page: 'Următoarea',
     previous_page: 'Anterioara',

@@ -40,6 +40,7 @@ export const cs: TranslationLanguage = {
     search_ask_no_answer:
         'Na vaši otázku se nepodařilo najít odpověď. Zkuste ji přeformulovat nebo být konkrétnější.',
     search_ask_error: 'Něco se pokazilo. Zkuste to prosím znovu později.',
+    search_partial_error: 'Některé výsledky se nepodařilo načíst. Zobrazují se dostupné výsledky.',
     on_this_page: 'Na této stránce',
     next_page: 'Další',
     previous_page: 'Předchozí',

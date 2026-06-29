@@ -40,6 +40,8 @@ export const sl: TranslationLanguage = {
     search_ask_no_answer:
         'Odgovora na vaše vprašanje ni bilo mogoče najti. Poskusite ga preoblikovati ali biti bolj natančni.',
     search_ask_error: 'Nekaj je šlo narobe. Poskusite znova pozneje.',
+    search_partial_error:
+        'Nekaterih rezultatov ni bilo mogoče naložiti. Prikazani so razpoložljivi rezultati.',
     on_this_page: 'Na tej strani',
     next_page: 'Naslednja',
     previous_page: 'Prejšnja',
