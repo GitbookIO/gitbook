@@ -156,14 +156,74 @@ function ImagePicture(
         } & ImageCommonProps
     >
 ) {
-    const { source, ...rest } = props;
+    const { source, resize, ...rest } = props;
     const { size } = source;
 
+    if (resize === false) {
+        return (
+            <ImagePictureStatic
+                {...rest}
+                resize={resize}
+                source={{ ...source, size: source.size ?? null }}
+            />
+        );
+    }
+
     return size ? (
-        <ImagePictureSized {...rest} source={{ ...source, size }} />
+        <ImagePictureSized {...rest} resize={resize} source={{ ...source, size }} />
     ) : (
-        <ImagePictureUnsized {...rest} source={source} />
+        <ImagePictureUnsized {...rest} resize={resize} source={source} />
     );
+}
+
+function ImagePictureStatic(
+    props: PolymorphicComponentProp<
+        'img',
+        {
+            source: ImageSourceSized;
+        } & ImageCommonProps
+    >
+) {
+    const {
+        source,
+        sizes: _sizes,
+        style: _style,
+        alt,
+        quality: _quality = 100,
+        inline: _inline = false,
+        zoom = false,
+        resize: _resize = false,
+        preload = false,
+        loading,
+        fetchPriority,
+        inlineStyle,
+        ...rest
+    } = props;
+
+    const aspectRatioStyle = source.aspectRatio ? { aspectRatio: source.aspectRatio } : {};
+    const style = { ...aspectRatioStyle, ...inlineStyle };
+    const attrs = {
+        src: source.src,
+        ...source.size,
+    };
+
+    if (fetchPriority === 'high' || preload) {
+        ReactDOM.preload(attrs.src, {
+            as: 'image',
+            fetchPriority,
+        });
+    }
+
+    const imgProps: ImgDOMPropsWithSrc = {
+        alt,
+        style,
+        loading,
+        fetchPriority,
+        ...rest,
+        ...attrs,
+    };
+
+    return zoom ? <ZoomImage {...imgProps} /> : <img {...imgProps} alt={imgProps.alt ?? ''} />;
 }
 
 async function ImagePictureUnsized(

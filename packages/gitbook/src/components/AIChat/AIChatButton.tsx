@@ -1,12 +1,58 @@
 'use client';
+import type { ReactNode } from 'react';
+
 import { useLanguage } from '@/intl/client';
 import { t, tString } from '@/intl/translate';
+import { tcls } from '@/lib/tailwind';
 import type { Assistant } from '../AI';
 import { useIsMobile } from '../hooks/useIsMobile';
 import { Button } from '../primitives';
 import { KeyboardShortcut } from '../primitives/KeyboardShortcut';
 
 const MOBILE_BREAKPOINT = 688; // 43rem, equal to Tailwind's @max-2xl container breakpoint
+
+/**
+ * Button visual for an AI assistant in the header.
+ */
+export function AIChatButtonView(props: {
+    icon: ReactNode;
+    label: string;
+    onClick?: () => void;
+    showLabel?: boolean;
+    withShortcut?: boolean;
+    inert?: boolean;
+}) {
+    const { icon, label, onClick, showLabel = true, withShortcut = true, inert = false } = props;
+    const language = useLanguage();
+    const isMobile = useIsMobile(MOBILE_BREAKPOINT, '[data-gb-header-content]');
+
+    return (
+        <Button
+            icon={icon}
+            data-testid="ai-chat-button"
+            iconOnly={!showLabel || isMobile}
+            size="medium"
+            variant="header"
+            label={
+                <div className="flex items-center gap-2">
+                    {t(language, 'ai_chat_ask', label)}
+                    {withShortcut ? (
+                        <KeyboardShortcut
+                            keys={['mod', 'i']}
+                            className="border-tint-11 text-tint-1"
+                        />
+                    ) : null}
+                </div>
+            }
+            aria-label={tString(language, 'ai_chat_ask', label)}
+            onClick={inert ? undefined : onClick}
+            tabIndex={inert ? -1 : undefined}
+            className={tcls(inert ? 'pointer-events-none select-none' : null)}
+        >
+            {showLabel ? t(language, 'ask') : null}
+        </Button>
+    );
+}
 
 /**
  * Button to open/close the AI chat.
@@ -17,31 +63,14 @@ export function AIChatButton(props: {
     withShortcut?: boolean;
 }) {
     const { assistant, showLabel = true, withShortcut = true } = props;
-    const language = useLanguage();
-    const isMobile = useIsMobile(MOBILE_BREAKPOINT, '[data-gb-header-content]');
 
     return (
-        <Button
+        <AIChatButtonView
             icon={assistant.icon}
-            data-testid="ai-chat-button"
-            iconOnly={!showLabel || isMobile}
-            size="medium"
-            variant="header"
-            label={
-                <div className="flex items-center gap-2">
-                    {t(language, 'ai_chat_ask', assistant.label)}
-                    {withShortcut ? (
-                        <KeyboardShortcut
-                            keys={['mod', 'i']}
-                            className="border-tint-11 text-tint-1"
-                        />
-                    ) : null}
-                </div>
-            }
-            aria-label={tString(language, 'ai_chat_ask', assistant.label)}
+            label={assistant.label}
             onClick={() => assistant.open()}
-        >
-            {showLabel ? t(language, 'ask') : null}
-        </Button>
+            showLabel={showLabel}
+            withShortcut={withShortcut}
+        />
     );
 }

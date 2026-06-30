@@ -8,6 +8,10 @@ import { PageBody } from '../PageBody';
 import { SiteSectionTabs, encodeClientSiteSections } from '../SiteSections';
 import { categorizeVariants } from '../SpaceLayout/categorizeVariants';
 import { TableOfContents } from '../TableOfContents';
+import {
+    TABLE_OF_CONTENTS_SPACES_DROPDOWN_CLASS,
+    getTableOfContentsInnerHeaderClassName,
+} from '../TableOfContents/styles';
 import { ScrollContainer } from '../primitives/ScrollContainer';
 import { EmbeddableDocsPageControlButtons } from './EmbeddableDocsPageControlButtons';
 import {
@@ -129,13 +133,13 @@ export async function EmbeddableDocsPage(
                             }
                             innerHeader={
                                 variants.generic.length > 1 ? (
-                                    <div className="my-5 sidebar-default:mt-2 flex flex-col gap-2 px-5 empty:hidden">
+                                    <div className={getTableOfContentsInnerHeaderClassName()}>
                                         {variants.generic.length > 1 ? (
                                             <SpacesDropdown
                                                 context={context}
                                                 siteSpace={context.siteSpace}
                                                 siteSpaces={variants.generic}
-                                                className="w-full px-3"
+                                                className={TABLE_OF_CONTENTS_SPACES_DROPDOWN_CLASS}
                                             />
                                         ) : null}
                                     </div>

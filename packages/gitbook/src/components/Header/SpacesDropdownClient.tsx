@@ -5,6 +5,7 @@ import type { IconName } from '@gitbook/icons';
 import { type ClassValue, tcls } from '@/lib/tailwind';
 import { Button, type ButtonProps, ToggleChevron } from '../primitives';
 import { DropdownMenu } from '../primitives/DropdownMenu';
+import type { SlimSiteSpace } from './SpacesDropdownData';
 import { SpacesDropdownMenuItems } from './SpacesDropdownMenuItem';
 
 /**
@@ -17,16 +18,12 @@ export function SpacesDropdownClient(props: {
     variant: ButtonProps['variant'];
     className?: ClassValue;
     dropdownClassName: string;
-    slimSpaces: Array<{
-        id: string;
-        title: string;
-        url: string;
-        isActive: boolean;
-        spaceId: string;
-    }>;
+    slimSpaces: SlimSiteSpace[];
     curPath: string;
+    clickable?: boolean;
 }) {
-    const { title, icon, variant, className, dropdownClassName, slimSpaces, curPath } = props;
+    const { title, icon, variant, className, dropdownClassName, slimSpaces, curPath, clickable } =
+        props;
 
     return (
         <DropdownMenu
@@ -44,7 +41,11 @@ export function SpacesDropdownClient(props: {
                 </Button>
             }
         >
-            <SpacesDropdownMenuItems slimSpaces={slimSpaces} curPath={curPath} />
+            <SpacesDropdownMenuItems
+                slimSpaces={slimSpaces}
+                curPath={curPath}
+                clickable={clickable}
+            />
         </DropdownMenu>
     );
 }

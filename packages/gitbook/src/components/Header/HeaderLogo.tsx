@@ -1,11 +1,16 @@
 import type { GitBookSiteContext } from '@/lib/context';
 
 import { Image } from '@/components/utils';
-import { tcls } from '@/lib/tailwind';
 
 import { resolveContentRef } from '@/lib/references';
 import { Link } from '../primitives';
 import { CurrentContentIcon } from './CurrentContentIcon';
+import {
+    HEADER_LOGO_CONTAINER_CLASS,
+    HEADER_LOGO_IMAGE_CLASS,
+    HEADER_LOGO_IMAGE_SIZES,
+    HeaderLogoContent,
+} from './HeaderLogoContent';
 
 interface HeaderLogoProps {
     context: GitBookSiteContext;
@@ -26,83 +31,56 @@ export async function HeaderLogo(props: HeaderLogoProps) {
     return (
         <Link
             href={primaryLink?.href ?? linker.toPathInSite('')}
-            className={tcls('group/headerlogo', 'min-w-0', 'shrink', 'flex', 'items-center')}
+            className={HEADER_LOGO_CONTAINER_CLASS}
         >
-            {customization.header.logo ? (
-                <Image
-                    alt="Logo"
-                    resize={context.imageResizer}
-                    sources={{
-                        light: {
-                            src: customization.header.logo.light,
-                        },
-                        dark: customization.header.logo.dark
-                            ? {
-                                  src: customization.header.logo.dark,
-                              }
-                            : null,
-                    }}
-                    sizes={[
-                        {
-                            media: '(max-width: 1024px)',
-                            width: 160,
-                        },
-                        {
-                            width: 260,
-                        },
-                    ]}
-                    preload
-                    style={tcls(
-                        'overflow-hidden',
-                        'shrink',
-                        'min-w-0',
-                        'max-w-40',
-                        'lg:max-w-64',
-                        'lg:site-header-none:page-no-toc:max-w-56',
-                        'max-h-8',
-                        'h-full',
-                        'w-full',
-                        'object-contain',
-                        'object-left'
-                    )}
-                />
-            ) : (
-                <LogoFallback {...props} />
-            )}
+            <HeaderLogoContent
+                logo={customization.header.logo ? <LogoImage context={context} /> : null}
+                fallbackIcon={<LogoFallbackIcon context={context} />}
+                title={context.site.title}
+            />
         </Link>
     );
 }
 
-function LogoFallback(props: HeaderLogoProps) {
+function LogoImage(props: HeaderLogoProps) {
     const { context } = props;
-    const { site } = context;
+    const { customization } = context;
+
+    if (!customization.header.logo) {
+        return null;
+    }
 
     return (
-        <>
-            <CurrentContentIcon
-                context={context}
-                alt=""
-                sizes={[{ width: 32 }]}
-                style={['object-contain', 'size-8']}
-                fetchPriority="high"
-            />
-            <div
-                className={tcls(
-                    'text-pretty',
-                    'line-clamp-2',
-                    'tracking-tight',
-                    'max-w-[18ch]',
-                    'lg:max-w-[24ch]',
-                    'font-semibold',
-                    'ms-3',
-                    'text-base/tight',
-                    'lg:text-lg/tight',
-                    'text-tint-strong',
-                    'theme-bold:text-header-link'
-                )}
-            >
-                {site.title}
-            </div>
-        </>
+        <Image
+            alt="Logo"
+            resize={context.imageResizer}
+            sources={{
+                light: {
+                    src: customization.header.logo.light,
+                },
+                dark: customization.header.logo.dark
+                    ? {
+                          src: customization.header.logo.dark,
+                      }
+                    : null,
+            }}
+            sizes={HEADER_LOGO_IMAGE_SIZES}
+            preload
+            style={HEADER_LOGO_IMAGE_CLASS}
+        />
+    );
+}
+
+function LogoFallbackIcon(props: HeaderLogoProps) {
+    const { context } = props;
+
+    return (
+        <CurrentContentIcon
+            context={context}
+            alt=""
+            sizes={[{ width: 32 }]}
+            style={['object-contain', 'size-8']}
+            fetchPriority="high"
+        />
     );
 }
