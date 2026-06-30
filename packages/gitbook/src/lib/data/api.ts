@@ -351,7 +351,7 @@ const getChangeRequestChanges = cache(
             })
         );
 
-        return wrapCacheDataFetcherError(async () => {
+        return wrapDataFetcherError(async () => {
             return trace(
                 `getChangeRequestChanges(${params.spaceId}, ${params.changeRequestId})`,
                 async () => {
@@ -381,7 +381,7 @@ const getRevisionSemanticChanges = cache(
         params: { spaceId: string; revisionId: string; limit?: number }
     ) => {
         'use cache: remote';
-        return wrapCacheDataFetcherError(async () => {
+        return wrapDataFetcherError(async () => {
             return trace(
                 `getRevisionSemanticChanges(${params.spaceId}, ${params.revisionId})`,
                 async () => {
