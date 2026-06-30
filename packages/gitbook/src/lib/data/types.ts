@@ -66,12 +66,30 @@ export interface GitBookDataFetcher {
     }): Promise<DataFetcherResponse<api.ChangeRequest>>;
 
     /**
+     * Get the semantic changes for a change request.
+     */
+    getChangeRequestChanges(params: {
+        spaceId: string;
+        changeRequestId: string;
+        limit?: number;
+    }): Promise<DataFetcherResponse<api.RevisionSemanticChanges>>;
+
+    /**
      * Get the revision by its space ID and revision ID.
      */
     getRevision(params: {
         spaceId: string;
         revisionId: string;
     }): Promise<DataFetcherResponse<api.Revision>>;
+
+    /**
+     * Get the semantic changes for a revision.
+     */
+    getRevisionSemanticChanges(params: {
+        spaceId: string;
+        revisionId: string;
+        limit?: number;
+    }): Promise<DataFetcherResponse<api.RevisionSemanticChanges>>;
 
     /**
      * Get a revision page by its path.

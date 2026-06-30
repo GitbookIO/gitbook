@@ -139,6 +139,20 @@ export function createDataFetcher(
                 changeRequestId: params.changeRequestId,
             });
         },
+        getChangeRequestChanges(params) {
+            return getChangeRequestChanges(input, {
+                spaceId: params.spaceId,
+                changeRequestId: params.changeRequestId,
+                limit: params.limit,
+            });
+        },
+        getRevisionSemanticChanges(params) {
+            return getRevisionSemanticChanges(input, {
+                spaceId: params.spaceId,
+                revisionId: params.revisionId,
+                limit: params.limit,
+            });
+        },
         getDocument(params) {
             return getDocument(input, {
                 spaceId: params.spaceId,
@@ -319,6 +333,76 @@ const getRevision = cache(
                 cacheLife('max');
                 return res.data;
             });
+        });
+    }
+);
+
+const getChangeRequestChanges = cache(
+    async (
+        input: DataFetcherInput,
+        params: { spaceId: string; changeRequestId: string; limit?: number }
+    ) => {
+        'use cache: remote';
+        cacheTag(
+            getCacheTag({
+                tag: 'change-request',
+                space: params.spaceId,
+                changeRequest: params.changeRequestId,
+            })
+        );
+
+        return wrapDataFetcherError(async () => {
+            return trace(
+                `getChangeRequestChanges(${params.spaceId}, ${params.changeRequestId})`,
+                async () => {
+                    const api = apiClient(input);
+                    const res = await api.spaces.getChangeRequestChanges(
+                        params.spaceId,
+                        params.changeRequestId,
+                        {
+                            limit: params.limit,
+                        },
+                        {
+                            ...noCacheFetchOptions,
+                        }
+                    );
+                    cacheTag(...getCacheTagsFromResponse(res));
+                    cacheLife('minutes');
+                    return res.data;
+                }
+            );
+        });
+    }
+);
+
+const getRevisionSemanticChanges = cache(
+    async (
+        input: DataFetcherInput,
+        params: { spaceId: string; revisionId: string; limit?: number }
+    ) => {
+        'use cache: remote';
+        return wrapDataFetcherError(async () => {
+            return trace(
+                `getRevisionSemanticChanges(${params.spaceId}, ${params.revisionId})`,
+                async () => {
+                    const api = apiClient(input);
+                    const res = await api.spaces.getRevisionSemanticChanges(
+                        params.spaceId,
+                        params.revisionId,
+                        {
+                            computed: false,
+                            limit: params.limit,
+                            metadata: false,
+                        },
+                        {
+                            ...noCacheFetchOptions,
+                        }
+                    );
+                    cacheTag(...getCacheTagsFromResponse(res));
+                    cacheLife('max');
+                    return res.data;
+                }
+            );
         });
     }
 );
