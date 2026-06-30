@@ -10,7 +10,7 @@ import { getCacheTag, getComputedContentSourceCacheTags } from '@gitbook/cache-t
 import { parse as parseCacheControl } from '@tusbar/cache-control';
 import { cacheLife, cacheTag } from 'next/cache';
 import { cache } from '../cache';
-import { DataFetcherError, wrapCacheDataFetcherError } from './errors';
+import { DataFetcherError, wrapDataFetcherError } from './errors';
 import type { GitBookDataFetcher } from './types';
 
 interface DataFetcherInput {
@@ -223,7 +223,7 @@ function cacheLifeFromResponse(
 
 const getUserById = cache(async (input: DataFetcherInput, params: { userId: string }) => {
     'use cache';
-    return wrapCacheDataFetcherError(async () => {
+    return wrapDataFetcherError(async () => {
         return trace(`getUserById(${params.userId})`, async () => {
             const api = apiClient(input);
             const res = await api.users.getUserById(params.userId, {
@@ -246,7 +246,7 @@ const getSpace = cache(
             })
         );
 
-        return wrapCacheDataFetcherError(async () => {
+        return wrapDataFetcherError(async () => {
             return trace(`getSpace(${params.spaceId}, ${params.shareKey})`, async () => {
                 const api = apiClient(input);
                 const res = await api.spaces.getSpaceById(
@@ -277,7 +277,7 @@ const getChangeRequest = cache(
             })
         );
 
-        return wrapCacheDataFetcherError(async () => {
+        return wrapDataFetcherError(async () => {
             return trace(
                 `getChangeRequest(${params.spaceId}, ${params.changeRequestId})`,
                 async () => {
@@ -302,7 +302,7 @@ const getChangeRequest = cache(
 const getRevision = cache(
     async (input: DataFetcherInput, params: { spaceId: string; revisionId: string }) => {
         'use cache';
-        return wrapCacheDataFetcherError(async () => {
+        return wrapDataFetcherError(async () => {
             return trace(`getRevision(${params.spaceId}, ${params.revisionId})`, async () => {
                 const api = apiClient(input);
                 const res = await api.spaces.getRevisionById(
@@ -331,7 +331,7 @@ const getRevisionPageMarkdown = cache(
         _functionName: string
     ) => {
         'use cache';
-        return wrapCacheDataFetcherError(async () => {
+        return wrapDataFetcherError(async () => {
             return trace(
                 `getRevisionPageMarkdown(${params.spaceId}, ${params.revisionId}, ${params.pageId})`,
                 async () => {
@@ -373,7 +373,7 @@ const getRevisionPageDocument = cache(
         _functionName: string
     ) => {
         'use cache';
-        return wrapCacheDataFetcherError(async () => {
+        return wrapDataFetcherError(async () => {
             return trace(
                 `getRevisionPageDocument(${params.spaceId}, ${params.revisionId}, ${params.pageId})`,
                 async () => {
@@ -407,7 +407,7 @@ const getRevisionReusableContentDocument = cache(
         params: { spaceId: string; revisionId: string; reusableContentId: string }
     ) => {
         'use cache';
-        return wrapCacheDataFetcherError(async () => {
+        return wrapDataFetcherError(async () => {
             return trace(
                 `getRevisionReusableContentDocument(${params.spaceId}, ${params.revisionId}, ${params.reusableContentId})`,
                 async () => {
@@ -440,7 +440,7 @@ const getRevisionPageByPath = cache(
         params: { spaceId: string; revisionId: string; path: string }
     ) => {
         'use cache';
-        return wrapCacheDataFetcherError(async () => {
+        return wrapDataFetcherError(async () => {
             return trace(
                 `getRevisionPageByPath(${params.spaceId}, ${params.revisionId}, ${params.path})`,
                 async () => {
@@ -467,7 +467,7 @@ const getRevisionPageByPath = cache(
 const getDocument = cache(
     async (input: DataFetcherInput, params: { spaceId: string; documentId: string }) => {
         'use cache';
-        return wrapCacheDataFetcherError(async () => {
+        return wrapDataFetcherError(async () => {
             return trace(`getDocument(${params.spaceId}, ${params.documentId})`, async () => {
                 const api = apiClient(input);
                 const res = await api.spaces.getDocumentById(
@@ -507,7 +507,7 @@ const getComputedDocument = cache(
             )
         );
 
-        return wrapCacheDataFetcherError(async () => {
+        return wrapDataFetcherError(async () => {
             return trace(
                 `getComputedDocument(${params.spaceId}, ${params.organizationId}, ${params.source.type}, ${params.seed})`,
                 async () => {
@@ -544,7 +544,7 @@ const getLatestOpenAPISpecVersionContent = cache(
             })
         );
 
-        return wrapCacheDataFetcherError(async () => {
+        return wrapDataFetcherError(async () => {
             return trace(
                 `getLatestOpenAPISpecVersionContent(${params.organizationId}, ${params.slug})`,
                 async () => {
@@ -579,7 +579,7 @@ const getPublishedContentSite = cache(
             })
         );
 
-        return wrapCacheDataFetcherError(async () => {
+        return wrapDataFetcherError(async () => {
             return trace(
                 `getPublishedContentSite(${params.organizationId}, ${params.siteId}, ${params.siteShareKey})`,
                 async () => {
@@ -621,7 +621,7 @@ const getSiteRedirectBySource = cache(
             })
         );
 
-        return wrapCacheDataFetcherError(async () => {
+        return wrapDataFetcherError(async () => {
             return trace(
                 `getSiteRedirectBySource(${params.organizationId}, ${params.siteId}, ${params.siteShareKey}, ${params.source})`,
                 async () => {
@@ -656,7 +656,7 @@ const getEmbedByUrl = cache(
             })
         );
 
-        return wrapCacheDataFetcherError(async () => {
+        return wrapDataFetcherError(async () => {
             return trace(`getEmbedByUrl(${params.spaceId}, ${params.url})`, async () => {
                 const api = apiClient(input);
                 const res = await api.spaces.getEmbedByUrlInSpace(
@@ -690,7 +690,7 @@ const searchSiteContent = cache(
             })
         );
 
-        return wrapCacheDataFetcherError(async () => {
+        return wrapDataFetcherError(async () => {
             return trace(
                 `searchSiteContent(${params.organizationId}, ${params.siteId}, ${params.query})`,
                 async () => {
@@ -730,7 +730,7 @@ const renderIntegrationUi = cache(
             })
         );
 
-        return wrapCacheDataFetcherError(async () => {
+        return wrapDataFetcherError(async () => {
             return trace(`renderIntegrationUi(${params.integrationName})`, async () => {
                 const api = apiClient(input);
                 const res = await api.integrations.renderIntegrationUiWithPost(
@@ -757,7 +757,7 @@ const listRevisionPageMetaLinks = cache(
         params: { spaceId: string; revisionId: string; pageId: string }
     ) => {
         'use cache';
-        return wrapCacheDataFetcherError(async () => {
+        return wrapDataFetcherError(async () => {
             return trace(
                 `listRevisionPageMetaLinks(${params.spaceId}, ${params.revisionId}, ${params.pageId})`,
                 async () => {
