@@ -41,6 +41,8 @@ export const nl: TranslationLanguage = {
     search_ask_no_answer:
         'Er kon geen antwoord op je vraag worden gevonden. Probeer je vraag anders te formuleren of wees specifieker.',
     search_ask_error: 'Er is iets misgegaan. Probeer het later opnieuw.',
+    search_partial_error:
+        'Sommige resultaten konden niet worden geladen. Beschikbare resultaten worden weergegeven.',
     on_this_page: 'Op deze pagina',
     next_page: 'Volgende',
     previous_page: 'Vorige',

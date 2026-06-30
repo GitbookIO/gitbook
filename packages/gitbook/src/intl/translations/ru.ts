@@ -1,4 +1,6 @@
-export const ru = {
+import type { TranslationLanguage } from './types';
+
+export const ru: TranslationLanguage = {
     locale: 'ru',
     language: 'Русский',
     flag: '🇷🇺',
@@ -39,6 +41,8 @@ export const ru = {
     search_ask_no_answer:
         'Не удалось найти ответ на ваш вопрос. Попробуйте перефразировать его или задать более конкретный вопрос.',
     search_ask_error: 'Что-то пошло не так. Пожалуйста, попробуйте позже.',
+    search_partial_error:
+        'Не удалось загрузить некоторые результаты. Показаны доступные результаты.',
     on_this_page: 'На этой странице',
     next_page: 'Следующая',
     previous_page: 'Предыдущая',

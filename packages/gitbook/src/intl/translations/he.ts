@@ -40,6 +40,7 @@ export const he: TranslationLanguage = {
     search_ask_no_answer:
         'לא נמצאה תשובה לשאלה שלך. אפשר לנסות לנסח אותה מחדש או להיות מדויקים יותר.',
     search_ask_error: 'משהו השתבש. נסה שוב מאוחר יותר.',
+    search_partial_error: 'לא ניתן היה לטעון חלק מהתוצאות. מוצגות התוצאות הזמינות.',
     on_this_page: 'בדף הזה',
     next_page: 'הבא',
     previous_page: 'הקודם',

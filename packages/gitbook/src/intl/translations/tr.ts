@@ -40,6 +40,7 @@ export const tr: TranslationLanguage = {
     search_ask_no_answer:
         'Sorunuz için bir cevap bulunamadı. Soruyu yeniden ifade etmeyi veya daha spesifik olmayı deneyebilirsiniz.',
     search_ask_error: 'Bir şeyler ters gitti. Lütfen daha sonra tekrar deneyin.',
+    search_partial_error: 'Bazı sonuçlar yüklenemedi. Kullanılabilir sonuçlar gösteriliyor.',
     on_this_page: 'Bu sayfada',
     next_page: 'Sonraki',
     previous_page: 'Önceki',

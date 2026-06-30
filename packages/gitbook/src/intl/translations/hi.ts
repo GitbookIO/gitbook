@@ -40,6 +40,7 @@ export const hi: TranslationLanguage = {
     search_ask_no_answer:
         'आपके प्रश्न का उत्तर नहीं मिल सका। आप इसे फिर से लिखने या अधिक विशिष्ट बनाने की कोशिश कर सकते हैं।',
     search_ask_error: 'कुछ गलत हो गया। कृपया बाद में फिर कोशिश करें।',
+    search_partial_error: 'कुछ परिणाम लोड नहीं हो सके। उपलब्ध परिणाम दिखाए जा रहे हैं।',
     on_this_page: 'इस पृष्ठ पर',
     next_page: 'अगला',
     previous_page: 'पिछला',

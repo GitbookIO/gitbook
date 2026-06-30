@@ -41,6 +41,7 @@ export const ja: TranslationLanguage = {
     search_ask_no_answer:
         'ご質問への回答が見つかりませんでした。質問を言い換えるか、もう少し具体的にしてください。',
     search_ask_error: '何らかのエラーが発生しました。後ほど再度お試しください。',
+    search_partial_error: '一部の結果を読み込めませんでした。利用可能な結果を表示しています。',
     on_this_page: 'このページ内',
     next_page: '次へ',
     previous_page: '前へ',

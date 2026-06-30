@@ -39,6 +39,7 @@ export const zh_tw: TranslationLanguage = {
     search_ask_sources_no_answer: '相關頁面',
     search_ask_no_answer: '找不到您問題的答案。您可以嘗試改寫問題，或提出更具體的內容。',
     search_ask_error: '發生錯誤。請稍後再試。',
+    search_partial_error: '部分結果無法載入。正在顯示可用結果。',
     on_this_page: '本頁內容',
     next_page: '下一頁',
     previous_page: '上一頁',

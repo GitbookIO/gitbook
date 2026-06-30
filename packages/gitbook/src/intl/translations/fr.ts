@@ -1,4 +1,6 @@
-export const fr = {
+import type { TranslationLanguage } from './types';
+
+export const fr: TranslationLanguage = {
     locale: 'fr',
     language: 'Français',
     flag: '🇫🇷',
@@ -38,6 +40,8 @@ export const fr = {
     search_ask_sources_no_answer: 'Pages associées',
     search_ask_no_answer: 'Pas de réponse trouvée. Essayez de reformuler votre question.',
     search_ask_error: 'Une erreur est survenue. Veuillez réessayer plus tard.',
+    search_partial_error:
+        'Certains résultats n’ont pas pu être chargés. Les résultats disponibles sont affichés.',
     on_this_page: 'Sur cette page',
     next_page: 'Suivant',
     previous_page: 'Précédent',
