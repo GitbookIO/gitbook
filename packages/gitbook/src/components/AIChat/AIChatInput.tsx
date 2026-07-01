@@ -1,7 +1,7 @@
 import { t, tString, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
 import { Icon } from '@gitbook/icons';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { useAIChatController, useAIChatState } from '../AI/useAIChat';
 import { HoverCard, HoverCardRoot, HoverCardTrigger } from '../primitives';
@@ -23,6 +23,29 @@ export function AIChatInput(props: {
     const chatController = useAIChatController();
 
     const inputRef = useRef<HTMLTextAreaElement>(null);
+
+    // Controlled value so a pre-filled draft can be injected without sending it.
+    const [value, setValue] = useState('');
+
+    // Consume a draft staged via the controller (e.g. the per-paragraph "Ask" button): seed the
+    // input, focus it with the cursor at the end, then clear the pending draft so it is applied
+    // once and not re-injected on a later mount.
+    useEffect(() => {
+        if (!chat.draft) {
+            return;
+        }
+        setValue(chat.draft);
+        chatController.setDraft('');
+        const raf = requestAnimationFrame(() => {
+            const el = inputRef.current;
+            if (el) {
+                el.focus();
+                const end = el.value.length;
+                el.setSelectionRange(end, end);
+            }
+        });
+        return () => cancelAnimationFrame(raf);
+    }, [chat.draft, chatController]);
 
     useEffect(() => {
         if (chat.opened && !disabled && !responding) {
@@ -66,6 +89,8 @@ export function AIChatInput(props: {
             sizing="large"
             label="Assistant chat input"
             placeholder={tString(language, 'ai_chat_input_placeholder')}
+            value={value}
+            onValueChange={setValue}
             onSubmit={(val) => onSubmit(val as string)}
             submitButton={{
                 size: 'small',
