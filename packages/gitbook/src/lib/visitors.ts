@@ -296,7 +296,7 @@ export function getResponseCookiesForVisitorAuth(
     }
 
     /**
-     * If the visitor token has been retrieve from the URL, or if its a VA cookie and the basePath is the same, set it
+     * If the visitor token has been retrieved from the URL, or if its a VA cookie and the basePath is the same, set it
      * as a cookie on the response.
      *
      * Note that we do not re-store the gitbook-visitor-cookie in another cookie, to maintain a single source of truth.

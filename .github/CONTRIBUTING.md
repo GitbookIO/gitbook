@@ -24,7 +24,7 @@ We recommend adding as many relevant links, minimal reproductions of the issue, 
 
 ### Solve an issue
 
-If you're interested in solving an issue in our repository, start by scanning through it's exisiting issues to find one that you're interested in working on. If you find an issue to work on, you are welcome to open a PR with a fix. See the following sections below for more information on contributing for specific sections.
+If you're interested in solving an issue in our repository, start by scanning through it's existing issues to find one that you're interested in working on. If you find an issue to work on, you are welcome to open a PR with a fix. See the following sections below for more information on contributing for specific sections.
 
 ### Documentation
 
@@ -93,7 +93,7 @@ You can visit any published GitBook site behind your development server. Please 
 
 [Commit your changes](https://github.com/git-guides/git-commit) once you are happy with them. See [Atom's contributing guide](https://github.com/atom/atom/blob/master/CONTRIBUTING.md#git-commit-messages) to know how to use emoji for commit messages!
 
-Once your changes are ready, don't forget to self-review your code to double check that your chagnes are ready to be added.
+Once your changes are ready, don't forget to self-review your code to double check that your changes are ready to be added.
 
 ### Pull Request
 

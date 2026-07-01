@@ -161,7 +161,7 @@ export function Link(props: LinkProps) {
     // client router cache to be used properly.
     //
     // However, we need to disable prefetch for links with query params that
-    // can trigger server-side side effects, such as persisting visitor claims in a
+    // can trigger server-side effects, such as persisting visitor claims in a
     // cookie or starting the assistant. Automatic RSC prefetch requests can otherwise
     // trigger those effects without user intent.
     const _prefetch = hasSideEffectQueryParams(href) ? false : (prefetch ?? true);
@@ -181,7 +181,7 @@ export function Link(props: LinkProps) {
 }
 
 /**
- * Whether the given href carries query params that have a server-side side effect when fetched:
+ * Whether the given href carries query params that have a server-side effect when fetched:
  *   - `visitor.*` params persist unsigned visitor claims into the `gitbook-visitor-public` cookie.
  *   - `ask` triggers the assistant & `q` the search.
  *
