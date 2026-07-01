@@ -1,6 +1,5 @@
 'use client';
 
-import { CustomizationAIMode } from '@gitbook/api';
 import fnv1a from '@sindresorhus/fnv1a';
 import { AnimatePresence, motion } from 'motion/react';
 import * as React from 'react';
@@ -10,6 +9,7 @@ import { useAIChatController, useAIConfig } from '@/components/AI';
 import { useIsMobile } from '@/components/hooks/useIsMobile';
 import { useIsMounted } from '@/components/hooks/useIsMounted';
 import { Button } from '@/components/primitives';
+import { isAIChatEnabled } from '@/components/utils/isAIChatEnabled';
 import { t, useLanguage } from '@/intl/client';
 
 import { AIChatIcon } from '../AIChatIcon';
@@ -31,7 +31,7 @@ export function AskAITextSelection() {
     const isMobile = useIsMobile();
     const isMounted = useIsMounted();
 
-    const enabled = config.aiMode === CustomizationAIMode.Assistant && !isMobile;
+    const enabled = isAIChatEnabled(config.aiMode) && !isMobile;
 
     const toolbarRef = React.useRef<HTMLDivElement>(null);
     const { selection, clear } = useStableTextSelection({

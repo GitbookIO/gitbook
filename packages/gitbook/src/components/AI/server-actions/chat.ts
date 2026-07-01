@@ -1,6 +1,7 @@
 'use server';
+import { isAIChatEnabled } from '@/components/utils/isAIChatEnabled';
 import { getSiteURLDataFromMiddleware } from '@/lib/middleware';
-import { getServerActionBaseContext } from '@/lib/server-actions';
+import { fetchServerActionSiteContext, getServerActionBaseContext } from '@/lib/server-actions';
 import { traceErrorOnly } from '@/lib/tracing';
 import {
     type AIMessageContext,
@@ -38,6 +39,11 @@ export async function* streamAIChatResponse({
         const context = await getServerActionBaseContext({
             isEmbeddable: options?.asEmbeddable,
         });
+
+        const siteContext = await fetchServerActionSiteContext(context);
+        if (!isAIChatEnabled(siteContext.customization.ai.mode)) {
+            throw new Error('The AI Assistant is not enabled for this site.');
+        }
 
         const siteURLData = await getSiteURLDataFromMiddleware();
 
