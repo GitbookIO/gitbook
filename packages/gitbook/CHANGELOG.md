@@ -1,5 +1,19 @@
 # gitbook
 
+## 0.27.2
+
+### Patch Changes
+
+- 36dbdb4: Support an optional `goal` query parameter on the markdown ask interface (`?ask=…&goal=…`), letting agents describe the broader end goal they are working towards so the answer can be steered towards it.
+- 7e55cd5: Add an "Available in MCP" badge on OpenAPI operations marked with `x-gitbook-mcp: true`. When `x-gitbook-mcp-url` is set (on the operation, path, or root — most specific wins), the badge becomes a button that copies the MCP server URL to the clipboard.
+- 6146f8e: Reduce the size of `searchDocumentation` MCP responses by returning only the best-matching section per page instead of concatenating every section body.
+- 77efd44: Show changed pages in preview toolbars for change requests and revisions.
+- 2dc76a2: Fix grouped top-nav section dropdowns rendering empty when the site is embedded in an iframe (visitor-auth embeds, editor preview) or shown in the embeddable view. The dropdown viewport is composited and animated, and a clipped composited layer fails to rasterize its text in Chromium when painted inside a sub compositing root; the rounded-corner clipping is now done on an inner wrapper so the viewport itself is no longer clipped.
+- 9f65133: Improve the 404 page: remove the table of contents sidebar and center the content, suggest related pages (ranked from the already-cached search index, so no extra request per 404), show a search or assistant input depending on the site's AI configuration, and move "Go to homepage" to the bottom as a last resort.
+- Updated dependencies [7e55cd5]
+  - @gitbook/openapi-parser@3.0.12
+  - @gitbook/react-openapi@1.5.15
+
 ## 0.27.1
 
 ### Patch Changes
