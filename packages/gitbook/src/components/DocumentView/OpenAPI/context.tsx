@@ -51,6 +51,7 @@ export function getOpenAPIContext(args: {
             copy: <Icon icon="copy" />,
             check: <Icon icon="check" />,
             lock: <Icon icon="lock" />,
+            mcp: <Icon icon="mcp" />,
         },
         renderCodeBlock: (codeProps) => (
             <PlainCodeBlock

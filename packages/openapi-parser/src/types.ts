@@ -37,6 +37,12 @@ export interface OpenAPICustomSpecProperties {
      * Description in HTML format.
      */
     'x-gitbook-description-html'?: string;
+
+    /**
+     * Default URL of the MCP server exposing the operations in this spec.
+     * Can be overridden at the path or operation level via the same extension.
+     */
+    'x-gitbook-mcp-url'?: string;
 }
 
 /**
@@ -100,6 +106,18 @@ export interface OpenAPICustomOperationProperties {
      * @enum 'experimental' | 'alpha' | 'beta'
      */
     'x-stability'?: OpenAPIStability;
+
+    /**
+     * If `true`, indicates this operation is available as a tool in an MCP server.
+     */
+    'x-gitbook-mcp'?: boolean;
+
+    /**
+     * URL of the MCP server exposing this operation. When set — here, or inherited from
+     * the path or root level (operation > path > root) — the "Available in MCP" badge
+     * becomes a button that copies this URL to the clipboard.
+     */
+    'x-gitbook-mcp-url'?: string;
 }
 
 /**
