@@ -1,3 +1,4 @@
+import { isAIEnabled } from '@/components/utils/isAIChatEnabled';
 import { type GitBookSiteContext, checkIsRootSiteContext } from '@/lib/context';
 import { throwIfDataError } from '@/lib/data';
 import { type GitBookLinker, linkerWithMarkdownPages } from '@/lib/links';
@@ -203,6 +204,10 @@ export async function getMarkdownForPagesTree(
 }
 
 function renderAskFooter(context: GitBookSiteContext) {
+    if (!isAIEnabled(context.customization.ai.mode)) {
+        return '';
+    }
+
     return `\n\n---\n\n# Agent Instructions
 This documentation is published with GitBook. GitBook is the documentation platform designed so that both humans and AI agents can read, navigate, and reason over technical content effectively. Learn more at gitbook.com.
 
