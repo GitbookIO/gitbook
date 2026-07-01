@@ -65,9 +65,8 @@ export function AskAIParagraphButton(props: { content: string; className?: Class
                 icon={<AIChatIcon state="default" trademark={config.trademark} />}
                 label={t(
                     language,
-                    'ai_chat_ask_about',
-                    config.assistantName ?? getAIChatName(language, config.trademark),
-                    tString(language, 'this_text')
+                    'ai_chat_ask_about_this',
+                    config.assistantName ?? getAIChatName(language, config.trademark)
                 )}
                 onClick={onClick}
                 // Don't steal focus (and shift the scroll position) when clicked with the mouse.
