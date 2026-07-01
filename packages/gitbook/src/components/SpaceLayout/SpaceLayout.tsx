@@ -17,6 +17,7 @@ import type { RenderAIMessageOptions } from '../AI';
 import { AIChat, AskAITextSelection } from '../AIChat';
 import { AdaptiveVisitorContextProvider } from '../Adaptive';
 import { Announcement } from '../Announcement';
+import { OpenAPICodeSampleAIProvider } from '../DocumentView/OpenAPI/OpenAPICodeSampleAIProvider';
 import { SpacesDropdown, TranslationsDropdown } from '../Header/SpacesDropdown';
 import { InsightsProvider, VisitorProvider } from '../Insights';
 import { SearchContainer, getSearchBaseProps } from '../Search';
@@ -92,7 +93,9 @@ export function SpaceLayoutServerContext(props: SpaceLayoutProps) {
                     >
                         <InsightsProvider enabled={withTracking} eventUrl={eventUrl.toString()}>
                             <AIChatProvider renderMessageOptions={aiChatRenderMessageOptions}>
-                                {children}
+                                <OpenAPICodeSampleAIProvider>
+                                    {children}
+                                </OpenAPICodeSampleAIProvider>
                             </AIChatProvider>
                         </InsightsProvider>
                     </VisitorProvider>

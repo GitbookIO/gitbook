@@ -45,4 +45,7 @@ export const es = {
     or: 'o',
     and: 'y',
     possible_values: 'Valores posibles',
+    code_sample_custom: 'Lenguaje personalizado',
+    code_sample_custom_description: 'Reescribir con ${1}',
+    code_sample_rewrite_prompt: 'Reescribe esto en el siguiente lenguaje: ',
 };

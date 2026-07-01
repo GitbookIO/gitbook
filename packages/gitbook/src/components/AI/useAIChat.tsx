@@ -117,6 +117,12 @@ export type AIChatState = {
      * References staged on the next user message.
      */
     references: AIChatReference[];
+
+    /**
+     * Draft text to pre-fill into the chat input without sending it. Consumed by
+     * the input on the next render and then reset to `null`.
+     */
+    inputDraft: string | null;
 };
 
 export type AIChatEvent =
@@ -140,6 +146,8 @@ export type AIChatController = {
     close: () => void;
     /** Post a message to the session */
     postMessage: (input: { message: string }) => void;
+    /** Pre-fill the chat input with a draft message, without sending it */
+    setDraft: (value: string | null) => void;
     /** Clear the conversation */
     clear: () => void;
     /** Stage a reference on the next message */
@@ -173,6 +181,7 @@ const globalState = zustand.create<AIChatState>(() => {
         error: false,
         initialQuery: null,
         references: [],
+        inputDraft: null,
     };
 });
 
@@ -612,6 +621,7 @@ export function AIChatProvider(props: {
             error: false,
             initialQuery: null,
             references: [],
+            inputDraft: null,
         }));
 
         // Reset ask parameter to empty string (keeps chat open but clears content)
@@ -661,6 +671,10 @@ export function AIChatProvider(props: {
         notify(eventsRef.current.get('focus'), {});
     }, []);
 
+    const onSetDraft = React.useCallback((value: string | null) => {
+        globalState.setState((state) => ({ ...state, inputDraft: value }));
+    }, []);
+
     const onEvent = React.useCallback(
         <T extends AIChatEvent['type']>(
             event: T,
@@ -686,6 +700,7 @@ export function AIChatProvider(props: {
             close: onClose,
             clear: onClear,
             postMessage: onPostMessage,
+            setDraft: onSetDraft,
             addReference: onAddReference,
             removeReference: onRemoveReference,
             clearReferences: onClearReferences,
@@ -697,6 +712,7 @@ export function AIChatProvider(props: {
         onClose,
         onClear,
         onPostMessage,
+        onSetDraft,
         onAddReference,
         onRemoveReference,
         onClearReferences,

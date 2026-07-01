@@ -1,5 +1,5 @@
 import type { JSONDocument } from '@gitbook/api';
-import { Icon } from '@gitbook/icons';
+import { Icon, type IconName } from '@gitbook/icons';
 import { type OpenAPIContextInput, checkIsValidLocale } from '@gitbook/react-openapi';
 
 import type { BlockProps } from '../Block';
@@ -73,6 +73,9 @@ export function getOpenAPIContext(args: {
                 blockStyle="max-w-full"
             />
         ),
+        getCodeSampleIcon: (sample) => (
+            <Icon icon={getCodeSampleIconName(sample)} className="me-1.5 size-4 shrink-0" />
+        ),
         renderHeading: (headingProps) => (
             <Heading
                 document={props.document}
@@ -103,4 +106,48 @@ export function getOpenAPIContext(args: {
         blockKey: block.key,
         locale,
     };
+}
+
+/**
+ * Resolve the icon shown next to a code sample language in the selector.
+ * Falls back to a generic code icon for unknown languages.
+ */
+function getCodeSampleIconName(sample: { id?: string; syntax: string; label: string }): IconName {
+    const key = (sample.id ?? sample.syntax).toLowerCase();
+    switch (key) {
+        case 'http':
+            return 'globe';
+        case 'curl':
+        case 'bash':
+        case 'sh':
+        case 'shell':
+        case 'zsh':
+            return 'square-terminal';
+        case 'javascript':
+        case 'js':
+        case 'jsx':
+        case 'mjs':
+        case 'cjs':
+        case 'node':
+            return 'js';
+        case 'python':
+        case 'py':
+            return 'python';
+        case 'go':
+        case 'golang':
+            return 'golang';
+        case 'rust':
+        case 'rs':
+            return 'rust';
+        case 'php':
+            return 'php';
+        case 'java':
+            return 'java';
+        case 'swift':
+            return 'swift';
+        case 'json':
+            return 'brackets-curly';
+        default:
+            return 'code';
+    }
 }

@@ -470,6 +470,11 @@ button.openapi-mcp {
     @apply flex flex-row items-center;
 }
 
+/* Single code sample (no dropdown): icon next to the language label. */
+.openapi-codesample-label {
+    @apply flex items-center;
+}
+
 .openapi-response-media-types-examples-footer-content {
     @apply flex flex-row items-center gap-2.5;
 }
@@ -694,6 +699,11 @@ body:has(.openapi-select-popover) {
 
 .openapi-select-item.openapi-select-item-column {
     @apply flex flex-col gap-1 justify-start items-start;
+}
+
+/* The "Custom" AI rewrite option: assistant icon next to a stacked title + description. */
+.openapi-select-item-custom .openapi-select-item-text {
+    @apply flex flex-col min-w-0 gap-0.5;
 }
 
 .openapi-select > button > span.react-aria-SelectValue:has(.openapi-statuscode),

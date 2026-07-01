@@ -45,4 +45,7 @@ export const zh = {
     or: '或',
     and: '和',
     possible_values: '可能的值',
+    code_sample_custom: '自定义语言',
+    code_sample_custom_description: '使用 ${1} 重写',
+    code_sample_rewrite_prompt: '用以下语言重写： ',
 };
