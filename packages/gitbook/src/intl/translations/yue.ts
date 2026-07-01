@@ -39,6 +39,7 @@ export const yue: TranslationLanguage = {
     search_ask_sources_no_answer: '相關頁面',
     search_ask_no_answer: '搵唔到你問題嘅答案。你可以試下改寫，或者問得更具體。',
     search_ask_error: '發生錯誤。請稍後再試。',
+    search_partial_error: '部分結果載入唔到。顯示緊可用嘅結果。',
     on_this_page: '本頁內容',
     next_page: '下一頁',
     previous_page: '上一頁',

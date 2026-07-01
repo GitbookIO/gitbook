@@ -114,7 +114,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
     const { assistants } = useAI();
     const primaryAssistant = assistants[0];
 
-    if (error) {
+    if (error && results.length === 0) {
         return (
             <output
                 className={tcls(
@@ -156,6 +156,26 @@ export const SearchResults = React.forwardRef(function SearchResults(
             {t(language, 'search_no_results_for', query)}
         </output>
     );
+
+    const partialError = error ? (
+        <div
+            className={tcls(
+                'mt-3',
+                'rounded-corners:rounded-md',
+                'circular-corners:rounded-2xl',
+                'bg-tint-subtle',
+                'px-3',
+                'py-2',
+                'text-center',
+                'text-sm',
+                'text-tint-subtle',
+                'animate-blur-in-slow'
+            )}
+            role="status"
+        >
+            {t(language, 'search_partial_error')}
+        </div>
+    ) : null;
 
     return (
         <output className="flex grow flex-col" aria-busy={fetching}>
@@ -318,6 +338,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
                     {!fetching && results.length === 0 ? noResults : null}
                 </>
             )}
+            {partialError}
             {fetching ? (
                 <div
                     className={tcls(

@@ -39,6 +39,7 @@ export const th: TranslationLanguage = {
     search_ask_sources_no_answer: 'หน้าที่เกี่ยวข้อง',
     search_ask_no_answer: 'ไม่พบคำตอบสำหรับคำถามของคุณ ลองเรียบเรียงใหม่หรือถามให้เฉพาะเจาะจงขึ้น',
     search_ask_error: 'มีบางอย่างผิดพลาด โปรดลองอีกครั้งในภายหลัง',
+    search_partial_error: 'โหลดผลลัพธ์บางรายการไม่ได้ กำลังแสดงผลลัพธ์ที่พร้อมใช้งาน',
     on_this_page: 'ในหน้านี้',
     next_page: 'ถัดไป',
     previous_page: 'ก่อนหน้า',

@@ -40,6 +40,7 @@ export const hr: TranslationLanguage = {
     search_ask_no_answer:
         'Nije bilo moguće pronaći odgovor na vaše pitanje. Pokušajte ga preformulirati ili biti konkretniji.',
     search_ask_error: 'Nešto je pošlo po zlu. Pokušajte ponovno kasnije.',
+    search_partial_error: 'Neki se rezultati nisu mogli učitati. Prikazuju se dostupni rezultati.',
     on_this_page: 'Na ovoj stranici',
     next_page: 'Sljedeća',
     previous_page: 'Prethodna',

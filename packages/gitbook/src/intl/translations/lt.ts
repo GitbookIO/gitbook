@@ -40,6 +40,7 @@ export const lt: TranslationLanguage = {
     search_ask_no_answer:
         'Nepavyko rasti atsakymo į jūsų klausimą. Galite pabandyti jį performuluoti arba pateikti konkrečiau.',
     search_ask_error: 'Kažkas nepavyko. Bandykite dar kartą vėliau.',
+    search_partial_error: 'Nepavyko įkelti kai kurių rezultatų. Rodomi pasiekiami rezultatai.',
     on_this_page: 'Šiame puslapyje',
     next_page: 'Kitas',
     previous_page: 'Ankstesnis',

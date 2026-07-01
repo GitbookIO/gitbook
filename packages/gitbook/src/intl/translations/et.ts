@@ -40,6 +40,7 @@ export const et: TranslationLanguage = {
     search_ask_no_answer:
         'Teie küsimusele ei leitud vastust. Proovige seda ümber sõnastada või olla täpsem.',
     search_ask_error: 'Midagi läks valesti. Palun proovige hiljem uuesti.',
+    search_partial_error: 'Mõnda tulemust ei saanud laadida. Kuvatakse saadaolevad tulemused.',
     on_this_page: 'Sellel lehel',
     next_page: 'Järgmine',
     previous_page: 'Eelmine',

@@ -40,6 +40,7 @@ export const zh: TranslationLanguage = {
     search_ask_sources_no_answer: '相关页面',
     search_ask_no_answer: '无法找到您的问题的答案。您可以尝试改述问题或提供更具体的信息。',
     search_ask_error: '出了些问题。请稍后再试。',
+    search_partial_error: '部分结果无法加载。正在显示可用结果。',
     on_this_page: '在本页',
     next_page: '下一页',
     previous_page: '上一页',

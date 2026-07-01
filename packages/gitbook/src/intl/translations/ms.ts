@@ -40,6 +40,7 @@ export const ms: TranslationLanguage = {
     search_ask_no_answer:
         'Jawapan untuk soalan anda tidak ditemui. Anda boleh cuba menyusunnya semula atau bertanya dengan lebih khusus.',
     search_ask_error: 'Ada sesuatu yang tidak kena. Sila cuba lagi kemudian.',
+    search_partial_error: 'Sesetengah hasil tidak dapat dimuatkan. Memaparkan hasil yang tersedia.',
     on_this_page: 'Pada halaman ini',
     next_page: 'Seterusnya',
     previous_page: 'Sebelumnya',

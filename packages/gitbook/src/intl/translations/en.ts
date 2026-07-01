@@ -38,6 +38,7 @@ export const en = {
     search_ask_no_answer:
         'An answer could not be found for your question. You could try rephrasing it, or be more specific.',
     search_ask_error: 'Something went wrong. Please try again later.',
+    search_partial_error: "Some results couldn't load. Showing available results.",
     on_this_page: 'On this page',
     next_page: 'Next',
     previous_page: 'Previous',

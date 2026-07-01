@@ -40,6 +40,7 @@ export const da: TranslationLanguage = {
     search_ask_no_answer:
         'Der kunne ikke findes et svar på dit spørgsmål. Prøv at omformulere det eller være mere specifik.',
     search_ask_error: 'Noget gik galt. Prøv igen senere.',
+    search_partial_error: 'Nogle resultater kunne ikke indlæses. Viser tilgængelige resultater.',
     on_this_page: 'På denne side',
     next_page: 'Næste',
     previous_page: 'Forrige',
