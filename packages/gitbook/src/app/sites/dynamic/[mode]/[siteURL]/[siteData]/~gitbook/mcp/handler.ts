@@ -5,6 +5,7 @@ import { getExposableError, throwIfDataError } from '@/lib/data';
 import { getMarkdownForPageInSpace } from '@/lib/markdownPage';
 import { resolvePagePath } from '@/lib/pages';
 import { joinPathWithBaseURL } from '@/lib/paths';
+import { getBestScoredResult } from '@/lib/search';
 import { findSiteSpaceBy, findSiteSpaceByUrl } from '@/lib/sites';
 import { trackServerInsightsEvents } from '@/lib/tracking';
 import { waitUntil } from '@/lib/waitUntil';
@@ -128,9 +129,9 @@ export async function handleMcpRequest(
                                     )
                                 );
 
-                                const body = pageResult.sections
-                                    ?.map((section) => section.body)
-                                    .join('\n');
+                                const body = getBestScoredResult(
+                                    (pageResult.sections ?? []).filter((section) => section.body)
+                                )?.body;
 
                                 return {
                                     type: 'text',
