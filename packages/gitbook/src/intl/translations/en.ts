@@ -148,6 +148,7 @@ export const en = {
     ai_chat_ask_query: 'Ask ${1} "${2}"',
     this_page: 'this page',
     this_text: 'this text',
+    ai_chat_paragraph_draft: 'Tell me more about this',
     copy_for_llms: 'Copy for LLMs',
     copy_page_markdown: 'Copy page as Markdown for LLMs',
     copy_page: 'Copy page',

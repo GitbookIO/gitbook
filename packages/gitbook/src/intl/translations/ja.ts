@@ -150,6 +150,7 @@ export const ja: TranslationLanguage = {
     ai_chat_ask_about: '${1}に${2}について質問する',
     this_page: 'このページ',
     this_text: 'このテキスト',
+    ai_chat_paragraph_draft: 'これについてもっと教えて',
     copy_for_llms: 'LLM 用にコピー',
     copy_page_markdown: 'ページを Markdown として LLM 用にコピー',
     copy_page: 'ページをコピー',

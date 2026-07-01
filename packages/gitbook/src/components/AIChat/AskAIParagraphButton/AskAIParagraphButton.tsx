@@ -36,6 +36,7 @@ export function AskAIParagraphButton(props: { content: string; className?: Class
             content: text,
         });
         chatController.open();
+        chatController.setDraft(tString(language, 'ai_chat_paragraph_draft'));
         chatController.focus();
     };
 

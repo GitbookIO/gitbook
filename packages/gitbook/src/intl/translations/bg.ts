@@ -152,6 +152,7 @@ export const bg: TranslationLanguage = {
     ai_chat_ask_about: 'Попитайте ${1} за ${2}',
     this_page: 'тази страница',
     this_text: 'този текст',
+    ai_chat_paragraph_draft: 'Кажи ми повече за това',
     ai_chat_ask_query: 'Попитайте ${1} "${2}"',
     copy_for_llms: 'Копиране за LLM',
     copy_page_markdown: 'Копиране на страницата като Markdown за LLM',

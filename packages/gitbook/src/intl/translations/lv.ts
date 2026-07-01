@@ -148,6 +148,7 @@ export const lv: TranslationLanguage = {
     ai_chat_ask_about: 'Jautāt ${1} par ${2}',
     this_page: 'šo lapu',
     this_text: 'šo tekstu',
+    ai_chat_paragraph_draft: 'Pastāsti man par to vairāk',
     ai_chat_ask_query: 'Jautāt ${1} "${2}"',
     copy_for_llms: 'Kopēt LLM vajadzībām',
     copy_page_markdown: 'Kopēt lapu kā Markdown LLM vajadzībām',

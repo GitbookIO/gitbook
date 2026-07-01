@@ -146,6 +146,7 @@ export const zh: TranslationLanguage = {
     ai_chat_ask_about: '向 ${1} 询问${2}',
     this_page: '此页面',
     this_text: '此文本',
+    ai_chat_paragraph_draft: '告诉我更多相关信息',
     copy_for_llms: '复制供 LLMs 使用',
     copy_page_markdown: '将页面以 Markdown 格式复制供 LLMs 使用',
     copy_page: '复制页面',

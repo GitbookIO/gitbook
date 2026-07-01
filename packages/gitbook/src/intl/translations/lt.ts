@@ -150,6 +150,7 @@ export const lt: TranslationLanguage = {
     ai_chat_ask_about: 'Klausti ${1} apie ${2}',
     this_page: 'šį puslapį',
     this_text: 'šį tekstą',
+    ai_chat_paragraph_draft: 'Papasakok apie tai daugiau',
     ai_chat_ask_query: 'Klausti ${1} "${2}"',
     copy_for_llms: 'Kopijuoti LLM',
     copy_page_markdown: 'Kopijuoti puslapį kaip Markdown LLM',

@@ -151,6 +151,7 @@ export const fi: TranslationLanguage = {
     ai_chat_ask_about: 'Kysy ${1}: ${2}',
     this_page: 'tätä sivua',
     this_text: 'tätä tekstiä',
+    ai_chat_paragraph_draft: 'Kerro minulle tästä lisää',
     ai_chat_ask_query: 'Kysy ${1}: "${2}"',
     copy_for_llms: 'Kopioi LLM:ille',
     copy_page_markdown: 'Kopioi sivu Markdownina LLM:ille',

@@ -148,6 +148,7 @@ export const hi: TranslationLanguage = {
     ai_chat_ask_about: '${1} से ${2} के बारे में पूछें',
     this_page: 'इस पृष्ठ',
     this_text: 'इस पाठ',
+    ai_chat_paragraph_draft: 'इसके बारे में और बताएं',
     ai_chat_ask_query: '${1} से "${2}" पूछें',
     copy_for_llms: 'LLM के लिए कॉपी करें',
     copy_page_markdown: 'पृष्ठ को LLM के लिए Markdown के रूप में कॉपी करें',

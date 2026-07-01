@@ -154,6 +154,7 @@ export const pt_br: TranslationLanguage = {
     ai_chat_ask_about: 'Perguntar a ${1} sobre ${2}',
     this_page: 'esta página',
     this_text: 'este texto',
+    ai_chat_paragraph_draft: 'Conte-me mais sobre isso',
     copy_for_llms: 'Copiar para LLMs',
     copy_page_markdown: 'Copiar página como Markdown para LLMs',
     copy_page: 'Copiar página',

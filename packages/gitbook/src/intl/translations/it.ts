@@ -153,6 +153,7 @@ export const it: TranslationLanguage = {
     ai_chat_ask_about: 'Chiedi a ${1} riguardo a ${2}',
     this_page: 'questa pagina',
     this_text: 'questo testo',
+    ai_chat_paragraph_draft: 'Dimmi di più a riguardo',
     copy_for_llms: 'Copia per LLM',
     copy_page_markdown: 'Copia la pagina come Markdown per LLM',
     copy_page: 'Copia pagina',

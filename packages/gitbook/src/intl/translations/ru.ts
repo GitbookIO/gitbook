@@ -153,6 +153,7 @@ export const ru: TranslationLanguage = {
     ai_chat_ask_about: 'Спросить у ${1} о ${2}',
     this_page: 'этой странице',
     this_text: 'этом тексте',
+    ai_chat_paragraph_draft: 'Расскажи мне об этом подробнее',
     copy_for_llms: 'Скопировать для LLM',
     copy_page_markdown: 'Скопировать страницу как Markdown для LLM',
     copy_page: 'Скопировать страницу',

@@ -145,6 +145,7 @@ export const yue: TranslationLanguage = {
     ai_chat_ask_about: '問 ${1} 關於${2}',
     this_page: '此頁面',
     this_text: '此文字',
+    ai_chat_paragraph_draft: '同我講多啲呢方面嘅嘢',
     ai_chat_ask_query: '問 ${1}「${2}」',
     copy_for_llms: '複製俾 LLM 用',
     copy_page_markdown: '以 Markdown 複製頁面俾 LLM 用',

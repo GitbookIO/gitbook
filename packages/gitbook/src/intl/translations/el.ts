@@ -154,6 +154,7 @@ export const el: TranslationLanguage = {
     ai_chat_ask_about: 'Ρωτήστε ${1} για ${2}',
     this_page: 'αυτή τη σελίδα',
     this_text: 'αυτό το κείμενο',
+    ai_chat_paragraph_draft: 'Πες μου περισσότερα για αυτό',
     ai_chat_ask_query: 'Ρωτήστε ${1} "${2}"',
     copy_for_llms: 'Αντιγραφή για LLM',
     copy_page_markdown: 'Αντιγραφή σελίδας ως Markdown για LLM',

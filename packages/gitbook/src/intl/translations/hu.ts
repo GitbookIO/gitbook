@@ -151,6 +151,7 @@ export const hu: TranslationLanguage = {
     ai_chat_ask_about: '${1} megkérdezése ${2} témában',
     this_page: 'ez az oldal',
     this_text: 'ez a szöveg',
+    ai_chat_paragraph_draft: 'Mesélj erről többet',
     ai_chat_ask_query: '${1} kérdezése: "${2}"',
     copy_for_llms: 'Másolás LLM-ekhez',
     copy_page_markdown: 'Oldal másolása Markdownként LLM-ekhez',

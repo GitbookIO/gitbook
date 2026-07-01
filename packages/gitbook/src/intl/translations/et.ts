@@ -149,6 +149,7 @@ export const et: TranslationLanguage = {
     ai_chat_ask_about: 'Küsi ${1}: ${2}',
     this_page: 'seda lehte',
     this_text: 'seda teksti',
+    ai_chat_paragraph_draft: 'Räägi mulle sellest lähemalt',
     ai_chat_ask_query: 'Küsi ${1} "${2}"',
     copy_for_llms: 'Kopeeri LLM-idele',
     copy_page_markdown: 'Kopeeri leht Markdownina LLM-idele',

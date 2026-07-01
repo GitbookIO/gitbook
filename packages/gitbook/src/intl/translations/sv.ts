@@ -150,6 +150,7 @@ export const sv: TranslationLanguage = {
     ai_chat_ask_about: 'Fråga ${1} om ${2}',
     this_page: 'den här sidan',
     this_text: 'den här texten',
+    ai_chat_paragraph_draft: 'Berätta mer om det här',
     ai_chat_ask_query: 'Fråga ${1} "${2}"',
     copy_for_llms: 'Kopiera för LLM:er',
     copy_page_markdown: 'Kopiera sidan som Markdown för LLM:er',

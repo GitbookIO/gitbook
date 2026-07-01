@@ -153,6 +153,7 @@ export const ro: TranslationLanguage = {
     ai_chat_ask_about: 'Întreabă ${1} despre ${2}',
     this_page: 'această pagină',
     this_text: 'acest text',
+    ai_chat_paragraph_draft: 'Spune-mi mai multe despre asta',
     ai_chat_ask_query: 'Întreabă ${1} "${2}"',
     copy_for_llms: 'Copiază pentru LLM-uri',
     copy_page_markdown: 'Copiază pagina ca Markdown pentru LLM-uri',

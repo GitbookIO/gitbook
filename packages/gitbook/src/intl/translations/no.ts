@@ -151,6 +151,7 @@ export const no: TranslationLanguage = {
     ai_chat_ask_about: 'Spør ${1} om ${2}',
     this_page: 'denne siden',
     this_text: 'denne teksten',
+    ai_chat_paragraph_draft: 'Fortell meg mer om dette',
     copy_for_llms: 'Kopier for LLMs',
     copy_page_markdown: 'Kopier siden som Markdown for LLMs',
     copy_page: 'Kopier side',

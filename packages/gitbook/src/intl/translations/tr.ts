@@ -148,6 +148,7 @@ export const tr: TranslationLanguage = {
     ai_chat_ask_about: '${1} için ${2} hakkında sor',
     this_page: 'bu sayfa',
     this_text: 'bu metin',
+    ai_chat_paragraph_draft: 'Bana bundan daha fazla bahset',
     ai_chat_ask_query: '${1} için "${2}" sor',
     copy_for_llms: 'LLM için kopyala',
     copy_page_markdown: 'Sayfayı LLM için Markdown olarak kopyala',

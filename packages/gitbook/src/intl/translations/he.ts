@@ -147,6 +147,7 @@ export const he: TranslationLanguage = {
     ai_chat_ask_about: 'שאל את ${1} על ${2}',
     this_page: 'הדף הזה',
     this_text: 'הטקסט הזה',
+    ai_chat_paragraph_draft: 'ספר לי עוד על זה',
     ai_chat_ask_query: 'שאל את ${1} "${2}"',
     copy_for_llms: 'העתקה עבור LLMs',
     copy_page_markdown: 'העתקת הדף כ-Markdown עבור LLMs',

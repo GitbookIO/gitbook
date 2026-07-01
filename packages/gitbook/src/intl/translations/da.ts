@@ -149,6 +149,7 @@ export const da: TranslationLanguage = {
     ai_chat_ask_about: 'Spørg ${1} om ${2}',
     this_page: 'denne side',
     this_text: 'denne tekst',
+    ai_chat_paragraph_draft: 'Fortæl mig mere om dette',
     ai_chat_ask_query: 'Spørg ${1} "${2}"',
     copy_for_llms: 'Kopiér til LLMer',
     copy_page_markdown: 'Kopiér siden som Markdown til LLMer',

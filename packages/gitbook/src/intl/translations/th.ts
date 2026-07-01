@@ -146,6 +146,7 @@ export const th: TranslationLanguage = {
     ai_chat_ask_about: 'ถาม ${1} เกี่ยวกับ ${2}',
     this_page: 'หน้านี้',
     this_text: 'ข้อความนี้',
+    ai_chat_paragraph_draft: 'บอกฉันเพิ่มเติมเกี่ยวกับเรื่องนี้',
     ai_chat_ask_query: 'ถาม ${1} "${2}"',
     copy_for_llms: 'คัดลอกสำหรับ LLM',
     copy_page_markdown: 'คัดลอกหน้าเป็น Markdown สำหรับ LLM',

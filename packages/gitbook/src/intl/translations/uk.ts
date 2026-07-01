@@ -148,6 +148,7 @@ export const uk: TranslationLanguage = {
     ai_chat_ask_about: 'Запитати ${1} про ${2}',
     this_page: 'цю сторінку',
     this_text: 'цей текст',
+    ai_chat_paragraph_draft: 'Розкажи мені про це більше',
     ai_chat_ask_query: 'Запитати ${1} "${2}"',
     copy_for_llms: 'Копіювати для LLM',
     copy_page_markdown: 'Копіювати сторінку як Markdown для LLM',

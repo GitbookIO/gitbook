@@ -149,6 +149,7 @@ export const ms: TranslationLanguage = {
     ai_chat_ask_about: 'Tanya ${1} tentang ${2}',
     this_page: 'halaman ini',
     this_text: 'teks ini',
+    ai_chat_paragraph_draft: 'Beritahu saya lebih lanjut tentang ini',
     ai_chat_ask_query: 'Tanya ${1} "${2}"',
     copy_for_llms: 'Salin untuk LLM',
     copy_page_markdown: 'Salin halaman sebagai Markdown untuk LLM',

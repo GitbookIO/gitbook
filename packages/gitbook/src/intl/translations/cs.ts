@@ -150,6 +150,7 @@ export const cs: TranslationLanguage = {
     ai_chat_ask_about: 'Zeptat se ${1} na ${2}',
     this_page: 'tuto stránku',
     this_text: 'tento text',
+    ai_chat_paragraph_draft: 'Řekni mi o tom více',
     ai_chat_ask_query: 'Zeptat se ${1} "${2}"',
     copy_for_llms: 'Kopírovat pro LLM',
     copy_page_markdown: 'Kopírovat stránku jako Markdown pro LLM',

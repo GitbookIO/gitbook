@@ -152,6 +152,7 @@ export const sk: TranslationLanguage = {
     ai_chat_ask_about: 'Opýtať sa ${1} na ${2}',
     this_page: 'túto stránku',
     this_text: 'tento text',
+    ai_chat_paragraph_draft: 'Povedz mi o tom viac',
     ai_chat_ask_query: 'Opýtať sa ${1} "${2}"',
     copy_for_llms: 'Kopírovať pre LLM',
     copy_page_markdown: 'Kopírovať stránku ako Markdown pre LLM',

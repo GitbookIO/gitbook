@@ -152,6 +152,7 @@ export const nl: TranslationLanguage = {
     ai_chat_ask_about: 'Stel ${1} een vraag over ${2}',
     this_page: 'deze pagina',
     this_text: 'deze tekst',
+    ai_chat_paragraph_draft: 'Vertel me hier meer over',
     copy_for_llms: 'Kopiëren voor LLMs',
     copy_page_markdown: 'Pagina kopiëren als Markdown voor LLMs',
     copy_page: 'Pagina kopiëren',

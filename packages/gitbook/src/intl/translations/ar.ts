@@ -148,6 +148,7 @@ export const ar: TranslationLanguage = {
     ai_chat_ask_about: 'اسأل ${1} عن ${2}',
     this_page: 'هذه الصفحة',
     this_text: 'هذا النص',
+    ai_chat_paragraph_draft: 'أخبرني المزيد عن هذا',
     ai_chat_ask_query: 'اسأل ${1} "${2}"',
     copy_for_llms: 'نسخ للنماذج اللغوية الكبيرة',
     copy_page_markdown: 'نسخ الصفحة بصيغة Markdown للنماذج اللغوية الكبيرة',

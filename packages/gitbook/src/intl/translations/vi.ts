@@ -148,6 +148,7 @@ export const vi: TranslationLanguage = {
     ai_chat_ask_about: 'Hỏi ${1} về ${2}',
     this_page: 'trang này',
     this_text: 'văn bản này',
+    ai_chat_paragraph_draft: 'Cho tôi biết thêm về điều này',
     ai_chat_ask_query: 'Hỏi ${1} "${2}"',
     copy_for_llms: 'Sao chép cho LLM',
     copy_page_markdown: 'Sao chép trang dưới dạng Markdown cho LLM',

@@ -149,6 +149,7 @@ export const ko: TranslationLanguage = {
     ai_chat_ask_about: '${1}에게 ${2}에 대해 질문',
     this_page: '이 페이지',
     this_text: '이 텍스트',
+    ai_chat_paragraph_draft: '이것에 대해 더 알려줘',
     copy_for_llms: 'LLM용 복사',
     copy_page_markdown: 'LLM용으로 페이지를 Markdown으로 복사',
     copy_page: '페이지 복사',

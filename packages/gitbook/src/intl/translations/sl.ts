@@ -150,6 +150,7 @@ export const sl: TranslationLanguage = {
     ai_chat_ask_about: 'Vprašaj ${1} o ${2}',
     this_page: 'to stran',
     this_text: 'to besedilo',
+    ai_chat_paragraph_draft: 'Povej mi več o tem',
     ai_chat_ask_query: 'Vprašaj ${1} "${2}"',
     copy_for_llms: 'Kopiraj za LLM',
     copy_page_markdown: 'Kopiraj stran kot Markdown za LLM',
