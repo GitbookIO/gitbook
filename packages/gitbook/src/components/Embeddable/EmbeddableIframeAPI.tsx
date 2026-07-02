@@ -4,8 +4,8 @@ import type { GitBookEmbeddableConfiguration, ParentToFrameMessage } from '@gitb
 import React, { useEffect, useRef } from 'react';
 
 import { useAI, useAIChatController } from '@/components/AI';
+import { isAIChatEnabled } from '@/components/utils/isAIChatEnabled';
 import { tString, useLanguage } from '@/intl/client';
-import { CustomizationAIMode } from '@gitbook/api';
 import { useRouter } from 'next/navigation';
 import { createStore, useStore } from 'zustand';
 import { integrationsAssistantTools } from '../Integrations';
@@ -186,9 +186,7 @@ export function EmbeddableIframeTabs(props: {
     const router = useRouter();
 
     const enabledTabs = [
-        config.aiMode === CustomizationAIMode.Assistant &&
-        assistants[0] &&
-        tabs.includes('assistant')
+        isAIChatEnabled(config.aiMode) && assistants[0] && tabs.includes('assistant')
             ? {
                   key: 'assistant',
                   label: assistants[0].label,
