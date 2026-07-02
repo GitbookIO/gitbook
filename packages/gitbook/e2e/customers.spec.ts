@@ -41,11 +41,6 @@ const testCases: TestsCase[] = [
         tests: [{ name: 'Home', url: '/' }],
     },
     {
-        name: 'jasons-tutorials.gitbook.io',
-        contentBaseURL: 'https://jasons-tutorials.gitbook.io',
-        tests: [{ name: 'Home', url: '/' }],
-    },
-    {
         name: 'faq.deltaemulator.com',
         contentBaseURL: 'https://faq.deltaemulator.com',
         tests: [{ name: 'Home', url: '/' }],
@@ -70,11 +65,6 @@ const testCases: TestsCase[] = [
         contentBaseURL: 'https://docs.gmgn.ai',
         tests: [{ name: 'Home', url: '/' }],
     },
-    // {
-    //     name: 'docs.spicychat.ai',
-    //     contentBaseURL: 'https://docs.spicychat.ai',
-    //     tests: [{ name: 'Home', url: '/' }],
-    // },
     {
         name: 'docs.portainer.io',
         contentBaseURL: 'https://docs.portainer.io',
@@ -110,27 +100,11 @@ const testCases: TestsCase[] = [
         contentBaseURL: 'https://docs.midas.app',
         tests: [{ name: 'Home', url: '/' }],
     },
-    // Disabling for now, one of the image is making the tests timeout
-    // {
-    //     name: 'docs.keeper.io',
-    //     contentBaseURL: 'https://docs.keeper.io',
-    //     tests: [{ name: 'Home', url: '/en', run: waitForCookiesDialog }],
-    // },
     {
         name: 'adiblar.gitbook.io',
         contentBaseURL: 'https://adiblar.gitbook.io',
         tests: [{ name: 'Home', url: '/' }],
     },
-    // {
-    //     name: 'docs.gradient.network',
-    //     contentBaseURL: 'https://docs.gradient.network',
-    //     tests: [{ name: 'Home', url: '/' }],
-    // },
-    // {
-    //     name: 'mygate-network.gitbook.io',
-    //     contentBaseURL: 'https://mygate-network.gitbook.io',
-    //     tests: [{ name: 'Home', url: '/' }],
-    // },
     {
         name: 'treasurenft.gitbook.io',
         contentBaseURL: 'https://treasurenft.gitbook.io',
@@ -166,16 +140,6 @@ const testCases: TestsCase[] = [
         contentBaseURL: 'https://wiki.redmodding.org',
         tests: [{ name: 'Home', url: '/' }],
     },
-    // {
-    //     name: 'docs.cherry-ai.com',
-    //     contentBaseURL: 'https://docs.cherry-ai.com',
-    //     tests: [{ name: 'Home', url: '/', run: waitForCookiesDialog }],
-    // },
-    {
-        name: 'docs.snyk.io',
-        contentBaseURL: 'https://docs.snyk.io',
-        tests: [{ name: 'Home', url: '/', run: waitForCookiesDialog }],
-    },
     {
         name: 'docs.realapp.link',
         contentBaseURL: 'https://docs.realapp.link',
@@ -208,11 +172,6 @@ const testCases: TestsCase[] = [
         contentBaseURL: 'https://sosovalue-white-paper.gitbook.io',
         tests: [{ name: 'Home', url: '/' }],
     },
-    // {
-    //     name: 'docs.revrobotics.com',
-    //     contentBaseURL: 'https://docs.revrobotics.com',
-    //     tests: [{ name: 'Home', url: '/', run: waitForCookiesDialog }],
-    // },
     {
         name: 'chartschool.stockcharts.com',
         contentBaseURL: 'https://chartschool.stockcharts.com',
@@ -223,12 +182,6 @@ const testCases: TestsCase[] = [
         contentBaseURL: 'https://docs.soniclabs.com',
         tests: [{ name: 'Home', url: '/' }],
     },
-    // This one redirects to binance now
-    // {
-    //     name: 'docs.meshchain.ai',
-    //     contentBaseURL: 'https://docs.meshchain.ai',
-    //     tests: [{ name: 'Home', url: '/' }],
-    // },
     {
         name: 'docs.thousandeyes.com',
         contentBaseURL: 'https://docs.thousandeyes.com',
@@ -255,6 +208,414 @@ const testCases: TestsCase[] = [
             },
             { name: 'OG Image', url: '/~gitbook/ogimage/h17zQIFwy3MaafVNmItO', mode: 'image' },
         ],
+    },
+
+    // Additional customer docs sites.
+    {
+        name: 'unsloth.ai/docs',
+        contentBaseURL: 'https://unsloth.ai',
+        tests: [{ name: 'Home', url: '/docs' }],
+    },
+    {
+        name: 'mariadb.com/docs',
+        contentBaseURL: 'https://mariadb.com',
+        tests: [{ name: 'Home', url: '/docs' }],
+    },
+    {
+        name: 'docs.n8n.io',
+        contentBaseURL: 'https://docs.n8n.io',
+        tests: [{ name: 'Home', url: '/' }],
+    },
+    {
+        name: 'docs.cherry-ai.com',
+        contentBaseURL: 'https://docs.cherry-ai.com',
+        tests: [{ name: 'Home', url: '/', run: waitForCookiesDialog }],
+    },
+    {
+        name: 'library.zoom.com',
+        contentBaseURL: 'https://library.zoom.com',
+        tests: [{ name: 'Home', url: '/' }],
+    },
+    {
+        name: 'help.verkada.com',
+        contentBaseURL: 'https://help.verkada.com',
+        tests: [{ name: 'Home', url: '/' }],
+    },
+    {
+        name: 'docs.overleaf.com',
+        contentBaseURL: 'https://docs.overleaf.com',
+        tests: [{ name: 'Home', url: '/' }],
+    },
+    {
+        name: 'wiki.tiltedphoques.com/tilted-online',
+        contentBaseURL: 'https://wiki.tiltedphoques.com',
+        tests: [{ name: 'Home', url: '/tilted-online' }],
+    },
+    {
+        name: 'handbook.musescore.org',
+        contentBaseURL: 'https://handbook.musescore.org',
+        tests: [{ name: 'Home', url: '/' }],
+    },
+    {
+        name: 'kakaobusiness.gitbook.io/main',
+        contentBaseURL: 'https://kakaobusiness.gitbook.io',
+        tests: [{ name: 'Home', url: '/main' }],
+    },
+    {
+        name: 'docs.maestro.dev',
+        contentBaseURL: 'https://docs.maestro.dev',
+        tests: [{ name: 'Home', url: '/' }],
+    },
+    {
+        name: 'developers.oxylabs.io',
+        contentBaseURL: 'https://developers.oxylabs.io',
+        tests: [{ name: 'Home', url: '/' }],
+    },
+    {
+        name: 'docs.parallels.com/landing',
+        contentBaseURL: 'https://docs.parallels.com',
+        tests: [{ name: 'Home', url: '/landing' }],
+    },
+    {
+        name: 'help.impact.com',
+        contentBaseURL: 'https://help.impact.com',
+        tests: [{ name: 'Home', url: '/' }],
+    },
+    {
+        name: 'docs.9proxy.com',
+        contentBaseURL: 'https://docs.9proxy.com',
+        tests: [{ name: 'Home', url: '/' }],
+    },
+    {
+        name: 'vimeo.com/legal',
+        contentBaseURL: 'https://vimeo.com',
+        tests: [{ name: 'Home', url: '/legal' }],
+    },
+    {
+        name: 'help.platipomiru.com',
+        contentBaseURL: 'https://help.platipomiru.com',
+        tests: [{ name: 'Home', url: '/' }],
+    },
+    {
+        name: 'help.aikido.dev',
+        contentBaseURL: 'https://help.aikido.dev',
+        tests: [{ name: 'Home', url: '/' }],
+    },
+    {
+        name: 'doc.demarche.numerique.gouv.fr',
+        contentBaseURL: 'https://doc.demarche.numerique.gouv.fr',
+        tests: [{ name: 'Home', url: '/' }],
+    },
+    {
+        name: 'docs.adapta.org',
+        contentBaseURL: 'https://docs.adapta.org',
+        tests: [{ name: 'Home', url: '/' }],
+    },
+    {
+        name: 'www.xabuxa.com',
+        contentBaseURL: 'https://www.xabuxa.com',
+        tests: [{ name: 'Home', url: '/' }],
+    },
+    {
+        name: 'docs.triumpharcade.com',
+        contentBaseURL: 'https://docs.triumpharcade.com',
+        tests: [{ name: 'Home', url: '/' }],
+    },
+    {
+        name: 'docs.nats.io',
+        contentBaseURL: 'https://docs.nats.io',
+        tests: [{ name: 'Home', url: '/' }],
+    },
+    {
+        name: 'help.glpi-project.org',
+        contentBaseURL: 'https://help.glpi-project.org',
+        tests: [{ name: 'Home', url: '/' }],
+    },
+    {
+        name: 'docs.waydro.id',
+        contentBaseURL: 'https://docs.waydro.id',
+        tests: [{ name: 'Home', url: '/' }],
+    },
+    {
+        name: 'bellingcat.gitbook.io/toolkit',
+        contentBaseURL: 'https://bellingcat.gitbook.io',
+        tests: [{ name: 'Home', url: '/toolkit' }],
+    },
+    {
+        name: 'wiki.project-fika.com',
+        contentBaseURL: 'https://wiki.project-fika.com',
+        tests: [{ name: 'Home', url: '/' }],
+    },
+    {
+        name: 'docs.pinot.apache.org',
+        contentBaseURL: 'https://docs.pinot.apache.org',
+        tests: [{ name: 'Home', url: '/' }],
+    },
+    {
+        name: 'docs.devolutions.net',
+        contentBaseURL: 'https://docs.devolutions.net',
+        tests: [{ name: 'Home', url: '/' }],
+    },
+    {
+        name: 'guides.gresb.com',
+        contentBaseURL: 'https://guides.gresb.com',
+        tests: [{ name: 'Home', url: '/' }],
+    },
+    {
+        name: 'docs.prestashop-project.org/welcome',
+        contentBaseURL: 'https://docs.prestashop-project.org',
+        tests: [{ name: 'Home', url: '/welcome' }],
+    },
+    {
+        name: 'help.researchgate.net',
+        contentBaseURL: 'https://help.researchgate.net',
+        tests: [{ name: 'Home', url: '/' }],
+    },
+    {
+        name: 'docs.verifone.com',
+        contentBaseURL: 'https://docs.verifone.com',
+        tests: [{ name: 'Home', url: '/' }],
+    },
+    {
+        name: 'docs.roboflow.com',
+        contentBaseURL: 'https://docs.roboflow.com',
+        tests: [{ name: 'Home', url: '/' }],
+    },
+    {
+        name: 'www.netexec.wiki',
+        contentBaseURL: 'https://www.netexec.wiki',
+        tests: [{ name: 'Home', url: '/' }],
+    },
+    {
+        name: 'guide.strikepack.com',
+        contentBaseURL: 'https://guide.strikepack.com',
+        tests: [{ name: 'Home', url: '/' }],
+    },
+    {
+        name: 'gitbook.com/docs',
+        contentBaseURL: 'https://gitbook.com',
+        tests: [
+            { name: 'Home', url: '/docs' },
+            {
+                name: 'OpenAPI',
+                url: '/docs/developers/gitbook-api/api-reference/docs-sites/site-ai-ask',
+            },
+        ],
+    },
+    {
+        name: 'documentation.gravitee.io',
+        contentBaseURL: 'https://documentation.gravitee.io',
+        tests: [{ name: 'Home', url: '/' }],
+    },
+    {
+        name: 'faq.wanttopay.net/wanttopay-app',
+        contentBaseURL: 'https://faq.wanttopay.net',
+        tests: [{ name: 'Home', url: '/wanttopay-app' }],
+    },
+    {
+        name: 'guide.prismlive.com',
+        contentBaseURL: 'https://guide.prismlive.com',
+        tests: [{ name: 'Home', url: '/' }],
+    },
+    {
+        name: 'docs.ionos.com/cloud',
+        contentBaseURL: 'https://docs.ionos.com',
+        tests: [{ name: 'Home', url: '/cloud' }],
+    },
+    {
+        name: 'support.evite.com',
+        contentBaseURL: 'https://support.evite.com',
+        tests: [{ name: 'Home', url: '/' }],
+    },
+    {
+        name: 'knowledge.illumina.com',
+        contentBaseURL: 'https://knowledge.illumina.com',
+        tests: [{ name: 'Home', url: '/' }],
+    },
+    {
+        name: 'wiki.retrobat.org',
+        contentBaseURL: 'https://wiki.retrobat.org',
+        tests: [{ name: 'Home', url: '/' }],
+    },
+    {
+        name: 'wiki.polymaker.com',
+        contentBaseURL: 'https://wiki.polymaker.com',
+        tests: [{ name: 'Home', url: '/' }],
+    },
+    {
+        name: 'docs.ducks-services.com',
+        contentBaseURL: 'https://docs.ducks-services.com',
+        tests: [{ name: 'Home', url: '/' }],
+    },
+    {
+        name: 'docs.hex-rays.com',
+        contentBaseURL: 'https://docs.hex-rays.com',
+        tests: [{ name: 'Home', url: '/' }],
+    },
+    {
+        name: 'whitepaper.interlinklabs.ai',
+        contentBaseURL: 'https://whitepaper.interlinklabs.ai',
+        tests: [{ name: 'Home', url: '/' }],
+    },
+    {
+        name: 'help.openloyalty.io',
+        contentBaseURL: 'https://help.openloyalty.io',
+        tests: [{ name: 'Home', url: '/' }],
+    },
+    {
+        name: 'retrozia.gitbook.io/retrozia',
+        contentBaseURL: 'https://retrozia.gitbook.io',
+        tests: [{ name: 'Home', url: '/retrozia' }],
+    },
+    {
+        name: 'helpcenter.channable.com',
+        contentBaseURL: 'https://helpcenter.channable.com',
+        tests: [{ name: 'Home', url: '/' }],
+    },
+    {
+        name: 'developerdocs.instructure.com',
+        contentBaseURL: 'https://developerdocs.instructure.com',
+        tests: [{ name: 'Home', url: '/' }],
+    },
+    {
+        name: 'legal.jagex.com',
+        contentBaseURL: 'https://legal.jagex.com',
+        tests: [{ name: 'Home', url: '/' }],
+    },
+    {
+        name: 'manual.edgetx.org',
+        contentBaseURL: 'https://manual.edgetx.org',
+        tests: [{ name: 'Home', url: '/' }],
+    },
+    {
+        name: 'docs.cortex.io',
+        contentBaseURL: 'https://docs.cortex.io',
+        tests: [{ name: 'Home', url: '/' }],
+    },
+    {
+        name: 'docs.mufy.ai',
+        contentBaseURL: 'https://docs.mufy.ai',
+        tests: [{ name: 'Home', url: '/' }],
+    },
+    {
+        name: 'docs.ndi.video/all',
+        contentBaseURL: 'https://docs.ndi.video',
+        tests: [{ name: 'Home', url: '/all' }],
+    },
+    {
+        name: 'docs.sevenpens.com/drawtab',
+        contentBaseURL: 'https://docs.sevenpens.com',
+        tests: [{ name: 'Home', url: '/drawtab' }],
+    },
+    {
+        name: 'manuals.i-reporter.jp',
+        contentBaseURL: 'https://manuals.i-reporter.jp',
+        tests: [{ name: 'Home', url: '/' }],
+    },
+    {
+        name: 'docs.holybro.com',
+        contentBaseURL: 'https://docs.holybro.com',
+        tests: [{ name: 'Home', url: '/' }],
+    },
+    {
+        name: 'help.tokenpocket.pro/en',
+        contentBaseURL: 'https://help.tokenpocket.pro',
+        tests: [{ name: 'Home', url: '/en' }],
+    },
+    {
+        name: 'docs.bullmq.io',
+        contentBaseURL: 'https://docs.bullmq.io',
+        tests: [{ name: 'Home', url: '/' }],
+    },
+    {
+        name: 'tools.osintnewsletter.com',
+        contentBaseURL: 'https://tools.osintnewsletter.com',
+        tests: [{ name: 'Home', url: '/' }],
+    },
+    {
+        name: 'wiki.mmorealms.gg',
+        contentBaseURL: 'https://wiki.mmorealms.gg',
+        tests: [{ name: 'Home', url: '/' }],
+    },
+    {
+        name: 'docs.vectra.ai',
+        contentBaseURL: 'https://docs.vectra.ai',
+        tests: [{ name: 'Home', url: '/' }],
+    },
+    {
+        name: 'docs.cipp.app',
+        contentBaseURL: 'https://docs.cipp.app',
+        tests: [{ name: 'Home', url: '/' }],
+    },
+    {
+        name: 'sinfa-com-co.gitbook.io/manual-de-usuario',
+        contentBaseURL: 'https://sinfa-com-co.gitbook.io',
+        tests: [{ name: 'Home', url: '/manual-de-usuario' }],
+    },
+    {
+        name: 'support.skylum.com',
+        contentBaseURL: 'https://support.skylum.com',
+        tests: [{ name: 'Home', url: '/' }],
+    },
+    {
+        name: 'docs.jgscripts.com',
+        contentBaseURL: 'https://docs.jgscripts.com',
+        tests: [{ name: 'Home', url: '/' }],
+    },
+    {
+        name: 'docs.patchmypc.com',
+        contentBaseURL: 'https://docs.patchmypc.com',
+        tests: [{ name: 'Home', url: '/' }],
+    },
+    {
+        name: 'guide.cryosparc.com',
+        contentBaseURL: 'https://guide.cryosparc.com',
+        tests: [{ name: 'Home', url: '/' }],
+    },
+    {
+        name: 'guides.stellaraio.com/stellar',
+        contentBaseURL: 'https://guides.stellaraio.com',
+        tests: [{ name: 'Home', url: '/stellar' }],
+    },
+    {
+        name: 'docs.iyzico.com',
+        contentBaseURL: 'https://docs.iyzico.com',
+        tests: [{ name: 'Home', url: '/' }],
+    },
+    {
+        name: 'help.wotnot.io',
+        contentBaseURL: 'https://help.wotnot.io',
+        tests: [{ name: 'Home', url: '/' }],
+    },
+    {
+        name: 'docs.sportmonks.com/v3',
+        contentBaseURL: 'https://docs.sportmonks.com',
+        tests: [{ name: 'Home', url: '/v3' }],
+    },
+    {
+        name: 'docs.payments.thalescloud.io',
+        contentBaseURL: 'https://docs.payments.thalescloud.io',
+        tests: [{ name: 'Home', url: '/' }],
+    },
+    {
+        name: 'doc.anytype.io/anytype-docs',
+        contentBaseURL: 'https://doc.anytype.io',
+        tests: [{ name: 'Home', url: '/anytype-docs' }],
+    },
+    {
+        name: 'help.blotato.com',
+        contentBaseURL: 'https://help.blotato.com',
+        tests: [{ name: 'Home', url: '/' }],
+    },
+    {
+        name: 'docs.cartographer3d.com',
+        contentBaseURL: 'https://docs.cartographer3d.com',
+        tests: [{ name: 'Home', url: '/' }],
+    },
+    {
+        name: 'docs.acestudio.ai',
+        contentBaseURL: 'https://docs.acestudio.ai',
+        tests: [{ name: 'Home', url: '/' }],
     },
 ];
 
