@@ -1,3 +1,4 @@
+import { isAIEnabled } from '@/components/utils/isAIChatEnabled';
 import type { GitBookSiteContext } from '@/lib/context';
 import { throwIfDataError } from '@/lib/data';
 import { linkerWithMarkdownPages } from '@/lib/links';
@@ -27,6 +28,10 @@ export async function serveAskMarkdown(
     rawQuestion: string,
     options: ServeAskMarkdownOptions = {}
 ) {
+    if (!isAIEnabled(context.customization.ai.mode)) {
+        return new Response('Not Found', { status: 404 });
+    }
+
     return serveMarkdown(async () => {
         const question = rawQuestion.trim();
         const goal = options.goal?.trim() || undefined;
