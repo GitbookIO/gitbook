@@ -21,7 +21,12 @@ import {
     normalizeRequestURL,
     throwIfDataError,
 } from '@/lib/data';
-import { GITBOOK_OAUTH_SERVER_URL, isGitBookAssetsHostURL, isGitBookHostURL } from '@/lib/env';
+import {
+    GITBOOK_ALLOW_CUSTOMIZATION_OVERRIDE,
+    GITBOOK_OAUTH_SERVER_URL,
+    isGitBookAssetsHostURL,
+    isGitBookHostURL,
+} from '@/lib/env';
 import { getImageResizingContextId } from '@/lib/images';
 import { MiddlewareHeaders } from '@/lib/middleware';
 import {
@@ -397,27 +402,32 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         // The customization override is only honored for a legitimate preview
         // (backend-authoritative `siteURLData.preview`), so an anonymous public request can't
         // force customization — e.g. ai.mode — via the query string or a forged cookie.
+        // Preview/test deployments opt in via GITBOOK_ALLOW_CUSTOMIZATION_OVERRIDE to drive it in e2e.
+        const allowCustomizationOverride =
+            siteURLData.preview || GITBOOK_ALLOW_CUSTOMIZATION_OVERRIDE;
         const customizationCookie = request.cookies.get(MiddlewareHeaders.Customization);
         const customization =
             siteRequestURL.searchParams.get('customization') ??
             (customizationCookie ? decodeURIComponent(customizationCookie.value) : undefined);
         if (
-            siteURLData.preview &&
+            allowCustomizationOverride &&
             customization &&
             validateSerializedCustomization(customization)
         ) {
             routeType = 'dynamic';
             // We need to encode the customization headers, otherwise it will fail for some customization values containing non ASCII chars on vercel.
             requestHeaders.set(MiddlewareHeaders.Customization, encodeURIComponent(customization));
-            cookies.push(
-                getPreviewCookieResponse({
-                    name: MiddlewareHeaders.Customization,
-                    value: encodeURIComponent(customization),
-                    mode,
-                    siteRequestURL,
-                    siteURLData,
-                })
-            );
+            if (siteURLData.preview) {
+                cookies.push(
+                    getPreviewCookieResponse({
+                        name: MiddlewareHeaders.Customization,
+                        value: encodeURIComponent(customization),
+                        mode,
+                        siteRequestURL,
+                        siteURLData,
+                    })
+                );
+            }
         }
         const theme =
             siteRequestURL.searchParams.get('theme') ??

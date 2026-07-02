@@ -79,6 +79,14 @@ export const GITBOOK_DISABLE_TRACKING = Boolean(
 );
 
 /**
+ * Allow the `?customization=` override outside of an authenticated preview.
+ * Enabled on preview/test deployments so end-to-end tests can drive customization
+ * variants; must stay unset in production.
+ */
+export const GITBOOK_ALLOW_CUSTOMIZATION_OVERRIDE =
+    process.env.GITBOOK_ALLOW_CUSTOMIZATION_OVERRIDE === 'true';
+
+/**
  * Hostname serving the integrations.
  */
 export const GITBOOK_INTEGRATIONS_HOST =
