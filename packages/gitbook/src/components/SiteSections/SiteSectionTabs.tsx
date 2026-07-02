@@ -165,20 +165,26 @@ export function SiteSectionTabs(props: {
 
             <div
                 className="absolute top-full left-0 z-20 flex w-full"
-                style={{ paddingInline: `${SCREEN_OFFSET}px` }}
+                style={{
+                    paddingInline: `${SCREEN_OFFSET}px`,
+                    // Force a stacking context on this wrapper (rather than on the Viewport) to fix a rendering bug on
+                    // Safari. Keeping it here — off the clipped Viewport — avoids a Chromium bug where a clipped,
+                    // composited layer drops its text inside an iframe (empty dropdowns on embedded sites).
+                    transform: 'translateZ(0)',
+                }}
             >
                 <NavigationMenu.Viewport
                     className={tcls(
-                        // Note: this layer is composited (translateZ) and animated. Chromium fails to paint a clipped composited layer's text
-                        // inside an iframe or `overflow-hidden` ancestor. Clipping is done on the inner content wrapper instead.
-                        'relative origin-[center_top] circular-corners:rounded-3xl rounded-corners:rounded-xl border border-tint bg-tint-base shadow-lg',
+                        // `overflow-hidden` clips the content to this animating box, keeping it bounded by the rounded
+                        // container as the Viewport resizes/scales. The stacking context Safari needs lives on the
+                        // parent wrapper (translateZ), deliberately not here — see the note above.
+                        'relative origin-[center_top] overflow-hidden circular-corners:rounded-3xl rounded-corners:rounded-xl border border-tint bg-tint-base shadow-lg',
                         '-mt-0.5 h-(--radix-navigation-menu-viewport-height) w-full max-w-full md:w-(--radix-navigation-menu-viewport-width)',
                         'max-h-[calc(100vh-8rem)] data-[state=closed]:animate-scale-out data-[state=open]:animate-scale-in',
                         'ease has-[&[data-motion]]:transition-[left,width,height] has-[&[data-motion]]:duration-300'
                     )}
                     style={{
                         left: viewportLeft,
-                        translate: '0 0 0', // TranslateZ is needed to force a stacking context, fixing a rendering bug on Safari
                     }}
                 />
             </div>
