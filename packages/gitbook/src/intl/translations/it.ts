@@ -41,6 +41,8 @@ export const it: TranslationLanguage = {
     search_ask_no_answer:
         'Non è stato possibile trovare una risposta alla tua domanda. Prova a riformularla o a essere più specifico.',
     search_ask_error: 'Qualcosa è andato storto. Riprova più tardi.',
+    search_partial_error:
+        'Non è stato possibile caricare alcuni risultati. Visualizziamo i risultati disponibili.',
     on_this_page: 'In questa pagina',
     next_page: 'Successivo',
     previous_page: 'Precedente',
@@ -148,7 +150,10 @@ export const it: TranslationLanguage = {
     ai_chat_tools_navigate_failed: 'Impossibile aprire la pagina',
     ai_chat_tools_mcp_tool: 'Ha chiamato ${1}',
     ai_chat_ask: 'Chiedi a ${1}',
-    ai_chat_ask_about_page: 'Chiedi a ${1} riguardo a questa pagina',
+    ai_chat_ask_about: 'Chiedi a ${1} riguardo a ${2}',
+    ai_chat_ask_about_this: 'Chiedi a ${1} riguardo a questo',
+    this_page: 'questa pagina',
+    ai_chat_paragraph_draft: 'Dimmi di più a riguardo',
     copy_for_llms: 'Copia per LLM',
     copy_page_markdown: 'Copia la pagina come Markdown per LLM',
     copy_page: 'Copia pagina',

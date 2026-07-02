@@ -40,6 +40,8 @@ export const fi: TranslationLanguage = {
     search_ask_no_answer:
         'Kysymykseesi ei löytynyt vastausta. Voit yrittää muotoilla sen uudelleen tai olla tarkempi.',
     search_ask_error: 'Jokin meni pieleen. Yritä myöhemmin uudelleen.',
+    search_partial_error:
+        'Joitakin tuloksia ei voitu ladata. Näytetään saatavilla olevat tulokset.',
     on_this_page: 'Tällä sivulla',
     next_page: 'Seuraava',
     previous_page: 'Edellinen',
@@ -146,7 +148,10 @@ export const fi: TranslationLanguage = {
     ai_chat_tools_navigate_failed: 'Sivun avaaminen epäonnistui',
     ai_chat_tools_mcp_tool: 'Kutsuttiin ${1}',
     ai_chat_ask: 'Kysy ${1}',
-    ai_chat_ask_about_page: 'Kysy ${1} tältä sivulta',
+    ai_chat_ask_about: 'Kysy ${1}: ${2}',
+    ai_chat_ask_about_this: 'Kysy ${1}:lta tästä',
+    this_page: 'tätä sivua',
+    ai_chat_paragraph_draft: 'Kerro minulle tästä lisää',
     ai_chat_ask_query: 'Kysy ${1}: "${2}"',
     copy_for_llms: 'Kopioi LLM:ille',
     copy_page_markdown: 'Kopioi sivu Markdownina LLM:ille',

@@ -41,6 +41,8 @@ export const nl: TranslationLanguage = {
     search_ask_no_answer:
         'Er kon geen antwoord op je vraag worden gevonden. Probeer je vraag anders te formuleren of wees specifieker.',
     search_ask_error: 'Er is iets misgegaan. Probeer het later opnieuw.',
+    search_partial_error:
+        'Sommige resultaten konden niet worden geladen. Beschikbare resultaten worden weergegeven.',
     on_this_page: 'Op deze pagina',
     next_page: 'Volgende',
     previous_page: 'Vorige',
@@ -147,7 +149,10 @@ export const nl: TranslationLanguage = {
     ai_chat_tools_navigate_failed: 'Kan de pagina niet openen',
     ai_chat_tools_mcp_tool: '${1} aangeroepen',
     ai_chat_ask: 'Vraag het aan ${1}',
-    ai_chat_ask_about_page: 'Vraag ${1} naar deze pagina',
+    ai_chat_ask_about: 'Stel ${1} een vraag over ${2}',
+    ai_chat_ask_about_this: 'Stel ${1} een vraag hierover',
+    this_page: 'deze pagina',
+    ai_chat_paragraph_draft: 'Vertel me hier meer over',
     copy_for_llms: 'Kopiëren voor LLMs',
     copy_page_markdown: 'Pagina kopiëren als Markdown voor LLMs',
     copy_page: 'Pagina kopiëren',

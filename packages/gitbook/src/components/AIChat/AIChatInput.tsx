@@ -23,16 +23,29 @@ export function AIChatInput(props: {
     const chatController = useAIChatController();
 
     const inputRef = useRef<HTMLTextAreaElement>(null);
+
+    // Controlled value so a pre-filled draft can be injected without sending it.
     const [value, setValue] = useState('');
 
-    // Consume a draft requested via the controller (e.g. "rewrite this code sample"),
-    // pre-filling the input without sending it.
+    // Consume a draft staged via the controller (e.g. the per-paragraph "Ask" button): seed the
+    // input, focus it with the cursor at the end, then clear the pending draft so it is applied
+    // once and not re-injected on a later mount.
     useEffect(() => {
-        if (chat.inputDraft != null) {
-            setValue(chat.inputDraft);
-            chatController.setDraft(null);
+        if (!chat.draft) {
+            return;
         }
-    }, [chat.inputDraft, chatController]);
+        setValue(chat.draft);
+        chatController.setDraft('');
+        const raf = requestAnimationFrame(() => {
+            const el = inputRef.current;
+            if (el) {
+                el.focus();
+                const end = el.value.length;
+                el.setSelectionRange(end, end);
+            }
+        });
+        return () => cancelAnimationFrame(raf);
+    }, [chat.draft, chatController]);
 
     useEffect(() => {
         if (chat.opened && !disabled && !responding) {

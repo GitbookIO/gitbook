@@ -40,6 +40,8 @@ export const bg: TranslationLanguage = {
     search_ask_no_answer:
         'Не беше намерен отговор на въпроса ви. Можете да опитате да го преформулирате или да бъдете по-конкретни.',
     search_ask_error: 'Нещо се обърка. Моля, опитайте отново по-късно.',
+    search_partial_error:
+        'Някои резултати не можаха да се заредят. Показват се наличните резултати.',
     on_this_page: 'На тази страница',
     next_page: 'Следваща',
     previous_page: 'Предишна',
@@ -147,7 +149,10 @@ export const bg: TranslationLanguage = {
     ai_chat_tools_navigate_failed: 'Страницата не може да бъде отворена',
     ai_chat_tools_mcp_tool: 'Извика ${1}',
     ai_chat_ask: 'Попитайте ${1}',
-    ai_chat_ask_about_page: 'Попитайте ${1} за тази страница',
+    ai_chat_ask_about: 'Попитайте ${1} за ${2}',
+    ai_chat_ask_about_this: 'Попитайте ${1} за това',
+    this_page: 'тази страница',
+    ai_chat_paragraph_draft: 'Кажи ми повече за това',
     ai_chat_ask_query: 'Попитайте ${1} "${2}"',
     copy_for_llms: 'Копиране за LLM',
     copy_page_markdown: 'Копиране на страницата като Markdown за LLM',

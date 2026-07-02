@@ -40,6 +40,8 @@ export const sk: TranslationLanguage = {
     search_ask_no_answer:
         'Na vašu otázku sa nepodarilo nájsť odpoveď. Skúste ju preformulovať alebo byť konkrétnejší.',
     search_ask_error: 'Niečo sa pokazilo. Skúste to znova neskôr.',
+    search_partial_error:
+        'Niektoré výsledky sa nepodarilo načítať. Zobrazujú sa dostupné výsledky.',
     on_this_page: 'Na tejto stránke',
     next_page: 'Ďalej',
     previous_page: 'Predchádzajúca',
@@ -147,7 +149,10 @@ export const sk: TranslationLanguage = {
     ai_chat_tools_navigate_failed: 'Stránku sa nepodarilo otvoriť',
     ai_chat_tools_mcp_tool: 'Zavolal ${1}',
     ai_chat_ask: 'Opýtať sa ${1}',
-    ai_chat_ask_about_page: 'Opýtať sa ${1} na túto stránku',
+    ai_chat_ask_about: 'Opýtať sa ${1} na ${2}',
+    ai_chat_ask_about_this: 'Opýtať sa ${1} na to',
+    this_page: 'túto stránku',
+    ai_chat_paragraph_draft: 'Povedz mi o tom viac',
     ai_chat_ask_query: 'Opýtať sa ${1} "${2}"',
     copy_for_llms: 'Kopírovať pre LLM',
     copy_page_markdown: 'Kopírovať stránku ako Markdown pre LLM',

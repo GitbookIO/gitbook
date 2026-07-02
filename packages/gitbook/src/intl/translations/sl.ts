@@ -40,6 +40,8 @@ export const sl: TranslationLanguage = {
     search_ask_no_answer:
         'Odgovora na vaše vprašanje ni bilo mogoče najti. Poskusite ga preoblikovati ali biti bolj natančni.',
     search_ask_error: 'Nekaj je šlo narobe. Poskusite znova pozneje.',
+    search_partial_error:
+        'Nekaterih rezultatov ni bilo mogoče naložiti. Prikazani so razpoložljivi rezultati.',
     on_this_page: 'Na tej strani',
     next_page: 'Naslednja',
     previous_page: 'Prejšnja',
@@ -145,7 +147,10 @@ export const sl: TranslationLanguage = {
     ai_chat_tools_navigate_failed: 'Strani ni bilo mogoče odpreti',
     ai_chat_tools_mcp_tool: 'Poklicano ${1}',
     ai_chat_ask: 'Vprašaj ${1}',
-    ai_chat_ask_about_page: 'Vprašaj ${1} o tej strani',
+    ai_chat_ask_about: 'Vprašaj ${1} o ${2}',
+    ai_chat_ask_about_this: 'Vprašaj ${1} o tem',
+    this_page: 'to stran',
+    ai_chat_paragraph_draft: 'Povej mi več o tem',
     ai_chat_ask_query: 'Vprašaj ${1} "${2}"',
     copy_for_llms: 'Kopiraj za LLM',
     copy_page_markdown: 'Kopiraj stran kot Markdown za LLM',

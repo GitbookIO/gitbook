@@ -30,27 +30,6 @@ import {
  */
 type PageActionType = `${CustomizationPageActionType}`;
 
-/**
- * Order used to derive the list of actions from the deprecated boolean flags when the API does not
- * provide `items` yet. It matches the order the page actions menu used before the `items` model, so
- * existing sites keep the same dropdown ordering until they are migrated.
- */
-const LEGACY_PAGE_ACTION_ORDER: PageActionType[] = [
-    'assistant',
-    'markdown',
-    'external-ai',
-    'mcp',
-    'git',
-    'pdf',
-];
-
-/**
- * Default-button priority used in legacy mode (no `items`). It reproduces the previous behavior,
- * which only ever surfaced the assistant, the Git edit link or the markdown copy as the default
- * action — never ChatGPT, MCP or PDF.
- */
-const LEGACY_DEFAULT_ACTION_PRIORITY: PageActionType[] = ['assistant', 'git', 'markdown'];
-
 export type PageActionsDropdownURLs = {
     html: string;
     markdown: string;
@@ -88,11 +67,7 @@ export function PageActionsDropdown(props: PageActionsDropdownProps) {
     const assistants = useAI().assistants.filter(
         (assistant) => assistant.ui === true && assistant.pageAction
     );
-    // `items` is the source of truth when the API provides it. Until then (legacy mode), we derive
-    // the list from the deprecated boolean flags using the previous ordering.
-    const configuredItems = getConfiguredPageActionItems(props.actions);
-    const isLegacy = configuredItems === null;
-    const items = configuredItems ?? deriveLegacyPageActionItems(props.actions);
+    const items = props.actions.items;
 
     let defaultAction: ReactNode = null;
     let markdownIsDefault = false;
@@ -102,12 +77,8 @@ export function PageActionsDropdown(props: PageActionsDropdownProps) {
         // present, as a contextual override of the configured list.
         defaultAction = <ActionViewAsRSS url={urls.rss} type="button" />;
     } else {
-        // The default button is the first available action. With `items`, that is simply the first
-        // entry of the configured list. In legacy mode we keep the previous default-action priority
-        // (assistant → Git → markdown), so existing sites don't suddenly surface ChatGPT/MCP/PDF.
-        const defaultPriority = isLegacy ? LEGACY_DEFAULT_ACTION_PRIORITY : items;
-        const defaultActionType = defaultPriority.find(
-            (type) => items.includes(type) && isActionTypeAvailable(type, urls, assistants)
+        const defaultActionType = items.find(
+            (type) => items?.includes(type) && isActionTypeAvailable(type, urls, assistants)
         );
         if (defaultActionType) {
             defaultAction = renderDefaultActionForType(defaultActionType, {
@@ -123,17 +94,19 @@ export function PageActionsDropdown(props: PageActionsDropdownProps) {
     // Build the dropdown menu items, grouped by action type. RSS is appended as its own group
     // since it is not part of the configurable `items` list.
     const groups: { key: string; items: ReactNode[] }[] = items
-        .map((type) => ({
-            key: type,
-            items: renderDropdownActionsForType(type, {
-                siteTitle,
-                urls,
-                markdownIsDefault,
-                assistants,
-                page: props.page,
-            }),
-        }))
-        .filter((group) => group.items.length > 0);
+        ? items
+              .map((type) => ({
+                  key: type,
+                  items: renderDropdownActionsForType(type, {
+                      siteTitle,
+                      urls,
+                      markdownIsDefault,
+                      assistants,
+                      page: props.page,
+                  }),
+              }))
+              .filter((group) => group.items.length > 0)
+        : [];
 
     if (urls.rss) {
         groups.push({
@@ -176,43 +149,6 @@ export function PageActionsDropdown(props: PageActionsDropdownProps) {
             ) : null}
         </ButtonGroup>
     ) : null;
-}
-
-/**
- * Return the configured ordered list of enabled page actions, or `null` when the API does not
- * provide it yet (legacy mode).
- */
-function getConfiguredPageActionItems(
-    actions: SiteCustomizationSettings['pageActions']
-): PageActionType[] | null {
-    return actions.items ?? null;
-}
-
-/**
- * Derive the ordered list of enabled page actions from the deprecated boolean flags, following the
- * ordering used before the `items` model. Used only when the API does not provide `items`.
- */
-function deriveLegacyPageActionItems(
-    actions: SiteCustomizationSettings['pageActions']
-): PageActionType[] {
-    return LEGACY_PAGE_ACTION_ORDER.filter((type) => {
-        switch (type) {
-            case 'external-ai':
-                return actions.externalAI;
-            case 'markdown':
-                return actions.markdown;
-            case 'mcp':
-                return actions.mcp;
-            // `assistant` is governed by the AI mode setting, and `git`/`pdf` are not represented
-            // by the legacy `pageActions` flags; all three are gated by availability at render time.
-            case 'assistant':
-            case 'git':
-            case 'pdf':
-                return true;
-            default:
-                return false;
-        }
-    });
 }
 
 /**

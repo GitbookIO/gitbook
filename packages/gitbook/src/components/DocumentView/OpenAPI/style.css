@@ -38,9 +38,27 @@
     @apply pt-0;
 }
 
+/* In headless mode the tags row sits directly above the path; match the operation-level rhythm. */
+.openapi-summary-tags + .openapi-path {
+    @apply mt-3;
+}
+
 .openapi-deprecated,
-.openapi-stability {
+.openapi-stability,
+.openapi-mcp {
     @apply py-0.5 px-1.5 min-w-[1.625rem] font-normal w-fit justify-center items-center ring-1 ring-inset ring-tint bg-tint rounded-md straight-corners:rounded-none circular-corners:rounded-lg text-sm leading-[calc(max(1.20em,1.25rem))] before:content-none! after:!content-none;
+}
+
+.openapi-mcp {
+    @apply inline-flex items-center gap-1.5 text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-900/6 ring-emerald-500/5;
+}
+
+button.openapi-mcp {
+    @apply cursor-pointer transition-colors hover:bg-emerald-100 dark:hover:bg-emerald-900/12;
+}
+
+.openapi-mcp .gb-icon {
+    @apply size-3;
 }
 
 .openapi-stability-alpha {

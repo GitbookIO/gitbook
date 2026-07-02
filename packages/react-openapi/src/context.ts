@@ -16,6 +16,7 @@ export interface OpenAPIClientContext {
         copy: React.ReactNode;
         check: React.ReactNode;
         lock: React.ReactNode;
+        mcp: React.ReactNode;
     };
 
     /**

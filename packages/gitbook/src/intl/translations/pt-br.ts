@@ -1,4 +1,6 @@
-export const pt_br = {
+import type { TranslationLanguage } from './types';
+
+export const pt_br: TranslationLanguage = {
     locale: 'pt-br',
     language: 'Português (Brasil)',
     flag: '🇧🇷',
@@ -39,6 +41,8 @@ export const pt_br = {
     search_ask_no_answer:
         'Não foi possível encontrar uma resposta para sua pergunta. Você pode tentar reformulá-la ou ser mais específico.',
     search_ask_error: 'Algo deu errado. Por favor, tente novamente mais tarde.',
+    search_partial_error:
+        'Alguns resultados não puderam ser carregados. Mostrando os resultados disponíveis.',
     on_this_page: 'Nesta página',
     next_page: 'Próximo',
     previous_page: 'Anterior',
@@ -147,7 +151,10 @@ export const pt_br = {
     ai_chat_tools_navigate_failed: 'Falha ao abrir a página',
     ai_chat_tools_mcp_tool: 'Chamou ${1}',
     ai_chat_ask: 'Perguntar a ${1}',
-    ai_chat_ask_about_page: 'Perguntar a ${1} sobre esta página',
+    ai_chat_ask_about: 'Perguntar a ${1} sobre ${2}',
+    ai_chat_ask_about_this: 'Perguntar a ${1} sobre isso',
+    this_page: 'esta página',
+    ai_chat_paragraph_draft: 'Conte-me mais sobre isso',
     copy_for_llms: 'Copiar para LLMs',
     copy_page_markdown: 'Copiar página como Markdown para LLMs',
     copy_page: 'Copiar página',

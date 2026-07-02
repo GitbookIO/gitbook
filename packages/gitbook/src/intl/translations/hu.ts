@@ -40,6 +40,8 @@ export const hu: TranslationLanguage = {
     search_ask_no_answer:
         'Nem található válasz a kérdésére. Próbálja meg átfogalmazni, vagy legyen pontosabb.',
     search_ask_error: 'Valami hiba történt. Kérjük, próbálja újra később.',
+    search_partial_error:
+        'Néhány találatot nem sikerült betölteni. Az elérhető találatok jelennek meg.',
     on_this_page: 'Ezen az oldalon',
     next_page: 'Következő',
     previous_page: 'Előző',
@@ -146,7 +148,10 @@ export const hu: TranslationLanguage = {
     ai_chat_tools_navigate_failed: 'Az oldal megnyitása sikertelen',
     ai_chat_tools_mcp_tool: '${1} meghívva',
     ai_chat_ask: '${1} kérdezése',
-    ai_chat_ask_about_page: '${1} kérdezése erről az oldalról',
+    ai_chat_ask_about: '${1} megkérdezése ${2} témában',
+    ai_chat_ask_about_this: '${1} megkérdezése erről',
+    this_page: 'ez az oldal',
+    ai_chat_paragraph_draft: 'Mesélj erről többet',
     ai_chat_ask_query: '${1} kérdezése: "${2}"',
     copy_for_llms: 'Másolás LLM-ekhez',
     copy_page_markdown: 'Oldal másolása Markdownként LLM-ekhez',

@@ -45,7 +45,12 @@ export function ActionOpenAssistant(props: {
             icon={assistant.icon}
             label={assistant.label}
             shortLabel={tString(language, 'ask')}
-            description={tString(language, 'ai_chat_ask_about_page', assistant.label)}
+            description={tString(
+                language,
+                'ai_chat_ask_about',
+                assistant.label,
+                tString(language, 'this_page')
+            )}
             disabled={chat.responding}
             onClick={() => {
                 // Stage a reference to the current page so the assistant is informed about
@@ -213,7 +218,12 @@ export function ActionOpenInLLM(props: {
             icon={provider}
             label={tString(language, 'open_in', providerLabel)}
             shortLabel={providerLabel}
-            description={tString(language, 'ai_chat_ask_about_page', providerLabel)}
+            description={tString(
+                language,
+                'ai_chat_ask_about',
+                providerLabel,
+                tString(language, 'this_page')
+            )}
             href={getURLForLLM(provider, prompt)}
         />
     );

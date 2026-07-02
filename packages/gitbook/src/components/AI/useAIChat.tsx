@@ -119,10 +119,10 @@ export type AIChatState = {
     references: AIChatReference[];
 
     /**
-     * Draft text to pre-fill into the chat input without sending it. Consumed by
-     * the input on the next render and then reset to `null`.
+     * Draft text to pre-fill the chat input with, without sending it. The chat input consumes
+     * this value (seeding its editable content) and then clears it back to an empty string.
      */
-    inputDraft: string | null;
+    draft: string;
 };
 
 export type AIChatEvent =
@@ -146,8 +146,6 @@ export type AIChatController = {
     close: () => void;
     /** Post a message to the session */
     postMessage: (input: { message: string }) => void;
-    /** Pre-fill the chat input with a draft message, without sending it */
-    setDraft: (value: string | null) => void;
     /** Clear the conversation */
     clear: () => void;
     /** Stage a reference on the next message */
@@ -158,6 +156,8 @@ export type AIChatController = {
     clearReferences: () => void;
     /** Focus the chat input */
     focus: () => void;
+    /** Pre-fill the chat input with draft text, without sending it. */
+    setDraft: (draft: string) => void;
     /** Register an event listener */
     on: <T extends AIChatEvent['type']>(
         event: T,
@@ -181,7 +181,7 @@ const globalState = zustand.create<AIChatState>(() => {
         error: false,
         initialQuery: null,
         references: [],
-        inputDraft: null,
+        draft: '',
     };
 });
 
@@ -621,7 +621,6 @@ export function AIChatProvider(props: {
             error: false,
             initialQuery: null,
             references: [],
-            inputDraft: null,
         }));
 
         // Reset ask parameter to empty string (keeps chat open but clears content)
@@ -671,8 +670,8 @@ export function AIChatProvider(props: {
         notify(eventsRef.current.get('focus'), {});
     }, []);
 
-    const onSetDraft = React.useCallback((value: string | null) => {
-        globalState.setState((state) => ({ ...state, inputDraft: value }));
+    const onSetDraft = React.useCallback((draft: string) => {
+        globalState.setState({ draft });
     }, []);
 
     const onEvent = React.useCallback(
@@ -700,11 +699,11 @@ export function AIChatProvider(props: {
             close: onClose,
             clear: onClear,
             postMessage: onPostMessage,
-            setDraft: onSetDraft,
             addReference: onAddReference,
             removeReference: onRemoveReference,
             clearReferences: onClearReferences,
             focus: onFocus,
+            setDraft: onSetDraft,
             on: onEvent,
         };
     }, [
@@ -712,11 +711,11 @@ export function AIChatProvider(props: {
         onClose,
         onClear,
         onPostMessage,
-        onSetDraft,
         onAddReference,
         onRemoveReference,
         onClearReferences,
         onFocus,
+        onSetDraft,
         onEvent,
     ]);
 

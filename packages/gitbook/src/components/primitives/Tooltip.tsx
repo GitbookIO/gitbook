@@ -20,6 +20,7 @@ export function Tooltip(props: {
     arrowProps?: RadixTooltip.TooltipArrowProps;
     arrow?: boolean;
     className?: string;
+    pinOnClick?: boolean;
 }) {
     const {
         children,
@@ -31,6 +32,7 @@ export function Tooltip(props: {
         arrowProps,
         arrow = false,
         className,
+        pinOnClick = true,
     } = props;
 
     const [open, setOpen] = useState(false);
@@ -56,7 +58,11 @@ export function Tooltip(props: {
 
     return (
         <RadixTooltip.Root open={open || clicked} onOpenChange={setOpen} {...rootProps}>
-            <RadixTooltip.Trigger asChild onClick={() => setClicked(true)} {...triggerProps}>
+            <RadixTooltip.Trigger
+                asChild
+                onClick={pinOnClick ? () => setClicked(true) : undefined}
+                {...triggerProps}
+            >
                 {children}
             </RadixTooltip.Trigger>
             <RadixTooltip.Portal {...portalProps}>

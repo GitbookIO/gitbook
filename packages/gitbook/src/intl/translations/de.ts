@@ -1,4 +1,6 @@
-export const de = {
+import type { TranslationLanguage } from './types';
+
+export const de: TranslationLanguage = {
     locale: 'de',
     language: 'Deutsch',
     flag: '🇩🇪',
@@ -39,6 +41,8 @@ export const de = {
     search_ask_no_answer:
         'Es konnte keine Antwort auf Ihre Frage gefunden werden. Versuchen Sie, sie umzuformulieren oder genauer zu sein.',
     search_ask_error: 'Etwas ist schief gelaufen. Bitte versuchen Sie es später noch einmal.',
+    search_partial_error:
+        'Einige Ergebnisse konnten nicht geladen werden. Verfügbare Ergebnisse werden angezeigt.',
     on_this_page: 'Auf dieser Seite',
     next_page: 'Nächste',
     previous_page: 'Vorherige',
@@ -149,7 +153,10 @@ export const de = {
     ai_chat_tools_navigate_failed: 'Seite konnte nicht geöffnet werden',
     ai_chat_tools_mcp_tool: '${1} aufgerufen',
     ai_chat_ask: '${1} fragen',
-    ai_chat_ask_about_page: '${1} zu dieser Seite befragen',
+    ai_chat_ask_about: '${1} zu ${2} befragen',
+    ai_chat_ask_about_this: '${1} dazu befragen',
+    this_page: 'dieser Seite',
+    ai_chat_paragraph_draft: 'Erzähl mir mehr darüber',
     copy_for_llms: 'Für LLMs kopieren',
     copy_page_markdown: 'Seite als Markdown für LLMs kopieren',
     copy_page: 'Seite kopieren',

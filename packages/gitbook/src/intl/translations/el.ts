@@ -40,6 +40,8 @@ export const el: TranslationLanguage = {
     search_ask_no_answer:
         'Δεν ήταν δυνατή η εύρεση απάντησης στην ερώτησή σας. Δοκιμάστε να τη διατυπώσετε διαφορετικά ή πιο συγκεκριμένα.',
     search_ask_error: 'Κάτι πήγε στραβά. Δοκιμάστε ξανά αργότερα.',
+    search_partial_error:
+        'Δεν ήταν δυνατή η φόρτωση ορισμένων αποτελεσμάτων. Εμφανίζονται τα διαθέσιμα αποτελέσματα.',
     on_this_page: 'Σε αυτήν τη σελίδα',
     next_page: 'Επόμενη',
     previous_page: 'Προηγούμενη',
@@ -149,7 +151,10 @@ export const el: TranslationLanguage = {
     ai_chat_tools_navigate_failed: 'Αποτυχία ανοίγματος της σελίδας',
     ai_chat_tools_mcp_tool: 'Κλήθηκε ${1}',
     ai_chat_ask: 'Ρωτήστε ${1}',
-    ai_chat_ask_about_page: 'Ρωτήστε ${1} για αυτήν τη σελίδα',
+    ai_chat_ask_about: 'Ρωτήστε ${1} για ${2}',
+    ai_chat_ask_about_this: 'Ρωτήστε ${1} για αυτό',
+    this_page: 'αυτή τη σελίδα',
+    ai_chat_paragraph_draft: 'Πες μου περισσότερα για αυτό',
     ai_chat_ask_query: 'Ρωτήστε ${1} "${2}"',
     copy_for_llms: 'Αντιγραφή για LLM',
     copy_page_markdown: 'Αντιγραφή σελίδας ως Markdown για LLM',

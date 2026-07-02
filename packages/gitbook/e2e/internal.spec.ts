@@ -185,17 +185,8 @@ const searchTestCases: Test[] = [
             await waitForCookiesDialog(page);
             const searchInput = page.locator('css=[data-testid="search-input"]');
 
-            // Focus search input, expecting recommended questions
-            await searchInput.focus();
-            await expect(page.getByTestId('search-results')).toBeVisible({
-                timeout: 30_000,
-            });
-            const recommendedQuestions = await page
-                .getByTestId('search-recommended-question')
-                .all();
-            await expect(recommendedQuestions.length).toBeGreaterThanOrEqual(1); // Expect at least 1 question
-
             // Fill search input, expecting AI search option
+            await searchInput.focus();
             await searchInput.fill(AI_PROMPT);
             const aiSearchResult = page.getByTestId('search-ask-question');
             await expect(aiSearchResult).toBeVisible();
@@ -1364,8 +1355,6 @@ const testCases: TestsCase[] = [
                 name: 'Without page actions',
                 url: getCustomizationURL({
                     pageActions: {
-                        markdown: false,
-                        externalAI: false,
                         items: [],
                     },
                 }),

@@ -40,6 +40,8 @@ export const ro: TranslationLanguage = {
     search_ask_no_answer:
         'Nu s-a putut găsi un răspuns la întrebarea ta. Poți încerca să o reformulezi sau să fii mai specific.',
     search_ask_error: 'Ceva nu a mers bine. Te rugăm să încerci din nou mai târziu.',
+    search_partial_error:
+        'Unele rezultate nu au putut fi încărcate. Se afișează rezultatele disponibile.',
     on_this_page: 'Pe această pagină',
     next_page: 'Următoarea',
     previous_page: 'Anterioara',
@@ -148,7 +150,10 @@ export const ro: TranslationLanguage = {
     ai_chat_tools_navigate_failed: 'Deschiderea paginii a eșuat',
     ai_chat_tools_mcp_tool: 'A apelat ${1}',
     ai_chat_ask: 'Întreabă ${1}',
-    ai_chat_ask_about_page: 'Întreabă ${1} despre această pagină',
+    ai_chat_ask_about: 'Întreabă ${1} despre ${2}',
+    ai_chat_ask_about_this: 'Întreabă ${1} despre asta',
+    this_page: 'această pagină',
+    ai_chat_paragraph_draft: 'Spune-mi mai multe despre asta',
     ai_chat_ask_query: 'Întreabă ${1} "${2}"',
     copy_for_llms: 'Copiază pentru LLM-uri',
     copy_page_markdown: 'Copiază pagina ca Markdown pentru LLM-uri',

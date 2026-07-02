@@ -1,4 +1,6 @@
-export const ru = {
+import type { TranslationLanguage } from './types';
+
+export const ru: TranslationLanguage = {
     locale: 'ru',
     language: 'Русский',
     flag: '🇷🇺',
@@ -39,6 +41,8 @@ export const ru = {
     search_ask_no_answer:
         'Не удалось найти ответ на ваш вопрос. Попробуйте перефразировать его или задать более конкретный вопрос.',
     search_ask_error: 'Что-то пошло не так. Пожалуйста, попробуйте позже.',
+    search_partial_error:
+        'Не удалось загрузить некоторые результаты. Показаны доступные результаты.',
     on_this_page: 'На этой странице',
     next_page: 'Следующая',
     previous_page: 'Предыдущая',
@@ -146,7 +150,10 @@ export const ru = {
     ai_chat_tools_navigate_failed: 'Не удалось открыть страницу',
     ai_chat_tools_mcp_tool: 'Вызван ${1}',
     ai_chat_ask: 'Спросить у ${1}',
-    ai_chat_ask_about_page: 'Спросить у ${1} об этой странице',
+    ai_chat_ask_about: 'Спросить у ${1} о ${2}',
+    ai_chat_ask_about_this: 'Спросить у ${1} об этом',
+    this_page: 'этой странице',
+    ai_chat_paragraph_draft: 'Расскажи мне об этом подробнее',
     copy_for_llms: 'Скопировать для LLM',
     copy_page_markdown: 'Скопировать страницу как Markdown для LLM',
     copy_page: 'Скопировать страницу',

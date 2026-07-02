@@ -6,7 +6,7 @@ import type {
 } from '@gitbook/openapi-parser';
 import { dereferenceFilesystem } from './dereference';
 import type { OpenAPIOperationData, OpenAPISecurityScope } from './types';
-import { checkIsReference } from './utils';
+import { checkIsReference, readMcpUrl } from './utils';
 
 export { fromJSON, toJSON } from 'flatted';
 
@@ -71,7 +71,11 @@ export async function resolveOpenAPIOperation(
 
     return {
         servers,
-        operation: { ...operation, security },
+        operation: {
+            ...operation,
+            security,
+            'x-gitbook-mcp-url': getMcpUrl(schema, path, operation),
+        },
         method,
         path,
         securities: Array.from(securitiesMap.entries()),
@@ -146,6 +150,18 @@ function getServers(
     }
 
     return 'servers' in schema ? (schema.servers ?? []) : [];
+}
+
+/**
+ * Resolve the MCP server URL for an operation, following the same precedence as servers:
+ * operation > path > root.
+ */
+function getMcpUrl(
+    schema: OpenAPIV3.Document | OpenAPIV3_1.Document,
+    path: string,
+    operation: OpenAPIV3.OperationObject
+): string | undefined {
+    return readMcpUrl(operation) ?? readMcpUrl(getPathObject(schema, path)) ?? readMcpUrl(schema);
 }
 
 /**
