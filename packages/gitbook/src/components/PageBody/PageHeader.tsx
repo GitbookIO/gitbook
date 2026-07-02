@@ -20,6 +20,7 @@ import {
 } from '../PageActions/PageActionsDropdown';
 import { PageAsideToggleButton } from '../PageAside/PageAsideButton';
 import { PageIcon } from '../PageIcon';
+import { categorizeVariants } from '../SpaceLayout/categorizeVariants';
 import { CONTENT_STYLE, CONTENT_STYLE_REDUCED } from '../layout';
 import { BreadcrumbItemDropdown, type BreadcrumbSibling } from './BreadcrumbItemDropdown';
 import { PageTags } from './PageTags';
@@ -36,14 +37,13 @@ export async function PageHeader(props: {
     const hasAncestors = ancestors.length > 0;
 
     // Surface where the page lives in the site at the start of the breadcrumbs: the section (with
-    // its enclosing section groups) and the variant. When there are page breadcrumbs, these are
-    // collapsed behind a "…" that expands on hover; otherwise they're shown inline. Each crumb also
-    // carries its siblings, so hovering it reveals a dropdown to switch to them.
+    // its enclosing section groups) and the variant. Each crumb also carries its siblings, so
+    // hovering it reveals a dropdown to switch to them.
     const currentSection = context.sections?.current ?? null;
-    // Variants to offer, falling back to all site spaces only when none are visible. Only surface
-    // the variant crumb when there's more than one to switch between — otherwise it's just noise.
-    const variantSpaces =
-        context.visibleSiteSpaces.length > 0 ? context.visibleSiteSpaces : context.siteSpaces;
+    // Variants to offer as a crumb: only the "generic" variants (versions, etc.). Language variants
+    // are excluded — they belong to the dedicated language picker — using the same split it uses.
+    // Only surface the variant crumb when there's more than one to switch between.
+    const variantSpaces = categorizeVariants(context).generic;
     const currentSiteSpace = variantSpaces.length > 1 ? context.siteSpace : null;
     const contextCrumbs: BreadcrumbContextCrumb[] = [];
     if (currentSection) {
@@ -146,68 +146,14 @@ export async function PageHeader(props: {
             {showBreadcrumbs && (
                 <nav aria-label="Breadcrumb" className="text-tint text-xs leading-snug">
                     <ol className="inline">
-                        {hasContextCrumbs &&
-                            (hasAncestors && contextCrumbs.length > 1 ? (
-                                // With page breadcrumbs and both a section & variant to show, collapse
-                                // them behind a "…" that expands when hovered. A single item isn't
-                                // worth hiding, so it's shown inline (below) instead.
-                                <li className="inline">
-                                    <span
-                                        className={tcls(
-                                            'group/breadcrumb-context inline',
-                                            // Keep the "…" collapsed while a dropdown is open (matches the reveal).
-                                            'has-[*[data-state=open]]:[&>svg]:w-0 has-[*[data-state=open]]:[&>svg]:opacity-0 has-[*[data-state=open]]:[&>svg]:blur-[2px]'
-                                        )}
-                                    >
-                                        {/* The crumbs come first in the flow so their left edge stays
-                                            fixed as they fade in/out — only the trailing "…" moves. */}
-                                        <span
-                                            className={tcls(
-                                                'invisible inline-flex w-0 items-center overflow-hidden whitespace-nowrap align-bottom opacity-0 blur-[2px]',
-                                                'group-hover/breadcrumb-context:visible group-hover/breadcrumb-context:w-auto group-hover/breadcrumb-context:opacity-100 group-hover/breadcrumb-context:blur-[0px]',
-                                                // Stay open while one of the items' dropdowns is open (its trigger
-                                                // carries Radix's `data-state="open"`), so the pointer can move into
-                                                // the portalled menu without collapsing the reveal.
-                                                'has-[*[data-state=open]]:visible has-[*[data-state=open]]:w-auto has-[*[data-state=open]]:opacity-100 has-[*[data-state=open]]:blur-[0px]',
-                                                'transition-[visibility,width,opacity,filter] duration-200 motion-reduce:transition-none'
-                                            )}
-                                        >
-                                            {contextCrumbs.map((crumb, index) => (
-                                                <span
-                                                    key={crumb.key}
-                                                    className="inline-flex items-center"
-                                                >
-                                                    <ContextCrumb crumb={crumb} />
-                                                    {index !== contextCrumbs.length - 1 && (
-                                                        <BreadcrumbSeparator />
-                                                    )}
-                                                </span>
-                                            ))}
-                                        </span>
-                                        <Icon
-                                            aria-hidden
-                                            icon="ellipsis-h"
-                                            className={tcls(
-                                                'inline-block size-[1em] shrink-0 overflow-hidden align-text-bottom text-tint-subtle blur-[0px]',
-                                                'group-hover/breadcrumb-context:w-0 group-hover/breadcrumb-context:opacity-0 group-hover/breadcrumb-context:blur-[2px]',
-                                                'transition-[width,opacity,filter] duration-200 motion-reduce:transition-none'
-                                            )}
-                                        />
-                                    </span>
+                        {contextCrumbs.map((crumb, index) => (
+                            <li key={crumb.key} className="inline">
+                                <ContextCrumb crumb={crumb} />
+                                {(index !== contextCrumbs.length - 1 || hasAncestors) && (
                                     <BreadcrumbSeparator />
-                                </li>
-                            ) : (
-                                // Otherwise show the section/variant inline — either there are no page
-                                // breadcrumbs, or there's only one of them (not worth a "…").
-                                contextCrumbs.map((crumb, index) => (
-                                    <li key={crumb.key} className="inline">
-                                        <ContextCrumb crumb={crumb} />
-                                        {(index !== contextCrumbs.length - 1 || hasAncestors) && (
-                                            <BreadcrumbSeparator />
-                                        )}
-                                    </li>
-                                ))
-                            ))}
+                                )}
+                            </li>
+                        ))}
                         {ancestors.map((breadcrumb, index) => {
                             const parentPages = ancestors[index - 1]?.pages ?? revision.pages;
                             const href = linker.toPathForPage({
