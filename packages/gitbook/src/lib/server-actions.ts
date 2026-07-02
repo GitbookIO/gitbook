@@ -1,4 +1,5 @@
 import { type GitBookBaseContext, fetchSiteContextByURLLookup, getBaseContext } from './context';
+import { getDynamicCustomizationSettings } from './customization';
 import { getEmbeddableLinker } from './embeddable-linker';
 import {
     getSiteURLDataFromMiddleware,
@@ -37,5 +38,8 @@ export async function getServerActionBaseContext(options?: { isEmbeddable?: bool
  */
 export async function fetchServerActionSiteContext(baseContext: GitBookBaseContext) {
     const siteURLData = await getSiteURLDataFromMiddleware();
-    return fetchSiteContextByURLLookup(baseContext, siteURLData);
+    const context = await fetchSiteContextByURLLookup(baseContext, siteURLData);
+    // Apply the preview customization override
+    context.customization = await getDynamicCustomizationSettings(context.customization);
+    return context;
 }
