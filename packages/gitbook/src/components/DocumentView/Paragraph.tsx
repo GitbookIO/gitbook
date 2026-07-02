@@ -33,8 +33,16 @@ export function Paragraph(props: BlockProps<DocumentBlockParagraph>) {
 
     const text = aiAssistantEnabled ? getNodeText(block) : '';
     if (aiAssistantEnabled && text.trim()) {
+        // The wrapper is now the flex child, so it must carry the block alignment (notably
+        // `self-center`/`self-end`) — otherwise centered paragraphs pin left on wide/no-TOC pages.
         return (
-            <div className={tcls('group/ask-ai relative', style)}>
+            <div
+                className={tcls(
+                    'group/ask-ai relative',
+                    style,
+                    getTextAlignment(block.data?.align)
+                )}
+            >
                 {paragraph}
                 <AskAIParagraphButton content={text} />
             </div>
