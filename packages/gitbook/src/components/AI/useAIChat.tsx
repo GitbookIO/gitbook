@@ -117,6 +117,12 @@ export type AIChatState = {
      * References staged on the next user message.
      */
     references: AIChatReference[];
+
+    /**
+     * Draft text to pre-fill the chat input with, without sending it. The chat input consumes
+     * this value (seeding its editable content) and then clears it back to an empty string.
+     */
+    draft: string;
 };
 
 export type AIChatEvent =
@@ -150,6 +156,8 @@ export type AIChatController = {
     clearReferences: () => void;
     /** Focus the chat input */
     focus: () => void;
+    /** Pre-fill the chat input with draft text, without sending it. */
+    setDraft: (draft: string) => void;
     /** Register an event listener */
     on: <T extends AIChatEvent['type']>(
         event: T,
@@ -173,6 +181,7 @@ const globalState = zustand.create<AIChatState>(() => {
         error: false,
         initialQuery: null,
         references: [],
+        draft: '',
     };
 });
 
@@ -661,6 +670,10 @@ export function AIChatProvider(props: {
         notify(eventsRef.current.get('focus'), {});
     }, []);
 
+    const onSetDraft = React.useCallback((draft: string) => {
+        globalState.setState({ draft });
+    }, []);
+
     const onEvent = React.useCallback(
         <T extends AIChatEvent['type']>(
             event: T,
@@ -690,6 +703,7 @@ export function AIChatProvider(props: {
             removeReference: onRemoveReference,
             clearReferences: onClearReferences,
             focus: onFocus,
+            setDraft: onSetDraft,
             on: onEvent,
         };
     }, [
@@ -701,6 +715,7 @@ export function AIChatProvider(props: {
         onRemoveReference,
         onClearReferences,
         onFocus,
+        onSetDraft,
         onEvent,
     ]);
 
