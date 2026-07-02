@@ -46,6 +46,7 @@ export const nl: TranslationLanguage = {
     on_this_page: 'Op deze pagina',
     next_page: 'Volgende',
     previous_page: 'Vorige',
+    toc_back_to_space: 'Terug naar ${1}',
     page_last_modified: 'Laatst bijgewerkt ${1}',
     was_this_helpful: 'Was dit nuttig?',
     was_this_helpful_positive: 'Ja, het was nuttig!',

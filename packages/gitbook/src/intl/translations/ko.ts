@@ -45,6 +45,7 @@ export const ko: TranslationLanguage = {
     on_this_page: '이 페이지에서',
     next_page: '다음',
     previous_page: '이전',
+    toc_back_to_space: '${1}(으)로 돌아가기',
     page_last_modified: '마지막 업데이트 ${1}',
     was_this_helpful: '도움이 되었나요?',
     was_this_helpful_positive: '네, 도움이 되었어요!',

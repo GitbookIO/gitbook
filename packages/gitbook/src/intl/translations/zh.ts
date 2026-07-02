@@ -44,6 +44,7 @@ export const zh: TranslationLanguage = {
     on_this_page: '在本页',
     next_page: '下一页',
     previous_page: '上一页',
+    toc_back_to_space: '返回${1}',
     page_last_modified: '最后更新于 ${1}',
     was_this_helpful: '这有帮助吗？',
     was_this_helpful_positive: '是的，很有帮助！',

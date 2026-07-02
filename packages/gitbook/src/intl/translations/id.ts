@@ -44,6 +44,7 @@ export const id: TranslationLanguage = {
     on_this_page: 'Di halaman ini',
     next_page: 'Berikutnya',
     previous_page: 'Sebelumnya',
+    toc_back_to_space: 'Kembali ke ${1}',
     page_last_modified: 'Terakhir diperbarui ${1}',
     was_this_helpful: 'Apakah ini membantu?',
     was_this_helpful_positive: 'Ya, membantu!',

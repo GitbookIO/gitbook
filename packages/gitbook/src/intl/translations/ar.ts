@@ -44,6 +44,7 @@ export const ar: TranslationLanguage = {
     on_this_page: 'في هذه الصفحة',
     next_page: 'التالي',
     previous_page: 'السابق',
+    toc_back_to_space: 'العودة إلى ${1}',
     page_last_modified: 'آخر تحديث ${1}',
     was_this_helpful: 'هل كان هذا مفيدا؟',
     was_this_helpful_positive: 'نعم، كان مفيدا!',

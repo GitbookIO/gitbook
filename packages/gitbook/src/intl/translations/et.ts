@@ -44,6 +44,7 @@ export const et: TranslationLanguage = {
     on_this_page: 'Sellel lehel',
     next_page: 'Järgmine',
     previous_page: 'Eelmine',
+    toc_back_to_space: 'Tagasi: ${1}',
     page_last_modified: 'Viimati uuendatud ${1}',
     was_this_helpful: 'Kas sellest oli abi?',
     was_this_helpful_positive: 'Jah, oli!',

@@ -43,6 +43,7 @@ export const th: TranslationLanguage = {
     on_this_page: 'ในหน้านี้',
     next_page: 'ถัดไป',
     previous_page: 'ก่อนหน้า',
+    toc_back_to_space: 'กลับไปที่ ${1}',
     page_last_modified: 'อัปเดตล่าสุด ${1}',
     was_this_helpful: 'สิ่งนี้มีประโยชน์หรือไม่?',
     was_this_helpful_positive: 'ใช่ มีประโยชน์!',

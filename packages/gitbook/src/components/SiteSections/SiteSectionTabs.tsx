@@ -7,6 +7,7 @@ import React from 'react';
 import { Button, Link, ToggleChevron } from '@/components/primitives';
 import { tcls } from '@/lib/tailwind';
 import { findSectionInGroup } from '@/lib/utils';
+import { markSpaceNavigationFromPickerOnClick } from '../hooks';
 import { useIsMobile } from '../hooks/useIsMobile';
 import { CONTAINER_STYLE } from '../layout';
 import { ScrollContainer } from '../primitives/ScrollContainer';
@@ -64,6 +65,7 @@ export function SiteSectionTabs(props: {
                 className
             )}
             ref={containerRef}
+            onClickCapture={markSpaceNavigationFromPickerOnClick}
             style={
                 {
                     '--site-section-column-width': COLUMN_WIDTH,
