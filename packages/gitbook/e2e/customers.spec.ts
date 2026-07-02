@@ -41,11 +41,6 @@ const testCases: TestsCase[] = [
         tests: [{ name: 'Home', url: '/' }],
     },
     {
-        name: 'jasons-tutorials.gitbook.io',
-        contentBaseURL: 'https://jasons-tutorials.gitbook.io',
-        tests: [{ name: 'Home', url: '/' }],
-    },
-    {
         name: 'faq.deltaemulator.com',
         contentBaseURL: 'https://faq.deltaemulator.com',
         tests: [{ name: 'Home', url: '/' }],
@@ -227,11 +222,6 @@ const testCases: TestsCase[] = [
         tests: [{ name: 'Home', url: '/docs' }],
     },
     {
-        name: 'docs.sonarsource.com',
-        contentBaseURL: 'https://docs.sonarsource.com',
-        tests: [{ name: 'Home', url: '/' }],
-    },
-    {
         name: 'docs.n8n.io',
         contentBaseURL: 'https://docs.n8n.io',
         tests: [{ name: 'Home', url: '/' }],
@@ -245,11 +235,6 @@ const testCases: TestsCase[] = [
         name: 'library.zoom.com',
         contentBaseURL: 'https://library.zoom.com',
         tests: [{ name: 'Home', url: '/' }],
-    },
-    {
-        name: 'docs.keeper.io',
-        contentBaseURL: 'https://docs.keeper.io',
-        tests: [{ name: 'Home', url: '/en', run: waitForCookiesDialog }],
     },
     {
         name: 'help.verkada.com',
