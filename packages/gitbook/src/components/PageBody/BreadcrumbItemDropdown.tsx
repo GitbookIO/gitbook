@@ -34,8 +34,15 @@ export function BreadcrumbItemDropdown(props: {
     linkClassName: ClassValue;
     /** All items at the same level, including the current one (flagged `isActive`). */
     siblings: BreadcrumbSibling[];
+    /**
+     * Custom dropdown content, rendered instead of the `siblings` list. Used by the variant crumb to
+     * reuse the header's variant switcher, whose entries resolve to the current page in the target
+     * variant (via per-page alternates) rather than just its landing page. When set, the dropdown is
+     * always shown.
+     */
+    children?: React.ReactNode;
 }) {
-    const { href, label, emoji, icon, linkClassName, siblings } = props;
+    const { href, label, emoji, icon, linkClassName, siblings, children } = props;
 
     const content = (
         <>
@@ -61,7 +68,7 @@ export function BreadcrumbItemDropdown(props: {
         );
 
     // No dropdown when there is nowhere else to go at this level.
-    if (siblings.length <= 1) {
+    if (children == null && siblings.length <= 1) {
         return trigger;
     }
 
@@ -72,23 +79,24 @@ export function BreadcrumbItemDropdown(props: {
             button={trigger}
             className="max-h-72 overflow-auto text-sm"
         >
-            {siblings.map((sibling) => (
-                <DropdownMenuItem
-                    key={sibling.id}
-                    href={sibling.href || '/'}
-                    active={sibling.isActive}
-                    leadingIcon={
-                        sibling.emoji || sibling.icon ? (
-                            <PageIcon
-                                page={{ emoji: sibling.emoji, icon: sibling.icon }}
-                                style="size-3 shrink-0 text-tint-subtle"
-                            />
-                        ) : undefined
-                    }
-                >
-                    {sibling.title}
-                </DropdownMenuItem>
-            ))}
+            {children ??
+                siblings.map((sibling) => (
+                    <DropdownMenuItem
+                        key={sibling.id}
+                        href={sibling.href || '/'}
+                        active={sibling.isActive}
+                        leadingIcon={
+                            sibling.emoji || sibling.icon ? (
+                                <PageIcon
+                                    page={{ emoji: sibling.emoji, icon: sibling.icon }}
+                                    style="size-3 shrink-0 text-tint-subtle"
+                                />
+                            ) : undefined
+                        }
+                    >
+                        {sibling.title}
+                    </DropdownMenuItem>
+                ))}
         </DropdownMenu>
     );
 }

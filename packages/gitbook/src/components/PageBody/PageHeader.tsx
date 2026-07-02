@@ -1,6 +1,6 @@
 import type { GitBookSiteContext } from '@/lib/context';
-import type { AncestorRevisionPage } from '@/lib/pages';
-import { getLocalizedTitle, getSectionURL, getSiteSpaceURL } from '@/lib/sites';
+import { type AncestorRevisionPage, resolveFirstDocument } from '@/lib/pages';
+import { getLocalizedTitle, getSiteSpaceURL } from '@/lib/sites';
 import { tcls } from '@/lib/tailwind';
 import { getPageRSSURL } from '@/routes/rss';
 import {
@@ -13,6 +13,7 @@ import {
 } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
 import urlJoin from 'url-join';
+import { SpacesDropdownMenuItems, type VariantSpace } from '../Header/SpacesDropdownMenuItem';
 import { getPDFURLSearchParams } from '../PDF';
 import {
     PageActionsDropdown,
@@ -20,6 +21,7 @@ import {
 } from '../PageActions/PageActionsDropdown';
 import { PageAsideToggleButton } from '../PageAside/PageAsideButton';
 import { PageIcon } from '../PageIcon';
+import { findBestTargetURL } from '../SiteSections/encodeClientSiteSections';
 import { categorizeVariants } from '../SpaceLayout/categorizeVariants';
 import { CONTENT_STYLE, CONTENT_STYLE_REDUCED } from '../layout';
 import { BreadcrumbItemDropdown, type BreadcrumbSibling } from './BreadcrumbItemDropdown';
@@ -59,8 +61,10 @@ export async function PageHeader(props: {
         for (const { node, siblings } of chain) {
             contextCrumbs.push({
                 key: `section-${node.id}`,
-                // Section groups have no URL of their own; only sections are navigable.
-                href: node.object === 'site-section' ? getSectionURL(context, node) : undefined,
+                // Section groups have no URL of their own; only sections are navigable. Resolve the
+                // section to the site space matching the current variant so switching sections keeps
+                // the reader on their current variant (same logic as the section tabs).
+                href: node.object === 'site-section' ? findBestTargetURL(context, node) : undefined,
                 label: getLocalizedTitle(node, context.locale),
                 icon: node.icon,
                 siblings: siblings
@@ -89,12 +93,20 @@ export async function PageHeader(props: {
             key: `variant-${currentSiteSpace.id}`,
             href: getSiteSpaceURL(context, currentSiteSpace),
             label: getLocalizedTitle(currentSiteSpace, context.locale),
-            siblings: variantSpaces.map((siteSpace) => ({
-                id: siteSpace.id,
-                title: getLocalizedTitle(siteSpace, context.locale),
-                href: getSiteSpaceURL(context, siteSpace),
-                isActive: siteSpace.id === currentSiteSpace.id,
-            })),
+            siblings: [],
+            // Reuse the header's variant switcher rather than plain per-variant links, so each entry
+            // resolves to the current page in the target variant (via per-page alternates) instead
+            // of that variant's landing page.
+            variantSwitcher: {
+                slimSpaces: variantSpaces.map((siteSpace) => ({
+                    id: siteSpace.id,
+                    title: getLocalizedTitle(siteSpace, context.locale),
+                    url: getSiteSpaceURL(context, siteSpace),
+                    isActive: siteSpace.id === currentSiteSpace.id,
+                    spaceId: siteSpace.space.id,
+                })),
+                curPath: currentSiteSpace.path,
+            },
         });
     }
     const hasContextCrumbs = contextCrumbs.length > 0;
@@ -235,6 +247,11 @@ type BreadcrumbContextCrumb = {
     // Sections, section groups and variants only ever carry an icon, never an emoji.
     icon?: string;
     siblings: BreadcrumbSibling[];
+    /**
+     * Present only for the variant crumb: the header's variant switcher data, whose dropdown entries
+     * resolve to the current page in each variant. Rendered instead of `siblings`.
+     */
+    variantSwitcher?: { slimSpaces: VariantSpace[]; curPath: string };
 };
 
 /** Render a context crumb (section group / section / variant) with its sibling dropdown. */
@@ -246,7 +263,14 @@ function ContextCrumb({ crumb }: { crumb: BreadcrumbContextCrumb }) {
             icon={crumb.icon}
             linkClassName={BREADCRUMB_LINK_CLASSES}
             siblings={crumb.siblings}
-        />
+        >
+            {crumb.variantSwitcher ? (
+                <SpacesDropdownMenuItems
+                    slimSpaces={crumb.variantSwitcher.slimSpaces}
+                    curPath={crumb.variantSwitcher.curPath}
+                />
+            ) : undefined}
+        </BreadcrumbItemDropdown>
     );
 }
 
@@ -296,10 +320,12 @@ function findFirstSection(node: SectionNode): SiteSection | null {
 /**
  * Resolve a section-tree node to a navigable URL. Sections use their own URL; section groups (which
  * have none of their own) fall back to their first section, so they stay navigable in a dropdown.
+ * The URL resolves to the site space matching the current variant (same logic as the section tabs),
+ * so switching sections keeps the reader on their current variant.
  */
 function getSectionNodeURL(context: GitBookSiteContext, node: SectionNode): string | undefined {
     const section = findFirstSection(node);
-    return section ? getSectionURL(context, section) : undefined;
+    return section ? findBestTargetURL(context, section) : undefined;
 }
 
 /** Collect the ids of every section and section group in a (visible) section tree. */
@@ -333,6 +359,11 @@ function getPageSiblings(
             continue;
         }
         if (page.hidden && page.id !== activeId) {
+            continue;
+        }
+        // A group whose subtree has no document resolves to no page — the sidebar renders it as a
+        // non-clickable label, so don't offer it as a navigable sibling (its path would 404).
+        if (page.type === 'group' && page.id !== activeId && !resolveFirstDocument([page], [])) {
             continue;
         }
         result.push({
