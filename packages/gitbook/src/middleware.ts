@@ -21,12 +21,7 @@ import {
     normalizeRequestURL,
     throwIfDataError,
 } from '@/lib/data';
-import {
-    GITBOOK_ALLOW_CUSTOMIZATION_OVERRIDE,
-    GITBOOK_OAUTH_SERVER_URL,
-    isGitBookAssetsHostURL,
-    isGitBookHostURL,
-} from '@/lib/env';
+import { GITBOOK_OAUTH_SERVER_URL, isGitBookAssetsHostURL, isGitBookHostURL } from '@/lib/env';
 import { getImageResizingContextId } from '@/lib/images';
 import { MiddlewareHeaders } from '@/lib/middleware';
 import {
@@ -404,7 +399,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         // force customization — e.g. ai.mode — via the query string or a forged cookie.
         // Preview/test deployments opt in via GITBOOK_ALLOW_CUSTOMIZATION_OVERRIDE to drive it in e2e.
         const allowCustomizationOverride =
-            siteURLData.preview || GITBOOK_ALLOW_CUSTOMIZATION_OVERRIDE;
+            siteURLData.preview || process.env.GITBOOK_ALLOW_CUSTOMIZATION_OVERRIDE === 'true';
         const customizationCookie = request.cookies.get(MiddlewareHeaders.Customization);
         const customization =
             siteRequestURL.searchParams.get('customization') ??
