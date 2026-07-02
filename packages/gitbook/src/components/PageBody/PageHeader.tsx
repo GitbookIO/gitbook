@@ -47,17 +47,15 @@ export async function PageHeader(props: {
     const currentSiteSpace = variantSpaces.length > 1 ? context.siteSpace : null;
     const contextCrumbs: BreadcrumbContextCrumb[] = [];
     if (currentSection) {
-        // Walk from the root down to the current section, adding a crumb for each enclosing section
-        // group (non-navigable) and then the section itself. Prefer the visibility-filtered list for
-        // the sibling dropdowns, but fall back to the full list if the current section was filtered
-        // out of it (e.g. all its variants are hidden) so its crumb still renders.
-        const visibleSections = context.visibleSections ?? context.sections;
-        let chain = visibleSections
-            ? findSectionChain(visibleSections.list, currentSection.id)
+        // Walk the full section tree so the current section (and its enclosing groups) always shows
+        // as a crumb, even when it's hidden in the site structure. Only *visible* sections/groups
+        // are offered as siblings to switch to, though.
+        const chain = context.sections
+            ? findSectionChain(context.sections.list, currentSection.id)
             : [];
-        if (chain.length === 0 && context.sections && context.sections !== visibleSections) {
-            chain = findSectionChain(context.sections.list, currentSection.id);
-        }
+        const visibleSectionIds = context.visibleSections
+            ? collectSectionNodeIds(context.visibleSections.list)
+            : null;
         for (const { node, siblings } of chain) {
             contextCrumbs.push({
                 key: `section-${node.id}`,
@@ -66,6 +64,8 @@ export async function PageHeader(props: {
                 label: getLocalizedTitle(node, context.locale),
                 icon: node.icon,
                 siblings: siblings
+                    // Don't offer hidden sections/groups as switch targets.
+                    .filter((sibling) => !visibleSectionIds || visibleSectionIds.has(sibling.id))
                     .map((sibling) => {
                         const href = getSectionNodeURL(context, sibling);
                         // Keep siblings whose URL is "" (the site's first page); only drop the ones
@@ -300,6 +300,21 @@ function findFirstSection(node: SectionNode): SiteSection | null {
 function getSectionNodeURL(context: GitBookSiteContext, node: SectionNode): string | undefined {
     const section = findFirstSection(node);
     return section ? getSectionURL(context, section) : undefined;
+}
+
+/** Collect the ids of every section and section group in a (visible) section tree. */
+function collectSectionNodeIds(list: SectionNode[]): Set<string> {
+    const ids = new Set<string>();
+    const walk = (nodes: SectionNode[]) => {
+        for (const node of nodes) {
+            ids.add(node.id);
+            if (node.object === 'site-section-group') {
+                walk(node.children);
+            }
+        }
+    };
+    walk(list);
+    return ids;
 }
 
 /**
