@@ -41,7 +41,13 @@ export async function PageHeader(props: {
     // Surface where the page lives in the site at the start of the breadcrumbs: the section (with
     // its enclosing section groups) and the variant. Each crumb also carries its siblings, so
     // hovering it reveals a dropdown to switch to them.
-    const currentSection = context.sections?.current ?? null;
+    // Only surface section crumbs when the site actually has more than one section to switch between
+    // (mirroring the section tabs). A single-space site has one section named after the site, which
+    // is not a meaningful breadcrumb.
+    const hasMultipleSections = Boolean(
+        context.visibleSections && context.visibleSections.list.length > 1
+    );
+    const currentSection = hasMultipleSections ? (context.sections?.current ?? null) : null;
     // Variants to offer as a crumb: only the "generic" variants (versions, etc.). Language variants
     // are excluded — they belong to the dedicated language picker — using the same split it uses.
     // Only surface the variant crumb when there's more than one to switch between.
