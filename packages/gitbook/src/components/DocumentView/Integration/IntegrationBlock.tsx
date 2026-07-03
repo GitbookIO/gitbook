@@ -105,7 +105,7 @@ export async function IntegrationBlock(props: BlockProps<DocumentBlockIntegratio
                     {...contentKitProps}
                     canAccessVisitorClaims={canAccessVisitorClaims}
                     page={page}
-                    spaceBasePath={context.contentContext.linker.spaceBasePath}
+                    siteBasePath={context.contentContext.linker.siteBasePath}
                 >
                     <ContentKitOutput output={initialOutput} context={contentKitServerContext} />
                 </ContentKitWithClientContext>

@@ -19,11 +19,11 @@ export function ContentKitWithClientContext<RenderContext>(
         canAccessVisitorClaims: boolean;
         /** Current page to inject into the webframe, or `null` when unknown. */
         page: WebframePageContext | null;
-        /** Base path of the current space, used to resolve webframe navigation requests. */
-        spaceBasePath: string;
+        /** Base path of the current site, used to resolve webframe navigation requests. */
+        siteBasePath: string;
     }
 ) {
-    const { canAccessVisitorClaims, page, spaceBasePath, ...contentKitProps } = props;
+    const { canAccessVisitorClaims, page, siteBasePath, ...contentKitProps } = props;
 
     const router = useRouter();
     const getAdaptiveVisitorClaims = useAdaptiveVisitor();
@@ -38,13 +38,13 @@ export function ContentKitWithClientContext<RenderContext>(
                 : undefined,
             getPageContext: page ? () => ({ page }) : undefined,
             navigate: ({ path, anchor }) => {
-                // Resolve the requested page path within the current space so a webframe can only
-                // navigate within the site, then soft-navigate client-side.
-                const target = joinPath(spaceBasePath, path) + (anchor ? `#${anchor}` : '');
+                // Resolve the requested path relative to the site root so a webframe can navigate
+                // to any section or space within the site (and nowhere outside it).
+                const target = joinPath(siteBasePath, path) + (anchor ? `#${anchor}` : '');
                 router.push(target);
             },
         }),
-        [canAccessVisitorClaims, visitorClaims, page, spaceBasePath, router]
+        [canAccessVisitorClaims, visitorClaims, page, siteBasePath, router]
     );
 
     return <ContentKit {...contentKitProps} clientContext={clientContext} />;
@@ -52,7 +52,7 @@ export function ContentKitWithClientContext<RenderContext>(
 
 /**
  * Join a base path and a relative path, mirroring the server-side linker so navigation stays
- * within the current space. Kept inline to remain client-safe.
+ * within the current site. Kept inline to remain client-safe.
  */
 function joinPath(prefix: string, path: string): string {
     const prefixPath = prefix.endsWith('/') ? prefix : `${prefix}/`;
