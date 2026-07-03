@@ -625,9 +625,13 @@ const testCases: TestsCase[] = [
                 url: '',
                 screenshot: false,
                 run: async (page) => {
-                    const sectionGroupDropdown = await page.getByText('Test Section Group 1');
+                    // Scope to the section-group switcher button — the breadcrumbs also render the
+                    // section group name, so a plain text lookup would be ambiguous.
+                    const sectionGroupDropdown = page.getByRole('button', {
+                        name: 'Test Section Group 1',
+                    });
                     await sectionGroupDropdown.hover();
-                    await page.getByText('Section B').click();
+                    await page.getByRole('link', { name: /Section B/ }).click();
                     await page.waitForURL((url) => url.pathname.includes('/sections/sections-4'));
                 },
             },
