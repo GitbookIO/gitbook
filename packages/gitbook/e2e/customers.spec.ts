@@ -214,7 +214,7 @@ const testCases: TestsCase[] = [
     {
         name: 'unsloth.ai/docs',
         contentBaseURL: 'https://unsloth.ai',
-        tests: [{ name: 'Home', url: '/docs' }],
+        tests: [{ name: 'Home', url: '/docs', run: waitForCookiesDialog }],
     },
     {
         name: 'mariadb.com/docs',
@@ -234,7 +234,7 @@ const testCases: TestsCase[] = [
     {
         name: 'library.zoom.com',
         contentBaseURL: 'https://library.zoom.com',
-        tests: [{ name: 'Home', url: '/' }],
+        tests: [{ name: 'Home', url: '/', run: waitForCookiesDialog }],
     },
     {
         name: 'help.verkada.com',
@@ -269,7 +269,7 @@ const testCases: TestsCase[] = [
     {
         name: 'developers.oxylabs.io',
         contentBaseURL: 'https://developers.oxylabs.io',
-        tests: [{ name: 'Home', url: '/' }],
+        tests: [{ name: 'Home', url: '/', run: waitForCookiesDialog }],
     },
     {
         name: 'docs.parallels.com/landing',
@@ -324,12 +324,12 @@ const testCases: TestsCase[] = [
     {
         name: 'docs.nats.io',
         contentBaseURL: 'https://docs.nats.io',
-        tests: [{ name: 'Home', url: '/' }],
+        tests: [{ name: 'Home', url: '/', run: waitForCookiesDialog }],
     },
     {
         name: 'help.glpi-project.org',
         contentBaseURL: 'https://help.glpi-project.org',
-        tests: [{ name: 'Home', url: '/' }],
+        tests: [{ name: 'Home', url: '/', run: waitForCookiesDialog }],
     },
     {
         name: 'docs.waydro.id',
@@ -349,7 +349,7 @@ const testCases: TestsCase[] = [
     {
         name: 'docs.pinot.apache.org',
         contentBaseURL: 'https://docs.pinot.apache.org',
-        tests: [{ name: 'Home', url: '/' }],
+        tests: [{ name: 'Home', url: '/', run: waitForCookiesDialog }],
     },
     {
         name: 'docs.devolutions.net',
@@ -369,7 +369,7 @@ const testCases: TestsCase[] = [
     {
         name: 'help.researchgate.net',
         contentBaseURL: 'https://help.researchgate.net',
-        tests: [{ name: 'Home', url: '/' }],
+        tests: [{ name: 'Home', url: '/', run: waitForCookiesDialog }],
     },
     {
         name: 'docs.verifone.com',
@@ -395,10 +395,11 @@ const testCases: TestsCase[] = [
         name: 'gitbook.com/docs',
         contentBaseURL: 'https://gitbook.com',
         tests: [
-            { name: 'Home', url: '/docs' },
+            { name: 'Home', url: '/docs', run: waitForCookiesDialog },
             {
                 name: 'OpenAPI',
                 url: '/docs/developers/gitbook-api/api-reference/docs-sites/site-ai-ask',
+                run: waitForCookiesDialog,
             },
         ],
     },
@@ -440,7 +441,7 @@ const testCases: TestsCase[] = [
     {
         name: 'wiki.polymaker.com',
         contentBaseURL: 'https://wiki.polymaker.com',
-        tests: [{ name: 'Home', url: '/' }],
+        tests: [{ name: 'Home', url: '/', run: waitForCookiesDialog }],
     },
     {
         name: 'docs.ducks-services.com',
@@ -460,7 +461,7 @@ const testCases: TestsCase[] = [
     {
         name: 'help.openloyalty.io',
         contentBaseURL: 'https://help.openloyalty.io',
-        tests: [{ name: 'Home', url: '/' }],
+        tests: [{ name: 'Home', url: '/', run: waitForCookiesDialog }],
     },
     {
         name: 'retrozia.gitbook.io/retrozia',
@@ -480,7 +481,7 @@ const testCases: TestsCase[] = [
     {
         name: 'legal.jagex.com',
         contentBaseURL: 'https://legal.jagex.com',
-        tests: [{ name: 'Home', url: '/' }],
+        tests: [{ name: 'Home', url: '/', run: waitForCookiesDialog }],
     },
     {
         name: 'manual.edgetx.org',
@@ -600,7 +601,7 @@ const testCases: TestsCase[] = [
     {
         name: 'doc.anytype.io/anytype-docs',
         contentBaseURL: 'https://doc.anytype.io',
-        tests: [{ name: 'Home', url: '/anytype-docs' }],
+        tests: [{ name: 'Home', url: '/anytype-docs', run: waitForCookiesDialog }],
     },
     {
         name: 'help.blotato.com',
