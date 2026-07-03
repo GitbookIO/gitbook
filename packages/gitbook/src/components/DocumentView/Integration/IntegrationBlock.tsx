@@ -72,7 +72,11 @@ export async function IntegrationBlock(props: BlockProps<DocumentBlockIntegratio
 
     const containsWebframe = integrationBlockContainsWebframe(initialOutput);
     const canAccessVisitorClaims = initialOutput.canAccessVisitorClaims === true;
-    const page = getWebframePageContext(context.contentContext);
+    const canAccessPageContext =
+        // @ts-expect-error remove when @gitbook/api is updated with canAccessPageContext
+        initialOutput.canAccessPageContext === true;
+    // The current page is only exposed to webframes when the integration declares the scope for it.
+    const page = canAccessPageContext ? getWebframePageContext(context.contentContext) : null;
 
     // Only use the client-context wrapper when a webframe can actually consume client-only context.
     const useClientContext = containsWebframe && (page !== null || canAccessVisitorClaims);
