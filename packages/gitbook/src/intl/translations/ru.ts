@@ -46,6 +46,7 @@ export const ru: TranslationLanguage = {
     on_this_page: 'На этой странице',
     next_page: 'Следующая',
     previous_page: 'Предыдущая',
+    toc_back_to_space: 'Назад к ${1}',
     page_last_modified: 'Последнее обновление ${1}',
     was_this_helpful: 'Это было полезно?',
     was_this_helpful_positive: 'Да, было!',

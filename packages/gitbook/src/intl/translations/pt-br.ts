@@ -46,6 +46,7 @@ export const pt_br: TranslationLanguage = {
     on_this_page: 'Nesta página',
     next_page: 'Próximo',
     previous_page: 'Anterior',
+    toc_back_to_space: 'Voltar para ${1}',
     page_last_modified: 'Atualizado ${1}',
     was_this_helpful: 'Isto foi útil?',
     was_this_helpful_positive: 'Sim, foi!',

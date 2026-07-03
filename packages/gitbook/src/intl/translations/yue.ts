@@ -43,6 +43,7 @@ export const yue: TranslationLanguage = {
     on_this_page: '本頁內容',
     next_page: '下一頁',
     previous_page: '上一頁',
+    toc_back_to_space: '返去${1}',
     page_last_modified: '最後更新 ${1}',
     was_this_helpful: '呢個有冇幫助？',
     was_this_helpful_positive: '有，幫到手！',

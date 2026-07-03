@@ -44,6 +44,7 @@ export const vi: TranslationLanguage = {
     on_this_page: 'Trên trang này',
     next_page: 'Tiếp theo',
     previous_page: 'Trước',
+    toc_back_to_space: 'Quay lại ${1}',
     page_last_modified: 'Cập nhật lần cuối ${1}',
     was_this_helpful: 'Nội dung này có hữu ích không?',
     was_this_helpful_positive: 'Có, hữu ích!',

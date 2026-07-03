@@ -1,7 +1,11 @@
 'use client';
 
 import { joinPath } from '@/lib/paths';
-import { useCurrentPageMetadata, useCurrentPagePath } from '../hooks';
+import {
+    markSpaceNavigationFromPickerOnClick,
+    useCurrentPageMetadata,
+    useCurrentPagePath,
+} from '../hooks';
 import { DropdownMenuItem } from '../primitives/DropdownMenu';
 
 interface VariantSpace {
@@ -60,7 +64,18 @@ export function SpacesDropdownMenuItem(props: {
     const variantHref = useVariantSpaceHref(variantSpace, currentSpacePath, active);
 
     return (
-        <DropdownMenuItem key={variantSpace.id} href={variantHref} active={active}>
+        <DropdownMenuItem
+            key={variantSpace.id}
+            href={variantHref}
+            active={active}
+            onClick={(event) => {
+                // Switching variant/translation through the picker shouldn't offer to
+                // navigate "back" to the space we're leaving.
+                if (!active) {
+                    markSpaceNavigationFromPickerOnClick(event);
+                }
+            }}
+        >
             {variantSpace.title}
         </DropdownMenuItem>
     );

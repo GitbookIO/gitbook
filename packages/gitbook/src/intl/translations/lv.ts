@@ -44,6 +44,7 @@ export const lv: TranslationLanguage = {
     on_this_page: 'Šajā lapā',
     next_page: 'Nākamā',
     previous_page: 'Iepriekšējā',
+    toc_back_to_space: 'Atpakaļ uz ${1}',
     page_last_modified: 'Pēdoreiz atjaunināts ${1}',
     was_this_helpful: 'Vai tas bija noderīgi?',
     was_this_helpful_positive: 'Jā, bija!',

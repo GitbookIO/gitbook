@@ -44,6 +44,7 @@ export const hi: TranslationLanguage = {
     on_this_page: 'इस पृष्ठ पर',
     next_page: 'अगला',
     previous_page: 'पिछला',
+    toc_back_to_space: '${1} पर वापस जाएँ',
     page_last_modified: 'अंतिम अपडेट ${1}',
     was_this_helpful: 'क्या यह उपयोगी था?',
     was_this_helpful_positive: 'हां, था!',

@@ -45,6 +45,7 @@ export const no: TranslationLanguage = {
     on_this_page: 'På denne siden',
     next_page: 'Neste',
     previous_page: 'Forrige',
+    toc_back_to_space: 'Tilbake til ${1}',
     page_last_modified: 'Sist oppdatert ${1}',
     was_this_helpful: 'Var dette nyttig?',
     was_this_helpful_positive: 'Ja, det var det!',

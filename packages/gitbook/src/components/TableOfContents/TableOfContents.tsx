@@ -2,9 +2,11 @@ import type { GitBookSiteContext } from '@/lib/context';
 import { SiteInsightsTrademarkPlacement } from '@gitbook/api';
 import type React from 'react';
 
+import { getSiteStructureTitle } from '@/lib/sites';
 import { tcls } from '@/lib/tailwind';
 import { ScrollContainer } from '../primitives/ScrollContainer';
 import { SideSheet } from '../primitives/SideSheet';
+import { BackToSpaceButton } from './BackToSpaceButton';
 import { PagesList } from './PagesList';
 import { TableOfContentsScript } from './TableOfContentsScript';
 import { Trademark } from './Trademark';
@@ -119,6 +121,12 @@ export async function TableOfContents(props: {
                         '[html.sidebar-filled.circular-corners_&]:layout-wide:rounded-4xl'
                     )}
                 >
+                    <BackToSpaceButton
+                        spaceId={context.space.id}
+                        // Use the section/variant title as shown in the site navigation,
+                        // falling back to the site title for the default space.
+                        spaceTitle={getSiteStructureTitle(context) || context.site.title}
+                    />
                     {innerHeader}
                     <ScrollContainer
                         data-testid="toc-scroll-container"
