@@ -127,6 +127,19 @@ export function ElementWebframe(props: ContentKitClientElementProps<ContentKitWe
                             })(),
                         }));
                         break;
+                    case '@webframe.navigate':
+                        // Let the host navigate to another page. The host resolves the path within
+                        // the current content and gates the destination.
+                        if (typeof message.action.path === 'string') {
+                            renderer.clientContext?.navigate?.({
+                                path: message.action.path,
+                                anchor:
+                                    typeof message.action.anchor === 'string'
+                                        ? message.action.anchor
+                                        : undefined,
+                            });
+                        }
+                        break;
                     default:
                         renderer.update({
                             action: message.action,

@@ -36,6 +36,13 @@ export type ContentKitClientContextData = {
         | null
         | undefined
         | Promise<Record<string, unknown> | null | undefined>;
+
+    /**
+     * Navigate the host page to another page, in response to a webframe `@webframe.navigate`
+     * action. The host is responsible for resolving `path` within the current content and for
+     * restricting navigation to trusted destinations.
+     */
+    navigate?: (target: { path: string; anchor?: string }) => void;
 };
 
 export interface ContentKitClientContextType {
