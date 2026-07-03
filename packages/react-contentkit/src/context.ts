@@ -18,7 +18,20 @@ export type ContentKitRenderUpdate = Partial<
 >;
 
 export type ContentKitClientContextData = {
+    /**
+     * Client-only visitor claims, merged into the webframe state.
+     * Gated by the integration's visitor-claims scope.
+     */
     getVisitorContext?: () =>
+        | Record<string, unknown>
+        | null
+        | undefined
+        | Promise<Record<string, unknown> | null | undefined>;
+
+    /**
+     * Client-only current-page context, merged into the webframe state.
+     */
+    getPageContext?: () =>
         | Record<string, unknown>
         | null
         | undefined
