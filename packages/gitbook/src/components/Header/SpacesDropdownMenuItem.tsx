@@ -2,7 +2,7 @@
 
 import { joinPath } from '@/lib/paths';
 import {
-    markSpaceNavigationFromPicker,
+    markSpaceNavigationFromPickerOnClick,
     useCurrentPageMetadata,
     useCurrentPagePath,
 } from '../hooks';
@@ -68,11 +68,11 @@ export function SpacesDropdownMenuItem(props: {
             key={variantSpace.id}
             href={variantHref}
             active={active}
-            onSelect={() => {
+            onClick={(event) => {
                 // Switching variant/translation through the picker shouldn't offer to
                 // navigate "back" to the space we're leaving.
                 if (!active) {
-                    markSpaceNavigationFromPicker();
+                    markSpaceNavigationFromPickerOnClick(event);
                 }
             }}
         >

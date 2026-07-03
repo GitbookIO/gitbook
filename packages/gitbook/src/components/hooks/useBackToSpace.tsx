@@ -31,20 +31,38 @@ const FROM_PICKER_KEY = 'gitbook-space-navigation:from-picker';
  * picker (spaces dropdown, translations dropdown or section switcher).
  *
  * Such navigations are deliberate moves within the site's own structure and should
- * not surface a "Back to space" shortcut. Called synchronously when a picker link
- * is activated, so the flag is set before the destination page reads it.
+ * not surface a "Back to space" shortcut. Set synchronously when a picker link is
+ * activated, so the flag is in place before the destination page reads it.
  */
-export function markSpaceNavigationFromPicker() {
+function markSpaceNavigationFromPicker() {
     setSessionStorageItem(FROM_PICKER_KEY, true);
 }
 
 /**
- * Event handler variant of {@link markSpaceNavigationFromPicker} for use with
- * `onClickCapture` on a picker container. It only marks the navigation when an
- * actual link (not the currently active one) is being followed, so that clicking
- * a group toggle or the current section doesn't leave a stale flag behind.
+ * Whether a click opens its link in a new tab or window instead of navigating the
+ * current tab (a modifier key or a non-primary button). These must not mark a picker
+ * navigation: the current tab stays put, so the flag would otherwise linger and be
+ * mis-attributed to a later, unrelated navigation.
+ */
+function opensInNewTab(event: React.MouseEvent): boolean {
+    return event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0;
+}
+
+/**
+ * Click handler for the section/variant/translation pickers that marks the upcoming
+ * navigation as picker-initiated, so arriving in the target space doesn't surface a
+ * "Back to space" shortcut.
+ *
+ * Attach it with `onClickCapture` on a picker container (section list/tabs) or as the
+ * `onClick` of a picker menu item (spaces dropdown). It intentionally does nothing for
+ * clicks that leave the current tab unchanged: re-selecting the already-active item,
+ * or opening the link in a new tab/window.
  */
 export function markSpaceNavigationFromPickerOnClick(event: React.MouseEvent<HTMLElement>) {
+    if (opensInNewTab(event)) {
+        return;
+    }
+
     const target = event.target;
     if (!(target instanceof Element)) {
         return;
@@ -55,16 +73,17 @@ export function markSpaceNavigationFromPickerOnClick(event: React.MouseEvent<HTM
         return;
     }
 
-    // Skip the currently active item: re-selecting it doesn't navigate, so it
-    // shouldn't leave a "from picker" flag behind for a later navigation to pick up.
-    // The sidebar section list marks the active link with `aria-current`, while the
-    // header section tabs (rendered via the Button primitive) use `aria-pressed`.
-    const isActiveLink =
+    // Skip the currently active item: re-selecting it doesn't navigate. The sidebar
+    // section list marks the active link with `aria-current`, while the header section
+    // tabs (rendered via the Button primitive) use `aria-pressed`.
+    if (
         link.getAttribute('aria-current') === 'page' ||
-        link.getAttribute('aria-pressed') === 'true';
-    if (!isActiveLink) {
-        markSpaceNavigationFromPicker();
+        link.getAttribute('aria-pressed') === 'true'
+    ) {
+        return;
     }
+
+    markSpaceNavigationFromPicker();
 }
 
 /**
