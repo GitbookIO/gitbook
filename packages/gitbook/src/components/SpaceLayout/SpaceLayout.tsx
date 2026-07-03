@@ -1,14 +1,11 @@
 import type { GitBookSiteContext } from '@/lib/context';
-import {
-    CustomizationAIMode,
-    CustomizationHeaderPreset,
-    CustomizationSearchStyle,
-} from '@gitbook/api';
+import { CustomizationHeaderPreset, CustomizationSearchStyle } from '@gitbook/api';
 import type React from 'react';
 
 import { Footer } from '@/components/Footer';
 import { Header, HeaderLogo } from '@/components/Header';
 import { TableOfContents } from '@/components/TableOfContents';
+import { isAIChatEnabled } from '@/components/utils/isAIChatEnabled';
 import type { VisitorAuthClaims } from '@/lib/adaptive';
 import { GITBOOK_APP_URL } from '@/lib/env';
 import { tcls } from '@/lib/tailwind';
@@ -128,7 +125,7 @@ export function SpaceLayout(props: SpaceLayoutProps) {
             <Announcement context={context} />
             <Header withTopHeader={withTopHeader} variants={variants} context={context} />
             <NavigationLoader />
-            {customization.ai?.mode === CustomizationAIMode.Assistant ? (
+            {isAIChatEnabled(customization.ai?.mode) ? (
                 <>
                     <AIChat />
                     <AskAITextSelection />
