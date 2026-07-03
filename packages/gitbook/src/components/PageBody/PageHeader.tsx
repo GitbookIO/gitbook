@@ -136,7 +136,7 @@ export async function PageHeader(props: {
             <div
                 className={tcls(
                     'float-right ml-4 flex gap-2',
-                    showBreadcrumbs ? '-my-0.5' : '-mt-3 xs:mt-2'
+                    showBreadcrumbs ? '-mb-1 -mt-1.5' : '-mt-3 xs:mt-2'
                 )}
             >
                 {hasPageActions ? (
@@ -156,7 +156,12 @@ export async function PageHeader(props: {
             </div>
 
             {showBreadcrumbs && (
-                <nav aria-label="Breadcrumb" className="text-tint text-xs leading-snug">
+                // Hide the breadcrumbs on wide pages that have no table of contents: there the
+                // content spans the full width with no navigation column, so the crumbs sit stranded.
+                <nav
+                    aria-label="Breadcrumb"
+                    className="layout-wide:page-no-toc:hidden text-tint text-xs leading-relaxed"
+                >
                     <ol className="inline">
                         {contextCrumbs.map((crumb, index) => (
                             <li key={crumb.key} className="inline">
