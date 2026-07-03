@@ -374,7 +374,7 @@ const testCases: TestsCase[] = [
     {
         name: 'docs.verifone.com',
         contentBaseURL: 'https://docs.verifone.com',
-        tests: [{ name: 'Home', url: '/' }],
+        tests: [{ name: 'Home', url: '/', run: waitForCookiesDialog }],
     },
     {
         name: 'docs.roboflow.com',
@@ -501,7 +501,7 @@ const testCases: TestsCase[] = [
     {
         name: 'docs.ndi.video/all',
         contentBaseURL: 'https://docs.ndi.video',
-        tests: [{ name: 'Home', url: '/all' }],
+        tests: [{ name: 'Home', url: '/all', run: waitForCookiesDialog }],
     },
     {
         name: 'docs.sevenpens.com/drawtab',
@@ -516,7 +516,7 @@ const testCases: TestsCase[] = [
     {
         name: 'docs.holybro.com',
         contentBaseURL: 'https://docs.holybro.com',
-        tests: [{ name: 'Home', url: '/' }],
+        tests: [{ name: 'Home', url: '/', run: waitForCookiesDialog }],
     },
     {
         name: 'help.tokenpocket.pro/en',
@@ -566,7 +566,7 @@ const testCases: TestsCase[] = [
     {
         name: 'docs.patchmypc.com',
         contentBaseURL: 'https://docs.patchmypc.com',
-        tests: [{ name: 'Home', url: '/' }],
+        tests: [{ name: 'Home', url: '/', run: waitForCookiesDialog }],
     },
     {
         name: 'guide.cryosparc.com',
