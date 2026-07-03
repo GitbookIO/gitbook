@@ -263,7 +263,11 @@ export function runTestCases(testCases: TestsCase[]) {
                         }
                     });
 
-                    const response = await page.goto(url);
+                    // Wait only for `domcontentloaded` rather than the default `load`: these
+                    // are real customer sites whose third-party subresources can hang and
+                    // never fire `load`, aborting the navigation. Argos stabilization (run in
+                    // `beforeScreenshot`) still waits for images/fonts before capturing.
+                    const response = await page.goto(url, { waitUntil: 'domcontentloaded' });
                     if (testEntry.run) {
                         await testEntry.run(page, response);
                     }
