@@ -201,7 +201,7 @@
         "zustand": "^5.0.3",
       },
       "devDependencies": {
-        "@argos-ci/playwright": "^7.1.3",
+        "@argos-ci/playwright": "^7.2.0",
         "@playwright/test": "^1.61.1",
         "@scalar/api-client-react": "catalog:",
         "@tailwindcss/postcss": "^4.1.11",
@@ -394,11 +394,11 @@
 
     "@argos-ci/api-client": ["@argos-ci/api-client@0.24.0", "", { "dependencies": { "debug": "^4.4.3", "openapi-fetch": "^0.17.0", "p-retry": "^8.0.0" } }, "sha512-pWEkmqVyD2CbGGG9KsTQgufWIYRzMsZVWyLY4d3lI2pUbuTlv0W0pvvmJybmKkIk3Tcn1T5vMBjT2DYuUiZbqQ=="],
 
-    "@argos-ci/browser": ["@argos-ci/browser@6.2.0", "", {}, "sha512-AZUI5mDQ+XWa29Bcj23bW6UbFwMLfwItmR4QClgcjt/5auW57fwnRN7p0enOetx+v5DNz4jG4ZhgLFM/1P4kFQ=="],
+    "@argos-ci/browser": ["@argos-ci/browser@6.3.0", "", {}, "sha512-quTww/Yhm2jv+Y6q6dD4xEpm9Bb/SrZNFJaXgncAnCvW8jNnCrmDE2+8zAuGUh41Wkq1JQNDYKlBCO/RpY6A8Q=="],
 
     "@argos-ci/core": ["@argos-ci/core@6.4.0", "", { "dependencies": { "@argos-ci/api-client": "0.24.0", "@argos-ci/util": "4.0.0", "convict": "^6.2.5", "debug": "^4.4.3", "fast-glob": "^3.3.3", "mime-types": "^3.0.2", "p-retry": "^8.0.0", "sharp": "^0.35.2", "tmp": "^0.2.7" } }, "sha512-YUySBUbjHpI8GZKe96n4VzgPPXl90hjw/GCHLQ3U6xbbIEZczCBCHeHB/MDjyXCHyk+9T7FUJSE0ddWnpDRI8Q=="],
 
-    "@argos-ci/playwright": ["@argos-ci/playwright@7.1.3", "", { "dependencies": { "@argos-ci/browser": "6.2.0", "@argos-ci/core": "6.4.0", "@argos-ci/util": "4.0.0", "chalk": "^5.6.2", "debug": "^4.4.3" } }, "sha512-md4vzp/2l/TcVVWemt0umkYmw9sqOsJnID0JZf4Bka9yArQeaARVRRS/5S6i6ibCqfG2P29WMCH/eWo3mJsU4w=="],
+    "@argos-ci/playwright": ["@argos-ci/playwright@7.2.0", "", { "dependencies": { "@argos-ci/browser": "6.3.0", "@argos-ci/core": "6.4.0", "@argos-ci/util": "4.0.0", "chalk": "^5.6.2", "debug": "^4.4.3" } }, "sha512-YkZswuc+hZLC8sUUp6QPzZJSfZsxnbt+sfyZr5DWSHuz5g2XRxJ8oEsXJwFraDMYku5jwfAtqXvza1J3WUo6qA=="],
 
     "@argos-ci/util": ["@argos-ci/util@4.0.0", "", {}, "sha512-2yrJr81OVpa2TkvSjzGZlGv6SVqZcxF62AVk6M79aZ7nXkwWFg3tjA8awbFwn2mODI67gkP5FarAD29bzx3P3w=="],
 
