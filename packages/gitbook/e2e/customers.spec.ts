@@ -411,7 +411,7 @@ const testCases: TestsCase[] = [
     {
         name: 'faq.wanttopay.net/wanttopay-app',
         contentBaseURL: 'https://faq.wanttopay.net',
-        tests: [{ name: 'Home', url: '/wanttopay-app' }],
+        tests: [{ name: 'Home', url: '/wanttopay-app', run: waitForCookiesDialog }],
     },
     {
         name: 'guide.prismlive.com',
@@ -476,7 +476,7 @@ const testCases: TestsCase[] = [
     {
         name: 'developerdocs.instructure.com',
         contentBaseURL: 'https://developerdocs.instructure.com',
-        tests: [{ name: 'Home', url: '/' }],
+        tests: [{ name: 'Home', url: '/', run: waitForCookiesDialog }],
     },
     {
         name: 'legal.jagex.com',
@@ -576,7 +576,7 @@ const testCases: TestsCase[] = [
     {
         name: 'guides.stellaraio.com/stellar',
         contentBaseURL: 'https://guides.stellaraio.com',
-        tests: [{ name: 'Home', url: '/stellar' }],
+        tests: [{ name: 'Home', url: '/stellar', run: waitForCookiesDialog }],
     },
     {
         name: 'docs.iyzico.com',
