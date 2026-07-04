@@ -264,7 +264,7 @@ const testCases: TestsCase[] = [
     {
         name: 'docs.maestro.dev',
         contentBaseURL: 'https://docs.maestro.dev',
-        tests: [{ name: 'Home', url: '/' }],
+        tests: [{ name: 'Home', url: '/', run: waitForCookiesDialog }],
     },
     {
         name: 'developers.oxylabs.io',
@@ -541,7 +541,7 @@ const testCases: TestsCase[] = [
     {
         name: 'docs.vectra.ai',
         contentBaseURL: 'https://docs.vectra.ai',
-        tests: [{ name: 'Home', url: '/' }],
+        tests: [{ name: 'Home', url: '/', run: waitForCookiesDialog }],
     },
     {
         name: 'docs.cipp.app',
