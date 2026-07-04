@@ -617,8 +617,14 @@ const testCases: TestsCase[] = [
                 url: '',
                 screenshot: false,
                 run: async (page) => {
-                    const sectionGroupDropdown = await page.getByText('Test Section Group 1');
-                    await sectionGroupDropdown.hover();
+                    const trigger = page.getByRole('button', { name: 'Test Section Group 1' });
+                    // Radix NavigationMenu opens the dropdown on a `pointermove`. A single
+                    // synthetic hover can land before hydration and be lost, so re-hover
+                    // until the dropdown content actually appears.
+                    await expect(async () => {
+                        await trigger.hover();
+                        await expect(page.getByText('Section B')).toBeVisible({ timeout: 1000 });
+                    }).toPass({ timeout: 15000 });
                     await page.getByText('Section B').click();
                     await page.waitForURL((url) => url.pathname.includes('/sections/sections-4'));
                 },
