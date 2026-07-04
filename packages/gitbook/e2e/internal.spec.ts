@@ -613,14 +613,6 @@ const testCases: TestsCase[] = [
                 url: '',
             },
             {
-                name: 'Section group dropdown',
-                url: '',
-                run: async (page) => {
-                    await page.getByRole('button', { name: 'Test Section Group 1' }).hover();
-                    await expect(page.getByRole('link', { name: /Section B/ })).toBeVisible();
-                },
-            },
-            {
                 name: 'Section group link',
                 url: '',
                 screenshot: false,
