@@ -180,7 +180,7 @@ const testCases: TestsCase[] = [
     {
         name: 'docs.soniclabs.com',
         contentBaseURL: 'https://docs.soniclabs.com',
-        tests: [{ name: 'Home', url: '/' }],
+        tests: [{ name: 'Home', url: '/', run: waitForCookiesDialog }],
     },
     {
         name: 'docs.thousandeyes.com',
@@ -274,12 +274,12 @@ const testCases: TestsCase[] = [
     {
         name: 'docs.parallels.com/landing',
         contentBaseURL: 'https://docs.parallels.com',
-        tests: [{ name: 'Home', url: '/landing' }],
+        tests: [{ name: 'Home', url: '/landing', run: waitForCookiesDialog }],
     },
     {
         name: 'help.impact.com',
         contentBaseURL: 'https://help.impact.com',
-        tests: [{ name: 'Home', url: '/' }],
+        tests: [{ name: 'Home', url: '/', run: waitForCookiesDialog }],
     },
     {
         name: 'docs.9proxy.com',
@@ -299,7 +299,7 @@ const testCases: TestsCase[] = [
     {
         name: 'help.aikido.dev',
         contentBaseURL: 'https://help.aikido.dev',
-        tests: [{ name: 'Home', url: '/' }],
+        tests: [{ name: 'Home', url: '/', run: waitForCookiesDialog }],
     },
     {
         name: 'doc.demarche.numerique.gouv.fr',
