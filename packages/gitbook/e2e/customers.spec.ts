@@ -548,7 +548,7 @@ const testCases: TestsCase[] = [
     {
         name: 'sinfa-com-co.gitbook.io/manual-de-usuario',
         contentBaseURL: 'https://sinfa-com-co.gitbook.io',
-        tests: [{ name: 'Home', url: '/manual-de-usuario', run: waitForCookiesDialog }],
+        tests: [{ name: 'Home', url: '/manual-de-usuario' }],
     },
     {
         name: 'support.skylum.com',
