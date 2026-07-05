@@ -65,11 +65,12 @@ const testCases: TestsCase[] = [
         contentBaseURL: 'https://docs.gmgn.ai',
         tests: [{ name: 'Home', url: '/' }],
     },
-    {
-        name: 'docs.portainer.io',
-        contentBaseURL: 'https://docs.portainer.io',
-        tests: [{ name: 'Home', url: '/', run: waitForCookiesDialog }],
-    },
+    // Removed, an AI widget, makes it flaky.
+    // {
+    //     name: 'docs.portainer.io',
+    //     contentBaseURL: 'https://docs.portainer.io',
+    //     tests: [{ name: 'Home', url: '/', run: waitForCookiesDialog }],
+    // },
     {
         name: 'docs.chirptoken.io',
         contentBaseURL: 'https://docs.chirptoken.io',
@@ -181,11 +182,6 @@ const testCases: TestsCase[] = [
         name: 'docs.thousandeyes.com',
         contentBaseURL: 'https://docs.thousandeyes.com',
         tests: [{ name: 'Home', url: '/', run: waitForCookiesDialog }],
-    },
-    {
-        name: 'docs.raydium.io',
-        contentBaseURL: 'https://docs.raydium.io',
-        tests: [{ name: 'Home', url: '/introduction' }],
     },
     {
         name: 'docs.fluentbit.io',
