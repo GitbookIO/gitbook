@@ -261,6 +261,19 @@ export function runTestCases(testCases: TestsCase[]) {
                         );
                     }
 
+                    // Reset the cross-space navigation state on every document load so the
+                    // "Back to <space>" shortcut never leaks between navigations/tests. It is
+                    // detected client-side from this sessionStorage, and a stale value (e.g.
+                    // after a retry or a cross-space redirect) makes it appear or not
+                    // non-deterministically, causing flaky screenshots.
+                    await page.addInitScript(() => {
+                        try {
+                            sessionStorage.removeItem('gitbook-space-navigation:last');
+                            sessionStorage.removeItem('gitbook-space-navigation:back');
+                            sessionStorage.removeItem('gitbook-space-navigation:from-picker');
+                        } catch {}
+                    });
+
                     // Set the header to disable the Vercel toolbar
                     // But only on the main document as it'd cause CORS issues on other resources
                     await page.route('**/*', async (route, request) => {
