@@ -172,6 +172,19 @@ export async function waitForCookiesDialog(page: Page) {
     });
 }
 
+/**
+ * Wait for the GitBook admin toolbar to be present.
+ *
+ * The toolbar only renders when signed in to GitBook. It is hidden from
+ * screenshots (see `argosCSS`) because it auto-expands with an animation, so
+ * use this to assert it is rendered without capturing its flaky visual state.
+ */
+export async function waitForAdminToolbar(page: Page) {
+    await expect(page.getByTestId('admin-toolbar')).toBeVisible({
+        timeout: 10_000,
+    });
+}
+
 export async function waitForNotFound(_page: Page, response: Response | null) {
     expect(response).not.toBeNull();
     expect(response?.status()).toBe(404);
@@ -286,6 +299,12 @@ export function runTestCases(testCases: TestsCase[]) {
                                 argosCSS: `
                             /* Hide Intercom */
                             .intercom-lightweight-app {
+                                display: none !important;
+                            }
+                            /* Hide the GitBook admin toolbar: it auto-expands with an
+                               animation, so its state at capture time is non-deterministic.
+                               Its presence is asserted separately via waitForAdminToolbar. */
+                            [data-testid="admin-toolbar"] {
                                 display: none !important;
                             }
                                 `,

@@ -32,6 +32,7 @@ import {
     runTestCases,
     setTimeToMorning,
     waitForAIChatResponse,
+    waitForAdminToolbar,
     waitForCookiesDialog,
     waitForCoverImages,
     waitForNotFound,
@@ -654,7 +655,12 @@ const testCases: TestsCase[] = [
             {
                 name: 'Revision',
                 url: '~/revisions/S55pwsEr5UVoroaOiWnP/blocks/headings',
-                run: waitForCookiesDialog,
+                run: async (page) => {
+                    await waitForCookiesDialog(page);
+                    // Viewing a past revision shows the admin toolbar; assert it is
+                    // present (it is hidden from the screenshot as it animates open).
+                    await waitForAdminToolbar(page);
+                },
             },
             {
                 name: 'Invalid revision',
