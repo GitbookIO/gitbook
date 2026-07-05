@@ -421,7 +421,7 @@ const testCases: TestsCase[] = [
     {
         name: 'docs.ionos.com/cloud',
         contentBaseURL: 'https://docs.ionos.com',
-        tests: [{ name: 'Home', url: '/cloud' }],
+        tests: [{ name: 'Home', url: '/cloud', run: waitForCookiesDialog }],
     },
     {
         name: 'support.evite.com',
