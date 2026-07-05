@@ -141,7 +141,7 @@ export function SpaceLayout(props: SpaceLayoutProps) {
                         'lg:flex-row',
                         'lg:justify-center',
                         CONTAINER_STYLE,
-                        'transition-[max-width] duration-300',
+                        'transition-[max-width] duration-300 motion-reduce:transition-none',
 
                         !withTopHeader || variants.generic.length > 1
                             ? 'has-sidebar'
