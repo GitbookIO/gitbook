@@ -149,7 +149,6 @@ export const sl: TranslationLanguage = {
     ai_chat_tools_mcp_tool: 'Poklicano ${1}',
     ai_chat_ask: 'Vprašaj ${1}',
     ai_chat_ask_about: 'Vprašaj ${1} o ${2}',
-    ai_chat_ask_about_this: 'Vprašaj ${1} o tem',
     this_page: 'to stran',
     ai_chat_paragraph_draft: 'Povej mi več o tem',
     ai_chat_ask_query: 'Vprašaj ${1} "${2}"',

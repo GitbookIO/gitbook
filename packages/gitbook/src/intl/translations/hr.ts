@@ -149,7 +149,6 @@ export const hr: TranslationLanguage = {
     ai_chat_tools_mcp_tool: 'Pozvao ${1}',
     ai_chat_ask: 'Pitaj ${1}',
     ai_chat_ask_about: 'Pitaj ${1} o ${2}',
-    ai_chat_ask_about_this: 'Pitaj ${1} o ovome',
     this_page: 'ova stranica',
     ai_chat_paragraph_draft: 'Reci mi više o ovome',
     ai_chat_ask_query: 'Pitaj ${1} "${2}"',

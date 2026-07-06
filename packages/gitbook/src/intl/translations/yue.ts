@@ -144,7 +144,6 @@ export const yue: TranslationLanguage = {
     ai_chat_tools_mcp_tool: '已呼叫 ${1}',
     ai_chat_ask: '問 ${1}',
     ai_chat_ask_about: '問 ${1} 關於${2}',
-    ai_chat_ask_about_this: '問 ${1} 關於呢樣嘢',
     this_page: '此頁面',
     ai_chat_paragraph_draft: '同我講多啲呢方面嘅嘢',
     ai_chat_ask_query: '問 ${1}「${2}」',

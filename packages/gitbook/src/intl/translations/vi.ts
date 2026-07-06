@@ -147,7 +147,6 @@ export const vi: TranslationLanguage = {
     ai_chat_tools_mcp_tool: 'Đã gọi ${1}',
     ai_chat_ask: 'Hỏi ${1}',
     ai_chat_ask_about: 'Hỏi ${1} về ${2}',
-    ai_chat_ask_about_this: 'Hỏi ${1} về điều này',
     this_page: 'trang này',
     ai_chat_paragraph_draft: 'Cho tôi biết thêm về điều này',
     ai_chat_ask_query: 'Hỏi ${1} "${2}"',

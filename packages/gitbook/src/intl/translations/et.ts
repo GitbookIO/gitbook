@@ -148,7 +148,6 @@ export const et: TranslationLanguage = {
     ai_chat_tools_mcp_tool: 'Kutsus ${1}',
     ai_chat_ask: 'Küsi ${1}',
     ai_chat_ask_about: 'Küsi ${1}: ${2}',
-    ai_chat_ask_about_this: 'Küsi ${1} käest selle kohta',
     this_page: 'seda lehte',
     ai_chat_paragraph_draft: 'Räägi mulle sellest lähemalt',
     ai_chat_ask_query: 'Küsi ${1} "${2}"',

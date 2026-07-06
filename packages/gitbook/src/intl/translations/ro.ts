@@ -152,7 +152,6 @@ export const ro: TranslationLanguage = {
     ai_chat_tools_mcp_tool: 'A apelat ${1}',
     ai_chat_ask: 'Întreabă ${1}',
     ai_chat_ask_about: 'Întreabă ${1} despre ${2}',
-    ai_chat_ask_about_this: 'Întreabă ${1} despre asta',
     this_page: 'această pagină',
     ai_chat_paragraph_draft: 'Spune-mi mai multe despre asta',
     ai_chat_ask_query: 'Întreabă ${1} "${2}"',

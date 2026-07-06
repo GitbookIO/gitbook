@@ -146,7 +146,6 @@ export const en = {
     ai_chat_tools_mcp_tool: 'Called ${1}',
     ai_chat_ask: 'Ask ${1}',
     ai_chat_ask_about: 'Ask ${1} about ${2}',
-    ai_chat_ask_about_this: 'Ask ${1} about this',
     ai_chat_ask_query: 'Ask ${1} "${2}"',
     this_page: 'this page',
     ai_chat_paragraph_draft: 'Tell me more about this',

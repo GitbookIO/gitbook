@@ -150,7 +150,6 @@ export const pt: TranslationLanguage = {
     ai_chat_tools_mcp_tool: 'Chamou ${1}',
     ai_chat_ask: 'Perguntar a ${1}',
     ai_chat_ask_about: 'Perguntar a ${1} sobre ${2}',
-    ai_chat_ask_about_this: 'Perguntar a ${1} sobre isto',
     this_page: 'esta página',
     ai_chat_paragraph_draft: 'Conta-me mais sobre isto',
     ai_chat_ask_query: 'Perguntar a ${1} "${2}"',

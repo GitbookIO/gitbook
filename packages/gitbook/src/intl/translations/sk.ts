@@ -151,7 +151,6 @@ export const sk: TranslationLanguage = {
     ai_chat_tools_mcp_tool: 'Zavolal ${1}',
     ai_chat_ask: 'Opýtať sa ${1}',
     ai_chat_ask_about: 'Opýtať sa ${1} na ${2}',
-    ai_chat_ask_about_this: 'Opýtať sa ${1} na to',
     this_page: 'túto stránku',
     ai_chat_paragraph_draft: 'Povedz mi o tom viac',
     ai_chat_ask_query: 'Opýtať sa ${1} "${2}"',

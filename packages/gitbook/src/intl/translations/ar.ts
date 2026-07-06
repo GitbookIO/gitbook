@@ -147,7 +147,6 @@ export const ar: TranslationLanguage = {
     ai_chat_tools_mcp_tool: 'تم استدعاء ${1}',
     ai_chat_ask: 'اسأل ${1}',
     ai_chat_ask_about: 'اسأل ${1} عن ${2}',
-    ai_chat_ask_about_this: 'اسأل ${1} عن هذا',
     this_page: 'هذه الصفحة',
     ai_chat_paragraph_draft: 'أخبرني المزيد عن هذا',
     ai_chat_ask_query: 'اسأل ${1} "${2}"',

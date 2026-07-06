@@ -150,7 +150,6 @@ export const hu: TranslationLanguage = {
     ai_chat_tools_mcp_tool: '${1} meghívva',
     ai_chat_ask: '${1} kérdezése',
     ai_chat_ask_about: '${1} megkérdezése ${2} témában',
-    ai_chat_ask_about_this: '${1} megkérdezése erről',
     this_page: 'ez az oldal',
     ai_chat_paragraph_draft: 'Mesélj erről többet',
     ai_chat_ask_query: '${1} kérdezése: "${2}"',

@@ -155,7 +155,6 @@ export const de: TranslationLanguage = {
     ai_chat_tools_mcp_tool: '${1} aufgerufen',
     ai_chat_ask: '${1} fragen',
     ai_chat_ask_about: '${1} zu ${2} befragen',
-    ai_chat_ask_about_this: '${1} dazu befragen',
     this_page: 'dieser Seite',
     ai_chat_paragraph_draft: 'Erzähl mir mehr darüber',
     copy_for_llms: 'Für LLMs kopieren',
