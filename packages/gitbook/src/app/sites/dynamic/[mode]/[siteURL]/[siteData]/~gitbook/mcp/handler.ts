@@ -1,8 +1,10 @@
 import { CustomizationPageActionType, SiteInsightsDisplayContext } from '@gitbook/api';
 
 import { type RouteLayoutParams, getDynamicSiteContext } from '@/app/utils';
+import { isAIEnabled } from '@/components/utils/isAIChatEnabled';
+import { renderAskSourcesMarkdown, streamSiteAskAnswer } from '@/lib/ask';
 import { getExposableError, throwIfDataError } from '@/lib/data';
-import { getMarkdownForPageInSpace } from '@/lib/markdownPage';
+import { fromPageMarkdown, getMarkdownForPageInSpace, toPageMarkdown } from '@/lib/markdownPage';
 import { resolvePagePath } from '@/lib/pages';
 import { joinPathWithBaseURL } from '@/lib/paths';
 import { getBestScoredResult } from '@/lib/search';
@@ -236,6 +238,97 @@ export async function handleMcpRequest(
                     }
                 }
             );
+
+            // Only expose the answer tool when the site has AI enabled, since it relies on
+            // the same AI search backend that powers the site's "ask a question" experience.
+            if (isAIEnabled(context.customization.ai.mode)) {
+                server.tool(
+                    'askQuestion',
+                    `Ask a natural-language question about ${site.title} and get a synthesized answer, with links to the source pages. Prefer this over \`searchDocumentation\` when you want a direct answer to a question rather than a list of matching pages; use \`searchDocumentation\`/\`getPage\` when you need to browse or read full pages yourself.`,
+                    {
+                        question: z
+                            .string()
+                            .describe(
+                                `The natural-language question to answer about ${site.title}.`
+                            ),
+                    },
+                    {
+                        title: 'Ask a question',
+                        readOnlyHint: true,
+                        destructiveHint: false,
+                        idempotentHint: false,
+                        openWorldHint: true,
+                    },
+                    async ({ question }) => {
+                        try {
+                            const trimmedQuestion = question.trim();
+                            if (!trimmedQuestion) {
+                                return {
+                                    content: [
+                                        {
+                                            type: 'text',
+                                            text: 'Please provide a question to answer.',
+                                        },
+                                    ],
+                                    isError: true,
+                                };
+                            }
+
+                            const answer = await streamSiteAskAnswer(context, trimmedQuestion);
+
+                            trackMcpEvent({
+                                organizationId: context.organizationId,
+                                siteId: site.id,
+                                events: [
+                                    {
+                                        type: 'ask_question',
+                                        query: trimmedQuestion,
+                                        location: {
+                                            displayContext: SiteInsightsDisplayContext.Mcp,
+                                        },
+                                    },
+                                ],
+                                request,
+                            });
+
+                            if (!answer || !answer.answer || !('markdown' in answer.answer)) {
+                                return {
+                                    content: [
+                                        {
+                                            type: 'text',
+                                            text: "We couldn't answer this question.",
+                                        },
+                                    ],
+                                };
+                            }
+
+                            const answerMarkdown = toPageMarkdown(
+                                await fromPageMarkdown(context, {
+                                    markdown: answer.answer.markdown,
+                                    pagePath: '',
+                                })
+                            );
+                            const sourcesMarkdown = await renderAskSourcesMarkdown(
+                                context,
+                                answer.sources ?? []
+                            );
+
+                            let text = answerMarkdown.trim();
+                            if (sourcesMarkdown) {
+                                text += `\n\n# Sources\n\n${sourcesMarkdown}`;
+                            }
+
+                            return { content: [{ type: 'text', text }] };
+                        } catch (error) {
+                            const exposable = getExposableError(error);
+                            return {
+                                content: [{ type: 'text', text: exposable.message }],
+                                isError: true,
+                            };
+                        }
+                    }
+                );
+            }
         },
         {},
         {
