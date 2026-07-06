@@ -138,11 +138,28 @@ export async function PageHeader(props: {
     }
 
     return (
-        <header className={tcls(CONTENT_STYLE, 'mb-6 space-y-3 after:clear-both after:block')}>
+        <>
+            {/* Page actions ("Ask", "On this page"…). Rendered as a sibling of the <header> — i.e. a
+                direct child of the scrolling <main> — rather than inside it, so their sticky
+                containing block is the full-height article instead of the short header. That lets
+                them stay pinned below the site header while scrolling, but only where it matters:
+                desktop API-reference pages (see the `page-api-block:lg:` classes), where the outline
+                collapses to a button and long operations would otherwise scroll it out of reach.
+                Everywhere else they keep flowing (and scrolling away) with the header as before. */}
             <div
                 className={tcls(
                     'float-right ml-4 flex gap-2',
-                    showBreadcrumbs ? '-mb-1 -mt-1.5' : '-mt-3 xs:mt-2'
+                    showBreadcrumbs ? '-mb-1 -mt-1.5' : '-mt-3 xs:mt-2',
+                    'page-api-block:lg:sticky',
+                    // Pin just below the site header; the offset tracks the header height (banner,
+                    // cover…) via the same --toc-top-offset the outline and code samples use.
+                    'page-api-block:lg:top-[calc(var(--toc-top-offset,4rem)+1rem)]',
+                    'page-api-block:lg:z-20',
+                    // When the outline opens as a drawer over this pinned bar (desktop API pages),
+                    // hide the bar so it doesn't overlap the sheet — the sheet has its own header
+                    // and close button. A single body-rooted selector, since `page-api-block`
+                    // (also body-rooted) can't be stacked with another `body…&` variant.
+                    'lg:[body.outline-open:has(.openapi-block)_&]:hidden'
                 )}
             >
                 {hasPageActions ? (
@@ -160,78 +177,86 @@ export async function PageHeader(props: {
                 ) : null}
                 <PageAsideToggleButton />
             </div>
-
-            {showBreadcrumbs && (
-                // Hide the breadcrumbs on wide pages that have no table of contents: there the
-                // content spans the full width with no navigation column, so the crumbs sit stranded.
-                <nav
-                    aria-label="Breadcrumb"
-                    className="layout-wide:page-no-toc:hidden text-tint text-xs leading-relaxed"
-                >
-                    <ol className="inline">
-                        {contextCrumbs.map((crumb, index) => (
-                            <li key={crumb.key} className="inline">
-                                <ContextCrumb crumb={crumb} />
-                                {(index !== contextCrumbs.length - 1 || hasAncestors) && (
-                                    <BreadcrumbSeparator />
-                                )}
-                            </li>
-                        ))}
-                        {ancestors.map((breadcrumb, index) => {
-                            const parentPages = ancestors[index - 1]?.pages ?? revision.pages;
-                            const href = linker.toPathForPage({
-                                pages: revision.pages,
-                                page: breadcrumb,
-                            });
-                            return (
-                                <li key={breadcrumb.id} className="inline">
-                                    <BreadcrumbItemDropdown
-                                        href={href}
-                                        label={breadcrumb.title}
-                                        emoji={breadcrumb.emoji}
-                                        icon={breadcrumb.icon}
-                                        linkClassName={BREADCRUMB_LINK_CLASSES}
-                                        siblings={getPageSiblings(
-                                            context,
-                                            parentPages,
-                                            breadcrumb.id
-                                        )}
-                                    />
-                                    {index !== ancestors.length - 1 && <BreadcrumbSeparator />}
+            <header className={tcls(CONTENT_STYLE, 'mb-6 space-y-3 after:clear-both after:block')}>
+                {showBreadcrumbs && (
+                    // Hide the breadcrumbs on wide pages that have no table of contents: there the
+                    // content spans the full width with no navigation column, so the crumbs sit stranded.
+                    <nav
+                        aria-label="Breadcrumb"
+                        className="layout-wide:page-no-toc:hidden text-tint text-xs leading-relaxed"
+                    >
+                        <ol className="inline">
+                            {contextCrumbs.map((crumb, index) => (
+                                <li key={crumb.key} className="inline">
+                                    <ContextCrumb crumb={crumb} />
+                                    {(index !== contextCrumbs.length - 1 || hasAncestors) && (
+                                        <BreadcrumbSeparator />
+                                    )}
                                 </li>
-                            );
-                        })}
-                    </ol>
-                </nav>
-            )}
-            <PageTags page={page} revision={revision} />
-            {page.layout.title ? (
-                <h1
-                    className={tcls(
-                        'text-2xl',
-                        '@xs:text-3xl',
-                        '@lg:text-4xl',
-                        'leading-tight',
-                        'font-bold',
-                        'flex',
-                        'items-center',
-                        'gap-[.5em]',
-                        'grow',
-                        'text-pretty',
-                        'clear-right',
-                        'xs:clear-none'
-                    )}
-                >
-                    <PageIcon page={page} style={['text-tint-subtle ', 'shrink-0']} />
-                    {page.title}
-                </h1>
-            ) : null}
-            {page.description && page.layout.description ? (
-                <p className={tcls(CONTENT_STYLE_REDUCED, 'text-lg', 'text-tint', 'clear-both')}>
-                    {page.description}
-                </p>
-            ) : null}
-        </header>
+                            ))}
+                            {ancestors.map((breadcrumb, index) => {
+                                const parentPages = ancestors[index - 1]?.pages ?? revision.pages;
+                                const href = linker.toPathForPage({
+                                    pages: revision.pages,
+                                    page: breadcrumb,
+                                });
+                                return (
+                                    <li key={breadcrumb.id} className="inline">
+                                        <BreadcrumbItemDropdown
+                                            href={href}
+                                            label={breadcrumb.title}
+                                            emoji={breadcrumb.emoji}
+                                            icon={breadcrumb.icon}
+                                            linkClassName={BREADCRUMB_LINK_CLASSES}
+                                            siblings={getPageSiblings(
+                                                context,
+                                                parentPages,
+                                                breadcrumb.id
+                                            )}
+                                        />
+                                        {index !== ancestors.length - 1 && <BreadcrumbSeparator />}
+                                    </li>
+                                );
+                            })}
+                        </ol>
+                    </nav>
+                )}
+                <PageTags page={page} revision={revision} />
+                {page.layout.title ? (
+                    <h1
+                        className={tcls(
+                            'text-2xl',
+                            '@xs:text-3xl',
+                            '@lg:text-4xl',
+                            'leading-tight',
+                            'font-bold',
+                            'flex',
+                            'items-center',
+                            'gap-[.5em]',
+                            'grow',
+                            'text-pretty',
+                            'clear-right',
+                            'xs:clear-none'
+                        )}
+                    >
+                        <PageIcon page={page} style={['text-tint-subtle ', 'shrink-0']} />
+                        {page.title}
+                    </h1>
+                ) : null}
+                {page.description && page.layout.description ? (
+                    <p
+                        className={tcls(
+                            CONTENT_STYLE_REDUCED,
+                            'text-lg',
+                            'text-tint',
+                            'clear-both'
+                        )}
+                    >
+                        {page.description}
+                    </p>
+                ) : null}
+            </header>
+        </>
     );
 }
 
