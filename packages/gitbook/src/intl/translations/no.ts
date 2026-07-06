@@ -150,7 +150,6 @@ export const no: TranslationLanguage = {
     ai_chat_tools_mcp_tool: 'Kalte ${1}',
     ai_chat_ask: 'Spør ${1}',
     ai_chat_ask_about: 'Spør ${1} om ${2}',
-    ai_chat_ask_about_this: 'Spør ${1} om dette',
     this_page: 'denne siden',
     ai_chat_paragraph_draft: 'Fortell meg mer om dette',
     copy_for_llms: 'Kopier for LLMs',

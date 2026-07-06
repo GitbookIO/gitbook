@@ -147,7 +147,6 @@ export const uk: TranslationLanguage = {
     ai_chat_tools_mcp_tool: 'Викликано ${1}',
     ai_chat_ask: 'Запитати ${1}',
     ai_chat_ask_about: 'Запитати ${1} про ${2}',
-    ai_chat_ask_about_this: 'Запитати ${1} про це',
     this_page: 'цю сторінку',
     ai_chat_paragraph_draft: 'Розкажи мені про це більше',
     ai_chat_ask_query: 'Запитати ${1} "${2}"',

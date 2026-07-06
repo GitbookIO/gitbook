@@ -149,7 +149,6 @@ export const lt: TranslationLanguage = {
     ai_chat_tools_mcp_tool: 'Iškviesta ${1}',
     ai_chat_ask: 'Klausti ${1}',
     ai_chat_ask_about: 'Klausti ${1} apie ${2}',
-    ai_chat_ask_about_this: 'Klausti ${1} apie tai',
     this_page: 'šį puslapį',
     ai_chat_paragraph_draft: 'Papasakok apie tai daugiau',
     ai_chat_ask_query: 'Klausti ${1} "${2}"',

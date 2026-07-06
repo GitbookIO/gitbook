@@ -148,7 +148,6 @@ export const ko: TranslationLanguage = {
     ai_chat_tools_mcp_tool: '${1} 호출함',
     ai_chat_ask: '${1}에게 질문',
     ai_chat_ask_about: '${1}에게 ${2}에 대해 질문',
-    ai_chat_ask_about_this: '${1}에게 이에 대해 질문',
     this_page: '이 페이지',
     ai_chat_paragraph_draft: '이것에 대해 더 알려줘',
     copy_for_llms: 'LLM용 복사',

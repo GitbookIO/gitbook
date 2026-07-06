@@ -145,7 +145,6 @@ export const th: TranslationLanguage = {
     ai_chat_tools_mcp_tool: 'เรียกใช้ ${1}',
     ai_chat_ask: 'ถาม ${1}',
     ai_chat_ask_about: 'ถาม ${1} เกี่ยวกับ ${2}',
-    ai_chat_ask_about_this: 'ถาม ${1} เกี่ยวกับเรื่องนี้',
     this_page: 'หน้านี้',
     ai_chat_paragraph_draft: 'บอกฉันเพิ่มเติมเกี่ยวกับเรื่องนี้',
     ai_chat_ask_query: 'ถาม ${1} "${2}"',

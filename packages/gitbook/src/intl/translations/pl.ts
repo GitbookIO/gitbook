@@ -149,7 +149,6 @@ export const pl: TranslationLanguage = {
     ai_chat_tools_mcp_tool: 'Wywołano ${1}',
     ai_chat_ask: 'Zapytaj ${1}',
     ai_chat_ask_about: 'Zapytaj ${1} o ${2}',
-    ai_chat_ask_about_this: 'Zapytaj ${1} o to',
     this_page: 'tę stronę',
     ai_chat_paragraph_draft: 'Powiedz mi o tym więcej',
     ai_chat_ask_query: 'Zapytaj ${1} "${2}"',

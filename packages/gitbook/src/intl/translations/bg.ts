@@ -151,7 +151,6 @@ export const bg: TranslationLanguage = {
     ai_chat_tools_mcp_tool: 'Извика ${1}',
     ai_chat_ask: 'Попитайте ${1}',
     ai_chat_ask_about: 'Попитайте ${1} за ${2}',
-    ai_chat_ask_about_this: 'Попитайте ${1} за това',
     this_page: 'тази страница',
     ai_chat_paragraph_draft: 'Кажи ми повече за това',
     ai_chat_ask_query: 'Попитайте ${1} "${2}"',

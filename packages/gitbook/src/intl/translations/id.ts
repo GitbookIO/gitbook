@@ -148,7 +148,6 @@ export const id: TranslationLanguage = {
     ai_chat_tools_mcp_tool: 'Memanggil ${1}',
     ai_chat_ask: 'Tanya ${1}',
     ai_chat_ask_about: 'Tanya ${1} tentang ${2}',
-    ai_chat_ask_about_this: 'Tanya ${1} tentang ini',
     this_page: 'halaman ini',
     ai_chat_paragraph_draft: 'Ceritakan lebih banyak tentang ini',
     ai_chat_ask_query: 'Tanya ${1} "${2}"',

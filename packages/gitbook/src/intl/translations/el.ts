@@ -153,7 +153,6 @@ export const el: TranslationLanguage = {
     ai_chat_tools_mcp_tool: 'Κλήθηκε ${1}',
     ai_chat_ask: 'Ρωτήστε ${1}',
     ai_chat_ask_about: 'Ρωτήστε ${1} για ${2}',
-    ai_chat_ask_about_this: 'Ρωτήστε ${1} για αυτό',
     this_page: 'αυτή τη σελίδα',
     ai_chat_paragraph_draft: 'Πες μου περισσότερα για αυτό',
     ai_chat_ask_query: 'Ρωτήστε ${1} "${2}"',

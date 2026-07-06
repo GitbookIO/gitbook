@@ -149,7 +149,6 @@ export const ja: TranslationLanguage = {
     ai_chat_tools_mcp_tool: '${1} を呼び出しました',
     ai_chat_ask: '${1} に質問する',
     ai_chat_ask_about: '${1}に${2}について質問する',
-    ai_chat_ask_about_this: '${1}にこれについて質問する',
     this_page: 'このページ',
     ai_chat_paragraph_draft: 'これについてもっと教えて',
     copy_for_llms: 'LLM 用にコピー',

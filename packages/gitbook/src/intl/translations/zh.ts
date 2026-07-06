@@ -145,7 +145,6 @@ export const zh: TranslationLanguage = {
     ai_chat_tools_mcp_tool: '调用了 ${1}',
     ai_chat_ask: '向 ${1} 提问',
     ai_chat_ask_about: '向 ${1} 询问${2}',
-    ai_chat_ask_about_this: '向 ${1} 询问这个',
     this_page: '此页面',
     ai_chat_paragraph_draft: '告诉我更多相关信息',
     copy_for_llms: '复制供 LLMs 使用',

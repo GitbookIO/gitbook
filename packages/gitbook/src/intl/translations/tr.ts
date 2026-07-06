@@ -147,7 +147,6 @@ export const tr: TranslationLanguage = {
     ai_chat_tools_mcp_tool: '${1} çağrıldı',
     ai_chat_ask: '${1} sor',
     ai_chat_ask_about: '${1} için ${2} hakkında sor',
-    ai_chat_ask_about_this: '${1} için bununla ilgili sor',
     this_page: 'bu sayfa',
     ai_chat_paragraph_draft: 'Bana bundan daha fazla bahset',
     ai_chat_ask_query: '${1} için "${2}" sor',

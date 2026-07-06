@@ -147,7 +147,6 @@ export const lv: TranslationLanguage = {
     ai_chat_tools_mcp_tool: 'Izsauca ${1}',
     ai_chat_ask: 'Jautāt ${1}',
     ai_chat_ask_about: 'Jautāt ${1} par ${2}',
-    ai_chat_ask_about_this: 'Jautāt ${1} par to',
     this_page: 'šo lapu',
     ai_chat_paragraph_draft: 'Pastāsti man par to vairāk',
     ai_chat_ask_query: 'Jautāt ${1} "${2}"',

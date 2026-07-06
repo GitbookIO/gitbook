@@ -147,7 +147,6 @@ export const hi: TranslationLanguage = {
     ai_chat_tools_mcp_tool: '${1} को कॉल किया',
     ai_chat_ask: '${1} से पूछें',
     ai_chat_ask_about: '${1} से ${2} के बारे में पूछें',
-    ai_chat_ask_about_this: '${1} से इसके बारे में पूछें',
     this_page: 'इस पृष्ठ',
     ai_chat_paragraph_draft: 'इसके बारे में और बताएं',
     ai_chat_ask_query: '${1} से "${2}" पूछें',
