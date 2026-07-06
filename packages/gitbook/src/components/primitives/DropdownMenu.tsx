@@ -2,7 +2,7 @@
 
 import { Icon, type IconName } from '@gitbook/icons';
 import type { DetailedHTMLProps, HTMLAttributes } from 'react';
-import { createContext, useCallback, useContext, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 
 import { type ClassValue, tcls } from '@/lib/tailwind';
 
@@ -32,6 +32,20 @@ const DROPDOWN_CONTENT_INNER_CLASS =
     'flex flex-col gap-1 overflow-auto circular-corners:rounded-xl rounded-md straight-corners:rounded-none border border-tint bg-tint-base p-2 shadow-lg';
 
 /**
+ * Grace period before a hover-opened menu closes, so the pointer can travel from the trigger to the
+ * (portalled) menu without it collapsing. Only used when `openDelay` is set.
+ */
+const HOVER_CLOSE_DELAY_MS = 150;
+
+/** Clear a pending timeout ref, if any. */
+function clearTimer(ref: { current: ReturnType<typeof setTimeout> | null }) {
+    if (ref.current) {
+        clearTimeout(ref.current);
+        ref.current = null;
+    }
+}
+
+/**
  * Button with a dropdown.
  */
 export function DropdownMenu(props: {
@@ -45,6 +59,11 @@ export function DropdownMenu(props: {
     className?: ClassValue;
     /** Open the dropdown on hover */
     openOnHover?: boolean;
+    /**
+     * Delay in milliseconds before the dropdown opens on hover. Only applies with `openOnHover`.
+     * @default 0
+     */
+    openDelay?: number;
     /**
      * Side of the dropdown
      * @default "bottom"
@@ -67,6 +86,7 @@ export function DropdownMenu(props: {
         children,
         className,
         openOnHover = false,
+        openDelay = 0,
         side = 'bottom',
         align = 'start',
         sideOffset = 0,
@@ -74,13 +94,54 @@ export function DropdownMenu(props: {
     const [hovered, setHovered] = useState(false);
     const [open, setOpen] = useState(false);
 
+    // Timers used to delay opening on hover (and to keep the menu open while the pointer travels
+    // between the trigger and the menu).
+    const openTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const closeTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+    // Clear any pending timers when unmounting.
+    useEffect(
+        () => () => {
+            clearTimer(openTimeout);
+            clearTimer(closeTimeout);
+        },
+        []
+    );
+
+    const handleHoverEnter = useCallback(() => {
+        clearTimer(closeTimeout);
+        if (openDelay > 0) {
+            if (!openTimeout.current) {
+                openTimeout.current = setTimeout(() => {
+                    openTimeout.current = null;
+                    setHovered(true);
+                }, openDelay);
+            }
+        } else {
+            setHovered(true);
+        }
+    }, [openDelay]);
+
+    const handleHoverLeave = useCallback(() => {
+        clearTimer(openTimeout);
+        clearTimer(closeTimeout);
+        if (openDelay > 0) {
+            // Grace period so moving between the trigger and the menu doesn't close it.
+            closeTimeout.current = setTimeout(() => {
+                closeTimeout.current = null;
+                setHovered(false);
+            }, HOVER_CLOSE_DELAY_MS);
+        } else {
+            setHovered(false);
+        }
+    }, [openDelay]);
+
     const isOpen = openOnHover ? open || hovered : open;
 
     const trigger = (
         <RadixDropdownMenu.Trigger
             asChild
-            onMouseEnter={() => setHovered(true)}
-            onMouseLeave={() => setHovered(false)}
+            onMouseEnter={handleHoverEnter}
+            onMouseLeave={handleHoverLeave}
             onClick={() => (openOnHover ? setOpen(!open) : null)}
             className="group/dropdown"
         >
@@ -108,8 +169,8 @@ export function DropdownMenu(props: {
                         data-testid="dropdown-menu"
                         hideWhenDetached
                         collisionPadding={8}
-                        onMouseEnter={() => setHovered(true)}
-                        onMouseLeave={() => setHovered(false)}
+                        onMouseEnter={handleHoverEnter}
+                        onMouseLeave={handleHoverLeave}
                         align={align}
                         side={side}
                         sideOffset={sideOffset}
