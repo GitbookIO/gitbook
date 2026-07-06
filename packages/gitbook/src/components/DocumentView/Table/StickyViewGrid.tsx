@@ -28,7 +28,10 @@ function DefaultHeaderScrollGrid({
 
     return (
         <div className={className}>
-            <div className="group/table relative flex w-full min-w-0 max-w-full flex-col rounded-lg border-tint-subtle">
+            <div
+                role="table"
+                className="group/table relative flex w-full min-w-0 max-w-full flex-col rounded-lg border-tint-subtle"
+            >
                 <div className="w-full min-w-0 overflow-x-auto overflow-y-hidden overscroll-x-none border-tint-subtle">
                     <div className={tcls('flex', 'flex-col', resolvedTableClassName)}>
                         {header}
@@ -137,6 +140,7 @@ function StickyHeaderOverlayScrollGrid({
                 ref={rootRef}
                 className="group/table relative flex w-full min-w-0 max-w-full flex-col rounded-lg border-tint-subtle data-[scrollable=true]:border"
                 data-scrollable="false"
+                role="table"
             >
                 {header ? (
                     <div
