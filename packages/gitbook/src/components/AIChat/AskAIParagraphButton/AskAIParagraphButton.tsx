@@ -47,14 +47,16 @@ export function AskAIParagraphButton(props: { content: string; className?: Class
                 // Per-block nudges: `in-[…]` matches an ancestor (tag or class) with no markup
                 // changes elsewhere — add a self-contained rule per block type to clear its gutter.
                 'in-[.hint]:-top-0.5 in-[.hint]:pr-2',
-                'in-[li]:-ml-4',
+                'in-[li]:-left-14',
                 'in-[blockquote]:pr-0',
                 // Hover affordance only: hidden until the paragraph (or the button) is hovered.
                 'invisible opacity-0 transition-opacity duration-150',
                 'hover:visible hover:opacity-100 group-hover/ask-ai:visible group-hover/ask-ai:opacity-100',
                 // Never shown on touch / hover-less contexts.
                 'not-pointer-fine:hidden',
+                // Hidden where an overflow-clipped ancestor would cut it off (tables, record cards).
                 'in-[[role=table]]:hidden',
+                'in-[[data-card]]:hidden',
                 className
             )}
         >
