@@ -30,6 +30,12 @@ export async function resizeImageWithGitbookServices(
         );
     }
 
+    if (!GITBOOK_IMAGE_RESIZE_URL) {
+        throw new Error(
+            'GITBOOK_IMAGE_RESIZE_URL is not set for gitbook-service image resize mode'
+        );
+    }
+
     const signature = sdbmHash(`${input}:${GITBOOK_IMAGE_RESIZE_SALT}`).toString();
     const resizeURL = `${GITBOOK_IMAGE_RESIZE_URL}${stringifyOptions({
         ...resizeOptions,
