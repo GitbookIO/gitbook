@@ -1,5 +1,32 @@
 # gitbook
 
+## 0.27.2
+
+### Patch Changes
+
+- bb30db1: Add a hover affordance in the document margin to ask the AI Assistant about a paragraph. On devices with a fine pointer, hovering a top-level paragraph reveals a small button that stages the paragraph's text as context and opens the assistant — making the existing text-selection "Ask" flow more discoverable.
+- 62ca6d3: Show a "Back to [space]" shortcut at the top of the table of contents when a reader follows a link into a different space, so they don't lose track of where they were browsing from.
+- fdea8f1: Show where a page lives in the site at the start of the page breadcrumbs: its section (including any enclosing section groups) and variant. Hovering any breadcrumb item reveals a dropdown to switch to its siblings at the same level — other section groups, sections, variants, page groups or pages — computed on the server from already-available data (no extra request). Language variants are left to the dedicated language picker rather than shown as a crumb. Also restyles the breadcrumbs to normal casing (matching search results).
+- 37c2dd8: Navigate customer visual tests with `domcontentloaded` to avoid `load`-event hangs on external sites.
+- c923c65: Fix center- and end-aligned paragraphs shifting left on wide/no-TOC pages when the AI Assistant is enabled, caused by the per-paragraph ask-button wrapper not inheriting the block alignment.
+- 37c2dd8: Fix flaky customer e2e screenshots by waiting for the built-in cookie banner before capturing.
+- 37c2dd8: Add a `data-testid` to the admin toolbar so e2e tests can assert its presence while hiding it from visual screenshots (it animates open, causing flaky diffs).
+- 36dbdb4: Support an optional `goal` query parameter on the markdown ask interface (`?ask=…&goal=…`), letting agents describe the broader end goal they are working towards so the answer can be steered towards it.
+- 7e55cd5: Add an "Available in MCP" badge on OpenAPI operations marked with `x-gitbook-mcp: true`. When `x-gitbook-mcp-url` is set (on the operation, path, or root — most specific wins), the badge becomes a button that copies the MCP server URL to the clipboard.
+- 6146f8e: Reduce the size of `searchDocumentation` MCP responses by returning only the best-matching section per page instead of concatenating every section body.
+- 37c2dd8: Disable the content max-width transition under reduced motion, matching the surrounding layout transitions.
+- 37c2dd8: Reset cross-space navigation state between e2e navigations so the "Back to <space>" shortcut can't leak in and cause flaky screenshots.
+- bcea23e: Render `anyOf`/`oneOf` with a `null` member as a nullable schema instead of a `null` union branch.
+- 77efd44: Show changed pages in preview toolbars for change requests and revisions.
+- 578a3a8: Fix site section dropdowns not being bounded by their container during the open/resize animation, causing the contents to visually clip.
+- 2dc76a2: Fix grouped top-nav section dropdowns rendering empty when the site is embedded in an iframe (visitor-auth embeds, editor preview) or shown in the embeddable view. The dropdown viewport is composited and animated, and a clipped composited layer fails to rasterize its text in Chromium when painted inside a sub compositing root; the rounded-corner clipping is now done on an inner wrapper so the viewport itself is no longer clipped.
+- 9f65133: Improve the 404 page: remove the table of contents sidebar and center the content, suggest related pages (ranked from the already-cached search index, so no extra request per 404), show a search or assistant input depending on the site's AI configuration, and move "Go to homepage" to the bottom as a last resort.
+- Updated dependencies [3fedaaa]
+- Updated dependencies [7e55cd5]
+  - @gitbook/expr@1.3.1
+  - @gitbook/openapi-parser@3.0.12
+  - @gitbook/react-openapi@1.5.15
+
 ## 0.27.1
 
 ### Patch Changes

@@ -140,7 +140,10 @@ function TableView({
                             'w-full min-w-0 overflow-x-auto overflow-y-hidden overscroll-x-none border-tint-subtle '
                         )}
                     >
-                        <div className={tcls('flex', 'flex-col', tableContainerClassName)}>
+                        <div
+                            className={tcls('flex', 'flex-col', tableContainerClassName)}
+                            role="table"
+                        >
                             {withHeader ? (
                                 <ViewGridHeader
                                     {...gridProps}
