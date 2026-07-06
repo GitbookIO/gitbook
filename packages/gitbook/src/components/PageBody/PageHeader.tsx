@@ -155,11 +155,14 @@ export async function PageHeader(props: {
                     // cover…) via the same --toc-top-offset the outline and code samples use.
                     'page-api-block:lg:top-[calc(var(--toc-top-offset,4rem)+1rem)]',
                     'page-api-block:lg:z-20',
-                    // When the outline opens as a drawer over this pinned bar (desktop API pages),
-                    // hide the bar so it doesn't overlap the sheet — the sheet has its own header
-                    // and close button. A single body-rooted selector, since `page-api-block`
-                    // (also body-rooted) can't be stacked with another `body…&` variant.
-                    'lg:[body.outline-open:has(.openapi-block)_&]:hidden'
+                    // When the outline opens as a drawer over this pinned bar, hide the bar so it
+                    // doesn't overlap the sheet — the sheet has its own header and close button.
+                    // Bounded to the drawer widths only (lg up to <96rem): at ≥96rem the outline is
+                    // forced inline and its toggle/close controls are hidden, so `outline-open` can
+                    // linger after a resize — the actions must stay visible there. A single
+                    // body-rooted selector, since `page-api-block` (also body-rooted) can't be
+                    // stacked with another `body…&` variant.
+                    'lg:max-[96rem]:[body.outline-open:has(.openapi-block)_&]:hidden'
                 )}
             >
                 {hasPageActions ? (
