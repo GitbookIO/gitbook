@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'bun:test';
-import type { OpenAPIV3_1 } from '@gitbook/openapi-parser';
-import { extractNonNullTypes, getEffectiveArrayType, getSchemaTitle } from './utils';
+import type { OpenAPIV3, OpenAPIV3_1 } from '@gitbook/openapi-parser';
+import {
+    extractNonNullTypes,
+    getEffectiveArrayType,
+    getSchemaTitle,
+    normalizeNullableUnion,
+} from './utils';
 
 describe('getSchemaTitle', () => {
     it('should handle OpenAPI 3.1 nullable array with reference items', () => {
@@ -179,5 +184,90 @@ describe('extractNonNullTypes', () => {
         const result = extractNonNullTypes(['null']);
         expect(result.nonNullTypes).toEqual([]);
         expect(result.hasNull).toBe(true);
+    });
+});
+
+describe('normalizeNullableUnion', () => {
+    it('should collapse anyOf with a single non-null member into a nullable schema', () => {
+        const schema: OpenAPIV3_1.SchemaObject = {
+            anyOf: [{ type: 'string' }, { type: 'null' }],
+        };
+
+        expect(normalizeNullableUnion(schema)).toEqual({ type: 'string', nullable: true });
+    });
+
+    it('should collapse oneOf with a single object member into a nullable object schema', () => {
+        const schema: OpenAPIV3_1.SchemaObject = {
+            oneOf: [
+                {
+                    type: 'object',
+                    properties: { id: { type: 'string' } },
+                },
+                { type: 'null' },
+            ],
+        };
+
+        expect(normalizeNullableUnion(schema)).toEqual({
+            type: 'object',
+            properties: { id: { type: 'string' } },
+            nullable: true,
+        });
+    });
+
+    it('should handle a null member expressed as type: ["null"]', () => {
+        const schema: OpenAPIV3_1.SchemaObject = {
+            anyOf: [{ type: 'integer' }, { type: ['null'] }],
+        };
+
+        expect(normalizeNullableUnion(schema)).toEqual({ type: 'integer', nullable: true });
+    });
+
+    it('should keep the union (without null) and flag nullable for multiple non-null members', () => {
+        const schema: OpenAPIV3_1.SchemaObject = {
+            anyOf: [{ type: 'string' }, { type: 'number' }, { type: 'null' }],
+        };
+
+        expect(normalizeNullableUnion(schema)).toEqual({
+            anyOf: [{ type: 'string' }, { type: 'number' }],
+            nullable: true,
+        });
+    });
+
+    it('should preserve outer-level metadata over the collapsed member', () => {
+        const schema: OpenAPIV3_1.SchemaObject = {
+            description: 'Outer description',
+            anyOf: [{ type: 'string', description: 'Member description' }, { type: 'null' }],
+        };
+
+        expect(normalizeNullableUnion(schema)).toEqual({
+            type: 'string',
+            description: 'Outer description',
+            nullable: true,
+        });
+    });
+
+    it('should return the schema unchanged when there is no null member', () => {
+        const schema: OpenAPIV3.SchemaObject = {
+            anyOf: [{ type: 'string' }, { type: 'number' }],
+        };
+
+        expect(normalizeNullableUnion(schema)).toBe(schema);
+    });
+
+    it('should return the schema unchanged when there is no union', () => {
+        const schema: OpenAPIV3.SchemaObject = { type: 'string' };
+
+        expect(normalizeNullableUnion(schema)).toBe(schema);
+    });
+
+    it('should keep a $ref member as a nullable union rather than inlining it', () => {
+        const schema: OpenAPIV3_1.SchemaObject = {
+            anyOf: [{ $ref: '#/components/schemas/Foo' }, { type: 'null' }],
+        };
+
+        expect(normalizeNullableUnion(schema)).toEqual({
+            anyOf: [{ $ref: '#/components/schemas/Foo' }],
+            nullable: true,
+        });
     });
 });

@@ -20,6 +20,7 @@ import {
     checkIsReference,
     getEffectiveArrayType,
     getSchemaTitle,
+    normalizeNullableUnion,
     resolveDescription,
     resolveFirstExample,
 } from './utils';
@@ -50,12 +51,18 @@ function OpenAPISchemaProperty(
         circularRefs: parentCircularRefs,
         context,
         className,
-        property,
+        property: rawProperty,
         discriminator,
         discriminatorValue,
         ...rest
     } = props;
 
+    // Normalize the OpenAPI 3.1+ `anyOf`/`oneOf` + `null` nullability idiom into a plain
+    // nullable schema before it enters the render pipeline.
+    const property = {
+        ...rawProperty,
+        schema: normalizeNullableUnion(rawProperty.schema),
+    };
     const { schema } = property;
 
     const id = useId();
@@ -201,10 +208,13 @@ function OpenAPIRootSchema(props: {
     circularRefs?: CircularRefsIds;
 }) {
     const {
-        schema,
         context,
         circularRefs: parentCircularRefs = new Map<OpenAPIV3.SchemaObject, string>(),
     } = props;
+
+    // Normalize the OpenAPI 3.1+ `anyOf`/`oneOf` + `null` nullability idiom into a plain
+    // nullable schema before it enters the render pipeline.
+    const schema = normalizeNullableUnion(props.schema);
 
     const id = useId();
     const ancestors = new Set(parentCircularRefs.keys());

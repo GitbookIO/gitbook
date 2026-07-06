@@ -132,10 +132,10 @@ function encodeSection(context: GitBookSiteContext, section: SiteSection, asEmbe
  * 4. Otherwise, return the default first language match.
  * 5. Otherwise, return the default one.
  */
-function findBestTargetURL(
+export function findBestTargetURL(
     context: GitBookSiteContext,
     section: SiteSection,
-    asEmbeddable: boolean
+    asEmbeddable = false
 ) {
     const { siteSpace: currentSiteSpace } = context;
 

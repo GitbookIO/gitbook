@@ -196,7 +196,7 @@ export async function Header(props: {
                                             ) ?? siteSpace
                                         }
                                         siteSpaces={variants.translations}
-                                        className="flex! site-header:theme-bold:text-header-link hover:site-header:theme-bold:bg-header-link/3 focus-visible:site-header:theme-bold:bg-header-link/3 aria-expanded:site-header:theme-bold:bg-header-link/5"
+                                        className="flex! -mx-3 site-header:theme-bold:text-header-link hover:site-header:theme-bold:bg-header-link/3 focus-visible:site-header:theme-bold:bg-header-link/3 aria-expanded:site-header:theme-bold:bg-header-link/5"
                                     />
                                 ) : null}
                             </HeaderLinks>
@@ -217,7 +217,7 @@ export async function Header(props: {
                                     ) ?? siteSpace
                                 }
                                 siteSpaces={variants.translations}
-                                className="my-1.5 ml-2 self-start"
+                                className="-mx-3 my-1.5 ml-2 self-start"
                             />
                         ) : null}
                     </SiteSectionTabs>
