@@ -44,6 +44,7 @@ export const uk: TranslationLanguage = {
     on_this_page: 'На цій сторінці',
     next_page: 'Наступна',
     previous_page: 'Попередня',
+    toc_back_to_space: 'Назад до ${1}',
     page_last_modified: 'Останнє оновлення ${1}',
     was_this_helpful: 'Це було корисно?',
     was_this_helpful_positive: 'Так, було!',

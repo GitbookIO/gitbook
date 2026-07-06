@@ -44,6 +44,7 @@ export const he: TranslationLanguage = {
     on_this_page: 'בדף הזה',
     next_page: 'הבא',
     previous_page: 'הקודם',
+    toc_back_to_space: 'חזרה אל ${1}',
     page_last_modified: 'עודכן לאחרונה ${1}',
     was_this_helpful: 'האם זה היה מועיל?',
     was_this_helpful_positive: 'כן, זה עזר!',

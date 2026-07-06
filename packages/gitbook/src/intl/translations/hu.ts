@@ -45,6 +45,7 @@ export const hu: TranslationLanguage = {
     on_this_page: 'Ezen az oldalon',
     next_page: 'Következő',
     previous_page: 'Előző',
+    toc_back_to_space: 'Vissza ide: ${1}',
     page_last_modified: 'Utoljára frissítve: ${1}',
     was_this_helpful: 'Hasznos volt ez?',
     was_this_helpful_positive: 'Igen, az volt!',

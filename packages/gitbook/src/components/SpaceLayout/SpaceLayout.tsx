@@ -141,7 +141,7 @@ export function SpaceLayout(props: SpaceLayoutProps) {
                         'lg:flex-row',
                         'lg:justify-center',
                         CONTAINER_STYLE,
-                        'transition-[max-width] duration-300',
+                        'transition-[max-width] duration-300 motion-reduce:transition-none',
 
                         !withTopHeader || variants.generic.length > 1
                             ? 'has-sidebar'
@@ -171,7 +171,7 @@ export function SpaceLayout(props: SpaceLayoutProps) {
                                     // On bold themes also color the TOC header so the logo looks correct.
                                     'site-header:theme-bold:bg-header-background',
                                     'site-header:theme-bold:m-[-1.5rem_-1px_-0.5rem_-2rem]',
-                                    'site-header:theme-bold:p-[1rem_0_1rem_2rem]'
+                                    'site-header:theme-bold:p-[1rem_1rem_1rem_2rem]'
                                 )}
                             >
                                 <HeaderLogo context={context} />
@@ -185,6 +185,7 @@ export function SpaceLayout(props: SpaceLayoutProps) {
                                         }
                                         siteSpaces={variants.translations}
                                         className="[&_.button-leading-icon]:block! ml-auto py-2 [&_.button-content]:hidden"
+                                        variant="header"
                                     />
                                 ) : null}
                             </div>

@@ -32,6 +32,7 @@ import {
     runTestCases,
     setTimeToMorning,
     waitForAIChatResponse,
+    waitForAdminToolbar,
     waitForCookiesDialog,
     waitForCoverImages,
     waitForNotFound,
@@ -613,25 +614,19 @@ const testCases: TestsCase[] = [
                 url: '',
             },
             {
-                name: 'Section group dropdown',
-                url: '',
-                run: async (page) => {
-                    await page.getByRole('button', { name: 'Test Section Group 1' }).hover();
-                    await expect(page.getByRole('link', { name: /Section B/ })).toBeVisible();
-                },
-            },
-            {
                 name: 'Section group link',
                 url: '',
                 screenshot: false,
                 run: async (page) => {
-                    // Scope to the section-group switcher button — the breadcrumbs also render the
-                    // section group name, so a plain text lookup would be ambiguous.
-                    const sectionGroupDropdown = page.getByRole('button', {
-                        name: 'Test Section Group 1',
-                    });
-                    await sectionGroupDropdown.hover();
-                    await page.getByRole('link', { name: /Section B/ }).click();
+                    const trigger = page.getByRole('button', { name: 'Test Section Group 1' });
+                    // Radix NavigationMenu opens the dropdown on a `pointermove`. A single
+                    // synthetic hover can land before hydration and be lost, so re-hover
+                    // until the dropdown content actually appears.
+                    await expect(async () => {
+                        await trigger.hover();
+                        await expect(page.getByText('Section B')).toBeVisible({ timeout: 1000 });
+                    }).toPass({ timeout: 15000 });
+                    await page.getByText('Section B').click();
                     await page.waitForURL((url) => url.pathname.includes('/sections/sections-4'));
                 },
             },
@@ -660,7 +655,12 @@ const testCases: TestsCase[] = [
             {
                 name: 'Revision',
                 url: '~/revisions/S55pwsEr5UVoroaOiWnP/blocks/headings',
-                run: waitForCookiesDialog,
+                run: async (page) => {
+                    await waitForCookiesDialog(page);
+                    // Viewing a past revision shows the admin toolbar; assert it is
+                    // present (it is hidden from the screenshot as it animates open).
+                    await waitForAdminToolbar(page);
+                },
             },
             {
                 name: 'Invalid revision',

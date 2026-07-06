@@ -260,6 +260,33 @@ export function getLocalizedTitle(
 }
 
 /**
+ * A string concatenation of the site structure (sections and variants) titles for the
+ * current context, as shown in the site's navigation. Returns an empty string when the
+ * current space is the default section and variant (i.e. it has no distinguishing label).
+ */
+export function getSiteStructureTitle(context: GitBookSiteContext): string {
+    const { visibleSections: sections, siteSpace, visibleSiteSpaces: siteSpaces } = context;
+    const currentLanguage = context.locale;
+
+    const title = [];
+    if (
+        sections &&
+        sections.current.default === false && // Only if the current section is not the default one
+        sections.list.filter((section) => section.object === 'site-section').length > 1 // Only if there are multiple sections
+    ) {
+        title.push(getLocalizedTitle(sections.current, currentLanguage));
+    }
+    if (
+        siteSpaces.length > 1 && // Only if there are multiple variants
+        siteSpace.default === false && // Only if the variant is not the default one
+        siteSpaces.filter((space) => space.space.language === siteSpace.space.language).length > 1 // Only if there are multiple variants *for the current language*. This filters out spaces that are "just" translations of each other, not versions.
+    ) {
+        title.push(getLocalizedTitle(siteSpace, siteSpace.space.language));
+    }
+    return title.join(' ');
+}
+
+/**
  * Get the localized description for a site entity.
  */
 export function getLocalizedDescription(

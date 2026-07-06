@@ -45,6 +45,7 @@ export const el: TranslationLanguage = {
     on_this_page: 'Σε αυτήν τη σελίδα',
     next_page: 'Επόμενη',
     previous_page: 'Προηγούμενη',
+    toc_back_to_space: 'Επιστροφή σε ${1}',
     page_last_modified: 'Τελευταία ενημέρωση ${1}',
     was_this_helpful: 'Ήταν χρήσιμο αυτό;',
     was_this_helpful_positive: 'Ναι, ήταν!',

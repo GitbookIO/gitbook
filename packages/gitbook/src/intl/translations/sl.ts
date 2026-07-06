@@ -45,6 +45,7 @@ export const sl: TranslationLanguage = {
     on_this_page: 'Na tej strani',
     next_page: 'Naslednja',
     previous_page: 'Prejšnja',
+    toc_back_to_space: 'Nazaj na ${1}',
     page_last_modified: 'Nazadnje posodobljeno ${1}',
     was_this_helpful: 'Je bilo to koristno?',
     was_this_helpful_positive: 'Da, bilo je!',

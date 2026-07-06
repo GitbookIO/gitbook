@@ -44,6 +44,7 @@ export const tr: TranslationLanguage = {
     on_this_page: 'Bu sayfada',
     next_page: 'Sonraki',
     previous_page: 'Önceki',
+    toc_back_to_space: 'Şuraya dön: ${1}',
     page_last_modified: 'Son güncelleme ${1}',
     was_this_helpful: 'Bu yararlı oldu mu?',
     was_this_helpful_positive: 'Evet, oldu!',

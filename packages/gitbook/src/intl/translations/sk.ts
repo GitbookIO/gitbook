@@ -45,6 +45,7 @@ export const sk: TranslationLanguage = {
     on_this_page: 'Na tejto stránke',
     next_page: 'Ďalej',
     previous_page: 'Predchádzajúca',
+    toc_back_to_space: 'Späť na ${1}',
     page_last_modified: 'Naposledy aktualizované ${1}',
     was_this_helpful: 'Bolo to užitočné?',
     was_this_helpful_positive: 'Áno, bolo!',

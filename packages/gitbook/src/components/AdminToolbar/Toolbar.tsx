@@ -105,7 +105,10 @@ export function Toolbar(props: ToolbarProps) {
     }
 
     return (
-        <motion.div className="-translate-x-1/2 fixed bottom-5 left-1/2 z-40 w-auto max-w-xl transform px-4">
+        <motion.div
+            data-testid="admin-toolbar"
+            className="-translate-x-1/2 fixed bottom-5 left-1/2 z-40 w-auto max-w-xl transform px-4"
+        >
             <ToolbarVisibilityHint show={showHint} />
 
             <AnimatePresence mode="wait">

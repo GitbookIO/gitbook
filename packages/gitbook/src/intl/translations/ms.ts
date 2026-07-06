@@ -44,6 +44,7 @@ export const ms: TranslationLanguage = {
     on_this_page: 'Pada halaman ini',
     next_page: 'Seterusnya',
     previous_page: 'Sebelumnya',
+    toc_back_to_space: 'Kembali ke ${1}',
     page_last_modified: 'Terakhir dikemas kini ${1}',
     was_this_helpful: 'Adakah ini membantu?',
     was_this_helpful_positive: 'Ya, membantu!',

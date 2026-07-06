@@ -44,6 +44,7 @@ export const da: TranslationLanguage = {
     on_this_page: 'På denne side',
     next_page: 'Næste',
     previous_page: 'Forrige',
+    toc_back_to_space: 'Tilbage til ${1}',
     page_last_modified: 'Sidst opdateret ${1}',
     was_this_helpful: 'Var dette nyttigt?',
     was_this_helpful_positive: 'Ja, det var det!',
