@@ -37,7 +37,7 @@ export async function resizeImageWithGitbookServices(
     })}/${encodeURIComponent(input)}`;
 
     const logger = getLogger().subLogger('imageResizing');
-    logger.log(`resize image using gitbook-service: ${resizeURL}`);
+    logger.log(`resize image using gitbook-service: ${resizeURL}, format: ${resizeOptions.format}`);
 
     return copyImageResponse(
         await fetch(resizeURL, {
