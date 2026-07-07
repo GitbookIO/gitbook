@@ -32,8 +32,14 @@ export async function PageHeader(props: {
     page: RevisionPageDocument;
     ancestors: AncestorRevisionPage[];
     withRSSFeed: boolean;
+    /**
+     * Whether the page has OpenAPI/Swagger blocks. On desktop, such pages get the page-actions
+     * pinned below the site header (see the render below); everywhere else the header is left
+     * exactly as-is.
+     */
+    hasAPIBlocks: boolean;
 }) {
-    const { context, page, ancestors, withRSSFeed } = props;
+    const { context, page, ancestors, withRSSFeed, hasAPIBlocks } = props;
     const { revision, linker } = context;
 
     const hasAncestors = ancestors.length > 0;
@@ -137,129 +143,132 @@ export async function PageHeader(props: {
         return null;
     }
 
-    return (
-        <>
-            {/* Page actions ("Ask", "On this page"…). Rendered as a sibling of the <header> — i.e. a
-                direct child of the scrolling <main> — rather than inside it, so their sticky
-                containing block is the full-height article instead of the short header. That lets
-                them stay pinned below the site header while scrolling, but only where it matters:
-                desktop API-reference pages (see the `page-api-block:lg:` classes), where the outline
-                collapses to a button and long operations would otherwise scroll it out of reach.
-                Everywhere else they keep flowing (and scrolling away) with the header as before. */}
-            <div
-                className={tcls(
-                    'float-right ml-4 flex gap-2',
-                    showBreadcrumbs ? '-mb-1 -mt-1.5' : '-mt-3 xs:mt-2',
+    const pageActions = (
+        <div
+            className={tcls(
+                'float-right ml-4 flex gap-2',
+                showBreadcrumbs ? '-mb-1 -mt-1.5' : '-mt-3 xs:mt-2',
+                // On desktop API pages (where this <div> is rendered as a sibling of <header>, see
+                // below) keep the actions pinned below the site header while scrolling long
+                // operations. The offset tracks the header height (banner, cover…) via the same
+                // --toc-top-offset the outline and code samples use. Hidden while the outline drawer
+                // is open (drawer widths only) so it doesn't overlap the sheet.
+                hasAPIBlocks && [
                     'page-api-block:lg:sticky',
-                    // Pin just below the site header; the offset tracks the header height (banner,
-                    // cover…) via the same --toc-top-offset the outline and code samples use.
                     'page-api-block:lg:top-[calc(var(--toc-top-offset,4rem)+1rem)]',
                     'page-api-block:lg:z-20',
-                    // When the outline opens as a drawer over this pinned bar, hide the bar so it
-                    // doesn't overlap the sheet — the sheet has its own header and close button.
-                    // Bounded to the drawer widths only (lg up to <96rem): at ≥96rem the outline is
-                    // forced inline and its toggle/close controls are hidden, so `outline-open` can
-                    // linger after a resize — the actions must stay visible there. A single
-                    // body-rooted selector, since `page-api-block` (also body-rooted) can't be
-                    // stacked with another `body…&` variant.
-                    'lg:max-[96rem]:[body.outline-open:has(.openapi-block)_&]:hidden'
-                )}
-            >
-                {hasPageActions ? (
-                    <PageActionsDropdown
-                        siteTitle={context.site.title}
-                        urls={getPageActionsURLs({ context, page, withRSSFeed })}
-                        actions={context.customization.pageActions}
-                        page={{
-                            id: page.id,
-                            title: page.title,
-                            path: page.path,
-                            href: linker.toPathForPage({ pages: revision.pages, page }),
-                        }}
-                    />
-                ) : null}
-                <PageAsideToggleButton />
-            </div>
-            <header className={tcls(CONTENT_STYLE, 'mb-6 space-y-3 after:clear-both after:block')}>
-                {showBreadcrumbs && (
-                    // Hide the breadcrumbs on wide pages that have no table of contents: there the
-                    // content spans the full width with no navigation column, so the crumbs sit stranded.
-                    <nav
-                        aria-label="Breadcrumb"
-                        className="layout-wide:page-no-toc:hidden text-tint text-xs leading-relaxed"
-                    >
-                        <ol className="inline">
-                            {contextCrumbs.map((crumb, index) => (
-                                <li key={crumb.key} className="inline">
-                                    <ContextCrumb crumb={crumb} />
-                                    {(index !== contextCrumbs.length - 1 || hasAncestors) && (
-                                        <BreadcrumbSeparator />
-                                    )}
+                    'lg:max-[96rem]:[body.outline-open:has(.openapi-block)_&]:hidden',
+                ]
+            )}
+        >
+            {hasPageActions ? (
+                <PageActionsDropdown
+                    siteTitle={context.site.title}
+                    urls={getPageActionsURLs({ context, page, withRSSFeed })}
+                    actions={context.customization.pageActions}
+                    page={{
+                        id: page.id,
+                        title: page.title,
+                        path: page.path,
+                        href: linker.toPathForPage({ pages: revision.pages, page }),
+                    }}
+                />
+            ) : null}
+            <PageAsideToggleButton />
+        </div>
+    );
+
+    const headerContent = (
+        <>
+            {showBreadcrumbs && (
+                // Hide the breadcrumbs on wide pages that have no table of contents: there the
+                // content spans the full width with no navigation column, so the crumbs sit stranded.
+                <nav
+                    aria-label="Breadcrumb"
+                    className="layout-wide:page-no-toc:hidden text-tint text-xs leading-relaxed"
+                >
+                    <ol className="inline">
+                        {contextCrumbs.map((crumb, index) => (
+                            <li key={crumb.key} className="inline">
+                                <ContextCrumb crumb={crumb} />
+                                {(index !== contextCrumbs.length - 1 || hasAncestors) && (
+                                    <BreadcrumbSeparator />
+                                )}
+                            </li>
+                        ))}
+                        {ancestors.map((breadcrumb, index) => {
+                            const parentPages = ancestors[index - 1]?.pages ?? revision.pages;
+                            const href = linker.toPathForPage({
+                                pages: revision.pages,
+                                page: breadcrumb,
+                            });
+                            return (
+                                <li key={breadcrumb.id} className="inline">
+                                    <BreadcrumbItemDropdown
+                                        href={href}
+                                        label={breadcrumb.title}
+                                        emoji={breadcrumb.emoji}
+                                        icon={breadcrumb.icon}
+                                        linkClassName={BREADCRUMB_LINK_CLASSES}
+                                        siblings={getPageSiblings(
+                                            context,
+                                            parentPages,
+                                            breadcrumb.id
+                                        )}
+                                    />
+                                    {index !== ancestors.length - 1 && <BreadcrumbSeparator />}
                                 </li>
-                            ))}
-                            {ancestors.map((breadcrumb, index) => {
-                                const parentPages = ancestors[index - 1]?.pages ?? revision.pages;
-                                const href = linker.toPathForPage({
-                                    pages: revision.pages,
-                                    page: breadcrumb,
-                                });
-                                return (
-                                    <li key={breadcrumb.id} className="inline">
-                                        <BreadcrumbItemDropdown
-                                            href={href}
-                                            label={breadcrumb.title}
-                                            emoji={breadcrumb.emoji}
-                                            icon={breadcrumb.icon}
-                                            linkClassName={BREADCRUMB_LINK_CLASSES}
-                                            siblings={getPageSiblings(
-                                                context,
-                                                parentPages,
-                                                breadcrumb.id
-                                            )}
-                                        />
-                                        {index !== ancestors.length - 1 && <BreadcrumbSeparator />}
-                                    </li>
-                                );
-                            })}
-                        </ol>
-                    </nav>
-                )}
-                <PageTags page={page} revision={revision} />
-                {page.layout.title ? (
-                    <h1
-                        className={tcls(
-                            'text-2xl',
-                            '@xs:text-3xl',
-                            '@lg:text-4xl',
-                            'leading-tight',
-                            'font-bold',
-                            'flex',
-                            'items-center',
-                            'gap-[.5em]',
-                            'grow',
-                            'text-pretty',
-                            'clear-right',
-                            'xs:clear-none'
-                        )}
-                    >
-                        <PageIcon page={page} style={['text-tint-subtle ', 'shrink-0']} />
-                        {page.title}
-                    </h1>
-                ) : null}
-                {page.description && page.layout.description ? (
-                    <p
-                        className={tcls(
-                            CONTENT_STYLE_REDUCED,
-                            'text-lg',
-                            'text-tint',
-                            'clear-both'
-                        )}
-                    >
-                        {page.description}
-                    </p>
-                ) : null}
-            </header>
+                            );
+                        })}
+                    </ol>
+                </nav>
+            )}
+            <PageTags page={page} revision={revision} />
+            {page.layout.title ? (
+                <h1
+                    className={tcls(
+                        'text-2xl',
+                        '@xs:text-3xl',
+                        '@lg:text-4xl',
+                        'leading-tight',
+                        'font-bold',
+                        'flex',
+                        'items-center',
+                        'gap-[.5em]',
+                        'grow',
+                        'text-pretty',
+                        'clear-right',
+                        'xs:clear-none'
+                    )}
+                >
+                    <PageIcon page={page} style={['text-tint-subtle ', 'shrink-0']} />
+                    {page.title}
+                </h1>
+            ) : null}
+            {page.description && page.layout.description ? (
+                <p className={tcls(CONTENT_STYLE_REDUCED, 'text-lg', 'text-tint', 'clear-both')}>
+                    {page.description}
+                </p>
+            ) : null}
         </>
+    );
+
+    const headerClassName = tcls(CONTENT_STYLE, 'mb-6 space-y-3 after:clear-both after:block');
+
+    // On API pages the actions are pulled out of <header> so their sticky containing block is the
+    // full-height <main> rather than the short header (a sticky element can't outlive its containing
+    // block). Everywhere else they stay inside <header> exactly as before, so those pages render
+    // byte-for-byte identically.
+    return hasAPIBlocks ? (
+        <>
+            {pageActions}
+            <header className={headerClassName}>{headerContent}</header>
+        </>
+    ) : (
+        <header className={headerClassName}>
+            {pageActions}
+            {headerContent}
+        </header>
     );
 }
 
