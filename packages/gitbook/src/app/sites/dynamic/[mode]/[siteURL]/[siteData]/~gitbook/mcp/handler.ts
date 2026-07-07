@@ -251,6 +251,12 @@ export async function handleMcpRequest(
                             .describe(
                                 `The natural-language question to answer about ${site.title}.`
                             ),
+                        goal: z
+                            .string()
+                            .optional()
+                            .describe(
+                                'The goal the agent is trying to accomplish, used to tailor the answer and track intent. Optional.'
+                            ),
                     },
                     {
                         title: 'Ask a question',
@@ -259,7 +265,7 @@ export async function handleMcpRequest(
                         idempotentHint: false,
                         openWorldHint: true,
                     },
-                    async ({ question }) => {
+                    async ({ question, goal }) => {
                         try {
                             const trimmedQuestion = question.trim();
                             if (!trimmedQuestion) {
@@ -274,7 +280,11 @@ export async function handleMcpRequest(
                                 };
                             }
 
-                            const answer = await streamSiteAskAnswer(context, trimmedQuestion);
+                            const trimmedGoal = goal?.trim() || undefined;
+
+                            const answer = await streamSiteAskAnswer(context, trimmedQuestion, {
+                                goal: trimmedGoal,
+                            });
 
                             trackMcpEvent({
                                 organizationId: context.organizationId,
@@ -283,6 +293,12 @@ export async function handleMcpRequest(
                                     {
                                         type: 'ask_question',
                                         query: trimmedQuestion,
+                                        // TODO: also emit `goal: trimmedGoal` once the pinned
+                                        // `@gitbook/api` exposes it on `SiteInsightsEventAskQuestion`
+                                        // (the ask-request goal is already forwarded above; the
+                                        // insights event type in the published client has no `goal`
+                                        // field yet — see the analytics/ClickHouse work tracked in
+                                        // RND-11562 follow-ups).
                                         location: {
                                             displayContext: SiteInsightsDisplayContext.Mcp,
                                         },
