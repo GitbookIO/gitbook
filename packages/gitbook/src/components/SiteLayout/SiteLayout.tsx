@@ -56,7 +56,11 @@ export async function SiteLayout(props: {
             contextId={context.contextId}
             forcedTheme={
                 forcedTheme ??
-                (customization.themes.toggeable ? undefined : customization.themes.default)
+                // Only force concrete light/dark; System stays unforced so next-themes resolves prefers-color-scheme pre-paint (avoids the flash). A theme saved while the toggle was previously on still wins — see the PR's "Known limitation". RND-11643
+                (customization.themes.toggeable ||
+                customization.themes.default === CustomizationDefaultThemeMode.System
+                    ? undefined
+                    : customization.themes.default)
             }
             defaultTheme={customization.themes.default}
             externalLinksTarget={customization.externalLinks.target}
