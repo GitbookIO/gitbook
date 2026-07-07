@@ -6,6 +6,7 @@ import React, { useEffect, useRef } from 'react';
 import { useAI, useAIChatController } from '@/components/AI';
 import { isAIChatEnabled } from '@/components/utils/isAIChatEnabled';
 import { tString, useLanguage } from '@/intl/client';
+import { extractPagePath } from '@/lib/pages';
 import { useRouter } from 'next/navigation';
 import { createStore, useStore } from 'zustand';
 import { integrationsAssistantTools } from '../Integrations';
@@ -32,16 +33,18 @@ function log(...data: any[]) {
  */
 export function EmbeddableIframeAPI(props: {
     baseURL: string;
+    /** Absolute URL of the published site, used to resolve `navigateToPage` inputs. */
+    siteURL: string;
 }) {
-    const { baseURL } = props;
+    const { baseURL, siteURL } = props;
 
     const router = useRouter();
     const chatController = useAIChatController();
 
     // Live ref to avoid adding them as dependencies
-    const refs = useRef({ router, chatController, baseURL });
+    const refs = useRef({ router, chatController, baseURL, siteURL });
     useEffect(() => {
-        refs.current = { router, chatController, baseURL };
+        refs.current = { router, chatController, baseURL, siteURL };
     });
 
     React.useEffect(() => {
@@ -58,7 +61,7 @@ export function EmbeddableIframeAPI(props: {
         }
 
         channel.receive((payload) => {
-            const { baseURL, router, chatController } = refs.current;
+            const { baseURL, siteURL, router, chatController } = refs.current;
             const message = payload as ParentToFrameMessage;
 
             log('[gitbook] received message', message);
@@ -82,7 +85,10 @@ export function EmbeddableIframeAPI(props: {
                     break;
                 }
                 case 'navigateToPage': {
-                    router.push(`${baseURL}/page/${message.pagePath}`);
+                    // Accept either the page path within the site or the page's full
+                    // published URL; resolve the latter to a page path.
+                    const pagePath = extractPagePath(message.pagePath, siteURL) ?? message.pagePath;
+                    router.push(`${baseURL}/page/${pagePath}`);
                     break;
                 }
                 case 'navigateToAssistant': {

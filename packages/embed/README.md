@@ -187,7 +187,7 @@ function MyComponent() {
 - `GitBook('open')` - Open widget window
 - `GitBook('close')` - Close widget window
 - `GitBook('toggle')` - Toggle widget window
-- `GitBook('navigateToPage', path: string)` - Navigate to page
+- `GitBook('navigateToPage', path: string)` - Navigate to page (accepts the page path relative to your docs root, or the full published URL; for docs served from a subdirectory, omit the subdirectory from the path)
 - `GitBook('navigateToAssistant')` - Navigate to assistant tab
 - `GitBook('postUserMessage', message: string)` - Post message to chat
 - `GitBook('clearChat')` - Clear chat history
@@ -202,7 +202,7 @@ function MyComponent() {
 - `client.createFrame(iframe: HTMLIFrameElement)` → `GitBookFrameClient`
 
 **Frame Client:**
-- `frame.navigateToPage(path: string)` → `void`
+- `frame.navigateToPage(path: string)` → `void` (accepts the page path relative to your docs root, or the full published URL; for docs served from a subdirectory, omit the subdirectory from the path)
 - `frame.navigateToAssistant()` → `void`
 - `frame.postUserMessage(message: string)` → `void`
 - `frame.clearChat()` → `void`

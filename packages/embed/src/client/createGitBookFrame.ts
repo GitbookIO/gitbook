@@ -7,7 +7,16 @@ import type {
 
 export type GitBookFrameClient = {
     /**
-     * Navigate to a page by its path.
+     * Navigate to a page in the docs tab.
+     *
+     * Provide the page's path relative to the root of your docs
+     * (e.g. `getting-started/quickstart`), or its full published URL
+     * (e.g. `https://example.com/docs/getting-started/quickstart`).
+     *
+     * If your docs are served from a subdirectory (e.g. `example.com/docs`), the
+     * path must be relative to the docs root — omit the subdirectory
+     * (`getting-started/quickstart`, not `/docs/getting-started/quickstart`) — or
+     * pass the full URL.
      */
     navigateToPage: (path: string) => void;
 
