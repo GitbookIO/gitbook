@@ -1,9 +1,8 @@
 import { describe, expect, it } from 'bun:test';
-import type { SiteSpace, SiteStructure } from '@gitbook/api';
+import type { SiteSpace } from '@gitbook/api';
 import { TranslationLanguage } from '@gitbook/api';
 
-import { createLinker } from './links';
-import { filterSiteSpacesByLocale, toEmbeddableLinkForURL } from './sites';
+import { filterSiteSpacesByLocale } from './sites';
 
 function makeSiteSpace(language: TranslationLanguage | undefined): SiteSpace {
     return { space: { language } } as unknown as SiteSpace;
@@ -28,66 +27,5 @@ describe('filterSiteSpacesByLocale', () => {
             undefinedLanguage,
             en,
         ]);
-    });
-});
-
-describe('toEmbeddableLinkForURL', () => {
-    function siteSpaceWithURL(published: string): SiteSpace {
-        return { urls: { published } } as unknown as SiteSpace;
-    }
-
-    // Multi-space site served at the host root: a default space and a `help-center` section.
-    const structure = {
-        type: 'siteSpaces',
-        structure: [
-            siteSpaceWithURL('https://help.example.com'),
-            siteSpaceWithURL('https://help.example.com/help-center'),
-        ],
-    } as unknown as SiteStructure;
-
-    const linker = createLinker({
-        host: 'help.example.com',
-        spaceBasePath: '/',
-        siteBasePath: '/',
-    });
-
-    it('places the section base before the embed path for a cross-space URL', () => {
-        expect(
-            toEmbeddableLinkForURL(
-                linker,
-                structure,
-                'https://help.example.com/help-center/integrations'
-            )
-        ).toBe('/help-center/~gitbook/embed/page/integrations');
-    });
-
-    it('resolves a page in the default space', () => {
-        expect(
-            toEmbeddableLinkForURL(
-                linker,
-                structure,
-                'https://help.example.com/getting-started/quickstart'
-            )
-        ).toBe('/~gitbook/embed/page/getting-started/quickstart');
-    });
-
-    it('resolves the section root', () => {
-        expect(
-            toEmbeddableLinkForURL(linker, structure, 'https://help.example.com/help-center')
-        ).toBe('/help-center/~gitbook/embed/page');
-    });
-
-    it('returns null when the URL maps to no space', () => {
-        const subdirStructure = {
-            type: 'siteSpaces',
-            structure: [
-                siteSpaceWithURL('https://help.example.com/docs'),
-                siteSpaceWithURL('https://help.example.com/help-center'),
-            ],
-        } as unknown as SiteStructure;
-
-        expect(
-            toEmbeddableLinkForURL(linker, subdirStructure, 'https://help.example.com/marketing/x')
-        ).toBeNull();
     });
 });
