@@ -178,10 +178,13 @@ button.openapi-mcp {
 }
 
 .openapi-column-preview {
-    /* Only on the 2-column layout is the preview a sticky pane capped to the viewport so both panels fit
-       (max-height accounts for the top offset + a 1.5rem bottom margin). On mobile (single column) it flows
-       normally, each block bounded by max-h-96, so the response isn't crammed into the viewport. */
-    @apply flex flex-col flex-1 scroll-mt-4 lg:sticky lg:self-start lg:max-h-[calc(100vh-var(--toc-top-offset)-3rem)] lg:top-[calc(var(--toc-top-offset)+1.5rem)];
+    /* Only on the 2-column layout is the preview a sticky pane capped to the viewport so both panels fit.
+       The top offset clears the site header (--toc-top-offset) plus the sticky page-actions bar pinned just
+       below it on desktop API pages (~3rem: its 1rem gap under the header + the button row), landing 4rem
+       down with a small gap beneath the bar. The max-height subtracts that same 4rem top offset plus a
+       1.5rem bottom margin. On mobile (single column) it flows normally, each block bounded by max-h-96, so
+       the response isn't crammed into the viewport. */
+    @apply flex flex-col flex-1 scroll-mt-4 lg:sticky lg:self-start lg:max-h-[calc(100vh-var(--toc-top-offset)-5.5rem)] lg:top-[calc(var(--toc-top-offset)+4rem)];
 }
 
 .openapi-column-preview-body {

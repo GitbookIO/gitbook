@@ -3,7 +3,13 @@ import type { JSONDocument, RevisionPageDocument, SiteInsightsDisplayContext } f
 
 import { getSpaceLanguage } from '@/intl/server';
 import { t } from '@/intl/translate';
-import { hasFullWidthBlock, hasMoreThan, hasTopLevelBlock, isNodeEmpty } from '@/lib/document';
+import {
+    hasAPIBlock,
+    hasFullWidthBlock,
+    hasMoreThan,
+    hasTopLevelBlock,
+    isNodeEmpty,
+} from '@/lib/document';
 import { getLLMsTxtURL, getPageMarkdownURL } from '@/lib/llms-directive';
 import type { AncestorRevisionPage } from '@/lib/pages';
 import { tcls } from '@/lib/tailwind';
@@ -59,6 +65,10 @@ export async function PageBody(props: {
     // Determine if content should use wide layout (2-column or 1-column instead of 3-column)
     // This happens when: (1) document has full-width blocks, OR (2) page layout is explicitly set to 'wide'
     const wideContent = document ? hasFullWidthBlock(document) : false;
+    // Whether the page has OpenAPI/Swagger blocks — used to scope the sticky, extracted page-actions
+    // to API-reference pages only (matching the `page-api-block` styling), so other pages keep the
+    // header structure untouched.
+    const hasAPIBlocks = document ? hasAPIBlock(document) : false;
     const wideLayout = wideContent || page.layout.width === 'wide';
     const language = await getSpaceLanguage(context);
     const updatedAt = page.updatedAt ?? page.createdAt;
@@ -99,6 +109,7 @@ export async function PageBody(props: {
                     page={page}
                     ancestors={ancestors}
                     withRSSFeed={contentHasUpdates}
+                    hasAPIBlocks={hasAPIBlocks}
                 />
                 {document && !isNodeEmpty(document) ? (
                     <OptionalSuspense
