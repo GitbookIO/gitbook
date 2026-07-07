@@ -59,8 +59,8 @@ export function OpenAPIDisclosureGroup(props: DisclosureGroupProps & Props) {
         onExpandedChange,
     } = props;
 
-    // When `expandedKeys` is provided, the group is controlled by the parent (e.g. synced to the
-    // responses selector). Otherwise it owns its expanded state in a store keyed by `stateKey`.
+    // When `expandedKeys` is provided, the group is controlled by the parent. Otherwise it owns
+    // its expanded state in a store keyed by `stateKey`.
     const isControlled = expandedKeys !== undefined;
 
     const initialKeys = defaultExpandedKeys ? new Set(defaultExpandedKeys) : undefined;

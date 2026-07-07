@@ -2,6 +2,7 @@
 
 import type { OpenAPIV3, OpenAPIV3_1 } from '@gitbook/openapi-parser';
 import clsx from 'classnames';
+import type { Key } from 'react-aria';
 import { Markdown } from './Markdown';
 import { OpenAPIDisclosureGroup } from './OpenAPIDisclosureGroup';
 import { OpenAPIResponse } from './OpenAPIResponse';
@@ -109,9 +110,19 @@ export function OpenAPIResponses(props: {
 
     const expandAll = context.expandAllResponses;
 
-    // The selected response is shared page-wide; fall back to the first response when this
-    // operation doesn't define the globally-selected status code.
-    const selectedKey = groups.find((g) => g.key === state.key)?.key ?? groups[0]?.key;
+    // In expand-all mode the group manages its own (multiple) expanded rows; otherwise it's
+    // controlled and stays in sync with the page-wide responses selector.
+    const disclosureProps = expandAll
+        ? {
+              stateKey: createStateKey('openapi-responses-disclosure', context.blockKey),
+              defaultExpandedKeys: groups.map((g) => g.key),
+          }
+        : {
+              expandedKeys: getExpandedResponseKeys(groups, state.key),
+              onExpandedChange: (keys: Set<Key>) => {
+                  state.setKey(keys.values().next().value ?? null);
+              },
+          };
 
     return (
         <StaticSection header={t(context.translation, 'responses')} className="openapi-responses">
@@ -121,22 +132,21 @@ export function OpenAPIResponses(props: {
                 groups={groups}
                 selectIcon={context.icons.chevronDown}
                 selectStateKey={createStateKey('response-media-types', context.blockKey)}
-                {...(expandAll
-                    ? {
-                          stateKey: createStateKey(
-                              'openapi-responses-disclosure',
-                              context.blockKey
-                          ),
-                          defaultExpandedKeys: groups.map((g) => g.key),
-                      }
-                    : {
-                          // Controlled: stay in sync with the responses selector via the shared store.
-                          expandedKeys: selectedKey ? new Set([selectedKey]) : new Set<string>(),
-                          onExpandedChange: (keys) => {
-                              state.setKey(keys.values().next().value ?? null);
-                          },
-                      })}
+                {...disclosureProps}
             />
         </StaticSection>
     );
+}
+
+/**
+ * Resolve the expanded response for the controlled accordion: nothing when the selection is
+ * cleared, otherwise the selected status code, falling back to the first response when this
+ * operation doesn't define it.
+ */
+function getExpandedResponseKeys(groups: { key: string }[], selectedKey: Key | null): Set<string> {
+    if (selectedKey == null) {
+        return new Set<string>();
+    }
+    const key = groups.find((g) => g.key === selectedKey)?.key ?? groups[0]?.key;
+    return key ? new Set([key]) : new Set<string>();
 }
