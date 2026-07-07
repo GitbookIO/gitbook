@@ -59,10 +59,11 @@ export function OpenAPIDisclosureGroup(props: DisclosureGroupProps & Props) {
         onExpandedChange,
     } = props;
 
-    const initialKeys =
-        expandedKeys || defaultExpandedKeys
-            ? new Set(expandedKeys || defaultExpandedKeys)
-            : undefined;
+    // When `expandedKeys` is provided, the group is controlled by the parent (e.g. synced to the
+    // responses selector). Otherwise it owns its expanded state in a store keyed by `stateKey`.
+    const isControlled = expandedKeys !== undefined;
+
+    const initialKeys = defaultExpandedKeys ? new Set(defaultExpandedKeys) : undefined;
     const { expandedKeys: storeExpandedKeys, setExpandedKeys } = useDisclosureGroupStore(
         stateKey,
         initialKeys
@@ -70,9 +71,11 @@ export function OpenAPIDisclosureGroup(props: DisclosureGroupProps & Props) {
 
     const state = useDisclosureGroupState({
         ...props,
-        expandedKeys: storeExpandedKeys,
+        expandedKeys: isControlled ? expandedKeys : storeExpandedKeys,
         onExpandedChange: (keys) => {
-            setExpandedKeys(keys);
+            if (!isControlled) {
+                setExpandedKeys(keys);
+            }
             onExpandedChange?.(keys);
         },
     });

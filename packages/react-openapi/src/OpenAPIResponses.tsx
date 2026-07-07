@@ -108,25 +108,30 @@ export function OpenAPIResponses(props: {
     const state = useResponseExamplesState(context.blockKey, groups[0]?.key);
 
     const expandAll = context.expandAllResponses;
-    const expandedKeys = expandAll
-        ? new Set(groups.map((g) => g.key))
-        : state.key
-          ? new Set([state.key])
-          : new Set<string>();
 
     return (
         <StaticSection header={t(context.translation, 'responses')} className="openapi-responses">
             <OpenAPIDisclosureGroup
                 icon={context.icons.chevronRight}
                 allowsMultipleExpanded={expandAll}
-                expandedKeys={expandedKeys}
-                onExpandedChange={(keys) => {
-                    const key = keys.values().next().value ?? null;
-                    state.setKey(key);
-                }}
                 groups={groups}
                 selectIcon={context.icons.chevronDown}
                 selectStateKey={createStateKey('response-media-types', context.blockKey)}
+                {...(expandAll
+                    ? {
+                          stateKey: createStateKey(
+                              'openapi-responses-disclosure',
+                              context.blockKey
+                          ),
+                          defaultExpandedKeys: groups.map((g) => g.key),
+                      }
+                    : {
+                          // Controlled: stay in sync with the responses selector via the shared store.
+                          expandedKeys: state.key ? new Set([state.key]) : new Set<string>(),
+                          onExpandedChange: (keys) => {
+                              state.setKey(keys.values().next().value ?? null);
+                          },
+                      })}
             />
         </StaticSection>
     );
