@@ -32,8 +32,14 @@ export async function PageHeader(props: {
     page: RevisionPageDocument;
     ancestors: AncestorRevisionPage[];
     withRSSFeed: boolean;
+    /**
+     * Whether the page has OpenAPI/Swagger blocks. On desktop, such pages get the page-actions
+     * pinned below the site header (see the render below); everywhere else the header is left
+     * exactly as-is.
+     */
+    hasAPIBlocks: boolean;
 }) {
-    const { context, page, ancestors, withRSSFeed } = props;
+    const { context, page, ancestors, withRSSFeed, hasAPIBlocks } = props;
     const { revision, linker } = context;
 
     const hasAncestors = ancestors.length > 0;
@@ -137,30 +143,43 @@ export async function PageHeader(props: {
         return null;
     }
 
-    return (
-        <header className={tcls(CONTENT_STYLE, 'mb-6 space-y-3 after:clear-both after:block')}>
-            <div
-                className={tcls(
-                    'float-right ml-4 flex gap-2',
-                    showBreadcrumbs ? '-mb-1 -mt-1.5' : '-mt-3 xs:mt-2'
-                )}
-            >
-                {hasPageActions ? (
-                    <PageActionsDropdown
-                        siteTitle={context.site.title}
-                        urls={getPageActionsURLs({ context, page, withRSSFeed })}
-                        actions={context.customization.pageActions}
-                        page={{
-                            id: page.id,
-                            title: page.title,
-                            path: page.path,
-                            href: linker.toPathForPage({ pages: revision.pages, page }),
-                        }}
-                    />
-                ) : null}
-                <PageAsideToggleButton />
-            </div>
+    const pageActions = (
+        <div
+            className={tcls(
+                'float-right ml-4 flex gap-2',
+                showBreadcrumbs ? '-mb-1 -mt-1.5' : '-mt-3 xs:mt-2',
+                // On desktop API pages (where this <div> is rendered as a sibling of <header>, see
+                // below) keep the actions pinned below the site header while scrolling long
+                // operations. The offset tracks the header height (banner, cover…) via the same
+                // --toc-top-offset the outline and code samples use. Hidden while the outline drawer
+                // is open (drawer widths only) so it doesn't overlap the sheet.
+                hasAPIBlocks && [
+                    'page-api-block:lg:sticky',
+                    'page-api-block:lg:top-[calc(var(--toc-top-offset,4rem)+1rem)]',
+                    'page-api-block:lg:z-20',
+                    'lg:max-[96rem]:[body.outline-open:has(.openapi-block)_&]:hidden',
+                ]
+            )}
+        >
+            {hasPageActions ? (
+                <PageActionsDropdown
+                    siteTitle={context.site.title}
+                    urls={getPageActionsURLs({ context, page, withRSSFeed })}
+                    actions={context.customization.pageActions}
+                    page={{
+                        id: page.id,
+                        title: page.title,
+                        path: page.path,
+                        href: linker.toPathForPage({ pages: revision.pages, page }),
+                    }}
+                />
+            ) : null}
+            <PageAsideToggleButton />
+        </div>
+    );
 
+    const headerContent = (
+        <>
             {showBreadcrumbs && (
                 // Hide the breadcrumbs on wide pages that have no table of contents: there the
                 // content spans the full width with no navigation column, so the crumbs sit stranded.
@@ -231,6 +250,24 @@ export async function PageHeader(props: {
                     {page.description}
                 </p>
             ) : null}
+        </>
+    );
+
+    const headerClassName = tcls(CONTENT_STYLE, 'mb-6 space-y-3 after:clear-both after:block');
+
+    // On API pages the actions are pulled out of <header> so their sticky containing block is the
+    // full-height <main> rather than the short header (a sticky element can't outlive its containing
+    // block). Everywhere else they stay inside <header> exactly as before, so those pages render
+    // byte-for-byte identically.
+    return hasAPIBlocks ? (
+        <>
+            {pageActions}
+            <header className={headerClassName}>{headerContent}</header>
+        </>
+    ) : (
+        <header className={headerClassName}>
+            {pageActions}
+            {headerContent}
         </header>
     );
 }

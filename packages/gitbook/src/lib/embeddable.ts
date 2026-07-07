@@ -47,10 +47,12 @@ export function resolveEmbeddableTheme(
     forcedTheme?: CustomizationDefaultThemeMode | null
 ) {
     if (!customization.themes.toggeable) {
+        const mode = customization.themes.default;
         return {
-            htmlTheme: customization.themes.default,
-            defaultTheme: customization.themes.default,
-            forcedTheme: customization.themes.default,
+            htmlTheme: mode,
+            defaultTheme: mode,
+            // Only force concrete light/dark; System stays unforced so next-themes resolves prefers-color-scheme pre-paint (avoids the flash). A theme saved while the toggle was previously on still wins — see the PR's "Known limitation". RND-11643
+            forcedTheme: mode === CustomizationDefaultThemeMode.System ? undefined : mode,
         };
     }
 

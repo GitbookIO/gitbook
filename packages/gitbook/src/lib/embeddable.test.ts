@@ -161,4 +161,22 @@ describe('resolveEmbeddableTheme', () => {
             forcedTheme: CustomizationDefaultThemeMode.Light,
         });
     });
+
+    it('does not force `system` for single-theme sites set to the system default', () => {
+        // Forcing `system` makes next-themes' pre-paint script skip
+        // prefers-color-scheme resolution, causing a light→dark flash (RND-11643).
+        // It must stay unforced so next-themes resolves it before first paint.
+        expect(
+            resolveEmbeddableTheme(
+                createCustomization({
+                    toggeable: false,
+                    default: CustomizationDefaultThemeMode.System,
+                })
+            )
+        ).toEqual({
+            htmlTheme: CustomizationDefaultThemeMode.System,
+            defaultTheme: CustomizationDefaultThemeMode.System,
+            forcedTheme: undefined,
+        });
+    });
 });
