@@ -105,9 +105,13 @@ export function OpenAPIResponses(props: {
             };
         });
 
-    const state = useResponseExamplesState(context.blockKey, groups[0]?.key);
+    const state = useResponseExamplesState(groups[0]?.key);
 
     const expandAll = context.expandAllResponses;
+
+    // The selected response is shared page-wide; fall back to the first response when this
+    // operation doesn't define the globally-selected status code.
+    const selectedKey = groups.find((g) => g.key === state.key)?.key ?? groups[0]?.key;
 
     return (
         <StaticSection header={t(context.translation, 'responses')} className="openapi-responses">
@@ -127,7 +131,7 @@ export function OpenAPIResponses(props: {
                       }
                     : {
                           // Controlled: stay in sync with the responses selector via the shared store.
-                          expandedKeys: state.key ? new Set([state.key]) : new Set<string>(),
+                          expandedKeys: selectedKey ? new Set([selectedKey]) : new Set<string>(),
                           onExpandedChange: (keys) => {
                               state.setKey(keys.values().next().value ?? null);
                           },
