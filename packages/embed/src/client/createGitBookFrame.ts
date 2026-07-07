@@ -9,14 +9,10 @@ export type GitBookFrameClient = {
     /**
      * Navigate to a page in the docs tab.
      *
-     * Provide the page's path relative to the root of your docs
-     * (e.g. `getting-started/quickstart`), or its full published URL
-     * (e.g. `https://example.com/docs/getting-started/quickstart`).
-     *
-     * If your docs are served from a subdirectory (e.g. `example.com/docs`), the
-     * path must be relative to the docs root — omit the subdirectory
-     * (`getting-started/quickstart`, not `/docs/getting-started/quickstart`) — or
-     * pass the full URL.
+     * Accepts the page's path within the site (e.g. `getting-started/quickstart`),
+     * an absolute path (e.g. `/help-center/integrations`), or its full published URL.
+     * The target page may live in any space/section of the site — including one other
+     * than the embed is currently showing — and is resolved to the right space.
      */
     navigateToPage: (path: string) => void;
 

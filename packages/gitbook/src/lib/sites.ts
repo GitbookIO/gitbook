@@ -8,6 +8,8 @@ import type {
     SiteStructure,
     TranslationLanguage,
 } from '@gitbook/api';
+import { toEmbeddableLinkForPublishedContent } from './embeddable-linker';
+import type { GitBookLinker } from './links';
 import { extractPagePath } from './pages';
 import { joinPath } from './paths';
 import { flattenSectionsFromGroup } from './utils';
@@ -119,6 +121,28 @@ export function findSiteSpaceByUrl(
     }
 
     return bestMatch;
+}
+
+/**
+ * Resolve a URL within the site to its embeddable page link.
+ *
+ * Finds the space that owns the URL and builds the embed link with its base
+ * (section/space) placed before `~gitbook/embed/page`, so a link into another
+ * space resolves correctly (e.g. `/help-center/~gitbook/embed/page/integrations`).
+ * Returns `null` when the URL does not map to a page in the site.
+ */
+export function toEmbeddableLinkForURL(
+    linker: GitBookLinker,
+    siteStructure: SiteStructure,
+    url: string
+): string | null {
+    const match = findSiteSpaceByUrl(siteStructure, url);
+    const publishedUrl = match?.siteSpace.urls.published;
+    if (!match || !publishedUrl) {
+        return null;
+    }
+
+    return toEmbeddableLinkForPublishedContent(linker, publishedUrl, match.pagePath ?? '');
 }
 
 /**

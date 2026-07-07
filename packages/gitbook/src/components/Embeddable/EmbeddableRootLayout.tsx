@@ -79,7 +79,6 @@ export async function EmbeddableRootLayout({
                         </div>
                         <EmbeddableIframeAPI
                             baseURL={context.linker.toPathInSite('~gitbook/embed/')}
-                            siteURL={context.linker.toAbsoluteURL(context.linker.toPathInSite(''))}
                         />
                     </SpaceLayoutServerContext>
                 </EmbeddableAIContextProvider>

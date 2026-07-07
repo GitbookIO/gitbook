@@ -6,12 +6,12 @@ import React, { useEffect, useRef } from 'react';
 import { useAI, useAIChatController } from '@/components/AI';
 import { isAIChatEnabled } from '@/components/utils/isAIChatEnabled';
 import { tString, useLanguage } from '@/intl/client';
-import { extractPagePath } from '@/lib/pages';
 import { useRouter } from 'next/navigation';
 import { createStore, useStore } from 'zustand';
 import { integrationsAssistantTools } from '../Integrations';
 import { Button, LinkContext, type LinkContextType } from '../primitives';
 import { getChannel } from './channel';
+import { resolveEmbedPageLink } from './server-actions';
 
 const embeddableConfiguration = createStore<GitBookEmbeddableConfiguration>(() => ({
     tabs: [],
@@ -33,18 +33,16 @@ function log(...data: any[]) {
  */
 export function EmbeddableIframeAPI(props: {
     baseURL: string;
-    /** Absolute URL of the published site, used to resolve `navigateToPage` inputs. */
-    siteURL: string;
 }) {
-    const { baseURL, siteURL } = props;
+    const { baseURL } = props;
 
     const router = useRouter();
     const chatController = useAIChatController();
 
     // Live ref to avoid adding them as dependencies
-    const refs = useRef({ router, chatController, baseURL, siteURL });
+    const refs = useRef({ router, chatController, baseURL });
     useEffect(() => {
-        refs.current = { router, chatController, baseURL, siteURL };
+        refs.current = { router, chatController, baseURL };
     });
 
     React.useEffect(() => {
@@ -61,7 +59,7 @@ export function EmbeddableIframeAPI(props: {
         }
 
         channel.receive((payload) => {
-            const { baseURL, siteURL, router, chatController } = refs.current;
+            const { baseURL, router, chatController } = refs.current;
             const message = payload as ParentToFrameMessage;
 
             log('[gitbook] received message', message);
@@ -85,10 +83,17 @@ export function EmbeddableIframeAPI(props: {
                     break;
                 }
                 case 'navigateToPage': {
-                    // Accept either the page path within the site or the page's full
-                    // published URL; resolve the latter to a page path.
-                    const pagePath = extractPagePath(message.pagePath, siteURL) ?? message.pagePath;
-                    router.push(`${baseURL}/page/${pagePath}`);
+                    // Resolve the target server-side: on a multi-space site the page may
+                    // live in another space/section, whose base must go before
+                    // `~gitbook/embed/page`. Fall back to a same-space push on failure.
+                    const { pagePath } = message;
+                    resolveEmbedPageLink(pagePath)
+                        .then((resolved) => {
+                            router.push(
+                                'href' in resolved ? resolved.href : `${baseURL}/page/${pagePath}`
+                            );
+                        })
+                        .catch(() => router.push(`${baseURL}/page/${pagePath}`));
                     break;
                 }
                 case 'navigateToAssistant': {
