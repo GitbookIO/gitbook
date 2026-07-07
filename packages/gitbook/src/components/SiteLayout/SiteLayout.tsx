@@ -61,6 +61,10 @@ export async function SiteLayout(props: {
                 // (it applies the literal value), causing a light→dark flash on sites
                 // set to respect the system default. Leaving it unforced lets next-themes
                 // resolve `system` before first paint (RND-11643).
+                // Accepted consequence: on a non-toggleable System site, if a visitor saved a
+                // concrete theme while the toggle was previously enabled, next-themes' unforced
+                // path still honors that stored value and there is no in-page UI to reset it —
+                // the visitor can clear the site's stored data/localStorage to fall back to the OS.
                 (customization.themes.toggeable ||
                 customization.themes.default === CustomizationDefaultThemeMode.System
                     ? undefined

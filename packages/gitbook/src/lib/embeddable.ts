@@ -55,6 +55,9 @@ export function resolveEmbeddableTheme(
             // next-themes' pre-paint script skip `prefers-color-scheme` resolution
             // (it applies the literal value), causing a light→dark flash. Leaving it
             // unforced lets next-themes resolve `system` before first paint (RND-11643).
+            // Accepted consequence: a concrete theme saved while the toggle was previously
+            // enabled is still honored by next-themes' unforced path (no in-page reset UI —
+            // clear the site's stored data/localStorage to fall back to the OS preference).
             forcedTheme: mode === CustomizationDefaultThemeMode.System ? undefined : mode,
         };
     }
