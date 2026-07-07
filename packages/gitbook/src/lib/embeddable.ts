@@ -51,13 +51,7 @@ export function resolveEmbeddableTheme(
         return {
             htmlTheme: mode,
             defaultTheme: mode,
-            // Only force a concrete light/dark theme. Forcing `system` would make
-            // next-themes' pre-paint script skip `prefers-color-scheme` resolution
-            // (it applies the literal value), causing a light→dark flash. Leaving it
-            // unforced lets next-themes resolve `system` before first paint (RND-11643).
-            // Accepted consequence: a concrete theme saved while the toggle was previously
-            // enabled is still honored by next-themes' unforced path (no in-page reset UI —
-            // clear the site's stored data/localStorage to fall back to the OS preference).
+            // Only force concrete light/dark; System stays unforced so next-themes resolves prefers-color-scheme pre-paint (avoids the flash). A theme saved while the toggle was previously on still wins — see the PR's "Known limitation". RND-11643
             forcedTheme: mode === CustomizationDefaultThemeMode.System ? undefined : mode,
         };
     }

@@ -56,15 +56,7 @@ export async function SiteLayout(props: {
             contextId={context.contextId}
             forcedTheme={
                 forcedTheme ??
-                // Only force a concrete light/dark theme. Forcing `system` would make
-                // next-themes' pre-paint script skip `prefers-color-scheme` resolution
-                // (it applies the literal value), causing a light→dark flash on sites
-                // set to respect the system default. Leaving it unforced lets next-themes
-                // resolve `system` before first paint (RND-11643).
-                // Accepted consequence: on a non-toggleable System site, if a visitor saved a
-                // concrete theme while the toggle was previously enabled, next-themes' unforced
-                // path still honors that stored value and there is no in-page UI to reset it —
-                // the visitor can clear the site's stored data/localStorage to fall back to the OS.
+                // Only force concrete light/dark; System stays unforced so next-themes resolves prefers-color-scheme pre-paint (avoids the flash). A theme saved while the toggle was previously on still wins — see the PR's "Known limitation". RND-11643
                 (customization.themes.toggeable ||
                 customization.themes.default === CustomizationDefaultThemeMode.System
                     ? undefined
