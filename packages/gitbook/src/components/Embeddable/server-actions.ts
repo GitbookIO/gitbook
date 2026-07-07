@@ -9,8 +9,11 @@ import { traceErrorOnly } from '@/lib/tracing';
 /**
  * Resolve a `navigateToPage` reference into the embed link for that page.
  *
- * The reference can be the page path (e.g. `getting-started/quickstart`), an absolute
- * path (`/help-center/integrations`), or the full published URL.
+ * The reference can be a page path relative to the docs root
+ * (e.g. `getting-started/quickstart` or `/help-center/integrations`) or the full
+ * published URL. Paths are resolved relative to the site's published URL, so a
+ * leading slash means "from the docs root" even when the site is served from a
+ * subdirectory (e.g. `example.com/docs`).
  *
  * On a multi-space site the target may live in a different space/section than the one
  * the embed is currently showing, and the section base must go *before*
@@ -32,10 +35,12 @@ export async function resolveEmbedPageLink(
             return { error: 'The site has no published URL.' };
         }
 
-        // Resolve the reference to a full URL within the published site.
+        // Resolve the reference to a full URL within the published site. Strip a leading
+        // slash so an absolute-looking path is treated as relative to the docs root
+        // rather than the domain root (which matters when the site is on a subdirectory).
         let target: URL;
         try {
-            target = new URL(reference, withTrailingSlash(sitePublishedURL));
+            target = new URL(reference.replace(/^\/+/, ''), withTrailingSlash(sitePublishedURL));
         } catch {
             return { error: `Invalid page reference: ${reference}` };
         }
