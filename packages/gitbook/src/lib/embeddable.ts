@@ -47,10 +47,15 @@ export function resolveEmbeddableTheme(
     forcedTheme?: CustomizationDefaultThemeMode | null
 ) {
     if (!customization.themes.toggeable) {
+        const mode = customization.themes.default;
         return {
-            htmlTheme: customization.themes.default,
-            defaultTheme: customization.themes.default,
-            forcedTheme: customization.themes.default,
+            htmlTheme: mode,
+            defaultTheme: mode,
+            // Only force a concrete light/dark theme. Forcing `system` would make
+            // next-themes' pre-paint script skip `prefers-color-scheme` resolution
+            // (it applies the literal value), causing a light→dark flash. Leaving it
+            // unforced lets next-themes resolve `system` before first paint (RND-11643).
+            forcedTheme: mode === CustomizationDefaultThemeMode.System ? undefined : mode,
         };
     }
 

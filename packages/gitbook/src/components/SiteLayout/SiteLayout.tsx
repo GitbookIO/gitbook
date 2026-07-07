@@ -56,7 +56,15 @@ export async function SiteLayout(props: {
             contextId={context.contextId}
             forcedTheme={
                 forcedTheme ??
-                (customization.themes.toggeable ? undefined : customization.themes.default)
+                // Only force a concrete light/dark theme. Forcing `system` would make
+                // next-themes' pre-paint script skip `prefers-color-scheme` resolution
+                // (it applies the literal value), causing a light→dark flash on sites
+                // set to respect the system default. Leaving it unforced lets next-themes
+                // resolve `system` before first paint (RND-11643).
+                (customization.themes.toggeable ||
+                customization.themes.default === CustomizationDefaultThemeMode.System
+                    ? undefined
+                    : customization.themes.default)
             }
             defaultTheme={customization.themes.default}
             externalLinksTarget={customization.externalLinks.target}

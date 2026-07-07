@@ -34,26 +34,18 @@ export async function EmbeddableRootLayout({
     children,
 }: React.PropsWithChildren<EmbeddableRootLayoutProps>) {
     const theme = resolveEmbeddableTheme(context.customization, forcedTheme);
-    // Keep embed theme separate from site so it does not reuse the full site's saved theme and vice versa.
-    const themeStorageKey = `gitbook-theme-embed:${context.site.id}`;
 
     return (
         <CustomizationRootLayout
             context={context}
             htmlClassName="embed"
             forcedTheme={theme.htmlTheme}
-            // Mirror the next-themes config below so the pre-paint theme script
-            // matches what next-themes applies at hydration for embeds.
-            themeResolution={{
-                forcedTheme: theme.forcedTheme,
-                defaultTheme: theme.defaultTheme,
-                storageKey: themeStorageKey,
-            }}
         >
             <SiteLayoutClientContexts
                 forcedTheme={theme.forcedTheme}
                 defaultTheme={theme.defaultTheme}
-                themeStorageKey={themeStorageKey}
+                // Keep embed theme separate from site so it does not reuse the full site's saved theme and vice versa.
+                themeStorageKey={`gitbook-theme-embed:${context.site.id}`}
                 externalLinksTarget={context.customization.externalLinks.target}
                 contextId={context.contextId}
                 proxyOrigin={context.site.proxy?.origin}

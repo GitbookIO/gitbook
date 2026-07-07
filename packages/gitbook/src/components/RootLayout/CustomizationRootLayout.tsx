@@ -40,13 +40,6 @@ import {
 import { defaultCustomization } from '@/lib/utils';
 import { AnnouncementDismissedScript } from '../Announcement';
 import { OperatingSystemClassScript } from './OperatingSystemClassScript';
-import { ResolvedThemeClassScript, type ResolvedThemeConfig } from './ResolvedThemeClassScript';
-
-/**
- * Default `next-themes` `storageKey`. `SiteLayoutClientContexts` does not pass a
- * `storageKey` for the main site, so it falls back to this value.
- */
-const DEFAULT_THEME_STORAGE_KEY = 'theme';
 
 function preloadFont(fontData: FontData) {
     if (fontData.type === 'custom') {
@@ -74,37 +67,12 @@ export async function CustomizationRootLayout(props: {
     /** The class name to apply to the body element. */
     bodyClassName?: string;
     forcedTheme?: CustomizationDefaultThemeMode | null;
-    /**
-     * How the client (`next-themes`) will resolve the theme at hydration. When
-     * provided, it is used verbatim to build the pre-paint theme script; otherwise
-     * it is derived from the customization (matching `SiteLayoutClientContexts`).
-     */
-    themeResolution?: ResolvedThemeConfig;
     context: GitBookAnyContext;
     children: React.ReactNode;
 }) {
     const { htmlClassName, bodyClassName, context, forcedTheme, children } = props;
     const customization =
         'customization' in context ? context.customization : defaultCustomization();
-
-    // Mirror the `next-themes` config used by the matching client contexts so the
-    // pre-paint `dark` class matches what will be applied at hydration. For the main
-    // site this is derived here; embeds pass an explicit config (custom storageKey).
-    const themeResolution: ResolvedThemeConfig = props.themeResolution ?? {
-        forcedTheme:
-            forcedTheme ??
-            (customization.themes.toggeable ? undefined : customization.themes.default),
-        defaultTheme: customization.themes.default,
-        storageKey: DEFAULT_THEME_STORAGE_KEY,
-    };
-
-    // The `dark` class only depends on `prefers-color-scheme` (and thus flashes on
-    // the cached/instant render) when the resolved theme may be `system` — i.e. when
-    // we are not forcing a concrete light/dark theme. Gate strictly so forced-light
-    // and forced-dark sites keep relying on the static class below and are untouched.
-    const needsResolvedThemeScript =
-        themeResolution.forcedTheme == null ||
-        themeResolution.forcedTheme === CustomizationDefaultThemeMode.System;
 
     const locale = getContentLocale(context);
     const language = await getSpaceLanguage(context);
@@ -170,16 +138,6 @@ export async function CustomizationRootLayout(props: {
                 ) : null}
 
                 <OperatingSystemClassScript />
-
-                {/* Resolve the theme (incl. `system` → prefers-color-scheme) and set the
-                    `dark` class before first paint, to avoid a light/dark flash. */}
-                {needsResolvedThemeScript ? (
-                    <ResolvedThemeClassScript
-                        forcedTheme={themeResolution.forcedTheme}
-                        defaultTheme={themeResolution.defaultTheme}
-                        storageKey={themeResolution.storageKey}
-                    />
-                ) : null}
 
                 {/* Inject custom font @font-face rules */}
                 {fontData.type === 'custom' ? <style>{fontData.fontFaceRules}</style> : null}
