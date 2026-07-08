@@ -138,6 +138,7 @@ export const it: TranslationLanguage = {
     ai_chat_context_previous_messages: 'Messaggi nella tua conversazione',
     ai_chat_context_disclaimer: "Le risposte dell'IA possono contenere errori.",
     ai_chat_input_placeholder: 'Chiedi, cerca o spiega...',
+    ai_chat_queued_message: 'This message will be sent after ${1} finishes',
     send: 'Invia',
     actions: 'Azioni',
     ai_chat_suggested_questions_title: 'Domande suggerite',

@@ -11,8 +11,8 @@ import { AIChatReferenceChips } from './AIChatReferenceChips';
 export function AIChatInput(props: {
     disabled?: boolean;
     /**
-     * When true, the assistant is streaming an answer. The field stays editable so a follow-up
-     * can be composed, but submitting is blocked until the answer completes.
+     * When true, the assistant is streaming an answer. The field stays editable and submitting a
+     * follow-up queues it (sent automatically once the answer finishes) rather than being blocked.
      */
     responding: boolean;
     onSubmit: (value: string) => void;
@@ -112,7 +112,6 @@ export function AIChatInput(props: {
                     : undefined
             }
             disabled={disabled || chat.control !== null}
-            submitDisabled={responding}
             aria-busy={responding}
             ref={inputRef}
             header={

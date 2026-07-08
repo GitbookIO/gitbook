@@ -132,6 +132,7 @@ export const en = {
     ai_chat_context_previous_messages: 'Messages in your conversation',
     ai_chat_context_disclaimer: 'AI responses may contain mistakes.',
     ai_chat_input_placeholder: 'Ask, search, or explain...',
+    ai_chat_queued_message: 'This message will be sent after ${1} finishes',
     send: 'Send',
     actions: 'Actions',
     ai_chat_suggested_questions_title: 'Suggested questions',

@@ -35,6 +35,7 @@ import { AIChatExpandButton } from './AIChatExpandButton';
 import { AIChatIcon } from './AIChatIcon';
 import { AIChatInput } from './AIChatInput';
 import { AIChatMessages } from './AIChatMessages';
+import { AIChatQueuedMessage } from './AIChatQueuedMessage';
 import { AIChatResizeHandle } from './AIChatResizeHandle';
 import AIChatSuggestedQuestions from './AIChatSuggestedQuestions';
 
@@ -284,6 +285,15 @@ export function AIChatBody(props: {
                 {chat.error ? <AIChatError chatController={chatController} /> : null}
 
                 {chat.control ? <AIChatControl control={chat.control} /> : null}
+                {chat.queuedMessage ? (
+                    <AIChatQueuedMessage
+                        message={chat.queuedMessage}
+                        assistantName={
+                            config.assistantName ?? getAIChatName(language, config.trademark)
+                        }
+                        onRemove={chatController.cancelQueuedMessage}
+                    />
+                ) : null}
                 <AIChatInput
                     responding={chat.responding}
                     disabled={chat.error}

@@ -123,6 +123,13 @@ export type AIChatState = {
      * this value (seeding its editable content) and then clears it back to an empty string.
      */
     draft: string;
+
+    /**
+     * A follow-up the visitor submitted while a previous turn was still streaming. It is held
+     * here and sent automatically once the current answer finishes (see the flush in
+     * `streamResponse`), so submitting mid-stream isn't lost. `null` when nothing is queued.
+     */
+    queuedMessage: string | null;
 };
 
 export type AIChatEvent =
@@ -158,6 +165,8 @@ export type AIChatController = {
     focus: () => void;
     /** Pre-fill the chat input with draft text, without sending it. */
     setDraft: (draft: string) => void;
+    /** Remove the follow-up queued to send after the current answer finishes. */
+    cancelQueuedMessage: () => void;
     /** Register an event listener */
     on: <T extends AIChatEvent['type']>(
         event: T,
@@ -182,6 +191,7 @@ const globalState = zustand.create<AIChatState>(() => {
         initialQuery: null,
         references: [],
         draft: '',
+        queuedMessage: null,
     };
 });
 
@@ -256,6 +266,11 @@ export function AIChatProvider(props: {
 
         notify(eventsRef.current.get('close'), {});
     }, [setSearchState]);
+
+    // Holds the latest `onPostMessage` so `streamResponse` can flush a queued follow-up once a
+    // turn finishes. A ref avoids a declaration cycle (streamResponse is defined before
+    // onPostMessage) and keeps the callback stable across renders.
+    const postMessageRef = React.useRef<((input: { message: string }) => void) | null>(null);
 
     // Stream a message with the AI backend
     const streamResponse = React.useCallback(
@@ -512,6 +527,16 @@ export function AIChatProvider(props: {
                         loading: false,
                         error: false,
                     }));
+
+                    // The turn is fully settled: send any follow-up the visitor queued while it was
+                    // streaming. Skipped when a control is awaiting input (posting would throw and
+                    // the input is disabled anyway) — it stays queued and flushes after the control
+                    // continuation ends.
+                    const { queuedMessage, control: activeControl } = globalState.getState();
+                    if (queuedMessage !== null && !activeControl) {
+                        globalState.setState((state) => ({ ...state, queuedMessage: null }));
+                        postMessageRef.current?.({ message: queuedMessage });
+                    }
                 }
             } catch (error) {
                 console.error('Error streaming AI response', error);
@@ -545,8 +570,11 @@ export function AIChatProvider(props: {
                 throw new Error("We can't post a message when a control is active");
             }
 
-            // Ignore duplicates while a previous turn is still streaming
+            // A turn is still streaming: queue this follow-up instead of dropping it. It is sent
+            // automatically once the current answer finishes (flushed in `streamResponse`). The
+            // latest submission wins if one is already queued.
             if (responding) {
+                globalState.setState((state) => ({ ...state, queuedMessage: input.message }));
                 return;
             }
 
@@ -607,6 +635,16 @@ export function AIChatProvider(props: {
         [setSearchState, siteSpaceId, trackEvent, streamResponse]
     );
 
+    // Keep the ref current so `streamResponse` can flush a queued follow-up via the latest callback.
+    postMessageRef.current = onPostMessage;
+
+    // Remove a follow-up queued while the assistant is still answering (the × on the affordance).
+    const onCancelQueuedMessage = React.useCallback(() => {
+        globalState.setState((state) =>
+            state.queuedMessage === null ? state : { ...state, queuedMessage: null }
+        );
+    }, []);
+
     // Clear the conversation and reset ask parameter
     const onClear = React.useCallback(() => {
         globalState.setState((state) => ({
@@ -621,6 +659,7 @@ export function AIChatProvider(props: {
             error: false,
             initialQuery: null,
             references: [],
+            queuedMessage: null,
         }));
 
         // Reset ask parameter to empty string (keeps chat open but clears content)
@@ -704,6 +743,7 @@ export function AIChatProvider(props: {
             clearReferences: onClearReferences,
             focus: onFocus,
             setDraft: onSetDraft,
+            cancelQueuedMessage: onCancelQueuedMessage,
             on: onEvent,
         };
     }, [
@@ -716,6 +756,7 @@ export function AIChatProvider(props: {
         onClearReferences,
         onFocus,
         onSetDraft,
+        onCancelQueuedMessage,
         onEvent,
     ]);
 

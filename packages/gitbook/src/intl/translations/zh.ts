@@ -131,6 +131,7 @@ export const zh: TranslationLanguage = {
     ai_chat_context_previous_messages: '您对话中的消息',
     ai_chat_context_disclaimer: '人工智能的回答可能包含错误。',
     ai_chat_input_placeholder: '询问、搜索或解释...',
+    ai_chat_queued_message: 'This message will be sent after ${1} finishes',
     send: '发送',
     actions: '操作',
     ai_chat_suggested_questions_title: '建议的问题',

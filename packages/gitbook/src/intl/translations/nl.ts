@@ -137,6 +137,7 @@ export const nl: TranslationLanguage = {
     ai_chat_context_previous_messages: 'Berichten in je gesprek',
     ai_chat_context_disclaimer: 'AI-antwoorden kunnen fouten bevatten.',
     ai_chat_input_placeholder: 'Vraag, zoek of leg uit...',
+    ai_chat_queued_message: 'This message will be sent after ${1} finishes',
     send: 'Versturen',
     actions: 'Acties',
     ai_chat_suggested_questions_title: 'Voorgestelde vragen',

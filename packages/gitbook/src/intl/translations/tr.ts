@@ -133,6 +133,7 @@ export const tr: TranslationLanguage = {
     ai_chat_context_previous_messages: 'Konuşmanızdaki mesajlar',
     ai_chat_context_disclaimer: 'AI yanıtları hata içerebilir.',
     ai_chat_input_placeholder: 'Sor, ara veya açıkla...',
+    ai_chat_queued_message: 'This message will be sent after ${1} finishes',
     send: 'Gönder',
     actions: 'Eylemler',
     ai_chat_suggested_questions_title: 'Önerilen sorular',

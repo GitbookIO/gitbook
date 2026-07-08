@@ -136,6 +136,7 @@ export const hu: TranslationLanguage = {
     ai_chat_context_previous_messages: 'Üzenetek a beszélgetésében',
     ai_chat_context_disclaimer: 'Az AI-válaszok hibákat tartalmazhatnak.',
     ai_chat_input_placeholder: 'Kérdezzen, keressen vagy magyarázzon...',
+    ai_chat_queued_message: 'This message will be sent after ${1} finishes',
     send: 'Küldés',
     actions: 'Műveletek',
     ai_chat_suggested_questions_title: 'Javasolt kérdések',

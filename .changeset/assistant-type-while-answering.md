@@ -2,4 +2,4 @@
 "gitbook": patch
 ---
 
-Assistant: you can now start typing a follow-up question while an answer is still being written. The input stays editable during streaming and sends as soon as the answer completes.
+Assistant: you can now send a follow-up question while an answer is still being written. It's queued with a "will be sent after … finishes" note (and an × to cancel), then sent automatically as soon as the current answer completes.

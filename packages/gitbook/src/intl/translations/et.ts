@@ -134,6 +134,7 @@ export const et: TranslationLanguage = {
     ai_chat_context_previous_messages: 'Teie vestluse sõnumid',
     ai_chat_context_disclaimer: 'AI vastused võivad sisaldada vigu.',
     ai_chat_input_placeholder: 'Küsige, otsige või selgitage...',
+    ai_chat_queued_message: 'This message will be sent after ${1} finishes',
     send: 'Saada',
     actions: 'Toimingud',
     ai_chat_suggested_questions_title: 'Soovitatud küsimused',

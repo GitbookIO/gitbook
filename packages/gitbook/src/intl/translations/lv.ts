@@ -133,6 +133,7 @@ export const lv: TranslationLanguage = {
     ai_chat_context_previous_messages: 'Ziņojumi jūsų sarunā',
     ai_chat_context_disclaimer: 'AI atbildēs var būt kļūdas.',
     ai_chat_input_placeholder: 'Jautājiet, meklējiet vai skaidrojiet...',
+    ai_chat_queued_message: 'This message will be sent after ${1} finishes',
     send: 'Sūtīt',
     actions: 'Darbības',
     ai_chat_suggested_questions_title: 'Ieteiktie jautājumi',

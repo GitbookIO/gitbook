@@ -130,6 +130,7 @@ export const zh_tw: TranslationLanguage = {
     ai_chat_context_previous_messages: '您對話中的訊息',
     ai_chat_context_disclaimer: 'AI 回答可能包含錯誤。',
     ai_chat_input_placeholder: '提問、搜尋或說明...',
+    ai_chat_queued_message: 'This message will be sent after ${1} finishes',
     send: '傳送',
     actions: '動作',
     ai_chat_suggested_questions_title: '建議問題',

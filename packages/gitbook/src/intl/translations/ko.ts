@@ -134,6 +134,7 @@ export const ko: TranslationLanguage = {
     ai_chat_context_previous_messages: '대화의 메시지',
     ai_chat_context_disclaimer: 'AI 응답에는 오류가 있을 수 있습니다.',
     ai_chat_input_placeholder: '질문, 검색 또는 설명...',
+    ai_chat_queued_message: 'This message will be sent after ${1} finishes',
     send: '전송',
     actions: '작업',
     ai_chat_suggested_questions_title: '추천 질문',

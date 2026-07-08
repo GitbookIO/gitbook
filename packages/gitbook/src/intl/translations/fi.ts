@@ -136,6 +136,7 @@ export const fi: TranslationLanguage = {
     ai_chat_context_previous_messages: 'Viestit keskustelussasi',
     ai_chat_context_disclaimer: 'AI-vastaukset voivat sisältää virheitä.',
     ai_chat_input_placeholder: 'Kysy, hae tai selitä...',
+    ai_chat_queued_message: 'This message will be sent after ${1} finishes',
     send: 'Lähetä',
     actions: 'Toiminnot',
     ai_chat_suggested_questions_title: 'Ehdotetut kysymykset',
