@@ -136,7 +136,7 @@ export const no: TranslationLanguage = {
     ai_chat_context_previous_messages: 'Meldinger i samtalen din',
     ai_chat_context_disclaimer: 'AI-svar kan inneholde feil.',
     ai_chat_input_placeholder: 'Spør, søk eller forklar...',
-    ai_chat_queued_message: 'This message will be sent after ${1} finishes',
+    ai_chat_queued_message: 'Denne meldingen sendes når ${1} er ferdig',
     send: 'Send',
     actions: 'Handlinger',
     ai_chat_suggested_questions_title: 'Foreslåtte spørsmål',

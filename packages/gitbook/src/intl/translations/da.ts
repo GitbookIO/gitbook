@@ -134,7 +134,7 @@ export const da: TranslationLanguage = {
     ai_chat_context_previous_messages: 'Beskeder i din samtale',
     ai_chat_context_disclaimer: 'AI-svar kan indeholde fejl.',
     ai_chat_input_placeholder: 'Spørg, søg eller forklar...',
-    ai_chat_queued_message: 'This message will be sent after ${1} finishes',
+    ai_chat_queued_message: 'Denne besked sendes, når ${1} er færdig',
     send: 'Send',
     actions: 'Handlinger',
     ai_chat_suggested_questions_title: 'Foreslåede spørgsmål',

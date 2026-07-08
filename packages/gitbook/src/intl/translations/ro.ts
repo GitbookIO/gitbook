@@ -138,7 +138,7 @@ export const ro: TranslationLanguage = {
     ai_chat_context_previous_messages: 'Mesaje din conversația ta',
     ai_chat_context_disclaimer: 'Răspunsurile AI pot conține greșeli.',
     ai_chat_input_placeholder: 'Întreabă, caută sau explică...',
-    ai_chat_queued_message: 'This message will be sent after ${1} finishes',
+    ai_chat_queued_message: 'Acest mesaj va fi trimis după ce ${1} termină',
     send: 'Trimite',
     actions: 'Acțiuni',
     ai_chat_suggested_questions_title: 'Întrebări sugerate',

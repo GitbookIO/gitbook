@@ -130,7 +130,7 @@ export const yue: TranslationLanguage = {
     ai_chat_context_previous_messages: '你對話入面嘅訊息',
     ai_chat_context_disclaimer: 'AI 回答可能有錯。',
     ai_chat_input_placeholder: '發問、搜尋或說明...',
-    ai_chat_queued_message: 'This message will be sent after ${1} finishes',
+    ai_chat_queued_message: '呢個訊息會喺 ${1} 完成後發送',
     send: '傳送',
     actions: '動作',
     ai_chat_suggested_questions_title: '建議問題',

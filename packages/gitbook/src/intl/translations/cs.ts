@@ -135,7 +135,7 @@ export const cs: TranslationLanguage = {
     ai_chat_context_previous_messages: 'Zprávy ve vaší konverzaci',
     ai_chat_context_disclaimer: 'Odpovědi AI mohou obsahovat chyby.',
     ai_chat_input_placeholder: 'Zeptejte se, hledejte nebo vysvětlete...',
-    ai_chat_queued_message: 'This message will be sent after ${1} finishes',
+    ai_chat_queued_message: 'Tato zpráva se odešle, až ${1} dokončí odpověď',
     send: 'Odeslat',
     actions: 'Akce',
     ai_chat_suggested_questions_title: 'Navrhované otázky',

@@ -135,7 +135,7 @@ export const sl: TranslationLanguage = {
     ai_chat_context_previous_messages: 'Sporočila v vašem pogovoru',
     ai_chat_context_disclaimer: 'Odgovori AI lahko vsebujejo napake.',
     ai_chat_input_placeholder: 'Vprašajte, iščite ali razložite...',
-    ai_chat_queued_message: 'This message will be sent after ${1} finishes',
+    ai_chat_queued_message: 'To sporočilo bo poslano, ko ${1} zaključi',
     send: 'Pošlji',
     actions: 'Dejanja',
     ai_chat_suggested_questions_title: 'Predlagana vprašanja',

@@ -137,7 +137,7 @@ export const bg: TranslationLanguage = {
     ai_chat_context_previous_messages: 'Съобщения във вашия разговор',
     ai_chat_context_disclaimer: 'AI отговорите може да съдържат грешки.',
     ai_chat_input_placeholder: 'Попитайте, потърсете или обяснете...',
-    ai_chat_queued_message: 'This message will be sent after ${1} finishes',
+    ai_chat_queued_message: 'Това съобщение ще бъде изпратено, след като ${1} приключи',
     send: 'Изпращане',
     actions: 'Действия',
     ai_chat_suggested_questions_title: 'Предложени въпроси',

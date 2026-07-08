@@ -138,7 +138,7 @@ export const ru: TranslationLanguage = {
     ai_chat_context_previous_messages: 'Сообщения в вашем разговоре',
     ai_chat_context_disclaimer: 'Ответы ИИ могут содержать ошибки.',
     ai_chat_input_placeholder: 'Спросите, найдите или объясните...',
-    ai_chat_queued_message: 'This message will be sent after ${1} finishes',
+    ai_chat_queued_message: 'Это сообщение будет отправлено, когда ${1} закончит',
     send: 'Отправить',
     actions: 'Действия',
     ai_chat_suggested_questions_title: 'Предложенные вопросы',

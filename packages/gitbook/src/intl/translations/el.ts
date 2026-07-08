@@ -139,7 +139,7 @@ export const el: TranslationLanguage = {
     ai_chat_context_previous_messages: 'Μηνύματα στη συνομιλία σας',
     ai_chat_context_disclaimer: 'Οι απαντήσεις AI μπορεί να περιέχουν λάθη.',
     ai_chat_input_placeholder: 'Ρωτήστε, αναζητήστε ή εξηγήστε...',
-    ai_chat_queued_message: 'This message will be sent after ${1} finishes',
+    ai_chat_queued_message: 'Αυτό το μήνυμα θα σταλεί μόλις ολοκληρώσει ${1}',
     send: 'Αποστολή',
     actions: 'Ενέργειες',
     ai_chat_suggested_questions_title: 'Προτεινόμενες ερωτήσεις',

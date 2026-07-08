@@ -141,7 +141,7 @@ export const de: TranslationLanguage = {
     ai_chat_context_previous_messages: 'Nachrichten in Ihrem Gespräch',
     ai_chat_context_disclaimer: 'KI-Antworten können Fehler enthalten.',
     ai_chat_input_placeholder: 'Fragen, suchen oder erklären...',
-    ai_chat_queued_message: 'This message will be sent after ${1} finishes',
+    ai_chat_queued_message: 'Diese Nachricht wird gesendet, sobald ${1} fertig ist',
     send: 'Senden',
     actions: 'Aktionen',
     ai_chat_suggested_questions_title: 'Vorgeschlagene Fragen',
