@@ -7,7 +7,12 @@ import type {
 
 export type GitBookFrameClient = {
     /**
-     * Navigate to a page by its path.
+     * Navigate to a page in the docs tab.
+     *
+     * Accepts the page's path within the site (e.g. `getting-started/quickstart`),
+     * an absolute path (e.g. `/help-center/integrations`), or its full published URL.
+     * The target page may live in any space/section of the site — including one other
+     * than the embed is currently showing — and is resolved to the right space.
      */
     navigateToPage: (path: string) => void;
 
