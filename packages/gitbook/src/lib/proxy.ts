@@ -1,10 +1,32 @@
 /**
+ * Check if a host is one of the GitBook proxy domains.
+ */
+export function isProxyHost(host: string): boolean {
+    return host === 'proxy.gitbook.site' || host === 'proxy.gitbook-staging.site';
+}
+
+/**
  * Check if the request to the site was through a proxy.
  */
 export function isProxyRequest(requestURL: URL): boolean {
-    return (
-        requestURL.host === 'proxy.gitbook.site' || requestURL.host === 'proxy.gitbook-staging.site'
-    );
+    return isProxyHost(requestURL.host);
+}
+
+/**
+ * Resolve the host to build the site URL from when a request carries an `x-forwarded-host`.
+ *
+ * A request that physically reaches GitBook on the proxy domain identifies its site by the
+ * `/sites/<id>` path, not by its host. Some upstream proxies (e.g. a customer's Vercel rewrite
+ * to the proxy domain) forward their own `x-forwarded-host`; trusting it would glue the customer
+ * host onto the internal `/sites/<id>` path and resolve to a "Domain not found". When the request
+ * actually arrived on the proxy domain, keep that host so the site resolves by its path instead.
+ */
+export function resolveForwardedHost(args: { host: string | null; forwardedHost: string }): string {
+    const { host, forwardedHost } = args;
+    if (host && isProxyHost(host)) {
+        return host;
+    }
+    return forwardedHost;
 }
 
 export function getProxyRequestIdentifier(requestURL: URL): string {

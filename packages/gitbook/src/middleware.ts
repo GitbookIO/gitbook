@@ -31,6 +31,7 @@ import {
     isOAuthProtectedResourceRequest,
 } from '@/lib/oauth-protected';
 import { removeLeadingSlash, removeTrailingSlash } from '@/lib/paths';
+import { resolveForwardedHost } from '@/lib/proxy';
 import {
     getPreviewCookieResponse,
     getPreviewRequestIdentifier,
@@ -645,6 +646,8 @@ async function serveWithQueryAPIToken(input: {
  *      URL is taken from the header.
  * - The request has a `X-Forwarded-Host` header:
  *      Host is taken from the header, pathname is taken from the request URL.
+ *      Except when the request actually reached us on the proxy domain, in which
+ *      case the proxy host is kept (see `resolveForwardedHost`).
  * - The request URL is matching `/url/:url`:
  *      URL is taken from the pathname.
  */
@@ -681,9 +684,16 @@ function getSiteURLFromRequest(request: NextRequest): URLWithMode | null {
     // The x-forwarded-host is set by Vercel for all requests
     // so we ignore it if the hostname is the same as the instance one.
     if (xForwardedHost) {
+        // A request proxied to us on the proxy domain (e.g. a customer's Vercel rewrite
+        // to proxy.gitbook.site/sites/<id>) can forward its own x-forwarded-host. Keep the
+        // proxy host in that case so the site resolves by its `/sites/<id>` path.
+        const host = resolveForwardedHost({
+            host: request.headers.get('host'),
+            forwardedHost: xForwardedHost,
+        });
         return {
             url: appendQueryParams(
-                new URL(`https://${xForwardedHost}${request.nextUrl.pathname}`),
+                new URL(`https://${host}${request.nextUrl.pathname}`),
                 request.nextUrl.searchParams
             ),
             mode: 'url-host',
