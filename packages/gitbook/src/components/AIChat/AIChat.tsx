@@ -285,17 +285,21 @@ export function AIChatBody(props: {
             </ScrollContainer>
 
             <div className="flex max-h-3/4 min-h-0 flex-col gap-2 not-embed:px-4 pb-4">
+                {!chat.error &&
+                    chat.queuedMessages.map((message, index) => (
+                        <AIChatQueuedMessage
+                            // Queue order is stable and items carry no local state, so the index is a
+                            // safe key here.
+                            key={index}
+                            message={message}
+                            assistantName={resolvedAssistantName}
+                            onRemove={() => chatController.cancelQueuedMessage(index)}
+                        />
+                    ))}
                 {/* Display an error banner when something went wrong. */}
                 {chat.error ? <AIChatError chatController={chatController} /> : null}
 
                 {chat.control ? <AIChatControl control={chat.control} /> : null}
-                {chat.queuedMessage ? (
-                    <AIChatQueuedMessage
-                        message={chat.queuedMessage}
-                        assistantName={resolvedAssistantName}
-                        onRemove={chatController.cancelQueuedMessage}
-                    />
-                ) : null}
                 <AIChatInput
                     responding={chat.responding}
                     disabled={chat.error}

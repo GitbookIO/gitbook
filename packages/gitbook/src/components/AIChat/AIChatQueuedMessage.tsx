@@ -1,10 +1,13 @@
 import { t, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
-import { Button } from '../primitives';
+import { Icon } from '@gitbook/icons';
+import { Button, Tooltip } from '../primitives';
 
 /**
- * Shows the follow-up a visitor submitted while the assistant was still answering, with a note
- * that it will be sent once the current answer finishes and an × to drop it from the queue.
+ * Shows a follow-up the visitor submitted while the assistant was still answering. It mirrors a
+ * sent user message — a right-aligned, tinted bubble — so it reads as "theirs", with a clock icon
+ * marking it as pending and a tooltip (on the whole bubble) explaining it will be sent once the
+ * current answer finishes. The × beside the bubble drops it from the queue.
  */
 export function AIChatQueuedMessage(props: {
     message: string;
@@ -15,18 +18,18 @@ export function AIChatQueuedMessage(props: {
     const language = useLanguage();
 
     return (
-        <div
-            className={tcls(
-                'flex items-start gap-2 circular-corners:rounded-2xl rounded-corners:rounded-lg',
-                'border border-tint-subtle bg-tint-base/9 p-2 pl-3 text-sm backdrop-blur-lg'
-            )}
-        >
-            <div className="flex min-w-0 grow flex-col gap-0.5">
-                <span className="truncate text-tint-strong">{message}</span>
-                <span className="text-tint text-xs">
-                    {t(language, 'ai_chat_queued_message', assistantName)}
-                </span>
-            </div>
+        <div className="flex max-w-[80%] origin-top-right animate-scale-in items-center gap-1 self-end">
+            <Tooltip label={t(language, 'ai_chat_queued_message', assistantName)}>
+                <div
+                    className={tcls(
+                        'flex min-w-0 items-center gap-2 circular-corners:rounded-2xl rounded-corners:rounded-md',
+                        'bg-primary-solid/1 px-4 py-2 text-tint'
+                    )}
+                >
+                    <Icon icon="clock" className="size-3.5 shrink-0 text-tint" />
+                    <span className="min-w-0 break-words">{message}</span>
+                </div>
+            </Tooltip>
             <Button
                 variant="blank"
                 size="small"
@@ -34,7 +37,7 @@ export function AIChatQueuedMessage(props: {
                 icon="xmark"
                 label={t(language, 'clear')}
                 onClick={onRemove}
-                className="-my-1 -mr-1 shrink-0 text-tint"
+                className="shrink-0 text-tint"
             />
         </div>
     );

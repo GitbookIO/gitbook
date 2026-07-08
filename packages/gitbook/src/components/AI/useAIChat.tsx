@@ -125,11 +125,12 @@ export type AIChatState = {
     draft: string;
 
     /**
-     * A follow-up the visitor submitted while a previous turn was still streaming. It is held
-     * here and sent automatically once the current answer finishes (see the flush in
-     * `streamResponse`), so submitting mid-stream isn't lost. `null` when nothing is queued.
+     * Follow-ups the visitor submitted while a previous turn was still streaming. They are held
+     * here and sent automatically, one at a time in submission order, as each answer finishes
+     * (see the flush in `streamResponse`), so submitting mid-stream isn't lost. Empty when
+     * nothing is queued.
      */
-    queuedMessage: string | null;
+    queuedMessages: string[];
 };
 
 export type AIChatEvent =
@@ -165,8 +166,8 @@ export type AIChatController = {
     focus: () => void;
     /** Pre-fill the chat input with draft text, without sending it. */
     setDraft: (draft: string) => void;
-    /** Remove the follow-up queued to send after the current answer finishes. */
-    cancelQueuedMessage: () => void;
+    /** Remove a follow-up queued to send after the current answer finishes, by its queue index. */
+    cancelQueuedMessage: (index: number) => void;
     /** Register an event listener */
     on: <T extends AIChatEvent['type']>(
         event: T,
@@ -191,7 +192,7 @@ const globalState = zustand.create<AIChatState>(() => {
         initialQuery: null,
         references: [],
         draft: '',
-        queuedMessage: null,
+        queuedMessages: [],
     };
 });
 
@@ -528,14 +529,17 @@ export function AIChatProvider(props: {
                         error: false,
                     }));
 
-                    // The turn is fully settled: send any follow-up the visitor queued while it was
-                    // streaming. Skipped when a control is awaiting input (posting would throw and
-                    // the input is disabled anyway) — it stays queued and flushes after the control
-                    // continuation ends.
-                    const { queuedMessage, control: activeControl } = globalState.getState();
-                    if (queuedMessage !== null && !activeControl) {
-                        globalState.setState((state) => ({ ...state, queuedMessage: null }));
-                        postMessageRef.current?.({ message: queuedMessage });
+                    // The turn is fully settled: send the next follow-up the visitor queued while
+                    // it was streaming (oldest first). Skipped when a control is awaiting input
+                    // (posting would throw and the input is disabled anyway) — they stay queued and
+                    // flush after the control continuation ends. Sending one message starts a new
+                    // turn whose own completion flushes the following one, draining the queue in
+                    // order.
+                    const { queuedMessages, control: activeControl } = globalState.getState();
+                    const [next, ...rest] = queuedMessages;
+                    if (next !== undefined && !activeControl) {
+                        globalState.setState((state) => ({ ...state, queuedMessages: rest }));
+                        postMessageRef.current?.({ message: next });
                     }
                 }
             } catch (error) {
@@ -570,11 +574,14 @@ export function AIChatProvider(props: {
                 throw new Error("We can't post a message when a control is active");
             }
 
-            // A turn is still streaming: queue this follow-up instead of dropping it. It is sent
-            // automatically once the current answer finishes (flushed in `streamResponse`). The
-            // latest submission wins if one is already queued.
+            // A turn is still streaming: queue this follow-up instead of dropping it. Queued
+            // messages are sent automatically, one at a time in submission order, as each answer
+            // finishes (flushed in `streamResponse`).
             if (responding) {
-                globalState.setState((state) => ({ ...state, queuedMessage: input.message }));
+                globalState.setState((state) => ({
+                    ...state,
+                    queuedMessages: [...state.queuedMessages, input.message],
+                }));
                 return;
             }
 
@@ -639,9 +646,14 @@ export function AIChatProvider(props: {
     postMessageRef.current = onPostMessage;
 
     // Remove a follow-up queued while the assistant is still answering (the × on the affordance).
-    const onCancelQueuedMessage = React.useCallback(() => {
+    const onCancelQueuedMessage = React.useCallback((index: number) => {
         globalState.setState((state) =>
-            state.queuedMessage === null ? state : { ...state, queuedMessage: null }
+            index < 0 || index >= state.queuedMessages.length
+                ? state
+                : {
+                      ...state,
+                      queuedMessages: state.queuedMessages.filter((_, i) => i !== index),
+                  }
         );
     }, []);
 
@@ -659,7 +671,7 @@ export function AIChatProvider(props: {
             error: false,
             initialQuery: null,
             references: [],
-            queuedMessage: null,
+            queuedMessages: [],
         }));
 
         // Reset ask parameter to empty string (keeps chat open but clears content)
