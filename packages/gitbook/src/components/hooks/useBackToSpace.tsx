@@ -24,23 +24,25 @@ export type SpaceLocation = {
 // Keys used to persist the navigation state for the current tab session.
 const LAST_LOCATION_KEY = 'gitbook-space-navigation:last';
 const BACK_TO_SPACE_KEY = 'gitbook-space-navigation:back';
-const FROM_PICKER_KEY = 'gitbook-space-navigation:from-picker';
+const FROM_TOC_LINK_KEY = 'gitbook-space-navigation:from-toc-link';
 
 /**
- * Mark that the navigation about to happen was initiated from the section/variant
- * picker (spaces dropdown, translations dropdown or section switcher).
+ * Mark that the navigation about to happen was initiated from a link in the table of
+ * contents.
  *
- * Such navigations are deliberate moves within the site's own structure and should
- * not surface a "Back to space" shortcut. Set synchronously when a picker link is
- * activated, so the flag is in place before the destination page reads it.
+ * Only deliberate, author-defined links in the ToC — including cross-space links — may
+ * surface a "Back to space" shortcut on the destination page. Reaching another space any
+ * other way (an in-content link, the section/variant picker, a direct URL or the browser
+ * history) must not. Set synchronously when a ToC link is activated, so the flag is in
+ * place before the destination page reads it.
  */
-function markSpaceNavigationFromPicker() {
-    setSessionStorageItem(FROM_PICKER_KEY, true);
+function markSpaceNavigationFromTOCLink() {
+    setSessionStorageItem(FROM_TOC_LINK_KEY, true);
 }
 
 /**
  * Whether a click opens its link in a new tab or window instead of navigating the
- * current tab (a modifier key or a non-primary button). These must not mark a picker
+ * current tab (a modifier key or a non-primary button). These must not mark a ToC
  * navigation: the current tab stays put, so the flag would otherwise linger and be
  * mis-attributed to a later, unrelated navigation.
  */
@@ -49,16 +51,16 @@ function opensInNewTab(event: React.MouseEvent): boolean {
 }
 
 /**
- * Click handler for the section/variant/translation pickers that marks the upcoming
- * navigation as picker-initiated, so arriving in the target space doesn't surface a
- * "Back to space" shortcut.
+ * Click handler for the table of contents that marks the upcoming navigation as
+ * ToC-initiated, so arriving in a different space can surface the "Back to space"
+ * shortcut.
  *
- * Attach it with `onClickCapture` on a picker container (section list/tabs) or as the
- * `onClick` of a picker menu item (spaces dropdown). It intentionally does nothing for
- * clicks that leave the current tab unchanged: re-selecting the already-active item,
- * or opening the link in a new tab/window.
+ * Attach it with `onClickCapture` on the root of the page list. It intentionally does
+ * nothing for clicks that leave the current tab unchanged — not on a link, re-selecting
+ * the already-active page, or opening the link in a new tab/window — since the flag
+ * would otherwise linger and be mis-attributed to a later, unrelated navigation.
  */
-export function markSpaceNavigationFromPickerOnClick(event: React.MouseEvent<HTMLElement>) {
+export function markSpaceNavigationFromTOCLinkOnClick(event: React.MouseEvent<HTMLElement>) {
     if (opensInNewTab(event)) {
         return;
     }
@@ -73,17 +75,13 @@ export function markSpaceNavigationFromPickerOnClick(event: React.MouseEvent<HTM
         return;
     }
 
-    // Skip the currently active item: re-selecting it doesn't navigate. The sidebar
-    // section list marks the active link with `aria-current`, while the header section
-    // tabs (rendered via the Button primitive) use `aria-pressed`.
-    if (
-        link.getAttribute('aria-current') === 'page' ||
-        link.getAttribute('aria-pressed') === 'true'
-    ) {
+    // Skip the currently active page: re-selecting it doesn't navigate, so the flag
+    // would linger. Active ToC links are marked with `aria-current="page"`.
+    if (link.getAttribute('aria-current') === 'page') {
         return;
     }
 
-    markSpaceNavigationFromPicker();
+    markSpaceNavigationFromTOCLink();
 }
 
 /**
@@ -97,9 +95,9 @@ export function resolveBackToSpace(input: {
     current: SpaceLocation;
     lastLocation: SpaceLocation | null;
     storedBack: SpaceLocation | null;
-    fromPicker: boolean;
+    fromTocLink: boolean;
 }): SpaceLocation | null {
-    const { current, lastLocation, storedBack, fromPicker } = input;
+    const { current, lastLocation, storedBack, fromTocLink } = input;
 
     // No previous navigation this session, or we're still browsing the same space:
     // keep whatever "back" target we already had (it persists while browsing).
@@ -109,18 +107,20 @@ export function resolveBackToSpace(input: {
 
     // The reader moved to a different space since the last navigation.
 
-    // Switching space through the picker is a deliberate navigation within the
-    // site structure: reset the context instead of offering to go back.
-    if (fromPicker) {
-        return null;
-    }
-
-    // The reader returned to the space they originally came from.
+    // The reader returned to the space they originally came from: clear the shortcut.
     if (storedBack && storedBack.spaceId === current.spaceId) {
         return null;
     }
 
-    // The reader followed a link into a different space: offer to go back to the
+    // Only a deliberate cross-space link in the table of contents may surface the
+    // shortcut — that was the intent of the feature. Reaching a different space any
+    // other way (an in-content link, the section/variant picker, a direct URL or the
+    // browser history) must not introduce it, and clears any shortcut we were showing.
+    if (!fromTocLink) {
+        return null;
+    }
+
+    // The reader followed a ToC link into a different space: offer to go back to the
     // page they were on.
     return lastLocation;
 }
@@ -128,11 +128,10 @@ export function resolveBackToSpace(input: {
 /**
  * Track navigation between spaces and return the space to offer navigating back to.
  *
- * When a reader follows a link (in the ToC or in the content) into a space different
- * from the one they were browsing, we remember where they came from so a "Back to
- * [space]" shortcut can be surfaced. The shortcut persists while they browse the
- * destination space and is cleared once they return or switch space through the
- * section/variant picker.
+ * When a reader follows a cross-space link in the ToC into a space different from the
+ * one they were browsing, we remember where they came from so a "Back to [space]"
+ * shortcut can be surfaced. The shortcut persists while they browse the destination
+ * space and is cleared once they return or reach another space some other way.
  *
  * The state is kept in `sessionStorage` so it survives both client-side and full-page
  * navigations within the tab, without leaking across tabs or sessions.
@@ -154,14 +153,14 @@ export function useBackToSpace(current: {
             url: `${pathname}${window.location.search}`,
         };
 
-        const fromPicker = getSessionStorageItem<boolean>(FROM_PICKER_KEY, false);
-        removeSessionStorageItem(FROM_PICKER_KEY);
+        const fromTocLink = getSessionStorageItem<boolean>(FROM_TOC_LINK_KEY, false);
+        removeSessionStorageItem(FROM_TOC_LINK_KEY);
 
         const back = resolveBackToSpace({
             current: currentLocation,
             lastLocation: getSessionStorageItem<SpaceLocation | null>(LAST_LOCATION_KEY, null),
             storedBack: getSessionStorageItem<SpaceLocation | null>(BACK_TO_SPACE_KEY, null),
-            fromPicker,
+            fromTocLink,
         });
 
         if (back) {
