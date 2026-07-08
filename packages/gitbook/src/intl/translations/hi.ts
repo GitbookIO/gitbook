@@ -157,6 +157,7 @@ export const hi: TranslationLanguage = {
     view_page_markdown: 'Markdown के रूप में देखें',
     view_page_plaintext: 'इस पृष्ठ को सादे पाठ के रूप में देखें',
     open_in: '${1} में खोलें',
+    open_in_ai: 'इसमें खोलें',
     open_in_llms_pre_prompt: '${1} पढ़ें और सामग्री के बारे में प्रश्नों का उत्तर दें।',
     connect_mcp_to: '${1} से कनेक्ट करें',
     install_mcp_on: 'इस MCP को ${1} में उपयोग करें',

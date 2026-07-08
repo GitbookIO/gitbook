@@ -161,6 +161,7 @@ export const it: TranslationLanguage = {
     view_page_markdown: 'Visualizza come Markdown',
     view_page_plaintext: 'Visualizza questa pagina come testo semplice',
     open_in: 'Apri in ${1}',
+    open_in_ai: 'Apri in',
     open_in_llms_pre_prompt: 'Leggi ${1} e rispondi alle domande sul contenuto.',
     connect_mcp_to: 'Connetti a ${1}',
     install_mcp_on: 'Usa questo MCP in ${1}',

@@ -160,6 +160,7 @@ export const fi: TranslationLanguage = {
     view_page_markdown: 'Näytä Markdownina',
     view_page_plaintext: 'Näytä tämä sivu pelkkänä tekstinä',
     open_in: 'Avaa sovelluksessa ${1}',
+    open_in_ai: 'Avaa sovelluksessa',
     open_in_llms_pre_prompt: 'Lue ${1} ja vastaa sisältöä koskeviin kysymyksiin.',
     connect_mcp_to: 'Yhdistä kohteeseen ${1}',
     install_mcp_on: 'Käytä tätä MCP:tä sovelluksessa ${1}',

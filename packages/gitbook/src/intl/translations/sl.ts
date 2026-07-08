@@ -159,6 +159,7 @@ export const sl: TranslationLanguage = {
     view_page_markdown: 'Prikaži kot Markdown',
     view_page_plaintext: 'Prikaži to stran kot navadno besedilo',
     open_in: 'Odpri v ${1}',
+    open_in_ai: 'Odpri v',
     open_in_llms_pre_prompt: 'Preberite ${1} in odgovorite na vprašanja o vsebini.',
     connect_mcp_to: 'Poveži z ${1}',
     install_mcp_on: 'Uporabi ta MCP v ${1}',

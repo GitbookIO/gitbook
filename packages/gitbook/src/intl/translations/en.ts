@@ -156,6 +156,7 @@ export const en = {
     view_page_markdown: 'View as Markdown',
     view_page_plaintext: 'View this page as plain text',
     open_in: 'Open in ${1}',
+    open_in_ai: 'Open in',
     open_in_llms_pre_prompt: 'Read ${1} and answer questions about the content.',
     connect_mcp_to: 'Connect to ${1}',
     install_mcp_on: 'Use this MCP in ${1}',

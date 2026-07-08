@@ -156,6 +156,7 @@ export const he: TranslationLanguage = {
     view_page_markdown: 'הצגה כ-Markdown',
     view_page_plaintext: 'הצגת דף זה כטקסט פשוט',
     open_in: 'פתיחה ב-${1}',
+    open_in_ai: 'פתיחה באמצעות',
     open_in_llms_pre_prompt: 'קרא את ${1} וענה על שאלות לגבי התוכן.',
     connect_mcp_to: 'התחברות אל ${1}',
     install_mcp_on: 'שימוש ב-MCP הזה ב-${1}',

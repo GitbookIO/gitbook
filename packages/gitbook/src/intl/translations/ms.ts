@@ -158,6 +158,7 @@ export const ms: TranslationLanguage = {
     view_page_markdown: 'Lihat sebagai Markdown',
     view_page_plaintext: 'Lihat halaman ini sebagai teks biasa',
     open_in: 'Buka dalam ${1}',
+    open_in_ai: 'Buka dalam',
     open_in_llms_pre_prompt: 'Baca ${1} dan jawab soalan tentang kandungan.',
     connect_mcp_to: 'Sambung ke ${1}',
     install_mcp_on: 'Gunakan MCP ini dalam ${1}',

@@ -159,6 +159,7 @@ export const cs: TranslationLanguage = {
     view_page_markdown: 'Zobrazit jako Markdown',
     view_page_plaintext: 'Zobrazit tuto stránku jako prostý text',
     open_in: 'Otevřít v ${1}',
+    open_in_ai: 'Otevřít v',
     open_in_llms_pre_prompt: 'Přečtěte si ${1} a odpovězte na otázky o obsahu.',
     connect_mcp_to: 'Připojit k ${1}',
     install_mcp_on: 'Použít tento MCP v ${1}',

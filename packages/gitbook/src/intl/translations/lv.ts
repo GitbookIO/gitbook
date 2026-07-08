@@ -157,6 +157,7 @@ export const lv: TranslationLanguage = {
     view_page_markdown: 'Skatīt kā Markdown',
     view_page_plaintext: 'Skatīt šo lapu kā vienkāršu tekstu',
     open_in: 'Atvērt ${1}',
+    open_in_ai: 'Atvērt ar',
     open_in_llms_pre_prompt: 'Izlasiet ${1} un atbildiet uz jautājumiem par saturu.',
     connect_mcp_to: 'Savienot ar ${1}',
     install_mcp_on: 'Izmantot šo MCP ${1}',

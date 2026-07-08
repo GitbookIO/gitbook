@@ -157,6 +157,7 @@ export const ko: TranslationLanguage = {
     view_page_markdown: 'Markdown으로 보기',
     view_page_plaintext: '이 페이지를 일반 텍스트로 보기',
     open_in: '${1}에서 열기',
+    open_in_ai: '다음에서 열기',
     open_in_llms_pre_prompt: '${1}을(를) 읽고 콘텐츠에 대한 질문에 답하세요.',
     connect_mcp_to: '${1}에 연결',
     install_mcp_on: '${1}에서 이 MCP 사용',

@@ -157,6 +157,7 @@ export const vi: TranslationLanguage = {
     view_page_markdown: 'Xem dưới dạng Markdown',
     view_page_plaintext: 'Xem trang này dưới dạng văn bản thuần',
     open_in: 'Mở trong ${1}',
+    open_in_ai: 'Mở trong',
     open_in_llms_pre_prompt: 'Đọc ${1} và trả lời câu hỏi về nội dung.',
     connect_mcp_to: 'Kết nối với ${1}',
     install_mcp_on: 'Dùng MCP này trong ${1}',

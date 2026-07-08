@@ -161,6 +161,7 @@ export const bg: TranslationLanguage = {
     view_page_markdown: 'Преглед като Markdown',
     view_page_plaintext: 'Преглед на тази страница като обикновен текст',
     open_in: 'Отваряне в ${1}',
+    open_in_ai: 'Отвори в',
     open_in_llms_pre_prompt: 'Прочетете ${1} и отговорете на въпроси за съдържанието.',
     connect_mcp_to: 'Свързване към ${1}',
     install_mcp_on: 'Използване на този MCP в ${1}',

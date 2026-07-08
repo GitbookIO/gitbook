@@ -160,6 +160,7 @@ export const hu: TranslationLanguage = {
     view_page_markdown: 'Megtekintés Markdownként',
     view_page_plaintext: 'Az oldal megtekintése egyszerű szövegként',
     open_in: 'Megnyitás itt: ${1}',
+    open_in_ai: 'Megnyitás ebben:',
     open_in_llms_pre_prompt:
         'Olvassa el ezt: ${1}, és válaszoljon a tartalommal kapcsolatos kérdésekre.',
     connect_mcp_to: 'Csatlakozás ehhez: ${1}',

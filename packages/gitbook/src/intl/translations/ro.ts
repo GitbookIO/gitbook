@@ -162,6 +162,7 @@ export const ro: TranslationLanguage = {
     view_page_markdown: 'Vizualizează ca Markdown',
     view_page_plaintext: 'Vizualizează această pagină ca text simplu',
     open_in: 'Deschide în ${1}',
+    open_in_ai: 'Deschide în',
     open_in_llms_pre_prompt: 'Citește ${1} și răspunde la întrebări despre conținut.',
     connect_mcp_to: 'Conectează la ${1}',
     install_mcp_on: 'Folosește acest MCP în ${1}',
