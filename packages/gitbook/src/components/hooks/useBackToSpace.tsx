@@ -55,10 +55,13 @@ function opensInNewTab(event: React.MouseEvent): boolean {
  * ToC-initiated, so arriving in a different space can surface the "Back to space"
  * shortcut.
  *
- * Attach it with `onClickCapture` on the root of the page list. It intentionally does
- * nothing for clicks that leave the current tab unchanged — not on a link, re-selecting
- * the already-active page, or opening the link in a new tab/window — since the flag
- * would otherwise linger and be mis-attributed to a later, unrelated navigation.
+ * Attach it with `onClickCapture` on the root of the page list. It only flags clicks
+ * that will actually navigate to a different page, since the destination effect is what
+ * consumes the flag: a click that doesn't change the pathname would leave the flag
+ * lingering, to be mis-attributed to a later, unrelated navigation. So it does nothing
+ * for clicks that open a new tab/window, land on a nested control (e.g. the
+ * expand/collapse chevron, which toggles the tree rather than navigating), or target the
+ * current page (the active item or an in-page anchor).
  */
 export function markSpaceNavigationFromTOCLinkOnClick(event: React.MouseEvent<HTMLElement>) {
     if (opensInNewTab(event)) {
@@ -70,14 +73,21 @@ export function markSpaceNavigationFromTOCLinkOnClick(event: React.MouseEvent<HT
         return;
     }
 
-    const link = target.closest('a[href]');
-    if (!link) {
+    // The expand/collapse chevron is a <button> nested inside the link; clicking it only
+    // toggles the tree (it calls preventDefault/stopPropagation), so it must not flag a
+    // navigation — and this runs in the capture phase, before that handler.
+    if (target.closest('button')) {
         return;
     }
 
-    // Skip the currently active page: re-selecting it doesn't navigate, so the flag
-    // would linger. Active ToC links are marked with `aria-current="page"`.
-    if (link.getAttribute('aria-current') === 'page') {
+    const link = target.closest('a[href]');
+    if (!(link instanceof HTMLAnchorElement)) {
+        return;
+    }
+
+    // Skip same-page links (the active item, or an in-page anchor): they don't change the
+    // pathname, so the effect never re-runs to consume the flag.
+    if (link.pathname === window.location.pathname) {
         return;
     }
 
