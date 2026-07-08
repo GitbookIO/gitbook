@@ -157,6 +157,7 @@ export const ja: TranslationLanguage = {
     view_page_markdown: 'Markdown として表示',
     view_page_plaintext: 'このページをプレーンテキストで表示',
     open_in: '${1} で開く',
+    open_in_ai: '以下で開く',
     open_in_llms_pre_prompt: '${1} を読んで内容に関する質問に答えてください。',
     connect_mcp_to: '${1} に接続',
     install_mcp_on: '${1} でこのMCPを使用',

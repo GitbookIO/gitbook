@@ -156,6 +156,7 @@ export const ar: TranslationLanguage = {
     view_page_markdown: 'عرض كـ Markdown',
     view_page_plaintext: 'عرض هذه الصفحة كنص عادي',
     open_in: 'فتح في ${1}',
+    open_in_ai: 'فتح في',
     open_in_llms_pre_prompt: 'اقرأ ${1} وأجب عن الأسئلة المتعلقة بالمحتوى.',
     connect_mcp_to: 'الاتصال بـ ${1}',
     install_mcp_on: 'استخدام MCP هذا في ${1}',

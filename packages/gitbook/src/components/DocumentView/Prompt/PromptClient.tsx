@@ -1,12 +1,6 @@
 'use client';
 
-import {
-    Button,
-    ButtonGroup,
-    DropdownMenu,
-    DropdownMenuItem,
-    ToggleChevron,
-} from '@/components/primitives';
+import { Button, DropdownMenu, DropdownMenuItem, ToggleChevron } from '@/components/primitives';
 import { getURLForLLM } from '@/components/utils';
 import { tString, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
@@ -29,7 +23,7 @@ export function PromptClient(props: {
     const [headerHasFocus, setHeaderHasFocus] = React.useState(false);
     return (
         <>
-            <div className="group/prompt-header relative flex min-h-9 flex-row items-center justify-between gap-4 px-3 py-2">
+            <div className="group/prompt-header relative flex min-h-9 flex-row items-center justify-between gap-4 p-3">
                 <button
                     type="button"
                     aria-controls={promptId}
@@ -109,10 +103,10 @@ function PromptActions(props: { prompt: string; openInAIProviders: boolean }) {
     const { prompt, openInAIProviders } = props;
 
     return (
-        <ButtonGroup className="relative z-20 shrink-0 overflow-visible">
+        <div className="relative z-20 flex shrink-0 items-center gap-2">
             <CopyPromptButton prompt={prompt} />
             {openInAIProviders ? <OpenPromptDropdown prompt={prompt} /> : null}
-        </ButtonGroup>
+        </div>
     );
 }
 
@@ -142,9 +136,7 @@ function CopyPromptButton(props: { prompt: string }) {
         <Button
             variant="secondary"
             size="xsmall"
-            icon={copied ? 'check' : 'copy'}
             label={copied ? tString(language, 'code_copied') : tString(language, 'prompt_copy')}
-            className="bg-tint-base"
             disabled={!prompt}
             onClick={() => {
                 navigator.clipboard.writeText(prompt);
@@ -164,12 +156,10 @@ function OpenPromptDropdown(props: { prompt: string }) {
             className="!min-w-48 max-w-max"
             button={
                 <Button
-                    icon={<ToggleChevron className="size-text-sm" />}
-                    label={tString(language, 'open')}
-                    iconOnly
+                    label={tString(language, 'open_in_ai')}
+                    trailing={<ToggleChevron className="size-text-sm" />}
                     size="xsmall"
-                    variant="secondary"
-                    className="bg-tint-base"
+                    variant="primary"
                     disabled={!prompt}
                 />
             }

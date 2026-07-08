@@ -156,6 +156,7 @@ export const tr: TranslationLanguage = {
     view_page_markdown: 'Markdown olarak görüntüle',
     view_page_plaintext: 'Bu sayfayı düz metin olarak görüntüle',
     open_in: '${1} içinde aç',
+    open_in_ai: 'Şununla aç',
     open_in_llms_pre_prompt: '${1} içeriğini okuyun ve içerikle ilgili soruları yanıtlayın.',
     connect_mcp_to: '${1} ile bağlan',
     install_mcp_on: 'Bu MCPyi ${1} içinde kullan',

@@ -158,6 +158,7 @@ export const hr: TranslationLanguage = {
     view_page_markdown: 'Prikaži kao Markdown',
     view_page_plaintext: 'Prikaži ovu stranicu kao običan tekst',
     open_in: 'Otvori u ${1}',
+    open_in_ai: 'Otvori u',
     open_in_llms_pre_prompt: 'Pročitajte ${1} i odgovorite na pitanja o sadržaju.',
     connect_mcp_to: 'Poveži s ${1}',
     install_mcp_on: 'Upotrijebi ovaj MCP u ${1}',

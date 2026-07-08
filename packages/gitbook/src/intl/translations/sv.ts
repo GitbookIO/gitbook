@@ -158,6 +158,7 @@ export const sv: TranslationLanguage = {
     view_page_markdown: 'Visa som Markdown',
     view_page_plaintext: 'Visa den här sidan som vanlig text',
     open_in: 'Öppna i ${1}',
+    open_in_ai: 'Öppna i',
     open_in_llms_pre_prompt: 'Läs ${1} och svara på frågor om innehållet.',
     connect_mcp_to: 'Anslut till ${1}',
     install_mcp_on: 'Använd denna MCP i ${1}',
