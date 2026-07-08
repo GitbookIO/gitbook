@@ -132,6 +132,7 @@ function OpenPromptDropdown(props: { prompt: string }) {
                     trailing={<ToggleChevron className="size-text-sm" />}
                     size="xsmall"
                     variant="secondary"
+                    className="max-sm:hidden"
                     disabled={!prompt}
                 />
             }
