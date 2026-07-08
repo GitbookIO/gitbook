@@ -20,10 +20,21 @@ export function PromptClient(props: {
     const language = useLanguage();
     const promptId = React.useId();
     const [open, setOpen] = React.useState(false);
-    const [headerHasFocus, setHeaderHasFocus] = React.useState(false);
     return (
-        <>
-            <div className="group/prompt-header relative flex min-h-9 flex-row items-center justify-between gap-4 p-3">
+        <div
+            className={tcls(
+                'relative flex w-full flex-col overflow-hidden rounded-lg text-tint-strong',
+                'border border-tint-subtle contrast-more:border-tint',
+                'transition',
+                open ? 'bg-tint depth-subtle:shadow-xs' : 'bg-tint-base'
+            )}
+        >
+            <div
+                className={tcls(
+                    'group/prompt-header relative flex min-h-9 flex-row items-center justify-between gap-4 p-3 transition-colors',
+                    open ? 'hover:bg-tint-hover' : 'hover:bg-tint-subtle'
+                )}
+            >
                 <button
                     type="button"
                     aria-controls={promptId}
@@ -34,16 +45,15 @@ export function PromptClient(props: {
                         'focus-visible:ring-2 focus-visible:ring-primary-hover'
                     )}
                     disabled={!prompt}
-                    onBlur={() => setHeaderHasFocus(false)}
                     onClick={() => setOpen((prev) => !prev)}
-                    onFocus={() => setHeaderHasFocus(true)}
                 />
                 <div className="pointer-events-none relative z-0 flex min-w-0 flex-row items-center gap-2 text-tint-strong">
-                    <PromptDisclosureIcon
-                        contentIcon={contentIcon}
-                        headerHasFocus={headerHasFocus}
+                    <ToggleChevron
                         open={open}
+                        orientation="right-to-down"
+                        className="size-3 shrink-0 text-tint-subtle transition-colors group-hover/prompt-header:text-tint-strong"
                     />
+                    {contentIcon ? <Icon icon={contentIcon} className="size-4 shrink-0" /> : null}
                     <span className="min-w-0 truncate">{description}</span>
                 </div>
                 <PromptActions prompt={prompt} openInAIProviders={openInAIProviders} />
@@ -57,45 +67,7 @@ export function PromptClient(props: {
                     </pre>
                 </div>
             ) : null}
-        </>
-    );
-}
-
-function PromptDisclosureIcon(props: {
-    contentIcon: IconName | null;
-    headerHasFocus: boolean;
-    open: boolean;
-}) {
-    const { contentIcon, headerHasFocus, open } = props;
-    return (
-        <span className="relative flex size-4 shrink-0 items-center justify-center">
-            {contentIcon ? (
-                <>
-                    <span
-                        className={tcls(
-                            'flex items-center transition-opacity duration-150 group-hover/prompt-header:opacity-0',
-                            headerHasFocus && 'opacity-0'
-                        )}
-                    >
-                        <Icon icon={contentIcon} className="size-4 shrink-0" />
-                    </span>
-                    <span
-                        className={tcls(
-                            'absolute inset-0 flex items-center justify-center text-tint-subtle opacity-0 transition-opacity duration-150 group-hover/prompt-header:opacity-100',
-                            headerHasFocus && 'opacity-100'
-                        )}
-                    >
-                        <ToggleChevron open={open} orientation="right-to-down" className="size-3" />
-                    </span>
-                </>
-            ) : (
-                <ToggleChevron
-                    open={open}
-                    orientation="right-to-down"
-                    className="size-3 text-tint-subtle"
-                />
-            )}
-        </span>
+        </div>
     );
 }
 
