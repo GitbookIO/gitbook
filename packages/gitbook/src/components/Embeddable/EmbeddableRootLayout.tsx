@@ -14,6 +14,7 @@ import { Trademark } from '../TableOfContents/Trademark';
 import { NavigationLoader } from '../primitives/NavigationLoader';
 import { EmbeddableAIContextProvider } from './EmbeddableAIContextProvider';
 import { EmbeddableIframeAPI } from './EmbeddableIframeAPI';
+import { EmbeddableThemeSync } from './EmbeddableThemeSync';
 import { IfEmbeddableTrademark } from './EmbeddableTrademark';
 
 type EmbeddableRootLayoutProps = {
@@ -50,6 +51,9 @@ export async function EmbeddableRootLayout({
                 contextId={context.contextId}
                 proxyOrigin={context.site.proxy?.origin}
             >
+                {/* Persist the resolved theme (not the raw ?theme=) so it survives tab navigation
+                    without single-theme sites persisting an override they ignore. RND-11571 */}
+                <EmbeddableThemeSync forcedTheme={theme.forcedTheme} />
                 <EmbeddableAIContextProvider
                     aiMode={context.customization.ai.mode}
                     suggestions={context.customization.ai.suggestions}
