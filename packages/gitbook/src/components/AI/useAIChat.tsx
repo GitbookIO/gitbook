@@ -268,9 +268,7 @@ export function AIChatProvider(props: {
         notify(eventsRef.current.get('close'), {});
     }, [setSearchState]);
 
-    // Holds the latest `onPostMessage` so `streamResponse` can flush a queued follow-up once a
-    // turn finishes. A ref avoids a declaration cycle (streamResponse is defined before
-    // onPostMessage) and keeps the callback stable across renders.
+    // Lets `streamResponse` flush a queued follow-up via `onPostMessage`, which is defined later.
     const postMessageRef = React.useRef<((input: { message: string }) => void) | null>(null);
 
     // Stream a message with the AI backend
@@ -529,12 +527,8 @@ export function AIChatProvider(props: {
                         error: false,
                     }));
 
-                    // The turn is fully settled: send the next follow-up the visitor queued while
-                    // it was streaming (oldest first). Skipped when a control is awaiting input
-                    // (posting would throw and the input is disabled anyway) — they stay queued and
-                    // flush after the control continuation ends. Sending one message starts a new
-                    // turn whose own completion flushes the following one, draining the queue in
-                    // order.
+                    // Turn settled: send the next queued follow-up (oldest first). Held back while a
+                    // control is pending, since posting would throw; it flushes after that resolves.
                     const { queuedMessages, control: activeControl } = globalState.getState();
                     const [next, ...rest] = queuedMessages;
                     if (next !== undefined && !activeControl) {
@@ -574,9 +568,7 @@ export function AIChatProvider(props: {
                 throw new Error("We can't post a message when a control is active");
             }
 
-            // A turn is still streaming: queue this follow-up instead of dropping it. Queued
-            // messages are sent automatically, one at a time in submission order, as each answer
-            // finishes (flushed in `streamResponse`).
+            // Still streaming: queue this follow-up instead of dropping it (flushed in order in `streamResponse`).
             if (responding) {
                 globalState.setState((state) => ({
                     ...state,

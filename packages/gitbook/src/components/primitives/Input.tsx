@@ -195,9 +195,7 @@ export const Input = React.forwardRef<InputElement, InputProps>((props, passedRe
     };
 
     const inputClassName = tcls(
-        // Note: `aria-busy` intentionally does NOT change the cursor here — a busy field can still
-        // be editable (e.g. composing a follow-up while the Assistant streams), and a progress
-        // cursor made it look disabled. Read-only state is conveyed by `disabled` instead.
+        // `aria-busy` must not change the cursor: a busy field can still be editable.
         'peer -m-2 max-h-64 grow shrink resize-none leading-normal text-left outline-none placeholder:text-tint/8 placeholder-shown:text-ellipsis',
         sizes[sizing].input
     );
