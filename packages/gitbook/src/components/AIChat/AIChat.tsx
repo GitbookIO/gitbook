@@ -120,6 +120,7 @@ export function AIChat() {
                             chat={chat}
                             suggestions={config.suggestions}
                             trademark={config.trademark}
+                            assistantName={config.assistantName}
                         />
                     </EmbeddableFrameBody>
                 </EmbeddableFrameMain>
@@ -208,14 +209,17 @@ export function AIChatBody(props: {
     welcomeMessage?: string;
     suggestions?: string[];
     trademark?: boolean;
+    /** Custom assistant name override; falls back to the branded/unbranded default name. */
+    assistantName?: string;
     greeting?: {
         title: string;
         subtitle: string;
     };
 }) {
-    const { chatController, chat, suggestions, greeting, trademark } = props;
+    const { chatController, chat, suggestions, greeting, trademark, assistantName } = props;
 
     const language = useLanguage();
+    const resolvedAssistantName = assistantName ?? getAIChatName(language, trademark ?? true);
     const now = useNow(60 * 60 * 1000); // Refresh every hour for greeting
 
     const isEmpty = !chat.messages.length;
@@ -288,9 +292,7 @@ export function AIChatBody(props: {
                 {chat.queuedMessage ? (
                     <AIChatQueuedMessage
                         message={chat.queuedMessage}
-                        assistantName={
-                            config.assistantName ?? getAIChatName(language, config.trademark)
-                        }
+                        assistantName={resolvedAssistantName}
                         onRemove={chatController.cancelQueuedMessage}
                     />
                 ) : null}
