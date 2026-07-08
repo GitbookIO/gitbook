@@ -286,7 +286,7 @@ export function AIChatBody(props: {
                 {chat.control ? <AIChatControl control={chat.control} /> : null}
                 <AIChatInput
                     responding={chat.responding}
-                    disabled={chat.responding || chat.error}
+                    disabled={chat.error}
                     onSubmit={(value) => {
                         chatController.postMessage({ message: value });
                     }}

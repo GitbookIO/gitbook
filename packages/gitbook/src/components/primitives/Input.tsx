@@ -23,6 +23,13 @@ type CustomInputProps = {
      */
     submitButton?: boolean | ButtonProps;
     /**
+     * When true, the field stays editable but submitting is blocked: pressing Enter or the
+     * submit button does nothing and the typed value is preserved. Distinct from `disabled`,
+     * which also makes the field read-only. Lets callers keep the field usable while a submit
+     * would be premature (e.g. composing an Assistant follow-up while an answer streams).
+     */
+    submitDisabled?: boolean;
+    /**
      * A message to be shown to the right of the input when the value has been submitted.
      */
     submitMessage?: string | ReactNode;
@@ -84,6 +91,7 @@ export const Input = React.forwardRef<InputElement, InputProps>((props, passedRe
         className,
         clearButton,
         submitButton,
+        submitDisabled,
         submitMessage,
         label,
         keyboardShortcut,
@@ -168,6 +176,11 @@ export const Input = React.forwardRef<InputElement, InputProps>((props, passedRe
     };
 
     const handleSubmit = () => {
+        // Keep the typed value when submitting is blocked, so the caller can let the field stay
+        // editable (e.g. composing a follow-up) without losing what was typed.
+        if (submitDisabled) {
+            return;
+        }
         if (hasValue && onSubmit) {
             onSubmit(value);
             setSubmitted(true);
@@ -365,7 +378,7 @@ export const Input = React.forwardRef<InputElement, InputProps>((props, passedRe
                             label={tString(language, 'submit')}
                             onClick={handleSubmit}
                             icon={multiline ? undefined : 'arrow-right'}
-                            disabled={disabled || !hasValidValue}
+                            disabled={disabled || submitDisabled || !hasValidValue}
                             iconOnly={!multiline}
                             className={tcls(
                                 'ml-auto',
