@@ -14,42 +14,31 @@ type OpenAPIResponseExampleItem = OpenAPISelectItem & {
 /**
  * Get the state of the response examples select.
  */
-export function useResponseExamplesState(
-    blockKey: string | undefined,
-    initialKey: Key = 'default'
-) {
-    return useSelectState(getResponseExampleStateKey(blockKey), initialKey);
+export function useResponseExamplesState(initialKey: Key = 'default') {
+    return useSelectState(getResponseExampleStateKey(), initialKey);
 }
 
 export function OpenAPIResponseExampleContent(props: {
     items: OpenAPIResponseExampleItem[];
-    blockKey?: string;
     selectIcon?: React.ReactNode;
 }) {
-    const { blockKey, items, selectIcon } = props;
+    const { items, selectIcon } = props;
 
     return (
         <StaticSection
-            header={
-                <OpenAPIResponseExampleHeader
-                    selectIcon={selectIcon}
-                    blockKey={blockKey}
-                    items={items}
-                />
-            }
+            header={<OpenAPIResponseExampleHeader selectIcon={selectIcon} items={items} />}
             className="openapi-response-examples"
         >
-            <OpenAPIResponseExampleBody blockKey={blockKey} items={items} />
+            <OpenAPIResponseExampleBody items={items} />
         </StaticSection>
     );
 }
 
 function OpenAPIResponseExampleHeader(props: {
     items: OpenAPIResponseExampleItem[];
-    blockKey?: string;
     selectIcon?: React.ReactNode;
 }) {
-    const { items, blockKey, selectIcon } = props;
+    const { items, selectIcon } = props;
 
     if (items.length === 1) {
         const item = items[0];
@@ -69,7 +58,7 @@ function OpenAPIResponseExampleHeader(props: {
         <OpenAPISelect
             items={items}
             icon={selectIcon}
-            stateKey={getResponseExampleStateKey(blockKey)}
+            stateKey={getResponseExampleStateKey()}
             placement="bottom start"
         >
             {items.map((item) => (
@@ -103,10 +92,9 @@ function OpenAPIResponseExampleItem(props: {
 
 function OpenAPIResponseExampleBody(props: {
     items: OpenAPIResponseExampleItem[];
-    blockKey?: string;
 }) {
-    const { blockKey, items } = props;
-    const state = useResponseExamplesState(blockKey, items[0]?.key);
+    const { items } = props;
+    const state = useResponseExamplesState(items[0]?.key);
 
     const selectedItem = items.find((item) => item.key === state.key) ?? items[0];
 
@@ -118,8 +106,9 @@ function OpenAPIResponseExampleBody(props: {
 }
 
 /**
- * Return the state key for the response examples.
+ * Return the state key for the response examples. Not scoped to a block so the selected response
+ * stays in sync across every operation on the page (like the code sample language selector).
  */
-function getResponseExampleStateKey(blockKey: string | undefined) {
-    return createStateKey('openapi-responses', blockKey);
+function getResponseExampleStateKey() {
+    return createStateKey('openapi-responses');
 }
