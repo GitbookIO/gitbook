@@ -157,6 +157,7 @@ export const da: TranslationLanguage = {
     view_page_markdown: 'Vis som Markdown',
     view_page_plaintext: 'Vis denne side som almindelig tekst',
     open_in: 'Åbn i ${1}',
+    open_in_ai: 'Åbn i',
     open_in_llms_pre_prompt: 'Læs ${1}, og besvar spørgsmål om indholdet.',
     connect_mcp_to: 'Opret forbindelse til ${1}',
     install_mcp_on: 'Brug denne MCP i ${1}',

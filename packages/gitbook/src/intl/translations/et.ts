@@ -157,6 +157,7 @@ export const et: TranslationLanguage = {
     view_page_markdown: 'Kuva Markdownina',
     view_page_plaintext: 'Kuva see leht lihttekstina',
     open_in: 'Ava rakenduses ${1}',
+    open_in_ai: 'Ava rakenduses',
     open_in_llms_pre_prompt: 'Lugege ${1} ja vastake sisu puudutavatele küsimustele.',
     connect_mcp_to: 'Ühenda teenusega ${1}',
     install_mcp_on: 'Kasuta seda MCP-d rakenduses ${1}',

@@ -153,6 +153,7 @@ export const zh: TranslationLanguage = {
     view_page_markdown: '以 Markdown 查看',
     view_page_plaintext: '以纯文本查看此页面',
     open_in: '在 ${1} 中打开',
+    open_in_ai: '打开方式',
     open_in_llms_pre_prompt: '阅读 ${1} 并回答内容相关的问题。',
     connect_mcp_to: '连接到 ${1}',
     install_mcp_on: '在 ${1} 中使用此 MCP',

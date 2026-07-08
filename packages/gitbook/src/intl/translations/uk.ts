@@ -156,6 +156,7 @@ export const uk: TranslationLanguage = {
     view_page_markdown: 'Переглянути як Markdown',
     view_page_plaintext: 'Переглянути цю сторінку як звичайний текст',
     open_in: 'Відкрити в ${1}',
+    open_in_ai: 'Відкрити в',
     open_in_llms_pre_prompt: 'Прочитайте ${1} і дайте відповіді на запитання про вміст.',
     connect_mcp_to: 'Підключитися до ${1}',
     install_mcp_on: 'Використати цей MCP у ${1}',

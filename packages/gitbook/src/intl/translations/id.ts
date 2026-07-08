@@ -157,6 +157,7 @@ export const id: TranslationLanguage = {
     view_page_markdown: 'Lihat sebagai Markdown',
     view_page_plaintext: 'Lihat halaman ini sebagai teks biasa',
     open_in: 'Buka di ${1}',
+    open_in_ai: 'Buka di',
     open_in_llms_pre_prompt: 'Baca ${1} dan jawab pertanyaan tentang kontennya.',
     connect_mcp_to: 'Hubungkan ke ${1}',
     install_mcp_on: 'Gunakan MCP ini di ${1}',

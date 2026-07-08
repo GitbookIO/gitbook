@@ -158,6 +158,7 @@ export const pl: TranslationLanguage = {
     view_page_markdown: 'Wyświetl jako Markdown',
     view_page_plaintext: 'Wyświetl tę stronę jako zwykły tekst',
     open_in: 'Otwórz w ${1}',
+    open_in_ai: 'Otwórz w',
     open_in_llms_pre_prompt: 'Przeczytaj ${1} i odpowiedz na pytania dotyczące treści.',
     connect_mcp_to: 'Połącz z ${1}',
     install_mcp_on: 'Użyj tego MCP w ${1}',

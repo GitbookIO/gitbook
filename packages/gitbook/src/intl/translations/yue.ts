@@ -153,6 +153,7 @@ export const yue: TranslationLanguage = {
     view_page_markdown: '以 Markdown 檢視',
     view_page_plaintext: '以純文字檢視此頁面',
     open_in: '喺 ${1} 開啟',
+    open_in_ai: '開啟方式',
     open_in_llms_pre_prompt: '閱讀 ${1}，並回答關於內容嘅問題。',
     connect_mcp_to: '連接到 ${1}',
     install_mcp_on: '喺 ${1} 使用此 MCP',

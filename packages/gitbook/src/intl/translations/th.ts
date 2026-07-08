@@ -154,6 +154,7 @@ export const th: TranslationLanguage = {
     view_page_markdown: 'ดูเป็น Markdown',
     view_page_plaintext: 'ดูหน้านี้เป็นข้อความธรรมดา',
     open_in: 'เปิดใน ${1}',
+    open_in_ai: 'เปิดใน',
     open_in_llms_pre_prompt: 'อ่าน ${1} แล้วตอบคำถามเกี่ยวกับเนื้อหา',
     connect_mcp_to: 'เชื่อมต่อกับ ${1}',
     install_mcp_on: 'ใช้ MCP นี้ใน ${1}',

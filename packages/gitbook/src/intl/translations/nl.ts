@@ -159,6 +159,7 @@ export const nl: TranslationLanguage = {
     view_page_markdown: 'Bekijk als Markdown',
     view_page_plaintext: 'Bekijk deze pagina als platte tekst',
     open_in: 'Open in ${1}',
+    open_in_ai: 'Openen in',
     open_in_llms_pre_prompt: 'Lees ${1} en beantwoord vragen over de inhoud.',
     connect_mcp_to: 'Verbind met ${1}',
     install_mcp_on: 'Gebruik deze MCP in ${1}',

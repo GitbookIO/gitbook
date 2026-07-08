@@ -160,6 +160,7 @@ export const sk: TranslationLanguage = {
     view_page_markdown: 'Zobraziť ako Markdown',
     view_page_plaintext: 'Zobraziť túto stránku ako obyčajný text',
     open_in: 'Otvoriť v ${1}',
+    open_in_ai: 'Otvoriť v',
     open_in_llms_pre_prompt: 'Prečítajte si ${1} a odpovedzte na otázky o obsahu.',
     connect_mcp_to: 'Pripojiť k ${1}',
     install_mcp_on: 'Použiť tento MCP v ${1}',
