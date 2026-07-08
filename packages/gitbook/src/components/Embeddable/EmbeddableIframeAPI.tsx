@@ -4,13 +4,14 @@ import type { GitBookEmbeddableConfiguration, ParentToFrameMessage } from '@gitb
 import React, { useEffect, useRef } from 'react';
 
 import { useAI, useAIChatController } from '@/components/AI';
+import { isAIChatEnabled } from '@/components/utils/isAIChatEnabled';
 import { tString, useLanguage } from '@/intl/client';
-import { CustomizationAIMode } from '@gitbook/api';
 import { useRouter } from 'next/navigation';
 import { createStore, useStore } from 'zustand';
 import { integrationsAssistantTools } from '../Integrations';
 import { Button, LinkContext, type LinkContextType } from '../primitives';
 import { getChannel } from './channel';
+import { resolveEmbedPageLink } from './server-actions';
 
 const embeddableConfiguration = createStore<GitBookEmbeddableConfiguration>(() => ({
     tabs: [],
@@ -44,9 +45,14 @@ export function EmbeddableIframeAPI(props: {
         refs.current = { router, chatController, baseURL };
     });
 
+    // Bumped on every navigation so an in-flight (async) `navigateToPage` can tell it has
+    // been superseded by a later command and skip its now-stale `router.push`.
+    const navToken = useRef(0);
+
     React.useEffect(() => {
         return chatController.on('open', () => {
             const { baseURL, router } = refs.current;
+            navToken.current++;
             router.push(`${baseURL}/assistant`);
         });
     }, [chatController]);
@@ -82,10 +88,26 @@ export function EmbeddableIframeAPI(props: {
                     break;
                 }
                 case 'navigateToPage': {
-                    router.push(`${baseURL}/page/${message.pagePath}`);
+                    // Resolve the target server-side: on a multi-space site the page may
+                    // live in another space/section, whose base must go before
+                    // `~gitbook/embed/page`. Fall back to a same-space push on failure.
+                    const { pagePath } = message;
+                    const token = ++navToken.current;
+                    // Ignore the result if a later navigation has since superseded this one.
+                    const push = (href: string) => {
+                        if (navToken.current === token) {
+                            router.push(href);
+                        }
+                    };
+                    resolveEmbedPageLink(pagePath)
+                        .then((resolved) =>
+                            push('href' in resolved ? resolved.href : `${baseURL}/page/${pagePath}`)
+                        )
+                        .catch(() => push(`${baseURL}/page/${pagePath}`));
                     break;
                 }
                 case 'navigateToAssistant': {
+                    navToken.current++;
                     router.push(`${baseURL}/assistant`);
                     break;
                 }
@@ -186,9 +208,7 @@ export function EmbeddableIframeTabs(props: {
     const router = useRouter();
 
     const enabledTabs = [
-        config.aiMode === CustomizationAIMode.Assistant &&
-        assistants[0] &&
-        tabs.includes('assistant')
+        isAIChatEnabled(config.aiMode) && assistants[0] && tabs.includes('assistant')
             ? {
                   key: 'assistant',
                   label: assistants[0].label,

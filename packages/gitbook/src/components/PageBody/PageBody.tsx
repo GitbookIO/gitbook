@@ -3,7 +3,14 @@ import type { JSONDocument, RevisionPageDocument, SiteInsightsDisplayContext } f
 
 import { getSpaceLanguage } from '@/intl/server';
 import { t } from '@/intl/translate';
-import { hasFullWidthBlock, hasMoreThan, hasTopLevelBlock, isNodeEmpty } from '@/lib/document';
+import {
+    hasAPIBlock,
+    hasFullWidthBlock,
+    hasMoreThan,
+    hasTopLevelBlock,
+    isNodeEmpty,
+} from '@/lib/document';
+import { getLLMsTxtURL, getPageMarkdownURL } from '@/lib/llms-directive';
 import type { AncestorRevisionPage } from '@/lib/pages';
 import { tcls } from '@/lib/tailwind';
 import { DocumentView, DocumentViewSkeleton } from '../DocumentView';
@@ -21,7 +28,7 @@ import { PreservePageLayout } from './PreservePageLayout';
 
 const LINK_PREVIEW_MAX_COUNT = 500;
 
-export function PageBody(props: {
+export async function PageBody(props: {
     context: GitBookSiteContext;
     page: RevisionPageDocument;
     ancestors: AncestorRevisionPage[];
@@ -58,8 +65,12 @@ export function PageBody(props: {
     // Determine if content should use wide layout (2-column or 1-column instead of 3-column)
     // This happens when: (1) document has full-width blocks, OR (2) page layout is explicitly set to 'wide'
     const wideContent = document ? hasFullWidthBlock(document) : false;
+    // Whether the page has OpenAPI/Swagger blocks — used to scope the sticky, extracted page-actions
+    // to API-reference pages only (matching the `page-api-block` styling), so other pages keep the
+    // header structure untouched.
+    const hasAPIBlocks = document ? hasAPIBlock(document) : false;
     const wideLayout = wideContent || page.layout.width === 'wide';
-    const language = getSpaceLanguage(context);
+    const language = await getSpaceLanguage(context);
     const updatedAt = page.updatedAt ?? page.createdAt;
 
     const hasVisibleTOCItems =
@@ -89,6 +100,7 @@ export function PageBody(props: {
                 )}
             >
                 <PreservePageLayout wideLayout={wideLayout} pageHasToc={pageHasToc} />
+                <LLMsTxtPageDirective context={context} page={page} />
                 {page.cover && page.layout.cover && page.layout.coverSize === 'hero' ? (
                     <PageCover as="hero" page={page} cover={page.cover} context={context} />
                 ) : null}
@@ -98,6 +110,7 @@ export function PageBody(props: {
                     page={page}
                     ancestors={ancestors}
                     withRSSFeed={contentHasUpdates}
+                    hasAPIBlocks={hasAPIBlocks}
                 />
                 {document && !isNodeEmpty(document) ? (
                     <OptionalSuspense
@@ -105,18 +118,20 @@ export function PageBody(props: {
                         fallback={<DocumentViewSkeleton document={document} blockStyle="" />}
                     >
                         <SuspenseLoadedHint />
-                        <DocumentView
-                            document={document}
-                            style="clear-both flex grow flex-col [&>*+*]:mt-5"
-                            context={{
-                                mode: 'default',
-                                contentContext: {
-                                    ...context,
-                                    page,
-                                },
-                                withLinkPreviews,
-                            }}
-                        />
+                        <div className="contents" data-content-ref-root="">
+                            <DocumentView
+                                document={document}
+                                style="flex grow flex-col [&>*+*]:mt-5"
+                                context={{
+                                    mode: 'default',
+                                    contentContext: {
+                                        ...context,
+                                        page,
+                                    },
+                                    withLinkPreviews,
+                                }}
+                            />
+                        </div>
                     </OptionalSuspense>
                 ) : (
                     <PageBodyBlankslate page={page} context={context} />
@@ -159,5 +174,16 @@ export function PageBody(props: {
 
             <TrackPageViewEvent displayContext={insightsDisplayContext} />
         </CurrentPageProvider>
+    );
+}
+
+function LLMsTxtPageDirective(props: { context: GitBookSiteContext; page: RevisionPageDocument }) {
+    const { context, page } = props;
+
+    return (
+        <div className="sr-only">
+            For the complete documentation index, see <a href={getLLMsTxtURL(context)}>llms.txt</a>.
+            This page is also available as <a href={getPageMarkdownURL(context, page)}>Markdown</a>.
+        </div>
     );
 }

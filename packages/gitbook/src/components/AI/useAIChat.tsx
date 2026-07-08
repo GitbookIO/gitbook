@@ -2,6 +2,7 @@
 
 import * as zustand from 'zustand';
 
+import { useCurrentContent } from '@/components/hooks';
 import { useLanguage } from '@/intl/client';
 import { tString } from '@/intl/translate';
 import {
@@ -13,19 +14,22 @@ import {
 } from '@gitbook/api';
 import assertNever from 'assert-never';
 import * as React from 'react';
-import { getVisitor, useTrackEvent } from '../Insights';
-import { getSession } from '../Insights/sessions';
+import { getInsightsSession, useTrackEvent } from '../Insights';
 import { useSetSearchState } from '../Search';
+import { addRecentSearchQuery } from '../Search/recent-queries';
 import type { AnyAIControl } from './controls';
 import { ConfirmControlDef, ConfirmControlOutputSchema } from './controls/ConfirmControl';
+import { type AIChatReference, serializeReferences } from './references';
 import { type RenderAIMessageOptions, streamAIChatResponse } from './server-actions';
 import { getTools } from './tools';
 import { useAIMessageContextRef } from './useAIMessageContext';
+import { useNavigateToPageTool } from './useNavigateToPageTool';
 
 export type AIChatMessage = {
     role: AIMessageRole;
     content: React.ReactNode;
     query?: string;
+    references?: AIChatReference[];
     activity?: AIChatMessageActivity;
 };
 
@@ -82,7 +86,23 @@ export type AIChatState = {
     control: AnyAIControl | null;
 
     /**
-     * If true, the session is in progress.
+     * If true, the assistant is actively producing its answer — from the moment a
+     * message is sent until the `response_finish` event. It is cleared at that point
+     * (even though follow-up suggestions may still trickle in) so the input can be
+     * re-enabled. Drives the local "are we still answering" UI: the disabled input,
+     * the loading shim, and the thinking/exploring/working status.
+     */
+    responding: boolean;
+
+    /**
+     * If true, the turn is still in progress overall: from the moment a message is
+     * sent until the stream fully completes, including the follow-up suggestion
+     * phase.
+     *
+     * Unlike `responding` — which clears on `response_finish` — this stays true
+     * until the response is truly settled. It is the global busyness indicator,
+     * surfaced as `aria-busy` on the chat so that assistive tech (and visual tests)
+     * can wait for a complete, stable response.
      */
     loading: boolean;
 
@@ -92,13 +112,25 @@ export type AIChatState = {
      * display an error alert. Clearing the conversation will reset this flag.
      */
     error: boolean;
+
+    /**
+     * References staged on the next user message.
+     */
+    references: AIChatReference[];
+
+    /**
+     * Draft text to pre-fill the chat input with, without sending it. The chat input consumes
+     * this value (seeding its editable content) and then clears it back to an empty string.
+     */
+    draft: string;
 };
 
 export type AIChatEvent =
     | { type: 'open' }
     | { type: 'postMessage'; message: string }
     | { type: 'clear' }
-    | { type: 'close' };
+    | { type: 'close' }
+    | { type: 'focus' };
 
 type AIChatEventData<T extends AIChatEvent['type']> = Omit<
     Extract<AIChatEvent, { type: T }>,
@@ -116,6 +148,16 @@ export type AIChatController = {
     postMessage: (input: { message: string }) => void;
     /** Clear the conversation */
     clear: () => void;
+    /** Stage a reference on the next message */
+    addReference: (ref: AIChatReference) => string;
+    /** Remove a staged reference */
+    removeReference: (id: string) => void;
+    /** Clear all staged references */
+    clearReferences: () => void;
+    /** Focus the chat input */
+    focus: () => void;
+    /** Pre-fill the chat input with draft text, without sending it. */
+    setDraft: (draft: string) => void;
     /** Register an event listener */
     on: <T extends AIChatEvent['type']>(
         event: T,
@@ -134,9 +176,12 @@ const globalState = zustand.create<AIChatState>(() => {
         query: null,
         followUpSuggestions: [],
         control: null,
+        responding: false,
         loading: false,
         error: false,
         initialQuery: null,
+        references: [],
+        draft: '',
     };
 });
 
@@ -171,7 +216,12 @@ export function AIChatProvider(props: {
     const messageContextRef = useAIMessageContextRef();
     const trackEvent = useTrackEvent();
     const setSearchState = useSetSearchState();
+    const { siteSpaceId } = useCurrentContent();
     const language = useLanguage();
+
+    // Built-in tools exposed to the assistant (e.g. navigating to a page). The tool has a stable
+    // identity, so it can be referenced directly from the streaming callback.
+    const navigateToPageTool = useNavigateToPageTool();
 
     // Event listeners storage
     const eventsRef = React.useRef<Map<AIChatEvent['type'], AIChatEventListener[]>>(new Map());
@@ -212,6 +262,8 @@ export function AIChatProvider(props: {
         async (input: {
             /** Text message to send to the AI backend */
             message?: string;
+            /** User-typed prompt; compared against state.query to abort stale streams */
+            userQuery?: string;
             /** Tool call to send to the AI backend */
             toolCall?: AIToolCallResult;
         }) => {
@@ -220,6 +272,7 @@ export function AIChatProvider(props: {
                     ...state,
                     followUpSuggestions: [],
                     control: null,
+                    responding: true,
                     loading: true,
                     error: false,
                     messages: [
@@ -233,9 +286,19 @@ export function AIChatProvider(props: {
                 };
             });
 
+            // A stream becomes stale once a newer turn (or a clear) has replaced its
+            // query. Because `responding` clears on `response_finish` — before follow-up
+            // suggestions finish streaming — the user can start a new turn while this one
+            // is still wrapping up. A stale stream must not mutate the shared
+            // loading/responding state, which now belongs to the active turn; otherwise
+            // it would make the UI look idle mid-response. (`userQuery` is only set for
+            // user-initiated turns, not tool-call continuations.)
+            const isSuperseded = () =>
+                !!input.userQuery && globalState.getState().query !== input.userQuery;
+
             // Execute a tool call
             const executeToolCall = async (event: AIStreamResponseToolCallPending) => {
-                const tools = getTools();
+                const tools = getTools([navigateToPageTool]);
                 const toolDef = tools.find((tool) => tool.name === event.toolCall.tool);
 
                 if (!toolDef || !('execute' in toolDef)) {
@@ -271,16 +334,13 @@ export function AIChatProvider(props: {
 
             let toolToExecute: AIStreamResponseToolCallPending | null = null;
             try {
-                const tools = getTools();
+                const tools = getTools([navigateToPageTool]);
                 const stream = await streamAIChatResponse({
                     message: input.message,
                     toolCall: input.toolCall,
                     messageContext: messageContextRef.current,
                     previousResponseId: globalState.getState().responseId ?? undefined,
-                    session: {
-                        sessionId: getSession().id,
-                        visitorId: (await getVisitor()).deviceId,
-                    },
+                    session: await getInsightsSession(),
                     tools: tools.map((tool) => ({
                         name: tool.name,
                         description: tool.description,
@@ -298,8 +358,8 @@ export function AIChatProvider(props: {
                 for await (const data of stream) {
                     if (!data) continue;
 
-                    if (input.message && globalState.getState().query !== input.message) {
-                        // Chat was cleared, stop processing the stream
+                    if (isSuperseded()) {
+                        // Chat was cleared or a newer turn started; stop processing.
                         break;
                     }
 
@@ -310,9 +370,9 @@ export function AIChatProvider(props: {
                             globalState.setState((state) => ({
                                 ...state,
                                 responseId: event.response.id ?? null,
-                                // Mark as not loading when the response is finished
+                                // Mark as not responding when the response is finished
                                 // Even if the stream might continue as we receive 'response_followup_suggestion'
-                                loading: false,
+                                responding: false,
                                 error: false,
                             }));
                             break;
@@ -430,23 +490,40 @@ export function AIChatProvider(props: {
                     }));
                 }
 
-                // Execute the tool call if it doesn't require confirmation
+                // If a newer turn replaced this one while we were finishing (e.g.
+                // streaming follow-up suggestions after `response_finish`), abandon this
+                // stale stream without executing leftover tools or clearing the shared
+                // loading/responding state, which now belongs to the active turn.
+                if (isSuperseded()) {
+                    return;
+                }
+
+                // Execute the tool call if it doesn't require confirmation.
+                // When a tool call (or control) keeps the turn going, `loading`
+                // stays true: either the recursive `streamResponse` will clear it
+                // when its stream settles, or it is cleared below once the loop ends
+                // (e.g. while waiting on a user confirmation control).
                 if (toolToExecute) {
                     await executeToolCall(toolToExecute);
                 } else {
                     globalState.setState((state) => ({
                         ...state,
+                        responding: false,
                         loading: false,
                         error: false,
                     }));
                 }
             } catch (error) {
                 console.error('Error streaming AI response', error);
-                globalState.setState((state) => ({
-                    ...state,
-                    loading: false,
-                    error: true,
-                }));
+                // Don't surface a stale stream's error onto the active turn.
+                if (!isSuperseded()) {
+                    globalState.setState((state) => ({
+                        ...state,
+                        responding: false,
+                        loading: false,
+                        error: true,
+                    }));
+                }
             }
         },
         [
@@ -455,20 +532,32 @@ export function AIChatProvider(props: {
             renderMessageOptions?.withToolCalls,
             renderMessageOptions?.asEmbeddable,
             language,
+            navigateToPageTool,
         ]
     );
 
     // Post a message to the AI chat
     const onPostMessage = React.useCallback(
         async (input: { message: string }) => {
-            const { query, messages, control } = globalState.getState();
+            const { query, messages, control, references, responding } = globalState.getState();
 
             if (control) {
                 throw new Error("We can't post a message when a control is active");
             }
 
+            // Ignore duplicates while a previous turn is still streaming
+            if (responding) {
+                return;
+            }
+
+            const wireMessage = `${serializeReferences(references)}${input.message}`;
+
             // For first message, update the ask parameter in URL
             if (messages.length === 0) {
+                if (siteSpaceId) {
+                    addRecentSearchQuery(siteSpaceId, input.message, 'ask');
+                }
+
                 setSearchState((prev) => ({
                     ask: input.message,
                     query: prev?.query ?? null,
@@ -479,8 +568,9 @@ export function AIChatProvider(props: {
 
             notify(eventsRef.current.get('postMessage'), { message: input.message });
 
-            if (query === input.message) {
+            if (query === input.message && references.length === 0) {
                 // Return early if the message is the same as the previous message
+                // (unless new references are staged, which change the payload)
                 globalState.setState((state) => ({
                     ...state,
                     opened: true,
@@ -500,25 +590,28 @@ export function AIChatProvider(props: {
                             role: AIMessageRole.User,
                             content: input.message,
                             query: input.message,
+                            references,
                         },
                     ],
                     query: input.message,
                     followUpSuggestions: [],
-                    loading: true,
+                    responding: true,
                     error: false,
                     initialQuery: state.initialQuery ?? input.message,
+                    references: [],
                 };
             });
 
-            streamResponse({ message: input.message });
+            streamResponse({ message: wireMessage, userQuery: input.message });
         },
-        [setSearchState, trackEvent, streamResponse, language]
+        [setSearchState, siteSpaceId, trackEvent, streamResponse]
     );
 
     // Clear the conversation and reset ask parameter
     const onClear = React.useCallback(() => {
         globalState.setState((state) => ({
             opened: state.opened,
+            responding: false,
             loading: false,
             messages: [],
             query: null,
@@ -527,6 +620,7 @@ export function AIChatProvider(props: {
             responseId: null,
             error: false,
             initialQuery: null,
+            references: [],
         }));
 
         // Reset ask parameter to empty string (keeps chat open but clears content)
@@ -537,6 +631,48 @@ export function AIChatProvider(props: {
             open: false,
         }));
     }, [setSearchState]);
+
+    const onAddReference = React.useCallback((ref: AIChatReference) => {
+        globalState.setState((state) => {
+            if (state.references.some((existingRef) => existingRef.id === ref.id)) {
+                return state;
+            }
+            return {
+                ...state,
+                references: [...state.references, ref],
+            };
+        });
+        return ref.id;
+    }, []);
+
+    const onRemoveReference = React.useCallback((id: string) => {
+        globalState.setState((state) => {
+            if (!state.references.some((ref) => ref.id === id)) {
+                return state;
+            }
+            return {
+                ...state,
+                references: state.references.filter((ref) => ref.id !== id),
+            };
+        });
+    }, []);
+
+    const onClearReferences = React.useCallback(() => {
+        globalState.setState((state) => {
+            if (state.references.length === 0) {
+                return state;
+            }
+            return { ...state, references: [] };
+        });
+    }, []);
+
+    const onFocus = React.useCallback(() => {
+        notify(eventsRef.current.get('focus'), {});
+    }, []);
+
+    const onSetDraft = React.useCallback((draft: string) => {
+        globalState.setState({ draft });
+    }, []);
 
     const onEvent = React.useCallback(
         <T extends AIChatEvent['type']>(
@@ -563,9 +699,25 @@ export function AIChatProvider(props: {
             close: onClose,
             clear: onClear,
             postMessage: onPostMessage,
+            addReference: onAddReference,
+            removeReference: onRemoveReference,
+            clearReferences: onClearReferences,
+            focus: onFocus,
+            setDraft: onSetDraft,
             on: onEvent,
         };
-    }, [onOpen, onClose, onClear, onPostMessage, onEvent]);
+    }, [
+        onOpen,
+        onClose,
+        onClear,
+        onPostMessage,
+        onAddReference,
+        onRemoveReference,
+        onClearReferences,
+        onFocus,
+        onSetDraft,
+        onEvent,
+    ]);
 
     return (
         <AIChatControllerContext.Provider value={controller}>
@@ -595,7 +747,7 @@ export function getAIChatStatus(chat: AIChatState): AIChatStatus {
         return 'confirm';
     }
 
-    if (chat.loading) {
+    if (chat.responding) {
         const latestMessage = getLatestAssistantMessage(chat.messages);
         const phase = latestMessage?.activity?.currentPhase;
         switch (phase) {

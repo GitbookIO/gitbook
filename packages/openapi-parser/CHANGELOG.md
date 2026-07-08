@@ -1,5 +1,11 @@
 # @gitbook/openapi-parser
 
+## 3.0.12
+
+### Patch Changes
+
+- 7e55cd5: Add an "Available in MCP" badge on OpenAPI operations marked with `x-gitbook-mcp: true`. When `x-gitbook-mcp-url` is set (on the operation, path, or root — most specific wins), the badge becomes a button that copies the MCP server URL to the clipboard.
+
 ## 3.0.11
 
 ### Patch Changes

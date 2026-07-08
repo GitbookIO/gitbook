@@ -137,7 +137,10 @@ describe('getDocumentSections', () => {
                         {
                             object: 'block',
                             type: 'update',
-                            data: { date: '2026-04-08' },
+                            data: {
+                                date: '2026-04-08',
+                                tags: [{ kind: 'tag', tag: 'improvements' }],
+                            },
                             isVoid: false,
                             nodes: [
                                 {
@@ -183,24 +186,42 @@ describe('getDocumentSections', () => {
             ],
         };
 
-        const sections = await getDocumentSections(context, document);
+        const sections = await getDocumentSections(
+            {
+                ...context,
+                revision: {
+                    tags: [
+                        {
+                            slug: 'improvements',
+                            label: 'Improvements',
+                            color: 'default',
+                            icon: undefined,
+                        },
+                    ],
+                },
+            } as unknown as GitBookAnyContext,
+            document
+        );
 
         expect(
             sections.map((section) => ({
                 id: section.id,
                 depth: section.depth,
                 title: reactNodeToText(section.title),
+                tags: section.tags,
             }))
         ).toEqual([
             {
                 id: 'h1-in-update',
                 depth: 1,
                 title: 'Heading 1 in update',
+                tags: ['improvements'],
             },
             {
                 id: 'h2-in-update',
                 depth: 2,
                 title: 'Heading 2 in update',
+                tags: ['improvements'],
             },
         ]);
     });

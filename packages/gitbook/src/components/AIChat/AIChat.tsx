@@ -31,9 +31,11 @@ import { ScrollContainer } from '../primitives/ScrollContainer';
 import { SideSheet } from '../primitives/SideSheet';
 import { AIChatControl } from './AIChatControl';
 import { AIChatControlButton } from './AIChatControlButton';
+import { AIChatExpandButton } from './AIChatExpandButton';
 import { AIChatIcon } from './AIChatIcon';
 import { AIChatInput } from './AIChatInput';
 import { AIChatMessages } from './AIChatMessages';
+import { AIChatResizeHandle } from './AIChatResizeHandle';
 import AIChatSuggestedQuestions from './AIChatSuggestedQuestions';
 
 export function AIChat() {
@@ -83,12 +85,14 @@ export function AIChat() {
                 }
             }}
             withOverlay={true}
+            data-ai-chat
             className={tcls(
-                'ai-chat mx-auto ml-8 not-hydrated:hidden w-96 transition-[width] duration-300 ease-quint lg:max-xl:w-80'
+                'ai-chat mx-auto ml-8 not-hydrated:hidden w-96 transition-[width] duration-300 ease-quint lg:w-(--ai-chat-width)'
             )}
         >
-            <EmbeddableFrame className="relative shrink-0 border-tint-subtle border-l to-tint-base">
-                <EmbeddableFrameMain data-testid="ai-chat">
+            <AIChatResizeHandle />
+            <EmbeddableFrame className="relative w-full shrink-0 border-tint-subtle border-l to-tint-base">
+                <EmbeddableFrameMain data-testid="ai-chat" aria-busy={chat.loading}>
                     <EmbeddableFrameHeader className="not-embed:px-4">
                         <AIChatDynamicIcon trademark={config.trademark} />
                         <EmbeddableFrameHeaderMain>
@@ -99,6 +103,7 @@ export function AIChat() {
                         </EmbeddableFrameHeaderMain>
                         <EmbeddableFrameButtons>
                             <AIChatControlButton />
+                            <AIChatExpandButton />
                             <Button
                                 onClick={() => chatController.close()}
                                 iconOnly
@@ -225,7 +230,7 @@ export function AIChatBody(props: {
     return (
         <>
             <ScrollContainer
-                className="min-h-[20%] shrink grow animate-fade-in-slow [container-type:size]"
+                className="min-h-[20%] max-w-full shrink grow animate-fade-in-slow [container-type:size]"
                 contentClassName="py-4 gutter-stable flex flex-col gap-4 not-embed:px-4 [scroll-behavior:smooth]"
                 orientation="vertical"
                 trailing={{ fade: false, button: true }}
@@ -280,8 +285,8 @@ export function AIChatBody(props: {
 
                 {chat.control ? <AIChatControl control={chat.control} /> : null}
                 <AIChatInput
-                    loading={chat.loading}
-                    disabled={chat.loading || chat.error}
+                    responding={chat.responding}
+                    disabled={chat.responding || chat.error}
                     onSubmit={(value) => {
                         chatController.postMessage({ message: value });
                     }}

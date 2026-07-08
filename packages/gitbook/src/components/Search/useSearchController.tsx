@@ -7,6 +7,7 @@ import { useAI } from '../AI';
 import { useTrackEvent } from '../Insights';
 import { useBodyLoaded } from '../primitives';
 import type { SearchResultsRef } from './SearchResults';
+import { addRecentSearchQuery } from './recent-queries';
 import type { SearchBaseProps } from './search-props';
 import { useSearchState, useSetSearchState } from './useSearch';
 import { useSearchResults } from './useSearchResults';
@@ -19,18 +20,23 @@ function useInitialAskBootstrap(props: {
     isLoaded: boolean;
 }) {
     const { asEmbeddable, assistants, initialAsk, isLoaded } = props;
-    const handledInitialAskRef = React.useRef<string | null | undefined>(undefined);
+    const hasBootstrappedRef = React.useRef(false);
 
     React.useEffect(() => {
         if (asEmbeddable) return;
+        if (hasBootstrappedRef.current) return;
         if (assistants.length === 0) return;
-        if (initialAsk === null) return;
-        if (handledInitialAskRef.current === initialAsk) return;
+        if (!isLoaded) return;
 
-        // For simplicity we're only triggering the first assistant.
-        if (isLoaded) {
+        // Mark bootstrap as done once assistants and the body are ready, even if
+        // there is no initial ask. Subsequent `ask` changes come from user
+        // interactions (e.g. clicking "Ask with …" in the search bar, which also
+        // calls `assistant.open` directly) and must not re-trigger this effect.
+        hasBootstrappedRef.current = true;
+
+        if (initialAsk !== null) {
+            // For simplicity we're only triggering the first assistant.
             assistants[0]?.open(initialAsk || undefined);
-            handledInitialAskRef.current = initialAsk;
         }
     }, [asEmbeddable, assistants, initialAsk, isLoaded]);
 }
@@ -62,11 +68,15 @@ function useSearchKeyboardNavigation(props: {
     query: string;
     results: ReturnType<typeof useSearchResults>['results'];
     resultsRef: React.RefObject<SearchResultsRef | null>;
+    abort: () => void;
+    askCount: number;
+    onAskSelect: (index: number) => void;
 }) {
-    const { query, results, resultsRef } = props;
+    const { query, results, resultsRef, abort, askCount, onAskSelect } = props;
     const { cursor, moveBy: moveCursorBy } = useSearchResultsCursor({
         query,
-        results,
+        resultCount: results.length,
+        totalCount: results.length + askCount,
     });
 
     const onInputKeyDown = React.useCallback(
@@ -77,12 +87,20 @@ function useSearchKeyboardNavigation(props: {
             } else if (event.key === 'ArrowDown') {
                 event.preventDefault();
                 moveCursorBy(1);
-            } else if (event.key === 'Enter') {
+            } else if (event.key === 'Enter' && !event.nativeEvent.isComposing) {
                 event.preventDefault();
-                resultsRef.current?.select();
+                if (cursor !== null && cursor >= results.length) {
+                    onAskSelect(cursor - results.length);
+                    return;
+                }
+
+                if (resultsRef.current?.select()) {
+                    // Stop any in-flight search request only when activating a result.
+                    abort();
+                }
             }
         },
-        [moveCursorBy, resultsRef]
+        [moveCursorBy, cursor, results.length, onAskSelect, resultsRef, abort]
     );
 
     return {
@@ -101,6 +119,7 @@ export function useSearchController(props: SearchBaseProps) {
         withSections,
         siteSpaces,
         searchURL,
+        indexURL,
     } = props;
 
     const { assistants, config } = useAI();
@@ -178,7 +197,7 @@ export function useSearchController(props: SearchBaseProps) {
         language: siteSpace.space.language,
     });
 
-    const { results, fetching, error } = useSearchResults({
+    const { results, fetching, error, abort } = useSearchResults({
         asEmbeddable,
         disabled: !(state?.query || withAI),
         query: normalizedQuery,
@@ -187,23 +206,57 @@ export function useSearchController(props: SearchBaseProps) {
         scope: state?.scope ?? 'default',
         suggestions: config.suggestions,
         searchURL,
+        indexURL,
+        lang: siteSpace.space.language,
+        withSections,
     });
 
     const searchValue = state?.query ?? (withSearchAI || !withAI ? state?.ask : null) ?? '';
     const searchResultsId = `search-results-${React.useId()}`;
 
+    const askInAssistant = React.useCallback(
+        (assistantIndex = 0) => {
+            const assistant = assistants[assistantIndex];
+            if (!assistant || !normalizedQuery) {
+                return;
+            }
+
+            if (assistant.mode === 'search') {
+                addRecentSearchQuery(siteSpace.id, normalizedQuery, 'ask');
+            }
+
+            abort();
+            assistant.open(normalizedQuery);
+            setSearchState({
+                ask: normalizedQuery,
+                query: null,
+                scope: state?.scope ?? 'default',
+                open: assistant.mode === 'search',
+            });
+        },
+        [abort, assistants, normalizedQuery, setSearchState, siteSpace.id, state?.scope]
+    );
+
+    const askCount = normalizedQuery && !showAsk ? assistants.length : 0;
+
     const { cursor, onInputKeyDown } = useSearchKeyboardNavigation({
         query: normalizedQuery,
         results,
         resultsRef,
+        abort,
+        askCount,
+        onAskSelect: askInAssistant,
     });
 
     return {
         assistants,
         askQuery: normalizedAsk,
+        askCount,
+        askInAssistant,
         cursor,
         error,
         fetching,
+        abort,
         open: onOpen,
         close: onClose,
         query: normalizedQuery,

@@ -164,7 +164,20 @@ export async function resolveContentRef(
         case 'anchor':
         case 'page': {
             if (isContentRefInDifferentSpace(contentRef, context)) {
-                return resolveContentRefInSpace(contentRef.space, context, contentRef, options);
+                let contextWithoutPage: GitBookAnyContext = context;
+                if ('page' in contextWithoutPage) {
+                    // We need to remove the page from the context to avoid issues when resolving the content ref in the target space.
+                    // The problem happens when the same page exists in the target space (i.e. a duplicate space), it then contaminates the resolution because it looks like the page is already resolved
+                    // while it is not the case as it is a different page with the same id in another space.
+                    const { page, ...rest } = contextWithoutPage;
+                    contextWithoutPage = rest;
+                }
+                return resolveContentRefInSpace(
+                    contentRef.space,
+                    contextWithoutPage,
+                    contentRef,
+                    options
+                );
             }
 
             const resolvePageResult =
@@ -586,7 +599,7 @@ async function createContextForSpace(
 }
 
 /**
- * When the API outputs markdown, it can sometimes format the content-ref into a strings that can be parsed back.
+ * When the API outputs markdown with `format.markdown.refs: stable`, the content refs are formatted this way.
  */
 export function resolveStringContentRef(src: string): ContentRef | null {
     for (const resolver of Object.values(RESOLVERS)) {

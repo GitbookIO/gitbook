@@ -1,11 +1,13 @@
 'use client';
 import React from 'react';
 
+import { useUpdatesFilter } from '@/components/DocumentView/UpdatesFilter';
 import { useScrollActiveId } from '@/components/hooks';
 import type { DocumentSection } from '@/lib/document-sections';
 import { tcls } from '@/lib/tailwind';
 
 import { useBodyLoaded } from '@/components/primitives';
+import { OpenAPIMethodBadge } from '@gitbook/react-openapi';
 import { HEADER_HEIGHT_DESKTOP } from '../layout';
 
 /**
@@ -19,7 +21,21 @@ const SECTION_INTERSECTING_THRESHOLD = 0.9;
 const ACTIVE_ITEM_OFFSET = 100;
 
 export function ScrollSectionsList({ sections }: { sections: DocumentSection[] }) {
-    const ids = React.useMemo(() => sections.map(({ id }) => id), [sections]);
+    const { selectedTagSet } = useUpdatesFilter();
+    const visibleSections = React.useMemo(() => {
+        if (selectedTagSet.size === 0) {
+            return sections;
+        }
+
+        return sections.filter((section) => {
+            if (section.tags === undefined) {
+                return true;
+            }
+
+            return section.tags.some((tagSlug) => selectedTagSet.has(tagSlug));
+        });
+    }, [sections, selectedTagSet]);
+    const ids = React.useMemo(() => visibleSections.map(({ id }) => id), [visibleSections]);
 
     const enabled = useBodyLoaded();
 
@@ -46,7 +62,7 @@ export function ScrollSectionsList({ sections }: { sections: DocumentSection[] }
             className="relative flex flex-col border-tint-subtle sidebar-list-line:border-l pb-5"
             ref={scrollContainerRef}
         >
-            {sections.map((section) => (
+            {visibleSections.map((section) => (
                 <li
                     key={section.id}
                     className={tcls(
@@ -93,6 +109,9 @@ export function ScrollSectionsList({ sections }: { sections: DocumentSection[] }
                             'sidebar-list-line:-left-px',
                             'xl:page-cover-background:text-contrast-cover',
 
+                            // The method badge no longer has a right margin, so lay the row out with a gap
+                            section.tag && ['flex', 'items-baseline', 'gap-2'],
+
                             section.depth > 1 && [
                                 'subitem',
                                 'sidebar-list-line:pl-6',
@@ -127,11 +146,12 @@ export function ScrollSectionsList({ sections }: { sections: DocumentSection[] }
                         )}
                     >
                         {section.tag ? (
-                            <span
-                                className={`-mt-0.5 openapi-method text-xs! openapi-method-${section.tag.toLowerCase()}`}
-                            >
-                                {section.tag}
-                            </span>
+                            <OpenAPIMethodBadge
+                                method={section.tag}
+                                size="small"
+                                className="-mt-0.5"
+                                short
+                            />
                         ) : null}
 
                         <span

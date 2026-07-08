@@ -1,4 +1,5 @@
 import * as api from '@gitbook/api';
+import { CustomizationPageActionType } from '@gitbook/api';
 
 /**
  * Return the default customization settings for a site.
@@ -53,9 +54,6 @@ export function defaultCustomization(): api.SiteCustomizationSettings {
             default: api.CustomizationDefaultThemeMode.Light,
             toggeable: true,
         },
-        pdf: {
-            enabled: true,
-        },
         feedback: {
             enabled: false,
         },
@@ -68,16 +66,17 @@ export function defaultCustomization(): api.SiteCustomizationSettings {
         advancedCustomization: {
             enabled: true,
         },
-        git: {
-            showEditLink: false,
-        },
         pagination: {
             enabled: true,
         },
         pageActions: {
-            externalAI: true,
-            markdown: true,
-            mcp: true,
+            items: [
+                CustomizationPageActionType.Assistant,
+                CustomizationPageActionType.Markdown,
+                CustomizationPageActionType.ExternalAi,
+                CustomizationPageActionType.Mcp,
+                CustomizationPageActionType.Pdf,
+            ],
         },
         trademark: {
             enabled: true,

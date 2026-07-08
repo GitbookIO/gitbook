@@ -5,6 +5,8 @@ export const pt_br = {
     stability_experimental: 'Experimental',
     stability_alpha: 'Alfa',
     stability_beta: 'Beta',
+    available_in_mcp: 'Disponível no MCP',
+    copy_url: 'Copiar URL',
     discriminator: 'Discriminador',
     copy_to_clipboard: 'Copiar para a área de transferência',
     copied: 'Copiado',

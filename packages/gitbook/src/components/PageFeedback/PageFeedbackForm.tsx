@@ -6,6 +6,7 @@ import React, { type ButtonHTMLAttributes } from 'react';
 import { useLanguage } from '@/intl/client';
 import { t, tString } from '@/intl/translate';
 import { tcls } from '@/lib/tailwind';
+import { Icon } from '@gitbook/icons';
 import { useTrackEvent } from '../Insights';
 import { Button, ButtonGroup, Input } from '../primitives';
 
@@ -85,21 +86,27 @@ export function PageFeedbackForm(props: {
                 </ButtonGroup>
             </div>
             {rating ? (
-                <Input
-                    ref={inputRef}
-                    label={tString(languages, 'was_this_helpful_comment')}
-                    multiline
-                    submitButton
-                    rows={3}
-                    name="page-feedback-comment"
-                    onSubmit={(comment) => onSubmitComment(rating, comment as string)}
-                    maxLength={MAX_COMMENT_LENGTH}
-                    minLength={MIN_COMMENT_LENGTH}
-                    disabled={submitted}
-                    submitMessage={tString(languages, 'was_this_helpful_thank_you')}
-                    className="animate-blur-in"
-                    resize
-                />
+                submitted ? (
+                    <div className="flex animate-blur-in-display-slow items-center gap-1 p-1.5 text-success-subtle">
+                        <Icon icon="check-circle" className="size-4" />
+                        {tString(languages, 'was_this_helpful_thank_you')}
+                    </div>
+                ) : (
+                    <Input
+                        ref={inputRef}
+                        label={tString(languages, 'was_this_helpful_comment')}
+                        multiline
+                        submitButton
+                        rows={3}
+                        name="page-feedback-comment"
+                        onSubmit={(comment) => onSubmitComment(rating, comment as string)}
+                        maxLength={MAX_COMMENT_LENGTH}
+                        minLength={MIN_COMMENT_LENGTH}
+                        disabled={submitted}
+                        className="animate-blur-in"
+                        resize
+                    />
+                )
             ) : null}
         </div>
     );

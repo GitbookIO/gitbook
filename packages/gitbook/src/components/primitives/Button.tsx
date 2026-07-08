@@ -219,7 +219,7 @@ export const Button = React.forwardRef<
                 }}
                 label={label}
                 triggerProps={{ disabled, ...tooltipProps?.triggerProps }}
-                contentProps={{ ...tooltipProps?.contentProps }}
+                contentProps={tooltipProps?.contentProps}
             >
                 {button}
             </Tooltip>

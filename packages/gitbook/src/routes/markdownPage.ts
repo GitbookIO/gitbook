@@ -1,13 +1,14 @@
+import { isAIEnabled } from '@/components/utils/isAIChatEnabled';
 import type { GitBookSiteContext } from '@/lib/context';
 import { getExposableError } from '@/lib/data';
 import { linkerWithMarkdownPages } from '@/lib/links';
+import { renderLLMsTxtMarkdownDirective } from '@/lib/llms-directive';
 import { getMarkdownForPage } from '@/lib/markdownPage';
 import {
     type ResolvedPagePath,
     getSimilarPages,
     resolvePagePathDocumentOrGroup,
 } from '@/lib/pages';
-import { isRollout } from '@/lib/rollout';
 import type { RevisionPageDocument, RevisionPageGroup } from '@gitbook/api';
 
 /**
@@ -28,7 +29,10 @@ export async function servePageMarkdown(baseContext: GitBookSiteContext, pagePat
         }
 
         const markdownPage = await getMarkdownForPage(context, pageLookup);
-        return `${markdownPage}${renderAskFooter(context, pageLookup)}`;
+        if (baseContext.displayAgentInstructions === false) {
+            return markdownPage;
+        }
+        return `${renderLLMsTxtMarkdownDirective(context, pageLookup.page)}\n\n${markdownPage}${renderAskFooter(context, pageLookup)}`;
     });
 }
 
@@ -54,17 +58,19 @@ If the exact page cannot be found, you can still retrieve the information using 
 
 ### Option 1 — Ask a question (recommended)
 
-Perform an HTTP GET request on the documentation index with the \`ask\` parameter:
+Perform an HTTP GET request on the documentation index with the \`ask\` parameter, and the optional \`goal\` parameter:
 
 \`\`\`
 GET ${context.linker.toAbsoluteURL(
         context.linker.toPathForPagePath({
             path: similarPages[0]?.path ?? 'docs/example',
         })
-    )}?ask=<question>
+    )}?ask=<question>&goal=<end_goal>
 \`\`\`
 
-The question should be specific, self-contained, and written in natural language.
+\`ask\` is the immediate question: it should be specific, self-contained, and written in natural language.
+\`goal\` is optional and describes the broader end goal you are ultimately trying to accomplish on behalf of the user. GitBook uses it to tailor the answer towards what is most useful for that goal.
+
 The response will contain a direct answer to the question and relevant excerpts and sources from the documentation.
 
 ### Option 2 — Browse the documentation index
@@ -95,32 +101,32 @@ function renderAskFooter(
     context: GitBookSiteContext,
     pageLookup: ResolvedPagePath<RevisionPageDocument | RevisionPageGroup>
 ) {
-    if (
-        !isRollout({
-            discriminator: context.site.id,
-            percentageRollout: 25,
-        }) &&
-        context.site.id !== 'site_p4Xo4'
-    ) {
+    if (!isAIEnabled(context.customization.ai.mode)) {
         return '';
     }
 
-    return `\n\n---\n\n# Agent Instructions: Querying This Documentation
-
-If you need additional information that is not directly available in this page, you can query the documentation dynamically by asking a question.
-
-Perform an HTTP GET request on the current page URL with the \`ask\` query parameter:
-
-\`\`\`
-GET ${context.linker.toAbsoluteURL(
+    const pageUrl = context.linker.toAbsoluteURL(
         context.linker.toPathForPage({
             page: pageLookup.page,
             pages: context.revision.pages,
         })
-    )}?ask=<question>
+    );
+
+    return `\n\n---\n\n# Agent Instructions
+This documentation is published with GitBook. GitBook is the documentation platform designed so that both humans and AI agents can read, navigate, and reason over technical content effectively. Learn more at gitbook.com.
+
+## Querying This Documentation
+If you need additional information that is not directly available in this page, you can query the documentation dynamically by asking a question.
+
+Perform an HTTP GET request on the current page URL with the \`ask\` query parameter, and the optional \`goal\` query parameter:
+
+\`\`\`
+GET ${pageUrl}?ask=<question>&goal=<endgoal>
 \`\`\`
 
-The question should be specific, self-contained, and written in natural language.
+\`ask\` is the immediate question: it should be specific, self-contained, and written in natural language.
+\`goal\` is optional and describes the broader end goal you are ultimately trying to accomplish on behalf of the user. GitBook uses it to tailor the answer towards what is most useful for that goal.
+
 The response will contain a direct answer to the question and relevant excerpts and sources from the documentation.
 
 Use this mechanism when the answer is not explicitly present in the current page, you need clarification or additional context, or you want to retrieve related documentation sections.
@@ -137,6 +143,7 @@ export async function serveMarkdown(fn: () => Promise<string>) {
             headers: {
                 'Content-Type': 'text/markdown; charset=utf-8',
                 'X-Robots-Tag': 'noindex',
+                Vary: 'Accept',
             },
         });
     } catch (error) {
@@ -145,6 +152,7 @@ export async function serveMarkdown(fn: () => Promise<string>) {
             status: exposable.code,
             headers: {
                 'Content-Type': 'text/plain; charset=utf-8',
+                Vary: 'Accept',
             },
         });
     }

@@ -13,6 +13,7 @@ import {
     CustomizationIconsStyle,
     CustomizationLinksStyle,
     CustomizationLocale,
+    CustomizationPageActionType,
     CustomizationSearchStyle,
     CustomizationSidebarBackgroundStyle,
     CustomizationSidebarListStyle,
@@ -21,7 +22,14 @@ import {
     type SiteCustomizationSettings,
     SiteExternalLinksTarget,
 } from '@gitbook/api';
-import { type BrowserContext, type Page, type Response, expect, test } from '@playwright/test';
+import {
+    type BrowserContext,
+    type FrameLocator,
+    type Page,
+    type Response,
+    expect,
+    test,
+} from '@playwright/test';
 import deepMerge from 'deepmerge';
 import rison from 'rison';
 import type { DeepPartial } from 'ts-essentials';
@@ -39,6 +47,16 @@ export interface Test {
      * Test to run
      */
     run?: (page: Page, response: Response | null) => Promise<unknown>;
+    /**
+     * Re-applied right before every viewport screenshot (after Argos
+     * stabilization), so it survives re-renders triggered by viewport resizing.
+     *
+     * Use this — rather than mutating the DOM once in `run` — to normalize
+     * non-deterministic content (e.g. AI responses). A one-time mutation in `run`
+     * is clobbered when React re-renders on resize (e.g. crossing the mobile
+     * breakpoint), so only the first viewport ends up normalized.
+     */
+    normalizeBeforeScreenshot?: (page: Page) => Promise<void> | void;
     /**
      * Mode for the test.
      */
@@ -75,6 +93,10 @@ export type TestsCase = {
     skip?: boolean;
     tests: Array<Test>;
     contentBaseURL?: string;
+    /**
+     * Whether screenshots in this test case should capture the full scrollable page by default.
+     */
+    fullPage?: boolean;
 };
 
 export const allLocales: CustomizationLocale[] = [
@@ -150,9 +172,44 @@ export async function waitForCookiesDialog(page: Page) {
     });
 }
 
+/**
+ * Wait for the GitBook admin toolbar to be present.
+ *
+ * The toolbar only renders when signed in to GitBook. It is hidden from
+ * screenshots (see `argosCSS`) because it auto-expands with an animation, so
+ * use this to assert it is rendered without capturing its flaky visual state.
+ */
+export async function waitForAdminToolbar(page: Page) {
+    await expect(page.getByTestId('admin-toolbar')).toBeVisible({
+        timeout: 10_000,
+    });
+}
+
 export async function waitForNotFound(_page: Page, response: Response | null) {
     expect(response).not.toBeNull();
     expect(response?.status()).toBe(404);
+}
+
+/**
+ * Wait for an AI chat response to be fully settled before asserting or
+ * screenshotting it.
+ *
+ * The chat exposes `aria-busy` on its container (`[data-testid="ai-chat"]`),
+ * which stays true from the moment a message is sent until the stream — including
+ * the follow-up suggestion phase — completes. Gating on it avoids the two main
+ * sources of flakiness: capturing a "thinking" placeholder or a half-streamed
+ * answer, and running the content normalization while React is still re-rendering
+ * (which would clobber the replacements).
+ *
+ * Argos also waits for `aria-busy` to clear during its own stabilization
+ * (`waitForAriaBusy`), so this is both an explicit gate and a backstop.
+ *
+ * Accepts a `Page` or a `FrameLocator` (for the embedded assistant in an iframe).
+ */
+export async function waitForAIChatResponse(scope: Page | FrameLocator) {
+    await expect(scope.getByTestId('ai-chat')).toHaveAttribute('aria-busy', 'false', {
+        timeout: 60_000,
+    });
 }
 
 export async function setTimeToMorning(page: Page) {
@@ -204,6 +261,19 @@ export function runTestCases(testCases: TestsCase[]) {
                         );
                     }
 
+                    // Reset the cross-space navigation state on every document load so the
+                    // "Back to <space>" shortcut never leaks between navigations/tests. It is
+                    // detected client-side from this sessionStorage, and a stale value (e.g.
+                    // after a retry or a cross-space redirect) makes it appear or not
+                    // non-deterministically, causing flaky screenshots.
+                    await page.addInitScript(() => {
+                        try {
+                            sessionStorage.removeItem('gitbook-space-navigation:last');
+                            sessionStorage.removeItem('gitbook-space-navigation:back');
+                            sessionStorage.removeItem('gitbook-space-navigation:from-picker');
+                        } catch {}
+                    });
+
                     // Set the header to disable the Vercel toolbar
                     // But only on the main document as it'd cause CORS issues on other resources
                     await page.route('**/*', async (route, request) => {
@@ -219,7 +289,11 @@ export function runTestCases(testCases: TestsCase[]) {
                         }
                     });
 
-                    const response = await page.goto(url);
+                    // Wait only for `domcontentloaded` rather than the default `load`: these
+                    // are real customer sites whose third-party subresources can hang and
+                    // never fire `load`, aborting the navigation. Argos stabilization (run in
+                    // `beforeScreenshot`) still waits for images/fonts before capturing.
+                    const response = await page.goto(url, { waitUntil: 'domcontentloaded' });
                     if (testEntry.run) {
                         await testEntry.run(page, response);
                     }
@@ -240,15 +314,24 @@ export function runTestCases(testCases: TestsCase[]) {
                             .intercom-lightweight-app {
                                 display: none !important;
                             }
-                            `,
+                            /* Hide the GitBook admin toolbar: it auto-expands with an
+                               animation, so its state at capture time is non-deterministic.
+                               Its presence is asserted separately via waitForAdminToolbar. */
+                            [data-testid="admin-toolbar"] {
+                                display: none !important;
+                            }
+                                `,
                                 threshold: screenshotOptions?.threshold ?? undefined,
-                                fullPage: testEntry.fullPage ?? false,
+                                fullPage: testEntry.fullPage ?? testCase.fullPage ?? false,
                                 beforeScreenshot: async ({ runStabilization }) => {
                                     await runStabilization();
                                     if (screenshotOptions?.waitForTOCScrolling !== false) {
                                         await waitForTOCScrolling(page);
                                     }
                                     await waitForIcons(page);
+                                    // Re-apply per viewport, last — after any resize-driven
+                                    // re-render — so normalized content survives to capture.
+                                    await testEntry.normalizeBeforeScreenshot?.(page);
                                 },
                             });
                         }
@@ -343,9 +426,6 @@ export function getCustomizationURL(partial: DeepPartial<SiteCustomizationSettin
             default: CustomizationDefaultThemeMode.System,
             toggeable: true,
         },
-        pdf: {
-            enabled: true,
-        },
         feedback: {
             enabled: false,
         },
@@ -358,16 +438,17 @@ export function getCustomizationURL(partial: DeepPartial<SiteCustomizationSettin
         advancedCustomization: {
             enabled: true,
         },
-        git: {
-            showEditLink: false,
-        },
         pagination: {
             enabled: true,
         },
         pageActions: {
-            externalAI: true,
-            markdown: true,
-            mcp: true,
+            items: [
+                CustomizationPageActionType.Assistant,
+                CustomizationPageActionType.Markdown,
+                CustomizationPageActionType.ExternalAi,
+                CustomizationPageActionType.Mcp,
+                CustomizationPageActionType.Pdf,
+            ],
         },
         trademark: {
             enabled: true,
@@ -392,11 +473,13 @@ export function getCustomizationURL(partial: DeepPartial<SiteCustomizationSettin
  */
 export async function waitForIcons(page: Page) {
     await page.waitForFunction(() => {
-        const urlStates: Record<
+        type IconURLStates = Record<
             string,
             { state: 'pending'; uri: null } | { state: 'loaded'; uri: string }
-        > = (window as any).__ICONS_STATES__ || {};
-        (window as any).__ICONS_STATES__ = urlStates;
+        >;
+        const iconStatesWindow = window as Window & { __ICONS_STATES__?: IconURLStates };
+        const urlStates: IconURLStates = iconStatesWindow.__ICONS_STATES__ || {};
+        iconStatesWindow.__ICONS_STATES__ = urlStates;
 
         const fetchSvgAsDataUri = async (url: string): Promise<string> => {
             const response = await fetch(url);
@@ -441,7 +524,15 @@ export async function waitForIcons(page: Page) {
 
             const maskImage = icon.querySelector('[data-testid="mask-image"]');
             if (!maskImage) {
-                throw new Error('No mask-image element');
+                const inlineContent = icon.querySelector(
+                    'path, circle, ellipse, line, polygon, polyline, rect, g, use'
+                );
+                if (inlineContent) {
+                    icon.setAttribute('data-argos-state', 'loaded');
+                    return true;
+                }
+
+                throw new Error('Icon has no inline SVG content or mask-image element');
             }
 
             const url = maskImage.getAttribute('href');

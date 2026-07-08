@@ -1,4 +1,4 @@
-import type { DocumentBlockTable, DocumentTableRecord } from '@gitbook/api';
+import type { DocumentBlockTable } from '@gitbook/api';
 import assertNever from 'assert-never';
 
 import { tcls } from '@/lib/tailwind';
@@ -6,11 +6,19 @@ import { tcls } from '@/lib/tailwind';
 import type { BlockProps } from '../Block';
 import { isBlockOffscreen } from '../utils';
 import { StickyViewGrid } from './StickyViewGrid';
+import { TableSearchEmpty, TableSearchInput, TableSearchProvider } from './TableSearch';
 import { ViewCards } from './ViewCards';
 import { ViewGrid, ViewGridHeader } from './ViewGrid';
 import { getViewGridLayout, hasVisibleHeader } from './layout';
+import {
+    type TableRecordKV,
+    getTableCheckboxColumns,
+    getTableRecordSearchData,
+    getTableSelectColumns,
+} from './search';
+import { shouldShowTableSearch } from './shouldShowSearch';
 
-export type TableRecordKV = [string, DocumentTableRecord];
+export type { TableRecordKV };
 
 export interface TableViewProps<View> extends BlockProps<DocumentBlockTable> {
     view: View;
@@ -22,9 +30,47 @@ export function Table(props: BlockProps<DocumentBlockTable>) {
     const { block, ancestorBlocks, document, context, style } = props;
     const isOffscreen = isBlockOffscreen({ block, ancestorBlocks, document });
 
-    const records: TableRecordKV[] = Object.entries(block.data.records).sort((a, b) => {
-        return a[1].orderIndex.localeCompare(b[1].orderIndex);
+    const records: TableRecordKV[] = Object.entries(block.data.records).sort((a, b) =>
+        a[1].orderIndex.localeCompare(b[1].orderIndex)
+    );
+
+    // Authors can override the smart default per block with `search: true | false`; `undefined`
+    // keeps the default (search on grid tables with enough rows, off on cards). See the helper.
+    const showSearch = shouldShowTableSearch({
+        recordCount: records.length,
+        viewType: block.data.view.type,
+        searchOverride: block.data.search,
+        isPrint: context.mode === 'print',
     });
+    const searchRecords = showSearch
+        ? records.map(([id, record]) => ({ id, ...getTableRecordSearchData(block, record) }))
+        : [];
+
+    return (
+        <TableSearchProvider records={searchRecords}>
+            <div className={tcls(style, 'flex flex-col gap-3')}>
+                {showSearch ? (
+                    <TableSearchInput
+                        selectColumns={getTableSelectColumns(block)}
+                        checkboxColumns={getTableCheckboxColumns(block)}
+                    />
+                ) : null}
+                <TableView {...props} isOffscreen={isOffscreen} records={records} />
+                <TableSearchEmpty />
+            </div>
+        </TableSearchProvider>
+    );
+}
+
+/**
+ * Renders the table itself (grid or cards view) for the given records.
+ */
+function TableView({
+    isOffscreen,
+    records,
+    ...props
+}: BlockProps<DocumentBlockTable> & { isOffscreen: boolean; records: TableRecordKV[] }) {
+    const { block, context, style } = props;
 
     switch (block.data.view.type) {
         case 'cards':
@@ -94,7 +140,10 @@ export function Table(props: BlockProps<DocumentBlockTable>) {
                             'w-full min-w-0 overflow-x-auto overflow-y-hidden overscroll-x-none border-tint-subtle '
                         )}
                     >
-                        <div className={tcls('flex', 'flex-col', tableContainerClassName)}>
+                        <div
+                            className={tcls('flex', 'flex-col', tableContainerClassName)}
+                            role="table"
+                        >
                             {withHeader ? (
                                 <ViewGridHeader
                                     {...gridProps}

@@ -1,16 +1,29 @@
-import { SiteInsightsDisplayContext } from '@gitbook/api';
+import { CustomizationPageActionType, SiteInsightsDisplayContext } from '@gitbook/api';
 
 import { type RouteLayoutParams, getDynamicSiteContext } from '@/app/utils';
 import { getExposableError, throwIfDataError } from '@/lib/data';
 import { getMarkdownForPageInSpace } from '@/lib/markdownPage';
 import { resolvePagePath } from '@/lib/pages';
 import { joinPathWithBaseURL } from '@/lib/paths';
+import { getBestScoredResult } from '@/lib/search';
 import { findSiteSpaceBy, findSiteSpaceByUrl } from '@/lib/sites';
 import { trackServerInsightsEvents } from '@/lib/tracking';
 import { waitUntil } from '@/lib/waitUntil';
 import { createMcpHandler } from 'mcp-handler';
 import type { NextRequest } from 'next/server';
 import { z } from 'zod';
+
+/**
+ * Fire-and-forget insights tracking for the MCP endpoint. A tracking failure (e.g. a 422 from the
+ * insights API) must never reject into the request lifecycle, or it surfaces as an MCP transport error.
+ */
+function trackMcpEvent(args: Parameters<typeof trackServerInsightsEvents>[0]) {
+    waitUntil(
+        trackServerInsightsEvents(args).catch((error) => {
+            console.error('Failed to track MCP insights event:', error);
+        })
+    );
+}
 
 export async function handleMcpRequest(
     rawRequest: NextRequest,
@@ -20,26 +33,30 @@ export async function handleMcpRequest(
     const { context } = await getDynamicSiteContext(params);
     const { dataFetcher, linker, site } = context;
 
+    const { pageActions } = context.customization;
+    const isMcpEnabled = pageActions.items.includes(CustomizationPageActionType.Mcp);
+    if (!isMcpEnabled) {
+        return new Response('Not Found', { status: 404 });
+    }
+
     // Next.js request.url is the original URL and not the rewritten one from the middleware
     const requestURL = new URL(context.linker.toAbsoluteURL(context.linker.toPathInSite(endpoint)));
     requestURL.search = rawRequest.nextUrl.search;
     const request = new Request(requestURL, rawRequest);
 
-    waitUntil(
-        trackServerInsightsEvents({
-            organizationId: context.organizationId,
-            siteId: context.site.id,
-            events: [
-                {
-                    type: 'mcp_request',
-                    location: {
-                        displayContext: SiteInsightsDisplayContext.Server,
-                    },
+    trackMcpEvent({
+        organizationId: context.organizationId,
+        siteId: context.site.id,
+        events: [
+            {
+                type: 'mcp_request',
+                location: {
+                    displayContext: SiteInsightsDisplayContext.Server,
                 },
-            ],
-            request,
-        })
-    );
+            },
+        ],
+        request,
+    });
 
     const mcpHandler = createMcpHandler(
         (server) => {
@@ -48,6 +65,13 @@ export async function handleMcpRequest(
                 `Search across the documentation to find relevant information, code examples, API references, and guides. Use this tool when you need to answer questions about ${site.title}, find specific documentation, understand how features work, or locate implementation details. The search returns contextual content with titles and direct links to the documentation pages.`,
                 {
                     query: z.string(),
+                },
+                {
+                    title: 'Search documentation',
+                    readOnlyHint: true,
+                    destructiveHint: false,
+                    idempotentHint: true,
+                    openWorldHint: true,
                 },
                 async ({ query }) => {
                     const results = await throwIfDataError(
@@ -59,22 +83,20 @@ export async function handleMcpRequest(
                         })
                     );
 
-                    waitUntil(
-                        trackServerInsightsEvents({
-                            organizationId: context.organizationId,
-                            siteId: site.id,
-                            events: [
-                                {
-                                    type: 'search_type_query',
-                                    query,
-                                    location: {
-                                        displayContext: SiteInsightsDisplayContext.Mcp,
-                                    },
+                    trackMcpEvent({
+                        organizationId: context.organizationId,
+                        siteId: site.id,
+                        events: [
+                            {
+                                type: 'search_type_query',
+                                query,
+                                location: {
+                                    displayContext: SiteInsightsDisplayContext.Mcp,
                                 },
-                            ],
-                            request,
-                        })
-                    );
+                            },
+                        ],
+                        request,
+                    });
 
                     return {
                         content: results.flatMap((result) => {
@@ -107,9 +129,9 @@ export async function handleMcpRequest(
                                     )
                                 );
 
-                                const body = pageResult.sections
-                                    ?.map((section) => section.body)
-                                    .join('\n');
+                                const body = getBestScoredResult(
+                                    (pageResult.sections ?? []).filter((section) => section.body)
+                                )?.body;
 
                                 return {
                                     type: 'text',
@@ -149,6 +171,13 @@ export async function handleMcpRequest(
                             return z.NEVER;
                         }),
                 },
+                {
+                    title: 'Get page content',
+                    readOnlyHint: true,
+                    destructiveHint: false,
+                    idempotentHint: true,
+                    openWorldHint: true,
+                },
                 async ({ url }) => {
                     try {
                         const match = findSiteSpaceByUrl(context.structure, url);
@@ -180,24 +209,22 @@ export async function handleMcpRequest(
                             resolved.page
                         );
 
-                        waitUntil(
-                            trackServerInsightsEvents({
-                                organizationId: context.organizationId,
-                                siteId: site.id,
-                                events: [
-                                    {
-                                        type: 'page_view',
-                                        location: {
-                                            displayContext: SiteInsightsDisplayContext.Mcp,
-                                            page: resolved.page.id,
-                                            space: match.siteSpace.space.id,
-                                            revision: match.siteSpace.space.revision,
-                                        },
+                        trackMcpEvent({
+                            organizationId: context.organizationId,
+                            siteId: site.id,
+                            events: [
+                                {
+                                    type: 'page_view',
+                                    location: {
+                                        displayContext: SiteInsightsDisplayContext.Mcp,
+                                        page: resolved.page.id,
+                                        space: match.siteSpace.space.id,
+                                        revision: match.siteSpace.space.revision,
                                     },
-                                ],
-                                request,
-                            })
-                        );
+                                },
+                            ],
+                            request,
+                        });
 
                         return { content: [{ type: 'text', text: markdown }] };
                     } catch (error) {

@@ -1,4 +1,6 @@
-export const pt_br = {
+import type { TranslationLanguage } from './types';
+
+export const pt_br: TranslationLanguage = {
     locale: 'pt-br',
     language: 'Português (Brasil)',
     flag: '🇧🇷',
@@ -9,6 +11,7 @@ export const pt_br = {
     switch_to_system_theme: 'Mudar para configuração do sistema',
     search: 'Buscar',
     clear: 'Limpar',
+    tags: 'Tags',
     search_back: 'Voltar aos resultados da busca',
     search_or_ask: 'Perguntar ou buscar',
     search_input_placeholder: 'Buscar conteúdo',
@@ -30,6 +33,7 @@ export const pt_br = {
     search_scope_variant_all: 'Todo o conteúdo',
     search_scope_variant_all_description: 'Cada variante disponível',
     ask: 'Perguntar',
+    ai_chat_ask_query: 'Perguntar a ${1} "${2}"',
     search_ask: 'Perguntar "${1}"',
     search_ask_description: 'Encontre a resposta com ${1}',
     search_ask_sources: 'Fontes',
@@ -37,9 +41,12 @@ export const pt_br = {
     search_ask_no_answer:
         'Não foi possível encontrar uma resposta para sua pergunta. Você pode tentar reformulá-la ou ser mais específico.',
     search_ask_error: 'Algo deu errado. Por favor, tente novamente mais tarde.',
+    search_partial_error:
+        'Alguns resultados não puderam ser carregados. Mostrando os resultados disponíveis.',
     on_this_page: 'Nesta página',
     next_page: 'Próximo',
     previous_page: 'Anterior',
+    toc_back_to_space: 'Voltar para ${1}',
     page_last_modified: 'Atualizado ${1}',
     was_this_helpful: 'Isto foi útil?',
     was_this_helpful_positive: 'Sim, foi!',
@@ -53,6 +60,7 @@ export const pt_br = {
     annotation_button_label: 'Abrir anotação',
     code_copied: 'Copiado!',
     code_copy: 'Copiar',
+    prompt_copy: 'Copiar prompt',
     code_block_collapsed: 'Mostrar todas as ${1} linhas',
     code_block_expanded: 'Mostrar menos',
     table_of_contents_button_label: 'Abrir o índice',
@@ -73,6 +81,10 @@ export const pt_br = {
     notfound_adaptive:
         'Esta página pode existir, mas talvez você precise fazer login para acessá-la.',
     notfound_adaptive_login: 'Fazer login',
+    notfound_adaptive_registration_hint:
+        'O registro pode estar disponível dependendo da organização.',
+    notfound_goto_home: 'Ir para a página inicial',
+    notfound_suggestions_title: 'Você pode estar procurando por',
     unexpected_error_title: 'Aconteceu um erro',
     unexpected_error:
         'Desculpe, aconteceu um erro inesperado. Por favor, tente novamente mais tarde.',
@@ -104,6 +116,8 @@ export const pt_br = {
     ai_chat_assistant_greeting_evening: 'Boa tarde',
     ai_chat_assistant_greeting_night: 'Boa noite',
     ai_chat_clear_conversation: 'Limpar conversa',
+    ai_chat_expand_panel: 'Expandir painel',
+    ai_chat_collapse_panel: 'Recolher painel',
     ai_chat_thinking: 'Pensando...',
     ai_chat_working: 'Trabalhando...',
     ai_chat_exploring: 'Explorando...',
@@ -119,10 +133,10 @@ export const pt_br = {
     ai_chat_hold_message_2: 'Um momento…',
     ai_chat_context_title: 'Baseado no seu contexto',
     ai_chat_context_description:
-        'O assistente usa IA e seu contexto para gerar respostas e realizar ações.',
-    ai_chat_context_pages_youve_read: 'Páginas que você leu',
-    ai_chat_context_info_provided_by_the_site: 'Informações fornecidas pelo site',
-    ai_chat_context_previous_messages: 'Mensagens anteriores',
+        'O Assistente usa IA e seu contexto para gerar respostas e realizar ações.',
+    ai_chat_context_pages_youve_read: 'A página em que você está agora',
+    ai_chat_context_info_provided_by_the_site: 'Informações sobre você fornecidas pelo site',
+    ai_chat_context_previous_messages: 'Mensagens na sua conversa',
     ai_chat_context_disclaimer: 'Respostas de IA podem conter erros.',
     ai_chat_input_placeholder: 'Pergunte, pesquise ou explique...',
     send: 'Enviar',
@@ -134,9 +148,13 @@ export const pt_br = {
     searched_for: 'Pesquisou por ${1}',
     ai_chat_tools_listed_pages: 'Navegou pelos docs',
     ai_chat_tools_read_page: 'Leu a página ${1}',
+    ai_chat_tools_navigated_to_page: 'Página aberta',
+    ai_chat_tools_navigate_failed: 'Falha ao abrir a página',
     ai_chat_tools_mcp_tool: 'Chamou ${1}',
     ai_chat_ask: 'Perguntar a ${1}',
-    ai_chat_ask_about_page: 'Perguntar a ${1} sobre esta página',
+    ai_chat_ask_about: 'Perguntar a ${1} sobre ${2}',
+    this_page: 'esta página',
+    ai_chat_paragraph_draft: 'Conte-me mais sobre isso',
     copy_for_llms: 'Copiar para LLMs',
     copy_page_markdown: 'Copiar página como Markdown para LLMs',
     copy_page: 'Copiar página',
@@ -163,4 +181,5 @@ export const pt_br = {
     form_other_prompt: 'Digite sua resposta...',
     form_other_field: 'Outro...',
     cancel: 'Cancelar',
+    direct_link_to_heading: 'Link direto para o título',
 };

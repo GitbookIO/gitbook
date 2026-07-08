@@ -108,9 +108,5 @@ export function ViewGrid(props: ViewGridProps) {
         </div>
     );
 
-    return (
-        <div role="table" className={tcls('flex', 'flex-col', tableClassName ?? tableWidth)}>
-            {body}
-        </div>
-    );
+    return <div className={tcls('flex', 'flex-col', tableClassName ?? tableWidth)}>{body}</div>;
 }

@@ -14,15 +14,15 @@ function startsWithEmoji(text: string): boolean {
     return EMOJI_REGEX.test(text);
 }
 
-export function SpacesDropdown(props: {
-    context: GitBookSiteContext;
-    siteSpace: SiteSpace;
-    siteSpaces: SiteSpace[];
-    className?: string;
-    variant?: ButtonProps['variant'];
-    icon?: IconName;
-}) {
-    const { context, siteSpace, siteSpaces, className, variant = 'secondary', icon } = props;
+export function SpacesDropdown(
+    props: {
+        context: GitBookSiteContext;
+        siteSpace: SiteSpace;
+        siteSpaces: SiteSpace[];
+        className?: string;
+    } & ButtonProps
+) {
+    const { context, siteSpace, siteSpaces, className, ...buttonProps } = props;
     const currentLanguage = context.locale;
 
     const dropdownClassName = tcls(
@@ -41,8 +41,8 @@ export function SpacesDropdown(props: {
     return (
         <SpacesDropdownClient
             title={getLocalizedTitle(siteSpace, currentLanguage)}
-            icon={icon}
-            variant={variant}
+            icon={buttonProps.icon as IconName}
+            variant={buttonProps.variant ?? 'secondary'}
             className={className}
             dropdownClassName={dropdownClassName}
             slimSpaces={slimSpaces}
@@ -51,13 +51,15 @@ export function SpacesDropdown(props: {
     );
 }
 
-export function TranslationsDropdown(props: {
-    context: GitBookSiteContext;
-    siteSpace: SiteSpace;
-    siteSpaces: SiteSpace[];
-    className?: string;
-}) {
-    const { context, siteSpace, siteSpaces, className } = props;
+export function TranslationsDropdown(
+    props: {
+        context: GitBookSiteContext;
+        siteSpace: SiteSpace;
+        siteSpaces: SiteSpace[];
+        className?: string;
+    } & ButtonProps
+) {
+    const { context, siteSpace, siteSpaces, className, ...buttonProps } = props;
 
     const title = getLocalizedTitle(siteSpace, context.locale);
     const hasEmojiPrefix = startsWithEmoji(title);
@@ -70,12 +72,13 @@ export function TranslationsDropdown(props: {
             siteSpaces={siteSpaces}
             variant="blank"
             className={tcls(
-                '-mx-3 bg-transparent lg:max-w-64 max-md:[&_.button-content]:hidden',
+                'bg-transparent lg:max-w-64 max-md:[&_.button-content]:hidden',
                 hasEmojiPrefix
                     ? 'md:[&_.button-leading-icon]:hidden' // If the title starts with an emoji, don't show the icon (on desktop)
                     : '',
                 className
             )}
+            {...buttonProps}
         />
     );
 }

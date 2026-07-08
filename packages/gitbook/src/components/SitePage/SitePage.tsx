@@ -7,17 +7,25 @@ import {
     SiteInsightsDisplayContext,
     type TranslationLanguage,
 } from '@gitbook/api';
+import { IconsProvider } from '@gitbook/icons';
 import type { Metadata, Viewport } from 'next';
 import { notFound, redirect } from 'next/navigation';
 
+import { UpdatesFilterProvider } from '@/components/DocumentView/UpdatesFilter';
 import { PageAside } from '@/components/PageAside';
 import { PageBody, PageCover } from '@/components/PageBody';
 import { getPagePath } from '@/lib/pages';
 import { isPageIndexable, isSiteIndexable } from '@/lib/seo';
+import { getDocumentFilterableTags } from '@/lib/updates';
 
+import {
+    getContentInlineIconSourceRequests,
+    getCustomizationIconStyle,
+    getInlineIconSources,
+} from '@/lib/icons/inline';
 import { getResizedImageURL } from '@/lib/images';
 import { resolveContentRef } from '@/lib/references';
-import { getLocalizedTitle } from '@/lib/sites';
+import { getSiteStructureTitle } from '@/lib/sites';
 import { tcls } from '@/lib/tailwind';
 import { getPageRSSURL } from '@/routes/rss';
 import { PageContextProvider } from '../PageContext';
@@ -65,11 +73,12 @@ export async function SitePage(props: SitePageProps & { staticRoute: boolean }) 
         withSections,
         withTopHeader,
         pageMetaLinks,
+        iconSources,
     } = await getSitePageData(props);
     const headerOffset = { sectionsHeader: withSections, topHeader: withTopHeader };
-
-    return (
-        <PageContextProvider pageId={page.id} spaceId={context.space.id} title={page.title}>
+    const filterableTags = document ? getDocumentFilterableTags(document, context.revision) : [];
+    const content = (
+        <>
             {/* Using `contents` makes the children of this div according to its parent — which keeps them in a single flex row with the TOC by default.
             If there's a page cover, we use `flex flex-col` to lay out the PageCover above the PageBody + PageAside instead. */}
             <div
@@ -92,6 +101,7 @@ export async function SitePage(props: SitePageProps & { staticRoute: boolean }) 
                     <PageAside
                         page={page}
                         document={document}
+                        filterableTags={filterableTags}
                         withHeaderOffset={headerOffset}
                         withFullPageCover={withFullPageCover}
                         withPageFeedback={withPageFeedback}
@@ -109,7 +119,21 @@ export async function SitePage(props: SitePageProps & { staticRoute: boolean }) 
                 </div>
                 <PageClientLayout pageMetaLinks={pageMetaLinks} />
             </div>
-        </PageContextProvider>
+        </>
+    );
+
+    return (
+        <IconsProvider iconSources={iconSources}>
+            <PageContextProvider pageId={page.id} spaceId={context.space.id} title={page.title}>
+                {filterableTags.length > 0 ? (
+                    <UpdatesFilterProvider tagSlugs={filterableTags.map((tag) => tag.slug)}>
+                        {content}
+                    </UpdatesFilterProvider>
+                ) : (
+                    content
+                )}
+            </PageContextProvider>
+        </IconsProvider>
     );
 }
 
@@ -127,31 +151,6 @@ export async function generateSitePageViewport(context: GitBookSiteContext): Pro
                 ? 'light'
                 : 'light dark', // 'system' → let browser decide based on OS preference
     };
-}
-
-/**
- * A string concatenation of the site structure (sections and variants) titles.
- */
-function getSiteStructureTitle(context: GitBookSiteContext): string | null {
-    const { visibleSections: sections, siteSpace, visibleSiteSpaces: siteSpaces } = context;
-    const currentLanguage = context.locale;
-
-    const title = [];
-    if (
-        sections &&
-        sections.current.default === false && // Only if the current section is not the default one
-        sections.list.filter((section) => section.object === 'site-section').length > 1 // Only if there are multiple sections
-    ) {
-        title.push(getLocalizedTitle(sections.current, currentLanguage));
-    }
-    if (
-        siteSpaces.length > 1 && // Only if there are multiple variants
-        siteSpace.default === false && // Only if the variant is not the default one
-        siteSpaces.filter((space) => space.space.language === siteSpace.space.language).length > 1 // Only if there are multiple variants *for the current language*. This filters out spaces that are "just" translations of each other, not versions.
-    ) {
-        title.push(getLocalizedTitle(siteSpace, siteSpace.space.language));
-    }
-    return title.join(' ');
 }
 
 export async function generateSitePageMetadata(props: SitePageProps): Promise<Metadata> {
@@ -284,6 +283,13 @@ export async function getSitePageData(props: SitePageProps) {
     const withSections = Boolean(visibleSections && visibleSections.list.length > 0);
 
     const document = await getPageDocument(context, page);
+    const iconStyle = getCustomizationIconStyle(customization);
+    const iconSources = await getInlineIconSources(
+        getContentInlineIconSourceRequests({
+            iconStyle,
+            document,
+        })
+    );
 
     return {
         context,
@@ -295,6 +301,7 @@ export async function getSitePageData(props: SitePageProps) {
         withFullPageCover,
         withTopHeader,
         pageMetaLinks,
+        iconSources,
     };
 }
 

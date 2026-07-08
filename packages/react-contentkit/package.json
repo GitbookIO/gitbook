@@ -1,11 +1,15 @@
 {
     "name": "@gitbook/react-contentkit",
-    "version": "0.7.15",
+    "version": "0.7.16",
     "type": "module",
     "exports": {
         ".": {
             "types": "./dist/index.d.ts",
             "default": "./dist/index.js"
+        },
+        "./client": {
+            "types": "./dist/client.d.ts",
+            "default": "./dist/client.js"
         }
     },
     "sideEffects": false,

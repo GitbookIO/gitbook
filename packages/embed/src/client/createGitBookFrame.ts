@@ -7,7 +7,12 @@ import type {
 
 export type GitBookFrameClient = {
     /**
-     * Navigate to a page by its path.
+     * Navigate to a page in the docs tab.
+     *
+     * Accepts the page's path within the site (e.g. `getting-started/quickstart`),
+     * an absolute path (e.g. `/help-center/integrations`), or its full published URL.
+     * The target page may live in any space/section of the site — including one other
+     * than the embed is currently showing — and is resolved to the right space.
      */
     navigateToPage: (path: string) => void;
 
@@ -44,6 +49,16 @@ export function createGitBookFrame(iframe: HTMLIFrameElement): GitBookFrameClien
     if (!iframe.contentWindow) {
         throw new Error('Iframe must have a content window');
     }
+
+    const allowTokens = iframe.allow
+        .split(';')
+        .map((token) => token.trim())
+        .filter(Boolean);
+
+    if (!allowTokens.includes('clipboard-write')) {
+        iframe.allow = [...allowTokens, 'clipboard-write'].join('; ');
+    }
+
     const channel = createChannel(iframe.contentWindow);
 
     channel.receive((message: FrameToParentMessage) => {

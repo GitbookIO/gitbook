@@ -8,6 +8,7 @@ import { throwIfDataError } from '@/lib/data';
 import { toEmbeddableLinkForPublishedContent } from '@/lib/embeddable-linker';
 import { getSiteURLDataFromMiddleware } from '@/lib/middleware';
 import { joinPathWithBaseURL } from '@/lib/paths';
+import { getBestScoredResult } from '@/lib/search';
 import { getServerActionBaseContext } from '@/lib/server-actions';
 import { findSiteSpaceBy, getLocalizedTitle } from '@/lib/sites';
 import type {
@@ -158,7 +159,7 @@ function transformSitePageResult(args: {
         pageItem.sections
             ?.filter((section) => section.title || section.body)
             .map<ComputedSectionResult>((section) => {
-                let sectionHref = linker.toPathInSpace(pageItem.path);
+                let sectionHref = linker.toPathInSpace(section.path);
 
                 if (spaceURL) {
                     if (asEmbeddable) {
@@ -186,5 +187,16 @@ function transformSitePageResult(args: {
                 };
             }) ?? [];
 
-    return [page, ...pageSections];
+    // Find the best-scoring section to use as a body preview on the page result.
+    const bestSection = getBestScoredResult(pageSections);
+    if (bestSection) {
+        page.bestSection = {
+            href: bestSection.href,
+            title: bestSection.title,
+            body: bestSection.body,
+            score: bestSection.score,
+        };
+    }
+
+    return [page];
 }

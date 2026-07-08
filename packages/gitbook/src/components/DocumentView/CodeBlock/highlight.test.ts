@@ -1,7 +1,13 @@
 import { expect, it } from 'bun:test';
 import type { DocumentBlockCode } from '@gitbook/api';
 
-import { type RenderedInline, getInlines, highlight } from './highlight';
+import {
+    type HighlightLine,
+    type HighlightToken,
+    type RenderedInline,
+    getInlines,
+    highlight,
+} from './highlight';
 
 async function highlightWithInlines(block: DocumentBlockCode) {
     const inlines: RenderedInline[] = getInlines(block).map((inline) => ({
@@ -688,6 +694,138 @@ it('should support multiple code tokens in an annotation', async () => {
             ],
         },
     ]);
+});
+
+function joinLineContent(line: HighlightLine): string {
+    const visit = (tokens: HighlightToken[]): string =>
+        tokens
+            .map((t) => {
+                if (t.type === 'plain') return t.content;
+                if (t.type === 'shiki') return t.token.content;
+                return visit(t.children);
+            })
+            .join('');
+    return visit(line.tokens);
+}
+
+function singleLineBlock(syntax: string | undefined, text: string): DocumentBlockCode {
+    return {
+        object: 'block',
+        type: 'code',
+        data: syntax ? { syntax } : {},
+        nodes: [
+            {
+                object: 'block',
+                type: 'code-line',
+                data: {},
+                nodes: [
+                    {
+                        object: 'text',
+                        leaves: [{ object: 'leaf', marks: [], text }],
+                    },
+                ],
+            },
+        ],
+    };
+}
+
+it('classifies and strips trailing // [!code ++] in JS', async () => {
+    const lines = await highlightWithInlines(
+        singleLineBlock('javascript', 'const a = 1 // [!code ++]')
+    );
+    expect(lines).toHaveLength(1);
+    expect(lines[0]!.diff).toBe('added');
+    expect(joinLineContent(lines[0]!)).toBe('const a = 1');
+});
+
+it('classifies and strips trailing # [!code --] in Python', async () => {
+    const lines = await highlightWithInlines(singleLineBlock('python', 'x = 1 # [!code --]'));
+    expect(lines[0]!.diff).toBe('deleted');
+    expect(joinLineContent(lines[0]!)).toBe('x = 1');
+});
+
+it('classifies and strips <!-- [!code ++] --> in HTML', async () => {
+    const lines = await highlightWithInlines(
+        singleLineBlock('html', '<div></div> <!-- [!code ++] -->')
+    );
+    expect(lines[0]!.diff).toBe('added');
+    expect(joinLineContent(lines[0]!)).toBe('<div></div>');
+});
+
+it('classifies and strips /* [!code --] */ in CSS', async () => {
+    const lines = await highlightWithInlines(
+        singleLineBlock('css', '.a { color: red; } /* [!code --] */')
+    );
+    expect(lines[0]!.diff).toBe('deleted');
+    expect(joinLineContent(lines[0]!)).toBe('.a { color: red; }');
+});
+
+it('does not classify when marker is not at end of line', async () => {
+    const lines = await highlightWithInlines(
+        singleLineBlock('javascript', 'const x = 1 // [!code ++] trailing')
+    );
+    expect(lines[0]!.diff).toBeNull();
+    expect(joinLineContent(lines[0]!)).toBe('const x = 1 // [!code ++] trailing');
+});
+
+it('returns diff: null for lines without a marker', async () => {
+    const lines = await highlightWithInlines(singleLineBlock('javascript', 'console.log("hi")'));
+    expect(lines[0]!.diff).toBeNull();
+});
+
+it('classifies and strips marker via plainHighlighting fallback', async () => {
+    const lines = await highlightWithInlines(
+        singleLineBlock(undefined, 'plain text // [!code ++]')
+    );
+    expect(lines[0]!.diff).toBe('added');
+    expect(joinLineContent(lines[0]!)).toBe('plain text');
+});
+
+it('preserves inline annotation when marker is stripped', async () => {
+    const tokens = await highlightWithInlines({
+        object: 'block',
+        type: 'code',
+        data: { syntax: 'javascript' },
+        nodes: [
+            {
+                object: 'block',
+                type: 'code-line',
+                data: {},
+                nodes: [
+                    {
+                        object: 'text',
+                        leaves: [{ object: 'leaf', marks: [], text: 'console.' }],
+                    },
+                    {
+                        object: 'inline',
+                        type: 'annotation',
+                        nodes: [
+                            {
+                                object: 'text',
+                                leaves: [{ object: 'leaf', marks: [], text: 'log' }],
+                            },
+                        ],
+                        isVoid: false,
+                        fragments: [],
+                    },
+                    {
+                        object: 'text',
+                        leaves: [{ object: 'leaf', marks: [], text: '("Hi") // [!code ++]' }],
+                    },
+                ],
+            },
+        ],
+    });
+
+    expect(tokens[0]!.diff).toBe('added');
+    expect(joinLineContent(tokens[0]!)).toBe('console.log("Hi")');
+    // inline annotation around "log" must be preserved
+    const hasAnnotation = tokens[0]!.tokens.some(
+        (t) =>
+            t.type === 'annotation' &&
+            t.children.some((c) => c.type === 'shiki' && c.token.content === 'log')
+    );
+    expect(hasAnnotation).toBe(true);
 });
 
 it('should handle \\r', async () => {

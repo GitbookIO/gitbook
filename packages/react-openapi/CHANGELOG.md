@@ -1,5 +1,30 @@
 # @gitbook/react-openapi
 
+## 1.5.15
+
+### Patch Changes
+
+- 7e55cd5: Add an "Available in MCP" badge on OpenAPI operations marked with `x-gitbook-mcp: true`. When `x-gitbook-mcp-url` is set (on the operation, path, or root — most specific wins), the badge becomes a button that copies the MCP server URL to the clipboard.
+- Updated dependencies [3fedaaa]
+- Updated dependencies [7e55cd5]
+  - @gitbook/expr@1.3.1
+  - @gitbook/openapi-parser@3.0.12
+
+## 1.5.14
+
+### Patch Changes
+
+- f4469b2: Support OpenAPI one-operation-per-page mode
+- 88b94b5: Handle circular oneOf with discriminator and allOf in OpenAPI schemas
+
+## 1.5.13
+
+### Patch Changes
+
+- f158064: Match OpenAPI operation paths regardless of trailing slash
+- Updated dependencies [6eabaec]
+  - @gitbook/expr@1.3.0
+
 ## 1.5.12
 
 ### Patch Changes

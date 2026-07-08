@@ -16,6 +16,7 @@ export interface OpenAPIClientContext {
         copy: React.ReactNode;
         check: React.ReactNode;
         lock: React.ReactNode;
+        mcp: React.ReactNode;
     };
 
     /**
@@ -71,6 +72,11 @@ export interface OpenAPIContext
      * Render the document of the operation.
      */
     renderDocument: (props: { document: object }) => React.ReactNode;
+
+    /**
+     * If `true`, the block omits its own title and description (the page renders them instead).
+     */
+    headless?: boolean;
 
     /**
      * Public specification URL, used by Scalar's "Test it" modal.

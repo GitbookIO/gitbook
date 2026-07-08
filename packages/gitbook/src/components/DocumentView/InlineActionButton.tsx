@@ -51,8 +51,8 @@ export function InlineActionButton(
                     className: 'text-[1em]',
                 }}
                 maxLength={action === 'ask' ? 2048 : 512}
-                disabled={action === 'ask' && chatState.loading}
-                aria-busy={action === 'ask' && chatState.loading}
+                disabled={action === 'ask' && chatState.responding}
+                aria-busy={action === 'ask' && chatState.responding}
                 leading={icon}
                 keyboardShortcut={false}
                 onSubmit={(value) => handleSubmit(value as string)}

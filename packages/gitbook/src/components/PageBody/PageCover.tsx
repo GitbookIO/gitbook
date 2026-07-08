@@ -28,7 +28,7 @@ export async function PageCover(props: {
     cover: RevisionPageDocumentCover;
     context: GitBookSiteContext;
 }) {
-    let { as, cover, context } = props;
+    const { as, cover, context } = props;
     const height = getCoverHeight(cover);
 
     const initialCoverCutoff = () => {
@@ -48,8 +48,6 @@ export async function PageCover(props: {
         }
         return `${total}px`;
     };
-
-    as = 'background';
 
     const [resolved, resolvedDark] = await Promise.all([
         cover.ref ? resolveContentRef(cover.ref, context) : null,

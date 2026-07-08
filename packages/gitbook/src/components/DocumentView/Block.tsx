@@ -5,7 +5,6 @@ import {
     SkeletonHeading,
     SkeletonImage,
     SkeletonParagraph,
-    SkeletonSmall,
     SkeletonUpdate,
 } from '@/components/primitives';
 import type { ClassValue } from '@/lib/tailwind';
@@ -29,6 +28,7 @@ import { ListItem } from './ListItem';
 import { BlockMath } from './Math';
 import { OpenAPIOperation, OpenAPISchemas, OpenAPIWebhook } from './OpenAPI';
 import { Paragraph } from './Paragraph';
+import { Prompt } from './Prompt';
 import { Quote } from './Quote';
 import { ReusableContent } from './ReusableContent';
 import { Stepper } from './Stepper';
@@ -112,6 +112,8 @@ export function Block<T extends DocumentBlock>(props: BlockProps<T>) {
                 return <Updates {...props} block={block} />;
             case 'update':
                 return <Update {...props} block={block} />;
+            case 'prompt':
+                return <Prompt {...props} block={block} />;
             case 'if':
                 // If block should be processed by the API.
                 return null;
@@ -142,7 +144,7 @@ export function BlockSkeleton(props: { block: DocumentBlock; style: ClassValue }
         case 'file':
             return <SkeletonHeading id={id} style={style} />;
         case 'paragraph':
-            return <SkeletonSmall id={id} style={style} />;
+            return <SkeletonParagraph id={id} className={style} />;
         case 'list-ordered':
         case 'list-unordered':
         case 'list-tasks':
@@ -152,8 +154,9 @@ export function BlockSkeleton(props: { block: DocumentBlock; style: ClassValue }
         case 'hint':
         case 'tabs':
         case 'stepper-step':
+        case 'prompt':
         case 'if':
-            return <SkeletonParagraph id={id} style={style} />;
+            return <SkeletonParagraph id={id} className={style} />;
         case 'expandable':
         case 'table':
         case 'swagger':
@@ -173,7 +176,7 @@ export function BlockSkeleton(props: { block: DocumentBlock; style: ClassValue }
         case 'drawing':
             return <SkeletonImage id={id} style={style} />;
         case 'updates':
-            return <SkeletonUpdate id={id} style={style} />;
+            return <SkeletonUpdate id={id} className={style} />;
         case 'image':
         case 'code-line':
         case 'tabs-item':

@@ -17,7 +17,7 @@ import { TranslationsDropdown } from './SpacesDropdown';
 /**
  * Render the header for the space.
  */
-export function Header(props: {
+export async function Header(props: {
     context: GitBookSiteContext;
     withTopHeader?: boolean;
     variants: {
@@ -28,6 +28,7 @@ export function Header(props: {
     const { context, withTopHeader, variants } = props;
     const { siteSpace, visibleSections, customization } = context;
     const searchProps = getSearchBaseProps(context);
+    const language = await getSpaceLanguage(context);
 
     const withSections = Boolean(
         visibleSections &&
@@ -74,7 +75,7 @@ export function Header(props: {
                     'site-header:theme-bold:shadow-tint-12/2'
                 )}
             >
-                <div className="transition-all duration-300 motion-reduce:transition-none lg:chat-open:pr-80 xl:chat-open:pr-96">
+                <div className="transition-all duration-300 motion-reduce:transition-none lg:chat-open:pr-(--ai-chat-width)">
                     <div
                         data-gb-header-content
                         className={tcls(
@@ -122,7 +123,7 @@ export function Header(props: {
                                 'flex',
                                 'grow-0',
                                 'shrink-0',
-                                '@2xl:basis-56',
+                                'md:@2xl:basis-56',
                                 'justify-self-end',
                                 'items-center',
                                 'gap-2',
@@ -130,15 +131,15 @@ export function Header(props: {
                                 'search' in customization.styling &&
                                     customization.styling.search === 'prominent'
                                     ? [
-                                          '@2xl:grow-[0.8]',
-                                          '@4xl:basis-40',
-                                          '@2xl:max-w-[50%]',
-                                          '@4xl:max-w-lg',
+                                          'md:@2xl:grow-[0.8]',
+                                          'md:@4xl:basis-40',
+                                          'md:@2xl:max-w-[50%]',
+                                          'md:@4xl:max-w-lg',
                                           'lg:@2xl:ml-[max(calc((100%-18rem-48rem)/2),1.5rem)]', // container (100%) - sidebar (18rem) - content (48rem)
                                           'not-chat-open:xl:ml-[max(calc((100%-18rem-48rem-14rem-3rem)/2),1.5rem)]', // container (100%) - sidebar (18rem) - content (48rem) - outline (14rem) - margin (3rem)
-                                          '@2xl:mr-auto',
+                                          'md:@2xl:mr-auto',
                                           'order-last',
-                                          '@2xl:order-[unset]',
+                                          'md:@2xl:order-[unset]',
                                       ]
                                     : ['order-last']
                             )}
@@ -180,7 +181,7 @@ export function Header(props: {
                                 {customization.header.links.length > 0 ||
                                 headerSocialAccounts.length > 0 ? (
                                     <HeaderLinkMore
-                                        label={t(getSpaceLanguage(context), 'more')}
+                                        label={t(language, 'more')}
                                         links={customization.header.links}
                                         socialAccounts={headerSocialAccounts}
                                         context={context}
@@ -195,7 +196,7 @@ export function Header(props: {
                                             ) ?? siteSpace
                                         }
                                         siteSpaces={variants.translations}
-                                        className="flex! site-header:theme-bold:text-header-link hover:site-header:theme-bold:bg-header-link/3 focus-visible:site-header:theme-bold:bg-header-link/3 aria-expanded:site-header:theme-bold:bg-header-link/5"
+                                        className="flex! -mx-3 site-header:theme-bold:text-header-link hover:site-header:theme-bold:bg-header-link/3 focus-visible:site-header:theme-bold:bg-header-link/3 aria-expanded:site-header:theme-bold:bg-header-link/5"
                                     />
                                 ) : null}
                             </HeaderLinks>
@@ -205,7 +206,7 @@ export function Header(props: {
             </div>
 
             {visibleSections && withSections ? (
-                <div className="transition-[padding] duration-300 motion-reduce:transition-none lg:chat-open:pr-80 xl:chat-open:pr-96">
+                <div className="transition-[padding] duration-300 motion-reduce:transition-none lg:chat-open:pr-(--ai-chat-width)">
                     <SiteSectionTabs sections={encodeClientSiteSections(context, visibleSections)}>
                         {variants.translations.length > 1 ? (
                             <TranslationsDropdown
@@ -216,7 +217,7 @@ export function Header(props: {
                                     ) ?? siteSpace
                                 }
                                 siteSpaces={variants.translations}
-                                className="my-1.5 ml-2 self-start"
+                                className="-mx-3 my-1.5 ml-2 self-start"
                             />
                         ) : null}
                     </SiteSectionTabs>

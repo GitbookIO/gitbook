@@ -172,7 +172,8 @@ function Toggler(props: {
             size="xsmall"
             iconOnly
             variant="blank"
-            className="ml-auto text-current hover:bg-tint-base"
+            aria-hidden="true" // The button has no label or focus so hiding it from screen readers.
+            className="-my-0.5 ml-auto min-h-6 min-w-6 text-current hover:bg-tint-base"
             tabIndex={-1} // Prevent focus on the button since it's already inside a clickable link that performs the same toggle action.
         />
     );

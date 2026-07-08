@@ -1,4 +1,6 @@
-export const ru = {
+import type { TranslationLanguage } from './types';
+
+export const ru: TranslationLanguage = {
     locale: 'ru',
     language: 'Русский',
     flag: '🇷🇺',
@@ -9,6 +11,7 @@ export const ru = {
     switch_to_system_theme: 'Переключиться на системную тему',
     search: 'Поиск',
     clear: 'Очистить',
+    tags: 'Теги',
     search_back: 'Вернуться к результатам поиска',
     search_or_ask: 'Найти или спросить',
     search_input_placeholder: 'Поиск по содержимому',
@@ -30,6 +33,7 @@ export const ru = {
     search_scope_variant_all: 'Весь контент',
     search_scope_variant_all_description: 'Каждый доступный вариант',
     ask: 'Спросить',
+    ai_chat_ask_query: 'Спросить у ${1} "${2}"',
     search_ask: 'Спросить "${1}"',
     search_ask_description: 'Найти ответ с помощью ${1}',
     search_ask_sources: 'Источники',
@@ -37,9 +41,12 @@ export const ru = {
     search_ask_no_answer:
         'Не удалось найти ответ на ваш вопрос. Попробуйте перефразировать его или задать более конкретный вопрос.',
     search_ask_error: 'Что-то пошло не так. Пожалуйста, попробуйте позже.',
+    search_partial_error:
+        'Не удалось загрузить некоторые результаты. Показаны доступные результаты.',
     on_this_page: 'На этой странице',
     next_page: 'Следующая',
     previous_page: 'Предыдущая',
+    toc_back_to_space: 'Назад к ${1}',
     page_last_modified: 'Последнее обновление ${1}',
     was_this_helpful: 'Это было полезно?',
     was_this_helpful_positive: 'Да, было!',
@@ -53,6 +60,7 @@ export const ru = {
     annotation_button_label: 'Открыть аннотацию',
     code_copied: 'Скопировано!',
     code_copy: 'Копировать',
+    prompt_copy: 'Скопировать промпт',
     code_block_collapsed: 'Показать все ${1} строк',
     code_block_expanded: 'Показать меньше',
     table_of_contents_button_label: 'Открыть оглавление',
@@ -73,6 +81,10 @@ export const ru = {
     notfound_adaptive:
         'Эта страница может существовать, но для доступа к ней может потребоваться вход.',
     notfound_adaptive_login: 'Войти',
+    notfound_adaptive_registration_hint:
+        'Регистрация может быть доступна в зависимости от организации.',
+    notfound_goto_home: 'Перейти на главную',
+    notfound_suggestions_title: 'Возможно, вы ищете',
     unexpected_error_title: 'Произошла ошибка',
     unexpected_error: 'Извините, произошла непредвиденная ошибка. Пожалуйста, попробуйте позже.',
     unexpected_error_retry: 'Попробуйте снова',
@@ -103,6 +115,8 @@ export const ru = {
     ai_chat_assistant_greeting_evening: 'Добрый вечер',
     ai_chat_assistant_greeting_night: 'Доброй ночи',
     ai_chat_clear_conversation: 'Очистить диалог',
+    ai_chat_expand_panel: 'Развернуть панель',
+    ai_chat_collapse_panel: 'Свернуть панель',
     ai_chat_thinking: 'Думает…',
     ai_chat_working: 'Работает…',
     ai_chat_exploring: 'Изучает…',
@@ -119,9 +133,9 @@ export const ru = {
     ai_chat_context_title: 'На основе вашего контекста',
     ai_chat_context_description:
         'Помощник использует ИИ и ваш контекст для генерации ответов и выполнения действий.',
-    ai_chat_context_pages_youve_read: 'Страницы, которые вы прочитали',
-    ai_chat_context_info_provided_by_the_site: 'Информация, предоставленная сайтом',
-    ai_chat_context_previous_messages: 'Предыдущие сообщения',
+    ai_chat_context_pages_youve_read: 'Страница, на которой вы сейчас находитесь',
+    ai_chat_context_info_provided_by_the_site: 'Информация о вас, предоставленная сайтом',
+    ai_chat_context_previous_messages: 'Сообщения в вашем разговоре',
     ai_chat_context_disclaimer: 'Ответы ИИ могут содержать ошибки.',
     ai_chat_input_placeholder: 'Спросите, найдите или объясните...',
     send: 'Отправить',
@@ -133,9 +147,13 @@ export const ru = {
     searched_for: 'Выполнен поиск ${1}',
     ai_chat_tools_listed_pages: 'Просмотрены документы',
     ai_chat_tools_read_page: 'Прочитана страница ${1}',
+    ai_chat_tools_navigated_to_page: 'Страница открыта',
+    ai_chat_tools_navigate_failed: 'Не удалось открыть страницу',
     ai_chat_tools_mcp_tool: 'Вызван ${1}',
     ai_chat_ask: 'Спросить у ${1}',
-    ai_chat_ask_about_page: 'Спросить у ${1} об этой странице',
+    ai_chat_ask_about: 'Спросить у ${1} о ${2}',
+    this_page: 'этой странице',
+    ai_chat_paragraph_draft: 'Расскажи мне об этом подробнее',
     copy_for_llms: 'Скопировать для LLM',
     copy_page_markdown: 'Скопировать страницу как Markdown для LLM',
     copy_page: 'Скопировать страницу',
@@ -162,4 +180,5 @@ export const ru = {
     form_other_prompt: 'Введите ответ...',
     form_other_field: 'Другое...',
     cancel: 'Отмена',
+    direct_link_to_heading: 'Прямая ссылка на заголовок',
 };

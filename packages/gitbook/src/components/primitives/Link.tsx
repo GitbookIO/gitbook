@@ -4,6 +4,7 @@ import NextLink, { type LinkProps as NextLinkProps } from 'next/link';
 import React from 'react';
 
 import { tcls } from '@/lib/tailwind';
+import { checkIsAnchor, resolveAnchorURL } from '@/lib/urls';
 import { type TrackEventInput, useTrackEvent } from '../Insights';
 import { NavigationStatusContext } from '../hooks';
 import { isExternalLink, toNonEmbedLink } from '../utils/link';
@@ -58,6 +59,10 @@ function getTargetProps(
         isExternal: boolean;
     }
 ) {
+    if (props.href.startsWith('mailto:')) {
+        return {};
+    }
+
     const target =
         props.target ??
         (context.isExternal && context.externalTarget === '_blank' ? '_blank' : undefined);
@@ -88,12 +93,20 @@ export function Link(props: LinkProps) {
     const trackEvent = useTrackEvent();
     const forwardedClassNames = useClassnames(classNames || []);
     const isExternal = isExternalServer(href);
+    const isAnchor = checkIsAnchor(href);
     const { target, rel } = getTargetProps(props, { externalTarget, isExternal });
 
     const onClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
         // Only trigger navigation context for internal links in the same window without modifier keys (i.e. open in new tab).
         if (!isExternal && target !== '_blank' && !event.ctrlKey && !event.metaKey) {
-            onNavigationClick(href);
+            if (isAnchor) {
+                event.preventDefault();
+                const resolvedHref = resolveAnchorURL(href, window.location);
+                window.history.pushState(null, '', resolvedHref);
+                onNavigationClick(resolvedHref);
+            } else {
+                onNavigationClick(href);
+            }
         }
 
         const isExternalOnClient = isExternalClient(href);
@@ -144,9 +157,14 @@ export function Link(props: LinkProps) {
         );
     }
 
-    // Not sure why yet, but it seems necessary to force prefetch to true
-    // default behavior doesn't seem to properly use the client router cache.
-    const _prefetch = prefetch === null || prefetch === undefined ? true : prefetch;
+    // Not sure why yet, but forcing prefetch to true seems necessary for the
+    // client router cache to be used properly.
+    //
+    // However, we need to disable prefetch for links with query params that
+    // can trigger server-side side effects, such as persisting visitor claims in a
+    // cookie or starting the assistant. Automatic RSC prefetch requests can otherwise
+    // trigger those effects without user intent.
+    const _prefetch = hasSideEffectQueryParams(href) ? false : (prefetch ?? true);
 
     return (
         <NextLink
@@ -160,6 +178,31 @@ export function Link(props: LinkProps) {
             {children}
         </NextLink>
     );
+}
+
+/**
+ * Whether the given href carries query params that have a server-side side effect when fetched:
+ *   - `visitor.*` params persist unsigned visitor claims into the `gitbook-visitor-public` cookie.
+ *   - `ask` triggers the assistant & `q` the search.
+ *
+ * NextLink automatically prefetches links (RSC requests) on hover/viewport, which would fire those
+ * side effects without any user intent, so such links should not be prefetched.
+ */
+function hasSideEffectQueryParams(href: string): boolean {
+    const baseURL = typeof window !== 'undefined' ? window.location.origin : 'http://localhost';
+    const linkURL = URL.canParse(href) ? new URL(href) : new URL(href, baseURL);
+
+    if (linkURL.searchParams.get('ask') !== null || linkURL.searchParams.get('q') !== null) {
+        return true;
+    }
+
+    for (const key of linkURL.searchParams.keys()) {
+        if (key.startsWith('visitor.')) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 /**

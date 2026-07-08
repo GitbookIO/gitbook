@@ -6,7 +6,7 @@ import React from 'react';
 
 import { type ClassValue, tcls } from '@/lib/tailwind';
 import { findSectionInGroup } from '@/lib/utils';
-import { useToggleAnimation } from '../hooks';
+import { markSpaceNavigationFromPickerOnClick, useToggleAnimation } from '../hooks';
 import { Link, ToggleChevron } from '../primitives';
 import { ScrollContainer } from '../primitives/ScrollContainer';
 import { SectionIcon } from './SectionIcon';
@@ -31,6 +31,7 @@ export function SiteSectionList(props: { sections: ClientSiteSections; className
         sectionsAndGroups.length > 0 && (
             <nav
                 aria-label="Sections"
+                onClickCapture={markSpaceNavigationFromPickerOnClick}
                 className={tcls(
                     '-mx-5 before:contents[] relative border-tint-subtle border-b from-transparent sidebar-filled:to-tint-subtle theme-muted:to-tint-subtle to-tint-base text-sm text-tint before:pointer-events-none before:absolute before:right-2 before:bottom-0 before:left-0 before:h-12 before:bg-linear-to-b [html.sidebar-filled.theme-bold.tint_&]:to-tint-base [html.sidebar-filled.theme-bold.tint_&]:to-tint-subtle [html.sidebar-filled.theme-muted_&]:to-tint-base',
                     className

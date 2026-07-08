@@ -1,4 +1,6 @@
-export const de = {
+import type { TranslationLanguage } from './types';
+
+export const de: TranslationLanguage = {
     locale: 'de',
     language: 'Deutsch',
     flag: '🇩🇪',
@@ -9,6 +11,7 @@ export const de = {
     switch_to_system_theme: 'Zum Systemmodus wechseln',
     search: 'Suche',
     clear: 'Löschen',
+    tags: 'Tags',
     search_back: 'Zurück zu den Suchergebnissen',
     search_or_ask: 'Fragen oder Suchen',
     search_input_placeholder: 'Inhalt durchsuchen',
@@ -30,6 +33,7 @@ export const de = {
     search_scope_variant_all: 'Alle Inhalte',
     search_scope_variant_all_description: 'Jede verfügbare Variante',
     ask: 'Fragen',
+    ai_chat_ask_query: 'An ${1} fragen: "${2}"',
     search_ask: 'Fragen "${1}"',
     search_ask_description: 'Finden Sie die Antwort mit ${1}',
     search_ask_sources: 'Quellen',
@@ -37,9 +41,12 @@ export const de = {
     search_ask_no_answer:
         'Es konnte keine Antwort auf Ihre Frage gefunden werden. Versuchen Sie, sie umzuformulieren oder genauer zu sein.',
     search_ask_error: 'Etwas ist schief gelaufen. Bitte versuchen Sie es später noch einmal.',
+    search_partial_error:
+        'Einige Ergebnisse konnten nicht geladen werden. Verfügbare Ergebnisse werden angezeigt.',
     on_this_page: 'Auf dieser Seite',
     next_page: 'Nächste',
     previous_page: 'Vorherige',
+    toc_back_to_space: 'Zurück zu ${1}',
     page_last_modified: 'Zuletzt aktualisiert ${1}',
     was_this_helpful: 'War das hilfreich?',
     was_this_helpful_positive: 'Ja, das war es!',
@@ -53,6 +60,7 @@ export const de = {
     annotation_button_label: 'Kommentar öffnen',
     code_copied: 'Kopiert!',
     code_copy: 'Kopieren',
+    prompt_copy: 'Prompt kopieren',
     code_block_collapsed: 'Alle ${1} Zeilen anzeigen',
     code_block_expanded: 'Weniger anzeigen',
     table_of_contents_button_label: 'Inhaltsverzeichnis öffnen',
@@ -74,6 +82,10 @@ export const de = {
     notfound_adaptive:
         'Diese Seite existiert möglicherweise, aber Sie müssen sich eventuell anmelden, um darauf zuzugreifen.',
     notfound_adaptive_login: 'Anmelden',
+    notfound_adaptive_registration_hint:
+        'Die Registrierung ist je nach Organisation möglicherweise verfügbar.',
+    notfound_goto_home: 'Zur Startseite',
+    notfound_suggestions_title: 'Vielleicht suchen Sie nach',
     unexpected_error_title: 'Ein Fehler ist aufgetreten',
     unexpected_error:
         'Entschuldigung, ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.',
@@ -105,6 +117,8 @@ export const de = {
     ai_chat_assistant_greeting_evening: 'Guten Abend',
     ai_chat_assistant_greeting_night: 'Gute Nacht',
     ai_chat_clear_conversation: 'Unterhaltung löschen',
+    ai_chat_expand_panel: 'Panel erweitern',
+    ai_chat_collapse_panel: 'Panel reduzieren',
     ai_chat_thinking: 'Denke nach...',
     ai_chat_working: 'Arbeite...',
     ai_chat_exploring: 'Erkunde...',
@@ -121,9 +135,10 @@ export const de = {
     ai_chat_context_title: 'Basierend auf Ihrem Kontext',
     ai_chat_context_description:
         'Der Assistent verwendet KI und Ihren Kontext, um Antworten zu generieren und Aktionen durchzuführen.',
-    ai_chat_context_pages_youve_read: 'Seiten, die Sie gelesen haben',
-    ai_chat_context_info_provided_by_the_site: 'Von der Website bereitgestellte Informationen',
-    ai_chat_context_previous_messages: 'Vorherige Nachrichten',
+    ai_chat_context_pages_youve_read: 'Die Seite, auf der Sie sich gerade befinden',
+    ai_chat_context_info_provided_by_the_site:
+        'Von der Website bereitgestellte Informationen über Sie',
+    ai_chat_context_previous_messages: 'Nachrichten in Ihrem Gespräch',
     ai_chat_context_disclaimer: 'KI-Antworten können Fehler enthalten.',
     ai_chat_input_placeholder: 'Fragen, suchen oder erklären...',
     send: 'Senden',
@@ -135,9 +150,13 @@ export const de = {
     searched_for: 'Gesucht nach ${1}',
     ai_chat_tools_listed_pages: 'Docs durchsucht',
     ai_chat_tools_read_page: 'Seite ${1} gelesen',
+    ai_chat_tools_navigated_to_page: 'Seite geöffnet',
+    ai_chat_tools_navigate_failed: 'Seite konnte nicht geöffnet werden',
     ai_chat_tools_mcp_tool: '${1} aufgerufen',
     ai_chat_ask: '${1} fragen',
-    ai_chat_ask_about_page: '${1} zu dieser Seite befragen',
+    ai_chat_ask_about: '${1} zu ${2} befragen',
+    this_page: 'dieser Seite',
+    ai_chat_paragraph_draft: 'Erzähl mir mehr darüber',
     copy_for_llms: 'Für LLMs kopieren',
     copy_page_markdown: 'Seite als Markdown für LLMs kopieren',
     copy_page: 'Seite kopieren',
@@ -164,4 +183,5 @@ export const de = {
     form_other_prompt: 'Geben Sie Ihre Antwort ein...',
     form_other_field: 'Sonstiges...',
     cancel: 'Abbrechen',
+    direct_link_to_heading: 'Direkter Link zur Überschrift',
 };

@@ -15,6 +15,10 @@ jobs:
             id-token: write
             pull-requests: write
             contents: write
+        env:
+            # The repo is managed by Bun, but publishing uses npm for provenance.
+            # Keep Corepack from rejecting packageManager: bun@... when npm runs.
+            COREPACK_ENABLE_PROJECT_SPEC: 0
         steps:
             - name: Checkout Repo
               uses: actions/checkout@v3

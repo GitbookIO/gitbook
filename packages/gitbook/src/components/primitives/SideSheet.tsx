@@ -4,6 +4,7 @@ import { useLanguage } from '@/intl/client';
 import { tString } from '@/intl/translate';
 import { type ClassValue, tcls } from '@/lib/tailwind';
 import React from 'react';
+import { createPortal } from 'react-dom';
 import { useIsMobile } from '../hooks/useIsMobile';
 import { Button } from './Button';
 
@@ -61,6 +62,7 @@ export function SideSheet(
     const isMobile = useIsMobile();
     const isModal = modal === 'mobile' ? isMobile : modal;
     const asideRef = React.useRef<HTMLElement>(null);
+    const [portalTarget, setPortalTarget] = React.useState<HTMLElement | null>(null);
 
     // Internal state for uncontrolled mode (only used when open prop is undefined)
     const [open, setOpen] = React.useState(openState ?? false);
@@ -72,6 +74,15 @@ export function SideSheet(
     const [shouldHide, setShouldHide] = React.useState(!isOpen);
 
     // Track if component has been opened to prevent initial animation
+    React.useEffect(() => {
+        if (isModal) {
+            setPortalTarget(document.body);
+            return;
+        }
+
+        setPortalTarget(null);
+    }, [isModal]);
+
     React.useEffect(() => {
         let timer: ReturnType<typeof setTimeout> | undefined;
         if (isOpen) {
@@ -191,7 +202,7 @@ export function SideSheet(
         return () => document.removeEventListener('keydown', handleKeyDown);
     }, [isModal, isOpen]);
 
-    return (
+    const content = (
         <>
             {withOverlay ? (
                 <SideSheetOverlay
@@ -206,7 +217,7 @@ export function SideSheet(
                     'side-sheet',
                     'fixed inset-y-0 z-41', // Above the side sheet overlay on z-40
                     side === 'left' ? 'left-0' : 'right-0',
-                    withCloseButton ? 'max-w-[calc(100%-4rem)]' : 'max-w-[calc(100%-3rem)]',
+                    withCloseButton ? 'max-w-[calc(100%-4.5rem)]' : 'max-w-[calc(100%-3rem)]',
                     isOpen
                         ? side === 'left'
                             ? 'hydrated:animate-enter-from-left'
@@ -240,6 +251,12 @@ export function SideSheet(
             </aside>
         </>
     );
+
+    if (isModal && portalTarget) {
+        return createPortal(content, portalTarget);
+    }
+
+    return content;
 }
 
 /** Backdrop overlay shown behind the modal sheet */

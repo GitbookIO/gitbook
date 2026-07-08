@@ -1,6 +1,7 @@
 import { OpenAPIPath } from '../OpenAPIPath';
 import type { OpenAPIContext } from '../context';
 import type { OpenAPIOperationData, OpenAPIWebhookData } from '../types';
+import { OpenAPIMcpBadge } from './OpenAPIMcpBadge';
 import { OpenAPIStability } from './OpenAPIStability';
 
 export function OpenAPISummary(props: {
@@ -23,16 +24,22 @@ export function OpenAPISummary(props: {
     })();
 
     return (
-        <div className="openapi-summary" id={operation.summary ? undefined : context.id}>
-            {(operation.deprecated || operation['x-stability']) && (
+        <div
+            className="openapi-summary"
+            id={!context.headless && operation.summary ? undefined : context.id}
+        >
+            {(operation.deprecated || operation['x-stability'] || operation['x-gitbook-mcp']) && (
                 <div className="openapi-summary-tags">
                     {operation.deprecated && <div className="openapi-deprecated">Deprecated</div>}
                     {operation['x-stability'] && (
                         <OpenAPIStability stability={operation['x-stability']} />
                     )}
+                    {operation['x-gitbook-mcp'] && (
+                        <OpenAPIMcpBadge url={operation['x-gitbook-mcp-url']} context={context} />
+                    )}
                 </div>
             )}
-            {title
+            {!context.headless && title
                 ? context.renderHeading({
                       deprecated: operation.deprecated ?? false,
                       stability: operation['x-stability'],

@@ -4,7 +4,7 @@ import type { ContentKitWebFrame } from '@gitbook/api';
 import React from 'react';
 
 import { Icon } from '@gitbook/icons';
-import { useContentKitClientContext } from './context';
+import { type ContentKitClientContextData, useContentKitClientContext } from './context';
 import { resolveDynamicBinding } from './dynamic';
 import type { ContentKitClientElementProps } from './types';
 
@@ -47,7 +47,7 @@ export function ElementWebframe(props: ContentKitClientElementProps<ContentKitWe
                 messagesQueueRef.current.push(message);
             }
         },
-        [renderer.security]
+        [element.source.url, renderer.security]
     );
 
     // Listen to messages coming from the webframe
@@ -146,19 +146,21 @@ export function ElementWebframe(props: ContentKitClientElementProps<ContentKitWe
         };
     }, [renderer, sendMessage]);
 
-    // Send data to the webframe
+    // Send data and client-only visitor context as state to the webframe.
     React.useEffect(() => {
-        if (!element.data) {
-            return;
-        }
-
-        const state: Record<string, string> = {};
-        Object.entries(element.data).forEach(([key, value]) => {
-            state[key] = resolveDynamicBinding(renderer.state, value);
+        const abort = { cancelled: false };
+        sendWebframeState({
+            elementData: element.data,
+            rendererState: renderer.state,
+            clientContext: renderer.clientContext,
+            sendMessage,
+            abort,
         });
 
-        return sendMessage({ state });
-    }, [element.data, renderer.state, sendMessage]);
+        return () => {
+            abort.cancelled = true;
+        };
+    }, [element.data, renderer.state, renderer.clientContext, sendMessage]);
 
     const height = size.height ? Math.max(size.height, MIN_HEIGHT) : undefined;
 
@@ -191,4 +193,60 @@ export function ElementWebframe(props: ContentKitClientElementProps<ContentKitWe
             }}
         />
     );
+}
+
+type WebframeState = Record<string, unknown>;
+
+/**
+ * Resolve configured webframe data bindings against the current ContentKit state.
+ */
+function resolveWebframeState(
+    elementData: ContentKitWebFrame['data'],
+    rendererState: object
+): WebframeState {
+    const state: WebframeState = {};
+
+    if (!elementData) {
+        return state;
+    }
+
+    Object.entries(elementData).forEach(([key, value]) => {
+        state[key] = resolveDynamicBinding(rendererState, value);
+    });
+
+    return state;
+}
+
+/**
+ * Read optional client-only visitor context.
+ */
+async function resolveVisitorContext(clientContext: ContentKitClientContextData | undefined) {
+    return await clientContext?.getVisitorContext?.();
+}
+
+/**
+ * Send the combined webframe state once visitor context has been resolved.
+ */
+async function sendWebframeState(args: {
+    elementData: ContentKitWebFrame['data'];
+    rendererState: object;
+    clientContext: ContentKitClientContextData | undefined;
+    sendMessage: (message: object) => void;
+    abort: { cancelled: boolean };
+}) {
+    const { elementData, rendererState, clientContext, sendMessage, abort } = args;
+    const state = resolveWebframeState(elementData, rendererState);
+    const visitorContext = await resolveVisitorContext(clientContext);
+
+    if (abort.cancelled) {
+        return;
+    }
+
+    if (typeof visitorContext !== 'undefined') {
+        Object.assign(state, visitorContext);
+    }
+
+    if (Object.keys(state).length > 0) {
+        sendMessage({ state });
+    }
 }

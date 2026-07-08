@@ -1,7 +1,7 @@
 import type { RouteParams } from '@/app/utils';
 import { EmbeddableAssistantPage } from '@/components/Embeddable';
+import { isAIChatEnabled } from '@/components/utils/isAIChatEnabled';
 import { getEmbeddableStaticContext } from '@/lib/embeddable';
-import { CustomizationAIMode } from '@gitbook/api';
 import { redirect } from 'next/navigation';
 
 export const dynamic = 'force-static';
@@ -15,7 +15,7 @@ export default async function Page(props: PageProps) {
     const { context } = await getEmbeddableStaticContext(params);
 
     // If the assistant is not enabled, redirect to the docs
-    if (context.customization.ai.mode !== CustomizationAIMode.Assistant) {
+    if (!isAIChatEnabled(context.customization.ai.mode)) {
         redirect(`${context.linker.toPathInSite('~gitbook/embed/page/')}`);
     }
 

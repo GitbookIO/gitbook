@@ -17,6 +17,18 @@ export function createStateKey(key: string, scope?: string) {
 }
 
 /**
+ * Read the `x-gitbook-mcp-url` extension from any spec object, treating an empty string as unset
+ * so it falls through to the next level when resolving the operation > path > root cascade.
+ */
+export function readMcpUrl(obj: unknown): string | undefined {
+    if (obj && typeof obj === 'object' && 'x-gitbook-mcp-url' in obj) {
+        const value = obj['x-gitbook-mcp-url'];
+        return typeof value === 'string' && value ? value : undefined;
+    }
+    return undefined;
+}
+
+/**
  * Check if an object has a description. Either at the root level or in items.
  */
 function hasDescription(object: AnyObject) {
@@ -255,6 +267,66 @@ export function getEffectiveArrayType(schema: OpenAPIV3.SchemaObject | OpenAPIV3
     }
 
     return { isArray: false, hasNull: false };
+}
+
+/**
+ * Check if a schema only describes the `null` type, i.e. it is used as a nullability
+ * marker inside an `anyOf`/`oneOf` (OpenAPI 3.1+).
+ */
+function isNullSchema(schema: OpenAPIV3.SchemaObject | OpenAPIV3.ReferenceObject): boolean {
+    if (checkIsReference(schema)) {
+        return false;
+    }
+    // `null` is only a valid type in OpenAPI 3.1+, hence the widening.
+    const type = schema.type as string | string[] | undefined;
+    if (Array.isArray(type)) {
+        return type.length > 0 && type.every((t) => t === 'null');
+    }
+    return type === 'null';
+}
+
+/**
+ * Normalize the OpenAPI 3.1+ idiom of expressing nullability through `anyOf`/`oneOf`
+ * (e.g. `anyOf: [{ type: 'string' }, { type: 'null' }]`) into a regular nullable schema,
+ * mirroring how `type: ['string', 'null']` is handled.
+ *
+ * - Single non-null member: collapse into that member with `nullable: true`.
+ * - Multiple non-null members (or a single `$ref` member): drop the null member and keep
+ *   the union, flagged `nullable: true`.
+ * - No null member: returned unchanged (preserves identity for circular-ref tracking).
+ */
+export function normalizeNullableUnion(
+    schema: OpenAPIV3.SchemaObject | OpenAPIV3_1.SchemaObject
+): OpenAPIV3.SchemaObject {
+    const typed = schema as OpenAPIV3.SchemaObject;
+
+    const isAnyOf = Array.isArray(typed.anyOf);
+    const isOneOf = !isAnyOf && Array.isArray(typed.oneOf);
+    if (!isAnyOf && !isOneOf) {
+        return typed;
+    }
+
+    const unionKey = isAnyOf ? 'anyOf' : 'oneOf';
+    const union = (isAnyOf ? typed.anyOf : typed.oneOf) as (
+        | OpenAPIV3.SchemaObject
+        | OpenAPIV3.ReferenceObject
+    )[];
+
+    const nonNullMembers = union.filter((member) => !isNullSchema(member));
+    if (nonNullMembers.length === union.length) {
+        // No null member, nothing to normalize.
+        return typed;
+    }
+
+    const { anyOf: _anyOf, oneOf: _oneOf, ...rest } = typed;
+
+    const single = nonNullMembers.length === 1 ? nonNullMembers[0] : undefined;
+    if (single && !checkIsReference(single)) {
+        // Outer-level metadata (description, title, …) takes precedence over the member's.
+        return { ...single, ...rest, nullable: true };
+    }
+
+    return { ...rest, [unionKey]: nonNullMembers, nullable: true };
 }
 
 export function getSchemaTitle(

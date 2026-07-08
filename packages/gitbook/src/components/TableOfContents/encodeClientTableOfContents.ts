@@ -1,4 +1,5 @@
 import type { GitBookSiteContext } from '@/lib/context';
+import { getOpenAPIOperationPageProps } from '@/lib/openapi/computedSourceProps';
 import { getPagePaths, hasPageVisibleDescendant } from '@/lib/pages';
 import { resolveContentRef } from '@/lib/references';
 import { getRevisionTags, resolveTag } from '@/lib/tags';
@@ -26,6 +27,7 @@ export type ClientTOCPageDocument = {
     pathnames: string[];
     descendants?: ClientTOCPage[];
     primaryTag?: RevisionTag;
+    openAPIOperation?: { method: string; deprecated: boolean };
 };
 
 export type ClientTOCPageGroup = {
@@ -83,6 +85,7 @@ export async function encodeClientTableOfContents(
                         pathnames: getPagePaths(rootPages, page),
                         descendants,
                         primaryTag,
+                        openAPIOperation: getOpenAPIOperationPageProps(page),
                         type: 'document',
                     })
                 );

@@ -1,10 +1,11 @@
 'use client';
 
-import { CustomizationAIMode } from '@gitbook/api';
+import type { CustomizationAIMode } from '@gitbook/api';
 import { Icon, type IconName } from '@gitbook/icons';
 import * as React from 'react';
 import type { ReactNode } from 'react';
 
+import { isAIChatEnabled, isAISearchEnabled } from '@/components/utils/isAIChatEnabled';
 import { tString, useLanguage } from '@/intl/client';
 import type { GitBookAssistant } from '@gitbook/browser-types';
 import { useAIChatController, useAIChatState } from '.';
@@ -63,7 +64,7 @@ export function AIContextProvider(props: React.PropsWithChildren<AIConfig>): Rea
     return <AIContext.Provider value={value}>{children}</AIContext.Provider>;
 }
 
-function useAIConfig(): AIConfig {
+export function useAIConfig(): AIConfig {
     const ctx = React.useContext(AIContext);
     if (!ctx) {
         throw new Error('useAI must be used within AIContextProvider');
@@ -89,13 +90,13 @@ export function useAI(): AIContext {
 
     const assistants: Assistant[] = [];
 
-    if (config.aiMode === CustomizationAIMode.Assistant) {
+    if (isAIChatEnabled(config.aiMode)) {
         assistants.push({
             id: 'gitbook-assistant',
             label: config.assistantName ?? getAIChatName(language, config.trademark),
             icon: (
                 <AIChatIcon
-                    state={chat.loading ? 'thinking' : 'default'}
+                    state={chat.responding ? 'thinking' : 'default'}
                     trademark={config.trademark}
                     className="size-text-lg"
                 />
@@ -110,7 +111,7 @@ export function useAI(): AIContext {
             ui: true,
             mode: 'sidebar',
         });
-    } else if (config.aiMode === CustomizationAIMode.Search) {
+    } else if (isAISearchEnabled(config.aiMode)) {
         assistants.push({
             id: 'gitbook-ai-search',
             label: tString(language, 'ai_chat_context_badge'),

@@ -2,6 +2,7 @@
 
 import { tcls } from '@/lib/tailwind';
 import { SiteInsightsLinkPosition } from '@gitbook/api';
+import { OpenAPIMethodBadge } from '@gitbook/react-openapi';
 import { Tag } from '../Tag';
 import { PagesList } from './PagesList';
 import { TOCPageIcon } from './TOCPageIcon';
@@ -41,7 +42,18 @@ export function PageDocumentItem(props: { page: ClientTOCPageDocument }) {
                 icon={<TOCPageIcon page={page} />}
                 tag={page.primaryTag ? <Tag tag={page.primaryTag} /> : null}
             >
-                {page.title}
+                {page.openAPIOperation ? (
+                    <span className="flex h-[1lh] w-9 shrink-0 self-baseline">
+                        <OpenAPIMethodBadge
+                            method={page.openAPIOperation.method}
+                            short
+                            size="small"
+                        />
+                    </span>
+                ) : null}
+                <span className={page.openAPIOperation?.deprecated ? 'line-through' : undefined}>
+                    {page.title}
+                </span>
             </ToggleableLinkItem>
         </li>
     );

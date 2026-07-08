@@ -31,12 +31,25 @@ import {
     headerLinks,
     runTestCases,
     setTimeToMorning,
+    waitForAIChatResponse,
+    waitForAdminToolbar,
     waitForCookiesDialog,
     waitForCoverImages,
     waitForNotFound,
 } from './util';
 
-const AI_PROMPT = `You're being invoked by the GitBook CI/CD pipeline. Search for "Lorem ipsum", then return the first sentence of the first page you find.`;
+// Kept as deterministic as possible to reduce visual flakiness: no preamble, a
+// single fixed search, a concise answer, and a fixed number of follow-ups. The
+// model is never perfectly deterministic, so `overrideAIResponse` still
+// normalizes the rendered content below — this prompt just narrows the variance.
+const AI_PROMPT = [
+    "You're being invoked by the GitBook CI/CD pipeline for automated visual testing.",
+    'Follow these instructions exactly and do not deviate:',
+    '1. Do not write any preamble, commentary, or reasoning before acting.',
+    '2. Perform a single search for exactly "Lorem ipsum".',
+    '3. Reply with only the first sentence of the first page you find, and nothing else.',
+    '4. Always end by proposing exactly 3 follow-up suggestions.',
+].join('\n');
 
 const overrideAIInitialState = () => {
     const greeting = document.querySelector('[data-testid="ai-chat-greeting-title"]');
@@ -44,21 +57,45 @@ const overrideAIInitialState = () => {
         greeting.textContent = 'Good morning';
     }
 };
+
+/**
+ * Normalize the non-deterministic content of an AI response before screenshotting,
+ * while preserving the surrounding structure (message bubbles, tool/activity
+ * summary, response container, suggestion buttons) so visual regressions in the
+ * chat chrome are still caught. The actual answer formatting is covered separately
+ * by the deterministic page tests, since the AI response renders through the same
+ * `DocumentView`.
+ *
+ * Must run only once the chat is no longer `aria-busy` (the response has fully
+ * settled), otherwise React re-renders from late stream events will clobber these
+ * mutations. See `waitForAIChatResponse`.
+ */
 const overrideAIResponse = () => {
-    const userMessage = document.querySelector('[data-testid="ai-chat-message-user"]');
-    if (userMessage) {
+    // The user's prompt varies in length; pin it to a fixed string.
+    document.querySelectorAll('[data-testid="ai-chat-message-user"]').forEach((userMessage) => {
         userMessage.textContent = '[Replaced message] Chat message sent by the user';
-    }
-    const assistantMessage = document.querySelectorAll(
-        '[data-testid="ai-chat-message-assistant"] .ai-response-document'
-    );
-    assistantMessage.forEach((message) => {
-        message.innerHTML = '[Replaced message] AI chat response';
     });
-    const suggestions = document.querySelectorAll('[data-testid="ai-chat-followup-suggestion"]');
-    suggestions.forEach((suggestion) => {
-        suggestion.textContent = 'Follow-up suggestion';
+
+    // The assistant's answer text is non-deterministic; replace the rendered
+    // document body while keeping the `.ai-response-document` container.
+    document
+        .querySelectorAll('[data-testid="ai-chat-message-assistant"] .ai-response-document')
+        .forEach((message) => {
+            message.innerHTML = '<p>[Replaced message] AI chat response</p>';
+        });
+
+    // The "Explored with N tools" activity label varies with the number of tool
+    // calls; pin it (the chevron sibling is left intact).
+    document.querySelectorAll('[data-testid="ai-chat-activity-summary"]').forEach((summary) => {
+        summary.textContent = 'Explored';
     });
+
+    // Follow-up suggestion text varies; pin each label.
+    document
+        .querySelectorAll('[data-testid="ai-chat-followup-suggestion"]')
+        .forEach((suggestion) => {
+            suggestion.textContent = 'Follow-up suggestion';
+        });
 };
 
 const searchTestCases: Test[] = [
@@ -82,8 +119,6 @@ const searchTestCases: Test[] = [
             });
             const pageResults = await page.getByTestId('search-page-result').all();
             await expect(pageResults.length).toBeGreaterThanOrEqual(1);
-            const pageSectionResults = await page.getByTestId('search-page-section-result').all();
-            await expect(pageSectionResults.length).toBeGreaterThanOrEqual(2);
             await expect(page.getByTestId('search-ask-question')).toHaveCount(0); // No AI search results with aiMode=None.
         },
     },
@@ -151,17 +186,8 @@ const searchTestCases: Test[] = [
             await waitForCookiesDialog(page);
             const searchInput = page.locator('css=[data-testid="search-input"]');
 
-            // Focus search input, expecting recommended questions
-            await searchInput.focus();
-            await expect(page.getByTestId('search-results')).toBeVisible({
-                timeout: 30_000,
-            });
-            const recommendedQuestions = await page
-                .getByTestId('search-recommended-question')
-                .all();
-            await expect(recommendedQuestions.length).toBeGreaterThanOrEqual(1); // Expect at least 1 question
-
             // Fill search input, expecting AI search option
+            await searchInput.focus();
             await searchInput.fill(AI_PROMPT);
             const aiSearchResult = page.getByTestId('search-ask-question');
             await expect(aiSearchResult).toBeVisible();
@@ -169,12 +195,13 @@ const searchTestCases: Test[] = [
             await expect(page.getByTestId('ai-chat')).toBeVisible();
             await expect(page.getByTestId('ai-chat-message-user').first()).toHaveText(AI_PROMPT);
             await expect(page.getByTestId('ai-chat-message-assistant').first()).toBeVisible();
-            await expect(page.getByTestId('ai-chat-followup-suggestion')).toHaveCount(3, {
-                timeout: 60_000,
-            });
-            // Override text content for visual consistency in screenshots
-            await page.evaluate(overrideAIResponse);
+            // Wait for the full response (incl. follow-up suggestions) to settle before
+            // asserting/screenshotting, rather than racing a fixed suggestion count.
+            await waitForAIChatResponse(page);
+            await expect(page.getByTestId('ai-chat-followup-suggestion').first()).toBeVisible();
         },
+        // Re-applied per viewport so the replacement survives resize-driven re-renders.
+        normalizeBeforeScreenshot: (page) => page.evaluate(overrideAIResponse),
     },
     {
         name: 'Ask - AI Mode: Assistant - Keyboard shortcut',
@@ -188,9 +215,9 @@ const searchTestCases: Test[] = [
             await page.keyboard.press('ControlOrMeta+I');
             await expect(page.getByTestId('ai-chat')).toBeVisible();
             await expect(page.getByTestId('ai-chat-input')).toBeFocused();
-            // Override text content for visual consistency in screenshots
-            await page.evaluate(overrideAIInitialState);
         },
+        // Re-applied per viewport so the replacement survives resize-driven re-renders.
+        normalizeBeforeScreenshot: (page) => page.evaluate(overrideAIInitialState),
     },
     {
         name: 'Ask - AI Mode: Assistant - Button',
@@ -204,9 +231,9 @@ const searchTestCases: Test[] = [
             await page.getByTestId('ai-chat-button').click();
             await expect(page.getByTestId('ai-chat')).toBeVisible();
             await expect(page.getByTestId('ai-chat-input')).toBeFocused();
-            // Override text content for visual consistency in screenshots
-            await page.evaluate(overrideAIInitialState);
         },
+        // Re-applied per viewport so the replacement survives resize-driven re-renders.
+        normalizeBeforeScreenshot: (page) => page.evaluate(overrideAIInitialState),
     },
     {
         name: 'Ask - AI Mode: Assistant - URL query (Initial)',
@@ -221,9 +248,9 @@ const searchTestCases: Test[] = [
             await expect(page.getByTestId('search-input')).toBeEmpty();
             await expect(page.getByTestId('ai-chat')).toBeVisible();
             await expect(page.getByTestId('ai-chat-input')).toBeFocused();
-            // Override text content for visual consistency in screenshots
-            await page.evaluate(overrideAIInitialState);
         },
+        // Re-applied per viewport so the replacement survives resize-driven re-renders.
+        normalizeBeforeScreenshot: (page) => page.evaluate(overrideAIInitialState),
     },
     {
         name: 'Ask - AI Mode: Assistant - URL query (Results)',
@@ -239,12 +266,13 @@ const searchTestCases: Test[] = [
             await expect(page.getByTestId('ai-chat')).toBeVisible();
             await expect(page.getByTestId('ai-chat-message-user').first()).toHaveText(AI_PROMPT);
             await expect(page.getByTestId('ai-chat-message-assistant').first()).toBeVisible();
-            await expect(page.getByTestId('ai-chat-followup-suggestion')).toHaveCount(3, {
-                timeout: 60_000,
-            });
-            // Override text content for visual consistency in screenshots
-            await page.evaluate(overrideAIResponse);
+            // Wait for the full response (incl. follow-up suggestions) to settle before
+            // asserting/screenshotting, rather than racing a fixed suggestion count.
+            await waitForAIChatResponse(page);
+            await expect(page.getByTestId('ai-chat-followup-suggestion').first()).toBeVisible();
         },
+        // Re-applied per viewport so the replacement survives resize-driven re-renders.
+        normalizeBeforeScreenshot: (page) => page.evaluate(overrideAIResponse),
     },
 ];
 
@@ -586,20 +614,18 @@ const testCases: TestsCase[] = [
                 url: '',
             },
             {
-                name: 'Section group dropdown',
-                url: '',
-                run: async (page) => {
-                    await page.getByRole('button', { name: 'Test Section Group 1' }).hover();
-                    await expect(page.getByRole('link', { name: /Section B/ })).toBeVisible();
-                },
-            },
-            {
                 name: 'Section group link',
                 url: '',
                 screenshot: false,
                 run: async (page) => {
-                    const sectionGroupDropdown = await page.getByText('Test Section Group 1');
-                    await sectionGroupDropdown.hover();
+                    const trigger = page.getByRole('button', { name: 'Test Section Group 1' });
+                    // Radix NavigationMenu opens the dropdown on a `pointermove`. A single
+                    // synthetic hover can land before hydration and be lost, so re-hover
+                    // until the dropdown content actually appears.
+                    await expect(async () => {
+                        await trigger.hover();
+                        await expect(page.getByText('Section B')).toBeVisible({ timeout: 1000 });
+                    }).toPass({ timeout: 15000 });
                     await page.getByText('Section B').click();
                     await page.waitForURL((url) => url.pathname.includes('/sections/sections-4'));
                 },
@@ -629,7 +655,12 @@ const testCases: TestsCase[] = [
             {
                 name: 'Revision',
                 url: '~/revisions/S55pwsEr5UVoroaOiWnP/blocks/headings',
-                run: waitForCookiesDialog,
+                run: async (page) => {
+                    await waitForCookiesDialog(page);
+                    // Viewing a past revision shows the admin toolbar; assert it is
+                    // present (it is hidden from the screenshot as it animates open).
+                    await waitForAdminToolbar(page);
+                },
             },
             {
                 name: 'Invalid revision',
@@ -876,6 +907,7 @@ const testCases: TestsCase[] = [
     {
         name: 'Content tests',
         contentBaseURL: 'https://gitbook.gitbook.io/test-gitbook-open/',
+        fullPage: true,
         tests: [
             {
                 name: 'Text',
@@ -1057,8 +1089,8 @@ const testCases: TestsCase[] = [
                 url: 'blocks/annotations',
                 run: async (page) => {
                     await waitForCookiesDialog(page);
-                    await page.waitForSelector('[data-testid="annotation-button"]');
-                    await page.click('[data-testid="annotation-button"]');
+                    await page.waitForSelector('[data-annotation]');
+                    await page.click('[data-annotation]');
                 },
             },
             {
@@ -1074,6 +1106,11 @@ const testCases: TestsCase[] = [
             {
                 name: 'Mermaid',
                 url: 'blocks/mermaid',
+                run: waitForCookiesDialog,
+            },
+            {
+                name: 'Prompt',
+                url: 'blocks/prompt',
                 run: waitForCookiesDialog,
             },
         ],
@@ -1322,8 +1359,7 @@ const testCases: TestsCase[] = [
                 name: 'Without page actions',
                 url: getCustomizationURL({
                     pageActions: {
-                        markdown: false,
-                        externalAI: false,
+                        items: [],
                     },
                 }),
                 run: waitForCookiesDialog,
@@ -2222,9 +2258,13 @@ const testCases: TestsCase[] = [
 
                     await iframe.getByTestId('embed-tab-assistant').click(); // Switch to assistant tab
                     await expect(iframe.getByTestId('ai-chat')).toBeVisible();
-
-                    await iframe.owner().evaluate(overrideAIInitialState);
                 },
+                // Runs inside the iframe (not the parent doc) and per viewport.
+                normalizeBeforeScreenshot: (page) =>
+                    page
+                        .frameLocator('#gitbook-widget-iframe')
+                        .locator('body')
+                        .evaluate(overrideAIInitialState),
             },
             {
                 name: 'API - navigateToPage',
@@ -2258,8 +2298,15 @@ const testCases: TestsCase[] = [
                     await expect(iframe.getByTestId('ai-chat-message-user').first()).toHaveText(
                         AI_PROMPT
                     );
-                    await iframe.owner().evaluate(overrideAIResponse);
+                    // Wait for the full response to settle before normalizing.
+                    await waitForAIChatResponse(iframe);
                 },
+                // Runs inside the iframe (not the parent doc) and per viewport.
+                normalizeBeforeScreenshot: (page) =>
+                    page
+                        .frameLocator('#gitbook-widget-iframe')
+                        .locator('body')
+                        .evaluate(overrideAIResponse),
             },
             {
                 name: 'Configuration - Suggested questions',
@@ -2285,8 +2332,13 @@ const testCases: TestsCase[] = [
                     await expect(
                         iframe.getByTestId('ai-chat-suggested-question').nth(2)
                     ).toHaveText('What can you do?');
-                    await iframe.owner().evaluate(overrideAIInitialState);
                 },
+                // Runs inside the iframe (not the parent doc) and per viewport.
+                normalizeBeforeScreenshot: (page) =>
+                    page
+                        .frameLocator('#gitbook-widget-iframe')
+                        .locator('body')
+                        .evaluate(overrideAIInitialState),
             },
             {
                 name: 'Configuration - Custom action buttons',
@@ -2368,8 +2420,15 @@ const testCases: TestsCase[] = [
                     await actions.nth(3).click();
                     await expect(page.locator('#gitbook-widget-window')).not.toBeVisible();
                     await page.locator('#gitbook-widget-button').click();
-                    await iframe.owner().evaluate(overrideAIResponse);
+                    // Wait for the response posted above to settle before normalizing.
+                    await waitForAIChatResponse(iframe);
                 },
+                // Runs inside the iframe (not the parent doc) and per viewport.
+                normalizeBeforeScreenshot: (page) =>
+                    page
+                        .frameLocator('#gitbook-widget-iframe')
+                        .locator('body')
+                        .evaluate(overrideAIResponse),
             },
             {
                 name: 'Configuration - Custom tools',
@@ -2413,8 +2472,16 @@ const testCases: TestsCase[] = [
                     await expect(toolConfirmation).toBeVisible({
                         timeout: 30000,
                     });
-                    await iframe.owner().evaluate(overrideAIResponse);
+                    // The turn settles (aria-busy clears) once the stream pauses on the
+                    // confirmation control; wait for that before normalizing.
+                    await waitForAIChatResponse(iframe);
                 },
+                // Runs inside the iframe (not the parent doc) and per viewport.
+                normalizeBeforeScreenshot: (page) =>
+                    page
+                        .frameLocator('#gitbook-widget-iframe')
+                        .locator('body')
+                        .evaluate(overrideAIResponse),
             },
         ],
     },

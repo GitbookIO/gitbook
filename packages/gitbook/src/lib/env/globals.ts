@@ -85,6 +85,15 @@ export const GITBOOK_INTEGRATIONS_HOST =
     process.env.GITBOOK_INTEGRATIONS_HOST || 'integrations.gitbook.com';
 
 /**
+ * Hostname serving integration-rendered content (e.g. WebFrames), isolated from the
+ * cookie-bearing integrations origin to remediate stored-XSS on the main origin.
+ * Defaults to `GITBOOK_INTEGRATIONS_HOST` until a distinct content origin is configured,
+ * which keeps behavior unchanged.
+ */
+export const GITBOOK_INTEGRATIONS_CONTENT_HOST =
+    process.env.GITBOOK_INTEGRATIONS_CONTENT_HOST || GITBOOK_INTEGRATIONS_HOST;
+
+/**
  * Hostname for fonts.
  */
 export const GITBOOK_FONTS_URL = process.env.GITBOOK_FONTS_URL || 'https://fonts.gitbook.com';
@@ -96,14 +105,15 @@ export const GITBOOK_FONTS_URL = process.env.GITBOOK_FONTS_URL || 'https://fonts
 export const GITBOOK_IMAGE_RESIZE_URL = process.env.GITBOOK_IMAGE_RESIZE_URL ?? null;
 export const GITBOOK_IMAGE_RESIZE_SIGNING_KEY =
     process.env.GITBOOK_IMAGE_RESIZE_SIGNING_KEY ?? null;
+export const GITBOOK_IMAGE_RESIZE_SALT = process.env.GITBOOK_IMAGE_RESIZE_SALT ?? null;
 
 /**
  * Mode used for resizing images.
  */
 export const GITBOOK_IMAGE_RESIZE_MODE = enforceEnum(
     'GITBOOK_IMAGE_RESIZE_MODE',
-    process.env.GITBOOK_IMAGE_RESIZE_MODE || 'cdn-cgi',
-    ['cdn-cgi', 'cf-fetch']
+    process.env.GITBOOK_IMAGE_RESIZE_MODE || 'cf-fetch',
+    ['cf-fetch', 'gitbook-service', 'cdn-cgi']
 );
 
 /**

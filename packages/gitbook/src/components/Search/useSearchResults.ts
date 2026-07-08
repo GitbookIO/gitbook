@@ -3,20 +3,33 @@ import React from 'react';
 
 import { assert } from 'ts-essentials';
 
+import {
+    type RecommendedQuestionResult,
+    createRecommendedQuestionResult,
+    getEmptySearchResults,
+} from './empty-search-results';
 import type { OrderedComputedResult } from './search-types';
 import { streamRecommendedQuestions } from './server-actions';
 
-import { type Assistant, useAI } from '@/components/AI';
+import { useAI } from '@/components/AI';
 import assertNever from 'assert-never';
-import { useEventCallback } from 'usehooks-ts';
 import { useTrackEvent } from '../Insights';
-import { isQuestion } from './isQuestion';
+import { computeFilterSiteSpaceIds } from './filter';
+import { useRecentSearchQueries } from './recent-queries';
+import { type MergedPageResult, reciprocalRankFusion } from './reciprocalRankFusion';
+import { type LocalPageResult, useLocalSearchResults } from './useLocalSearchResults';
 import type { SearchScope } from './useSearch';
 
 export type ResultType =
     | OrderedComputedResult
-    | { type: 'question'; id: string; query: string; assistant: Assistant }
-    | { type: 'recommended-question'; id: string; question: string };
+    | LocalPageResult
+    | MergedPageResult
+    | RecommendedQuestionResult;
+
+export type { LocalPageResult, MergedPageResult };
+
+// Small helper extracted for unit testing of scope → local filter mapping
+// computeFilterSiteSpaceIds is imported from './filter' for testability
 
 /**
  * We cache the recommended questions globally to avoid calling the API multiple times
@@ -24,7 +37,7 @@ export type ResultType =
  * have different recommended questions for different spaces of the same site.
  * It should not be used outside of an useEffect.
  */
-const cachedRecommendedQuestions: Map<string, ResultType[]> = new Map();
+const cachedRecommendedQuestions: Map<string, RecommendedQuestionResult[]> = new Map();
 
 export function useSearchResults(props: {
     asEmbeddable?: boolean;
@@ -36,6 +49,12 @@ export function useSearchResults(props: {
     suggestions?: string[];
     /** URL for the search API route (e.g. from linker.toPathInSpace('~gitbook/search')). */
     searchURL: string;
+    /** URL for the local index JSON (e.g. from linker.toPathInSite('~gitbook/index')). */
+    indexURL: string;
+    /** BCP-47 language code of the current site space, used to filter local search results. */
+    lang?: string;
+    /** Whether the site has multiple sections. If false, treat default scope as current for local filtering. */
+    withSections?: boolean;
 }) {
     const {
         asEmbeddable,
@@ -46,19 +65,39 @@ export function useSearchResults(props: {
         scope,
         suggestions,
         searchURL,
+        indexURL,
+        lang,
+        withSections,
     } = props;
 
     const trackEvent = useTrackEvent();
 
-    const [resultsState, setResultsState] = React.useState<{
-        results: ResultType[];
+    const filterSiteSpaceIds = React.useMemo(
+        () => computeFilterSiteSpaceIds(scope, siteSpaceId, siteSpaceIds, withSections),
+        [scope, siteSpaceId, siteSpaceIds, withSections]
+    );
+
+    const { results: localResults } = useLocalSearchResults({
+        query,
+        indexURL,
+        lang,
+        disabled,
+        filterSiteSpaceIds,
+    });
+
+    const [remoteState, setRemoteState] = React.useState<{
+        results: OrderedComputedResult[];
         fetching: boolean;
         error: boolean;
     }>({ results: [], fetching: false, error: false });
 
+    // Track the current in-flight fetch so it can be aborted imperatively
+    // when the user navigates away before the request completes.
+    const abortRef = React.useRef<(() => void) | null>(null);
+
     const { assistants } = useAI();
-    const getAssistants = useEventCallback(() => assistants);
     const withAI = assistants.length > 0;
+    const recentQueries = useRecentSearchQueries(siteSpaceId);
 
     React.useEffect(() => {
         if (disabled) {
@@ -66,7 +105,7 @@ export function useSearchResults(props: {
         }
         if (!query) {
             if (!withAI) {
-                setResultsState({ results: [], fetching: false, error: false });
+                setRemoteState({ results: [], fetching: false, error: false });
                 return;
             }
 
@@ -76,32 +115,25 @@ export function useSearchResults(props: {
                     results,
                     `Cached recommended questions should be set for site-space ${siteSpaceId}`
                 );
-                setResultsState({ results, fetching: false, error: false });
+                // Recommended questions are stored as ResultType[] already
+                setRemoteState({ results: [], fetching: false, error: false });
                 return;
             }
 
-            setResultsState({ results: [], fetching: false, error: false });
+            setRemoteState({ results: [], fetching: false, error: false });
 
             let cancelled = false;
 
             // We currently have a bug where the same question can be returned multiple times.
             // This is a workaround to avoid that.
             const questions = new Set<string>();
-            const recommendedQuestions: ResultType[] = [];
+            const recommendedQuestions: RecommendedQuestionResult[] = [];
 
             if (suggestions && suggestions.length > 0) {
                 suggestions.forEach((question) => {
                     questions.add(question);
                 });
-                setResultsState({
-                    results: suggestions.map((question, index) => ({
-                        type: 'recommended-question',
-                        id: `recommended-question-${index}`,
-                        question,
-                    })),
-                    fetching: false,
-                    error: false,
-                });
+                setRemoteState({ results: [], fetching: false, error: false });
                 return;
             }
 
@@ -122,19 +154,12 @@ export function useSearchResults(props: {
                     }
 
                     questions.add(question);
-                    recommendedQuestions.push({
-                        type: 'recommended-question',
-                        id: question,
-                        question,
-                    });
+                    recommendedQuestions.push(createRecommendedQuestionResult(question, question));
                     cachedRecommendedQuestions.set(siteSpaceId, recommendedQuestions);
 
                     if (!cancelled) {
-                        setResultsState({
-                            results: [...recommendedQuestions],
-                            fetching: false,
-                            error: false,
-                        });
+                        // Recommended questions are handled via a separate path below
+                        setRemoteState({ results: [], fetching: false, error: false });
                     }
                 }
             }, 100);
@@ -144,8 +169,8 @@ export function useSearchResults(props: {
                 clearTimeout(timeout);
             };
         }
-        setResultsState({
-            results: withAI ? withAskTriggers([], query, getAssistants()) : [],
+        setRemoteState({
+            results: [],
             fetching: true,
             error: false,
         });
@@ -191,15 +216,11 @@ export function useSearchResults(props: {
                     // One time when this one returns undefined is when it cannot find the server action and returns the html from the page.
                     // In that case, we want to avoid being stuck in a loading state, but it is an error.
                     // We could potentially try to force reload the page here, but i'm not 100% sure it would be a better experience.
-                    setResultsState({ results: [], fetching: false, error: true });
+                    setRemoteState({ results: [], fetching: false, error: true });
                     return;
                 }
 
-                const aiEnrichedResults = withAI
-                    ? withAskTriggers(results, query, getAssistants())
-                    : results;
-
-                setResultsState({ results: aiEnrichedResults, fetching: false, error: false });
+                setRemoteState({ results, fetching: false, error: false });
 
                 trackEvent({
                     type: 'search_type_query',
@@ -210,14 +231,21 @@ export function useSearchResults(props: {
                 if (cancelled) {
                     return;
                 }
-                setResultsState({ results: [], fetching: false, error: true });
+                setRemoteState({ results: [], fetching: false, error: true });
             }
         }, 200);
+
+        abortRef.current = () => {
+            cancelled = true;
+            clearTimeout(timeout);
+            abortController.abort();
+        };
 
         return () => {
             cancelled = true;
             clearTimeout(timeout);
             abortController.abort();
+            abortRef.current = null;
         };
     }, [
         query,
@@ -230,10 +258,43 @@ export function useSearchResults(props: {
         suggestions,
         searchURL,
         asEmbeddable,
-        getAssistants,
     ]);
 
-    return resultsState;
+    const abort = React.useCallback(() => {
+        abortRef.current?.();
+        abortRef.current = null;
+        setRemoteState((prev) => (prev.fetching ? { ...prev, fetching: false } : prev));
+    }, []);
+
+    // Merge local and remote results.
+    // Re-runs immediately whenever either result set changes.
+    const results = React.useMemo<ResultType[]>(() => {
+        if (!query) {
+            const recommendedQuestions =
+                cachedRecommendedQuestions.get(siteSpaceId) ??
+                suggestions?.map((question, index) =>
+                    createRecommendedQuestionResult(`recommended-question-${index}`, question)
+                ) ??
+                [];
+
+            return getEmptySearchResults({
+                withAI,
+                recentQueries,
+                recommendedQuestions,
+            });
+        }
+
+        const merged = reciprocalRankFusion(localResults, remoteState.results, query);
+
+        return merged;
+    }, [localResults, remoteState.results, query, withAI, siteSpaceId, suggestions, recentQueries]);
+
+    return {
+        results,
+        fetching: remoteState.fetching,
+        error: remoteState.error,
+        abort,
+    };
 }
 
 /**
@@ -265,32 +326,4 @@ async function fetchSearchResults(
     }
 
     return response.json() as Promise<OrderedComputedResult[]>;
-}
-
-/**
- * Add a "Ask <question>" item at the top of the results list.
- */
-function withAskTriggers(
-    results: ResultType[],
-    query: string,
-    assistants: Assistant[]
-): ResultType[] {
-    const without = results.filter((result) => result.type !== 'question');
-
-    if (query.length === 0) {
-        return without;
-    }
-
-    const queryIsQuestion = isQuestion(query);
-
-    return [
-        ...(queryIsQuestion ? [] : (without ?? [])),
-        ...assistants.map((assistant, index) => ({
-            type: 'question' as const,
-            id: `question-${index}`,
-            query,
-            assistant,
-        })),
-        ...(!queryIsQuestion ? [] : (without ?? [])),
-    ];
 }

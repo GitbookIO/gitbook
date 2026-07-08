@@ -1,5 +1,8 @@
 'use client';
 
+import type { SiteInsightsSession } from '@gitbook/api';
+import type { MaybePromise } from 'p-map';
+import React from 'react';
 import { createStore, useStore } from 'zustand';
 
 import {
@@ -9,13 +12,12 @@ import {
     setLocalStorageItem,
 } from '@/lib/browser';
 
-import type { MaybePromise } from 'p-map';
-import React from 'react';
 import { isCookiesTrackingDisabled } from './cookies';
+import { getSession } from './sessions';
 import { generateRandomId } from './utils';
 
 const VISITORID_COOKIE = '__session';
-const VISITOR_UPDATED_AT_STORAGE_KEY = '__session_updated';
+const VISITOR_STORAGE_KEY = '__session_updated';
 
 /**
  * Visitor state when the visitor is not a signed-in GitBook user.
@@ -38,31 +40,38 @@ type VisitorUserResponse = Pick<AnyVisitorResponse, 'deviceId'> & {
 };
 
 /**
- * Time while a cookie is considered valid before revalidating it.
+ * Time while a stored visitor is considered valid before revalidating it.
  */
 const STALE_TIME_MS = 60 * 60 * 1000;
 
-function getVisitorUpdatedAt(deviceId: string): number | null {
-    const value = getLocalStorageItem<{ deviceId: string; updatedAt: number } | null>(
-        VISITOR_UPDATED_AT_STORAGE_KEY,
-        null
-    );
-    if (!value) {
-        return null;
-    }
-    if (value.deviceId !== deviceId) {
-        clearVisitorUpdatedAt();
-        return null;
-    }
-    return value.updatedAt;
+interface StoredVisitor {
+    visitor: VisitorResponse;
+    updatedAt: number;
 }
 
-function clearVisitorUpdatedAt() {
-    removeLocalStorageItem(VISITOR_UPDATED_AT_STORAGE_KEY);
+interface StoredVisitorRaw {
+    visitor?: unknown;
+    deviceId?: unknown;
+    updatedAt?: unknown;
 }
 
-function setVisitorUpdatedAt(deviceId: string, updatedAt: number) {
-    setLocalStorageItem(VISITOR_UPDATED_AT_STORAGE_KEY, { deviceId, updatedAt });
+function getStoredVisitor(): StoredVisitor | null {
+    const value = getLocalStorageItem<StoredVisitorRaw | null>(VISITOR_STORAGE_KEY, null);
+    if (!value || typeof value.updatedAt !== 'number') {
+        return null;
+    }
+    if (isVisitor(value.visitor)) {
+        return { visitor: value.visitor, updatedAt: value.updatedAt };
+    }
+    // Migrate the legacy { deviceId, updatedAt } shape written by older clients.
+    if (typeof value.deviceId === 'string' && value.deviceId) {
+        return { visitor: { deviceId: value.deviceId }, updatedAt: value.updatedAt };
+    }
+    return null;
+}
+
+function setStoredVisitor(visitor: VisitorResponse, updatedAt: number) {
+    setLocalStorageItem(VISITOR_STORAGE_KEY, { visitor, updatedAt });
 }
 
 export type VisitorResponse = AnyVisitorResponse | VisitorUserResponse;
@@ -75,10 +84,6 @@ function isVisitor(value: unknown): value is VisitorResponse {
             typeof value.deviceId === 'string' &&
             value.deviceId
     );
-}
-
-function isSignedInVisitor(value: unknown): value is VisitorUserResponse {
-    return Boolean(isVisitor(value) && value?.userId && value.organizationId);
 }
 
 const visitorStore = createStore<{
@@ -127,6 +132,16 @@ export function useVisitor() {
 }
 
 /**
+ * Get the visitor session for insights.
+ */
+export async function getInsightsSession(): Promise<SiteInsightsSession> {
+    return {
+        sessionId: getSession().id,
+        visitorId: (await getVisitor()).deviceId,
+    };
+}
+
+/**
  * Get the current visitor ID.
  */
 export function getVisitor(): MaybePromise<VisitorResponse> {
@@ -159,13 +174,21 @@ function getGlobalVisitor({
     const withoutCookies = isCookiesTrackingDisabled();
 
     if (withoutCookies || !visitorCookieTrackingEnabled) {
+        // Consent withdrawn or tracking disabled: stop using AND retaining the stored id.
+        removeLocalStorageItem(VISITOR_STORAGE_KEY);
         return { visitor: { deviceId: getProposedVisitorId() }, pendingVisitor: null };
     }
+
+    const { existing, proposedId } = getVisitorFromCookies();
+    const stored = getStoredVisitor();
+
+    // Cookie wins, localStorage survives third-party cookie blocking, proposed id is the fallback
+    const stableId = existing?.deviceId ?? stored?.visitor.deviceId ?? proposedId;
 
     const fetchGlobalVisitor = async () => {
         const url = new URL(appURL);
         url.pathname = '/__session/2/';
-        url.searchParams.set('proposed', proposedId);
+        url.searchParams.set('proposed', stableId);
 
         try {
             const resp = await fetch(url, {
@@ -186,33 +209,26 @@ function getGlobalVisitor({
                 throw new Error(`Unexpected __session format: ${JSON.stringify(visitor)}`);
             }
 
-            // When cookie tracking is disabled we still allow a signed-in session to be detected,
-            // but otherwise we preserve the no-cookie behavior by returning an anonymous visitor.
-            if (!isSignedInVisitor(visitor)) {
-                clearVisitorUpdatedAt();
-                return { deviceId: proposedId };
-            }
-
-            setVisitorUpdatedAt(visitor.deviceId, Date.now());
+            setStoredVisitor(visitor, Date.now());
 
             return visitor;
         } catch (error) {
-            clearVisitorUpdatedAt();
             console.error('Failed to fetch visitor session ID', error);
-            if (existing) {
-                return existing;
-            }
-            return { deviceId: proposedId };
+            return existing ?? stored?.visitor ?? { deviceId: stableId };
         }
     };
 
-    const { existing, proposedId } = getVisitorFromCookies();
-
-    if (existing) {
-        // Revalidate in background if stale.
-        const updatedAt = getVisitorUpdatedAt(existing.deviceId);
-        const isStale = !updatedAt || updatedAt < Date.now() - STALE_TIME_MS;
-        return { visitor: existing, pendingVisitor: isStale ? fetchGlobalVisitor() : null };
+    // Return immediately if we already have a visitor, revalidate in the background only when stale
+    const immediate = existing ?? stored?.visitor ?? null;
+    if (immediate) {
+        const isStale =
+            !stored ||
+            stored.visitor.deviceId !== immediate.deviceId ||
+            stored.updatedAt < Date.now() - STALE_TIME_MS;
+        return {
+            visitor: immediate,
+            pendingVisitor: isStale ? fetchGlobalVisitor() : null,
+        };
     }
 
     return { visitor: null, pendingVisitor: fetchGlobalVisitor() };

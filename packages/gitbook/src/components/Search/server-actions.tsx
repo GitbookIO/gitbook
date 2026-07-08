@@ -1,5 +1,6 @@
 'use server';
 
+import { isAIEnabled, isAISearchEnabled } from '@/components/utils/isAIChatEnabled';
 import type { GitBookSiteContext } from '@/lib/context';
 import { resolvePageId } from '@/lib/pages';
 import { fetchServerActionSiteContext, getServerActionBaseContext } from '@/lib/server-actions';
@@ -10,6 +11,7 @@ import type {
     RevisionPage,
     SearchAIAnswer,
     SearchAIRecommendedQuestionStream,
+    SiteInsightsSession,
 } from '@gitbook/api';
 import { createStreamableValue } from 'ai/rsc';
 import type * as React from 'react';
@@ -40,9 +42,11 @@ export interface AskAnswerResult {
 export async function streamAskQuestion({
     asEmbeddable,
     question,
+    session,
 }: {
     asEmbeddable?: boolean;
     question: string;
+    session: SiteInsightsSession;
 }) {
     return traceErrorOnly('Search.streamAskQuestion', async () => {
         const responseStream = createStreamableValue<AskAnswerResult | undefined>();
@@ -51,6 +55,10 @@ export async function streamAskQuestion({
             const context = await fetchServerActionSiteContext(
                 await getServerActionBaseContext({ isEmbeddable: asEmbeddable })
             );
+
+            if (!isAISearchEnabled(context.customization.ai.mode)) {
+                throw new Error('AI Search is not enabled for this site.');
+            }
 
             const apiClient = await context.dataFetcher.api();
 
@@ -66,6 +74,7 @@ export async function streamAskQuestion({
                         mode: 'default',
                         currentSiteSpace: context.siteSpace.id,
                     },
+                    session,
                 },
                 { format: 'document' }
             );
@@ -147,6 +156,11 @@ export async function streamRecommendedQuestions(args: { siteSpaceId?: string })
         >();
 
         (async () => {
+            const siteContext = await fetchServerActionSiteContext(context);
+            if (!isAIEnabled(siteContext.customization.ai.mode)) {
+                throw new Error('AI is not enabled for this site.');
+            }
+
             const apiClient = await context.dataFetcher.api();
             const apiStream = apiClient.orgs.streamRecommendedQuestionsInSite(
                 siteURLData.organization,

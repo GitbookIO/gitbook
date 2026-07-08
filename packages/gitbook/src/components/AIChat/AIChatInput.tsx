@@ -1,29 +1,54 @@
 import { t, tString, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
 import { Icon } from '@gitbook/icons';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
-import { useAIChatState } from '../AI/useAIChat';
+import { useAIChatController, useAIChatState } from '../AI/useAIChat';
 import { HoverCard, HoverCardRoot, HoverCardTrigger } from '../primitives';
 import { Input } from '../primitives/Input';
+import { AIChatReferenceChips } from './AIChatReferenceChips';
 
 export function AIChatInput(props: {
     disabled?: boolean;
     /**
      * When true, the input is disabled
      */
-    loading: boolean;
+    responding: boolean;
     onSubmit: (value: string) => void;
 }) {
-    const { onSubmit, disabled, loading } = props;
+    const { onSubmit, disabled, responding } = props;
 
     const language = useLanguage();
     const chat = useAIChatState();
+    const chatController = useAIChatController();
 
     const inputRef = useRef<HTMLTextAreaElement>(null);
 
+    // Controlled value so a pre-filled draft can be injected without sending it.
+    const [value, setValue] = useState('');
+
+    // Consume a draft staged via the controller (e.g. the per-paragraph "Ask" button): seed the
+    // input, focus it with the cursor at the end, then clear the pending draft so it is applied
+    // once and not re-injected on a later mount.
     useEffect(() => {
-        if (chat.opened && !disabled && !loading) {
+        if (!chat.draft) {
+            return;
+        }
+        setValue(chat.draft);
+        chatController.setDraft('');
+        const raf = requestAnimationFrame(() => {
+            const el = inputRef.current;
+            if (el) {
+                el.focus();
+                const end = el.value.length;
+                el.setSelectionRange(end, end);
+            }
+        });
+        return () => cancelAnimationFrame(raf);
+    }, [chat.draft, chatController]);
+
+    useEffect(() => {
+        if (chat.opened && !disabled && !responding) {
             // Add a small delay to ensure the input is rendered before focusing
             // This fixes inconsistent focus behaviour across browsers
             const timeout = setTimeout(() => {
@@ -32,7 +57,14 @@ export function AIChatInput(props: {
 
             return () => clearTimeout(timeout);
         }
-    }, [disabled, loading, chat.opened]);
+    }, [disabled, responding, chat.opened]);
+
+    // Explicit focus requests (e.g. clicking "Ask" while the chat is already open).
+    useEffect(() => {
+        return chatController.on('focus', () => {
+            inputRef.current?.focus();
+        });
+    }, [chatController]);
 
     useHotkeys(
         'mod+i',
@@ -42,6 +74,9 @@ export function AIChatInput(props: {
         },
         {
             enableOnFormTags: true,
+            // Match the logical character so Dvorak ⌘-C (physical "I" key) copies
+            // instead of focusing the Assistant input. RND-11340.
+            ignoreEventWhen: (e) => e.key.toLowerCase() !== 'i',
         }
     );
 
@@ -54,6 +89,8 @@ export function AIChatInput(props: {
             sizing="large"
             label="Assistant chat input"
             placeholder={tString(language, 'ai_chat_input_placeholder')}
+            value={value}
+            onValueChange={setValue}
             onSubmit={(val) => onSubmit(val as string)}
             submitButton={{
                 size: 'small',
@@ -66,16 +103,23 @@ export function AIChatInput(props: {
             rows={1}
             maxLength={2048}
             keyboardShortcut={
-                !disabled && !loading
+                !disabled && !responding
                     ? {
                           keys: ['mod', 'i'],
                           className: 'bg-tint-base group-focus-within/input:hidden',
                       }
                     : undefined
             }
-            disabled={disabled || loading || chat.control !== null}
-            aria-busy={loading}
+            disabled={disabled || responding || chat.control !== null}
+            aria-busy={responding}
             ref={inputRef}
+            header={
+                <AIChatReferenceChips
+                    references={chat.references}
+                    onRemove={chatController.removeReference}
+                    disabled={responding || disabled}
+                />
+            }
             trailing={
                 <HoverCardRoot openDelay={500}>
                     <HoverCard

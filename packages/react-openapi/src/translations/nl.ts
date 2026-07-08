@@ -5,6 +5,8 @@ export const nl = {
     stability_experimental: 'Experimenteel',
     stability_alpha: 'Alfa',
     stability_beta: 'Bèta',
+    available_in_mcp: 'Beschikbaar in MCP',
+    copy_url: 'URL kopiëren',
     discriminator: 'Discriminator',
     copy_to_clipboard: 'Kopiëren naar klembord',
     copied: 'Gekopieerd',
