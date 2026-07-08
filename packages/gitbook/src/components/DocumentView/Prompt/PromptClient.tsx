@@ -23,7 +23,7 @@ export function PromptClient(props: {
     return (
         <div
             className={tcls(
-                'relative flex w-full flex-col overflow-hidden rounded-lg text-tint-strong',
+                'relative flex w-full flex-col overflow-hidden circular-corners:rounded-2xl rounded-corners:rounded-xl straight-corners:rounded-xs text-tint-strong',
                 'border border-tint-subtle contrast-more:border-tint',
                 'transition',
                 open ? 'bg-tint depth-subtle:shadow-xs' : 'bg-tint-base'
