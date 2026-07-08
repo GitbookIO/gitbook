@@ -208,7 +208,10 @@ export const Input = React.forwardRef<InputElement, InputProps>((props, passedRe
     };
 
     const inputClassName = tcls(
-        'peer -m-2 max-h-64 grow shrink resize-none leading-normal text-left outline-none placeholder:text-tint/8 placeholder-shown:text-ellipsis aria-busy:cursor-progress',
+        // Note: `aria-busy` intentionally does NOT change the cursor here — a busy field can still
+        // be editable (e.g. composing a follow-up while the Assistant streams), and a progress
+        // cursor made it look disabled. Read-only state is conveyed by `disabled` instead.
+        'peer -m-2 max-h-64 grow shrink resize-none leading-normal text-left outline-none placeholder:text-tint/8 placeholder-shown:text-ellipsis',
         sizes[sizing].input
     );
 
@@ -241,7 +244,6 @@ export const Input = React.forwardRef<InputElement, InputProps>((props, passedRe
                           'focus-within:border-primary-hover focus-within:depth-subtle:shadow-lg focus-within:shadow-primary-subtle focus-within:ring-2 hover:not-has-[button:hover]:cursor-text hover:not-has-[button:hover]:border-tint-hover hover:not-has-[button:hover]:not-focus-within:bg-tint-subtle depth-subtle:hover:not-has-[button:hover]:not-focus-within:shadow-md focus-within:hover:not-has-[button:hover]:border-primary-hover',
                       ],
                 multiline ? 'flex-col' : 'flex-row',
-                ariaBusy ? 'cursor-progress' : '',
                 sizes[sizing].container,
                 className
             )}
