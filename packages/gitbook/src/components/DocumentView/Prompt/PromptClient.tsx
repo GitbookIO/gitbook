@@ -106,7 +106,7 @@ function CopyPromptButton(props: { prompt: string }) {
 
     return (
         <Button
-            variant="secondary"
+            variant="primary"
             size="xsmall"
             label={copied ? tString(language, 'code_copied') : tString(language, 'prompt_copy')}
             disabled={!prompt}
@@ -131,7 +131,7 @@ function OpenPromptDropdown(props: { prompt: string }) {
                     label={tString(language, 'open_in_ai')}
                     trailing={<ToggleChevron className="size-text-sm" />}
                     size="xsmall"
-                    variant="primary"
+                    variant="secondary"
                     disabled={!prompt}
                 />
             }
