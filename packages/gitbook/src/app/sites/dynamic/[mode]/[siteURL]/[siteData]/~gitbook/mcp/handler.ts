@@ -293,12 +293,7 @@ export async function handleMcpRequest(
                                     {
                                         type: 'ask_question',
                                         query: trimmedQuestion,
-                                        // TODO: also emit `goal: trimmedGoal` once the pinned
-                                        // `@gitbook/api` exposes it on `SiteInsightsEventAskQuestion`
-                                        // (the ask-request goal is already forwarded above; the
-                                        // insights event type in the published client has no `goal`
-                                        // field yet — see the analytics/ClickHouse work tracked in
-                                        // RND-11562 follow-ups).
+                                        ...(trimmedGoal ? { goal: trimmedGoal } : {}),
                                         location: {
                                             displayContext: SiteInsightsDisplayContext.Mcp,
                                         },
