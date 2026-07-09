@@ -1,6 +1,7 @@
 'use client';
 
 import { useAdaptiveVisitor } from '@/components/Adaptive';
+import { NavigationStatusContext } from '@/components/hooks';
 import { ContentKit, type ContentKitClientContextData } from '@gitbook/react-contentkit/client';
 import { useRouter } from 'next/navigation';
 import React from 'react';
@@ -27,7 +28,18 @@ export function ContentKitWithClientContext<RenderContext>(
     const { canAccessVisitorClaims, page, siteBasePath, ...contentKitProps } = props;
 
     const router = useRouter();
+    const { onNavigationClick } = React.useContext(NavigationStatusContext);
     const getAdaptiveVisitorClaims = useAdaptiveVisitor();
+
+    // Navigate to an in-site href, driving the same navigation progress bar as a regular link so
+    // the reader gets feedback while the destination page loads.
+    const navigateTo = React.useCallback(
+        (href: string) => {
+            onNavigationClick(href);
+            router.push(href);
+        },
+        [onNavigationClick, router]
+    );
     // Read during render (Suspense) only when the integration is allowed visitor claims, so that
     // webframes that don't use visitor claims don't suspend on the visitor-claims fetch.
     const visitorClaims = canAccessVisitorClaims ? getAdaptiveVisitorClaims() : null;
@@ -42,19 +54,20 @@ export function ContentKitWithClientContext<RenderContext>(
                 // Resolve the requested path relative to the site root so a webframe can navigate
                 // to any section or space within the site (and nowhere outside it).
                 const suffix = anchor ? `#${anchor}` : '';
-                router.push(joinPath(siteBasePath, path) + suffix);
+                navigateTo(joinPath(siteBasePath, path) + suffix);
             },
             navigateToPageId: async ({ pageId, anchor }) => {
                 // Resolve the page ID against the site's page tree so the destination is a real
-                // in-site page (and nowhere outside it).
+                // in-site page (and nowhere outside it). Resolution is a (fast, cached) server
+                // round-trip; the navigation progress bar is triggered once the path is known.
                 const path = await resolveWebframePagePath(pageId);
                 if (path) {
                     const suffix = anchor ? `#${anchor}` : '';
-                    router.push(path + suffix);
+                    navigateTo(path + suffix);
                 }
             },
         }),
-        [canAccessVisitorClaims, visitorClaims, page, siteBasePath, router]
+        [canAccessVisitorClaims, visitorClaims, page, siteBasePath, navigateTo]
     );
 
     return <ContentKit {...contentKitProps} clientContext={clientContext} />;
