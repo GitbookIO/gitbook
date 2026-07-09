@@ -135,6 +135,7 @@ export const fr: TranslationLanguage = {
     ai_chat_context_previous_messages: 'Messages de votre conversation',
     ai_chat_context_disclaimer: 'Les réponses générées peuvent contenir des erreurs.',
     ai_chat_input_placeholder: 'Demander, rechercher ou expliquer...',
+    ai_chat_queued_message: 'Ce message sera envoyé une fois que ${1} aura terminé',
     send: 'Envoyer',
     actions: 'Actions',
     ai_chat_suggested_questions_title: 'Suggestions de questions',

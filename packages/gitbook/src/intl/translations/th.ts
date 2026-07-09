@@ -131,6 +131,7 @@ export const th: TranslationLanguage = {
     ai_chat_context_previous_messages: 'ข้อความในการสนทนาของคุณ',
     ai_chat_context_disclaimer: 'คำตอบจาก AI อาจมีข้อผิดพลาด',
     ai_chat_input_placeholder: 'ถาม ค้นหา หรืออธิบาย...',
+    ai_chat_queued_message: 'ข้อความนี้จะถูกส่งหลังจากที่ ${1} เสร็จสิ้น',
     send: 'ส่ง',
     actions: 'การดำเนินการ',
     ai_chat_suggested_questions_title: 'คำถามที่แนะนำ',

@@ -133,6 +133,7 @@ export const hi: TranslationLanguage = {
     ai_chat_context_previous_messages: 'आपकी बातचीत के संदेश',
     ai_chat_context_disclaimer: 'AI उत्तरों में गलतियां हो सकती हैं।',
     ai_chat_input_placeholder: 'पूछें, खोजें या समझाएं...',
+    ai_chat_queued_message: 'यह संदेश ${1} के समाप्त होने के बाद भेजा जाएगा',
     send: 'भेजें',
     actions: 'कार्रवाइयां',
     ai_chat_suggested_questions_title: 'सुझाए गए प्रश्न',

@@ -135,6 +135,7 @@ export const sv: TranslationLanguage = {
     ai_chat_context_previous_messages: 'Meddelanden i din konversation',
     ai_chat_context_disclaimer: 'AI-svar kan innehålla fel.',
     ai_chat_input_placeholder: 'Fråga, sök eller förklara...',
+    ai_chat_queued_message: 'Det här meddelandet skickas när ${1} är klar',
     send: 'Skicka',
     actions: 'Åtgärder',
     ai_chat_suggested_questions_title: 'Föreslagna frågor',

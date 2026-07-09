@@ -134,6 +134,7 @@ export const id: TranslationLanguage = {
     ai_chat_context_previous_messages: 'Pesan dalam percakapan Anda',
     ai_chat_context_disclaimer: 'Jawaban AI dapat berisi kesalahan.',
     ai_chat_input_placeholder: 'Tanya, cari, atau jelaskan...',
+    ai_chat_queued_message: 'Pesan ini akan dikirim setelah ${1} selesai',
     send: 'Kirim',
     actions: 'Tindakan',
     ai_chat_suggested_questions_title: 'Pertanyaan yang disarankan',

@@ -133,6 +133,7 @@ export const ar: TranslationLanguage = {
     ai_chat_context_previous_messages: 'الرسائل في محادثتك',
     ai_chat_context_disclaimer: 'قد تحتوي إجابات الذكاء الاصطناعي على أخطاء.',
     ai_chat_input_placeholder: 'اسأل أو ابحث أو اشرح...',
+    ai_chat_queued_message: 'سيتم إرسال هذه الرسالة بعد أن ينتهي ${1}',
     send: 'إرسال',
     actions: 'إجراءات',
     ai_chat_suggested_questions_title: 'أسئلة مقترحة',

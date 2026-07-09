@@ -135,6 +135,7 @@ export const lt: TranslationLanguage = {
     ai_chat_context_previous_messages: 'Pranešimai jūsų pokalbyje',
     ai_chat_context_disclaimer: 'AI atsakymuose gali būti klaidų.',
     ai_chat_input_placeholder: 'Klauskite, ieškokite arba paaiškinkite...',
+    ai_chat_queued_message: 'Ši žinutė bus išsiųsta, kai ${1} baigs',
     send: 'Siųsti',
     actions: 'Veiksmai',
     ai_chat_suggested_questions_title: 'Siūlomi klausimai',

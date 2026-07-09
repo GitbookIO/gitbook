@@ -133,6 +133,7 @@ export const uk: TranslationLanguage = {
     ai_chat_context_previous_messages: 'Повідомлення у вашій розмові',
     ai_chat_context_disclaimer: 'Відповіді AI можуть містити помилки.',
     ai_chat_input_placeholder: 'Запитайте, знайдіть або поясніть...',
+    ai_chat_queued_message: 'Це повідомлення буде надіслано, коли ${1} завершить',
     send: 'Надіслати',
     actions: 'Дії',
     ai_chat_suggested_questions_title: 'Запропоновані запитання',

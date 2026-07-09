@@ -132,6 +132,7 @@ export const he: TranslationLanguage = {
     ai_chat_context_previous_messages: 'הודעות בשיחה שלך',
     ai_chat_context_disclaimer: 'תשובות AI עשויות להכיל טעויות.',
     ai_chat_input_placeholder: 'שאל, חפש או הסבר...',
+    ai_chat_queued_message: 'הודעה זו תישלח לאחר ש-${1} יסיים',
     send: 'שליחה',
     actions: 'פעולות',
     ai_chat_suggested_questions_title: 'שאלות מוצעות',
