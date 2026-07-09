@@ -1,4 +1,8 @@
-import { CustomizationPageActionType, SiteInsightsDisplayContext } from '@gitbook/api';
+import {
+    CustomizationPageActionType,
+    SiteFindingType,
+    SiteInsightsDisplayContext,
+} from '@gitbook/api';
 
 import { type RouteLayoutParams, getDynamicSiteContext } from '@/app/utils';
 import { isAIEnabled } from '@/components/utils/isAIChatEnabled';
@@ -340,6 +344,126 @@ export async function handleMcpRequest(
                     }
                 );
             }
+
+            server.tool(
+                'sendFeedback',
+                `Report an issue in the documentation of ${site.title} so the team can fix it. Use it whenever, while helping a user, you come across content that is outdated, contradictory, missing information, or otherwise unhelpful. Also use it when the user themselves reports a problem with the docs, even if you could not verify it yourself. If it's your own observation, do a quick sanity check that the issue is real before reporting — no need to exhaustively re-read the page. Send one call per distinct issue and do not report the same issue twice in a conversation. Do not use this tool to confirm that a page is accurate; it is for reporting problems only.`,
+                {
+                    category: z
+                        .nativeEnum(SiteFindingType)
+                        .describe(
+                            'The kind of issue. "content-outdated": the content was correct at some point but no longer matches the current product or reality. "incoherence": the content contradicts itself or another page. "content-gap": information the reader needs is missing entirely, whether or not it was ever documented. "other": only as a last resort when none of the above fits.'
+                        ),
+                    content: z
+                        .string()
+                        .min(1)
+                        .max(2048)
+                        .describe(
+                            'Explain the issue in full, as if writing to a documentation maintainer who never saw this conversation. Describe what is wrong, where on the page it appears (quote the exact sentence or section title when possible), what the user was trying to do, and, when relevant, what the correct or expected information should be. Write a few clear, specific sentences in English. Never include personal or confidential information from the conversation. Up to 2048 characters.'
+                        ),
+                    pageUrl: z
+                        .string()
+                        .describe(
+                            `The full URL of the page the issue is about (e.g. ${siteUrl}/getting-started). Provide it whenever you can so the finding is linked to the exact page.`
+                        )
+                        .transform((value, ctx) => {
+                            const candidate = URL.canParse(value)
+                                ? new URL(value)
+                                : URL.canParse(value, siteUrl)
+                                  ? new URL(value, siteUrl)
+                                  : null;
+
+                            if (
+                                !candidate ||
+                                (candidate.protocol !== 'https:' && candidate.protocol !== 'http:')
+                            ) {
+                                ctx.addIssue({
+                                    code: z.ZodIssueCode.custom,
+                                    message: `"${value}" is not a valid URL on this site. Expected a full URL like ${siteUrl}/getting-started`,
+                                });
+                                return z.NEVER;
+                            }
+
+                            return candidate.toString();
+                        })
+                        .optional(),
+                },
+                {
+                    title: 'Send feedback',
+                    readOnlyHint: false,
+                    destructiveHint: false,
+                    idempotentHint: false,
+                    openWorldHint: true,
+                },
+                async ({ category, content, pageUrl }) => {
+                    try {
+                        let pageLocation:
+                            | { page: string; space: string; revision: string }
+                            | undefined;
+
+                        if (pageUrl) {
+                            const match = findSiteSpaceByUrl(context.structure, pageUrl);
+                            if (!match) {
+                                return {
+                                    content: [
+                                        { type: 'text', text: `Page not found: "${pageUrl}"` },
+                                    ],
+                                    isError: true,
+                                };
+                            }
+
+                            const revision = await throwIfDataError(
+                                dataFetcher.getRevision({
+                                    spaceId: match.siteSpace.space.id,
+                                    revisionId: match.siteSpace.space.revision,
+                                })
+                            );
+
+                            const resolved = resolvePagePath(revision.pages, match.pagePath ?? '');
+                            if (!resolved) {
+                                return {
+                                    content: [
+                                        { type: 'text', text: `Page not found: "${pageUrl}"` },
+                                    ],
+                                    isError: true,
+                                };
+                            }
+
+                            pageLocation = {
+                                page: resolved.page.id,
+                                space: match.siteSpace.space.id,
+                                revision: match.siteSpace.space.revision,
+                            };
+                        }
+
+                        trackMcpEvent({
+                            organizationId: context.organizationId,
+                            siteId: site.id,
+                            events: [
+                                {
+                                    type: 'agent_feedback',
+                                    feedback: { content, category },
+                                    location: {
+                                        displayContext: SiteInsightsDisplayContext.Mcp,
+                                        ...pageLocation,
+                                    },
+                                },
+                            ],
+                            request,
+                        });
+
+                        return {
+                            content: [{ type: 'text', text: 'Feedback recorded. Thank you.' }],
+                        };
+                    } catch (error) {
+                        const exposable = getExposableError(error);
+                        return {
+                            content: [{ type: 'text', text: exposable.message }],
+                            isError: true,
+                        };
+                    }
+                }
+            );
         },
         {},
         {
