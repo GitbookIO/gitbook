@@ -5,6 +5,7 @@ import { ContentKit, type ContentKitClientContextData } from '@gitbook/react-con
 import { useRouter } from 'next/navigation';
 import React from 'react';
 import type { WebframePageContext } from './adaptive';
+import { resolveWebframePagePath } from './server-actions';
 
 type ContentKitProps<RenderContext> = React.ComponentProps<typeof ContentKit<RenderContext>>;
 
@@ -37,11 +38,20 @@ export function ContentKitWithClientContext<RenderContext>(
                 ? () => ({ visitor: visitorClaims?.visitor ?? null })
                 : undefined,
             getPageContext: page ? () => ({ page }) : undefined,
-            navigate: ({ path, anchor }) => {
+            navigateToPath: ({ path, anchor }) => {
                 // Resolve the requested path relative to the site root so a webframe can navigate
                 // to any section or space within the site (and nowhere outside it).
-                const target = joinPath(siteBasePath, path) + (anchor ? `#${anchor}` : '');
-                router.push(target);
+                const suffix = anchor ? `#${anchor}` : '';
+                router.push(joinPath(siteBasePath, path) + suffix);
+            },
+            navigateToPageId: async ({ pageId, anchor }) => {
+                // Resolve the page ID against the site's page tree so the destination is a real
+                // in-site page (and nowhere outside it).
+                const path = await resolveWebframePagePath(pageId);
+                if (path) {
+                    const suffix = anchor ? `#${anchor}` : '';
+                    router.push(path + suffix);
+                }
             },
         }),
         [canAccessVisitorClaims, visitorClaims, page, siteBasePath, router]

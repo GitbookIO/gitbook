@@ -127,19 +127,27 @@ export function ElementWebframe(props: ContentKitClientElementProps<ContentKitWe
                             })(),
                         }));
                         break;
-                    case '@webframe.navigate':
-                        // Let the host navigate to another page. The host resolves the path within
-                        // the current content and gates the destination.
-                        if (typeof message.action.path === 'string') {
-                            renderer.clientContext?.navigate?.({
+                    case '@webframe.navigate': {
+                        // Let the host navigate to another page. The destination is addressed by
+                        // `pageId` (preferred, resolved against the site's page tree) or `path`;
+                        // the host resolves it within the current site and gates the destination.
+                        const anchor =
+                            typeof message.action.anchor === 'string'
+                                ? message.action.anchor
+                                : undefined;
+                        if (typeof message.action.pageId === 'string') {
+                            renderer.clientContext?.navigateToPageId?.({
+                                pageId: message.action.pageId,
+                                anchor,
+                            });
+                        } else if (typeof message.action.path === 'string') {
+                            renderer.clientContext?.navigateToPath?.({
                                 path: message.action.path,
-                                anchor:
-                                    typeof message.action.anchor === 'string'
-                                        ? message.action.anchor
-                                        : undefined,
+                                anchor,
                             });
                         }
                         break;
+                    }
                     default:
                         renderer.update({
                             action: message.action,

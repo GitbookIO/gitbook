@@ -17,6 +17,15 @@ export type ContentKitRenderUpdate = Partial<
     Pick<RequestRenderIntegrationUI, 'action' | 'props' | 'state'>
 >;
 
+/**
+ * The current page exposed to a webframe through the client-only webframe state.
+ */
+export type ContentKitWebframePage = {
+    id: string;
+    path: string;
+    title: string;
+};
+
 export type ContentKitClientContextData = {
     /**
      * Client-only visitor claims, merged into the webframe state.
@@ -32,17 +41,24 @@ export type ContentKitClientContextData = {
      * Client-only current-page context, merged into the webframe state.
      */
     getPageContext?: () =>
-        | Record<string, unknown>
+        | { page: ContentKitWebframePage }
         | null
         | undefined
-        | Promise<Record<string, unknown> | null | undefined>;
+        | Promise<{ page: ContentKitWebframePage } | null | undefined>;
 
     /**
-     * Navigate the host page to another page, in response to a webframe `@webframe.navigate`
-     * action. The host is responsible for resolving `path` within the current content and for
-     * restricting navigation to trusted destinations.
+     * Navigate the host page to a page addressed by its path, in response to a webframe
+     * `@webframe.navigate` action. The path is resolved against the site base path, so navigation
+     * stays within the site.
      */
-    navigate?: (target: { path: string; anchor?: string }) => void;
+    navigateToPath?: (target: { path: string; anchor?: string }) => void;
+
+    /**
+     * Navigate the host page to a page addressed by its ID, in response to a webframe
+     * `@webframe.navigate` action. The ID is resolved against the site's page tree (asynchronously),
+     * so navigation stays within the site.
+     */
+    navigateToPageId?: (target: { pageId: string; anchor?: string }) => void;
 };
 
 export interface ContentKitClientContextType {
