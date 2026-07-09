@@ -398,7 +398,7 @@ const testCases: TestsCase[] = [
     {
         name: 'documentation.gravitee.io',
         contentBaseURL: 'https://documentation.gravitee.io',
-        tests: [{ name: 'Home', url: '/', run: waitForCookiesDialog }],
+        tests: [{ name: 'Home', url: '/' }],
     },
     {
         name: 'faq.wanttopay.net/wanttopay-app',
