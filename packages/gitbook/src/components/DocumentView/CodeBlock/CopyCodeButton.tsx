@@ -6,7 +6,7 @@ import { Button } from '@/components/primitives';
 import { t, useLanguage } from '@/intl/client';
 import { type ClassValue, tcls } from '@/lib/tailwind';
 
-import { getCodeTextFromId } from './utils';
+import { copyToClipboard, getCodeTextFromId } from './utils';
 
 /**
  * Client component to copy the code of a code block.
@@ -32,15 +32,17 @@ export function CopyCodeButton(props: { codeId: string; style: ClassValue }) {
         };
     }, [copied]);
 
-    const onClick = () => {
+    const onClick = async () => {
         const codeText = getCodeTextFromId(codeId);
         if (codeText === null) {
             return;
         }
 
-        navigator.clipboard.writeText(codeText);
-
-        setCopied(true);
+        // Only surface the "copied" state when the write actually succeeded, so a blocked
+        // clipboard in the embed no longer looks like a successful copy.
+        if (await copyToClipboard(codeText)) {
+            setCopied(true);
+        }
     };
 
     return (

@@ -76,6 +76,61 @@ export function getCodeTextFromId(codeId: string): string | null {
 }
 
 /**
+ * Copy text to the clipboard in a way that survives embed contexts.
+ *
+ * The async Clipboard API (`navigator.clipboard`) is unavailable or rejects in some embed
+ * setups — cross-origin iframes where the `clipboard-write` permission wasn't delegated, or
+ * non-secure contexts — which is why copying silently failed (and logged an error) in the
+ * Assistant embed. We fall back to a hidden `<textarea>` + `execCommand('copy')` so the button
+ * keeps working there. Returns whether the copy succeeded so callers only show a success state
+ * when the text actually reached the clipboard.
+ */
+export async function copyToClipboard(text: string): Promise<boolean> {
+    if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
+        try {
+            await navigator.clipboard.writeText(text);
+            return true;
+        } catch {
+            // The async API can reject in restricted embed contexts; fall back below.
+        }
+    }
+
+    return copyWithExecCommand(text);
+}
+
+/**
+ * Legacy clipboard write used as a fallback when the async Clipboard API is unavailable.
+ *
+ * `execCommand('copy')` still works in cross-origin iframes where the async API is blocked,
+ * which is why we keep it as the safety net for the embed.
+ */
+function copyWithExecCommand(text: string): boolean {
+    if (typeof document === 'undefined') {
+        return false;
+    }
+
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    // Keep it out of view and avoid scrolling/zooming to it when focused.
+    textarea.setAttribute('readonly', '');
+    textarea.style.position = 'fixed';
+    textarea.style.top = '0';
+    textarea.style.left = '0';
+    textarea.style.opacity = '0';
+    document.body.appendChild(textarea);
+
+    try {
+        textarea.focus();
+        textarea.select();
+        return document.execCommand('copy');
+    } catch {
+        return false;
+    } finally {
+        textarea.remove();
+    }
+}
+
+/**
  * Compute the code text from the DOM,
  * ignoring the empty white space we use for empty lines (represented with a class "ew").
  */
