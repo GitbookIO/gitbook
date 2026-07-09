@@ -255,7 +255,7 @@ export async function handleMcpRequest(
                             .string()
                             .optional()
                             .describe(
-                                'The goal the agent is trying to accomplish, used to tailor the answer and track intent. Optional.'
+                                'The broader end goal you are ultimately trying to accomplish (as/on behalf of the user). Used to tailor the answer to be most useful for your goal. Optional.'
                             ),
                     },
                     {
