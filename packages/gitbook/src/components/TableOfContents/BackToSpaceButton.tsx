@@ -25,7 +25,9 @@ export function BackToSpaceButton(props: { spaceId: string; spaceTitle: string }
     }
 
     return (
-        <div className="mb-2 px-2">
+        // Top margin so the shortcut, as the first element in the sidebar, isn't flush
+        // against the (rounded) filled-sidebar edge.
+        <div className="mt-2 mb-2 px-2">
             <Link
                 href={backToSpace.url}
                 className={tcls(

@@ -25,20 +25,33 @@ describe('resolveBackToSpace', () => {
                 current: gettingStarted,
                 lastLocation: null,
                 storedBack: null,
-                fromPicker: false,
+                fromTocLink: false,
             })
         ).toBeNull();
     });
 
-    it('offers to go back after following a link into a different space', () => {
+    it('offers to go back after following a ToC link into a different space', () => {
         expect(
             resolveBackToSpace({
                 current: programmersGuide,
                 lastLocation: gettingStarted,
                 storedBack: null,
-                fromPicker: false,
+                fromTocLink: true,
             })
         ).toEqual(gettingStarted);
+    });
+
+    it('does not offer to go back when reaching a different space without a ToC link', () => {
+        // e.g. an in-content text link, the section/variant picker, a direct URL or the
+        // browser history — none of which should surface the shortcut.
+        expect(
+            resolveBackToSpace({
+                current: programmersGuide,
+                lastLocation: gettingStarted,
+                storedBack: null,
+                fromTocLink: false,
+            })
+        ).toBeNull();
     });
 
     it('keeps the back target while browsing within the destination space', () => {
@@ -51,20 +64,9 @@ describe('resolveBackToSpace', () => {
                 current: deeperInGuide,
                 lastLocation: programmersGuide,
                 storedBack: gettingStarted,
-                fromPicker: false,
+                fromTocLink: false,
             })
         ).toEqual(gettingStarted);
-    });
-
-    it('does not offer to go back when the space was changed through the picker', () => {
-        expect(
-            resolveBackToSpace({
-                current: programmersGuide,
-                lastLocation: gettingStarted,
-                storedBack: null,
-                fromPicker: true,
-            })
-        ).toBeNull();
     });
 
     it('clears the back target once the reader returns to the space they came from', () => {
@@ -73,31 +75,31 @@ describe('resolveBackToSpace', () => {
                 current: gettingStarted,
                 lastLocation: programmersGuide,
                 storedBack: gettingStarted,
-                fromPicker: false,
+                fromTocLink: false,
             })
         ).toBeNull();
     });
 
-    it('points back to the most recent space when chaining cross-space links', () => {
-        // Was in Getting Started (stored back), followed a link from the Programmer's
+    it('points back to the most recent space when chaining cross-space ToC links', () => {
+        // Was in Getting Started (stored back), followed a ToC link from the Programmer's
         // Guide into the API Reference: back should now point to the Programmer's Guide.
         expect(
             resolveBackToSpace({
                 current: apiReference,
                 lastLocation: programmersGuide,
                 storedBack: gettingStarted,
-                fromPicker: false,
+                fromTocLink: true,
             })
         ).toEqual(programmersGuide);
     });
 
-    it('resets the back target when switching space through the picker even if one was set', () => {
+    it('clears an existing back target when reaching a new space without a ToC link', () => {
         expect(
             resolveBackToSpace({
                 current: apiReference,
                 lastLocation: programmersGuide,
                 storedBack: gettingStarted,
-                fromPicker: true,
+                fromTocLink: false,
             })
         ).toBeNull();
     });
