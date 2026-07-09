@@ -50,6 +50,36 @@ it(
         const tools = await client.listTools();
         expect(tools.tools[0]?.name).toBe('searchDocumentation');
         expect(tools.tools[1]?.name).toBe('getPage');
+        expect(tools.tools.some((tool) => tool.name === 'sendFeedback')).toBe(true);
+    },
+    { timeout: 10_000 }
+);
+
+it(
+    'should record agent feedback through MCP',
+    async () => {
+        const client = new Client({
+            name: 'test',
+            version: '1.0.0',
+        });
+
+        await client.connect(
+            new StreamableHTTPClientTransport(
+                new URL(getContentTestURL('https://gitbook.com/docs/~gitbook/mcp/auth'))
+            )
+        );
+
+        const response = await client.callTool({
+            name: 'sendFeedback',
+            arguments: {
+                category: 'content-gap',
+                content: 'The authentication section does not explain how to rotate API tokens.',
+            },
+        });
+
+        expect(response.isError).toBeFalsy();
+        // @ts-expect-error - response.content is of type unknown
+        expect(response.content[0]?.text).toContain('Feedback recorded');
     },
     { timeout: 10_000 }
 );
