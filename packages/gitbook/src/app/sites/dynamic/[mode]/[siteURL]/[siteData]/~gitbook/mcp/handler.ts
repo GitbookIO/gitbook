@@ -11,7 +11,6 @@ import { getExposableError, throwIfDataError } from '@/lib/data';
 import { fromPageMarkdown, getMarkdownForPageInSpace, toPageMarkdown } from '@/lib/markdownPage';
 import { resolvePagePath } from '@/lib/pages';
 import { joinPathWithBaseURL } from '@/lib/paths';
-import { getBestScoredResult } from '@/lib/search';
 import { findSiteSpaceBy, findSiteSpaceByUrl } from '@/lib/sites';
 import { trackServerInsightsEvents } from '@/lib/tracking';
 import { waitUntil } from '@/lib/waitUntil';
@@ -135,8 +134,10 @@ export async function handleMcpRequest(
                                     )
                                 );
 
-                                const body = getBestScoredResult(
-                                    (pageResult.sections ?? []).filter((section) => section.body)
+                                // The search API returns sections ordered highest-score-first, so
+                                // the first section with a body is the best-scoring preview.
+                                const body = (pageResult.sections ?? []).find(
+                                    (section) => section.body
                                 )?.body;
 
                                 return {
