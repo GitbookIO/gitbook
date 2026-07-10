@@ -5,6 +5,7 @@ import {
     createOAuthProtectedResourceUnauthResponse,
     handleUnauthedOAuthProtectedResourceRequest,
     isOAuthProtectedResourceMetadataRequest,
+    isOAuthProtectedResourceMetadataRequestForAuthEndpoint,
     isOAuthProtectedResourceRequest,
 } from './oauth-protected';
 
@@ -248,6 +249,34 @@ describe('OAuth protected resources flow', () => {
         ])('$scenario', ({ input, expected }) => {
             const url = new URL(input);
             expect(isOAuthProtectedResourceMetadataRequest(url)).toBe(expected);
+        });
+    });
+
+    describe('isOAuthProtectedResourceMetadataRequestForAuthEndpoint', () => {
+        it.each([
+            {
+                scenario: 'matches metadata doc for the authenticated resource',
+                input: 'https://docs.acme.org/.well-known/oauth-protected-resource/~gitbook/mcp/auth',
+                expected: true,
+            },
+            {
+                scenario: 'does not match metadata doc for the public base resource',
+                input: 'https://docs.acme.org/.well-known/oauth-protected-resource/~gitbook/mcp',
+                expected: false,
+            },
+            {
+                scenario: 'does not match the resource itself',
+                input: 'https://docs.acme.org/~gitbook/mcp/auth',
+                expected: false,
+            },
+            {
+                scenario: 'does not match a non-protected path',
+                input: 'https://docs.acme.org/.well-known/oauth-protected-resource/~gitbook/other',
+                expected: false,
+            },
+        ])('$scenario', ({ input, expected }) => {
+            const url = new URL(input);
+            expect(isOAuthProtectedResourceMetadataRequestForAuthEndpoint(url)).toBe(expected);
         });
     });
 });
