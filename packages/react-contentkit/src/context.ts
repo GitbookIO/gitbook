@@ -17,24 +17,6 @@ export type ContentKitRenderUpdate = Partial<
     Pick<RequestRenderIntegrationUI, 'action' | 'props' | 'state'>
 >;
 
-/**
- * The current page exposed to a webframe through the client-only webframe state.
- */
-export type ContentKitWebframePage = {
-    id: string;
-    path: string;
-    title: string;
-};
-
-/**
- * Target of a webframe `@webframe.navigate` action. A destination is addressed either by `path`
- * (resolved against the site base path) or by `pageId` (resolved against the site's page tree).
- * An optional `anchor` scrolls to a heading within the destination page.
- */
-export type ContentKitNavigateTarget =
-    | { path: string; anchor?: string }
-    | { pageId: string; anchor?: string };
-
 export type ContentKitClientContextData = {
     /**
      * Client-only visitor claims, merged into the webframe state.
@@ -47,20 +29,11 @@ export type ContentKitClientContextData = {
         | Promise<Record<string, unknown> | null | undefined>;
 
     /**
-     * Client-only current-page context, merged into the webframe state.
-     */
-    getPageContext?: () =>
-        | { page: ContentKitWebframePage }
-        | null
-        | undefined
-        | Promise<{ page: ContentKitWebframePage } | null | undefined>;
-
-    /**
      * Navigate the host page to another page, in response to a webframe `@webframe.navigate`
-     * action. The destination is addressed by `path` or `pageId`; the host resolves it within the
-     * current site and restricts navigation to destinations within it.
+     * action. The destination is addressed by `path` (resolved against the site base path); the
+     * host restricts navigation to destinations within the current site.
      */
-    navigate?: (target: ContentKitNavigateTarget) => void;
+    navigate?: (target: { path: string; anchor?: string }) => void;
 };
 
 export interface ContentKitClientContextType {

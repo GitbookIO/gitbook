@@ -10,11 +10,7 @@ import {
     ContentKitWithClientContext,
     type WebframeLinkerData,
 } from './ContentKitWithClientContext';
-import {
-    getWebframePageContext,
-    getWebframePagePaths,
-    integrationBlockContainsWebframe,
-} from './adaptive';
+import { integrationBlockContainsWebframe } from './adaptive';
 import { contentKitServerContext } from './contentkit';
 import { fetchSafeIntegrationUI } from './render';
 import { renderIntegrationUi } from './server-actions';
@@ -80,11 +76,9 @@ export async function IntegrationBlock(props: BlockProps<DocumentBlockIntegratio
 
     const containsWebframe = integrationBlockContainsWebframe(initialOutput);
     const canAccessVisitorClaims = initialOutput.canAccessVisitorClaims === true;
-    // The current page (path/id/title) is non-sensitive, so it is always exposed to webframes.
-    const page = getWebframePageContext(context.contentContext);
 
-    // Any webframe uses the client-context wrapper: it enables navigation to other pages and
-    // exposes the current page, plus visitor claims when the integration is allowed them.
+    // Any webframe uses the client-context wrapper: it enables navigation to other pages, plus
+    // visitor claims when the integration is allowed them.
     const useClientContext = containsWebframe;
 
     const contentKitProps = {
@@ -112,9 +106,7 @@ export async function IntegrationBlock(props: BlockProps<DocumentBlockIntegratio
                 <ContentKitWithClientContext
                     {...contentKitProps}
                     canAccessVisitorClaims={canAccessVisitorClaims}
-                    page={page}
                     linkerData={getWebframeLinkerData(context.contentContext.linker)}
-                    pagePaths={getWebframePagePaths(context.contentContext)}
                 >
                     <ContentKitOutput output={initialOutput} context={contentKitServerContext} />
                 </ContentKitWithClientContext>

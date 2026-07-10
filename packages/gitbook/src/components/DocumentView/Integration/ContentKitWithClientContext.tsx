@@ -6,7 +6,6 @@ import { type GitBookLinker, createLinker } from '@/lib/links';
 import { ContentKit, type ContentKitClientContextData } from '@gitbook/react-contentkit/client';
 import { useRouter } from 'next/navigation';
 import React from 'react';
-import type { WebframePageContext } from './adaptive';
 
 type ContentKitProps<RenderContext> = React.ComponentProps<typeof ContentKit<RenderContext>>;
 
@@ -18,22 +17,18 @@ export type WebframeLinkerData = Pick<
 
 /**
  * ContentKit wrapper for integration blocks that expose client-only capabilities to webframes:
- * the current page, navigation to other pages, and adaptive visitor claims (only when the
- * integration is allowed to access them).
+ * navigation to other pages, and adaptive visitor claims (only when the integration is allowed to
+ * access them).
  */
 export function ContentKitWithClientContext<RenderContext>(
     props: ContentKitProps<RenderContext> & {
         /** Whether visitor claims may be exposed to the webframe (integration scope gated). */
         canAccessVisitorClaims: boolean;
-        /** Current page to inject into the webframe, or `null` when unknown. */
-        page: WebframePageContext | null;
         /** Data to rebuild the site linker, used to resolve webframe navigation requests. */
         linkerData: WebframeLinkerData;
-        /** Map of page id → space-relative path, to resolve `@webframe.navigate` by page id. */
-        pagePaths: Record<string, string>;
     }
 ) {
-    const { canAccessVisitorClaims, page, linkerData, pagePaths, ...contentKitProps } = props;
+    const { canAccessVisitorClaims, linkerData, ...contentKitProps } = props;
 
     const router = useRouter();
     const { onNavigationClick } = React.useContext(NavigationStatusContext);
@@ -61,27 +56,14 @@ export function ContentKitWithClientContext<RenderContext>(
             getVisitorContext: canAccessVisitorClaims
                 ? () => ({ visitor: visitorClaims?.visitor ?? null })
                 : undefined,
-            getPageContext: page ? () => ({ page }) : undefined,
-            navigate: (target) => {
-                const suffix = target.anchor ? `#${target.anchor}` : '';
-
-                if ('pageId' in target) {
-                    // Resolve the page id against the current space's pages so the destination is
-                    // a real in-site page (and nowhere outside it).
-                    const pagePath = pagePaths[target.pageId];
-                    if (pagePath === undefined) {
-                        return;
-                    }
-                    navigateTo(linker.toPathInSpace(pagePath) + suffix);
-                    return;
-                }
-
+            navigate: ({ path, anchor }) => {
                 // Resolve the requested path relative to the site root so a webframe can navigate
                 // to any section or space within the site (and nowhere outside it).
-                navigateTo(linker.toPathInSite(target.path) + suffix);
+                const suffix = anchor ? `#${anchor}` : '';
+                navigateTo(linker.toPathInSite(path) + suffix);
             },
         }),
-        [canAccessVisitorClaims, visitorClaims, page, linker, pagePaths, navigateTo]
+        [canAccessVisitorClaims, visitorClaims, linker, navigateTo]
     );
 
     return <ContentKit {...contentKitProps} clientContext={clientContext} />;

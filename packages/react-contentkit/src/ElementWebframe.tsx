@@ -127,27 +127,19 @@ export function ElementWebframe(props: ContentKitClientElementProps<ContentKitWe
                             })(),
                         }));
                         break;
-                    case '@webframe.navigate': {
+                    case '@webframe.navigate':
                         // Let the host navigate to another page. The destination is addressed by
-                        // `pageId` (preferred, resolved against the site's page tree) or `path`;
-                        // the host resolves it within the current site and gates the destination.
-                        const anchor =
-                            typeof message.action.anchor === 'string'
-                                ? message.action.anchor
-                                : undefined;
-                        if (typeof message.action.pageId === 'string') {
-                            renderer.clientContext?.navigate?.({
-                                pageId: message.action.pageId,
-                                anchor,
-                            });
-                        } else if (typeof message.action.path === 'string') {
+                        // `path`; the host resolves it within the current site and gates it.
+                        if (typeof message.action.path === 'string') {
                             renderer.clientContext?.navigate?.({
                                 path: message.action.path,
-                                anchor,
+                                anchor:
+                                    typeof message.action.anchor === 'string'
+                                        ? message.action.anchor
+                                        : undefined,
                             });
                         }
                         break;
-                    }
                     default:
                         renderer.update({
                             action: message.action,
@@ -167,7 +159,7 @@ export function ElementWebframe(props: ContentKitClientElementProps<ContentKitWe
         };
     }, [renderer, sendMessage]);
 
-    // Send data and client-only context (visitor claims, current page) as state to the webframe.
+    // Send data and client-only context (visitor claims) as state to the webframe.
     React.useEffect(() => {
         const abort = { cancelled: false };
         sendWebframeState({
@@ -239,14 +231,10 @@ function resolveWebframeState(
 }
 
 /**
- * Resolve the optional client-only contexts (visitor claims, current page)
- * to merge into the webframe state.
+ * Resolve the optional client-only contexts (visitor claims) to merge into the webframe state.
  */
 async function resolveClientContexts(clientContext: ContentKitClientContextData | undefined) {
-    return await Promise.all([
-        clientContext?.getVisitorContext?.(),
-        clientContext?.getPageContext?.(),
-    ]);
+    return await Promise.all([clientContext?.getVisitorContext?.()]);
 }
 
 /**
