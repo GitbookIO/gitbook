@@ -55,8 +55,8 @@ export type ContentKitClientContextData = {
 
     /**
      * Navigate the host page to a page addressed by its ID, in response to a webframe
-     * `@webframe.navigate` action. The ID is resolved against the site's page tree (asynchronously),
-     * so navigation stays within the site.
+     * `@webframe.navigate` action. The ID is resolved against the site's page tree, so navigation
+     * stays within the site.
      */
     navigateToPageId?: (target: { pageId: string; anchor?: string }) => void;
 };

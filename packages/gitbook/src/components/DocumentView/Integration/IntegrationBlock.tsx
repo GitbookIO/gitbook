@@ -5,8 +5,16 @@ import { ContentKit, ContentKitOutput } from '@gitbook/react-contentkit';
 
 import type { BlockProps } from '../Block';
 import './contentkit.css';
-import { ContentKitWithClientContext } from './ContentKitWithClientContext';
-import { getWebframePageContext, integrationBlockContainsWebframe } from './adaptive';
+import type { GitBookLinker } from '@/lib/links';
+import {
+    ContentKitWithClientContext,
+    type WebframeLinkerData,
+} from './ContentKitWithClientContext';
+import {
+    getWebframePageContext,
+    getWebframePagePaths,
+    integrationBlockContainsWebframe,
+} from './adaptive';
 import { contentKitServerContext } from './contentkit';
 import { fetchSafeIntegrationUI } from './render';
 import { renderIntegrationUi } from './server-actions';
@@ -105,7 +113,8 @@ export async function IntegrationBlock(props: BlockProps<DocumentBlockIntegratio
                     {...contentKitProps}
                     canAccessVisitorClaims={canAccessVisitorClaims}
                     page={page}
-                    siteBasePath={context.contentContext.linker.siteBasePath}
+                    linkerData={getWebframeLinkerData(context.contentContext.linker)}
+                    pagePaths={getWebframePagePaths(context.contentContext)}
                 >
                     <ContentKitOutput output={initialOutput} context={contentKitServerContext} />
                 </ContentKitWithClientContext>
@@ -116,4 +125,27 @@ export async function IntegrationBlock(props: BlockProps<DocumentBlockIntegratio
             )}
         </div>
     );
+}
+
+/**
+ * Extract the serializable data needed to rebuild the site linker on the client, so webframe
+ * navigation resolves paths through the same (tested) linker as the rest of the app.
+ */
+function getWebframeLinkerData(linker: GitBookLinker): WebframeLinkerData {
+    const data: WebframeLinkerData = {
+        siteBasePath: linker.siteBasePath,
+        spaceBasePath: linker.spaceBasePath,
+    };
+
+    // `host`/`protocol` are only used to build absolute URLs, which webframe navigation never does.
+    // Carry them along when available so the rebuilt linker is complete (and avoids a dev warning).
+    try {
+        const url = new URL(linker.toAbsoluteURL('/'));
+        data.host = url.host;
+        data.protocol = url.protocol;
+    } catch {
+        // No usable host (e.g. tests): the linker still resolves in-site paths without it.
+    }
+
+    return data;
 }
