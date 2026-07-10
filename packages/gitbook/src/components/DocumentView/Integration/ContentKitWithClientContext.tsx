@@ -62,21 +62,23 @@ export function ContentKitWithClientContext<RenderContext>(
                 ? () => ({ visitor: visitorClaims?.visitor ?? null })
                 : undefined,
             getPageContext: page ? () => ({ page }) : undefined,
-            navigateToPath: ({ path, anchor }) => {
-                // Resolve the requested path relative to the site root so a webframe can navigate
-                // to any section or space within the site (and nowhere outside it).
-                const suffix = anchor ? `#${anchor}` : '';
-                navigateTo(linker.toPathInSite(path) + suffix);
-            },
-            navigateToPageId: ({ pageId, anchor }) => {
-                // Resolve the page id against the current space's pages so the destination is a
-                // real in-site page (and nowhere outside it).
-                const pagePath = pagePaths[pageId];
-                if (pagePath === undefined) {
+            navigate: (target) => {
+                const suffix = target.anchor ? `#${target.anchor}` : '';
+
+                if ('pageId' in target) {
+                    // Resolve the page id against the current space's pages so the destination is
+                    // a real in-site page (and nowhere outside it).
+                    const pagePath = pagePaths[target.pageId];
+                    if (pagePath === undefined) {
+                        return;
+                    }
+                    navigateTo(linker.toPathInSpace(pagePath) + suffix);
                     return;
                 }
-                const suffix = anchor ? `#${anchor}` : '';
-                navigateTo(linker.toPathInSpace(pagePath) + suffix);
+
+                // Resolve the requested path relative to the site root so a webframe can navigate
+                // to any section or space within the site (and nowhere outside it).
+                navigateTo(linker.toPathInSite(target.path) + suffix);
             },
         }),
         [canAccessVisitorClaims, visitorClaims, page, linker, pagePaths, navigateTo]

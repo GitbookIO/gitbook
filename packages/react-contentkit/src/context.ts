@@ -26,6 +26,15 @@ export type ContentKitWebframePage = {
     title: string;
 };
 
+/**
+ * Target of a webframe `@webframe.navigate` action. A destination is addressed either by `path`
+ * (resolved against the site base path) or by `pageId` (resolved against the site's page tree).
+ * An optional `anchor` scrolls to a heading within the destination page.
+ */
+export type ContentKitNavigateTarget =
+    | { path: string; anchor?: string }
+    | { pageId: string; anchor?: string };
+
 export type ContentKitClientContextData = {
     /**
      * Client-only visitor claims, merged into the webframe state.
@@ -47,18 +56,11 @@ export type ContentKitClientContextData = {
         | Promise<{ page: ContentKitWebframePage } | null | undefined>;
 
     /**
-     * Navigate the host page to a page addressed by its path, in response to a webframe
-     * `@webframe.navigate` action. The path is resolved against the site base path, so navigation
-     * stays within the site.
+     * Navigate the host page to another page, in response to a webframe `@webframe.navigate`
+     * action. The destination is addressed by `path` or `pageId`; the host resolves it within the
+     * current site and restricts navigation to destinations within it.
      */
-    navigateToPath?: (target: { path: string; anchor?: string }) => void;
-
-    /**
-     * Navigate the host page to a page addressed by its ID, in response to a webframe
-     * `@webframe.navigate` action. The ID is resolved against the site's page tree, so navigation
-     * stays within the site.
-     */
-    navigateToPageId?: (target: { pageId: string; anchor?: string }) => void;
+    navigate?: (target: ContentKitNavigateTarget) => void;
 };
 
 export interface ContentKitClientContextType {

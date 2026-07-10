@@ -136,12 +136,12 @@ export function ElementWebframe(props: ContentKitClientElementProps<ContentKitWe
                                 ? message.action.anchor
                                 : undefined;
                         if (typeof message.action.pageId === 'string') {
-                            renderer.clientContext?.navigateToPageId?.({
+                            renderer.clientContext?.navigate?.({
                                 pageId: message.action.pageId,
                                 anchor,
                             });
                         } else if (typeof message.action.path === 'string') {
-                            renderer.clientContext?.navigateToPath?.({
+                            renderer.clientContext?.navigate?.({
                                 path: message.action.path,
                                 anchor,
                             });
