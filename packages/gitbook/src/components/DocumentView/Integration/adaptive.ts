@@ -8,19 +8,15 @@ import type {
 type ContentKitElement = ContentKitRootElement | ContentKitDescendantElement | ContentKitStepper;
 
 /**
- * Decide whether an integration block should expose Adaptive visitor context to webframes.
+ * Whether an integration block's output contains a webframe that can consume client-only context
+ * (navigation and/or visitor claims).
  */
-export function shouldRenderIntegrationBlockWithAdaptiveVisitorContext(
-    output: ContentKitRenderOutput
-) {
+export function integrationBlockContainsWebframe(output: ContentKitRenderOutput): boolean {
     if (output.type === 'complete') {
         return false;
     }
 
-    return (
-        output.canAccessVisitorClaims === true &&
-        doesContentKitElementContainWebframe(output.element)
-    );
+    return doesContentKitElementContainWebframe(output.element);
 }
 
 /**
