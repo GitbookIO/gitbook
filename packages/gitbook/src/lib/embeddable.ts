@@ -46,6 +46,18 @@ export function resolveEmbeddableTheme(
     customization: Pick<SiteCustomizationSettings, 'themes'>,
     forcedTheme?: CustomizationDefaultThemeMode | null
 ) {
+    // An explicit override (the embed's `?theme=` / `colorScheme` option) always wins, even for
+    // single-theme sites: the embedder is deliberately matching the color scheme of their own page,
+    // and a webview can only pass it via the URL. This must be checked before the toggeable branch,
+    // otherwise a site with the theme toggle disabled silently ignores the requested scheme. RND-11571
+    if (forcedTheme) {
+        return {
+            htmlTheme: forcedTheme,
+            defaultTheme: forcedTheme,
+            forcedTheme,
+        };
+    }
+
     if (!customization.themes.toggeable) {
         const mode = customization.themes.default;
         return {
@@ -53,14 +65,6 @@ export function resolveEmbeddableTheme(
             defaultTheme: mode,
             // Only force concrete light/dark; System stays unforced so next-themes resolves prefers-color-scheme pre-paint (avoids the flash). A theme saved while the toggle was previously on still wins — see the PR's "Known limitation". RND-11643
             forcedTheme: mode === CustomizationDefaultThemeMode.System ? undefined : mode,
-        };
-    }
-
-    if (forcedTheme) {
-        return {
-            htmlTheme: forcedTheme,
-            defaultTheme: forcedTheme,
-            forcedTheme,
         };
     }
 

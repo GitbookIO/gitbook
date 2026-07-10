@@ -146,14 +146,31 @@ describe('resolveEmbeddableTheme', () => {
         });
     });
 
-    it('keeps the site theme for single-theme sites', () => {
+    it('keeps the site theme for single-theme sites without an override', () => {
         expect(
             resolveEmbeddableTheme(
                 createCustomization({
                     toggeable: false,
                     default: CustomizationDefaultThemeMode.Light,
+                })
+            )
+        ).toEqual({
+            htmlTheme: CustomizationDefaultThemeMode.Light,
+            defaultTheme: CustomizationDefaultThemeMode.Light,
+            forcedTheme: CustomizationDefaultThemeMode.Light,
+        });
+    });
+
+    it('honors an explicit override on single-theme sites (RND-11571)', () => {
+        // A `?theme=light` embed on a site with the theme toggle disabled must still
+        // force the requested scheme, since a webview can only pass it via the URL.
+        expect(
+            resolveEmbeddableTheme(
+                createCustomization({
+                    toggeable: false,
+                    default: CustomizationDefaultThemeMode.Dark,
                 }),
-                CustomizationDefaultThemeMode.Dark
+                CustomizationDefaultThemeMode.Light
             )
         ).toEqual({
             htmlTheme: CustomizationDefaultThemeMode.Light,
