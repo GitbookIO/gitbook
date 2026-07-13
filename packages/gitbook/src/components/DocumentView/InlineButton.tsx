@@ -9,6 +9,16 @@ import type { InlineProps } from './Inline';
 import { InlineActionButton } from './InlineActionButton';
 import { NotFoundRefHoverCard } from './NotFoundRefHoverCard';
 
+// Editor button sizes render one step smaller here; the editor default (`large`) keeps the previous `medium`.
+const BUTTON_SIZE_MAP: Record<
+    NonNullable<api.DocumentInlineButton['data']['size']>,
+    ButtonProps['size']
+> = {
+    small: 'xsmall',
+    medium: 'small',
+    large: 'medium',
+};
+
 export function InlineButton(props: InlineProps<api.DocumentInlineButton>) {
     const { inline, context } = props;
 
@@ -16,7 +26,7 @@ export function InlineButton(props: InlineProps<api.DocumentInlineButton>) {
         label: inline.data.label,
         variant: inline.data.kind,
         icon: inline.data.icon as IconName | undefined,
-        size: 'medium',
+        size: BUTTON_SIZE_MAP[inline.data.size ?? 'large'],
     };
 
     const ButtonImplementation = () => {
