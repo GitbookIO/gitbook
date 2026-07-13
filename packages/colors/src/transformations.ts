@@ -272,9 +272,10 @@ export function colorScale(
                 case 11:
                     return 0.1;
                 default:
-                    // When the tint is the exact base, hold the low steps at its chroma instead of
-                    // desaturating to gray, so the background end stays consistently tinted.
-                    return isExactBase ? 1 : index * 0.05;
+                    // When the tint is the exact base, hold the steps from the base toward the
+                    // accents at its chroma so the background stays tinted; steps lighter than the
+                    // base (e.g. cards in `muted`) keep desaturating toward white.
+                    return isExactBase && index >= exactBaseIndex ? 1 : index * 0.05;
             }
         })();
 
