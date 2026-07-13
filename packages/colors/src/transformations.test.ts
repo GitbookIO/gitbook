@@ -31,7 +31,7 @@ describe('colorScale exact base', () => {
     it('does not trigger for a saturated light color, keeping the normal accent ramp', () => {
         // Light enough (L≈0.93) to pass the lightness bound, but too chromatic to read as a
         // background — emitting it verbatim would leave a vivid step 1 above a near-gray scale.
-        const scale = colorScale('#FFEB3B', {});
+        const scale = colorScale('#FFEB3B', { baseStep: 1 });
         expect(scale[0]).toBe('#ffffff');
         expect(scale[0]).not.toBe('#FFEB3B');
     });
@@ -39,7 +39,7 @@ describe('colorScale exact base', () => {
     it('respects a custom light background instead of overriding it with the tint', () => {
         // The color is darker than the requested background, so it is not the extreme end and the
         // supplied base must be preserved rather than overwritten.
-        const scale = colorScale('#eeeeee', { background: '#f8f8f8' });
+        const scale = colorScale('#eeeeee', { baseStep: 1, background: '#f8f8f8' });
         expect(scale[0]).not.toBe('#eeeeee');
     });
 
@@ -51,5 +51,19 @@ describe('colorScale exact base', () => {
             mix: { color: '#787878', ratio: 0.4 },
         });
         expect(scale[0]).toBe('#F5F3EF');
+    });
+
+    it('does not trigger for a light accent color below the near-white threshold', () => {
+        // #D8DEEC (light blue-gray, L≈0.90) is a UI accent, not a background, so it must not anchor.
+        const scale = colorScale('#D8DEEC', { baseStep: 1 });
+        expect(scale[0]).toBe('#ffffff');
+        expect(scale[0]).not.toBe('#D8DEEC');
+    });
+
+    it('never anchors when no baseStep is given (accent scales and the bold theme)', () => {
+        // A scale that does not define the page background opts out of the exact base entirely.
+        const scale = colorScale('#F5F3EF', {});
+        expect(scale[0]).toBe('#ffffff');
+        expect(scale[0]).not.toBe('#F5F3EF');
     });
 });

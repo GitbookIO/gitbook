@@ -80,15 +80,13 @@ export async function CustomizationRootLayout(props: {
     const tintColor = getTintColor(customization);
     const mixColor = getTintMixColor(customization.styling.primaryColor, tintColor);
     const sidebarStyles = getSidebarStyles(customization);
-    // `muted` (and `bold` with a filled sidebar) render the second scale step (tint-subtle) as the
-    // page background; other themes use the first. When a tint is taken as the exact base, this is
-    // the step it anchors to.
-    const usesSubtleBackground =
-        'theme' in customization.styling &&
-        (customization.styling.theme === CustomizationTheme.Muted ||
-            (customization.styling.theme === CustomizationTheme.Bold &&
-                sidebarStyles.background === CustomizationSidebarBackgroundStyle.Filled));
-    const tintBaseStep = usesSubtleBackground ? 2 : 1;
+    const theme = 'theme' in customization.styling ? customization.styling.theme : undefined;
+    // Which scale step the theme renders as the page background — the step an exact light/dark tint
+    // anchors to. `muted` uses tint-subtle (step 2), other themes tint-base (step 1). `bold` is
+    // intentionally two-tone and already uses the tint for the header, so it opts out entirely
+    // (undefined) and keeps a neutral page background.
+    const tintBaseStep =
+        theme === CustomizationTheme.Bold ? undefined : theme === CustomizationTheme.Muted ? 2 : 1;
     const { infoColor, successColor, warningColor, dangerColor } = getSemanticColors(customization);
     const fontData = getFontData(customization.styling.font, 'content');
     // Temporarily add a if here while the cache is being warmed up.

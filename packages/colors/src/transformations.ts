@@ -84,9 +84,10 @@ export const colorMixMapping = {
 
 /**
  * Light mode has no equivalent to the dark base bound (nothing is lighter than white), so a tint
- * at or above this lightness is treated as an explicit, near-white background (e.g. a warm `#F5F3EF`).
+ * at or above this lightness is treated as an explicit, near-white background (e.g. a warm `#F5F3EF`
+ * at L≈0.96). Kept high so light UI accent colors (around L≈0.90) aren't mistaken for backgrounds.
  */
-const EXACT_BASE_LIGHT_THRESHOLD = 0.9;
+const EXACT_BASE_LIGHT_THRESHOLD = 0.95;
 
 /**
  * Only a near-neutral tint reads as a background. A saturated color would keep the exact hue at the
@@ -175,10 +176,10 @@ export type ColorScaleOptions = {
     foreground?: string;
 
     /**
-     * The 1-indexed scale step that the consuming theme renders as the page background
-     * (1 = `clean`/`bold` → `tint-base`, 2 = `muted` → `tint-subtle`). When a tint sits at the
-     * extreme light/dark end and is taken as the exact base, the supplied color is anchored to
-     * this step so the page background matches it exactly regardless of theme. Defaults to 1.
+     * The 1-indexed scale step this scale renders as the page background (1 = `tint-base` for
+     * `clean`, 2 = `tint-subtle` for `muted`). When set, an extreme near-neutral tint is taken as
+     * the exact background, anchored to this step so it matches exactly. Omit for scales that don't
+     * define the page background (accents, or the two-tone `bold` theme) — they never anchor.
      */
     baseStep?: number;
 
@@ -202,7 +203,7 @@ export function colorScale(
         darkMode = false,
         background = darkMode ? DARK_BASE : LIGHT_BASE,
         foreground = darkMode ? LIGHT_BASE : DARK_BASE,
-        baseStep = 1,
+        baseStep,
         mix,
     }: ColorScaleOptions = {}
 ) {
@@ -214,16 +215,18 @@ export function colorScale(
 
     // A near-neutral tint at the extreme end of the scale is taken as the exact page background
     // rather than tinting pure black/white with it — letting brands set an exact background such as
-    // a warm `#F5F3EF`. In light mode the base is pure white by default, so a near-white tint also
-    // qualifies (nothing is lighter than white); a custom, lower background is respected instead.
-    // Decided on the raw color so a neutral mix (below) can't darken a tint out of the exact base.
+    // a warm `#F5F3EF`. Only scales that define the page background opt in (via `baseStep`). In light
+    // mode the base is pure white by default, so a near-white tint also qualifies (nothing is lighter
+    // than white); a custom, lower background is respected instead. Decided on the raw color so a
+    // neutral mix (below) can't darken a tint out of the exact base.
     const isExtremeBase = darkMode
         ? baseColor.L < backgroundColor.L
         : backgroundColor.L >= LIGHT_BASE_L
           ? baseColor.L > EXACT_BASE_LIGHT_THRESHOLD
           : baseColor.L > backgroundColor.L;
-    const isExactBase = isExtremeBase && baseColor.C < EXACT_BASE_NEUTRAL_CHROMA;
-    const exactBaseIndex = baseStep - 1;
+    const isExactBase =
+        baseStep !== undefined && isExtremeBase && baseColor.C < EXACT_BASE_NEUTRAL_CHROMA;
+    const exactBaseIndex = (baseStep ?? 1) - 1;
 
     if (mixColor && mix?.ratio && mix.ratio > 0 && !isExactBase) {
         // Mix a little of the mix color into the base — but not when the tint is the exact base,
