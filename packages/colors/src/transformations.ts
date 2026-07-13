@@ -94,6 +94,9 @@ const EXACT_BASE_LIGHT_THRESHOLD = 0.9;
  */
 const EXACT_BASE_NEUTRAL_CHROMA = 0.05;
 
+/** Lightness of the default white light background (≈0.99999, not exactly 1). */
+const LIGHT_BASE_L = rgbToOklch(hexToRgbArray(LIGHT_BASE)).L;
+
 /**
  * Convert a hex color to an RGB color.
  */
@@ -209,21 +212,26 @@ export function colorScale(
     const backgroundColor = rgbToOklch(hexToRgbArray(background));
     let mapping = darkMode ? colorMixMapping.dark : colorMixMapping.light;
 
-    if (mixColor && mix?.ratio && mix.ratio > 0) {
-        // If defined, we mix in a (tiny) bit of the mix color with the base color.
+    // A near-neutral tint at the extreme end of the scale is taken as the exact page background
+    // rather than tinting pure black/white with it — letting brands set an exact background such as
+    // a warm `#F5F3EF`. In light mode the base is pure white by default, so a near-white tint also
+    // qualifies (nothing is lighter than white); a custom, lower background is respected instead.
+    // Decided on the raw color so a neutral mix (below) can't darken a tint out of the exact base.
+    const isExtremeBase = darkMode
+        ? baseColor.L < backgroundColor.L
+        : backgroundColor.L >= LIGHT_BASE_L
+          ? baseColor.L > EXACT_BASE_LIGHT_THRESHOLD
+          : baseColor.L > backgroundColor.L;
+    const isExactBase = isExtremeBase && baseColor.C < EXACT_BASE_NEUTRAL_CHROMA;
+    const exactBaseIndex = baseStep - 1;
+
+    if (mixColor && mix?.ratio && mix.ratio > 0 && !isExactBase) {
+        // Mix a little of the mix color into the base — but not when the tint is the exact base,
+        // where it must stay true to the supplied color (and match `--header-background`).
         baseColor.L = mixColor.L * mix.ratio + baseColor.L * (1 - mix.ratio);
         baseColor.C = mixColor.C * mix.ratio + baseColor.C * (1 - mix.ratio);
         baseColor.H = mix.color === DEFAULT_TINT_COLOR ? baseColor.H : mixColor.H;
     }
-
-    // A near-neutral tint at the extreme end of the scale (darker than our dark base, or near-white
-    // in light mode) is taken as the exact page background rather than tinting pure black/white with
-    // it — letting brands set an exact background such as a warm `#F5F3EF`.
-    const isExtremeBase = darkMode
-        ? baseColor.L < backgroundColor.L
-        : baseColor.L > EXACT_BASE_LIGHT_THRESHOLD;
-    const isExactBase = isExtremeBase && baseColor.C < EXACT_BASE_NEUTRAL_CHROMA;
-    const exactBaseIndex = baseStep - 1;
 
     if (isExactBase) {
         const difference = (backgroundColor.L - baseColor.L) / backgroundColor.L;

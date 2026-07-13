@@ -35,4 +35,21 @@ describe('colorScale exact base', () => {
         expect(scale[0]).toBe('#ffffff');
         expect(scale[0]).not.toBe('#FFEB3B');
     });
+
+    it('respects a custom light background instead of overriding it with the tint', () => {
+        // The color is darker than the requested background, so it is not the extreme end and the
+        // supplied base must be preserved rather than overwritten.
+        const scale = colorScale('#eeeeee', { background: '#f8f8f8' });
+        expect(scale[0]).not.toBe('#eeeeee');
+    });
+
+    it('anchors an exact base even when a neutral mix is supplied (tint === primary)', () => {
+        // getTintMixColor blends neutral into the tint when it equals the primary color; that must
+        // not darken a near-white tint out of the exact-base path.
+        const scale = colorScale('#F5F3EF', {
+            baseStep: 1,
+            mix: { color: '#787878', ratio: 0.4 },
+        });
+        expect(scale[0]).toBe('#F5F3EF');
+    });
 });
