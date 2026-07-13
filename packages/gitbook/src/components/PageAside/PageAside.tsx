@@ -77,6 +77,7 @@ export async function PageAside(props: {
                 'break-anywhere', // To prevent long words in headings from breaking the layout
 
                 'lg:z-10',
+                'lg:hover:z-12',
                 'layout-default:xl:not-chat-open:pr-0',
                 'layout-default:xl:not-chat-open:pl-8',
                 'layout-default:xl:not-chat-open:flex!',
@@ -98,7 +99,7 @@ export async function PageAside(props: {
                 'page-api-block:page-has-outline:min-[96rem]:border-l-0',
                 'page-api-block:page-has-outline:min-[96rem]:pl-8',
 
-                'hydrated:site-background', // Only add a background once the element is positioned correctly to prevent overlapping the page cover
+                'max-xl:hydrated:site-background', // Only add a background once the element is positioned correctly to prevent overlapping the page cover
                 'text-tint',
                 'contrast-more:text-tint-strong'
             )}
