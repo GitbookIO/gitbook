@@ -272,7 +272,9 @@ export function colorScale(
                 case 11:
                     return 0.1;
                 default:
-                    return index * 0.05;
+                    // When the tint is the exact base, hold the low steps at its chroma instead of
+                    // desaturating to gray, so the background end stays consistently tinted.
+                    return isExactBase ? 1 : index * 0.05;
             }
         })();
 
