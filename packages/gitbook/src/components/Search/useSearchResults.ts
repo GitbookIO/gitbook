@@ -28,6 +28,9 @@ export type ResultType =
 
 export type { LocalPageResult, MergedPageResult };
 
+// Score multiplier for current site space results when combined with those from other site spaces
+const CURRENT_SITE_SPACE_SCORE_MULTIPLIER = 2;
+
 // Small helper extracted for unit testing of scope → local filter mapping
 // computeFilterSiteSpaceIds is imported from './filter' for testability
 
@@ -87,7 +90,6 @@ export function useSearchResults(props: {
 
     const [remoteState, setRemoteState] = React.useState<{
         results: OrderedComputedResult[];
-        /** Results from the other site spaces, appended below all other results. */
         otherSpacesResults: OrderedComputedResult[];
         fetching: boolean;
         error: boolean;
@@ -213,7 +215,6 @@ export function useSearchResults(props: {
             try {
                 // Each scope resolves to a primary search request and, for the default scope
                 // on a multi-section site, a secondary request for the other site spaces
-                // whose results are displayed below all other results.
                 const { resultsPromise, otherSpacesResultsPromise } = ((): {
                     resultsPromise: Promise<OrderedComputedResult[]>;
                     otherSpacesResultsPromise?: Promise<OrderedComputedResult[]>;
@@ -267,66 +268,75 @@ export function useSearchResults(props: {
                     }
                 })();
 
-                let resultsArrived = false;
-                otherSpacesResultsPromise?.then(
-                    () => {
-                        if (!resultsArrived && !cancelled) {
-                            console.warn(
-                                'Search results for the other site spaces arrived before the current site space results'
-                            );
-                        }
-                    },
-                    // Swallow the rejection to avoid an unhandled one;
-                    // failures are handled where the promise is awaited below.
-                    () => {}
-                );
+                if (!otherSpacesResultsPromise) {
+                    const results = await resultsPromise;
 
-                const results = await resultsPromise;
-                resultsArrived = true;
+                    if (cancelled) {
+                        return;
+                    }
 
-                if (cancelled) {
-                    return;
-                }
+                    if (!results) {
+                        // One time when this one returns undefined is when it cannot find the server action and returns the html from the page.
+                        // In that case, we want to avoid being stuck in a loading state, but it is an error.
+                        // We could potentially try to force reload the page here, but i'm not 100% sure it would be a better experience.
+                        setRemoteState({
+                            results: [],
+                            otherSpacesResults: [],
+                            fetching: false,
+                            error: true,
+                        });
+                        return;
+                    }
 
-                if (!results) {
-                    // One time when this one returns undefined is when it cannot find the server action and returns the html from the page.
-                    // In that case, we want to avoid being stuck in a loading state, but it is an error.
-                    // We could potentially try to force reload the page here, but i'm not 100% sure it would be a better experience.
                     setRemoteState({
-                        results: [],
+                        results,
                         otherSpacesResults: [],
                         fetching: false,
-                        error: true,
+                        error: false,
                     });
+                    trackEvent({ type: 'search_type_query', query });
                     return;
                 }
 
-                // Keep fetching while the other site spaces request, if any, is in flight.
-                setRemoteState({
-                    results: results,
-                    otherSpacesResults: [],
-                    fetching: Boolean(otherSpacesResultsPromise),
-                    error: false,
-                });
+                // Render each result set as soon as its response arrives; a failed
+                // request reports an error without discarding the other result set.
+                let tracked = false;
+                const onResults =
+                    (key: 'results' | 'otherSpacesResults') =>
+                    (results: OrderedComputedResult[]) => {
+                        if (cancelled) {
+                            return;
+                        }
 
-                trackEvent({ type: 'search_type_query', query });
+                        if (!results) {
+                            // Can happen when the route cannot be found and returns the page's html.
+                            setRemoteState((prev) => ({ ...prev, error: true }));
+                            return;
+                        }
 
-                if (!otherSpacesResultsPromise) {
-                    return;
-                }
+                        setRemoteState((prev) => ({ ...prev, [key]: results }));
 
-                // If only the other site spaces request fails, keep the current site space
-                // results and report a partial error.
-                const otherSpacesResults = await otherSpacesResultsPromise.catch(() => null);
+                        if (!tracked) {
+                            tracked = true;
+                            trackEvent({ type: 'search_type_query', query });
+                        }
+                    };
+                const onError = () => {
+                    if (cancelled) {
+                        return;
+                    }
+                    setRemoteState((prev) => ({ ...prev, error: true }));
+                };
+
+                await Promise.all([
+                    resultsPromise.then(onResults('results'), onError),
+                    otherSpacesResultsPromise.then(onResults('otherSpacesResults'), onError),
+                ]);
+
                 if (cancelled) {
                     return;
                 }
-                setRemoteState({
-                    results: results,
-                    otherSpacesResults: otherSpacesResults ?? [],
-                    fetching: false,
-                    error: !otherSpacesResults,
-                });
+                setRemoteState((prev) => ({ ...prev, fetching: false }));
             } catch {
                 // If there is an error, we need to catch it to avoid infinite loading state.
                 if (cancelled) {
@@ -393,8 +403,7 @@ export function useSearchResults(props: {
 
         return reciprocalRankFusion(
             localResults,
-            remoteState.results,
-            remoteState.otherSpacesResults,
+            combineRemoteResults(remoteState.results, remoteState.otherSpacesResults),
             query
         );
     }, [
@@ -442,4 +451,17 @@ async function fetchSearchResults(
     }
 
     return response.json() as Promise<OrderedComputedResult[]>;
+}
+
+function combineRemoteResults(
+    remoteResultsCurrentSpace: OrderedComputedResult[],
+    remoteResultsOtherSpaces: OrderedComputedResult[]
+): OrderedComputedResult[] {
+    return [
+        ...remoteResultsCurrentSpace.map((result) => ({
+            ...result,
+            score: result.score * CURRENT_SITE_SPACE_SCORE_MULTIPLIER,
+        })),
+        ...remoteResultsOtherSpaces,
+    ].sort((a, b) => b.score - a.score);
 }

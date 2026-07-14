@@ -133,7 +133,7 @@ function mergePinnedRemoteResult(
 
 /**
  * Merge local (FlexSearch) and remote (API) search results using
- * Reciprocal Rank Fusion (RRF), while preserving the API order for the first
+ * Reciprocal Rank Fusion (RRF), while preserving the order of the first
  * three remote results.
  *
  * RRF formula: score(d) = Σ_i  1 / (k + rank_i(d))
@@ -151,26 +151,19 @@ function mergePinnedRemoteResult(
  * Additionally, a Jaro-Winkler title-match bonus is applied per query word:
  * for each query word that appears as a substring in the title, the best
  * Jaro-Winkler similarity score against any individual title word is added.
- *
- * Results from the other site spaces (`otherRemoteResults`) are appended at the
- * very bottom in their API order, excluded from fusion so they never outrank
- * the pinned or fused results. A page already present in the pinned or fused
- * results wins over its duplicate in the other site spaces: the duplicate is
- * dropped, only enriching a matching local page with the remote fields.
  */
 export function reciprocalRankFusion(
     localResults: LocalPageResult[],
-    remoteResultsCurrentSpace: OrderedComputedResult[],
-    remoteResultsOtherSpaces: OrderedComputedResult[],
+    remoteResults: OrderedComputedResult[],
     query: string
 ): Array<RRFResult> {
     const localResultsByKey = new Map(localResults.map((result) => [getResultKey(result), result]));
-    const pinnedRemoteResults = remoteResultsCurrentSpace.slice(0, PINNED_REMOTE_RESULTS_COUNT);
+    const pinnedRemoteResults = remoteResults.slice(0, PINNED_REMOTE_RESULTS_COUNT);
     const pinnedResultKeys = new Set(pinnedRemoteResults.map((result) => getResultKey(result)));
     const remainingLocalResults = localResults.filter(
         (result) => !pinnedResultKeys.has(getResultKey(result))
     );
-    const remainingRemoteResults = remoteResultsCurrentSpace
+    const remainingRemoteResults = remoteResults
         .slice(PINNED_REMOTE_RESULTS_COUNT)
         .filter((result) => !pinnedResultKeys.has(getResultKey(result)));
 
@@ -242,26 +235,6 @@ export function reciprocalRankFusion(
         }
     }
 
-    // Deduplicate the other site spaces results against the pinned and fused results,
-    // without contributing to the fusion scores.
-    const appendedOtherResults: RRFResult[] = [];
-    for (const result of remoteResultsOtherSpaces) {
-        const key = getResultKey(result);
-        if (pinnedResultKeys.has(key)) {
-            continue;
-        }
-
-        const existing = scoreMap.get(key);
-        if (existing) {
-            if (existing.result.type === 'local-page' && result.type === 'page') {
-                existing.result = mergeLocalPageWithRemotePage(existing.result, result);
-            }
-            continue;
-        }
-
-        appendedOtherResults.push(result);
-    }
-
     // Sort descending by RRF score
     const fusedResults = Array.from(scoreMap.values())
         .sort((a, b) => b.score - a.score)
@@ -270,6 +243,5 @@ export function reciprocalRankFusion(
     return [
         ...pinnedRemoteResults.map((result) => mergePinnedRemoteResult(result, localResultsByKey)),
         ...fusedResults,
-        ...appendedOtherResults,
     ];
 }
