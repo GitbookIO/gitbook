@@ -370,7 +370,9 @@ export function useSearchResults(props: {
 
         return reciprocalRankFusion(
             localResults,
-            combineRemoteResults(remoteState.results, remoteState.otherSpacesResults),
+            remoteState.otherSpacesResults.length > 0
+                ? combineRemoteResults(remoteState.results, remoteState.otherSpacesResults)
+                : remoteState.results,
             query
         );
     }, [
