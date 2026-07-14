@@ -80,72 +80,29 @@ export function useScrollToHash() {
 let cancelScrollToHash: (() => void) | null = null;
 
 /**
- * Scroll to the element matching a hash, robustly, during a client-side navigation.
+ * Scroll to the element matching a hash during a client-side navigation.
  *
- * Two things fight a naive one-shot scroll on a cross-page anchor link (`/page#heading`):
- *   1. The hash is known on link click, before the destination content commits, so the target
- *      element doesn't exist yet on the first attempt.
- *   2. Next's scroll restoration fires a `window.scrollTo(0, 0)` *after* the destination commits,
- *      overriding a single `scrollIntoView` and leaving the page at the top.
- * So we retry until the element exists, then keep re-asserting the scroll for a short window to win
- * against that late reset — bailing immediately if the user scrolls, so we never hijack their intent.
+ * On a cross-page anchor link the target commits a few frames after the hash is known, and Next's
+ * scroll restoration then fires a `scrollTo(0, 0)` that overrides a one-shot scroll. So retry until
+ * the element exists, then re-assert briefly so GitBook scrolls last. `instant` (not `smooth`) can't
+ * be interrupted mid-animation, and re-scrolling to a reached position is a no-op.
  */
 function scrollToHash(hash: string) {
     cancelScrollToHash?.();
 
-    // ~1s to wait for the element to commit; ~0.3s of re-asserting once it has.
-    const maxFramesToFind = 60;
-    const framesToHoldAfterFound = 20;
-
     let frame = 0;
-    let framesSinceFound = 0;
-    let rafId: number | null = null;
-    let aborted = false;
-
-    const onUserScroll = () => {
-        aborted = true;
-    };
-
-    const cleanup = () => {
-        if (rafId !== null) {
-            cancelAnimationFrame(rafId);
-            rafId = null;
-        }
-        window.removeEventListener('wheel', onUserScroll);
-        window.removeEventListener('touchmove', onUserScroll);
-        window.removeEventListener('keydown', onUserScroll);
-        cancelScrollToHash = null;
-    };
-    cancelScrollToHash = cleanup;
-
-    window.addEventListener('wheel', onUserScroll, { passive: true });
-    window.addEventListener('touchmove', onUserScroll, { passive: true });
-    window.addEventListener('keydown', onUserScroll);
-
-    const tick = () => {
-        if (aborted) {
-            cleanup();
-            return;
-        }
-
+    let framesAfterFound = 0;
+    let rafId = requestAnimationFrame(function tick() {
         const element = document.getElementById(hash);
-        if (element) {
-            // `instant` (not `smooth`): a smooth animation is easily interrupted by the competing
-            // scroll reset, and re-asserting an instant scroll to a position already reached is a
-            // no-op, so holding costs nothing.
-            element.scrollIntoView({ block: 'start', behavior: 'instant' });
-            if (framesSinceFound++ >= framesToHoldAfterFound) {
-                cleanup();
-                return;
-            }
-        } else if (frame >= maxFramesToFind) {
-            cleanup();
-            return;
+        element?.scrollIntoView({ block: 'start', behavior: 'instant' });
+
+        // Retry ~1s for the element to commit; once found, hold ~0.3s to outlast the reset.
+        if (frame++ < 60 && (!element || framesAfterFound++ < 20)) {
+            rafId = requestAnimationFrame(tick);
+        } else {
+            cancelScrollToHash = null;
         }
+    });
 
-        frame++;
-        rafId = requestAnimationFrame(tick);
-    };
-
-    tick();
+    cancelScrollToHash = () => cancelAnimationFrame(rafId);
 }
