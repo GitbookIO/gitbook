@@ -69,20 +69,12 @@ export function ScrollPage() {
  */
 export function useScrollToHash() {
     const hash = useHash();
-    const pathname = usePathname();
 
-    // Depend on `pathname` as well as `hash`: on a soft navigation to another page
-    // (e.g. a homepage card linking to `/page#heading`), the hash is set on click while
-    // the previous page is still mounted, so a hash-only effect fires before the target
-    // element exists. Because sibling pages share the same `[pagePath]` route, this hook's
-    // host component is reused rather than remounted, so it would otherwise never re-run
-    // once the destination content commits. Re-running on `pathname` re-attempts the scroll
-    // when the target heading is finally in the DOM.
     React.useEffect(() => {
         if (hash) {
             scrollToHash(hash);
         }
-    }, [hash, pathname]);
+    }, [hash]);
 }
 
 /**
