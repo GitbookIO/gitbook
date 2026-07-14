@@ -47,11 +47,20 @@ function useScrollPage() {
             return;
         }
 
-        if (hash) {
-            scrollToHash(hash);
+        // For a same-page anchor the context `hash` is authoritative (set on click, before Next
+        // commits the URL). For a cross-page navigation the context hash is transiently empty while
+        // the section remounts, so read the committed URL instead.
+        const samePage = previous !== undefined && previous.pathname === pathname;
+        const targetHash = samePage ? hash : window.location.hash.slice(1);
+
+        if (targetHash) {
+            scrollToHash(targetHash);
             return;
         }
 
+        // No hash: cancel any in-flight scroll-to-hash from a previous navigation so it can't fight
+        // this one. Next handles the actual scroll-to-top of the new page.
+        cancelScrollToHash?.();
         window.scrollTo(0, 0);
     }, [hash, pathname, previous]);
 }
@@ -77,32 +86,45 @@ export function useScrollToHash() {
     }, [hash]);
 }
 
+/** Cancels an in-flight {@link scrollToHash} run, if any. */
 let cancelScrollToHash: (() => void) | null = null;
 
+/** Treat a navigation as settled — and stop re-asserting the scroll — once the DOM is quiet this long. */
+const SCROLL_TO_HASH_SETTLE_MS = 400;
+
 /**
- * Scroll to the element matching a hash during a client-side navigation.
+ * Scroll to the element matching a hash after a client-side navigation.
  *
- * On a cross-page anchor link the target commits a few frames after the hash is known, and Next's
- * scroll restoration then fires a `scrollTo(0, 0)` that overrides a one-shot scroll. So retry until
- * the element exists, then re-assert briefly so GitBook scrolls last. `instant` (not `smooth`) can't
- * be interrupted mid-animation, and re-scrolling to a reached position is a no-op.
+ * A soft navigation delivers the destination asynchronously: its content keeps mounting and reflowing
+ * for a few hundred ms after the URL changes, so a single scroll lands before the target reaches its
+ * final position. Re-scroll on every DOM change until it goes quiet — mirroring the fragment scrolling
+ * the browser does for free during a full page load. Bail if the visitor scrolls, so we never fight
+ * them. (`instant` so re-scrolling to an already-reached position is a no-op.)
  */
 function scrollToHash(hash: string) {
     cancelScrollToHash?.();
 
-    let frame = 0;
-    let framesAfterFound = 0;
-    let rafId = requestAnimationFrame(function tick() {
-        const element = document.getElementById(hash);
-        element?.scrollIntoView({ block: 'start', behavior: 'instant' });
+    let settleTimer = 0;
+    const stop = () => {
+        observer.disconnect();
+        window.clearTimeout(settleTimer);
+        window.removeEventListener('wheel', stop);
+        window.removeEventListener('touchmove', stop);
+        cancelScrollToHash = null;
+    };
 
-        // Retry ~1s for the element to commit; once found, hold ~0.3s to outlast the reset.
-        if (frame++ < 60 && (!element || framesAfterFound++ < 20)) {
-            rafId = requestAnimationFrame(tick);
-        } else {
-            cancelScrollToHash = null;
-        }
-    });
+    const reassert = () => {
+        document.getElementById(hash)?.scrollIntoView({ block: 'start', behavior: 'instant' });
+        window.clearTimeout(settleTimer);
+        settleTimer = window.setTimeout(stop, SCROLL_TO_HASH_SETTLE_MS);
+    };
 
-    cancelScrollToHash = () => cancelAnimationFrame(rafId);
+    // Our own `scrollIntoView` dispatches `scroll`, not `wheel`/`touchmove`, so it can't self-cancel.
+    const observer = new MutationObserver(reassert);
+    observer.observe(document.body, { childList: true, subtree: true });
+    window.addEventListener('wheel', stop, { passive: true });
+    window.addEventListener('touchmove', stop, { passive: true });
+
+    reassert();
+    cancelScrollToHash = stop;
 }
