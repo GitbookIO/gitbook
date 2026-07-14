@@ -171,6 +171,12 @@ export function Link(props: LinkProps) {
             ref={ref}
             href={href}
             prefetch={_prefetch}
+            // GitBook is the sole scroll authority on client-side navigation (`ScrollPage` /
+            // `useScrollToHash` → `scrollToHash`, which retries until the target commits). Next's
+            // own post-navigation scroll (see `useHash`, vercel/next.js#49465) otherwise fires its
+            // own `scrollToHash` and a scroll-to-top that override ours, leaving cross-page anchor
+            // links stuck at the top. Opt out so only our handlers scroll.
+            scroll={false}
             className={tcls(...forwardedClassNames, className)}
             {...domProps}
             onClick={onClick}
