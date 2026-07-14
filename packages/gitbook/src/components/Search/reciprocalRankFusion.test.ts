@@ -48,6 +48,7 @@ describe('reciprocalRankFusion', () => {
                 remotePage('remote-3'),
                 remotePage('remote-4'),
             ],
+            [],
             'alpha'
         );
 
@@ -67,6 +68,7 @@ describe('reciprocalRankFusion', () => {
                 remotePage('remote-3'),
                 remotePage('remote-4'),
             ],
+            [],
             'alpha'
         );
 
@@ -86,6 +88,7 @@ describe('reciprocalRankFusion', () => {
         const results = reciprocalRankFusion(
             [localPage('local-match', 'Alpha Local Match')],
             [remoteRecord('remote-1'), remotePage('remote-2')],
+            [],
             'alpha'
         );
 
@@ -104,6 +107,7 @@ describe('reciprocalRankFusion', () => {
                 remotePage('remote-2'),
                 remotePage('remote-3'),
             ],
+            [],
             'remote'
         );
         const pinnedResult = results[0] as MergedPageResult;
@@ -126,11 +130,75 @@ describe('reciprocalRankFusion', () => {
                 remoteRecord('record-1'),
                 remotePage('remote-4'),
             ],
+            [],
             'remote'
         );
 
         expect(results.map(getResultKey).filter((key) => key === 'record:record-1')).toHaveLength(
             1
         );
+    });
+
+    describe('other site spaces results', () => {
+        it('appends them at the very bottom in their API order', () => {
+            const results = reciprocalRankFusion(
+                [localPage('local-match', 'Alpha Local Match')],
+                [remotePage('remote-1'), remotePage('remote-2')],
+                [remotePage('other-2'), remoteRecord('other-record'), remotePage('other-1')],
+                'alpha'
+            );
+
+            expect(results.map(getResultKey)).toEqual([
+                'page:remote-1',
+                'page:remote-2',
+                'page:local-match',
+                'page:other-2',
+                'record:other-record',
+                'page:other-1',
+            ]);
+        });
+
+        it('drops duplicates of pinned results', () => {
+            const results = reciprocalRankFusion(
+                [],
+                [remotePage('remote-1'), remotePage('remote-2')],
+                [remotePage('remote-1'), remotePage('other-1')],
+                'remote'
+            );
+
+            expect(results.map(getResultKey)).toEqual([
+                'page:remote-1',
+                'page:remote-2',
+                'page:other-1',
+            ]);
+        });
+
+        it('keeps a matching local page in its fused position, enriched with the remote fields', () => {
+            const results = reciprocalRankFusion(
+                [localPage('other-1', 'Local title')],
+                [
+                    remotePage('remote-1'),
+                    remotePage('remote-2'),
+                    remotePage('remote-3'),
+                    remotePage('remote-4'),
+                ],
+                [remotePage('other-1', 'Remote title'), remotePage('other-2')],
+                'local'
+            );
+
+            expect(results.map(getResultKey)).toEqual([
+                'page:remote-1',
+                'page:remote-2',
+                'page:remote-3',
+                'page:other-1',
+                'page:remote-4',
+                'page:other-2',
+            ]);
+
+            const mergedResult = results[3] as MergedPageResult;
+            expect(mergedResult.type).toBe('page');
+            expect(mergedResult.title).toBe('Remote title');
+            expect(mergedResult.description).toBe('Local description for Local title');
+        });
     });
 });
