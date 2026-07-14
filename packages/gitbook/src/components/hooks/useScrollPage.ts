@@ -77,44 +77,75 @@ export function useScrollToHash() {
     }, [hash]);
 }
 
-let scrollToHashFrame: number | null = null;
+let cancelScrollToHash: (() => void) | null = null;
 
 /**
- * Scroll to the element matching a hash.
+ * Scroll to the element matching a hash, robustly, during a client-side navigation.
  *
- * On a soft navigation to another page the hash is known (set on link click) before the
- * destination content commits to the DOM, so the target element is often missing on the first
- * attempt. Rather than give up — which left cross-page anchor links stuck at the top of the page —
- * retry across animation frames (bounded) until the element appears.
+ * Two things fight a naive one-shot scroll on a cross-page anchor link (`/page#heading`):
+ *   1. The hash is known on link click, before the destination content commits, so the target
+ *      element doesn't exist yet on the first attempt.
+ *   2. Next's scroll restoration fires a `window.scrollTo(0, 0)` *after* the destination commits,
+ *      overriding a single `scrollIntoView` and leaving the page at the top.
+ * So we retry until the element exists, then keep re-asserting the scroll for a short window to win
+ * against that late reset — bailing immediately if the user scrolls, so we never hijack their intent.
  */
 function scrollToHash(hash: string) {
-    if (scrollToHashFrame !== null) {
-        cancelAnimationFrame(scrollToHashFrame);
-        scrollToHashFrame = null;
-    }
+    cancelScrollToHash?.();
 
-    // ~1s at 60fps: enough for a prefetched page to commit, short enough not to hijack the
-    // scroll long after the user has moved on.
-    let remainingFrames = 60;
+    // ~1s to wait for the element to commit; ~0.3s of re-asserting once it has.
+    const maxFramesToFind = 60;
+    const framesToHoldAfterFound = 20;
 
-    const attempt = () => {
-        const element = document.getElementById(hash);
-        if (element) {
-            element.scrollIntoView({
-                block: 'start',
-                behavior: 'smooth',
-            });
-            scrollToHashFrame = null;
-            return;
-        }
+    let frame = 0;
+    let framesSinceFound = 0;
+    let rafId: number | null = null;
+    let aborted = false;
 
-        if (remainingFrames-- <= 0) {
-            scrollToHashFrame = null;
-            return;
-        }
-
-        scrollToHashFrame = requestAnimationFrame(attempt);
+    const onUserScroll = () => {
+        aborted = true;
     };
 
-    attempt();
+    const cleanup = () => {
+        if (rafId !== null) {
+            cancelAnimationFrame(rafId);
+            rafId = null;
+        }
+        window.removeEventListener('wheel', onUserScroll);
+        window.removeEventListener('touchmove', onUserScroll);
+        window.removeEventListener('keydown', onUserScroll);
+        cancelScrollToHash = null;
+    };
+    cancelScrollToHash = cleanup;
+
+    window.addEventListener('wheel', onUserScroll, { passive: true });
+    window.addEventListener('touchmove', onUserScroll, { passive: true });
+    window.addEventListener('keydown', onUserScroll);
+
+    const tick = () => {
+        if (aborted) {
+            cleanup();
+            return;
+        }
+
+        const element = document.getElementById(hash);
+        if (element) {
+            // `instant` (not `smooth`): a smooth animation is easily interrupted by the competing
+            // scroll reset, and re-asserting an instant scroll to a position already reached is a
+            // no-op, so holding costs nothing.
+            element.scrollIntoView({ block: 'start', behavior: 'instant' });
+            if (framesSinceFound++ >= framesToHoldAfterFound) {
+                cleanup();
+                return;
+            }
+        } else if (frame >= maxFramesToFind) {
+            cleanup();
+            return;
+        }
+
+        frame++;
+        rafId = requestAnimationFrame(tick);
+    };
+
+    tick();
 }
