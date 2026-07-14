@@ -77,17 +77,44 @@ export function useScrollToHash() {
     }, [hash]);
 }
 
+let scrollToHashFrame: number | null = null;
+
 /**
- * Scroll to a hash, if scroll didn't work, return false.
+ * Scroll to the element matching a hash.
+ *
+ * On a soft navigation to another page the hash is known (set on link click) before the
+ * destination content commits to the DOM, so the target element is often missing on the first
+ * attempt. Rather than give up — which left cross-page anchor links stuck at the top of the page —
+ * retry across animation frames (bounded) until the element appears.
  */
 function scrollToHash(hash: string) {
-    const element = document.getElementById(hash);
-    if (element) {
-        element.scrollIntoView({
-            block: 'start',
-            behavior: 'smooth',
-        });
-        return true;
+    if (scrollToHashFrame !== null) {
+        cancelAnimationFrame(scrollToHashFrame);
+        scrollToHashFrame = null;
     }
-    return false;
+
+    // ~1s at 60fps: enough for a prefetched page to commit, short enough not to hijack the
+    // scroll long after the user has moved on.
+    let remainingFrames = 60;
+
+    const attempt = () => {
+        const element = document.getElementById(hash);
+        if (element) {
+            element.scrollIntoView({
+                block: 'start',
+                behavior: 'smooth',
+            });
+            scrollToHashFrame = null;
+            return;
+        }
+
+        if (remainingFrames-- <= 0) {
+            scrollToHashFrame = null;
+            return;
+        }
+
+        scrollToHashFrame = requestAnimationFrame(attempt);
+    };
+
+    attempt();
 }

@@ -171,11 +171,6 @@ export function Link(props: LinkProps) {
             ref={ref}
             href={href}
             prefetch={_prefetch}
-            // GitBook owns scroll-on-navigation via `ScrollPage`/`useScrollToHash` (see `useHash`,
-            // vercel/next.js#49465). Next's default post-navigation scroll races and wins over our
-            // `scrollToHash`, so a cross-page link to `/page#heading` lands at the top. Opt out and
-            // let our handlers scroll to the hash (or to the top when there's none).
-            scroll={false}
             className={tcls(...forwardedClassNames, className)}
             {...domProps}
             onClick={onClick}
