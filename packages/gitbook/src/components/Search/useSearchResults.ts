@@ -250,10 +250,7 @@ export function useSearchResults(props: {
                         case 'extended':
                             // Search all variants of the current section
                             return {
-                                resultsPromise: fetchSearch({
-                                    mode: 'specific',
-                                    siteSpaceIds,
-                                }),
+                                resultsPromise: fetchSearch({ mode: 'specific', siteSpaceIds }),
                             };
                         case 'current':
                             // Search only the current section's current variant
@@ -267,36 +264,6 @@ export function useSearchResults(props: {
                             assertNever(scope);
                     }
                 })();
-
-                if (!otherSpacesResultsPromise) {
-                    const results = await resultsPromise;
-
-                    if (cancelled) {
-                        return;
-                    }
-
-                    if (!results) {
-                        // One time when this one returns undefined is when it cannot find the server action and returns the html from the page.
-                        // In that case, we want to avoid being stuck in a loading state, but it is an error.
-                        // We could potentially try to force reload the page here, but i'm not 100% sure it would be a better experience.
-                        setRemoteState({
-                            results: [],
-                            otherSpacesResults: [],
-                            fetching: false,
-                            error: true,
-                        });
-                        return;
-                    }
-
-                    setRemoteState({
-                        results,
-                        otherSpacesResults: [],
-                        fetching: false,
-                        error: false,
-                    });
-                    trackEvent({ type: 'search_type_query', query });
-                    return;
-                }
 
                 // Render each result set as soon as its response arrives; a failed
                 // request reports an error without discarding the other result set.
@@ -330,7 +297,7 @@ export function useSearchResults(props: {
 
                 await Promise.all([
                     resultsPromise.then(onResults('results'), onError),
-                    otherSpacesResultsPromise.then(onResults('otherSpacesResults'), onError),
+                    otherSpacesResultsPromise?.then(onResults('otherSpacesResults'), onError),
                 ]);
 
                 if (cancelled) {
