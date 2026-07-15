@@ -111,7 +111,7 @@ export async function PageBody(props: {
                     stays a plain block — this gives the floated, sticky API page-actions a tall
                     containing block to travel within while letting the breadcrumbs wrap around them
                     (see PageHeader). */}
-                <div className="grow min-w-0">
+                <div className="min-w-0 grow">
                     <PageHeader
                         context={context}
                         page={page}
