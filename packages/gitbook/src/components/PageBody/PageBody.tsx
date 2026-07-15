@@ -69,15 +69,6 @@ export async function PageBody(props: {
     // to API-reference pages only (matching the `page-api-block` styling), so other pages keep the
     // header structure untouched.
     const hasAPIBlocks = document ? hasAPIBlock(document) : false;
-    // A full-page cover (full/background) is the only reason <main> becomes a flex column: it lets
-    // the document grow to fill the page behind/below the cover. On every other page <main> stays a
-    // plain block so its children keep a normal block formatting context — in particular the
-    // sticky, extracted API page-actions bar relies on `float-right`, which is ignored on a flex item.
-    const withFullPageCover = !!(
-        page.cover &&
-        page.layout.cover &&
-        (page.layout.coverSize === 'full' || page.layout.coverSize === 'background')
-    );
     const wideLayout = wideContent || page.layout.width === 'wide';
     const language = await getSpaceLanguage(context);
     const updatedAt = page.updatedAt ?? page.createdAt;
@@ -102,7 +93,11 @@ export async function PageBody(props: {
                     'py-8',
                     'layout-wide:no-sidebar:lg:max-xl:pb-20', // Add padding to prevent overlap of minimised trademark
                     '@container',
-                    withFullPageCover && 'flex flex-col',
+                    // Flex column so the document can grow to fill the page: the footer navigation
+                    // settles at the bottom rather than snug against short content, and a full-page
+                    // cover shows behind the content. (The extracted API page-actions bar right-aligns
+                    // with `self-end` instead of `float-right`, which is ignored on flex items.)
+                    'flex flex-col',
                     CONTENT_STYLE,
                     pageHasToc ? 'page-has-toc' : 'page-no-toc',
                     wideLayout ? 'layout-wide' : 'layout-default'

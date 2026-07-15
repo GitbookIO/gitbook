@@ -158,10 +158,13 @@ export async function PageHeader(props: {
                     'page-api-block:lg:top-[calc(var(--toc-top-offset,4rem)+1rem)]',
                     'page-api-block:lg:z-20',
                     'lg:max-[96rem]:[body.outline-open:has(.openapi-block)_&]:hidden',
-                    // On a full-page-cover page <main> is a flex column, where `float-right` is
-                    // inert; align to the end so the actions still sit on the right. Harmless
-                    // (align-self has no effect) on the usual block layout, where the float wins.
+                    // Here the actions are a direct child of the flex-column <main> (extracted for
+                    // sticky positioning), so `float-right` is ignored — right-align with `self-end`
+                    // instead. When there's a breadcrumb, collapse this row's flow height (negative
+                    // margin ≈ the button-row height) so the breadcrumb sits on the same line, as it
+                    // does beside the floated actions on every other page.
                     'self-end',
+                    showBreadcrumbs && '-mb-7',
                 ]
             )}
         >
