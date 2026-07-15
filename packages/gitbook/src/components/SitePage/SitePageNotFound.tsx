@@ -8,6 +8,7 @@ import { Icon, type IconName } from '@gitbook/icons';
 import leven from 'leven';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { preload } from 'react-dom';
 import { useAI } from '../AI';
 import { PreservePageLayout } from '../PageBody/PreservePageLayout';
 import { useSetSearchState } from '../Search';
@@ -41,6 +42,11 @@ export function SitePageNotFound() {
     const setSearchState = useSetSearchState();
     const { assistants } = useAI();
 
+    // getRelatedPages (below) fetches the site index on mount; preload it so the request starts
+    // before hydration. Scoped to the 404 page — the common way to hit a broken link cold —
+    // rather than the previous every-page preload.
+    preload(siteIndexURL, { as: 'fetch', type: 'application/json' });
+
     // Show the assistant input when a non-search assistant is available (i.e. not just ask-AI).
     const assistant = assistants.find((candidate) => candidate.mode !== 'search') ?? null;
     const inputLabel = tString(language, assistant ? 'search_or_ask' : 'search');
@@ -63,7 +69,7 @@ export function SitePageNotFound() {
         }
 
         // Otherwise, rank the site's pages against the path that 404'd. We reuse the search index
-        // (already preloaded and CDN-cached), so this adds no origin request — see getRelatedPages.
+        // (preloaded above and CDN-cached), so this adds no extra origin request — see getRelatedPages.
         let active = true;
         getRelatedPages(siteIndexURL, pathname ?? '', siteSpaceId).then(
             (pages) => {
