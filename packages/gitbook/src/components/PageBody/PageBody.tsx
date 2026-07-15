@@ -138,6 +138,7 @@ export async function PageBody(props: {
                                         page,
                                     },
                                     withLinkPreviews,
+                                    isPageBody: true,
                                 }}
                             />
                         </div>

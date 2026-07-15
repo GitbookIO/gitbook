@@ -59,7 +59,9 @@ export async function Heading(props: BlockProps<DocumentBlockHeading>) {
                     'justify-self-start',
                     'max-w-full',
                     'break-words',
-                    'page-cover-background:text-contrast-cover',
+                    // Cover-aware contrast text applies only to the page body, not to documents
+                    // rendered in overlays (search answers, AI chat) on a background-cover page.
+                    context.isPageBody && 'page-cover-background:text-contrast-cover',
                     getTextAlignment(block.data.align),
                     textStyle.lineHeight
                 )}
