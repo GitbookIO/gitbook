@@ -8,7 +8,6 @@ import { throwIfDataError } from '@/lib/data';
 import { toEmbeddableLinkForPublishedContent } from '@/lib/embeddable-linker';
 import { getSiteURLDataFromMiddleware } from '@/lib/middleware';
 import { joinPathWithBaseURL } from '@/lib/paths';
-import { getBestScoredResult } from '@/lib/search';
 import { getServerActionBaseContext } from '@/lib/server-actions';
 import { findSiteSpaceBy, getLocalizedTitle } from '@/lib/sites';
 import type {
@@ -187,8 +186,9 @@ function transformSitePageResult(args: {
                 };
             }) ?? [];
 
-    // Find the best-scoring section to use as a body preview on the page result.
-    const bestSection = getBestScoredResult(pageSections);
+    // The search API returns each page's sections ordered highest-score-first and caps them at one
+    // per page, so the first section is the best-scoring one to use as a body preview.
+    const bestSection = pageSections[0];
     if (bestSection) {
         page.bestSection = {
             href: bestSection.href,
