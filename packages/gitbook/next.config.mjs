@@ -37,6 +37,16 @@ const nextConfig = {
         optimisticClientCache: false,
         // Disable splitting the RSC in like 5 chunks
         prefetchInlining: true,
+
+        // Tree-shake barrel imports from these packages so only the used entrypoints ship
+        // in the client bundle (notably `motion`, which is otherwise pulled in wholesale).
+        optimizePackageImports: [
+            'motion',
+            '@gitbook/icons',
+            'react-aria',
+            'react-aria-components',
+            'react-stately',
+        ],
     },
 
     env: {

@@ -138,9 +138,7 @@
         "e2e-browserless": "bun test ./tests/",
         "typecheck": "tsc --noEmit"
     },
-    "browserslist": [
-        ">0.3%, chrome >= 64, edge >= 79, firefox >= 67, opera >= 51, safari >= 12 and not dead"
-    ],
+    "browserslist": ["chrome >= 93, edge >= 93, firefox >= 92, safari >= 15.4, not dead"],
     "publishConfig": {
         "access": "public",
         "registry": "https://registry.npmjs.org/"
