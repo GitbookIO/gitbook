@@ -93,11 +93,9 @@ export async function PageBody(props: {
                     'py-8',
                     'layout-wide:no-sidebar:lg:max-xl:pb-20', // Add padding to prevent overlap of minimised trademark
                     '@container',
-                    // At lg+ this is a flex column so the document can grow to fill the page (footer
-                    // navigation settles at the bottom, and a full-page cover shows behind the
-                    // content). Below lg it stays a block so the extracted API page-actions can use
-                    // `float-right`, letting the breadcrumbs wrap around them instead of overlapping.
-                    'lg:flex lg:flex-col',
+                    // Flex column so the growing content wrapper below fills the page: the footer
+                    // navigation settles at the bottom, and a full-page cover shows behind the content.
+                    'flex flex-col',
                     CONTENT_STYLE,
                     pageHasToc ? 'page-has-toc' : 'page-no-toc',
                     wideLayout ? 'layout-wide' : 'layout-default'
@@ -109,38 +107,44 @@ export async function PageBody(props: {
                     <PageCover as="hero" page={page} cover={page.cover} context={context} />
                 ) : null}
 
-                <PageHeader
-                    context={context}
-                    page={page}
-                    ancestors={ancestors}
-                    withRSSFeed={contentHasUpdates}
-                    hasAPIBlocks={hasAPIBlocks}
-                />
-                {document && !isNodeEmpty(document) ? (
-                    <OptionalSuspense
-                        staticRoute={staticRoute}
-                        fallback={<DocumentViewSkeleton document={document} blockStyle="" />}
-                    >
-                        <SuspenseLoadedHint />
-                        <div className="contents" data-content-ref-root="">
-                            <DocumentView
-                                document={document}
-                                style="flex grow flex-col [&>*+*]:mt-5"
-                                context={{
-                                    mode: 'default',
-                                    contentContext: {
-                                        ...context,
-                                        page,
-                                    },
-                                    withLinkPreviews,
-                                    isPageBody: true,
-                                }}
-                            />
-                        </div>
-                    </OptionalSuspense>
-                ) : (
-                    <PageBodyBlankslate page={page} context={context} />
-                )}
+                {/* Grows to fill the page (so the footer navigation below settles at the bottom) and
+                    stays a plain block — this gives the floated, sticky API page-actions a tall
+                    containing block to travel within while letting the breadcrumbs wrap around them
+                    (see PageHeader). */}
+                <div className="grow min-w-0">
+                    <PageHeader
+                        context={context}
+                        page={page}
+                        ancestors={ancestors}
+                        withRSSFeed={contentHasUpdates}
+                        hasAPIBlocks={hasAPIBlocks}
+                    />
+                    {document && !isNodeEmpty(document) ? (
+                        <OptionalSuspense
+                            staticRoute={staticRoute}
+                            fallback={<DocumentViewSkeleton document={document} blockStyle="" />}
+                        >
+                            <SuspenseLoadedHint />
+                            <div className="contents" data-content-ref-root="">
+                                <DocumentView
+                                    document={document}
+                                    style="flex flex-col [&>*+*]:mt-5"
+                                    context={{
+                                        mode: 'default',
+                                        contentContext: {
+                                            ...context,
+                                            page,
+                                        },
+                                        withLinkPreviews,
+                                        isPageBody: true,
+                                    }}
+                                />
+                            </div>
+                        </OptionalSuspense>
+                    ) : (
+                        <PageBodyBlankslate page={page} context={context} />
+                    )}
+                </div>
 
                 {page.layout.pagination && customization.pagination.enabled ? (
                     <PageFooterNavigation context={context} page={page} />

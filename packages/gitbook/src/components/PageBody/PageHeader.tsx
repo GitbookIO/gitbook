@@ -148,23 +148,19 @@ export async function PageHeader(props: {
             className={tcls(
                 'float-right ml-4 flex gap-2',
                 showBreadcrumbs ? '-mb-1 -mt-1.5' : '-mt-3 xs:mt-2',
-                // On desktop API pages (where this <div> is rendered as a sibling of <header>, see
-                // below) keep the actions pinned below the site header while scrolling long
-                // operations. The offset tracks the header height (banner, cover…) via the same
-                // --toc-top-offset the outline and code samples use. Hidden while the outline drawer
-                // is open (drawer widths only) so it doesn't overlap the sheet.
+                // On desktop API pages these actions are pulled out of <header> (rendered as its
+                // preceding sibling, see below) so their sticky containing block is the tall,
+                // growing content wrapper in <main> — a plain block — rather than the short header.
+                // There they keep the base `float-right`, so the breadcrumbs wrap around them at any
+                // width, while pinning below the site header when scrolling long operations. The
+                // offset tracks the header height (banner, cover…) via the same --toc-top-offset the
+                // outline and code samples use. Hidden while the outline drawer is open (drawer
+                // widths only) so it doesn't overlap the sheet.
                 hasAPIBlocks && [
                     'page-api-block:lg:sticky',
                     'page-api-block:lg:top-[calc(var(--toc-top-offset,4rem)+1rem)]',
                     'page-api-block:lg:z-20',
                     'lg:max-[96rem]:[body.outline-open:has(.openapi-block)_&]:hidden',
-                    // At lg+ <main> is a flex column, so `float-right` is ignored here (these actions
-                    // are extracted from <header> for sticky positioning): right-align with
-                    // `lg:self-end`, and collapse this row's flow height (negative margin ≈ the
-                    // button-row height) so the breadcrumb shares its line. Below lg <main> is a
-                    // block, so the base `float-right` applies and the breadcrumb wraps around them.
-                    'lg:self-end',
-                    showBreadcrumbs && 'lg:-mb-7',
                 ]
             )}
         >
