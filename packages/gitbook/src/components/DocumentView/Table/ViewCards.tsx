@@ -6,10 +6,11 @@ import { tcls } from '@/lib/tailwind';
 import { RecordCard } from './RecordCard';
 import type { TableViewProps } from './Table';
 import { TableSearchRecord } from './TableSearch';
-import { isCardsCarousel } from './carousel';
 
 export function ViewCards(props: TableViewProps<DocumentTableViewCards>) {
-    if (isCardsCarousel(props.view)) {
+    // `wrap` defaults to `true` (a wrapping grid); only an explicit `false` opts into the
+    // horizontally-scrolling carousel row.
+    if (props.view.wrap === false) {
         return <CardsCarousel {...props} />;
     }
 
