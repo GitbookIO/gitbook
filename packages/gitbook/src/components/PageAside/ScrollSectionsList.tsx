@@ -107,6 +107,7 @@ export function ScrollSectionsList({ sections }: { sections: DocumentSection[] }
                             'sidebar-list-line:border-l-2',
                             'border-transparent',
                             'sidebar-list-line:-left-px',
+                            'xl:page-cover-background:text-contrast-cover',
 
                             // The method badge no longer has a right margin, so lay the row out with a gap
                             section.tag && ['flex', 'items-baseline', 'gap-2'],

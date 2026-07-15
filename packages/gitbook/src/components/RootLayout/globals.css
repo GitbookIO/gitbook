@@ -2,8 +2,7 @@
 
 @config '../../../tailwind.config.ts';
 
-@import './prose.css';
-
+@import "./prose.css";
 
 /*
   The default border color has changed to `currentcolor` in Tailwind CSS v4,
@@ -14,37 +13,37 @@
   color utility to any element that depends on these defaults.
 */
 @layer base {
-    *,
-    ::after,
-    ::before,
-    ::backdrop,
-    ::file-selector-button {
-        border-color: var(--color-gray-200, currentcolor);
-    }
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentcolor);
+  }
 }
 
 @utility no-scrollbar {
-    &::-webkit-scrollbar {
-        display: none;
-    }
-    scrollbar-width: none;
-    -ms-overflow-style: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
 @utility hide-scrollbar {
-    /* Hide scrollbar by default */
-    scrollbar-color: transparent transparent;
-    transition: scrollbar-color 0.2s ease-in-out;
+  /* Hide scrollbar by default */
+  scrollbar-color: transparent transparent;
+  transition: scrollbar-color 0.2s ease-in-out;
 
-    &:hover {
-        /* Show scrollbar on hover */
-        scrollbar-color: unset;
-    }
+  &:hover {
+    /* Show scrollbar on hover */
+    scrollbar-color: unset;
+  }
 
-    @media (prefers-contrast: more) {
-        /* Always show scrollbar in high contrast mode */
-        scrollbar-color: unset;
-    }
+  @media (prefers-contrast: more) {
+    /* Always show scrollbar in high contrast mode */
+    scrollbar-color: unset;
+  }
 }
 
 /*
@@ -55,137 +54,147 @@
   wrapper from React, so let pointer events pass through it for these tooltips only.
 */
 [data-radix-popper-content-wrapper]:has([data-non-interactive]) {
-    pointer-events: none;
+  pointer-events: none;
 }
 
 @utility linear-mask-gradient {
-    mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 96px, rgba(0, 0, 0, 0));
-    mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 96px, rgba(0, 0, 0, 0));
+  mask-image: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 1) 96px,
+    rgba(0, 0, 0, 0)
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 1) 96px,
+    rgba(0, 0, 0, 0)
+  );
 }
 
 @utility linear-mask-util {
-    mask-image: linear-gradient(to bottom, white, white);
-    mask-image: linear-gradient(to bottom, white, white);
+  mask-image: linear-gradient(to bottom, white, white);
+  mask-image: linear-gradient(to bottom, white, white);
 }
 
 @utility grid-area-1-1 {
-    grid-area: 1 / 1;
-    grid-area: 1 / 1;
+  grid-area: 1 / 1;
+  grid-area: 1 / 1;
 }
 
 @utility gutter-stable {
-    scrollbar-gutter: stable;
+  scrollbar-gutter: stable;
 }
 
 @utility triangle {
-    position: relative;
-    background-color: orange;
-    text-align: left;
-    transform: rotate(-60deg) skewX(-30deg) scale(1, 0.866);
-    &:before {
-        content: "";
-        position: absolute;
-        background-color: inherit;
-    }
-    &:after {
-        content: "";
-        position: absolute;
-        background-color: inherit;
-    }
+  position: relative;
+  background-color: orange;
+  text-align: left;
+  transform: rotate(-60deg) skewX(-30deg) scale(1, 0.866);
+  &:before {
+    content: "";
+    position: absolute;
+    background-color: inherit;
+  }
+  &:after {
+    content: "";
+    position: absolute;
+    background-color: inherit;
+  }
+  width: inherit;
+  height: inherit;
+  border-top-right-radius: 30%;
+  &:before {
     width: inherit;
     height: inherit;
     border-top-right-radius: 30%;
-    &:before {
-        width: inherit;
-        height: inherit;
-        border-top-right-radius: 30%;
-    }
-    &:after {
-        width: inherit;
-        height: inherit;
-        border-top-right-radius: 30%;
-    }
-
-    &:before {
-        transform: rotate(-135deg) skewX(-45deg) scale(1.414, 0.707) translate(0, -50%);
-    }
-    &:after {
-        transform: rotate(135deg) skewY(-45deg) scale(0.707, 1.414) translate(50%);
-    }
-    position: relative;
-    background-color: orange;
-    text-align: left;
-    transform: rotate(-60deg) skewX(-30deg) scale(1, 0.866);
-    &:before {
-        content: "";
-        position: absolute;
-        background-color: inherit;
-    }
-    &:after {
-        content: "";
-        position: absolute;
-        background-color: inherit;
-    }
+  }
+  &:after {
     width: inherit;
     height: inherit;
     border-top-right-radius: 30%;
-    &:before {
-        width: inherit;
-        height: inherit;
-        border-top-right-radius: 30%;
-    }
-    &:after {
-        width: inherit;
-        height: inherit;
-        border-top-right-radius: 30%;
-    }
+  }
 
-    &:before {
-        transform: rotate(-135deg) skewX(-45deg) scale(1.414, 0.707) translate(0, -50%);
-    }
-    &:after {
-        transform: rotate(135deg) skewY(-45deg) scale(0.707, 1.414) translate(50%);
-    }
+  &:before {
+    transform: rotate(-135deg) skewX(-45deg) scale(1.414, 0.707)
+      translate(0, -50%);
+  }
+  &:after {
+    transform: rotate(135deg) skewY(-45deg) scale(0.707, 1.414) translate(50%);
+  }
+  position: relative;
+  background-color: orange;
+  text-align: left;
+  transform: rotate(-60deg) skewX(-30deg) scale(1, 0.866);
+  &:before {
+    content: "";
+    position: absolute;
+    background-color: inherit;
+  }
+  &:after {
+    content: "";
+    position: absolute;
+    background-color: inherit;
+  }
+  width: inherit;
+  height: inherit;
+  border-top-right-radius: 30%;
+  &:before {
+    width: inherit;
+    height: inherit;
+    border-top-right-radius: 30%;
+  }
+  &:after {
+    width: inherit;
+    height: inherit;
+    border-top-right-radius: 30%;
+  }
+
+  &:before {
+    transform: rotate(-135deg) skewX(-45deg) scale(1.414, 0.707)
+      translate(0, -50%);
+  }
+  &:after {
+    transform: rotate(135deg) skewY(-45deg) scale(0.707, 1.414) translate(50%);
+  }
 }
 
 @utility break-anywhere {
+  word-break: break-word;
+  @supports (overflow-wrap: anywhere) {
     word-break: break-word;
-    @supports (overflow-wrap: anywhere) {
-        word-break: break-word;
-        overflow-wrap: anywhere;
-    }
+    overflow-wrap: anywhere;
+  }
+  word-break: break-word;
+  @supports (overflow-wrap: anywhere) {
     word-break: break-word;
-    @supports (overflow-wrap: anywhere) {
-        word-break: break-word;
-        overflow-wrap: anywhere;
-    }
+    overflow-wrap: anywhere;
+  }
 }
 
 @utility bg-gradient-primary {
-    @apply bg-linear-to-bl from-primary-4 to-tint-base to-60% bg-fixed;
-    @apply bg-linear-to-bl from-primary-4 to-tint-base to-60% bg-fixed;
+  @apply bg-linear-to-bl from-primary-4 to-tint-base to-60% bg-fixed;
+  @apply bg-linear-to-bl from-primary-4 to-tint-base to-60% bg-fixed;
 }
 
 @utility bg-gradient-tint {
-    @apply bg-linear-to-bl from-tint-4 to-tint-base to-60% bg-fixed;
-    @apply bg-linear-to-bl from-tint-4 to-tint-base to-60% bg-fixed;
+  @apply bg-linear-to-bl from-tint-4 to-tint-base to-60% bg-fixed;
+  @apply bg-linear-to-bl from-tint-4 to-tint-base to-60% bg-fixed;
 }
 
 @utility site-background {
-    @apply [html.sidebar-filled.theme-bold.tint_&]:bg-tint-subtle;
-    @apply bg-tint-base;
-    @apply theme-muted:bg-tint-subtle;
+  @apply [html.sidebar-filled.theme-bold.tint_&]:bg-tint-subtle;
+  @apply bg-tint-base;
+  @apply theme-muted:bg-tint-subtle;
 
-    @apply theme-gradient:bg-gradient-primary;
-    @apply theme-gradient-tint:bg-gradient-tint;
+  @apply theme-gradient:bg-gradient-primary;
+  @apply theme-gradient-tint:bg-gradient-tint;
 }
 
 @utility elevate-link {
-    & a[href]:not(.link-overlay),
-    & [data-annotation] {
-        position: relative;
-        z-index: 20;
-    }
+  & a[href]:not(.link-overlay),
+  & [data-annotation] {
+    position: relative;
+    z-index: 20;
+  }
 }
 
 /*
@@ -197,141 +206,190 @@
   color utility to any element that depends on these defaults.
 */
 @layer base {
-    *,
-    ::after,
-    ::before,
-    ::backdrop,
-    ::file-selector-button {
-        border-color: var(--color-gray-200, currentcolor);
-    }
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentcolor);
+  }
 }
 
 @layer base {
-    :root {
-        @apply leading-relaxed;
-        interpolate-size: allow-keywords; /* Opt-in for modern browsers to interpolate "auto" values in transitions/animations. */
-        overflow-x: hidden; /* We never want horizontal scroll of the whole page, it looks buggy and we should never have overflow anyway */
-        --ai-chat-width: 24rem; /* Default AI chat panel width (= AI_CHAT_DEFAULT_WIDTH 384px); overridden client-side from local storage. */
-    }
-    
-    /* Modern browsers with `scrollbar-*` support */
-    @supports (scrollbar-color: auto) {
-        * {
-            scrollbar-color: theme("colors.tint.7") transparent;
-            scrollbar-width: thin;
-        }
+  :root {
+    @apply leading-relaxed;
+    interpolate-size: allow-keywords; /* Opt-in for modern browsers to interpolate "auto" values in transitions/animations. */
+    overflow-x: hidden; /* We never want horizontal scroll of the whole page, it looks buggy and we should never have overflow anyway */
+    --ai-chat-width: 24rem; /* Default AI chat panel width (= AI_CHAT_DEFAULT_WIDTH 384px); overridden client-side from local storage. */
+    --cover-height: 0px;
+    --cover-text-top: rgb(var(--tint-12));
+    --cover-text-bottom: rgb(var(--tint-12));
+  }
 
-        @media (prefers-contrast: more) {
-            * {
-                scrollbar-color: theme("colors.tint.11") transparent;
-                scrollbar-width: auto;
-            }
-        }
-    }
-    
-    /* Otherwise, use `::-webkit-scrollbar-*` pseudo-elements */
-    @supports selector(::-webkit-scrollbar) {
-        ::-webkit-scrollbar {
-            background: transparent;
-            max-width: 8px;
-            max-height: 6px;
-        }
+  :root:not(.dark):has(
+      [data-gb-page-cover][data-cover-type="background"][data-cover-text-color="white"]
+    ),
+  :root.dark:has(
+      [data-gb-page-cover][data-cover-type="background"][data-cover-text-color-dark="black"]
+    ) {
+    --cover-text-top: rgb(var(--contrast-tint-12));
+  }
 
-        ::-webkit-scrollbar-thumb {
-            background: theme("colors.tint.7");
-            border-radius: 8px;
-            transition: background 0.2s ease-in-out;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: theme("colors.tint.8");
-        }
-
-        @media (prefers-contrast: more) {
-            ::-webkit-scrollbar-thumb {
-                background: theme("colors.tint.11");
-            }
-
-            ::-webkit-scrollbar-thumb:hover {
-                background: theme("colors.tint.12");
-            }
-        }
+  /* Modern browsers with `scrollbar-*` support */
+  @supports (scrollbar-color: auto) {
+    * {
+      scrollbar-color: theme("colors.tint.7") transparent;
+      scrollbar-width: thin;
     }
 
-
-    body {
-        @apply text-tint-strong antialiased;
-    }
-    html {
+    @media (prefers-contrast: more) {
+      * {
+        scrollbar-color: theme("colors.tint.11") transparent;
         scrollbar-width: auto;
+      }
     }
-    h1 {
-        @apply tracking-[-0.025em] text-tint-strong text-balance;
-    }
-    h2,
-    h3,
-    h4,
-    h5,
-    h6 {
-        @apply tracking-[-0.0125em] text-tint-strong;
+  }
+
+  /* Otherwise, use `::-webkit-scrollbar-*` pseudo-elements */
+  @supports selector(::-webkit-scrollbar) {
+    ::-webkit-scrollbar {
+      background: transparent;
+      max-width: 8px;
+      max-height: 6px;
     }
 
-    a,
-    button,
-    input,
-    textarea {
-        @apply focus-visible:outline-2 focus-visible:outline-primary;
+    ::-webkit-scrollbar-thumb {
+      background: theme("colors.tint.7");
+      border-radius: 8px;
+      transition: background 0.2s ease-in-out;
     }
 
-    button:not(:disabled),
-    [role="button"]:not(:disabled) {
-        cursor: pointer;
+    ::-webkit-scrollbar-thumb:hover {
+      background: theme("colors.tint.8");
     }
 
-    code,
-    pre {
-        /* Don't apply antialiased to `code` and `pre` elements */
-        @apply subpixel-antialiased;
+    @media (prefers-contrast: more) {
+      ::-webkit-scrollbar-thumb {
+        background: theme("colors.tint.11");
+      }
+
+      ::-webkit-scrollbar-thumb:hover {
+        background: theme("colors.tint.12");
+      }
     }
+  }
+
+  body {
+    @apply text-tint-strong antialiased;
+  }
+  html {
+    scrollbar-width: auto;
+  }
+  h1 {
+    @apply tracking-[-0.025em] text-tint-strong text-balance;
+  }
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply tracking-[-0.0125em] text-tint-strong;
+  }
+
+  a,
+  button,
+  input,
+  textarea {
+    @apply focus-visible:outline-2 focus-visible:outline-primary;
+  }
+
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+
+  code,
+  pre {
+    /* Don't apply antialiased to `code` and `pre` elements */
+    @apply subpixel-antialiased;
+  }
+}
+
+@utility contrast-cover {
+  background-clip: border-box;
+  background-image: linear-gradient(
+    to bottom,
+    var(--cover-text-top) 0,
+    var(--cover-text-top) var(--cover-height),
+    var(--cover-text-bottom) var(--cover-height),
+    var(--cover-text-bottom) 100vh
+  );
+  background-repeat: no-repeat;
+  background-size: 100% 100vh;
+  background-attachment: fixed;
+}
+
+@utility text-contrast-cover {
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  background-image: linear-gradient(
+    to bottom,
+    var(--cover-text-top) 0,
+    var(--cover-text-top) var(--cover-height),
+    var(--cover-text-bottom) var(--cover-height),
+    var(--cover-text-bottom) 100vh
+  );
+  background-repeat: no-repeat;
+  background-size: 100% 100vh;
+  background-attachment: fixed;
+  background-clip: text;
+  -webkit-background-clip: text;
+
+  @media (prefers-contrast: more) {
+    color: var(--cover-text-bottom);
+    -webkit-text-fill-color: var(--cover-text-bottom);
+    background-image: none;
+  }
 }
 
 html {
-    color-scheme: light;
+  color-scheme: light;
 
-    /** Ensure PDF export and print correctly displays the background colors */
-    print-color-adjust: exact;
-    -webkit-print-color-adjust: exact;
+  /** Ensure PDF export and print correctly displays the background colors */
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
 }
 html.dark {
-    color-scheme: dark light;
+  color-scheme: dark light;
 }
 
 /** While the AI chat panel is being resized, suppress transitions */
 html[data-ai-chat-resizing="true"] {
-    cursor: col-resize;
-    user-select: none;
+  cursor: col-resize;
+  user-select: none;
 }
 html[data-ai-chat-resizing="true"] * {
-    transition-duration: 0s !important;
+  transition-duration: 0s !important;
 }
 
 html.announcement-hidden [data-gb-announcement-banner] {
-    @apply hidden;
+  @apply hidden;
 }
 
 html.font-Lato {
-    /* Lato's default ligatures impact readability, so we turn them off */
-    font-variant-ligatures: no-common-ligatures;
+  /* Lato's default ligatures impact readability, so we turn them off */
+  font-variant-ligatures: no-common-ligatures;
 }
 
 /* Code blocks */
 /* Shiki themes can define font styling (style, weight, decoration) via CSS variables.
  * These variables are prefixed with --shiki-{mode}-{property} and allow themes to customize
  * typography beyond just colors. We apply them here so code blocks respect theme font styling. */
-.shiki, .shiki span {
-    font-style: var(--shiki-light-font-style) !important;
-    font-weight: var(--shiki-light-font-weight) !important;
-    text-decoration: var(--shiki-light-text-decoration) !important;
+.shiki,
+.shiki span {
+  font-style: var(--shiki-light-font-style) !important;
+  font-weight: var(--shiki-light-font-weight) !important;
+  text-decoration: var(--shiki-light-text-decoration) !important;
 }
 
 html.dark .shiki,
@@ -342,29 +400,29 @@ html.dark .shiki span {
 }
 
 .highlight-line {
-    @apply min-w-min text-tint-strong table-row bg-tint-subtle theme-muted:bg-tint-base theme-bold-tint:bg-tint-base relative hover:invert-5 hover:z-1 rounded-sm;
-    @apply only:hover:ring-transparent;
-    @apply [counter-increment:line];
+  @apply min-w-min text-tint-strong table-row bg-tint-subtle theme-muted:bg-tint-base theme-bold-tint:bg-tint-base relative hover:invert-5 hover:z-1 rounded-sm;
+  @apply only:hover:ring-transparent;
+  @apply [counter-increment:line];
 
-    &.highlighted {
-        /* Use `invert-` to get a dynamic color that contrasts with the background, regardless of the codeblock's theme. */
-        @apply bg-tint-base invert-10 hover:invert-15;
-        @apply first:rounded-t-md first:*:mt-1;
-        @apply last:rounded-b-md last:*:mb-1;
-        @apply rounded-none;
-    }
+  &.highlighted {
+    /* Use `invert-` to get a dynamic color that contrasts with the background, regardless of the codeblock's theme. */
+    @apply bg-tint-base invert-10 hover:invert-15;
+    @apply first:rounded-t-md first:*:mt-1;
+    @apply last:rounded-b-md last:*:mb-1;
+    @apply rounded-none;
+  }
 
-    &:not(.highlighted) + .highlighted {
-        @apply rounded-t-md *:mt-1;
-    }
+  &:not(.highlighted) + .highlighted {
+    @apply rounded-t-md *:mt-1;
+  }
 
-    &.highlighted:has(+ :not(.highlighted)) {
-        @apply rounded-b-md *:mb-1;
-    }
+  &.highlighted:has(+ :not(.highlighted)) {
+    @apply rounded-b-md *:mb-1;
+  }
 
-    &:not(.highlighted) + .highlighted:has(+ :not(.highlighted)) {
-        @apply rounded-md;
-    }
+  &:not(.highlighted) + .highlighted:has(+ :not(.highlighted)) {
+    @apply rounded-md;
+  }
 }
 
 /*
@@ -381,70 +439,70 @@ html.dark .shiki span {
  * otherwise muddy the tint.
  */
 .highlight-line.diff-added {
-    background-color: #e1f8ec !important; /* gbx --green-3 (light) */
-    @apply rounded-md;
+  background-color: #e1f8ec !important; /* gbx --green-3 (light) */
+  @apply rounded-md;
 }
 .highlight-line.diff-deleted {
-    background-color: #ffeae6 !important; /* gbx --red-3 (light) */
-    @apply rounded-md;
+  background-color: #ffeae6 !important; /* gbx --red-3 (light) */
+  @apply rounded-md;
 }
 .highlight-line.diff-added.highlighted {
-    background-color: #baebd3 !important; /* gbx --green-5 (light) */
-    filter: none !important;
+  background-color: #baebd3 !important; /* gbx --green-5 (light) */
+  filter: none !important;
 }
 .highlight-line.diff-deleted.highlighted {
-    background-color: #ffcac0 !important; /* gbx --red-5 (light) */
-    filter: none !important;
+  background-color: #ffcac0 !important; /* gbx --red-5 (light) */
+  filter: none !important;
 }
 
 html.dark .highlight-line.diff-added {
-    background-color: #113023 !important; /* gbx --green-3 (dark) */
+  background-color: #113023 !important; /* gbx --green-3 (dark) */
 }
 html.dark .highlight-line.diff-deleted {
-    background-color: #411510 !important; /* gbx --red-3 (dark) */
+  background-color: #411510 !important; /* gbx --red-3 (dark) */
 }
 html.dark .highlight-line.diff-added.highlighted {
-    background-color: #064b34 !important; /* gbx --green-5 (dark) */
-    filter: none !important;
+  background-color: #064b34 !important; /* gbx --green-5 (dark) */
+  filter: none !important;
 }
 html.dark .highlight-line.diff-deleted.highlighted {
-    background-color: #67100a !important; /* gbx --red-5 (dark) */
-    filter: none !important;
+  background-color: #67100a !important; /* gbx --red-5 (dark) */
+  filter: none !important;
 }
 
 .highlight-line-number {
-    @apply table-cell whitespace-nowrap w-0 text-sm text-tint pl-4 pr-2 text-right bg-tint-subtle theme-muted:bg-tint-base theme-bold-tint:bg-tint-base sticky -left-2;
-    @apply before:content-[counter(line)] not-contrast-more:before:opacity-6;
+  @apply table-cell whitespace-nowrap w-0 text-sm text-tint pl-4 pr-2 text-right bg-tint-subtle theme-muted:bg-tint-base theme-bold-tint:bg-tint-base sticky -left-2;
+  @apply before:content-[counter(line)] not-contrast-more:before:opacity-6;
 
-    .highlighted & {
-        @apply bg-tint-base
-    }
+  .highlighted & {
+    @apply bg-tint-base;
+  }
 }
 
 /* Diff line gutter (line numbers) — same tint as the line itself. */
 .diff-added > .highlight-line-number {
-    background-color: #e1f8ec !important;
+  background-color: #e1f8ec !important;
 }
 .diff-deleted > .highlight-line-number {
-    background-color: #ffeae6 !important;
+  background-color: #ffeae6 !important;
 }
 .diff-added.highlighted > .highlight-line-number {
-    background-color: #baebd3 !important;
+  background-color: #baebd3 !important;
 }
 .diff-deleted.highlighted > .highlight-line-number {
-    background-color: #ffcac0 !important;
+  background-color: #ffcac0 !important;
 }
 html.dark .diff-added > .highlight-line-number {
-    background-color: #113023 !important;
+  background-color: #113023 !important;
 }
 html.dark .diff-deleted > .highlight-line-number {
-    background-color: #411510 !important;
+  background-color: #411510 !important;
 }
 html.dark .diff-added.highlighted > .highlight-line-number {
-    background-color: #064b34 !important;
+  background-color: #064b34 !important;
 }
 html.dark .diff-deleted.highlighted > .highlight-line-number {
-    background-color: #67100a !important;
+  background-color: #67100a !important;
 }
 
 /*
@@ -455,32 +513,31 @@ html.dark .diff-deleted.highlighted > .highlight-line-number {
  */
 .highlight-line.diff-added .highlight-line-content::before,
 .highlight-line.diff-deleted .highlight-line-content::before {
-    display: inline-block;
-    width: 1ch;
-    margin-right: 0.5ch;
-    font-weight: 600;
-    user-select: none;
+  display: inline-block;
+  width: 1ch;
+  margin-right: 0.5ch;
+  font-weight: 600;
+  user-select: none;
 }
 .highlight-line.diff-added .highlight-line-content::before {
-    content: "+";
-    color: #247758; /* gbx --green-11 light */
+  content: "+";
+  color: #247758; /* gbx --green-11 light */
 }
 .highlight-line.diff-deleted .highlight-line-content::before {
-    content: "\2212"; /* U+2212 minus sign — visually clearer than a hyphen */
-    color: #de0000; /* gbx --red-11 light */
+  content: "\2212"; /* U+2212 minus sign — visually clearer than a hyphen */
+  color: #de0000; /* gbx --red-11 light */
 }
 html.dark .highlight-line.diff-added .highlight-line-content::before {
-    color: #6ecea5; /* gbx --green-11 dark */
+  color: #6ecea5; /* gbx --green-11 dark */
 }
 html.dark .highlight-line.diff-deleted .highlight-line-content::before {
-    color: #ff9080; /* gbx --red-11 dark */
+  color: #ff9080; /* gbx --red-11 dark */
 }
 
-
 .highlight-line-content {
-    @apply table-cell text-sm px-4;
+  @apply table-cell text-sm px-4;
 
-    .highlight-line-number + & {
-        @apply pl-2;
-    }
+  .highlight-line-number + & {
+    @apply pl-2;
+  }
 }
