@@ -27,7 +27,7 @@ import { MiddlewareHeaders } from '@/lib/middleware';
 import {
     createOAuthProtectedResourceMetadataResponse,
     handleUnauthedOAuthProtectedResourceRequest,
-    isOAuthProtectedResourceMetadataRequest,
+    isOAuthProtectedResourceMetadataRequestForAuthEndpoint,
     isOAuthProtectedResourceRequest,
 } from '@/lib/oauth-protected';
 import { removeLeadingSlash, removeTrailingSlash } from '@/lib/paths';
@@ -299,8 +299,10 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         }
 
         // Handles OAuth protected resource metadata for non-VA adaptive content sites.
-        // If the requested URL resolved directly to a site, synthesize the metadata response immediately.
-        if (isOAuthProtectedResourceMetadataRequest(siteRequestURL)) {
+        // Only the `~gitbook/mcp/auth` endpoint advertises auth here; the base `~gitbook/mcp`
+        // endpoint stays public so clients doing proactive PRM discovery don't start an OAuth
+        // flow against an endpoint that never issues a challenge.
+        if (isOAuthProtectedResourceMetadataRequestForAuthEndpoint(siteRequestURL)) {
             return createOAuthProtectedResourceMetadataResponse({
                 siteRequestURL,
                 siteId: siteURLData.site,

@@ -4,6 +4,14 @@ import { useAI, useAIChatController, useAIChatState } from '../AI';
 import { useSetSearchState } from '../Search';
 import { Button, type ButtonProps, Input } from '../primitives';
 
+// The Input primitive has no `xsmall`; otherwise it shares the button's size scale.
+const INPUT_SIZE_MAP: Record<NonNullable<ButtonProps['size']>, 'small' | 'medium' | 'large'> = {
+    xsmall: 'small',
+    small: 'small',
+    medium: 'medium',
+    large: 'large',
+};
+
 export function InlineActionButton(
     props: { action: 'ask' | 'search'; query?: string } & { buttonProps: ButtonProps } // TODO: Type this properly: Pick<api.DocumentInlineButton, 'action' | 'query'> & { buttonProps: ButtonProps }
 ) {
@@ -42,7 +50,7 @@ export function InlineActionButton(
             <Input
                 inline
                 label={buttonProps.label as string}
-                sizing="medium"
+                sizing={INPUT_SIZE_MAP[buttonProps.size ?? 'medium']}
                 className="inline-flex max-w-full grow"
                 submitButton={{
                     label: tString(language, action === 'ask' ? 'send' : 'search'),

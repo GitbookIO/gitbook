@@ -136,6 +136,7 @@ export const hu: TranslationLanguage = {
     ai_chat_context_previous_messages: 'Üzenetek a beszélgetésében',
     ai_chat_context_disclaimer: 'Az AI-válaszok hibákat tartalmazhatnak.',
     ai_chat_input_placeholder: 'Kérdezzen, keressen vagy magyarázzon...',
+    ai_chat_queued_message: 'Ez az üzenet akkor lesz elküldve, amikor ${1} befejezi',
     send: 'Küldés',
     actions: 'Műveletek',
     ai_chat_suggested_questions_title: 'Javasolt kérdések',
@@ -159,6 +160,7 @@ export const hu: TranslationLanguage = {
     view_page_markdown: 'Megtekintés Markdownként',
     view_page_plaintext: 'Az oldal megtekintése egyszerű szövegként',
     open_in: 'Megnyitás itt: ${1}',
+    open_in_ai: 'Megnyitás ebben:',
     open_in_llms_pre_prompt:
         'Olvassa el ezt: ${1}, és válaszoljon a tartalommal kapcsolatos kérdésekre.',
     connect_mcp_to: 'Csatlakozás ehhez: ${1}',

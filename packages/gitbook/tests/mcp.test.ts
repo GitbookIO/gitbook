@@ -50,6 +50,7 @@ it(
         const tools = await client.listTools();
         expect(tools.tools[0]?.name).toBe('searchDocumentation');
         expect(tools.tools[1]?.name).toBe('getPage');
+        expect(tools.tools.some((tool) => tool.name === 'sendFeedback')).toBe(true);
     },
     { timeout: 10_000 }
 );

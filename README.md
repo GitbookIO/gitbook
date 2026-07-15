@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="./assets/gitbook_icon_dark.svg" alt="GitBook" width="48" />
+</p>
+
 <h1 align="center">GitBook</h1>
 
 <p align="center">

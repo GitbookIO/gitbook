@@ -102,6 +102,7 @@ export function EmbeddableAIChat(props: EmbeddableAIChatProps) {
                             suggestions={siteConfig.suggestions}
                             greeting={siteConfig.greeting}
                             trademark={trademark}
+                            assistantName={siteConfig.assistantName}
                         />
                     </LinkContext>
                 </EmbeddableFrameBody>

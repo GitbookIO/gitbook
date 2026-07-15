@@ -123,6 +123,14 @@ export type AIChatState = {
      * this value (seeding its editable content) and then clears it back to an empty string.
      */
     draft: string;
+
+    /**
+     * Follow-ups the visitor submitted while a previous turn was still streaming. They are held
+     * here and sent automatically, one at a time in submission order, as each answer finishes
+     * (see the flush in `streamResponse`), so submitting mid-stream isn't lost. Empty when
+     * nothing is queued.
+     */
+    queuedMessages: string[];
 };
 
 export type AIChatEvent =
@@ -158,6 +166,8 @@ export type AIChatController = {
     focus: () => void;
     /** Pre-fill the chat input with draft text, without sending it. */
     setDraft: (draft: string) => void;
+    /** Remove a follow-up queued to send after the current answer finishes, by its queue index. */
+    cancelQueuedMessage: (index: number) => void;
     /** Register an event listener */
     on: <T extends AIChatEvent['type']>(
         event: T,
@@ -182,6 +192,7 @@ const globalState = zustand.create<AIChatState>(() => {
         initialQuery: null,
         references: [],
         draft: '',
+        queuedMessages: [],
     };
 });
 
@@ -256,6 +267,9 @@ export function AIChatProvider(props: {
 
         notify(eventsRef.current.get('close'), {});
     }, [setSearchState]);
+
+    // Lets `streamResponse` flush a queued follow-up via `onPostMessage`, which is defined later.
+    const postMessageRef = React.useRef<((input: { message: string }) => void) | null>(null);
 
     // Stream a message with the AI backend
     const streamResponse = React.useCallback(
@@ -512,6 +526,15 @@ export function AIChatProvider(props: {
                         loading: false,
                         error: false,
                     }));
+
+                    // Turn settled: send the next queued follow-up (oldest first). Held back while a
+                    // control is pending, since posting would throw; it flushes after that resolves.
+                    const { queuedMessages, control: activeControl } = globalState.getState();
+                    const [next, ...rest] = queuedMessages;
+                    if (next !== undefined && !activeControl) {
+                        globalState.setState((state) => ({ ...state, queuedMessages: rest }));
+                        postMessageRef.current?.({ message: next });
+                    }
                 }
             } catch (error) {
                 console.error('Error streaming AI response', error);
@@ -545,8 +568,12 @@ export function AIChatProvider(props: {
                 throw new Error("We can't post a message when a control is active");
             }
 
-            // Ignore duplicates while a previous turn is still streaming
+            // Still streaming: queue this follow-up instead of dropping it (flushed in order in `streamResponse`).
             if (responding) {
+                globalState.setState((state) => ({
+                    ...state,
+                    queuedMessages: [...state.queuedMessages, input.message],
+                }));
                 return;
             }
 
@@ -607,6 +634,21 @@ export function AIChatProvider(props: {
         [setSearchState, siteSpaceId, trackEvent, streamResponse]
     );
 
+    // Keep the ref current so `streamResponse` can flush a queued follow-up via the latest callback.
+    postMessageRef.current = onPostMessage;
+
+    // Remove a follow-up queued while the assistant is still answering (the × on the affordance).
+    const onCancelQueuedMessage = React.useCallback((index: number) => {
+        globalState.setState((state) =>
+            index < 0 || index >= state.queuedMessages.length
+                ? state
+                : {
+                      ...state,
+                      queuedMessages: state.queuedMessages.filter((_, i) => i !== index),
+                  }
+        );
+    }, []);
+
     // Clear the conversation and reset ask parameter
     const onClear = React.useCallback(() => {
         globalState.setState((state) => ({
@@ -621,6 +663,7 @@ export function AIChatProvider(props: {
             error: false,
             initialQuery: null,
             references: [],
+            queuedMessages: [],
         }));
 
         // Reset ask parameter to empty string (keeps chat open but clears content)
@@ -704,6 +747,7 @@ export function AIChatProvider(props: {
             clearReferences: onClearReferences,
             focus: onFocus,
             setDraft: onSetDraft,
+            cancelQueuedMessage: onCancelQueuedMessage,
             on: onEvent,
         };
     }, [
@@ -716,6 +760,7 @@ export function AIChatProvider(props: {
         onClearReferences,
         onFocus,
         onSetDraft,
+        onCancelQueuedMessage,
         onEvent,
     ]);
 
