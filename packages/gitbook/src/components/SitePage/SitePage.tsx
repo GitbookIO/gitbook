@@ -87,7 +87,12 @@ export async function SitePage(props: SitePageProps & { staticRoute: boolean }) 
                 }
             >
                 {withFullPageCover && page.cover ? (
-                    <PageCover as="full" page={page} cover={page.cover} context={context} />
+                    <PageCover
+                        as={page.layout.coverSize === 'background' ? 'background' : 'full'}
+                        page={page}
+                        cover={page.cover}
+                        context={context}
+                    />
                 ) : null}
 
                 <div
@@ -276,7 +281,7 @@ export async function getSitePageData(props: SitePageProps) {
     const withFullPageCover = !!(
         page.cover &&
         page.layout.cover &&
-        page.layout.coverSize === 'full'
+        (page.layout.coverSize === 'full' || page.layout.coverSize === 'background')
     );
     const withPageFeedback = customization.feedback.enabled;
 

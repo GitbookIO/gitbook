@@ -28,8 +28,9 @@ export async function PageCover(props: {
     cover: RevisionPageDocumentCover;
     context: GitBookSiteContext;
 }) {
-    const { as, cover, context } = props;
+    const { as, page, cover, context } = props;
     const height = getCoverHeight(cover);
+    const mask = page.layout.coverMask === 'radial' ? 'radial' : 'none';
 
     const initialCoverCutoff = () => {
         if (!height) {
@@ -106,7 +107,8 @@ export async function PageCover(props: {
             <style>{`:root { --cover-height: ${initialCoverCutoff()}; }`}</style>
             <div
                 data-gb-page-cover
-                // data-cover-text-color={white or black} TODO: Retrieve from API for light & dark mode
+                data-cover-text-color={cover.textColor}
+                data-cover-text-color-dark={cover.textColorDark}
                 data-cover-type={as}
                 data-full={String(as === 'full')}
                 className={tcls(
@@ -165,6 +167,7 @@ export async function PageCover(props: {
                     }}
                     y={cover.yPos}
                     height={height}
+                    mask={mask}
                 />
             </div>
         </>

@@ -230,7 +230,7 @@
       [data-gb-page-cover][data-cover-type="background"][data-cover-text-color="white"]
     ),
   :root.dark:has(
-      [data-gb-page-cover][data-cover-type="background"][data-cover-text-color="black"]
+      [data-gb-page-cover][data-cover-type="background"][data-cover-text-color-dark="black"]
     ) {
     --cover-text-top: rgb(var(--contrast-tint-12));
   }
