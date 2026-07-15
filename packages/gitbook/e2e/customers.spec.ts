@@ -218,8 +218,8 @@ const testCases: TestsCase[] = [
         tests: [{ name: 'Home', url: '/', run: waitForCookiesDialog }],
     },
     {
-        name: 'docs.cherry-ai.com',
-        contentBaseURL: 'https://docs.cherry-ai.com',
+        name: 'docs.cherryai.com.cn',
+        contentBaseURL: 'https://docs.cherryai.com.cn',
         tests: [{ name: 'Home', url: '/', run: waitForCookiesDialog }],
     },
     {
