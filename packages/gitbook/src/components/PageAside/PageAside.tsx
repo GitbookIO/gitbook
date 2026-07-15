@@ -99,7 +99,13 @@ export async function PageAside(props: {
                 'page-api-block:page-has-outline:min-[96rem]:border-l-0',
                 'page-api-block:page-has-outline:min-[96rem]:pl-8',
 
-                'max-xl:hydrated:site-background', // Only add a background once the element is positioned correctly to prevent overlapping the page cover
+                // Only add a background once the element is positioned correctly, to prevent
+                // overlapping the page cover. Kept opaque wherever the outline is a toggleable
+                // overlay (below xl in any layout, and xl–3xl in wide layout, where it opens as
+                // a desktop SideSheet), but dropped for the permanent outline column so a bleeding
+                // cards carousel can scroll behind it.
+                'max-xl:hydrated:site-background',
+                'layout-wide:max-3xl:hydrated:site-background',
                 'text-tint',
                 'contrast-more:text-tint-strong'
             )}

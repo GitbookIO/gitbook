@@ -9,8 +9,9 @@ import { TableSearchRecord } from './TableSearch';
 
 export function ViewCards(props: TableViewProps<DocumentTableViewCards>) {
     // `wrap` defaults to `true` (a wrapping grid); only an explicit `false` opts into the
-    // horizontally-scrolling carousel row.
-    if (props.view.wrap === false) {
+    // horizontally-scrolling carousel row. Fall back to the grid in print mode: a PDF can't
+    // scroll, so carousel overflow would be silently clipped.
+    if (props.view.wrap === false && props.context.mode !== 'print') {
         return <CardsCarousel {...props} />;
     }
 
