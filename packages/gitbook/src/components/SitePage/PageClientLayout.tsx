@@ -117,12 +117,20 @@ function useSetCoverHeight() {
             resizeObserver.observe(pageCover);
         }
 
+        // Dismissing the announcement banner only toggles a class on <html> (see
+        // dismissAnnouncement) — no scroll/resize event and no cover resize — yet it shifts the
+        // cover up. Watch <html> class changes so the cover height is recomputed in that case too.
+        const classObserver =
+            typeof MutationObserver !== 'undefined' ? new MutationObserver(scheduleUpdate) : null;
+        classObserver?.observe(root, { attributes: true, attributeFilter: ['class'] });
+
         return () => {
             if (animationFrame !== null) {
                 cancelAnimationFrame(animationFrame);
             }
 
             resizeObserver?.disconnect();
+            classObserver?.disconnect();
             window.removeEventListener('scroll', scheduleUpdate);
             window.removeEventListener('resize', scheduleUpdate);
         };
