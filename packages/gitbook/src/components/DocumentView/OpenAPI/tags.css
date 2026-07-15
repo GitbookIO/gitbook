@@ -1,0 +1,56 @@
+/*
+ * OpenAPI method / status-code tag styles.
+ *
+ * These live outside the deferred `style.css` and are loaded from the global stylesheet because
+ * the HTTP method badge (`OpenAPIMethodBadge`) renders in the always-present sidebar (table of
+ * contents) on every page — not only on pages that mount an OpenAPI block. If they stayed in the
+ * lazily-loaded stylesheet, the sidebar badges would be unstyled until an OpenAPI page pulled in
+ * the heavy Scalar CSS.
+ */
+
+/* Method Tags */
+.openapi-method,
+.openapi-statuscode {
+    @apply m-0 h-5 min-w-9 justify-center rounded-md text-xs straight-corners:rounded-none circular-corners:rounded-lg uppercase font-mono items-center shrink-0 font-semibold px-1.5 py-0.5 text-tint-12/8 leading-tight align-middle inline-flex whitespace-nowrap;
+}
+
+.openapi-method-small {}
+
+.openapi-method-medium {
+    @apply m-0 px-2.5 py-1 h-6 text-[0.813rem];
+}
+
+.toclink .openapi-method {
+    @apply text-[0.625rem] flex items-center justify-center;
+}
+
+.openapi-method-get,
+.openapi-statuscode-success {
+    @apply bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100;
+}
+
+.openapi-method-post,
+.openapi-statuscode-redirection {
+    @apply bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-100;
+}
+
+.openapi-method-put,
+.openapi-statuscode-informational {
+    @apply bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100;
+}
+
+.openapi-method-patch {
+    @apply bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-100;
+}
+
+.openapi-method-delete,
+.openapi-statuscode-error {
+    @apply bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100;
+}
+
+.openapi-method-head,
+.openapi-method-options,
+.openapi-method-trace,
+.openapi-method-hook {
+    @apply bg-tint;
+}
