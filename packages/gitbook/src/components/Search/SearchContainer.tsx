@@ -3,6 +3,7 @@
 import { t, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
 import { CustomizationSearchStyle } from '@gitbook/api';
+import dynamic from 'next/dynamic';
 import React, { useRef } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { AIChatButton } from '../AIChat';
@@ -10,12 +11,17 @@ import { useIsMobile } from '../hooks/useIsMobile';
 import { Button, Popover } from '../primitives';
 import { KeyboardShortcut } from '../primitives/KeyboardShortcut';
 import { SideSheet } from '../primitives/SideSheet';
-import { SearchFrame } from './SearchFrame';
 import { SearchInput } from './SearchInput';
 import { SearchLiveResultsAnnouncer } from './SearchLiveResultsAnnouncer';
 import { SearchScopeControl } from './SearchScopeControl';
 import type { SearchBaseProps } from './search-props';
 import { useSearchController } from './useSearchController';
+
+// The results panel (and its ranking/AI code) only appears once search is used, so load it on
+// demand instead of shipping it in every page's client bundle.
+const SearchFrame = dynamic(() => import('./SearchFrame').then((mod) => mod.SearchFrame), {
+    ssr: false,
+});
 
 interface SearchContainerProps extends SearchBaseProps {
     style: CustomizationSearchStyle;

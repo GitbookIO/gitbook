@@ -243,9 +243,8 @@ type IndexPage = {
  * Return the pages whose path is closest to the one that 404'd.
  *
  * Rather than asking the server (which would mean an extra request per 404), this reuses the
- * search index served at `~gitbook/site-index` — already preloaded and CDN-cached on every page —
- * so it's a cache hit, not an origin request. The ranking is a lighter, client-side cousin of
- * `getSimilarPages` (which the Markdown 404 runs server-side from the full page tree).
+ * CDN-cached search index served at `~gitbook/site-index`. The ranking is a lighter, client-side
+ * cousin of `getSimilarPages` (which the Markdown 404 runs server-side from the full page tree).
  */
 async function getRelatedPages(
     indexURL: string,
