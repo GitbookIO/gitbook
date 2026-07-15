@@ -93,11 +93,11 @@ export async function PageBody(props: {
                     'py-8',
                     'layout-wide:no-sidebar:lg:max-xl:pb-20', // Add padding to prevent overlap of minimised trademark
                     '@container',
-                    // Flex column so the document can grow to fill the page: the footer navigation
-                    // settles at the bottom rather than snug against short content, and a full-page
-                    // cover shows behind the content. (The extracted API page-actions bar right-aligns
-                    // with `self-end` instead of `float-right`, which is ignored on flex items.)
-                    'flex flex-col',
+                    // At lg+ this is a flex column so the document can grow to fill the page (footer
+                    // navigation settles at the bottom, and a full-page cover shows behind the
+                    // content). Below lg it stays a block so the extracted API page-actions can use
+                    // `float-right`, letting the breadcrumbs wrap around them instead of overlapping.
+                    'lg:flex lg:flex-col',
                     CONTENT_STYLE,
                     pageHasToc ? 'page-has-toc' : 'page-no-toc',
                     wideLayout ? 'layout-wide' : 'layout-default'
