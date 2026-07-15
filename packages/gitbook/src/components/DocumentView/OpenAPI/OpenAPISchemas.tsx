@@ -4,7 +4,7 @@ import { OpenAPISchemas as BaseOpenAPISchemas } from '@gitbook/react-openapi';
 
 import type { OpenAPISchemasBlock } from '@/lib/openapi/types';
 import type { BlockProps } from '../Block';
-import { getOpenAPIContext } from './context';
+import { OpenAPIStyles, getOpenAPIContext } from './context';
 
 /**
  * Render an openapi-schemas block.
@@ -13,6 +13,7 @@ export async function OpenAPISchemas(props: BlockProps<OpenAPISchemasBlock>) {
     const { style } = props;
     return (
         <div className={tcls('flex w-full', style, 'max-w-full')}>
+            <OpenAPIStyles />
             <OpenAPISchemasBody {...props} />
         </div>
     );

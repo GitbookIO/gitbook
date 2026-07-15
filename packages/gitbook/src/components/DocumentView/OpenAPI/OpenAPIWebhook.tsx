@@ -5,7 +5,7 @@ import { tcls } from '@/lib/tailwind';
 
 import type { OpenAPIWebhookBlock } from '@/lib/openapi/types';
 import type { BlockProps } from '../Block';
-import { getOpenAPIContext } from './context';
+import { OpenAPIStyles, getOpenAPIContext } from './context';
 
 /**
  * Render an openapi block or an openapi-webhook block.
@@ -14,6 +14,7 @@ export async function OpenAPIWebhook(props: BlockProps<OpenAPIWebhookBlock>) {
     const { style } = props;
     return (
         <div className={tcls('flex w-full min-w-0', style, 'max-w-full')}>
+            <OpenAPIStyles />
             <OpenAPIWebhookBody {...props} />
         </div>
     );
