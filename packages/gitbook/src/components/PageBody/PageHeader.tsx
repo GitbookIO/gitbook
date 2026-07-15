@@ -158,6 +158,10 @@ export async function PageHeader(props: {
                     'page-api-block:lg:top-[calc(var(--toc-top-offset,4rem)+1rem)]',
                     'page-api-block:lg:z-20',
                     'lg:max-[96rem]:[body.outline-open:has(.openapi-block)_&]:hidden',
+                    // On a full-page-cover page <main> is a flex column, where `float-right` is
+                    // inert; align to the end so the actions still sit on the right. Harmless
+                    // (align-self has no effect) on the usual block layout, where the float wins.
+                    'self-end',
                 ]
             )}
         >
