@@ -150,6 +150,8 @@ export const ro: TranslationLanguage = {
     ai_chat_tools_read_page: 'A citit pagina ${1}',
     ai_chat_tools_navigated_to_page: 'Pagina a fost deschisă',
     ai_chat_tools_navigate_failed: 'Deschiderea paginii a eșuat',
+    ai_chat_tools_submit_feedback: 'Trimite feedback',
+    ai_chat_tools_submitted_feedback: 'Feedback trimis',
     ai_chat_tools_mcp_tool: 'A apelat ${1}',
     ai_chat_ask: 'Întreabă ${1}',
     ai_chat_ask_about: 'Întreabă ${1} despre ${2}',

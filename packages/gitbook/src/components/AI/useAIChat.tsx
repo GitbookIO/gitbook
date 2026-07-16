@@ -24,6 +24,7 @@ import { type RenderAIMessageOptions, streamAIChatResponse } from './server-acti
 import { getTools } from './tools';
 import { useAIMessageContextRef } from './useAIMessageContext';
 import { useNavigateToPageTool } from './useNavigateToPageTool';
+import { useSubmitPageFeedbackTool } from './useSubmitPageFeedbackTool';
 
 export type AIChatMessage = {
     role: AIMessageRole;
@@ -230,9 +231,11 @@ export function AIChatProvider(props: {
     const { siteSpaceId } = useCurrentContent();
     const language = useLanguage();
 
-    // Built-in tools exposed to the assistant (e.g. navigating to a page). The tool has a stable
-    // identity, so it can be referenced directly from the streaming callback.
+    // Built-in tools exposed to the assistant (e.g. navigating to a page, submitting page
+    // feedback). Each tool has a stable identity, so it can be referenced directly from the
+    // streaming callback.
     const navigateToPageTool = useNavigateToPageTool();
+    const submitPageFeedbackTool = useSubmitPageFeedbackTool();
 
     // Event listeners storage
     const eventsRef = React.useRef<Map<AIChatEvent['type'], AIChatEventListener[]>>(new Map());
@@ -312,7 +315,7 @@ export function AIChatProvider(props: {
 
             // Execute a tool call
             const executeToolCall = async (event: AIStreamResponseToolCallPending) => {
-                const tools = getTools([navigateToPageTool]);
+                const tools = getTools([navigateToPageTool, submitPageFeedbackTool]);
                 const toolDef = tools.find((tool) => tool.name === event.toolCall.tool);
 
                 if (!toolDef || !('execute' in toolDef)) {
@@ -348,7 +351,7 @@ export function AIChatProvider(props: {
 
             let toolToExecute: AIStreamResponseToolCallPending | null = null;
             try {
-                const tools = getTools([navigateToPageTool]);
+                const tools = getTools([navigateToPageTool, submitPageFeedbackTool]);
                 const stream = await streamAIChatResponse({
                     message: input.message,
                     toolCall: input.toolCall,
@@ -569,6 +572,7 @@ export function AIChatProvider(props: {
             renderMessageOptions?.asEmbeddable,
             language,
             navigateToPageTool,
+            submitPageFeedbackTool,
         ]
     );
 
