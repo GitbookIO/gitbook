@@ -200,6 +200,7 @@ export function useSearchController(props: SearchBaseProps) {
     const { results, fetching, error, abort } = useSearchResults({
         asEmbeddable,
         disabled: !(state?.query || withAI),
+        open: Boolean(state?.open),
         query: normalizedQuery,
         siteSpaceId: siteSpace.id,
         siteSpaceIds,
