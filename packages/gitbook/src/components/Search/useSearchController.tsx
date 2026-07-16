@@ -200,9 +200,7 @@ export function useSearchController(props: SearchBaseProps) {
     const { results, fetching, error, abort } = useSearchResults({
         asEmbeddable,
         disabled: !(state?.query || withAI),
-        // Only load the local search index once the user shows intent (opens search
-        // or has a query). Avoids fetching the whole-site index on every page view.
-        active: Boolean(state?.open || state?.query),
+        open: Boolean(state?.open),
         query: normalizedQuery,
         siteSpaceId: siteSpace.id,
         siteSpaceIds,

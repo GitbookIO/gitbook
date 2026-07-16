@@ -2,26 +2,13 @@
 
 import type { Document, DocumentValue } from 'flexsearch';
 import React from 'react';
-
-interface Breadcrumb {
-    label: string;
-    icon?: string;
-    emoji?: string;
-}
-
-/** Raw entry from the `~gitbook/index` JSON response */
-interface RawIndexPage {
-    id: string;
-    title: string;
-    pathname: string;
-    siteSpaceId: string;
-    /** BCP-47 language code emitted by the index route, absent when no language is set. */
-    lang?: string;
-    icon?: string;
-    emoji?: string;
-    description?: string;
-    breadcrumbs?: Breadcrumb[];
-}
+import {
+    type SiteIndexBreadcrumb,
+    type SiteIndexPage,
+    fetchSiteIndex,
+    prefetchSiteIndex,
+    releaseSiteIndex,
+} from './site-index';
 
 /** FlexSearch-compatible document type — satisfies DocumentData via explicit index signature */
 interface IndexPage {
@@ -41,7 +28,7 @@ export interface LocalPageResult {
     icon?: string;
     emoji?: string;
     description?: string;
-    breadcrumbs?: Breadcrumb[];
+    breadcrumbs?: SiteIndexBreadcrumb[];
 }
 
 type LocalSearchState = {
@@ -58,37 +45,14 @@ const cachedIndexes = new Map<string, Document<IndexPage>>();
 // Keyed by page id, shared across all language groups.
 const cachedPageData = new Map<
     string,
-    { pathname: string; icon?: string; emoji?: string; breadcrumbs?: Breadcrumb[] }
+    { pathname: string; icon?: string; emoji?: string; breadcrumbs?: SiteIndexBreadcrumb[] }
 >();
 
 let pendingFetch: Promise<Map<string, Document<IndexPage>>> | null = null;
 
-// Global fetch of the raw index data, started at page load so the bytes are already
-// here (or in flight) when the user opens search. Fetching is network-only; the
-// FlexSearch build (main-thread work) stays deferred until search is used.
-let rawIndexFetch: Promise<{ version: 1; pages: RawIndexPage[] }> | null = null;
-
-function fetchRawIndex(indexURL: string): Promise<{ version: 1; pages: RawIndexPage[] }> {
-    if (!rawIndexFetch) {
-        rawIndexFetch = fetch(indexURL).then((response) => {
-            if (!response.ok) {
-                throw new Error(`Failed to fetch search index: ${response.status}`);
-            }
-            return response.json();
-        });
-
-        // Clear on error so opening search can retry the download
-        rawIndexFetch.catch(() => {
-            rawIndexFetch = null;
-        });
-    }
-
-    return rawIndexFetch;
-}
-
 function buildLangIndex(
     DocumentCtor: typeof import('flexsearch').Document,
-    pages: RawIndexPage[]
+    pages: SiteIndexPage[]
 ): Document<IndexPage> {
     const index = new DocumentCtor<IndexPage>({
         document: {
@@ -136,16 +100,14 @@ async function getOrBuildIndexes(indexURL: string): Promise<Map<string, Document
     }
 
     pendingFetch = (async () => {
-        // Load FlexSearch lazily so its code lands in an on-demand chunk instead of the
-        // main client bundle — it's only needed once the user actually searches. The index
-        // data itself was already requested at page load (see fetchRawIndex).
+        // FlexSearch stays in an on-demand chunk instead of the main client bundle, it's only needed once the user actually searches.
         const [{ Document }, data] = await Promise.all([
             import('flexsearch'),
-            fetchRawIndex(indexURL),
+            fetchSiteIndex(indexURL),
         ]);
 
         // Group pages by their `lang` value (empty string for pages without one)
-        const pagesByLang = new Map<string, RawIndexPage[]>();
+        const pagesByLang = new Map<string, SiteIndexPage[]>();
         for (const page of data.pages) {
             const key = page.lang ?? '';
             const bucket = pagesByLang.get(key);
@@ -161,8 +123,7 @@ async function getOrBuildIndexes(indexURL: string): Promise<Map<string, Document
             cachedIndexes.set(lang, buildLangIndex(Document, pages));
         }
 
-        // Release the raw data: every path checks cachedIndexes before re-fetching
-        rawIndexFetch = null;
+        releaseSiteIndex();
 
         return cachedIndexes;
     })();
@@ -186,11 +147,10 @@ export function useLocalSearchResults(props: {
      * are returned. Uses FlexSearch native tag filtering. Omit for no filtering (all spaces). */
     filterSiteSpaceIds?: string[];
     disabled?: boolean;
-    /** Whether search is active (opened or has a query). The index data is downloaded
-     * eagerly at page load, but FlexSearch and the index build only load once this is true. */
-    active?: boolean;
+    /** Whether the search surface is open. */
+    open: boolean;
 }): LocalSearchState {
-    const { query, indexURL, lang, filterSiteSpaceIds, disabled = false, active = true } = props;
+    const { query, indexURL, lang, filterSiteSpaceIds, disabled = false, open } = props;
 
     const [state, setState] = React.useState<LocalSearchState>({
         results: [],
@@ -201,24 +161,16 @@ export function useLocalSearchResults(props: {
     // Track whether the indexes are loaded so the search effect re-runs after load
     const [indexReady, setIndexReady] = React.useState(cachedIndexes.size > 0);
 
-    // Start downloading the index data as early as possible so results are instant
-    // when the user opens search. Build (below) stays deferred until then.
-    // Note: `disabled` means "nothing to search right now", not "search is off",
-    // so it must not gate the prefetch.
-    React.useEffect(() => {
-        if (cachedIndexes.size === 0) {
-            fetchRawIndex(indexURL).catch(() => {
-                // Errors are surfaced when search actually runs; the fetch retries then.
-            });
-        }
-    }, [indexURL]);
+    const active = open || Boolean(query);
 
-    // Build the indexes once search becomes active (opened or queried).
+    // Load the indexes once
     React.useEffect(() => {
         if (cachedIndexes.size > 0) {
             setIndexReady(true);
             return;
         }
+
+        prefetchSiteIndex(indexURL);
 
         if (!active) {
             return;

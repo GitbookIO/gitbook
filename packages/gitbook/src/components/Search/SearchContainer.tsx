@@ -17,8 +17,6 @@ import { SearchScopeControl } from './SearchScopeControl';
 import type { SearchBaseProps } from './search-props';
 import { useSearchController } from './useSearchController';
 
-// The results panel (and its ranking/AI code) only appears once search is used, so load it on
-// demand instead of shipping it in every page's client bundle.
 const SearchFrame = dynamic(() => import('./SearchFrame').then((mod) => mod.SearchFrame), {
     ssr: false,
 });
@@ -119,8 +117,20 @@ export function SearchContainer({
         cursor !== null && cursor < results.length ? `${resultsId}-${cursor}` : undefined;
     const isSearchOpen = Boolean(visible && (state?.open ?? false));
     const shouldFillHeight = Boolean(query || showAsk);
+
+    // The SideSheet always renders its children (it hides them with CSS, unlike the desktop
+    // Popover which mounts its content on open). Mounting the frame only after the first open
+    // keeps the dynamic SearchFrame chunk off the mobile startup path, while leaving it mounted
+    // afterwards so the sheet's exit animation isn't cut short.
+    const [wasSearchOpened, setWasSearchOpened] = React.useState(false);
+    React.useEffect(() => {
+        if (isSearchOpen) {
+            setWasSearchOpened(true);
+        }
+    }, [isSearchOpen]);
+
     const shouldShowSearchFrame = usesSideSheet
-        ? Boolean(state?.open || state?.query || withAI)
+        ? Boolean(state?.open || state?.query || wasSearchOpened)
         : Boolean(state?.query || withAI);
     const scopeControlNode =
         searchProps.withVariants || searchProps.withSections ? (
