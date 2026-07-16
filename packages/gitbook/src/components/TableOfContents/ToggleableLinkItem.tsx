@@ -111,9 +111,6 @@ function LinkItem(
             data-active={isActive}
             href={href}
             insights={insights}
-            // The sidebar renders hundreds of links; prefetch on hover/focus instead of eagerly
-            // to keep them out of the router's load-time work (navigation stays instant on hover).
-            prefetch="hover"
             aria-current={isActive ? 'page' : undefined}
             classNames={[
                 'ToCLinkItemStyles',

@@ -25,19 +25,13 @@ export type LinkInsightsProps = {
         | TrackEventInput<'search_open_result'>;
 };
 
-export type LinkProps = Omit<BaseLinkProps, 'href' | 'prefetch'> &
+export type LinkProps = Omit<BaseLinkProps, 'href'> &
     LinkInsightsProps & {
         ref?: React.Ref<HTMLAnchorElement>;
         /** Enforce href is passed as a string (not a URL). */
         href: string;
         /** This is a temporary solution designed to reduce the number of tailwind class passed to the client */
         classNames?: DesignTokenName[];
-        /**
-         * `'hover'` defers prefetching until the link is hovered/focused instead of eagerly on
-         * viewport — for large link lists (e.g. the sidebar) where prefetching every entry at load
-         * floods the router. Navigation stays instant since hover fires before the click.
-         */
-        prefetch?: NextLinkProps['prefetch'] | 'hover';
     };
 
 type LinkTarget = '_blank' | '_self';
@@ -90,7 +84,6 @@ function defaultIsExternalClient(href: string) {
  */
 export function Link(props: LinkProps) {
     const { ref, href, prefetch, children, insights, classNames, className, ...domProps } = props;
-    const [hoverPrefetch, setHoverPrefetch] = React.useState(false);
     const {
         externalTarget,
         isExternalClient = defaultIsExternalClient,
@@ -164,32 +157,14 @@ export function Link(props: LinkProps) {
         );
     }
 
-    // Forcing prefetch to true seems necessary for the client router cache to be used properly.
-    // `'hover'` gates that same full prefetch behind hover/focus intent so large link lists (the
-    // sidebar) don't prefetch every entry at load — see `hoverPrefetch` above.
+    // Not sure why yet, but forcing prefetch to true seems necessary for the
+    // client router cache to be used properly.
     //
-    // We also disable prefetch for links with query params that can trigger server-side side
-    // effects (persisting visitor claims in a cookie, starting the assistant); automatic RSC
-    // prefetch requests would otherwise fire those without user intent.
-    const _prefetch = hasSideEffectQueryParams(href)
-        ? false
-        : prefetch === 'hover'
-          ? hoverPrefetch
-          : (prefetch ?? true);
-
-    const hoverPrefetchProps =
-        prefetch === 'hover'
-            ? {
-                  onMouseEnter: (event: React.MouseEvent<HTMLAnchorElement>) => {
-                      setHoverPrefetch(true);
-                      domProps.onMouseEnter?.(event);
-                  },
-                  onFocus: (event: React.FocusEvent<HTMLAnchorElement>) => {
-                      setHoverPrefetch(true);
-                      domProps.onFocus?.(event);
-                  },
-              }
-            : undefined;
+    // However, we need to disable prefetch for links with query params that
+    // can trigger server-side side effects, such as persisting visitor claims in a
+    // cookie or starting the assistant. Automatic RSC prefetch requests can otherwise
+    // trigger those effects without user intent.
+    const _prefetch = hasSideEffectQueryParams(href) ? false : (prefetch ?? true);
 
     return (
         <NextLink
@@ -198,7 +173,6 @@ export function Link(props: LinkProps) {
             prefetch={_prefetch}
             className={tcls(...forwardedClassNames, className)}
             {...domProps}
-            {...hoverPrefetchProps}
             onClick={onClick}
         >
             {children}
