@@ -33,6 +33,10 @@
                     "binding": "WORKER_SELF_REFERENCE",
                     "service": "gitbook-open-v2-server-dev",
                 },
+                {
+                    "binding": "NEXT_INC_CACHE_WORKER",
+                    "service": "gitbook-open-v2-do-dev",
+                },
             ],
             "durable_objects": {
                 "bindings": [
@@ -70,6 +74,10 @@
                     "binding": "WORKER_SELF_REFERENCE",
                     "service": "gitbook-open-v2-server-preview",
                 },
+                {
+                    "binding": "NEXT_INC_CACHE_WORKER",
+                    "service": "gitbook-open-v2-do-preview",
+                },
             ],
             "durable_objects": {
                 "bindings": [
@@ -105,6 +113,10 @@
                 {
                     "binding": "WORKER_SELF_REFERENCE",
                     "service": "gitbook-open-v2-server-staging",
+                },
+                {
+                    "binding": "NEXT_INC_CACHE_WORKER",
+                    "service": "gitbook-open-v2-do-staging",
                 },
             ],
             "durable_objects": {
@@ -149,6 +161,10 @@
                 {
                     "binding": "WORKER_SELF_REFERENCE",
                     "service": "gitbook-open-v2-server-production",
+                },
+                {
+                    "binding": "NEXT_INC_CACHE_WORKER",
+                    "service": "gitbook-open-v2-do-production",
                 },
             ],
             "durable_objects": {
