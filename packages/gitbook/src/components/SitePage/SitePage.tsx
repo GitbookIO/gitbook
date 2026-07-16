@@ -159,7 +159,7 @@ export async function generateSitePageViewport(context: GitBookSiteContext): Pro
 }
 
 export async function generateSitePageMetadata(props: SitePageProps): Promise<Metadata> {
-    const { context, pageTarget } = await getPageDataWithFallback({
+    const { context, pageTarget, pageMetaLinks } = await getPageDataWithFallback({
         context: props.context,
         pagePathParams: props.pageParams,
     });
@@ -173,8 +173,6 @@ export async function generateSitePageMetadata(props: SitePageProps): Promise<Me
 
     const { page, ancestors } = pageTarget;
     const { customization, revision, linker, imageResizer } = context;
-
-    const pageMetaLinks = await resolvePageMetaLinks(context, page.id);
 
     const canonical = (
         pageMetaLinks?.canonical
@@ -248,7 +246,7 @@ export async function generateSitePageMetadata(props: SitePageProps): Promise<Me
  * Fetches all the data required to render the site page.
  */
 export async function getSitePageData(props: SitePageProps) {
-    const { context, pageTarget } = await getPageDataWithFallback({
+    const { context, pageTarget, pageMetaLinks } = await getPageDataWithFallback({
         context: props.context,
         pagePathParams: props.pageParams,
     });
@@ -289,12 +287,7 @@ export async function getSitePageData(props: SitePageProps) {
 
     const withSections = Boolean(visibleSections && visibleSections.list.length > 0);
 
-    // The page document and its meta links are independent; resolve them concurrently to
-    // avoid stacking two round trips in front of the LCP content.
-    const [document, pageMetaLinks] = await Promise.all([
-        getPageDocument(context, page),
-        resolvePageMetaLinks(context, page.id),
-    ]);
+    const document = await getPageDocument(context, page);
     const iconStyle = getCustomizationIconStyle(customization);
     const iconSources = await getInlineIconSources(
         getContentInlineIconSourceRequests({
@@ -326,6 +319,9 @@ async function getPageDataWithFallback(args: {
 }) {
     const { context: baseContext, pagePathParams } = args;
     const { context, pageTarget } = await fetchPageData(baseContext, pagePathParams);
+    const pageMetaLinks = await (pageTarget?.page
+        ? resolvePageMetaLinks(context, pageTarget.page.id)
+        : null);
 
     return {
         context: {
@@ -333,6 +329,7 @@ async function getPageDataWithFallback(args: {
             page: pageTarget?.page,
         },
         pageTarget,
+        pageMetaLinks,
     };
 }
 

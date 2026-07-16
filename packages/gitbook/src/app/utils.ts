@@ -1,5 +1,4 @@
 import { getVisitorAuthClaims, getVisitorAuthClaimsFromToken } from '@/lib/adaptive';
-import { cache } from '@/lib/cache';
 import { type SiteURLData, fetchSiteContextByURLLookup, getBaseContext } from '@/lib/context';
 import { getDynamicCustomizationSettings } from '@/lib/customization';
 import type { SiteAPIToken } from '@gitbook/api';
@@ -27,16 +26,6 @@ export type RouteParams = RouteLayoutParams & {
  * Get the static context when rendering statically a site.
  */
 export async function getStaticSiteContext(params: RouteLayoutParams) {
-    // Only the fields the context depends on — dropping pagePath so the layout, page and their
-    // metadata/viewport generators all share a single cached execution per request.
-    return fetchStaticSiteContext({
-        mode: params.mode,
-        siteURL: params.siteURL,
-        siteData: params.siteData,
-    });
-}
-
-const fetchStaticSiteContext = cache(async (params: RouteLayoutParams) => {
     const siteURL = getSiteURLFromParams(params);
     const siteURLData = getSiteURLDataFromParams(params);
 
@@ -60,21 +49,13 @@ const fetchStaticSiteContext = cache(async (params: RouteLayoutParams) => {
         context,
         visitorAuthClaims: getVisitorAuthClaimsFromToken(decoded),
     };
-});
+}
 
 /**
  * Get the site context when rendering dynamically.
  * The context will depend on the request.
  */
 export async function getDynamicSiteContext(params: RouteLayoutParams) {
-    return fetchDynamicSiteContext({
-        mode: params.mode,
-        siteURL: params.siteURL,
-        siteData: params.siteData,
-    });
-}
-
-const fetchDynamicSiteContext = cache(async (params: RouteLayoutParams) => {
     const siteURL = getSiteURLFromParams(params);
     const siteURLData = getSiteURLDataFromParams(params);
 
@@ -93,7 +74,7 @@ const fetchDynamicSiteContext = cache(async (params: RouteLayoutParams) => {
         context,
         visitorAuthClaims: getVisitorAuthClaims(siteURLData),
     };
-});
+}
 
 /**
  * Get the decoded page path from the params.

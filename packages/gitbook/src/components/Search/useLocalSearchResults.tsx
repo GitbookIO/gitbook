@@ -20,10 +20,7 @@ interface RawIndexPage {
     icon?: string;
     emoji?: string;
     description?: string;
-    /** Inlined breadcrumbs (version 1 responses). */
     breadcrumbs?: Breadcrumb[];
-    /** Indices into the response-level `crumbs` table (version 2 responses). */
-    breadcrumbRefs?: number[];
 }
 
 /** FlexSearch-compatible document type — satisfies DocumentData via explicit index signature */
@@ -123,21 +120,7 @@ async function getOrBuildIndexes(indexURL: string): Promise<Map<string, Document
             throw new Error(`Failed to fetch search index: ${response.status}`);
         }
 
-        const data: { version: number; pages: RawIndexPage[]; crumbs?: Breadcrumb[] } =
-            await response.json();
-
-        // Version 2 dedupes breadcrumbs into a shared `crumbs` table; resolve the per-page
-        // references back to inline breadcrumbs so the rest of the code is version-agnostic.
-        if (data.crumbs) {
-            const crumbs = data.crumbs;
-            for (const page of data.pages) {
-                if (page.breadcrumbRefs) {
-                    page.breadcrumbs = page.breadcrumbRefs
-                        .map((index) => crumbs[index])
-                        .filter((crumb): crumb is Breadcrumb => crumb !== undefined);
-                }
-            }
-        }
+        const data: { version: 1; pages: RawIndexPage[] } = await response.json();
 
         // Group pages by their `lang` value (empty string for pages without one)
         const pagesByLang = new Map<string, RawIndexPage[]>();

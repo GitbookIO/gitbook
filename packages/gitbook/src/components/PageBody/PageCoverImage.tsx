@@ -29,10 +29,15 @@ interface PageCoverImageProps {
 
 export function PageCoverImage(props: PageCoverImageProps) {
     const { imgs, y, height, mask } = props;
-    // The image is always rendered server-side (reserving space via aspect-ratio) so it stays
-    // discoverable by the preload scanner as the LCP element; the client probe only refines
-    // `objectPositionY` once real dimensions are known.
-    const { containerRef, objectPositionY } = useCoverPosition(imgs, y);
+    const { containerRef, objectPositionY, isLoading } = useCoverPosition(imgs, y);
+
+    if (isLoading) {
+        return (
+            <div className="h-full w-full overflow-hidden" ref={containerRef}>
+                <div className="h-full w-full animate-pulse bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900" />
+            </div>
+        );
+    }
 
     return (
         <div className="h-full w-full overflow-hidden" ref={containerRef} style={{ height }}>

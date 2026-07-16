@@ -1,7 +1,6 @@
 import type { GitBookSiteContext } from '@/lib/context';
 import { CustomizationDefaultThemeMode } from '@gitbook/api';
 import type { Metadata, Viewport } from 'next';
-import Script from 'next/script';
 import React from 'react';
 import * as ReactDOM from 'react-dom';
 
@@ -40,6 +39,12 @@ export async function SiteLayout(props: {
         ReactDOM.preconnect(GITBOOK_ASSETS_URL);
     }
 
+    scripts.forEach(({ script }) => {
+        ReactDOM.preload(script, {
+            as: 'script',
+        });
+    });
+
     return (
         <SiteLayoutClientContexts
             contextId={context.contextId}
@@ -71,9 +76,7 @@ export async function SiteLayout(props: {
 
             <LoadIntegrations />
             {scripts.length > 0
-                ? scripts.map(({ script }) => (
-                      <Script key={script} src={script} strategy="afterInteractive" />
-                  ))
+                ? scripts.map(({ script }) => <script key={script} async src={script} />)
                 : null}
 
             {scripts.some((script) => script.cookies) || customization.privacyPolicy.url ? (

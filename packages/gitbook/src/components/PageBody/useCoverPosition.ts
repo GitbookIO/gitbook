@@ -28,6 +28,7 @@ interface Images {
 export function useCoverPosition(imgs: Images, y: number) {
     const containerRef = useRef<HTMLDivElement>(null);
     const [loadedDimensions, setLoadedDimensions] = useState<ImageSize | null>(null);
+    const [isLoading, setIsLoading] = useState(!imgs.light.size && !imgs.dark?.size);
 
     const container = useResizeObserver({
         // @ts-expect-error wrong types
@@ -43,6 +44,8 @@ export function useCoverPosition(imgs: Images, y: number) {
             return; // Already have dimensions
         }
 
+        setIsLoading(true);
+
         // Load the original image (using src, not srcSet) to get true dimensions
         // Use dark image if available, otherwise fall back to light
         const imageToLoad = imgs.dark || imgs.light;
@@ -52,6 +55,11 @@ export function useCoverPosition(imgs: Images, y: number) {
                 width: img.naturalWidth,
                 height: img.naturalHeight,
             });
+            setIsLoading(false);
+        };
+        img.onerror = () => {
+            // If image fails to load, use a fallback
+            setIsLoading(false);
         };
         img.src = imageToLoad.src;
     }, [imgs.light, imgs.dark]);
@@ -96,5 +104,6 @@ export function useCoverPosition(imgs: Images, y: number) {
     return {
         containerRef,
         objectPositionY,
+        isLoading: !imageDimensions || isLoading,
     };
 }
