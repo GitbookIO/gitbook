@@ -77,6 +77,7 @@ export async function PageAside(props: {
                 'break-anywhere', // To prevent long words in headings from breaking the layout
 
                 'lg:z-10',
+                'lg:hover:z-12',
                 'layout-default:xl:not-chat-open:pr-0',
                 'layout-default:xl:not-chat-open:pl-8',
                 'layout-default:xl:not-chat-open:flex!',
@@ -98,9 +99,16 @@ export async function PageAside(props: {
                 'page-api-block:page-has-outline:min-[96rem]:border-l-0',
                 'page-api-block:page-has-outline:min-[96rem]:pl-8',
 
-                'hydrated:site-background', // Only add a background once the element is positioned correctly to prevent overlapping the page cover
+                // Only add a background once the element is positioned correctly, to prevent
+                // overlapping the page cover. Kept opaque wherever the outline is a toggleable
+                // overlay (below xl in any layout, and xl–3xl in wide layout, where it opens as
+                // a desktop SideSheet), but dropped for the permanent outline column so a bleeding
+                // cards carousel can scroll behind it.
+                'max-xl:hydrated:site-background',
+                'layout-wide:max-3xl:hydrated:site-background',
                 'text-tint',
-                'contrast-more:text-tint-strong'
+                'contrast-more:text-tint-strong',
+                'xl:page-cover-background:text-contrast-cover'
             )}
         >
             <div className="flex h-full w-full shrink-0 flex-col overflow-hidden">
