@@ -4,7 +4,7 @@
     "private": true,
     "dependencies": {
         "@base-ui/react": "catalog:",
-        "@cloudflare/workers-types": "^4.20251011.0",
+        "@cloudflare/workers-types": "^5.20260716.1",
         "@gitbook/api": "catalog:",
         "@gitbook/browser-types": "workspace:*",
         "@gitbook/cache-tags": "workspace:*",
