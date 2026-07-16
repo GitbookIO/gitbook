@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'bun:test';
 import {
     type RevisionPage,
+    RevisionPageLayoutOptionsCoverMask,
     RevisionPageLayoutOptionsCoverSize,
     RevisionPageLayoutOptionsWidth,
 } from '@gitbook/api';
@@ -77,6 +78,7 @@ describe('resolveFirstDocument', () => {
                         layout: {
                             cover: true,
                             coverSize: RevisionPageLayoutOptionsCoverSize.Full,
+                            coverMask: RevisionPageLayoutOptionsCoverMask.None,
                             title: true,
                             description: true,
                             tableOfContents: true,
@@ -130,6 +132,7 @@ describe('resolveFirstDocument', () => {
                 layout: {
                     cover: true,
                     coverSize: RevisionPageLayoutOptionsCoverSize.Full,
+                    coverMask: RevisionPageLayoutOptionsCoverMask.None,
                     title: true,
                     description: true,
                     tableOfContents: true,
@@ -176,6 +179,7 @@ describe('resolvePagePath', () => {
                 layout: {
                     cover: true,
                     coverSize: RevisionPageLayoutOptionsCoverSize.Full,
+                    coverMask: RevisionPageLayoutOptionsCoverMask.None,
                     title: true,
                     description: true,
                     tableOfContents: true,
@@ -252,6 +256,7 @@ describe('resolvePagePath', () => {
                         layout: {
                             cover: true,
                             coverSize: RevisionPageLayoutOptionsCoverSize.Full,
+                            coverMask: RevisionPageLayoutOptionsCoverMask.None,
                             title: true,
                             description: true,
                             tableOfContents: true,
@@ -370,6 +375,7 @@ function createDocumentPage(id: string, path: string, hidden = false): RevisionP
         layout: {
             cover: true,
             coverSize: RevisionPageLayoutOptionsCoverSize.Full,
+            coverMask: RevisionPageLayoutOptionsCoverMask.None,
             title: true,
             description: true,
             tableOfContents: true,

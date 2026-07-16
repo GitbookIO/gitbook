@@ -36,6 +36,14 @@ export interface DocumentContext {
      * @default false
      */
     withLinkPreviews?: boolean;
+
+    /**
+     * True when this document is the main page body — the only place a background page cover is
+     * shown behind the content. Cover-aware text styling (contrast over the cover) is scoped to it
+     * so auxiliary documents (search answers, AI chat, PDF export) don't inherit the cover colors.
+     * @default false
+     */
+    isPageBody?: boolean;
 }
 
 export interface DocumentContextProps {
