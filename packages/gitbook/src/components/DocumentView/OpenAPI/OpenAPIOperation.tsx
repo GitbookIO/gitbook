@@ -5,7 +5,7 @@ import { tcls } from '@/lib/tailwind';
 
 import type { AnyOpenAPIOperationsBlock } from '@/lib/openapi/types';
 import type { BlockProps } from '../Block';
-import { getOpenAPIContext } from './context';
+import { OpenAPIStyles, getOpenAPIContext } from './context';
 
 /**
  * Render an openapi block or an openapi-operation block.
@@ -14,6 +14,7 @@ export async function OpenAPIOperation(props: BlockProps<AnyOpenAPIOperationsBlo
     const { style } = props;
     return (
         <div className={tcls('flex w-full min-w-0', style, 'max-w-full')}>
+            <OpenAPIStyles />
             <OpenAPIOperationBody {...props} />
         </div>
     );

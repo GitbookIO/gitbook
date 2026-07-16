@@ -1,13 +1,13 @@
 import type { JSONDocument } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
 import { type OpenAPIContextInput, checkIsValidLocale } from '@gitbook/react-openapi';
+import React from 'react';
 
 import type { BlockProps } from '../Block';
 import { PlainCodeBlock } from '../CodeBlock';
 import { DocumentView } from '../DocumentView';
 import { Heading } from '../Heading';
 
-import './style.css';
 import { DEFAULT_LOCALE, getSpaceLocale } from '@/intl/server';
 import type { GitBookAnyContext } from '@/lib/context';
 import { buildSignedProxyUrl } from '@/lib/openapi/proxy-token';
@@ -16,6 +16,12 @@ import type {
     OpenAPISchemasBlock,
     OpenAPIWebhookBlock,
 } from '@/lib/openapi/types';
+
+/**
+ * Lazy loader for the OpenAPI/Scalar stylesheet, rendered by each OpenAPI block so the CSS
+ * is only fetched on pages that use one.
+ */
+export const OpenAPIStyles = React.lazy(() => import('./OpenAPIStyles'));
 
 /**
  * Get the OpenAPI context to render a block.

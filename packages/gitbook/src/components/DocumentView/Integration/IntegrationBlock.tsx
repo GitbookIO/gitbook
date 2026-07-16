@@ -2,10 +2,10 @@ import { GITBOOK_INTEGRATIONS_CONTENT_HOST, GITBOOK_INTEGRATIONS_HOST } from '@/
 import { tcls } from '@/lib/tailwind';
 import type { DocumentBlockIntegration, RenderIntegrationUI } from '@gitbook/api';
 import { ContentKit, ContentKitOutput } from '@gitbook/react-contentkit';
+import React from 'react';
 
-import type { BlockProps } from '../Block';
-import './contentkit.css';
 import type { GitBookLinker } from '@/lib/links';
+import type { BlockProps } from '../Block';
 import {
     ContentKitWithClientContext,
     type WebframeLinkerData,
@@ -14,6 +14,9 @@ import { integrationBlockContainsWebframe } from './adaptive';
 import { contentKitServerContext } from './contentkit';
 import { fetchSafeIntegrationUI } from './render';
 import { renderIntegrationUi } from './server-actions';
+
+// Lazy so the ContentKit CSS is only fetched on pages that render an integration block.
+const ContentKitStyles = React.lazy(() => import('./ContentKitStyles'));
 
 export async function IntegrationBlock(props: BlockProps<DocumentBlockIntegration>) {
     const { block, context, style } = props;
@@ -102,6 +105,7 @@ export async function IntegrationBlock(props: BlockProps<DocumentBlockIntegratio
 
     return (
         <div className={tcls(style)}>
+            <ContentKitStyles />
             {useClientContext ? (
                 <ContentKitWithClientContext
                     {...contentKitProps}
