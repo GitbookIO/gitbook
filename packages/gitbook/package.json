@@ -3,7 +3,7 @@
     "version": "0.27.2",
     "private": true,
     "dependencies": {
-        "@cloudflare/workers-types": "^4.20251011.0",
+        "@cloudflare/workers-types": "^5.20260716.1",
         "@gitbook/api": "catalog:",
         "@gitbook/browser-types": "workspace:*",
         "@gitbook/cache-tags": "workspace:*",
