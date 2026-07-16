@@ -19,6 +19,8 @@ export function PageLinkItem(props: { page: ClientTOCPageLink }) {
             <Link
                 href={page.href ?? '#'}
                 classNames={['ToCLinkItemStyles']}
+                // Sidebar links prefetch on hover/focus, not eagerly (see ToggleableLinkItem).
+                prefetch="hover"
                 insights={{
                     type: 'link_click',
                     link: {
