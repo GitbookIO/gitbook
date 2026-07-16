@@ -23,9 +23,6 @@
             "vars": {
                 "STAGE": "dev",
                 "NEXT_PRIVATE_DEBUG_CACHE": "true",
-                // When deployed locally, we don't have access to the tag cache here,
-                // we should just bypass the cache to go to the server directly
-                "SHOULD_BYPASS_CACHE": "true",
                 "OPEN_NEXT_REQUEST_ID_HEADER": "true",
                 "GITBOOK_URL": "http://localhost:8771"
             },
@@ -43,6 +40,10 @@
                 {
                     "binding": "DEFAULT_WORKER",
                     "service": "gitbook-open-v2-server-dev"
+                },
+                {
+                    "binding": "NEXT_INC_CACHE_WORKER",
+                    "service": "gitbook-open-v2-do-dev"
                 }
             ]
         },
@@ -66,6 +67,10 @@
                 {
                     "binding": "DEFAULT_WORKER",
                     "service": "gitbook-open-v2-server-preview"
+                },
+                {
+                    "binding": "NEXT_INC_CACHE_WORKER",
+                    "service": "gitbook-open-v2-do-preview"
                 }
             ],
             "durable_objects": {
@@ -118,6 +123,10 @@
                 {
                     "binding": "DEFAULT_WORKER",
                     "service": "gitbook-open-v2-server-staging"
+                },
+                {
+                    "binding": "NEXT_INC_CACHE_WORKER",
+                    "service": "gitbook-open-v2-do-staging"
                 }
             ],
             "tail_consumers": [
@@ -187,6 +196,10 @@
                 {
                     "binding": "DEFAULT_WORKER",
                     "service": "gitbook-open-v2-server-production"
+                },
+                {
+                    "binding": "NEXT_INC_CACHE_WORKER",
+                    "service": "gitbook-open-v2-do-production"
                 }
             ],
             "tail_consumers": [

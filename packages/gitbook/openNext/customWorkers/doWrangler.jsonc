@@ -1,5 +1,5 @@
 {
-    "main": "do.js",
+    "main": "do.ts",
     "name": "gitbook-open-v2-do",
     "compatibility_date": "2025-04-14",
     "keep_names": false,
@@ -12,6 +12,46 @@
         "enabled": false
     },
     "env": {
+        "dev": {
+            "vars": {
+                "STAGE": "dev",
+                "NEXT_CACHE_DO_QUEUE_DISABLE_SQLITE": "true"
+            },
+            "r2_buckets": [
+                {
+                    "binding": "NEXT_INC_CACHE_R2_BUCKET",
+                    "bucket_name": "gitbook-open-v2-cache-preview"
+                }
+            ],
+            "services": [
+                {
+                    "binding": "WORKER_SELF_REFERENCE",
+                    "service": "gitbook-open-v2-dev"
+                }
+            ],
+            "durable_objects": {
+                "bindings": [
+                    {
+                        "name": "NEXT_CACHE_DO_QUEUE",
+                        "class_name": "DOQueueHandler"
+                    },
+                    {
+                        "name": "NEXT_TAG_CACHE_DO_SHARDED",
+                        "class_name": "DOShardedTagCache"
+                    },
+                    {
+                        "name": "WRITE_BUFFER",
+                        "class_name": "R2WriteBuffer"
+                    }
+                ]
+            },
+            "migrations": [
+                {
+                    "tag": "v1",
+                    "new_sqlite_classes": ["DOQueueHandler", "DOShardedTagCache", "R2WriteBuffer"]
+                }
+            ]
+        },
         "preview": {
             "vars": {
                 "STAGE": "preview",
