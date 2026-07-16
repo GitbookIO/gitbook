@@ -1,7 +1,7 @@
 {
     "main": "do.ts",
     "name": "gitbook-open-v2-do",
-    "compatibility_date": "2025-04-14",
+    "compatibility_date": "2026-06-14",
     "keep_names": false,
     "compatibility_flags": [
         "nodejs_compat",
@@ -10,6 +10,12 @@
     ],
     "observability": {
         "enabled": false
+    },
+    "cache": {
+        "enabled": true
+    },
+    "placement": {
+        "region": "gcp:us-central1"
     },
     "env": {
         "dev": {
