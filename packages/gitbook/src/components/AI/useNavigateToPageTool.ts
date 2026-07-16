@@ -6,19 +6,32 @@ import type { AIToolDefinition } from '@gitbook/api';
 import type { GitBookIntegrationTool } from '@gitbook/browser-types';
 import { useRouter } from 'next/navigation';
 import * as React from 'react';
-import { z } from 'zod';
-import { zodToJsonSchema } from 'zod-to-json-schema';
 import { NavigationStatusContext } from '../hooks';
 import { normalizePathname, resolveNavigationTarget } from './navigation';
 import { resolveAINavigationLink } from './server-actions';
 
-const NavigateToPageInputSchema = z.object({
-    url: z
-        .string()
-        .describe(
-            'The URL of the documentation page to open. Must be a page within this documentation site (the same URL you would use to link to the page). Can include a section anchor (e.g. #section).'
-        ),
-});
+// Hand-written JSON Schema: this hook runs in the always-mounted provider, so pulling zod +
+// zod-to-json-schema here would keep the entire zod chunk eager for every visitor.
+const NAVIGATE_TO_PAGE_INPUT_SCHEMA = {
+    type: 'object',
+    properties: {
+        url: {
+            type: 'string',
+            description:
+                'The URL of the documentation page to open. Must be a page within this documentation site (the same URL you would use to link to the page). Can include a section anchor (e.g. #section).',
+        },
+    },
+    required: ['url'],
+    additionalProperties: false,
+} as AIToolDefinition['inputSchema'];
+
+function parseNavigateToPageInput(input: unknown): { url: string } {
+    const url = (input as { url?: unknown } | null | undefined)?.url;
+    if (typeof url !== 'string') {
+        throw new Error('Invalid input for navigateToPage: expected { url: string }');
+    }
+    return { url };
+}
 
 /**
  * Resolve once the SPA navigation to `pathname` has committed (the browser URL reflects it), or
@@ -70,12 +83,10 @@ export function useNavigateToPageTool(): GitBookIntegrationTool {
             name: 'navigateToPage',
             description:
                 'Navigate the user to a page in the documentation. The page opens instantly without asking for confirmation, so only use it when the user clearly wants to be taken to a specific page. Provide the URL of the page within this documentation site.',
-            inputSchema: zodToJsonSchema(
-                NavigateToPageInputSchema as any
-            ) as AIToolDefinition['inputSchema'],
+            inputSchema: NAVIGATE_TO_PAGE_INPUT_SCHEMA,
             execute: async (input) => {
                 const { router, language, onNavigationClick } = ref.current;
-                const { url } = NavigateToPageInputSchema.parse(input);
+                const { url } = parseNavigateToPageInput(input);
 
                 // The assistant references pages using the stable content-ref scheme
                 // (e.g. `/spaces/<id>/pages/<id>`). Resolve it server-side to the real site link.

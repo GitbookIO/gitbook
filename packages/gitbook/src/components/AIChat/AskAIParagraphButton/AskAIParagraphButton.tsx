@@ -4,6 +4,7 @@ import fnv1a from '@sindresorhus/fnv1a';
 
 import { useAIChatController, useAIConfig } from '@/components/AI';
 import { Button } from '@/components/primitives';
+import { isAIChatEnabled } from '@/components/utils/isAIChatEnabled';
 import { t, tString, useLanguage } from '@/intl/client';
 import { type ClassValue, tcls } from '@/lib/tailwind';
 
@@ -22,6 +23,10 @@ export function AskAIParagraphButton(props: { content: string; className?: Class
     const config = useAIConfig();
     const language = useLanguage();
     const chatController = useAIChatController();
+
+    if (!isAIChatEnabled(config.aiMode)) {
+        return null;
+    }
 
     const onClick = () => {
         const text = content.trim();

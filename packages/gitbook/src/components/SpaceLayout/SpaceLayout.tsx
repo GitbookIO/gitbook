@@ -9,8 +9,10 @@ import { isAIChatEnabled } from '@/components/utils/isAIChatEnabled';
 import type { VisitorAuthClaims } from '@/lib/adaptive';
 import { GITBOOK_APP_URL } from '@/lib/env';
 import { tcls } from '@/lib/tailwind';
-import { AIChatProvider } from '../AI';
 import type { RenderAIMessageOptions } from '../AI';
+// Import directly (not via the AI barrel) so the chat runtime stays out of the graph of every
+// consumer of '../AI'; the provider itself is only mounted when AI chat is enabled.
+import { AIChatProvider } from '../AI/AIChatProvider';
 import { AIChat, AskAITextSelection } from '../AIChat';
 import { AdaptiveVisitorContextProvider } from '../Adaptive';
 import { Announcement } from '../Announcement';
@@ -88,9 +90,13 @@ export function SpaceLayoutServerContext(props: SpaceLayoutProps) {
                         visitorCookieTrackingEnabled={customization.insights?.trackingCookie}
                     >
                         <InsightsProvider enabled={withTracking} eventUrl={eventUrl.toString()}>
-                            <AIChatProvider renderMessageOptions={aiChatRenderMessageOptions}>
-                                {children}
-                            </AIChatProvider>
+                            {isAIChatEnabled(customization.ai?.mode) ? (
+                                <AIChatProvider renderMessageOptions={aiChatRenderMessageOptions}>
+                                    {children}
+                                </AIChatProvider>
+                            ) : (
+                                children
+                            )}
                         </InsightsProvider>
                     </VisitorProvider>
                 </CurrentContentProvider>
