@@ -45,6 +45,8 @@ const cachedRecommendedQuestions: Map<string, RecommendedQuestionResult[]> = new
 export function useSearchResults(props: {
     asEmbeddable?: boolean;
     disabled: boolean;
+    /** Whether the search surface is active (opened or has a query). Gates loading of the local index. */
+    active: boolean;
     query: string;
     siteSpaceId: string;
     siteSpaceIds: string[];
@@ -62,6 +64,7 @@ export function useSearchResults(props: {
     const {
         asEmbeddable,
         disabled,
+        active,
         query,
         siteSpaceId,
         siteSpaceIds,
@@ -85,6 +88,7 @@ export function useSearchResults(props: {
         indexURL,
         lang,
         disabled,
+        active,
         filterSiteSpaceIds,
     });
 

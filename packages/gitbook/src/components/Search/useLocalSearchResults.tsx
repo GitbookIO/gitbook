@@ -1,6 +1,6 @@
 'use client';
 
-import { Document, type DocumentValue } from 'flexsearch';
+import type { Document, DocumentValue } from 'flexsearch';
 import React from 'react';
 
 interface Breadcrumb {
@@ -63,8 +63,11 @@ const cachedPageData = new Map<
 
 let pendingFetch: Promise<Map<string, Document<IndexPage>>> | null = null;
 
-function buildLangIndex(pages: RawIndexPage[]): Document<IndexPage> {
-    const index = new Document<IndexPage>({
+function buildLangIndex(
+    DocumentCtor: typeof import('flexsearch').Document,
+    pages: RawIndexPage[]
+): Document<IndexPage> {
+    const index = new DocumentCtor<IndexPage>({
         document: {
             id: 'id',
             index: ['title', 'description'],
@@ -110,7 +113,9 @@ async function getOrBuildIndexes(indexURL: string): Promise<Map<string, Document
     }
 
     pendingFetch = (async () => {
-        const response = await fetch(indexURL);
+        // Load FlexSearch lazily so its code lands in an on-demand chunk instead of the
+        // main client bundle — it's only needed once the user actually searches.
+        const [{ Document }, response] = await Promise.all([import('flexsearch'), fetch(indexURL)]);
         if (!response.ok) {
             throw new Error(`Failed to fetch search index: ${response.status}`);
         }
@@ -131,7 +136,7 @@ async function getOrBuildIndexes(indexURL: string): Promise<Map<string, Document
 
         // Build one FlexSearch Document per language group
         for (const [lang, pages] of pagesByLang) {
-            cachedIndexes.set(lang, buildLangIndex(pages));
+            cachedIndexes.set(lang, buildLangIndex(Document, pages));
         }
 
         return cachedIndexes;
@@ -156,8 +161,11 @@ export function useLocalSearchResults(props: {
      * are returned. Uses FlexSearch native tag filtering. Omit for no filtering (all spaces). */
     filterSiteSpaceIds?: string[];
     disabled?: boolean;
+    /** Whether search is active (opened or has a query). The whole-site index is only
+     * fetched/built once this is true, so an idle page never downloads it. */
+    active?: boolean;
 }): LocalSearchState {
-    const { query, indexURL, lang, filterSiteSpaceIds, disabled = false } = props;
+    const { query, indexURL, lang, filterSiteSpaceIds, disabled = false, active = true } = props;
 
     const [state, setState] = React.useState<LocalSearchState>({
         results: [],
@@ -168,10 +176,14 @@ export function useLocalSearchResults(props: {
     // Track whether the indexes are loaded so the search effect re-runs after load
     const [indexReady, setIndexReady] = React.useState(cachedIndexes.size > 0);
 
-    // Load the indexes once
+    // Load the indexes once search becomes active (opened or queried).
     React.useEffect(() => {
         if (cachedIndexes.size > 0) {
             setIndexReady(true);
+            return;
+        }
+
+        if (!active) {
             return;
         }
 
@@ -194,7 +206,7 @@ export function useLocalSearchResults(props: {
         return () => {
             cancelled = true;
         };
-    }, [indexURL]);
+    }, [indexURL, active]);
 
     // Perform instant local search whenever query, lang, or index readiness changes
     React.useEffect(() => {
