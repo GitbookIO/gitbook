@@ -118,7 +118,7 @@
         "ts-essentials": "^10.0.1",
         "typescript": "catalog:",
         "vercel": "50.37.3",
-        "wrangler": "^4.79.0",
+        "wrangler": "^4.110.0",
         "rss-parser": "^3.13.0"
     },
     "scripts": {
