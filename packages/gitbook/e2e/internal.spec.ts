@@ -274,6 +274,67 @@ const searchTestCases: Test[] = [
         // Re-applied per viewport so the replacement survives resize-driven re-renders.
         normalizeBeforeScreenshot: (page) => page.evaluate(overrideAIResponse),
     },
+    {
+        name: 'Search - Results scroll button reflects overflow immediately',
+        url: getCustomizationURL({
+            ai: {
+                mode: CustomizationAIMode.None,
+            },
+        }),
+        run: async (page) => {
+            // Small viewport so a handful of results overflow the results panel.
+            await page.setViewportSize({ width: 400, height: 400 });
+            await waitForCookiesDialog(page);
+            const searchInput = page.getByTestId('search-input');
+            await searchInput.focus();
+
+            const scrollFurtherButton = page.getByRole('button', { name: 'Scroll further' });
+
+            // Overflowing results show the scroll-further button immediately, without
+            // requiring a manual scroll first.
+            await searchInput.fill('gitbook');
+            await expect(page.getByTestId('search-results')).toBeVisible({
+                timeout: 10_000,
+            });
+            const pageResults = await page.getByTestId('search-page-result').all();
+            await expect(pageResults.length).toBeGreaterThanOrEqual(1);
+            await expect(scrollFurtherButton).toBeVisible();
+
+            // Scrolling to the bottom hides the trailing button.
+            await page.getByTestId('search-results').evaluate((el) => {
+                el.scrollTop = el.scrollHeight;
+            });
+            await expect(scrollFurtherButton).toBeHidden();
+
+            // Switching to a query with no results hides the button without another
+            // scroll event being fired.
+            await searchInput.fill('zzzznonexistentqueryxyz123');
+            await expect(page.getByTestId('search-results')).toBeVisible();
+            await expect(scrollFurtherButton).toBeHidden();
+        },
+        screenshot: false,
+    },
+    {
+        name: 'Search - Results scroll button stays hidden when results fit',
+        url: getCustomizationURL({
+            ai: {
+                mode: CustomizationAIMode.None,
+            },
+        }),
+        run: async (page) => {
+            // Large viewport so the initial result set fits without overflowing.
+            await page.setViewportSize({ width: 1280, height: 1024 });
+            await waitForCookiesDialog(page);
+            const searchInput = page.getByTestId('search-input');
+            await searchInput.focus();
+            await searchInput.fill('gitbook');
+            await expect(page.getByTestId('search-results')).toBeVisible({
+                timeout: 10_000,
+            });
+            await expect(page.getByRole('button', { name: 'Scroll further' })).toBeHidden();
+        },
+        screenshot: false,
+    },
 ];
 
 const testCases: TestsCase[] = [
