@@ -55,6 +55,7 @@ runs:
             GITBOOK_API_PUBLIC_URL: ${{ inputs.opItem }}/GITBOOK_API_PUBLIC_URL
             GITBOOK_API_TOKEN: ${{ inputs.opItem }}/GITBOOK_API_TOKEN
             GITBOOK_OAUTH_SERVER_URL: ${{ inputs.opItem }}/GITBOOK_OAUTH_SERVER_URL
+            GITBOOK_SITE_OAUTH_SIGNING_SECRET: ${{ inputs.opItem }}/GITBOOK_SITE_OAUTH_SIGNING_SECRET
             GITBOOK_PREVIEW_BASE_URL: ${{ inputs.opItem }}/GITBOOK_PREVIEW_BASE_URL
             GITBOOK_INTEGRATIONS_HOST: ${{ inputs.opItem }}/GITBOOK_INTEGRATIONS_HOST
             GITBOOK_INTEGRATIONS_CONTENT_HOST: ${{ inputs.opItem }}/GITBOOK_INTEGRATIONS_CONTENT_HOST
@@ -84,6 +85,8 @@ runs:
             VERCEL_PROJECT_ID: ${{ inputs.vercelProject }}
             GITBOOK_RUNTIME: vercel
             GITBOOK_HEAD_SHA: ${{ inputs.headSha }}
+            # Enable the sites OAuth consent screen everywhere but production, matching the OAuth server default.
+            GITBOOK_SITE_OAUTH_CONSENT_ENABLED: ${{ inputs.environment != 'production' && 'true' || 'false' }}
         - name: Deploy Project Artifacts to Vercel
           id: deploy
           shell: bash
