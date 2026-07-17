@@ -45,6 +45,8 @@ const cachedRecommendedQuestions: Map<string, RecommendedQuestionResult[]> = new
 export function useSearchResults(props: {
     asEmbeddable?: boolean;
     disabled: boolean;
+    /** Whether the search surface is open. Gates building the local search index. */
+    open: boolean;
     query: string;
     siteSpaceId: string;
     siteSpaceIds: string[];
@@ -52,7 +54,7 @@ export function useSearchResults(props: {
     suggestions?: string[];
     /** URL for the search API route (e.g. from linker.toPathInSpace('~gitbook/search')). */
     searchURL: string;
-    /** URL for the local index JSON (e.g. from linker.toPathInSite('~gitbook/index')). */
+    /** URL for the local index JSON (e.g. from linker.toPathInSite('~gitbook/site-index')). */
     indexURL: string;
     /** BCP-47 language code of the current site space, used to filter local search results. */
     lang?: string;
@@ -62,6 +64,7 @@ export function useSearchResults(props: {
     const {
         asEmbeddable,
         disabled,
+        open,
         query,
         siteSpaceId,
         siteSpaceIds,
@@ -85,6 +88,7 @@ export function useSearchResults(props: {
         indexURL,
         lang,
         disabled,
+        open,
         filterSiteSpaceIds,
     });
 

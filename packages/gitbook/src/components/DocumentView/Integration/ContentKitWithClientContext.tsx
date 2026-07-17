@@ -6,6 +6,7 @@ import { type GitBookLinker, createLinker } from '@/lib/links';
 import { ContentKit, type ContentKitClientContextData } from '@gitbook/react-contentkit/client';
 import { useRouter } from 'next/navigation';
 import React from 'react';
+import type { WebframePageContext } from './adaptive';
 
 type ContentKitProps<RenderContext> = React.ComponentProps<typeof ContentKit<RenderContext>>;
 
@@ -17,18 +18,20 @@ export type WebframeLinkerData = Pick<
 
 /**
  * ContentKit wrapper for integration blocks that expose client-only capabilities to webframes:
- * navigation to other pages, and adaptive visitor claims (only when the integration is allowed to
- * access them).
+ * the current page, navigation to other pages, and adaptive visitor claims (only when the
+ * integration is allowed to access them).
  */
 export function ContentKitWithClientContext<RenderContext>(
     props: ContentKitProps<RenderContext> & {
         /** Whether visitor claims may be exposed to the webframe (integration scope gated). */
         canAccessVisitorClaims: boolean;
+        /** Current page to inject into the webframe, or `null` when unknown. */
+        page: WebframePageContext | null;
         /** Data to rebuild the site linker, used to resolve webframe navigation requests. */
         linkerData: WebframeLinkerData;
     }
 ) {
-    const { canAccessVisitorClaims, linkerData, ...contentKitProps } = props;
+    const { canAccessVisitorClaims, page, linkerData, ...contentKitProps } = props;
 
     const router = useRouter();
     const { onNavigationClick } = React.useContext(NavigationStatusContext);
@@ -56,6 +59,7 @@ export function ContentKitWithClientContext<RenderContext>(
             getVisitorContext: canAccessVisitorClaims
                 ? () => ({ visitor: visitorClaims?.visitor ?? null })
                 : undefined,
+            getPageContext: page ? () => ({ page }) : undefined,
             navigate: ({ path, anchor }) => {
                 // Resolve the requested path relative to the site root so a webframe can navigate
                 // to any section or space within the site (and nowhere outside it).
@@ -63,7 +67,7 @@ export function ContentKitWithClientContext<RenderContext>(
                 navigateTo(linker.toPathInSite(path) + suffix);
             },
         }),
-        [canAccessVisitorClaims, visitorClaims, linker, navigateTo]
+        [canAccessVisitorClaims, visitorClaims, page, linker, navigateTo]
     );
 
     return <ContentKit {...contentKitProps} clientContext={clientContext} />;

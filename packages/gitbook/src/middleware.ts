@@ -36,6 +36,7 @@ import {
     getPreviewRequestIdentifier,
     isPreviewRequest,
 } from '@/lib/preview';
+import { shouldRenderSiteOAuthConsent } from '@/lib/site-oauth/flag';
 import {
     type ResponseCookies,
     getPathScopedCookieName,
@@ -194,10 +195,19 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
 
     if (siteOAuthAuthorizeMatch) {
         const siteId = siteOAuthAuthorizeMatch.pathname.groups.siteId;
-        const siteOAuthAuthorizeURL = new URL(oauthServerURL);
-        siteOAuthAuthorizeURL.pathname += `/${siteId}/authorize`;
-        siteOAuthAuthorizeURL.search = siteOAuthAuthorizeMatch.search.input.replace('?', '');
-        return NextResponse.redirect(siteOAuthAuthorizeURL.toString());
+
+        // When the consent flow is enabled, GBO renders the consent screen for the post-login resume
+        // (recognized by the `gb_oauth_state` interaction id the OAuth server puts on the resume URL)
+        // instead of forwarding. We fall through to the normal site routing, which rewrites the
+        // request to the `~gitbook/oauth2/v1/[siteId]/authorize` route that renders consent.
+        //
+        // Otherwise we forward to the OAuth server exactly as before (legacy path).
+        if (!shouldRenderSiteOAuthConsent(siteRequestURL.searchParams)) {
+            const siteOAuthAuthorizeURL = new URL(oauthServerURL);
+            siteOAuthAuthorizeURL.pathname += `/${siteId}/authorize`;
+            siteOAuthAuthorizeURL.search = siteOAuthAuthorizeMatch.search.input.replace('?', '');
+            return NextResponse.redirect(siteOAuthAuthorizeURL.toString());
+        }
     }
 
     //
@@ -541,6 +551,21 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
             response.headers.set('cache-control', 'public, max-age=0, must-revalidate');
         }
 
+        // The sites OAuth consent screen carries a security decision: lock it down so it can't be
+        // framed, cached, or leak the client's redirect URI via the Referer header.
+        if (pathname.match(/^~gitbook\/oauth2\/v1\/[^/]+\/authorize$/)) {
+            response.headers.set(
+                'content-security-policy',
+                getContentSecurityPolicy().replace(
+                    /frame-ancestors[^;]*;/,
+                    "frame-ancestors 'none';"
+                )
+            );
+            response.headers.set('x-frame-options', 'DENY');
+            response.headers.set('referrer-policy', 'no-referrer');
+            response.headers.set('cache-control', 'no-store');
+        }
+
         return writeResponseCookies(response, cookies);
     };
 
@@ -729,6 +754,11 @@ function encodePathInSiteContent(
 
     if (pathname.match(/^~gitbook\/ogimage\/\S+$/)) {
         return { pathname };
+    }
+
+    // The sites OAuth consent screen is rendered dynamically per request (client details, visitor).
+    if (pathname.match(/^~gitbook\/oauth2\/v1\/[^/]+\/authorize$/)) {
+        return { pathname, routeType: 'dynamic' };
     }
 
     // If the pathname is a RSS feed (/.../rss.xml), we rewrite it to ~gitbook/rss/:pathname
