@@ -37,7 +37,12 @@ export type ComputedRecordResult = BaseComputedResult & {
 
 export type SearchSiteContentScope =
     | { mode: 'all' }
-    | { mode: 'current'; siteSpaceId: string }
+    | {
+          mode: 'current';
+          siteSpaceId: string;
+          /** Restrict the search to the current site space alone, or to the other site spaces in the scope. */
+          restrictTo?: 'currentSiteSpace' | 'otherSiteSpaces';
+      }
     | { mode: 'specific'; siteSpaceIds: string[] };
 
 export interface SearchSiteContentRequest {

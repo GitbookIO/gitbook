@@ -3,6 +3,7 @@
 import { t, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
 import { CustomizationSearchStyle } from '@gitbook/api';
+import dynamic from 'next/dynamic';
 import React, { useRef } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { AIChatButton } from '../AIChat';
@@ -10,12 +11,15 @@ import { useIsMobile } from '../hooks/useIsMobile';
 import { Button, Popover } from '../primitives';
 import { KeyboardShortcut } from '../primitives/KeyboardShortcut';
 import { SideSheet } from '../primitives/SideSheet';
-import { SearchFrame } from './SearchFrame';
 import { SearchInput } from './SearchInput';
 import { SearchLiveResultsAnnouncer } from './SearchLiveResultsAnnouncer';
 import { SearchScopeControl } from './SearchScopeControl';
 import type { SearchBaseProps } from './search-props';
 import { useSearchController } from './useSearchController';
+
+const SearchFrame = dynamic(() => import('./SearchFrame').then((mod) => mod.SearchFrame), {
+    ssr: false,
+});
 
 interface SearchContainerProps extends SearchBaseProps {
     style: CustomizationSearchStyle;
@@ -113,8 +117,20 @@ export function SearchContainer({
         cursor !== null && cursor < results.length ? `${resultsId}-${cursor}` : undefined;
     const isSearchOpen = Boolean(visible && (state?.open ?? false));
     const shouldFillHeight = Boolean(query || showAsk);
+
+    // The SideSheet always renders its children (it hides them with CSS, unlike the desktop
+    // Popover which mounts its content on open). Mounting the frame only after the first open
+    // keeps the dynamic SearchFrame chunk off the mobile startup path, while leaving it mounted
+    // afterwards so the sheet's exit animation isn't cut short.
+    const [wasSearchOpened, setWasSearchOpened] = React.useState(false);
+    React.useEffect(() => {
+        if (isSearchOpen) {
+            setWasSearchOpened(true);
+        }
+    }, [isSearchOpen]);
+
     const shouldShowSearchFrame = usesSideSheet
-        ? Boolean(state?.open || state?.query || withAI)
+        ? Boolean(state?.open || state?.query || wasSearchOpened)
         : Boolean(state?.query || withAI);
     const scopeControlNode =
         searchProps.withVariants || searchProps.withSections ? (
