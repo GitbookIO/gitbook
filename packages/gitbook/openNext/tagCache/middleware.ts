@@ -1,4 +1,7 @@
-import type { NextModeTagCache } from '@opennextjs/aws/types/overrides.js';
+import type {
+    NextModeTagCache,
+    NextModeTagCacheWriteInput,
+} from '@opennextjs/aws/types/overrides.js';
 import doShardedTagCache from '@opennextjs/cloudflare/overrides/tag-cache/do-sharded-tag-cache';
 import { softTagFilter } from '@opennextjs/cloudflare/overrides/tag-cache/tag-cache-filter';
 
@@ -48,7 +51,7 @@ export default {
             return false; // In case of error, return false
         }
     },
-    writeTags: async (tags: string[]) => {
+    writeTags: async (tags: NextModeTagCacheWriteInput[]) => {
         const tagsToWrite = tags.filter(softTagFilter);
         if (tagsToWrite.length === 0) {
             const logger = getLogger().subLogger('gitbookTagCache');

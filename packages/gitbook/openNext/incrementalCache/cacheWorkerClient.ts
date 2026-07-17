@@ -74,3 +74,5 @@ export class GitbookIncrementalCache implements IncrementalCache {
         return worker;
     }
 }
+
+export default new GitbookIncrementalCache();
