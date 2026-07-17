@@ -22,6 +22,7 @@ export type ContentKitRenderUpdate = Partial<
  */
 export type ContentKitWebframePage = {
     id: string;
+    /** Path of the page relative to the site root. */
     path: string;
     title: string;
 };
