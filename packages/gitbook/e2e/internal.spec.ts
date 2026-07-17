@@ -282,34 +282,48 @@ const searchTestCases: Test[] = [
             },
         }),
         run: async (page) => {
-            // Small viewport so a handful of results overflow the results panel.
-            await page.setViewportSize({ width: 400, height: 400 });
+            // Constrained height so a handful of results overflow the results panel.
+            // Width is kept above the mobile breakpoint so search stays in its popover
+            // form (search-input directly focusable) instead of the mobile side sheet.
+            await page.setViewportSize({ width: 1024, height: 400 });
             await waitForCookiesDialog(page);
             const searchInput = page.getByTestId('search-input');
             await searchInput.focus();
 
-            const scrollFurtherButton = page.getByRole('button', { name: 'Scroll further' });
+            const scrollContainer = page.getByTestId('search-results-scroll-container');
+            const scrollFurtherButton = scrollContainer.getByRole('button', {
+                name: 'Scroll further',
+            });
+            const scrollableContent = scrollContainer.locator('.overflow-y-auto');
 
             // Overflowing results show the scroll-further button immediately, without
-            // requiring a manual scroll first.
-            await searchInput.fill('gitbook');
+            // requiring a manual scroll first. "page" matches many pages on the fixture
+            // site, guaranteeing enough results to overflow the results panel.
+            await searchInput.fill('page');
             await expect(page.getByTestId('search-results')).toBeVisible({
                 timeout: 10_000,
             });
             const pageResults = await page.getByTestId('search-page-result').all();
-            await expect(pageResults.length).toBeGreaterThanOrEqual(1);
+            await expect(pageResults.length).toBeGreaterThanOrEqual(6);
+            // The button only becomes visible on hover of the container (`group-hover`);
+            // hover once so its scale/opacity reflect the underlying overflow state below.
+            await scrollContainer.hover();
             await expect(scrollFurtherButton).toBeVisible();
 
-            // Scrolling to the bottom hides the trailing button.
-            await page.getByTestId('search-results').evaluate((el) => {
-                el.scrollTop = el.scrollHeight;
-            });
-            await expect(scrollFurtherButton).toBeHidden();
+            // Scrolling to the bottom hides the trailing button. Results can still be
+            // streaming in, which grows scrollHeight after the fact, so re-scroll to the
+            // (possibly new) bottom on each retry instead of scrolling only once.
+            await expect(async () => {
+                await scrollableContent.evaluate((el) => {
+                    el.scrollTop = el.scrollHeight;
+                });
+                await expect(scrollFurtherButton).toBeHidden();
+            }).toPass();
 
             // Switching to a query with no results hides the button without another
             // scroll event being fired.
             await searchInput.fill('zzzznonexistentqueryxyz123');
-            await expect(page.getByTestId('search-results')).toBeVisible();
+            await expect(page.getByTestId('search-results')).toBeHidden();
             await expect(scrollFurtherButton).toBeHidden();
         },
         screenshot: false,
@@ -331,7 +345,11 @@ const searchTestCases: Test[] = [
             await expect(page.getByTestId('search-results')).toBeVisible({
                 timeout: 10_000,
             });
-            await expect(page.getByRole('button', { name: 'Scroll further' })).toBeHidden();
+            await expect(
+                page
+                    .getByTestId('search-results-scroll-container')
+                    .getByRole('button', { name: 'Scroll further' })
+            ).toBeHidden();
         },
         screenshot: false,
     },

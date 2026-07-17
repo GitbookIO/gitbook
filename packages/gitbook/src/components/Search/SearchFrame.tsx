@@ -96,6 +96,7 @@ export function SearchFrame(props: {
                             )}
                         >
                             <ScrollContainer
+                                data-testid="search-results-scroll-container"
                                 orientation="vertical"
                                 className={tcls(fillHeight ? 'min-h-0 flex-1' : '')}
                                 contentClassName={tcls(
