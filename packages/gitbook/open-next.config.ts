@@ -8,8 +8,8 @@ export default {
             proxyExternalRequest: 'fetch',
             queue: () => import('./openNext/queue/middleware').then((m) => m.default),
             incrementalCache: () =>
-                import('./openNext/incrementalCache/server').then((m) => m.default),
-            tagCache: () => import('./openNext/tagCache/middleware').then((m) => m.default),
+                import('./openNext/incrementalCache/cacheWorkerClient').then((m) => m.default),
+            tagCache: () => import('./openNext/tagCache/cacheWorkerClient').then((m) => m.default),
         },
     },
     middleware: {
@@ -20,8 +20,8 @@ export default {
             proxyExternalRequest: 'fetch',
             queue: () => import('./openNext/queue/middleware').then((m) => m.default),
             incrementalCache: () =>
-                import('./openNext/incrementalCache/middleware').then((m) => m.default),
-            tagCache: () => import('./openNext/tagCache/middleware').then((m) => m.default),
+                import('./openNext/incrementalCache/cacheWorkerClient').then((m) => m.default),
+            tagCache: () => import('./openNext/tagCache/cacheWorkerClient').then((m) => m.default),
         },
     },
     dangerous: {
