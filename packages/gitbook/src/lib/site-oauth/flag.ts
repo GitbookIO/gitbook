@@ -1,8 +1,7 @@
 /**
  * Whether GBO should render the sites OAuth consent screen (instead of forwarding the post-login
- * resume to the OAuth server). Mirrors the OAuth server's own flag: an explicit env override
- * decides, otherwise consent is enabled everywhere but production. This must be coordinated with the
- * OAuth server so GBO renders consent exactly when the server expects it.
+ * resume to the OAuth server). This must be coordinated with the OAuth server so GBO renders consent
+ * exactly when the server expects it.
  *
  * Kept in its own module (free of `node:crypto`/`server-only`) so it can be imported from the edge
  * middleware. It is never imported into a client bundle.
@@ -12,7 +11,7 @@ export function isSitesOAuthConsentEnabled(): boolean {
     if (override !== undefined) {
         return override === 'true';
     }
-    return process.env.NODE_ENV !== 'production';
+    return process.env.NODE_ENV === 'development';
 }
 
 /**
