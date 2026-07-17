@@ -283,11 +283,6 @@ const testCases: TestsCase[] = [
         tests: [{ name: 'Home', url: '/legal' }],
     },
     {
-        name: 'help.platipomiru.com',
-        contentBaseURL: 'https://help.platipomiru.com',
-        tests: [{ name: 'Home', url: '/' }],
-    },
-    {
         name: 'help.aikido.dev',
         contentBaseURL: 'https://help.aikido.dev',
         tests: [{ name: 'Home', url: '/', run: waitForCookiesDialog }],
