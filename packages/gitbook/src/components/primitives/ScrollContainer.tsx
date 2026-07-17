@@ -58,7 +58,7 @@ export function ScrollContainer(props: ScrollContainerProps) {
 
     const language = useLanguage();
 
-    const { scrollPosition, scrollSize } = useScrollOverflow(orientation, containerRef, children);
+    const { scrollPosition, scrollSize } = useScrollOverflow(orientation, containerRef);
 
     React.useEffect(() => {
         const container = containerRef.current;

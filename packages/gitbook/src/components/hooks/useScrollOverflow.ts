@@ -9,8 +9,7 @@ import { useScrollListener } from './useScrollListener';
  */
 export function useScrollOverflow(
     orientation: 'horizontal' | 'vertical',
-    containerRef: React.RefObject<HTMLElement | null>,
-    children: React.ReactNode
+    containerRef: React.RefObject<HTMLElement | null>
 ) {
     const [scrollPosition, setScrollPosition] = React.useState(0);
     const [scrollSize, setScrollSize] = React.useState(0);
@@ -34,11 +33,11 @@ export function useScrollOverflow(
 
     useScrollListener(measure, containerRef);
 
-    // Measure synchronously after mount and whenever the rendered children change,
-    // so overflow is detected immediately instead of waiting for a resize/scroll event.
+    // Measure synchronously after every render, so overflow is detected
+    // immediately instead of waiting for a resize/scroll event.
     React.useLayoutEffect(() => {
         measure();
-    }, [measure, children]);
+    });
 
     React.useEffect(() => {
         const container = containerRef.current;
