@@ -33,11 +33,13 @@ export function useScrollOverflow(
 
     useScrollListener(measure, containerRef);
 
-    // Measure synchronously after every render, so overflow is detected
-    // immediately instead of waiting for a resize/scroll event.
+    // Measure synchronously on mount (and when the container/orientation changes), so
+    // initial overflow is detected without waiting for a resize/scroll event. Subsequent
+    // content changes are picked up by the observers below instead of re-measuring on
+    // every render.
     React.useLayoutEffect(() => {
         measure();
-    });
+    }, [measure]);
 
     React.useEffect(() => {
         const container = containerRef.current;
@@ -67,6 +69,11 @@ export function useScrollOverflow(
 
         const mo = new MutationObserver((mutations) => {
             for (const mutation of mutations) {
+                // Only re-register direct children with the resize observer; descendants
+                // deeper in the tree are covered by their parent's resize/mutation handling.
+                if (mutation.target !== container) {
+                    continue;
+                }
                 for (const node of Array.from(mutation.addedNodes)) {
                     if (node instanceof Element) {
                         ro.observe(node);
@@ -80,7 +87,9 @@ export function useScrollOverflow(
             }
             scheduleMeasure();
         });
-        mo.observe(container, { childList: true });
+        // Also watch descendants (subtree/characterData) so text/content changes deeper in
+        // the tree that grow or shrink scrollHeight/scrollWidth still trigger a re-measure.
+        mo.observe(container, { childList: true, subtree: true, characterData: true });
 
         return () => {
             if (frame !== null) {
