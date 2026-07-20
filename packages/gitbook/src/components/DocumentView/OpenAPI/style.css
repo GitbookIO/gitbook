@@ -989,7 +989,7 @@ body:has(.openapi-select-popover) {
     }
 }
 
-.openapi-disclosure-trigger[aria-expanded="true"] svg {
+.openapi-disclosure-trigger[aria-expanded="true"] .openapi-disclosure-trigger-label svg {
     @apply rotate-45;
 }
 
