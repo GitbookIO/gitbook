@@ -60,7 +60,7 @@ export function useSubmitPageFeedbackTool(): GitBookIntegrationTool {
         () => ({
             name: 'submitPageFeedback',
             description:
-                "Submit the user's feedback about the documentation page they are currently viewing, on their behalf. Only use it when the user clearly wants to share or submit feedback about the page. The user is asked to confirm before the feedback is recorded. Provide a rating and, when the user gave one, a comment in their own words.",
+                "Submit the feedback on behalf of the user about the documentation page they are currently viewing. You can use this when the user is indicating a sentiment about the page, particularly a negative one. You can proactively suggest to submit feedback for the user to help alleviate frustration or indicate a content gap they've encountered. The user will be asked to confirm before the feedback is recorded. Provide a rating and, when the user gave one, a comment in their own words.",
             confirmation: {
                 icon: 'paper-plane',
                 label: tString(language, 'ai_chat_tools_submit_feedback'),
