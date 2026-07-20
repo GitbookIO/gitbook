@@ -8,11 +8,10 @@ import { useTrackEvent } from '../Insights';
 import { useBodyLoaded } from '../primitives';
 import type { SearchResultsRef } from './SearchResults';
 import {
-    clearLastSearchState,
-    getLastSearchState,
-    resolveSearchValue,
-    setLastSearchState,
-    useLastSearchState,
+    clearLastSearchQuery,
+    getLastSearchQuery,
+    setLastSearchQuery,
+    useLastSearchQuery,
 } from './last-query';
 import { addRecentSearchQuery } from './recent-queries';
 import type { SearchBaseProps } from './search-props';
@@ -150,8 +149,7 @@ export function useSearchController(
         }
 
         restoredLastQueryForSiteSpaceRef.current = siteSpace.id;
-        const lastSearchState = getLastSearchState(siteSpace.id);
-        const restoredQuery = resolveSearchValue({ q: null, ask: null }, lastSearchState);
+        const restoredQuery = getLastSearchQuery(siteSpace.id);
         if (!restoredQuery) {
             return;
         }
@@ -181,14 +179,11 @@ export function useSearchController(
             setSearchState((prev) => {
                 if (!prev) return null;
 
-                if (prev.query !== null || prev.ask !== null) {
-                    setLastSearchState(siteSpace.id, {
-                        q: prev.query,
-                        ask: prev.ask,
-                    });
+                if (prev.query !== null) {
+                    setLastSearchQuery(siteSpace.id, prev.query);
                 }
 
-                return { ...prev, open: false, query: null, ask: null };
+                return { ...prev, open: false, query: null };
             });
 
             if (to) {
@@ -203,18 +198,16 @@ export function useSearchController(
             return;
         }
         setSearchState((prev) => {
-            const query = resolveSearchValue(
-                {
-                    q: prev?.query ?? null,
-                    ask: prev?.ask ?? null,
-                },
-                getLastSearchState(siteSpace.id)
-            );
+            const query =
+                prev?.query ??
+                getLastSearchQuery(siteSpace.id) ??
+                (withSearchAI || !withAI ? prev?.ask : null) ??
+                '';
 
             return {
                 ask: withAI ? (prev?.ask ?? null) : null,
                 scope: prev?.scope ?? 'default',
-                query: query ?? '',
+                query,
                 open: true,
             };
         });
@@ -222,7 +215,7 @@ export function useSearchController(
         trackEvent({
             type: 'search_open',
         });
-    }, [state?.open, setSearchState, siteSpace.id, trackEvent, withAI]);
+    }, [state?.open, setSearchState, siteSpace.id, trackEvent, withAI, withSearchAI]);
 
     const setQuery = React.useCallback(
         (value: string) => {
@@ -262,30 +255,24 @@ export function useSearchController(
         withSections,
     });
 
-    const lastSearchState = useLastSearchState(siteSpace.id);
+    const lastSearchQuery = useLastSearchQuery(siteSpace.id);
     const searchValue =
-        resolveSearchValue(
-            {
-                q: state?.query ?? null,
-                ask: state?.ask ?? null,
-            },
-            lastSearchState
-        ) ?? '';
+        state?.query ?? (withSearchAI || !withAI ? state?.ask : null) ?? lastSearchQuery ?? '';
     const searchResultsId = `search-results-${React.useId()}`;
 
     const onAskSelect = React.useCallback(() => {
-        clearLastSearchState(siteSpace.id);
+        clearLastSearchQuery(siteSpace.id);
         abort();
     }, [abort, siteSpace.id]);
 
     const onResultSelect = React.useCallback(
         (result: ResultType) => {
-            clearLastSearchState(siteSpace.id);
+            clearLastSearchQuery(siteSpace.id);
             abort();
 
             if (result.type !== 'recommended-question') {
                 void setSearchState((prev) =>
-                    prev ? { ...prev, query: null, ask: null, open: false } : null
+                    prev ? { ...prev, query: null, open: false } : null
                 );
             }
         },
