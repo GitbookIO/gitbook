@@ -11,6 +11,7 @@ import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import rison from 'rison';
 
+import { getAPITokenFromCookies, getAPITokenResponseCookies } from '@/lib/api-token-cookie';
 import type { SiteURLData } from '@/lib/context';
 import { getContentSecurityPolicy } from '@/lib/csp';
 import { validateSerializedCustomization } from '@/lib/customization';
@@ -647,21 +648,23 @@ async function serveWithQueryAPIToken(input: {
     const queryAPIToken = requestURL.searchParams.get('token');
     if (queryAPIToken) {
         requestURL.searchParams.delete('token');
-        return writeResponseCookies(NextResponse.redirect(requestURL.toString()), [
-            {
-                name: cookieName,
-                value: queryAPIToken,
+        return writeResponseCookies(
+            NextResponse.redirect(requestURL.toString()),
+            getAPITokenResponseCookies({
+                cookies: requestCookies.getAll(),
+                cookieName,
+                apiToken: queryAPIToken,
                 options: {
                     httpOnly: true,
                     sameSite: process.env.NODE_ENV === 'production' ? 'none' : undefined,
                     secure: process.env.NODE_ENV === 'production',
                     maxAge: 60 * 60, // 1 hour
                 },
-            },
-        ]);
+            })
+        );
     }
 
-    const apiToken = requestCookies.get(cookieName)?.value;
+    const apiToken = getAPITokenFromCookies(requestCookies.getAll(), cookieName);
 
     return serve(apiToken ?? null);
 }
