@@ -435,8 +435,9 @@ export function AIChatProvider(props: {
                             const confirmation = 'confirmation' in toolDef && toolDef.confirmation;
                             if (confirmation) {
                                 const supportingContext =
-                                    'context' in toolDef && typeof toolDef.context === 'string'
-                                        ? toolDef.context.slice(0, 512)
+                                    'context' in confirmation &&
+                                    typeof confirmation.context === 'string'
+                                        ? confirmation.context.slice(0, 512)
                                         : undefined;
                                 globalState.setState((state) => ({
                                     ...state,

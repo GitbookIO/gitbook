@@ -7,18 +7,18 @@ export type GitBookIntegrationEventCallback = (...args: any[]) => void;
 
 export type GitBookIntegrationTool = AIToolDefinition & {
     /**
-     * Supporting context displayed to the user above the confirmation dialog,
-     * to help them understand what they are approving or rejecting.
-     * Limited to 512 characters.
-     */
-    context?: string;
-
-    /**
      * Confirmation action to be displayed to the user before executing the tool.
      */
     confirmation?: {
         icon?: IconName;
         label: string;
+
+        /**
+         * Supporting context displayed to the user above the confirmation dialog,
+         * to help them understand what they are approving or rejecting.
+         * Limited to 512 characters.
+         */
+        context?: string;
     };
 
     /**
