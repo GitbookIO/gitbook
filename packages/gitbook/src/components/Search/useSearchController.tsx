@@ -7,6 +7,7 @@ import { useAI } from '../AI';
 import { useTrackEvent } from '../Insights';
 import { useBodyLoaded } from '../primitives';
 import type { SearchResultsRef } from './SearchResults';
+import { getLastSearchQuery, setLastSearchQuery, useLastSearchQuery } from './last-query';
 import { addRecentSearchQuery } from './recent-queries';
 import type { SearchBaseProps } from './search-props';
 import { useSearchState, useSetSearchState } from './useSearch';
@@ -109,7 +110,10 @@ function useSearchKeyboardNavigation(props: {
     };
 }
 
-export function useSearchController(props: SearchBaseProps) {
+export function useSearchController(
+    props: SearchBaseProps,
+    options: { restoreLastQueryOnMount?: boolean } = {}
+) {
     const {
         asEmbeddable,
         siteSpace,
@@ -130,6 +134,32 @@ export function useSearchController(props: SearchBaseProps) {
     const resultsRef = React.useRef<SearchResultsRef>(null);
     const isLoaded = useBodyLoaded();
 
+    const restoredLastQueryForSiteSpaceRef = React.useRef<string | null>(null);
+    React.useEffect(() => {
+        if (
+            !options.restoreLastQueryOnMount ||
+            restoredLastQueryForSiteSpaceRef.current === siteSpace.id
+        ) {
+            return;
+        }
+
+        restoredLastQueryForSiteSpaceRef.current = siteSpace.id;
+        const lastQuery = getLastSearchQuery(siteSpace.id);
+        if (!lastQuery) {
+            return;
+        }
+
+        void setSearchState(
+            (prev) =>
+                prev ?? {
+                    ask: null,
+                    query: lastQuery,
+                    scope: 'default',
+                    open: true,
+                }
+        );
+    }, [options.restoreLastQueryOnMount, setSearchState, siteSpace.id]);
+
     const withAI = assistants.length > 0;
     const withSearchAI = assistants.filter((assistant) => assistant.mode === 'search').length > 0;
 
@@ -141,21 +171,17 @@ export function useSearchController(props: SearchBaseProps) {
 
     const onClose = React.useCallback(
         async (to?: string) => {
-            setSearchState((prev) =>
-                prev
-                    ? {
-                          ...prev,
-                          open: false,
-                          query: prev.query === '' ? null : prev.query,
-                      }
-                    : null
-            );
+            setSearchState((prev) => {
+                if (!prev) return null;
+                setLastSearchQuery(siteSpace.id, prev.query ?? prev.ask ?? '');
+                return { ...prev, open: false, query: null, ask: null };
+            });
 
             if (to) {
                 router.push(to);
             }
         },
-        [setSearchState, router]
+        [setSearchState, router, siteSpace.id]
     );
 
     const onOpen = React.useCallback(() => {
@@ -165,14 +191,18 @@ export function useSearchController(props: SearchBaseProps) {
         setSearchState((prev) => ({
             ask: withAI ? (prev?.ask ?? null) : null,
             scope: prev?.scope ?? 'default',
-            query: prev?.query ?? (withSearchAI || !withAI ? prev?.ask : null) ?? '',
+            query:
+                prev?.query ??
+                getLastSearchQuery(siteSpace.id) ??
+                (withSearchAI || !withAI ? prev?.ask : null) ??
+                '',
             open: true,
         }));
 
         trackEvent({
             type: 'search_open',
         });
-    }, [state?.open, setSearchState, trackEvent, withAI, withSearchAI]);
+    }, [state?.open, setSearchState, siteSpace.id, trackEvent, withAI, withSearchAI]);
 
     const setQuery = React.useCallback(
         (value: string) => {
@@ -212,7 +242,9 @@ export function useSearchController(props: SearchBaseProps) {
         withSections,
     });
 
-    const searchValue = state?.query ?? (withSearchAI || !withAI ? state?.ask : null) ?? '';
+    const lastQuery = useLastSearchQuery(siteSpace.id);
+    const searchValue =
+        state?.query ?? (withSearchAI || !withAI ? state?.ask : null) ?? lastQuery ?? '';
     const searchResultsId = `search-results-${React.useId()}`;
 
     const askInAssistant = React.useCallback(
