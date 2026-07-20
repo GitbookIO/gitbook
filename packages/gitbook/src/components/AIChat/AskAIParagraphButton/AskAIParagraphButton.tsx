@@ -7,7 +7,6 @@ import { Button } from '@/components/primitives';
 import { t, tString, useLanguage } from '@/intl/client';
 import { type ClassValue, tcls } from '@/lib/tailwind';
 
-import { getAIChatName } from '../AIChat';
 import { AIChatIcon } from '../AIChatIcon';
 
 /**
@@ -48,13 +47,16 @@ export function AskAIParagraphButton(props: { content: string; className?: Class
                 // Per-block nudges: `in-[…]` matches an ancestor (tag or class) with no markup
                 // changes elsewhere — add a self-contained rule per block type to clear its gutter.
                 'in-[.hint]:-top-0.5 in-[.hint]:pr-2',
+                'in-[li]:-left-14',
                 'in-[blockquote]:pr-0',
                 // Hover affordance only: hidden until the paragraph (or the button) is hovered.
                 'invisible opacity-0 transition-opacity duration-150',
                 'hover:visible hover:opacity-100 group-hover/ask-ai:visible group-hover/ask-ai:opacity-100',
                 // Never shown on touch / hover-less contexts.
                 'not-pointer-fine:hidden',
+                // Hidden where an overflow-clipped ancestor would cut it off (tables, record cards).
                 'in-[[role=table]]:hidden',
+                'in-[[data-card]]:hidden',
                 className
             )}
         >
@@ -63,11 +65,7 @@ export function AskAIParagraphButton(props: { content: string; className?: Class
                 size="xsmall"
                 iconOnly
                 icon={<AIChatIcon state="default" trademark={config.trademark} />}
-                label={t(
-                    language,
-                    'ai_chat_ask_about_this',
-                    config.assistantName ?? getAIChatName(language, config.trademark)
-                )}
+                label={t(language, 'ask')}
                 onClick={onClick}
                 // Don't steal focus (and shift the scroll position) when clicked with the mouse.
                 onMouseDown={(event) => event.preventDefault()}

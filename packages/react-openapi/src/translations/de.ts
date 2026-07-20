@@ -48,4 +48,5 @@ export const de = {
     code_sample_custom: 'Benutzerdefinierte Sprache',
     code_sample_custom_description: 'Mit ${1} umschreiben',
     code_sample_rewrite_prompt: 'Schreibe dies in die folgende Sprache um: ',
+    direct_link_to_model: 'Direktlink zu ${1}',
 };

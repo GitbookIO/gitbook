@@ -53,11 +53,13 @@ runs:
             GITBOOK_API_PUBLIC_URL: ${{ inputs.opItem }}/GITBOOK_API_PUBLIC_URL
             GITBOOK_API_TOKEN: ${{ inputs.opItem }}/GITBOOK_API_TOKEN
             GITBOOK_OAUTH_SERVER_URL: ${{ inputs.opItem }}/GITBOOK_OAUTH_SERVER_URL
+            GITBOOK_SITE_OAUTH_SIGNING_SECRET: ${{ inputs.opItem }}/GITBOOK_SITE_OAUTH_SIGNING_SECRET
             GITBOOK_PREVIEW_BASE_URL: ${{ inputs.opItem }}/GITBOOK_PREVIEW_BASE_URL
             GITBOOK_INTEGRATIONS_HOST: ${{ inputs.opItem }}/GITBOOK_INTEGRATIONS_HOST
             GITBOOK_INTEGRATIONS_CONTENT_HOST: ${{ inputs.opItem }}/GITBOOK_INTEGRATIONS_CONTENT_HOST
             GITBOOK_IMAGE_RESIZE_SIGNING_KEY: ${{ inputs.opItem }}/GITBOOK_IMAGE_RESIZE_SIGNING_KEY
-            GITBOOK_IMAGE_RESIZE_URL: ${{ inputs.opItem }}/GITBOOK_IMAGE_RESIZE_URL
+            GITBOOK_IMAGE_RESIZE_URL: ${{ inputs.opItem }}/GITBOOK_IMAGE_RESIZE_URL_2
+            GITBOOK_IMAGE_RESIZE_SALT: ${{ inputs.opItem }}/GITBOOK_IMAGE_RESIZE_SALT
             GITBOOK_IMAGE_RESIZE_MODE: ${{ inputs.opItem }}/GITBOOK_IMAGE_RESIZE_MODE
             GITBOOK_ASSETS_PREFIX: ${{ inputs.opItem }}/GITBOOK_ASSETS_PREFIX
             GITBOOK_FONTS_URL: ${{ inputs.opItem }}/GITBOOK_FONTS_URL
@@ -66,6 +68,9 @@ runs:
           env:
             GITBOOK_RUNTIME: cloudflare
             GITBOOK_BLOCK_SEARCH_INDEXATION: ${{ inputs.environment == 'preview' && 'true' || '' }}
+            GITBOOK_ALLOW_CUSTOMIZATION_OVERRIDE: ${{ inputs.environment == 'preview' && 'true' || '' }}
+            # Enable the sites OAuth consent screen everywhere but production, matching the OAuth server default.
+            GITBOOK_SITE_OAUTH_CONSENT_ENABLED: ${{ inputs.environment != 'production' && 'true' || 'false' }}
           shell: bash
 
         - name: Upload the DO worker

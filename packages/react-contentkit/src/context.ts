@@ -17,12 +17,42 @@ export type ContentKitRenderUpdate = Partial<
     Pick<RequestRenderIntegrationUI, 'action' | 'props' | 'state'>
 >;
 
+/**
+ * The current page exposed to a webframe through the client-only webframe state.
+ */
+export type ContentKitWebframePage = {
+    id: string;
+    /** Path of the page relative to the site root. */
+    path: string;
+    title: string;
+};
+
 export type ContentKitClientContextData = {
+    /**
+     * Client-only visitor claims, merged into the webframe state.
+     * Gated by the integration's visitor-claims scope.
+     */
     getVisitorContext?: () =>
         | Record<string, unknown>
         | null
         | undefined
         | Promise<Record<string, unknown> | null | undefined>;
+
+    /**
+     * Client-only current-page context, merged into the webframe state.
+     */
+    getPageContext?: () =>
+        | { page: ContentKitWebframePage }
+        | null
+        | undefined
+        | Promise<{ page: ContentKitWebframePage } | null | undefined>;
+
+    /**
+     * Navigate the host page to another page, in response to a webframe `@webframe.navigate`
+     * action. The destination is addressed by `path` (resolved against the site base path); the
+     * host restricts navigation to destinations within the current site.
+     */
+    navigate?: (target: { path: string; anchor?: string }) => void;
 };
 
 export interface ContentKitClientContextType {

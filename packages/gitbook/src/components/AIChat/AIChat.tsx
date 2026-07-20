@@ -35,6 +35,7 @@ import { AIChatExpandButton } from './AIChatExpandButton';
 import { AIChatIcon } from './AIChatIcon';
 import { AIChatInput } from './AIChatInput';
 import { AIChatMessages } from './AIChatMessages';
+import { AIChatQueuedMessage } from './AIChatQueuedMessage';
 import { AIChatResizeHandle } from './AIChatResizeHandle';
 import AIChatSuggestedQuestions from './AIChatSuggestedQuestions';
 
@@ -119,6 +120,7 @@ export function AIChat() {
                             chat={chat}
                             suggestions={config.suggestions}
                             trademark={config.trademark}
+                            assistantName={config.assistantName}
                         />
                     </EmbeddableFrameBody>
                 </EmbeddableFrameMain>
@@ -207,14 +209,17 @@ export function AIChatBody(props: {
     welcomeMessage?: string;
     suggestions?: string[];
     trademark?: boolean;
+    /** Custom assistant name override; falls back to the branded/unbranded default name. */
+    assistantName?: string;
     greeting?: {
         title: string;
         subtitle: string;
     };
 }) {
-    const { chatController, chat, suggestions, greeting, trademark } = props;
+    const { chatController, chat, suggestions, greeting, trademark, assistantName } = props;
 
     const language = useLanguage();
+    const resolvedAssistantName = assistantName ?? getAIChatName(language, trademark ?? true);
     const now = useNow(60 * 60 * 1000); // Refresh every hour for greeting
 
     const isEmpty = !chat.messages.length;
@@ -280,13 +285,24 @@ export function AIChatBody(props: {
             </ScrollContainer>
 
             <div className="flex max-h-3/4 min-h-0 flex-col gap-2 not-embed:px-4 pb-4">
+                {!chat.error &&
+                    chat.queuedMessages.map((message, index) => (
+                        <AIChatQueuedMessage
+                            // Queue order is stable and items carry no local state, so the index is a
+                            // safe key here.
+                            key={index}
+                            message={message}
+                            assistantName={resolvedAssistantName}
+                            onRemove={() => chatController.cancelQueuedMessage(index)}
+                        />
+                    ))}
                 {/* Display an error banner when something went wrong. */}
                 {chat.error ? <AIChatError chatController={chatController} /> : null}
 
                 {chat.control ? <AIChatControl control={chat.control} /> : null}
                 <AIChatInput
                     responding={chat.responding}
-                    disabled={chat.responding || chat.error}
+                    disabled={chat.error}
                     onSubmit={(value) => {
                         chatController.postMessage({ message: value });
                     }}

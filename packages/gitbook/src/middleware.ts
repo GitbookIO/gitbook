@@ -27,7 +27,7 @@ import { MiddlewareHeaders } from '@/lib/middleware';
 import {
     createOAuthProtectedResourceMetadataResponse,
     handleUnauthedOAuthProtectedResourceRequest,
-    isOAuthProtectedResourceMetadataRequest,
+    isOAuthProtectedResourceMetadataRequestForAuthEndpoint,
     isOAuthProtectedResourceRequest,
 } from '@/lib/oauth-protected';
 import { removeLeadingSlash, removeTrailingSlash } from '@/lib/paths';
@@ -36,6 +36,7 @@ import {
     getPreviewRequestIdentifier,
     isPreviewRequest,
 } from '@/lib/preview';
+import { shouldRenderSiteOAuthConsent } from '@/lib/site-oauth/flag';
 import {
     type ResponseCookies,
     getPathScopedCookieName,
@@ -194,10 +195,19 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
 
     if (siteOAuthAuthorizeMatch) {
         const siteId = siteOAuthAuthorizeMatch.pathname.groups.siteId;
-        const siteOAuthAuthorizeURL = new URL(oauthServerURL);
-        siteOAuthAuthorizeURL.pathname += `/${siteId}/authorize`;
-        siteOAuthAuthorizeURL.search = siteOAuthAuthorizeMatch.search.input.replace('?', '');
-        return NextResponse.redirect(siteOAuthAuthorizeURL.toString());
+
+        // When the consent flow is enabled, GBO renders the consent screen for the post-login resume
+        // (recognized by the `gb_oauth_state` interaction id the OAuth server puts on the resume URL)
+        // instead of forwarding. We fall through to the normal site routing, which rewrites the
+        // request to the `~gitbook/oauth2/v1/[siteId]/authorize` route that renders consent.
+        //
+        // Otherwise we forward to the OAuth server exactly as before (legacy path).
+        if (!shouldRenderSiteOAuthConsent(siteRequestURL.searchParams)) {
+            const siteOAuthAuthorizeURL = new URL(oauthServerURL);
+            siteOAuthAuthorizeURL.pathname += `/${siteId}/authorize`;
+            siteOAuthAuthorizeURL.search = siteOAuthAuthorizeMatch.search.input.replace('?', '');
+            return NextResponse.redirect(siteOAuthAuthorizeURL.toString());
+        }
     }
 
     //
@@ -299,8 +309,10 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         }
 
         // Handles OAuth protected resource metadata for non-VA adaptive content sites.
-        // If the requested URL resolved directly to a site, synthesize the metadata response immediately.
-        if (isOAuthProtectedResourceMetadataRequest(siteRequestURL)) {
+        // Only the `~gitbook/mcp/auth` endpoint advertises auth here; the base `~gitbook/mcp`
+        // endpoint stays public so clients doing proactive PRM discovery don't start an OAuth
+        // flow against an endpoint that never issues a challenge.
+        if (isOAuthProtectedResourceMetadataRequestForAuthEndpoint(siteRequestURL)) {
             return createOAuthProtectedResourceMetadataResponse({
                 siteRequestURL,
                 siteId: siteURLData.site,
@@ -393,12 +405,22 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         );
         requestHeaders.set(MiddlewareHeaders.SiteURLData, JSON.stringify(stableSiteURLData));
 
-        // Preview of customization/theme
+        // Preview of customization/theme.
+        // The customization override is only honored for a legitimate preview
+        // (backend-authoritative `siteURLData.preview`), so an anonymous public request can't
+        // force customization — e.g. ai.mode — via the query string or a forged cookie.
+        // Preview/test deployments opt in via GITBOOK_ALLOW_CUSTOMIZATION_OVERRIDE to drive it in e2e.
+        const allowCustomizationOverride =
+            siteURLData.preview || process.env.GITBOOK_ALLOW_CUSTOMIZATION_OVERRIDE === 'true';
         const customizationCookie = request.cookies.get(MiddlewareHeaders.Customization);
         const customization =
             siteRequestURL.searchParams.get('customization') ??
             (customizationCookie ? decodeURIComponent(customizationCookie.value) : undefined);
-        if (customization && validateSerializedCustomization(customization)) {
+        if (
+            allowCustomizationOverride &&
+            customization &&
+            validateSerializedCustomization(customization)
+        ) {
             routeType = 'dynamic';
             // We need to encode the customization headers, otherwise it will fail for some customization values containing non ASCII chars on vercel.
             requestHeaders.set(MiddlewareHeaders.Customization, encodeURIComponent(customization));
@@ -527,6 +549,21 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         // Vercel already set this header, this is needed in OpenNext.
         if (siteURLData.contextId && !siteRequestURL.pathname.endsWith('~gitbook/site-index')) {
             response.headers.set('cache-control', 'public, max-age=0, must-revalidate');
+        }
+
+        // The sites OAuth consent screen carries a security decision: lock it down so it can't be
+        // framed, cached, or leak the client's redirect URI via the Referer header.
+        if (pathname.match(/^~gitbook\/oauth2\/v1\/[^/]+\/authorize$/)) {
+            response.headers.set(
+                'content-security-policy',
+                getContentSecurityPolicy().replace(
+                    /frame-ancestors[^;]*;/,
+                    "frame-ancestors 'none';"
+                )
+            );
+            response.headers.set('x-frame-options', 'DENY');
+            response.headers.set('referrer-policy', 'no-referrer');
+            response.headers.set('cache-control', 'no-store');
         }
 
         return writeResponseCookies(response, cookies);
@@ -717,6 +754,11 @@ function encodePathInSiteContent(
 
     if (pathname.match(/^~gitbook\/ogimage\/\S+$/)) {
         return { pathname };
+    }
+
+    // The sites OAuth consent screen is rendered dynamically per request (client details, visitor).
+    if (pathname.match(/^~gitbook\/oauth2\/v1\/[^/]+\/authorize$/)) {
+        return { pathname, routeType: 'dynamic' };
     }
 
     // If the pathname is a RSS feed (/.../rss.xml), we rewrite it to ~gitbook/rss/:pathname

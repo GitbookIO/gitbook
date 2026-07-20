@@ -475,7 +475,10 @@ function PageActionWrapper(props: {
                 variant="secondary"
                 label={label ?? shortLabel}
                 aria-label={shortLabel}
-                className="bg-tint-base"
+                // `relative z-20` keeps the button above the breadcrumbs, whose container can sit on
+                // top of it over a page cover. `disabled:bg-tint-base` preserves the background while
+                // busy — the `secondary` variant would otherwise reset it via `disabled:bg-transparent`.
+                className="relative z-20 bg-tint-base disabled:bg-tint-base"
                 onClick={onClick}
                 href={href}
                 target={href ? target : undefined}

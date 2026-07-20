@@ -7,6 +7,13 @@ type OAuthProtectedResource = {
     endpoint: string;
     /** Authentication realm for this resource */
     realm?: string;
+    /**
+     * Whether this resource requires authentication regardless of visitor auth.
+     * The base `~gitbook/mcp` endpoint is only protected when the site enforces
+     * visitor auth; `~gitbook/mcp/auth` always advertises auth so clients can opt
+     * into adaptive content on non-VA sites.
+     */
+    authRequired?: boolean;
 };
 
 /**
@@ -18,7 +25,7 @@ const OAUTH_PROTECTED_RESOURCE_METADATA_PATH = '/.well-known/oauth-protected-res
  * List of OAuth protected resources.
  */
 const OAUTH_PROTECTED_RESOURCES: OAuthProtectedResource[] = [
-    { endpoint: '/~gitbook/mcp/auth', realm: 'mcp' },
+    { endpoint: '/~gitbook/mcp/auth', realm: 'mcp', authRequired: true },
     { endpoint: '/~gitbook/mcp', realm: 'mcp' },
 ];
 
@@ -136,6 +143,20 @@ export function isOAuthProtectedResourceMetadataRequest(
     siteRequestURL: URL | NextRequest['nextUrl']
 ) {
     return Boolean(getMatchedProtectedMetadataEndpoint(siteRequestURL));
+}
+
+/**
+ * Check if a metadata request targets a resource that requires authentication
+ * regardless of visitor auth (e.g. `~gitbook/mcp/auth`).
+ *
+ * On non-VA sites the base `~gitbook/mcp` endpoint is public, so we must not
+ * advertise a PRM document for it: clients that discover PRM proactively would
+ * otherwise start an OAuth flow against an endpoint that never issues a challenge.
+ */
+export function isOAuthProtectedResourceMetadataRequestForAuthEndpoint(
+    siteRequestURL: URL | NextRequest['nextUrl']
+) {
+    return Boolean(getMatchedProtectedMetadataEndpoint(siteRequestURL)?.authRequired);
 }
 
 /**

@@ -55,11 +55,13 @@ runs:
             GITBOOK_API_PUBLIC_URL: ${{ inputs.opItem }}/GITBOOK_API_PUBLIC_URL
             GITBOOK_API_TOKEN: ${{ inputs.opItem }}/GITBOOK_API_TOKEN
             GITBOOK_OAUTH_SERVER_URL: ${{ inputs.opItem }}/GITBOOK_OAUTH_SERVER_URL
+            GITBOOK_SITE_OAUTH_SIGNING_SECRET: ${{ inputs.opItem }}/GITBOOK_SITE_OAUTH_SIGNING_SECRET
             GITBOOK_PREVIEW_BASE_URL: ${{ inputs.opItem }}/GITBOOK_PREVIEW_BASE_URL
             GITBOOK_INTEGRATIONS_HOST: ${{ inputs.opItem }}/GITBOOK_INTEGRATIONS_HOST
             GITBOOK_INTEGRATIONS_CONTENT_HOST: ${{ inputs.opItem }}/GITBOOK_INTEGRATIONS_CONTENT_HOST
             GITBOOK_IMAGE_RESIZE_SIGNING_KEY: ${{ inputs.opItem }}/GITBOOK_IMAGE_RESIZE_SIGNING_KEY
-            GITBOOK_IMAGE_RESIZE_URL: ${{ inputs.opItem }}/GITBOOK_IMAGE_RESIZE_URL
+            GITBOOK_IMAGE_RESIZE_URL: ${{ inputs.opItem }}/GITBOOK_IMAGE_RESIZE_URL_2
+            GITBOOK_IMAGE_RESIZE_SALT: ${{ inputs.opItem }}/GITBOOK_IMAGE_RESIZE_SALT
             GITBOOK_IMAGE_RESIZE_MODE: ${{ inputs.opItem }}/GITBOOK_IMAGE_RESIZE_MODE
             GITBOOK_ASSETS_PREFIX: ${{ inputs.opItem }}/GITBOOK_ASSETS_PREFIX
             GITBOOK_FONTS_URL: ${{ inputs.opItem }}/GITBOOK_FONTS_URL
@@ -72,6 +74,7 @@ runs:
             echo "GITBOOK_HEAD_SHA=$HEAD_SHA" >> .vercel/.env.${{ inputs.environment }}.local
             echo "GITBOOK_RUNTIME=vercel" >> .vercel/.env.${{ inputs.environment }}.local
             echo "GITBOOK_BLOCK_SEARCH_INDEXATION=true" >> .vercel/.env.${{ inputs.environment }}.local
+            echo "GITBOOK_ALLOW_CUSTOMIZATION_OVERRIDE=true" >> .vercel/.env.${{ inputs.environment }}.local
             echo "--- .vercel/.env.${{ inputs.environment }}.local after inject ---"
             cat .vercel/.env.${{ inputs.environment }}.local
         - name: Build Project Artifacts
@@ -82,6 +85,8 @@ runs:
             VERCEL_PROJECT_ID: ${{ inputs.vercelProject }}
             GITBOOK_RUNTIME: vercel
             GITBOOK_HEAD_SHA: ${{ inputs.headSha }}
+            # Enable the sites OAuth consent screen everywhere but production, matching the OAuth server default.
+            GITBOOK_SITE_OAUTH_CONSENT_ENABLED: ${{ inputs.environment != 'production' && 'true' || 'false' }}
         - name: Deploy Project Artifacts to Vercel
           id: deploy
           shell: bash

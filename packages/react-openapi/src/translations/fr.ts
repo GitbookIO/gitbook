@@ -48,4 +48,5 @@ export const fr = {
     code_sample_custom: 'Langage personnalisé',
     code_sample_custom_description: 'Réécrire avec ${1}',
     code_sample_rewrite_prompt: 'Réécrivez ceci dans le langage suivant : ',
+    direct_link_to_model: 'Lien direct vers ${1}',
 };

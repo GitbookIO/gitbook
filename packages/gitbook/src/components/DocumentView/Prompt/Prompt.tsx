@@ -1,4 +1,3 @@
-import { tcls } from '@/lib/tailwind';
 import {
     CustomizationPageActionType,
     type DocumentBlockPrompt,
@@ -15,21 +14,12 @@ export function Prompt(props: BlockProps<DocumentBlockPrompt>) {
         block.data.icon && validateIconName(block.data.icon) ? block.data.icon : null;
 
     return (
-        <div
-            className={tcls(
-                'relative flex w-full flex-col overflow-hidden',
-                'border border-tint-subtle bg-tint-subtle theme-bold-tint:bg-tint-base theme-muted:bg-tint-base text-tint-strong contrast-more:border-tint contrast-more:bg-tint-base',
-                'circular-corners:rounded-2xl rounded-corners:rounded-xl straight-corners:rounded-xs',
-                'depth-subtle:shadow-xs'
-            )}
-        >
-            <PromptClient
-                contentIcon={contentIcon}
-                description={block.data.description}
-                prompt={getPromptText(block)}
-                openInAIProviders={getOpenInAIProviders(props)}
-            />
-        </div>
+        <PromptClient
+            contentIcon={contentIcon}
+            description={block.data.description}
+            prompt={getPromptText(block)}
+            openInAIProviders={getOpenInAIProviders(props)}
+        />
     );
 }
 

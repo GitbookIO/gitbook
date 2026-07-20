@@ -48,4 +48,5 @@ export const en = {
     code_sample_custom: 'Custom language',
     code_sample_custom_description: 'Rewrite with ${1}',
     code_sample_rewrite_prompt: 'Rewrite this in the following language: ',
+    direct_link_to_model: 'Direct link to ${1}',
 };

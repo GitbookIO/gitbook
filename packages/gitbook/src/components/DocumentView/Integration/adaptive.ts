@@ -1,3 +1,4 @@
+import type { GitBookAnyContext } from '@/lib/context';
 import type {
     ContentKitDescendantElement,
     ContentKitRenderOutput,
@@ -8,19 +9,50 @@ import type {
 type ContentKitElement = ContentKitRootElement | ContentKitDescendantElement | ContentKitStepper;
 
 /**
- * Decide whether an integration block should expose Adaptive visitor context to webframes.
+ * Current page exposed to a webframe through the client-only webframe state.
  */
-export function shouldRenderIntegrationBlockWithAdaptiveVisitorContext(
-    output: ContentKitRenderOutput
-) {
+export type WebframePageContext = {
+    id: string;
+    /** Path of the page relative to the site root (includes the section and variant). */
+    path: string;
+    title: string;
+};
+
+/**
+ * Whether an integration block's output contains a webframe that can consume client-only context
+ * (navigation, visitor claims and/or the current page).
+ */
+export function integrationBlockContainsWebframe(output: ContentKitRenderOutput): boolean {
     if (output.type === 'complete') {
         return false;
     }
 
-    return (
-        output.canAccessVisitorClaims === true &&
-        doesContentKitElementContainWebframe(output.element)
-    );
+    return doesContentKitElementContainWebframe(output.element);
+}
+
+/**
+ * Extract the current page to expose to a webframe, or `null` when it is unknown
+ * (e.g. a non-page context, or reusable content resolved from another source).
+ *
+ * The exposed `path` is resolved relative to the site root — so it carries the section and
+ * variant, unlike the space-relative `page.path` — matching how `@webframe.navigate` resolves a
+ * path. A webframe can pass `page.path` straight back to the navigate action.
+ */
+export function getWebframePageContext(
+    contentContext: GitBookAnyContext
+): WebframePageContext | null {
+    if (!('page' in contentContext) || !contentContext.page) {
+        return null;
+    }
+
+    const { linker } = contentContext;
+    const { id, path, title } = contentContext.page;
+
+    return {
+        id,
+        path: linker.toRelativePathInSite(linker.toPathInSpace(path)),
+        title,
+    };
 }
 
 /**

@@ -24,6 +24,7 @@ export function PageClientLayout({
     useRegisterPageMetadata({ pageMetaLinks });
 
     useStripFallbackQueryParam();
+    useSetCoverHeight();
     return null;
 }
 
@@ -59,4 +60,79 @@ function useRegisterPageMetadata(metadata: {
     React.useEffect(() => {
         currentPageMetadataStore.setState({ metaLinks: pageMetaLinks });
     }, [pageMetaLinks]);
+}
+
+/**
+ * Expose the visible bottom edge of the page cover as a viewport-relative CSS variable.
+ */
+function useSetCoverHeight() {
+    React.useEffect(() => {
+        const root = document.documentElement;
+        let animationFrame: number | null = null;
+
+        const updateCoverHeight = () => {
+            const pageCover = document.querySelector<HTMLElement>('[data-gb-page-cover]');
+            const isBackgroundCover = pageCover?.dataset.coverType === 'background';
+
+            if (!isBackgroundCover) {
+                root.style.setProperty('--cover-height', '0px');
+                return;
+            }
+
+            if (!pageCover) {
+                return;
+            }
+
+            const bottom = pageCover.getBoundingClientRect().bottom;
+            const height = Math.max(Math.min(bottom, window.innerHeight), 0);
+
+            root.style.setProperty('--cover-height', `${height}px`);
+        };
+
+        const scheduleUpdate = () => {
+            if (animationFrame !== null) {
+                return;
+            }
+
+            animationFrame = requestAnimationFrame(() => {
+                animationFrame = null;
+                updateCoverHeight();
+            });
+        };
+
+        scheduleUpdate();
+
+        window.addEventListener('scroll', scheduleUpdate, { passive: true });
+        window.addEventListener('resize', scheduleUpdate, { passive: true });
+
+        const pageCover = document.querySelector<HTMLElement>('[data-gb-page-cover]');
+        const resizeObserver =
+            pageCover && typeof ResizeObserver !== 'undefined'
+                ? new ResizeObserver(() => {
+                      scheduleUpdate();
+                  })
+                : null;
+
+        if (pageCover && resizeObserver) {
+            resizeObserver.observe(pageCover);
+        }
+
+        // Dismissing the announcement banner only toggles a class on <html> (see
+        // dismissAnnouncement) — no scroll/resize event and no cover resize — yet it shifts the
+        // cover up. Watch <html> class changes so the cover height is recomputed in that case too.
+        const classObserver =
+            typeof MutationObserver !== 'undefined' ? new MutationObserver(scheduleUpdate) : null;
+        classObserver?.observe(root, { attributes: true, attributeFilter: ['class'] });
+
+        return () => {
+            if (animationFrame !== null) {
+                cancelAnimationFrame(animationFrame);
+            }
+
+            resizeObserver?.disconnect();
+            classObserver?.disconnect();
+            window.removeEventListener('scroll', scheduleUpdate);
+            window.removeEventListener('resize', scheduleUpdate);
+        };
+    }, []);
 }

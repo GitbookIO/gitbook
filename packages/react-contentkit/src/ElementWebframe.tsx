@@ -127,6 +127,19 @@ export function ElementWebframe(props: ContentKitClientElementProps<ContentKitWe
                             })(),
                         }));
                         break;
+                    case '@webframe.navigate':
+                        // Let the host navigate to another page. The destination is addressed by
+                        // `path`; the host resolves it within the current site and gates it.
+                        if (typeof message.action.path === 'string') {
+                            renderer.clientContext?.navigate?.({
+                                path: message.action.path,
+                                anchor:
+                                    typeof message.action.anchor === 'string'
+                                        ? message.action.anchor
+                                        : undefined,
+                            });
+                        }
+                        break;
                     default:
                         renderer.update({
                             action: message.action,
@@ -146,7 +159,7 @@ export function ElementWebframe(props: ContentKitClientElementProps<ContentKitWe
         };
     }, [renderer, sendMessage]);
 
-    // Send data and client-only visitor context as state to the webframe.
+    // Send data and client-only context (visitor claims, current page) as state to the webframe.
     React.useEffect(() => {
         const abort = { cancelled: false };
         sendWebframeState({
@@ -218,14 +231,18 @@ function resolveWebframeState(
 }
 
 /**
- * Read optional client-only visitor context.
+ * Resolve the optional client-only contexts (visitor claims, current page)
+ * to merge into the webframe state.
  */
-async function resolveVisitorContext(clientContext: ContentKitClientContextData | undefined) {
-    return await clientContext?.getVisitorContext?.();
+async function resolveClientContexts(clientContext: ContentKitClientContextData | undefined) {
+    return await Promise.all([
+        clientContext?.getVisitorContext?.(),
+        clientContext?.getPageContext?.(),
+    ]);
 }
 
 /**
- * Send the combined webframe state once visitor context has been resolved.
+ * Send the combined webframe state once client-only contexts have been resolved.
  */
 async function sendWebframeState(args: {
     elementData: ContentKitWebFrame['data'];
@@ -236,14 +253,16 @@ async function sendWebframeState(args: {
 }) {
     const { elementData, rendererState, clientContext, sendMessage, abort } = args;
     const state = resolveWebframeState(elementData, rendererState);
-    const visitorContext = await resolveVisitorContext(clientContext);
+    const clientContexts = await resolveClientContexts(clientContext);
 
     if (abort.cancelled) {
         return;
     }
 
-    if (typeof visitorContext !== 'undefined') {
-        Object.assign(state, visitorContext);
+    for (const context of clientContexts) {
+        if (context) {
+            Object.assign(state, context);
+        }
     }
 
     if (Object.keys(state).length > 0) {

@@ -18,7 +18,17 @@ export function Paragraph(props: BlockProps<DocumentBlockParagraph>) {
         'has-[.button,input]:flex has-[.button,input]:flex-wrap has-[.button,input]:gap-2 has-[.button,input]:items-center';
 
     const paragraph = (
-        <p className={tcls(inlineButtonStyle, style, getTextAlignment(block.data?.align))}>
+        <p
+            className={tcls(
+                // Cover-aware contrast text applies only to the page body, not to documents
+                // rendered in overlays (search answers, AI chat) on a background-cover page.
+                context.isPageBody &&
+                    'page-cover-background:[&:not(:has(.button,input))]:text-contrast-cover',
+                inlineButtonStyle,
+                style,
+                getTextAlignment(block.data?.align)
+            )}
+        >
             <Inlines {...contextProps} nodes={block.nodes} ancestorInlines={[]} />
         </p>
     );
@@ -33,8 +43,16 @@ export function Paragraph(props: BlockProps<DocumentBlockParagraph>) {
 
     const text = aiAssistantEnabled ? getNodeText(block) : '';
     if (aiAssistantEnabled && text.trim()) {
+        // The wrapper is now the flex child, so it must carry the block alignment (notably
+        // `self-center`/`self-end`) — otherwise centered paragraphs pin left on wide/no-TOC pages.
         return (
-            <div className={tcls('group/ask-ai relative', style)}>
+            <div
+                className={tcls(
+                    'group/ask-ai relative',
+                    style,
+                    getTextAlignment(block.data?.align)
+                )}
+            >
                 {paragraph}
                 <AskAIParagraphButton content={text} />
             </div>

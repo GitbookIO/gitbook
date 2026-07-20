@@ -75,3 +75,7 @@ Save as `.changeset/<name>.md`, then commit it separately with message: `changes
 ## Formatting
 
 Uses Biome (not ESLint/Prettier). Always run `bun run format` before committing.
+
+## Comments
+
+Comment to explain *why*, not *what* — the code already shows what it does. Keep comments short, ideally a single line. Avoid multi-line block comments that narrate mechanics a reader can follow from the code; they add noise and go stale. Reserve longer comments for genuinely non-obvious rationale: a subtle invariant, or a workaround and the reason it exists.

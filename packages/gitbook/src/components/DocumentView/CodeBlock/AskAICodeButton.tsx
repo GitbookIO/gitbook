@@ -1,10 +1,9 @@
 'use client';
 
-import { CustomizationAIMode } from '@gitbook/api';
-
 import { useAIChatController, useAIConfig } from '@/components/AI';
 import { AIChatIcon } from '@/components/AIChat';
 import { Button } from '@/components/primitives';
+import { isAIChatEnabled } from '@/components/utils/isAIChatEnabled';
 import { t, useLanguage } from '@/intl/client';
 import { type ClassValue, tcls } from '@/lib/tailwind';
 
@@ -22,7 +21,7 @@ export function AskAICodeButton(props: {
     const config = useAIConfig();
     const chatController = useAIChatController();
 
-    if (config.aiMode !== CustomizationAIMode.Assistant) {
+    if (!isAIChatEnabled(config.aiMode)) {
         return null;
     }
 

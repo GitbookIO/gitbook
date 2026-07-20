@@ -1,3 +1,4 @@
+import { isAIEnabled } from '@/components/utils/isAIChatEnabled';
 import type { GitBookSiteContext } from '@/lib/context';
 import { getExposableError } from '@/lib/data';
 import { linkerWithMarkdownPages } from '@/lib/links';
@@ -100,6 +101,10 @@ function renderAskFooter(
     context: GitBookSiteContext,
     pageLookup: ResolvedPagePath<RevisionPageDocument | RevisionPageGroup>
 ) {
+    if (!isAIEnabled(context.customization.ai.mode)) {
+        return '';
+    }
+
     const pageUrl = context.linker.toAbsoluteURL(
         context.linker.toPathForPage({
             page: pageLookup.page,

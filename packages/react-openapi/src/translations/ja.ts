@@ -48,4 +48,5 @@ export const ja = {
     code_sample_custom: 'カスタム言語',
     code_sample_custom_description: '${1} で書き換える',
     code_sample_rewrite_prompt: '次の言語に書き換えてください: ',
+    direct_link_to_model: '${1} への直接リンク',
 };

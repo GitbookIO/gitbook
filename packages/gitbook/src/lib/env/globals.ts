@@ -105,14 +105,15 @@ export const GITBOOK_FONTS_URL = process.env.GITBOOK_FONTS_URL || 'https://fonts
 export const GITBOOK_IMAGE_RESIZE_URL = process.env.GITBOOK_IMAGE_RESIZE_URL ?? null;
 export const GITBOOK_IMAGE_RESIZE_SIGNING_KEY =
     process.env.GITBOOK_IMAGE_RESIZE_SIGNING_KEY ?? null;
+export const GITBOOK_IMAGE_RESIZE_SALT = process.env.GITBOOK_IMAGE_RESIZE_SALT ?? null;
 
 /**
  * Mode used for resizing images.
  */
 export const GITBOOK_IMAGE_RESIZE_MODE = enforceEnum(
     'GITBOOK_IMAGE_RESIZE_MODE',
-    process.env.GITBOOK_IMAGE_RESIZE_MODE || 'cdn-cgi',
-    ['cdn-cgi', 'cf-fetch']
+    process.env.GITBOOK_IMAGE_RESIZE_MODE || 'cf-fetch',
+    ['cf-fetch', 'gitbook-service', 'cdn-cgi']
 );
 
 /**
@@ -130,6 +131,14 @@ export const GITBOOK_ICONS_TOKEN = process.env.GITBOOK_ICONS_TOKEN;
  * Secret used to validate requests from the GitBook app.
  */
 export const GITBOOK_SECRET = process.env.GITBOOK_SECRET ?? null;
+
+/**
+ * Shared secret used to sign server-to-server requests to the sites OAuth server consent endpoints.
+ * This must match the sites OAuth provider signing secret (`functionsConfig.sitesOAuth.signingSecret`
+ * in gitbook-x); it is a dedicated secret and must not be confused with `GITBOOK_SECRET`.
+ */
+export const GITBOOK_SITE_OAUTH_SIGNING_SECRET =
+    process.env.GITBOOK_SITE_OAUTH_SIGNING_SECRET ?? null;
 
 function enforceEnum<T extends string>(key: string, value: string, enumValues: T[]): T {
     if (!enumValues.includes(value as T)) {

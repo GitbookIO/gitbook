@@ -48,4 +48,5 @@ export const zh = {
     code_sample_custom: '自定义语言',
     code_sample_custom_description: '使用 ${1} 重写',
     code_sample_rewrite_prompt: '用以下语言重写： ',
+    direct_link_to_model: '${1} 的直接链接',
 };

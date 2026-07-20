@@ -25,7 +25,7 @@ import {
 } from '@/lib/icons/inline';
 import { getResizedImageURL } from '@/lib/images';
 import { resolveContentRef } from '@/lib/references';
-import { getLocalizedTitle } from '@/lib/sites';
+import { getSiteStructureTitle } from '@/lib/sites';
 import { tcls } from '@/lib/tailwind';
 import { getPageRSSURL } from '@/routes/rss';
 import { PageContextProvider } from '../PageContext';
@@ -81,9 +81,18 @@ export async function SitePage(props: SitePageProps & { staticRoute: boolean }) 
         <>
             {/* Using `contents` makes the children of this div according to its parent — which keeps them in a single flex row with the TOC by default.
             If there's a page cover, we use `flex flex-col` to lay out the PageCover above the PageBody + PageAside instead. */}
-            <div className={withFullPageCover && page.cover ? 'flex grow flex-col' : 'contents'}>
+            <div
+                className={
+                    withFullPageCover && page.cover ? 'relative flex grow flex-col' : 'contents'
+                }
+            >
                 {withFullPageCover && page.cover ? (
-                    <PageCover as="full" page={page} cover={page.cover} context={context} />
+                    <PageCover
+                        as={page.layout.coverSize === 'background' ? 'background' : 'full'}
+                        page={page}
+                        cover={page.cover}
+                        context={context}
+                    />
                 ) : null}
 
                 <div
@@ -147,31 +156,6 @@ export async function generateSitePageViewport(context: GitBookSiteContext): Pro
                 ? 'light'
                 : 'light dark', // 'system' → let browser decide based on OS preference
     };
-}
-
-/**
- * A string concatenation of the site structure (sections and variants) titles.
- */
-function getSiteStructureTitle(context: GitBookSiteContext): string | null {
-    const { visibleSections: sections, siteSpace, visibleSiteSpaces: siteSpaces } = context;
-    const currentLanguage = context.locale;
-
-    const title = [];
-    if (
-        sections &&
-        sections.current.default === false && // Only if the current section is not the default one
-        sections.list.filter((section) => section.object === 'site-section').length > 1 // Only if there are multiple sections
-    ) {
-        title.push(getLocalizedTitle(sections.current, currentLanguage));
-    }
-    if (
-        siteSpaces.length > 1 && // Only if there are multiple variants
-        siteSpace.default === false && // Only if the variant is not the default one
-        siteSpaces.filter((space) => space.space.language === siteSpace.space.language).length > 1 // Only if there are multiple variants *for the current language*. This filters out spaces that are "just" translations of each other, not versions.
-    ) {
-        title.push(getLocalizedTitle(siteSpace, siteSpace.space.language));
-    }
-    return title.join(' ');
 }
 
 export async function generateSitePageMetadata(props: SitePageProps): Promise<Metadata> {
@@ -297,7 +281,7 @@ export async function getSitePageData(props: SitePageProps) {
     const withFullPageCover = !!(
         page.cover &&
         page.layout.cover &&
-        page.layout.coverSize === 'full'
+        (page.layout.coverSize === 'full' || page.layout.coverSize === 'background')
     );
     const withPageFeedback = customization.feedback.enabled;
 

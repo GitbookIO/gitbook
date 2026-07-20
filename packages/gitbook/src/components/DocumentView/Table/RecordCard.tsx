@@ -46,6 +46,9 @@ export async function RecordCard(
 
     const body = (
         <div
+            // Marks the card body so overflow-clipped affordances (e.g. the paragraph "Ask"
+            // button) can opt out of rendering inside it.
+            data-card=""
             className={tcls(
                 'grid-area-1-1',
                 'relative',

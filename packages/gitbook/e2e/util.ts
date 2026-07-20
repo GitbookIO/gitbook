@@ -172,6 +172,19 @@ export async function waitForCookiesDialog(page: Page) {
     });
 }
 
+/**
+ * Wait for the GitBook admin toolbar to be present.
+ *
+ * The toolbar only renders when signed in to GitBook. It is hidden from
+ * screenshots (see `argosCSS`) because it auto-expands with an animation, so
+ * use this to assert it is rendered without capturing its flaky visual state.
+ */
+export async function waitForAdminToolbar(page: Page) {
+    await expect(page.getByTestId('admin-toolbar')).toBeVisible({
+        timeout: 10_000,
+    });
+}
+
 export async function waitForNotFound(_page: Page, response: Response | null) {
     expect(response).not.toBeNull();
     expect(response?.status()).toBe(404);
@@ -248,6 +261,19 @@ export function runTestCases(testCases: TestsCase[]) {
                         );
                     }
 
+                    // Reset the cross-space navigation state on every document load so the
+                    // "Back to <space>" shortcut never leaks between navigations/tests. It is
+                    // detected client-side from this sessionStorage, and a stale value (e.g.
+                    // after a retry or a cross-space redirect) makes it appear or not
+                    // non-deterministically, causing flaky screenshots.
+                    await page.addInitScript(() => {
+                        try {
+                            sessionStorage.removeItem('gitbook-space-navigation:last');
+                            sessionStorage.removeItem('gitbook-space-navigation:back');
+                            sessionStorage.removeItem('gitbook-space-navigation:from-picker');
+                        } catch {}
+                    });
+
                     // Set the header to disable the Vercel toolbar
                     // But only on the main document as it'd cause CORS issues on other resources
                     await page.route('**/*', async (route, request) => {
@@ -263,7 +289,11 @@ export function runTestCases(testCases: TestsCase[]) {
                         }
                     });
 
-                    const response = await page.goto(url);
+                    // Wait only for `domcontentloaded` rather than the default `load`: these
+                    // are real customer sites whose third-party subresources can hang and
+                    // never fire `load`, aborting the navigation. Argos stabilization (run in
+                    // `beforeScreenshot`) still waits for images/fonts before capturing.
+                    const response = await page.goto(url, { waitUntil: 'domcontentloaded' });
                     if (testEntry.run) {
                         await testEntry.run(page, response);
                     }
@@ -282,6 +312,12 @@ export function runTestCases(testCases: TestsCase[]) {
                                 argosCSS: `
                             /* Hide Intercom */
                             .intercom-lightweight-app {
+                                display: none !important;
+                            }
+                            /* Hide the GitBook admin toolbar: it auto-expands with an
+                               animation, so its state at capture time is non-deterministic.
+                               Its presence is asserted separately via waitForAdminToolbar. */
+                            [data-testid="admin-toolbar"] {
                                 display: none !important;
                             }
                                 `,
