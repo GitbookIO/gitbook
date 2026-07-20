@@ -201,7 +201,7 @@ export function TableSearchEmpty(props: { className?: ClassValue }) {
 
     const trimmed = query.trim();
     return (
-        <div className={tcls('mx-auto text-center text-sm text-tint', props.className)}>
+        <div className={tcls('mx-auto py-8 text-center text-sm text-tint', props.className)}>
             {trimmed
                 ? tString(language, 'search_no_results_for', trimmed)
                 : tString(language, 'search_no_results')}
