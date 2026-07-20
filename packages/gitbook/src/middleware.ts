@@ -11,7 +11,11 @@ import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import rison from 'rison';
 
-import { getAPITokenFromCookies, getAPITokenResponseCookies } from '@/lib/api-token-cookie';
+import {
+    MAX_API_TOKEN_COOKIE_LENGTH,
+    getAPITokenFromCookies,
+    getAPITokenResponseCookies,
+} from '@/lib/api-token-cookie';
 import type { SiteURLData } from '@/lib/context';
 import { getContentSecurityPolicy } from '@/lib/csp';
 import { validateSerializedCustomization } from '@/lib/customization';
@@ -647,6 +651,13 @@ async function serveWithQueryAPIToken(input: {
     // If found, we redirect to the same URL but with the token in the cookie
     const queryAPIToken = requestURL.searchParams.get('token');
     if (queryAPIToken) {
+        if (queryAPIToken.length > MAX_API_TOKEN_COOKIE_LENGTH) {
+            return new Response('API token is too large', {
+                status: 400,
+                headers: { 'content-type': 'text/plain' },
+            });
+        }
+
         requestURL.searchParams.delete('token');
         return writeResponseCookies(
             NextResponse.redirect(requestURL.toString()),

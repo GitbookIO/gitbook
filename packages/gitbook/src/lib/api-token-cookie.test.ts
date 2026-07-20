@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'bun:test';
 
-import { getAPITokenFromCookies, getAPITokenResponseCookies } from './api-token-cookie';
+import {
+    MAX_API_TOKEN_COOKIE_LENGTH,
+    getAPITokenFromCookies,
+    getAPITokenResponseCookies,
+} from './api-token-cookie';
 
 const cookieName = 'gitbook-api-token~test';
 const options = {
@@ -29,6 +33,17 @@ describe('API token cookies', () => {
             { name: `${cookieName}-1`, value: 'b', options },
         ]);
         expect(getAPITokenFromCookies(cookies, cookieName)).toBe(apiToken);
+    });
+
+    it('rejects tokens that would exceed the response cookie header limit', () => {
+        expect(() =>
+            getAPITokenResponseCookies({
+                cookies: [],
+                cookieName,
+                apiToken: 'a'.repeat(MAX_API_TOKEN_COOKIE_LENGTH + 1),
+                options,
+            })
+        ).toThrow(`API token exceeds the ${MAX_API_TOKEN_COOKIE_LENGTH}-character cookie limit`);
     });
 
     it('reads legacy single-cookie tokens', () => {
@@ -86,5 +101,16 @@ describe('API token cookies', () => {
             { name: `${cookieName}-1`, value: '', options: { ...options, maxAge: 0 } },
             { name: `${cookieName}-2`, value: '', options: { ...options, maxAge: 0 } },
         ]);
+    });
+
+    it('does not attempt to expire an unbounded number of forged chunks', () => {
+        expect(
+            getAPITokenResponseCookies({
+                cookies: [{ name: cookieName, value: '999999999' }],
+                cookieName,
+                apiToken: 'replacement',
+                options,
+            })
+        ).toEqual([{ name: cookieName, value: 'replacement', options }]);
     });
 });

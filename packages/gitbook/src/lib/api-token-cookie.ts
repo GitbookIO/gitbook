@@ -1,11 +1,13 @@
 import type { ResponseCookie, ResponseCookies } from './visitors';
 
 const COOKIE_CHUNK_SIZE = 4_000;
+const MAX_COOKIE_CHUNKS = 3;
+export const MAX_API_TOKEN_COOKIE_LENGTH = COOKIE_CHUNK_SIZE * MAX_COOKIE_CHUNKS;
 
 type RequestCookie = Pick<ResponseCookie, 'name' | 'value'>;
 
 /**
- * 
+ *
  * Retrieves the API token from the provided cookies, handling both single-cookie and chunked representations.
  * We need to split the token into multiple cookies if it exceeds the size limit of a single cookie (4,000 characters).
  * Some sites go over that limit which then cause an infinite redirect loop.
@@ -23,6 +25,10 @@ export function getAPITokenFromCookies(
     // If chunk count is undefined, it means the cookie is a single value (not chunked), so we can return it directly.
     if (chunkCount === undefined) {
         return cookie.value;
+    }
+
+    if (chunkCount > MAX_COOKIE_CHUNKS) {
+        return undefined;
     }
 
     const chunks = new Map<number, string>();
@@ -69,6 +75,10 @@ export function getAPITokenResponseCookies(input: {
     options: NonNullable<ResponseCookie['options']>;
 }): ResponseCookies {
     const { cookies, cookieName, apiToken, options } = input;
+    if (apiToken.length > MAX_API_TOKEN_COOKIE_LENGTH) {
+        throw new APITokenCookieTooLargeError();
+    }
+
     const chunks = splitIntoCookieChunks(apiToken);
     const previousChunkCount = getPreviousChunkCount(cookies, cookieName);
     const responseCookies: ResponseCookies =
@@ -109,7 +119,8 @@ function splitIntoCookieChunks(value: string): string[] {
 
 function getPreviousChunkCount(cookies: readonly RequestCookie[], cookieName: string): number {
     const cookie = cookies.find(({ name }) => name === cookieName);
-    return cookie ? (parseChunkCount(cookie.value) ?? 0) : 0;
+    const chunkCount = cookie ? parseChunkCount(cookie.value) : undefined;
+    return chunkCount && chunkCount <= MAX_COOKIE_CHUNKS ? chunkCount : 0;
 }
 
 function parseChunkCount(value: string): number | undefined {
@@ -119,4 +130,10 @@ function parseChunkCount(value: string): number | undefined {
 
     const count = Number(value);
     return Number.isSafeInteger(count) ? count : undefined;
+}
+
+export class APITokenCookieTooLargeError extends Error {
+    constructor() {
+        super(`API token exceeds the ${MAX_API_TOKEN_COOKIE_LENGTH}-character cookie limit`);
+    }
 }
