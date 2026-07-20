@@ -45,4 +45,5 @@ export const en = {
     properties: 'Properties',
     or: 'or',
     and: 'and',
+    direct_link_to_model: 'Direct link to ${1}',
 };
