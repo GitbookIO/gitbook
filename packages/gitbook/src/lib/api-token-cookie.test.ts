@@ -28,7 +28,7 @@ describe('API token cookies', () => {
         const cookies = getAPITokenResponseCookies({ cookies: [], cookieName, apiToken, options });
 
         expect(cookies).toEqual([
-            { name: cookieName, value: '2', options },
+            { name: cookieName, value: 'chunks:2', options },
             { name: `${cookieName}-0`, value: 'a'.repeat(4_000), options },
             { name: `${cookieName}-1`, value: 'b', options },
         ]);
@@ -56,7 +56,7 @@ describe('API token cookies', () => {
         expect(
             getAPITokenFromCookies(
                 [
-                    { name: cookieName, value: '2' },
+                    { name: cookieName, value: 'chunks:2' },
                     { name: `${cookieName}-0`, value: 'first' },
                 ],
                 cookieName
@@ -68,7 +68,7 @@ describe('API token cookies', () => {
         expect(
             getAPITokenFromCookies(
                 [
-                    { name: cookieName, value: '2' },
+                    { name: cookieName, value: 'chunks:2' },
                     { name: `${cookieName}-1`, value: 'second' },
                 ],
                 cookieName
@@ -76,13 +76,25 @@ describe('API token cookies', () => {
         ).toBeUndefined();
     });
 
-    it('treats malformed chunk counts as legacy token values', () => {
-        expect(getAPITokenFromCookies([{ name: cookieName, value: '02' }], cookieName)).toBe('02');
+    it('returns the base cookie value when its chunk count is unknown', () => {
+        expect(
+            getAPITokenFromCookies(
+                [
+                    { name: cookieName, value: '2' },
+                    { name: `${cookieName}-0`, value: 'first' },
+                    { name: `${cookieName}-1`, value: 'second' },
+                ],
+                cookieName
+            )
+        ).toBe('2');
+        expect(getAPITokenFromCookies([{ name: cookieName, value: 'chunks:02' }], cookieName)).toBe(
+            'chunks:02'
+        );
     });
 
     it('expires chunks no longer needed by a replacement token', () => {
         const oldCookies = [
-            { name: cookieName, value: '3' },
+            { name: cookieName, value: 'chunks:3' },
             { name: `${cookieName}-0`, value: 'first' },
             { name: `${cookieName}-1`, value: 'second' },
             { name: `${cookieName}-2`, value: 'third' },
@@ -106,7 +118,7 @@ describe('API token cookies', () => {
     it('does not attempt to expire an unbounded number of forged chunks', () => {
         expect(
             getAPITokenResponseCookies({
-                cookies: [{ name: cookieName, value: '999999999' }],
+                cookies: [{ name: cookieName, value: 'chunks:999999999' }],
                 cookieName,
                 apiToken: 'replacement',
                 options,

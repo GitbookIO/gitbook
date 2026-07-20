@@ -22,7 +22,7 @@ export function getAPITokenFromCookies(
     }
 
     const chunkCount = parseChunkCount(cookie.value);
-    // If chunk count is undefined, it means the cookie is a single value (not chunked), so we can return it directly.
+    // A base cookie without a recognized chunk marker is always a token value.
     if (chunkCount === undefined) {
         return cookie.value;
     }
@@ -43,11 +43,6 @@ export function getAPITokenFromCookies(
         if (/^\d+$/.test(indexValue) && Number.isSafeInteger(index) && index >= 0) {
             chunks.set(index, value);
         }
-    }
-
-    // A numeric legacy token remains a single cookie until at least one chunk identifies it as chunked.
-    if (chunks.size === 0) {
-        return cookie.value;
     }
 
     // We don't have all the chunks, so we can't reconstruct the token.
@@ -85,7 +80,7 @@ export function getAPITokenResponseCookies(input: {
         chunks.length === 1
             ? [{ name: cookieName, value: apiToken, options }]
             : [
-                  { name: cookieName, value: String(chunks.length), options },
+                  { name: cookieName, value: `chunks:${chunks.length}`, options },
                   ...chunks.map((value, index) => ({
                       name: `${cookieName}-${index}`,
                       value,
@@ -124,11 +119,13 @@ function getPreviousChunkCount(cookies: readonly RequestCookie[], cookieName: st
 }
 
 function parseChunkCount(value: string): number | undefined {
-    if (!/^(?:[2-9]|[1-9]\d+)$/.test(value)) {
+    // This regex matches the format "chunks:N" where N is a number between 2 and 9 or any number with two or more digits.
+    const match = /^chunks:([2-9]|[1-9]\d+)$/.exec(value);
+    if (!match) {
         return undefined;
     }
 
-    const count = Number(value);
+    const count = Number(match[1]);
     return Number.isSafeInteger(count) ? count : undefined;
 }
 
