@@ -16,6 +16,7 @@ import assertNever from 'assert-never';
 import * as React from 'react';
 import { getInsightsSession, useTrackEvent } from '../Insights';
 import { useSetSearchState } from '../Search';
+import { setLastSearchState } from '../Search/last-query';
 import { addRecentSearchQuery } from '../Search/recent-queries';
 import type { AnyAIControl } from './controls';
 import { ConfirmControlDef, ConfirmControlOutputSchema } from './controls/ConfirmControl';
@@ -258,15 +259,24 @@ export function AIChatProvider(props: {
         globalState.setState((state) => ({ ...state, opened: false }));
 
         // Clear ask parameter but keep other search state
-        setSearchState((prev) => ({
-            ask: null,
-            query: prev?.query ?? null,
-            scope: prev?.scope ?? 'default',
-            open: false,
-        }));
+        setSearchState((prev) => {
+            if (siteSpaceId && prev && (prev.query !== null || prev.ask !== null)) {
+                setLastSearchState(siteSpaceId, {
+                    q: prev.query,
+                    ask: prev.ask,
+                });
+            }
+
+            return {
+                ask: null,
+                query: prev?.query ?? null,
+                scope: prev?.scope ?? 'default',
+                open: false,
+            };
+        });
 
         notify(eventsRef.current.get('close'), {});
-    }, [setSearchState]);
+    }, [setSearchState, siteSpaceId]);
 
     // Lets `streamResponse` flush a queued follow-up via `onPostMessage`, which is defined later.
     const postMessageRef = React.useRef<((input: { message: string }) => void) | null>(null);

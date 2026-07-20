@@ -7,11 +7,17 @@ import { useAI } from '../AI';
 import { useTrackEvent } from '../Insights';
 import { useBodyLoaded } from '../primitives';
 import type { SearchResultsRef } from './SearchResults';
-import { getLastSearchQuery, setLastSearchQuery, useLastSearchQuery } from './last-query';
+import {
+    clearLastSearchState,
+    getLastSearchState,
+    resolveSearchValue,
+    setLastSearchState,
+    useLastSearchState,
+} from './last-query';
 import { addRecentSearchQuery } from './recent-queries';
 import type { SearchBaseProps } from './search-props';
 import { useSearchState, useSetSearchState } from './useSearch';
-import { useSearchResults } from './useSearchResults';
+import { type ResultType, useSearchResults } from './useSearchResults';
 import { useSearchResultsCursor } from './useSearchResultsCursor';
 
 function useInitialAskBootstrap(props: {
@@ -144,8 +150,9 @@ export function useSearchController(
         }
 
         restoredLastQueryForSiteSpaceRef.current = siteSpace.id;
-        const lastQuery = getLastSearchQuery(siteSpace.id);
-        if (!lastQuery) {
+        const lastSearchState = getLastSearchState(siteSpace.id);
+        const restoredQuery = resolveSearchValue({ q: null, ask: null }, lastSearchState);
+        if (!restoredQuery) {
             return;
         }
 
@@ -153,7 +160,7 @@ export function useSearchController(
             (prev) =>
                 prev ?? {
                     ask: null,
-                    query: lastQuery,
+                    query: restoredQuery,
                     scope: 'default',
                     open: true,
                 }
@@ -173,7 +180,14 @@ export function useSearchController(
         async (to?: string) => {
             setSearchState((prev) => {
                 if (!prev) return null;
-                setLastSearchQuery(siteSpace.id, prev.query ?? prev.ask ?? '');
+
+                if (prev.query !== null || prev.ask !== null) {
+                    setLastSearchState(siteSpace.id, {
+                        q: prev.query,
+                        ask: prev.ask,
+                    });
+                }
+
                 return { ...prev, open: false, query: null, ask: null };
             });
 
@@ -188,21 +202,27 @@ export function useSearchController(
         if (state?.open) {
             return;
         }
-        setSearchState((prev) => ({
-            ask: withAI ? (prev?.ask ?? null) : null,
-            scope: prev?.scope ?? 'default',
-            query:
-                prev?.query ??
-                getLastSearchQuery(siteSpace.id) ??
-                (withSearchAI || !withAI ? prev?.ask : null) ??
-                '',
-            open: true,
-        }));
+        setSearchState((prev) => {
+            const query = resolveSearchValue(
+                {
+                    q: prev?.query ?? null,
+                    ask: prev?.ask ?? null,
+                },
+                getLastSearchState(siteSpace.id)
+            );
+
+            return {
+                ask: withAI ? (prev?.ask ?? null) : null,
+                scope: prev?.scope ?? 'default',
+                query: query ?? '',
+                open: true,
+            };
+        });
 
         trackEvent({
             type: 'search_open',
         });
-    }, [state?.open, setSearchState, siteSpace.id, trackEvent, withAI, withSearchAI]);
+    }, [state?.open, setSearchState, siteSpace.id, trackEvent, withAI]);
 
     const setQuery = React.useCallback(
         (value: string) => {
@@ -242,10 +262,35 @@ export function useSearchController(
         withSections,
     });
 
-    const lastQuery = useLastSearchQuery(siteSpace.id);
+    const lastSearchState = useLastSearchState(siteSpace.id);
     const searchValue =
-        state?.query ?? (withSearchAI || !withAI ? state?.ask : null) ?? lastQuery ?? '';
+        resolveSearchValue(
+            {
+                q: state?.query ?? null,
+                ask: state?.ask ?? null,
+            },
+            lastSearchState
+        ) ?? '';
     const searchResultsId = `search-results-${React.useId()}`;
+
+    const onAskSelect = React.useCallback(() => {
+        clearLastSearchState(siteSpace.id);
+        abort();
+    }, [abort, siteSpace.id]);
+
+    const onResultSelect = React.useCallback(
+        (result: ResultType) => {
+            clearLastSearchState(siteSpace.id);
+            abort();
+
+            if (result.type !== 'recommended-question') {
+                void setSearchState((prev) =>
+                    prev ? { ...prev, query: null, ask: null, open: false } : null
+                );
+            }
+        },
+        [abort, setSearchState, siteSpace.id]
+    );
 
     const askInAssistant = React.useCallback(
         (assistantIndex = 0) => {
@@ -258,7 +303,7 @@ export function useSearchController(
                 addRecentSearchQuery(siteSpace.id, normalizedQuery, 'ask');
             }
 
-            abort();
+            onAskSelect();
             assistant.open(normalizedQuery);
             setSearchState({
                 ask: normalizedQuery,
@@ -267,7 +312,7 @@ export function useSearchController(
                 open: assistant.mode === 'search',
             });
         },
-        [abort, assistants, normalizedQuery, setSearchState, siteSpace.id, state?.scope]
+        [assistants, normalizedQuery, onAskSelect, setSearchState, siteSpace.id, state?.scope]
     );
 
     const askCount = normalizedQuery && !showAsk ? assistants.length : 0;
@@ -292,6 +337,8 @@ export function useSearchController(
         abort,
         open: onOpen,
         close: onClose,
+        onAskSelect,
+        onResultSelect,
         query: normalizedQuery,
         results,
         resultsId: searchResultsId,

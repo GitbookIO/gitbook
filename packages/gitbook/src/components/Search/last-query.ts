@@ -5,44 +5,82 @@ import React from 'react';
 import { getLocalStorageItem, setLocalStorageItem } from '@/lib/browser';
 
 const STORAGE_KEY = '@gitbook/searchLastQuery';
-const EMPTY_LAST_QUERY_STATE: LastQueryState = {};
 
-type LastQueryState = Record<string, string>;
+export type LastSearchState = {
+    q: string | null;
+    ask: string | null;
+};
+
+type LastSearchStateBySiteSpace = Record<string, LastSearchState>;
+
+const EMPTY_LAST_SEARCH_STATE: LastSearchState = { q: null, ask: null };
+const EMPTY_LAST_SEARCH_STATE_BY_SITE_SPACE: LastSearchStateBySiteSpace = {};
 
 const listeners = new Set<() => void>();
 
-let globalLastQueryState = EMPTY_LAST_QUERY_STATE;
+let globalLastSearchState = EMPTY_LAST_SEARCH_STATE_BY_SITE_SPACE;
 let hasStorageListener = false;
-let hasLoadedLastQueryState = false;
+let hasLoadedLastSearchState = false;
 
-function sanitizeState(value: unknown): LastQueryState {
+function normalizeValue(value: unknown): string | null {
+    if (typeof value !== 'string') {
+        return null;
+    }
+
+    const normalizedValue = value.trim();
+    return normalizedValue || null;
+}
+
+function normalizeEntry(value: unknown): LastSearchState {
+    // Migrate the original per-site string format to the new q/ask format.
+    if (typeof value === 'string') {
+        return { q: normalizeValue(value), ask: null };
+    }
+
+    if (!value || typeof value !== 'object') {
+        return EMPTY_LAST_SEARCH_STATE;
+    }
+
+    const entry = value as Record<string, unknown>;
+    return {
+        q: normalizeValue(entry.q),
+        ask: normalizeValue(entry.ask),
+    };
+}
+
+export function sanitizeLastSearchState(value: unknown): LastSearchStateBySiteSpace {
     if (!value || typeof value !== 'object') {
         return {};
     }
 
     return Object.fromEntries(
-        Object.entries(value).flatMap(([siteSpaceId, query]) => {
-            if (typeof query !== 'string') {
-                return [];
-            }
-
-            const normalizedQuery = query.trim();
-            return siteSpaceId && normalizedQuery ? [[siteSpaceId, normalizedQuery]] : [];
+        Object.entries(value).flatMap(([siteSpaceId, entry]) => {
+            const normalizedEntry = normalizeEntry(entry);
+            return siteSpaceId && (normalizedEntry.q || normalizedEntry.ask)
+                ? [[siteSpaceId, normalizedEntry]]
+                : [];
         })
     );
 }
 
-function readLastQueryState(): LastQueryState {
-    return sanitizeState(getLocalStorageItem<unknown>(STORAGE_KEY, {}));
+export function resolveSearchValue(
+    urlState: LastSearchState,
+    storedState: LastSearchState
+): string | null {
+    return urlState.q ?? storedState.q ?? urlState.ask ?? storedState.ask ?? null;
 }
 
-function ensureLastQueryStateLoaded() {
-    if (typeof window === 'undefined' || hasLoadedLastQueryState) {
+function readLastSearchState(): LastSearchStateBySiteSpace {
+    return sanitizeLastSearchState(getLocalStorageItem<unknown>(STORAGE_KEY, {}));
+}
+
+function ensureLastSearchStateLoaded() {
+    if (typeof window === 'undefined' || hasLoadedLastSearchState) {
         return;
     }
 
-    globalLastQueryState = readLastQueryState();
-    hasLoadedLastQueryState = true;
+    globalLastSearchState = readLastSearchState();
+    hasLoadedLastSearchState = true;
 }
 
 function emitChange() {
@@ -54,47 +92,51 @@ function ensureStorageListener() {
         return;
     }
 
-    ensureLastQueryStateLoaded();
+    ensureLastSearchStateLoaded();
 
     window.addEventListener('storage', () => {
-        globalLastQueryState = readLastQueryState();
-        hasLoadedLastQueryState = true;
+        globalLastSearchState = readLastSearchState();
+        hasLoadedLastSearchState = true;
         emitChange();
     });
     hasStorageListener = true;
 }
 
-function writeLastQueryState(nextState: LastQueryState) {
-    globalLastQueryState = nextState;
+function writeLastSearchState(nextState: LastSearchStateBySiteSpace) {
+    globalLastSearchState = nextState;
     setLocalStorageItem(STORAGE_KEY, nextState);
     emitChange();
 }
 
-export function getLastSearchQuery(siteSpaceId: string): string | null {
-    ensureLastQueryStateLoaded();
-    return globalLastQueryState[siteSpaceId] ?? null;
+export function getLastSearchState(siteSpaceId: string): LastSearchState {
+    ensureLastSearchStateLoaded();
+    return globalLastSearchState[siteSpaceId] ?? EMPTY_LAST_SEARCH_STATE;
 }
 
-export function setLastSearchQuery(siteSpaceId: string, query: string | null): void {
+export function setLastSearchState(siteSpaceId: string, state: LastSearchState): void {
     if (!siteSpaceId) {
         return;
     }
 
-    ensureLastQueryStateLoaded();
+    ensureLastSearchStateLoaded();
 
-    const normalizedQuery = query?.trim() ?? '';
-    const nextState = { ...globalLastQueryState };
+    const normalizedState = normalizeEntry(state);
+    const nextState = { ...globalLastSearchState };
 
-    if (normalizedQuery) {
-        nextState[siteSpaceId] = normalizedQuery;
+    if (normalizedState.q || normalizedState.ask) {
+        nextState[siteSpaceId] = normalizedState;
     } else {
         delete nextState[siteSpaceId];
     }
 
-    writeLastQueryState(nextState);
+    writeLastSearchState(nextState);
 }
 
-export function useLastSearchQuery(siteSpaceId: string): string | null {
+export function clearLastSearchState(siteSpaceId: string): void {
+    setLastSearchState(siteSpaceId, EMPTY_LAST_SEARCH_STATE);
+}
+
+export function useLastSearchState(siteSpaceId: string): LastSearchState {
     const subscribe = React.useCallback((listener: () => void) => {
         ensureStorageListener();
         listeners.add(listener);
@@ -103,9 +145,9 @@ export function useLastSearchQuery(siteSpaceId: string): string | null {
     }, []);
 
     const getSnapshot = React.useCallback(
-        () => globalLastQueryState[siteSpaceId] ?? null,
+        () => globalLastSearchState[siteSpaceId] ?? EMPTY_LAST_SEARCH_STATE,
         [siteSpaceId]
     );
 
-    return React.useSyncExternalStore(subscribe, getSnapshot, () => null);
+    return React.useSyncExternalStore(subscribe, getSnapshot, () => EMPTY_LAST_SEARCH_STATE);
 }

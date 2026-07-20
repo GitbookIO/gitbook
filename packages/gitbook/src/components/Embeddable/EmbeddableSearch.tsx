@@ -43,6 +43,8 @@ export function EmbeddableSearch(props: EmbeddableSearchProps) {
         error,
         fetching,
         onInputKeyDown,
+        onAskSelect,
+        onResultSelect,
         query,
         results,
         resultsId,
@@ -70,6 +72,8 @@ export function EmbeddableSearch(props: EmbeddableSearchProps) {
                 results={results}
                 resultsId={resultsId}
                 resultsRef={resultsRef}
+                onAskSelect={onAskSelect}
+                onResultSelect={onResultSelect}
                 showAsk={showAsk}
                 dataTestId="embed-search"
                 input={

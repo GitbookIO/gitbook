@@ -44,12 +44,13 @@ export function SearchContainer({
         askQuery,
         askCount,
         askInAssistant,
-        abort,
         close,
         cursor,
         error,
         fetching,
         onInputKeyDown,
+        onAskSelect,
+        onResultSelect,
         open,
         query,
         results,
@@ -169,7 +170,8 @@ export function SearchContainer({
             results={results}
             resultsId={resultsId}
             resultsRef={resultsRef}
-            onResultSelect={abort}
+            onAskSelect={onAskSelect}
+            onResultSelect={onResultSelect}
             showAsk={showAsk}
             scopeControl={scopeControlNode}
             fillHeight={usesSideSheet || shouldFillHeight}

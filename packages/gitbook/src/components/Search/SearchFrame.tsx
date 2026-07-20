@@ -29,7 +29,8 @@ export function SearchFrame(props: {
     results: ResultType[];
     resultsId: string;
     resultsRef: React.Ref<SearchResultsRef>;
-    onResultSelect?: () => void;
+    onAskSelect?: () => void;
+    onResultSelect?: (result: ResultType) => void;
     scopeControl?: React.ReactNode;
     showAsk: boolean;
     sidebar?: React.ReactNode;
@@ -50,6 +51,7 @@ export function SearchFrame(props: {
         results,
         resultsId,
         resultsRef,
+        onAskSelect,
         onResultSelect,
         scopeControl,
         showAsk,
@@ -126,7 +128,7 @@ export function SearchFrame(props: {
                                           assistant={assistant}
                                           active={cursor === results.length + index}
                                           withShortcut={assistant === assistants[0]}
-                                          onSelect={onResultSelect}
+                                          onSelect={onAskSelect}
                                       />
                                   ))
                                 : null}
