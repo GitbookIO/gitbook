@@ -434,6 +434,10 @@ export function AIChatProvider(props: {
 
                             const confirmation = 'confirmation' in toolDef && toolDef.confirmation;
                             if (confirmation) {
+                                const supportingContext =
+                                    'context' in toolDef && typeof toolDef.context === 'string'
+                                        ? toolDef.context.slice(0, 512)
+                                        : undefined;
                                 globalState.setState((state) => ({
                                     ...state,
                                     control: ConfirmControlDef.createControl({
@@ -444,6 +448,7 @@ export function AIChatProvider(props: {
                                         input: {
                                             label: confirmation.label,
                                             icon: confirmation.icon,
+                                            context: supportingContext,
                                         },
                                         language,
                                         send: async (result) => {
