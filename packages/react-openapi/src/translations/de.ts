@@ -45,4 +45,5 @@ export const de = {
     or: 'oder',
     and: 'und',
     possible_values: 'Mögliche Werte',
+    direct_link_to_model: 'Direktlink zu ${1}',
 };

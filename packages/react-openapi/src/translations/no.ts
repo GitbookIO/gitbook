@@ -45,4 +45,5 @@ export const no = {
     or: 'eller',
     and: 'og',
     possible_values: 'Mulige verdier',
+    direct_link_to_model: 'Direktelenke til ${1}',
 };

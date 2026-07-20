@@ -45,4 +45,5 @@ export const fr = {
     or: 'ou',
     and: 'et',
     possible_values: 'Valeurs possibles',
+    direct_link_to_model: 'Lien direct vers ${1}',
 };

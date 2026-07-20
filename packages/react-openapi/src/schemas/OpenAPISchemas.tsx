@@ -1,3 +1,4 @@
+import { getOpenAPISchemaAnchorId } from '@gitbook/openapi-parser';
 import clsx from 'classnames';
 import { OpenAPIExample } from '../OpenAPIExample';
 import { OpenAPIRootSchema } from '../OpenAPISchemaServer';
@@ -41,7 +42,9 @@ export function OpenAPISchemas(props: {
         const title = `The ${firstSchema.name} object`;
         return (
             <div className={clsx('openapi-schemas openapi-schemas-single', className)}>
-                <div className="openapi-summary" id={context.id}>
+                {/* The heading rendered below already carries the anchor id; a second id here would
+                    win the fragment target and scroll to the wrong margin. */}
+                <div className="openapi-summary">
                     {context.renderHeading({
                         title,
                         deprecated: Boolean(firstSchema.schema.deprecated),
@@ -88,6 +91,7 @@ export function OpenAPISchemas(props: {
                 return (
                     <OpenAPISchemaItem
                         key={name}
+                        id={getOpenAPISchemaAnchorId(name)}
                         name={name}
                         context={clientContext}
                         schema={schema}
