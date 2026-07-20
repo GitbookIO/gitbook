@@ -4,6 +4,12 @@ const COOKIE_CHUNK_SIZE = 4_000;
 
 type RequestCookie = Pick<ResponseCookie, 'name' | 'value'>;
 
+/**
+ * 
+ * Retrieves the API token from the provided cookies, handling both single-cookie and chunked representations.
+ * We need to split the token into multiple cookies if it exceeds the size limit of a single cookie (4,000 characters).
+ * Some sites go over that limit which then cause an infinite redirect loop.
+ */
 export function getAPITokenFromCookies(
     cookies: readonly RequestCookie[],
     cookieName: string
