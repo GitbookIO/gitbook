@@ -6,6 +6,13 @@ import type { IconName } from '@gitbook/icons';
  */
 export type GitBookToolDefinition = AIToolDefinition & {
     /**
+     * Supporting context displayed to the user above the confirmation dialog,
+     * to help them understand what they are approving or rejecting.
+     * Limited to 512 characters.
+     */
+    context?: string;
+
+    /**
      * Confirmation action to be displayed to the user before executing the tool.
      */
     confirmation?: {
