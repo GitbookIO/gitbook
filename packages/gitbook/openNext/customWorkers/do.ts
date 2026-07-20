@@ -18,6 +18,13 @@ type CacheWorkerEnv = {
     };
 };
 
+//@ts-ignore - Just to avoid tag cache crashing
+globalThis.openNextConfig = {
+    dangerous: {
+        enableCacheInterception: true,
+    },
+}
+
 const cacheEntryTypes = new Set<CacheEntryType>(['cache', 'fetch', 'composable']);
 
 const isCacheEntryType = (value: string | null): value is CacheEntryType =>
