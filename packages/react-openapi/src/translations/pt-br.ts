@@ -45,4 +45,5 @@ export const pt_br = {
     or: 'ou',
     and: 'e',
     possible_values: 'Valores possíveis',
+    direct_link_to_model: 'Link direto para ${1}',
 };
