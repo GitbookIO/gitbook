@@ -2,13 +2,20 @@
 
 import { useLanguage } from '@/intl/client';
 import { tString } from '@/intl/translate';
-import { type AIToolDefinition, PageFeedbackRating } from '@gitbook/api';
+import {
+    type AIToolDefinition,
+    PageFeedbackRating,
+    type SiteInsightsDisplayContext,
+} from '@gitbook/api';
 import type { GitBookIntegrationTool } from '@gitbook/browser-types';
 import * as React from 'react';
 import { z } from 'zod';
 import { zodToJsonSchema } from 'zod-to-json-schema';
-import { useTrackEvent } from '../Insights';
+import { type InsightsEventPageContext, useTrackEvent } from '../Insights';
 import { type PagePointer, useCurrentPage } from '../hooks';
+
+// Matches the comment cap the "Was this helpful?" widget enforces (PageFeedbackForm).
+const MAX_COMMENT_LENGTH = 512;
 
 const SubmitPageFeedbackInputSchema = z.object({
     rating: z
@@ -18,9 +25,10 @@ const SubmitPageFeedbackInputSchema = z.object({
         ),
     comment: z
         .string()
+        .max(MAX_COMMENT_LENGTH)
         .optional()
         .describe(
-            "The user's feedback about the page, in their own words (e.g. what was confusing or missing). Optional — omit it when the user only expressed a rating."
+            `The user's feedback about the page, in their own words (e.g. what was confusing or missing), at most ${MAX_COMMENT_LENGTH} characters. Optional — omit it when the user only expressed a rating.`
         ),
 });
 
@@ -40,8 +48,15 @@ const ratingByInput: Record<
  * insights pipeline as the "Was this helpful?" widget (a `page_post_feedback` event, plus a
  * `page_post_feedback_comment` event when the user left a comment). Because it acts on the user's
  * behalf, it asks for confirmation before submitting.
+ *
+ * The events are tracked with an explicit page context so they attribute to the current page even
+ * on pathnames whose ambient insights context has no page (e.g. the embed's assistant tab).
  */
-export function useSubmitPageFeedbackTool(): GitBookIntegrationTool {
+export function useSubmitPageFeedbackTool(options: {
+    /** Display context recorded with the feedback events (e.g. `site` vs. `embed`). */
+    displayContext: SiteInsightsDisplayContext;
+}): GitBookIntegrationTool {
+    const { displayContext } = options;
     const trackEvent = useTrackEvent();
     const language = useLanguage();
     const currentPage = useCurrentPage();
@@ -51,9 +66,10 @@ export function useSubmitPageFeedbackTool(): GitBookIntegrationTool {
         trackEvent: typeof trackEvent;
         language: typeof language;
         currentPage: PagePointer | null;
-    }>({ trackEvent, language, currentPage });
+        displayContext: SiteInsightsDisplayContext;
+    }>({ trackEvent, language, currentPage, displayContext });
     React.useEffect(() => {
-        ref.current = { trackEvent, language, currentPage };
+        ref.current = { trackEvent, language, currentPage, displayContext };
     });
 
     return React.useMemo<GitBookIntegrationTool>(
@@ -69,7 +85,7 @@ export function useSubmitPageFeedbackTool(): GitBookIntegrationTool {
                 SubmitPageFeedbackInputSchema as any
             ) as AIToolDefinition['inputSchema'],
             execute: async (input) => {
-                const { trackEvent, language, currentPage } = ref.current;
+                const { trackEvent, language, currentPage, displayContext } = ref.current;
                 const { rating, comment } = SubmitPageFeedbackInputSchema.parse(input);
 
                 if (!currentPage) {
@@ -81,9 +97,14 @@ export function useSubmitPageFeedbackTool(): GitBookIntegrationTool {
                 const pageFeedbackRating = ratingByInput[rating];
                 const trimmedComment = comment?.trim() || undefined;
 
+                const pageContext: InsightsEventPageContext = {
+                    pageId: currentPage.pageId,
+                    displayContext,
+                };
+
                 trackEvent(
                     { type: 'page_post_feedback', feedback: { rating: pageFeedbackRating } },
-                    undefined,
+                    pageContext,
                     { immediate: !trimmedComment }
                 );
 
@@ -93,7 +114,7 @@ export function useSubmitPageFeedbackTool(): GitBookIntegrationTool {
                             type: 'page_post_feedback_comment',
                             feedback: { rating: pageFeedbackRating, comment: trimmedComment },
                         },
-                        undefined,
+                        pageContext,
                         { immediate: true }
                     );
                 }

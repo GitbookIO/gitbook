@@ -11,6 +11,7 @@ import {
     type AIStreamResponse,
     type AIStreamResponseToolCallPending,
     type AIToolCallResult,
+    SiteInsightsDisplayContext,
 } from '@gitbook/api';
 import assertNever from 'assert-never';
 import * as React from 'react';
@@ -221,9 +222,11 @@ function notify(
  */
 export function AIChatProvider(props: {
     renderMessageOptions?: RenderAIMessageOptions;
+    /** Whether page feedback is enabled for the site (gates the submit-feedback tool). */
+    withPageFeedback?: boolean;
     children: React.ReactNode;
 }) {
-    const { renderMessageOptions, children } = props;
+    const { renderMessageOptions, withPageFeedback = false, children } = props;
 
     const messageContextRef = useAIMessageContextRef();
     const trackEvent = useTrackEvent();
@@ -235,7 +238,19 @@ export function AIChatProvider(props: {
     // feedback). Each tool has a stable identity, so it can be referenced directly from the
     // streaming callback.
     const navigateToPageTool = useNavigateToPageTool();
-    const submitPageFeedbackTool = useSubmitPageFeedbackTool();
+    const submitPageFeedbackTool = useSubmitPageFeedbackTool({
+        displayContext: renderMessageOptions?.asEmbeddable
+            ? SiteInsightsDisplayContext.Embed
+            : SiteInsightsDisplayContext.Site,
+    });
+
+    // Only expose the submit-feedback tool when the site has page feedback enabled, mirroring the
+    // "Was this helpful?" widget's visibility.
+    const builtInTools = React.useMemo(
+        () =>
+            withPageFeedback ? [navigateToPageTool, submitPageFeedbackTool] : [navigateToPageTool],
+        [navigateToPageTool, submitPageFeedbackTool, withPageFeedback]
+    );
 
     // Event listeners storage
     const eventsRef = React.useRef<Map<AIChatEvent['type'], AIChatEventListener[]>>(new Map());
@@ -315,7 +330,7 @@ export function AIChatProvider(props: {
 
             // Execute a tool call
             const executeToolCall = async (event: AIStreamResponseToolCallPending) => {
-                const tools = getTools([navigateToPageTool, submitPageFeedbackTool]);
+                const tools = getTools(builtInTools);
                 const toolDef = tools.find((tool) => tool.name === event.toolCall.tool);
 
                 if (!toolDef || !('execute' in toolDef)) {
@@ -351,7 +366,7 @@ export function AIChatProvider(props: {
 
             let toolToExecute: AIStreamResponseToolCallPending | null = null;
             try {
-                const tools = getTools([navigateToPageTool, submitPageFeedbackTool]);
+                const tools = getTools(builtInTools);
                 const stream = await streamAIChatResponse({
                     message: input.message,
                     toolCall: input.toolCall,
@@ -571,8 +586,7 @@ export function AIChatProvider(props: {
             renderMessageOptions?.withToolCalls,
             renderMessageOptions?.asEmbeddable,
             language,
-            navigateToPageTool,
-            submitPageFeedbackTool,
+            builtInTools,
         ]
     );
 
