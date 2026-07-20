@@ -866,13 +866,13 @@ body:has(.openapi-select-popover) {
 }
 
 /* Model name + its hover hash-link, inline. Carries the anchor id / deep-link scroll target. */
-.openapi-schemas-title {
+.openapi-schemas-model-title {
     @apply flex items-center gap-2 min-w-0;
     /* Offset by the trigger's p-5 so a deep-link lands the model's top edge, not its title, below the header. */
     scroll-margin-top: calc(var(--content-scroll-margin) + 1.25rem);
 }
 
-.openapi-schemas-title-name {
+.openapi-schemas-model-title-name {
     @apply min-w-0 truncate;
 }
 

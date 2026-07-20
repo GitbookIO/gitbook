@@ -26,8 +26,8 @@ export function OpenAPISchemaItem(props: {
             icon={context.icons.plus}
             header={
                 id ? (
-                    <span id={id} className="openapi-schemas-title">
-                        <span className="openapi-schemas-title-name">{name}</span>
+                    <span id={id} className="openapi-schemas-model-title">
+                        <span className="openapi-schemas-model-title-name">{name}</span>
                         <a
                             href={`#${id}`}
                             className="openapi-schemas-anchor-link"
