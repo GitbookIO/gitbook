@@ -43,26 +43,30 @@ function ConfirmControl(props: GetAIControlProps<typeof ConfirmControlDef>) {
             {context ? (
                 <p className="whitespace-pre-line px-2 pt-1 text-sm text-tint">{context}</p>
             ) : null}
-            <Button
-                data-testid="ai-chat-tool-confirm-cancel"
-                onClick={() => {
-                    onSubmit({ result: 'cancelled' });
-                }}
-                truncate={false}
-                variant="blank"
-                icon="xmark"
-                label={tString(language, 'cancel')}
-            />
-            <Button
-                data-testid="ai-chat-tool-confirm-accept"
-                onClick={() => {
-                    onSubmit({ result: 'confirmed' });
-                }}
-                variant="primary"
-                truncate={false}
-                icon={icon}
-                label={label}
-            />
+            <div className="flex w-full flex-wrap gap-2">
+                <Button
+                    data-testid="ai-chat-tool-confirm-cancel"
+                    onClick={() => {
+                        onSubmit({ result: 'cancelled' });
+                    }}
+                    truncate={false}
+                    variant="secondary"
+                    icon="xmark"
+                    label={tString(language, 'cancel')}
+                    className="shrink-0 grow justify-center"
+                />
+                <Button
+                    data-testid="ai-chat-tool-confirm-accept"
+                    onClick={() => {
+                        onSubmit({ result: 'confirmed' });
+                    }}
+                    variant="primary"
+                    truncate={false}
+                    icon={icon}
+                    label={label}
+                    className="min-w-1/2 shrink-0 grow justify-center"
+                />
+            </div>
         </AIToolContainer>
     );
 }

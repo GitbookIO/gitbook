@@ -85,7 +85,7 @@ export function useSubmitPageFeedbackTool(options: {
                 return {
                     icon: 'paper-plane',
                     label: tString(language, 'ai_chat_tools_submit_feedback', ''),
-                    context: `${tString(language, 'ai_chat_tools_submit_feedback')}?${comment ? `\n"${comment}"` : ''}`,
+                    context: comment ? `"${comment}"` : undefined,
                 };
             },
             inputSchema: zodToJsonSchema(
@@ -135,7 +135,7 @@ export function useSubmitPageFeedbackTool(options: {
                     },
                     summary: {
                         icon: 'comment-check',
-                        text: `${tString(language, 'ai_chat_tools_submitted_feedback')}${trimmedComment ? `: ${trimmedComment}` : ''}`,
+                        text: `${tString(language, 'ai_chat_tools_submitted_feedback')}${trimmedComment ? `: "${trimmedComment}"` : ''}`,
                     },
                 };
             },
