@@ -2,4 +2,4 @@
 "gitbook": patch
 ---
 
-Add preview to Prompt block
+Add configurable default visibility to Prompt block

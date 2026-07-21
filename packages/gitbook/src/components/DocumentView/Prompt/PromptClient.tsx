@@ -4,25 +4,38 @@ import { Button, DropdownMenu, DropdownMenuItem, ToggleChevron } from '@/compone
 import { getURLForLLM } from '@/components/utils';
 import { tString, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
+import type { DocumentBlockPrompt } from '@gitbook/api';
 import { Icon, type IconName } from '@gitbook/icons';
 import React from 'react';
 
 const OPEN_IN_AI_PROVIDERS = ['claude', 'chatgpt', 'cursor'] as const;
 type AIProviders = (typeof OPEN_IN_AI_PROVIDERS)[number];
 
-export function PromptClient(props: {
+type PromptClientProps = DocumentBlockPrompt['data'] & {
     contentIcon: IconName | null;
-    description: string;
     prompt: string;
-    openInAIProviders: boolean;
-    preview: boolean;
     children?: React.ReactNode;
-}) {
-    const { contentIcon, description, prompt, openInAIProviders, preview, children } = props;
+};
+
+export function PromptClient(props: PromptClientProps) {
+    const {
+        contentIcon,
+        description,
+        openInAIProviders = false,
+        defaultExpanded = 'hidden',
+        prompt,
+        children,
+    } = props;
     const language = useLanguage();
     const promptId = React.useId();
-    const [open, setOpen] = React.useState(false);
-    const expanded = preview || open;
+    const [open, setOpen] = React.useState(defaultExpanded === 'full');
+    const isPartiallyExpanded = defaultExpanded === 'partial';
+    const expanded = isPartiallyExpanded || open;
+
+    React.useEffect(() => {
+        setOpen(defaultExpanded === 'full');
+    }, [defaultExpanded]);
+
     return (
         <div
             className={tcls(
@@ -35,10 +48,10 @@ export function PromptClient(props: {
             <div
                 className={tcls(
                     'group/prompt-header relative flex min-h-9 flex-row items-center justify-between gap-4 p-3 transition-colors',
-                    !preview && (open ? 'hover:bg-tint-hover' : 'hover:bg-tint-subtle')
+                    !isPartiallyExpanded && (open ? 'hover:bg-tint-hover' : 'hover:bg-tint-subtle')
                 )}
             >
-                {!preview ? (
+                {!isPartiallyExpanded ? (
                     <button
                         type="button"
                         aria-controls={promptId}
@@ -53,7 +66,7 @@ export function PromptClient(props: {
                     />
                 ) : null}
                 <div className="pointer-events-none relative z-0 flex min-w-0 flex-row items-center gap-2 text-tint-strong">
-                    {!preview ? (
+                    {!isPartiallyExpanded ? (
                         <ToggleChevron
                             open={open}
                             orientation="right-to-down"
@@ -65,7 +78,7 @@ export function PromptClient(props: {
                 </div>
                 <PromptActions prompt={prompt} openInAIProviders={openInAIProviders} />
             </div>
-            {preview || open ? (
+            {isPartiallyExpanded || open ? (
                 <div id={promptId} className="border-tint-subtle border-t bg-tint-base">
                     {children}
                 </div>

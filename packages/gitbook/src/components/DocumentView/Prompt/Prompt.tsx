@@ -17,12 +17,12 @@ export function Prompt(props: BlockProps<DocumentBlockPrompt>) {
     const contentIcon =
         block.data.icon && validateIconName(block.data.icon) ? block.data.icon : null;
     const prompt = getPromptText(block);
-    const preview = block.data.preview === true;
+    const defaultExpanded = block.data.defaultExpanded ?? 'hidden';
 
     const promptContent = block.nodes.map((node, index) => (
         <CodeBlock
             key={node.key ?? index}
-            block={getPromptCodeBlock(node, { preview })}
+            block={getPromptCodeBlock(node, { defaultExpanded })}
             document={document}
             ancestorBlocks={[...ancestorBlocks, block]}
             context={context}
@@ -33,11 +33,11 @@ export function Prompt(props: BlockProps<DocumentBlockPrompt>) {
 
     return (
         <PromptClient
+            {...block.data}
             contentIcon={contentIcon}
-            description={block.data.description}
-            prompt={prompt}
+            defaultExpanded={defaultExpanded}
             openInAIProviders={getOpenInAIProviders(props)}
-            preview={preview}
+            prompt={prompt}
         >
             {promptContent}
         </PromptClient>
@@ -73,15 +73,17 @@ function getPromptText(block: DocumentBlockPrompt): string {
 
 function getPromptCodeBlock(
     block: DocumentBlockCode,
-    options: { preview: boolean }
+    options: { defaultExpanded: 'hidden' | 'partial' | 'full' }
 ): DocumentBlockCode {
+    const isPartiallyExpanded = options.defaultExpanded === 'partial';
+
     return {
         ...block,
         data: {
             ...block.data,
             syntax: block.data.syntax ?? 'markdown',
-            expandable: options.preview,
-            collapsedLineCount: options.preview ? PROMPT_COLLAPSED_LINE_COUNT : undefined,
+            expandable: isPartiallyExpanded,
+            collapsedLineCount: isPartiallyExpanded ? PROMPT_COLLAPSED_LINE_COUNT : undefined,
             lineNumbers: false,
             overflow: 'wrap',
         },
