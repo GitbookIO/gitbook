@@ -11,6 +11,7 @@ import {
     type AIStreamResponse,
     type AIStreamResponseToolCallPending,
     type AIToolCallResult,
+    SiteInsightsDisplayContext,
 } from '@gitbook/api';
 import assertNever from 'assert-never';
 import * as React from 'react';
@@ -24,6 +25,7 @@ import { type RenderAIMessageOptions, streamAIChatResponse } from './server-acti
 import { getTools } from './tools';
 import { useAIMessageContextRef } from './useAIMessageContext';
 import { useNavigateToPageTool } from './useNavigateToPageTool';
+import { useSubmitPageFeedbackTool } from './useSubmitPageFeedbackTool';
 
 export type AIChatMessage = {
     role: AIMessageRole;
@@ -220,9 +222,11 @@ function notify(
  */
 export function AIChatProvider(props: {
     renderMessageOptions?: RenderAIMessageOptions;
+    /** Whether page feedback is enabled for the site (gates the submit-feedback tool). */
+    withPageFeedback?: boolean;
     children: React.ReactNode;
 }) {
-    const { renderMessageOptions, children } = props;
+    const { renderMessageOptions, withPageFeedback = false, children } = props;
 
     const messageContextRef = useAIMessageContextRef();
     const trackEvent = useTrackEvent();
@@ -230,9 +234,23 @@ export function AIChatProvider(props: {
     const { siteSpaceId } = useCurrentContent();
     const language = useLanguage();
 
-    // Built-in tools exposed to the assistant (e.g. navigating to a page). The tool has a stable
-    // identity, so it can be referenced directly from the streaming callback.
+    // Built-in tools exposed to the assistant (e.g. navigating to a page, submitting page
+    // feedback). Each tool has a stable identity, so it can be referenced directly from the
+    // streaming callback.
     const navigateToPageTool = useNavigateToPageTool();
+    const submitPageFeedbackTool = useSubmitPageFeedbackTool({
+        displayContext: renderMessageOptions?.asEmbeddable
+            ? SiteInsightsDisplayContext.Embed
+            : SiteInsightsDisplayContext.Site,
+    });
+
+    // Only expose the submit-feedback tool when the site has page feedback enabled, mirroring the
+    // "Was this helpful?" widget's visibility.
+    const builtInTools = React.useMemo(
+        () =>
+            withPageFeedback ? [navigateToPageTool, submitPageFeedbackTool] : [navigateToPageTool],
+        [navigateToPageTool, submitPageFeedbackTool, withPageFeedback]
+    );
 
     // Event listeners storage
     const eventsRef = React.useRef<Map<AIChatEvent['type'], AIChatEventListener[]>>(new Map());
@@ -312,7 +330,7 @@ export function AIChatProvider(props: {
 
             // Execute a tool call
             const executeToolCall = async (event: AIStreamResponseToolCallPending) => {
-                const tools = getTools([navigateToPageTool]);
+                const tools = getTools(builtInTools);
                 const toolDef = tools.find((tool) => tool.name === event.toolCall.tool);
 
                 if (!toolDef || !('execute' in toolDef)) {
@@ -348,7 +366,7 @@ export function AIChatProvider(props: {
 
             let toolToExecute: AIStreamResponseToolCallPending | null = null;
             try {
-                const tools = getTools([navigateToPageTool]);
+                const tools = getTools(builtInTools);
                 const stream = await streamAIChatResponse({
                     message: input.message,
                     toolCall: input.toolCall,
@@ -434,6 +452,18 @@ export function AIChatProvider(props: {
 
                             const confirmation = 'confirmation' in toolDef && toolDef.confirmation;
                             if (confirmation) {
+                                // The confirmation can be a static object or a function that
+                                // derives it from the AI-provided input (e.g. dynamic context).
+                                // The function call is awaited because, for embed-registered
+                                // tools, it arrives as an async proxy over the postMessage channel.
+                                const resolvedConfirmation =
+                                    typeof confirmation === 'function'
+                                        ? await confirmation(event.toolCall.input)
+                                        : confirmation;
+                                const supportingContext =
+                                    typeof resolvedConfirmation.context === 'string'
+                                        ? resolvedConfirmation.context.slice(0, 512)
+                                        : undefined;
                                 globalState.setState((state) => ({
                                     ...state,
                                     control: ConfirmControlDef.createControl({
@@ -442,8 +472,9 @@ export function AIChatProvider(props: {
                                             toolCallId: event.toolCallId,
                                         },
                                         input: {
-                                            label: confirmation.label,
-                                            icon: confirmation.icon,
+                                            label: resolvedConfirmation.label,
+                                            icon: resolvedConfirmation.icon,
+                                            context: supportingContext,
                                         },
                                         language,
                                         send: async (result) => {
@@ -462,7 +493,7 @@ export function AIChatProvider(props: {
                                                                 text: tString(
                                                                     language,
                                                                     'tool_call_skipped',
-                                                                    confirmation.label
+                                                                    resolvedConfirmation.label
                                                                 ),
                                                             },
                                                         },
@@ -555,7 +586,7 @@ export function AIChatProvider(props: {
             renderMessageOptions?.withToolCalls,
             renderMessageOptions?.asEmbeddable,
             language,
-            navigateToPageTool,
+            builtInTools,
         ]
     );
 

@@ -154,7 +154,11 @@ export function InsightsProvider(props: InsightsProviderProps) {
             const pathname = window.location.pathname;
             const previous = eventsRef.current[pathname];
             eventsRef.current[pathname] = {
-                pageContext: previous?.pageContext ?? ctx,
+                // An explicitly-provided context wins so page-scoped events (e.g. feedback) can
+                // attribute to their page even when the pathname's ambient context has none — such
+                // as the embed's assistant tab, whose view records a null page. Events that pass no
+                // context keep the stored one.
+                pageContext: ctx ?? previous?.pageContext,
                 url: previous?.url ?? window.location.href,
                 events: [
                     ...(previous?.events ?? []),

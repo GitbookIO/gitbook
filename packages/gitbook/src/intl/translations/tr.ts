@@ -145,6 +145,8 @@ export const tr: TranslationLanguage = {
     ai_chat_tools_read_page: '${1} sayfası okundu',
     ai_chat_tools_navigated_to_page: 'Sayfa açıldı',
     ai_chat_tools_navigate_failed: 'Sayfa açılamadı',
+    ai_chat_tools_submit_feedback: 'Geri bildirim gönder',
+    ai_chat_tools_submitted_feedback: 'Geri bildiriminiz gönderildi',
     ai_chat_tools_mcp_tool: '${1} çağrıldı',
     ai_chat_ask: '${1} sor',
     ai_chat_ask_about: '${1} için ${2} hakkında sor',
