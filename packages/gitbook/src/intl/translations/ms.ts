@@ -146,6 +146,8 @@ export const ms: TranslationLanguage = {
     ai_chat_tools_read_page: 'Membaca halaman ${1}',
     ai_chat_tools_navigated_to_page: 'Halaman dibuka',
     ai_chat_tools_navigate_failed: 'Gagal membuka halaman',
+    ai_chat_tools_submit_feedback: 'Hantar maklum balas',
+    ai_chat_tools_submitted_feedback: 'Maklum balas dihantar',
     ai_chat_tools_mcp_tool: 'Memanggil ${1}',
     ai_chat_ask: 'Tanya ${1}',
     ai_chat_ask_about: 'Tanya ${1} tentang ${2}',

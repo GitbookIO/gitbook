@@ -142,6 +142,8 @@ export const yue: TranslationLanguage = {
     ai_chat_tools_read_page: '已閱讀頁面 ${1}',
     ai_chat_tools_navigated_to_page: '已開啟頁面',
     ai_chat_tools_navigate_failed: '無法開啟頁面',
+    ai_chat_tools_submit_feedback: '提交反饋',
+    ai_chat_tools_submitted_feedback: '已提交反饋',
     ai_chat_tools_mcp_tool: '已呼叫 ${1}',
     ai_chat_ask: '問 ${1}',
     ai_chat_ask_about: '問 ${1} 關於${2}',

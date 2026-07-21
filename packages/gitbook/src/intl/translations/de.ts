@@ -153,6 +153,8 @@ export const de: TranslationLanguage = {
     ai_chat_tools_read_page: 'Seite ${1} gelesen',
     ai_chat_tools_navigated_to_page: 'Seite geöffnet',
     ai_chat_tools_navigate_failed: 'Seite konnte nicht geöffnet werden',
+    ai_chat_tools_submit_feedback: 'Feedback senden',
+    ai_chat_tools_submitted_feedback: 'Feedback gesendet',
     ai_chat_tools_mcp_tool: '${1} aufgerufen',
     ai_chat_ask: '${1} fragen',
     ai_chat_ask_about: '${1} zu ${2} befragen',

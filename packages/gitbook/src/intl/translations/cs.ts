@@ -147,6 +147,8 @@ export const cs: TranslationLanguage = {
     ai_chat_tools_read_page: 'Přečetl stránku ${1}',
     ai_chat_tools_navigated_to_page: 'Stránka otevřena',
     ai_chat_tools_navigate_failed: 'Stránku se nepodařilo otevřít',
+    ai_chat_tools_submit_feedback: 'Odeslat zpětnou vazbu',
+    ai_chat_tools_submitted_feedback: 'Zpětná vazba odeslána',
     ai_chat_tools_mcp_tool: 'Zavolal ${1}',
     ai_chat_ask: 'Zeptat se ${1}',
     ai_chat_ask_about: 'Zeptat se ${1} na ${2}',
