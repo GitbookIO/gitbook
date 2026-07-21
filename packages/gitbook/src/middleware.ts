@@ -198,16 +198,21 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         pathname: `*/~gitbook/${oauthServerURL.pathname.substring(1)}/:siteId/authorize`,
     }).exec(siteRequestURL.toString());
 
+    // TODO-RND-12161: Clean this up once the consent flow is fully shipped (drop this legacy
+    // forward — GBO should then always render consent for these resumes).
     if (siteOAuthAuthorizeMatch) {
         const siteId = siteOAuthAuthorizeMatch.pathname.groups.siteId;
 
-        // When the consent flow is enabled, GBO renders the consent screen for the post-login resume
-        // (recognized by the `gb_oauth_state` interaction id the OAuth server puts on the resume URL)
-        // instead of forwarding. We fall through to the normal site routing, which rewrites the
-        // request to the `~gitbook/oauth2/v1/[siteId]/authorize` route that renders consent.
+        // When the OAuth server has consent enabled, it stamps the post-login resume URL with a signed
+        // `gb_consent` marker. If it verifies, GBO renders the consent screen by falling through to the
+        // normal site consent page routing.
         //
-        // Otherwise we forward to the OAuth server exactly as before (legacy path).
-        if (!shouldRenderSiteOAuthConsent(siteRequestURL.searchParams)) {
+        // Otherwise (no marker or it fails verification) we forward to the OAuth server as before.
+        const renderConsent = await shouldRenderSiteOAuthConsent(
+            siteId,
+            siteRequestURL.searchParams
+        );
+        if (!renderConsent) {
             const siteOAuthAuthorizeURL = new URL(oauthServerURL);
             siteOAuthAuthorizeURL.pathname += `/${siteId}/authorize`;
             siteOAuthAuthorizeURL.search = siteOAuthAuthorizeMatch.search.input.replace('?', '');

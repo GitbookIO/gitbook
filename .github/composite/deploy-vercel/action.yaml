@@ -85,8 +85,6 @@ runs:
             VERCEL_PROJECT_ID: ${{ inputs.vercelProject }}
             GITBOOK_RUNTIME: vercel
             GITBOOK_HEAD_SHA: ${{ inputs.headSha }}
-            # Enable the sites OAuth consent screen everywhere but production, matching the OAuth server default.
-            GITBOOK_SITE_OAUTH_CONSENT_ENABLED: ${{ inputs.environment != 'production' && 'true' || 'false' }}
         - name: Deploy Project Artifacts to Vercel
           id: deploy
           shell: bash

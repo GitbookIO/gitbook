@@ -10,8 +10,8 @@ import { ConsentError, ConsentScreen } from '@/components/SiteOAuthConsent';
 import { withLeadingSlash, withTrailingSlash } from '@/lib/paths';
 import {
     SiteOAuthConsentError,
-    isSitesOAuthConsentEnabled,
     startSiteOAuthConsent,
+    verifySiteOAuthConsentMarker,
 } from '@/lib/site-oauth';
 import { getVisitorToken } from '@/lib/visitors';
 
@@ -25,15 +25,20 @@ type PageParams = RouteLayoutParams & { siteId: string };
  */
 export default async function Page(props: {
     params: Promise<PageParams>;
-    searchParams: Promise<{ gb_oauth_state?: string }>;
+    searchParams: Promise<{ gb_oauth_state?: string; gb_consent?: string }>;
 }) {
-    if (!isSitesOAuthConsentEnabled()) {
-        notFound();
-    }
-
     const params = await props.params;
     const searchParams = await props.searchParams;
     const { siteId } = params;
+
+    const consentVerified = await verifySiteOAuthConsentMarker({
+        siteId,
+        interactionId: searchParams.gb_oauth_state,
+        signature: searchParams.gb_consent,
+    });
+    if (!consentVerified) {
+        notFound();
+    }
 
     const { context } = await getDynamicSiteContext(params);
     const siteBasePath = withTrailingSlash(
