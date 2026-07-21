@@ -43,12 +43,6 @@ const ratingByInput: Record<
     bad: PageFeedbackRating.Bad,
 };
 
-const ratingEmoji: Record<z.infer<typeof SubmitPageFeedbackInputSchema>['rating'], string> = {
-    good: '🙁',
-    ok: '😐',
-    bad: '🙂',
-};
-
 /**
  * Build the built-in `submitPageFeedback` tool exposed to the assistant.
  *
@@ -87,12 +81,11 @@ export function useSubmitPageFeedbackTool(options: {
                 "Submit the feedback on behalf of the user about the documentation page they are currently viewing. Use this when the user is indicating a sentiment about the page, particularly a negative one, or pointing to incorrect or incoherent information on a page. Proactively suggest to submit feedback for the user to help alleviate frustration or indicate a content gap they've encountered. The user will be asked to confirm before the feedback is recorded. Provide a rating and, when the user gave one, a comment in their own words.",
             confirmation: (input) => {
                 const parsed = SubmitPageFeedbackInputSchema.safeParse(input);
-                const rating = parsed.success ? parsed.data.rating : undefined;
                 const comment = parsed.success ? parsed.data.comment?.trim() : undefined;
                 return {
                     icon: 'paper-plane',
                     label: tString(language, 'ai_chat_tools_submit_feedback', ''),
-                    context: `${tString(language, 'ai_chat_tools_submit_feedback')}?${rating && comment ? `\n\n"${ratingEmoji[rating] ? ratingEmoji[rating] : ''}${comment ? ` ${comment}` : ''}"` : ''}`,
+                    context: `${tString(language, 'ai_chat_tools_submit_feedback')}?${comment ? `\n"${comment}"` : ''}`,
                 };
             },
             inputSchema: zodToJsonSchema(
@@ -109,7 +102,6 @@ export function useSubmitPageFeedbackTool(options: {
                 }
 
                 const pageFeedbackRating = ratingByInput[rating];
-                const pageFeedbackEmoji = ratingEmoji[rating];
                 const trimmedComment = comment?.trim() || undefined;
 
                 const pageContext: InsightsEventPageContext = {
@@ -143,7 +135,7 @@ export function useSubmitPageFeedbackTool(options: {
                     },
                     summary: {
                         icon: 'comment-check',
-                        text: `${tString(language, 'ai_chat_tools_submitted_feedback')}${pageFeedbackEmoji ? `: ${pageFeedbackEmoji}` : undefined}${trimmedComment ? ` ${trimmedComment}` : ''}`,
+                        text: `${tString(language, 'ai_chat_tools_submitted_feedback')}${trimmedComment ? `: ${trimmedComment}` : ''}`,
                     },
                 };
             },
