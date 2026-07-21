@@ -147,6 +147,7 @@ export const et: TranslationLanguage = {
     ai_chat_tools_navigated_to_page: 'Leht avatud',
     ai_chat_tools_navigate_failed: 'Lehe avamine ebaõnnestus',
     ai_chat_tools_submit_feedback: 'Saada tagasiside',
+    ai_chat_tools_submit_assistant_feedback: 'Hinda assistendi eelmist sõnumit kui ${1}',
     ai_chat_tools_submitted_feedback: 'Tagasiside saadetud',
     ai_chat_tools_mcp_tool: 'Kutsus ${1}',
     ai_chat_ask: 'Küsi ${1}',

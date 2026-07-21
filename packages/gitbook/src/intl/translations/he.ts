@@ -145,6 +145,7 @@ export const he: TranslationLanguage = {
     ai_chat_tools_navigated_to_page: 'הדף נפתח',
     ai_chat_tools_navigate_failed: 'פתיחת הדף נכשלה',
     ai_chat_tools_submit_feedback: 'שליחת משוב',
+    ai_chat_tools_submit_assistant_feedback: 'דרג את ההודעה הקודמת של העוזר בתור ${1}',
     ai_chat_tools_submitted_feedback: 'המשוב נשלח',
     ai_chat_tools_mcp_tool: 'קרא ל-${1}',
     ai_chat_ask: 'שאל את ${1}',

@@ -151,6 +151,8 @@ export const it: TranslationLanguage = {
     ai_chat_tools_navigated_to_page: 'Pagina aperta',
     ai_chat_tools_navigate_failed: 'Impossibile aprire la pagina',
     ai_chat_tools_submit_feedback: 'Invia feedback',
+    ai_chat_tools_submit_assistant_feedback:
+        "Valuta il messaggio precedente dell'assistente come ${1}",
     ai_chat_tools_submitted_feedback: 'Feedback inviato',
     ai_chat_tools_mcp_tool: 'Ha chiamato ${1}',
     ai_chat_ask: 'Chiedi a ${1}',

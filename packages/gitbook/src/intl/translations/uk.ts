@@ -146,6 +146,7 @@ export const uk: TranslationLanguage = {
     ai_chat_tools_navigated_to_page: 'Сторінку відкрито',
     ai_chat_tools_navigate_failed: 'Не вдалося відкрити сторінку',
     ai_chat_tools_submit_feedback: 'Надіслати відгук',
+    ai_chat_tools_submit_assistant_feedback: 'Оцініть попереднє повідомлення асистента як ${1}',
     ai_chat_tools_submitted_feedback: 'Відгук надіслано',
     ai_chat_tools_mcp_tool: 'Викликано ${1}',
     ai_chat_ask: 'Запитати ${1}',
