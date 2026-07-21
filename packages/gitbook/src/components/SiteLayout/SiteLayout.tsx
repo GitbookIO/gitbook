@@ -27,8 +27,18 @@ export async function SiteLayout(props: {
     withTracking: boolean;
     visitorAuthClaims: VisitorAuthClaims;
     children: React.ReactNode;
+    headerSlot?: React.ReactNode;
+    tableOfContentsSlot?: React.ReactNode;
 }) {
-    const { context, forcedTheme, withTracking, visitorAuthClaims, children } = props;
+    const {
+        context,
+        forcedTheme,
+        withTracking,
+        visitorAuthClaims,
+        children,
+        headerSlot,
+        tableOfContentsSlot,
+    } = props;
 
     const { customization } = context;
     const { ai } = customization;
@@ -82,6 +92,8 @@ export async function SiteLayout(props: {
                     context={context}
                     withTracking={withTracking}
                     visitorAuthClaims={visitorAuthClaims}
+                    headerSlot={headerSlot}
+                    tableOfContentsSlot={tableOfContentsSlot}
                 >
                     {children}
                 </SpaceLayout>

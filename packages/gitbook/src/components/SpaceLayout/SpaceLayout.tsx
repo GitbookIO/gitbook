@@ -39,6 +39,12 @@ type SpaceLayoutProps = {
 
     /** The children of the layout. */
     children: React.ReactNode;
+
+    /** Override the site header without changing the surrounding layout. */
+    headerSlot?: React.ReactNode;
+
+    /** Override the table of contents without changing the surrounding layout. */
+    tableOfContentsSlot?: React.ReactNode;
 };
 
 /**
@@ -104,16 +110,116 @@ export function SpaceLayoutServerContext(props: SpaceLayoutProps) {
 }
 
 /**
+ * Render the site header from a site context.
+ */
+export function SpaceHeader(props: { context: GitBookSiteContext }) {
+    const { context } = props;
+    const withTopHeader = context.customization.header.preset !== CustomizationHeaderPreset.None;
+
+    return (
+        <Header
+            withTopHeader={withTopHeader}
+            variants={categorizeVariants(context)}
+            context={context}
+        />
+    );
+}
+
+/**
+ * Render the table of contents and its site-specific controls from a site context.
+ */
+export function SpaceTableOfContents(props: { context: GitBookSiteContext }) {
+    const { context } = props;
+    const { siteSpace, customization, visibleSections } = context;
+    const searchProps = getSearchBaseProps(context);
+    const withTopHeader = customization.header.preset !== CustomizationHeaderPreset.None;
+    const withSections = Boolean(visibleSections && visibleSections.list.length > 1);
+    const variants = categorizeVariants(context);
+
+    return (
+        <TableOfContents
+            context={context}
+            header={
+                <div
+                    className={tcls(
+                        'pr-4',
+                        'flex',
+                        withTopHeader ? 'lg:hidden' : '',
+                        'grow-0',
+                        'dark:shadow-light/1',
+                        'text-base/tight',
+                        'items-center',
+                        // On bold themes also color the TOC header so the logo looks correct.
+                        'site-header:theme-bold:bg-header-background',
+                        'site-header:theme-bold:m-[-1.5rem_-1px_-0.5rem_-2rem]',
+                        'site-header:theme-bold:p-[1rem_1rem_1rem_2rem]'
+                    )}
+                >
+                    <HeaderLogo context={context} />
+                    {variants.translations.length > 1 ? (
+                        <TranslationsDropdown
+                            context={context}
+                            siteSpace={
+                                variants.translations.find((space) => space.id === siteSpace.id) ??
+                                siteSpace
+                            }
+                            siteSpaces={variants.translations}
+                            className="[&_.button-leading-icon]:block! ml-auto py-2 [&_.button-content]:hidden"
+                            variant="header"
+                        />
+                    ) : null}
+                </div>
+            }
+            // Displays the search button and/or the space dropdown in the ToC
+            // according to the header/variant settings.
+            // E.g if there is no header, the search button will be displayed in the ToC.
+            innerHeader={
+                !withTopHeader || variants.generic.length > 1 ? (
+                    <div
+                        className={tcls(
+                            'my-5 sidebar-default:mt-2 flex flex-col gap-2 px-5 empty:hidden',
+                            variants.generic.length > 1 ? '' : 'max-lg:hidden'
+                        )}
+                    >
+                        {!withTopHeader && (
+                            <div className="flex gap-2 max-lg:hidden">
+                                <SearchContainer
+                                    {...searchProps}
+                                    style={CustomizationSearchStyle.Subtle}
+                                    viewport="desktop"
+                                />
+                            </div>
+                        )}
+                        {!withTopHeader && withSections && visibleSections && (
+                            <SiteSectionList
+                                className="hidden lg:block"
+                                sections={encodeClientSiteSections(context, visibleSections)}
+                            />
+                        )}
+                        {variants.generic.length > 1 ? (
+                            <SpacesDropdown
+                                context={context}
+                                siteSpace={siteSpace}
+                                siteSpaces={variants.generic}
+                                className="w-full px-3"
+                            />
+                        ) : null}
+                    </div>
+                ) : null
+            }
+        />
+    );
+}
+
+/**
  * Render the entire layout of the space (header, table of contents, footer).
  */
 export function SpaceLayout(props: SpaceLayoutProps) {
-    const { context, children } = props;
-    const { siteSpace, customization, visibleSections } = context;
-    const searchProps = getSearchBaseProps(context);
+    const { context, children, headerSlot, tableOfContentsSlot } = props;
+    const { customization } = context;
 
     const withTopHeader = customization.header.preset !== CustomizationHeaderPreset.None;
 
-    const withSections = Boolean(visibleSections && visibleSections.list.length > 1);
     const variants = categorizeVariants(context);
     const socialLinks = customization.socialAccounts.filter((account) => account.display?.footer);
 
@@ -125,9 +231,14 @@ export function SpaceLayout(props: SpaceLayoutProps) {
         customization.footer.groups?.length;
 
     return (
-        <SpaceLayoutServerContext {...props}>
+        <SpaceLayoutServerContext
+            context={context}
+            withTracking={props.withTracking}
+            visitorAuthClaims={props.visitorAuthClaims}
+            aiChatRenderMessageOptions={props.aiChatRenderMessageOptions}
+        >
             <Announcement context={context} />
-            <Header withTopHeader={withTopHeader} variants={variants} context={context} />
+            {headerSlot ?? <SpaceHeader context={context} />}
             <NavigationLoader />
             {isAIChatEnabled(customization.ai?.mode) ? (
                 <>
@@ -160,81 +271,7 @@ export function SpaceLayout(props: SpaceLayoutProps) {
                             : 'lg:min-h-screen'
                     )}
                 >
-                    <TableOfContents
-                        context={context}
-                        header={
-                            <div
-                                className={tcls(
-                                    'pr-4',
-                                    'flex',
-                                    withTopHeader ? 'lg:hidden' : '',
-                                    'grow-0',
-                                    'dark:shadow-light/1',
-                                    'text-base/tight',
-                                    'items-center',
-                                    // On bold themes also color the TOC header so the logo looks correct.
-                                    'site-header:theme-bold:bg-header-background',
-                                    'site-header:theme-bold:m-[-1.5rem_-1px_-0.5rem_-2rem]',
-                                    'site-header:theme-bold:p-[1rem_1rem_1rem_2rem]'
-                                )}
-                            >
-                                <HeaderLogo context={context} />
-                                {variants.translations.length > 1 ? (
-                                    <TranslationsDropdown
-                                        context={context}
-                                        siteSpace={
-                                            variants.translations.find(
-                                                (space) => space.id === siteSpace.id
-                                            ) ?? siteSpace
-                                        }
-                                        siteSpaces={variants.translations}
-                                        className="[&_.button-leading-icon]:block! ml-auto py-2 [&_.button-content]:hidden"
-                                        variant="header"
-                                    />
-                                ) : null}
-                            </div>
-                        }
-                        // Displays the search button and/or the space dropdown in the ToC
-                        // according to the header/variant settings.
-                        // E.g if there is no header, the search button will be displayed in the ToC.
-                        innerHeader={
-                            !withTopHeader || variants.generic.length > 1 ? (
-                                <div
-                                    className={tcls(
-                                        'my-5 sidebar-default:mt-2 flex flex-col gap-2 px-5 empty:hidden',
-                                        variants.generic.length > 1 ? '' : 'max-lg:hidden'
-                                    )}
-                                >
-                                    {!withTopHeader && (
-                                        <div className="flex gap-2 max-lg:hidden">
-                                            <SearchContainer
-                                                {...searchProps}
-                                                style={CustomizationSearchStyle.Subtle}
-                                                viewport="desktop"
-                                            />
-                                        </div>
-                                    )}
-                                    {!withTopHeader && withSections && visibleSections && (
-                                        <SiteSectionList
-                                            className="hidden lg:block"
-                                            sections={encodeClientSiteSections(
-                                                context,
-                                                visibleSections
-                                            )}
-                                        />
-                                    )}
-                                    {variants.generic.length > 1 ? (
-                                        <SpacesDropdown
-                                            context={context}
-                                            siteSpace={siteSpace}
-                                            siteSpaces={variants.generic}
-                                            className="w-full px-3"
-                                        />
-                                    ) : null}
-                                </div>
-                            ) : null
-                        }
-                    />
+                    {tableOfContentsSlot ?? <SpaceTableOfContents context={context} />}
                     {children}
                 </div>
             </div>
