@@ -77,9 +77,14 @@ export function useSubmitPageFeedbackTool(options: {
             name: 'submitPageFeedback',
             description:
                 "Submit the feedback on behalf of the user about the documentation page they are currently viewing. You can use this when the user is indicating a sentiment about the page, particularly a negative one. You can proactively suggest to submit feedback for the user to help alleviate frustration or indicate a content gap they've encountered. The user will be asked to confirm before the feedback is recorded. Provide a rating and, when the user gave one, a comment in their own words.",
-            confirmation: {
-                icon: 'paper-plane',
-                label: tString(language, 'ai_chat_tools_submit_feedback'),
+            confirmation: (input) => {
+                const parsed = SubmitPageFeedbackInputSchema.safeParse(input);
+                const comment = parsed.success ? parsed.data.comment?.trim() : undefined;
+                return {
+                    icon: 'paper-plane',
+                    label: tString(language, 'ai_chat_tools_submit_feedback'),
+                    context: comment ? `"${comment}"` : undefined,
+                };
             },
             inputSchema: zodToJsonSchema(
                 SubmitPageFeedbackInputSchema as any
@@ -128,7 +133,7 @@ export function useSubmitPageFeedbackTool(options: {
                     },
                     summary: {
                         icon: 'comment-check',
-                        text: tString(language, 'ai_chat_tools_submitted_feedback'),
+                        text: `${tString(language, 'ai_chat_tools_submitted_feedback')}${trimmedComment ? `: ${trimmedComment}` : ''}`,
                     },
                 };
             },
