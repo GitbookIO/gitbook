@@ -40,6 +40,7 @@ import {
 } from '@/lib/icons/inline';
 import { defaultCustomization } from '@/lib/utils';
 import { AnnouncementDismissedScript } from '../Announcement';
+import { SelectStateScript } from '../Select';
 import { OperatingSystemClassScript } from './OperatingSystemClassScript';
 
 function preloadFont(fontData: FontData) {
@@ -146,6 +147,9 @@ export async function CustomizationRootLayout(props: {
                 ) : null}
 
                 <OperatingSystemClassScript />
+
+                {/* Apply the visitor's content selection to <html> before first paint (no flash) */}
+                <SelectStateScript />
 
                 {/* Inject custom font @font-face rules */}
                 {fontData.type === 'custom' ? <style>{fontData.fontFaceRules}</style> : null}
