@@ -38,16 +38,15 @@ export function clearLastSearchQuery(siteSpaceId: string): void {
     setLastSearchQuery(siteSpaceId, null);
 }
 
+function subscribe(listener: () => void) {
+    listeners.add(listener);
+    return () => listeners.delete(listener);
+}
+
 export function useLastSearchQuery(siteSpaceId: string): string | null {
-    const subscribe = React.useCallback((listener: () => void) => {
-        listeners.add(listener);
-        return () => listeners.delete(listener);
-    }, []);
-
-    const getSnapshot = React.useCallback(
+    return React.useSyncExternalStore(
+        subscribe,
         () => globalLastSearchQuery[siteSpaceId] ?? null,
-        [siteSpaceId]
+        () => null
     );
-
-    return React.useSyncExternalStore(subscribe, getSnapshot, () => null);
 }
