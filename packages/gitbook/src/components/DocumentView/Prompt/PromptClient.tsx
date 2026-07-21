@@ -15,56 +15,59 @@ export function PromptClient(props: {
     description: string;
     prompt: string;
     openInAIProviders: boolean;
+    preview: boolean;
+    children?: React.ReactNode;
 }) {
-    const { contentIcon, description, prompt, openInAIProviders } = props;
+    const { contentIcon, description, prompt, openInAIProviders, preview, children } = props;
     const language = useLanguage();
     const promptId = React.useId();
     const [open, setOpen] = React.useState(false);
+    const expanded = preview || open;
     return (
         <div
             className={tcls(
                 'relative flex w-full flex-col overflow-hidden circular-corners:rounded-2xl rounded-corners:rounded-xl straight-corners:rounded-xs text-tint-strong',
                 'border border-tint-subtle contrast-more:border-tint',
                 'transition',
-                open ? 'bg-tint depth-subtle:shadow-xs' : 'bg-tint-base'
+                expanded ? 'bg-tint depth-subtle:shadow-xs' : 'bg-tint-base'
             )}
         >
             <div
                 className={tcls(
                     'group/prompt-header relative flex min-h-9 flex-row items-center justify-between gap-4 p-3 transition-colors',
-                    open ? 'hover:bg-tint-hover' : 'hover:bg-tint-subtle'
+                    !preview && (open ? 'hover:bg-tint-hover' : 'hover:bg-tint-subtle')
                 )}
             >
-                <button
-                    type="button"
-                    aria-controls={promptId}
-                    aria-expanded={open}
-                    aria-label={tString(language, 'view')}
-                    className={tcls(
-                        'absolute inset-0 z-10 cursor-pointer outline-hidden',
-                        'focus-visible:ring-2 focus-visible:ring-primary-hover'
-                    )}
-                    disabled={!prompt}
-                    onClick={() => setOpen((prev) => !prev)}
-                />
-                <div className="pointer-events-none relative z-0 flex min-w-0 flex-row items-center gap-2 text-tint-strong">
-                    <ToggleChevron
-                        open={open}
-                        orientation="right-to-down"
-                        className="size-3 shrink-0 text-tint-subtle transition-colors group-hover/prompt-header:text-tint-strong"
+                {!preview ? (
+                    <button
+                        type="button"
+                        aria-controls={promptId}
+                        aria-expanded={open}
+                        aria-label={tString(language, 'view')}
+                        className={tcls(
+                            'absolute inset-0 z-10 cursor-pointer outline-hidden',
+                            'focus-visible:ring-2 focus-visible:ring-primary-hover'
+                        )}
+                        disabled={!prompt}
+                        onClick={() => setOpen((prev) => !prev)}
                     />
+                ) : null}
+                <div className="pointer-events-none relative z-0 flex min-w-0 flex-row items-center gap-2 text-tint-strong">
+                    {!preview ? (
+                        <ToggleChevron
+                            open={open}
+                            orientation="right-to-down"
+                            className="size-3 shrink-0 text-tint-subtle transition-colors group-hover/prompt-header:text-tint-strong"
+                        />
+                    ) : null}
                     {contentIcon ? <Icon icon={contentIcon} className="size-4 shrink-0" /> : null}
                     <span className="min-w-0 truncate">{description}</span>
                 </div>
                 <PromptActions prompt={prompt} openInAIProviders={openInAIProviders} />
             </div>
-            {open ? (
+            {preview || open ? (
                 <div id={promptId} className="border-tint-subtle border-t bg-tint-base">
-                    <pre className="overflow-auto p-4 text-sm text-tint-strong">
-                        <code className="language-markdown whitespace-pre-wrap font-mono">
-                            {prompt}
-                        </code>
-                    </pre>
+                    {children}
                 </div>
             ) : null}
         </div>

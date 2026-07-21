@@ -8,6 +8,7 @@ export type PromptBlock = {
         icon?: string;
         description?: string;
         openInAIProviders?: boolean;
+        preview?: boolean;
     };
     nodes?: DocumentBlockCode[];
     isVoid?: false;
