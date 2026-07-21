@@ -52,6 +52,7 @@ export function getOpenAPIContext(args: {
             check: <Icon icon="check" />,
             lock: <Icon icon="lock" />,
             mcp: <Icon icon="mcp" />,
+            hashtag: <Icon icon="hashtag" />,
         },
         renderCodeBlock: (codeProps) => (
             <PlainCodeBlock

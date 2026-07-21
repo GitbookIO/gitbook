@@ -16,6 +16,13 @@ export const ConfirmControlDef = createAIControl({
     description:
         'Display a confirmation prompt to the user (Confirm / Cancel) to approve or abort a pending action. Use this when an operation is irreversible, sensitive, or should only proceed with explicit user consent. Returns either a `confirmed` or `cancelled` result based on the user’s click.',
     inputSchema: z.object({
+        context: z
+            .string()
+            .max(512)
+            .optional()
+            .describe(
+                'Supporting context shown above the prompt to help the user understand what they are approving or rejecting.'
+            ),
         icon: z
             .string()
             .optional()
@@ -29,10 +36,13 @@ export const ConfirmControlDef = createAIControl({
 });
 
 function ConfirmControl(props: GetAIControlProps<typeof ConfirmControlDef>) {
-    const { label, icon, onSubmit } = props;
+    const { label, icon, context, onSubmit } = props;
     const language = useLanguage();
     return (
         <AIToolContainer className="flex w-full flex-col gap-2">
+            {context ? (
+                <p className="whitespace-pre-line px-2 pt-1 text-sm text-tint">{context}</p>
+            ) : null}
             <Button
                 data-testid="ai-chat-tool-confirm-cancel"
                 onClick={() => {

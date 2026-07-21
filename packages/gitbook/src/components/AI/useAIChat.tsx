@@ -434,6 +434,18 @@ export function AIChatProvider(props: {
 
                             const confirmation = 'confirmation' in toolDef && toolDef.confirmation;
                             if (confirmation) {
+                                // The confirmation can be a static object or a function that
+                                // derives it from the AI-provided input (e.g. dynamic context).
+                                // The function call is awaited because, for embed-registered
+                                // tools, it arrives as an async proxy over the postMessage channel.
+                                const resolvedConfirmation =
+                                    typeof confirmation === 'function'
+                                        ? await confirmation(event.toolCall.input)
+                                        : confirmation;
+                                const supportingContext =
+                                    typeof resolvedConfirmation.context === 'string'
+                                        ? resolvedConfirmation.context.slice(0, 512)
+                                        : undefined;
                                 globalState.setState((state) => ({
                                     ...state,
                                     control: ConfirmControlDef.createControl({
@@ -442,8 +454,9 @@ export function AIChatProvider(props: {
                                             toolCallId: event.toolCallId,
                                         },
                                         input: {
-                                            label: confirmation.label,
-                                            icon: confirmation.icon,
+                                            label: resolvedConfirmation.label,
+                                            icon: resolvedConfirmation.icon,
+                                            context: supportingContext,
                                         },
                                         language,
                                         send: async (result) => {
@@ -462,7 +475,7 @@ export function AIChatProvider(props: {
                                                                 text: tString(
                                                                     language,
                                                                     'tool_call_skipped',
-                                                                    confirmation.label
+                                                                    resolvedConfirmation.label
                                                                 ),
                                                             },
                                                         },
