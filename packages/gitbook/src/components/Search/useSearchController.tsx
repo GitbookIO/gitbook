@@ -260,11 +260,6 @@ export function useSearchController(
         state?.query ?? (withSearchAI || !withAI ? state?.ask : null) ?? lastSearchQuery ?? '';
     const searchResultsId = `search-results-${React.useId()}`;
 
-    const onAskSelect = React.useCallback(() => {
-        clearLastSearchQuery(siteSpace.id);
-        abort();
-    }, [abort, siteSpace.id]);
-
     const onResultSelect = React.useCallback(
         (result: ResultType) => {
             clearLastSearchQuery(siteSpace.id);
@@ -290,7 +285,7 @@ export function useSearchController(
                 addRecentSearchQuery(siteSpace.id, normalizedQuery, 'ask');
             }
 
-            onAskSelect();
+            abort();
             assistant.open(normalizedQuery);
             setSearchState({
                 ask: normalizedQuery,
@@ -299,7 +294,7 @@ export function useSearchController(
                 open: assistant.mode === 'search',
             });
         },
-        [assistants, normalizedQuery, onAskSelect, setSearchState, siteSpace.id, state?.scope]
+        [abort, assistants, normalizedQuery, setSearchState, siteSpace.id, state?.scope]
     );
 
     const askCount = normalizedQuery && !showAsk ? assistants.length : 0;
@@ -324,7 +319,6 @@ export function useSearchController(
         abort,
         open: onOpen,
         close: onClose,
-        onAskSelect,
         onResultSelect,
         query: normalizedQuery,
         results,

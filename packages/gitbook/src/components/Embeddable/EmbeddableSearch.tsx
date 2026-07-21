@@ -38,12 +38,12 @@ export function EmbeddableSearch(props: EmbeddableSearchProps) {
     const tabsRef = React.useRef<HTMLDivElement>(null);
     const {
         askQuery,
+        abort,
         close,
         cursor,
         error,
         fetching,
         onInputKeyDown,
-        onAskSelect,
         onResultSelect,
         query,
         results,
@@ -72,7 +72,7 @@ export function EmbeddableSearch(props: EmbeddableSearchProps) {
                 results={results}
                 resultsId={resultsId}
                 resultsRef={resultsRef}
-                onAskSelect={onAskSelect}
+                onAskSelect={abort}
                 onResultSelect={onResultSelect}
                 showAsk={showAsk}
                 dataTestId="embed-search"

@@ -44,12 +44,12 @@ export function SearchContainer({
         askQuery,
         askCount,
         askInAssistant,
+        abort,
         close,
         cursor,
         error,
         fetching,
         onInputKeyDown,
-        onAskSelect,
         onResultSelect,
         open,
         query,
@@ -170,7 +170,7 @@ export function SearchContainer({
             results={results}
             resultsId={resultsId}
             resultsRef={resultsRef}
-            onAskSelect={onAskSelect}
+            onAskSelect={abort}
             onResultSelect={onResultSelect}
             showAsk={showAsk}
             scopeControl={scopeControlNode}

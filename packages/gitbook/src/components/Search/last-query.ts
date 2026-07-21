@@ -6,7 +6,6 @@ type LastSearchQueryBySiteSpace = Record<string, string>;
 
 const listeners = new Set<() => void>();
 
-// In-memory only (like Linear/GitHub/Notion) — no need to persist across page loads.
 let globalLastSearchQuery: LastSearchQueryBySiteSpace = {};
 
 function emitChange() {
