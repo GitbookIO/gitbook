@@ -832,10 +832,20 @@ function updateAIChatMessageActivity(
             return {
                 ...activity,
                 currentPhase: event.phase,
-                hasCommentary:
-                    activity.hasCommentary || event.phase === AIMessageStepPhase.Commentary,
                 hasFinalAnswer:
                     activity.hasFinalAnswer || event.phase === AIMessageStepPhase.FinalAnswer,
+            };
+        }
+        case 'response_document': {
+            // A commentary phase can start without ever producing anything visible. Only a
+            // commentary step that emits document content is a real preamble worth collapsing
+            // behind the activity heading, so flag it here rather than on phase start.
+            return {
+                ...activity,
+                hasCommentary:
+                    activity.hasCommentary ||
+                    (activity.currentPhase === AIMessageStepPhase.Commentary &&
+                        event.blocks.length > 0),
             };
         }
         case 'response_tool_call': {
