@@ -7,6 +7,7 @@ import { NuqsAdapter } from 'nuqs/adapters/next/app';
 import type React from 'react';
 import { useMemo } from 'react';
 import { SearchContextProvider } from '../Search';
+import { SelectProvider } from '../Select';
 import { useClearRouterCache } from '../hooks/useClearRouterCache';
 import { LinkContext, type LinkContextType } from '../primitives';
 import { isExternalLink } from '../utils/link';
@@ -62,11 +63,13 @@ export function SiteLayoutClientContexts(props: {
             storageKey={themeStorageKey}
         >
             <NuqsAdapter>
-                <LinkContext.Provider value={linkContext}>
-                    <SearchContextProvider>
-                        <ReducedMotionProvider>{children}</ReducedMotionProvider>
-                    </SearchContextProvider>
-                </LinkContext.Provider>
+                <SelectProvider>
+                    <LinkContext.Provider value={linkContext}>
+                        <SearchContextProvider>
+                            <ReducedMotionProvider>{children}</ReducedMotionProvider>
+                        </SearchContextProvider>
+                    </LinkContext.Provider>
+                </SelectProvider>
             </NuqsAdapter>
         </ThemeProvider>
     );
