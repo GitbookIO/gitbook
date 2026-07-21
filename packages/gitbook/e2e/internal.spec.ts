@@ -287,6 +287,18 @@ const testCases: TestsCase[] = [
                 run: waitForCookiesDialog,
             },
             {
+                name: 'PPR route renders the site shell',
+                url: '',
+                cookies: [{ name: 'gitbook-ppr-route', value: 'true' }],
+                screenshot: false,
+                run: async (page, response) => {
+                    expect(response?.headers()['x-gitbook-route-type']).toBe('ppr');
+                    await expect(page.locator('header[data-gb-site-header]')).toBeVisible();
+                    await expect(page.getByTestId('table-of-contents')).toBeVisible();
+                    await expect(page.locator('main')).toBeVisible();
+                },
+            },
+            {
                 name: 'No variants dropdown',
                 url: '',
                 run: async (page) => {

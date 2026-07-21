@@ -36,6 +36,7 @@ import {
     isOAuthProtectedResourceRequest,
 } from '@/lib/oauth-protected';
 import { removeLeadingSlash, removeTrailingSlash } from '@/lib/paths';
+import { type SiteRouteType, getPPRRouteType } from '@/lib/ppr';
 import {
     getPreviewCookieResponse,
     getPreviewRequestIdentifier,
@@ -344,7 +345,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
 
         // The route is static, except when using dynamic parameters from query params
         // (customization override, theme, etc)
-        let routeType: 'dynamic' | 'static' = 'static';
+        let routeType: SiteRouteType = 'static';
 
         // We pick only stable data from the siteURL data to prevent re-rendering of
         // the root layout when changing pages..
@@ -377,7 +378,6 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         };
 
         const requestHeaders = new Headers(request.headers);
-        requestHeaders.set(MiddlewareHeaders.RouteType, routeType);
         requestHeaders.set(MiddlewareHeaders.URLMode, mode);
         requestHeaders.set(
             MiddlewareHeaders.SiteURL,
@@ -449,9 +449,15 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         const {
             pathname,
             routeType: routeTypeFromPathname,
+            isPPRPage,
             events,
         } = encodePathInSiteContent(siteURLData, request);
         routeType = routeTypeFromPathname ?? routeType;
+
+        const searchParams = new URLSearchParams(request.nextUrl.search);
+
+        routeType = getPPRRouteType(routeType, isPPRPage, true /* hasPPRRouteCookie */);
+        requestHeaders.set(MiddlewareHeaders.RouteType, routeType);
 
         if (events && events.length > 0) {
             waitUntil(
@@ -733,6 +739,7 @@ function encodePathInSiteContent(
 ): {
     pathname: string;
     routeType?: 'static' | 'dynamic';
+    isPPRPage?: boolean;
     events?: ServerInsightsEventInput[] | undefined;
 } {
     let pathname = removeLeadingSlash(removeTrailingSlash(siteURLData.pathname));
@@ -887,7 +894,7 @@ function encodePathInSiteContent(
                           ],
                 };
             }
-            return { pathname: encodePagePath(pathname) };
+            return { pathname: encodePagePath(pathname), isPPRPage: true };
         }
     }
 }
