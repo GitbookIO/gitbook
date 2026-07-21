@@ -147,6 +147,8 @@ export const pl: TranslationLanguage = {
     ai_chat_tools_read_page: 'Przeczytano stronę ${1}',
     ai_chat_tools_navigated_to_page: 'Otwarto stronę',
     ai_chat_tools_navigate_failed: 'Nie udało się otworzyć strony',
+    ai_chat_tools_submit_feedback: 'Wyślij opinię',
+    ai_chat_tools_submitted_feedback: 'Przesłano opinię',
     ai_chat_tools_mcp_tool: 'Wywołano ${1}',
     ai_chat_ask: 'Zapytaj ${1}',
     ai_chat_ask_about: 'Zapytaj ${1} o ${2}',

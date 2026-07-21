@@ -89,7 +89,10 @@ export function SpaceLayoutServerContext(props: SpaceLayoutProps) {
                         visitorCookieTrackingEnabled={customization.insights?.trackingCookie}
                     >
                         <InsightsProvider enabled={withTracking} eventUrl={eventUrl.toString()}>
-                            <AIChatProvider renderMessageOptions={aiChatRenderMessageOptions}>
+                            <AIChatProvider
+                                renderMessageOptions={aiChatRenderMessageOptions}
+                                withPageFeedback={customization.feedback.enabled}
+                            >
                                 <OpenAPICodeSampleAIProvider>
                                     {children}
                                 </OpenAPICodeSampleAIProvider>

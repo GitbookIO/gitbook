@@ -147,6 +147,8 @@ export const sv: TranslationLanguage = {
     ai_chat_tools_read_page: 'Läste sidan ${1}',
     ai_chat_tools_navigated_to_page: 'Öppnade sidan',
     ai_chat_tools_navigate_failed: 'Det gick inte att öppna sidan',
+    ai_chat_tools_submit_feedback: 'Skicka feedback',
+    ai_chat_tools_submitted_feedback: 'Feedback skickad',
     ai_chat_tools_mcp_tool: 'Anropade ${1}',
     ai_chat_ask: 'Fråga ${1}',
     ai_chat_ask_about: 'Fråga ${1} om ${2}',

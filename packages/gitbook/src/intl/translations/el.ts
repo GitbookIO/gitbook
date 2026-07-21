@@ -151,6 +151,8 @@ export const el: TranslationLanguage = {
     ai_chat_tools_read_page: 'Διαβάστηκε η σελίδα ${1}',
     ai_chat_tools_navigated_to_page: 'Άνοιξε η σελίδα',
     ai_chat_tools_navigate_failed: 'Αποτυχία ανοίγματος της σελίδας',
+    ai_chat_tools_submit_feedback: 'Υποβολή σχολίων',
+    ai_chat_tools_submitted_feedback: 'Τα σχόλια υποβλήθηκαν',
     ai_chat_tools_mcp_tool: 'Κλήθηκε ${1}',
     ai_chat_ask: 'Ρωτήστε ${1}',
     ai_chat_ask_about: 'Ρωτήστε ${1} για ${2}',
