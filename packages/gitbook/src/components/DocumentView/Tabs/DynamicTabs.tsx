@@ -1,213 +1,73 @@
 'use client';
 
-import React, {
-    memo,
-    useCallback,
-    useMemo,
-    useRef,
-    useState,
-    type ComponentPropsWithRef,
-} from 'react';
+import type React from 'react';
+import { type ComponentPropsWithRef, memo, useCallback, useMemo } from 'react';
 
-import { NavigationStatusContext, useListOverflow } from '@/components/hooks';
+import { useResolvedSlug, useSelect } from '@/components/Select';
+import { useListOverflow } from '@/components/hooks';
 import { DropdownMenu, DropdownMenuItem } from '@/components/primitives';
 import { useLanguage } from '@/intl/client';
 import { tString } from '@/intl/translate';
-import { getLocalStorageItem, setLocalStorageItem } from '@/lib/browser';
+import { SELECT_DEFAULT_ATTR, SELECT_GROUP_ATTR, SELECT_OPTION_ATTR } from '@/lib/select';
 import { tcls } from '@/lib/tailwind';
 import { Icon, type IconName } from '@gitbook/icons';
-import { useRouter } from 'next/navigation';
-
-interface TabsState {
-    activeIds: {
-        [tabsBlockId: string]: string;
-    };
-    activeTitles: string[];
-}
-
-const defaultTabsState: TabsState = {
-    activeIds: {},
-    activeTitles: [],
-};
-
-let globalTabsState = getLocalStorageItem('@gitbook/tabsState', defaultTabsState);
-const listeners = new Set<() => void>();
-
-function useTabsState() {
-    const subscribe = useCallback((callback: () => void) => {
-        listeners.add(callback);
-        return () => listeners.delete(callback);
-    }, []);
-
-    const getSnapshot = useCallback(() => globalTabsState, []);
-
-    const setTabsState = useCallback((updater: (previous: TabsState) => TabsState) => {
-        globalTabsState = updater(globalTabsState);
-        setLocalStorageItem('@gitbook/tabsState', globalTabsState);
-        listeners.forEach((listener) => listener());
-    }, []);
-    const state = React.useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
-    return [state, setTabsState] as const;
-}
-
-// How many titles are remembered:
-const TITLES_MAX = 5;
 
 export interface TabsItem {
     id: string;
     title: string;
+    /** The `select` slug for this tab, derived from its title (see Tabs.tsx). */
+    slug: string;
     icon?: IconName;
     body: React.ReactNode;
 }
 
-interface TabsState {
-    activeIds: {
-        [tabsBlockId: string]: string;
-    };
-    activeTitles: string[];
-}
-
 /**
  * Client side component for the tabs, taking care of interactions.
+ *
+ * Pane visibility is driven entirely by CSS (see generateSelectCSS): each pane carries its slug as
+ * `data-select-option`, and the generated stylesheet shows the most-recently-activated one based on
+ * the `data-sel-*` attributes on `<html>`. That means the correct pane is visible before hydration
+ * (no flash) and with JS disabled. This component only handles clicks and the tablist's own
+ * active/aria state.
  */
 export function DynamicTabs(props: {
-    id: string;
     tabs: TabsItem[];
+    setClassName: string;
     className?: string;
 }) {
-    const { id, tabs, className } = props;
-    const router = useRouter();
+    const { tabs, setClassName, className } = props;
+    const { activate } = useSelect();
 
-    const { onNavigationClick, hash } = React.useContext(NavigationStatusContext);
-    const [initialized, setInitialized] = useState(false);
-    const [tabsState, setTabsState] = useTabsState();
-    const activeState = useMemo(() => {
-        const input = { id, tabs };
-        return (
-            getTabBySelection(input, tabsState) ?? getTabByTitle(input, tabsState) ?? input.tabs[0]
-        );
-    }, [id, tabs, tabsState]);
+    const candidateSlugs = useMemo(() => tabs.map((tab) => tab.slug), [tabs]);
+    // Only used for the tablist button highlight/aria; falls back to the first tab, matching the CSS
+    // default. Pre-hydration this is the first tab on both server and client, so it never mismatches.
+    const activeSlug = useResolvedSlug(candidateSlugs, tabs[0]?.slug ?? null);
 
-    // Track if the tab has been touched by the user.
-    const touchedRef = useRef(false);
-
-    // To avoid issue with hydration, we only use the state from localStorage
-    // once the component has been initialized (=mounted).
-    // Otherwise because of  the streaming/suspense approach, tabs can be first-rendered at different time
-    // and get stuck into an inconsistent state.
-    const active = initialized ? activeState : tabs[0];
-
-    // When clicking to select a tab, we:
-    // - update the URL hash
-    // - mark this specific ID as selected
-    // - store the ID to auto-select other tabs with the same title
     const selectTab = useCallback(
-        (tabId: string, manual = true) => {
-            const tab = tabs.find((tab) => tab.id === tabId);
-
-            if (!tab) {
-                return;
+        (tabId: string) => {
+            const tab = tabs.find((item) => item.id === tabId);
+            if (tab?.slug) {
+                activate(tab.slug);
             }
-
-            if (manual) {
-                touchedRef.current = true;
-                const href = `#${tab.id}`;
-                if (window.location.hash !== href) {
-                    onNavigationClick(href);
-                    router.replace(href, { scroll: false });
-                }
-            }
-
-            setTabsState((prev) => {
-                if (prev.activeIds[id] === tab.id) {
-                    return prev;
-                }
-                return {
-                    activeIds: {
-                        ...prev.activeIds,
-                        [id]: tab.id,
-                    },
-                    activeTitles: tab.title
-                        ? prev.activeTitles
-                              .filter((t) => t !== tab.title)
-                              .concat([tab.title])
-                              .slice(-TITLES_MAX)
-                        : prev.activeTitles,
-                };
-            });
         },
-        [router, setTabsState, tabs, id]
+        [tabs, activate]
     );
-
-    // When the hash changes, we try to select the tab containing the targetted element.
-    React.useLayoutEffect(() => {
-        setInitialized(true);
-
-        if (hash) {
-            // First check if the hash matches a tab ID.
-            const hashIsTab = tabs.some((tab) => tab.id === hash);
-            if (hashIsTab) {
-                selectTab(hash, false);
-                return;
-            }
-
-            // Then check if the hash matches an element inside a tab.
-            const activeElement = document.getElementById(hash);
-            if (!activeElement) {
-                return;
-            }
-
-            const tabPanel = activeElement.closest('[role="tabpanel"]');
-            if (!tabPanel) {
-                return;
-            }
-
-            selectTab(tabPanel.id, false);
-        }
-    }, [selectTab, tabs, hash]);
-
-    // Scroll to active element in the tab.
-    React.useLayoutEffect(() => {
-        // If there is no hash or active tab, nothing to scroll.
-        if (!hash || hash !== '' || !active) {
-            return;
-        }
-
-        // If the tab is touched, we don't want to scroll.
-        if (touchedRef.current) {
-            return;
-        }
-
-        // If the hash matches a tab, then the scroll is already done.
-        const hashIsTab = tabs.some((tab) => tab.id === hash);
-        if (hashIsTab) {
-            return;
-        }
-
-        const activeElement = document.getElementById(hash);
-        if (!activeElement) {
-            return;
-        }
-
-        activeElement.scrollIntoView({
-            block: 'start',
-            behavior: 'instant',
-        });
-    }, [active, tabs, hash]);
 
     return (
         <div
+            {...{ [SELECT_GROUP_ATTR]: '' }}
             className={tcls(
                 'rounded-lg',
                 'straight-corners:rounded-xs',
                 'ring-1 ring-tint-subtle ring-inset',
                 'flex min-w-0 flex-col',
+                setClassName,
                 className
             )}
         >
-            <TabItemList tabs={tabs} activeTabId={active?.id ?? null} onSelect={selectTab} />
-            {tabs.map((tab) => (
-                <TabPanel key={tab.id} tab={tab} isActive={tab.id === active?.id} />
+            <TabItemList tabs={tabs} activeSlug={activeSlug} onSelect={selectTab} />
+            {tabs.map((tab, index) => (
+                <TabPanel key={tab.id} tab={tab} isDefault={index === 0} />
             ))}
         </div>
     );
@@ -215,29 +75,31 @@ export function DynamicTabs(props: {
 
 const TabPanel = memo(function TabPanel(props: {
     tab: TabsItem;
-    isActive: boolean;
+    isDefault: boolean;
 }) {
-    const { tab, isActive } = props;
+    const { tab, isDefault } = props;
     return (
         <div
+            {...{
+                [SELECT_OPTION_ATTR]: tab.slug,
+                ...(isDefault ? { [SELECT_DEFAULT_ATTR]: '' } : {}),
+            }}
             role="tabpanel"
             id={tab.id}
             aria-labelledby={getTabButtonId(tab.id)}
             className="scroll-mt-[calc(var(--content-scroll-margin)+var(--spacing)*20)]"
         >
-            <div className="p-4" hidden={!isActive}>
-                {tab.body}
-            </div>
+            <div className="p-4">{tab.body}</div>
         </div>
     );
 });
 
 const TabItemList = memo(function TabItemList(props: {
     tabs: TabsItem[];
-    activeTabId: string | null;
+    activeSlug: string | null;
     onSelect: (tabId: string) => void;
 }) {
-    const { tabs, activeTabId, onSelect } = props;
+    const { tabs, activeSlug, onSelect } = props;
     const { containerRef, itemRef, overflowing, isMeasuring } = useListOverflow();
     const overflowingTabs = useMemo(
         () =>
@@ -266,7 +128,7 @@ const TabItemList = memo(function TabItemList(props: {
         >
             {/* When we measure, we add the menu at start to be sure everything's fit. */}
             {isMeasuring ? (
-                <TabsDropdownMenu tabs={tabs} onSelect={onSelect} activeTabId={activeTabId} />
+                <TabsDropdownMenu tabs={tabs} onSelect={onSelect} activeSlug={activeSlug} />
             ) : null}
             {tabs.map((tab) => {
                 // Hide overflowing tabs when not measuring.
@@ -277,7 +139,7 @@ const TabItemList = memo(function TabItemList(props: {
                     <TabItem
                         key={tab.id}
                         ref={itemRef}
-                        isActive={tab.id === activeTabId}
+                        isActive={tab.slug === activeSlug}
                         tab={tab}
                         onSelect={onSelect}
                     />
@@ -288,7 +150,7 @@ const TabItemList = memo(function TabItemList(props: {
                 <TabsDropdownMenu
                     tabs={overflowingTabs}
                     onSelect={onSelect}
-                    activeTabId={activeTabId}
+                    activeSlug={activeSlug}
                 />
             ) : null}
         </div>
@@ -297,16 +159,16 @@ const TabItemList = memo(function TabItemList(props: {
 
 function TabsDropdownMenu(props: {
     tabs: TabsItem[];
-    activeTabId: string | null;
+    activeSlug: string | null;
     onSelect: (tabId: string) => void;
 }) {
-    const { tabs, onSelect, activeTabId } = props;
+    const { tabs, onSelect, activeSlug } = props;
     const language = useLanguage();
     return (
         <DropdownMenu
             button={
                 <TabButton
-                    isActive={tabs.some((tab) => tab.id === activeTabId)}
+                    isActive={tabs.some((tab) => tab.slug === activeSlug)}
                     aria-label={tString(language, 'more')}
                     className="shrink-0"
                 >
@@ -319,7 +181,7 @@ function TabsDropdownMenu(props: {
                     <DropdownMenuItem
                         key={tab.id}
                         onClick={() => onSelect(tab.id)}
-                        active={tab.id === activeTabId}
+                        active={tab.slug === activeSlug}
                         leadingIcon={tab.icon}
                     >
                         {tab.title}
@@ -437,43 +299,4 @@ function getTabIdFromButtonId(buttonId: string) {
         return buttonId.slice(4);
     }
     return buttonId;
-}
-
-/**
- * Get explicitly selected tab in a set of tabs.
- */
-function getTabBySelection(
-    input: {
-        id: string;
-        tabs: TabsItem[];
-    },
-    state: TabsState
-): TabsItem | null {
-    const activeId = state.activeIds[input.id];
-    return activeId ? (input.tabs.find((child) => child.id === activeId) ?? null) : null;
-}
-
-/**
- * Get the best selected tab in a set of tabs by taking only title into account.
- */
-function getTabByTitle(
-    input: {
-        id: string;
-        tabs: TabsItem[];
-    },
-    state: TabsState
-): TabsItem | null {
-    return (
-        input.tabs
-            .map((item) => {
-                return {
-                    item,
-                    score: state.activeTitles.indexOf(item.title),
-                };
-            })
-            .filter(({ score }) => score >= 0)
-            // .sortBy(({ score }) => -score)
-            .sort(({ score: a }, { score: b }) => b - a)
-            .map(({ item }) => item)[0] ?? null
-    );
 }

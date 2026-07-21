@@ -5,6 +5,7 @@ import { parseAsString, useQueryState } from 'nuqs';
 import type React from 'react';
 import { useEffect, useRef } from 'react';
 import { useSelect } from './useSelect';
+import { useSelectAnchor } from './useSelectAnchor';
 
 function parseSelectParam(value: string | null): string[] {
     if (!value) {
@@ -26,6 +27,8 @@ export function SelectProvider(props: { children: React.ReactNode }) {
     const { slugs } = useSelect();
     // The last value we wrote to the URL, so we can tell our own writes apart from external ones.
     const mirroredRef = useRef<string | null>(null);
+
+    useSelectAnchor();
 
     // Adopt whatever the pre-paint script already merged (URL + storage) into the in-memory store.
     useEffect(() => {
