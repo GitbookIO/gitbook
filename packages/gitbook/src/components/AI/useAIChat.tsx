@@ -436,9 +436,11 @@ export function AIChatProvider(props: {
                             if (confirmation) {
                                 // The confirmation can be a static object or a function that
                                 // derives it from the AI-provided input (e.g. dynamic context).
+                                // The function call is awaited because, for embed-registered
+                                // tools, it arrives as an async proxy over the postMessage channel.
                                 const resolvedConfirmation =
                                     typeof confirmation === 'function'
-                                        ? confirmation(event.toolCall.input)
+                                        ? await confirmation(event.toolCall.input)
                                         : confirmation;
                                 const supportingContext =
                                     typeof resolvedConfirmation.context === 'string'
