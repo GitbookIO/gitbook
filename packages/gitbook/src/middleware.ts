@@ -541,6 +541,11 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         response.headers.set('x-gitbook-route-type', routeType);
         response.headers.set('x-gitbook-route-site', siteURLWithoutProtocol);
 
+        // noindex search/assistant deep links, kept crawlable so Google sees the directive.
+        if (rewrittenURL.searchParams.has('ask') || rewrittenURL.searchParams.has('q')) {
+            response.headers.set('x-robots-tag', 'noindex');
+        }
+
         // Allow cross-origin requests from the same parent domain as the site.
         const allowedOrigin = getAllowedCORSOrigin(request, siteCanonicalURL);
         if (allowedOrigin) {
