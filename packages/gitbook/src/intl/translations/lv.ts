@@ -146,6 +146,7 @@ export const lv: TranslationLanguage = {
     ai_chat_tools_navigated_to_page: 'Lapa atvērta',
     ai_chat_tools_navigate_failed: 'Neizdevās atvērt lapu',
     ai_chat_tools_submit_feedback: 'Nosūtīt atsauksmi',
+    ai_chat_tools_submit_assistant_feedback: 'Novērtējiet asistenta iepriekšējo ziņojumu kā ${1}',
     ai_chat_tools_submitted_feedback: 'Atsauksme nosūtīta',
     ai_chat_tools_mcp_tool: 'Izsauca ${1}',
     ai_chat_ask: 'Jautāt ${1}',

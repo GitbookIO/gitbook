@@ -147,6 +147,7 @@ export const ko: TranslationLanguage = {
     ai_chat_tools_navigated_to_page: '페이지를 열었습니다',
     ai_chat_tools_navigate_failed: '페이지를 열지 못했습니다',
     ai_chat_tools_submit_feedback: '피드백 제출',
+    ai_chat_tools_submit_assistant_feedback: '어시스턴트의 이전 메시지를 ${1}(으)로 평가하기',
     ai_chat_tools_submitted_feedback: '피드백을 제출했습니다',
     ai_chat_tools_mcp_tool: '${1} 호출함',
     ai_chat_ask: '${1}에게 질문',

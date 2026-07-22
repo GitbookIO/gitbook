@@ -152,6 +152,8 @@ export const el: TranslationLanguage = {
     ai_chat_tools_navigated_to_page: 'Άνοιξε η σελίδα',
     ai_chat_tools_navigate_failed: 'Αποτυχία ανοίγματος της σελίδας',
     ai_chat_tools_submit_feedback: 'Υποβολή σχολίων',
+    ai_chat_tools_submit_assistant_feedback:
+        'Αξιολόγηση του προηγούμενου μηνύματος του Βοηθού ως ${1}',
     ai_chat_tools_submitted_feedback: 'Τα σχόλια υποβλήθηκαν',
     ai_chat_tools_mcp_tool: 'Κλήθηκε ${1}',
     ai_chat_ask: 'Ρωτήστε ${1}',
