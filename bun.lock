@@ -346,6 +346,7 @@
     },
   },
   "patchedDependencies": {
+    "next@16.2.11": "patches/next@16.2.11.patch",
     "decode-named-character-reference@1.0.2": "patches/decode-named-character-reference@1.0.2.patch",
   },
   "overrides": {
