@@ -38,10 +38,13 @@ export function EmbeddableSearch(props: EmbeddableSearchProps) {
     const tabsRef = React.useRef<HTMLDivElement>(null);
     const {
         askQuery,
+        abort,
+        close,
         cursor,
         error,
         fetching,
         onInputKeyDown,
+        onResultSelect,
         query,
         results,
         resultsId,
@@ -51,7 +54,10 @@ export function EmbeddableSearch(props: EmbeddableSearchProps) {
         showAsk,
         withSearchAI,
         scopeControl,
-    } = useSearchController({ ...searchProps, asEmbeddable: hasDocsTab });
+    } = useSearchController(
+        { ...searchProps, asEmbeddable: hasDocsTab },
+        { restoreLastQueryOnMount: true }
+    );
 
     return (
         <LinkContext value={linkContext}>
@@ -66,6 +72,8 @@ export function EmbeddableSearch(props: EmbeddableSearchProps) {
                 results={results}
                 resultsId={resultsId}
                 resultsRef={resultsRef}
+                onAskSelect={abort}
+                onResultSelect={onResultSelect}
                 showAsk={showAsk}
                 dataTestId="embed-search"
                 input={
@@ -97,9 +105,10 @@ export function EmbeddableSearch(props: EmbeddableSearchProps) {
                             active="search"
                             baseURL={baseURL}
                             siteTitle={siteTitle}
+                            onNavigate={close}
                         />
                         <EmbeddableIframeButtons />
-                        <EmbeddableIframeCloseButton />
+                        <EmbeddableIframeCloseButton onClose={close} />
                     </>
                 }
                 scopeControl={
