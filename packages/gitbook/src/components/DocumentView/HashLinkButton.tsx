@@ -20,21 +20,23 @@ export function HashLinkButton(props: {
     const { id, block, className, iconClassName, label } = props;
     const textStyle = getBlockTextStyle(block);
     return (
-        <div
+        <span
             className={tcls(
                 'relative',
                 'hash',
-                'grid',
+                'inline-grid',
                 'grid-area-1-1',
                 'h-[1em]',
                 'border-0',
                 'opacity-0',
                 'site-background',
                 'rounded',
-                'group-hover/hash:opacity-[0]',
-                'group-focus/hash:opacity-[0]',
-                'md:group-hover/hash:opacity-[1]',
-                'md:group-focus/hash:opacity-[1]',
+                'transition-opacity',
+                'pointer-fine:group-hover/hash:opacity-100',
+                'pointer-fine:group-focus-within/hash:opacity-100',
+                'not-pointer-fine:pointer-events-none',
+                'not-pointer-fine:[.hash-revealed_&]:opacity-100',
+                'not-pointer-fine:[.hash-revealed_&]:pointer-events-auto',
                 className
             )}
         >
@@ -50,12 +52,16 @@ export function HashLinkButton(props: {
                         'self-center',
                         'transition-colors',
                         'text-transparent',
-                        'group-hover/hash:text-tint-subtle',
-                        'contrast-more:group-hover/hash:text-tint-strong',
+                        'pointer-fine:group-hover/hash:text-tint-subtle',
+                        'contrast-more:pointer-fine:group-hover/hash:text-tint-strong',
+                        'pointer-fine:group-focus-within/hash:text-tint-subtle',
+                        'contrast-more:pointer-fine:group-focus-within/hash:text-tint-strong',
+                        'not-pointer-fine:[.hash-revealed_&]:text-tint-subtle',
+                        'contrast-more:not-pointer-fine:[.hash-revealed_&]:text-tint-strong',
                         iconClassName
                     )}
                 />
             </Link>
-        </div>
+        </span>
     );
 }

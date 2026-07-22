@@ -6,6 +6,7 @@ import { tcls } from '@/lib/tailwind';
 
 import type { BlockProps } from './Block';
 import { HashLinkButton, hashLinkButtonWrapperStyles } from './HashLinkButton';
+import { HeadingRevealWrapper } from './HeadingRevealWrapper';
 import { Inlines } from './Inlines';
 import { getBlockTextStyle } from './spacing';
 import { getTextAlignment } from './utils';
@@ -25,36 +26,26 @@ export async function Heading(props: BlockProps<DocumentBlockHeading>) {
         : defaultLanguage;
 
     return (
-        <Tag
+        <HeadingRevealWrapper
+            as={Tag}
             id={id}
             className={tcls(
                 textStyle.textSize,
                 'heading',
                 'pdf-heading',
-                'flex',
-                'items-baseline',
+                'block',
+                'pointer-fine:flex',
+                'pointer-fine:items-baseline',
                 'scroll-mt-(--content-scroll-margin)',
                 getTextAlignment(block.data.align),
                 hashLinkButtonWrapperStyles,
                 style,
                 textStyle.marginTop
             )}
-            data-pdf-heading
         >
-            <HashLinkButton
-                id={id}
-                block={block}
+            <span
                 className={tcls(
-                    '-ml-6 self-center pr-2',
-                    '[.flip-heading-hash_&]:order-last [.flip-heading-hash_&]:ml-1 [.flip-heading-hash_&]:pl-2'
-                )}
-                iconClassName={tcls('size-4')}
-                label={tString(language, 'direct_link_to_heading')}
-            />
-
-            <div
-                className={tcls(
-                    'flex-1',
+                    'pointer-fine:flex-1',
                     'z-1',
                     'justify-self-start',
                     'max-w-full',
@@ -67,8 +58,20 @@ export async function Heading(props: BlockProps<DocumentBlockHeading>) {
                 )}
             >
                 <Inlines {...rest} context={context} nodes={block.nodes} ancestorInlines={[]} />
-            </div>
-        </Tag>
+            </span>
+
+            <HashLinkButton
+                id={id}
+                block={block}
+                className={tcls(
+                    'ml-1 align-baseline',
+                    'pointer-fine:-ml-6 pointer-fine:order-first pointer-fine:self-center pointer-fine:pr-2',
+                    'pointer-fine:[.flip-heading-hash_&]:order-last pointer-fine:[.flip-heading-hash_&]:ml-1 pointer-fine:[.flip-heading-hash_&]:pl-2'
+                )}
+                iconClassName={tcls('size-4')}
+                label={tString(language, 'direct_link_to_heading')}
+            />
+        </HeadingRevealWrapper>
     );
 }
 
