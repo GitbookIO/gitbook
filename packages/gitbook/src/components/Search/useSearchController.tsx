@@ -7,16 +7,10 @@ import { useAI } from '../AI';
 import { useTrackEvent } from '../Insights';
 import { useBodyLoaded } from '../primitives';
 import type { SearchResultsRef } from './SearchResults';
-import {
-    clearLastSearchQuery,
-    getLastSearchQuery,
-    setLastSearchQuery,
-    useLastSearchQuery,
-} from './last-query';
 import { addRecentSearchQuery } from './recent-queries';
 import type { SearchBaseProps } from './search-props';
 import { useSearchState, useSetSearchState } from './useSearch';
-import { type ResultType, useSearchResults } from './useSearchResults';
+import { useSearchResults } from './useSearchResults';
 import { useSearchResultsCursor } from './useSearchResultsCursor';
 
 function useInitialAskBootstrap(props: {
@@ -115,10 +109,7 @@ function useSearchKeyboardNavigation(props: {
     };
 }
 
-export function useSearchController(
-    props: SearchBaseProps,
-    options: { restoreLastQueryOnMount?: boolean } = {}
-) {
+export function useSearchController(props: SearchBaseProps) {
     const {
         asEmbeddable,
         siteSpace,
@@ -139,32 +130,6 @@ export function useSearchController(
     const resultsRef = React.useRef<SearchResultsRef>(null);
     const isLoaded = useBodyLoaded();
 
-    const restoredLastQueryForSiteSpaceRef = React.useRef<string | null>(null);
-    React.useEffect(() => {
-        if (
-            !options.restoreLastQueryOnMount ||
-            restoredLastQueryForSiteSpaceRef.current === siteSpace.id
-        ) {
-            return;
-        }
-
-        restoredLastQueryForSiteSpaceRef.current = siteSpace.id;
-        const restoredQuery = getLastSearchQuery(siteSpace.id);
-        if (!restoredQuery) {
-            return;
-        }
-
-        void setSearchState(
-            (prev) =>
-                prev ?? {
-                    ask: null,
-                    query: restoredQuery,
-                    scope: 'default',
-                    open: true,
-                }
-        );
-    }, [options.restoreLastQueryOnMount, setSearchState, siteSpace.id]);
-
     const withAI = assistants.length > 0;
     const withSearchAI = assistants.filter((assistant) => assistant.mode === 'search').length > 0;
 
@@ -176,46 +141,38 @@ export function useSearchController(
 
     const onClose = React.useCallback(
         async (to?: string) => {
-            setSearchState((prev) => {
-                if (!prev) return null;
-
-                if (prev.query !== null) {
-                    setLastSearchQuery(siteSpace.id, prev.query);
-                }
-
-                return { ...prev, open: false, query: null };
-            });
+            setSearchState((prev) =>
+                prev
+                    ? {
+                          ...prev,
+                          open: false,
+                          query: prev.query === '' ? null : prev.query,
+                      }
+                    : null
+            );
 
             if (to) {
                 router.push(to);
             }
         },
-        [setSearchState, router, siteSpace.id]
+        [setSearchState, router]
     );
 
     const onOpen = React.useCallback(() => {
         if (state?.open) {
             return;
         }
-        setSearchState((prev) => {
-            const query =
-                prev?.query ??
-                getLastSearchQuery(siteSpace.id) ??
-                (withSearchAI || !withAI ? prev?.ask : null) ??
-                '';
-
-            return {
-                ask: withAI ? (prev?.ask ?? null) : null,
-                scope: prev?.scope ?? 'default',
-                query,
-                open: true,
-            };
-        });
+        setSearchState((prev) => ({
+            ask: withAI ? (prev?.ask ?? null) : null,
+            scope: prev?.scope ?? 'default',
+            query: prev?.query ?? (withSearchAI || !withAI ? prev?.ask : null) ?? '',
+            open: true,
+        }));
 
         trackEvent({
             type: 'search_open',
         });
-    }, [state?.open, setSearchState, siteSpace.id, trackEvent, withAI, withSearchAI]);
+    }, [state?.open, setSearchState, trackEvent, withAI, withSearchAI]);
 
     const setQuery = React.useCallback(
         (value: string) => {
@@ -255,24 +212,8 @@ export function useSearchController(
         withSections,
     });
 
-    const lastSearchQuery = useLastSearchQuery(siteSpace.id);
-    const searchValue =
-        state?.query ?? (withSearchAI || !withAI ? state?.ask : null) ?? lastSearchQuery ?? '';
+    const searchValue = state?.query ?? (withSearchAI || !withAI ? state?.ask : null) ?? '';
     const searchResultsId = `search-results-${React.useId()}`;
-
-    const onResultSelect = React.useCallback(
-        (result: ResultType) => {
-            clearLastSearchQuery(siteSpace.id);
-            abort();
-
-            if (result.type !== 'recommended-question') {
-                void setSearchState((prev) =>
-                    prev ? { ...prev, query: null, open: false } : null
-                );
-            }
-        },
-        [abort, setSearchState, siteSpace.id]
-    );
 
     const askInAssistant = React.useCallback(
         (assistantIndex = 0) => {
@@ -319,7 +260,6 @@ export function useSearchController(
         abort,
         open: onOpen,
         close: onClose,
-        onResultSelect,
         query: normalizedQuery,
         results,
         resultsId: searchResultsId,

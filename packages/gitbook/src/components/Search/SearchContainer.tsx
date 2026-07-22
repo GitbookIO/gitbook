@@ -50,7 +50,6 @@ export function SearchContainer({
         error,
         fetching,
         onInputKeyDown,
-        onResultSelect,
         open,
         query,
         results,
@@ -170,8 +169,7 @@ export function SearchContainer({
             results={results}
             resultsId={resultsId}
             resultsRef={resultsRef}
-            onAskSelect={abort}
-            onResultSelect={onResultSelect}
+            onResultSelect={abort}
             showAsk={showAsk}
             scopeControl={scopeControlNode}
             fillHeight={usesSideSheet || shouldFillHeight}
