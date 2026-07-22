@@ -36,8 +36,8 @@ export function ScalarApiButton(props: {
         configuration: {
             url: specUrl,
             ...prefillConfig,
-            proxyUrl: 'https://proxy.scalar.com',
-            // proxyUrl: withProxy ? context.proxyUrl : undefined,
+            // proxyUrl: 'https://proxy.scalar.com',
+            proxyUrl: withProxy ? context.proxyUrl : undefined,
         },
     });
 
