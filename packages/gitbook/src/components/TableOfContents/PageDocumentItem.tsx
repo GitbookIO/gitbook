@@ -15,6 +15,7 @@ export function PageDocumentItem(props: { page: ClientTOCPageDocument }) {
     return (
         <li className="page-document-item flex flex-col [.page-group-item+&]:mt-4">
             <ToggleableLinkItem
+                id={page.id}
                 href={page.href ?? '#'}
                 pathnames={page.pathnames}
                 insights={{
