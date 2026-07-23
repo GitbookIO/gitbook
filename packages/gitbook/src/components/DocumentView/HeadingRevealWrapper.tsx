@@ -13,7 +13,7 @@ const HEADING_ATTR = 'data-heading-reveal-wrapper';
 let revealedId: string | null = null;
 const listeners = new Set<() => void>();
 
-function handleDocumentClick(event: MouseEvent) {
+function handleDocumentPointerUp(event: PointerEvent) {
     const target = event.target;
     if (!(target instanceof Element) || !target.closest(`[${HEADING_ATTR}]`)) {
         setRevealedId(null);
@@ -23,13 +23,13 @@ function handleDocumentClick(event: MouseEvent) {
 function subscribe(onStoreChange: () => void) {
     listeners.add(onStoreChange);
     if (listeners.size === 1) {
-        document.addEventListener('click', handleDocumentClick);
+        document.addEventListener('pointerup', handleDocumentPointerUp);
     }
 
     return () => {
         listeners.delete(onStoreChange);
         if (listeners.size === 0) {
-            document.removeEventListener('click', handleDocumentClick);
+            document.removeEventListener('pointerup', handleDocumentPointerUp);
         }
     };
 }

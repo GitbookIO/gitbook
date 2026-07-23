@@ -66,10 +66,10 @@ export async function Heading(props: BlockProps<DocumentBlockHeading>) {
                 id={id}
                 block={block}
                 className={tcls(
-                    'absolute ml-1',
+                    'absolute',
                     block.type === 'heading-1'
                         ? '[transform:translateY(0.125em)]'
-                        : '[transform:translateY(0.1875em)]',
+                        : '[transform:translateY(0.17em)]',
                     'pointer-fine:-ml-6 pointer-fine:relative pointer-fine:order-first pointer-fine:self-center pointer-fine:pr-2 pointer-fine:[transform:none]',
                     'pointer-fine:[.flip-heading-hash_&]:order-last pointer-fine:[.flip-heading-hash_&]:ml-1 pointer-fine:[.flip-heading-hash_&]:pl-2'
                 )}

@@ -27,7 +27,7 @@ export function HashLinkButton(props: {
                 'hash',
                 'inline-grid',
                 'grid-area-1-1',
-                'h-[1em]',
+                'pointer-fine:h-[1em]',
                 'border-0',
                 'opacity-0',
                 'pointer-events-none',
@@ -45,7 +45,12 @@ export function HashLinkButton(props: {
             <Link
                 href={`#${id}`}
                 aria-label={label}
-                className={tcls('inline-flex h-full items-center', textStyle.lineHeight)}
+                className={tcls(
+                    'inline-flex items-center',
+                    'p-1',
+                    'pointer-fine:h-full pointer-fine:p-0',
+                    textStyle.lineHeight
+                )}
             >
                 <Icon
                     icon="hashtag"
