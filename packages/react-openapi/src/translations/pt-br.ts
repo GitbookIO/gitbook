@@ -45,5 +45,8 @@ export const pt_br = {
     or: 'ou',
     and: 'e',
     possible_values: 'Valores possíveis',
+    code_sample_custom: 'Linguagem personalizada',
+    code_sample_custom_description: 'Reescrever com ${1}',
+    code_sample_rewrite_prompt: 'Reescreva isto na seguinte linguagem: ',
     direct_link_to_model: 'Link direto para ${1}',
 };
