@@ -197,9 +197,8 @@ export function EmbeddableIframeTabs(props: {
     active?: string;
     baseURL: string;
     siteTitle: string;
-    onNavigate?: (href: string) => void;
 }) {
-    const { ref, active = 'assistant', baseURL, siteTitle, onNavigate } = props;
+    const { ref, active = 'assistant', baseURL, siteTitle } = props;
     const actions = useEmbeddableConfiguration((state) => state.actions);
     const tabs = useEmbeddableTabs();
 
@@ -262,10 +261,6 @@ export function EmbeddableIframeTabs(props: {
                     className="not-hydrated:animate-blur-in-slow [&_.button-leading-icon]:size-5"
                     iconOnly
                     onClick={() => {
-                        if (tab.key !== active && onNavigate) {
-                            onNavigate(tab.href);
-                            return;
-                        }
                         router.push(tab.href);
                     }}
                     tooltipProps={{
@@ -279,8 +274,7 @@ export function EmbeddableIframeTabs(props: {
     ) : null;
 }
 
-export function EmbeddableIframeCloseButton(props: { onClose?: () => void }) {
-    const { onClose } = props;
+export function EmbeddableIframeCloseButton() {
     const { closeButton } = useEmbeddableConfiguration();
 
     if (!closeButton) {
@@ -297,7 +291,6 @@ export function EmbeddableIframeCloseButton(props: { onClose?: () => void }) {
                 className="not-hydrated:animate-blur-in-slow [&_.button-leading-icon]:size-5"
                 iconOnly
                 onClick={() => {
-                    onClose?.();
                     getChannel()?.send({ type: 'close' });
                 }}
                 tooltipProps={{

@@ -50,7 +50,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
         fetching: boolean;
         cursor: number | null;
         error: boolean;
-        onResultSelect?: (result: ResultType) => void;
+        onResultSelect?: () => void;
     },
     ref: React.Ref<SearchResultsRef>
 ) {
@@ -211,7 +211,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
                                         addRecentSearchQuery(siteSpaceId, query, 'search');
                                     }
 
-                                    onResultSelect?.(item);
+                                    onResultSelect?.();
                                 };
                                 const resultItemProps = {
                                     'aria-posinset': index + 1,

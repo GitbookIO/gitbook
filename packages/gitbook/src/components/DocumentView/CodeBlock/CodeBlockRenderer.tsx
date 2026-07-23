@@ -19,6 +19,7 @@ type CodeBlockRendererProps = Pick<BlockProps<DocumentBlockCode>, 'block' | 'sty
      * When true, the "Ask AI" button is not rendered.
      */
     isPrint?: boolean;
+    embedded?: boolean;
 };
 
 /**
@@ -28,11 +29,12 @@ export const CodeBlockRenderer = forwardRef(function CodeBlockRenderer(
     props: CodeBlockRendererProps,
     ref: React.ForwardedRef<HTMLDivElement>
 ) {
-    const { block, style, theme, 'aria-busy': ariaBusy, isPrint } = props;
+    const { block, style, theme, 'aria-busy': ariaBusy, isPrint, embedded } = props;
 
     const withLineNumbers = Boolean(block.data.lineNumbers) && block.nodes.length > 1;
     const withWrap = block.data.overflow === 'wrap';
     const title = block.data.title;
+    const withTitle = Boolean(title && !embedded);
     const isSingleLine = theme.lines.length <= 1 && !withWrap;
 
     const id = useId();
@@ -42,6 +44,7 @@ export const CodeBlockRenderer = forwardRef(function CodeBlockRenderer(
     So we parse the foreground & background into objects that can be passed into React's `style` prop. */
     const bg = parseShikiColorString(theme.bg);
     const fg = parseShikiColorString(theme.fg);
+    const codeBackground = embedded ? undefined : bg;
 
     return (
         <div
@@ -50,8 +53,10 @@ export const CodeBlockRenderer = forwardRef(function CodeBlockRenderer(
             aria-busy={ariaBusy}
             className={tcls(
                 'group/codeblock shiki relative flex shrink flex-col overflow-hidden print:overflow-visible',
-                'circular-corners:rounded-2xl rounded-corners:rounded-xl straight-corners:rounded-xs',
-                '[&:has([data-codeblock-focus]:focus)]:ring-2 [&:has([data-codeblock-focus]:focus)]:ring-primary-hover',
+                !embedded &&
+                    'circular-corners:rounded-2xl rounded-corners:rounded-xl straight-corners:rounded-xs',
+                !embedded &&
+                    '[&:has([data-codeblock-focus]:focus)]:ring-2 [&:has([data-codeblock-focus]:focus)]:ring-primary-hover',
                 style
             )}
             /* Sets the code theme's mode (light or dark) for the site's theme mode (light or dark).
@@ -65,7 +70,7 @@ export const CodeBlockRenderer = forwardRef(function CodeBlockRenderer(
                 className="pointer-events-none absolute size-0 outline-none"
             />
             <div className="flex items-center justify-start gap-2 text-sm">
-                {title ? (
+                {withTitle ? (
                     <div
                         className="relative top-px z-20 inline-flex items-center justify-center circular-corners:rounded-t-xl rounded-corners:rounded-t-lg straight-corners:rounded-t-xs border border-tint-subtle border-b-0 bg-tint-subtle theme-bold-tint:bg-tint-base theme-muted:bg-tint-base px-3 py-2 text-tint text-xs leading-none tracking-wide contrast-more:border-tint contrast-more:bg-tint-base [html.theme-bold.sidebar-filled_&]:bg-tint-base"
                         style={{
@@ -80,31 +85,37 @@ export const CodeBlockRenderer = forwardRef(function CodeBlockRenderer(
                 ) : null}
             </div>
             <div className="relative flex min-h-0 flex-col">
-                <div
-                    className={tcls(
-                        'absolute right-2 z-2 flex items-center gap-1.5 font-sans leading-none opacity-0 group-hover/codeblock:opacity-11 has-[button:focus-visible]:opacity-11',
-                        isSingleLine ? 'inset-y-0' : 'top-2'
-                    )}
-                >
-                    {!isPrint ? (
-                        <AskAICodeButton
-                            codeId={codeId}
-                            title={title}
-                            syntax={block.data.syntax}
-                            style="backdrop-blur-md"
-                        />
-                    ) : null}
-                    <CopyCodeButton codeId={codeId} style="backdrop-blur-md" />
-                </div>
+                {!embedded ? (
+                    <div
+                        className={tcls(
+                            'absolute right-2 z-2 flex items-center gap-1.5 font-sans leading-none opacity-0 group-hover/codeblock:opacity-11 has-[button:focus-visible]:opacity-11',
+                            isSingleLine ? 'inset-y-0' : 'top-2'
+                        )}
+                    >
+                        {!isPrint ? (
+                            <AskAICodeButton
+                                codeId={codeId}
+                                title={title}
+                                syntax={block.data.syntax}
+                                style="backdrop-blur-md"
+                            />
+                        ) : null}
+                        <CopyCodeButton codeId={codeId} style="backdrop-blur-md" />
+                    </div>
+                ) : null}
                 <pre
                     className={tcls(
-                        'relative overflow-auto border border-tint-subtle bg-tint-subtle theme-bold-tint:bg-tint-base theme-muted:bg-tint-base py-2.5 text-tint-strong contrast-more:border-tint contrast-more:bg-tint-base print:overflow-visible',
-                        'circular-corners:rounded-2xl rounded-corners:rounded-xl straight-corners:rounded-xs depth-subtle:shadow-xs',
-                        title && 'rounded-ss-none!'
+                        'relative overflow-auto py-2.5 text-tint-strong print:overflow-visible',
+                        embedded
+                            ? 'bg-tint-base'
+                            : 'border border-tint-subtle bg-tint-subtle theme-bold-tint:bg-tint-base theme-muted:bg-tint-base contrast-more:border-tint contrast-more:bg-tint-base',
+                        !embedded &&
+                            'circular-corners:rounded-2xl rounded-corners:rounded-xl straight-corners:rounded-xs depth-subtle:shadow-xs',
+                        withTitle && 'rounded-ss-none!'
                     )}
                     style={{
-                        backgroundColor: bg?.color,
-                        ...bg?.vars,
+                        backgroundColor: codeBackground?.color,
+                        ...codeBackground?.vars,
                         color: fg?.color,
                         ...fg?.vars,
                     }}
@@ -118,7 +129,8 @@ export const CodeBlockRenderer = forwardRef(function CodeBlockRenderer(
                     >
                         {theme.lines.map((line, index) => (
                             <CodeHighlightLine
-                                bg={bg}
+                                bg={codeBackground}
+                                embedded={embedded}
                                 fg={fg}
                                 key={index}
                                 line={line}
@@ -136,11 +148,13 @@ export const CodeBlockRenderer = forwardRef(function CodeBlockRenderer(
 function CodeHighlightLine(props: {
     line: HighlightLine;
     bg?: ShikiColorDefinition;
+    embedded?: boolean;
     fg?: ShikiColorDefinition;
     isLast: boolean;
     withLineNumbers: boolean;
 }) {
-    const { line, isLast, withLineNumbers, bg, fg } = props;
+    const { line, isLast, withLineNumbers, bg, embedded, fg } = props;
+    const embeddedPlainLine = Boolean(embedded && !line.diff && !line.highlighted);
     const lineStyle = {
         color: fg?.color,
         ...fg?.vars,
@@ -151,6 +165,7 @@ function CodeHighlightLine(props: {
         <span
             className={tcls(
                 'highlight-line',
+                embeddedPlainLine && 'bg-transparent! hover:bg-tint-subtle!',
                 line.diff === 'added' && 'diff-added',
                 line.diff === 'deleted' && 'diff-deleted',
                 line.highlighted && 'highlighted'
