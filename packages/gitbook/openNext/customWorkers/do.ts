@@ -23,7 +23,7 @@ globalThis.openNextConfig = {
     dangerous: {
         enableCacheInterception: true,
     },
-}
+};
 
 const cacheEntryTypes = new Set<CacheEntryType>(['cache', 'fetch', 'composable']);
 

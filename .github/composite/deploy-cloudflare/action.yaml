@@ -66,9 +66,22 @@ runs:
           run: bun run turbo build:cloudflare
           env:
             GITBOOK_RUNTIME: cloudflare
+            VERCEL_TARGET_ENV: ${{ inputs.environment }}
             GITBOOK_BLOCK_SEARCH_INDEXATION: ${{ inputs.environment == 'preview' && 'true' || '' }}
             GITBOOK_ALLOW_CUSTOMIZATION_OVERRIDE: ${{ inputs.environment == 'preview' && 'true' || '' }}
           shell: bash
+
+        - id: extract_deployment_id
+          name: Extract Next deployment ID
+          shell: bash
+          run: |
+              deployment_id=$(bun -e '
+                  const buildOutput = await Bun.file("packages/gitbook/.open-next/server-functions/default/packages/gitbook/.next/required-server-files.json").json();
+                  const deploymentId = buildOutput.config?.deploymentId;
+                  if (!deploymentId) throw new Error("Next build did not emit a deployment ID");
+                  console.log(deploymentId);
+              ')
+              echo "deployment_id=$deployment_id" >> $GITHUB_OUTPUT
 
         - name: Upload the DO worker
           uses: cloudflare/wrangler-action@v3.14.0
@@ -78,7 +91,7 @@ runs:
               workingDirectory: ./
               wranglerVersion: '4.43.0'
               environment: ${{ inputs.environment }}
-              command: deploy --config ./packages/gitbook/openNext/customWorkers/doWrangler.jsonc
+              command: ${{ format('deploy --var OPEN_NEXT_BUILD_ID:{0} --config ./packages/gitbook/openNext/customWorkers/doWrangler.jsonc', steps.extract_deployment_id.outputs.deployment_id) }}
 
         - id: upload_server
           name: Upload server to Cloudflare

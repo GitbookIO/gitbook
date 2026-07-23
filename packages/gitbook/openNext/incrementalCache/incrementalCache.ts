@@ -129,7 +129,8 @@ export class GitbookIncrementalCache implements IncrementalCache {
         }
 
         const hash = createHash('sha256').update(key).digest('hex');
-        return `${DEFAULT_PREFIX}/${cacheType === 'cache' ? process.env?.NEXT_BUILD_ID : 'dataCache'}/${hash}.${cacheType}`.replace(
+        const buildId = process.env.OPEN_NEXT_BUILD_ID ?? process.env.DEPLOYMENT_ID;
+        return `${DEFAULT_PREFIX}/${cacheType === 'cache' ? buildId : 'dataCache'}/${hash}.${cacheType}`.replace(
             /\/+/g,
             '/'
         );
