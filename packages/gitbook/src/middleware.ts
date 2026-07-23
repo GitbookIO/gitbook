@@ -26,7 +26,7 @@ import {
     normalizeRequestURL,
     throwIfDataError,
 } from '@/lib/data';
-import { GITBOOK_OAUTH_SERVER_URL, isGitBookAssetsHostURL, isGitBookHostURL } from '@/lib/env';
+import { isGitBookAssetsHostURL, isGitBookHostURL } from '@/lib/env';
 import { getImageResizingContextId } from '@/lib/images';
 import { MiddlewareHeaders } from '@/lib/middleware';
 import {
@@ -41,7 +41,6 @@ import {
     getPreviewRequestIdentifier,
     isPreviewRequest,
 } from '@/lib/preview';
-import { shouldRenderSiteOAuthConsent } from '@/lib/site-oauth/flag';
 import {
     type ResponseCookies,
     getPathScopedCookieName,
@@ -189,35 +188,6 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
     // Handler that returns visitor data for the app to consume.
     if (siteRequestURL.pathname.endsWith('/~gitbook/visitor')) {
         return serveVisitorClaimsDataRequest(request, siteRequestURL);
-    }
-
-    // Handler that forwards redirections from upstream auth provider during a site's OAuth /authorize session
-    // back to the site's OAuth server.
-    const oauthServerURL = new URL(GITBOOK_OAUTH_SERVER_URL);
-    const siteOAuthAuthorizeMatch = new URLPattern({
-        pathname: `*/~gitbook/${oauthServerURL.pathname.substring(1)}/:siteId/authorize`,
-    }).exec(siteRequestURL.toString());
-
-    // TODO-RND-12161: Clean this up once the consent flow is fully shipped (drop this legacy
-    // forward — GBO should then always render consent for these resumes).
-    if (siteOAuthAuthorizeMatch) {
-        const siteId = siteOAuthAuthorizeMatch.pathname.groups.siteId;
-
-        // When the OAuth server has consent enabled, it stamps the post-login resume URL with a signed
-        // `gb_consent` marker. If it verifies, GBO renders the consent screen by falling through to the
-        // normal site consent page routing.
-        //
-        // Otherwise (no marker or it fails verification) we forward to the OAuth server as before.
-        const renderConsent = await shouldRenderSiteOAuthConsent(
-            siteId,
-            siteRequestURL.searchParams
-        );
-        if (!renderConsent) {
-            const siteOAuthAuthorizeURL = new URL(oauthServerURL);
-            siteOAuthAuthorizeURL.pathname += `/${siteId}/authorize`;
-            siteOAuthAuthorizeURL.search = siteOAuthAuthorizeMatch.search.input.replace('?', '');
-            return NextResponse.redirect(siteOAuthAuthorizeURL.toString());
-        }
     }
 
     //

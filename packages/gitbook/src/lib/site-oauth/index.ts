@@ -4,13 +4,6 @@ import { createHmac } from 'node:crypto';
 
 import { GITBOOK_OAUTH_SERVER_URL, GITBOOK_SITE_OAUTH_SIGNING_SECRET } from '@/lib/env';
 
-export {
-    SITE_OAUTH_CONSENT_PARAM,
-    SITE_OAUTH_STATE_PARAM,
-    shouldRenderSiteOAuthConsent,
-    verifySiteOAuthConsentMarker,
-} from './flag';
-
 /**
  * Details about the OAuth client requesting authorization, as returned by the OAuth server. The
  * `name` and `uri` are client-supplied and must be treated as untrusted when rendered.

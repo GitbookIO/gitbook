@@ -8,11 +8,7 @@ import {
 } from '@/app/utils';
 import { ConsentError, ConsentScreen } from '@/components/SiteOAuthConsent';
 import { withLeadingSlash, withTrailingSlash } from '@/lib/paths';
-import {
-    SiteOAuthConsentError,
-    startSiteOAuthConsent,
-    verifySiteOAuthConsentMarker,
-} from '@/lib/site-oauth';
+import { SiteOAuthConsentError, startSiteOAuthConsent } from '@/lib/site-oauth';
 import { getVisitorToken } from '@/lib/visitors';
 
 // The consent screen depends on the request (visitor, one-time interaction) and must never be cached.
@@ -25,18 +21,14 @@ type PageParams = RouteLayoutParams & { siteId: string };
  */
 export default async function Page(props: {
     params: Promise<PageParams>;
-    searchParams: Promise<{ gb_oauth_state?: string; gb_consent?: string }>;
+    searchParams: Promise<{ gb_oauth_state?: string }>;
 }) {
     const params = await props.params;
     const searchParams = await props.searchParams;
     const { siteId } = params;
 
-    const consentVerified = await verifySiteOAuthConsentMarker({
-        siteId,
-        interactionId: searchParams.gb_oauth_state,
-        signature: searchParams.gb_consent,
-    });
-    if (!consentVerified) {
+    // Only a post-login resume (carrying the interaction id) legitimately reaches this route.
+    if (!searchParams.gb_oauth_state) {
         notFound();
     }
 
