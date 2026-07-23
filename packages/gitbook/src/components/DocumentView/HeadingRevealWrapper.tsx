@@ -55,7 +55,7 @@ function setRevealedId(id: string | null) {
 
 /**
  * Wraps a heading tag with tap-to-reveal state for its anchor-link icon on
- * coarse-pointer (touch) devices, where hover isn't available to reveal it.
+ * touch devices, where hover isn't available to reveal it.
  * Only one heading can be revealed at a time, and tapping outside of any
  * heading clears it.
  */
@@ -69,8 +69,8 @@ export function HeadingRevealWrapper(props: {
     const currentRevealedId = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
     const revealed = currentRevealedId === id;
 
-    const handleClick = (event: React.MouseEvent<HTMLElement>) => {
-        if (window.matchMedia('(pointer: fine)').matches) {
+    const handlePointerUp = (event: React.PointerEvent<HTMLElement>) => {
+        if (event.pointerType === 'mouse' && window.matchMedia('(hover: hover)').matches) {
             return;
         }
 
@@ -88,8 +88,7 @@ export function HeadingRevealWrapper(props: {
         <Tag
             id={id}
             className={tcls(className, revealed && 'hash-revealed')}
-            onClick={handleClick}
-            data-pdf-heading
+            onPointerUp={handlePointerUp}
             {...{ [HEADING_ATTR]: true }}
             {...rest}
         >

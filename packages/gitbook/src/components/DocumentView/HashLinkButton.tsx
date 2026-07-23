@@ -19,6 +19,7 @@ export function HashLinkButton(props: {
 }) {
     const { id, block, className, iconClassName, label } = props;
     const textStyle = getBlockTextStyle(block);
+
     return (
         <span
             className={tcls(
@@ -29,21 +30,22 @@ export function HashLinkButton(props: {
                 'h-[1em]',
                 'border-0',
                 'opacity-0',
+                'pointer-events-none',
                 'site-background',
                 'rounded',
                 'transition-opacity',
+                'pointer-fine:pointer-events-auto',
                 'pointer-fine:group-hover/hash:opacity-100',
                 'pointer-fine:group-focus-within/hash:opacity-100',
-                'not-pointer-fine:pointer-events-none',
-                'not-pointer-fine:[.hash-revealed_&]:opacity-100',
-                'not-pointer-fine:[.hash-revealed_&]:pointer-events-auto',
+                '[.hash-revealed_&]:opacity-100',
+                '[.hash-revealed_&]:pointer-events-auto',
                 className
             )}
         >
             <Link
                 href={`#${id}`}
                 aria-label={label}
-                className={tcls('inline-flex h-full items-start', textStyle.lineHeight)}
+                className={tcls('inline-flex h-full items-center', textStyle.lineHeight)}
             >
                 <Icon
                     icon="hashtag"
@@ -56,8 +58,8 @@ export function HashLinkButton(props: {
                         'contrast-more:pointer-fine:group-hover/hash:text-tint-strong',
                         'pointer-fine:group-focus-within/hash:text-tint-subtle',
                         'contrast-more:pointer-fine:group-focus-within/hash:text-tint-strong',
-                        'not-pointer-fine:[.hash-revealed_&]:text-tint-subtle',
-                        'contrast-more:not-pointer-fine:[.hash-revealed_&]:text-tint-strong',
+                        '[.hash-revealed_&]:text-tint-subtle',
+                        'contrast-more:[.hash-revealed_&]:text-tint-strong',
                         iconClassName
                     )}
                 />
