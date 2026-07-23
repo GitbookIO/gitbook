@@ -365,7 +365,7 @@ export async function handleMcpRequest(
                     pageUrl: z
                         .string()
                         .describe(
-                            `The full URL of the page the issue is about (e.g. ${siteUrl}/getting-started). Provide it whenever you can so the finding is linked to the exact page.`
+                            `The full URL of the page the issue is about (e.g. ${siteUrl}/getting-started), so the finding is linked to the exact page.`
                         )
                         .transform((value, ctx) => {
                             const candidate = URL.canParse(value)
@@ -386,8 +386,13 @@ export async function handleMcpRequest(
                             }
 
                             return candidate.toString();
-                        })
-                        .optional(),
+                        }),
+                    goal: z
+                        .string()
+                        .optional()
+                        .describe(
+                            'The broader end goal you were ultimately trying to accomplish (as/on behalf of the user) when you hit this issue. Gives the team the context you were working towards. Optional.'
+                        ),
                 },
                 {
                     title: 'Send feedback',
@@ -396,46 +401,32 @@ export async function handleMcpRequest(
                     idempotentHint: false,
                     openWorldHint: true,
                 },
-                async ({ category, content, pageUrl }) => {
+                async ({ category, content, pageUrl, goal }) => {
                     try {
-                        let pageLocation:
-                            | { page: string; space: string; revision: string }
-                            | undefined;
-
-                        if (pageUrl) {
-                            const match = findSiteSpaceByUrl(context.structure, pageUrl);
-                            if (!match) {
-                                return {
-                                    content: [
-                                        { type: 'text', text: `Page not found: "${pageUrl}"` },
-                                    ],
-                                    isError: true,
-                                };
-                            }
-
-                            const revision = await throwIfDataError(
-                                dataFetcher.getRevision({
-                                    spaceId: match.siteSpace.space.id,
-                                    revisionId: match.siteSpace.space.revision,
-                                })
-                            );
-
-                            const resolved = resolvePagePath(revision.pages, match.pagePath ?? '');
-                            if (!resolved) {
-                                return {
-                                    content: [
-                                        { type: 'text', text: `Page not found: "${pageUrl}"` },
-                                    ],
-                                    isError: true,
-                                };
-                            }
-
-                            pageLocation = {
-                                page: resolved.page.id,
-                                space: match.siteSpace.space.id,
-                                revision: match.siteSpace.space.revision,
+                        const match = findSiteSpaceByUrl(context.structure, pageUrl);
+                        if (!match) {
+                            return {
+                                content: [{ type: 'text', text: `Page not found: "${pageUrl}"` }],
+                                isError: true,
                             };
                         }
+
+                        const revision = await throwIfDataError(
+                            dataFetcher.getRevision({
+                                spaceId: match.siteSpace.space.id,
+                                revisionId: match.siteSpace.space.revision,
+                            })
+                        );
+
+                        const resolved = resolvePagePath(revision.pages, match.pagePath ?? '');
+                        if (!resolved) {
+                            return {
+                                content: [{ type: 'text', text: `Page not found: "${pageUrl}"` }],
+                                isError: true,
+                            };
+                        }
+
+                        const trimmedGoal = goal?.trim() || undefined;
 
                         trackMcpEvent({
                             organizationId: context.organizationId,
@@ -446,12 +437,27 @@ export async function handleMcpRequest(
                                     feedback: { content, category },
                                     location: {
                                         displayContext: SiteInsightsDisplayContext.Mcp,
-                                        ...pageLocation,
+                                        page: resolved.page.id,
+                                        space: match.siteSpace.space.id,
+                                        revision: match.siteSpace.space.revision,
                                     },
                                 },
                             ],
                             request,
                         });
+
+                        const apiClient = await dataFetcher.api();
+                        await apiClient.orgs.submitSiteAgentFeedback(
+                            context.organizationId,
+                            site.id,
+                            {
+                                feedback: content,
+                                url: pageUrl,
+                                spaceId: match.siteSpace.space.id,
+                                pageId: resolved.page.id,
+                                ...(trimmedGoal ? { goal: trimmedGoal } : {}),
+                            }
+                        );
 
                         return {
                             content: [{ type: 'text', text: 'Feedback recorded. Thank you.' }],
