@@ -168,7 +168,6 @@
         "next": "^16.2.11",
         "next-themes": "^0.4.6",
         "nuqs": "^2.2.3",
-        "object-hash": "^3.0.0",
         "object-identity": "^0.1.2",
         "openapi-types": "^12.1.3",
         "p-map": "^7.0.3",
@@ -211,7 +210,6 @@
         "@types/mdast": "^4.0.4",
         "@types/negotiator": "^0.6.4",
         "@types/node": "^20",
-        "@types/object-hash": "^3.0.6",
         "@types/parse-cache-control": "^1.0.4",
         "@types/react": "19.2.14",
         "@types/react-dom": "19.2.3",
@@ -296,7 +294,6 @@
       "dependencies": {
         "katex": "^0.16.25",
         "mathjax": "^3.2.2",
-        "object-hash": "^3.0.0",
       },
       "devDependencies": {
         "@types/katex": "^0.16.7",
@@ -1707,8 +1704,6 @@
     "@types/node": ["@types/node@20.19.1", "", { "dependencies": { "undici-types": "~6.21.0" } }, "sha512-jJD50LtlD2dodAEO653i3YF04NWak6jN3ky+Ri3Em3mGR39/glWiboM/IePaRbgwSfqM1TpGXfAg8ohn/4dTgA=="],
 
     "@types/node-fetch": ["@types/node-fetch@2.6.12", "", { "dependencies": { "@types/node": "*", "form-data": "^4.0.0" } }, "sha512-8nneRWKCg3rMtF69nLQJnOYUcbafYeFSjqkw3jCRLsqkWFlHaoQrr5mXmofFGOx3DKn7UfmBMyov8ySvLRVldA=="],
-
-    "@types/object-hash": ["@types/object-hash@3.0.6", "", {}, "sha512-fOBV8C1FIu2ELinoILQ+ApxcUKz4ngq+IWUYrxSGjXzzjUALijilampwkMgEtJ+h2njAW3pi853QpzNVCHB73w=="],
 
     "@types/parse-cache-control": ["@types/parse-cache-control@1.0.4", "", {}, "sha512-YA9hcvRn3oYBdLK0PdWRsw5ehrqmfdCwfz68sSAxi2OB6L7B3jJEhrqlLfMvxnWfsZcUdbR6QI6NfkY1Y4e2zg=="],
 
