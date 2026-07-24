@@ -1,8 +1,4 @@
-import {
-    CustomizationPageActionType,
-    SiteFindingType,
-    SiteInsightsDisplayContext,
-} from '@gitbook/api';
+import { CustomizationPageActionType, SiteInsightsDisplayContext } from '@gitbook/api';
 
 import { type RouteLayoutParams, getDynamicSiteContext } from '@/app/utils';
 import { isAIEnabled } from '@/components/utils/isAIChatEnabled';
@@ -350,11 +346,6 @@ export async function handleMcpRequest(
                 'sendFeedback',
                 `Report an issue in the documentation of ${site.title} so the team can fix it. Use it whenever, while helping a user, you come across content that is outdated, contradictory, missing information, or otherwise unhelpful. Also use it when the user themselves reports a problem with the docs, even if you could not verify it yourself. If it's your own observation, do a quick sanity check that the issue is real before reporting — no need to exhaustively re-read the page. Send one call per distinct issue and do not report the same issue twice in a conversation. Do not use this tool to confirm that a page is accurate; it is for reporting problems only.`,
                 {
-                    category: z
-                        .nativeEnum(SiteFindingType)
-                        .describe(
-                            'The kind of issue. "content-outdated": the content was correct at some point but no longer matches the current product or reality. "incoherence": the content contradicts itself or another page. "content-gap": information the reader needs is missing entirely, whether or not it was ever documented. "other": only as a last resort when none of the above fits.'
-                        ),
                     content: z
                         .string()
                         .min(1)
@@ -401,7 +392,7 @@ export async function handleMcpRequest(
                     idempotentHint: false,
                     openWorldHint: true,
                 },
-                async ({ category, content, pageUrl, goal }) => {
+                async ({ content, pageUrl, goal }) => {
                     try {
                         const match = findSiteSpaceByUrl(context.structure, pageUrl);
                         if (!match) {
@@ -428,23 +419,24 @@ export async function handleMcpRequest(
 
                         const trimmedGoal = goal?.trim() || undefined;
 
-                        trackMcpEvent({
-                            organizationId: context.organizationId,
-                            siteId: site.id,
-                            events: [
-                                {
-                                    type: 'agent_feedback',
-                                    feedback: { content, category },
-                                    location: {
-                                        displayContext: SiteInsightsDisplayContext.Mcp,
-                                        page: resolved.page.id,
-                                        space: match.siteSpace.space.id,
-                                        revision: match.siteSpace.space.revision,
-                                    },
-                                },
-                            ],
-                            request,
-                        });
+                        //!! DISABLED FOR NOW: We'll add this back in when we have a way to track agent feedback.
+                        // trackMcpEvent({
+                        //     organizationId: context.organizationId,
+                        //     siteId: site.id,
+                        //     events: [
+                        //         {
+                        //             type: 'agent_feedback',
+                        //             feedback: { content, category },
+                        //             location: {
+                        //                 displayContext: SiteInsightsDisplayContext.Mcp,
+                        //                 page: resolved.page.id,
+                        //                 space: match.siteSpace.space.id,
+                        //                 revision: match.siteSpace.space.revision,
+                        //             },
+                        //         },
+                        //     ],
+                        //     request,
+                        // });
 
                         const apiClient = await dataFetcher.api();
                         await apiClient.orgs.submitSiteAgentFeedback(
