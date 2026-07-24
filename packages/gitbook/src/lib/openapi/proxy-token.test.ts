@@ -11,32 +11,39 @@ const { buildSignedProxyUrl, isAllowedByOrigins, verifyProxyRequest } = await im
 
 describe('buildSignedProxyUrl', () => {
     it('returns null for empty hosts', () => {
-        expect(buildSignedProxyUrl('http://localhost/proxy', [])).toBeNull();
+        expect(buildSignedProxyUrl('http://localhost/proxy', [], 'site_1')).toBeNull();
     });
 
-    it('builds a URL with allowed_origin and token params', () => {
-        const result = buildSignedProxyUrl('http://localhost/proxy', ['api.example.com']);
+    it('returns null when no site id is provided', () => {
+        expect(buildSignedProxyUrl('http://localhost/proxy', ['api.example.com'], '')).toBeNull();
+    });
+
+    it('builds a URL with allowed_origin, site_id and token params', () => {
+        const result = buildSignedProxyUrl('http://localhost/proxy', ['api.example.com'], 'site_1');
         expect(result).not.toBeNull();
 
         // biome-ignore lint/style/noNonNullAssertion: test assertion
         const url = new URL(result!);
         expect(url.searchParams.getAll('allowed_origin')).toEqual(['api.example.com']);
+        expect(url.searchParams.get('site_id')).toBe('site_1');
         expect(url.searchParams.get('token')).toBeTruthy();
     });
 
     it('appends params with & when base URL already has query params', () => {
-        const result = buildSignedProxyUrl('http://localhost/proxy?existing=1', [
-            'api.example.com',
-        ]);
+        const result = buildSignedProxyUrl(
+            'http://localhost/proxy?existing=1',
+            ['api.example.com'],
+            'site_1'
+        );
         expect(result).toContain('?existing=1&');
     });
 
     it('deduplicates and sorts hosts', () => {
-        const result = buildSignedProxyUrl('http://localhost/proxy', [
-            'b.example.com',
-            'a.example.com',
-            'b.example.com',
-        ]);
+        const result = buildSignedProxyUrl(
+            'http://localhost/proxy',
+            ['b.example.com', 'a.example.com', 'b.example.com'],
+            'site_1'
+        );
         // biome-ignore lint/style/noNonNullAssertion: test assertion
         const url = new URL(result!);
         expect(url.searchParams.getAll('allowed_origin')).toEqual([
@@ -59,6 +66,7 @@ describe('verifyProxyRequest', () => {
     it('rejects when token is invalid', () => {
         const params = new URLSearchParams();
         params.set('allowed_origin', 'api.example.com');
+        params.set('site_id', 'site_1');
         params.set('token', 'invalid-token');
         const result = verifyProxyRequest(params, 'https://api.example.com/v1/users');
         expect(result.allowed).toBe(false);
@@ -69,7 +77,7 @@ describe('verifyProxyRequest', () => {
 
     it('rejects when target is not in the allowed origins', () => {
         // biome-ignore lint/style/noNonNullAssertion: test assertion
-        const signed = buildSignedProxyUrl('http://localhost/proxy', ['api.example.com'])!;
+        const signed = buildSignedProxyUrl('http://localhost/proxy', ['api.example.com'], 'site_1')!;
         const params = new URL(signed).searchParams;
         const result = verifyProxyRequest(params, 'https://evil.com/hack');
         expect(result.allowed).toBe(false);
@@ -80,7 +88,7 @@ describe('verifyProxyRequest', () => {
 
     it('allows when token is valid and host matches', () => {
         // biome-ignore lint/style/noNonNullAssertion: test assertion
-        const signed = buildSignedProxyUrl('http://localhost/proxy', ['api.example.com'])!;
+        const signed = buildSignedProxyUrl('http://localhost/proxy', ['api.example.com'], 'site_1')!;
         const params = new URL(signed).searchParams;
         const result = verifyProxyRequest(params, 'https://api.example.com/v1/users');
         expect(result.allowed).toBe(true);
@@ -91,7 +99,7 @@ describe('verifyProxyRequest', () => {
 
     it('allows any protocol on an allowed host', () => {
         // biome-ignore lint/style/noNonNullAssertion: test assertion
-        const signed = buildSignedProxyUrl('http://localhost/proxy', ['api.example.com'])!;
+        const signed = buildSignedProxyUrl('http://localhost/proxy', ['api.example.com'], 'site_1')!;
         const params = new URL(signed).searchParams;
         expect(verifyProxyRequest(params, 'https://api.example.com/path').allowed).toBe(true);
         expect(verifyProxyRequest(params, 'http://api.example.com/path').allowed).toBe(true);
@@ -100,7 +108,7 @@ describe('verifyProxyRequest', () => {
     it('supports multiple allowed hosts', () => {
         const hosts = ['api.example.com', 'cdn.example.com'];
         // biome-ignore lint/style/noNonNullAssertion: test assertion
-        const signed = buildSignedProxyUrl('http://localhost/proxy', hosts)!;
+        const signed = buildSignedProxyUrl('http://localhost/proxy', hosts, 'site_1')!;
         const params = new URL(signed).searchParams;
 
         expect(verifyProxyRequest(params, 'https://api.example.com/v1').allowed).toBe(true);
@@ -110,7 +118,7 @@ describe('verifyProxyRequest', () => {
 
     it('rejects a forged token with tampered hosts', () => {
         // biome-ignore lint/style/noNonNullAssertion: test assertion
-        const signed = buildSignedProxyUrl('http://localhost/proxy', ['api.example.com'])!;
+        const signed = buildSignedProxyUrl('http://localhost/proxy', ['api.example.com'], 'site_1')!;
         const url = new URL(signed);
 
         // Tamper with the allowed origins but keep the original token
@@ -126,7 +134,11 @@ describe('verifyProxyRequest', () => {
 
     it('checks path prefix when origin includes a path', () => {
         // biome-ignore lint/style/noNonNullAssertion: test assertion
-        const signed = buildSignedProxyUrl('http://localhost/proxy', ['api.example.com/v1'])!;
+        const signed = buildSignedProxyUrl(
+            'http://localhost/proxy',
+            ['api.example.com/v1'],
+            'site_1'
+        )!;
         const params = new URL(signed).searchParams;
 
         expect(verifyProxyRequest(params, 'https://api.example.com/v1').allowed).toBe(true);
@@ -138,7 +150,7 @@ describe('verifyProxyRequest', () => {
 
     it('rejects a hostname-suffix confusion target', () => {
         // biome-ignore lint/style/noNonNullAssertion: test assertion
-        const signed = buildSignedProxyUrl('http://localhost/proxy', ['api.nansen.ai'])!;
+        const signed = buildSignedProxyUrl('http://localhost/proxy', ['api.nansen.ai'], 'site_1')!;
         const params = new URL(signed).searchParams;
 
         expect(verifyProxyRequest(params, 'https://api.nansen.ai/v1').allowed).toBe(true);
@@ -181,13 +193,16 @@ describe('verifyProxyRequest', () => {
         }
     });
 
-    it('returns null site id when none was signed', () => {
+    it('rejects when no site id is present', () => {
         // biome-ignore lint/style/noNonNullAssertion: test assertion
-        const signed = buildSignedProxyUrl('http://localhost/proxy', ['api.example.com'])!;
-        const result = verifyProxyRequest(new URL(signed).searchParams, 'https://api.example.com');
-        expect(result.allowed).toBe(true);
-        if (result.allowed) {
-            expect(result.siteId).toBeNull();
+        const signed = buildSignedProxyUrl('http://localhost/proxy', ['api.example.com'], 'site_1')!;
+        const url = new URL(signed);
+        url.searchParams.delete('site_id');
+
+        const result = verifyProxyRequest(url.searchParams, 'https://api.example.com');
+        expect(result.allowed).toBe(false);
+        if (!result.allowed) {
+            expect(result.reason).toBe('Missing proxy authorization token');
         }
     });
 });

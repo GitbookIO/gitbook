@@ -25,14 +25,15 @@ function verifySignature(siteId: string, origins: string[], signature: string): 
 export function buildSignedProxyUrl(
     baseProxyUrl: string,
     allowedOrigins: string[],
-    siteId?: string
+    siteId: string
 ): string | null {
     const origins = deduplicateAndSort(allowedOrigins);
-    if (origins.length === 0) {
+    // A proxied request must be attributable to a site, so never issue a token without one.
+    if (origins.length === 0 || !siteId) {
         return null;
     }
 
-    const signature = signProxyToken(siteId ?? '', origins);
+    const signature = signProxyToken(siteId, origins);
     if (!signature) {
         return null;
     }
@@ -41,9 +42,7 @@ export function buildSignedProxyUrl(
     for (const origin of origins) {
         url.searchParams.append('allowed_origin', origin);
     }
-    if (siteId) {
-        url.searchParams.set('site_id', siteId);
-    }
+    url.searchParams.set('site_id', siteId);
     url.searchParams.set('token', signature);
 
     return url.toString();
@@ -57,7 +56,7 @@ export function verifyProxyRequest(
     searchParams: URLSearchParams,
     targetUrl: string
 ):
-    | { allowed: true; allowedOrigins: string[]; siteId: string | null }
+    | { allowed: true; allowedOrigins: string[]; siteId: string }
     | { allowed: false; reason: string } {
     if (!GITBOOK_SECRET) {
         return { allowed: false, reason: 'Proxy is disabled: no signing key configured' };
@@ -65,10 +64,11 @@ export function verifyProxyRequest(
 
     const allowedOrigins = searchParams.getAll('allowed_origin');
     const token = searchParams.get('token');
-    // Signed into the token, so it can't be forged to blame another site; used for attribution.
-    const siteId = searchParams.get('site_id') ?? '';
+    // Signed into the token (so it can't be forged) and required — every proxied request must be
+    // attributable to its issuing site.
+    const siteId = searchParams.get('site_id');
 
-    if (allowedOrigins.length === 0 || !token) {
+    if (allowedOrigins.length === 0 || !token || !siteId) {
         return { allowed: false, reason: 'Missing proxy authorization token' };
     }
 
@@ -85,7 +85,7 @@ export function verifyProxyRequest(
         };
     }
 
-    return { allowed: true, allowedOrigins: sorted, siteId: siteId || null };
+    return { allowed: true, allowedOrigins: sorted, siteId };
 }
 
 // Match by canonical host (+ port) and path boundary, never a raw prefix — else

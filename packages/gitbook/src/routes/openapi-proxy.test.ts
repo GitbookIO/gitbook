@@ -23,7 +23,7 @@ const originalFetch = globalThis.fetch;
 function signedProxyUrl(targetUrl: string, extraHosts?: string[]): string {
     const hostname = new URL(targetUrl).hostname;
     const hosts = [hostname, ...(extraHosts ?? [])];
-    const signed = buildSignedProxyUrl('http://localhost/~scalar/proxy', hosts);
+    const signed = buildSignedProxyUrl('http://localhost/~scalar/proxy', hosts, 'site_1');
     return `${signed}&scalar_url=${encodeURIComponent(targetUrl)}`;
 }
 
@@ -120,14 +120,18 @@ describe('handleOpenAPIProxyRequest', () => {
     it('returns 403 when token is invalid', async () => {
         const res = await handleOpenAPIProxyRequest(
             createRequest(
-                'http://localhost/~scalar/proxy?scalar_url=https://api.example.com&allowed_origin=api.example.com&token=bad-token'
+                'http://localhost/~scalar/proxy?scalar_url=https://api.example.com&allowed_origin=api.example.com&site_id=site_1&token=bad-token'
             )
         );
         await expectJsonError(res, 403, 'Invalid proxy authorization token');
     });
 
     it('returns 403 when target host is not in the allowed list', async () => {
-        const signed = buildSignedProxyUrl('http://localhost/~scalar/proxy', ['api.example.com']);
+        const signed = buildSignedProxyUrl(
+            'http://localhost/~scalar/proxy',
+            ['api.example.com'],
+            'site_1'
+        );
         const res = await handleOpenAPIProxyRequest(
             createRequest(`${signed}&scalar_url=${encodeURIComponent('https://evil.com/hack')}`)
         );

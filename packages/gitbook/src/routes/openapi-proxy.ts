@@ -189,9 +189,7 @@ export async function handleOpenAPIProxyRequest(request: NextRequest): Promise<R
 
     // siteId is signed into the token, so it attributes the request to its issuing site even
     // though the open-origin route has no live site context to verify it against.
-    const logger = getLogger().subLogger('openapi-proxy', {
-        labels: { siteId: siteId ?? 'unknown' },
-    });
+    const logger = getLogger().subLogger('openapi-proxy', { labels: { siteId } });
     logger.info(`proxying to ${parsedUrl.host}`);
 
     // Build forwarded headers
