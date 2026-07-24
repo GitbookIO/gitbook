@@ -1,5 +1,56 @@
 # gitbook
 
+## 0.28.0
+
+### Minor Changes
+
+- 3d37684: Add a carousel layout option to cards blocks, rendering them as a horizontally-scrolling, scroll-snapping row instead of a wrapping grid.
+- 89c4a0f: Add an `askQuestion` tool to the site MCP server. Alongside `searchDocumentation` and `getPage`, MCP clients can now ask a natural-language question and get a synthesized answer with links to the source pages, powered by the same AI search backend as the site's "ask a question" experience. The tool accepts an optional `goal` param so calling agents can attach the intent they're trying to accomplish, which tailors the answer and is tracked in analytics. The tool is only exposed on sites that have AI enabled.
+
+### Patch Changes
+
+- cef1870: Add an assistant tool to submit feedback about the current page on behalf of the user.
+- 49d35aa: Assistant: you can now send follow-up questions while an answer is still being written. Each one appears as your own message with a "Queued" badge (hover for when it will send, × to cancel), and they're sent automatically one at a time as each answer completes.
+- ae9367d: Assistant: the "Explored briefly" activity heading no longer appears when there's nothing to show. It now renders only when the answer is preceded by a real preamble or one or more tool calls, so a simple answer with an empty reasoning step no longer surfaces an empty collapsible.
+- 4e9071d: Fix the docs embed `navigateToPage` API on multi-space sites. Deep-linking to a page in a different space/section (e.g. `navigateToPage('/help-center/integrations')`) previously 404'd because the section base was not placed before `~gitbook/embed/page`. The target is now resolved to its space server-side, so pages in any space resolve correctly. The input accepts the page path, an absolute path, or the full published URL.
+- b5f3c14: Add configurable default visibility to Prompt block
+- a69a307: A near-white tint color (e.g. a warm `#F5F3EF`) is now taken as the exact page background, mirroring the existing behavior for near-black tints. The tint's exact lightness, hue and chroma are preserved, and the color is anchored to whichever scale step the active theme renders as the background — so it matches exactly on `muted` (which uses the second step) as well as `clean`. This applies only to near-neutral tints that are light enough to read as a background; saturated or merely light-ish colors keep their normal accent scale. The `bold` theme is unaffected: it already uses the tint for the header and stays intentionally two-tone.
+- 03bbacf: Add missing link reference to OpenAPI models
+- c41cf9c: Add cover image background mode and masks
+- 39156ee: Button blocks now respect the `size` option, so you can render small, medium, or large buttons.
+- bf674a4: Add an optional `context` property (string, up to 512 characters) to the `confirmation` of custom AI tools, shown above the confirmation dialog to help the user understand what they are approving or rejecting. The `confirmation` can now also be a function that receives the AI-provided input and returns the confirmation, so the context can be derived dynamically from the arguments the tool is about to run with. Available both to integrations (`GitBookIntegrationTool`) and to embed consumers (`GitBookToolDefinition`).
+- ccb9d7b: Submit `sendFeedback` MCP tool findings through the dedicated `submitSiteAgentFeedback` API endpoint. The `pageUrl` is now required and an optional `goal` can be provided.
+- 14562e9: Serve `X-Robots-Tag: noindex` on internal search/assistant URLs (`?q=` / `?ask=`) and stop disallowing them in robots.txt, so Google can crawl the directive and drop them from the index instead of reporting "Indexed, though blocked by robots.txt".
+- db176ba: Add an "On this page" table of contents on OpenAPI models pages. Each model in a grouped/multi-model "Models" section is now listed as its own section, matching operations and webhooks.
+- a9a52fe: Remove GBO's redundant re-selection of the best-scoring search section. The search API now returns a single highest-scoring section per page (and orders sections highest-score-first), so GBO no longer needs its own `getBestScoredResult` helper to pick the best section for the search and MCP previews. No user-visible change.
+- 597fe34: Sync the API reference responses selector with the "Responses" collapsibles, and keep the selected response in sync across every operation on the page (like the code sample language selector). Selecting a status code now expands the matching response section and applies to all operations at once.
+- e14609c: Fix a light/dark flash on published sites configured to respect the system default (no theme toggle). Such sites forced the `system` theme, but `next-themes`' pre-paint script applies a forced value verbatim without resolving `prefers-color-scheme`, so the page painted light and only switched to dark after hydration. We now leave the theme unforced when the default is `system` (only concrete light/dark themes are forced), letting `next-themes`' existing pre-paint script resolve the system preference before first paint.
+- 98b2df4: Add a `sendFeedback` MCP tool so AI agents can report documentation findings (outdated / incoherent / gap / other) as `agent_feedback` insights events. The tool only accepts finding categories, so it never records positive feedback.
+- 8e9a49d: Separate the prompt block actions into a primary "Open in" dropdown and a secondary "Copy prompt" button, instead of a single combined button group, and align the block's design with the expandable block (bordered frame, left disclosure chevron, and subtle elevation when expanded).
+- e73b182: Fix the docs embed widget shipping a stale script: declare the embed package's `standalone/` bundle as a Turbo build output. Because it wasn't declared, changes confined to the standalone widget (which compiles to `standalone/` but not `dist/`) didn't invalidate the downstream `generate` cache that copies it into the app, so the deployed widget could lag the source — e.g. the `clipboard-write` permission on the widget iframe never reached production, breaking the copy button in the Assistant embed.
+- 484cc11: Fix ScrollContainer scroll buttons not reflecting content overflow immediately or after dynamic content changes (e.g. search results).
+- ad3399b: Refine the per-paragraph AI ask button: shorten its tooltip to "Ask" (from "Ask <assistant> about this"), and hide it inside cards where it would otherwise be clipped by the card's overflow.
+- 703e654: Split the default-scope site search into two parallel API requests — one restricted to the current site space and one for the other site spaces — rendering each result set as soon as its response arrives. All results are ranked together by score, with the current site space scores boosted.
+- 57f3077: Keep the "On this page" and "Ask" buttons pinned below the header while scrolling on desktop API reference pages, so the page outline stays reachable throughout long operations.
+- 8676ad1: Hide unfocusable unlabelled button from screen readers
+- 6cf4278: Only show the "Back to [space]" shortcut for cross-space links in the table of contents, not for in-content text links or other ways of reaching another space.
+- 038008c: Fix heading anchor links being unreachable on touch devices by adding a tap-to-reveal state. The anchor icon now appears after the heading text without wrapping onto an orphan line while retaining its existing desktop placement. Use `pointerup` for the dismiss listener to fix unreliable dismissal on iOS Safari, and enlarge the anchor's touch tap target to a square 24px area (meeting the WCAG 2.5.8 minimum) so the icon stays centered instead of overflowing shorter headings' line height.
+- f3408ed: a11y screen reader fixes
+- cb92754: Let integration block webframes navigate the reader to another page in the site by posting a `@webframe.navigate` action with a `path` (and optional `anchor`). Resolved client-side against the site base path, so navigation stays in-site and drives the standard navigation progress bar.
+- 6083a88: Expose the current page (`id`, `path`, `title`) to integration block webframes through the client-only webframe `state.page`, alongside adaptive visitor claims.
+- cf94386: Fix an issue where certain keywords could cause an exception when rendering emojis
+- Updated dependencies [a69a307]
+- Updated dependencies [03bbacf]
+- Updated dependencies [bf674a4]
+- Updated dependencies [cb92754]
+- Updated dependencies [6083a88]
+  - @gitbook/colors@0.4.4
+  - @gitbook/openapi-parser@3.0.13
+  - @gitbook/react-openapi@1.5.16
+  - @gitbook/browser-types@0.1.6
+  - @gitbook/embed@0.5.2
+  - @gitbook/react-contentkit@0.7.17
+
 ## 0.27.2
 
 ### Patch Changes
