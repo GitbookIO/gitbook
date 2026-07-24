@@ -77,7 +77,11 @@ describe('verifyProxyRequest', () => {
 
     it('rejects when target is not in the allowed origins', () => {
         // biome-ignore lint/style/noNonNullAssertion: test assertion
-        const signed = buildSignedProxyUrl('http://localhost/proxy', ['api.example.com'], 'site_1')!;
+        const signed = buildSignedProxyUrl(
+            'http://localhost/proxy',
+            ['api.example.com'],
+            'site_1'
+        )!;
         const params = new URL(signed).searchParams;
         const result = verifyProxyRequest(params, 'https://evil.com/hack');
         expect(result.allowed).toBe(false);
@@ -88,7 +92,11 @@ describe('verifyProxyRequest', () => {
 
     it('allows when token is valid and host matches', () => {
         // biome-ignore lint/style/noNonNullAssertion: test assertion
-        const signed = buildSignedProxyUrl('http://localhost/proxy', ['api.example.com'], 'site_1')!;
+        const signed = buildSignedProxyUrl(
+            'http://localhost/proxy',
+            ['api.example.com'],
+            'site_1'
+        )!;
         const params = new URL(signed).searchParams;
         const result = verifyProxyRequest(params, 'https://api.example.com/v1/users');
         expect(result.allowed).toBe(true);
@@ -99,7 +107,11 @@ describe('verifyProxyRequest', () => {
 
     it('allows any protocol on an allowed host', () => {
         // biome-ignore lint/style/noNonNullAssertion: test assertion
-        const signed = buildSignedProxyUrl('http://localhost/proxy', ['api.example.com'], 'site_1')!;
+        const signed = buildSignedProxyUrl(
+            'http://localhost/proxy',
+            ['api.example.com'],
+            'site_1'
+        )!;
         const params = new URL(signed).searchParams;
         expect(verifyProxyRequest(params, 'https://api.example.com/path').allowed).toBe(true);
         expect(verifyProxyRequest(params, 'http://api.example.com/path').allowed).toBe(true);
@@ -118,7 +130,11 @@ describe('verifyProxyRequest', () => {
 
     it('rejects a forged token with tampered hosts', () => {
         // biome-ignore lint/style/noNonNullAssertion: test assertion
-        const signed = buildSignedProxyUrl('http://localhost/proxy', ['api.example.com'], 'site_1')!;
+        const signed = buildSignedProxyUrl(
+            'http://localhost/proxy',
+            ['api.example.com'],
+            'site_1'
+        )!;
         const url = new URL(signed);
 
         // Tamper with the allowed origins but keep the original token
@@ -195,7 +211,11 @@ describe('verifyProxyRequest', () => {
 
     it('rejects when no site id is present', () => {
         // biome-ignore lint/style/noNonNullAssertion: test assertion
-        const signed = buildSignedProxyUrl('http://localhost/proxy', ['api.example.com'], 'site_1')!;
+        const signed = buildSignedProxyUrl(
+            'http://localhost/proxy',
+            ['api.example.com'],
+            'site_1'
+        )!;
         const url = new URL(signed);
         url.searchParams.delete('site_id');
 
