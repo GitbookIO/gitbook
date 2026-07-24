@@ -1,24 +1,17 @@
 import { createHmac, timingSafeEqual } from 'node:crypto';
 import { GITBOOK_SECRET } from '@/lib/env/globals';
-import { extractOrigin } from '@gitbook/react-openapi';
 
-/**
- * Sign a list of allowed origins for the OpenAPI proxy.
- * Returns null if no signing key is available.
- */
-function signOrigins(origins: string[]): string | null {
+// Sign the allowed origins plus the issuing site id (for attribution). Null if no signing key.
+function signProxyToken(siteId: string, origins: string[]): string | null {
     if (!GITBOOK_SECRET) {
         return null;
     }
-    const payload = origins.sort().join('\n');
+    const payload = [`site:${siteId}`, ...[...origins].sort()].join('\n');
     return createHmac('sha256', GITBOOK_SECRET).update(payload).digest('hex');
 }
 
-/**
- * Verify a proxy token signature against the allowed origins.
- */
-function verifySignature(origins: string[], signature: string): boolean {
-    const expected = signOrigins(origins);
+function verifySignature(siteId: string, origins: string[], signature: string): boolean {
+    const expected = signProxyToken(siteId, origins);
     if (!expected || expected.length !== signature.length) {
         return false;
     }
@@ -29,13 +22,17 @@ function verifySignature(origins: string[], signature: string): boolean {
  * Build a signed proxy URL that restricts which origins can be proxied.
  * Returns null if no signing key is configured (proxy should be disabled).
  */
-export function buildSignedProxyUrl(baseProxyUrl: string, allowedOrigins: string[]): string | null {
+export function buildSignedProxyUrl(
+    baseProxyUrl: string,
+    allowedOrigins: string[],
+    siteId?: string
+): string | null {
     const origins = deduplicateAndSort(allowedOrigins);
     if (origins.length === 0) {
         return null;
     }
 
-    const signature = signOrigins(origins);
+    const signature = signProxyToken(siteId ?? '', origins);
     if (!signature) {
         return null;
     }
@@ -43,6 +40,9 @@ export function buildSignedProxyUrl(baseProxyUrl: string, allowedOrigins: string
     const url = new URL(baseProxyUrl);
     for (const origin of origins) {
         url.searchParams.append('allowed_origin', origin);
+    }
+    if (siteId) {
+        url.searchParams.set('site_id', siteId);
     }
     url.searchParams.set('token', signature);
 
@@ -56,20 +56,24 @@ export function buildSignedProxyUrl(baseProxyUrl: string, allowedOrigins: string
 export function verifyProxyRequest(
     searchParams: URLSearchParams,
     targetUrl: string
-): { allowed: true; allowedOrigins: string[] } | { allowed: false; reason: string } {
+):
+    | { allowed: true; allowedOrigins: string[]; siteId: string | null }
+    | { allowed: false; reason: string } {
     if (!GITBOOK_SECRET) {
         return { allowed: false, reason: 'Proxy is disabled: no signing key configured' };
     }
 
     const allowedOrigins = searchParams.getAll('allowed_origin');
     const token = searchParams.get('token');
+    // Signed into the token, so it can't be forged to blame another site; used for attribution.
+    const siteId = searchParams.get('site_id') ?? '';
 
     if (allowedOrigins.length === 0 || !token) {
         return { allowed: false, reason: 'Missing proxy authorization token' };
     }
 
     const sorted = deduplicateAndSort(allowedOrigins);
-    if (!verifySignature(sorted, token)) {
+    if (!verifySignature(siteId, sorted, token)) {
         return { allowed: false, reason: 'Invalid proxy authorization token' };
     }
 
@@ -81,18 +85,46 @@ export function verifyProxyRequest(
         };
     }
 
-    return { allowed: true, allowedOrigins: sorted };
+    return { allowed: true, allowedOrigins: sorted, siteId: siteId || null };
 }
 
-/**
- * Check if a URL's host+path matches one of the allowed origin entries.
- */
+// Match by canonical host (+ port) and path boundary, never a raw prefix — else
+// `api.example.com.evil.com` would pass for `api.example.com`, or `/v10` for `/v1`.
 export function isAllowedByOrigins(url: string, allowedOrigins: string[]): boolean {
-    const hostAndPath = extractOrigin(url);
-    if (!hostAndPath) {
+    let target: URL;
+    try {
+        target = new URL(url);
+    } catch {
         return false;
     }
-    return allowedOrigins.some((allowed) => hostAndPath.startsWith(allowed));
+    return allowedOrigins.some((allowed) => matchesAllowedOrigin(target, allowed));
+}
+
+// `allowed` is a scheme-less host with an optional path, e.g. `api.example.com` or `api.example.com/v1`.
+function matchesAllowedOrigin(target: URL, allowed: string): boolean {
+    let allowedUrl: URL;
+    try {
+        allowedUrl = new URL(`https://${allowed}`);
+    } catch {
+        return false;
+    }
+
+    // URL.host is lowercased, punycode-normalized and includes a non-default port.
+    if (target.host !== allowedUrl.host) {
+        return false;
+    }
+
+    const allowedPath = stripTrailingSlash(allowedUrl.pathname);
+    if (allowedPath === '') {
+        return true;
+    }
+
+    const targetPath = stripTrailingSlash(target.pathname);
+    return targetPath === allowedPath || targetPath.startsWith(`${allowedPath}/`);
+}
+
+function stripTrailingSlash(path: string): string {
+    return path.replace(/\/+$/, '');
 }
 
 function deduplicateAndSort(values: string[]): string[] {

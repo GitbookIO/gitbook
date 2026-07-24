@@ -10,12 +10,19 @@ import { Heading } from '../Heading';
 import './style.css';
 import { DEFAULT_LOCALE, getSpaceLocale } from '@/intl/server';
 import type { GitBookAnyContext } from '@/lib/context';
+import { GITBOOK_URL } from '@/lib/env';
 import { buildSignedProxyUrl } from '@/lib/openapi/proxy-token';
 import type {
     AnyOpenAPIOperationsBlock,
     OpenAPISchemasBlock,
     OpenAPIWebhookBlock,
 } from '@/lib/openapi/types';
+
+// Serve the proxy from GitBook's own origin rather than the customer domain, so a proxied
+// response can never execute as HTML under a customer's trusted origin.
+const OPEN_ORIGIN_PROXY_URL = GITBOOK_URL
+    ? new URL('/~scalar/proxy', GITBOOK_URL).toString()
+    : null;
 
 /**
  * Get the OpenAPI context to render a block.
@@ -34,15 +41,20 @@ export function getOpenAPIContext(args: {
     const customizationLocale = context ? getSpaceLocale(context) : DEFAULT_LOCALE;
     const locale = checkIsValidLocale(customizationLocale) ? customizationLocale : DEFAULT_LOCALE;
 
-    const proxyUrl =
-        context && props.context.mode !== 'print'
-            ? context.linker.toAbsoluteURL(context.linker.toPathInSite('~scalar/proxy'))
-            : undefined;
+    // Fall back to the site's own host root when GITBOOK_URL is unset (self-hosted single-origin);
+    // the proxy route is only ever mounted at the host root, never under the site base path.
+    let proxyUrl: string | undefined;
+    if (context && props.context.mode !== 'print') {
+        proxyUrl = OPEN_ORIGIN_PROXY_URL ?? context.linker.toAbsoluteURL('/~scalar/proxy');
+    }
+
+    // Signed into the proxy token so a proxied request can be attributed to its issuing site.
+    const siteId = context && 'site' in context ? context.site.id : undefined;
 
     return {
         specUrl,
         resolveProxyUrl: proxyUrl
-            ? (allowedOrigins: string[]) => buildSignedProxyUrl(proxyUrl, allowedOrigins)
+            ? (allowedOrigins: string[]) => buildSignedProxyUrl(proxyUrl, allowedOrigins, siteId)
             : undefined,
         icons: {
             chevronDown: <Icon icon="chevron-down" />,

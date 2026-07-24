@@ -838,7 +838,6 @@ function encodePathInSiteContent(
         case '~gitbook/search':
         case '~gitbook/auth/login':
         case '~gitbook/auth/logout':
-        case '~scalar/proxy':
             // PDF, search and auth routes are always dynamic as they depend on the request.
             return { pathname, routeType: 'dynamic' };
         default: {

@@ -5,7 +5,9 @@ afterAll(() => mock.restore());
 const realGlobals = await import('@/lib/env/globals');
 mock.module('@/lib/env/globals', () => ({ ...realGlobals, GITBOOK_SECRET: 'test-secret-key' }));
 
-const { buildSignedProxyUrl, verifyProxyRequest } = await import('./proxy-token');
+const { buildSignedProxyUrl, isAllowedByOrigins, verifyProxyRequest } = await import(
+    './proxy-token'
+);
 
 describe('buildSignedProxyUrl', () => {
     it('returns null for empty hosts', () => {
@@ -127,7 +129,117 @@ describe('verifyProxyRequest', () => {
         const signed = buildSignedProxyUrl('http://localhost/proxy', ['api.example.com/v1'])!;
         const params = new URL(signed).searchParams;
 
+        expect(verifyProxyRequest(params, 'https://api.example.com/v1').allowed).toBe(true);
         expect(verifyProxyRequest(params, 'https://api.example.com/v1/users').allowed).toBe(true);
         expect(verifyProxyRequest(params, 'https://api.example.com/v2/users').allowed).toBe(false);
+        // Path-prefix confusion: /v10 must not be treated as under /v1.
+        expect(verifyProxyRequest(params, 'https://api.example.com/v10/users').allowed).toBe(false);
+    });
+
+    it('rejects a hostname-suffix confusion target', () => {
+        // biome-ignore lint/style/noNonNullAssertion: test assertion
+        const signed = buildSignedProxyUrl('http://localhost/proxy', ['api.nansen.ai'])!;
+        const params = new URL(signed).searchParams;
+
+        expect(verifyProxyRequest(params, 'https://api.nansen.ai/v1').allowed).toBe(true);
+        expect(verifyProxyRequest(params, 'https://api.nansen.ai.evil.com/xss').allowed).toBe(
+            false
+        );
+    });
+
+    it('binds and returns the issuing site id', () => {
+        // biome-ignore lint/style/noNonNullAssertion: test assertion
+        const signed = buildSignedProxyUrl(
+            'http://localhost/proxy',
+            ['api.example.com'],
+            'site_1'
+        )!;
+        const url = new URL(signed);
+        expect(url.searchParams.get('site_id')).toBe('site_1');
+
+        const result = verifyProxyRequest(url.searchParams, 'https://api.example.com/v1');
+        expect(result.allowed).toBe(true);
+        if (result.allowed) {
+            expect(result.siteId).toBe('site_1');
+        }
+    });
+
+    it('rejects a token whose site id was tampered with', () => {
+        // biome-ignore lint/style/noNonNullAssertion: test assertion
+        const signed = buildSignedProxyUrl(
+            'http://localhost/proxy',
+            ['api.example.com'],
+            'site_1'
+        )!;
+        const url = new URL(signed);
+        url.searchParams.set('site_id', 'site_2');
+
+        const result = verifyProxyRequest(url.searchParams, 'https://api.example.com/v1');
+        expect(result.allowed).toBe(false);
+        if (!result.allowed) {
+            expect(result.reason).toBe('Invalid proxy authorization token');
+        }
+    });
+
+    it('returns null site id when none was signed', () => {
+        // biome-ignore lint/style/noNonNullAssertion: test assertion
+        const signed = buildSignedProxyUrl('http://localhost/proxy', ['api.example.com'])!;
+        const result = verifyProxyRequest(new URL(signed).searchParams, 'https://api.example.com');
+        expect(result.allowed).toBe(true);
+        if (result.allowed) {
+            expect(result.siteId).toBeNull();
+        }
+    });
+});
+
+describe('isAllowedByOrigins', () => {
+    it('requires an exact hostname match', () => {
+        expect(isAllowedByOrigins('https://api.example.com/v1', ['api.example.com'])).toBe(true);
+        expect(isAllowedByOrigins('https://api.example.com.evil.com/v1', ['api.example.com'])).toBe(
+            false
+        );
+        expect(isAllowedByOrigins('https://evil-api.example.com/v1', ['api.example.com'])).toBe(
+            false
+        );
+    });
+
+    it('allows any path for a host-only entry', () => {
+        expect(isAllowedByOrigins('https://api.example.com', ['api.example.com'])).toBe(true);
+        expect(isAllowedByOrigins('https://api.example.com/a/b/c', ['api.example.com'])).toBe(true);
+    });
+
+    it('enforces a path boundary for a path entry', () => {
+        const allowed = ['api.example.com/v1'];
+        expect(isAllowedByOrigins('https://api.example.com/v1', allowed)).toBe(true);
+        expect(isAllowedByOrigins('https://api.example.com/v1/', allowed)).toBe(true);
+        expect(isAllowedByOrigins('https://api.example.com/v1/users', allowed)).toBe(true);
+        expect(isAllowedByOrigins('https://api.example.com/v10', allowed)).toBe(false);
+        expect(isAllowedByOrigins('https://api.example.com/v1abc', allowed)).toBe(false);
+        expect(isAllowedByOrigins('https://api.example.com/v2', allowed)).toBe(false);
+    });
+
+    it('rejects a port mismatch', () => {
+        expect(isAllowedByOrigins('https://api.example.com:8443/v1', ['api.example.com'])).toBe(
+            false
+        );
+        expect(isAllowedByOrigins('https://api.example.com/v1', ['api.example.com:8443'])).toBe(
+            false
+        );
+        expect(
+            isAllowedByOrigins('https://api.example.com:8443/v1', ['api.example.com:8443'])
+        ).toBe(true);
+    });
+
+    it('matches IDN and punycode hosts equivalently', () => {
+        expect(isAllowedByOrigins('https://münchen.example.com/v1', ['münchen.example.com'])).toBe(
+            true
+        );
+        expect(
+            isAllowedByOrigins('https://xn--mnchen-3ya.example.com/v1', ['münchen.example.com'])
+        ).toBe(true);
+    });
+
+    it('returns false for an unparseable target URL', () => {
+        expect(isAllowedByOrigins('not a url', ['api.example.com'])).toBe(false);
     });
 });

@@ -1,6 +1,9 @@
 import { lookup } from 'node:dns/promises';
 import { isIP } from 'node:net';
 
+import { GITBOOK_URL } from '@/lib/env/globals';
+import { matchesGitBookHost } from '@/lib/env/urls';
+import { getLogger } from '@/lib/logger';
 import { isAllowedByOrigins, verifyProxyRequest } from '@/lib/openapi/proxy-token';
 
 import { type NextRequest, NextResponse } from 'next/server';
@@ -41,6 +44,34 @@ const CORS_HEADERS = {
     'access-control-allow-headers': '*',
     'access-control-expose-headers': '*',
 } as const;
+
+// Neutralize active HTML: a navigated proxy response must never execute script, on any origin.
+// Scalar's fetch-based "Test it" is unaffected (the sandbox applies to documents, not fetch).
+const PROXY_SECURITY_HEADERS = {
+    'content-security-policy': 'sandbox',
+    'x-content-type-options': 'nosniff',
+} as const;
+
+const PROXY_RESPONSE_HEADERS = { ...CORS_HEADERS, ...PROXY_SECURITY_HEADERS } as const;
+
+function proxyJsonError(error: string, status: number): Response {
+    return NextResponse.json({ error }, { status, headers: PROXY_SECURITY_HEADERS });
+}
+
+// The proxy must only be served on GitBook's own origin, never a customer domain, so a proxied
+// response can't render under a customer's trusted origin.
+function isServedOnGitBookOrigin(request: NextRequest): boolean {
+    if (!GITBOOK_URL) {
+        return true;
+    }
+    const host = (request.headers.get('x-forwarded-host') ?? request.headers.get('host'))
+        ?.split(',')[0]
+        ?.trim();
+    if (!host) {
+        return true;
+    }
+    return matchesGitBookHost(host);
+}
 
 /**
  * Check if an IPv4 address is in a private/reserved range.
@@ -119,38 +150,33 @@ export async function isBlockedHost(hostname: string): Promise<boolean> {
 }
 
 export async function handleOpenAPIProxyRequest(request: NextRequest): Promise<Response> {
+    if (!isServedOnGitBookOrigin(request)) {
+        return proxyJsonError('Not found', 404);
+    }
+
     const targetUrl = request.nextUrl.searchParams.get('scalar_url');
 
     if (!targetUrl) {
-        return NextResponse.json(
-            { error: 'Missing required query parameter: scalar_url' },
-            { status: 400 }
-        );
+        return proxyJsonError('Missing required query parameter: scalar_url', 400);
     }
 
     // Host allowlist: verify the signed token and check the target URL is allowed.
     // This prevents the proxy from being used as an open proxy for arbitrary URLs.
     const verification = verifyProxyRequest(request.nextUrl.searchParams, targetUrl);
     if (!verification.allowed) {
-        return NextResponse.json({ error: verification.reason }, { status: 403 });
+        return proxyJsonError(verification.reason, 403);
     }
-    const { allowedOrigins } = verification;
+    const { allowedOrigins, siteId } = verification;
 
     let parsedUrl: URL;
     try {
         parsedUrl = new URL(targetUrl);
     } catch {
-        return NextResponse.json(
-            { error: 'Invalid URL provided in scalar_url parameter' },
-            { status: 400 }
-        );
+        return proxyJsonError('Invalid URL provided in scalar_url parameter', 400);
     }
 
     if (parsedUrl.protocol !== 'https:' && parsedUrl.protocol !== 'http:') {
-        return NextResponse.json(
-            { error: 'Only HTTP and HTTPS URLs are supported' },
-            { status: 400 }
-        );
+        return proxyJsonError('Only HTTP and HTTPS URLs are supported', 400);
     }
 
     // SSRF protection: block requests to private/internal addresses.
@@ -158,11 +184,15 @@ export async function handleOpenAPIProxyRequest(request: NextRequest): Promise<R
     // (returning a public IP first, then a private IP) could theoretically bypass this.
     // Mitigating this fully would require controlling DNS at the socket level.
     if (await isBlockedHost(parsedUrl.hostname)) {
-        return NextResponse.json(
-            { error: 'Forbidden: access to private addresses is not allowed' },
-            { status: 403 }
-        );
+        return proxyJsonError('Forbidden: access to private addresses is not allowed', 403);
     }
+
+    // siteId is signed into the token, so it attributes the request to its issuing site even
+    // though the open-origin route has no live site context to verify it against.
+    const logger = getLogger().subLogger('openapi-proxy', {
+        labels: { siteId: siteId ?? 'unknown' },
+    });
+    logger.info(`proxying to ${parsedUrl.host}`);
 
     // Build forwarded headers
     const forwardedHeaders = new Headers();
@@ -216,8 +246,8 @@ export async function handleOpenAPIProxyRequest(request: NextRequest): Promise<R
             }
         }
 
-        // Add our own CORS headers
-        for (const [key, value] of Object.entries(CORS_HEADERS)) {
+        // Add our own CORS + security headers (the latter override any upstream values)
+        for (const [key, value] of Object.entries(PROXY_RESPONSE_HEADERS)) {
             responseHeaders.set(key, value);
         }
 
@@ -227,8 +257,8 @@ export async function handleOpenAPIProxyRequest(request: NextRequest): Promise<R
             headers: responseHeaders,
         });
     } catch (error) {
-        console.error('[openapi-proxy] upstream fetch failed:', error);
-        return NextResponse.json({ error: 'Failed to fetch from target URL' }, { status: 502 });
+        logger.error('upstream fetch failed:', error);
+        return proxyJsonError('Failed to fetch from target URL', 502);
     } finally {
         clearTimeout(timeout);
     }
@@ -297,7 +327,7 @@ export function handleOpenAPIProxyOptions() {
     return new Response(null, {
         status: 204,
         headers: {
-            ...CORS_HEADERS,
+            ...PROXY_RESPONSE_HEADERS,
             'access-control-max-age': '86400',
         },
     });

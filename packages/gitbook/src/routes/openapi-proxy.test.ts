@@ -5,7 +5,11 @@ afterAll(() => mock.restore());
 const mockDnsLookup = mock(() => Promise.resolve([{ address: '93.184.215.14', family: 4 }]));
 mock.module('node:dns/promises', () => ({ lookup: mockDnsLookup }));
 const realGlobals = await import('@/lib/env/globals');
-mock.module('@/lib/env/globals', () => ({ ...realGlobals, GITBOOK_SECRET: 'test-secret-key' }));
+mock.module('@/lib/env/globals', () => ({
+    ...realGlobals,
+    GITBOOK_SECRET: 'test-secret-key',
+    GITBOOK_URL: 'https://open.gitbook.com',
+}));
 
 import { NextRequest } from 'next/server';
 
@@ -269,6 +273,8 @@ describe('handleOpenAPIProxyRequest', () => {
     it('blocks redirects to non-allowed hosts or private IPs', async () => {
         for (const location of [
             'https://evil.com/steal-data',
+            // Hostname-suffix confusion: must not pass as a redirect under api.example.com.
+            'https://api.example.com.evil.com/steal-data',
             'http://169.254.169.254/latest/meta-data',
         ]) {
             globalThis.fetch = mock(() =>
@@ -303,6 +309,39 @@ describe('handleOpenAPIProxyRequest', () => {
         expect(res.status).toBe(200);
         expect(await res.text()).toBe('from cdn');
     });
+
+    it('serves inert responses (sandbox CSP + nosniff) on success and error', async () => {
+        const ok = await handleOpenAPIProxyRequest(
+            createRequest(signedProxyUrl('https://api.example.com/v1'))
+        );
+        expect(ok.headers.get('content-security-policy')).toBe('sandbox');
+        expect(ok.headers.get('x-content-type-options')).toBe('nosniff');
+
+        const forbidden = await handleOpenAPIProxyRequest(
+            createRequest('http://localhost/~scalar/proxy?scalar_url=https://api.example.com')
+        );
+        expect(forbidden.status).toBe(403);
+        expect(forbidden.headers.get('content-security-policy')).toBe('sandbox');
+        expect(forbidden.headers.get('x-content-type-options')).toBe('nosniff');
+    });
+
+    it('rejects proxy requests served on a non-GitBook (customer) host', async () => {
+        const res = await handleOpenAPIProxyRequest(
+            createRequest(signedProxyUrl('https://api.example.com/v1'), {
+                headers: { host: 'docs.customer.com' },
+            })
+        );
+        await expectJsonError(res, 404, 'Not found');
+    });
+
+    it('serves proxy requests on the GitBook open host', async () => {
+        const res = await handleOpenAPIProxyRequest(
+            createRequest(signedProxyUrl('https://api.example.com/v1'), {
+                headers: { host: 'open.gitbook.com' },
+            })
+        );
+        expect(res.status).toBe(200);
+    });
 });
 
 describe('handleOpenAPIProxyOptions', () => {
@@ -311,5 +350,7 @@ describe('handleOpenAPIProxyOptions', () => {
         expect(res.status).toBe(204);
         expect(res.headers.get('access-control-allow-origin')).toBe('*');
         expect(res.headers.get('access-control-max-age')).toBe('86400');
+        expect(res.headers.get('content-security-policy')).toBe('sandbox');
+        expect(res.headers.get('x-content-type-options')).toBe('nosniff');
     });
 });
