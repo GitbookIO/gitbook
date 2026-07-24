@@ -61,7 +61,7 @@
         "next-themes": "^0.4.6",
         "nuqs": "^2.2.3",
         "object-hash": "^3.0.0",
-        "object-identity": "^0.1.2",
+        "object-identity": "^0.2.1",
         "openapi-types": "^12.1.3",
         "p-map": "^7.0.3",
         "p-retry": "^8.0.0",

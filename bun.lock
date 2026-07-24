@@ -169,7 +169,7 @@
         "next-themes": "^0.4.6",
         "nuqs": "^2.2.3",
         "object-hash": "^3.0.0",
-        "object-identity": "^0.1.2",
+        "object-identity": "^0.2.1",
         "openapi-types": "^12.1.3",
         "p-map": "^7.0.3",
         "p-retry": "^8.0.0",
@@ -2892,7 +2892,7 @@
 
     "object-hash": ["object-hash@3.0.0", "", {}, "sha512-RSn9F68PjH9HqtltsSnqYC1XXoWe9Bju5+213R98cNGttag9q9yAOTzdbsqvIa7aNm5WffBZFpWYr2aWrklWAw=="],
 
-    "object-identity": ["object-identity@0.1.2", "", {}, "sha512-Px5puVllX5L2aBjbcfXpiG5xXeq6OE8RckryTeP2Zq+0PgYrCGJXmC6LblWgknKSJs11Je2W4U2NOWFj3t/QXQ=="],
+    "object-identity": ["object-identity@0.2.1", "", {}, "sha512-itX2N4m0IvaLhFZMi9YkW4nFML6FshKCCpnn6iKJZVIkCNM/ZRaG4t1bzD2ncaW4r6cHJa59XY+7oZAH7tg8tA=="],
 
     "object-inspect": ["object-inspect@1.13.2", "", {}, "sha512-IRZSRuzJiynemAXPYtPe5BoI/RESNYR7TYm50MC5Mqbd3Jmw5y790sErYw3V6SryFJD64b74qQQs9wn5Bg/k3g=="],
 
