@@ -62,7 +62,11 @@ const nextConfig = {
     },
 
     env: {
-        BUILD_VERSION: (process.env.GITBOOK_HEAD_SHA || process.env.GITHUB_SHA || Date.now().toString()).slice(0, 7),
+        BUILD_VERSION: (
+            process.env.GITBOOK_HEAD_SHA ||
+            process.env.GITHUB_SHA ||
+            Date.now().toString()
+        ).slice(0, 7),
 
         // GitBook envs
         GITBOOK_API_URL: process.env.GITBOOK_API_URL,
