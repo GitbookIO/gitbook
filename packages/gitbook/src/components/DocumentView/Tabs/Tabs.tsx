@@ -75,15 +75,23 @@ export function Tabs(props: BlockProps<DocumentBlockTabs>) {
 }
 
 /**
- * Inline stylesheet that resolves which pane a tab group shows, purely in CSS (see
- * generateSelectCSS). Byte-identical for every visitor, so it has no cache impact.
+ * Stylesheet that resolves which pane a tab group shows, purely in CSS (see generateSelectCSS).
+ * Byte-identical for every visitor, so it has no cache impact.
+ *
+ * `href` + `precedence` opt into React's stylesheet hoisting: the tag is moved to `<head>` (out of
+ * the content flow, so sibling/child selectors like Tailwind's `space-y-*` never count it as a
+ * phantom node) and deduped by `href`, so identical option-sets across the page share one sheet.
  */
 function SelectGroupStyle({ slugs }: { slugs: string[] }) {
     const css = generateSelectCSS(slugs);
     if (!css) {
         return null;
     }
-    return <style dangerouslySetInnerHTML={{ __html: css }} />;
+    return (
+        <style href={selectSetClassName(slugs)} precedence="high">
+            {css}
+        </style>
+    );
 }
 
 /**

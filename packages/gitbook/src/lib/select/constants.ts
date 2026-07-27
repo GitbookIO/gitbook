@@ -12,10 +12,12 @@ export const SELECT_STORAGE_KEY = '@gitbook/select';
 export const SELECT_URL_PARAM = 'select';
 
 /**
- * How many slugs are remembered. Also the depth of the CSS "rank ladder" (see generateSelectCSS):
- * a candidate ranked beyond this falls back to its default until re-activated.
+ * How many slugs are remembered, most-recent-first. This is also the depth of the CSS "rank ladder"
+ * (see generateSelectCSS): since pane visibility is CSS-only, the ladder must cover every stored
+ * rank, so the two are one knob. The generated CSS is linear in this value, so it's cheap to tune;
+ * 8 comfortably covers realistic stacking of distinct preferences.
  */
-export const SELECT_LIST_CAP = 12;
+export const SELECT_LIST_CAP = 8;
 
 /**
  * Attribute written on `<html>` for the slug at a given recency rank, e.g. `data-sel-0="python"`.
