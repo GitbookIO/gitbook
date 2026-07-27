@@ -20,6 +20,10 @@ import { getExtension } from '@/lib/paths';
 import { getCacheTag } from '@gitbook/cache-tags';
 import { SiteDefaultIcon } from './icon';
 
+// Upper bound on the rendered title length. Kept generous so full titles are
+// shown (the font scales down to fit); only pathological titles get clipped.
+const MAX_TITLE_LENGTH = 128;
+
 /**
  * Render the OpenGraph image for a site content.
  */
@@ -40,8 +44,8 @@ export async function serveOGImage(baseContext: GitBookSiteContext, params: Page
 
     // Compute all text to load only the necessary fonts
     const pageTitle = page
-        ? page.title.length > 64
-            ? `${page.title.slice(0, 64)}...`
+        ? page.title.length > MAX_TITLE_LENGTH
+            ? `${page.title.slice(0, MAX_TITLE_LENGTH)}...`
             : page.title
         : 'Not found';
     const pageDescription =
@@ -199,7 +203,8 @@ export async function serveOGImage(baseContext: GitBookSiteContext, params: Page
             {/* Title and description */}
             <div tw="flex flex-col">
                 <h1
-                    tw={`text-8xl my-0 tracking-tight leading-none text-left text-[${colors.title}] font-bold`}
+                    tw={`my-0 tracking-tight leading-none text-left text-[${colors.title}] font-bold`}
+                    style={{ fontSize: getTitleFontSize(pageTitle.length) }}
                 >
                     {transformText(pageTitle)}
                 </h1>
@@ -344,6 +349,24 @@ function transformText(text: string) {
     }
 
     return '';
+}
+
+/**
+ * Scale the title font size down as the title gets longer, so long titles wrap
+ * across a few lines and stay within the fixed-height image instead of being
+ * cropped. Sizes mirror Tailwind's text-8xl down to text-5xl.
+ */
+function getTitleFontSize(length: number): number {
+    if (length <= 32) {
+        return 96;
+    }
+    if (length <= 64) {
+        return 72;
+    }
+    if (length <= 96) {
+        return 60;
+    }
+    return 48;
 }
 
 type Theme = CustomizationDefaultThemeMode.Dark | CustomizationDefaultThemeMode.Light;
