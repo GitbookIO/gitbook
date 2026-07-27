@@ -26,6 +26,12 @@ export default defineConfig({
                         '--disable-lcd-text',
                         // Disable font hinting so glyph rasterization is platform-independent.
                         '--font-render-hinting=none',
+                        // Force software rendering everywhere so image compositing/downscaling
+                        // always goes through the same filter, whether or not a GPU is present —
+                        // a machine with a real GPU renders images more sharply than headless CI
+                        // (no GPU, SwiftShader fallback), causing smooth-vs-pixelated diffs.
+                        '--disable-gpu',
+                        '--use-gl=swiftshader',
                     ],
                 },
             },
