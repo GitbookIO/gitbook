@@ -55,6 +55,14 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
               }
             : undefined;
 
+    // TEMP MOCK: origin badge for debugging local vs API results. Not for commit.
+    const originBadge =
+        item.type === 'local-page'
+            ? 'local'
+            : item.type === 'page' && 'pathname' in item
+              ? 'merged'
+              : 'API';
+
     return (
         <SearchResultItem
             ref={ref}
@@ -73,6 +81,25 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
             <Breadcrumbs breadcrumbs={item.breadcrumbs} />
             <p className="line-clamp-1 font-semibold text-base text-tint-strong leading-snug">
                 <HighlightQuery query={query} text={item.title} />
+                {/* TEMP MOCK: origin badge. Not for commit. */}
+                <span
+                    className={tcls(
+                        'ml-2',
+                        'rounded-full',
+                        'px-1.5',
+                        'py-0.5',
+                        'align-middle',
+                        'font-bold',
+                        'text-[10px]',
+                        'uppercase',
+                        'tracking-wide',
+                        originBadge === 'local' && 'bg-blue-200 text-blue-900',
+                        originBadge === 'API' && 'bg-purple-200 text-purple-900',
+                        originBadge === 'merged' && 'bg-green-200 text-green-900'
+                    )}
+                >
+                    {originBadge}
+                </span>
             </p>
             <div
                 className={tcls(
