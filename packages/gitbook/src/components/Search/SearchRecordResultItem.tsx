@@ -1,4 +1,5 @@
 import { tString, useLanguage } from '@/intl/client';
+import { tcls } from '@/lib/tailwind';
 import { Icon } from '@gitbook/icons';
 import React from 'react';
 import { Favicon } from '../utils';
@@ -47,6 +48,24 @@ export const SearchRecordResultItem = React.forwardRef(function SearchRecordResu
         >
             <p className="line-clamp-2 font-semibold text-base text-tint-strong leading-snug">
                 <HighlightQuery query={query} text={item.title} />
+                {/* TEMP MOCK: origin badge, records are always API-only. Not for commit. */}
+                <span
+                    className={tcls(
+                        'ml-2',
+                        'rounded-full',
+                        'bg-purple-200',
+                        'px-1.5',
+                        'py-0.5',
+                        'align-middle',
+                        'font-bold',
+                        'text-[10px]',
+                        'text-purple-900',
+                        'uppercase',
+                        'tracking-wide'
+                    )}
+                >
+                    API
+                </span>
             </p>
             {domain ? (
                 <p className="text-sm text-tint/7 group-[.is-active]:text-tint contrast-more:text-tint">
