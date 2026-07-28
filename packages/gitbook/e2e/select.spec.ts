@@ -90,6 +90,16 @@ test.describe('select CSS visibility', () => {
         await setup(page, slugs, ['dark', 'light']);
         await expectOnlyVisible(page, slugs, 'python');
     });
+
+    test('keeps symbol-bearing slugs (c / c++ / c#) distinct through the CSS selectors', async ({
+        page,
+    }) => {
+        // Slugs can contain `+` and `#` (see slugifySelectValue); they must survive quoted attribute
+        // selectors without collapsing together.
+        const symbols = ['c', 'c++', 'c#'];
+        await setup(page, symbols, ['c++']);
+        await expectOnlyVisible(page, symbols, 'c++');
+    });
 });
 
 interface GroupSpec {

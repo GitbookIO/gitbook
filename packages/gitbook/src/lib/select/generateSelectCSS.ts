@@ -35,6 +35,15 @@ function uniqueSlugs(slugs: string[]): string[] {
 }
 
 /**
+ * Escape a slug for interpolation into a CSS string literal (a quoted attribute-selector value).
+ * `slugifySelectValue` can't currently produce `"` or `\`, so this is defensive — it keeps the
+ * generated CSS well-formed if the slug charset is ever widened.
+ */
+function escapeCssString(value: string): string {
+    return value.replace(/["\\]/g, '\\$&');
+}
+
+/**
  * Generate the CSS that makes a group show the most-recently-activated of its options — the same
  * rule as `resolveActiveSlug`, expressed purely in CSS so it works before hydration and with
  * JavaScript disabled.
@@ -77,12 +86,15 @@ export function generateSelectCSS(candidateSlugs: string[], depth = SELECT_LIST_
 
     for (let rank = depth - 1; rank >= 0; rank--) {
         const attr = selectRankAttribute(rank);
-        const anyAtRank = slugs.map((slug) => `[${attr}="${slug}"]`).join(',');
+        const anyAtRank = slugs.map((slug) => `[${attr}="${escapeCssString(slug)}"]`).join(',');
         // When any of the set's options sits at this rank, hide the group's panes...
         rules.push(`html:is(${anyAtRank}) & ${option}{display:none}`);
         // ...then reveal whichever one matches (correlated, so a per-option list).
         const show = slugs
-            .map((slug) => `html[${attr}="${slug}"] & [${SELECT_OPTION_ATTR}="${slug}"]`)
+            .map((slug) => {
+                const value = escapeCssString(slug);
+                return `html[${attr}="${value}"] & [${SELECT_OPTION_ATTR}="${value}"]`;
+            })
             .join(',');
         rules.push(`${show}{display:block}`);
     }
