@@ -204,10 +204,14 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
     //
     request.headers.delete('x-gitbook-disable-tracking');
 
+    // header that allow to bypass the race in lookupPublishedContentByUrl when we know in advance the correct lookup to use
+    const urlLookup = request.headers.get('x-gitbook-lookup-url') ?? undefined;
+
     const withAPIToken = async (apiToken: string | null) => {
         const siteURLData = await throwIfDataError(
             lookupPublishedContentByUrl({
                 url: siteRequestURL.toString(),
+                urlLookup,
                 visitorPayload: {
                     jwtToken: visitorToken?.token ?? undefined,
                     unsignedClaims,

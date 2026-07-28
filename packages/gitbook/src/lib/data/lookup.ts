@@ -12,6 +12,11 @@ interface LookupPublishedContentByUrlInput {
     redirectOnError: boolean;
     apiToken: string | null;
     visitorPayload: SiteVisitorPayload;
+    /**
+     * When provided and matching one of the URL lookup alternatives, restrict the lookup
+     * to that single alternative instead of racing all of them.
+     */
+    urlLookup?: string;
 }
 
 /**
@@ -24,6 +29,16 @@ export async function lookupPublishedContentByUrl(
     const lookupURL = new URL(input.url);
     const url = stripURLSearch(lookupURL);
     const lookup = getURLLookupAlternatives(url);
+
+    if (input.urlLookup) {
+        // We verify first that it matches one of the alternatives, otherwise we ignore it and race all alternatives.
+        const matched = lookup.urls.find((alternative) => alternative.url === input.urlLookup);
+        if (matched) {
+            // Restrict to the requested alternative, forced as primary so errors and
+            // incomplete results still surface instead of being swallowed as null.
+            lookup.urls = [{ ...matched, primary: true }];
+        }
+    }
 
     const result = await race(lookup.urls, async (alternative, { signal }) => {
         const api = apiClient({ apiToken: input.apiToken });
