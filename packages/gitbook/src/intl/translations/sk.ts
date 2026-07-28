@@ -150,6 +150,7 @@ export const sk: TranslationLanguage = {
     ai_chat_tools_navigated_to_page: 'Stránka otvorená',
     ai_chat_tools_navigate_failed: 'Stránku sa nepodarilo otvoriť',
     ai_chat_tools_submit_feedback: 'Odoslať spätnú väzbu',
+    ai_chat_tools_submit_assistant_feedback: 'Ohodnotiť predchádzajúcu správu asistenta ako ${1}',
     ai_chat_tools_submitted_feedback: 'Spätná väzba odoslaná',
     ai_chat_tools_mcp_tool: 'Zavolal ${1}',
     ai_chat_ask: 'Opýtať sa ${1}',

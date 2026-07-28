@@ -145,6 +145,7 @@ export const en = {
     ai_chat_tools_navigated_to_page: 'Opened the page',
     ai_chat_tools_navigate_failed: 'Failed to open the page',
     ai_chat_tools_submit_feedback: 'Submit feedback',
+    ai_chat_tools_submit_assistant_feedback: "Rate the Assistant's previous message as ${1}",
     ai_chat_tools_submitted_feedback: 'Submitted your feedback',
     ai_chat_tools_mcp_tool: 'Called ${1}',
     ai_chat_ask: 'Ask ${1}',

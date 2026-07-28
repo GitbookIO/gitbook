@@ -148,6 +148,7 @@ export const hr: TranslationLanguage = {
     ai_chat_tools_navigated_to_page: 'Stranica otvorena',
     ai_chat_tools_navigate_failed: 'Stranicu nije moguće otvoriti',
     ai_chat_tools_submit_feedback: 'Pošalji povratne informacije',
+    ai_chat_tools_submit_assistant_feedback: 'Ocijenite prethodnu poruku asistenta kao ${1}',
     ai_chat_tools_submitted_feedback: 'Povratne informacije poslane',
     ai_chat_tools_mcp_tool: 'Pozvao ${1}',
     ai_chat_ask: 'Pitaj ${1}',

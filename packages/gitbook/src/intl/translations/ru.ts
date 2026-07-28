@@ -151,6 +151,7 @@ export const ru: TranslationLanguage = {
     ai_chat_tools_navigated_to_page: 'Страница открыта',
     ai_chat_tools_navigate_failed: 'Не удалось открыть страницу',
     ai_chat_tools_submit_feedback: 'Отправить отзыв',
+    ai_chat_tools_submit_assistant_feedback: 'Оцените предыдущее сообщение ассистента как ${1}',
     ai_chat_tools_submitted_feedback: 'Отзыв отправлен',
     ai_chat_tools_mcp_tool: 'Вызван ${1}',
     ai_chat_ask: 'Спросить у ${1}',

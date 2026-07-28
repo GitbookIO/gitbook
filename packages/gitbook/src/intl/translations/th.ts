@@ -144,6 +144,7 @@ export const th: TranslationLanguage = {
     ai_chat_tools_navigated_to_page: 'เปิดหน้าแล้ว',
     ai_chat_tools_navigate_failed: 'ไม่สามารถเปิดหน้าได้',
     ai_chat_tools_submit_feedback: 'ส่งความคิดเห็น',
+    ai_chat_tools_submit_assistant_feedback: 'ให้คะแนนข้อความก่อนหน้าของผู้ช่วยเป็น ${1}',
     ai_chat_tools_submitted_feedback: 'ส่งความคิดเห็นแล้ว',
     ai_chat_tools_mcp_tool: 'เรียกใช้ ${1}',
     ai_chat_ask: 'ถาม ${1}',

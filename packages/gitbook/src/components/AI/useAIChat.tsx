@@ -25,6 +25,10 @@ import { type RenderAIMessageOptions, streamAIChatResponse } from './server-acti
 import { getTools } from './tools';
 import { useAIMessageContextRef } from './useAIMessageContext';
 import { useNavigateToPageTool } from './useNavigateToPageTool';
+import {
+    type ResponseToRate,
+    useSubmitAssistantFeedbackTool,
+} from './useSubmitAssistantFeedbackTool';
 import { useSubmitPageFeedbackTool } from './useSubmitPageFeedbackTool';
 
 export type AIChatMessage = {
@@ -234,23 +238,35 @@ export function AIChatProvider(props: {
     const { siteSpaceId } = useCurrentContent();
     const language = useLanguage();
 
-    // Built-in tools exposed to the assistant (e.g. navigating to a page, submitting page
-    // feedback). Each tool has a stable identity, so it can be referenced directly from the
-    // streaming callback.
+    const displayContext = renderMessageOptions?.asEmbeddable
+        ? SiteInsightsDisplayContext.Embed
+        : SiteInsightsDisplayContext.Site;
+
+    // The assistant response the user is reacting to. Snapshotted when a new user turn begins
+    // (before it overwrites the store's responseId/query), so the self-feedback tool rates that
+    // previous response rather than the one this reaction turn produces.
+    const responseToRateRef = React.useRef<ResponseToRate>({ responseId: null, query: null });
+    const getResponseToRate = React.useCallback(() => responseToRateRef.current, []);
+
+    // Built-in tools exposed to the assistant (e.g. navigating to a page, submitting page or
+    // assistant feedback). Each tool has a stable identity, so it can be referenced directly from
+    // the streaming callback.
     const navigateToPageTool = useNavigateToPageTool();
-    const submitPageFeedbackTool = useSubmitPageFeedbackTool({
-        displayContext: renderMessageOptions?.asEmbeddable
-            ? SiteInsightsDisplayContext.Embed
-            : SiteInsightsDisplayContext.Site,
+    const submitPageFeedbackTool = useSubmitPageFeedbackTool({ displayContext });
+    const submitAssistantFeedbackTool = useSubmitAssistantFeedbackTool({
+        displayContext,
+        getResponseToRate,
     });
 
-    // Only expose the submit-feedback tool when the site has page feedback enabled, mirroring the
-    // "Was this helpful?" widget's visibility.
-    const builtInTools = React.useMemo(
-        () =>
-            withPageFeedback ? [navigateToPageTool, submitPageFeedbackTool] : [navigateToPageTool],
-        [navigateToPageTool, submitPageFeedbackTool, withPageFeedback]
-    );
+    // The assistant-feedback tool is always available (it mirrors the chat's own thumbs up/down
+    // rating), while the page-feedback tool is gated on the site's "Was this helpful?" setting.
+    const builtInTools = React.useMemo(() => {
+        const tools = [navigateToPageTool, submitAssistantFeedbackTool];
+        if (withPageFeedback) {
+            tools.push(submitPageFeedbackTool);
+        }
+        return tools;
+    }, [navigateToPageTool, submitAssistantFeedbackTool, submitPageFeedbackTool, withPageFeedback]);
 
     // Event listeners storage
     const eventsRef = React.useRef<Map<AIChatEvent['type'], AIChatEventListener[]>>(new Map());
@@ -636,6 +652,14 @@ export function AIChatProvider(props: {
                 return;
             }
 
+            // Snapshot the response the user is reacting to before this turn overwrites the store's
+            // query/responseId, so the self-feedback tool rates the previous answer. `query` and
+            // `responseId` here still describe the last completed turn.
+            const { responseId: previousResponseId } = globalState.getState();
+            if (previousResponseId) {
+                responseToRateRef.current = { responseId: previousResponseId, query };
+            }
+
             trackEvent({ type: 'ask_question', query: input.message });
 
             // Add user message and placeholder for AI response
@@ -682,6 +706,7 @@ export function AIChatProvider(props: {
 
     // Clear the conversation and reset ask parameter
     const onClear = React.useCallback(() => {
+        responseToRateRef.current = { responseId: null, query: null };
         globalState.setState((state) => ({
             opened: state.opened,
             responding: false,

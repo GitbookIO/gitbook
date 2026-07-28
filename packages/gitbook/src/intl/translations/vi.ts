@@ -146,6 +146,7 @@ export const vi: TranslationLanguage = {
     ai_chat_tools_navigated_to_page: 'Đã mở trang',
     ai_chat_tools_navigate_failed: 'Không thể mở trang',
     ai_chat_tools_submit_feedback: 'Gửi phản hồi',
+    ai_chat_tools_submit_assistant_feedback: 'Đánh giá tin nhắn trước đó của Trợ lý là ${1}',
     ai_chat_tools_submitted_feedback: 'Đã gửi phản hồi',
     ai_chat_tools_mcp_tool: 'Đã gọi ${1}',
     ai_chat_ask: 'Hỏi ${1}',

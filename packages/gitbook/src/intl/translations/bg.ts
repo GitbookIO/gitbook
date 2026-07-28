@@ -150,6 +150,7 @@ export const bg: TranslationLanguage = {
     ai_chat_tools_navigated_to_page: 'Страницата е отворена',
     ai_chat_tools_navigate_failed: 'Страницата не може да бъде отворена',
     ai_chat_tools_submit_feedback: 'Изпращане на обратна връзка',
+    ai_chat_tools_submit_assistant_feedback: 'Оценете предишното съобщение на асистента като ${1}',
     ai_chat_tools_submitted_feedback: 'Обратната връзка е изпратена',
     ai_chat_tools_mcp_tool: 'Извика ${1}',
     ai_chat_ask: 'Попитайте ${1}',

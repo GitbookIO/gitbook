@@ -148,6 +148,7 @@ export const lt: TranslationLanguage = {
     ai_chat_tools_navigated_to_page: 'Puslapis atidarytas',
     ai_chat_tools_navigate_failed: 'Nepavyko atidaryti puslapio',
     ai_chat_tools_submit_feedback: 'Siųsti atsiliepimą',
+    ai_chat_tools_submit_assistant_feedback: 'Įvertinkite ankstesnę asistento žinutę kaip ${1}',
     ai_chat_tools_submitted_feedback: 'Atsiliepimas išsiųstas',
     ai_chat_tools_mcp_tool: 'Iškviesta ${1}',
     ai_chat_ask: 'Klausti ${1}',

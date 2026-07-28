@@ -149,6 +149,7 @@ export const no: TranslationLanguage = {
     ai_chat_tools_navigated_to_page: 'Åpnet siden',
     ai_chat_tools_navigate_failed: 'Kunne ikke åpne siden',
     ai_chat_tools_submit_feedback: 'Send tilbakemelding',
+    ai_chat_tools_submit_assistant_feedback: 'Vurder assistentens forrige melding som ${1}',
     ai_chat_tools_submitted_feedback: 'Tilbakemelding sendt',
     ai_chat_tools_mcp_tool: 'Kalte ${1}',
     ai_chat_ask: 'Spør ${1}',
