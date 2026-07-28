@@ -69,8 +69,6 @@ runs:
             GITBOOK_RUNTIME: cloudflare
             GITBOOK_BLOCK_SEARCH_INDEXATION: ${{ inputs.environment == 'preview' && 'true' || '' }}
             GITBOOK_ALLOW_CUSTOMIZATION_OVERRIDE: ${{ inputs.environment == 'preview' && 'true' || '' }}
-            # Enable the sites OAuth consent screen everywhere but production, matching the OAuth server default.
-            GITBOOK_SITE_OAUTH_CONSENT_ENABLED: ${{ inputs.environment != 'production' && 'true' || 'false' }}
           shell: bash
 
         - name: Upload the DO worker

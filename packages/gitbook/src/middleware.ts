@@ -26,7 +26,7 @@ import {
     normalizeRequestURL,
     throwIfDataError,
 } from '@/lib/data';
-import { GITBOOK_OAUTH_SERVER_URL, isGitBookAssetsHostURL, isGitBookHostURL } from '@/lib/env';
+import { isGitBookAssetsHostURL, isGitBookHostURL } from '@/lib/env';
 import { getImageResizingContextId } from '@/lib/images';
 import { MiddlewareHeaders } from '@/lib/middleware';
 import {
@@ -41,7 +41,6 @@ import {
     getPreviewRequestIdentifier,
     isPreviewRequest,
 } from '@/lib/preview';
-import { shouldRenderSiteOAuthConsent } from '@/lib/site-oauth/flag';
 import {
     type ResponseCookies,
     getPathScopedCookieName,
@@ -189,30 +188,6 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
     // Handler that returns visitor data for the app to consume.
     if (siteRequestURL.pathname.endsWith('/~gitbook/visitor')) {
         return serveVisitorClaimsDataRequest(request, siteRequestURL);
-    }
-
-    // Handler that forwards redirections from upstream auth provider during a site's OAuth /authorize session
-    // back to the site's OAuth server.
-    const oauthServerURL = new URL(GITBOOK_OAUTH_SERVER_URL);
-    const siteOAuthAuthorizeMatch = new URLPattern({
-        pathname: `*/~gitbook/${oauthServerURL.pathname.substring(1)}/:siteId/authorize`,
-    }).exec(siteRequestURL.toString());
-
-    if (siteOAuthAuthorizeMatch) {
-        const siteId = siteOAuthAuthorizeMatch.pathname.groups.siteId;
-
-        // When the consent flow is enabled, GBO renders the consent screen for the post-login resume
-        // (recognized by the `gb_oauth_state` interaction id the OAuth server puts on the resume URL)
-        // instead of forwarding. We fall through to the normal site routing, which rewrites the
-        // request to the `~gitbook/oauth2/v1/[siteId]/authorize` route that renders consent.
-        //
-        // Otherwise we forward to the OAuth server exactly as before (legacy path).
-        if (!shouldRenderSiteOAuthConsent(siteRequestURL.searchParams)) {
-            const siteOAuthAuthorizeURL = new URL(oauthServerURL);
-            siteOAuthAuthorizeURL.pathname += `/${siteId}/authorize`;
-            siteOAuthAuthorizeURL.search = siteOAuthAuthorizeMatch.search.input.replace('?', '');
-            return NextResponse.redirect(siteOAuthAuthorizeURL.toString());
-        }
     }
 
     //
@@ -536,6 +511,11 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         response.headers.set('x-gitbook-route-type', routeType);
         response.headers.set('x-gitbook-route-site', siteURLWithoutProtocol);
 
+        // noindex search/assistant deep links, kept crawlable so Google sees the directive.
+        if (rewrittenURL.searchParams.has('ask') || rewrittenURL.searchParams.has('q')) {
+            response.headers.set('x-robots-tag', 'noindex');
+        }
+
         // Allow cross-origin requests from the same parent domain as the site.
         const allowedOrigin = getAllowedCORSOrigin(request, siteCanonicalURL);
         if (allowedOrigin) {
@@ -858,7 +838,6 @@ function encodePathInSiteContent(
         case '~gitbook/search':
         case '~gitbook/auth/login':
         case '~gitbook/auth/logout':
-        case '~scalar/proxy':
             // PDF, search and auth routes are always dynamic as they depend on the request.
             return { pathname, routeType: 'dynamic' };
         default: {

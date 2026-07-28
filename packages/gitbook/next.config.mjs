@@ -1,5 +1,26 @@
 // @ts-check
 
+import { networkInterfaces } from 'node:os';
+
+// Next blocks its dev client and HMR when a physical device opens the server over a LAN address.
+// Needed to hydrate the dev client on physical phones/tablets over the internal network
+const allowedDevOrigins =
+    process.env.NODE_ENV === 'development'
+        ? [
+              ...new Set(
+                  Object.values(networkInterfaces())
+                      .flat()
+                      .filter(
+                          (networkInterface) =>
+                              networkInterface &&
+                              !networkInterface.internal &&
+                              networkInterface.family === 'IPv4'
+                      )
+                      .map((networkInterface) => networkInterface?.address)
+              ),
+          ]
+        : undefined;
+
 // We don't use the deployment ID yet on 2c, we need to remove it because of https://github.com/opennextjs/opennextjs-aws/issues/1136
 let deploymentId =
     process.env.GITBOOK_RUNTIME === 'cloudflare'
@@ -21,6 +42,7 @@ if (VERCEL_TARGET_ENV === 'preview') {
  * @type {import('next').NextConfig}
  */
 const nextConfig = {
+    allowedDevOrigins,
     deploymentId: deploymentId?.slice(0, 32), // Vercel's deployment ID has a max length of 32 characters
     experimental: {
         // This is needed to throw "forbidden" when the api token expired during revalidation
@@ -40,14 +62,17 @@ const nextConfig = {
     },
 
     env: {
-        BUILD_VERSION: (process.env.GITBOOK_HEAD_SHA ?? process.env.GITHUB_SHA ?? '').slice(0, 7),
+        BUILD_VERSION: (
+            process.env.GITBOOK_HEAD_SHA ||
+            process.env.GITHUB_SHA ||
+            Date.now().toString()
+        ).slice(0, 7),
 
         // GitBook envs
         GITBOOK_API_URL: process.env.GITBOOK_API_URL,
         GITBOOK_APP_URL: process.env.GITBOOK_APP_URL,
         GITBOOK_OAUTH_SERVER_URL: process.env.GITBOOK_OAUTH_SERVER_URL,
         GITBOOK_SITE_OAUTH_SIGNING_SECRET: process.env.GITBOOK_SITE_OAUTH_SIGNING_SECRET,
-        GITBOOK_SITE_OAUTH_CONSENT_ENABLED: process.env.GITBOOK_SITE_OAUTH_CONSENT_ENABLED,
         GITBOOK_PREVIEW_BASE_URL: process.env.GITBOOK_PREVIEW_BASE_URL,
         GITBOOK_INTEGRATIONS_HOST: process.env.GITBOOK_INTEGRATIONS_HOST,
         GITBOOK_INTEGRATIONS_CONTENT_HOST: process.env.GITBOOK_INTEGRATIONS_CONTENT_HOST,

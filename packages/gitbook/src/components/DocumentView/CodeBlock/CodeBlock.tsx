@@ -22,6 +22,7 @@ export async function CodeBlock(
     props: BlockProps<DocumentBlockCode> & {
         themeKey?: keyof SiteCustomizationSettings['styling']['codeTheme'];
         themes?: CustomizationThemedCodeTheme;
+        embedded?: boolean;
     }
 ) {
     const {
@@ -32,6 +33,7 @@ export async function CodeBlock(
         context,
         themeKey = 'default',
         themes: providedThemes,
+        embedded,
     } = props;
     const inlines = getInlines(block);
     const isMermaid = block.data.syntax?.toLowerCase() === 'mermaid';
@@ -87,6 +89,7 @@ export async function CodeBlock(
                 style={style}
                 theme={theme}
                 isPrint={context.mode === 'print'}
+                embedded={embedded}
             />
         );
     }
@@ -108,6 +111,7 @@ export async function CodeBlock(
         inlineExprVariables: variables,
         mode: context.mode,
         themes,
+        embedded,
     };
 
     return (
