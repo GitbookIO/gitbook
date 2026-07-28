@@ -39,7 +39,10 @@ export function ConsentScreen(props: {
                     <div className="flex min-w-0 flex-col gap-0.5">
                         <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
                             <h1 className="font-semibold text-tint-strong">{client.name}</h1>
-                            <ClientTrustBadge verified={client.verified} />
+                            <ClientTrustBadge
+                                verified={client.verified}
+                                verifiedName={client.verifiedName}
+                            />
                         </div>
                         {client.uri ? (
                             <StyledLink
@@ -184,10 +187,17 @@ function parseRedirectURI(uri: string): { prefix: string; host: string; rest: st
 }
 
 /**
- * Inline verified/unverified indicator shown next to the client name.
+ * Inline verified/unverified indicator shown next to the client name. When the OAuth server matched
+ * the client to a known application, `verifiedName` is the identity GitBook vouches for — anchoring
+ * the trust signal to that name rather than the client-supplied (untrusted) name.
  */
-function ClientTrustBadge(props: { verified: boolean }) {
-    const { verified } = props;
+function ClientTrustBadge(props: { verified: boolean; verifiedName?: string }) {
+    const { verified, verifiedName } = props;
+
+    let label = 'Unverified';
+    if (verified) {
+        label = verifiedName ? `Verified as ${verifiedName}` : 'Verified';
+    }
 
     return (
         <span
@@ -197,7 +207,7 @@ function ClientTrustBadge(props: { verified: boolean }) {
             )}
         >
             <Icon icon={verified ? 'circle-check' : 'triangle-exclamation'} className="size-3" />
-            {verified ? 'Verified' : 'Unverified'}
+            {label}
         </span>
     );
 }
