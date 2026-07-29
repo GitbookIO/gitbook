@@ -1,4 +1,4 @@
-import { type RouteParams, getPagePathFromParams, getStaticSiteContext } from '@/app/utils';
+import { type PPRRouteParams, getPagePathFromParams, getStaticSiteContext } from '@/app/utils';
 import {
     PPRPageBody,
     generateSitePageMetadata,
@@ -10,7 +10,7 @@ import type { Metadata, Viewport } from 'next';
 export const dynamic = 'force-static';
 
 type PageProps = {
-    params: Promise<RouteParams>;
+    params: Promise<PPRRouteParams>;
 };
 
 export default async function Page(props: PageProps) {

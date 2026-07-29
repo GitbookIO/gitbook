@@ -44,6 +44,8 @@ export interface Test {
      */
     url: string | (() => string | Promise<string>);
     cookies?: Parameters<BrowserContext['addCookies']>[0];
+    /** Headers to send with the main document request. */
+    headers?: Record<string, string>;
     /**
      * Test to run
      */
@@ -287,6 +289,7 @@ export function runTestCases(testCases: TestsCase[]) {
                                 headers: {
                                     ...request.headers(),
                                     'x-vercel-skip-toolbar': '1',
+                                    ...testEntry.headers,
                                 },
                             });
                         } else {
