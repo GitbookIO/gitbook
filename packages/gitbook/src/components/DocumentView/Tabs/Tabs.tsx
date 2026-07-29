@@ -1,7 +1,6 @@
 import type { DocumentBlockTabs } from '@gitbook/api';
 import type { IconName } from '@gitbook/icons';
 import { validateIconName } from '@gitbook/icons/icons';
-import { Fragment } from 'react';
 
 import { generateSelectCSS, selectSetClassName, slugifySelectValue } from '@/lib/select';
 import { tcls } from '@/lib/tailwind';
@@ -47,16 +46,17 @@ export function Tabs(props: BlockProps<DocumentBlockTabs>) {
 
     // When printing, we display the tabs one after the other, each as its own single-tab group so
     // every variant is visible (no selection to hide them).
+    // When printing we show every tab, one after another, so there's no selection to resolve — skip
+    // the generated stylesheet entirely (each single-tab group's pane is its own default and stays
+    // visible on its own).
     if (context.mode === 'print') {
         return tabs.map((tab) => (
-            <Fragment key={tab.id}>
-                <SelectGroupStyle slugs={[tab.slug]} />
-                <DynamicTabs
-                    tabs={[tab]}
-                    setClassName={selectSetClassName([tab.slug])}
-                    className={tcls(style)}
-                />
-            </Fragment>
+            <DynamicTabs
+                key={tab.id}
+                tabs={[tab]}
+                setClassName={selectSetClassName([tab.slug])}
+                className={tcls(style)}
+            />
         ));
     }
 
