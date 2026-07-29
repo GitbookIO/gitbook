@@ -7,6 +7,8 @@ import {
 
 import type { Metadata, Viewport } from 'next';
 
+export const dynamic = 'force-static';
+
 type PageProps = {
     params: Promise<RouteParams>;
 };
