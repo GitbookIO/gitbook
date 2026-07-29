@@ -7,6 +7,7 @@ import { Tooltip } from '../primitives';
 import { Emoji } from '../primitives/Emoji/Emoji';
 import { HighlightQuery } from './HighlightQuery';
 import { SearchResultItem } from './SearchResultItem';
+import { isPageTitleMatch } from './isPageTitleMatch';
 import type { MergedPageResult } from './reciprocalRankFusion';
 import type { ComputedPageResult } from './search-types';
 import type { LocalPageResult } from './useLocalSearchResults';
@@ -26,9 +27,12 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
     const language = useLanguage();
 
     const bestSection = item.type === 'page' ? item.bestSection : undefined;
-    // When the section snippet is displayed, link to the section anchor so the
-    // link matches what the user sees.
-    const href = bestSection?.body ? bestSection.href : 'href' in item ? item.href : item.pathname;
+    const pageHref = 'href' in item ? item.href : item.pathname;
+    // Link to the section anchor only when a section snippet is shown AND the
+    // query is not a title match. Title/page matches link to the top of the page;
+    // section-level matches keep their heading anchor.
+    const href =
+        bestSection?.body && !isPageTitleMatch(query, item.title) ? bestSection.href : pageHref;
 
     const emoji = 'emoji' in item ? item.emoji : undefined;
     const icon = 'icon' in item ? item.icon : undefined;
