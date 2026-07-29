@@ -1,4 +1,4 @@
-import { type RouteLayoutParams, getStaticSiteContext } from '@/app/utils';
+import { type PPRRouteLayoutParams, getStaticSiteContext } from '@/app/utils';
 import { CustomizationRootLayout } from '@/components/RootLayout';
 import {
     SiteLayout,
@@ -9,7 +9,7 @@ import { PPRHeader, PPRTableOfContents } from '@/components/SitePage/PPRSitePage
 import { shouldTrackEvents } from '@/lib/tracking';
 
 interface SitePPRLayoutProps {
-    params: Promise<RouteLayoutParams>;
+    params: Promise<PPRRouteLayoutParams>;
 }
 
 export default async function SitePPRLayout({

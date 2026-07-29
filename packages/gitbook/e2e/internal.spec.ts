@@ -328,7 +328,19 @@ const testCases: TestsCase[] = [
             {
                 name: 'PPR route renders the site shell',
                 url: '',
-                cookies: [{ name: 'gitbook-ppr-route', value: 'true' }],
+                headers: (() => {
+                    const token = jwt.sign({ name: 'gitbook-open-tests' }, 'ppr-test-token', {
+                        expiresIn: '24h',
+                    });
+
+                    return {
+                        'x-gitbook-lookup-url':
+                            'https://gitbook-open-e2e-sites.gitbook.io/gitbook-doc/',
+                        'x-gitbook-structure-token': token,
+                        'x-gitbook-toc-token': token,
+                        'x-gitbook-page-token': token,
+                    };
+                })(),
                 screenshot: false,
                 run: async (page, response) => {
                     expect(response?.headers()['x-gitbook-route-type']).toBe('ppr');
