@@ -3,10 +3,10 @@ import { describe, expect, it } from 'bun:test';
 import { getPPRRequest, getPPRRouteType } from './ppr';
 
 const pprHeaders = new Headers({
-    'x-gitbook-lookup-url': 'https://docs.example.com/guide',
-    'x-gitbook-structure-token': 'structure-token',
-    'x-gitbook-toc-token': 'toc-token',
-    'x-gitbook-page-token': 'page-token',
+    'x-gbo-lookup-url': 'https://docs.example.com/guide',
+    'x-gbo-struct-token': 'structure-token',
+    'x-gbo-toc-token': 'toc-token',
+    'x-gbo-page-token': 'page-token',
 });
 
 describe('getPPRRouteType', () => {
@@ -24,10 +24,10 @@ describe('getPPRRouteType', () => {
 
     it('does not opt in with a partial PPR header set', () => {
         for (const header of [
-            'x-gitbook-lookup-url',
-            'x-gitbook-structure-token',
-            'x-gitbook-toc-token',
-            'x-gitbook-page-token',
+            'x-gbo-lookup-url',
+            'x-gbo-struct-token',
+            'x-gbo-toc-token',
+            'x-gbo-page-token',
         ]) {
             const headers = new Headers(pprHeaders);
             headers.delete(header);

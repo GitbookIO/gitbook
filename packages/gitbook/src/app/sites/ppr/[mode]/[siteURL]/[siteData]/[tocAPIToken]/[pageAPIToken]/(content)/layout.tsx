@@ -1,4 +1,4 @@
-import { type PPRRouteLayoutParams, getStaticSiteContext } from '@/app/utils';
+import { type PPRRouteLayoutParams, getPPRRouteParams, getStaticSiteContext } from '@/app/utils';
 import { CustomizationRootLayout } from '@/components/RootLayout';
 import {
     SiteLayout,
@@ -7,6 +7,8 @@ import {
 } from '@/components/SiteLayout';
 import { PPRHeader, PPRTableOfContents } from '@/components/SitePage/PPRSitePage';
 import { shouldTrackEvents } from '@/lib/tracking';
+
+import type React from 'react';
 
 interface SitePPRLayoutProps {
     params: Promise<PPRRouteLayoutParams>;
@@ -17,6 +19,8 @@ export default async function SitePPRLayout({
     children,
 }: React.PropsWithChildren<SitePPRLayoutProps>) {
     const routeParams = await params;
+    const headerParams = getPPRRouteParams(routeParams, 'structure');
+    const tocParams = getPPRRouteParams(routeParams, 'toc');
     const { context, visitorAuthClaims } = await getStaticSiteContext(routeParams);
     const withTracking = shouldTrackEvents();
 
@@ -30,8 +34,8 @@ export default async function SitePPRLayout({
                 context={context}
                 withTracking={withTracking}
                 visitorAuthClaims={visitorAuthClaims}
-                headerSlot={<PPRHeader params={routeParams} />}
-                tableOfContentsSlot={<PPRTableOfContents params={routeParams} />}
+                headerSlot={<PPRHeader params={headerParams} />}
+                tableOfContentsSlot={<PPRTableOfContents params={tocParams} />}
             >
                 {children}
             </SiteLayout>
