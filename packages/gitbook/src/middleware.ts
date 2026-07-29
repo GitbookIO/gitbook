@@ -46,7 +46,7 @@ import {
     isOAuthProtectedResourceRequest,
 } from '@/lib/oauth-protected';
 import { removeLeadingSlash, removeTrailingSlash } from '@/lib/paths';
-import { type SiteRouteType, getPPRRouteType } from '@/lib/ppr';
+import { type SiteRouteType, getPPRRequest, getPPRRouteType } from '@/lib/ppr';
 import {
     getPreviewCookieResponse,
     getPreviewRequestIdentifier,
@@ -216,12 +216,15 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
     //
     request.headers.delete('x-gitbook-disable-tracking');
 
+    const pprRequest = getPPRRequest(request.headers);
+    console.log('pprRequest', pprRequest);
+
     const withAPIToken = async (apiToken: string | null) => {
         const siteURLData = await throwIfDataError(
             lookupPublishedContentByUrl({
                 url: siteRequestURL.toString(),
                 visitorPayload: {
-                    jwtToken: visitorToken?.token ?? undefined,
+                    jwtToken: pprRequest?.structureToken ?? visitorToken?.token ?? undefined,
                     unsignedClaims,
                     type: getVisitorType(request),
                 },
@@ -495,10 +498,39 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
             }
         }
 
-        const searchParams = new URLSearchParams(request.nextUrl.search);
-
-        routeType = getPPRRouteType(routeType, isPPRPage, true /* hasPPRRouteCookie */);
+        routeType = getPPRRouteType(routeType, isPPRPage, pprRequest);
+        console.log('routeType', routeType, 'isPPRPage', isPPRPage, 'pprRequest', pprRequest);
         requestHeaders.set(MiddlewareHeaders.RouteType, routeType);
+
+        let pprAPITokens: { toc: string; page: string } | undefined;
+        if (routeType === 'ppr' && pprRequest) {
+            const lookupPPRContent = (token: string) =>
+                throwIfDataError(
+                    lookupPublishedContentByUrl({
+                        url: siteRequestURL.toString(),
+                        urlLookup: pprRequest.lookupURL,
+                        visitorPayload: {
+                            jwtToken: token,
+                            unsignedClaims,
+                        },
+                        redirectOnError: false,
+                        apiToken,
+                    })
+                );
+            const [tocURLData, pageURLData] = await Promise.all([
+                lookupPPRContent(pprRequest.tocToken),
+                lookupPPRContent(pprRequest.pageToken),
+            ]);
+
+            if ('redirect' in tocURLData || 'redirect' in pageURLData) {
+                throw new DataFetcherError('PPR content lookup resulted in a redirect', 502);
+            }
+
+            pprAPITokens = {
+                toc: tocURLData.apiToken,
+                page: pageURLData.apiToken,
+            };
+        }
 
         if (events && events.length > 0) {
             waitUntil(
@@ -529,10 +561,14 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
                     )
                 )
             ),
+            ...(pprAPITokens
+                ? [encodeURIComponent(pprAPITokens.toc), encodeURIComponent(pprAPITokens.page)]
+                : []),
             pathname,
         ].join('/');
 
         const rewrittenURL = new URL(`/${route}`, request.nextUrl.toString());
+        console.log('rewrittenURL', rewrittenURL.toString(), 'routeType', routeType, 'pathname', pathname);
         // Preserve the original search params but remove fallback=true if present
         rewrittenURL.search = request.nextUrl.search;
         if (rewrittenURL.searchParams.has('fallback')) {
@@ -556,7 +592,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         response.headers.set('x-content-type-options', 'nosniff');
         // Debug header
         response.headers.set('x-gitbook-route-type', routeType);
-        response.headers.set('x-gitbook-route-site', siteURLWithoutProtocol);
+        // response.headers.set('x-gitbook-route-site', siteURLWithoutProtocol);
 
         // noindex search/assistant deep links, kept crawlable so Google sees the directive.
         if (rewrittenURL.searchParams.has('ask') || rewrittenURL.searchParams.has('q')) {

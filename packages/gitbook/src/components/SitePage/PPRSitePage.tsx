@@ -1,4 +1,8 @@
-import { type RouteLayoutParams, getStaticSiteContext } from '@/app/utils';
+import {
+    type PPRRouteLayoutParams,
+    getPPRAPITokenFromParams,
+    getStaticSiteContext,
+} from '@/app/utils';
 import { SpaceHeader, SpaceTableOfContents } from '@/components/SpaceLayout';
 
 import { getCacheTag } from '@gitbook/cache-tags';
@@ -10,9 +14,12 @@ import { SitePage } from './SitePage';
 /**
  * Render the header from cache without carrying a request-scoped data fetcher into the cache key.
  */
-export async function PPRHeader(props: { params: RouteLayoutParams }) {
+export async function PPRHeader(props: { params: PPRRouteLayoutParams }) {
     'use cache: remote';
     cacheLife('days'); // Cache for 1 day
+
+    //TODO: remove these console logs after debugging
+    console.log('PPRHeader');
 
     const { context } = await getStaticSiteContext(props.params);
 
@@ -30,11 +37,16 @@ export async function PPRHeader(props: { params: RouteLayoutParams }) {
 /**
  * Render the table of contents independently so navigation changes do not invalidate the header.
  */
-export async function PPRTableOfContents(props: { params: RouteLayoutParams }) {
+export async function PPRTableOfContents(props: { params: PPRRouteLayoutParams }) {
     'use cache: remote';
     cacheLife('days'); // Cache for 1 day
 
-    const { context } = await getStaticSiteContext(props.params);
+    console.log('PPRTableOfContents');
+
+    const { context } = await getStaticSiteContext(
+        props.params,
+        getPPRAPITokenFromParams(props.params, 'toc')
+    );
 
     cacheTag(
         getCacheTag({
@@ -56,10 +68,15 @@ export async function PPRTableOfContents(props: { params: RouteLayoutParams }) {
 /**
  * Render the page body independently from the shared navigation shell.
  */
-export async function PPRPageBody(props: { params: RouteLayoutParams; pathname: string }) {
+export async function PPRPageBody(props: { params: PPRRouteLayoutParams; pathname: string }) {
     'use cache: remote';
     cacheLife('days'); // Cache for 1 day
-    const { context } = await getStaticSiteContext(props.params);
+    const { context } = await getStaticSiteContext(
+        props.params,
+        getPPRAPITokenFromParams(props.params, 'page')
+    );
+
+    console.log('PPRPageBody');
 
     cacheTag(
         getCacheTag({
