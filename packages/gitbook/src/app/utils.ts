@@ -34,12 +34,9 @@ export type PPRRouteParams = PPRRouteLayoutParams & {
 /**
  * Get the static context when rendering statically a site.
  */
-export async function getStaticSiteContext(params: RouteLayoutParams, apiToken?: string) {
+export async function getStaticSiteContext(params: RouteLayoutParams) {
     const siteURL = getSiteURLFromParams(params);
-    const siteURLData = {
-        ...getSiteURLDataFromParams(params),
-        ...(apiToken ? { apiToken } : {}),
-    };
+    const siteURLData = getSiteURLDataFromParams(params);
 
     // For static routes, we check the expiration of the JWT token
     // as the route might be revalidated after expiration
@@ -143,15 +140,34 @@ export function getSiteURLDataFromParams(params: RouteLayoutParams): SiteURLData
     }
 }
 
-/**
- * PPR API tokens are route params so each independently cached region gets its own context.
- */
-export function getPPRAPITokenFromParams(
-    params: PPRRouteLayoutParams,
-    region: 'toc' | 'page'
-): string {
-    const encodedToken = region === 'toc' ? params.tocAPIToken : params.pageAPIToken;
+export type PPRRegion = 'structure' | 'toc' | 'page';
 
+export function getPPRRouteParams(params: PPRRouteParams, region: PPRRegion): RouteParams;
+export function getPPRRouteParams(
+    params: PPRRouteLayoutParams,
+    region: PPRRegion
+): RouteLayoutParams;
+/**
+ * Project PPR route params for one cached region, replacing the API token in site data.
+ */
+export function getPPRRouteParams(
+    params: PPRRouteLayoutParams,
+    region: PPRRegion
+): RouteLayoutParams {
+    const { tocAPIToken, pageAPIToken, ...routeParams } = params;
+    const siteURLData = getSiteURLDataFromParams(params);
+    const apiToken =
+        region === 'structure'
+            ? siteURLData.apiToken
+            : getPPRAPITokenFromParams(region === 'toc' ? tocAPIToken : pageAPIToken, region);
+
+    return {
+        ...routeParams,
+        siteData: encodeURIComponent(rison.encode({ ...siteURLData, apiToken })),
+    };
+}
+
+function getPPRAPITokenFromParams(encodedToken: string, region: 'toc' | 'page'): string {
     try {
         return decodeURIComponent(encodedToken);
     } catch (error) {

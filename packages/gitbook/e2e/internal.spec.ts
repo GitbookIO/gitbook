@@ -295,11 +295,11 @@ const testCases: TestsCase[] = [
                     });
 
                     return {
-                        'x-gitbook-lookup-url':
+                        'x-gbo-lookup-url':
                             'https://gitbook-open-e2e-sites.gitbook.io/gitbook-doc/',
-                        'x-gitbook-structure-token': token,
-                        'x-gitbook-toc-token': token,
-                        'x-gitbook-page-token': token,
+                        'x-gbo-struct-token': token,
+                        'x-gbo-toc-token': token,
+                        'x-gbo-page-token': token,
                     };
                 })(),
                 screenshot: false,
