@@ -22,12 +22,24 @@ export type RouteParams = RouteLayoutParams & {
     pagePath: string;
 };
 
+export type PPRRouteLayoutParams = RouteLayoutParams & {
+    tocAPIToken: string;
+    pageAPIToken: string;
+};
+
+export type PPRRouteParams = PPRRouteLayoutParams & {
+    pagePath: string;
+};
+
 /**
  * Get the static context when rendering statically a site.
  */
-export async function getStaticSiteContext(params: RouteLayoutParams) {
+export async function getStaticSiteContext(params: RouteLayoutParams, apiToken?: string) {
     const siteURL = getSiteURLFromParams(params);
-    const siteURLData = getSiteURLDataFromParams(params);
+    const siteURLData = {
+        ...getSiteURLDataFromParams(params),
+        ...(apiToken ? { apiToken } : {}),
+    };
 
     // For static routes, we check the expiration of the JWT token
     // as the route might be revalidated after expiration
@@ -127,6 +139,23 @@ export function getSiteURLDataFromParams(params: RouteLayoutParams): SiteURLData
         console.error(
             `Returning 404 after failing to decode site data ${params.siteData}: ${error}`
         );
+        notFound();
+    }
+}
+
+/**
+ * PPR API tokens are route params so each independently cached region gets its own context.
+ */
+export function getPPRAPITokenFromParams(
+    params: PPRRouteLayoutParams,
+    region: 'toc' | 'page'
+): string {
+    const encodedToken = region === 'toc' ? params.tocAPIToken : params.pageAPIToken;
+
+    try {
+        return decodeURIComponent(encodedToken);
+    } catch (error) {
+        console.error(`Returning 404 after failing to decode PPR ${region} API token: ${error}`);
         notFound();
     }
 }

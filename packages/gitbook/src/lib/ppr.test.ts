@@ -1,21 +1,47 @@
 import { describe, expect, it } from 'bun:test';
 
-import { getPPRRouteType } from './ppr';
+import { getPPRRequest, getPPRRouteType } from './ppr';
+
+const pprHeaders = new Headers({
+    'x-gitbook-lookup-url': 'https://docs.example.com/guide',
+    'x-gitbook-structure-token': 'structure-token',
+    'x-gitbook-toc-token': 'toc-token',
+    'x-gitbook-page-token': 'page-token',
+});
 
 describe('getPPRRouteType', () => {
-    it('routes opted-in static document pages through PPR', () => {
-        expect(getPPRRouteType('static', true, true)).toBe('ppr');
+    it('routes static document pages through PPR when all PPR headers are present', () => {
+        expect(getPPRRouteType('static', true, getPPRRequest(pprHeaders))).toBe('ppr');
     });
 
     it('keeps special static routes on their existing route', () => {
-        expect(getPPRRouteType('static', false, true)).toBe('static');
+        expect(getPPRRouteType('static', false, getPPRRequest(pprHeaders))).toBe('static');
     });
 
     it('keeps dynamic pages dynamic even when PPR is requested', () => {
-        expect(getPPRRouteType('dynamic', true, true)).toBe('dynamic');
+        expect(getPPRRouteType('dynamic', true, getPPRRequest(pprHeaders))).toBe('dynamic');
     });
 
-    it('does not opt in without the PPR cookie', () => {
-        expect(getPPRRouteType('static', true, false)).toBe('static');
+    it('does not opt in with a partial PPR header set', () => {
+        for (const header of [
+            'x-gitbook-lookup-url',
+            'x-gitbook-structure-token',
+            'x-gitbook-toc-token',
+            'x-gitbook-page-token',
+        ]) {
+            const headers = new Headers(pprHeaders);
+            headers.delete(header);
+            expect(getPPRRequest(headers)).toBeUndefined();
+            expect(getPPRRouteType('static', true, getPPRRequest(headers))).toBe('static');
+        }
+    });
+
+    it('reads the complete PPR request data', () => {
+        expect(getPPRRequest(pprHeaders)).toEqual({
+            lookupURL: 'https://docs.example.com/guide',
+            structureToken: 'structure-token',
+            tocToken: 'toc-token',
+            pageToken: 'page-token',
+        });
     });
 });
