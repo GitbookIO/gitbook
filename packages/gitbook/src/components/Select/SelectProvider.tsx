@@ -3,9 +3,13 @@
 import { SELECT_URL_PARAM, selectStore } from '@/lib/select';
 import { parseAsString, useQueryState } from 'nuqs';
 import type React from 'react';
-import { useEffect, useRef } from 'react';
+import { useEffect, useLayoutEffect, useRef } from 'react';
 import { useSelect } from './useSelect';
 import { useSelectAnchor } from './useSelectAnchor';
+
+// `useLayoutEffect` runs before paint but warns during SSR (effects don't run on the server anyway),
+// so fall back to `useEffect` there.
+const useIsomorphicLayoutEffect = typeof document !== 'undefined' ? useLayoutEffect : useEffect;
 
 function parseSelectParam(value: string | null): string[] {
     if (!value) {
@@ -31,7 +35,9 @@ export function SelectProvider(props: { children: React.ReactNode }) {
     useSelectAnchor();
 
     // Adopt whatever the pre-paint script already merged (URL + storage) into the in-memory store.
-    useEffect(() => {
+    // Layout effect so the store (and the tab highlight it drives) is settled before first paint,
+    // matching the `<html data-sel-*>` the pre-paint script already applied.
+    useIsomorphicLayoutEffect(() => {
         selectStore.init();
     }, []);
 

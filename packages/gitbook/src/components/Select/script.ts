@@ -11,16 +11,18 @@
 export function applySelectStateScript(storageKey: string, urlParam: string, cap: number) {
     try {
         const slugs: string[] = [];
-        const seen: Record<string, boolean> = {};
+        // A Set (not a plain object) so slugs like "constructor"/"toString" aren't treated as
+        // already-seen via Object.prototype — matching the runtime store's dedupe.
+        const seen = new Set<string>();
         const push = (value: string | null | undefined) => {
             if (!value) {
                 return;
             }
             const slug = String(value).trim();
-            if (!slug || seen[slug] || slugs.length >= cap) {
+            if (!slug || seen.has(slug) || slugs.length >= cap) {
                 return;
             }
-            seen[slug] = true;
+            seen.add(slug);
             slugs.push(slug);
         };
 
@@ -35,7 +37,9 @@ export function applySelectStateScript(storageKey: string, urlParam: string, cap
         const storedStr = window.localStorage.getItem(storageKey);
         if (storedStr) {
             const stored = JSON.parse(storedStr);
-            if (stored?.length) {
+            // Only trust a real array — corrupted storage (a string, or an object with `length`)
+            // would otherwise iterate per character/index. Matches the runtime store's handling.
+            if (Array.isArray(stored)) {
                 for (let j = 0; j < stored.length; j++) {
                     push(stored[j]);
                 }
