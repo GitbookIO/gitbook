@@ -17,6 +17,7 @@ export interface OpenAPIClientContext {
         check: React.ReactNode;
         lock: React.ReactNode;
         mcp: React.ReactNode;
+        hashtag: React.ReactNode;
     };
 
     /**

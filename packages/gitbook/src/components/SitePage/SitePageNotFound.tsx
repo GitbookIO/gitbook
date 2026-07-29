@@ -11,6 +11,7 @@ import { useEffect, useState } from 'react';
 import { useAI } from '../AI';
 import { PreservePageLayout } from '../PageBody/PreservePageLayout';
 import { useSetSearchState } from '../Search';
+import { fetchSiteIndex } from '../Search/site-index';
 import { SiteAuthLoginButton } from '../SiteAuth/SiteAuthLoginLink';
 import {
     useSiteAdaptiveAuthLoginHref,
@@ -229,34 +230,21 @@ function NotFoundSuggestions(props: { suggestions: RelatedPage[] | null }) {
     ) : null;
 }
 
-/** Minimal shape of an entry in the `~gitbook/site-index` response. */
-type IndexPage = {
-    id: string;
-    title: string;
-    pathname: string;
-    siteSpaceId: string;
-    icon?: string;
-    emoji?: string;
-};
-
 /**
  * Return the pages whose path is closest to the one that 404'd.
  *
  * Rather than asking the server (which would mean an extra request per 404), this reuses the
- * search index served at `~gitbook/site-index` — already preloaded and CDN-cached on every page —
- * so it's a cache hit, not an origin request. The ranking is a lighter, client-side cousin of
- * `getSimilarPages` (which the Markdown 404 runs server-side from the full page tree).
+ * search index served at `~gitbook/site-index` — preloaded on every page and shared with
+ * instant search via the module cache in `site-index.ts`, so at most one request is made.
+ * The ranking is a lighter, client-side cousin of `getSimilarPages` (which the Markdown 404
+ * runs server-side from the full page tree).
  */
 async function getRelatedPages(
     indexURL: string,
     requestedPath: string,
     siteSpaceId: string | null
 ): Promise<RelatedPage[]> {
-    const response = await fetch(indexURL);
-    if (!response.ok) {
-        return [];
-    }
-    const { pages } = (await response.json()) as { pages: IndexPage[] };
+    const { pages } = await fetchSiteIndex(indexURL);
 
     return pages
         .filter((page) => !siteSpaceId || page.siteSpaceId === siteSpaceId)

@@ -3,7 +3,7 @@
 import { tString, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
 import * as React from 'react';
-import { useScrollListener } from '../hooks/useScrollListener';
+import { useScrollOverflow } from '../hooks/useScrollOverflow';
 import { Button, type ButtonProps } from './Button';
 
 /**
@@ -56,50 +56,9 @@ export function ScrollContainer(props: ScrollContainerProps) {
 
     const containerRef = React.useRef<HTMLDivElement>(null);
 
-    const [scrollPosition, setScrollPosition] = React.useState(0);
-    const [scrollSize, setScrollSize] = React.useState(0);
-
     const language = useLanguage();
 
-    useScrollListener(() => {
-        const container = containerRef.current;
-        if (!container) {
-            return;
-        }
-
-        setScrollSize(
-            orientation === 'horizontal'
-                ? container.scrollWidth - container.clientWidth - 1
-                : container.scrollHeight - container.clientHeight - 1
-        );
-
-        setScrollPosition(
-            orientation === 'horizontal' ? container.scrollLeft : container.scrollTop
-        );
-    }, containerRef);
-
-    React.useEffect(() => {
-        const container = containerRef.current;
-        if (!container) {
-            return;
-        }
-
-        // Update max scroll position using resize observer
-        const ro = new ResizeObserver((entries) => {
-            const [entry] = entries;
-            if (entry) {
-                setScrollSize(
-                    orientation === 'horizontal'
-                        ? entry.target.scrollWidth - entry.target.clientWidth - 1
-                        : entry.target.scrollHeight - entry.target.clientHeight - 1
-                );
-            }
-        });
-
-        ro.observe(container);
-
-        return () => ro.disconnect();
-    }, [orientation]);
+    const { scrollPosition, scrollSize } = useScrollOverflow(orientation, containerRef);
 
     React.useEffect(() => {
         const container = containerRef.current;

@@ -85,7 +85,9 @@ function scrollToHash(hash: string) {
     if (element) {
         element.scrollIntoView({
             block: 'start',
-            behavior: 'smooth',
+            // Looks like there is a bug when using smooth scroll on navigation between pages.
+            // The browser does not scroll, probably some kind of browser optimization.
+            behavior: 'instant',
         });
         return true;
     }

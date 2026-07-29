@@ -133,7 +133,7 @@ function mergePinnedRemoteResult(
 
 /**
  * Merge local (FlexSearch) and remote (API) search results using
- * Reciprocal Rank Fusion (RRF), while preserving the API order for the first
+ * Reciprocal Rank Fusion (RRF), while preserving the order of the first
  * three remote results.
  *
  * RRF formula: score(d) = Σ_i  1 / (k + rank_i(d))

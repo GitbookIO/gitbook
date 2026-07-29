@@ -178,7 +178,12 @@ export interface GitBookDataFetcher {
         query: string;
         scope:
             | { mode: 'all' }
-            | { mode: 'current'; siteSpaceId: string }
+            | {
+                  mode: 'current';
+                  siteSpaceId: string;
+                  /** Restrict the search to the current site space alone, or to the other site spaces in the scope. */
+                  restrictTo?: 'currentSiteSpace' | 'otherSiteSpaces';
+              }
             | { mode: 'specific'; siteSpaceIds: string[] };
         /** Cache bust to ensure the search results are fresh when the space is updated. */
         cacheBust?: string;

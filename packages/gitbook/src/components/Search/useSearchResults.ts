@@ -8,7 +8,7 @@ import {
     createRecommendedQuestionResult,
     getEmptySearchResults,
 } from './empty-search-results';
-import type { OrderedComputedResult } from './search-types';
+import type { OrderedComputedResult, SearchSiteContentScope } from './search-types';
 import { streamRecommendedQuestions } from './server-actions';
 
 import { useAI } from '@/components/AI';
@@ -28,6 +28,9 @@ export type ResultType =
 
 export type { LocalPageResult, MergedPageResult };
 
+// Score multiplier for current site space results when combined with those from other site spaces
+const CURRENT_SITE_SPACE_SCORE_MULTIPLIER = 2;
+
 // Small helper extracted for unit testing of scope → local filter mapping
 // computeFilterSiteSpaceIds is imported from './filter' for testability
 
@@ -42,6 +45,8 @@ const cachedRecommendedQuestions: Map<string, RecommendedQuestionResult[]> = new
 export function useSearchResults(props: {
     asEmbeddable?: boolean;
     disabled: boolean;
+    /** Whether the search surface is open. Gates building the local search index. */
+    open: boolean;
     query: string;
     siteSpaceId: string;
     siteSpaceIds: string[];
@@ -49,7 +54,7 @@ export function useSearchResults(props: {
     suggestions?: string[];
     /** URL for the search API route (e.g. from linker.toPathInSpace('~gitbook/search')). */
     searchURL: string;
-    /** URL for the local index JSON (e.g. from linker.toPathInSite('~gitbook/index')). */
+    /** URL for the local index JSON (e.g. from linker.toPathInSite('~gitbook/site-index')). */
     indexURL: string;
     /** BCP-47 language code of the current site space, used to filter local search results. */
     lang?: string;
@@ -59,6 +64,7 @@ export function useSearchResults(props: {
     const {
         asEmbeddable,
         disabled,
+        open,
         query,
         siteSpaceId,
         siteSpaceIds,
@@ -82,14 +88,16 @@ export function useSearchResults(props: {
         indexURL,
         lang,
         disabled,
+        open,
         filterSiteSpaceIds,
     });
 
     const [remoteState, setRemoteState] = React.useState<{
         results: OrderedComputedResult[];
+        otherSpacesResults: OrderedComputedResult[];
         fetching: boolean;
         error: boolean;
-    }>({ results: [], fetching: false, error: false });
+    }>({ results: [], otherSpacesResults: [], fetching: false, error: false });
 
     // Track the current in-flight fetch so it can be aborted imperatively
     // when the user navigates away before the request completes.
@@ -105,7 +113,12 @@ export function useSearchResults(props: {
         }
         if (!query) {
             if (!withAI) {
-                setRemoteState({ results: [], fetching: false, error: false });
+                setRemoteState({
+                    results: [],
+                    otherSpacesResults: [],
+                    fetching: false,
+                    error: false,
+                });
                 return;
             }
 
@@ -116,11 +129,21 @@ export function useSearchResults(props: {
                     `Cached recommended questions should be set for site-space ${siteSpaceId}`
                 );
                 // Recommended questions are stored as ResultType[] already
-                setRemoteState({ results: [], fetching: false, error: false });
+                setRemoteState({
+                    results: [],
+                    otherSpacesResults: [],
+                    fetching: false,
+                    error: false,
+                });
                 return;
             }
 
-            setRemoteState({ results: [], fetching: false, error: false });
+            setRemoteState({
+                results: [],
+                otherSpacesResults: [],
+                fetching: false,
+                error: false,
+            });
 
             let cancelled = false;
 
@@ -133,7 +156,12 @@ export function useSearchResults(props: {
                 suggestions.forEach((question) => {
                     questions.add(question);
                 });
-                setRemoteState({ results: [], fetching: false, error: false });
+                setRemoteState({
+                    results: [],
+                    otherSpacesResults: [],
+                    fetching: false,
+                    error: false,
+                });
                 return;
             }
 
@@ -159,7 +187,12 @@ export function useSearchResults(props: {
 
                     if (!cancelled) {
                         // Recommended questions are handled via a separate path below
-                        setRemoteState({ results: [], fetching: false, error: false });
+                        setRemoteState({
+                            results: [],
+                            otherSpacesResults: [],
+                            fetching: false,
+                            error: false,
+                        });
                     }
                 }
             }, 100);
@@ -171,67 +204,121 @@ export function useSearchResults(props: {
         }
         setRemoteState({
             results: [],
+            otherSpacesResults: [],
             fetching: true,
             error: false,
         });
         let cancelled = false;
         const abortController = new AbortController();
         const timeout = setTimeout(async () => {
-            try {
-                const results = await (() => {
-                    const fetchSearch = (
-                        scope: Parameters<typeof fetchSearchResults>[1]
-                    ): Promise<OrderedComputedResult[]> =>
-                        fetchSearchResults(
-                            searchURL,
-                            scope,
-                            query,
-                            abortController.signal,
-                            asEmbeddable
-                        );
+            const fetchSearch = (
+                scope: Parameters<typeof fetchSearchResults>[1]
+            ): Promise<OrderedComputedResult[]> =>
+                fetchSearchResults(searchURL, scope, query, abortController.signal, asEmbeddable);
 
+            try {
+                // Each scope resolves to a primary search request and, for the default scope
+                // on a multi-section site, a secondary request for the other site spaces
+                const { resultsPromise, otherSpacesResultsPromise } = ((): {
+                    resultsPromise: Promise<OrderedComputedResult[]>;
+                    otherSpacesResultsPromise?: Promise<OrderedComputedResult[]>;
+                } => {
                     switch (scope) {
                         case 'all':
                             // Search all content on the site
-                            return fetchSearch({ mode: 'all' });
+                            return { resultsPromise: fetchSearch({ mode: 'all' }) };
                         case 'default':
-                            // Search the current section's variant + matched/default variant for other sections
-                            return fetchSearch({ mode: 'current', siteSpaceId });
+                            // Search the current section's variant + matched/default variant for other sections.
+                            // Without sections, the scope resolves to the current site space alone, so a
+                            // second request restricted to the other site spaces would be redundant.
+                            if (!withSections) {
+                                return {
+                                    resultsPromise: fetchSearch({ mode: 'current', siteSpaceId }),
+                                };
+                            }
+
+                            // Split into two parallel requests so the (smaller, faster) current site
+                            // space results can be shown while the other site spaces are still being searched.
+                            return {
+                                resultsPromise: fetchSearch({
+                                    mode: 'current',
+                                    siteSpaceId,
+                                    restrictTo: 'currentSiteSpace',
+                                }),
+                                otherSpacesResultsPromise: fetchSearch({
+                                    mode: 'current',
+                                    siteSpaceId,
+                                    restrictTo: 'otherSiteSpaces',
+                                }),
+                            };
                         case 'extended':
                             // Search all variants of the current section
-                            return fetchSearch({ mode: 'specific', siteSpaceIds });
+                            return {
+                                resultsPromise: fetchSearch({ mode: 'specific', siteSpaceIds }),
+                            };
                         case 'current':
                             // Search only the current section's current variant
-                            return fetchSearch({ mode: 'specific', siteSpaceIds: [siteSpaceId] });
+                            return {
+                                resultsPromise: fetchSearch({
+                                    mode: 'specific',
+                                    siteSpaceIds: [siteSpaceId],
+                                }),
+                            };
                         default:
                             assertNever(scope);
                     }
                 })();
 
+                // Render each result set as soon as its response arrives; a failed
+                // request reports an error without discarding the other result set.
+                let tracked = false;
+                const onResults =
+                    (key: 'results' | 'otherSpacesResults') =>
+                    (results: OrderedComputedResult[]) => {
+                        if (cancelled) {
+                            return;
+                        }
+
+                        if (!results) {
+                            // Can happen when the route cannot be found and returns the page's html.
+                            setRemoteState((prev) => ({ ...prev, error: true }));
+                            return;
+                        }
+
+                        setRemoteState((prev) => ({ ...prev, [key]: results }));
+
+                        if (!tracked) {
+                            tracked = true;
+                            trackEvent({ type: 'search_type_query', query });
+                        }
+                    };
+                const onError = () => {
+                    if (cancelled) {
+                        return;
+                    }
+                    setRemoteState((prev) => ({ ...prev, error: true }));
+                };
+
+                await Promise.all([
+                    resultsPromise.then(onResults('results'), onError),
+                    otherSpacesResultsPromise?.then(onResults('otherSpacesResults'), onError),
+                ]);
+
                 if (cancelled) {
                     return;
                 }
-
-                if (!results) {
-                    // One time when this one returns undefined is when it cannot find the server action and returns the html from the page.
-                    // In that case, we want to avoid being stuck in a loading state, but it is an error.
-                    // We could potentially try to force reload the page here, but i'm not 100% sure it would be a better experience.
-                    setRemoteState({ results: [], fetching: false, error: true });
-                    return;
-                }
-
-                setRemoteState({ results, fetching: false, error: false });
-
-                trackEvent({
-                    type: 'search_type_query',
-                    query,
-                });
+                setRemoteState((prev) => ({ ...prev, fetching: false }));
             } catch {
                 // If there is an error, we need to catch it to avoid infinite loading state.
                 if (cancelled) {
                     return;
                 }
-                setRemoteState({ results: [], fetching: false, error: true });
+                setRemoteState({
+                    results: [],
+                    otherSpacesResults: [],
+                    fetching: false,
+                    error: true,
+                });
             }
         }, 200);
 
@@ -258,6 +345,7 @@ export function useSearchResults(props: {
         suggestions,
         searchURL,
         asEmbeddable,
+        withSections,
     ]);
 
     const abort = React.useCallback(() => {
@@ -284,10 +372,23 @@ export function useSearchResults(props: {
             });
         }
 
-        const merged = reciprocalRankFusion(localResults, remoteState.results, query);
-
-        return merged;
-    }, [localResults, remoteState.results, query, withAI, siteSpaceId, suggestions, recentQueries]);
+        return reciprocalRankFusion(
+            localResults,
+            remoteState.otherSpacesResults.length > 0
+                ? combineRemoteResults(remoteState.results, remoteState.otherSpacesResults)
+                : remoteState.results,
+            query
+        );
+    }, [
+        localResults,
+        remoteState.results,
+        remoteState.otherSpacesResults,
+        query,
+        withAI,
+        siteSpaceId,
+        suggestions,
+        recentQueries,
+    ]);
 
     return {
         results,
@@ -302,10 +403,7 @@ export function useSearchResults(props: {
  */
 async function fetchSearchResults(
     searchURL: string,
-    scope:
-        | { mode: 'all' }
-        | { mode: 'current'; siteSpaceId: string }
-        | { mode: 'specific'; siteSpaceIds: string[] },
+    scope: SearchSiteContentScope,
     query: string,
     signal?: AbortSignal,
     asEmbeddable?: boolean
@@ -326,4 +424,17 @@ async function fetchSearchResults(
     }
 
     return response.json() as Promise<OrderedComputedResult[]>;
+}
+
+function combineRemoteResults(
+    remoteResultsCurrentSpace: OrderedComputedResult[],
+    remoteResultsOtherSpaces: OrderedComputedResult[]
+): OrderedComputedResult[] {
+    return [
+        ...remoteResultsCurrentSpace.map((result) => ({
+            ...result,
+            score: result.score * CURRENT_SITE_SPACE_SCORE_MULTIPLIER,
+        })),
+        ...remoteResultsOtherSpaces,
+    ].sort((a, b) => b.score - a.score);
 }

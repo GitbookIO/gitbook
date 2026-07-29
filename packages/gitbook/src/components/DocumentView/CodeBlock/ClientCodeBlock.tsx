@@ -21,6 +21,7 @@ export type ClientBlockProps = Pick<BlockProps<DocumentBlockCode>, 'block' | 'st
     inlineExprVariables: InlineExpressionVariables;
     mode: BlockProps<DocumentBlockCode>['context']['mode'];
     themes?: CustomizationThemedCodeTheme;
+    embedded?: boolean;
 };
 
 export const CODE_BLOCK_DEFAULT_COLLAPSED_LINE_COUNT = 10;
@@ -30,7 +31,7 @@ export const CODE_BLOCK_DEFAULT_COLLAPSED_LINE_COUNT = 10;
  * It allows us to defer some load to avoid blocking the rendering of the whole page with block highlighting.
  */
 export function ClientCodeBlock(props: ClientBlockProps) {
-    const { block, mode, style, inlines, inlineExprVariables, themes } = props;
+    const { block, mode, style, inlines, inlineExprVariables, themes, embedded } = props;
     const blockRef = useRef<HTMLDivElement>(null);
     const isInViewportRef = useRef(false);
     const [isInViewport, setIsInViewport] = useState(false);
@@ -142,6 +143,7 @@ export function ClientCodeBlock(props: ClientBlockProps) {
             theme={theme ?? plainTheme}
             id={codeBlockBodyId}
             isPrint={mode === 'print'}
+            embedded={embedded}
         />
     );
 

@@ -11,6 +11,11 @@ import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import rison from 'rison';
 
+import {
+    MAX_API_TOKEN_COOKIE_LENGTH,
+    getAPITokenFromCookies,
+    getAPITokenResponseCookies,
+} from '@/lib/api-token-cookie';
 import type { SiteURLData } from '@/lib/context';
 import { getContentSecurityPolicy } from '@/lib/csp';
 import { validateSerializedCustomization } from '@/lib/customization';
@@ -21,7 +26,7 @@ import {
     normalizeRequestURL,
     throwIfDataError,
 } from '@/lib/data';
-import { GITBOOK_OAUTH_SERVER_URL, isGitBookAssetsHostURL, isGitBookHostURL } from '@/lib/env';
+import { isGitBookAssetsHostURL, isGitBookHostURL } from '@/lib/env';
 import { getImageResizingContextId } from '@/lib/images';
 import { MiddlewareHeaders } from '@/lib/middleware';
 import {
@@ -183,21 +188,6 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
     // Handler that returns visitor data for the app to consume.
     if (siteRequestURL.pathname.endsWith('/~gitbook/visitor')) {
         return serveVisitorClaimsDataRequest(request, siteRequestURL);
-    }
-
-    // Handler that forwards redirections from upstream auth provider during a site's OAuth /authorize session
-    // back to the site's OAuth server.
-    const oauthServerURL = new URL(GITBOOK_OAUTH_SERVER_URL);
-    const siteOAuthAuthorizeMatch = new URLPattern({
-        pathname: `*/~gitbook/${oauthServerURL.pathname.substring(1)}/:siteId/authorize`,
-    }).exec(siteRequestURL.toString());
-
-    if (siteOAuthAuthorizeMatch) {
-        const siteId = siteOAuthAuthorizeMatch.pathname.groups.siteId;
-        const siteOAuthAuthorizeURL = new URL(oauthServerURL);
-        siteOAuthAuthorizeURL.pathname += `/${siteId}/authorize`;
-        siteOAuthAuthorizeURL.search = siteOAuthAuthorizeMatch.search.input.replace('?', '');
-        return NextResponse.redirect(siteOAuthAuthorizeURL.toString());
     }
 
     //
@@ -521,6 +511,11 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         response.headers.set('x-gitbook-route-type', routeType);
         response.headers.set('x-gitbook-route-site', siteURLWithoutProtocol);
 
+        // noindex search/assistant deep links, kept crawlable so Google sees the directive.
+        if (rewrittenURL.searchParams.has('ask') || rewrittenURL.searchParams.has('q')) {
+            response.headers.set('x-robots-tag', 'noindex');
+        }
+
         // Allow cross-origin requests from the same parent domain as the site.
         const allowedOrigin = getAllowedCORSOrigin(request, siteCanonicalURL);
         if (allowedOrigin) {
@@ -539,6 +534,21 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         // Vercel already set this header, this is needed in OpenNext.
         if (siteURLData.contextId && !siteRequestURL.pathname.endsWith('~gitbook/site-index')) {
             response.headers.set('cache-control', 'public, max-age=0, must-revalidate');
+        }
+
+        // The sites OAuth consent screen carries a security decision: lock it down so it can't be
+        // framed, cached, or leak the client's redirect URI via the Referer header.
+        if (pathname.match(/^~gitbook\/oauth2\/v1\/[^/]+\/authorize$/)) {
+            response.headers.set(
+                'content-security-policy',
+                getContentSecurityPolicy().replace(
+                    /frame-ancestors[^;]*;/,
+                    "frame-ancestors 'none';"
+                )
+            );
+            response.headers.set('x-frame-options', 'DENY');
+            response.headers.set('referrer-policy', 'no-referrer');
+            response.headers.set('cache-control', 'no-store');
         }
 
         return writeResponseCookies(response, cookies);
@@ -621,22 +631,31 @@ async function serveWithQueryAPIToken(input: {
     // If found, we redirect to the same URL but with the token in the cookie
     const queryAPIToken = requestURL.searchParams.get('token');
     if (queryAPIToken) {
+        if (queryAPIToken.length > MAX_API_TOKEN_COOKIE_LENGTH) {
+            return new Response('API token is too large', {
+                status: 400,
+                headers: { 'content-type': 'text/plain' },
+            });
+        }
+
         requestURL.searchParams.delete('token');
-        return writeResponseCookies(NextResponse.redirect(requestURL.toString()), [
-            {
-                name: cookieName,
-                value: queryAPIToken,
+        return writeResponseCookies(
+            NextResponse.redirect(requestURL.toString()),
+            getAPITokenResponseCookies({
+                cookies: requestCookies.getAll(),
+                cookieName,
+                apiToken: queryAPIToken,
                 options: {
                     httpOnly: true,
                     sameSite: process.env.NODE_ENV === 'production' ? 'none' : undefined,
                     secure: process.env.NODE_ENV === 'production',
                     maxAge: 60 * 60, // 1 hour
                 },
-            },
-        ]);
+            })
+        );
     }
 
-    const apiToken = requestCookies.get(cookieName)?.value;
+    const apiToken = getAPITokenFromCookies(requestCookies.getAll(), cookieName);
 
     return serve(apiToken ?? null);
 }
@@ -731,6 +750,11 @@ function encodePathInSiteContent(
         return { pathname };
     }
 
+    // The sites OAuth consent screen is rendered dynamically per request (client details, visitor).
+    if (pathname.match(/^~gitbook\/oauth2\/v1\/[^/]+\/authorize$/)) {
+        return { pathname, routeType: 'dynamic' };
+    }
+
     // If the pathname is a RSS feed (/.../rss.xml), we rewrite it to ~gitbook/rss/:pathname
     const rssMatch = pathname.match(RSS_PATH_REGEX);
     if (rssMatch) {
@@ -814,7 +838,6 @@ function encodePathInSiteContent(
         case '~gitbook/search':
         case '~gitbook/auth/login':
         case '~gitbook/auth/logout':
-        case '~scalar/proxy':
             // PDF, search and auth routes are always dynamic as they depend on the request.
             return { pathname, routeType: 'dynamic' };
         default: {

@@ -865,6 +865,30 @@ body:has(.openapi-select-popover) {
     @apply border-t border-x last:border-b border-tint-subtle !ring-0 rounded-corners:first:!rounded-t-xl rounded-corners:last:!rounded-b-xl circular-corners:first:!rounded-t-2xl circular-corners:last:!rounded-b-2xl straight-corners:first:!rounded-t-xs straight-corners:last:!rounded-b-xs !rounded-none;
 }
 
+/* Model name + its hover hash-link, inline. Carries the anchor id / deep-link scroll target. */
+.openapi-schemas-model-title {
+    @apply flex items-center gap-2 min-w-0;
+    /* Offset by the trigger's p-5 so a deep-link lands the model's top edge, not its title, below the header. */
+    scroll-margin-top: calc(var(--content-scroll-margin) + 1.25rem);
+}
+
+.openapi-schemas-model-title-name {
+    @apply min-w-0 truncate;
+}
+
+.openapi-schemas-anchor-link {
+    @apply shrink-0 flex items-center opacity-0 transition-opacity;
+}
+
+.openapi-schemas-disclosure:hover .openapi-schemas-anchor-link,
+.openapi-schemas-anchor-link:focus-visible {
+    @apply opacity-100;
+}
+
+.openapi-schemas-anchor-link svg {
+    @apply size-3 text-tint-subtle hover:text-tint-strong;
+}
+
 .openapi-schemas-disclosure > .openapi-disclosure-trigger {
     @apply flex items-center font-mono transition-all font-normal text-tint-strong !text-sm hover:bg-tint-subtle dark:hover:bg-tint-hover relative flex-1 gap-2.5 p-5 truncate -outline-offset-1;
 }
@@ -965,7 +989,7 @@ body:has(.openapi-select-popover) {
     }
 }
 
-.openapi-disclosure-trigger[aria-expanded="true"] svg {
+.openapi-disclosure-trigger[aria-expanded="true"] .openapi-disclosure-trigger-label svg {
     @apply rotate-45;
 }
 

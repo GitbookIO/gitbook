@@ -27,9 +27,7 @@ export async function serveRobotsTxt(context: GitBookSiteContext) {
         ? [
               'User-agent: *',
               'Content-Signal: ai-train=yes, search=yes, ai-input=yes',
-              // Disallow only internal search
-              'Disallow: /*?*q=*',
-              'Disallow: /*?*ask=*',
+              // Internal search (?q= / ?ask=) is left crawlable and served noindex via middleware.
               // Allow dynamic assets (may include ?)
               'Allow: /~gitbook/image?*',
               'Allow: /~gitbook/icon?*',

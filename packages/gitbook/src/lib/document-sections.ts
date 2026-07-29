@@ -1,5 +1,6 @@
 import type { GitBookAnyContext } from '@/lib/context';
 import type { DocumentBlock, JSONDocument } from '@gitbook/api';
+import { getOpenAPISchemaAnchorId } from '@gitbook/openapi-parser';
 
 import type { ReactNode } from 'react';
 import { getDataOrNull } from './data';
@@ -142,31 +143,30 @@ async function getSectionsFromNodes(
                 continue;
             }
             case 'openapi-schemas': {
-                const id = block.meta?.id;
-                if (!id) {
-                    continue;
-                }
-                if (block.data.grouped || block.data.schemas.length !== 1) {
-                    // Skip grouped schemas, they are not sections
-                    continue;
-                }
-
                 const { data } = await resolveOpenAPISchemasBlock({
                     block,
                     context,
                 });
-                const schema = data?.schemas[0];
-                if (schema) {
-                    sections.push(
-                        withTags(
-                            {
-                                id,
-                                title: `The ${schema.name} object`,
-                                depth: 1,
-                            },
-                            tags
-                        )
-                    );
+
+                // A lone model anchors on the block's own id, like an operation.
+                if (!block.data.grouped && block.data.schemas.length === 1) {
+                    const id = block.meta?.id;
+                    const schema = data?.schemas[0];
+                    if (id && schema) {
+                        sections.push(
+                            withTags({ id, title: `The ${schema.name} object`, depth: 1 }, tags)
+                        );
+                    }
+                    continue;
+                }
+
+                // Grouped/multiple schemas each render as a deep-linkable model, keyed by name slug.
+                for (const schema of data?.schemas ?? []) {
+                    const id = getOpenAPISchemaAnchorId(schema.name);
+                    if (!id) {
+                        continue;
+                    }
+                    sections.push(withTags({ id, title: schema.name, depth: 1 }, tags));
                 }
                 continue;
             }

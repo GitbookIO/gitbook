@@ -14,7 +14,7 @@ function localPage(id: string, title = id): LocalPageResult {
     };
 }
 
-function remotePage(id: string, title = id): OrderedComputedResult {
+function remotePage(id: string, title = id, score = 0): OrderedComputedResult {
     return {
         type: 'page',
         id: `remote-${id}`,
@@ -22,7 +22,7 @@ function remotePage(id: string, title = id): OrderedComputedResult {
         spaceId: 'space',
         title,
         href: `/${id}`,
-        score: 0,
+        score,
         breadcrumbs: [{ label: 'Remote' }],
     };
 }

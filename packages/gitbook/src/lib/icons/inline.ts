@@ -225,7 +225,10 @@ async function getInlineIconSource(
     const cacheKey = getInlineIconSourceKey(style, icon);
     const existing = rawSvgPromises.get(cacheKey);
     if (existing) {
-        return existing;
+        // If we already have a request for this icon, return the existing promise.
+        // We should never throw an error here, as it would crash the entire page. Instead, we return null and let the client handle the missing icon gracefully.
+        // This is only visible in dev, where the map will stay around.
+        return existing.catch(() => null);
     }
 
     try {

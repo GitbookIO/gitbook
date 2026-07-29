@@ -45,4 +45,5 @@ export const nl = {
     or: 'of',
     and: 'en',
     possible_values: 'Mogelijke waarden',
+    direct_link_to_model: 'Directe link naar ${1}',
 };
