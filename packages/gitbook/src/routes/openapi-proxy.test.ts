@@ -179,6 +179,7 @@ describe('handleOpenAPIProxyRequest', () => {
                     referer: 'http://localhost:3000/docs',
                     'x-forwarded-for': '127.0.0.1',
                     accept: 'application/json',
+                    cookie: 'gitbook_visitor=secret',
                     'x-scalar-cookie': 'session=abc123',
                     'x-scalar-user-agent': 'ScalarClient/1.0',
                 },
@@ -192,7 +193,7 @@ describe('handleOpenAPIProxyRequest', () => {
         expect(headers.get('x-forwarded-for')).toBeNull();
         // Kept
         expect(headers.get('accept')).toBe('application/json');
-        // Remapped
+        // The browser's own cookie must not leak to the target; only the scalar cookie is sent.
         expect(headers.get('cookie')).toBe('session=abc123');
         expect(headers.get('user-agent')).toBe('ScalarClient/1.0');
         // Host set to target
@@ -208,6 +209,7 @@ describe('handleOpenAPIProxyRequest', () => {
                         'content-encoding': 'gzip',
                         'transfer-encoding': 'chunked',
                         'content-type': 'application/json',
+                        'set-cookie': 'evil=1; Domain=.gitbook.com; Path=/',
                     },
                 })
             )
@@ -222,6 +224,8 @@ describe('handleOpenAPIProxyRequest', () => {
         expect(res.headers.get('content-type')).toBe('application/json');
         expect(res.headers.get('content-encoding')).toBeNull();
         expect(res.headers.get('transfer-encoding')).toBeNull();
+        // A target must not be able to set cookies on GitBook's own origin.
+        expect(res.headers.get('set-cookie')).toBeNull();
     });
 
     it('returns 502 when upstream fetch fails', async () => {
