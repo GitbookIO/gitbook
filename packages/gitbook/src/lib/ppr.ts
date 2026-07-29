@@ -7,6 +7,10 @@ export type PPRRequest = {
     pageToken: string;
 };
 
+// We need to find a better way than having to pass 3 different tokens
+// We should also not have to encode 3 different API tokens in the URL, but for a POC it's fine
+// This is not true PPR, but in combination with what we are doing in the background,
+// it will allow us to cache the different regions independently and invalidate them when needed
 export const PPRRequestHeaders = {
     LookupURL: 'x-gbo-lookup-url',
     StructureToken: 'x-gbo-struct-token',
