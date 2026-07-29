@@ -1,14 +1,20 @@
 'use client';
 
 import type React from 'react';
-import { type ComponentPropsWithRef, memo, useCallback, useMemo } from 'react';
+import { type ComponentPropsWithRef, memo, useCallback, useMemo, useState } from 'react';
 
 import { useResolvedSlug, useSelect } from '@/components/Select';
 import { useListOverflow } from '@/components/hooks';
 import { DropdownMenu, DropdownMenuItem } from '@/components/primitives';
 import { useLanguage } from '@/intl/client';
 import { tString } from '@/intl/translate';
-import { SELECT_DEFAULT_ATTR, SELECT_GROUP_ATTR, SELECT_OPTION_ATTR } from '@/lib/select';
+import {
+    SELECT_DEFAULT_ATTR,
+    SELECT_GROUP_ATTR,
+    SELECT_OPTION_ATTR,
+    SELECT_PINNED_ATTR,
+    SELECT_UNPINNED_ATTR,
+} from '@/lib/select';
 import { tcls } from '@/lib/tailwind';
 import { Icon, type IconName } from '@gitbook/icons';
 
@@ -27,8 +33,12 @@ export interface TabsItem {
  * Pane visibility is driven entirely by CSS (see generateSelectCSS): each pane carries its slug as
  * `data-select-option`, and the generated stylesheet shows the most-recently-activated one based on
  * the `data-sel-*` attributes on `<html>`. That means the correct pane is visible before hydration
- * (no flash) and with JS disabled. This component only handles clicks and the tablist's own
- * active/aria state.
+ * (no flash) and with JS disabled.
+ *
+ * The one thing CSS can't decide is *which* of several same-named tabs in one group the visitor
+ * clicked — by slug they're identical, so the stylesheet falls back to the first. After an explicit
+ * click we pin the exact pane via `data-select-pinned`/`-unpinned` (a client-only override that
+ * reverts to first-match on reload). The tablist highlight follows the same resolved tab.
  */
 export function DynamicTabs(props: {
     tabs: TabsItem[];
@@ -37,17 +47,30 @@ export function DynamicTabs(props: {
 }) {
     const { tabs, setClassName, className } = props;
     const { activate } = useSelect();
+    // The tab the visitor explicitly clicked this session (not persisted — reload reverts to CSS).
+    const [manualId, setManualId] = useState<string | null>(null);
 
     const candidateSlugs = useMemo(() => tabs.map((tab) => tab.slug), [tabs]);
-    // Only used for the tablist button highlight/aria; falls back to the first tab, matching the CSS
-    // default. Pre-hydration this is the first tab on both server and client, so it never mismatches.
     const activeSlug = useResolvedSlug(candidateSlugs, tabs[0]?.slug ?? null);
+
+    // Resolve which tab is shown. Default: the first tab of the active slug — matching the CSS
+    // first-match. A manual click pins a specific tab, but only while its slug is the active one; if
+    // the active slug is a duplicate and the pinned tab isn't the first of it, `override` carries the
+    // pin so the panes below can steer CSS past first-match.
+    const { activeTabId, override } = useMemo(() => {
+        const firstMatch = tabs.find((tab) => tab.slug === activeSlug) ?? tabs[0];
+        const manual = manualId ? tabs.find((tab) => tab.id === manualId) : undefined;
+        const pinned =
+            manual && manual.slug === activeSlug && manual.id !== firstMatch?.id ? manual : null;
+        return { activeTabId: pinned?.id ?? firstMatch?.id ?? null, override: pinned };
+    }, [tabs, activeSlug, manualId]);
 
     const selectTab = useCallback(
         (tabId: string) => {
             const tab = tabs.find((item) => item.id === tabId);
             if (tab?.slug) {
                 activate(tab.slug);
+                setManualId(tabId);
             }
         },
         [tabs, activate]
@@ -65,9 +88,20 @@ export function DynamicTabs(props: {
                 className
             )}
         >
-            <TabItemList tabs={tabs} activeSlug={activeSlug} onSelect={selectTab} />
+            <TabItemList tabs={tabs} activeTabId={activeTabId} onSelect={selectTab} />
             {tabs.map((tab, index) => (
-                <TabPanel key={tab.id} tab={tab} isDefault={index === 0} />
+                <TabPanel
+                    key={tab.id}
+                    tab={tab}
+                    isDefault={index === 0}
+                    pin={
+                        override && tab.slug === override.slug
+                            ? tab.id === override.id
+                                ? 'pinned'
+                                : 'unpinned'
+                            : undefined
+                    }
+                />
             ))}
         </div>
     );
@@ -76,13 +110,16 @@ export function DynamicTabs(props: {
 const TabPanel = memo(function TabPanel(props: {
     tab: TabsItem;
     isDefault: boolean;
+    pin?: 'pinned' | 'unpinned';
 }) {
-    const { tab, isDefault } = props;
+    const { tab, isDefault, pin } = props;
     return (
         <div
             {...{
                 [SELECT_OPTION_ATTR]: tab.slug,
                 ...(isDefault ? { [SELECT_DEFAULT_ATTR]: '' } : {}),
+                ...(pin === 'pinned' ? { [SELECT_PINNED_ATTR]: '' } : {}),
+                ...(pin === 'unpinned' ? { [SELECT_UNPINNED_ATTR]: '' } : {}),
             }}
             role="tabpanel"
             id={tab.id}
@@ -96,10 +133,10 @@ const TabPanel = memo(function TabPanel(props: {
 
 const TabItemList = memo(function TabItemList(props: {
     tabs: TabsItem[];
-    activeSlug: string | null;
+    activeTabId: string | null;
     onSelect: (tabId: string) => void;
 }) {
-    const { tabs, activeSlug, onSelect } = props;
+    const { tabs, activeTabId, onSelect } = props;
     const { containerRef, itemRef, overflowing, isMeasuring } = useListOverflow();
     const overflowingTabs = useMemo(
         () =>
@@ -128,7 +165,7 @@ const TabItemList = memo(function TabItemList(props: {
         >
             {/* When we measure, we add the menu at start to be sure everything's fit. */}
             {isMeasuring ? (
-                <TabsDropdownMenu tabs={tabs} onSelect={onSelect} activeSlug={activeSlug} />
+                <TabsDropdownMenu tabs={tabs} onSelect={onSelect} activeTabId={activeTabId} />
             ) : null}
             {tabs.map((tab) => {
                 // Hide overflowing tabs when not measuring.
@@ -139,7 +176,7 @@ const TabItemList = memo(function TabItemList(props: {
                     <TabItem
                         key={tab.id}
                         ref={itemRef}
-                        isActive={tab.slug === activeSlug}
+                        isActive={tab.id === activeTabId}
                         tab={tab}
                         onSelect={onSelect}
                     />
@@ -150,7 +187,7 @@ const TabItemList = memo(function TabItemList(props: {
                 <TabsDropdownMenu
                     tabs={overflowingTabs}
                     onSelect={onSelect}
-                    activeSlug={activeSlug}
+                    activeTabId={activeTabId}
                 />
             ) : null}
         </div>
@@ -159,16 +196,16 @@ const TabItemList = memo(function TabItemList(props: {
 
 function TabsDropdownMenu(props: {
     tabs: TabsItem[];
-    activeSlug: string | null;
+    activeTabId: string | null;
     onSelect: (tabId: string) => void;
 }) {
-    const { tabs, onSelect, activeSlug } = props;
+    const { tabs, onSelect, activeTabId } = props;
     const language = useLanguage();
     return (
         <DropdownMenu
             button={
                 <TabButton
-                    isActive={tabs.some((tab) => tab.slug === activeSlug)}
+                    isActive={tabs.some((tab) => tab.id === activeTabId)}
                     aria-label={tString(language, 'more')}
                     className="shrink-0"
                 >
@@ -181,7 +218,7 @@ function TabsDropdownMenu(props: {
                     <DropdownMenuItem
                         key={tab.id}
                         onClick={() => onSelect(tab.id)}
-                        active={tab.slug === activeSlug}
+                        active={tab.id === activeTabId}
                         leadingIcon={tab.icon}
                     >
                         {tab.title}

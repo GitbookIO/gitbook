@@ -95,18 +95,19 @@ function SelectGroupStyle({ slugs }: { slugs: string[] }) {
 }
 
 /**
- * Derive a `select` slug for each tab from its title. Untitled tabs fall back to their id so they
- * stay selectable, and slugs that collide within a group are suffixed so panes remain distinct
- * (cross-group syncing still keys off the base slug).
+ * Derive a `select` slug for each tab from its title. Untitled tabs fall back to their (stable) id
+ * so they stay selectable.
+ *
+ * Same-named tabs deliberately share a slug — selecting one syncs every tab of that name, here and
+ * on other pages, which is the whole point of name-based selection. We don't disambiguate duplicates
+ * with a positional suffix: that would desync the duplicate and, because the slug rides in the
+ * frozen `?select=` URL, a shared link would silently retarget when tabs are renamed or reordered.
  */
 function withSelectSlugs<T extends { id: string; title: string }>(
     items: T[]
 ): Array<T & { slug: string }> {
-    const counts = new Map<string, number>();
-    return items.map((item) => {
-        const base = slugifySelectValue(item.title) || slugifySelectValue(item.id) || item.id;
-        const seen = counts.get(base) ?? 0;
-        counts.set(base, seen + 1);
-        return { ...item, slug: seen === 0 ? base : `${base}-${seen + 1}` };
-    });
+    return items.map((item) => ({
+        ...item,
+        slug: slugifySelectValue(item.title) || slugifySelectValue(item.id) || item.id,
+    }));
 }

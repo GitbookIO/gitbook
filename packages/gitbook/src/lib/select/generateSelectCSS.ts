@@ -2,7 +2,9 @@ import {
     SELECT_DEFAULT_ATTR,
     SELECT_LIST_CAP,
     SELECT_OPTION_ATTR,
+    SELECT_PINNED_ATTR,
     SELECT_SET_CLASS_PREFIX,
+    SELECT_UNPINNED_ATTR,
     selectRankAttribute,
 } from './constants';
 
@@ -102,6 +104,22 @@ export function generateSelectCSS(candidateSlugs: string[], depth = SELECT_LIST_
             .join(',');
         rules.push(`${show}{display:block}`);
     }
+
+    // Duplicate tab names in one group would otherwise reveal two panes at once. Keep only the first:
+    // hide any option pane preceded by a same-slug sibling. Emitted last and prefixed with `html` so
+    // it beats the show rules above (equal specificity, later source order). The slug stays shared, so
+    // syncing and the `?select=` URL are unaffected — only the second pane's visibility changes.
+    for (const slug of slugs) {
+        const value = escapeCssString(slug);
+        const pane = `[${SELECT_OPTION_ATTR}="${value}"]`;
+        rules.push(`html & ${pane} ~ ${pane}{display:none}`);
+    }
+
+    // A client click can override that first-match default: it pins the picked pane and unpins its
+    // same-slug siblings so the visitor sees exactly the duplicate they clicked (reload reverts to
+    // first-match since these attributes aren't persisted). Emitted last to win at equal specificity.
+    rules.push(`html & ${option}[${SELECT_PINNED_ATTR}]{display:block}`);
+    rules.push(`html & ${option}[${SELECT_UNPINNED_ATTR}]{display:none}`);
 
     return `.${selectSetClassName(slugs)}{${rules.join('')}}`;
 }

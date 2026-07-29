@@ -100,6 +100,34 @@ test.describe('select CSS visibility', () => {
         await setup(page, symbols, ['c++']);
         await expectOnlyVisible(page, symbols, 'c++');
     });
+
+    test('shows only the first pane when a group repeats a slug (duplicate tab names)', async ({
+        page,
+    }) => {
+        // Two panes share the slug `js`; activating it must reveal only the first, never both.
+        const scope = selectSetClassName(['js', 'ts']);
+        await page.setContent(
+            `<!doctype html><html><head><style>${generateSelectCSS(['js', 'ts'])}</style></head><body><div class="${scope}" data-select-group><div data-testid="js-first" data-select-option="js" data-select-default>js 1</div><div data-testid="js-second" data-select-option="js">js 2</div><div data-testid="ts" data-select-option="ts">ts</div></div></body></html>`
+        );
+        await applySelection(page, ['js']);
+        await expect(page.getByTestId('js-first')).toBeVisible();
+        await expect(page.getByTestId('js-second')).toBeHidden();
+        await expect(page.getByTestId('ts')).toBeHidden();
+    });
+
+    test('a pinned pane overrides first-match (the duplicate the visitor clicked)', async ({
+        page,
+    }) => {
+        // The client marks the clicked pane data-select-pinned and its same-slug sibling unpinned;
+        // the pinned one must win over the first-match default.
+        const scope = selectSetClassName(['js', 'ts']);
+        await page.setContent(
+            `<!doctype html><html><head><style>${generateSelectCSS(['js', 'ts'])}</style></head><body><div class="${scope}" data-select-group><div data-testid="js-first" data-select-option="js" data-select-default data-select-unpinned>js 1</div><div data-testid="js-second" data-select-option="js" data-select-pinned>js 2</div></div></body></html>`
+        );
+        await applySelection(page, ['js']);
+        await expect(page.getByTestId('js-second')).toBeVisible();
+        await expect(page.getByTestId('js-first')).toBeHidden();
+    });
 });
 
 interface GroupSpec {

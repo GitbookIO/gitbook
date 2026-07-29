@@ -36,6 +36,13 @@ export const SELECT_OPTION_ATTR = 'data-select-option';
 /** Marks the pane shown when none of the group's slugs are active. */
 export const SELECT_DEFAULT_ATTR = 'data-select-default';
 /**
+ * Set by the client on an explicitly-clicked pane to pin it (with `data-select-unpinned` on its
+ * same-slug siblings), overriding the first-match default so the visitor sees exactly the duplicate
+ * they picked. Only applied after a real click — the pre-paint/reload path stays purely CSS-driven.
+ */
+export const SELECT_PINNED_ATTR = 'data-select-pinned';
+export const SELECT_UNPINNED_ATTR = 'data-select-unpinned';
+/**
  * Class prefix (followed by a set hash) identifying a distinct candidate-set so identical sets share
  * one stylesheet. Uses the `gb-` namespace like GitBook's other own classes (`gb-page-cover`, …) to
  * avoid colliding with author or Tailwind classes; `sel` matches the `data-sel-*` rank attributes.
