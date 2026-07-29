@@ -35,5 +35,9 @@ export const SELECT_GROUP_ATTR = 'data-select-group';
 export const SELECT_OPTION_ATTR = 'data-select-option';
 /** Marks the pane shown when none of the group's slugs are active. */
 export const SELECT_DEFAULT_ATTR = 'data-select-default';
-/** Class prefix identifying a distinct candidate-set so identical sets share one stylesheet. */
-export const SELECT_SET_CLASS_PREFIX = 'sgset-';
+/**
+ * Class prefix (followed by a set hash) identifying a distinct candidate-set so identical sets share
+ * one stylesheet. Uses the `gb-` namespace like GitBook's other own classes (`gb-page-cover`, …) to
+ * avoid colliding with author or Tailwind classes; `sel` matches the `data-sel-*` rank attributes.
+ */
+export const SELECT_SET_CLASS_PREFIX = 'gb-sel-';

@@ -6,6 +6,10 @@ import {
     selectRankAttribute,
 } from './constants';
 
+// FNV-1a (32-bit) constants — see https://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function
+const FNV_OFFSET_BASIS_32 = 0x811c9dc5;
+const FNV_PRIME_32 = 0x01000193;
+
 /**
  * Stable, order-independent hash of a candidate set, so two groups offering the same options
  * (e.g. `npm`/`yarn`/`pnpm` repeated across a docs site) share one generated stylesheet.
@@ -14,10 +18,10 @@ function hashSlugSet(slugs: string[]): string {
     const key = [...slugs].sort().join(' ');
     // FNV-1a: deterministic and dependency-free. Collision risk is irrelevant here since a clash
     // only means two identical-looking sets share CSS, which is exactly what we want anyway.
-    let hash = 0x811c9dc5;
+    let hash = FNV_OFFSET_BASIS_32;
     for (let i = 0; i < key.length; i++) {
         hash ^= key.charCodeAt(i);
-        hash = Math.imul(hash, 0x01000193);
+        hash = Math.imul(hash, FNV_PRIME_32);
     }
     return (hash >>> 0).toString(36);
 }
