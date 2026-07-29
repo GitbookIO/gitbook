@@ -31,8 +31,7 @@ function CardsGrid(props: TableViewProps<DocumentTableViewCards>) {
                 'inline-grid',
                 'gap-4',
                 'grid-cols-1',
-                '@sm:grid-cols-2',
-                view.cardSize === 'large' ? '@xl:grid-cols-2' : '@xl:grid-cols-3',
+                view.cardSize === 'large' ? '@2xl:grid-cols-2' : '@2xl:grid-cols-3 @sm:grid-cols-2',
                 block.data.fullWidth ? 'large:flex-column' : null
             )}
         >
