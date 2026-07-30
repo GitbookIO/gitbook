@@ -6,8 +6,8 @@ import {
 } from '@/app/utils';
 import {
     PPRPageBody,
-    generateSitePageMetadata,
-    generateSitePageViewport,
+    cachedGenerateSitePageMetadata,
+    cachedGenerateSitePageViewport,
 } from '@/components/SitePage';
 
 import type { Metadata, Viewport } from 'next';
@@ -26,16 +26,18 @@ export default async function Page(props: PageProps) {
 }
 
 export async function generateViewport(props: PageProps): Promise<Viewport> {
-    const { context } = await getStaticSiteContext(await props.params);
-    return generateSitePageViewport(context);
+    const params = await props.params;
+    const { context } = await getStaticSiteContext(getPPRRouteParams(params, 'page'));
+    return cachedGenerateSitePageViewport(context);
 }
 
 export async function generateMetadata(props: PageProps): Promise<Metadata> {
     const params = await props.params;
-    const { context } = await getStaticSiteContext(params);
-    const pathname = getPagePathFromParams(params);
+    const correctParams = getPPRRouteParams(params, 'page');
+    const { context } = await getStaticSiteContext(correctParams);
+    const pathname = getPagePathFromParams(correctParams);
 
-    return generateSitePageMetadata({
+    return cachedGenerateSitePageMetadata({
         context,
         pageParams: { pathname },
     });
