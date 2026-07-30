@@ -502,36 +502,6 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         console.log('routeType', routeType, 'isPPRPage', isPPRPage, 'pprRequest', pprRequest);
         requestHeaders.set(MiddlewareHeaders.RouteType, routeType);
 
-        let pprAPITokens: { toc: string; page: string } | undefined;
-        if (routeType === 'ppr' && pprRequest) {
-            const lookupPPRContent = (token: string) =>
-                throwIfDataError(
-                    lookupPublishedContentByUrl({
-                        url: siteRequestURL.toString(),
-                        urlLookup: pprRequest.lookupURL,
-                        visitorPayload: {
-                            jwtToken: token,
-                            unsignedClaims,
-                        },
-                        redirectOnError: false,
-                        apiToken,
-                    })
-                );
-            const [tocURLData, pageURLData] = await Promise.all([
-                lookupPPRContent(pprRequest.tocToken),
-                lookupPPRContent(pprRequest.pageToken),
-            ]);
-
-            if ('redirect' in tocURLData || 'redirect' in pageURLData) {
-                throw new DataFetcherError('PPR content lookup resulted in a redirect', 502);
-            }
-
-            pprAPITokens = {
-                toc: tocURLData.apiToken,
-                page: pageURLData.apiToken,
-            };
-        }
-
         if (events && events.length > 0) {
             waitUntil(
                 trackServerInsightsEvents({
@@ -561,12 +531,13 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
                     )
                 )
             ),
-            ...(pprAPITokens && pprRequest
+            ...(routeType === 'ppr' && pprRequest
                 ? [
+                      encodeURIComponent(pprRequest.lookupURL),
                       encodeURIComponent(pprRequest.revisionId),
                       encodeURIComponent(pprRequest.revalidationId),
-                      encodeURIComponent(pprAPITokens.toc),
-                      encodeURIComponent(pprAPITokens.page),
+                      encodeURIComponent(pprRequest.tocToken),
+                      encodeURIComponent(pprRequest.pageToken),
                   ]
                 : []),
             pathname,
