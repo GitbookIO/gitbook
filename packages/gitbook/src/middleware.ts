@@ -561,8 +561,13 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
                     )
                 )
             ),
-            ...(pprAPITokens
-                ? [encodeURIComponent(pprAPITokens.toc), encodeURIComponent(pprAPITokens.page)]
+            ...(pprAPITokens && pprRequest
+                ? [
+                      encodeURIComponent(pprRequest.revisionId),
+                      encodeURIComponent(pprRequest.revalidationId),
+                      encodeURIComponent(pprAPITokens.toc),
+                      encodeURIComponent(pprAPITokens.page),
+                  ]
                 : []),
             pathname,
         ].join('/');

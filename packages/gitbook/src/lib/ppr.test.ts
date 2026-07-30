@@ -7,6 +7,8 @@ const pprHeaders = new Headers({
     'x-gbo-struct-token': 'structure-token',
     'x-gbo-toc-token': 'toc-token',
     'x-gbo-page-token': 'page-token',
+    'x-gbo-revision-id': 'revision-id',
+    'x-gbo-revalidation-id': 'revalidation-id',
 });
 
 describe('getPPRRouteType', () => {
@@ -28,9 +30,27 @@ describe('getPPRRouteType', () => {
             'x-gbo-struct-token',
             'x-gbo-toc-token',
             'x-gbo-page-token',
+            'x-gbo-revision-id',
+            'x-gbo-revalidation-id',
         ]) {
             const headers = new Headers(pprHeaders);
             headers.delete(header);
+            expect(getPPRRequest(headers)).toBeUndefined();
+            expect(getPPRRouteType('static', true, getPPRRequest(headers))).toBe('static');
+        }
+    });
+
+    it('does not opt in when a required PPR header is empty', () => {
+        for (const header of [
+            'x-gbo-lookup-url',
+            'x-gbo-struct-token',
+            'x-gbo-toc-token',
+            'x-gbo-page-token',
+            'x-gbo-revision-id',
+            'x-gbo-revalidation-id',
+        ]) {
+            const headers = new Headers(pprHeaders);
+            headers.set(header, '');
             expect(getPPRRequest(headers)).toBeUndefined();
             expect(getPPRRouteType('static', true, getPPRRequest(headers))).toBe('static');
         }
@@ -42,6 +62,8 @@ describe('getPPRRouteType', () => {
             structureToken: 'structure-token',
             tocToken: 'toc-token',
             pageToken: 'page-token',
+            revisionId: 'revision-id',
+            revalidationId: 'revalidation-id',
         });
     });
 });
