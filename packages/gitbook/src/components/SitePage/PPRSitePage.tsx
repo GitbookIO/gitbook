@@ -3,9 +3,16 @@ import { SpaceHeader, SpaceTableOfContents } from '@/components/SpaceLayout';
 
 import { getCacheTag } from '@gitbook/cache-tags';
 
-import { cacheLife, cacheTag } from 'next/cache';
+import { cacheLife, cacheTag, unstable_cache } from 'next/cache';
 
-import { SitePage } from './SitePage';
+import type { GitBookSiteContext } from '@/lib/context';
+import type { Metadata, Viewport } from 'next';
+import {
+    SitePage,
+    type SitePageProps,
+    generateSitePageMetadata,
+    generateSitePageViewport,
+} from './SitePage';
 
 /**
  * Render the header from cache without carrying a request-scoped data fetcher into the cache key.
@@ -91,4 +98,48 @@ export async function PPRPageBody(props: { params: RouteLayoutParams; pathname: 
     ); // Tag the cache entry for the table of contents so it can be invalidated when the document changes
 
     return <SitePage context={context} pageParams={{ pathname: props.pathname }} staticRoute />;
+}
+
+// It looks like we cannot use use cache for this one.
+export const cachedGenerateSitePageMetadata = (props: SitePageProps): (() => Promise<Metadata>) => {
+    return unstable_cache(
+        async () => generateSitePageMetadata(props),
+        ['cachedGenerateSitePageMetadata'],
+        {
+            revalidate: 60 * 60 * 24, // Revalidate every 24 hours
+            tags: [
+                getCacheTag({
+                    tag: 'site',
+                    site: props.context.site.id,
+                }),
+                getCacheTag({
+                    tag: 'space',
+                    space: props.context.space.id,
+                }),
+            ],
+        }
+    );
+};
+
+export async function cachedGenerateSitePageViewport(
+    context: GitBookSiteContext
+): Promise<Viewport> {
+    'use cache: remote';
+    cacheLife('days'); // Cache for 1 day
+
+    cacheTag(
+        getCacheTag({
+            tag: 'site',
+            site: context.site.id,
+        })
+    ); // Tag the cache entry for the metadata so it can be invalidated when the site changes
+
+    cacheTag(
+        getCacheTag({
+            tag: 'space',
+            space: context.space.id,
+        })
+    ); // Tag the cache entry for the metadata so it can be invalidated when the space changes
+
+    return generateSitePageViewport(context);
 }
