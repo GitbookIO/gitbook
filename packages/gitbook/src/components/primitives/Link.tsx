@@ -6,7 +6,7 @@ import React from 'react';
 import { tcls } from '@/lib/tailwind';
 import { checkIsAnchor, resolveAnchorURL } from '@/lib/urls';
 import { type TrackEventInput, useTrackEvent } from '../Insights';
-import { NavigationStatusContext } from '../hooks';
+import { NavigationStatusContext, scrollToHash } from '../hooks';
 import { isExternalLink, toNonEmbedLink } from '../utils/link';
 import { type DesignTokenName, useClassnames } from './StyleProvider';
 
@@ -104,6 +104,10 @@ export function Link(props: LinkProps) {
                 const resolvedHref = resolveAnchorURL(href, window.location);
                 window.history.pushState(null, '', resolvedHref);
                 onNavigationClick(resolvedHref);
+                // preventDefault() killed native scroll and the hash may be unchanged
+                // (same anchor clicked again), so the change-keyed scroll effect won't
+                // fire — scroll imperatively here to always reach the heading.
+                scrollToHash(href.slice(1));
             } else {
                 onNavigationClick(href);
             }

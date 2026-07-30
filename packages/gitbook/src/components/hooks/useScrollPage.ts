@@ -80,8 +80,9 @@ export function useScrollToHash() {
 /**
  * Scroll to a hash, if scroll didn't work, return false.
  */
-function scrollToHash(hash: string) {
-    const element = document.getElementById(hash);
+export function scrollToHash(hash: string) {
+    // Decode so non-ASCII / spaced heading ids (percent-encoded in the URL) resolve.
+    const element = document.getElementById(decodeHash(hash));
     if (element) {
         element.scrollIntoView({
             block: 'start',
@@ -92,4 +93,15 @@ function scrollToHash(hash: string) {
         return true;
     }
     return false;
+}
+
+/**
+ * Decode a URL hash, falling back to the raw value if it is malformed.
+ */
+function decodeHash(hash: string): string {
+    try {
+        return decodeURIComponent(hash);
+    } catch {
+        return hash;
+    }
 }
