@@ -18,6 +18,7 @@ const REQUEST_HEADERS_TO_STRIP = new Set([
     'origin',
     'referer',
     'connection',
+    'cookie',
     'x-scalar-cookie',
     'x-scalar-user-agent',
     'x-forwarded-for',
@@ -36,6 +37,7 @@ const RESPONSE_HEADERS_TO_STRIP = new Set([
     'transfer-encoding',
     'connection',
     'keep-alive',
+    'set-cookie',
 ]);
 
 const CORS_HEADERS = {
@@ -236,11 +238,7 @@ export async function handleOpenAPIProxyRequest(request: NextRequest): Promise<R
         for (const [key, value] of response.headers.entries()) {
             const lower = key.toLowerCase();
             if (!RESPONSE_HEADERS_TO_STRIP.has(lower) && !lower.startsWith('access-control-')) {
-                if (lower === 'set-cookie') {
-                    responseHeaders.append(key, value);
-                } else {
-                    responseHeaders.set(key, value);
-                }
+                responseHeaders.set(key, value);
             }
         }
 
