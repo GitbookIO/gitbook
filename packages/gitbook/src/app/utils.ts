@@ -1,6 +1,7 @@
 import { getVisitorAuthClaims, getVisitorAuthClaimsFromToken } from '@/lib/adaptive';
 import { type SiteURLData, fetchSiteContextByURLLookup, getBaseContext } from '@/lib/context';
 import { getDynamicCustomizationSettings } from '@/lib/customization';
+import { DataFetcherError, lookupPublishedContentByUrl, throwIfDataError } from '@/lib/data';
 import type { SiteAPIToken } from '@gitbook/api';
 import { jwtDecode } from 'jwt-decode';
 import { forbidden, notFound } from 'next/navigation';
@@ -23,10 +24,11 @@ export type RouteParams = RouteLayoutParams & {
 };
 
 export type PPRRouteLayoutParams = RouteLayoutParams & {
+    lookupURL: string;
     revisionId: string;
     revalidationId: string;
-    tocAPIToken: string;
-    pageAPIToken: string;
+    tocVisitorToken: string;
+    pageVisitorToken: string;
 };
 
 export type PPRRouteParams = PPRRouteLayoutParams & {
@@ -142,33 +144,29 @@ export function getSiteURLDataFromParams(params: RouteLayoutParams): SiteURLData
     }
 }
 
-export type PPRRegion = 'structure' | 'toc' | 'page';
+export type PPRRegion = 'toc' | 'page';
 
-export function getPPRRouteParams(params: PPRRouteParams, region: PPRRegion): RouteParams;
-export function getPPRRouteParams(
-    params: PPRRouteLayoutParams,
-    region: PPRRegion
-): RouteLayoutParams;
+export function getPPRRouteParams(params: PPRRouteParams): RouteParams;
+export function getPPRRouteParams(params: PPRRouteLayoutParams): RouteLayoutParams;
 /**
- * Project PPR route params for one cached region, replacing the API token in site data.
+ * Project PPR route params shared by every cached region.
  */
-export function getPPRRouteParams(
-    params: PPRRouteLayoutParams,
-    region: PPRRegion
-): RouteLayoutParams {
-    const { revisionId, revalidationId, tocAPIToken, pageAPIToken, ...routeParams } = params;
+export function getPPRRouteParams(params: PPRRouteLayoutParams): RouteLayoutParams {
+    const {
+        lookupURL,
+        revisionId,
+        revalidationId,
+        tocVisitorToken,
+        pageVisitorToken,
+        ...routeParams
+    } = params;
     const siteURLData = getSiteURLDataFromParams(params);
-    const apiToken =
-        region === 'structure'
-            ? siteURLData.apiToken
-            : getPPRAPITokenFromParams(region === 'toc' ? tocAPIToken : pageAPIToken, region);
 
     return {
         ...routeParams,
         siteData: encodeURIComponent(
             rison.encode({
                 ...siteURLData,
-                apiToken,
                 revision: getPPRRouteParam(revisionId, 'revision ID'),
                 revalidationId: getPPRRouteParam(revalidationId, 'revalidation ID'),
             })
@@ -176,13 +174,43 @@ export function getPPRRouteParams(
     };
 }
 
-function getPPRAPITokenFromParams(encodedToken: string, region: 'toc' | 'page'): string {
-    try {
-        return decodeURIComponent(encodedToken);
-    } catch (error) {
-        console.error(`Returning 404 after failing to decode PPR ${region} API token: ${error}`);
-        notFound();
+/**
+ * Resolve the region-scoped API token from its visitor token before fetching its context.
+ */
+export async function getPPRStaticSiteContext(params: PPRRouteLayoutParams, region: PPRRegion) {
+    const routeParams = getPPRRouteParams(params);
+    const siteURLData = getSiteURLDataFromParams(routeParams);
+    const visitorToken = getPPRRouteParam(
+        region === 'toc' ? params.tocVisitorToken : params.pageVisitorToken,
+        `${region} visitor token`
+    );
+    const lookupURL = getPPRRouteParam(params.lookupURL, 'lookup URL');
+    const lookup = await throwIfDataError(
+        lookupPublishedContentByUrl({
+            url: getSiteURLFromParams(routeParams).toString(),
+            urlLookup: lookupURL,
+            visitorPayload: {
+                jwtToken: visitorToken,
+                unsignedClaims: {},
+            },
+            redirectOnError: false,
+            apiToken: siteURLData.apiToken,
+        })
+    );
+
+    if ('redirect' in lookup) {
+        throw new DataFetcherError('PPR content lookup resulted in a redirect', 502);
     }
+
+    return getStaticSiteContext({
+        ...routeParams,
+        siteData: encodeURIComponent(
+            rison.encode({
+                ...siteURLData,
+                apiToken: lookup.apiToken,
+            })
+        ),
+    });
 }
 
 function getPPRRouteParam(encodedParam: string, name: string): string {
