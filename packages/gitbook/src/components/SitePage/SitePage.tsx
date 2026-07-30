@@ -28,11 +28,11 @@ import { resolveContentRef } from '@/lib/references';
 import { getSiteStructureTitle } from '@/lib/sites';
 import { tcls } from '@/lib/tailwind';
 import { getPageRSSURL } from '@/routes/rss';
+import { getCacheTag } from '@gitbook/cache-tags';
+import { cacheLife, cacheTag } from 'next/cache';
 import { PageContextProvider } from '../PageContext';
 import { PageClientLayout } from './PageClientLayout';
 import { type PagePathParams, fetchPageData, getPathnameParam } from './fetch';
-import { cacheLife, cacheTag } from 'next/cache';
-import { getCacheTag } from '@gitbook/cache-tags';
 
 export type SitePageProps = {
     context: GitBookSiteContext;
@@ -144,7 +144,9 @@ export async function SitePage(props: SitePageProps & { staticRoute: boolean }) 
     );
 }
 
-export async function cachedGenerateSitePageViewport(context: GitBookSiteContext): Promise<Viewport> {
+export async function cachedGenerateSitePageViewport(
+    context: GitBookSiteContext
+): Promise<Viewport> {
     'use cache: remote';
     cacheLife('days'); // Cache for 1 day
 
@@ -198,7 +200,6 @@ export async function cachedGenerateSitePageMetadata(props: SitePageProps): Prom
             space: props.context.space.id,
         })
     ); // Tag the cache entry for the metadata so it can be invalidated when the space changes
-
 
     return generateSitePageMetadata(props);
 }
