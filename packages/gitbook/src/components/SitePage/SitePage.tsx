@@ -1,5 +1,4 @@
 import type { Metadata, Viewport } from 'next';
-import { cacheLife, cacheTag } from 'next/cache';
 import { notFound, redirect } from 'next/navigation';
 
 import {
@@ -9,7 +8,6 @@ import {
     SiteInsightsDisplayContext,
     type TranslationLanguage,
 } from '@gitbook/api';
-import { getCacheTag } from '@gitbook/cache-tags';
 import { IconsProvider } from '@gitbook/icons';
 
 import { PageContextProvider } from '../PageContext';
@@ -148,29 +146,6 @@ export async function SitePage(props: SitePageProps & { staticRoute: boolean }) 
     );
 }
 
-export async function cachedGenerateSitePageViewport(
-    context: GitBookSiteContext
-): Promise<Viewport> {
-    'use cache: remote';
-    cacheLife('days'); // Cache for 1 day
-
-    cacheTag(
-        getCacheTag({
-            tag: 'site',
-            site: context.site.id,
-        })
-    ); // Tag the cache entry for the metadata so it can be invalidated when the site changes
-
-    cacheTag(
-        getCacheTag({
-            tag: 'space',
-            space: context.space.id,
-        })
-    ); // Tag the cache entry for the metadata so it can be invalidated when the space changes
-
-    return generateSitePageViewport(context);
-}
-
 export async function generateSitePageViewport(context: GitBookSiteContext): Promise<Viewport> {
     const { customization } = context;
 
@@ -185,27 +160,6 @@ export async function generateSitePageViewport(context: GitBookSiteContext): Pro
                 ? 'light'
                 : 'light dark', // 'system' → let browser decide based on OS preference
     };
-}
-
-export async function cachedGenerateSitePageMetadata(props: SitePageProps): Promise<Metadata> {
-    'use cache: remote';
-    cacheLife('days'); // Cache for 1 day
-
-    cacheTag(
-        getCacheTag({
-            tag: 'site',
-            site: props.context.site.id,
-        })
-    ); // Tag the cache entry for the metadata so it can be invalidated when the site changes
-
-    cacheTag(
-        getCacheTag({
-            tag: 'space',
-            space: props.context.space.id,
-        })
-    ); // Tag the cache entry for the metadata so it can be invalidated when the space changes
-
-    return generateSitePageMetadata(props);
 }
 
 export async function generateSitePageMetadata(props: SitePageProps): Promise<Metadata> {
