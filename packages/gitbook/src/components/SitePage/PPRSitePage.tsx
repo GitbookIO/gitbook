@@ -1,18 +1,17 @@
-import { type RouteLayoutParams, getStaticSiteContext } from '@/app/utils';
+import {
+    type RouteLayoutParams,
+    type RouteParams,
+    getPagePathFromParams,
+    getStaticSiteContext,
+} from '@/app/utils';
 import { SpaceHeader, SpaceTableOfContents } from '@/components/SpaceLayout';
 
 import { getCacheTag } from '@gitbook/cache-tags';
 
-import { cacheLife, cacheTag, unstable_cache } from 'next/cache';
+import { cacheLife, cacheTag } from 'next/cache';
 
-import type { GitBookSiteContext } from '@/lib/context';
 import type { Metadata, Viewport } from 'next';
-import {
-    SitePage,
-    type SitePageProps,
-    generateSitePageMetadata,
-    generateSitePageViewport,
-} from './SitePage';
+import { SitePage, generateSitePageMetadata, generateSitePageViewport } from './SitePage';
 
 /**
  * Render the header from cache without carrying a request-scoped data fetcher into the cache key.
@@ -100,32 +99,35 @@ export async function PPRPageBody(props: { params: RouteLayoutParams; pathname: 
     return <SitePage context={context} pageParams={{ pathname: props.pathname }} staticRoute />;
 }
 
-// It looks like we cannot use use cache for this one.
-export const cachedGenerateSitePageMetadata = (props: SitePageProps): (() => Promise<Metadata>) => {
-    return unstable_cache(
-        async () => generateSitePageMetadata(props),
-        ['cachedGenerateSitePageMetadata'],
-        {
-            revalidate: 60 * 60 * 24, // Revalidate every 24 hours
-            tags: [
-                getCacheTag({
-                    tag: 'site',
-                    site: props.context.site.id,
-                }),
-                getCacheTag({
-                    tag: 'space',
-                    space: props.context.space.id,
-                }),
-            ],
-        }
-    );
-};
+export async function cachedGenerateSitePageMetadata(routeParams: RouteParams): Promise<Metadata> {
+    'use cache: remote';
 
-export async function cachedGenerateSitePageViewport(
-    context: GitBookSiteContext
-): Promise<Viewport> {
+    const { context } = await getStaticSiteContext(routeParams);
+    const pathname = getPagePathFromParams(routeParams);
+    cacheLife('days'); // Cache for 1 day
+
+    cacheTag(
+        getCacheTag({
+            tag: 'site',
+            site: context.site.id,
+        })
+    ); // Tag the cache entry for the metadata so it can be invalidated when the site changes
+
+    cacheTag(
+        getCacheTag({
+            tag: 'space',
+            space: context.space.id,
+        })
+    ); // Tag the cache entry for the metadata so it can be invalidated when the space changes
+
+    return generateSitePageMetadata({ context, pageParams: { pathname } });
+}
+
+export async function cachedGenerateSitePageViewport(routeParams: RouteParams): Promise<Viewport> {
     'use cache: remote';
     cacheLife('days'); // Cache for 1 day
+
+    const { context } = await getStaticSiteContext(routeParams);
 
     cacheTag(
         getCacheTag({
