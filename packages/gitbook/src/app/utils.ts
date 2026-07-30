@@ -25,6 +25,8 @@ export type RouteParams = RouteLayoutParams & {
 };
 
 export type PPRRouteLayoutParams = RouteLayoutParams & {
+    revisionId: string;
+    revalidationId: string;
     tocAPIToken: string;
     pageAPIToken: string;
 };
@@ -156,7 +158,7 @@ export function getPPRRouteParams(
     params: PPRRouteLayoutParams,
     region: PPRRegion
 ): RouteLayoutParams {
-    const { tocAPIToken, pageAPIToken, ...routeParams } = params;
+    const { revisionId, revalidationId, tocAPIToken, pageAPIToken, ...routeParams } = params;
     const siteURLData = getSiteURLDataFromParams(params);
     const apiToken =
         region === 'structure'
@@ -165,7 +167,14 @@ export function getPPRRouteParams(
 
     return {
         ...routeParams,
-        siteData: encodeURIComponent(rison.encode({ ...siteURLData, apiToken })),
+        siteData: encodeURIComponent(
+            rison.encode({
+                ...siteURLData,
+                apiToken,
+                revision: getPPRRouteParam(revisionId, 'revision ID'),
+                revalidationId: getPPRRouteParam(revalidationId, 'revalidation ID'),
+            })
+        ),
     };
 }
 
@@ -174,6 +183,15 @@ function getPPRAPITokenFromParams(encodedToken: string, region: 'toc' | 'page'):
         return decodeURIComponent(encodedToken);
     } catch (error) {
         console.error(`Returning 404 after failing to decode PPR ${region} API token: ${error}`);
+        notFound();
+    }
+}
+
+function getPPRRouteParam(encodedParam: string, name: string): string {
+    try {
+        return decodeURIComponent(encodedParam);
+    } catch (error) {
+        console.error(`Returning 404 after failing to decode PPR ${name}: ${error}`);
         notFound();
     }
 }

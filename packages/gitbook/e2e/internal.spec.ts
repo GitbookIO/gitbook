@@ -328,10 +328,17 @@ const testCases: TestsCase[] = [
             {
                 name: 'PPR route renders the site shell',
                 url: '',
-                headers: (() => {
+                headers: async () => {
                     const token = jwt.sign({ name: 'gitbook-open-tests' }, 'ppr-test-token', {
                         expiresIn: '24h',
                     });
+                    const data = await getSiteAPIToken(
+                        'https://gitbook-open-e2e-sites.gitbook.io/gitbook-doc/'
+                    );
+
+                    if ('redirect' in data || !data.revision) {
+                        throw new Error('PPR test site did not resolve to content with a revision');
+                    }
 
                     return {
                         'x-gbo-lookup-url':
@@ -339,8 +346,10 @@ const testCases: TestsCase[] = [
                         'x-gbo-struct-token': token,
                         'x-gbo-toc-token': token,
                         'x-gbo-page-token': token,
+                        'x-gbo-revision-id': data.revision,
+                        'x-gbo-revalidation-id': 'ppr-e2e-revalidation',
                     };
-                })(),
+                },
                 screenshot: false,
                 run: async (page, response) => {
                     expect(response?.headers()['x-gitbook-route-type']).toBe('ppr');

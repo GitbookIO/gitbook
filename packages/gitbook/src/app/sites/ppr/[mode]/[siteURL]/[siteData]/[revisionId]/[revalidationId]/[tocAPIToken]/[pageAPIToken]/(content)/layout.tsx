@@ -21,7 +21,7 @@ export default async function SitePPRLayout({
     const routeParams = await params;
     const headerParams = getPPRRouteParams(routeParams, 'structure');
     const tocParams = getPPRRouteParams(routeParams, 'toc');
-    const { context, visitorAuthClaims } = await getStaticSiteContext(routeParams);
+    const { context, visitorAuthClaims } = await getStaticSiteContext(headerParams);
     const withTracking = shouldTrackEvents();
 
     return (
@@ -44,11 +44,11 @@ export default async function SitePPRLayout({
 }
 
 export async function generateViewport({ params }: SitePPRLayoutProps) {
-    const { context } = await getStaticSiteContext(await params);
+    const { context } = await getStaticSiteContext(getPPRRouteParams(await params, 'structure'));
     return generateSiteLayoutViewport(context);
 }
 
 export async function generateMetadata({ params }: SitePPRLayoutProps) {
-    const { context } = await getStaticSiteContext(await params);
+    const { context } = await getStaticSiteContext(getPPRRouteParams(await params, 'structure'));
     return generateSiteLayoutMetadata(context);
 }
