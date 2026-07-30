@@ -19,8 +19,7 @@ export default async function SitePPRLayout({
     children,
 }: React.PropsWithChildren<SitePPRLayoutProps>) {
     const routeParams = await params;
-    const headerParams = getPPRRouteParams(routeParams, 'structure');
-    const tocParams = getPPRRouteParams(routeParams, 'toc');
+    const headerParams = getPPRRouteParams(routeParams);
     const { context, visitorAuthClaims } = await getStaticSiteContext(headerParams);
     const withTracking = shouldTrackEvents();
 
@@ -35,7 +34,7 @@ export default async function SitePPRLayout({
                 withTracking={withTracking}
                 visitorAuthClaims={visitorAuthClaims}
                 headerSlot={<PPRHeader params={headerParams} />}
-                tableOfContentsSlot={<PPRTableOfContents params={tocParams} />}
+                tableOfContentsSlot={<PPRTableOfContents params={routeParams} />}
             >
                 {children}
             </SiteLayout>
@@ -44,11 +43,11 @@ export default async function SitePPRLayout({
 }
 
 export async function generateViewport({ params }: SitePPRLayoutProps) {
-    const { context } = await getStaticSiteContext(getPPRRouteParams(await params, 'structure'));
+    const { context } = await getStaticSiteContext(getPPRRouteParams(await params));
     return generateSiteLayoutViewport(context);
 }
 
 export async function generateMetadata({ params }: SitePPRLayoutProps) {
-    const { context } = await getStaticSiteContext(getPPRRouteParams(await params, 'structure'));
+    const { context } = await getStaticSiteContext(getPPRRouteParams(await params));
     return generateSiteLayoutMetadata(context);
 }
