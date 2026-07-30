@@ -5,6 +5,8 @@ export type PPRRequest = {
     structureToken: string;
     tocToken: string;
     pageToken: string;
+    revisionId: string;
+    revalidationId: string;
 };
 
 // We need to find a better way than having to pass 3 different tokens
@@ -16,6 +18,8 @@ export const PPRRequestHeaders = {
     StructureToken: 'x-gbo-struct-token',
     TOCToken: 'x-gbo-toc-token',
     PageToken: 'x-gbo-page-token',
+    RevisionID: 'x-gbo-revision-id',
+    RevalidationID: 'x-gbo-revalidation-id',
 } as const;
 
 /**
@@ -27,8 +31,17 @@ export function getPPRRequest(headers: Headers): PPRRequest | undefined {
     const structureToken = headers.get(PPRRequestHeaders.StructureToken);
     const tocToken = headers.get(PPRRequestHeaders.TOCToken);
     const pageToken = headers.get(PPRRequestHeaders.PageToken);
+    const revisionId = headers.get(PPRRequestHeaders.RevisionID);
+    const revalidationId = headers.get(PPRRequestHeaders.RevalidationID);
 
-    if (!lookupURL || !structureToken || !tocToken || !pageToken) {
+    if (
+        !lookupURL ||
+        !structureToken ||
+        !tocToken ||
+        !pageToken ||
+        !revisionId ||
+        !revalidationId
+    ) {
         return undefined;
     }
 
@@ -37,6 +50,8 @@ export function getPPRRequest(headers: Headers): PPRRequest | undefined {
         structureToken,
         tocToken,
         pageToken,
+        revisionId,
+        revalidationId,
     };
 }
 

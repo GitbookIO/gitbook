@@ -82,6 +82,9 @@ export type SiteURLData = Pick<
      * Defaults to true when undefined.
      */
     displayAgentInstructions?: boolean;
+
+    /** Opaque identifier that partitions PPR renders across revalidations. */
+    revalidationId?: string;
 };
 
 /**
@@ -182,6 +185,9 @@ export type GitBookSiteContext = GitBookSpaceContext & {
 
     /** Whether to display agent instructions in the markdown output. Defaults to true when undefined. */
     displayAgentInstructions?: boolean;
+
+    /** Opaque identifier that partitions PPR renders across revalidations. */
+    revalidationId?: string;
 };
 
 /**
@@ -264,6 +270,7 @@ export async function fetchSiteContextByURLLookup(
         noIndexSearch: data.noIndexSearch ?? false,
         isLoggedInVisitor: data.isLoggedInVisitor ?? false,
         displayAgentInstructions: data.displayAgentInstructions,
+        revalidationId: data.revalidationId,
     });
 }
 
@@ -286,6 +293,7 @@ export async function fetchSiteContextByIds(
         noIndexSearch: boolean;
         isLoggedInVisitor: boolean;
         displayAgentInstructions?: boolean;
+        revalidationId?: string;
     }
 ): Promise<GitBookSiteContext> {
     const { dataFetcher } = baseContext;
@@ -412,6 +420,7 @@ export async function fetchSiteContextByIds(
         noIndexSearch: ids.noIndexSearch,
         isLoggedInVisitor: ids.isLoggedInVisitor,
         displayAgentInstructions: ids.displayAgentInstructions,
+        revalidationId: ids.revalidationId,
     };
 }
 
