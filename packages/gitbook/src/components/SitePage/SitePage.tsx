@@ -148,7 +148,9 @@ export async function SitePage(props: SitePageProps & { staticRoute: boolean }) 
     );
 }
 
-export async function cachedGenerateSitePageViewport(context: GitBookSiteContext): Promise<Viewport> {
+export async function cachedGenerateSitePageViewport(
+    context: GitBookSiteContext
+): Promise<Viewport> {
     'use cache: remote';
     cacheLife('days'); // Cache for 1 day
 
@@ -202,7 +204,6 @@ export async function cachedGenerateSitePageMetadata(props: SitePageProps): Prom
             space: props.context.space.id,
         })
     ); // Tag the cache entry for the metadata so it can be invalidated when the space changes
-
 
     return generateSitePageMetadata(props);
 }
