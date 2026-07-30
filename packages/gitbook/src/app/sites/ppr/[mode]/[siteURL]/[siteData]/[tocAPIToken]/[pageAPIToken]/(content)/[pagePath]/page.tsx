@@ -40,5 +40,5 @@ export async function generateMetadata(props: PageProps): Promise<Metadata> {
     return cachedGenerateSitePageMetadata({
         context,
         pageParams: { pathname },
-    });
+    })();
 }
