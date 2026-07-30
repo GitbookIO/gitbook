@@ -1,6 +1,8 @@
 import {
+    type PPRRouteLayoutParams,
+    type PPRRouteParams,
     type RouteLayoutParams,
-    type RouteParams,
+    getPPRStaticSiteContext,
     getPagePathFromParams,
     getStaticSiteContext,
 } from '@/app/utils';
@@ -39,13 +41,13 @@ export async function PPRHeader(props: { params: RouteLayoutParams }) {
 /**
  * Render the table of contents independently so navigation changes do not invalidate the header.
  */
-export async function PPRTableOfContents(props: { params: RouteLayoutParams }) {
+export async function PPRTableOfContents(props: { params: PPRRouteLayoutParams }) {
     'use cache: remote';
     cacheLife('days'); // Cache for 1 day
 
     console.log('PPRTableOfContents');
 
-    const { context } = await getStaticSiteContext(props.params);
+    const { context } = await getPPRStaticSiteContext(props.params, 'toc');
 
     cacheTag(
         getCacheTag({
@@ -67,10 +69,10 @@ export async function PPRTableOfContents(props: { params: RouteLayoutParams }) {
 /**
  * Render the page body independently from the shared navigation shell.
  */
-export async function PPRPageBody(props: { params: RouteLayoutParams; pathname: string }) {
+export async function PPRPageBody(props: { params: PPRRouteParams; pathname: string }) {
     'use cache: remote';
     cacheLife('days'); // Cache for 1 day
-    const { context } = await getStaticSiteContext(props.params);
+    const { context } = await getPPRStaticSiteContext(props.params, 'page');
 
     console.log('PPRPageBody');
 
@@ -99,10 +101,12 @@ export async function PPRPageBody(props: { params: RouteLayoutParams; pathname: 
     return <SitePage context={context} pageParams={{ pathname: props.pathname }} staticRoute />;
 }
 
-export async function cachedGenerateSitePageMetadata(routeParams: RouteParams): Promise<Metadata> {
+export async function cachedGenerateSitePageMetadata(
+    routeParams: PPRRouteParams
+): Promise<Metadata> {
     'use cache: remote';
 
-    const { context } = await getStaticSiteContext(routeParams);
+    const { context } = await getPPRStaticSiteContext(routeParams, 'page');
     const pathname = getPagePathFromParams(routeParams);
     cacheLife('days'); // Cache for 1 day
 
@@ -123,11 +127,13 @@ export async function cachedGenerateSitePageMetadata(routeParams: RouteParams): 
     return generateSitePageMetadata({ context, pageParams: { pathname } });
 }
 
-export async function cachedGenerateSitePageViewport(routeParams: RouteParams): Promise<Viewport> {
+export async function cachedGenerateSitePageViewport(
+    routeParams: PPRRouteParams
+): Promise<Viewport> {
     'use cache: remote';
     cacheLife('days'); // Cache for 1 day
 
-    const { context } = await getStaticSiteContext(routeParams);
+    const { context } = await getPPRStaticSiteContext(routeParams, 'page');
 
     cacheTag(
         getCacheTag({
