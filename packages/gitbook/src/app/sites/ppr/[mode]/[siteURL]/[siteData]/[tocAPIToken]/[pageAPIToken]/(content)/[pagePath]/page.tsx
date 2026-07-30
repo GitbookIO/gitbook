@@ -8,7 +8,7 @@ import {
     PPRPageBody,
     cachedGenerateSitePageMetadata,
     cachedGenerateSitePageViewport,
-} from '@/components/SitePage';
+} from '@/components/SitePage/PPRSitePage';
 
 import type { Metadata, Viewport } from 'next';
 
