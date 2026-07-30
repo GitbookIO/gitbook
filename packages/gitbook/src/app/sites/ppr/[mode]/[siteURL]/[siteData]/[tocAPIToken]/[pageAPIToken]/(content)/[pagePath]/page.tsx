@@ -1,9 +1,4 @@
-import {
-    type PPRRouteParams,
-    getPPRRouteParams,
-    getPagePathFromParams,
-    getStaticSiteContext,
-} from '@/app/utils';
+import { type PPRRouteParams, getPPRRouteParams, getPagePathFromParams } from '@/app/utils';
 import {
     PPRPageBody,
     cachedGenerateSitePageMetadata,
@@ -27,18 +22,12 @@ export default async function Page(props: PageProps) {
 
 export async function generateViewport(props: PageProps): Promise<Viewport> {
     const params = await props.params;
-    const { context } = await getStaticSiteContext(getPPRRouteParams(params, 'page'));
-    return cachedGenerateSitePageViewport(context);
+    return cachedGenerateSitePageViewport(getPPRRouteParams(params, 'page'));
 }
 
 export async function generateMetadata(props: PageProps): Promise<Metadata> {
     const params = await props.params;
     const correctParams = getPPRRouteParams(params, 'page');
-    const { context } = await getStaticSiteContext(correctParams);
-    const pathname = getPagePathFromParams(correctParams);
 
-    return cachedGenerateSitePageMetadata({
-        context,
-        pageParams: { pathname },
-    })();
+    return cachedGenerateSitePageMetadata(correctParams);
 }
