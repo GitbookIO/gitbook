@@ -568,7 +568,6 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         ].join('/');
 
         const rewrittenURL = new URL(`/${route}`, request.nextUrl.toString());
-        console.log('rewrittenURL', rewrittenURL.toString(), 'routeType', routeType, 'pathname', pathname);
         // Preserve the original search params but remove fallback=true if present
         rewrittenURL.search = request.nextUrl.search;
         if (rewrittenURL.searchParams.has('fallback')) {
