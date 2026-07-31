@@ -4,9 +4,9 @@ import NextLink, { type LinkProps as NextLinkProps } from 'next/link';
 import React from 'react';
 
 import { tcls } from '@/lib/tailwind';
-import { checkIsAnchor, resolveAnchorURL } from '@/lib/urls';
+import { getSamePageAnchor, resolveAnchorURL } from '@/lib/urls';
 import { type TrackEventInput, useTrackEvent } from '../Insights';
-import { NavigationStatusContext } from '../hooks';
+import { NavigationStatusContext, scrollToHash } from '../hooks';
 import { isExternalLink, toNonEmbedLink } from '../utils/link';
 import { type DesignTokenName, useClassnames } from './StyleProvider';
 
@@ -93,17 +93,19 @@ export function Link(props: LinkProps) {
     const trackEvent = useTrackEvent();
     const forwardedClassNames = useClassnames(classNames || []);
     const isExternal = isExternalServer(href);
-    const isAnchor = checkIsAnchor(href);
     const { target, rel } = getTargetProps(props, { externalTarget, isExternal });
 
     const onClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
         // Only trigger navigation context for internal links in the same window without modifier keys (i.e. open in new tab).
         if (!isExternal && target !== '_blank' && !event.ctrlKey && !event.metaKey) {
-            if (isAnchor) {
+            const samePageAnchor = getSamePageAnchor(href, window.location);
+            if (samePageAnchor) {
                 event.preventDefault();
-                const resolvedHref = resolveAnchorURL(href, window.location);
+                const resolvedHref = resolveAnchorURL(`#${samePageAnchor}`, window.location);
                 window.history.pushState(null, '', resolvedHref);
                 onNavigationClick(resolvedHref);
+                // Repeated anchor clicks don't change hash state, so the navigation effect won't rerun.
+                scrollToHash(samePageAnchor);
             } else {
                 onNavigationClick(href);
             }
