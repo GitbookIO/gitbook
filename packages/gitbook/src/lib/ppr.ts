@@ -1,58 +1,111 @@
+import type { PublishedSiteContent } from '@gitbook/api';
+
 export type SiteRouteType = 'dynamic' | 'static' | 'ppr';
 
 export type PPRRequest = {
-    lookupURL: string;
-    structureToken: string;
-    tocToken: string;
-    pageToken: string;
-    revisionId: string;
+    content: PublishedSiteContent & { revision: string };
     revalidationId: string;
 };
 
-// We need to find a better way than having to pass 3 different visitor tokens.
-// The TOC and page tokens are resolved by their cached regions, rather than in middleware.
-// This is not true PPR, but in combination with what we are doing in the background,
-// it will allow us to cache the different regions independently and invalidate them when needed
 export const PPRRequestHeaders = {
-    LookupURL: 'x-gbo-lookup-url',
-    StructureToken: 'x-gbo-struct-token',
-    TOCToken: 'x-gbo-toc-token',
-    PageToken: 'x-gbo-page-token',
-    RevisionID: 'x-gbo-revision-id',
+    Site: 'x-gbo-site',
+    SiteSection: 'x-gbo-site-section',
+    SiteSpace: 'x-gbo-site-space',
+    Space: 'x-gbo-space',
+    SiteBasePath: 'x-gbo-site-base-path',
+    BasePath: 'x-gbo-base-path',
+    Pathname: 'x-gbo-pathname',
+    Organization: 'x-gbo-organization',
+    ShareKey: 'x-gbo-share-key',
+    Complete: 'x-gbo-complete',
+    ContextID: 'x-gbo-context-id',
+    CanonicalURL: 'x-gbo-canonical-url',
+    Preview: 'x-gbo-preview',
+    Revision: 'x-gbo-revision',
+    ChangeRequest: 'x-gbo-change-request',
+    APIToken: 'x-gbo-api-token',
     RevalidationID: 'x-gbo-revalidation-id',
 } as const;
 
 /**
- * PPR needs independently scoped tokens for each cached region, so partial header sets
- * must continue through the regular rendering path.
+ * GBO has already resolved PPR requests, so a complete header set can skip URL resolution.
  */
 export function getPPRRequest(headers: Headers): PPRRequest | undefined {
-    const lookupURL = headers.get(PPRRequestHeaders.LookupURL);
-    const structureToken = headers.get(PPRRequestHeaders.StructureToken);
-    const tocToken = headers.get(PPRRequestHeaders.TOCToken);
-    const pageToken = headers.get(PPRRequestHeaders.PageToken);
-    const revisionId = headers.get(PPRRequestHeaders.RevisionID);
+    const site = getRequiredHeader(headers, PPRRequestHeaders.Site);
+    const siteSpace = getRequiredHeader(headers, PPRRequestHeaders.SiteSpace);
+    const space = getRequiredHeader(headers, PPRRequestHeaders.Space);
+    const siteBasePath = getRequiredHeader(headers, PPRRequestHeaders.SiteBasePath);
+    const basePath = getRequiredHeader(headers, PPRRequestHeaders.BasePath);
+    const pathname = getRequiredHeader(headers, PPRRequestHeaders.Pathname);
+    const organization = getRequiredHeader(headers, PPRRequestHeaders.Organization);
+    const complete = getBooleanHeader(headers, PPRRequestHeaders.Complete);
+    const canonicalUrl = getRequiredHeader(headers, PPRRequestHeaders.CanonicalURL);
+    const apiToken = getRequiredHeader(headers, PPRRequestHeaders.APIToken);
+    const preview = getBooleanHeader(headers, PPRRequestHeaders.Preview);
+    const revision = getRequiredHeader(headers, PPRRequestHeaders.Revision);
     const revalidationId = headers.get(PPRRequestHeaders.RevalidationID);
 
     if (
-        !lookupURL ||
-        !structureToken ||
-        !tocToken ||
-        !pageToken ||
-        !revisionId ||
+        !site ||
+        !siteSpace ||
+        !space ||
+        !siteBasePath ||
+        !basePath ||
+        !pathname ||
+        !organization ||
+        complete === undefined ||
+        !canonicalUrl ||
+        !apiToken ||
+        (headers.get(PPRRequestHeaders.Preview) && preview === undefined) ||
+        !revision ||
         !revalidationId
     ) {
         return undefined;
     }
 
     return {
-        lookupURL,
-        structureToken,
-        tocToken,
-        pageToken,
-        revisionId,
+        content: {
+            site,
+            siteSection: getOptionalHeader(headers, PPRRequestHeaders.SiteSection),
+            siteSpace,
+            space,
+            siteBasePath,
+            basePath,
+            pathname,
+            organization,
+            shareKey: getOptionalHeader(headers, PPRRequestHeaders.ShareKey),
+            complete,
+            contextId: getOptionalHeader(headers, PPRRequestHeaders.ContextID),
+            canonicalUrl,
+            preview,
+            revision,
+            changeRequest: getOptionalHeader(headers, PPRRequestHeaders.ChangeRequest),
+            apiToken,
+        },
         revalidationId,
     };
+}
+
+function getRequiredHeader(headers: Headers, name: string): string | undefined {
+    return getOptionalHeader(headers, name);
+}
+
+function getOptionalHeader(headers: Headers, name: string): string | undefined {
+    return headers.get(name) || undefined;
+}
+
+function getBooleanHeader(headers: Headers, name: string): boolean | undefined {
+    const value = getOptionalHeader(headers, name);
+    if (!value) {
+        return undefined;
+    }
+    if (value === 'true') {
+        return true;
+    }
+    if (value === 'false') {
+        return false;
+    }
+    return undefined;
 }
 
 /**

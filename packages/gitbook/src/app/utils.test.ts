@@ -6,6 +6,7 @@ mock.module('server-only', () => ({}));
 mock.module('@/lib/adaptive', () => ({
     getVisitorAuthClaims: () => ({}),
     getVisitorAuthClaimsFromToken: () => ({}),
+    getPPRVisitorAuthClaimsFromToken: () => ({ scope: 'site-structure' }),
 }));
 mock.module('@/lib/context', () => ({
     getBaseContext: (input: unknown) => input,
@@ -13,29 +14,6 @@ mock.module('@/lib/context', () => ({
 }));
 mock.module('jwt-decode', () => ({
     jwtDecode: () => ({}),
-}));
-
-const lookupCalls: unknown[] = [];
-let redirectLookup = false;
-mock.module('@/lib/data', () => ({
-    DataFetcherError: class DataFetcherError extends Error {},
-    lookupPublishedContentByUrl: async (input: unknown) => {
-        lookupCalls.push(input);
-        if (redirectLookup) {
-            return {
-                data: {
-                    redirect: 'https://docs.example.com/redirected',
-                    target: 'content',
-                },
-            };
-        }
-        return {
-            data: {
-                apiToken: `resolved-${(input as { visitorPayload: { jwtToken: string } }).visitorPayload.jwtToken}`,
-            },
-        };
-    },
-    throwIfDataError: async <T>(response: Promise<{ data: T }>) => (await response).data,
 }));
 
 const { getPPRRouteParams, getPPRStaticSiteContext, getSiteURLDataFromParams } = await import(
@@ -48,23 +26,20 @@ const routeParams: PPRRouteParams = {
     siteURL: 'docs.example.com',
     siteData: encodeURIComponent(
         rison.encode({
-            apiToken: 'structure-api-token',
+            apiToken: 'ppr-api-token',
             site: 'site-id',
             space: 'space-id',
-            revision: 'revision-id',
+            revision: 'resolved-revision-id',
             imagesContextId: 'images-context-id',
         })
     ),
-    lookupURL: encodeURIComponent('https://docs.example.com/guide'),
     revisionId: encodeURIComponent('ppr-revision-id'),
     revalidationId: encodeURIComponent('revalidation-id'),
-    tocVisitorToken: encodeURIComponent('toc-visitor-token'),
-    pageVisitorToken: encodeURIComponent('page-visitor-token'),
     pagePath: 'guide',
 };
 
 describe('getPPRRouteParams', () => {
-    it('removes PPR-only parameters while preserving the structure API token and revision data', () => {
+    it('removes the PPR cache key while preserving resolved content and API token', () => {
         const params = getPPRRouteParams(routeParams);
 
         expect(params).toMatchObject({
@@ -72,13 +47,10 @@ describe('getPPRRouteParams', () => {
             siteURL: routeParams.siteURL,
             pagePath: routeParams.pagePath,
         });
-        expect(params).not.toHaveProperty('lookupURL');
-        expect(params).not.toHaveProperty('tocVisitorToken');
-        expect(params).not.toHaveProperty('pageVisitorToken');
         expect(params).not.toHaveProperty('revisionId');
         expect(params).not.toHaveProperty('revalidationId');
         expect(getSiteURLDataFromParams(params)).toMatchObject({
-            apiToken: 'structure-api-token',
+            apiToken: 'ppr-api-token',
             site: 'site-id',
             space: 'space-id',
             revision: 'ppr-revision-id',
@@ -89,40 +61,14 @@ describe('getPPRRouteParams', () => {
 });
 
 describe('getPPRStaticSiteContext', () => {
-    it.each([
-        ['toc', 'toc-visitor-token'],
-        ['page', 'page-visitor-token'],
-    ] as const)('resolves the %s context with its scoped visitor token', async (region, token) => {
-        lookupCalls.length = 0;
+    it('uses the supplied API token without resolving published content again', async () => {
+        const { context, visitorAuthClaims } = await getPPRStaticSiteContext(routeParams);
 
-        const { context } = await getPPRStaticSiteContext(routeParams, region);
-
-        expect(lookupCalls).toEqual([
-            {
-                url: 'https://docs.example.com/',
-                urlLookup: 'https://docs.example.com/guide',
-                visitorPayload: {
-                    jwtToken: token,
-                    unsignedClaims: {},
-                },
-                redirectOnError: false,
-                apiToken: 'structure-api-token',
-            },
-        ]);
         expect(context).toMatchObject({
-            apiToken: `resolved-${token}`,
+            apiToken: 'ppr-api-token',
             revision: 'ppr-revision-id',
             revalidationId: 'revalidation-id',
         });
-    });
-
-    it('rejects redirects from a region lookup', async () => {
-        redirectLookup = true;
-
-        await expect(getPPRStaticSiteContext(routeParams, 'toc')).rejects.toThrow(
-            'PPR content lookup resulted in a redirect'
-        );
-
-        redirectLookup = false;
+        expect(visitorAuthClaims).toEqual({ scope: 'site-structure' });
     });
 });

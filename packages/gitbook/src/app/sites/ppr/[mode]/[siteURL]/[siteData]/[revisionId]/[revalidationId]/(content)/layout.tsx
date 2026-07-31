@@ -1,4 +1,4 @@
-import { type PPRRouteLayoutParams, getPPRRouteParams, getStaticSiteContext } from '@/app/utils';
+import { type PPRRouteLayoutParams, getPPRRouteParams, getPPRStaticSiteContext } from '@/app/utils';
 import { CustomizationRootLayout } from '@/components/RootLayout';
 import {
     SiteLayout,
@@ -20,7 +20,7 @@ export default async function SitePPRLayout({
 }: React.PropsWithChildren<SitePPRLayoutProps>) {
     const routeParams = await params;
     const headerParams = getPPRRouteParams(routeParams);
-    const { context, visitorAuthClaims } = await getStaticSiteContext(headerParams);
+    const { context, visitorAuthClaims } = await getPPRStaticSiteContext(routeParams);
     const withTracking = shouldTrackEvents();
 
     return (
@@ -43,11 +43,11 @@ export default async function SitePPRLayout({
 }
 
 export async function generateViewport({ params }: SitePPRLayoutProps) {
-    const { context } = await getStaticSiteContext(getPPRRouteParams(await params));
+    const { context } = await getPPRStaticSiteContext(await params);
     return generateSiteLayoutViewport(context);
 }
 
 export async function generateMetadata({ params }: SitePPRLayoutProps) {
-    const { context } = await getStaticSiteContext(getPPRRouteParams(await params));
+    const { context } = await getPPRStaticSiteContext(await params);
     return generateSiteLayoutMetadata(context);
 }
