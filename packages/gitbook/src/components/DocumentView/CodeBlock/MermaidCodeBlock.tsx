@@ -12,7 +12,7 @@ import type { RenderResult } from 'mermaid';
 import { FocusScope, usePreventScroll } from 'react-aria';
 import { type ClientBlockProps, ClientCodeBlock } from './ClientCodeBlock';
 import { MermaidPanZoomControls } from './MermaidPanZoomControls';
-import { getPlainCodeBlock } from './highlight';
+import { getPlainCodeBlock } from './highlight-tokens';
 
 /** Duration of the fullscreen dialog enter/exit animation, must match `animate-blur-in/out`. */
 const DIALOG_ANIMATION_MS = 200;

@@ -13,7 +13,7 @@ import { useDebounceCallback } from 'usehooks-ts';
 import type { BlockProps } from '../Block';
 import { type InlineExpressionVariables, useEvaluateInlineExpression } from '../InlineExpression';
 import { CodeBlockRenderer } from './CodeBlockRenderer';
-import type { HighlightTheme, RenderedInline } from './highlight';
+import type { HighlightTheme, RenderedInline } from './highlight-tokens';
 import { plainHighlight } from './plain-highlight';
 
 export type ClientBlockProps = Pick<BlockProps<DocumentBlockCode>, 'block' | 'style'> & {

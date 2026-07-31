@@ -8,7 +8,7 @@ import { AnnotationPopover } from '../Annotation/AnnotationPopover';
 import type { BlockProps } from '../Block';
 import { AskAICodeButton } from './AskAICodeButton';
 import { CopyCodeButton } from './CopyCodeButton';
-import type { HighlightLine, HighlightTheme, HighlightToken } from './highlight';
+import type { HighlightLine, HighlightTheme, HighlightToken } from './highlight-tokens';
 
 type CodeBlockRendererProps = Pick<BlockProps<DocumentBlockCode>, 'block' | 'style'> & {
     theme: HighlightTheme;
