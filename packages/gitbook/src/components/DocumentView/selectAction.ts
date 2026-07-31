@@ -22,9 +22,9 @@ export function getSelectAction(
     if (!('action' in data)) {
         return null;
     }
-    const action = data.action as { action?: string; value?: unknown };
-    if (action.action === 'select' && typeof action.value === 'string') {
-        return { action: 'select', value: action.value };
+    const action = data.action as { action?: string; slug?: unknown };
+    if (action.action === 'select' && typeof action.slug === 'string') {
+        return { action: 'select', value: action.slug };
     }
     return null;
 }
