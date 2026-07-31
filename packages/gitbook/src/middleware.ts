@@ -217,27 +217,31 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
     request.headers.delete('x-gitbook-disable-tracking');
 
     const pprRequest = getPPRRequest(request.headers);
-    console.log('pprRequest', pprRequest);
 
-    const withAPIToken = async (apiToken: string | null) => {
-        const siteURLData = await throwIfDataError(
-            lookupPublishedContentByUrl({
-                url: siteRequestURL.toString(),
-                visitorPayload: {
-                    jwtToken: pprRequest?.structureToken ?? visitorToken?.token ?? undefined,
-                    unsignedClaims,
-                    type: getVisitorType(request),
-                },
-                // When the visitor auth token is pulled from the cookie, set redirectOnError when calling resolvePublishedContentByUrl to allow
-                // redirecting when the token is invalid as we could be dealing with stale token stored in the cookie.
-                // For example when the VA backend signature has changed but the token stored in the cookie is not yet expired.
-                redirectOnError: visitorToken?.source === 'visitor-auth-cookie',
+    const withAPIToken = async (
+        apiToken: string | null,
+        resolvedPPRContent?: PublishedSiteContent
+    ) => {
+        const siteURLData =
+            resolvedPPRContent ??
+            (await throwIfDataError(
+                lookupPublishedContentByUrl({
+                    url: siteRequestURL.toString(),
+                    visitorPayload: {
+                        jwtToken: visitorToken?.token ?? undefined,
+                        unsignedClaims,
+                        type: getVisitorType(request),
+                    },
+                    // When the visitor auth token is pulled from the cookie, set redirectOnError when calling resolvePublishedContentByUrl to allow
+                    // redirecting when the token is invalid as we could be dealing with stale token stored in the cookie.
+                    // For example when the VA backend signature has changed but the token stored in the cookie is not yet expired.
+                    redirectOnError: visitorToken?.source === 'visitor-auth-cookie',
 
-                // Use the API token passed in the request, if any
-                // as it could be used for .preview hostnames
-                apiToken,
-            })
-        );
+                    // Use the API token passed in the request, if any
+                    // as it could be used for .preview hostnames
+                    apiToken,
+                })
+            ));
 
         const cookies: ResponseCookies = visitorParamsCookie
             ? [
@@ -499,7 +503,6 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         }
 
         routeType = getPPRRouteType(routeType, isPPRPage, pprRequest);
-        console.log('routeType', routeType, 'isPPRPage', isPPRPage, 'pprRequest', pprRequest);
         requestHeaders.set(MiddlewareHeaders.RouteType, routeType);
 
         if (events && events.length > 0) {
@@ -533,11 +536,8 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
             ),
             ...(routeType === 'ppr' && pprRequest
                 ? [
-                      encodeURIComponent(pprRequest.lookupURL),
-                      encodeURIComponent(pprRequest.revisionId),
+                      encodeURIComponent(pprRequest.content.revision),
                       encodeURIComponent(pprRequest.revalidationId),
-                      encodeURIComponent(pprRequest.tocToken),
-                      encodeURIComponent(pprRequest.pageToken),
                   ]
                 : []),
             pathname,
@@ -611,6 +611,10 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
 
         return writeResponseCookies(response, cookies);
     };
+
+    if (pprRequest) {
+        return withAPIToken(null, pprRequest.content);
+    }
 
     // For preview requests like:
     // - https://<GITBOOK_PREVIEW_BASE_URL>/<siteID> requests (ex: https://sites.gitbook.com/preview/site_id/path)

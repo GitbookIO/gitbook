@@ -4,10 +4,13 @@ import rison from 'rison';
 
 import type { SiteAPIToken } from '@gitbook/api';
 
-import { getVisitorAuthClaims, getVisitorAuthClaimsFromToken } from '@/lib/adaptive';
+import {
+    getPPRVisitorAuthClaimsFromToken,
+    getVisitorAuthClaims,
+    getVisitorAuthClaimsFromToken,
+} from '@/lib/adaptive';
 import { type SiteURLData, fetchSiteContextByURLLookup, getBaseContext } from '@/lib/context';
 import { getDynamicCustomizationSettings } from '@/lib/customization';
-import { DataFetcherError, lookupPublishedContentByUrl, throwIfDataError } from '@/lib/data';
 
 export type RouteParamMode = 'url-host' | 'url';
 
@@ -26,11 +29,8 @@ export type RouteParams = RouteLayoutParams & {
 };
 
 export type PPRRouteLayoutParams = RouteLayoutParams & {
-    lookupURL: string;
     revisionId: string;
     revalidationId: string;
-    tocVisitorToken: string;
-    pageVisitorToken: string;
 };
 
 export type PPRRouteParams = PPRRouteLayoutParams & {
@@ -40,7 +40,10 @@ export type PPRRouteParams = PPRRouteLayoutParams & {
 /**
  * Get the static context when rendering statically a site.
  */
-export async function getStaticSiteContext(params: RouteLayoutParams) {
+export async function getStaticSiteContext(
+    params: RouteLayoutParams,
+    getClaims = getVisitorAuthClaimsFromToken
+) {
     const siteURL = getSiteURLFromParams(params);
     const siteURLData = getSiteURLDataFromParams(params);
 
@@ -62,7 +65,7 @@ export async function getStaticSiteContext(params: RouteLayoutParams) {
 
     return {
         context,
-        visitorAuthClaims: getVisitorAuthClaimsFromToken(decoded),
+        visitorAuthClaims: getClaims(decoded),
     };
 }
 
@@ -146,22 +149,13 @@ export function getSiteURLDataFromParams(params: RouteLayoutParams): SiteURLData
     }
 }
 
-export type PPRRegion = 'toc' | 'page';
-
 export function getPPRRouteParams(params: PPRRouteParams): RouteParams;
 export function getPPRRouteParams(params: PPRRouteLayoutParams): RouteLayoutParams;
 /**
  * Project PPR route params shared by every cached region.
  */
 export function getPPRRouteParams(params: PPRRouteLayoutParams): RouteLayoutParams {
-    const {
-        lookupURL,
-        revisionId,
-        revalidationId,
-        tocVisitorToken,
-        pageVisitorToken,
-        ...routeParams
-    } = params;
+    const { revisionId, revalidationId, ...routeParams } = params;
     const siteURLData = getSiteURLDataFromParams(params);
 
     return {
@@ -176,43 +170,8 @@ export function getPPRRouteParams(params: PPRRouteLayoutParams): RouteLayoutPara
     };
 }
 
-/**
- * Resolve the region-scoped API token from its visitor token before fetching its context.
- */
-export async function getPPRStaticSiteContext(params: PPRRouteLayoutParams, region: PPRRegion) {
-    const routeParams = getPPRRouteParams(params);
-    const siteURLData = getSiteURLDataFromParams(routeParams);
-    const visitorToken = getPPRRouteParam(
-        region === 'toc' ? params.tocVisitorToken : params.pageVisitorToken,
-        `${region} visitor token`
-    );
-    const lookupURL = getPPRRouteParam(params.lookupURL, 'lookup URL');
-    const lookup = await throwIfDataError(
-        lookupPublishedContentByUrl({
-            url: getSiteURLFromParams(routeParams).toString(),
-            urlLookup: lookupURL,
-            visitorPayload: {
-                jwtToken: visitorToken,
-                unsignedClaims: {},
-            },
-            redirectOnError: false,
-            apiToken: siteURLData.apiToken,
-        })
-    );
-
-    if ('redirect' in lookup) {
-        throw new DataFetcherError('PPR content lookup resulted in a redirect', 502);
-    }
-
-    return getStaticSiteContext({
-        ...routeParams,
-        siteData: encodeURIComponent(
-            rison.encode({
-                ...siteURLData,
-                apiToken: lookup.apiToken,
-            })
-        ),
-    });
+export async function getPPRStaticSiteContext(params: PPRRouteLayoutParams) {
+    return getStaticSiteContext(getPPRRouteParams(params), getPPRVisitorAuthClaimsFromToken);
 }
 
 function getPPRRouteParam(encodedParam: string, name: string): string {

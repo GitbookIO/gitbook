@@ -329,24 +329,31 @@ const testCases: TestsCase[] = [
                 name: 'PPR route renders the site shell',
                 url: '',
                 headers: async () => {
-                    const token = jwt.sign({ name: 'gitbook-open-tests' }, 'ppr-test-token', {
-                        expiresIn: '24h',
-                    });
                     const data = await getSiteAPIToken(
                         'https://gitbook-open-e2e-sites.gitbook.io/gitbook-doc/'
                     );
 
-                    if ('redirect' in data || !data.revision) {
+                    if (!data.revision) {
                         throw new Error('PPR test site did not resolve to content with a revision');
                     }
 
                     return {
-                        'x-gbo-lookup-url':
-                            'https://gitbook-open-e2e-sites.gitbook.io/gitbook-doc/',
-                        'x-gbo-struct-token': token,
-                        'x-gbo-toc-token': token,
-                        'x-gbo-page-token': token,
-                        'x-gbo-revision-id': data.revision,
+                        'x-gbo-site': data.site,
+                        'x-gbo-site-section': data.siteSection ?? '',
+                        'x-gbo-site-space': data.siteSpace,
+                        'x-gbo-space': data.space,
+                        'x-gbo-site-base-path': data.siteBasePath,
+                        'x-gbo-base-path': data.basePath,
+                        'x-gbo-pathname': data.pathname || '/',
+                        'x-gbo-organization': data.organization,
+                        'x-gbo-share-key': data.shareKey ?? '',
+                        'x-gbo-complete': String(data.complete),
+                        'x-gbo-context-id': data.contextId ?? '',
+                        'x-gbo-canonical-url': data.canonicalUrl,
+                        'x-gbo-preview': data.preview === undefined ? '' : String(data.preview),
+                        'x-gbo-revision': data.revision ?? '',
+                        'x-gbo-change-request': data.changeRequest ?? '',
+                        'x-gbo-api-token': data.apiToken,
                         'x-gbo-revalidation-id': 'ppr-e2e-revalidation',
                     };
                 },

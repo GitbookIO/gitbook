@@ -22,9 +22,6 @@ export async function PPRHeader(props: { params: RouteLayoutParams }) {
     'use cache: remote';
     cacheLife('days'); // Cache for 1 day
 
-    //TODO: remove these console logs after debugging
-    console.log('PPRHeader');
-
     const { context } = await getStaticSiteContext(props.params);
 
     // We only need the site cache tag for the header, as the header is not dependent on the page or space content.
@@ -45,9 +42,7 @@ export async function PPRTableOfContents(props: { params: PPRRouteLayoutParams }
     'use cache: remote';
     cacheLife('days'); // Cache for 1 day
 
-    console.log('PPRTableOfContents');
-
-    const { context } = await getPPRStaticSiteContext(props.params, 'toc');
+    const { context } = await getPPRStaticSiteContext(props.params);
 
     cacheTag(
         getCacheTag({
@@ -72,9 +67,7 @@ export async function PPRTableOfContents(props: { params: PPRRouteLayoutParams }
 export async function PPRPageBody(props: { params: PPRRouteParams; pathname: string }) {
     'use cache: remote';
     cacheLife('days'); // Cache for 1 day
-    const { context } = await getPPRStaticSiteContext(props.params, 'page');
-
-    console.log('PPRPageBody');
+    const { context } = await getPPRStaticSiteContext(props.params);
 
     cacheTag(
         getCacheTag({
@@ -106,7 +99,7 @@ export async function cachedGenerateSitePageMetadata(
 ): Promise<Metadata> {
     'use cache: remote';
 
-    const { context } = await getPPRStaticSiteContext(routeParams, 'page');
+    const { context } = await getPPRStaticSiteContext(routeParams);
     const pathname = getPagePathFromParams(routeParams);
     cacheLife('days'); // Cache for 1 day
 
@@ -133,7 +126,7 @@ export async function cachedGenerateSitePageViewport(
     'use cache: remote';
     cacheLife('days'); // Cache for 1 day
 
-    const { context } = await getPPRStaticSiteContext(routeParams, 'page');
+    const { context } = await getPPRStaticSiteContext(routeParams);
 
     cacheTag(
         getCacheTag({
