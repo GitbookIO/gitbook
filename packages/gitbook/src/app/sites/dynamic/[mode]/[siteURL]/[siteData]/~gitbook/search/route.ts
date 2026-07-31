@@ -143,6 +143,12 @@ function transformSitePageResult(args: {
           ? toEmbeddableLinkForPublishedContent(linker, spaceURL, pageItem.path)
           : linker.toLinkForContent(joinPathWithBaseURL(spaceURL, pageItem.path));
 
+    // `resultType` marks whether the API matched the page at the title/page level or on a
+    // specific section. It is read defensively because it is not yet in the published
+    // `@gitbook/api` types; once present, page-level matches link to the top of the page.
+    const resultType = (pageItem as SearchPageResult & { resultType?: 'page' | 'section' })
+        .resultType;
+
     const page: ComputedPageResult = {
         type: 'page',
         id: `${spaceItem.id}/${pageItem.id}`,
@@ -151,6 +157,7 @@ function transformSitePageResult(args: {
         pageId: pageItem.id,
         spaceId: spaceItem.id,
         score: pageItem.score,
+        resultType,
         breadcrumbs,
     };
 

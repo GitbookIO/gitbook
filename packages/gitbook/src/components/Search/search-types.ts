@@ -20,6 +20,13 @@ export type ComputedPageResult = BaseComputedResult & {
     type: 'page';
     pageId: string;
     spaceId: string;
+    /**
+     * Whether the API matched this result at the page/title level or on a specific
+     * section. Page-level matches link to the top of the page; section-level matches
+     * keep the section anchor. Optional to stay backward-compatible with API responses
+     * that do not yet return it.
+     */
+    resultType?: 'page' | 'section';
     breadcrumbs?: Array<{ icon?: IconName; label: string }>;
     /** The highest-scoring section for this page, used as a body snippet preview. */
     bestSection?: {
