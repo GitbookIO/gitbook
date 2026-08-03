@@ -7,7 +7,7 @@ describe('isAITrainingOrIndexingRequest', () => {
             ['Meta-ExternalAgent/1.1', 'ask'],
             ['meta-webindexer/1.0', 'q'],
             ['Amazonbot/0.1', 'ask'],
-        ]) {
+        ] as const) {
             expect(
                 isAITrainingOrIndexingRequest(
                     new Request(`https://docs.example.com/page?${parameter}=query`, {
