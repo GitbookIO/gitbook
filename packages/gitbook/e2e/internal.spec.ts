@@ -316,6 +316,9 @@ const testCases: TestsCase[] = [
                         'x-gbo-change-request': data.changeRequest ?? '',
                         'x-gbo-api-token': data.apiToken,
                         'x-gbo-revalidation-id': 'ppr-e2e-revalidation',
+                        'x-gbo-default-site-section': data.siteSection ?? '',
+                        'x-gbo-default-site-space': data.siteSpace,
+                        'x-gbo-default-space': data.space,
                     };
                 },
                 screenshot: false,

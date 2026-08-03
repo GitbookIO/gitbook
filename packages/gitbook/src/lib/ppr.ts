@@ -4,6 +4,11 @@ export type SiteRouteType = 'dynamic' | 'static' | 'ppr';
 
 export type PPRRequest = {
     content: PublishedSiteContent & { revision: string };
+    defaults: {
+        siteSection: string | undefined;
+        siteSpace: string;
+        space: string;
+    };
     revalidationId: string;
 };
 
@@ -25,6 +30,9 @@ export const PPRRequestHeaders = {
     ChangeRequest: 'x-gbo-change-request',
     APIToken: 'x-gbo-api-token',
     RevalidationID: 'x-gbo-revalidation-id',
+    DefaultSiteSection: 'x-gbo-default-site-section',
+    DefaultSiteSpace: 'x-gbo-default-site-space',
+    DefaultSpace: 'x-gbo-default-space',
 } as const;
 
 /**
@@ -44,6 +52,9 @@ export function getPPRRequest(headers: Headers): PPRRequest | undefined {
     const preview = getBooleanHeader(headers, PPRRequestHeaders.Preview);
     const revision = getRequiredHeader(headers, PPRRequestHeaders.Revision);
     const revalidationId = headers.get(PPRRequestHeaders.RevalidationID);
+    const defaultSiteSection = getOptionalHeader(headers, PPRRequestHeaders.DefaultSiteSection);
+    const defaultSiteSpace = getRequiredHeader(headers, PPRRequestHeaders.DefaultSiteSpace);
+    const defaultSpace = getRequiredHeader(headers, PPRRequestHeaders.DefaultSpace);
 
     if (
         !site ||
@@ -58,7 +69,10 @@ export function getPPRRequest(headers: Headers): PPRRequest | undefined {
         !apiToken ||
         (headers.get(PPRRequestHeaders.Preview) && preview === undefined) ||
         !revision ||
-        !revalidationId
+        !revalidationId ||
+        !headers.has(PPRRequestHeaders.DefaultSiteSection) ||
+        !defaultSiteSpace ||
+        !defaultSpace
     ) {
         return undefined;
     }
@@ -81,6 +95,11 @@ export function getPPRRequest(headers: Headers): PPRRequest | undefined {
             revision,
             changeRequest: getOptionalHeader(headers, PPRRequestHeaders.ChangeRequest),
             apiToken,
+        },
+        defaults: {
+            siteSection: defaultSiteSection,
+            siteSpace: defaultSiteSpace,
+            space: defaultSpace,
         },
         revalidationId,
     };
