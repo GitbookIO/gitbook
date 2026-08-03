@@ -1,36 +1,25 @@
-const INDEXING_CRAWLER_USER_AGENT_PATTERNS = [
-    // Conventional search engines
-    'googlebot',
-    'bingbot',
-    'yandexbot',
-    'baiduspider',
-    'duckduckbot',
-    // AI training and indexing crawlers
+const AI_TRAINING_OR_INDEXING_USER_AGENT_PATTERNS = [
     // We try to be conservative here, and only act on bot causing excessive load
     'meta-externalagent',
     'meta-webindexer',
     'amazonbot',
 ] as const;
 
-function isIndexingCrawler(request: Request): boolean {
+function isAITrainingOrIndexingCrawler(request: Request): boolean {
     const userAgent = request.headers.get('user-agent')?.toLowerCase() ?? '';
-    return INDEXING_CRAWLER_USER_AGENT_PATTERNS.some((pattern) => userAgent.includes(pattern));
+    return AI_TRAINING_OR_INDEXING_USER_AGENT_PATTERNS.some((pattern) =>
+        userAgent.includes(pattern)
+    );
 }
 
 /**
- * Clear internal search state for indexing crawlers without changing unrelated query parameters.
+ * Detect AI training and indexing crawlers accessing an internal search endpoint.
  */
-export function getSearchParamsForIndexingCrawler(request: Request): URLSearchParams {
+export function isAITrainingOrIndexingRequest(request: Request): boolean {
+    if (!isAITrainingOrIndexingCrawler(request)) {
+        return false;
+    }
+
     const searchParams = new URL(request.url).searchParams;
-    if (!isIndexingCrawler(request)) {
-        return searchParams;
-    }
-
-    for (const parameter of ['ask', 'q']) {
-        if (searchParams.has(parameter)) {
-            searchParams.set(parameter, '');
-        }
-    }
-
-    return searchParams;
+    return searchParams.has('ask') || searchParams.has('q');
 }
