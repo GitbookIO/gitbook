@@ -163,7 +163,6 @@ export function getPPRRouteParams(params: PPRRouteLayoutParams): RouteLayoutPara
             rison.encode({
                 ...siteURLData,
                 revision: getPPRRouteParam(revisionId, 'revision ID'),
-                revalidationId: getPPRRouteParam(revalidationId, 'revalidation ID'),
             })
         ),
     };
