@@ -28,6 +28,7 @@ import {
 } from '@/lib/data';
 import { isGitBookAssetsHostURL, isGitBookHostURL } from '@/lib/env';
 import { getImageResizingContextId } from '@/lib/images';
+import { isAITrainingOrIndexingRequest } from '@/lib/indexing-crawlers';
 import { MiddlewareHeaders } from '@/lib/middleware';
 import {
     createOAuthProtectedResourceMetadataResponse,
@@ -150,6 +151,13 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
     }
 
     const { url: siteRequestURL, mode } = match;
+
+    if (isAITrainingOrIndexingRequest(request)) {
+        return new Response('This endpoint is not intended for AI training or indexing.', {
+            status: 403,
+            headers: { 'content-type': 'text/plain; charset=utf-8' },
+        });
+    }
 
     // Normalize URL after extracting the URL from the request to make sure the client is redirected to the proper one
     const normalizationResponse = normalizeRequestURL(siteRequestURL);
