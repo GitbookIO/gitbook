@@ -31,6 +31,7 @@ export type RouteParams = RouteLayoutParams & {
 export type PPRRouteLayoutParams = RouteLayoutParams & {
     revisionId: string;
     revalidationId: string;
+    pprDefaults: string;
 };
 
 export type PPRRouteParams = PPRRouteLayoutParams & {
@@ -152,10 +153,10 @@ export function getSiteURLDataFromParams(params: RouteLayoutParams): SiteURLData
 export function getPPRRouteParams(params: PPRRouteParams): RouteParams;
 export function getPPRRouteParams(params: PPRRouteLayoutParams): RouteLayoutParams;
 /**
- * Project PPR route params shared by every cached region.
+ * Project PPR route params for the current page, without PPR-only cache inputs.
  */
 export function getPPRRouteParams(params: PPRRouteLayoutParams): RouteLayoutParams {
-    const { revisionId, revalidationId, ...routeParams } = params;
+    const { revisionId, revalidationId, pprDefaults: _, ...routeParams } = params;
     const siteURLData = getSiteURLDataFromParams(params);
 
     return {
@@ -170,8 +171,37 @@ export function getPPRRouteParams(params: PPRRouteLayoutParams): RouteLayoutPara
     };
 }
 
-export async function getPPRStaticSiteContext(params: PPRRouteLayoutParams) {
-    return getStaticSiteContext(getPPRRouteParams(params), getPPRVisitorAuthClaimsFromToken);
+/**
+ * Project PPR params for the shared header by replacing page-varying location data.
+ */
+export function getPPRHeaderRouteParams(params: PPRRouteLayoutParams): RouteLayoutParams {
+    const routeParams = getPPRRouteParams(params);
+    const siteURLData = getSiteURLDataFromParams(routeParams);
+    const defaults = getPPRDefaults(params);
+
+    return {
+        ...routeParams,
+        siteData: encodeURIComponent(
+            rison.encode({
+                ...siteURLData,
+                pathname: '/',
+                siteSection: defaults.siteSection ?? undefined,
+                siteSpace: defaults.siteSpace,
+                space: defaults.space,
+            })
+        ),
+    };
+}
+
+/**
+ * Project PPR params for the table of contents, keeping its current location data.
+ */
+export function getPPRTableOfContentsRouteParams(params: PPRRouteLayoutParams): RouteLayoutParams {
+    return getPPRRouteParams(params);
+}
+
+export async function getPPRStaticSiteContext(params: RouteLayoutParams) {
+    return getStaticSiteContext(params, getPPRVisitorAuthClaimsFromToken);
 }
 
 function getPPRRouteParam(encodedParam: string, name: string): string {
@@ -179,6 +209,38 @@ function getPPRRouteParam(encodedParam: string, name: string): string {
         return decodeURIComponent(encodedParam);
     } catch (error) {
         console.error(`Returning 404 after failing to decode PPR ${name}: ${error}`);
+        notFound();
+    }
+}
+
+type PPRDefaults = {
+    siteSection: string | null;
+    siteSpace: string;
+    space: string;
+};
+
+function getPPRDefaults(params: PPRRouteLayoutParams): PPRDefaults {
+    try {
+        const defaults: unknown = rison.decode(decodeURIComponent(params.pprDefaults));
+        if (
+            !defaults ||
+            typeof defaults !== 'object' ||
+            Array.isArray(defaults) ||
+            !('siteSection' in defaults) ||
+            !('siteSpace' in defaults) ||
+            !('space' in defaults) ||
+            (defaults.siteSection !== null && typeof defaults.siteSection !== 'string') ||
+            typeof defaults.siteSpace !== 'string' ||
+            !defaults.siteSpace ||
+            typeof defaults.space !== 'string' ||
+            !defaults.space
+        ) {
+            notFound();
+        }
+
+        return defaults as PPRDefaults;
+    } catch (error) {
+        console.error(`Returning 404 after failing to decode PPR defaults: ${error}`);
         notFound();
     }
 }

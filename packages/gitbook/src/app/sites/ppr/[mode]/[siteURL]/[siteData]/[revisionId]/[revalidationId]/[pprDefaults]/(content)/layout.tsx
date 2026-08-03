@@ -1,4 +1,10 @@
-import { type PPRRouteLayoutParams, getPPRRouteParams, getPPRStaticSiteContext } from '@/app/utils';
+import {
+    type PPRRouteLayoutParams,
+    getPPRHeaderRouteParams,
+    getPPRRouteParams,
+    getPPRStaticSiteContext,
+    getPPRTableOfContentsRouteParams,
+} from '@/app/utils';
 import { CustomizationRootLayout } from '@/components/RootLayout';
 import {
     SiteLayout,
@@ -19,8 +25,10 @@ export default async function SitePPRLayout({
     children,
 }: React.PropsWithChildren<SitePPRLayoutProps>) {
     const routeParams = await params;
-    const headerParams = getPPRRouteParams(routeParams);
-    const { context, visitorAuthClaims } = await getPPRStaticSiteContext(routeParams);
+    const pageParams = getPPRRouteParams(routeParams);
+    const headerParams = getPPRHeaderRouteParams(routeParams);
+    const tableOfContentsParams = getPPRTableOfContentsRouteParams(routeParams);
+    const { context, visitorAuthClaims } = await getPPRStaticSiteContext(pageParams);
     const withTracking = shouldTrackEvents();
 
     return (
@@ -34,7 +42,7 @@ export default async function SitePPRLayout({
                 withTracking={withTracking}
                 visitorAuthClaims={visitorAuthClaims}
                 headerSlot={<PPRHeader params={headerParams} />}
-                tableOfContentsSlot={<PPRTableOfContents params={routeParams} />}
+                tableOfContentsSlot={<PPRTableOfContents params={tableOfContentsParams} />}
             >
                 {children}
             </SiteLayout>
@@ -43,11 +51,11 @@ export default async function SitePPRLayout({
 }
 
 export async function generateViewport({ params }: SitePPRLayoutProps) {
-    const { context } = await getPPRStaticSiteContext(await params);
+    const { context } = await getPPRStaticSiteContext(getPPRRouteParams(await params));
     return generateSiteLayoutViewport(context);
 }
 
 export async function generateMetadata({ params }: SitePPRLayoutProps) {
-    const { context } = await getPPRStaticSiteContext(await params);
+    const { context } = await getPPRStaticSiteContext(getPPRRouteParams(await params));
     return generateSiteLayoutMetadata(context);
 }
