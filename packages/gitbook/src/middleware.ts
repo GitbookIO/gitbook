@@ -538,6 +538,13 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
                 ? [
                       encodeURIComponent(pprRequest.content.revision),
                       encodeURIComponent(pprRequest.revalidationId),
+                      encodeURIComponent(
+                          rison.encode({
+                              siteSection: pprRequest.defaults.siteSection ?? null,
+                              siteSpace: pprRequest.defaults.siteSpace,
+                              space: pprRequest.defaults.space,
+                          })
+                      ),
                   ]
                 : []),
             pathname,

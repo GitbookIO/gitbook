@@ -20,6 +20,9 @@ const pprHeaders = new Headers({
     'x-gbo-change-request': 'change-request-id',
     'x-gbo-api-token': 'api-token',
     'x-gbo-revalidation-id': 'revalidation-id',
+    'x-gbo-default-site-section': 'default-site-section-id',
+    'x-gbo-default-site-space': 'default-site-space-id',
+    'x-gbo-default-space': 'default-space-id',
 });
 
 describe('getPPRRouteType', () => {
@@ -49,6 +52,9 @@ describe('getPPRRouteType', () => {
             'x-gbo-api-token',
             'x-gbo-revision',
             'x-gbo-revalidation-id',
+            'x-gbo-default-site-section',
+            'x-gbo-default-site-space',
+            'x-gbo-default-space',
         ]) {
             const headers = new Headers(pprHeaders);
             headers.delete(header);
@@ -71,6 +77,8 @@ describe('getPPRRouteType', () => {
             'x-gbo-api-token',
             'x-gbo-revision',
             'x-gbo-revalidation-id',
+            'x-gbo-default-site-space',
+            'x-gbo-default-space',
         ]) {
             const headers = new Headers(pprHeaders);
             headers.set(header, '');
@@ -106,6 +114,11 @@ describe('getPPRRouteType', () => {
                 changeRequest: 'change-request-id',
                 apiToken: 'api-token',
             },
+            defaults: {
+                siteSection: 'default-site-section-id',
+                siteSpace: 'default-site-space-id',
+                space: 'default-space-id',
+            },
             revalidationId: 'revalidation-id',
         });
     });
@@ -131,6 +144,30 @@ describe('getPPRRouteType', () => {
             revision: 'revision-id',
             changeRequest: undefined,
         });
+    });
+
+    it('accepts an explicitly empty default site section', () => {
+        const headers = new Headers(pprHeaders);
+        headers.set('x-gbo-default-site-section', '');
+
+        expect(getPPRRequest(headers)?.defaults).toEqual({
+            siteSection: undefined,
+            siteSpace: 'default-site-space-id',
+            space: 'default-space-id',
+        });
+    });
+
+    it('requires all default location headers before opting into PPR', () => {
+        for (const header of [
+            'x-gbo-default-site-section',
+            'x-gbo-default-site-space',
+            'x-gbo-default-space',
+        ]) {
+            const headers = new Headers(pprHeaders);
+            headers.delete(header);
+            expect(getPPRRequest(headers)).toBeUndefined();
+            expect(getPPRRouteType('static', true, getPPRRequest(headers))).toBe('static');
+        }
     });
 
     it('parses false and true boolean header values', () => {
