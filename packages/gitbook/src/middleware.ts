@@ -28,6 +28,7 @@ import {
 } from '@/lib/data';
 import { isGitBookAssetsHostURL, isGitBookHostURL } from '@/lib/env';
 import { getImageResizingContextId } from '@/lib/images';
+import { getSearchParamsForIndexingCrawler } from '@/lib/indexing-crawlers';
 import { MiddlewareHeaders } from '@/lib/middleware';
 import {
     createOAuthProtectedResourceMetadataResponse,
@@ -445,12 +446,15 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         requestHeaders.set('x-forwarded-host', request.nextUrl.host);
         requestHeaders.set('origin', request.nextUrl.origin);
 
+        const originalSearchParams = request.nextUrl.searchParams;
+        const rewrittenSearchParams = getSearchParamsForIndexingCrawler(request);
+
         const siteURLWithoutProtocol = `${siteCanonicalURL.host}${siteURLData.basePath}`;
         const {
             pathname,
             routeType: routeTypeFromPathname,
             events,
-        } = encodePathInSiteContent(siteURLData, request);
+        } = encodePathInSiteContent(siteURLData, request, rewrittenSearchParams);
         routeType = routeTypeFromPathname ?? routeType;
 
         if (events && events.length > 0) {
@@ -486,8 +490,8 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         ].join('/');
 
         const rewrittenURL = new URL(`/${route}`, request.nextUrl.toString());
-        // Preserve the original search params but remove fallback=true if present
-        rewrittenURL.search = request.nextUrl.search;
+        // Preserve the original search params, except internal search state for indexing crawlers.
+        rewrittenURL.search = rewrittenSearchParams.toString();
         if (rewrittenURL.searchParams.has('fallback')) {
             rewrittenURL.searchParams.delete('fallback');
         }
@@ -512,7 +516,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         response.headers.set('x-gitbook-route-site', siteURLWithoutProtocol);
 
         // noindex search/assistant deep links, kept crawlable so Google sees the directive.
-        if (rewrittenURL.searchParams.has('ask') || rewrittenURL.searchParams.has('q')) {
+        if (originalSearchParams.has('ask') || originalSearchParams.has('q')) {
             response.headers.set('x-robots-tag', 'noindex');
         }
 
@@ -729,7 +733,8 @@ const PATH_ALIASES: Record<string, string> = {
  */
 function encodePathInSiteContent(
     siteURLData: PublishedSiteContent,
-    request: Request
+    request: Request,
+    searchParams: URLSearchParams = new URL(request.url).searchParams
 ): {
     pathname: string;
     routeType?: 'static' | 'dynamic';
@@ -851,27 +856,25 @@ function encodePathInSiteContent(
                 acceptsMarkdown(request);
             if (pathname.match(MARKDOWN_PATH_REGEX) || shouldServeMarkdown) {
                 const pagePathWithoutMD = pathname.replace(MARKDOWN_PATH_REGEX, '');
-                const searchParams = new URL(request.url).searchParams;
-                const ask = searchParams.get('ask');
+                const question = searchParams.get('ask') || undefined;
                 // Optional end goal the calling agent is trying to accomplish, used to steer the answer.
                 // It is encoded as a second path segment (the route is statically rendered, so it can't
                 // read query params at runtime — the question is path-encoded for the same reason).
                 const goal = searchParams.get('goal');
                 return {
-                    pathname:
-                        typeof ask === 'string'
-                            ? `~gitbook/markdown-ask/${encodeURIComponent(ask)}${
-                                  typeof goal === 'string' ? `/${encodeURIComponent(goal)}` : ''
-                              }`
-                            : `~gitbook/markdown/${encodePagePath(pagePathWithoutMD)}`,
+                    pathname: question
+                        ? `~gitbook/markdown-ask/${encodeURIComponent(question)}${
+                              typeof goal === 'string' ? `/${encodeURIComponent(goal)}` : ''
+                          }`
+                        : `~gitbook/markdown/${encodePagePath(pagePathWithoutMD)}`,
                     routeType: 'static',
                     // TODO: track pageId / spaceId when possible
                     // We don't do it at the moment as we can't easily extract it from the URL.
-                    events: ask
+                    events: question
                         ? [
                               {
                                   type: 'ask_question',
-                                  query: ask,
+                                  query: question,
                                   location: {
                                       displayContext: SiteInsightsDisplayContext.Server,
                                   },

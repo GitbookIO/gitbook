@@ -50,6 +50,96 @@ describe('markdown serving based on user agent', () => {
     });
 });
 
+describe('search parameters for indexing crawlers', () => {
+    const ASK_QUESTION = 'This question must not reach Ask AI';
+    const SEARCH_QUERY = 'This query must not reach search';
+
+    it('should empty ask for Meta external agents', async () => {
+        const response = await fetch(
+            getContentTestURL(
+                `${TEST_PAGE_URL}?ask=${encodeURIComponent(ASK_QUESTION)}&goal=Read%20the%20docs`
+            ),
+            { headers: { 'User-Agent': 'meta-externalagent/1.1' } }
+        );
+        const text = await response.text();
+
+        expect(response.status).toBe(200);
+        expect(response.headers.get('content-type')).toContain('text/markdown');
+        expect(response.headers.get('x-robots-tag')).toBe('noindex');
+        expect(text).toContain('# Text page');
+        expect(text).not.toContain(`# ${ASK_QUESTION}`);
+    });
+
+    it('should empty q for Amazonbot', async () => {
+        const response = await fetch(
+            getContentTestURL(`${TEST_PAGE_URL}?q=${encodeURIComponent(SEARCH_QUERY)}`),
+            { headers: { 'User-Agent': 'Amazonbot/0.1' } }
+        );
+        const text = await response.text();
+
+        expect(response.status).toBe(200);
+        expect(response.headers.get('content-type')).toContain('text/markdown');
+        expect(response.headers.get('x-robots-tag')).toBe('noindex');
+        expect(text).toContain('# Text page');
+        expect(text).not.toContain(SEARCH_QUERY);
+    });
+
+    it('should empty ask and q for conventional search crawlers', async () => {
+        const response = await fetch(
+            getContentTestURL(
+                `${TEST_PAGE_URL}?ask=${encodeURIComponent(ASK_QUESTION)}&q=${encodeURIComponent(SEARCH_QUERY)}`
+            ),
+            {
+                headers: {
+                    'User-Agent':
+                        'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
+                },
+            }
+        );
+        const text = await response.text();
+
+        expect(response.status).toBe(200);
+        expect(response.headers.get('content-type')).toContain('text/html');
+        expect(response.headers.get('x-robots-tag')).toBe('noindex');
+        expect(text).not.toContain(ASK_QUESTION);
+        expect(text).not.toContain(SEARCH_QUERY);
+    });
+
+    it(
+        'should preserve Ask AI for unlisted AI crawlers',
+        async () => {
+            const response = await fetch(
+                getContentTestURL(`${TEST_PAGE_URL}?ask=${encodeURIComponent(ASK_QUESTION)}`),
+                { headers: { 'User-Agent': 'GPTBot/1.2' } }
+            );
+            const text = await response.text();
+
+            expect(response.status).toBe(200);
+            expect(response.headers.get('content-type')).toContain('text/markdown');
+            expect(response.headers.get('x-robots-tag')).toBe('noindex');
+            expect(text).toContain(`# ${ASK_QUESTION}`);
+        },
+        { timeout: 60_000 }
+    );
+
+    it(
+        'should preserve Ask AI for user-triggered assistants',
+        async () => {
+            const response = await fetch(
+                getContentTestURL(`${TEST_PAGE_URL}?ask=${encodeURIComponent(ASK_QUESTION)}`),
+                { headers: { 'User-Agent': 'ChatGPT-User/1.0' } }
+            );
+            const text = await response.text();
+
+            expect(response.status).toBe(200);
+            expect(response.headers.get('content-type')).toContain('text/markdown');
+            expect(response.headers.get('x-robots-tag')).toBe('noindex');
+            expect(text).toContain(`# ${ASK_QUESTION}`);
+        },
+        { timeout: 60_000 }
+    );
+});
+
 describe('markdown pages', () => {
     it('should expose a markdown page with the .md extension', async () => {
         const response = await fetch(
