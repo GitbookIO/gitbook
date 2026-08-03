@@ -16,6 +16,7 @@ import {
     SELECT_UNPINNED_ATTR,
 } from '@/lib/select';
 import { tcls } from '@/lib/tailwind';
+import { resolveAnchorURL } from '@/lib/urls';
 import { Icon, type IconName } from '@gitbook/icons';
 
 export interface TabsItem {
@@ -68,10 +69,15 @@ export function DynamicTabs(props: {
     const selectTab = useCallback(
         (tabId: string) => {
             const tab = tabs.find((item) => item.id === tabId);
-            if (tab?.slug) {
-                activate(tab.slug);
-                setManualId(tabId);
+            if (!tab?.slug) {
+                return;
             }
+            activate(tab.slug);
+            setManualId(tabId);
+            // The hash is purely positional now — `select` carries the selection — so writing it just
+            // makes a copied URL land on this tab. We deliberately bypass the navigation context: it
+            // would report a hash change and scroll the tab the visitor is already looking at.
+            window.history.replaceState(null, '', resolveAnchorURL(`#${tab.id}`, window.location));
         },
         [tabs, activate]
     );
