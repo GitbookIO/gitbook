@@ -341,7 +341,10 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         // on the redirect response.
         //
         const normalizedVisitorURL = normalizeVisitorURL(incomingURL);
-        if (normalizedVisitorURL.toString() !== incomingURL.toString() && visitorToken?.source !== 'revalidation') {
+        if (
+            normalizedVisitorURL.toString() !== incomingURL.toString() &&
+            visitorToken?.source !== 'revalidation'
+        ) {
             return writeResponseCookies(
                 NextResponse.redirect(normalizedVisitorURL.toString()),
                 cookies

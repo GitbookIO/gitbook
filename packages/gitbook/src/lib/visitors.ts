@@ -135,7 +135,7 @@ export function getVisitorToken({
 
     // Allow the empty string to come through
     if (fromUrl !== null && fromUrl !== undefined) {
-        if(headers.get('user-agent')?.toLowerCase() === "gitbook-open-revalidation-worker") {
+        if (headers.get('user-agent')?.toLowerCase() === 'gitbook-open-revalidation-worker') {
             return { source: 'revalidation', token: fromUrl };
         }
 
