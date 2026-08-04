@@ -20,8 +20,12 @@ const DIALOG_ANIMATION_MS = 200;
 /**
  * Used to render a Mermaid diagram from a CodeBlock.
  */
-export function MermaidCodeBlock(props: ClientBlockProps) {
-    const { block, mode, style } = props;
+export function MermaidCodeBlock(
+    props: ClientBlockProps & {
+        mermaidRuntimeURL: string;
+    }
+) {
+    const { block, mode, style, mermaidRuntimeURL } = props;
     const source = getPlainCodeBlock(block);
     const rootRef = useRef<HTMLDivElement>(null);
     const panelRef = useRef<HTMLDivElement>(null);
@@ -80,6 +84,7 @@ export function MermaidCodeBlock(props: ClientBlockProps) {
                     source,
                     id,
                     darkMode,
+                    mermaidRuntimeURL,
                 });
             })
                 .then((result) => {
@@ -116,7 +121,7 @@ export function MermaidCodeBlock(props: ClientBlockProps) {
             cleanupPanZoom?.();
             setPanZoom(null);
         };
-    }, [source, id, darkMode, shouldRender]);
+    }, [source, id, darkMode, mermaidRuntimeURL, shouldRender]);
 
     // Lock the page scroll while the dialog is on screen (handles scrollbar width and iOS).
     usePreventScroll({ isDisabled: !isPresent });
@@ -286,9 +291,10 @@ async function renderMermaidDiagram(args: {
     source: string;
     id: string;
     darkMode: boolean;
+    mermaidRuntimeURL: string;
 }): Promise<RenderResult> {
-    const { source, id, darkMode } = args;
-    const { mermaid } = await loadMermaid();
+    const { source, id, darkMode, mermaidRuntimeURL } = args;
+    const { mermaid } = await loadMermaid(mermaidRuntimeURL);
 
     mermaid.initialize({
         startOnLoad: false,
@@ -338,13 +344,16 @@ let mermaidLoadPromise: Promise<{
     mermaid: typeof import('mermaid')['default'];
 }> | null = null;
 
-async function loadMermaid() {
+async function loadMermaid(runtimeURL: string) {
     if (!mermaidLoadPromise) {
-        mermaidLoadPromise = Promise.all([import('mermaid'), import('@mermaid-js/mermaid-zenuml')])
-            .then(async ([{ default: mermaid }, { default: zenuml }]) => {
-                await mermaid.registerExternalDiagrams([zenuml]);
-                return { mermaid };
-            })
+        mermaidLoadPromise = import(/* webpackIgnore: true */ runtimeURL)
+            .then(
+                async (runtime: {
+                    loadMermaid: () => Promise<typeof import('mermaid')['default']>;
+                }) => {
+                    return { mermaid: await runtime.loadMermaid() };
+                }
+            )
             .catch((error) => {
                 mermaidLoadPromise = null;
                 throw error;
