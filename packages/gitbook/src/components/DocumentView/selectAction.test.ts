@@ -7,7 +7,7 @@ const data = (value: unknown) => value as api.DocumentInlineButton['data'];
 
 describe('getSelectAction', () => {
     it('returns the action for a select button', () => {
-        expect(getSelectAction(data({ action: { action: 'select', value: 'Python' } }))).toEqual({
+        expect(getSelectAction(data({ action: { action: 'select', slug: 'Python' } }))).toEqual({
             action: 'select',
             value: 'Python',
         });
@@ -24,6 +24,6 @@ describe('getSelectAction', () => {
 
     it('returns null when the value is missing or not a string', () => {
         expect(getSelectAction(data({ action: { action: 'select' } }))).toBeNull();
-        expect(getSelectAction(data({ action: { action: 'select', value: 42 } }))).toBeNull();
+        expect(getSelectAction(data({ action: { action: 'select', slug: 42 } }))).toBeNull();
     });
 });

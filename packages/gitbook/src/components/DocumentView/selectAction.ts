@@ -8,7 +8,7 @@ export function getSelectAction(data: api.DocumentInlineButton['data']) {
         return null;
     }
     const action = data.action;
-    if (action.action === 'select') {
+    if (action.action === 'select' && typeof action.slug === 'string') {
         return { action: action.action, value: action.slug };
     }
     return null;
