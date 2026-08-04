@@ -9,6 +9,7 @@ import { Heading } from '../Heading';
 
 import './style.css';
 import { DEFAULT_LOCALE, getSpaceLocale } from '@/intl/server';
+import { getAssetURL } from '@/lib/assets';
 import type { GitBookAnyContext } from '@/lib/context';
 import { GITBOOK_URL } from '@/lib/env';
 import { buildSignedProxyUrl } from '@/lib/openapi/proxy-token';
@@ -17,6 +18,7 @@ import type {
     OpenAPISchemasBlock,
     OpenAPIWebhookBlock,
 } from '@/lib/openapi/types';
+import { SCALAR_RUNTIME_PATH } from './scalar-runtime-path';
 
 // Serve the proxy from GitBook's own origin rather than the customer domain, so a proxied
 // response can never execute as HTML under a customer's trusted origin.
@@ -113,6 +115,7 @@ export function getOpenAPIContext(args: {
         expandAllResponses: expandAllResponses || props.context.mode === 'print',
         expandAllModelSections: expandAllModelSections || props.context.mode === 'print',
         headless,
+        scalarRuntimeURL: getAssetURL(SCALAR_RUNTIME_PATH),
         id: block.meta?.id,
         blockKey: block.key,
         locale,
