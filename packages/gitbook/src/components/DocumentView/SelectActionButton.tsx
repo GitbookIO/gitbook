@@ -13,5 +13,10 @@ export function SelectActionButton(props: { value: string; buttonProps: ButtonPr
     const { value, buttonProps } = props;
     const { activate } = useSelect();
     const slug = slugifySelectValue(value);
-    return <Button {...buttonProps} disabled={!slug} onClick={() => activate(slug)} />;
+    const label = `Select "${slug}"`;
+    return (
+        <Button {...buttonProps} disabled={!slug} onClick={() => activate(slug)} label={label}>
+            {label !== buttonProps.label ? buttonProps.label : null}
+        </Button>
+    );
 }
