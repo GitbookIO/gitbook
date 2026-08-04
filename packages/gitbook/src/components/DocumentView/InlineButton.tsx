@@ -8,6 +8,8 @@ import { Button, type ButtonProps } from '../primitives';
 import type { InlineProps } from './Inline';
 import { InlineActionButton } from './InlineActionButton';
 import { NotFoundRefHoverCard } from './NotFoundRefHoverCard';
+import { SelectActionButton } from './SelectActionButton';
+import { getSelectAction } from './selectAction';
 
 // Editor button sizes render one step smaller here; the editor default (`large`) keeps the previous `medium`.
 const BUTTON_SIZE_MAP: Record<
@@ -30,6 +32,13 @@ export function InlineButton(props: InlineProps<api.DocumentInlineButton>) {
     };
 
     const ButtonImplementation = () => {
+        // Skip the select action in print/PDF: the client store isn't mounted, so it falls through
+        // to the plain disabled button below.
+        const selectAction = context.mode !== 'print' ? getSelectAction(inline.data) : null;
+        if (selectAction) {
+            return <SelectActionButton value={selectAction.value} buttonProps={buttonProps} />;
+        }
+
         // In print/PDF mode, skip interactive action buttons (AI/search providers are not mounted).
         if (context.mode !== 'print' && 'action' in inline.data && 'query' in inline.data.action) {
             return (
