@@ -172,6 +172,7 @@ export function getPPRRouteParams(params: PPRRouteLayoutParams): RouteLayoutPara
 
 /**
  * Project PPR params for the shared header by replacing page-varying location data.
+ * TODO: We'll need to exchange the api token provided by the original PPR request for one that the API will understand
  */
 export function getPPRHeaderRouteParams(params: PPRRouteLayoutParams): RouteLayoutParams {
     const routeParams = getPPRRouteParams(params);
@@ -183,7 +184,9 @@ export function getPPRHeaderRouteParams(params: PPRRouteLayoutParams): RouteLayo
         siteData: encodeURIComponent(
             rison.encode({
                 ...siteURLData,
+                // For the header, we don't want to vary the cache by page path, so we set it to the root.
                 pathname: '/',
+                // For the header, we keep site section and space data from the PPR defaults, so that the header can be cached across all pages in a site.
                 siteSection: defaults.siteSection ?? undefined,
                 siteSpace: defaults.siteSpace,
                 space: defaults.space,
@@ -194,9 +197,21 @@ export function getPPRHeaderRouteParams(params: PPRRouteLayoutParams): RouteLayo
 
 /**
  * Project PPR params for the table of contents, keeping its current location data.
+ * For the table of contents, we don't want to vary the cache by page path, so we set it to the root.
+ * Table of content depends only on the space that you're in and the specific claims from that revision, not the actual path inside that space
+ * TODO: We'll need to exchange the api token provided by the original PPR request for one that the API will understand
  */
 export function getPPRTableOfContentsRouteParams(params: PPRRouteLayoutParams): RouteLayoutParams {
-    return getPPRRouteParams(params);
+    const routeParams = getPPRRouteParams(params);
+    return {
+        ...routeParams,
+        siteData: encodeURIComponent(
+            rison.encode({
+                ...getSiteURLDataFromParams(routeParams),
+                pathname: '/',
+            })
+        ),
+    }
 }
 
 export async function getPPRStaticSiteContext(params: RouteLayoutParams) {
