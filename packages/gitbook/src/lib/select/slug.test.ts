@@ -2,8 +2,8 @@ import { describe, expect, it } from 'bun:test';
 import { SLUG_MAX_CODE_POINTS, slugifySelectValue } from './slug';
 
 describe('slugifySelectValue', () => {
-    // This table IS the frozen public contract for `?select=` URLs — see SLUG_ALGO_VERSION.
-    // Changing any expectation here is a breaking change to already-shared links.
+    // This table IS the slug contract — see SLUG_ALGO_VERSION. Changing any expectation here orphans
+    // selections already persisted in visitors' localStorage.
     const cases: Array<[input: string, expected: string]> = [
         ['Python', 'python'],
         ['JavaScript', 'javascript'],

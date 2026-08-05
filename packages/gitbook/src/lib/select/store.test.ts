@@ -60,7 +60,7 @@ describe('select store', () => {
             unsubscribe();
         });
 
-        it('does not notify when the list is unchanged (prevents URL mirror loops)', () => {
+        it('does not notify when the list is unchanged (avoids redundant re-renders)', () => {
             setSlugs(['python', 'go']);
             let calls = 0;
             const unsubscribe = subscribe(() => {
