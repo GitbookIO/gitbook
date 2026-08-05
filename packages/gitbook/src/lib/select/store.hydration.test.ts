@@ -1,13 +1,15 @@
-import { beforeEach, describe, expect, it } from 'bun:test';
+import { afterEach, beforeEach, describe, expect, it } from 'bun:test';
 import { SELECT_STORAGE_KEY } from './constants';
 
 // Own file, own module instance: the store hydrates once per page load, so the "mutation before
 // init()" path can only be exercised on a store nothing has touched yet.
 const storage = new Map<string, string>();
+const globals = globalThis as unknown as { localStorage?: unknown };
+const originalLocalStorage = Object.getOwnPropertyDescriptor(globalThis, 'localStorage');
 
 beforeEach(() => {
     storage.clear();
-    (globalThis as unknown as { localStorage: unknown }).localStorage = {
+    globals.localStorage = {
         getItem: (key: string) => storage.get(key) ?? null,
         setItem: (key: string, value: string) => {
             storage.set(key, value);
@@ -16,6 +18,17 @@ beforeEach(() => {
             storage.delete(key);
         },
     };
+});
+
+// Bun shares globals across test files, so leave `localStorage` exactly as we found it (absent) —
+// every other suite relies on the `typeof localStorage` guard in `lib/browser` short-circuiting.
+afterEach(() => {
+    if (originalLocalStorage) {
+        Object.defineProperty(globalThis, 'localStorage', originalLocalStorage);
+    } else {
+        delete globals.localStorage;
+    }
+    storage.clear();
 });
 
 describe('select store hydration', () => {
