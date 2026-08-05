@@ -51,6 +51,7 @@ async function OpenAPISchemasBody(props: BlockProps<OpenAPISchemasBlock>) {
             grouped={block.data.grouped}
             {...getOpenAPIBlockClientProps({
                 props,
+                schemas: { data, grouped: block.data.grouped },
                 specUrl: publicURL,
                 context: context.contentContext,
                 expandAllModelSections: data['x-expandAllModelSections'],

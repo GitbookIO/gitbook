@@ -3,12 +3,14 @@ import { Icon } from '@gitbook/icons';
 import {
     type OpenAPIContextInput,
     type OpenAPIOperationData,
+    type OpenAPISchemasData,
     type OpenAPIWebhookData,
     checkIsValidLocale,
     extractOrigin,
     getAllServerOrigins,
     getOperationTitle,
-} from '@gitbook/react-openapi/core';
+    getSchemasHeading,
+} from '@gitbook/react-openapi';
 
 import type { BlockProps } from '../Block';
 import { PlainCodeBlock } from '../CodeBlock';
@@ -132,20 +134,26 @@ export function getOpenAPIContext(args: {
 // here or rebuilt on the client, so the block can sit behind a `next/dynamic` chunk.
 export function getOpenAPIBlockClientProps(args: {
     props: BlockProps<AnyOpenAPIOperationsBlock | OpenAPISchemasBlock | OpenAPIWebhookBlock>;
-    /** Omitted for schemas blocks, which have no operation, servers or heading. */
+    /** Omitted for schemas blocks, which have no operation nor servers. */
     data?: OpenAPIOperationData | OpenAPIWebhookData;
+    /** Schemas blocks render their own heading, from a different shape. */
+    schemas?: { data: OpenAPISchemasData; grouped: boolean | undefined };
     specUrl: string | null;
     context: GitBookAnyContext | undefined;
     expandAllResponses?: boolean;
     expandAllModelSections?: boolean;
     headless?: boolean;
 }): OpenAPIBlockClientContextProps {
-    const { props, data, specUrl, context } = args;
+    const { props, data, schemas, specUrl, context } = args;
     const serverContext = getOpenAPIContext(args);
     const { renderCodeBlock, renderDocument, renderHeading, resolveProxyUrl, ...serializable } =
         serverContext;
 
-    const title = data ? getOperationTitle(data) : undefined;
+    const heading = data
+        ? getOperationHeading(data, serializable.headless)
+        : schemas
+          ? getSchemasHeading(schemas.data, schemas.grouped)
+          : null;
     const descriptionDocument = data?.operation['x-gitbook-description-document'];
 
     const origins = data ? getAllServerOrigins(data.servers) : [];
@@ -162,12 +170,26 @@ export function getOpenAPIBlockClientProps(args: {
                 ? context.customization.styling.codeTheme.openapi
                 : undefined,
         proxyUrl: resolveProxyUrl?.(origins) ?? undefined,
-        headingNode:
-            data && !serializable.headless && title
-                ? renderHeading({ deprecated: data.operation.deprecated ?? false, title })
-                : null,
+        headingNode: heading ? renderHeading(heading) : null,
         descriptionNode: descriptionDocument
             ? renderDocument({ document: descriptionDocument })
             : null,
+    };
+}
+
+// Mirrors the condition in `OpenAPISummary`, which is the only place asking for this heading.
+function getOperationHeading(
+    data: OpenAPIOperationData | OpenAPIWebhookData,
+    headless: boolean | undefined
+) {
+    const title = getOperationTitle(data);
+    if (headless || !title) {
+        return null;
+    }
+
+    return {
+        title,
+        deprecated: data.operation.deprecated ?? false,
+        stability: data.operation['x-stability'],
     };
 }
