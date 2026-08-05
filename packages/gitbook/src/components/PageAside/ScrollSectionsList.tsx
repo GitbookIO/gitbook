@@ -7,7 +7,7 @@ import type { DocumentSection } from '@/lib/document-sections';
 import { tcls } from '@/lib/tailwind';
 
 import { useBodyLoaded } from '@/components/primitives';
-import { OpenAPIMethodBadge } from '@gitbook/react-openapi';
+import { OpenAPIMethodBadge } from '@gitbook/react-openapi/light';
 import { HEADER_HEIGHT_DESKTOP } from '../layout';
 
 /**

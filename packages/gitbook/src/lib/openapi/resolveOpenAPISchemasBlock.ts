@@ -1,5 +1,5 @@
 import { OpenAPIParseError } from '@gitbook/openapi-parser';
-import { type OpenAPISchemasData, resolveOpenAPISchemas } from '@gitbook/react-openapi';
+import { type OpenAPISchemasData, resolveOpenAPISchemas } from '@gitbook/react-openapi/core';
 import { fetchOpenAPIFilesystem } from './fetch';
 import type {
     OpenAPISchemasBlock,

@@ -1,6 +1,6 @@
 import { fetchOpenAPIFilesystem } from '@/lib/openapi/fetch';
 import { OpenAPIParseError } from '@gitbook/openapi-parser';
-import { type OpenAPIOperationData, resolveOpenAPIOperation } from '@gitbook/react-openapi';
+import { type OpenAPIOperationData, resolveOpenAPIOperation } from '@gitbook/react-openapi/core';
 import type {
     AnyOpenAPIOperationsBlock,
     ResolveOpenAPIBlockArgs,
