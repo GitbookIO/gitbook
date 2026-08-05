@@ -21,6 +21,18 @@ describe('getVisitorAuthToken', () => {
         ).toEqual({ source: 'url', token: '123' });
     });
 
+    it('should return a revalidation token for requests from the revalidation worker', () => {
+        expect(
+            getVisitorToken({
+                cookies: [],
+                headers: new Headers({
+                    'User-Agent': 'GitBook-Open-Revalidation-Worker',
+                }),
+                url: new URL('https://example.com?jwt_token=123'),
+            })
+        ).toEqual({ source: 'revalidation', token: '123' });
+    });
+
     it('should return the token from the cookie root basepath', () => {
         const visitorAuth = getVisitorToken({
             cookies: [

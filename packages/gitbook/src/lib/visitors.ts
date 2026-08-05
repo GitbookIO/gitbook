@@ -79,6 +79,11 @@ export type VisitorTokenLookup =
           source: 'visitor-oauth-protected';
           token: string;
       }
+    | {
+          /** A visitor token used for revalidation purposes. This is coming from our backend and we don't want to redirect in this case */
+          source: 'revalidation';
+          token: string;
+      }
     /** Not visitor token was found */
     | undefined;
 
@@ -130,6 +135,10 @@ export function getVisitorToken({
 
     // Allow the empty string to come through
     if (fromUrl !== null && fromUrl !== undefined) {
+        if (headers.get('user-agent')?.toLowerCase() === 'gitbook-open-revalidation-worker') {
+            return { source: 'revalidation', token: fromUrl };
+        }
+
         return { source: 'url', token: fromUrl };
     }
 
