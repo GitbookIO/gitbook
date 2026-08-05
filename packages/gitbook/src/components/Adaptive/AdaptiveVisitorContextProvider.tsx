@@ -1,7 +1,7 @@
 'use client';
 
 import type { GitBookSiteContext } from '@/lib/context';
-import { OpenAPIPrefillContextProvider } from '@gitbook/react-openapi/light';
+import { OpenAPIPrefillContextProvider } from '@gitbook/react-openapi';
 import * as React from 'react';
 import { createContext, useContext } from 'react';
 import type { AdaptiveVisitorClaims } from './types';

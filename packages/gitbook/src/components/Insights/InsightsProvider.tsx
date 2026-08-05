@@ -1,7 +1,7 @@
 'use client';
 
 import type * as api from '@gitbook/api';
-import { OpenAPIOperationContextProvider } from '@gitbook/react-openapi/light';
+import { OpenAPIOperationContextProvider } from '@gitbook/react-openapi';
 import * as React from 'react';
 import { useDebounceCallback, useEventCallback } from 'usehooks-ts';
 

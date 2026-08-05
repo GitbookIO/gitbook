@@ -2,7 +2,7 @@
 
 import { tcls } from '@/lib/tailwind';
 import { SiteInsightsLinkPosition } from '@gitbook/api';
-import { OpenAPIMethodBadge } from '@gitbook/react-openapi/light';
+import { OpenAPIMethodBadge } from '@gitbook/react-openapi';
 import { Tag } from '../Tag';
 import { PagesList } from './PagesList';
 import { TOCPageIcon } from './TOCPageIcon';
