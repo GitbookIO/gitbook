@@ -41,11 +41,7 @@ export interface TabsItem {
  * click we pin the exact pane via `data-select-pinned`/`-unpinned` (a client-only override that
  * reverts to first-match on reload). The tablist highlight follows the same resolved tab.
  */
-export function DynamicTabs(props: {
-    tabs: TabsItem[];
-    setClassName: string;
-    className?: string;
-}) {
+export function DynamicTabs(props: { tabs: TabsItem[]; setClassName: string; className?: string }) {
     const { tabs, setClassName, className } = props;
     const { activate } = useSelect();
     // The tab the visitor explicitly clicked this session (not persisted — reload reverts to CSS).
@@ -74,9 +70,10 @@ export function DynamicTabs(props: {
             }
             activate(tab.slug);
             setManualId(tabId);
-            // The hash is purely positional now — `select` carries the selection — so writing it just
-            // makes a copied URL land on this tab. We deliberately bypass the navigation context: it
-            // would report a hash change and scroll the tab the visitor is already looking at.
+            // The hash is the only URL handle for a selection, so a copied URL lands on this tab and
+            // `useSelectAnchor` re-activates its slug on load. We deliberately bypass the navigation
+            // context: it would report a hash change and scroll the tab the visitor is already
+            // looking at.
             window.history.replaceState(null, '', resolveAnchorURL(`#${tab.id}`, window.location));
         },
         [tabs, activate]

@@ -1,35 +1,35 @@
 /**
  * Version of the slugification algorithm below.
  *
- * The slugs it produces are the keys that sync content across the site AND the values that appear
- * in the public `?select=` URL parameter. Once those URLs are in the wild the algorithm is frozen:
- * changing it would silently re-resolve links people have already shared. Any future change must
- * bump this version and be gated behind it, never applied in place.
+ * The slugs it produces are the keys that sync content across the site, baked into server-rendered
+ * markup and CSS and persisted in the visitor's localStorage. Changing the algorithm in place would
+ * orphan every stored selection and desync it from the markup, so any future change must bump this
+ * version and be gated behind it.
  */
 export const SLUG_ALGO_VERSION = 1;
 
 /**
  * Maximum slug length, counted in code points (not UTF-16 units, so we never cleave a surrogate
- * pair). Guards against pathological titles — 30 CJK characters is already ~270 bytes once
- * percent-encoded into `?select=`. Part of the frozen contract (see {@link SLUG_ALGO_VERSION}).
+ * pair). Guards against pathological titles bloating the generated CSS and stored state. Part of the
+ * contract (see {@link SLUG_ALGO_VERSION}).
  */
 export const SLUG_MAX_CODE_POINTS = 64;
 
 /**
  * Turn an author-typed name (a tab title, button label, picker option…) into a `select` slug.
  *
- * DO NOT CHANGE — this is the frozen public `?select=` URL contract (see {@link SLUG_ALGO_VERSION}).
- * The output must be byte-identical on the server (baking slugs into markup/CSS) and the client
- * (parsing URLs/storage), so it relies only on locale-independent primitives: Unicode NFKC
+ * DO NOT CHANGE in place — see {@link SLUG_ALGO_VERSION}. The output must be byte-identical on the
+ * server (baking slugs into markup/CSS) and the client (reading storage), so it relies only on
+ * locale-independent primitives: Unicode NFKC
  * normalization + `String.prototype.toLowerCase` (Unicode default case folding, not locale-sensitive).
  *
  * It keeps letters, numbers and marks from every script (so `café`, `安装`, `日本語` survive) plus a
  * small safelist of symbols — `+ # . _` — that distinguish technical names that would otherwise
  * collide (`c` vs `c++` vs `c#`, `node.js`, `on_prem`). Every other run of characters collapses to a
- * single `-`, and leading/trailing `-` are trimmed. A slug can never contain the `,` that delimits
- * `?select=`, and none of these characters need escaping in a URL-encoded query param — but the
- * safelist widens the set beyond bare word characters, so consumers that interpolate a slug into
- * another syntax must still escape for it (see the CSS escaping in generateSelectCSS).
+ * single `-`, and leading/trailing `-` are trimmed. A slug can never contain a `,`, which callers rely
+ * on to join slug lists into a single key (see `useResolvedSlug`) — but the safelist widens the set
+ * beyond bare word characters, so consumers that interpolate a slug into another syntax must still
+ * escape for it (see the CSS escaping in generateSelectCSS).
  *
  * Control, format, bidi and lone-surrogate characters (`\p{C}`) are dropped outright rather than
  * turned into a `-`, and the string is re-normalized after `toLowerCase` (case mapping can leave it

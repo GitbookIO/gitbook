@@ -100,8 +100,8 @@ function SelectGroupStyle({ slugs }: { slugs: string[] }) {
  *
  * Same-named tabs deliberately share a slug — selecting one syncs every tab of that name, here and
  * on other pages, which is the whole point of name-based selection. We don't disambiguate duplicates
- * with a positional suffix: that would desync the duplicate and, because the slug rides in the
- * frozen `?select=` URL, a shared link would silently retarget when tabs are renamed or reordered.
+ * with a positional suffix: that would desync the duplicate and make a stored selection retarget
+ * whenever tabs are renamed or reordered.
  */
 function withSelectSlugs<T extends { id: string; title: string }>(
     items: T[]

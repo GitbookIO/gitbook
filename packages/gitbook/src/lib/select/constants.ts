@@ -6,12 +6,6 @@
 export const SELECT_STORAGE_KEY = '@gitbook/select';
 
 /**
- * Single query parameter carrying shareable selection state, e.g. `?select=python,cloud`
- * (most-recent-first). A fixed key so author-chosen names never collide with reserved params.
- */
-export const SELECT_URL_PARAM = 'select';
-
-/**
  * How many slugs are remembered, most-recent-first. This is also the depth of the CSS "rank ladder"
  * (see generateSelectCSS): since pane visibility is CSS-only, the ladder must cover every stored
  * rank, so the two are one knob. The generated CSS is linear in this value, so it's cheap to tune;
