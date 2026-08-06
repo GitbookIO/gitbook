@@ -13,7 +13,6 @@ import type { BlockProps } from '../Block';
 import { Blocks } from '../Blocks';
 import { ClientCodeBlock } from './ClientCodeBlock';
 import { CodeBlockRenderer } from './CodeBlockRenderer';
-<<<<<<< HEAD
 import { MermaidCodeBlockLazy } from './MermaidCodeBlockLazy';
 import { highlight } from './highlight';
 import { type RenderedInline, getInlines } from './highlight-tokens';
