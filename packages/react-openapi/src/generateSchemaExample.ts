@@ -1,6 +1,5 @@
 import type { OpenAPIV3 } from '@gitbook/openapi-parser';
 import { isPlainObject } from './contentTypeChecks';
-import { readGeneratedExample } from './util/generated-examples';
 import { checkIsReference } from './utils';
 
 type JSONValue = string | number | boolean | null | JSONValue[] | { [key: string]: JSONValue };
@@ -18,11 +17,6 @@ export function generateSchemaExample(
     schema: OpenAPIV3.SchemaObject,
     options?: GenerateSchemaExampleOptions
 ): JSONValue | undefined {
-    const precomputed = readGeneratedExample(schema, options);
-    if (precomputed) {
-        return precomputed.value as JSONValue | undefined;
-    }
-
     return getExampleFromSchema(schema, {
         emptyString: 'text',
         ...options,
@@ -70,9 +64,9 @@ export function generateMediaTypeExamples(
 /** Hard limit for rendering circular references */
 const MAX_LEVELS_DEEP = 5;
 
-// Evaluated at module load, so it only ever runs where examples are generated: on the server, during
-// resolution. The browser reads the precomputed values instead of reaching this.
-const EXAMPLE_DATE = new Date().toISOString();
+// Fixed, not `new Date()`: the block is rendered on the server and hydrated in the browser, so any
+// value read from the clock differs between the two and fails hydration.
+const EXAMPLE_DATE = '2026-01-01T00:00:00.000Z';
 
 const genericExampleValues: Record<string, string> = {
     'date-time': EXAMPLE_DATE,

@@ -6,7 +6,6 @@ import type {
 } from '@gitbook/openapi-parser';
 import { dereferenceFilesystem } from './dereference';
 import type { OpenAPIWebhookData } from './types';
-import { precomputeOperationExamples } from './util/precompute-examples';
 import { readMcpUrl } from './utils';
 
 export { fromJSON, toJSON } from 'flatted';
@@ -37,8 +36,6 @@ export async function resolveOpenAPIWebhook(
             parameters: [...commonParameters, ...(operation.parameters ?? [])],
         };
     }
-
-    precomputeOperationExamples(operation);
 
     const servers = 'servers' in schema ? (schema.servers ?? []) : [];
 

@@ -6,7 +6,6 @@ import type {
 } from '@gitbook/openapi-parser';
 import { dereferenceFilesystem } from './dereference';
 import type { OpenAPIOperationData, OpenAPISecurityScope } from './types';
-import { precomputeOperationExamples } from './util/precompute-examples';
 import { checkIsReference, readMcpUrl } from './utils';
 
 export { fromJSON, toJSON } from 'flatted';
@@ -51,8 +50,6 @@ export async function resolveOpenAPIOperation(
     const flatSecurities = flattenSecurities(security);
 
     // Resolve securities
-    precomputeOperationExamples(operation);
-
     const securitiesMap = new Map<string, OpenAPIOperationData['securities'][number][1]>();
     for (const entry of flatSecurities) {
         const [securityKey, operationScopes] = Object.entries(entry)[0] ?? [];
