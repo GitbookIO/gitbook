@@ -10,6 +10,7 @@
     "version": "1.5.15",
     "sideEffects": false,
     "dependencies": {
+        "@base-ui/react": "^1.7.0",
         "@gitbook/expr": "workspace:*",
         "@gitbook/openapi-parser": "workspace:*",
         "@scalar/api-client-react": "catalog:",
@@ -17,13 +18,13 @@
         "@scalar/types": "^0.4.0",
         "classnames": "catalog:",
         "flatted": "^3.2.9",
+        "js-yaml": "^4.1.0",
         "json-xml-parse": "^1.3.0",
-        "react-aria-components": "^1.13.0",
         "react-aria": "^3.44.0",
+        "react-aria-components": "^1.13.0",
         "react-stately": "^3.42.0",
         "usehooks-ts": "catalog:",
-        "zustand": "^5.0.3",
-        "js-yaml": "^4.1.0"
+        "zustand": "^5.0.3"
     },
     "devDependencies": {
         "@types/js-yaml": "^4.0.9",

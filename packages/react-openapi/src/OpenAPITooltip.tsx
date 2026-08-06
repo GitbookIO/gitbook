@@ -1,34 +1,46 @@
 'use client';
 
+import { Tooltip } from '@base-ui/react/tooltip';
 import classNames from 'classnames';
-import type { TooltipTriggerProps } from 'react-aria';
-import { Tooltip, type TooltipProps, TooltipTrigger } from 'react-aria-components';
 
-export function OpenAPITooltip(
-    props: TooltipTriggerProps & {
-        children: React.ReactNode;
-    }
-) {
-    const { children, ...rest } = props;
+export function OpenAPITooltip(props: {
+    children: React.ReactNode;
+    open?: boolean;
+    onOpenChange?: (open: boolean) => void;
+    disabled?: boolean;
+}) {
+    const { children, open, onOpenChange, disabled } = props;
     return (
-        <TooltipTrigger {...rest} closeDelay={200} delay={200}>
-            {children}
-        </TooltipTrigger>
+        <Tooltip.Provider delay={200} closeDelay={200}>
+            <Tooltip.Root open={open} onOpenChange={onOpenChange} disabled={disabled}>
+                {children}
+            </Tooltip.Root>
+        </Tooltip.Provider>
     );
 }
 
-function OpenAPITooltipContent(props: TooltipProps) {
-    const { children, placement = 'top', offset = 4, className, ...rest } = props;
+// react-aria inferred the trigger from the first child; Base UI wants it declared.
+function OpenAPITooltipTrigger(props: { render: React.ReactElement<Record<string, unknown>> }) {
+    return <Tooltip.Trigger render={props.render} />;
+}
+
+function OpenAPITooltipContent(props: {
+    children: React.ReactNode;
+    className?: string;
+    side?: 'top' | 'bottom' | 'left' | 'right';
+    sideOffset?: number;
+}) {
+    const { children, className, side = 'top', sideOffset = 4 } = props;
     return (
-        <Tooltip
-            {...rest}
-            placement={placement}
-            offset={offset}
-            className={classNames('openapi-tooltip', className)}
-        >
-            {children}
-        </Tooltip>
+        <Tooltip.Portal>
+            <Tooltip.Positioner side={side} sideOffset={sideOffset}>
+                <Tooltip.Popup className={classNames('openapi-tooltip', className)}>
+                    {children}
+                </Tooltip.Popup>
+            </Tooltip.Positioner>
+        </Tooltip.Portal>
     );
 }
 
+OpenAPITooltip.Trigger = OpenAPITooltipTrigger;
 OpenAPITooltip.Content = OpenAPITooltipContent;

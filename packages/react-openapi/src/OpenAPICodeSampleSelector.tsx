@@ -4,7 +4,7 @@ import { useCallback } from 'react';
 import type { Key } from 'react-aria';
 import { useStore } from 'zustand';
 import { OpenAPIPath } from './OpenAPIPath';
-import { OpenAPISelect, OpenAPISelectItem } from './OpenAPISelect';
+import { OpenAPISelect, type OpenAPISelectItem } from './OpenAPISelect';
 import { StaticSection } from './StaticSection';
 import type { OpenAPIClientContext } from './context';
 import { getOrCreateStoreByKey } from './getOrCreateStoreByKey';
@@ -47,11 +47,7 @@ function OpenAPICodeSampleHeader(props: {
                     stateKey="codesample"
                     placement="bottom end"
                 >
-                    {items.map((item) => (
-                        <OpenAPISelectItem key={item.key} id={item.key} value={item}>
-                            {item.label}
-                        </OpenAPISelectItem>
-                    ))}
+                    {(item) => item.label}
                 </OpenAPISelect>
             ) : items[0] ? (
                 <span className="openapi-codesample-label">{items[0].label}</span>

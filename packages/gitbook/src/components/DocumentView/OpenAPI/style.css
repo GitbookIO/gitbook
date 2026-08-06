@@ -639,7 +639,7 @@ button.openapi-mcp {
     @apply w-auto max-w-full;
 }
 
-/* Prevent react-aria popover from setting overflow:auto on body */
+/* Belt and braces: keep the document scrollable while the select popup is open. */
 body:has(.openapi-select-popover) {
     overflow: unset !important;
 }
@@ -657,15 +657,15 @@ body:has(.openapi-select-popover) {
     @apply p-1 *:truncate max-w-full;
 }
 
-.openapi-select > button[data-focused="true"] {
+.openapi-select > button:focus {
     @apply outline-primary -outline-offset-1 outline;
 }
 
-.openapi-select > button > span.react-aria-SelectValue {
+.openapi-select > button > span.openapi-select-value {
     @apply shrink truncate flex items-center;
 }
 
-.openapi-select > button > .react-aria-SelectValue [slot="description"] {
+.openapi-select > button > .openapi-select-value [slot="description"] {
     display: none;
 }
 
@@ -678,15 +678,15 @@ body:has(.openapi-select-popover) {
 }
 
 .openapi-select-popover {
-    @apply min-w-32 z-10 max-w-[max(20rem,var(--trigger-width))] overflow-x-hidden max-h-52 overflow-y-auto p-1.5 border border-tint-subtle bg-tint-base backdrop-blur-xl rounded-corners:rounded-md circular-corners:rounded-xl straight-corners:rounded-none;
+    @apply min-w-32 z-10 max-w-[max(20rem,var(--anchor-width))] overflow-x-hidden max-h-52 overflow-y-auto p-1.5 border border-tint-subtle bg-tint-base backdrop-blur-xl rounded-corners:rounded-md circular-corners:rounded-xl straight-corners:rounded-none;
     @apply shadow-md shadow-tint-12/1 dark:shadow-tint-1/1;
 }
 
-.openapi-select-popover[data-entering] {
+.openapi-select-popover[data-starting-style] {
     animation: popover-enter 0.2s ease-in-out;
 }
 
-.openapi-select-popover[data-exiting] {
+.openapi-select-popover[data-ending-style] {
     animation: popover-leave 0.2s ease-in-out;
 }
 
@@ -699,7 +699,7 @@ body:has(.openapi-select-popover) {
     @apply flex flex-col gap-1 justify-start items-start;
 }
 
-.openapi-select > button > span.react-aria-SelectValue:has(.openapi-statuscode),
+.openapi-select > button > span.openapi-select-value:has(.openapi-statuscode),
 .openapi-select-item:has(.openapi-statuscode) {
     @apply gap-2;
 }
@@ -1024,11 +1024,11 @@ body:has(.openapi-select-popover) {
     @apply size-3 text-tint-strong;
 }
 
-.openapi-tooltip[data-entering] {
+.openapi-tooltip[data-starting-style] {
     animation: tooltip-enter 0.2s ease-in-out forwards;
 }
 
-.openapi-tooltip[data-exiting] {
+.openapi-tooltip[data-ending-style] {
     animation: tooltip-leave 0.2s ease-in-out forwards;
 }
 

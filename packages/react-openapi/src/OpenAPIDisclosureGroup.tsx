@@ -11,7 +11,7 @@ import {
     useDisclosureState,
 } from 'react-stately';
 import { useStore } from 'zustand';
-import { OpenAPISelect, OpenAPISelectItem, useSelectState } from './OpenAPISelect';
+import { OpenAPISelect, useSelectState } from './OpenAPISelect';
 import { getOrCreateDisclosureStoreByKey } from './getOrCreateDisclosureStoreByKey';
 
 interface Props {
@@ -180,11 +180,7 @@ function DisclosureItem(props: {
                                     items={group.tabs}
                                     placement="bottom end"
                                 >
-                                    {group.tabs.map((tab) => (
-                                        <OpenAPISelectItem key={tab.key} id={tab.key} value={tab}>
-                                            {tab.label}
-                                        </OpenAPISelectItem>
-                                    ))}
+                                    {(tab) => tab.label}
                                 </OpenAPISelect>
                             ) : group.tabs[0]?.label ? (
                                 <span>{group.tabs[0].label}</span>
