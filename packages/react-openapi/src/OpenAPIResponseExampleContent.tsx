@@ -1,7 +1,7 @@
 'use client';
 
 import clsx from 'classnames';
-import type { Key } from 'react-aria';
+import type { Key } from './OpenAPISelect';
 import { OpenAPISelect, type OpenAPISelectItem, useSelectState } from './OpenAPISelect';
 import { StaticSection } from './StaticSection';
 import { createStateKey, getStatusCodeClassName } from './utils';

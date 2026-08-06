@@ -1,7 +1,7 @@
 'use client';
 
-import type { Key } from 'react-aria';
 import { OpenAPIEmptyExample } from './OpenAPIExample';
+import type { Key } from './OpenAPISelect';
 import { OpenAPISelect, type OpenAPISelectItem, useSelectState } from './OpenAPISelect';
 import { StaticSection } from './StaticSection';
 import type { OpenAPIClientContext } from './context';

@@ -1,9 +1,9 @@
 'use client';
 
 import { useCallback } from 'react';
-import type { Key } from 'react-aria';
 import { useStore } from 'zustand';
 import { OpenAPIPath } from './OpenAPIPath';
+import type { Key } from './OpenAPISelect';
 import { OpenAPISelect, type OpenAPISelectItem } from './OpenAPISelect';
 import { StaticSection } from './StaticSection';
 import type { OpenAPIClientContext } from './context';
