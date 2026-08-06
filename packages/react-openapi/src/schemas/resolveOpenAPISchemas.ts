@@ -6,7 +6,6 @@ import type {
 } from '@gitbook/openapi-parser';
 import { filterSelectedOpenAPISchemas } from '@gitbook/openapi-parser';
 import { dereferenceFilesystem } from '../dereference';
-import { precomputeSchemasExamples } from '../util/precompute-examples';
 
 export type OpenAPISchemasData = Pick<OpenAPICustomSpecProperties, 'x-expandAllModelSections'> & {
     schemas: OpenAPISchema[];
@@ -49,8 +48,6 @@ export async function resolveOpenAPISchemas(
     if (schemas.length === 0) {
         return null;
     }
-
-    precomputeSchemasExamples(schemas);
 
     return {
         schemas,
