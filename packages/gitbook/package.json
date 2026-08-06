@@ -125,8 +125,8 @@
     },
     "scripts": {
         "generate": "./scripts/generate.sh",
-        "generate:assets": "bun ./scripts/generate-translations.ts && bun ./scripts/generate-mermaid-runtime.ts && bun ./scripts/generate-scalar-runtime.ts",
-        "clean": "rm -rf ./.next && rm -rf ./public/~gitbook/static/icons && rm -rf ./public/~gitbook/static/math && rm -rf ./public/~gitbook/static/mermaid && rm -rf ./public/~gitbook/static/scalar && rm -rf ./public/~gitbook/static/translations",
+        "generate:assets": "bun ./scripts/generate-translations.ts && bun ./scripts/generate-mermaid-runtime.ts && bun ./scripts/generate-scalar-runtime.ts && bun ./scripts/generate-shiki-runtime.ts",
+        "clean": "rm -rf ./.next && rm -rf ./public/~gitbook/static/icons && rm -rf ./public/~gitbook/static/math && rm -rf ./public/~gitbook/static/mermaid && rm -rf ./public/~gitbook/static/scalar && rm -rf ./public/~gitbook/static/shiki && rm -rf ./public/~gitbook/static/translations",
         "dev": "bun run generate:assets && env-cmd --silent -f ../../.env.local next --webpack",
         "build": "bun run generate:assets && next build --webpack",
         "build:local": "bun run generate:assets && GITBOOK_URL=http://localhost:3000 next build --webpack",
