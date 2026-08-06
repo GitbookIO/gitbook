@@ -678,15 +678,16 @@ body:has(.openapi-select-popover) {
 }
 
 .openapi-select-popover {
+    @apply outline-none;
     @apply min-w-32 z-10 max-w-[max(20rem,var(--anchor-width))] overflow-x-hidden max-h-52 overflow-y-auto p-1.5 border border-tint-subtle bg-tint-base backdrop-blur-xl rounded-corners:rounded-md circular-corners:rounded-xl straight-corners:rounded-none;
     @apply shadow-md shadow-tint-12/1 dark:shadow-tint-1/1;
 }
 
-.openapi-select-popover[data-starting-style] {
+.openapi-select-popover[data-open] {
     animation: popover-enter 0.2s ease-in-out;
 }
 
-.openapi-select-popover[data-ending-style] {
+.openapi-select-popover[data-closed] {
     animation: popover-leave 0.2s ease-in-out;
 }
 
@@ -1011,11 +1012,11 @@ body:has(.openapi-select-popover) {
     @apply size-3 text-tint-strong;
 }
 
-.openapi-tooltip[data-starting-style] {
+.openapi-tooltip[data-open] {
     animation: tooltip-enter 0.2s ease-in-out forwards;
 }
 
-.openapi-tooltip[data-ending-style] {
+.openapi-tooltip[data-closed] {
     animation: tooltip-leave 0.2s ease-in-out forwards;
 }
 
