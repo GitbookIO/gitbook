@@ -1,4 +1,4 @@
-import type { Key } from 'react-stately';
+export type Key = string | number;
 import { createStore } from 'zustand';
 
 type DisclosureState = {
