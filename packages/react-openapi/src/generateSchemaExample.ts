@@ -1,5 +1,6 @@
 import type { OpenAPIV3 } from '@gitbook/openapi-parser';
 import { isPlainObject } from './contentTypeChecks';
+import { readGeneratedExample } from './util/generated-examples';
 import { checkIsReference } from './utils';
 
 type JSONValue = string | number | boolean | null | JSONValue[] | { [key: string]: JSONValue };
@@ -17,6 +18,11 @@ export function generateSchemaExample(
     schema: OpenAPIV3.SchemaObject,
     options?: GenerateSchemaExampleOptions
 ): JSONValue | undefined {
+    const precomputed = readGeneratedExample(schema, options);
+    if (precomputed) {
+        return precomputed.value as JSONValue | undefined;
+    }
+
     return getExampleFromSchema(schema, {
         emptyString: 'text',
         ...options,
@@ -64,9 +70,13 @@ export function generateMediaTypeExamples(
 /** Hard limit for rendering circular references */
 const MAX_LEVELS_DEEP = 5;
 
+// Evaluated at module load, so it only ever runs where examples are generated: on the server, during
+// resolution. The browser reads the precomputed values instead of reaching this.
+const EXAMPLE_DATE = new Date().toISOString();
+
 const genericExampleValues: Record<string, string> = {
-    'date-time': new Date().toISOString(),
-    date: new Date().toISOString().split('T')[0] ?? '1970-01-01',
+    'date-time': EXAMPLE_DATE,
+    date: EXAMPLE_DATE.split('T')[0] ?? '1970-01-01',
     email: 'name@gmail.com',
     hostname: 'example.com',
     ipv4: '0.0.0.0',
@@ -86,7 +96,7 @@ const genericExampleValues: Record<string, string> = {
     // https://tools.ietf.org/html/draft-handrews-relative-json-pointer-01
     'relative-json-pointer': '1/nested/objects',
     // full-time in https://tools.ietf.org/html/rfc3339#section-5.6
-    time: new Date().toISOString().split('T')[1]?.split('.')[0] ?? '00:00:00Z',
+    time: EXAMPLE_DATE.split('T')[1]?.split('.')[0] ?? '00:00:00Z',
     // either a URI or relative-reference https://tools.ietf.org/html/rfc3986#section-4.1
     'uri-reference': '../folder',
     'uri-template': 'https://example.com/{id}',
