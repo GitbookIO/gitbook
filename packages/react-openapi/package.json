@@ -13,8 +13,7 @@
         "@gitbook/expr": "workspace:*",
         "@gitbook/openapi-parser": "workspace:*",
         "@scalar/api-client-react": "catalog:",
-        "@scalar/oas-utils": "^0.6.3",
-        "@scalar/types": "^0.4.0",
+        "@scalar/types": "^0.17.0",
         "classnames": "catalog:",
         "flatted": "^3.2.9",
         "json-xml-parse": "^1.3.0",
@@ -42,7 +41,7 @@
         "react-dom": "catalog:"
     },
     "peerDependencies": {
-        "react": ">=17",
+        "react": ">=18",
         "react-dom": "*"
     },
     "scripts": {
