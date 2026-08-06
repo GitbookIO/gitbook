@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { useRef, useState } from 'react';
-import { createPortal } from 'react-dom';
+import { createPortal, preload } from 'react-dom';
 import * as ReactJSXRuntime from 'react/jsx-runtime';
 
 import type { OpenAPIV3_1 } from '@gitbook/openapi-parser';
@@ -33,6 +33,8 @@ export function ScalarApiButton(props: {
     const [isOpen, setIsOpen] = useState(false);
     const [runtime, setRuntime] = useState<ScalarRuntime | null>(null);
     const controllerRef = useRef<ScalarModalControllerRef>(null);
+
+    preloadScalarRuntime(context.scalarRuntimeURL);
 
     return (
         <div className="scalar scalar-activate">
@@ -80,6 +82,16 @@ export function ScalarApiButton(props: {
                 )}
         </div>
     );
+}
+
+export function preloadScalarRuntime(
+    runtimeURL: string,
+    preloadRuntime: (
+        href: string,
+        options: { as: 'script'; crossOrigin: 'anonymous' }
+    ) => void = preload
+) {
+    preloadRuntime(runtimeURL, { as: 'script', crossOrigin: 'anonymous' });
 }
 
 async function loadScalarRuntime(runtimeURL: string): Promise<ScalarRuntime> {
