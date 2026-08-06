@@ -40,7 +40,12 @@ function OpenAPITooltipContent(props: {
     const { children, className, side = 'top', sideOffset = 4 } = props;
     return (
         <Tooltip.Portal>
-            <Tooltip.Positioner side={side} sideOffset={sideOffset} positionMethod="fixed">
+            <Tooltip.Positioner
+                className="openapi-tooltip-positioner"
+                side={side}
+                sideOffset={sideOffset}
+                positionMethod="fixed"
+            >
                 <Tooltip.Popup className={classNames('openapi-tooltip', className)}>
                     {children}
                 </Tooltip.Popup>

@@ -1011,8 +1011,14 @@ body:has(.openapi-select-popover) {
     @apply p-0.5 tracking-wide leading-none uppercase text-[0.625rem] text-tint-subtle whitespace-nowrap absolute -left-3 -bottom-2.5 -translate-x-1/2 z-10 bg-tint-base border-y border-tint-subtle -rotate-6;
 }
 
+/* z-index only applies to positioned elements, and the popup itself is static. */
+.openapi-tooltip-positioner,
+.openapi-select-positioner {
+    @apply z-50;
+}
+
 .openapi-tooltip {
-    @apply z-50 flex items-center gap-1 bg-tint-base border border-tint-subtle text-tint-strong rounded-corners:rounded-md circular-corners:rounded-xl straight-corners:rounded-none font-medium px-1.5 py-0.5 shadow-sm text-[13px];
+    @apply flex items-center gap-1 bg-tint-base border border-tint-subtle text-tint-strong rounded-corners:rounded-md circular-corners:rounded-xl straight-corners:rounded-none font-medium px-1.5 py-0.5 shadow-sm text-[13px];
 }
 
 .openapi-tooltip svg {

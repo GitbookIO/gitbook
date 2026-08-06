@@ -102,6 +102,7 @@ export function OpenAPISelect<T extends OpenAPISelectItem>(props: OpenAPISelectP
             </div>
             <Select.Portal>
                 <Select.Positioner
+                    className="openapi-select-positioner"
                     side={side}
                     align={align}
                     sideOffset={8}
