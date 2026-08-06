@@ -652,6 +652,8 @@ body:has(.openapi-select-popover) {
 
 .openapi-select:not(.openapi-select-unstyled) > button {
     @apply border border-tint-subtle bg-tint text-xs;
+    /* The generic rule hovers to `bg-tint`, which is this variant's resting colour. */
+    @apply hover:bg-tint-hover;
 }
 
 .openapi-select-unstyled > button {
