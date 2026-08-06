@@ -790,23 +790,6 @@ body:has(.openapi-select-popover) {
 
 /* Tabs */
 .openapi-panel-header,
-.openapi-tabs-list {
-    @apply flex flex-row gap-1.5 py-1.5 px-2.5 w-full overflow-x-auto no-scrollbar;
-}
-
-.openapi-tabs-tab {
-    @apply hover:bg-primary-hover whitespace-nowrap font-mono font-normal tabular-nums hover:text-primary cursor-pointer transition-all relative text-[0.813rem] text-tint px-1 border border-transparent rounded-md straight-corners:rounded-none circular-corners:rounded-lg;
-}
-
-.openapi-tabs-tab[aria-selected="true"] {
-    @apply text-primary-subtle! after:absolute after:-bottom-[calc(0.375rem+1px)] after:z-20 after:left-0 after:w-full after:h-px after:bg-primary-solid after:transition-all;
-}
-
-.openapi-tabs-panel {
-    @apply flex-1 text-sm relative focus-visible:outline-none;
-    @apply before:w-full before:h-px before:absolute before:bg-tint-6 before:-top-px before:z-10;
-}
-
 /* Disclosure group */
 .openapi-disclosure-group {
     @apply border-tint-subtle transition-all border-b border-x overflow-auto rounded-corners:last:rounded-b-xl circular-corners:last:rounded-b-2xl straight-corners:last:rounded-b-xs rounded-corners:first:rounded-t-xl circular-corners:first:rounded-t-2xl straight-corners:first:rounded-t-xs first:border-t relative;
