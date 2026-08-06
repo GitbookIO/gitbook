@@ -1,9 +1,7 @@
 'use client';
-import { Text } from 'react-aria-components';
 import type { OpenAPIPathProps } from './OpenAPIPath';
 import { OpenAPIPathItem } from './OpenAPIPathItem';
-import { OpenAPISelect, OpenAPISelectItem, useSelectState } from './OpenAPISelect';
-import { OpenAPITooltip } from './OpenAPITooltip';
+import { OpenAPISelect, useSelectState } from './OpenAPISelect';
 import type { OpenAPIClientContext } from './context';
 import { formatPath } from './formatPath';
 import type { OpenAPIServerWithCustomProperties } from './types';
@@ -46,33 +44,26 @@ export function OpenAPIPathMultipleServers(
             context={context}
         >
             {withServer ? (
-                <OpenAPITooltip>
-                    <OpenAPISelect
-                        className="openapi-select openapi-select-unstyled"
-                        items={items}
-                        stateKey={serversStateKey}
-                        placement="bottom start"
-                        icon={context.icons.chevronDown}
-                        defaultValue={defaultServer}
-                        onChange={setKey}
-                    >
-                        {items.map((item) => (
-                            <OpenAPISelectItem
-                                textValue={item.label}
-                                key={item.key}
-                                id={item.key}
-                                value={item}
-                                className="openapi-select-item-column"
-                            >
-                                <Text slot="label">{item.label}</Text>
-                                {item.description ? (
-                                    <Text slot="description">{item.description}</Text>
-                                ) : null}
-                            </OpenAPISelectItem>
-                        ))}
-                    </OpenAPISelect>
-                    <OpenAPITooltip.Content>Click to select a server</OpenAPITooltip.Content>
-                </OpenAPITooltip>
+                <OpenAPISelect
+                    className="openapi-select openapi-select-unstyled"
+                    items={items}
+                    itemClassName="openapi-select-item-column"
+                    stateKey={serversStateKey}
+                    placement="bottom start"
+                    icon={context.icons.chevronDown}
+                    defaultValue={defaultServer}
+                    onChange={setKey}
+                    tooltip="Click to select a server"
+                >
+                    {(item) => (
+                        <>
+                            <span slot="label">{item.label}</span>
+                            {item.description ? (
+                                <span slot="description">{item.description}</span>
+                            ) : null}
+                        </>
+                    )}
+                </OpenAPISelect>
             ) : null}
             {formattedPath}
         </OpenAPIPathItem>

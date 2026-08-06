@@ -4,7 +4,7 @@ import clsx from 'classnames';
 import { useRef } from 'react';
 import { mergeProps, useButton, useDisclosure, useFocusRing } from 'react-aria';
 import { useDisclosureState } from 'react-stately';
-import { OpenAPISelect, OpenAPISelectItem, useSelectState } from './OpenAPISelect';
+import { OpenAPISelect, useSelectState } from './OpenAPISelect';
 import { Section, SectionBody, SectionHeader, SectionHeaderContent } from './StaticSection';
 
 interface InteractiveSectionTab {
@@ -122,11 +122,7 @@ export function InteractiveSection(props: {
                                 icon={selectIcon}
                                 placement="bottom end"
                             >
-                                {tabs.map((tab) => (
-                                    <OpenAPISelectItem key={tab.key} id={tab.key} value={tab}>
-                                        {tab.label}
-                                    </OpenAPISelectItem>
-                                ))}
+                                {(tab) => tab.label}
                             </OpenAPISelect>
                         ) : null}
                     </div>
