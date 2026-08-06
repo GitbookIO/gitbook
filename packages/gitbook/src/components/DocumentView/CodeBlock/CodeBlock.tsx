@@ -12,8 +12,9 @@ import type { BlockProps } from '../Block';
 import { Blocks } from '../Blocks';
 import { ClientCodeBlock } from './ClientCodeBlock';
 import { CodeBlockRenderer } from './CodeBlockRenderer';
-import { MermaidCodeBlock } from './MermaidCodeBlock';
-import { type RenderedInline, getInlines, highlight } from './highlight';
+import { MermaidCodeBlockLazy } from './MermaidCodeBlockLazy';
+import { highlight } from './highlight';
+import { type RenderedInline, getInlines } from './highlight-tokens';
 
 /**
  * Render a code block, can be client-side or server-side.
@@ -117,7 +118,7 @@ export async function CodeBlock(
     return (
         <React.Suspense fallback={null}>
             {isMermaid ? (
-                <MermaidCodeBlock {...clientProps} />
+                <MermaidCodeBlockLazy {...clientProps} />
             ) : (
                 <ClientCodeBlock {...clientProps} />
             )}
