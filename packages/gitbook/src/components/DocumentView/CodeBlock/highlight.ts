@@ -11,6 +11,7 @@ import {
     truncateHighlightTokens,
 } from './highlight-tokens';
 import { plainHighlight } from './plain-highlight';
+import { getShikiLanguage } from './shiki-syntax';
 
 export * from './highlight-tokens';
 
@@ -125,30 +126,7 @@ export async function highlight(
  * Get the language of a code block.
  */
 function getBlockLang(block: DocumentBlockCode): string | null {
-    return block.data.syntax ? getLanguageForSyntax(block.data.syntax) : null;
-}
-
-const syntaxAliases: Record<string, string> = {
-    // "Parser" language does not exist in Shiki, but it's used in GitBook
-    // The closest language is "Blade"
-    parser: 'blade',
-
-    // From GitBook App we receive "objectivec" instead of "objective-c"
-    objectivec: 'objective-c',
-};
-
-/**
- * Normalize syntax names before loading their language modules.
- */
-function getLanguageForSyntax(syntax: string): string | null {
-    // Normalize the syntax to lowercase.
-    syntax = syntax.toLowerCase();
-
-    if (!syntax || syntax.includes('/')) {
-        return null;
-    }
-
-    return syntaxAliases[syntax] ?? syntax;
+    return getShikiLanguage(block.data.syntax);
 }
 
 function loadShikiRuntime(runtimeURL: string): Promise<ShikiRuntime> {

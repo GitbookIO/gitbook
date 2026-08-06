@@ -1,4 +1,5 @@
 import * as React from 'react';
+import * as ReactDOM from 'react-dom';
 
 import type {
     CustomizationThemedCodeTheme,
@@ -15,6 +16,7 @@ import { ClientCodeBlock } from './ClientCodeBlock';
 import { MermaidCodeBlockLazy } from './MermaidCodeBlockLazy';
 import { type RenderedInline, getInlines } from './highlight-tokens';
 import { MERMAID_RUNTIME_PATH } from './mermaid-runtime-path';
+import { preloadShikiAssets } from './shiki-assets';
 import { SHIKI_RUNTIME_PATH } from './shiki-runtime-path';
 
 /**
@@ -38,6 +40,8 @@ export async function CodeBlock(
     } = props;
     const inlines = getInlines(block);
     const isMermaid = block.data.syntax?.toLowerCase() === 'mermaid';
+
+    preloadShikiAssets(block.data.syntax, ReactDOM.preload);
 
     const richInlines: RenderedInline[] = inlines
         // Exclude inline expressions from rendered inline as they are rendered as code text once evaluated
