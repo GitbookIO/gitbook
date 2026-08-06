@@ -897,6 +897,10 @@ body:has(.openapi-select-popover) {
     @apply flex flex-row justify-between flex-wrap relative items-start gap-2 text-left -mx-3 px-3 -my-2.5 py-2.5 pr-10;
 }
 
+.openapi-disclosure-trigger:focus-visible {
+    outline: 2px solid rgb(var(--primary-color-500) / 0.4);
+}
+
 .openapi-disclosure {
     @apply -mx-3 px-3 py-2.5 transition-all flex flex-col ring-tint-subtle;
 }
@@ -925,14 +929,14 @@ body:has(.openapi-select-popover) {
     @apply bg-tint-subtle overflow-hidden;
 }
 
-.openapi-disclosure[data-expanded="true"] {
+.openapi-disclosure[data-open] {
     @apply ring-1 shadow-sm;
 }
 
-.openapi-disclosure[data-expanded="true"]:not(.openapi-schemas-disclosure,.openapi-required-scopes):not(:first-child) {
+.openapi-disclosure[data-open]:not(.openapi-schemas-disclosure,.openapi-required-scopes):not(:first-child) {
     @apply mt-2;
 }
-.openapi-disclosure[data-expanded="true"]:not(.openapi-schemas-disclosure,.openapi-required-scopes):not(:last-child) {
+.openapi-disclosure[data-open]:not(.openapi-schemas-disclosure,.openapi-required-scopes):not(:last-child) {
     @apply mb-2;
 }
 
