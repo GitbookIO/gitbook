@@ -99,7 +99,13 @@ export function OpenAPISelect<T extends OpenAPISelectItem>(props: OpenAPISelectP
                 )}
             </div>
             <Select.Portal>
-                <Select.Positioner side={side} align={align}>
+                <Select.Positioner
+                    side={side}
+                    align={align}
+                    sideOffset={8}
+                    // Base UI overlaps the trigger by default to line the selected item up with it.
+                    alignItemWithTrigger={false}
+                >
                     <Select.Popup className="openapi-select-popover">
                         {items.map((item) => (
                             <OpenAPISelectItem
