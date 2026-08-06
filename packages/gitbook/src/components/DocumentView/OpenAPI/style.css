@@ -639,11 +639,6 @@ button.openapi-mcp {
     @apply w-auto max-w-full;
 }
 
-/* Belt and braces: keep the document scrollable while the select popup is open. */
-body:has(.openapi-select-popover) {
-    overflow: unset !important;
-}
-
 .openapi-select > button {
     @apply flex items-center font-normal cursor-pointer *:truncate gap-1.5 p-1.5 border border-tint-subtle text-tint-strong rounded-md straight-corners:rounded-none circular-corners:rounded-lg leading-none;
     @apply outline-none;
