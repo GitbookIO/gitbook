@@ -346,9 +346,12 @@ body {
 .light .scalar .client-wrapper-bg-color {
     background-color: var(--scalar-background-2) !important;
 }
-.scalar .gitbook-show {
-    display: block !important;
-}
-.scalar .gitbook-hidden {
-    display: none !important;
+/*
+ * The client locks scrolling by setting overflow on <body>, but :root carries overflow-x: hidden,
+ * which computes overflow-y to auto and makes <html> the scroll container — so the body lock never
+ * reaches the viewport. Lock <html> instead, reserving the gutter so the page doesn't shift.
+ */
+html:has(.scalar-container.scalar-client--open) {
+    overflow: hidden;
+    scrollbar-gutter: stable;
 }

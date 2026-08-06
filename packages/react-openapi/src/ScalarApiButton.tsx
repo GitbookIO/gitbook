@@ -1,8 +1,8 @@
 'use client';
 
-import { ApiClientModalProvider, useApiClientModal } from '@scalar/api-client-react';
-import { Suspense, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
-import { createPortal } from 'react-dom';
+import { type ApiClientConfigurationReact, useApiClient } from '@scalar/api-client-react';
+import { useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
+import { useEventCallback } from 'usehooks-ts';
 
 import type { OpenAPIV3_1 } from '@gitbook/openapi-parser';
 import { useOpenAPIOperationContext } from './OpenAPIOperationContext';
@@ -11,6 +11,10 @@ import type { OpenAPIClientContext } from './context';
 import { t } from './translate';
 import type { OpenAPIOperationData } from './types';
 import { resolveTryItPrefillForOperation } from './util/tryit-prefill';
+
+type ScalarModalControllerRef = {
+    openClient: () => void;
+};
 
 /**
  * Button which launches the Scalar API Client
@@ -25,16 +29,27 @@ export function ScalarApiButton(props: {
     context: OpenAPIClientContext;
 }) {
     const { method, path, securities, servers, specUrl, withProxy, context } = props;
-    const [isOpen, setIsOpen] = useState(false);
+    // Mounting the controller runs useApiClient, which downloads the client and registers the
+    // document. Doing that on intent rather than on click gives the spec time to load, so the
+    // modal opens already populated instead of flashing "No document selected".
+    const [isPreloaded, setIsPreloaded] = useState(false);
+    const [hasRequestedOpen, setHasRequestedOpen] = useState(false);
     const controllerRef = useRef<ScalarModalControllerRef>(null);
+
+    const preload = () => setIsPreloaded(true);
 
     return (
         <div className="scalar scalar-activate">
             <button
                 className="scalar-activate-button button"
+                onPointerEnter={preload}
+                onPointerDown={preload}
+                onFocus={preload}
                 onClick={() => {
-                    controllerRef.current?.openClient?.();
-                    setIsOpen(true);
+                    setHasRequestedOpen(true);
+                    // Opens straight away when preloading already finished; otherwise the
+                    // controller opens itself as soon as the client resolves.
+                    controllerRef.current?.openClient();
                 }}
             >
                 {t(context.translation, 'test_it')}
@@ -47,27 +62,28 @@ export function ScalarApiButton(props: {
                 </svg>
             </button>
 
-            {isOpen &&
-                createPortal(
-                    <Suspense fallback={null}>
-                        <ScalarModal
-                            controllerRef={controllerRef}
-                            withProxy={withProxy}
-                            proxyUrl={context.proxyUrl}
-                            method={method}
-                            path={path}
-                            securities={securities}
-                            servers={servers}
-                            specUrl={specUrl}
-                        />
-                    </Suspense>,
-                    document.body
-                )}
+            {isPreloaded || hasRequestedOpen ? (
+                <ScalarModalController
+                    controllerRef={controllerRef}
+                    method={method}
+                    path={path}
+                    proxyUrl={context.proxyUrl}
+                    securities={securities}
+                    servers={servers}
+                    shouldOpen={hasRequestedOpen}
+                    specUrl={specUrl}
+                    withProxy={withProxy}
+                />
+            ) : null}
         </div>
     );
 }
 
-function ScalarModal(props: {
+/**
+ * Drives the shared API client. Renders nothing: the client mounts its own container on
+ * document.body and lives there for the rest of the page's life.
+ */
+function ScalarModalController(props: {
     method: OpenAPIV3_1.HttpMethods;
     path: string;
     securities: OpenAPIOperationData['securities'];
@@ -75,72 +91,75 @@ function ScalarModal(props: {
     specUrl: string;
     withProxy: boolean;
     proxyUrl?: string;
+    /** False while only preloading: the client is built and the document registered, but not shown. */
+    shouldOpen: boolean;
     controllerRef: React.Ref<ScalarModalControllerRef>;
 }) {
-    const { method, path, securities, servers, specUrl, withProxy, proxyUrl, controllerRef } =
-        props;
+    const {
+        method,
+        path,
+        securities,
+        servers,
+        specUrl,
+        withProxy,
+        proxyUrl,
+        shouldOpen,
+        controllerRef,
+    } = props;
 
     const getPrefillInputContextData = useOpenAPIPrefillContext();
-    const prefillInputContext = getPrefillInputContextData();
+    const { onOpenClient: trackClientOpening } = useOpenAPIOperationContext();
 
-    const prefillConfig = resolveTryItPrefillForOperation({
-        operation: { securities, servers },
-        prefillInputContext,
+    const resolvedProxyUrl = withProxy ? proxyUrl : undefined;
+
+    // Kept deliberately minimal: this feeds a page-wide singleton, so per-operation
+    // authentication and servers are applied imperatively on open instead. proxyUrl belongs
+    // here because registering the document fetches the spec through it.
+    const configuration = useMemo<ApiClientConfigurationReact>(
+        () => ({ url: specUrl, ...(resolvedProxyUrl ? { proxyUrl: resolvedProxyUrl } : {}) }),
+        [specUrl, resolvedProxyUrl]
+    );
+
+    const client = useApiClient({ configuration });
+
+    // The hook returns a new object and a new open() every render, so it must never land in a
+    // dependency array. useEventCallback keeps the latest closure behind a stable identity.
+    const hasServedOpenRef = useRef(false);
+
+    const openClient = useEventCallback(() => {
+        if (!client) {
+            return;
+        }
+        hasServedOpenRef.current = true;
+
+        // Options are global to the singleton and every consumer overwrites them, so re-apply
+        // this operation's before opening — a sibling operation may have replaced them.
+        client.updateOptions(
+            {
+                ...resolveTryItPrefillForOperation({
+                    operation: { securities, servers },
+                    prefillInputContext: getPrefillInputContextData(),
+                }),
+                ...(resolvedProxyUrl ? { proxyUrl: resolvedProxyUrl } : {}),
+            },
+            true
+        );
+
+        client.open({ method, path });
+        trackClientOpening({ method, path });
     });
 
-    return (
-        <ApiClientModalProvider
-            configuration={{
-                url: specUrl,
-                ...prefillConfig,
-                proxyUrl: withProxy ? proxyUrl : undefined,
-            }}
-            initialRequest={{ method: toScalarHttpMethod(method), path }}
-        >
-            <ScalarModalController method={method} path={path} controllerRef={controllerRef} />
-        </ApiClientModalProvider>
-    );
-}
+    useImperativeHandle(controllerRef, () => ({ openClient }), [openClient]);
 
-function toScalarHttpMethod<T extends OpenAPIV3_1.HttpMethods>(method: T): Uppercase<T> {
-    return method.toUpperCase() as Uppercase<T>;
-}
-
-type ScalarModalControllerRef = {
-    openClient: (() => void) | undefined;
-};
-
-function ScalarModalController(props: {
-    method: OpenAPIV3_1.HttpMethods;
-    path: string;
-    controllerRef: React.Ref<ScalarModalControllerRef>;
-}) {
-    const { method, path, controllerRef } = props;
-    const client = useApiClientModal();
-    const openScalarClient = client?.open;
-    const { onOpenClient: trackClientOpening } = useOpenAPIOperationContext();
-    const openClient = useMemo(() => {
-        if (openScalarClient) {
-            return () => {
-                openScalarClient({
-                    method: toScalarHttpMethod(method),
-                    path,
-                    _source: 'gitbook',
-                });
-                trackClientOpening({ method, path });
-            };
-        }
-        return null;
-    }, [openScalarClient, method, path, trackClientOpening]);
-    useImperativeHandle(
-        controllerRef,
-        () => ({ openClient: openClient ? () => openClient() : undefined }),
-        [openClient]
-    );
-
-    // Open at mount
+    // Only covers a click that landed before the client finished loading. When preloading got
+    // there first the click already opened it directly, and opening again here would report a
+    // second view to the operation context.
+    const isReady = Boolean(client);
     useEffect(() => {
-        openClient?.();
-    }, [openClient]);
+        if (isReady && shouldOpen && !hasServedOpenRef.current) {
+            openClient();
+        }
+    }, [isReady, shouldOpen, openClient]);
+
     return null;
 }

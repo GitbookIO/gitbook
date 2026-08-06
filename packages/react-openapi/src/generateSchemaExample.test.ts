@@ -46,10 +46,12 @@ describe('generateSchemaExample', () => {
                         first_name: {
                             type: 'string',
                         },
+                        // A boolean `required` on a property is non-standard, but common enough
+                        // in the wild that generateSchemaExample handles it. The types don't.
                         last_name: {
                             type: 'string',
                             required: true,
-                        },
+                        } as unknown as OpenAPIV3.SchemaObject,
                         position: {
                             type: 'string',
                             examples: ['Developer'],
@@ -85,10 +87,12 @@ describe('generateSchemaExample', () => {
                         first_name: {
                             type: 'string',
                         },
+                        // A boolean `required` on a property is non-standard, but common enough
+                        // in the wild that generateSchemaExample handles it. The types don't.
                         last_name: {
                             type: 'string',
                             required: true,
-                        },
+                        } as unknown as OpenAPIV3.SchemaObject,
                         position: {
                             type: 'string',
                             examples: ['Developer'],
@@ -713,9 +717,8 @@ describe('generateSchemaExample', () => {
                         maxLength: 255,
                         type: 'string',
                     },
-                    {
-                        type: 'null',
-                    },
+                    // `type: 'null'` is OpenAPI 3.1; these fixtures are typed as 3.0.
+                    { type: 'null' } as unknown as OpenAPIV3.SchemaObject,
                 ],
             })
         ).toBe('text');
@@ -1000,9 +1003,8 @@ describe('generateSchemaExample', () => {
                                         type: 'string',
                                         example: 'https://example.com',
                                     },
-                                    {
-                                        type: 'null',
-                                    },
+                                    // `type: 'null'` is OpenAPI 3.1; these fixtures are typed as 3.0.
+                                    { type: 'null' } as unknown as OpenAPIV3.SchemaObject,
                                 ],
                             },
                         },
@@ -1071,7 +1073,7 @@ describe('generateSchemaExample', () => {
                     ],
                 },
             ],
-        } satisfies OpenAPIV3.SchemaObject;
+        } as OpenAPIV3.SchemaObject;
 
         const result = generateSchemaExample(schema);
 
@@ -1114,7 +1116,7 @@ describe('generateSchemaExample', () => {
                     ],
                 },
             ],
-        } satisfies OpenAPIV3.SchemaObject;
+        } as OpenAPIV3.SchemaObject;
 
         const result = generateSchemaExample(schema);
 
