@@ -11,9 +11,9 @@
     "version": "3.0.12",
     "sideEffects": false,
     "dependencies": {
-        "@scalar/json-magic": "^0.9.4",
-        "@scalar/openapi-parser": "^0.24.5",
-        "@scalar/openapi-types": "^0.5.3"
+        "@scalar/json-magic": "^0.12.19",
+        "@scalar/openapi-parser": "^0.28.11",
+        "@scalar/openapi-types": "^0.9.4"
     },
     "devDependencies": {
         "@tsconfig/strictest": "catalog:",

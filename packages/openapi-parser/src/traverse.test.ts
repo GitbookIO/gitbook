@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'bun:test';
-import { dereference } from '@scalar/openapi-parser';
+import { type AnyObject, dereference } from '@scalar/openapi-parser';
 import { createFileSystem } from './filesystem';
 import { traverse } from './traverse';
 
@@ -21,7 +21,7 @@ describe('#traverse', () => {
             );
         }
 
-        const specification = await traverse(result.specification!, async (node) => {
+        const specification = await traverse(result.specification as AnyObject, async (node) => {
             if ('description' in node && node.description) {
                 node.description = 'Hello, world!';
                 return node;

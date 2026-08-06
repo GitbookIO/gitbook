@@ -16,11 +16,16 @@ export async function createFileSystem(
 
     const result = await bundle(value, {
         treeShake: false,
+        // Since json-magic 0.11 the origin defaults to '/' for non-string input, which turns every
+        // relative $ref into an origin-absolute path and resolves it against the wrong directory.
+        ...(rootURL ? { origin: rootURL } : {}),
         plugins: [
+            // fetchURLs must precede fetchURL: both match absolute URLs, the bundler picks the
+            // first plugin that validates, and only fetchURLs enforces the request limit.
+            fetchURLs({ rootURL }),
             fetchURL(),
             parseYaml(),
             parseJson(),
-            fetchURLs({ rootURL }),
             ...(options?.plugins || []),
         ],
     });
