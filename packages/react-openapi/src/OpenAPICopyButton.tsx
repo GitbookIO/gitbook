@@ -20,7 +20,16 @@ export function OpenAPICopyButton(props: {
      */
     withTooltip?: boolean;
 }) {
-    const { value, label, children, onClick, className, context, isDisabled, withTooltip } = props;
+    const {
+        value,
+        label,
+        children,
+        onClick,
+        className,
+        context,
+        isDisabled,
+        withTooltip = true,
+    } = props;
     const [copied, setCopied] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
 
