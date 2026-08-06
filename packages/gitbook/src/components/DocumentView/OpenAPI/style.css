@@ -646,6 +646,7 @@ body:has(.openapi-select-popover) {
 
 .openapi-select > button {
     @apply flex items-center font-normal cursor-pointer *:truncate gap-1.5 p-1.5 border border-tint-subtle text-tint-strong rounded-md straight-corners:rounded-none circular-corners:rounded-lg leading-none;
+    @apply outline-none;
     @apply hover:bg-tint dark:hover:bg-tint-hover transition-all;
 }
 
@@ -657,7 +658,7 @@ body:has(.openapi-select-popover) {
     @apply p-1 *:truncate max-w-full;
 }
 
-.openapi-select > button:focus {
+.openapi-select > button:focus-visible {
     @apply outline-primary -outline-offset-1 outline;
 }
 
