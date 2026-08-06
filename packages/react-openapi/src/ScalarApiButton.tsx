@@ -29,18 +29,26 @@ export function ScalarApiButton(props: {
     context: OpenAPIClientContext;
 }) {
     const { method, path, securities, servers, specUrl, withProxy, context } = props;
-    // useApiClient downloads and mounts the Vue client as soon as it runs, so the controller
-    // stays unmounted until the reader actually asks for it.
-    const [isMounted, setIsMounted] = useState(false);
+    // Mounting the controller runs useApiClient, which downloads the client and registers the
+    // document. Doing that on intent rather than on click gives the spec time to load, so the
+    // modal opens already populated instead of flashing "No document selected".
+    const [isPreloaded, setIsPreloaded] = useState(false);
+    const [hasRequestedOpen, setHasRequestedOpen] = useState(false);
     const controllerRef = useRef<ScalarModalControllerRef>(null);
+
+    const preload = () => setIsPreloaded(true);
 
     return (
         <div className="scalar scalar-activate">
             <button
                 className="scalar-activate-button button"
+                onPointerEnter={preload}
+                onPointerDown={preload}
+                onFocus={preload}
                 onClick={() => {
-                    setIsMounted(true);
-                    // No-op on the first click; the controller opens itself once the client resolves.
+                    setHasRequestedOpen(true);
+                    // Opens straight away when preloading already finished; otherwise the
+                    // controller opens itself as soon as the client resolves.
                     controllerRef.current?.openClient();
                 }}
             >
@@ -54,7 +62,7 @@ export function ScalarApiButton(props: {
                 </svg>
             </button>
 
-            {isMounted ? (
+            {isPreloaded || hasRequestedOpen ? (
                 <ScalarModalController
                     controllerRef={controllerRef}
                     method={method}
@@ -62,6 +70,7 @@ export function ScalarApiButton(props: {
                     proxyUrl={context.proxyUrl}
                     securities={securities}
                     servers={servers}
+                    shouldOpen={hasRequestedOpen}
                     specUrl={specUrl}
                     withProxy={withProxy}
                 />
@@ -82,10 +91,21 @@ function ScalarModalController(props: {
     specUrl: string;
     withProxy: boolean;
     proxyUrl?: string;
+    /** False while only preloading: the client is built and the document registered, but not shown. */
+    shouldOpen: boolean;
     controllerRef: React.Ref<ScalarModalControllerRef>;
 }) {
-    const { method, path, securities, servers, specUrl, withProxy, proxyUrl, controllerRef } =
-        props;
+    const {
+        method,
+        path,
+        securities,
+        servers,
+        specUrl,
+        withProxy,
+        proxyUrl,
+        shouldOpen,
+        controllerRef,
+    } = props;
 
     const getPrefillInputContextData = useOpenAPIPrefillContext();
     const { onOpenClient: trackClientOpening } = useOpenAPIOperationContext();
@@ -104,10 +124,13 @@ function ScalarModalController(props: {
 
     // The hook returns a new object and a new open() every render, so it must never land in a
     // dependency array. useEventCallback keeps the latest closure behind a stable identity.
+    const hasServedOpenRef = useRef(false);
+
     const openClient = useEventCallback(() => {
         if (!client) {
             return;
         }
+        hasServedOpenRef.current = true;
 
         // Options are global to the singleton and every consumer overwrites them, so re-apply
         // this operation's before opening — a sibling operation may have replaced them.
@@ -128,14 +151,15 @@ function ScalarModalController(props: {
 
     useImperativeHandle(controllerRef, () => ({ openClient }), [openClient]);
 
-    // This only mounts on the first click, so opening as soon as the client resolves is the
-    // deferred answer to that click.
+    // Only covers a click that landed before the client finished loading. When preloading got
+    // there first the click already opened it directly, and opening again here would report a
+    // second view to the operation context.
     const isReady = Boolean(client);
     useEffect(() => {
-        if (isReady) {
+        if (isReady && shouldOpen && !hasServedOpenRef.current) {
             openClient();
         }
-    }, [isReady, openClient]);
+    }, [isReady, shouldOpen, openClient]);
 
     return null;
 }
