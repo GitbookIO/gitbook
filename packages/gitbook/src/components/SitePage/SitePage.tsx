@@ -25,7 +25,11 @@ import {
 } from '@/lib/icons/inline';
 import { getResizedImageURL } from '@/lib/images';
 import { resolveContentRef } from '@/lib/references';
-import { getSiteStructureTitle } from '@/lib/sites';
+import {
+    getSiteSpacePagePaths,
+    getSiteStructureTitle,
+    resolveSiteSpaceCustomHomePage,
+} from '@/lib/sites';
 import { tcls } from '@/lib/tailwind';
 import { getPageRSSURL } from '@/routes/rss';
 import { PageContextProvider } from '../PageContext';
@@ -265,13 +269,27 @@ export async function getSitePageData(props: SitePageProps) {
             }
             notFound();
         }
-    } else if (getPagePath(context.revision.pages, pageTarget.page) !== rawPathname) {
-        redirect(
-            context.linker.toPathForPage({
-                pages: context.revision.pages,
-                page: pageTarget.page,
-            })
+    } else {
+        const customHomePage = resolveSiteSpaceCustomHomePage(
+            context.siteSpace,
+            context.revision.pages
         );
+        const isExpectedPagePath = customHomePage
+            ? getSiteSpacePagePaths(
+                  context.siteSpace,
+                  context.revision.pages,
+                  pageTarget.page
+              ).includes(rawPathname)
+            : getPagePath(context.revision.pages, pageTarget.page) === rawPathname;
+
+        if (!isExpectedPagePath) {
+            redirect(
+                context.linker.toPathForPage({
+                    pages: context.revision.pages,
+                    page: pageTarget.page,
+                })
+            );
+        }
     }
 
     const { customization, visibleSections } = context;

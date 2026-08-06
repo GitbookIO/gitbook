@@ -1,8 +1,10 @@
 import { describe, expect, it } from 'bun:test';
+import type { RevisionPageDocument } from '@gitbook/api';
 import {
     createLinker,
     linkerForPublishedURL,
     linkerWithAbsoluteURLs,
+    linkerWithDirectPagePaths,
     linkerWithMarkdownPages,
 } from './links';
 
@@ -162,6 +164,17 @@ describe('linkerWithAbsoluteURLs', () => {
                 page: pages[1],
             })
         ).toBe('https://docs.company.com/section/variant/editor');
+    });
+
+    it('preserves direct page paths from wrapped linkers', () => {
+        const pages = [{ id: 'intro', type: 'document', path: 'intro', pages: [] }] as unknown as [
+            RevisionPageDocument,
+        ];
+        const absoluteLinker = linkerWithAbsoluteURLs(linkerWithDirectPagePaths(root));
+
+        expect(absoluteLinker.toPathForPage({ pages, page: pages[0] })).toBe(
+            'https://docs.company.com/intro'
+        );
     });
 });
 
