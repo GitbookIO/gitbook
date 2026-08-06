@@ -687,11 +687,11 @@ body:has(.openapi-select-popover) {
 }
 
 .openapi-select-popover[data-open] {
-    animation: popover-enter 0.2s ease-in-out;
+    @apply animate-scale-in;
 }
 
 .openapi-select-popover[data-closed] {
-    animation: popover-leave 0.2s ease-in-out;
+    @apply animate-scale-out;
 }
 
 .openapi-select-list {
@@ -1026,51 +1026,11 @@ body:has(.openapi-select-popover) {
 }
 
 .openapi-tooltip[data-open] {
-    animation: tooltip-enter 0.2s ease-in-out forwards;
+    @apply animate-scale-in;
 }
 
 .openapi-tooltip[data-closed] {
-    animation: tooltip-leave 0.2s ease-in-out forwards;
-}
-
-@keyframes tooltip-enter {
-    0% {
-        opacity: 0;
-    }
-    100% {
-        opacity: 1;
-    }
-}
-
-@keyframes tooltip-leave {
-    0% {
-        opacity: 1;
-    }
-    100% {
-        opacity: 0;
-    }
-}
-
-@keyframes popover-enter {
-    0% {
-        opacity: 0;
-        transform: translateY(4px) scale(0.95);
-    }
-    100% {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
-}
-
-@keyframes popover-leave {
-    from {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
-    to {
-        opacity: 0;
-        transform: translateY(4px) scale(0.95);
-    }
+    @apply animate-scale-out;
 }
 
 .openapi-copy-button {
