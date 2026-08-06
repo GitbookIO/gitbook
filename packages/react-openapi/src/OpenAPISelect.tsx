@@ -66,7 +66,9 @@ export function OpenAPISelect<T extends OpenAPISelectItem>(props: OpenAPISelectP
         'start' | 'end',
     ];
 
-    const SelectTrigger = () => (
+    // An element, not a component: declaring one inline would give React a new type on every
+    // render and remount the whole trigger each time.
+    const trigger = (
         <Select.Trigger aria-label="OpenAPI Select">
             <Select.Value className="openapi-select-value">
                 {(current) => {
@@ -91,11 +93,11 @@ export function OpenAPISelect<T extends OpenAPISelectItem>(props: OpenAPISelectP
             <div className={clsx('openapi-select', className)}>
                 {tooltip ? (
                     <OpenAPITooltip>
-                        <OpenAPITooltip.Trigger render={<SelectTrigger />} />
+                        <OpenAPITooltip.Trigger render={trigger} />
                         <OpenAPITooltip.Content>{tooltip}</OpenAPITooltip.Content>
                     </OpenAPITooltip>
                 ) : (
-                    <SelectTrigger />
+                    trigger
                 )}
             </div>
             <Select.Portal>
@@ -103,6 +105,9 @@ export function OpenAPISelect<T extends OpenAPISelectItem>(props: OpenAPISelectP
                     side={side}
                     align={align}
                     sideOffset={8}
+                    // Absolute positioning makes floating-ui walk offset parents and read scroll
+                    // offsets on every measure, which dominates the profile on long pages.
+                    positionMethod="fixed"
                     // Base UI overlaps the trigger by default to line the selected item up with it.
                     alignItemWithTrigger={false}
                 >

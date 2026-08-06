@@ -1012,7 +1012,7 @@ body:has(.openapi-select-popover) {
 }
 
 .openapi-tooltip {
-    @apply flex items-center gap-1 bg-tint-base border border-tint-subtle text-tint-strong rounded-corners:rounded-md circular-corners:rounded-xl straight-corners:rounded-none font-medium px-1.5 py-0.5 shadow-sm text-[13px];
+    @apply z-50 flex items-center gap-1 bg-tint-base border border-tint-subtle text-tint-strong rounded-corners:rounded-md circular-corners:rounded-xl straight-corners:rounded-none font-medium px-1.5 py-0.5 shadow-sm text-[13px];
 }
 
 .openapi-tooltip svg {
