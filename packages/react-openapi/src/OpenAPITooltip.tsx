@@ -12,7 +12,14 @@ export function OpenAPITooltip(props: {
     const { children, open, onOpenChange, disabled } = props;
     return (
         <Tooltip.Provider delay={200} closeDelay={200}>
-            <Tooltip.Root open={open} onOpenChange={onOpenChange} disabled={disabled}>
+            <Tooltip.Root
+                open={open}
+                onOpenChange={onOpenChange}
+                disabled={disabled}
+                // These are plain labels; keeping them alive while the pointer travels towards them
+                // just makes them linger after the trigger is left.
+                disableHoverablePopup
+            >
                 {children}
             </Tooltip.Root>
         </Tooltip.Provider>

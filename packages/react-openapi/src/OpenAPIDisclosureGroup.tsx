@@ -168,6 +168,10 @@ function DisclosureItem(props: {
                     {group.tabs ? (
                         <div
                             className="openapi-disclosure-group-mediatype"
+                            // The group trigger still runs on react-aria's `usePress`, which reacts
+                            // to pointer events rather than clicks.
+                            onPointerDown={(e) => e.stopPropagation()}
+                            onMouseDown={(e) => e.stopPropagation()}
                             onClick={(e) => e.stopPropagation()}
                         >
                             {group.tabs?.length > 1 ? (
