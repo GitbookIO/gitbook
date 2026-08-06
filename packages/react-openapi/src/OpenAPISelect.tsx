@@ -107,15 +107,18 @@ export function OpenAPISelect<T extends OpenAPISelectItem>(props: OpenAPISelectP
                     alignItemWithTrigger={false}
                 >
                     <Select.Popup className="openapi-select-popover">
-                        {items.map((item) => (
-                            <OpenAPISelectItem
-                                key={item.key}
-                                value={item.key}
-                                className={itemClassName}
-                            >
-                                {children(item)}
-                            </OpenAPISelectItem>
-                        ))}
+                        {/* Base UI scrolls and reveals the selected item through the list, not the popup. */}
+                        <Select.List className="openapi-select-list">
+                            {items.map((item) => (
+                                <OpenAPISelectItem
+                                    key={item.key}
+                                    value={item.key}
+                                    className={itemClassName}
+                                >
+                                    {children(item)}
+                                </OpenAPISelectItem>
+                            ))}
+                        </Select.List>
                     </Select.Popup>
                 </Select.Positioner>
             </Select.Portal>
