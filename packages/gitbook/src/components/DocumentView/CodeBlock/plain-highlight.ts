@@ -1,8 +1,6 @@
 import type { CustomizationThemedCodeTheme, DocumentBlockCode } from '@gitbook/api';
 
 import { getNodeText } from '@/lib/document';
-import { bundledThemesInfo } from 'shiki/themes';
-import { customThemes } from './customThemes';
 import {
     type HighlightTheme,
     type HighlightToken,
@@ -25,17 +23,10 @@ export function plainHighlight(
 ): HighlightTheme {
     const inlinesCopy = Array.from(inlines);
 
-    // Resolve theme objects: first check bundled Shiki themes, then custom themes, finally fallback to type-only
-    // The type-only fallback ensures HighlightTheme always has valid theme objects even when theme names don't match
+    // Plain code only needs the declared color mode. The full theme is loaded with Shiki in the browser.
     const themes = {
-        light: bundledThemesInfo.find((theme) => theme.id === options?.themes?.light) ??
-            Object.values(customThemes).find((theme) => theme.name === options?.themes?.light) ?? {
-                type: 'light',
-            },
-        dark: bundledThemesInfo.find((theme) => theme.id === options?.themes?.dark) ??
-            Object.values(customThemes).find((theme) => theme.name === options?.themes?.dark) ?? {
-                type: 'dark',
-            },
+        light: { type: 'light' as const },
+        dark: { type: 'dark' as const },
     };
 
     return {

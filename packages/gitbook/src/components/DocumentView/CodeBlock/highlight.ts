@@ -1,10 +1,4 @@
 import type { CustomizationThemedCodeTheme, DocumentBlockCode } from '@gitbook/api';
-import { createSingletonShorthands, createdBundledHighlighter } from 'shiki/core';
-import { createJavaScriptRegexEngine } from 'shiki/engine/javascript';
-import { type BundledLanguage, bundledLanguages } from 'shiki/langs';
-import { bundledThemes } from 'shiki/themes';
-
-import { customThemes } from './customThemes';
 import {
     DEFAULT_THEMES,
     type HighlightTheme,
@@ -20,30 +14,21 @@ import { plainHighlight } from './plain-highlight';
 
 export * from './highlight-tokens';
 
-// Merge bundled Shiki themes with our custom themes so both are available to the highlighter
-const { getSingletonHighlighter } = createSingletonShorthands(
-    createdBundledHighlighter<any, any>({
-        langs: bundledLanguages,
-        themes: { ...bundledThemes, ...customThemes },
-        engine: () => createJavaScriptRegexEngine({ forgiving: true, target: 'ES2018' }),
-    })
-);
+type ShikiRuntime = {
+    highlight: (options: {
+        code: string;
+        language: string;
+        themes: CustomizationThemedCodeTheme;
+        runtimeURL: string;
+        tokenizeMaxLineLength: number;
+    }) => Promise<ShikiRuntimeResult | null>;
+};
 
-/**
- * Preload the highlighter for a code block.
- */
-export async function preloadHighlight(
-    block: DocumentBlockCode,
-    themes: CustomizationThemedCodeTheme = DEFAULT_THEMES
-) {
-    const langName = getBlockLang(block);
-    if (langName) {
-        await getSingletonHighlighter({
-            langs: [langName],
-            themes: [themes.light, themes.dark],
-        });
-    }
-}
+type ShikiRuntimeResult = Pick<HighlightTheme, 'bg' | 'fg' | 'themes'> & {
+    tokens: PositionedToken[][];
+};
+
+const loadedRuntimes = new Map<string, Promise<ShikiRuntime>>();
 
 /**
  * Highlight a code block while preserving inline elements.
@@ -54,6 +39,7 @@ export async function highlight(
     options?: {
         evaluateInlineExpression?: (expr: string) => string;
         themes?: CustomizationThemedCodeTheme;
+        shikiRuntimeURL?: string;
     }
 ): Promise<HighlightTheme> {
     const langName = getBlockLang(block);
@@ -64,18 +50,13 @@ export async function highlight(
     }
 
     const themes = options?.themes ?? DEFAULT_THEMES;
+    const runtimeURL = options?.shikiRuntimeURL;
+
+    if (!runtimeURL) {
+        return plainHighlight(block, inlines, options);
+    }
 
     const code = getPlainCodeBlock(block, undefined, options);
-
-    const highlighter = await getSingletonHighlighter({
-        langs: [langName],
-        themes: [themes.light, themes.dark],
-    });
-
-    const resolvedThemes = {
-        light: highlighter.getTheme(themes.light),
-        dark: highlighter.getTheme(themes.dark),
-    };
 
     let tokenizeMaxLineLength = 400;
     // In some cases, people will use unindented code blocks with a single line.
@@ -84,21 +65,26 @@ export async function highlight(
         tokenizeMaxLineLength = 5000;
     }
 
-    const result = highlighter.codeToTokens(code, {
-        lang: langName,
-        themes: resolvedThemes,
-        // Shiki's light-dark() CSS function provides different colors for light/dark modes based on the resolved themes
-        defaultColor: 'light-dark()',
-        tokenizeMaxLineLength,
-    });
+    const highlighted = await loadShikiRuntime(runtimeURL).then((runtime) =>
+        runtime.highlight({
+            code,
+            language: langName,
+            themes,
+            runtimeURL,
+            tokenizeMaxLineLength,
+        })
+    );
+    if (!highlighted) {
+        return plainHighlight(block, inlines, options);
+    }
 
-    const lines = result.tokens;
+    const lines = highlighted.tokens;
 
     let currentIndex = 0;
     return {
-        bg: result.bg,
-        fg: result.fg,
-        themes: resolvedThemes,
+        bg: highlighted.bg,
+        fg: highlighted.fg,
+        themes: highlighted.themes,
         lines: lines.map((tokens, index) => {
             const lineBlock = block.nodes[index];
             const result: HighlightToken[] = [];
@@ -142,7 +128,7 @@ function getBlockLang(block: DocumentBlockCode): string | null {
     return block.data.syntax ? getLanguageForSyntax(block.data.syntax) : null;
 }
 
-const syntaxAliases: Record<string, BundledLanguage> = {
+const syntaxAliases: Record<string, string> = {
     // "Parser" language does not exist in Shiki, but it's used in GitBook
     // The closest language is "Blade"
     parser: 'blade',
@@ -151,27 +137,25 @@ const syntaxAliases: Record<string, BundledLanguage> = {
     objectivec: 'objective-c',
 };
 
-function checkIsBundledLanguage(lang: string): lang is BundledLanguage {
-    return lang in bundledLanguages;
-}
-
 /**
- * Validate a language name.
+ * Normalize syntax names before loading their language modules.
  */
-function getLanguageForSyntax(syntax: string): BundledLanguage | null {
+function getLanguageForSyntax(syntax: string): string | null {
     // Normalize the syntax to lowercase.
     syntax = syntax.toLowerCase();
 
-    // Check if the syntax is a bundled language.
-    if (checkIsBundledLanguage(syntax)) {
-        return syntax;
+    if (!syntax || syntax.includes('/')) {
+        return null;
     }
 
-    // Check if there is a valid alias for the syntax.
-    const alias = syntaxAliases[syntax];
-    if (alias && checkIsBundledLanguage(alias)) {
-        return alias;
-    }
+    return syntaxAliases[syntax] ?? syntax;
+}
 
-    return null;
+function loadShikiRuntime(runtimeURL: string): Promise<ShikiRuntime> {
+    let runtime = loadedRuntimes.get(runtimeURL);
+    if (!runtime) {
+        runtime = import(/* webpackIgnore: true */ runtimeURL) as Promise<ShikiRuntime>;
+        loadedRuntimes.set(runtimeURL, runtime);
+    }
+    return runtime;
 }

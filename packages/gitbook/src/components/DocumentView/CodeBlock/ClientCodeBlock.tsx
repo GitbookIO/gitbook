@@ -21,6 +21,7 @@ export type ClientBlockProps = Pick<BlockProps<DocumentBlockCode>, 'block' | 'st
     inlineExprVariables: InlineExpressionVariables;
     mode: BlockProps<DocumentBlockCode>['context']['mode'];
     themes?: CustomizationThemedCodeTheme;
+    shikiRuntimeURL: string;
     embedded?: boolean;
 };
 
@@ -31,7 +32,8 @@ export const CODE_BLOCK_DEFAULT_COLLAPSED_LINE_COUNT = 10;
  * It allows us to defer some load to avoid blocking the rendering of the whole page with block highlighting.
  */
 export function ClientCodeBlock(props: ClientBlockProps) {
-    const { block, mode, style, inlines, inlineExprVariables, themes, embedded } = props;
+    const { block, mode, style, inlines, inlineExprVariables, themes, shikiRuntimeURL, embedded } =
+        props;
     const blockRef = useRef<HTMLDivElement>(null);
     const isInViewportRef = useRef(false);
     const [isInViewport, setIsInViewport] = useState(false);
@@ -48,11 +50,6 @@ export function ClientCodeBlock(props: ClientBlockProps) {
     );
     const [theme, setTheme] = useState<null | HighlightTheme>(null);
     const [highlighting, setHighlighting] = useState(false);
-
-    // Preload the highlighter when the block is mounted.
-    useEffect(() => {
-        import('./highlight').then(({ preloadHighlight }) => preloadHighlight(block, themes));
-    }, [block, themes]);
 
     // When user scrolls, we need to wait for the scroll to finish before running the highlight
     const isScrollingRef = useRef(false);
@@ -98,21 +95,31 @@ export function ClientCodeBlock(props: ClientBlockProps) {
             // If the block is in viewport, we need to run the highlight
             let cancelled = false;
 
-            if (typeof window !== 'undefined') {
-                setHighlighting(true);
-                import('./highlight').then(({ highlight }) => {
-                    highlight(block, inlines, { evaluateInlineExpression, themes }).then(
-                        (theme) => {
-                            if (cancelled) {
-                                return;
-                            }
-
-                            setTheme(theme);
-                            setHighlighting(false);
-                        }
-                    );
+            setTheme(null);
+            setHighlighting(true);
+            void import('./highlight')
+                .then(({ highlight }) =>
+                    highlight(block, inlines, {
+                        evaluateInlineExpression,
+                        themes,
+                        shikiRuntimeURL,
+                    })
+                )
+                .then((theme) => {
+                    if (!cancelled) {
+                        setTheme(theme);
+                    }
+                })
+                .catch(() => {
+                    if (!cancelled) {
+                        setTheme(null);
+                    }
+                })
+                .finally(() => {
+                    if (!cancelled) {
+                        setHighlighting(false);
+                    }
                 });
-            }
 
             return () => {
                 cancelled = true;
@@ -121,7 +128,8 @@ export function ClientCodeBlock(props: ClientBlockProps) {
 
         // Otherwise if the block is not in viewport, we reset to the plain lines
         setTheme(null);
-    }, [isInViewport, block, inlines, evaluateInlineExpression, themes]);
+        setHighlighting(false);
+    }, [isInViewport, block, inlines, evaluateInlineExpression, themes, shikiRuntimeURL]);
 
     const expandable = block.data.expandable;
 
