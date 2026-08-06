@@ -16,6 +16,9 @@ type CacheWorkerEnv = {
     NEXT_INC_CACHE_R2_BUCKET: {
         put(key: string, value: string): Promise<unknown>;
     };
+    WORKER_SELF_REFERENCE: {
+        fetch(request: Request): Promise<Response>;
+    };
 };
 
 //@ts-ignore - Just to avoid tag cache crashing
@@ -31,14 +34,47 @@ const isCacheEntryType = (value: string | null): value is CacheEntryType =>
     value !== null && cacheEntryTypes.has(value as CacheEntryType);
 
 const NO_STORE_CACHE_CONTROL = 'private, no-store, max-age=0, must-revalidate';
+const INTERNAL_PATH = '/internal';
+const CACHE_CONTROL_HEADER = 'x-gitbook-cache-control';
+const CACHE_TAG_HEADER = 'x-gitbook-cache-tag';
+
+const getCacheHeaders = (cacheControl: string, cacheTag?: string): HeadersInit => ({
+    'Cache-Control': cacheControl,
+    [CACHE_CONTROL_HEADER]: cacheControl,
+    ...(cacheTag
+        ? {
+              'Cache-Tag': cacheTag,
+              [CACHE_TAG_HEADER]: cacheTag,
+          }
+        : {}),
+});
 
 const nullCacheResponse = (hasBeenRevalidated = false): Response =>
     Response.json(null, {
         headers: {
-            'Cache-Control': NO_STORE_CACHE_CONTROL,
+            ...getCacheHeaders(NO_STORE_CACHE_CONTROL),
             ...(hasBeenRevalidated ? { 'x-gitbook-cache-revalidated': 'true' } : {}),
         },
     });
+
+const restoreCacheHeaders = (response: Response): Response => {
+    const headers = new Headers(response.headers);
+    const cacheControl = headers.get(CACHE_CONTROL_HEADER);
+    const cacheTag = headers.get(CACHE_TAG_HEADER);
+
+    if (cacheControl) {
+        headers.set('Cache-Control', cacheControl);
+    }
+    if (cacheTag) {
+        headers.set('Cache-Tag', cacheTag);
+    }
+
+    return new Response(response.body, {
+        status: response.status,
+        statusText: response.statusText,
+        headers,
+    });
+};
 
 const isTimeStale = (value: CacheValue<CacheEntryType>, lastModified?: number): boolean => {
     const revalidate = value.revalidate;
@@ -84,6 +120,12 @@ export default class IncrementalCacheWorker extends WorkerEntrypoint<CacheWorker
         }
 
         const url = new URL(request.url);
+        if (url.pathname !== INTERNAL_PATH) {
+            url.pathname = INTERNAL_PATH;
+            const response = await this.env.WORKER_SELF_REFERENCE.fetch(new Request(url, request));
+            return restoreCacheHeaders(response);
+        }
+
         const key = url.searchParams.get('key');
         const cacheType = url.searchParams.get('cacheType');
         if (!key || (cacheType !== null && !isCacheEntryType(cacheType))) {
@@ -106,10 +148,11 @@ export default class IncrementalCacheWorker extends WorkerEntrypoint<CacheWorker
             }
 
             return Response.json(value, {
-                headers: {
-                    'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=3600',
-                    'Cache-Tag': [`incremental-cache:${key}`, ...tags].join(','),
-                },
+                headers: getCacheHeaders(
+                    // 1 hour cache, with a 1 day stale-while-revalidate.
+                    'public, s-maxage=3600, stale-while-revalidate=86400',
+                    [`incremental-cache:${key}`, ...tags].join(',')
+                ),
             });
         });
     }
