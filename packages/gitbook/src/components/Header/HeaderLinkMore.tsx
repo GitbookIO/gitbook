@@ -45,7 +45,7 @@ export function HeaderLinkMore(props: {
                 {links.map((link, index) => (
                     <MoreMenuLink key={index} link={link} context={context} />
                 ))}
-                {socialAccounts.length > 0 && <DropdownMenuSeparator />}
+                {links.length > 0 && socialAccounts.length > 0 && <DropdownMenuSeparator />}
                 {socialAccounts.map((account) => (
                     <SocialAccountLink
                         key={`${account.platform}-${account.handle}`}
