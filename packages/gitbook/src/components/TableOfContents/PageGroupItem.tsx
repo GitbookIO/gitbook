@@ -9,12 +9,13 @@ import { ToggleChevron } from '../primitives';
 import { PagesList } from './PagesList';
 import { TOCPageIcon } from './TOCPageIcon';
 import { ToCButtonItemStyles } from './styles';
+import { useTOCGroupState } from './useTOCGroupState';
 
 export function PageGroupItem(props: { page: ClientTOCPageGroup; isFirst?: boolean }) {
     const { page, isFirst } = props;
     const descendants = page.descendants ?? [];
     const hasDescendants = descendants.length > 0;
-    const [isOpen, setIsOpen] = React.useState(true);
+    const [isOpen, setIsOpen] = useTOCGroupState(page.id, true);
     const { sentinelRef, isSticking } = useIsSticking();
 
     const handleToggle = () => {
@@ -22,7 +23,7 @@ export function PageGroupItem(props: { page: ClientTOCPageGroup; isFirst?: boole
             return;
         }
 
-        setIsOpen((prev) => !prev);
+        setIsOpen(!isOpen);
     };
 
     return (

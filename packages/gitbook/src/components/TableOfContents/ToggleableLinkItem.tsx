@@ -1,14 +1,16 @@
 'use client';
 import { AnimatePresence, motion } from 'motion/react';
-import React, { useRef } from 'react';
+import type React from 'react';
 import { useCurrentPagePath } from '../hooks';
 import { Button, Link, type LinkInsightsProps, type LinkProps, ToggleChevron } from '../primitives';
+import { useTOCGroupState } from './useTOCGroupState';
 
 /**
  * Client component for a page document to toggle its children and be marked as active.
  */
 export function ToggleableLinkItem(
     props: {
+        id: string;
         href: string;
         pathnames: string[];
         children: React.ReactNode;
@@ -17,30 +19,15 @@ export function ToggleableLinkItem(
         tag?: React.ReactNode;
     } & LinkInsightsProps
 ) {
-    const { href, children, descendants, pathnames, insights, icon, tag } = props;
+    const { id, href, children, descendants, pathnames, insights, icon, tag } = props;
 
     const currentPagePath = useCurrentPagePath();
     const isActive = pathnames.some((pathname) => pathname === currentPagePath);
+    // Auto-expand to reveal the active page; the store keeps this open across navigations and
+    // remembers the visitor's own toggles instead of re-deriving (and flickering) on every remount.
     const defaultIsOpen =
         isActive || pathnames.some((pathname) => currentPagePath.startsWith(`${pathname}/`));
-    const [isOpen, setIsOpen] = React.useState(defaultIsOpen);
-    const hasBeenToggled = useRef(false);
-
-    // Update the visibility of the children if one of the descendants becomes active.
-    React.useEffect(() => {
-        if (defaultIsOpen && !hasBeenToggled.current) {
-            setIsOpen(defaultIsOpen);
-        }
-    }, [defaultIsOpen]);
-
-    const handleToggle = (newState: boolean | ((prev: boolean) => boolean)) => {
-        hasBeenToggled.current = true;
-        if (typeof newState === 'function') {
-            setIsOpen(newState);
-        } else {
-            setIsOpen(newState);
-        }
-    };
+    const [isOpen, setIsOpen] = useTOCGroupState(id, defaultIsOpen);
 
     if (!descendants) {
         return (
@@ -59,14 +46,18 @@ export function ToggleableLinkItem(
     }
 
     return (
-        <DescendantsRenderer descendants={descendants} isOpen={isOpen} setIsOpen={handleToggle}>
+        <DescendantsRenderer
+            descendants={descendants}
+            isOpen={isOpen}
+            onToggle={() => setIsOpen(!isOpen)}
+        >
             {({ descendants, toggler }) => (
                 <>
                     <LinkItem
                         href={href}
                         insights={insights}
                         isActive={isActive}
-                        onActiveClick={() => handleToggle(!isOpen)}
+                        onActiveClick={() => setIsOpen(!isOpen)}
                     >
                         {icon}
                         {tag ? (
@@ -126,24 +117,16 @@ function LinkItem(
 function DescendantsRenderer(props: {
     descendants: React.ReactNode;
     isOpen: boolean;
-    setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+    onToggle: () => void;
     children: (renderProps: {
         descendants: React.ReactNode;
         toggler: React.ReactNode;
     }) => React.ReactNode;
 }) {
-    const { descendants, isOpen, setIsOpen } = props;
+    const { descendants, isOpen, onToggle } = props;
 
     return props.children({
-        toggler: (
-            <Toggler
-                isLinkActive={isOpen}
-                isOpen={isOpen}
-                onToggle={() => {
-                    setIsOpen((prev) => !prev);
-                }}
-            />
-        ),
+        toggler: <Toggler isLinkActive={isOpen} isOpen={isOpen} onToggle={onToggle} />,
         descendants: <Descendants isVisible={isOpen}>{descendants}</Descendants>,
     });
 }
@@ -193,8 +176,11 @@ function Descendants(props: {
     children: React.ReactNode;
 }) {
     const { isVisible, children } = props;
+    // `initial={false}` renders an already-open group without replaying the expand animation on
+    // mount: the layout remounts on navigation, and animating every time looked like the sidebar
+    // flickering. Visitor-initiated toggles still animate since they happen after mount.
     return (
-        <AnimatePresence>
+        <AnimatePresence initial={false}>
             {isVisible ? (
                 <motion.div
                     initial={hide}
