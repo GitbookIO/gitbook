@@ -15,6 +15,8 @@ export type ClientTOCPageLink = {
     emoji?: string;
     icon?: string;
     target: ContentRef;
+    /** Paths of the page this link points to, when it resolves to a page in the current space. */
+    pathnames?: string[];
 };
 
 export type ClientTOCPageDocument = {
@@ -93,6 +95,15 @@ export async function encodeClientTableOfContents(
             }
             case 'link': {
                 const resolved = await resolveContentRef(page.target, context);
+                // Highlight the link when it points to a page in the current space, matching how
+                // page entries compute their active state. Restricted to page targets (no anchors,
+                // no cross-space refs) to avoid over-highlighting.
+                const pathnames =
+                    page.target.kind === 'page' &&
+                    resolved?.page &&
+                    resolved.space?.id === context.space.id
+                        ? getPagePaths(rootPages, resolved.page)
+                        : undefined;
                 result.push(
                     removeUndefined({
                         id: page.id,
@@ -101,6 +112,7 @@ export async function encodeClientTableOfContents(
                         emoji: page.emoji,
                         icon: page.icon,
                         target: page.target,
+                        pathnames,
                         type: 'link',
                     })
                 );
