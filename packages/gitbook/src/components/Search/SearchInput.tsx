@@ -45,11 +45,22 @@ export const SearchInput = React.forwardRef<HTMLDivElement, SearchInputProps>(
         } = props;
         const inputRef = useRef<HTMLInputElement>(null);
         const isFrame = mode === 'frame';
+        const isInitialMountRef = useRef(true);
 
         const language = useLanguage();
 
         useEffect(() => {
+            const isInitialMount = isInitialMountRef.current;
+            isInitialMountRef.current = false;
+
             if (!isOpen) {
+                // A user can focus the SSR'd input natively before hydration attaches
+                // React's focus handler; syncing to "open" instead of blurring avoids
+                // stealing that focus back on mount.
+                if (isInitialMount && document.activeElement === inputRef.current) {
+                    onFocus?.();
+                    return;
+                }
                 inputRef.current?.blur();
                 return;
             }
@@ -68,7 +79,7 @@ export const SearchInput = React.forwardRef<HTMLDivElement, SearchInputProps>(
 
             const timeout = window.setTimeout(focusInput, 150);
             return () => window.clearTimeout(timeout);
-        }, [isFrame, isOpen, value.length]);
+        }, [isFrame, isOpen, value.length, onFocus]);
 
         return (
             <div
