@@ -1,5 +1,13 @@
 # @gitbook/react-openapi
 
+## 1.5.16
+
+### Patch Changes
+
+- 03bbacf: Add missing link reference to OpenAPI models
+- Updated dependencies [03bbacf]
+  - @gitbook/openapi-parser@3.0.13
+
 ## 1.5.15
 
 ### Patch Changes
