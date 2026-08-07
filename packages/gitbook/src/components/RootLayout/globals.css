@@ -330,7 +330,6 @@
 }
 
 @utility text-contrast-cover {
-  color: transparent;
   -webkit-text-fill-color: transparent;
   background-image: linear-gradient(
     to bottom,
