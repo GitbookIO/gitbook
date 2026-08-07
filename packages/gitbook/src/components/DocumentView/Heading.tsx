@@ -46,6 +46,7 @@ export async function Heading(props: BlockProps<DocumentBlockHeading>) {
             )}
         >
             <span
+                data-cover-aware-text={context.isPageBody ? '' : undefined}
                 className={tcls(
                     'pointer-fine:flex-1',
                     'z-1',

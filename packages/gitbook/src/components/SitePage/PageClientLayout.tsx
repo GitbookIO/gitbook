@@ -24,7 +24,7 @@ export function PageClientLayout({
     useRegisterPageMetadata({ pageMetaLinks });
 
     useStripFallbackQueryParam();
-    useSetCoverHeight();
+    useMarkTextOverCover();
     return null;
 }
 
@@ -63,30 +63,48 @@ function useRegisterPageMetadata(metadata: {
 }
 
 /**
- * Expose the visible bottom edge of the page cover as a viewport-relative CSS variable.
+ * Mark the text elements that overlap a background page cover, so they can be recolored to stay
+ * readable against it (see the `text-contrast-cover` utility).
+ *
+ * The elements that opt in carry `data-cover-aware-text`; the ones found to overlap get
+ * `data-over-cover`. Both edges are read in viewport coordinates, which is what makes this work for
+ * the sticky page outline too: it stays pinned while the cover scrolls away underneath it.
  */
-function useSetCoverHeight() {
+function useMarkTextOverCover() {
     React.useEffect(() => {
         const root = document.documentElement;
+        const pageCover = document.querySelector<HTMLElement>('[data-gb-page-cover]');
+
+        // Only a background cover sits behind the content; a hero/full cover pushes it down.
+        if (!pageCover || pageCover.dataset.coverType !== 'background') {
+            return;
+        }
+
         let animationFrame: number | null = null;
 
-        const updateCoverHeight = () => {
-            const pageCover = document.querySelector<HTMLElement>('[data-gb-page-cover]');
-            const isBackgroundCover = pageCover?.dataset.coverType === 'background';
+        const update = () => {
+            const coverBottom = pageCover.getBoundingClientRect().bottom;
+            const elements = Array.from(
+                document.querySelectorAll<HTMLElement>('[data-cover-aware-text]')
+            );
 
-            if (!isBackgroundCover) {
-                root.style.setProperty('--cover-height', '0px');
-                return;
-            }
+            // Measure everything before mutating, so we don't interleave layout reads and writes.
+            const isOverCover = elements.map((element) => {
+                const rect = element.getBoundingClientRect();
 
-            if (!pageCover) {
-                return;
-            }
+                // A `display: none` element has no box, and its empty rect reads as sitting at the
+                // very top of the document — keep the marking it was rendered with until it is
+                // actually laid out, rather than flipping it on a meaningless measurement.
+                if (rect.width === 0 && rect.height === 0) {
+                    return element.hasAttribute('data-over-cover');
+                }
 
-            const bottom = pageCover.getBoundingClientRect().bottom;
-            const height = Math.max(Math.min(bottom, window.innerHeight), 0);
+                return rect.top < coverBottom;
+            });
 
-            root.style.setProperty('--cover-height', `${height}px`);
+            elements.forEach((element, index) => {
+                element.toggleAttribute('data-over-cover', isOverCover[index]);
+            });
         };
 
         const scheduleUpdate = () => {
@@ -96,7 +114,7 @@ function useSetCoverHeight() {
 
             animationFrame = requestAnimationFrame(() => {
                 animationFrame = null;
-                updateCoverHeight();
+                update();
             });
         };
 
@@ -105,24 +123,25 @@ function useSetCoverHeight() {
         window.addEventListener('scroll', scheduleUpdate, { passive: true });
         window.addEventListener('resize', scheduleUpdate, { passive: true });
 
-        const pageCover = document.querySelector<HTMLElement>('[data-gb-page-cover]');
         const resizeObserver =
-            pageCover && typeof ResizeObserver !== 'undefined'
-                ? new ResizeObserver(() => {
-                      scheduleUpdate();
-                  })
-                : null;
+            typeof ResizeObserver !== 'undefined' ? new ResizeObserver(scheduleUpdate) : null;
+        resizeObserver?.observe(pageCover);
 
-        if (pageCover && resizeObserver) {
-            resizeObserver.observe(pageCover);
-        }
+        const mutationObserver =
+            typeof MutationObserver !== 'undefined' ? new MutationObserver(scheduleUpdate) : null;
 
         // Dismissing the announcement banner only toggles a class on <html> (see
         // dismissAnnouncement) — no scroll/resize event and no cover resize — yet it shifts the
-        // cover up. Watch <html> class changes so the cover height is recomputed in that case too.
-        const classObserver =
-            typeof MutationObserver !== 'undefined' ? new MutationObserver(scheduleUpdate) : null;
-        classObserver?.observe(root, { attributes: true, attributeFilter: ['class'] });
+        // cover up.
+        mutationObserver?.observe(root, { attributes: true, attributeFilter: ['class'] });
+
+        // Blocks that stream in late bring elements that still need measuring. Scoped to the page
+        // body so unrelated DOM churn elsewhere (portals, the AI chat streaming its answer) doesn't
+        // schedule a measurement pass.
+        const pageBody = document.querySelector('main');
+        if (pageBody) {
+            mutationObserver?.observe(pageBody, { childList: true, subtree: true });
+        }
 
         return () => {
             if (animationFrame !== null) {
@@ -130,7 +149,7 @@ function useSetCoverHeight() {
             }
 
             resizeObserver?.disconnect();
-            classObserver?.disconnect();
+            mutationObserver?.disconnect();
             window.removeEventListener('scroll', scheduleUpdate);
             window.removeEventListener('resize', scheduleUpdate);
         };

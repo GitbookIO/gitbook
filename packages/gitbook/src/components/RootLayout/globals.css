@@ -221,9 +221,7 @@
     interpolate-size: allow-keywords; /* Opt-in for modern browsers to interpolate "auto" values in transitions/animations. */
     overflow-x: hidden; /* We never want horizontal scroll of the whole page, it looks buggy and we should never have overflow anyway */
     --ai-chat-width: 24rem; /* Default AI chat panel width (= AI_CHAT_DEFAULT_WIDTH 384px); overridden client-side from local storage. */
-    --cover-height: 0px;
-    --cover-text-top: rgb(var(--tint-12));
-    --cover-text-bottom: rgb(var(--tint-12));
+    --cover-text: rgb(var(--tint-12));
   }
 
   :root:not(.dark):has(
@@ -232,7 +230,7 @@
   :root.dark:has(
       [data-gb-page-cover][data-cover-type="background"][data-cover-text-color-dark="black"]
     ) {
-    --cover-text-top: rgb(var(--contrast-tint-12));
+    --cover-text: rgb(var(--contrast-tint-12));
   }
 
   /* Modern browsers with `scrollbar-*` support */
@@ -315,40 +313,26 @@
   }
 }
 
-@utility contrast-cover {
-  background-clip: border-box;
-  background-image: linear-gradient(
-    to bottom,
-    var(--cover-text-top) 0,
-    var(--cover-text-top) var(--cover-height),
-    var(--cover-text-bottom) var(--cover-height),
-    var(--cover-text-bottom) 100vh
-  );
-  background-repeat: no-repeat;
-  background-size: 100% 100vh;
-  background-attachment: fixed;
-}
+/*
+  Recolor text that sits over a background page cover, so it stays readable against the cover image.
 
+  Whether an element actually overlaps the cover can't be expressed in CSS: it depends on layout,
+  and for the sticky page outline it also changes as the cover scrolls away. `useMarkTextOverCover`
+  measures it and marks the overlapping elements with `data-over-cover`.
+
+  This deliberately recolors with a plain `color`. A previous version painted a viewport-fixed
+  gradient through `background-clip: text` on transparent glyphs, which let CSS alone resolve the
+  cover edge — but neither Firefox nor iOS Safari paints a fixed-attachment background clipped to
+  text inside a clipped stacking context, so the text vanished entirely.
+
+  In high contrast the cover itself is all but hidden (`contrast-more:opacity-5`), so the rule is
+  dropped there and the element keeps its regular color.
+*/
 @utility text-contrast-cover {
-  color: transparent;
-  -webkit-text-fill-color: transparent;
-  background-image: linear-gradient(
-    to bottom,
-    var(--cover-text-top) 0,
-    var(--cover-text-top) var(--cover-height),
-    var(--cover-text-bottom) var(--cover-height),
-    var(--cover-text-bottom) 100vh
-  );
-  background-repeat: no-repeat;
-  background-size: 100% 100vh;
-  background-attachment: fixed;
-  background-clip: text;
-  -webkit-background-clip: text;
-
-  @media (prefers-contrast: more) {
-    color: var(--cover-text-bottom);
-    -webkit-text-fill-color: var(--cover-text-bottom);
-    background-image: none;
+  @media not (prefers-contrast: more) {
+    &[data-over-cover] {
+      color: var(--cover-text);
+    }
   }
 }
 

@@ -43,6 +43,7 @@ export async function PageAside(props: {
             toggleClass="outline-open"
             withOverlay
             withCloseButton
+            data-cover-aware-text
             className={tcls(
                 'group/aside',
                 'order-last',
