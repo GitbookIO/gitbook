@@ -125,9 +125,15 @@ function useIsSticking() {
 
         const observer = new IntersectionObserver(
             ([entry]) => {
-                if (entry) {
-                    setIsSticking(!entry.isIntersecting);
-                }
+                if (!entry) return;
+                // The sentinel also stops intersecting when the group is simply below the
+                // fold, or transiently during a client-side navigation before layout
+                // settles — not only when the header pins to the top. Treating those as
+                // "stuck" turns on the header's fade gradient, which overlaps the group's
+                // first item and can be left painted over it as a stale layer. Only mark it
+                // stuck once the sentinel has actually scrolled above the scroll area's top.
+                const rootTop = entry.rootBounds?.top ?? 0;
+                setIsSticking(!entry.isIntersecting && entry.boundingClientRect.top < rootTop);
             },
             { root: scrollParent }
         );
