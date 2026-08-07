@@ -188,6 +188,10 @@ export async function PageHeader(props: {
                 // content spans the full width with no navigation column, so the crumbs sit stranded.
                 <nav
                     aria-label="Breadcrumb"
+                    // A background cover starts at the top of the page body, so the header always
+                    // overlaps it: mark it here so it is never briefly unstyled before hydration.
+                    data-cover-aware-text
+                    data-over-cover
                     className="layout-wide:page-no-toc:hidden page-cover-background:text-contrast-cover text-tint text-xs leading-relaxed page-cover-background:opacity-9"
                 >
                     <ol className="inline">
@@ -229,6 +233,8 @@ export async function PageHeader(props: {
             <PageTags page={page} revision={revision} />
             {page.layout.title ? (
                 <h1
+                    data-cover-aware-text
+                    data-over-cover
                     className={tcls(
                         'text-2xl',
                         '@xs:text-3xl',
@@ -251,6 +257,8 @@ export async function PageHeader(props: {
             ) : null}
             {page.description && page.layout.description ? (
                 <p
+                    data-cover-aware-text
+                    data-over-cover
                     className={tcls(
                         CONTENT_STYLE_REDUCED,
                         'text-lg',

@@ -79,6 +79,7 @@ export function ScrollSectionsList({ sections }: { sections: DocumentSection[] }
                 >
                     <a
                         href={`#${section.id}`}
+                        data-cover-aware-text
                         className={tcls(
                             'relative',
                             'z-10',

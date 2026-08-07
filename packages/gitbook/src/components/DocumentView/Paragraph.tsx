@@ -19,6 +19,7 @@ export function Paragraph(props: BlockProps<DocumentBlockParagraph>) {
 
     const paragraph = (
         <p
+            data-cover-aware-text={context.isPageBody ? '' : undefined}
             className={tcls(
                 // Cover-aware contrast text applies only to the page body, not to documents
                 // rendered in overlays (search answers, AI chat) on a background-cover page.

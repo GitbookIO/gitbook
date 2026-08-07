@@ -20,6 +20,12 @@ export async function RecordCard(
 ) {
     const { view, record, context, block, isOffscreen, document } = props;
 
+    // A card paints its own opaque background, so a background page cover is never behind its
+    // content. Cover-aware contrast text must not apply inside it: it leaves the glyphs transparent
+    // and relies on a viewport-fixed background clipped to text, which Firefox and iOS Safari fail
+    // to paint through the card's clipped stacking context — the text disappears entirely.
+    const cardProps = { ...props, context: { ...context, isPageBody: false } };
+
     const { dark, light } = getRecordCardCovers(record[1], view);
     const targetRef = view.targetDefinition
         ? (record[1].values[view.targetDefinition] as ContentRef)
@@ -154,7 +160,7 @@ export async function RecordCard(
                                     {definition.title}
                                 </div>
                                 <RecordColumnValue
-                                    {...props}
+                                    {...cardProps}
                                     column={column}
                                     ariaLabelledBy={ariaLabelledBy}
                                 />
@@ -162,7 +168,7 @@ export async function RecordCard(
                         );
                     }
 
-                    return <RecordColumnValue key={column} {...props} column={column} />;
+                    return <RecordColumnValue key={column} {...cardProps} column={column} />;
                 })}
             </div>
         </div>
