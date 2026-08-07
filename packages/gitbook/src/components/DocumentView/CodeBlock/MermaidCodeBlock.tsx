@@ -46,6 +46,10 @@ export function MermaidCodeBlock(props: ClientBlockProps) {
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [isExiting, setIsExiting] = useState(false);
     const isPresent = isFullscreen || isExiting;
+    // Read by the wheel handler (registered once in `initPanzoom`) so it always knows
+    // whether the diagram is currently in the fullscreen dialog.
+    const isPresentRef = useRef(isPresent);
+    isPresentRef.current = isPresent;
     const { resolvedTheme } = useTheme();
     const darkMode = resolvedTheme === 'dark';
     const id = useSafeId();
@@ -95,6 +99,7 @@ export function MermaidCodeBlock(props: ClientBlockProps) {
                     cleanupPanZoom = initPanzoom({
                         container,
                         wrapper,
+                        isFullscreenRef: isPresentRef,
                         onInit: setPanZoom,
                     });
                 })
@@ -412,9 +417,10 @@ type WindowWithIdleCallback = Window & {
 function initPanzoom(args: {
     container: HTMLElement;
     wrapper: HTMLElement;
+    isFullscreenRef: { current: boolean };
     onInit: (instance: ReturnType<typeof Panzoom> | null) => void;
 }): () => void {
-    const { container, wrapper, onInit } = args;
+    const { container, wrapper, isFullscreenRef, onInit } = args;
 
     const instance = Panzoom(container, {
         maxScale: 5,
@@ -425,10 +431,21 @@ function initPanzoom(args: {
 
     onInit(instance);
 
-    wrapper.addEventListener('wheel', instance.zoomWithWheel, { passive: false });
+    // Inline, the wheel must scroll the page — only zoom when the user holds Ctrl/Cmd, so
+    // scrolling past a diagram isn't hijacked (mirrors the modifier-to-zoom behavior of
+    // embedded maps; trackpad pinch also arrives as a Ctrl+wheel event). In the fullscreen
+    // dialog the page scroll is locked, so the wheel always zooms.
+    const onWheel = (event: WheelEvent) => {
+        if (!isFullscreenRef.current && !event.ctrlKey && !event.metaKey) {
+            return;
+        }
+        instance.zoomWithWheel(event);
+    };
+
+    wrapper.addEventListener('wheel', onWheel, { passive: false });
 
     return () => {
-        wrapper.removeEventListener('wheel', instance.zoomWithWheel);
+        wrapper.removeEventListener('wheel', onWheel);
         instance.destroy();
         onInit(null);
     };
