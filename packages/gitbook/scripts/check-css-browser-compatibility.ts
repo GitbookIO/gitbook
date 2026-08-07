@@ -218,9 +218,7 @@ async function run(): Promise<boolean> {
     });
     await upsertCompatibilityComment({
         body: comment,
-        createIfMissing:
-            diagnostics.length > 0 ||
-            process.env.CSS_BROWSER_COMPATIBILITY_ALWAYS_COMMENT === 'true',
+        createIfMissing: diagnostics.length > 0,
         client: api,
         issueNumber: pullRequest.number,
     });
