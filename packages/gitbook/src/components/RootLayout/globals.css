@@ -222,6 +222,8 @@
     overflow-x: hidden; /* We never want horizontal scroll of the whole page, it looks buggy and we should never have overflow anyway */
     --ai-chat-width: 24rem; /* Default AI chat panel width (= AI_CHAT_DEFAULT_WIDTH 384px); overridden client-side from local storage. */
     --cover-text: rgb(var(--tint-12));
+    /* Color to fall back to below the cover, for text that crosses its bottom edge. */
+    --cover-text-below: rgb(var(--tint-12));
   }
 
   :root:not(.dark):has(
@@ -316,22 +318,41 @@
 /*
   Recolor text that sits over a background page cover, so it stays readable against the cover image.
 
-  Whether an element actually overlaps the cover can't be expressed in CSS: it depends on layout,
-  and for the sticky page outline it also changes as the cover scrolls away. `useMarkTextOverCover`
-  measures it and marks the overlapping elements with `data-over-cover`.
+  Whether an element overlaps the cover can't be expressed in CSS: it depends on layout, and for the
+  sticky page outline it also changes as the cover scrolls away. `useMarkTextOverCover` measures it
+  and marks the overlapping elements with `data-over-cover`.
 
-  This deliberately recolors with a plain `color`. A previous version painted a viewport-fixed
-  gradient through `background-clip: text` on transparent glyphs, which let CSS alone resolve the
-  cover edge — but neither Firefox nor iOS Safari paints a fixed-attachment background clipped to
-  text inside a clipped stacking context, so the text vanished entirely.
+  Text fully over the cover is recolored with a plain `color`, so the glyphs are never transparent.
+  Only an element crossing the cover's bottom edge needs the gradient, and that gradient is
+  element-relative: an earlier version anchored it to the viewport with `background-attachment:
+  fixed`, which neither Firefox nor iOS Safari paints when clipped to text inside a clipped stacking
+  context — leaving the transparent glyphs invisible.
 
-  In high contrast the cover itself is all but hidden (`contrast-more:opacity-5`), so the rule is
+  In high contrast the cover itself is all but hidden (`contrast-more:opacity-5`), so both rules are
   dropped there and the element keeps its regular color.
 */
 @utility text-contrast-cover {
   @media not (prefers-contrast: more) {
     &[data-over-cover] {
       color: var(--cover-text);
+    }
+
+    &[data-over-cover="split"] {
+      color: transparent;
+      -webkit-text-fill-color: transparent;
+      background-image: linear-gradient(
+        to bottom,
+        var(--cover-text) 0,
+        var(--cover-text) var(--cover-edge),
+        var(--cover-text-below) var(--cover-edge),
+        var(--cover-text-below) 100%
+      );
+      background-repeat: no-repeat;
+      /* Align the gradient with the box `--cover-edge` was measured from. */
+      background-origin: border-box;
+      /* Firefox only has partial support for this, but it should be enough for our use case */
+      background-clip: text;
+      -webkit-background-clip: text;
     }
   }
 }

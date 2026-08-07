@@ -43,7 +43,6 @@ export async function PageAside(props: {
             toggleClass="outline-open"
             withOverlay
             withCloseButton
-            data-cover-aware-text
             className={tcls(
                 'group/aside',
                 'order-last',
@@ -108,8 +107,10 @@ export async function PageAside(props: {
                 'max-xl:hydrated:site-background',
                 'layout-wide:max-3xl:hydrated:site-background',
                 'text-tint',
-                'contrast-more:text-tint-strong',
-                'xl:page-cover-background:text-contrast-cover'
+                'contrast-more:text-tint-strong'
+                // The cover-aware text color lives on the individual rows below, not here: the
+                // outline column is tall enough to always cross the cover's bottom edge, and a
+                // container can't carry a single correct color for text on both sides of it.
             )}
         >
             <div className="flex h-full w-full shrink-0 flex-col overflow-hidden">
@@ -128,7 +129,10 @@ export async function PageAside(props: {
                                 filterableTags.length > 0 && 'mt-4'
                             )}
                         >
-                            <ScrollToTopButton className="flex cursor-pointer items-center gap-1 font-semibold text-tint text-xs uppercase leading-wider">
+                            <ScrollToTopButton
+                                data-cover-aware-text
+                                className="flex cursor-pointer items-center gap-1 font-semibold text-tint text-xs uppercase leading-wider xl:page-cover-background:text-contrast-cover"
+                            >
                                 <Icon icon="block-quote" className="size-3" />{' '}
                                 {t(language, 'on_this_page')}
                             </ScrollToTopButton>
