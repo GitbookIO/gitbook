@@ -8,6 +8,7 @@ import { getLogger } from '@/lib/logger';
 import {
     findSiteSpaceBy,
     getFallbackSiteSpacePath,
+    getLinkerForSiteSpace,
     getLocalizedTitle,
     getSiteStructureSections,
 } from '@/lib/sites';
@@ -391,12 +392,14 @@ export async function fetchSiteContextByIds(
             : {}),
     };
 
+    const siteLinker = site.urls.published
+        ? linkerForPublishedURL(spaceContext.linker, site.urls.published)
+        : spaceContext.linker;
+
     return {
         ...spaceContext,
         locale: siteSpace.space.language ?? spaceContext.locale,
-        linker: site.urls.published
-            ? linkerForPublishedURL(spaceContext.linker, site.urls.published)
-            : spaceContext.linker,
+        linker: getLinkerForSiteSpace(siteLinker, siteSpace, spaceContext.revision.pages),
         organizationId: ids.organization,
         site,
         siteSpaces,
@@ -442,13 +445,15 @@ export async function fetchSiteContextForSiteSpace(
             ? baseContext.structure.structure
             : (found.siteSection?.siteSpaces ?? baseContext.siteSpaces);
 
+    const siteSpaceLinker = baseContext.linker.withOtherSiteSpace({
+        spaceBasePath: getFallbackSiteSpacePath(baseContext, siteSpace),
+    });
+
     return {
         ...baseContext,
         ...spaceContext,
         locale: siteSpace.space.language ?? spaceContext.locale,
-        linker: baseContext.linker.withOtherSiteSpace({
-            spaceBasePath: getFallbackSiteSpacePath(baseContext, siteSpace),
-        }),
+        linker: getLinkerForSiteSpace(siteSpaceLinker, siteSpace, spaceContext.revision.pages),
         siteSpace,
         siteSpaces,
         visibleSiteSpaces: filterHiddenSiteSpaces(siteSpaces),

@@ -239,13 +239,30 @@ export function linkerWithAbsoluteURLs(linker: GitBookLinker): GitBookLinker {
         ...linker,
         toPathInSpace: (path) => linker.toAbsoluteURL(linker.toPathInSpace(path)),
         toPathInSite: (path) => linker.toAbsoluteURL(linker.toPathInSite(path)),
+        toPathForPage: (input) => linker.toAbsoluteURL(linker.toPathForPage(input)),
+        toPathForPagePath: (input) => linker.toAbsoluteURL(linker.toPathForPagePath(input)),
+    };
+
+    return self;
+}
+
+/**
+ * Create a linker for a space whose root is an additional landing URL.
+ *
+ * All pages keep their explicit paths because the root can render a different page.
+ */
+export function linkerWithDirectPagePaths(linker: GitBookLinker): GitBookLinker {
+    const self: GitBookLinker = {
+        ...linker,
+        fork: (override) => linkerWithDirectPagePaths(linker.fork(override)),
+        // The target site space decides independently whether it has a custom home page.
+        withOtherSiteSpace: (override) => linker.withOtherSiteSpace(override),
         toPathForPage: (input) => {
             return self.toPathForPagePath({
-                path: getPagePath(input.pages, input.page),
+                path: input.page.path,
                 anchor: input.anchor,
             });
         },
-        toPathForPagePath: (input) => linker.toAbsoluteURL(linker.toPathForPagePath(input)),
     };
 
     return self;

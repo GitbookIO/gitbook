@@ -2,13 +2,16 @@ import { languages } from '@/intl/translations';
 import type { GitBookSiteContext } from '@/lib/context';
 import type {
     LocalizedString,
+    Revision,
+    RevisionPageDocument,
     SiteSection,
     SiteSectionGroup,
     SiteSpace,
     SiteStructure,
     TranslationLanguage,
 } from '@gitbook/api';
-import { extractPagePath } from './pages';
+import { type GitBookLinker, linkerWithDirectPagePaths } from './links';
+import { extractPagePath, getPagePaths, resolvePageId } from './pages';
 import { joinPath } from './paths';
 import { flattenSectionsFromGroup } from './utils';
 
@@ -71,6 +74,51 @@ export function filterSiteSpacesByLocale(
     return siteSpaces.filter(
         (siteSpace) => normalizeLanguage(siteSpace.space.language) === normalizedLocale
     );
+}
+
+// Remove this compatibility type once @gitbook/api publishes SiteSpace.pageId.
+type SiteSpaceWithCustomHomePage = SiteSpace & {
+    pageId?: string;
+};
+
+/**
+ * Resolve the custom home page for a site space in the current revision.
+ */
+export function resolveSiteSpaceCustomHomePage(siteSpace: SiteSpace, pages: Revision['pages']) {
+    const pageId = (siteSpace as SiteSpaceWithCustomHomePage).pageId;
+    const resolved = pageId ? resolvePageId(pages, pageId) : undefined;
+
+    // A group ID resolves to its first document, but only documents can be custom home pages.
+    return resolved?.page.id === pageId ? resolved : undefined;
+}
+
+/**
+ * Return every URL path that can display a page in a site space.
+ */
+export function getSiteSpacePagePaths(
+    siteSpace: SiteSpace,
+    pages: Revision['pages'],
+    page: RevisionPageDocument
+): string[] {
+    const customHomePage = resolveSiteSpaceCustomHomePage(siteSpace, pages);
+    if (!customHomePage) {
+        return getPagePaths(pages, page);
+    }
+
+    return customHomePage.page.id === page.id ? ['', page.path] : [page.path];
+}
+
+/**
+ * Keep normal page paths when a site-space root renders a custom home page.
+ */
+export function getLinkerForSiteSpace(
+    linker: GitBookLinker,
+    siteSpace: SiteSpace,
+    pages: Revision['pages']
+): GitBookLinker {
+    return resolveSiteSpaceCustomHomePage(siteSpace, pages)
+        ? linkerWithDirectPagePaths(linker)
+        : linker;
 }
 
 /*

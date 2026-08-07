@@ -29,7 +29,12 @@ import { PageIcon } from '@/components/PageIcon';
 import { getGitBookAppHref } from './app';
 import { getBlockById, getBlockTitle } from './document';
 import { resolvePageId } from './pages';
-import { findSiteSpaceBy, getFallbackSiteSpacePath, getLocalizedTitle } from './sites';
+import {
+    findSiteSpaceBy,
+    getFallbackSiteSpacePath,
+    getLinkerForSiteSpace,
+    getLocalizedTitle,
+} from './sites';
 import { getRevisionTags, resolveTag } from './tags';
 import type { ClassValue } from './tailwind';
 import { filterOutNullable } from './typescript';
@@ -575,9 +580,13 @@ async function createContextForSpace(
 
     if (bestTargetSpace?.siteSpace && 'site' in context) {
         // If we found the space ID in the current site context, we can resolve links relative to it in the site.
-        linker = context.linker.withOtherSiteSpace({
-            spaceBasePath: getFallbackSiteSpacePath(context, bestTargetSpace.siteSpace),
-        });
+        linker = getLinkerForSiteSpace(
+            context.linker.withOtherSiteSpace({
+                spaceBasePath: getFallbackSiteSpacePath(context, bestTargetSpace.siteSpace),
+            }),
+            bestTargetSpace.siteSpace,
+            spaceContext.revision.pages
+        );
     } else {
         // Otherwise we generate absolute URLs as we are pointing to a different site.
         linker = linkerWithAbsoluteURLs(
