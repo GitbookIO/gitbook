@@ -31,3 +31,5 @@ jobs:
             - name: Check CSS browser compatibility
               working-directory: packages/gitbook
               run: bun run check:css-browser-compatibility
+              env:
+                  GITHUB_TOKEN: ${{ github.token }}

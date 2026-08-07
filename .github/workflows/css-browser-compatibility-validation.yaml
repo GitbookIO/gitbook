@@ -29,3 +29,4 @@ jobs:
               run: bun run check:css-browser-compatibility
               env:
                   CSS_BROWSER_COMPATIBILITY_ALWAYS_COMMENT: 'true'
+                  GITHUB_TOKEN: ${{ github.token }}
