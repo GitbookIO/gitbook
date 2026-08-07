@@ -13,6 +13,7 @@ import {
 } from '@/lib/sites';
 import type {
     ChangeRequest,
+    CustomizationDefaultThemeMode,
     PublishedSiteContent,
     Revision,
     RevisionPageDocument,
@@ -82,6 +83,13 @@ export type SiteURLData = Pick<
      * Defaults to true when undefined.
      */
     displayAgentInstructions?: boolean;
+
+    /**
+     * Theme forced via `?theme=` for the docs embed only. Passed through the route context (rather
+     * than a request header) so the embed routes can honor it while staying statically rendered.
+     * Not set for the main site. RND-11571.
+     */
+    embedTheme?: CustomizationDefaultThemeMode;
 };
 
 /**
