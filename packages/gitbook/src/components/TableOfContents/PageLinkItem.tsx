@@ -7,6 +7,7 @@ import { Link } from '@/components/primitives';
 import { tcls } from '@/lib/tailwind';
 
 import { SiteInsightsLinkPosition } from '@gitbook/api';
+import { useCurrentPagePath } from '../hooks';
 import { TOCPageIcon } from './TOCPageIcon';
 
 export function PageLinkItem(props: { page: ClientTOCPageLink }) {
@@ -14,11 +15,19 @@ export function PageLinkItem(props: { page: ClientTOCPageLink }) {
 
     const isExternal = page.target.kind === 'url';
 
+    const currentPagePath = useCurrentPagePath();
+    const isActive = page.pathnames?.some((pathname) => pathname === currentPagePath) ?? false;
+
     return (
         <li className="page-link-item flex flex-col [.page-group-item+&]:mt-4">
             <Link
                 href={page.href ?? '#'}
-                classNames={['ToCLinkItemStyles']}
+                data-active={isActive}
+                aria-current={isActive ? 'page' : undefined}
+                classNames={[
+                    'ToCLinkItemStyles',
+                    ...(isActive ? ['ToCLinkItemActiveStyles' as const] : []),
+                ]}
                 insights={{
                     type: 'link_click',
                     link: {
