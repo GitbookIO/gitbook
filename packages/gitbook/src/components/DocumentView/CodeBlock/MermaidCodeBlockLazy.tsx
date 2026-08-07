@@ -10,8 +10,6 @@ const MermaidCodeBlock = dynamic(
     { ssr: true }
 );
 
-export function MermaidCodeBlockLazy(
-    props: ClientBlockProps & { mermaidRuntimeURL: string }
-) {
+export function MermaidCodeBlockLazy(props: ClientBlockProps & { mermaidRuntimeURL: string }) {
     return <MermaidCodeBlock {...props} />;
 }
