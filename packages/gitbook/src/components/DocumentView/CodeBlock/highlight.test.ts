@@ -8,19 +8,13 @@ import {
     getInlines,
     highlight,
 } from './highlight';
-import { SHIKI_RUNTIME_PATH } from './shiki-runtime-path';
-
-const shikiRuntimeURL = new URL(
-    `../../../../public/~gitbook/static/${SHIKI_RUNTIME_PATH}`,
-    import.meta.url
-).href;
 
 async function highlightWithInlines(block: DocumentBlockCode) {
     const inlines: RenderedInline[] = getInlines(block).map((inline) => ({
         inline,
         body: null,
     }));
-    const result = await highlight(block, inlines, { shikiRuntimeURL });
+    const result = await highlight(block, inlines);
     return result.lines;
 }
 
@@ -81,35 +75,10 @@ it('should parse different code in parallel', async () => {
                         },
                     ],
                 },
-                [],
-                { shikiRuntimeURL }
+                []
             )
         )
     );
-});
-
-it('falls back to plain code when the language module cannot be loaded', async () => {
-    const tokens = await highlightWithInlines(singleLineBlock('not-a-language', 'const value = 1'));
-
-    expect(tokens).toMatchObject([
-        {
-            tokens: [{ type: 'plain', content: 'const value = 1' }],
-        },
-    ]);
-});
-
-it('loads the parser alias from its direct language module', async () => {
-    const tokens = await highlightWithInlines(singleLineBlock('parser', '@if ($enabled)'));
-
-    expect(tokens[0]?.tokens.some((token) => token.type === 'shiki')).toBe(true);
-});
-
-it('loads the objectivec alias from its direct language module', async () => {
-    const tokens = await highlightWithInlines(
-        singleLineBlock('objectivec', '@interface Thing : NSObject')
-    );
-
-    expect(tokens[0]?.tokens.some((token) => token.type === 'shiki')).toBe(true);
 });
 
 it('should parse a multilines plain code', async () => {
