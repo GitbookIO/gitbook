@@ -1,0 +1,30 @@
+name: CSS browser compatibility validation
+
+on:
+    pull_request:
+        types: [opened, reopened, synchronize]
+
+permissions:
+    contents: read
+    issues: write
+    pull-requests: read
+
+jobs:
+    validate:
+        if: github.event.pull_request.number == 4478
+        name: Validate newly added CSS declarations
+        runs-on: ubuntu-latest
+        timeout-minutes: 6
+        steps:
+            - name: Checkout pull request
+              uses: actions/checkout@v4
+            - name: Setup Bun
+              uses: ./.github/composite/setup-bun
+            - name: Install dependencies
+              run: bun install --frozen-lockfile
+              env:
+                  PUPPETEER_SKIP_DOWNLOAD: 1
+            - name: Validate CSS browser compatibility
+              run: bun --cwd packages/gitbook run check:css-browser-compatibility
+              env:
+                  CSS_BROWSER_COMPATIBILITY_ALWAYS_COMMENT: 'true'
