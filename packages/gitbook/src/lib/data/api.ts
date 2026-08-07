@@ -324,7 +324,7 @@ const getRevision = cache(
                     params.spaceId,
                     params.revisionId,
                     {
-                        metadata: true,
+                        metadata: false,
                     },
                     {
                         ...noCacheFetchOptions,
@@ -428,6 +428,7 @@ const getRevisionPageMarkdown = cache(
                         {
                             format: 'markdown',
                             'format.markdown.refs': 'stable',
+                            metadata: false,
                         },
                         {
                             ...noCacheFetchOptions,
@@ -535,7 +536,9 @@ const getRevisionPageByPath = cache(
                         params.spaceId,
                         params.revisionId,
                         encodedPath,
-                        {},
+                        {
+                            metadata: false,
+                        },
                         {
                             ...noCacheFetchOptions,
                         }
