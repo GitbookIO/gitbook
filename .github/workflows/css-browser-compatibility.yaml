@@ -29,4 +29,5 @@ jobs:
               env:
                   PUPPETEER_SKIP_DOWNLOAD: 1
             - name: Check CSS browser compatibility
-              run: bun --cwd packages/gitbook run check:css-browser-compatibility
+              working-directory: packages/gitbook
+              run: bun run check:css-browser-compatibility

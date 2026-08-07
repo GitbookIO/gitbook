@@ -25,6 +25,7 @@ jobs:
               env:
                   PUPPETEER_SKIP_DOWNLOAD: 1
             - name: Validate CSS browser compatibility
-              run: bun --cwd packages/gitbook run check:css-browser-compatibility
+              working-directory: packages/gitbook
+              run: bun run check:css-browser-compatibility
               env:
                   CSS_BROWSER_COMPATIBILITY_ALWAYS_COMMENT: 'true'
