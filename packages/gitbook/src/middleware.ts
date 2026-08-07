@@ -37,6 +37,7 @@ import {
     isOAuthProtectedResourceRequest,
 } from '@/lib/oauth-protected';
 import { removeLeadingSlash, removeTrailingSlash } from '@/lib/paths';
+import { type SiteRouteType, getPPRRequest, getPPRRouteType } from '@/lib/ppr';
 import {
     getPreviewCookieResponse,
     getPreviewRequestIdentifier,
@@ -212,24 +213,31 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
     //
     request.headers.delete('x-gitbook-disable-tracking');
 
-    const withAPIToken = async (apiToken: string | null) => {
-        const siteURLData = await throwIfDataError(
-            lookupPublishedContentByUrl({
-                url: siteRequestURL.toString(),
-                visitorPayload: {
-                    jwtToken: visitorToken?.token ?? undefined,
-                    unsignedClaims,
-                },
-                // When the visitor auth token is pulled from the cookie, set redirectOnError when calling resolvePublishedContentByUrl to allow
-                // redirecting when the token is invalid as we could be dealing with stale token stored in the cookie.
-                // For example when the VA backend signature has changed but the token stored in the cookie is not yet expired.
-                redirectOnError: visitorToken?.source === 'visitor-auth-cookie',
+    const pprRequest = getPPRRequest(request.headers);
 
-                // Use the API token passed in the request, if any
-                // as it could be used for .preview hostnames
-                apiToken,
-            })
-        );
+    const withAPIToken = async (
+        apiToken: string | null,
+        resolvedPPRContent?: PublishedSiteContent
+    ) => {
+        const siteURLData =
+            resolvedPPRContent ??
+            (await throwIfDataError(
+                lookupPublishedContentByUrl({
+                    url: siteRequestURL.toString(),
+                    visitorPayload: {
+                        jwtToken: visitorToken?.token ?? undefined,
+                        unsignedClaims,
+                    },
+                    // When the visitor auth token is pulled from the cookie, set redirectOnError when calling resolvePublishedContentByUrl to allow
+                    // redirecting when the token is invalid as we could be dealing with stale token stored in the cookie.
+                    // For example when the VA backend signature has changed but the token stored in the cookie is not yet expired.
+                    redirectOnError: visitorToken?.source === 'visitor-auth-cookie',
+
+                    // Use the API token passed in the request, if any
+                    // as it could be used for .preview hostnames
+                    apiToken,
+                })
+            ));
 
         const cookies: ResponseCookies = visitorParamsCookie
             ? [
@@ -357,7 +365,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
 
         // The route is static, except when using dynamic parameters from query params
         // (customization override, theme, etc)
-        let routeType: 'dynamic' | 'static' = 'static';
+        let routeType: SiteRouteType = 'static';
 
         // We pick only stable data from the siteURL data to prevent re-rendering of
         // the root layout when changing pages..
@@ -390,7 +398,6 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         };
 
         const requestHeaders = new Headers(request.headers);
-        requestHeaders.set(MiddlewareHeaders.RouteType, routeType);
         requestHeaders.set(MiddlewareHeaders.URLMode, mode);
         requestHeaders.set(
             MiddlewareHeaders.SiteURL,
@@ -462,9 +469,13 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         const {
             pathname,
             routeType: routeTypeFromPathname,
+            isPPRPage,
             events,
         } = encodePathInSiteContent(siteURLData, request);
         routeType = routeTypeFromPathname ?? routeType;
+
+        routeType = getPPRRouteType(routeType, isPPRPage, pprRequest);
+        requestHeaders.set(MiddlewareHeaders.RouteType, routeType);
 
         if (events && events.length > 0) {
             waitUntil(
@@ -495,6 +506,19 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
                     )
                 )
             ),
+            ...(routeType === 'ppr' && pprRequest
+                ? [
+                      encodeURIComponent(pprRequest.content.revision),
+                      encodeURIComponent(pprRequest.revalidationId),
+                      encodeURIComponent(
+                          rison.encode({
+                              siteSection: pprRequest.defaults.siteSection ?? null,
+                              siteSpace: pprRequest.defaults.siteSpace,
+                              space: pprRequest.defaults.space,
+                          })
+                      ),
+                  ]
+                : []),
             pathname,
         ].join('/');
 
@@ -522,7 +546,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         response.headers.set('x-content-type-options', 'nosniff');
         // Debug header
         response.headers.set('x-gitbook-route-type', routeType);
-        response.headers.set('x-gitbook-route-site', siteURLWithoutProtocol);
+        // response.headers.set('x-gitbook-route-site', siteURLWithoutProtocol);
 
         // noindex search/assistant deep links, kept crawlable so Google sees the directive.
         if (rewrittenURL.searchParams.has('ask') || rewrittenURL.searchParams.has('q')) {
@@ -566,6 +590,10 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
 
         return writeResponseCookies(response, cookies);
     };
+
+    if (pprRequest) {
+        return withAPIToken(null, pprRequest.content);
+    }
 
     // For preview requests like:
     // - https://<GITBOOK_PREVIEW_BASE_URL>/<siteID> requests (ex: https://sites.gitbook.com/preview/site_id/path)
@@ -746,6 +774,7 @@ function encodePathInSiteContent(
 ): {
     pathname: string;
     routeType?: 'static' | 'dynamic';
+    isPPRPage?: boolean;
     events?: ServerInsightsEventInput[] | undefined;
 } {
     let pathname = removeLeadingSlash(removeTrailingSlash(siteURLData.pathname));
@@ -900,7 +929,7 @@ function encodePathInSiteContent(
                           ],
                 };
             }
-            return { pathname: encodePagePath(pathname) };
+            return { pathname: encodePagePath(pathname), isPPRPage: true };
         }
     }
 }

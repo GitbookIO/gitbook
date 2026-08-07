@@ -4,14 +4,16 @@ import { trace } from '@/lib/tracing';
 import type { PublishedSiteContentLookup, SiteVisitorPayload } from '@gitbook/api';
 import { apiClient } from './api';
 import { getExposableError } from './errors';
+import { getPublishedContentLookupPlan } from './lookup-plan';
 import type { DataFetcherResponse } from './types';
-import { getURLLookupAlternatives, stripURLSearch } from './urls';
 
 interface LookupPublishedContentByUrlInput {
     url: string;
     redirectOnError: boolean;
     apiToken: string | null;
     visitorPayload: SiteVisitorPayload;
+    /** A known lookup URL that can be resolved directly without racing alternatives. */
+    urlLookup?: string;
 }
 
 /**
@@ -21,11 +23,12 @@ interface LookupPublishedContentByUrlInput {
 export async function lookupPublishedContentByUrl(
     input: LookupPublishedContentByUrlInput
 ): Promise<DataFetcherResponse<PublishedSiteContentLookup>> {
-    const lookupURL = new URL(input.url);
-    const url = stripURLSearch(lookupURL);
-    const lookup = getURLLookupAlternatives(url);
+    const lookup = getPublishedContentLookupPlan(input);
 
-    const result = await race(lookup.urls, async (alternative, { signal }) => {
+    const resolveAlternative = async (
+        alternative: (typeof lookup.urls)[number],
+        signal?: AbortSignal
+    ) => {
         const api = apiClient({ apiToken: input.apiToken });
         const callResult = await trace(
             {
@@ -40,7 +43,7 @@ export async function lookupPublishedContentByUrl(
                             ...(input.visitorPayload ? { visitor: input.visitorPayload } : {}),
                             redirectOnError: input.redirectOnError,
                         },
-                        { signal }
+                        signal ? { signal } : undefined
                     )
                 )
         );
@@ -111,7 +114,17 @@ export async function lookupPublishedContentByUrl(
         }
 
         return null;
-    });
+    };
+
+    const result = lookup.direct
+        ? await resolveAlternative({
+              url: input.urlLookup ?? input.url,
+              primary: true,
+              extraPath: '',
+          })
+        : await race(lookup.urls, (alternative, { signal }) =>
+              resolveAlternative(alternative, signal)
+          );
 
     if (!result) {
         return {
