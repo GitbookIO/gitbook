@@ -26,9 +26,15 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
     const language = useLanguage();
 
     const bestSection = item.type === 'page' ? item.bestSection : undefined;
-    // When the section snippet is displayed, link to the section anchor so the
-    // link matches what the user sees.
-    const href = bestSection?.body ? bestSection.href : 'href' in item ? item.href : item.pathname;
+    // Section-level matches deep-link to their section anchor; page/title-level matches
+    // link to the top of the page even when a section snippet is shown as a preview.
+    const isPageLevelMatch = item.type === 'page' && item.resultType === 'page';
+    const href =
+        bestSection?.body && !isPageLevelMatch
+            ? bestSection.href
+            : 'href' in item
+              ? item.href
+              : item.pathname;
 
     const emoji = 'emoji' in item ? item.emoji : undefined;
     const icon = 'icon' in item ? item.icon : undefined;
