@@ -20,6 +20,11 @@ import { getOrCreateStoreByKey } from './getOrCreateStoreByKey';
 export type OpenAPISelectItem = {
     key: Key;
     label: string | React.ReactNode;
+    /**
+     * If `true`, selecting this item runs `onAction` instead of changing the selection,
+     * leaving the current selection unchanged (e.g. an item that opens a dialog).
+     */
+    action?: boolean;
 };
 
 interface OpenAPISelectProps<T extends OpenAPISelectItem> extends Omit<SelectProps<T>, 'children'> {
@@ -31,6 +36,10 @@ interface OpenAPISelectProps<T extends OpenAPISelectItem> extends Omit<SelectPro
      * Icon to display in the select button.
      */
     icon?: React.ReactNode | null;
+    /**
+     * Called when an item flagged with `action` is selected. The selection is not changed.
+     */
+    onAction?: (key: Key) => void;
 }
 
 export function useSelectState(stateKey = 'select-state', initialKey: Key = 'default') {
@@ -42,8 +51,19 @@ export function useSelectState(stateKey = 'select-state', initialKey: Key = 'def
 }
 
 export function OpenAPISelect<T extends OpenAPISelectItem>(props: OpenAPISelectProps<T>) {
-    const { icon, items, children, className, placement, stateKey, value, onChange, defaultValue } =
-        props;
+    const {
+        icon,
+        items,
+        children,
+        className,
+        placement,
+        stateKey,
+        value,
+        onChange,
+        defaultValue,
+        onAction,
+        ...selectProps
+    } = props;
 
     const state = useSelectState(stateKey, defaultValue ?? items[0]?.key);
 
@@ -52,9 +72,14 @@ export function OpenAPISelect<T extends OpenAPISelectItem>(props: OpenAPISelectP
     return (
         <Select
             aria-label="OpenAPI Select"
-            {...props}
+            {...selectProps}
             value={value ?? selected?.key}
             onChange={(key) => {
+                // Action items trigger a side effect without changing the selection.
+                if (key !== null && items.find((item) => item.key === key)?.action) {
+                    onAction?.(key);
+                    return;
+                }
                 onChange?.(key);
                 state.setKey(key);
             }}

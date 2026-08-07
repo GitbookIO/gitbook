@@ -45,5 +45,8 @@ export const nl = {
     or: 'of',
     and: 'en',
     possible_values: 'Mogelijke waarden',
+    code_sample_custom: 'Aangepaste taal',
+    code_sample_custom_description: 'Herschrijven met ${1}',
+    code_sample_rewrite_prompt: 'Herschrijf dit in de volgende taal: ',
     direct_link_to_model: 'Directe link naar ${1}',
 };

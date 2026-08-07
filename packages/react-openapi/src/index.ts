@@ -4,6 +4,7 @@ export * from './OpenAPIMethodBadge';
 export * from './OpenAPIOperation';
 export * from './OpenAPIWebhook';
 export * from './OpenAPIOperationContext';
+export * from './OpenAPICodeSampleAssistant';
 export * from './OpenAPIPrefillContextProvider';
 export * from './resolveOpenAPIOperation';
 export * from './resolveOpenAPIWebhook';

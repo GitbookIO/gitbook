@@ -165,11 +165,18 @@ function generateCodeSamples(props: {
     );
 
     return codeSampleGenerators.map((generator) => {
+        const icon = context.getCodeSampleIcon?.({
+            id: generator.id,
+            syntax: generator.syntax,
+            label: generator.label,
+        });
         if (mediaTypeRendererFactories.length > 0) {
             const renderers = mediaTypeRendererFactories.map((generate) => generate(generator));
             return {
                 key: `default-${generator.id}`,
                 label: generator.label,
+                icon,
+                syntax: generator.syntax,
                 body: (
                     <OpenAPIMediaTypeExamplesBody
                         method={data.method}
@@ -186,6 +193,8 @@ function generateCodeSamples(props: {
         return {
             key: `default-${generator.id}`,
             label: generator.label,
+            icon,
+            syntax: generator.syntax,
             body: context.renderCodeBlock({
                 code: generator.generate({
                     url: { origin: serverUrlOrigin, path },
@@ -299,6 +308,8 @@ function getCustomCodeSamples(props: {
     let customCodeSamples: null | Array<{
         key: string;
         label: string;
+        icon?: React.ReactNode;
+        syntax?: string;
         body: React.ReactNode;
     }> = null;
 
@@ -312,6 +323,11 @@ function getCustomCodeSamples(props: {
                 .map((sample, index) => ({
                     key: `custom-sample-${sample.lang}-${index}`,
                     label: sample.label || sample.lang,
+                    icon: context.getCodeSampleIcon?.({
+                        syntax: sample.lang,
+                        label: sample.label || sample.lang,
+                    }),
+                    syntax: sample.lang,
                     body: context.renderCodeBlock({
                         code: sample.source,
                         syntax: sample.lang,

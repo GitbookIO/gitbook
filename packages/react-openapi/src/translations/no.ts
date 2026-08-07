@@ -45,5 +45,8 @@ export const no = {
     or: 'eller',
     and: 'og',
     possible_values: 'Mulige verdier',
+    code_sample_custom: 'Egendefinert språk',
+    code_sample_custom_description: 'Skriv om med ${1}',
+    code_sample_rewrite_prompt: 'Skriv om dette til følgende språk: ',
     direct_link_to_model: 'Direktelenke til ${1}',
 };
