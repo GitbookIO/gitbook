@@ -1,8 +1,8 @@
 'use client';
+import { Collapsible } from '@base-ui/react/collapsible';
 import clsx from 'classnames';
 import type React from 'react';
 import { useEffect, useState } from 'react';
-import { Button, Disclosure, DisclosurePanel } from 'react-aria-components';
 
 /**
  * Display an interactive OpenAPI disclosure.
@@ -45,20 +45,12 @@ export function OpenAPIDisclosure(props: {
     }, [id]);
 
     return (
-        <Disclosure
+        <Collapsible.Root
             className={clsx('openapi-disclosure', className)}
-            isExpanded={isExpanded}
-            onExpandedChange={setIsExpanded}
+            open={isExpanded}
+            onOpenChange={setIsExpanded}
         >
-            <Button
-                slot="trigger"
-                className="openapi-disclosure-trigger"
-                style={({ isFocusVisible }) => ({
-                    outline: isFocusVisible
-                        ? '2px solid rgb(var(--primary-color-500) / 0.4)'
-                        : 'none',
-                })}
-            >
+            <Collapsible.Trigger className="openapi-disclosure-trigger">
                 {header}
                 <div className="openapi-disclosure-trigger-label">
                     {label ? (
@@ -66,10 +58,8 @@ export function OpenAPIDisclosure(props: {
                     ) : null}
                     {icon}
                 </div>
-            </Button>
-            {isExpanded ? (
-                <DisclosurePanel className="openapi-disclosure-panel">{children}</DisclosurePanel>
-            ) : null}
-        </Disclosure>
+            </Collapsible.Trigger>
+            <Collapsible.Panel className="openapi-disclosure-panel">{children}</Collapsible.Panel>
+        </Collapsible.Root>
     );
 }
