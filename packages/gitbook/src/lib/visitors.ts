@@ -1,6 +1,6 @@
 import { type JwtPayload, jwtDecode } from 'jwt-decode';
 import { type NextRequest, NextResponse } from 'next/server';
-import hash from 'object-hash';
+import { hash } from './utils';
 
 const VISITOR_AUTH_PARAM = 'jwt_token';
 const VISITOR_PARAM_PREFIX = 'visitor.';
