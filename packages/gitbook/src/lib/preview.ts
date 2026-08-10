@@ -61,7 +61,12 @@ export function getPreviewCookieResponse(args: {
         value,
         options: {
             httpOnly: true,
-            sameSite: 'lax',
+            // The preview runs in a cross-site iframe, so a Lax cookie would be withheld on
+            // in-iframe navigations and the override would be lost. Match the visitor cookies
+            // (see getResponseCookiesForVisitorAuth) with SameSite=None + Secure in production
+            // (None requires Secure); dev is same-origin so no attributes are needed.
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : undefined,
+            secure: process.env.NODE_ENV === 'production',
             maxAge: 10 * 60, // 10 minutes
             path,
         },
