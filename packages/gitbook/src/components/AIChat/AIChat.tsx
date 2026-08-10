@@ -121,6 +121,7 @@ export function AIChat() {
                             suggestions={config.suggestions}
                             trademark={config.trademark}
                             assistantName={config.assistantName}
+                            greeting={config.greeting}
                         />
                     </EmbeddableFrameBody>
                 </EmbeddableFrameMain>
@@ -212,7 +213,7 @@ export function AIChatBody(props: {
     /** Custom assistant name override; falls back to the branded/unbranded default name. */
     assistantName?: string;
     greeting?: {
-        title: string;
+        title?: string;
         subtitle: string;
     };
 }) {
