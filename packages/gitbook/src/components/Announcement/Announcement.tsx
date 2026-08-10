@@ -26,6 +26,7 @@ export async function Announcement(props: {
     return (
         <AnnouncementBanner
             announcement={customization.announcement}
+            locale={context.locale}
             contentRef={resolvedContentRef}
         />
     );

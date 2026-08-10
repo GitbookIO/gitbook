@@ -8,7 +8,7 @@ describe('getImageResizingContextId', () => {
     });
 
     it('should return preview identifier for preview requests', () => {
-        const previewRequestURL = new URL('https://preview/site_foo/hello/world');
+        const previewRequestURL = new URL('https://sites.gitbook.com/preview/site_foo/hello/world');
         expect(getImageResizingContextId(previewRequestURL)).toBe('site_foo');
     });
 

@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'bun:test';
-import { createLinker, linkerForPublishedURL, linkerWithAbsoluteURLs } from './links';
+import {
+    createLinker,
+    linkerForPublishedURL,
+    linkerWithAbsoluteURLs,
+    linkerWithMarkdownPages,
+} from './links';
 
 const root = createLinker({
     host: 'docs.company.com',
@@ -20,9 +25,9 @@ const siteGitBookIO = createLinker({
 });
 
 const preview = createLinker({
-    host: 'preview',
-    spaceBasePath: '/site_abc/section/space/',
-    siteBasePath: '/site_abc/',
+    host: 'sites.gitbook.com',
+    spaceBasePath: '/preview/site_abc/section/space/',
+    siteBasePath: '/preview/site_abc/',
 });
 
 describe('toPathInSpace', () => {
@@ -77,6 +82,22 @@ describe('toRelativePathInSite', () => {
     });
 });
 
+describe('toPathForPagePath', () => {
+    it('should return the correct path', () => {
+        expect(root.toPathForPagePath({ path: 'some/path' })).toBe('/some/path');
+        expect(variantInSection.toPathForPagePath({ path: 'some/path' })).toBe(
+            '/section/variant/some/path'
+        );
+    });
+
+    it('should preserve anchors and resolve index pages', () => {
+        expect(root.toPathForPagePath({ path: '', anchor: 'intro' })).toBe('/#intro');
+        expect(variantInSection.toPathForPagePath({ path: '', anchor: 'intro' })).toBe(
+            '/section/variant#intro'
+        );
+    });
+});
+
 describe('toAbsoluteURL', () => {
     it('should return the correct path', () => {
         expect(root.toAbsoluteURL('some/path')).toBe('https://docs.company.com/some/path');
@@ -115,6 +136,33 @@ describe('linkerWithAbsoluteURLs', () => {
         );
         expect(absoluteLinker.toPathInSite('some/path')).toBe('https://docs.company.com/some/path');
     });
+
+    it('should return absolute URLs for toPathForPage', () => {
+        const absoluteLinker = linkerWithAbsoluteURLs(variantInSection);
+        const pages = [
+            {
+                id: 'page-intro',
+                type: 'document',
+                title: 'Intro',
+                path: 'intro',
+                pages: [],
+            },
+            {
+                id: 'page-editor',
+                type: 'document',
+                title: 'Editor',
+                path: 'editor',
+                pages: [],
+            },
+        ] as any;
+
+        expect(
+            absoluteLinker.toPathForPage({
+                pages,
+                page: pages[1],
+            })
+        ).toBe('https://docs.company.com/section/variant/editor');
+    });
 });
 
 describe('linker.withOtherSiteSpace', () => {
@@ -149,6 +197,42 @@ describe('linker.withOtherSiteSpace', () => {
         });
         expect(otherSpaceBasePathLinker.toPathInSpace('some/path')).toBe('/sitename/a/b/some/path');
     });
+
+    it('should resolve toPathForPagePath using the overridden spaceBasePath', () => {
+        const otherSpaceBasePathLinker = root.withOtherSiteSpace({
+            spaceBasePath: '/section/variant',
+        });
+        expect(otherSpaceBasePathLinker.toPathForPagePath({ path: 'some/path' })).toBe(
+            '/section/variant/some/path'
+        );
+        expect(otherSpaceBasePathLinker.toPathForPagePath({ path: '', anchor: 'intro' })).toBe(
+            '/section/variant#intro'
+        );
+    });
+
+    it('should resolve page paths relative to the overridden spaceBasePath', () => {
+        const otherSpaceBasePathLinker = siteGitBookIO.withOtherSiteSpace({
+            spaceBasePath: '/a/b',
+        });
+        expect(otherSpaceBasePathLinker.toPathForPagePath({ path: 'some/path' })).toBe(
+            '/sitename/a/b/some/path'
+        );
+        expect(otherSpaceBasePathLinker.toPathForPagePath({ path: '', anchor: 'intro' })).toBe(
+            '/sitename/a/b#intro'
+        );
+    });
+});
+
+describe('linkerWithMarkdownPages', () => {
+    it('should append .md to page paths and preserve anchors', () => {
+        const markdownLinker = linkerWithMarkdownPages(variantInSection);
+        expect(markdownLinker.toPathForPagePath({ path: 'some/path' })).toBe(
+            '/section/variant/some/path.md'
+        );
+        expect(markdownLinker.toPathForPagePath({ path: 'some/path', anchor: 'intro' })).toBe(
+            '/section/variant/some/path.md#intro'
+        );
+    });
 });
 
 describe('linkerForPublishedURL', () => {
@@ -156,11 +240,11 @@ describe('linkerForPublishedURL', () => {
         it('should rewrite links that belongs to the published site to be part of the preview site', () => {
             const previewLinker = linkerForPublishedURL(preview, 'https://docs.company.com/');
             expect(previewLinker.toLinkForContent('https://docs.company.com/some/path')).toBe(
-                '/site_abc/some/path'
+                '/preview/site_abc/some/path'
             );
             expect(
                 previewLinker.toLinkForContent('https://docs.company.com/section/variant/some/path')
-            ).toBe('/site_abc/section/variant/some/path');
+            ).toBe('/preview/site_abc/section/variant/some/path');
             expect(previewLinker.toLinkForContent('https://www.google.com')).toBe(
                 'https://www.google.com'
             );
@@ -175,12 +259,12 @@ describe('linkerForPublishedURL', () => {
             );
             expect(
                 previewLinker.toLinkForContent('https://org.gitbook.io/sitename/some/path')
-            ).toBe('/site_abc/some/path');
+            ).toBe('/preview/site_abc/some/path');
             expect(
                 previewLinker.toLinkForContent(
                     'https://org.gitbook.io/sitename/section/variant/some/path'
                 )
-            ).toBe('/site_abc/section/variant/some/path');
+            ).toBe('/preview/site_abc/section/variant/some/path');
             expect(previewLinker.toLinkForContent('https://www.google.com')).toBe(
                 'https://www.google.com'
             );
@@ -190,7 +274,7 @@ describe('linkerForPublishedURL', () => {
     it('should should preserve hash and search', () => {
         const previewLinker = linkerForPublishedURL(preview, 'https://docs.company.com/');
         expect(previewLinker.toLinkForContent('https://docs.company.com/some/path?a=b#c')).toBe(
-            '/site_abc/some/path?a=b#c'
+            '/preview/site_abc/some/path?a=b#c'
         );
     });
 });

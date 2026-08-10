@@ -182,8 +182,16 @@ function getOrderedListItemPrefixContent(input: {
 }): string {
     const { parent, block } = input;
     const start = parent.data.start ?? 1;
-    const index = parent.nodes.findIndex((node) => node.key === block.key) ?? 0;
-    const value = index + start;
+
+    let index: number;
+    // If the block has a key, use it to find the index. Otherwise, use the object reference.
+    if (block.key) {
+        index = parent.nodes.findIndex((node) => node.key === block.key);
+    } else {
+        index = parent.nodes.findIndex((node) => node === block);
+    }
+
+    const value = index >= 0 ? index + start : Math.max(start, 1);
     switch (input.depth % 3) {
         // Use numbers
         case 0: {

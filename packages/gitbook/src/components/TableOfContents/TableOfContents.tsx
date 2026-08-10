@@ -2,43 +2,70 @@ import type { GitBookSiteContext } from '@/lib/context';
 import { SiteInsightsTrademarkPlacement } from '@gitbook/api';
 import type React from 'react';
 
+import { getSiteStructureTitle } from '@/lib/sites';
 import { tcls } from '@/lib/tailwind';
+import { ScrollContainer } from '../primitives/ScrollContainer';
+import { SideSheet } from '../primitives/SideSheet';
+import { BackToSpaceButton } from './BackToSpaceButton';
 import { PagesList } from './PagesList';
-import { TOCScrollContainer } from './TOCScroller';
 import { TableOfContentsScript } from './TableOfContentsScript';
 import { Trademark } from './Trademark';
 import { encodeClientTableOfContents } from './encodeClientTableOfContents';
 
+/**
+ * Sidebar container, responsible for setting the right dimensions and position for the sidebar.
+ */
 export async function TableOfContents(props: {
     context: GitBookSiteContext;
     header?: React.ReactNode; // Displayed outside the scrollable TOC as a sticky header
     innerHeader?: React.ReactNode; // Displayed outside the scrollable TOC, directly above the page list
+    withTrademark?: boolean;
     className?: string;
 }) {
-    const { innerHeader, context, header, className } = props;
+    const { innerHeader, context, header, className, withTrademark = true } = props;
     const { customization, revision } = context;
 
     const pages = await encodeClientTableOfContents(context, revision.pages, revision.pages);
 
     return (
         <>
-            <aside // Sidebar container, responsible for setting the right dimensions and position for the sidebar.
+            <SideSheet
+                side="left"
                 data-testid="table-of-contents"
-                id="table-of-contents"
+                data-gb-table-of-contents
+                toggleClass="navigation-open"
+                withOverlay={true}
+                withCloseButton={true}
                 className={tcls(
-                    'group',
+                    'group/table-of-contents',
                     'text-sm',
 
                     'grow-0',
                     'shrink-0',
-                    'basis-full',
-                    'lg:basis-72',
-                    'lg:page-no-toc:basis-56',
 
-                    'relative',
-                    'z-1',
+                    'w-4/5',
+                    'md:w-1/2',
+                    'lg:w-72',
+
+                    'max-lg:not-sidebar-filled:bg-tint-base',
+                    'max-lg:not-sidebar-filled:border-r',
+                    'border-tint-subtle',
+
+                    'lg:flex!',
+                    'lg:animate-none!',
                     'lg:sticky',
                     'lg:mr-12',
+                    'lg:z-0',
+
+                    'layout-wide:no-sidebar:lg:fixed',
+                    'layout-wide:no-sidebar:lg:max-3xl:w-12',
+                    'layout-wide:no-sidebar:lg:left-5',
+                    'layout-wide:no-sidebar:lg:z-30',
+
+                    'layout-default:no-sidebar:lg:max-xl:fixed',
+                    'layout-default:no-sidebar:lg:max-xl:w-12',
+                    'layout-default:no-sidebar:lg:max-xl:left-5',
+                    'layout-default:no-sidebar:lg:max-xl:z-30',
 
                     // Server-side static positioning
                     'lg:top-0',
@@ -58,32 +85,26 @@ export async function TableOfContents(props: {
                     'lg:[html[style*="--toc-top-offset"]_&]:top-(--toc-top-offset)!',
                     'lg:[html[style*="--toc-height"]_&]:h-(--toc-height)!',
                     'lg:page-no-toc:[html[style*="--outline-top-offset"]_&]:top-(--outline-top-offset)!',
-                    'lg:page-no-toc:[html[style*="--outline-height"]_&]:top-(--outline-height)!',
+                    'lg:page-no-toc:[html[style*="--outline-height"]_&]:h-(--outline-height)!',
 
-                    'pt-4',
-                    'pb-4',
-                    'lg:sidebar-filled:pr-6',
-                    'lg:page-no-toc:pr-0',
+                    'pt-6 pb-4',
+                    'supports-[-webkit-touch-callout]:pb-[env(safe-area-inset-bottom)]', // Override bottom padding on iOS since we have a transparent bottom bar
+                    'lg:max-3xl:has-sidebar:sidebar-filled:layout-default:pr-6',
+                    'max-lg:pl-8',
 
-                    'hidden',
-                    'navigation-open:flex!',
-                    'lg:flex',
-                    'lg:page-no-toc:hidden',
-                    'xl:page-no-toc:flex',
-                    'lg:site-header-none:page-no-toc:flex',
+                    'flex',
                     'flex-col',
+                    'min-h-0',
                     'gap-4',
-
-                    'navigation-open:border-b',
-                    'border-tint-subtle',
                     className
                 )}
             >
-                {header && header}
+                {header}
                 <div // The actual sidebar, either shown with a filled bg or transparent.
                     className={tcls(
-                        'lg:-ms-5',
-                        'relative flex grow flex-col overflow-hidden border-tint-subtle',
+                        '-ms-5', // By default we shift the sidebar to the left to compensate for the PagesList padding.
+                        'layout-wide:no-sidebar:ms-0 layout-default:no-sidebar:lg:max-xl:ms-0',
+                        'relative flex min-h-0 grow flex-col border-tint-subtle',
 
                         'sidebar-filled:bg-tint-subtle',
                         'theme-muted:bg-tint-subtle',
@@ -91,40 +112,65 @@ export async function TableOfContents(props: {
                         '[html.sidebar-filled.theme-muted_&]:bg-tint-base',
                         '[html.sidebar-filled.theme-bold.tint_&]:bg-tint-base',
                         '[html.sidebar-filled.theme-gradient_&]:border',
-                        'page-no-toc:bg-transparent!',
-                        'page-no-toc:border-none!',
+                        'max-lg:sidebar-filled:border',
+                        'lg:page-no-toc:bg-transparent!',
+                        'lg:page-no-toc:border-none!',
 
-                        'sidebar-filled:rounded-xl',
+                        'sidebar-filled:rounded-2xl',
                         'straight-corners:rounded-none',
-                        'page-has-toc:[html.sidebar-filled.circular-corners_&]:rounded-3xl'
+                        '[html.sidebar-filled.circular-corners_&]:layout-wide:rounded-4xl'
                     )}
                 >
-                    {innerHeader ? (
-                        <div className="my-4 flex flex-col space-y-4 px-5 empty:hidden">
-                            {innerHeader}
-                        </div>
-                    ) : null}
-                    <TOCScrollContainer // The scrollview inside the sidebar
-                        className={tcls(
-                            'flex grow flex-col p-2 pt-4',
-                            customization.trademark.enabled && 'lg:pb-20',
-                            'hide-scrollbar overflow-y-auto'
-                        )}
+                    <BackToSpaceButton
+                        spaceId={context.space.id}
+                        // Use the section/variant title as shown in the site navigation,
+                        // falling back to the site title for the default space.
+                        spaceTitle={getSiteStructureTitle(context) || context.site.title}
+                    />
+                    {innerHeader}
+                    <ScrollContainer
+                        data-testid="toc-scroll-container"
+                        orientation="vertical"
+                        contentClassName="flex flex-col p-2 gutter-stable"
+                        active="[data-active=true]"
+                        leading={{
+                            fade: true,
+                            button: {
+                                className: '-mt-4',
+                            },
+                        }}
                     >
                         <PagesList
                             pages={pages}
                             isRoot={true}
-                            style="page-no-toc:hidden border-tint-subtle sidebar-list-line:border-l"
+                            style="page-no-toc:hidden grow border-tint-subtle sidebar-list-line:border-l"
                         />
-                        {customization.trademark.enabled ? (
+                    </ScrollContainer>
+                    {withTrademark && customization.trademark.enabled ? (
+                        <>
+                            {/* Normal trademark shown when there's a TOC */}
                             <Trademark
                                 context={context}
                                 placement={SiteInsightsTrademarkPlacement.Sidebar}
+                                className={tcls(
+                                    'm-2 mt-auto px-4 py-3.5 layout-wide:no-sidebar:lg:max-3xl:hidden layout-default:no-sidebar:lg:max-xl:hidden'
+                                )}
+                                truncate={false}
                             />
-                        ) : null}
-                    </TOCScrollContainer>
+
+                            {/* IconOnly trademark shown when there's no TOC */}
+                            <Trademark
+                                context={context}
+                                placement={SiteInsightsTrademarkPlacement.Sidebar}
+                                className={tcls(
+                                    'mb-2 3xl:hidden layout-default:hidden self-start bg-tint-base depth-flat:bg-tint-base has-sidebar:hidden layout-default:no-sidebar:lg:max-xl:flex'
+                                )}
+                                iconOnly={true}
+                            />
+                        </>
+                    ) : null}
                 </div>
-            </aside>
+            </SideSheet>
             <TableOfContentsScript />
         </>
     );

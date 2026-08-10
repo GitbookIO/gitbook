@@ -68,7 +68,7 @@ export const NavigationStatusProvider: React.FC<React.PropsWithChildren> = ({ ch
         }
         const url = new URL(
             href,
-            typeof window !== 'undefined' ? window.location.origin : 'http://localhost'
+            typeof window !== 'undefined' ? window.location.href : 'http://localhost'
         );
         setHash(url.hash.slice(1));
 

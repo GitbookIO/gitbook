@@ -3,8 +3,8 @@ import { getLogger } from '@/lib/logger';
 import assertNever from 'assert-never';
 import { GITBOOK_IMAGE_RESIZE_MODE } from '../../env';
 import { SizableImageAction, checkIsSizableImageURL } from '../checkIsSizableImageURL';
-import { resizeImageWithCDNCgi } from './cdn-cgi';
 import { resizeImageWithCFFetch } from './cf-fetch';
+import { resizeImageWithGitbookServices } from './gitbook-service';
 import type { CloudflareImageJsonFormat, CloudflareImageOptions } from './types';
 
 /**
@@ -41,19 +41,21 @@ export async function getImageSize(
     }
 }
 
+export type CloudflareResizeImageOptions = CloudflareImageOptions & {
+    signal?: AbortSignal;
+    /**
+     * Bypass the check to see if the image can be resized.
+     * This is useful for some format that are not supported by @next/og and need to be transformed
+     */
+    bypassSkipCheck?: boolean;
+};
+
 /**
  * Execute a Cloudflare Image Resize operation on an image.
  */
 export async function resizeImage(
     input: string,
-    options: CloudflareImageOptions & {
-        signal?: AbortSignal;
-        /**
-         * Bypass the check to see if the image can be resized.
-         * This is useful for some format that are not supported by @next/og and need to be transformed
-         */
-        bypassSkipCheck?: boolean;
-    }
+    options: CloudflareResizeImageOptions
 ): Promise<Response> {
     const action = checkIsSizableImageURL(input);
     if (action === SizableImageAction.Skip && !options.bypassSkipCheck) {
@@ -69,10 +71,11 @@ export async function resizeImage(
     }
 
     switch (GITBOOK_IMAGE_RESIZE_MODE) {
-        case 'cdn-cgi':
-            return resizeImageWithCDNCgi(input, options);
         case 'cf-fetch':
             return resizeImageWithCFFetch(input, options);
+        case 'gitbook-service':
+        case 'cdn-cgi':
+            return resizeImageWithGitbookServices(input, options);
         default:
             assertNever(GITBOOK_IMAGE_RESIZE_MODE);
     }

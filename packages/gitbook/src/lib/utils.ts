@@ -1,4 +1,5 @@
 import * as api from '@gitbook/api';
+import { CustomizationPageActionType } from '@gitbook/api';
 
 /**
  * Return the default customization settings for a site.
@@ -19,6 +20,16 @@ export function defaultCustomization(): api.SiteCustomizationSettings {
             icons: api.CustomizationIconsStyle.Regular,
             links: api.CustomizationLinksStyle.Default,
             depth: api.CustomizationDepth.Subtle,
+            codeTheme: {
+                default: {
+                    light: api.CustomizationCodeTheme.DefaultLight,
+                    dark: api.CustomizationCodeTheme.DefaultDark,
+                },
+                openapi: {
+                    light: api.CustomizationCodeTheme.DefaultLight,
+                    dark: api.CustomizationCodeTheme.DefaultDark,
+                },
+            },
             sidebar: {
                 background: api.CustomizationSidebarBackgroundStyle.Default,
                 list: api.CustomizationSidebarListStyle.Default,
@@ -40,11 +51,8 @@ export function defaultCustomization(): api.SiteCustomizationSettings {
             groups: [],
         },
         themes: {
-            default: api.CustomizationThemeMode.Light,
+            default: api.CustomizationDefaultThemeMode.Light,
             toggeable: true,
-        },
-        pdf: {
-            enabled: true,
         },
         feedback: {
             enabled: false,
@@ -58,16 +66,17 @@ export function defaultCustomization(): api.SiteCustomizationSettings {
         advancedCustomization: {
             enabled: true,
         },
-        git: {
-            showEditLink: false,
-        },
         pagination: {
             enabled: true,
         },
         pageActions: {
-            externalAI: true,
-            markdown: true,
-            mcp: true,
+            items: [
+                CustomizationPageActionType.Assistant,
+                CustomizationPageActionType.Markdown,
+                CustomizationPageActionType.ExternalAi,
+                CustomizationPageActionType.Mcp,
+                CustomizationPageActionType.Pdf,
+            ],
         },
         trademark: {
             enabled: true,
@@ -76,6 +85,7 @@ export function defaultCustomization(): api.SiteCustomizationSettings {
             url: 'https://www.gitbook.com/privacy',
         },
         socialPreview: {},
+        socialAccounts: [],
     };
 }
 

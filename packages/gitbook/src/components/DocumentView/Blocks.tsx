@@ -2,6 +2,7 @@ import type { DocumentBlock, JSONDocument } from '@gitbook/api';
 
 import { type ClassValue, tcls } from '@/lib/tailwind';
 
+import { CONTENT_STYLE, CONTENT_STYLE_REDUCED } from '../layout';
 import { Block } from './Block';
 import type { DocumentContextProps } from './DocumentView';
 import { isBlockOffscreen } from './utils';
@@ -63,7 +64,7 @@ const FULL_WIDTH_BLOCKS: DocumentBlock['type'][] = [
     'columns',
     'code',
     'content-ref',
-    'hint',
+    'divider',
 ];
 
 const LIST_BLOCKS: DocumentBlock['type'][] = ['list-ordered', 'list-tasks', 'list-unordered'];
@@ -89,12 +90,10 @@ export function UnwrappedBlocks<TBlock extends DocumentBlock>(props: UnwrappedBl
                 key={node.key || `${node.type}-${index}`}
                 block={node}
                 style={[
-                    'mx-auto page-width-wide:mx-0 w-full decoration-primary/6',
-                    node.data && 'fullWidth' in node.data && node.data.fullWidth
-                        ? 'max-w-screen-xl'
-                        : 'max-w-3xl',
+                    'decoration-primary/6',
+                    FULL_WIDTH_BLOCKS.includes(node.type) ? CONTENT_STYLE : CONTENT_STYLE_REDUCED,
+
                     !LIST_BLOCKS.includes(node.type) && 'print:break-inside-avoid',
-                    FULL_WIDTH_BLOCKS.includes(node.type) && 'page-width-wide:max-w-full',
                     blockStyle,
                 ]}
                 isEstimatedOffscreen={isOffscreen}

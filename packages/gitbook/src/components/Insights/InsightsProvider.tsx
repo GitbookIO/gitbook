@@ -8,7 +8,7 @@ import { useDebounceCallback, useEventCallback } from 'usehooks-ts';
 import { getAllBrowserCookiesMap } from '@/lib/browser';
 import { type CurrentContentContext, useCurrentContent } from '../hooks';
 import { getSession } from './sessions';
-import { type SessionResponse, useVisitorSession } from './visitorId';
+import { type VisitorResponse, useVisitor } from './visitorId';
 
 export type InsightsEventName = api.SiteInsightsEvent['type'];
 
@@ -68,7 +68,7 @@ interface InsightsProviderProps {
 export function InsightsProvider(props: InsightsProviderProps) {
     const { enabled, children, eventUrl } = props;
 
-    const visitorSession = useVisitorSession();
+    const visitor = useVisitor();
     const currentContent = useCurrentContent();
     const eventsRef = React.useRef<{
         [pathname: string]:
@@ -86,7 +86,7 @@ export function InsightsProvider(props: InsightsProviderProps) {
      */
     const flushEventsSync = useEventCallback(() => {
         const session = getSession();
-        if (!visitorSession) {
+        if (!visitor) {
             return;
         }
 
@@ -107,7 +107,7 @@ export function InsightsProvider(props: InsightsProviderProps) {
                     events: eventsForPathname.events,
                     context: currentContent,
                     pageContext: eventsForPathname.pageContext,
-                    visitorSession,
+                    visitor: visitor,
                     sessionId: session.id,
                 })
             );
@@ -140,10 +140,10 @@ export function InsightsProvider(props: InsightsProviderProps) {
 
     // Flush pending events once the visitor session has been fetched
     React.useEffect(() => {
-        if (visitorSession) {
+        if (visitor) {
             flushEventsSync();
         }
-    }, [visitorSession, flushEventsSync]);
+    }, [visitor, flushEventsSync]);
 
     const trackEvent: TrackEventCallback = useEventCallback(
         (
@@ -154,7 +154,11 @@ export function InsightsProvider(props: InsightsProviderProps) {
             const pathname = window.location.pathname;
             const previous = eventsRef.current[pathname];
             eventsRef.current[pathname] = {
-                pageContext: previous?.pageContext ?? ctx,
+                // An explicitly-provided context wins so page-scoped events (e.g. feedback) can
+                // attribute to their page even when the pathname's ambient context has none — such
+                // as the embed's assistant tab, whose view records a null page. Events that pass no
+                // context keep the stored one.
+                pageContext: ctx ?? previous?.pageContext,
                 url: previous?.url ?? window.location.href,
                 events: [
                     ...(previous?.events ?? []),
@@ -241,12 +245,12 @@ function transformEvents(input: {
     events: TrackEventInput<InsightsEventName>[];
     context: CurrentContentContext;
     pageContext: InsightsEventPageContext;
-    visitorSession: SessionResponse;
+    visitor: VisitorResponse;
     sessionId: string;
 }): api.SiteInsightsEvent[] {
     const session: api.SiteInsightsEventSession = {
         sessionId: input.sessionId,
-        visitorId: input.visitorSession.deviceId,
+        visitorId: input.visitor.deviceId,
         userAgent: window.navigator.userAgent,
         language: window.navigator.language,
         cookies: getAllBrowserCookiesMap(),

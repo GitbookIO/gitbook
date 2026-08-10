@@ -18,13 +18,17 @@ export const NavigationLoader = () => {
         void pathname;
         const root = document.documentElement;
         root.classList.add('route-change');
+        let raf2 = 0;
         const raf1 = requestAnimationFrame(() => {
-            const raf2 = requestAnimationFrame(() => {
+            raf2 = requestAnimationFrame(() => {
                 root.classList.remove('route-change');
             });
-            return () => cancelAnimationFrame(raf2);
         });
-        return () => cancelAnimationFrame(raf1);
+        return () => {
+            root.classList.remove('route-change');
+            cancelAnimationFrame(raf1);
+            cancelAnimationFrame(raf2);
+        };
     }, [pathname]);
 
     return (

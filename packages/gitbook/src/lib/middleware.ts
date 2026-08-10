@@ -1,4 +1,4 @@
-import { CustomizationThemeMode } from '@gitbook/api';
+import { CustomizationDefaultThemeMode } from '@gitbook/api';
 import { headers } from 'next/headers';
 import type { SiteURLData } from './context';
 
@@ -97,8 +97,8 @@ export async function getThemeFromMiddleware() {
     }
 
     return queryStringTheme === 'light'
-        ? CustomizationThemeMode.Light
-        : CustomizationThemeMode.Dark;
+        ? CustomizationDefaultThemeMode.Light
+        : CustomizationDefaultThemeMode.Dark;
 }
 
 /**

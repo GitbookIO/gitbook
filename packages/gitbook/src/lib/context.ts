@@ -5,7 +5,12 @@ import {
     throwIfDataError,
 } from '@/lib/data';
 import { getLogger } from '@/lib/logger';
-import { getSiteStructureSections } from '@/lib/sites';
+import {
+    findSiteSpaceBy,
+    getFallbackSiteSpacePath,
+    getLocalizedTitle,
+    getSiteStructureSections,
+} from '@/lib/sites';
 import type {
     ChangeRequest,
     PublishedSiteContent,
@@ -19,6 +24,7 @@ import type {
     SiteSpace,
     SiteStructure,
     Space,
+    TranslationLanguage,
 } from '@gitbook/api';
 import assertNever from 'assert-never';
 import { notFound } from 'next/navigation';
@@ -45,6 +51,7 @@ export type SiteURLData = Pick<
     | 'siteBasePath'
     | 'basePath'
     | 'contextId'
+    | 'preview'
 > & {
     /**
      * Identifier used for image resizing.
@@ -57,6 +64,24 @@ export type SiteURLData = Pick<
      * By knowing it's a fallback, we can redirect to the space base path instead of returning a 404.
      */
     isFallback?: boolean;
+
+    /**
+     * Whether search indexation is blocked for this deployment.
+     * Computed in middleware from GITBOOK_BLOCK_SEARCH_INDEXATION env var and x-gitbook-search-indexation header.
+     */
+    noIndexSearch?: boolean;
+
+    /**
+     * Whether the request included a visitor token.
+     */
+    isLoggedInVisitor?: boolean;
+
+    /**
+     * Whether to display agent instructions in the markdown output.
+     * When false, agent-facing footers (e.g. "Agent Instructions") are omitted.
+     * Defaults to true when undefined.
+     */
+    displayAgentInstructions?: boolean;
 };
 
 /**
@@ -77,6 +102,11 @@ export type GitBookBaseContext = {
      * Image resizer to resize images.
      */
     imageResizer?: ImageResizer;
+
+    /**
+     * Translation language of the space.
+     */
+    locale?: TranslationLanguage;
 };
 
 /**
@@ -143,6 +173,15 @@ export type GitBookSiteContext = GitBookSpaceContext & {
 
     /** Whether this request is a fallback rendering. */
     isFallback: boolean;
+
+    /** Whether search indexation is blocked for this deployment. */
+    noIndexSearch: boolean;
+
+    /** Whether the request included a visitor token. */
+    isLoggedInVisitor: boolean;
+
+    /** Whether to display agent instructions in the markdown output. Defaults to true when undefined. */
+    displayAgentInstructions?: boolean;
 };
 
 /**
@@ -222,6 +261,9 @@ export async function fetchSiteContextByURLLookup(
         revision: data.revision,
         contextId: data.contextId,
         isFallback: data.isFallback ?? false,
+        noIndexSearch: data.noIndexSearch ?? false,
+        isLoggedInVisitor: data.isLoggedInVisitor ?? false,
+        displayAgentInstructions: data.displayAgentInstructions,
     });
 }
 
@@ -241,6 +283,9 @@ export async function fetchSiteContextByIds(
         revision: string | undefined;
         contextId?: string;
         isFallback: boolean;
+        noIndexSearch: boolean;
+        isLoggedInVisitor: boolean;
+        displayAgentInstructions?: boolean;
     }
 ): Promise<GitBookSiteContext> {
     const { dataFetcher } = baseContext;
@@ -256,13 +301,6 @@ export async function fetchSiteContextByIds(
             ),
             fetchSpaceContextByIds(baseContext, ids),
         ]);
-
-    // override the title with the customization title
-    // TODO: remove this hack once we have a proper way to handle site customizations
-    const site = {
-        ...orgSite,
-        ...(customizations.site?.title ? { title: customizations.site.title } : {}),
-    };
 
     const sections = ids.siteSection
         ? parseSiteSectionsAndGroups(siteStructure, ids.siteSection)
@@ -336,8 +374,26 @@ export async function fetchSiteContextByIds(
         return customizations.site;
     })();
 
+    // override the title with the customization title
+    // TODO: remove this hack once we have a proper way to handle site customizations
+    const site = {
+        ...orgSite,
+        ...(customizations.site?.title
+            ? {
+                  title: getLocalizedTitle(
+                      {
+                          title: customizations.site.title,
+                          localizedTitle: customizations.site.localizedTitle,
+                      },
+                      siteSpace.space.language
+                  ),
+              }
+            : {}),
+    };
+
     return {
         ...spaceContext,
+        locale: siteSpace.space.language ?? spaceContext.locale,
         linker: site.urls.published
             ? linkerForPublishedURL(spaceContext.linker, site.urls.published)
             : spaceContext.linker,
@@ -353,6 +409,57 @@ export async function fetchSiteContextByIds(
         scripts,
         contextId: ids.contextId,
         isFallback: ids.isFallback,
+        noIndexSearch: ids.noIndexSearch,
+        isLoggedInVisitor: ids.isLoggedInVisitor,
+        displayAgentInstructions: ids.displayAgentInstructions,
+    };
+}
+
+/**
+ * Create a site context scoped to a specific site space.
+ * This keeps the site structure from the current context while resolving content
+ * against the target space revision.
+ */
+export async function fetchSiteContextForSiteSpace(
+    baseContext: GitBookSiteContext,
+    siteSpace: SiteSpace
+): Promise<GitBookSiteContext> {
+    const found = findSiteSpaceBy(baseContext.structure, (entry) => entry.id === siteSpace.id);
+
+    if (!found) {
+        throw new Error(`Site space "${siteSpace.id}" not found in site structure`);
+    }
+
+    const spaceContext = await fetchSpaceContextByIds(baseContext, {
+        space: siteSpace.space.id,
+        shareKey: baseContext.shareKey,
+        changeRequest: undefined,
+        revision: siteSpace.space.revision,
+    });
+
+    const siteSpaces =
+        baseContext.structure.type === 'siteSpaces'
+            ? baseContext.structure.structure
+            : (found.siteSection?.siteSpaces ?? baseContext.siteSpaces);
+
+    return {
+        ...baseContext,
+        ...spaceContext,
+        locale: siteSpace.space.language ?? spaceContext.locale,
+        linker: baseContext.linker.withOtherSiteSpace({
+            spaceBasePath: getFallbackSiteSpacePath(baseContext, siteSpace),
+        }),
+        siteSpace,
+        siteSpaces,
+        visibleSiteSpaces: filterHiddenSiteSpaces(siteSpaces),
+        sections:
+            baseContext.sections && found.siteSection
+                ? { ...baseContext.sections, current: found.siteSection }
+                : baseContext.sections,
+        visibleSections:
+            baseContext.visibleSections && found.siteSection
+                ? { ...baseContext.visibleSections, current: found.siteSection }
+                : baseContext.visibleSections,
     };
 }
 
@@ -412,6 +519,7 @@ export async function fetchSpaceContextByIds(
     return {
         ...baseContext,
         organizationId: space.organization,
+        locale: space.language,
         space,
         revision,
         revisionId,

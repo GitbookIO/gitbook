@@ -1,6 +1,11 @@
 import type { GitBookSiteContext } from '@/lib/context';
 import { redirect } from 'next/navigation';
 
+import {
+    SITE_REDIRECT_SOURCE_PATH_MAX_LENGTH,
+    SITE_REDIRECT_SOURCE_PATH_PATTERN,
+} from '@gitbook/api';
+
 import { getDataOrNull } from '@/lib/data';
 import { resolvePageId, resolvePagePath } from '@/lib/pages';
 import { withLeadingSlash } from '@/lib/paths';
@@ -53,38 +58,37 @@ async function resolvePage(context: GitBookSiteContext, params: PagePathParams |
 
     // We don't test path that are too long as GitBook doesn't support them and will return a 404 anyway.
     // API has a limit of less than 512 characters for the source path, so we use the same limit here.
-    if (rawPathname.length < 512) {
-        // Duplicated the regex pattern from SiteRedirectSourcePath API type.
-        const SITE_REDIRECT_SOURCE_PATH_REGEX =
-            /^\/(?:[A-Za-z0-9\-._~]|%[0-9A-Fa-f]{2})+(?:\/(?:[A-Za-z0-9\-._~]|%[0-9A-Fa-f]{2})+)*$/;
+    if (rawPathname.length < SITE_REDIRECT_SOURCE_PATH_MAX_LENGTH) {
+        const SITE_REDIRECT_SOURCE_PATH_REGEX = new RegExp(SITE_REDIRECT_SOURCE_PATH_PATTERN);
         const redirectPathname = withLeadingSlash(rawPathname);
         // If a page can't be found, we try with the API, in case we have a redirect at site level.
-        if (SITE_REDIRECT_SOURCE_PATH_REGEX.test(redirectPathname)) {
-            const redirectSources = new Set<string>([
+        const redirectSources = new Set(
+            [
                 // Test the pathname relative to the root
                 // For example hello/world -> section/variant/hello/world
-                withLeadingSlash(
-                    linker.toRelativePathInSite(linker.toPathInSpace(redirectPathname))
-                ),
+                linker.toRelativePathInSite(linker.toPathInSpace(redirectPathname)),
                 // Test the pathname relative to the content/space
                 // For example hello/world -> /hello/world
                 redirectPathname,
-            ]);
-            for (const source of redirectSources) {
-                // We try to resolve the site redirect
-                const resolvedSiteRedirect =
-                    source.length < 512 &&
-                    (await getDataOrNull(
-                        context.dataFetcher.getSiteRedirectBySource({
-                            organizationId,
-                            siteId: site.id,
-                            source,
-                            siteShareKey: shareKey,
-                        })
-                    ));
-                if (resolvedSiteRedirect) {
-                    return redirect(linker.toLinkForContent(resolvedSiteRedirect.target));
-                }
+            ]
+                .map(toSiteRedirectSourceCandidate)
+                .filter((source) => SITE_REDIRECT_SOURCE_PATH_REGEX.test(source))
+        );
+
+        for (const source of redirectSources) {
+            // We try to resolve the site redirect
+            const resolvedSiteRedirect =
+                source.length < SITE_REDIRECT_SOURCE_PATH_MAX_LENGTH &&
+                (await getDataOrNull(
+                    context.dataFetcher.getSiteRedirectBySource({
+                        organizationId,
+                        siteId: site.id,
+                        source,
+                        siteShareKey: shareKey,
+                    })
+                ));
+            if (resolvedSiteRedirect) {
+                return redirect(linker.toLinkForContent(resolvedSiteRedirect.target));
             }
         }
 
@@ -104,6 +108,21 @@ async function resolvePage(context: GitBookSiteContext, params: PagePathParams |
     }
 
     return undefined;
+}
+
+/**
+ * Transform a pathname into a candidate source for site redirect matching.
+ * We also encode each segment to handle special characters in redirects.
+ */
+function toSiteRedirectSourceCandidate(pathname: string): string {
+    const normalized = withLeadingSlash(pathname);
+    return withLeadingSlash(
+        normalized
+            .slice(1)
+            .split('/')
+            .map((segment) => encodeURIComponent(segment))
+            .join('/')
+    );
 }
 
 /**

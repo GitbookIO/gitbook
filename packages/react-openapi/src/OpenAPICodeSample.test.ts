@@ -50,6 +50,71 @@ describe('getSecurityHeaders', () => {
         });
     });
 
+    it('should use default placeholder for basic auth', () => {
+        const securities: OpenAPIOperationData['securities'] = [
+            [
+                'basicAuth',
+                {
+                    type: 'http',
+                    scheme: 'basic',
+                },
+            ],
+        ];
+
+        const result = getSecurityHeaders({
+            securityRequirement: [{ basicAuth: [] }],
+            securities,
+        });
+
+        expect(result).toEqual({
+            Authorization: 'Basic username:password',
+        });
+    });
+
+    it('should use x-gitbook-token-placeholder for basic auth', () => {
+        const securities: OpenAPIOperationData['securities'] = [
+            [
+                'basicAuth',
+                {
+                    type: 'http',
+                    scheme: 'basic',
+                    'x-gitbook-token-placeholder': 'admin:secret123',
+                },
+            ],
+        ];
+
+        const result = getSecurityHeaders({
+            securityRequirement: [{ basicAuth: [] }],
+            securities,
+        });
+
+        expect(result).toEqual({
+            Authorization: 'Basic admin:secret123',
+        });
+    });
+
+    it('should use x-gitbook-token-placeholder for bearer auth', () => {
+        const securities: OpenAPIOperationData['securities'] = [
+            [
+                'bearerAuth',
+                {
+                    type: 'http',
+                    scheme: 'bearer',
+                    'x-gitbook-token-placeholder': 'MY_CUSTOM_TOKEN',
+                },
+            ],
+        ];
+
+        const result = getSecurityHeaders({
+            securityRequirement: [{ bearerAuth: [] }],
+            securities,
+        });
+
+        expect(result).toEqual({
+            Authorization: 'Bearer MY_CUSTOM_TOKEN',
+        });
+    });
+
     it('should not use x-gitbook-prefix for http scheme', () => {
         const securities: OpenAPIOperationData['securities'] = [
             [

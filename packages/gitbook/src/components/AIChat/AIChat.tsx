@@ -9,6 +9,7 @@ import { useHotkeys } from 'react-hotkeys-hook';
 import {
     type AIChatController,
     type AIChatState,
+    getAIChatStatus,
     useAI,
     useAIChatController,
     useAIChatState,
@@ -27,10 +28,15 @@ import { useTrackEvent } from '../Insights';
 import { useNow } from '../hooks';
 import { Button } from '../primitives';
 import { ScrollContainer } from '../primitives/ScrollContainer';
+import { SideSheet } from '../primitives/SideSheet';
+import { AIChatControl } from './AIChatControl';
 import { AIChatControlButton } from './AIChatControlButton';
+import { AIChatExpandButton } from './AIChatExpandButton';
 import { AIChatIcon } from './AIChatIcon';
 import { AIChatInput } from './AIChatInput';
 import { AIChatMessages } from './AIChatMessages';
+import { AIChatQueuedMessage } from './AIChatQueuedMessage';
+import { AIChatResizeHandle } from './AIChatResizeHandle';
 import AIChatSuggestedQuestions from './AIChatSuggestedQuestions';
 
 export function AIChat() {
@@ -69,26 +75,36 @@ export function AIChat() {
     }, [chat.opened, trackEvent]);
 
     return (
-        <div
+        <SideSheet
+            side="right"
+            open={chat.opened}
+            onOpenChange={(open) => {
+                if (open) {
+                    chatController.open();
+                } else {
+                    chatController.close();
+                }
+            }}
+            withOverlay={true}
+            data-ai-chat
             className={tcls(
-                'ai-chat inset-y-0 right-0 z-40 mx-auto flex max-w-3xl scroll-mt-36 px-4 py-4 transition-[width,opacity,margin,display] transition-discrete duration-300 sm:px-6 lg:fixed lg:w-80 lg:p-0 xl:w-96',
-                chat.opened
-                    ? 'lg:starting:ml-0 lg:starting:w-0 lg:starting:opacity-0'
-                    : 'hidden lg:ml-0 lg:w-0! lg:opacity-0'
+                'ai-chat mx-auto ml-8 not-hydrated:hidden w-96 transition-[width] duration-300 ease-quint lg:w-(--ai-chat-width)'
             )}
         >
-            <EmbeddableFrame className="relative shrink-0 border-tint-subtle border-l to-tint-base transition-all duration-300 max-lg:circular-corners:rounded-3xl max-lg:rounded-corners:rounded-md max-lg:border lg:w-80 xl:w-96">
-                <EmbeddableFrameMain data-testid="ai-chat">
-                    <EmbeddableFrameHeader>
+            <AIChatResizeHandle />
+            <EmbeddableFrame className="relative w-full shrink-0 border-tint-subtle border-l to-tint-base">
+                <EmbeddableFrameMain data-testid="ai-chat" aria-busy={chat.loading}>
+                    <EmbeddableFrameHeader className="not-embed:px-4">
                         <AIChatDynamicIcon trademark={config.trademark} />
                         <EmbeddableFrameHeaderMain>
                             <EmbeddableFrameTitle>
-                                {getAIChatName(language, config.trademark)}
+                                {config.assistantName ?? getAIChatName(language, config.trademark)}
                             </EmbeddableFrameTitle>
                             <AIChatSubtitle chat={chat} />
                         </EmbeddableFrameHeaderMain>
                         <EmbeddableFrameButtons>
                             <AIChatControlButton />
+                            <AIChatExpandButton />
                             <Button
                                 onClick={() => chatController.close()}
                                 iconOnly
@@ -98,16 +114,18 @@ export function AIChat() {
                             />
                         </EmbeddableFrameButtons>
                     </EmbeddableFrameHeader>
-                    <EmbeddableFrameBody>
+                    <EmbeddableFrameBody className="not-embed:px-0">
                         <AIChatBody
                             chatController={chatController}
                             chat={chat}
                             suggestions={config.suggestions}
+                            trademark={config.trademark}
+                            assistantName={config.assistantName}
                         />
                     </EmbeddableFrameBody>
                 </EmbeddableFrameMain>
             </EmbeddableFrame>
-        </div>
+        </SideSheet>
     );
 }
 
@@ -120,24 +138,13 @@ export function AIChatDynamicIcon(props: {
 }) {
     const { trademark, className } = props;
     const chat = useAIChatState();
+    const status = getAIChatStatus(chat);
 
     return (
         <AIChatIcon
             className={tcls('size-5 text-tint', className)}
             trademark={trademark}
-            state={
-                chat.error
-                    ? 'error'
-                    : chat.loading
-                      ? chat.messages[chat.messages.length - 1]?.content
-                          ? 'working'
-                          : 'thinking'
-                      : chat.messages.length > 0
-                        ? chat.pendingTools.length > 0
-                            ? 'confirm'
-                            : 'done'
-                        : 'default'
-            }
+            state={status}
         />
     );
 }
@@ -150,35 +157,45 @@ export function AIChatSubtitle(props: {
 }) {
     const { chat } = props;
     const language = useLanguage();
+    const status = getAIChatStatus(chat);
+    const subtitleKey =
+        status === 'thinking'
+            ? 'ai_chat_thinking'
+            : status === 'exploring'
+              ? 'ai_chat_exploring'
+              : status === 'working'
+                ? 'ai_chat_working'
+                : status === 'confirm'
+                  ? 'ai_chat_waiting'
+                  : null;
 
     return (
         <EmbeddableFrameSubtitle
-            className={tcls('relative', chat.loading ? 'h-3 opacity-11' : 'h-0 opacity-0')}
+            className={tcls('relative', subtitleKey ? 'h-3 opacity-11' : 'h-0 opacity-0')}
         >
-            <span
-                className={tcls(
-                    'absolute left-0',
-                    chat.loading
-                        ? chat.messages[chat.messages.length - 1]?.content
-                            ? 'animate-blur-in-slow'
-                            : 'hidden'
-                        : 'animate-blur-out-slow'
-                )}
-            >
-                {t(language, 'ai_chat_working')}
-            </span>
-            <span
-                className={tcls(
-                    'absolute left-0',
-                    chat.loading
-                        ? chat.messages[chat.messages.length - 1]?.content
-                            ? 'animate-blur-out-slow'
-                            : 'animate-blur-in-slow'
-                        : 'hidden'
-                )}
-            >
-                {t(language, 'ai_chat_thinking')}
-            </span>
+            {(
+                [
+                    ['thinking', 'ai_chat_thinking'],
+                    ['exploring', 'ai_chat_exploring'],
+                    ['working', 'ai_chat_working'],
+                    ['confirm', 'ai_chat_waiting'],
+                ] as const
+            ).map(([candidateStatus, key]) => (
+                <span
+                    key={candidateStatus}
+                    className={tcls(
+                        'absolute left-0',
+                        status === candidateStatus
+                            ? 'animate-blur-in-display-slow'
+                            : 'animate-blur-out-display-slow'
+                    )}
+                    style={{
+                        animationDelay: status === candidateStatus ? '.3s' : undefined,
+                    }}
+                >
+                    {subtitleKey ? t(language, key) : null}
+                </span>
+            ))}
         </EmbeddableFrameSubtitle>
     );
 }
@@ -191,15 +208,18 @@ export function AIChatBody(props: {
     chat: AIChatState;
     welcomeMessage?: string;
     suggestions?: string[];
+    trademark?: boolean;
+    /** Custom assistant name override; falls back to the branded/unbranded default name. */
+    assistantName?: string;
     greeting?: {
         title: string;
         subtitle: string;
     };
 }) {
-    const { chatController, chat, suggestions, greeting } = props;
-    const { trademark } = useAI().config;
+    const { chatController, chat, suggestions, greeting, trademark, assistantName } = props;
 
     const language = useLanguage();
+    const resolvedAssistantName = assistantName ?? getAIChatName(language, trademark ?? true);
     const now = useNow(60 * 60 * 1000); // Refresh every hour for greeting
 
     const isEmpty = !chat.messages.length;
@@ -215,11 +235,11 @@ export function AIChatBody(props: {
     return (
         <>
             <ScrollContainer
-                className="shrink grow basis-80 animate-fade-in-slow [container-type:size]"
-                contentClassName="p-4 gutter-stable flex flex-col gap-4"
+                className="min-h-[20%] max-w-full shrink grow animate-fade-in-slow [container-type:size]"
+                contentClassName="py-4 gutter-stable flex flex-col gap-4 not-embed:px-4 [scroll-behavior:smooth]"
                 orientation="vertical"
-                fadeEdges={['leading']}
-                active={`message-group-${chat.messages.filter((message) => message.role === 'user').length - 1}`}
+                trailing={{ fade: false, button: true }}
+                active={`#message-group-${chat.messages.filter((message) => message.role === 'user').length - 1}`}
             >
                 {isEmpty ? (
                     <div className="flex grow flex-col">
@@ -264,13 +284,25 @@ export function AIChatBody(props: {
                 )}
             </ScrollContainer>
 
-            <div className="flex flex-col gap-2 px-4 pb-4">
+            <div className="flex max-h-3/4 min-h-0 flex-col gap-2 not-embed:px-4 pb-4">
+                {!chat.error &&
+                    chat.queuedMessages.map((message, index) => (
+                        <AIChatQueuedMessage
+                            // Queue order is stable and items carry no local state, so the index is a
+                            // safe key here.
+                            key={index}
+                            message={message}
+                            assistantName={resolvedAssistantName}
+                            onRemove={() => chatController.cancelQueuedMessage(index)}
+                        />
+                    ))}
                 {/* Display an error banner when something went wrong. */}
                 {chat.error ? <AIChatError chatController={chatController} /> : null}
 
+                {chat.control ? <AIChatControl control={chat.control} /> : null}
                 <AIChatInput
-                    loading={chat.loading}
-                    disabled={chat.loading || chat.error}
+                    responding={chat.responding}
+                    disabled={chat.error}
                     onSubmit={(value) => {
                         chatController.postMessage({ message: value });
                     }}

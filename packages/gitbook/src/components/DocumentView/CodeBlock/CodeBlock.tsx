@@ -1,6 +1,10 @@
 import * as React from 'react';
 
-import type { DocumentBlockCode } from '@gitbook/api';
+import type {
+    CustomizationThemedCodeTheme,
+    DocumentBlockCode,
+    SiteCustomizationSettings,
+} from '@gitbook/api';
 
 import { getNodeFragmentByType } from '@/lib/document';
 
@@ -8,14 +12,32 @@ import type { BlockProps } from '../Block';
 import { Blocks } from '../Blocks';
 import { ClientCodeBlock } from './ClientCodeBlock';
 import { CodeBlockRenderer } from './CodeBlockRenderer';
-import { type RenderedInline, getInlines, highlight } from './highlight';
+import { MermaidCodeBlockLazy } from './MermaidCodeBlockLazy';
+import { highlight } from './highlight';
+import { type RenderedInline, getInlines } from './highlight-tokens';
 
 /**
  * Render a code block, can be client-side or server-side.
  */
-export async function CodeBlock(props: BlockProps<DocumentBlockCode>) {
-    const { block, document, style, isEstimatedOffscreen, context } = props;
+export async function CodeBlock(
+    props: BlockProps<DocumentBlockCode> & {
+        themeKey?: keyof SiteCustomizationSettings['styling']['codeTheme'];
+        themes?: CustomizationThemedCodeTheme;
+        embedded?: boolean;
+    }
+) {
+    const {
+        block,
+        document,
+        style,
+        isEstimatedOffscreen,
+        context,
+        themeKey = 'default',
+        themes: providedThemes,
+        embedded,
+    } = props;
     const inlines = getInlines(block);
+    const isMermaid = block.data.syntax?.toLowerCase() === 'mermaid';
 
     let hasInlineExpression = false;
 
@@ -50,10 +72,27 @@ export async function CodeBlock(props: BlockProps<DocumentBlockCode>) {
             return { inline, body };
         });
 
-    if (!isEstimatedOffscreen && !hasInlineExpression && !block.data.expandable) {
+    // Get code themes from customization
+    const themes =
+        providedThemes ??
+        (context.contentContext && 'customization' in context.contentContext
+            ? context.contentContext.customization.styling.codeTheme[themeKey]
+            : undefined);
+
+    if (!isMermaid && !isEstimatedOffscreen && !hasInlineExpression && !block.data.expandable) {
         // In v2, we render the code block server-side
-        const lines = await highlight(block, richInlines);
-        return <CodeBlockRenderer block={block} style={style} lines={lines} />;
+        const theme = await highlight(block, richInlines, {
+            themes: themes,
+        });
+        return (
+            <CodeBlockRenderer
+                block={block}
+                style={style}
+                theme={theme}
+                isPrint={context.mode === 'print'}
+                embedded={embedded}
+            />
+        );
     }
 
     const variables = context.contentContext
@@ -66,15 +105,23 @@ export async function CodeBlock(props: BlockProps<DocumentBlockCode>) {
           }
         : {};
 
+    const clientProps = {
+        block,
+        style,
+        inlines: richInlines,
+        inlineExprVariables: variables,
+        mode: context.mode,
+        themes,
+        embedded,
+    };
+
     return (
         <React.Suspense fallback={null}>
-            <ClientCodeBlock
-                block={block}
-                style={style}
-                inlines={richInlines}
-                inlineExprVariables={variables}
-                mode={context.mode}
-            />
+            {isMermaid ? (
+                <MermaidCodeBlockLazy {...clientProps} />
+            ) : (
+                <ClientCodeBlock {...clientProps} />
+            )}
         </React.Suspense>
     );
 }

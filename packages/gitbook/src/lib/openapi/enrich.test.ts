@@ -13,7 +13,7 @@ describe('#enrichFilesystem', () => {
         });
         const enriched = await enrichFilesystem(filesystem);
         expect(enriched[0]?.specification.paths['/pet'].put['x-gitbook-description-html']).toBe(
-            '<p>Social platform</p>'
+            '<p>Social platform<br>Hello</p>'
         );
     });
 });

@@ -19,7 +19,7 @@ export function getDefaultServerURL(servers: OpenAPIV3.ServerObject[]): string {
 export function interpolateServerURL(server: OpenAPIV3.ServerObject) {
     const parts = parseServerURL(server?.url ?? '');
 
-    return parts
+    const url = parts
         .map((part) => {
             if (part.kind === 'text') {
                 return part.text;
@@ -27,6 +27,9 @@ export function interpolateServerURL(server: OpenAPIV3.ServerObject) {
             return server.variables?.[part.name]?.default ?? `{${part.name}}`;
         })
         .join('');
+
+    // Remove trailing slash to avoid double slashes when concatenated with paths
+    return url.endsWith('/') ? url.slice(0, -1) : url;
 }
 
 function parseServerURL(url: string) {
@@ -44,4 +47,63 @@ function parseServerURL(url: string) {
         }
     }
     return result;
+}
+
+/**
+ * Check if any server has a host that can be used in an HTTP request.
+ * This is used to determine if the "Try it" button should be shown.
+ */
+export function hasValidServerHost(servers: OpenAPIV3.ServerObject[]): boolean {
+    if (servers.length === 0) {
+        return false;
+    }
+
+    return servers.some((server) => {
+        const url = interpolateServerURL(server);
+        return isValidServerHost(url);
+    });
+}
+
+/**
+ * Get the unique host+path entries from a list of servers (using default variable values).
+ * Used to build the allowlist for the OpenAPI proxy.
+ * Returns entries like "api.example.com/v1" (without protocol or trailing slash).
+ */
+export function getAllServerOrigins(servers: OpenAPIV3.ServerObject[]): string[] {
+    const origins = new Set<string>();
+
+    for (const server of servers) {
+        const url = interpolateServerURL(server);
+        const origin = extractOrigin(url);
+        if (origin) {
+            origins.add(origin);
+        }
+    }
+
+    return Array.from(origins);
+}
+
+/**
+ * Extract the host and path from a URL string by stripping the protocol and trailing slash.
+ * e.g. "https://api.example.com/v1/" → "api.example.com/v1"
+ */
+export function extractOrigin(url: string): string | null {
+    const stripped = url.replace(/^https?:\/\//, '').replace(/\/+$/, '');
+    if (!stripped) {
+        return null;
+    }
+    return stripped;
+}
+
+/**
+ * Check if the server host/URL is valid for making direct HTTP requests.
+ * Accepts both full URLs (with protocol) and hostnames (without protocol).
+ */
+export function isValidServerHost(url: string): boolean {
+    // Check if URL starts with http:// or https://
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+        return true;
+    }
+
+    return /^(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$/.test(url);
 }

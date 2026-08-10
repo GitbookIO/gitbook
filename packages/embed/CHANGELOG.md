@@ -1,5 +1,50 @@
 # @gitbook/embed
 
+## 0.5.1
+
+### Patch Changes
+
+- 37a9453: Allow copying in embed
+- Updated dependencies [47c8ccb]
+  - @gitbook/icons@0.5.0
+
+## 0.5.0
+
+### Minor Changes
+
+- 88c38fa: Add Search tab to Docs Embed, refactor search
+
+### Patch Changes
+
+- 8d2a95b: Docs Embed: Better support light/dark mode overrides
+
+## 0.4.0
+
+### Minor Changes
+
+- b3875a1: Support `assistantName` property to override Assistant name
+
+## 0.3.0
+
+### Minor Changes
+
+- 370b731: Docs Embed: Make trademark optional
+
+## 0.2.2
+
+### Patch Changes
+
+- b4b471f: Fix unexpected error thrown when using the embed in standalone mode
+
+## 0.2.1
+
+### Patch Changes
+
+- 96e24a1: Fix signed JWT token usage
+- 0aa34cc: Fix Embed options in React
+- Updated dependencies [6f1db32]
+  - @gitbook/icons@0.4.3
+
 ## 0.2.0
 
 ### Minor Changes

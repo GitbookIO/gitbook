@@ -18,6 +18,22 @@ export default defineConfig({
             use: {
                 ...devices['Desktop Chrome'],
                 channel: 'chrome',
+                launchOptions: {
+                    args: [
+                        // Disable subpixel (LCD) text so glyphs always render with
+                        // grayscale antialiasing — removes the red/blue edge fringing
+                        // that varies between macOS (local) and Linux (CI) runs.
+                        '--disable-lcd-text',
+                        // Disable font hinting so glyph rasterization is platform-independent.
+                        '--font-render-hinting=none',
+                        // Force software rendering everywhere so image compositing/downscaling
+                        // always goes through the same filter, whether or not a GPU is present —
+                        // a machine with a real GPU renders images more sharply than headless CI
+                        // (no GPU, SwiftShader fallback), causing smooth-vs-pixelated diffs.
+                        '--disable-gpu',
+                        '--use-gl=swiftshader',
+                    ],
+                },
             },
         },
     ],

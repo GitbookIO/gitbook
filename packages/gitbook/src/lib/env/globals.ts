@@ -59,6 +59,18 @@ export const GITBOOK_API_TOKEN = process.env.GITBOOK_API_TOKEN || null;
 export const GITBOOK_USER_AGENT = process.env.GITBOOK_USER_AGENT || 'GitBook-Open/2.0.0';
 
 /**
+ * URL to the GitBook sites OAuth server.
+ */
+export const GITBOOK_OAUTH_SERVER_URL =
+    process.env.GITBOOK_OAUTH_SERVER_URL || 'https://sites.gitbook.com/oauth2/v1';
+
+/**
+ * Base URL for GitBook preview requests.
+ */
+export const GITBOOK_PREVIEW_BASE_URL =
+    process.env.GITBOOK_PREVIEW_BASE_URL || 'https://sites.gitbook.com/preview/';
+
+/**
  * Whether to disable tracking of events into site insights.
  * This is used to disable tracking in development mode.
  */
@@ -73,6 +85,15 @@ export const GITBOOK_INTEGRATIONS_HOST =
     process.env.GITBOOK_INTEGRATIONS_HOST || 'integrations.gitbook.com';
 
 /**
+ * Hostname serving integration-rendered content (e.g. WebFrames), isolated from the
+ * cookie-bearing integrations origin to remediate stored-XSS on the main origin.
+ * Defaults to `GITBOOK_INTEGRATIONS_HOST` until a distinct content origin is configured,
+ * which keeps behavior unchanged.
+ */
+export const GITBOOK_INTEGRATIONS_CONTENT_HOST =
+    process.env.GITBOOK_INTEGRATIONS_CONTENT_HOST || GITBOOK_INTEGRATIONS_HOST;
+
+/**
  * Hostname for fonts.
  */
 export const GITBOOK_FONTS_URL = process.env.GITBOOK_FONTS_URL || 'https://fonts.gitbook.com';
@@ -84,14 +105,15 @@ export const GITBOOK_FONTS_URL = process.env.GITBOOK_FONTS_URL || 'https://fonts
 export const GITBOOK_IMAGE_RESIZE_URL = process.env.GITBOOK_IMAGE_RESIZE_URL ?? null;
 export const GITBOOK_IMAGE_RESIZE_SIGNING_KEY =
     process.env.GITBOOK_IMAGE_RESIZE_SIGNING_KEY ?? null;
+export const GITBOOK_IMAGE_RESIZE_SALT = process.env.GITBOOK_IMAGE_RESIZE_SALT ?? null;
 
 /**
  * Mode used for resizing images.
  */
 export const GITBOOK_IMAGE_RESIZE_MODE = enforceEnum(
     'GITBOOK_IMAGE_RESIZE_MODE',
-    process.env.GITBOOK_IMAGE_RESIZE_MODE || 'cdn-cgi',
-    ['cdn-cgi', 'cf-fetch']
+    process.env.GITBOOK_IMAGE_RESIZE_MODE || 'cf-fetch',
+    ['cf-fetch', 'gitbook-service', 'cdn-cgi']
 );
 
 /**
@@ -109,6 +131,14 @@ export const GITBOOK_ICONS_TOKEN = process.env.GITBOOK_ICONS_TOKEN;
  * Secret used to validate requests from the GitBook app.
  */
 export const GITBOOK_SECRET = process.env.GITBOOK_SECRET ?? null;
+
+/**
+ * Shared secret used to sign server-to-server requests to the sites OAuth server consent endpoints.
+ * This must match the sites OAuth provider signing secret (`functionsConfig.sitesOAuth.signingSecret`
+ * in gitbook-x); it is a dedicated secret and must not be confused with `GITBOOK_SECRET`.
+ */
+export const GITBOOK_SITE_OAUTH_SIGNING_SECRET =
+    process.env.GITBOOK_SITE_OAUTH_SIGNING_SECRET ?? null;
 
 function enforceEnum<T extends string>(key: string, value: string, enumValues: T[]): T {
     if (!enumValues.includes(value as T)) {

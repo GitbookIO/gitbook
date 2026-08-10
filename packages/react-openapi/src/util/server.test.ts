@@ -23,6 +23,25 @@ describe('#interpolateServerURL', () => {
         expect(result).toBe('https://{username}.example.com/{basePath}');
     });
 
+    it('strips trailing slash from the server URL', () => {
+        const server: OpenAPIV3.ServerObject = {
+            url: '/butler/api/',
+        };
+        const result = interpolateServerURL(server);
+        expect(result).toBe('/butler/api');
+    });
+
+    it('strips trailing slash after variable interpolation', () => {
+        const server: OpenAPIV3.ServerObject = {
+            url: 'https://example.com/{basePath}/',
+            variables: {
+                basePath: { default: 'v1' },
+            },
+        };
+        const result = interpolateServerURL(server);
+        expect(result).toBe('https://example.com/v1');
+    });
+
     it('returns the URL with mixed placeholders and default values', () => {
         const server: OpenAPIV3.ServerObject = {
             url: 'https://{username}.example.com/{basePath}',

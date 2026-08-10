@@ -33,7 +33,13 @@ function OpenAPICodeSampleHeader(props: {
 
     return (
         <>
-            <OpenAPIPath context={context} canCopy={false} withServer={false} data={data} />
+            <OpenAPIPath
+                context={context}
+                canCopy={false}
+                withServer={false}
+                data={data}
+                methodBadgeSize="small"
+            />
             {items.length > 1 ? (
                 <OpenAPISelect
                     icon={selectIcon}

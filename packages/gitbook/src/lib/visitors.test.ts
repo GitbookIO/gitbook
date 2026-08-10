@@ -13,8 +13,24 @@ import {
 describe('getVisitorAuthToken', () => {
     it('should return the token from the query parameters', () => {
         expect(
-            getVisitorToken({ cookies: [], url: new URL('https://example.com?jwt_token=123') })
+            getVisitorToken({
+                cookies: [],
+                headers: new Headers(),
+                url: new URL('https://example.com?jwt_token=123'),
+            })
         ).toEqual({ source: 'url', token: '123' });
+    });
+
+    it('should return a revalidation token for requests from the revalidation worker', () => {
+        expect(
+            getVisitorToken({
+                cookies: [],
+                headers: new Headers({
+                    'User-Agent': 'GitBook-Open-Revalidation-Worker',
+                }),
+                url: new URL('https://example.com?jwt_token=123'),
+            })
+        ).toEqual({ source: 'revalidation', token: '123' });
     });
 
     it('should return the token from the cookie root basepath', () => {
@@ -25,6 +41,7 @@ describe('getVisitorAuthToken', () => {
                     value: getVisitorAuthCookieValue('/', '123'),
                 },
             ],
+            headers: new Headers(),
             url: new URL('https://example.com'),
         });
         assertVisitorAuthCookieValue(visitorAuth);
@@ -39,6 +56,7 @@ describe('getVisitorAuthToken', () => {
                     value: getVisitorAuthCookieValue('/', '123'),
                 },
             ],
+            headers: new Headers(),
             url: new URL('https://example.com/hello/world'),
         });
         assertVisitorAuthCookieValue(visitorAuth);
@@ -56,6 +74,7 @@ describe('getVisitorAuthToken', () => {
                     value: getVisitorAuthCookieValue('/hello/', '123'),
                 },
             ],
+            headers: new Headers(),
             url: new URL('https://example.com/hello/world'),
         });
         assertVisitorAuthCookieValue(visitorAuth);
@@ -70,6 +89,7 @@ describe('getVisitorAuthToken', () => {
                     value: getVisitorAuthCookieValue('/hello/v/space1/', '123'),
                 },
             ],
+            headers: new Headers(),
             url: new URL('https://example.com/hello/v/space1/cool'),
         });
         assertVisitorAuthCookieValue(visitorAuth);
@@ -80,6 +100,7 @@ describe('getVisitorAuthToken', () => {
         expect(
             getVisitorToken({
                 cookies: [],
+                headers: new Headers(),
                 url: new URL('https://example.com'),
             })
         ).toBeUndefined();
@@ -98,10 +119,107 @@ describe('getVisitorAuthToken', () => {
                     value: getVisitorAuthCookieValue('/hello/v/space1/', 'gotcha'),
                 },
             ],
+            headers: new Headers(),
             url: new URL('https://example.com/hello/space1/cool'),
         });
         assertVisitorAuthCookieValue(visitorAuth);
         expect(visitorAuth.token).toEqual('gotcha');
+    });
+
+    describe('MCP', () => {
+        it('should return token for MCP request when included in the auth header', () => {
+            expect(
+                getVisitorToken({
+                    cookies: [],
+                    headers: new Headers({
+                        Authorization: 'Bearer token-in-header',
+                    }),
+                    url: new URL('https://docs.acme.org/~gitbook/mcp'),
+                })
+            ).toEqual({
+                source: 'visitor-oauth-protected',
+                token: 'token-in-header',
+            });
+        });
+
+        it('should return token for authenticated MCP request when included in the auth header', () => {
+            expect(
+                getVisitorToken({
+                    cookies: [],
+                    headers: new Headers({
+                        Authorization: 'Bearer token-in-header',
+                    }),
+                    url: new URL('https://docs.acme.org/~gitbook/mcp/auth'),
+                })
+            ).toEqual({
+                source: 'visitor-oauth-protected',
+                token: 'token-in-header',
+            });
+        });
+
+        it('should return undefined for malformced auth header', () => {
+            expect(
+                getVisitorToken({
+                    cookies: [],
+                    headers: new Headers({
+                        Authorization: 'Bearer ',
+                    }),
+                    url: new URL('https://docs.acme.org/~gitbook/mcp'),
+                })
+            ).toBeUndefined();
+        });
+
+        it('should return undefined for empty auth header', () => {
+            expect(
+                getVisitorToken({
+                    cookies: [],
+                    headers: new Headers({
+                        Authorization: ' ',
+                    }),
+                    url: new URL('https://docs.acme.org/~gitbook/mcp'),
+                })
+            ).toBeUndefined();
+        });
+
+        it('should return undefined for auth header with different scheme', () => {
+            expect(
+                getVisitorToken({
+                    cookies: [],
+                    headers: new Headers({
+                        Authorization: 'Basic dXNlcjpwYXNz',
+                    }),
+                    url: new URL('https://docs.acme.org/~gitbook/mcp'),
+                })
+            ).toBeUndefined();
+        });
+
+        it('should return token for MCP request when included in the URL', () => {
+            expect(
+                getVisitorToken({
+                    cookies: [],
+                    headers: new Headers(),
+                    url: new URL('https://docs.acme.org/~gitbook/mcp?access_token=token-in-query'),
+                })
+            ).toEqual({
+                source: 'visitor-oauth-protected',
+                token: 'token-in-query',
+            });
+        });
+
+        it('should return token for authenticated MCP request when included in the URL', () => {
+            expect(
+                getVisitorToken({
+                    cookies: [],
+                    headers: new Headers(),
+                    url: new URL(
+                        'https://docs.acme.org/~gitbook/mcp/auth?access_token=token-in-query'
+                    ),
+                })
+            ).toEqual({
+                source: 'visitor-oauth-protected',
+                token: 'token-in-query',
+            });
+        });
     });
 });
 

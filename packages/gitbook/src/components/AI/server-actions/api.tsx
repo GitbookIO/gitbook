@@ -39,9 +39,7 @@ export async function streamRenderAIMessage(
 
             if (message.steps[stepIndex]) {
                 message.steps = [...message.steps];
-                // @ts-expect-error
                 message.steps[stepIndex] = { ...message.steps[stepIndex] };
-                // @ts-expect-error
                 callback(message.steps[stepIndex]);
             } else {
                 message.steps = [
@@ -67,6 +65,16 @@ export async function streamRenderAIMessage(
             event: AIStreamResponse;
         }>(rawStream, async (event) => {
             switch (event.type) {
+                /**
+                 * A new step started (phase update).
+                 */
+                case 'response_step_start': {
+                    updateProcessingMessageStep(event.stepIndex, (step) => {
+                        step.phase = event.phase;
+                    });
+                    break;
+                }
+
                 /**
                  * The agent is processing a tool call in a new message.
                  */

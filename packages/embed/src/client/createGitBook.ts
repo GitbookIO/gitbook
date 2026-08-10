@@ -9,6 +9,12 @@ export type CreateGitBookOptions = {
 
 export type GetFrameURLOptions = {
     /**
+     * Override the color scheme used by the embedded docs.
+     * When omitted, the embed follows the iframe's CSS `color-scheme`.
+     */
+    colorScheme?: 'light' | 'dark';
+
+    /**
      * Authentication to use for the frame.
      */
     visitor?: {
@@ -42,8 +48,12 @@ export function createGitBook(options: CreateGitBookOptions) {
             const url = new URL(options.siteURL);
             url.pathname = `${url.pathname.endsWith('/') ? url.pathname : `${url.pathname}/`}~gitbook/embed`;
 
+            if (frameOptions.colorScheme) {
+                url.searchParams.set('theme', frameOptions.colorScheme);
+            }
+
             if (frameOptions.visitor?.token) {
-                url.searchParams.set('token', frameOptions.visitor.token);
+                url.searchParams.set('jwt_token', frameOptions.visitor.token);
             }
 
             if (frameOptions.visitor?.unsignedClaims) {

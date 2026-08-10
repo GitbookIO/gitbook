@@ -7,18 +7,18 @@ import {
 import { Card, type CardProps } from '@/components/primitives';
 import {
     type ResolvedContentRef,
-    resolveContentRef,
     resolveContentRefFallback,
+    resolveContentRefInDocument,
 } from '@/lib/references';
 
 import type { BlockProps } from './Block';
 import { NotFoundRefHoverCard } from './NotFoundRefHoverCard';
 
 export async function BlockContentRef(props: BlockProps<DocumentBlockContentRef>) {
-    const { block, context, style } = props;
+    const { document, block, context, style } = props;
 
     const resolved = context.contentContext
-        ? await resolveContentRef(block.data.ref, context.contentContext, {
+        ? await resolveContentRefInDocument(document, block.data.ref, context.contentContext, {
               resolveAnchorText: true,
               iconStyle: ['text-xl', 'text-tint'],
           })

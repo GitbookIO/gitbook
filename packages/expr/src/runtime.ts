@@ -11,7 +11,7 @@ import {
 import { parse as parseLoose } from 'acorn-loose';
 import escodegen from 'escodegen';
 import evalESTreeExpr from 'eval-estree-expression';
-const { evaluate } = evalESTreeExpr;
+const { evaluate, variables } = evalESTreeExpr;
 
 import { AutoComplete } from './autocomplete';
 import { ExpressionError } from './errors';
@@ -160,6 +160,28 @@ export class ExpressionRuntime {
                 return formatExpressionResult(result, '');
             })
             .join('');
+    }
+
+    /**
+     * Given an expression, returns a list of variables used in the expression.
+     */
+    public getVariables(expr: string): string[] {
+        try {
+            const parsed = this.parse(expr);
+
+            if (parsed.invalidNodes.length > 0) {
+                throw new ExpressionError('Invalid nodes found when parsing');
+            }
+
+            return variables(parsed.result, {
+                functions: true,
+                withMembers: true,
+                generate: escodegen.generate,
+            });
+        } catch (error) {
+            this.#logger.error(`Error while parsing expression ${expr} to get variables`, error);
+            return [];
+        }
     }
 
     /**

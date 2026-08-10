@@ -4,10 +4,10 @@ import NextLink, { type LinkProps as NextLinkProps } from 'next/link';
 import React from 'react';
 
 import { tcls } from '@/lib/tailwind';
-import { SiteExternalLinksTarget } from '@gitbook/api';
+import { getSamePageAnchor, resolveAnchorURL } from '@/lib/urls';
 import { type TrackEventInput, useTrackEvent } from '../Insights';
-import { NavigationStatusContext } from '../hooks';
-import { isExternalLink } from '../utils/link';
+import { NavigationStatusContext, scrollToHash } from '../hooks';
+import { isExternalLink, toNonEmbedLink } from '../utils/link';
 import { type DesignTokenName, useClassnames } from './StyleProvider';
 
 // Props from Next, which includes NextLinkProps and all the things anchor elements support.
@@ -34,13 +34,19 @@ export type LinkProps = Omit<BaseLinkProps, 'href'> &
         classNames?: DesignTokenName[];
     };
 
+type LinkTarget = '_blank' | '_self';
+
+export type LinkContextType = {
+    externalTarget: LinkTarget;
+    isExternalServer?: ((href: string) => boolean) | undefined;
+    isExternalClient?: ((href: string) => boolean) | undefined;
+};
+
 /**
  * Context to configure the default behavior of links.
  */
-export const LinkSettingsContext = React.createContext<{
-    externalLinksTarget: SiteExternalLinksTarget;
-}>({
-    externalLinksTarget: SiteExternalLinksTarget.Self,
+export const LinkContext = React.createContext<LinkContextType>({
+    externalTarget: '_self',
 });
 
 /**
@@ -49,18 +55,27 @@ export const LinkSettingsContext = React.createContext<{
 function getTargetProps(
     props: Pick<LinkProps, 'href' | 'rel' | 'target'>,
     context: {
-        externalLinksTarget: SiteExternalLinksTarget;
+        externalTarget: LinkTarget;
         isExternal: boolean;
     }
 ) {
+    if (props.href.startsWith('mailto:')) {
+        return {};
+    }
+
     const target =
         props.target ??
-        (context.isExternal && context.externalLinksTarget === SiteExternalLinksTarget.Blank
-            ? '_blank'
-            : undefined);
+        (context.isExternal && context.externalTarget === '_blank' ? '_blank' : undefined);
     // Automatically set rel if target is _blank, or use the specified rel.
     const rel = props.rel ?? (target === '_blank' ? 'noopener noreferrer' : undefined);
     return { target, rel };
+}
+
+/**
+ * Check if the link is external with the origin.
+ */
+function defaultIsExternalClient(href: string) {
+    return isExternalLink(href, window.location.origin);
 }
 
 /**
@@ -69,41 +84,58 @@ function getTargetProps(
  */
 export function Link(props: LinkProps) {
     const { ref, href, prefetch, children, insights, classNames, className, ...domProps } = props;
-    const { externalLinksTarget } = React.useContext(LinkSettingsContext);
+    const {
+        externalTarget,
+        isExternalClient = defaultIsExternalClient,
+        isExternalServer = isExternalLink,
+    } = React.useContext(LinkContext);
     const { onNavigationClick } = React.useContext(NavigationStatusContext);
     const trackEvent = useTrackEvent();
     const forwardedClassNames = useClassnames(classNames || []);
-    const isExternal = isExternalLink(href);
-    const { target, rel } = getTargetProps(props, { externalLinksTarget, isExternal });
+    const isExternal = isExternalServer(href);
+    const { target, rel } = getTargetProps(props, { externalTarget, isExternal });
 
     const onClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
-        const isExternalWithOrigin = isExternalLink(href, window.location.origin);
         // Only trigger navigation context for internal links in the same window without modifier keys (i.e. open in new tab).
         if (!isExternal && target !== '_blank' && !event.ctrlKey && !event.metaKey) {
-            onNavigationClick(href);
+            const samePageAnchor = getSamePageAnchor(href, window.location);
+            if (samePageAnchor) {
+                event.preventDefault();
+                const resolvedHref = resolveAnchorURL(`#${samePageAnchor}`, window.location);
+                window.history.pushState(null, '', resolvedHref);
+                onNavigationClick(resolvedHref);
+                // Repeated anchor clicks don't change hash state, so the navigation effect won't rerun.
+                scrollToHash(samePageAnchor);
+            } else {
+                onNavigationClick(href);
+            }
         }
 
+        const isExternalOnClient = isExternalClient(href);
+
         if (insights) {
-            trackEvent(insights, undefined, { immediate: isExternalWithOrigin });
+            trackEvent(insights, undefined, { immediate: isExternalOnClient });
         }
 
         const isInIframe = window.self !== window.top;
 
         // When the page is embedded in an iframe
         // for security reasons other urls cannot be opened.
-        if (isInIframe && isExternalWithOrigin) {
-            event.preventDefault();
-            window.open(href, '_blank', 'noopener noreferrer');
+        if (isInIframe) {
+            if (isExternalOnClient || event.ctrlKey || event.metaKey) {
+                event.preventDefault();
+                window.open(toNonEmbedLink(href), '_blank', 'noopener noreferrer');
+            }
         } else if (isExternal && !event.ctrlKey && !event.metaKey) {
             // The external logic server-side is limited
             // so we use the client-side logic to determine the real target
             // by default the target is "_self".
             const { target = '_self' } = getTargetProps(props, {
-                externalLinksTarget,
-                isExternal: isExternalWithOrigin,
+                externalTarget,
+                isExternal: isExternalOnClient,
             });
             event.preventDefault();
-            window.open(href, target, rel);
+            window.open(target === '_blank' ? toNonEmbedLink(href) : href, target, rel);
         }
 
         domProps.onClick?.(event);
@@ -127,9 +159,14 @@ export function Link(props: LinkProps) {
         );
     }
 
-    // Not sure why yet, but it seems necessary to force prefetch to true
-    // default behavior doesn't seem to properly use the client router cache.
-    const _prefetch = prefetch === null || prefetch === undefined ? true : prefetch;
+    // Not sure why yet, but forcing prefetch to true seems necessary for the
+    // client router cache to be used properly.
+    //
+    // However, we need to disable prefetch for links with query params that
+    // can trigger server-side side effects, such as persisting visitor claims in a
+    // cookie or starting the assistant. Automatic RSC prefetch requests can otherwise
+    // trigger those effects without user intent.
+    const _prefetch = hasSideEffectQueryParams(href) ? false : (prefetch ?? true);
 
     return (
         <NextLink
@@ -143,6 +180,31 @@ export function Link(props: LinkProps) {
             {children}
         </NextLink>
     );
+}
+
+/**
+ * Whether the given href carries query params that have a server-side side effect when fetched:
+ *   - `visitor.*` params persist unsigned visitor claims into the `gitbook-visitor-public` cookie.
+ *   - `ask` triggers the assistant & `q` the search.
+ *
+ * NextLink automatically prefetches links (RSC requests) on hover/viewport, which would fire those
+ * side effects without any user intent, so such links should not be prefetched.
+ */
+function hasSideEffectQueryParams(href: string): boolean {
+    const baseURL = typeof window !== 'undefined' ? window.location.origin : 'http://localhost';
+    const linkURL = URL.canParse(href) ? new URL(href) : new URL(href, baseURL);
+
+    if (linkURL.searchParams.get('ask') !== null || linkURL.searchParams.get('q') !== null) {
+        return true;
+    }
+
+    for (const key of linkURL.searchParams.keys()) {
+        if (key.startsWith('visitor.')) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 /**

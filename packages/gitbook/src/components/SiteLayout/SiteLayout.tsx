@@ -1,5 +1,5 @@
 import type { GitBookSiteContext } from '@/lib/context';
-import { CustomizationThemeMode } from '@gitbook/api';
+import { CustomizationDefaultThemeMode } from '@gitbook/api';
 import type { Metadata, Viewport } from 'next';
 import React from 'react';
 import * as ReactDOM from 'react-dom';
@@ -22,7 +22,7 @@ import { SiteLayoutClientContexts } from './SiteLayoutClientContexts';
  */
 export async function SiteLayout(props: {
     context: GitBookSiteContext;
-    forcedTheme?: CustomizationThemeMode | null;
+    forcedTheme?: CustomizationDefaultThemeMode | null;
     withTracking: boolean;
     visitorAuthClaims: VisitorAuthClaims;
     children: React.ReactNode;
@@ -39,6 +39,15 @@ export async function SiteLayout(props: {
         ReactDOM.preconnect(GITBOOK_ASSETS_URL);
     }
 
+    // Start the search-index download from the HTML itself. `crossOrigin` must match the
+    // client `fetch()` (cors + same-origin credentials) or the preload is ignored and the
+    // index downloads twice — the omission was exactly that bug before.
+    ReactDOM.preload(`${context.linker.siteBasePath}~gitbook/site-index`, {
+        as: 'fetch',
+        type: 'application/json',
+        crossOrigin: 'anonymous',
+    });
+
     scripts.forEach(({ script }) => {
         ReactDOM.preload(script, {
             as: 'script',
@@ -50,9 +59,15 @@ export async function SiteLayout(props: {
             contextId={context.contextId}
             forcedTheme={
                 forcedTheme ??
-                (customization.themes.toggeable ? undefined : customization.themes.default)
+                // Only force concrete light/dark; System stays unforced so next-themes resolves prefers-color-scheme pre-paint (avoids the flash). A theme saved while the toggle was previously on still wins — see the PR's "Known limitation". RND-11643
+                (customization.themes.toggeable ||
+                customization.themes.default === CustomizationDefaultThemeMode.System
+                    ? undefined
+                    : customization.themes.default)
             }
+            defaultTheme={customization.themes.default}
             externalLinksTarget={customization.externalLinks.target}
+            proxyOrigin={context.site.proxy?.origin}
         >
             <AIContextProvider
                 aiMode={customization.ai?.mode}
@@ -68,14 +83,10 @@ export async function SiteLayout(props: {
                 </SpaceLayout>
             </AIContextProvider>
 
-            {scripts.length > 0 ? (
-                <>
-                    <LoadIntegrations />
-                    {scripts.map(({ script }) => (
-                        <script key={script} async src={script} />
-                    ))}
-                </>
-            ) : null}
+            <LoadIntegrations />
+            {scripts.length > 0
+                ? scripts.map(({ script }) => <script key={script} async src={script} />)
+                : null}
 
             {scripts.some((script) => script.cookies) || customization.privacyPolicy.url ? (
                 <React.Suspense fallback={null}>
@@ -94,13 +105,17 @@ export async function generateSiteLayoutViewport(context: GitBookSiteContext): P
     const { customization } = context;
     return {
         colorScheme: customization.themes.toggeable
-            ? customization.themes.default === CustomizationThemeMode.Dark
+            ? customization.themes.default === CustomizationDefaultThemeMode.Dark
                 ? 'dark light'
                 : 'light dark'
-            : customization.themes.default,
+            : customization.themes.default === CustomizationDefaultThemeMode.Dark
+              ? 'dark'
+              : customization.themes.default === CustomizationDefaultThemeMode.Light
+                ? 'light'
+                : 'light dark', // 'system' → let browser decide based on OS preference
         width: 'device-width',
         initialScale: 1,
-        maximumScale: 1,
+        viewportFit: 'cover',
     };
 }
 
@@ -186,8 +201,10 @@ export async function generateSiteLayoutMetadata(context: GitBookSiteContext): P
             capable: true,
             title: site.title,
             statusBarStyle:
-                customization.themes.default === CustomizationThemeMode.Dark ? 'black' : 'default',
+                customization.themes.default === CustomizationDefaultThemeMode.Dark
+                    ? 'black'
+                    : 'default',
         },
-        robots: (await isSiteIndexable(context)) ? 'index, follow' : 'noindex, nofollow',
+        robots: isSiteIndexable(context) ? 'index, follow' : 'noindex, nofollow',
     };
 }

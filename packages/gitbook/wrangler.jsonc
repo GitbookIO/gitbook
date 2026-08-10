@@ -7,6 +7,9 @@
         "allow_importable_env",
         "global_fetch_strictly_public"
     ],
+    "observability": {
+        "enabled": false
+    },
     "assets": {
         "directory": ".open-next/assets",
         "binding": "ASSETS"

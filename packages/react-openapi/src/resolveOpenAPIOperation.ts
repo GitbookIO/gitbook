@@ -6,7 +6,7 @@ import type {
 } from '@gitbook/openapi-parser';
 import { dereferenceFilesystem } from './dereference';
 import type { OpenAPIOperationData, OpenAPISecurityScope } from './types';
-import { checkIsReference } from './utils';
+import { checkIsReference, readMcpUrl } from './utils';
 
 export { fromJSON, toJSON } from 'flatted';
 
@@ -37,7 +37,7 @@ export async function resolveOpenAPIOperation(
         };
     }
 
-    const servers = 'servers' in schema ? (schema.servers ?? []) : [];
+    const servers = getServers(schema, path, operation);
     const schemaSecurity = Array.isArray(schema.security)
         ? schema.security
         : schema.security
@@ -50,7 +50,7 @@ export async function resolveOpenAPIOperation(
     const flatSecurities = flattenSecurities(security);
 
     // Resolve securities
-    const securities: OpenAPIOperationData['securities'] = [];
+    const securitiesMap = new Map<string, OpenAPIOperationData['securities'][number][1]>();
     for (const entry of flatSecurities) {
         const [securityKey, operationScopes] = Object.entries(entry)[0] ?? [];
         if (securityKey) {
@@ -59,28 +59,41 @@ export async function resolveOpenAPIOperation(
                 securityScheme,
                 operationScopes,
             });
-            securities.push([
-                securityKey,
-                {
-                    ...securityScheme,
-                    required: !isOptionalSecurity,
-                    scopes,
-                },
-            ]);
+            const existing = securitiesMap.get(securityKey);
+            const mergedScopes = mergeSecurityScopes(existing?.scopes ?? null, scopes);
+            securitiesMap.set(securityKey, {
+                ...securityScheme,
+                required: !isOptionalSecurity,
+                scopes: mergedScopes,
+            });
         }
     }
 
     return {
         servers,
-        operation: { ...operation, security },
+        operation: {
+            ...operation,
+            security,
+            'x-gitbook-mcp-url': getMcpUrl(schema, path, operation),
+        },
         method,
         path,
-        securities,
+        securities: Array.from(securitiesMap.entries()),
         'x-codeSamples':
             typeof schema['x-codeSamples'] === 'boolean' ? schema['x-codeSamples'] : undefined,
         'x-hideTryItPanel':
             typeof schema['x-hideTryItPanel'] === 'boolean'
                 ? schema['x-hideTryItPanel']
+                : undefined,
+        'x-enable-proxy':
+            typeof schema['x-enable-proxy'] === 'boolean' ? schema['x-enable-proxy'] : undefined,
+        'x-expandAllResponses':
+            typeof schema['x-expandAllResponses'] === 'boolean'
+                ? schema['x-expandAllResponses']
+                : undefined,
+        'x-expandAllModelSections':
+            typeof schema['x-expandAllModelSections'] === 'boolean'
+                ? schema['x-expandAllModelSections']
                 : undefined,
     };
 }
@@ -92,7 +105,13 @@ function getPathObject(
     schema: OpenAPIV3.Document | OpenAPIV3_1.Document,
     path: string
 ): OpenAPIV3.PathItemObject | OpenAPIV3_1.PathItemObject | null {
-    return schema.paths?.[path] || null;
+    const paths = schema.paths;
+    if (!paths) {
+        return null;
+    }
+    // Match regardless of a trailing slash, which specs may or may not include
+    const alternatePath = path.endsWith('/') ? path.slice(0, -1) : `${path}/`;
+    return paths[path] ?? paths[alternatePath] ?? null;
 }
 
 /**
@@ -110,6 +129,39 @@ function getPathObjectParameter(
         return pathObject.parameters;
     }
     return null;
+}
+
+/**
+ * Resolve servers for an operation following OpenAPI precedence rules.
+ * Per the spec, only the lowest-level servers array is used: operation > path > root.
+ */
+function getServers(
+    schema: OpenAPIV3.Document | OpenAPIV3_1.Document,
+    path: string,
+    operation: OpenAPIV3.OperationObject
+): OpenAPIV3.ServerObject[] {
+    if ('servers' in operation && operation.servers) {
+        return operation.servers;
+    }
+
+    const pathObject = getPathObject(schema, path);
+    if (pathObject && 'servers' in pathObject && pathObject.servers) {
+        return pathObject.servers;
+    }
+
+    return 'servers' in schema ? (schema.servers ?? []) : [];
+}
+
+/**
+ * Resolve the MCP server URL for an operation, following the same precedence as servers:
+ * operation > path > root.
+ */
+function getMcpUrl(
+    schema: OpenAPIV3.Document | OpenAPIV3_1.Document,
+    path: string,
+    operation: OpenAPIV3.OperationObject
+): string | undefined {
+    return readMcpUrl(operation) ?? readMcpUrl(getPathObject(schema, path)) ?? readMcpUrl(schema);
 }
 
 /**
@@ -174,6 +226,31 @@ function resolveSecurityScopes({
     }
 
     return operationScopes.map((scope) => [scope, undefined]);
+}
+
+function mergeSecurityScopes(
+    existing: OpenAPISecurityScope[] | null,
+    incoming: OpenAPISecurityScope[] | null
+): OpenAPISecurityScope[] | null {
+    if (!existing?.length) {
+        return incoming;
+    }
+    if (!incoming?.length) {
+        return existing;
+    }
+
+    const seen = new Set<string>();
+    const merged: OpenAPISecurityScope[] = [];
+
+    for (const scope of [...existing, ...incoming]) {
+        if (seen.has(scope[0])) {
+            continue;
+        }
+        seen.add(scope[0]);
+        merged.push(scope);
+    }
+
+    return merged;
 }
 
 /**

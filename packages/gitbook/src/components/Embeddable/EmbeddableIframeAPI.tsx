@@ -1,15 +1,17 @@
 'use client';
 
 import type { GitBookEmbeddableConfiguration, ParentToFrameMessage } from '@gitbook/embed';
-import { createChannel } from 'bidc';
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 
 import { useAI, useAIChatController } from '@/components/AI';
-import { CustomizationAIMode } from '@gitbook/api';
+import { isAIChatEnabled } from '@/components/utils/isAIChatEnabled';
+import { tString, useLanguage } from '@/intl/client';
 import { useRouter } from 'next/navigation';
 import { createStore, useStore } from 'zustand';
 import { integrationsAssistantTools } from '../Integrations';
-import { Button } from '../primitives';
+import { Button, LinkContext, type LinkContextType } from '../primitives';
+import { getChannel } from './channel';
+import { resolveEmbedPageLink } from './server-actions';
 
 const embeddableConfiguration = createStore<GitBookEmbeddableConfiguration>(() => ({
     tabs: [],
@@ -17,7 +19,14 @@ const embeddableConfiguration = createStore<GitBookEmbeddableConfiguration>(() =
     greeting: { title: '', subtitle: '' },
     suggestions: [],
     tools: [],
+    trademark: true,
 }));
+
+// biome-ignore lint/suspicious/noExplicitAny: expected
+function log(...data: any[]) {
+    // biome-ignore lint/suspicious/noConsole: expected
+    console.log(...data);
+}
 
 /**
  * Expose the API to communicate with the parent window.
@@ -30,24 +39,35 @@ export function EmbeddableIframeAPI(props: {
     const router = useRouter();
     const chatController = useAIChatController();
 
-    React.useEffect(() => {
-        return chatController.on('open', () => {
-            router.push(`${baseURL}/assistant`);
-        });
-    }, [router, baseURL, chatController]);
+    // Live ref to avoid adding them as dependencies
+    const refs = useRef({ router, chatController, baseURL });
+    useEffect(() => {
+        refs.current = { router, chatController, baseURL };
+    });
+
+    // Bumped on every navigation so an in-flight (async) `navigateToPage` can tell it has
+    // been superseded by a later command and skip its now-stale `router.push`.
+    const navToken = useRef(0);
 
     React.useEffect(() => {
-        if (window.parent === window) {
+        return chatController.on('open', () => {
+            const { baseURL, router } = refs.current;
+            navToken.current++;
+            router.push(`${baseURL}/assistant`);
+        });
+    }, [chatController]);
+
+    React.useEffect(() => {
+        const channel = getChannel();
+        if (!channel) {
             return;
         }
 
-        console.log('[gitbook] create channel with parent window');
-        const channel = createChannel();
-
         channel.receive((payload) => {
+            const { baseURL, router, chatController } = refs.current;
             const message = payload as ParentToFrameMessage;
 
-            console.log('[gitbook] received message', message);
+            log('[gitbook] received message', message);
 
             switch (message.type) {
                 case 'clearChat': {
@@ -68,21 +88,32 @@ export function EmbeddableIframeAPI(props: {
                     break;
                 }
                 case 'navigateToPage': {
-                    router.push(`${baseURL}/page/${message.pagePath}`);
+                    // Resolve the target server-side: on a multi-space site the page may
+                    // live in another space/section, whose base must go before
+                    // `~gitbook/embed/page`. Fall back to a same-space push on failure.
+                    const { pagePath } = message;
+                    const token = ++navToken.current;
+                    // Ignore the result if a later navigation has since superseded this one.
+                    const push = (href: string) => {
+                        if (navToken.current === token) {
+                            router.push(href);
+                        }
+                    };
+                    resolveEmbedPageLink(pagePath)
+                        .then((resolved) =>
+                            push('href' in resolved ? resolved.href : `${baseURL}/page/${pagePath}`)
+                        )
+                        .catch(() => push(`${baseURL}/page/${pagePath}`));
                     break;
                 }
                 case 'navigateToAssistant': {
+                    navToken.current++;
                     router.push(`${baseURL}/assistant`);
                     break;
                 }
             }
         });
-
-        return () => {
-            console.log('[gitbook] cleanup');
-            channel.cleanup();
-        };
-    }, [chatController, router, baseURL]);
+    }, []);
 
     return null;
 }
@@ -95,6 +126,31 @@ export function useEmbeddableConfiguration<T = GitBookEmbeddableConfiguration>(
     fn: (state: GitBookEmbeddableConfiguration) => T = (state) => state
 ) {
     return useStore(embeddableConfiguration, fn);
+}
+
+export function useEmbeddableTabs() {
+    const configuredTabs = useEmbeddableConfiguration((state) => state.tabs);
+    return configuredTabs.length > 0 ? configuredTabs : ['assistant', 'search', 'docs'];
+}
+
+export function useEmbeddableLinkContext() {
+    const tabs = useEmbeddableTabs();
+    const hasDocsTab = tabs.includes('docs');
+    const currentLinkContext = React.useContext(LinkContext);
+    const linkContext: LinkContextType = React.useMemo(
+        () =>
+            hasDocsTab
+                ? { ...currentLinkContext, externalTarget: '_blank' }
+                : {
+                      ...currentLinkContext,
+                      isExternalClient: () => true,
+                      isExternalServer: () => true,
+                      externalTarget: '_blank',
+                  },
+        [currentLinkContext, hasDocsTab]
+    );
+
+    return { hasDocsTab, linkContext };
 }
 
 /**
@@ -141,57 +197,60 @@ export function EmbeddableIframeTabs(props: {
     active?: string;
     baseURL: string;
     siteTitle: string;
+    onNavigate?: (href: string) => void;
 }) {
-    const { ref, active = 'assistant', baseURL, siteTitle } = props;
-    const { tabs: configuredTabs, actions } = useEmbeddableConfiguration();
+    const { ref, active = 'assistant', baseURL, siteTitle, onNavigate } = props;
+    const actions = useEmbeddableConfiguration((state) => state.actions);
+    const tabs = useEmbeddableTabs();
 
     const { assistants, config } = useAI();
+    const language = useLanguage();
 
     const router = useRouter();
 
-    const tabs = [
-        config.aiMode === CustomizationAIMode.Assistant &&
-        assistants[0] &&
-        (configuredTabs.includes('assistant') || configuredTabs.length === 0)
+    const enabledTabs = [
+        isAIChatEnabled(config.aiMode) && assistants[0] && tabs.includes('assistant')
             ? {
                   key: 'assistant',
                   label: assistants[0].label,
                   icon: assistants[0].icon,
-                  onClick: () => {
-                      router.push(`${baseURL}/assistant`);
-                  },
+                  href: `${baseURL}/assistant`,
               }
             : null,
-        configuredTabs.includes('docs') || configuredTabs.length === 0
+        tabs.includes('search')
+            ? {
+                  key: 'search',
+                  label: tString(language, 'search'),
+                  icon: 'search',
+                  href: `${baseURL}/search`,
+              }
+            : null,
+        tabs.includes('docs')
             ? {
                   key: 'docs',
                   label: siteTitle,
                   icon: 'book-open',
-                  onClick: () => {
-                      router.push(`${baseURL}/page/`);
-                  },
+                  href: `${baseURL}/page/`,
               }
             : null,
     ].filter((tab) => tab !== null);
 
-    // Override the active tab if it doesn't match the configured tabs
+    // Override the active tab if it doesn't match the configured tabs.
     React.useEffect(() => {
-        const hasAssistant = tabs.find((tab) => tab.key === 'assistant');
-        const hasDocs = tabs.find((tab) => tab.key === 'docs');
-        if (!hasAssistant && !hasDocs) {
-            // No valid tabs, do not redirect
+        if (enabledTabs.length === 0) {
             return;
         }
-        if (active === 'assistant' && !hasAssistant) {
-            router.replace(`${baseURL}/page`);
-        } else if (active === 'docs' && !hasDocs) {
-            router.replace(`${baseURL}/assistant`);
-        }
-    }, [tabs, baseURL, router, active]);
 
-    return tabs.length > 1 || actions.length > 0 ? (
-        <div className="flex flex-col gap-2" ref={ref}>
-            {tabs.map((tab) => (
+        const activeTab = enabledTabs.find((tab) => tab.key === active);
+        const fallbackTab = enabledTabs.at(0);
+        if (!activeTab && fallbackTab) {
+            router.replace(fallbackTab.href);
+        }
+    }, [enabledTabs, router, active]);
+
+    return enabledTabs.length > 1 || actions.length > 0 ? (
+        <div className="flex flex-col items-center gap-2" ref={ref}>
+            {enabledTabs.map((tab) => (
                 <Button
                     key={tab.key}
                     data-testid={`embed-tab-${tab.key}`}
@@ -202,7 +261,13 @@ export function EmbeddableIframeTabs(props: {
                     active={tab.key === active}
                     className="not-hydrated:animate-blur-in-slow [&_.button-leading-icon]:size-5"
                     iconOnly
-                    onClick={tab.onClick}
+                    onClick={() => {
+                        if (tab.key !== active && onNavigate) {
+                            onNavigate(tab.href);
+                            return;
+                        }
+                        router.push(tab.href);
+                    }}
                     tooltipProps={{
                         contentProps: {
                             side: 'right',
@@ -212,4 +277,35 @@ export function EmbeddableIframeTabs(props: {
             ))}
         </div>
     ) : null;
+}
+
+export function EmbeddableIframeCloseButton(props: { onClose?: () => void }) {
+    const { onClose } = props;
+    const { closeButton } = useEmbeddableConfiguration();
+
+    if (!closeButton) {
+        return null;
+    }
+
+    return (
+        <div className="flex flex-1 flex-col justify-end">
+            <Button
+                label="Close"
+                variant="blank"
+                size="large"
+                icon="xmark"
+                className="not-hydrated:animate-blur-in-slow [&_.button-leading-icon]:size-5"
+                iconOnly
+                onClick={() => {
+                    onClose?.();
+                    getChannel()?.send({ type: 'close' });
+                }}
+                tooltipProps={{
+                    contentProps: {
+                        side: 'right',
+                    },
+                }}
+            />
+        </div>
+    );
 }

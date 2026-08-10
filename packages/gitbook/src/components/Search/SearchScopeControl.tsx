@@ -3,7 +3,7 @@
 import { t, tString, useLanguage } from '@/intl/client';
 import type { SiteSection } from '@gitbook/api';
 import { Button, DropdownMenu, DropdownMenuItem, ToggleChevron } from '../primitives';
-import { useSearch } from './useSearch';
+import { useSearchState, useSetSearchState } from './useSearch';
 
 interface SearchScopeControlProps {
     spaceTitle: string;
@@ -20,10 +20,9 @@ interface SearchScopeControlProps {
 export function SearchScopeControl(props: SearchScopeControlProps) {
     const { withVariants, withSections } = props;
 
-    const [state] = useSearch();
-    const language = useLanguage();
+    const state = useSearchState();
 
-    if (!state) {
+    if (!state?.open) {
         return null;
     }
 
@@ -32,8 +31,8 @@ export function SearchScopeControl(props: SearchScopeControlProps) {
     const variantScopeIsExtended = ['extended', 'all'].includes(state.scope);
 
     return (
-        <div className="flex items-center gap-1">
-            <span className="mr-1">{t(language, 'search_scope_title')}</span>
+        <div className="flex items-center">
+            <SearchScopeTitle />
             {withSections ? (
                 <SearchScopeSectionControl isExtended={sectionScopeIsExtended} {...props} />
             ) : null}
@@ -45,11 +44,16 @@ export function SearchScopeControl(props: SearchScopeControlProps) {
     );
 }
 
+function SearchScopeTitle() {
+    const language = useLanguage();
+    return <span className="mr-1">{t(language, 'search_scope_title')}</span>;
+}
+
 function SearchScopeSectionControl(props: SearchScopeControlProps & { isExtended: boolean }) {
     const { isExtended, section } = props;
 
     const language = useLanguage();
-    const [, setSearchState] = useSearch();
+    const setSearchState = useSetSearchState();
 
     return (
         <DropdownMenu
@@ -110,7 +114,7 @@ function SearchScopeVariantControl(props: SearchScopeControlProps & { isExtended
     const { isExtended, spaceTitle, withSections } = props;
 
     const language = useLanguage();
-    const [, setSearchState] = useSearch();
+    const setSearchState = useSetSearchState();
 
     return (
         <DropdownMenu

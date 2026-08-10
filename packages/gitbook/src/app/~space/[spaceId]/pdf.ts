@@ -21,16 +21,15 @@ export async function getSpacePDFContext(
     const apiToken = await getAPITokenFromMiddleware();
 
     const basePath = getPDFRoutePath(params);
-    const linker = createLinker({
-        spaceBasePath: basePath,
-        siteBasePath: basePath,
-    });
     const dataFetcher = createDataFetcher({
         apiToken: apiToken,
     });
 
     const baseContext: GitBookBaseContext = {
-        linker,
+        linker: createLinker({
+            spaceBasePath: basePath,
+            siteBasePath: basePath,
+        }),
         dataFetcher,
     };
 

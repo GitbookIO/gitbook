@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 
+import { getInlineIconSourceKey } from './IconSources';
 import { getIconAssetURL, useIcons } from './IconsProvider';
 import { getIconStyle } from './getIconStyle';
 import type { IconName, IconStyle } from './types';
@@ -50,8 +51,28 @@ export const Icon = React.forwardRef(function Icon(
     } = props;
 
     const [iconStyle, icon] = getIconStyle(propIconStyle, propIcon);
-    const url = getIconAssetURL(context, iconStyle, icon);
+    const source = context.iconSources?.[getInlineIconSourceKey(iconStyle, icon)];
     const maskId = React.useId();
+
+    if (source) {
+        return (
+            <svg
+                ref={ref}
+                {...rest}
+                viewBox={source.viewBox}
+                fill="currentColor"
+                style={{
+                    overflow: 'visible',
+                    ...(size ? { width: size, height: size } : {}),
+                    ...rest.style,
+                }}
+                className={`gb-icon ${className}`}
+                dangerouslySetInnerHTML={{ __html: source.markup }}
+            />
+        );
+    }
+
+    const url = getIconAssetURL(context, iconStyle, icon);
 
     return (
         <svg

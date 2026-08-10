@@ -1,5 +1,308 @@
 # gitbook
 
+## 0.27.2
+
+### Patch Changes
+
+- bb30db1: Add a hover affordance in the document margin to ask the AI Assistant about a paragraph. On devices with a fine pointer, hovering a top-level paragraph reveals a small button that stages the paragraph's text as context and opens the assistant — making the existing text-selection "Ask" flow more discoverable.
+- 62ca6d3: Show a "Back to [space]" shortcut at the top of the table of contents when a reader follows a link into a different space, so they don't lose track of where they were browsing from.
+- fdea8f1: Show where a page lives in the site at the start of the page breadcrumbs: its section (including any enclosing section groups) and variant. Hovering any breadcrumb item reveals a dropdown to switch to its siblings at the same level — other section groups, sections, variants, page groups or pages — computed on the server from already-available data (no extra request). Language variants are left to the dedicated language picker rather than shown as a crumb. Also restyles the breadcrumbs to normal casing (matching search results).
+- 37c2dd8: Navigate customer visual tests with `domcontentloaded` to avoid `load`-event hangs on external sites.
+- c923c65: Fix center- and end-aligned paragraphs shifting left on wide/no-TOC pages when the AI Assistant is enabled, caused by the per-paragraph ask-button wrapper not inheriting the block alignment.
+- 37c2dd8: Fix flaky customer e2e screenshots by waiting for the built-in cookie banner before capturing.
+- 37c2dd8: Add a `data-testid` to the admin toolbar so e2e tests can assert its presence while hiding it from visual screenshots (it animates open, causing flaky diffs).
+- 36dbdb4: Support an optional `goal` query parameter on the markdown ask interface (`?ask=…&goal=…`), letting agents describe the broader end goal they are working towards so the answer can be steered towards it.
+- 7e55cd5: Add an "Available in MCP" badge on OpenAPI operations marked with `x-gitbook-mcp: true`. When `x-gitbook-mcp-url` is set (on the operation, path, or root — most specific wins), the badge becomes a button that copies the MCP server URL to the clipboard.
+- 6146f8e: Reduce the size of `searchDocumentation` MCP responses by returning only the best-matching section per page instead of concatenating every section body.
+- 37c2dd8: Disable the content max-width transition under reduced motion, matching the surrounding layout transitions.
+- 37c2dd8: Reset cross-space navigation state between e2e navigations so the "Back to <space>" shortcut can't leak in and cause flaky screenshots.
+- bcea23e: Render `anyOf`/`oneOf` with a `null` member as a nullable schema instead of a `null` union branch.
+- 77efd44: Show changed pages in preview toolbars for change requests and revisions.
+- 578a3a8: Fix site section dropdowns not being bounded by their container during the open/resize animation, causing the contents to visually clip.
+- 2dc76a2: Fix grouped top-nav section dropdowns rendering empty when the site is embedded in an iframe (visitor-auth embeds, editor preview) or shown in the embeddable view. The dropdown viewport is composited and animated, and a clipped composited layer fails to rasterize its text in Chromium when painted inside a sub compositing root; the rounded-corner clipping is now done on an inner wrapper so the viewport itself is no longer clipped.
+- 9f65133: Improve the 404 page: remove the table of contents sidebar and center the content, suggest related pages (ranked from the already-cached search index, so no extra request per 404), show a search or assistant input depending on the site's AI configuration, and move "Go to homepage" to the bottom as a last resort.
+- Updated dependencies [3fedaaa]
+- Updated dependencies [7e55cd5]
+  - @gitbook/expr@1.3.1
+  - @gitbook/openapi-parser@3.0.12
+  - @gitbook/react-openapi@1.5.15
+
+## 0.27.1
+
+### Patch Changes
+
+- acf2719: Mark the AI Assistant chat as `aria-busy` while it is generating a response (including the follow-up suggestion phase), so assistive technologies are notified of the in-progress state.
+- 72a1596: Fix the AI assistant panel overflowing its frame when rendering single/multi-choice question forms with long option text.
+- 77c717c: Assistant: group all of a turn's tool calls behind a single "Explored with N tools" expandable instead of rendering a separate single-item expandable for each client-side tool call.
+- c44d822: Trust an optional cookieless integration content host (`GITBOOK_INTEGRATIONS_CONTENT_HOST`) for WebFrame postMessage, in preparation for isolating integration-rendered content onto a separate origin. Defaults to `GITBOOK_INTEGRATIONS_HOST`, so behavior is unchanged until the content host is configured.
+- 7655041: Match keyboard shortcuts by the logical character typed instead of the physical key position, so that ⌘-C no longer opens the Assistant on the Dvorak layout (and other non-QWERTY layouts).
+- af3cda1: Fix wide content (such as code blocks and tables) overflowing the edges of hint blocks instead of scrolling within them.
+- 0ca4952: Remove the external link button from the link tooltip hover card, as its arrow read as clickable even though the preview card isn't interactive.
+- 3ff88ba: Add a Prompt block
+- 251630c: Drive page actions ordering and default action from the new `pageActions.items` list, including the reorderable assistant action
+- ddba803: Add a page reference chip when opening the Assistant from the page action, so the assistant is informed about the page the reader is currently on.
+- f4469b2: Support OpenAPI one-operation-per-page mode
+- 6c967c9: Add a client-side search field to table blocks, with per-column filters for select and checkbox columns
+- 882dfcd: Tidy prompt and add e2e test
+- Updated dependencies [f4469b2]
+- Updated dependencies [88b94b5]
+  - @gitbook/react-openapi@1.5.14
+
+## 0.27.0
+
+### Minor Changes
+
+- aa9d41a: Update llms.txt footer for GitBook sites
+- 4f754a7: Add GitBook information to footer of markdown pages
+- 2ecbdd8: Add a `navigateToPage` assistant tool that lets the AI open a documentation page on the reader's behalf. The page opens instantly (no confirmation) and is pushed to the browser history so the reader can navigate back.
+
+### Patch Changes
+
+- 7036b67: Fix custom assistants (e.g. Kapa, Inkeep) being opened twice when clicking "Ask with …" in the search bar.
+- 2885a13: Fix heading anchor alignment with heading text and translate its accessibility label.
+- b9bb535: Allow Mermaid diagrams to be enlarged into a fullscreen dialog from a control in the bottom-right corner. Clicking outside the dialog, pressing Escape, or using the reduce control returns to the inline view.
+- b116a0a: Fix OpenAPI CodeBlock scroll
+- d83ea4c: Improve a11y of list item collapse/extend toggle
+- 92b6856: Add Ask AI in CodeBlock
+- 7a1236a: Fix search results linking to the page instead of the section anchor when a section snippet is displayed.
+- b9bb535: Make `Tooltip` content non-interactive when `disableHoverableContent` is set, so its portaled popper wrapper no longer steals pointer events (e.g. hover-revealed controls) from the trigger.
+- Updated dependencies [6eabaec]
+- Updated dependencies [f158064]
+  - @gitbook/expr@1.3.0
+  - @gitbook/react-openapi@1.5.13
+
+## 0.26.2
+
+### Patch Changes
+
+- 67f31aa: Allow user-triggered AI assistants (ChatGPT-User, Claude-User, Perplexity-User) to read pages on non-indexable sites, so end-users can pull content into an LLM without an MCP connection. Search engines and training crawlers remain blocked.
+- 0c577a0: Allow CORS for the same root domain
+- 51fef84: Remove the date-gated header logo height logic and always apply the compact logo size to prevent size shifts between sections and translations.
+- f405fff: Add icon support in tab items
+- 3697dfe: Add support for hiding page actions from page layout options.
+- 127ef54: Add tag filtering controls for Updates blocks.
+
+## 0.26.1
+
+### Patch Changes
+
+- b70b8fd: Fix llms-full.txt pagination to include pages from all site sections.
+- 6ba5e54: Support isComposing for search
+- 47c8ccb: Render icons as svg markup
+- a9ba996: Fix left/right aligment of images with caption
+- 56aeb19: Fix events tracked from the middleware missing some properties.
+- Updated dependencies [47c8ccb]
+- Updated dependencies [37a9453]
+  - @gitbook/icons@0.5.0
+  - @gitbook/embed@0.5.1
+  - @gitbook/react-contentkit@0.7.16
+
+## 0.26.0
+
+### Minor Changes
+
+- d3d5150: Add "Content-Signal" to "robots.txt"
+- 7595706: Allow AI agents to ask questions and get the answer in markdown when fetching with `?ask=<question>`.
+- a17ab65: Support variant selector in hidden section
+
+### Patch Changes
+
+- d1a2958: Skip AI questions when it matches the example provided to agents / crawlers.
+- e3aca9e: Fix embeddable search links
+- 4b78672: Fix links to other spaces/sections in the llms.txt.
+- d1a2958: Pass visitor session to Ask AI.
+
+## 0.25.1
+
+### Patch Changes
+
+- aa1fc24: Add support for sticky first column in tables
+
+## 0.25.0
+
+### Minor Changes
+
+- 88c38fa: Add Search tab to Docs Embed, refactor search
+- 709964f: Rework page layout
+
+### Patch Changes
+
+- 789c2fa: Adjust empty TOC logic and layout
+- 8d2a95b: Docs Embed: Better support light/dark mode overrides
+- 7fd381c: Hide empty sidebar on OpenAPI pages
+- 723e579: Fix rendering multi-expandable block in a column
+- 68c842b: Translations dropdown should show language spaces that best matches the current space title
+- Updated dependencies [8d2a95b]
+- Updated dependencies [88c38fa]
+  - @gitbook/embed@0.5.0
+
+## 0.24.0
+
+### Minor Changes
+
+- 50653ab: Redirect sitemap.md and .well-known/sitemap.md to llms.txt.
+- 50653ab: Improve AI agent detection and readability by outputting 200 for page not found.
+
+### Patch Changes
+
+- 126d4b7: Improve Assistant form controls
+- Updated dependencies [8242f18]
+  - @gitbook/expr@1.2.5
+  - @gitbook/react-openapi@1.5.12
+
+## 0.23.2
+
+### Patch Changes
+
+- Updated dependencies [ab17ff4]
+  - @gitbook/icons@0.4.6
+  - @gitbook/react-contentkit@0.7.15
+
+## 0.23.1
+
+### Patch Changes
+
+- Updated dependencies [3c141f0]
+  - @gitbook/icons@0.4.5
+  - @gitbook/react-contentkit@0.7.14
+
+## 0.23.0
+
+### Minor Changes
+
+- 8e5a2aa: Pan and zoom controls for mermaid diagrams
+
+### Patch Changes
+
+- b77c4fc: Add getPage MCP tool
+- 31e77d4: Track new events for site analytics.
+- f884477: Associate questions asked in the embeddable assistant to the proper channel.
+- deabce9: Sort results by score to mix records and pages.
+- 4909044: Add Claude Code and Codex connect actions
+- da648ca: Fix regressions in Assistant UX
+- 3ce7e52: Fix Variant dropdown not showing in GitBook embed
+- 7f4e644: Small OpenAPI Improvements
+- 4787b7e: Use localized titles/descriptions for site entities
+- 7ab6351: Import site redirect patterns from @gitbook/api
+- b40465e: Fix normalization of URL causing invalid redirections.
+- b5d6f2e: Fix translation quality across 11 locales
+- 3151864: Track events from the proper server URL.
+- 16bfafe: Add option to sticky header row in tables
+- 7c2823c: Fix full width header alignment
+- c4a2604: Fix PDF export crash when page contains an OpenAPI block
+- c56b569: Support expand-all options for OpenAPI
+- Updated dependencies [7f4e644]
+- Updated dependencies [b5d6f2e]
+- Updated dependencies [9dd2db6]
+- Updated dependencies [c56b569]
+- Updated dependencies [ccd21e4]
+  - @gitbook/react-openapi@1.5.11
+  - @gitbook/openapi-parser@3.0.11
+  - @gitbook/icons@0.4.4
+  - @gitbook/react-contentkit@0.7.13
+
+## 0.22.3
+
+### Patch Changes
+
+- f182680: Add backward compatibility for OpenAPI spec content URL
+- bdc6cd9: Use OpenAPI publicURL as Scalar specUrl
+- b3875a1: Refactor embeddable context to merge local & site properties in one unified way
+- eceec6f: Move ~scalar/proxy route to site route group
+- 887c3f8: Add token verification on OpenAPI proxy
+- d666212: Add support for localized site section titles
+- Updated dependencies [b3875a1]
+- Updated dependencies [bdc6cd9]
+- Updated dependencies [8ab419a]
+- Updated dependencies [eceec6f]
+- Updated dependencies [887c3f8]
+  - @gitbook/embed@0.4.0
+  - @gitbook/react-openapi@1.5.10
+  - @gitbook/openapi-parser@3.0.10
+
+## 0.22.2
+
+### Patch Changes
+
+- e074283: Add server-side proxy for Scalar API client to bypass CORS
+- afa868e: Show "Ask Assistant" search result immediately
+- 0803db0: Track opening of search results for records and in the assistant.
+- cb71511: Wrap tracking call with waitUntil
+- 4a6f91a: Show social accounts in header
+- 370b731: Docs Embed: Make trademark optional
+- afa476c: Add server-side insight event tracking for MCP route
+- Updated dependencies [e074283]
+- Updated dependencies [370b731]
+  - @gitbook/openapi-parser@3.0.9
+  - @gitbook/react-openapi@1.5.9
+  - @gitbook/embed@0.3.0
+
+## 0.22.1
+
+### Patch Changes
+
+- 9d5e397: Remove code syntax highlighting patch for Safari
+- 3d8e89c: Show favicon for record search results in the assistant.
+- 5f66860: Use isCookiesTrackingDisabled for cookie consent integrations
+- 426aabe: Fix TOC header logo on bold themes
+- ae30a57: Integrate Ask AI with upcoming insights by passing visitor session IDs.
+- f7c251e: Update Reddit social account rendering
+- e31a8f4: Hide cookie banner for AI user agents
+- 2e495cb: Add Global Privacy Control (GPC) support
+- Updated dependencies [1a7ef78]
+- Updated dependencies [93eea0b]
+- Updated dependencies [b4b471f]
+- Updated dependencies [5f66860]
+- Updated dependencies [2ebb18d]
+- Updated dependencies [11d9b80]
+- Updated dependencies [2e495cb]
+- Updated dependencies [f517035]
+  - @gitbook/react-openapi@1.5.8
+  - @gitbook/embed@0.2.2
+  - @gitbook/browser-types@0.1.5
+
+## 0.22.0
+
+### Minor Changes
+
+- e00d1c5: Support code themes customization
+- f294818: Serve a markdown version of the page when the "Accept" header contains "text/markdown".
+
+### Patch Changes
+
+- 9d6457f: OpenAPI styling tweaks
+- d738e11: Prevent form submission during IME composition
+- 1e53376: Add sidesheet component, use it for TOC and AIChat
+- f7f6f9d: Set <html lang> based on translated language
+- 89de966: Support social links
+- b53cb1d: Align styling of PageLinkItem and PageDocumentItem
+- 27a34b7: Support `defaultExpanded` in Expandable block
+- a5ef44a: Better conditional display of page actions
+- 07c02eb: Header & TOC tweaks
+- 29e2b22: Fix ordered list item index calculation
+- f6cf62a: Standardise toggle chevrons across the app
+- b57561d: Fix rendering of images in reusable content from an external space with the new dereferencing in the API.
+- e172b25: Grow InlineActionButton to take available width on line
+- 7a11861: Add support for custom cookie banner registration
+- 8f32f4f: Better handle huge section groups
+- 0aa34cc: Fix Embed options in React
+- Updated dependencies [e00d1c5]
+- Updated dependencies [96e24a1]
+- Updated dependencies [4e2d863]
+- Updated dependencies [d3f6c38]
+- Updated dependencies [3ba9e46]
+- Updated dependencies [717ad0b]
+- Updated dependencies [6f1db32]
+- Updated dependencies [7a11861]
+- Updated dependencies [0aa34cc]
+- Updated dependencies [48ca21e]
+  - @gitbook/react-openapi@1.5.7
+  - @gitbook/embed@0.2.1
+  - @gitbook/openapi-parser@3.0.8
+  - @gitbook/icons@0.4.3
+  - @gitbook/browser-types@0.1.4
+  - @gitbook/react-contentkit@0.7.12
+
 ## 0.21.3
 
 ### Patch Changes

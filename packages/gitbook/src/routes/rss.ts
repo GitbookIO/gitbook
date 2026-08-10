@@ -4,7 +4,8 @@ import { getPageDocument } from '@/lib/data/pages';
 import { getBlocksByType, getNodeText, isHeadingBlock } from '@/lib/document';
 import { resolvePagePathDocumentOrGroup } from '@/lib/pages';
 import { joinPath } from '@/lib/paths';
-import { type RevisionPageDocument, RevisionPageType } from '@gitbook/api';
+import type { RevisionPageDocument } from '@gitbook/api';
+import { RevisionPageType } from '@gitbook/api';
 import { Feed } from 'feed';
 
 /**

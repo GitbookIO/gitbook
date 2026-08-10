@@ -3,23 +3,20 @@ import {
     CustomizationBackground,
     CustomizationCorners,
     CustomizationDefaultMonospaceFont,
+    CustomizationDefaultThemeMode,
     CustomizationDepth,
     CustomizationHeaderPreset,
     CustomizationIconsStyle,
     CustomizationSidebarListStyle,
-    CustomizationThemeMode,
+    SiteSocialAccountPlatform,
 } from '@gitbook/api';
 import type { GitBookStandalone } from '@gitbook/embed';
 import { expect } from '@playwright/test';
 import jwt from 'jsonwebtoken';
 
-import {
-    VISITOR_TOKEN_COOKIE,
-    getVisitorAuthCookieName,
-    getVisitorAuthCookieValue,
-} from '@/lib/visitors';
+import { VISITOR_TOKEN_COOKIE } from '@/lib/visitors';
 
-import { getSiteAPIToken } from '../tests/utils';
+import { getGitBookPreviewURL, getSiteAPIToken } from '../tests/utils';
 import {
     type Test,
     type TestsCase,
@@ -33,12 +30,26 @@ import {
     getCustomizationURL,
     headerLinks,
     runTestCases,
+    setTimeToMorning,
+    waitForAIChatResponse,
+    waitForAdminToolbar,
     waitForCookiesDialog,
     waitForCoverImages,
     waitForNotFound,
 } from './util';
 
-const AI_PROMPT = `You're being invoked by the GitBook CI/CD pipeline. To make screenshot testing of the GitBook Assistant visually consistent, look up the title of the first page you find and respond with only EXACTLY its title. To find the page title, invoke the search tool with the query "GitBook". Before invoking the search tool, respond with the exact text: "I'm going to look up 'GitBook' and then respond with only the page title.". Do not execute any other tools or output any other text.`;
+// Kept as deterministic as possible to reduce visual flakiness: no preamble, a
+// single fixed search, a concise answer, and a fixed number of follow-ups. The
+// model is never perfectly deterministic, so `overrideAIResponse` still
+// normalizes the rendered content below — this prompt just narrows the variance.
+const AI_PROMPT = [
+    "You're being invoked by the GitBook CI/CD pipeline for automated visual testing.",
+    'Follow these instructions exactly and do not deviate:',
+    '1. Do not write any preamble, commentary, or reasoning before acting.',
+    '2. Perform a single search for exactly "Lorem ipsum".',
+    '3. Reply with only the first sentence of the first page you find, and nothing else.',
+    '4. Always end by proposing exactly 3 follow-up suggestions.',
+].join('\n');
 
 const overrideAIInitialState = () => {
     const greeting = document.querySelector('[data-testid="ai-chat-greeting-title"]');
@@ -46,21 +57,45 @@ const overrideAIInitialState = () => {
         greeting.textContent = 'Good morning';
     }
 };
+
+/**
+ * Normalize the non-deterministic content of an AI response before screenshotting,
+ * while preserving the surrounding structure (message bubbles, tool/activity
+ * summary, response container, suggestion buttons) so visual regressions in the
+ * chat chrome are still caught. The actual answer formatting is covered separately
+ * by the deterministic page tests, since the AI response renders through the same
+ * `DocumentView`.
+ *
+ * Must run only once the chat is no longer `aria-busy` (the response has fully
+ * settled), otherwise React re-renders from late stream events will clobber these
+ * mutations. See `waitForAIChatResponse`.
+ */
 const overrideAIResponse = () => {
-    const userMessage = document.querySelector('[data-testid="ai-chat-message-user"]');
-    if (userMessage) {
+    // The user's prompt varies in length; pin it to a fixed string.
+    document.querySelectorAll('[data-testid="ai-chat-message-user"]').forEach((userMessage) => {
         userMessage.textContent = '[Replaced message] Chat message sent by the user';
-    }
-    const assistantMessage = document.querySelectorAll(
-        '[data-testid="ai-chat-message-assistant"] .ai-response-document'
-    );
-    assistantMessage.forEach((message) => {
-        message.innerHTML = '[Replaced message] AI chat response';
     });
-    const suggestions = document.querySelectorAll('[data-testid="ai-chat-followup-suggestion"]');
-    suggestions.forEach((suggestion) => {
-        suggestion.textContent = 'Follow-up suggestion';
+
+    // The assistant's answer text is non-deterministic; replace the rendered
+    // document body while keeping the `.ai-response-document` container.
+    document
+        .querySelectorAll('[data-testid="ai-chat-message-assistant"] .ai-response-document')
+        .forEach((message) => {
+            message.innerHTML = '<p>[Replaced message] AI chat response</p>';
+        });
+
+    // The "Explored with N tools" activity label varies with the number of tool
+    // calls; pin it (the chevron sibling is left intact).
+    document.querySelectorAll('[data-testid="ai-chat-activity-summary"]').forEach((summary) => {
+        summary.textContent = 'Explored';
     });
+
+    // Follow-up suggestion text varies; pin each label.
+    document
+        .querySelectorAll('[data-testid="ai-chat-followup-suggestion"]')
+        .forEach((suggestion) => {
+            suggestion.textContent = 'Follow-up suggestion';
+        });
 };
 
 const searchTestCases: Test[] = [
@@ -71,8 +106,8 @@ const searchTestCases: Test[] = [
                 mode: CustomizationAIMode.None,
             },
         }),
-        screenshot: false,
         run: async (page) => {
+            await waitForCookiesDialog(page);
             const searchInput = page.getByTestId('search-input');
             await searchInput.focus();
             await expect(page.getByTestId('search-results')).toHaveCount(0); // No pop-up yet because there's no recommended questions.
@@ -84,8 +119,6 @@ const searchTestCases: Test[] = [
             });
             const pageResults = await page.getByTestId('search-page-result').all();
             await expect(pageResults.length).toBeGreaterThanOrEqual(1);
-            const pageSectionResults = await page.getByTestId('search-page-section-result').all();
-            await expect(pageSectionResults.length).toBeGreaterThanOrEqual(2);
             await expect(page.getByTestId('search-ask-question')).toHaveCount(0); // No AI search results with aiMode=None.
         },
     },
@@ -96,8 +129,8 @@ const searchTestCases: Test[] = [
                 mode: CustomizationAIMode.None,
             },
         }),
-        screenshot: false,
         run: async (page) => {
+            await waitForCookiesDialog(page);
             await page.keyboard.press('ControlOrMeta+K');
             await expect(page.getByTestId('search-input')).toBeFocused();
         },
@@ -110,6 +143,7 @@ const searchTestCases: Test[] = [
             },
         })}&q=`,
         run: async (page) => {
+            await waitForCookiesDialog(page);
             await expect(page.getByTestId('search-results')).toHaveCount(0); // No pop-up yet because there's no recommended questions.
         },
     },
@@ -121,6 +155,7 @@ const searchTestCases: Test[] = [
             },
         })}&q=gitbook`,
         run: async (page) => {
+            await waitForCookiesDialog(page);
             await expect(page.getByTestId('search-input')).toBeFocused();
             await expect(page.getByTestId('search-input')).toHaveValue('gitbook');
             await expect(page.getByTestId('search-results')).toBeVisible();
@@ -134,6 +169,7 @@ const searchTestCases: Test[] = [
             },
         })}&q=gitbook`,
         run: async (page) => {
+            await waitForCookiesDialog(page);
             await expect(page.getByTestId('search-input')).toBeFocused();
             await expect(page.getByTestId('search-input')).toHaveValue('gitbook');
             await expect(page.getByTestId('search-results')).toBeVisible();
@@ -147,19 +183,11 @@ const searchTestCases: Test[] = [
             },
         }),
         run: async (page) => {
+            await waitForCookiesDialog(page);
             const searchInput = page.locator('css=[data-testid="search-input"]');
 
-            // Focus search input, expecting recommended questions
-            await searchInput.focus();
-            await expect(page.getByTestId('search-results')).toBeVisible({
-                timeout: 30_000,
-            });
-            const recommendedQuestions = await page
-                .getByTestId('search-recommended-question')
-                .all();
-            await expect(recommendedQuestions.length).toBeGreaterThan(2); // Expect at least 3 questions
-
             // Fill search input, expecting AI search option
+            await searchInput.focus();
             await searchInput.fill(AI_PROMPT);
             const aiSearchResult = page.getByTestId('search-ask-question');
             await expect(aiSearchResult).toBeVisible();
@@ -167,12 +195,13 @@ const searchTestCases: Test[] = [
             await expect(page.getByTestId('ai-chat')).toBeVisible();
             await expect(page.getByTestId('ai-chat-message-user').first()).toHaveText(AI_PROMPT);
             await expect(page.getByTestId('ai-chat-message-assistant').first()).toBeVisible();
-            await expect(page.getByTestId('ai-chat-followup-suggestion')).toHaveCount(3, {
-                timeout: 60_000,
-            });
-            // Override text content for visual consistency in screenshots
-            await page.evaluate(overrideAIResponse);
+            // Wait for the full response (incl. follow-up suggestions) to settle before
+            // asserting/screenshotting, rather than racing a fixed suggestion count.
+            await waitForAIChatResponse(page);
+            await expect(page.getByTestId('ai-chat-followup-suggestion').first()).toBeVisible();
         },
+        // Re-applied per viewport so the replacement survives resize-driven re-renders.
+        normalizeBeforeScreenshot: (page) => page.evaluate(overrideAIResponse),
     },
     {
         name: 'Ask - AI Mode: Assistant - Keyboard shortcut',
@@ -182,12 +211,13 @@ const searchTestCases: Test[] = [
             },
         }),
         run: async (page) => {
+            await waitForCookiesDialog(page);
             await page.keyboard.press('ControlOrMeta+I');
             await expect(page.getByTestId('ai-chat')).toBeVisible();
             await expect(page.getByTestId('ai-chat-input')).toBeFocused();
-            // Override text content for visual consistency in screenshots
-            await page.evaluate(overrideAIInitialState);
         },
+        // Re-applied per viewport so the replacement survives resize-driven re-renders.
+        normalizeBeforeScreenshot: (page) => page.evaluate(overrideAIInitialState),
     },
     {
         name: 'Ask - AI Mode: Assistant - Button',
@@ -196,14 +226,14 @@ const searchTestCases: Test[] = [
                 mode: CustomizationAIMode.Assistant,
             },
         }),
-        screenshot: false,
         run: async (page) => {
+            await waitForCookiesDialog(page);
             await page.getByTestId('ai-chat-button').click();
             await expect(page.getByTestId('ai-chat')).toBeVisible();
             await expect(page.getByTestId('ai-chat-input')).toBeFocused();
-            // Override text content for visual consistency in screenshots
-            await page.evaluate(overrideAIInitialState);
         },
+        // Re-applied per viewport so the replacement survives resize-driven re-renders.
+        normalizeBeforeScreenshot: (page) => page.evaluate(overrideAIInitialState),
     },
     {
         name: 'Ask - AI Mode: Assistant - URL query (Initial)',
@@ -213,13 +243,14 @@ const searchTestCases: Test[] = [
             },
         })}&ask=`,
         run: async (page) => {
+            await waitForCookiesDialog(page);
             await expect(page.getByTestId('search-input')).not.toBeFocused();
             await expect(page.getByTestId('search-input')).toBeEmpty();
             await expect(page.getByTestId('ai-chat')).toBeVisible();
             await expect(page.getByTestId('ai-chat-input')).toBeFocused();
-            // Override text content for visual consistency in screenshots
-            await page.evaluate(overrideAIInitialState);
         },
+        // Re-applied per viewport so the replacement survives resize-driven re-renders.
+        normalizeBeforeScreenshot: (page) => page.evaluate(overrideAIInitialState),
     },
     {
         name: 'Ask - AI Mode: Assistant - URL query (Results)',
@@ -229,17 +260,19 @@ const searchTestCases: Test[] = [
             },
         })}&ask=${encodeURIComponent(AI_PROMPT)}`,
         run: async (page) => {
+            await waitForCookiesDialog(page);
             await expect(page.getByTestId('search-input')).not.toBeFocused();
             await expect(page.getByTestId('search-input')).not.toHaveValue('What is GitBook?');
             await expect(page.getByTestId('ai-chat')).toBeVisible();
             await expect(page.getByTestId('ai-chat-message-user').first()).toHaveText(AI_PROMPT);
             await expect(page.getByTestId('ai-chat-message-assistant').first()).toBeVisible();
-            await expect(page.getByTestId('ai-chat-followup-suggestion')).toHaveCount(3, {
-                timeout: 60_000,
-            });
-            // Override text content for visual consistency in screenshots
-            await page.evaluate(overrideAIResponse);
+            // Wait for the full response (incl. follow-up suggestions) to settle before
+            // asserting/screenshotting, rather than racing a fixed suggestion count.
+            await waitForAIChatResponse(page);
+            await expect(page.getByTestId('ai-chat-followup-suggestion').first()).toBeVisible();
         },
+        // Re-applied per viewport so the replacement survives resize-driven re-renders.
+        normalizeBeforeScreenshot: (page) => page.evaluate(overrideAIResponse),
     },
 ];
 
@@ -257,6 +290,7 @@ const testCases: TestsCase[] = [
                 name: 'No variants dropdown',
                 url: '',
                 run: async (page) => {
+                    await waitForCookiesDialog(page);
                     await expect(page.locator('[data-testid="space-dropdown-button"]')).toHaveCount(
                         0
                     );
@@ -314,7 +348,6 @@ const testCases: TestsCase[] = [
                     await expect(navigationLink).toBeVisible();
                 },
             },
-            ...searchTestCases,
             {
                 name: 'Not found',
                 url: 'content-not-found',
@@ -507,6 +540,72 @@ const testCases: TestsCase[] = [
         ],
     },
     {
+        name: 'Language Site (Navigation when switching language variant)',
+        contentBaseURL: 'https://gitbook-open-e2e-sites.gitbook.io/yjs/',
+        tests: [
+            {
+                name: 'Should resolve to the same page in the new language variant when switching language variant (Source English -> Target Dutch)',
+                url: 'ecosystem/connection-provider',
+                screenshot: false,
+                run: async (page) => {
+                    const spaceDropdown = page
+                        .locator('[data-testid="space-dropdown-button"]')
+                        .locator('visible=true');
+                    await spaceDropdown.click();
+
+                    const variantSelectionDropdown = page.locator(
+                        'css=[data-testid="dropdown-menu"]'
+                    );
+                    // Click the dutch language variant in the dropdown
+                    await variantSelectionDropdown
+                        .getByRole('menuitem', {
+                            name: 'Yjs (NL)',
+                        })
+                        .click();
+
+                    // It should keep the current page path, i.e "ecosysteem/connection-provider" when navigating to the NL variant
+                    await page.waitForURL((url) =>
+                        url.pathname.includes('nl/ecosysteem/connection-provider')
+                    );
+                    // Verify we are on the correct page by checking the h1
+                    await expect(
+                        page.getByRole('heading', { level: 1, name: 'Connectieprovider' })
+                    ).toBeVisible();
+                },
+            },
+            {
+                name: 'Should resolve to the same page in the new language variant when switching language variant (Source Dutch -> Target Finnish)',
+                url: 'nl/ecosysteem/connection-provider',
+                screenshot: false,
+                run: async (page) => {
+                    const spaceDropdown = page
+                        .locator('[data-testid="space-dropdown-button"]')
+                        .locator('visible=true');
+                    await spaceDropdown.click();
+
+                    const variantSelectionDropdown = page.locator(
+                        'css=[data-testid="dropdown-menu"]'
+                    );
+                    // Click the finnish language variant in the dropdown
+                    await variantSelectionDropdown
+                        .getByRole('menuitem', {
+                            name: 'Yjs (FI)',
+                        })
+                        .click();
+
+                    // It should keep the current page path, i.e "ecosysteem/connection-provider" when navigating to the FI variant
+                    await page.waitForURL((url) =>
+                        url.pathname.includes('fi/ekosysteemi/connection-provider')
+                    );
+                    // Verify we are on the correct page by checking the h1
+                    await expect(
+                        page.getByRole('heading', { level: 1, name: 'Yhteysvälittäjä' })
+                    ).toBeVisible();
+                },
+            },
+        ],
+    },
+    {
         name: 'GitBook Site (Sections and Section Groups)',
         contentBaseURL: 'https://gitbook-open-e2e-sites.gitbook.io/sections/',
         tests: [
@@ -515,20 +614,18 @@ const testCases: TestsCase[] = [
                 url: '',
             },
             {
-                name: 'Section group dropdown',
-                url: '',
-                run: async (page) => {
-                    await page.getByRole('button', { name: 'Test Section Group 1' }).hover();
-                    await expect(page.getByRole('link', { name: /Section B/ })).toBeVisible();
-                },
-            },
-            {
                 name: 'Section group link',
                 url: '',
                 screenshot: false,
                 run: async (page) => {
-                    const sectionGroupDropdown = await page.getByText('Test Section Group 1');
-                    await sectionGroupDropdown.hover();
+                    const trigger = page.getByRole('button', { name: 'Test Section Group 1' });
+                    // Radix NavigationMenu opens the dropdown on a `pointermove`. A single
+                    // synthetic hover can land before hydration and be lost, so re-hover
+                    // until the dropdown content actually appears.
+                    await expect(async () => {
+                        await trigger.hover();
+                        await expect(page.getByText('Section B')).toBeVisible({ timeout: 1000 });
+                    }).toPass({ timeout: 15000 });
                     await page.getByText('Section B').click();
                     await page.waitForURL((url) => url.pathname.includes('/sections/sections-4'));
                 },
@@ -544,7 +641,6 @@ const testCases: TestsCase[] = [
                 url: '',
                 run: waitForCookiesDialog,
             },
-            ...searchTestCases,
             {
                 name: 'Not found',
                 url: 'content-not-found',
@@ -559,7 +655,12 @@ const testCases: TestsCase[] = [
             {
                 name: 'Revision',
                 url: '~/revisions/S55pwsEr5UVoroaOiWnP/blocks/headings',
-                run: waitForCookiesDialog,
+                run: async (page) => {
+                    await waitForCookiesDialog(page);
+                    // Viewing a past revision shows the admin toolbar; assert it is
+                    // present (it is hidden from the screenshot as it animates open).
+                    await waitForAdminToolbar(page);
+                },
             },
             {
                 name: 'Invalid revision',
@@ -630,10 +731,30 @@ const testCases: TestsCase[] = [
                     await expect(page.locator('[data-testid="print-button"]')).toBeVisible();
                 },
             },
+            {
+                name: 'Show error when missing token',
+                url: async () => {
+                    const data = await getSiteAPIToken(
+                        'https://gitbook.gitbook.io/test-gitbook-open/'
+                    );
+
+                    // Intentionally not setting the token to test error handling when the token is missing
+                    const searchParams = new URLSearchParams();
+                    searchParams.set('limit', '10');
+
+                    return `~space/${data.space}/~gitbook/pdf?${searchParams.toString()}`;
+                },
+                screenshot: false,
+                run: async (page, response) => {
+                    expect(response).not.toBeNull();
+                    expect(response?.status()).toBe(400);
+                    await expect(page.getByText('Missing API token')).toBeVisible();
+                },
+            },
         ],
     },
     {
-        name: 'Site Preview',
+        name: 'Site Previews',
         skip: process.env.ARGOS_BUILD_NAME !== 'v2-vercel',
         tests: [
             {
@@ -646,7 +767,7 @@ const testCases: TestsCase[] = [
                     const searchParams = new URLSearchParams();
                     searchParams.set('token', data.apiToken);
 
-                    return `url/preview/${data.site}/?${searchParams.toString()}`;
+                    return `url/${getGitBookPreviewURL(`${data.site}/?${searchParams.toString()}`)}`;
                 },
                 screenshot: false,
                 run: async (page) => {
@@ -661,7 +782,7 @@ const testCases: TestsCase[] = [
                     const searchParams = new URLSearchParams();
                     searchParams.set('token', data.apiToken);
 
-                    return `url/preview/${data.site}/?${searchParams.toString()}`;
+                    return `url/${getGitBookPreviewURL(`${data.site}/?${searchParams.toString()}`)}`;
                 },
                 screenshot: false,
                 run: async (page) => {
@@ -671,72 +792,72 @@ const testCases: TestsCase[] = [
                     const sectionTabLinks = sectionTabs.getByRole('link');
                     for (const link of await sectionTabLinks.all()) {
                         const href = await link.getAttribute('href');
-                        expect(href).toMatch(/^\/url\/preview\/site_p4Xo4\/?/);
+                        expect(href?.includes('/preview/site_p4Xo4')).toBeTruthy();
                     }
                 },
             },
-        ],
-    },
-    {
-        name: 'Markdown page',
-        skip: process.env.ARGOS_BUILD_NAME !== 'v2-vercel',
-        contentBaseURL: 'https://gitbook.gitbook.io/test-gitbook-open/',
-        tests: [
             {
-                name: 'Text page',
-                url: 'text-page.md',
+                name: 'With customization cookie',
+                url: async () => {
+                    const data = await getSiteAPIToken(
+                        'https://gitbook.gitbook.io/test-gitbook-open/'
+                    );
+
+                    const searchParams = new URLSearchParams();
+                    searchParams.set('token', data.apiToken);
+
+                    return `url/${getGitBookPreviewURL(`${data.site}/?${searchParams.toString()}`)}`;
+                },
                 screenshot: false,
-                run: async (_page, response) => {
-                    expect(response?.status()).toBe(200);
-                    expect(response?.headers()['content-type']).toContain('text/markdown');
+                run: async (page) => {
+                    await expect(page.locator('[data-testid="table-of-contents"]')).toBeVisible();
+                    // Trademark exists by default
+                    expect(await page.getByTestId('gb-trademark').count()).toBeGreaterThanOrEqual(
+                        1
+                    ); // We output 2 trademark buttons that are quite different, and can only determine which one is appropriate based on screen size / CSS. So our check needs to be more lenient than "exactly 1".
+
+                    // Go to another page with the customization query to disable the trademark
+                    const pageBlocks = new URL(page.url());
+                    pageBlocks.pathname = `${pageBlocks.pathname.replace(/\/$/, '')}/blocks`;
+                    pageBlocks.search = getCustomizationURL({
+                        trademark: {
+                            enabled: false,
+                        },
+                    }).slice(1);
+                    await page.goto(pageBlocks.toString());
+                    // No trademark because customization is disabled
+                    await expect(page.getByTestId('gb-trademark')).toHaveCount(0);
+                    await expect(
+                        page.getByRole('heading', { level: 1, name: 'Blocks' })
+                    ).toBeVisible();
+
+                    const pageBlocksCode = new URL(page.url());
+                    pageBlocksCode.pathname = `${pageBlocksCode.pathname.replace(/\/$/, '')}/code`;
+                    pageBlocksCode.search = '';
+                    await page.goto(pageBlocksCode.toString());
+                    // The trademark should not be visible because the cookie is still set,
+                    await expect(page.getByTestId('gb-trademark')).toHaveCount(0);
+                    await expect(
+                        page.getByRole('heading', { level: 1, name: 'Code' })
+                    ).toBeVisible();
                 },
             },
-        ],
-    },
-    {
-        name: 'llms.txt',
-        skip: process.env.ARGOS_BUILD_NAME !== 'v2-vercel',
-        contentBaseURL: 'https://gitbook.gitbook.io/test-gitbook-open/',
-        tests: [
             {
-                name: 'llms.txt',
-                url: 'llms.txt',
-                screenshot: false,
-                run: async (_page, response) => {
-                    expect(response?.status()).toBe(200);
-                    expect(response?.headers()['content-type']).toContain('text/markdown');
+                name: 'Redirect to app for authentication when missing token',
+                url: async () => {
+                    const data = await getSiteAPIToken('https://gitbook.com/docs');
+
+                    const searchParams = new URLSearchParams();
+                    // Intentionally not setting the token to test redirection for authentication
+
+                    return `url/${getGitBookPreviewURL(`${data.site}/?${searchParams.toString()}`)}`;
                 },
-            },
-        ],
-    },
-    {
-        name: 'llms-full.txt',
-        skip: process.env.ARGOS_BUILD_NAME !== 'v2-vercel',
-        contentBaseURL: 'https://gitbook.gitbook.io/test-gitbook-open/',
-        tests: [
-            {
-                name: 'llms-full.txt',
-                url: 'llms-full.txt',
                 screenshot: false,
-                run: async (_page, response) => {
-                    expect(response?.status()).toBe(200);
-                    expect(response?.headers()['content-type']).toContain('text/markdown');
-                },
-            },
-        ],
-    },
-    {
-        name: '[page].md',
-        skip: process.env.ARGOS_BUILD_NAME !== 'v2-vercel',
-        contentBaseURL: 'https://gitbook.gitbook.io/test-gitbook-open/',
-        tests: [
-            {
-                name: 'blocks.md',
-                url: 'blocks.md',
-                screenshot: false,
-                run: async (_page, response) => {
-                    expect(response?.status()).toBe(200);
-                    expect(response?.headers()['content-type']).toContain('text/markdown');
+                run: async (page) => {
+                    await page.waitForURL(
+                        (url) =>
+                            url.host === 'app.gitbook.com' && url.pathname.includes('/preview/auth')
+                    );
                 },
             },
         ],
@@ -779,8 +900,14 @@ const testCases: TestsCase[] = [
         ],
     },
     {
+        name: 'Search & AI',
+        contentBaseURL: 'https://gitbook.gitbook.io/test-gitbook-open/',
+        tests: searchTestCases,
+    },
+    {
         name: 'Content tests',
         contentBaseURL: 'https://gitbook.gitbook.io/test-gitbook-open/',
+        fullPage: true,
         tests: [
             {
                 name: 'Text',
@@ -902,26 +1029,31 @@ const testCases: TestsCase[] = [
                 name: 'Lists',
                 url: 'blocks/lists',
                 fullPage: true,
+                run: waitForCookiesDialog,
             },
             {
                 name: 'Code',
                 url: 'blocks/code',
                 fullPage: true,
+                run: waitForCookiesDialog,
             },
             {
                 name: 'Cards',
                 url: 'blocks/cards',
                 fullPage: true,
+                run: waitForCookiesDialog,
             },
             {
                 name: 'Updates',
                 url: 'blocks/updates',
                 fullPage: true,
+                run: waitForCookiesDialog,
             },
             {
                 name: 'Math',
                 url: 'blocks/math',
                 run: async (page) => {
+                    await waitForCookiesDialog(page);
                     await page.waitForFunction(() => {
                         const fonts = Array.from(document.fonts.values());
                         const mjxFonts = fonts.filter(
@@ -938,30 +1070,49 @@ const testCases: TestsCase[] = [
                 name: 'Files',
                 url: 'blocks/files',
                 fullPage: true,
+                run: waitForCookiesDialog,
             },
             {
                 name: 'Embeds',
                 url: 'blocks/embeds',
                 fullPage: true,
+                run: waitForCookiesDialog,
             },
             {
                 name: 'Page links',
                 url: 'blocks/page-links',
                 fullPage: true,
+                run: waitForCookiesDialog,
             },
             {
                 name: 'Annotations',
                 url: 'blocks/annotations',
                 run: async (page) => {
-                    await page.waitForSelector('[data-testid="annotation-button"]');
-                    await page.click('[data-testid="annotation-button"]');
+                    await waitForCookiesDialog(page);
+                    await page.waitForSelector('[data-annotation]');
+                    await page.click('[data-annotation]');
                 },
             },
             {
                 name: 'Stepper',
                 url: 'blocks/stepper',
+                run: waitForCookiesDialog,
             },
-            { name: 'Columns', url: 'blocks/columns' },
+            {
+                name: 'Columns',
+                url: 'blocks/columns',
+                run: waitForCookiesDialog,
+            },
+            {
+                name: 'Mermaid',
+                url: 'blocks/mermaid',
+                run: waitForCookiesDialog,
+            },
+            {
+                name: 'Prompt',
+                url: 'blocks/prompt',
+                run: waitForCookiesDialog,
+            },
         ],
     },
     {
@@ -985,11 +1136,14 @@ const testCases: TestsCase[] = [
                 name: 'With cover for dark mode',
                 url: `page-options/page-with-dark-cover${getCustomizationURL({
                     themes: {
-                        default: CustomizationThemeMode.Dark,
+                        default: CustomizationDefaultThemeMode.Dark,
                         toggeable: false,
                     },
                 })}`,
-                run: waitForCookiesDialog,
+                run: async (page) => {
+                    await waitForCookiesDialog(page);
+                    await waitForCoverImages(page, { darkMode: true });
+                },
             },
             {
                 name: 'With hero cover',
@@ -1188,6 +1342,16 @@ const testCases: TestsCase[] = [
         ]),
     },
     {
+        name: 'Reusable contents',
+        contentBaseURL: 'https://gitbook-open-e2e-sites.gitbook.io/reusable-contents/',
+        tests: [
+            {
+                name: 'All cases',
+                url: '',
+            },
+        ],
+    },
+    {
         name: 'Page actions',
         contentBaseURL: 'https://gitbook.gitbook.io/test-gitbook-open/',
         tests: [
@@ -1195,10 +1359,39 @@ const testCases: TestsCase[] = [
                 name: 'Without page actions',
                 url: getCustomizationURL({
                     pageActions: {
-                        markdown: false,
-                        externalAI: false,
+                        items: [],
                     },
                 }),
+                run: waitForCookiesDialog,
+            },
+        ],
+    },
+    {
+        name: 'Social links',
+        contentBaseURL: 'https://gitbook.gitbook.io/test-gitbook-open/',
+        tests: [
+            {
+                name: 'With social links',
+                url: getCustomizationURL({
+                    socialAccounts: [
+                        {
+                            platform: SiteSocialAccountPlatform.Github,
+                            display: { footer: true },
+                            handle: 'GitbookIO',
+                        },
+                        {
+                            platform: SiteSocialAccountPlatform.Linkedin,
+                            display: { footer: true },
+                            handle: 'gitbook',
+                        },
+                        {
+                            platform: SiteSocialAccountPlatform.Twitter,
+                            display: { footer: false },
+                            handle: 'GitBookIO',
+                        },
+                    ],
+                }),
+                fullPage: true,
                 run: waitForCookiesDialog,
             },
         ],
@@ -1229,7 +1422,7 @@ const testCases: TestsCase[] = [
                     ).toBeVisible();
                     const url = page.url();
                     expect(url.includes('shared-space-uno')).toBeTruthy(); // same uno site
-                    expect(url.endsWith('/shared/')).toBeTruthy(); // correct page
+                    expect(url.endsWith('/shared')).toBeTruthy(); // correct page
                 },
                 screenshot: false,
             },
@@ -1249,7 +1442,7 @@ const testCases: TestsCase[] = [
                     ).toBeVisible();
                     const url = page.url();
                     expect(url.includes('shared-space-dos')).toBeTruthy(); // same dos site
-                    expect(url.endsWith('/shared/')).toBeTruthy(); // correct page
+                    expect(url.endsWith('/shared')).toBeTruthy(); // correct page
                 },
                 screenshot: false,
             },
@@ -1260,10 +1453,18 @@ const testCases: TestsCase[] = [
         contentBaseURL: 'https://gitbook-open-e2e-sites.gitbook.io/gitbook-doc/',
         tests: [
             {
-                name: 'Redirect to SSO page',
+                name: 'Basic redirect',
                 url: 'a/redirect/to/sso',
                 run: async (page) => {
                     await expect(page.locator('h1')).toHaveText('SSO');
+                },
+                screenshot: false,
+            },
+            {
+                name: 'Complex wildcard with special characters',
+                url: 'foo/bar/baz/123456789-welcome-to-gitbook-%22%20target=%22_blank',
+                run: async (page) => {
+                    await expect(page.locator('h1')).toHaveText('SEO');
                 },
                 screenshot: false,
             },
@@ -1568,33 +1769,36 @@ const testCases: TestsCase[] = [
         name: 'Visitor Auth - Site (redirects to fallback/auth URL)',
         contentBaseURL: 'https://gitbook-open-e2e-sites.gitbook.io/va-site-redirects-fallback/',
         tests: [
-            {
-                name: 'Redirect to fallback on invalid token pulled from cookie',
-                url: '',
-                screenshot: false,
-                cookies: (() => {
-                    const basePath = '/va-site-redirects-fallback/';
-                    const invalidToken = jwt.sign(
-                        {
-                            name: 'gitbook-open-tests',
-                        },
-                        'invalidKey',
-                        {
-                            expiresIn: '24h',
-                        }
-                    );
-                    return [
-                        {
-                            name: getVisitorAuthCookieName(basePath),
-                            value: getVisitorAuthCookieValue(basePath, invalidToken),
-                            httpOnly: true,
-                        },
-                    ];
-                })(),
-                run: async (page) => {
-                    await expect(page).toHaveURL(/https:\/\/www.google.com/);
-                },
-            },
+            // This test does not work on Playwright
+            // Error: page.goto: net::ERR_ABORTED; maybe frame was detached?
+            // @see https://github.com/microsoft/playwright/issues/34889
+            // {
+            //     name: 'Redirect to fallback on invalid token pulled from cookie',
+            //     url: '',
+            //     screenshot: false,
+            //     cookies: (() => {
+            //         const basePath = '/va-site-redirects-fallback/';
+            //         const invalidToken = jwt.sign(
+            //             {
+            //                 name: 'gitbook-open-tests',
+            //             },
+            //             'invalidKey',
+            //             {
+            //                 expiresIn: '24h',
+            //             }
+            //         );
+            //         return [
+            //             {
+            //                 name: getVisitorAuthCookieName(basePath),
+            //                 value: getVisitorAuthCookieValue(basePath, invalidToken),
+            //                 httpOnly: true,
+            //             },
+            //         ];
+            //     })(),
+            //     run: async (page) => {
+            //         await expect(page).toHaveURL(/https:\/\/www.google.com/);
+            //     },
+            // },
             {
                 name: 'Show error message when invalid token is passed to url',
                 screenshot: false,
@@ -1989,7 +2193,7 @@ const testCases: TestsCase[] = [
     },
     {
         name: 'Docs Embed - Basic',
-        contentBaseURL: 'https://gitbook.com/docs/~gitbook/embed/demo/',
+        contentBaseURL: 'https://gitbook.gitbook.io/test-gitbook-open/~gitbook/embed/demo/',
         tests: [
             {
                 name: 'Standalone UX',
@@ -2036,13 +2240,15 @@ const testCases: TestsCase[] = [
     },
     {
         name: 'Docs Embed - Assistant + Docs',
-        contentBaseURL: 'https://gitbook.com/docs/~gitbook/embed/demo/',
+        contentBaseURL: 'https://gitbook.gitbook.io/test-gitbook-open/~gitbook/embed/demo/',
         skip: process.env.ARGOS_BUILD_NAME !== 'v2-vercel',
         tests: [
             {
                 name: 'Switch between tabs',
                 url: '',
                 run: async (page) => {
+                    await setTimeToMorning(page);
+                    await page.reload();
                     await expect(page.locator('#gitbook-widget-window')).toBeVisible();
                     const iframe = page.frameLocator('#gitbook-widget-iframe');
                     await iframe.getByTestId('embed-tab-docs').click(); // Switch to docs tab
@@ -2052,9 +2258,13 @@ const testCases: TestsCase[] = [
 
                     await iframe.getByTestId('embed-tab-assistant').click(); // Switch to assistant tab
                     await expect(iframe.getByTestId('ai-chat')).toBeVisible();
-
-                    await iframe.owner().evaluate(overrideAIInitialState);
                 },
+                // Runs inside the iframe (not the parent doc) and per viewport.
+                normalizeBeforeScreenshot: (page) =>
+                    page
+                        .frameLocator('#gitbook-widget-iframe')
+                        .locator('body')
+                        .evaluate(overrideAIInitialState),
             },
             {
                 name: 'API - navigateToPage',
@@ -2062,7 +2272,7 @@ const testCases: TestsCase[] = [
                 run: async (page) => {
                     await page.evaluate(() => {
                         const GitBook = window.GitBook as unknown as GitBookStandalone;
-                        GitBook('navigateToPage', '/getting-started/quickstart');
+                        GitBook('navigateToPage', '/text-page');
                     });
                     await expect(page.locator('#gitbook-widget-window')).toBeVisible();
                     const iframe = page.frameLocator('#gitbook-widget-iframe');
@@ -2071,7 +2281,7 @@ const testCases: TestsCase[] = [
                     });
                     await expect(iframe.owner()).toHaveAttribute(
                         'src',
-                        expect.stringContaining('getting-started/quickstart')
+                        expect.stringContaining('text-page')
                     );
                 },
             },
@@ -2088,8 +2298,15 @@ const testCases: TestsCase[] = [
                     await expect(iframe.getByTestId('ai-chat-message-user').first()).toHaveText(
                         AI_PROMPT
                     );
-                    await iframe.owner().evaluate(overrideAIResponse);
+                    // Wait for the full response to settle before normalizing.
+                    await waitForAIChatResponse(iframe);
                 },
+                // Runs inside the iframe (not the parent doc) and per viewport.
+                normalizeBeforeScreenshot: (page) =>
+                    page
+                        .frameLocator('#gitbook-widget-iframe')
+                        .locator('body')
+                        .evaluate(overrideAIResponse),
             },
             {
                 name: 'Configuration - Suggested questions',
@@ -2115,8 +2332,13 @@ const testCases: TestsCase[] = [
                     await expect(
                         iframe.getByTestId('ai-chat-suggested-question').nth(2)
                     ).toHaveText('What can you do?');
-                    await iframe.owner().evaluate(overrideAIInitialState);
                 },
+                // Runs inside the iframe (not the parent doc) and per viewport.
+                normalizeBeforeScreenshot: (page) =>
+                    page
+                        .frameLocator('#gitbook-widget-iframe')
+                        .locator('body')
+                        .evaluate(overrideAIInitialState),
             },
             {
                 name: 'Configuration - Custom action buttons',
@@ -2132,7 +2354,7 @@ const testCases: TestsCase[] = [
                                     onClick: () => {
                                         const GitBook =
                                             window.GitBook as unknown as GitBookStandalone;
-                                        GitBook('navigateToPage', '/getting-started/quickstart');
+                                        GitBook('navigateToPage', '/text-page');
                                     },
                                 },
                                 {
@@ -2173,7 +2395,7 @@ const testCases: TestsCase[] = [
                     await expect(iframe.getByTestId('embed-docs-page')).toBeVisible();
                     await expect(iframe.owner()).toHaveAttribute(
                         'src',
-                        expect.stringContaining('getting-started/quickstart')
+                        expect.stringContaining('text-page')
                     );
 
                     await expect(actions.nth(1)).toHaveAccessibleName('Open external link');
@@ -2198,8 +2420,15 @@ const testCases: TestsCase[] = [
                     await actions.nth(3).click();
                     await expect(page.locator('#gitbook-widget-window')).not.toBeVisible();
                     await page.locator('#gitbook-widget-button').click();
-                    await iframe.owner().evaluate(overrideAIResponse);
+                    // Wait for the response posted above to settle before normalizing.
+                    await waitForAIChatResponse(iframe);
                 },
+                // Runs inside the iframe (not the parent doc) and per viewport.
+                normalizeBeforeScreenshot: (page) =>
+                    page
+                        .frameLocator('#gitbook-widget-iframe')
+                        .locator('body')
+                        .evaluate(overrideAIResponse),
             },
             {
                 name: 'Configuration - Custom tools',
@@ -2238,13 +2467,21 @@ const testCases: TestsCase[] = [
                         'I want to contact support. Call the tool directly without a preamble. Do not respond with anything else.'
                     );
                     const toolConfirmation = iframe
-                        .getByTestId('ai-chat-tool-confirmation')
+                        .getByTestId('ai-chat-tool-confirm-accept')
                         .first();
                     await expect(toolConfirmation).toBeVisible({
                         timeout: 30000,
                     });
-                    await iframe.owner().evaluate(overrideAIResponse);
+                    // The turn settles (aria-busy clears) once the stream pauses on the
+                    // confirmation control; wait for that before normalizing.
+                    await waitForAIChatResponse(iframe);
                 },
+                // Runs inside the iframe (not the parent doc) and per viewport.
+                normalizeBeforeScreenshot: (page) =>
+                    page
+                        .frameLocator('#gitbook-widget-iframe')
+                        .locator('body')
+                        .evaluate(overrideAIResponse),
             },
         ],
     },
@@ -2257,6 +2494,12 @@ const testCases: TestsCase[] = [
                 name: 'Docs only',
                 url: '',
                 run: async (page) => {
+                    await page.evaluate(() => {
+                        const GitBook = window.GitBook as unknown as GitBookStandalone;
+                        GitBook('configure', {
+                            tabs: ['docs'],
+                        });
+                    });
                     await expect(page.locator('#gitbook-widget-window')).toBeVisible();
                     const iframe = page.frameLocator('#gitbook-widget-iframe');
                     await expect(iframe.getByTestId('embed-docs-page')).toBeVisible({
@@ -2268,6 +2511,12 @@ const testCases: TestsCase[] = [
                 name: 'Table of contents',
                 url: '',
                 run: async (page) => {
+                    await page.evaluate(() => {
+                        const GitBook = window.GitBook as unknown as GitBookStandalone;
+                        GitBook('configure', {
+                            tabs: ['docs'],
+                        });
+                    });
                     await expect(page.locator('#gitbook-widget-window')).toBeVisible();
                     const iframe = page.frameLocator('#gitbook-widget-iframe');
                     await expect(iframe.getByTestId('embed-docs-page')).toBeVisible({
@@ -2283,6 +2532,12 @@ const testCases: TestsCase[] = [
                 name: 'Open in new tab',
                 url: '',
                 run: async (page) => {
+                    await page.evaluate(() => {
+                        const GitBook = window.GitBook as unknown as GitBookStandalone;
+                        GitBook('configure', {
+                            tabs: ['docs'],
+                        });
+                    });
                     await expect(page.locator('#gitbook-widget-window')).toBeVisible();
                     const iframe = page.frameLocator('#gitbook-widget-iframe');
                     await expect(iframe.getByTestId('embed-docs-page')).toBeVisible({

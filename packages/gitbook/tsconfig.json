@@ -1,43 +1,50 @@
 {
-    "compilerOptions": {
-        "target": "esnext",
-        "lib": ["dom", "dom.iterable", "esnext"],
-        "allowJs": true,
-        "skipLibCheck": true,
-        "strict": true,
-        "noUncheckedIndexedAccess": true,
-        "noEmit": true,
-        "incremental": true,
-        "module": "esnext",
-        "esModuleInterop": true,
-        "moduleResolution": "bundler",
-        "resolveJsonModule": true,
-        "isolatedModules": true,
-        "jsx": "preserve",
-        "plugins": [
-            {
-                "name": "next"
-            }
-        ],
-        "paths": {
-            "@/*": ["./src/*"]
-        },
-        "types": [
-            "bun-types" // add Bun global
-        ]
-    },
-    "include": [
-        "next-env.d.ts",
-        ".next/types/**/*.ts",
-        "**/*.ts",
-        "**/*.tsx",
-        "types/**/*.d.ts",
-        "@gitbook/browser-types"
+  "compilerOptions": {
+    "target": "esnext",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
     ],
-    "exclude": [
-        "node_modules",
-        "packages/openapi-parser",
-        "packages/react-openapi",
-        "packages/react-math"
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noEmit": true,
+    "incremental": true,
+    "module": "esnext",
+    "esModuleInterop": true,
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "react-jsx",
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ]
+    },
+    "types": [
+      "bun-types" // add Bun global
     ]
+  },
+  "include": [
+    "next-env.d.ts",
+    ".next/types/**/*.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    "types/**/*.d.ts",
+    "@gitbook/browser-types",
+    ".next/dev/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "packages/openapi-parser",
+    "packages/react-openapi",
+    "packages/react-math"
+  ]
 }

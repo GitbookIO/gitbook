@@ -2,16 +2,31 @@ import type { AIToolCallResult, AIToolDefinition } from '@gitbook/api';
 import type { IconName } from '@gitbook/icons';
 
 /**
+ * Confirmation action to be displayed to the user before executing a tool.
+ */
+export type GitBookToolConfirmation = {
+    icon?: IconName;
+    label: string;
+
+    /**
+     * Supporting context displayed to the user above the confirmation dialog,
+     * to help them understand what they are approving or rejecting.
+     * Limited to 512 characters.
+     */
+    context?: string;
+};
+
+/**
  * Custom tool definition to be passed to the AI assistant.
  */
 export type GitBookToolDefinition = AIToolDefinition & {
     /**
      * Confirmation action to be displayed to the user before executing the tool.
+     * Provide a static object, or a function that receives the input provided by
+     * the AI assistant and returns the confirmation — useful to display dynamic
+     * context based on the arguments the tool is about to be executed with.
      */
-    confirmation?: {
-        icon?: IconName;
-        label: string;
-    };
+    confirmation?: GitBookToolConfirmation | ((input: object) => GitBookToolConfirmation);
 
     /**
      * Callback when the tool is executed.
@@ -45,7 +60,7 @@ export type GitBookEmbeddableActionDefinition = {
  */
 export type GitBookEmbeddableConfiguration = {
     /** Tabs to display in the embed (if enabled on the site). */
-    tabs: ('assistant' | 'docs')[];
+    tabs: ('assistant' | 'docs' | 'search')[];
 
     /** Additional buttons to be displayed in the header of the GitBook embed. */
     actions: GitBookEmbeddableActionDefinition[];
@@ -62,11 +77,27 @@ export type GitBookEmbeddableConfiguration = {
         subtitle: string;
     };
 
+    /**
+     * Override the assistant name displayed in the UI.
+     * Limited to 32 characters.
+     */
+    assistantName?: string;
+
     /** Suggestions of questions to be displayed in the welcome page. */
     suggestions: string[];
 
     /** Tools to be provided to the assistant. */
     tools: GitBookToolDefinition[];
+
+    /**
+     * Display GitBook branding in the embed.
+     */
+    trademark?: boolean;
+
+    /**
+     * Display a close button inside the assistant.
+     */
+    closeButton?: boolean;
 };
 
 /**

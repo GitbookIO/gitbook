@@ -5,6 +5,7 @@ import {
     generateEmbeddableViewport,
 } from '@/components/Embeddable';
 import { getEmbeddableStaticContext } from '@/lib/embeddable';
+import { getThemeFromMiddleware } from '@/lib/middleware';
 import { shouldTrackEvents } from '@/lib/tracking';
 import { headers } from 'next/headers';
 
@@ -18,12 +19,14 @@ export default async function RootLayout({
 }: React.PropsWithChildren<SiteStaticLayoutProps>) {
     const { context, visitorAuthClaims } = await getEmbeddableStaticContext(await params);
     const withTracking = shouldTrackEvents(await headers());
+    const forcedTheme = await getThemeFromMiddleware();
 
     return (
         <EmbeddableRootLayout
             context={context}
             withTracking={withTracking}
             visitorAuthClaims={visitorAuthClaims}
+            forcedTheme={forcedTheme}
         >
             {children}
         </EmbeddableRootLayout>

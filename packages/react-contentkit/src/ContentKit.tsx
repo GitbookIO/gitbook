@@ -10,6 +10,7 @@ import React from 'react';
 
 import {
     ContentKitClientContext,
+    type ContentKitClientContextData,
     type ContentKitClientContextType,
     type ContentKitRenderUpdate,
     type ContentKitSecurity,
@@ -28,6 +29,8 @@ export function ContentKit<RenderContext>(props: {
     renderContext: RenderContext;
     /** Security configuration */
     security: ContentKitSecurity;
+    /** Client-only contextual data for client-rendered elements */
+    clientContext?: ContentKitClientContextData;
     /** Initial input being displayed */
     initialInput: RequestRenderIntegrationUI;
     /** Initial output being displayed */
@@ -58,6 +61,7 @@ export function ContentKit<RenderContext>(props: {
     const {
         renderContext,
         security,
+        clientContext,
         initialInput,
         initialOutput,
         children: initialChildren,
@@ -125,6 +129,7 @@ export function ContentKit<RenderContext>(props: {
     const renderer = React.useMemo<ContentKitClientContextType>(() => {
         return {
             security,
+            clientContext,
             state: current.state,
             setState: (newState) => {
                 setCurrent((latest) => ({
@@ -184,7 +189,7 @@ export function ContentKit<RenderContext>(props: {
                 }
             },
         };
-    }, [update, security, current.state, current.input.context, setCurrent, render]);
+    }, [update, security, clientContext, current.state, current.input.context, setCurrent, render]);
 
     const onSubViewAction = React.useCallback(async (action: ContentKitAction) => {
         switch (action.action) {
@@ -208,6 +213,7 @@ export function ContentKit<RenderContext>(props: {
                 <ContentKit
                     renderContext={renderContext}
                     security={security}
+                    clientContext={clientContext}
                     initialInput={subView.initialInput}
                     initialOutput={subView.initialOutput}
                     render={render}

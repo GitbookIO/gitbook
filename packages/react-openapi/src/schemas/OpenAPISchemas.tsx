@@ -1,4 +1,4 @@
-import type { OpenAPISchema } from '@gitbook/openapi-parser';
+import { getOpenAPISchemaAnchorId } from '@gitbook/openapi-parser';
 import clsx from 'classnames';
 import { OpenAPIExample } from '../OpenAPIExample';
 import { OpenAPIRootSchema } from '../OpenAPISchemaServer';
@@ -11,20 +11,22 @@ import {
 import { t } from '../translate';
 import { getExampleFromSchema } from '../util/example';
 import { OpenAPISchemaItem } from './OpenAPISchemaItem';
+import type { OpenAPISchemasData } from './resolveOpenAPISchemas';
 
 /**
  * OpenAPI Schemas component.
  */
 export function OpenAPISchemas(props: {
     className?: string;
-    schemas: OpenAPISchema[];
+    data: OpenAPISchemasData;
     context: OpenAPIContextInput;
     /**
      * Whether to show the schema directly if there is only one.
      */
     grouped?: boolean;
 }) {
-    const { schemas, context: contextInput, grouped, className } = props;
+    const { data, context: contextInput, grouped, className } = props;
+    const { schemas } = data;
 
     const firstSchema = schemas[0];
 
@@ -39,8 +41,10 @@ export function OpenAPISchemas(props: {
     if (schemas.length === 1 && !grouped) {
         const title = `The ${firstSchema.name} object`;
         return (
-            <div className={clsx('openapi-schemas', className)}>
-                <div className="openapi-summary" id={context.id}>
+            <div className={clsx('openapi-schemas openapi-schemas-single', className)}>
+                {/* The heading rendered below already carries the anchor id; a second id here would
+                    win the fragment target and scroll to the wrong margin. */}
+                <div className="openapi-summary">
                     {context.renderHeading({
                         title,
                         deprecated: Boolean(firstSchema.schema.deprecated),
@@ -61,7 +65,7 @@ export function OpenAPISchemas(props: {
                     </div>
                     <div className="openapi-column-preview">
                         <div className="openapi-column-preview-body">
-                            <div className="openapi-panel">
+                            <div className="openapi-panel" data-follow-color-scheme="true">
                                 <h4 className="openapi-panel-heading">{title}</h4>
                                 <div className="openapi-panel-body">
                                     <OpenAPIExample
@@ -87,6 +91,7 @@ export function OpenAPISchemas(props: {
                 return (
                     <OpenAPISchemaItem
                         key={name}
+                        id={getOpenAPISchemaAnchorId(name)}
                         name={name}
                         context={clientContext}
                         schema={schema}

@@ -1,10 +1,8 @@
 import type { GitBookSiteContext, GitBookSpaceContext } from '@/lib/context';
-import type { GitBookLinker } from '@/lib/links';
 import {
     type Revision,
     type RevisionPageDocument,
     type RevisionPageGroup,
-    RevisionPageType,
     type SiteCustomizationSettings,
     SiteInsightsTrademarkPlacement,
     type Space,
@@ -15,7 +13,7 @@ import { notFound } from 'next/navigation';
 import * as React from 'react';
 
 import { DocumentView } from '@/components/DocumentView';
-import { TrademarkLink } from '@/components/TableOfContents/Trademark';
+import { Trademark } from '@/components/TableOfContents/Trademark';
 import type { PolymorphicComponentProp } from '@/components/utils/types';
 import { getSpaceLanguage } from '@/intl/server';
 import { tString } from '@/intl/translate';
@@ -24,11 +22,13 @@ import { tcls } from '@/lib/tailwind';
 import { defaultCustomization } from '@/lib/utils';
 import { type PDFSearchParams, getPDFSearchParams } from './urls';
 
+import { PDFPrintControls } from './PDFPrintControls';
 import { PageControlButtons } from './PageControlButtons';
-import { PrintButton } from './PrintButton';
+import { createPDFLinker, getPagePDFContainerId } from './linker';
 import './pdf.css';
 import { sanitizeGitBookAppURL } from '@/lib/app';
 import { getPageDocument } from '@/lib/data';
+import { ImagesLoadingStatus } from './ImagesLoadingStatus';
 
 const DEFAULT_LIMIT = 100;
 
@@ -57,7 +57,7 @@ export async function PDFPage(props: {
 
     const customization =
         'customization' in baseContext ? baseContext.customization : defaultCustomization();
-    const language = getSpaceLanguage(baseContext);
+    const language = await getSpaceLanguage(baseContext);
 
     // Compute the pages to render
     const { pages, total } = selectPages(baseContext.revision.pages, pdfParams);
@@ -66,20 +66,7 @@ export async function PDFPage(props: {
     );
 
     // Build a linker that create anchor links for the pages rendered in the PDF page.
-    const linker: GitBookLinker = {
-        ...baseContext.linker,
-        toPathForPage(input) {
-            if (pages.some((p) => p.page.id === input.page.id)) {
-                return `#${getPagePDFContainerId(input.page, input.anchor)}`;
-            }
-            if (input.page.type === RevisionPageType.Group) {
-                return '#';
-            }
-
-            // Use an absolute URL to the page
-            return input.page.urls.app;
-        },
-    };
+    const linker = createPDFLinker(baseContext.linker, pages, baseContext.space.urls.published);
 
     const context: GitBookSpaceContext = {
         ...baseContext,
@@ -118,28 +105,9 @@ export async function PDFPage(props: {
                 </div>
             ) : null}
 
-            <div className={tcls('fixed', 'right-12', 'top-12', 'print:hidden', 'z-50')}>
-                <PrintButton
-                    title={tString(language, 'pdf_print')}
-                    className={tcls(
-                        'flex',
-                        'flex-row',
-                        'items-center',
-                        'justify-center',
-                        'text-sm',
-                        'text-tint',
-                        'hover:text-primary',
-                        'p-4',
-                        'rounded-full',
-                        'bg-white',
-                        'shadow-xs',
-                        'hover:shadow-md',
-                        'border-slate-300',
-                        'border'
-                    )}
-                >
-                    <Icon icon="print" className={tcls('size-6')} />
-                </PrintButton>
+            <div className="fixed top-12 right-12 z-50 flex flex-col items-end gap-2 print:hidden">
+                <PDFPrintControls language={language} />
+                <ImagesLoadingStatus language={language} />
             </div>
 
             <PageControlButtons
@@ -148,7 +116,7 @@ export async function PDFPage(props: {
                 total={total}
                 trademark={
                     customization.trademark.enabled ? (
-                        <TrademarkLink
+                        <Trademark
                             context={context}
                             placement={SiteInsightsTrademarkPlacement.Pdf}
                         />
@@ -187,10 +155,8 @@ async function PDFSpaceIntro(props: {
 
     return (
         <PrintPage isFirst>
-            <div className={tcls('flex', 'items-center', 'justify-center', 'py-12')}>
-                <h1 className={tcls('text-6xl', 'font-bold')}>
-                    {customization.title ?? space.title}
-                </h1>
+            <div className="flex items-center justify-center py-12">
+                <h1 className="font-bold text-6xl">{customization.title ?? space.title}</h1>
             </div>
         </PrintPage>
     );
@@ -201,18 +167,8 @@ async function PDFPageGroup(props: { space: Space; page: RevisionPageGroup }) {
 
     return (
         <PrintPage id={getPagePDFContainerId(page)}>
-            <div
-                className={tcls(
-                    'break-before-page',
-                    'mt-10',
-                    'print:mt-0',
-                    'flex',
-                    'items-center',
-                    'justify-center',
-                    'py-12'
-                )}
-            >
-                <h1 className={tcls('text-5xl', 'font-bold')}>{page.title}</h1>
+            <div className="mt-10 flex break-before-page items-center justify-center py-12 print:mt-0">
+                <h1 className="font-bold text-5xl">{page.title}</h1>
             </div>
         </PrintPage>
     );
@@ -227,9 +183,9 @@ async function PDFPageDocument(props: {
 
     return (
         <PrintPage id={getPagePDFContainerId(page)}>
-            <h1 className={tcls('text-4xl', 'font-bold')}>{page.title}</h1>
+            <h1 className="font-bold text-4xl">{page.title}</h1>
             {page.description ? (
-                <p className={tcls('decoration-primary/6', 'mt-2', 'mb-3')}>{page.description}</p>
+                <p className="mt-2 mb-3 decoration-primary/6">{page.description}</p>
             ) : null}
 
             {document ? (
@@ -354,14 +310,4 @@ function selectPages(
         return flattenPage(page, 0);
     });
     return limitTo(allPages);
-}
-
-/**
- * Create the HTML ID for the container of a page or a given anchor in it.
- */
-function getPagePDFContainerId(
-    page: RevisionPageDocument | RevisionPageGroup,
-    anchor?: string
-): string {
-    return `pdf-page-${page.id}${anchor ? `-${anchor}` : ''}`;
 }

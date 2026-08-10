@@ -93,13 +93,7 @@ export function OpenAPIResponseExample(props: {
         return null;
     }
 
-    return (
-        <OpenAPIResponseExampleContent
-            selectIcon={context.icons.chevronDown}
-            blockKey={context.blockKey}
-            items={tabs}
-        />
-    );
+    return <OpenAPIResponseExampleContent selectIcon={context.icons.chevronDown} items={tabs} />;
 }
 
 function OpenAPIResponse(props: {

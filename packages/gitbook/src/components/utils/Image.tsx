@@ -33,7 +33,7 @@ export type ImageResponsiveSize = {
     width: number;
 };
 
-const MAX_DPR = 4;
+const MAX_DPR = 3;
 
 interface ImageCommonProps {
     /**
@@ -110,7 +110,7 @@ export function Image(
         } & ImageCommonProps
     >
 ) {
-    const { sources, style, inline = false, alt, ...rest } = props;
+    const { sources, style, inline = false, alt, loading, ...rest } = props;
 
     return (
         <>
@@ -125,6 +125,7 @@ export function Image(
                     style
                 )}
                 alt={sources.light.alt || alt}
+                loading={loading}
             />
             {sources.dark ? (
                 <ImagePicture
@@ -133,7 +134,7 @@ export function Image(
                     inline={inline}
                     // We don't want to preload the dark image, because it's not visible
                     // TODO: adapt based on the default theme
-                    loading="lazy"
+                    loading={loading === 'eager' ? 'eager' : 'lazy'}
                     className={tcls(
                         rest.className,
                         'hidden',

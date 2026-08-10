@@ -4,7 +4,7 @@ import type { ContentKitWebFrame } from '@gitbook/api';
 import React from 'react';
 
 import { Icon } from '@gitbook/icons';
-import { useContentKitClientContext } from './context';
+import { type ContentKitClientContextData, useContentKitClientContext } from './context';
 import { resolveDynamicBinding } from './dynamic';
 import type { ContentKitClientElementProps } from './types';
 
@@ -47,7 +47,7 @@ export function ElementWebframe(props: ContentKitClientElementProps<ContentKitWe
                 messagesQueueRef.current.push(message);
             }
         },
-        [renderer.security]
+        [element.source.url, renderer.security]
     );
 
     // Listen to messages coming from the webframe
@@ -127,6 +127,19 @@ export function ElementWebframe(props: ContentKitClientElementProps<ContentKitWe
                             })(),
                         }));
                         break;
+                    case '@webframe.navigate':
+                        // Let the host navigate to another page. The destination is addressed by
+                        // `path`; the host resolves it within the current site and gates it.
+                        if (typeof message.action.path === 'string') {
+                            renderer.clientContext?.navigate?.({
+                                path: message.action.path,
+                                anchor:
+                                    typeof message.action.anchor === 'string'
+                                        ? message.action.anchor
+                                        : undefined,
+                            });
+                        }
+                        break;
                     default:
                         renderer.update({
                             action: message.action,
@@ -146,19 +159,21 @@ export function ElementWebframe(props: ContentKitClientElementProps<ContentKitWe
         };
     }, [renderer, sendMessage]);
 
-    // Send data to the webframe
+    // Send data and client-only context (visitor claims, current page) as state to the webframe.
     React.useEffect(() => {
-        if (!element.data) {
-            return;
-        }
-
-        const state: Record<string, string> = {};
-        Object.entries(element.data).forEach(([key, value]) => {
-            state[key] = resolveDynamicBinding(renderer.state, value);
+        const abort = { cancelled: false };
+        sendWebframeState({
+            elementData: element.data,
+            rendererState: renderer.state,
+            clientContext: renderer.clientContext,
+            sendMessage,
+            abort,
         });
 
-        return sendMessage({ state });
-    }, [element.data, renderer.state, sendMessage]);
+        return () => {
+            abort.cancelled = true;
+        };
+    }, [element.data, renderer.state, renderer.clientContext, sendMessage]);
 
     const height = size.height ? Math.max(size.height, MIN_HEIGHT) : undefined;
 
@@ -191,4 +206,66 @@ export function ElementWebframe(props: ContentKitClientElementProps<ContentKitWe
             }}
         />
     );
+}
+
+type WebframeState = Record<string, unknown>;
+
+/**
+ * Resolve configured webframe data bindings against the current ContentKit state.
+ */
+function resolveWebframeState(
+    elementData: ContentKitWebFrame['data'],
+    rendererState: object
+): WebframeState {
+    const state: WebframeState = {};
+
+    if (!elementData) {
+        return state;
+    }
+
+    Object.entries(elementData).forEach(([key, value]) => {
+        state[key] = resolveDynamicBinding(rendererState, value);
+    });
+
+    return state;
+}
+
+/**
+ * Resolve the optional client-only contexts (visitor claims, current page)
+ * to merge into the webframe state.
+ */
+async function resolveClientContexts(clientContext: ContentKitClientContextData | undefined) {
+    return await Promise.all([
+        clientContext?.getVisitorContext?.(),
+        clientContext?.getPageContext?.(),
+    ]);
+}
+
+/**
+ * Send the combined webframe state once client-only contexts have been resolved.
+ */
+async function sendWebframeState(args: {
+    elementData: ContentKitWebFrame['data'];
+    rendererState: object;
+    clientContext: ContentKitClientContextData | undefined;
+    sendMessage: (message: object) => void;
+    abort: { cancelled: boolean };
+}) {
+    const { elementData, rendererState, clientContext, sendMessage, abort } = args;
+    const state = resolveWebframeState(elementData, rendererState);
+    const clientContexts = await resolveClientContexts(clientContext);
+
+    if (abort.cancelled) {
+        return;
+    }
+
+    for (const context of clientContexts) {
+        if (context) {
+            Object.assign(state, context);
+        }
+    }
+
+    if (Object.keys(state).length > 0) {
+        sendMessage({ state });
+    }
 }

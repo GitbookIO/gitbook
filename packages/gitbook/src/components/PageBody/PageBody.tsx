@@ -3,13 +3,21 @@ import type { JSONDocument, RevisionPageDocument, SiteInsightsDisplayContext } f
 
 import { getSpaceLanguage } from '@/intl/server';
 import { t } from '@/intl/translate';
-import { hasFullWidthBlock, hasMoreThan, hasTopLevelBlock, isNodeEmpty } from '@/lib/document';
+import {
+    hasAPIBlock,
+    hasFullWidthBlock,
+    hasMoreThan,
+    hasTopLevelBlock,
+    isNodeEmpty,
+} from '@/lib/document';
+import { getLLMsTxtURL, getPageMarkdownURL } from '@/lib/llms-directive';
 import type { AncestorRevisionPage } from '@/lib/pages';
 import { tcls } from '@/lib/tailwind';
 import { DocumentView, DocumentViewSkeleton } from '../DocumentView';
 import { TrackPageViewEvent } from '../Insights';
 import { PageFeedbackForm } from '../PageFeedback';
 import { CurrentPageProvider } from '../hooks/useCurrentPage';
+import { CONTENT_STYLE } from '../layout';
 import { DateRelative, SuspenseLoadedHint } from '../primitives';
 import OptionalSuspense from './OptionalSuspense';
 import { PageBodyBlankslate } from './PageBodyBlankslate';
@@ -20,7 +28,7 @@ import { PreservePageLayout } from './PreservePageLayout';
 
 const LINK_PREVIEW_MAX_COUNT = 500;
 
-export function PageBody(props: {
+export async function PageBody(props: {
     context: GitBookSiteContext;
     page: RevisionPageDocument;
     ancestors: AncestorRevisionPage[];
@@ -40,8 +48,6 @@ export function PageBody(props: {
     } = props;
     const { customization } = context;
 
-    const contentFullWidth = document ? hasFullWidthBlock(document) : false;
-
     // Update blocks can only be at the top level of the document, so we optimize the check.
     const contentHasUpdates = document
         ? hasTopLevelBlock(document, (block) => block.type === 'updates')
@@ -55,101 +61,138 @@ export function PageBody(props: {
               LINK_PREVIEW_MAX_COUNT
           )
         : false;
-    const pageWidthWide = page.layout.width === 'wide';
-    const siteWidthWide = pageWidthWide || contentFullWidth;
-    const language = getSpaceLanguage(context);
+
+    // Determine if content should use wide layout (2-column or 1-column instead of 3-column)
+    // This happens when: (1) document has full-width blocks, OR (2) page layout is explicitly set to 'wide'
+    const wideContent = document ? hasFullWidthBlock(document) : false;
+    // Whether the page has OpenAPI/Swagger blocks — used to scope the sticky, extracted page-actions
+    // to API-reference pages only (matching the `page-api-block` styling), so other pages keep the
+    // header structure untouched.
+    const hasAPIBlocks = document ? hasAPIBlock(document) : false;
+    const wideLayout = wideContent || page.layout.width === 'wide';
+    const language = await getSpaceLanguage(context);
     const updatedAt = page.updatedAt ?? page.createdAt;
 
     const hasVisibleTOCItems =
         context.revision.pages.filter(
-            (page) => page.type !== 'document' || (page.type === 'document' && !page.hidden)
+            (page) =>
+                page.type === 'link' ||
+                page.type === 'computed' ||
+                (page.type === 'group' && !page.hidden) ||
+                (page.type === 'document' && !page.hidden)
         ).length > 0;
+
+    const pageHasToc = page.layout.tableOfContents && hasVisibleTOCItems;
 
     return (
         <CurrentPageProvider page={{ spaceId: context.space.id, pageId: page.id }}>
             <main
                 className={tcls(
                     'relative min-w-0 flex-1',
-                    'max-w-screen-2xl py-8',
-                    // Allow words to break if they are too long.
-                    'break-anywhere',
+                    'break-anywhere', // Allow words to break if they are too long.
+                    'py-8',
+                    'layout-wide:no-sidebar:lg:max-xl:pb-20', // Add padding to prevent overlap of minimised trademark
                     '@container',
-                    pageWidthWide ? 'page-width-wide 3xl:px-8' : 'page-width-default',
-                    siteWidthWide ? 'site-width-wide' : 'site-width-default',
-                    page.layout.tableOfContents && hasVisibleTOCItems
-                        ? 'page-has-toc'
-                        : 'page-no-toc'
+                    // Flex column so the growing content wrapper below fills the page: the footer
+                    // navigation settles at the bottom, and a full-page cover shows behind the content.
+                    'flex flex-col',
+                    CONTENT_STYLE,
+                    pageHasToc ? 'page-has-toc' : 'page-no-toc',
+                    wideLayout ? 'layout-wide' : 'layout-default'
                 )}
             >
-                <PreservePageLayout siteWidthWide={siteWidthWide} />
+                <PreservePageLayout wideLayout={wideLayout} pageHasToc={pageHasToc} />
+                <LLMsTxtPageDirective context={context} page={page} />
                 {page.cover && page.layout.cover && page.layout.coverSize === 'hero' ? (
                     <PageCover as="hero" page={page} cover={page.cover} context={context} />
                 ) : null}
 
-                <PageHeader
-                    context={context}
-                    page={page}
-                    ancestors={ancestors}
-                    withRSSFeed={contentHasUpdates}
-                />
-                {document && !isNodeEmpty(document) ? (
-                    <OptionalSuspense
-                        staticRoute={staticRoute}
-                        fallback={
-                            <DocumentViewSkeleton
-                                document={document}
-                                blockStyle="page-api-block:ml-0"
-                            />
-                        }
-                    >
-                        <SuspenseLoadedHint />
-                        <DocumentView
-                            document={document}
-                            style="flex flex-col [&>*+*]:mt-5"
-                            blockStyle="page-api-block:ml-0"
-                            context={{
-                                mode: 'default',
-                                contentContext: {
-                                    ...context,
-                                    page,
-                                },
-                                withLinkPreviews,
-                            }}
-                        />
-                    </OptionalSuspense>
-                ) : (
-                    <PageBodyBlankslate page={page} context={context} />
-                )}
+                {/* Grows to fill the page (so the footer navigation below settles at the bottom) and
+                    stays a plain block — this gives the floated, sticky API page-actions a tall
+                    containing block to travel within while letting the breadcrumbs wrap around them
+                    (see PageHeader). */}
+                <div className="min-w-0 grow">
+                    <PageHeader
+                        context={context}
+                        page={page}
+                        ancestors={ancestors}
+                        withRSSFeed={contentHasUpdates}
+                        hasAPIBlocks={hasAPIBlocks}
+                    />
+                    {document && !isNodeEmpty(document) ? (
+                        <OptionalSuspense
+                            staticRoute={staticRoute}
+                            fallback={<DocumentViewSkeleton document={document} blockStyle="" />}
+                        >
+                            <SuspenseLoadedHint />
+                            <div className="contents" data-content-ref-root="">
+                                <DocumentView
+                                    document={document}
+                                    style="flex flex-col [&>*+*]:mt-5"
+                                    context={{
+                                        mode: 'default',
+                                        contentContext: {
+                                            ...context,
+                                            page,
+                                        },
+                                        withLinkPreviews,
+                                        isPageBody: true,
+                                    }}
+                                />
+                            </div>
+                        </OptionalSuspense>
+                    ) : (
+                        <PageBodyBlankslate page={page} context={context} />
+                    )}
+                </div>
 
                 {page.layout.pagination && customization.pagination.enabled ? (
                     <PageFooterNavigation context={context} page={page} />
                 ) : null}
 
-                {
-                    // TODO: after 25/07/2025, we can chage it to a true check as the cache will be updated
-                    page.layout.metadata !== false ? (
-                        <div className="mx-auto mt-6 page-api-block:ml-0 flex max-w-3xl page-full-width:max-w-screen-2xl flex-row flex-wrap items-center gap-4 text-tint contrast-more:text-tint-strong">
-                            {updatedAt ? (
-                                <p className="mr-auto text-sm ">
-                                    {t(
-                                        language,
-                                        'page_last_modified',
-                                        <DateRelative value={updatedAt} />
-                                    )}
-                                </p>
-                            ) : null}
-                            {withPageFeedback ? (
-                                <PageFeedbackForm
-                                    className={page.layout.outline ? 'xl:hidden' : ''}
-                                    pageId={page.id}
-                                />
-                            ) : null}
-                        </div>
-                    ) : null
-                }
+                {page.layout.metadata ? (
+                    <div
+                        className={tcls(
+                            CONTENT_STYLE,
+                            'mt-6 flex flex-row flex-wrap items-center gap-4 text-tint contrast-more:text-tint-strong'
+                        )}
+                    >
+                        {updatedAt ? (
+                            <p className="mr-auto text-sm ">
+                                {t(
+                                    language,
+                                    'page_last_modified',
+                                    <DateRelative value={updatedAt} />
+                                )}
+                            </p>
+                        ) : null}
+                        {withPageFeedback ? (
+                            <PageFeedbackForm
+                                className={
+                                    // Hide feedback form when outline is visible on desktop, but show it in some special cases
+                                    page.layout.outline
+                                        ? 'layout-wide:chat-open:max-[2416px]:flex layout-wide:max-3xl:flex xl:hidden xl:max-3xl:chat-open:flex'
+                                        : ''
+                                }
+                                pageId={page.id}
+                            />
+                        ) : null}
+                    </div>
+                ) : null}
             </main>
 
             <TrackPageViewEvent displayContext={insightsDisplayContext} />
         </CurrentPageProvider>
+    );
+}
+
+function LLMsTxtPageDirective(props: { context: GitBookSiteContext; page: RevisionPageDocument }) {
+    const { context, page } = props;
+
+    return (
+        <div className="sr-only">
+            For the complete documentation index, see <a href={getLLMsTxtURL(context)}>llms.txt</a>.
+            This page is also available as <a href={getPageMarkdownURL(context, page)}>Markdown</a>.
+        </div>
     );
 }

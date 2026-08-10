@@ -1,8 +1,8 @@
 import {
-    CustomizationIconsStyle,
+    CustomizationDefaultThemeMode,
     CustomizationSidebarBackgroundStyle,
     CustomizationSidebarListStyle,
-    CustomizationThemeMode,
+    CustomizationTheme,
     type CustomizationThemedColor,
     type CustomizationTint,
     type SiteCustomizationSettings,
@@ -18,12 +18,12 @@ import {
     colorScale,
     hexToRgb,
 } from '@gitbook/colors';
-import { IconStyle, IconsProvider } from '@gitbook/icons';
+import { IconsProvider } from '@gitbook/icons';
 import * as ReactDOM from 'react-dom';
 
 import { type FontData, getFontData } from '@/fonts';
 import { fontNotoColorEmoji, fonts } from '@/fonts/default';
-import { getSpaceLanguage } from '@/intl/server';
+import { getContentLocale, getSpaceLanguage } from '@/intl/server';
 import { getAssetURL } from '@/lib/assets';
 import { tcls } from '@/lib/tailwind';
 
@@ -32,8 +32,16 @@ import { RootLayoutClientContexts } from './RootLayoutClientContexts';
 import './globals.css';
 import type { GitBookAnyContext } from '@/lib/context';
 import { GITBOOK_FONTS_URL, GITBOOK_ICONS_TOKEN, GITBOOK_ICONS_URL } from '@/lib/env';
+import {
+    getContentInlineIconSourceRequests,
+    getCustomizationIconStyle,
+    getDefaultInlineIconSourceRequests,
+    getInlineIconSources,
+} from '@/lib/icons/inline';
 import { defaultCustomization } from '@/lib/utils';
 import { AnnouncementDismissedScript } from '../Announcement';
+import { SelectStateScript } from '../Select';
+import { OperatingSystemClassScript } from './OperatingSystemClassScript';
 
 function preloadFont(fontData: FontData) {
     if (fontData.type === 'custom') {
@@ -56,20 +64,30 @@ function preloadFont(fontData: FontData) {
  * It takes care of setting the theme and the language.
  */
 export async function CustomizationRootLayout(props: {
+    /** The class name to apply to the html element. */
+    htmlClassName?: string;
     /** The class name to apply to the body element. */
-    className?: string;
-    forcedTheme?: CustomizationThemeMode | null;
+    bodyClassName?: string;
+    forcedTheme?: CustomizationDefaultThemeMode | null;
     context: GitBookAnyContext;
     children: React.ReactNode;
 }) {
-    const { className, context, forcedTheme, children } = props;
+    const { htmlClassName, bodyClassName, context, forcedTheme, children } = props;
     const customization =
         'customization' in context ? context.customization : defaultCustomization();
 
-    const language = getSpaceLanguage(context);
+    const locale = getContentLocale(context);
+    const language = await getSpaceLanguage(context);
     const tintColor = getTintColor(customization);
     const mixColor = getTintMixColor(customization.styling.primaryColor, tintColor);
     const sidebarStyles = getSidebarStyles(customization);
+    const theme = 'theme' in customization.styling ? customization.styling.theme : undefined;
+    // Which scale step the theme renders as the page background — the step an exact light/dark tint
+    // anchors to. `muted` uses tint-subtle (step 2), other themes tint-base (step 1). `bold` is
+    // intentionally two-tone and already uses the tint for the header, so it opts out entirely
+    // (undefined) and keeps a neutral page background.
+    const tintBaseStep =
+        theme === CustomizationTheme.Bold ? undefined : theme === CustomizationTheme.Muted ? 2 : 1;
     const { infoColor, successColor, warningColor, dangerColor } = getSemanticColors(customization);
     const fontData = getFontData(customization.styling.font, 'content');
     // Temporarily add a if here while the cache is being warmed up.
@@ -84,11 +102,24 @@ export async function CustomizationRootLayout(props: {
     // Preconnect and preload custom fonts if needed
     preloadFont(fontData);
     preloadFont(monospaceFontData);
+    const iconStyle = getCustomizationIconStyle(customization);
+    const iconSources = await getInlineIconSources([
+        ...getDefaultInlineIconSourceRequests(iconStyle),
+        ...getContentInlineIconSourceRequests({
+            iconStyle,
+            pages: context.revision.pages,
+            tags: context.revision.tags,
+            sections:
+                'sections' in context
+                    ? [...(context.sections?.list ?? []), ...(context.visibleSections?.list ?? [])]
+                    : null,
+        }),
+    ]);
 
     return (
         <html
             suppressHydrationWarning
-            lang={customization.internationalization.locale}
+            lang={locale}
             className={tcls(
                 customization.styling.corners && `${customization.styling.corners}-corners`,
                 'theme' in customization.styling && `theme-${customization.styling.theme}`,
@@ -104,15 +135,21 @@ export async function CustomizationRootLayout(props: {
                     : null,
 
                 // Set the dark/light class statically to avoid flashing and make it work when JS is disabled
-                (forcedTheme ?? customization.themes.default) === CustomizationThemeMode.Dark
+                (forcedTheme ?? customization.themes.default) === CustomizationDefaultThemeMode.Dark
                     ? 'dark'
-                    : ''
+                    : '',
+                htmlClassName
             )}
         >
             <head>
                 {customization.privacyPolicy.url ? (
                     <link rel="privacy-policy" href={customization.privacyPolicy.url} />
                 ) : null}
+
+                <OperatingSystemClassScript />
+
+                {/* Apply the visitor's content selection to <html> before first paint (no flash) */}
+                <SelectStateScript />
 
                 {/* Inject custom font @font-face rules */}
                 {fontData.type === 'custom' ? <style>{fontData.fontFaceRules}</style> : null}
@@ -131,9 +168,9 @@ export async function CustomizationRootLayout(props: {
                         undefined
                     }
                 >{`
-                    :root {
+                    :root, .light, .dark [data-color-scheme$="light"], .dark [data-follow-color-scheme="true"]:has([data-color-scheme$="light"]) {
                         ${generateColorVariable('primary', customization.styling.primaryColor.light)}
-                        ${generateColorVariable('tint', tintColor ? tintColor.light : DEFAULT_TINT_COLOR, { mix: mixColor && { color: mixColor.color.light, ratio: mixColor.ratio.light } })}
+                        ${generateColorVariable('tint', tintColor ? tintColor.light : DEFAULT_TINT_COLOR, { baseStep: tintBaseStep, mix: mixColor && { color: mixColor.color.light, ratio: mixColor.ratio.light } })}
                         ${generateColorVariable('neutral', DEFAULT_TINT_COLOR)}
 
                         --header-background: ${
@@ -158,9 +195,9 @@ export async function CustomizationRootLayout(props: {
                         ${generateColorVariable('success', successColor.light)}
                     }
 
-                    .dark {
+                    .dark, :root:not(.dark) [data-color-scheme^="dark"], :root:not(.dark) [data-follow-color-scheme="true"]:has([data-color-scheme^="dark"]) {
                         ${generateColorVariable('primary', customization.styling.primaryColor.dark, { darkMode: true })}
-                        ${generateColorVariable('tint', tintColor ? tintColor.dark : DEFAULT_TINT_COLOR, { darkMode: true, mix: mixColor && { color: mixColor?.color.dark, ratio: mixColor.ratio.dark } })}
+                        ${generateColorVariable('tint', tintColor ? tintColor.dark : DEFAULT_TINT_COLOR, { darkMode: true, baseStep: tintBaseStep, mix: mixColor && { color: mixColor?.color.dark, ratio: mixColor.ratio.dark } })}
                         ${generateColorVariable('neutral', DEFAULT_TINT_COLOR, { darkMode: true })}
 
                         --header-background: ${hexToRgb(customization.header.backgroundColor?.dark ?? tintColor?.dark ?? customization.styling.primaryColor.dark)};
@@ -178,7 +215,7 @@ export async function CustomizationRootLayout(props: {
                     }
                 `}</style>
             </head>
-            <body className={className}>
+            <body className={tcls(bodyClassName, 'sheet-open:overflow-hidden')}>
                 <IconsProvider
                     assetsURL={GITBOOK_ICONS_URL}
                     assetsURLToken={GITBOOK_ICONS_TOKEN}
@@ -187,11 +224,8 @@ export async function CustomizationRootLayout(props: {
                             assetsURL: getAssetURL('icons'),
                         },
                     }}
-                    iconStyle={
-                        ('icons' in customization.styling
-                            ? apiToIconsStyles[customization.styling.icons]
-                            : null) || IconStyle.Regular
-                    }
+                    iconSources={iconSources}
+                    iconStyle={iconStyle}
                 >
                     <RootLayoutClientContexts language={language}>
                         {children}
@@ -338,13 +372,3 @@ function generateColorVariable(
         })
         .join('\n');
 }
-
-const apiToIconsStyles: {
-    [key in CustomizationIconsStyle]: IconStyle;
-} = {
-    [CustomizationIconsStyle.Regular]: IconStyle.Regular,
-    [CustomizationIconsStyle.Solid]: IconStyle.Solid,
-    [CustomizationIconsStyle.Duotone]: IconStyle.Duotone,
-    [CustomizationIconsStyle.Thin]: IconStyle.Thin,
-    [CustomizationIconsStyle.Light]: IconStyle.Light,
-};

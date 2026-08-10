@@ -1,6 +1,7 @@
 'use server';
 
-import type { GitBookBaseContext, GitBookSiteContext } from '@/lib/context';
+import { isAIEnabled, isAISearchEnabled } from '@/components/utils/isAIChatEnabled';
+import type { GitBookSiteContext } from '@/lib/context';
 import { resolvePageId } from '@/lib/pages';
 import { fetchServerActionSiteContext, getServerActionBaseContext } from '@/lib/server-actions';
 import { findSiteSpaceBy } from '@/lib/sites';
@@ -10,48 +11,17 @@ import type {
     RevisionPage,
     SearchAIAnswer,
     SearchAIRecommendedQuestionStream,
-    SearchPageResult,
-    SearchSpaceResult,
-    SiteSection,
-    SiteSectionGroup,
-    SiteSpace,
-    Space,
+    SiteInsightsSession,
 } from '@gitbook/api';
 import { createStreamableValue } from 'ai/rsc';
 import type * as React from 'react';
 
 import { throwIfDataError } from '@/lib/data';
+import { toEmbeddableLinkForPublishedContent } from '@/lib/embeddable-linker';
 import { getSiteURLDataFromMiddleware } from '@/lib/middleware';
 import { joinPathWithBaseURL } from '@/lib/paths';
 import { traceErrorOnly } from '@/lib/tracing';
-import type { IconName } from '@gitbook/icons';
 import { DocumentView } from '../DocumentView';
-
-export type OrderedComputedResult = ComputedPageResult | ComputedSectionResult;
-
-export interface ComputedSectionResult {
-    type: 'section';
-    id: string;
-    title: string;
-    body: string;
-    href: string;
-
-    pageId: string;
-    spaceId: string;
-}
-
-export interface ComputedPageResult {
-    type: 'page';
-    id: string;
-    title: string;
-
-    href: string;
-
-    pageId: string;
-    spaceId: string;
-
-    breadcrumbs?: Array<{ icon?: IconName; label: string }>;
-}
 
 export interface AskAnswerSource {
     id: string;
@@ -70,15 +40,25 @@ export interface AskAnswerResult {
  * Server action to ask a question in a space.
  */
 export async function streamAskQuestion({
+    asEmbeddable,
     question,
+    session,
 }: {
+    asEmbeddable?: boolean;
     question: string;
+    session: SiteInsightsSession;
 }) {
     return traceErrorOnly('Search.streamAskQuestion', async () => {
         const responseStream = createStreamableValue<AskAnswerResult | undefined>();
 
         (async () => {
-            const context = await fetchServerActionSiteContext(await getServerActionBaseContext());
+            const context = await fetchServerActionSiteContext(
+                await getServerActionBaseContext({ isEmbeddable: asEmbeddable })
+            );
+
+            if (!isAISearchEnabled(context.customization.ai.mode)) {
+                throw new Error('AI Search is not enabled for this site.');
+            }
 
             const apiClient = await context.dataFetcher.api();
 
@@ -94,6 +74,7 @@ export async function streamAskQuestion({
                         mode: 'default',
                         currentSiteSpace: context.siteSpace.id,
                     },
+                    session,
                 },
                 { format: 'document' }
             );
@@ -140,7 +121,11 @@ export async function streamAskQuestion({
                     }, new Map<string, RevisionPage[]>());
                 });
                 responseStream.update(
-                    await transformAnswer(context, { answer: chunk.answer, spacePages: pages })
+                    await transformAnswer(context, {
+                        answer: chunk.answer,
+                        asEmbeddable: Boolean(asEmbeddable),
+                        spacePages: pages,
+                    })
                 );
             }
         })()
@@ -171,6 +156,11 @@ export async function streamRecommendedQuestions(args: { siteSpaceId?: string })
         >();
 
         (async () => {
+            const siteContext = await fetchServerActionSiteContext(context);
+            if (!isAIEnabled(siteContext.customization.ai.mode)) {
+                throw new Error('AI is not enabled for this site.');
+            }
+
             const apiClient = await context.dataFetcher.api();
             const apiStream = apiClient.orgs.streamRecommendedQuestionsInSite(
                 siteURLData.organization,
@@ -195,84 +185,15 @@ export async function streamRecommendedQuestions(args: { siteSpaceId?: string })
     });
 }
 
-/**
- * Search for content in a site by scoping the search to all content, a specific spaces or current space.
- */
-export async function searchSiteContent({
-    query,
-    ...scope
-}: {
-    query: string;
-} & (
-    | { mode: 'all' }
-    | { mode: 'current'; siteSpaceId: string }
-    | { mode: 'specific'; siteSpaceIds: string[] }
-)): Promise<OrderedComputedResult[]> {
-    return traceErrorOnly(`Search.searchSiteContent.${scope.mode}`, async () => {
-        if (query.length <= 1) {
-            return [];
-        }
-
-        const [context, { organization, site, shareKey }] = await Promise.all([
-            getServerActionBaseContext(),
-            getSiteURLDataFromMiddleware(),
-        ]);
-
-        const [searchResults, { structure }] = await Promise.all([
-            throwIfDataError(
-                context.dataFetcher.searchSiteContent({
-                    organizationId: organization,
-                    siteId: site,
-                    query,
-                    scope,
-                })
-            ),
-            throwIfDataError(
-                context.dataFetcher.getPublishedContentSite({
-                    organizationId: organization,
-                    siteId: site,
-                    siteShareKey: shareKey,
-                })
-            ),
-        ]);
-
-        return (
-            await Promise.all(
-                searchResults.map((spaceItem) => {
-                    const found = findSiteSpaceBy(
-                        structure,
-                        (siteSpace) => siteSpace.space.id === spaceItem.id
-                    );
-                    const siteSection = found?.siteSection;
-                    const siteSectionGroup = found?.siteSectionGroup;
-
-                    return Promise.all(
-                        spaceItem.pages.map((pageItem) =>
-                            transformSitePageResult(context, {
-                                pageItem,
-                                spaceItem,
-                                siteSpace: found?.siteSpace,
-                                space: found?.siteSpace.space,
-                                spaceURL: found?.siteSpace.urls.published,
-                                siteSection: siteSection ?? undefined,
-                                siteSectionGroup:
-                                    (siteSectionGroup as SiteSectionGroup) ?? undefined,
-                            })
-                        )
-                    );
-                })
-            )
-        ).flat(2);
-    });
-}
-
 async function transformAnswer(
     context: GitBookSiteContext,
     {
         answer,
+        asEmbeddable,
         spacePages,
     }: {
         answer: SearchAIAnswer;
+        asEmbeddable: boolean;
         spacePages: Map<string, RevisionPage[]>;
     }
 ): Promise<AskAnswerResult> {
@@ -301,12 +222,24 @@ async function transformAnswer(
                 );
                 const spaceURL = found?.siteSpace.urls.published;
 
-                const href = spaceURL
-                    ? joinPathWithBaseURL(spaceURL, page.page.path)
-                    : context.linker.toPathForPage({
-                          pages,
-                          page: page.page,
-                      });
+                let href = context.linker.toPathForPage({
+                    pages,
+                    page: page.page,
+                });
+
+                if (spaceURL) {
+                    if (asEmbeddable) {
+                        href = toEmbeddableLinkForPublishedContent(
+                            context.linker,
+                            spaceURL,
+                            page.page.path
+                        );
+                    } else {
+                        href = context.linker.toLinkForContent(
+                            joinPathWithBaseURL(spaceURL, page.page.path)
+                        );
+                    }
+                }
 
                 return {
                     id: source.page,
@@ -334,72 +267,4 @@ async function transformAnswer(
         followupQuestions: answer.followupQuestions,
         sources,
     };
-}
-
-async function transformSitePageResult(
-    context: GitBookBaseContext,
-    args: {
-        pageItem: SearchPageResult;
-        spaceItem: SearchSpaceResult;
-        space?: Space;
-        siteSpace?: SiteSpace;
-        spaceURL?: string;
-        siteSection?: SiteSection;
-        siteSectionGroup?: SiteSectionGroup;
-    }
-): Promise<OrderedComputedResult[]> {
-    const { pageItem, spaceItem, spaceURL, siteSection, siteSectionGroup, siteSpace } = args;
-    const { linker } = context;
-
-    const page: ComputedPageResult = {
-        type: 'page',
-        id: `${spaceItem.id}/${pageItem.id}`,
-        title: pageItem.title,
-        href: spaceURL
-            ? linker.toLinkForContent(joinPathWithBaseURL(spaceURL, pageItem.path))
-            : linker.toPathInSpace(pageItem.path),
-        pageId: pageItem.id,
-        spaceId: spaceItem.id,
-        breadcrumbs: [
-            siteSectionGroup && {
-                icon: siteSectionGroup?.icon as IconName,
-                label: siteSectionGroup.title,
-            },
-            siteSection && {
-                icon: siteSection?.icon as IconName,
-                label: siteSection.title,
-            },
-            (siteSection?.siteSpaces?.filter(
-                // If a space is the only one in its langauge, it's a translation variant and we don't want to show it.
-                (space) =>
-                    siteSection?.siteSpaces?.filter(
-                        // Check if there are other spaces in the same language within the section.
-                        (s) => s.space.language === space.space.language
-                    ).length > 1 // We only want to show the space if there are other spaces in the same language within the section.
-            ).length ?? 0) > 1 && siteSpace
-                ? {
-                      label: siteSpace.title,
-                  }
-                : undefined,
-            ...pageItem.ancestors.map((ancestor) => ({
-                label: ancestor.title,
-            })),
-        ].filter((item) => item !== undefined),
-    };
-
-    const pageSections = await Promise.all(
-        pageItem.sections?.map<Promise<ComputedSectionResult>>(async (section) => ({
-            type: 'section',
-            id: `${page.id}/${section.id}`,
-            title: section.title,
-            href: spaceURL
-                ? linker.toLinkForContent(joinPathWithBaseURL(spaceURL, section.path))
-                : linker.toPathInSpace(pageItem.path),
-            body: section.body,
-            pageId: pageItem.id,
-            spaceId: spaceItem.id,
-        })) ?? []
-    );
-
-    return [page, ...pageSections];
 }

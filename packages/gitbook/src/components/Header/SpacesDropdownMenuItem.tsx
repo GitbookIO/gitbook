@@ -4,7 +4,7 @@ import { joinPath } from '@/lib/paths';
 import { useCurrentPageMetadata, useCurrentPagePath } from '../hooks';
 import { DropdownMenuItem } from '../primitives/DropdownMenu';
 
-interface VariantSpace {
+export interface VariantSpace {
     id: string;
     title: string;
     url: string;

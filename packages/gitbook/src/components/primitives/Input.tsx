@@ -13,6 +13,8 @@ type CustomInputProps = {
     inline?: boolean;
     leading?: IconName | React.ReactNode;
     trailing?: React.ReactNode;
+    /** Slot rendered above the input row (multiline only) */
+    header?: React.ReactNode;
     sizing?: 'small' | 'medium' | 'large'; // The `size` prop is already taken by the HTML input element.
     containerRef?: React.RefObject<HTMLDivElement | null>;
     containerStyle?: React.CSSProperties;
@@ -32,15 +34,37 @@ type CustomInputProps = {
      * A keyboard shortcut, shown to the right of the input.
      */
     keyboardShortcut?: boolean | KeyboardShortcutProps;
-
-    onSubmit?: (value: string | number | readonly string[] | undefined) => void;
+    /**
+     * Callback invoked when the user submits the input by pressing Enter.
+     * Only called if the input has a non-empty value.
+     */
+    onSubmit?: (value: string) => void;
+    /**
+     * Controlled value of the input. When provided, the input becomes a controlled component.
+     */
+    value?: string;
+    /**
+     * Callback invoked whenever the input value changes.
+     * Used to update the parent component's state in controlled mode.
+     */
+    onValueChange?: (value: string) => void;
+    /**
+     * When true, automatically resizes the textarea vertically to fit its content.
+     * Only applies when multiline is true.
+     */
     resize?: boolean;
 };
 
 export type InputProps = CustomInputProps &
     (
-        | ({ multiline?: false } & React.InputHTMLAttributes<HTMLInputElement>)
-        | ({ multiline: true } & React.TextareaHTMLAttributes<HTMLTextAreaElement>)
+        | ({ multiline?: false } & Omit<
+              React.InputHTMLAttributes<HTMLInputElement>,
+              'value' | 'onChange' | 'onSubmit'
+          >)
+        | ({ multiline: true } & Omit<
+              React.TextareaHTMLAttributes<HTMLTextAreaElement>,
+              'value' | 'onChange' | 'onSubmit'
+          >)
     );
 
 type InputElement = HTMLInputElement | HTMLTextAreaElement;
@@ -56,6 +80,7 @@ export const Input = React.forwardRef<InputElement, InputProps>((props, passedRe
         inline = false,
         leading,
         trailing,
+        header,
         className,
         clearButton,
         submitButton,
@@ -72,7 +97,7 @@ export const Input = React.forwardRef<InputElement, InputProps>((props, passedRe
         'aria-busy': ariaBusy,
         placeholder,
         disabled,
-        onChange,
+        onValueChange,
         onKeyDown,
         maxLength,
         minLength,
@@ -80,7 +105,7 @@ export const Input = React.forwardRef<InputElement, InputProps>((props, passedRe
         ...htmlProps
     } = props;
 
-    const [value, setValue] = useControlledState(passedValue, passedValue ?? '');
+    const [value, setValue] = useControlledState(passedValue, passedValue ?? '', onValueChange);
     const [submitted, setSubmitted] = React.useState(false);
     const [height, setHeight] = React.useState<number>();
     const inputRef = React.useRef<InputElement>(null);
@@ -120,7 +145,6 @@ export const Input = React.forwardRef<InputElement, InputProps>((props, passedRe
     const handleChange = (event: React.ChangeEvent<InputElement>) => {
         const newValue = event.target.value;
         setValue(newValue);
-        onChange?.(event as React.ChangeEvent<HTMLInputElement & HTMLTextAreaElement>);
 
         // Reset submitted state when user edits the value to allow re-submission
         if (submitted) {
@@ -156,7 +180,12 @@ export const Input = React.forwardRef<InputElement, InputProps>((props, passedRe
         // If the user wants to handle the keydown by itself, we let him do it.
         if (event.defaultPrevented) return;
 
-        if (event.key === 'Enter' && !event.shiftKey && hasValue) {
+        if (
+            event.key === 'Enter' &&
+            !event.shiftKey &&
+            !event.nativeEvent.isComposing &&
+            hasValue
+        ) {
             event.preventDefault();
             handleSubmit();
         } else if (event.key === 'Escape') {
@@ -166,7 +195,8 @@ export const Input = React.forwardRef<InputElement, InputProps>((props, passedRe
     };
 
     const inputClassName = tcls(
-        'peer -m-2 max-h-64 grow shrink resize-none leading-normal text-left outline-none placeholder:text-tint/8 placeholder-shown:text-ellipsis aria-busy:cursor-progress',
+        // `aria-busy` must not change the cursor: a busy field can still be editable.
+        'peer -m-2 max-h-64 grow shrink resize-none leading-normal text-left outline-none placeholder:text-tint/8 placeholder-shown:text-ellipsis',
         sizes[sizing].input
     );
 
@@ -195,11 +225,10 @@ export const Input = React.forwardRef<InputElement, InputProps>((props, passedRe
                 disabled
                     ? 'cursor-not-allowed border-tint-subtle bg-tint-subtle opacity-7'
                     : [
-                          'depth-subtle:focus-within:-translate-y-px depth-subtle:hover:-translate-y-px depth-subtle:shadow-xs',
-                          'focus-within:border-primary-hover focus-within:depth-subtle:shadow-lg focus-within:shadow-primary-subtle focus-within:ring-2 hover:cursor-text hover:border-tint-hover hover:not-focus-within:bg-tint-subtle depth-subtle:hover:not-focus-within:shadow-md focus-within:hover:border-primary-hover',
+                          'depth-subtle:focus-within:-translate-y-px depth-subtle:hover:not-has-[button:hover]:-translate-y-px depth-subtle:shadow-xs',
+                          'focus-within:border-primary-hover focus-within:depth-subtle:shadow-lg focus-within:shadow-primary-subtle focus-within:ring-2 hover:not-has-[button:hover]:cursor-text hover:not-has-[button:hover]:border-tint-hover hover:not-has-[button:hover]:not-focus-within:bg-tint-subtle depth-subtle:hover:not-has-[button:hover]:not-focus-within:shadow-md focus-within:hover:not-has-[button:hover]:border-primary-hover',
                       ],
                 multiline ? 'flex-col' : 'flex-row',
-                ariaBusy ? 'cursor-progress' : '',
                 sizes[sizing].container,
                 className
             )}
@@ -212,6 +241,7 @@ export const Input = React.forwardRef<InputElement, InputProps>((props, passedRe
             ref={containerRef}
             style={containerStyle}
         >
+            {multiline && header ? <Tag className="empty:hidden">{header}</Tag> : null}
             <Tag
                 className={tcls(
                     'flex shrink grow',

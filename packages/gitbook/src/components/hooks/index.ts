@@ -9,3 +9,4 @@ export * from './useCurrentPage';
 export * from './useNow';
 export * from './useListOverflow';
 export * from './useCurrentPageMetadata';
+export * from './useBackToSpace';

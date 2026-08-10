@@ -1,11 +1,11 @@
 import type { DocumentBlockImage, DocumentBlockImages, JSONDocument, Length } from '@gitbook/api';
 
 import { Image, type ImageResponsiveSize } from '@/components/utils';
-import { resolveContentRef } from '@/lib/references';
+import { resolveContentRefInDocument } from '@/lib/references';
 import { type ClassValue, tcls } from '@/lib/tailwind';
 
 import type { BlockProps } from './Block';
-import { Caption } from './Caption';
+import { Caption, type CaptionAlign } from './Caption';
 import type { DocumentContext } from './DocumentView';
 
 export function Images(props: BlockProps<DocumentBlockImages>) {
@@ -52,6 +52,7 @@ export function Images(props: BlockProps<DocumentBlockImages>) {
                         context={context}
                         isEstimatedOffscreen={isEstimatedOffscreen}
                         withFrame={withFrame}
+                        align={align}
                     />
                 ))}
             </div>
@@ -80,13 +81,16 @@ async function ImageBlock(props: {
     siblings: number;
     isEstimatedOffscreen: boolean;
     withFrame?: boolean;
+    align?: CaptionAlign;
 }) {
-    const { block, context, isEstimatedOffscreen, withFrame } = props;
+    const { document, block, context, isEstimatedOffscreen, withFrame, align } = props;
 
     const [src, darkSrc] = await Promise.all([
-        context.contentContext ? resolveContentRef(block.data.ref, context.contentContext) : null,
+        context.contentContext
+            ? resolveContentRefInDocument(document, block.data.ref, context.contentContext)
+            : null,
         block.data.refDark && context.contentContext
-            ? resolveContentRef(block.data.refDark, context.contentContext)
+            ? resolveContentRefInDocument(document, block.data.refDark, context.contentContext)
             : null,
     ]);
 
@@ -96,7 +100,7 @@ async function ImageBlock(props: {
 
     return (
         <div className={tcls('relative', 'overflow-hidden')}>
-            <Caption {...props} fit>
+            <Caption {...props} fit align={align}>
                 <Image
                     alt={block.data.alt ?? ''}
                     sizes={imageBlockSizes}
@@ -113,14 +117,18 @@ async function ImageBlock(props: {
                               }
                             : null,
                     }}
-                    loading={isEstimatedOffscreen ? 'lazy' : 'eager'}
+                    loading={isEstimatedOffscreen && context.mode !== 'print' ? 'lazy' : 'eager'}
                     zoom
                     inlineStyle={{
                         maxWidth: '100%',
                         width: getImageDimension(block.data.width, undefined),
                         height: getImageDimension(block.data.height, 'auto'),
                     }}
-                    style={withFrame ? 'rounded-xl' : undefined}
+                    style={
+                        withFrame
+                            ? 'rounded-xl'
+                            : 'circular-corners:rounded-2xl rounded-corners:rounded-sm'
+                    }
                 />
             </Caption>
         </div>

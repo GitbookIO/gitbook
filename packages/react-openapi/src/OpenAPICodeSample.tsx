@@ -10,7 +10,13 @@ import { type OpenAPIContext, getOpenAPIClientContext } from './context';
 import { generateMediaTypeExamples, generateSchemaExample } from './generateSchemaExample';
 import { stringifyOpenAPI } from './stringifyOpenAPI';
 import type { OpenAPIOperationData } from './types';
-import { getDefaultServerURL } from './util/server';
+import { mergeHeaders } from './util/headers';
+import {
+    extractOrigin,
+    getAllServerOrigins,
+    getDefaultServerURL,
+    hasValidServerHost,
+} from './util/server';
 import {
     resolvePrefillCodePlaceholderFromSecurityScheme,
     resolveURLWithPrefillCodePlaceholdersFromServer,
@@ -125,10 +131,9 @@ function generateCodeSamples(props: {
     const mediaTypeRendererFactories = Object.entries(requestBody?.content ?? {}).map(
         ([mediaType, mediaTypeObject]) => {
             return (generator: CodeSampleGenerator) => {
-                const mediaTypeHeaders = {
-                    ...genericHeaders,
+                const mediaTypeHeaders = mergeHeaders(genericHeaders, {
                     'Content-Type': mediaType,
-                };
+                });
                 return {
                     mediaType,
                     element: context.renderCodeBlock({
@@ -214,13 +219,16 @@ function OpenAPICodeSampleFooter(props: {
     const { specUrl } = context;
     const hideTryItPanel = data['x-hideTryItPanel'] || data.operation['x-hideTryItPanel'];
     const hasMultipleMediaTypes =
-        renderers.length > 1 || renderers.some((renderer) => renderer.examples.length > 0);
+        renderers.length >= 2 || renderers.some((renderer) => renderer.examples.length >= 2);
+
+    // Check if any server has a host that can be used in an HTTP request
+    const hasValidHost = hasValidServerHost(servers);
 
     if (hideTryItPanel && !hasMultipleMediaTypes) {
         return null;
     }
 
-    if (!validateHttpMethod(method) || (!hasMultipleMediaTypes && servers.length === 0)) {
+    if (!validateHttpMethod(method) || (!hasMultipleMediaTypes && !hasValidHost)) {
         return null;
     }
 
@@ -237,9 +245,10 @@ function OpenAPICodeSampleFooter(props: {
             ) : (
                 <span />
             )}
-            {!hideTryItPanel && servers.length > 0 && (
+            {!hideTryItPanel && hasValidHost && specUrl && (
                 <ScalarApiButton
-                    context={getOpenAPIClientContext(context)}
+                    context={resolveScalarClientContext(context, servers, specUrl)}
+                    withProxy={Boolean(data.operation['x-enable-proxy'] ?? data['x-enable-proxy'])}
                     method={method}
                     path={path}
                     securities={securities}
@@ -249,6 +258,33 @@ function OpenAPICodeSampleFooter(props: {
             )}
         </div>
     );
+}
+
+/**
+ * Build the client context for ScalarApiButton, resolving the signed proxy URL
+ * with the allowed server hosts for SSRF protection.
+ */
+function resolveScalarClientContext(
+    context: OpenAPIContext,
+    servers: OpenAPIOperationData['servers'],
+    specUrl: string
+) {
+    const clientContext = getOpenAPIClientContext(context);
+
+    if (context.resolveProxyUrl) {
+        // Collect all possible host+path entries from spec servers
+        const origins = getAllServerOrigins(servers);
+
+        // Add the spec URL so the proxy can resolve it
+        const specOrigin = extractOrigin(specUrl);
+        if (specOrigin) {
+            origins.push(specOrigin);
+        }
+
+        clientContext.proxyUrl = context.resolveProxyUrl(origins) ?? undefined;
+    }
+
+    return clientContext;
 }
 
 /**

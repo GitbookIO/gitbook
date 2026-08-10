@@ -5,7 +5,9 @@ export const ja = {
     stability_experimental: '実験的',
     stability_alpha: 'アルファ',
     stability_beta: 'ベータ',
-    discriminator: '識別子',
+    available_in_mcp: 'MCPで利用可能',
+    copy_url: 'URLをコピー',
+    discriminator: 'ディスクリミネーター',
     copy_to_clipboard: 'クリップボードにコピー',
     copied: 'コピー済み',
     no_content: 'コンテンツなし',
@@ -38,9 +40,10 @@ export const ja = {
     available_items: '利用可能なアイテム',
     required_scopes: '必須スコープ',
     required_scopes_description: 'このエンドポイントには次のスコープが必要です：',
-    available_scopes: '利用可能なスコープ：',
+
     properties: 'プロパティ',
     or: 'または',
-    and: 'かつ',
+    and: 'および',
     possible_values: '可能な値',
+    direct_link_to_model: '${1} への直接リンク',
 };

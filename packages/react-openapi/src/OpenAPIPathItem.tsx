@@ -1,4 +1,5 @@
 import { OpenAPICopyButton } from './OpenAPICopyButton';
+import { OpenAPIMethodBadge } from './OpenAPIMethodBadge';
 import type { OpenAPIPathProps } from './OpenAPIPath';
 import type { OpenAPIClientContext } from './context';
 
@@ -10,14 +11,22 @@ export function OpenAPIPathItem(
         context: OpenAPIClientContext;
     }
 ) {
-    const { value, canCopy = true, context, children, data, copyType = 'children' } = props;
+    const {
+        value,
+        canCopy = true,
+        context,
+        children,
+        data,
+        copyType = 'children',
+        methodBadgeSize = 'medium',
+    } = props;
     const { operation, method } = data;
 
     const title = <span className="openapi-path-title">{children}</span>;
 
     return (
         <div className="openapi-path">
-            <div className={`openapi-method openapi-method-${method}`}>{method}</div>
+            <OpenAPIMethodBadge method={method} size={methodBadgeSize} />
             {canCopy && value ? (
                 copyType === 'children' ? (
                     <OpenAPICopyButton

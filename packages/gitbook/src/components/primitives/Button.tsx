@@ -21,6 +21,7 @@ export type ButtonProps = {
     children?: React.ReactNode;
     active?: boolean;
     tooltipProps?: TooltipProps;
+    truncate?: boolean;
 } & LinkInsightsProps &
     React.HTMLAttributes<HTMLElement>;
 
@@ -28,9 +29,9 @@ export const variantClasses = {
     primary: [
         'bg-primary-original',
         'text-contrast-primary-original',
-        'hover:bg-primary-solid-hover',
-        'hover:border-primary-solid-hover',
-        'hover:text-contrast-primary-solid-hover',
+        'hover:not-disabled:bg-primary-solid-hover',
+        'hover:not-disabled:border-primary-solid-hover',
+        'hover:not-disabled:text-contrast-primary-solid-hover',
         'border-primary-original',
         'contrast-more:bg-primary-solid',
         'contrast-more:text-contrast-primary-solid',
@@ -45,23 +46,23 @@ export const variantClasses = {
         'contrast-more:border',
         'shadow-none!',
         'translate-y-0!',
-        'hover:bg-tint-hover',
-        'hover:text-tint-strong',
+        'hover:not-disabled:bg-tint-hover',
+        'hover:not-disabled:text-tint-strong',
         'focus-visible:bg-tint-hover',
         'focus-visible:text-tint-strong',
-        'data-[state=open]:bg-tint-hover',
-        'data-[state=open]:text-tint-strong',
+        'aria-expanded:bg-tint-hover',
+        'aria-expanded:text-tint-strong',
         'contrast-more:bg-tint-subtle',
         'disabled:text-tint/8',
         'disabled:bg-transparent',
     ],
     secondary: [
         'bg-tint',
-        'depth-flat:bg-transparent',
+        'depth-flat:bg-tint-base',
         'text-tint',
         'hover:bg-tint-hover',
-        'hover:depth-flat:bg-tint-hover',
-        'hover:text-tint',
+        'hover:not-disabled:depth-flat:bg-tint-hover',
+        'hover:not-disabled:text-tint',
         'contrast-more:bg-tint-subtle',
         'disabled:bg-transparent',
         'disabled:text-tint/8',
@@ -70,12 +71,12 @@ export const variantClasses = {
         'bg-tint-base text-tint',
         'hover:theme-clean:bg-tint-subtle',
 
-        'theme-bold:bg-header-link/2',
+        'theme-bold:bg-header-link/1',
         'theme-bold:text-header-link',
         'theme-bold:shadow-none!',
         'theme-bold:border-header-link/4',
 
-        'hover:theme-bold:bg-header-link/3',
+        'hover:theme-bold:bg-header-link/2',
         'hover:theme-bold:text-header-link',
         'hover:theme-bold:shadow-none',
         'hover:theme-bold:border-header-link/5',
@@ -89,7 +90,7 @@ export const variantClasses = {
 
 export const activeClasses = {
     primary: 'bg-primary-solid-hover',
-    blank: 'bg-primary-active contrast-more:bg-primary-12 contrast-more:text-contrast-primary-12 disabled:bg-primary-active text-primary-strong font-medium hover:text-primary-strong disabled:text-primary-strong hover:bg-primary-active focus-visible:bg-primary-active focus-visible:text-primary-strong data-[state=open]:bg-primary-active data-[state=open]:text-primary-strong',
+    blank: 'bg-primary-active contrast-more:bg-primary-12 contrast-more:text-contrast-primary-12 disabled:bg-primary-active text-primary-strong font-medium hover:text-primary-strong disabled:text-primary-strong hover:bg-primary-active focus-visible:bg-primary-active focus-visible:text-primary-strong aria-expanded:bg-primary-active aria-expanded:text-primary-strong',
     secondary: 'bg-tint-active disabled:bg-tint-active',
     header: 'bg-header-link/3',
 };
@@ -115,6 +116,7 @@ export const Button = React.forwardRef<
             trailing,
             disabled,
             tooltipProps,
+            truncate = true,
             ...rest
         },
         ref
@@ -144,22 +146,21 @@ export const Button = React.forwardRef<
         };
         let iconElement = null;
         if (icon) {
-            if (React.isValidElement(icon)) {
-                type IconElement = React.ReactElement<React.SVGProps<SVGSVGElement>>;
-                iconElement = React.cloneElement(icon as IconElement, {
-                    className: tcls(
-                        'button-leading-icon shrink-0',
-                        iconSizeClasses[size],
-                        (icon as IconElement).props.className
-                    ),
-                });
-            } else {
+            if (typeof icon === 'string') {
                 iconElement = (
                     <Icon
                         icon={icon as IconName}
                         className={tcls('button-leading-icon shrink-0', iconSizeClasses[size])}
                     />
                 );
+            } else if (React.isValidElement<React.SVGProps<SVGSVGElement>>(icon)) {
+                iconElement = React.cloneElement(icon, {
+                    className: tcls(
+                        'button-leading-icon shrink-0',
+                        iconSizeClasses[size],
+                        icon.props.className
+                    ),
+                });
             }
         }
 
@@ -167,7 +168,14 @@ export const Button = React.forwardRef<
             <>
                 {iconElement}
                 {iconOnly || (!children && !label) ? null : (
-                    <span className="button-content truncate">{children ?? label}</span>
+                    <span
+                        className={tcls(
+                            'button-content',
+                            truncate ? 'truncate' : 'whitespace-normal text-start'
+                        )}
+                    >
+                        {children ?? label}
+                    </span>
                 )}
             </>
         );
@@ -211,7 +219,7 @@ export const Button = React.forwardRef<
                 }}
                 label={label}
                 triggerProps={{ disabled, ...tooltipProps?.triggerProps }}
-                contentProps={{ ...tooltipProps?.contentProps }}
+                contentProps={tooltipProps?.contentProps}
             >
                 {button}
             </Tooltip>

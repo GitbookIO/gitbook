@@ -4,8 +4,8 @@ import { tcls } from '@/lib/tailwind';
 
 import { RecordColumnValue } from './RecordColumnValue';
 import type { TableRecordKV, TableViewProps } from './Table';
-import { getColumnWidth } from './ViewGrid';
-import styles from './table.module.css';
+import { TableSearchRecord } from './TableSearch';
+import { getColumnWidth } from './layout';
 import { getColumnVerticalAlignment } from './utils';
 
 export function RecordRow(
@@ -15,10 +15,22 @@ export function RecordRow(
         fixedColumns: string[];
     }
 ) {
-    const { view, autoSizedColumns, fixedColumns, block, context } = props;
+    const { view, record, autoSizedColumns, fixedColumns, block, context } = props;
+    const stickyFirstColumn = context.mode !== 'print' && view.stickyFirstColumn === true;
+    const firstVisibleColumn = view.columns[0];
 
     return (
-        <div className={styles.row} role="row">
+        <TableSearchRecord
+            role="row"
+            recordId={record[0]}
+            visibleClassName="flex"
+            className={tcls(
+                'group/row',
+                'border-tint-subtle',
+                'transition-colors',
+                'hover:bg-tint-hover'
+            )}
+        >
             {view.columns.map((column) => {
                 const columnWidth = getColumnWidth({
                     column,
@@ -26,6 +38,7 @@ export function RecordRow(
                     autoSizedColumns,
                     fixedColumns,
                 });
+                const isStickyFirstColumnCell = stickyFirstColumn && column === firstVisibleColumn;
                 // @ts-expect-error
                 const verticalAlignment = getColumnVerticalAlignment(block.data.definition[column]);
 
@@ -33,7 +46,13 @@ export function RecordRow(
                     <div
                         key={column}
                         role="cell"
-                        className={tcls(styles.cell)}
+                        className={tcls(
+                            'relative flex flex-1 border-r px-3 py-2 align-middle text-sm last:border-r-0',
+                            'border-tint-subtle',
+                            isStickyFirstColumnCell
+                                ? 'sticky left-0 z-10 bg-tint-base group-hover/row:bg-tint-hover'
+                                : undefined
+                        )}
                         style={{
                             width: columnWidth,
                             minWidth: columnWidth || '100px',
@@ -47,6 +66,6 @@ export function RecordRow(
                     </div>
                 );
             })}
-        </div>
+        </TableSearchRecord>
     );
 }

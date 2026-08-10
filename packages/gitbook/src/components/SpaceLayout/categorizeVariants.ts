@@ -1,47 +1,67 @@
 import { languages } from '@/intl/translations';
 import type { GitBookSiteContext } from '@/lib/context';
+import { getSiteSpaceLanguages, normalizeLanguage } from '@/lib/sites';
 
 /**
  * Categorize the variants of the space into generic and translation variants.
  */
 export function categorizeVariants(context: GitBookSiteContext) {
-    const { siteSpace, visibleSiteSpaces: siteSpaces } = context;
-    const currentLanguage = siteSpace.space.language;
+    const { siteSpace } = context;
+
+    // By default, variants only include visible spaces.
+    // If all variants in the current section are hidden, we still show the selector in-place
+    // by falling back to all section variants.
+    const siteSpaces =
+        context.visibleSiteSpaces.length > 0 ? context.visibleSiteSpaces : context.siteSpaces;
+
+    const currentLanguage = normalizeLanguage(context.locale);
 
     // Get all languages of the variants.
-    const variantLanguages = [...new Set(siteSpaces.map((space) => space.space.language))];
+    const variantLanguages = getSiteSpaceLanguages(siteSpaces);
 
-    // We only show the language picker if there are at least 2 distinct languages, excluding undefined.
-    const isMultiLanguage =
-        variantLanguages.filter((language) => language !== undefined).length > 1;
+    // We show the language picker when there are at least 2 distinct languages.
+    // Spaces without an explicit language are treated as English, matching runtime defaults.
+    const isMultiLanguage = variantLanguages.length > 1;
 
-    // Generic variants are all spaces that have the same language as the current (can also be undefined).
+    const toNormalizedLanguage = (space: (typeof siteSpaces)[number]) =>
+        normalizeLanguage(space.space.language);
+
+    // Generic variants are all spaces that have the same language as the current (undefined is normalized to English).
     const genericVariants = isMultiLanguage
         ? siteSpaces.filter(
-              (space) => space === siteSpace || space.space.language === currentLanguage
+              (space) => space === siteSpace || toNormalizedLanguage(space) === currentLanguage
           )
         : siteSpaces;
 
     // Translation variants are all spaces that have a different language than the current.
     let translationVariants = isMultiLanguage
         ? siteSpaces.filter(
-              (space) => space === siteSpace || space.space.language !== currentLanguage
+              (space) => space === siteSpace || toNormalizedLanguage(space) !== currentLanguage
           )
         : [];
 
+    const findPreferredTranslationVariant = (variantLanguage: string) => {
+        const candidateSiteSpaces = translationVariants.filter(
+            (space) => toNormalizedLanguage(space) === variantLanguage
+        );
+
+        return (
+            candidateSiteSpaces.find((candidate) => candidate.title === siteSpace.title) ??
+            candidateSiteSpaces[0]
+        );
+    };
+
     // If there is exactly 1 variant per language, we will use them as-is.
-    // Otherwise, we will create a translation dropdown with the first space of each language.
+    // Otherwise, we will create a translation dropdown with the space that best matches the
+    // current space title for each language, falling back to the first one.
     if (variantLanguages.length !== translationVariants.length) {
         translationVariants = variantLanguages
-            // Get the first space of each language.
-            .map((variantLanguage) =>
-                translationVariants.find((space) => space.space.language === variantLanguage)
-            )
+            .map((variantLanguage) => findPreferredTranslationVariant(variantLanguage))
             // Filter out unmatched languages.
             .filter((space) => space !== undefined)
             // Transform the title to include the language name if we have a translation. Otherwise, use the original title.
             .map((space) => {
-                const language = languages[space.space.language as keyof typeof languages];
+                const language = languages[toNormalizedLanguage(space) as keyof typeof languages];
                 return {
                     ...space,
                     title: language ? language.language : space.title,

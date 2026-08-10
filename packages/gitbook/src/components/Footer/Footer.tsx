@@ -6,8 +6,9 @@ import { partition } from '@/lib/arrays';
 import { tcls } from '@/lib/tailwind';
 
 import { ThemeToggler } from '../ThemeToggler';
-import { CONTAINER_STYLE } from '../layout';
+import { CONTAINER_STYLE, CONTENT_STYLE } from '../layout';
 import { FooterLinksGroup } from './FooterLinksGroup';
+import { SocialAccountButton } from './SocialAccounts';
 
 const FOOTER_COLUMNS = 4;
 
@@ -20,19 +21,21 @@ export function Footer(props: { context: GitBookSiteContext }) {
     const hasGroups = groupCount > 0;
     const hasCopyright = customization.footer.copyright;
     const hasThemeToggle = customization.themes.toggeable;
+    const socialLinks = customization.socialAccounts.filter((account) => account.display?.footer);
 
-    const mobileOnly = !hasLogo && !hasGroups && !hasCopyright && hasThemeToggle;
+    const mobileOnly =
+        !hasLogo && !hasGroups && !hasCopyright && !socialLinks.length && hasThemeToggle;
 
     return (
         <footer
-            id="site-footer"
+            data-gb-site-footer
             className={tcls(
                 'border-tint-subtle border-t',
                 // If the footer only contains a mode toggle, we only show it on smaller screens
                 mobileOnly ? 'xl:hidden' : null
             )}
         >
-            <div className="motion-safe:transition-[padding] motion-safe:duration-300 lg:chat-open:pr-80 xl:chat-open:pr-96">
+            <div className="transition-[padding] duration-300 motion-reduce:transition-none lg:chat-open:pr-(--ai-chat-width)">
                 <div
                     className={tcls(
                         CONTAINER_STYLE,
@@ -45,16 +48,11 @@ export function Footer(props: { context: GitBookSiteContext }) {
                 >
                     <div
                         className={tcls(
-                            'mx-auto flex @xs:grid @4xl:max-w-none! max-w-3xl site-width-wide:max-w-screen-2xl flex-col justify-between gap-12',
+                            CONTENT_STYLE,
+                            'flex @xs:grid @4xl:max-w-none! flex-col justify-between gap-12',
                             'grid-cols-[auto_auto]',
                             '@4xl:grid-cols-[18rem_minmax(auto,48rem)_auto]',
-                            '@7xl:grid-cols-[18rem_minmax(auto,48rem)_14rem]',
-                            '@4xl:site-width-wide:grid-cols-[18rem_minmax(auto,80rem)_auto]',
-                            '@7xl:site-width-wide:grid-cols-[18rem_minmax(auto,80rem)_14rem]',
-                            '@4xl:page-no-toc:grid-cols-[minmax(auto,48rem)_auto]',
-                            '@7xl:page-no-toc:grid-cols-[14rem_minmax(auto,48rem)_14rem]',
-                            '@4xl:[body:has(.site-width-wide,.page-no-toc)_&]:grid-cols-[minmax(auto,90rem)_auto]',
-                            '@7xl:[body:has(.site-width-wide,.page-no-toc)_&]:grid-cols-[14rem_minmax(auto,90rem)_14rem]'
+                            '@7xl:grid-cols-[18rem_minmax(auto,48rem)_14rem]'
                         )}
                     >
                         {
@@ -110,12 +108,8 @@ export function Footer(props: { context: GitBookSiteContext }) {
                         {
                             // Navigation groups (split into equal columns)
                             customization.footer.groups?.length > 0 ? (
-                                <div
-                                    className={tcls(
-                                        '@4xl:page-has-toc:col-span-1 @7xl:page-no-toc:col-span-1 col-span-2 @4xl:page-has-toc:col-start-2 @7xl:page-no-toc:col-start-2'
-                                    )}
-                                >
-                                    <div className="mx-auto flex max-w-3xl site-width-wide:max-w-screen-2xl @xl:flex-row flex-col @xl:gap-6 gap-10">
+                                <div className={tcls('col-span-2')}>
+                                    <div className="mx-auto flex @xl:flex-row flex-col @xl:gap-6 gap-10">
                                         {partition(customization.footer.groups, FOOTER_COLUMNS).map(
                                             (column, columnIndex) => (
                                                 <div
@@ -133,6 +127,21 @@ export function Footer(props: { context: GitBookSiteContext }) {
                                             )
                                         )}
                                     </div>
+                                </div>
+                            ) : null
+                        }
+
+                        {
+                            // Social Links
+                            socialLinks.length > 0 ? (
+                                <div className="col-span-full flex w-full grow items-center justify-center gap-2">
+                                    {socialLinks.map((account) => (
+                                        <SocialAccountButton
+                                            key={`${account.platform}-${account.handle}`}
+                                            account={account}
+                                            target={customization.externalLinks.target}
+                                        />
+                                    ))}
                                 </div>
                             ) : null
                         }

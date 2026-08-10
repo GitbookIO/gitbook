@@ -1,5 +1,35 @@
 # @gitbook/openapi-parser
 
+## 3.0.12
+
+### Patch Changes
+
+- 7e55cd5: Add an "Available in MCP" badge on OpenAPI operations marked with `x-gitbook-mcp: true`. When `x-gitbook-mcp-url` is set (on the operation, path, or root — most specific wins), the badge becomes a button that copies the MCP server URL to the clipboard.
+
+## 3.0.11
+
+### Patch Changes
+
+- c56b569: Support expand-all options for OpenAPI
+
+## 3.0.10
+
+### Patch Changes
+
+- 8ab419a: Support x-enable-proxy at operation level
+
+## 3.0.9
+
+### Patch Changes
+
+- e074283: Add server-side proxy for Scalar API client to bypass CORS
+
+## 3.0.8
+
+### Patch Changes
+
+- d3f6c38: Update scalar dependencies.
+
 ## 3.0.7
 
 ### Patch Changes

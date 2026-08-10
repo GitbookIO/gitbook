@@ -12,10 +12,10 @@ export function TableOfContentsScript() {
         // Calculate and set TOC dimensions
         const updateTocLayout = () => {
             // Get key elements
-            const header = document.getElementById('site-header');
-            const banner = document.getElementById('announcement-banner');
-            const footer = document.getElementById('site-footer');
-            const pageCover = document.getElementById('page-cover');
+            const header = document.querySelector<HTMLElement>('[data-gb-site-header]');
+            const banner = document.querySelector<HTMLElement>('[data-gb-announcement-banner]');
+            const footer = document.querySelector<HTMLElement>('[data-gb-site-footer]');
+            const pageCover = document.querySelector<HTMLElement>('[data-gb-page-cover]');
 
             // Set sticky top position based on header
             const headerHeight = header?.offsetHeight ?? 0;
@@ -42,8 +42,8 @@ export function TableOfContentsScript() {
             }
 
             // Update height
-            root.style.setProperty('--toc-height', `${height}px`);
-            root.style.setProperty('--toc-top-offset', `${offset}px`);
+            root.style.setProperty('--toc-height', `${Math.max(height, 0)}px`);
+            root.style.setProperty('--toc-top-offset', `${Math.max(offset, 0)}px`);
 
             // Subtract visible pageCover (if any)
             if (
@@ -64,8 +64,8 @@ export function TableOfContentsScript() {
                 }
             }
 
-            root.style.setProperty('--outline-height', `${height}px`);
-            root.style.setProperty('--outline-top-offset', `${offset}px`);
+            root.style.setProperty('--outline-height', `${Math.max(height, 0)}px`);
+            root.style.setProperty('--outline-top-offset', `${Math.max(offset, 0)}px`);
         };
 
         // Initial update

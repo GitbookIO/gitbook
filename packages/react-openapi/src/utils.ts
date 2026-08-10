@@ -2,7 +2,11 @@ import type { AnyObject, OpenAPIV3, OpenAPIV3_1 } from '@gitbook/openapi-parser'
 import type { OpenAPIUniversalContext } from './context';
 import { stringifyOpenAPI } from './stringifyOpenAPI';
 import { tString } from './translate';
-import type { OpenAPICustomSecurityScheme, OpenAPIOperationData } from './types';
+import type {
+    OpenAPICustomSecurityScheme,
+    OpenAPIOperationData,
+    OpenAPISecurityScope,
+} from './types';
 
 export function checkIsReference(input: unknown): input is OpenAPIV3.ReferenceObject {
     return typeof input === 'object' && !!input && '$ref' in input;
@@ -10,6 +14,18 @@ export function checkIsReference(input: unknown): input is OpenAPIV3.ReferenceOb
 
 export function createStateKey(key: string, scope?: string) {
     return scope ? `${scope}_${key}` : key;
+}
+
+/**
+ * Read the `x-gitbook-mcp-url` extension from any spec object, treating an empty string as unset
+ * so it falls through to the next level when resolving the operation > path > root cascade.
+ */
+export function readMcpUrl(obj: unknown): string | undefined {
+    if (obj && typeof obj === 'object' && 'x-gitbook-mcp-url' in obj) {
+        const value = obj['x-gitbook-mcp-url'];
+        return typeof value === 'string' && value ? value : undefined;
+    }
+    return undefined;
 }
 
 /**
@@ -218,8 +234,103 @@ function getStatusCodeCategory(statusCode: number | string): number | string {
     return category;
 }
 
+/**
+ * Extract non-null types from a union type array.
+ * Returns the types excluding 'null' and whether null was present.
+ */
+export function extractNonNullTypes(types: string[]): { nonNullTypes: string[]; hasNull: boolean } {
+    const nonNullTypes = types.filter((t) => t !== 'null');
+    const hasNull = nonNullTypes.length < types.length;
+    return { nonNullTypes, hasNull };
+}
+
+/**
+ * Get the effective array type from a schema, handling union types.
+ * Returns the array type if present, or null if not an array.
+ * Handles both OpenAPI 3.0 (type: 'array') and OpenAPI 3.1 (type: ['null', 'array']) nullable arrays.
+ */
+export function getEffectiveArrayType(schema: OpenAPIV3.SchemaObject | OpenAPIV3_1.SchemaObject): {
+    isArray: boolean;
+    hasNull: boolean;
+    items?: OpenAPIV3.SchemaObject | OpenAPIV3.ReferenceObject;
+} {
+    if (Array.isArray(schema.type)) {
+        const { nonNullTypes, hasNull } = extractNonNullTypes(schema.type);
+        if (nonNullTypes.includes('array')) {
+            return { isArray: true, hasNull, items: schema.items };
+        }
+        return { isArray: false, hasNull };
+    }
+
+    if (schema.type === 'array') {
+        return { isArray: true, hasNull: false, items: schema.items };
+    }
+
+    return { isArray: false, hasNull: false };
+}
+
+/**
+ * Check if a schema only describes the `null` type, i.e. it is used as a nullability
+ * marker inside an `anyOf`/`oneOf` (OpenAPI 3.1+).
+ */
+function isNullSchema(schema: OpenAPIV3.SchemaObject | OpenAPIV3.ReferenceObject): boolean {
+    if (checkIsReference(schema)) {
+        return false;
+    }
+    // `null` is only a valid type in OpenAPI 3.1+, hence the widening.
+    const type = schema.type as string | string[] | undefined;
+    if (Array.isArray(type)) {
+        return type.length > 0 && type.every((t) => t === 'null');
+    }
+    return type === 'null';
+}
+
+/**
+ * Normalize the OpenAPI 3.1+ idiom of expressing nullability through `anyOf`/`oneOf`
+ * (e.g. `anyOf: [{ type: 'string' }, { type: 'null' }]`) into a regular nullable schema,
+ * mirroring how `type: ['string', 'null']` is handled.
+ *
+ * - Single non-null member: collapse into that member with `nullable: true`.
+ * - Multiple non-null members (or a single `$ref` member): drop the null member and keep
+ *   the union, flagged `nullable: true`.
+ * - No null member: returned unchanged (preserves identity for circular-ref tracking).
+ */
+export function normalizeNullableUnion(
+    schema: OpenAPIV3.SchemaObject | OpenAPIV3_1.SchemaObject
+): OpenAPIV3.SchemaObject {
+    const typed = schema as OpenAPIV3.SchemaObject;
+
+    const isAnyOf = Array.isArray(typed.anyOf);
+    const isOneOf = !isAnyOf && Array.isArray(typed.oneOf);
+    if (!isAnyOf && !isOneOf) {
+        return typed;
+    }
+
+    const unionKey = isAnyOf ? 'anyOf' : 'oneOf';
+    const union = (isAnyOf ? typed.anyOf : typed.oneOf) as (
+        | OpenAPIV3.SchemaObject
+        | OpenAPIV3.ReferenceObject
+    )[];
+
+    const nonNullMembers = union.filter((member) => !isNullSchema(member));
+    if (nonNullMembers.length === union.length) {
+        // No null member, nothing to normalize.
+        return typed;
+    }
+
+    const { anyOf: _anyOf, oneOf: _oneOf, ...rest } = typed;
+
+    const single = nonNullMembers.length === 1 ? nonNullMembers[0] : undefined;
+    if (single && !checkIsReference(single)) {
+        // Outer-level metadata (description, title, …) takes precedence over the member's.
+        return { ...single, ...rest, nullable: true };
+    }
+
+    return { ...rest, [unionKey]: nonNullMembers, nullable: true };
+}
+
 export function getSchemaTitle(
-    schema: OpenAPIV3.SchemaObject,
+    schema: OpenAPIV3.SchemaObject | OpenAPIV3_1.SchemaObject,
     options?: { ignoreAlternatives?: boolean }
 ): string {
     // Otherwise try to infer a nice title
@@ -227,21 +338,48 @@ export function getSchemaTitle(
 
     if (schema.enum || schema['x-enumDescriptions'] || schema['x-gitbook-enum']) {
         type = `${schema.type} · enum`;
-        // check array AND schema.items as this is sometimes null despite what the type indicates
-    } else if (schema.type === 'array' && !!schema.items) {
-        type = `${getSchemaTitle(schema.items, options)}[]`;
-    } else if (Array.isArray(schema.type)) {
-        type = schema.type.join(' | ');
-    } else if (schema.type || schema.properties) {
-        type = schema.type ?? 'object';
+    } else {
+        // Handle union types (OpenAPI 3.1 nullable)
+        const arrayInfo = getEffectiveArrayType(schema);
 
-        if (schema.format) {
-            type += ` · ${schema.format}`;
-        }
+        if (arrayInfo.isArray && !!schema.items) {
+            // Handle array type (nullable is handled separately in getAdditionalItems)
+            let itemsTitle: string;
+            if (checkIsReference(schema.items)) {
+                // Extract schema name from $ref (e.g., #/components/schemas/ProductPayoutSplitDto -> ProductPayoutSplitDto)
+                const refPath = schema.items.$ref;
+                const schemaName = refPath?.split('/').pop() ?? 'object';
+                itemsTitle = schemaName;
+            } else {
+                itemsTitle = getSchemaTitle(schema.items, options);
+            }
+            type = `${itemsTitle}[]`;
+        } else if (Array.isArray(schema.type)) {
+            // Handle other union types (non-array)
+            // For nullable union types, we show the non-null types only
+            // since nullable is handled separately in getAdditionalItems
+            const { nonNullTypes } = extractNonNullTypes(schema.type);
+            if (nonNullTypes.length === 1) {
+                // Single non-null type - show just that type
+                type = nonNullTypes[0] ?? 'any';
+            } else if (nonNullTypes.length > 1) {
+                // Multiple non-null types - join them (excluding null)
+                type = nonNullTypes.join(' | ');
+            } else {
+                // Only null types - fallback to 'any'
+                type = 'any';
+            }
+        } else if (schema.type || schema.properties) {
+            type = schema.type ?? 'object';
 
-        // Only add the title if it's an object (no need for the title of a string, number, etc.)
-        if (type === 'object' && schema.title) {
-            type += ` · ${schema.title.replaceAll(' ', '')}`;
+            if (schema.format) {
+                type += ` · ${schema.format}`;
+            }
+
+            // Only add the title if it's an object (no need for the title of a string, number, etc.)
+            if (type === 'object' && schema.title) {
+                type += ` · ${schema.title}`;
+            }
         }
     }
 
@@ -265,6 +403,7 @@ export type OperationSecurityInfo = {
     key: string;
     label: string;
     schemes: OpenAPICustomSecurityScheme[];
+    scopeAlternatives: OpenAPISecurityScope[][];
 };
 
 /**
@@ -283,18 +422,64 @@ export function extractOperationSecurityInfo(args: {
             key,
             label: key,
             schemes: [security],
+            scopeAlternatives: security.scopes?.length ? [security.scopes] : [],
         }));
     }
 
-    return securityRequirement.map((requirement, idx) => {
-        const schemeKeys = Object.keys(requirement);
+    const grouped = new Map<string, OperationSecurityInfo>();
 
-        return {
-            key: `security-${idx}`,
-            label: schemeKeys.join(' & '),
-            schemes: schemeKeys
-                .map((schemeKey) => securitiesMap.get(schemeKey))
-                .filter((s): s is OpenAPICustomSecurityScheme => s !== undefined),
-        };
+    securityRequirement.forEach((requirement) => {
+        const schemeKeys = Object.keys(requirement).sort();
+        if (schemeKeys.length === 0) {
+            return;
+        }
+        const label = schemeKeys.join(' & ');
+        const existing = grouped.get(label);
+        const schemes = schemeKeys
+            .map((schemeKey) => securitiesMap.get(schemeKey))
+            .filter((s): s is OpenAPICustomSecurityScheme => s !== undefined);
+        const scopesForRequirement = schemeKeys.flatMap((schemeKey) =>
+            resolveRequiredScopesForScheme(securitiesMap.get(schemeKey), requirement[schemeKey])
+        );
+
+        if (existing) {
+            existing.scopeAlternatives.push(scopesForRequirement);
+            if (!existing.schemes.length && schemes.length) {
+                existing.schemes = schemes;
+            }
+        } else {
+            grouped.set(label, {
+                key: `security-${grouped.size}`,
+                label,
+                schemes,
+                scopeAlternatives: [scopesForRequirement],
+            });
+        }
     });
+
+    return Array.from(grouped.values());
+}
+
+function resolveRequiredScopesForScheme(
+    security: OpenAPICustomSecurityScheme | undefined,
+    operationScopes: string[] | undefined
+): OpenAPISecurityScope[] {
+    if (!security || !operationScopes?.length) {
+        return [];
+    }
+
+    if (security.type === 'oauth2') {
+        const flows = security.flows ? Object.entries(security.flows) : [];
+        const resolved = flows.flatMap(([_, flow]) => {
+            return Object.entries(flow.scopes ?? {}).filter(([scope]) =>
+                operationScopes.includes(scope)
+            );
+        });
+
+        if (resolved.length) {
+            return resolved;
+        }
+    }
+
+    return operationScopes.map((scope) => [scope, undefined]);
 }

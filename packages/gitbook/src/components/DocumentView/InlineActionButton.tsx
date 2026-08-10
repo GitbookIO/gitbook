@@ -1,8 +1,16 @@
 'use client';
 import { tString, useLanguage } from '@/intl/client';
 import { useAI, useAIChatController, useAIChatState } from '../AI';
-import { useSearch } from '../Search';
+import { useSetSearchState } from '../Search';
 import { Button, type ButtonProps, Input } from '../primitives';
+
+// The Input primitive has no `xsmall`; otherwise it shares the button's size scale.
+const INPUT_SIZE_MAP: Record<NonNullable<ButtonProps['size']>, 'small' | 'medium' | 'large'> = {
+    xsmall: 'small',
+    small: 'small',
+    medium: 'medium',
+    large: 'large',
+};
 
 export function InlineActionButton(
     props: { action: 'ask' | 'search'; query?: string } & { buttonProps: ButtonProps } // TODO: Type this properly: Pick<api.DocumentInlineButton, 'action' | 'query'> & { buttonProps: ButtonProps }
@@ -12,7 +20,7 @@ export function InlineActionButton(
     const { assistants } = useAI();
     const chatController = useAIChatController();
     const chatState = useAIChatState();
-    const [, setSearchState] = useSearch();
+    const setSearchState = useSetSearchState();
     const language = useLanguage();
 
     const handleSubmit = (value: string) => {
@@ -42,8 +50,8 @@ export function InlineActionButton(
             <Input
                 inline
                 label={buttonProps.label as string}
-                sizing="medium"
-                className="inline-flex max-w-full leading-normal [transition-property:translate,opacity,box-shadow,background,border]"
+                sizing={INPUT_SIZE_MAP[buttonProps.size ?? 'medium']}
+                className="inline-flex max-w-full grow"
                 submitButton={{
                     label: tString(language, action === 'ask' ? 'send' : 'search'),
                 }}
@@ -51,8 +59,8 @@ export function InlineActionButton(
                     className: 'text-[1em]',
                 }}
                 maxLength={action === 'ask' ? 2048 : 512}
-                disabled={action === 'ask' && chatState.loading}
-                aria-busy={action === 'ask' && chatState.loading}
+                disabled={action === 'ask' && chatState.responding}
+                aria-busy={action === 'ask' && chatState.responding}
                 leading={icon}
                 keyboardShortcut={false}
                 onSubmit={(value) => handleSubmit(value as string)}

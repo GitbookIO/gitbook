@@ -1,6 +1,11 @@
-import type { JSONDocument } from '@gitbook/api';
+import type {
+    CustomizationThemedCodeTheme,
+    JSONDocument,
+    SiteCustomizationSettings,
+} from '@gitbook/api';
 import { useId } from 'react';
 
+import type { DocumentContext } from '../DocumentView';
 import { CodeBlock } from './CodeBlock';
 import { convertCodeStringToBlock } from './utils';
 
@@ -8,8 +13,14 @@ import { convertCodeStringToBlock } from './utils';
  * Plain code block with syntax highlighting.
  * For simplicity, this is just a wrapper around the CodeBlock component, emulating a document.
  */
-export function PlainCodeBlock(props: { code: string; syntax: string }) {
-    const { code, syntax } = props;
+export function PlainCodeBlock(props: {
+    code: string;
+    syntax: string;
+    mode?: DocumentContext['mode'];
+    themeKey?: keyof SiteCustomizationSettings['styling']['codeTheme'];
+    themes?: CustomizationThemedCodeTheme;
+}) {
+    const { code, syntax, mode = 'default', themeKey, themes } = props;
     const id = useId();
 
     const block = convertCodeStringToBlock({ key: id, code, syntax });
@@ -24,8 +35,10 @@ export function PlainCodeBlock(props: { code: string; syntax: string }) {
         <CodeBlock
             document={document}
             context={{
-                mode: 'default',
+                mode,
             }}
+            themeKey={themeKey}
+            themes={themes}
             block={block}
             ancestorBlocks={[]}
             // We optimize perf by default

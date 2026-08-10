@@ -3,8 +3,10 @@ import type { GitBookSiteContext } from '@/lib/context';
 import { SiteInsightsDisplayContext } from '@gitbook/api';
 import type { Metadata } from 'next';
 import { HeaderMobileMenu } from '../Header/HeaderMobileMenu';
+import { SpacesDropdown, TranslationsDropdown } from '../Header/SpacesDropdown';
 import { PageBody } from '../PageBody';
 import { SiteSectionTabs, encodeClientSiteSections } from '../SiteSections';
+import { categorizeVariants } from '../SpaceLayout/categorizeVariants';
 import { TableOfContents } from '../TableOfContents';
 import { ScrollContainer } from '../primitives/ScrollContainer';
 import { EmbeddableDocsPageControlButtons } from './EmbeddableDocsPageControlButtons';
@@ -18,7 +20,11 @@ import {
     EmbeddableFrameSidebar,
     EmbeddableFrameTitle,
 } from './EmbeddableFrame';
-import { EmbeddableIframeButtons, EmbeddableIframeTabs } from './EmbeddableIframeAPI';
+import {
+    EmbeddableIframeButtons,
+    EmbeddableIframeCloseButton,
+    EmbeddableIframeTabs,
+} from './EmbeddableIframeAPI';
 
 export const dynamic = 'force-static';
 
@@ -39,6 +45,8 @@ export async function EmbeddableDocsPage(
         pageParams,
     });
 
+    const variants = categorizeVariants(context);
+
     return (
         <EmbeddableFrame className="site-background">
             <EmbeddableFrameSidebar>
@@ -48,11 +56,15 @@ export async function EmbeddableDocsPage(
                     siteTitle={context.site.title}
                 />
                 <EmbeddableIframeButtons />
+                <EmbeddableIframeCloseButton />
             </EmbeddableFrameSidebar>
-            <EmbeddableFrameMain data-testid="embed-docs-page">
-                <div className="relative flex not-hydrated:animate-blur-in-slow flex-col">
-                    <EmbeddableFrameHeader>
-                        <HeaderMobileMenu className="-ml-2 page-no-toc:hidden" />
+            <EmbeddableFrameMain
+                data-testid="embed-docs-page"
+                className={variants.generic.length > 1 ? 'has-sidebar' : 'no-sidebar'}
+            >
+                <div className="relative flex flex-col border-tint-subtle border-b theme-bold:bg-header-background">
+                    <EmbeddableFrameHeader className="theme-bold:text-header-link">
+                        <HeaderMobileMenu className="-ml-2 no-sidebar:hidden theme-bold:text-header-link hover:theme-bold:bg-header-link/3 hover:theme-bold:text-header-link lg:hidden" />
                         <EmbeddableFrameHeaderMain>
                             <EmbeddableFrameTitle>{context.site.title}</EmbeddableFrameTitle>
                         </EmbeddableFrameHeaderMain>
@@ -69,19 +81,67 @@ export async function EmbeddableDocsPage(
                     </EmbeddableFrameHeader>
                     {context.sections ? (
                         <SiteSectionTabs
-                            className="-mt-2 border-tint-subtle border-b"
-                            sections={encodeClientSiteSections(context, context.sections)}
-                        />
+                            className="not-theme-bold:-mt-2 theme-bold:bg-tint-base"
+                            sections={encodeClientSiteSections(context, context.sections, {
+                                asEmbeddable: true,
+                            })}
+                        >
+                            {variants.translations.length > 1 ? (
+                                <TranslationsDropdown
+                                    context={context}
+                                    siteSpace={
+                                        variants.translations.find(
+                                            (space) => space.id === context.siteSpace.id
+                                        ) ?? context.siteSpace
+                                    }
+                                    siteSpaces={variants.translations}
+                                    className="my-1.5 ml-2 self-start"
+                                />
+                            ) : null}
+                        </SiteSectionTabs>
                     ) : null}
                 </div>
                 <EmbeddableFrameBody>
                     <ScrollContainer
                         orientation="vertical"
-                        className="not-hydrated:animate-blur-in-slow"
-                        contentClassName="p-4"
-                        fadeEdges={context.sections ? [] : ['leading']}
+                        className="-mx-4 not-hydrated:animate-blur-in-slow"
+                        contentClassName="flex-row px-4"
+                        leading={{ fade: false, button: true }}
+                        trailing={{ fade: false, button: true }}
                     >
-                        <TableOfContents className="pt-0" context={context} />
+                        <TableOfContents
+                            className="layout-wide:no-sidebar:lg:hidden!"
+                            context={context}
+                            withTrademark={false}
+                            header={
+                                !context.sections && variants.translations.length > 1 ? (
+                                    <TranslationsDropdown
+                                        context={context}
+                                        siteSpace={
+                                            variants.translations.find(
+                                                (space) => space.id === context.siteSpace.id
+                                            ) ?? context.siteSpace
+                                        }
+                                        siteSpaces={variants.translations}
+                                        className="max-md:[&_.button-content]:block"
+                                    />
+                                ) : null
+                            }
+                            innerHeader={
+                                variants.generic.length > 1 ? (
+                                    <div className="my-5 sidebar-default:mt-2 flex flex-col gap-2 px-5 empty:hidden">
+                                        {variants.generic.length > 1 ? (
+                                            <SpacesDropdown
+                                                context={context}
+                                                siteSpace={context.siteSpace}
+                                                siteSpaces={variants.generic}
+                                                className="w-full px-3"
+                                            />
+                                        ) : null}
+                                    </div>
+                                ) : null
+                            }
+                        />
                         <PageBody
                             context={context}
                             page={page}

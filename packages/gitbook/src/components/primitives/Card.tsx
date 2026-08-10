@@ -49,7 +49,7 @@ export function Card(
                 </span>
 
                 {postTitle ? (
-                    <span className={tcls('text-xs', 'text-tint')}>{postTitle}</span>
+                    <span className={tcls('text-xs', 'text-base')}>{postTitle}</span>
                 ) : null}
             </span>
             <Icon

@@ -1,24 +1,46 @@
-import { resolveContentRef, resolveContentRefFallback } from '@/lib/references';
+import { isSiteAuthLoginHref } from '@/lib/auth-login-link';
+import { resolveContentRefFallback, resolveContentRefInDocument } from '@/lib/references';
 import * as api from '@gitbook/api';
 import type { IconName } from '@gitbook/icons';
+import type React from 'react';
+import { SiteAuthLoginButton } from '../SiteAuth/SiteAuthLoginLink';
 import { Button, type ButtonProps } from '../primitives';
 import type { InlineProps } from './Inline';
 import { InlineActionButton } from './InlineActionButton';
 import { NotFoundRefHoverCard } from './NotFoundRefHoverCard';
+import { SelectActionButton } from './SelectActionButton';
+import { getSelectAction } from './selectAction';
+
+// Editor button sizes render one step smaller here; the editor default (`large`) keeps the previous `medium`.
+const BUTTON_SIZE_MAP: Record<
+    NonNullable<api.DocumentInlineButton['data']['size']>,
+    ButtonProps['size']
+> = {
+    small: 'xsmall',
+    medium: 'small',
+    large: 'medium',
+};
 
 export function InlineButton(props: InlineProps<api.DocumentInlineButton>) {
-    const { inline } = props;
+    const { inline, context } = props;
 
     const buttonProps: ButtonProps = {
         label: inline.data.label,
         variant: inline.data.kind,
         icon: inline.data.icon as IconName | undefined,
-        size: 'medium',
-        className: 'leading-normal',
+        size: BUTTON_SIZE_MAP[inline.data.size ?? 'large'],
     };
 
     const ButtonImplementation = () => {
-        if ('action' in inline.data && 'query' in inline.data.action) {
+        // Skip the select action in print/PDF: the client store isn't mounted, so it falls through
+        // to the plain disabled button below.
+        const selectAction = context.mode !== 'print' ? getSelectAction(inline.data) : null;
+        if (selectAction) {
+            return <SelectActionButton value={selectAction.value} buttonProps={buttonProps} />;
+        }
+
+        // In print/PDF mode, skip interactive action buttons (AI/search providers are not mounted).
+        if (context.mode !== 'print' && 'action' in inline.data && 'query' in inline.data.action) {
             return (
                 <InlineActionButton
                     action={inline.data.action.action}
@@ -37,9 +59,7 @@ export function InlineButton(props: InlineProps<api.DocumentInlineButton>) {
 
     const inlineElement = (
         // Set the leading to have some vertical space between adjacent buttons
-        <span className="inline-button leading-12 [&:has(+.inline-button)]:mr-2">
-            <ButtonImplementation />
-        </span>
+        <ButtonImplementation />
     );
 
     return inlineElement;
@@ -48,33 +68,39 @@ export function InlineButton(props: InlineProps<api.DocumentInlineButton>) {
 export async function InlineLinkButton(
     props: InlineProps<api.DocumentInlineButton> & { buttonProps: ButtonProps }
 ) {
-    const { inline, context, buttonProps } = props;
+    const { document, inline, context, buttonProps } = props;
 
     if (!('ref' in inline.data)) return;
 
     const resolved =
         context.contentContext && inline.data.ref
-            ? await resolveContentRef(inline.data.ref, context.contentContext)
+            ? await resolveContentRefInDocument(document, inline.data.ref, context.contentContext)
             : null;
 
     const href =
         resolved?.href ??
         (inline.data.ref ? resolveContentRefFallback(inline.data.ref)?.href : undefined);
+    const sharedProps: React.ComponentProps<typeof Button> = {
+        ...buttonProps,
+        insights: {
+            type: 'link_click' as const,
+            link: {
+                target: inline.data.ref,
+                position: api.SiteInsightsLinkPosition.Content,
+            },
+        },
+        href,
+        disabled: href === undefined,
+    };
 
-    const button = (
-        <Button
-            {...buttonProps}
-            insights={{
-                type: 'link_click',
-                link: {
-                    target: inline.data.ref,
-                    position: api.SiteInsightsLinkPosition.Content,
-                },
-            }}
-            href={href}
-            disabled={href === undefined}
-        />
-    );
+    const button =
+        href &&
+        context.contentContext &&
+        isSiteAuthLoginHref(context.contentContext.linker, href) ? (
+            <SiteAuthLoginButton {...sharedProps} />
+        ) : (
+            <Button {...sharedProps} />
+        );
 
     if (inline.data.ref && !resolved) {
         return <NotFoundRefHoverCard context={context}>{button}</NotFoundRefHoverCard>;

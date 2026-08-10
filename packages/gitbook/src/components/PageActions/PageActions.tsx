@@ -1,11 +1,11 @@
 'use client';
 
-import { useAIChatState } from '@/components/AI';
+import { useAIChatController, useAIChatState } from '@/components/AI';
 import type { Assistant } from '@/components/AI';
 import { Button } from '@/components/primitives/Button';
 import { DropdownMenuItem, useDropdownMenuClose } from '@/components/primitives/DropdownMenu';
+import { getURLForLLM } from '@/components/utils';
 import { tString, useLanguage } from '@/intl/client';
-import type { TranslationLanguage } from '@/intl/translations';
 import type { GitSyncState } from '@gitbook/api';
 import { Icon, type IconName, IconStyle } from '@gitbook/icons';
 import assertNever from 'assert-never';
@@ -16,11 +16,27 @@ import { createStore, useStore } from 'zustand';
 type PageActionType = 'button' | 'dropdown-menu-item';
 
 /**
+ * Context about the current page, attached to the assistant as a reference when opened.
+ */
+export type PageActionAssistantContext = {
+    id: string;
+    title: string;
+    path?: string;
+    /** Site-relative href of the page, used to navigate back to it from the chip. */
+    href?: string;
+};
+
+/**
  * Action to open the GitBook Assistant.
  */
-export function ActionOpenAssistant(props: { assistant: Assistant; type: PageActionType }) {
-    const { assistant, type } = props;
+export function ActionOpenAssistant(props: {
+    assistant: Assistant;
+    type: PageActionType;
+    page?: PageActionAssistantContext;
+}) {
+    const { assistant, type, page } = props;
     const chat = useAIChatState();
+    const chatController = useAIChatController();
     const language = useLanguage();
 
     return (
@@ -29,10 +45,27 @@ export function ActionOpenAssistant(props: { assistant: Assistant; type: PageAct
             icon={assistant.icon}
             label={assistant.label}
             shortLabel={tString(language, 'ask')}
-            description={tString(language, 'ai_chat_ask_about_page', assistant.label)}
-            disabled={chat.loading}
+            description={tString(
+                language,
+                'ai_chat_ask_about',
+                assistant.label,
+                tString(language, 'this_page')
+            )}
+            disabled={chat.responding}
             onClick={() => {
-                assistant.open(tString(language, 'ai_chat_suggested_questions_about_this_page'));
+                // Stage a reference to the current page so the assistant is informed about
+                // the context the user is asking from. Only the sidebar GitBook Assistant
+                // uses the chat reference system.
+                if (page && assistant.mode === 'sidebar') {
+                    chatController.addReference({
+                        type: 'page',
+                        id: page.id,
+                        label: page.title,
+                        path: page.path,
+                        href: page.href,
+                    });
+                }
+                assistant.open();
             }}
         />
     );
@@ -86,7 +119,7 @@ function useCopiedStore(stateKey: string) {
 }
 
 /**
- * Cache for the markdown versbion of the page.
+ * Cache for the markdown version of the page.
  */
 const markdownCache = new QuickLRU<string, string>({ maxSize: 10 });
 
@@ -109,7 +142,8 @@ export function ActionCopyMarkdown(props: {
     const fetchMarkdown = async () => {
         setLoading(true);
 
-        const result = await fetch(markdownPageURL).then((res) => res.text());
+        const humanURL = `${markdownPageURL}?displayAgentInstructions=false`;
+        const result = await fetch(humanURL).then((res) => res.text());
         markdownCache.set(markdownPageURL, result);
 
         setLoading(false);
@@ -160,7 +194,7 @@ export function ActionViewAsMarkdown(props: { markdownPageURL: string; type: Pag
             icon="markdown"
             label={tString(language, 'view_page_markdown')}
             description={tString(language, 'view_page_plaintext')}
-            href={markdownPageURL}
+            href={`${markdownPageURL}?displayAgentInstructions=false`}
         />
     );
 }
@@ -177,15 +211,20 @@ export function ActionOpenInLLM(props: {
     const language = useLanguage();
 
     const providerLabel = provider === 'chatgpt' ? 'ChatGPT' : 'Claude';
-
+    const prompt = tString(language, 'open_in_llms_pre_prompt', url);
     return (
         <PageActionWrapper
             type={type}
             icon={provider}
             label={tString(language, 'open_in', providerLabel)}
             shortLabel={providerLabel}
-            description={tString(language, 'ai_chat_ask_about_page', providerLabel)}
-            href={getLLMURL(provider, url, language)}
+            description={tString(
+                language,
+                'ai_chat_ask_about',
+                providerLabel,
+                tString(language, 'this_page')
+            )}
+            href={getURLForLLM(provider, prompt)}
         />
     );
 }
@@ -266,6 +305,54 @@ export function ActionOpenMCP(props: {
             href={providerInfo.url}
             label={tString(language, 'connect_mcp_to', providerInfo.label)}
             description={tString(language, 'install_mcp_on', providerInfo.label)}
+            icon={providerInfo.icon}
+        />
+    );
+}
+
+/**
+ * Action to copy the MCP install command for a CLI-based provider.
+ */
+export function ActionCopyMCPCommand(props: {
+    siteTitle: string;
+    mcpURL: string;
+    provider: 'claude-code' | 'codex';
+    type: PageActionType;
+}) {
+    const { siteTitle, provider, mcpURL, type } = props;
+    const language = useLanguage();
+
+    const slug =
+        siteTitle
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/^-|-$/g, '') || 'docs';
+
+    const providerInfo = React.useMemo<{ label: string; icon: IconName; command: string }>(() => {
+        switch (provider) {
+            case 'claude-code':
+                return {
+                    label: 'Claude Code',
+                    icon: 'claude',
+                    command: `claude mcp add ${slug} --scope user --transport http ${mcpURL}`,
+                };
+            case 'codex':
+                return {
+                    label: 'Codex',
+                    icon: 'chatgpt',
+                    command: `codex mcp add ${slug} --url ${mcpURL}`,
+                };
+            default:
+                assertNever(provider);
+        }
+    }, [provider, slug, mcpURL]);
+
+    return (
+        <CopyToClipboard
+            type={type}
+            data={providerInfo.command}
+            label={tString(language, 'connect_mcp_to', providerInfo.label)}
+            description={tString(language, 'copy_mcp_install_command', providerInfo.label)}
             icon={providerInfo.icon}
         />
     );
@@ -387,7 +474,11 @@ function PageActionWrapper(props: {
                 size="xsmall"
                 variant="secondary"
                 label={label ?? shortLabel}
-                className="bg-tint-base"
+                aria-label={shortLabel}
+                // `relative z-20` keeps the button above the breadcrumbs, whose container can sit on
+                // top of it over a page cover. `disabled:bg-tint-base` preserves the background while
+                // busy — the `secondary` variant would otherwise reset it via `disabled:bg-transparent`.
+                className="relative z-20 bg-tint-base disabled:bg-tint-base"
                 onClick={onClick}
                 href={href}
                 target={href ? target : undefined}
@@ -433,20 +524,4 @@ function PageActionWrapper(props: {
             </div>
         </DropdownMenuItem>
     );
-}
-
-/**
- * Returns the URL to open the page in a LLM with a pre-filled prompt.
- */
-function getLLMURL(provider: 'chatgpt' | 'claude', url: string, language: TranslationLanguage) {
-    const prompt = encodeURIComponent(tString(language, 'open_in_llms_pre_prompt', url));
-
-    switch (provider) {
-        case 'chatgpt':
-            return `https://chat.openai.com/?q=${prompt}`;
-        case 'claude':
-            return `https://claude.ai/new?q=${prompt}`;
-        default:
-            assertNever(provider);
-    }
 }

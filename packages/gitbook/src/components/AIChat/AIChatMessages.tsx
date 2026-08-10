@@ -1,9 +1,18 @@
 import { useLanguage } from '@/intl/client';
-import { tString } from '@/intl/translate';
+import { t, tString } from '@/intl/translate';
 import { tcls } from '@/lib/tailwind';
 import { AIMessageRole } from '@gitbook/api';
-import type { AIChatController, AIChatState } from '../AI';
-import { AIChatToolConfirmations } from './AIChatToolConfirmations';
+import { Fragment } from 'react';
+import {
+    type AIChatController,
+    type AIChatMessage,
+    type AIChatState,
+    getAIChatStatus,
+} from '../AI';
+import { ToggleChevron } from '../primitives';
+import { Button } from '../primitives/Button';
+import { Collapsible, CollapsibleTrigger } from '../primitives/Collapsible';
+import { AIChatReferenceChips } from './AIChatReferenceChips';
 import { AIResponseFeedback } from './AIResponseFeedback';
 import { AIChatFollowupSuggestions } from './AiChatFollowupSuggestions';
 
@@ -12,10 +21,11 @@ export function AIChatMessages(props: {
     chatController: AIChatController;
 }) {
     const { chat, chatController } = props;
+    const status = getAIChatStatus(chat);
+    const showLoadingShim = chat.responding && status !== 'working' && status !== 'done';
 
     // Group messages: user messages start a new group, all following messages until next user message belong to that group
-    type Message = (typeof chat.messages)[0];
-    type MessageGroup = { message: Message; originalIndex: number };
+    type MessageGroup = { message: AIChatMessage; originalIndex: number };
     const messageGroups: Array<Array<MessageGroup>> = [];
     let currentGroup: Array<MessageGroup> = [];
 
@@ -37,8 +47,33 @@ export function AIChatMessages(props: {
         messageGroups.push(currentGroup);
     }
 
+    const language = useLanguage();
+
     return messageGroups.map((group, groupIndex) => {
         const isLastGroup = group === messageGroups[messageGroups.length - 1];
+
+        const userItems = group.filter(({ message }) => message.role === AIMessageRole.User);
+        const assistantItems = group.filter(
+            ({ message }) => message.role === AIMessageRole.Assistant
+        );
+
+        // Each client-side tool call splits a turn into a separate assistant message, so without
+        // aggregating here every tool would render its own "Explored with 1 tool" expandable.
+        // We collapse the whole assistant run behind a single expandable instead, reusing the
+        // commentary (hidden) vs final-answer (visible) distinction from AIMessageView.
+        const toolCount = assistantItems.reduce(
+            (acc, { message }) => acc + (message.activity?.toolCount ?? 0),
+            0
+        );
+        const hasCommentary =
+            assistantItems.some(({ message }) => message.activity?.hasCommentary) || toolCount > 0;
+        const hasFinalAnswer =
+            assistantItems.some(({ message }) => message.activity?.hasFinalAnswer) || !isLastGroup;
+
+        const firstAssistantIndex = assistantItems.at(0)?.originalIndex ?? -1;
+        const lastAssistantIndex = assistantItems.at(-1)?.originalIndex ?? -1;
+        const isLastMessage = lastAssistantIndex === chat.messages.length - 1;
+
         return (
             <div
                 key={groupIndex}
@@ -51,68 +86,125 @@ export function AIChatMessages(props: {
                 )}
                 style={{ animationDelay: '.2s' }}
             >
-                {group.map(({ message, originalIndex }) => {
-                    const isLastMessage = originalIndex === chat.messages.length - 1;
-                    return (
+                {userItems.map(({ message, originalIndex }) => (
+                    <Fragment key={originalIndex}>
+                        {message.references?.length ? (
+                            <div className="flex max-w-[80%] origin-top-right justify-end self-end">
+                                <AIChatReferenceChips references={message.references} />
+                            </div>
+                        ) : null}
                         <div
-                            key={originalIndex}
-                            data-testid={
-                                message.role === AIMessageRole.User
-                                    ? 'ai-chat-message-user'
-                                    : 'ai-chat-message-assistant'
-                            }
+                            data-testid="ai-chat-message-user"
                             id={`message-${originalIndex}`}
                             className={tcls(
-                                'flex flex-col gap-6',
+                                'flex flex-col gap-2',
                                 'break-words',
                                 'group/message',
                                 'animate-blur-in-slow',
-                                isLastMessage ? 'basis-full' : '',
-                                message.role === AIMessageRole.User
-                                    ? 'max-w-[80%] origin-top-right self-end circular-corners:rounded-2xl rounded-corners:rounded-md bg-tint px-4 py-2'
-                                    : 'origin-top-left text-tint-strong'
+                                'mb-4 max-w-[80%] origin-top-right self-end circular-corners:rounded-2xl rounded-corners:rounded-md bg-tint px-4 py-2'
                             )}
                             style={{
                                 animationDelay: `${Math.min(originalIndex * 0.1, 0.6)}s`,
                             }}
                         >
                             {message.content}
-
-                            {isLastMessage && message.role === AIMessageRole.Assistant ? (
-                                <div
-                                    className={tcls(
-                                        'flex w-full shrink-0 flex-col gap-2 starting:opacity-0 transition-all transition-discrete duration-500',
-                                        chat.loading ? '' : 'hidden opacity-0'
-                                    )}
-                                >
-                                    <HoldMessage className={message.content ? 'hidden' : ''} />
-                                    <LoadingSkeleton />
-                                </div>
-                            ) : null}
-
-                            {isLastMessage ? (
-                                <>
-                                    {!chat.loading &&
-                                    !chat.error &&
-                                    chat.query &&
-                                    chat.responseId &&
-                                    chat.pendingTools.length === 0 ? (
-                                        <AIResponseFeedback
-                                            responseId={chat.responseId}
-                                            query={chat.query}
-                                            className="-ml-1 -mt-4"
-                                        />
-                                    ) : null}
-                                    <AIChatToolConfirmations chat={chat} />
-                                    <AIChatFollowupSuggestions
-                                        chat={chat}
-                                        chatController={chatController}
-                                    />
-                                </>
-                            ) : null}
                         </div>
-                    );
-                })}
+                    </Fragment>
+                ))}
+
+                {assistantItems.length > 0 ? (
+                    <Collapsible
+                        open={!hasFinalAnswer}
+                        disabled={!hasFinalAnswer}
+                        data-testid="ai-chat-message-assistant"
+                        id={`message-${firstAssistantIndex}`}
+                        className={tcls(
+                            'flex flex-col gap-2',
+                            'break-words',
+                            'group/message',
+                            'animate-blur-in-slow',
+                            'origin-top-left text-tint-strong',
+                            isLastMessage ? 'grow' : ''
+                        )}
+                        style={{
+                            animationDelay: `${Math.min(firstAssistantIndex * 0.1, 0.6)}s`,
+                        }}
+                    >
+                        {hasCommentary && hasFinalAnswer ? (
+                            <CollapsibleTrigger asChild>
+                                <Button
+                                    variant="blank"
+                                    size="small"
+                                    label={tString(language, 'ai_chat_view_activity')}
+                                    className="-mx-3 -my-1.5 group/dropdown animate-blur-in-display-slow self-start"
+                                >
+                                    <div className="flex items-center gap-2">
+                                        <span data-testid="ai-chat-activity-summary">
+                                            {toolCount > 0
+                                                ? t(
+                                                      language,
+                                                      'ai_chat_explored_with',
+                                                      tString(
+                                                          language,
+                                                          toolCount === 1
+                                                              ? 'tool_count'
+                                                              : 'tool_count_plural',
+                                                          toolCount.toString()
+                                                      )
+                                                  )
+                                                : t(language, 'ai_chat_explored')}
+                                        </span>
+                                        <ToggleChevron orientation="right-to-down" />
+                                    </div>
+                                </Button>
+                            </CollapsibleTrigger>
+                        ) : null}
+
+                        {assistantItems.map(({ message, originalIndex }) => (
+                            <Fragment key={originalIndex}>{message.content}</Fragment>
+                        ))}
+
+                        {isLastMessage ? (
+                            <div
+                                className={tcls(
+                                    'mt-4 flex w-full shrink-0 flex-col gap-2 overflow-hidden starting:opacity-0 transition-all transition-discrete duration-300',
+                                    showLoadingShim
+                                        ? 'max-h-48 opacity-11'
+                                        : 'pointer-events-none max-h-0 opacity-0'
+                                )}
+                            >
+                                <HoldMessage
+                                    className={
+                                        assistantItems.some(({ message }) => message.content)
+                                            ? 'hidden'
+                                            : ''
+                                    }
+                                />
+                                <LoadingSkeleton />
+                            </div>
+                        ) : null}
+
+                        {isLastMessage ? (
+                            <>
+                                {!chat.responding &&
+                                !chat.error &&
+                                chat.query &&
+                                chat.responseId &&
+                                !chat.control ? (
+                                    <AIResponseFeedback
+                                        responseId={chat.responseId}
+                                        query={chat.query}
+                                        className="-ml-1.5 -mt-4 mb-2"
+                                    />
+                                ) : null}
+                                <AIChatFollowupSuggestions
+                                    chat={chat}
+                                    chatController={chatController}
+                                />
+                            </>
+                        ) : null}
+                    </Collapsible>
+                ) : null}
             </div>
         );
     });

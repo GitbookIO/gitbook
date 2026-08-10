@@ -3,6 +3,7 @@ import type {
     DocumentBlockEmbed,
     DocumentBlockFile,
     DocumentBlockImage,
+    DocumentBlockImages,
     JSONDocument,
 } from '@gitbook/api';
 
@@ -11,6 +12,14 @@ import { type ClassValue, tcls } from '@/lib/tailwind';
 
 import type { DocumentContextProps } from './DocumentView';
 import { Inlines } from './Inlines';
+
+export type CaptionAlign = NonNullable<DocumentBlockImages['data']['align']>;
+
+const captionAlignStyles = {
+    center: 'mx-auto',
+    left: 'mr-auto ml-0',
+    right: 'mr-0 ml-auto',
+} satisfies Record<CaptionAlign, ClassValue>;
 
 /**
  * Wrap a content of a block that has a potential caption.
@@ -22,6 +31,7 @@ export function Caption(
         style?: ClassValue;
         fit?: boolean;
         wrapperStyle?: ClassValue;
+        align?: CaptionAlign;
         block: DocumentBlockImage | DocumentBlockDrawing | DocumentBlockEmbed | DocumentBlockFile;
         withBorder?: boolean;
         withFrame?: boolean;
@@ -49,6 +59,7 @@ export function Caption(
             withFrame && 'p-2',
         ],
         style,
+        align = 'center',
     } = props;
 
     const caption = getNodeFragmentByName(block, 'caption');
@@ -64,7 +75,7 @@ export function Caption(
 
     return (
         <picture className={tcls('relative', style)}>
-            <div className={tcls(wrapperStyle, 'mx-auto')}>{children}</div>
+            <div className={tcls(wrapperStyle, captionAlignStyles[align])}>{children}</div>
             <figcaption
                 className={tcls(
                     'text-xs',

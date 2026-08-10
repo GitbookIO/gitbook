@@ -3,7 +3,6 @@ import { AnimatePresence, motion } from 'motion/react';
 import React, { useRef } from 'react';
 import { useCurrentPagePath } from '../hooks';
 import { Button, Link, type LinkInsightsProps, type LinkProps, ToggleChevron } from '../primitives';
-import { useScrollToActiveTOCItem } from './TOCScroller';
 
 /**
  * Client component for a page document to toggle its children and be marked as active.
@@ -14,9 +13,11 @@ export function ToggleableLinkItem(
         pathnames: string[];
         children: React.ReactNode;
         descendants: React.ReactNode;
+        icon?: React.ReactNode;
+        tag?: React.ReactNode;
     } & LinkInsightsProps
 ) {
-    const { href, children, descendants, pathnames, insights } = props;
+    const { href, children, descendants, pathnames, insights, icon, tag } = props;
 
     const currentPagePath = useCurrentPagePath();
     const isActive = pathnames.some((pathname) => pathname === currentPagePath);
@@ -44,7 +45,15 @@ export function ToggleableLinkItem(
     if (!descendants) {
         return (
             <LinkItem href={href} insights={insights} isActive={isActive}>
-                {children}
+                {icon}
+                {tag ? (
+                    <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2">
+                        {children}
+                        <div className="flex shrink-0 items-center">{tag}</div>
+                    </div>
+                ) : (
+                    children
+                )}
             </LinkItem>
         );
     }
@@ -59,8 +68,21 @@ export function ToggleableLinkItem(
                         isActive={isActive}
                         onActiveClick={() => handleToggle(!isOpen)}
                     >
-                        {children}
-                        {toggler}
+                        {icon}
+                        {tag ? (
+                            <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2">
+                                {children}
+                                <div className="flex shrink-0 items-center">
+                                    {tag}
+                                    {toggler}
+                                </div>
+                            </div>
+                        ) : (
+                            <>
+                                {children}
+                                {toggler}
+                            </>
+                        )}
                     </LinkItem>
                     {descendants}
                 </>
@@ -76,8 +98,6 @@ function LinkItem(
     }
 ) {
     const { isActive, href, insights, children, onActiveClick } = props;
-    const anchorRef = useRef<HTMLAnchorElement>(null);
-    useScrollToActiveTOCItem({ anchorRef, isActive });
 
     const handleClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
         if (isActive && onActiveClick) {
@@ -88,13 +108,13 @@ function LinkItem(
 
     return (
         <Link
-            ref={anchorRef}
+            data-active={isActive}
             href={href}
             insights={insights}
             aria-current={isActive ? 'page' : undefined}
             classNames={[
-                'ToggleableLinkItemStyles',
-                ...(isActive ? ['ToggleableLinkItemActiveStyles' as const] : []),
+                'ToCLinkItemStyles',
+                ...(isActive ? ['ToCLinkItemActiveStyles' as const] : []),
             ]}
             onClick={handleClick}
         >
@@ -152,7 +172,8 @@ function Toggler(props: {
             size="xsmall"
             iconOnly
             variant="blank"
-            className="ml-auto text-current hover:bg-tint-base"
+            aria-hidden="true" // The button has no label or focus so hiding it from screen readers.
+            className="-my-0.5 ml-auto min-h-6 min-w-6 text-current hover:bg-tint-base"
             tabIndex={-1} // Prevent focus on the button since it's already inside a clickable link that performs the same toggle action.
         />
     );

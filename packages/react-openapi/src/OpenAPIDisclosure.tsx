@@ -1,7 +1,7 @@
 'use client';
 import clsx from 'classnames';
 import type React from 'react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button, Disclosure, DisclosurePanel } from 'react-aria-components';
 
 /**
@@ -14,9 +14,35 @@ export function OpenAPIDisclosure(props: {
     label: string | ((isExpanded: boolean) => string);
     className?: string;
     defaultExpanded?: boolean;
+    /**
+     * Anchor id used as a deep-link target. When set, the disclosure expands and scrolls the
+     * element carrying this id into view once the URL hash matches it.
+     */
+    id?: string;
 }): React.JSX.Element {
-    const { icon, header, label, children, className, defaultExpanded = false } = props;
+    const { icon, header, label, children, className, defaultExpanded = false, id } = props;
     const [isExpanded, setIsExpanded] = useState(defaultExpanded);
+
+    // Expand and scroll into view when the URL hash points to this disclosure.
+    useEffect(() => {
+        if (!id) {
+            return;
+        }
+
+        const openFromHash = () => {
+            if (window.location.hash.slice(1) !== id) {
+                return;
+            }
+            setIsExpanded(true);
+            requestAnimationFrame(() => {
+                document.getElementById(id)?.scrollIntoView({ block: 'start' });
+            });
+        };
+
+        openFromHash();
+        window.addEventListener('hashchange', openFromHash);
+        return () => window.removeEventListener('hashchange', openFromHash);
+    }, [id]);
 
     return (
         <Disclosure

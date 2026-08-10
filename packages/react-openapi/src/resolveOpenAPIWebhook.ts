@@ -6,6 +6,7 @@ import type {
 } from '@gitbook/openapi-parser';
 import { dereferenceFilesystem } from './dereference';
 import type { OpenAPIWebhookData } from './types';
+import { readMcpUrl } from './utils';
 
 export { fromJSON, toJSON } from 'flatted';
 
@@ -40,9 +41,23 @@ export async function resolveOpenAPIWebhook(
 
     return {
         servers,
-        operation,
+        operation: {
+            ...operation,
+            'x-gitbook-mcp-url':
+                readMcpUrl(operation) ??
+                readMcpUrl(getPathObject(schema, name)) ??
+                readMcpUrl(schema),
+        },
         method,
         name,
+        'x-expandAllResponses':
+            typeof schema['x-expandAllResponses'] === 'boolean'
+                ? schema['x-expandAllResponses']
+                : undefined,
+        'x-expandAllModelSections':
+            typeof schema['x-expandAllModelSections'] === 'boolean'
+                ? schema['x-expandAllModelSections']
+                : undefined,
     };
 }
 

@@ -6,3 +6,53 @@
         content: counter(page);
     }
 }
+
+/* --- Print-safe rules: avoid cutting headings/step headings --- */
+@media print {
+    /* Ensure headings act like blocks in print and aren't split */
+    .pdf-heading,
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        display: block !important;
+        break-inside: avoid !important;
+        page-break-inside: avoid !important;
+        -webkit-column-break-inside: avoid !important;
+        widows: 2;
+        orphans: 2;
+    }
+
+    /* Keep heading with the immediate following block */
+    .pdf-heading {
+        break-after: avoid !important;
+        page-break-after: avoid !important;
+        -webkit-column-break-after: avoid !important;
+    }
+
+    .pdf-heading + * {
+        break-before: avoid !important;
+        page-break-before: avoid !important;
+    }
+
+    /* Treat each step as its own printable block so headings in steps don't orphan */
+    .stepper-step,
+    .stepper .step,
+    .stepper-step__wrapper {
+        display: block !important;
+        break-inside: avoid !important;
+        page-break-inside: avoid !important;
+        -webkit-column-break-inside: avoid !important;
+        /* Small breathing room to avoid visible cutting when browser is tight */
+        padding-bottom: 6mm !important;
+    }
+
+    /* If the stepper was flex/grid on screen, simplify layout in print */
+    .stepper,
+    .Stepper,
+    .stepper-root {
+        display: block !important;
+    }
+}

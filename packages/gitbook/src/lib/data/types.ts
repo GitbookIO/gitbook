@@ -66,12 +66,30 @@ export interface GitBookDataFetcher {
     }): Promise<DataFetcherResponse<api.ChangeRequest>>;
 
     /**
+     * Get the semantic changes for a change request.
+     */
+    getChangeRequestChanges(params: {
+        spaceId: string;
+        changeRequestId: string;
+        limit?: number;
+    }): Promise<DataFetcherResponse<api.RevisionSemanticChanges>>;
+
+    /**
      * Get the revision by its space ID and revision ID.
      */
     getRevision(params: {
         spaceId: string;
         revisionId: string;
     }): Promise<DataFetcherResponse<api.Revision>>;
+
+    /**
+     * Get the semantic changes for a revision.
+     */
+    getRevisionSemanticChanges(params: {
+        spaceId: string;
+        revisionId: string;
+        limit?: number;
+    }): Promise<DataFetcherResponse<api.RevisionSemanticChanges>>;
 
     /**
      * Get a revision page by its path.
@@ -160,11 +178,16 @@ export interface GitBookDataFetcher {
         query: string;
         scope:
             | { mode: 'all' }
-            | { mode: 'current'; siteSpaceId: string }
+            | {
+                  mode: 'current';
+                  siteSpaceId: string;
+                  /** Restrict the search to the current site space alone, or to the other site spaces in the scope. */
+                  restrictTo?: 'currentSiteSpace' | 'otherSiteSpaces';
+              }
             | { mode: 'specific'; siteSpaceIds: string[] };
         /** Cache bust to ensure the search results are fresh when the space is updated. */
         cacheBust?: string;
-    }): Promise<DataFetcherResponse<api.SearchSpaceResult[]>>;
+    }): Promise<DataFetcherResponse<Array<api.SearchSpaceResult | api.SearchRecordResult>>>;
 
     /**
      * Render an integration UI.

@@ -5,6 +5,8 @@ export const en = {
     stability_experimental: 'Experimental',
     stability_alpha: 'Alpha',
     stability_beta: 'Beta',
+    available_in_mcp: 'Available in MCP',
+    copy_url: 'Copy URL',
     discriminator: 'Discriminator',
     copy_to_clipboard: 'Copy to clipboard',
     copied: 'Copied',
@@ -38,9 +40,10 @@ export const en = {
     available_items: 'Available items',
     required_scopes: 'Required scopes',
     required_scopes_description: 'This endpoint requires the following scopes:',
-    available_scopes: 'Available scopes:',
+
     possible_values: 'Possible values',
     properties: 'Properties',
     or: 'or',
     and: 'and',
+    direct_link_to_model: 'Direct link to ${1}',
 };

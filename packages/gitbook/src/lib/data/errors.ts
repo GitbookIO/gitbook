@@ -1,6 +1,5 @@
 import { GitBookAPIError } from '@gitbook/api';
 import { parse as parseCacheControl } from '@tusbar/cache-control';
-import { unstable_cacheLife as cacheLife } from 'next/cache';
 import type { DataFetcherErrorData, DataFetcherResponse } from './types';
 
 export class DataFetcherError extends Error {
@@ -59,7 +58,7 @@ export async function ignoreDataThrownError<T>(promise: Promise<T>): Promise<T |
     try {
         return await promise;
     } catch (error) {
-        getExposableError(error as Error);
+        console.warn('ignored Data error', getExposableError(error as Error));
         return null;
     }
 }
@@ -78,6 +77,7 @@ export async function ignoreAllThrownError<T>(promise: Promise<T>): Promise<T | 
 
 /**
  * Wrap an async execution to handle errors and return a DataFetcherResponse.
+ * This function should not throw.
  */
 export async function wrapDataFetcherError<T>(
     fn: () => Promise<T>
@@ -89,34 +89,6 @@ export async function wrapDataFetcherError<T>(
             error: getExposableError(error as Error),
         };
     }
-}
-
-/**
- * Wrap an async execution to handle errors and return a DataFetcherResponse.
- * This should be used inside 'use cache' functions.
- */
-export async function wrapCacheDataFetcherError<T>(
-    fn: () => Promise<T>
-): Promise<DataFetcherResponse<T>> {
-    const result = await wrapDataFetcherError(fn);
-    if (result.error) {
-        const cacheValue = result.error.cache;
-        // We only want to cache 404 errors for "long", because that's an "expected" error.
-        if (result.error.code === 404) {
-            cacheLife({
-                stale: 60,
-                revalidate: cacheValue?.maxAge ?? 60 * 60, // 1 hour
-                expire: cacheValue?.staleWhileRevalidate ?? 60 * 60 * 24, // 1 day
-            });
-        } else {
-            cacheLife({
-                stale: 60, // This one is only for the client
-                revalidate: cacheValue?.maxAge ?? 30, // we don't want to cache it for too long, but at least 30 seconds to avoid hammering the API
-                expire: cacheValue?.staleWhileRevalidate ?? 90, // we want to revalidate this error after 90 seconds for sure
-            });
-        }
-    }
-    return result;
 }
 
 /**
@@ -178,8 +150,9 @@ export function extractCacheControl(error: GitBookAPIError) {
 
 /**
  * Get a data fetcher exposable error from a JS error.
+ * This function should never throw, even if the error is not in the expected format. In that case, it should return a generic error with code 500.
  */
-export function getExposableError(error: Error): DataFetcherErrorData {
+export function getExposableError(error: unknown): DataFetcherErrorData {
     if (error instanceof GitBookAPIError) {
         const cache = extractCacheControl(error);
 
@@ -197,5 +170,10 @@ export function getExposableError(error: Error): DataFetcherErrorData {
         };
     }
 
-    throw error;
+    console.warn('An unexpected error occurred', error);
+
+    return {
+        code: 500,
+        message: 'An unexpected error occurred',
+    };
 }

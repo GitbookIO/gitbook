@@ -64,7 +64,8 @@ let frameConfiguration: GitBookEmbeddableConfiguration & StandaloneConfiguration
     greeting: { title: '', subtitle: '' },
     suggestions: [],
     tools: [],
-    tabs: ['assistant', 'docs'],
+    tabs: ['assistant', 'search', 'docs'],
+    trademark: true,
 };
 
 const widgetButton = document.createElement('button');
@@ -100,12 +101,20 @@ function getIframe() {
         widgetIframe?.remove();
         widgetIframe = document.createElement('iframe');
         widgetIframe.id = 'gitbook-widget-iframe';
+        widgetIframe.allow = 'clipboard-write';
+        if (frameOptions?.colorScheme) {
+            widgetIframe.style.colorScheme = frameOptions.colorScheme;
+        }
         widgetIframe.src = client.getFrameURL({
             ...frameOptions,
         });
         widgetWindow.appendChild(widgetIframe);
 
         _frame = client.createFrame(widgetIframe);
+        _frame.on('close', () => {
+            widgetWindow.classList.add('hidden');
+            widgetButton.classList.remove('open');
+        });
     }
     return { iframe: widgetIframe, frame: _frame };
 }
@@ -152,6 +161,19 @@ const GitBook = (...args: StandaloneCalls) => {
             break;
         case 'configure': {
             const settings = args[1];
+
+            // If trademark is disabled, change the (branded) icon to the sparkle icon
+            if (
+                settings.trademark === false &&
+                !settings.button?.icon &&
+                frameConfiguration.button.icon === 'assistant'
+            ) {
+                settings.button = {
+                    label: frameConfiguration.button.label,
+                    icon: 'sparkle',
+                };
+            }
+
             frameConfiguration = {
                 ...frameConfiguration,
                 ...settings,
@@ -193,5 +215,3 @@ const precalls = (window.GitBook as GitBookStandalone | undefined)?.q ?? [];
 // @ts-expect-error - GitBook is not defined in the global scope
 window.GitBook = GitBook;
 precalls.forEach((call) => GitBook(...call));
-
-GitBook('configure', {});

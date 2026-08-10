@@ -157,6 +157,31 @@ const StandardLibrary: Partial<
                 }),
             }),
             SymbolFunction({
+                name: 'startsWith',
+                description: `Returns true if the given characters are found at the beginning of the string, including when searchString 
+            is an empty string. Otherwise returns false.`,
+                link: 'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/startsWith',
+                args: [
+                    SymbolString({
+                        name: 'searchString',
+                        description: `The characters to be searched for at the start of this string. Cannot be a regex.
+                    All values that are not regexes are coerced to strings, so omitting it or passing undefined causes startsWith() to search for 
+                    the string "undefined", which is rarely what you want.`,
+                    }),
+                    OptionalFunctionArg(
+                        SymbolNumber({
+                            name: 'position',
+                            description: `The start position at which searchString is expected to be found 
+                    (the index of searchString's first character). Defaults to 0.`,
+                        })
+                    ),
+                ],
+                returns: SymbolBoolean({
+                    description: `true if the given characters are found at the beginning of the string, including when searchString is an empty string; 
+                otherwise, false.`,
+                }),
+            }),
+            SymbolFunction({
                 name: 'endsWith',
                 description: `Returns true if the sequence of elements of searchString converted to a String is the same as the corresponding 
             elements of this object (converted to a String) starting at endPosition – length(this). Otherwise returns false.`,
@@ -203,6 +228,39 @@ const StandardLibrary: Partial<
                 returns: SymbolBoolean({
                     description: `true if the search string is found anywhere within the given string, including when searchString is an empty string; 
                 otherwise, false.`,
+                }),
+            }),
+            SymbolFunction({
+                name: 'toLowerCase',
+                description:
+                    'Returns the value of the string converted to lower case. toLowerCase() does not affect the value of the string str itself.',
+                link: 'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/toLowerCase',
+                args: [],
+                returns: SymbolString({
+                    description:
+                        'A new string representing the calling string converted to lower case.',
+                }),
+            }),
+            SymbolFunction({
+                name: 'toUpperCase',
+                description:
+                    'Returns the value of the string converted to uppercase. toUpperCase() does not affect the value of the string str itself.',
+                link: 'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/toUpperCase',
+                args: [],
+                returns: SymbolString({
+                    description:
+                        'A new string representing the calling string converted to upper case.',
+                }),
+            }),
+            SymbolFunction({
+                name: 'trim',
+                description:
+                    'Returns new string representing str stripped of whitespace from both its beginning and end.',
+                link: 'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/trim',
+                args: [],
+                returns: SymbolString({
+                    description:
+                        'A new string representing str stripped of whitespace from both its beginning and end.',
                 }),
             }),
         ],

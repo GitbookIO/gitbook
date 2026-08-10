@@ -1,5 +1,89 @@
 # @gitbook/react-openapi
 
+## 1.5.15
+
+### Patch Changes
+
+- 7e55cd5: Add an "Available in MCP" badge on OpenAPI operations marked with `x-gitbook-mcp: true`. When `x-gitbook-mcp-url` is set (on the operation, path, or root — most specific wins), the badge becomes a button that copies the MCP server URL to the clipboard.
+- Updated dependencies [3fedaaa]
+- Updated dependencies [7e55cd5]
+  - @gitbook/expr@1.3.1
+  - @gitbook/openapi-parser@3.0.12
+
+## 1.5.14
+
+### Patch Changes
+
+- f4469b2: Support OpenAPI one-operation-per-page mode
+- 88b94b5: Handle circular oneOf with discriminator and allOf in OpenAPI schemas
+
+## 1.5.13
+
+### Patch Changes
+
+- f158064: Match OpenAPI operation paths regardless of trailing slash
+- Updated dependencies [6eabaec]
+  - @gitbook/expr@1.3.0
+
+## 1.5.12
+
+### Patch Changes
+
+- Updated dependencies [8242f18]
+  - @gitbook/expr@1.2.5
+
+## 1.5.11
+
+### Patch Changes
+
+- 7f4e644: Small OpenAPI Improvements
+- b5d6f2e: Fix translation quality across 11 locales
+- 9dd2db6: Support x-gitbook-token-placeholder as TryIt prefill fallback for HTTP auth (basic and bearer)
+- c56b569: Support expand-all options for OpenAPI
+- Updated dependencies [c56b569]
+  - @gitbook/openapi-parser@3.0.11
+
+## 1.5.10
+
+### Patch Changes
+
+- bdc6cd9: Use OpenAPI publicURL as Scalar specUrl
+- 8ab419a: Support x-enable-proxy at operation level
+- eceec6f: Move ~scalar/proxy route to site route group
+- 887c3f8: Add token verification on OpenAPI proxy
+- Updated dependencies [8ab419a]
+  - @gitbook/openapi-parser@3.0.10
+
+## 1.5.9
+
+### Patch Changes
+
+- e074283: Add server-side proxy for Scalar API client to bypass CORS
+- Updated dependencies [e074283]
+  - @gitbook/openapi-parser@3.0.9
+
+## 1.5.8
+
+### Patch Changes
+
+- 1a7ef78: Handle non-array required field in OpenAPI schema to fix TypeError with specs using boolean required values
+- 93eea0b: Strip trailing slash from OpenAPI server URLs to avoid double slashes in rendered paths
+- 2ebb18d: Make OpenAPI Response structure clearer
+- 11d9b80: Use precedence for OpenAPI servers
+- f517035: Remove available scopes list from OAuth2 endpoints when no scopes are required
+
+## 1.5.7
+
+### Patch Changes
+
+- e00d1c5: Support code themes customization
+- 4e2d863: Fix OpenAPI example not showing
+- 3ba9e46: Improve OpenAPI server URL validation
+- 717ad0b: Fix Scalar Try it button justification
+- 48ca21e: Add OpenAPI 3.1 nullable array support
+- Updated dependencies [d3f6c38]
+  - @gitbook/openapi-parser@3.0.8
+
 ## 1.5.6
 
 ### Patch Changes

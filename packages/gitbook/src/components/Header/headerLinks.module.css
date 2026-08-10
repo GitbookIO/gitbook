@@ -18,7 +18,7 @@
     }
     .containerHeaderlinks > :nth-child(n + 1) ~ .linkEllipsis {
         display: flex;
-        & div > a:nth-of-type(n + 1) {
+        & div > *:nth-child(n + 1) {
             display: flex;
         }
     }
@@ -29,7 +29,7 @@
     }
     .containerHeaderlinks > :nth-child(n + 2) ~ .linkEllipsis {
         display: flex;
-        & div > a:nth-of-type(n + 2) {
+        & div > *:nth-child(n + 2) {
             display: flex;
         }
     }
@@ -40,7 +40,7 @@
     }
     .containerHeaderlinks > :nth-child(n + 3) ~ .linkEllipsis {
         display: flex;
-        & div > a:nth-of-type(n + 3) {
+        & div > *:nth-child(n + 3) {
             display: flex;
         }
     }
@@ -51,7 +51,7 @@
     }
     .containerHeaderlinks > :nth-child(n + 4) ~ .linkEllipsis {
         display: flex;
-        & div > a:nth-of-type(n + 4) {
+        & div > *:nth-child(n + 4) {
             display: flex;
         }
     }
@@ -62,7 +62,7 @@
     }
     .containerHeaderlinks > :nth-child(n + 5) ~ .linkEllipsis {
         display: flex;
-        & div > a:nth-of-type(n + 5) {
+        & div > *:nth-child(n + 5) {
             display: flex;
         }
     }
@@ -73,7 +73,7 @@
     }
     .containerHeaderlinks > :nth-child(n + 6) ~ .linkEllipsis {
         display: flex;
-        & div > a:nth-of-type(n + 6) {
+        & div > *:nth-child(n + 6) {
             display: flex;
         }
     }

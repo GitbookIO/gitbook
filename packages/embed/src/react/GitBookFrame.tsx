@@ -11,19 +11,34 @@ import { useGitBook } from './GitBookProvider';
 export type GitBookFrameProps = {
     className?: string;
 } & GetFrameURLOptions &
-    GitBookEmbeddableConfiguration;
+    Partial<GitBookEmbeddableConfiguration>;
 
 /**
  * Render a frame with the GitBook Assistant in it.
  */
 export function GitBookFrame(props: GitBookFrameProps) {
-    const { className, visitor, actions, greeting, suggestions, tools } = props;
+    const {
+        className,
+        colorScheme,
+        visitor,
+        actions = [],
+        greeting,
+        suggestions = [],
+        tools = [],
+        tabs = ['assistant', 'search', 'docs'],
+        trademark = true,
+        closeButton = false,
+        assistantName,
+    } = props;
 
     const frameRef = useRef<HTMLIFrameElement>(null);
     const gitbook = useGitBook();
     const [gitbookFrame, setGitbookFrame] = useState<GitBookFrameClient | null>(null);
 
-    const frameURL = useMemo(() => gitbook.getFrameURL({ visitor }), [gitbook, visitor]);
+    const frameURL = useMemo(
+        () => gitbook.getFrameURL({ visitor, colorScheme }),
+        [gitbook, visitor, colorScheme]
+    );
 
     useEffect(() => {
         if (frameRef.current) {
@@ -33,13 +48,26 @@ export function GitBookFrame(props: GitBookFrameProps) {
 
     useEffect(() => {
         gitbookFrame?.configure({
-            tabs: ['assistant', 'docs'],
+            tabs,
             actions,
             greeting,
             suggestions,
             tools,
+            closeButton,
+            trademark,
+            assistantName,
         });
-    }, [gitbookFrame, actions, greeting, suggestions, tools]);
+    }, [
+        gitbookFrame,
+        actions,
+        greeting,
+        suggestions,
+        tools,
+        tabs,
+        closeButton,
+        trademark,
+        assistantName,
+    ]);
 
     return (
         <iframe
@@ -48,7 +76,9 @@ export function GitBookFrame(props: GitBookFrameProps) {
             src={frameURL}
             width="100%"
             height="100%"
+            allow="clipboard-write"
             className={className}
+            style={colorScheme ? { colorScheme } : undefined}
         />
     );
 }

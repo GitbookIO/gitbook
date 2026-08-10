@@ -4,7 +4,8 @@ import { CONTAINER_STYLE, HEADER_HEIGHT_DESKTOP } from '@/components/layout';
 import { getSpaceLanguage, t } from '@/intl/server';
 import { tcls } from '@/lib/tailwind';
 import type { SiteSpace } from '@gitbook/api';
-import { SearchContainer } from '../Search';
+import { SocialAccountButton } from '../Footer/SocialAccounts';
+import { SearchContainer, getSearchBaseProps } from '../Search';
 import { SiteSectionTabs, encodeClientSiteSections } from '../SiteSections';
 import { HeaderLink } from './HeaderLink';
 import { HeaderLinkMore } from './HeaderLinkMore';
@@ -16,7 +17,7 @@ import { TranslationsDropdown } from './SpacesDropdown';
 /**
  * Render the header for the space.
  */
-export function Header(props: {
+export async function Header(props: {
     context: GitBookSiteContext;
     withTopHeader?: boolean;
     variants: {
@@ -25,7 +26,9 @@ export function Header(props: {
     };
 }) {
     const { context, withTopHeader, variants } = props;
-    const { siteSpace, visibleSiteSpaces, visibleSections, customization } = context;
+    const { siteSpace, visibleSections, customization } = context;
+    const searchProps = getSearchBaseProps(context);
+    const language = await getSpaceLanguage(context);
 
     const withSections = Boolean(
         visibleSections &&
@@ -33,15 +36,20 @@ export function Header(props: {
                 visibleSections.list.some((s) => s.object === 'site-section-group'))
     );
 
+    const headerSocialAccounts = customization.socialAccounts.filter(
+        (account) => account.display.header === true
+    );
+
     return (
         <header
-            id="site-header"
+            data-gb-site-header
             className={tcls(
                 'flex',
                 'flex-col',
                 `h-[${HEADER_HEIGHT_DESKTOP}px]`,
                 'sticky',
                 'top-0',
+                'pt-[env(safe-area-inset-top)]',
                 'z-30',
                 'w-full',
                 'flex-none',
@@ -62,14 +70,14 @@ export function Header(props: {
         >
             <div
                 className={tcls(
-                    'theme-bold:bg-header-background',
-                    'theme-bold:shadow-[0px_1px_0px]',
-                    'theme-bold:shadow-tint-12/2'
+                    'site-header:theme-bold:bg-header-background',
+                    'site-header:theme-bold:shadow-[0px_1px_0px]',
+                    'site-header:theme-bold:shadow-tint-12/2'
                 )}
             >
-                <div className="transition-all duration-300 lg:chat-open:pr-80 xl:chat-open:pr-96">
+                <div className="transition-all duration-300 motion-reduce:transition-none lg:chat-open:pr-(--ai-chat-width)">
                     <div
-                        id="header-content"
+                        data-gb-header-content
                         className={tcls(
                             'gap-4',
                             'lg:gap-6',
@@ -81,7 +89,7 @@ export function Header(props: {
                             'min-h-16',
                             'sm:h-16',
                             CONTAINER_STYLE,
-                            'transition-[max-width] duration-300',
+                            'transition-[max-width] duration-300 motion-reduce:transition-none',
                             '@container/header'
                         )}
                     >
@@ -99,12 +107,12 @@ export function Header(props: {
                                 className={tcls(
                                     '-ml-2',
                                     'text-tint-strong',
-                                    'theme-bold:text-header-link',
+                                    'site-header:theme-bold:text-header-link',
                                     'hover:bg-tint-hover',
-                                    'hover:theme-bold:bg-header-link/3',
+                                    'hover:site-header:theme-bold:bg-header-link/3',
                                     variants.generic.length > 1
                                         ? 'lg:hidden'
-                                        : 'page-no-toc:hidden lg:hidden'
+                                        : 'no-sidebar:hidden lg:hidden'
                                 )}
                             />
                             <HeaderLogo context={context} />
@@ -115,71 +123,69 @@ export function Header(props: {
                                 'flex',
                                 'grow-0',
                                 'shrink-0',
-                                '@2xl:basis-56',
+                                'md:@2xl:basis-56',
                                 'justify-self-end',
                                 'items-center',
                                 'gap-2',
-                                'transition-[margin] duration-300',
+                                'transition-[margin] duration-300 motion-reduce:transition-none',
                                 'search' in customization.styling &&
                                     customization.styling.search === 'prominent'
                                     ? [
-                                          '@2xl:grow-[0.8]',
-                                          '@4xl:basis-40',
-                                          '@2xl:max-w-[40%]',
-                                          '@4xl:max-w-lg',
+                                          'md:@2xl:grow-[0.8]',
+                                          'md:@4xl:basis-40',
+                                          'md:@2xl:max-w-[50%]',
+                                          'md:@4xl:max-w-lg',
                                           'lg:@2xl:ml-[max(calc((100%-18rem-48rem)/2),1.5rem)]', // container (100%) - sidebar (18rem) - content (48rem)
                                           'not-chat-open:xl:ml-[max(calc((100%-18rem-48rem-14rem-3rem)/2),1.5rem)]', // container (100%) - sidebar (18rem) - content (48rem) - outline (14rem) - margin (3rem)
-                                          '@2xl:mr-auto',
+                                          'md:@2xl:mr-auto',
                                           'order-last',
-                                          '@2xl:order-[unset]',
+                                          'md:@2xl:order-[unset]',
                                       ]
                                     : ['order-last']
                             )}
                         >
                             <SearchContainer
+                                {...searchProps}
                                 style={customization.styling.search}
-                                withVariants={variants.generic.length > 1}
-                                withSiteVariants={
-                                    visibleSections?.list.some(
-                                        (s) =>
-                                            s.object === 'site-section' && s.siteSpaces.length > 1
-                                    ) ?? false
-                                }
-                                withSections={
-                                    visibleSections ? visibleSections.list.length > 1 : false
-                                }
-                                section={
-                                    visibleSections
-                                        ? // Client-encode to avoid a serialization issue that was causing the language selector to disappear
-                                          encodeClientSiteSections(context, visibleSections).current
-                                        : undefined
-                                }
-                                siteSpace={siteSpace}
-                                siteSpaces={visibleSiteSpaces}
                                 viewport={!withTopHeader ? 'mobile' : undefined}
                             />
                         </div>
 
                         {customization.header.links.length > 0 ||
+                        headerSocialAccounts.length > 0 ||
                         (!withSections && variants.translations.length > 1) ? (
                             <HeaderLinks>
-                                {customization.header.links.length > 0 ? (
-                                    <>
-                                        {customization.header.links.map((link) => {
+                                {customization.header.links.map((link) => {
+                                    return (
+                                        <HeaderLink
+                                            key={link.title}
+                                            link={link}
+                                            context={context}
+                                        />
+                                    );
+                                })}
+                                {headerSocialAccounts.length > 0 ? (
+                                    <div className="flex items-center gap-1">
+                                        {headerSocialAccounts.map((account) => {
                                             return (
-                                                <HeaderLink
-                                                    key={link.title}
-                                                    link={link}
-                                                    context={context}
+                                                <SocialAccountButton
+                                                    key={`${account.platform}-${account.handle}`}
+                                                    account={account}
+                                                    target={customization.externalLinks.target}
+                                                    className="p-2 theme-bold:text-header-link hover:site-header:theme-bold:bg-header-link/3 hover:theme-bold:text-header-link focus-visible:site-header:theme-bold:bg-header-link/3"
                                                 />
                                             );
                                         })}
-                                        <HeaderLinkMore
-                                            label={t(getSpaceLanguage(context), 'more')}
-                                            links={customization.header.links}
-                                            context={context}
-                                        />
-                                    </>
+                                    </div>
+                                ) : null}
+                                {customization.header.links.length > 0 ||
+                                headerSocialAccounts.length > 0 ? (
+                                    <HeaderLinkMore
+                                        label={t(language, 'more')}
+                                        links={customization.header.links}
+                                        socialAccounts={headerSocialAccounts}
+                                        context={context}
+                                    />
                                 ) : null}
                                 {!withSections && variants.translations.length > 1 ? (
                                     <TranslationsDropdown
@@ -190,7 +196,7 @@ export function Header(props: {
                                             ) ?? siteSpace
                                         }
                                         siteSpaces={variants.translations}
-                                        className="flex! theme-bold:text-header-link hover:theme-bold:bg-header-link/3"
+                                        className="flex! -mx-3 site-header:theme-bold:text-header-link hover:site-header:theme-bold:bg-header-link/3 focus-visible:site-header:theme-bold:bg-header-link/3 aria-expanded:site-header:theme-bold:bg-header-link/5"
                                     />
                                 ) : null}
                             </HeaderLinks>
@@ -200,7 +206,7 @@ export function Header(props: {
             </div>
 
             {visibleSections && withSections ? (
-                <div className="transition-[padding] duration-300 lg:chat-open:pr-80 xl:chat-open:pr-96">
+                <div className="transition-[padding] duration-300 motion-reduce:transition-none lg:chat-open:pr-(--ai-chat-width)">
                     <SiteSectionTabs sections={encodeClientSiteSections(context, visibleSections)}>
                         {variants.translations.length > 1 ? (
                             <TranslationsDropdown
@@ -211,7 +217,7 @@ export function Header(props: {
                                     ) ?? siteSpace
                                 }
                                 siteSpaces={variants.translations}
-                                className="my-1.5 ml-2 self-start"
+                                className="-mx-3 my-1.5 ml-2 self-start"
                             />
                         ) : null}
                     </SiteSectionTabs>

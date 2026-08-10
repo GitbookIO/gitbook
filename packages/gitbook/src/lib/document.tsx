@@ -25,11 +25,30 @@ export function hasFullWidthBlock(document: JSONDocument): boolean {
         if (block.data && 'fullWidth' in block.data && block.data.fullWidth) {
             return true;
         }
-        if (block.type === 'swagger' || block.type === 'openapi-operation') {
+        if (
+            block.type === 'swagger' ||
+            block.type === 'openapi-operation' ||
+            block.type === 'openapi-webhook'
+        ) {
             return true;
         }
         return false;
     });
+}
+
+/**
+ * Check if the document contains an OpenAPI/Swagger block at the top level.
+ * Mirrors the `page-api-block` CSS variant (`body:has(.openapi-block)`) so server-rendered layout
+ * decisions can be scoped to API-reference pages the same way the styling is.
+ */
+export function hasAPIBlock(document: JSONDocument): boolean {
+    return hasTopLevelBlock(
+        document,
+        (block) =>
+            block.type === 'swagger' ||
+            block.type === 'openapi-operation' ||
+            block.type === 'openapi-webhook'
+    );
 }
 
 /**

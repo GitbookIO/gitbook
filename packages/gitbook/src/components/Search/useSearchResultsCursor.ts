@@ -1,9 +1,12 @@
 import React from 'react';
-import type { ResultType } from './useSearchResults';
 
-export function useSearchResultsCursor(props: { query: string; results: ResultType[] }) {
+export function useSearchResultsCursor(props: {
+    query: string;
+    resultCount: number;
+    totalCount: number;
+}) {
     const [cursor, setCursor] = React.useState<number | null>(null);
-    const { query, results } = props;
+    const { query, resultCount, totalCount } = props;
 
     React.useEffect(() => {
         if (!query) {
@@ -13,22 +16,48 @@ export function useSearchResultsCursor(props: { query: string; results: ResultTy
     }, [query]);
 
     React.useEffect(() => {
-        if (results.length > 0) {
-            // Auto-focus the first result
-            setCursor(0);
+        if (totalCount === 0) {
+            return;
         }
-    }, [results]);
+
+        setCursor((prev) => {
+            if (resultCount > 0) {
+                return 0;
+            }
+
+            return prev ?? 0;
+        });
+    }, [resultCount, totalCount]);
+
+    React.useEffect(() => {
+        setCursor((prev) => {
+            if (prev === null) {
+                return prev;
+            }
+
+            if (totalCount === 0) {
+                return null;
+            }
+
+            return Math.min(prev, totalCount - 1);
+        });
+    }, [totalCount]);
 
     const moveBy = React.useCallback(
         (delta: number) => {
             setCursor((prev) => {
+                if (totalCount === 0) {
+                    return null;
+                }
+
                 if (prev === null) {
                     return 0;
                 }
-                return Math.max(Math.min(prev + delta, results.length - 1), 0);
+
+                return Math.max(Math.min(prev + delta, totalCount - 1), 0);
             });
         },
-        [results]
+        [totalCount]
     );
 
     return {

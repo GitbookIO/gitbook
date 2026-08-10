@@ -1,57 +1,60 @@
 import React from 'react';
 
 import type { Assistant } from '@/components/AI';
-import { t, tString, useLanguage } from '@/intl/client';
+import { useCurrentContent } from '@/components/hooks';
+import { tString, useLanguage } from '@/intl/client';
 import { SearchResultItem } from './SearchResultItem';
+import { addRecentSearchQuery } from './recent-queries';
 import { useSearchLink } from './useSearch';
 
 export const SearchQuestionResultItem = React.forwardRef(function SearchQuestionResultItem(
     props: {
         question: string;
+        action: 'ask' | 'search';
         active: boolean;
-        recommended?: boolean;
         assistant: Assistant;
     },
     ref: React.Ref<HTMLAnchorElement>
 ) {
-    const { question, recommended = false, active, assistant, ...rest } = props;
+    const { question, action, active, assistant, ...rest } = props;
     const language = useLanguage();
+    const { siteSpaceId } = useCurrentContent();
     const getLinkProp = useSearchLink();
+    const shouldAsk = action === 'ask';
 
     return (
         <SearchResultItem
-            size={recommended ? 'small' : 'medium'}
-            action={tString(language, 'ask', '')}
+            size="small"
+            action={tString(language, shouldAsk ? 'ask' : 'search')}
             ref={ref}
-            data-testid={recommended ? 'search-recommended-question' : 'search-ask-question'}
+            data-testid="search-recommended-question"
             scroll={false}
             {...getLinkProp(
-                {
-                    ask: question,
-                    query: null,
-                    open: assistant.mode === 'search',
-                },
-                () => {
-                    assistant.open(question);
-                }
+                shouldAsk
+                    ? {
+                          ask: question,
+                          query: null,
+                          open: assistant.mode === 'search',
+                      }
+                    : {
+                          ask: null,
+                          query: question,
+                          open: true,
+                      },
+                shouldAsk
+                    ? () => {
+                          if (assistant.mode === 'search' && siteSpaceId) {
+                              addRecentSearchQuery(siteSpaceId, question, 'ask');
+                          }
+                          assistant.open(question);
+                      }
+                    : undefined
             )}
             active={active}
-            leadingIcon={recommended ? 'search' : assistant.icon}
-            className={recommended ? 'pr-1.5' : ''}
+            leadingIcon={shouldAsk ? assistant.icon : 'search'}
             {...rest}
         >
-            {recommended ? (
-                question
-            ) : (
-                <>
-                    <div className="font-semibold text-base text-tint-strong leading-tight">
-                        {t(language, 'search_ask', [question])}
-                    </div>
-                    <div className="text-sm text-tint-subtle">
-                        {t(language, 'search_ask_description', assistant.label)}
-                    </div>
-                </>
-            )}
+            {question}
         </SearchResultItem>
     );
 });

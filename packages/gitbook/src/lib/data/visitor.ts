@@ -7,7 +7,7 @@ import type { PublishedSiteContent } from '@gitbook/api';
  */
 export function getVisitorAuthBasePath(
     siteRequestURL: URL,
-    siteURLData: PublishedSiteContent
+    siteURLData: Pick<PublishedSiteContent, 'siteBasePath'>
 ): string {
     // The siteRequestURL for proxy requests is of the form `https://proxy.gitbook.com/site/siteId/...`
     // In such cases, we should not use the resolved siteBasePath for the cookie because for subsequent requests

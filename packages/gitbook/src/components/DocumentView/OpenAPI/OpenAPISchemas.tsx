@@ -25,7 +25,7 @@ async function OpenAPISchemasBody(props: BlockProps<OpenAPISchemasBlock>) {
         return null;
     }
 
-    const { data, specUrl, error } = await resolveOpenAPISchemasBlock({
+    const { data, specUrl, publicURL, error } = await resolveOpenAPISchemasBlock({
         block,
         context: context.contentContext,
     });
@@ -46,9 +46,14 @@ async function OpenAPISchemasBody(props: BlockProps<OpenAPISchemasBlock>) {
 
     return (
         <BaseOpenAPISchemas
-            schemas={data.schemas}
+            data={data}
             grouped={block.data.grouped}
-            context={getOpenAPIContext({ props, specUrl, context: context.contentContext })}
+            context={getOpenAPIContext({
+                props,
+                specUrl: publicURL,
+                context: context.contentContext,
+                expandAllModelSections: data['x-expandAllModelSections'],
+            })}
             className="openapi-block"
         />
     );

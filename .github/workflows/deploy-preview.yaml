@@ -1,15 +1,25 @@
 name: Preview
 on:
-    pull_request:
+    pull_request_target:
     push:
-      branches:
-        - main
-env:
-    BUN_NPM_TOKEN: ${{ secrets.NPM_TOKEN_READONLY }}
+        branches:
+            - main
 jobs:
+    approval:
+        # Ensure that external contributors' PRs are manually approved before deployment
+        name: Approve Preview Deployment
+        runs-on: ubuntu-latest
+        if: ${{ github.event_name == 'pull_request_target' && github.event.pull_request.head.repo.fork }}
+        environment:
+          name: preview-approval
+        steps:
+            - name: Approval gate
+              run: echo "Preview deployment approved."
     deploy-v2-vercel:
         name: Deploy v2 to Vercel (preview)
         runs-on: ubuntu-latest
+        needs: approval
+        if: ${{ always() && (needs.approval.result == 'success' || needs.approval.result == 'skipped') }}
         environment:
           name: 2v-preview
           url: ${{ steps.deploy.outputs.deployment-url }}
@@ -18,6 +28,8 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v4
+              with:
+                  ref: ${{ github.event.pull_request.head.sha || github.sha }}
             - name: Deploy to Vercel
               id: deploy
               uses: ./.github/composite/deploy-vercel
@@ -28,9 +40,12 @@ jobs:
                   vercelToken: ${{ secrets.VERCEL_TOKEN }}
                   opItem: op://gitbook-open/2v-preview
                   opServiceAccount: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+                  headSha: ${{ github.event.pull_request.head.sha || github.sha }}
     deploy-v2-cloudflare:
         name: Deploy v2 to Cloudflare Worker (preview)
         runs-on: ubuntu-latest
+        needs: approval
+        if: ${{ always() && (needs.approval.result == 'success' || needs.approval.result == 'skipped') }}
         environment:
           name: 2c-preview
           url: ${{ steps.deploy.outputs.deployment-url }}
@@ -39,6 +54,8 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v4
+              with:
+                  ref: ${{ github.event.pull_request.head.sha || github.sha }}
             - name: Deploy to Cloudflare
               id: deploy
               uses: ./.github/composite/deploy-cloudflare
@@ -65,7 +82,7 @@ jobs:
     comment-deployments:
         runs-on: ubuntu-latest
         name: Comment Deployments (preview)
-        if: always() && !startsWith(github.ref, 'refs/heads/main')
+        if: always() && github.event_name != 'push'
         needs:
             - deploy-v2-vercel
             - deploy-v2-cloudflare
@@ -102,10 +119,13 @@ jobs:
         runs-on: ubuntu-latest
         name: Visual Testing v2
         needs: deploy-v2-vercel
+        if: ${{ always() && needs.deploy-v2-vercel.result == 'success' }}
         timeout-minutes: 15
         steps:
             - name: Checkout
               uses: actions/checkout@v4
+              with:
+                  ref: ${{ github.event.pull_request.head.sha || github.sha }}
             - name: Setup Bun
               uses: ./.github/composite/setup-bun
             - name: Install dependencies
@@ -118,15 +138,18 @@ jobs:
                   BASE_URL: ${{ needs.deploy-v2-vercel.outputs.deployment-url }}
                   SITE_BASE_URL: ${{ needs.deploy-v2-vercel.outputs.deployment-url }}/url/
                   ARGOS_TOKEN: ${{ secrets.ARGOS_TOKEN }}
-                  ARGOS_BUILD_NAME: 'v2-vercel'
+                  ARGOS_BUILD_NAME: v2-vercel
     visual-testing-v2-cloudflare:
         runs-on: ubuntu-latest
         name: Visual Testing v2 (Cloudflare)
         needs: deploy-v2-cloudflare
+        if: ${{ always() && needs.deploy-v2-cloudflare.result == 'success' }}
         timeout-minutes: 15
         steps:
             - name: Checkout
               uses: actions/checkout@v4
+              with:
+                  ref: ${{ github.event.pull_request.head.sha || github.sha }}
             - name: Setup Bun
               uses: ./.github/composite/setup-bun
             - name: Install dependencies
@@ -139,15 +162,18 @@ jobs:
                   BASE_URL: ${{ needs.deploy-v2-cloudflare.outputs.deployment-url }}
                   SITE_BASE_URL: ${{ needs.deploy-v2-cloudflare.outputs.deployment-url }}/url/
                   ARGOS_TOKEN: ${{ secrets.ARGOS_TOKEN }}
-                  ARGOS_BUILD_NAME: 'v2-cloudflare'
+                  ARGOS_BUILD_NAME: v2-cloudflare
     visual-testing-customers-v2:
         runs-on: ubuntu-latest
         name: Visual Testing Customers v2
         needs: deploy-v2-vercel
-        timeout-minutes: 15
+        if: ${{ always() && needs.deploy-v2-vercel.result == 'success' }}
+        timeout-minutes: 30
         steps:
             - name: Checkout
               uses: actions/checkout@v4
+              with:
+                  ref: ${{ github.event.pull_request.head.sha || github.sha }}
             - name: Setup Bun
               uses: ./.github/composite/setup-bun
             - name: Install dependencies
@@ -160,15 +186,18 @@ jobs:
                   BASE_URL: ${{ needs.deploy-v2-vercel.outputs.deployment-url }}
                   SITE_BASE_URL: ${{ needs.deploy-v2-vercel.outputs.deployment-url }}/url/
                   ARGOS_TOKEN: ${{ secrets.ARGOS_TOKEN }}
-                  ARGOS_BUILD_NAME: 'customers-v2'
+                  ARGOS_BUILD_NAME: customers-v2-vercel
     visual-testing-customers-v2-cloudflare:
         runs-on: ubuntu-latest
         name: Visual Testing Customers v2 (Cloudflare)
         needs: deploy-v2-cloudflare
-        timeout-minutes: 15
+        if: ${{ always() && needs.deploy-v2-cloudflare.result == 'success' }}
+        timeout-minutes: 30
         steps:
             - name: Checkout
               uses: actions/checkout@v4
+              with:
+                  ref: ${{ github.event.pull_request.head.sha || github.sha }}
             - name: Setup Bun
               uses: ./.github/composite/setup-bun
             - name: Install dependencies
@@ -181,14 +210,17 @@ jobs:
                   BASE_URL: ${{ needs.deploy-v2-cloudflare.outputs.deployment-url }}
                   SITE_BASE_URL: ${{ needs.deploy-v2-cloudflare.outputs.deployment-url }}/url/
                   ARGOS_TOKEN: ${{ secrets.ARGOS_TOKEN }}
-                  ARGOS_BUILD_NAME: 'customers-v2'
+                  ARGOS_BUILD_NAME: customers-v2-cloudflare
     browserless-testing-v2-vercel:
         runs-on: ubuntu-latest
         name: Browserless Testing v2 (Vercel)
         needs: deploy-v2-vercel
+        if: ${{ always() && needs.deploy-v2-vercel.result == 'success' }}
         steps:
             - name: Checkout
               uses: actions/checkout@v4
+              with:
+                  ref: ${{ github.event.pull_request.head.sha || github.sha }}
             - name: Setup Bun
               uses: ./.github/composite/setup-bun
             - name: Install dependencies

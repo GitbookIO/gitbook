@@ -2,7 +2,7 @@ import { type DocumentBlockFile, SiteInsightsLinkPosition } from '@gitbook/api';
 
 import { t } from '@/intl/translate';
 import { getSimplifiedContentType } from '@/lib/files';
-import { resolveContentRef } from '@/lib/references';
+import { resolveContentRefInDocument } from '@/lib/references';
 
 import { getSpaceLanguage } from '@/intl/server';
 import { Button, Link } from '../primitives';
@@ -12,20 +12,24 @@ import { Caption } from './Caption';
 import { FileIcon } from './FileIcon';
 
 export async function File(props: BlockProps<DocumentBlockFile>) {
-    const { block, context } = props;
+    const { document, block, context } = props;
 
     if (!context.contentContext) {
         return null;
     }
 
-    const contentRef = await resolveContentRef(block.data.ref, context.contentContext);
+    const contentRef = await resolveContentRefInDocument(
+        document,
+        block.data.ref,
+        context.contentContext
+    );
     const file = contentRef?.file;
 
     if (!file) {
         return null;
     }
 
-    const language = getSpaceLanguage(context.contentContext);
+    const language = await getSpaceLanguage(context.contentContext);
     const contentType = getSimplifiedContentType(file.contentType);
     const insights = {
         type: 'link_click' as const,

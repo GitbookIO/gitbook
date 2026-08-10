@@ -9,7 +9,21 @@ import {
     resizeImage,
     verifyImageSignature,
 } from '@/lib/images';
+import type { CloudflareResizeImageOptions } from '@/lib/images/resizer';
 import { NextResponse } from 'next/server';
+
+const FORMATS = [
+    {
+        format: 'avif' as const,
+        regexp: /image\/avif/,
+        maxAllowedEdge: 1600,
+    },
+    {
+        format: 'webp' as const,
+        regexp: /image\/webp/,
+        maxAllowedEdge: 1920,
+    },
+];
 
 /**
  * Resize an image using the Cloudflare Image API.
@@ -70,10 +84,13 @@ export async function serveResizedImage(
         return NextResponse.redirect(url, 302);
     }
 
+    const defaultFormat = getOriginalFormatFromURL(url);
+
     // Cloudflare-specific options are in the cf object.
     const options: CloudflareImageOptions = {
         fit: 'scale-down',
-        format: 'jpeg',
+        // For GIF, we will use webp as default format for resizing.
+        format: defaultFormat === 'gif' ? 'webp' : defaultFormat,
         quality: 100,
     };
 
@@ -101,24 +118,54 @@ export async function serveResizedImage(
 
     // Check the Accept header to handle content negotiation
     const accept = request.headers.get('accept');
-    // We use transform image, max size for avif should be 1600
-    // https://developers.cloudflare.com/images/transform-images/#limits-per-format
-    if (accept && /image\/avif/.test(accept) && longestEdgeValue <= 1600) {
-        options.format = 'avif';
-        options.dpr = chooseDPR(longestEdgeValue, 1600, options.dpr);
-    } else if (accept && /image\/webp/.test(accept) && longestEdgeValue <= 1920) {
-        options.format = 'webp';
-        options.dpr = chooseDPR(longestEdgeValue, 1920, options.dpr);
+
+    // We test if we can use AVIF based on the accept header and constraints from Cloudflare
+    // @see https://developers.cloudflare.com/images/transform-images/#limits-per-format
+    if (accept) {
+        for (const entry of FORMATS) {
+            if (entry.regexp.test(accept) && longestEdgeValue <= entry.maxAllowedEdge) {
+                const wantedDpr = options.dpr ?? 1;
+                const dpr = chooseDPR(longestEdgeValue, entry.maxAllowedEdge, wantedDpr);
+                if (dpr === wantedDpr) {
+                    options.format = entry.format;
+                    break;
+                }
+            }
+        }
     }
 
+    return resizeImageWithFallback(
+        url,
+        options,
+        // For GIF, we won't fallback to any format, we will just serve the original
+        defaultFormat === 'gif' ? null : defaultFormat
+    );
+}
+
+/**
+ * Try to resize the image in an optimized format.
+ * If not possible, fallback to a default format.
+ */
+async function resizeImageWithFallback(
+    url: string,
+    options: CloudflareResizeImageOptions,
+    formatFallback: 'jpeg' | 'png' | null
+) {
     try {
         const response = await resizeImage(url, options);
         if (!response.ok) {
             throw new Error(`Failed to resize image, received status code ${response.status}`);
         }
-
         return response;
     } catch (error) {
+        if (formatFallback && options.format !== formatFallback) {
+            return resizeImageWithFallback(
+                url,
+                { ...options, format: formatFallback },
+                formatFallback
+            );
+        }
+
         // Redirect to the original image if resizing fails
         console.warn('Error while resizing image, redirecting to original', error);
         return NextResponse.redirect(url, 302);
@@ -126,16 +173,28 @@ export async function serveResizedImage(
 }
 
 /**
- * Choose the appropriate device pixel ratio (DPR) based on the longest edge of the image.
- * This function ensures that the DPR is within a reasonable range (1 to 3).
- * This is only used for AVIF/WebP formats to avoid issues with Cloudflare resizing.
- * It means that dpr may not be respected for avif/webp formats, but it will also improve the cache hit ratio.
+ * Get the original format from URL.
  */
-function chooseDPR(longestEdgeValue: number, maxAllowedSize: number, wantedDpr?: number): number {
-    const maxDprBySize = Math.floor(maxAllowedSize / longestEdgeValue);
-    const clampedDpr = Math.min(wantedDpr ?? 1, 3); // Limit to a maximum of 3, default to 1 if not specified
+function getOriginalFormatFromURL(url: string) {
+    const urlObj = new URL(url);
+    const pathname = urlObj.pathname.toLowerCase();
+    if (pathname.endsWith('.gif')) {
+        return 'gif';
+    }
+    if (pathname.endsWith('.png')) {
+        return 'png';
+    }
+    return 'jpeg';
+}
+
+/**
+ * Choose the DPR allowed to resize an image on Cloudflare.
+ * @see https://developers.cloudflare.com/images/transform-images/#limits-per-format
+ */
+function chooseDPR(longestEdgeValue: number, maxAllowedEdge: number, wantedDpr: number): number {
+    const maxDprBySize = Math.floor(maxAllowedEdge / longestEdgeValue);
     // Ensure that the DPR is within the allowed range
-    return Math.max(1, Math.min(maxDprBySize, clampedDpr));
+    return Math.max(1, Math.min(maxDprBySize, wantedDpr));
 }
 
 /**

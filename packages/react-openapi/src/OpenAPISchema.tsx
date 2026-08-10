@@ -16,7 +16,14 @@ import { retrocycle } from './decycle';
 import { getDisclosureLabel } from './getDisclosureLabel';
 import { stringifyOpenAPI } from './stringifyOpenAPI';
 import { tString } from './translate';
-import { checkIsReference, getSchemaTitle, resolveDescription, resolveFirstExample } from './utils';
+import {
+    checkIsReference,
+    getEffectiveArrayType,
+    getSchemaTitle,
+    normalizeNullableUnion,
+    resolveDescription,
+    resolveFirstExample,
+} from './utils';
 
 type CircularRefsIds = Map<OpenAPIV3.SchemaObject, string>;
 
@@ -44,12 +51,18 @@ function OpenAPISchemaProperty(
         circularRefs: parentCircularRefs,
         context,
         className,
-        property,
+        property: rawProperty,
         discriminator,
         discriminatorValue,
         ...rest
     } = props;
 
+    // Normalize the OpenAPI 3.1+ `anyOf`/`oneOf` + `null` nullability idiom into a plain
+    // nullable schema before it enters the render pipeline.
+    const property = {
+        ...rawProperty,
+        schema: normalizeNullableUnion(rawProperty.schema),
+    };
     const { schema } = property;
 
     const id = useId();
@@ -69,14 +82,28 @@ function OpenAPISchemaProperty(
     const circularRefs = new Map(parentCircularRefs);
     circularRefs.set(schema, id);
 
-    const properties = getSchemaProperties(schema, discriminator, discriminatorValue);
-
     const ancestors = new Set(circularRefs.keys());
     const alternatives = getSchemaAlternatives(schema, ancestors);
 
-    const header = <OpenAPISchemaPresentation id={id} context={context} property={property} />;
+    // When allOf fully merges into a single schema, use it directly
+    // instead of rendering as "allOf" with one child.
+    const mergedAllOfSchema =
+        alternatives?.type === 'allOf' && alternatives.schemas.length === 1
+            ? alternatives.schemas[0]
+            : undefined;
+    const effectiveSchema = mergedAllOfSchema ?? schema;
+    const effectiveProperty = mergedAllOfSchema
+        ? { ...property, schema: mergedAllOfSchema }
+        : property;
+
+    const properties = getSchemaProperties(effectiveSchema, discriminator, discriminatorValue);
+
+    const header = (
+        <OpenAPISchemaPresentation id={id} context={context} property={effectiveProperty} />
+    );
     const content = (() => {
-        if (alternatives?.schemas) {
+        // For oneOf/anyOf/allOf with multiple schemas, show alternatives
+        if (!mergedAllOfSchema && alternatives?.schemas && alternatives.schemas.length > 0) {
             return (
                 <OpenAPISchemaAlternatives
                     alternatives={alternatives}
@@ -107,7 +134,10 @@ function OpenAPISchemaProperty(
             <OpenAPIDisclosure
                 icon={context.icons.plus}
                 header={header}
-                label={(isExpanded) => getDisclosureLabel({ schema, isExpanded, context })}
+                label={(isExpanded) =>
+                    getDisclosureLabel({ schema: effectiveSchema, isExpanded, context })
+                }
+                defaultExpanded={context.expandAllModelSections}
             >
                 {content}
             </OpenAPIDisclosure>
@@ -178,22 +208,33 @@ function OpenAPIRootSchema(props: {
     circularRefs?: CircularRefsIds;
 }) {
     const {
-        schema,
         context,
         circularRefs: parentCircularRefs = new Map<OpenAPIV3.SchemaObject, string>(),
     } = props;
 
+    // Normalize the OpenAPI 3.1+ `anyOf`/`oneOf` + `null` nullability idiom into a plain
+    // nullable schema before it enters the render pipeline.
+    const schema = normalizeNullableUnion(props.schema);
+
     const id = useId();
-    const properties = getSchemaProperties(schema);
-    const description = resolveDescription(schema);
     const ancestors = new Set(parentCircularRefs.keys());
     const alternatives = getSchemaAlternatives(schema, ancestors);
+
+    // When allOf fully merges into a single schema, use it directly
+    const mergedAllOfSchema =
+        alternatives?.type === 'allOf' && alternatives.schemas.length === 1
+            ? alternatives.schemas[0]
+            : undefined;
+    const effectiveSchema = mergedAllOfSchema ?? schema;
+
+    const properties = getSchemaProperties(effectiveSchema);
+    const description = resolveDescription(effectiveSchema);
 
     const circularRefs = new Map(parentCircularRefs);
     circularRefs.set(schema, id);
 
-    // Handle root-level oneOf/allOf/anyOf
-    if (alternatives?.schemas) {
+    // Handle root-level oneOf/anyOf/allOf with multiple schemas
+    if (!mergedAllOfSchema && alternatives?.schemas && alternatives.schemas.length > 0) {
         return (
             <>
                 {description ? (
@@ -378,6 +419,7 @@ function OpenAPISchemaAlternative(props: {
             icon={context.icons.plus}
             header={<OpenAPISchemaPresentation property={{ schema }} context={context} />}
             label={(isExpanded) => getDisclosureLabel({ schema, isExpanded, context })}
+            defaultExpanded={context.expandAllModelSections}
         >
             <OpenAPISchemaProperties
                 properties={properties}
@@ -421,7 +463,10 @@ function OpenAPISchemaAlternativeSeparator(props: {
 /**
  * Render a circular reference to a schema.
  */
-function OpenAPISchemaCircularRef(props: { id: string; schema: OpenAPIV3.SchemaObject }) {
+function OpenAPISchemaCircularRef(props: {
+    id: string;
+    schema: OpenAPIV3.SchemaObject;
+}) {
     const { id, schema } = props;
 
     return (
@@ -616,7 +661,7 @@ function processSchemaProperties(
 }
 
 /**
- * Merge properties into a result array, with later properties overriding earlier ones.
+ * Merge properties into a result array, deep-merging overlapping schemas.
  */
 function mergeProperties(
     result: OpenAPISchemaPropertyEntry[],
@@ -625,7 +670,15 @@ function mergeProperties(
     for (const prop of newProperties) {
         const existingIndex = result.findIndex((p) => p.propertyName === prop.propertyName);
         if (existingIndex >= 0) {
-            result[existingIndex] = prop;
+            const existing = result[existingIndex];
+            if (existing) {
+                result[existingIndex] = {
+                    ...existing,
+                    ...prop,
+                    schema: deepMergeSchemas(existing.schema, prop.schema),
+                    required: prop.required ?? existing.required,
+                };
+            }
         } else {
             result.push(prop);
         }
@@ -633,15 +686,69 @@ function mergeProperties(
 }
 
 /**
+ * Deep-merge two schemas by combining their properties recursively.
+ * schema2 takes precedence for metadata and property order.
+ */
+function deepMergeSchemas(
+    schema1: OpenAPIV3.SchemaObject,
+    schema2: OpenAPIV3.SchemaObject,
+    seen: WeakSet<OpenAPIV3.SchemaObject> = new WeakSet()
+): OpenAPIV3.SchemaObject {
+    if (seen.has(schema1) || seen.has(schema2)) {
+        return { ...schema1, ...schema2 };
+    }
+    seen.add(schema1);
+    seen.add(schema2);
+
+    if (schema1.properties && schema2.properties) {
+        const mergedProperties: Record<string, OpenAPIV3.SchemaObject | OpenAPIV3.ReferenceObject> =
+            { ...schema2.properties };
+
+        for (const [key, value] of Object.entries(schema1.properties)) {
+            const existing = mergedProperties[key];
+            if (existing && !checkIsReference(existing) && !checkIsReference(value)) {
+                mergedProperties[key] = deepMergeSchemas(value, existing, seen);
+            } else if (!existing) {
+                mergedProperties[key] = value;
+            }
+        }
+
+        return {
+            ...schema1,
+            ...schema2,
+            properties: mergedProperties,
+        };
+    }
+
+    if (
+        schema1.type === 'array' &&
+        schema2.type === 'array' &&
+        schema1.items &&
+        schema2.items &&
+        !checkIsReference(schema1.items) &&
+        !checkIsReference(schema2.items)
+    ) {
+        return {
+            ...schema1,
+            ...schema2,
+            items: deepMergeSchemas(schema1.items, schema2.items, seen),
+        };
+    }
+
+    return { ...schema1, ...schema2 };
+}
+
+/**
  * Get the sub-properties of a schema.
  */
-function getSchemaProperties(
+export function getSchemaProperties(
     schema: OpenAPIV3.SchemaObject,
     discriminator?: OpenAPIV3.DiscriminatorObject | undefined,
     discriminatorValue?: string | undefined
 ): null | OpenAPISchemaPropertyEntry[] {
     // check array AND schema.items as this is sometimes null despite what the type indicates
-    if (schema.type === 'array' && schema.items && !checkIsReference(schema.items)) {
+    const arrayInfo = getEffectiveArrayType(schema);
+    if (arrayInfo.isArray && schema.items && !checkIsReference(schema.items)) {
         const items = schema.items;
         const itemProperties = getSchemaProperties(items, discriminator, discriminatorValue);
         if (itemProperties) {
@@ -767,13 +874,39 @@ export function getSchemaAlternatives(
 
     const [type, schemas, discriminator] = alternatives;
 
+    const flattened = flattenAlternatives(type, schemas, new Set(ancestors).add(schema));
+    const merged = mergeAlternatives(type, flattened) ?? [];
+
+    // For allOf, merge the root schema's properties with the merged alternatives.
+    // This handles cases where a schema has both allOf and direct properties/required fields.
+    // Example: { allOf: [...], properties: {...}, required: [...] }
+    if (type === 'allOf' && merged.length > 0 && (schema.properties || schema.required)) {
+        const rootSchema = merged[0];
+        if (!rootSchema) {
+            return {
+                type,
+                schemas: merged,
+                discriminator,
+            };
+        }
+        // Exclude allOf from the root schema since we've already processed it
+        const { allOf: _, ...schemaWithoutAllOf } = schema;
+
+        // Merge root schema properties with the first merged alternative.
+        // Root schema properties take precedence (merged second).
+        const result = mergeTwoSchemas(rootSchema, schemaWithoutAllOf);
+
+        // Return the merged result as the first schema, keeping any remaining unmerged schemas
+        return {
+            type,
+            schemas: [result, ...merged.slice(1)],
+            discriminator,
+        };
+    }
+
     return {
         type,
-        schemas:
-            mergeAlternatives(
-                type,
-                flattenAlternatives(type, schemas, new Set(ancestors).add(schema))
-            ) ?? [],
+        schemas: merged,
         discriminator,
     };
 }
@@ -796,15 +929,14 @@ const safeExtensions = [
 function isSafeToMerge(schema: OpenAPIV3.SchemaObject): boolean {
     const keys = Object.keys(schema);
 
-    const coreProperties = ['type', 'properties', 'required', 'nullable'];
+    const safeProperties = ['type', 'properties', 'required', 'nullable'];
 
-    const coreKeys = keys.filter((key) => coreProperties.includes(key));
     const unknownKeys = keys.filter(
         (key) =>
-            !coreProperties.includes(key) && !safeExtensions.includes(key) && !key.startsWith('x-')
+            !safeProperties.includes(key) && !safeExtensions.includes(key) && !key.startsWith('x-')
     );
 
-    return coreKeys.length > 0 && unknownKeys.length === 0;
+    return unknownKeys.length === 0;
 }
 
 /**
@@ -833,7 +965,8 @@ function mergeAlternatives(
                     return acc;
                 }
 
-                acc.push(schemaOrRef);
+                // Clone to avoid mutating shared schema objects from $ref dereferencing
+                acc.push({ ...schemaOrRef });
                 return acc;
             }, []);
         }
@@ -856,7 +989,11 @@ function mergeAlternatives(
                     }
                 }
 
-                if (latest && latest.type === 'object' && schemaOrRef.type === 'object') {
+                if (
+                    latest &&
+                    latest.type === 'object' &&
+                    (!schemaOrRef.type || schemaOrRef.type === 'object')
+                ) {
                     const keys = Object.keys(schemaOrRef);
 
                     if (isSafeToMerge(schemaOrRef)) {
@@ -896,7 +1033,8 @@ function mergeAlternatives(
                     }
                 }
 
-                acc.push(schemaOrRef);
+                // Clone to avoid mutating shared schema objects from $ref dereferencing
+                acc.push({ ...schemaOrRef });
                 return acc;
             }, []);
         }
@@ -941,6 +1079,22 @@ function flattenSchema(
     if (schema[alternativeType] && !ancestors.has(schema)) {
         const alternatives = getSchemaAlternatives(schema, ancestors);
         if (alternatives?.schemas) {
+            // For nested allOf, merge the flattened alternatives with the schema's own properties.
+            // This handles deeply nested allOf structures by flattening and merging them recursively.
+            if (alternativeType === 'allOf' && alternatives.schemas.length > 0) {
+                // Merge all flattened alternatives into a single schema
+                const mergedSchema = mergeSchemas(alternatives.schemas);
+
+                // Merge with the current schema's own properties (excluding allOf since we've already processed it).
+                // Current schema properties take precedence (merged second).
+                const { allOf: _, ...schemaWithoutAllOf } = schema;
+                const result = mergeTwoSchemas(mergedSchema, schemaWithoutAllOf);
+
+                // Merge required fields from ancestor schemas
+                const required = mergeRequiredFields(result, latestAncestor);
+                return [{ ...result, ...(required ? { required } : {}) }];
+            }
+
             return alternatives.schemas.map((s) => {
                 const required = mergeRequiredFields(s, latestAncestor);
                 return {
@@ -954,7 +1108,7 @@ function flattenSchema(
         return [{ ...schema, ...(required ? { required } : {}) }];
     }
 
-    // if a schema has allOf that can be safely merged, merge it
+    // If a schema has allOf that can be safely merged, merge it.
     if (
         (alternativeType === 'oneOf' || alternativeType === 'anyOf') &&
         schema.allOf &&
@@ -966,22 +1120,23 @@ function flattenSchema(
         );
 
         if (allOfSchemas.length > 0) {
+            // Circular allOf: a variant references its parent (e.g. Dog allOf: [Pet, ...])
+            if (allOfSchemas.some((s) => isAncestorOrCopy(s, ancestors))) {
+                return flattenCircularAllOf(schema, allOfSchemas, ancestors, latestAncestor);
+            }
+
             const merged = mergeAlternatives('allOf', allOfSchemas);
             if (merged && merged.length > 0) {
                 // Only merge if all schemas were successfully merged into one (safe to merge)
                 if (merged.length === 1) {
+                    // Merge the parent schema's own fields (title, description, etc.)
+                    // onto the merged result, so the parent's overrides take precedence.
+                    const { allOf: _, ...schemaWithoutAllOf } = schema;
+
                     return merged.map((s) => {
-                        const required = mergeRequiredFields(s, latestAncestor);
-                        const result: OpenAPIV3.SchemaObject = {
-                            ...s,
-                            ...(required ? { required } : {}),
-                        };
-
-                        if (schema.title && !s.title) {
-                            result.title = schema.title;
-                        }
-
-                        return result;
+                        const result = mergeTwoSchemas(s, schemaWithoutAllOf);
+                        const required = mergeRequiredFields(result, latestAncestor);
+                        return { ...result, ...(required ? { required } : {}) };
                     });
                 }
             }
@@ -999,21 +1154,164 @@ function flattenSchema(
 }
 
 /**
+ * Flatten a circular allOf by stripping ancestor fields and merging the rest.
+ */
+function flattenCircularAllOf(
+    schema: OpenAPIV3.SchemaObject,
+    allOfSchemas: OpenAPIV3.SchemaObject[],
+    ancestors: Set<OpenAPIV3.SchemaObject>,
+    latestAncestor: OpenAPIV3.SchemaObject | undefined
+): OpenAPIV3.SchemaObject[] {
+    const cleanSchemas = allOfSchemas.map((s) =>
+        isAncestorOrCopy(s, ancestors) ? stripAncestorFields(s, ancestors) : s
+    );
+
+    const { allOf: _, oneOf: _1, anyOf: _2, discriminator: _3, ...ownProps } = schema;
+    let merged = mergeSchemas(cleanSchemas);
+    merged = mergeTwoSchemas(merged, ownProps);
+
+    const required = mergeRequiredFields(merged, latestAncestor);
+    return [
+        {
+            ...merged,
+            ...(required ? { required } : {}),
+            ...(schema.title ? { title: schema.title } : {}),
+        },
+    ];
+}
+
+/**
+ * Check if a schema is an ancestor or a structurally matching copy of one.
+ */
+function isAncestorOrCopy(
+    schema: OpenAPIV3.SchemaObject,
+    ancestors: Set<OpenAPIV3.SchemaObject>
+): boolean {
+    if (ancestors.has(schema)) {
+        return true;
+    }
+    const discriminatorName = schema.discriminator?.propertyName;
+    if (!discriminatorName) {
+        return false;
+    }
+    for (const ancestor of Array.from(ancestors)) {
+        if (ancestor.discriminator?.propertyName === discriminatorName) {
+            return true;
+        }
+    }
+    return false;
+}
+
+const polymorphicFields = new Set([
+    'oneOf',
+    'anyOf',
+    'discriminator',
+    'description',
+    'x-gitbook-description-html',
+]);
+
+/**
+ * Strip polymorphic fields from an ancestor schema, preserving non-circular allOf composition.
+ */
+function stripAncestorFields(
+    schema: OpenAPIV3.SchemaObject,
+    ancestors: Set<OpenAPIV3.SchemaObject>
+): OpenAPIV3.SchemaObject {
+    let base: OpenAPIV3.SchemaObject = schema;
+
+    // Merge non-circular allOf entries so composition properties aren't lost
+    if (Array.isArray(schema.allOf)) {
+        const safeAllOf = schema.allOf.filter(
+            (s): s is OpenAPIV3.SchemaObject =>
+                !checkIsReference(s) && !isAncestorOrCopy(s, ancestors)
+        );
+        if (safeAllOf.length > 0) {
+            base = mergeSchemas([schema, ...safeAllOf]);
+        }
+    }
+
+    const clean = Object.fromEntries(
+        Object.entries(base).filter(([key]) => !polymorphicFields.has(key) && key !== 'allOf')
+    ) as OpenAPIV3.SchemaObject;
+    if (clean.properties) {
+        clean.properties = { ...clean.properties };
+    }
+    if (Array.isArray(clean.required)) {
+        clean.required = [...clean.required];
+    }
+    return clean;
+}
+
+/**
+ * Merge two schemas by combining their properties and required fields.
+ * Later schema properties override earlier ones.
+ */
+function mergeTwoSchemas(
+    schema1: OpenAPIV3.SchemaObject,
+    schema2: OpenAPIV3.SchemaObject
+): OpenAPIV3.SchemaObject {
+    const merged: OpenAPIV3.SchemaObject = {
+        ...schema1,
+        ...schema2,
+        properties: {
+            ...(schema1.properties || {}),
+            ...(schema2.properties || {}),
+        },
+    };
+
+    // Merge required fields
+    const allRequired = new Set<string>();
+    if (Array.isArray(schema1.required)) {
+        schema1.required.forEach((req) => allRequired.add(req));
+    }
+    if (Array.isArray(schema2.required)) {
+        schema2.required.forEach((req) => allRequired.add(req));
+    }
+    if (allRequired.size > 0) {
+        merged.required = Array.from(allRequired);
+    }
+
+    return merged;
+}
+
+/**
+ * Merge multiple schemas into a single schema by combining properties and required fields.
+ */
+function mergeSchemas(schemas: OpenAPIV3.SchemaObject[]): OpenAPIV3.SchemaObject {
+    if (schemas.length === 0) {
+        return {};
+    }
+    const firstSchema = schemas[0];
+    if (!firstSchema) {
+        return {};
+    }
+    if (schemas.length === 1) {
+        return firstSchema;
+    }
+    // Start with first schema and merge the rest into it
+    return schemas.slice(1).reduce((acc, schema) => mergeTwoSchemas(acc, schema), firstSchema);
+}
+
+/**
  * Merge the required fields of a schema with the required fields of its latest ancestor.
  */
 function mergeRequiredFields(
     schemaOrRef: OpenAPIV3.SchemaObject | OpenAPIV3.ReferenceObject,
     latestAncestor: OpenAPIV3.SchemaObject | undefined
 ) {
-    if (!schemaOrRef.required && !latestAncestor?.required) {
+    const ancestorRequired = Array.isArray(latestAncestor?.required)
+        ? latestAncestor.required
+        : undefined;
+
+    if (checkIsReference(schemaOrRef)) {
+        return ancestorRequired;
+    }
+
+    const schemaRequired = Array.isArray(schemaOrRef.required) ? schemaOrRef.required : undefined;
+
+    if (!ancestorRequired && !schemaRequired) {
         return undefined;
     }
 
-    if (checkIsReference(schemaOrRef)) {
-        return latestAncestor?.required;
-    }
-
-    return Array.from(
-        new Set([...(latestAncestor?.required || []), ...(schemaOrRef.required || [])])
-    );
+    return Array.from(new Set([...(ancestorRequired || []), ...(schemaRequired || [])]));
 }

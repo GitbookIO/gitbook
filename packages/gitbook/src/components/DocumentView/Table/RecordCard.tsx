@@ -1,6 +1,6 @@
 import { LinkBox, LinkOverlay } from '@/components/primitives';
 import { Image } from '@/components/utils';
-import { type ResolvedContentRef, resolveContentRef } from '@/lib/references';
+import { type ResolvedContentRef, resolveContentRefInDocument } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 import {
     CardsImageObjectFit,
@@ -18,7 +18,13 @@ export async function RecordCard(
         record: TableRecordKV;
     }
 ) {
-    const { view, record, context, block, isOffscreen } = props;
+    const { view, record, context, block, isOffscreen, document } = props;
+
+    // A card paints its own opaque background, so a background page cover is never behind its
+    // content. Cover-aware contrast text must not apply inside it: it leaves the glyphs transparent
+    // and relies on a viewport-fixed background clipped to text, which Firefox and iOS Safari fail
+    // to paint through the card's clipped stacking context — the text disappears entirely.
+    const cardProps = { ...props, context: { ...context, isPageBody: false } };
 
     const { dark, light } = getRecordCardCovers(record[1], view);
     const targetRef = view.targetDefinition
@@ -27,13 +33,13 @@ export async function RecordCard(
 
     const [lightCover, darkCover, target] = await Promise.all([
         light.contentRef && context.contentContext
-            ? resolveContentRef(light.contentRef, context.contentContext)
+            ? resolveContentRefInDocument(document, light.contentRef, context.contentContext)
             : null,
         dark.contentRef && context.contentContext
-            ? resolveContentRef(dark.contentRef, context.contentContext)
+            ? resolveContentRefInDocument(document, dark.contentRef, context.contentContext)
             : null,
         targetRef && context.contentContext
-            ? resolveContentRef(targetRef, context.contentContext)
+            ? resolveContentRefInDocument(document, targetRef, context.contentContext)
             : null,
     ]);
 
@@ -46,6 +52,9 @@ export async function RecordCard(
 
     const body = (
         <div
+            // Marks the card body so overflow-clipped affordances (e.g. the paragraph "Ask"
+            // button) can opt out of rendering inside it.
+            data-card=""
             className={tcls(
                 'grid-area-1-1',
                 'relative',
@@ -120,7 +129,7 @@ export async function RecordCard(
                             : ['h-auto', 'aspect-video'],
                         objectFits
                     )}
-                    loading={isOffscreen ? 'lazy' : 'eager'}
+                    loading={isOffscreen && context.mode !== 'print' ? 'lazy' : 'eager'}
                 />
             ) : null}
             <div
@@ -133,9 +142,7 @@ export async function RecordCard(
                     'gap-3',
                     'p-4',
                     'text-sm',
-                    target
-                        ? ['transition-colors', 'text-tint', 'group-hover:text-tint-strong']
-                        : ['text-tint-strong']
+                    'text-tint-strong'
                 )}
             >
                 {view.columns.map((column) => {
@@ -153,7 +160,7 @@ export async function RecordCard(
                                     {definition.title}
                                 </div>
                                 <RecordColumnValue
-                                    {...props}
+                                    {...cardProps}
                                     column={column}
                                     ariaLabelledBy={ariaLabelledBy}
                                 />
@@ -161,7 +168,7 @@ export async function RecordCard(
                         );
                     }
 
-                    return <RecordColumnValue key={column} {...props} column={column} />;
+                    return <RecordColumnValue key={column} {...cardProps} column={column} />;
                 })}
             </div>
         </div>
@@ -172,7 +179,7 @@ export async function RecordCard(
             // We don't use `Link` directly here because we could end up in a situation where
             // a link is rendered inside a link, which is not allowed in HTML.
             // It causes an hydration error in React.
-            <LinkBox href={target.href} classNames={['RecordCardStyles']}>
+            <LinkBox href={target.href} classNames={['RecordCardStyles', 'RecordCardLinkStyles']}>
                 <LinkOverlay
                     href={target.href}
                     insights={{

@@ -1,7 +1,7 @@
 'use server';
-import { getEmbeddableLinker } from '@/lib/embeddable';
+import { isAIChatEnabled } from '@/components/utils/isAIChatEnabled';
 import { getSiteURLDataFromMiddleware } from '@/lib/middleware';
-import { getServerActionBaseContext } from '@/lib/server-actions';
+import { fetchServerActionSiteContext, getServerActionBaseContext } from '@/lib/server-actions';
 import { traceErrorOnly } from '@/lib/tracing';
 import {
     type AIMessageContext,
@@ -9,6 +9,8 @@ import {
     AIModel,
     type AIToolCallResult,
     type AIToolDefinition,
+    SiteCoreChannelType,
+    type SiteInsightsSession,
 } from '@gitbook/api';
 import { streamRenderAIMessage } from './api';
 import type { RenderAIMessageOptions } from './types';
@@ -22,6 +24,7 @@ export async function* streamAIChatResponse({
     previousResponseId,
     toolCall,
     tools,
+    session,
     options,
 }: {
     message?: string;
@@ -29,12 +32,17 @@ export async function* streamAIChatResponse({
     previousResponseId?: string;
     toolCall?: AIToolCallResult;
     tools?: AIToolDefinition[];
+    session: SiteInsightsSession;
     options?: RenderAIMessageOptions;
 }) {
     const { stream } = await traceErrorOnly('AI.streamAIChatResponse', async () => {
-        let context = await getServerActionBaseContext();
-        if (options?.asEmbeddable) {
-            context = { ...context, linker: getEmbeddableLinker(context.linker) };
+        const context = await getServerActionBaseContext({
+            isEmbeddable: options?.asEmbeddable,
+        });
+
+        const siteContext = await fetchServerActionSiteContext(context);
+        if (!isAIChatEnabled(siteContext.customization.ai.mode)) {
+            throw new Error('The AI Assistant is not enabled for this site.');
         }
 
         const siteURLData = await getSiteURLDataFromMiddleware();
@@ -57,6 +65,12 @@ export async function* streamAIChatResponse({
                 previousResponseId,
                 toolCall,
                 tools,
+                session,
+                channel: {
+                    type: options?.asEmbeddable
+                        ? SiteCoreChannelType.Embed
+                        : SiteCoreChannelType.Site,
+                },
             }
         );
 
