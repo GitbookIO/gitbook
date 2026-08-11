@@ -176,7 +176,7 @@ export function getPPRRouteParams(params: PPRRouteLayoutParams): RouteLayoutPara
  */
 export function getPPRHeaderRouteParams(params: PPRRouteLayoutParams): RouteLayoutParams {
     const routeParams = getPPRRouteParams(params);
-    const {revision, ...siteURLData} = getSiteURLDataFromParams(routeParams);
+    const { revision, ...siteURLData } = getSiteURLDataFromParams(routeParams);
     const defaults = getPPRDefaults(params);
 
     return {
@@ -211,7 +211,7 @@ export function getPPRTableOfContentsRouteParams(params: PPRRouteLayoutParams): 
                 pathname: '/',
             })
         ),
-    }
+    };
 }
 
 export async function getPPRStaticSiteContext(params: RouteLayoutParams) {

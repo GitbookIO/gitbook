@@ -8,7 +8,7 @@ export interface VariantSpace {
     id: string;
     title: string;
     url: string;
-    isActive: boolean;
+    path: string;
     spaceId: string;
 }
 
@@ -66,8 +66,12 @@ export function SpacesDropdownMenuItem(props: {
     );
 }
 
-export function SpacesDropdownMenuItems(props: { slimSpaces: VariantSpace[]; curPath: string }) {
-    const { slimSpaces, curPath } = props;
+export function SpacesDropdownMenuItems(props: {
+    slimSpaces: VariantSpace[];
+    selectedId: string | null;
+    curPath: string;
+}) {
+    const { slimSpaces, selectedId, curPath } = props;
 
     return (
         <>
@@ -75,7 +79,7 @@ export function SpacesDropdownMenuItems(props: { slimSpaces: VariantSpace[]; cur
                 <SpacesDropdownMenuItem
                     key={space.id}
                     variantSpace={space}
-                    active={space.isActive}
+                    active={space.id === selectedId}
                     currentSpacePath={curPath}
                 />
             ))}

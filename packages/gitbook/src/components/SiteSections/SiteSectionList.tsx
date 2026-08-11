@@ -6,12 +6,11 @@ import React from 'react';
 
 import type { IconName } from '@gitbook/icons';
 
-import { useToggleAnimation } from '../hooks';
+import { useSelectedSiteSectionId, useToggleAnimation } from '../hooks';
 import { Link, ToggleChevron } from '../primitives';
 import { ScrollContainer } from '../primitives/ScrollContainer';
 import type {
     ClientSiteNavigationItem,
-    ClientSiteSection,
     ClientSiteSectionGroup,
     ClientSiteSections,
 } from './encodeClientSiteSections';
@@ -30,6 +29,8 @@ export function SiteSectionList(props: { sections: ClientSiteSections; className
         className,
     } = props;
 
+    const currentSectionId = useSelectedSiteSectionId(currentSection.id);
+
     return (
         sectionsAndGroups.length > 0 && (
             <nav
@@ -43,7 +44,7 @@ export function SiteSectionList(props: { sections: ClientSiteSections; className
                     orientation="vertical"
                     style={{ maxHeight: `${MAX_ITEMS * 3 + 2}rem` }}
                     className="pb-4"
-                    active={`#${currentSection.id}`}
+                    active={currentSectionId ? `#${currentSectionId}` : undefined}
                 >
                     <div className="flex w-full flex-col px-2">
                         {sectionsAndGroups.map((item) => {
@@ -53,7 +54,7 @@ export function SiteSectionList(props: { sections: ClientSiteSections; className
                                         <SiteSectionGroupItem
                                             key={item.id}
                                             group={item}
-                                            currentSection={currentSection}
+                                            currentSectionId={currentSectionId}
                                         />
                                     );
                                 case 'site-section':
@@ -63,7 +64,7 @@ export function SiteSectionList(props: { sections: ClientSiteSections; className
                                             item={item}
                                             isActive={
                                                 item.object === 'site-section' &&
-                                                item.id === currentSection.id
+                                                item.id === currentSectionId
                                             }
                                             key={item.id}
                                         />
@@ -139,13 +140,14 @@ export function SiteSectionListItem(props: {
 
 export function SiteSectionGroupItem(props: {
     group: ClientSiteSectionGroup;
-    currentSection: ClientSiteSection;
+    currentSectionId: string | null;
     level?: number;
 }) {
-    const { group, currentSection, level = 0 } = props;
+    const { group, currentSectionId, level = 0 } = props;
 
     const hasDescendants = group.children.length > 0;
-    const isActiveGroup = Boolean(findSectionInGroup(group, currentSection.id));
+    const isActiveGroup =
+        currentSectionId !== null && Boolean(findSectionInGroup(group, currentSectionId));
     const shouldOpen = hasDescendants && isActiveGroup;
     const [isOpen, setIsOpen] = React.useState(shouldOpen);
 
@@ -236,7 +238,7 @@ export function SiteSectionGroupItem(props: {
                                         item={child}
                                         isActive={
                                             child.object === 'site-section' &&
-                                            child.id === currentSection.id
+                                            child.id === currentSectionId
                                         }
                                         key={child.id}
                                     />
@@ -245,7 +247,7 @@ export function SiteSectionGroupItem(props: {
                                 return (
                                     <SiteSectionGroupItem
                                         group={child}
-                                        currentSection={currentSection}
+                                        currentSectionId={currentSectionId}
                                         key={child.id}
                                         level={level + 1}
                                     />
