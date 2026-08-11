@@ -2,7 +2,7 @@
 import { AnimatePresence, motion } from 'motion/react';
 import React, { useRef } from 'react';
 
-import { useCurrentPagePath } from '../hooks';
+import { useSelectedPagePath } from '../hooks';
 import { Button, Link, type LinkInsightsProps, type LinkProps, ToggleChevron } from '../primitives';
 
 /**
@@ -20,10 +20,13 @@ export function ToggleableLinkItem(
 ) {
     const { href, children, descendants, pathnames, insights, icon, tag } = props;
 
-    const currentPagePath = useCurrentPagePath();
-    const isActive = pathnames.some((pathname) => pathname === currentPagePath);
+    const currentPagePath = useSelectedPagePath();
+    const isActive =
+        currentPagePath !== null && pathnames.some((pathname) => pathname === currentPagePath);
     const defaultIsOpen =
-        isActive || pathnames.some((pathname) => currentPagePath.startsWith(`${pathname}/`));
+        isActive ||
+        (currentPagePath !== null &&
+            pathnames.some((pathname) => currentPagePath.startsWith(`${pathname}/`)));
     const [isOpen, setIsOpen] = React.useState(defaultIsOpen);
     const hasBeenToggled = useRef(false);
 

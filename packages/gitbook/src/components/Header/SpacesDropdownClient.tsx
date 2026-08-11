@@ -2,9 +2,10 @@
 
 import type { IconName } from '@gitbook/icons';
 
+import { useSelectedSiteSpaceId } from '../hooks';
 import { Button, type ButtonProps, ToggleChevron } from '../primitives';
 import { DropdownMenu } from '../primitives/DropdownMenu';
-import { SpacesDropdownMenuItems } from './SpacesDropdownMenuItem';
+import { SpacesDropdownMenuItems, type VariantSpace } from './SpacesDropdownMenuItem';
 import { type ClassValue, tcls } from '@/lib/tailwind';
 
 /**
@@ -17,16 +18,16 @@ export function SpacesDropdownClient(props: {
     variant: ButtonProps['variant'];
     className?: ClassValue;
     dropdownClassName: string;
-    slimSpaces: {
-        id: string;
-        title: string;
-        url: string;
-        isActive: boolean;
-        spaceId: string;
-    }[];
+    slimSpaces: VariantSpace[];
+    /** Site space the server rendered as selected, used as a fallback. */
+    siteSpaceId: string;
     curPath: string;
 }) {
-    const { title, icon, variant, className, dropdownClassName, slimSpaces, curPath } = props;
+    const { title, icon, variant, className, dropdownClassName, slimSpaces, siteSpaceId, curPath } =
+        props;
+
+    const selectedId = useSelectedSiteSpaceId(siteSpaceId);
+    const selected = selectedId ? slimSpaces.find((space) => space.id === selectedId) : undefined;
 
     return (
         <DropdownMenu
@@ -40,11 +41,15 @@ export function SpacesDropdownClient(props: {
                     trailing={<ToggleChevron />}
                     className={tcls('bg-tint-base', className)}
                 >
-                    <span className="button-content">{title}</span>
+                    <span className="button-content">{selected?.title ?? title}</span>
                 </Button>
             }
         >
-            <SpacesDropdownMenuItems slimSpaces={slimSpaces} curPath={curPath} />
+            <SpacesDropdownMenuItems
+                slimSpaces={slimSpaces}
+                selectedId={selectedId}
+                curPath={selected?.path ?? curPath}
+            />
         </DropdownMenu>
     );
 }

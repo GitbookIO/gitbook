@@ -29,6 +29,7 @@ export async function SiteLayout(props: {
     children: React.ReactNode;
     headerSlot?: React.ReactNode;
     tableOfContentsSlot?: React.ReactNode;
+    clientNavigationSelection?: boolean;
 }) {
     const {
         context,
@@ -38,6 +39,7 @@ export async function SiteLayout(props: {
         children,
         headerSlot,
         tableOfContentsSlot,
+        clientNavigationSelection,
     } = props;
 
     const { customization } = context;
@@ -94,6 +96,7 @@ export async function SiteLayout(props: {
                     visitorAuthClaims={visitorAuthClaims}
                     headerSlot={headerSlot}
                     tableOfContentsSlot={tableOfContentsSlot}
+                    clientNavigationSelection={clientNavigationSelection}
                 >
                     {children}
                 </SpaceLayout>
