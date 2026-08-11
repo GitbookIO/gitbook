@@ -1,12 +1,12 @@
-import { type DocumentBlockFile, SiteInsightsLinkPosition } from '@gitbook/api';
-
 import { t } from '@/intl/translate';
 import { getSimplifiedContentType } from '@/lib/files';
 import { resolveContentRefInDocument } from '@/lib/references';
+import { type DocumentBlockFile, SiteInsightsLinkPosition } from '@gitbook/api';
 
 import { getSpaceLanguage } from '@/intl/server';
 import { Button, Link } from '../primitives';
 import { DownloadButton } from '../primitives/DownloadButton';
+import { Image } from '../utils';
 import type { BlockProps } from './Block';
 import { Caption } from './Caption';
 import { FileIcon } from './FileIcon';
@@ -42,9 +42,24 @@ export async function File(props: BlockProps<DocumentBlockFile>) {
     return (
         <Caption {...props} withBorder>
             <div className="flex flex-wrap items-center gap-5 px-5 py-3">
-                <div className="flex min-w-14 flex-col items-center gap-1 border-tint-subtle border-r pr-5">
-                    <FileIcon contentType={contentType} className="size-5 text-primary" />
-                    <div className="text-hint text-xs">{getHumanFileSize(file.size)}</div>
+                <div className="flex min-h-8 min-w-14 flex-col items-center justify-center gap-1 border-tint-subtle border-r pr-4">
+                    {contentType === 'image' ? (
+                        <Image
+                            alt={file.name}
+                            className="h-auto max-h-10 w-auto max-w-10 rounded object-contain"
+                            sizes={[{ width: 40 }]}
+                            resize={context.contentContext?.imageResizer}
+                            sources={{
+                                light: {
+                                    src: file.downloadURL,
+                                    size: file.dimensions,
+                                },
+                            }}
+                            loading="lazy"
+                        />
+                    ) : (
+                        <FileIcon contentType={contentType} className="size-5 text-primary" />
+                    )}
                 </div>
                 <div className="min-w-24 flex-1">
                     <div className="text-base">
@@ -57,7 +72,11 @@ export async function File(props: BlockProps<DocumentBlockFile>) {
                             {file.name}
                         </Link>
                     </div>
-                    <div className="text-sm opacity-9 dark:opacity-8">{contentType}</div>
+                    <div className="text-sm text-tint-subtle">
+                        {contentType
+                            ? `${contentType} · ${getHumanFileSize(file.size)}`
+                            : getHumanFileSize(file.size)}
+                    </div>
                 </div>
                 <div className="flex shrink-0 flex-wrap gap-2">
                     <DownloadButton
