@@ -1,5 +1,6 @@
 import { type DocumentBlockFile, SiteInsightsLinkPosition } from '@gitbook/api';
 
+import { Image } from '@/components/utils';
 import { t } from '@/intl/translate';
 import { getSimplifiedContentType } from '@/lib/files';
 import { resolveContentRefInDocument } from '@/lib/references';
@@ -43,8 +44,23 @@ export async function File(props: BlockProps<DocumentBlockFile>) {
         <Caption {...props} withBorder>
             <div className="flex flex-wrap items-center gap-5 px-5 py-3">
                 <div className="flex min-w-14 flex-col items-center gap-1 border-tint-subtle border-r pr-5">
-                    <FileIcon contentType={contentType} className="size-5 text-primary" />
-                    <div className="text-hint text-xs">{getHumanFileSize(file.size)}</div>
+                    {contentType === 'image' ? (
+                        <Image
+                            alt={file.name}
+                            className="size-10 rounded object-cover"
+                            sizes={[{ width: 40 }]}
+                            resize={context.contentContext?.imageResizer}
+                            sources={{
+                                light: {
+                                    src: file.downloadURL,
+                                    size: { width: 40, height: 40 },
+                                },
+                            }}
+                            loading="lazy"
+                        />
+                    ) : (
+                        <FileIcon contentType={contentType} className="size-5 text-primary" />
+                    )}
                 </div>
                 <div className="min-w-24 flex-1">
                     <div className="text-base">
@@ -57,7 +73,9 @@ export async function File(props: BlockProps<DocumentBlockFile>) {
                             {file.name}
                         </Link>
                     </div>
-                    <div className="text-sm opacity-9 dark:opacity-8">{contentType}</div>
+                    <div className="text-sm text-tint-subtle">
+                        {contentType} · {getHumanFileSize(file.size)}
+                    </div>
                 </div>
                 <div className="flex shrink-0 flex-wrap gap-2">
                     <DownloadButton
