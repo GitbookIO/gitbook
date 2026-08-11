@@ -9,8 +9,7 @@ import {
     defaultLanguage,
     isAvailableLanguage,
 } from '.';
-
-const assetPath = (locale: TranslationLocale) => `translations/${locale}.json`;
+import { translationAssetPaths } from './assets';
 
 type CloudflareAssets = {
     fetch(input: URL): Promise<Response>;
@@ -31,15 +30,23 @@ export async function loadLanguage(locale: string): Promise<TranslationLanguage 
 
     let pending = pendingLanguages.get(locale);
     if (!pending) {
-        pending = loadLanguageAsset(locale).catch(() => null);
+        // Don't memoize failures, a transient error shouldn't pin the locale to English for the isolate lifetime.
+        pending = loadLanguageAsset(locale).catch((error) => {
+            pendingLanguages.delete(locale);
+            throw error;
+        });
         pendingLanguages.set(locale, pending);
     }
 
-    return pending;
+    return pending.catch(() => null);
 }
 
 async function loadLanguageAsset(locale: TranslationLocale): Promise<TranslationLanguage> {
-    const path = assetPath(locale);
+    const path = translationAssetPaths[locale];
+    if (!path) {
+        throw new Error(`No translation asset generated for ${locale}`);
+    }
+
     const cloudflareAssets = getCloudflareAssets();
     const response = cloudflareAssets
         ? await cloudflareAssets.fetch(new URL(`/~gitbook/static/${path}`, 'http://assets.local'))

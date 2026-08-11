@@ -45,7 +45,12 @@ export function ScalarApiButton(props: {
                     controllerRef.current?.openClient?.();
                     setIsOpen(true);
                     if (!runtime) {
-                        void loadScalarRuntime(context.scalarRuntimeURL).then(setRuntime);
+                        loadScalarRuntime(context.scalarRuntimeURL)
+                            .then(setRuntime)
+                            .catch((error) => {
+                                console.error('Unable to load the Scalar API client', error);
+                                setIsOpen(false);
+                            });
                     }
                 }}
             >

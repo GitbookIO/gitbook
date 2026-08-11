@@ -4,6 +4,7 @@ import { join } from 'node:path';
 
 import { type TranslationLanguage, defaultLanguage, languageLocales } from '.';
 import { getSpaceLanguage } from '../server';
+import { translationAssetPaths } from './assets';
 import { loadLanguage } from './server';
 
 const originalFetch = globalThis.fetch;
@@ -18,7 +19,13 @@ describe('translation assets', () => {
             join(import.meta.dir, '../../../public/~gitbook/static/translations')
         );
 
-        expect(files.sort()).toEqual(languageLocales.map((locale) => `${locale}.json`).sort());
+        // The manifest is generated alongside the assets, it has to point at the files on disk.
+        expect(
+            Object.entries(translationAssetPaths)
+                .map(([locale, path]) => `${locale}:${path}`)
+                .sort()
+        ).toEqual(files.map((file) => `${file.split('.')[0]}:translations/${file}`).sort());
+        expect(Object.keys(translationAssetPaths).sort()).toEqual([...languageLocales].sort());
 
         const expectedKeys = Object.keys(defaultLanguage).sort();
         await Promise.all(
@@ -62,6 +69,17 @@ describe('translation assets', () => {
         const language = await getSpaceLanguage({ locale: 'de' } as never);
 
         expect(language).toEqual(defaultLanguage);
+    });
+
+    it('retries a locale after a failed load', async () => {
+        const translation = { ...defaultLanguage, locale: 'it', language: 'Italiano', flag: '🇮🇹' };
+        globalThis.fetch = mock(() => Promise.resolve(new Response(null, { status: 500 })));
+
+        expect(await loadLanguage('it')).toBeNull();
+
+        globalThis.fetch = mock(() => Promise.resolve(Response.json(translation)));
+
+        expect(await loadLanguage('it')).toEqual(translation);
     });
 
     it('rejects locale assets with an incomplete translation shape', async () => {
