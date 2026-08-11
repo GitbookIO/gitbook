@@ -8,7 +8,7 @@ import type { RenderAIMessageOptions } from '../AI';
 import { AIChat, AskAITextSelection } from '../AIChat';
 import { Announcement } from '../Announcement';
 import { SpacesDropdown, TranslationsDropdown } from '../Header/SpacesDropdown';
-import { CurrentContentProvider } from '../hooks';
+import { ClientNavigationSelectionProvider, CurrentContentProvider } from '../hooks';
 import { InsightsProvider, VisitorProvider } from '../Insights';
 import { CONTAINER_STYLE } from '../layout';
 import { NavigationLoader } from '../primitives/NavigationLoader';
@@ -45,14 +45,26 @@ type SpaceLayoutProps = {
 
     /** Override the table of contents without changing the surrounding layout. */
     tableOfContentsSlot?: React.ReactNode;
+
+    /**
+     * Resolve the selected section/space/page on the client instead of trusting the server render.
+     * Set when the navigation shell comes from a cache shared across pages (PPR).
+     */
+    clientNavigationSelection?: boolean;
 };
 
 /**
  * Provide all contexts for a space.
  */
 export function SpaceLayoutServerContext(props: SpaceLayoutProps) {
-    const { context, withTracking, visitorAuthClaims, aiChatRenderMessageOptions, children } =
-        props;
+    const {
+        context,
+        withTracking,
+        visitorAuthClaims,
+        aiChatRenderMessageOptions,
+        clientNavigationSelection = false,
+        children,
+    } = props;
 
     const { customization } = context;
     const siteAdaptiveAuthLoginHref =
@@ -99,7 +111,11 @@ export function SpaceLayoutServerContext(props: SpaceLayoutProps) {
                                 renderMessageOptions={aiChatRenderMessageOptions}
                                 withPageFeedback={customization.feedback.enabled}
                             >
-                                {children}
+                                <ClientNavigationSelectionProvider
+                                    enabled={clientNavigationSelection}
+                                >
+                                    {children}
+                                </ClientNavigationSelectionProvider>
                             </AIChatProvider>
                         </InsightsProvider>
                     </VisitorProvider>
@@ -236,6 +252,7 @@ export function SpaceLayout(props: SpaceLayoutProps) {
             withTracking={props.withTracking}
             visitorAuthClaims={props.visitorAuthClaims}
             aiChatRenderMessageOptions={props.aiChatRenderMessageOptions}
+            clientNavigationSelection={props.clientNavigationSelection}
         >
             <Announcement context={context} />
             {headerSlot ?? <SpaceHeader context={context} />}

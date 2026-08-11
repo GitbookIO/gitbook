@@ -43,6 +43,9 @@ export default async function SitePPRLayout({
                 visitorAuthClaims={visitorAuthClaims}
                 headerSlot={<PPRHeader params={headerParams} />}
                 tableOfContentsSlot={<PPRTableOfContents params={tableOfContentsParams} />}
+                // The header and table of contents are cached across pages, so the selection they
+                // were rendered with belongs to another page and has to be resolved on the client.
+                clientNavigationSelection
             >
                 {children}
             </SiteLayout>
