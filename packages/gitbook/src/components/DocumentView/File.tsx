@@ -73,7 +73,9 @@ export async function File(props: BlockProps<DocumentBlockFile>) {
                         </Link>
                     </div>
                     <div className="text-sm text-tint-subtle">
-                        {contentType} · {getHumanFileSize(file.size)}
+                        {contentType
+                            ? `${contentType} · ${getHumanFileSize(file.size)}`
+                            : getHumanFileSize(file.size)}
                     </div>
                 </div>
                 <div className="flex shrink-0 flex-wrap gap-2">
