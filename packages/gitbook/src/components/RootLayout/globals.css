@@ -353,6 +353,14 @@
       /* Firefox only has partial support for this, but it should be enough for our use case */
       background-clip: text;
       -webkit-background-clip: text;
+
+      /* Inline chips paint their own background, so the cover is never behind their glyphs. They
+         inherit the transparent fill above but get no text-clipped gradient of their own, which
+         renders them as empty boxes — give them back a solid, readable fill. */
+      & :is(code, kbd) {
+        color: var(--cover-text-below);
+        -webkit-text-fill-color: var(--cover-text-below);
+      }
     }
   }
 }
