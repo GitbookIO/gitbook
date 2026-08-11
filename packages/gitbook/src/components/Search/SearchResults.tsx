@@ -1,7 +1,7 @@
 'use client';
 
 import assertNever from 'assert-never';
-import { AnimatePresence, motion } from 'framer-motion';
+import { motion } from 'framer-motion';
 import React from 'react';
 
 import { useAI } from '@/components/AI';
@@ -195,145 +195,141 @@ export const SearchResults = React.forwardRef(function SearchResults(
                         role="listbox"
                         aria-live="polite"
                     >
-                        <AnimatePresence initial={false} mode="popLayout">
-                            {results.map((item, index) => {
-                                const itemKey = getResultKey(item);
-                                const shouldAnimateItem =
-                                    shouldAnimateResults || !seenResultKeys.current.has(itemKey);
-                                const handleResultSelect = () => {
-                                    if (
-                                        query &&
-                                        siteSpaceId &&
-                                        (item.type === 'local-page' ||
-                                            item.type === 'page' ||
-                                            item.type === 'record')
-                                    ) {
-                                        addRecentSearchQuery(siteSpaceId, query, 'search');
-                                    }
+                        {results.map((item, index) => {
+                            const itemKey = getResultKey(item);
+                            const shouldAnimateItem =
+                                shouldAnimateResults || !seenResultKeys.current.has(itemKey);
+                            const handleResultSelect = () => {
+                                if (
+                                    query &&
+                                    siteSpaceId &&
+                                    (item.type === 'local-page' ||
+                                        item.type === 'page' ||
+                                        item.type === 'record')
+                                ) {
+                                    addRecentSearchQuery(siteSpaceId, query, 'search');
+                                }
 
-                                    onResultSelect?.();
-                                };
-                                const resultItemProps = {
-                                    'aria-posinset': index + 1,
-                                    'aria-setsize': results.length,
-                                    id: `${id}-${index}`,
-                                    onClickCapture: handleResultSelect,
-                                };
-                                switch (item.type) {
-                                    case 'local-page':
-                                    case 'page': {
-                                        return (
-                                            <motion.div
-                                                layout="position"
-                                                transition={
-                                                    shouldDisableLayoutAnimation
-                                                        ? { layout: { duration: 0 } }
-                                                        : { duration: 0.3, ease: 'circInOut' }
-                                                }
-                                                key={itemKey}
-                                            >
-                                                <div
-                                                    className={
-                                                        shouldAnimateItem
-                                                            ? 'animate-blur-in-height'
-                                                            : undefined
-                                                    }
-                                                    style={{
-                                                        animationDelay: `${index * 25}ms,${100 + index * 25}ms`,
-                                                    }}
-                                                >
-                                                    <SearchPageResultItem
-                                                        ref={(ref) => {
-                                                            refs.current[index] = ref;
-                                                        }}
-                                                        query={query}
-                                                        item={item}
-                                                        active={index === cursor}
-                                                        style={{
-                                                            animationDelay: `${index * 25}ms,${100 + index * 25}ms`,
-                                                        }}
-                                                        {...resultItemProps}
-                                                    />
-                                                </div>
-                                            </motion.div>
-                                        );
-                                    }
-                                    case 'recommended-question': {
-                                        if (!primaryAssistant) {
-                                            return null;
-                                        }
-                                        return (
-                                            <motion.div
+                                onResultSelect?.();
+                            };
+                            const resultItemProps = {
+                                'aria-posinset': index + 1,
+                                'aria-setsize': results.length,
+                                id: `${id}-${index}`,
+                                onClickCapture: handleResultSelect,
+                            };
+                            switch (item.type) {
+                                case 'local-page':
+                                case 'page': {
+                                    return (
+                                        <motion.div
+                                            layout="position"
+                                            transition={
+                                                shouldDisableLayoutAnimation
+                                                    ? { layout: { duration: 0 } }
+                                                    : { duration: 0.3, ease: 'circInOut' }
+                                            }
+                                            key={itemKey}
+                                        >
+                                            <div
                                                 className={
                                                     shouldAnimateItem
-                                                        ? 'animate-blur-in'
+                                                        ? 'animate-blur-in-height'
                                                         : undefined
                                                 }
-                                                style={
-                                                    shouldAnimateItem
-                                                        ? {
-                                                              animationDelay: `${index * 25}ms,${100 + index * 25}ms`,
-                                                          }
-                                                        : undefined
-                                                }
-                                                key={itemKey}
+                                                style={{
+                                                    animationDelay: `${index * 25}ms,${100 + index * 25}ms`,
+                                                }}
                                             >
-                                                <SearchQuestionResultItem
+                                                <SearchPageResultItem
                                                     ref={(ref) => {
                                                         refs.current[index] = ref;
                                                     }}
-                                                    question={item.question}
-                                                    action={item.action}
+                                                    query={query}
+                                                    item={item}
                                                     active={index === cursor}
-                                                    assistant={primaryAssistant}
-                                                    {...resultItemProps}
-                                                />
-                                            </motion.div>
-                                        );
-                                    }
-                                    case 'record': {
-                                        return (
-                                            <motion.div
-                                                layout="position"
-                                                transition={
-                                                    shouldDisableLayoutAnimation
-                                                        ? { layout: { duration: 0 } }
-                                                        : { duration: 0.3, ease: 'circInOut' }
-                                                }
-                                                key={itemKey}
-                                            >
-                                                <div
-                                                    className={
-                                                        shouldAnimateItem
-                                                            ? 'animate-blur-in-height'
-                                                            : undefined
-                                                    }
                                                     style={{
                                                         animationDelay: `${index * 25}ms,${100 + index * 25}ms`,
                                                     }}
-                                                >
-                                                    <SearchRecordResultItem
-                                                        ref={(ref) => {
-                                                            refs.current[index] = ref;
-                                                        }}
-                                                        key={itemKey}
-                                                        query={query}
-                                                        item={item}
-                                                        active={index === cursor}
-                                                        style={{
-                                                            animationDelay: `${index * 25}ms,${100 + index * 25}ms`,
-                                                        }}
-                                                        {...resultItemProps}
-                                                    />
-                                                </div>
-                                            </motion.div>
-                                        );
-                                    }
-                                    default:
-                                        assertNever(item);
+                                                    {...resultItemProps}
+                                                />
+                                            </div>
+                                        </motion.div>
+                                    );
                                 }
-                            })}
-                        </AnimatePresence>
+                                case 'recommended-question': {
+                                    if (!primaryAssistant) {
+                                        return null;
+                                    }
+                                    return (
+                                        <motion.div
+                                            className={
+                                                shouldAnimateItem ? 'animate-blur-in' : undefined
+                                            }
+                                            style={
+                                                shouldAnimateItem
+                                                    ? {
+                                                          animationDelay: `${index * 25}ms,${100 + index * 25}ms`,
+                                                      }
+                                                    : undefined
+                                            }
+                                            key={itemKey}
+                                        >
+                                            <SearchQuestionResultItem
+                                                ref={(ref) => {
+                                                    refs.current[index] = ref;
+                                                }}
+                                                question={item.question}
+                                                action={item.action}
+                                                active={index === cursor}
+                                                assistant={primaryAssistant}
+                                                {...resultItemProps}
+                                            />
+                                        </motion.div>
+                                    );
+                                }
+                                case 'record': {
+                                    return (
+                                        <motion.div
+                                            layout="position"
+                                            transition={
+                                                shouldDisableLayoutAnimation
+                                                    ? { layout: { duration: 0 } }
+                                                    : { duration: 0.3, ease: 'circInOut' }
+                                            }
+                                            key={itemKey}
+                                        >
+                                            <div
+                                                className={
+                                                    shouldAnimateItem
+                                                        ? 'animate-blur-in-height'
+                                                        : undefined
+                                                }
+                                                style={{
+                                                    animationDelay: `${index * 25}ms,${100 + index * 25}ms`,
+                                                }}
+                                            >
+                                                <SearchRecordResultItem
+                                                    ref={(ref) => {
+                                                        refs.current[index] = ref;
+                                                    }}
+                                                    key={itemKey}
+                                                    query={query}
+                                                    item={item}
+                                                    active={index === cursor}
+                                                    style={{
+                                                        animationDelay: `${index * 25}ms,${100 + index * 25}ms`,
+                                                    }}
+                                                    {...resultItemProps}
+                                                />
+                                            </div>
+                                        </motion.div>
+                                    );
+                                }
+                                default:
+                                    assertNever(item);
+                            }
+                        })}
                     </div>
                     {!fetching && results.length === 0 ? noResults : null}
                 </>
