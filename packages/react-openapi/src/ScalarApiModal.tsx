@@ -7,6 +7,7 @@ import {
     useEffect,
     useImperativeHandle,
     useMemo,
+    useRef,
 } from 'react';
 
 import type { OpenAPIV3_1 } from '@gitbook/openapi-parser';
@@ -41,6 +42,8 @@ export type ScalarApiModalProps = {
     context: OpenAPIClientContext;
     runtime: ScalarRuntime;
     controllerRef: Ref<ScalarModalControllerRef>;
+    /** Called once the client is initialized and the modal is opening. */
+    onReady: () => void;
 };
 
 /** Loaded only after a reader opens the Try it client. */
@@ -55,6 +58,7 @@ export function ScalarApiModal(props: ScalarApiModalProps) {
         context,
         controllerRef,
         runtime,
+        onReady,
     } = props;
     const getPrefillInputContextData = useOpenAPIPrefillContext();
     const prefillInputContext = getPrefillInputContextData();
@@ -78,6 +82,7 @@ export function ScalarApiModal(props: ScalarApiModalProps) {
                 path={path}
                 controllerRef={controllerRef}
                 runtime={runtime}
+                onReady={onReady}
             />
         </runtime.ApiClientModalProvider>
     );
@@ -88,8 +93,9 @@ function ScalarModalController(props: {
     path: string;
     controllerRef: Ref<ScalarModalControllerRef>;
     runtime: ScalarRuntime;
+    onReady: () => void;
 }) {
-    const { method, path, controllerRef, runtime } = props;
+    const { method, path, controllerRef, runtime, onReady } = props;
     const client = runtime.useApiClientModal();
     const openScalarClient = client?.open;
     const { onOpenClient: trackClientOpening } = useOpenAPIOperationContext();
@@ -112,8 +118,15 @@ function ScalarModalController(props: {
         [openClient]
     );
 
+    // Through a ref, so an unstable callback doesn't re-open the client on every render.
+    const onReadyRef = useRef(onReady);
+    onReadyRef.current = onReady;
+
     useEffect(() => {
-        openClient?.();
+        if (openClient) {
+            openClient();
+            onReadyRef.current();
+        }
     }, [openClient]);
 
     return null;
