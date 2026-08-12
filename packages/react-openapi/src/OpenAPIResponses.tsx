@@ -2,11 +2,11 @@
 
 import type { OpenAPIV3, OpenAPIV3_1 } from '@gitbook/openapi-parser';
 import clsx from 'classnames';
-import type { Key } from 'react-aria';
 import { Markdown } from './Markdown';
 import { OpenAPIDisclosureGroup } from './OpenAPIDisclosureGroup';
 import { OpenAPIResponse } from './OpenAPIResponse';
 import { useResponseExamplesState } from './OpenAPIResponseExampleContent';
+import type { Key } from './OpenAPISelect';
 import { StaticSection } from './StaticSection';
 import type { OpenAPIClientContext } from './context';
 import { t } from './translate';
