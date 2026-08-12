@@ -200,8 +200,9 @@ export const Input = React.forwardRef<InputElement, InputProps>((props, passedRe
         // `aria-busy` must not change the cursor: a busy field can still be editable.
         'peer -m-2 max-h-64 grow shrink resize-none leading-normal text-left outline-none placeholder-shown:text-ellipsis',
         // Styling `::placeholder` from an ancestor variant costs a full-document restyle, so callers
-        // override this variable instead of targeting the pseudo-element.
-        '[--input-placeholder:color-mix(in_oklab,rgb(var(--tint-11))_72%,transparent)] placeholder:text-(--input-placeholder)',
+        // set this variable on the container instead. It must stay a `var()` fallback rather than a
+        // declaration here, or the input would shadow the inherited override.
+        'placeholder:text-[var(--input-placeholder,color-mix(in_oklab,rgb(var(--tint-11))_72%,transparent))]',
         sizes[sizing].input
     );
 
