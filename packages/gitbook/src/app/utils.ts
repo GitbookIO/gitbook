@@ -181,18 +181,27 @@ export function getPPRHeaderRouteParams(params: PPRRouteLayoutParams): RouteLayo
 
     return {
         ...routeParams,
-        siteData: encodeURIComponent(
-            rison.encode({
-                ...siteURLData,
-                // For the header, we don't want to vary the cache by page path, so we set it to the root.
-                pathname: '/',
-                // For the header, we keep site section and space data from the PPR defaults, so that the header can be cached across all pages in a site.
-                siteSection: defaults.siteSection ?? undefined,
-                siteSpace: defaults.siteSpace,
-                space: defaults.space,
-            })
-        ),
+        siteData: encodeSiteData({
+            ...siteURLData,
+            // For the header, we don't want to vary the cache by page path, so we set it to the root.
+            pathname: '/',
+            // For the header, we keep site section and space data from the PPR defaults, so that the header can be cached across all pages in a site.
+            siteSection: defaults.siteSection ?? undefined,
+            siteSpace: defaults.siteSpace,
+            space: defaults.space,
+        }),
     };
+}
+
+/** rison can't encode undefined values, so they are dropped like the middleware does. */
+function encodeSiteData(siteURLData: Record<string, unknown>): string {
+    return encodeURIComponent(
+        rison.encode(
+            Object.fromEntries(
+                Object.entries(siteURLData).filter(([_, value]) => typeof value !== 'undefined')
+            )
+        )
+    );
 }
 
 /**
