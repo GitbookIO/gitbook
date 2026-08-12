@@ -4,8 +4,8 @@ import {
     type TranslationLocale,
     defaultLanguage,
     isAvailableLanguage,
+    loadLanguage,
 } from './translations';
-import { loadLanguage } from './translations/server';
 
 export * from './translate';
 
