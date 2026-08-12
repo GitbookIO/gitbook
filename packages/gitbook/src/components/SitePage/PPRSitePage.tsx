@@ -3,9 +3,9 @@ import {
     type RouteParams,
     getPPRStaticSiteContext,
     getPagePathFromParams,
-    getStaticSiteContext,
 } from '@/app/utils';
 import { SpaceHeader, SpaceTableOfContents } from '@/components/SpaceLayout';
+import { prefixCacheTags } from '@/lib/cache-tags';
 
 import { getCacheTag } from '@gitbook/cache-tags';
 
@@ -23,14 +23,19 @@ export async function PPRHeader(props: { params: RouteLayoutParams }) {
 
     console.log('PPRHeader props.params', props.params);
 
-    const { context } = await getStaticSiteContext(props.params);
+    const { context } = await getPPRStaticSiteContext(props.params);
 
     // We only need the site cache tag for the header, as the header is not dependent on the page or space content.
     cacheTag(
-        getCacheTag({
-            tag: 'site',
-            site: context.site.id,
-        })
+        ...prefixCacheTags(
+            [
+                getCacheTag({
+                    tag: 'site',
+                    site: context.site.id,
+                }),
+            ],
+            true
+        )
     ); // Tag the cache entry for the header so it can be invalidated when the site changes
 
     return <SpaceHeader context={context} />;
@@ -80,18 +85,22 @@ export async function cachedGenerateSitePageViewport(routeParams: RouteParams): 
     const { context } = await getPPRStaticSiteContext(routeParams);
 
     cacheTag(
-        getCacheTag({
-            tag: 'site',
-            site: context.site.id,
-        })
-    ); // Tag the cache entry for the metadata so it can be invalidated when the site changes
-
-    cacheTag(
-        getCacheTag({
-            tag: 'space',
-            space: context.space.id,
-        })
-    ); // Tag the cache entry for the metadata so it can be invalidated when the space changes
+        ...prefixCacheTags(
+            [
+                // Tag the cache entry for the metadata so it can be invalidated when the site changes
+                getCacheTag({
+                    tag: 'site',
+                    site: context.site.id,
+                }),
+                // ...or when the space changes
+                getCacheTag({
+                    tag: 'space',
+                    space: context.space.id,
+                }),
+            ],
+            true
+        )
+    );
 
     return generateSitePageViewport(context);
 }

@@ -225,12 +225,15 @@ export function getBaseContext(input: {
     siteURL: URL | string;
     siteURLData: SiteURLData;
     urlMode: 'url' | 'url-host';
+    /** Set when rendering under the PPR route, to prefix the cache tags emitted by the fetcher. */
+    ppr?: true;
 }) {
     const { urlMode, siteURLData } = input;
     const siteURL = typeof input.siteURL === 'string' ? new URL(input.siteURL) : input.siteURL;
 
     const dataFetcher = createDataFetcher({
         apiToken: siteURLData.apiToken ?? null,
+        ...(input.ppr ? { ppr: input.ppr } : {}),
     });
 
     const gitbookURL = GITBOOK_URL ? new URL(GITBOOK_URL) : undefined;
