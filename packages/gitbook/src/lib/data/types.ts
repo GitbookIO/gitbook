@@ -25,6 +25,12 @@ export type DataFetcherResponse<T> =
  */
 export interface GitBookDataFetcher {
     /**
+     * Set when rendering under the PPR route: the cache entries are partitioned from the static
+     * ones and their cache tags are prefixed.
+     */
+    readonly ppr?: true;
+
+    /**
      * Get an API client for the current context.
      */
     api(): Promise<api.GitBookAPI>;
