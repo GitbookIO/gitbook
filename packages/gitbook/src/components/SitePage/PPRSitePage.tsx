@@ -47,20 +47,6 @@ export async function PPRTableOfContents(props: { params: RouteLayoutParams }) {
 
     const { context } = await getPPRStaticSiteContext(props.params);
 
-    cacheTag(
-        getCacheTag({
-            tag: 'site',
-            site: context.site.id,
-        })
-    ); // Tag the cache entry for the table of contents so it can be invalidated when the site changes
-
-    cacheTag(
-        getCacheTag({
-            tag: 'space',
-            space: context.space.id,
-        })
-    ); // Tag the cache entry for the table of contents so it can be invalidated when the space changes
-
     return <SpaceTableOfContents context={context} />;
 }
 
@@ -74,28 +60,6 @@ export async function PPRPageBody(props: { params: RouteParams; pathname: string
     console.log('PPRPageBody: caching page body for', props.pathname);
     const { context } = await getPPRStaticSiteContext(props.params);
 
-    cacheTag(
-        getCacheTag({
-            tag: 'site',
-            site: context.site.id,
-        })
-    ); // Tag the cache entry for the table of contents so it can be invalidated when the site changes
-
-    cacheTag(
-        getCacheTag({
-            tag: 'space',
-            space: context.space.id,
-        })
-    ); // Tag the cache entry for the table of contents so it can be invalidated when the space changes
-
-    cacheTag(
-        getCacheTag({
-            tag: 'document',
-            space: context.space.id,
-            document: props.pathname,
-        })
-    ); // Tag the cache entry for the table of contents so it can be invalidated when the document changes
-
     return <SitePage context={context} pageParams={{ pathname: props.pathname }} staticRoute />;
 }
 
@@ -105,20 +69,6 @@ export async function cachedGenerateSitePageMetadata(routeParams: RouteParams): 
     const { context } = await getPPRStaticSiteContext(routeParams);
     const pathname = getPagePathFromParams(routeParams);
     cacheLife('days'); // Cache for 1 day
-
-    cacheTag(
-        getCacheTag({
-            tag: 'site',
-            site: context.site.id,
-        })
-    ); // Tag the cache entry for the metadata so it can be invalidated when the site changes
-
-    cacheTag(
-        getCacheTag({
-            tag: 'space',
-            space: context.space.id,
-        })
-    ); // Tag the cache entry for the metadata so it can be invalidated when the space changes
 
     return generateSitePageMetadata({ context, pageParams: { pathname } });
 }
