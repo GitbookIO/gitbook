@@ -1,4 +1,5 @@
 import { type RouteLayoutParams, getDynamicSiteContext } from '@/app/utils';
+import { resolveUpstreamAuthURL } from '@/lib/site-auth-urls';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
@@ -11,20 +12,10 @@ export async function GET(
 ) {
     const { context } = await getDynamicSiteContext(await params);
     const noLoginFallbackURL = context.linker.toAbsoluteURL(context.linker.toPathInSite(''));
+    const loginURL = resolveUpstreamAuthURL({
+        siteAuthURL: context.site.urls.login,
+        location: request.nextUrl.searchParams.get('location'),
+    });
 
-    if (!context.site.urls.login) {
-        return NextResponse.redirect(noLoginFallbackURL);
-    }
-
-    try {
-        const loginURL = new URL(context.site.urls.login);
-        const location = request.nextUrl.searchParams.get('location');
-        if (location) {
-            loginURL.searchParams.set('location', location);
-        }
-
-        return NextResponse.redirect(loginURL);
-    } catch (_error) {
-        return NextResponse.redirect(noLoginFallbackURL);
-    }
+    return NextResponse.redirect(loginURL ?? noLoginFallbackURL);
 }
