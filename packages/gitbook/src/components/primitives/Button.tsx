@@ -212,15 +212,7 @@ export const Button = React.forwardRef<
         );
 
         return (children || iconOnly) && label ? (
-            <Tooltip
-                rootProps={{
-                    open: disabled === true ? false : undefined,
-                    ...tooltipProps?.rootProps,
-                }}
-                label={label}
-                triggerProps={{ disabled, ...tooltipProps?.triggerProps }}
-                contentProps={tooltipProps?.contentProps}
-            >
+            <Tooltip label={label} disabled={disabled} {...tooltipProps}>
                 {button}
             </Tooltip>
         ) : (

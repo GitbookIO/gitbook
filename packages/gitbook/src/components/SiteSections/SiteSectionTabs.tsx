@@ -1,25 +1,26 @@
 'use client';
 
-import * as NavigationMenu from '@radix-ui/react-navigation-menu';
+import { NavigationMenu } from '@base-ui/react/navigation-menu';
+import type { IconName } from '@gitbook/icons';
 import React from 'react';
 
-import type { IconName } from '@gitbook/icons';
-
-import { useIsMobile } from '../hooks/useIsMobile';
+import { Button, Link, ToggleChevron } from '@/components/primitives';
+import { tcls } from '@/lib/tailwind';
+import { findSectionInGroup } from '@/lib/utils';
 import { CONTAINER_STYLE } from '../layout';
 import { ScrollContainer } from '../primitives/ScrollContainer';
+import { SectionIcon } from './SectionIcon';
 import type {
     ClientSiteSection,
     ClientSiteSectionGroup,
     ClientSiteSections,
 } from './encodeClientSiteSections';
-import { SectionIcon } from './SectionIcon';
-import { Button, Link, ToggleChevron } from '@/components/primitives';
-import { tcls } from '@/lib/tailwind';
-import { findSectionInGroup } from '@/lib/utils';
 
-const DESKTOP_BREAKPOINT = 768;
 const SCREEN_OFFSET = 16; // 1rem
+// The tabs have a 6px bottom margin, and the popup used to overlap the header border by 1px.
+const POPUP_OFFSET = 4;
+const OPEN_DELAY_MS = 200;
+const MOTION = 'duration-300 ease-[cubic-bezier(0.83,0,0.17,1)]';
 const MAX_ITEMS_PER_COLUMN = 10; // number of items per column
 const GROUP_MASONRY_THRESHOLD = 3; // if a section group has more than this many child groups, it will be shown in a masonry grid
 const COLUMN_WIDTH = '18rem';
@@ -40,40 +41,26 @@ export function SiteSectionTabs(props: {
         children,
     } = props;
 
-    const containerRef = React.useRef<HTMLDivElement>(null);
-    const currentTriggerRef = React.useRef<HTMLButtonElement | null>(null);
-    const [value, setValue] = React.useState<string | undefined>();
-
-    const isMobile = useIsMobile(DESKTOP_BREAKPOINT);
-    const offset = useNavigationMenuViewportOffset({
-        value,
-        isMobile,
-        triggerRef: currentTriggerRef,
-        containerRef,
-    });
-    const viewportLeft =
-        !isMobile && offset !== null
-            ? `clamp(0px, calc(${offset - SCREEN_OFFSET}px - var(--radix-navigation-menu-viewport-width, 0px)/2), calc(100% - var(--radix-navigation-menu-viewport-width, 0px)))`
-            : '0px';
+    // The popup is portalled into the tabs container rather than <body>, so it keeps inheriting the
+    // header's typography and theming.
+    const containerRef = React.useRef<HTMLElement>(null);
 
     return structure.length > 0 ? (
         <NavigationMenu.Root
+            ref={containerRef}
             className={tcls(
                 CONTAINER_STYLE,
                 'relative z-10 flex w-full flex-nowrap items-end',
                 'page-default-width:2xl:px-[calc((100%-1536px+4rem)/2)]',
                 className
             )}
-            ref={containerRef}
             style={
                 {
                     '--site-section-column-width': COLUMN_WIDTH,
                     '--site-section-column-gap': COLUMN_GAP,
                 } as React.CSSProperties
             }
-            value={value}
-            onValueChange={setValue}
-            skipDelayDuration={500}
+            delay={OPEN_DELAY_MS}
         >
             <ScrollContainer
                 orientation="horizontal"
@@ -112,49 +99,45 @@ export function SiteSectionTabs(props: {
                                 {isGroup && structureItem.children.length > 0 ? (
                                     <>
                                         <NavigationMenu.Trigger
-                                            asChild
-                                            ref={value === id ? currentTriggerRef : undefined}
-                                            onClick={(e) => {
-                                                // Prevent clicking the trigger from closing when the viewport is open
-                                                if (value === id) {
-                                                    e.preventDefault();
-                                                    e.stopPropagation();
-                                                }
-                                            }}
-                                        >
-                                            <SectionTab
-                                                isActive={isActive}
-                                                title={title}
-                                                icon={icon as IconName}
-                                            />
-                                        </NavigationMenu.Trigger>
-                                        <NavigationMenu.Content
-                                            className={tcls([
-                                                'absolute top-0 left-0 w-full md:w-auto',
-                                                'data-[motion=from-start]:*:animate-[enterFromLeft_300ms_ease_both] data-[motion=to-end]:*:animate-[exitToRight_300ms_ease_both] data-[motion=to-start]:*:animate-[exitToLeft_300ms_ease_both] motion-safe:data-[motion=from-end]:*:animate-[enterFromRight_300ms_ease_both]',
-                                            ])}
-                                        >
-                                            <div className="max-h-[calc(100vh-8rem)] w-full overflow-y-auto overflow-x-hidden rounded-corners:rounded-xl circular-corners:rounded-3xl">
-                                                <SectionGroupTileList
-                                                    items={structureItem.children}
-                                                    currentSection={currentSection}
+                                            render={
+                                                <SectionTab
+                                                    isActive={isActive}
+                                                    title={title}
+                                                    icon={icon as IconName}
                                                 />
-                                            </div>
+                                            }
+                                        />
+                                        <NavigationMenu.Content
+                                            className={tcls(
+                                                'h-full w-[calc(100vw-2rem)] overflow-y-auto overflow-x-hidden md:w-max md:max-w-(--available-width)',
+                                                `transition-[opacity,translate] ${MOTION}`,
+                                                'data-ending-style:opacity-0 data-starting-style:opacity-0',
+                                                'data-starting-style:data-[activation-direction=left]:-translate-x-1/2 data-ending-style:data-[activation-direction=left]:translate-x-1/2',
+                                                'data-ending-style:data-[activation-direction=right]:-translate-x-1/2 data-starting-style:data-[activation-direction=right]:translate-x-1/2'
+                                            )}
+                                        >
+                                            <SectionGroupTileList
+                                                items={structureItem.children}
+                                                currentSection={currentSection}
+                                            />
                                         </NavigationMenu.Content>
                                     </>
                                 ) : (
-                                    <NavigationMenu.Link asChild>
-                                        <SectionTab
-                                            url={
-                                                structureItem.object === 'site-section'
-                                                    ? structureItem.url
-                                                    : undefined
-                                            }
-                                            isActive={isActive}
-                                            title={title}
-                                            icon={icon ? (icon as IconName) : undefined}
-                                        />
-                                    </NavigationMenu.Link>
+                                    <NavigationMenu.Link
+                                        active={isActive}
+                                        render={
+                                            <SectionTab
+                                                url={
+                                                    structureItem.object === 'site-section'
+                                                        ? structureItem.url
+                                                        : undefined
+                                                }
+                                                isActive={isActive}
+                                                title={title}
+                                                icon={icon ? (icon as IconName) : undefined}
+                                            />
+                                        }
+                                    />
                                 )}
                             </NavigationMenu.Item>
                         );
@@ -164,68 +147,31 @@ export function SiteSectionTabs(props: {
 
             {children}
 
-            <div
-                className="absolute left-0 top-full z-20 flex w-full"
-                style={{
-                    paddingInline: `${SCREEN_OFFSET}px`,
-                    // Force a stacking context on this wrapper (rather than on the Viewport) to fix a rendering bug on
-                    // Safari. Keeping it here — off the clipped Viewport — avoids a Chromium bug where a clipped,
-                    // composited layer drops its text inside an iframe (empty dropdowns on embedded sites).
-                    transform: 'translateZ(0)',
-                }}
-            >
-                <NavigationMenu.Viewport
+            <NavigationMenu.Portal container={containerRef}>
+                <NavigationMenu.Positioner
                     className={tcls(
-                        // `overflow-hidden` clips the content to this animating box, keeping it bounded by the rounded
-                        // container as the Viewport resizes/scales. The stacking context Safari needs lives on the
-                        // parent wrapper (translateZ), deliberately not here — see the note above.
-                        'relative origin-[center_top] overflow-hidden circular-corners:rounded-3xl rounded-corners:rounded-xl border border-tint bg-tint-base shadow-lg',
-                        '-mt-0.5 h-(--radix-navigation-menu-viewport-height) w-full max-w-full md:w-(--radix-navigation-menu-viewport-width)',
-                        'max-h-[calc(100vh-8rem)] data-[state=closed]:animate-scale-out data-[state=open]:animate-scale-in',
-                        'ease has-[&[data-motion]]:transition-[left,width,height] has-[&[data-motion]]:duration-300'
+                        'z-20 h-(--positioner-height) w-(--positioner-width) max-w-(--available-width) outline-hidden',
+                        `transition-[top,left,right,bottom] ${MOTION} data-instant:transition-none`
                     )}
-                    style={{
-                        left: viewportLeft,
-                    }}
-                />
-            </div>
+                    sideOffset={POPUP_OFFSET}
+                    collisionPadding={SCREEN_OFFSET}
+                    // The tabs sit right under the header: flipping the popup above them would
+                    // hide it behind the header.
+                    collisionAvoidance={{ side: 'none' }}
+                >
+                    <NavigationMenu.Popup
+                        className={tcls(
+                            'relative h-(--popup-height) max-h-[calc(100vh-8rem)] w-(--popup-width) origin-(--transform-origin) overflow-hidden circular-corners:rounded-3xl rounded-corners:rounded-xl border border-tint bg-tint-base shadow-lg outline-hidden',
+                            `transition-[opacity,transform,width,height] ${MOTION}`,
+                            'data-ending-style:scale-95 data-starting-style:scale-95 data-ending-style:opacity-0 data-starting-style:opacity-0'
+                        )}
+                    >
+                        <NavigationMenu.Viewport className="relative h-full w-full overflow-hidden" />
+                    </NavigationMenu.Popup>
+                </NavigationMenu.Positioner>
+            </NavigationMenu.Portal>
         </NavigationMenu.Root>
     ) : null;
-}
-
-function useNavigationMenuViewportOffset(args: {
-    value: string | undefined;
-    isMobile: boolean;
-    triggerRef: React.RefObject<HTMLButtonElement | null>;
-    containerRef: React.RefObject<HTMLDivElement | null>;
-}) {
-    const { value, isMobile, triggerRef, containerRef } = args;
-    const [offset, setOffset] = React.useState<number | null>(null);
-
-    React.useLayoutEffect(() => {
-        if (isMobile) {
-            setOffset(null);
-            return;
-        }
-
-        if (!value) {
-            return;
-        }
-
-        const trigger = triggerRef.current;
-        const container = containerRef.current;
-        if (!trigger || !container) {
-            return;
-        }
-
-        const containerLeft = container.getBoundingClientRect().left;
-        const triggerWidth = trigger.getBoundingClientRect().width;
-        const triggerLeft = trigger.getBoundingClientRect().left - containerLeft;
-
-        setOffset(triggerLeft + triggerWidth / 2);
-    }, [containerRef, isMobile, triggerRef, value]);
-
-    return offset;
 }
 
 /**
@@ -395,7 +341,7 @@ function SectionGroupTile(props: {
 
     return (
         <li className="flex w-full min-w-0 shrink-0 break-inside-avoid flex-col gap-1 md:w-auto">
-            <div className="mb-1 mt-2 flex min-w-0 gap-2 px-2.5 text-xs font-semibold text-tint-subtle">
+            <div className="mt-2 mb-1 flex min-w-0 gap-2 px-2.5 font-semibold text-tint-subtle text-xs">
                 {icon && (
                     <SectionIcon className="mt-0.5" isActive={false} icon={icon as IconName} />
                 )}

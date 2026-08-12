@@ -1,86 +1,79 @@
 'use client';
 
-import * as RadixTooltip from '@radix-ui/react-tooltip';
-import { useState } from 'react';
-
 import { tcls } from '@/lib/tailwind';
+import { Tooltip as BaseTooltip } from '@base-ui/react/tooltip';
+import { PopupArrow } from './PopupArrow';
 
 export type TooltipProps = {
-    rootProps?: RadixTooltip.TooltipProps;
-    triggerProps?: RadixTooltip.TooltipTriggerProps;
-    contentProps?: RadixTooltip.TooltipContentProps;
+    /** Side of the trigger the tooltip is displayed on. */
+    side?: BaseTooltip.Positioner.Props['side'];
+    /** Alignment of the tooltip relative to the trigger. */
+    align?: BaseTooltip.Positioner.Props['align'];
+    /** Distance between the trigger and the tooltip. */
+    sideOffset?: number;
+    /** Delay before opening on hover, overriding the shared provider delay. */
+    delay?: number;
+    /** Prevent the tooltip from opening at all. */
+    disabled?: boolean;
+    /** Let the tooltip close as soon as the trigger is left, instead of staying alive while the pointer travels towards it. */
+    disableHoverablePopup?: boolean;
+    /** Custom props for the popup itself. */
+    popupProps?: Omit<BaseTooltip.Popup.Props, 'className' | 'children' | 'render'>;
 };
 
-export function Tooltip(props: {
-    children: React.ReactNode;
-    label?: string | React.ReactNode;
-    triggerProps?: RadixTooltip.TooltipTriggerProps;
-    contentProps?: RadixTooltip.TooltipContentProps;
-    portalProps?: RadixTooltip.TooltipPortalProps;
-    rootProps?: RadixTooltip.TooltipProps;
-    arrowProps?: RadixTooltip.TooltipArrowProps;
-    arrow?: boolean;
-    className?: string;
-    pinOnClick?: boolean;
-}) {
+export function Tooltip(
+    props: TooltipProps & {
+        children: React.ReactElement<Record<string, unknown>>;
+        label?: string | React.ReactNode;
+        arrow?: boolean | { className?: string };
+        className?: string;
+    }
+) {
     const {
         children,
         label,
-        triggerProps,
-        contentProps,
-        portalProps,
-        rootProps,
-        arrowProps,
+        side,
+        align,
+        sideOffset = 4,
+        delay,
+        disabled,
+        disableHoverablePopup,
+        popupProps,
         arrow = false,
         className,
-        pinOnClick = true,
     } = props;
 
-    const [open, setOpen] = useState(false);
-    const [clicked, setClicked] = useState(false);
-
-    // When hoverable content is disabled, the content is purely informational: make it
-    // non-interactive so its (portaled) popper wrapper can't steal hover/clicks from the
-    // trigger. The `data-non-interactive` marker lets a scoped global rule (globals.css)
-    // set `pointer-events: none` on the wrapper, which we can't reach from React.
-    const nonInteractive = rootProps?.disableHoverableContent ?? false;
-    const resolvedContentProps = nonInteractive
-        ? {
-              ...contentProps,
-              'data-non-interactive': '',
-              style: {
-                  ...contentProps?.style,
-                  // Forced last so the non-interactive guarantee can't be overridden.
-                  pointerEvents: 'none' as const,
-                  userSelect: 'none' as const,
-              },
-          }
-        : contentProps;
-
     return (
-        <RadixTooltip.Root open={open || clicked} onOpenChange={setOpen} {...rootProps}>
-            <RadixTooltip.Trigger
-                asChild
-                onClick={pinOnClick ? () => setClicked(true) : undefined}
-                {...triggerProps}
-            >
-                {children}
-            </RadixTooltip.Trigger>
-            <RadixTooltip.Portal {...portalProps}>
-                <RadixTooltip.Content
-                    sideOffset={4}
+        <BaseTooltip.Root disabled={disabled} disableHoverablePopup={disableHoverablePopup}>
+            <BaseTooltip.Trigger render={children} delay={delay} />
+            <BaseTooltip.Portal>
+                <BaseTooltip.Positioner
+                    className="z-50"
+                    side={side}
+                    align={align}
+                    sideOffset={sideOffset}
                     collisionPadding={8}
-                    className={tcls(
-                        'z-50 max-w-xs circular-corners:rounded-2xl rounded-corners:rounded-md bg-tint-12 px-2 py-1 text-contrast-tint-12 text-sm data-[state$="closed"]:animate-scale-out data-[state$="open"]:animate-scale-in',
-                        className
-                    )}
-                    onPointerDownOutside={() => setClicked(false)}
-                    {...resolvedContentProps}
                 >
-                    {label}
-                    {arrow && <RadixTooltip.Arrow {...arrowProps} />}
-                </RadixTooltip.Content>
-            </RadixTooltip.Portal>
-        </RadixTooltip.Root>
+                    <BaseTooltip.Popup
+                        {...popupProps}
+                        className={tcls(
+                            'max-w-xs circular-corners:rounded-2xl rounded-corners:rounded-md bg-tint-12 px-2 py-1 text-contrast-tint-12 text-sm data-closed:animate-scale-out data-open:animate-scale-in',
+                            className
+                        )}
+                    >
+                        {label}
+                        {arrow ? (
+                            <PopupArrow
+                                arrow={BaseTooltip.Arrow}
+                                className={
+                                    (typeof arrow === 'object' ? arrow.className : null) ??
+                                    'fill-tint-12'
+                                }
+                            />
+                        ) : null}
+                    </BaseTooltip.Popup>
+                </BaseTooltip.Positioner>
+            </BaseTooltip.Portal>
+        </BaseTooltip.Root>
     );
 }

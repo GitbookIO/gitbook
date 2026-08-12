@@ -1,51 +1,63 @@
 'use client';
-import * as RadixHoverCard from '@radix-ui/react-hover-card';
-
 import { tcls } from '@/lib/tailwind';
+import { PreviewCard } from '@base-ui/react/preview-card';
+import { PopupArrow } from './PopupArrow';
 
-export function HoverCardRoot(props: RadixHoverCard.HoverCardProps) {
-    return (
-        <RadixHoverCard.Root
-            openDelay={props.openDelay ?? 200}
-            closeDelay={props.closeDelay ?? 100}
-            {...props}
-        />
-    );
+export function HoverCardRoot(props: PreviewCard.Root.Props) {
+    return <PreviewCard.Root {...props} />;
 }
 
-// We wrap the Trigger child in a span to avoid react slot seeing a lazy chunk
-export function HoverCardTrigger(props: RadixHoverCard.HoverCardTriggerProps) {
-    const { children, ...rest } = props;
+// We wrap the Trigger child in a span to avoid the render prop seeing a lazy chunk
+export function HoverCardTrigger(props: {
+    children: React.ReactNode;
+    className?: string;
+    openDelay?: number;
+    closeDelay?: number;
+}) {
+    const { children, className, openDelay = 200, closeDelay = 100 } = props;
     return (
-        <RadixHoverCard.Trigger asChild {...rest}>
-            <span>{children}</span>
-        </RadixHoverCard.Trigger>
+        <PreviewCard.Trigger
+            render={<span className={className} />}
+            delay={openDelay}
+            closeDelay={closeDelay}
+        >
+            {children}
+        </PreviewCard.Trigger>
     );
 }
 
 export function HoverCard(
-    props: RadixHoverCard.HoverCardContentProps & { arrow?: RadixHoverCard.HoverCardArrowProps }
+    props: Omit<PreviewCard.Popup.Props, 'className'> & {
+        className?: string;
+        side?: PreviewCard.Positioner.Props['side'];
+        arrow?: { className?: string };
+    }
 ) {
-    const { arrow, ...cardProps } = props;
+    const { arrow, side = 'top', className, children, ...popupProps } = props;
     return (
-        <RadixHoverCard.Portal>
-            <RadixHoverCard.Content
-                side={props.side ?? 'top'}
-                className="animate-scale-in data-[state='closed']:animate-scale-out pointer-events-none z-50 w-screen max-w-md px-4 sm:w-auto"
+        <PreviewCard.Portal>
+            <PreviewCard.Positioner
+                side={side}
+                className="pointer-events-none z-50 w-screen max-w-md px-4 sm:w-auto"
             >
-                <div
-                    className={tcls(
-                        'overflow-hidden rounded-md straight-corners:rounded-none bg-tint-base shadow-lg shadow-tint-12/4 ring-1 ring-tint-subtle dark:shadow-tint-1',
-                        cardProps.className
-                    )}
+                <PreviewCard.Popup
+                    {...popupProps}
+                    className="animate-scale-in data-closed:animate-scale-out"
                 >
-                    {cardProps.children}
-                </div>
-                <RadixHoverCard.Arrow
-                    className={tcls('fill-tint-1', arrow?.className)}
-                    {...arrow}
-                />
-            </RadixHoverCard.Content>
-        </RadixHoverCard.Portal>
+                    <div
+                        className={tcls(
+                            'overflow-hidden rounded-md straight-corners:rounded-none bg-tint-base shadow-lg shadow-tint-12/4 ring-1 ring-tint-subtle dark:shadow-tint-1',
+                            className
+                        )}
+                    >
+                        {children}
+                    </div>
+                    <PopupArrow
+                        arrow={PreviewCard.Arrow}
+                        className={arrow?.className ?? 'fill-tint-1'}
+                    />
+                </PreviewCard.Popup>
+            </PreviewCard.Positioner>
+        </PreviewCard.Portal>
     );
 }

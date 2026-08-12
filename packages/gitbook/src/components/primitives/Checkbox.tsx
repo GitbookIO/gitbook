@@ -1,13 +1,12 @@
 'use client';
 
-import * as CheckboxPrimitive from '@radix-ui/react-checkbox';
-import React from 'react';
-
+import { Checkbox as BaseCheckbox } from '@base-ui/react/checkbox';
 import { Icon, IconStyle } from '@gitbook/icons';
 
 import { tcls } from '@/lib/tailwind';
 
-export type CheckboxProps = React.ComponentProps<typeof CheckboxPrimitive.Root> & {
+export type CheckboxProps = Omit<BaseCheckbox.Root.Props, 'className'> & {
+    className?: string;
     /**
      * The size of the checkbox.
      * @default medium
@@ -15,36 +14,31 @@ export type CheckboxProps = React.ComponentProps<typeof CheckboxPrimitive.Root> 
     size?: 'small' | 'medium';
 };
 
-export const Checkbox = React.forwardRef<
-    React.ElementRef<typeof CheckboxPrimitive.Root>,
-    CheckboxProps
->(({ className, size = 'medium', ...props }, ref) => (
-    <CheckboxPrimitive.Root
-        ref={ref}
-        className={tcls(
-            'peer',
-            'shrink-0',
-            'rounded-xs',
-            'straight-corners:rounded-none',
-            'ring-1',
-            'ring-tint-12/4',
-            'ring-inset',
-            'flex',
-            'items-center',
-            'justify-center',
-            'data-[state=checked]:bg-primary-original',
-            'data-[state=checked]:text-contrast-primary-original',
-            'contrast-more:ring-tint-12',
-            { small: 'size-4', medium: 'size-5' }[size],
-            className
-        )}
-        {...props}
-    >
-        <CheckboxPrimitive.Indicator className="relative text-current">
-            {props.checked ? (
-                <Icon icon="check" iconStyle={IconStyle.Solid} className={'size-3'} />
-            ) : null}
-        </CheckboxPrimitive.Indicator>
-    </CheckboxPrimitive.Root>
-));
-Checkbox.displayName = CheckboxPrimitive.Root.displayName;
+export function Checkbox({ className, size = 'medium', ...props }: CheckboxProps) {
+    return (
+        <BaseCheckbox.Root
+            className={tcls(
+                'peer',
+                'shrink-0',
+                'rounded-xs',
+                'straight-corners:rounded-none',
+                'ring-1',
+                'ring-tint-12/4',
+                'ring-inset',
+                'flex',
+                'items-center',
+                'justify-center',
+                'data-checked:bg-primary-original',
+                'data-checked:text-contrast-primary-original',
+                'contrast-more:ring-tint-12',
+                { small: 'size-4', medium: 'size-5' }[size],
+                className
+            )}
+            {...props}
+        >
+            <BaseCheckbox.Indicator className="relative text-current">
+                <Icon icon="check" iconStyle={IconStyle.Solid} className="size-3" />
+            </BaseCheckbox.Indicator>
+        </BaseCheckbox.Root>
+    );
+}

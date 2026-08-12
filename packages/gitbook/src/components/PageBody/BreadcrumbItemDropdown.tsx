@@ -75,6 +75,7 @@ export function BreadcrumbItemDropdown(props: {
         <DropdownMenu
             openOnHover
             openDelay={200}
+            nativeButton={false}
             button={trigger}
             className="max-h-72 overflow-auto text-sm"
         >

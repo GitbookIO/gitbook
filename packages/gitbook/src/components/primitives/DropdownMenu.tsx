@@ -1,16 +1,17 @@
 'use client';
 
-import * as RadixDropdownMenu from '@radix-ui/react-dropdown-menu';
-import type { DetailedHTMLProps, HTMLAttributes } from 'react';
-import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
-import { assert } from 'ts-essentials';
-
 import { Icon, type IconName } from '@gitbook/icons';
+import type { DetailedHTMLProps, HTMLAttributes } from 'react';
+import { createContext, useCallback, useContext, useState } from 'react';
 
+import { type ClassValue, tcls } from '@/lib/tailwind';
+
+import { Menu } from '@base-ui/react/menu';
+
+import { assert } from 'ts-essentials';
 import { Link, type LinkInsightsProps } from '.';
 import { ToggleChevron } from './ToggleChevron';
 import { Tooltip } from './Tooltip';
-import { type ClassValue, tcls } from '@/lib/tailwind';
 
 export type DropdownButtonProps<E extends HTMLElement = HTMLElement> = Omit<
     Partial<DetailedHTMLProps<HTMLAttributes<E>, E>>,
@@ -25,31 +26,21 @@ const DropdownMenuContext = createContext<{
     setOpen: () => {},
 });
 
-const DROPDOWN_CONTENT_OUTER_CLASS =
-    'z-50 flex max-h-(--radix-dropdown-menu-content-available-height) min-w-28 xs:min-w-40 max-w-(--radix-dropdown-menu-content-available-width) origin-top animate-scale-in flex-col pt-2 data-[state=closed]:animate-scale-out';
-const DROPDOWN_CONTENT_INNER_CLASS =
-    'flex flex-col gap-1 overflow-auto circular-corners:rounded-xl rounded-md straight-corners:rounded-none border border-tint bg-tint-base p-2 shadow-lg';
+const DROPDOWN_POSITIONER_CLASS =
+    'z-50 flex max-h-(--available-height) min-w-28 xs:min-w-40 max-w-(--available-width) flex-col pt-2 outline-hidden data-anchor-hidden:hidden';
+// The exit animation has to live on the popup: Base UI keeps it mounted until *its* animations end.
+const DROPDOWN_POPUP_CLASS =
+    'flex origin-(--transform-origin) animate-scale-in flex-col gap-1 overflow-auto circular-corners:rounded-xl rounded-md straight-corners:rounded-none border border-tint bg-tint-base p-2 shadow-lg outline-hidden data-closed:animate-scale-out';
 
-/**
- * Grace period before a hover-opened menu closes, so the pointer can travel from the trigger to the
- * (portalled) menu without it collapsing. Only used when `openDelay` is set.
- */
+/** Grace period letting the pointer travel from the trigger to the (portalled) menu. */
 const HOVER_CLOSE_DELAY_MS = 150;
-
-/** Clear a pending timeout ref, if any. */
-function clearTimer(ref: { current: ReturnType<typeof setTimeout> | null }) {
-    if (ref.current) {
-        clearTimeout(ref.current);
-        ref.current = null;
-    }
-}
 
 /**
  * Button with a dropdown.
  */
 export function DropdownMenu(props: {
     /** Content of the button */
-    button: React.ReactNode;
+    button: React.ReactElement<Record<string, unknown>>;
     /** Tooltip label for the button */
     buttonTooltip?: React.ReactNode;
     /** Content of the dropdown */
@@ -63,21 +54,23 @@ export function DropdownMenu(props: {
      * @default 0
      */
     openDelay?: number;
+    /** Whether the trigger renders a native `<button>`. */
+    nativeButton?: boolean;
     /**
      * Side of the dropdown
      * @default "bottom"
      */
-    side?: RadixDropdownMenu.DropdownMenuContentProps['side'];
+    side?: Menu.Positioner.Props['side'];
     /**
      * Alignment of the dropdown
      * @default "start"
      */
-    align?: RadixDropdownMenu.DropdownMenuContentProps['align'];
+    align?: Menu.Positioner.Props['align'];
     /**
      * Distance between the trigger and the dropdown.
      * @default 0
      */
-    sideOffset?: RadixDropdownMenu.DropdownMenuContentProps['sideOffset'];
+    sideOffset?: Menu.Positioner.Props['sideOffset'];
 }) {
     const {
         button,
@@ -86,101 +79,52 @@ export function DropdownMenu(props: {
         className,
         openOnHover = false,
         openDelay = 0,
+        nativeButton,
         side = 'bottom',
         align = 'start',
         sideOffset = 0,
     } = props;
-    const [hovered, setHovered] = useState(false);
     const [open, setOpen] = useState(false);
 
-    // Timers used to delay opening on hover (and to keep the menu open while the pointer travels
-    // between the trigger and the menu).
-    const openTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
-    const closeTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
-    // Clear any pending timers when unmounting.
-    useEffect(
-        () => () => {
-            clearTimer(openTimeout);
-            clearTimer(closeTimeout);
-        },
-        []
-    );
-
-    const handleHoverEnter = useCallback(() => {
-        clearTimer(closeTimeout);
-        if (openDelay > 0) {
-            if (!openTimeout.current) {
-                openTimeout.current = setTimeout(() => {
-                    openTimeout.current = null;
-                    setHovered(true);
-                }, openDelay);
-            }
-        } else {
-            setHovered(true);
-        }
-    }, [openDelay]);
-
-    const handleHoverLeave = useCallback(() => {
-        clearTimer(openTimeout);
-        clearTimer(closeTimeout);
-        if (openDelay > 0) {
-            // Grace period so moving between the trigger and the menu doesn't close it.
-            closeTimeout.current = setTimeout(() => {
-                closeTimeout.current = null;
-                setHovered(false);
-            }, HOVER_CLOSE_DELAY_MS);
-        } else {
-            setHovered(false);
-        }
-    }, [openDelay]);
-
-    const isOpen = openOnHover ? open || hovered : open;
-
     const trigger = (
-        <RadixDropdownMenu.Trigger
-            asChild
-            onMouseEnter={handleHoverEnter}
-            onMouseLeave={handleHoverLeave}
-            onClick={() => (openOnHover ? setOpen(!open) : null)}
+        <Menu.Trigger
+            render={button}
+            nativeButton={nativeButton}
+            openOnHover={openOnHover}
+            delay={openDelay}
+            closeDelay={HOVER_CLOSE_DELAY_MS}
             className="group/dropdown"
-        >
-            {button}
-        </RadixDropdownMenu.Trigger>
+        />
     );
 
     return (
-        <DropdownMenuContext.Provider value={{ open: isOpen, setOpen }}>
-            <RadixDropdownMenu.Root modal={false} open={isOpen} onOpenChange={setOpen}>
+        <DropdownMenuContext.Provider value={{ open, setOpen }}>
+            <Menu.Root modal={false} open={open} onOpenChange={setOpen}>
                 {buttonTooltip ? (
-                    <Tooltip
-                        label={buttonTooltip}
-                        pinOnClick={false}
-                        rootProps={{ disableHoverableContent: true }}
-                    >
+                    <Tooltip label={buttonTooltip} disableHoverablePopup>
                         {trigger}
                     </Tooltip>
                 ) : (
                     trigger
                 )}
 
-                <RadixDropdownMenu.Portal>
-                    <RadixDropdownMenu.Content
-                        data-testid="dropdown-menu"
-                        hideWhenDetached
+                <Menu.Portal>
+                    <Menu.Positioner
                         collisionPadding={8}
-                        onMouseEnter={handleHoverEnter}
-                        onMouseLeave={handleHoverLeave}
                         align={align}
                         side={side}
                         sideOffset={sideOffset}
-                        className={DROPDOWN_CONTENT_OUTER_CLASS}
+                        className={DROPDOWN_POSITIONER_CLASS}
                     >
-                        <div className={tcls(DROPDOWN_CONTENT_INNER_CLASS, className)}>
+                        <Menu.Popup
+                            data-testid="dropdown-menu"
+                            className={tcls(DROPDOWN_POPUP_CLASS, className)}
+                        >
                             {children}
-                        </div>
-                    </RadixDropdownMenu.Content>
-                </RadixDropdownMenu.Portal>
-            </RadixDropdownMenu.Root>
+                        </Menu.Popup>
+                    </Menu.Positioner>
+                </Menu.Portal>
+            </Menu.Root>
         </DropdownMenuContext.Provider>
     );
 }
@@ -188,7 +132,10 @@ export function DropdownMenu(props: {
 /**
  * Button with a chevron for use in dropdowns.
  */
-export function DropdownButton(props: { children: React.ReactNode; className?: ClassValue }) {
+export function DropdownButton(props: {
+    children: React.ReactNode;
+    className?: ClassValue;
+}) {
     const { children, className } = props;
 
     return (
@@ -211,7 +158,7 @@ export function DropdownMenuItem(
         children: React.ReactNode;
         leadingIcon?: IconName | React.ReactNode;
     } & LinkInsightsProps &
-        RadixDropdownMenu.DropdownMenuItemProps
+        Omit<Menu.Item.Props, 'className' | 'render'>
 ) {
     const {
         children,
@@ -247,20 +194,22 @@ export function DropdownMenuItem(
 
     if (href) {
         return (
-            <RadixDropdownMenu.Item {...rest} asChild>
-                <Link href={href} insights={insights} className={itemClassName} target={target}>
-                    {icon}
-                    {children}
-                </Link>
-            </RadixDropdownMenu.Item>
+            <Menu.Item
+                {...rest}
+                className={itemClassName}
+                render={<Link href={href} insights={insights} target={target} />}
+            >
+                {icon}
+                {children}
+            </Menu.Item>
         );
     }
 
     return (
-        <RadixDropdownMenu.Item {...rest} className={tcls('px-3 py-1', itemClassName, className)}>
+        <Menu.Item {...rest} className={tcls('px-3 py-1', itemClassName, className)}>
             {icon}
             {children}
-        </RadixDropdownMenu.Item>
+        </Menu.Item>
     );
 }
 
@@ -268,28 +217,24 @@ export function DropdownSubMenu(props: { children: React.ReactNode; label: React
     const { children, label } = props;
 
     return (
-        <RadixDropdownMenu.Sub>
-            <RadixDropdownMenu.SubTrigger className="straight-corners:rounded-xs focus:outline-hidden data-highlighted:bg-tint-hover flex cursor-pointer items-center justify-between rounded-sm px-3 py-1 text-sm">
+        <Menu.SubmenuRoot>
+            <Menu.SubmenuTrigger className="flex cursor-pointer items-center justify-between rounded-sm straight-corners:rounded-xs px-3 py-1 text-sm focus:outline-hidden data-highlighted:bg-tint-hover">
                 {label}
                 <Icon icon="chevron-right" className="size-3 shrink-0 opacity-6" />
-            </RadixDropdownMenu.SubTrigger>
-            <RadixDropdownMenu.Portal>
-                <RadixDropdownMenu.SubContent
-                    hideWhenDetached
-                    collisionPadding={8}
-                    className={DROPDOWN_CONTENT_OUTER_CLASS}
-                >
-                    <div className={DROPDOWN_CONTENT_INNER_CLASS}>{children}</div>
-                </RadixDropdownMenu.SubContent>
-            </RadixDropdownMenu.Portal>
-        </RadixDropdownMenu.Sub>
+            </Menu.SubmenuTrigger>
+            <Menu.Portal>
+                <Menu.Positioner collisionPadding={8} className={DROPDOWN_POSITIONER_CLASS}>
+                    <Menu.Popup className={DROPDOWN_POPUP_CLASS}>{children}</Menu.Popup>
+                </Menu.Positioner>
+            </Menu.Portal>
+        </Menu.SubmenuRoot>
     );
 }
 
 export function DropdownMenuSeparator(props: { className?: ClassValue }) {
     const { className } = props;
     return (
-        <RadixDropdownMenu.Separator
+        <Menu.Separator
             className={tcls('my-1 h-px w-full border-tint-subtle border-t', className)}
         />
     );

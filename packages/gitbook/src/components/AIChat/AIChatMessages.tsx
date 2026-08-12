@@ -1,7 +1,8 @@
-import { Fragment } from 'react';
-
+import { useLanguage } from '@/intl/client';
+import { t, tString } from '@/intl/translate';
+import { tcls } from '@/lib/tailwind';
 import { AIMessageRole } from '@gitbook/api';
-
+import { Fragment } from 'react';
 import {
     type AIChatController,
     type AIChatMessage,
@@ -11,22 +12,22 @@ import {
 import { ToggleChevron } from '../primitives';
 import { Button } from '../primitives/Button';
 import { Collapsible, CollapsibleTrigger } from '../primitives/Collapsible';
-import { AIChatFollowupSuggestions } from './AiChatFollowupSuggestions';
 import { AIChatReferenceChips } from './AIChatReferenceChips';
 import { AIResponseFeedback } from './AIResponseFeedback';
-import { useLanguage } from '@/intl/client';
-import { t, tString } from '@/intl/translate';
-import { tcls } from '@/lib/tailwind';
+import { AIChatFollowupSuggestions } from './AiChatFollowupSuggestions';
 
-export function AIChatMessages(props: { chat: AIChatState; chatController: AIChatController }) {
+export function AIChatMessages(props: {
+    chat: AIChatState;
+    chatController: AIChatController;
+}) {
     const { chat, chatController } = props;
     const status = getAIChatStatus(chat);
     const showLoadingShim = chat.responding && status !== 'working' && status !== 'done';
 
     // Group messages: user messages start a new group, all following messages until next user message belong to that group
     type MessageGroup = { message: AIChatMessage; originalIndex: number };
-    const messageGroups: MessageGroup[][] = [];
-    let currentGroup: MessageGroup[] = [];
+    const messageGroups: Array<Array<MessageGroup>> = [];
+    let currentGroup: Array<MessageGroup> = [];
 
     chat.messages.forEach((message, index) => {
         if (message.role === AIMessageRole.User) {
@@ -130,32 +131,34 @@ export function AIChatMessages(props: { chat: AIChatState; chatController: AICha
                         }}
                     >
                         {hasCommentary && hasFinalAnswer ? (
-                            <CollapsibleTrigger asChild>
-                                <Button
-                                    variant="blank"
-                                    size="small"
-                                    label={tString(language, 'ai_chat_view_activity')}
-                                    className="group/dropdown animate-blur-in-display-slow -mx-3 -my-1.5 self-start"
-                                >
-                                    <div className="flex items-center gap-2">
-                                        <span data-testid="ai-chat-activity-summary">
-                                            {toolCount > 0
-                                                ? t(
+                            <CollapsibleTrigger
+                                render={
+                                    <Button
+                                        variant="blank"
+                                        size="small"
+                                        label={tString(language, 'ai_chat_view_activity')}
+                                        className="-mx-3 -my-1.5 group/dropdown animate-blur-in-display-slow self-start"
+                                    />
+                                }
+                            >
+                                <div className="flex items-center gap-2">
+                                    <span data-testid="ai-chat-activity-summary">
+                                        {toolCount > 0
+                                            ? t(
+                                                  language,
+                                                  'ai_chat_explored_with',
+                                                  tString(
                                                       language,
-                                                      'ai_chat_explored_with',
-                                                      tString(
-                                                          language,
-                                                          toolCount === 1
-                                                              ? 'tool_count'
-                                                              : 'tool_count_plural',
-                                                          toolCount.toString()
-                                                      )
+                                                      toolCount === 1
+                                                          ? 'tool_count'
+                                                          : 'tool_count_plural',
+                                                      toolCount.toString()
                                                   )
-                                                : t(language, 'ai_chat_explored')}
-                                        </span>
-                                        <ToggleChevron orientation="right-to-down" />
-                                    </div>
-                                </Button>
+                                              )
+                                            : t(language, 'ai_chat_explored')}
+                                    </span>
+                                    <ToggleChevron orientation="right-to-down" />
+                                </div>
                             </CollapsibleTrigger>
                         ) : null}
 
@@ -212,10 +215,7 @@ export function AIChatMessages(props: { chat: AIChatState; chatController: AICha
 export function HoldMessage({
     breakLines = false,
     className,
-}: {
-    breakLines?: boolean;
-    className?: string;
-}) {
+}: { breakLines?: boolean; className?: string }) {
     const language = useLanguage();
 
     return (
@@ -262,7 +262,7 @@ function LoadingSkeleton() {
             {Array.from({ length: 7 }).map((_, index) => (
                 <div
                     key={index}
-                    className="h-4 animate-[blurIn_500ms_ease-out_both,pulse_1.5s_infinite] bg-tint-solid/2 rounded-corners:rounded-md circular-corners:rounded-2xl"
+                    className="h-4 animate-[blurIn_500ms_ease-out_both,pulse_1.5s_infinite] circular-corners:rounded-2xl rounded-corners:rounded-md bg-tint-solid/2"
                     style={{
                         width: `calc(${(4 - (index % 4)) * 8 + 14}% - 4px)`,
                         animationDelay: `${index * 0.1}s`,

@@ -1,21 +1,18 @@
 'use client';
 
-import Panzoom from '@panzoom/panzoom';
-import type { RenderResult } from 'mermaid';
 import { useTheme } from 'next-themes';
 import { useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { FocusScope, usePreventScroll } from 'react-aria';
 import { createPortal } from 'react-dom';
 
-import { type ClientBlockProps, ClientCodeBlock } from './ClientCodeBlock';
-import { getPlainCodeBlock } from './highlight-tokens';
-import { MermaidPanZoomControls } from './MermaidPanZoomControls';
 import { useHasBeenInViewport } from '@/components/hooks/useHasBeenInViewport';
 import { Loading } from '@/components/primitives/Loading';
 import { tcls } from '@/lib/tailwind';
-
-/** Duration of the fullscreen dialog enter/exit animation, must match `animate-blur-in/out`. */
-const DIALOG_ANIMATION_MS = 200;
+import { Dialog } from '@base-ui/react/dialog';
+import Panzoom from '@panzoom/panzoom';
+import type { RenderResult } from 'mermaid';
+import { type ClientBlockProps, ClientCodeBlock } from './ClientCodeBlock';
+import { MermaidPanZoomControls } from './MermaidPanZoomControls';
+import { getPlainCodeBlock } from './highlight-tokens';
 
 /**
  * Used to render a Mermaid diagram from a CodeBlock.
@@ -45,11 +42,10 @@ export function MermaidCodeBlock(
     const [panZoom, setPanZoom] = useState<ReturnType<typeof Panzoom> | null>(null);
     const [error, setError] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
-    // `isFullscreen` is the open intent; `isExiting` keeps the dialog mounted while it
-    // animates closed. `isPresent` is true whenever the diagram lives in the dialog.
+    // `isFullscreen` is the open intent; `isPresent` tracks where the diagram actually lives, and
+    // stays true through the closing animation until the panel hands the host back.
     const [isFullscreen, setIsFullscreen] = useState(false);
-    const [isExiting, setIsExiting] = useState(false);
-    const isPresent = isFullscreen || isExiting;
+    const [isPresent, setIsPresent] = useState(false);
     const { resolvedTheme } = useTheme();
     const darkMode = resolvedTheme === 'dark';
     const id = useSafeId();
@@ -123,9 +119,6 @@ export function MermaidCodeBlock(
         };
     }, [source, id, darkMode, mermaidRuntimeURL, shouldRender]);
 
-    // Lock the page scroll while the dialog is on screen (handles scrollbar width and iOS).
-    usePreventScroll({ isDisabled: !isPresent });
-
     const openFullscreen = useCallback(() => {
         // Reserve the inline slot's current height before the diagram is detached, so the
         // page layout does not jump. Measured here while still inline and un-restyled.
@@ -133,7 +126,7 @@ export function MermaidCodeBlock(
         if (root) {
             root.style.minHeight = `${root.offsetHeight}px`;
         }
-        setIsExiting(false);
+        setIsPresent(true);
         setIsFullscreen(true);
         // Re-center the diagram for the larger view.
         panZoom?.reset();
@@ -141,37 +134,7 @@ export function MermaidCodeBlock(
 
     const closeFullscreen = useCallback(() => {
         setIsFullscreen(false);
-        setIsExiting(true);
     }, []);
-
-    // Keep the dialog mounted until the exit animation finishes, then unmount it.
-    useEffect(() => {
-        if (!isExiting) {
-            return;
-        }
-
-        const timer = window.setTimeout(() => {
-            setIsExiting(false);
-            panZoom?.reset();
-        }, DIALOG_ANIMATION_MS);
-        return () => window.clearTimeout(timer);
-    }, [isExiting, panZoom]);
-
-    // Allow Escape to close the dialog.
-    useEffect(() => {
-        if (!isFullscreen) {
-            return;
-        }
-
-        const onKeyDown = (event: KeyboardEvent) => {
-            if (event.key === 'Escape') {
-                closeFullscreen();
-            }
-        };
-
-        document.addEventListener('keydown', onKeyDown);
-        return () => document.removeEventListener('keydown', onKeyDown);
-    }, [isFullscreen, closeFullscreen]);
 
     // Keep the diagram host in the inline slot on mount (and whenever it isn't in the dialog).
     useLayoutEffect(() => {
@@ -183,7 +146,7 @@ export function MermaidCodeBlock(
     }, []);
 
     // Move the diagram host into the dialog panel (and back) as the panel mounts/unmounts.
-    // Done in the panel's ref callback so it happens during commit, before FocusScope reads
+    // Done in the panel's ref callback so it happens during commit, before the dialog reads
     // focus. The inline slot's reserved height (set in openFullscreen) is cleared on return.
     const setPanel = useCallback((panel: HTMLDivElement | null) => {
         panelRef.current = panel;
@@ -198,6 +161,7 @@ export function MermaidCodeBlock(
         } else if (root) {
             root.appendChild(host);
             root.style.minHeight = '';
+            setIsPresent(false);
         }
     }, []);
 
@@ -253,36 +217,20 @@ export function MermaidCodeBlock(
             {/* Inline slot: hosts the diagram in the document flow until it goes fullscreen. */}
             <div ref={rootRef} className={tcls('relative', style)} contentEditable={false} />
             {diagramHostRef.current ? createPortal(diagram, diagramHostRef.current) : null}
-            {isPresent
-                ? createPortal(
-                      <FocusScope contain restoreFocus>
-                          {/* Backdrop: dims and blurs the page, closes on click. */}
-                          {/* oxlint-disable-next-line jsx-a11y/click-events-have-key-events */}
-                          <div
-                              aria-hidden="true"
-                              className={tcls(
-                                  'fixed inset-0 z-40 bg-tint-base/3 backdrop-blur-md dark:bg-tint-base/6',
-                                  isFullscreen ? 'animate-fade-in' : 'animate-fade-out'
-                              )}
-                              onClick={closeFullscreen}
-                          />
-                          {/* Centered panel. The padding area lets clicks fall through to the backdrop. */}
-                          <div className="pointer-events-none fixed inset-0 z-40 flex items-center justify-center p-3 sm:p-5 lg:p-8">
-                              <div
-                                  ref={setPanel}
-                                  role="dialog"
-                                  aria-modal="true"
-                                  aria-label="Mermaid diagram"
-                                  className={tcls(
-                                      'pointer-events-auto relative flex h-full w-full max-w-[110rem] flex-col overflow-hidden rounded-2xl border border-tint-subtle bg-tint-base shadow-2xl',
-                                      isFullscreen ? 'animate-blur-in' : 'animate-blur-out'
-                                  )}
-                              />
-                          </div>
-                      </FocusScope>,
-                      document.body
-                  )
-                : null}
+            <Dialog.Root
+                open={isFullscreen}
+                onOpenChange={(open) => !open && closeFullscreen()}
+                onOpenChangeComplete={(open) => !open && panZoom?.reset()}
+            >
+                <Dialog.Portal>
+                    <Dialog.Backdrop className="fixed inset-0 z-40 bg-tint-base/3 backdrop-blur-md data-closed:animate-fade-out data-open:animate-fade-in dark:bg-tint-base/6" />
+                    <Dialog.Popup
+                        aria-label="Mermaid diagram"
+                        render={<div ref={setPanel} />}
+                        className="fixed inset-3 z-40 mx-auto flex max-w-[110rem] flex-col overflow-hidden rounded-2xl border border-tint-subtle bg-tint-base shadow-2xl outline-hidden data-closed:animate-blur-out data-open:animate-blur-in sm:inset-5 lg:inset-8"
+                    />
+                </Dialog.Portal>
+            </Dialog.Root>
         </>
     );
 }
@@ -341,7 +289,7 @@ function createMermaidRenderContainer() {
 }
 
 let mermaidLoadPromise: Promise<{
-    mermaid: (typeof import('mermaid'))['default'];
+    mermaid: typeof import('mermaid')['default'];
 }> | null = null;
 
 async function loadMermaid(runtimeURL: string) {
@@ -349,7 +297,7 @@ async function loadMermaid(runtimeURL: string) {
         mermaidLoadPromise = import(/* webpackIgnore: true */ runtimeURL)
             .then(
                 async (runtime: {
-                    loadMermaid: () => Promise<(typeof import('mermaid'))['default']>;
+                    loadMermaid: () => Promise<typeof import('mermaid')['default']>;
                 }) => {
                     return { mermaid: await runtime.loadMermaid() };
                 }
