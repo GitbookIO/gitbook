@@ -136,7 +136,7 @@ export async function Header(props: {
                                           'md:@2xl:max-w-[50%]',
                                           'md:@4xl:max-w-lg',
                                           'lg:@2xl:ml-[max(calc((100%-18rem-48rem)/2),1.5rem)]', // container (100%) - sidebar (18rem) - content (48rem)
-                                          'not-chat-open:xl:ml-[max(calc((100%-18rem-48rem-14rem-3rem)/2),1.5rem)]', // container (100%) - sidebar (18rem) - content (48rem) - outline (14rem) - margin (3rem)
+                                          'chat-closed:xl:ml-[max(calc((100%-18rem-48rem-14rem-3rem)/2),1.5rem)]', // container (100%) - sidebar (18rem) - content (48rem) - outline (14rem) - margin (3rem)
                                           'md:@2xl:mr-auto',
                                           'order-last',
                                           'md:@2xl:order-[unset]',
