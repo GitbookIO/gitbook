@@ -1,3 +1,5 @@
+import type { SiteVisitorPayload } from '@gitbook/api';
+import { isAIAgent } from '@vercel/agent-readability';
 import { type JwtPayload, jwtDecode } from 'jwt-decode';
 import { type NextRequest, NextResponse } from 'next/server';
 import hash from 'object-hash';
@@ -86,6 +88,16 @@ export type VisitorTokenLookup =
       }
     /** Not visitor token was found */
     | undefined;
+
+/**
+ * Get the type of visitor, i.e human or agent, accessing the published site.
+ */
+export function getVisitorType(request: { headers: Headers }): NonNullable<
+    SiteVisitorPayload['type']
+> {
+    const detection = isAIAgent(request);
+    return detection.detected && detection.method !== 'heuristic' ? 'agent' : 'human';
+}
 
 /**
  * Get the visitor data for the request potentially including:
