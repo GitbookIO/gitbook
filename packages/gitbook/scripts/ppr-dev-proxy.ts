@@ -159,10 +159,15 @@ const DECODED_RESPONSE_HEADERS = ['content-encoding', 'content-length', 'transfe
 
 async function forward(request: Request, url: URL, headers: Headers): Promise<Response> {
     const hasBody = request.method !== 'GET' && request.method !== 'HEAD';
+    const upstreamURL = new URL(url.pathname + url.search, UPSTREAM);
+
+    // `/url/` mode is only enabled for requests on the app's own host (`GITBOOK_URL`), so the proxy
+    // host must not leak through: the app would treat it as a custom domain and 404.
+    headers.set('host', upstreamURL.host);
 
     let response: Response;
     try {
-        response = await fetch(new URL(url.pathname + url.search, UPSTREAM), {
+        response = await fetch(upstreamURL, {
             method: request.method,
             headers,
             body: hasBody ? request.body : undefined,
