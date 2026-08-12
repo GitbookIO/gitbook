@@ -43,7 +43,8 @@ export type PPRRouteParams = PPRRouteLayoutParams & {
  */
 export async function getStaticSiteContext(
     params: RouteLayoutParams,
-    getClaims = getVisitorAuthClaimsFromToken
+    getClaims = getVisitorAuthClaimsFromToken,
+    options?: { ppr?: true }
 ) {
     const siteURL = getSiteURLFromParams(params);
     const siteURLData = getSiteURLDataFromParams(params);
@@ -60,6 +61,7 @@ export async function getStaticSiteContext(
             siteURL,
             siteURLData,
             urlMode: getModeFromParams(params.mode),
+            ...(options?.ppr ? { ppr: options.ppr } : {}),
         }),
         siteURLData
     );
@@ -224,7 +226,7 @@ export function getPPRTableOfContentsRouteParams(params: PPRRouteLayoutParams): 
 }
 
 export async function getPPRStaticSiteContext(params: RouteLayoutParams) {
-    return getStaticSiteContext(params, getPPRVisitorAuthClaimsFromToken);
+    return getStaticSiteContext(params, getPPRVisitorAuthClaimsFromToken, { ppr: true });
 }
 
 function getPPRRouteParam(encodedParam: string, name: string): string {
