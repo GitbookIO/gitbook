@@ -284,6 +284,11 @@ body {
     @apply size-2.5;
 }
 
+/* Same size as the play icon it replaces, so the button doesn't shift while loading. */
+.scalar-activate-button .scalar-activate-spinner {
+    @apply animate-spin motion-reduce:animate-none;
+}
+
 .scalar-app-loading {
     flex: 1;
     display: flex;
