@@ -674,11 +674,9 @@ const config: Config = {
              * Variant when the Table of Content navigation is open.
              */
             addVariant('navigation-open', 'body.navigation-open &');
-            addVariant('chat-open', 'body:has(.ai-chat[aria-expanded="true"]) &');
-            addVariant(
-                'sheet-open',
-                'html:has(.side-sheet[aria-modal="true"][aria-expanded="true"]) &, &:has(.side-sheet[aria-modal="true"][aria-expanded="true"])'
-            );
+            addVariant('chat-open', 'html[data-ai-chat-open="true"] &');
+            /* Second selector targets the elements carrying the attribute themselves (<html>). */
+            addVariant('sheet-open', ['html[data-sheet-open] &', '&[data-sheet-open]']);
 
             /**
              * Variant when a header is displayed.

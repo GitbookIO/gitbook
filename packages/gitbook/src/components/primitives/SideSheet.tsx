@@ -143,6 +143,18 @@ export function SideSheet(
         return () => observer.disconnect();
     }, [toggleClass, openState, onOpenChange]);
 
+    React.useEffect(() => {
+        if (!isModal || !isOpen) {
+            return;
+        }
+
+        document.documentElement.setAttribute('data-sheet-open', '');
+
+        return () => {
+            document.documentElement.removeAttribute('data-sheet-open');
+        };
+    }, [isModal, isOpen]);
+
     // Handle Escape key press to close the modal sheet
     React.useEffect(() => {
         if (!isModal || !isOpen) {

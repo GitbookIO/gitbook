@@ -202,6 +202,13 @@ const globalState = zustand.create<AIChatState>(() => {
     };
 });
 
+// Mirrored onto <html> because CSS (the `chat-open` variant) can't read the store.
+globalState.subscribe((state, prev) => {
+    if (state.opened !== prev.opened) {
+        document.documentElement.dataset.aiChatOpen = String(state.opened);
+    }
+});
+
 /**
  * Get the current state of the AI chat.
  */

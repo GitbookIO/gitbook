@@ -64,6 +64,13 @@ export function AIChat() {
         []
     );
 
+    // AI chat can be disabled per space, so this view can go away while the store says opened.
+    React.useEffect(() => {
+        return () => {
+            delete document.documentElement.dataset.aiChatOpen;
+        };
+    }, []);
+
     // Track the view of the AI chat
     const trackEvent = useTrackEvent();
     React.useEffect(() => {
