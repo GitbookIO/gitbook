@@ -31,6 +31,7 @@ export type OpenAPIBlockClientContextProps = {
     /** Rendered on the server: both go through the async document pipeline. */
     headingNode: React.ReactNode;
     descriptionNode: React.ReactNode;
+    scalarRuntimeURL: string;
 };
 
 type OpenAPIBlockVariant =
@@ -62,6 +63,7 @@ export function OpenAPIBlockClient(props: OpenAPIBlockClientProps) {
         renderDocument: () => descriptionNode,
         renderHeading: () => headingNode,
         resolveProxyUrl: proxyUrl ? () => proxyUrl : undefined,
+        scalarRuntimeURL: props.scalarRuntimeURL,
     };
 
     switch (props.variant) {
