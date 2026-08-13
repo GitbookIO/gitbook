@@ -675,6 +675,9 @@ const config: Config = {
              */
             addVariant('navigation-open', 'body.navigation-open &');
             addVariant('chat-open', 'body:has(.ai-chat[aria-expanded="true"]) &');
+            /* Use this over `not-chat-open:`, which Tailwind emits as `&:not(body:has(…) *)` —
+               a universal subject under `:has()` invalidates the whole document on any DOM change. */
+            addVariant('chat-closed', 'body:not(:has(.ai-chat[aria-expanded="true"])) &');
             addVariant(
                 'sheet-open',
                 'html:has(.side-sheet[aria-modal="true"][aria-expanded="true"]) &, &:has(.side-sheet[aria-modal="true"][aria-expanded="true"])'

@@ -1,5 +1,6 @@
 'use client';
 
+import '@scalar/api-client-react/style.css';
 import {
     type ComponentType,
     type ReactNode,

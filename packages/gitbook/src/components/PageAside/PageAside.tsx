@@ -79,18 +79,18 @@ export async function PageAside(props: {
 
                 'lg:z-10',
                 'lg:hover:z-12',
-                'layout-default:xl:not-chat-open:pr-0',
-                'layout-default:xl:not-chat-open:pl-8',
-                'layout-default:xl:not-chat-open:flex!',
-                'layout-default:xl:not-chat-open:animate-none!',
+                'layout-default:xl:chat-closed:pr-0',
+                'layout-default:xl:chat-closed:pl-8',
+                'layout-default:xl:chat-closed:flex!',
+                'layout-default:xl:chat-closed:animate-none!',
                 'layout-default:3xl:flex!',
                 'layout-default:3xl:animate-none!',
 
                 // In layout-wide mode, hide outline when viewport is too narrow
                 // or when chat is open and viewport is narrow, to prevent layout overflow
                 'layout-wide:xl:-mr-68',
-                'layout-wide:3xl:not-chat-open:flex!',
-                'layout-wide:3xl:not-chat-open:animate-none!',
+                'layout-wide:3xl:chat-closed:flex!',
+                'layout-wide:3xl:chat-closed:animate-none!',
 
                 // Show outline if page has OpenAPI block
                 // TODO: remove this in favour of a nicer, more immediately accessible solution in the future.
