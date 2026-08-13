@@ -1,13 +1,14 @@
 import type { OpenAPIV3 } from '@gitbook/openapi-parser';
+
+import { type CodeSampleGenerator, codeSampleGenerators, parseHostAndPath } from './code-samples';
+import { type OpenAPIContext, getOpenAPIClientContext } from './context';
+import { generateMediaTypeExamples, generateSchemaExample } from './generateSchemaExample';
 import {
     OpenAPIMediaTypeExamplesBody,
     OpenAPIMediaTypeExamplesSelector,
 } from './OpenAPICodeSampleInteractive';
 import { OpenAPICodeSampleBody } from './OpenAPICodeSampleSelector';
 import { ScalarApiButton } from './ScalarApiButton';
-import { type CodeSampleGenerator, codeSampleGenerators, parseHostAndPath } from './code-samples';
-import { type OpenAPIContext, getOpenAPIClientContext } from './context';
-import { generateMediaTypeExamples, generateSchemaExample } from './generateSchemaExample';
 import { stringifyOpenAPI } from './stringifyOpenAPI';
 import type { OpenAPIOperationData } from './types';
 import { mergeHeaders } from './util/headers';
@@ -29,10 +30,7 @@ const CUSTOM_CODE_SAMPLES_KEYS = ['x-custom-examples', 'x-code-samples', 'x-code
  * Display code samples to execute the operation.
  * It supports the Redocly custom syntax as well (https://redocly.com/docs/api-reference-docs/specification-extensions/x-code-samples/)
  */
-export function OpenAPICodeSample(props: {
-    data: OpenAPIOperationData;
-    context: OpenAPIContext;
-}) {
+export function OpenAPICodeSample(props: { data: OpenAPIOperationData; context: OpenAPIContext }) {
     const { data, context } = props;
 
     // If code samples are disabled at operation level, we don't display the code samples.
@@ -67,10 +65,7 @@ export function OpenAPICodeSample(props: {
 /**
  * Generate code samples for the operation.
  */
-function generateCodeSamples(props: {
-    data: OpenAPIOperationData;
-    context: OpenAPIContext;
-}) {
+function generateCodeSamples(props: { data: OpenAPIOperationData; context: OpenAPIContext }) {
     const { data, context } = props;
 
     const searchParams = new URLSearchParams();
@@ -203,10 +198,10 @@ function generateCodeSamples(props: {
 export interface MediaTypeRenderer {
     mediaType: string;
     element: React.ReactNode;
-    examples: Array<{
+    examples: {
         example: OpenAPIV3.ExampleObject;
         element: React.ReactNode;
-    }>;
+    }[];
 }
 
 function OpenAPICodeSampleFooter(props: {
@@ -290,17 +285,16 @@ function resolveScalarClientContext(
 /**
  * Get custom code samples for the operation.
  */
-function getCustomCodeSamples(props: {
-    data: OpenAPIOperationData;
-    context: OpenAPIContext;
-}) {
+function getCustomCodeSamples(props: { data: OpenAPIOperationData; context: OpenAPIContext }) {
     const { data, context } = props;
 
-    let customCodeSamples: null | Array<{
-        key: string;
-        label: string;
-        body: React.ReactNode;
-    }> = null;
+    let customCodeSamples:
+        | null
+        | {
+              key: string;
+              label: string;
+              body: React.ReactNode;
+          }[] = null;
 
     CUSTOM_CODE_SAMPLES_KEYS.forEach((key) => {
         const customSamples = data.operation[key];

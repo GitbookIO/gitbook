@@ -1,5 +1,6 @@
 import type { Plugin } from '@scalar/json-magic/bundle';
 import type { AnyObject, ErrorObject } from '@scalar/openapi-parser';
+
 import { OpenAPIParseError } from './error';
 import type { Filesystem, OpenAPIV3xDocument } from './types';
 import { convertOpenAPIV2ToOpenAPIV3 } from './v2';

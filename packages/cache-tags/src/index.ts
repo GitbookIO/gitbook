@@ -1,14 +1,15 @@
-import type { ComputedContentSource } from '@gitbook/api';
 import assertNever from 'assert-never';
+
+import type { ComputedContentSource } from '@gitbook/api';
 
 /**
  * Get a stringified cache tag for a given object.
  */
 export function getCacheTag(
     spec: /**
-     * All data related to a user
-     * @deprecated - in v2, no tag as this is an immutable data
-     */
+         * All data related to a user
+         * @deprecated - in v2, no tag as this is an immutable data
+         */
         | {
               tag: 'user';
               user: string;

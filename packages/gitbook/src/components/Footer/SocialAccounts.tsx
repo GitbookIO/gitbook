@@ -4,6 +4,7 @@ import {
     SiteSocialAccountPlatform,
 } from '@gitbook/api';
 import type { IconName } from '@gitbook/icons';
+
 import { Button, type ButtonProps, DropdownMenuItem } from '../primitives';
 
 type SocialPlatformData = {
@@ -106,9 +107,7 @@ export function SocialAccountButton(
     );
 }
 
-export function SocialAccountLink(props: {
-    account: SiteSocialAccount;
-}) {
+export function SocialAccountLink(props: { account: SiteSocialAccount }) {
     const { account } = props;
     const platform = SOCIAL_PLATFORMS[account.platform];
 

@@ -1,3 +1,5 @@
+import classNames from 'classnames';
+
 import type {
     ContentKitButton,
     ContentKitCheckbox,
@@ -8,7 +10,7 @@ import type {
     ContentKitSwitch,
     ContentKitTextInput,
 } from '@gitbook/api';
-import classNames from 'classnames';
+
 import { ElementButton } from './ElementButton';
 import { ElementCodeBlock } from './ElementCodeBlock';
 import { ElementIcon } from './ElementIcon';

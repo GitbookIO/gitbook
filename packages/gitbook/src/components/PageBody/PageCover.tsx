@@ -1,16 +1,16 @@
-import type { GitBookSiteContext } from '@/lib/context';
-import type { RevisionPageDocument, RevisionPageDocumentCover } from '@gitbook/api';
 import type { StaticImageData } from 'next/image';
-
-import { getImageAttributes } from '@/components/utils';
-import { type ResolvedContentRef, resolveContentRef } from '@/lib/references';
-import { tcls } from '@/lib/tailwind';
-
 import { assert } from 'ts-essentials';
+
+import type { RevisionPageDocument, RevisionPageDocumentCover } from '@gitbook/api';
+
 import { CONTENT_STYLE } from '../layout';
-import { PageCoverImage } from './PageCoverImage';
 import { getCoverHeight } from './coverHeight';
 import defaultPageCoverSVG from './default-page-cover.svg';
+import { PageCoverImage } from './PageCoverImage';
+import { getImageAttributes } from '@/components/utils';
+import type { GitBookSiteContext } from '@/lib/context';
+import { type ResolvedContentRef, resolveContentRef } from '@/lib/references';
+import { tcls } from '@/lib/tailwind';
 
 const defaultPageCover = defaultPageCoverSVG as StaticImageData;
 

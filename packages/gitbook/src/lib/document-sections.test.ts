@@ -1,7 +1,9 @@
 import { describe, expect, it, mock } from 'bun:test';
-import type { GitBookAnyContext } from '@/lib/context';
-import type { JSONDocument } from '@gitbook/api';
 import { type ReactNode, isValidElement } from 'react';
+
+import type { JSONDocument } from '@gitbook/api';
+
+import type { GitBookAnyContext } from '@/lib/context';
 
 mock.module('./openapi/resolveOpenAPIOperationBlock', () => ({
     resolveOpenAPIOperationBlock: async () => ({ data: null }),

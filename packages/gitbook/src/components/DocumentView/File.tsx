@@ -1,15 +1,15 @@
-import { t } from '@/intl/translate';
-import { getSimplifiedContentType } from '@/lib/files';
-import { resolveContentRefInDocument } from '@/lib/references';
 import { type DocumentBlockFile, SiteInsightsLinkPosition } from '@gitbook/api';
 
-import { getSpaceLanguage } from '@/intl/server';
 import { Button, Link } from '../primitives';
 import { DownloadButton } from '../primitives/DownloadButton';
 import { Image } from '../utils';
 import type { BlockProps } from './Block';
 import { Caption } from './Caption';
 import { FileIcon } from './FileIcon';
+import { getSpaceLanguage } from '@/intl/server';
+import { t } from '@/intl/translate';
+import { getSimplifiedContentType } from '@/lib/files';
+import { resolveContentRefInDocument } from '@/lib/references';
 
 export async function File(props: BlockProps<DocumentBlockFile>) {
     const { document, block, context } = props;
@@ -42,7 +42,7 @@ export async function File(props: BlockProps<DocumentBlockFile>) {
     return (
         <Caption {...props} withBorder>
             <div className="flex flex-wrap items-center gap-5 px-5 py-3">
-                <div className="flex min-h-8 min-w-14 flex-col items-center justify-center gap-1 border-tint-subtle border-r pr-4">
+                <div className="flex min-h-8 min-w-14 flex-col items-center justify-center gap-1 border-r border-tint-subtle pr-4">
                     {contentType === 'image' ? (
                         <Image
                             alt={file.name}

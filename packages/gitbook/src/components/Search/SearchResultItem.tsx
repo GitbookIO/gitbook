@@ -1,8 +1,10 @@
-import { tcls } from '@/lib/tailwind';
-import { Icon, type IconName } from '@gitbook/icons';
 import * as React from 'react';
+
+import { Icon, type IconName } from '@gitbook/icons';
+
 import { Button } from '../primitives';
 import { Link, type LinkInsightsProps } from '../primitives/Link';
+import { tcls } from '@/lib/tailwind';
 
 export const SearchResultItem = React.forwardRef(function SearchResultItem(
     props: {

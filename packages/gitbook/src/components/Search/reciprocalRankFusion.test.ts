@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'bun:test';
+
 import { type MergedPageResult, getResultKey, reciprocalRankFusion } from './reciprocalRankFusion';
 import type { OrderedComputedResult } from './search-types';
 import type { LocalPageResult } from './useLocalSearchResults';

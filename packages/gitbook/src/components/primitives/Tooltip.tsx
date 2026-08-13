@@ -1,8 +1,9 @@
 'use client';
 
-import { tcls } from '@/lib/tailwind';
 import * as RadixTooltip from '@radix-ui/react-tooltip';
 import { useState } from 'react';
+
+import { tcls } from '@/lib/tailwind';
 
 export type TooltipProps = {
     rootProps?: RadixTooltip.TooltipProps;

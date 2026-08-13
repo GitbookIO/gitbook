@@ -4,6 +4,7 @@ import classNames from 'classnames';
 import type React from 'react';
 
 import type { ContentKitCard } from '@gitbook/api';
+
 import { useContentKitClientContext } from './context';
 import type { ContentKitClientElementProps } from './types';
 

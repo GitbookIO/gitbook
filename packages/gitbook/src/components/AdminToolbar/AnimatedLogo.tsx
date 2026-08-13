@@ -1,6 +1,7 @@
-import { tcls } from '@/lib/tailwind';
 import type React from 'react';
+
 import styles from './AnimatedLogo.module.css';
+import { tcls } from '@/lib/tailwind';
 
 interface AnimatedLogoProps {
     shouldAnimate?: boolean;

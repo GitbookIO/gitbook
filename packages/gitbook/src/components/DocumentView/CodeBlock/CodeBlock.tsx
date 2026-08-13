@@ -6,17 +6,16 @@ import type {
     SiteCustomizationSettings,
 } from '@gitbook/api';
 
-import { getAssetURL } from '@/lib/assets';
-import { getNodeFragmentByType } from '@/lib/document';
-
 import type { BlockProps } from '../Block';
 import { Blocks } from '../Blocks';
 import { ClientCodeBlock } from './ClientCodeBlock';
 import { CodeBlockRenderer } from './CodeBlockRenderer';
-import { MermaidCodeBlockLazy } from './MermaidCodeBlockLazy';
 import { highlight } from './highlight';
 import { type RenderedInline, getInlines } from './highlight-tokens';
 import { MERMAID_RUNTIME_PATH } from './mermaid-runtime-path';
+import { MermaidCodeBlockLazy } from './MermaidCodeBlockLazy';
+import { getAssetURL } from '@/lib/assets';
+import { getNodeFragmentByType } from '@/lib/document';
 
 /**
  * Render a code block, can be client-side or server-side.

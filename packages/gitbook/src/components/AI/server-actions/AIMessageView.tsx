@@ -1,10 +1,11 @@
-import { CollapsibleContent } from '@/components/primitives';
-import type { GitBookSiteContext } from '@/lib/context';
-import { tcls } from '@/lib/tailwind';
 import { type AIMessage, AIMessageStepPhase } from '@gitbook/api';
+
 import { DocumentView } from '../../DocumentView';
 import { AIToolCallsSummary } from './AIToolCallsSummary';
 import type { RenderAIMessageOptions } from './types';
+import { CollapsibleContent } from '@/components/primitives';
+import type { GitBookSiteContext } from '@/lib/context';
+import { tcls } from '@/lib/tailwind';
 
 /**
  * Render a message from the API backend.

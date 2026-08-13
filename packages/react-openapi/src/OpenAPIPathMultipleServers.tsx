@@ -1,9 +1,9 @@
 'use client';
+import type { OpenAPIClientContext } from './context';
+import { formatPath } from './formatPath';
 import type { OpenAPIPathProps } from './OpenAPIPath';
 import { OpenAPIPathItem } from './OpenAPIPathItem';
 import { OpenAPISelect, useSelectState } from './OpenAPISelect';
-import type { OpenAPIClientContext } from './context';
-import { formatPath } from './formatPath';
 import type { OpenAPIServerWithCustomProperties } from './types';
 import { getDefaultServerURL, interpolateServerURL } from './util/server';
 import { createStateKey } from './utils';

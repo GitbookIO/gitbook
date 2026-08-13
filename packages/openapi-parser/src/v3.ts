@@ -1,4 +1,5 @@
 import { validate } from '@scalar/openapi-parser';
+
 import { OpenAPIParseError } from './error';
 import { createFileSystem } from './filesystem';
 import type { ParseOpenAPIInput, ParseOpenAPIResult } from './parse';

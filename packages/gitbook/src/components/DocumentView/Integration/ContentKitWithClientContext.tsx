@@ -1,12 +1,14 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
+import React from 'react';
+
+import { ContentKit, type ContentKitClientContextData } from '@gitbook/react-contentkit/client';
+
+import type { WebframePageContext } from './adaptive';
 import { useAdaptiveVisitor } from '@/components/Adaptive';
 import { NavigationStatusContext } from '@/components/hooks';
 import { type GitBookLinker, createLinker } from '@/lib/links';
-import { ContentKit, type ContentKitClientContextData } from '@gitbook/react-contentkit/client';
-import { useRouter } from 'next/navigation';
-import React from 'react';
-import type { WebframePageContext } from './adaptive';
 
 type ContentKitProps<RenderContext> = React.ComponentProps<typeof ContentKit<RenderContext>>;
 

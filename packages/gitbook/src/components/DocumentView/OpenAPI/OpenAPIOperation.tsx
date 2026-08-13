@@ -1,10 +1,9 @@
-import { resolveOpenAPIOperationBlock } from '@/lib/openapi/resolveOpenAPIOperationBlock';
-import { tcls } from '@/lib/tailwind';
-
-import type { AnyOpenAPIOperationsBlock } from '@/lib/openapi/types';
 import type { BlockProps } from '../Block';
-import { OpenAPIBlockLazy } from './OpenAPIBlockLazy';
 import { getOpenAPIBlockClientProps } from './context';
+import { OpenAPIBlockLazy } from './OpenAPIBlockLazy';
+import { resolveOpenAPIOperationBlock } from '@/lib/openapi/resolveOpenAPIOperationBlock';
+import type { AnyOpenAPIOperationsBlock } from '@/lib/openapi/types';
+import { tcls } from '@/lib/tailwind';
 
 /**
  * Render an openapi block or an openapi-operation block.

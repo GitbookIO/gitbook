@@ -11,13 +11,13 @@ function flattenPages(
     rootPages: RevisionPage[],
     filter: (
         page: RevisionPageDocument | RevisionPageGroup,
-        ancestors: Array<RevisionPageDocument | RevisionPageGroup>
+        ancestors: (RevisionPageDocument | RevisionPageGroup)[]
     ) => boolean
 ): FlatPageEntry[] {
     const flattenPage = (
         page: RevisionPageDocument | RevisionPageGroup,
         depth: number,
-        ancestors: Array<RevisionPageDocument | RevisionPageGroup>
+        ancestors: (RevisionPageDocument | RevisionPageGroup)[]
     ): FlatPageEntry[] => {
         const allowed = filter(page, ancestors);
         if (!allowed) {

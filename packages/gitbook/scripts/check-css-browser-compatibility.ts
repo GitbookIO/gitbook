@@ -1,4 +1,5 @@
 import { readFile } from 'node:fs/promises';
+
 import {
     type CompatibilityDiagnostic,
     type IssueCommentClient,

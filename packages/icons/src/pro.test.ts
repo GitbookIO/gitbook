@@ -1,4 +1,5 @@
 import { it } from 'bun:test';
+
 import { validateIconName } from './icons';
 
 it('should have the GitBook custom icon', () => {

@@ -1,13 +1,12 @@
 'use client';
 
+import { SiteInsightsLinkPosition } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
-import type { ClientTOCPageLink } from './encodeClientTableOfContents';
 
+import type { ClientTOCPageLink } from './encodeClientTableOfContents';
+import { TOCPageIcon } from './TOCPageIcon';
 import { Link } from '@/components/primitives';
 import { tcls } from '@/lib/tailwind';
-
-import { SiteInsightsLinkPosition } from '@gitbook/api';
-import { TOCPageIcon } from './TOCPageIcon';
 
 export function PageLinkItem(props: { page: ClientTOCPageLink }) {
     const { page } = props;

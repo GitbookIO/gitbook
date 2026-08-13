@@ -1,9 +1,10 @@
 import clsx from 'classnames';
-import { OpenAPICodeSample } from './OpenAPICodeSample';
-import { OpenAPIResponseExample } from './OpenAPIResponseExample';
+
 import { OpenAPIColumnSpec } from './common/OpenAPIColumnSpec';
 import { OpenAPISummary } from './common/OpenAPISummary';
 import { type OpenAPIContextInput, resolveOpenAPIContext } from './context';
+import { OpenAPICodeSample } from './OpenAPICodeSample';
+import { OpenAPIResponseExample } from './OpenAPIResponseExample';
 import type { OpenAPIOperationData } from './types';
 
 /**

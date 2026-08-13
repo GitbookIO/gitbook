@@ -1,7 +1,6 @@
-import { Image } from '@/components/utils';
-
-import type { GitBookSiteContext } from '@/lib/context';
 import { Emoji } from '../primitives';
+import { Image } from '@/components/utils';
+import type { GitBookSiteContext } from '@/lib/context';
 
 /**
  * Icon for the current content.

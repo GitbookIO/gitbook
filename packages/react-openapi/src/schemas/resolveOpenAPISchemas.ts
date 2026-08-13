@@ -5,6 +5,7 @@ import type {
     OpenAPIV3xDocument,
 } from '@gitbook/openapi-parser';
 import { filterSelectedOpenAPISchemas } from '@gitbook/openapi-parser';
+
 import { dereferenceFilesystem } from '../dereference';
 
 export type OpenAPISchemasData = Pick<OpenAPICustomSpecProperties, 'x-expandAllModelSections'> & {

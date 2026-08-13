@@ -1,7 +1,8 @@
 'use client';
+import { type ReactNode, useCallback, useEffect, useLayoutEffect, useRef } from 'react';
+
 import { useScrollListener } from '@/components/hooks/useScrollListener';
 import { tcls } from '@/lib/tailwind';
-import { type ReactNode, useCallback, useEffect, useLayoutEffect, useRef } from 'react';
 
 interface StickyViewGridProps {
     className?: string;

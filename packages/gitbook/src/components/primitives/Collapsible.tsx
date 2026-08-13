@@ -1,8 +1,9 @@
 'use client';
 
-import { tcls } from '@/lib/tailwind';
 import * as RadixCollapsible from '@radix-ui/react-collapsible';
 import { useEffect, useState } from 'react';
+
+import { tcls } from '@/lib/tailwind';
 
 export function Collapsible(
     props: {

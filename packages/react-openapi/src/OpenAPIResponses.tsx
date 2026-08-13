@@ -1,14 +1,16 @@
 'use client';
 
-import type { OpenAPIV3, OpenAPIV3_1 } from '@gitbook/openapi-parser';
 import clsx from 'classnames';
+
+import type { OpenAPIV3, OpenAPIV3_1 } from '@gitbook/openapi-parser';
+
+import type { OpenAPIClientContext } from './context';
 import { Markdown } from './Markdown';
 import { OpenAPIDisclosureGroup } from './OpenAPIDisclosureGroup';
 import { OpenAPIResponse } from './OpenAPIResponse';
 import { useResponseExamplesState } from './OpenAPIResponseExampleContent';
 import type { Key } from './OpenAPISelect';
 import { StaticSection } from './StaticSection';
-import type { OpenAPIClientContext } from './context';
 import { t } from './translate';
 import {
     createStateKey,

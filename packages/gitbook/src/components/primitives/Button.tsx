@@ -2,12 +2,12 @@
 
 import * as React from 'react';
 
-import { type ClassValue, tcls } from '@/lib/tailwind';
-
 import { Icon, type IconName } from '@gitbook/icons';
+
 import { Link, type LinkInsightsProps } from './Link';
 import { useClassnames } from './StyleProvider';
 import { Tooltip, type TooltipProps } from './Tooltip';
+import { type ClassValue, tcls } from '@/lib/tailwind';
 
 export type ButtonProps = {
     href?: string;

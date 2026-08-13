@@ -2,6 +2,7 @@
 
 import type { Document, DocumentValue } from 'flexsearch';
 import React from 'react';
+
 import {
     type SiteIndexBreadcrumb,
     type SiteIndexPage,

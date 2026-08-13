@@ -1,5 +1,6 @@
-import { type RouteLayoutParams, getStaticSiteContext } from '@/app/utils';
 import type { NextRequest } from 'next/server';
+
+import { type RouteLayoutParams, getStaticSiteContext } from '@/app/utils';
 
 export const dynamic = 'force-static';
 

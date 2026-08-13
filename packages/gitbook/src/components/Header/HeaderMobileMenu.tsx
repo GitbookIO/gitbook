@@ -2,9 +2,8 @@
 import { usePathname } from 'next/navigation';
 import { useEffect } from 'react';
 
-import { tString, useLanguage } from '@/intl/client';
-
 import { Button, type ButtonProps } from '../primitives';
+import { tString, useLanguage } from '@/intl/client';
 
 const globalClassName = 'navigation-open';
 
