@@ -13,7 +13,7 @@ describe('getEmbeddableLinker', () => {
         const linker = linkerWithDirectPagePaths(getEmbeddableLinker(root));
         const pages = [
             { id: 'intro', type: 'document', path: 'introduction', pages: [] },
-        ] as unknown as [RevisionPageDocument];
+        ] as [RevisionPageDocument];
 
         expect(linker.toPathForPage({ pages, page: pages[0] })).toBe(
             '/api/js/~gitbook/embed/page/introduction'

@@ -13,7 +13,7 @@ import {
 } from './sites';
 
 function makeSiteSpace(language: TranslationLanguage | undefined): SiteSpace {
-    return { space: { language } } as unknown as SiteSpace;
+    return { space: { language } } as SiteSpace;
 }
 
 describe('filterSiteSpacesByLocale', () => {
@@ -52,10 +52,10 @@ describe('custom site-space home page', () => {
             path: 'guides/getting-started',
             pages: [],
         },
-    ] as unknown as RevisionPageDocument[];
+    ] as RevisionPageDocument[];
 
     function makeTargetedSiteSpace(pageId: string): SiteSpace {
-        return { pageId } as unknown as SiteSpace;
+        return { pageId } as SiteSpace;
     }
 
     it('resolves a custom home page from the current revision', () => {
@@ -78,7 +78,7 @@ describe('custom site-space home page', () => {
                 path: 'group',
                 pages: [pages[1]],
             },
-        ] as unknown as RevisionPageDocument[];
+        ] as RevisionPageDocument[];
 
         expect(
             resolveSiteSpaceCustomHomePage(makeTargetedSiteSpace('group'), pagesWithGroup)
@@ -133,7 +133,7 @@ describe('custom site-space home page', () => {
 
 describe('getFallbackSiteSpacePath', () => {
     function makeVariant(id: string, path: string, isDefault: boolean): SiteSpace {
-        return { id, path, default: isDefault } as unknown as SiteSpace;
+        return { id, path, default: isDefault } as SiteSpace;
     }
 
     function makeSection(

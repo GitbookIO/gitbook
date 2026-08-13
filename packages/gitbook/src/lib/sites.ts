@@ -76,16 +76,10 @@ export function filterSiteSpacesByLocale(
     );
 }
 
-// Remove this compatibility type once @gitbook/api publishes SiteSpace.pageId.
-type SiteSpaceWithCustomHomePage = SiteSpace & {
-    pageId?: string;
-};
-
 /**
  * Resolve the custom home page for a site space in the current revision.
  */
-export function resolveSiteSpaceCustomHomePage(siteSpace: SiteSpace, pages: Revision['pages']) {
-    const pageId = (siteSpace as SiteSpaceWithCustomHomePage).pageId;
+export function resolveSiteSpaceCustomHomePage({ pageId }: SiteSpace, pages: Revision['pages']) {
     const resolved = pageId ? resolvePageId(pages, pageId) : undefined;
 
     // A group ID resolves to its first document, but only documents can be custom home pages.
