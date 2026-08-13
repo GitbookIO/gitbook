@@ -222,16 +222,11 @@ export function SearchContainer({
                                 eventDetails.cancel();
                                 return;
                             }
-                            // Base UI returns focus to the trigger once the close animation has
-                            // run, which re-fires the input's `onFocus` and would reopen the
-                            // popover. Hold the guard until the close actually completes.
+                            // Base UI hands focus back to the trigger after closing, which re-fires
+                            // the input's `onFocus`. Swallow that one focus rather than timing it:
+                            // it lands after the close animation, so any timer-based guard races.
                             closingRef.current = true;
                             close();
-                        },
-                        onOpenChangeComplete: (isOpen) => {
-                            if (!isOpen) {
-                                closingRef.current = false;
-                            }
                         },
                     }}
                     positionerProps={{
@@ -265,9 +260,11 @@ export function SearchContainer({
                         isOpen={isSearchOpen}
                         className={className}
                         onFocus={() => {
-                            if (!closingRef.current) {
-                                open();
+                            if (closingRef.current) {
+                                closingRef.current = false;
+                                return;
                             }
+                            open();
                         }}
                         resultsCount={results.length}
                         fetching={fetching}
