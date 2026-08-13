@@ -47,6 +47,7 @@ import {
     getPathScopedCookieName,
     getResponseCookiesForVisitorAuth,
     getVisitorData,
+    getVisitorType,
     normalizeVisitorURL,
     serveVisitorClaimsDataRequest,
 } from '@/lib/visitors';
@@ -219,6 +220,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
                 visitorPayload: {
                     jwtToken: visitorToken?.token ?? undefined,
                     unsignedClaims,
+                    type: getVisitorType(request),
                 },
                 // When the visitor auth token is pulled from the cookie, set redirectOnError when calling resolvePublishedContentByUrl to allow
                 // redirecting when the token is invalid as we could be dealing with stale token stored in the cookie.

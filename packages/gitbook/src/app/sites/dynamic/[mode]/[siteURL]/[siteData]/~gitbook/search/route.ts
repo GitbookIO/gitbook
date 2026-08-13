@@ -143,6 +143,13 @@ function transformSitePageResult(args: {
           ? toEmbeddableLinkForPublishedContent(linker, spaceURL, pageItem.path)
           : linker.toLinkForContent(joinPathWithBaseURL(spaceURL, pageItem.path));
 
+    // The deployed API already returns this field, but older generated clients and responses do not.
+    const resultType =
+        'resultType' in pageItem &&
+        (pageItem.resultType === 'page' || pageItem.resultType === 'section')
+            ? pageItem.resultType
+            : undefined;
+
     const page: ComputedPageResult = {
         type: 'page',
         id: `${spaceItem.id}/${pageItem.id}`,
@@ -151,6 +158,7 @@ function transformSitePageResult(args: {
         pageId: pageItem.id,
         spaceId: spaceItem.id,
         score: pageItem.score,
+        resultType,
         breadcrumbs,
     };
 
