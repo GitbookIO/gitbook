@@ -7,6 +7,7 @@ import { Tooltip } from '../primitives';
 import { Emoji } from '../primitives/Emoji/Emoji';
 import { HighlightQuery } from './HighlightQuery';
 import { SearchResultItem } from './SearchResultItem';
+import { getPageResultHref } from './getPageResultHref';
 import type { MergedPageResult } from './reciprocalRankFusion';
 import type { ComputedPageResult } from './search-types';
 import type { LocalPageResult } from './useLocalSearchResults';
@@ -26,9 +27,7 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
     const language = useLanguage();
 
     const bestSection = item.type === 'page' ? item.bestSection : undefined;
-    // When the section snippet is displayed, link to the section anchor so the
-    // link matches what the user sees.
-    const href = bestSection?.body ? bestSection.href : 'href' in item ? item.href : item.pathname;
+    const href = item.type === 'page' ? getPageResultHref(item) : item.pathname;
 
     const emoji = 'emoji' in item ? item.emoji : undefined;
     const icon = 'icon' in item ? item.icon : undefined;

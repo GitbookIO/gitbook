@@ -204,8 +204,9 @@ export function getFallbackSiteSpacePath(context: GitBookSiteContext, siteSpace:
     // don't include the path for the default site space
     const siteSpacePath = siteSpace.default ? '' : siteSpace.path;
 
-    // for non-default site sections, include the section path.
-    if (found?.siteSection && !found?.siteSection.default) {
+    // The section path is only dropped for the default variant of the default section:
+    // its other variants are still published under the section path.
+    if (found?.siteSection && (!found.siteSection.default || !siteSpace.default)) {
         return joinPath(found.siteSection.path, siteSpacePath);
     }
 

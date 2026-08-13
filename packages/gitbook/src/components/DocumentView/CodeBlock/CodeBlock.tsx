@@ -6,6 +6,7 @@ import type {
     SiteCustomizationSettings,
 } from '@gitbook/api';
 
+import { getAssetURL } from '@/lib/assets';
 import { getNodeFragmentByType } from '@/lib/document';
 
 import type { BlockProps } from '../Block';
@@ -15,6 +16,7 @@ import { CodeBlockRenderer } from './CodeBlockRenderer';
 import { MermaidCodeBlockLazy } from './MermaidCodeBlockLazy';
 import { highlight } from './highlight';
 import { type RenderedInline, getInlines } from './highlight-tokens';
+import { MERMAID_RUNTIME_PATH } from './mermaid-runtime-path';
 
 /**
  * Render a code block, can be client-side or server-side.
@@ -118,7 +120,10 @@ export async function CodeBlock(
     return (
         <React.Suspense fallback={null}>
             {isMermaid ? (
-                <MermaidCodeBlockLazy {...clientProps} />
+                <MermaidCodeBlockLazy
+                    {...clientProps}
+                    mermaidRuntimeURL={getAssetURL(MERMAID_RUNTIME_PATH)}
+                />
             ) : (
                 <ClientCodeBlock {...clientProps} />
             )}
