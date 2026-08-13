@@ -151,11 +151,13 @@ test('opening a popup restyles a bounded part of a large API reference', async (
 
     await expectIdle(page, client);
 
+    // Click rather than focus: after a close the input still holds focus, so `focus()` fires
+    // nothing and would not reopen. A click is what a reader does anyway.
     const searchInput = page.getByTestId('search-input');
     const search = await measureReopen(
         page,
         client,
-        () => searchInput.focus(),
+        () => searchInput.click(),
         page.getByTestId('search-results')
     );
 
