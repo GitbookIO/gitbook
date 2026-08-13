@@ -618,14 +618,13 @@ const testCases: TestsCase[] = [
                 url: '',
                 screenshot: false,
                 run: async (page) => {
+                    // The menu only opens on `mouseenter`, which cannot fire again while the
+                    // pointer is already inside, so a hover landing before hydration is lost
+                    // for good and re-hovering cannot recover it.
+                    await page.locator('html.hydrated').waitFor();
                     const trigger = page.getByRole('button', { name: 'Test Section Group 1' });
-                    // Radix NavigationMenu opens the dropdown on a `pointermove`. A single
-                    // synthetic hover can land before hydration and be lost, so re-hover
-                    // until the dropdown content actually appears.
-                    await expect(async () => {
-                        await trigger.hover();
-                        await expect(page.getByText('Section B')).toBeVisible({ timeout: 1000 });
-                    }).toPass({ timeout: 15000 });
+                    await trigger.hover();
+                    await expect(page.getByText('Section B')).toBeVisible();
                     await page.getByText('Section B').click();
                     await page.waitForURL((url) => url.pathname.includes('/sections/sections-4'));
                 },
