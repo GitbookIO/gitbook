@@ -17,12 +17,6 @@ import { AIContextProvider } from '../AI';
 import { RocketLoaderDetector } from './RocketLoaderDetector';
 import { SiteLayoutClientContexts } from './SiteLayoutClientContexts';
 
-// DO NOT MERGE: it's just for local simulation. It won't be necessary with an API version bump
-type SiteCustomizationAI = NonNullable<GitBookSiteContext['customization']['ai']> & {
-    greeting?: string;
-    localizedGreeting?: Record<string, string>;
-};
-
 /**
  * Layout when rendering a site.
  */
@@ -36,7 +30,7 @@ export async function SiteLayout(props: {
     const { context, forcedTheme, withTracking, visitorAuthClaims, children } = props;
 
     const { customization } = context;
-    const ai = customization.ai as SiteCustomizationAI | undefined;
+    const { ai } = customization;
     const aiGreeting = (context.locale && ai?.localizedGreeting?.[context.locale]) ?? ai?.greeting;
     // Scripts are disabled when tracking is disabled
     const scripts = withTracking ? context.scripts : [];
