@@ -231,7 +231,13 @@ export const ButtonGroup = React.forwardRef<
             className={tcls(
                 'flex h-fit items-stretch justify-start overflow-hidden',
                 combinedShape
-                    ? '*:translate-y-0! *:shadow-none! [&>*:not(:first-child)]:border-l-0 [&>*:not(:first-child,:last-child)]:rounded-none! [&>*:not(:only-child):first-child]:rounded-r-none [&>*:not(:only-child):last-child]:rounded-l-none'
+                    ? [
+                          // The per-segment rounding lives in `globals.css`: Tailwind's arbitrary
+                          // variants cannot express "last button" once focus guards are injected.
+                          'button-group',
+                          '*:translate-y-0! *:shadow-none!',
+                          '[&>*:not(:first-child)]:border-l-0',
+                      ]
                     : '',
                 className
             )}

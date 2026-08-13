@@ -540,3 +540,15 @@ html.dark .highlight-line.diff-deleted .highlight-line-content::before {
     @apply pl-2;
   }
 }
+
+/* An open dropdown injects focus guards as siblings of its trigger, so `:last-child` is not the
+   last item of a button group: match the buttons and links themselves. */
+.button-group > :is(button, a):not(:only-child):first-child {
+  @apply rounded-r-none;
+}
+.button-group > :is(button, a):not(:first-child):not(:has(~ :is(button, a))) {
+  @apply rounded-l-none;
+}
+.button-group > :is(button, a):not(:first-child):has(~ :is(button, a)) {
+  @apply rounded-none!;
+}
