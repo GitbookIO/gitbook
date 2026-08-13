@@ -11,9 +11,9 @@ describe('getEmbeddableLinker', () => {
             siteBasePath: '/',
         });
         const linker = linkerWithDirectPagePaths(getEmbeddableLinker(root));
-        const pages = [
-            { id: 'intro', type: 'document', path: 'introduction', pages: [] },
-        ] as [RevisionPageDocument];
+        const pages = [{ id: 'intro', type: 'document', path: 'introduction', pages: [] }] as [
+            RevisionPageDocument,
+        ];
 
         expect(linker.toPathForPage({ pages, page: pages[0] })).toBe(
             '/api/js/~gitbook/embed/page/introduction'
