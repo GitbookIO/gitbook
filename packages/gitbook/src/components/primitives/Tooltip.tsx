@@ -1,8 +1,9 @@
 'use client';
 
-import { tcls } from '@/lib/tailwind';
 import { Tooltip as BaseTooltip } from '@base-ui/react/tooltip';
+
 import { PopupArrow } from './PopupArrow';
+import { tcls } from '@/lib/tailwind';
 
 export type TooltipProps = {
     /** Side of the trigger the tooltip is displayed on. */

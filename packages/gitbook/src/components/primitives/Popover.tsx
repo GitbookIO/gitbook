@@ -1,5 +1,6 @@
-import { tcls } from '@/lib/tailwind';
 import { Popover as BasePopover } from '@base-ui/react/popover';
+
+import { tcls } from '@/lib/tailwind';
 
 export function Popover(props: {
     children: React.ReactElement<Record<string, unknown>>;

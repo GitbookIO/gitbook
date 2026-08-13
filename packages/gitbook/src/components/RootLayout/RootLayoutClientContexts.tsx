@@ -1,12 +1,12 @@
 'use client';
 
+import { Tooltip } from '@base-ui/react/tooltip';
 import type React from 'react';
 
-import { TranslateContext } from '@/intl/client';
-import type { TranslationLanguage } from '@/intl/translations';
-import { Tooltip } from '@base-ui/react/tooltip';
 import { NavigationStatusProvider, ScrollPage } from '../hooks';
 import { LoadingStateProvider } from '../primitives/LoadingStateProvider';
+import { TranslateContext } from '@/intl/client';
+import type { TranslationLanguage } from '@/intl/translations';
 
 /**
  * Client component context providers for the root layout.

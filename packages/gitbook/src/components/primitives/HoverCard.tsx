@@ -1,7 +1,8 @@
 'use client';
-import { tcls } from '@/lib/tailwind';
 import { PreviewCard } from '@base-ui/react/preview-card';
+
 import { PopupArrow } from './PopupArrow';
+import { tcls } from '@/lib/tailwind';
 
 export function HoverCardRoot(props: PreviewCard.Root.Props) {
     return <PreviewCard.Root {...props} />;

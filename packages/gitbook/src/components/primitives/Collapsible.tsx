@@ -1,7 +1,8 @@
 'use client';
 
-import { tcls } from '@/lib/tailwind';
 import { Collapsible as BaseCollapsible } from '@base-ui/react/collapsible';
+
+import { tcls } from '@/lib/tailwind';
 
 export function Collapsible(
     props: Omit<BaseCollapsible.Root.Props, 'className'> & {

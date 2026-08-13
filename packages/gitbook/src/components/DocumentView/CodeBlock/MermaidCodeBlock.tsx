@@ -1,18 +1,18 @@
 'use client';
 
+import { Dialog } from '@base-ui/react/dialog';
+import Panzoom from '@panzoom/panzoom';
+import type { RenderResult } from 'mermaid';
 import { useTheme } from 'next-themes';
 import { useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
+import { type ClientBlockProps, ClientCodeBlock } from './ClientCodeBlock';
+import { getPlainCodeBlock } from './highlight-tokens';
+import { MermaidPanZoomControls } from './MermaidPanZoomControls';
 import { useHasBeenInViewport } from '@/components/hooks/useHasBeenInViewport';
 import { Loading } from '@/components/primitives/Loading';
 import { tcls } from '@/lib/tailwind';
-import { Dialog } from '@base-ui/react/dialog';
-import Panzoom from '@panzoom/panzoom';
-import type { RenderResult } from 'mermaid';
-import { type ClientBlockProps, ClientCodeBlock } from './ClientCodeBlock';
-import { MermaidPanZoomControls } from './MermaidPanZoomControls';
-import { getPlainCodeBlock } from './highlight-tokens';
 
 /**
  * Used to render a Mermaid diagram from a CodeBlock.
@@ -223,11 +223,11 @@ export function MermaidCodeBlock(
                 onOpenChangeComplete={(open) => !open && panZoom?.reset()}
             >
                 <Dialog.Portal>
-                    <Dialog.Backdrop className="fixed inset-0 z-40 bg-tint-base/3 backdrop-blur-md data-closed:animate-fade-out data-open:animate-fade-in dark:bg-tint-base/6" />
+                    <Dialog.Backdrop className="data-closed:animate-fade-out data-open:animate-fade-in fixed inset-0 z-40 bg-tint-base/3 backdrop-blur-md dark:bg-tint-base/6" />
                     <Dialog.Popup
                         aria-label="Mermaid diagram"
                         render={<div ref={setPanel} />}
-                        className="fixed inset-3 z-40 mx-auto flex max-w-[110rem] flex-col overflow-hidden rounded-2xl border border-tint-subtle bg-tint-base shadow-2xl outline-hidden data-closed:animate-blur-out data-open:animate-blur-in sm:inset-5 lg:inset-8"
+                        className="outline-hidden data-closed:animate-blur-out data-open:animate-blur-in fixed inset-3 z-40 mx-auto flex max-w-[110rem] flex-col overflow-hidden rounded-2xl border border-tint-subtle bg-tint-base shadow-2xl sm:inset-5 lg:inset-8"
                     />
                 </Dialog.Portal>
             </Dialog.Root>
@@ -289,7 +289,7 @@ function createMermaidRenderContainer() {
 }
 
 let mermaidLoadPromise: Promise<{
-    mermaid: typeof import('mermaid')['default'];
+    mermaid: (typeof import('mermaid'))['default'];
 }> | null = null;
 
 async function loadMermaid(runtimeURL: string) {
@@ -297,7 +297,7 @@ async function loadMermaid(runtimeURL: string) {
         mermaidLoadPromise = import(/* webpackIgnore: true */ runtimeURL)
             .then(
                 async (runtime: {
-                    loadMermaid: () => Promise<typeof import('mermaid')['default']>;
+                    loadMermaid: () => Promise<(typeof import('mermaid'))['default']>;
                 }) => {
                     return { mermaid: await runtime.loadMermaid() };
                 }

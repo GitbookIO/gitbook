@@ -1,6 +1,7 @@
 'use client';
 
 import { Checkbox as BaseCheckbox } from '@base-ui/react/checkbox';
+
 import { Icon, IconStyle } from '@gitbook/icons';
 
 import { tcls } from '@/lib/tailwind';

@@ -1,17 +1,16 @@
 'use client';
 
-import { Icon, type IconName } from '@gitbook/icons';
+import { Menu } from '@base-ui/react/menu';
 import type { DetailedHTMLProps, HTMLAttributes } from 'react';
 import { createContext, useCallback, useContext, useState } from 'react';
-
-import { type ClassValue, tcls } from '@/lib/tailwind';
-
-import { Menu } from '@base-ui/react/menu';
-
 import { assert } from 'ts-essentials';
+
+import { Icon, type IconName } from '@gitbook/icons';
+
 import { Link, type LinkInsightsProps } from '.';
 import { ToggleChevron } from './ToggleChevron';
 import { Tooltip } from './Tooltip';
+import { type ClassValue, tcls } from '@/lib/tailwind';
 
 export type DropdownButtonProps<E extends HTMLElement = HTMLElement> = Omit<
     Partial<DetailedHTMLProps<HTMLAttributes<E>, E>>,
@@ -132,10 +131,7 @@ export function DropdownMenu(props: {
 /**
  * Button with a chevron for use in dropdowns.
  */
-export function DropdownButton(props: {
-    children: React.ReactNode;
-    className?: ClassValue;
-}) {
+export function DropdownButton(props: { children: React.ReactNode; className?: ClassValue }) {
     const { children, className } = props;
 
     return (
@@ -218,7 +214,7 @@ export function DropdownSubMenu(props: { children: React.ReactNode; label: React
 
     return (
         <Menu.SubmenuRoot>
-            <Menu.SubmenuTrigger className="flex cursor-pointer items-center justify-between rounded-sm straight-corners:rounded-xs px-3 py-1 text-sm focus:outline-hidden data-highlighted:bg-tint-hover">
+            <Menu.SubmenuTrigger className="straight-corners:rounded-xs focus:outline-hidden data-highlighted:bg-tint-hover flex cursor-pointer items-center justify-between rounded-sm px-3 py-1 text-sm">
                 {label}
                 <Icon icon="chevron-right" className="size-3 shrink-0 opacity-6" />
             </Menu.SubmenuTrigger>

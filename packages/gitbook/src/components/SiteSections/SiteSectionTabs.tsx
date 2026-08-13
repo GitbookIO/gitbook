@@ -1,20 +1,21 @@
 'use client';
 
 import { NavigationMenu } from '@base-ui/react/navigation-menu';
-import type { IconName } from '@gitbook/icons';
 import React from 'react';
 
-import { Button, Link, ToggleChevron } from '@/components/primitives';
-import { tcls } from '@/lib/tailwind';
-import { findSectionInGroup } from '@/lib/utils';
+import type { IconName } from '@gitbook/icons';
+
 import { CONTAINER_STYLE } from '../layout';
 import { ScrollContainer } from '../primitives/ScrollContainer';
-import { SectionIcon } from './SectionIcon';
 import type {
     ClientSiteSection,
     ClientSiteSectionGroup,
     ClientSiteSections,
 } from './encodeClientSiteSections';
+import { SectionIcon } from './SectionIcon';
+import { Button, Link, ToggleChevron } from '@/components/primitives';
+import { tcls } from '@/lib/tailwind';
+import { findSectionInGroup } from '@/lib/utils';
 
 const SCREEN_OFFSET = 16; // 1rem
 // The tabs have a 6px bottom margin, and the popup used to overlap the header border by 1px.
@@ -341,7 +342,7 @@ function SectionGroupTile(props: {
 
     return (
         <li className="flex w-full min-w-0 shrink-0 break-inside-avoid flex-col gap-1 md:w-auto">
-            <div className="mt-2 mb-1 flex min-w-0 gap-2 px-2.5 font-semibold text-tint-subtle text-xs">
+            <div className="mb-1 mt-2 flex min-w-0 gap-2 px-2.5 text-xs font-semibold text-tint-subtle">
                 {icon && (
                     <SectionIcon className="mt-0.5" isActive={false} icon={icon as IconName} />
                 )}
