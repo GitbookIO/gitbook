@@ -176,7 +176,7 @@ export function useSearchController(
 
     const onClose = React.useCallback(
         async (to?: string) => {
-            setSearchState((prev) => {
+            await setSearchState((prev) => {
                 if (!prev) return null;
 
                 if (prev.query !== null) {
