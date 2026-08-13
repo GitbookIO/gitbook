@@ -39,7 +39,6 @@ export function SearchContainer({
     ...searchProps
 }: SearchContainerProps) {
     const searchInputRef = useRef<HTMLDivElement>(null);
-    const closingRef = useRef(false);
     const language = useLanguage();
     const usesSideSheet = useIsMobile(768);
     const {
@@ -222,10 +221,6 @@ export function SearchContainer({
                                 eventDetails.cancel();
                                 return;
                             }
-                            // Base UI hands focus back to the trigger after closing, which re-fires
-                            // the input's `onFocus`. Swallow that one focus rather than timing it:
-                            // it lands after the close animation, so any timer-based guard races.
-                            closingRef.current = true;
                             close();
                         },
                     }}
@@ -241,6 +236,9 @@ export function SearchContainer({
                     }}
                     popupProps={{
                         initialFocus: false,
+                        // The input is its own trigger, so restoring focus to it on close would
+                        // re-fire `onFocus` and reopen the popover immediately.
+                        finalFocus: false,
                         className: tcls(
                             '@container flex flex-col overflow-hidden bg-tint-base has-[.empty]:hidden w-128 p-0 max-w-[min(var(--available-width),32rem)]',
                             shouldFillHeight
@@ -259,13 +257,7 @@ export function SearchContainer({
                         withAI={withSearchAI}
                         isOpen={isSearchOpen}
                         className={className}
-                        onFocus={() => {
-                            if (closingRef.current) {
-                                closingRef.current = false;
-                                return;
-                            }
-                            open();
-                        }}
+                        onFocus={open}
                         resultsCount={results.length}
                         fetching={fetching}
                         showAsk={showAsk}
