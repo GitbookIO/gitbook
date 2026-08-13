@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it } from 'bun:test';
+
 import { SELECT_STORAGE_KEY } from './constants';
 
 // Own file, own module instance: the store hydrates once per page load, so the "mutation before

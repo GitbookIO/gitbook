@@ -1,10 +1,12 @@
-import { getVisitorAuthClaims, getVisitorAuthClaimsFromToken } from '@/lib/adaptive';
-import { type SiteURLData, fetchSiteContextByURLLookup, getBaseContext } from '@/lib/context';
-import { getDynamicCustomizationSettings } from '@/lib/customization';
-import type { SiteAPIToken } from '@gitbook/api';
 import { jwtDecode } from 'jwt-decode';
 import { forbidden, notFound } from 'next/navigation';
 import rison from 'rison';
+
+import type { SiteAPIToken } from '@gitbook/api';
+
+import { getVisitorAuthClaims, getVisitorAuthClaimsFromToken } from '@/lib/adaptive';
+import { type SiteURLData, fetchSiteContextByURLLookup, getBaseContext } from '@/lib/context';
+import { getDynamicCustomizationSettings } from '@/lib/customization';
 
 export type RouteParamMode = 'url-host' | 'url';
 

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'bun:test';
 
 import { parseOpenAPI, traverse } from '@gitbook/openapi-parser';
+
 import { resolveOpenAPISchemas } from './resolveOpenAPISchemas';
 
 async function fetchFilesystem(url: string) {

@@ -1,9 +1,10 @@
+import assertNever from 'assert-never';
+
 import type {
     DocumentBlockListOrdered,
     DocumentBlockListTasks,
     DocumentBlockListUnordered,
 } from '@gitbook/api';
-import assertNever from 'assert-never';
 
 import type { BlockProps } from './Block';
 import { Blocks } from './Blocks';

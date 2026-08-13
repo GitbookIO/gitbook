@@ -1,8 +1,9 @@
 import clsx from 'classnames';
-import { OpenAPIWebhookExample } from './OpenAPIWebhookExample';
+
 import { OpenAPIColumnSpec } from './common/OpenAPIColumnSpec';
 import { OpenAPISummary } from './common/OpenAPISummary';
 import { type OpenAPIContextInput, resolveOpenAPIContext } from './context';
+import { OpenAPIWebhookExample } from './OpenAPIWebhookExample';
 import type { OpenAPIWebhookData } from './types';
 
 /**

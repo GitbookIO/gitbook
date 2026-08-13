@@ -51,7 +51,11 @@
         "clean": "rm -rf ./dist",
         "publish-to-npm": "../../scripts/publish-if-new.sh"
     },
-    "files": ["dist", "README.md", "CHANGELOG.md"],
+    "files": [
+        "dist",
+        "README.md",
+        "CHANGELOG.md"
+    ],
     "publishConfig": {
         "access": "public",
         "registry": "https://registry.npmjs.org/"

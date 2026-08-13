@@ -1,12 +1,11 @@
-import type { GitBookBaseContext } from '@/lib/context';
-import { getResizedImageURL } from '@/lib/images';
 import type { SiteInsightsAd } from '@gitbook/api';
 import { hexToRgba } from '@gitbook/colors';
 
-import { tcls } from '@/lib/tailwind';
-
 import { Link } from '../primitives';
 import type { AdCover } from './types';
+import type { GitBookBaseContext } from '@/lib/context';
+import { getResizedImageURL } from '@/lib/images';
+import { tcls } from '@/lib/tailwind';
 
 /**
  * Cover rendering for an ad.

@@ -2,10 +2,10 @@
 
 import type { IconName } from '@gitbook/icons';
 
-import { type ClassValue, tcls } from '@/lib/tailwind';
 import { Button, type ButtonProps, ToggleChevron } from '../primitives';
 import { DropdownMenu } from '../primitives/DropdownMenu';
 import { SpacesDropdownMenuItems } from './SpacesDropdownMenuItem';
+import { type ClassValue, tcls } from '@/lib/tailwind';
 
 /**
  * Client component that creates the Button trigger and DropdownMenu internally,
@@ -17,13 +17,13 @@ export function SpacesDropdownClient(props: {
     variant: ButtonProps['variant'];
     className?: ClassValue;
     dropdownClassName: string;
-    slimSpaces: Array<{
+    slimSpaces: {
         id: string;
         title: string;
         url: string;
         isActive: boolean;
         spaceId: string;
-    }>;
+    }[];
     curPath: string;
 }) {
     const { title, icon, variant, className, dropdownClassName, slimSpaces, curPath } = props;

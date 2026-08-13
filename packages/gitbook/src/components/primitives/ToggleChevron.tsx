@@ -1,5 +1,6 @@
-import { type ClassValue, tcls } from '@/lib/tailwind';
 import { Icon, type IconName } from '@gitbook/icons';
+
+import { type ClassValue, tcls } from '@/lib/tailwind';
 
 /**
  * Animated chevron to display in dropdowns and other toggleable elements.

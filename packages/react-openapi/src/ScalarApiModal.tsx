@@ -11,9 +11,10 @@ import {
 } from 'react';
 
 import type { OpenAPIV3_1 } from '@gitbook/openapi-parser';
+
+import type { OpenAPIClientContext } from './context';
 import { useOpenAPIOperationContext } from './OpenAPIOperationContext';
 import { useOpenAPIPrefillContext } from './OpenAPIPrefillContextProvider';
-import type { OpenAPIClientContext } from './context';
 import type { OpenAPIOperationData } from './types';
 import { resolveTryItPrefillForOperation } from './util/tryit-prefill';
 

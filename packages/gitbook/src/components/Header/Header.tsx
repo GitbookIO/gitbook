@@ -1,9 +1,5 @@
-import type { GitBookSiteContext } from '@/lib/context';
-
-import { CONTAINER_STYLE, HEADER_HEIGHT_DESKTOP } from '@/components/layout';
-import { getSpaceLanguage, t } from '@/intl/server';
-import { tcls } from '@/lib/tailwind';
 import type { SiteSpace } from '@gitbook/api';
+
 import { SocialAccountButton } from '../Footer/SocialAccounts';
 import { SearchContainer, getSearchBaseProps } from '../Search';
 import { SiteSectionTabs, encodeClientSiteSections } from '../SiteSections';
@@ -13,6 +9,10 @@ import { HeaderLinks } from './HeaderLinks';
 import { HeaderLogo } from './HeaderLogo';
 import { HeaderMobileMenu } from './HeaderMobileMenu';
 import { TranslationsDropdown } from './SpacesDropdown';
+import { CONTAINER_STYLE, HEADER_HEIGHT_DESKTOP } from '@/components/layout';
+import { getSpaceLanguage, t } from '@/intl/server';
+import type { GitBookSiteContext } from '@/lib/context';
+import { tcls } from '@/lib/tailwind';
 
 /**
  * Render the header for the space.
@@ -32,8 +32,8 @@ export async function Header(props: {
 
     const withSections = Boolean(
         visibleSections &&
-            (visibleSections.list.length > 1 || // Show section tabs if there are at least 2 sections or at least 1 section group
-                visibleSections.list.some((s) => s.object === 'site-section-group'))
+        (visibleSections.list.length > 1 || // Show section tabs if there are at least 2 sections or at least 1 section group
+            visibleSections.list.some((s) => s.object === 'site-section-group'))
     );
 
     const headerSocialAccounts = customization.socialAccounts.filter(
@@ -75,7 +75,7 @@ export async function Header(props: {
                     'site-header:theme-bold:shadow-tint-12/2'
                 )}
             >
-                <div className="transition-all duration-300 motion-reduce:transition-none lg:chat-open:pr-(--ai-chat-width)">
+                <div className="lg:chat-open:pr-(--ai-chat-width) transition-all duration-300 motion-reduce:transition-none">
                     <div
                         data-gb-header-content
                         className={tcls(
@@ -172,7 +172,7 @@ export async function Header(props: {
                                                     key={`${account.platform}-${account.handle}`}
                                                     account={account}
                                                     target={customization.externalLinks.target}
-                                                    className="p-2 theme-bold:text-header-link hover:site-header:theme-bold:bg-header-link/3 hover:theme-bold:text-header-link focus-visible:site-header:theme-bold:bg-header-link/3"
+                                                    className="p-2 theme-bold:text-header-link hover:theme-bold:text-header-link hover:site-header:theme-bold:bg-header-link/3 focus-visible:site-header:theme-bold:bg-header-link/3"
                                                 />
                                             );
                                         })}
@@ -206,7 +206,7 @@ export async function Header(props: {
             </div>
 
             {visibleSections && withSections ? (
-                <div className="transition-[padding] duration-300 motion-reduce:transition-none lg:chat-open:pr-(--ai-chat-width)">
+                <div className="lg:chat-open:pr-(--ai-chat-width) transition-[padding] duration-300 motion-reduce:transition-none">
                     <SiteSectionTabs sections={encodeClientSiteSections(context, visibleSections)}>
                         {variants.translations.length > 1 ? (
                             <TranslationsDropdown

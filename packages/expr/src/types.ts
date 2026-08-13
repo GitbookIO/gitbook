@@ -20,7 +20,7 @@ export interface ExpressionParserResult {
     /**
      * The information of the invalid (non-expression) nodes found from the other portions of the parsed expression.
      */
-    invalidNodes: Array<ExpressionStatement>;
+    invalidNodes: ExpressionStatement[];
 }
 
 export interface ExpressionAutocompleteResults {
@@ -158,11 +158,11 @@ export interface AutocompleteSymbolSuggestion {
     symbol: SymbolInfo;
 }
 
-export type AutocompleteSuggestions = Array<
+export type AutocompleteSuggestions = (
     | AutocompleteSymbolSuggestion
     | AutocompleteLiteralValueSuggestion
     | AutocompleteOperatorSuggestion
->;
+)[];
 
 type LoggerFn = (message: string, ...args: any[]) => void;
 

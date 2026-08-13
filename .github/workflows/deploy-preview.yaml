@@ -11,7 +11,7 @@ jobs:
         runs-on: ubuntu-latest
         if: ${{ github.event_name == 'pull_request_target' && github.event.pull_request.head.repo.fork }}
         environment:
-          name: preview-approval
+            name: preview-approval
         steps:
             - name: Approval gate
               run: echo "Preview deployment approved."
@@ -21,8 +21,8 @@ jobs:
         needs: approval
         if: ${{ always() && (needs.approval.result == 'success' || needs.approval.result == 'skipped') }}
         environment:
-          name: 2v-preview
-          url: ${{ steps.deploy.outputs.deployment-url }}
+            name: 2v-preview
+            url: ${{ steps.deploy.outputs.deployment-url }}
         outputs:
             deployment-url: ${{ steps.deploy.outputs.deployment-url }}
         steps:
@@ -47,8 +47,8 @@ jobs:
         needs: approval
         if: ${{ always() && (needs.approval.result == 'success' || needs.approval.result == 'skipped') }}
         environment:
-          name: 2c-preview
-          url: ${{ steps.deploy.outputs.deployment-url }}
+            name: 2c-preview
+            url: ${{ steps.deploy.outputs.deployment-url }}
         outputs:
             deployment-url: ${{ steps.deploy.outputs.deployment-url || steps.extract-worker-id.outputs.worker-url }}
         steps:
@@ -72,10 +72,10 @@ jobs:
               id: extract-worker-id
               if: ${{ !steps.deploy.outputs.deployment-url }}
               run: |
-                if [[ "${{ steps.deploy.outputs.command-output }}" =~ Worker\ Version\ ID:\ ([0-9a-f]{8})-([0-9a-f-]+) ]]; then
-                  WORKER_ID_FIRST_PART="${BASH_REMATCH[1]}"
-                  echo "worker-url=https://${WORKER_ID_FIRST_PART}-gitbook-open-v2-preview.gitbook.workers.dev/" >> $GITHUB_OUTPUT
-                fi
+                  if [[ "${{ steps.deploy.outputs.command-output }}" =~ Worker\ Version\ ID:\ ([0-9a-f]{8})-([0-9a-f-]+) ]]; then
+                    WORKER_ID_FIRST_PART="${BASH_REMATCH[1]}"
+                    echo "worker-url=https://${WORKER_ID_FIRST_PART}-gitbook-open-v2-preview.gitbook.workers.dev/" >> $GITHUB_OUTPUT
+                  fi
             - name: Outputs
               run: |
                   echo "URL: ${{ steps.deploy.outputs.deployment-url || steps.extract-worker-id.outputs.worker-url }}"

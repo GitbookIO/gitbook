@@ -1,3 +1,11 @@
+import { isAIAgent } from '@vercel/agent-readability';
+import Negotiator from 'negotiator';
+import { cookies } from 'next/headers';
+import type { NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
+import rison from 'rison';
+import { getDomain } from 'tldts';
+
 import {
     CustomizationThemeMode,
     type PublishedSiteContent,
@@ -5,12 +13,12 @@ import {
     type SiteInsightsEventLocation,
     SiteInsightsLLMSVariant,
 } from '@gitbook/api';
-import { isAIAgent } from '@vercel/agent-readability';
-import { cookies } from 'next/headers';
-import type { NextRequest } from 'next/server';
-import { NextResponse } from 'next/server';
-import rison from 'rison';
 
+import {
+    type ServerInsightsEventInput,
+    serveProxyAnalyticsEvent,
+    trackServerInsightsEvents,
+} from './lib/tracking';
 import {
     MAX_API_TOKEN_COOKIE_LENGTH,
     getAPITokenFromCookies,
@@ -53,13 +61,6 @@ import {
 } from '@/lib/visitors';
 import { waitUntil } from '@/lib/waitUntil';
 import { serveResizedImage } from '@/routes/image';
-import Negotiator from 'negotiator';
-import { getDomain } from 'tldts';
-import {
-    type ServerInsightsEventInput,
-    serveProxyAnalyticsEvent,
-    trackServerInsightsEvents,
-} from './lib/tracking';
 export const config = {
     matcher: [
         '/((?!_next/static|_next/image|~gitbook/static|~gitbook/revalidate|~gitbook/monitoring|~scalar/proxy).*)',
@@ -273,7 +274,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
                           },
                       })
                     : NextResponse.redirect(url);
-            // biome-ignore lint/suspicious/noConsole: we want to log the redirect
+            // oxlint-disable-next-line no-console
             console.log('redirect', siteURLData.redirect);
             if (siteURLData.target === 'content') {
                 let contentRedirect = new URL(siteURLData.redirect, request.url);

@@ -1,4 +1,5 @@
 import type { CustomizationDefaultFont } from '@gitbook/api';
+
 import { fonts } from './fonts';
 import type { FontWeight } from './types';
 
@@ -86,7 +87,7 @@ function getBestUnicodeRange(text: string, ranges: Record<string, string>): stri
     // ---------- tally code-point hits ----------
     const hits: Record<string, number> = Object.fromEntries(Object.keys(parsed).map((k) => [k, 0]));
 
-    for (let i = 0; i < text.length; ) {
+    for (let i = 0; i < text.length;) {
         const cp = text.codePointAt(i)!;
         i += cp > 0xffff ? 2 : 1; // advance by 1 UTF-16 code-unit (or 2 for surrogates)
 

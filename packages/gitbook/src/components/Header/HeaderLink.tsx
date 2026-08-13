@@ -1,16 +1,16 @@
-import { isSiteAuthLoginHref } from '@/lib/auth-login-link';
-import type { GitBookSiteContext } from '@/lib/context';
 import {
     type CustomizationContentLink,
     type CustomizationHeaderItem,
     SiteInsightsLinkPosition,
 } from '@gitbook/api';
 
+import { DropdownMenuItem } from '../primitives/DropdownMenu';
+import { SiteAuthLoginDropdownMenuItem } from '../SiteAuth/SiteAuthLoginLink';
+import { HeaderLinkDropdown, HeaderLinkNavItem } from './HeaderLinkDropdown';
+import { isSiteAuthLoginHref } from '@/lib/auth-login-link';
+import type { GitBookSiteContext } from '@/lib/context';
 import { resolveContentRef } from '@/lib/references';
 import { getLocalizedTitle } from '@/lib/sites';
-import { SiteAuthLoginDropdownMenuItem } from '../SiteAuth/SiteAuthLoginLink';
-import { DropdownMenuItem } from '../primitives/DropdownMenu';
-import { HeaderLinkDropdown, HeaderLinkNavItem } from './HeaderLinkDropdown';
 
 export async function HeaderLink(props: {
     context: GitBookSiteContext;

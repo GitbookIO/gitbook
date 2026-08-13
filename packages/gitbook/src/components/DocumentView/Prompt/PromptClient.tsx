@@ -1,12 +1,14 @@
 'use client';
 
+import React from 'react';
+
+import type { DocumentBlockPrompt } from '@gitbook/api';
+import { Icon, type IconName } from '@gitbook/icons';
+
 import { Button, DropdownMenu, DropdownMenuItem, ToggleChevron } from '@/components/primitives';
 import { getURLForLLM } from '@/components/utils';
 import { tString, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
-import type { DocumentBlockPrompt } from '@gitbook/api';
-import { Icon, type IconName } from '@gitbook/icons';
-import React from 'react';
 
 const OPEN_IN_AI_PROVIDERS = ['claude', 'chatgpt', 'cursor'] as const;
 type AIProviders = (typeof OPEN_IN_AI_PROVIDERS)[number];
@@ -79,7 +81,7 @@ export function PromptClient(props: PromptClientProps) {
                 <PromptActions prompt={prompt} openInAIProviders={openInAIProviders} />
             </div>
             {isPartiallyExpanded || open ? (
-                <div id={promptId} className="border-tint-subtle border-t bg-tint-base">
+                <div id={promptId} className="border-t border-tint-subtle bg-tint-base">
                     {children}
                 </div>
             ) : null}

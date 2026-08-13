@@ -1,12 +1,14 @@
 'use client';
 
-import { tString, useLanguage } from '@/intl/client';
-import { tcls } from '@/lib/tailwind';
-import { Icon, type IconName } from '@gitbook/icons';
 import React, { type ReactNode } from 'react';
+
+import { Icon, type IconName } from '@gitbook/icons';
+
 import { useControlledState } from '../hooks/useControlledState';
 import { Button, type ButtonProps } from './Button';
 import { KeyboardShortcut, type KeyboardShortcutProps } from './KeyboardShortcut';
+import { tString, useLanguage } from '@/intl/client';
+import { tcls } from '@/lib/tailwind';
 
 type CustomInputProps = {
     label: string;
@@ -306,7 +308,7 @@ export const Input = React.forwardRef<InputElement, InputProps>((props, passedRe
                 {keyboardShortcut !== false ? (
                     <Tag
                         className={
-                            multiline ? `absolute top-0 right-0 ${sizes[sizing].container}` : ''
+                            multiline ? `absolute right-0 top-0 ${sizes[sizing].container}` : ''
                         }
                     >
                         {typeof keyboardShortcut === 'object' ? (
@@ -342,7 +344,7 @@ export const Input = React.forwardRef<InputElement, InputProps>((props, passedRe
                     ) : null}
                     {submitted && submitMessage ? (
                         typeof submitMessage === 'string' ? (
-                            <Tag className="ml-auto flex animate-fade-in items-center gap-1 p-1.5 text-success-subtle">
+                            <Tag className="animate-fade-in ml-auto flex items-center gap-1 p-1.5 text-success-subtle">
                                 <Icon icon="check-circle" className="size-4" />
                                 {submitMessage}
                             </Tag>

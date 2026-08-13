@@ -1,9 +1,10 @@
 'use client';
 
-import { tString, useLanguage } from '@/intl/client';
 import { Icon } from '@gitbook/icons';
+
 import { Button } from '../primitives';
 import { useAIChatWidthStore, useIsAIChatMaxWidth } from './useAIChatWidthStore';
+import { tString, useLanguage } from '@/intl/client';
 
 export function AIChatExpandButton() {
     const language = useLanguage();

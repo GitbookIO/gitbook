@@ -1,21 +1,22 @@
 'use client';
 
-import type { IconName } from '@gitbook/icons';
 import * as NavigationMenu from '@radix-ui/react-navigation-menu';
 import React from 'react';
 
-import { Button, Link, ToggleChevron } from '@/components/primitives';
-import { tcls } from '@/lib/tailwind';
-import { findSectionInGroup } from '@/lib/utils';
+import type { IconName } from '@gitbook/icons';
+
 import { useIsMobile } from '../hooks/useIsMobile';
 import { CONTAINER_STYLE } from '../layout';
 import { ScrollContainer } from '../primitives/ScrollContainer';
-import { SectionIcon } from './SectionIcon';
 import type {
     ClientSiteSection,
     ClientSiteSectionGroup,
     ClientSiteSections,
 } from './encodeClientSiteSections';
+import { SectionIcon } from './SectionIcon';
+import { Button, Link, ToggleChevron } from '@/components/primitives';
+import { tcls } from '@/lib/tailwind';
+import { findSectionInGroup } from '@/lib/utils';
 
 const DESKTOP_BREAKPOINT = 768;
 const SCREEN_OFFSET = 16; // 1rem
@@ -133,7 +134,7 @@ export function SiteSectionTabs(props: {
                                                 'data-[motion=from-start]:*:animate-[enterFromLeft_300ms_ease_both] data-[motion=to-end]:*:animate-[exitToRight_300ms_ease_both] data-[motion=to-start]:*:animate-[exitToLeft_300ms_ease_both] motion-safe:data-[motion=from-end]:*:animate-[enterFromRight_300ms_ease_both]',
                                             ])}
                                         >
-                                            <div className="max-h-[calc(100vh-8rem)] w-full overflow-y-auto overflow-x-hidden circular-corners:rounded-3xl rounded-corners:rounded-xl">
+                                            <div className="max-h-[calc(100vh-8rem)] w-full overflow-y-auto overflow-x-hidden rounded-corners:rounded-xl circular-corners:rounded-3xl">
                                                 <SectionGroupTileList
                                                     items={structureItem.children}
                                                     currentSection={currentSection}
@@ -164,7 +165,7 @@ export function SiteSectionTabs(props: {
             {children}
 
             <div
-                className="absolute top-full left-0 z-20 flex w-full"
+                className="absolute left-0 top-full z-20 flex w-full"
                 style={{
                     paddingInline: `${SCREEN_OFFSET}px`,
                     // Force a stacking context on this wrapper (rather than on the Viewport) to fix a rendering bug on
@@ -394,7 +395,7 @@ function SectionGroupTile(props: {
 
     return (
         <li className="flex w-full min-w-0 shrink-0 break-inside-avoid flex-col gap-1 md:w-auto">
-            <div className="mt-2 mb-1 flex min-w-0 gap-2 px-2.5 font-semibold text-tint-subtle text-xs">
+            <div className="mb-1 mt-2 flex min-w-0 gap-2 px-2.5 text-xs font-semibold text-tint-subtle">
                 {icon && (
                     <SectionIcon className="mt-0.5" isActive={false} icon={icon as IconName} />
                 )}

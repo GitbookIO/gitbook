@@ -1,12 +1,11 @@
 'use client';
 
-import { getLocalizedTitle } from '@/lib/sites';
 import { useRouter } from 'next/navigation';
 import React from 'react';
+
 import { useAI } from '../AI';
 import { useTrackEvent } from '../Insights';
 import { useBodyLoaded } from '../primitives';
-import type { SearchResultsRef } from './SearchResults';
 import {
     clearLastSearchQuery,
     getLastSearchQuery,
@@ -15,9 +14,11 @@ import {
 } from './last-query';
 import { addRecentSearchQuery } from './recent-queries';
 import type { SearchBaseProps } from './search-props';
+import type { SearchResultsRef } from './SearchResults';
 import { useSearchState, useSetSearchState } from './useSearch';
 import { useSearchResults } from './useSearchResults';
 import { useSearchResultsCursor } from './useSearchResultsCursor';
+import { getLocalizedTitle } from '@/lib/sites';
 
 function useInitialAskBootstrap(props: {
     asEmbeddable?: boolean;

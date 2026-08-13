@@ -1,6 +1,7 @@
 'use client';
 import { AnimatePresence, motion } from 'motion/react';
 import React, { useRef } from 'react';
+
 import { useCurrentPagePath } from '../hooks';
 import { Button, Link, type LinkInsightsProps, type LinkProps, ToggleChevron } from '../primitives';
 
@@ -148,11 +149,7 @@ function DescendantsRenderer(props: {
     });
 }
 
-function Toggler(props: {
-    isLinkActive: boolean;
-    isOpen: boolean;
-    onToggle: () => void;
-}) {
+function Toggler(props: { isLinkActive: boolean; isOpen: boolean; onToggle: () => void }) {
     const { isOpen, onToggle } = props;
     return (
         <Button
@@ -188,10 +185,7 @@ const hide = {
     height: 0,
 };
 
-function Descendants(props: {
-    isVisible: boolean;
-    children: React.ReactNode;
-}) {
+function Descendants(props: { isVisible: boolean; children: React.ReactNode }) {
     const { isVisible, children } = props;
     return (
         <AnimatePresence>

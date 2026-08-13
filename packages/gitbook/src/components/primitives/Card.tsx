@@ -1,8 +1,7 @@
 import { Icon } from '@gitbook/icons';
 
-import { type ClassValue, tcls } from '@/lib/tailwind';
-
 import { Link, type LinkInsightsProps, type LinkProps } from './Link';
+import { type ClassValue, tcls } from '@/lib/tailwind';
 
 export type CardProps = {
     href: string;

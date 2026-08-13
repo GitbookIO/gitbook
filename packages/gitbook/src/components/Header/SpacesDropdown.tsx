@@ -1,11 +1,11 @@
 import type { SiteSpace } from '@gitbook/api';
 import type { IconName } from '@gitbook/icons';
 
+import type { ButtonProps } from '../primitives';
+import { SpacesDropdownClient } from './SpacesDropdownClient';
 import type { GitBookSiteContext } from '@/lib/context';
 import { getLocalizedTitle, getSiteSpaceURL } from '@/lib/sites';
 import { tcls } from '@/lib/tailwind';
-import type { ButtonProps } from '../primitives';
-import { SpacesDropdownClient } from './SpacesDropdownClient';
 
 // Memoized regex for checking if a string starts with an emoji
 const EMOJI_REGEX = /^\p{Emoji}/u;

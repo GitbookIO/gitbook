@@ -3,12 +3,12 @@
 import NextLink, { type LinkProps as NextLinkProps } from 'next/link';
 import React from 'react';
 
-import { tcls } from '@/lib/tailwind';
-import { getSamePageAnchor, resolveAnchorURL } from '@/lib/urls';
-import { type TrackEventInput, useTrackEvent } from '../Insights';
 import { NavigationStatusContext, scrollToHash } from '../hooks';
+import { type TrackEventInput, useTrackEvent } from '../Insights';
 import { isExternalLink, toNonEmbedLink } from '../utils/link';
 import { type DesignTokenName, useClassnames } from './StyleProvider';
+import { tcls } from '@/lib/tailwind';
+import { getSamePageAnchor, resolveAnchorURL } from '@/lib/urls';
 
 // Props from Next, which includes NextLinkProps and all the things anchor elements support.
 type BaseLinkProps = Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, keyof NextLinkProps> &

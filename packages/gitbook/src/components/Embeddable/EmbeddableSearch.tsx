@@ -1,14 +1,7 @@
 'use client';
 
-import {
-    type SearchBaseProps,
-    SearchFrame,
-    SearchInput,
-    SearchLiveResultsAnnouncer,
-    SearchScopeControl,
-    useSearchController,
-} from '@/components/Search';
 import React from 'react';
+
 import { useTrackEvent } from '../Insights';
 import { LinkContext } from '../primitives';
 import {
@@ -17,6 +10,14 @@ import {
     EmbeddableIframeTabs,
     useEmbeddableLinkContext,
 } from './EmbeddableIframeAPI';
+import {
+    type SearchBaseProps,
+    SearchFrame,
+    SearchInput,
+    SearchLiveResultsAnnouncer,
+    SearchScopeControl,
+    useSearchController,
+} from '@/components/Search';
 
 type EmbeddableSearchProps = {
     baseURL: string;

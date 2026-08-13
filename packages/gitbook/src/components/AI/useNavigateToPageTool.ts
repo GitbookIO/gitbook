@@ -1,16 +1,18 @@
 'use client';
 
-import { useLanguage } from '@/intl/client';
-import { tString } from '@/intl/translate';
-import type { AIToolDefinition } from '@gitbook/api';
-import type { GitBookIntegrationTool } from '@gitbook/browser-types';
 import { useRouter } from 'next/navigation';
 import * as React from 'react';
 import { z } from 'zod';
 import { zodToJsonSchema } from 'zod-to-json-schema';
+
+import type { AIToolDefinition } from '@gitbook/api';
+import type { GitBookIntegrationTool } from '@gitbook/browser-types';
+
 import { NavigationStatusContext } from '../hooks';
 import { normalizePathname, resolveNavigationTarget } from './navigation';
 import { resolveAINavigationLink } from './server-actions';
+import { useLanguage } from '@/intl/client';
+import { tString } from '@/intl/translate';
 
 const NavigateToPageInputSchema = z.object({
     url: z
@@ -99,7 +101,7 @@ export function useNavigateToPageTool(): GitBookIntegrationTool {
                 router.push(target.href);
                 const committed = await waitForNavigationCommit(target.pathname);
                 if (!committed) {
-                    // biome-ignore lint/suspicious/noConsole: surfaces a navigation that never committed
+                    // oxlint-disable-next-line no-console
                     console.warn(`navigateToPage: navigation to ${target.href} did not commit`);
                 }
 

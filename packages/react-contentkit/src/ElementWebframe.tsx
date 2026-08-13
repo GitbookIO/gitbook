@@ -1,9 +1,10 @@
 'use client';
 
-import type { ContentKitWebFrame } from '@gitbook/api';
 import React from 'react';
 
+import type { ContentKitWebFrame } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
+
 import { type ContentKitClientContextData, useContentKitClientContext } from './context';
 import { resolveDynamicBinding } from './dynamic';
 import type { ContentKitClientElementProps } from './types';

@@ -1,3 +1,7 @@
+import { createMcpHandler } from 'mcp-handler';
+import type { NextRequest } from 'next/server';
+import { z } from 'zod';
+
 import { CustomizationPageActionType, SiteInsightsDisplayContext } from '@gitbook/api';
 
 import { type RouteLayoutParams, getDynamicSiteContext } from '@/app/utils';
@@ -10,9 +14,6 @@ import { joinPathWithBaseURL } from '@/lib/paths';
 import { findSiteSpaceBy, findSiteSpaceByUrl } from '@/lib/sites';
 import { trackServerInsightsEvents } from '@/lib/tracking';
 import { waitUntil } from '@/lib/waitUntil';
-import { createMcpHandler } from 'mcp-handler';
-import type { NextRequest } from 'next/server';
-import { z } from 'zod';
 
 /**
  * Fire-and-forget insights tracking for the MCP endpoint. A tracking failure (e.g. a 422 from the

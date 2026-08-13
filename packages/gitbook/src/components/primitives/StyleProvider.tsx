@@ -1,9 +1,8 @@
 'use client';
-import type { ClassValue } from '@/lib/tailwind';
-
 import { RecordCardLinkStyles, RecordCardStyles } from '../DocumentView/Table/styles';
 import { ToCLinkItemActiveStyles, ToCLinkItemStyles } from '../TableOfContents/styles';
 import { ButtonStyles, CardStyles, LinkStyles } from './styles';
+import type { ClassValue } from '@/lib/tailwind';
 
 const styles = {
     LinkStyles,

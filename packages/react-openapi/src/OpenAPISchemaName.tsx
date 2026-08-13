@@ -1,5 +1,7 @@
-import type { OpenAPIV3 } from '@gitbook/openapi-parser';
 import type React from 'react';
+
+import type { OpenAPIV3 } from '@gitbook/openapi-parser';
+
 import type { OpenAPIClientContext } from './context';
 import { t, tString } from './translate';
 import { getEffectiveArrayType } from './utils';

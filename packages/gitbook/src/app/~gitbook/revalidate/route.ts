@@ -1,8 +1,8 @@
+import { revalidateTag } from 'next/cache';
 import { type NextRequest, NextResponse } from 'next/server';
 
 import { getLogger } from '@/lib/logger';
 import { withVerifySignature } from '@/lib/routes';
-import { revalidateTag } from 'next/cache';
 
 interface JsonBody {
     tags: string[];

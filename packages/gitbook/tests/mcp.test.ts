@@ -1,6 +1,7 @@
-import { expect, it } from 'bun:test';
 import { Client } from '@modelcontextprotocol/sdk/client';
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js';
+import { expect, it } from 'bun:test';
+
 import { getContentTestURL } from './utils';
 
 it(

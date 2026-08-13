@@ -1,7 +1,8 @@
-import { parseMarkdown } from '@/lib/markdown';
 import { Icon } from '@gitbook/icons';
 import type { ContentKitServerContext } from '@gitbook/react-contentkit';
+
 import { PlainCodeBlock } from '../CodeBlock';
+import { parseMarkdown } from '@/lib/markdown';
 
 export const contentKitServerContext: ContentKitServerContext = {
     icons: {

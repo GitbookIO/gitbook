@@ -1,10 +1,9 @@
 'use client';
 
-import { type ClassValue, tcls } from '@/lib/tailwind';
-
 import { PageIcon } from '../PageIcon';
 import { StyledLink } from '../primitives';
 import { DropdownMenu, DropdownMenuItem } from '../primitives/DropdownMenu';
+import { type ClassValue, tcls } from '@/lib/tailwind';
 
 export type BreadcrumbSibling = {
     id: string;

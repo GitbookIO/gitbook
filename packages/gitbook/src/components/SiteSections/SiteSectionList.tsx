@@ -1,20 +1,21 @@
 'use client';
 
-import type { IconName } from '@gitbook/icons';
 import { motion } from 'motion/react';
 import React from 'react';
 
-import { type ClassValue, tcls } from '@/lib/tailwind';
-import { findSectionInGroup } from '@/lib/utils';
+import type { IconName } from '@gitbook/icons';
+
 import { useToggleAnimation } from '../hooks';
 import { Link, ToggleChevron } from '../primitives';
 import { ScrollContainer } from '../primitives/ScrollContainer';
-import { SectionIcon } from './SectionIcon';
 import type {
     ClientSiteSection,
     ClientSiteSectionGroup,
     ClientSiteSections,
 } from './encodeClientSiteSections';
+import { SectionIcon } from './SectionIcon';
+import { type ClassValue, tcls } from '@/lib/tailwind';
+import { findSectionInGroup } from '@/lib/utils';
 
 const MAX_ITEMS = 6; // If there are more sections than this, they'll be shown below the fold in a scrollview.
 
@@ -155,7 +156,7 @@ export function SiteSectionGroupItem(props: {
                     event.stopPropagation();
                     setIsOpen((prev) => !prev);
                 }}
-                className={`group/section-link flex w-full flex-row items-center gap-3 rounded-md straight-corners:rounded-none px-3 py-2 text-left transition-all hover:bg-tint-hover hover:text-tint-strong contrast-more:hover:ring-1 contrast-more:hover:ring-tint ${
+                className={`group/section-link flex w-full flex-row items-center gap-3 rounded-md px-3 py-2 text-left transition-all hover:bg-tint-hover hover:text-tint-strong straight-corners:rounded-none contrast-more:hover:ring-1 contrast-more:hover:ring-tint ${
                     isActiveGroup
                         ? 'font-semibold text-primary hover:bg-primary-hover hover:text-primary-strong contrast-more:text-primary-strong contrast-more:hover:ring-1 contrast-more:hover:ring-primary-hover'
                         : null
@@ -243,10 +244,7 @@ export function SiteSectionGroupItem(props: {
     );
 }
 
-function Descendants(props: {
-    isVisible: boolean;
-    children: React.ReactNode;
-}) {
+function Descendants(props: { isVisible: boolean; children: React.ReactNode }) {
     const { isVisible, children } = props;
     const { show, hide, scope } = useToggleAnimation(isVisible);
     return (

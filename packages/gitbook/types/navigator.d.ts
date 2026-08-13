@@ -3,5 +3,3 @@ declare global {
         globalPrivacyControl: boolean | undefined;
     }
 }
-
-export {};

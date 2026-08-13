@@ -1,10 +1,9 @@
 import { Icon } from '@gitbook/icons';
 
+import { ConsentForm } from './ConsentForm';
 import { StyledLink } from '@/components/primitives/StyledLink';
 import type { SiteOAuthConsentStart } from '@/lib/site-oauth';
 import { tcls } from '@/lib/tailwind';
-
-import { ConsentForm } from './ConsentForm';
 
 /**
  * Consent screen shown to a visitor when an MCP client requests authorization to a published site.
@@ -27,11 +26,11 @@ export function ConsentScreen(props: {
                         <img
                             src={client.logoUri}
                             alt=""
-                            className="size-10 shrink-0 rounded-corners:rounded-lg straight-corners:rounded-none object-contain"
+                            className="size-10 shrink-0 object-contain straight-corners:rounded-none rounded-corners:rounded-lg"
                             referrerPolicy="no-referrer"
                         />
                     ) : (
-                        <span className="flex size-10 shrink-0 items-center justify-center rounded-corners:rounded-lg straight-corners:rounded-none bg-tint-subtle text-tint">
+                        <span className="flex size-10 shrink-0 items-center justify-center bg-tint-subtle text-tint straight-corners:rounded-none rounded-corners:rounded-lg">
                             <Icon icon="key" className="size-5" />
                         </span>
                     )}
@@ -54,7 +53,7 @@ export function ConsentScreen(props: {
                 </div>
 
                 {/* Request statement — toned down, with the client and site names emphasized. */}
-                <p className="text-base text-tint leading-snug">
+                <p className="text-base leading-snug text-tint">
                     <span className="font-semibold text-tint-strong">{client.name}</span> wants to
                     access <span className="font-semibold text-tint-strong">{siteTitle} MCP</span>{' '}
                     on your behalf.
@@ -112,7 +111,7 @@ export function ConsentScreen(props: {
             </div>
 
             {/* Footer: trust acknowledgement + decision */}
-            <div className="border-tint-subtle border-t p-4 sm:px-8">
+            <div className="border-t border-tint-subtle p-4 sm:px-8">
                 <ConsentForm
                     siteId={siteId}
                     consentSessionId={consentSessionId}
@@ -156,10 +155,10 @@ export function ConsentError(props: { title?: string; message?: string }) {
     return (
         <ConsentCard>
             <div className="flex flex-col items-center gap-4 p-6 text-center sm:p-8">
-                <span className="flex size-12 items-center justify-center rounded-corners:rounded-full straight-corners:rounded-none bg-danger text-danger-strong">
+                <span className="flex size-12 items-center justify-center bg-danger text-danger-strong straight-corners:rounded-none rounded-corners:rounded-full">
                     <Icon icon="circle-exclamation" className="size-6" />
                 </span>
-                <h1 className="font-semibold text-lg text-tint-strong">{title}</h1>
+                <h1 className="text-lg font-semibold text-tint-strong">{title}</h1>
                 <p className="text-tint">{message}</p>
             </div>
         </ConsentCard>

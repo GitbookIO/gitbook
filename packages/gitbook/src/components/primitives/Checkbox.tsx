@@ -1,8 +1,9 @@
 'use client';
 
-import { Icon, IconStyle } from '@gitbook/icons';
 import * as CheckboxPrimitive from '@radix-ui/react-checkbox';
 import React from 'react';
+
+import { Icon, IconStyle } from '@gitbook/icons';
 
 import { tcls } from '@/lib/tailwind';
 
