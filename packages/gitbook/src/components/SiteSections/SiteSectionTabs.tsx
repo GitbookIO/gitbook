@@ -163,7 +163,12 @@ export function SiteSectionTabs(props: {
                     <NavigationMenu.Popup
                         className={tcls(
                             'relative h-(--popup-height) max-h-[calc(100vh-8rem)] w-(--popup-width) origin-(--transform-origin) overflow-hidden circular-corners:rounded-3xl rounded-corners:rounded-xl border border-tint bg-tint-base shadow-lg outline-hidden',
-                            `transition-[opacity,transform,width,height] ${MOTION}`,
+                            // `scale`, not `transform`: that is the property `scale-95` sets, and
+                            // leaving it out of the list makes the scale snap instead of animate.
+                            `transition-[opacity,scale,width,height] ${MOTION}`,
+                            // The size vars reset as the popup closes, so animating them on the way
+                            // out collapses the panel and grows it back while it fades.
+                            'data-ending-style:transition-[opacity,scale]',
                             'data-ending-style:scale-95 data-starting-style:scale-95 data-ending-style:opacity-0 data-starting-style:opacity-0'
                         )}
                     >
