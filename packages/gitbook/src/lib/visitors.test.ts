@@ -6,6 +6,7 @@ import {
     getVisitorAuthCookieName,
     getVisitorAuthCookieValue,
     getVisitorToken,
+    getVisitorType,
     getVisitorUnsignedClaims,
     normalizeVisitorURL,
 } from './visitors';
@@ -443,5 +444,49 @@ describe('normalizeVisitorURL', () => {
         expect(normalizeVisitorURL(url2).toString()).toBe(
             'https://docs.example.com/?ask=this+is+a+question'
         );
+    });
+});
+
+describe('getVisitorType', () => {
+    const requestWith = (headers: Record<string, string>) => ({ headers: new Headers(headers) });
+
+    it('should classify a known AI agent user-agent as "agent"', () => {
+        expect(
+            getVisitorType(
+                requestWith({
+                    'user-agent':
+                        'Mozilla/5.0 (compatible; GPTBot/1.2; +https://openai.com/gptbot)',
+                })
+            )
+        ).toBe('agent');
+        expect(getVisitorType(requestWith({ 'user-agent': 'ClaudeBot/1.0' }))).toBe('agent');
+    });
+
+    it('should classify a request with a Signature-Agent header as "agent"', () => {
+        expect(
+            getVisitorType(
+                requestWith({
+                    'user-agent': 'SomeClient/1.0',
+                    'signature-agent': '"https://chatgpt.com"',
+                })
+            )
+        ).toBe('agent');
+    });
+
+    it('should classify a normal browser user-agent as "human"', () => {
+        expect(
+            getVisitorType(
+                requestWith({
+                    'user-agent':
+                        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36',
+                    'sec-fetch-mode': 'navigate',
+                })
+            )
+        ).toBe('human');
+    });
+
+    it('should default to "human" when the user-agent is missing or empty', () => {
+        expect(getVisitorType(requestWith({}))).toBe('human');
+        expect(getVisitorType(requestWith({ 'user-agent': '' }))).toBe('human');
     });
 });
