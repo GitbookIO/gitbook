@@ -98,6 +98,16 @@
                     "new_sqlite_classes": ["DOQueueHandler", "DOShardedTagCache", "R2WriteBuffer"],
                 },
             ],
+            "observability": {
+                "traces": {
+                    "enabled": true,
+                    "head_sampling_rate": 1,
+                },
+                "logs": {
+                    "enabled": true,
+                    "head_sampling_rate": 1,
+                },
+            },
         },
         "staging": {
             "vars": {

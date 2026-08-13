@@ -92,6 +92,16 @@
                     },
                 ],
             },
+            "observability": {
+                "traces": {
+                    "enabled": true,
+                    "head_sampling_rate": 1,
+                },
+                "logs": {
+                    "enabled": true,
+                    "head_sampling_rate": 1,
+                },
+            },
         },
         "staging": {
             "vars": {
