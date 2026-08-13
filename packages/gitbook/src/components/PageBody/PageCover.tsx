@@ -1,9 +1,5 @@
 import type { GitBookSiteContext } from '@/lib/context';
-import {
-    CustomizationHeaderPreset,
-    type RevisionPageDocument,
-    type RevisionPageDocumentCover,
-} from '@gitbook/api';
+import type { RevisionPageDocument, RevisionPageDocumentCover } from '@gitbook/api';
 import type { StaticImageData } from 'next/image';
 
 import { getImageAttributes } from '@/components/utils';
@@ -17,7 +13,6 @@ import { getCoverHeight } from './coverHeight';
 import defaultPageCoverSVG from './default-page-cover.svg';
 
 const defaultPageCover = defaultPageCoverSVG as StaticImageData;
-const DEFAULT_RESPONSIVE_COVER_CUTOFF = '56.25%';
 
 /**
  * Cover for the page.
@@ -31,24 +26,6 @@ export async function PageCover(props: {
     const { as, page, cover, context } = props;
     const height = getCoverHeight(cover);
     const mask = page.layout.coverMask === 'radial' ? 'radial' : 'none';
-
-    const initialCoverCutoff = () => {
-        if (!height) {
-            return DEFAULT_RESPONSIVE_COVER_CUTOFF;
-        }
-
-        let total = height;
-        if (context.customization.announcement?.enabled) {
-            total += 68;
-        }
-        if (context.customization.header.preset !== CustomizationHeaderPreset.None) {
-            total += 64;
-        }
-        if (context.visibleSections && context.visibleSections.list.length > 1) {
-            total += 45;
-        }
-        return `${total}px`;
-    };
 
     const [resolved, resolvedDark] = await Promise.all([
         cover.ref ? resolveContentRef(cover.ref, context) : null,
@@ -104,7 +81,6 @@ export async function PageCover(props: {
 
     return (
         <>
-            <style>{`:root { --cover-height: ${initialCoverCutoff()}; }`}</style>
             <div
                 data-gb-page-cover
                 data-cover-text-color={cover.textColor}

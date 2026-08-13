@@ -1,10 +1,12 @@
 import { describe, expect, it } from 'bun:test';
-import type { RevisionPageDocument, SiteSpace } from '@gitbook/api';
+import type { RevisionPageDocument, SiteSection, SiteSpace, SiteStructure } from '@gitbook/api';
 import { TranslationLanguage } from '@gitbook/api';
 
+import type { GitBookSiteContext } from '@/lib/context';
 import { createLinker } from './links';
 import {
     filterSiteSpacesByLocale,
+    getFallbackSiteSpacePath,
     getLinkerForSiteSpace,
     getSiteSpacePagePaths,
     resolveSiteSpaceCustomHomePage,
@@ -126,5 +128,58 @@ describe('custom site-space home page', () => {
             '',
             'introduction',
         ]);
+    });
+});
+
+describe('getFallbackSiteSpacePath', () => {
+    function makeVariant(id: string, path: string, isDefault: boolean): SiteSpace {
+        return { id, path, default: isDefault } as unknown as SiteSpace;
+    }
+
+    function makeSection(
+        id: string,
+        path: string,
+        isDefault: boolean,
+        siteSpaces: SiteSpace[]
+    ): SiteSection {
+        return { id, path, default: isDefault, object: 'site-section', siteSpaces } as SiteSection;
+    }
+
+    function makeContext(structure: SiteStructure): GitBookSiteContext {
+        return { structure } as GitBookSiteContext;
+    }
+
+    const defaultVariant = makeVariant('sitesp_en', 'eng-landing-page', true);
+    const translationVariant = makeVariant('sitesp_ua', 'landing-page', false);
+    const otherVariant = makeVariant('sitesp_docs_ua', 'documentation', false);
+
+    const context = makeContext({
+        type: 'sections',
+        structure: [
+            makeSection('sitesc_home', 'main-ua', true, [defaultVariant, translationVariant]),
+            makeSection('sitesc_docs', 'novaposhta-docs', false, [otherVariant]),
+        ],
+    });
+
+    it('returns an empty path for the default variant of the default section', () => {
+        expect(getFallbackSiteSpacePath(context, defaultVariant)).toBe('');
+    });
+
+    it('keeps the section path for a non-default variant of the default section', () => {
+        expect(getFallbackSiteSpacePath(context, translationVariant)).toBe('main-ua/landing-page');
+    });
+
+    it('keeps the section path for a non-default section', () => {
+        expect(getFallbackSiteSpacePath(context, otherVariant)).toBe(
+            'novaposhta-docs/documentation'
+        );
+    });
+
+    it('returns the variant path on a site without sections', () => {
+        const withoutSections = makeContext({
+            type: 'siteSpaces',
+            structure: [defaultVariant, translationVariant],
+        });
+        expect(getFallbackSiteSpacePath(withoutSections, translationVariant)).toBe('landing-page');
     });
 });

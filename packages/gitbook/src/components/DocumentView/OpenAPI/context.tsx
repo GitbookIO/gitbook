@@ -1,14 +1,26 @@
 import type { JSONDocument } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
-import { type OpenAPIContextInput, checkIsValidLocale } from '@gitbook/react-openapi';
+import {
+    type OpenAPIContextInput,
+    type OpenAPIOperationData,
+    type OpenAPISchemasData,
+    type OpenAPIWebhookData,
+    checkIsValidLocale,
+    extractOrigin,
+    getAllServerOrigins,
+    getOperationTitle,
+    getSchemasHeading,
+} from '@gitbook/react-openapi';
 
 import type { BlockProps } from '../Block';
 import { PlainCodeBlock } from '../CodeBlock';
 import { DocumentView } from '../DocumentView';
 import { Heading } from '../Heading';
+import type { OpenAPIBlockClientContextProps } from './OpenAPIBlockClient';
 
 import './style.css';
 import { DEFAULT_LOCALE, getSpaceLocale } from '@/intl/server';
+import { getAssetURL } from '@/lib/assets';
 import type { GitBookAnyContext } from '@/lib/context';
 import { GITBOOK_URL } from '@/lib/env';
 import { buildSignedProxyUrl } from '@/lib/openapi/proxy-token';
@@ -17,6 +29,7 @@ import type {
     OpenAPISchemasBlock,
     OpenAPIWebhookBlock,
 } from '@/lib/openapi/types';
+import { SCALAR_RUNTIME_PATH } from './scalar-runtime-path';
 
 // Serve the proxy from GitBook's own origin rather than the customer domain, so a proxied
 // response can never execute as HTML under a customer's trusted origin.
@@ -113,8 +126,73 @@ export function getOpenAPIContext(args: {
         expandAllResponses: expandAllResponses || props.context.mode === 'print',
         expandAllModelSections: expandAllModelSections || props.context.mode === 'print',
         headless,
+        scalarRuntimeURL: getAssetURL(SCALAR_RUNTIME_PATH),
         id: block.meta?.id,
         blockKey: block.key,
         locale,
+    };
+}
+
+// Same inputs as `getOpenAPIContext`, but anything that can't cross the RSC boundary is pre-rendered
+// here or rebuilt on the client, so the block can sit behind a `next/dynamic` chunk.
+export function getOpenAPIBlockClientProps(args: {
+    props: BlockProps<AnyOpenAPIOperationsBlock | OpenAPISchemasBlock | OpenAPIWebhookBlock>;
+    /** Omitted for schemas blocks, which have no operation nor servers. */
+    data?: OpenAPIOperationData | OpenAPIWebhookData;
+    /** Schemas blocks render their own heading, from a different shape. */
+    schemas?: { data: OpenAPISchemasData; grouped: boolean | undefined };
+    specUrl: string | null;
+    context: GitBookAnyContext | undefined;
+    expandAllResponses?: boolean;
+    expandAllModelSections?: boolean;
+    headless?: boolean;
+}): OpenAPIBlockClientContextProps {
+    const { props, data, schemas, specUrl, context } = args;
+    const serverContext = getOpenAPIContext(args);
+    const { renderCodeBlock, renderDocument, renderHeading, resolveProxyUrl, ...serializable } =
+        serverContext;
+
+    const heading = data
+        ? getOperationHeading(data, serializable.headless)
+        : schemas
+          ? getSchemasHeading(schemas.data, schemas.grouped)
+          : null;
+    const descriptionDocument = data?.operation['x-gitbook-description-document'];
+
+    const origins = data ? getAllServerOrigins(data.servers) : [];
+    const specOrigin = specUrl ? extractOrigin(specUrl) : null;
+    if (specOrigin) {
+        origins.push(specOrigin);
+    }
+
+    return {
+        ...serializable,
+        mode: props.context.mode,
+        codeTheme:
+            context && 'customization' in context
+                ? context.customization.styling.codeTheme.openapi
+                : undefined,
+        proxyUrl: resolveProxyUrl?.(origins) ?? undefined,
+        headingNode: heading ? renderHeading(heading) : null,
+        descriptionNode: descriptionDocument
+            ? renderDocument({ document: descriptionDocument })
+            : null,
+    };
+}
+
+// Mirrors the condition in `OpenAPISummary`, which is the only place asking for this heading.
+function getOperationHeading(
+    data: OpenAPIOperationData | OpenAPIWebhookData,
+    headless: boolean | undefined
+) {
+    const title = getOperationTitle(data);
+    if (headless || !title) {
+        return null;
+    }
+
+    return {
+        title,
+        deprecated: data.operation.deprecated ?? false,
+        stability: data.operation['x-stability'],
     };
 }

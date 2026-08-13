@@ -6,6 +6,7 @@ import type {
     OpenAPICustomSecurityScheme,
     OpenAPIOperationData,
     OpenAPISecurityScope,
+    OpenAPIWebhookData,
 } from './types';
 
 export function checkIsReference(input: unknown): input is OpenAPIV3.ReferenceObject {
@@ -482,4 +483,17 @@ function resolveRequiredScopesForScheme(
     }
 
     return operationScopes.map((scope) => [scope, undefined]);
+}
+
+/**
+ * Title shown for an operation or webhook. Exported so hosts that pre-render the heading
+ * server-side derive it the same way this package does.
+ */
+export function getOperationTitle(
+    data: OpenAPIOperationData | OpenAPIWebhookData
+): string | undefined {
+    if (data.operation.summary) {
+        return data.operation.summary;
+    }
+    return 'name' in data ? data.name : undefined;
 }

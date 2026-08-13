@@ -28,6 +28,7 @@ import {
 } from '@/lib/data';
 import { isGitBookAssetsHostURL, isGitBookHostURL } from '@/lib/env';
 import { getImageResizingContextId } from '@/lib/images';
+import { isAITrainingOrIndexingRequest } from '@/lib/indexing-crawlers';
 import { MiddlewareHeaders } from '@/lib/middleware';
 import {
     createOAuthProtectedResourceMetadataResponse,
@@ -150,6 +151,13 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
     }
 
     const { url: siteRequestURL, mode } = match;
+
+    if (isAITrainingOrIndexingRequest(request)) {
+        return new Response('This endpoint is not intended for AI training or indexing.', {
+            status: 403,
+            headers: { 'content-type': 'text/plain; charset=utf-8' },
+        });
+    }
 
     // Normalize URL after extracting the URL from the request to make sure the client is redirected to the proper one
     const normalizationResponse = normalizeRequestURL(siteRequestURL);
@@ -327,11 +335,16 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         // Make sure the URL is clean of any va token after a successful lookup,
         // and of any visitor.* params that may have been passed to the URL.
         //
+        // We only redirect if the visitor token is not coming from a revalidation request, as we don't want to redirect in that case.
+        //
         // The token and the visitor.* params value are stored in cookies that are set
         // on the redirect response.
         //
         const normalizedVisitorURL = normalizeVisitorURL(incomingURL);
-        if (normalizedVisitorURL.toString() !== incomingURL.toString()) {
+        if (
+            normalizedVisitorURL.toString() !== incomingURL.toString() &&
+            visitorToken?.source !== 'revalidation'
+        ) {
             return writeResponseCookies(
                 NextResponse.redirect(normalizedVisitorURL.toString()),
                 cookies

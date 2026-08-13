@@ -50,6 +50,37 @@ describe('markdown serving based on user agent', () => {
     });
 });
 
+describe('search parameters for indexing crawlers', () => {
+    const ASK_QUESTION = 'This question must not reach Ask AI';
+    const SEARCH_QUERY = 'This query must not reach search';
+
+    it('should reject Ask AI requests from Meta external agents', async () => {
+        const response = await fetch(
+            getContentTestURL(
+                `${TEST_PAGE_URL}?ask=${encodeURIComponent(ASK_QUESTION)}&goal=Read%20the%20docs`
+            ),
+            { headers: { 'User-Agent': 'meta-externalagent/1.1' } }
+        );
+        expect(response.status).toBe(403);
+        expect(response.headers.get('content-type')).toContain('text/plain');
+        expect(await response.text()).toBe(
+            'This endpoint is not intended for AI training or indexing.'
+        );
+    });
+
+    it('should reject search requests from Amazonbot', async () => {
+        const response = await fetch(
+            getContentTestURL(`${TEST_PAGE_URL}?q=${encodeURIComponent(SEARCH_QUERY)}`),
+            { headers: { 'User-Agent': 'Amazonbot/0.1' } }
+        );
+        expect(response.status).toBe(403);
+        expect(response.headers.get('content-type')).toContain('text/plain');
+        expect(await response.text()).toBe(
+            'This endpoint is not intended for AI training or indexing.'
+        );
+    });
+});
+
 describe('markdown pages', () => {
     it('should expose a markdown page with the .md extension', async () => {
         const response = await fetch(

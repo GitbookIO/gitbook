@@ -167,7 +167,7 @@ describe('linkerWithAbsoluteURLs', () => {
     });
 
     it('preserves direct page paths from wrapped linkers', () => {
-        const pages = [{ id: 'intro', type: 'document', path: 'intro', pages: [] }] as unknown as [
+        const pages = [{ id: 'intro', type: 'document', path: 'intro', pages: [] }] as [
             RevisionPageDocument,
         ];
         const absoluteLinker = linkerWithAbsoluteURLs(linkerWithDirectPagePaths(root));

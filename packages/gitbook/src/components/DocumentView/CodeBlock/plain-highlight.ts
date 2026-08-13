@@ -10,7 +10,7 @@ import {
     getHighlightTokensText,
     parseDiffNotation,
     truncateHighlightTokens,
-} from './highlight';
+} from './highlight-tokens';
 
 /**
  * Parse a code block without highlighting it.

@@ -1,0 +1,35 @@
+name: CSS browser compatibility
+
+on:
+    pull_request_target:
+        types: [opened, reopened, synchronize]
+
+permissions:
+    contents: read
+    issues: write
+    pull-requests: read
+
+concurrency:
+    group: css-browser-compatibility-${{ github.event.pull_request.number }}
+    cancel-in-progress: true
+
+jobs:
+    check:
+        name: Check newly added CSS declarations
+        runs-on: ubuntu-latest
+        timeout-minutes: 6
+        steps:
+            # pull_request_target checks out the trusted base branch by default. Never use the PR ref here.
+            - name: Checkout trusted checker
+              uses: actions/checkout@v4
+            - name: Setup Bun
+              uses: ./.github/composite/setup-bun
+            - name: Install dependencies
+              run: bun install --frozen-lockfile
+              env:
+                  PUPPETEER_SKIP_DOWNLOAD: 1
+            - name: Check CSS browser compatibility
+              working-directory: packages/gitbook
+              run: bun run check:css-browser-compatibility
+              env:
+                  GITHUB_TOKEN: ${{ github.token }}
