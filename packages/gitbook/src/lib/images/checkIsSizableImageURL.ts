@@ -9,7 +9,7 @@ export enum SizableImageAction {
 /**
  * https://developers.cloudflare.com/images/transform-images/#supported-input-formats
  */
-const SUPPORTED_IMAGE_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
+const SUPPORTED_IMAGE_EXTENSIONS = new Set(['.jpg', '.jpeg', '.png', '.gif', '.webp']);
 
 /**
  * Check if an image URL is resizable.
@@ -34,7 +34,7 @@ export function checkIsSizableImageURL(input: string): SizableImageAction {
     }
 
     const extension = getExtension(parsed.pathname).toLowerCase();
-    if (!extension || SUPPORTED_IMAGE_EXTENSIONS.includes(extension)) {
+    if (!extension || SUPPORTED_IMAGE_EXTENSIONS.has(extension)) {
         // If no extension, we consider it resizable.
         return SizableImageAction.Resize;
     }

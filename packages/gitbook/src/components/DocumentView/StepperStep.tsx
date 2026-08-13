@@ -1,10 +1,10 @@
-import type { DocumentBlockStepperStep } from '@gitbook/api';
 import { assert } from 'ts-essentials';
 
-import { tcls } from '@/lib/tailwind';
+import type { DocumentBlockStepperStep } from '@gitbook/api';
 
 import type { BlockProps } from './Block';
 import { Blocks } from './Blocks';
+import { tcls } from '@/lib/tailwind';
 
 export function StepperStep(props: BlockProps<DocumentBlockStepperStep>) {
     const { block, style, ancestorBlocks, ...contextProps } = props;
@@ -42,7 +42,7 @@ export function StepperStep(props: BlockProps<DocumentBlockStepperStep>) {
                 >
                     {index + 1}
                 </div>
-                <div className="can-override-bg absolute top-9 bottom-2 left-3.5 w-px bg-primary-7 theme-muted:bg-tint-6" />
+                <div className="can-override-bg absolute bottom-2 left-3.5 top-9 w-px bg-primary-7 theme-muted:bg-tint-6" />
             </div>
             <Blocks
                 {...contextProps}

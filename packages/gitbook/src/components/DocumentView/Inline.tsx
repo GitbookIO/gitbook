@@ -1,6 +1,5 @@
 import type { DocumentInline, JSONDocument } from '@gitbook/api';
 
-import { nullIfNever } from '@/lib/typescript';
 import { Annotation } from './Annotation/Annotation';
 import type { DocumentContextProps } from './DocumentView';
 import { Emoji } from './Emoji';
@@ -11,6 +10,7 @@ import { InlineImage } from './InlineImage';
 import { InlineLink } from './InlineLink';
 import { InlineMath } from './Math';
 import { Mention } from './Mention';
+import { nullIfNever } from '@/lib/typescript';
 
 export interface InlineProps<T extends DocumentInline> extends DocumentContextProps {
     inline: T;

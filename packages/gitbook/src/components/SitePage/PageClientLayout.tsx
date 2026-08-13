@@ -3,17 +3,13 @@
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import React from 'react';
 
-import { currentPageMetadataStore, useScrollToHash } from '@/components/hooks';
 import type { PageMetaLinks } from './SitePage';
+import { currentPageMetadataStore, useScrollToHash } from '@/components/hooks';
 
 /**
  * Client component to initialize interactivity for a page.
  */
-export function PageClientLayout({
-    pageMetaLinks,
-}: {
-    pageMetaLinks: PageMetaLinks | null;
-}) {
+export function PageClientLayout({ pageMetaLinks }: { pageMetaLinks: PageMetaLinks | null }) {
     // We use this hook in the page layout to ensure the elements for the blocks
     // are rendered before we scroll to a hash or to the top of the page
     useScrollToHash();
@@ -53,9 +49,7 @@ function useStripFallbackQueryParam() {
 /**
  * Register the generated page metadata such as meta links for the current page.
  */
-function useRegisterPageMetadata(metadata: {
-    pageMetaLinks: PageMetaLinks | null;
-}) {
+function useRegisterPageMetadata(metadata: { pageMetaLinks: PageMetaLinks | null }) {
     const { pageMetaLinks } = metadata;
     React.useEffect(() => {
         currentPageMetadataStore.setState({ metaLinks: pageMetaLinks });

@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'bun:test';
+
 import { type OpenAPIV3, parseOpenAPI } from '@gitbook/openapi-parser';
-import { getSchemaAlternatives, getSchemaProperties } from './OpenAPISchema';
+
 import { dereferenceFilesystem } from './dereference';
+import { getSchemaAlternatives, getSchemaProperties } from './OpenAPISchema';
 
 describe('getSchemaAlternatives', () => {
     it('should flatten oneOf', () => {

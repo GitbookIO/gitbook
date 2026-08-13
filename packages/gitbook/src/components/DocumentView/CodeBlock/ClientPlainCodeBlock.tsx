@@ -1,7 +1,8 @@
 'use client';
 
-import type { CustomizationThemedCodeTheme } from '@gitbook/api';
 import { useId } from 'react';
+
+import type { CustomizationThemedCodeTheme } from '@gitbook/api';
 
 import type { DocumentContext } from '../DocumentView';
 import { ClientCodeBlock } from './ClientCodeBlock';

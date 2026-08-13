@@ -1,6 +1,8 @@
 import { describe, expect, test } from 'bun:test';
-import type { CustomizationFontDefinition } from '@gitbook/api';
 import stylelint from 'stylelint';
+
+import type { CustomizationFontDefinition } from '@gitbook/api';
+
 import { generateFontFacesCSS, getFontSourcesToPreload } from './custom';
 
 const TEST_FONTS_BASIC: CustomizationFontDefinition = {

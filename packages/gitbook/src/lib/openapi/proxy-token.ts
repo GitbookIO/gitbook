@@ -1,4 +1,5 @@
 import { createHmac, timingSafeEqual } from 'node:crypto';
+
 import { GITBOOK_SECRET } from '@/lib/env/globals';
 
 // Sign the allowed origins plus the issuing site id (for attribution). Null if no signing key.

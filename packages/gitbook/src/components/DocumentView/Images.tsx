@@ -1,12 +1,11 @@
 import type { DocumentBlockImage, DocumentBlockImages, JSONDocument, Length } from '@gitbook/api';
 
-import { Image, type ImageResponsiveSize } from '@/components/utils';
-import { resolveContentRefInDocument } from '@/lib/references';
-import { type ClassValue, tcls } from '@/lib/tailwind';
-
 import type { BlockProps } from './Block';
 import { Caption, type CaptionAlign } from './Caption';
 import type { DocumentContext } from './DocumentView';
+import { Image, type ImageResponsiveSize } from '@/components/utils';
+import { resolveContentRefInDocument } from '@/lib/references';
+import { type ClassValue, tcls } from '@/lib/tailwind';
 
 export function Images(props: BlockProps<DocumentBlockImages>) {
     const { document, block, style, context, isEstimatedOffscreen } = props;
@@ -127,7 +126,7 @@ async function ImageBlock(props: {
                     style={
                         withFrame
                             ? 'rounded-xl'
-                            : 'circular-corners:rounded-2xl rounded-corners:rounded-sm'
+                            : 'rounded-corners:rounded-sm circular-corners:rounded-2xl'
                     }
                 />
             </Caption>

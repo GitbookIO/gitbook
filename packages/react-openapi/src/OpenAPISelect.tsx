@@ -4,8 +4,9 @@ import { Select } from '@base-ui/react/select';
 import clsx from 'classnames';
 import { useCallback } from 'react';
 import { useStore } from 'zustand';
-import { OpenAPITooltip } from './OpenAPITooltip';
+
 import { getOrCreateStoreByKey } from './getOrCreateStoreByKey';
+import { OpenAPITooltip } from './OpenAPITooltip';
 
 export type Key = string | number;
 

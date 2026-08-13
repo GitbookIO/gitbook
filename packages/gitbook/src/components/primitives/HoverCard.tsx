@@ -1,6 +1,7 @@
 'use client';
-import { tcls } from '@/lib/tailwind';
 import * as RadixHoverCard from '@radix-ui/react-hover-card';
+
+import { tcls } from '@/lib/tailwind';
 
 export function HoverCardRoot(props: RadixHoverCard.HoverCardProps) {
     return (
@@ -30,7 +31,7 @@ export function HoverCard(
         <RadixHoverCard.Portal>
             <RadixHoverCard.Content
                 side={props.side ?? 'top'}
-                className="pointer-events-none z-50 w-screen max-w-md animate-scale-in px-4 data-[state='closed']:animate-scale-out sm:w-auto"
+                className="animate-scale-in data-[state='closed']:animate-scale-out pointer-events-none z-50 w-screen max-w-md px-4 sm:w-auto"
             >
                 <div
                     className={tcls(

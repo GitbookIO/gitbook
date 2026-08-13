@@ -730,7 +730,7 @@ const config: Config = {
                     addVariant(variant, `html.${variant} &`);
 
                     if (category === 'tint') {
-                        /* Because we check for a class on the `html` element, like `html.$variant`, we cannot easily chain customisation variants "the Tailwind way". 
+                        /* Because we check for a class on the `html` element, like `html.$variant`, we cannot easily chain customisation variants "the Tailwind way".
                         Basically, when you write `theme-clean:tint:`, you're creating a CSS selector like `html.theme-clean html.tint &`.
                         We need the selector to apply to the same element, like `html.$variant.$otherVariant` instead.
                         Instead of relying on Tailwind variant chaining, we manually create a few additional variants for often-used combinations like theme+tint. */

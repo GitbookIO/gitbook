@@ -1,8 +1,8 @@
+import { build } from 'bun';
 import { mkdir, rename, rm } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { build } from 'bun';
 
 import { MERMAID_RUNTIME_PATH } from '../src/components/DocumentView/CodeBlock/mermaid-runtime-path';
 

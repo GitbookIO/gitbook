@@ -1,13 +1,12 @@
 import type { DocumentBlockParagraph } from '@gitbook/api';
 import { CustomizationAIMode } from '@gitbook/api';
 
-import { AskAIParagraphButton } from '@/components/AIChat/AskAIParagraphButton';
-import { getNodeText } from '@/lib/document';
-import { tcls } from '@/lib/tailwind';
-
 import type { BlockProps } from './Block';
 import { Inlines } from './Inlines';
 import { getTextAlignment } from './utils';
+import { AskAIParagraphButton } from '@/components/AIChat/AskAIParagraphButton';
+import { getNodeText } from '@/lib/document';
+import { tcls } from '@/lib/tailwind';
 
 export function Paragraph(props: BlockProps<DocumentBlockParagraph>) {
     const { block, style, ...contextProps } = props;

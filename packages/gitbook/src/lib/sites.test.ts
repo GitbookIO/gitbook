@@ -1,9 +1,10 @@
 import { describe, expect, it } from 'bun:test';
+
 import type { SiteSection, SiteSpace, SiteStructure } from '@gitbook/api';
 import { TranslationLanguage } from '@gitbook/api';
 
-import type { GitBookSiteContext } from '@/lib/context';
 import { filterSiteSpacesByLocale, getFallbackSiteSpacePath } from './sites';
+import type { GitBookSiteContext } from '@/lib/context';
 
 function makeSiteSpace(language: TranslationLanguage | undefined): SiteSpace {
     return { space: { language } } as unknown as SiteSpace;

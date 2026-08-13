@@ -1,17 +1,18 @@
 'use client';
 
-import type { CustomizationAIMode } from '@gitbook/api';
-import { Icon, type IconName } from '@gitbook/icons';
 import * as React from 'react';
 import type { ReactNode } from 'react';
 
-import { isAIChatEnabled, isAISearchEnabled } from '@/components/utils/isAIChatEnabled';
-import { tString, useLanguage } from '@/intl/client';
+import type { CustomizationAIMode } from '@gitbook/api';
 import type { GitBookAssistant } from '@gitbook/browser-types';
+import { Icon, type IconName } from '@gitbook/icons';
+
 import { useAIChatController, useAIChatState } from '.';
 import { AIChatIcon, AISearchIcon, getAIChatName } from '../AIChat';
 import { useIntegrationAssistants } from '../Integrations';
 import { useSetSearchState } from '../Search/useSearch';
+import { isAIChatEnabled, isAISearchEnabled } from '@/components/utils/isAIChatEnabled';
+import { tString, useLanguage } from '@/intl/client';
 
 // Unify assistants configuration context with the assistants hook in one place
 export type AIConfig = {

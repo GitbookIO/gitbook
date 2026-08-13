@@ -1,5 +1,4 @@
 import 'server-only';
-
 import { createHmac } from 'node:crypto';
 
 import { GITBOOK_OAUTH_SERVER_URL, GITBOOK_SITE_OAUTH_SIGNING_SECRET } from '@/lib/env';

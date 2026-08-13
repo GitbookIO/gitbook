@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'bun:test';
+
 import { GitBookAPIError } from '@gitbook/api';
+
 import { extractCacheControl } from './errors';
 
 describe('extractCacheControl', () => {

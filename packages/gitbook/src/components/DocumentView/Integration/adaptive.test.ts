@@ -1,9 +1,10 @@
 import { describe, expect, it } from 'bun:test';
+
 import type { ContentKitRenderOutput, ContentKitWebFrame } from '@gitbook/api';
 
+import { getWebframePageContext, integrationBlockContainsWebframe } from './adaptive';
 import type { GitBookAnyContext } from '@/lib/context';
 import { createLinker } from '@/lib/links';
-import { getWebframePageContext, integrationBlockContainsWebframe } from './adaptive';
 
 const webframe: ContentKitWebFrame = {
     type: 'webframe',

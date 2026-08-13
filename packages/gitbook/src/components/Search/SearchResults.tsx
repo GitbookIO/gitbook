@@ -4,18 +4,17 @@ import assertNever from 'assert-never';
 import { motion } from 'framer-motion';
 import React from 'react';
 
-import { useAI } from '@/components/AI';
-import { useCurrentContent } from '@/components/hooks';
-import { t, useLanguage } from '@/intl/client';
-import { tcls } from '@/lib/tailwind';
-
 import { Button, SkeletonParagraph, SkeletonSmall } from '../primitives';
+import { addRecentSearchQuery } from './recent-queries';
 import { SearchPageResultItem } from './SearchPageResultItem';
 import { SearchQuestionResultItem } from './SearchQuestionResultItem';
 import { SearchRecordResultItem } from './SearchRecordResultItem';
 import { SearchResultItem } from './SearchResultItem';
-import { addRecentSearchQuery } from './recent-queries';
 import type { ResultType } from './useSearchResults';
+import { useAI } from '@/components/AI';
+import { useCurrentContent } from '@/components/hooks';
+import { t, useLanguage } from '@/intl/client';
+import { tcls } from '@/lib/tailwind';
 
 export interface SearchResultsRef {
     select(): boolean;

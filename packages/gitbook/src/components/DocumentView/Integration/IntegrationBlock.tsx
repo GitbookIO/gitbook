@@ -1,19 +1,19 @@
-import { GITBOOK_INTEGRATIONS_CONTENT_HOST, GITBOOK_INTEGRATIONS_HOST } from '@/lib/env';
-import { tcls } from '@/lib/tailwind';
 import type { DocumentBlockIntegration, RenderIntegrationUI } from '@gitbook/api';
 import { ContentKit, ContentKitOutput } from '@gitbook/react-contentkit';
 
 import type { BlockProps } from '../Block';
+import { getWebframePageContext, integrationBlockContainsWebframe } from './adaptive';
+import { contentKitServerContext } from './contentkit';
 import './contentkit.css';
-import type { GitBookLinker } from '@/lib/links';
 import {
     ContentKitWithClientContext,
     type WebframeLinkerData,
 } from './ContentKitWithClientContext';
-import { getWebframePageContext, integrationBlockContainsWebframe } from './adaptive';
-import { contentKitServerContext } from './contentkit';
 import { fetchSafeIntegrationUI } from './render';
 import { renderIntegrationUi } from './server-actions';
+import { GITBOOK_INTEGRATIONS_CONTENT_HOST, GITBOOK_INTEGRATIONS_HOST } from '@/lib/env';
+import type { GitBookLinker } from '@/lib/links';
+import { tcls } from '@/lib/tailwind';
 
 export async function IntegrationBlock(props: BlockProps<DocumentBlockIntegration>) {
     const { block, context, style } = props;

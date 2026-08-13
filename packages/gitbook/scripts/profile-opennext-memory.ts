@@ -1,7 +1,7 @@
+import { file, sleep, spawn } from 'bun';
 import { stat } from 'node:fs/promises';
 import { createConnection } from 'node:net';
 import { join } from 'node:path';
-import { file, sleep, spawn } from 'bun';
 import WebSocket from 'ws';
 
 type HeapUsage = {
@@ -60,7 +60,7 @@ try {
     const afterLoad = await getMeasurements();
     const bundle = await getBundleMetrics();
 
-    // biome-ignore lint/suspicious/noConsole: JSON on stdout is this script's public interface.
+    // oxlint-disable-next-line no-console -- JSON on stdout is this script's public interface.
     console.log(
         JSON.stringify(
             {

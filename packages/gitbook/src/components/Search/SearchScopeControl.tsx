@@ -1,9 +1,10 @@
 'use client';
 
-import { t, tString, useLanguage } from '@/intl/client';
 import type { SiteSection } from '@gitbook/api';
+
 import { Button, DropdownMenu, DropdownMenuItem, ToggleChevron } from '../primitives';
 import { useSearchState, useSetSearchState } from './useSearch';
+import { t, tString, useLanguage } from '@/intl/client';
 
 interface SearchScopeControlProps {
     spaceTitle: string;
@@ -84,7 +85,7 @@ function SearchScopeSectionControl(props: SearchScopeControlProps & { isExtended
                     <span className="text-tint-strong">
                         {t(language, 'search_scope_section_all')}
                     </span>
-                    <span className="text-tint-subtle text-xs">
+                    <span className="text-xs text-tint-subtle">
                         {t(language, 'search_scope_section_all_description')}
                     </span>
                 </div>
@@ -101,7 +102,7 @@ function SearchScopeSectionControl(props: SearchScopeControlProps & { isExtended
                     <span className="text-tint-strong">
                         {t(language, 'search_scope_section_current', section?.title ?? '')}
                     </span>
-                    <span className="text-tint-subtle text-xs">
+                    <span className="text-xs text-tint-subtle">
                         {t(language, 'search_scope_section_current_description')}
                     </span>
                 </div>
@@ -144,7 +145,7 @@ function SearchScopeVariantControl(props: SearchScopeControlProps & { isExtended
                     <span className="text-tint-strong">
                         {t(language, 'search_scope_variant_current', spaceTitle ?? '')}
                     </span>
-                    <span className="text-tint-subtle text-xs">
+                    <span className="text-xs text-tint-subtle">
                         {t(language, 'search_scope_variant_current_description')}
                     </span>
                 </div>
@@ -160,7 +161,7 @@ function SearchScopeVariantControl(props: SearchScopeControlProps & { isExtended
                     <span className="text-tint-strong">
                         {t(language, 'search_scope_variant_all')}
                     </span>
-                    <span className="text-tint-subtle text-xs">
+                    <span className="text-xs text-tint-subtle">
                         {t(language, 'search_scope_variant_all_description')}
                     </span>
                 </div>

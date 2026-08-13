@@ -2,8 +2,8 @@
 
 import React from 'react';
 
-import { useLanguage } from '@/intl/client';
 import { Tooltip } from './Tooltip';
+import { useLanguage } from '@/intl/client';
 
 /**
  * Display a date as a relative time.

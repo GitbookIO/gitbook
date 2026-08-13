@@ -1,6 +1,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
+
 import type { ClientBlockProps } from './ClientCodeBlock';
 
 // Keeps react-aria and @panzoom/panzoom out of the entry chunk for the many pages that have code

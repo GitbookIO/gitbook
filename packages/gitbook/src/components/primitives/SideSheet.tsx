@@ -1,12 +1,13 @@
 'use client';
 
+import React from 'react';
+import { createPortal } from 'react-dom';
+
+import { useIsMobile } from '../hooks/useIsMobile';
+import { Button } from './Button';
 import { useLanguage } from '@/intl/client';
 import { tString } from '@/intl/translate';
 import { type ClassValue, tcls } from '@/lib/tailwind';
-import React from 'react';
-import { createPortal } from 'react-dom';
-import { useIsMobile } from '../hooks/useIsMobile';
-import { Button } from './Button';
 
 const ANIMATION_DURATION = 300;
 
@@ -263,7 +264,7 @@ export function SideSheet(
 export function SideSheetOverlay(props: { className?: ClassValue; onClick?: () => void }) {
     const { className, onClick } = props;
     return (
-        // biome-ignore lint/a11y/useKeyWithClickEvents: global escape key handler is used to close the modal sheet
+        // oxlint-disable-next-line jsx-a11y/click-events-have-key-events
         <div
             data-gb-side-sheet-overlay
             onClick={() => {

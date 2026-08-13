@@ -1,20 +1,20 @@
 'use client';
 
-import type { SiteInsightsSession } from '@gitbook/api';
 import type { MaybePromise } from 'p-map';
 import React from 'react';
 import { createStore, useStore } from 'zustand';
 
+import type { SiteInsightsSession } from '@gitbook/api';
+
+import { isCookiesTrackingDisabled } from './cookies';
+import { getSession } from './sessions';
+import { generateRandomId } from './utils';
 import {
     getBrowserCookie,
     getLocalStorageItem,
     removeLocalStorageItem,
     setLocalStorageItem,
 } from '@/lib/browser';
-
-import { isCookiesTrackingDisabled } from './cookies';
-import { getSession } from './sessions';
-import { generateRandomId } from './utils';
 
 const VISITORID_COOKIE = '__session';
 const VISITOR_STORAGE_KEY = '__session_updated';
@@ -79,10 +79,10 @@ export type VisitorResponse = AnyVisitorResponse | VisitorUserResponse;
 function isVisitor(value: unknown): value is VisitorResponse {
     return Boolean(
         value &&
-            typeof value === 'object' &&
-            'deviceId' in value &&
-            typeof value.deviceId === 'string' &&
-            value.deviceId
+        typeof value === 'object' &&
+        'deviceId' in value &&
+        typeof value.deviceId === 'string' &&
+        value.deviceId
     );
 }
 

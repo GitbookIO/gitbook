@@ -1,11 +1,10 @@
 import type { DocumentBlockMath, DocumentInlineMath } from '@gitbook/api';
 import { MathFormula } from '@gitbook/react-math';
 
-import { getAssetURL } from '@/lib/assets';
-import { tcls } from '@/lib/tailwind';
-
 import type { BlockProps } from './Block';
 import type { InlineProps } from './Inline';
+import { getAssetURL } from '@/lib/assets';
+import { tcls } from '@/lib/tailwind';
 
 const assetsUrl = getAssetURL('math');
 

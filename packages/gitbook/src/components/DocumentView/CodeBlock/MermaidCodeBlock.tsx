@@ -1,18 +1,18 @@
 'use client';
 
+import Panzoom from '@panzoom/panzoom';
+import type { RenderResult } from 'mermaid';
 import { useTheme } from 'next-themes';
 import { useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { FocusScope, usePreventScroll } from 'react-aria';
 import { createPortal } from 'react-dom';
 
+import { type ClientBlockProps, ClientCodeBlock } from './ClientCodeBlock';
+import { getPlainCodeBlock } from './highlight-tokens';
+import { MermaidPanZoomControls } from './MermaidPanZoomControls';
 import { useHasBeenInViewport } from '@/components/hooks/useHasBeenInViewport';
 import { Loading } from '@/components/primitives/Loading';
 import { tcls } from '@/lib/tailwind';
-import Panzoom from '@panzoom/panzoom';
-import type { RenderResult } from 'mermaid';
-import { FocusScope, usePreventScroll } from 'react-aria';
-import { type ClientBlockProps, ClientCodeBlock } from './ClientCodeBlock';
-import { MermaidPanZoomControls } from './MermaidPanZoomControls';
-import { getPlainCodeBlock } from './highlight-tokens';
 
 /** Duration of the fullscreen dialog enter/exit animation, must match `animate-blur-in/out`. */
 const DIALOG_ANIMATION_MS = 200;
@@ -257,7 +257,7 @@ export function MermaidCodeBlock(
                 ? createPortal(
                       <FocusScope contain restoreFocus>
                           {/* Backdrop: dims and blurs the page, closes on click. */}
-                          {/* biome-ignore lint/a11y/useKeyWithClickEvents: a global Escape handler closes the dialog. */}
+                          {/* oxlint-disable-next-line jsx-a11y/click-events-have-key-events */}
                           <div
                               aria-hidden="true"
                               className={tcls(
@@ -341,7 +341,7 @@ function createMermaidRenderContainer() {
 }
 
 let mermaidLoadPromise: Promise<{
-    mermaid: typeof import('mermaid')['default'];
+    mermaid: (typeof import('mermaid'))['default'];
 }> | null = null;
 
 async function loadMermaid(runtimeURL: string) {
@@ -349,7 +349,7 @@ async function loadMermaid(runtimeURL: string) {
         mermaidLoadPromise = import(/* webpackIgnore: true */ runtimeURL)
             .then(
                 async (runtime: {
-                    loadMermaid: () => Promise<typeof import('mermaid')['default']>;
+                    loadMermaid: () => Promise<(typeof import('mermaid'))['default']>;
                 }) => {
                     return { mermaid: await runtime.loadMermaid() };
                 }

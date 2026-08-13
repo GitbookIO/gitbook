@@ -17,8 +17,8 @@ import { PlainCodeBlock } from '../CodeBlock';
 import { DocumentView } from '../DocumentView';
 import { Heading } from '../Heading';
 import type { OpenAPIBlockClientContextProps } from './OpenAPIBlockClient';
-
 import './style.css';
+import { SCALAR_RUNTIME_PATH } from './scalar-runtime-path';
 import { DEFAULT_LOCALE, getSpaceLocale } from '@/intl/server';
 import { getAssetURL } from '@/lib/assets';
 import type { GitBookAnyContext } from '@/lib/context';
@@ -29,7 +29,6 @@ import type {
     OpenAPISchemasBlock,
     OpenAPIWebhookBlock,
 } from '@/lib/openapi/types';
-import { SCALAR_RUNTIME_PATH } from './scalar-runtime-path';
 
 // Serve the proxy from GitBook's own origin rather than the customer domain, so a proxied
 // response can never execute as HTML under a customer's trusted origin.

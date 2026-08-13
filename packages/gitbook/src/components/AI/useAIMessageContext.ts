@@ -1,5 +1,7 @@
-import type { AIMessageContext } from '@gitbook/api';
 import React from 'react';
+
+import type { AIMessageContext } from '@gitbook/api';
+
 import { useCurrentPage } from '../hooks';
 
 /**

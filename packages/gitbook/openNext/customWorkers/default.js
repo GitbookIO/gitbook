@@ -1,6 +1,6 @@
-import { runWithCloudflareRequestContext } from '../../.open-next/cloudflare/init.js';
-
 import { DurableObject } from 'cloudflare:workers';
+
+import { runWithCloudflareRequestContext } from '../../.open-next/cloudflare/init.js';
 
 //Only needed to run locally, in prod we'll use the one from do.js
 export { DOShardedTagCache } from '../../.open-next/.build/durable-objects/sharded-tag-cache.js';
@@ -28,9 +28,8 @@ export default {
     async fetch(request, env, ctx) {
         return runWithCloudflareRequestContext(request, env, ctx, async () => {
             // We can't move the handler import to the top level, otherwise the runtime will not be properly initialized
-            const { handler } = await import(
-                '../../.open-next/server-functions/default/handler.mjs'
-            );
+            const { handler } =
+                await import('../../.open-next/server-functions/default/handler.mjs');
 
             // - `Request`s are handled by the Next server
             return handler(request, env, ctx);

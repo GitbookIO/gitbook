@@ -2,6 +2,7 @@
 
 import clsx from 'classnames';
 import { useId, useState } from 'react';
+
 import { OpenAPISelect, useSelectState } from './OpenAPISelect';
 import { Section, SectionBody, SectionHeader, SectionHeaderContent } from './StaticSection';
 
@@ -26,7 +27,7 @@ export function InteractiveSection(props: {
     /** Icon to display for the toggle */
     toggleIcon?: React.ReactNode;
     /** Tabs of content to display */
-    tabs?: Array<InteractiveSectionTab>;
+    tabs?: InteractiveSectionTab[];
     /** Default tab to have opened */
     defaultTab?: string;
     /** Content of the header */
@@ -90,7 +91,7 @@ export function InteractiveSection(props: {
                         ) : null}
                         {header}
                     </SectionHeaderContent>
-                    {/* biome-ignore lint/a11y/useKeyWithClickEvents: we prevent default here */}
+                    {/* oxlint-disable-next-line jsx-a11y/click-events-have-key-events */}
                     <div
                         className={clsx(
                             'openapi-section-header-controls',

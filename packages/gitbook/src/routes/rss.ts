@@ -1,12 +1,14 @@
+import { Feed } from 'feed';
+
+import type { RevisionPageDocument } from '@gitbook/api';
+import { RevisionPageType } from '@gitbook/api';
+
 import { getPageFullTitle } from '@/components/SitePage';
 import type { GitBookSiteContext } from '@/lib/context';
 import { getPageDocument } from '@/lib/data/pages';
 import { getBlocksByType, getNodeText, isHeadingBlock } from '@/lib/document';
 import { resolvePagePathDocumentOrGroup } from '@/lib/pages';
 import { joinPath } from '@/lib/paths';
-import type { RevisionPageDocument } from '@gitbook/api';
-import { RevisionPageType } from '@gitbook/api';
-import { Feed } from 'feed';
 
 /**
  * Get the URL of a RSS feed for a page.

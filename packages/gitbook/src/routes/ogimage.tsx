@@ -1,10 +1,13 @@
-import { CustomizationDefaultThemeMode, CustomizationHeaderPreset } from '@gitbook/api';
-import { colorContrast } from '@gitbook/colors';
 import { direction } from 'direction';
 import { imageSize } from 'image-size';
 import { redirect } from 'next/navigation';
 import { ImageResponse } from 'next/og';
 
+import { CustomizationDefaultThemeMode, CustomizationHeaderPreset } from '@gitbook/api';
+import { getCacheTag } from '@gitbook/cache-tags';
+import { colorContrast } from '@gitbook/colors';
+
+import { SiteDefaultIcon } from './icon';
 import { type PageParams, fetchPageData } from '@/components/SitePage';
 import { getAssetURL } from '@/lib/assets';
 import type { GitBookSiteContext } from '@/lib/context';
@@ -17,8 +20,6 @@ import {
     resizeImage,
 } from '@/lib/images';
 import { getExtension } from '@/lib/paths';
-import { getCacheTag } from '@gitbook/cache-tags';
-import { SiteDefaultIcon } from './icon';
 
 /**
  * Render the OpenGraph image for a site content.
@@ -232,7 +233,7 @@ export async function serveOGImage(baseContext: GitBookSiteContext, params: Page
     );
 }
 
-// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+// oxlint-disable-next-line typescript/no-explicit-any
 const staticCache = new Map<string, any>();
 
 /**
@@ -267,7 +268,7 @@ async function fetchStaticImage(url: string) {
  * @vercel/og supports the following image formats:
  * Extracted from https://github.com/vercel/next.js/blob/canary/packages/next/src/compiled/%40vercel/og/index.node.js
  */
-const UNSUPPORTED_IMAGE_EXTENSIONS = ['.avif', '.webp'];
+const UNSUPPORTED_IMAGE_EXTENSIONS = new Set(['.avif', '.webp']);
 const SUPPORTED_IMAGE_TYPES = [
     'image/png',
     'image/apng',
@@ -286,7 +287,7 @@ async function fetchImage(url: string, options?: ResizeImageOptions) {
 
     let response: Response;
     if (
-        UNSUPPORTED_IMAGE_EXTENSIONS.includes(getExtension(parsedURL.pathname).toLowerCase()) ||
+        UNSUPPORTED_IMAGE_EXTENSIONS.has(getExtension(parsedURL.pathname).toLowerCase()) ||
         checkIsSizableImageURL(url) === SizableImageAction.Resize
     ) {
         // We use the image resizer to normalize the image format to PNG.

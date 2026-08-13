@@ -1,5 +1,5 @@
-import { OpenAPIPath } from '../OpenAPIPath';
 import type { OpenAPIContext } from '../context';
+import { OpenAPIPath } from '../OpenAPIPath';
 import type { OpenAPIOperationData, OpenAPIWebhookData } from '../types';
 import { getOperationTitle } from '../utils';
 import { OpenAPIMcpBadge } from './OpenAPIMcpBadge';

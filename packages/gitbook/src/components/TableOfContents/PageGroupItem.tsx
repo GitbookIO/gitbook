@@ -1,14 +1,13 @@
 'use client';
 
 import React from 'react';
-import type { ClientTOCPageGroup } from './encodeClientTableOfContents';
 
-import { tcls } from '@/lib/tailwind';
 import { ToggleChevron } from '../primitives';
-
+import type { ClientTOCPageGroup } from './encodeClientTableOfContents';
 import { PagesList } from './PagesList';
-import { TOCPageIcon } from './TOCPageIcon';
 import { ToCButtonItemStyles } from './styles';
+import { TOCPageIcon } from './TOCPageIcon';
+import { tcls } from '@/lib/tailwind';
 
 export function PageGroupItem(props: { page: ClientTOCPageGroup; isFirst?: boolean }) {
     const { page, isFirst } = props;

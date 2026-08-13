@@ -1,7 +1,8 @@
-import type { ContentKitText } from '@gitbook/api';
+import classNames from 'classnames';
 import type React from 'react';
 
-import classNames from 'classnames';
+import type { ContentKitText } from '@gitbook/api';
+
 import type { ContentKitServerElementProps } from './types';
 
 export function ElementText(

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test';
-
 import type { JwtPayload } from 'jwt-decode';
+
 import {
     getVisitorAuthCookieMaxAge,
     getVisitorAuthCookieName,

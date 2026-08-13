@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+
 import type { MathJaXFormulaProps } from './MathJaX';
 
 const MathJaXFormula = React.lazy(() => import('./MathJaX'));

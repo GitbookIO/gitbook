@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+
 import type { InlineIconSource } from './IconSources';
 import { IconStyle } from './types';
 import { GITBOOK_ICONS_ASSET_VERSION } from './version';

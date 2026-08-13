@@ -1,5 +1,5 @@
-import { SELECT_LIST_CAP, SELECT_STORAGE_KEY } from '@/lib/select';
 import { applySelectStateScript } from './script';
+import { SELECT_LIST_CAP, SELECT_STORAGE_KEY } from '@/lib/select';
 
 /**
  * Inline `<head>` script that applies the visitor's `select` state to `<html>` before first paint,

@@ -1,13 +1,13 @@
 'use client';
 
-import { Icon } from '@gitbook/icons';
 import classNames from 'classnames';
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import { tcls } from '@/lib/tailwind';
+import { Icon } from '@gitbook/icons';
 
 import styles from './ZoomImage.module.css';
+import { tcls } from '@/lib/tailwind';
 
 const PADDING = 32; // Padding around the image in the modal, in pixels
 

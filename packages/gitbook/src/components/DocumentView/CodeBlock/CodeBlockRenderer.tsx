@@ -1,14 +1,14 @@
-import type { DocumentBlockCode } from '@gitbook/api';
 import assertNever from 'assert-never';
 import { forwardRef, useId } from 'react';
 
-import { tcls } from '@/lib/tailwind';
+import type { DocumentBlockCode } from '@gitbook/api';
 
 import { AnnotationPopover } from '../Annotation/AnnotationPopover';
 import type { BlockProps } from '../Block';
 import { AskAICodeButton } from './AskAICodeButton';
 import { CopyCodeButton } from './CopyCodeButton';
 import type { HighlightLine, HighlightTheme, HighlightToken } from './highlight-tokens';
+import { tcls } from '@/lib/tailwind';
 
 type CodeBlockRendererProps = Pick<BlockProps<DocumentBlockCode>, 'block' | 'style'> & {
     theme: HighlightTheme;
@@ -72,7 +72,7 @@ export const CodeBlockRenderer = forwardRef(function CodeBlockRenderer(
             <div className="flex items-center justify-start gap-2 text-sm">
                 {withTitle ? (
                     <div
-                        className="relative top-px z-20 inline-flex items-center justify-center circular-corners:rounded-t-xl rounded-corners:rounded-t-lg straight-corners:rounded-t-xs border border-tint-subtle border-b-0 bg-tint-subtle theme-bold-tint:bg-tint-base theme-muted:bg-tint-base px-3 py-2 text-tint text-xs leading-none tracking-wide contrast-more:border-tint contrast-more:bg-tint-base [html.theme-bold.sidebar-filled_&]:bg-tint-base"
+                        className="straight-corners:rounded-t-xs relative top-px z-20 inline-flex items-center justify-center border border-b-0 border-tint-subtle bg-tint-subtle px-3 py-2 text-xs leading-none tracking-wide text-tint theme-bold-tint:bg-tint-base theme-muted:bg-tint-base rounded-corners:rounded-t-lg circular-corners:rounded-t-xl contrast-more:border-tint contrast-more:bg-tint-base [html.theme-bold.sidebar-filled_&]:bg-tint-base"
                         style={{
                             backgroundColor: bg?.color,
                             ...bg?.vars,

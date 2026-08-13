@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'bun:test';
 
 import { parseOpenAPI, traverse } from '@gitbook/openapi-parser';
+
 import serverPrecedenceSpec from './fixtures/spec-server-precedence.json';
 import { resolveOpenAPIOperation } from './resolveOpenAPIOperation';
 

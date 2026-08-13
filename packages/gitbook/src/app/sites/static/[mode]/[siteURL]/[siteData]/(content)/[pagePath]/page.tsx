@@ -1,11 +1,11 @@
+import type { Metadata, Viewport } from 'next';
+
 import { type RouteParams, getPagePathFromParams, getStaticSiteContext } from '@/app/utils';
 import {
     SitePage,
     generateSitePageMetadata,
     generateSitePageViewport,
 } from '@/components/SitePage';
-
-import type { Metadata, Viewport } from 'next';
 
 export const dynamic = 'force-static';
 

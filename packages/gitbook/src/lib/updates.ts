@@ -1,4 +1,5 @@
 import type { JSONDocument, Revision, RevisionTag } from '@gitbook/api';
+
 import { getBlocksByType } from './document';
 import { getRevisionTags, resolveBlockTags } from './tags';
 

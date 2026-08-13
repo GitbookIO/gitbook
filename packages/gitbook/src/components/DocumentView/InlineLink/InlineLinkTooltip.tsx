@@ -1,12 +1,14 @@
 'use client';
-import { tcls } from '@/lib/tailwind';
-import { Icon } from '@gitbook/icons';
 import { Fragment } from 'react';
+
+import { Icon } from '@gitbook/icons';
+
 import { HoverCard, HoverCardRoot, HoverCardTrigger, StyledLink } from '../../primitives';
+import { tcls } from '@/lib/tailwind';
 
 export function InlineLinkTooltip(props: {
     isExternal: boolean;
-    breadcrumbs: Array<{ href?: string; label: string; icon?: React.ReactNode }>;
+    breadcrumbs: { href?: string; label: string; icon?: React.ReactNode }[];
     target: {
         text: string;
         subText?: string;
@@ -22,7 +24,7 @@ export function InlineLinkTooltip(props: {
             <HoverCard className="p-4">
                 <div className="flex flex-col">
                     {breadcrumbs && breadcrumbs.length > 0 ? (
-                        <div className="mb-1 flex grow flex-wrap items-center gap-x-2 gap-y-0.5 font-semibold text-tint text-xs uppercase leading-tight tracking-wide">
+                        <div className="mb-1 flex grow flex-wrap items-center gap-x-2 gap-y-0.5 text-xs font-semibold uppercase leading-tight tracking-wide text-tint">
                             {breadcrumbs.map((crumb, index) => {
                                 const Tag = crumb.href ? StyledLink : 'div';
 

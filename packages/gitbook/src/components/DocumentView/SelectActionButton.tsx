@@ -1,8 +1,8 @@
 'use client';
 
+import { Button, type ButtonProps } from '../primitives';
 import { useSelect } from '@/components/Select';
 import { slugifySelectValue } from '@/lib/select';
-import { Button, type ButtonProps } from '../primitives';
 
 /**
  * Renders a "Select" button action: clicking it activates the slug derived from `value`, so any
