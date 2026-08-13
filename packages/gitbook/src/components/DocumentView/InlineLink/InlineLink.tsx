@@ -119,10 +119,11 @@ function InlineLinkTooltipWrapper(props: {
 }) {
     const { inline, language, resolved, children } = props;
 
+    const ref = inline.data.ref;
     let breadcrumbs = resolved.ancestors ?? [];
     const isMailto = resolved.href.startsWith('mailto:');
-    const isExternal = inline.data.ref.kind === 'url';
-    const isSamePage = inline.data.ref.kind === 'anchor' && inline.data.ref.page === undefined;
+    const isExternal = ref.kind === 'url';
+    const isSamePage = ref.kind === 'anchor' && ref.page === undefined;
 
     if (isMailto) {
         resolved.text = resolved.text.split('mailto:')[1] ?? resolved.text;
@@ -137,6 +138,13 @@ function InlineLinkTooltipWrapper(props: {
                 label: tString(language, 'link_tooltip_external_link'),
             },
         ];
+        // Present the destination domain as the heading, keeping the full URL as sub-text,
+        // instead of surfacing the raw URL as if it were a page title.
+        const hostname = getHostname(resolved.href);
+        if (hostname) {
+            resolved.subText = resolved.text;
+            resolved.text = hostname;
+        }
     } else if (isSamePage) {
         breadcrumbs = [
             {
@@ -144,6 +152,16 @@ function InlineLinkTooltipWrapper(props: {
                 icon: <Icon icon="arrow-down-short-wide" className="size-3" />,
             },
         ];
+        // A same-page anchor is a jump within the current page, not a link to it,
+        // so avoid showing the current page's title as the destination. Fall back to the
+        // humanized anchor as the section label (the true section title isn't resolved here,
+        // as resolveAnchorText is intentionally disabled for performance).
+        if (ref.kind === 'anchor') {
+            const sectionLabel = humanizeAnchor(ref.anchor);
+            if (sectionLabel) {
+                resolved.text = sectionLabel;
+            }
+        }
         resolved.subText = undefined;
     }
 
@@ -160,4 +178,28 @@ function InlineLinkTooltipWrapper(props: {
             {children}
         </InlineLinkTooltip>
     );
+}
+
+/**
+ * Extract the display hostname of an external URL, without the leading `www.`.
+ * Returns null if the URL cannot be parsed.
+ */
+function getHostname(href: string): string | null {
+    try {
+        return new URL(href).hostname.replace(/^www\./, '');
+    } catch {
+        return null;
+    }
+}
+
+/**
+ * Turn an anchor id (e.g. `installation-guide`) into a readable section label.
+ * Returns null when the anchor is empty.
+ */
+function humanizeAnchor(anchor: string): string | null {
+    const words = anchor.trim().replace(/[-_]+/g, ' ').trim();
+    if (!words) {
+        return null;
+    }
+    return words.charAt(0).toUpperCase() + words.slice(1);
 }
