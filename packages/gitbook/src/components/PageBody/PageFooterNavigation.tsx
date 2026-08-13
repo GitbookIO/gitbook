@@ -116,7 +116,7 @@ function NavigationCard(
                 'md:text-base'
             )}
         >
-            <span className={tcls('flex', 'flex-col', 'flex-1', reversed ? 'text-right' : null)}>
+            <span className={tcls('flex', 'flex-col', 'flex-1', reversed ? null : 'text-right')}>
                 <span className={tcls('text-xs')}>{label}</span>
                 <span
                     className={tcls('text-tint-strong', 'group-hover:text-primary', 'line-clamp-2')}
