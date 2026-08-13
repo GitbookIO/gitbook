@@ -39,6 +39,7 @@ export function SearchContainer({
     ...searchProps
 }: SearchContainerProps) {
     const searchInputRef = useRef<HTMLDivElement>(null);
+    const closingRef = useRef(false);
     const language = useLanguage();
     const usesSideSheet = useIsMobile(768);
     const {
@@ -221,7 +222,13 @@ export function SearchContainer({
                                 eventDetails.cancel();
                                 return;
                             }
+                            // Base UI returns focus to the trigger on close, which re-fires the
+                            // input's `onFocus` and would reopen the popover in the same frame.
+                            closingRef.current = true;
                             close();
+                            requestAnimationFrame(() => {
+                                closingRef.current = false;
+                            });
                         },
                     }}
                     positionerProps={{
@@ -254,7 +261,11 @@ export function SearchContainer({
                         withAI={withSearchAI}
                         isOpen={isSearchOpen}
                         className={className}
-                        onFocus={open}
+                        onFocus={() => {
+                            if (!closingRef.current) {
+                                open();
+                            }
+                        }}
                         resultsCount={results.length}
                         fetching={fetching}
                         showAsk={showAsk}
