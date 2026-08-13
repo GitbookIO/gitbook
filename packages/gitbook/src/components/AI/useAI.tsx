@@ -20,7 +20,7 @@ export type AIConfig = {
     trademark: boolean;
     assistantName?: string;
     greeting?: {
-        title: string;
+        title?: string;
         subtitle: string;
     };
 };
