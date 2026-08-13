@@ -222,13 +222,16 @@ export function SearchContainer({
                                 eventDetails.cancel();
                                 return;
                             }
-                            // Base UI returns focus to the trigger on close, which re-fires the
-                            // input's `onFocus` and would reopen the popover in the same frame.
+                            // Base UI returns focus to the trigger once the close animation has
+                            // run, which re-fires the input's `onFocus` and would reopen the
+                            // popover. Hold the guard until the close actually completes.
                             closingRef.current = true;
                             close();
-                            requestAnimationFrame(() => {
+                        },
+                        onOpenChangeComplete: (isOpen) => {
+                            if (!isOpen) {
                                 closingRef.current = false;
-                            });
+                            }
                         },
                     }}
                     positionerProps={{
