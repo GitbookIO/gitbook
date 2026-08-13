@@ -14,6 +14,8 @@ export type TooltipProps = {
     sideOffset?: number;
     /** Delay before opening on hover, overriding the shared provider delay. */
     delay?: number;
+    /** Keep the tooltip open when the trigger is pressed, instead of dismissing it. */
+    closeOnClick?: boolean;
     /** Prevent the tooltip from opening at all. */
     disabled?: boolean;
     /** Let the tooltip close as soon as the trigger is left, instead of staying alive while the pointer travels towards it. */
@@ -37,6 +39,7 @@ export function Tooltip(
         align,
         sideOffset = 4,
         delay,
+        closeOnClick,
         disabled,
         disableHoverablePopup,
         popupProps,
@@ -46,7 +49,7 @@ export function Tooltip(
 
     return (
         <BaseTooltip.Root disabled={disabled} disableHoverablePopup={disableHoverablePopup}>
-            <BaseTooltip.Trigger render={children} delay={delay} />
+            <BaseTooltip.Trigger render={children} delay={delay} closeOnClick={closeOnClick} />
             <BaseTooltip.Portal>
                 <BaseTooltip.Positioner
                     className="z-50"
