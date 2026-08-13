@@ -1,6 +1,6 @@
+import { type CDPSession, type Locator, type Page, expect, test } from '@playwright/test';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname } from 'node:path';
-import { type CDPSession, type Locator, type Page, expect, test } from '@playwright/test';
 
 import { getContentTestURL } from '../tests/utils';
 import { waitForCookiesDialog } from './util';
@@ -44,7 +44,7 @@ async function countRestyledElements(
     });
 
     let raw = '';
-    for (let eof = false; !eof; ) {
+    for (let eof = false; !eof;) {
         const chunk = await client.send('IO.read', { handle });
         raw += chunk.data;
         eof = chunk.eof;
