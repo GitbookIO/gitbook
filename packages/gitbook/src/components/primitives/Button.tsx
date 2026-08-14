@@ -232,8 +232,8 @@ export const ButtonGroup = React.forwardRef<
                 'flex h-fit items-stretch justify-start overflow-hidden',
                 combinedShape
                     ? [
-                          // The per-segment rounding lives in `globals.css`: Tailwind's arbitrary
-                          // variants cannot express "last button" once focus guards are injected.
+                          // Per-segment rounding lives in `globals.css`: Tailwind cannot express
+                          // "last button" once focus guards are injected.
                           'button-group',
                           '*:translate-y-0! *:shadow-none!',
                           '[&>*:not(:first-child)]:border-l-0',

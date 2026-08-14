@@ -42,8 +42,7 @@ export function MermaidCodeBlock(
     const [panZoom, setPanZoom] = useState<ReturnType<typeof Panzoom> | null>(null);
     const [error, setError] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
-    // `isFullscreen` is the open intent; `isPresent` tracks where the diagram actually lives, and
-    // stays true through the closing animation until the panel hands the host back.
+    // `isPresent` stays true through the closing animation, until the panel hands the host back.
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [isPresent, setIsPresent] = useState(false);
     const { resolvedTheme } = useTheme();
@@ -146,8 +145,7 @@ export function MermaidCodeBlock(
     }, []);
 
     // Move the diagram host into the dialog panel (and back) as the panel mounts/unmounts.
-    // Done in the panel's ref callback so it happens during commit, before the dialog reads
-    // focus. The inline slot's reserved height (set in openFullscreen) is cleared on return.
+    // The inline slot's reserved height (set in openFullscreen) is cleared on return.
     const setPanel = useCallback((panel: HTMLDivElement | null) => {
         panelRef.current = panel;
         const host = diagramHostRef.current;

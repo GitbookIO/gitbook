@@ -236,8 +236,8 @@ export function SearchContainer({
                     }}
                     popupProps={{
                         initialFocus: false,
-                        // The input is its own trigger, so restoring focus to it on close would
-                        // re-fire `onFocus` and reopen the popover immediately.
+                        // The input is its own trigger: restoring focus to it would re-fire
+                        // `onFocus` and reopen the popover.
                         finalFocus: false,
                         className: tcls(
                             '@container flex flex-col overflow-hidden bg-tint-base has-[.empty]:hidden w-128 p-0 max-w-[min(var(--available-width),32rem)]',

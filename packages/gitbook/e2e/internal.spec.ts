@@ -618,9 +618,8 @@ const testCases: TestsCase[] = [
                 url: '',
                 screenshot: false,
                 run: async (page) => {
-                    // The menu only opens on `mouseenter`, which cannot fire again while the
-                    // pointer is already inside, so a hover landing before hydration is lost
-                    // for good and re-hovering cannot recover it.
+                    // The menu only opens on `mouseenter`, which cannot fire again once the pointer
+                    // is inside: a hover landing before hydration is lost for good.
                     await page.locator('html.hydrated').waitFor();
                     const trigger = page.getByRole('button', { name: 'Test Section Group 1' });
                     await trigger.hover();

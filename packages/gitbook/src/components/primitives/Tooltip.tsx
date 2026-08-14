@@ -6,21 +6,13 @@ import { PopupArrow } from './PopupArrow';
 import { tcls } from '@/lib/tailwind';
 
 export type TooltipProps = {
-    /** Side of the trigger the tooltip is displayed on. */
     side?: BaseTooltip.Positioner.Props['side'];
-    /** Alignment of the tooltip relative to the trigger. */
     align?: BaseTooltip.Positioner.Props['align'];
-    /** Distance between the trigger and the tooltip. */
     sideOffset?: number;
-    /** Delay before opening on hover, overriding the shared provider delay. */
     delay?: number;
-    /** Keep the tooltip open when the trigger is pressed, instead of dismissing it. */
     closeOnClick?: boolean;
-    /** Prevent the tooltip from opening at all. */
     disabled?: boolean;
-    /** Let the tooltip close as soon as the trigger is left, instead of staying alive while the pointer travels towards it. */
     disableHoverablePopup?: boolean;
-    /** Custom props for the popup itself. */
     popupProps?: Omit<BaseTooltip.Popup.Props, 'className' | 'children' | 'render'>;
 };
 

@@ -18,7 +18,6 @@ import { tcls } from '@/lib/tailwind';
 import { findSectionInGroup } from '@/lib/utils';
 
 const SCREEN_OFFSET = 16; // 1rem
-// The tabs have a 6px bottom margin, and the popup used to overlap the header border by 1px.
 const POPUP_OFFSET = 4;
 const OPEN_DELAY_MS = 200;
 const MOTION = 'duration-300 ease-[cubic-bezier(0.83,0,0.17,1)]';
@@ -42,8 +41,7 @@ export function SiteSectionTabs(props: {
         children,
     } = props;
 
-    // The popup is portalled into the tabs container rather than <body>, so it keeps inheriting the
-    // header's typography and theming.
+    // Portalled into the tabs container rather than <body>, to keep inheriting the header's theming.
     const containerRef = React.useRef<HTMLElement>(null);
 
     return structure.length > 0 ? (
@@ -156,18 +154,16 @@ export function SiteSectionTabs(props: {
                     )}
                     sideOffset={POPUP_OFFSET}
                     collisionPadding={SCREEN_OFFSET}
-                    // The tabs sit right under the header: flipping the popup above them would
-                    // hide it behind the header.
+                    // Flipping above the tabs would hide the popup behind the header.
                     collisionAvoidance={{ side: 'none' }}
                 >
                     <NavigationMenu.Popup
                         className={tcls(
                             'relative h-(--popup-height) max-h-[calc(100vh-8rem)] w-(--popup-width) origin-(--transform-origin) overflow-hidden circular-corners:rounded-3xl rounded-corners:rounded-xl border border-tint bg-tint-base shadow-lg outline-hidden',
-                            // `scale`, not `transform`: that is the property `scale-95` sets, and
-                            // leaving it out of the list makes the scale snap instead of animate.
+                            // `scale` rather than `transform`: that is what `scale-95` sets.
                             `transition-[opacity,scale,width,height] ${MOTION}`,
-                            // The size vars reset as the popup closes, so animating them on the way
-                            // out collapses the panel and grows it back while it fades.
+                            // The size vars reset on close, so animating them out collapses the
+                            // panel and grows it back as it fades.
                             'data-ending-style:transition-[opacity,scale]',
                             'data-ending-style:scale-95 data-starting-style:scale-95 data-ending-style:opacity-0 data-starting-style:opacity-0'
                         )}

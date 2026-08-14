@@ -6,7 +6,6 @@ export function Popover(props: {
     children: React.ReactElement<Record<string, unknown>>;
     content?: string | React.ReactNode;
     rootProps?: Omit<BasePopover.Root.Props, 'children'>;
-    /** Whether the trigger renders a native `<button>`. */
     nativeButton?: boolean;
     positionerProps?: Omit<BasePopover.Positioner.Props, 'children' | 'className'> & {
         className?: string;

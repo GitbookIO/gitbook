@@ -8,7 +8,7 @@ export function HoverCardRoot(props: PreviewCard.Root.Props) {
     return <PreviewCard.Root {...props} />;
 }
 
-// We wrap the Trigger child in a span to avoid the render prop seeing a lazy chunk
+// Wrapped in a span so the render prop never receives a lazily-loaded component.
 export function HoverCardTrigger(props: {
     children: React.ReactNode;
     className?: string;

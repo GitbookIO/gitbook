@@ -31,7 +31,6 @@ const DROPDOWN_POSITIONER_CLASS =
 const DROPDOWN_POPUP_CLASS =
     'flex origin-(--transform-origin) animate-scale-in flex-col gap-1 overflow-auto circular-corners:rounded-xl rounded-md straight-corners:rounded-none border border-tint bg-tint-base p-2 shadow-lg outline-hidden data-closed:animate-scale-out';
 
-/** Grace period letting the pointer travel from the trigger to the (portalled) menu. */
 const HOVER_CLOSE_DELAY_MS = 150;
 
 /**
@@ -53,7 +52,6 @@ export function DropdownMenu(props: {
      * @default 0
      */
     openDelay?: number;
-    /** Whether the trigger renders a native `<button>`. */
     nativeButton?: boolean;
     /**
      * Side of the dropdown
