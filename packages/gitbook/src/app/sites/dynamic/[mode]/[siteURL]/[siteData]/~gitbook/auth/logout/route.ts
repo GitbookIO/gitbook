@@ -1,3 +1,7 @@
+import { cookies } from 'next/headers';
+import type { NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
+
 import {
     type RouteLayoutParams,
     getDynamicSiteContext,
@@ -6,9 +10,6 @@ import {
 import { getVisitorAuthBasePath } from '@/lib/data';
 import { resolveUpstreamAuthURL } from '@/lib/site-auth-urls';
 import { getVisitorAuthCookieName } from '@/lib/visitors';
-import { cookies } from 'next/headers';
-import type { NextRequest } from 'next/server';
-import { NextResponse } from 'next/server';
 
 /**
  * Clear the site-scoped auth session cookies and redirect to the upstream auth provider

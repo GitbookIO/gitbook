@@ -3,8 +3,9 @@
 import clsx from 'classnames';
 import { createContext, useContext, useId } from 'react';
 import { useStore } from 'zustand';
-import { OpenAPISelect, useSelectState } from './OpenAPISelect';
+
 import { getOrCreateDisclosureStoreByKey } from './getOrCreateDisclosureStoreByKey';
+import { OpenAPISelect, useSelectState } from './OpenAPISelect';
 
 interface Props {
     groups: TDisclosureGroup[];

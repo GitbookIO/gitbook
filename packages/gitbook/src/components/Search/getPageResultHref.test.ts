@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'bun:test';
+
 import { getPageResultHref } from './getPageResultHref';
 
 const pageResult = {

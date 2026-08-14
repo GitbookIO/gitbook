@@ -1,5 +1,6 @@
-import type { ContentKitIcon } from '@gitbook/api';
 import type React from 'react';
+
+import type { ContentKitIcon } from '@gitbook/api';
 
 interface CodeBlockCommonProps {
     code: string;

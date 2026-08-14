@@ -1,12 +1,13 @@
 'use client';
 
+import React from 'react';
+
 import type {
     ContentKitAction,
     ContentKitRenderOutput,
     ContentKitRenderOutputElement,
     RequestRenderIntegrationUI,
 } from '@gitbook/api';
-import React from 'react';
 
 import {
     ContentKitClientContext,

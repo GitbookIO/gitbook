@@ -1,10 +1,9 @@
 import type { SiteInsightsTrademarkPlacement } from '@gitbook/api';
 
-import { getSpaceLanguage, tString } from '@/intl/server';
-import { tcls } from '@/lib/tailwind';
-
-import type { GitBookAnyContext } from '@/lib/context';
 import { Button, type ButtonProps } from '../primitives';
+import { getSpaceLanguage, tString } from '@/intl/server';
+import type { GitBookAnyContext } from '@/lib/context';
+import { tcls } from '@/lib/tailwind';
 
 /**
  * Trademark link to the GitBook.

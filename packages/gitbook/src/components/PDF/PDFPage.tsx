@@ -1,4 +1,7 @@
-import type { GitBookSiteContext, GitBookSpaceContext } from '@/lib/context';
+import type { Metadata } from 'next';
+import { notFound } from 'next/navigation';
+import * as React from 'react';
+
 import {
     type Revision,
     type RevisionPageDocument,
@@ -8,27 +11,24 @@ import {
     type Space,
 } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
-import type { Metadata } from 'next';
-import { notFound } from 'next/navigation';
-import * as React from 'react';
 
+import { ImagesLoadingStatus } from './ImagesLoadingStatus';
+import { createPDFLinker, getPagePDFContainerId } from './linker';
+import { PageControlButtons } from './PageControlButtons';
+import { PDFPrintControls } from './PDFPrintControls';
+import { type PDFSearchParams, getPDFSearchParams } from './urls';
 import { DocumentView } from '@/components/DocumentView';
 import { Trademark } from '@/components/TableOfContents/Trademark';
 import type { PolymorphicComponentProp } from '@/components/utils/types';
 import { getSpaceLanguage } from '@/intl/server';
 import { tString } from '@/intl/translate';
+import { sanitizeGitBookAppURL } from '@/lib/app';
+import type { GitBookSiteContext, GitBookSpaceContext } from '@/lib/context';
+import { getPageDocument } from '@/lib/data';
+import './pdf.css';
 import { resolvePageId } from '@/lib/pages';
 import { tcls } from '@/lib/tailwind';
 import { defaultCustomization } from '@/lib/utils';
-import { type PDFSearchParams, getPDFSearchParams } from './urls';
-
-import { PDFPrintControls } from './PDFPrintControls';
-import { PageControlButtons } from './PageControlButtons';
-import { createPDFLinker, getPagePDFContainerId } from './linker';
-import './pdf.css';
-import { sanitizeGitBookAppURL } from '@/lib/app';
-import { getPageDocument } from '@/lib/data';
-import { ImagesLoadingStatus } from './ImagesLoadingStatus';
 
 const DEFAULT_LIMIT = 100;
 
@@ -105,7 +105,7 @@ export async function PDFPage(props: {
                 </div>
             ) : null}
 
-            <div className="fixed top-12 right-12 z-50 flex flex-col items-end gap-2 print:hidden">
+            <div className="fixed right-12 top-12 z-50 flex flex-col items-end gap-2 print:hidden">
                 <PDFPrintControls language={language} />
                 <ImagesLoadingStatus language={language} />
             </div>
@@ -147,16 +147,13 @@ export async function PDFPage(props: {
     );
 }
 
-async function PDFSpaceIntro(props: {
-    space: Space;
-    customization: SiteCustomizationSettings;
-}) {
+async function PDFSpaceIntro(props: { space: Space; customization: SiteCustomizationSettings }) {
     const { space, customization } = props;
 
     return (
         <PrintPage isFirst>
             <div className="flex items-center justify-center py-12">
-                <h1 className="font-bold text-6xl">{customization.title ?? space.title}</h1>
+                <h1 className="text-6xl font-bold">{customization.title ?? space.title}</h1>
             </div>
         </PrintPage>
     );
@@ -168,7 +165,7 @@ async function PDFPageGroup(props: { space: Space; page: RevisionPageGroup }) {
     return (
         <PrintPage id={getPagePDFContainerId(page)}>
             <div className="mt-10 flex break-before-page items-center justify-center py-12 print:mt-0">
-                <h1 className="font-bold text-5xl">{page.title}</h1>
+                <h1 className="text-5xl font-bold">{page.title}</h1>
             </div>
         </PrintPage>
     );
@@ -183,9 +180,9 @@ async function PDFPageDocument(props: {
 
     return (
         <PrintPage id={getPagePDFContainerId(page)}>
-            <h1 className="font-bold text-4xl">{page.title}</h1>
+            <h1 className="text-4xl font-bold">{page.title}</h1>
             {page.description ? (
-                <p className="mt-2 mb-3 decoration-primary/6">{page.description}</p>
+                <p className="mb-3 mt-2 decoration-primary/6">{page.description}</p>
             ) : null}
 
             {document ? (

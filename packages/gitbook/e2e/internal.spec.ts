@@ -1,3 +1,6 @@
+import { expect } from '@playwright/test';
+import jwt from 'jsonwebtoken';
+
 import {
     CustomizationAIMode,
     CustomizationBackground,
@@ -11,10 +14,6 @@ import {
     SiteSocialAccountPlatform,
 } from '@gitbook/api';
 import type { GitBookStandalone } from '@gitbook/embed';
-import { expect } from '@playwright/test';
-import jwt from 'jsonwebtoken';
-
-import { VISITOR_TOKEN_COOKIE } from '@/lib/visitors';
 
 import { getGitBookPreviewURL, getSiteAPIToken } from '../tests/utils';
 import {
@@ -37,6 +36,7 @@ import {
     waitForCoverImages,
     waitForNotFound,
 } from './util';
+import { VISITOR_TOKEN_COOKIE } from '@/lib/visitors';
 
 // Kept as deterministic as possible to reduce visual flakiness: no preamble, a
 // single fixed search, a concise answer, and a fixed number of follow-ups. The
@@ -1241,8 +1241,8 @@ const testCases: TestsCase[] = [
             },
             // New site themes
             ...allThemes.flatMap((theme) => [
-                ...allTintColors.flatMap((tint) => [
-                    ...allSidebarBackgroundStyles.flatMap((sidebarStyle) => ({
+                ...allTintColors.flatMap((tint) =>
+                    allSidebarBackgroundStyles.flatMap((sidebarStyle) => ({
                         name: `Theme ${theme} - Tint ${tint.label} - Sidebar ${sidebarStyle} - Mode ${themeMode}`,
                         url: getCustomizationURL({
                             styling: {
@@ -1262,8 +1262,8 @@ const testCases: TestsCase[] = [
                             },
                         }),
                         run: waitForCookiesDialog,
-                    })),
-                ]),
+                    }))
+                ),
                 ...allSearchStyles.flatMap((searchStyle) => ({
                     name: `Theme ${theme} – Search ${searchStyle} – Mode ${themeMode}`,
                     url: getCustomizationURL({
@@ -1283,8 +1283,8 @@ const testCases: TestsCase[] = [
                 })),
             ]),
             // Deprecated header themes
-            ...allDeprecatedThemePresets.flatMap((preset) => [
-                ...allSidebarBackgroundStyles.flatMap((sidebarStyle) => ({
+            ...allDeprecatedThemePresets.flatMap((preset) =>
+                allSidebarBackgroundStyles.flatMap((sidebarStyle) => ({
                     name: `With tint - Legacy header preset ${preset} - Sidebar ${sidebarStyle} - Theme mode ${themeMode}`,
                     url: getCustomizationURL({
                         styling: {
@@ -1310,8 +1310,8 @@ const testCases: TestsCase[] = [
                         },
                     }),
                     run: waitForCookiesDialog,
-                })),
-            ]),
+                }))
+            ),
             {
                 name: `With tint - Legacy background match - Theme mode ${themeMode}`,
                 url: getCustomizationURL({

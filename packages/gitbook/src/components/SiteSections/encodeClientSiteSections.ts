@@ -1,3 +1,7 @@
+import assertNever from 'assert-never';
+
+import type { SiteSection, SiteSectionGroup, SiteSpace } from '@gitbook/api';
+
 import type { GitBookSiteContext, SiteSections } from '@/lib/context';
 import { toEmbeddableLinkForPublishedContent } from '@/lib/embeddable-linker';
 import {
@@ -6,8 +10,6 @@ import {
     getSectionURL,
     getSiteSpaceURL,
 } from '@/lib/sites';
-import type { SiteSection, SiteSectionGroup, SiteSpace } from '@gitbook/api';
-import assertNever from 'assert-never';
 
 export type ClientSiteSections = {
     list: (ClientSiteSection | ClientSiteSectionGroup)[];

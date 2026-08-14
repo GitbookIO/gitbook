@@ -1,6 +1,6 @@
-import { getLogger } from '@/lib/logger';
 import type { CloudflareImageOptions } from './types';
 import { copyImageResponse } from './utils';
+import { getLogger } from '@/lib/logger';
 
 /**
  * Resize an image by doing a request to the image itself using the Cloudflare fetch.

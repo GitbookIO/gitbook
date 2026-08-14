@@ -1,8 +1,9 @@
+import type { RevisionTag } from '@gitbook/api';
+import { Icon, type IconName } from '@gitbook/icons';
+
 import { Emoji } from '@/components/primitives';
 import { backgroundColorToStyle, textColorToStyle } from '@/lib/colors';
 import { tcls } from '@/lib/tailwind';
-import type { RevisionTag } from '@gitbook/api';
-import { Icon, type IconName } from '@gitbook/icons';
 
 /**
  * Renders a tag, used to tag content like pages and blocks.

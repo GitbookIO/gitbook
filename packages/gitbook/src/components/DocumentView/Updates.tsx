@@ -1,4 +1,5 @@
 import type { DocumentBlockUpdates } from '@gitbook/api';
+
 import type { BlockProps } from './Block';
 import { Blocks } from './Blocks';
 

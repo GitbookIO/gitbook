@@ -1,11 +1,12 @@
 'use client';
 
-import { Icon } from '@gitbook/icons';
 import type React from 'react';
 
-import { type ClassValue, tcls } from '@/lib/tailwind';
+import { Icon } from '@gitbook/icons';
+
 import { ToggleChevron } from '../primitives';
 import { DropdownMenu } from '../primitives/DropdownMenu';
+import { type ClassValue, tcls } from '@/lib/tailwind';
 
 /**
  * Client component for the "More" header link dropdown.

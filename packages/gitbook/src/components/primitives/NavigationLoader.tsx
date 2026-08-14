@@ -1,8 +1,9 @@
 'use client';
-import { tcls } from '@/lib/tailwind';
 import { usePathname } from 'next/navigation';
 import { useEffect, useLayoutEffect } from 'react';
+
 import { useIsNavigating } from '../hooks';
+import { tcls } from '@/lib/tailwind';
 
 export const NavigationLoader = () => {
     const isNavigating = useIsNavigating();

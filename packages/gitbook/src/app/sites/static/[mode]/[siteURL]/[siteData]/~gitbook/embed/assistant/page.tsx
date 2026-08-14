@@ -1,8 +1,9 @@
+import { redirect } from 'next/navigation';
+
 import type { RouteParams } from '@/app/utils';
 import { EmbeddableAssistantPage } from '@/components/Embeddable';
 import { isAIChatEnabled } from '@/components/utils/isAIChatEnabled';
 import { getEmbeddableStaticContext } from '@/lib/embeddable';
-import { redirect } from 'next/navigation';
 
 export const dynamic = 'force-static';
 

@@ -1,8 +1,7 @@
 'use client';
 
-import { getLocalStorageItem, setLocalStorageItem } from '@/lib/browser';
-
 import { generateRandomId } from './utils';
+import { getLocalStorageItem, setLocalStorageItem } from '@/lib/browser';
 
 const SESSION_TTL = 1000 * 60 * 30; // 30 minutes
 

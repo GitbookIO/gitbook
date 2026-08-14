@@ -1,8 +1,4 @@
 'use server';
-import { isAIChatEnabled } from '@/components/utils/isAIChatEnabled';
-import { getSiteURLDataFromMiddleware } from '@/lib/middleware';
-import { fetchServerActionSiteContext, getServerActionBaseContext } from '@/lib/server-actions';
-import { traceErrorOnly } from '@/lib/tracing';
 import {
     type AIMessageContext,
     AIMessageRole,
@@ -12,8 +8,13 @@ import {
     SiteCoreChannelType,
     type SiteInsightsSession,
 } from '@gitbook/api';
+
 import { streamRenderAIMessage } from './api';
 import type { RenderAIMessageOptions } from './types';
+import { isAIChatEnabled } from '@/components/utils/isAIChatEnabled';
+import { getSiteURLDataFromMiddleware } from '@/lib/middleware';
+import { fetchServerActionSiteContext, getServerActionBaseContext } from '@/lib/server-actions';
+import { traceErrorOnly } from '@/lib/tracing';
 
 /**
  * Generate a response to a chat message.

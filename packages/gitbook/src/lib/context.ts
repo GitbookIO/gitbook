@@ -1,16 +1,7 @@
-import {
-    type GitBookDataFetcher,
-    createDataFetcher,
-    getDataOrNull,
-    throwIfDataError,
-} from '@/lib/data';
-import { getLogger } from '@/lib/logger';
-import {
-    findSiteSpaceBy,
-    getFallbackSiteSpacePath,
-    getLocalizedTitle,
-    getSiteStructureSections,
-} from '@/lib/sites';
+import assertNever from 'assert-never';
+import { notFound } from 'next/navigation';
+import { assert } from 'ts-essentials';
+
 import type {
     ChangeRequest,
     PublishedSiteContent,
@@ -26,12 +17,23 @@ import type {
     Space,
     TranslationLanguage,
 } from '@gitbook/api';
-import assertNever from 'assert-never';
-import { notFound } from 'next/navigation';
-import { assert } from 'ts-essentials';
+
 import { GITBOOK_URL } from './env';
 import { type ImageResizer, createImageResizer } from './images';
 import { type GitBookLinker, createLinker, linkerForPublishedURL } from './links';
+import {
+    type GitBookDataFetcher,
+    createDataFetcher,
+    getDataOrNull,
+    throwIfDataError,
+} from '@/lib/data';
+import { getLogger } from '@/lib/logger';
+import {
+    findSiteSpaceBy,
+    getFallbackSiteSpacePath,
+    getLocalizedTitle,
+    getSiteStructureSections,
+} from '@/lib/sites';
 
 /**
  * Data about the site URL. Provided by the middleware.

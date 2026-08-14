@@ -1,7 +1,7 @@
 import type { ContentKitMarkdown } from '@gitbook/api';
 
-import { ElementMarkdownClient } from './ElementMarkdownClient';
 import { resolveDynamicBinding } from './dynamic';
+import { ElementMarkdownClient } from './ElementMarkdownClient';
 import type { ContentKitServerElementProps } from './types';
 
 export function ElementMarkdown(props: ContentKitServerElementProps<ContentKitMarkdown>) {

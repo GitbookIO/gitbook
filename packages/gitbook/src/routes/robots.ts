@@ -1,6 +1,7 @@
+import { SiteVisibility } from '@gitbook/api';
+
 import { type GitBookSiteContext, checkIsRootSiteContext } from '@/lib/context';
 import { isSiteIndexable } from '@/lib/seo';
-import { SiteVisibility } from '@gitbook/api';
 
 /**
  * User-agents of AI assistants that fetch pages live in response to a user prompt.

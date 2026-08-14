@@ -5,9 +5,8 @@ afterAll(() => mock.restore());
 const realGlobals = await import('@/lib/env/globals');
 mock.module('@/lib/env/globals', () => ({ ...realGlobals, GITBOOK_SECRET: 'test-secret-key' }));
 
-const { buildSignedProxyUrl, isAllowedByOrigins, verifyProxyRequest } = await import(
-    './proxy-token'
-);
+const { buildSignedProxyUrl, isAllowedByOrigins, verifyProxyRequest } =
+    await import('./proxy-token');
 
 describe('buildSignedProxyUrl', () => {
     it('returns null for empty hosts', () => {
@@ -22,7 +21,7 @@ describe('buildSignedProxyUrl', () => {
         const result = buildSignedProxyUrl('http://localhost/proxy', ['api.example.com'], 'site_1');
         expect(result).not.toBeNull();
 
-        // biome-ignore lint/style/noNonNullAssertion: test assertion
+        // oxlint-disable-next-line typescript/no-non-null-assertion
         const url = new URL(result!);
         expect(url.searchParams.getAll('allowed_origin')).toEqual(['api.example.com']);
         expect(url.searchParams.get('site_id')).toBe('site_1');
@@ -44,7 +43,7 @@ describe('buildSignedProxyUrl', () => {
             ['b.example.com', 'a.example.com', 'b.example.com'],
             'site_1'
         );
-        // biome-ignore lint/style/noNonNullAssertion: test assertion
+        // oxlint-disable-next-line typescript/no-non-null-assertion
         const url = new URL(result!);
         expect(url.searchParams.getAll('allowed_origin')).toEqual([
             'a.example.com',
@@ -76,7 +75,7 @@ describe('verifyProxyRequest', () => {
     });
 
     it('rejects when target is not in the allowed origins', () => {
-        // biome-ignore lint/style/noNonNullAssertion: test assertion
+        // oxlint-disable-next-line typescript/no-non-null-assertion
         const signed = buildSignedProxyUrl(
             'http://localhost/proxy',
             ['api.example.com'],
@@ -91,7 +90,7 @@ describe('verifyProxyRequest', () => {
     });
 
     it('allows when token is valid and host matches', () => {
-        // biome-ignore lint/style/noNonNullAssertion: test assertion
+        // oxlint-disable-next-line typescript/no-non-null-assertion
         const signed = buildSignedProxyUrl(
             'http://localhost/proxy',
             ['api.example.com'],
@@ -106,7 +105,7 @@ describe('verifyProxyRequest', () => {
     });
 
     it('allows any protocol on an allowed host', () => {
-        // biome-ignore lint/style/noNonNullAssertion: test assertion
+        // oxlint-disable-next-line typescript/no-non-null-assertion
         const signed = buildSignedProxyUrl(
             'http://localhost/proxy',
             ['api.example.com'],
@@ -119,7 +118,7 @@ describe('verifyProxyRequest', () => {
 
     it('supports multiple allowed hosts', () => {
         const hosts = ['api.example.com', 'cdn.example.com'];
-        // biome-ignore lint/style/noNonNullAssertion: test assertion
+        // oxlint-disable-next-line typescript/no-non-null-assertion
         const signed = buildSignedProxyUrl('http://localhost/proxy', hosts, 'site_1')!;
         const params = new URL(signed).searchParams;
 
@@ -129,7 +128,7 @@ describe('verifyProxyRequest', () => {
     });
 
     it('rejects a forged token with tampered hosts', () => {
-        // biome-ignore lint/style/noNonNullAssertion: test assertion
+        // oxlint-disable-next-line typescript/no-non-null-assertion
         const signed = buildSignedProxyUrl(
             'http://localhost/proxy',
             ['api.example.com'],
@@ -149,7 +148,7 @@ describe('verifyProxyRequest', () => {
     });
 
     it('checks path prefix when origin includes a path', () => {
-        // biome-ignore lint/style/noNonNullAssertion: test assertion
+        // oxlint-disable-next-line typescript/no-non-null-assertion
         const signed = buildSignedProxyUrl(
             'http://localhost/proxy',
             ['api.example.com/v1'],
@@ -165,7 +164,7 @@ describe('verifyProxyRequest', () => {
     });
 
     it('rejects a hostname-suffix confusion target', () => {
-        // biome-ignore lint/style/noNonNullAssertion: test assertion
+        // oxlint-disable-next-line typescript/no-non-null-assertion
         const signed = buildSignedProxyUrl('http://localhost/proxy', ['api.nansen.ai'], 'site_1')!;
         const params = new URL(signed).searchParams;
 
@@ -176,7 +175,7 @@ describe('verifyProxyRequest', () => {
     });
 
     it('binds and returns the issuing site id', () => {
-        // biome-ignore lint/style/noNonNullAssertion: test assertion
+        // oxlint-disable-next-line typescript/no-non-null-assertion
         const signed = buildSignedProxyUrl(
             'http://localhost/proxy',
             ['api.example.com'],
@@ -193,7 +192,7 @@ describe('verifyProxyRequest', () => {
     });
 
     it('rejects a token whose site id was tampered with', () => {
-        // biome-ignore lint/style/noNonNullAssertion: test assertion
+        // oxlint-disable-next-line typescript/no-non-null-assertion
         const signed = buildSignedProxyUrl(
             'http://localhost/proxy',
             ['api.example.com'],
@@ -210,7 +209,7 @@ describe('verifyProxyRequest', () => {
     });
 
     it('rejects when no site id is present', () => {
-        // biome-ignore lint/style/noNonNullAssertion: test assertion
+        // oxlint-disable-next-line typescript/no-non-null-assertion
         const signed = buildSignedProxyUrl(
             'http://localhost/proxy',
             ['api.example.com'],

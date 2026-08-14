@@ -1,5 +1,6 @@
-import type { GitBookSiteContext } from '@/lib/context';
-import { getDataOrNull, getPageDocument } from '@/lib/data';
+import type { Metadata, Viewport } from 'next';
+import { notFound, redirect } from 'next/navigation';
+
 import {
     CustomizationDefaultThemeMode,
     CustomizationHeaderPreset,
@@ -8,29 +9,28 @@ import {
     type TranslationLanguage,
 } from '@gitbook/api';
 import { IconsProvider } from '@gitbook/icons';
-import type { Metadata, Viewport } from 'next';
-import { notFound, redirect } from 'next/navigation';
 
+import { PageContextProvider } from '../PageContext';
+import { type PagePathParams, fetchPageData, getPathnameParam } from './fetch';
+import { PageClientLayout } from './PageClientLayout';
 import { UpdatesFilterProvider } from '@/components/DocumentView/UpdatesFilter';
 import { PageAside } from '@/components/PageAside';
 import { PageBody, PageCover } from '@/components/PageBody';
-import { getPagePath } from '@/lib/pages';
-import { isPageIndexable, isSiteIndexable } from '@/lib/seo';
-import { getDocumentFilterableTags } from '@/lib/updates';
-
+import type { GitBookSiteContext } from '@/lib/context';
+import { getDataOrNull, getPageDocument } from '@/lib/data';
 import {
     getContentInlineIconSourceRequests,
     getCustomizationIconStyle,
     getInlineIconSources,
 } from '@/lib/icons/inline';
 import { getResizedImageURL } from '@/lib/images';
+import { getPagePath } from '@/lib/pages';
 import { resolveContentRef } from '@/lib/references';
+import { isPageIndexable, isSiteIndexable } from '@/lib/seo';
 import { getSiteStructureTitle } from '@/lib/sites';
 import { tcls } from '@/lib/tailwind';
+import { getDocumentFilterableTags } from '@/lib/updates';
 import { getPageRSSURL } from '@/routes/rss';
-import { PageContextProvider } from '../PageContext';
-import { PageClientLayout } from './PageClientLayout';
-import { type PagePathParams, fetchPageData, getPathnameParam } from './fetch';
 
 export type SitePageProps = {
     context: GitBookSiteContext;
@@ -50,13 +50,13 @@ export type PageMetaLinks = {
     /**
      * The alternate URLs for the page, if any.
      */
-    alternates: Array<{
+    alternates: {
         href: string;
         /**
          * Space the alternate link points to, if any.
          */
         space: AlternateLinkSpace | null;
-    }>;
+    }[];
 };
 
 /**
@@ -188,10 +188,10 @@ export async function generateSitePageMetadata(props: SitePageProps): Promise<Me
 
     const alternates = pageMetaLinks?.alternates.reduce<{
         languages: Record<string, string>;
-        generic: Array<{
+        generic: {
             title?: string;
             url: string;
-        }>;
+        }[];
     }>(
         (acc, alt) => {
             if (alt.space?.language) {

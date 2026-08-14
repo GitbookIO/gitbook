@@ -1,10 +1,11 @@
 'use client';
 
-import { Button } from '@/components/primitives';
-import { tString, useLanguage } from '@/intl/client';
 import { z } from 'zod';
+
 import { AIToolContainer } from './common';
 import { type GetAIControlProps, createAIControl } from './helpers';
+import { Button } from '@/components/primitives';
+import { tString, useLanguage } from '@/intl/client';
 
 export const ConfirmControlOutputSchema = z.object({
     result: z.enum(['confirmed', 'cancelled']),

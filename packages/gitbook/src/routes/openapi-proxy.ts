@@ -1,3 +1,4 @@
+import { type NextRequest, NextResponse } from 'next/server';
 import { lookup } from 'node:dns/promises';
 import { isIP } from 'node:net';
 
@@ -5,8 +6,6 @@ import { GITBOOK_URL } from '@/lib/env/globals';
 import { matchesGitBookHost } from '@/lib/env/urls';
 import { getLogger } from '@/lib/logger';
 import { isAllowedByOrigins, verifyProxyRequest } from '@/lib/openapi/proxy-token';
-
-import { type NextRequest, NextResponse } from 'next/server';
 
 const MAX_REDIRECTS = 10;
 const FETCH_TIMEOUT_MS = 30_000;

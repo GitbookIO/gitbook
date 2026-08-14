@@ -1,4 +1,5 @@
 import type { Variables } from '@gitbook/api';
+
 import type { AdaptiveVisitorClaims } from './types';
 
 /**

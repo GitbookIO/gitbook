@@ -1,6 +1,7 @@
+import { CustomizationDefaultThemeMode } from '@gitbook/api';
+
 import { CustomizationRootLayout } from '@/components/RootLayout';
 import type { GitBookSiteContext, GitBookSpaceContext } from '@/lib/context';
-import { CustomizationDefaultThemeMode } from '@gitbook/api';
 
 /**
  * Layout to be used for rendering the PDF.

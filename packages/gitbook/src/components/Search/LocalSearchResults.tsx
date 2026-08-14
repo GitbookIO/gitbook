@@ -1,10 +1,11 @@
 'use client';
 
-import { tcls } from '@/lib/tailwind';
 import { Icon, type IconName } from '@gitbook/icons';
+
 import { Emoji } from '../primitives/Emoji/Emoji';
 import { Link } from '../primitives/Link';
 import type { LocalPageResult } from './useLocalSearchResults';
+import { tcls } from '@/lib/tailwind';
 
 /**
  * Renders local search results above the main server results.
@@ -80,7 +81,7 @@ function LocalSearchResultCard({
                         <Icon icon={result.icon as IconName} className="size-4" />
                     </span>
                 ) : null}
-                <p className="grow truncate font-semibold text-sm text-tint-strong leading-snug">
+                <p className="grow truncate text-sm font-semibold leading-snug text-tint-strong">
                     {result.title}
                 </p>
                 <span className="ml-auto shrink-0 text-tint-subtle">

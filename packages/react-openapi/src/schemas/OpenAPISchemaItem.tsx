@@ -1,13 +1,13 @@
 'use client';
 
-import { SectionBody } from '../StaticSection';
-
 import type { OpenAPIV3 } from '@gitbook/openapi-parser';
-import { OpenAPIDisclosure } from '../OpenAPIDisclosure';
-import { OpenAPIRootSchema } from '../OpenAPISchemaServer';
-import { Section } from '../StaticSection';
+
 import type { OpenAPIClientContext } from '../context';
 import { getDisclosureLabel } from '../getDisclosureLabel';
+import { OpenAPIDisclosure } from '../OpenAPIDisclosure';
+import { OpenAPIRootSchema } from '../OpenAPISchemaServer';
+import { SectionBody } from '../StaticSection';
+import { Section } from '../StaticSection';
 import { tString } from '../translate';
 
 export function OpenAPISchemaItem(props: {

@@ -421,8 +421,13 @@ html.dark .shiki span {
     @apply rounded-t-md *:mt-1;
   }
 
+  &.highlighted > * {
+    margin-bottom: var(--highlighted-run-end-mb, 0);
+  }
+
   &.highlighted:has(+ :not(.highlighted)) {
-    @apply rounded-b-md *:mb-1;
+    @apply rounded-b-md;
+    --highlighted-run-end-mb: calc(var(--spacing) * 1);
   }
 
   &:not(.highlighted) + .highlighted:has(+ :not(.highlighted)) {

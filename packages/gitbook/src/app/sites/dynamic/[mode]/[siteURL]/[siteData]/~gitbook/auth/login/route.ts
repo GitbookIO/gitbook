@@ -1,7 +1,8 @@
-import { type RouteLayoutParams, getDynamicSiteContext } from '@/app/utils';
 import { resolveUpstreamAuthURL } from '@/lib/site-auth-urls';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
+
+import { type RouteLayoutParams, getDynamicSiteContext } from '@/app/utils';
 
 /**
  * Redirect to the upstream auth provider login URL of site, or to the site root when not configured.

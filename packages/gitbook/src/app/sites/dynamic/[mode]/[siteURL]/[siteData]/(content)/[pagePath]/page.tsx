@@ -1,10 +1,11 @@
+import type { Metadata, Viewport } from 'next';
+
 import { type RouteParams, getDynamicSiteContext, getPagePathFromParams } from '@/app/utils';
 import {
     SitePage,
     generateSitePageMetadata,
     generateSitePageViewport,
 } from '@/components/SitePage';
-import type { Metadata, Viewport } from 'next';
 
 type PageProps = {
     params: Promise<RouteParams>;

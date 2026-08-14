@@ -1,5 +1,11 @@
 import { type ContentRef, type DocumentInlineLink, SiteInsightsLinkPosition } from '@gitbook/api';
+import { Icon } from '@gitbook/icons';
 
+import { StyledLink } from '../../primitives';
+import type { InlineProps } from '../Inline';
+import { Inlines } from '../Inlines';
+import { NotFoundRefHoverCard } from '../NotFoundRefHoverCard';
+import { InlineLinkTooltip } from './InlineLinkTooltip';
 import { getSpaceLanguage, tString } from '@/intl/server';
 import { type TranslationLanguage, defaultLanguage } from '@/intl/translations';
 import {
@@ -7,12 +13,6 @@ import {
     resolveContentRefFallback,
     resolveContentRefInDocument,
 } from '@/lib/references';
-import { Icon } from '@gitbook/icons';
-import { StyledLink } from '../../primitives';
-import type { InlineProps } from '../Inline';
-import { Inlines } from '../Inlines';
-import { NotFoundRefHoverCard } from '../NotFoundRefHoverCard';
-import { InlineLinkTooltip } from './InlineLinkTooltip';
 
 export async function InlineLink(props: InlineProps<DocumentInlineLink>) {
     const { document, inline, context, ancestorInlines } = props;

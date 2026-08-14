@@ -1,3 +1,5 @@
+import type { RevisionPageDocument, RevisionPageGroup } from '@gitbook/api';
+
 import { isAIEnabled } from '@/components/utils/isAIChatEnabled';
 import type { GitBookSiteContext } from '@/lib/context';
 import { getExposableError } from '@/lib/data';
@@ -9,7 +11,6 @@ import {
     getSimilarPages,
     resolvePagePathDocumentOrGroup,
 } from '@/lib/pages';
-import type { RevisionPageDocument, RevisionPageGroup } from '@gitbook/api';
 
 /**
  * Serve a markdown version of a page.

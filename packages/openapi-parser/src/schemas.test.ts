@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'bun:test';
+
 import { getOpenAPISchemaAnchorId } from './schemas';
 
 describe('getOpenAPISchemaAnchorId', () => {

@@ -1,7 +1,8 @@
 'use client';
 
-import { selectStore } from '@/lib/select';
 import { useCallback, useSyncExternalStore } from 'react';
+
+import { selectStore } from '@/lib/select';
 
 /**
  * Subscribe to the site-wide `select` state. Returns the current recency list plus the setters.

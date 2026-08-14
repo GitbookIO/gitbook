@@ -1,7 +1,7 @@
-import type { GitBookSiteContext } from '@/lib/context';
-import { getDataOrNull, ignoreAllThrownError } from '@/lib/data';
 import { getToolbarChangedPagesFromChanges } from './changedPagesMapper';
 import type { MinimalChangedPages } from './types';
+import type { GitBookSiteContext } from '@/lib/context';
+import { getDataOrNull, ignoreAllThrownError } from '@/lib/data';
 
 export const TOOLBAR_CHANGED_PAGES_LIMIT = 100;
 

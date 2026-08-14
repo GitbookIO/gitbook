@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it } from 'bun:test';
+
 import { SELECT_LIST_CAP } from './constants';
 import { activate, deactivate, getState, resolveActiveSlug, setSlugs, subscribe } from './store';
 

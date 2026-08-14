@@ -1,4 +1,6 @@
-import { Emoji } from '@/components/primitives';
+import assertNever from 'assert-never';
+import { Fragment } from 'react';
+
 import type {
     DocumentBlock,
     DocumentBlockHeading,
@@ -7,8 +9,8 @@ import type {
     DocumentText,
     JSONDocument,
 } from '@gitbook/api';
-import assertNever from 'assert-never';
-import { Fragment } from 'react';
+
+import { Emoji } from '@/components/primitives';
 
 export interface DocumentSection {
     id: string;

@@ -14,9 +14,8 @@ mock.module('@/lib/env/globals', () => ({
 import { NextRequest } from 'next/server';
 
 const { buildSignedProxyUrl } = await import('@/lib/openapi/proxy-token');
-const { handleOpenAPIProxyOptions, handleOpenAPIProxyRequest, isBlockedHost } = await import(
-    './openapi-proxy'
-);
+const { handleOpenAPIProxyOptions, handleOpenAPIProxyRequest, isBlockedHost } =
+    await import('./openapi-proxy');
 
 const originalFetch = globalThis.fetch;
 
@@ -40,7 +39,7 @@ function createRequest(
 
 function getForwardedHeaders(): Headers {
     const calls = (globalThis.fetch as ReturnType<typeof mock>).mock.calls;
-    // biome-ignore lint/style/noNonNullAssertion: test helper
+    // oxlint-disable-next-line typescript/no-non-null-assertion
     return calls[0]![1].headers as Headers;
 }
 
@@ -165,7 +164,7 @@ describe('handleOpenAPIProxyRequest', () => {
 
         expect(globalThis.fetch).toHaveBeenCalledTimes(1);
         const calls = (globalThis.fetch as ReturnType<typeof mock>).mock.calls;
-        // biome-ignore lint/style/noNonNullAssertion: test assertion
+        // oxlint-disable-next-line typescript/no-non-null-assertion
         const [calledUrl, calledOptions] = calls[0]!;
         expect(calledUrl).toBe(target);
         expect(calledOptions.method).toBe('POST');

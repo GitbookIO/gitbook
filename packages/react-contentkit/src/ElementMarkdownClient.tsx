@@ -1,6 +1,7 @@
 'use client';
-import type { ContentKitMarkdown } from '@gitbook/api';
 import React from 'react';
+
+import type { ContentKitMarkdown } from '@gitbook/api';
 
 import { useContentKitClientContext } from './context';
 import { resolveDynamicBinding } from './dynamic';

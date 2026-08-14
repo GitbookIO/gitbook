@@ -1,17 +1,18 @@
 'use client';
 
+import assertNever from 'assert-never';
+import type React from 'react';
+
 import {
     type ContentRef,
     type CustomizationHeaderPreset,
     SiteInsightsLinkPosition,
 } from '@gitbook/api';
-import assertNever from 'assert-never';
-import type React from 'react';
 
-import { tcls } from '@/lib/tailwind';
-import { SiteAuthLoginButton, SiteAuthLoginLink } from '../SiteAuth/SiteAuthLoginLink';
 import { Button, Link, ToggleChevron } from '../primitives';
 import { type DropdownButtonProps, DropdownMenu } from '../primitives/DropdownMenu';
+import { SiteAuthLoginButton, SiteAuthLoginLink } from '../SiteAuth/SiteAuthLoginLink';
+import { tcls } from '@/lib/tailwind';
 
 /**
  * Client component wrapping the DropdownMenu for header links.

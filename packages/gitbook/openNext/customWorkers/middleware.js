@@ -1,6 +1,6 @@
 import { WorkerEntrypoint } from 'cloudflare:workers';
-import { runWithCloudflareRequestContext } from '../../.open-next/cloudflare/init.js';
 
+import { runWithCloudflareRequestContext } from '../../.open-next/cloudflare/init.js';
 import { handler as middlewareHandler } from '../../.open-next/middleware/handler.mjs';
 
 export { DOQueueHandler } from '../../.open-next/.build/durable-objects/queue.js';
@@ -38,7 +38,7 @@ export default class extends WorkerEntrypoint {
                     reqOrResp.headers.get('x-opennext-cache') ?? 'MISS',
                     getResolvedRoute(reqOrResp, 'middleware')
                 );
-                // biome-ignore lint/suspicious/noConsole: <explanation>
+                // oxlint-disable-next-line no-console
                 console.log(logMessage);
                 return reqOrResp;
             }
@@ -61,7 +61,7 @@ export default class extends WorkerEntrypoint {
                     `SERVER-${response.headers.get('x-nextjs-cache') ?? 'MISS'}`,
                     getResolvedRoute(reqOrResp, 'unresolved')
                 );
-                // biome-ignore lint/suspicious/noConsole: <explanation>
+                // oxlint-disable-next-line no-console
                 console.log(formatedLog);
 
                 return response;
