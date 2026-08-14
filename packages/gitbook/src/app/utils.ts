@@ -9,6 +9,7 @@ import {
     getVisitorAuthClaims,
     getVisitorAuthClaimsFromToken,
 } from '@/lib/adaptive';
+import type { PPRCacheScope } from '@/lib/cache-tags';
 import { type SiteURLData, fetchSiteContextByURLLookup, getBaseContext } from '@/lib/context';
 import { getDynamicCustomizationSettings } from '@/lib/customization';
 
@@ -44,7 +45,7 @@ export type PPRRouteParams = PPRRouteLayoutParams & {
 export async function getStaticSiteContext(
     params: RouteLayoutParams,
     getClaims = getVisitorAuthClaimsFromToken,
-    options?: { ppr?: true }
+    options?: { pprScope?: PPRCacheScope }
 ) {
     const siteURL = getSiteURLFromParams(params);
     const siteURLData = getSiteURLDataFromParams(params);
@@ -61,7 +62,7 @@ export async function getStaticSiteContext(
             siteURL,
             siteURLData,
             urlMode: getModeFromParams(params.mode),
-            ...(options?.ppr ? { ppr: options.ppr } : {}),
+            ...(options?.pprScope ? { pprScope: options.pprScope } : {}),
         }),
         siteURLData
     );
@@ -225,8 +226,12 @@ export function getPPRTableOfContentsRouteParams(params: PPRRouteLayoutParams): 
     };
 }
 
-export async function getPPRStaticSiteContext(params: RouteLayoutParams) {
-    return getStaticSiteContext(params, getPPRVisitorAuthClaimsFromToken, { ppr: true });
+/**
+ * Get the static context for a PPR component. The scope partitions the cache entries and scopes
+ * the tags they emit, so the component and its data are revalidated as one unit.
+ */
+export async function getPPRStaticSiteContext(params: RouteLayoutParams, pprScope: PPRCacheScope) {
+    return getStaticSiteContext(params, getPPRVisitorAuthClaimsFromToken, { pprScope });
 }
 
 function getPPRRouteParam(encodedParam: string, name: string): string {

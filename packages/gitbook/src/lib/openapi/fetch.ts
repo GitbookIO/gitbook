@@ -17,7 +17,7 @@ import type {
     ResolveOpenAPIBlockArgs,
 } from './types';
 import type { FetchOpenAPIFilesystemResult } from './types';
-import { prefixCacheTags } from '@/lib/cache-tags';
+import { type PPRCacheScope, scopeCacheTags } from '@/lib/cache-tags';
 import { DataFetcherError, noCacheFetchOptions } from '@/lib/data';
 import { resolveContentRef } from '@/lib/references';
 
@@ -45,7 +45,7 @@ export async function fetchOpenAPIFilesystem(
             return resolved.openapi.filesystem;
         }
         // For legacy blocks ("swagger"), we need to fetch the file system.
-        return fetchFilesystem(resolved.href, context.space.id, context.dataFetcher.ppr);
+        return fetchFilesystem(resolved.href, context.space.id, context.dataFetcher.pprScope);
     })();
 
     if ('error' in result) {
@@ -76,8 +76,8 @@ export async function fetchOpenAPIFilesystem(
 async function fetchFilesystem(
     url: string,
     spaceId: string,
-    // Part of the cache key, so PPR entries are not shared with the static ones.
-    ppr: true | undefined
+    // Part of the cache key, so each PPR scope owns its own entry, separate from the static one.
+    pprScope: PPRCacheScope | undefined
 ): Promise<
     | Filesystem
     | {
@@ -89,7 +89,7 @@ async function fetchFilesystem(
 > {
     'use cache';
     try {
-        cacheTag(...prefixCacheTags([getCacheTag({ tag: 'space', space: spaceId })], ppr));
+        cacheTag(...scopeCacheTags([getCacheTag({ tag: 'space', space: spaceId })], pprScope));
         return await fetchFilesystemNoCache(url);
     } catch (error) {
         // To avoid hammering the file with requests, we cache the error for around a minute.

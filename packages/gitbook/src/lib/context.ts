@@ -23,6 +23,7 @@ import type {
 import { GITBOOK_URL } from './env';
 import { type ImageResizer, createImageResizer } from './images';
 import { type GitBookLinker, createLinker, linkerForPublishedURL } from './links';
+import type { PPRCacheScope } from '@/lib/cache-tags';
 import {
     type GitBookDataFetcher,
     createDataFetcher,
@@ -228,15 +229,15 @@ export function getBaseContext(input: {
     siteURL: URL | string;
     siteURLData: SiteURLData;
     urlMode: 'url' | 'url-host';
-    /** Set when rendering under the PPR route, to prefix the cache tags emitted by the fetcher. */
-    ppr?: true;
+    /** Set when rendering a PPR component, to scope the cache tags emitted by the fetcher. */
+    pprScope?: PPRCacheScope;
 }) {
     const { urlMode, siteURLData } = input;
     const siteURL = typeof input.siteURL === 'string' ? new URL(input.siteURL) : input.siteURL;
 
     const dataFetcher = createDataFetcher({
         apiToken: siteURLData.apiToken ?? null,
-        ...(input.ppr ? { ppr: input.ppr } : {}),
+        ...(input.pprScope ? { pprScope: input.pprScope } : {}),
     });
 
     const gitbookURL = GITBOOK_URL ? new URL(GITBOOK_URL) : undefined;

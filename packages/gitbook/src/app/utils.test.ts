@@ -139,7 +139,8 @@ describe('PPR cache region params', () => {
 describe('getPPRStaticSiteContext', () => {
     it('uses the supplied API token without resolving published content again', async () => {
         const { context, visitorAuthClaims } = await getPPRStaticSiteContext(
-            getPPRRouteParams(routeParams)
+            getPPRRouteParams(routeParams),
+            'body'
         );
 
         expect(context).toMatchObject({
