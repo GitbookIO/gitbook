@@ -753,12 +753,14 @@ function encodePathInSiteContent(
 } {
     let pathname = removeLeadingSlash(removeTrailingSlash(siteURLData.pathname));
 
+    // The optional fields are coerced to null, otherwise they are dropped from the JSON payload
+    // instead of being sent as the `string | null` the API expects.
     const eventLocation: Partial<SiteInsightsEventLocation> = {
-        siteSection: siteURLData.siteSection,
+        siteSection: siteURLData.siteSection ?? null,
         siteSpace: siteURLData.siteSpace,
-        siteShareKey: siteURLData.shareKey,
+        siteShareKey: siteURLData.shareKey ?? null,
         space: siteURLData.space,
-        revision: siteURLData.revision,
+        revision: siteURLData.revision ?? null,
         displayContext: SiteInsightsDisplayContext.Server,
     };
 
@@ -881,24 +883,19 @@ function encodePathInSiteContent(
                               }`
                             : `~gitbook/markdown/${encodePagePath(pagePathWithoutMD)}`,
                     routeType: 'static',
-                    // TODO: track pageId / spaceId when possible
-                    // We don't do it at the moment as we can't easily extract it from the URL.
                     events: ask
                         ? [
                               {
                                   type: 'ask_question',
                                   query: ask,
-                                  location: {
-                                      displayContext: SiteInsightsDisplayContext.Server,
-                                  },
+                                  ...(goal ? { goal } : {}),
+                                  location: eventLocation,
                               },
                           ]
                         : [
                               {
                                   type: 'page_markdown_request',
-                                  location: {
-                                      displayContext: SiteInsightsDisplayContext.Server,
-                                  },
+                                  location: eventLocation,
                               },
                           ],
                 };
