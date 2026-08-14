@@ -13,7 +13,7 @@ import { getCacheTag, getComputedContentSourceCacheTags } from '@gitbook/cache-t
 import { cache } from '../cache';
 import { DataFetcherError, wrapDataFetcherError } from './errors';
 import type { GitBookDataFetcher } from './types';
-import { prefixCacheTags } from '@/lib/cache-tags';
+import { type PPRCacheScope, scopeCacheTags } from '@/lib/cache-tags';
 import { GITBOOK_API_TOKEN, GITBOOK_API_URL, GITBOOK_USER_AGENT } from '@/lib/env';
 import { trace } from '@/lib/tracing';
 
@@ -24,10 +24,10 @@ interface DataFetcherInput {
     apiToken: string | null;
 
     /**
-     * Set when rendering under the PPR route. It is part of the cache key, so PPR cache entries
-     * are never shared with the static ones and can carry their own `ppr:` prefixed cache tags.
+     * Set when rendering a PPR component. It is part of the cache key, so each scope owns its own
+     * copy of the data and can carry its own `ppr:<scope>:` cache tags.
      */
-    ppr?: true;
+    pprScope?: PPRCacheScope;
 }
 
 /**
@@ -47,13 +47,13 @@ export function createDataFetcher(
     rawInput: DataFetcherInput = { apiToken: null }
 ): GitBookDataFetcher {
     // The input is part of the cache key of every cached fetcher below, so we normalize its shape
-    // here: `ppr` is omitted entirely when unset, keeping non-PPR cache keys unchanged.
-    const input: DataFetcherInput = rawInput.ppr
-        ? { apiToken: rawInput.apiToken, ppr: true }
+    // here: `pprScope` is omitted entirely when unset, keeping non-PPR cache keys unchanged.
+    const input: DataFetcherInput = rawInput.pprScope
+        ? { apiToken: rawInput.apiToken, pprScope: rawInput.pprScope }
         : { apiToken: rawInput.apiToken };
 
     return {
-        ppr: input.ppr,
+        pprScope: input.pprScope,
 
         async api() {
             return apiClient(input);
@@ -918,8 +918,8 @@ function getCacheTagsFromResponse(response: HttpResponse<unknown, unknown>) {
 
 /**
  * Tag the current cache entry. Always tag through this helper, never `cacheTag` directly,
- * so that a PPR render never emits an un-prefixed tag.
+ * so that a PPR render never emits an unscoped tag.
  */
 function cacheTagsFor(input: DataFetcherInput, tags: string[]) {
-    cacheTag(...prefixCacheTags(tags, input.ppr));
+    cacheTag(...scopeCacheTags(tags, input.pprScope));
 }

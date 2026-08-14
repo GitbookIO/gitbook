@@ -28,7 +28,9 @@ export default async function SitePPRLayout({
     const pageParams = getPPRRouteParams(routeParams);
     const headerParams = getPPRHeaderRouteParams(routeParams);
     const tableOfContentsParams = getPPRTableOfContentsRouteParams(routeParams);
-    const { context, visitorAuthClaims } = await getPPRStaticSiteContext(pageParams);
+    // The layout resolves context from the same page params as PPRPageBody, so it shares its
+    // cache scope and its data entries rather than adding a fourth set of fetches.
+    const { context, visitorAuthClaims } = await getPPRStaticSiteContext(pageParams, 'body');
     const withTracking = shouldTrackEvents();
 
     return (
@@ -54,11 +56,11 @@ export default async function SitePPRLayout({
 }
 
 export async function generateViewport({ params }: SitePPRLayoutProps) {
-    const { context } = await getPPRStaticSiteContext(getPPRRouteParams(await params));
+    const { context } = await getPPRStaticSiteContext(getPPRRouteParams(await params), 'body');
     return generateSiteLayoutViewport(context);
 }
 
 export async function generateMetadata({ params }: SitePPRLayoutProps) {
-    const { context } = await getPPRStaticSiteContext(getPPRRouteParams(await params));
+    const { context } = await getPPRStaticSiteContext(getPPRRouteParams(await params), 'body');
     return generateSiteLayoutMetadata(context);
 }
