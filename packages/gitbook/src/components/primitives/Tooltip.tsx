@@ -1,6 +1,7 @@
 'use client';
 
 import { Tooltip as BaseTooltip } from '@base-ui/react/tooltip';
+import { useState } from 'react';
 
 import { PopupArrow } from './PopupArrow';
 import { tcls } from '@/lib/tailwind';
@@ -10,9 +11,9 @@ export type TooltipProps = {
     align?: BaseTooltip.Positioner.Props['align'];
     sideOffset?: number;
     delay?: number;
-    closeOnClick?: boolean;
     disabled?: boolean;
     disableHoverablePopup?: boolean;
+    pinOnClick?: boolean;
     popupProps?: Omit<BaseTooltip.Popup.Props, 'className' | 'children' | 'render'>;
 };
 
@@ -31,17 +32,37 @@ export function Tooltip(
         align,
         sideOffset = 4,
         delay,
-        closeOnClick,
         disabled,
         disableHoverablePopup,
+        pinOnClick = false,
         popupProps,
         arrow = false,
         className,
     } = props;
 
+    const [hovered, setHovered] = useState(false);
+    const [pinned, setPinned] = useState(false);
+
     return (
-        <BaseTooltip.Root disabled={disabled} disableHoverablePopup={disableHoverablePopup}>
-            <BaseTooltip.Trigger render={children} delay={delay} closeOnClick={closeOnClick} />
+        <BaseTooltip.Root
+            open={hovered || pinned}
+            onOpenChange={(nextOpen, eventDetails) => {
+                setHovered(nextOpen);
+                if (
+                    eventDetails.reason === 'outside-press' ||
+                    eventDetails.reason === 'escape-key'
+                ) {
+                    setPinned(false);
+                }
+            }}
+            disabled={disabled}
+            disableHoverablePopup={disableHoverablePopup}
+        >
+            <BaseTooltip.Trigger
+                render={children}
+                delay={delay}
+                onClick={pinOnClick ? () => setPinned(true) : undefined}
+            />
             <BaseTooltip.Portal>
                 <BaseTooltip.Positioner
                     className="z-50"

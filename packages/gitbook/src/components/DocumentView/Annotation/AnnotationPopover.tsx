@@ -10,7 +10,7 @@ export function AnnotationPopover(props: { children: React.ReactNode; body: Reac
     return (
         <Tooltip
             label={body}
-            closeOnClick={false}
+            pinOnClick
             popupProps={{
                 role: 'definition',
             }}
