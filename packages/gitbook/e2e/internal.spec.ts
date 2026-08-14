@@ -629,7 +629,9 @@ const testCases: TestsCase[] = [
                     // The menu only opens on `mouseenter`, which cannot fire again once the pointer
                     // is inside: a hover landing before hydration is lost for good.
                     await waitForHydration(page);
-                    const trigger = page.getByRole('button', { name: 'Test Section Group 1' });
+                    const trigger = page
+                        .locator('[data-gb-sections]')
+                        .getByRole('button', { name: 'Test Section Group 1' });
                     await trigger.hover();
                     await expect(page.getByText('Section B')).toBeVisible();
                     await page.getByText('Section B').click();
