@@ -136,6 +136,31 @@ async function expectIdle(page: Page, client: CDPSession) {
     expect(restyled, 'an idle page should barely restyle').toBeLessThan(IDLE_RESTYLE_TOLERANCE);
 }
 
+test('off-screen OpenAPI blocks skip their rendering work', async ({ page }) => {
+    await openLargePage(page);
+
+    const blocks = page.locator('.openapi-block');
+    const total = await blocks.count();
+    expect(total, 'the fixture needs enough blocks for some to sit off-screen').toBeGreaterThan(4);
+
+    await page.evaluate(() => window.scrollTo(0, 0));
+    const rendered = await page.evaluate(
+        () =>
+            [...document.querySelectorAll('.openapi-block')].filter((element) =>
+                element.checkVisibility({ contentVisibilityAuto: true })
+            ).length
+    );
+    expect(
+        rendered,
+        `${rendered} of ${total} blocks rendered from the top of the page`
+    ).toBeLessThan(total / 2);
+
+    // Un-skipping on approach is what keeps #anchors and find-in-page working.
+    const last = blocks.last();
+    await last.scrollIntoViewIfNeeded();
+    await expect(last).toBeVisible();
+});
+
 test('opening a popup restyles a bounded part of a large API reference', async ({ page }) => {
     const { client, totalElements } = await openLargePage(page);
     await expectIdle(page, client);
