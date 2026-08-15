@@ -177,7 +177,7 @@ const Breadcrumbs = (props: { breadcrumbs: PageItem['breadcrumbs']; withOverflow
                   <Tooltip
                       key="breadcrumbs-overflow"
                       label={formatCrumbs(crumbs.slice(3, -1))}
-                      rootProps={{ delayDuration: 0 }}
+                      delay={0}
                       arrow
                   >
                       <span>

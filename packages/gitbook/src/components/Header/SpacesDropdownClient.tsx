@@ -8,8 +8,8 @@ import { SpacesDropdownMenuItems } from './SpacesDropdownMenuItem';
 import { type ClassValue, tcls } from '@/lib/tailwind';
 
 /**
- * Client component that creates the Button trigger and DropdownMenu internally,
- * avoiding server→client element serialization through Radix's Slot.
+ * Client component that creates the Button trigger and DropdownMenu internally, avoiding
+ * server→client element serialization through the trigger's `render` prop.
  */
 export function SpacesDropdownClient(props: {
     title: string;

@@ -62,7 +62,7 @@ export function ConsentForm(props: {
                         <Checkbox
                             id="site-oauth-trusted"
                             checked={trusted}
-                            onCheckedChange={(value) => setTrusted(value === true)}
+                            onCheckedChange={setTrusted}
                         />
                         <span>I recognize and trust this client</span>
                     </label>

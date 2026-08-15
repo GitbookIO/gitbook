@@ -1,39 +1,40 @@
-import * as RadixPopover from '@radix-ui/react-popover';
+import { Popover as BasePopover } from '@base-ui/react/popover';
 
 import { tcls } from '@/lib/tailwind';
 
 export function Popover(props: {
-    children: React.ReactNode;
+    children: React.ReactElement<Record<string, unknown>>;
     content?: string | React.ReactNode;
-    rootProps?: RadixPopover.PopoverProps;
-    triggerProps?: RadixPopover.PopoverTriggerProps;
-    contentProps?: RadixPopover.PopoverContentProps;
-    arrow?: boolean;
+    rootProps?: Omit<BasePopover.Root.Props, 'children'>;
+    nativeButton?: boolean;
+    positionerProps?: Omit<BasePopover.Positioner.Props, 'children' | 'className'> & {
+        className?: string;
+    };
+    popupProps?: Omit<BasePopover.Popup.Props, 'children' | 'className'> & { className?: string };
 }) {
-    const { children, content, rootProps, triggerProps, contentProps, arrow = false } = props;
+    const { children, content, rootProps, nativeButton, positionerProps, popupProps } = props;
 
     return (
-        <RadixPopover.Root {...rootProps}>
-            <RadixPopover.Trigger {...triggerProps}>{children}</RadixPopover.Trigger>
-            <RadixPopover.Portal>
-                <RadixPopover.Content
-                    {...contentProps}
-                    collisionPadding={contentProps?.collisionPadding ?? 16}
-                    sideOffset={contentProps?.sideOffset ?? 4}
-                    className={tcls(
-                        'z-50 max-h-(--radix-popover-content-available-height) max-w-xs animate-scale-in overflow-y-auto overflow-x-hidden circular-corners:rounded-3xl rounded-corners:rounded-xl bg-tint px-4 py-3 text-sm text-tint depth-subtle:shadow-xl shadow-tint-12/4 outline-hidden ring-1 ring-tint transition-all empty:hidden data-[state="closed"]:animate-scale-out motion-reduce:transition-none dark:shadow-tint-1/6',
-                        contentProps?.className
-                    )}
-                    style={{
-                        ...contentProps?.style,
-                    }}
+        <BasePopover.Root {...rootProps}>
+            <BasePopover.Trigger render={children} nativeButton={nativeButton} />
+            <BasePopover.Portal>
+                <BasePopover.Positioner
+                    {...positionerProps}
+                    className={tcls('z-50 data-anchor-hidden:hidden', positionerProps?.className)}
+                    collisionPadding={positionerProps?.collisionPadding ?? 16}
+                    sideOffset={positionerProps?.sideOffset ?? 4}
                 >
-                    {content}
-                    {arrow && (
-                        <RadixPopover.Arrow className="-mb-px h-2 w-4 fill-tint-3 stroke-tint-7 stroke-2" />
-                    )}
-                </RadixPopover.Content>
-            </RadixPopover.Portal>
-        </RadixPopover.Root>
+                    <BasePopover.Popup
+                        {...popupProps}
+                        className={tcls(
+                            'max-h-(--available-height) max-w-xs animate-scale-in overflow-y-auto overflow-x-hidden circular-corners:rounded-3xl rounded-corners:rounded-xl bg-tint px-4 py-3 text-sm text-tint depth-subtle:shadow-xl shadow-tint-12/4 outline-hidden ring-1 ring-tint transition-all empty:hidden data-closed:animate-scale-out motion-reduce:transition-none dark:shadow-tint-1/6',
+                            popupProps?.className
+                        )}
+                    >
+                        {content}
+                    </BasePopover.Popup>
+                </BasePopover.Positioner>
+            </BasePopover.Portal>
+        </BasePopover.Root>
     );
 }

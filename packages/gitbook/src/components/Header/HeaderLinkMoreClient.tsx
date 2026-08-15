@@ -10,7 +10,8 @@ import { type ClassValue, tcls } from '@/lib/tailwind';
 
 /**
  * Client component for the "More" header link dropdown.
- * Creates the trigger button internally to avoid Flight lazy chunk wrappers reaching Radix's Slot.
+ * Creates the trigger button internally to avoid Flight lazy chunk wrappers reaching the trigger's
+ * `render` prop.
  */
 export function HeaderLinkMoreDropdown(props: {
     label: React.ReactNode;
