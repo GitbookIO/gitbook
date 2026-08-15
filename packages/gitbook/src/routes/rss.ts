@@ -2,9 +2,8 @@ import { getPageFullTitle } from '@/components/SitePage';
 import type { GitBookSiteContext } from '@/lib/context';
 import { getPageDocument } from '@/lib/data/pages';
 import { getBlocksByType, getNodeText, isHeadingBlock } from '@/lib/document';
-import { resolvePagePathDocumentOrGroup } from '@/lib/pages';
 import { joinPath } from '@/lib/paths';
-import { resolveSiteSpaceCustomHomePage } from '@/lib/sites';
+import { resolveSiteSpacePagePathDocumentOrGroup } from '@/lib/sites';
 import type { RevisionPageDocument } from '@gitbook/api';
 import { RevisionPageType } from '@gitbook/api';
 import { Feed } from 'feed';
@@ -24,10 +23,11 @@ export async function servePageRSS(
     context: GitBookSiteContext,
     inputPagePath: string
 ): Promise<Response> {
-    const pageLookup =
-        (inputPagePath === ''
-            ? resolveSiteSpaceCustomHomePage(context.siteSpace, context.revision.pages)
-            : undefined) ?? resolvePagePathDocumentOrGroup(context.revision.pages, inputPagePath);
+    const pageLookup = resolveSiteSpacePagePathDocumentOrGroup(
+        context.siteSpace,
+        context.revision.pages,
+        inputPagePath
+    );
 
     if (!pageLookup) {
         return notFoundResponse('Page not found');

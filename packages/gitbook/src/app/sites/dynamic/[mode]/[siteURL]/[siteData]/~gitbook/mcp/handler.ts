@@ -5,9 +5,8 @@ import { isAIEnabled } from '@/components/utils/isAIChatEnabled';
 import { renderAskSourcesMarkdown, streamSiteAskAnswer } from '@/lib/ask';
 import { getExposableError, throwIfDataError } from '@/lib/data';
 import { fromPageMarkdown, getMarkdownForPageInSpace, toPageMarkdown } from '@/lib/markdownPage';
-import { resolvePagePath } from '@/lib/pages';
 import { joinPathWithBaseURL } from '@/lib/paths';
-import { findSiteSpaceBy, findSiteSpaceByUrl, resolveSiteSpaceCustomHomePage } from '@/lib/sites';
+import { findSiteSpaceBy, findSiteSpaceByUrl, resolveSiteSpacePagePath } from '@/lib/sites';
 import { trackServerInsightsEvents } from '@/lib/tracking';
 import { waitUntil } from '@/lib/waitUntil';
 import { createMcpHandler } from 'mcp-handler';
@@ -198,11 +197,11 @@ export async function handleMcpRequest(
                             })
                         );
 
-                        const resolved =
-                            (match.pagePath === ''
-                                ? resolveSiteSpaceCustomHomePage(match.siteSpace, revision.pages)
-                                : undefined) ??
-                            resolvePagePath(revision.pages, match.pagePath ?? '');
+                        const resolved = resolveSiteSpacePagePath(
+                            match.siteSpace,
+                            revision.pages,
+                            match.pagePath
+                        );
                         if (!resolved) {
                             return {
                                 content: [{ type: 'text', text: `Page not found: "${url}"` }],
@@ -413,11 +412,11 @@ export async function handleMcpRequest(
                             })
                         );
 
-                        const resolved =
-                            (match.pagePath === ''
-                                ? resolveSiteSpaceCustomHomePage(match.siteSpace, revision.pages)
-                                : undefined) ??
-                            resolvePagePath(revision.pages, match.pagePath ?? '');
+                        const resolved = resolveSiteSpacePagePath(
+                            match.siteSpace,
+                            revision.pages,
+                            match.pagePath
+                        );
                         if (!resolved) {
                             return {
                                 content: [{ type: 'text', text: `Page not found: "${pageUrl}"` }],

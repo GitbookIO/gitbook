@@ -7,9 +7,9 @@ import {
 } from '@gitbook/api';
 
 import { getDataOrNull } from '@/lib/data';
-import { resolvePageId, resolvePagePath } from '@/lib/pages';
+import { resolvePageId } from '@/lib/pages';
 import { withLeadingSlash } from '@/lib/paths';
-import { resolveSiteSpaceCustomHomePage } from '@/lib/sites';
+import { resolveSiteSpacePagePath } from '@/lib/sites';
 
 export interface PagePathParams {
     pathname?: string | string[];
@@ -52,10 +52,7 @@ async function resolvePage(context: GitBookSiteContext, params: PagePathParams |
     const pathname = rawPathname.toLowerCase();
 
     // When resolving a page, we use the lowercased pathname
-    const page =
-        (pathname === ''
-            ? resolveSiteSpaceCustomHomePage(context.siteSpace, revision.pages)
-            : undefined) ?? resolvePagePath(revision.pages, pathname);
+    const page = resolveSiteSpacePagePath(context.siteSpace, revision.pages, pathname);
     if (page) {
         return page;
     }

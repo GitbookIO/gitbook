@@ -4,12 +4,8 @@ import { getExposableError } from '@/lib/data';
 import { linkerWithMarkdownPages } from '@/lib/links';
 import { renderLLMsTxtMarkdownDirective } from '@/lib/llms-directive';
 import { getMarkdownForPage } from '@/lib/markdownPage';
-import {
-    type ResolvedPagePath,
-    getSimilarPages,
-    resolvePagePathDocumentOrGroup,
-} from '@/lib/pages';
-import { resolveSiteSpaceCustomHomePage } from '@/lib/sites';
+import { type ResolvedPagePath, getSimilarPages } from '@/lib/pages';
+import { resolveSiteSpacePagePathDocumentOrGroup } from '@/lib/sites';
 import type { RevisionPageDocument, RevisionPageGroup } from '@gitbook/api';
 
 /**
@@ -23,12 +19,11 @@ export async function servePageMarkdown(baseContext: GitBookSiteContext, pagePat
             linker: linkerWithMarkdownPages(baseContext.linker),
         };
 
-        const customHomePage =
-            pagePath === ''
-                ? resolveSiteSpaceCustomHomePage(context.siteSpace, context.revision.pages)
-                : undefined;
-        const pageLookup =
-            customHomePage ?? resolvePagePathDocumentOrGroup(context.revision.pages, pagePath);
+        const pageLookup = resolveSiteSpacePagePathDocumentOrGroup(
+            context.siteSpace,
+            context.revision.pages,
+            pagePath
+        );
         if (!pageLookup) {
             // Generates a markdown body for missing pages. Return this with a 200 status (not 404) because agents discard 404 response bodies.=
             return renderNotFoundMarkdown(context, pagePath);

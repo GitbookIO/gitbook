@@ -274,15 +274,13 @@ export async function getSitePageData(props: SitePageProps) {
             context.siteSpace,
             context.revision.pages
         );
-        const isExpectedPagePath = customHomePage
-            ? getSiteSpacePagePaths(
-                  context.siteSpace,
-                  context.revision.pages,
-                  pageTarget.page
-              ).includes(rawPathname)
-            : getPagePath(context.revision.pages, pageTarget.page) === rawPathname;
+        // Without a custom home page, a page has a single canonical path. With one, the custom
+        // home page also gains the site space's root as a valid alias.
+        const expectedPagePaths = customHomePage
+            ? getSiteSpacePagePaths(context.siteSpace, context.revision.pages, pageTarget.page)
+            : [getPagePath(context.revision.pages, pageTarget.page)];
 
-        if (!isExpectedPagePath) {
+        if (!expectedPagePaths.includes(rawPathname)) {
             redirect(
                 context.linker.toPathForPage({
                     pages: context.revision.pages,
