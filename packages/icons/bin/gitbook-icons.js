@@ -44,7 +44,7 @@ async function main() {
         }),
     ]);
 
-    // biome-ignore lint/suspicious/noConsole: We want the CLI to log
+    // oxlint-disable-next-line no-console
     console.log(`Copied ${stylesToCopy.length} styles to ${outputFolder}`);
 }
 

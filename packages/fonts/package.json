@@ -27,7 +27,12 @@
         "unit": "bun test",
         "publish-to-npm": "../../scripts/publish-if-new.sh"
     },
-    "files": ["dist", "bin", "README.md", "CHANGELOG.md"],
+    "files": [
+        "dist",
+        "bin",
+        "README.md",
+        "CHANGELOG.md"
+    ],
     "engines": {
         "node": ">=20.0.0"
     },

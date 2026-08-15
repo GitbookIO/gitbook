@@ -1,7 +1,9 @@
+import warnOnce from 'warn-once';
+
+import type { RevisionPage, RevisionPageDocument, RevisionPageGroup } from '@gitbook/api';
+
 import { getPagePath } from '@/lib/pages';
 import { withLeadingSlash, withTrailingSlash } from '@/lib/paths';
-import type { RevisionPage, RevisionPageDocument, RevisionPageGroup } from '@gitbook/api';
-import warnOnce from 'warn-once';
 
 /**
  * Generic interface to generate links based on a given context.
@@ -45,10 +47,7 @@ export interface GitBookLinker {
      * Generate an absolute path for a page path in the current content.
      * The result should NOT be passed to `toPathInSpace`.
      */
-    toPathForPagePath(input: {
-        path: string;
-        anchor?: string;
-    }): string;
+    toPathForPagePath(input: { path: string; anchor?: string }): string;
 
     /**
      * Generate an absolute URL for a given path relative to the host of the current content.
@@ -111,9 +110,7 @@ export function createLinker(
             return spaceBasePath;
         },
 
-        fork(override: {
-            spaceBasePath: string;
-        }) {
+        fork(override: { spaceBasePath: string }) {
             return createLinker({
                 ...servedOn,
                 spaceBasePath: override.spaceBasePath,

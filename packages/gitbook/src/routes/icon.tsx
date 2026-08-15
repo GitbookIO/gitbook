@@ -1,13 +1,14 @@
 import { notFound, redirect } from 'next/navigation';
 import { ImageResponse } from 'next/og';
 
+import { getCacheTag } from '@gitbook/cache-tags';
+import { colorScale } from '@gitbook/colors';
+
 import type { GitBookSiteContext } from '@/lib/context';
 import { getEmojiForCode } from '@/lib/emojis';
 import { computeImageFonts } from '@/lib/imageFonts';
 import { getResizedImageURL } from '@/lib/images';
 import { tcls } from '@/lib/tailwind';
-import { getCacheTag } from '@gitbook/cache-tags';
-import { colorScale } from '@gitbook/colors';
 
 const SIZES = {
     /** Size for a favicon */

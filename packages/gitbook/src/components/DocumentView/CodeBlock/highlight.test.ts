@@ -1,4 +1,5 @@
 import { expect, it } from 'bun:test';
+
 import type { DocumentBlockCode } from '@gitbook/api';
 
 import {

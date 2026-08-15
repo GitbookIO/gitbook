@@ -1,5 +1,6 @@
-import { tcls } from '@/lib/tailwind';
 import * as RadixPopover from '@radix-ui/react-popover';
+
+import { tcls } from '@/lib/tailwind';
 
 export function Popover(props: {
     children: React.ReactNode;
@@ -29,7 +30,7 @@ export function Popover(props: {
                 >
                     {content}
                     {arrow && (
-                        <RadixPopover.Arrow className="-mb-px h-2 w-4 fill-tint-3 stroke-2 stroke-tint-7" />
+                        <RadixPopover.Arrow className="-mb-px h-2 w-4 fill-tint-3 stroke-tint-7 stroke-2" />
                     )}
                 </RadixPopover.Content>
             </RadixPopover.Portal>

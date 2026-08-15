@@ -5,8 +5,9 @@
         "node": "^22.3.0"
     },
     "devDependencies": {
-        "@biomejs/biome": "^1.9.4",
         "@changesets/cli": "^2.31.0",
+        "oxfmt": "^0.62.0",
+        "oxlint": "^1.77.0",
         "turbo": "^2.10.3",
         "vercel": "50.37.3"
     },
@@ -27,8 +28,10 @@
         "build": "turbo run build",
         "clean-deps": "rm -rf node_modules && rm -rf packages/*/node_modules",
         "typecheck": "turbo run typecheck",
-        "format": "biome check --write ./",
-        "format:check": "biome check --diagnostic-level=error ./",
+        "lint": "oxlint --quiet",
+        "lint:fix": "oxlint --fix --quiet",
+        "format": "oxfmt",
+        "format:check": "oxfmt --check",
         "unit": "turbo run unit",
         "e2e": "turbo run e2e",
         "e2e-customers": "turbo run e2e-customers",
@@ -39,7 +42,9 @@
         "clean": "turbo run clean"
     },
     "workspaces": {
-        "packages": ["packages/*"],
+        "packages": [
+            "packages/*"
+        ],
         "catalog": {
             "@tsconfig/strictest": "^2.0.6",
             "@tsconfig/node20": "^20.1.6",

@@ -1,9 +1,11 @@
 'use client';
-import { Icon } from '@gitbook/icons';
 import { MotionConfig, motion } from 'motion/react';
+
+import { Icon } from '@gitbook/icons';
+
 import { useCheckForContentUpdate } from '../AutoRefreshContent';
-import { useVisitor } from '../Insights';
 import { useCurrentPagePath } from '../hooks';
+import { useVisitor } from '../Insights';
 import { ChangedPagesButton } from './ChangedPagesButton';
 import { HideToolbarButton } from './HideToolbarButton';
 import { IframeWrapper } from './IframeWrapper';
@@ -225,7 +227,7 @@ function RevisionToolbar(props: ToolbarViewProps) {
                         ) : (
                             <div className="flex items-center gap-2">
                                 Setup GitSync to edit using Git{' '}
-                                <div className="flex items-center gap-1 text-neutral-8 text-xs hover:text-neutral-6 hover:underline dark:text-neutral-3">
+                                <div className="flex items-center gap-1 text-xs text-neutral-8 hover:text-neutral-6 hover:underline dark:text-neutral-3">
                                     <a
                                         href="https://gitbook.com/docs/getting-started/git-sync"
                                         target="_blank"
@@ -366,7 +368,11 @@ function getToolbarHref({
     href,
     siteId,
     buttonId,
-}: { href: string; siteId: string; buttonId: string }) {
+}: {
+    href: string;
+    siteId: string;
+    buttonId: string;
+}) {
     const url = new URL(href);
     url.searchParams.set('utm_source', 'content');
     url.searchParams.set('utm_medium', 'toolbar');

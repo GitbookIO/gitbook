@@ -385,7 +385,7 @@ const testCases: TestsCase[] = [
             { name: 'Home', url: '/docs', run: waitForCookiesDialog },
             {
                 name: 'OpenAPI',
-                url: '/docs/developers/gitbook-api/api-reference/docs-sites/site-ai-ask',
+                url: '/docs/developers/gitbook-api/api-reference/docs-sites/site-ai-ask/ask-a-question-in-a-site',
                 run: waitForCookiesDialog,
             },
         ],

@@ -4,6 +4,7 @@ import type {
     OpenAPIV3_1,
     OpenAPIV3xDocument,
 } from '@gitbook/openapi-parser';
+
 import { dereferenceFilesystem } from './dereference';
 import type { OpenAPIOperationData, OpenAPISecurityScope } from './types';
 import { checkIsReference, readMcpUrl } from './utils';

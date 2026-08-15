@@ -1,9 +1,10 @@
 'use client';
 
-import type { ContentKitTextInput } from '@gitbook/api';
+import classNames from 'classnames';
 import type React from 'react';
 
-import classNames from 'classnames';
+import type { ContentKitTextInput } from '@gitbook/api';
+
 import { useContentKitClientContext } from './context';
 import { getStateStringValue } from './dynamic';
 import type { ContentKitClientElementProps } from './types';

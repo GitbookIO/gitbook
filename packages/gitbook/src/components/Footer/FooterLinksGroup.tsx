@@ -1,15 +1,14 @@
-import type { GitBookAnyContext } from '@/lib/context';
 import {
     type CustomizationContentLink,
     type CustomizationFooterGroup,
     SiteInsightsLinkPosition,
 } from '@gitbook/api';
 
-import { resolveContentRef } from '@/lib/references';
-import { tcls } from '@/lib/tailwind';
-
-import { getLocalizedTitle } from '@/lib/sites';
 import { Link } from '../primitives';
+import type { GitBookAnyContext } from '@/lib/context';
+import { resolveContentRef } from '@/lib/references';
+import { getLocalizedTitle } from '@/lib/sites';
+import { tcls } from '@/lib/tailwind';
 
 export function FooterLinksGroup(props: {
     group: CustomizationFooterGroup;

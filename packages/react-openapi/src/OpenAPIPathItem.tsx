@@ -1,7 +1,7 @@
+import type { OpenAPIClientContext } from './context';
 import { OpenAPICopyButton } from './OpenAPICopyButton';
 import { OpenAPIMethodBadge } from './OpenAPIMethodBadge';
 import type { OpenAPIPathProps } from './OpenAPIPath';
-import type { OpenAPIClientContext } from './context';
 
 export function OpenAPIPathItem(
     props: OpenAPIPathProps & {

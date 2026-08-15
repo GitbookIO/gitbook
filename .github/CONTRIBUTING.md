@@ -76,7 +76,10 @@ bun dev
 ```
 
 Additional development commands:
-- `bun format`: Format the code using Biome
+- `bun lint`: Lint the code using Oxlint
+- `bun lint:fix`: Automatically fix lint issues using Oxlint
+- `bun format`: Format the code using Oxfmt
+- `bun format:check`: Check formatting without changing files
 - `bun typecheck`: Run TypeScript type checking
 - `bun unit`: Run unit tests
 - `bun e2e`: Run end-to-end tests

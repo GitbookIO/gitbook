@@ -29,7 +29,7 @@ export function AIChatFollowupSuggestions(props: {
                             chatController.postMessage({ message: suggestion });
                         }}
                         label={suggestion}
-                        className="starting:h-0 max-w-full origin-left animate-blur-in-slow border-none bg-primary-11/1 starting:py-0 text-left transition-all transition-discrete duration-500 hover:bg-primary-hover"
+                        className="starting:h-0 animate-blur-in-slow starting:py-0 transition-discrete max-w-full origin-left border-none bg-primary-11/1 text-left transition-all duration-500 hover:bg-primary-hover"
                         size="small"
                         variant="blank"
                         style={{

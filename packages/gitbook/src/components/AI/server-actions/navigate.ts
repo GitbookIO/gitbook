@@ -1,9 +1,9 @@
 'use server';
 
+import { toInSiteHref } from '../navigation';
 import { resolveContentRef, resolveStringContentRef } from '@/lib/references';
 import { fetchServerActionSiteContext, getServerActionBaseContext } from '@/lib/server-actions';
 import { traceErrorOnly } from '@/lib/tracing';
-import { toInSiteHref } from '../navigation';
 
 /**
  * Resolve a link provided by the assistant into a path that can be navigated to within the site.

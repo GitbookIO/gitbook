@@ -2,9 +2,9 @@
 
 import * as React from 'react';
 
+import { getIconStyle } from './getIconStyle';
 import { getInlineIconSourceKey } from './IconSources';
 import { getIconAssetURL, useIcons } from './IconsProvider';
-import { getIconStyle } from './getIconStyle';
 import type { IconName, IconStyle } from './types';
 
 /**

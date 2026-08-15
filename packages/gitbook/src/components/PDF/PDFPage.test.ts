@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'bun:test';
+
 import { RevisionPageType } from '@gitbook/api';
 
+import { createPDFLinker } from './linker';
 import { createLinker, linkerWithAbsoluteURLs } from '@/lib/links';
 import { getLinkerForSiteSpace } from '@/lib/sites';
-
-import { createPDFLinker } from './linker';
 
 function createDocumentPage(id: string, path: string) {
     return {

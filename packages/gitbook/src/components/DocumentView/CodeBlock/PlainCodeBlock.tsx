@@ -1,9 +1,10 @@
+import { useId } from 'react';
+
 import type {
     CustomizationThemedCodeTheme,
     JSONDocument,
     SiteCustomizationSettings,
 } from '@gitbook/api';
-import { useId } from 'react';
 
 import type { DocumentContext } from '../DocumentView';
 import { CodeBlock } from './CodeBlock';

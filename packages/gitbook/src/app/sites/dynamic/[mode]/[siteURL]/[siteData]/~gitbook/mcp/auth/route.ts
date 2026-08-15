@@ -1,6 +1,7 @@
-import type { RouteLayoutParams } from '@/app/utils';
 import type { NextRequest } from 'next/server';
+
 import { handleMcpRequest } from '../handler';
+import type { RouteLayoutParams } from '@/app/utils';
 
 async function handler(
     rawRequest: NextRequest,

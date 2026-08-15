@@ -1,11 +1,12 @@
 'use client';
 
+import { useState } from 'react';
+
+import { useTrackEvent } from '../Insights';
+import { Button } from '../primitives';
 import { useLanguage } from '@/intl/client';
 import { t, tString } from '@/intl/translate';
 import { type ClassValue, tcls } from '@/lib/tailwind';
-import { useState } from 'react';
-import { useTrackEvent } from '../Insights';
-import { Button } from '../primitives';
 
 export function AIResponseFeedback(props: {
     className?: ClassValue;
@@ -61,7 +62,7 @@ export function AIResponseFeedback(props: {
             />
             {rating !== null ? (
                 <span
-                    className="ml-2 animate-blur-in-slow text-tint-subtle"
+                    className="animate-blur-in-slow ml-2 text-tint-subtle"
                     style={{ animationDelay: '.5s' }}
                 >
                     {t(language, 'was_this_helpful_thank_you')}

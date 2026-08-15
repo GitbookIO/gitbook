@@ -1,7 +1,7 @@
 import type { ContentKitCodeBlock } from '@gitbook/api';
 
-import { DefaultCodeBlock, ElementCodeBlockClient } from './ElementCodeBlockClient';
 import { resolveDynamicBinding } from './dynamic';
+import { DefaultCodeBlock, ElementCodeBlockClient } from './ElementCodeBlockClient';
 import type { ContentKitServerElementProps } from './types';
 
 export function ElementCodeBlock(props: ContentKitServerElementProps<ContentKitCodeBlock>) {

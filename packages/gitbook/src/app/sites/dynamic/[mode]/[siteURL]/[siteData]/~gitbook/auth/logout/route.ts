@@ -1,3 +1,7 @@
+import { cookies } from 'next/headers';
+import type { NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
+
 import {
     type RouteLayoutParams,
     getDynamicSiteContext,
@@ -5,9 +9,6 @@ import {
 } from '@/app/utils';
 import { getVisitorAuthBasePath } from '@/lib/data';
 import { getVisitorAuthCookieName } from '@/lib/visitors';
-import { cookies } from 'next/headers';
-import type { NextRequest } from 'next/server';
-import { NextResponse } from 'next/server';
 
 /**
  * Clear the site-scoped auth session cookies and redirect to the site root.

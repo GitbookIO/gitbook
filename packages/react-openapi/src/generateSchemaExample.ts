@@ -1,4 +1,5 @@
 import type { OpenAPIV3 } from '@gitbook/openapi-parser';
+
 import { isPlainObject } from './contentTypeChecks';
 import { checkIsReference } from './utils';
 
@@ -523,7 +524,7 @@ const getExampleFromSchema = (
             example =
                 typeof newExample === 'object' && typeof example === 'object'
                     ? {
-                          ...(example ?? {}),
+                          ...example,
                           ...newExample,
                       }
                     : Array.isArray(newExample) && Array.isArray(example)

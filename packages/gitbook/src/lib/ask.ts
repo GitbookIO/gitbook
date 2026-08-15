@@ -1,9 +1,10 @@
+import type { SearchAIAnswer, SearchAIAnswerSource } from '@gitbook/api';
+
 import type { GitBookSiteContext } from '@/lib/context';
 import { throwIfDataError } from '@/lib/data';
 import { resolvePageId } from '@/lib/pages';
 import { findSiteSpaceBy, getFallbackSiteSpacePath } from '@/lib/sites';
 import { filterOutNullable } from '@/lib/typescript';
-import type { SearchAIAnswer, SearchAIAnswerSource } from '@gitbook/api';
 
 /**
  * Options to steer a site AI answer.

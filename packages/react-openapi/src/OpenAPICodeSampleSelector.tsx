@@ -2,12 +2,13 @@
 
 import { useCallback } from 'react';
 import { useStore } from 'zustand';
+
+import type { OpenAPIClientContext } from './context';
+import { getOrCreateStoreByKey } from './getOrCreateStoreByKey';
 import { OpenAPIPath } from './OpenAPIPath';
 import type { Key } from './OpenAPISelect';
 import { OpenAPISelect, type OpenAPISelectItem } from './OpenAPISelect';
 import { StaticSection } from './StaticSection';
-import type { OpenAPIClientContext } from './context';
-import { getOrCreateStoreByKey } from './getOrCreateStoreByKey';
 import type { OpenAPIOperationData } from './types';
 
 function useCodeSampleState(initialKey: Key = 'default') {

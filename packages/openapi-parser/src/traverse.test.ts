@@ -1,5 +1,6 @@
-import { describe, expect, it } from 'bun:test';
 import { dereference } from '@scalar/openapi-parser';
+import { describe, expect, it } from 'bun:test';
+
 import { createFileSystem } from './filesystem';
 import { traverse } from './traverse';
 

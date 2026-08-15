@@ -1,4 +1,3 @@
-import type { GitBookSiteContext } from '@/lib/context';
 import { redirect } from 'next/navigation';
 
 import {
@@ -6,6 +5,7 @@ import {
     SITE_REDIRECT_SOURCE_PATH_PATTERN,
 } from '@gitbook/api';
 
+import type { GitBookSiteContext } from '@/lib/context';
 import { getDataOrNull } from '@/lib/data';
 import { resolvePageId } from '@/lib/pages';
 import { withLeadingSlash } from '@/lib/paths';

@@ -1,10 +1,11 @@
+import type { NextRequest } from 'next/server';
+
 import {
     type RevisionPage,
     type RevisionPageDocument,
     type RevisionPageGroup,
     SiteVisibility,
 } from '@gitbook/api';
-import type { NextRequest } from 'next/server';
 
 import { type RouteLayoutParams, getStaticSiteContext } from '@/app/utils';
 import { throwIfDataError } from '@/lib/data';

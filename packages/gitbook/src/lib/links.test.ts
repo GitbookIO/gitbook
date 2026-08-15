@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'bun:test';
+
 import type { RevisionPageDocument } from '@gitbook/api';
+
 import {
     createLinker,
     linkerForPublishedURL,

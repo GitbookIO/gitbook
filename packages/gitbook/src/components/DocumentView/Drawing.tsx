@@ -1,11 +1,10 @@
 import type { DocumentBlockDrawing } from '@gitbook/api';
 
-import { resolveContentRefInDocument } from '@/lib/references';
-
 import { Image } from '../utils';
 import type { BlockProps } from './Block';
 import { Caption } from './Caption';
 import { imageBlockSizes } from './Images';
+import { resolveContentRefInDocument } from '@/lib/references';
 
 export async function Drawing(props: BlockProps<DocumentBlockDrawing>) {
     const { document, block, context } = props;

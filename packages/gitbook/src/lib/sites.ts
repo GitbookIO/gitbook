@@ -1,5 +1,3 @@
-import { languages } from '@/intl/translations';
-import type { GitBookSiteContext } from '@/lib/context';
 import type {
     LocalizedString,
     Revision,
@@ -10,6 +8,7 @@ import type {
     SiteStructure,
     TranslationLanguage,
 } from '@gitbook/api';
+
 import { type GitBookLinker, linkerWithDirectPagePaths } from './links';
 import {
     extractPagePath,
@@ -20,6 +19,8 @@ import {
 } from './pages';
 import { joinPath } from './paths';
 import { flattenSectionsFromGroup } from './utils';
+import { languages } from '@/intl/translations';
+import type { GitBookSiteContext } from '@/lib/context';
 
 /**
  * Get all sections from a site structure.

@@ -1,11 +1,7 @@
 import { type RouteLayoutParams, getDynamicSiteContext } from '@/app/utils';
 import { PDFPage, generatePDFMetadata } from '@/components/PDF';
 
-export async function generateMetadata({
-    params,
-}: {
-    params: Promise<RouteLayoutParams>;
-}) {
+export async function generateMetadata({ params }: { params: Promise<RouteLayoutParams> }) {
     const { context } = await getDynamicSiteContext(await params);
     return generatePDFMetadata(context);
 }

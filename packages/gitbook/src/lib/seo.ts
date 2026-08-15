@@ -1,11 +1,12 @@
-import type { GitBookSiteContext } from '@/lib/context';
 import { type RevisionPageDocument, type RevisionPageGroup, SiteVisibility } from '@gitbook/api';
+
+import type { GitBookSiteContext } from '@/lib/context';
 
 /**
  * Return true if a page is indexable in search.
  */
 export function isPageIndexable(
-    ancestors: Array<RevisionPageDocument | RevisionPageGroup>,
+    ancestors: (RevisionPageDocument | RevisionPageGroup)[],
     page: RevisionPageDocument | RevisionPageGroup
 ): boolean {
     // @ts-ignore - noIndex and noRobotsIndex are not in the type

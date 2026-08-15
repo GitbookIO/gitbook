@@ -1,3 +1,5 @@
+import type { RevisionPageDocument, RevisionPageGroup } from '@gitbook/api';
+
 import { isAIEnabled } from '@/components/utils/isAIChatEnabled';
 import type { GitBookSiteContext } from '@/lib/context';
 import { getExposableError } from '@/lib/data';
@@ -6,7 +8,6 @@ import { renderLLMsTxtMarkdownDirective } from '@/lib/llms-directive';
 import { getMarkdownForPage } from '@/lib/markdownPage';
 import { type ResolvedPagePath, getSimilarPages } from '@/lib/pages';
 import { resolveSiteSpacePagePathDocumentOrGroup } from '@/lib/sites';
-import type { RevisionPageDocument, RevisionPageGroup } from '@gitbook/api';
 
 /**
  * Serve a markdown version of a page.

@@ -1,12 +1,14 @@
 'use client';
 
+import React from 'react';
+
+import { Icon } from '@gitbook/icons';
+
+import type { TableCheckboxColumn, TableSelectColumn } from './search';
+import { type SelectedOptions, recordMatches } from './searchMatch';
 import { Button, Checkbox, DropdownMenu, DropdownMenuItem, Input } from '@/components/primitives';
 import { tString, useLanguage } from '@/intl/client';
 import { type ClassValue, tcls } from '@/lib/tailwind';
-import { Icon } from '@gitbook/icons';
-import React from 'react';
-import type { TableCheckboxColumn, TableSelectColumn } from './search';
-import { type SelectedOptions, recordMatches } from './searchMatch';
 
 /**
  * Client-side table search.

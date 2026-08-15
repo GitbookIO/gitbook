@@ -67,7 +67,7 @@ const DAY = 24 * HOUR;
 const MONTH = 30 * DAY;
 const YEAR = 365 * DAY;
 
-const RELATIVE_THRESHOLDS: Array<[number, number, Intl.RelativeTimeFormatUnit]> = [
+const RELATIVE_THRESHOLDS: [number, number, Intl.RelativeTimeFormatUnit][] = [
     [HOUR, MINUTE, 'minute'],
     [DAY, HOUR, 'hour'],
     [MONTH, DAY, 'day'],

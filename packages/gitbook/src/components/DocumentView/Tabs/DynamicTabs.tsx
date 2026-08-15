@@ -3,9 +3,11 @@
 import type React from 'react';
 import { type ComponentPropsWithRef, memo, useCallback, useMemo, useState } from 'react';
 
-import { useResolvedSlug, useSelect } from '@/components/Select';
+import { Icon, type IconName } from '@gitbook/icons';
+
 import { useListOverflow } from '@/components/hooks';
 import { DropdownMenu, DropdownMenuItem } from '@/components/primitives';
+import { useResolvedSlug, useSelect } from '@/components/Select';
 import { useLanguage } from '@/intl/client';
 import { tString } from '@/intl/translate';
 import {
@@ -17,7 +19,6 @@ import {
 } from '@/lib/select';
 import { tcls } from '@/lib/tailwind';
 import { resolveAnchorURL } from '@/lib/urls';
-import { Icon, type IconName } from '@gitbook/icons';
 
 export interface TabsItem {
     id: string;

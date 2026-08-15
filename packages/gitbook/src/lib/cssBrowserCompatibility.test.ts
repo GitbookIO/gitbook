@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'bun:test';
+
 import {
     COMMENT_MARKER,
     type IssueCommentClient,
@@ -119,12 +120,12 @@ describe('getCompatibilityDiagnostics', () => {
 
 class FakeCommentClient implements IssueCommentClient {
     created: string[] = [];
-    comments: Array<{
+    comments: {
         body: string;
         id: number;
         user: { login: string } | null;
-    }> = [];
-    updated: Array<{ body: string; id: number }> = [];
+    }[] = [];
+    updated: { body: string; id: number }[] = [];
 
     async createIssueComment(_issueNumber: number, body: string): Promise<void> {
         this.created.push(body);

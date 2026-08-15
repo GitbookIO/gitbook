@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'bun:test';
+
 import type { RevisionPageDocument, SiteSection, SiteSpace, SiteStructure } from '@gitbook/api';
 import { TranslationLanguage } from '@gitbook/api';
 
-import type { GitBookSiteContext } from '@/lib/context';
 import { createLinker } from './links';
 import {
     filterSiteSpacesByLocale,
@@ -11,6 +11,7 @@ import {
     getSiteSpacePagePaths,
     resolveSiteSpaceCustomHomePage,
 } from './sites';
+import type { GitBookSiteContext } from '@/lib/context';
 
 function makeSiteSpace(language: TranslationLanguage | undefined): SiteSpace {
     return { space: { language } } as SiteSpace;

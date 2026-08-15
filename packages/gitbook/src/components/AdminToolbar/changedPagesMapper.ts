@@ -1,16 +1,17 @@
-import type { GitBookLinker } from '@/lib/links';
-import { getPagePath, resolvePageId } from '@/lib/pages';
-import { joinPathWithBaseURL } from '@/lib/paths';
 import {
     type ChangedRevisionPage,
     type Revision,
     RevisionPageType,
     type RevisionSemanticChange,
 } from '@gitbook/api';
+
 import type { MinimalChangedPage } from './types';
+import type { GitBookLinker } from '@/lib/links';
+import { getPagePath, resolvePageId } from '@/lib/pages';
+import { joinPathWithBaseURL } from '@/lib/paths';
 
 // When one page has multiple semantic changes, show the label that best summarizes its final state.
-const CHANGE_STATUS_SUMMARY_ORDER: Array<MinimalChangedPage['status']> = [
+const CHANGE_STATUS_SUMMARY_ORDER: MinimalChangedPage['status'][] = [
     'edited',
     'moved',
     'created',

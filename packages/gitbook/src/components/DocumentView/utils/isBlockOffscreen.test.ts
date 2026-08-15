@@ -1,4 +1,5 @@
 import { expect, it } from 'bun:test';
+
 import type { DocumentBlockParagraph, JSONDocument } from '@gitbook/api';
 
 import { isBlockOffscreen } from './isBlockOffscreen';

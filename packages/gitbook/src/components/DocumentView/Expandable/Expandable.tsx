@@ -1,16 +1,15 @@
 import type { DocumentBlockExpandable } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
 
-import { getSpaceLanguage, tString } from '@/intl/server';
-import { defaultLanguage } from '@/intl/translations';
-import { getNodeFragmentByType } from '@/lib/document';
-import { tcls } from '@/lib/tailwind';
-
-import { ToggleChevron } from '@/components/primitives';
 import type { BlockProps } from '../Block';
 import { Blocks } from '../Blocks';
 import { Inlines } from '../Inlines';
 import { Details } from './Details';
+import { ToggleChevron } from '@/components/primitives';
+import { getSpaceLanguage, tString } from '@/intl/server';
+import { defaultLanguage } from '@/intl/translations';
+import { getNodeFragmentByType } from '@/lib/document';
+import { tcls } from '@/lib/tailwind';
 
 export async function Expandable(props: BlockProps<DocumentBlockExpandable>) {
     const { block, style, ancestorBlocks, document, context } = props;

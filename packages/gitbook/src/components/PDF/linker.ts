@@ -34,7 +34,7 @@ export function getPagePDFContainerId(
  */
 export function createPDFLinker(
     baseLinker: GitBookLinker,
-    pages: Array<{ page: Revision['pages'][number] }>,
+    pages: { page: Revision['pages'][number] }[],
     publishedLinker?: GitBookLinker
 ): GitBookLinker {
     return {

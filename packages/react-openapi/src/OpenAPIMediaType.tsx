@@ -1,10 +1,10 @@
 'use client';
 
+import type { OpenAPIClientContext } from './context';
 import { OpenAPIEmptyExample } from './OpenAPIExample';
 import type { Key } from './OpenAPISelect';
 import { OpenAPISelect, type OpenAPISelectItem, useSelectState } from './OpenAPISelect';
 import { StaticSection } from './StaticSection';
-import type { OpenAPIClientContext } from './context';
 
 type OpenAPIMediaTypeItem = OpenAPISelectItem & {
     body: React.ReactNode;

@@ -1,5 +1,5 @@
-import crypto from 'node:crypto';
 import type { NextApiRequest, NextApiResponse } from 'next';
+import crypto from 'node:crypto';
 
 interface JsonBody {
     // The paths need to be the rewritten one, `res.revalidate` call don't go through the middleware
@@ -26,7 +26,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             if (computedSignature === signatureHeader) {
                 const results = await Promise.allSettled(
                     (req.body as JsonBody).paths.map((path) => {
-                        // biome-ignore lint/suspicious/noConsole: we want to log here
+                        // oxlint-disable-next-line no-console
                         console.log(`Revalidating path: ${path}`);
                         return res.revalidate(path);
                     })

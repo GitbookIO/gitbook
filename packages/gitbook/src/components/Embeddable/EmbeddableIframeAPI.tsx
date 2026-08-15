@@ -1,17 +1,18 @@
 'use client';
 
-import type { GitBookEmbeddableConfiguration, ParentToFrameMessage } from '@gitbook/embed';
-import React, { useEffect, useRef } from 'react';
-
-import { useAI, useAIChatController } from '@/components/AI';
-import { isAIChatEnabled } from '@/components/utils/isAIChatEnabled';
-import { tString, useLanguage } from '@/intl/client';
 import { useRouter } from 'next/navigation';
+import React, { useEffect, useRef } from 'react';
 import { createStore, useStore } from 'zustand';
+
+import type { GitBookEmbeddableConfiguration, ParentToFrameMessage } from '@gitbook/embed';
+
 import { integrationsAssistantTools } from '../Integrations';
 import { Button, LinkContext, type LinkContextType } from '../primitives';
 import { getChannel } from './channel';
 import { resolveEmbedPageLink } from './server-actions';
+import { useAI, useAIChatController } from '@/components/AI';
+import { isAIChatEnabled } from '@/components/utils/isAIChatEnabled';
+import { tString, useLanguage } from '@/intl/client';
 
 const embeddableConfiguration = createStore<GitBookEmbeddableConfiguration>(() => ({
     tabs: [],
@@ -22,18 +23,16 @@ const embeddableConfiguration = createStore<GitBookEmbeddableConfiguration>(() =
     trademark: true,
 }));
 
-// biome-ignore lint/suspicious/noExplicitAny: expected
+// oxlint-disable-next-line typescript/no-explicit-any
 function log(...data: any[]) {
-    // biome-ignore lint/suspicious/noConsole: expected
+    // oxlint-disable-next-line no-console
     console.log(...data);
 }
 
 /**
  * Expose the API to communicate with the parent window.
  */
-export function EmbeddableIframeAPI(props: {
-    baseURL: string;
-}) {
+export function EmbeddableIframeAPI(props: { baseURL: string }) {
     const { baseURL } = props;
 
     const router = useRouter();
@@ -164,7 +163,7 @@ export function EmbeddableIframeButtons() {
     return (
         <>
             {actions.length > 0 && (
-                <hr className="my-2 border-0 border-tint-subtle border-b first:hidden" />
+                <hr className="my-2 border-0 border-b border-tint-subtle first:hidden" />
             )}
             {actions.map((action, index) => (
                 <Button

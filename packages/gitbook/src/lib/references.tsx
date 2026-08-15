@@ -1,16 +1,6 @@
-import {
-    type GitBookAnyContext,
-    type GitBookSpaceContext,
-    fetchSpaceContextByIds,
-} from '@/lib/context';
-import {
-    getDataOrNull,
-    getPageDocument,
-    getRevisionFile,
-    getRevisionReusableContent,
-    ignoreDataThrownError,
-} from '@/lib/data';
-import { type GitBookLinker, createLinker, linkerWithAbsoluteURLs } from '@/lib/links';
+import assertNever from 'assert-never';
+import type React from 'react';
+
 import type {
     ContentRef,
     JSONDocument,
@@ -21,10 +11,6 @@ import type {
     Space,
 } from '@gitbook/api';
 import type { Filesystem } from '@gitbook/openapi-parser';
-import assertNever from 'assert-never';
-import type React from 'react';
-
-import { PageIcon } from '@/components/PageIcon';
 
 import { getGitBookAppHref } from './app';
 import { getBlockById, getBlockTitle } from './document';
@@ -39,6 +25,20 @@ import { getRevisionTags, resolveTag } from './tags';
 import type { ClassValue } from './tailwind';
 import { filterOutNullable } from './typescript';
 import { checkIsExternalURL } from './urls';
+import { PageIcon } from '@/components/PageIcon';
+import {
+    type GitBookAnyContext,
+    type GitBookSpaceContext,
+    fetchSpaceContextByIds,
+} from '@/lib/context';
+import {
+    getDataOrNull,
+    getPageDocument,
+    getRevisionFile,
+    getRevisionReusableContent,
+    ignoreDataThrownError,
+} from '@/lib/data';
+import { type GitBookLinker, createLinker, linkerWithAbsoluteURLs } from '@/lib/links';
 
 export interface ResolvedContentRef {
     /** Text to render in the content ref */

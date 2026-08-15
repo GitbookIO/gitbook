@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'bun:test';
+
 import type { OpenAPIV3, OpenAPIV3_1 } from '@gitbook/openapi-parser';
+
 import {
     extractNonNullTypes,
     getEffectiveArrayType,

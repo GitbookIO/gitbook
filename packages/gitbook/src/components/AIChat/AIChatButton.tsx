@@ -1,10 +1,10 @@
 'use client';
-import { useLanguage } from '@/intl/client';
-import { t, tString } from '@/intl/translate';
 import type { Assistant } from '../AI';
 import { useIsMobile } from '../hooks/useIsMobile';
 import { Button } from '../primitives';
 import { KeyboardShortcut } from '../primitives/KeyboardShortcut';
+import { useLanguage } from '@/intl/client';
+import { t, tString } from '@/intl/translate';
 
 const MOBILE_BREAKPOINT = 688; // 43rem, equal to Tailwind's @max-2xl container breakpoint
 

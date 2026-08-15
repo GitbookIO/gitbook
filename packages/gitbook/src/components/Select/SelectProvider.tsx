@@ -1,9 +1,10 @@
 'use client';
 
-import { selectStore } from '@/lib/select';
 import type React from 'react';
 import { useEffect, useLayoutEffect } from 'react';
+
 import { useSelectAnchor } from './useSelectAnchor';
+import { selectStore } from '@/lib/select';
 
 // `useLayoutEffect` runs before paint but warns during SSR (effects don't run on the server anyway),
 // so fall back to `useEffect` there.

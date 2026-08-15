@@ -1,4 +1,5 @@
 import 'server-only';
+import pRetry from 'p-retry';
 
 import {
     CustomizationIconsStyle,
@@ -9,12 +10,11 @@ import {
     type SiteSection,
     type SiteSectionGroup,
 } from '@gitbook/api';
-import { type InlineIconSource, getInlineIconSourceKey } from '@gitbook/icons/IconSources';
 import { getIconStyle } from '@gitbook/icons/getIconStyle';
 import { validateIconName } from '@gitbook/icons/icons';
+import { type InlineIconSource, getInlineIconSourceKey } from '@gitbook/icons/IconSources';
 import { type IconName, IconStyle } from '@gitbook/icons/types';
 import { GITBOOK_ICONS_ASSET_VERSION } from '@gitbook/icons/version';
-import pRetry from 'p-retry';
 
 import { getAssetURL } from '@/lib/assets';
 import { GITBOOK_ICONS_TOKEN, GITBOOK_ICONS_URL, GITBOOK_URL } from '@/lib/env';

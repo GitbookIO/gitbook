@@ -1,14 +1,16 @@
 'use client';
 
-import { useLanguage } from '@/intl/client';
-import { tString } from '@/intl/translate';
-import type { AIToolDefinition, SiteInsightsDisplayContext } from '@gitbook/api';
-import type { GitBookIntegrationTool } from '@gitbook/browser-types';
 import * as React from 'react';
 import { z } from 'zod';
 import { zodToJsonSchema } from 'zod-to-json-schema';
-import { type InsightsEventPageContext, useTrackEvent } from '../Insights';
+
+import type { AIToolDefinition, SiteInsightsDisplayContext } from '@gitbook/api';
+import type { GitBookIntegrationTool } from '@gitbook/browser-types';
+
 import { type PagePointer, useCurrentPage } from '../hooks';
+import { type InsightsEventPageContext, useTrackEvent } from '../Insights';
+import { useLanguage } from '@/intl/client';
+import { tString } from '@/intl/translate';
 
 /** The assistant response the user is reacting to, which the tool rates. */
 export type ResponseToRate = {

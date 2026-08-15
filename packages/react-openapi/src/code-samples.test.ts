@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'bun:test';
+
 import { type CodeSampleInput, codeSampleGenerators, parseHostAndPath } from './code-samples';
 
 it('should parse host and path on url strings properly', () => {

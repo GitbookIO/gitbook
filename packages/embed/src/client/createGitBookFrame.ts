@@ -1,4 +1,5 @@
 import { createChannel } from 'bidc';
+
 import type {
     FrameToParentMessage,
     GitBookEmbeddableConfiguration,
@@ -76,7 +77,7 @@ export function createGitBookFrame(iframe: HTMLIFrameElement): GitBookFrameClien
         channel.send(message);
     };
 
-    const events = new Map<string, Array<(...args: any[]) => void>>();
+    const events = new Map<string, ((...args: any[]) => void)[]>();
 
     const configuration: GitBookEmbeddableConfiguration = {
         tabs: ['assistant', 'search', 'docs'],

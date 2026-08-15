@@ -1,8 +1,9 @@
-import { type RouteLayoutParams, getDynamicSiteContext, getStaticSiteContext } from '@/app/utils';
-import type { GitBookSiteContext } from '@/lib/context';
 import { CustomizationDefaultThemeMode, type SiteCustomizationSettings } from '@gitbook/api';
+
 import { getEmbeddableLinker } from './embeddable-linker';
 import { getLinkerForSiteSpace } from './sites';
+import { type RouteLayoutParams, getDynamicSiteContext, getStaticSiteContext } from '@/app/utils';
+import type { GitBookSiteContext } from '@/lib/context';
 
 /**
  * Get the context for the embeddable static routes.

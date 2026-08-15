@@ -1,3 +1,5 @@
+import type { ThemeRegistrationAny, ThemedToken } from 'shiki/core';
+
 import {
     CustomizationCodeTheme,
     type CustomizationThemedCodeTheme,
@@ -5,7 +7,6 @@ import {
     type DocumentBlockCodeLine,
     type DocumentInlineAnnotation,
 } from '@gitbook/api';
-import type { ThemeRegistrationAny, ThemedToken } from 'shiki/core';
 
 import { nullIfNever } from '@/lib/typescript';
 

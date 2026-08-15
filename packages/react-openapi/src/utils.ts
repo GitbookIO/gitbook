@@ -1,4 +1,5 @@
 import type { AnyObject, OpenAPIV3, OpenAPIV3_1 } from '@gitbook/openapi-parser';
+
 import type { OpenAPIUniversalContext } from './context';
 import { stringifyOpenAPI } from './stringifyOpenAPI';
 import { tString } from './translate';
@@ -147,8 +148,8 @@ function formatExample(example: unknown): string {
         return example
             .replace(/\n/g, ' ') // Replace newlines with spaces
             .replace(/\s+/g, ' ') // Collapse multiple spaces/newlines into a single space
-            .replace(/([\{\}:,])\s+/g, '$1 ') // Ensure a space after {, }, :, and ,
-            .replace(/\s+([\{\}:,])/g, ' $1') // Ensure a space before {, }, :, and ,
+            .replace(/([{}:,])\s+/g, '$1 ') // Ensure a space after {, }, :, and ,
+            .replace(/\s+([{}:,])/g, ' $1') // Ensure a space before {, }, :, and ,
             .trim();
     }
 

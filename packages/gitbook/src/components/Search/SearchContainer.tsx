@@ -1,21 +1,23 @@
 'use client';
 
-import { t, useLanguage } from '@/intl/client';
-import { tcls } from '@/lib/tailwind';
-import { CustomizationSearchStyle } from '@gitbook/api';
 import dynamic from 'next/dynamic';
 import React, { useRef } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
+
+import { CustomizationSearchStyle } from '@gitbook/api';
+
 import { AIChatButton } from '../AIChat';
 import { useIsMobile } from '../hooks/useIsMobile';
 import { Button, Popover } from '../primitives';
 import { KeyboardShortcut } from '../primitives/KeyboardShortcut';
 import { SideSheet } from '../primitives/SideSheet';
+import type { SearchBaseProps } from './search-props';
 import { SearchInput } from './SearchInput';
 import { SearchLiveResultsAnnouncer } from './SearchLiveResultsAnnouncer';
 import { SearchScopeControl } from './SearchScopeControl';
-import type { SearchBaseProps } from './search-props';
 import { useSearchController } from './useSearchController';
+import { t, useLanguage } from '@/intl/client';
+import { tcls } from '@/lib/tailwind';
 
 const SearchFrame = dynamic(() => import('./SearchFrame').then((mod) => mod.SearchFrame), {
     ssr: false,
@@ -271,7 +273,7 @@ export function SearchContainer({
                     modal
                     withOverlay
                     withCloseButton
-                    className="mx-auto w-96 border-tint-subtle border-l bg-tint-base"
+                    className="mx-auto w-96 border-l border-tint-subtle bg-tint-base"
                 >
                     {searchFrame}
                 </SideSheet>

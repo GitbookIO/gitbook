@@ -16,11 +16,7 @@ const LoadingStateProviderContext = createContext<{
  * This is used to determine when the body has finished loading.
  * If we need to track more loading states in the future, we can extend this context.
  */
-export function LoadingStateProvider({
-    children,
-}: {
-    children: React.ReactNode;
-}) {
+export function LoadingStateProvider({ children }: { children: React.ReactNode }) {
     const [bodyLoadedState, setBodyLoaded] = useState(false);
 
     const bodyLoaded = useMemo(() => bodyLoadedState, [bodyLoadedState]);

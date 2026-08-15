@@ -1,5 +1,6 @@
-import type { DocumentBlock, JSONDocument } from '@gitbook/api';
 import memoize from 'memoizee/weak';
+
+import type { DocumentBlock, JSONDocument } from '@gitbook/api';
 
 /**
  * Estimate if a block will be offscreen or not.

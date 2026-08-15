@@ -1,11 +1,8 @@
 'use server';
 
-import { isAIEnabled, isAISearchEnabled } from '@/components/utils/isAIChatEnabled';
-import type { GitBookSiteContext } from '@/lib/context';
-import { resolvePageId } from '@/lib/pages';
-import { fetchServerActionSiteContext, getServerActionBaseContext } from '@/lib/server-actions';
-import { findSiteSpaceBy } from '@/lib/sites';
-import { filterOutNullable } from '@/lib/typescript';
+import { createStreamableValue } from 'ai/rsc';
+import type * as React from 'react';
+
 import type {
     Revision,
     RevisionPage,
@@ -13,15 +10,19 @@ import type {
     SearchAIRecommendedQuestionStream,
     SiteInsightsSession,
 } from '@gitbook/api';
-import { createStreamableValue } from 'ai/rsc';
-import type * as React from 'react';
 
+import { DocumentView } from '../DocumentView';
+import { isAIEnabled, isAISearchEnabled } from '@/components/utils/isAIChatEnabled';
+import type { GitBookSiteContext } from '@/lib/context';
 import { throwIfDataError } from '@/lib/data';
 import { toEmbeddableLinkForPublishedContent } from '@/lib/embeddable-linker';
 import { getSiteURLDataFromMiddleware } from '@/lib/middleware';
+import { resolvePageId } from '@/lib/pages';
 import { joinPathWithBaseURL } from '@/lib/paths';
+import { fetchServerActionSiteContext, getServerActionBaseContext } from '@/lib/server-actions';
+import { findSiteSpaceBy } from '@/lib/sites';
 import { traceErrorOnly } from '@/lib/tracing';
-import { DocumentView } from '../DocumentView';
+import { filterOutNullable } from '@/lib/typescript';
 
 export interface AskAnswerSource {
     id: string;
@@ -261,7 +262,7 @@ async function transformAnswer(
                         wrapBlocksInSuspense: false,
                         withLinkPreviews: false, // We don't want to render link previews in the AI answer.
                     }}
-                    style="space-y-5 *:origin-top-left *:animate-blur-in-slow"
+                    style="*:animate-blur-in-slow space-y-5 *:origin-top-left"
                 />
             ) : null,
         followupQuestions: answer.followupQuestions,

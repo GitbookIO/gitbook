@@ -20,6 +20,20 @@ jobs:
               env:
                   PUPPETEER_SKIP_DOWNLOAD: 1
             - run: bun format:check
+    lint:
+        runs-on: ubuntu-latest
+        name: Lint
+        timeout-minutes: 6
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+            - name: Setup Bun
+              uses: ./.github/composite/setup-bun
+            - name: Install dependencies
+              run: bun install --frozen-lockfile
+              env:
+                  PUPPETEER_SKIP_DOWNLOAD: 1
+            - run: bun lint
     test:
         runs-on: ubuntu-latest
         name: Test
