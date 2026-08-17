@@ -224,8 +224,8 @@ export function SearchContainer({
                             showing={Boolean(searchValue) && !fetching}
                         />
                     </SearchInput>
-                    {/* Anchored rather than triggered by the input: a trigger would give it button
-                        semantics and swallow the space bar. Opening is driven by `onFocus`. */}
+                    {/* Anchored, not triggered: a trigger gives the input button semantics and
+                        swallows the space bar. */}
                     <Popover
                         content={searchFrame}
                         anchor={searchInputRef}
@@ -236,8 +236,7 @@ export function SearchContainer({
                                     open();
                                     return;
                                 }
-                                // Without a trigger, the input counts as outside the popover, so
-                                // this is what keeps a click on it from closing the results.
+                                // Without a trigger, the input counts as outside the popover.
                                 if (
                                     eventDetails.reason === 'outside-press' &&
                                     searchInputRef.current?.contains(
@@ -262,8 +261,7 @@ export function SearchContainer({
                         }}
                         popupProps={{
                             initialFocus: false,
-                            // Restoring focus to the input would re-fire `onFocus` and reopen the
-                            // popover.
+                            // Restoring focus to the input would re-fire `onFocus` and reopen it.
                             finalFocus: false,
                             className: tcls(
                                 '@container flex flex-col overflow-hidden bg-tint-base has-[.empty]:hidden w-128 p-0 max-w-[min(var(--available-width),32rem)]',
