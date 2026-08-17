@@ -130,32 +130,34 @@ export function AIChatMessages(props: { chat: AIChatState; chatController: AICha
                         }}
                     >
                         {hasCommentary && hasFinalAnswer ? (
-                            <CollapsibleTrigger asChild>
-                                <Button
-                                    variant="blank"
-                                    size="small"
-                                    label={tString(language, 'ai_chat_view_activity')}
-                                    className="group/dropdown animate-blur-in-display-slow -mx-3 -my-1.5 self-start"
-                                >
-                                    <div className="flex items-center gap-2">
-                                        <span data-testid="ai-chat-activity-summary">
-                                            {toolCount > 0
-                                                ? t(
+                            <CollapsibleTrigger
+                                render={
+                                    <Button
+                                        variant="blank"
+                                        size="small"
+                                        label={tString(language, 'ai_chat_view_activity')}
+                                        className="group/dropdown animate-blur-in-display-slow -mx-3 -my-1.5 self-start"
+                                    />
+                                }
+                            >
+                                <div className="flex items-center gap-2">
+                                    <span data-testid="ai-chat-activity-summary">
+                                        {toolCount > 0
+                                            ? t(
+                                                  language,
+                                                  'ai_chat_explored_with',
+                                                  tString(
                                                       language,
-                                                      'ai_chat_explored_with',
-                                                      tString(
-                                                          language,
-                                                          toolCount === 1
-                                                              ? 'tool_count'
-                                                              : 'tool_count_plural',
-                                                          toolCount.toString()
-                                                      )
+                                                      toolCount === 1
+                                                          ? 'tool_count'
+                                                          : 'tool_count_plural',
+                                                      toolCount.toString()
                                                   )
-                                                : t(language, 'ai_chat_explored')}
-                                        </span>
-                                        <ToggleChevron orientation="right-to-down" />
-                                    </div>
-                                </Button>
+                                              )
+                                            : t(language, 'ai_chat_explored')}
+                                    </span>
+                                    <ToggleChevron orientation="right-to-down" />
+                                </div>
                             </CollapsibleTrigger>
                         ) : null}
 

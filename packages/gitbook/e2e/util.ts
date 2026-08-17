@@ -173,6 +173,10 @@ export async function waitForCookiesDialog(page: Page) {
     });
 }
 
+export async function waitForHydration(page: Page) {
+    await page.locator('html.hydrated').waitFor();
+}
+
 /**
  * Wait for the GitBook admin toolbar to be present.
  *

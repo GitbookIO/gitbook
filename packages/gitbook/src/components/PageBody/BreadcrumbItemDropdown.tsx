@@ -57,7 +57,7 @@ export function BreadcrumbItemDropdown(props: {
     // normalize "" to "/" the way the table of contents does.
     const trigger =
         href !== undefined ? (
-            <StyledLink href={href || '/'} className={tcls(linkClassName)}>
+            <StyledLink href={href || '/'} role="link" className={tcls(linkClassName)}>
                 {content}
             </StyledLink>
         ) : (
@@ -75,6 +75,7 @@ export function BreadcrumbItemDropdown(props: {
         <DropdownMenu
             openOnHover
             openDelay={200}
+            nativeButton={false}
             button={trigger}
             className="max-h-72 overflow-auto text-sm"
         >

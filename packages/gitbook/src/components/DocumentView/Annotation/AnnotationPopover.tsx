@@ -10,12 +10,12 @@ export function AnnotationPopover(props: { children: React.ReactNode; body: Reac
     return (
         <Tooltip
             label={body}
-            contentProps={{
+            pinOnClick
+            popupProps={{
                 role: 'definition',
             }}
             className="bg-tint-base px-4 py-3 text-sm text-tint-strong shadow-lg shadow-tint-12/4 ring-1 ring-tint-subtle dark:shadow-tint-1"
-            arrow={true}
-            arrowProps={{ className: 'fill-tint-1' }}
+            arrow={{ className: 'fill-tint-1' }}
         >
             <dfn
                 data-annotation=""

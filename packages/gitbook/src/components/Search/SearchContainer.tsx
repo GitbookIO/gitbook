@@ -205,27 +205,27 @@ export function SearchContainer({
             ) : (
                 <Popover
                     content={searchFrame}
+                    nativeButton={false}
                     rootProps={{
                         open: isSearchOpen,
-                        modal: false,
-                    }}
-                    contentProps={{
-                        onOpenAutoFocus: (event) => event.preventDefault(),
-                        align: 'start',
-                        className: tcls(
-                            '@container flex flex-col overflow-hidden bg-tint-base has-[.empty]:hidden w-128 p-0 max-w-[min(var(--radix-popover-content-available-width),32rem)]',
-                            shouldFillHeight
-                                ? 'h-[min(32rem,var(--radix-popover-content-available-height))]'
-                                : 'max-h-[min(32rem,var(--radix-popover-content-available-height))]'
-                        ),
-                        onInteractOutside: (event) => {
+                        onOpenChange: (nextOpen, eventDetails) => {
+                            if (nextOpen) {
+                                open();
+                                return;
+                            }
                             // Don't close if clicking on the search input itself
-                            if (searchInputRef.current?.contains(event.target as Node)) {
-                                event.preventDefault();
+                            if (
+                                eventDetails.reason === 'outside-press' &&
+                                searchInputRef.current?.contains(eventDetails.event.target as Node)
+                            ) {
+                                eventDetails.cancel();
                                 return;
                             }
                             close();
                         },
+                    }}
+                    positionerProps={{
+                        align: 'start',
                         sideOffset: 8,
                         collisionPadding: {
                             top: 16,
@@ -233,10 +233,18 @@ export function SearchContainer({
                             bottom: 32,
                             left: 16,
                         },
-                        hideWhenDetached: true,
                     }}
-                    triggerProps={{
-                        asChild: true,
+                    popupProps={{
+                        initialFocus: false,
+                        // The input is its own trigger: restoring focus to it would re-fire
+                        // `onFocus` and reopen the popover.
+                        finalFocus: false,
+                        className: tcls(
+                            '@container flex flex-col overflow-hidden bg-tint-base has-[.empty]:hidden w-128 p-0 max-w-[min(var(--available-width),32rem)]',
+                            shouldFillHeight
+                                ? 'h-[min(32rem,var(--available-height))]'
+                                : 'max-h-[min(32rem,var(--available-height))]'
+                        ),
                     }}
                 >
                     <SearchInput

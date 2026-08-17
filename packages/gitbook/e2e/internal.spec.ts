@@ -34,6 +34,7 @@ import {
     waitForAdminToolbar,
     waitForCookiesDialog,
     waitForCoverImages,
+    waitForHydration,
     waitForNotFound,
 } from './util';
 import { VISITOR_TOKEN_COOKIE } from '@/lib/visitors';
@@ -381,6 +382,7 @@ const testCases: TestsCase[] = [
                 name: 'Customized variant titles are displayed',
                 url: '',
                 run: async (page) => {
+                    await waitForHydration(page);
                     const spaceDropdown = page
                         .locator('[data-testid="space-dropdown-button"]')
                         .locator('visible=true');
@@ -408,6 +410,7 @@ const testCases: TestsCase[] = [
                 name: 'Switch variant with alternate link in metadata',
                 url: 'rfcs',
                 run: async (page) => {
+                    await waitForHydration(page);
                     const spaceDropdown = page
                         .locator('[data-testid="space-dropdown-button"]')
                         .locator('visible=true');
@@ -446,6 +449,7 @@ const testCases: TestsCase[] = [
                 url: 'api-multi-versions/reference/api-reference/pets',
                 screenshot: false,
                 run: async (page) => {
+                    await waitForHydration(page);
                     const spaceDropdown = await page
                         .locator('[data-testid="space-dropdown-button"]')
                         .locator('visible=true');
@@ -472,6 +476,7 @@ const testCases: TestsCase[] = [
                 url: 'api-multi-versions-share-links/8tNo6MeXg7CkFMzSSz81/reference/api-reference/pets',
                 screenshot: false,
                 run: async (page) => {
+                    await waitForHydration(page);
                     const spaceDropdown = await page
                         .locator('[data-testid="space-dropdown-button"]')
                         .locator('visible=true');
@@ -513,6 +518,7 @@ const testCases: TestsCase[] = [
                     return `api-multi-versions-va/reference/api-reference/pets?jwt_token=${token}`;
                 },
                 run: async (page) => {
+                    await waitForHydration(page);
                     const spaceDropdown = await page
                         .locator('[data-testid="space-dropdown-button"]')
                         .locator('visible=true');
@@ -548,6 +554,7 @@ const testCases: TestsCase[] = [
                 url: 'ecosystem/connection-provider',
                 screenshot: false,
                 run: async (page) => {
+                    await waitForHydration(page);
                     const spaceDropdown = page
                         .locator('[data-testid="space-dropdown-button"]')
                         .locator('visible=true');
@@ -578,6 +585,7 @@ const testCases: TestsCase[] = [
                 url: 'nl/ecosysteem/connection-provider',
                 screenshot: false,
                 run: async (page) => {
+                    await waitForHydration(page);
                     const spaceDropdown = page
                         .locator('[data-testid="space-dropdown-button"]')
                         .locator('visible=true');
@@ -618,14 +626,14 @@ const testCases: TestsCase[] = [
                 url: '',
                 screenshot: false,
                 run: async (page) => {
-                    const trigger = page.getByRole('button', { name: 'Test Section Group 1' });
-                    // Radix NavigationMenu opens the dropdown on a `pointermove`. A single
-                    // synthetic hover can land before hydration and be lost, so re-hover
-                    // until the dropdown content actually appears.
-                    await expect(async () => {
-                        await trigger.hover();
-                        await expect(page.getByText('Section B')).toBeVisible({ timeout: 1000 });
-                    }).toPass({ timeout: 15000 });
+                    // The menu only opens on `mouseenter`, which cannot fire again once the pointer
+                    // is inside: a hover landing before hydration is lost for good.
+                    await waitForHydration(page);
+                    const trigger = page
+                        .locator('[data-gb-sections]')
+                        .getByRole('button', { name: 'Test Section Group 1' });
+                    await trigger.hover();
+                    await expect(page.getByText('Section B')).toBeVisible();
                     await page.getByText('Section B').click();
                     await page.waitForURL((url) => url.pathname.includes('/sections/sections-4'));
                 },
