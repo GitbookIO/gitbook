@@ -1,4 +1,6 @@
+import { execFileSync } from 'node:child_process';
 import { readFile } from 'node:fs/promises';
+import { join } from 'node:path';
 
 import {
     type CompatibilityDiagnostic,
@@ -138,6 +140,83 @@ async function getBaseContent(
     }
 }
 
+function report(diagnostics: CompatibilityDiagnostic[]): boolean {
+    if (diagnostics.length === 0) {
+        console.log('CSS browser compatibility check passed.');
+        return true;
+    }
+
+    console.error(
+        `${diagnostics.length} newly added CSS declaration(s) are not fully supported by the configured Browserslist targets:`
+    );
+    for (const diagnostic of diagnostics) {
+        // Workflow command so the failure is annotated on the PR diff.
+        console.error(
+            `::error file=${diagnostic.file},line=${diagnostic.line},col=${diagnostic.column}::${diagnostic.property} is not supported by ${diagnostic.unsupportedBrowsers}`
+        );
+    }
+    return false;
+}
+
+/** Same check as CI, but against a local `git diff` instead of the GitHub API. */
+async function runLocal(baseRef: string): Promise<boolean> {
+    const git = (...args: string[]) =>
+        execFileSync('git', args, { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
+    const root = git('rev-parse', '--show-toplevel').trim();
+    const mergeBase = git('merge-base', baseRef, 'HEAD').trim();
+    const browsers = (
+        JSON.parse(await readFile(join(root, 'packages/gitbook/package.json'), 'utf8')) as {
+            browserslist?: string[];
+        }
+    ).browserslist;
+
+    if (!browsers?.length) {
+        throw new Error('packages/gitbook/package.json must define a Browserslist configuration.');
+    }
+
+    // Working tree, so uncommitted changes are checked too.
+    const changes = git(
+        'diff',
+        '--name-status',
+        '--find-renames',
+        '--diff-filter=ACMR',
+        mergeBase,
+        '--',
+        '*.css'
+    )
+        .split('\n')
+        .filter(Boolean)
+        .map((line) => {
+            const [status, ...paths] = line.split('\t');
+            const previousPath = paths.length > 1 ? paths[0] : undefined;
+            const path = paths.at(-1) as string;
+            return { added: status?.startsWith('A'), path, previousPath };
+        });
+
+    const diagnostics: CompatibilityDiagnostic[] = [];
+    for (const change of changes) {
+        let base = '';
+        if (!change.added) {
+            try {
+                base = git('show', `${mergeBase}:${change.previousPath ?? change.path}`);
+            } catch {
+                base = '';
+            }
+        }
+        diagnostics.push(
+            ...(await getCompatibilityDiagnostics({
+                base,
+                browsers,
+                file: change.path,
+                head: await readFile(join(root, change.path), 'utf8'),
+            }))
+        );
+    }
+
+    console.log(`Checked ${changes.length} changed CSS file(s) against ${baseRef}.`);
+    return report(diagnostics);
+}
+
 async function run(): Promise<boolean> {
     const token = process.env.GITHUB_TOKEN;
     const repository = process.env.GITHUB_REPOSITORY;
@@ -175,25 +254,17 @@ async function run(): Promise<boolean> {
         );
     }
 
-    if (diagnostics.length === 0) {
-        console.log('CSS browser compatibility check passed.');
-        return true;
-    }
-
-    console.error(
-        `${diagnostics.length} newly added CSS declaration(s) are not fully supported by the configured Browserslist targets:`
-    );
-    for (const diagnostic of diagnostics) {
-        // Workflow command so the failure is annotated on the PR diff.
-        console.error(
-            `::error file=${diagnostic.file},line=${diagnostic.line},col=${diagnostic.column}::${diagnostic.property} is not supported by ${diagnostic.unsupportedBrowsers}`
-        );
-    }
-    return false;
+    return report(diagnostics);
 }
 
+const localFlagIndex = process.argv.indexOf('--local');
+
 try {
-    process.exitCode = (await run()) ? 0 : 1;
+    process.exitCode = (await (localFlagIndex === -1
+        ? run()
+        : runLocal(process.argv[localFlagIndex + 1] ?? 'origin/main')))
+        ? 0
+        : 1;
 } catch (error) {
     console.error(error);
     process.exitCode = 1;
