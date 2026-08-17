@@ -2413,7 +2413,7 @@ const testCases: TestsCase[] = [
                         actions.nth(1).click(),
                     ]);
                     // Verify the new page would have opened with the expected URL
-                    expect(newPage.url()).toContain('gitbook.com');
+                    await expect(newPage).toHaveURL(/gitbook\.com/);
                     // Close it immediately to avoid navigation
                     await newPage.close();
 
@@ -2561,7 +2561,7 @@ const testCases: TestsCase[] = [
                         openInNewTabButton.click(),
                     ]);
                     // Verify the new page would have opened with the expected URL
-                    expect(newPage.url()).toContain('gitbook.gitbook.io');
+                    await expect(newPage).toHaveURL(/gitbook\.gitbook\.io/);
                     // Close it immediately to avoid navigation
                     await newPage.close();
                 },
