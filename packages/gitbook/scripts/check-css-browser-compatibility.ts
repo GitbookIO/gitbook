@@ -260,11 +260,13 @@ async function run(): Promise<boolean> {
 const localFlagIndex = process.argv.indexOf('--local');
 
 try {
-    process.exitCode = (await (localFlagIndex === -1
-        ? run()
-        : runLocal(process.argv[localFlagIndex + 1] ?? 'origin/main')))
-        ? 0
-        : 1;
+    let success: boolean;
+    if (localFlagIndex === -1) {
+        success = await run();
+    } else {
+        success = await runLocal(process.argv[localFlagIndex + 1] ?? 'origin/main');
+    }
+    process.exitCode = success ? 0 : 1;
 } catch (error) {
     console.error(error);
     process.exitCode = 1;

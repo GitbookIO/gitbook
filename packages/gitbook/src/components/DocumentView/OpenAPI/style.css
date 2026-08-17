@@ -1,8 +1,6 @@
 @reference "../../RootLayout/globals.css";
 @import './scalar.css';
 
-
-
 /* Layout Components */
 .openapi-operation,
 .openapi-schemas,
