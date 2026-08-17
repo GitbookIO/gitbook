@@ -2,10 +2,7 @@ import { readFile } from 'node:fs/promises';
 
 import {
     type CompatibilityDiagnostic,
-    type IssueCommentClient,
-    formatCompatibilityComment,
     getCompatibilityDiagnostics,
-    upsertCompatibilityComment,
 } from '../src/lib/cssBrowserCompatibility';
 
 interface PullRequestEvent {
@@ -33,12 +30,6 @@ interface GitBlobResponse {
     encoding: string;
 }
 
-interface IssueComment {
-    body: string;
-    id: number;
-    user: { login: string } | null;
-}
-
 class GitHubRequestError extends Error {
     constructor(
         readonly status: number,
@@ -48,7 +39,7 @@ class GitHubRequestError extends Error {
     }
 }
 
-class GitHubApi implements IssueCommentClient {
+class GitHubApi {
     constructor(
         private readonly repository: string,
         private readonly token: string
@@ -113,34 +104,6 @@ class GitHubApi implements IssueCommentClient {
 
     async getFileAtRef(path: string, ref: string): Promise<string> {
         return this.getContent(path, ref);
-    }
-
-    async listIssueComments(issueNumber: number): Promise<IssueComment[]> {
-        const comments: IssueComment[] = [];
-
-        for (let page = 1; ; page += 1) {
-            const result = await this.request<IssueComment[]>(
-                `/repos/${this.repository}/issues/${issueNumber}/comments?per_page=100&page=${page}`
-            );
-            comments.push(...result);
-            if (result.length < 100) {
-                return comments;
-            }
-        }
-    }
-
-    async createIssueComment(issueNumber: number, body: string): Promise<void> {
-        await this.request(`/repos/${this.repository}/issues/${issueNumber}/comments`, {
-            body: JSON.stringify({ body }),
-            method: 'POST',
-        });
-    }
-
-    async updateIssueComment(commentId: number, body: string): Promise<void> {
-        await this.request(`/repos/${this.repository}/issues/comments/${commentId}`, {
-            body: JSON.stringify({ body }),
-            method: 'PATCH',
-        });
     }
 }
 
@@ -212,27 +175,18 @@ async function run(): Promise<boolean> {
         );
     }
 
-    const comment = formatCompatibilityComment({
-        diagnostics,
-        headSha: pullRequest.head.sha,
-        repository,
-    });
-    await upsertCompatibilityComment({
-        body: comment,
-        createIfMissing: diagnostics.length > 0,
-        client: api,
-        issueNumber: pullRequest.number,
-    });
-
     if (diagnostics.length === 0) {
         console.log('CSS browser compatibility check passed.');
         return true;
     }
 
-    console.error('Unsupported CSS declarations found:');
+    console.error(
+        `${diagnostics.length} newly added CSS declaration(s) are not fully supported by the configured Browserslist targets:`
+    );
     for (const diagnostic of diagnostics) {
+        // Workflow command so the failure is annotated on the PR diff.
         console.error(
-            `${diagnostic.file}:${diagnostic.line} ${diagnostic.property} — ${diagnostic.unsupportedBrowsers}`
+            `::error file=${diagnostic.file},line=${diagnostic.line},col=${diagnostic.column}::${diagnostic.property} is not supported by ${diagnostic.unsupportedBrowsers}`
         );
     }
     return false;
