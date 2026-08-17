@@ -203,50 +203,7 @@ export function SearchContainer({
                     aria-controls={resultsId}
                 />
             ) : (
-                <Popover
-                    content={searchFrame}
-                    nativeButton={false}
-                    rootProps={{
-                        open: isSearchOpen,
-                        onOpenChange: (nextOpen, eventDetails) => {
-                            if (nextOpen) {
-                                open();
-                                return;
-                            }
-                            // Don't close if clicking on the search input itself
-                            if (
-                                eventDetails.reason === 'outside-press' &&
-                                searchInputRef.current?.contains(eventDetails.event.target as Node)
-                            ) {
-                                eventDetails.cancel();
-                                return;
-                            }
-                            close();
-                        },
-                    }}
-                    positionerProps={{
-                        align: 'start',
-                        sideOffset: 8,
-                        collisionPadding: {
-                            top: 16,
-                            right: 16,
-                            bottom: 32,
-                            left: 16,
-                        },
-                    }}
-                    popupProps={{
-                        initialFocus: false,
-                        // The input is its own trigger: restoring focus to it would re-fire
-                        // `onFocus` and reopen the popover.
-                        finalFocus: false,
-                        className: tcls(
-                            '@container flex flex-col overflow-hidden bg-tint-base has-[.empty]:hidden w-128 p-0 max-w-[min(var(--available-width),32rem)]',
-                            shouldFillHeight
-                                ? 'h-[min(32rem,var(--available-height))]'
-                                : 'max-h-[min(32rem,var(--available-height))]'
-                        ),
-                    }}
-                >
+                <>
                     <SearchInput
                         ref={searchInputRef}
                         aria-activedescendant={searchResultsActiveDescendant}
@@ -267,7 +224,56 @@ export function SearchContainer({
                             showing={Boolean(searchValue) && !fetching}
                         />
                     </SearchInput>
-                </Popover>
+                    {/* Anchored rather than triggered by the input: a trigger would give it button
+                        semantics and swallow the space bar. Opening is driven by `onFocus`. */}
+                    <Popover
+                        content={searchFrame}
+                        anchor={searchInputRef}
+                        rootProps={{
+                            open: isSearchOpen,
+                            onOpenChange: (nextOpen, eventDetails) => {
+                                if (nextOpen) {
+                                    open();
+                                    return;
+                                }
+                                // Without a trigger, the input counts as outside the popover, so
+                                // this is what keeps a click on it from closing the results.
+                                if (
+                                    eventDetails.reason === 'outside-press' &&
+                                    searchInputRef.current?.contains(
+                                        eventDetails.event.target as Node
+                                    )
+                                ) {
+                                    eventDetails.cancel();
+                                    return;
+                                }
+                                close();
+                            },
+                        }}
+                        positionerProps={{
+                            align: 'start',
+                            sideOffset: 8,
+                            collisionPadding: {
+                                top: 16,
+                                right: 16,
+                                bottom: 32,
+                                left: 16,
+                            },
+                        }}
+                        popupProps={{
+                            initialFocus: false,
+                            // Restoring focus to the input would re-fire `onFocus` and reopen the
+                            // popover.
+                            finalFocus: false,
+                            className: tcls(
+                                '@container flex flex-col overflow-hidden bg-tint-base has-[.empty]:hidden w-128 p-0 max-w-[min(var(--available-width),32rem)]',
+                                shouldFillHeight
+                                    ? 'h-[min(32rem,var(--available-height))]'
+                                    : 'max-h-[min(32rem,var(--available-height))]'
+                            ),
+                        }}
+                    />
+                </>
             )}
             {usesSideSheet ? (
                 <SideSheet

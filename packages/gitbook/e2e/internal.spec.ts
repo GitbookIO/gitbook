@@ -137,6 +137,23 @@ const searchTestCases: Test[] = [
         },
     },
     {
+        // `fill()` bypasses key events, so it can't catch a swallowed key. RND-12484.
+        name: 'Search - AI Mode: None - Typing multi-word queries',
+        url: getCustomizationURL({
+            ai: {
+                mode: CustomizationAIMode.None,
+            },
+        }),
+        screenshot: false,
+        run: async (page) => {
+            await waitForCookiesDialog(page);
+            const searchInput = page.getByTestId('search-input');
+            await searchInput.focus();
+            await searchInput.pressSequentially('getting started');
+            await expect(searchInput).toHaveValue('getting started');
+        },
+    },
+    {
         name: 'Search - AI Mode: None - URL query (Initial)',
         url: `${getCustomizationURL({
             ai: {

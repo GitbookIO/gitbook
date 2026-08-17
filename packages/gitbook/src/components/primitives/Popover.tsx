@@ -3,23 +3,30 @@ import { Popover as BasePopover } from '@base-ui/react/popover';
 import { tcls } from '@/lib/tailwind';
 
 export function Popover(props: {
-    children: React.ReactElement<Record<string, unknown>>;
+    // A trigger gets button semantics (role, keyboard activation), which are wrong for elements
+    // such as a text input: omit it, drive `rootProps.open` yourself and pass `anchor` instead.
+    children?: React.ReactElement<Record<string, unknown>>;
+    anchor?: BasePopover.Positioner.Props['anchor'];
     content?: string | React.ReactNode;
     rootProps?: Omit<BasePopover.Root.Props, 'children'>;
     nativeButton?: boolean;
-    positionerProps?: Omit<BasePopover.Positioner.Props, 'children' | 'className'> & {
+    positionerProps?: Omit<BasePopover.Positioner.Props, 'children' | 'className' | 'anchor'> & {
         className?: string;
     };
     popupProps?: Omit<BasePopover.Popup.Props, 'children' | 'className'> & { className?: string };
 }) {
-    const { children, content, rootProps, nativeButton, positionerProps, popupProps } = props;
+    const { children, anchor, content, rootProps, nativeButton, positionerProps, popupProps } =
+        props;
 
     return (
         <BasePopover.Root {...rootProps}>
-            <BasePopover.Trigger render={children} nativeButton={nativeButton} />
+            {children ? (
+                <BasePopover.Trigger render={children} nativeButton={nativeButton} />
+            ) : null}
             <BasePopover.Portal>
                 <BasePopover.Positioner
                     {...positionerProps}
+                    anchor={anchor}
                     className={tcls('z-50 data-anchor-hidden:hidden', positionerProps?.className)}
                     collisionPadding={positionerProps?.collisionPadding ?? 16}
                     sideOffset={positionerProps?.sideOffset ?? 4}
