@@ -170,9 +170,11 @@ export function getLinkerForSiteSpace(
     siteSpace: SiteSpace,
     pages: Revision['pages']
 ): GitBookLinker {
-    return resolveSiteSpaceCustomHomePage(siteSpace, pages)
-        ? linkerWithDirectPagePaths(linker)
-        : linker;
+    if (!resolveSiteSpaceCustomHomePage(siteSpace, pages)) {
+        return linker;
+    }
+
+    return linkerWithDirectPagePaths(linker);
 }
 
 /*
