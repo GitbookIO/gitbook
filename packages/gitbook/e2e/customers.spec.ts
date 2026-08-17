@@ -360,7 +360,9 @@ const testCases: TestsCase[] = [
     {
         name: 'docs.verifone.com',
         contentBaseURL: 'https://docs.verifone.com',
-        tests: [{ name: 'Home', url: '/', run: waitForCookiesDialog }],
+        // Verifone's custom Cookiebot integration races with and suppresses GitBook's built-in
+        // banner, so waitForCookiesDialog is not a stable invariant here.
+        tests: [{ name: 'Home', url: '/' }],
     },
     // Deactivate it because of a custom Ask AI that causes flakiness.
     // {
