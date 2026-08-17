@@ -242,3 +242,10 @@ export function useDropdownMenuClose() {
     assert(context, 'DropdownMenuContext not found');
     return useCallback(() => context.setOpen(false), [context]);
 }
+
+/**
+ * Hook to read whether the dropdown menu is open.
+ */
+export function useDropdownMenuOpen() {
+    return useContext(DropdownMenuContext).open;
+}
