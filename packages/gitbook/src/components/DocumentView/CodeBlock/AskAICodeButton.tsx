@@ -1,13 +1,12 @@
 'use client';
 
+import { getCodeTextFromId } from './utils';
 import { useAIChatController, useAIConfig } from '@/components/AI';
 import { AIChatIcon } from '@/components/AIChat';
 import { Button } from '@/components/primitives';
 import { isAIChatEnabled } from '@/components/utils/isAIChatEnabled';
 import { t, useLanguage } from '@/intl/client';
 import { type ClassValue, tcls } from '@/lib/tailwind';
-
-import { getCodeTextFromId } from './utils';
 
 export function AskAICodeButton(props: {
     codeId: string;

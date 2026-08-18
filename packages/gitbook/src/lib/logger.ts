@@ -32,7 +32,7 @@ export const createLogger = (name: string, options: LoggerOptions) => {
         subLogger: (subName: string, options?: SubLoggerOptions) =>
             createLogger(`${name}:${subName}`, {
                 requestId,
-                labels: { ...labels, ...(options?.labels ?? {}) },
+                labels: { ...labels, ...options?.labels },
             }),
         info: (...data: any[]) => console.info(formatPrefix(name, finalOptions), ...data),
         warn: (...data: any[]) => console.warn(formatPrefix(name, finalOptions), ...data),

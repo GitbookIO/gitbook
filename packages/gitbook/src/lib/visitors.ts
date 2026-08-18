@@ -1,6 +1,9 @@
+import { isAIAgent } from '@vercel/agent-readability';
 import { type JwtPayload, jwtDecode } from 'jwt-decode';
 import { type NextRequest, NextResponse } from 'next/server';
 import hash from 'object-hash';
+
+import type { SiteVisitorPayload } from '@gitbook/api';
 
 const VISITOR_AUTH_PARAM = 'jwt_token';
 const VISITOR_PARAM_PREFIX = 'visitor.';
@@ -79,8 +82,23 @@ export type VisitorTokenLookup =
           source: 'visitor-oauth-protected';
           token: string;
       }
+    | {
+          /** A visitor token used for revalidation purposes. This is coming from our backend and we don't want to redirect in this case */
+          source: 'revalidation';
+          token: string;
+      }
     /** Not visitor token was found */
     | undefined;
+
+/**
+ * Get the type of visitor, i.e human or agent, accessing the published site.
+ */
+export function getVisitorType(request: {
+    headers: Headers;
+}): NonNullable<SiteVisitorPayload['type']> {
+    const detection = isAIAgent(request);
+    return detection.detected && detection.method !== 'heuristic' ? 'agent' : 'human';
+}
 
 /**
  * Get the visitor data for the request potentially including:
@@ -130,6 +148,10 @@ export function getVisitorToken({
 
     // Allow the empty string to come through
     if (fromUrl !== null && fromUrl !== undefined) {
+        if (headers.get('user-agent')?.toLowerCase() === 'gitbook-open-revalidation-worker') {
+            return { source: 'revalidation', token: fromUrl };
+        }
+
         return { source: 'url', token: fromUrl };
     }
 

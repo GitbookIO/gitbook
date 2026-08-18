@@ -1,3 +1,7 @@
+import { cacheLife, cacheTag } from 'next/cache';
+import { assert } from 'ts-essentials';
+
+import { getCacheTag } from '@gitbook/cache-tags';
 import {
     type Filesystem,
     OpenAPIParseError,
@@ -5,11 +9,6 @@ import {
     parseOpenAPI,
 } from '@gitbook/openapi-parser';
 
-import { DataFetcherError, noCacheFetchOptions } from '@/lib/data';
-import { resolveContentRef } from '@/lib/references';
-import { getCacheTag } from '@gitbook/cache-tags';
-import { cacheLife, cacheTag } from 'next/cache';
-import { assert } from 'ts-essentials';
 import { enrichFilesystem } from './enrich';
 import type {
     AnyOpenAPIOperationsBlock,
@@ -18,6 +17,8 @@ import type {
     ResolveOpenAPIBlockArgs,
 } from './types';
 import type { FetchOpenAPIFilesystemResult } from './types';
+import { DataFetcherError, noCacheFetchOptions } from '@/lib/data';
+import { resolveContentRef } from '@/lib/references';
 
 type AnyOpenAPIBlock = AnyOpenAPIOperationsBlock | OpenAPISchemasBlock | OpenAPIWebhookBlock;
 

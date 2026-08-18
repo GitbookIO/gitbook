@@ -1,6 +1,7 @@
 import * as React from 'react';
 
 import type { DocumentInlineExpression } from '@gitbook/api';
+
 import type { InlineProps } from '../Inline';
 import { InlineExpressionValue } from './InlineExpressionValue';
 

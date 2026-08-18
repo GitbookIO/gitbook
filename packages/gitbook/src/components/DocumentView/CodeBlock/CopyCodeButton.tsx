@@ -2,11 +2,10 @@
 
 import React from 'react';
 
+import { getCodeTextFromId } from './utils';
 import { Button } from '@/components/primitives';
 import { t, useLanguage } from '@/intl/client';
 import { type ClassValue, tcls } from '@/lib/tailwind';
-
-import { getCodeTextFromId } from './utils';
 
 /**
  * Client component to copy the code of a code block.

@@ -1,16 +1,9 @@
 'use client';
 
-import { useAI, useAIChatController, useAIChatState } from '@/components/AI';
-import {
-    AIChatBody,
-    AIChatControlButton,
-    AIChatDynamicIcon,
-    AIChatSubtitle,
-    getAIChatName,
-} from '@/components/AIChat';
-import { useLanguage } from '@/intl/client';
-import * as api from '@gitbook/api';
 import React from 'react';
+
+import * as api from '@gitbook/api';
+
 import { useTrackEvent } from '../Insights';
 import { LinkContext } from '../primitives';
 import {
@@ -29,6 +22,15 @@ import {
     EmbeddableIframeTabs,
     useEmbeddableLinkContext,
 } from './EmbeddableIframeAPI';
+import { useAI, useAIChatController, useAIChatState } from '@/components/AI';
+import {
+    AIChatBody,
+    AIChatControlButton,
+    AIChatDynamicIcon,
+    AIChatSubtitle,
+    getAIChatName,
+} from '@/components/AIChat';
+import { useLanguage } from '@/intl/client';
 
 type EmbeddableAIChatProps = {
     baseURL: string;

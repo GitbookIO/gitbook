@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'bun:test';
+
 import { getSecurityHeaders } from './OpenAPICodeSample';
 import type { OpenAPIOperationData } from './types';
 

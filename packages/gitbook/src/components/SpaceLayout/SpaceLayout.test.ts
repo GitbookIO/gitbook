@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'bun:test';
-import { languages } from '@/intl/translations';
+
 import { type SiteSpace, TranslationLanguage } from '@gitbook/api';
+
 import { categorizeVariants } from './categorizeVariants';
+import { languages } from '@/intl/translations';
 
 type FakeSiteSpace = {
     id: SiteSpace['id'];

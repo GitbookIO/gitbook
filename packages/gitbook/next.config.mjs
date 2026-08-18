@@ -59,6 +59,10 @@ const nextConfig = {
         optimisticClientCache: false,
         // Disable splitting the RSC in like 5 chunks
         prefetchInlining: true,
+
+        // Rewrites barrel imports into deep ones: without it, importing a single helper from
+        // react-openapi drags its whole client renderer into every page's entry.
+        optimizePackageImports: ['@gitbook/react-openapi'],
     },
 
     env: {

@@ -1,4 +1,5 @@
 import type { AnyObject, OpenAPIV3, OpenAPIV3_1 } from '@gitbook/openapi-parser';
+
 import type { OpenAPIUniversalContext } from './context';
 import { stringifyOpenAPI } from './stringifyOpenAPI';
 import { tString } from './translate';
@@ -6,6 +7,7 @@ import type {
     OpenAPICustomSecurityScheme,
     OpenAPIOperationData,
     OpenAPISecurityScope,
+    OpenAPIWebhookData,
 } from './types';
 
 export function checkIsReference(input: unknown): input is OpenAPIV3.ReferenceObject {
@@ -146,8 +148,8 @@ function formatExample(example: unknown): string {
         return example
             .replace(/\n/g, ' ') // Replace newlines with spaces
             .replace(/\s+/g, ' ') // Collapse multiple spaces/newlines into a single space
-            .replace(/([\{\}:,])\s+/g, '$1 ') // Ensure a space after {, }, :, and ,
-            .replace(/\s+([\{\}:,])/g, ' $1') // Ensure a space before {, }, :, and ,
+            .replace(/([{}:,])\s+/g, '$1 ') // Ensure a space after {, }, :, and ,
+            .replace(/\s+([{}:,])/g, ' $1') // Ensure a space before {, }, :, and ,
             .trim();
     }
 
@@ -482,4 +484,17 @@ function resolveRequiredScopesForScheme(
     }
 
     return operationScopes.map((scope) => [scope, undefined]);
+}
+
+/**
+ * Title shown for an operation or webhook. Exported so hosts that pre-render the heading
+ * server-side derive it the same way this package does.
+ */
+export function getOperationTitle(
+    data: OpenAPIOperationData | OpenAPIWebhookData
+): string | undefined {
+    if (data.operation.summary) {
+        return data.operation.summary;
+    }
+    return 'name' in data ? data.name : undefined;
 }

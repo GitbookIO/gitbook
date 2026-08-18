@@ -1,12 +1,14 @@
-import { tString } from '@/intl/translate';
-import type { TranslationLanguage } from '@/intl/translations/types';
+import type { ZodType, z } from 'zod';
+import { zodToJsonSchema } from 'zod-to-json-schema';
+
 import type {
     AIStreamResponseToolCallPending,
     AIToolCallResult,
     AIToolDefinition,
 } from '@gitbook/api';
-import type { ZodType, z } from 'zod';
-import { zodToJsonSchema } from 'zod-to-json-schema';
+
+import { tString } from '@/intl/translate';
+import type { TranslationLanguage } from '@/intl/translations/types';
 
 type AIUIToolContext = Pick<AIStreamResponseToolCallPending, 'toolCall' | 'toolCallId'>;
 

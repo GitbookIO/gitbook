@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'bun:test';
+
 import type { RevisionPage } from '@gitbook/api';
 
 import { getIndexablePages } from './sitemap';

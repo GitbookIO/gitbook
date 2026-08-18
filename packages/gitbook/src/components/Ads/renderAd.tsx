@@ -1,15 +1,16 @@
 'use server';
 
-import type { SiteInsightsAd, SiteInsightsAdPlacement } from '@gitbook/api';
 import { headers } from 'next/headers';
 
-import { getServerActionBaseContext } from '@/lib/server-actions';
-import { traceErrorOnly } from '@/lib/tracing';
+import type { SiteInsightsAd, SiteInsightsAdPlacement } from '@gitbook/api';
+
 import { AdClassicRendering } from './AdClassicRendering';
 import { AdCoverRendering } from './AdCoverRendering';
 import { AdPixels } from './AdPixels';
 import adGitbookSponsored from './assets/ad-gitbook-sponsored.svg';
 import type { AdItem, AdsResponse } from './types';
+import { getServerActionBaseContext } from '@/lib/server-actions';
+import { traceErrorOnly } from '@/lib/tracing';
 
 type FetchAdOptions = FetchLiveAdOptions | FetchPlaceholderAdOptions;
 

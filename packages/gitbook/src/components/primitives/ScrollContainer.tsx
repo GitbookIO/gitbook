@@ -1,10 +1,11 @@
 'use client';
 
-import { tString, useLanguage } from '@/intl/client';
-import { tcls } from '@/lib/tailwind';
 import * as React from 'react';
+
 import { useScrollOverflow } from '../hooks/useScrollOverflow';
 import { Button, type ButtonProps } from './Button';
+import { tString, useLanguage } from '@/intl/client';
+import { tcls } from '@/lib/tailwind';
 
 /**
  * A container that encapsulates a scrollable area with usability features.

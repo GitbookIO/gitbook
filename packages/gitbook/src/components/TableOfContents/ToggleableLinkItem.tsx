@@ -1,6 +1,7 @@
 'use client';
 import { AnimatePresence, motion } from 'motion/react';
 import React, { useRef } from 'react';
+
 import { useCurrentPagePath } from '../hooks';
 import { Button, Link, type LinkInsightsProps, type LinkProps, ToggleChevron } from '../primitives';
 
@@ -49,7 +50,7 @@ export function ToggleableLinkItem(
                 {tag ? (
                     <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2">
                         {children}
-                        <div className="flex shrink-0 items-center">{tag}</div>
+                        {tag}
                     </div>
                 ) : (
                     children
@@ -72,17 +73,12 @@ export function ToggleableLinkItem(
                         {tag ? (
                             <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2">
                                 {children}
-                                <div className="flex shrink-0 items-center">
-                                    {tag}
-                                    {toggler}
-                                </div>
+                                {tag}
                             </div>
                         ) : (
-                            <>
-                                {children}
-                                {toggler}
-                            </>
+                            children
                         )}
+                        {toggler}
                     </LinkItem>
                     {descendants}
                 </>
@@ -148,11 +144,7 @@ function DescendantsRenderer(props: {
     });
 }
 
-function Toggler(props: {
-    isLinkActive: boolean;
-    isOpen: boolean;
-    onToggle: () => void;
-}) {
+function Toggler(props: { isLinkActive: boolean; isOpen: boolean; onToggle: () => void }) {
     const { isOpen, onToggle } = props;
     return (
         <Button
@@ -188,10 +180,7 @@ const hide = {
     height: 0,
 };
 
-function Descendants(props: {
-    isVisible: boolean;
-    children: React.ReactNode;
-}) {
+function Descendants(props: { isVisible: boolean; children: React.ReactNode }) {
     const { isVisible, children } = props;
     return (
         <AnimatePresence>

@@ -1,3 +1,5 @@
+import React from 'react';
+
 import type {
     DocumentMarkBold,
     DocumentMarkCode,
@@ -10,7 +12,6 @@ import type {
     DocumentText,
     DocumentTextMark,
 } from '@gitbook/api';
-import React from 'react';
 
 import { backgroundColorToStyle, textColorToStyle } from '@/lib/colors';
 import { tcls } from '@/lib/tailwind';

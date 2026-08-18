@@ -1,21 +1,22 @@
-import type { GitBookSiteContext } from '@/lib/context';
-import { CustomizationDefaultThemeMode } from '@gitbook/api';
 import type { Metadata, Viewport } from 'next';
 import React from 'react';
 import * as ReactDOM from 'react-dom';
 
+import { CustomizationDefaultThemeMode } from '@gitbook/api';
+
+import { AIContextProvider } from '../AI';
+import { RocketLoaderDetector } from './RocketLoaderDetector';
+import { SiteLayoutClientContexts } from './SiteLayoutClientContexts';
 import { AdminToolbar } from '@/components/AdminToolbar';
 import { CookiesToast } from '@/components/Cookies';
 import { LoadIntegrations } from '@/components/Integrations';
 import { SpaceLayout } from '@/components/SpaceLayout';
 import type { VisitorAuthClaims } from '@/lib/adaptive';
 import { buildVersion } from '@/lib/build';
+import type { GitBookSiteContext } from '@/lib/context';
 import { GITBOOK_API_PUBLIC_URL, GITBOOK_ASSETS_URL, GITBOOK_ICONS_URL } from '@/lib/env';
 import { getResizedImageURL } from '@/lib/images';
 import { isSiteIndexable } from '@/lib/seo';
-import { AIContextProvider } from '../AI';
-import { RocketLoaderDetector } from './RocketLoaderDetector';
-import { SiteLayoutClientContexts } from './SiteLayoutClientContexts';
 
 /**
  * Layout when rendering a site.
@@ -30,6 +31,8 @@ export async function SiteLayout(props: {
     const { context, forcedTheme, withTracking, visitorAuthClaims, children } = props;
 
     const { customization } = context;
+    const { ai } = customization;
+    const aiGreeting = (context.locale && ai?.localizedGreeting?.[context.locale]) ?? ai?.greeting;
     // Scripts are disabled when tracking is disabled
     const scripts = withTracking ? context.scripts : [];
 
@@ -73,6 +76,7 @@ export async function SiteLayout(props: {
                 aiMode={customization.ai?.mode}
                 suggestions={context.customization.ai?.suggestions}
                 trademark={customization.trademark.enabled}
+                greeting={aiGreeting ? { subtitle: aiGreeting } : undefined}
             >
                 <SpaceLayout
                     context={context}

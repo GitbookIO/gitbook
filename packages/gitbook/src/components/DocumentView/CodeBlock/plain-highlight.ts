@@ -1,7 +1,7 @@
+import { bundledThemesInfo } from 'shiki/themes';
+
 import type { CustomizationThemedCodeTheme, DocumentBlockCode } from '@gitbook/api';
 
-import { getNodeText } from '@/lib/document';
-import { bundledThemesInfo } from 'shiki/themes';
 import { customThemes } from './customThemes';
 import {
     type HighlightTheme,
@@ -10,7 +10,8 @@ import {
     getHighlightTokensText,
     parseDiffNotation,
     truncateHighlightTokens,
-} from './highlight';
+} from './highlight-tokens';
+import { getNodeText } from '@/lib/document';
 
 /**
  * Parse a code block without highlighting it.

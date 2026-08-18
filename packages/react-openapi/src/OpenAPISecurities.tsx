@@ -1,11 +1,13 @@
-import type { OpenAPIV3 } from '@gitbook/openapi-parser';
 import { Fragment } from 'react';
+
+import type { OpenAPIV3 } from '@gitbook/openapi-parser';
+
+import type { OpenAPIClientContext } from './context';
 import { InteractiveSection } from './InteractiveSection';
 import { Markdown } from './Markdown';
 import { OpenAPICopyButton } from './OpenAPICopyButton';
 import { OpenAPIRequiredScopes } from './OpenAPIRequiredScopes';
 import { OpenAPISchemaName } from './OpenAPISchemaName';
-import type { OpenAPIClientContext } from './context';
 import { t } from './translate';
 import type { OpenAPICustomSecurityScheme } from './types';
 import type { OpenAPIOperationData } from './types';

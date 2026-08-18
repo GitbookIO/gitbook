@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'bun:test';
+
 import { getContentTestURL } from './utils';
 
 const TEST_PAGE_URL = 'https://gitbook.gitbook.io/test-gitbook-open/text-page';

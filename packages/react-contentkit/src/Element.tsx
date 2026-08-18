@@ -1,9 +1,10 @@
+import React from 'react';
+
 import type {
     ContentKitDescendantElement,
     ContentKitInlineElement,
     ContentKitRootElement,
 } from '@gitbook/api';
-import React from 'react';
 
 import { ElementBlock } from './ElementBlock';
 import { ElementBox } from './ElementBox';
@@ -168,7 +169,7 @@ export function Element(props: {
 }
 
 function Elements(props: {
-    elements: string | Array<string | ContentKitDescendantElement>;
+    elements: string | (string | ContentKitDescendantElement)[];
     context: ContentKitServerContext;
     state: object;
 }) {

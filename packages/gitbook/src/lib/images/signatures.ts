@@ -1,10 +1,10 @@
 import 'server-only';
-
-import { getLogger } from '@/lib/logger';
 import fnv1a from '@sindresorhus/fnv1a';
 import type { MaybePromise } from 'p-map';
 import { assert } from 'ts-essentials';
+
 import { GITBOOK_IMAGE_RESIZE_SIGNING_KEY } from '../env';
+import { getLogger } from '@/lib/logger';
 
 /**
  * GitBook has supported different version of image signing in the past. To maintain backwards

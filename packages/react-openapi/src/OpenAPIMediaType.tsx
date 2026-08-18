@@ -1,10 +1,10 @@
 'use client';
 
-import type { Key } from 'react-aria';
-import { OpenAPIEmptyExample } from './OpenAPIExample';
-import { OpenAPISelect, OpenAPISelectItem, useSelectState } from './OpenAPISelect';
-import { StaticSection } from './StaticSection';
 import type { OpenAPIClientContext } from './context';
+import { OpenAPIEmptyExample } from './OpenAPIExample';
+import type { Key } from './OpenAPISelect';
+import { OpenAPISelect, type OpenAPISelectItem, useSelectState } from './OpenAPISelect';
+import { StaticSection } from './StaticSection';
 
 type OpenAPIMediaTypeItem = OpenAPISelectItem & {
     body: React.ReactNode;
@@ -84,11 +84,7 @@ function OpenAPIMediaTypeFooter(props: {
                     stateKey={stateKey}
                     placement="bottom start"
                 >
-                    {items.map((item) => (
-                        <OpenAPISelectItem key={item.key} id={item.key} value={item}>
-                            <span>{item.label}</span>
-                        </OpenAPISelectItem>
-                    ))}
+                    {(item) => <span>{item.label}</span>}
                 </OpenAPISelect>
             )}
 
@@ -99,11 +95,7 @@ function OpenAPIMediaTypeFooter(props: {
                     stateKey={`${stateKey}-examples`}
                     placement="bottom start"
                 >
-                    {examples.map((example) => (
-                        <OpenAPISelectItem key={example.key} id={example.key} value={example}>
-                            <span>{example.label}</span>
-                        </OpenAPISelectItem>
-                    ))}
+                    {(example) => <span>{example.label}</span>}
                 </OpenAPISelect>
             ) : null}
         </>

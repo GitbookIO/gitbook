@@ -1,18 +1,17 @@
 'use client';
 import * as React from 'react';
 
-import { Button, StyledLink } from '@/components/primitives';
-import { useLanguage } from '@/intl/client';
-import { t, tString } from '@/intl/translate';
-import { tcls } from '@/lib/tailwind';
-
-import { useCustomCookieBanner, useIntegrationsLoaded } from '@/components/Integrations';
-import { isAIUserAgent } from '@/lib/browser';
 import {
     isCookiesTrackingDisabled,
     isGlobalPrivacyControlEnabled,
     setCookiesTracking,
 } from '../Insights';
+import { useCustomCookieBanner, useIntegrationsLoaded } from '@/components/Integrations';
+import { Button, StyledLink } from '@/components/primitives';
+import { useLanguage } from '@/intl/client';
+import { t, tString } from '@/intl/translate';
+import { isAIUserAgent } from '@/lib/browser';
+import { tcls } from '@/lib/tailwind';
 
 /**
  * Toast to accept or reject the use of cookies.

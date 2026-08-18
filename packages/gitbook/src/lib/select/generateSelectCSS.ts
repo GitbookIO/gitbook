@@ -108,7 +108,7 @@ export function generateSelectCSS(candidateSlugs: string[], depth = SELECT_LIST_
     // Duplicate tab names in one group would otherwise reveal two panes at once. Keep only the first:
     // hide any option pane preceded by a same-slug sibling. Emitted last and prefixed with `html` so
     // it beats the show rules above (equal specificity, later source order). The slug stays shared, so
-    // syncing and the `?select=` URL are unaffected — only the second pane's visibility changes.
+    // syncing is unaffected — only the second pane's visibility changes.
     for (const slug of slugs) {
         const value = escapeCssString(slug);
         const pane = `[${SELECT_OPTION_ATTR}="${value}"]`;

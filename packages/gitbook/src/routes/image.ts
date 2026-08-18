@@ -1,3 +1,5 @@
+import { NextResponse } from 'next/server';
+
 import {
     CURRENT_SIGNATURE_VERSION,
     type CloudflareImageOptions,
@@ -10,7 +12,6 @@ import {
     verifyImageSignature,
 } from '@/lib/images';
 import type { CloudflareResizeImageOptions } from '@/lib/images/resizer';
-import { NextResponse } from 'next/server';
 
 const FORMATS = [
     {

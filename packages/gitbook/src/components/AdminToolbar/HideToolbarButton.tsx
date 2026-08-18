@@ -1,12 +1,14 @@
 'use client';
-import { tcls } from '@/lib/tailwind';
-import { Icon, type IconName, IconStyle } from '@gitbook/icons';
 import { motion } from 'motion/react';
 import React, { useRef } from 'react';
 import { useOnClickOutside } from 'usehooks-ts';
+
+import { Icon, type IconName, IconStyle } from '@gitbook/icons';
+
 import { ToolbarButton, type ToolbarButtonProps } from './Toolbar';
 import styles from './Toolbar.module.css';
 import { useToolbarControls } from './ToolbarControlsContext';
+import { tcls } from '@/lib/tailwind';
 
 // Params for the expanding arc defined separately for easier tweaking.
 const ARC_PARAMS = {
@@ -110,7 +112,7 @@ export function HideToolbarButton(props: HideToolbarButtonProps) {
                   onClick: controls.closePersistent,
               }
             : null,
-    ].filter(Boolean) as Array<ArcMenuItem>;
+    ].filter(Boolean) as ArcMenuItem[];
 
     const sharedMotionStyle = motionValues
         ? {
@@ -124,7 +126,7 @@ export function HideToolbarButton(props: HideToolbarButtonProps) {
             title={open ? undefined : 'Hide toolbar'}
             className={
                 open || closing
-                    ? 'border-[0.5px] border-neutral-5 border-solid dark:border-neutral-8'
+                    ? 'border-[0.5px] border-solid border-neutral-5 dark:border-neutral-8'
                     : undefined
             }
             onClick={() => {

@@ -1,3 +1,5 @@
+import leven from 'leven';
+
 import {
     type Revision,
     type RevisionPage,
@@ -5,7 +7,7 @@ import {
     type RevisionPageGroup,
     RevisionPageType,
 } from '@gitbook/api';
-import leven from 'leven';
+
 import { removeLeadingSlash, removeTrailingSlash } from './paths';
 
 export type AncestorRevisionPage = RevisionPageDocument | RevisionPageGroup;

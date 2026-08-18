@@ -1,14 +1,14 @@
 /**
- * Read the `select` state (URL `?select=` + localStorage) and apply it to `<html>` as `data-sel-N`
- * attributes as early as possible, so the correct content variant is visible before hydration — no
- * flash, and it works on cached/static HTML.
+ * Read the `select` state from localStorage and apply it to `<html>` as `data-sel-N` attributes as
+ * early as possible, so the correct content variant is visible before hydration — no flash, and it
+ * works on cached/static HTML.
  *
  * NOTE: this runs in `<head>` before `<body>` exists, and is stringified and injected — so it must be
  * self-contained (no imports/closures) and touch only `document.documentElement`. The attribute name
- * and merge rules mirror `lib/select` (`selectRankAttribute`, the store's `normalize`); keep them in
- * sync. URL slugs are prepended so a shared link wins while the visitor's other preferences survive.
+ * and dedupe rules mirror `lib/select` (`selectRankAttribute`, the store's `normalize`); keep them in
+ * sync.
  */
-export function applySelectStateScript(storageKey: string, urlParam: string, cap: number) {
+export function applySelectStateScript(storageKey: string, cap: number) {
     try {
         const slugs: string[] = [];
         // A Set (not a plain object) so slugs like "constructor"/"toString" aren't treated as
@@ -26,22 +26,14 @@ export function applySelectStateScript(storageKey: string, urlParam: string, cap
             slugs.push(slug);
         };
 
-        const fromUrl = new URLSearchParams(window.location.search).get(urlParam);
-        if (fromUrl) {
-            const parts = fromUrl.split(',');
-            for (let i = 0; i < parts.length; i++) {
-                push(parts[i]);
-            }
-        }
-
         const storedStr = window.localStorage.getItem(storageKey);
         if (storedStr) {
             const stored = JSON.parse(storedStr);
             // Only trust a real array — corrupted storage (a string, or an object with `length`)
             // would otherwise iterate per character/index. Matches the runtime store's handling.
             if (Array.isArray(stored)) {
-                for (let j = 0; j < stored.length; j++) {
-                    push(stored[j]);
+                for (let i = 0; i < stored.length; i++) {
+                    push(stored[i]);
                 }
             }
         }
@@ -56,8 +48,6 @@ export function applySelectStateScript(storageKey: string, urlParam: string, cap
                 el.removeAttribute(attribute);
             }
         }
-
-        window.localStorage.setItem(storageKey, JSON.stringify(slugs));
     } catch {
         // localStorage blocked (private mode) or malformed state — fall through to block defaults.
     }

@@ -1,6 +1,6 @@
 'use client';
 import type { MediaTypeRenderer } from './OpenAPICodeSample';
-import { OpenAPISelect, OpenAPISelectItem, useSelectState } from './OpenAPISelect';
+import { OpenAPISelect, useSelectState } from './OpenAPISelect';
 import { createStateKey } from './utils';
 
 export function OpenAPIMediaTypeExamplesSelector(props: {
@@ -57,11 +57,7 @@ function MediaTypeSelector(props: {
 
     return (
         <OpenAPISelect items={items} icon={selectIcon} stateKey={stateKey} placement="bottom start">
-            {items.map((item) => (
-                <OpenAPISelectItem key={item.key} id={item.key} value={item}>
-                    {item.label}
-                </OpenAPISelectItem>
-            ))}
+            {(item) => item.label}
         </OpenAPISelect>
     );
 }
@@ -89,11 +85,7 @@ function ExamplesSelector(props: {
             stateKey={`media-type-sample-${renderer.mediaType}-${method}-${path}`}
             placement="bottom start"
         >
-            {items.map((item) => (
-                <OpenAPISelectItem key={item.key} id={item.key} value={item}>
-                    {item.label}
-                </OpenAPISelectItem>
-            ))}
+            {(item) => item.label}
         </OpenAPISelect>
     );
 }

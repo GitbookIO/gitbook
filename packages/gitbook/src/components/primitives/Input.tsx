@@ -1,12 +1,14 @@
 'use client';
 
-import { tString, useLanguage } from '@/intl/client';
-import { tcls } from '@/lib/tailwind';
-import { Icon, type IconName } from '@gitbook/icons';
 import React, { type ReactNode } from 'react';
+
+import { Icon, type IconName } from '@gitbook/icons';
+
 import { useControlledState } from '../hooks/useControlledState';
 import { Button, type ButtonProps } from './Button';
 import { KeyboardShortcut, type KeyboardShortcutProps } from './KeyboardShortcut';
+import { tString, useLanguage } from '@/intl/client';
+import { tcls } from '@/lib/tailwind';
 
 type CustomInputProps = {
     label: string;
@@ -196,7 +198,11 @@ export const Input = React.forwardRef<InputElement, InputProps>((props, passedRe
 
     const inputClassName = tcls(
         // `aria-busy` must not change the cursor: a busy field can still be editable.
-        'peer -m-2 max-h-64 grow shrink resize-none leading-normal text-left outline-none placeholder:text-tint/8 placeholder-shown:text-ellipsis',
+        'peer -m-2 max-h-64 grow shrink resize-none leading-normal text-left outline-none placeholder-shown:text-ellipsis',
+        // Styling `::placeholder` from an ancestor variant costs a full-document restyle, so callers
+        // set this variable on the container instead. It must stay a `var()` fallback rather than a
+        // declaration here, or the input would shadow the inherited override.
+        'placeholder:text-[var(--input-placeholder,color-mix(in_oklab,rgb(var(--tint-11))_72%,transparent))]',
         sizes[sizing].input
     );
 
@@ -306,7 +312,7 @@ export const Input = React.forwardRef<InputElement, InputProps>((props, passedRe
                 {keyboardShortcut !== false ? (
                     <Tag
                         className={
-                            multiline ? `absolute top-0 right-0 ${sizes[sizing].container}` : ''
+                            multiline ? `absolute right-0 top-0 ${sizes[sizing].container}` : ''
                         }
                     >
                         {typeof keyboardShortcut === 'object' ? (
@@ -342,7 +348,7 @@ export const Input = React.forwardRef<InputElement, InputProps>((props, passedRe
                     ) : null}
                     {submitted && submitMessage ? (
                         typeof submitMessage === 'string' ? (
-                            <Tag className="ml-auto flex animate-fade-in items-center gap-1 p-1.5 text-success-subtle">
+                            <Tag className="animate-fade-in ml-auto flex items-center gap-1 p-1.5 text-success-subtle">
                                 <Icon icon="check-circle" className="size-4" />
                                 {submitMessage}
                             </Tag>

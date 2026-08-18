@@ -1,8 +1,9 @@
 'use client';
 
+import { useLayoutEffect } from 'react';
+
 import { useHash } from '@/components/hooks';
 import { SELECT_OPTION_ATTR, selectStore } from '@/lib/select';
-import { useLayoutEffect } from 'react';
 
 /**
  * Make anchors work across `select` variants: when the URL points at an element inside an inactive
