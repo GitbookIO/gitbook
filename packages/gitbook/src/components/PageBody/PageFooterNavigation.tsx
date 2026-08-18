@@ -99,7 +99,7 @@ function NavigationCard(
                 >
                     {label}
                 </span>
-                <span className="line-clamp-2 text-tint-strong leading-snug transition-colors group-hover:text-primary contrast-more:group-hover:text-primary-strong">
+                <span className="line-clamp-2 leading-snug text-tint-strong transition-colors group-hover:text-primary contrast-more:group-hover:text-primary-strong">
                     {title}
                 </span>
             </div>
