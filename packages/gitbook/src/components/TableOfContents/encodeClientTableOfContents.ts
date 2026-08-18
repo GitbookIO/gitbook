@@ -4,8 +4,9 @@ import type { ContentRef, RevisionPage, RevisionPageTag, RevisionTag } from '@gi
 
 import type { GitBookSiteContext } from '@/lib/context';
 import { getOpenAPIOperationPageProps } from '@/lib/openapi/computedSourceProps';
-import { getPagePaths, hasPageVisibleDescendant } from '@/lib/pages';
+import { hasPageVisibleDescendant } from '@/lib/pages';
 import { resolveContentRef } from '@/lib/references';
+import { getSiteSpacePagePaths } from '@/lib/sites';
 import { getRevisionTags, resolveTag } from '@/lib/tags';
 import { removeUndefined } from '@/lib/typescript';
 
@@ -84,7 +85,7 @@ export async function encodeClientTableOfContents(
                         href,
                         emoji: page.emoji,
                         icon: page.icon,
-                        pathnames: getPagePaths(rootPages, page),
+                        pathnames: getSiteSpacePagePaths(context.siteSpace, rootPages, page),
                         descendants,
                         primaryTag,
                         openAPIOperation: getOpenAPIOperationPageProps(page),

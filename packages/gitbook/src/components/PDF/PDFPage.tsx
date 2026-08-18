@@ -25,8 +25,10 @@ import { tString } from '@/intl/translate';
 import { sanitizeGitBookAppURL } from '@/lib/app';
 import type { GitBookSiteContext, GitBookSpaceContext } from '@/lib/context';
 import { getPageDocument } from '@/lib/data';
+import { type GitBookLinker, createLinker, linkerWithAbsoluteURLs } from '@/lib/links';
 import './pdf.css';
 import { resolvePageId } from '@/lib/pages';
+import { getLinkerForSiteSpace } from '@/lib/sites';
 import { tcls } from '@/lib/tailwind';
 import { defaultCustomization } from '@/lib/utils';
 
@@ -66,7 +68,7 @@ export async function PDFPage(props: {
     );
 
     // Build a linker that create anchor links for the pages rendered in the PDF page.
-    const linker = createPDFLinker(baseContext.linker, pages, baseContext.space.urls.published);
+    const linker = createPDFLinker(baseContext.linker, pages, getPublishedLinker(baseContext));
 
     const context: GitBookSpaceContext = {
         ...baseContext,
@@ -145,6 +147,31 @@ export async function PDFPage(props: {
             )}
         </div>
     );
+}
+
+function getPublishedLinker(
+    context: GitBookSpaceContext | GitBookSiteContext
+): GitBookLinker | undefined {
+    const publishedURL =
+        ('siteSpace' in context ? context.siteSpace.urls.published : undefined) ??
+        context.space.urls.published;
+    if (!publishedURL) {
+        return undefined;
+    }
+
+    const url = new URL(publishedURL);
+    const publishedLinker = linkerWithAbsoluteURLs(
+        createLinker({
+            protocol: url.protocol,
+            host: url.host,
+            siteBasePath: url.pathname,
+            spaceBasePath: url.pathname,
+        })
+    );
+
+    return 'siteSpace' in context
+        ? getLinkerForSiteSpace(publishedLinker, context.siteSpace, context.revision.pages)
+        : publishedLinker;
 }
 
 async function PDFSpaceIntro(props: { space: Space; customization: SiteCustomizationSettings }) {
