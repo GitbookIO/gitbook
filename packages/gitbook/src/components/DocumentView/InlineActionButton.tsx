@@ -1,8 +1,8 @@
 'use client';
-import { tString, useLanguage } from '@/intl/client';
 import { useAI, useAIChatController, useAIChatState } from '../AI';
-import { useSetSearchState } from '../Search';
 import { Button, type ButtonProps, Input } from '../primitives';
+import { useSetSearchState } from '../Search';
+import { tString, useLanguage } from '@/intl/client';
 
 // The Input primitive has no `xsmall`; otherwise it shares the button's size scale.
 const INPUT_SIZE_MAP: Record<NonNullable<ButtonProps['size']>, 'small' | 'medium' | 'large'> = {

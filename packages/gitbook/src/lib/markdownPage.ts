@@ -1,4 +1,24 @@
+import type { Link, Root } from 'mdast';
+import { fromMarkdown } from 'mdast-util-from-markdown';
+import { frontmatterFromMarkdown } from 'mdast-util-frontmatter';
+import { gfmFromMarkdown, gfmToMarkdown } from 'mdast-util-gfm';
+import { toMarkdown } from 'mdast-util-to-markdown';
+import { frontmatter } from 'micromark-extension-frontmatter';
+import { gfm } from 'micromark-extension-gfm';
 import path from 'node:path';
+import { remove } from 'unist-util-remove';
+import { visit } from 'unist-util-visit';
+
+import {
+    type RevisionPageDocument,
+    type RevisionPageGroup,
+    RevisionPageType,
+    type SiteSpace,
+} from '@gitbook/api';
+
+import type { GitBookLinker } from './links';
+import { resolveContentRef, resolveStringContentRef } from './references';
+import { checkIsAnchor, checkIsExternalURL } from './urls';
 import {
     type GitBookAnyContext,
     type GitBookSiteContext,
@@ -8,24 +28,6 @@ import { DataFetcherError, throwIfDataError } from '@/lib/data';
 import type { ResolvedPagePath } from '@/lib/pages';
 import { getIndexablePages } from '@/lib/sitemap';
 import { getMarkdownForPagesTree } from '@/routes/llms';
-import {
-    type RevisionPageDocument,
-    type RevisionPageGroup,
-    RevisionPageType,
-    type SiteSpace,
-} from '@gitbook/api';
-import type { Link, Root } from 'mdast';
-import { fromMarkdown } from 'mdast-util-from-markdown';
-import { frontmatterFromMarkdown } from 'mdast-util-frontmatter';
-import { gfmFromMarkdown, gfmToMarkdown } from 'mdast-util-gfm';
-import { toMarkdown } from 'mdast-util-to-markdown';
-import { frontmatter } from 'micromark-extension-frontmatter';
-import { gfm } from 'micromark-extension-gfm';
-import { remove } from 'unist-util-remove';
-import { visit } from 'unist-util-visit';
-import type { GitBookLinker } from './links';
-import { resolveContentRef, resolveStringContentRef } from './references';
-import { checkIsAnchor, checkIsExternalURL } from './urls';
 
 /**
  * Generate a markdown version of a page.
@@ -227,7 +229,7 @@ async function rewriteMarkdownLinks(
 ): Promise<Root> {
     const currentDir = path.posix.dirname(currentPagePath);
 
-    const pending: Array<Promise<void>> = [];
+    const pending: Promise<void>[] = [];
 
     visit(tree, 'link', (node: Link) => {
         const isMention = isMentionLike(node);
@@ -280,7 +282,7 @@ async function rewriteMarkdownLinks(
             // but it means we are just at the root of the site.
             const pathInPage = path.posix
                 .normalize(path.posix.join(currentDir, original))
-                .replace(/^[\/\.]+/, '');
+                .replace(/^[/.]+/, '');
 
             node.url = context.linker.toAbsoluteURL(context.linker.toPathInSpace(pathInPage));
         }

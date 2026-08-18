@@ -1,13 +1,14 @@
 'use client';
 
-import { tcls } from '@/lib/tailwind';
 import { SiteInsightsLinkPosition } from '@gitbook/api';
 import { OpenAPIMethodBadge } from '@gitbook/react-openapi';
+
 import { Tag } from '../Tag';
+import type { ClientTOCPageDocument } from './encodeClientTableOfContents';
 import { PagesList } from './PagesList';
 import { TOCPageIcon } from './TOCPageIcon';
 import { ToggleableLinkItem } from './ToggleableLinkItem';
-import type { ClientTOCPageDocument } from './encodeClientTableOfContents';
+import { tcls } from '@/lib/tailwind';
 
 export function PageDocumentItem(props: { page: ClientTOCPageDocument }) {
     const { page } = props;

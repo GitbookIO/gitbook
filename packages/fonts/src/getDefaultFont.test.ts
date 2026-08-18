@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'bun:test';
+
 import { CustomizationDefaultFont } from '@gitbook/api';
+
 import { getDefaultFont } from './getDefaultFont';
 
 describe('getDefaultFont', () => {

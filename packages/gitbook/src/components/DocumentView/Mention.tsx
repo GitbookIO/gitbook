@@ -1,9 +1,8 @@
 import { type DocumentInlineMention, SiteInsightsLinkPosition } from '@gitbook/api';
 
+import type { InlineProps } from './Inline';
 import { StyledLink } from '@/components/primitives';
 import { resolveContentRefInDocument } from '@/lib/references';
-
-import type { InlineProps } from './Inline';
 
 export async function Mention(props: InlineProps<DocumentInlineMention>) {
     const { document, inline, context } = props;

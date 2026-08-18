@@ -1,5 +1,6 @@
-import type { ContentKitAction, RequestRenderIntegrationUI } from '@gitbook/api';
 import * as React from 'react';
+
+import type { ContentKitAction, RequestRenderIntegrationUI } from '@gitbook/api';
 
 /**
  * Security restrictions for elements.

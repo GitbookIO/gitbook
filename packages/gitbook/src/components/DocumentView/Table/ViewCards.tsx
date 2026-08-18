@@ -1,11 +1,10 @@
 import type { DocumentTableViewCards } from '@gitbook/api';
 
-import { ScrollContainer } from '@/components/primitives/ScrollContainer';
-import { tcls } from '@/lib/tailwind';
-
 import { RecordCard } from './RecordCard';
 import type { TableViewProps } from './Table';
 import { TableSearchRecord } from './TableSearch';
+import { ScrollContainer } from '@/components/primitives/ScrollContainer';
+import { tcls } from '@/lib/tailwind';
 
 export function ViewCards(props: TableViewProps<DocumentTableViewCards>) {
     // `wrap` defaults to `true` (a wrapping grid); only an explicit `false` opts into the

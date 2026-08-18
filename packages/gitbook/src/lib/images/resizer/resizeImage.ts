@@ -1,11 +1,11 @@
 import 'server-only';
-import { getLogger } from '@/lib/logger';
 import assertNever from 'assert-never';
+
 import { GITBOOK_IMAGE_RESIZE_MODE } from '../../env';
 import { SizableImageAction, checkIsSizableImageURL } from '../checkIsSizableImageURL';
-import { resizeImageWithCFFetch } from './cf-fetch';
 import { resizeImageWithGitbookServices } from './gitbook-service';
 import type { CloudflareImageJsonFormat, CloudflareImageOptions } from './types';
+import { getLogger } from '@/lib/logger';
 
 /**
  * Get the size of an image.
@@ -72,7 +72,6 @@ export async function resizeImage(
 
     switch (GITBOOK_IMAGE_RESIZE_MODE) {
         case 'cf-fetch':
-            return resizeImageWithCFFetch(input, options);
         case 'gitbook-service':
         case 'cdn-cgi':
             return resizeImageWithGitbookServices(input, options);

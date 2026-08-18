@@ -1,11 +1,12 @@
-import type { GitBookSiteContext } from '@/lib/context';
 import type { SiteSection, SiteSpace } from '@gitbook/api';
+
 import { encodeClientSiteSections } from '../SiteSections';
+import type { GitBookSiteContext } from '@/lib/context';
 
 export interface SearchBaseProps {
     asEmbeddable?: boolean;
     siteSpace: SiteSpace;
-    siteSpaces: ReadonlyArray<SiteSpace>;
+    siteSpaces: readonly SiteSpace[];
     withSections: boolean;
     section?: Pick<SiteSection, 'title' | 'icon'>;
     withVariants: boolean;

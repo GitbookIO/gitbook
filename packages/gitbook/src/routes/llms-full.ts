@@ -1,3 +1,9 @@
+import assertNever from 'assert-never';
+import type { Paragraph } from 'mdast';
+import pMap, { pMapIterable } from 'p-map';
+
+import type { RevisionPageDocument, SiteSection, SiteSpace } from '@gitbook/api';
+
 import {
     type GitBookSiteContext,
     checkIsRootSiteContext,
@@ -7,10 +13,6 @@ import { throwIfDataError } from '@/lib/data';
 import { fromPageMarkdown, toPageMarkdown } from '@/lib/markdownPage';
 import { getIndexablePages } from '@/lib/sitemap';
 import { filterSiteSpacesByLocale, getSiteStructureSections } from '@/lib/sites';
-import type { RevisionPageDocument, SiteSection, SiteSpace } from '@gitbook/api';
-import assertNever from 'assert-never';
-import type { Paragraph } from 'mdast';
-import pMap, { pMapIterable } from 'p-map';
 
 // We limit the concurrency to 100 to avoid reaching limit with concurrent requests
 // or file descriptor limits.

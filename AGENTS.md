@@ -6,7 +6,8 @@
 bun install          # Install dependencies
 bun dev              # Start dev server (all packages)
 bun run build        # Build all packages
-bun run format       # Format with Biome (run after every change)
+bun run lint         # Lint with Oxlint
+bun run format       # Format with Oxfmt (run after every change)
 bun run typecheck    # Type-check all packages
 bun run unit         # Run unit tests
 ```
@@ -74,7 +75,7 @@ Save as `.changeset/<name>.md`, then commit it separately with message: `changes
 
 ## Formatting
 
-Uses Biome (not ESLint/Prettier). Always run `bun run format` before committing.
+Linting uses Oxlint and formatting uses Oxfmt. Always run `bun run format` before committing.
 
 ## Comments
 

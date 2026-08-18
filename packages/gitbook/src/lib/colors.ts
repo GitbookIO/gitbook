@@ -1,5 +1,6 @@
-import type { ClassValue } from '@/lib/tailwind';
 import type { DocumentMarkColor } from '@gitbook/api';
+
+import type { ClassValue } from '@/lib/tailwind';
 
 type DocumentTextColor = DocumentMarkColor['data']['text'] | 'pink' | 'violet' | 'cyan' | '$tint';
 

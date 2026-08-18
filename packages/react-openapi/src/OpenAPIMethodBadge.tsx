@@ -1,4 +1,5 @@
 import clsx from 'classnames';
+
 import { formatOpenAPIMethod } from './formatOpenAPIMethod';
 
 /**

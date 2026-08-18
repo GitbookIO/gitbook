@@ -1,5 +1,6 @@
-import type { Revision, RevisionFile, RevisionReusableContent } from '@gitbook/api';
 import * as React from 'react';
+
+import type { Revision, RevisionFile, RevisionReusableContent } from '@gitbook/api';
 
 const getRevisionReusableContents = React.cache((revision: Revision) => {
     return new Map(

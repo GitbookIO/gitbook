@@ -1,10 +1,12 @@
 'use client';
 
-import type { GitBookSiteContext } from '@/lib/context';
-import { OpenAPIPrefillContextProvider } from '@gitbook/react-openapi';
 import * as React from 'react';
 import { createContext, useContext } from 'react';
+
+import { OpenAPIPrefillContextProvider } from '@gitbook/react-openapi';
+
 import type { AdaptiveVisitorClaims } from './types';
+import type { GitBookSiteContext } from '@/lib/context';
 
 /**
  * In-memory cache of visitor claim readers keyed by contextId.

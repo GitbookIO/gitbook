@@ -1,6 +1,7 @@
+import type { NextRequest } from 'next/server';
+
 import { type RouteParams, getPagePathFromParams, getStaticSiteContext } from '@/app/utils';
 import { servePageRSS } from '@/routes/rss';
-import type { NextRequest } from 'next/server';
 
 export const dynamic = 'force-static';
 

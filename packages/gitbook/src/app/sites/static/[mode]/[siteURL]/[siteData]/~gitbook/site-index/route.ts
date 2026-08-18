@@ -1,10 +1,11 @@
+import type { NextRequest } from 'next/server';
+
 import {
     type RevisionPage,
     type RevisionPageDocument,
     type RevisionPageGroup,
     SiteVisibility,
 } from '@gitbook/api';
-import type { NextRequest } from 'next/server';
 
 import { type RouteLayoutParams, getStaticSiteContext } from '@/app/utils';
 import { throwIfDataError } from '@/lib/data';
@@ -12,6 +13,7 @@ import { isPageIndexable } from '@/lib/seo';
 import {
     findSiteSpaceBy,
     getFallbackSiteSpacePath,
+    getLinkerForSiteSpace,
     getLocalizedTitle,
     listAllSiteSpaces,
 } from '@/lib/sites';
@@ -111,9 +113,13 @@ export async function GET(
     for (let i = 0; i < visibleSpaces.length; i++) {
         const siteSpace = visibleSpaces[i]!;
         const revision = revisions[i]!;
-        const forkedLinker = linker.withOtherSiteSpace({
-            spaceBasePath: getFallbackSiteSpacePath(context, siteSpace),
-        });
+        const forkedLinker = getLinkerForSiteSpace(
+            linker.withOtherSiteSpace({
+                spaceBasePath: getFallbackSiteSpacePath(context, siteSpace),
+            }),
+            siteSpace,
+            revision.pages
+        );
 
         const lang = siteSpace.space.language ?? undefined;
         const sectionInfo = findSiteSpaceBy(structure, (ss) => ss.id === siteSpace.id);

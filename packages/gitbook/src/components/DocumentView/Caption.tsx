@@ -7,11 +7,10 @@ import type {
     JSONDocument,
 } from '@gitbook/api';
 
-import { getNodeFragmentByName, isNodeEmpty } from '@/lib/document';
-import { type ClassValue, tcls } from '@/lib/tailwind';
-
 import type { DocumentContextProps } from './DocumentView';
 import { Inlines } from './Inlines';
+import { getNodeFragmentByName, isNodeEmpty } from '@/lib/document';
+import { type ClassValue, tcls } from '@/lib/tailwind';
 
 export type CaptionAlign = NonNullable<DocumentBlockImages['data']['align']>;
 

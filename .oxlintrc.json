@@ -1,0 +1,87 @@
+{
+    "$schema": "./node_modules/oxlint/configuration_schema.json",
+    "categories": {
+        "correctness": "warn",
+        "suspicious": "warn",
+        "perf": "warn"
+    },
+    "plugins": ["eslint", "typescript", "unicorn", "oxc", "react", "jsx-a11y", "vitest"],
+    "env": {
+        "builtin": true,
+        "browser": true,
+        "node": true,
+        "shared-node-browser": true,
+        "worker": true
+    },
+    "globals": {
+        "Bun": "readonly",
+        "GitBookIntegrationEvent": "readonly",
+        "React": "readonly"
+    },
+    "rules": {
+        "eslint/no-console": [
+            "warn",
+            {
+                "allow": ["assert", "error", "warn"]
+            }
+        ],
+        "eslint/no-control-regex": "warn",
+        "eslint/no-prototype-builtins": "warn",
+        "eslint/no-cond-assign": "warn",
+        "eslint/no-undef": "error",
+        "eslint/no-unused-vars": [
+            "error",
+            {
+                "argsIgnorePattern": "^_",
+                "caughtErrorsIgnorePattern": "^_",
+                "ignoreRestSiblings": true,
+                "varsIgnorePattern": "^_"
+            }
+        ],
+        "react/button-has-type": "warn",
+        "react/exhaustive-deps": "warn",
+        "react/jsx-key": "warn",
+        "react/jsx-no-useless-fragment": "warn",
+        "react/no-array-index-key": "warn",
+        "react/void-dom-elements-no-children": "warn",
+        "react/rules-of-hooks": "error",
+        "jsx-a11y/alt-text": "warn",
+        "jsx-a11y/anchor-is-valid": "warn",
+        "jsx-a11y/click-events-have-key-events": "warn",
+        "jsx-a11y/iframe-has-title": "warn",
+        "jsx-a11y/interactive-supports-focus": "warn",
+        "jsx-a11y/label-has-associated-control": "warn",
+        "jsx-a11y/no-noninteractive-tabindex": "warn",
+        "jsx-a11y/role-has-required-aria-props": "warn",
+        "jsx-a11y/tabindex-no-positive": "warn",
+        "typescript/array-type": "error",
+        "typescript/no-explicit-any": "warn",
+        "typescript/no-non-null-assertion": "warn",
+        "typescript/no-confusing-void-expression": "warn",
+        "typescript/only-throw-error": "error",
+        "vitest/no-focused-tests": "error",
+        "no-delete-var": "warn",
+        "no-debugger": "error",
+        "no-throw-literal": "error",
+        "use-isnan": "error",
+        "valid-typeof": "error"
+    },
+    "ignorePatterns": [
+        "**/node_modules/**",
+        "**/dist/**",
+        "**/build/**",
+        "**/public/**",
+        "**/.next/**",
+        "**/.open-next/**",
+        "**/.turbo/**",
+        "**/.vercel/**",
+        "**/.cache/**",
+        "**/.wrangler/**",
+        "packages/embed/standalone/**",
+        "packages/openapi-parser/src/fixtures/**",
+        "packages/emoji-codepoints/index.ts",
+        "packages/icons/src/data/*.json",
+        "packages/gitbook/worker-configuration.d.ts",
+        "**/*.css"
+    ]
+}

@@ -1,7 +1,7 @@
 'use client';
-import { tcls } from '@/lib/tailwind';
 import type { ImageSize } from '../utils';
 import { useCoverPosition } from './useCoverPosition';
+import { tcls } from '@/lib/tailwind';
 
 interface ImageAttributes {
     src: string;

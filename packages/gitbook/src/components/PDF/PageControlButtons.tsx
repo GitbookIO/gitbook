@@ -1,13 +1,14 @@
 'use client';
 
-import { Icon } from '@gitbook/icons';
 import React from 'react';
 
+import { Icon } from '@gitbook/icons';
+
+import { type PDFSearchParams, getPDFURLSearchParams } from './urls';
 import { useScrollActiveId } from '@/components/hooks';
 import { Button } from '@/components/primitives';
 import { t, tString, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
-import { type PDFSearchParams, getPDFURLSearchParams } from './urls';
 
 const limitExtend = 50;
 
@@ -17,7 +18,7 @@ const limitExtend = 50;
 export function PageControlButtons(props: {
     params: PDFSearchParams;
     /** Array of the [pageId, divId] */
-    pageIds: Array<[string, string]>;
+    pageIds: [string, string][];
     /** Total number of pages targetted by the generation */
     total: number;
     /** Trademark to display */

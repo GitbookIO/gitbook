@@ -1,6 +1,7 @@
 import yaml from 'js-yaml';
 
 import type { OpenAPIV3 } from '@gitbook/openapi-parser';
+
 import type { OpenAPIContext, OpenAPIUniversalContext } from './context';
 import { json2xml } from './json2xml';
 import { stringifyOpenAPI } from './stringifyOpenAPI';
@@ -24,9 +25,10 @@ export function OpenAPIExample(props: {
     return context.renderCodeBlock({ code, syntax });
 }
 
-function stringifyExample(args: { example: OpenAPIV3.ExampleObject; syntax: string }):
-    | string
-    | null {
+function stringifyExample(args: {
+    example: OpenAPIV3.ExampleObject;
+    syntax: string;
+}): string | null {
     const { example, syntax } = args;
 
     if (!example.value) {
@@ -51,9 +53,7 @@ function stringifyExample(args: { example: OpenAPIV3.ExampleObject; syntax: stri
 /**
  * Empty response example.
  */
-export function OpenAPIEmptyExample(props: {
-    context: OpenAPIUniversalContext;
-}) {
+export function OpenAPIEmptyExample(props: { context: OpenAPIUniversalContext }) {
     const { context } = props;
     return (
         <pre className="openapi-example-empty">

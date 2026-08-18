@@ -1,8 +1,10 @@
-import { tcls } from '@/lib/tailwind';
-import { type DocumentBlockColumns, type Length, VerticalAlignment } from '@gitbook/api';
 import React from 'react';
+
+import { type DocumentBlockColumns, type Length, VerticalAlignment } from '@gitbook/api';
+
 import type { BlockProps } from '../Block';
 import { Blocks } from '../Blocks';
+import { tcls } from '@/lib/tailwind';
 
 export function Columns(props: BlockProps<DocumentBlockColumns>) {
     const { block, style, ancestorBlocks, document, context } = props;

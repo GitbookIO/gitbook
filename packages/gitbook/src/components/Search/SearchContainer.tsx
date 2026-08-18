@@ -1,21 +1,23 @@
 'use client';
 
-import { t, useLanguage } from '@/intl/client';
-import { tcls } from '@/lib/tailwind';
-import { CustomizationSearchStyle } from '@gitbook/api';
 import dynamic from 'next/dynamic';
 import React, { useRef } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
+
+import { CustomizationSearchStyle } from '@gitbook/api';
+
 import { AIChatButton } from '../AIChat';
 import { useIsMobile } from '../hooks/useIsMobile';
 import { Button, Popover } from '../primitives';
 import { KeyboardShortcut } from '../primitives/KeyboardShortcut';
 import { SideSheet } from '../primitives/SideSheet';
+import type { SearchBaseProps } from './search-props';
 import { SearchInput } from './SearchInput';
 import { SearchLiveResultsAnnouncer } from './SearchLiveResultsAnnouncer';
 import { SearchScopeControl } from './SearchScopeControl';
-import type { SearchBaseProps } from './search-props';
 import { useSearchController } from './useSearchController';
+import { t, useLanguage } from '@/intl/client';
+import { tcls } from '@/lib/tailwind';
 
 const SearchFrame = dynamic(() => import('./SearchFrame').then((mod) => mod.SearchFrame), {
     ssr: false,
@@ -201,42 +203,7 @@ export function SearchContainer({
                     aria-controls={resultsId}
                 />
             ) : (
-                <Popover
-                    content={searchFrame}
-                    rootProps={{
-                        open: isSearchOpen,
-                        modal: false,
-                    }}
-                    contentProps={{
-                        onOpenAutoFocus: (event) => event.preventDefault(),
-                        align: 'start',
-                        className: tcls(
-                            '@container flex flex-col overflow-hidden bg-tint-base has-[.empty]:hidden w-128 p-0 max-w-[min(var(--radix-popover-content-available-width),32rem)]',
-                            shouldFillHeight
-                                ? 'h-[min(32rem,var(--radix-popover-content-available-height))]'
-                                : 'max-h-[min(32rem,var(--radix-popover-content-available-height))]'
-                        ),
-                        onInteractOutside: (event) => {
-                            // Don't close if clicking on the search input itself
-                            if (searchInputRef.current?.contains(event.target as Node)) {
-                                event.preventDefault();
-                                return;
-                            }
-                            close();
-                        },
-                        sideOffset: 8,
-                        collisionPadding: {
-                            top: 16,
-                            right: 16,
-                            bottom: 32,
-                            left: 16,
-                        },
-                        hideWhenDetached: true,
-                    }}
-                    triggerProps={{
-                        asChild: true,
-                    }}
-                >
+                <>
                     <SearchInput
                         ref={searchInputRef}
                         aria-activedescendant={searchResultsActiveDescendant}
@@ -257,7 +224,54 @@ export function SearchContainer({
                             showing={Boolean(searchValue) && !fetching}
                         />
                     </SearchInput>
-                </Popover>
+                    {/* Anchored, not triggered: a trigger gives the input button semantics and
+                        swallows the space bar. */}
+                    <Popover
+                        content={searchFrame}
+                        anchor={searchInputRef}
+                        rootProps={{
+                            open: isSearchOpen,
+                            onOpenChange: (nextOpen, eventDetails) => {
+                                if (nextOpen) {
+                                    open();
+                                    return;
+                                }
+                                // Without a trigger, the input counts as outside the popover.
+                                if (
+                                    eventDetails.reason === 'outside-press' &&
+                                    searchInputRef.current?.contains(
+                                        eventDetails.event.target as Node
+                                    )
+                                ) {
+                                    eventDetails.cancel();
+                                    return;
+                                }
+                                close();
+                            },
+                        }}
+                        positionerProps={{
+                            align: 'start',
+                            sideOffset: 8,
+                            collisionPadding: {
+                                top: 16,
+                                right: 16,
+                                bottom: 32,
+                                left: 16,
+                            },
+                        }}
+                        popupProps={{
+                            initialFocus: false,
+                            // Restoring focus to the input would re-fire `onFocus` and reopen it.
+                            finalFocus: false,
+                            className: tcls(
+                                '@container flex flex-col overflow-hidden bg-tint-base has-[.empty]:hidden w-128 p-0 max-w-[min(var(--available-width),32rem)]',
+                                shouldFillHeight
+                                    ? 'h-[min(32rem,var(--available-height))]'
+                                    : 'max-h-[min(32rem,var(--available-height))]'
+                            ),
+                        }}
+                    />
+                </>
             )}
             {usesSideSheet ? (
                 <SideSheet
@@ -271,7 +285,7 @@ export function SearchContainer({
                     modal
                     withOverlay
                     withCloseButton
-                    className="mx-auto w-96 border-tint-subtle border-l bg-tint-base"
+                    className="mx-auto w-96 border-l border-tint-subtle bg-tint-base"
                 >
                     {searchFrame}
                 </SideSheet>

@@ -1,9 +1,11 @@
+import type { NextRequest } from 'next/server';
+
+import type { CreateGitBookOptions } from '@gitbook/embed';
+
 import type { RouteLayoutParams } from '@/app/utils';
 import { getAssetURL } from '@/lib/assets';
 import { buildVersion } from '@/lib/build';
 import { getEmbeddableStaticContext } from '@/lib/embeddable';
-import type { CreateGitBookOptions } from '@gitbook/embed';
-import type { NextRequest } from 'next/server';
 
 export const dynamic = 'force-static';
 

@@ -1,4 +1,3 @@
-import type { GitBookSiteContext } from '@/lib/context';
 import { redirect } from 'next/navigation';
 
 import {
@@ -6,9 +5,11 @@ import {
     SITE_REDIRECT_SOURCE_PATH_PATTERN,
 } from '@gitbook/api';
 
+import type { GitBookSiteContext } from '@/lib/context';
 import { getDataOrNull } from '@/lib/data';
-import { resolvePageId, resolvePagePath } from '@/lib/pages';
+import { resolvePageId } from '@/lib/pages';
 import { withLeadingSlash } from '@/lib/paths';
+import { resolveSiteSpacePagePath } from '@/lib/sites';
 
 export interface PagePathParams {
     pathname?: string | string[];
@@ -51,7 +52,7 @@ async function resolvePage(context: GitBookSiteContext, params: PagePathParams |
     const pathname = rawPathname.toLowerCase();
 
     // When resolving a page, we use the lowercased pathname
-    const page = resolvePagePath(revision.pages, pathname);
+    const page = resolveSiteSpacePagePath(context.siteSpace, revision.pages, pathname);
     if (page) {
         return page;
     }

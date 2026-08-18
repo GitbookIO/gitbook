@@ -1,3 +1,9 @@
+import assertNever from 'assert-never';
+import type { ListItem, Paragraph, Root, RootContent } from 'mdast';
+import { toMarkdown } from 'mdast-util-to-markdown';
+
+import type { SiteSection, SiteSpace } from '@gitbook/api';
+
 import { isAIEnabled } from '@/components/utils/isAIChatEnabled';
 import { type GitBookSiteContext, checkIsRootSiteContext } from '@/lib/context';
 import { throwIfDataError } from '@/lib/data';
@@ -10,10 +16,6 @@ import {
     getLocalizedTitle,
     getSiteStructureSections,
 } from '@/lib/sites';
-import type { SiteSection, SiteSpace } from '@gitbook/api';
-import assertNever from 'assert-never';
-import type { ListItem, Paragraph, Root, RootContent } from 'mdast';
-import { toMarkdown } from 'mdast-util-to-markdown';
 
 /**
  * Generate a llms.txt file for the site.

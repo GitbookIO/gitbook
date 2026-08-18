@@ -1,5 +1,6 @@
-import type { GitBookSiteContext } from '@/lib/context';
-import { getDataOrNull, getPageDocument } from '@/lib/data';
+import type { Metadata, Viewport } from 'next';
+import { notFound, redirect } from 'next/navigation';
+
 import {
     CustomizationDefaultThemeMode,
     CustomizationHeaderPreset,
@@ -8,29 +9,32 @@ import {
     type TranslationLanguage,
 } from '@gitbook/api';
 import { IconsProvider } from '@gitbook/icons';
-import type { Metadata, Viewport } from 'next';
-import { notFound, redirect } from 'next/navigation';
 
+import { PageContextProvider } from '../PageContext';
+import { type PagePathParams, fetchPageData, getPathnameParam } from './fetch';
+import { PageClientLayout } from './PageClientLayout';
 import { UpdatesFilterProvider } from '@/components/DocumentView/UpdatesFilter';
 import { PageAside } from '@/components/PageAside';
 import { PageBody, PageCover } from '@/components/PageBody';
-import { getPagePath } from '@/lib/pages';
-import { isPageIndexable, isSiteIndexable } from '@/lib/seo';
-import { getDocumentFilterableTags } from '@/lib/updates';
-
+import type { GitBookSiteContext } from '@/lib/context';
+import { getDataOrNull, getPageDocument } from '@/lib/data';
 import {
     getContentInlineIconSourceRequests,
     getCustomizationIconStyle,
     getInlineIconSources,
 } from '@/lib/icons/inline';
 import { getResizedImageURL } from '@/lib/images';
+import { getPagePath } from '@/lib/pages';
 import { resolveContentRef } from '@/lib/references';
-import { getSiteStructureTitle } from '@/lib/sites';
+import { isPageIndexable, isSiteIndexable } from '@/lib/seo';
+import {
+    getSiteSpacePagePaths,
+    getSiteStructureTitle,
+    resolveSiteSpaceCustomHomePage,
+} from '@/lib/sites';
 import { tcls } from '@/lib/tailwind';
+import { getDocumentFilterableTags } from '@/lib/updates';
 import { getPageRSSURL } from '@/routes/rss';
-import { PageContextProvider } from '../PageContext';
-import { PageClientLayout } from './PageClientLayout';
-import { type PagePathParams, fetchPageData, getPathnameParam } from './fetch';
 
 export type SitePageProps = {
     context: GitBookSiteContext;
@@ -50,13 +54,13 @@ export type PageMetaLinks = {
     /**
      * The alternate URLs for the page, if any.
      */
-    alternates: Array<{
+    alternates: {
         href: string;
         /**
          * Space the alternate link points to, if any.
          */
         space: AlternateLinkSpace | null;
-    }>;
+    }[];
 };
 
 /**
@@ -188,10 +192,10 @@ export async function generateSitePageMetadata(props: SitePageProps): Promise<Me
 
     const alternates = pageMetaLinks?.alternates.reduce<{
         languages: Record<string, string>;
-        generic: Array<{
+        generic: {
             title?: string;
             url: string;
-        }>;
+        }[];
     }>(
         (acc, alt) => {
             if (alt.space?.language) {
@@ -265,13 +269,25 @@ export async function getSitePageData(props: SitePageProps) {
             }
             notFound();
         }
-    } else if (getPagePath(context.revision.pages, pageTarget.page) !== rawPathname) {
-        redirect(
-            context.linker.toPathForPage({
-                pages: context.revision.pages,
-                page: pageTarget.page,
-            })
+    } else {
+        const customHomePage = resolveSiteSpaceCustomHomePage(
+            context.siteSpace,
+            context.revision.pages
         );
+        // Without a custom home page, a page has a single canonical path. With one, the custom
+        // home page also gains the site space's root as a valid alias.
+        const expectedPagePaths = customHomePage
+            ? getSiteSpacePagePaths(context.siteSpace, context.revision.pages, pageTarget.page)
+            : [getPagePath(context.revision.pages, pageTarget.page)];
+
+        if (!expectedPagePaths.includes(rawPathname)) {
+            redirect(
+                context.linker.toPathForPage({
+                    pages: context.revision.pages,
+                    page: pageTarget.page,
+                })
+            );
+        }
     }
 
     const { customization, visibleSections } = context;

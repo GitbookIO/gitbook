@@ -4,15 +4,14 @@ import {
     SiteInsightsLinkPosition,
 } from '@gitbook/api';
 
+import type { BlockProps } from './Block';
+import { NotFoundRefHoverCard } from './NotFoundRefHoverCard';
 import { Card, type CardProps } from '@/components/primitives';
 import {
     type ResolvedContentRef,
     resolveContentRefFallback,
     resolveContentRefInDocument,
 } from '@/lib/references';
-
-import type { BlockProps } from './Block';
-import { NotFoundRefHoverCard } from './NotFoundRefHoverCard';
 
 export async function BlockContentRef(props: BlockProps<DocumentBlockContentRef>) {
     const { document, block, context, style } = props;

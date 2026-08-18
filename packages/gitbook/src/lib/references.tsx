@@ -1,3 +1,31 @@
+import assertNever from 'assert-never';
+import type React from 'react';
+
+import type {
+    ContentRef,
+    JSONDocument,
+    RevisionFile,
+    RevisionPageDocument,
+    RevisionReusableContent,
+    SiteSpace,
+    Space,
+} from '@gitbook/api';
+import type { Filesystem } from '@gitbook/openapi-parser';
+
+import { getGitBookAppHref } from './app';
+import { getBlockById, getBlockTitle } from './document';
+import { resolvePageId } from './pages';
+import {
+    findSiteSpaceBy,
+    getFallbackSiteSpacePath,
+    getLinkerForSiteSpace,
+    getLocalizedTitle,
+} from './sites';
+import { getRevisionTags, resolveTag } from './tags';
+import type { ClassValue } from './tailwind';
+import { filterOutNullable } from './typescript';
+import { checkIsExternalURL } from './urls';
+import { PageIcon } from '@/components/PageIcon';
 import {
     type GitBookAnyContext,
     type GitBookSpaceContext,
@@ -11,29 +39,6 @@ import {
     ignoreDataThrownError,
 } from '@/lib/data';
 import { type GitBookLinker, createLinker, linkerWithAbsoluteURLs } from '@/lib/links';
-import type {
-    ContentRef,
-    JSONDocument,
-    RevisionFile,
-    RevisionPageDocument,
-    RevisionReusableContent,
-    SiteSpace,
-    Space,
-} from '@gitbook/api';
-import type { Filesystem } from '@gitbook/openapi-parser';
-import assertNever from 'assert-never';
-import type React from 'react';
-
-import { PageIcon } from '@/components/PageIcon';
-
-import { getGitBookAppHref } from './app';
-import { getBlockById, getBlockTitle } from './document';
-import { resolvePageId } from './pages';
-import { findSiteSpaceBy, getFallbackSiteSpacePath, getLocalizedTitle } from './sites';
-import { getRevisionTags, resolveTag } from './tags';
-import type { ClassValue } from './tailwind';
-import { filterOutNullable } from './typescript';
-import { checkIsExternalURL } from './urls';
 
 export interface ResolvedContentRef {
     /** Text to render in the content ref */
@@ -575,9 +580,13 @@ async function createContextForSpace(
 
     if (bestTargetSpace?.siteSpace && 'site' in context) {
         // If we found the space ID in the current site context, we can resolve links relative to it in the site.
-        linker = context.linker.withOtherSiteSpace({
-            spaceBasePath: getFallbackSiteSpacePath(context, bestTargetSpace.siteSpace),
-        });
+        linker = getLinkerForSiteSpace(
+            context.linker.withOtherSiteSpace({
+                spaceBasePath: getFallbackSiteSpacePath(context, bestTargetSpace.siteSpace),
+            }),
+            bestTargetSpace.siteSpace,
+            spaceContext.revision.pages
+        );
     } else {
         // Otherwise we generate absolute URLs as we are pointing to a different site.
         linker = linkerWithAbsoluteURLs(

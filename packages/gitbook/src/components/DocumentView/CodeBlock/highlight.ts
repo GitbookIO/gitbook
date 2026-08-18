@@ -1,8 +1,9 @@
-import type { CustomizationThemedCodeTheme, DocumentBlockCode } from '@gitbook/api';
 import { createSingletonShorthands, createdBundledHighlighter } from 'shiki/core';
 import { createJavaScriptRegexEngine } from 'shiki/engine/javascript';
 import { type BundledLanguage, bundledLanguages } from 'shiki/langs';
 import { bundledThemes } from 'shiki/themes';
+
+import type { CustomizationThemedCodeTheme, DocumentBlockCode } from '@gitbook/api';
 
 import { customThemes } from './customThemes';
 import {

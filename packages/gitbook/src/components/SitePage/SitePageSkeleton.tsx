@@ -1,6 +1,6 @@
+import { CONTENT_STYLE } from '../layout';
 import { SkeletonHeading, SkeletonParagraph } from '@/components/primitives';
 import { tcls } from '@/lib/tailwind';
-import { CONTENT_STYLE } from '../layout';
 
 /**
  * Placeholder when loading a page.

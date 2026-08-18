@@ -1,8 +1,8 @@
+import type { AIChatController } from '../AI';
+import { Button } from '../primitives';
+import { useRecentSearchQueries } from '../Search/recent-queries';
 import { useCurrentContent } from '@/components/hooks';
 import { tString, useLanguage } from '@/intl/client';
-import type { AIChatController } from '../AI';
-import { useRecentSearchQueries } from '../Search/recent-queries';
-import { Button } from '../primitives';
 
 export default function AIChatSuggestedQuestions(props: {
     chatController: AIChatController;
@@ -47,7 +47,7 @@ export default function AIChatSuggestedQuestions(props: {
                     key={question}
                     variant="blank"
                     size="small"
-                    className="max-w-full animate-blur-in-slow border-none bg-primary-solid/1 hover:bg-primary-hover"
+                    className="animate-blur-in-slow max-w-full border-none bg-primary-solid/1 hover:bg-primary-hover"
                     style={{
                         animationDelay: `${1000 + index * 100}ms`,
                     }}

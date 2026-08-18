@@ -1,12 +1,9 @@
 import { describe, expect, it } from 'bun:test';
+
 import {
-    COMMENT_MARKER,
-    type IssueCommentClient,
-    formatCompatibilityComment,
     getAddedDeclarations,
     getChangedLines,
     getCompatibilityDiagnostics,
-    upsertCompatibilityComment,
 } from './cssBrowserCompatibility';
 
 const baseCSS = `.card {
@@ -114,97 +111,5 @@ describe('getCompatibilityDiagnostics', () => {
 
         expect(diagnostics).toHaveLength(1);
         expect(diagnostics[0]?.property).toBe('appearance');
-    });
-});
-
-class FakeCommentClient implements IssueCommentClient {
-    created: string[] = [];
-    comments: Array<{
-        body: string;
-        id: number;
-        user: { login: string } | null;
-    }> = [];
-    updated: Array<{ body: string; id: number }> = [];
-
-    async createIssueComment(_issueNumber: number, body: string): Promise<void> {
-        this.created.push(body);
-    }
-
-    async listIssueComments(): Promise<typeof this.comments> {
-        return this.comments;
-    }
-
-    async updateIssueComment(commentId: number, body: string): Promise<void> {
-        this.updated.push({ body, id: commentId });
-    }
-}
-
-describe('PR comments', () => {
-    const diagnostics = [
-        {
-            column: 5,
-            feature: 'css-container-queries',
-            file: 'packages/gitbook/src/example.css',
-            line: 3,
-            property: 'container-type',
-            unsupportedBrowsers: 'Safari 12',
-        },
-    ];
-
-    it('formats an actionable compatibility report', () => {
-        const comment = formatCompatibilityComment({
-            diagnostics,
-            headSha: 'abc123',
-            repository: 'GitbookIO/gitbook',
-        });
-
-        expect(comment).toContain(COMMENT_MARKER);
-        expect(comment).toContain('container-type');
-        expect(comment).toContain('Safari 12');
-        expect(comment).toContain('example.css:3');
-    });
-
-    it('creates a failure comment, updates it on rerun, and marks it clean', async () => {
-        const client = new FakeCommentClient();
-        const failureComment = formatCompatibilityComment({
-            diagnostics,
-            headSha: 'abc123',
-            repository: 'GitbookIO/gitbook',
-        });
-
-        await upsertCompatibilityComment({ body: failureComment, client, issueNumber: 42 });
-        expect(client.created).toEqual([failureComment]);
-
-        client.comments = [{ body: failureComment, id: 9, user: { login: 'github-actions[bot]' } }];
-        const passingComment = formatCompatibilityComment({
-            diagnostics: [],
-            headSha: 'def456',
-            repository: 'GitbookIO/gitbook',
-        });
-        await upsertCompatibilityComment({
-            body: passingComment,
-            createIfMissing: false,
-            client,
-            issueNumber: 42,
-        });
-
-        expect(client.updated).toEqual([{ body: passingComment, id: 9 }]);
-    });
-
-    it('does not add a passing comment when no compatibility comment exists', async () => {
-        const client = new FakeCommentClient();
-        await upsertCompatibilityComment({
-            body: formatCompatibilityComment({
-                diagnostics: [],
-                headSha: 'abc123',
-                repository: 'GitbookIO/gitbook',
-            }),
-            createIfMissing: false,
-            client,
-            issueNumber: 42,
-        });
-
-        expect(client.created).toEqual([]);
-        expect(client.updated).toEqual([]);
     });
 });

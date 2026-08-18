@@ -1,8 +1,9 @@
 import type { OpenAPIV3 } from '@gitbook/openapi-parser';
+
+import type { OpenAPIClientContext } from './context';
 import { InteractiveSection } from './InteractiveSection';
 import { OpenAPIRequestBodyHeaderType } from './OpenAPIRequestBodyHeaderType';
 import { OpenAPIRootSchema } from './OpenAPISchemaServer';
-import type { OpenAPIClientContext } from './context';
 import { t } from './translate';
 import type { OpenAPIOperationData, OpenAPIWebhookData } from './types';
 import { checkIsReference, createStateKey } from './utils';

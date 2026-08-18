@@ -1,6 +1,7 @@
 import type { OpenAPICustomOperationProperties, OpenAPIV3 } from '@gitbook/openapi-parser';
-import { Markdown } from '../Markdown';
+
 import type { OpenAPIContext } from '../context';
+import { Markdown } from '../Markdown';
 import { resolveDescription } from '../utils';
 
 export function OpenAPIOperationDescription(props: {

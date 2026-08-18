@@ -1,9 +1,10 @@
 'use client';
 
-import type { ContentKitModal } from '@gitbook/api';
+import classNames from 'classnames';
 import React from 'react';
 
-import classNames from 'classnames';
+import type { ContentKitModal } from '@gitbook/api';
+
 import { useContentKitClientContext } from './context';
 import type { ContentKitClientElementProps } from './types';
 

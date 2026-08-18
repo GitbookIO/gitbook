@@ -1,6 +1,6 @@
+import { EmbeddableSearch } from './EmbeddableSearch';
 import { getSearchBaseProps } from '@/components/Search/search-props';
 import type { GitBookSiteContext } from '@/lib/context';
-import { EmbeddableSearch } from './EmbeddableSearch';
 
 type EmbeddableSearchPageProps = {
     context: GitBookSiteContext;

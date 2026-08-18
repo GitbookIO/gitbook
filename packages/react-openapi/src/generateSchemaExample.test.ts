@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'bun:test';
 
 import type { OpenAPIV3 } from '@gitbook/openapi-parser';
+
 import { generateSchemaExample } from './generateSchemaExample';
 
 describe('generateSchemaExample', () => {

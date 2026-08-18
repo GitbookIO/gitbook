@@ -8,6 +8,7 @@ import {
     useQueryStates,
 } from 'nuqs';
 import React from 'react';
+
 import type { LinkProps } from '../primitives';
 
 export type SearchScope =

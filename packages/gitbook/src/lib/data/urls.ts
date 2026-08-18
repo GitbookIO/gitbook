@@ -27,7 +27,7 @@ export function getURLLookupAlternatives(input: URL) {
     let basePath: string | undefined = undefined;
     let changeRequest: string | undefined = undefined;
     let revision: string | undefined = undefined;
-    const alternatives: Array<{ url: string; extraPath: string; primary: boolean }> = [];
+    const alternatives: { url: string; extraPath: string; primary: boolean }[] = [];
 
     const pushAlternative = (adding: URL, extraPath: string) => {
         const existing = alternatives.find((alt) => alt.url === adding.toString());

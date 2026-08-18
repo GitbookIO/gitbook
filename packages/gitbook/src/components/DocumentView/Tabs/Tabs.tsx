@@ -2,12 +2,11 @@ import type { DocumentBlockTabs } from '@gitbook/api';
 import type { IconName } from '@gitbook/icons';
 import { validateIconName } from '@gitbook/icons/icons';
 
-import { generateSelectCSS, selectSetClassName, slugifySelectValue } from '@/lib/select';
-import { tcls } from '@/lib/tailwind';
-
 import type { BlockProps } from '../Block';
 import { Blocks } from '../Blocks';
 import { DynamicTabs } from './DynamicTabs';
+import { generateSelectCSS, selectSetClassName, slugifySelectValue } from '@/lib/select';
+import { tcls } from '@/lib/tailwind';
 
 export function Tabs(props: BlockProps<DocumentBlockTabs>) {
     const { block, ancestorBlocks, document, style, context } = props;
@@ -105,7 +104,7 @@ function SelectGroupStyle({ slugs }: { slugs: string[] }) {
  */
 function withSelectSlugs<T extends { id: string; title: string }>(
     items: T[]
-): Array<T & { slug: string }> {
+): (T & { slug: string })[] {
     return items.map((item) => ({
         ...item,
         slug: slugifySelectValue(item.title) || slugifySelectValue(item.id) || item.id,

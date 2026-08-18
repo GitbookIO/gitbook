@@ -1,11 +1,12 @@
-import { fetchOpenAPIFilesystem } from '@/lib/openapi/fetch';
 import { OpenAPIParseError } from '@gitbook/openapi-parser';
 import { type OpenAPIOperationData, resolveOpenAPIOperation } from '@gitbook/react-openapi';
+
 import type {
     AnyOpenAPIOperationsBlock,
     ResolveOpenAPIBlockArgs,
     ResolveOpenAPIBlockResult,
 } from './types';
+import { fetchOpenAPIFilesystem } from '@/lib/openapi/fetch';
 
 type ResolveOpenAPIOperationBlockResult = ResolveOpenAPIBlockResult<OpenAPIOperationData>;
 

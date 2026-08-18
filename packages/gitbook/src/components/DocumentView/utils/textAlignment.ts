@@ -1,6 +1,7 @@
+import { TextAlignment } from '@gitbook/api';
+
 import type { ClassValue } from '@/lib/tailwind';
 import { nullIfNever } from '@/lib/typescript';
-import { TextAlignment } from '@gitbook/api';
 
 /**
  * Get the tailwind class for a text alignment.
