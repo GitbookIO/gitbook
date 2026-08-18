@@ -14,7 +14,7 @@ import {
 } from '@gitbook/api';
 
 import { getInsightsSession, useTrackEvent } from '../Insights';
-import { useSetSearchState } from '../Search';
+import { type UpdateSearchState, useSetSearchState } from '../Search';
 import { addRecentSearchQuery } from '../Search/recent-queries';
 import type { AnyAIControl } from './controls';
 import { ConfirmControlDef, ConfirmControlOutputSchema } from './controls/ConfirmControl';
@@ -31,6 +31,8 @@ import { useSubmitPageFeedbackTool } from './useSubmitPageFeedbackTool';
 import { useCurrentContent } from '@/components/hooks';
 import { useLanguage } from '@/intl/client';
 import { tString } from '@/intl/translate';
+
+const noopSetSearchState: UpdateSearchState = () => Promise.resolve(new URLSearchParams());
 
 export type AIChatMessage = {
     role: AIMessageRole;
@@ -235,13 +237,18 @@ export function AIChatProvider(props: {
 
     const messageContextRef = useAIMessageContextRef();
     const trackEvent = useTrackEvent();
-    const setSearchState = useSetSearchState();
+    const setSearchStateInURL = useSetSearchState();
     const { siteSpaceId } = useCurrentContent();
     const language = useLanguage();
 
     const displayContext = renderMessageOptions?.asEmbeddable
         ? SiteInsightsDisplayContext.Embed
         : SiteInsightsDisplayContext.Site;
+
+    // The embed keeps its state in its own routes, not in URL search params.
+    const setSearchState = renderMessageOptions?.asEmbeddable
+        ? noopSetSearchState
+        : setSearchStateInURL;
 
     // The assistant response the user is reacting to. Snapshotted when a new user turn begins
     // (before it overwrites the store's responseId/query), so the self-feedback tool rates that
@@ -610,14 +617,12 @@ export function AIChatProvider(props: {
     // Post a message to the AI chat
     const onPostMessage = React.useCallback(
         async (input: { message: string }) => {
-            const { query, messages, control, references, responding } = globalState.getState();
+            const { query, messages, control, references, responding, opened } =
+                globalState.getState();
 
-            if (control) {
-                throw new Error("We can't post a message when a control is active");
-            }
-
-            // Still streaming: queue this follow-up instead of dropping it (flushed in order in `streamResponse`).
-            if (responding) {
+            // Still streaming, or waiting on a control (e.g. a tool confirmation): queue this
+            // follow-up instead of dropping it (flushed in order in `streamResponse`).
+            if (responding || control) {
                 globalState.setState((state) => ({
                     ...state,
                     queuedMessages: [...state.queuedMessages, input.message],
@@ -643,9 +648,7 @@ export function AIChatProvider(props: {
 
             notify(eventsRef.current.get('postMessage'), { message: input.message });
 
-            if (query === input.message && references.length === 0) {
-                // Return early if the message is the same as the previous message
-                // (unless new references are staged, which change the payload)
+            if (query === input.message && references.length === 0 && !opened) {
                 globalState.setState((state) => ({
                     ...state,
                     opened: true,

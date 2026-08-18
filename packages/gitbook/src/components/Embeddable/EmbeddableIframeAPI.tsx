@@ -74,6 +74,9 @@ export function EmbeddableIframeAPI(props: { baseURL: string }) {
                     break;
                 }
                 case 'postUserMessage': {
+                    // The answer renders in the assistant, so bring it up if another tab is showing.
+                    navToken.current++;
+                    router.push(`${baseURL}/assistant`);
                     chatController.postMessage({
                         message: message.message,
                     });
