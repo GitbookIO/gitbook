@@ -64,12 +64,6 @@ export async function resizeImage(
         );
     }
 
-    if (action === SizableImageAction.Passthrough) {
-        // Passthrough should never be fetched directly
-        // Because it is still necessary in some cases and for backward compatibility, we use a redirect instead
-        return Response.redirect(input, 302);
-    }
-
     switch (GITBOOK_IMAGE_RESIZE_MODE) {
         case 'cf-fetch':
         case 'gitbook-service':

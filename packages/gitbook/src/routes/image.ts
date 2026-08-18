@@ -10,6 +10,8 @@ import {
     parseImageAPIURL,
     resizeImage,
     verifyImageSignature,
+    IMAGE_REJECT_REASON_HEADER,
+    ImageRejectReason,
 } from '@/lib/images';
 import type { CloudflareResizeImageOptions } from '@/lib/images/resizer';
 
@@ -155,6 +157,29 @@ async function resizeImageWithFallback(
     try {
         const response = await resizeImage(url, options);
         if (!response.ok) {
+            const rejectReason = response.headers.get(IMAGE_REJECT_REASON_HEADER);
+            if (rejectReason) {
+                switch (rejectReason) {
+                    case ImageRejectReason.InvalidRequest:
+                        return new Response('Invalid request', { status: 400 });
+                    case ImageRejectReason.InvalidSignature:
+                        return new Response('Invalid signature', { status: 400 });
+                    case ImageRejectReason.UnsafeSourceURL:
+                        return new Response('Unsafe source URL', { status: 400 });
+                    case ImageRejectReason.UpstreamError:
+                        // this one can happen for a lot of reasons, so we fallback to a redirect to the original image
+                        // It sometimes happen when upstream block fetch from  our server
+                        throw new Error('Upstream error, falling back to a redirect');
+                    case ImageRejectReason.UnsupportedContentType:
+                        throw new Error('Unsupported content type, falling back to a redirect');
+                    case ImageRejectReason.InternalError:
+                        throw new Error('Internal error, falling back to a redirect');
+                    default:
+                        throw new Error(
+                            `Unknown reject reason "${rejectReason}", falling back to a redirect`
+                        );
+                }
+            }
             throw new Error(`Failed to resize image, received status code ${response.status}`);
         }
         return response;
