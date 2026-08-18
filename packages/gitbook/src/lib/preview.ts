@@ -51,8 +51,21 @@ export function getPreviewCookieResponse(args: {
                     gitbookPreviewBaseURL.host + gitbookPreviewBaseURL.pathname.replace(/\/$/, '');
                 return `/url/${gitbookPreviewHostPath}/${getPreviewRequestIdentifier(siteRequestURL)}`;
             }
-            case 'url-host':
-                return siteURLData.siteBasePath;
+            case 'url-host': {
+                // The whole site preview (all variants/sections/pages) is served under the preview
+                // route prefix `<previewBasePath>/<siteId>` (e.g. `/preview/<siteId>`). Scope the
+                // cookie to that prefix, derived from the request, so it is resent on every
+                // in-preview navigation. The resolved `siteBasePath` is the site's canonical base
+                // path and does not prefix the preview route, so relying on it makes the browser
+                // drop the cookie on the next page — the actual cause of the override being lost.
+                // Mirrors getVisitorAuthBasePath, which uses the request identifier for proxy
+                // requests. Fall back to `siteBasePath` for any preview not served under the route.
+                if (!isPreviewRequest(siteRequestURL)) {
+                    return siteURLData.siteBasePath;
+                }
+                const gitbookPreviewBaseURL = new URL(GITBOOK_PREVIEW_BASE_URL);
+                return `${gitbookPreviewBaseURL.pathname.replace(/\/$/, '')}/${getPreviewRequestIdentifier(siteRequestURL)}`;
+            }
             default:
                 assertNever(mode);
         }
@@ -63,12 +76,7 @@ export function getPreviewCookieResponse(args: {
         value,
         options: {
             httpOnly: true,
-            // The preview runs in a cross-site iframe, so a Lax cookie would be withheld on
-            // in-iframe navigations and the override would be lost. Match the visitor cookies
-            // (see getResponseCookiesForVisitorAuth) with SameSite=None + Secure in production
-            // (None requires Secure); dev is same-origin so no attributes are needed.
-            sameSite: process.env.NODE_ENV === 'production' ? 'none' : undefined,
-            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
             maxAge: 10 * 60, // 10 minutes
             path,
         },
