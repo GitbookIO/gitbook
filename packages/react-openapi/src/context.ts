@@ -56,8 +56,10 @@ export interface OpenAPIClientContext {
     $$isClientContext$$: true;
 }
 
-export interface OpenAPIContext
-    extends Omit<OpenAPIClientContext, '$$isClientContext$$' | 'proxyUrl' | 'scalarRuntimeURL'> {
+export interface OpenAPIContext extends Omit<
+    OpenAPIClientContext,
+    '$$isClientContext$$' | 'proxyUrl' | 'scalarRuntimeURL'
+> {
     /**
      * Render a code block.
      */

@@ -1,6 +1,7 @@
-import type { SiteSection, SiteSpace } from '@gitbook/api';
 import assertNever from 'assert-never';
 import jsontoxml from 'jsontoxml';
+
+import type { SiteSection, SiteSpace } from '@gitbook/api';
 
 import { type GitBookSiteContext, checkIsRootSiteContext } from '@/lib/context';
 import { joinPath } from '@/lib/paths';

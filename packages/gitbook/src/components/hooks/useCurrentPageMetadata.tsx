@@ -1,7 +1,7 @@
 'use client';
-import type { PageMetaLinks } from '../SitePage';
-
 import * as zustand from 'zustand';
+
+import type { PageMetaLinks } from '../SitePage';
 
 /**
  * A store for the current page metadata.

@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'bun:test';
+
 import { getContentTestURL } from './utils';
 
 describe('llms.txt', () => {

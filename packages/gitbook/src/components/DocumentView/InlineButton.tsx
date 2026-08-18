@@ -1,15 +1,17 @@
-import { isSiteAuthLoginHref } from '@/lib/auth-login-link';
-import { resolveContentRefFallback, resolveContentRefInDocument } from '@/lib/references';
+import type React from 'react';
+
 import * as api from '@gitbook/api';
 import type { IconName } from '@gitbook/icons';
-import type React from 'react';
-import { SiteAuthLoginButton } from '../SiteAuth/SiteAuthLoginLink';
+
 import { Button, type ButtonProps } from '../primitives';
+import { SiteAuthLoginButton } from '../SiteAuth/SiteAuthLoginLink';
 import type { InlineProps } from './Inline';
 import { InlineActionButton } from './InlineActionButton';
 import { NotFoundRefHoverCard } from './NotFoundRefHoverCard';
-import { SelectActionButton } from './SelectActionButton';
 import { getSelectAction } from './selectAction';
+import { SelectActionButton } from './SelectActionButton';
+import { isSiteAuthLoginHref } from '@/lib/auth-login-link';
+import { resolveContentRefFallback, resolveContentRefInDocument } from '@/lib/references';
 
 // Editor button sizes render one step smaller here; the editor default (`large`) keeps the previous `medium`.
 const BUTTON_SIZE_MAP: Record<

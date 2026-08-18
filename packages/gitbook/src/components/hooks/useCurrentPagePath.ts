@@ -1,9 +1,9 @@
 'use client';
 
 import { useParams } from 'next/navigation';
+import { useMemo } from 'react';
 
 import { removeLeadingSlash } from '@/lib/paths';
-import { useMemo } from 'react';
 
 /**
  * Return the page of the current page being rendered.

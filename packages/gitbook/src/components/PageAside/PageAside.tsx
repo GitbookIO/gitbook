@@ -1,7 +1,5 @@
-import { getSpaceLanguage, t, tString } from '@/intl/server';
-import type { GitBookSiteContext } from '@/lib/context';
-import { getDocumentSections } from '@/lib/document-sections';
-import { tcls } from '@/lib/tailwind';
+import React from 'react';
+
 import {
     type JSONDocument,
     type RevisionPageDocument,
@@ -9,17 +7,20 @@ import {
     SiteAdsStatus,
     SiteInsightsAdPlacement,
 } from '@gitbook/api';
-import React from 'react';
-
 import { Icon } from '@gitbook/icons';
+
 import { Ad } from '../Ads';
 import { UpdatesTagFilters } from '../DocumentView/UpdatesFilter';
 import { PageFeedbackForm } from '../PageFeedback';
-import { ThemeToggler } from '../ThemeToggler';
 import { SideSheet } from '../primitives/SideSheet';
+import { ThemeToggler } from '../ThemeToggler';
 import { PageAsideCloseButton } from './PageAsideButton';
 import { ScrollSectionsList } from './ScrollSectionsList';
 import { ScrollToTopButton } from './ScrollToTopButton';
+import { getSpaceLanguage, t, tString } from '@/intl/server';
+import type { GitBookSiteContext } from '@/lib/context';
+import { getDocumentSections } from '@/lib/document-sections';
+import { tcls } from '@/lib/tailwind';
 
 /**
  * Aside listing the headings in the document.
@@ -78,18 +79,18 @@ export async function PageAside(props: {
 
                 'lg:z-10',
                 'lg:hover:z-12',
-                'layout-default:xl:not-chat-open:pr-0',
-                'layout-default:xl:not-chat-open:pl-8',
-                'layout-default:xl:not-chat-open:flex!',
-                'layout-default:xl:not-chat-open:animate-none!',
+                'layout-default:xl:chat-closed:pr-0',
+                'layout-default:xl:chat-closed:pl-8',
+                'layout-default:xl:chat-closed:flex!',
+                'layout-default:xl:chat-closed:animate-none!',
                 'layout-default:3xl:flex!',
                 'layout-default:3xl:animate-none!',
 
                 // In layout-wide mode, hide outline when viewport is too narrow
                 // or when chat is open and viewport is narrow, to prevent layout overflow
                 'layout-wide:xl:-mr-68',
-                'layout-wide:3xl:not-chat-open:flex!',
-                'layout-wide:3xl:not-chat-open:animate-none!',
+                'layout-wide:3xl:chat-closed:flex!',
+                'layout-wide:3xl:chat-closed:animate-none!',
 
                 // Show outline if page has OpenAPI block
                 // TODO: remove this in favour of a nicer, more immediately accessible solution in the future.
@@ -131,12 +132,12 @@ export async function PageAside(props: {
                         >
                             <ScrollToTopButton
                                 data-cover-aware-text
-                                className="flex cursor-pointer items-center gap-1 font-semibold text-tint text-xs uppercase leading-wider xl:page-cover-background:text-contrast-cover"
+                                className="leading-wider xl:page-cover-background:text-contrast-cover flex cursor-pointer items-center gap-1 text-xs font-semibold uppercase text-tint"
                             >
                                 <Icon icon="block-quote" className="size-3" />{' '}
                                 {t(language, 'on_this_page')}
                             </ScrollToTopButton>
-                            <PageAsideCloseButton className="layout-wide:3xl:hidden layout-default:xl:hidden page-api-block:min-[96rem]:hidden" />
+                            <PageAsideCloseButton className="page-api-block:min-[96rem]:hidden layout-default:xl:hidden layout-wide:3xl:hidden" />
                         </div>
                         <div className="flex shrink flex-col overflow-hidden">
                             {document ? (
@@ -168,10 +169,7 @@ async function PageAsideSections(props: { document: JSONDocument; context: GitBo
     ) : null;
 }
 
-function PageAsideActions(props: {
-    withPageFeedback: boolean;
-    page: RevisionPageDocument;
-}) {
+function PageAsideActions(props: { withPageFeedback: boolean; page: RevisionPageDocument }) {
     const { page, withPageFeedback } = props;
 
     return (

@@ -1,13 +1,15 @@
-import { getOpenAPISchemaAnchorId } from '@gitbook/openapi-parser';
 import clsx from 'classnames';
-import { OpenAPIExample } from '../OpenAPIExample';
-import { OpenAPIRootSchema } from '../OpenAPISchemaServer';
-import { StaticSection } from '../StaticSection';
+
+import { getOpenAPISchemaAnchorId } from '@gitbook/openapi-parser';
+
 import {
     type OpenAPIContextInput,
     getOpenAPIClientContext,
     resolveOpenAPIContext,
 } from '../context';
+import { OpenAPIExample } from '../OpenAPIExample';
+import { OpenAPIRootSchema } from '../OpenAPISchemaServer';
+import { StaticSection } from '../StaticSection';
 import { t } from '../translate';
 import { getExampleFromSchema } from '../util/example';
 import { OpenAPISchemaItem } from './OpenAPISchemaItem';

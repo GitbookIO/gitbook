@@ -1,4 +1,5 @@
 import type { OpenAPIStability } from '@gitbook/openapi-parser';
+
 import type { OpenAPIContext } from './context';
 import { t } from './translate';
 

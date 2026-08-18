@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'bun:test';
+
 import type * as api from '@gitbook/api';
+
 import { getSelectAction } from './selectAction';
 
 // The action shapes are cast because the installed @gitbook/api doesn't type the select variant yet.

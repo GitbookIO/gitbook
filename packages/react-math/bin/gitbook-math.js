@@ -16,11 +16,13 @@ async function main() {
     await fs.mkdir(outputFolder, { recursive: true });
 
     // Copy the assets
-    await Promise.all([
-        fs.cp(path.join(source, 'es5'), path.join(outputFolder, `mathjax@${packageJson.version}`), {
+    await fs.cp(
+        path.join(source, 'es5'),
+        path.join(outputFolder, `mathjax@${packageJson.version}`),
+        {
             recursive: true,
-        }),
-    ]);
+        }
+    );
 }
 
 main().catch(console.error);

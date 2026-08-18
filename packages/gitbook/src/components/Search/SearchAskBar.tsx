@@ -1,12 +1,12 @@
 'use client';
 
+import { KeyboardShortcut } from '../primitives/KeyboardShortcut';
+import { addRecentSearchQuery } from './recent-queries';
+import { SearchResultItem } from './SearchResultItem';
+import { useSearchLink } from './useSearch';
 import type { Assistant } from '@/components/AI';
 import { useCurrentContent } from '@/components/hooks';
 import { t, tString, useLanguage } from '@/intl/client';
-import { KeyboardShortcut } from '../primitives/KeyboardShortcut';
-import { SearchResultItem } from './SearchResultItem';
-import { addRecentSearchQuery } from './recent-queries';
-import { useSearchLink } from './useSearch';
 
 /**
  * Sticky single-line bar at the bottom of the search frame.
@@ -46,7 +46,7 @@ export function SearchAskBar(props: {
             action={tString(language, 'ask')}
             leadingIcon={assistant.icon}
             data-testid="search-ask-question"
-            className="gutter-stable shrink-0 overflow-y-scroll rounded-none! border-tint-subtle border-t pr-5 pl-6"
+            className="gutter-stable rounded-none! shrink-0 overflow-y-scroll border-t border-tint-subtle pl-6 pr-5"
         >
             <div className="flex items-center justify-between gap-2">
                 <div className="line-clamp-1">

@@ -1,14 +1,14 @@
-import { type RevisionPageDocument, SiteInsightsLinkPosition } from '@gitbook/api';
-import { Icon, type IconName } from '@gitbook/icons';
 import type React from 'react';
 
-import { getSpaceLanguage, t } from '@/intl/server';
-import { resolvePrevNextPages } from '@/lib/pages';
-import { tcls } from '@/lib/tailwind';
+import { type RevisionPageDocument, SiteInsightsLinkPosition } from '@gitbook/api';
+import { Icon, type IconName } from '@gitbook/icons';
 
-import type { GitBookSiteContext } from '@/lib/context';
 import { CONTENT_STYLE } from '../layout';
 import { Link, type LinkInsightsProps } from '../primitives';
+import { getSpaceLanguage, t } from '@/intl/server';
+import type { GitBookSiteContext } from '@/lib/context';
+import { resolvePrevNextPages } from '@/lib/pages';
+import { tcls } from '@/lib/tailwind';
 
 /**
  * Show cards to go to previous/next pages at the bottom.

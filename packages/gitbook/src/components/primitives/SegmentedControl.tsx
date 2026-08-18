@@ -1,5 +1,5 @@
-import { type ClassValue, tcls } from '@/lib/tailwind';
 import { Button, type ButtonProps } from './Button';
+import { type ClassValue, tcls } from '@/lib/tailwind';
 
 export function SegmentedControl(props: { children: React.ReactNode; className?: ClassValue }) {
     const { children, className } = props;

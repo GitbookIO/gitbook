@@ -1,5 +1,7 @@
-import { CustomizationDefaultThemeMode } from '@gitbook/api';
 import { headers } from 'next/headers';
+
+import { CustomizationDefaultThemeMode } from '@gitbook/api';
+
 import type { SiteURLData } from './context';
 
 export enum MiddlewareHeaders {

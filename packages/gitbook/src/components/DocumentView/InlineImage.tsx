@@ -1,12 +1,12 @@
-import type { GitBookBaseContext } from '@/lib/context';
-import type { DocumentInlineImage } from '@gitbook/api';
 import assertNever from 'assert-never';
 
-import { type ResolvedContentRef, resolveContentRefInDocument } from '@/lib/references';
-import { tcls } from '@/lib/tailwind';
+import type { DocumentInlineImage } from '@gitbook/api';
 
 import { Image } from '../utils';
 import type { InlineProps } from './Inline';
+import type { GitBookBaseContext } from '@/lib/context';
+import { type ResolvedContentRef, resolveContentRefInDocument } from '@/lib/references';
+import { tcls } from '@/lib/tailwind';
 
 export async function InlineImage(props: InlineProps<DocumentInlineImage>) {
     const { document, inline, context, ancestorInlines } = props;

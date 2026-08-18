@@ -1,13 +1,14 @@
 'use client';
 
+import * as React from 'react';
+import { z } from 'zod';
+
+import { AIToolContainer } from './common';
+import { type GetAIControlProps, createAIControl } from './helpers';
 import { Button, Input } from '@/components/primitives';
 import { ScrollContainer } from '@/components/primitives/ScrollContainer';
 import { tString, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
-import * as React from 'react';
-import { z } from 'zod';
-import { AIToolContainer } from './common';
-import { type GetAIControlProps, createAIControl } from './helpers';
 
 const OTHER_OPTION_ID = '$other';
 
@@ -81,7 +82,7 @@ function SingleChoiceControl(props: GetAIControlProps<typeof SingleChoiceControl
 
     return (
         <AIToolContainer className="flex w-full flex-col gap-2">
-            <p className="px-2 pt-1 font-semibold text-sm">{prompt}</p>
+            <p className="px-2 pt-1 text-sm font-semibold">{prompt}</p>
             <ScrollContainer orientation="vertical" contentClassName="flex flex-col gap-2">
                 {options.map((option) => {
                     const isSelected = selectedId === option.id;
@@ -119,9 +120,9 @@ function SingleChoiceControl(props: GetAIControlProps<typeof SingleChoiceControl
                                     />
                                 </span>
                                 <span className="min-w-0">
-                                    <p className="font-medium text-sm">{option.label}</p>
+                                    <p className="text-sm font-medium">{option.label}</p>
                                     {option.description ? (
-                                        <p className="mt-0.5 text-tint-subtle text-xs">
+                                        <p className="mt-0.5 text-xs text-tint-subtle">
                                             {option.description}
                                         </p>
                                     ) : null}

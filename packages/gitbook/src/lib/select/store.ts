@@ -1,5 +1,5 @@
-import { getLocalStorageItem, setLocalStorageItem } from '@/lib/browser';
 import { SELECT_LIST_CAP, SELECT_STORAGE_KEY, selectRankAttribute } from './constants';
+import { getLocalStorageItem, setLocalStorageItem } from '@/lib/browser';
 
 /**
  * The one piece of `select` state: a site-wide, recency-ordered list of active slugs

@@ -6,12 +6,13 @@ import { createPortal } from 'react-dom';
 import * as ReactJSXRuntime from 'react/jsx-runtime';
 
 import type { OpenAPIV3_1 } from '@gitbook/openapi-parser';
+
+import type { OpenAPIClientContext } from './context';
 import type {
     ScalarApiModalProps,
     ScalarModalControllerRef,
     ScalarRuntime,
 } from './ScalarApiModal';
-import type { OpenAPIClientContext } from './context';
 import { t } from './translate';
 import type { OpenAPIOperationData } from './types';
 

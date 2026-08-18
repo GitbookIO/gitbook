@@ -1,8 +1,9 @@
-import { getSpaceLanguage, tString } from '@/intl/server';
-import { defaultLanguage } from '@/intl/translations';
 import { Icon } from '@gitbook/icons';
+
 import type { DocumentContextProps } from '../DocumentView';
 import { HoverCard, HoverCardRoot, HoverCardTrigger } from '../primitives';
+import { getSpaceLanguage, tString } from '@/intl/server';
+import { defaultLanguage } from '@/intl/translations';
 
 /**
  * Hover card displayed for a link not found.

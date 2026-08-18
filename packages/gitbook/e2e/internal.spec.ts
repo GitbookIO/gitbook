@@ -1,3 +1,6 @@
+import { expect } from '@playwright/test';
+import jwt from 'jsonwebtoken';
+
 import {
     CustomizationAIMode,
     CustomizationBackground,
@@ -11,10 +14,6 @@ import {
     SiteSocialAccountPlatform,
 } from '@gitbook/api';
 import type { GitBookStandalone } from '@gitbook/embed';
-import { expect } from '@playwright/test';
-import jwt from 'jsonwebtoken';
-
-import { VISITOR_TOKEN_COOKIE } from '@/lib/visitors';
 
 import { getGitBookPreviewURL, getSiteAPIToken } from '../tests/utils';
 import {
@@ -35,8 +34,10 @@ import {
     waitForAdminToolbar,
     waitForCookiesDialog,
     waitForCoverImages,
+    waitForHydration,
     waitForNotFound,
 } from './util';
+import { VISITOR_TOKEN_COOKIE } from '@/lib/visitors';
 
 // Kept as deterministic as possible to reduce visual flakiness: no preamble, a
 // single fixed search, a concise answer, and a fixed number of follow-ups. The
@@ -133,6 +134,23 @@ const searchTestCases: Test[] = [
             await waitForCookiesDialog(page);
             await page.keyboard.press('ControlOrMeta+K');
             await expect(page.getByTestId('search-input')).toBeFocused();
+        },
+    },
+    {
+        // `fill()` bypasses key events, so it can't catch a swallowed key. RND-12484.
+        name: 'Search - AI Mode: None - Typing multi-word queries',
+        url: getCustomizationURL({
+            ai: {
+                mode: CustomizationAIMode.None,
+            },
+        }),
+        screenshot: false,
+        run: async (page) => {
+            await waitForCookiesDialog(page);
+            const searchInput = page.getByTestId('search-input');
+            await searchInput.focus();
+            await searchInput.pressSequentially('getting started');
+            await expect(searchInput).toHaveValue('getting started');
         },
     },
     {
@@ -381,6 +399,7 @@ const testCases: TestsCase[] = [
                 name: 'Customized variant titles are displayed',
                 url: '',
                 run: async (page) => {
+                    await waitForHydration(page);
                     const spaceDropdown = page
                         .locator('[data-testid="space-dropdown-button"]')
                         .locator('visible=true');
@@ -408,6 +427,7 @@ const testCases: TestsCase[] = [
                 name: 'Switch variant with alternate link in metadata',
                 url: 'rfcs',
                 run: async (page) => {
+                    await waitForHydration(page);
                     const spaceDropdown = page
                         .locator('[data-testid="space-dropdown-button"]')
                         .locator('visible=true');
@@ -446,6 +466,7 @@ const testCases: TestsCase[] = [
                 url: 'api-multi-versions/reference/api-reference/pets',
                 screenshot: false,
                 run: async (page) => {
+                    await waitForHydration(page);
                     const spaceDropdown = await page
                         .locator('[data-testid="space-dropdown-button"]')
                         .locator('visible=true');
@@ -472,6 +493,7 @@ const testCases: TestsCase[] = [
                 url: 'api-multi-versions-share-links/8tNo6MeXg7CkFMzSSz81/reference/api-reference/pets',
                 screenshot: false,
                 run: async (page) => {
+                    await waitForHydration(page);
                     const spaceDropdown = await page
                         .locator('[data-testid="space-dropdown-button"]')
                         .locator('visible=true');
@@ -513,6 +535,7 @@ const testCases: TestsCase[] = [
                     return `api-multi-versions-va/reference/api-reference/pets?jwt_token=${token}`;
                 },
                 run: async (page) => {
+                    await waitForHydration(page);
                     const spaceDropdown = await page
                         .locator('[data-testid="space-dropdown-button"]')
                         .locator('visible=true');
@@ -548,6 +571,7 @@ const testCases: TestsCase[] = [
                 url: 'ecosystem/connection-provider',
                 screenshot: false,
                 run: async (page) => {
+                    await waitForHydration(page);
                     const spaceDropdown = page
                         .locator('[data-testid="space-dropdown-button"]')
                         .locator('visible=true');
@@ -578,6 +602,7 @@ const testCases: TestsCase[] = [
                 url: 'nl/ecosysteem/connection-provider',
                 screenshot: false,
                 run: async (page) => {
+                    await waitForHydration(page);
                     const spaceDropdown = page
                         .locator('[data-testid="space-dropdown-button"]')
                         .locator('visible=true');
@@ -618,14 +643,14 @@ const testCases: TestsCase[] = [
                 url: '',
                 screenshot: false,
                 run: async (page) => {
-                    const trigger = page.getByRole('button', { name: 'Test Section Group 1' });
-                    // Radix NavigationMenu opens the dropdown on a `pointermove`. A single
-                    // synthetic hover can land before hydration and be lost, so re-hover
-                    // until the dropdown content actually appears.
-                    await expect(async () => {
-                        await trigger.hover();
-                        await expect(page.getByText('Section B')).toBeVisible({ timeout: 1000 });
-                    }).toPass({ timeout: 15000 });
+                    // The menu only opens on `mouseenter`, which cannot fire again once the pointer
+                    // is inside: a hover landing before hydration is lost for good.
+                    await waitForHydration(page);
+                    const trigger = page
+                        .locator('[data-gb-sections]')
+                        .getByRole('button', { name: 'Test Section Group 1' });
+                    await trigger.hover();
+                    await expect(page.getByText('Section B')).toBeVisible();
                     await page.getByText('Section B').click();
                     await page.waitForURL((url) => url.pathname.includes('/sections/sections-4'));
                 },
@@ -1241,8 +1266,8 @@ const testCases: TestsCase[] = [
             },
             // New site themes
             ...allThemes.flatMap((theme) => [
-                ...allTintColors.flatMap((tint) => [
-                    ...allSidebarBackgroundStyles.flatMap((sidebarStyle) => ({
+                ...allTintColors.flatMap((tint) =>
+                    allSidebarBackgroundStyles.flatMap((sidebarStyle) => ({
                         name: `Theme ${theme} - Tint ${tint.label} - Sidebar ${sidebarStyle} - Mode ${themeMode}`,
                         url: getCustomizationURL({
                             styling: {
@@ -1262,8 +1287,8 @@ const testCases: TestsCase[] = [
                             },
                         }),
                         run: waitForCookiesDialog,
-                    })),
-                ]),
+                    }))
+                ),
                 ...allSearchStyles.flatMap((searchStyle) => ({
                     name: `Theme ${theme} – Search ${searchStyle} – Mode ${themeMode}`,
                     url: getCustomizationURL({
@@ -1283,8 +1308,8 @@ const testCases: TestsCase[] = [
                 })),
             ]),
             // Deprecated header themes
-            ...allDeprecatedThemePresets.flatMap((preset) => [
-                ...allSidebarBackgroundStyles.flatMap((sidebarStyle) => ({
+            ...allDeprecatedThemePresets.flatMap((preset) =>
+                allSidebarBackgroundStyles.flatMap((sidebarStyle) => ({
                     name: `With tint - Legacy header preset ${preset} - Sidebar ${sidebarStyle} - Theme mode ${themeMode}`,
                     url: getCustomizationURL({
                         styling: {
@@ -1310,8 +1335,8 @@ const testCases: TestsCase[] = [
                         },
                     }),
                     run: waitForCookiesDialog,
-                })),
-            ]),
+                }))
+            ),
             {
                 name: `With tint - Legacy background match - Theme mode ${themeMode}`,
                 url: getCustomizationURL({
@@ -2405,7 +2430,7 @@ const testCases: TestsCase[] = [
                         actions.nth(1).click(),
                     ]);
                     // Verify the new page would have opened with the expected URL
-                    expect(newPage.url()).toContain('gitbook.com');
+                    await expect(newPage).toHaveURL(/gitbook\.com/);
                     // Close it immediately to avoid navigation
                     await newPage.close();
 
@@ -2553,7 +2578,7 @@ const testCases: TestsCase[] = [
                         openInNewTabButton.click(),
                     ]);
                     // Verify the new page would have opened with the expected URL
-                    expect(newPage.url()).toContain('gitbook.gitbook.io');
+                    await expect(newPage).toHaveURL(/gitbook\.gitbook\.io/);
                     // Close it immediately to avoid navigation
                     await newPage.close();
                 },

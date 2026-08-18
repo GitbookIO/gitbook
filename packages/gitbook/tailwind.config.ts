@@ -675,6 +675,9 @@ const config: Config = {
              */
             addVariant('navigation-open', 'body.navigation-open &');
             addVariant('chat-open', 'body:has(.ai-chat[aria-expanded="true"]) &');
+            /* Use this over `not-chat-open:`, which Tailwind emits as `&:not(body:has(…) *)` —
+               a universal subject under `:has()` invalidates the whole document on any DOM change. */
+            addVariant('chat-closed', 'body:not(:has(.ai-chat[aria-expanded="true"])) &');
             addVariant(
                 'sheet-open',
                 'html:has(.side-sheet[aria-modal="true"][aria-expanded="true"]) &, &:has(.side-sheet[aria-modal="true"][aria-expanded="true"])'
@@ -730,7 +733,7 @@ const config: Config = {
                     addVariant(variant, `html.${variant} &`);
 
                     if (category === 'tint') {
-                        /* Because we check for a class on the `html` element, like `html.$variant`, we cannot easily chain customisation variants "the Tailwind way". 
+                        /* Because we check for a class on the `html` element, like `html.$variant`, we cannot easily chain customisation variants "the Tailwind way".
                         Basically, when you write `theme-clean:tint:`, you're creating a CSS selector like `html.theme-clean html.tint &`.
                         We need the selector to apply to the same element, like `html.$variant.$otherVariant` instead.
                         Instead of relying on Tailwind variant chaining, we manually create a few additional variants for often-used combinations like theme+tint. */

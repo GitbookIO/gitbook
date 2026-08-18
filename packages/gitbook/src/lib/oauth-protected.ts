@@ -1,5 +1,7 @@
-import type { PublishedContentRedirect } from '@gitbook/api';
 import { type NextRequest, NextResponse } from 'next/server';
+
+import type { PublishedContentRedirect } from '@gitbook/api';
+
 import { GITBOOK_OAUTH_SERVER_URL, GITBOOK_URL } from './env';
 
 type OAuthProtectedResource = {

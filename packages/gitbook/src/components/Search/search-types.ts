@@ -22,7 +22,7 @@ export type ComputedPageResult = BaseComputedResult & {
     spaceId: string;
     /** Whether the page matched on its own fields or on one of its sections. */
     resultType?: 'page' | 'section';
-    breadcrumbs?: Array<{ icon?: IconName; label: string }>;
+    breadcrumbs?: { icon?: IconName; label: string }[];
     /** The highest-scoring section for this page, used as a body snippet preview. */
     bestSection?: {
         href: string;

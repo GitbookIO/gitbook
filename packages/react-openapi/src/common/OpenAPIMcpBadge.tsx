@@ -1,5 +1,5 @@
-import { OpenAPICopyButton } from '../OpenAPICopyButton';
 import { type OpenAPIContext, getOpenAPIClientContext } from '../context';
+import { OpenAPICopyButton } from '../OpenAPICopyButton';
 import { t, tString } from '../translate';
 
 export function OpenAPIMcpBadge(props: { url?: string; context: OpenAPIContext }) {

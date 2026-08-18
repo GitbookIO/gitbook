@@ -1,5 +1,5 @@
-import { OpenAPISpec } from '../OpenAPISpec';
 import { type OpenAPIContext, getOpenAPIClientContext } from '../context';
+import { OpenAPISpec } from '../OpenAPISpec';
 import { t } from '../translate';
 import type { OpenAPIOperationData, OpenAPIWebhookData } from '../types';
 import { OpenAPIOperationDescription } from './OpenAPIOperationDescription';

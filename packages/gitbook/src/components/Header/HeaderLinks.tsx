@@ -1,8 +1,7 @@
 import type React from 'react';
 
-import { type ClassValue, tcls } from '@/lib/tailwind';
-
 import styles from './headerLinks.module.css';
+import { type ClassValue, tcls } from '@/lib/tailwind';
 
 interface HeaderLinksProps {
     children: React.ReactNode;

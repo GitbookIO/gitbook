@@ -1,8 +1,8 @@
-import type { GitBookAnyContext } from '@/lib/context';
+import type { ReactNode } from 'react';
+
 import type { DocumentBlock, JSONDocument } from '@gitbook/api';
 import { getOpenAPISchemaAnchorId } from '@gitbook/openapi-parser';
 
-import type { ReactNode } from 'react';
 import { getDataOrNull } from './data';
 import { getNodeReactText } from './document';
 import { resolveOpenAPIOperationBlock } from './openapi/resolveOpenAPIOperationBlock';
@@ -10,6 +10,7 @@ import { resolveOpenAPISchemasBlock } from './openapi/resolveOpenAPISchemasBlock
 import { resolveOpenAPIWebhookBlock } from './openapi/resolveOpenAPIWebhookBlock';
 import { resolveContentRef } from './references';
 import { getRevisionTags, resolveBlockTags } from './tags';
+import type { GitBookAnyContext } from '@/lib/context';
 
 export interface DocumentSection {
     id: string;

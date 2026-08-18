@@ -1,62 +1,48 @@
 'use client';
 
+import { Collapsible as BaseCollapsible } from '@base-ui/react/collapsible';
+
 import { tcls } from '@/lib/tailwind';
-import * as RadixCollapsible from '@radix-ui/react-collapsible';
-import { useEffect, useState } from 'react';
 
 export function Collapsible(
-    props: {
+    props: Omit<BaseCollapsible.Root.Props, 'className'> & {
         children: React.ReactNode;
-    } & RadixCollapsible.CollapsibleProps
+        className?: string;
+    }
 ) {
-    const { children, open, defaultOpen, onOpenChange, className, ...rest } = props;
-
-    useEffect(() => {
-        if (open !== undefined) {
-            setOpenState(open);
-        }
-    }, [open]);
-
-    const [openState, setOpenState] = useState<boolean>(open ?? defaultOpen ?? false);
+    const { children, className, ...rest } = props;
 
     return (
-        <RadixCollapsible.Root
-            {...rest}
-            className={tcls('group/collapsible', className)}
-            open={openState}
-            onOpenChange={(nextOpen) => {
-                setOpenState(nextOpen);
-                onOpenChange?.(nextOpen);
-            }}
-        >
+        <BaseCollapsible.Root {...rest} className={tcls('group/collapsible', className)}>
             {children}
-        </RadixCollapsible.Root>
+        </BaseCollapsible.Root>
     );
 }
 
 export function CollapsibleTrigger(
-    props: {
-        children: React.ReactNode;
-    } & RadixCollapsible.CollapsibleTriggerProps
+    props: BaseCollapsible.Trigger.Props & {
+        children?: React.ReactNode;
+    }
 ) {
-    return <RadixCollapsible.Trigger {...props}>{props.children}</RadixCollapsible.Trigger>;
+    return <BaseCollapsible.Trigger {...props} />;
 }
 
 export function CollapsibleContent(
-    props: {
+    props: Omit<BaseCollapsible.Panel.Props, 'className'> & {
         children: React.ReactNode;
-    } & RadixCollapsible.CollapsibleContentProps
+        className?: string;
+    }
 ) {
     const { children, className, ...rest } = props;
     return (
-        <RadixCollapsible.Content
+        <BaseCollapsible.Panel
+            {...rest}
             className={tcls(
-                'data-[state=closed]:animate-[blurOut_300ms,heightOut_300ms] data-[state=open]:animate-[blurIn_300ms,heightIn_300ms]',
+                'data-closed:animate-[blurOut_300ms,heightOut_300ms] data-open:animate-[blurIn_300ms,heightIn_300ms]',
                 className
             )}
-            {...rest}
         >
             {children}
-        </RadixCollapsible.Content>
+        </BaseCollapsible.Panel>
     );
 }

@@ -1,24 +1,22 @@
 import { readStreamableValue } from 'ai/rsc';
+import assertNever from 'assert-never';
 import React from 'react';
-
 import { assert } from 'ts-essentials';
 
+import { useTrackEvent } from '../Insights';
 import {
     type RecommendedQuestionResult,
     createRecommendedQuestionResult,
     getEmptySearchResults,
 } from './empty-search-results';
-import type { OrderedComputedResult, SearchSiteContentScope } from './search-types';
-import { streamRecommendedQuestions } from './server-actions';
-
-import { useAI } from '@/components/AI';
-import assertNever from 'assert-never';
-import { useTrackEvent } from '../Insights';
 import { computeFilterSiteSpaceIds } from './filter';
 import { useRecentSearchQueries } from './recent-queries';
 import { type MergedPageResult, reciprocalRankFusion } from './reciprocalRankFusion';
+import type { OrderedComputedResult, SearchSiteContentScope } from './search-types';
+import { streamRecommendedQuestions } from './server-actions';
 import { type LocalPageResult, useLocalSearchResults } from './useLocalSearchResults';
 import type { SearchScope } from './useSearch';
+import { useAI } from '@/components/AI';
 
 export type ResultType =
     | OrderedComputedResult

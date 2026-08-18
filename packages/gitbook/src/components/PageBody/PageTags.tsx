@@ -1,6 +1,7 @@
-import { getRevisionTags, resolveTag } from '@/lib/tags';
 import type { Revision, RevisionPageDocument } from '@gitbook/api';
+
 import { Tag } from '../Tag';
+import { getRevisionTags, resolveTag } from '@/lib/tags';
 
 /**
  * Render the tags that were added to a page.

@@ -1,7 +1,7 @@
-import { OpenAPIPathItem } from './OpenAPIPathItem';
-import { OpenAPIPathMultipleServers } from './OpenAPIPathMultipleServers';
 import { type OpenAPIUniversalContext, getOpenAPIClientContext } from './context';
 import { formatPath } from './formatPath';
+import { OpenAPIPathItem } from './OpenAPIPathItem';
+import { OpenAPIPathMultipleServers } from './OpenAPIPathMultipleServers';
 import type { OpenAPIOperationData } from './types';
 import { getDefaultServerURL } from './util/server';
 

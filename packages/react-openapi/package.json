@@ -10,7 +10,7 @@
     "version": "1.5.15",
     "sideEffects": false,
     "dependencies": {
-        "@base-ui/react": "^1.7.0",
+        "@base-ui/react": "catalog:",
         "@gitbook/expr": "workspace:*",
         "@gitbook/openapi-parser": "workspace:*",
         "@scalar/api-client-react": "catalog:",
@@ -51,7 +51,11 @@
         "clean": "rm -rf ./dist",
         "publish-to-npm": "../../scripts/publish-if-new.sh"
     },
-    "files": ["dist", "README.md", "CHANGELOG.md"],
+    "files": [
+        "dist",
+        "README.md",
+        "CHANGELOG.md"
+    ],
     "publishConfig": {
         "access": "public",
         "registry": "https://registry.npmjs.org/"

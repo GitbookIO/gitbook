@@ -1,17 +1,18 @@
-import { LinkBox, LinkOverlay } from '@/components/primitives';
-import { Image } from '@/components/utils';
-import { type ResolvedContentRef, resolveContentRefInDocument } from '@/lib/references';
-import { tcls } from '@/lib/tailwind';
 import {
     CardsImageObjectFit,
     type ContentRef,
     type DocumentTableViewCards,
     SiteInsightsLinkPosition,
 } from '@gitbook/api';
+
 import { RecordColumnValue } from './RecordColumnValue';
-import type { TableRecordKV, TableViewProps } from './Table';
 import { RecordCardStyles } from './styles';
+import type { TableRecordKV, TableViewProps } from './Table';
 import { getRecordCardCovers } from './utils';
+import { LinkBox, LinkOverlay } from '@/components/primitives';
+import { Image } from '@/components/utils';
+import { type ResolvedContentRef, resolveContentRefInDocument } from '@/lib/references';
+import { tcls } from '@/lib/tailwind';
 
 export async function RecordCard(
     props: TableViewProps<DocumentTableViewCards> & {
