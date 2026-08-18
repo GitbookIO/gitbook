@@ -2,12 +2,11 @@
 
 import fnv1a from '@sindresorhus/fnv1a';
 
+import { AIChatIcon } from '../AIChatIcon';
 import { useAIChatController, useAIConfig } from '@/components/AI';
 import { Button } from '@/components/primitives';
 import { t, tString, useLanguage } from '@/intl/client';
 import { type ClassValue, tcls } from '@/lib/tailwind';
-
-import { AIChatIcon } from '../AIChatIcon';
 
 /**
  * A small icon button revealed in the left margin of a top-level paragraph when it is hovered (on

@@ -58,10 +58,10 @@ describe('autocomplete', () => {
         }),
     };
     const context = new SymbolsTable(symbols);
-    const SCENARIOS: Array<{
+    const SCENARIOS: {
         expressionWithCursor: string;
         expectedSuggestions: AutocompleteSuggestions;
-    }> = [
+    }[] = [
         {
             expressionWithCursor: 'visit<cur>',
             expectedSuggestions: [

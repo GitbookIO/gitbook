@@ -1,5 +1,7 @@
 'use client';
 
+import type React from 'react';
+
 import type { CustomizationThemedCodeTheme } from '@gitbook/api';
 import {
     OpenAPIOperation as BaseOpenAPIOperation,
@@ -7,7 +9,6 @@ import {
     OpenAPIWebhook as BaseOpenAPIWebhook,
     type OpenAPIContextInput,
 } from '@gitbook/react-openapi';
-import type React from 'react';
 
 import { ClientPlainCodeBlock } from '../CodeBlock/ClientPlainCodeBlock';
 import type { DocumentContext } from '../DocumentView';

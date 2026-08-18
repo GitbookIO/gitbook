@@ -1,7 +1,7 @@
 'use client';
 
-import { type ClassValue, tcls } from '@/lib/tailwind';
 import React from 'react';
+
 import { useAI } from '../AI';
 import {
     EmbeddableFrame,
@@ -17,6 +17,7 @@ import { SearchAskBar } from './SearchAskBar';
 import { SearchAskProvider, useSearchAskState } from './SearchAskContext';
 import { SearchResults, type SearchResultsRef } from './SearchResults';
 import type { ResultType } from './useSearchResults';
+import { type ClassValue, tcls } from '@/lib/tailwind';
 export function SearchFrame(props: {
     asEmbeddable?: boolean;
     askQuery: string;
@@ -150,9 +151,9 @@ export function SearchFrame(props: {
 
 const SearchFrameKeyboardHints = () => {
     return (
-        <div className="@container/keyboard-hint flex not-pointer-fine:hidden w-full items-center justify-end py-1.5">
+        <div className="not-pointer-fine:hidden flex w-full items-center justify-end py-1.5 @container/keyboard-hint">
             {/* Compact view */}
-            <div className="flex @max-[6rem]/keyboard-hint:hidden @min-[12rem]/keyboard-hint:hidden items-center gap-2">
+            <div className="@max-[6rem]/keyboard-hint:hidden @min-[12rem]/keyboard-hint:hidden flex items-center gap-2">
                 <Tooltip label="Navigate">
                     <div>
                         <KeyboardShortcut className="bg-tint-base" keys={['up', 'down']} />
@@ -166,7 +167,7 @@ const SearchFrameKeyboardHints = () => {
                 </Tooltip>
             </div>
             {/* Normal view */}
-            <div className="flex @max-[12rem]/keyboard-hint:hidden items-center gap-2">
+            <div className="@max-[12rem]/keyboard-hint:hidden flex items-center gap-2">
                 <KeyboardShortcut className="bg-tint-base" keys={['up', 'down']} />
                 Navigate
                 <KeyboardShortcut className="ml-1 bg-tint-base" keys={['esc']} />

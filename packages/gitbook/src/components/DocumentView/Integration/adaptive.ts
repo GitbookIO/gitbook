@@ -1,10 +1,11 @@
-import type { GitBookAnyContext } from '@/lib/context';
 import type {
     ContentKitDescendantElement,
     ContentKitRenderOutput,
     ContentKitRootElement,
     ContentKitStepper,
 } from '@gitbook/api';
+
+import type { GitBookAnyContext } from '@/lib/context';
 
 type ContentKitElement = ContentKitRootElement | ContentKitDescendantElement | ContentKitStepper;
 

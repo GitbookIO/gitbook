@@ -8,10 +8,10 @@ import { checkIsSecurityError } from './security-error';
  * Get all cookies.
  * @returns A map of cookie names to their values.
  */
-export function getAllBrowserCookies(): Array<{
+export function getAllBrowserCookies(): {
     name: string;
     value: string;
-}> {
+}[] {
     try {
         const all = cookies.get();
         return Object.entries(all).map(([name, value]) => ({ name, value }));

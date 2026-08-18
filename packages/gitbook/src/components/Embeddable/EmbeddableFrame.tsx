@@ -1,7 +1,8 @@
-import { type ClassValue, tcls } from '@/lib/tailwind';
 import React from 'react';
+
 import { CONTAINER_STYLE } from '../layout';
 import { Button } from '../primitives';
+import { type ClassValue, tcls } from '@/lib/tailwind';
 
 export type EmbeddableFrameProps = React.ComponentProps<'div'> & {
     children: React.ReactNode;
@@ -61,18 +62,13 @@ export function EmbeddableFrameHeader(props: {
     );
 }
 
-export function EmbeddableFrameHeaderMain(props: {
-    children: React.ReactNode;
-}) {
+export function EmbeddableFrameHeaderMain(props: { children: React.ReactNode }) {
     const { children } = props;
 
     return <div className="flex h-8 flex-1 flex-col justify-center">{children}</div>;
 }
 
-export function EmbeddableFrameBody(props: {
-    children: React.ReactNode;
-    className?: ClassValue;
-}) {
+export function EmbeddableFrameBody(props: { children: React.ReactNode; className?: ClassValue }) {
     const { children, className } = props;
 
     return (
@@ -88,22 +84,17 @@ export function EmbeddableFrameBody(props: {
     );
 }
 
-export function EmbeddableFrameTitle(props: {
-    children: React.ReactNode;
-}) {
+export function EmbeddableFrameTitle(props: { children: React.ReactNode }) {
     const { children } = props;
 
     return <div className="font-bold">{children}</div>;
 }
 
 export function EmbeddableFrameClose() {
-    return <Button iconOnly icon="x" className="absolute top-1 right-1" />;
+    return <Button iconOnly icon="x" className="absolute right-1 top-1" />;
 }
 
-export function EmbeddableFrameSubtitle(props: {
-    children: React.ReactNode;
-    className?: string;
-}) {
+export function EmbeddableFrameSubtitle(props: { children: React.ReactNode; className?: string }) {
     const { children, className } = props;
 
     return (
@@ -122,16 +113,13 @@ export function EmbeddableFrameSidebar(props: { children: React.ReactNode }) {
     const { children } = props;
 
     return (
-        <div className="flex w-15 shrink-0 origin-top not-hydrated:animate-blur-in-slow flex-col gap-2 overflow-hidden border-tint-solid/3 border-r bg-tint-solid/1 p-2 transition-all transition-discrete duration-300 empty:hidden empty:w-0 empty:px-0 motion-reduce:transition-none">
+        <div className="w-15 not-hydrated:animate-blur-in-slow transition-discrete flex shrink-0 origin-top flex-col gap-2 overflow-hidden border-r border-tint-solid/3 bg-tint-solid/1 p-2 transition-all duration-300 empty:hidden empty:w-0 empty:px-0 motion-reduce:transition-none">
             {children}
         </div>
     );
 }
 
-export function EmbeddableFrameButtons(props: {
-    className?: string;
-    children: React.ReactNode;
-}) {
+export function EmbeddableFrameButtons(props: { className?: string; children: React.ReactNode }) {
     const { children, className } = props;
 
     return <div className={tcls('flex gap-2', className)}>{children}</div>;

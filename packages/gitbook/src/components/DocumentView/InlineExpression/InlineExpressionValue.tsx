@@ -1,8 +1,9 @@
 'use client';
-import { useAdaptiveVisitor } from '@/components/Adaptive';
 import { useMemo } from 'react';
+
 import type { InlineExpressionVariables } from './types';
 import { useEvaluateInlineExpression } from './useEvaluateInlineExpression';
+import { useAdaptiveVisitor } from '@/components/Adaptive';
 
 export function InlineExpressionValue(props: {
     expression: string;

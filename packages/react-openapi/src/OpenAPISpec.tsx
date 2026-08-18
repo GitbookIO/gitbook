@@ -1,11 +1,11 @@
 import type { OpenAPI } from '@gitbook/openapi-parser';
 
+import type { OpenAPIClientContext } from './context';
 import { OpenAPIRequestBody } from './OpenAPIRequestBody';
 import { OpenAPIResponses } from './OpenAPIResponses';
 import { OpenAPISchemaProperties } from './OpenAPISchemaServer';
 import { OpenAPISecurities } from './OpenAPISecurities';
 import { StaticSection } from './StaticSection';
-import type { OpenAPIClientContext } from './context';
 import { tString } from './translate';
 import type { OpenAPIOperationData, OpenAPIWebhookData } from './types';
 import { parameterToProperty } from './utils';
@@ -71,18 +71,18 @@ export function OpenAPISpec(props: {
 function groupParameters(
     parameters: OpenAPI.Parameters,
     context: OpenAPIClientContext
-): Array<{
+): {
     key: string;
     label: string;
     parameters: OpenAPI.Parameters;
-}> {
+}[] {
     const sorted = ['path', 'query', 'header'];
 
-    const groups: Array<{
+    const groups: {
         key: string;
         label: string;
         parameters: OpenAPI.Parameters;
-    }> = [];
+    }[] = [];
 
     parameters
         .filter((parameter) => parameter.in)

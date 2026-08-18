@@ -2,8 +2,9 @@
 
 import clsx from 'classnames';
 import { useState } from 'react';
-import { OpenAPITooltip } from './OpenAPITooltip';
+
 import type { OpenAPIClientContext } from './context';
+import { OpenAPITooltip } from './OpenAPITooltip';
 import { t } from './translate';
 
 export function OpenAPICopyButton(props: {

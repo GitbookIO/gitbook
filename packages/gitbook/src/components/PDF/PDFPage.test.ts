@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'bun:test';
+
 import { RevisionPageType } from '@gitbook/api';
 
-import { createLinker } from '@/lib/links';
-
 import { createPDFLinker } from './linker';
+import { createLinker } from '@/lib/links';
 
 function createDocumentPage(id: string, path: string) {
     return {

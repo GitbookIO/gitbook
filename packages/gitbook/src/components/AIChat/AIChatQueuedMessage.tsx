@@ -1,7 +1,8 @@
+import { Icon } from '@gitbook/icons';
+
+import { Button, Tooltip } from '../primitives';
 import { t, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
-import { Icon } from '@gitbook/icons';
-import { Button, Tooltip } from '../primitives';
 
 /**
  * Shows a follow-up the visitor submitted while the assistant was still answering. It mirrors a
@@ -18,7 +19,7 @@ export function AIChatQueuedMessage(props: {
     const language = useLanguage();
 
     return (
-        <div className="flex max-w-[80%] origin-top-right animate-scale-in items-center gap-1 self-end">
+        <div className="animate-scale-in flex max-w-[80%] origin-top-right items-center gap-1 self-end">
             <Tooltip label={t(language, 'ai_chat_queued_message', assistantName)}>
                 <div
                     className={tcls(

@@ -1,8 +1,8 @@
 'use client';
 
-import { joinPath } from '@/lib/paths';
 import { useCurrentPageMetadata, useCurrentPagePath } from '../hooks';
 import { DropdownMenuItem } from '../primitives/DropdownMenu';
+import { joinPath } from '@/lib/paths';
 
 export interface VariantSpace {
     id: string;
@@ -66,10 +66,7 @@ export function SpacesDropdownMenuItem(props: {
     );
 }
 
-export function SpacesDropdownMenuItems(props: {
-    slimSpaces: VariantSpace[];
-    curPath: string;
-}) {
+export function SpacesDropdownMenuItems(props: { slimSpaces: VariantSpace[]; curPath: string }) {
     const { slimSpaces, curPath } = props;
 
     return (

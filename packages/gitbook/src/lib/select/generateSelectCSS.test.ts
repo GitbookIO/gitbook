@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'bun:test';
+
 import { generateSelectCSS, selectSetClassName } from './generateSelectCSS';
 
 // The actual show/hide behaviour of this CSS (most-recent option wins, others hidden, default

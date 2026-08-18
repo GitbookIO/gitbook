@@ -1,10 +1,12 @@
-import { tString, useLanguage } from '@/intl/client';
-import { Icon } from '@gitbook/icons';
 import React from 'react';
+
+import { Icon } from '@gitbook/icons';
+
 import { Favicon } from '../utils';
 import { HighlightQuery } from './HighlightQuery';
-import { SearchResultItem } from './SearchResultItem';
 import type { ComputedRecordResult } from './search-types';
+import { SearchResultItem } from './SearchResultItem';
+import { tString, useLanguage } from '@/intl/client';
 
 export const SearchRecordResultItem = React.forwardRef(function SearchRecordResultItem(
     props: {
@@ -45,7 +47,7 @@ export const SearchRecordResultItem = React.forwardRef(function SearchRecordResu
             style={{ ...style }}
             {...rest}
         >
-            <p className="line-clamp-2 font-semibold text-base text-tint-strong leading-snug">
+            <p className="line-clamp-2 text-base font-semibold leading-snug text-tint-strong">
                 <HighlightQuery query={query} text={item.title} />
             </p>
             {domain ? (

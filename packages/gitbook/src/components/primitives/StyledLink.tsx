@@ -1,7 +1,6 @@
-import type { ClassValue } from '@/lib/tailwind';
-
 import { Link, type LinkProps } from '../primitives/Link';
 import type { DesignTokenName } from './StyleProvider';
+import type { ClassValue } from '@/lib/tailwind';
 
 /**
  * Styled version of Link component.

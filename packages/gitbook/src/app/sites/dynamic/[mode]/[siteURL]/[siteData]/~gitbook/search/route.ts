@@ -1,3 +1,14 @@
+import { type NextRequest, NextResponse } from 'next/server';
+
+import type {
+    SearchPageResult,
+    SearchSpaceResult,
+    SiteSection,
+    SiteSectionGroup,
+    SiteSpace,
+} from '@gitbook/api';
+import type { IconName } from '@gitbook/icons';
+
 import type {
     ComputedPageResult,
     ComputedSectionResult,
@@ -10,15 +21,6 @@ import { getSiteURLDataFromMiddleware } from '@/lib/middleware';
 import { joinPathWithBaseURL } from '@/lib/paths';
 import { getServerActionBaseContext } from '@/lib/server-actions';
 import { findSiteSpaceBy, getLocalizedTitle } from '@/lib/sites';
-import type {
-    SearchPageResult,
-    SearchSpaceResult,
-    SiteSection,
-    SiteSectionGroup,
-    SiteSpace,
-} from '@gitbook/api';
-import type { IconName } from '@gitbook/icons';
-import { type NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
     const { asEmbeddable, query, scope } = (await request.json()) as SearchSiteContentRequest;

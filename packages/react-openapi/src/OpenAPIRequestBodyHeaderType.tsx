@@ -1,6 +1,7 @@
 'use client';
 
 import type { OpenAPIV3 } from '@gitbook/openapi-parser';
+
 import { useSelectState } from './OpenAPISelect';
 import { getSchemaTitle } from './utils';
 

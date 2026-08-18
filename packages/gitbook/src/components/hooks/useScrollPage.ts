@@ -1,8 +1,8 @@
 'use client';
 
+import { usePathname } from 'next/navigation';
 import React from 'react';
 
-import { usePathname } from 'next/navigation';
 import { useHash } from './useHash';
 import { usePrevious } from './usePrevious';
 

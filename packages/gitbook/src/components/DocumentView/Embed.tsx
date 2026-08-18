@@ -1,15 +1,15 @@
-import type * as gitbookAPI from '@gitbook/api';
 import Script from 'next/script';
 import ReactDOM from 'react-dom';
 
-import { Card } from '@/components/primitives';
-import { tcls } from '@/lib/tailwind';
+import type * as gitbookAPI from '@gitbook/api';
 
-import { getDataOrNull } from '@/lib/data';
 import { Image } from '../utils';
 import type { BlockProps } from './Block';
 import { Caption } from './Caption';
 import { IntegrationBlock } from './Integration';
+import { Card } from '@/components/primitives';
+import { getDataOrNull } from '@/lib/data';
+import { tcls } from '@/lib/tailwind';
 
 export async function Embed(props: BlockProps<gitbookAPI.DocumentBlockEmbed>) {
     const { block, context, ...otherProps } = props;

@@ -1,4 +1,5 @@
 import type { OpenAPIV3, OpenAPIV3_1 } from '@scalar/openapi-types';
+
 import { shouldIgnoreEntity } from './helpers/shouldIgnoreEntity';
 import type { OpenAPISchema } from './types';
 

@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'bun:test';
+
 import type { JSONDocument, Revision } from '@gitbook/api';
+
 import { getDocumentFilterableTags } from './updates';
 
 describe('getDocumentFilterableTags', () => {

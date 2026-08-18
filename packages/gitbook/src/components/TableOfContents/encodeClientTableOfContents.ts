@@ -1,11 +1,13 @@
+import assertNever from 'assert-never';
+
+import type { ContentRef, RevisionPage, RevisionPageTag, RevisionTag } from '@gitbook/api';
+
 import type { GitBookSiteContext } from '@/lib/context';
 import { getOpenAPIOperationPageProps } from '@/lib/openapi/computedSourceProps';
 import { getPagePaths, hasPageVisibleDescendant } from '@/lib/pages';
 import { resolveContentRef } from '@/lib/references';
 import { getRevisionTags, resolveTag } from '@/lib/tags';
 import { removeUndefined } from '@/lib/typescript';
-import type { ContentRef, RevisionPage, RevisionPageTag, RevisionTag } from '@gitbook/api';
-import assertNever from 'assert-never';
 
 export type ClientTOCPageLink = {
     type: 'link';

@@ -156,7 +156,7 @@ export function reciprocalRankFusion(
     localResults: LocalPageResult[],
     remoteResults: OrderedComputedResult[],
     query: string
-): Array<RRFResult> {
+): RRFResult[] {
     const localResultsByKey = new Map(localResults.map((result) => [getResultKey(result), result]));
     const pinnedRemoteResults = remoteResults.slice(0, PINNED_REMOTE_RESULTS_COUNT);
     const pinnedResultKeys = new Set(pinnedRemoteResults.map((result) => getResultKey(result)));

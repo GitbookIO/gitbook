@@ -1,4 +1,5 @@
-@import "@scalar/api-client-react/style.css";
+/* The vendor stylesheet is imported by ScalarApiModal so it ships with the lazy client chunk:
+   its `group-has-*` rules make every DOM change restyle the whole document. */
 @reference "../../RootLayout/globals.css";
 
 html,

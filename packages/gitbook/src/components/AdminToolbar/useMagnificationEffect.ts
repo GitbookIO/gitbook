@@ -26,7 +26,7 @@ const defaultConfig: Required<MagnificationConfig> = {
 };
 
 const resetMotionValues = (
-    motionValues: Array<{ scale: MotionValue<number>; x: MotionValue<number> }>
+    motionValues: { scale: MotionValue<number>; x: MotionValue<number> }[]
 ) => {
     motionValues.forEach(({ scale, x }) => {
         scale.set(1);
@@ -94,8 +94,8 @@ const calculateScale = (
 
 const calculateSpacing = (
     buttonIndex: number,
-    buttonEffects: Array<{ scale: number; translateX: number }>,
-    positions: Array<{ left: number; width: number; top: number; height: number }>,
+    buttonEffects: { scale: number; translateX: number }[],
+    positions: { left: number; width: number; top: number; height: number }[],
     config: Required<MagnificationConfig>
 ) => {
     const currentPos = positions[buttonIndex];
@@ -141,7 +141,7 @@ export function useMagnificationEffect(props: {
 }) {
     const { childrenCount, containerRef, config } = props;
     const originalPositionsRef = React.useRef<
-        Array<{ left: number; width: number; top: number; height: number }>
+        { left: number; width: number; top: number; height: number }[]
     >([]);
 
     const finalConfig = React.useMemo(() => ({ ...defaultConfig, ...config }), [config]);

@@ -61,7 +61,12 @@
     "bin": {
         "gitbook-icons": "./bin/gitbook-icons.js"
     },
-    "files": ["dist", "bin", "README.md", "CHANGELOG.md"],
+    "files": [
+        "dist",
+        "bin",
+        "README.md",
+        "CHANGELOG.md"
+    ],
     "engines": {
         "node": ">=20.0.0"
     },

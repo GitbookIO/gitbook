@@ -1,6 +1,6 @@
+import emojisRaws from 'emoji-assets/emoji.json';
 import fs from 'node:fs';
 import path from 'node:path';
-import emojisRaws from 'emoji-assets/emoji.json';
 
 interface EmojiData {
     code_points: {

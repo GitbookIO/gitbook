@@ -1,9 +1,9 @@
 import type { DocumentBlockReusableContent } from '@gitbook/api';
 
-import { getDataOrNull } from '@/lib/data';
-import { resolveContentRefInDocument } from '@/lib/references';
 import type { BlockProps } from './Block';
 import { UnwrappedBlocks } from './Blocks';
+import { getDataOrNull } from '@/lib/data';
+import { resolveContentRefInDocument } from '@/lib/references';
 
 // TODO-DEREF: Remove this once we have rolled out the new reusable content deref in the API.
 export async function ReusableContent(props: BlockProps<DocumentBlockReusableContent>) {

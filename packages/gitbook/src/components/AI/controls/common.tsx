@@ -1,5 +1,6 @@
-import { tcls } from '@/lib/tailwind';
 import type { ComponentPropsWithRef } from 'react';
+
+import { tcls } from '@/lib/tailwind';
 
 export function AIToolContainer(props: ComponentPropsWithRef<'div'>) {
     return (

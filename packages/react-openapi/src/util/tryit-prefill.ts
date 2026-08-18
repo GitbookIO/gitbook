@@ -1,6 +1,8 @@
+import type { ApiClientConfiguration } from '@scalar/types';
+
 import { ExpressionRuntime, type TemplatePart, parseTemplate } from '@gitbook/expr';
 import type { OpenAPIV3 } from '@gitbook/openapi-parser';
-import type { ApiClientConfiguration } from '@scalar/types';
+
 import type { PrefillInputContextData } from '../OpenAPIPrefillContextProvider';
 import type {
     OpenAPICustomSecurityScheme,

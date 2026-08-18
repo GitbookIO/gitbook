@@ -1,10 +1,9 @@
-import { resolveOpenAPIWebhookBlock } from '@/lib/openapi/resolveOpenAPIWebhookBlock';
-import { tcls } from '@/lib/tailwind';
-
-import type { OpenAPIWebhookBlock } from '@/lib/openapi/types';
 import type { BlockProps } from '../Block';
-import { OpenAPIBlockLazy } from './OpenAPIBlockLazy';
 import { getOpenAPIBlockClientProps } from './context';
+import { OpenAPIBlockLazy } from './OpenAPIBlockLazy';
+import { resolveOpenAPIWebhookBlock } from '@/lib/openapi/resolveOpenAPIWebhookBlock';
+import type { OpenAPIWebhookBlock } from '@/lib/openapi/types';
+import { tcls } from '@/lib/tailwind';
 
 /**
  * Render an openapi block or an openapi-webhook block.

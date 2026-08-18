@@ -1,3 +1,5 @@
+import assertNever from 'assert-never';
+
 import {
     type ContentRef,
     type ContentRefUser,
@@ -5,16 +7,7 @@ import {
     SiteInsightsLinkPosition,
 } from '@gitbook/api';
 import { Icon, IconStyle } from '@gitbook/icons';
-import assertNever from 'assert-never';
 
-import { Checkbox } from '@/components/primitives';
-import { StyledLink } from '@/components/primitives';
-import { Image } from '@/components/utils';
-import { getNodeFragmentByName } from '@/lib/document';
-import { getSimplifiedContentType } from '@/lib/files';
-import { resolveContentRefInDocument } from '@/lib/references';
-import { tcls } from '@/lib/tailwind';
-import { filterOutNullable } from '@/lib/typescript';
 import type { BlockProps } from '../Block';
 import { Blocks } from '../Blocks';
 import { FileIcon } from '../FileIcon';
@@ -26,6 +19,14 @@ import {
     isDocumentTableImageRecord,
     isStringArray,
 } from './utils';
+import { Checkbox } from '@/components/primitives';
+import { StyledLink } from '@/components/primitives';
+import { Image } from '@/components/utils';
+import { getNodeFragmentByName } from '@/lib/document';
+import { getSimplifiedContentType } from '@/lib/files';
+import { resolveContentRefInDocument } from '@/lib/references';
+import { tcls } from '@/lib/tailwind';
+import { filterOutNullable } from '@/lib/typescript';
 
 const alignmentMap: Record<'text-left' | 'text-center' | 'text-right', string> = {
     'text-left': '**:text-left text-left',
