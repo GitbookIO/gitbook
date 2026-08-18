@@ -1,3 +1,5 @@
+import assertNever from 'assert-never';
+
 import type {
     CardsImageObjectFit,
     ContentRef,
@@ -8,7 +10,6 @@ import type {
     DocumentTableRecord,
     DocumentTableViewCards,
 } from '@gitbook/api';
-import assertNever from 'assert-never';
 
 /**
  * Get the value for a column in a record.

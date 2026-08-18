@@ -1,6 +1,7 @@
-import { OpenAPIPath } from '../OpenAPIPath';
 import type { OpenAPIContext } from '../context';
+import { OpenAPIPath } from '../OpenAPIPath';
 import type { OpenAPIOperationData, OpenAPIWebhookData } from '../types';
+import { getOperationTitle } from '../utils';
 import { OpenAPIMcpBadge } from './OpenAPIMcpBadge';
 import { OpenAPIStability } from './OpenAPIStability';
 
@@ -11,17 +12,7 @@ export function OpenAPISummary(props: {
     const { data, context } = props;
     const { operation } = data;
 
-    const title = (() => {
-        if (operation.summary) {
-            return operation.summary;
-        }
-
-        if ('name' in data) {
-            return data.name;
-        }
-
-        return undefined;
-    })();
+    const title = getOperationTitle(data);
 
     return (
         <div

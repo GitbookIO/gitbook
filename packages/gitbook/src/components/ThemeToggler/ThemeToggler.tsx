@@ -1,11 +1,12 @@
 'use client';
 
-import type { IconName } from '@gitbook/icons';
 import { useTheme } from 'next-themes';
 import React from 'react';
 
-import { tString, useLanguage } from '@/intl/client';
+import type { IconName } from '@gitbook/icons';
+
 import { Button, ButtonGroup } from '../primitives';
+import { tString, useLanguage } from '@/intl/client';
 
 type ThemeMode = 'light' | 'system' | 'dark';
 

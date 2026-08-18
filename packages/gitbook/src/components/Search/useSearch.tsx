@@ -8,6 +8,7 @@ import {
     useQueryStates,
 } from 'nuqs';
 import React from 'react';
+
 import type { LinkProps } from '../primitives';
 
 export type SearchScope =
@@ -61,6 +62,12 @@ function normalizeRawState(values: Values<typeof keyMap>) {
     return values;
 }
 
+export function shouldKeepSearchState(
+    values: Pick<Values<typeof keyMap>, 'q' | 'ask' | 'scope'>
+): boolean {
+    return values.q !== null || values.ask !== null || values.scope !== 'default';
+}
+
 export function SearchContextProvider(props: React.PropsWithChildren): React.ReactElement {
     const { children } = props;
 
@@ -74,7 +81,7 @@ export function SearchContextProvider(props: React.PropsWithChildren): React.Rea
 
     const state = React.useMemo<SearchState | null>(() => {
         const normalized = normalizeRawState(rawState);
-        if (normalized.q === null && normalized.ask === null) {
+        if (!shouldKeepSearchState(normalized)) {
             return null;
         }
         return {

@@ -1,3 +1,13 @@
+import type { CustomizationDefaultThemeMode } from '@gitbook/api';
+import { SiteInsightsTrademarkPlacement } from '@gitbook/api';
+
+import { NavigationLoader } from '../primitives/NavigationLoader';
+import { SpaceLayoutServerContext } from '../SpaceLayout';
+import { Trademark } from '../TableOfContents/Trademark';
+import { EmbeddableAIContextProvider } from './EmbeddableAIContextProvider';
+import { EmbeddableIframeAPI } from './EmbeddableIframeAPI';
+import { EmbeddableThemeSync } from './EmbeddableThemeSync';
+import { IfEmbeddableTrademark } from './EmbeddableTrademark';
 import { CustomizationRootLayout } from '@/components/RootLayout';
 import {
     SiteLayoutClientContexts,
@@ -7,15 +17,6 @@ import {
 import type { VisitorAuthClaims } from '@/lib/adaptive';
 import type { GitBookSiteContext } from '@/lib/context';
 import { resolveEmbeddableTheme } from '@/lib/embeddable';
-import type { CustomizationDefaultThemeMode } from '@gitbook/api';
-import { SiteInsightsTrademarkPlacement } from '@gitbook/api';
-import { SpaceLayoutServerContext } from '../SpaceLayout';
-import { Trademark } from '../TableOfContents/Trademark';
-import { NavigationLoader } from '../primitives/NavigationLoader';
-import { EmbeddableAIContextProvider } from './EmbeddableAIContextProvider';
-import { EmbeddableIframeAPI } from './EmbeddableIframeAPI';
-import { EmbeddableThemeSync } from './EmbeddableThemeSync';
-import { IfEmbeddableTrademark } from './EmbeddableTrademark';
 
 type EmbeddableRootLayoutProps = {
     context: GitBookSiteContext;
@@ -78,7 +79,7 @@ export async function EmbeddableRootLayout({
                             {context.customization.trademark.enabled ? (
                                 <IfEmbeddableTrademark>
                                     <Trademark
-                                        className="rounded-none! border-x-0 border-t border-b-0 bg-tint-solid/1 depth-flat:bg-tint-solid/1 px-4 py-2.5 text-tint/8"
+                                        className="rounded-none! border-x-0 border-b-0 border-t bg-tint-solid/1 px-4 py-2.5 text-tint/8 depth-flat:bg-tint-solid/1"
                                         context={context}
                                         placement={SiteInsightsTrademarkPlacement.Embed}
                                     />

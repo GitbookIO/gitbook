@@ -1,12 +1,12 @@
 'use client';
 
+import { Tooltip } from '@base-ui/react/tooltip';
 import type React from 'react';
 
-import { TranslateContext } from '@/intl/client';
-import type { TranslationLanguage } from '@/intl/translations';
-import { TooltipProvider } from '@radix-ui/react-tooltip';
 import { NavigationStatusProvider, ScrollPage } from '../hooks';
 import { LoadingStateProvider } from '../primitives/LoadingStateProvider';
+import { TranslateContext } from '@/intl/client';
+import type { TranslationLanguage } from '@/intl/translations';
 
 /**
  * Client component context providers for the root layout.
@@ -19,12 +19,12 @@ export function RootLayoutClientContexts(props: {
 
     return (
         <TranslateContext.Provider value={language}>
-            <TooltipProvider delayDuration={200}>
+            <Tooltip.Provider delay={200}>
                 <NavigationStatusProvider>
                     <LoadingStateProvider>{children}</LoadingStateProvider>
                     <ScrollPage />
                 </NavigationStatusProvider>
-            </TooltipProvider>
+            </Tooltip.Provider>
         </TranslateContext.Provider>
     );
 }

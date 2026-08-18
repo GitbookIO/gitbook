@@ -1,6 +1,7 @@
+import classNames from 'classnames';
+
 import type { ContentKitDivider } from '@gitbook/api';
 
-import classNames from 'classnames';
 import type { ContentKitServerElementProps } from './types';
 
 export function ElementDivider(props: ContentKitServerElementProps<ContentKitDivider>) {

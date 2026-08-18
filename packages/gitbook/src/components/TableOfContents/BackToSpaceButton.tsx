@@ -2,11 +2,10 @@
 
 import { Icon } from '@gitbook/icons';
 
-import { t, useLanguage } from '@/intl/client';
-import { tcls } from '@/lib/tailwind';
-
 import { useBackToSpace } from '../hooks';
 import { Link } from '../primitives';
+import { t, useLanguage } from '@/intl/client';
+import { tcls } from '@/lib/tailwind';
 
 /**
  * Shortcut displayed at the top of the ToC to navigate back to the space the reader
@@ -25,7 +24,9 @@ export function BackToSpaceButton(props: { spaceId: string; spaceTitle: string }
     }
 
     return (
-        <div className="mb-2 px-2">
+        // Top margin so the shortcut, as the first element in the sidebar, isn't flush
+        // against the (rounded) filled-sidebar edge.
+        <div className="mb-2 mt-2 px-2">
             <Link
                 href={backToSpace.url}
                 className={tcls(

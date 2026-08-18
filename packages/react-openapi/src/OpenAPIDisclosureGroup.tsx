@@ -1,18 +1,11 @@
 'use client';
 
 import clsx from 'classnames';
-import { createContext, useContext, useRef } from 'react';
-import { mergeProps, useButton, useDisclosure, useFocusRing, useId } from 'react-aria';
-import type { Key } from 'react-aria';
-import {
-    type DisclosureGroupProps,
-    type DisclosureGroupState,
-    useDisclosureGroupState,
-    useDisclosureState,
-} from 'react-stately';
+import { createContext, useContext, useId } from 'react';
 import { useStore } from 'zustand';
-import { OpenAPISelect, OpenAPISelectItem, useSelectState } from './OpenAPISelect';
+
 import { getOrCreateDisclosureStoreByKey } from './getOrCreateDisclosureStoreByKey';
+import { OpenAPISelect, useSelectState } from './OpenAPISelect';
 
 interface Props {
     groups: TDisclosureGroup[];
@@ -36,7 +29,24 @@ type TDisclosureGroup = {
     }[];
 };
 
+export type Key = string | number;
+
+type DisclosureGroupState = {
+    expandedKeys: Set<Key>;
+    toggleKey: (key: Key) => void;
+    isDisabled: boolean;
+};
+
 const DisclosureGroupStateContext = createContext<DisclosureGroupState | null>(null);
+
+type DisclosureGroupProps = {
+    /** When false, expanding a group collapses the others. */
+    allowsMultipleExpanded?: boolean;
+    expandedKeys?: Iterable<Key>;
+    defaultExpandedKeys?: Iterable<Key>;
+    onExpandedChange?: (keys: Set<Key>) => void;
+    isDisabled?: boolean;
+};
 
 function useDisclosureGroupStore(stateKey = 'disclosure-group', initialKeys?: Iterable<Key>) {
     const store = useStore(getOrCreateDisclosureStoreByKey(stateKey, initialKeys));
@@ -59,23 +69,33 @@ export function OpenAPIDisclosureGroup(props: DisclosureGroupProps & Props) {
         onExpandedChange,
     } = props;
 
-    const initialKeys =
-        expandedKeys || defaultExpandedKeys
-            ? new Set(expandedKeys || defaultExpandedKeys)
-            : undefined;
+    // When `expandedKeys` is provided, the group is controlled by the parent. Otherwise it owns
+    // its expanded state in a store keyed by `stateKey`.
+    const isControlled = expandedKeys !== undefined;
+
+    const initialKeys = defaultExpandedKeys ? new Set(defaultExpandedKeys) : undefined;
     const { expandedKeys: storeExpandedKeys, setExpandedKeys } = useDisclosureGroupStore(
         stateKey,
         initialKeys
     );
 
-    const state = useDisclosureGroupState({
-        ...props,
-        expandedKeys: storeExpandedKeys,
-        onExpandedChange: (keys) => {
-            setExpandedKeys(keys);
-            onExpandedChange?.(keys);
+    const currentKeys = new Set(isControlled ? expandedKeys : storeExpandedKeys);
+    const state: DisclosureGroupState = {
+        expandedKeys: currentKeys,
+        isDisabled: props.isDisabled ?? false,
+        toggleKey: (key) => {
+            const next = new Set(props.allowsMultipleExpanded ? currentKeys : []);
+            if (currentKeys.has(key)) {
+                next.delete(key);
+            } else {
+                next.add(key);
+            }
+            if (!isControlled) {
+                setExpandedKeys(next);
+            }
+            onExpandedChange?.(next);
         },
-    });
+    };
 
     return (
         <DisclosureGroupStateContext.Provider value={state}>
@@ -106,48 +126,33 @@ function DisclosureItem(props: {
     const id = group.key || defaultId;
     const groupState = useContext(DisclosureGroupStateContext);
     const isExpanded = groupState?.expandedKeys.has(id) || false;
-    const state = useDisclosureState({
-        isExpanded,
-        onExpandedChange() {
-            if (groupState) {
-                groupState.toggleKey(id);
-            }
-        },
-    });
-
-    const panelRef = useRef<HTMLDivElement | null>(null);
-    const triggerRef = useRef<HTMLDivElement | null>(null);
     const isDisabled = groupState?.isDisabled || !group.tabs?.length || false;
-    const { buttonProps: triggerProps, panelProps } = useDisclosure(
-        {
-            ...props,
-            isExpanded,
-            isDisabled,
-        },
-        state,
-        panelRef
-    );
-    const { buttonProps } = useButton(triggerProps, triggerRef);
-    const { isFocusVisible, focusProps } = useFocusRing();
+    const panelId = `${id}-panel`;
+    const toggle = () => {
+        if (!isDisabled) {
+            groupState?.toggleKey(id);
+        }
+    };
 
     const defaultTab = group.tabs?.[0]?.key || '';
     const store = useSelectState(selectStateKey, defaultTab);
     const selectedTab = group.tabs?.find((tab) => tab.key === store.key) || group.tabs?.[0];
 
     return (
-        <div
-            className={clsx('openapi-disclosure-group', className)}
-            aria-expanded={state.isExpanded}
-        >
+        <div className={clsx('openapi-disclosure-group', className)}>
+            {/* A div, not a button: the header hosts the media-type select. */}
             <div
-                slot="trigger"
-                ref={triggerRef}
-                {...mergeProps(buttonProps, focusProps)}
+                role="button"
+                tabIndex={isDisabled ? -1 : 0}
+                aria-expanded={isExpanded}
+                aria-controls={panelId}
                 aria-disabled={isDisabled}
-                style={{
-                    outline: isFocusVisible
-                        ? '2px solid rgb(var(--primary-color-500)/0.4)'
-                        : 'none',
+                onClick={toggle}
+                onKeyDown={(event) => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                        event.preventDefault();
+                        toggle();
+                    }
                 }}
                 className="openapi-disclosure-group-trigger"
             >
@@ -172,16 +177,14 @@ function DisclosureItem(props: {
                                     icon={selectIcon}
                                     stateKey={selectStateKey}
                                     onChange={() => {
-                                        state.expand();
+                                        if (!isExpanded) {
+                                            groupState?.toggleKey(id);
+                                        }
                                     }}
                                     items={group.tabs}
                                     placement="bottom end"
                                 >
-                                    {group.tabs.map((tab) => (
-                                        <OpenAPISelectItem key={tab.key} id={tab.key} value={tab}>
-                                            {tab.label}
-                                        </OpenAPISelectItem>
-                                    ))}
+                                    {(tab) => tab.label}
                                 </OpenAPISelect>
                             ) : group.tabs[0]?.label ? (
                                 <span>{group.tabs[0].label}</span>
@@ -191,8 +194,8 @@ function DisclosureItem(props: {
                 </div>
             </div>
 
-            {state.isExpanded && selectedTab && (
-                <div className="openapi-disclosure-group-panel" ref={panelRef} {...panelProps}>
+            {isExpanded && selectedTab && (
+                <div className="openapi-disclosure-group-panel" id={panelId}>
                     {selectedTab.body}
                 </div>
             )}

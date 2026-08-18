@@ -1,15 +1,18 @@
-import { tString, useLanguage } from '@/intl/client';
-import { tcls } from '@/lib/tailwind';
-import { Icon, type IconName } from '@gitbook/icons';
 import React from 'react';
+
+import { Icon, type IconName } from '@gitbook/icons';
+
 import { SkeletonParagraph } from '../primitives';
 import { Tooltip } from '../primitives';
 import { Emoji } from '../primitives/Emoji/Emoji';
+import { getPageResultHref } from './getPageResultHref';
 import { HighlightQuery } from './HighlightQuery';
-import { SearchResultItem } from './SearchResultItem';
 import type { MergedPageResult } from './reciprocalRankFusion';
 import type { ComputedPageResult } from './search-types';
+import { SearchResultItem } from './SearchResultItem';
 import type { LocalPageResult } from './useLocalSearchResults';
+import { tString, useLanguage } from '@/intl/client';
+import { tcls } from '@/lib/tailwind';
 
 type PageItem = ComputedPageResult | LocalPageResult | MergedPageResult;
 
@@ -26,9 +29,7 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
     const language = useLanguage();
 
     const bestSection = item.type === 'page' ? item.bestSection : undefined;
-    // When the section snippet is displayed, link to the section anchor so the
-    // link matches what the user sees.
-    const href = bestSection?.body ? bestSection.href : 'href' in item ? item.href : item.pathname;
+    const href = item.type === 'page' ? getPageResultHref(item) : item.pathname;
 
     const emoji = 'emoji' in item ? item.emoji : undefined;
     const icon = 'icon' in item ? item.icon : undefined;
@@ -71,7 +72,7 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
             {...rest}
         >
             <Breadcrumbs breadcrumbs={item.breadcrumbs} />
-            <p className="line-clamp-1 font-semibold text-base text-tint-strong leading-snug">
+            <p className="line-clamp-1 text-base font-semibold leading-snug text-tint-strong">
                 <HighlightQuery query={query} text={item.title} />
             </p>
             <div
@@ -85,7 +86,7 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
             >
                 {bestSection?.body ? (
                     <p
-                        className="absolute inset-0 line-clamp-1 origin-left animate-blur-in text-sm"
+                        className="animate-blur-in absolute inset-0 line-clamp-1 origin-left text-sm"
                         style={{ animationDelay: style?.animationDelay }}
                     >
                         <HighlightQuery
@@ -125,10 +126,7 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
     );
 });
 
-const Breadcrumbs = (props: {
-    breadcrumbs: PageItem['breadcrumbs'];
-    withOverflow?: boolean;
-}) => {
+const Breadcrumbs = (props: { breadcrumbs: PageItem['breadcrumbs']; withOverflow?: boolean }) => {
     const { breadcrumbs, withOverflow = (breadcrumbs?.length ?? 0) > 4 } = props;
 
     if (!breadcrumbs || breadcrumbs.length === 0) return null;
@@ -179,7 +177,7 @@ const Breadcrumbs = (props: {
                   <Tooltip
                       key="breadcrumbs-overflow"
                       label={formatCrumbs(crumbs.slice(3, -1))}
-                      rootProps={{ delayDuration: 0 }}
+                      delay={0}
                       arrow
                   >
                       <span>

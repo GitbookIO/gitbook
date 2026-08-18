@@ -34,7 +34,7 @@ export function interpolateServerURL(server: OpenAPIV3.ServerObject) {
 
 function parseServerURL(url: string) {
     const parts = url.split(/{([^}]+)}/g);
-    const result: Array<{ kind: 'variable'; name: string } | { kind: 'text'; text: string }> = [];
+    const result: ({ kind: 'variable'; name: string } | { kind: 'text'; text: string })[] = [];
     for (let i = 0; i < parts.length; i++) {
         const part = parts[i];
         if (!part) {

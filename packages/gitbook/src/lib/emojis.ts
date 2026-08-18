@@ -9,8 +9,10 @@ export function getEmojiForCode(code: string): string {
     }
 
     code = code.toLowerCase();
-    const fullCode = emojiCodepoints[code] ?? code;
 
+    const fullCode =
+        // use hasOwn to prevent codes like "constructor" or "prototype" from being resolved to the emoji codepoints object prototype
+        (Object.hasOwn(emojiCodepoints, code) ? emojiCodepoints[code] : undefined) ?? code;
     const codePoints = fullCode.split('-').map((elt) => Number.parseInt(elt, 16));
 
     try {

@@ -1,3 +1,5 @@
+import { headers } from 'next/headers';
+
 import { type RouteLayoutParams, getSiteURLDataFromParams } from '@/app/utils';
 import {
     EmbeddableRootLayout,
@@ -6,7 +8,6 @@ import {
 } from '@/components/Embeddable';
 import { getEmbeddableStaticContext } from '@/lib/embeddable';
 import { shouldTrackEvents } from '@/lib/tracking';
-import { headers } from 'next/headers';
 
 interface SiteStaticLayoutProps {
     params: Promise<RouteLayoutParams>;

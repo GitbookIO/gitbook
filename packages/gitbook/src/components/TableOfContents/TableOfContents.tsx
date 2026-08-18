@@ -1,16 +1,17 @@
-import type { GitBookSiteContext } from '@/lib/context';
-import { SiteInsightsTrademarkPlacement } from '@gitbook/api';
 import type React from 'react';
 
-import { getSiteStructureTitle } from '@/lib/sites';
-import { tcls } from '@/lib/tailwind';
+import { SiteInsightsTrademarkPlacement } from '@gitbook/api';
+
 import { ScrollContainer } from '../primitives/ScrollContainer';
 import { SideSheet } from '../primitives/SideSheet';
 import { BackToSpaceButton } from './BackToSpaceButton';
+import { encodeClientTableOfContents } from './encodeClientTableOfContents';
 import { PagesList } from './PagesList';
 import { TableOfContentsScript } from './TableOfContentsScript';
 import { Trademark } from './Trademark';
-import { encodeClientTableOfContents } from './encodeClientTableOfContents';
+import type { GitBookSiteContext } from '@/lib/context';
+import { getSiteStructureTitle } from '@/lib/sites';
+import { tcls } from '@/lib/tailwind';
 
 /**
  * Sidebar container, responsible for setting the right dimensions and position for the sidebar.
@@ -143,7 +144,7 @@ export async function TableOfContents(props: {
                         <PagesList
                             pages={pages}
                             isRoot={true}
-                            style="page-no-toc:hidden grow border-tint-subtle sidebar-list-line:border-l"
+                            style="grow border-tint-subtle sidebar-list-line:border-l page-no-toc:hidden"
                         />
                     </ScrollContainer>
                     {withTrademark && customization.trademark.enabled ? (

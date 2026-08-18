@@ -132,6 +132,14 @@ export const GITBOOK_ICONS_TOKEN = process.env.GITBOOK_ICONS_TOKEN;
  */
 export const GITBOOK_SECRET = process.env.GITBOOK_SECRET ?? null;
 
+/**
+ * Shared secret used to sign server-to-server requests to the sites OAuth server consent endpoints.
+ * This must match the sites OAuth provider signing secret (`functionsConfig.sitesOAuth.signingSecret`
+ * in gitbook-x); it is a dedicated secret and must not be confused with `GITBOOK_SECRET`.
+ */
+export const GITBOOK_SITE_OAUTH_SIGNING_SECRET =
+    process.env.GITBOOK_SITE_OAUTH_SIGNING_SECRET ?? null;
+
 function enforceEnum<T extends string>(key: string, value: string, enumValues: T[]): T {
     if (!enumValues.includes(value as T)) {
         throw new Error(

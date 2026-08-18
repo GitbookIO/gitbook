@@ -1,12 +1,11 @@
 import type { DocumentTableViewGrid } from '@gitbook/api';
 
-import { tcls } from '@/lib/tailwind';
-
+import { getColumnWidth } from './layout';
 import { RecordColumnValue } from './RecordColumnValue';
 import type { TableRecordKV, TableViewProps } from './Table';
 import { TableSearchRecord } from './TableSearch';
-import { getColumnWidth } from './layout';
 import { getColumnVerticalAlignment } from './utils';
+import { tcls } from '@/lib/tailwind';
 
 export function RecordRow(
     props: TableViewProps<DocumentTableViewGrid> & {

@@ -1,7 +1,6 @@
 'use client';
-import { type ClassValue, tcls } from '@/lib/tailwind';
-
 import { LoadingPane } from './LoadingPane';
+import { type ClassValue, tcls } from '@/lib/tailwind';
 
 /**
  * Placeholder to be used when a content is not yet loaded (in a React.Suspense boundary).

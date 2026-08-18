@@ -1,16 +1,18 @@
 'use client';
 
-import type { GitBookEmbeddableConfiguration, ParentToFrameMessage } from '@gitbook/embed';
-import React, { useEffect, useRef } from 'react';
-
-import { useAI, useAIChatController } from '@/components/AI';
-import { isAIChatEnabled } from '@/components/utils/isAIChatEnabled';
-import { tString, useLanguage } from '@/intl/client';
 import { useRouter } from 'next/navigation';
+import React, { useEffect, useRef } from 'react';
 import { createStore, useStore } from 'zustand';
+
+import type { GitBookEmbeddableConfiguration, ParentToFrameMessage } from '@gitbook/embed';
+
 import { integrationsAssistantTools } from '../Integrations';
 import { Button, LinkContext, type LinkContextType } from '../primitives';
 import { getChannel } from './channel';
+import { resolveEmbedPageLink } from './server-actions';
+import { useAI, useAIChatController } from '@/components/AI';
+import { isAIChatEnabled } from '@/components/utils/isAIChatEnabled';
+import { tString, useLanguage } from '@/intl/client';
 
 const embeddableConfiguration = createStore<GitBookEmbeddableConfiguration>(() => ({
     tabs: [],
@@ -21,18 +23,16 @@ const embeddableConfiguration = createStore<GitBookEmbeddableConfiguration>(() =
     trademark: true,
 }));
 
-// biome-ignore lint/suspicious/noExplicitAny: expected
+// oxlint-disable-next-line typescript/no-explicit-any
 function log(...data: any[]) {
-    // biome-ignore lint/suspicious/noConsole: expected
+    // oxlint-disable-next-line no-console
     console.log(...data);
 }
 
 /**
  * Expose the API to communicate with the parent window.
  */
-export function EmbeddableIframeAPI(props: {
-    baseURL: string;
-}) {
+export function EmbeddableIframeAPI(props: { baseURL: string }) {
     const { baseURL } = props;
 
     const router = useRouter();
@@ -44,9 +44,14 @@ export function EmbeddableIframeAPI(props: {
         refs.current = { router, chatController, baseURL };
     });
 
+    // Bumped on every navigation so an in-flight (async) `navigateToPage` can tell it has
+    // been superseded by a later command and skip its now-stale `router.push`.
+    const navToken = useRef(0);
+
     React.useEffect(() => {
         return chatController.on('open', () => {
             const { baseURL, router } = refs.current;
+            navToken.current++;
             router.push(`${baseURL}/assistant`);
         });
     }, [chatController]);
@@ -69,6 +74,9 @@ export function EmbeddableIframeAPI(props: {
                     break;
                 }
                 case 'postUserMessage': {
+                    // The answer renders in the assistant, so bring it up if another tab is showing.
+                    navToken.current++;
+                    router.push(`${baseURL}/assistant`);
                     chatController.postMessage({
                         message: message.message,
                     });
@@ -82,10 +90,26 @@ export function EmbeddableIframeAPI(props: {
                     break;
                 }
                 case 'navigateToPage': {
-                    router.push(`${baseURL}/page/${message.pagePath}`);
+                    // Resolve the target server-side: on a multi-space site the page may
+                    // live in another space/section, whose base must go before
+                    // `~gitbook/embed/page`. Fall back to a same-space push on failure.
+                    const { pagePath } = message;
+                    const token = ++navToken.current;
+                    // Ignore the result if a later navigation has since superseded this one.
+                    const push = (href: string) => {
+                        if (navToken.current === token) {
+                            router.push(href);
+                        }
+                    };
+                    resolveEmbedPageLink(pagePath)
+                        .then((resolved) =>
+                            push('href' in resolved ? resolved.href : `${baseURL}/page/${pagePath}`)
+                        )
+                        .catch(() => push(`${baseURL}/page/${pagePath}`));
                     break;
                 }
                 case 'navigateToAssistant': {
+                    navToken.current++;
                     router.push(`${baseURL}/assistant`);
                     break;
                 }
@@ -142,7 +166,7 @@ export function EmbeddableIframeButtons() {
     return (
         <>
             {actions.length > 0 && (
-                <hr className="my-2 border-0 border-tint-subtle border-b first:hidden" />
+                <hr className="my-2 border-0 border-b border-tint-subtle first:hidden" />
             )}
             {actions.map((action, index) => (
                 <Button
@@ -158,11 +182,7 @@ export function EmbeddableIframeButtons() {
                     onClick={() => {
                         action.onClick?.();
                     }}
-                    tooltipProps={{
-                        contentProps: {
-                            side: 'right',
-                        },
-                    }}
+                    tooltipProps={{ side: 'right' }}
                     style={{ animationDelay: `${index * 100}ms` }}
                 />
             ))}
@@ -175,8 +195,9 @@ export function EmbeddableIframeTabs(props: {
     active?: string;
     baseURL: string;
     siteTitle: string;
+    onNavigate?: (href: string) => void;
 }) {
-    const { ref, active = 'assistant', baseURL, siteTitle } = props;
+    const { ref, active = 'assistant', baseURL, siteTitle, onNavigate } = props;
     const actions = useEmbeddableConfiguration((state) => state.actions);
     const tabs = useEmbeddableTabs();
 
@@ -239,20 +260,21 @@ export function EmbeddableIframeTabs(props: {
                     className="not-hydrated:animate-blur-in-slow [&_.button-leading-icon]:size-5"
                     iconOnly
                     onClick={() => {
+                        if (tab.key !== active && onNavigate) {
+                            onNavigate(tab.href);
+                            return;
+                        }
                         router.push(tab.href);
                     }}
-                    tooltipProps={{
-                        contentProps: {
-                            side: 'right',
-                        },
-                    }}
+                    tooltipProps={{ side: 'right' }}
                 />
             ))}
         </div>
     ) : null;
 }
 
-export function EmbeddableIframeCloseButton() {
+export function EmbeddableIframeCloseButton(props: { onClose?: () => void }) {
+    const { onClose } = props;
     const { closeButton } = useEmbeddableConfiguration();
 
     if (!closeButton) {
@@ -269,13 +291,10 @@ export function EmbeddableIframeCloseButton() {
                 className="not-hydrated:animate-blur-in-slow [&_.button-leading-icon]:size-5"
                 iconOnly
                 onClick={() => {
+                    onClose?.();
                     getChannel()?.send({ type: 'close' });
                 }}
-                tooltipProps={{
-                    contentProps: {
-                        side: 'right',
-                    },
-                }}
+                tooltipProps={{ side: 'right' }}
             />
         </div>
     );

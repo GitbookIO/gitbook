@@ -1,10 +1,10 @@
-/* eslint-disable @next/next/no-img-element */
-import type { ImageResizer } from '@/lib/images';
 import ReactDOM from 'react-dom';
 
-import { type ClassValue, tcls } from '@/lib/tailwind';
-import { ZoomImage } from './ZoomImage';
 import type { PolymorphicComponentProp } from './types';
+import { ZoomImage } from './ZoomImage';
+/* eslint-disable @next/next/no-img-element */
+import type { ImageResizer } from '@/lib/images';
+import { type ClassValue, tcls } from '@/lib/tailwind';
 
 export type ImageSize = { width: number; height: number };
 

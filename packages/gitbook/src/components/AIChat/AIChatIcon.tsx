@@ -1,5 +1,6 @@
-import { Icon, IconStyle } from '@gitbook/icons';
 import type React from 'react';
+
+import { Icon, IconStyle } from '@gitbook/icons';
 
 interface AIChatIconProps extends React.SVGProps<SVGSVGElement> {
     className?: string;

@@ -1,21 +1,20 @@
 'use client';
 
+import assertNever from 'assert-never';
+import * as React from 'react';
 import * as zustand from 'zustand';
 
-import { useCurrentContent } from '@/components/hooks';
-import { useLanguage } from '@/intl/client';
-import { tString } from '@/intl/translate';
 import {
     AIMessageRole,
     AIMessageStepPhase,
     type AIStreamResponse,
     type AIStreamResponseToolCallPending,
     type AIToolCallResult,
+    SiteInsightsDisplayContext,
 } from '@gitbook/api';
-import assertNever from 'assert-never';
-import * as React from 'react';
+
 import { getInsightsSession, useTrackEvent } from '../Insights';
-import { useSetSearchState } from '../Search';
+import { type UpdateSearchState, useSetSearchState } from '../Search';
 import { addRecentSearchQuery } from '../Search/recent-queries';
 import type { AnyAIControl } from './controls';
 import { ConfirmControlDef, ConfirmControlOutputSchema } from './controls/ConfirmControl';
@@ -24,6 +23,16 @@ import { type RenderAIMessageOptions, streamAIChatResponse } from './server-acti
 import { getTools } from './tools';
 import { useAIMessageContextRef } from './useAIMessageContext';
 import { useNavigateToPageTool } from './useNavigateToPageTool';
+import {
+    type ResponseToRate,
+    useSubmitAssistantFeedbackTool,
+} from './useSubmitAssistantFeedbackTool';
+import { useSubmitPageFeedbackTool } from './useSubmitPageFeedbackTool';
+import { useCurrentContent } from '@/components/hooks';
+import { useLanguage } from '@/intl/client';
+import { tString } from '@/intl/translate';
+
+const noopSetSearchState: UpdateSearchState = () => Promise.resolve(new URLSearchParams());
 
 export type AIChatMessage = {
     role: AIMessageRole;
@@ -123,6 +132,14 @@ export type AIChatState = {
      * this value (seeding its editable content) and then clears it back to an empty string.
      */
     draft: string;
+
+    /**
+     * Follow-ups the visitor submitted while a previous turn was still streaming. They are held
+     * here and sent automatically, one at a time in submission order, as each answer finishes
+     * (see the flush in `streamResponse`), so submitting mid-stream isn't lost. Empty when
+     * nothing is queued.
+     */
+    queuedMessages: string[];
 };
 
 export type AIChatEvent =
@@ -158,6 +175,8 @@ export type AIChatController = {
     focus: () => void;
     /** Pre-fill the chat input with draft text, without sending it. */
     setDraft: (draft: string) => void;
+    /** Remove a follow-up queued to send after the current answer finishes, by its queue index. */
+    cancelQueuedMessage: (index: number) => void;
     /** Register an event listener */
     on: <T extends AIChatEvent['type']>(
         event: T,
@@ -182,6 +201,7 @@ const globalState = zustand.create<AIChatState>(() => {
         initialQuery: null,
         references: [],
         draft: '',
+        queuedMessages: [],
     };
 });
 
@@ -209,19 +229,52 @@ function notify(
  */
 export function AIChatProvider(props: {
     renderMessageOptions?: RenderAIMessageOptions;
+    /** Whether page feedback is enabled for the site (gates the submit-feedback tool). */
+    withPageFeedback?: boolean;
     children: React.ReactNode;
 }) {
-    const { renderMessageOptions, children } = props;
+    const { renderMessageOptions, withPageFeedback = false, children } = props;
 
     const messageContextRef = useAIMessageContextRef();
     const trackEvent = useTrackEvent();
-    const setSearchState = useSetSearchState();
+    const setSearchStateInURL = useSetSearchState();
     const { siteSpaceId } = useCurrentContent();
     const language = useLanguage();
 
-    // Built-in tools exposed to the assistant (e.g. navigating to a page). The tool has a stable
-    // identity, so it can be referenced directly from the streaming callback.
+    const displayContext = renderMessageOptions?.asEmbeddable
+        ? SiteInsightsDisplayContext.Embed
+        : SiteInsightsDisplayContext.Site;
+
+    // The embed keeps its state in its own routes, not in URL search params.
+    const setSearchState = renderMessageOptions?.asEmbeddable
+        ? noopSetSearchState
+        : setSearchStateInURL;
+
+    // The assistant response the user is reacting to. Snapshotted when a new user turn begins
+    // (before it overwrites the store's responseId/query), so the self-feedback tool rates that
+    // previous response rather than the one this reaction turn produces.
+    const responseToRateRef = React.useRef<ResponseToRate>({ responseId: null, query: null });
+    const getResponseToRate = React.useCallback(() => responseToRateRef.current, []);
+
+    // Built-in tools exposed to the assistant (e.g. navigating to a page, submitting page or
+    // assistant feedback). Each tool has a stable identity, so it can be referenced directly from
+    // the streaming callback.
     const navigateToPageTool = useNavigateToPageTool();
+    const submitPageFeedbackTool = useSubmitPageFeedbackTool({ displayContext });
+    const submitAssistantFeedbackTool = useSubmitAssistantFeedbackTool({
+        displayContext,
+        getResponseToRate,
+    });
+
+    // The assistant-feedback tool is always available (it mirrors the chat's own thumbs up/down
+    // rating), while the page-feedback tool is gated on the site's "Was this helpful?" setting.
+    const builtInTools = React.useMemo(() => {
+        const tools = [navigateToPageTool, submitAssistantFeedbackTool];
+        if (withPageFeedback) {
+            tools.push(submitPageFeedbackTool);
+        }
+        return tools;
+    }, [navigateToPageTool, submitAssistantFeedbackTool, submitPageFeedbackTool, withPageFeedback]);
 
     // Event listeners storage
     const eventsRef = React.useRef<Map<AIChatEvent['type'], AIChatEventListener[]>>(new Map());
@@ -256,6 +309,9 @@ export function AIChatProvider(props: {
 
         notify(eventsRef.current.get('close'), {});
     }, [setSearchState]);
+
+    // Lets `streamResponse` flush a queued follow-up via `onPostMessage`, which is defined later.
+    const postMessageRef = React.useRef<((input: { message: string }) => void) | null>(null);
 
     // Stream a message with the AI backend
     const streamResponse = React.useCallback(
@@ -298,7 +354,7 @@ export function AIChatProvider(props: {
 
             // Execute a tool call
             const executeToolCall = async (event: AIStreamResponseToolCallPending) => {
-                const tools = getTools([navigateToPageTool]);
+                const tools = getTools(builtInTools);
                 const toolDef = tools.find((tool) => tool.name === event.toolCall.tool);
 
                 if (!toolDef || !('execute' in toolDef)) {
@@ -334,7 +390,7 @@ export function AIChatProvider(props: {
 
             let toolToExecute: AIStreamResponseToolCallPending | null = null;
             try {
-                const tools = getTools([navigateToPageTool]);
+                const tools = getTools(builtInTools);
                 const stream = await streamAIChatResponse({
                     message: input.message,
                     toolCall: input.toolCall,
@@ -420,6 +476,18 @@ export function AIChatProvider(props: {
 
                             const confirmation = 'confirmation' in toolDef && toolDef.confirmation;
                             if (confirmation) {
+                                // The confirmation can be a static object or a function that
+                                // derives it from the AI-provided input (e.g. dynamic context).
+                                // The function call is awaited because, for embed-registered
+                                // tools, it arrives as an async proxy over the postMessage channel.
+                                const resolvedConfirmation =
+                                    typeof confirmation === 'function'
+                                        ? await confirmation(event.toolCall.input)
+                                        : confirmation;
+                                const supportingContext =
+                                    typeof resolvedConfirmation.context === 'string'
+                                        ? resolvedConfirmation.context.slice(0, 512)
+                                        : undefined;
                                 globalState.setState((state) => ({
                                     ...state,
                                     control: ConfirmControlDef.createControl({
@@ -428,8 +496,9 @@ export function AIChatProvider(props: {
                                             toolCallId: event.toolCallId,
                                         },
                                         input: {
-                                            label: confirmation.label,
-                                            icon: confirmation.icon,
+                                            label: resolvedConfirmation.label,
+                                            icon: resolvedConfirmation.icon,
+                                            context: supportingContext,
                                         },
                                         language,
                                         send: async (result) => {
@@ -448,7 +517,7 @@ export function AIChatProvider(props: {
                                                                 text: tString(
                                                                     language,
                                                                     'tool_call_skipped',
-                                                                    confirmation.label
+                                                                    resolvedConfirmation.label
                                                                 ),
                                                             },
                                                         },
@@ -512,6 +581,15 @@ export function AIChatProvider(props: {
                         loading: false,
                         error: false,
                     }));
+
+                    // Turn settled: send the next queued follow-up (oldest first). Held back while a
+                    // control is pending, since posting would throw; it flushes after that resolves.
+                    const { queuedMessages, control: activeControl } = globalState.getState();
+                    const [next, ...rest] = queuedMessages;
+                    if (next !== undefined && !activeControl) {
+                        globalState.setState((state) => ({ ...state, queuedMessages: rest }));
+                        postMessageRef.current?.({ message: next });
+                    }
                 }
             } catch (error) {
                 console.error('Error streaming AI response', error);
@@ -532,21 +610,23 @@ export function AIChatProvider(props: {
             renderMessageOptions?.withToolCalls,
             renderMessageOptions?.asEmbeddable,
             language,
-            navigateToPageTool,
+            builtInTools,
         ]
     );
 
     // Post a message to the AI chat
     const onPostMessage = React.useCallback(
         async (input: { message: string }) => {
-            const { query, messages, control, references, responding } = globalState.getState();
+            const { query, messages, control, references, responding, opened } =
+                globalState.getState();
 
-            if (control) {
-                throw new Error("We can't post a message when a control is active");
-            }
-
-            // Ignore duplicates while a previous turn is still streaming
-            if (responding) {
+            // Still streaming, or waiting on a control (e.g. a tool confirmation): queue this
+            // follow-up instead of dropping it (flushed in order in `streamResponse`).
+            if (responding || control) {
+                globalState.setState((state) => ({
+                    ...state,
+                    queuedMessages: [...state.queuedMessages, input.message],
+                }));
                 return;
             }
 
@@ -568,14 +648,20 @@ export function AIChatProvider(props: {
 
             notify(eventsRef.current.get('postMessage'), { message: input.message });
 
-            if (query === input.message && references.length === 0) {
-                // Return early if the message is the same as the previous message
-                // (unless new references are staged, which change the payload)
+            if (query === input.message && references.length === 0 && !opened) {
                 globalState.setState((state) => ({
                     ...state,
                     opened: true,
                 }));
                 return;
+            }
+
+            // Snapshot the response the user is reacting to before this turn overwrites the store's
+            // query/responseId, so the self-feedback tool rates the previous answer. `query` and
+            // `responseId` here still describe the last completed turn.
+            const { responseId: previousResponseId } = globalState.getState();
+            if (previousResponseId) {
+                responseToRateRef.current = { responseId: previousResponseId, query };
             }
 
             trackEvent({ type: 'ask_question', query: input.message });
@@ -607,8 +693,24 @@ export function AIChatProvider(props: {
         [setSearchState, siteSpaceId, trackEvent, streamResponse]
     );
 
+    // Keep the ref current so `streamResponse` can flush a queued follow-up via the latest callback.
+    postMessageRef.current = onPostMessage;
+
+    // Remove a follow-up queued while the assistant is still answering (the × on the affordance).
+    const onCancelQueuedMessage = React.useCallback((index: number) => {
+        globalState.setState((state) =>
+            index < 0 || index >= state.queuedMessages.length
+                ? state
+                : {
+                      ...state,
+                      queuedMessages: state.queuedMessages.filter((_, i) => i !== index),
+                  }
+        );
+    }, []);
+
     // Clear the conversation and reset ask parameter
     const onClear = React.useCallback(() => {
+        responseToRateRef.current = { responseId: null, query: null };
         globalState.setState((state) => ({
             opened: state.opened,
             responding: false,
@@ -621,6 +723,7 @@ export function AIChatProvider(props: {
             error: false,
             initialQuery: null,
             references: [],
+            queuedMessages: [],
         }));
 
         // Reset ask parameter to empty string (keeps chat open but clears content)
@@ -704,6 +807,7 @@ export function AIChatProvider(props: {
             clearReferences: onClearReferences,
             focus: onFocus,
             setDraft: onSetDraft,
+            cancelQueuedMessage: onCancelQueuedMessage,
             on: onEvent,
         };
     }, [
@@ -716,6 +820,7 @@ export function AIChatProvider(props: {
         onClearReferences,
         onFocus,
         onSetDraft,
+        onCancelQueuedMessage,
         onEvent,
     ]);
 
@@ -787,10 +892,20 @@ function updateAIChatMessageActivity(
             return {
                 ...activity,
                 currentPhase: event.phase,
-                hasCommentary:
-                    activity.hasCommentary || event.phase === AIMessageStepPhase.Commentary,
                 hasFinalAnswer:
                     activity.hasFinalAnswer || event.phase === AIMessageStepPhase.FinalAnswer,
+            };
+        }
+        case 'response_document': {
+            // A commentary phase can start without ever producing anything visible. Only a
+            // commentary step that emits document content is a real preamble worth collapsing
+            // behind the activity heading, so flag it here rather than on phase start.
+            return {
+                ...activity,
+                hasCommentary:
+                    activity.hasCommentary ||
+                    (activity.currentPhase === AIMessageStepPhase.Commentary &&
+                        event.blocks.length > 0),
             };
         }
         case 'response_tool_call': {

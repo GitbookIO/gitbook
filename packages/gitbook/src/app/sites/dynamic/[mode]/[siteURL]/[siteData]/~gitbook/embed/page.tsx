@@ -1,7 +1,8 @@
+import { redirect } from 'next/navigation';
+
 import { type RouteLayoutParams, getSiteURLDataFromParams } from '@/app/utils';
 import { isAIChatEnabled } from '@/components/utils/isAIChatEnabled';
 import { getEmbeddableDynamicContext } from '@/lib/embeddable';
-import { redirect } from 'next/navigation';
 
 type PageProps = {
     params: Promise<RouteLayoutParams>;

@@ -1,11 +1,9 @@
-import type { GitBookSiteContext } from '@/lib/context';
-
-import { Image } from '@/components/utils';
-import { tcls } from '@/lib/tailwind';
-
-import { resolveContentRef } from '@/lib/references';
 import { Link } from '../primitives';
 import { CurrentContentIcon } from './CurrentContentIcon';
+import { Image } from '@/components/utils';
+import type { GitBookSiteContext } from '@/lib/context';
+import { resolveContentRef } from '@/lib/references';
+import { tcls } from '@/lib/tailwind';
 
 interface HeaderLogoProps {
     context: GitBookSiteContext;

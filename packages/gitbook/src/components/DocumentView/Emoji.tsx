@@ -1,8 +1,7 @@
 import type { DocumentInlineEmoji } from '@gitbook/api';
 
-import { Emoji as EmojiPrimitive } from '@/components/primitives';
-
 import type { InlineProps } from './Inline';
+import { Emoji as EmojiPrimitive } from '@/components/primitives';
 
 export function Emoji(props: InlineProps<DocumentInlineEmoji>) {
     const { inline } = props;

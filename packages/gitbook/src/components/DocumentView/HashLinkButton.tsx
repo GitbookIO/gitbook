@@ -1,8 +1,9 @@
-import { type ClassValue, tcls } from '@/lib/tailwind';
 import type { DocumentBlockHeading, DocumentBlockTabs } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
+
 import { Link } from '../primitives';
 import { getBlockTextStyle } from './spacing';
+import { type ClassValue, tcls } from '@/lib/tailwind';
 
 /**
  * A hash icon which adds the block or active block item's ID in the URL hash.
@@ -19,29 +20,38 @@ export function HashLinkButton(props: {
 }) {
     const { id, block, className, iconClassName, label } = props;
     const textStyle = getBlockTextStyle(block);
+
     return (
-        <div
+        <span
             className={tcls(
                 'relative',
                 'hash',
-                'grid',
+                'inline-grid',
                 'grid-area-1-1',
-                'h-[1em]',
+                'pointer-fine:h-[1em]',
                 'border-0',
                 'opacity-0',
+                'pointer-events-none',
                 'site-background',
                 'rounded',
-                'group-hover/hash:opacity-[0]',
-                'group-focus/hash:opacity-[0]',
-                'md:group-hover/hash:opacity-[1]',
-                'md:group-focus/hash:opacity-[1]',
+                'transition-opacity',
+                'pointer-fine:pointer-events-auto',
+                'pointer-fine:group-hover/hash:opacity-100',
+                'pointer-fine:group-focus-within/hash:opacity-100',
+                '[.hash-revealed_&]:opacity-100',
+                '[.hash-revealed_&]:pointer-events-auto',
                 className
             )}
         >
             <Link
                 href={`#${id}`}
                 aria-label={label}
-                className={tcls('inline-flex h-full items-start', textStyle.lineHeight)}
+                className={tcls(
+                    'inline-flex items-center',
+                    'p-1',
+                    'pointer-fine:h-full pointer-fine:p-0',
+                    textStyle.lineHeight
+                )}
             >
                 <Icon
                     icon="hashtag"
@@ -50,12 +60,16 @@ export function HashLinkButton(props: {
                         'self-center',
                         'transition-colors',
                         'text-transparent',
-                        'group-hover/hash:text-tint-subtle',
-                        'contrast-more:group-hover/hash:text-tint-strong',
+                        'pointer-fine:group-hover/hash:text-tint-subtle',
+                        'contrast-more:pointer-fine:group-hover/hash:text-tint-strong',
+                        'pointer-fine:group-focus-within/hash:text-tint-subtle',
+                        'contrast-more:pointer-fine:group-focus-within/hash:text-tint-strong',
+                        '[.hash-revealed_&]:text-tint-subtle',
+                        'contrast-more:[.hash-revealed_&]:text-tint-strong',
                         iconClassName
                     )}
                 />
             </Link>
-        </div>
+        </span>
     );
 }

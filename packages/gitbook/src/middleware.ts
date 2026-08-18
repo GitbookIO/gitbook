@@ -1,3 +1,11 @@
+import { isAIAgent } from '@vercel/agent-readability';
+import Negotiator from 'negotiator';
+import { cookies } from 'next/headers';
+import type { NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
+import rison from 'rison';
+import { getDomain } from 'tldts';
+
 import {
     CustomizationDefaultThemeMode,
     CustomizationThemeMode,
@@ -6,12 +14,17 @@ import {
     type SiteInsightsEventLocation,
     SiteInsightsLLMSVariant,
 } from '@gitbook/api';
-import { isAIAgent } from '@vercel/agent-readability';
-import { cookies } from 'next/headers';
-import type { NextRequest } from 'next/server';
-import { NextResponse } from 'next/server';
-import rison from 'rison';
 
+import {
+    type ServerInsightsEventInput,
+    serveProxyAnalyticsEvent,
+    trackServerInsightsEvents,
+} from './lib/tracking';
+import {
+    MAX_API_TOKEN_COOKIE_LENGTH,
+    getAPITokenFromCookies,
+    getAPITokenResponseCookies,
+} from '@/lib/api-token-cookie';
 import type { SiteURLData } from '@/lib/context';
 import { getContentSecurityPolicy } from '@/lib/csp';
 import { validateSerializedCustomization } from '@/lib/customization';
@@ -22,13 +35,14 @@ import {
     normalizeRequestURL,
     throwIfDataError,
 } from '@/lib/data';
-import { GITBOOK_OAUTH_SERVER_URL, isGitBookAssetsHostURL, isGitBookHostURL } from '@/lib/env';
+import { isGitBookAssetsHostURL, isGitBookHostURL } from '@/lib/env';
 import { getImageResizingContextId } from '@/lib/images';
+import { isAITrainingOrIndexingRequest } from '@/lib/indexing-crawlers';
 import { MiddlewareHeaders } from '@/lib/middleware';
 import {
     createOAuthProtectedResourceMetadataResponse,
     handleUnauthedOAuthProtectedResourceRequest,
-    isOAuthProtectedResourceMetadataRequest,
+    isOAuthProtectedResourceMetadataRequestForAuthEndpoint,
     isOAuthProtectedResourceRequest,
 } from '@/lib/oauth-protected';
 import { removeLeadingSlash, removeTrailingSlash } from '@/lib/paths';
@@ -42,18 +56,12 @@ import {
     getPathScopedCookieName,
     getResponseCookiesForVisitorAuth,
     getVisitorData,
+    getVisitorType,
     normalizeVisitorURL,
     serveVisitorClaimsDataRequest,
 } from '@/lib/visitors';
 import { waitUntil } from '@/lib/waitUntil';
 import { serveResizedImage } from '@/routes/image';
-import Negotiator from 'negotiator';
-import { getDomain } from 'tldts';
-import {
-    type ServerInsightsEventInput,
-    serveProxyAnalyticsEvent,
-    trackServerInsightsEvents,
-} from './lib/tracking';
 export const config = {
     matcher: [
         '/((?!_next/static|_next/image|~gitbook/static|~gitbook/revalidate|~gitbook/monitoring|~scalar/proxy).*)',
@@ -147,6 +155,13 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
 
     const { url: siteRequestURL, mode } = match;
 
+    if (isAITrainingOrIndexingRequest(request)) {
+        return new Response('This endpoint is not intended for AI training or indexing.', {
+            status: 403,
+            headers: { 'content-type': 'text/plain; charset=utf-8' },
+        });
+    }
+
     // Normalize URL after extracting the URL from the request to make sure the client is redirected to the proper one
     const normalizationResponse = normalizeRequestURL(siteRequestURL);
     if (normalizationResponse) {
@@ -186,21 +201,6 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         return serveVisitorClaimsDataRequest(request, siteRequestURL);
     }
 
-    // Handler that forwards redirections from upstream auth provider during a site's OAuth /authorize session
-    // back to the site's OAuth server.
-    const oauthServerURL = new URL(GITBOOK_OAUTH_SERVER_URL);
-    const siteOAuthAuthorizeMatch = new URLPattern({
-        pathname: `*/~gitbook/${oauthServerURL.pathname.substring(1)}/:siteId/authorize`,
-    }).exec(siteRequestURL.toString());
-
-    if (siteOAuthAuthorizeMatch) {
-        const siteId = siteOAuthAuthorizeMatch.pathname.groups.siteId;
-        const siteOAuthAuthorizeURL = new URL(oauthServerURL);
-        siteOAuthAuthorizeURL.pathname += `/${siteId}/authorize`;
-        siteOAuthAuthorizeURL.search = siteOAuthAuthorizeMatch.search.input.replace('?', '');
-        return NextResponse.redirect(siteOAuthAuthorizeURL.toString());
-    }
-
     //
     // Detect and extract the visitor authentication token from the request
     //
@@ -222,6 +222,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
                 visitorPayload: {
                     jwtToken: visitorToken?.token ?? undefined,
                     unsignedClaims,
+                    type: getVisitorType(request),
                 },
                 // When the visitor auth token is pulled from the cookie, set redirectOnError when calling resolvePublishedContentByUrl to allow
                 // redirecting when the token is invalid as we could be dealing with stale token stored in the cookie.
@@ -274,7 +275,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
                           },
                       })
                     : NextResponse.redirect(url);
-            // biome-ignore lint/suspicious/noConsole: we want to log the redirect
+            // oxlint-disable-next-line no-console
             console.log('redirect', siteURLData.redirect);
             if (siteURLData.target === 'content') {
                 let contentRedirect = new URL(siteURLData.redirect, request.url);
@@ -300,8 +301,10 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         }
 
         // Handles OAuth protected resource metadata for non-VA adaptive content sites.
-        // If the requested URL resolved directly to a site, synthesize the metadata response immediately.
-        if (isOAuthProtectedResourceMetadataRequest(siteRequestURL)) {
+        // Only the `~gitbook/mcp/auth` endpoint advertises auth here; the base `~gitbook/mcp`
+        // endpoint stays public so clients doing proactive PRM discovery don't start an OAuth
+        // flow against an endpoint that never issues a challenge.
+        if (isOAuthProtectedResourceMetadataRequestForAuthEndpoint(siteRequestURL)) {
             return createOAuthProtectedResourceMetadataResponse({
                 siteRequestURL,
                 siteId: siteURLData.site,
@@ -336,11 +339,16 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         // Make sure the URL is clean of any va token after a successful lookup,
         // and of any visitor.* params that may have been passed to the URL.
         //
+        // We only redirect if the visitor token is not coming from a revalidation request, as we don't want to redirect in that case.
+        //
         // The token and the visitor.* params value are stored in cookies that are set
         // on the redirect response.
         //
         const normalizedVisitorURL = normalizeVisitorURL(incomingURL);
-        if (normalizedVisitorURL.toString() !== incomingURL.toString()) {
+        if (
+            normalizedVisitorURL.toString() !== incomingURL.toString() &&
+            visitorToken?.source !== 'revalidation'
+        ) {
             return writeResponseCookies(
                 NextResponse.redirect(normalizedVisitorURL.toString()),
                 cookies
@@ -541,6 +549,11 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         response.headers.set('x-gitbook-route-type', routeType);
         response.headers.set('x-gitbook-route-site', siteURLWithoutProtocol);
 
+        // noindex search/assistant deep links, kept crawlable so Google sees the directive.
+        if (rewrittenURL.searchParams.has('ask') || rewrittenURL.searchParams.has('q')) {
+            response.headers.set('x-robots-tag', 'noindex');
+        }
+
         // Allow cross-origin requests from the same parent domain as the site.
         const allowedOrigin = getAllowedCORSOrigin(request, siteCanonicalURL);
         if (allowedOrigin) {
@@ -559,6 +572,21 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         // Vercel already set this header, this is needed in OpenNext.
         if (siteURLData.contextId && !siteRequestURL.pathname.endsWith('~gitbook/site-index')) {
             response.headers.set('cache-control', 'public, max-age=0, must-revalidate');
+        }
+
+        // The sites OAuth consent screen carries a security decision: lock it down so it can't be
+        // framed, cached, or leak the client's redirect URI via the Referer header.
+        if (pathname.match(/^~gitbook\/oauth2\/v1\/[^/]+\/authorize$/)) {
+            response.headers.set(
+                'content-security-policy',
+                getContentSecurityPolicy().replace(
+                    /frame-ancestors[^;]*;/,
+                    "frame-ancestors 'none';"
+                )
+            );
+            response.headers.set('x-frame-options', 'DENY');
+            response.headers.set('referrer-policy', 'no-referrer');
+            response.headers.set('cache-control', 'no-store');
         }
 
         return writeResponseCookies(response, cookies);
@@ -641,22 +669,31 @@ async function serveWithQueryAPIToken(input: {
     // If found, we redirect to the same URL but with the token in the cookie
     const queryAPIToken = requestURL.searchParams.get('token');
     if (queryAPIToken) {
+        if (queryAPIToken.length > MAX_API_TOKEN_COOKIE_LENGTH) {
+            return new Response('API token is too large', {
+                status: 400,
+                headers: { 'content-type': 'text/plain' },
+            });
+        }
+
         requestURL.searchParams.delete('token');
-        return writeResponseCookies(NextResponse.redirect(requestURL.toString()), [
-            {
-                name: cookieName,
-                value: queryAPIToken,
+        return writeResponseCookies(
+            NextResponse.redirect(requestURL.toString()),
+            getAPITokenResponseCookies({
+                cookies: requestCookies.getAll(),
+                cookieName,
+                apiToken: queryAPIToken,
                 options: {
                     httpOnly: true,
                     sameSite: process.env.NODE_ENV === 'production' ? 'none' : undefined,
                     secure: process.env.NODE_ENV === 'production',
                     maxAge: 60 * 60, // 1 hour
                 },
-            },
-        ]);
+            })
+        );
     }
 
-    const apiToken = requestCookies.get(cookieName)?.value;
+    const apiToken = getAPITokenFromCookies(requestCookies.getAll(), cookieName);
 
     return serve(apiToken ?? null);
 }
@@ -751,6 +788,11 @@ function encodePathInSiteContent(
         return { pathname };
     }
 
+    // The sites OAuth consent screen is rendered dynamically per request (client details, visitor).
+    if (pathname.match(/^~gitbook\/oauth2\/v1\/[^/]+\/authorize$/)) {
+        return { pathname, routeType: 'dynamic' };
+    }
+
     // If the pathname is a RSS feed (/.../rss.xml), we rewrite it to ~gitbook/rss/:pathname
     const rssMatch = pathname.match(RSS_PATH_REGEX);
     if (rssMatch) {
@@ -834,7 +876,6 @@ function encodePathInSiteContent(
         case '~gitbook/search':
         case '~gitbook/auth/login':
         case '~gitbook/auth/logout':
-        case '~scalar/proxy':
             // PDF, search and auth routes are always dynamic as they depend on the request.
             return { pathname, routeType: 'dynamic' };
         default: {

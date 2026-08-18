@@ -1,26 +1,28 @@
 'use client';
 
-import type { CustomizationThemedCodeTheme, DocumentBlockCode } from '@gitbook/api';
 import { useEffect, useId, useMemo, useRef, useState } from 'react';
+import { useDebounceCallback } from 'usehooks-ts';
 
+import type { CustomizationThemedCodeTheme, DocumentBlockCode } from '@gitbook/api';
+
+import type { BlockProps } from '../Block';
+import { type InlineExpressionVariables, useEvaluateInlineExpression } from '../InlineExpression';
+import { CodeBlockRenderer } from './CodeBlockRenderer';
+import type { HighlightTheme, RenderedInline } from './highlight-tokens';
+import { plainHighlight } from './plain-highlight';
 import { useAdaptiveVisitor } from '@/components/Adaptive';
 import { useInViewportListener } from '@/components/hooks/useInViewportListener';
 import { useScrollListener } from '@/components/hooks/useScrollListener';
 import { Button, ToggleChevron } from '@/components/primitives';
 import { t, useLanguage } from '@/intl/client';
 import { type ClassValue, tcls } from '@/lib/tailwind';
-import { useDebounceCallback } from 'usehooks-ts';
-import type { BlockProps } from '../Block';
-import { type InlineExpressionVariables, useEvaluateInlineExpression } from '../InlineExpression';
-import { CodeBlockRenderer } from './CodeBlockRenderer';
-import type { HighlightTheme, RenderedInline } from './highlight';
-import { plainHighlight } from './plain-highlight';
 
 export type ClientBlockProps = Pick<BlockProps<DocumentBlockCode>, 'block' | 'style'> & {
     inlines: RenderedInline[];
     inlineExprVariables: InlineExpressionVariables;
     mode: BlockProps<DocumentBlockCode>['context']['mode'];
     themes?: CustomizationThemedCodeTheme;
+    embedded?: boolean;
 };
 
 export const CODE_BLOCK_DEFAULT_COLLAPSED_LINE_COUNT = 10;
@@ -30,7 +32,7 @@ export const CODE_BLOCK_DEFAULT_COLLAPSED_LINE_COUNT = 10;
  * It allows us to defer some load to avoid blocking the rendering of the whole page with block highlighting.
  */
 export function ClientCodeBlock(props: ClientBlockProps) {
-    const { block, mode, style, inlines, inlineExprVariables, themes } = props;
+    const { block, mode, style, inlines, inlineExprVariables, themes, embedded } = props;
     const blockRef = useRef<HTMLDivElement>(null);
     const isInViewportRef = useRef(false);
     const [isInViewport, setIsInViewport] = useState(false);
@@ -142,6 +144,7 @@ export function ClientCodeBlock(props: ClientBlockProps) {
             theme={theme ?? plainTheme}
             id={codeBlockBodyId}
             isPrint={mode === 'print'}
+            embedded={embedded}
         />
     );
 
@@ -197,7 +200,7 @@ function CodeBlockExpandable(props: {
                     variant="secondary"
                     type="button"
                     onClick={() => setIsExpanded(!isExpanded)}
-                    className="pointer-events-auto z-1 my-2 bg-tint! text-primary text-sm opacity-0 focus:opacity-11 group-hover/codeblock-expandable:opacity-11"
+                    className="z-1 bg-tint! pointer-events-auto my-2 text-sm text-primary opacity-0 focus:opacity-11 group-hover/codeblock-expandable:opacity-11"
                     aria-expanded={isExpanded}
                     aria-controls={controls}
                 >

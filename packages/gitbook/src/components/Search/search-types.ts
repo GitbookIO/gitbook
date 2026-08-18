@@ -20,7 +20,9 @@ export type ComputedPageResult = BaseComputedResult & {
     type: 'page';
     pageId: string;
     spaceId: string;
-    breadcrumbs?: Array<{ icon?: IconName; label: string }>;
+    /** Whether the page matched on its own fields or on one of its sections. */
+    resultType?: 'page' | 'section';
+    breadcrumbs?: { icon?: IconName; label: string }[];
     /** The highest-scoring section for this page, used as a body snippet preview. */
     bestSection?: {
         href: string;
@@ -37,7 +39,12 @@ export type ComputedRecordResult = BaseComputedResult & {
 
 export type SearchSiteContentScope =
     | { mode: 'all' }
-    | { mode: 'current'; siteSpaceId: string }
+    | {
+          mode: 'current';
+          siteSpaceId: string;
+          /** Restrict the search to the current site space alone, or to the other site spaces in the scope. */
+          restrictTo?: 'currentSiteSpace' | 'otherSiteSpaces';
+      }
     | { mode: 'specific'; siteSpaceIds: string[] };
 
 export interface SearchSiteContentRequest {

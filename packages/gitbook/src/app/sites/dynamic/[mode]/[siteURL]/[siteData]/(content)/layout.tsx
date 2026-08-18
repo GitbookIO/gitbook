@@ -1,3 +1,5 @@
+import { headers } from 'next/headers';
+
 import { type RouteLayoutParams, getDynamicSiteContext } from '@/app/utils';
 import { CustomizationRootLayout } from '@/components/RootLayout';
 import {
@@ -7,7 +9,6 @@ import {
 } from '@/components/SiteLayout';
 import { getThemeFromMiddleware } from '@/lib/middleware';
 import { shouldTrackEvents } from '@/lib/tracking';
-import { headers } from 'next/headers';
 
 interface SiteDynamicLayoutProps {
     params: Promise<RouteLayoutParams>;

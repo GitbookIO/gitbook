@@ -1,5 +1,5 @@
-import { withTrailingSlash } from '@/lib/paths';
 import { isExternalLink } from '../utils/link';
+import { withTrailingSlash } from '@/lib/paths';
 
 /**
  * Resolve a link into a same-site target to navigate to.

@@ -1,8 +1,10 @@
-import { tcls } from '@/lib/tailwind';
-import { type DocumentBlockColumns, type Length, VerticalAlignment } from '@gitbook/api';
 import React from 'react';
+
+import { type DocumentBlockColumns, type Length, VerticalAlignment } from '@gitbook/api';
+
 import type { BlockProps } from '../Block';
 import { Blocks } from '../Blocks';
+import { tcls } from '@/lib/tailwind';
 
 export function Columns(props: BlockProps<DocumentBlockColumns>) {
     const { block, style, ancestorBlocks, document, context } = props;
@@ -36,7 +38,7 @@ export function Columns(props: BlockProps<DocumentBlockColumns>) {
     return (
         <div
             className={tcls(
-                'grid w-full grid-cols-1 gap-x-8 gap-y-4 md:grid-flow-col md:grid-cols-[repeat(var(--grid-slices),minmax(0,1fr))] md:grid-rows-1',
+                'grid w-full @2xl:grid-flow-col @2xl:grid-cols-[repeat(var(--grid-slices),minmax(0,1fr))] grid-cols-1 @2xl:grid-rows-1 gap-x-8 gap-y-4',
                 style
             )}
             style={{ '--grid-slices': COLUMN_DIVISIONS } as React.CSSProperties}
@@ -102,7 +104,7 @@ export function transformLengthToCSS(length: Length) {
     }
     if (length.unit === '%') {
         return {
-            className: 'md:flex-shrink-0 md:[grid-column:var(--grid-col)]',
+            className: '@2xl:flex-shrink-0 @2xl:[grid-column:var(--grid-col)]',
             style: {
                 '--grid-col': `auto / span ${Math.round(length.value * 0.01 * COLUMN_DIVISIONS)}`,
             } as React.CSSProperties,

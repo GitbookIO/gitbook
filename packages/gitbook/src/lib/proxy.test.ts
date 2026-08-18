@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'bun:test';
+
 import { getProxyRequestIdentifier, isProxyRequest, isProxyRootRequest } from './proxy';
 
 describe('isProxyRequest', () => {

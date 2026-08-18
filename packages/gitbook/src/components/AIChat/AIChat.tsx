@@ -1,11 +1,10 @@
 'use client';
 
-import { t, tString, useLanguage } from '@/intl/client';
-import type { TranslationLanguage } from '@/intl/translations';
-import { tcls } from '@/lib/tailwind';
-import { Icon } from '@gitbook/icons';
 import React from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
+
+import { Icon } from '@gitbook/icons';
+
 import {
     type AIChatController,
     type AIChatState,
@@ -24,8 +23,8 @@ import {
     EmbeddableFrameSubtitle,
     EmbeddableFrameTitle,
 } from '../Embeddable/EmbeddableFrame';
-import { useTrackEvent } from '../Insights';
 import { useNow } from '../hooks';
+import { useTrackEvent } from '../Insights';
 import { Button } from '../primitives';
 import { ScrollContainer } from '../primitives/ScrollContainer';
 import { SideSheet } from '../primitives/SideSheet';
@@ -35,8 +34,12 @@ import { AIChatExpandButton } from './AIChatExpandButton';
 import { AIChatIcon } from './AIChatIcon';
 import { AIChatInput } from './AIChatInput';
 import { AIChatMessages } from './AIChatMessages';
+import { AIChatQueuedMessage } from './AIChatQueuedMessage';
 import { AIChatResizeHandle } from './AIChatResizeHandle';
 import AIChatSuggestedQuestions from './AIChatSuggestedQuestions';
+import { t, tString, useLanguage } from '@/intl/client';
+import type { TranslationLanguage } from '@/intl/translations';
+import { tcls } from '@/lib/tailwind';
 
 export function AIChat() {
     const { config } = useAI();
@@ -91,7 +94,7 @@ export function AIChat() {
             )}
         >
             <AIChatResizeHandle />
-            <EmbeddableFrame className="relative w-full shrink-0 border-tint-subtle border-l to-tint-base">
+            <EmbeddableFrame className="relative w-full shrink-0 border-l border-tint-subtle to-tint-base">
                 <EmbeddableFrameMain data-testid="ai-chat" aria-busy={chat.loading}>
                     <EmbeddableFrameHeader className="not-embed:px-4">
                         <AIChatDynamicIcon trademark={config.trademark} />
@@ -119,6 +122,8 @@ export function AIChat() {
                             chat={chat}
                             suggestions={config.suggestions}
                             trademark={config.trademark}
+                            assistantName={config.assistantName}
+                            greeting={config.greeting}
                         />
                     </EmbeddableFrameBody>
                 </EmbeddableFrameMain>
@@ -130,10 +135,7 @@ export function AIChat() {
 /**
  * Dynamic icon to indicate the AI chat state.
  */
-export function AIChatDynamicIcon(props: {
-    trademark: boolean;
-    className?: string;
-}) {
+export function AIChatDynamicIcon(props: { trademark: boolean; className?: string }) {
     const { trademark, className } = props;
     const chat = useAIChatState();
     const status = getAIChatStatus(chat);
@@ -150,9 +152,7 @@ export function AIChatDynamicIcon(props: {
 /**
  * Subtitle of the AI chat window.
  */
-export function AIChatSubtitle(props: {
-    chat: AIChatState;
-}) {
+export function AIChatSubtitle(props: { chat: AIChatState }) {
     const { chat } = props;
     const language = useLanguage();
     const status = getAIChatStatus(chat);
@@ -207,14 +207,17 @@ export function AIChatBody(props: {
     welcomeMessage?: string;
     suggestions?: string[];
     trademark?: boolean;
+    /** Custom assistant name override; falls back to the branded/unbranded default name. */
+    assistantName?: string;
     greeting?: {
-        title: string;
+        title?: string;
         subtitle: string;
     };
 }) {
-    const { chatController, chat, suggestions, greeting, trademark } = props;
+    const { chatController, chat, suggestions, greeting, trademark, assistantName } = props;
 
     const language = useLanguage();
+    const resolvedAssistantName = assistantName ?? getAIChatName(language, trademark ?? true);
     const now = useNow(60 * 60 * 1000); // Refresh every hour for greeting
 
     const isEmpty = !chat.messages.length;
@@ -230,7 +233,7 @@ export function AIChatBody(props: {
     return (
         <>
             <ScrollContainer
-                className="min-h-[20%] max-w-full shrink grow animate-fade-in-slow [container-type:size]"
+                className="animate-fade-in-slow min-h-[20%] max-w-full shrink grow [container-type:size]"
                 contentClassName="py-4 gutter-stable flex flex-col gap-4 not-embed:px-4 [scroll-behavior:smooth]"
                 orientation="vertical"
                 trailing={{ fade: false, button: true }}
@@ -240,7 +243,7 @@ export function AIChatBody(props: {
                     <div className="flex grow flex-col">
                         <div className="my-auto flex flex-row items-center gap-4 pb-6 [@container(min-height:400px)]:flex-col">
                             <div
-                                className="flex size-16 shrink-0 animate-scale-in items-center justify-center rounded-full bg-primary-solid/1 [@container(min-height:400px)]:size-32"
+                                className="animate-scale-in flex size-16 shrink-0 items-center justify-center rounded-full bg-primary-solid/1 [@container(min-height:400px)]:size-32"
                                 style={{ animationDelay: '.3s' }}
                             >
                                 <AIChatIcon
@@ -251,14 +254,14 @@ export function AIChatBody(props: {
                             </div>
                             <div className="flex flex-col items-start gap-1 [@container(min-height:400px)]:items-center">
                                 <h5
-                                    className="animate-blur-in-slow font-bold text-lg text-tint-strong leading-tight [@container(min-height:400px)]:text-center"
+                                    className="animate-blur-in-slow text-lg font-bold leading-tight text-tint-strong [@container(min-height:400px)]:text-center"
                                     style={{ animationDelay: '.5s' }}
                                     data-testid="ai-chat-greeting-title"
                                 >
                                     {greeting?.title || timeGreeting}
                                 </h5>
                                 <p
-                                    className="animate-blur-in-slow text-tint leading-tight [@container(min-height:400px)]:text-center"
+                                    className="animate-blur-in-slow leading-tight text-tint [@container(min-height:400px)]:text-center"
                                     style={{ animationDelay: '.6s' }}
                                     data-testid="ai-chat-greeting-subtitle"
                                 >
@@ -279,14 +282,25 @@ export function AIChatBody(props: {
                 )}
             </ScrollContainer>
 
-            <div className="flex max-h-3/4 min-h-0 flex-col gap-2 not-embed:px-4 pb-4">
+            <div className="max-h-3/4 not-embed:px-4 flex min-h-0 flex-col gap-2 pb-4">
+                {!chat.error &&
+                    chat.queuedMessages.map((message, index) => (
+                        <AIChatQueuedMessage
+                            // Queue order is stable and items carry no local state, so the index is a
+                            // safe key here.
+                            key={index}
+                            message={message}
+                            assistantName={resolvedAssistantName}
+                            onRemove={() => chatController.cancelQueuedMessage(index)}
+                        />
+                    ))}
                 {/* Display an error banner when something went wrong. */}
                 {chat.error ? <AIChatError chatController={chatController} /> : null}
 
                 {chat.control ? <AIChatControl control={chat.control} /> : null}
                 <AIChatInput
                     responding={chat.responding}
-                    disabled={chat.responding || chat.error}
+                    disabled={chat.error}
                     onSubmit={(value) => {
                         chatController.postMessage({ message: value });
                     }}
@@ -301,7 +315,7 @@ function AIChatError(props: { chatController: AIChatController }) {
     const { chatController } = props;
 
     return (
-        <div className="flex animate-scale-in flex-wrap justify-between gap-2 circular-corners:rounded-2xl rounded-corners:rounded-md bg-danger px-3 py-2 text-danger text-sm ring-1 ring-danger">
+        <div className="animate-scale-in flex flex-wrap justify-between gap-2 bg-danger px-3 py-2 text-sm text-danger ring-1 ring-danger rounded-corners:rounded-md circular-corners:rounded-2xl">
             <div className="flex items-center gap-2">
                 <Icon icon="exclamation-triangle" className="size-3.5" />
                 <span className="flex items-center gap-1">{t(language, 'ai_chat_error')}</span>

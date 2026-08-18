@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'bun:test';
+
 import type { RevisionPageDocument } from '@gitbook/api';
+
 import type { GitBookSiteContext } from './context';
 import { createLinker } from './links';
 import {

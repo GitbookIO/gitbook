@@ -1,7 +1,7 @@
-import { GITBOOK_IMAGE_RESIZE_SALT, GITBOOK_IMAGE_RESIZE_URL } from '@/lib/env';
-import { getLogger } from '@/lib/logger';
 import type { CloudflareImageOptions } from './types';
 import { copyImageResponse } from './utils';
+import { GITBOOK_IMAGE_RESIZE_SALT, GITBOOK_IMAGE_RESIZE_URL } from '@/lib/env';
+import { getLogger } from '@/lib/logger';
 
 function sdbmHash(str: string): number {
     let hash = 0;

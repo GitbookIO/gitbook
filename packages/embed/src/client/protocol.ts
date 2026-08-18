@@ -2,16 +2,31 @@ import type { AIToolCallResult, AIToolDefinition } from '@gitbook/api';
 import type { IconName } from '@gitbook/icons';
 
 /**
+ * Confirmation action to be displayed to the user before executing a tool.
+ */
+export type GitBookToolConfirmation = {
+    icon?: IconName;
+    label: string;
+
+    /**
+     * Supporting context displayed to the user above the confirmation dialog,
+     * to help them understand what they are approving or rejecting.
+     * Limited to 512 characters.
+     */
+    context?: string;
+};
+
+/**
  * Custom tool definition to be passed to the AI assistant.
  */
 export type GitBookToolDefinition = AIToolDefinition & {
     /**
      * Confirmation action to be displayed to the user before executing the tool.
+     * Provide a static object, or a function that receives the input provided by
+     * the AI assistant and returns the confirmation — useful to display dynamic
+     * context based on the arguments the tool is about to be executed with.
      */
-    confirmation?: {
-        icon?: IconName;
-        label: string;
-    };
+    confirmation?: GitBookToolConfirmation | ((input: object) => GitBookToolConfirmation);
 
     /**
      * Callback when the tool is executed.

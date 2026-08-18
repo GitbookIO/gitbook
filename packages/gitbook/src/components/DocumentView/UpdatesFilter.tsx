@@ -1,12 +1,14 @@
 'use client';
 
-import { Button } from '@/components/primitives';
-import { tcls } from '@/lib/tailwind';
-import type { RevisionTag } from '@gitbook/api';
-import { Icon } from '@gitbook/icons';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import React from 'react';
+
+import type { RevisionTag } from '@gitbook/api';
+import { Icon } from '@gitbook/icons';
+
 import { TagIcon } from '../Tag';
+import { Button } from '@/components/primitives';
+import { tcls } from '@/lib/tailwind';
 
 const UPDATES_FILTER_SEARCH_PARAM = 'tag';
 
@@ -26,10 +28,7 @@ const emptyUpdatesFilterContext: UpdatesFilterContextValue = {
 
 const UpdatesFilterContext = React.createContext<UpdatesFilterContextValue | null>(null);
 
-export function UpdatesFilterProvider(props: {
-    tagSlugs: string[];
-    children: React.ReactNode;
-}) {
+export function UpdatesFilterProvider(props: { tagSlugs: string[]; children: React.ReactNode }) {
     const { tagSlugs, children } = props;
     const pathname = usePathname();
     const router = useRouter();
@@ -161,9 +160,9 @@ export function UpdatesTagFilters(props: {
     }
 
     return (
-        <div className="shrink-0 border-tint-subtle border-b pt-px pb-4">
+        <div className="shrink-0 border-b border-tint-subtle pb-4 pt-px">
             <div className="mb-3 ml-3 flex items-center justify-between gap-2">
-                <div className="flex items-center gap-1 font-semibold text-tint text-xs uppercase leading-wider">
+                <div className="leading-wider flex items-center gap-1 text-xs font-semibold uppercase text-tint">
                     <Icon icon="tags" className="size-3" />
                     {tagsLabel}
                 </div>

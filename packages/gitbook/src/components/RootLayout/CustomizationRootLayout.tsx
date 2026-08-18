@@ -1,7 +1,10 @@
+import * as ReactDOM from 'react-dom';
+
 import {
     CustomizationDefaultThemeMode,
     CustomizationSidebarBackgroundStyle,
     CustomizationSidebarListStyle,
+    CustomizationTheme,
     type CustomizationThemedColor,
     type CustomizationTint,
     type SiteCustomizationSettings,
@@ -18,17 +21,16 @@ import {
     hexToRgb,
 } from '@gitbook/colors';
 import { IconsProvider } from '@gitbook/icons';
-import * as ReactDOM from 'react-dom';
 
+import { AnnouncementDismissedScript } from '../Announcement';
+import { SelectStateScript } from '../Select';
+import { OperatingSystemClassScript } from './OperatingSystemClassScript';
+import { RootLayoutClientContexts } from './RootLayoutClientContexts';
 import { type FontData, getFontData } from '@/fonts';
 import { fontNotoColorEmoji, fonts } from '@/fonts/default';
+import './globals.css';
 import { getContentLocale, getSpaceLanguage } from '@/intl/server';
 import { getAssetURL } from '@/lib/assets';
-import { tcls } from '@/lib/tailwind';
-
-import { RootLayoutClientContexts } from './RootLayoutClientContexts';
-
-import './globals.css';
 import type { GitBookAnyContext } from '@/lib/context';
 import { GITBOOK_FONTS_URL, GITBOOK_ICONS_TOKEN, GITBOOK_ICONS_URL } from '@/lib/env';
 import {
@@ -37,9 +39,8 @@ import {
     getDefaultInlineIconSourceRequests,
     getInlineIconSources,
 } from '@/lib/icons/inline';
+import { tcls } from '@/lib/tailwind';
 import { defaultCustomization } from '@/lib/utils';
-import { AnnouncementDismissedScript } from '../Announcement';
-import { OperatingSystemClassScript } from './OperatingSystemClassScript';
 
 function preloadFont(fontData: FontData) {
     if (fontData.type === 'custom') {
@@ -79,6 +80,13 @@ export async function CustomizationRootLayout(props: {
     const tintColor = getTintColor(customization);
     const mixColor = getTintMixColor(customization.styling.primaryColor, tintColor);
     const sidebarStyles = getSidebarStyles(customization);
+    const theme = 'theme' in customization.styling ? customization.styling.theme : undefined;
+    // Which scale step the theme renders as the page background — the step an exact light/dark tint
+    // anchors to. `muted` uses tint-subtle (step 2), other themes tint-base (step 1). `bold` is
+    // intentionally two-tone and already uses the tint for the header, so it opts out entirely
+    // (undefined) and keeps a neutral page background.
+    const tintBaseStep =
+        theme === CustomizationTheme.Bold ? undefined : theme === CustomizationTheme.Muted ? 2 : 1;
     const { infoColor, successColor, warningColor, dangerColor } = getSemanticColors(customization);
     const fontData = getFontData(customization.styling.font, 'content');
     // Temporarily add a if here while the cache is being warmed up.
@@ -139,6 +147,9 @@ export async function CustomizationRootLayout(props: {
 
                 <OperatingSystemClassScript />
 
+                {/* Apply the visitor's content selection to <html> before first paint (no flash) */}
+                <SelectStateScript />
+
                 {/* Inject custom font @font-face rules */}
                 {fontData.type === 'custom' ? <style>{fontData.fontFaceRules}</style> : null}
                 {monospaceFontData.type === 'custom' ? (
@@ -158,7 +169,7 @@ export async function CustomizationRootLayout(props: {
                 >{`
                     :root, .light, .dark [data-color-scheme$="light"], .dark [data-follow-color-scheme="true"]:has([data-color-scheme$="light"]) {
                         ${generateColorVariable('primary', customization.styling.primaryColor.light)}
-                        ${generateColorVariable('tint', tintColor ? tintColor.light : DEFAULT_TINT_COLOR, { mix: mixColor && { color: mixColor.color.light, ratio: mixColor.ratio.light } })}
+                        ${generateColorVariable('tint', tintColor ? tintColor.light : DEFAULT_TINT_COLOR, { baseStep: tintBaseStep, mix: mixColor && { color: mixColor.color.light, ratio: mixColor.ratio.light } })}
                         ${generateColorVariable('neutral', DEFAULT_TINT_COLOR)}
 
                         --header-background: ${
@@ -185,7 +196,7 @@ export async function CustomizationRootLayout(props: {
 
                     .dark, :root:not(.dark) [data-color-scheme^="dark"], :root:not(.dark) [data-follow-color-scheme="true"]:has([data-color-scheme^="dark"]) {
                         ${generateColorVariable('primary', customization.styling.primaryColor.dark, { darkMode: true })}
-                        ${generateColorVariable('tint', tintColor ? tintColor.dark : DEFAULT_TINT_COLOR, { darkMode: true, mix: mixColor && { color: mixColor?.color.dark, ratio: mixColor.ratio.dark } })}
+                        ${generateColorVariable('tint', tintColor ? tintColor.dark : DEFAULT_TINT_COLOR, { darkMode: true, baseStep: tintBaseStep, mix: mixColor && { color: mixColor?.color.dark, ratio: mixColor.ratio.dark } })}
                         ${generateColorVariable('neutral', DEFAULT_TINT_COLOR, { darkMode: true })}
 
                         --header-background: ${hexToRgb(customization.header.backgroundColor?.dark ?? tintColor?.dark ?? customization.styling.primaryColor.dark)};

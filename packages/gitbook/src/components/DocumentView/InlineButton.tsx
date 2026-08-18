@@ -1,13 +1,27 @@
-import { isSiteAuthLoginHref } from '@/lib/auth-login-link';
-import { resolveContentRefFallback, resolveContentRefInDocument } from '@/lib/references';
+import type React from 'react';
+
 import * as api from '@gitbook/api';
 import type { IconName } from '@gitbook/icons';
-import type React from 'react';
-import { SiteAuthLoginButton } from '../SiteAuth/SiteAuthLoginLink';
+
 import { Button, type ButtonProps } from '../primitives';
+import { SiteAuthLoginButton } from '../SiteAuth/SiteAuthLoginLink';
 import type { InlineProps } from './Inline';
 import { InlineActionButton } from './InlineActionButton';
 import { NotFoundRefHoverCard } from './NotFoundRefHoverCard';
+import { getSelectAction } from './selectAction';
+import { SelectActionButton } from './SelectActionButton';
+import { isSiteAuthLoginHref } from '@/lib/auth-login-link';
+import { resolveContentRefFallback, resolveContentRefInDocument } from '@/lib/references';
+
+// Editor button sizes render one step smaller here; the editor default (`large`) keeps the previous `medium`.
+const BUTTON_SIZE_MAP: Record<
+    NonNullable<api.DocumentInlineButton['data']['size']>,
+    ButtonProps['size']
+> = {
+    small: 'xsmall',
+    medium: 'small',
+    large: 'medium',
+};
 
 export function InlineButton(props: InlineProps<api.DocumentInlineButton>) {
     const { inline, context } = props;
@@ -16,10 +30,17 @@ export function InlineButton(props: InlineProps<api.DocumentInlineButton>) {
         label: inline.data.label,
         variant: inline.data.kind,
         icon: inline.data.icon as IconName | undefined,
-        size: 'medium',
+        size: BUTTON_SIZE_MAP[inline.data.size ?? 'large'],
     };
 
     const ButtonImplementation = () => {
+        // Skip the select action in print/PDF: the client store isn't mounted, so it falls through
+        // to the plain disabled button below.
+        const selectAction = context.mode !== 'print' ? getSelectAction(inline.data) : null;
+        if (selectAction) {
+            return <SelectActionButton value={selectAction.value} buttonProps={buttonProps} />;
+        }
+
         // In print/PDF mode, skip interactive action buttons (AI/search providers are not mounted).
         if (context.mode !== 'print' && 'action' in inline.data && 'query' in inline.data.action) {
             return (

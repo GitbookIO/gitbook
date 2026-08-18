@@ -1,11 +1,9 @@
-import { OpenAPIOperation as BaseOpenAPIOperation } from '@gitbook/react-openapi';
-
-import { resolveOpenAPIOperationBlock } from '@/lib/openapi/resolveOpenAPIOperationBlock';
-import { tcls } from '@/lib/tailwind';
-
-import type { AnyOpenAPIOperationsBlock } from '@/lib/openapi/types';
 import type { BlockProps } from '../Block';
-import { getOpenAPIContext } from './context';
+import { getOpenAPIBlockClientProps } from './context';
+import { OpenAPIBlockLazy } from './OpenAPIBlockLazy';
+import { resolveOpenAPIOperationBlock } from '@/lib/openapi/resolveOpenAPIOperationBlock';
+import type { AnyOpenAPIOperationsBlock } from '@/lib/openapi/types';
+import { tcls } from '@/lib/tailwind';
 
 /**
  * Render an openapi block or an openapi-operation block.
@@ -44,10 +42,12 @@ async function OpenAPIOperationBody(props: BlockProps<AnyOpenAPIOperationsBlock>
     }
 
     return (
-        <BaseOpenAPIOperation
+        <OpenAPIBlockLazy
+            variant="operation"
             data={data}
-            context={getOpenAPIContext({
+            {...getOpenAPIBlockClientProps({
                 props,
+                data,
                 specUrl: publicURL,
                 context: context.contentContext,
                 expandAllResponses:

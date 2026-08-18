@@ -1,7 +1,5 @@
-import { getSpaceLanguage, t, tString } from '@/intl/server';
-import type { GitBookSiteContext } from '@/lib/context';
-import { getDocumentSections } from '@/lib/document-sections';
-import { tcls } from '@/lib/tailwind';
+import React from 'react';
+
 import {
     type JSONDocument,
     type RevisionPageDocument,
@@ -9,17 +7,20 @@ import {
     SiteAdsStatus,
     SiteInsightsAdPlacement,
 } from '@gitbook/api';
-import React from 'react';
-
 import { Icon } from '@gitbook/icons';
+
 import { Ad } from '../Ads';
 import { UpdatesTagFilters } from '../DocumentView/UpdatesFilter';
 import { PageFeedbackForm } from '../PageFeedback';
-import { ThemeToggler } from '../ThemeToggler';
 import { SideSheet } from '../primitives/SideSheet';
+import { ThemeToggler } from '../ThemeToggler';
 import { PageAsideCloseButton } from './PageAsideButton';
 import { ScrollSectionsList } from './ScrollSectionsList';
 import { ScrollToTopButton } from './ScrollToTopButton';
+import { getSpaceLanguage, t, tString } from '@/intl/server';
+import type { GitBookSiteContext } from '@/lib/context';
+import { getDocumentSections } from '@/lib/document-sections';
+import { tcls } from '@/lib/tailwind';
 
 /**
  * Aside listing the headings in the document.
@@ -77,18 +78,19 @@ export async function PageAside(props: {
                 'break-anywhere', // To prevent long words in headings from breaking the layout
 
                 'lg:z-10',
-                'layout-default:xl:not-chat-open:pr-0',
-                'layout-default:xl:not-chat-open:pl-8',
-                'layout-default:xl:not-chat-open:flex!',
-                'layout-default:xl:not-chat-open:animate-none!',
+                'lg:hover:z-12',
+                'layout-default:xl:chat-closed:pr-0',
+                'layout-default:xl:chat-closed:pl-8',
+                'layout-default:xl:chat-closed:flex!',
+                'layout-default:xl:chat-closed:animate-none!',
                 'layout-default:3xl:flex!',
                 'layout-default:3xl:animate-none!',
 
                 // In layout-wide mode, hide outline when viewport is too narrow
                 // or when chat is open and viewport is narrow, to prevent layout overflow
                 'layout-wide:xl:-mr-68',
-                'layout-wide:3xl:not-chat-open:flex!',
-                'layout-wide:3xl:not-chat-open:animate-none!',
+                'layout-wide:3xl:chat-closed:flex!',
+                'layout-wide:3xl:chat-closed:animate-none!',
 
                 // Show outline if page has OpenAPI block
                 // TODO: remove this in favour of a nicer, more immediately accessible solution in the future.
@@ -98,9 +100,18 @@ export async function PageAside(props: {
                 'page-api-block:page-has-outline:min-[96rem]:border-l-0',
                 'page-api-block:page-has-outline:min-[96rem]:pl-8',
 
-                'hydrated:site-background', // Only add a background once the element is positioned correctly to prevent overlapping the page cover
+                // Only add a background once the element is positioned correctly, to prevent
+                // overlapping the page cover. Kept opaque wherever the outline is a toggleable
+                // overlay (below xl in any layout, and xl–3xl in wide layout, where it opens as
+                // a desktop SideSheet), but dropped for the permanent outline column so a bleeding
+                // cards carousel can scroll behind it.
+                'max-xl:hydrated:site-background',
+                'layout-wide:max-3xl:hydrated:site-background',
                 'text-tint',
                 'contrast-more:text-tint-strong'
+                // The cover-aware text color lives on the individual rows below, not here: the
+                // outline column is tall enough to always cross the cover's bottom edge, and a
+                // container can't carry a single correct color for text on both sides of it.
             )}
         >
             <div className="flex h-full w-full shrink-0 flex-col overflow-hidden">
@@ -119,11 +130,14 @@ export async function PageAside(props: {
                                 filterableTags.length > 0 && 'mt-4'
                             )}
                         >
-                            <ScrollToTopButton className="flex cursor-pointer items-center gap-1 font-semibold text-tint text-xs uppercase leading-wider">
+                            <ScrollToTopButton
+                                data-cover-aware-text
+                                className="leading-wider xl:page-cover-background:text-contrast-cover flex cursor-pointer items-center gap-1 text-xs font-semibold uppercase text-tint"
+                            >
                                 <Icon icon="block-quote" className="size-3" />{' '}
                                 {t(language, 'on_this_page')}
                             </ScrollToTopButton>
-                            <PageAsideCloseButton className="layout-wide:3xl:hidden layout-default:xl:hidden page-api-block:min-[96rem]:hidden" />
+                            <PageAsideCloseButton className="page-api-block:min-[96rem]:hidden layout-default:xl:hidden layout-wide:3xl:hidden" />
                         </div>
                         <div className="flex shrink flex-col overflow-hidden">
                             {document ? (
@@ -155,10 +169,7 @@ async function PageAsideSections(props: { document: JSONDocument; context: GitBo
     ) : null;
 }
 
-function PageAsideActions(props: {
-    withPageFeedback: boolean;
-    page: RevisionPageDocument;
-}) {
+function PageAsideActions(props: { withPageFeedback: boolean; page: RevisionPageDocument }) {
     const { page, withPageFeedback } = props;
 
     return (

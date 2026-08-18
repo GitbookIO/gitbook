@@ -1,4 +1,5 @@
-@import "@scalar/api-client-react/style.css";
+/* The vendor stylesheet is imported by ScalarApiModal so it ships with the lazy client chunk:
+   its `group-has-*` rules make every DOM change restyle the whole document. */
 @reference "../../RootLayout/globals.css";
 
 html,
@@ -282,6 +283,11 @@ body {
 
 .scalar-activate-button svg {
     @apply size-2.5;
+}
+
+/* Same size as the play icon it replaces, so the button doesn't shift while loading. */
+.scalar-activate-button .scalar-activate-spinner {
+    @apply animate-spin motion-reduce:animate-none;
 }
 
 .scalar-app-loading {

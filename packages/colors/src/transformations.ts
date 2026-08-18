@@ -83,6 +83,22 @@ export const colorMixMapping = {
 };
 
 /**
+ * Light mode has no equivalent to the dark base bound (nothing is lighter than white), so a tint
+ * at or above this lightness is treated as an explicit, near-white background (e.g. a warm `#F5F3EF`
+ * at L≈0.96). Kept high so light UI accent colors (around L≈0.90) aren't mistaken for backgrounds.
+ */
+const EXACT_BASE_LIGHT_THRESHOLD = 0.95;
+
+/**
+ * Only a near-neutral tint reads as a background. A saturated color would keep the exact hue at the
+ * anchored step while the rest of the low scale stays ~gray, so those keep the normal accent ramp.
+ */
+const EXACT_BASE_NEUTRAL_CHROMA = 0.05;
+
+/** Lightness of the default white light background (≈0.99999, not exactly 1). */
+const LIGHT_BASE_L = rgbToOklch(hexToRgbArray(LIGHT_BASE)).L;
+
+/**
  * Convert a hex color to an RGB color.
  */
 export function hexToRgb(hex: string): string {
@@ -159,6 +175,14 @@ export type ColorScaleOptions = {
     /** Define a custom foreground color to use. If left undefined, the global `light`/`dark` values (in `colors.ts`) will be used. */
     foreground?: string;
 
+    /**
+     * The 1-indexed scale step this scale renders as the page background (1 = `tint-base` for
+     * `clean`, 2 = `tint-subtle` for `muted`). When set, an extreme near-neutral tint is taken as
+     * the exact background, anchored to this step so it matches exactly. Omit for scales that don't
+     * define the page background (accents, or the two-tone `bold` theme) — they never anchor.
+     */
+    baseStep?: number;
+
     mix?: {
         /** If set to a hex code, this color will be additionally mixed into the generated scale according to `mix.ratio`. */
         color: string;
@@ -179,6 +203,7 @@ export function colorScale(
         darkMode = false,
         background = darkMode ? DARK_BASE : LIGHT_BASE,
         foreground = darkMode ? LIGHT_BASE : DARK_BASE,
+        baseStep,
         mix,
     }: ColorScaleOptions = {}
 ) {
@@ -188,31 +213,51 @@ export function colorScale(
     const backgroundColor = rgbToOklch(hexToRgbArray(background));
     let mapping = darkMode ? colorMixMapping.dark : colorMixMapping.light;
 
-    if (mixColor && mix?.ratio && mix.ratio > 0) {
-        // If defined, we mix in a (tiny) bit of the mix color with the base color.
+    // A near-neutral tint at the extreme end of the scale is taken as the exact page background
+    // rather than tinting pure black/white with it — letting brands set an exact background such as
+    // a warm `#F5F3EF`. Only scales that define the page background opt in (via `baseStep`). In light
+    // mode the base is pure white by default, so a near-white tint also qualifies (nothing is lighter
+    // than white); a custom, lower background is respected instead. Decided on the raw color so a
+    // neutral mix (below) can't darken a tint out of the exact base.
+    const isExtremeBase = darkMode
+        ? baseColor.L < backgroundColor.L
+        : backgroundColor.L >= LIGHT_BASE_L
+          ? baseColor.L > EXACT_BASE_LIGHT_THRESHOLD
+          : baseColor.L > backgroundColor.L;
+    const isExactBase =
+        baseStep !== undefined && isExtremeBase && baseColor.C < EXACT_BASE_NEUTRAL_CHROMA;
+    const exactBaseIndex = (baseStep ?? 1) - 1;
+
+    if (mixColor && mix?.ratio && mix.ratio > 0 && !isExactBase) {
+        // Mix a little of the mix color into the base — but not when the tint is the exact base,
+        // where it must stay true to the supplied color (and match `--header-background`).
         baseColor.L = mixColor.L * mix.ratio + baseColor.L * (1 - mix.ratio);
         baseColor.C = mixColor.C * mix.ratio + baseColor.C * (1 - mix.ratio);
         baseColor.H = mix.color === DEFAULT_TINT_COLOR ? baseColor.H : mixColor.H;
     }
 
-    if (
-        (darkMode && baseColor.L < backgroundColor.L) ||
-        (!darkMode && baseColor.L > backgroundColor.L)
-    ) {
-        // If the supplied color is outside of our lightness bounds, use the supplied color's lightness.
-        // This is mostly used to allow darker-than-dark backgrounds for brands that specifically want that look.
+    if (isExactBase) {
         const difference = (backgroundColor.L - baseColor.L) / backgroundColor.L;
-        backgroundColor.L = baseColor.L;
         // At the edges of the scale, the subtle lightness changes stop being perceptible. We need to amp up our mapping to still stand out.
         const amplifier = 1;
         mapping = mapping.map((step, index) =>
             index < 9 ? step + step * amplifier * difference : step
         );
+
+        // Anchor the supplied color to the step the theme renders as the background, solving the
+        // background lightness so neighbouring steps stay continuous with it.
+        const baseMix = mapping[exactBaseIndex]!;
+        backgroundColor.L = (baseColor.L - foregroundColor.L * baseMix) / (1 - baseMix);
     }
 
     const result = [];
 
     for (let index = 0; index < mapping.length; index++) {
+        if (isExactBase && index === exactBaseIndex) {
+            result.push(hex);
+            continue;
+        }
+
         const step = mapping[index]!;
         const targetL = foregroundColor.L * step + backgroundColor.L * (1 - step);
 
@@ -238,7 +283,10 @@ export function colorScale(
                 case 11:
                     return 0.1;
                 default:
-                    return index * 0.05;
+                    // When the tint is the exact base, hold the steps from the base toward the
+                    // accents at its chroma so the background stays tinted; steps lighter than the
+                    // base (e.g. cards in `muted`) keep desaturating toward white.
+                    return isExactBase && index >= exactBaseIndex ? 1 : index * 0.05;
             }
         })();
 

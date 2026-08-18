@@ -11,7 +11,7 @@ jobs:
         runs-on: ubuntu-latest
         if: ${{ github.event_name == 'pull_request_target' && github.event.pull_request.head.repo.fork }}
         environment:
-          name: preview-approval
+            name: preview-approval
         steps:
             - name: Approval gate
               run: echo "Preview deployment approved."
@@ -21,8 +21,8 @@ jobs:
         needs: approval
         if: ${{ always() && (needs.approval.result == 'success' || needs.approval.result == 'skipped') }}
         environment:
-          name: 2v-preview
-          url: ${{ steps.deploy.outputs.deployment-url }}
+            name: 2v-preview
+            url: ${{ steps.deploy.outputs.deployment-url }}
         outputs:
             deployment-url: ${{ steps.deploy.outputs.deployment-url }}
         steps:
@@ -47,8 +47,8 @@ jobs:
         needs: approval
         if: ${{ always() && (needs.approval.result == 'success' || needs.approval.result == 'skipped') }}
         environment:
-          name: 2c-preview
-          url: ${{ steps.deploy.outputs.deployment-url }}
+            name: 2c-preview
+            url: ${{ steps.deploy.outputs.deployment-url }}
         outputs:
             deployment-url: ${{ steps.deploy.outputs.deployment-url || steps.extract-worker-id.outputs.worker-url }}
         steps:
@@ -72,10 +72,10 @@ jobs:
               id: extract-worker-id
               if: ${{ !steps.deploy.outputs.deployment-url }}
               run: |
-                if [[ "${{ steps.deploy.outputs.command-output }}" =~ Worker\ Version\ ID:\ ([0-9a-f]{8})-([0-9a-f-]+) ]]; then
-                  WORKER_ID_FIRST_PART="${BASH_REMATCH[1]}"
-                  echo "worker-url=https://${WORKER_ID_FIRST_PART}-gitbook-open-v2-preview.gitbook.workers.dev/" >> $GITHUB_OUTPUT
-                fi
+                  if [[ "${{ steps.deploy.outputs.command-output }}" =~ Worker\ Version\ ID:\ ([0-9a-f]{8})-([0-9a-f-]+) ]]; then
+                    WORKER_ID_FIRST_PART="${BASH_REMATCH[1]}"
+                    echo "worker-url=https://${WORKER_ID_FIRST_PART}-gitbook-open-v2-preview.gitbook.workers.dev/" >> $GITHUB_OUTPUT
+                  fi
             - name: Outputs
               run: |
                   echo "URL: ${{ steps.deploy.outputs.deployment-url || steps.extract-worker-id.outputs.worker-url }}"
@@ -187,6 +187,54 @@ jobs:
                   SITE_BASE_URL: ${{ needs.deploy-v2-vercel.outputs.deployment-url }}/url/
                   ARGOS_TOKEN: ${{ secrets.ARGOS_TOKEN }}
                   ARGOS_BUILD_NAME: customers-v2-vercel
+
+            # Style recalc depends on the client bundle, not the host, so this runs here only and
+            # not in the Cloudflare job. Kept out of `e2e-customers`, which is a visual suite.
+            - name: Run style invalidation tests
+              if: always()
+              working-directory: packages/gitbook
+              run: bun run e2e-style-perf
+              env:
+                  BASE_URL: ${{ needs.deploy-v2-vercel.outputs.deployment-url }}
+                  SITE_BASE_URL: ${{ needs.deploy-v2-vercel.outputs.deployment-url }}/url/
+
+            # Runs on failure too: a blown style budget is exactly when the numbers are worth seeing.
+            - name: Build style invalidation report
+              if: always() && github.event_name != 'push'
+              id: style-perf
+              working-directory: packages/gitbook
+              run: |
+                  rows=$(cat test-results/style-perf.md 2>/dev/null || true)
+                  if [ -z "$rows" ]; then exit 0; fi
+                  {
+                    echo 'body<<STYLE_PERF_EOF'
+                    echo '### Style invalidation on a large API reference'
+                    echo
+                    echo 'Elements restyled by opening one popup on [the Snyk API reference](https://docs.snyk.io/snyk-api/reference/apps). A share near or above 100% means the insertion restyles the whole document.'
+                    echo
+                    echo '| interaction | restyled | page | share | budget | |'
+                    echo '| --- | ---: | ---: | ---: | ---: | :-: |'
+                    echo "$rows"
+                    echo 'STYLE_PERF_EOF'
+                  } >> "$GITHUB_OUTPUT"
+
+            - name: Find style invalidation comment
+              if: always() && github.event_name != 'push' && steps.style-perf.outputs.body != ''
+              uses: peter-evans/find-comment@v3
+              id: fc-style-perf
+              with:
+                  issue-number: ${{ github.event.pull_request.number }}
+                  comment-author: 'github-actions[bot]'
+                  body-includes: 'Style invalidation on a large API reference'
+
+            - name: Create or update style invalidation comment
+              if: always() && github.event_name != 'push' && steps.style-perf.outputs.body != ''
+              uses: peter-evans/create-or-update-comment@v4
+              with:
+                  comment-id: ${{ steps.fc-style-perf.outputs.comment-id }}
+                  issue-number: ${{ github.event.pull_request.number }}
+                  body: ${{ steps.style-perf.outputs.body }}
+                  edit-mode: replace
     visual-testing-customers-v2-cloudflare:
         runs-on: ubuntu-latest
         name: Visual Testing Customers v2 (Cloudflare)

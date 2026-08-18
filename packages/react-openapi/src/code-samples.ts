@@ -1,4 +1,5 @@
 import yaml from 'js-yaml';
+
 import {
     isCSV,
     isFormData,
@@ -374,7 +375,7 @@ const BodyGenerators = {
             // Convert JSON to XML if needed
             body = JSON.stringify(convertBodyToXML(body));
         } else if (isYAML(contentType)) {
-            code += `yamlBody = \"\"\"\n${indent(yaml.dump(body), 4)}\"\"\"\n\n`;
+            code += `yamlBody = """\n${indent(yaml.dump(body), 4)}"""\n\n`;
             body = 'yamlBody';
         } else {
             body = stringifyOpenAPI(

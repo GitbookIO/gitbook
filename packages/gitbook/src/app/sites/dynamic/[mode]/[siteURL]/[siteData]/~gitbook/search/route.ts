@@ -1,3 +1,14 @@
+import { type NextRequest, NextResponse } from 'next/server';
+
+import type {
+    SearchPageResult,
+    SearchSpaceResult,
+    SiteSection,
+    SiteSectionGroup,
+    SiteSpace,
+} from '@gitbook/api';
+import type { IconName } from '@gitbook/icons';
+
 import type {
     ComputedPageResult,
     ComputedSectionResult,
@@ -8,18 +19,8 @@ import { throwIfDataError } from '@/lib/data';
 import { toEmbeddableLinkForPublishedContent } from '@/lib/embeddable-linker';
 import { getSiteURLDataFromMiddleware } from '@/lib/middleware';
 import { joinPathWithBaseURL } from '@/lib/paths';
-import { getBestScoredResult } from '@/lib/search';
 import { getServerActionBaseContext } from '@/lib/server-actions';
 import { findSiteSpaceBy, getLocalizedTitle } from '@/lib/sites';
-import type {
-    SearchPageResult,
-    SearchSpaceResult,
-    SiteSection,
-    SiteSectionGroup,
-    SiteSpace,
-} from '@gitbook/api';
-import type { IconName } from '@gitbook/icons';
-import { type NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
     const { asEmbeddable, query, scope } = (await request.json()) as SearchSiteContentRequest;
@@ -144,6 +145,13 @@ function transformSitePageResult(args: {
           ? toEmbeddableLinkForPublishedContent(linker, spaceURL, pageItem.path)
           : linker.toLinkForContent(joinPathWithBaseURL(spaceURL, pageItem.path));
 
+    // The deployed API already returns this field, but older generated clients and responses do not.
+    const resultType =
+        'resultType' in pageItem &&
+        (pageItem.resultType === 'page' || pageItem.resultType === 'section')
+            ? pageItem.resultType
+            : undefined;
+
     const page: ComputedPageResult = {
         type: 'page',
         id: `${spaceItem.id}/${pageItem.id}`,
@@ -152,6 +160,7 @@ function transformSitePageResult(args: {
         pageId: pageItem.id,
         spaceId: spaceItem.id,
         score: pageItem.score,
+        resultType,
         breadcrumbs,
     };
 
@@ -187,8 +196,9 @@ function transformSitePageResult(args: {
                 };
             }) ?? [];
 
-    // Find the best-scoring section to use as a body preview on the page result.
-    const bestSection = getBestScoredResult(pageSections);
+    // The search API returns each page's sections ordered highest-score-first and caps them at one
+    // per page, so the first section is the best-scoring one to use as a body preview.
+    const bestSection = pageSections[0];
     if (bestSection) {
         page.bestSection = {
             href: bestSection.href,

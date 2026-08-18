@@ -1,3 +1,12 @@
+import { assertNever } from 'assert-never';
+import { assert } from 'ts-essentials';
+
+import type { DocumentBlockUpdate, DocumentBlockUpdates, TranslationLanguage } from '@gitbook/api';
+
+import { Tag } from '../Tag';
+import type { BlockProps } from './Block';
+import { Blocks } from './Blocks';
+import { FilteredUpdate } from './UpdatesFilter';
 import {
     getFullDateFormatter,
     getNumericDateFormatter,
@@ -5,13 +14,6 @@ import {
 } from '@/components/utils/dates';
 import { getRevisionTags, resolveBlockTags } from '@/lib/tags';
 import { tcls } from '@/lib/tailwind';
-import type { DocumentBlockUpdate, DocumentBlockUpdates, TranslationLanguage } from '@gitbook/api';
-import { assertNever } from 'assert-never';
-import { assert } from 'ts-essentials';
-import { Tag } from '../Tag';
-import type { BlockProps } from './Block';
-import { Blocks } from './Blocks';
-import { FilteredUpdate } from './UpdatesFilter';
 
 export function Update(props: BlockProps<DocumentBlockUpdate>) {
     const { block, style, ancestorBlocks, ...contextProps } = props;
@@ -57,7 +59,7 @@ export function Update(props: BlockProps<DocumentBlockUpdate>) {
                 <time
                     // Adding a dateTime attribute for accessibility (and SEO)
                     dateTime={date}
-                    className="inline-flex items-center font-medium text-neutral-10 text-sm tracking-wide"
+                    className="inline-flex items-center text-sm font-medium tracking-wide text-neutral-10"
                 >
                     {dateFormatter.format(parsedDate)}
                 </time>
@@ -73,7 +75,7 @@ export function Update(props: BlockProps<DocumentBlockUpdate>) {
                 {...contextProps}
                 nodes={block.nodes}
                 ancestorBlocks={[...ancestorBlocks, block]}
-                style="[&>*:first-child]:!pt-0 flex flex-1 flex-col [&>*+*]:mt-5"
+                style="flex flex-1 flex-col [&>*+*]:mt-5 [&>*:first-child]:!pt-0"
             />
         </FilteredUpdate>
     );

@@ -1,15 +1,5 @@
 import type { DocumentBlock, JSONDocument } from '@gitbook/api';
 
-import {
-    SkeletonCard,
-    SkeletonHeading,
-    SkeletonImage,
-    SkeletonParagraph,
-    SkeletonUpdate,
-} from '@/components/primitives';
-import type { ClassValue } from '@/lib/tailwind';
-
-import { nullIfNever } from '@/lib/typescript';
 import { BlockContentRef } from './BlockContentRef';
 import { CodeBlock } from './CodeBlock';
 import { Columns } from './Columns';
@@ -37,6 +27,15 @@ import { Table } from './Table';
 import { Tabs } from './Tabs';
 import { Update } from './Update';
 import { Updates } from './Updates';
+import {
+    SkeletonCard,
+    SkeletonHeading,
+    SkeletonImage,
+    SkeletonParagraph,
+    SkeletonUpdate,
+} from '@/components/primitives';
+import type { ClassValue } from '@/lib/tailwind';
+import { nullIfNever } from '@/lib/typescript';
 
 export interface BlockProps<Block extends DocumentBlock> extends DocumentContextProps {
     block: Block;
