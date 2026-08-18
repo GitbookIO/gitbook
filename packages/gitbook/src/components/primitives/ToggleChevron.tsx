@@ -22,13 +22,13 @@ export function ToggleChevron(props: {
             icon: 'chevron-down',
             animation: 'rotate-180',
             autoAnimation:
-                'group-data-popup-open/dropdown:rotate-180 group-data-panel-open/dropdown:rotate-180 group-open:rotate-180',
+                'group-aria-expanded/dropdown:rotate-180 group-data-panel-open/dropdown:rotate-180 group-open:rotate-180',
         },
         'right-to-down': {
             icon: 'chevron-right',
             animation: 'rotate-90',
             autoAnimation:
-                'group-data-popup-open/dropdown:rotate-90 group-data-panel-open/dropdown:rotate-90 group-open:rotate-90',
+                'group-aria-expanded/dropdown:rotate-90 group-data-panel-open/dropdown:rotate-90 group-open:rotate-90',
         },
     };
 
