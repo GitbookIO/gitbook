@@ -1,16 +1,19 @@
 import clsx from 'classnames';
-import { OpenAPIExample } from '../OpenAPIExample';
-import { OpenAPIRootSchema } from '../OpenAPISchemaServer';
-import { StaticSection } from '../StaticSection';
+
+import { getOpenAPISchemaAnchorId } from '@gitbook/openapi-parser';
+
 import {
     type OpenAPIContextInput,
     getOpenAPIClientContext,
     resolveOpenAPIContext,
 } from '../context';
+import { OpenAPIExample } from '../OpenAPIExample';
+import { OpenAPIRootSchema } from '../OpenAPISchemaServer';
+import { StaticSection } from '../StaticSection';
 import { t } from '../translate';
 import { getExampleFromSchema } from '../util/example';
 import { OpenAPISchemaItem } from './OpenAPISchemaItem';
-import type { OpenAPISchemasData } from './resolveOpenAPISchemas';
+import { type OpenAPISchemasData, getSchemasHeading } from './resolveOpenAPISchemas';
 
 /**
  * OpenAPI Schemas component.
@@ -37,17 +40,14 @@ export function OpenAPISchemas(props: {
     const clientContext = getOpenAPIClientContext(context);
 
     // If there is only one model and we are not grouping, we show it directly.
-    if (schemas.length === 1 && !grouped) {
-        const title = `The ${firstSchema.name} object`;
+    const heading = getSchemasHeading(data, grouped);
+    if (heading) {
+        const { title } = heading;
         return (
             <div className={clsx('openapi-schemas openapi-schemas-single', className)}>
-                <div className="openapi-summary" id={context.id}>
-                    {context.renderHeading({
-                        title,
-                        deprecated: Boolean(firstSchema.schema.deprecated),
-                        stability: firstSchema.schema['x-stability'],
-                    })}
-                </div>
+                {/* The heading rendered below already carries the anchor id; a second id here would
+                    win the fragment target and scroll to the wrong margin. */}
+                <div className="openapi-summary">{context.renderHeading(heading)}</div>
                 <div className="openapi-columns">
                     <div className="openapi-column-spec">
                         <StaticSection
@@ -88,6 +88,7 @@ export function OpenAPISchemas(props: {
                 return (
                     <OpenAPISchemaItem
                         key={name}
+                        id={getOpenAPISchemaAnchorId(name)}
                         name={name}
                         context={clientContext}
                         schema={schema}

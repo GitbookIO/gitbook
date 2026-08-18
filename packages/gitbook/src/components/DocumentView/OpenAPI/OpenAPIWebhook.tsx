@@ -1,11 +1,9 @@
-import { OpenAPIWebhook as BaseOpenAPIWebhook } from '@gitbook/react-openapi';
-
-import { resolveOpenAPIWebhookBlock } from '@/lib/openapi/resolveOpenAPIWebhookBlock';
-import { tcls } from '@/lib/tailwind';
-
-import type { OpenAPIWebhookBlock } from '@/lib/openapi/types';
 import type { BlockProps } from '../Block';
-import { getOpenAPIContext } from './context';
+import { getOpenAPIBlockClientProps } from './context';
+import { OpenAPIBlockLazy } from './OpenAPIBlockLazy';
+import { resolveOpenAPIWebhookBlock } from '@/lib/openapi/resolveOpenAPIWebhookBlock';
+import type { OpenAPIWebhookBlock } from '@/lib/openapi/types';
+import { tcls } from '@/lib/tailwind';
 
 /**
  * Render an openapi block or an openapi-webhook block.
@@ -46,10 +44,12 @@ async function OpenAPIWebhookBody(props: BlockProps<OpenAPIWebhookBlock>) {
     }
 
     return (
-        <BaseOpenAPIWebhook
+        <OpenAPIBlockLazy
+            variant="webhook"
             data={data}
-            context={getOpenAPIContext({
+            {...getOpenAPIBlockClientProps({
                 props,
+                data,
                 specUrl: publicURL,
                 context: context.contentContext,
                 expandAllResponses:

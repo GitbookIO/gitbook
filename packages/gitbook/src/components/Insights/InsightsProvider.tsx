@@ -1,14 +1,15 @@
 'use client';
 
-import type * as api from '@gitbook/api';
-import { OpenAPIOperationContextProvider } from '@gitbook/react-openapi';
 import * as React from 'react';
 import { useDebounceCallback, useEventCallback } from 'usehooks-ts';
 
-import { getAllBrowserCookiesMap } from '@/lib/browser';
+import type * as api from '@gitbook/api';
+import { OpenAPIOperationContextProvider } from '@gitbook/react-openapi';
+
 import { type CurrentContentContext, useCurrentContent } from '../hooks';
 import { getSession } from './sessions';
 import { type VisitorResponse, useVisitor } from './visitorId';
+import { getAllBrowserCookiesMap } from '@/lib/browser';
 
 export type InsightsEventName = api.SiteInsightsEvent['type'];
 
@@ -154,7 +155,11 @@ export function InsightsProvider(props: InsightsProviderProps) {
             const pathname = window.location.pathname;
             const previous = eventsRef.current[pathname];
             eventsRef.current[pathname] = {
-                pageContext: previous?.pageContext ?? ctx,
+                // An explicitly-provided context wins so page-scoped events (e.g. feedback) can
+                // attribute to their page even when the pathname's ambient context has none — such
+                // as the embed's assistant tab, whose view records a null page. Events that pass no
+                // context keep the stored one.
+                pageContext: ctx ?? previous?.pageContext,
                 url: previous?.url ?? window.location.href,
                 events: [
                     ...(previous?.events ?? []),
@@ -212,10 +217,7 @@ export function useTrackEvent(): TrackEventCallback {
 /**
  * Post the events to the server.
  */
-function sendEvents(args: {
-    eventUrl: string;
-    events: api.SiteInsightsEvent[];
-}) {
+function sendEvents(args: { eventUrl: string; events: api.SiteInsightsEvent[] }) {
     const { eventUrl, events } = args;
 
     fetch(eventUrl, {

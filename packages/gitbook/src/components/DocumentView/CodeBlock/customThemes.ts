@@ -357,7 +357,9 @@ function createTheme(options: {
         settings: [
             // Comments
             {
-                scope: ['comment'],
+                // Include the comment delimiter punctuation (e.g. `//`, `/*`) so it matches
+                // the comment body instead of falling through to the generic `punctuation` scope.
+                scope: ['comment', 'punctuation.definition.comment'],
                 settings: {
                     foreground: colors.basic.comment,
                 },

@@ -1,5 +1,6 @@
-import type { ContentKitBox } from '@gitbook/api';
 import type React from 'react';
+
+import type { ContentKitBox } from '@gitbook/api';
 
 import type { ContentKitServerElementProps } from './types';
 

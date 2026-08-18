@@ -1,11 +1,10 @@
 import type { DocumentTableViewCards } from '@gitbook/api';
 
-import { ScrollContainer } from '@/components/primitives/ScrollContainer';
-import { tcls } from '@/lib/tailwind';
-
 import { RecordCard } from './RecordCard';
 import type { TableViewProps } from './Table';
 import { TableSearchRecord } from './TableSearch';
+import { ScrollContainer } from '@/components/primitives/ScrollContainer';
+import { tcls } from '@/lib/tailwind';
 
 export function ViewCards(props: TableViewProps<DocumentTableViewCards>) {
     // `wrap` defaults to `true` (a wrapping grid); only an explicit `false` opts into the
@@ -31,8 +30,7 @@ function CardsGrid(props: TableViewProps<DocumentTableViewCards>) {
                 'inline-grid',
                 'gap-4',
                 'grid-cols-1',
-                '@sm:grid-cols-2',
-                view.cardSize === 'large' ? '@xl:grid-cols-2' : '@xl:grid-cols-3',
+                view.cardSize === 'large' ? '@xl:grid-cols-2' : '@2xl:grid-cols-3 @sm:grid-cols-2', // Large cards break earlier to avoid becoming *too* big.
                 block.data.fullWidth ? 'large:flex-column' : null
             )}
         >

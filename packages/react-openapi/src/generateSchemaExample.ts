@@ -1,4 +1,5 @@
 import type { OpenAPIV3 } from '@gitbook/openapi-parser';
+
 import { isPlainObject } from './contentTypeChecks';
 import { checkIsReference } from './utils';
 
@@ -64,9 +65,13 @@ export function generateMediaTypeExamples(
 /** Hard limit for rendering circular references */
 const MAX_LEVELS_DEEP = 5;
 
+// Fixed, not `new Date()`: the block is rendered on the server and hydrated in the browser, so any
+// value read from the clock differs between the two and fails hydration.
+const EXAMPLE_DATE = '2026-01-01T00:00:00.000Z';
+
 const genericExampleValues: Record<string, string> = {
-    'date-time': new Date().toISOString(),
-    date: new Date().toISOString().split('T')[0] ?? '1970-01-01',
+    'date-time': EXAMPLE_DATE,
+    date: EXAMPLE_DATE.split('T')[0] ?? '1970-01-01',
     email: 'name@gmail.com',
     hostname: 'example.com',
     ipv4: '0.0.0.0',
@@ -86,7 +91,7 @@ const genericExampleValues: Record<string, string> = {
     // https://tools.ietf.org/html/draft-handrews-relative-json-pointer-01
     'relative-json-pointer': '1/nested/objects',
     // full-time in https://tools.ietf.org/html/rfc3339#section-5.6
-    time: new Date().toISOString().split('T')[1]?.split('.')[0] ?? '00:00:00Z',
+    time: EXAMPLE_DATE.split('T')[1]?.split('.')[0] ?? '00:00:00Z',
     // either a URI or relative-reference https://tools.ietf.org/html/rfc3986#section-4.1
     'uri-reference': '../folder',
     'uri-template': 'https://example.com/{id}',
@@ -519,7 +524,7 @@ const getExampleFromSchema = (
             example =
                 typeof newExample === 'object' && typeof example === 'object'
                     ? {
-                          ...(example ?? {}),
+                          ...example,
                           ...newExample,
                       }
                     : Array.isArray(newExample) && Array.isArray(example)

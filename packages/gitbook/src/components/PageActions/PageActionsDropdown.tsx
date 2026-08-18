@@ -1,14 +1,13 @@
 'use client';
 
-import { Button, ButtonGroup } from '@/components/primitives/Button';
-import { DropdownMenu, DropdownMenuSeparator } from '@/components/primitives/DropdownMenu';
-import { tString, useLanguage } from '@/intl/client';
+import { type ReactNode, useRef } from 'react';
+
 import type {
     CustomizationPageActionType,
     GitSyncState,
     SiteCustomizationSettings,
 } from '@gitbook/api';
-import { type ReactNode, useRef } from 'react';
+
 import { type Assistant, useAI } from '../AI';
 import { ToggleChevron } from '../primitives';
 import {
@@ -24,6 +23,9 @@ import {
     ActionViewAsRSS,
     type PageActionAssistantContext,
 } from './PageActions';
+import { Button, ButtonGroup } from '@/components/primitives/Button';
+import { DropdownMenu, DropdownMenuSeparator } from '@/components/primitives/DropdownMenu';
+import { tString, useLanguage } from '@/intl/client';
 
 /**
  * Type of a built-in page action that can be displayed in the page actions menu.

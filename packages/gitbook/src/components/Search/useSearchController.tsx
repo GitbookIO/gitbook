@@ -1,17 +1,24 @@
 'use client';
 
-import { getLocalizedTitle } from '@/lib/sites';
 import { useRouter } from 'next/navigation';
 import React from 'react';
+
 import { useAI } from '../AI';
 import { useTrackEvent } from '../Insights';
 import { useBodyLoaded } from '../primitives';
-import type { SearchResultsRef } from './SearchResults';
+import {
+    clearLastSearchQuery,
+    getLastSearchQuery,
+    setLastSearchQuery,
+    useLastSearchQuery,
+} from './last-query';
 import { addRecentSearchQuery } from './recent-queries';
 import type { SearchBaseProps } from './search-props';
+import type { SearchResultsRef } from './SearchResults';
 import { useSearchState, useSetSearchState } from './useSearch';
 import { useSearchResults } from './useSearchResults';
 import { useSearchResultsCursor } from './useSearchResultsCursor';
+import { getLocalizedTitle } from '@/lib/sites';
 
 function useInitialAskBootstrap(props: {
     asEmbeddable?: boolean;
@@ -109,7 +116,10 @@ function useSearchKeyboardNavigation(props: {
     };
 }
 
-export function useSearchController(props: SearchBaseProps) {
+export function useSearchController(
+    props: SearchBaseProps,
+    options: { restoreLastQueryOnMount?: boolean } = {}
+) {
     const {
         asEmbeddable,
         siteSpace,
@@ -130,6 +140,32 @@ export function useSearchController(props: SearchBaseProps) {
     const resultsRef = React.useRef<SearchResultsRef>(null);
     const isLoaded = useBodyLoaded();
 
+    const restoredLastQueryForSiteSpaceRef = React.useRef<string | null>(null);
+    React.useEffect(() => {
+        if (
+            !options.restoreLastQueryOnMount ||
+            restoredLastQueryForSiteSpaceRef.current === siteSpace.id
+        ) {
+            return;
+        }
+
+        restoredLastQueryForSiteSpaceRef.current = siteSpace.id;
+        const restoredQuery = getLastSearchQuery(siteSpace.id);
+        if (!restoredQuery) {
+            return;
+        }
+
+        void setSearchState(
+            (prev) =>
+                prev ?? {
+                    ask: null,
+                    query: restoredQuery,
+                    scope: 'default',
+                    open: true,
+                }
+        );
+    }, [options.restoreLastQueryOnMount, setSearchState, siteSpace.id]);
+
     const withAI = assistants.length > 0;
     const withSearchAI = assistants.filter((assistant) => assistant.mode === 'search').length > 0;
 
@@ -141,38 +177,46 @@ export function useSearchController(props: SearchBaseProps) {
 
     const onClose = React.useCallback(
         async (to?: string) => {
-            setSearchState((prev) =>
-                prev
-                    ? {
-                          ...prev,
-                          open: false,
-                          query: prev.query === '' ? null : prev.query,
-                      }
-                    : null
-            );
+            await setSearchState((prev) => {
+                if (!prev) return null;
+
+                if (prev.query !== null) {
+                    setLastSearchQuery(siteSpace.id, prev.query);
+                }
+
+                return { ...prev, open: false, query: null };
+            });
 
             if (to) {
                 router.push(to);
             }
         },
-        [setSearchState, router]
+        [setSearchState, router, siteSpace.id]
     );
 
     const onOpen = React.useCallback(() => {
         if (state?.open) {
             return;
         }
-        setSearchState((prev) => ({
-            ask: withAI ? (prev?.ask ?? null) : null,
-            scope: prev?.scope ?? 'default',
-            query: prev?.query ?? (withSearchAI || !withAI ? prev?.ask : null) ?? '',
-            open: true,
-        }));
+        setSearchState((prev) => {
+            const query =
+                prev?.query ??
+                getLastSearchQuery(siteSpace.id) ??
+                (withSearchAI || !withAI ? prev?.ask : null) ??
+                '';
+
+            return {
+                ask: withAI ? (prev?.ask ?? null) : null,
+                scope: prev?.scope ?? 'default',
+                query,
+                open: true,
+            };
+        });
 
         trackEvent({
             type: 'search_open',
         });
-    }, [state?.open, setSearchState, trackEvent, withAI, withSearchAI]);
+    }, [state?.open, setSearchState, siteSpace.id, trackEvent, withAI, withSearchAI]);
 
     const setQuery = React.useCallback(
         (value: string) => {
@@ -186,7 +230,8 @@ export function useSearchController(props: SearchBaseProps) {
         [setSearchState, withAI, withSearchAI]
     );
 
-    const normalizedQuery = state?.query?.trim() ?? '';
+    const lastSearchQuery = useLastSearchQuery(siteSpace.id);
+    const normalizedQuery = (state?.query ?? lastSearchQuery ?? '').trim();
     const normalizedAsk = state?.ask?.trim() ?? '';
     const showAsk = withSearchAI && normalizedAsk.length > 0;
 
@@ -199,7 +244,7 @@ export function useSearchController(props: SearchBaseProps) {
 
     const { results, fetching, error, abort } = useSearchResults({
         asEmbeddable,
-        disabled: !(state?.query || withAI),
+        disabled: !(normalizedQuery || withAI),
         open: Boolean(state?.open),
         query: normalizedQuery,
         siteSpaceId: siteSpace.id,
@@ -212,8 +257,18 @@ export function useSearchController(props: SearchBaseProps) {
         withSections,
     });
 
-    const searchValue = state?.query ?? (withSearchAI || !withAI ? state?.ask : null) ?? '';
+    const searchValue =
+        state?.query ?? (withSearchAI || !withAI ? state?.ask : null) ?? lastSearchQuery ?? '';
     const searchResultsId = `search-results-${React.useId()}`;
+
+    // Only clears the remembered last query and stops any in-flight fetch — it must
+    // NOT touch searchState here. Navigable results dismiss the popover for free via
+    // their own <Link> navigation; racing that with a searchState/URL update in the
+    // same click caused a Next.js App Router transition conflict (RND-11972 regression).
+    const onResultSelect = React.useCallback(() => {
+        clearLastSearchQuery(siteSpace.id);
+        abort();
+    }, [abort, siteSpace.id]);
 
     const askInAssistant = React.useCallback(
         (assistantIndex = 0) => {
@@ -260,6 +315,7 @@ export function useSearchController(props: SearchBaseProps) {
         abort,
         open: onOpen,
         close: onClose,
+        onResultSelect,
         query: normalizedQuery,
         results,
         resultsId: searchResultsId,

@@ -1,9 +1,10 @@
 import type { OpenAPIV3 } from '@gitbook/openapi-parser';
+
+import { type OpenAPIContext, getOpenAPIClientContext } from './context';
 import { Markdown } from './Markdown';
 import { OpenAPIEmptyExample, OpenAPIExample } from './OpenAPIExample';
 import { OpenAPIMediaTypeContent } from './OpenAPIMediaType';
 import { OpenAPIResponseExampleContent } from './OpenAPIResponseExampleContent';
-import { type OpenAPIContext, getOpenAPIClientContext } from './context';
 import type { OpenAPIOperationData, OpenAPIWebhookData } from './types';
 import { getExampleFromReference, getExamples } from './util/example';
 import { createStateKey, getStatusCodeDefaultLabel, resolveDescription } from './utils';

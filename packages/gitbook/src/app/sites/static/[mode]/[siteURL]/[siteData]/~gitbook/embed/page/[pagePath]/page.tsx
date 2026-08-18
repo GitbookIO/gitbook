@@ -1,7 +1,8 @@
+import type { Metadata } from 'next';
+
 import { type RouteParams, getPagePathFromParams } from '@/app/utils';
 import { EmbeddableDocsPage, generateEmbeddableDocsPageMetadata } from '@/components/Embeddable';
 import { getEmbeddableStaticContext } from '@/lib/embeddable';
-import type { Metadata } from 'next';
 
 export const dynamic = 'force-static';
 

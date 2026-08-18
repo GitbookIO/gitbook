@@ -1,6 +1,7 @@
+import type { NextRequest } from 'next/server';
+
 import { type RouteParams, getPagePathFromParams, getStaticSiteContext } from '@/app/utils';
 import { servePageMarkdown } from '@/routes/markdownPage';
-import type { NextRequest } from 'next/server';
 
 export const dynamic = 'force-static';
 

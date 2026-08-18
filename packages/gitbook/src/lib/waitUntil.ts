@@ -1,7 +1,7 @@
 import { getCloudflareContext as getCloudflareContextV2 } from '@/lib/data/cloudflare';
 import { GITBOOK_RUNTIME } from '@/lib/env';
 
-let pendings: Array<Promise<unknown>> = [];
+let pendings: Promise<unknown>[] = [];
 
 /**
  * Extend the lifetime of the event handler until the promise is resolved.

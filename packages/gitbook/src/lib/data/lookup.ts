@@ -1,11 +1,12 @@
-import { race, tryCatch } from '@/lib/async';
-import { joinPath, joinPathWithBaseURL } from '@/lib/paths';
-import { trace } from '@/lib/tracing';
 import type { PublishedSiteContentLookup, SiteVisitorPayload } from '@gitbook/api';
+
 import { apiClient } from './api';
 import { getExposableError } from './errors';
 import type { DataFetcherResponse } from './types';
 import { getURLLookupAlternatives, stripURLSearch } from './urls';
+import { race, tryCatch } from '@/lib/async';
+import { joinPath, joinPathWithBaseURL } from '@/lib/paths';
+import { trace } from '@/lib/tracing';
 
 interface LookupPublishedContentByUrlInput {
     url: string;

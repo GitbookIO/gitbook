@@ -2,25 +2,35 @@
 
 import clsx from 'classnames';
 import { useState } from 'react';
-import { Button, type ButtonProps } from 'react-aria-components';
-import { OpenAPITooltip } from './OpenAPITooltip';
+
 import type { OpenAPIClientContext } from './context';
+import { OpenAPITooltip } from './OpenAPITooltip';
 import { t } from './translate';
 
-export function OpenAPICopyButton(
-    props: ButtonProps & {
-        value: string;
-        children: React.ReactNode;
-        context: OpenAPIClientContext;
-        label?: string;
-        /**
-         * Whether to show a tooltip.
-         * @default true
-         */
-        withTooltip?: boolean;
-    }
-) {
-    const { value, label, children, onPress, className, context, withTooltip = true } = props;
+export function OpenAPICopyButton(props: {
+    value: string;
+    children: React.ReactNode;
+    context: OpenAPIClientContext;
+    label?: string;
+    className?: string;
+    isDisabled?: boolean;
+    onClick?: () => void;
+    /**
+     * Whether to show a tooltip.
+     * @default true
+     */
+    withTooltip?: boolean;
+}) {
+    const {
+        value,
+        label,
+        children,
+        onClick,
+        className,
+        context,
+        isDisabled,
+        withTooltip = true,
+    } = props;
     const [copied, setCopied] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
 
@@ -38,21 +48,27 @@ export function OpenAPICopyButton(
     };
 
     return (
-        <OpenAPITooltip isDisabled={!withTooltip} isOpen={isOpen} onOpenChange={setIsOpen}>
-            <Button
-                type="button"
-                preventFocusOnPress
-                onPress={(e) => {
-                    handleCopy();
-                    onPress?.(e);
-                }}
-                className={clsx('openapi-copy-button', className)}
-                {...props}
-            >
-                {children}
-            </Button>
+        <OpenAPITooltip disabled={!withTooltip} open={isOpen} onOpenChange={setIsOpen}>
+            <OpenAPITooltip.Trigger
+                render={
+                    <button
+                        type="button"
+                        disabled={isDisabled}
+                        data-disabled={isDisabled ? 'true' : undefined}
+                        // Stands in for react-aria's `preventFocusOnPress`.
+                        onMouseDown={(event) => event.preventDefault()}
+                        onClick={() => {
+                            handleCopy();
+                            onClick?.();
+                        }}
+                        className={clsx('openapi-copy-button', className)}
+                    >
+                        {children}
+                    </button>
+                }
+            />
 
-            <OpenAPITooltip.Content isOpen={isOpen} onOpenChange={setIsOpen}>
+            <OpenAPITooltip.Content>
                 {copied ? (
                     <>
                         {context.icons.check}

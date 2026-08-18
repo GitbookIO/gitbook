@@ -1,14 +1,14 @@
-import { type PagePathParams, getSitePageData } from '@/components/SitePage';
-import type { GitBookSiteContext } from '@/lib/context';
-import { SiteInsightsDisplayContext } from '@gitbook/api';
 import type { Metadata } from 'next';
+
+import { SiteInsightsDisplayContext } from '@gitbook/api';
+
 import { HeaderMobileMenu } from '../Header/HeaderMobileMenu';
 import { SpacesDropdown, TranslationsDropdown } from '../Header/SpacesDropdown';
 import { PageBody } from '../PageBody';
+import { ScrollContainer } from '../primitives/ScrollContainer';
 import { SiteSectionTabs, encodeClientSiteSections } from '../SiteSections';
 import { categorizeVariants } from '../SpaceLayout/categorizeVariants';
 import { TableOfContents } from '../TableOfContents';
-import { ScrollContainer } from '../primitives/ScrollContainer';
 import { EmbeddableDocsPageControlButtons } from './EmbeddableDocsPageControlButtons';
 import {
     EmbeddableFrame,
@@ -25,6 +25,8 @@ import {
     EmbeddableIframeCloseButton,
     EmbeddableIframeTabs,
 } from './EmbeddableIframeAPI';
+import { type PagePathParams, getSitePageData } from '@/components/SitePage';
+import type { GitBookSiteContext } from '@/lib/context';
 
 export const dynamic = 'force-static';
 
@@ -62,9 +64,9 @@ export async function EmbeddableDocsPage(
                 data-testid="embed-docs-page"
                 className={variants.generic.length > 1 ? 'has-sidebar' : 'no-sidebar'}
             >
-                <div className="relative flex flex-col border-tint-subtle border-b theme-bold:bg-header-background">
+                <div className="relative flex flex-col border-b border-tint-subtle theme-bold:bg-header-background">
                     <EmbeddableFrameHeader className="theme-bold:text-header-link">
-                        <HeaderMobileMenu className="-ml-2 no-sidebar:hidden theme-bold:text-header-link hover:theme-bold:bg-header-link/3 hover:theme-bold:text-header-link lg:hidden" />
+                        <HeaderMobileMenu className="-ml-2 theme-bold:text-header-link hover:theme-bold:bg-header-link/3 hover:theme-bold:text-header-link no-sidebar:hidden lg:hidden" />
                         <EmbeddableFrameHeaderMain>
                             <EmbeddableFrameTitle>{context.site.title}</EmbeddableFrameTitle>
                         </EmbeddableFrameHeaderMain>
@@ -104,7 +106,7 @@ export async function EmbeddableDocsPage(
                 <EmbeddableFrameBody>
                     <ScrollContainer
                         orientation="vertical"
-                        className="-mx-4 not-hydrated:animate-blur-in-slow"
+                        className="not-hydrated:animate-blur-in-slow -mx-4"
                         contentClassName="flex-row px-4"
                         leading={{ fade: false, button: true }}
                         trailing={{ fade: false, button: true }}
@@ -129,7 +131,7 @@ export async function EmbeddableDocsPage(
                             }
                             innerHeader={
                                 variants.generic.length > 1 ? (
-                                    <div className="my-5 sidebar-default:mt-2 flex flex-col gap-2 px-5 empty:hidden">
+                                    <div className="my-5 flex flex-col gap-2 px-5 empty:hidden sidebar-default:mt-2">
                                         {variants.generic.length > 1 ? (
                                             <SpacesDropdown
                                                 context={context}

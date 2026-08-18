@@ -4,10 +4,10 @@ import { usePathname, useSearchParams } from 'next/navigation';
 import { useMemo } from 'react';
 import type React from 'react';
 
-import { removeTrailingSlash } from '@/lib/paths';
 import { Button, type ButtonProps } from '../primitives/Button';
 import { DropdownMenuItem } from '../primitives/DropdownMenu';
 import { Link, type LinkInsightsProps, type LinkProps } from '../primitives/Link';
+import { removeTrailingSlash } from '@/lib/paths';
 
 /**
  * Enrich a site auth login link with the current location relative to the site URL.

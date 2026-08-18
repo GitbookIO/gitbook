@@ -1,9 +1,10 @@
 'use client';
 
-import type { ContentKitWebFrame } from '@gitbook/api';
 import React from 'react';
 
+import type { ContentKitWebFrame } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
+
 import { type ContentKitClientContextData, useContentKitClientContext } from './context';
 import { resolveDynamicBinding } from './dynamic';
 import type { ContentKitClientElementProps } from './types';
@@ -159,7 +160,7 @@ export function ElementWebframe(props: ContentKitClientElementProps<ContentKitWe
         };
     }, [renderer, sendMessage]);
 
-    // Send data and client-only context (visitor claims) as state to the webframe.
+    // Send data and client-only context (visitor claims, current page) as state to the webframe.
     React.useEffect(() => {
         const abort = { cancelled: false };
         sendWebframeState({
@@ -231,10 +232,14 @@ function resolveWebframeState(
 }
 
 /**
- * Resolve the optional client-only contexts (visitor claims) to merge into the webframe state.
+ * Resolve the optional client-only contexts (visitor claims, current page)
+ * to merge into the webframe state.
  */
 async function resolveClientContexts(clientContext: ContentKitClientContextData | undefined) {
-    return await Promise.all([clientContext?.getVisitorContext?.()]);
+    return await Promise.all([
+        clientContext?.getVisitorContext?.(),
+        clientContext?.getPageContext?.(),
+    ]);
 }
 
 /**

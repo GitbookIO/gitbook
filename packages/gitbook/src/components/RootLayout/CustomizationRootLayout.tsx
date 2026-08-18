@@ -1,3 +1,5 @@
+import * as ReactDOM from 'react-dom';
+
 import {
     CustomizationDefaultThemeMode,
     CustomizationSidebarBackgroundStyle,
@@ -19,17 +21,16 @@ import {
     hexToRgb,
 } from '@gitbook/colors';
 import { IconsProvider } from '@gitbook/icons';
-import * as ReactDOM from 'react-dom';
 
+import { AnnouncementDismissedScript } from '../Announcement';
+import { SelectStateScript } from '../Select';
+import { OperatingSystemClassScript } from './OperatingSystemClassScript';
+import { RootLayoutClientContexts } from './RootLayoutClientContexts';
 import { type FontData, getFontData } from '@/fonts';
 import { fontNotoColorEmoji, fonts } from '@/fonts/default';
+import './globals.css';
 import { getContentLocale, getSpaceLanguage } from '@/intl/server';
 import { getAssetURL } from '@/lib/assets';
-import { tcls } from '@/lib/tailwind';
-
-import { RootLayoutClientContexts } from './RootLayoutClientContexts';
-
-import './globals.css';
 import type { GitBookAnyContext } from '@/lib/context';
 import { GITBOOK_FONTS_URL, GITBOOK_ICONS_TOKEN, GITBOOK_ICONS_URL } from '@/lib/env';
 import {
@@ -38,9 +39,8 @@ import {
     getDefaultInlineIconSourceRequests,
     getInlineIconSources,
 } from '@/lib/icons/inline';
+import { tcls } from '@/lib/tailwind';
 import { defaultCustomization } from '@/lib/utils';
-import { AnnouncementDismissedScript } from '../Announcement';
-import { OperatingSystemClassScript } from './OperatingSystemClassScript';
 
 function preloadFont(fontData: FontData) {
     if (fontData.type === 'custom') {
@@ -146,6 +146,9 @@ export async function CustomizationRootLayout(props: {
                 ) : null}
 
                 <OperatingSystemClassScript />
+
+                {/* Apply the visitor's content selection to <html> before first paint (no flash) */}
+                <SelectStateScript />
 
                 {/* Inject custom font @font-face rules */}
                 {fontData.type === 'custom' ? <style>{fontData.fontFaceRules}</style> : null}

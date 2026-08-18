@@ -1,5 +1,6 @@
-import { GITBOOK_API_TOKEN, GITBOOK_API_URL, GITBOOK_USER_AGENT } from '@/lib/env';
-import { trace } from '@/lib/tracing';
+import { parse as parseCacheControl } from '@tusbar/cache-control';
+import { cacheLife, cacheTag } from 'next/cache';
+
 import {
     type ComputedContentSource,
     GitBookAPI,
@@ -8,11 +9,12 @@ import {
     type SiteSearchScope,
 } from '@gitbook/api';
 import { getCacheTag, getComputedContentSourceCacheTags } from '@gitbook/cache-tags';
-import { parse as parseCacheControl } from '@tusbar/cache-control';
-import { cacheLife, cacheTag } from 'next/cache';
+
 import { cache } from '../cache';
 import { DataFetcherError, wrapDataFetcherError } from './errors';
 import type { GitBookDataFetcher } from './types';
+import { GITBOOK_API_TOKEN, GITBOOK_API_URL, GITBOOK_USER_AGENT } from '@/lib/env';
+import { trace } from '@/lib/tracing';
 
 interface DataFetcherInput {
     /**

@@ -1,5 +1,6 @@
 import { expect, it } from 'bun:test';
 import Parser from 'rss-parser';
+
 import { getContentTestURL } from './utils';
 
 it('should expose a RSS feed for a page with updates', async () => {

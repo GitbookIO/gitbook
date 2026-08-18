@@ -1,11 +1,12 @@
 import * as React from 'react';
 
+import type { Variables } from '@gitbook/api';
+import { ExpressionRuntime, formatExpressionResult } from '@gitbook/expr';
+
 import {
     type AdaptiveVisitorClaims,
     createExpressionEvaluationContext,
 } from '@/components/Adaptive';
-import type { Variables } from '@gitbook/api';
-import { ExpressionRuntime, formatExpressionResult } from '@gitbook/expr';
 
 /**
  * Hook that returns a callback to evaluate an inline expression with visitor data

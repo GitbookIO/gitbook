@@ -1,7 +1,7 @@
-import type { GitBookSiteContext } from '@/lib/context';
 import { AdminToolbarClient } from './AdminToolbarClient';
 import { getToolbarChangedPages } from './changedPages';
 import type { AdminToolbarContext } from './types';
+import type { GitBookSiteContext } from '@/lib/context';
 
 export interface AdminToolbarProps {
     context: GitBookSiteContext;

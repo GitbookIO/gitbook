@@ -1,5 +1,5 @@
-import { GITBOOK_ASSETS_URL, GITBOOK_URL } from '@/lib/env';
 import { joinPath, joinPathWithBaseURL } from './paths';
+import { GITBOOK_ASSETS_URL, GITBOOK_URL } from '@/lib/env';
 
 /**
  * Create a public URL for an asset.

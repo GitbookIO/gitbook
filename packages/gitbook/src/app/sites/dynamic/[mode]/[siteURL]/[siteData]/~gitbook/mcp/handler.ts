@@ -1,22 +1,18 @@
-import {
-    CustomizationPageActionType,
-    SiteFindingType,
-    SiteInsightsDisplayContext,
-} from '@gitbook/api';
+import { createMcpHandler } from 'mcp-handler';
+import type { NextRequest } from 'next/server';
+import { z } from 'zod';
+
+import { CustomizationPageActionType, SiteInsightsDisplayContext } from '@gitbook/api';
 
 import { type RouteLayoutParams, getDynamicSiteContext } from '@/app/utils';
 import { isAIEnabled } from '@/components/utils/isAIChatEnabled';
 import { renderAskSourcesMarkdown, streamSiteAskAnswer } from '@/lib/ask';
 import { getExposableError, throwIfDataError } from '@/lib/data';
 import { fromPageMarkdown, getMarkdownForPageInSpace, toPageMarkdown } from '@/lib/markdownPage';
-import { resolvePagePath } from '@/lib/pages';
 import { joinPathWithBaseURL } from '@/lib/paths';
-import { findSiteSpaceBy, findSiteSpaceByUrl } from '@/lib/sites';
+import { findSiteSpaceBy, findSiteSpaceByUrl, resolveSiteSpacePagePath } from '@/lib/sites';
 import { trackServerInsightsEvents } from '@/lib/tracking';
 import { waitUntil } from '@/lib/waitUntil';
-import { createMcpHandler } from 'mcp-handler';
-import type { NextRequest } from 'next/server';
-import { z } from 'zod';
 
 /**
  * Fire-and-forget insights tracking for the MCP endpoint. A tracking failure (e.g. a 422 from the
@@ -202,7 +198,11 @@ export async function handleMcpRequest(
                             })
                         );
 
-                        const resolved = resolvePagePath(revision.pages, match.pagePath ?? '');
+                        const resolved = resolveSiteSpacePagePath(
+                            match.siteSpace,
+                            revision.pages,
+                            match.pagePath
+                        );
                         if (!resolved) {
                             return {
                                 content: [{ type: 'text', text: `Page not found: "${url}"` }],
@@ -350,11 +350,6 @@ export async function handleMcpRequest(
                 'sendFeedback',
                 `Report an issue in the documentation of ${site.title} so the team can fix it. Use it whenever, while helping a user, you come across content that is outdated, contradictory, missing information, or otherwise unhelpful. Also use it when the user themselves reports a problem with the docs, even if you could not verify it yourself. If it's your own observation, do a quick sanity check that the issue is real before reporting — no need to exhaustively re-read the page. Send one call per distinct issue and do not report the same issue twice in a conversation. Do not use this tool to confirm that a page is accurate; it is for reporting problems only.`,
                 {
-                    category: z
-                        .nativeEnum(SiteFindingType)
-                        .describe(
-                            'The kind of issue. "content-outdated": the content was correct at some point but no longer matches the current product or reality. "incoherence": the content contradicts itself or another page. "content-gap": information the reader needs is missing entirely, whether or not it was ever documented. "other": only as a last resort when none of the above fits.'
-                        ),
                     content: z
                         .string()
                         .min(1)
@@ -365,7 +360,7 @@ export async function handleMcpRequest(
                     pageUrl: z
                         .string()
                         .describe(
-                            `The full URL of the page the issue is about (e.g. ${siteUrl}/getting-started). Provide it whenever you can so the finding is linked to the exact page.`
+                            `The full URL of the page the issue is about (e.g. ${siteUrl}/getting-started), so the finding is linked to the exact page.`
                         )
                         .transform((value, ctx) => {
                             const candidate = URL.canParse(value)
@@ -386,8 +381,13 @@ export async function handleMcpRequest(
                             }
 
                             return candidate.toString();
-                        })
-                        .optional(),
+                        }),
+                    goal: z
+                        .string()
+                        .optional()
+                        .describe(
+                            'The broader end goal you were ultimately trying to accomplish (as/on behalf of the user) when you hit this issue. Gives the team the context you were working towards. Optional.'
+                        ),
                 },
                 {
                     title: 'Send feedback',
@@ -396,62 +396,68 @@ export async function handleMcpRequest(
                     idempotentHint: false,
                     openWorldHint: true,
                 },
-                async ({ category, content, pageUrl }) => {
+                async ({ content, pageUrl, goal }) => {
                     try {
-                        let pageLocation:
-                            | { page: string; space: string; revision: string }
-                            | undefined;
-
-                        if (pageUrl) {
-                            const match = findSiteSpaceByUrl(context.structure, pageUrl);
-                            if (!match) {
-                                return {
-                                    content: [
-                                        { type: 'text', text: `Page not found: "${pageUrl}"` },
-                                    ],
-                                    isError: true,
-                                };
-                            }
-
-                            const revision = await throwIfDataError(
-                                dataFetcher.getRevision({
-                                    spaceId: match.siteSpace.space.id,
-                                    revisionId: match.siteSpace.space.revision,
-                                })
-                            );
-
-                            const resolved = resolvePagePath(revision.pages, match.pagePath ?? '');
-                            if (!resolved) {
-                                return {
-                                    content: [
-                                        { type: 'text', text: `Page not found: "${pageUrl}"` },
-                                    ],
-                                    isError: true,
-                                };
-                            }
-
-                            pageLocation = {
-                                page: resolved.page.id,
-                                space: match.siteSpace.space.id,
-                                revision: match.siteSpace.space.revision,
+                        const match = findSiteSpaceByUrl(context.structure, pageUrl);
+                        if (!match) {
+                            return {
+                                content: [{ type: 'text', text: `Page not found: "${pageUrl}"` }],
+                                isError: true,
                             };
                         }
 
-                        trackMcpEvent({
-                            organizationId: context.organizationId,
-                            siteId: site.id,
-                            events: [
-                                {
-                                    type: 'agent_feedback',
-                                    feedback: { content, category },
-                                    location: {
-                                        displayContext: SiteInsightsDisplayContext.Mcp,
-                                        ...pageLocation,
-                                    },
-                                },
-                            ],
-                            request,
-                        });
+                        const revision = await throwIfDataError(
+                            dataFetcher.getRevision({
+                                spaceId: match.siteSpace.space.id,
+                                revisionId: match.siteSpace.space.revision,
+                            })
+                        );
+
+                        const resolved = resolveSiteSpacePagePath(
+                            match.siteSpace,
+                            revision.pages,
+                            match.pagePath
+                        );
+                        if (!resolved) {
+                            return {
+                                content: [{ type: 'text', text: `Page not found: "${pageUrl}"` }],
+                                isError: true,
+                            };
+                        }
+
+                        const trimmedGoal = goal?.trim() || undefined;
+
+                        //!! DISABLED FOR NOW: We'll add this back in when we have a way to track agent feedback.
+                        // trackMcpEvent({
+                        //     organizationId: context.organizationId,
+                        //     siteId: site.id,
+                        //     events: [
+                        //         {
+                        //             type: 'agent_feedback',
+                        //             feedback: { content, category },
+                        //             location: {
+                        //                 displayContext: SiteInsightsDisplayContext.Mcp,
+                        //                 page: resolved.page.id,
+                        //                 space: match.siteSpace.space.id,
+                        //                 revision: match.siteSpace.space.revision,
+                        //             },
+                        //         },
+                        //     ],
+                        //     request,
+                        // });
+
+                        const apiClient = await dataFetcher.api();
+                        await apiClient.orgs.submitSiteAgentFeedback(
+                            context.organizationId,
+                            site.id,
+                            {
+                                feedback: content,
+                                url: pageUrl,
+                                spaceId: match.siteSpace.space.id,
+                                pageId: resolved.page.id,
+                                ...(trimmedGoal ? { goal: trimmedGoal } : {}),
+                            }
+                        );
 
                         return {
                             content: [{ type: 'text', text: 'Feedback recorded. Thank you.' }],

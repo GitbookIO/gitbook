@@ -1,4 +1,5 @@
 import 'server-only';
+import pRetry from 'p-retry';
 
 import {
     CustomizationIconsStyle,
@@ -9,12 +10,11 @@ import {
     type SiteSection,
     type SiteSectionGroup,
 } from '@gitbook/api';
-import { type InlineIconSource, getInlineIconSourceKey } from '@gitbook/icons/IconSources';
 import { getIconStyle } from '@gitbook/icons/getIconStyle';
 import { validateIconName } from '@gitbook/icons/icons';
+import { type InlineIconSource, getInlineIconSourceKey } from '@gitbook/icons/IconSources';
 import { type IconName, IconStyle } from '@gitbook/icons/types';
 import { GITBOOK_ICONS_ASSET_VERSION } from '@gitbook/icons/version';
-import pRetry from 'p-retry';
 
 import { getAssetURL } from '@/lib/assets';
 import { GITBOOK_ICONS_TOKEN, GITBOOK_ICONS_URL, GITBOOK_URL } from '@/lib/env';
@@ -225,7 +225,10 @@ async function getInlineIconSource(
     const cacheKey = getInlineIconSourceKey(style, icon);
     const existing = rawSvgPromises.get(cacheKey);
     if (existing) {
-        return existing;
+        // If we already have a request for this icon, return the existing promise.
+        // We should never throw an error here, as it would crash the entire page. Instead, we return null and let the client handle the missing icon gracefully.
+        // This is only visible in dev, where the map will stay around.
+        return existing.catch(() => null);
     }
 
     try {

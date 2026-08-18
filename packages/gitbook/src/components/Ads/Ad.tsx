@@ -1,5 +1,7 @@
 'use client';
 
+import * as React from 'react';
+
 import {
     type SiteAds,
     SiteAdsStatus,
@@ -7,15 +9,13 @@ import {
     type SiteInsightsAdPlacement,
     SiteInsightsTrademarkPlacement,
 } from '@gitbook/api';
-import * as React from 'react';
 
-import { t, useLanguage } from '@/intl/client';
-import { type ClassValue, tcls } from '@/lib/tailwind';
-
-import { useTrackEvent } from '../Insights';
 import { useHasBeenInViewport } from '../hooks/useHasBeenInViewport';
+import { useTrackEvent } from '../Insights';
 import { Link } from '../primitives';
 import { renderAd } from './renderAd';
+import { t, useLanguage } from '@/intl/client';
+import { type ClassValue, tcls } from '@/lib/tailwind';
 
 /**
  * Zone ID provided by BuySellAds for the preview.

@@ -1,18 +1,18 @@
+import assertNever from 'assert-never';
+import { assert } from 'ts-essentials';
+
 import type {
     DocumentBlock,
     DocumentBlockListItem,
     DocumentBlockListOrdered,
     DocumentBlockListUnordered,
 } from '@gitbook/api';
-import assertNever from 'assert-never';
-import { assert } from 'ts-essentials';
-
-import { Checkbox } from '@/components/primitives';
-import { tcls } from '@/lib/tailwind';
 
 import type { BlockProps } from './Block';
 import { Blocks } from './Blocks';
 import { getBlockTextStyle } from './spacing';
+import { Checkbox } from '@/components/primitives';
+import { tcls } from '@/lib/tailwind';
 
 export function ListItem(props: BlockProps<DocumentBlockListItem>) {
     const { block, ancestorBlocks, ...contextProps } = props;
@@ -163,7 +163,7 @@ function PseudoBefore(props: {
 }) {
     return (
         <div
-            className="before:font-var before:content-(--pseudoBefore--content)"
+            className="before:content-(--pseudoBefore--content) before:font-var"
             style={
                 {
                     '--pseudoBefore--content': `'${props.content}'`,

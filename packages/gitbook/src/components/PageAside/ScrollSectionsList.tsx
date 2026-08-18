@@ -1,14 +1,14 @@
 'use client';
 import React from 'react';
 
+import { OpenAPIMethodBadge } from '@gitbook/react-openapi';
+
+import { HEADER_HEIGHT_DESKTOP } from '../layout';
 import { useUpdatesFilter } from '@/components/DocumentView/UpdatesFilter';
 import { useScrollActiveId } from '@/components/hooks';
+import { useBodyLoaded } from '@/components/primitives';
 import type { DocumentSection } from '@/lib/document-sections';
 import { tcls } from '@/lib/tailwind';
-
-import { useBodyLoaded } from '@/components/primitives';
-import { OpenAPIMethodBadge } from '@gitbook/react-openapi';
-import { HEADER_HEIGHT_DESKTOP } from '../layout';
 
 /**
  * The threshold at which we consider a section as intersecting the viewport.
@@ -59,7 +59,7 @@ export function ScrollSectionsList({ sections }: { sections: DocumentSection[] }
 
     return (
         <ul
-            className="relative flex flex-col border-tint-subtle sidebar-list-line:border-l pb-5"
+            className="relative flex flex-col border-tint-subtle pb-5 sidebar-list-line:border-l"
             ref={scrollContainerRef}
         >
             {visibleSections.map((section) => (
@@ -79,6 +79,7 @@ export function ScrollSectionsList({ sections }: { sections: DocumentSection[] }
                 >
                     <a
                         href={`#${section.id}`}
+                        data-cover-aware-text
                         className={tcls(
                             'relative',
                             'z-10',

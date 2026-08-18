@@ -1,20 +1,21 @@
 'use client';
 
-import { tString, useLanguage } from '@/intl/client';
-import { setLocalStorageItem } from '@/lib/browser';
-import type { ResolvedContentRef } from '@/lib/references';
-import { getLocalizedMessage, getLocalizedTitle } from '@/lib/sites';
-import { tcls } from '@/lib/tailwind';
 import {
     type CustomizationAnnouncement,
     SiteInsightsLinkPosition,
     type TranslationLanguage,
 } from '@gitbook/api';
 import { Icon, type IconName } from '@gitbook/icons';
+
 import { CONTAINER_STYLE } from '../layout';
 import { Button, Link } from '../primitives';
 import { LinkStyles } from '../primitives/styles';
 import { ANNOUNCEMENT_CSS_CLASS, ANNOUNCEMENT_STORAGE_KEY } from './constants';
+import { tString, useLanguage } from '@/intl/client';
+import { setLocalStorageItem } from '@/lib/browser';
+import type { ResolvedContentRef } from '@/lib/references';
+import { getLocalizedMessage, getLocalizedTitle } from '@/lib/sites';
+import { tcls } from '@/lib/tailwind';
 
 /**
  * Client-side component to enable closing the banner
@@ -39,10 +40,10 @@ export function AnnouncementBanner(props: {
     return (
         <div
             data-gb-announcement-banner
-            className="theme-bold:bg-header-background pt-4 pb-2"
+            className="pb-2 pt-4 theme-bold:bg-header-background"
             data-nosnippet=""
         >
-            <div className="transition-all duration-300 motion-reduce:transition-none lg:chat-open:pr-(--ai-chat-width)">
+            <div className="lg:chat-open:pr-(--ai-chat-width) transition-all duration-300 motion-reduce:transition-none">
                 <div className={tcls('relative', CONTAINER_STYLE)}>
                     <Tag
                         href={contentRef?.href ?? ''}
@@ -66,14 +67,14 @@ export function AnnouncementBanner(props: {
                     >
                         <Icon
                             icon={style.icon as IconName}
-                            className={`mt-0.5 mr-3 size-4 shrink-0 ${style.iconColor}`}
+                            className={`mr-3 mt-0.5 size-4 shrink-0 ${style.iconColor}`}
                         />
                         <div>
                             {message}
                             {hasLink ? (
                                 <div className={tcls(LinkStyles, style.link, 'ml-1 inline')}>
                                     {contentRef?.icon ? (
-                                        <span className="mr-1 ml-2 *:inline">
+                                        <span className="ml-2 mr-1 *:inline">
                                             {contentRef?.icon}
                                         </span>
                                     ) : null}
@@ -98,7 +99,7 @@ export function AnnouncementBanner(props: {
                             variant="blank"
                             size="small"
                             onClick={dismissAnnouncement}
-                            className={`absolute top-0 right-4 mt-1.5 mr-1.5 circular-corners:rounded-lg rounded-sm straight-corners:rounded-none p-1.5 transition-all hover:ring-1 sm:right-6 md:right-8 ${style.close}`}
+                            className={`absolute right-4 top-0 mr-1.5 mt-1.5 rounded-sm p-1.5 transition-all hover:ring-1 straight-corners:rounded-none circular-corners:rounded-lg sm:right-6 md:right-8 ${style.close}`}
                         />
                     ) : null}
                 </div>

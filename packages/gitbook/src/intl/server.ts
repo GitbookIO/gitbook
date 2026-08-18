@@ -1,4 +1,3 @@
-import type { GitBookAnyContext } from '@/lib/context';
 import {
     type TranslationLanguage,
     type TranslationLocale,
@@ -6,6 +5,7 @@ import {
     isAvailableLanguage,
     loadLanguage,
 } from './translations';
+import type { GitBookAnyContext } from '@/lib/context';
 
 export * from './translate';
 

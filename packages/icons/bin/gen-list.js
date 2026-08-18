@@ -55,7 +55,7 @@ async function main() {
         writeDataFile('icons', JSON.stringify(result, null, 2)),
     ]);
 
-    // biome-ignore lint/suspicious/noConsole: We want the CLI to log
+    // oxlint-disable-next-line no-console
     console.log(`Generated ${result.length} icons`);
 }
 

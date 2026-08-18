@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'bun:test';
+
 import { normalizePathname, resolveNavigationTarget, toInSiteHref } from './navigation';
 
 const location = {

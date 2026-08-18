@@ -1,4 +1,3 @@
-import type { GitBookAnyContext } from '@/lib/context';
 import type {
     DocumentBlockOpenAPI,
     DocumentBlockOpenAPIOperation,
@@ -6,6 +5,8 @@ import type {
     DocumentBlockOpenAPIWebhook,
 } from '@gitbook/api';
 import type { Filesystem, OpenAPIParseError, OpenAPIV3xDocument } from '@gitbook/openapi-parser';
+
+import type { GitBookAnyContext } from '@/lib/context';
 
 /**
  * Type for both OpenAPI & OpenAPIOperation block

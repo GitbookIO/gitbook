@@ -1,4 +1,5 @@
 import type { RevisionPageDocument, RevisionPageGroup } from '@gitbook/api';
+
 import type { GitBookSiteContext } from './context';
 
 /**

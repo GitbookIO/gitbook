@@ -1,11 +1,7 @@
 import { type SpacePDFRouteParams, getSpacePDFContext } from '@/app/~space/[spaceId]/pdf';
 import { PDFPage, generatePDFMetadata } from '@/components/PDF';
 
-export async function generateMetadata({
-    params,
-}: {
-    params: Promise<SpacePDFRouteParams>;
-}) {
+export async function generateMetadata({ params }: { params: Promise<SpacePDFRouteParams> }) {
     const context = await getSpacePDFContext(await params);
     return generatePDFMetadata(context);
 }

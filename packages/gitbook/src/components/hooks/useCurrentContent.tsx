@@ -1,7 +1,8 @@
 'use client';
 
-import type { VisitorAuthClaims } from '@/lib/adaptive';
 import * as React from 'react';
+
+import type { VisitorAuthClaims } from '@/lib/adaptive';
 
 /**
  * Global context for the current content.

@@ -1,4 +1,5 @@
 import { upgrade } from '@scalar/openapi-parser';
+
 import { OpenAPIParseError } from './error';
 import type { ParseOpenAPIInput, ParseOpenAPIResult } from './parse';
 import { parseOpenAPIV3 } from './v3';

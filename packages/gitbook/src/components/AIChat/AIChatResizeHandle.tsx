@@ -1,8 +1,9 @@
 'use client';
 
-import { tcls } from '@/lib/tailwind';
 import React from 'react';
+
 import { useAIChatWidthStore } from './useAIChatWidthStore';
+import { tcls } from '@/lib/tailwind';
 
 function setResizing(active: boolean) {
     document.documentElement.dataset.aiChatResizing = String(active);
@@ -77,7 +78,7 @@ export function AIChatResizeHandle() {
                 'items-stretch justify-center'
             )}
         >
-            <span className="h-full w-px rounded-full bg-transparent transition-all duration-150 ease-out group-hover:w-0.5 group-hover:bg-primary-solid/40 group-active:w-0.5 group-active:bg-primary-solid" />
+            <span className="group-hover:bg-primary-solid/40 h-full w-px rounded-full bg-transparent transition-all duration-150 ease-out group-hover:w-0.5 group-active:w-0.5 group-active:bg-primary-solid" />
         </div>
     );
 }

@@ -5,24 +5,16 @@ import { GITBOOK_ASSETS_URL, GITBOOK_URL } from './globals';
  */
 export function isGitBookHostURL(input: URL | string): boolean {
     const url = typeof input === 'string' ? new URL(input) : input;
+    return matchesGitBookHost(url.host);
+}
 
+// Check a bare host (`hostname[:port]`), incl. Cloudflare preview URLs prefixed with a hash.
+export function matchesGitBookHost(host: string): boolean {
     if (!GITBOOK_URL) {
         return false;
     }
-
     const gitbookHost = new URL(GITBOOK_URL).host;
-
-    if (url.host === gitbookHost) {
-        return true;
-    }
-
-    // Handle the Cloudflare preview URLs that are prefixed with a random hash
-    // https://developers.cloudflare.com/workers/configuration/previews/
-    if (url.host.endsWith(`-${gitbookHost}`)) {
-        return true;
-    }
-
-    return false;
+    return host === gitbookHost || host.endsWith(`-${gitbookHost}`);
 }
 
 /**

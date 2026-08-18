@@ -45,4 +45,5 @@ export const ja = {
     or: 'または',
     and: 'および',
     possible_values: '可能な値',
+    direct_link_to_model: '${1} への直接リンク',
 };

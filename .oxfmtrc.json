@@ -1,0 +1,70 @@
+{
+    "$schema": "./node_modules/oxfmt/configuration_schema.json",
+    "printWidth": 100,
+    "tabWidth": 4,
+    "useTabs": false,
+    "semi": true,
+    "singleQuote": true,
+    "jsxSingleQuote": false,
+    "quoteProps": "as-needed",
+    "trailingComma": "es5",
+    "bracketSpacing": true,
+    "bracketSameLine": false,
+    "arrowParens": "always",
+    "endOfLine": "lf",
+    "sortImports": {
+        "customGroups": [
+            {
+                "groupName": "workspace",
+                "elementNamePattern": ["@gitbook/**"]
+            }
+        ],
+        "groups": [
+            ["value-builtin", "value-external", "type-builtin", "type-external"],
+            { "newlinesBetween": true },
+            "workspace",
+            { "newlinesBetween": true },
+            [
+                "value-internal",
+                "type-internal",
+                "value-parent",
+                "type-parent",
+                "value-sibling",
+                "type-sibling",
+                "value-index",
+                "type-index"
+            ],
+            "type-import",
+            "unknown"
+        ]
+    },
+    "sortPackageJson": false,
+    "sortTailwindcss": {
+        "config": "./packages/gitbook/tailwind.config.ts",
+        "attributes": ["class", "className", "style"],
+        "functions": ["clsx", "tw"]
+    },
+    "ignorePatterns": [
+        "**/node_modules/**",
+        "**/dist/**",
+        "**/build/**",
+        "**/public/**",
+        "**/.next/**",
+        "**/.open-next/**",
+        "**/.turbo/**",
+        "**/.vercel/**",
+        "**/.cache/**",
+        "**/.wrangler/**",
+        "**/*.log",
+        "**/*.MD",
+        "**/*.md",
+        "**/*.mdx",
+        "**/*.html",
+        "**/*.css",
+        "packages/embed/standalone/**",
+        "packages/openapi-parser/src/fixtures/**",
+        "packages/emoji-codepoints/index.ts",
+        "packages/icons/src/data/*.json",
+        "packages/gitbook/worker-configuration.d.ts"
+    ]
+}

@@ -1,6 +1,7 @@
+import { SiteVisibility } from '@gitbook/api';
+
 import { type GitBookSiteContext, checkIsRootSiteContext } from '@/lib/context';
 import { isSiteIndexable } from '@/lib/seo';
-import { SiteVisibility } from '@gitbook/api';
 
 /**
  * User-agents of AI assistants that fetch pages live in response to a user prompt.
@@ -27,9 +28,7 @@ export async function serveRobotsTxt(context: GitBookSiteContext) {
         ? [
               'User-agent: *',
               'Content-Signal: ai-train=yes, search=yes, ai-input=yes',
-              // Disallow only internal search
-              'Disallow: /*?*q=*',
-              'Disallow: /*?*ask=*',
+              // Internal search (?q= / ?ask=) is left crawlable and served noindex via middleware.
               // Allow dynamic assets (may include ?)
               'Allow: /~gitbook/image?*',
               'Allow: /~gitbook/icon?*',

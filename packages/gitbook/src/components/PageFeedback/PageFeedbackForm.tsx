@@ -1,14 +1,15 @@
 'use client';
 
-import { PageFeedbackRating } from '@gitbook/api';
 import React, { type ButtonHTMLAttributes } from 'react';
 
+import { PageFeedbackRating } from '@gitbook/api';
+import { Icon } from '@gitbook/icons';
+
+import { useTrackEvent } from '../Insights';
+import { Button, ButtonGroup, Input } from '../primitives';
 import { useLanguage } from '@/intl/client';
 import { t, tString } from '@/intl/translate';
 import { tcls } from '@/lib/tailwind';
-import { Icon } from '@gitbook/icons';
-import { useTrackEvent } from '../Insights';
-import { Button, ButtonGroup, Input } from '../primitives';
 
 const MIN_COMMENT_LENGTH = 3;
 const MAX_COMMENT_LENGTH = 512;
@@ -16,10 +17,7 @@ const MAX_COMMENT_LENGTH = 512;
 /**
  * Form to submit feedback on a page.
  */
-export function PageFeedbackForm(props: {
-    pageId: string;
-    className?: string;
-}) {
+export function PageFeedbackForm(props: { pageId: string; className?: string }) {
     const { className } = props;
     const languages = useLanguage();
     const trackEvent = useTrackEvent();
@@ -87,7 +85,7 @@ export function PageFeedbackForm(props: {
             </div>
             {rating ? (
                 submitted ? (
-                    <div className="flex animate-blur-in-display-slow items-center gap-1 p-1.5 text-success-subtle">
+                    <div className="animate-blur-in-display-slow flex items-center gap-1 p-1.5 text-success-subtle">
                         <Icon icon="check-circle" className="size-4" />
                         {tString(languages, 'was_this_helpful_thank_you')}
                     </div>
