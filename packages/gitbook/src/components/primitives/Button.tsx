@@ -212,15 +212,7 @@ export const Button = React.forwardRef<
         );
 
         return (children || iconOnly) && label ? (
-            <Tooltip
-                rootProps={{
-                    open: disabled === true ? false : undefined,
-                    ...tooltipProps?.rootProps,
-                }}
-                label={label}
-                triggerProps={{ disabled, ...tooltipProps?.triggerProps }}
-                contentProps={tooltipProps?.contentProps}
-            >
+            <Tooltip label={label} disabled={disabled} {...tooltipProps}>
                 {button}
             </Tooltip>
         ) : (
@@ -239,7 +231,13 @@ export const ButtonGroup = React.forwardRef<
             className={tcls(
                 'flex h-fit items-stretch justify-start overflow-hidden',
                 combinedShape
-                    ? '*:translate-y-0! *:shadow-none! [&>*:not(:first-child)]:border-l-0 [&>*:not(:first-child,:last-child)]:rounded-none! [&>*:not(:only-child):first-child]:rounded-r-none [&>*:not(:only-child):last-child]:rounded-l-none'
+                    ? [
+                          // Per-segment rounding lives in `globals.css`: Tailwind cannot express
+                          // "last button" once focus guards are injected.
+                          'button-group',
+                          '*:translate-y-0! *:shadow-none!',
+                          '[&>*:not(:first-child)]:border-l-0',
+                      ]
                     : '',
                 className
             )}

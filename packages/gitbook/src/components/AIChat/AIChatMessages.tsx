@@ -1,4 +1,4 @@
-import { Fragment } from 'react';
+import { Fragment, useState } from 'react';
 
 import { AIMessageRole } from '@gitbook/api';
 
@@ -18,13 +18,14 @@ import { useLanguage } from '@/intl/client';
 import { t, tString } from '@/intl/translate';
 import { tcls } from '@/lib/tailwind';
 
+type MessageGroup = { message: AIChatMessage; originalIndex: number };
+
 export function AIChatMessages(props: { chat: AIChatState; chatController: AIChatController }) {
     const { chat, chatController } = props;
     const status = getAIChatStatus(chat);
     const showLoadingShim = chat.responding && status !== 'working' && status !== 'done';
 
     // Group messages: user messages start a new group, all following messages until next user message belong to that group
-    type MessageGroup = { message: AIChatMessage; originalIndex: number };
     const messageGroups: MessageGroup[][] = [];
     let currentGroup: MessageGroup[] = [];
 
@@ -45,8 +46,6 @@ export function AIChatMessages(props: { chat: AIChatState; chatController: AICha
     if (currentGroup.length > 0) {
         messageGroups.push(currentGroup);
     }
-
-    const language = useLanguage();
 
     return messageGroups.map((group, groupIndex) => {
         const isLastGroup = group === messageGroups[messageGroups.length - 1];
@@ -112,101 +111,139 @@ export function AIChatMessages(props: { chat: AIChatState; chatController: AICha
                 ))}
 
                 {assistantItems.length > 0 ? (
-                    <Collapsible
-                        open={!hasFinalAnswer}
-                        disabled={!hasFinalAnswer}
-                        data-testid="ai-chat-message-assistant"
-                        id={`message-${firstAssistantIndex}`}
-                        className={tcls(
-                            'flex flex-col gap-2',
-                            'break-words',
-                            'group/message',
-                            'animate-blur-in-slow',
-                            'origin-top-left text-tint-strong',
-                            isLastMessage ? 'grow' : ''
-                        )}
-                        style={{
-                            animationDelay: `${Math.min(firstAssistantIndex * 0.1, 0.6)}s`,
-                        }}
-                    >
-                        {hasCommentary && hasFinalAnswer ? (
-                            <CollapsibleTrigger asChild>
-                                <Button
-                                    variant="blank"
-                                    size="small"
-                                    label={tString(language, 'ai_chat_view_activity')}
-                                    className="group/dropdown animate-blur-in-display-slow -mx-3 -my-1.5 self-start"
-                                >
-                                    <div className="flex items-center gap-2">
-                                        <span data-testid="ai-chat-activity-summary">
-                                            {toolCount > 0
-                                                ? t(
-                                                      language,
-                                                      'ai_chat_explored_with',
-                                                      tString(
-                                                          language,
-                                                          toolCount === 1
-                                                              ? 'tool_count'
-                                                              : 'tool_count_plural',
-                                                          toolCount.toString()
-                                                      )
-                                                  )
-                                                : t(language, 'ai_chat_explored')}
-                                        </span>
-                                        <ToggleChevron orientation="right-to-down" />
-                                    </div>
-                                </Button>
-                            </CollapsibleTrigger>
-                        ) : null}
-
-                        {assistantItems.map(({ message, originalIndex }) => (
-                            <Fragment key={originalIndex}>{message.content}</Fragment>
-                        ))}
-
-                        {isLastMessage ? (
-                            <div
-                                className={tcls(
-                                    'mt-4 flex w-full shrink-0 flex-col gap-2 overflow-hidden starting:opacity-0 transition-all transition-discrete duration-300',
-                                    showLoadingShim
-                                        ? 'max-h-48 opacity-11'
-                                        : 'pointer-events-none max-h-0 opacity-0'
-                                )}
-                            >
-                                <HoldMessage
-                                    className={
-                                        assistantItems.some(({ message }) => message.content)
-                                            ? 'hidden'
-                                            : ''
-                                    }
-                                />
-                                <LoadingSkeleton />
-                            </div>
-                        ) : null}
-
-                        {isLastMessage ? (
-                            <>
-                                {!chat.responding &&
-                                !chat.error &&
-                                chat.query &&
-                                chat.responseId &&
-                                !chat.control ? (
-                                    <AIResponseFeedback
-                                        responseId={chat.responseId}
-                                        query={chat.query}
-                                        className="-ml-1.5 -mt-4 mb-2"
-                                    />
-                                ) : null}
-                                <AIChatFollowupSuggestions
-                                    chat={chat}
-                                    chatController={chatController}
-                                />
-                            </>
-                        ) : null}
-                    </Collapsible>
+                    <AIChatAssistantGroup
+                        chat={chat}
+                        chatController={chatController}
+                        assistantItems={assistantItems}
+                        hasCommentary={hasCommentary}
+                        hasFinalAnswer={hasFinalAnswer}
+                        toolCount={toolCount}
+                        firstAssistantIndex={firstAssistantIndex}
+                        isLastMessage={isLastMessage}
+                        showLoadingShim={showLoadingShim}
+                    />
                 ) : null}
             </div>
         );
     });
+}
+
+function AIChatAssistantGroup(props: {
+    chat: AIChatState;
+    chatController: AIChatController;
+    assistantItems: MessageGroup[];
+    hasCommentary: boolean;
+    hasFinalAnswer: boolean;
+    toolCount: number;
+    firstAssistantIndex: number;
+    isLastMessage: boolean;
+    showLoadingShim: boolean;
+}) {
+    const {
+        chat,
+        chatController,
+        assistantItems,
+        hasCommentary,
+        hasFinalAnswer,
+        toolCount,
+        firstAssistantIndex,
+        isLastMessage,
+        showLoadingShim,
+    } = props;
+    const language = useLanguage();
+    // Base UI locks controlled/uncontrolled mode on first render, so once `hasFinalAnswer`
+    // flips the trigger over to being interactive, we need our own state to track manual toggles.
+    const [manuallyOpened, setManuallyOpened] = useState(false);
+
+    return (
+        <Collapsible
+            open={!hasFinalAnswer || manuallyOpened}
+            onOpenChange={setManuallyOpened}
+            disabled={!hasFinalAnswer}
+            data-testid="ai-chat-message-assistant"
+            id={`message-${firstAssistantIndex}`}
+            className={tcls(
+                'flex flex-col gap-2',
+                'break-words',
+                'group/message',
+                'animate-blur-in-slow',
+                'origin-top-left text-tint-strong',
+                isLastMessage ? 'grow' : ''
+            )}
+            style={{
+                animationDelay: `${Math.min(firstAssistantIndex * 0.1, 0.6)}s`,
+            }}
+        >
+            {hasCommentary && hasFinalAnswer ? (
+                <CollapsibleTrigger
+                    render={
+                        <Button
+                            variant="blank"
+                            size="small"
+                            label={tString(language, 'ai_chat_view_activity')}
+                            className="group/dropdown animate-blur-in-display-slow -mx-3 -my-1.5 self-start"
+                        />
+                    }
+                >
+                    <div className="flex items-center gap-2">
+                        <span data-testid="ai-chat-activity-summary">
+                            {toolCount > 0
+                                ? t(
+                                      language,
+                                      'ai_chat_explored_with',
+                                      tString(
+                                          language,
+                                          toolCount === 1 ? 'tool_count' : 'tool_count_plural',
+                                          toolCount.toString()
+                                      )
+                                  )
+                                : t(language, 'ai_chat_explored')}
+                        </span>
+                        <ToggleChevron orientation="right-to-down" />
+                    </div>
+                </CollapsibleTrigger>
+            ) : null}
+
+            {assistantItems.map(({ message, originalIndex }) => (
+                <Fragment key={originalIndex}>{message.content}</Fragment>
+            ))}
+
+            {isLastMessage ? (
+                <div
+                    className={tcls(
+                        'mt-4 flex w-full shrink-0 flex-col gap-2 overflow-hidden starting:opacity-0 transition-all transition-discrete duration-300',
+                        showLoadingShim
+                            ? 'max-h-48 opacity-11'
+                            : 'pointer-events-none max-h-0 opacity-0'
+                    )}
+                >
+                    <HoldMessage
+                        className={
+                            assistantItems.some(({ message }) => message.content) ? 'hidden' : ''
+                        }
+                    />
+                    <LoadingSkeleton />
+                </div>
+            ) : null}
+
+            {isLastMessage ? (
+                <>
+                    {!chat.responding &&
+                    !chat.error &&
+                    chat.query &&
+                    chat.responseId &&
+                    !chat.control ? (
+                        <AIResponseFeedback
+                            responseId={chat.responseId}
+                            query={chat.query}
+                            className="-ml-1.5 -mt-4 mb-2"
+                        />
+                    ) : null}
+                    <AIChatFollowupSuggestions chat={chat} chatController={chatController} />
+                </>
+            ) : null}
+        </Collapsible>
+    );
 }
 
 export function HoldMessage({

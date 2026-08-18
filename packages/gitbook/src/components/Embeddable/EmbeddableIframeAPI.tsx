@@ -179,11 +179,7 @@ export function EmbeddableIframeButtons() {
                     onClick={() => {
                         action.onClick?.();
                     }}
-                    tooltipProps={{
-                        contentProps: {
-                            side: 'right',
-                        },
-                    }}
+                    tooltipProps={{ side: 'right' }}
                     style={{ animationDelay: `${index * 100}ms` }}
                 />
             ))}
@@ -267,11 +263,7 @@ export function EmbeddableIframeTabs(props: {
                         }
                         router.push(tab.href);
                     }}
-                    tooltipProps={{
-                        contentProps: {
-                            side: 'right',
-                        },
-                    }}
+                    tooltipProps={{ side: 'right' }}
                 />
             ))}
         </div>
@@ -299,11 +291,7 @@ export function EmbeddableIframeCloseButton(props: { onClose?: () => void }) {
                     onClose?.();
                     getChannel()?.send({ type: 'close' });
                 }}
-                tooltipProps={{
-                    contentProps: {
-                        side: 'right',
-                    },
-                }}
+                tooltipProps={{ side: 'right' }}
             />
         </div>
     );

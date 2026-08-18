@@ -10,7 +10,7 @@
     "version": "1.5.15",
     "sideEffects": false,
     "dependencies": {
-        "@base-ui/react": "^1.7.0",
+        "@base-ui/react": "catalog:",
         "@gitbook/expr": "workspace:*",
         "@gitbook/openapi-parser": "workspace:*",
         "@scalar/api-client-react": "catalog:",

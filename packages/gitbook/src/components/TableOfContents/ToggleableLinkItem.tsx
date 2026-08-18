@@ -50,7 +50,7 @@ export function ToggleableLinkItem(
                 {tag ? (
                     <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2">
                         {children}
-                        <div className="flex shrink-0 items-center">{tag}</div>
+                        {tag}
                     </div>
                 ) : (
                     children
@@ -73,17 +73,12 @@ export function ToggleableLinkItem(
                         {tag ? (
                             <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2">
                                 {children}
-                                <div className="flex shrink-0 items-center">
-                                    {tag}
-                                    {toggler}
-                                </div>
+                                {tag}
                             </div>
                         ) : (
-                            <>
-                                {children}
-                                {toggler}
-                            </>
+                            children
                         )}
+                        {toggler}
                     </LinkItem>
                     {descendants}
                 </>

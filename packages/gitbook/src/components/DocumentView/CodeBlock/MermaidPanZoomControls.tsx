@@ -20,10 +20,9 @@ export function MermaidPanZoomControls(props: {
         size: 'xsmall' as const,
         iconOnly: true,
         className: tcls('p-1 [&_svg]:size-3.5 opacity-90'),
-        // Non-interactive tooltips: the Tooltip primitive makes their popper wrapper
-        // pointer-transparent so it can't steal the hover that reveals these controls.
+        // Non-hoverable so the tooltip can't steal the hover that reveals these controls.
         tooltipProps: {
-            rootProps: { disableHoverableContent: true },
+            disableHoverablePopup: true,
         },
     };
 

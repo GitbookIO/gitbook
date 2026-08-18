@@ -16,7 +16,7 @@ import { tcls } from '@/lib/tailwind';
 
 /**
  * Client component wrapping the DropdownMenu for header links.
- * Accepts serializable props to avoid Flight lazy chunk wrappers reaching Radix's Slot.
+ * Accepts serializable props to avoid Flight lazy chunk wrappers reaching the trigger's `render` prop.
  */
 export function HeaderLinkDropdown(props: {
     headerPreset: CustomizationHeaderPreset;
@@ -59,6 +59,7 @@ export function HeaderLinkDropdown(props: {
                     />
                 )
             }
+            nativeButton={false}
             openOnHover={true}
         >
             {children}
@@ -145,12 +146,12 @@ function getHeaderLinkClassName(_props: { headerPreset: CustomizationHeaderPrese
 
         'text-tint',
         'links-default:hover:text-primary',
-        'links-default:data-[state=open]:text-primary',
+        'links-default:aria-expanded:text-primary',
         'links-default:tint:hover:text-tint-strong',
-        'links-default:tint:data-[state=open]:text-tint-strong',
+        'links-default:tint:aria-expanded:text-tint-strong',
         'underline-offset-2',
         'links-accent:hover:underline',
-        'links-accent:data-[state=open]:underline',
+        'links-accent:aria-expanded:underline',
         'links-accent:underline-offset-4',
         'links-accent:decoration-primary-subtle',
         'links-accent:decoration-[3px]',

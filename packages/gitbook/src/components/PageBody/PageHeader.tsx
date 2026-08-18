@@ -194,7 +194,7 @@ export async function PageHeader(props: {
                     // overlaps it: mark it here so it is never briefly unstyled before hydration.
                     data-cover-aware-text
                     data-over-cover
-                    className="page-cover-background:text-contrast-cover text-xs leading-relaxed text-tint layout-wide:page-no-toc:hidden page-cover-background:opacity-9"
+                    className="page-cover-background:text-contrast-cover flow-root text-xs leading-relaxed text-tint layout-wide:page-no-toc:hidden page-cover-background:opacity-9"
                 >
                     <ol className="inline">
                         {contextCrumbs.map((crumb, index) => (
