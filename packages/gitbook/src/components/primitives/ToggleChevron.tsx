@@ -37,11 +37,24 @@ export function ToggleChevron(props: {
             icon={classes[orientation].icon as IconName}
             className={tcls(
                 'shrink-0',
-                open ? classes[orientation].animation : classes[orientation].autoAnimation,
+                getRotationClassName(open, classes[orientation]),
                 'size-3',
                 'transition-all',
                 className
             )}
         />
     );
+}
+
+function getRotationClassName(
+    open: boolean | undefined,
+    classes: { animation: string; autoAnimation: string }
+): string {
+    if (open === undefined) {
+        return classes.autoAnimation;
+    }
+    if (open) {
+        return classes.animation;
+    }
+    return '';
 }
