@@ -585,12 +585,18 @@ button.openapi-mcp {
     @apply bg-transparent!
 }
 
+.openapi-panel {
+    @apply flex flex-col;
+}
+
 .openapi-panel-heading {
-    @apply font-medium px-4 py-2 text-xs uppercase;
+    @apply font-medium px-4 py-2 text-xs uppercase shrink-0;
 }
 
 .openapi-panel-body {
-    @apply relative;
+    /* Mirrors .openapi-section-body: the sticky preview column caps the height, so the body must be
+       able to shrink for the code block's own overflow-auto to kick in instead of being clipped. */
+    @apply relative flex flex-col shrink min-h-0 overflow-clip [overflow-clip-margin:0.75rem];
 }
 
 .openapi-panel-footer,
