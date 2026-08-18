@@ -1,8 +1,9 @@
 'use client';
 
-import type { CustomizationDefaultThemeMode } from '@gitbook/api';
 import { useTheme } from 'next-themes';
 import { useEffect, useRef } from 'react';
+
+import type { CustomizationDefaultThemeMode } from '@gitbook/api';
 
 /**
  * Persist a theme forced via the URL (`?theme=light`/`?theme=dark`) into the embed's own
