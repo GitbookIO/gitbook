@@ -10,7 +10,7 @@ import {
 } from '../AI';
 import { ToggleChevron } from '../primitives';
 import { Button } from '../primitives/Button';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../primitives/Collapsible';
+import { Collapsible, CollapsibleTrigger } from '../primitives/Collapsible';
 import { AIChatFollowupSuggestions } from './AiChatFollowupSuggestions';
 import { AIChatReferenceChips } from './AIChatReferenceChips';
 import { AIResponseFeedback } from './AIResponseFeedback';
