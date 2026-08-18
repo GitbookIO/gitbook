@@ -1,10 +1,10 @@
 'use client';
 
+import { AnimatePresence, motion } from 'motion/react';
 import React from 'react';
 
-import { useLanguage } from '@/intl/client';
-import { AnimatePresence, motion } from 'motion/react';
 import { formatDateTime, formatDateWeekday, formatRelative } from '../utils/dates';
+import { useLanguage } from '@/intl/client';
 
 type DateFormat = 'relative' | 'weekday' | 'full';
 

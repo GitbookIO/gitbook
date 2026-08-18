@@ -1,8 +1,10 @@
 'use client';
 
-import { tcls } from '@/lib/tailwind';
-import { Icon } from '@gitbook/icons';
 import type * as React from 'react';
+
+import { Icon } from '@gitbook/icons';
+
+import { tcls } from '@/lib/tailwind';
 
 export type KeyboardShortcutProps = {
     keys: string[];

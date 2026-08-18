@@ -1,9 +1,9 @@
 'use client';
 
+import type { OpenAPIClientContext } from './context';
 import { OpenAPICopyButton } from './OpenAPICopyButton';
 import { OpenAPIDisclosureGroup } from './OpenAPIDisclosureGroup';
 import { useSelectState } from './OpenAPISelect';
-import type { OpenAPIClientContext } from './context';
 import { t } from './translate';
 import type { OpenAPISecurityScope } from './types';
 import type { OperationSecurityInfo } from './utils';
@@ -131,10 +131,7 @@ export function OpenAPISchemaScopes(props: {
 /**
  * Display a scope item. Either a key-value pair or a single string.
  */
-function OpenAPIScopeItem(props: {
-    scope: OpenAPISecurityScope;
-    context: OpenAPIClientContext;
-}) {
+function OpenAPIScopeItem(props: { scope: OpenAPISecurityScope; context: OpenAPIClientContext }) {
     const { scope, context } = props;
 
     return (
@@ -148,10 +145,7 @@ function OpenAPIScopeItem(props: {
 /**
  * Displays the scope name within a copyable button.
  */
-function OpenAPIScopeItemKey(props: {
-    name: string;
-    context: OpenAPIClientContext;
-}) {
+function OpenAPIScopeItemKey(props: { name: string; context: OpenAPIClientContext }) {
     const { name, context } = props;
 
     return (

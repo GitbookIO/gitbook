@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it } from 'bun:test';
+
 import { SELECT_LIST_CAP } from './constants';
 import { activate, deactivate, getState, resolveActiveSlug, setSlugs, subscribe } from './store';
 
@@ -60,7 +61,7 @@ describe('select store', () => {
             unsubscribe();
         });
 
-        it('does not notify when the list is unchanged (prevents URL mirror loops)', () => {
+        it('does not notify when the list is unchanged (avoids redundant re-renders)', () => {
             setSlugs(['python', 'go']);
             let calls = 0;
             const unsubscribe = subscribe(() => {

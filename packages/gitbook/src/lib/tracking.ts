@@ -1,5 +1,7 @@
-import type * as api from '@gitbook/api';
 import type { headers as nextHeaders } from 'next/headers';
+
+import type * as api from '@gitbook/api';
+
 import { apiClient } from './data/api';
 import { GITBOOK_DISABLE_TRACKING } from './env';
 import { getLogger } from './logger';

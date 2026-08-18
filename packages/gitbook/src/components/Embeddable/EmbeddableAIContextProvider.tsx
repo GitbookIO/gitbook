@@ -1,8 +1,9 @@
 'use client';
 
-import { type AIConfig, AIContextProvider } from '@/components/AI';
 import type { PropsWithChildren } from 'react';
+
 import { useEmbeddableConfiguration } from './EmbeddableIframeAPI';
+import { type AIConfig, AIContextProvider } from '@/components/AI';
 
 type EmbeddableAIContextProviderProps = PropsWithChildren<AIConfig>;
 

@@ -1,16 +1,18 @@
 'use server';
-import type { GitBookBaseContext } from '@/lib/context';
-import { fetchServerActionSiteContext } from '@/lib/server-actions';
-import { traceErrorOnly } from '@/lib/tracing';
+import { EventIterator } from 'event-iterator';
+
 import {
     type AIMessage,
     AIMessageRole,
     type AIMessageStep,
     type AIStreamResponse,
 } from '@gitbook/api';
-import { EventIterator } from 'event-iterator';
+
 import { AIMessageView } from './AIMessageView';
 import type { RenderAIMessageOptions } from './types';
+import type { GitBookBaseContext } from '@/lib/context';
+import { fetchServerActionSiteContext } from '@/lib/server-actions';
+import { traceErrorOnly } from '@/lib/tracing';
 
 /**
  * Stream the generation of a document.

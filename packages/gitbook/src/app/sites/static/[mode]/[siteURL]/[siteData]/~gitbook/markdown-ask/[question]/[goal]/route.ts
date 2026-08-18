@@ -1,6 +1,7 @@
+import type { NextRequest } from 'next/server';
+
 import { type RouteLayoutParams, getStaticSiteContext } from '@/app/utils';
 import { serveAskMarkdown } from '@/routes/markdownAsk';
-import type { NextRequest } from 'next/server';
 
 export const dynamic = 'force-static';
 

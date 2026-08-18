@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'bun:test';
+
 import { type AIChatReference, serializeReferences } from './references';
 
 describe('serializeReferences', () => {

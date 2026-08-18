@@ -2,18 +2,19 @@
 // This component does not use any client feature but we don't want to
 // render it server-side because it has recursion.
 
-import type { OpenAPICustomOperationProperties, OpenAPIV3 } from '@gitbook/openapi-parser';
+import clsx from 'classnames';
 import { useId } from 'react';
 import type { ComponentPropsWithoutRef } from 'react';
 
-import clsx from 'classnames';
+import type { OpenAPICustomOperationProperties, OpenAPIV3 } from '@gitbook/openapi-parser';
+
+import type { OpenAPIClientContext } from './context';
+import { retrocycle } from './decycle';
+import { getDisclosureLabel } from './getDisclosureLabel';
 import { Markdown } from './Markdown';
 import { OpenAPICopyButton } from './OpenAPICopyButton';
 import { OpenAPIDisclosure } from './OpenAPIDisclosure';
 import { OpenAPISchemaName } from './OpenAPISchemaName';
-import type { OpenAPIClientContext } from './context';
-import { retrocycle } from './decycle';
-import { getDisclosureLabel } from './getDisclosureLabel';
 import { stringifyOpenAPI } from './stringifyOpenAPI';
 import { tString } from './translate';
 import {
@@ -463,10 +464,7 @@ function OpenAPISchemaAlternativeSeparator(props: {
 /**
  * Render a circular reference to a schema.
  */
-function OpenAPISchemaCircularRef(props: {
-    id: string;
-    schema: OpenAPIV3.SchemaObject;
-}) {
+function OpenAPISchemaCircularRef(props: { id: string; schema: OpenAPIV3.SchemaObject }) {
     const { id, schema } = props;
 
     return (
@@ -912,7 +910,7 @@ export function getSchemaAlternatives(
 }
 
 // These extensions are safe to merge
-const safeExtensions = [
+const safeExtensions = new Set([
     'description',
     'title',
     'example',
@@ -921,7 +919,7 @@ const safeExtensions = [
     'readOnly',
     'writeOnly',
     'deprecated',
-];
+]);
 
 /**
  * Determine if a schema is safe to merge based on its properties
@@ -929,11 +927,10 @@ const safeExtensions = [
 function isSafeToMerge(schema: OpenAPIV3.SchemaObject): boolean {
     const keys = Object.keys(schema);
 
-    const safeProperties = ['type', 'properties', 'required', 'nullable'];
+    const safeProperties = new Set(['type', 'properties', 'required', 'nullable']);
 
     const unknownKeys = keys.filter(
-        (key) =>
-            !safeProperties.includes(key) && !safeExtensions.includes(key) && !key.startsWith('x-')
+        (key) => !safeProperties.has(key) && !safeExtensions.has(key) && !key.startsWith('x-')
     );
 
     return unknownKeys.length === 0;
@@ -997,12 +994,12 @@ function mergeAlternatives(
                     const keys = Object.keys(schemaOrRef);
 
                     if (isSafeToMerge(schemaOrRef)) {
-                        const safeKeys = keys.filter((key) => safeExtensions.includes(key));
+                        const safeKeys = keys.filter((key) => safeExtensions.has(key));
                         const vendorKeys = keys.filter((key) => key.startsWith('x-'));
 
                         latest.properties = {
-                            ...(latest.properties || {}),
-                            ...(schemaOrRef.properties || {}),
+                            ...latest.properties,
+                            ...schemaOrRef.properties,
                         };
                         latest.required = Array.from(
                             new Set([
@@ -1254,8 +1251,8 @@ function mergeTwoSchemas(
         ...schema1,
         ...schema2,
         properties: {
-            ...(schema1.properties || {}),
-            ...(schema2.properties || {}),
+            ...schema1.properties,
+            ...schema2.properties,
         },
     };
 

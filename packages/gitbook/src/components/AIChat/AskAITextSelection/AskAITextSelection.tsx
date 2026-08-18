@@ -5,15 +5,14 @@ import { AnimatePresence, motion } from 'motion/react';
 import * as React from 'react';
 import { createPortal } from 'react-dom';
 
+import { AIChatIcon } from '../AIChatIcon';
+import { useStableTextSelection } from './useStableTextSelection';
 import { useAIChatController, useAIConfig } from '@/components/AI';
 import { useIsMobile } from '@/components/hooks/useIsMobile';
 import { useIsMounted } from '@/components/hooks/useIsMounted';
 import { Button } from '@/components/primitives';
 import { isAIChatEnabled } from '@/components/utils/isAIChatEnabled';
 import { t, useLanguage } from '@/intl/client';
-
-import { AIChatIcon } from '../AIChatIcon';
-import { useStableTextSelection } from './useStableTextSelection';
 
 /** Gap between the selection and the button. */
 const GAP = 8;

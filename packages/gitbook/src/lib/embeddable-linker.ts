@@ -41,12 +41,17 @@ export function toEmbeddableLinkForPublishedContent(
  * Get a linker to generate links in the embeddable context.
  */
 export function getEmbeddableLinker(linker: GitBookLinker): GitBookLinker {
-    return {
+    const embeddableLinker: GitBookLinker = {
         ...linker,
         toPathForPage({ pages, page, anchor }) {
-            const pagePath = getPagePath(pages, page);
-            const embedPagePath = joinPath(EMBED_PAGE_PATH, pagePath);
+            return embeddableLinker.toPathForPagePath({
+                path: getPagePath(pages, page),
+                anchor,
+            });
+        },
 
+        toPathForPagePath({ path, anchor }) {
+            const embedPagePath = joinPath(EMBED_PAGE_PATH, path);
             return `${linker.toPathInSpace(embedPagePath)}${anchor ? `#${anchor}` : ''}`;
         },
 
@@ -73,4 +78,6 @@ export function getEmbeddableLinker(linker: GitBookLinker): GitBookLinker {
             return result;
         },
     };
+
+    return embeddableLinker;
 }

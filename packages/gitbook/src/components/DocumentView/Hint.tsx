@@ -2,14 +2,13 @@ import type { DocumentBlockHint } from '@gitbook/api';
 import { Icon, type IconName } from '@gitbook/icons';
 import { validateIconName } from '@gitbook/icons/icons';
 
-import { type ClassValue, tcls } from '@/lib/tailwind';
-
-import { getSpaceLanguage, tString } from '@/intl/server';
-import { defaultLanguage } from '@/intl/translations';
-import { isHeadingBlock } from '@/lib/document';
 import { Block, type BlockProps } from './Block';
 import { Blocks } from './Blocks';
 import { getBlockTextStyle } from './spacing';
+import { getSpaceLanguage, tString } from '@/intl/server';
+import { defaultLanguage } from '@/intl/translations';
+import { isHeadingBlock } from '@/lib/document';
+import { type ClassValue, tcls } from '@/lib/tailwind';
 
 export async function Hint({
     block,

@@ -1,12 +1,13 @@
 'use client';
 
+import { create } from 'zustand';
+import { type StorageValue, persist } from 'zustand/middleware';
+
 import {
     getLocalStorageItem,
     removeLocalStorageItem,
     setLocalStorageItem,
 } from '@/lib/browser/local-storage';
-import { create } from 'zustand';
-import { type StorageValue, persist } from 'zustand/middleware';
 
 const AI_CHAT_MIN_WIDTH = 384;
 const AI_CHAT_MAX_WIDTH = 640;

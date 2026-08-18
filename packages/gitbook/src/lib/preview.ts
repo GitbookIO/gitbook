@@ -1,6 +1,8 @@
-import type { PublishedSiteContent } from '@gitbook/api';
 import assertNever from 'assert-never';
 import { assert } from 'ts-essentials';
+
+import type { PublishedSiteContent } from '@gitbook/api';
+
 import { GITBOOK_PREVIEW_BASE_URL } from './env';
 import type { ResponseCookie } from './visitors';
 

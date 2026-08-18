@@ -1,5 +1,5 @@
-import { getLocalStorageItem, setLocalStorageItem } from '@/lib/browser';
 import { SELECT_LIST_CAP, SELECT_STORAGE_KEY, selectRankAttribute } from './constants';
+import { getLocalStorageItem, setLocalStorageItem } from '@/lib/browser';
 
 /**
  * The one piece of `select` state: a site-wide, recency-ordered list of active slugs
@@ -50,8 +50,11 @@ function sameList(a: string[], b: string[]): boolean {
 }
 
 function commit(nextSlugs: string[]) {
+    // Latch hydration even for callers that replace the list wholesale, so a later `init()` can't
+    // overwrite this write with what was in storage beforehand.
+    hydrate();
     const slugs = normalize(nextSlugs);
-    // No-op when nothing changed — this is what keeps the store⇄URL mirror from looping.
+    // No-op when nothing changed, so we don't rewrite storage or re-render every consumer.
     if (sameList(slugs, state.slugs)) {
         return;
     }
@@ -68,6 +71,9 @@ export function activate(slug: string) {
     if (!slug) {
         return;
     }
+    // Hydrate before reading `state`, not just before writing: a mutation that lands ahead of `init()`
+    // (a deep-linked pane activating during hydration) must merge into the stored list, not replace it.
+    hydrate();
     commit([slug, ...state.slugs]);
 }
 
@@ -76,10 +82,11 @@ export function deactivate(slug: string) {
     if (!slug) {
         return;
     }
+    hydrate();
     commit(state.slugs.filter((s) => s !== slug));
 }
 
-/** Replace the whole list (used when hydrating from URL + storage). */
+/** Replace the whole list. */
 export function setSlugs(slugs: string[]) {
     commit(slugs);
 }
@@ -104,20 +111,25 @@ export function resolveActiveSlug(candidates: string[]): string | null {
 
 /**
  * Hydrate the in-memory store from localStorage (once per full page load). The pre-paint script has
- * already merged `?select=` into storage and written `<html>` before this runs, so we just adopt it;
- * we re-mirror to `<html>` too, to stay correct after a client-side navigation.
+ * already read the same storage and written `<html>` before this runs, so we just adopt it; we
+ * re-mirror to `<html>` too, to stay correct after a client-side navigation.
  */
 export function init() {
+    hydrate();
+    mirrorToHtml(state.slugs);
+    for (const listener of listeners) {
+        listener();
+    }
+}
+
+/** Read the persisted list into memory, once per page load. Silent — callers notify if they need to. */
+function hydrate() {
     if (initialized) {
         return;
     }
     initialized = true;
     const stored = getLocalStorageItem<string[]>(SELECT_STORAGE_KEY, []);
     state = { slugs: normalize(Array.isArray(stored) ? stored : []) };
-    mirrorToHtml(state.slugs);
-    for (const listener of listeners) {
-        listener();
-    }
 }
 
 /**

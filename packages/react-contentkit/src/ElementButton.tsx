@@ -1,10 +1,11 @@
 'use client';
 
-import type { ContentKitButton } from '@gitbook/api';
-import { Icon } from '@gitbook/icons';
+import classNames from 'classnames';
 import React from 'react';
 
-import classNames from 'classnames';
+import type { ContentKitButton } from '@gitbook/api';
+import { Icon } from '@gitbook/icons';
+
 import { useContentKitClientContext } from './context';
 import type { ContentKitClientElementProps } from './types';
 

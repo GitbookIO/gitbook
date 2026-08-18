@@ -1,11 +1,12 @@
 'use client';
 
-import { Icon, type IconName } from '@gitbook/icons';
 import assertNever from 'assert-never';
 
-import { tcls } from '@/lib/tailwind';
+import { Icon, type IconName } from '@gitbook/icons';
+
 import type { AIChatReference } from '../AI/references';
 import { Link } from '../primitives';
+import { tcls } from '@/lib/tailwind';
 
 const triggerClassName =
     'inline-flex min-w-0 items-center gap-1.5 circular-corners:rounded-2xl rounded-corners:rounded-sm py-0.5 pr-1 pl-1.5 text-tint no-underline transition hover:bg-tint hover:text-tint';
@@ -41,7 +42,7 @@ export function AIChatReferenceChips(props: {
                 return (
                     <div
                         key={ref.id}
-                        className="inline-flex max-w-52 items-center gap-1 circular-corners:rounded-2xl rounded-corners:rounded-md straight-corners:rounded-xs border border-tint-subtle bg-tint-base px-0.5 py-0.5 text-tint text-xs leading-none"
+                        className="straight-corners:rounded-xs inline-flex max-w-52 items-center gap-1 border border-tint-subtle bg-tint-base px-0.5 py-0.5 text-xs leading-none text-tint rounded-corners:rounded-md circular-corners:rounded-2xl"
                     >
                         {ref.type === 'page' && ref.href ? (
                             // A page reference may be clicked from anywhere: render a link so it
@@ -80,7 +81,7 @@ export function AIChatReferenceChips(props: {
                                     onRemove(ref.id);
                                 }}
                                 disabled={disabled}
-                                className="inline-flex size-4 shrink-0 items-center justify-center circular-corners:rounded-full rounded-corners:rounded-sm text-tint/8 transition hover:bg-tint hover:text-tint-strong disabled:cursor-not-allowed disabled:opacity-5"
+                                className="inline-flex size-4 shrink-0 items-center justify-center text-tint/8 transition hover:bg-tint hover:text-tint-strong disabled:cursor-not-allowed disabled:opacity-5 rounded-corners:rounded-sm circular-corners:rounded-full"
                             >
                                 <Icon icon="xmark" className="size-2.5" />
                             </button>

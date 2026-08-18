@@ -1,16 +1,15 @@
-import type { GitBookAnyContext } from '@/lib/context';
 import {
     type RevisionPageDocument,
     RevisionPageType,
     SiteInsightsLinkPosition,
 } from '@gitbook/api';
 
+import { CONTENT_STYLE } from '../layout';
+import { PageIcon } from '../PageIcon';
 import { Card } from '@/components/primitives';
+import type { GitBookAnyContext } from '@/lib/context';
 import { resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
-
-import { PageIcon } from '../PageIcon';
-import { CONTENT_STYLE } from '../layout';
 
 /**
  * Blankslate when the page has no document or the document is empty.

@@ -46,17 +46,6 @@
   }
 }
 
-/*
-  Radix renders tooltip content inside a portaled `[data-radix-popper-content-wrapper]` attached
-  to <body>. A non-interactive tooltip (Tooltip with `disableHoverableContent`) marks its content
-  with `data-non-interactive`; without this rule the pointer-interactive wrapper could sit over
-  the trigger and steal its hover (e.g. breaking hover-revealed controls). We can't style the
-  wrapper from React, so let pointer events pass through it for these tooltips only.
-*/
-[data-radix-popper-content-wrapper]:has([data-non-interactive]) {
-  pointer-events: none;
-}
-
 @utility linear-mask-gradient {
   mask-image: linear-gradient(
     to bottom,
@@ -221,9 +210,9 @@
     interpolate-size: allow-keywords; /* Opt-in for modern browsers to interpolate "auto" values in transitions/animations. */
     overflow-x: hidden; /* We never want horizontal scroll of the whole page, it looks buggy and we should never have overflow anyway */
     --ai-chat-width: 24rem; /* Default AI chat panel width (= AI_CHAT_DEFAULT_WIDTH 384px); overridden client-side from local storage. */
-    --cover-height: 0px;
-    --cover-text-top: rgb(var(--tint-12));
-    --cover-text-bottom: rgb(var(--tint-12));
+    --cover-text: rgb(var(--tint-12));
+    /* Color to fall back to below the cover, for text that crosses its bottom edge. */
+    --cover-text-below: rgb(var(--tint-12));
   }
 
   :root:not(.dark):has(
@@ -232,7 +221,7 @@
   :root.dark:has(
       [data-gb-page-cover][data-cover-type="background"][data-cover-text-color-dark="black"]
     ) {
-    --cover-text-top: rgb(var(--contrast-tint-12));
+    --cover-text: rgb(var(--contrast-tint-12));
   }
 
   /* Modern browsers with `scrollbar-*` support */
@@ -315,40 +304,45 @@
   }
 }
 
-@utility contrast-cover {
-  background-clip: border-box;
-  background-image: linear-gradient(
-    to bottom,
-    var(--cover-text-top) 0,
-    var(--cover-text-top) var(--cover-height),
-    var(--cover-text-bottom) var(--cover-height),
-    var(--cover-text-bottom) 100vh
-  );
-  background-repeat: no-repeat;
-  background-size: 100% 100vh;
-  background-attachment: fixed;
-}
+/*
+  Recolor text that sits over a background page cover, so it stays readable against the cover image.
 
+  Whether an element overlaps the cover can't be expressed in CSS: it depends on layout, and for the
+  sticky page outline it also changes as the cover scrolls away. `useMarkTextOverCover` measures it
+  and marks the overlapping elements with `data-over-cover`.
+
+  Text fully over the cover is recolored with a plain `color`, so the glyphs are never transparent.
+  Only an element crossing the cover's bottom edge needs the gradient, and that gradient is
+  element-relative: an earlier version anchored it to the viewport with `background-attachment:
+  fixed`, which neither Firefox nor iOS Safari paints when clipped to text inside a clipped stacking
+  context — leaving the transparent glyphs invisible.
+
+  In high contrast the cover itself is all but hidden (`contrast-more:opacity-5`), so both rules are
+  dropped there and the element keeps its regular color.
+*/
 @utility text-contrast-cover {
-  color: transparent;
-  -webkit-text-fill-color: transparent;
-  background-image: linear-gradient(
-    to bottom,
-    var(--cover-text-top) 0,
-    var(--cover-text-top) var(--cover-height),
-    var(--cover-text-bottom) var(--cover-height),
-    var(--cover-text-bottom) 100vh
-  );
-  background-repeat: no-repeat;
-  background-size: 100% 100vh;
-  background-attachment: fixed;
-  background-clip: text;
-  -webkit-background-clip: text;
+  @media not (prefers-contrast: more) {
+    &[data-over-cover] {
+      color: var(--cover-text);
+    }
 
-  @media (prefers-contrast: more) {
-    color: var(--cover-text-bottom);
-    -webkit-text-fill-color: var(--cover-text-bottom);
-    background-image: none;
+    &[data-over-cover="split"] {
+      color: transparent;
+      -webkit-text-fill-color: transparent;
+      background-image: linear-gradient(
+        to bottom,
+        var(--cover-text) 0,
+        var(--cover-text) var(--cover-edge),
+        var(--cover-text-below) var(--cover-edge),
+        var(--cover-text-below) 100%
+      );
+      background-repeat: no-repeat;
+      /* Align the gradient with the box `--cover-edge` was measured from. */
+      background-origin: border-box;
+      /* Firefox only has partial support for this, but it should be enough for our use case */
+      background-clip: text;
+      -webkit-background-clip: text;
+    }
   }
 }
 
@@ -416,8 +410,13 @@ html.dark .shiki span {
     @apply rounded-t-md *:mt-1;
   }
 
+  &.highlighted > * {
+    margin-bottom: var(--highlighted-run-end-mb, 0);
+  }
+
   &.highlighted:has(+ :not(.highlighted)) {
-    @apply rounded-b-md *:mb-1;
+    @apply rounded-b-md;
+    --highlighted-run-end-mb: calc(var(--spacing) * 1);
   }
 
   &:not(.highlighted) + .highlighted:has(+ :not(.highlighted)) {
@@ -540,4 +539,16 @@ html.dark .highlight-line.diff-deleted .highlight-line-content::before {
   .highlight-line-number + & {
     @apply pl-2;
   }
+}
+
+/* An open dropdown injects focus guards as siblings of its trigger, so `:last-child` is not the
+   last item of a button group: match the buttons and links themselves. */
+.button-group > :is(button, a):not(:only-child):first-child {
+  @apply rounded-r-none;
+}
+.button-group > :is(button, a):not(:first-child):not(:has(~ :is(button, a))) {
+  @apply rounded-l-none;
+}
+.button-group > :is(button, a):not(:first-child):has(~ :is(button, a)) {
+  @apply rounded-none!;
 }

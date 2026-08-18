@@ -1,11 +1,6 @@
-import { HighlightQuery } from '@/components/Search/HighlightQuery';
-import { Link, StyledLink } from '@/components/primitives';
-import { Favicon } from '@/components/utils';
-import { getSpaceLanguage } from '@/intl/server';
-import { t } from '@/intl/translate';
-import type { GitBookSiteContext } from '@/lib/context';
-import { resolveContentRef } from '@/lib/references';
-import { tcls } from '@/lib/tailwind';
+import assertNever from 'assert-never';
+import type * as React from 'react';
+
 import type {
     AIToolCall,
     AIToolCallGetPageContent,
@@ -16,8 +11,15 @@ import type {
     ContentRef,
 } from '@gitbook/api';
 import { Icon, type IconName } from '@gitbook/icons';
-import assertNever from 'assert-never';
-import type * as React from 'react';
+
+import { Link, StyledLink } from '@/components/primitives';
+import { HighlightQuery } from '@/components/Search/HighlightQuery';
+import { Favicon } from '@/components/utils';
+import { getSpaceLanguage } from '@/intl/server';
+import { t } from '@/intl/translate';
+import type { GitBookSiteContext } from '@/lib/context';
+import { resolveContentRef } from '@/lib/references';
+import { tcls } from '@/lib/tailwind';
 
 /**
  * Display the tool calls in a message or step.
@@ -43,7 +45,7 @@ function ToolCallSummary(props: { toolCall: AIToolCall; context: GitBookSiteCont
     return (
         <div
             data-testid="ai-chat-tool-summary"
-            className="mt-2 flex origin-top-left animate-blur-in-slow items-start gap-2 text-sm text-tint-subtle"
+            className="animate-blur-in-slow mt-2 flex origin-top-left items-start gap-2 text-sm text-tint-subtle"
         >
             <Icon
                 icon={getIconForToolCall(toolCall)}
@@ -177,7 +179,7 @@ async function DescriptionForSearchToolCall(props: {
     const hasResults = toolCall.results.length > 0;
 
     return (
-        <details className="-ml-5 group flex w-full flex-col">
+        <details className="group -ml-5 flex w-full flex-col">
             <summary
                 className={tcls(
                     '-mx-2 flex list-none items-center gap-2 circular-corners:rounded-2xl rounded-corners:rounded-md pr-4 pl-7 transition-colors marker:hidden',
@@ -186,7 +188,7 @@ async function DescriptionForSearchToolCall(props: {
             >
                 <div className="flex min-w-0 flex-col break-words leading-snug">
                     <p>{t(language, 'searched_for', <strong>{toolCall.query}</strong>)}</p>
-                    <p className="mt-0.5 text-tint-subtle text-xs">
+                    <p className="mt-0.5 text-xs text-tint-subtle">
                         {hasResults
                             ? t(language, 'search_results_count', toolCall.results.length)
                             : t(language, 'search_no_results')}
@@ -204,7 +206,7 @@ async function DescriptionForSearchToolCall(props: {
                 ) : null}
             </summary>
             {hasResults ? (
-                <div className="hide-scrollbar mt-4 max-h-0 overflow-y-auto circular-corners:rounded-2xl rounded-corners:rounded-lg border border-tint-subtle p-2 opacity-0 transition-all transition-discrete duration-500 group-open:max-h-96 group-open:opacity-11">
+                <div className="hide-scrollbar transition-discrete mt-4 max-h-0 overflow-y-auto border border-tint-subtle p-2 opacity-0 transition-all duration-500 group-open:max-h-96 group-open:opacity-11 rounded-corners:rounded-lg circular-corners:rounded-2xl">
                     <ol className="space-y-1">
                         {searchResultsWithHrefs.map((result, index) => {
                             const resultKey = (() => {
@@ -231,7 +233,7 @@ async function DescriptionForSearchToolCall(props: {
                                 >
                                     <Link
                                         href={result.href}
-                                        className="flex items-start gap-2 circular-corners:rounded-2xl rounded-corners:rounded-md px-3 py-2 transition-colors hover:bg-primary-hover"
+                                        className="flex items-start gap-2 px-3 py-2 transition-colors hover:bg-primary-hover rounded-corners:rounded-md circular-corners:rounded-2xl"
                                         insights={
                                             result.type === 'record'
                                                 ? {
@@ -257,14 +259,14 @@ async function DescriptionForSearchToolCall(props: {
                                             icon
                                         )}
                                         <div className="flex flex-col gap-1 text-tint">
-                                            <h3 className="line-clamp-2 font-medium text-sm text-tint">
+                                            <h3 className="line-clamp-2 text-sm font-medium text-tint">
                                                 <HighlightQuery
                                                     query={toolCall.query}
                                                     text={result.title}
                                                 />
                                             </h3>
                                             {result.description && (
-                                                <p className="line-clamp-2 text-tint-subtle text-xs">
+                                                <p className="line-clamp-2 text-xs text-tint-subtle">
                                                     <HighlightQuery
                                                         query={toolCall.query}
                                                         text={result.description}

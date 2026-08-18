@@ -1,10 +1,11 @@
 import { describe, expect, it } from 'bun:test';
+
 import type { Revision, RevisionPageDocument, Space } from '@gitbook/api';
 
+import { resolveContentRef, resolveStringContentRef } from './references';
 import type { GitBookAnyContext } from '@/lib/context';
 import type { GitBookDataFetcher } from '@/lib/data';
 import { createLinker } from '@/lib/links';
-import { resolveContentRef, resolveStringContentRef } from './references';
 
 describe('resolveStringContentRef', () => {
     it.each([

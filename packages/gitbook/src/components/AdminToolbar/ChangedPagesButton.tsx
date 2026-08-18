@@ -1,12 +1,14 @@
 'use client';
 
-import { tcls } from '@/lib/tailwind';
-import { Icon, type IconName, IconStyle } from '@gitbook/icons';
 import { motion, useReducedMotion } from 'motion/react';
 import type { SVGProps } from 'react';
+
+import { Icon, type IconName, IconStyle } from '@gitbook/icons';
+
 import { DropdownMenu, DropdownMenuItem, DropdownMenuSeparator } from '../primitives';
 import type { ToolbarButtonProps } from './Toolbar';
 import type { MinimalChangedPage, MinimalChangedPages } from './types';
+import { tcls } from '@/lib/tailwind';
 
 const STATUS_ICON_STYLES: Record<
     MinimalChangedPage['status'],
@@ -102,7 +104,7 @@ export function ChangedPagesButton(props: {
             sideOffset={12}
             className="w-80 max-w-[calc(100vw-2rem)] gap-0 overflow-hidden p-0"
         >
-            <div className="px-3 py-2 font-medium text-sm text-tint">{changedPagesLabel}</div>
+            <div className="px-3 py-2 text-sm font-medium text-tint">{changedPagesLabel}</div>
             <DropdownMenuSeparator className="m-0" />
             <div className="flex max-h-80 flex-col overflow-y-auto">
                 {changedPages.pages.map((page) => (
@@ -112,7 +114,7 @@ export function ChangedPagesButton(props: {
             {changedPages.more > 0 ? (
                 <>
                     <DropdownMenuSeparator />
-                    <div className="px-3 py-1 text-tint-subtle text-xs">
+                    <div className="px-3 py-1 text-xs text-tint-subtle">
                         {changedPages.more} more changes not shown
                     </div>
                 </>
@@ -133,14 +135,14 @@ function ChangedPageMenuItem(props: { page: MinimalChangedPage }) {
             <span className="flex min-w-0 flex-1 items-center gap-2">
                 <ChangedPageStatusIcon status={page.status} />
                 <span className="min-w-0 flex-1 transition-[padding] group-hover/changed-page:pr-24 group-focus-visible/changed-page:pr-24 group-data-[highlighted]/changed-page:pr-24">
-                    <span className="block truncate font-medium text-sm leading-4">
+                    <span className="block truncate text-sm font-medium leading-4">
                         {page.title}
                     </span>
-                    <span className="block truncate text-tint-subtle text-xs leading-4">
+                    <span className="block truncate text-xs leading-4 text-tint-subtle">
                         /{page.path || ''}
                     </span>
                 </span>
-                <span className="pointer-events-none absolute right-2 flex items-center gap-0.5 bg-tint-hover pl-3 text-tint-subtle text-xs opacity-0 transition-opacity group-hover/changed-page:opacity-100 group-focus-visible/changed-page:opacity-100 group-data-[highlighted]/changed-page:opacity-100">
+                <span className="group-hover/changed-page:opacity-100 group-focus-visible/changed-page:opacity-100 group-data-[highlighted]/changed-page:opacity-100 pointer-events-none absolute right-2 flex items-center gap-0.5 bg-tint-hover pl-3 text-xs text-tint-subtle opacity-0 transition-opacity">
                     {actionLabel}
                     <Icon icon="chevron-right" className="size-3 shrink-0" />
                 </span>

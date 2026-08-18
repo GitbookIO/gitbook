@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'bun:test';
+
 import { parseOpenAPI } from '@gitbook/openapi-parser';
 
 import { enrichFilesystem } from './enrich';

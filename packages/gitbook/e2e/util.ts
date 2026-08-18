@@ -1,5 +1,17 @@
 import { argosScreenshot } from '@argos-ci/playwright';
 import {
+    type BrowserContext,
+    type FrameLocator,
+    type Page,
+    type Response,
+    expect,
+    test,
+} from '@playwright/test';
+import deepMerge from 'deepmerge';
+import rison from 'rison';
+import type { DeepPartial } from 'ts-essentials';
+
+import {
     CustomizationAIMode,
     CustomizationBackground,
     CustomizationCodeTheme,
@@ -22,17 +34,6 @@ import {
     type SiteCustomizationSettings,
     SiteExternalLinksTarget,
 } from '@gitbook/api';
-import {
-    type BrowserContext,
-    type FrameLocator,
-    type Page,
-    type Response,
-    expect,
-    test,
-} from '@playwright/test';
-import deepMerge from 'deepmerge';
-import rison from 'rison';
-import type { DeepPartial } from 'ts-essentials';
 
 import { getContentTestURL, getTestURL } from '../tests/utils';
 
@@ -91,7 +92,7 @@ export interface Test {
 export type TestsCase = {
     name: string;
     skip?: boolean;
-    tests: Array<Test>;
+    tests: Test[];
     contentBaseURL?: string;
     /**
      * Whether screenshots in this test case should capture the full scrollable page by default.
@@ -111,10 +112,10 @@ export const allThemeModes: CustomizationDefaultThemeMode[] = [
     CustomizationDefaultThemeMode.Dark,
 ];
 
-export const allTintColors: Array<{
+export const allTintColors: {
     label: string;
     value: CustomizationThemedColor | undefined;
-}> = [
+}[] = [
     {
         label: 'Off',
         value: undefined,
@@ -170,6 +171,10 @@ export async function waitForCookiesDialog(page: Page) {
         // Cookies dialog may take some times to appear
         timeout: 10_000,
     });
+}
+
+export async function waitForHydration(page: Page) {
+    await page.locator('html.hydrated').waitFor();
 }
 
 /**

@@ -1,14 +1,9 @@
-import type { DocumentBlockTable } from '@gitbook/api';
 import assertNever from 'assert-never';
 
-import { tcls } from '@/lib/tailwind';
+import type { DocumentBlockTable } from '@gitbook/api';
 
 import type { BlockProps } from '../Block';
 import { isBlockOffscreen } from '../utils';
-import { StickyViewGrid } from './StickyViewGrid';
-import { TableSearchEmpty, TableSearchInput, TableSearchProvider } from './TableSearch';
-import { ViewCards } from './ViewCards';
-import { ViewGrid, ViewGridHeader } from './ViewGrid';
 import { getViewGridLayout, hasVisibleHeader } from './layout';
 import {
     type TableRecordKV,
@@ -17,6 +12,11 @@ import {
     getTableSelectColumns,
 } from './search';
 import { shouldShowTableSearch } from './shouldShowSearch';
+import { StickyViewGrid } from './StickyViewGrid';
+import { TableSearchEmpty, TableSearchInput, TableSearchProvider } from './TableSearch';
+import { ViewCards } from './ViewCards';
+import { ViewGrid, ViewGridHeader } from './ViewGrid';
+import { tcls } from '@/lib/tailwind';
 
 export type { TableRecordKV };
 

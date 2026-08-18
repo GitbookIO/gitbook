@@ -5,9 +5,10 @@ import {
     type SiteCustomizationSettings,
 } from '@gitbook/api';
 import { validateIconName } from '@gitbook/icons/icons';
+
 import type { BlockProps } from '../Block';
 import { CodeBlock } from '../CodeBlock';
-import { getPlainCodeBlock } from '../CodeBlock/highlight';
+import { getPlainCodeBlock } from '../CodeBlock/highlight-tokens';
 import { PromptClient } from './PromptClient';
 
 const PROMPT_COLLAPSED_LINE_COUNT = 10;

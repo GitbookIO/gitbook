@@ -1,7 +1,9 @@
-import { MiddlewareHeaders } from '@/lib/middleware';
-import type { SiteCustomizationSettings } from '@gitbook/api';
 import { headers } from 'next/headers';
 import rison from 'rison';
+
+import type { SiteCustomizationSettings } from '@gitbook/api';
+
+import { MiddlewareHeaders } from '@/lib/middleware';
 
 /**
  * Selects the customization settings from the x-gitbook-customization header if present,

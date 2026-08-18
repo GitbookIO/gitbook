@@ -7,15 +7,16 @@ import {
     useSpring,
 } from 'motion/react';
 import React, { isValidElement } from 'react';
+
+import { Icon, type IconName, IconStyle } from '@gitbook/icons';
+
+import { Tooltip } from '../primitives';
 import { AnimatedLogo } from './AnimatedLogo';
 import { useToolbarControls } from './ToolbarControlsContext';
 import { ToolbarVisibilityHint } from './ToolbarVisibilityHint';
-
-import { tcls } from '@/lib/tailwind';
-import { Icon, type IconName, IconStyle } from '@gitbook/icons';
-import { Tooltip } from '../primitives';
 import { getCopyVariants, toolbarEasings } from './transitions';
 import { useMagnificationEffect } from './useMagnificationEffect';
+import { tcls } from '@/lib/tailwind';
 
 const DURATION_LOGO_APPEARANCE = 2000;
 const DELAY_BETWEEN_LOGO_AND_CONTENT = 100;
@@ -107,7 +108,7 @@ export function Toolbar(props: ToolbarProps) {
     return (
         <motion.div
             data-testid="admin-toolbar"
-            className="-translate-x-1/2 fixed bottom-5 left-1/2 z-40 w-auto max-w-xl transform px-4"
+            className="fixed bottom-5 left-1/2 z-40 w-auto max-w-xl -translate-x-1/2 transform px-4"
         >
             <ToolbarVisibilityHint show={showHint} />
 
@@ -182,7 +183,7 @@ export function ToolbarButtonGroup(props: { children: React.ReactNode }) {
             variants={toolbarEasings.parent}
             initial="hidden"
             animate="show"
-            className="flex items-center gap-1 overflow-visible pr-2 pl-4"
+            className="flex items-center gap-1 overflow-visible pl-4 pr-2"
         >
             {buttonChildren.map((child, index) => {
                 const childEl = child as React.ReactElement;
@@ -318,7 +319,7 @@ function ToolbarButtonWrapper(props: {
 
 export function ToolbarTitle(props: { prefix?: string; suffix: string }) {
     return (
-        <div className="flex items-center gap-1 text-xs ">
+        <div className="flex items-center gap-1 text-xs">
             {props.prefix ? <ToolbarTitlePrefix title={props.prefix} /> : null}
             <ToolbarTitleSuffix title={props.suffix} />
         </div>
@@ -351,7 +352,7 @@ export function ToolbarSubtitle(props: { subtitle: React.ReactNode }) {
     return (
         <motion.span
             {...getCopyVariants(1)}
-            className="inline-flex items-center gap-1 text-neutral-1/80 text-xxs dark:text-neutral-12/80"
+            className="text-neutral-1/80 dark:text-neutral-12/80 inline-flex items-center gap-1 text-xxs"
         >
             {props.subtitle}
         </motion.span>

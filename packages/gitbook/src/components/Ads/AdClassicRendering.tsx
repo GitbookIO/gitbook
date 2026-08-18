@@ -1,11 +1,10 @@
-import type { GitBookBaseContext } from '@/lib/context';
-import { getResizedImageURL } from '@/lib/images';
 import type { SiteInsightsAd } from '@gitbook/api';
-
-import { tcls } from '@/lib/tailwind';
 
 import { Link } from '../primitives';
 import type { AdItem } from './types';
+import type { GitBookBaseContext } from '@/lib/context';
+import { getResizedImageURL } from '@/lib/images';
+import { tcls } from '@/lib/tailwind';
 
 /**
  * Classic rendering for an ad.

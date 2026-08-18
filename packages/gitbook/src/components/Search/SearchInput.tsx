@@ -1,10 +1,11 @@
 'use client';
 import React, { useEffect, useRef } from 'react';
 
-import { t, tString, useLanguage } from '@/intl/client';
 import { Icon } from '@gitbook/icons';
+
 import { AISearchIcon } from '../AIChat';
 import { Input } from '../primitives';
+import { t, tString, useLanguage } from '@/intl/client';
 
 interface SearchInputProps {
     'aria-activedescendant'?: string;
@@ -73,7 +74,7 @@ export const SearchInput = React.forwardRef<HTMLDivElement, SearchInputProps>(
         return (
             <div
                 className={
-                    isFrame ? 'relative flex w-full grow' : 'relative flex @max-2xl:size-9.5 grow'
+                    isFrame ? 'relative flex w-full grow' : '@max-2xl:size-9.5 relative flex grow'
                 }
             >
                 <Input
@@ -86,7 +87,7 @@ export const SearchInput = React.forwardRef<HTMLDivElement, SearchInputProps>(
                     className={
                         isFrame
                             ? 'grow bg-tint-base [&_input]:text-sm'
-                            : '@max-2xl:absolute inset-y-0 right-0 z-30 @max-2xl:max-w-9.5 grow site-header:theme-bold:border-header-link/4 site-header:theme-bold:bg-header-link/1 @max-2xl:px-2.5 site-header:theme-bold:text-header-link site-header:theme-bold:shadow-none! site-header:theme-bold:backdrop-blur-xl @max-2xl:focus-within:w-56 @max-2xl:focus-within:max-w-[calc(100vw-5rem)] site-header:theme-bold:focus-within:border-header-link/6 site-header:theme-bold:focus-within:ring-header-link/5 site-header:theme-bold:hover:border-header-link/5 site-header:theme-bold:hover:not-focus-within:bg-header-link/2 @max-2xl:has-[input[aria-expanded=true]]:w-56 @max-2xl:has-[input[aria-expanded=true]]:max-w-[calc(100vw-5rem)] @max-2xl:[&_input]:opacity-0 site-header:theme-bold:[&_input]:placeholder:text-header-link/8 @max-2xl:focus-within:[&_input]:opacity-11 @max-2xl:has-[input[aria-expanded=true]]:[&_input]:opacity-11'
+                            : '@max-2xl:absolute @max-2xl:max-w-9.5 @max-2xl:px-2.5 site-header:theme-bold:shadow-none! @max-2xl:focus-within:w-56 @max-2xl:focus-within:max-w-[calc(100vw-5rem)] site-header:theme-bold:hover:not-focus-within:bg-header-link/2 @max-2xl:has-[input[aria-expanded=true]]:w-56 @max-2xl:has-[input[aria-expanded=true]]:max-w-[calc(100vw-5rem)] @max-2xl:[&_input]:opacity-0 @max-2xl:focus-within:[&_input]:opacity-11 @max-2xl:has-[input[aria-expanded=true]]:[&_input]:opacity-11 inset-y-0 right-0 z-30 grow site-header:theme-bold:border-header-link/4 site-header:theme-bold:bg-header-link/1 site-header:theme-bold:text-header-link site-header:theme-bold:backdrop-blur-xl site-header:theme-bold:[--input-placeholder:color-mix(in_oklab,rgb(var(--header-link))_72%,transparent)] site-header:theme-bold:focus-within:border-header-link/6 site-header:theme-bold:focus-within:ring-header-link/5 site-header:theme-bold:hover:border-header-link/5'
                     }
                     placeholder={`${tString(language, withAI ? 'search_or_ask' : 'search')}…`}
                     onFocus={onFocus}
@@ -100,7 +101,7 @@ export const SearchInput = React.forwardRef<HTMLDivElement, SearchInputProps>(
                                 className={
                                     isFrame
                                         ? 'size-text-lg shrink-0 text-tint-subtle'
-                                        : 'size-text-lg shrink-0 site-header:theme-bold:text-header-link/8 text-tint'
+                                        : 'size-text-lg shrink-0 text-tint site-header:theme-bold:text-header-link/8'
                                 }
                             />
                         )
@@ -122,7 +123,7 @@ export const SearchInput = React.forwardRef<HTMLDivElement, SearchInputProps>(
                     }
                     trailing={
                         !showAsk && value && resultsCount > 0 ? (
-                            <div className="mr-2 animate-blur-in text-sm text-tint-subtle">
+                            <div className="animate-blur-in mr-2 text-sm text-tint-subtle">
                                 {t(language, 'search_results_count', resultsCount.toString())}
                             </div>
                         ) : undefined

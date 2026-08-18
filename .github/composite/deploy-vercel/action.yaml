@@ -1,31 +1,31 @@
 name: 'Deploy vercel'
 description: 'Deploy GitBook to Vercel'
 inputs:
-  vercelOrg:
-    description: 'Vercel organization'
-    required: true
-  vercelProject:
-    description: 'Vercel project'
-    required: true
-  vercelToken:
-    description: 'Vercel token'
-    required: true
-  opItem:
-    description: '1Password item to load secrets from'
-    required: true
-  opServiceAccount:
-    description: '1Password service account token'
-    required: true
-  environment:
-    description: 'Environment to deploy to'
-    required: true
-  headSha:
-    description: 'Git ref to deploy, used for the deploymentId'
-    required: false
+    vercelOrg:
+        description: 'Vercel organization'
+        required: true
+    vercelProject:
+        description: 'Vercel project'
+        required: true
+    vercelToken:
+        description: 'Vercel token'
+        required: true
+    opItem:
+        description: '1Password item to load secrets from'
+        required: true
+    opServiceAccount:
+        description: '1Password service account token'
+        required: true
+    environment:
+        description: 'Environment to deploy to'
+        required: true
+    headSha:
+        description: 'Git ref to deploy, used for the deploymentId'
+        required: false
 outputs:
     deployment-url:
-      description: "Deployment URL"
-      value: ${{ steps.deploy.outputs.deployment-url }}
+        description: 'Deployment URL'
+        value: ${{ steps.deploy.outputs.deployment-url }}
 runs:
     using: 'composite'
     steps:
@@ -40,51 +40,51 @@ runs:
           run: bun run vercel pull --yes --environment=${{ inputs.environment }} --token=${{ inputs.vercelToken }}
           shell: bash
           env:
-            VERCEL_ORG_ID: ${{ inputs.vercelOrg }}
-            VERCEL_PROJECT_ID: ${{ inputs.vercelProject }}
+              VERCEL_ORG_ID: ${{ inputs.vercelOrg }}
+              VERCEL_PROJECT_ID: ${{ inputs.vercelProject }}
         - name: Load secret
           uses: 1password/load-secrets-action@v2
           env:
-            OP_SERVICE_ACCOUNT_TOKEN: ${{ inputs.opServiceAccount }}
-            GITBOOK_URL: ${{ inputs.opItem }}/GITBOOK_URL
-            GITBOOK_ICONS_URL: ${{ inputs.opItem }}/GITBOOK_ICONS_URL
-            GITBOOK_ICONS_TOKEN: ${{ inputs.opItem }}/GITBOOK_ICONS_TOKEN
-            GITBOOK_SECRET: ${{ inputs.opItem }}/GITBOOK_SECRET
-            GITBOOK_APP_URL: ${{ inputs.opItem }}/GITBOOK_APP_URL
-            GITBOOK_API_URL: ${{ inputs.opItem }}/GITBOOK_API_URL
-            GITBOOK_API_PUBLIC_URL: ${{ inputs.opItem }}/GITBOOK_API_PUBLIC_URL
-            GITBOOK_API_TOKEN: ${{ inputs.opItem }}/GITBOOK_API_TOKEN
-            GITBOOK_OAUTH_SERVER_URL: ${{ inputs.opItem }}/GITBOOK_OAUTH_SERVER_URL
-            GITBOOK_SITE_OAUTH_SIGNING_SECRET: ${{ inputs.opItem }}/GITBOOK_SITE_OAUTH_SIGNING_SECRET
-            GITBOOK_PREVIEW_BASE_URL: ${{ inputs.opItem }}/GITBOOK_PREVIEW_BASE_URL
-            GITBOOK_INTEGRATIONS_HOST: ${{ inputs.opItem }}/GITBOOK_INTEGRATIONS_HOST
-            GITBOOK_INTEGRATIONS_CONTENT_HOST: ${{ inputs.opItem }}/GITBOOK_INTEGRATIONS_CONTENT_HOST
-            GITBOOK_IMAGE_RESIZE_SIGNING_KEY: ${{ inputs.opItem }}/GITBOOK_IMAGE_RESIZE_SIGNING_KEY
-            GITBOOK_IMAGE_RESIZE_URL: ${{ inputs.opItem }}/GITBOOK_IMAGE_RESIZE_URL_2
-            GITBOOK_IMAGE_RESIZE_SALT: ${{ inputs.opItem }}/GITBOOK_IMAGE_RESIZE_SALT
-            GITBOOK_IMAGE_RESIZE_MODE: ${{ inputs.opItem }}/GITBOOK_IMAGE_RESIZE_MODE
-            GITBOOK_ASSETS_PREFIX: ${{ inputs.opItem }}/GITBOOK_ASSETS_PREFIX
-            GITBOOK_FONTS_URL: ${{ inputs.opItem }}/GITBOOK_FONTS_URL
+              OP_SERVICE_ACCOUNT_TOKEN: ${{ inputs.opServiceAccount }}
+              GITBOOK_URL: ${{ inputs.opItem }}/GITBOOK_URL
+              GITBOOK_ICONS_URL: ${{ inputs.opItem }}/GITBOOK_ICONS_URL
+              GITBOOK_ICONS_TOKEN: ${{ inputs.opItem }}/GITBOOK_ICONS_TOKEN
+              GITBOOK_SECRET: ${{ inputs.opItem }}/GITBOOK_SECRET
+              GITBOOK_APP_URL: ${{ inputs.opItem }}/GITBOOK_APP_URL
+              GITBOOK_API_URL: ${{ inputs.opItem }}/GITBOOK_API_URL
+              GITBOOK_API_PUBLIC_URL: ${{ inputs.opItem }}/GITBOOK_API_PUBLIC_URL
+              GITBOOK_API_TOKEN: ${{ inputs.opItem }}/GITBOOK_API_TOKEN
+              GITBOOK_OAUTH_SERVER_URL: ${{ inputs.opItem }}/GITBOOK_OAUTH_SERVER_URL
+              GITBOOK_SITE_OAUTH_SIGNING_SECRET: ${{ inputs.opItem }}/GITBOOK_SITE_OAUTH_SIGNING_SECRET
+              GITBOOK_PREVIEW_BASE_URL: ${{ inputs.opItem }}/GITBOOK_PREVIEW_BASE_URL
+              GITBOOK_INTEGRATIONS_HOST: ${{ inputs.opItem }}/GITBOOK_INTEGRATIONS_HOST
+              GITBOOK_INTEGRATIONS_CONTENT_HOST: ${{ inputs.opItem }}/GITBOOK_INTEGRATIONS_CONTENT_HOST
+              GITBOOK_IMAGE_RESIZE_SIGNING_KEY: ${{ inputs.opItem }}/GITBOOK_IMAGE_RESIZE_SIGNING_KEY
+              GITBOOK_IMAGE_RESIZE_URL: ${{ inputs.opItem }}/GITBOOK_IMAGE_RESIZE_URL_2
+              GITBOOK_IMAGE_RESIZE_SALT: ${{ inputs.opItem }}/GITBOOK_IMAGE_RESIZE_SALT
+              GITBOOK_IMAGE_RESIZE_MODE: ${{ inputs.opItem }}/GITBOOK_IMAGE_RESIZE_MODE
+              GITBOOK_ASSETS_PREFIX: ${{ inputs.opItem }}/GITBOOK_ASSETS_PREFIX
+              GITBOOK_FONTS_URL: ${{ inputs.opItem }}/GITBOOK_FONTS_URL
         - name: Inject build env vars
           if: ${{ inputs.environment == 'preview' }}
           shell: bash
           run: |
-            HEAD_SHA=$(git rev-parse HEAD)
-            echo "resolved HEAD_SHA: $HEAD_SHA"
-            echo "GITBOOK_HEAD_SHA=$HEAD_SHA" >> .vercel/.env.${{ inputs.environment }}.local
-            echo "GITBOOK_RUNTIME=vercel" >> .vercel/.env.${{ inputs.environment }}.local
-            echo "GITBOOK_BLOCK_SEARCH_INDEXATION=true" >> .vercel/.env.${{ inputs.environment }}.local
-            echo "GITBOOK_ALLOW_CUSTOMIZATION_OVERRIDE=true" >> .vercel/.env.${{ inputs.environment }}.local
-            echo "--- .vercel/.env.${{ inputs.environment }}.local after inject ---"
-            cat .vercel/.env.${{ inputs.environment }}.local
+              HEAD_SHA=$(git rev-parse HEAD)
+              echo "resolved HEAD_SHA: $HEAD_SHA"
+              echo "GITBOOK_HEAD_SHA=$HEAD_SHA" >> .vercel/.env.${{ inputs.environment }}.local
+              echo "GITBOOK_RUNTIME=vercel" >> .vercel/.env.${{ inputs.environment }}.local
+              echo "GITBOOK_BLOCK_SEARCH_INDEXATION=true" >> .vercel/.env.${{ inputs.environment }}.local
+              echo "GITBOOK_ALLOW_CUSTOMIZATION_OVERRIDE=true" >> .vercel/.env.${{ inputs.environment }}.local
+              echo "--- .vercel/.env.${{ inputs.environment }}.local after inject ---"
+              cat .vercel/.env.${{ inputs.environment }}.local
         - name: Build Project Artifacts
           run: bun run vercel build --target=${{ inputs.environment }} --token=${{ inputs.vercelToken }}
           shell: bash
           env:
-            VERCEL_ORG_ID: ${{ inputs.vercelOrg }}
-            VERCEL_PROJECT_ID: ${{ inputs.vercelProject }}
-            GITBOOK_RUNTIME: vercel
-            GITBOOK_HEAD_SHA: ${{ inputs.headSha }}
+              VERCEL_ORG_ID: ${{ inputs.vercelOrg }}
+              VERCEL_PROJECT_ID: ${{ inputs.vercelProject }}
+              GITBOOK_RUNTIME: vercel
+              GITBOOK_HEAD_SHA: ${{ inputs.headSha }}
         - name: Deploy Project Artifacts to Vercel
           id: deploy
           shell: bash
@@ -92,10 +92,9 @@ runs:
               DEPLOYMENT_URL=$(bun run vercel deploy --prebuilt --target=${{ inputs.environment }} --token=${{ inputs.vercelToken }})
               echo "deployment-url=$DEPLOYMENT_URL" >> "$GITHUB_OUTPUT"
           env:
-            VERCEL_ORG_ID: ${{ inputs.vercelOrg }}
-            VERCEL_PROJECT_ID: ${{ inputs.vercelProject }}
+              VERCEL_ORG_ID: ${{ inputs.vercelOrg }}
+              VERCEL_PROJECT_ID: ${{ inputs.vercelProject }}
         - name: Outputs
           shell: bash
           run: |
               echo "URL: ${{ steps.deploy.outputs.deployment-url }}"
-

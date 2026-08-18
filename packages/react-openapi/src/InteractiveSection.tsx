@@ -1,10 +1,9 @@
 'use client';
 
 import clsx from 'classnames';
-import { useRef } from 'react';
-import { mergeProps, useButton, useDisclosure, useFocusRing } from 'react-aria';
-import { useDisclosureState } from 'react-stately';
-import { OpenAPISelect, OpenAPISelectItem, useSelectState } from './OpenAPISelect';
+import { useId, useState } from 'react';
+
+import { OpenAPISelect, useSelectState } from './OpenAPISelect';
 import { Section, SectionBody, SectionHeader, SectionHeaderContent } from './StaticSection';
 
 interface InteractiveSectionTab {
@@ -28,7 +27,7 @@ export function InteractiveSection(props: {
     /** Icon to display for the toggle */
     toggleIcon?: React.ReactNode;
     /** Tabs of content to display */
-    tabs?: Array<InteractiveSectionTab>;
+    tabs?: InteractiveSectionTab[];
     /** Default tab to have opened */
     defaultTab?: string;
     /** Content of the header */
@@ -53,14 +52,8 @@ export function InteractiveSection(props: {
         selectIcon,
         stateKey = 'interactive-section',
     } = props;
-    const state = useDisclosureState({
-        defaultExpanded: defaultOpened,
-    });
-    const panelRef = useRef<HTMLDivElement | null>(null);
-    const triggerRef = useRef<HTMLButtonElement | null>(null);
-    const { buttonProps: triggerProps, panelProps } = useDisclosure({}, state, panelRef);
-    const { buttonProps } = useButton(triggerProps, triggerRef);
-    const { isFocusVisible, focusProps } = useFocusRing();
+    const [isExpanded, setIsExpanded] = useState(defaultOpened);
+    const panelId = useId();
     const store = useSelectState(stateKey, defaultTab);
 
     const selectedTab: InteractiveSectionTab | undefined =
@@ -73,14 +66,14 @@ export function InteractiveSection(props: {
                 'openapi-section',
                 toggeable ? 'openapi-section-toggeable' : null,
                 className,
-                toggeable ? `${className}-${state.isExpanded ? 'opened' : 'closed'}` : null
+                toggeable ? `${className}-${isExpanded ? 'opened' : 'closed'}` : null
             )}
         >
             {header ? (
                 <SectionHeader
                     onClick={() => {
                         if (toggeable) {
-                            state.toggle();
+                            setIsExpanded((expanded) => !expanded);
                         }
                     }}
                     className={className}
@@ -88,21 +81,17 @@ export function InteractiveSection(props: {
                     <SectionHeaderContent className={className}>
                         {selectedTab?.body && toggeable ? (
                             <button
-                                {...mergeProps(buttonProps, focusProps)}
-                                ref={triggerRef}
+                                type="button"
+                                aria-expanded={isExpanded}
+                                aria-controls={panelId}
                                 className={clsx('openapi-section-toggle', `${className}-toggle`)}
-                                style={{
-                                    outline: isFocusVisible
-                                        ? '2px solid rgb(var(--primary-color-500) / 0.4)'
-                                        : 'none',
-                                }}
                             >
                                 {toggleIcon}
                             </button>
                         ) : null}
                         {header}
                     </SectionHeaderContent>
-                    {/* biome-ignore lint/a11y/useKeyWithClickEvents: we prevent default here */}
+                    {/* oxlint-disable-next-line jsx-a11y/click-events-have-key-events */}
                     <div
                         className={clsx(
                             'openapi-section-header-controls',
@@ -117,23 +106,19 @@ export function InteractiveSection(props: {
                                 stateKey={stateKey}
                                 items={tabs}
                                 onChange={() => {
-                                    state.expand();
+                                    setIsExpanded(true);
                                 }}
                                 icon={selectIcon}
                                 placement="bottom end"
                             >
-                                {tabs.map((tab) => (
-                                    <OpenAPISelectItem key={tab.key} id={tab.key} value={tab}>
-                                        {tab.label}
-                                    </OpenAPISelectItem>
-                                ))}
+                                {(tab) => tab.label}
                             </OpenAPISelect>
                         ) : null}
                     </div>
                 </SectionHeader>
             ) : null}
-            {(!toggeable || state.isExpanded) && selectedTab?.body ? (
-                <SectionBody ref={panelRef} {...panelProps} className={className}>
+            {(!toggeable || isExpanded) && selectedTab?.body ? (
+                <SectionBody id={panelId} className={className}>
                     {selectedTab?.body}
                 </SectionBody>
             ) : null}

@@ -3,6 +3,7 @@ import type {
     CustomizationFontDefinition,
     CustomizationMonospaceFont,
 } from '@gitbook/api';
+
 import { generateFontFacesCSS, getFontSourcesToPreload } from './custom';
 import { fonts } from './default';
 

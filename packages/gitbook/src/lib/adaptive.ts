@@ -1,6 +1,8 @@
-import type { SiteURLData } from '@/lib/context';
-import type { SiteAPIToken } from '@gitbook/api';
 import { jwtDecode } from 'jwt-decode';
+
+import type { SiteAPIToken } from '@gitbook/api';
+
+import type { SiteURLData } from '@/lib/context';
 
 /**
  * Claims about the visitor, stored in the VA and auth token.

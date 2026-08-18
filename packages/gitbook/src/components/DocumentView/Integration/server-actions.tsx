@@ -1,11 +1,12 @@
 'use server';
 
-import { getServerActionBaseContext } from '@/lib/server-actions';
-import { traceErrorOnly } from '@/lib/tracing';
 import type { RenderIntegrationUI } from '@gitbook/api';
 import { ContentKitOutput } from '@gitbook/react-contentkit';
+
 import { contentKitServerContext } from './contentkit';
 import { fetchSafeIntegrationUI } from './render';
+import { getServerActionBaseContext } from '@/lib/server-actions';
+import { traceErrorOnly } from '@/lib/tracing';
 
 /**
  * Server action to render an integration UI request from <ContentKit />.

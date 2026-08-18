@@ -1,9 +1,10 @@
 'use client';
-import { useLanguage } from '@/intl/client';
-import { tString } from '@/intl/translate';
 import { usePathname } from 'next/navigation';
 import { useEffect } from 'react';
+
 import { Button } from '../primitives';
+import { useLanguage } from '@/intl/client';
+import { tString } from '@/intl/translate';
 
 const globalClassName = 'outline-open';
 
@@ -27,7 +28,7 @@ export function PageAsideToggleButton() {
                 onClick={() => {
                     document.body.classList.toggle(globalClassName);
                 }}
-                className="layout-default:hidden layout-wide:3xl:hidden page-no-outline:hidden layout-wide:max-xl:hidden page-api-block:min-[96rem]:hidden"
+                className="page-api-block:min-[96rem]:hidden layout-default:hidden page-no-outline:hidden layout-wide:max-xl:hidden layout-wide:3xl:hidden"
             />
             <Button
                 icon="block-quote"

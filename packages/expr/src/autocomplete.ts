@@ -11,7 +11,6 @@ import type {
 } from 'acorn';
 import { isDummy } from 'acorn-loose';
 import * as walk from 'acorn-walk';
-
 import assertNever from 'assert-never';
 
 import { type ExtractSymbolDef, SymbolType, SymbolsTable } from './symbols';
@@ -312,7 +311,7 @@ export class AutoComplete {
         node: BinaryExpression,
         cursorOffset: number,
         context: SymbolsTable
-    ): Array<AutocompleteLiteralValueSuggestion> {
+    ): AutocompleteLiteralValueSuggestion[] {
         const { left, right } = node;
 
         if (left.type !== 'MemberExpression' && left.type !== 'Identifier') {
@@ -431,7 +430,7 @@ export class AutoComplete {
         node: AnyNode,
         cursorOffset: number,
         context: SymbolsTable
-    ): Array<AutocompleteOperatorSuggestion> {
+    ): AutocompleteOperatorSuggestion[] {
         if (node.type === 'Literal') {
             const parent = findParentNode(node, ast);
 
@@ -496,7 +495,7 @@ export class AutoComplete {
      */
     private getOperatorSuggestionsForSymbol(
         symbol: ExtractSymbolDef<SymbolType>
-    ): Array<AutocompleteOperatorSuggestion> {
+    ): AutocompleteOperatorSuggestion[] {
         switch (symbol.type) {
             case SymbolType.Number:
             case SymbolType.Boolean:
@@ -526,7 +525,7 @@ export class AutoComplete {
             case SymbolType.Function:
                 return this.getOperatorSuggestionsForSymbol(symbol.returns);
             case SymbolType.Union: {
-                return symbol.members.reduce<Array<AutocompleteOperatorSuggestion>>((prev, cur) => {
+                return symbol.members.reduce<AutocompleteOperatorSuggestion[]>((prev, cur) => {
                     prev.push(...this.getOperatorSuggestionsForSymbol(cur));
                     return prev;
                 }, []);

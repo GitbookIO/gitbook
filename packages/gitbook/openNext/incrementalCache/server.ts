@@ -1,4 +1,5 @@
 import { withRegionalCache } from '@opennextjs/cloudflare/overrides/incremental-cache/regional-cache';
+
 import { GitbookIncrementalCache } from './incrementalCache';
 
 // We cannot have regional cache only in the middleware, otherwise it will override things on cache miss

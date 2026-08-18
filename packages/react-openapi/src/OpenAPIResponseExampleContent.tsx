@@ -1,8 +1,9 @@
 'use client';
 
 import clsx from 'classnames';
-import type { Key } from 'react-aria';
-import { OpenAPISelect, OpenAPISelectItem, useSelectState } from './OpenAPISelect';
+
+import type { Key } from './OpenAPISelect';
+import { OpenAPISelect, type OpenAPISelectItem, useSelectState } from './OpenAPISelect';
 import { StaticSection } from './StaticSection';
 import { createStateKey, getStatusCodeClassName } from './utils';
 
@@ -61,18 +62,12 @@ function OpenAPIResponseExampleHeader(props: {
             stateKey={getResponseExampleStateKey()}
             placement="bottom start"
         >
-            {items.map((item) => (
-                <OpenAPISelectItem key={item.key} id={item.key} value={item}>
-                    <OpenAPIResponseExampleItem item={item} />
-                </OpenAPISelectItem>
-            ))}
+            {(item) => <OpenAPIResponseExampleItem item={item} />}
         </OpenAPISelect>
     );
 }
 
-function OpenAPIResponseExampleItem(props: {
-    item: OpenAPIResponseExampleItem;
-}) {
+function OpenAPIResponseExampleItem(props: { item: OpenAPIResponseExampleItem }) {
     const { item } = props;
     return (
         <>
@@ -90,9 +85,7 @@ function OpenAPIResponseExampleItem(props: {
     );
 }
 
-function OpenAPIResponseExampleBody(props: {
-    items: OpenAPIResponseExampleItem[];
-}) {
+function OpenAPIResponseExampleBody(props: { items: OpenAPIResponseExampleItem[] }) {
     const { items } = props;
     const state = useResponseExamplesState(items[0]?.key);
 

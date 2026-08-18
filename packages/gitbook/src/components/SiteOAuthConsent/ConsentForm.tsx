@@ -2,11 +2,10 @@
 
 import { useState, useTransition } from 'react';
 
+import { type SubmitConsentInput, submitSiteOAuthConsent } from './actions';
 import { Button } from '@/components/primitives/Button';
 import { Checkbox } from '@/components/primitives/Checkbox';
 import { tcls } from '@/lib/tailwind';
-
-import { type SubmitConsentInput, submitSiteOAuthConsent } from './actions';
 
 /**
  * Site's OAuth consent form to present to the user the client's information requesting access to the site's MCP.
@@ -47,7 +46,7 @@ export function ConsentForm(props: {
     return (
         <div className="flex flex-col gap-3">
             {error ? (
-                <p role="alert" className="text-danger-strong text-sm">
+                <p role="alert" className="text-sm text-danger-strong">
                     {error}
                 </p>
             ) : null}
@@ -63,7 +62,7 @@ export function ConsentForm(props: {
                         <Checkbox
                             id="site-oauth-trusted"
                             checked={trusted}
-                            onCheckedChange={(value) => setTrusted(value === true)}
+                            onCheckedChange={setTrusted}
                         />
                         <span>I recognize and trust this client</span>
                     </label>

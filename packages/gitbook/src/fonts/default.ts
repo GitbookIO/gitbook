@@ -1,4 +1,3 @@
-import { CustomizationDefaultFont, CustomizationDefaultMonospaceFont } from '@gitbook/api';
 import {
     DM_Mono,
     Fira_Code,
@@ -25,6 +24,8 @@ import {
     Ubuntu,
 } from 'next/font/google';
 import localFont from 'next/font/local';
+
+import { CustomizationDefaultFont, CustomizationDefaultMonospaceFont } from '@gitbook/api';
 
 export const fontNotoColorEmoji = Noto_Color_Emoji({
     variable: '--font-noto-color-emoji',

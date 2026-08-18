@@ -3,9 +3,11 @@
 import type React from 'react';
 import { type ComponentPropsWithRef, memo, useCallback, useMemo, useState } from 'react';
 
-import { useResolvedSlug, useSelect } from '@/components/Select';
+import { Icon, type IconName } from '@gitbook/icons';
+
 import { useListOverflow } from '@/components/hooks';
 import { DropdownMenu, DropdownMenuItem } from '@/components/primitives';
+import { useResolvedSlug, useSelect } from '@/components/Select';
 import { useLanguage } from '@/intl/client';
 import { tString } from '@/intl/translate';
 import {
@@ -16,7 +18,7 @@ import {
     SELECT_UNPINNED_ATTR,
 } from '@/lib/select';
 import { tcls } from '@/lib/tailwind';
-import { Icon, type IconName } from '@gitbook/icons';
+import { resolveAnchorURL } from '@/lib/urls';
 
 export interface TabsItem {
     id: string;
@@ -40,11 +42,7 @@ export interface TabsItem {
  * click we pin the exact pane via `data-select-pinned`/`-unpinned` (a client-only override that
  * reverts to first-match on reload). The tablist highlight follows the same resolved tab.
  */
-export function DynamicTabs(props: {
-    tabs: TabsItem[];
-    setClassName: string;
-    className?: string;
-}) {
+export function DynamicTabs(props: { tabs: TabsItem[]; setClassName: string; className?: string }) {
     const { tabs, setClassName, className } = props;
     const { activate } = useSelect();
     // The tab the visitor explicitly clicked this session (not persisted — reload reverts to CSS).
@@ -68,10 +66,16 @@ export function DynamicTabs(props: {
     const selectTab = useCallback(
         (tabId: string) => {
             const tab = tabs.find((item) => item.id === tabId);
-            if (tab?.slug) {
-                activate(tab.slug);
-                setManualId(tabId);
+            if (!tab?.slug) {
+                return;
             }
+            activate(tab.slug);
+            setManualId(tabId);
+            // The hash is the only URL handle for a selection, so a copied URL lands on this tab and
+            // `useSelectAnchor` re-activates its slug on load. We deliberately bypass the navigation
+            // context: it would report a hash change and scroll the tab the visitor is already
+            // looking at.
+            window.history.replaceState(null, '', resolveAnchorURL(`#${tab.id}`, window.location));
         },
         [tabs, activate]
     );

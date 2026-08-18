@@ -1,8 +1,9 @@
-import { type ClassValue, tcls } from '@/lib/tailwind';
 import type { DocumentBlockHeading, DocumentBlockTabs } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
+
 import { Link } from '../primitives';
 import { getBlockTextStyle } from './spacing';
+import { type ClassValue, tcls } from '@/lib/tailwind';
 
 /**
  * A hash icon which adds the block or active block item's ID in the URL hash.

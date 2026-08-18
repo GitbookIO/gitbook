@@ -1,8 +1,20 @@
-import type { GitBookSiteContext } from '@/lib/context';
 import type { JSONDocument, RevisionPageDocument, SiteInsightsDisplayContext } from '@gitbook/api';
 
+import { DocumentView, DocumentViewSkeleton } from '../DocumentView';
+import { CurrentPageProvider } from '../hooks/useCurrentPage';
+import { TrackPageViewEvent } from '../Insights';
+import { CONTENT_STYLE } from '../layout';
+import { PageFeedbackForm } from '../PageFeedback';
+import { DateRelative, SuspenseLoadedHint } from '../primitives';
+import OptionalSuspense from './OptionalSuspense';
+import { PageBodyBlankslate } from './PageBodyBlankslate';
+import { PageCover } from './PageCover';
+import { PageFooterNavigation } from './PageFooterNavigation';
+import { PageHeader } from './PageHeader';
+import { PreservePageLayout } from './PreservePageLayout';
 import { getSpaceLanguage } from '@/intl/server';
 import { t } from '@/intl/translate';
+import type { GitBookSiteContext } from '@/lib/context';
 import {
     hasAPIBlock,
     hasFullWidthBlock,
@@ -13,18 +25,6 @@ import {
 import { getLLMsTxtURL, getPageMarkdownURL } from '@/lib/llms-directive';
 import type { AncestorRevisionPage } from '@/lib/pages';
 import { tcls } from '@/lib/tailwind';
-import { DocumentView, DocumentViewSkeleton } from '../DocumentView';
-import { TrackPageViewEvent } from '../Insights';
-import { PageFeedbackForm } from '../PageFeedback';
-import { CurrentPageProvider } from '../hooks/useCurrentPage';
-import { CONTENT_STYLE } from '../layout';
-import { DateRelative, SuspenseLoadedHint } from '../primitives';
-import OptionalSuspense from './OptionalSuspense';
-import { PageBodyBlankslate } from './PageBodyBlankslate';
-import { PageCover } from './PageCover';
-import { PageFooterNavigation } from './PageFooterNavigation';
-import { PageHeader } from './PageHeader';
-import { PreservePageLayout } from './PreservePageLayout';
 
 const LINK_PREVIEW_MAX_COUNT = 500;
 
@@ -158,7 +158,7 @@ export async function PageBody(props: {
                         )}
                     >
                         {updatedAt ? (
-                            <p className="mr-auto text-sm ">
+                            <p className="mr-auto text-sm">
                                 {t(
                                     language,
                                     'page_last_modified',

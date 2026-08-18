@@ -1,10 +1,9 @@
 'use client';
 
+import assertNever from 'assert-never';
+import * as React from 'react';
 import * as zustand from 'zustand';
 
-import { useCurrentContent } from '@/components/hooks';
-import { useLanguage } from '@/intl/client';
-import { tString } from '@/intl/translate';
 import {
     AIMessageRole,
     AIMessageStepPhase,
@@ -13,8 +12,7 @@ import {
     type AIToolCallResult,
     SiteInsightsDisplayContext,
 } from '@gitbook/api';
-import assertNever from 'assert-never';
-import * as React from 'react';
+
 import { getInsightsSession, useTrackEvent } from '../Insights';
 import { useSetSearchState } from '../Search';
 import { addRecentSearchQuery } from '../Search/recent-queries';
@@ -30,6 +28,9 @@ import {
     useSubmitAssistantFeedbackTool,
 } from './useSubmitAssistantFeedbackTool';
 import { useSubmitPageFeedbackTool } from './useSubmitPageFeedbackTool';
+import { useCurrentContent } from '@/components/hooks';
+import { useLanguage } from '@/intl/client';
+import { tString } from '@/intl/translate';
 
 export type AIChatMessage = {
     role: AIMessageRole;

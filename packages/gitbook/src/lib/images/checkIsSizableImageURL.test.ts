@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'bun:test';
+
 import { SizableImageAction, checkIsSizableImageURL } from './checkIsSizableImageURL';
 
 describe('checkIsSizableImageURL', () => {

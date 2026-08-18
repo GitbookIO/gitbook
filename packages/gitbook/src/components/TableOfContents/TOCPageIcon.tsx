@@ -1,8 +1,7 @@
 import type { RevisionPage } from '@gitbook/api';
 
-import { tcls } from '@/lib/tailwind';
-
 import { PageIcon } from '../PageIcon';
+import { tcls } from '@/lib/tailwind';
 
 /**
  * Styled page icon for the table of contents.

@@ -1,15 +1,14 @@
 import type { DocumentBlockHeading } from '@gitbook/api';
 
-import { getSpaceLanguage, tString } from '@/intl/server';
-import { defaultLanguage } from '@/intl/translations';
-import { tcls } from '@/lib/tailwind';
-
 import type { BlockProps } from './Block';
 import { HashLinkButton, hashLinkButtonWrapperStyles } from './HashLinkButton';
 import { HeadingRevealWrapper } from './HeadingRevealWrapper';
 import { Inlines } from './Inlines';
 import { getBlockTextStyle } from './spacing';
 import { getTextAlignment } from './utils';
+import { getSpaceLanguage, tString } from '@/intl/server';
+import { defaultLanguage } from '@/intl/translations';
+import { tcls } from '@/lib/tailwind';
 
 export async function Heading(props: BlockProps<DocumentBlockHeading>) {
     const { block, style, context, ...rest } = props;
@@ -46,6 +45,7 @@ export async function Heading(props: BlockProps<DocumentBlockHeading>) {
             )}
         >
             <span
+                data-cover-aware-text={context.isPageBody ? '' : undefined}
                 className={tcls(
                     'pointer-fine:flex-1',
                     'z-1',

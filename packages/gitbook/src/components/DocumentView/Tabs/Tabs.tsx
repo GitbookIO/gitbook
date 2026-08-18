@@ -2,12 +2,11 @@ import type { DocumentBlockTabs } from '@gitbook/api';
 import type { IconName } from '@gitbook/icons';
 import { validateIconName } from '@gitbook/icons/icons';
 
-import { generateSelectCSS, selectSetClassName, slugifySelectValue } from '@/lib/select';
-import { tcls } from '@/lib/tailwind';
-
 import type { BlockProps } from '../Block';
 import { Blocks } from '../Blocks';
 import { DynamicTabs } from './DynamicTabs';
+import { generateSelectCSS, selectSetClassName, slugifySelectValue } from '@/lib/select';
+import { tcls } from '@/lib/tailwind';
 
 export function Tabs(props: BlockProps<DocumentBlockTabs>) {
     const { block, ancestorBlocks, document, style, context } = props;
@@ -100,12 +99,12 @@ function SelectGroupStyle({ slugs }: { slugs: string[] }) {
  *
  * Same-named tabs deliberately share a slug — selecting one syncs every tab of that name, here and
  * on other pages, which is the whole point of name-based selection. We don't disambiguate duplicates
- * with a positional suffix: that would desync the duplicate and, because the slug rides in the
- * frozen `?select=` URL, a shared link would silently retarget when tabs are renamed or reordered.
+ * with a positional suffix: that would desync the duplicate and make a stored selection retarget
+ * whenever tabs are renamed or reordered.
  */
 function withSelectSlugs<T extends { id: string; title: string }>(
     items: T[]
-): Array<T & { slug: string }> {
+): (T & { slug: string })[] {
     return items.map((item) => ({
         ...item,
         slug: slugifySelectValue(item.title) || slugifySelectValue(item.id) || item.id,

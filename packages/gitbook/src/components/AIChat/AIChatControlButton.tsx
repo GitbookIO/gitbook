@@ -1,9 +1,9 @@
 'use client';
 
-import { useLanguage } from '@/intl/client';
-import { t } from '@/intl/translate';
 import { useAIChatController, useAIChatState } from '../AI';
 import { Button } from '../primitives';
+import { useLanguage } from '@/intl/client';
+import { t } from '@/intl/translate';
 
 /**
  * Button to control the chat (clear, etc.)

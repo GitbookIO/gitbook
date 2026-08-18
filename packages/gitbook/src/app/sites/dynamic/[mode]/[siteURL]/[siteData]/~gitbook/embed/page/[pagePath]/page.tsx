@@ -1,7 +1,8 @@
+import type { Metadata } from 'next';
+
 import { type RouteParams, getPagePathFromParams } from '@/app/utils';
 import { EmbeddableDocsPage, generateEmbeddableDocsPageMetadata } from '@/components/Embeddable';
 import { getEmbeddableDynamicContext } from '@/lib/embeddable';
-import type { Metadata } from 'next';
 
 type PageProps = {
     params: Promise<RouteParams>;
