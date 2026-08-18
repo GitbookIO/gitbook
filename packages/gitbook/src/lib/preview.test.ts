@@ -1,5 +1,6 @@
-import type { PublishedSiteContent } from '@gitbook/api';
 import { describe, expect, it } from 'bun:test';
+
+import type { PublishedSiteContent } from '@gitbook/api';
 
 import { getPreviewCookieResponse, getPreviewRequestIdentifier, isPreviewRequest } from './preview';
 
