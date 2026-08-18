@@ -124,6 +124,7 @@
         "build": "bun run generate:assets && next build --webpack",
         "build:local": "bun run generate:assets && GITBOOK_URL=http://localhost:3000 next build --webpack",
         "check:css-browser-compatibility": "bun scripts/check-css-browser-compatibility.ts",
+        "check:css-browser-compatibility:local": "bun run check:css-browser-compatibility --local origin/main",
         "start": "GITBOOK_URL=http://localhost:3000 next start",
         "build:cloudflare": "bun run generate:assets && GITBOOK_RUNTIME=cloudflare opennextjs-cloudflare build",
         "dev:cloudflare": "wrangler dev --port 8771 --env preview",
