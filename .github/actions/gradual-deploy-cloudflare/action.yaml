@@ -35,7 +35,7 @@ runs:
             command: deployments status --config ./packages/gitbook/openNext/customWorkers/defaultWrangler.jsonc
 
         # This step is used to get the version ID that is currently deployed to Cloudflare.
-        - id: extract_current_version
+      - id: extract_current_version
           name: Extract current version
           shell: bash
           run: |
