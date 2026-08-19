@@ -27,17 +27,7 @@ export async function PageFooterNavigation(props: {
     const nextHref = next ? linker.toPathForPage({ pages: revision.pages, page: next }) : '';
 
     return (
-        <div
-            className={tcls(
-                CONTENT_STYLE,
-                'flex',
-                'flex-col',
-                'md:flex-row',
-                'mt-6',
-                'gap-2',
-                'text-tint'
-            )}
-        >
+        <div className={tcls(CONTENT_STYLE, 'mt-6 flex @xl:flex-row flex-col gap-3 text-tint')}>
             {previous ? (
                 <NavigationCard
                     icon="chevron-left"
@@ -54,7 +44,6 @@ export async function PageFooterNavigation(props: {
                             position: SiteInsightsLinkPosition.Content,
                         },
                     }}
-                    reversed
                 />
             ) : null}
             {next ? (
@@ -73,6 +62,7 @@ export async function PageFooterNavigation(props: {
                             position: SiteInsightsLinkPosition.Content,
                         },
                     }}
+                    reversed
                 />
             ) : null}
         </div>
@@ -95,46 +85,24 @@ function NavigationCard(
             href={href}
             insights={insights}
             className={tcls(
-                'group',
-                'text-sm',
-                'p-2.5',
-                'flex',
-                'gap-4 ',
-                'flex-1',
-                reversed ? 'flex-row-reverse' : 'flex-row',
-                'items-center',
-                reversed ? null : 'pr-4',
-                reversed ? 'pl-4' : null,
-                'border',
-                'border-tint-subtle',
-                'rounded-sm',
-                'circular-corners:rounded-2xl',
-                'straight-corners:rounded-none',
-                'hover:border-primary',
-                'text-pretty',
-                'md:p-4',
-                'md:text-base'
+                'group flex flex-1 items-center @xl:gap-3 gap-2 text-pretty circular-corners:rounded-2xl rounded-corners:rounded-xl border border-tint-subtle @xl:p-4 p-3 @xl:text-base text-sm text-tint outline-tint-12 transition-colors hover:border-primary-hover contrast-more:border-tint-12 contrast-more:text-tint-strong contrast-more:hover:border-primary-12 contrast-more:hover:outline-2',
+                reversed ? 'flex-row-reverse text-end' : 'text-start'
             )}
         >
-            <span className={tcls('flex', 'flex-col', 'flex-1', reversed ? 'text-right' : null)}>
-                <span className={tcls('text-xs')}>{label}</span>
+            <Icon icon={icon} className="size-3" />
+            <div className="flex flex-col">
                 <span
-                    className={tcls('text-tint-strong', 'group-hover:text-primary', 'line-clamp-2')}
+                    className={tcls(
+                        'flex items-center gap-1 text-xs',
+                        reversed ? 'flex-row-reverse' : 'flex-row'
+                    )}
                 >
+                    {label}
+                </span>
+                <span className="line-clamp-2 leading-snug text-tint-strong transition-colors group-hover:text-primary contrast-more:group-hover:text-primary-strong">
                     {title}
                 </span>
-            </span>
-            <Icon
-                icon={icon}
-                className={tcls(
-                    'hidden',
-                    'size-4',
-                    'text-tint-subtle',
-                    'contrast-more:text-tint-strong',
-                    'group-hover:text-primary',
-                    'md:block'
-                )}
-            />
+            </div>
         </Link>
     );
 }
