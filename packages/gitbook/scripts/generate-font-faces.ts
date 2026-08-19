@@ -6,10 +6,10 @@ import { fileURLToPath } from 'node:url';
 
 import { ABC_FAVORIT, FONT_DEFINITIONS, type FontDefinition } from '../src/fonts/definitions';
 import type {
-    FontFaceData,
     FontFacesData,
     FontFallbackFaceData,
     FontSourcesData,
+    FontVariantData,
 } from '../src/fonts/types';
 
 // Google Fonts picks the file format from the user agent — the same modern Chrome `next/font` sends,
@@ -30,10 +30,17 @@ const { calculateSizeAdjustValues } = createRequire(import.meta.url)(
     };
 };
 
+type ResolvedFace = {
+    weight: string;
+    style: string;
+    file: string;
+    source: string;
+    unicodeRange: string;
+};
+
 const scriptDir = dirname(fileURLToPath(import.meta.url));
-const output: FontFacesData = {};
-// Kept out of `faces.json` so the URLs never reach the server bundle: only the downloader needs them.
-const sources: FontSourcesData = {};
+const faces: FontFacesData = {};
+const sources: FontSourcesData = { google: {}, local: {} };
 
 for (const [name, definition] of Object.entries(FONT_DEFINITIONS)) {
     const resolved = definition.googleId
@@ -44,12 +51,22 @@ for (const [name, definition] of Object.entries(FONT_DEFINITIONS)) {
         throw new Error(`No font faces resolved for ${name}`);
     }
 
-    const faces = resolved.map(({ source, ...face }) => {
-        sources[face.file] = source;
-        return face;
-    });
+    recordSources(definition, resolved);
 
-    output[name] = {
+    const subsets = [...new Set(resolved.map((face) => face.unicodeRange))];
+    const variants = new Map<string, FontVariantData>();
+
+    for (const face of resolved) {
+        const key = `${face.weight}|${face.style}`;
+        let variant = variants.get(key);
+        if (!variant) {
+            variant = { weight: face.weight, style: face.style, files: [] };
+            variants.set(key, variant);
+        }
+        variant.files[subsets.indexOf(face.unicodeRange)] = face.file;
+    }
+
+    faces[name] = {
         family: definition.family,
         variable: definition.variable,
         fontFamilyValue: [
@@ -57,16 +74,38 @@ for (const [name, definition] of Object.entries(FONT_DEFINITIONS)) {
             ...(definition.adjustFallback ? [`"${definition.family} Fallback"`] : []),
             ...definition.fallback,
         ].join(','),
-        faces,
+        subsets,
+        variants: [...variants.values()],
         fallbackFace: definition.adjustFallback ? getFallbackFace(name, definition.family) : null,
+        ...(definition.googleId ? {} : { ascentOverride: ABC_FAVORIT.ascentOverride }),
     };
 }
 
 const generatedDir = join(scriptDir, '../src/fonts/generated');
-await writeFile(join(generatedDir, 'faces.json'), `${JSON.stringify(output, null, 4)}\n`);
+await writeFile(join(generatedDir, 'faces.json'), `${JSON.stringify(faces, null, 4)}\n`);
 await writeFile(join(generatedDir, 'sources.json'), `${JSON.stringify(sources, null, 4)}\n`);
 
-type ResolvedFace = FontFaceData & { source: string };
+/** Google serves every file of a family from one versioned directory, so only the names differ. */
+function recordSources(definition: FontDefinition, resolved: ResolvedFace[]) {
+    if (!definition.googleId) {
+        for (const face of resolved) {
+            sources.local[face.file] = face.source;
+        }
+        return;
+    }
+
+    const prefixes = new Set(
+        resolved.map((face) => face.source.slice(0, face.source.lastIndexOf('/')))
+    );
+    if (prefixes.size !== 1) {
+        throw new Error(`${definition.family} spans several Google Fonts directories`);
+    }
+
+    sources.google[definition.googleId] = {
+        prefix: [...prefixes][0] as string,
+        files: [...new Set(resolved.map((face) => basename(face.file)))],
+    };
+}
 
 async function getGoogleFaces(definition: FontDefinition): Promise<ResolvedFace[]> {
     const { family, googleId, weights } = definition;
@@ -77,7 +116,7 @@ async function getGoogleFaces(definition: FontDefinition): Promise<ResolvedFace[
         throw new Error(`Unable to fetch ${family} from Google Fonts: ${response.status} (${url})`);
     }
 
-    const faces = [...(await response.text()).matchAll(/@font-face\s*\{([^}]*)\}/g)].map(
+    const resolved = [...(await response.text()).matchAll(/@font-face\s*\{([^}]*)\}/g)].map(
         (match) => {
             const block = match[1] ?? '';
             const source = read(block, 'src')?.match(/url\((https:[^)]+\.woff2)\)/)?.[1];
@@ -99,12 +138,12 @@ async function getGoogleFaces(definition: FontDefinition): Promise<ResolvedFace[
         }
     );
 
-    const missing = weights.filter((weight) => !faces.some((face) => face.weight === weight));
+    const missing = weights.filter((weight) => !resolved.some((face) => face.weight === weight));
     if (missing.length > 0) {
         throw new Error(`Google Fonts returned no ${missing.join('/')} weight for ${family}`);
     }
 
-    return faces;
+    return resolved;
 }
 
 async function getABCFavoritFaces(): Promise<ResolvedFace[]> {
@@ -120,7 +159,7 @@ async function getABCFavoritFaces(): Promise<ResolvedFace[]> {
                 style: source.style,
                 file: `abcfavorit/${digest.slice(0, 16)}.woff2`,
                 source: `./ABCFavorit/${source.file}`,
-                ascentOverride: ABC_FAVORIT.ascentOverride,
+                unicodeRange: '',
             };
         })
     );

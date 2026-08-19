@@ -12,7 +12,13 @@ const scriptDir = dirname(fileURLToPath(import.meta.url));
 const fontsDir = join(scriptDir, '../src/fonts');
 const outputDir = join(scriptDir, '../public/~gitbook/static/fonts');
 
-const sources = new Map(Object.entries(sourcesData as FontSourcesData));
+const { google, local } = sourcesData as FontSourcesData;
+const sources = new Map<string, string>(Object.entries(local));
+for (const [googleId, { prefix, files }] of Object.entries(google)) {
+    for (const file of files) {
+        sources.set(`${googleId}/${file}`, `${prefix}/${file}`);
+    }
+}
 
 // Faces move between releases; stale files would otherwise pile up in the deployed assets.
 await mkdir(outputDir, { recursive: true });
