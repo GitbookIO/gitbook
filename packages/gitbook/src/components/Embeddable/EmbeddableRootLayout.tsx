@@ -4,6 +4,7 @@ import { SiteInsightsTrademarkPlacement } from '@gitbook/api';
 import { NavigationLoader } from '../primitives/NavigationLoader';
 import { SpaceLayoutServerContext } from '../SpaceLayout';
 import { Trademark } from '../TableOfContents/Trademark';
+import { VisibilityProvider } from '../VisibilityContext';
 import { EmbeddableAIContextProvider } from './EmbeddableAIContextProvider';
 import { EmbeddableIframeAPI } from './EmbeddableIframeAPI';
 import { EmbeddableThemeSync } from './EmbeddableThemeSync';
@@ -74,7 +75,7 @@ export async function EmbeddableRootLayout({
                         }}
                     >
                         <NavigationLoader />
-                        <div className="fixed inset-0 flex flex-col">
+                        <VisibilityProvider className="fixed inset-0 flex flex-col">
                             {children}
                             {context.customization.trademark.enabled ? (
                                 <IfEmbeddableTrademark>
@@ -85,7 +86,7 @@ export async function EmbeddableRootLayout({
                                     />
                                 </IfEmbeddableTrademark>
                             ) : null}
-                        </div>
+                        </VisibilityProvider>
                         <EmbeddableIframeAPI
                             baseURL={context.linker.toPathInSite('~gitbook/embed/')}
                         />

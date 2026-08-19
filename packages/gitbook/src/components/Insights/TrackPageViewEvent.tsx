@@ -5,6 +5,7 @@ import * as React from 'react';
 import type { SiteInsightsDisplayContext } from '@gitbook/api';
 
 import { useCurrentPage } from '../hooks';
+import { useIsVisible } from '../VisibilityContext';
 import { useTrackEvent } from './InsightsProvider';
 
 /**
@@ -14,8 +15,14 @@ export function TrackPageViewEvent(props: { displayContext: SiteInsightsDisplayC
     const { displayContext } = props;
     const page = useCurrentPage();
     const trackEvent = useTrackEvent();
+    // Always true outside of the embed, whose frame can be loaded while hidden.
+    const isVisible = useIsVisible();
 
     React.useEffect(() => {
+        if (!isVisible) {
+            return;
+        }
+
         trackEvent(
             {
                 type: 'page_view',
@@ -25,7 +32,7 @@ export function TrackPageViewEvent(props: { displayContext: SiteInsightsDisplayC
                 displayContext,
             }
         );
-    }, [page, trackEvent, displayContext]);
+    }, [page, trackEvent, displayContext, isVisible]);
 
     return null;
 }
