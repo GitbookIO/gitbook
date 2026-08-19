@@ -1,3 +1,6 @@
+// Inlined rather than imported as CSS: a `.css` import lands in the route's render-blocking
+// stylesheets, and webpack was attaching this one to the content pages too.
+export const PRINT_STYLES = `
 @page {
     size: A4;
     margin: 60pt 60pt;
@@ -56,3 +59,4 @@
         display: block !important;
     }
 }
+`;

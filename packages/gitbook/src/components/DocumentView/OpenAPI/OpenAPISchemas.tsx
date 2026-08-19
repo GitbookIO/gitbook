@@ -1,4 +1,5 @@
 import type { BlockProps } from '../Block';
+import { BlockStylesheet } from '../BlockStylesheet';
 import { getOpenAPIBlockClientProps } from './context';
 import { OpenAPIBlockLazy } from './OpenAPIBlockLazy';
 import { resolveOpenAPISchemasBlock } from '@/lib/openapi/resolveOpenAPISchemasBlock';
@@ -11,9 +12,12 @@ import { tcls } from '@/lib/tailwind';
 export async function OpenAPISchemas(props: BlockProps<OpenAPISchemasBlock>) {
     const { style } = props;
     return (
-        <div className={tcls('flex w-full', style, 'max-w-full')}>
-            <OpenAPISchemasBody {...props} />
-        </div>
+        <>
+            <BlockStylesheet name="openapi" />
+            <div className={tcls('flex w-full', style, 'max-w-full')}>
+                <OpenAPISchemasBody {...props} />
+            </div>
+        </>
     );
 }
 

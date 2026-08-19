@@ -26,7 +26,6 @@ import { sanitizeGitBookAppURL } from '@/lib/app';
 import type { GitBookSiteContext, GitBookSpaceContext } from '@/lib/context';
 import { getPageDocument } from '@/lib/data';
 import { type GitBookLinker, createLinker, linkerWithAbsoluteURLs } from '@/lib/links';
-import './pdf.css';
 import { resolvePageId } from '@/lib/pages';
 import { getLinkerForSiteSpace } from '@/lib/sites';
 import { tcls } from '@/lib/tailwind';

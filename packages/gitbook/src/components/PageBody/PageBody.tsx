@@ -1,6 +1,9 @@
+import * as ReactDOM from 'react-dom';
+
 import type { JSONDocument, RevisionPageDocument, SiteInsightsDisplayContext } from '@gitbook/api';
 
 import { DocumentView, DocumentViewSkeleton } from '../DocumentView';
+import { getBlockStylesheetURL } from '../DocumentView/BlockStylesheet';
 import { CurrentPageProvider } from '../hooks/useCurrentPage';
 import { TrackPageViewEvent } from '../Insights';
 import { CONTENT_STYLE } from '../layout';
@@ -69,6 +72,14 @@ export async function PageBody(props: {
     // to API-reference pages only (matching the `page-api-block` styling), so other pages keep the
     // header structure untouched.
     const hasAPIBlocks = document ? hasAPIBlock(document) : false;
+
+    // The block renders its own stylesheet link, but that only reaches the browser once the block
+    // streams in — start the request from the shell instead. Top-level blocks only, which is the
+    // common case; nested ones still get the sheet from the link.
+    if (hasAPIBlocks) {
+        ReactDOM.preload(getBlockStylesheetURL('openapi'), { as: 'style' });
+    }
+
     const wideLayout = wideContent || page.layout.width === 'wide';
     const language = await getSpaceLanguage(context);
     const updatedAt = page.updatedAt ?? page.createdAt;

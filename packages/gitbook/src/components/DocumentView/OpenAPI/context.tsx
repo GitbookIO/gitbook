@@ -17,7 +17,6 @@ import { PlainCodeBlock } from '../CodeBlock';
 import { DocumentView } from '../DocumentView';
 import { Heading } from '../Heading';
 import type { OpenAPIBlockClientContextProps } from './OpenAPIBlockClient';
-import './style.css';
 import { SCALAR_RUNTIME_PATH } from './scalar-runtime-path';
 import { DEFAULT_LOCALE, getSpaceLocale } from '@/intl/server';
 import { getAssetURL } from '@/lib/assets';

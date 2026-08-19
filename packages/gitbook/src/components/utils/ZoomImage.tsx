@@ -6,7 +6,6 @@ import ReactDOM from 'react-dom';
 
 import { Icon } from '@gitbook/icons';
 
-import styles from './ZoomImage.module.css';
 import { tcls } from '@/lib/tailwind';
 
 const PADDING = 32; // Padding around the image in the modal, in pixels
@@ -159,8 +158,8 @@ export function ZoomImage(
                     }}
                     className={classNames(
                         props.className,
-                        zoomable ? styles.zoomImg : null,
-                        active ? styles.zoomImageActive : null
+                        zoomable ? 'zoom-img' : null,
+                        active ? 'zoom-image-active' : null
                     )}
                 />
             )}
@@ -200,7 +199,7 @@ function ZoomImageModal(props: {
         <div
             data-testid="zoom-image-modal"
             className={classNames(
-                styles.zoomModal,
+                'zoom-modal',
                 tcls(
                     'fixed',
                     'inset-0',

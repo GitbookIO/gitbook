@@ -2,9 +2,9 @@ import type { DocumentBlockIntegration, RenderIntegrationUI } from '@gitbook/api
 import { ContentKit, ContentKitOutput } from '@gitbook/react-contentkit';
 
 import type { BlockProps } from '../Block';
+import { BlockStylesheet } from '../BlockStylesheet';
 import { getWebframePageContext, integrationBlockContainsWebframe } from './adaptive';
 import { contentKitServerContext } from './contentkit';
-import './contentkit.css';
 import {
     ContentKitWithClientContext,
     type WebframeLinkerData,
@@ -105,6 +105,7 @@ export async function IntegrationBlock(props: BlockProps<DocumentBlockIntegratio
 
     return (
         <div className={tcls(style)}>
+            <BlockStylesheet name="contentkit" />
             {useClientContext ? (
                 <ContentKitWithClientContext
                     {...contentKitProps}

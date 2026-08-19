@@ -1,4 +1,5 @@
 import type { BlockProps } from '../Block';
+import { BlockStylesheet } from '../BlockStylesheet';
 import { getOpenAPIBlockClientProps } from './context';
 import { OpenAPIBlockLazy } from './OpenAPIBlockLazy';
 import { resolveOpenAPIOperationBlock } from '@/lib/openapi/resolveOpenAPIOperationBlock';
@@ -11,9 +12,12 @@ import { tcls } from '@/lib/tailwind';
 export async function OpenAPIOperation(props: BlockProps<AnyOpenAPIOperationsBlock>) {
     const { style } = props;
     return (
-        <div className={tcls('flex w-full min-w-0', style, 'max-w-full')}>
-            <OpenAPIOperationBody {...props} />
-        </div>
+        <>
+            <BlockStylesheet name="openapi" />
+            <div className={tcls('flex w-full min-w-0', style, 'max-w-full')}>
+                <OpenAPIOperationBody {...props} />
+            </div>
+        </>
     );
 }
 
