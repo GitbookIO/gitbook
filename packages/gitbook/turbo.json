@@ -6,7 +6,8 @@
                 "public/~gitbook/static/icons/**/*",
                 "public/~gitbook/static/math/**/*",
                 "public/~gitbook/static/embed/**/*",
-                "public/~gitbook/static/css/**/*"
+                "public/~gitbook/static/css/**/*",
+                "public/~gitbook/static/fonts/**/*"
             ],
             "dependsOn": ["^generate", "@gitbook/embed#build"]
         },
