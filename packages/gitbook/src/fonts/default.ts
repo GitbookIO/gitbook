@@ -2,7 +2,7 @@ import { CustomizationDefaultMonospaceFont } from '@gitbook/api';
 
 import { EMOJI_FONT, type FontName } from './definitions';
 import faces from './generated/faces.json';
-import type { FontFaceData, FontFacesData, FontFamilyData } from './types';
+import type { FontFacesData, FontFamilyData } from './types';
 import { getAssetURL } from '@/lib/assets';
 
 const fontFaces = faces as FontFacesData;
@@ -27,7 +27,11 @@ export function generateDefaultFontFacesCSS(font: FontName): string {
     }
 
     const css = [
-        ...family.faces.map((face) => generateFace(family, face)),
+        ...family.variants.flatMap((variant) =>
+            variant.files.map((file, subset) =>
+                generateFace(family, variant.weight, variant.style, file, family.subsets[subset])
+            )
+        ),
         generateFallbackFace(family),
         `:root { ${family.variable}: ${family.fontFamilyValue}; }`,
     ]
@@ -42,14 +46,20 @@ export function generateEmojiFontFacesCSS(): string {
     return generateDefaultFontFacesCSS(EMOJI_FONT);
 }
 
-function generateFace(family: FontFamilyData, face: FontFaceData): string {
+function generateFace(
+    family: FontFamilyData,
+    weight: string,
+    style: string,
+    file: string,
+    unicodeRange: string | undefined
+): string {
     return `@font-face {
     font-family: "${family.family}";
-    font-style: ${face.style};
-    font-weight: ${face.weight};
-    font-display: swap;${face.ascentOverride ? `\n    ascent-override: ${face.ascentOverride};` : ''}
-    src: url(${getAssetURL(`fonts/${face.file}`)}) format("woff2");${
-        face.unicodeRange ? `\n    unicode-range: ${face.unicodeRange};` : ''
+    font-style: ${style};
+    font-weight: ${weight};
+    font-display: swap;${family.ascentOverride ? `\n    ascent-override: ${family.ascentOverride};` : ''}
+    src: url(${getAssetURL(`fonts/${file}`)}) format("woff2");${
+        unicodeRange ? `\n    unicode-range: ${unicodeRange};` : ''
     }
 }`;
 }
