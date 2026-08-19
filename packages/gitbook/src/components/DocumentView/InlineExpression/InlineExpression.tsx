@@ -3,7 +3,7 @@ import * as React from 'react';
 import type { DocumentInlineExpression } from '@gitbook/api';
 
 import type { InlineProps } from '../Inline';
-import { InlineExpressionValue } from './InlineExpressionValue';
+import { InlineExpressionValueLazy } from './InlineExpressionValueLazy';
 
 /**
  * Render an inline expression.
@@ -25,7 +25,7 @@ export function InlineExpression(props: InlineProps<DocumentInlineExpression>) {
 
     return (
         <React.Suspense fallback={null}>
-            <InlineExpressionValue expression={data.expression} variables={variables} />
+            <InlineExpressionValueLazy expression={data.expression} variables={variables} />
         </React.Suspense>
     );
 }

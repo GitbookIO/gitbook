@@ -9,6 +9,7 @@ import type {
 import type { BlockProps } from '../Block';
 import { Blocks } from '../Blocks';
 import { ClientCodeBlock } from './ClientCodeBlock';
+import { ClientCodeBlockWithExpressionsLazy } from './ClientCodeBlockWithExpressionsLazy';
 import { CodeBlockRenderer } from './CodeBlockRenderer';
 import { highlight } from './highlight';
 import { type RenderedInline, getInlines } from './highlight-tokens';
@@ -121,8 +122,11 @@ export async function CodeBlock(
             {isMermaid ? (
                 <MermaidCodeBlockLazy
                     {...clientProps}
+                    hasInlineExpression={hasInlineExpression}
                     mermaidRuntimeURL={getAssetURL(MERMAID_RUNTIME_PATH)}
                 />
+            ) : hasInlineExpression ? (
+                <ClientCodeBlockWithExpressionsLazy {...clientProps} />
             ) : (
                 <ClientCodeBlock {...clientProps} />
             )}
