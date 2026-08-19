@@ -8,7 +8,8 @@ import type { GitBookAssistant } from '@gitbook/browser-types';
 import { Icon, type IconName } from '@gitbook/icons';
 
 import { useAIChatController, useAIChatState } from '.';
-import { AIChatIcon, AISearchIcon, getAIChatName } from '../AIChat';
+import { AIChatIcon, AISearchIcon } from '../AIChat/AIChatIcon';
+import { getAIChatName } from '../AIChat/name';
 import { useIntegrationAssistants } from '../Integrations';
 import { useSetSearchState } from '../Search/useSearch';
 import { isAIChatEnabled, isAISearchEnabled } from '@/components/utils/isAIChatEnabled';

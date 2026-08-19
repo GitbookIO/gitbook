@@ -5,7 +5,8 @@ import { CustomizationHeaderPreset, CustomizationSearchStyle } from '@gitbook/ap
 import { AdaptiveVisitorContextProvider } from '../Adaptive';
 import { AIChatProvider } from '../AI';
 import type { RenderAIMessageOptions } from '../AI';
-import { AIChat, AskAITextSelection } from '../AIChat';
+import { AIChat } from '../AIChat/AIChat';
+import { AskAITextSelection } from '../AIChat/AskAITextSelection';
 import { Announcement } from '../Announcement';
 import { SpacesDropdown, TranslationsDropdown } from '../Header/SpacesDropdown';
 import { CurrentContentProvider } from '../hooks';

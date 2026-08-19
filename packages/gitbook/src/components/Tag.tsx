@@ -1,7 +1,7 @@
 import type { RevisionTag } from '@gitbook/api';
 import { Icon, type IconName } from '@gitbook/icons';
 
-import { Emoji } from '@/components/primitives';
+import { Emoji } from '@/components/primitives/Emoji';
 import { backgroundColorToStyle, textColorToStyle } from '@/lib/colors';
 import { tcls } from '@/lib/tailwind';
 

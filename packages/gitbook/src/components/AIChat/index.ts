@@ -1,4 +1,5 @@
 export * from './AIChat';
+export * from './name';
 export * from './AIChatButton';
 export * from './AIChatIcon';
 export * from './AIResponseFeedback';

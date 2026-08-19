@@ -1,7 +1,7 @@
 import type { RevisionPage } from '@gitbook/api';
 import { Icon, type IconName } from '@gitbook/icons';
 
-import { Emoji } from '@/components/primitives';
+import { Emoji } from '@/components/primitives/Emoji';
 import { type ClassValue, tcls } from '@/lib/tailwind';
 
 export function PageIcon(props: {

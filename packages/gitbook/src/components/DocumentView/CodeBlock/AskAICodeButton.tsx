@@ -2,7 +2,7 @@
 
 import { getCodeTextFromId } from './utils';
 import { useAIChatController, useAIConfig } from '@/components/AI';
-import { AIChatIcon } from '@/components/AIChat';
+import { AIChatIcon } from '@/components/AIChat/AIChatIcon';
 import { Button } from '@/components/primitives';
 import { isAIChatEnabled } from '@/components/utils/isAIChatEnabled';
 import { t, useLanguage } from '@/intl/client';

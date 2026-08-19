@@ -6,7 +6,6 @@ export * from './Skeleton';
 export * from './Link';
 export * from './StyledLink';
 export * from './DateRelative';
-export * from './Emoji';
 export * from './LoadingPane';
 export * from './Tooltip';
 export * from './Popover';

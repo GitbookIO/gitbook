@@ -10,18 +10,19 @@ interface EmojiData {
 }
 
 const emojis = emojisRaws as Record<string, EmojiData>;
-const output: Record<string, string> = {};
+const sequences: string[] = [];
 
 Object.entries(emojis).forEach(([key, value]) => {
     const emoji = value.code_points?.fully_qualified;
     if (emoji && key !== emoji) {
-        output[key] = emoji;
-    } else if (!emoji) {
+        // The base form is always the fully-qualified one minus its `fe0f`/`200d` joiners, so only
+        // the qualified sequence is shipped and the lookup key is derived at runtime.
+        sequences.push(emoji);
     }
 });
 
 fs.mkdirSync(path.resolve(__dirname, 'dist'), { recursive: true });
 fs.writeFileSync(
     path.resolve(__dirname, 'dist/index.ts'),
-    `export const emojiCodepoints: Record<string, string> = ${JSON.stringify(output, null, 4)};`
+    `export const emojiSequences = ${JSON.stringify(sequences.join('\n'))};\n`
 );

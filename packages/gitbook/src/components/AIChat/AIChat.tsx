@@ -37,8 +37,8 @@ import { AIChatMessages } from './AIChatMessages';
 import { AIChatQueuedMessage } from './AIChatQueuedMessage';
 import { AIChatResizeHandle } from './AIChatResizeHandle';
 import AIChatSuggestedQuestions from './AIChatSuggestedQuestions';
+import { getAIChatName } from './name';
 import { t, tString, useLanguage } from '@/intl/client';
-import type { TranslationLanguage } from '@/intl/translations';
 import { tcls } from '@/lib/tailwind';
 
 export function AIChat() {
@@ -336,10 +336,4 @@ function AIChatError(props: { chatController: AIChatController }) {
             </div>
         </div>
     );
-}
-
-export function getAIChatName(language: TranslationLanguage, trademark: boolean) {
-    return trademark
-        ? tString(language, 'ai_chat_assistant_name')
-        : tString(language, 'ai_chat_assistant_name_unbranded');
 }

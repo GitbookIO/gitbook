@@ -10,7 +10,7 @@ import type {
     JSONDocument,
 } from '@gitbook/api';
 
-import { Emoji } from '@/components/primitives';
+import { Emoji } from '@/components/primitives/Emoji';
 
 export interface DocumentSection {
     id: string;

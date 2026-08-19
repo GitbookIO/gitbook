@@ -1,4 +1,4 @@
-import { Emoji } from '../primitives';
+import { Emoji } from '../primitives/Emoji';
 import { Image } from '@/components/utils';
 import type { GitBookSiteContext } from '@/lib/context';
 

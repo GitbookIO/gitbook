@@ -5,8 +5,9 @@ import React from 'react';
 
 import { Icon } from '@gitbook/icons';
 
-import { AIResponseFeedback, AISearchIcon } from '../AIChat';
+import { AISearchIcon } from '../AIChat/AIChatIcon';
 import { HoldMessage } from '../AIChat/AIChatMessages';
+import { AIResponseFeedback } from '../AIChat/AIResponseFeedback';
 import { getInsightsSession, useTrackEvent } from '../Insights';
 import { Button, Link } from '../primitives';
 import { useSearchAskContext } from './SearchAskContext';

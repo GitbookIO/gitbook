@@ -6,7 +6,7 @@ import { useHotkeys } from 'react-hotkeys-hook';
 
 import { CustomizationSearchStyle } from '@gitbook/api';
 
-import { AIChatButton } from '../AIChat';
+import { AIChatButton } from '../AIChat/AIChatButton';
 import { useIsMobile } from '../hooks/useIsMobile';
 import { Button, Popover } from '../primitives';
 import { KeyboardShortcut } from '../primitives/KeyboardShortcut';

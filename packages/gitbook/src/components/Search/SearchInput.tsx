@@ -3,7 +3,7 @@ import React, { useEffect, useRef } from 'react';
 
 import { Icon } from '@gitbook/icons';
 
-import { AISearchIcon } from '../AIChat';
+import { AISearchIcon } from '../AIChat/AIChatIcon';
 import { Input } from '../primitives';
 import { t, tString, useLanguage } from '@/intl/client';
 
