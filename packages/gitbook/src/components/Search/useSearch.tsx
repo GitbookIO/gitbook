@@ -163,16 +163,16 @@ export function useSearchLink(): (
             return {
                 href: `?${searchParams.toString()}`,
                 prefetch: false,
-                onClick: (event) => {
+                onClick: async (event) => {
                     event.preventDefault();
-                    callback?.();
-                    setSearchState((prev) => ({
+                    await setSearchState((prev) => ({
                         ...prev,
                         query: params.query !== undefined ? params.query : null,
                         ask: params.ask !== undefined ? params.ask : null,
                         scope: params.scope !== undefined ? params.scope : 'default',
                         open: params.open !== undefined ? params.open : false,
                     }));
+                    callback?.();
                 },
             };
         },

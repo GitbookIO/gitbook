@@ -271,7 +271,7 @@ export function useSearchController(
     }, [abort, siteSpace.id]);
 
     const askInAssistant = React.useCallback(
-        (assistantIndex = 0) => {
+        async (assistantIndex = 0) => {
             const assistant = assistants[assistantIndex];
             if (!assistant || !normalizedQuery) {
                 return;
@@ -282,13 +282,13 @@ export function useSearchController(
             }
 
             abort();
-            assistant.open(normalizedQuery);
-            setSearchState({
+            await setSearchState({
                 ask: normalizedQuery,
                 query: null,
                 scope: state?.scope ?? 'default',
                 open: assistant.mode === 'search',
             });
+            assistant.open(normalizedQuery);
         },
         [abort, assistants, normalizedQuery, setSearchState, siteSpace.id, state?.scope]
     );
