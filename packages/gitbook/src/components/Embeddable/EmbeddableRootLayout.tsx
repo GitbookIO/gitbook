@@ -6,6 +6,7 @@ import { SpaceLayoutServerContext } from '../SpaceLayout';
 import { Trademark } from '../TableOfContents/Trademark';
 import { EmbeddableAIContextProvider } from './EmbeddableAIContextProvider';
 import { EmbeddableIframeAPI } from './EmbeddableIframeAPI';
+import { EmbeddableThemeSync } from './EmbeddableThemeSync';
 import { IfEmbeddableTrademark } from './EmbeddableTrademark';
 import { CustomizationRootLayout } from '@/components/RootLayout';
 import {
@@ -36,6 +37,11 @@ export async function EmbeddableRootLayout({
 }: React.PropsWithChildren<EmbeddableRootLayoutProps>) {
     const theme = resolveEmbeddableTheme(context.customization, forcedTheme);
 
+    // Only remember a theme the visitor explicitly requested via `?theme=`, and only on
+    // multi-theme sites that actually honor the override. Single-theme sites ignore it (and would
+    // otherwise persist their own default on every plain visit — see PR #4380 review). RND-11571
+    const rememberedTheme = context.customization.themes.toggeable ? forcedTheme : null;
+
     return (
         <CustomizationRootLayout
             context={context}
@@ -51,6 +57,8 @@ export async function EmbeddableRootLayout({
                 contextId={context.contextId}
                 proxyOrigin={context.site.proxy?.origin}
             >
+                {/* Persist an explicit ?theme= override so it survives tab navigation. RND-11571 */}
+                <EmbeddableThemeSync forcedTheme={rememberedTheme} />
                 <EmbeddableAIContextProvider
                     aiMode={context.customization.ai.mode}
                     suggestions={context.customization.ai.suggestions}
