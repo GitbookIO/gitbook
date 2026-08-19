@@ -46,7 +46,10 @@ export function BreadcrumbItemDropdown(props: {
     const content = (
         <>
             {emoji || icon ? (
-                <PageIcon page={{ emoji, icon }} style="mr-1 inline size-[1em] shrink-0" />
+                <PageIcon
+                    page={{ emoji, icon }}
+                    style="mb-0.5 mr-1 inline-block size-[1em] shrink-0"
+                />
             ) : null}
             {label}
         </>
