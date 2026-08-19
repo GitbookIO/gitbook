@@ -63,7 +63,9 @@ export function AIChat() {
         () => {
             chatController.close();
         },
-        []
+        {
+            useKey: true,
+        }
     );
 
     // Track the view of the AI chat
