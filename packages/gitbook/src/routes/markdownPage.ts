@@ -7,6 +7,7 @@ import { linkerWithMarkdownPages } from '@/lib/links';
 import { renderLLMsTxtMarkdownDirective } from '@/lib/llms-directive';
 import { getMarkdownForPage } from '@/lib/markdownPage';
 import { type ResolvedPagePath, getSimilarPages } from '@/lib/pages';
+import { isPageIndexable, isSiteIndexable } from '@/lib/seo';
 import { resolveSiteSpacePagePathDocumentOrGroup } from '@/lib/sites';
 
 /**
@@ -27,15 +28,38 @@ export async function servePageMarkdown(baseContext: GitBookSiteContext, pagePat
         );
         if (!pageLookup) {
             // Generates a markdown body for missing pages. Return this with a 200 status (not 404) because agents discard 404 response bodies.=
-            return renderNotFoundMarkdown(context, pagePath);
+            return {
+                markdown: renderNotFoundMarkdown(context, pagePath),
+                robots: 'noindex, nofollow',
+            };
         }
+
+        const robots = getMarkdownRobots(context, pageLookup);
 
         const markdownPage = await getMarkdownForPage(context, pageLookup);
         if (baseContext.displayAgentInstructions === false) {
-            return markdownPage;
+            return { markdown: markdownPage, robots };
         }
-        return `${renderLLMsTxtMarkdownDirective(context, pageLookup.page)}\n\n${markdownPage}${renderAskFooter(context, pageLookup)}`;
+        return {
+            markdown: `${renderLLMsTxtMarkdownDirective(context, pageLookup.page)}\n\n${markdownPage}${renderAskFooter(context, pageLookup)}`,
+            robots,
+        };
     });
+}
+
+/**
+ * Robots directive for a markdown page: the markdown version is only indexable for AI agents,
+ * and only when the page itself is indexable.
+ */
+function getMarkdownRobots(
+    context: GitBookSiteContext,
+    pageLookup: ResolvedPagePath<RevisionPageDocument | RevisionPageGroup>
+) {
+    if (!isSiteIndexable(context) || !isPageIndexable(pageLookup.ancestors, pageLookup.page)) {
+        return 'noindex, nofollow';
+    }
+
+    return context.isAiAgent ? 'index, follow' : 'noindex';
 }
 
 function renderNotFoundMarkdown(context: GitBookSiteContext, pagePath: string) {
@@ -138,13 +162,17 @@ Use this mechanism when the answer is not explicitly present in the current page
 /**
  * Return a markdown content.
  */
-export async function serveMarkdown(fn: () => Promise<string>) {
+export async function serveMarkdown(
+    fn: () => Promise<string | { markdown: string; robots: string }>
+) {
     try {
-        const markdown = await fn();
+        const result = await fn();
+        const { markdown, robots } =
+            typeof result === 'string' ? { markdown: result, robots: 'noindex' } : result;
         return new Response(markdown, {
             headers: {
                 'Content-Type': 'text/markdown; charset=utf-8',
-                'X-Robots-Tag': 'noindex',
+                'X-Robots-Tag': robots,
                 Vary: 'Accept',
             },
         });

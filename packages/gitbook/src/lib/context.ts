@@ -93,6 +93,13 @@ export type SiteURLData = Pick<
      * Should never be set for the main site. RND-11571.
      */
     embedTheme?: CustomizationDefaultThemeMode;
+
+    /**
+     * Whether the request comes from a detected AI agent. Used to serve an indexable
+     * `X-Robots-Tag` on markdown pages. Only set for markdown routes, to avoid splitting
+     * the static cache of the other routes.
+     */
+    isAiAgent?: boolean;
 };
 
 /**
@@ -193,6 +200,9 @@ export type GitBookSiteContext = GitBookSpaceContext & {
 
     /** Whether to display agent instructions in the markdown output. Defaults to true when undefined. */
     displayAgentInstructions?: boolean;
+
+    /** Whether the request comes from a detected AI agent. Only set for markdown routes. */
+    isAiAgent?: boolean;
 };
 
 /**
@@ -275,6 +285,7 @@ export async function fetchSiteContextByURLLookup(
         noIndexSearch: data.noIndexSearch ?? false,
         isLoggedInVisitor: data.isLoggedInVisitor ?? false,
         displayAgentInstructions: data.displayAgentInstructions,
+        isAiAgent: data.isAiAgent,
     });
 }
 
@@ -297,6 +308,7 @@ export async function fetchSiteContextByIds(
         noIndexSearch: boolean;
         isLoggedInVisitor: boolean;
         displayAgentInstructions?: boolean;
+        isAiAgent?: boolean;
     }
 ): Promise<GitBookSiteContext> {
     const { dataFetcher } = baseContext;
@@ -425,6 +437,7 @@ export async function fetchSiteContextByIds(
         noIndexSearch: ids.noIndexSearch,
         isLoggedInVisitor: ids.isLoggedInVisitor,
         displayAgentInstructions: ids.displayAgentInstructions,
+        isAiAgent: ids.isAiAgent,
     };
 }
 
