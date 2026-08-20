@@ -164,10 +164,29 @@ async function resizeImageWithFallback(
             );
         }
 
+        // Never bounce the visitor to a GitBook-hosted URL: it would expose our internal
+        // asset URLs and hide a failure that is ours to fix.
+        if (isGitBookHostedURL(url)) {
+            console.warn('Error while resizing GitBook-hosted image', error);
+            return new Response('Failed to resize image', { status: 502 });
+        }
+
         // Redirect to the original image if resizing fails
         console.warn('Error while resizing image, redirecting to original', error);
         return NextResponse.redirect(url, 302);
     }
+}
+
+/**
+ * Check if a URL is hosted on a GitBook domain.
+ */
+function isGitBookHostedURL(url: string): boolean {
+    if (!URL.canParse(url)) {
+        return false;
+    }
+
+    const { hostname } = new URL(url);
+    return hostname === 'gitbook.com' || hostname.endsWith('.gitbook.com');
 }
 
 /**
