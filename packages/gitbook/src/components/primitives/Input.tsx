@@ -53,8 +53,10 @@ type CustomInputProps = {
     /**
      * Rich rendering of `value`, to emphasize part of it (e.g. the host of a URL). Only honored on a
      * `readOnly` input, since an editable field needs its native caret; it must spell out the same
-     * text as `value`, which stays what gets announced. Unlike the input, it wraps instead of
-     * truncating, so a long value is never partly hidden.
+     * text as `value`, which stays what gets announced. A plain string renders as-is.
+     *
+     * It follows `multiline` like the real control does: wrapping when set, a single scrollable line
+     * otherwise. Either way nothing is permanently hidden.
      */
     displayValue?: React.ReactNode;
     /**
@@ -267,9 +269,11 @@ export const Input = React.forwardRef<InputElement, InputProps>((props, passedRe
             <Tag
                 className={tcls(
                     'flex shrink grow',
+                    // An input has a tiny min-content width, but a span of unbreakable text does not:
+                    // without this the row outgrows the container and the tail is clipped unscrollably.
+                    showDisplayValue ? 'min-w-0' : '',
                     sizes[sizing].gap,
-                    // A rich display wraps, so its leading icon belongs on the first line.
-                    multiline || showDisplayValue ? 'items-start' : 'items-center'
+                    multiline ? 'items-start' : 'items-center'
                 )}
             >
                 {leading ? (
@@ -321,7 +325,14 @@ export const Input = React.forwardRef<InputElement, InputProps>((props, passedRe
                         aria-label={ariaLabel ?? label}
                         tabIndex={0}
                         className={tcls(
-                            'grow shrink leading-normal text-left break-all outline-none',
+                            // min-w-0 so the flex shrink actually applies; without it the span grows
+                            // to its content and the container clips the tail unscrollably.
+                            'grow shrink min-w-0 leading-normal text-left outline-none',
+                            // Mirror the control: wrap when multiline, otherwise stay one line the
+                            // visitor can still scroll. `break-all` so an unbroken URL wraps at all.
+                            multiline
+                                ? 'whitespace-pre-wrap break-all'
+                                : 'overflow-x-auto whitespace-nowrap',
                             sizes[sizing].input
                         )}
                     >

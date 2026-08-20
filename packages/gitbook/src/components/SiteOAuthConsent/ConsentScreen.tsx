@@ -97,6 +97,7 @@ export async function ConsentScreen(props: {
                                 leading="link"
                                 label={tString(language, 'auth_redirect_uri_label')}
                                 readOnly
+                                multiline
                                 value={redirectDisplayed}
                                 displayValue={
                                     redirectParts ? (
