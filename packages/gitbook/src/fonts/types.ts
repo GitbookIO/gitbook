@@ -31,6 +31,8 @@ export type FontFacesData = Record<string, FontFamilyData>;
 
 /** Where `scripts/download-fonts.ts` fetches (or copies) each file from. */
 export interface FontSourcesData {
+    /** Hash of definitions.ts at generation time, used to detect a stale manifest. */
+    definitionsHash: string;
     google: Record<string, { prefix: string; files: string[] }>;
     local: Record<string, string>;
 }

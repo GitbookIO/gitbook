@@ -1,3 +1,6 @@
+// Regenerates the committed font manifest from the Google Fonts CSS API. download-fonts.ts runs it
+// automatically when definitions.ts changed since the last generation; `bun run generate:fonts`
+// forces it (e.g. to pick up new Google Fonts releases).
 import { createHash } from 'node:crypto';
 import { readFile, writeFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
@@ -11,6 +14,7 @@ import type {
     FontSourcesData,
     FontVariantData,
 } from '../src/fonts/types';
+import { getFontDefinitionsHash } from './font-definitions-hash';
 
 // Google Fonts picks the file format from the user agent — the same modern Chrome `next/font` sends,
 // so we keep getting compact woff2 (and vector rather than bitmap emoji).
@@ -40,7 +44,11 @@ type ResolvedFace = {
 
 const scriptDir = dirname(fileURLToPath(import.meta.url));
 const faces: FontFacesData = {};
-const sources: FontSourcesData = { google: {}, local: {} };
+const sources: FontSourcesData = {
+    definitionsHash: await getFontDefinitionsHash(),
+    google: {},
+    local: {},
+};
 
 for (const [name, definition] of Object.entries(FONT_DEFINITIONS)) {
     const resolved = definition.googleId
