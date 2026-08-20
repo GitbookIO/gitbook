@@ -264,18 +264,14 @@ export async function resolveContentRef(
         }
 
         case 'space': {
-            let targetSpace:
-                | { space: Space; siteSpace: SiteSpace | null; siteSection: SiteSection | null }
-                | undefined;
-            if (isContentRefInDifferentSpace(contentRef, context)) {
-                targetSpace = await getBestTargetSpace(context, contentRef.space);
-            } else {
-                targetSpace = {
-                    space: context.space,
-                    siteSpace: 'siteSpace' in context ? context.siteSpace : null,
-                    siteSection: 'sections' in context ? (context.sections?.current ?? null) : null,
-                };
-            }
+            const targetSpace = !isContentRefInDifferentSpace(contentRef, context)
+                ? {
+                      space: context.space,
+                      siteSpace: 'siteSpace' in context ? context.siteSpace : null,
+                      siteSection:
+                          'sections' in context ? (context.sections?.current ?? null) : null,
+                  }
+                : await getBestTargetSpace(context, contentRef.space);
 
             if (!targetSpace) {
                 return null;
