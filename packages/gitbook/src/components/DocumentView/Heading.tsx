@@ -31,6 +31,7 @@ export async function Heading(props: BlockProps<DocumentBlockHeading>) {
             className={tcls(
                 textStyle.textSize,
                 'heading',
+                'font-heading',
                 'pdf-heading',
                 'block',
                 'pr-6',

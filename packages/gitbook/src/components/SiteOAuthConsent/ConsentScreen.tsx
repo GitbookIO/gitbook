@@ -37,7 +37,9 @@ export function ConsentScreen(props: {
 
                     <div className="flex min-w-0 flex-col gap-0.5">
                         <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                            <h1 className="font-semibold text-tint-strong">{client.name}</h1>
+                            <h1 className="font-heading font-semibold text-tint-strong">
+                                {client.name}
+                            </h1>
                             <ClientTrustBadge verified={client.verified} />
                         </div>
                         {client.uri ? (
@@ -158,7 +160,7 @@ export function ConsentError(props: { title?: string; message?: string }) {
                 <span className="flex size-12 items-center justify-center bg-danger text-danger-strong straight-corners:rounded-none rounded-corners:rounded-full">
                     <Icon icon="circle-exclamation" className="size-6" />
                 </span>
-                <h1 className="text-lg font-semibold text-tint-strong">{title}</h1>
+                <h1 className="font-heading text-lg font-semibold text-tint-strong">{title}</h1>
                 <p className="text-tint">{message}</p>
             </div>
         </ConsentCard>

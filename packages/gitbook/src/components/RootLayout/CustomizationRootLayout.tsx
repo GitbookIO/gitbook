@@ -31,6 +31,7 @@ import {
     type FontData,
     generateEmojiFontFacesCSS,
     getFontData,
+    getHeadingFont,
 } from '@/fonts';
 import './globals.css';
 import { getContentLocale, getSpaceLanguage } from '@/intl/server';
@@ -99,10 +100,16 @@ export async function CustomizationRootLayout(props: {
         customization.styling.monospaceFont ?? DEFAULT_MONOSPACE_FONT,
         'mono'
     );
+    // Only set when headings use a font of their own; otherwise they inherit `--font-content`.
+    const headingFont = getHeadingFont(customization);
+    const headingFontData = headingFont ? getFontData(headingFont, 'heading') : null;
 
     // Preconnect and preload custom fonts if needed
     preloadFont(fontData);
     preloadFont(monospaceFontData);
+    if (headingFontData) {
+        preloadFont(headingFontData);
+    }
     const iconStyle = getCustomizationIconStyle(customization);
     const iconSources = await getInlineIconSources([
         ...getDefaultInlineIconSourceRequests(iconStyle),
@@ -132,6 +139,7 @@ export async function CustomizationRootLayout(props: {
                 typeof customization.styling.font === 'string'
                     ? `font-${customization.styling.font}`
                     : null,
+                typeof headingFont === 'string' ? `heading-font-${headingFont}` : null,
 
                 // Set the dark/light class statically to avoid flashing and make it work when JS is disabled
                 (forcedTheme ?? customization.themes.default) === CustomizationDefaultThemeMode.Dark
@@ -154,6 +162,7 @@ export async function CustomizationRootLayout(props: {
                 <style>{generateEmojiFontFacesCSS()}</style>
                 <style>{fontData.fontFaceRules}</style>
                 <style>{monospaceFontData.fontFaceRules}</style>
+                {headingFontData ? <style>{headingFontData.fontFaceRules}</style> : null}
 
                 {/* Inject a script to detect if the announcmeent banner has been dismissed */}
                 {'announcement' in customization && customization.announcement?.enabled ? (
