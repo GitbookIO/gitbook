@@ -1,11 +1,11 @@
 import type { Metadata, Viewport } from 'next';
+import Script from 'next/script';
 import React from 'react';
 import * as ReactDOM from 'react-dom';
 
 import { CustomizationDefaultThemeMode } from '@gitbook/api';
 
 import { AIContextProvider } from '../AI';
-import { DeferredTrackingScripts } from './DeferredTrackingScripts';
 import { RocketLoaderDetector } from './RocketLoaderDetector';
 import { SiteLayoutClientContexts } from './SiteLayoutClientContexts';
 import { AdminToolbar } from '@/components/AdminToolbar';
@@ -83,9 +83,11 @@ export async function SiteLayout(props: {
             </AIContextProvider>
 
             <LoadIntegrations />
-            {scripts.length > 0 ? (
-                <DeferredTrackingScripts scripts={scripts.map(({ script }) => script)} />
-            ) : null}
+            {scripts.length > 0
+                ? scripts.map(({ script }) => (
+                      <Script key={script} src={script} strategy="lazyOnload" />
+                  ))
+                : null}
 
             {scripts.some((script) => script.cookies) || customization.privacyPolicy.url ? (
                 <React.Suspense fallback={null}>
