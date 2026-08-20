@@ -51,6 +51,13 @@ type CustomInputProps = {
      */
     onValueChange?: (value: string) => void;
     /**
+     * Rich rendering of `value`, to emphasize part of it (e.g. the host of a URL). Only honored on a
+     * `readOnly` input, since an editable field needs its native caret; it must spell out the same
+     * text as `value`, which stays what gets announced. Unlike the input, it wraps instead of
+     * truncating, so a long value is never partly hidden.
+     */
+    displayValue?: React.ReactNode;
+    /**
      * When true, automatically resizes the textarea vertically to fit its content.
      * Only applies when multiline is true.
      */
@@ -99,6 +106,8 @@ export const Input = React.forwardRef<InputElement, InputProps>((props, passedRe
         'aria-busy': ariaBusy,
         placeholder,
         disabled,
+        readOnly,
+        displayValue,
         onValueChange,
         onKeyDown,
         maxLength,
@@ -215,12 +224,19 @@ export const Input = React.forwardRef<InputElement, InputProps>((props, passedRe
         'aria-label': ariaLabel ?? label,
         placeholder: placeholder ?? label,
         disabled: disabled,
+        readOnly: readOnly,
         maxLength: maxLength,
         minLength: minLength,
         style: {
             height: multiline && resize && hasValue && height ? `${height}px` : undefined,
         },
     };
+
+    // A rich display replaces the control, so it only makes sense when there is nothing to type into.
+    const showDisplayValue = displayValue != null && !!readOnly;
+    if (process.env.NODE_ENV === 'development' && displayValue != null && !readOnly) {
+        console.warn('Input: `displayValue` is ignored without `readOnly`.');
+    }
 
     const Tag: React.ElementType = inline ? 'span' : 'div';
 
@@ -252,7 +268,8 @@ export const Input = React.forwardRef<InputElement, InputProps>((props, passedRe
                 className={tcls(
                     'flex shrink grow',
                     sizes[sizing].gap,
-                    multiline ? 'items-start' : 'items-center'
+                    // A rich display wraps, so its leading icon belongs on the first line.
+                    multiline || showDisplayValue ? 'items-start' : 'items-center'
                 )}
             >
                 {leading ? (
@@ -297,7 +314,20 @@ export const Input = React.forwardRef<InputElement, InputProps>((props, passedRe
                     />
                 ) : null}
 
-                {multiline ? (
+                {showDisplayValue ? (
+                    <span
+                        role="textbox"
+                        aria-readonly
+                        aria-label={ariaLabel ?? label}
+                        tabIndex={0}
+                        className={tcls(
+                            'grow shrink leading-normal text-left break-all outline-none',
+                            sizes[sizing].input
+                        )}
+                    >
+                        {displayValue}
+                    </span>
+                ) : multiline ? (
                     <textarea
                         {...inputProps}
                         ref={ref as React.RefObject<HTMLTextAreaElement>}

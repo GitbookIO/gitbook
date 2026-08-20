@@ -23,6 +23,9 @@ export async function ConsentScreen(props: {
     const siteTitle = context.site.title;
     const { client, redirectUri, consentSessionId } = consent;
     const redirectParts = parseRedirectURI(redirectUri);
+    const redirectDisplayed = redirectParts
+        ? `${redirectParts.prefix}${redirectParts.host}${redirectParts.rest}`
+        : redirectUri;
     const language = await getSpaceLanguage(context);
 
     return (
@@ -94,10 +97,21 @@ export async function ConsentScreen(props: {
                                 leading="link"
                                 label={tString(language, 'auth_redirect_uri_label')}
                                 readOnly
-                                value={
-                                    redirectParts
-                                        ? `${redirectParts.prefix}${redirectParts.host}${redirectParts.rest}`
-                                        : redirectUri
+                                value={redirectDisplayed}
+                                displayValue={
+                                    redirectParts ? (
+                                        <>
+                                            <span className="text-tint">
+                                                {redirectParts.prefix}
+                                            </span>
+                                            <span className="font-semibold text-tint-strong">
+                                                {redirectParts.host}
+                                            </span>
+                                            <span className="text-tint">{redirectParts.rest}</span>
+                                        </>
+                                    ) : (
+                                        redirectUri
+                                    )
                                 }
                             />
                         </div>
