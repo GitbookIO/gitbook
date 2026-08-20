@@ -74,12 +74,8 @@ export function ZoomImage(
         };
     }, [imgRef, width]);
 
-    // Preload the image that will be displayed in the modal
-    if (zoomable) {
-        ReactDOM.preload(src, {
-            as: 'image',
-        });
-    }
+    // The modal image is loaded on demand (hover or click) by `preloadImage`; preloading it at
+    // render time would download every zoomable image twice during the initial page load.
     const preloadImage = React.useCallback(
         (onLoad?: () => void) => {
             const image = new Image();

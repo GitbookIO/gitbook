@@ -124,9 +124,9 @@ function useIsSticking() {
 
         const observer = new IntersectionObserver(
             ([entry]) => {
-                if (entry) {
-                    setIsSticking(!entry.isIntersecting);
-                }
+                if (!entry) return;
+                const rootTop = entry.rootBounds?.top ?? 0;
+                setIsSticking(!entry.isIntersecting && entry.boundingClientRect.top < rootTop);
             },
             { root: scrollParent }
         );
