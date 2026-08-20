@@ -6,7 +6,7 @@ import sourcesData from '../src/fonts/generated/sources.json' with { type: 'json
 import type { FontSourcesData } from '../src/fonts/types';
 
 const CONCURRENCY = 8;
-const ATTEMPTS = 3;
+const ATTEMPTS = 6;
 
 const scriptDir = dirname(fileURLToPath(import.meta.url));
 const fontsDir = join(scriptDir, '../src/fonts');
