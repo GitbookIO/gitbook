@@ -90,6 +90,30 @@ describe('isNodeEmpty', () => {
         ).toEqual(true);
     });
 
+    it('should return false for a document with a tabs block whose panes are blank', () => {
+        expect(
+            isNodeEmpty({
+                object: 'document',
+                data: {},
+                nodes: [
+                    {
+                        object: 'block',
+                        type: 'tabs',
+                        nodes: [
+                            {
+                                object: 'block',
+                                type: 'tabs-item',
+                                data: { title: 'Shown in the tab bar' },
+                                nodes: [emptyParagraph],
+                            },
+                        ],
+                        data: {},
+                    },
+                ],
+            })
+        ).toEqual(false);
+    });
+
     it('should return false for a document with an api block', () => {
         expect(
             isNodeEmpty({

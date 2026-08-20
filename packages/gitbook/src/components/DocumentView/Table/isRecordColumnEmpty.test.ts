@@ -81,11 +81,22 @@ describe('isRecordColumnEmpty', () => {
             expect(isEmpty(TEXT, 'fragment', [ifBlock, paragraph('')])).toBe(true);
         });
 
-        it('keeps a fragment holding a void block', () => {
+        it('keeps a fragment whose blocks paint something of their own', () => {
             expect(
                 isEmpty(TEXT, 'fragment', [
                     paragraph(''),
                     { object: 'block', type: 'divider', isVoid: true, data: {} },
+                ])
+            ).toBe(false);
+            // A hint renders its coloured box however blank its content is.
+            expect(
+                isEmpty(TEXT, 'fragment', [
+                    {
+                        object: 'block',
+                        type: 'hint',
+                        data: { style: 'info' },
+                        nodes: [paragraph('')],
+                    },
                 ])
             ).toBe(false);
         });
