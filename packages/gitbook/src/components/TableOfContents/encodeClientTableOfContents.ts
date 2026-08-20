@@ -18,6 +18,10 @@ export type ClientTOCPageLink = {
     emoji?: string;
     icon?: string;
     target: ContentRef;
+    /** Paths of the page this link points to, when it resolves to a page in the current space. */
+    pathnames?: string[];
+    /** Anchor the link points to on that page, when the target is a section of it. */
+    anchor?: string;
 };
 
 export type ClientTOCPageDocument = {
@@ -96,6 +100,15 @@ export async function encodeClientTableOfContents(
             }
             case 'link': {
                 const resolved = await resolveContentRef(page.target, context);
+                // Links to a page (or a section of one) in the current space compute their active
+                // state the same way page entries do. Cross-space and external targets are left out
+                // to avoid over-highlighting.
+                const targetPage =
+                    (page.target.kind === 'page' || page.target.kind === 'anchor') &&
+                    resolved?.page &&
+                    resolved.space?.id === context.space.id
+                        ? resolved.page
+                        : undefined;
                 result.push(
                     removeUndefined({
                         id: page.id,
@@ -104,6 +117,13 @@ export async function encodeClientTableOfContents(
                         emoji: page.emoji,
                         icon: page.icon,
                         target: page.target,
+                        pathnames: targetPage
+                            ? getSiteSpacePagePaths(context.siteSpace, rootPages, targetPage)
+                            : undefined,
+                        anchor:
+                            targetPage && page.target.kind === 'anchor'
+                                ? page.target.anchor
+                                : undefined,
                         type: 'link',
                     })
                 );
