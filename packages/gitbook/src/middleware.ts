@@ -459,8 +459,11 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
             pathname,
             routeType: routeTypeFromPathname,
             events,
+            isAiAgent,
         } = encodePathInSiteContent(siteURLData, request);
         routeType = routeTypeFromPathname ?? routeType;
+        // Only set for markdown routes, so it becomes part of their static cache key.
+        stableSiteURLData.isAiAgent = isAiAgent;
 
         // Apply a forced theme (`?theme=`/cookie). For the docs embed we thread it through the
         // route context (`embedTheme`) so those routes stay statically rendered — it becomes part
@@ -772,6 +775,8 @@ function encodePathInSiteContent(
     pathname: string;
     routeType?: 'static' | 'dynamic';
     events?: ServerInsightsEventInput[] | undefined;
+    /** Only set for markdown routes, where the output depends on the visitor being an agent. */
+    isAiAgent?: boolean;
 } {
     let pathname = removeLeadingSlash(removeTrailingSlash(siteURLData.pathname));
 
@@ -884,9 +889,8 @@ function encodePathInSiteContent(
             const aiAgentDetection = isAIAgent(request);
             // Using heuristic detection incorrectly detects some legitimate bot requests as AI agents (e.g. Slackbot)
             // We don't want to serve markdown for these requests as it can cause issues like breaking slack unfurling.
-            const shouldServeMarkdown =
-                (aiAgentDetection.detected && aiAgentDetection.method !== 'heuristic') ||
-                acceptsMarkdown(request);
+            const isAiAgent = aiAgentDetection.detected && aiAgentDetection.method !== 'heuristic';
+            const shouldServeMarkdown = isAiAgent || acceptsMarkdown(request);
             if (pathname.match(MARKDOWN_PATH_REGEX) || shouldServeMarkdown) {
                 const pagePathWithoutMD = pathname.replace(MARKDOWN_PATH_REGEX, '');
                 const searchParams = new URL(request.url).searchParams;
@@ -903,6 +907,8 @@ function encodePathInSiteContent(
                               }`
                             : `~gitbook/markdown/${encodePagePath(pagePathWithoutMD)}`,
                     routeType: 'static',
+                    // Left undefined for non-agents to avoid splitting the static cache for them.
+                    isAiAgent: isAiAgent || undefined,
                     // TODO: track pageId / spaceId when possible
                     // We don't do it at the moment as we can't easily extract it from the URL.
                     events: ask
