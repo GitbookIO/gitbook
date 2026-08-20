@@ -171,7 +171,7 @@
         "quick-lru": "^7.0.1",
         "react": "19.2.4",
         "react-dom": "19.2.4",
-        "react-hotkeys-hook": "^4.4.1",
+        "react-hotkeys-hook": "^5.3.3",
         "rehype-raw": "^7.0.0",
         "rehype-sanitize": "^6.0.0",
         "rehype-stringify": "^10.0.1",
@@ -2862,7 +2862,7 @@
 
     "react-dom": ["react-dom@19.1.0", "", { "dependencies": { "scheduler": "^0.26.0" }, "peerDependencies": { "react": "^19.1.0" } }, "sha512-Xs1hdnE+DyKgeHJeJznQmYMIBG3TKIHJJT95Q58nHLSrElKlGQqDTR2HQ9fx5CN/Gk6Vh/kupBTDLU11/nDk/g=="],
 
-    "react-hotkeys-hook": ["react-hotkeys-hook@4.5.1", "", { "peerDependencies": { "react": ">=16.8.1", "react-dom": ">=16.8.1" } }, "sha512-scAEJOh3Irm0g95NIn6+tQVf/OICCjsQsC9NBHfQws/Vxw4sfq1tDQut5fhTEvPraXhu/sHxRd9lOtxzyYuNAg=="],
+    "react-hotkeys-hook": ["react-hotkeys-hook@5.3.3", "", { "peerDependencies": { "react": ">=16.8.0", "react-dom": ">=16.8.0" } }, "sha512-aswgyWUnE25hmhzHTfKDmKzsaSE5DJ4LKaU/o6rQSXkDd/1Bh9TfAFQbHkf6fLy11HvlYkp+cDDarGdhmCDhoQ=="],
 
     "read-cache": ["read-cache@1.0.0", "", { "dependencies": { "pify": "^2.3.0" } }, "sha512-Owdv/Ft7IjOgm/i0xvNDZ1LrRANRfew4b2prF3OWMQLxLfu3bS8FVhCsrSCMK4lR56Y9ya+AThoTpDCTxCmpRA=="],
 
