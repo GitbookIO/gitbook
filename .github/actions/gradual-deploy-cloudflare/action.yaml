@@ -34,13 +34,13 @@ runs:
             environment: ${{ inputs.environment }}
             command: deployments status --config ./packages/gitbook/openNext/customWorkers/defaultWrangler.jsonc
 
-        # This step is used to get the version ID that is currently deployed to Cloudflare.
+      # This step is used to get the version ID that is currently deployed to Cloudflare.
       - id: extract_current_version
-          name: Extract current version
-          shell: bash
-          run: |
-              version_id=$(echo "${{ steps.wrangler_status.outputs.command-output }}" | grep -A 3 "(100%)" | grep -oP '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}')
-              echo "version_id=$version_id" >> $GITHUB_OUTPUT
+        name: Extract current version
+        shell: bash
+        run: |
+            version_id=$(echo "${{ steps.wrangler_status.outputs.command-output }}" | grep -A 3 "(100%)" | grep -oP '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}')
+            echo "version_id=$version_id" >> $GITHUB_OUTPUT
 
       - id: deploy_server
         name: Deploy server to Cloudflare at 0%
@@ -75,9 +75,9 @@ runs:
             environment: ${{ inputs.environment }}
             command: versions deploy ${{ inputs.serverVersionId }}@100% -y --config ./packages/gitbook/openNext/customWorkers/defaultWrangler.jsonc
 
-        - name: Outputs
-          shell: bash
-          env:
-              DEPLOYMENT_URL: ${{ steps.deploy_middleware.outputs.deployment-url }}
-          run: |
-              echo "URL: ${{ steps.deploy_middleware.outputs.deployment-url }}"
+      - name: Outputs
+        shell: bash
+        env:
+            DEPLOYMENT_URL: ${{ steps.deploy_middleware.outputs.deployment-url }}
+        run: |
+            echo "URL: ${{ steps.deploy_middleware.outputs.deployment-url }}"
