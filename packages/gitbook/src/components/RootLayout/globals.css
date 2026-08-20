@@ -555,10 +555,12 @@ html.dark .highlight-line.diff-deleted .highlight-line-content::before {
 
 /* Zoomable images */
 html:has(.zoom-modal) {
+  /* stylelint-disable-next-line plugin/no-unsupported-browser-features -- single-value overflow is universal; doiuse flags the whole css-overflow feature */
   overflow: hidden;
 }
 
 .zoom-img {
+  /* stylelint-disable-next-line plugin/no-unsupported-browser-features -- zoom cursors are irrelevant on the touch browsers doiuse flags */
   cursor: zoom-in;
 }
 
@@ -568,6 +570,7 @@ html:has(.zoom-modal) {
 
 .zoom-modal img {
   view-transition-name: zoom-image;
+  /* stylelint-disable-next-line plugin/no-unsupported-browser-features -- zoom cursors are irrelevant on the touch browsers doiuse flags */
   cursor: zoom-out;
 }
 
