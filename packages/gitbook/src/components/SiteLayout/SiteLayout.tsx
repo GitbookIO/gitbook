@@ -5,6 +5,7 @@ import * as ReactDOM from 'react-dom';
 import { CustomizationDefaultThemeMode } from '@gitbook/api';
 
 import { AIContextProvider } from '../AI';
+import { DeferredTrackingScripts } from './DeferredTrackingScripts';
 import { RocketLoaderDetector } from './RocketLoaderDetector';
 import { SiteLayoutClientContexts } from './SiteLayoutClientContexts';
 import { AdminToolbar } from '@/components/AdminToolbar';
@@ -51,12 +52,6 @@ export async function SiteLayout(props: {
         crossOrigin: 'anonymous',
     });
 
-    scripts.forEach(({ script }) => {
-        ReactDOM.preload(script, {
-            as: 'script',
-        });
-    });
-
     return (
         <SiteLayoutClientContexts
             contextId={context.contextId}
@@ -88,9 +83,9 @@ export async function SiteLayout(props: {
             </AIContextProvider>
 
             <LoadIntegrations />
-            {scripts.length > 0
-                ? scripts.map(({ script }) => <script key={script} async src={script} />)
-                : null}
+            {scripts.length > 0 ? (
+                <DeferredTrackingScripts scripts={scripts.map(({ script }) => script)} />
+            ) : null}
 
             {scripts.some((script) => script.cookies) || customization.privacyPolicy.url ? (
                 <React.Suspense fallback={null}>
