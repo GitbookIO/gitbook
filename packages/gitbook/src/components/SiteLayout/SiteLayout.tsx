@@ -19,6 +19,31 @@ import { GITBOOK_API_PUBLIC_URL, GITBOOK_ASSETS_URL, GITBOOK_ICONS_URL } from '@
 import { getResizedImageURL } from '@/lib/images';
 import { isSiteIndexable } from '@/lib/seo';
 
+// Pure trackers with no visitor-facing UI, safe to load after `load` + idle. Anything not
+// listed (consent managers, chats, assistants…) keeps loading eagerly.
+const DEFERRABLE_TRACKING_INTEGRATIONS = new Set([
+    'ahrefs',
+    'amplitude',
+    'fathom',
+    'fullstory',
+    'googleanalytics',
+    'heap',
+    'koala',
+    'marketo',
+    'mixpanel',
+    'piwik',
+    'plausible',
+    'reo',
+    'salesviewer',
+    'unify',
+    'zoominfo',
+]);
+
+function isDeferrableScript(script: string): boolean {
+    const name = script.match(/\/v1\/integrations\/([^/]+)\//)?.[1];
+    return name !== undefined && DEFERRABLE_TRACKING_INTEGRATIONS.has(name);
+}
+
 /**
  * Layout when rendering a site.
  */
@@ -52,6 +77,14 @@ export async function SiteLayout(props: {
         crossOrigin: 'anonymous',
     });
 
+    scripts.forEach(({ script }) => {
+        if (!isDeferrableScript(script)) {
+            ReactDOM.preload(script, {
+                as: 'script',
+            });
+        }
+    });
+
     return (
         <SiteLayoutClientContexts
             contextId={context.contextId}
@@ -83,11 +116,13 @@ export async function SiteLayout(props: {
             </AIContextProvider>
 
             <LoadIntegrations />
-            {scripts.length > 0
-                ? scripts.map(({ script }) => (
-                      <Script key={script} src={script} strategy="lazyOnload" />
-                  ))
-                : null}
+            {scripts.map(({ script }) =>
+                isDeferrableScript(script) ? (
+                    <Script key={script} src={script} strategy="lazyOnload" />
+                ) : (
+                    <script key={script} async src={script} />
+                )
+            )}
 
             {scripts.some((script) => script.cookies) || customization.privacyPolicy.url ? (
                 <React.Suspense fallback={null}>
