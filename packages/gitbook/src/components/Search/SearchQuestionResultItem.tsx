@@ -1,11 +1,11 @@
 import React from 'react';
 
+import { addRecentSearchQuery } from './recent-queries';
+import { SearchResultItem } from './SearchResultItem';
+import { useSearchLink } from './useSearch';
 import type { Assistant } from '@/components/AI';
 import { useCurrentContent } from '@/components/hooks';
 import { tString, useLanguage } from '@/intl/client';
-import { SearchResultItem } from './SearchResultItem';
-import { addRecentSearchQuery } from './recent-queries';
-import { useSearchLink } from './useSearch';
 
 export const SearchQuestionResultItem = React.forwardRef(function SearchQuestionResultItem(
     props: {

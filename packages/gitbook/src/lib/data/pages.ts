@@ -1,4 +1,5 @@
 import type { JSONDocument, RevisionPageDocument } from '@gitbook/api';
+
 import type { GitBookSiteContext, GitBookSpaceContext } from '../context';
 import { getDataOrNull } from './errors';
 

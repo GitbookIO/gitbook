@@ -1,6 +1,7 @@
+import type { RenderIntegrationUI } from '@gitbook/api';
+
 import type { GitBookBaseContext } from '@/lib/context';
 import { ignoreDataFetcherErrors } from '@/lib/data';
-import type { RenderIntegrationUI } from '@gitbook/api';
 
 /**
  * Render an integration UI while ignoring some errors.

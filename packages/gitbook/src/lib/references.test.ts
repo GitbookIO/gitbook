@@ -1,10 +1,11 @@
 import { describe, expect, it } from 'bun:test';
-import type { Revision, RevisionPageDocument, Space } from '@gitbook/api';
 
+import type { Revision, RevisionPageDocument, SiteSpace, Space } from '@gitbook/api';
+
+import { resolveContentRef, resolveStringContentRef } from './references';
 import type { GitBookAnyContext } from '@/lib/context';
 import type { GitBookDataFetcher } from '@/lib/data';
 import { createLinker } from '@/lib/links';
-import { resolveContentRef, resolveStringContentRef } from './references';
 
 describe('resolveStringContentRef', () => {
     it.each([
@@ -264,5 +265,184 @@ describe('resolveContentRef', () => {
         );
 
         expect(result?.text).toBe('Space B Page');
+    });
+});
+
+describe('resolveContentRef for direct space links', () => {
+    function buildSpace(id: string, title: string): Space {
+        return {
+            object: 'space',
+            id,
+            title,
+            organization: 'org',
+            revision: `rev-${id}`,
+            urls: {
+                location: `https://api.gitbook.com/spaces/${id}`,
+                app: `https://app.gitbook.com/o/org/s/${id}/`,
+                published: `https://${id}.gitbook.io/`,
+            },
+        } as unknown as Space;
+    }
+
+    function buildSiteSpace(space: Space, title: string): SiteSpace {
+        return {
+            object: 'site-space',
+            id: `site-${space.id}`,
+            path: '',
+            space,
+            title,
+            draft: false,
+            urls: { published: `https://site.gitbook.io/${space.id}/` },
+        } as unknown as SiteSpace;
+    }
+
+    function buildContext(overrides: Record<string, unknown>): GitBookAnyContext {
+        const currentSpace = buildSpace('space-current', 'Current Space');
+
+        const dataFetcher = {
+            getSpace: async () => ({ error: { code: 404, message: 'Not found' } }),
+            getRevision: async () => ({ error: { code: 404, message: 'Not found' } }),
+            getChangeRequest: async () => ({ error: { code: 404, message: 'Not found' } }),
+            withToken: function () {
+                return this;
+            },
+        } as unknown as GitBookDataFetcher;
+
+        return {
+            dataFetcher,
+            linker: createLinker({
+                host: 'docs.example.com',
+                spaceBasePath: '/space-current/',
+                siteBasePath: '/',
+            }),
+            organizationId: 'org',
+            space: currentSpace,
+            revision: {
+                object: 'revision',
+                id: 'rev-space-current',
+                pages: [],
+                files: [],
+                reusableContents: [],
+            },
+            revisionId: 'rev-space-current',
+            changeRequest: null,
+            shareKey: undefined,
+            site: { object: 'site', id: 'site-1' },
+            ...overrides,
+        } as unknown as GitBookAnyContext;
+    }
+
+    it('returns the containing section title, not the site-space title', async () => {
+        const targetSpace = buildSpace('space-target', 'Target Space Title');
+        const siteSpace = buildSiteSpace(targetSpace, 'Variant Title');
+        const section = {
+            object: 'site-section',
+            id: 'section-1',
+            title: 'Reference',
+            draft: false,
+            path: '',
+            siteSpaces: [siteSpace],
+            urls: {},
+        };
+
+        const context = buildContext({
+            siteSpace,
+            sections: { list: [section], current: section },
+            structure: { type: 'sections', structure: [section] },
+        });
+
+        const result = await resolveContentRef({ kind: 'space', space: 'space-current' }, context);
+
+        expect(result?.text).toBe('Reference');
+        expect(result?.href).toBe(siteSpace.urls.published!);
+        expect(result?.active).toBe(true);
+    });
+
+    it('returns the localized section title when available', async () => {
+        const targetSpace = buildSpace('space-target', 'Target Space Title');
+        const siteSpace = buildSiteSpace(targetSpace, 'Variant Title');
+        const section = {
+            object: 'site-section',
+            id: 'section-1',
+            title: 'Reference',
+            localizedTitle: { fr: 'Référence' },
+            draft: false,
+            path: '',
+            siteSpaces: [siteSpace],
+            urls: {},
+        };
+
+        const contextFr = buildContext({
+            siteSpace,
+            sections: { list: [section], current: section },
+            structure: { type: 'sections', structure: [section] },
+            locale: 'fr',
+        });
+
+        const resultFr = await resolveContentRef(
+            { kind: 'space', space: 'space-current' },
+            contextFr
+        );
+        expect(resultFr?.text).toBe('Référence');
+
+        const contextEn = buildContext({
+            siteSpace,
+            sections: { list: [section], current: section },
+            structure: { type: 'sections', structure: [section] },
+            locale: 'en',
+        });
+
+        const resultEn = await resolveContentRef(
+            { kind: 'space', space: 'space-current' },
+            contextEn
+        );
+        expect(resultEn?.text).toBe('Reference');
+    });
+
+    it('falls back to the site-space title when the site has no sections', async () => {
+        const targetSpace = buildSpace('space-target', 'Target Space Title');
+        const siteSpace = buildSiteSpace(targetSpace, 'Variant Title');
+
+        const context = buildContext({
+            siteSpace,
+            sections: null,
+            structure: { type: 'siteSpaces', structure: [siteSpace] },
+        });
+
+        const result = await resolveContentRef({ kind: 'space', space: 'space-current' }, context);
+
+        expect(result?.text).toBe('Variant Title');
+    });
+
+    it('falls back to the raw space title for an external/unmapped space', async () => {
+        const externalSpace = buildSpace('space-external', 'External Space Title');
+
+        const dataFetcher = {
+            getSpace: async ({ spaceId }: { spaceId: string }) => {
+                if (spaceId === 'space-external') return { data: externalSpace };
+                return { error: { code: 404, message: 'Not found' } };
+            },
+            getRevision: async () => ({ error: { code: 404, message: 'Not found' } }),
+            getChangeRequest: async () => ({ error: { code: 404, message: 'Not found' } }),
+            withToken: function () {
+                return this;
+            },
+        } as unknown as GitBookDataFetcher;
+
+        const context = buildContext({
+            siteSpace: buildSiteSpace(
+                buildSpace('space-current', 'Current Space'),
+                'Current Variant'
+            ),
+            sections: null,
+            structure: { type: 'siteSpaces', structure: [] },
+            dataFetcher,
+        });
+
+        const result = await resolveContentRef({ kind: 'space', space: 'space-external' }, context);
+
+        expect(result?.text).toBe('External Space Title');
+        expect(result?.href).toBe(externalSpace.urls.published!);
+        expect(result?.active).toBe(false);
     });
 });

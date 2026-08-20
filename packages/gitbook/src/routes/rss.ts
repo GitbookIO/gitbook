@@ -1,12 +1,14 @@
+import { Feed } from 'feed';
+
+import type { RevisionPageDocument } from '@gitbook/api';
+import { RevisionPageType } from '@gitbook/api';
+
 import { getPageFullTitle } from '@/components/SitePage';
 import type { GitBookSiteContext } from '@/lib/context';
 import { getPageDocument } from '@/lib/data/pages';
 import { getBlocksByType, getNodeText, isHeadingBlock } from '@/lib/document';
-import { resolvePagePathDocumentOrGroup } from '@/lib/pages';
 import { joinPath } from '@/lib/paths';
-import type { RevisionPageDocument } from '@gitbook/api';
-import { RevisionPageType } from '@gitbook/api';
-import { Feed } from 'feed';
+import { resolveSiteSpacePagePathDocumentOrGroup } from '@/lib/sites';
 
 /**
  * Get the URL of a RSS feed for a page.
@@ -23,7 +25,11 @@ export async function servePageRSS(
     context: GitBookSiteContext,
     inputPagePath: string
 ): Promise<Response> {
-    const pageLookup = resolvePagePathDocumentOrGroup(context.revision.pages, inputPagePath);
+    const pageLookup = resolveSiteSpacePagePathDocumentOrGroup(
+        context.siteSpace,
+        context.revision.pages,
+        inputPagePath
+    );
 
     if (!pageLookup) {
         return notFoundResponse('Page not found');

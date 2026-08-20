@@ -1,26 +1,25 @@
-import { isSiteAuthLoginHref } from '@/lib/auth-login-link';
-import type { GitBookSiteContext } from '@/lib/context';
+import type React from 'react';
+
 import {
     type CustomizationContentLink,
     type CustomizationHeaderItem,
     SiteInsightsLinkPosition,
     type SiteSocialAccount,
 } from '@gitbook/api';
-import type React from 'react';
-
-import { resolveContentRef } from '@/lib/references';
-import { getLocalizedTitle } from '@/lib/sites';
-import { tcls } from '@/lib/tailwind';
 
 import { SocialAccountLink } from '../Footer/SocialAccounts';
-import { SiteAuthLoginDropdownMenuItem } from '../SiteAuth/SiteAuthLoginLink';
 import {
     DropdownMenuItem,
     DropdownMenuSeparator,
     DropdownSubMenu,
 } from '../primitives/DropdownMenu';
+import { SiteAuthLoginDropdownMenuItem } from '../SiteAuth/SiteAuthLoginLink';
 import { HeaderLinkMoreDropdown } from './HeaderLinkMoreClient';
-import styles from './headerLinks.module.css';
+import { isSiteAuthLoginHref } from '@/lib/auth-login-link';
+import type { GitBookSiteContext } from '@/lib/context';
+import { resolveContentRef } from '@/lib/references';
+import { getLocalizedTitle } from '@/lib/sites';
+import { tcls } from '@/lib/tailwind';
 
 /**
  * Dropdown menu for header links hidden at small screen size.
@@ -34,7 +33,7 @@ export function HeaderLinkMore(props: {
     const { label, links, context, socialAccounts } = props;
 
     return (
-        <div className={`${styles.linkEllipsis} z-20 items-center`}>
+        <div className="header-links-ellipsis z-20 items-center">
             <HeaderLinkMoreDropdown
                 label={label}
                 dropdownClassName={tcls(

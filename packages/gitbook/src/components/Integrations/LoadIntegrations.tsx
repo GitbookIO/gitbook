@@ -1,20 +1,22 @@
 'use client';
 
-import {
-    isCookiesTrackingDisabled,
-    isGlobalPrivacyControlEnabled,
-    setCookiesTracking,
-} from '@/components/Insights';
-import { isAIUserAgent } from '@/lib/browser';
+import * as React from 'react';
+import * as zustand from 'zustand';
+
 import type {
     GitBookGlobal,
     GitBookIntegrationEvent,
     GitBookIntegrationEventCallback,
     GitBookIntegrationTool,
 } from '@gitbook/browser-types';
-import * as React from 'react';
-import * as zustand from 'zustand';
+
 import type { Assistant } from '../AI';
+import {
+    isCookiesTrackingDisabled,
+    isGlobalPrivacyControlEnabled,
+    setCookiesTracking,
+} from '@/components/Insights';
+import { isAIUserAgent } from '@/lib/browser';
 
 const events = new Map<GitBookIntegrationEvent, GitBookIntegrationEventCallback[]>();
 
@@ -29,7 +31,7 @@ export const integrationsAssistantTools = zustand.createStore<{
     };
 });
 
-export const integrationAssistants = zustand.createStore<Array<Assistant>>(() => []);
+export const integrationAssistants = zustand.createStore<Assistant[]>(() => []);
 
 // Store to track when integrations have been loaded
 export const integrationsStore = zustand.createStore<{
@@ -121,7 +123,7 @@ if (typeof window !== 'undefined') {
 /**
  * Get the current state of the assistants.
  */
-export function useIntegrationAssistants(): Array<Assistant> {
+export function useIntegrationAssistants(): Assistant[] {
     return zustand.useStore(integrationAssistants);
 }
 

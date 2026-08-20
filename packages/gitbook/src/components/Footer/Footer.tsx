@@ -1,14 +1,13 @@
-import type { GitBookSiteContext } from '@/lib/context';
 import React from 'react';
 
-import { Image } from '@/components/utils';
-import { partition } from '@/lib/arrays';
-import { tcls } from '@/lib/tailwind';
-
-import { ThemeToggler } from '../ThemeToggler';
 import { CONTAINER_STYLE, CONTENT_STYLE } from '../layout';
+import { ThemeToggler } from '../ThemeToggler';
 import { FooterLinksGroup } from './FooterLinksGroup';
 import { SocialAccountButton } from './SocialAccounts';
+import { Image } from '@/components/utils';
+import { partition } from '@/lib/arrays';
+import type { GitBookSiteContext } from '@/lib/context';
+import { tcls } from '@/lib/tailwind';
 
 const FOOTER_COLUMNS = 4;
 
@@ -31,11 +30,14 @@ export function Footer(props: { context: GitBookSiteContext }) {
             data-gb-site-footer
             className={tcls(
                 'border-tint-subtle border-t',
-                // If the footer only contains a mode toggle, we only show it on smaller screens
-                mobileOnly ? 'xl:hidden' : null
+                // If the footer only contains a mode toggle, we only show it where the outline
+                // column — which carries its own toggle — isn't pinned open.
+                mobileOnly
+                    ? 'layout-default:xl:chat-closed:hidden layout-default:3xl:hidden layout-wide:3xl:chat-closed:hidden page-api-block:page-has-outline:min-[96rem]:hidden'
+                    : null
             )}
         >
-            <div className="transition-[padding] duration-300 motion-reduce:transition-none lg:chat-open:pr-(--ai-chat-width)">
+            <div className="lg:chat-open:pr-(--ai-chat-width) transition-[padding] duration-300 motion-reduce:transition-none">
                 <div
                     className={tcls(
                         CONTAINER_STYLE,
@@ -97,7 +99,9 @@ export function Footer(props: { context: GitBookSiteContext }) {
                         {
                             // Theme Toggle
                             customization.themes.toggeable ? (
-                                <div className="-col-start-2 row-start-1 flex items-start @xs:justify-end xl:hidden">
+                                // Hidden where the outline column is pinned open (see PageAside),
+                                // since that column carries its own toggle.
+                                <div className="page-api-block:page-has-outline:min-[96rem]:hidden -col-start-2 row-start-1 flex items-start @xs:justify-end layout-default:xl:chat-closed:hidden layout-default:3xl:hidden layout-wide:3xl:chat-closed:hidden">
                                     <React.Suspense fallback={null}>
                                         <ThemeToggler />
                                     </React.Suspense>
@@ -109,7 +113,7 @@ export function Footer(props: { context: GitBookSiteContext }) {
                             // Navigation groups (split into equal columns)
                             customization.footer.groups?.length > 0 ? (
                                 <div className={tcls('col-span-2')}>
-                                    <div className="mx-auto flex @xl:flex-row flex-col @xl:gap-6 gap-10">
+                                    <div className="mx-auto flex flex-col gap-10 @xl:flex-row @xl:gap-6">
                                         {partition(customization.footer.groups, FOOTER_COLUMNS).map(
                                             (column, columnIndex) => (
                                                 <div
@@ -149,7 +153,7 @@ export function Footer(props: { context: GitBookSiteContext }) {
                         {
                             // Legal
                             customization.footer.copyright ? (
-                                <div className="order-last col-span-full flex w-full grow flex-col items-center gap-2 text-center text-tint text-xs">
+                                <div className="order-last col-span-full flex w-full grow flex-col items-center gap-2 text-center text-xs text-tint">
                                     <p>{customization.footer.copyright}</p>
                                 </div>
                             ) : null

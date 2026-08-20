@@ -1,13 +1,12 @@
 import type { DocumentBlockParagraph } from '@gitbook/api';
 import { CustomizationAIMode } from '@gitbook/api';
 
-import { AskAIParagraphButton } from '@/components/AIChat/AskAIParagraphButton';
-import { getNodeText } from '@/lib/document';
-import { tcls } from '@/lib/tailwind';
-
 import type { BlockProps } from './Block';
 import { Inlines } from './Inlines';
 import { getTextAlignment } from './utils';
+import { AskAIParagraphButton } from '@/components/AIChat/AskAIParagraphButton';
+import { getNodeText } from '@/lib/document';
+import { tcls } from '@/lib/tailwind';
 
 export function Paragraph(props: BlockProps<DocumentBlockParagraph>) {
     const { block, style, ...contextProps } = props;
@@ -18,7 +17,18 @@ export function Paragraph(props: BlockProps<DocumentBlockParagraph>) {
         'has-[.button,input]:flex has-[.button,input]:flex-wrap has-[.button,input]:gap-2 has-[.button,input]:items-center';
 
     const paragraph = (
-        <p className={tcls(inlineButtonStyle, style, getTextAlignment(block.data?.align))}>
+        <p
+            data-cover-aware-text={context.isPageBody ? '' : undefined}
+            className={tcls(
+                // Cover-aware contrast text applies only to the page body, not to documents
+                // rendered in overlays (search answers, AI chat) on a background-cover page.
+                context.isPageBody &&
+                    'page-cover-background:[&:not(:has(.button,input))]:text-contrast-cover',
+                inlineButtonStyle,
+                style,
+                getTextAlignment(block.data?.align)
+            )}
+        >
             <Inlines {...contextProps} nodes={block.nodes} ancestorInlines={[]} />
         </p>
     );

@@ -2,12 +2,12 @@
 
 import * as React from 'react';
 
-import { type ClassValue, tcls } from '@/lib/tailwind';
-
 import { Icon, type IconName } from '@gitbook/icons';
+
 import { Link, type LinkInsightsProps } from './Link';
 import { useClassnames } from './StyleProvider';
 import { Tooltip, type TooltipProps } from './Tooltip';
+import { type ClassValue, tcls } from '@/lib/tailwind';
 
 export type ButtonProps = {
     href?: string;
@@ -58,7 +58,7 @@ export const variantClasses = {
     ],
     secondary: [
         'bg-tint',
-        'depth-flat:bg-transparent',
+        'depth-flat:bg-tint-base',
         'text-tint',
         'hover:bg-tint-hover',
         'hover:not-disabled:depth-flat:bg-tint-hover',
@@ -212,15 +212,7 @@ export const Button = React.forwardRef<
         );
 
         return (children || iconOnly) && label ? (
-            <Tooltip
-                rootProps={{
-                    open: disabled === true ? false : undefined,
-                    ...tooltipProps?.rootProps,
-                }}
-                label={label}
-                triggerProps={{ disabled, ...tooltipProps?.triggerProps }}
-                contentProps={tooltipProps?.contentProps}
-            >
+            <Tooltip label={label} disabled={disabled} {...tooltipProps}>
                 {button}
             </Tooltip>
         ) : (
@@ -239,7 +231,13 @@ export const ButtonGroup = React.forwardRef<
             className={tcls(
                 'flex h-fit items-stretch justify-start overflow-hidden',
                 combinedShape
-                    ? '*:translate-y-0! *:shadow-none! [&>*:not(:first-child)]:border-l-0 [&>*:not(:first-child,:last-child)]:rounded-none! [&>*:not(:only-child):first-child]:rounded-r-none [&>*:not(:only-child):last-child]:rounded-l-none'
+                    ? [
+                          // Per-segment rounding lives in `globals.css`: Tailwind cannot express
+                          // "last button" once focus guards are injected.
+                          'button-group',
+                          '*:translate-y-0! *:shadow-none!',
+                          '[&>*:not(:first-child)]:border-l-0',
+                      ]
                     : '',
                 className
             )}

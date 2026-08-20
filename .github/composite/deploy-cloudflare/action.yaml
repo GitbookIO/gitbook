@@ -1,34 +1,34 @@
 name: 'Deploy cloudflare'
 description: 'Deploy GitBook to Cloudflare'
 inputs:
-  opItem:
-    description: '1Password item to load secrets from'
-    required: true
-  opServiceAccount:
-    description: '1Password service account token'
-    required: true
-  apiToken:
-    description: 'Cloudflare API token'
-    required: true
-  accountId:
-    description: 'Cloudflare account ID'
-    required: true
-  environment:
-    description: 'Cloudflare environment to deploy to (staging, production, preview)'
-    required: true
-  deploy:
-    description: 'Deploy as main version for all traffic instead of uploading versions'
-    required: true
-  commitTag:
-    description: 'Commit branch to associate with the deployment'
-    required: true
-  commitMessage:
-    description: 'Commit message to associate with the deployment'
-    required: true
+    opItem:
+        description: '1Password item to load secrets from'
+        required: true
+    opServiceAccount:
+        description: '1Password service account token'
+        required: true
+    apiToken:
+        description: 'Cloudflare API token'
+        required: true
+    accountId:
+        description: 'Cloudflare account ID'
+        required: true
+    environment:
+        description: 'Cloudflare environment to deploy to (staging, production, preview)'
+        required: true
+    deploy:
+        description: 'Deploy as main version for all traffic instead of uploading versions'
+        required: true
+    commitTag:
+        description: 'Commit branch to associate with the deployment'
+        required: true
+    commitMessage:
+        description: 'Commit message to associate with the deployment'
+        required: true
 outputs:
     deployment-url:
-      description: "Deployment URL"
-      value: ${{ steps.upload_middleware.outputs.deployment-url }}
+        description: 'Deployment URL'
+        value: ${{ steps.upload_middleware.outputs.deployment-url }}
 runs:
     using: 'composite'
     steps:
@@ -42,32 +42,33 @@ runs:
         - name: Load secret
           uses: 1password/load-secrets-action@v2
           env:
-            OP_SERVICE_ACCOUNT_TOKEN: ${{ inputs.opServiceAccount }}
-            GITBOOK_URL: ${{ inputs.opItem }}/GITBOOK_URL
-            GITBOOK_ICONS_URL: ${{ inputs.opItem }}/GITBOOK_ICONS_URL
-            GITBOOK_ICONS_TOKEN: ${{ inputs.opItem }}/GITBOOK_ICONS_TOKEN
-            NEXT_SERVER_ACTIONS_ENCRYPTION_KEY: ${{ inputs.opItem }}/NEXT_SERVER_ACTIONS_ENCRYPTION_KEY
-            GITBOOK_SECRET: ${{ inputs.opItem }}/GITBOOK_SECRET
-            GITBOOK_APP_URL: ${{ inputs.opItem }}/GITBOOK_APP_URL
-            GITBOOK_API_URL: ${{ inputs.opItem }}/GITBOOK_API_URL
-            GITBOOK_API_PUBLIC_URL: ${{ inputs.opItem }}/GITBOOK_API_PUBLIC_URL
-            GITBOOK_API_TOKEN: ${{ inputs.opItem }}/GITBOOK_API_TOKEN
-            GITBOOK_OAUTH_SERVER_URL: ${{ inputs.opItem }}/GITBOOK_OAUTH_SERVER_URL
-            GITBOOK_PREVIEW_BASE_URL: ${{ inputs.opItem }}/GITBOOK_PREVIEW_BASE_URL
-            GITBOOK_INTEGRATIONS_HOST: ${{ inputs.opItem }}/GITBOOK_INTEGRATIONS_HOST
-            GITBOOK_INTEGRATIONS_CONTENT_HOST: ${{ inputs.opItem }}/GITBOOK_INTEGRATIONS_CONTENT_HOST
-            GITBOOK_IMAGE_RESIZE_SIGNING_KEY: ${{ inputs.opItem }}/GITBOOK_IMAGE_RESIZE_SIGNING_KEY
-            GITBOOK_IMAGE_RESIZE_URL: ${{ inputs.opItem }}/GITBOOK_IMAGE_RESIZE_URL_2
-            GITBOOK_IMAGE_RESIZE_SALT: ${{ inputs.opItem }}/GITBOOK_IMAGE_RESIZE_SALT
-            GITBOOK_IMAGE_RESIZE_MODE: ${{ inputs.opItem }}/GITBOOK_IMAGE_RESIZE_MODE
-            GITBOOK_ASSETS_PREFIX: ${{ inputs.opItem }}/GITBOOK_ASSETS_PREFIX
-            GITBOOK_FONTS_URL: ${{ inputs.opItem }}/GITBOOK_FONTS_URL
+              OP_SERVICE_ACCOUNT_TOKEN: ${{ inputs.opServiceAccount }}
+              GITBOOK_URL: ${{ inputs.opItem }}/GITBOOK_URL
+              GITBOOK_ICONS_URL: ${{ inputs.opItem }}/GITBOOK_ICONS_URL
+              GITBOOK_ICONS_TOKEN: ${{ inputs.opItem }}/GITBOOK_ICONS_TOKEN
+              NEXT_SERVER_ACTIONS_ENCRYPTION_KEY: ${{ inputs.opItem }}/NEXT_SERVER_ACTIONS_ENCRYPTION_KEY
+              GITBOOK_SECRET: ${{ inputs.opItem }}/GITBOOK_SECRET
+              GITBOOK_APP_URL: ${{ inputs.opItem }}/GITBOOK_APP_URL
+              GITBOOK_API_URL: ${{ inputs.opItem }}/GITBOOK_API_URL
+              GITBOOK_API_PUBLIC_URL: ${{ inputs.opItem }}/GITBOOK_API_PUBLIC_URL
+              GITBOOK_API_TOKEN: ${{ inputs.opItem }}/GITBOOK_API_TOKEN
+              GITBOOK_OAUTH_SERVER_URL: ${{ inputs.opItem }}/GITBOOK_OAUTH_SERVER_URL
+              GITBOOK_SITE_OAUTH_SIGNING_SECRET: ${{ inputs.opItem }}/GITBOOK_SITE_OAUTH_SIGNING_SECRET
+              GITBOOK_PREVIEW_BASE_URL: ${{ inputs.opItem }}/GITBOOK_PREVIEW_BASE_URL
+              GITBOOK_INTEGRATIONS_HOST: ${{ inputs.opItem }}/GITBOOK_INTEGRATIONS_HOST
+              GITBOOK_INTEGRATIONS_CONTENT_HOST: ${{ inputs.opItem }}/GITBOOK_INTEGRATIONS_CONTENT_HOST
+              GITBOOK_IMAGE_RESIZE_SIGNING_KEY: ${{ inputs.opItem }}/GITBOOK_IMAGE_RESIZE_SIGNING_KEY
+              GITBOOK_IMAGE_RESIZE_URL: ${{ inputs.opItem }}/GITBOOK_IMAGE_RESIZE_URL_2
+              GITBOOK_IMAGE_RESIZE_SALT: ${{ inputs.opItem }}/GITBOOK_IMAGE_RESIZE_SALT
+              GITBOOK_IMAGE_RESIZE_MODE: ${{ inputs.opItem }}/GITBOOK_IMAGE_RESIZE_MODE
+              GITBOOK_ASSETS_PREFIX: ${{ inputs.opItem }}/GITBOOK_ASSETS_PREFIX
+              GITBOOK_FONTS_URL: ${{ inputs.opItem }}/GITBOOK_FONTS_URL
         - name: Build worker
           run: bun run turbo build:cloudflare
           env:
-            GITBOOK_RUNTIME: cloudflare
-            GITBOOK_BLOCK_SEARCH_INDEXATION: ${{ inputs.environment == 'preview' && 'true' || '' }}
-            GITBOOK_ALLOW_CUSTOMIZATION_OVERRIDE: ${{ inputs.environment == 'preview' && 'true' || '' }}
+              GITBOOK_RUNTIME: cloudflare
+              GITBOOK_BLOCK_SEARCH_INDEXATION: ${{ inputs.environment == 'preview' && 'true' || '' }}
+              GITBOOK_ALLOW_CUSTOMIZATION_OVERRIDE: ${{ inputs.environment == 'preview' && 'true' || '' }}
           shell: bash
 
         - name: Upload the DO worker
@@ -134,11 +135,10 @@ runs:
               middlewareVersionId: ${{ steps.extract_middleware_version_id.outputs.version_id }}
               deploy: ${{ inputs.deploy }}
 
-
         - name: Outputs
           shell: bash
           env:
-            DEPLOYMENT_URL: ${{ steps.upload_middleware.outputs.deployment-url }}
+              DEPLOYMENT_URL: ${{ steps.upload_middleware.outputs.deployment-url }}
           run: |
               echo "URL: ${{ steps.upload_middleware.outputs.deployment-url }}"
               echo "Output server: ${{ steps.upload_server.outputs.command-output }}"

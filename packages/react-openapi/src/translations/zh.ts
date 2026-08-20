@@ -45,4 +45,5 @@ export const zh = {
     or: '或',
     and: '和',
     possible_values: '可能的值',
+    direct_link_to_model: '${1} 的直接链接',
 };

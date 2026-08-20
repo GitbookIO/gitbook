@@ -1,20 +1,15 @@
 'use client';
 
-import type { ClientTOCPage } from './encodeClientTableOfContents';
-
-import { type ClassValue, tcls } from '@/lib/tailwind';
-
 import assertNever from 'assert-never';
+
 import { markSpaceNavigationFromTOCLinkOnClick } from '../hooks';
+import type { ClientTOCPage } from './encodeClientTableOfContents';
 import { PageDocumentItem } from './PageDocumentItem';
 import { PageGroupItem } from './PageGroupItem';
 import { PageLinkItem } from './PageLinkItem';
+import { type ClassValue, tcls } from '@/lib/tailwind';
 
-export function PagesList(props: {
-    pages: ClientTOCPage[];
-    style?: ClassValue;
-    isRoot?: boolean;
-}) {
+export function PagesList(props: { pages: ClientTOCPage[]; style?: ClassValue; isRoot?: boolean }) {
     const { pages, style, isRoot = false } = props;
 
     return (

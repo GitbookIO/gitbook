@@ -1,7 +1,8 @@
 import type { OpenAPIV3 } from '@gitbook/openapi-parser';
-import { OpenAPIExample } from '../OpenAPIExample';
+
 import type { OpenAPIContext } from '../context';
 import { generateSchemaExample } from '../generateSchemaExample';
+import { OpenAPIExample } from '../OpenAPIExample';
 import { tString } from '../translate';
 import { checkIsReference } from '../utils';
 

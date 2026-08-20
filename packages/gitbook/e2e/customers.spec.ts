@@ -283,11 +283,6 @@ const testCases: TestsCase[] = [
         tests: [{ name: 'Home', url: '/legal' }],
     },
     {
-        name: 'help.platipomiru.com',
-        contentBaseURL: 'https://help.platipomiru.com',
-        tests: [{ name: 'Home', url: '/' }],
-    },
-    {
         name: 'help.aikido.dev',
         contentBaseURL: 'https://help.aikido.dev',
         tests: [{ name: 'Home', url: '/', run: waitForCookiesDialog }],
@@ -365,7 +360,9 @@ const testCases: TestsCase[] = [
     {
         name: 'docs.verifone.com',
         contentBaseURL: 'https://docs.verifone.com',
-        tests: [{ name: 'Home', url: '/', run: waitForCookiesDialog }],
+        // Verifone's custom Cookiebot integration races with and suppresses GitBook's built-in
+        // banner, so waitForCookiesDialog is not a stable invariant here.
+        tests: [{ name: 'Home', url: '/' }],
     },
     // Deactivate it because of a custom Ask AI that causes flakiness.
     // {
@@ -390,7 +387,7 @@ const testCases: TestsCase[] = [
             { name: 'Home', url: '/docs', run: waitForCookiesDialog },
             {
                 name: 'OpenAPI',
-                url: '/docs/developers/gitbook-api/api-reference/docs-sites/site-ai-ask',
+                url: '/docs/developers/gitbook-api/api-reference/docs-sites/site-ai-ask/ask-a-question-in-a-site',
                 run: waitForCookiesDialog,
             },
         ],

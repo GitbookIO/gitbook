@@ -1,5 +1,6 @@
-import type { ContentKitCodeBlock } from '@gitbook/api';
 import type React from 'react';
+
+import type { ContentKitCodeBlock } from '@gitbook/api';
 
 import type { ContentKitClientElementProps } from './types';
 

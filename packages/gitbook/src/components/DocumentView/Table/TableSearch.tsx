@@ -1,12 +1,14 @@
 'use client';
 
+import React from 'react';
+
+import { Icon } from '@gitbook/icons';
+
+import type { TableCheckboxColumn, TableSelectColumn } from './search';
+import { type SelectedOptions, recordMatches } from './searchMatch';
 import { Button, Checkbox, DropdownMenu, DropdownMenuItem, Input } from '@/components/primitives';
 import { tString, useLanguage } from '@/intl/client';
 import { type ClassValue, tcls } from '@/lib/tailwind';
-import { Icon } from '@gitbook/icons';
-import React from 'react';
-import type { TableCheckboxColumn, TableSelectColumn } from './search';
-import { type SelectedOptions, recordMatches } from './searchMatch';
 
 /**
  * Client-side table search.
@@ -201,7 +203,7 @@ export function TableSearchEmpty(props: { className?: ClassValue }) {
 
     const trimmed = query.trim();
     return (
-        <div className={tcls('mx-auto text-center text-sm text-tint', props.className)}>
+        <div className={tcls('mx-auto py-8 text-center text-sm text-tint', props.className)}>
             {trimmed
                 ? tString(language, 'search_no_results_for', trimmed)
                 : tString(language, 'search_no_results')}

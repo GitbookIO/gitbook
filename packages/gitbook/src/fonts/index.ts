@@ -3,28 +3,34 @@ import type {
     CustomizationFontDefinition,
     CustomizationMonospaceFont,
 } from '@gitbook/api';
+
 import { generateFontFacesCSS, getFontSourcesToPreload } from './custom';
-import { fonts } from './default';
+import { generateDefaultFontFacesCSS } from './default';
+
+export { DEFAULT_MONOSPACE_FONT, generateEmojiFontFacesCSS } from './default';
 
 /**
  * Represents font data for either a default font or a custom font
  */
 export type FontData = DefaultFontData | CustomFontData;
 
+interface BaseFontData {
+    /** `@font-face` rules and the CSS variable, to inline in the document head. */
+    fontFaceRules: string;
+}
+
 /**
- * Font data for a default font, currently handle with next/font
+ * Font data for a default font, self-hosted from our own assets
  */
-interface DefaultFontData {
+interface DefaultFontData extends BaseFontData {
     type: 'default';
-    variable: string;
 }
 
 /**
  * Font data for a custom font with @font-face rules
  */
-interface CustomFontData {
+interface CustomFontData extends BaseFontData {
     type: 'custom';
-    fontFaceRules: string;
     preloadSources: CustomizationFontDefinition['fontFaces'];
 }
 
@@ -38,7 +44,7 @@ export function getFontData(
     if (typeof font === 'string') {
         return {
             type: 'default',
-            variable: fonts[font].variable,
+            fontFaceRules: generateDefaultFontFacesCSS(font),
         };
     }
 

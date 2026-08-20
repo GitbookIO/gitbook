@@ -1,5 +1,7 @@
-import { GitBookAPIError } from '@gitbook/api';
 import { parse as parseCacheControl } from '@tusbar/cache-control';
+
+import { GitBookAPIError } from '@gitbook/api';
+
 import type { DataFetcherErrorData, DataFetcherResponse } from './types';
 
 export class DataFetcherError extends Error {

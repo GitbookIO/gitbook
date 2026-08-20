@@ -1,296 +1,83 @@
-import { CustomizationDefaultFont, CustomizationDefaultMonospaceFont } from '@gitbook/api';
-import {
-    DM_Mono,
-    Fira_Code,
-    Fira_Sans_Extra_Condensed,
-    IBM_Plex_Mono,
-    IBM_Plex_Serif,
-    Inconsolata,
-    Inter,
-    JetBrains_Mono,
-    Lato,
-    Merriweather,
-    Noto_Color_Emoji,
-    Noto_Sans,
-    Open_Sans,
-    Overpass,
-    Poppins,
-    Raleway,
-    Roboto,
-    Roboto_Mono,
-    Roboto_Slab,
-    Source_Code_Pro,
-    Source_Sans_3,
-    Space_Mono,
-    Ubuntu,
-} from 'next/font/google';
-import localFont from 'next/font/local';
+import { CustomizationDefaultMonospaceFont } from '@gitbook/api';
 
-export const fontNotoColorEmoji = Noto_Color_Emoji({
-    variable: '--font-noto-color-emoji',
-    weight: ['400'],
-    preload: false,
-    display: 'swap',
-});
+import { EMOJI_FONT, type FontName } from './definitions';
+import faces from './generated/faces.json';
+import type { FontFacesData, FontFamilyData } from './types';
+import { getAssetURL } from '@/lib/assets';
 
-/*
-    Fonts are downloaded and loaded by next/font.
+const fontFaces = faces as FontFacesData;
 
-    We can't use "preload: true" as otherwise Next will preload all the fonts on the page
-    while spaces only use one font at a time.
- */
+// The rules only vary by font, and every page renders a few dozen of them.
+const cache = new Map<FontName, string>();
 
-const inter = Inter({
-    weight: ['400', '500', '600', '700'],
-    variable: '--font-content',
-    preload: false,
-    display: 'swap',
-    fallback: ['system-ui', 'arial'],
-});
+/** Used until the cache has warmed up for sites saved before the setting existed. */
+export const DEFAULT_MONOSPACE_FONT = CustomizationDefaultMonospaceFont.IBMPlexMono;
 
-const firaSans = Fira_Sans_Extra_Condensed({
-    weight: ['400', '500', '600', '700'],
-    variable: '--font-content',
-    preload: false,
-    display: 'swap',
-    fallback: ['system-ui', 'arial'],
-});
+// Emitted per picked family and inlined in the head, so a page never carries the other 20 families
+// the way a shared `next/font` stylesheet did.
+export function generateDefaultFontFacesCSS(font: FontName): string {
+    const cached = cache.get(font);
+    if (cached !== undefined) {
+        return cached;
+    }
 
-const ibmPlexSerif = IBM_Plex_Serif({
-    weight: ['400', '500', '600', '700'],
-    variable: '--font-content',
-    preload: false,
-    display: 'swap',
-    fallback: ['serif'],
-});
+    const family = fontFaces[font];
+    if (!family) {
+        throw new Error(`Missing generated font faces for ${font}`);
+    }
 
-const lato = Lato({
-    weight: ['400', '700', '900'],
-    variable: '--font-content',
-    preload: false,
-    display: 'swap',
-    fallback: ['system-ui', 'arial'],
-});
+    const css = [
+        ...family.variants.flatMap((variant) =>
+            variant.files.map((file, subset) =>
+                generateFace(family, variant.weight, variant.style, file, family.subsets[subset])
+            )
+        ),
+        generateFallbackFace(family),
+        `:root { ${family.variable}: ${family.fontFamilyValue}; }`,
+    ]
+        .filter(Boolean)
+        .join('\n');
 
-const merriweather = Merriweather({
-    weight: ['400', '700', '900'],
-    variable: '--font-content',
-    preload: false,
-    display: 'swap',
-    fallback: ['serif'],
-});
+    cache.set(font, css);
+    return css;
+}
 
-const notoSans = Noto_Sans({
-    weight: ['400', '500', '600', '700'],
-    variable: '--font-content',
-    preload: false,
-    display: 'swap',
-    fallback: ['system-ui', 'arial'],
-});
+export function generateEmojiFontFacesCSS(): string {
+    return generateDefaultFontFacesCSS(EMOJI_FONT);
+}
 
-const openSans = Open_Sans({
-    weight: ['400', '500', '600', '700'],
-    variable: '--font-content',
-    preload: false,
-    display: 'swap',
-    fallback: ['system-ui', 'arial'],
-});
+function generateFace(
+    family: FontFamilyData,
+    weight: string,
+    style: string,
+    file: string,
+    unicodeRange: string | undefined
+): string {
+    return `@font-face {
+    font-family: "${family.family}";
+    font-style: ${style};
+    font-weight: ${weight};
+    font-display: swap;${family.ascentOverride ? `\n    ascent-override: ${family.ascentOverride};` : ''}
+    src: url(${getAssetURL(`fonts/${file}`)}) format("woff2");${
+        unicodeRange ? `\n    unicode-range: ${unicodeRange};` : ''
+    }
+}`;
+}
 
-const overpass = Overpass({
-    weight: ['400', '500', '600', '700'],
-    variable: '--font-content',
-    preload: false,
-    display: 'swap',
-    fallback: ['system-ui', 'arial'],
-});
+// A `local()` face with the real font's metrics: the page keeps the system font's glyphs but the
+// picked font's proportions, so swapping it in barely shifts the layout.
+function generateFallbackFace(family: FontFamilyData): string {
+    const fallback = family.fallbackFace;
+    if (!fallback) {
+        return '';
+    }
 
-const poppins = Poppins({
-    weight: ['400', '500', '600', '700'],
-    variable: '--font-content',
-    preload: false,
-    display: 'swap',
-    fallback: ['system-ui', 'arial'],
-});
-
-const raleway = Raleway({
-    weight: ['400', '500', '600', '700'],
-    variable: '--font-content',
-    preload: false,
-    display: 'swap',
-    fallback: ['system-ui', 'arial'],
-});
-
-const roboto = Roboto({
-    weight: ['400', '500', '600', '700'],
-    variable: '--font-content',
-    preload: false,
-    display: 'swap',
-    fallback: ['system-ui', 'arial'],
-});
-
-const robotoSlab = Roboto_Slab({
-    weight: ['400', '500', '600', '700'],
-    variable: '--font-content',
-    preload: false,
-    display: 'swap',
-    fallback: ['system-ui', 'arial'],
-});
-
-const sourceSansPro = Source_Sans_3({
-    weight: ['400', '500', '600', '700'],
-    variable: '--font-content',
-    preload: false,
-    display: 'swap',
-    fallback: ['system-ui', 'arial'],
-});
-
-const ubuntu = Ubuntu({
-    weight: ['400', '500', '700'],
-    variable: '--font-content',
-    preload: false,
-    display: 'swap',
-    fallback: ['system-ui', 'arial'],
-});
-
-const abcFavorit = localFont({
-    variable: '--font-content',
-    preload: false,
-    display: 'swap',
-    fallback: ['system-ui', 'arial'],
-    src: [
-        {
-            path: './ABCFavorit/ABCFavorit-Variable.woff2',
-            weight: '400 700',
-            style: 'normal',
-        },
-        {
-            path: './ABCFavorit/ABCFavorit-BoldItalic.woff2',
-            weight: '700',
-            style: 'italic',
-        },
-        {
-            path: './ABCFavorit/ABCFavorit-MediumItalic.woff2',
-            weight: '500',
-            style: 'italic',
-        },
-        {
-            path: './ABCFavorit/ABCFavorit-RegularItalic.woff2',
-            weight: '400',
-            style: 'italic',
-        },
-    ],
-    declarations: [{ prop: 'ascent-override', value: '100%' }],
-});
-
-const ibmPlexMono = IBM_Plex_Mono({
-    weight: ['400', '500', '600', '700'],
-    variable: '--font-mono',
-    style: 'normal',
-    display: 'swap',
-    preload: false,
-    fallback: ['monospace'],
-    adjustFontFallback: false,
-});
-
-const dmMono = DM_Mono({
-    weight: ['400', '500'],
-    variable: '--font-mono',
-    style: 'normal',
-    display: 'swap',
-    preload: false,
-    fallback: ['monospace'],
-    adjustFontFallback: false,
-});
-
-const firaCode = Fira_Code({
-    weight: ['400', '500', '600', '700'],
-    variable: '--font-mono',
-    style: 'normal',
-    display: 'swap',
-    preload: false,
-    fallback: ['monospace'],
-    adjustFontFallback: false,
-});
-
-const inconsolata = Inconsolata({
-    weight: ['400', '500', '600', '700'],
-    variable: '--font-mono',
-    style: 'normal',
-    display: 'swap',
-    preload: false,
-    fallback: ['monospace'],
-    adjustFontFallback: false,
-});
-
-const jetBrainsMono = JetBrains_Mono({
-    weight: ['400', '500', '600', '700'],
-    variable: '--font-mono',
-    style: 'normal',
-    display: 'swap',
-    preload: false,
-    fallback: ['monospace'],
-    adjustFontFallback: false,
-});
-
-const robotoMono = Roboto_Mono({
-    weight: ['400', '500', '600', '700'],
-    variable: '--font-mono',
-    style: 'normal',
-    display: 'swap',
-    preload: false,
-    fallback: ['monospace'],
-    adjustFontFallback: false,
-});
-
-const sourceCodePro = Source_Code_Pro({
-    weight: ['400', '500', '600', '700'],
-    variable: '--font-mono',
-    style: 'normal',
-    display: 'swap',
-    preload: false,
-    fallback: ['monospace'],
-    adjustFontFallback: false,
-});
-
-const spaceMono = Space_Mono({
-    weight: ['400', '700'],
-    variable: '--font-mono',
-    style: 'normal',
-    display: 'swap',
-    preload: false,
-    fallback: ['monospace'],
-    adjustFontFallback: false,
-});
-
-/**
- * Font definitions.
- */
-export const fonts: {
-    [fontName in CustomizationDefaultFont | CustomizationDefaultMonospaceFont]: {
-        variable: string;
-    };
-} = {
-    [CustomizationDefaultFont.Inter]: inter,
-    [CustomizationDefaultFont.FiraSans]: firaSans,
-    [CustomizationDefaultFont.IBMPlexSerif]: ibmPlexSerif,
-    [CustomizationDefaultFont.Lato]: lato,
-    [CustomizationDefaultFont.Merriweather]: merriweather,
-    [CustomizationDefaultFont.NotoSans]: notoSans,
-    [CustomizationDefaultFont.OpenSans]: openSans,
-    [CustomizationDefaultFont.Overpass]: overpass,
-    [CustomizationDefaultFont.Poppins]: poppins,
-    [CustomizationDefaultFont.Raleway]: raleway,
-    [CustomizationDefaultFont.Roboto]: roboto,
-    [CustomizationDefaultFont.RobotoSlab]: robotoSlab,
-    [CustomizationDefaultFont.SourceSansPro]: sourceSansPro,
-    [CustomizationDefaultFont.Ubuntu]: ubuntu,
-    [CustomizationDefaultFont.ABCFavorit]: abcFavorit,
-    [CustomizationDefaultMonospaceFont.IBMPlexMono]: ibmPlexMono,
-    [CustomizationDefaultMonospaceFont.DMMono]: dmMono,
-    [CustomizationDefaultMonospaceFont.FiraCode]: firaCode,
-    [CustomizationDefaultMonospaceFont.Inconsolata]: inconsolata,
-    [CustomizationDefaultMonospaceFont.JetBrainsMono]: jetBrainsMono,
-    [CustomizationDefaultMonospaceFont.RobotoMono]: robotoMono,
-    [CustomizationDefaultMonospaceFont.SourceCodePro]: sourceCodePro,
-    [CustomizationDefaultMonospaceFont.SpaceMono]: spaceMono,
-};
+    return `@font-face {
+    font-family: "${fallback.family}";
+    src: local("${fallback.local}");
+    ascent-override: ${fallback.ascentOverride};
+    descent-override: ${fallback.descentOverride};
+    line-gap-override: ${fallback.lineGapOverride};
+    size-adjust: ${fallback.sizeAdjust};
+}`;
+}

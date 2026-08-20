@@ -1,17 +1,19 @@
-import { LinkBox, LinkOverlay } from '@/components/primitives';
-import { Image } from '@/components/utils';
-import { type ResolvedContentRef, resolveContentRefInDocument } from '@/lib/references';
-import { tcls } from '@/lib/tailwind';
 import {
     CardsImageObjectFit,
     type ContentRef,
     type DocumentTableViewCards,
     SiteInsightsLinkPosition,
 } from '@gitbook/api';
+
+import { isRecordColumnEmpty } from './isRecordColumnEmpty';
 import { RecordColumnValue } from './RecordColumnValue';
-import type { TableRecordKV, TableViewProps } from './Table';
 import { RecordCardStyles } from './styles';
+import type { TableRecordKV, TableViewProps } from './Table';
 import { getRecordCardCovers } from './utils';
+import { LinkBox, LinkOverlay } from '@/components/primitives';
+import { Image } from '@/components/utils';
+import { type ResolvedContentRef, resolveContentRefInDocument } from '@/lib/references';
+import { tcls } from '@/lib/tailwind';
 
 export async function RecordCard(
     props: TableViewProps<DocumentTableViewCards> & {
@@ -19,6 +21,12 @@ export async function RecordCard(
     }
 ) {
     const { view, record, context, block, isOffscreen, document } = props;
+
+    // A card paints its own opaque background, so a background page cover is never behind its
+    // content. Cover-aware contrast text must not apply inside it: it leaves the glyphs transparent
+    // and relies on a viewport-fixed background clipped to text, which Firefox and iOS Safari fail
+    // to paint through the card's clipped stacking context — the text disappears entirely.
+    const cardProps = { ...props, context: { ...context, isPageBody: false } };
 
     const { dark, light } = getRecordCardCovers(record[1], view);
     const targetRef = view.targetDefinition
@@ -146,6 +154,12 @@ export async function RecordCard(
                         return null;
                     }
 
+                    // A field can hold nothing at all (an `if` block that didn't match, an
+                    // empty value); rendering it would leave a gap and a dangling title.
+                    if (isRecordColumnEmpty(block, record[1], column)) {
+                        return null;
+                    }
+
                     if (!view.hideColumnTitle && definition.title) {
                         const ariaLabelledBy = `${block.key}-${column}-title`;
                         return (
@@ -154,7 +168,7 @@ export async function RecordCard(
                                     {definition.title}
                                 </div>
                                 <RecordColumnValue
-                                    {...props}
+                                    {...cardProps}
                                     column={column}
                                     ariaLabelledBy={ariaLabelledBy}
                                 />
@@ -162,7 +176,7 @@ export async function RecordCard(
                         );
                     }
 
-                    return <RecordColumnValue key={column} {...props} column={column} />;
+                    return <RecordColumnValue key={column} {...cardProps} column={column} />;
                 })}
             </div>
         </div>

@@ -1,5 +1,6 @@
 export * from './schemas';
 export * from './formatOpenAPIMethod';
+export { getOperationTitle } from './utils';
 export * from './OpenAPIMethodBadge';
 export * from './OpenAPIOperation';
 export * from './OpenAPIWebhook';
@@ -10,4 +11,4 @@ export * from './resolveOpenAPIWebhook';
 export type { OpenAPIOperationData, OpenAPIWebhookData } from './types';
 export type { OpenAPIContextInput } from './context';
 export { checkIsValidLocale } from './translations';
-export { extractOrigin } from './util/server';
+export { extractOrigin, getAllServerOrigins } from './util/server';

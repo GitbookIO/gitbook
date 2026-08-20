@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'bun:test';
+
 import { convertOpenAPIV2ToOpenAPIV3 } from './v2';
 
 const specV2 = await Bun.file(new URL('./fixtures/spec-v2.json', import.meta.url)).text();

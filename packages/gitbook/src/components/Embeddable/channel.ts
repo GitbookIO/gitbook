@@ -3,9 +3,9 @@
 import { createChannel } from 'bidc';
 import memoize from 'memoizee';
 
-// biome-ignore lint/suspicious/noExplicitAny: expected
+// oxlint-disable-next-line typescript/no-explicit-any
 export function log(...data: any[]) {
-    // biome-ignore lint/suspicious/noConsole: expected
+    // oxlint-disable-next-line no-console
     console.log(...data);
 }
 

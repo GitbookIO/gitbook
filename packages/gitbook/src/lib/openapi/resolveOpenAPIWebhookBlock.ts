@@ -1,11 +1,12 @@
-import { fetchOpenAPIFilesystem } from '@/lib/openapi/fetch';
 import { OpenAPIParseError } from '@gitbook/openapi-parser';
 import { type OpenAPIWebhookData, resolveOpenAPIWebhook } from '@gitbook/react-openapi';
+
 import type {
     OpenAPIWebhookBlock,
     ResolveOpenAPIBlockArgs,
     ResolveOpenAPIBlockResult,
 } from './types';
+import { fetchOpenAPIFilesystem } from '@/lib/openapi/fetch';
 
 type ResolveOpenAPIWebhookBlockResult = ResolveOpenAPIBlockResult<OpenAPIWebhookData>;
 

@@ -1,10 +1,9 @@
 'use client';
 
-import { type ClassValue, tcls } from '@/lib/tailwind';
-
 import { PageIcon } from '../PageIcon';
 import { StyledLink } from '../primitives';
 import { DropdownMenu, DropdownMenuItem } from '../primitives/DropdownMenu';
+import { type ClassValue, tcls } from '@/lib/tailwind';
 
 export type BreadcrumbSibling = {
     id: string;
@@ -47,7 +46,10 @@ export function BreadcrumbItemDropdown(props: {
     const content = (
         <>
             {emoji || icon ? (
-                <PageIcon page={{ emoji, icon }} style="mr-1 inline size-[1em] shrink-0" />
+                <PageIcon
+                    page={{ emoji, icon }}
+                    style="mb-0.5 mr-1 inline-block size-[1em] shrink-0"
+                />
             ) : null}
             {label}
         </>
@@ -58,7 +60,7 @@ export function BreadcrumbItemDropdown(props: {
     // normalize "" to "/" the way the table of contents does.
     const trigger =
         href !== undefined ? (
-            <StyledLink href={href || '/'} className={tcls(linkClassName)}>
+            <StyledLink href={href || '/'} role="link" className={tcls(linkClassName)}>
                 {content}
             </StyledLink>
         ) : (
@@ -76,6 +78,7 @@ export function BreadcrumbItemDropdown(props: {
         <DropdownMenu
             openOnHover
             openDelay={200}
+            nativeButton={false}
             button={trigger}
             className="max-h-72 overflow-auto text-sm"
         >

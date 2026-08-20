@@ -1,28 +1,29 @@
-import type { GitBookSiteContext } from '@/lib/context';
-import { CustomizationHeaderPreset, CustomizationSearchStyle } from '@gitbook/api';
 import type React from 'react';
 
+import { CustomizationHeaderPreset, CustomizationSearchStyle } from '@gitbook/api';
+
+import { AdaptiveVisitorContextProvider } from '../Adaptive';
+import { AIChatProvider } from '../AI';
+import type { RenderAIMessageOptions } from '../AI';
+import { AIChat, AskAITextSelection } from '../AIChat';
+import { Announcement } from '../Announcement';
+import { SpacesDropdown, TranslationsDropdown } from '../Header/SpacesDropdown';
+import { CurrentContentProvider } from '../hooks';
+import { InsightsProvider, VisitorProvider } from '../Insights';
+import { CONTAINER_STYLE } from '../layout';
+import { NavigationLoader } from '../primitives/NavigationLoader';
+import { SearchContainer, getSearchBaseProps } from '../Search';
+import { SiteSectionList, encodeClientSiteSections } from '../SiteSections';
+import { categorizeVariants } from './categorizeVariants';
+import { SpaceLayoutContextProvider } from './SpaceLayoutContext';
 import { Footer } from '@/components/Footer';
 import { Header, HeaderLogo } from '@/components/Header';
 import { TableOfContents } from '@/components/TableOfContents';
 import { isAIChatEnabled } from '@/components/utils/isAIChatEnabled';
 import type { VisitorAuthClaims } from '@/lib/adaptive';
+import type { GitBookSiteContext } from '@/lib/context';
 import { GITBOOK_APP_URL } from '@/lib/env';
 import { tcls } from '@/lib/tailwind';
-import { AIChatProvider } from '../AI';
-import type { RenderAIMessageOptions } from '../AI';
-import { AIChat, AskAITextSelection } from '../AIChat';
-import { AdaptiveVisitorContextProvider } from '../Adaptive';
-import { Announcement } from '../Announcement';
-import { SpacesDropdown, TranslationsDropdown } from '../Header/SpacesDropdown';
-import { InsightsProvider, VisitorProvider } from '../Insights';
-import { SearchContainer, getSearchBaseProps } from '../Search';
-import { SiteSectionList, encodeClientSiteSections } from '../SiteSections';
-import { CurrentContentProvider } from '../hooks';
-import { CONTAINER_STYLE } from '../layout';
-import { NavigationLoader } from '../primitives/NavigationLoader';
-import { SpaceLayoutContextProvider } from './SpaceLayoutContext';
-import { categorizeVariants } from './categorizeVariants';
 
 type SpaceLayoutProps = {
     context: GitBookSiteContext;
@@ -88,7 +89,10 @@ export function SpaceLayoutServerContext(props: SpaceLayoutProps) {
                         visitorCookieTrackingEnabled={customization.insights?.trackingCookie}
                     >
                         <InsightsProvider enabled={withTracking} eventUrl={eventUrl.toString()}>
-                            <AIChatProvider renderMessageOptions={aiChatRenderMessageOptions}>
+                            <AIChatProvider
+                                renderMessageOptions={aiChatRenderMessageOptions}
+                                withPageFeedback={customization.feedback.enabled}
+                            >
                                 {children}
                             </AIChatProvider>
                         </InsightsProvider>
@@ -133,7 +137,7 @@ export function SpaceLayout(props: SpaceLayoutProps) {
             ) : null}
 
             {/* Chat panel shifts content left when open */}
-            <div className="motion-safe:transition-all motion-safe:duration-300 lg:chat-open:mr-(--ai-chat-width)">
+            <div className="lg:chat-open:mr-(--ai-chat-width) motion-safe:transition-all motion-safe:duration-300">
                 <div
                     className={tcls(
                         'flex',

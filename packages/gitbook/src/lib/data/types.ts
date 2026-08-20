@@ -32,9 +32,7 @@ export interface GitBookDataFetcher {
     /**
      * Create a data fetcher authenticated with a specific token.
      */
-    withToken(input: {
-        apiToken: string;
-    }): GitBookDataFetcher;
+    withToken(input: { apiToken: string }): GitBookDataFetcher;
 
     /**
      * Get a user by its ID.
@@ -53,9 +51,10 @@ export interface GitBookDataFetcher {
     /**
      * Get a space by its ID.
      */
-    getSpace(params: { spaceId: string; shareKey: string | undefined }): Promise<
-        DataFetcherResponse<api.Space>
-    >;
+    getSpace(params: {
+        spaceId: string;
+        shareKey: string | undefined;
+    }): Promise<DataFetcherResponse<api.Space>>;
 
     /**
      * Get a change request by its space ID and change request ID.
@@ -130,9 +129,10 @@ export interface GitBookDataFetcher {
     /**
      * Get a document by its space ID and document ID.
      */
-    getDocument(params: { spaceId: string; documentId: string }): Promise<
-        DataFetcherResponse<api.JSONDocument>
-    >;
+    getDocument(params: {
+        spaceId: string;
+        documentId: string;
+    }): Promise<DataFetcherResponse<api.JSONDocument>>;
 
     /**
      * Get a computed document by its space ID and computed source.
@@ -165,9 +165,10 @@ export interface GitBookDataFetcher {
     /**
      * Get an embed by its URL.
      */
-    getEmbedByUrl(params: { url: string; spaceId: string }): Promise<
-        DataFetcherResponse<api.Embed>
-    >;
+    getEmbedByUrl(params: {
+        url: string;
+        spaceId: string;
+    }): Promise<DataFetcherResponse<api.Embed>>;
 
     /**
      * Search content in a site.
@@ -178,11 +179,16 @@ export interface GitBookDataFetcher {
         query: string;
         scope:
             | { mode: 'all' }
-            | { mode: 'current'; siteSpaceId: string }
+            | {
+                  mode: 'current';
+                  siteSpaceId: string;
+                  /** Restrict the search to the current site space alone, or to the other site spaces in the scope. */
+                  restrictTo?: 'currentSiteSpace' | 'otherSiteSpaces';
+              }
             | { mode: 'specific'; siteSpaceIds: string[] };
         /** Cache bust to ensure the search results are fresh when the space is updated. */
         cacheBust?: string;
-    }): Promise<DataFetcherResponse<Array<api.SearchSpaceResult | api.SearchRecordResult>>>;
+    }): Promise<DataFetcherResponse<(api.SearchSpaceResult | api.SearchRecordResult)[]>>;
 
     /**
      * Render an integration UI.

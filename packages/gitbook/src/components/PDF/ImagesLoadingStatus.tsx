@@ -1,17 +1,16 @@
 'use client';
 
-import { tString } from '@/intl/translate';
-import type { TranslationLanguage } from '@/intl/translations';
 import assertNever from 'assert-never';
 import * as React from 'react';
 
-export function ImagesLoadingStatus(props: {
-    language: TranslationLanguage;
-}) {
+import { tString } from '@/intl/translate';
+import type { TranslationLanguage } from '@/intl/translations';
+
+export function ImagesLoadingStatus(props: { language: TranslationLanguage }) {
     const { language } = props;
     const state = useImagesLoadingState();
     return (
-        <p className="text-right text-slate-500 text-xs" data-visual-test="removed">
+        <p className="text-right text-xs text-slate-500" data-visual-test="removed">
             {(() => {
                 switch (state.status) {
                     case 'pending':

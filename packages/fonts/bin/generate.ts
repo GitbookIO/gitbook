@@ -1,7 +1,6 @@
+import { APIv2 } from 'google-font-metadata';
 import fs from 'node:fs/promises';
 import path from 'node:path';
-
-import { APIv2 } from 'google-font-metadata';
 
 import { CustomizationDefaultFont } from '@gitbook/api';
 

@@ -1,10 +1,11 @@
+import QuickLRU from 'quick-lru';
+
 import { CustomizationDefaultFont } from '@gitbook/api';
 import { type FontWeight, getDefaultFont } from '@gitbook/fonts';
 
 import { getFontSourcesToPreload } from '@/fonts/custom';
 import type { GitBookSiteContext } from '@/lib/context';
 import { filterOutNullable } from '@/lib/typescript';
-import QuickLRU from 'quick-lru';
 
 type ComputeFontsInput = {
     regularText: string;

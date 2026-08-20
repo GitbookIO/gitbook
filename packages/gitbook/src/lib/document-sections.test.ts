@@ -1,14 +1,20 @@
 import { describe, expect, it, mock } from 'bun:test';
-import type { GitBookAnyContext } from '@/lib/context';
-import type { JSONDocument } from '@gitbook/api';
 import { type ReactNode, isValidElement } from 'react';
+
+import type { JSONDocument } from '@gitbook/api';
+
+import type { GitBookAnyContext } from '@/lib/context';
 
 mock.module('./openapi/resolveOpenAPIOperationBlock', () => ({
     resolveOpenAPIOperationBlock: async () => ({ data: null }),
 }));
 
 mock.module('./openapi/resolveOpenAPISchemasBlock', () => ({
-    resolveOpenAPISchemasBlock: async () => ({ data: null }),
+    resolveOpenAPISchemasBlock: async ({ block }: { block: { data: { schemas?: string[] } } }) => ({
+        data: {
+            schemas: (block.data.schemas ?? []).map((name) => ({ name, schema: {} })),
+        },
+    }),
 }));
 
 const { getDocumentSections } = await import('./document-sections');
@@ -223,6 +229,63 @@ describe('getDocumentSections', () => {
                 title: 'Heading 2 in update',
                 tags: ['improvements'],
             },
+        ]);
+    });
+
+    it('extracts a single-schema openapi-schemas block as one section', async () => {
+        const document: JSONDocument = {
+            object: 'document',
+            data: { schemaVersion: 2 },
+            nodes: [
+                {
+                    object: 'block',
+                    type: 'openapi-schemas',
+                    data: { schemas: ['User'], grouped: false },
+                    meta: { id: 'models-block' },
+                    isVoid: false,
+                    nodes: [],
+                } as unknown as JSONDocument['nodes'][number],
+            ],
+        };
+
+        const sections = await getDocumentSections(context, document);
+
+        expect(
+            sections.map((section) => ({
+                id: section.id,
+                depth: section.depth,
+                title: reactNodeToText(section.title),
+            }))
+        ).toEqual([{ id: 'models-block', depth: 1, title: 'The User object' }]);
+    });
+
+    it('extracts one section per model for grouped/multi-schema openapi-schemas blocks', async () => {
+        const document: JSONDocument = {
+            object: 'document',
+            data: { schemaVersion: 2 },
+            nodes: [
+                {
+                    object: 'block',
+                    type: 'openapi-schemas',
+                    data: { schemas: ['User', 'Pet Store'], grouped: true },
+                    meta: { id: 'models-block' },
+                    isVoid: false,
+                    nodes: [],
+                } as unknown as JSONDocument['nodes'][number],
+            ],
+        };
+
+        const sections = await getDocumentSections(context, document);
+
+        expect(
+            sections.map((section) => ({
+                id: section.id,
+                depth: section.depth,
+                title: reactNodeToText(section.title),
+            }))
+        ).toEqual([
+            { id: 'user', depth: 1, title: 'User' },
+            { id: 'pet-store', depth: 1, title: 'Pet Store' },
         ]);
     });
 });

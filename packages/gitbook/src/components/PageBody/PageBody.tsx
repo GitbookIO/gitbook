@@ -1,8 +1,20 @@
-import type { GitBookSiteContext } from '@/lib/context';
 import type { JSONDocument, RevisionPageDocument, SiteInsightsDisplayContext } from '@gitbook/api';
 
+import { DocumentView, DocumentViewSkeleton } from '../DocumentView';
+import { CurrentPageProvider } from '../hooks/useCurrentPage';
+import { TrackPageViewEvent } from '../Insights';
+import { CONTENT_STYLE } from '../layout';
+import { PageFeedbackForm } from '../PageFeedback';
+import { DateRelative, SuspenseLoadedHint } from '../primitives';
+import OptionalSuspense from './OptionalSuspense';
+import { PageBodyBlankslate } from './PageBodyBlankslate';
+import { PageCover } from './PageCover';
+import { PageFooterNavigation } from './PageFooterNavigation';
+import { PageHeader } from './PageHeader';
+import { PreservePageLayout } from './PreservePageLayout';
 import { getSpaceLanguage } from '@/intl/server';
 import { t } from '@/intl/translate';
+import type { GitBookSiteContext } from '@/lib/context';
 import {
     hasAPIBlock,
     hasFullWidthBlock,
@@ -13,18 +25,6 @@ import {
 import { getLLMsTxtURL, getPageMarkdownURL } from '@/lib/llms-directive';
 import type { AncestorRevisionPage } from '@/lib/pages';
 import { tcls } from '@/lib/tailwind';
-import { DocumentView, DocumentViewSkeleton } from '../DocumentView';
-import { TrackPageViewEvent } from '../Insights';
-import { PageFeedbackForm } from '../PageFeedback';
-import { CurrentPageProvider } from '../hooks/useCurrentPage';
-import { CONTENT_STYLE } from '../layout';
-import { DateRelative, SuspenseLoadedHint } from '../primitives';
-import OptionalSuspense from './OptionalSuspense';
-import { PageBodyBlankslate } from './PageBodyBlankslate';
-import { PageCover } from './PageCover';
-import { PageFooterNavigation } from './PageFooterNavigation';
-import { PageHeader } from './PageHeader';
-import { PreservePageLayout } from './PreservePageLayout';
 
 const LINK_PREVIEW_MAX_COUNT = 500;
 
@@ -93,6 +93,9 @@ export async function PageBody(props: {
                     'py-8',
                     'layout-wide:no-sidebar:lg:max-xl:pb-20', // Add padding to prevent overlap of minimised trademark
                     '@container',
+                    // Flex column so the growing content wrapper below fills the page: the footer
+                    // navigation settles at the bottom, and a full-page cover shows behind the content.
+                    'flex flex-col',
                     CONTENT_STYLE,
                     pageHasToc ? 'page-has-toc' : 'page-no-toc',
                     wideLayout ? 'layout-wide' : 'layout-default'
@@ -104,37 +107,44 @@ export async function PageBody(props: {
                     <PageCover as="hero" page={page} cover={page.cover} context={context} />
                 ) : null}
 
-                <PageHeader
-                    context={context}
-                    page={page}
-                    ancestors={ancestors}
-                    withRSSFeed={contentHasUpdates}
-                    hasAPIBlocks={hasAPIBlocks}
-                />
-                {document && !isNodeEmpty(document) ? (
-                    <OptionalSuspense
-                        staticRoute={staticRoute}
-                        fallback={<DocumentViewSkeleton document={document} blockStyle="" />}
-                    >
-                        <SuspenseLoadedHint />
-                        <div className="contents" data-content-ref-root="">
-                            <DocumentView
-                                document={document}
-                                style="flex flex-col [&>*+*]:mt-5"
-                                context={{
-                                    mode: 'default',
-                                    contentContext: {
-                                        ...context,
-                                        page,
-                                    },
-                                    withLinkPreviews,
-                                }}
-                            />
-                        </div>
-                    </OptionalSuspense>
-                ) : (
-                    <PageBodyBlankslate page={page} context={context} />
-                )}
+                {/* Grows to fill the page (so the footer navigation below settles at the bottom) and
+                    stays a plain block — this gives the floated, sticky API page-actions a tall
+                    containing block to travel within while letting the breadcrumbs wrap around them
+                    (see PageHeader). */}
+                <div className="min-w-0 grow">
+                    <PageHeader
+                        context={context}
+                        page={page}
+                        ancestors={ancestors}
+                        withRSSFeed={contentHasUpdates}
+                        hasAPIBlocks={hasAPIBlocks}
+                    />
+                    {document && !isNodeEmpty(document) ? (
+                        <OptionalSuspense
+                            staticRoute={staticRoute}
+                            fallback={<DocumentViewSkeleton document={document} blockStyle="" />}
+                        >
+                            <SuspenseLoadedHint />
+                            <div className="contents" data-content-ref-root="">
+                                <DocumentView
+                                    document={document}
+                                    style="flex flex-col [&>*+*]:mt-5"
+                                    context={{
+                                        mode: 'default',
+                                        contentContext: {
+                                            ...context,
+                                            page,
+                                        },
+                                        withLinkPreviews,
+                                        isPageBody: true,
+                                    }}
+                                />
+                            </div>
+                        </OptionalSuspense>
+                    ) : (
+                        <PageBodyBlankslate page={page} context={context} />
+                    )}
+                </div>
 
                 {page.layout.pagination && customization.pagination.enabled ? (
                     <PageFooterNavigation context={context} page={page} />
@@ -148,7 +158,7 @@ export async function PageBody(props: {
                         )}
                     >
                         {updatedAt ? (
-                            <p className="mr-auto text-sm ">
+                            <p className="mr-auto text-sm">
                                 {t(
                                     language,
                                     'page_last_modified',
@@ -176,10 +186,7 @@ export async function PageBody(props: {
     );
 }
 
-function LLMsTxtPageDirective(props: {
-    context: GitBookSiteContext;
-    page: RevisionPageDocument;
-}) {
+function LLMsTxtPageDirective(props: { context: GitBookSiteContext; page: RevisionPageDocument }) {
     const { context, page } = props;
 
     return (

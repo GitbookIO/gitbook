@@ -1,12 +1,14 @@
-import { t, tString, useLanguage } from '@/intl/client';
-import { tcls } from '@/lib/tailwind';
-import { Icon } from '@gitbook/icons';
 import { useEffect, useRef, useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
+
+import { Icon } from '@gitbook/icons';
+
 import { useAIChatController, useAIChatState } from '../AI/useAIChat';
 import { HoverCard, HoverCardRoot, HoverCardTrigger } from '../primitives';
 import { Input } from '../primitives/Input';
 import { AIChatReferenceChips } from './AIChatReferenceChips';
+import { t, tString, useLanguage } from '@/intl/client';
+import { tcls } from '@/lib/tailwind';
 
 export function AIChatInput(props: {
     disabled?: boolean;
@@ -75,9 +77,9 @@ export function AIChatInput(props: {
         },
         {
             enableOnFormTags: true,
-            // Match the logical character so Dvorak ⌘-C (physical "I" key) copies
+            // Match the produced key so Dvorak ⌘-C (physical "I" key) copies
             // instead of focusing the Assistant input. RND-11340.
-            ignoreEventWhen: (e) => e.key.toLowerCase() !== 'i',
+            useKey: true,
         }
     );
 
@@ -122,7 +124,7 @@ export function AIChatInput(props: {
                 />
             }
             trailing={
-                <HoverCardRoot openDelay={500}>
+                <HoverCardRoot>
                     <HoverCard
                         className="max-w-xs bg-tint p-2 text-sm text-tint"
                         arrow={{ className: 'fill-tint-3' }}
@@ -148,10 +150,10 @@ export function AIChatInput(props: {
                             <p>{t(language, 'ai_chat_context_disclaimer')}</p>
                         </div>
                     </HoverCard>
-                    <HoverCardTrigger>
+                    <HoverCardTrigger openDelay={500}>
                         {/* Negative margin to compensate for Input's padding, so the badge appears flush with the cursor */}
-                        <div className="-ml-1 flex cursor-help items-center gap-1 circular-corners:rounded-2xl rounded-corners:rounded-md px-2.5 py-1.5 text-tint/7 text-xs transition-all hover:bg-tint">
-                            <span className="-ml-1 circular-corners:rounded-2xl rounded-corners:rounded-sm bg-tint-11/7 px-1 py-0.5 font-mono font-semibold text-[0.65rem] text-contrast-tint-11 leading-none">
+                        <div className="-ml-1 flex cursor-help items-center gap-1 px-2.5 py-1.5 text-xs text-tint/7 transition-all hover:bg-tint rounded-corners:rounded-md circular-corners:rounded-2xl">
+                            <span className="-ml-1 bg-tint-11/7 px-1 py-0.5 font-mono text-[0.65rem] font-semibold leading-none text-contrast-tint-11 rounded-corners:rounded-sm circular-corners:rounded-2xl">
                                 {t(language, 'ai_chat_context_badge')}
                             </span>{' '}
                             <span className="leading-none">

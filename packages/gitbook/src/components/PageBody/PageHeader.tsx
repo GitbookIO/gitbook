@@ -1,8 +1,5 @@
-import type { GitBookSiteContext } from '@/lib/context';
-import { type AncestorRevisionPage, resolveFirstDocument } from '@/lib/pages';
-import { getLocalizedTitle, getSiteSpaceURL } from '@/lib/sites';
-import { tcls } from '@/lib/tailwind';
-import { getPageRSSURL } from '@/routes/rss';
+import urlJoin from 'url-join';
+
 import {
     CustomizationPageActionType,
     type RevisionPage,
@@ -12,20 +9,25 @@ import {
     SiteVisibility,
 } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
-import urlJoin from 'url-join';
+
 import { SpacesDropdownMenuItems, type VariantSpace } from '../Header/SpacesDropdownMenuItem';
-import { getPDFURLSearchParams } from '../PDF';
+import { CONTENT_STYLE, CONTENT_STYLE_REDUCED } from '../layout';
 import {
     PageActionsDropdown,
     type PageActionsDropdownURLs,
 } from '../PageActions/PageActionsDropdown';
 import { PageAsideToggleButton } from '../PageAside/PageAsideButton';
 import { PageIcon } from '../PageIcon';
+import { getPDFURLSearchParams } from '../PDF';
 import { findBestTargetURL } from '../SiteSections/encodeClientSiteSections';
 import { categorizeVariants } from '../SpaceLayout/categorizeVariants';
-import { CONTENT_STYLE, CONTENT_STYLE_REDUCED } from '../layout';
 import { BreadcrumbItemDropdown, type BreadcrumbSibling } from './BreadcrumbItemDropdown';
 import { PageTags } from './PageTags';
+import type { GitBookSiteContext } from '@/lib/context';
+import { type AncestorRevisionPage, resolveFirstDocument } from '@/lib/pages';
+import { getLocalizedTitle, getSiteSpaceURL } from '@/lib/sites';
+import { tcls } from '@/lib/tailwind';
+import { getPageRSSURL } from '@/routes/rss';
 
 export async function PageHeader(props: {
     context: GitBookSiteContext;
@@ -148,11 +150,14 @@ export async function PageHeader(props: {
             className={tcls(
                 'float-right ml-4 flex gap-2',
                 showBreadcrumbs ? '-mb-1 -mt-1.5' : '-mt-3 xs:mt-2',
-                // On desktop API pages (where this <div> is rendered as a sibling of <header>, see
-                // below) keep the actions pinned below the site header while scrolling long
-                // operations. The offset tracks the header height (banner, cover…) via the same
-                // --toc-top-offset the outline and code samples use. Hidden while the outline drawer
-                // is open (drawer widths only) so it doesn't overlap the sheet.
+                // On desktop API pages these actions are pulled out of <header> (rendered as its
+                // preceding sibling, see below) so their sticky containing block is the tall,
+                // growing content wrapper in <main> — a plain block — rather than the short header.
+                // There they keep the base `float-right`, so the breadcrumbs wrap around them at any
+                // width, while pinning below the site header when scrolling long operations. The
+                // offset tracks the header height (banner, cover…) via the same --toc-top-offset the
+                // outline and code samples use. Hidden while the outline drawer is open (drawer
+                // widths only) so it doesn't overlap the sheet.
                 hasAPIBlocks && [
                     'page-api-block:lg:sticky',
                     'page-api-block:lg:top-[calc(var(--toc-top-offset,4rem)+1rem)]',
@@ -185,7 +190,11 @@ export async function PageHeader(props: {
                 // content spans the full width with no navigation column, so the crumbs sit stranded.
                 <nav
                     aria-label="Breadcrumb"
-                    className="layout-wide:page-no-toc:hidden text-tint text-xs leading-relaxed"
+                    // A background cover starts at the top of the page body, so the header always
+                    // overlaps it: mark it here so it is never briefly unstyled before hydration.
+                    data-cover-aware-text
+                    data-over-cover
+                    className="page-cover-background:text-contrast-cover flow-root text-xs leading-relaxed text-tint layout-wide:page-no-toc:hidden page-cover-background:opacity-9"
                 >
                     <ol className="inline">
                         {contextCrumbs.map((crumb, index) => (
@@ -226,6 +235,8 @@ export async function PageHeader(props: {
             <PageTags page={page} revision={revision} />
             {page.layout.title ? (
                 <h1
+                    data-cover-aware-text
+                    data-over-cover
                     className={tcls(
                         'text-2xl',
                         '@xs:text-3xl',
@@ -238,15 +249,26 @@ export async function PageHeader(props: {
                         'grow',
                         'text-pretty',
                         'clear-right',
-                        'xs:clear-none'
+                        'xs:clear-none',
+                        'page-cover-background:text-contrast-cover'
                     )}
                 >
-                    <PageIcon page={page} style={['text-tint-subtle ', 'shrink-0']} />
+                    <PageIcon page={page} style={['text-tint-subtle', 'shrink-0']} />
                     {page.title}
                 </h1>
             ) : null}
             {page.description && page.layout.description ? (
-                <p className={tcls(CONTENT_STYLE_REDUCED, 'text-lg', 'text-tint', 'clear-both')}>
+                <p
+                    data-cover-aware-text
+                    data-over-cover
+                    className={tcls(
+                        CONTENT_STYLE_REDUCED,
+                        'text-lg',
+                        'page-cover-background:text-contrast-cover',
+                        'text-tint contrast-more:text-tint-strong',
+                        'clear-both'
+                    )}
+                >
                     {page.description}
                 </p>
             ) : null}
@@ -332,7 +354,7 @@ type SectionNode = SiteSection | SiteSectionGroup;
 function findSectionChain(
     list: SectionNode[],
     sectionId: string
-): Array<{ node: SectionNode; siblings: SectionNode[] }> {
+): { node: SectionNode; siblings: SectionNode[] }[] {
     for (const item of list) {
         if (item.object === 'site-section') {
             if (item.id === sectionId) {
@@ -499,9 +521,9 @@ function isPageActionEnabled(
 function getPageActionsMCPURL(context: GitBookSiteContext) {
     const useAuthenticatedEndpoint = Boolean(
         context.site.visibility !== SiteVisibility.VisitorAuth &&
-            context.site.adaptiveContent?.enabled &&
-            context.site.urls.login &&
-            context.isLoggedInVisitor
+        context.site.adaptiveContent?.enabled &&
+        context.site.urls.login &&
+        context.isLoggedInVisitor
     );
     const endpoint = useAuthenticatedEndpoint ? '~gitbook/mcp/auth' : '~gitbook/mcp';
 

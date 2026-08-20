@@ -1,4 +1,5 @@
 import type { GitBookIntegrationTool } from '@gitbook/browser-types';
+
 import { integrationsAssistantTools } from '../Integrations';
 import { type AnyAIControlTool, getControlTools } from './controls';
 

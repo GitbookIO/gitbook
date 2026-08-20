@@ -1,18 +1,10 @@
-import {
-    type GitBookDataFetcher,
-    createDataFetcher,
-    getDataOrNull,
-    throwIfDataError,
-} from '@/lib/data';
-import { getLogger } from '@/lib/logger';
-import {
-    findSiteSpaceBy,
-    getFallbackSiteSpacePath,
-    getLocalizedTitle,
-    getSiteStructureSections,
-} from '@/lib/sites';
+import assertNever from 'assert-never';
+import { notFound } from 'next/navigation';
+import { assert } from 'ts-essentials';
+
 import type {
     ChangeRequest,
+    CustomizationDefaultThemeMode,
     PublishedSiteContent,
     Revision,
     RevisionPageDocument,
@@ -26,12 +18,24 @@ import type {
     Space,
     TranslationLanguage,
 } from '@gitbook/api';
-import assertNever from 'assert-never';
-import { notFound } from 'next/navigation';
-import { assert } from 'ts-essentials';
+
 import { GITBOOK_URL } from './env';
 import { type ImageResizer, createImageResizer } from './images';
 import { type GitBookLinker, createLinker, linkerForPublishedURL } from './links';
+import {
+    type GitBookDataFetcher,
+    createDataFetcher,
+    getDataOrNull,
+    throwIfDataError,
+} from '@/lib/data';
+import { getLogger } from '@/lib/logger';
+import {
+    findSiteSpaceBy,
+    getFallbackSiteSpacePath,
+    getLinkerForSiteSpace,
+    getLocalizedTitle,
+    getSiteStructureSections,
+} from '@/lib/sites';
 
 /**
  * Data about the site URL. Provided by the middleware.
@@ -82,6 +86,20 @@ export type SiteURLData = Pick<
      * Defaults to true when undefined.
      */
     displayAgentInstructions?: boolean;
+
+    /**
+     * Theme forced via `?theme=` for the docs embed only. Passed through the route context (rather
+     * than a request header) so the embed routes can honor it while staying statically rendered.
+     * Should never be set for the main site. RND-11571.
+     */
+    embedTheme?: CustomizationDefaultThemeMode;
+
+    /**
+     * Whether the request comes from a detected AI agent. Used to serve an indexable
+     * `X-Robots-Tag` on markdown pages. Only set for markdown routes, to avoid splitting
+     * the static cache of the other routes.
+     */
+    isAiAgent?: boolean;
 };
 
 /**
@@ -182,6 +200,9 @@ export type GitBookSiteContext = GitBookSpaceContext & {
 
     /** Whether to display agent instructions in the markdown output. Defaults to true when undefined. */
     displayAgentInstructions?: boolean;
+
+    /** Whether the request comes from a detected AI agent. Only set for markdown routes. */
+    isAiAgent?: boolean;
 };
 
 /**
@@ -264,6 +285,7 @@ export async function fetchSiteContextByURLLookup(
         noIndexSearch: data.noIndexSearch ?? false,
         isLoggedInVisitor: data.isLoggedInVisitor ?? false,
         displayAgentInstructions: data.displayAgentInstructions,
+        isAiAgent: data.isAiAgent,
     });
 }
 
@@ -286,6 +308,7 @@ export async function fetchSiteContextByIds(
         noIndexSearch: boolean;
         isLoggedInVisitor: boolean;
         displayAgentInstructions?: boolean;
+        isAiAgent?: boolean;
     }
 ): Promise<GitBookSiteContext> {
     const { dataFetcher } = baseContext;
@@ -391,12 +414,14 @@ export async function fetchSiteContextByIds(
             : {}),
     };
 
+    const siteLinker = site.urls.published
+        ? linkerForPublishedURL(spaceContext.linker, site.urls.published)
+        : spaceContext.linker;
+
     return {
         ...spaceContext,
         locale: siteSpace.space.language ?? spaceContext.locale,
-        linker: site.urls.published
-            ? linkerForPublishedURL(spaceContext.linker, site.urls.published)
-            : spaceContext.linker,
+        linker: getLinkerForSiteSpace(siteLinker, siteSpace, spaceContext.revision.pages),
         organizationId: ids.organization,
         site,
         siteSpaces,
@@ -412,6 +437,7 @@ export async function fetchSiteContextByIds(
         noIndexSearch: ids.noIndexSearch,
         isLoggedInVisitor: ids.isLoggedInVisitor,
         displayAgentInstructions: ids.displayAgentInstructions,
+        isAiAgent: ids.isAiAgent,
     };
 }
 
@@ -442,13 +468,15 @@ export async function fetchSiteContextForSiteSpace(
             ? baseContext.structure.structure
             : (found.siteSection?.siteSpaces ?? baseContext.siteSpaces);
 
+    const siteSpaceLinker = baseContext.linker.withOtherSiteSpace({
+        spaceBasePath: getFallbackSiteSpacePath(baseContext, siteSpace),
+    });
+
     return {
         ...baseContext,
         ...spaceContext,
         locale: siteSpace.space.language ?? spaceContext.locale,
-        linker: baseContext.linker.withOtherSiteSpace({
-            spaceBasePath: getFallbackSiteSpacePath(baseContext, siteSpace),
-        }),
+        linker: getLinkerForSiteSpace(siteSpaceLinker, siteSpace, spaceContext.revision.pages),
         siteSpace,
         siteSpaces,
         visibleSiteSpaces: filterHiddenSiteSpaces(siteSpaces),

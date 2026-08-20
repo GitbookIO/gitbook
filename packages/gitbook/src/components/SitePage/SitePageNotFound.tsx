@@ -1,25 +1,28 @@
 'use client';
 
-import { TrackPageViewEvent } from '@/components/Insights';
-import { t, tString, useLanguage } from '@/intl/client';
-import { tcls } from '@/lib/tailwind';
-import { SiteInsightsDisplayContext } from '@gitbook/api';
-import { Icon, type IconName } from '@gitbook/icons';
 import leven from 'leven';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
+
+import { SiteInsightsDisplayContext } from '@gitbook/api';
+import { Icon, type IconName } from '@gitbook/icons';
+
 import { useAI } from '../AI';
+import { CurrentPageProvider, useCurrentContent } from '../hooks';
 import { PreservePageLayout } from '../PageBody/PreservePageLayout';
+import { Button, Emoji, SkeletonList, StyledLink, SuspenseLoadedHint } from '../primitives';
+import { Input } from '../primitives/Input';
 import { useSetSearchState } from '../Search';
+import { fetchSiteIndex } from '../Search/site-index';
 import { SiteAuthLoginButton } from '../SiteAuth/SiteAuthLoginLink';
 import {
     useSiteAdaptiveAuthLoginHref,
     useSiteIndexURL,
     useSpaceBasePath,
 } from '../SpaceLayout/SpaceLayoutContext';
-import { CurrentPageProvider, useCurrentContent } from '../hooks';
-import { Button, Emoji, SkeletonList, StyledLink, SuspenseLoadedHint } from '../primitives';
-import { Input } from '../primitives/Input';
+import { TrackPageViewEvent } from '@/components/Insights';
+import { t, tString, useLanguage } from '@/intl/client';
+import { tcls } from '@/lib/tailwind';
 
 const RELATED_PAGES_COUNT = 5;
 
@@ -193,7 +196,7 @@ function NotFoundSuggestions(props: { suggestions: RelatedPage[] | null }) {
     const hasResults = suggestions != null && suggestions.length > 0;
 
     return loading || hasResults ? (
-        <div className="-mt-4 flex w-full flex-col gap-2 circular-corners:rounded-b-3xl rounded-corners:rounded-b-xl theme-gradient:border border-tint-subtle bg-tint-subtle theme-muted:bg-tint p-8 pt-10">
+        <div className="-mt-4 flex w-full flex-col gap-2 border-tint-subtle bg-tint-subtle p-8 pt-10 theme-muted:bg-tint theme-gradient:border rounded-corners:rounded-b-xl circular-corners:rounded-b-3xl">
             <h2 className="font-medium text-tint">{t(language, 'notfound_suggestions_title')}</h2>
             <ul className="flex flex-col gap-2">
                 {loading ? (
@@ -202,7 +205,7 @@ function NotFoundSuggestions(props: { suggestions: RelatedPage[] | null }) {
                     suggestions.map((suggestion, index) => (
                         <li
                             key={suggestion.id}
-                            className="flex grow origin-left animate-blur-in-slow"
+                            className="animate-blur-in-slow flex grow origin-left"
                             style={{ animationDelay: `${index * 25}ms` }}
                         >
                             <StyledLink href={suggestion.href} className="flex items-center gap-2">
@@ -229,34 +232,21 @@ function NotFoundSuggestions(props: { suggestions: RelatedPage[] | null }) {
     ) : null;
 }
 
-/** Minimal shape of an entry in the `~gitbook/site-index` response. */
-type IndexPage = {
-    id: string;
-    title: string;
-    pathname: string;
-    siteSpaceId: string;
-    icon?: string;
-    emoji?: string;
-};
-
 /**
  * Return the pages whose path is closest to the one that 404'd.
  *
  * Rather than asking the server (which would mean an extra request per 404), this reuses the
- * search index served at `~gitbook/site-index` — already preloaded and CDN-cached on every page —
- * so it's a cache hit, not an origin request. The ranking is a lighter, client-side cousin of
- * `getSimilarPages` (which the Markdown 404 runs server-side from the full page tree).
+ * search index served at `~gitbook/site-index` — preloaded on every page and shared with
+ * instant search via the module cache in `site-index.ts`, so at most one request is made.
+ * The ranking is a lighter, client-side cousin of `getSimilarPages` (which the Markdown 404
+ * runs server-side from the full page tree).
  */
 async function getRelatedPages(
     indexURL: string,
     requestedPath: string,
     siteSpaceId: string | null
 ): Promise<RelatedPage[]> {
-    const response = await fetch(indexURL);
-    if (!response.ok) {
-        return [];
-    }
-    const { pages } = (await response.json()) as { pages: IndexPage[] };
+    const { pages } = await fetchSiteIndex(indexURL);
 
     return pages
         .filter((page) => !siteSpaceId || page.siteSpaceId === siteSpaceId)

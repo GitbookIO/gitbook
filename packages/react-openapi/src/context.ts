@@ -17,6 +17,7 @@ export interface OpenAPIClientContext {
         check: React.ReactNode;
         lock: React.ReactNode;
         mcp: React.ReactNode;
+        hashtag: React.ReactNode;
     };
 
     /**
@@ -46,14 +47,19 @@ export interface OpenAPIClientContext {
      */
     proxyUrl?: string;
 
+    /** URL of the lazily loaded Scalar browser runtime. */
+    scalarRuntimeURL: string;
+
     /**
      * Mark the context as a client context.
      */
     $$isClientContext$$: true;
 }
 
-export interface OpenAPIContext
-    extends Omit<OpenAPIClientContext, '$$isClientContext$$' | 'proxyUrl'> {
+export interface OpenAPIContext extends Omit<
+    OpenAPIClientContext,
+    '$$isClientContext$$' | 'proxyUrl' | 'scalarRuntimeURL'
+> {
     /**
      * Render a code block.
      */
@@ -89,6 +95,9 @@ export interface OpenAPIContext
      * Called at render time (server-side) with the server origins for an operation.
      */
     resolveProxyUrl?: (allowedOrigins: string[]) => string | null;
+
+    /** URL of the lazily loaded Scalar browser runtime. */
+    scalarRuntimeURL: string;
 }
 
 export type OpenAPIUniversalContext = OpenAPIClientContext | OpenAPIContext;
@@ -124,6 +133,7 @@ export function getOpenAPIClientContext(context: OpenAPIUniversalContext): OpenA
         blockKey: context.blockKey,
         id: context.id,
         proxyUrl: '$$isClientContext$$' in context ? context.proxyUrl : undefined,
+        scalarRuntimeURL: context.scalarRuntimeURL,
         $$isClientContext$$: true,
     };
 }

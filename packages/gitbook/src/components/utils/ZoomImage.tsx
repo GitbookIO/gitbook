@@ -1,13 +1,12 @@
 'use client';
 
-import { Icon } from '@gitbook/icons';
 import classNames from 'classnames';
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import { tcls } from '@/lib/tailwind';
+import { Icon } from '@gitbook/icons';
 
-import styles from './ZoomImage.module.css';
+import { tcls } from '@/lib/tailwind';
 
 const PADDING = 32; // Padding around the image in the modal, in pixels
 
@@ -75,12 +74,8 @@ export function ZoomImage(
         };
     }, [imgRef, width]);
 
-    // Preload the image that will be displayed in the modal
-    if (zoomable) {
-        ReactDOM.preload(src, {
-            as: 'image',
-        });
-    }
+    // The modal image is loaded on demand (hover or click) by `preloadImage`; preloading it at
+    // render time would download every zoomable image twice during the initial page load.
     const preloadImage = React.useCallback(
         (onLoad?: () => void) => {
             const image = new Image();
@@ -159,8 +154,8 @@ export function ZoomImage(
                     }}
                     className={classNames(
                         props.className,
-                        zoomable ? styles.zoomImg : null,
-                        active ? styles.zoomImageActive : null
+                        zoomable ? 'zoom-img' : null,
+                        active ? 'zoom-image-active' : null
                     )}
                 />
             )}
@@ -200,7 +195,7 @@ function ZoomImageModal(props: {
         <div
             data-testid="zoom-image-modal"
             className={classNames(
-                styles.zoomModal,
+                'zoom-modal',
                 tcls(
                     'fixed',
                     'inset-0',

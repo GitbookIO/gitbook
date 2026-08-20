@@ -5,21 +5,24 @@ afterAll(() => mock.restore());
 const mockDnsLookup = mock(() => Promise.resolve([{ address: '93.184.215.14', family: 4 }]));
 mock.module('node:dns/promises', () => ({ lookup: mockDnsLookup }));
 const realGlobals = await import('@/lib/env/globals');
-mock.module('@/lib/env/globals', () => ({ ...realGlobals, GITBOOK_SECRET: 'test-secret-key' }));
+mock.module('@/lib/env/globals', () => ({
+    ...realGlobals,
+    GITBOOK_SECRET: 'test-secret-key',
+    GITBOOK_URL: 'https://open.gitbook.com',
+}));
 
 import { NextRequest } from 'next/server';
 
 const { buildSignedProxyUrl } = await import('@/lib/openapi/proxy-token');
-const { handleOpenAPIProxyOptions, handleOpenAPIProxyRequest, isBlockedHost } = await import(
-    './openapi-proxy'
-);
+const { handleOpenAPIProxyOptions, handleOpenAPIProxyRequest, isBlockedHost } =
+    await import('./openapi-proxy');
 
 const originalFetch = globalThis.fetch;
 
 function signedProxyUrl(targetUrl: string, extraHosts?: string[]): string {
     const hostname = new URL(targetUrl).hostname;
     const hosts = [hostname, ...(extraHosts ?? [])];
-    const signed = buildSignedProxyUrl('http://localhost/~scalar/proxy', hosts);
+    const signed = buildSignedProxyUrl('http://localhost/~scalar/proxy', hosts, 'site_1');
     return `${signed}&scalar_url=${encodeURIComponent(targetUrl)}`;
 }
 
@@ -36,7 +39,7 @@ function createRequest(
 
 function getForwardedHeaders(): Headers {
     const calls = (globalThis.fetch as ReturnType<typeof mock>).mock.calls;
-    // biome-ignore lint/style/noNonNullAssertion: test helper
+    // oxlint-disable-next-line typescript/no-non-null-assertion
     return calls[0]![1].headers as Headers;
 }
 
@@ -116,14 +119,18 @@ describe('handleOpenAPIProxyRequest', () => {
     it('returns 403 when token is invalid', async () => {
         const res = await handleOpenAPIProxyRequest(
             createRequest(
-                'http://localhost/~scalar/proxy?scalar_url=https://api.example.com&allowed_origin=api.example.com&token=bad-token'
+                'http://localhost/~scalar/proxy?scalar_url=https://api.example.com&allowed_origin=api.example.com&site_id=site_1&token=bad-token'
             )
         );
         await expectJsonError(res, 403, 'Invalid proxy authorization token');
     });
 
     it('returns 403 when target host is not in the allowed list', async () => {
-        const signed = buildSignedProxyUrl('http://localhost/~scalar/proxy', ['api.example.com']);
+        const signed = buildSignedProxyUrl(
+            'http://localhost/~scalar/proxy',
+            ['api.example.com'],
+            'site_1'
+        );
         const res = await handleOpenAPIProxyRequest(
             createRequest(`${signed}&scalar_url=${encodeURIComponent('https://evil.com/hack')}`)
         );
@@ -157,7 +164,7 @@ describe('handleOpenAPIProxyRequest', () => {
 
         expect(globalThis.fetch).toHaveBeenCalledTimes(1);
         const calls = (globalThis.fetch as ReturnType<typeof mock>).mock.calls;
-        // biome-ignore lint/style/noNonNullAssertion: test assertion
+        // oxlint-disable-next-line typescript/no-non-null-assertion
         const [calledUrl, calledOptions] = calls[0]!;
         expect(calledUrl).toBe(target);
         expect(calledOptions.method).toBe('POST');
@@ -171,6 +178,7 @@ describe('handleOpenAPIProxyRequest', () => {
                     referer: 'http://localhost:3000/docs',
                     'x-forwarded-for': '127.0.0.1',
                     accept: 'application/json',
+                    cookie: 'gitbook_visitor=secret',
                     'x-scalar-cookie': 'session=abc123',
                     'x-scalar-user-agent': 'ScalarClient/1.0',
                 },
@@ -184,7 +192,7 @@ describe('handleOpenAPIProxyRequest', () => {
         expect(headers.get('x-forwarded-for')).toBeNull();
         // Kept
         expect(headers.get('accept')).toBe('application/json');
-        // Remapped
+        // The browser's own cookie must not leak to the target; only the scalar cookie is sent.
         expect(headers.get('cookie')).toBe('session=abc123');
         expect(headers.get('user-agent')).toBe('ScalarClient/1.0');
         // Host set to target
@@ -200,6 +208,7 @@ describe('handleOpenAPIProxyRequest', () => {
                         'content-encoding': 'gzip',
                         'transfer-encoding': 'chunked',
                         'content-type': 'application/json',
+                        'set-cookie': 'evil=1; Domain=.gitbook.com; Path=/',
                     },
                 })
             )
@@ -214,6 +223,8 @@ describe('handleOpenAPIProxyRequest', () => {
         expect(res.headers.get('content-type')).toBe('application/json');
         expect(res.headers.get('content-encoding')).toBeNull();
         expect(res.headers.get('transfer-encoding')).toBeNull();
+        // A target must not be able to set cookies on GitBook's own origin.
+        expect(res.headers.get('set-cookie')).toBeNull();
     });
 
     it('returns 502 when upstream fetch fails', async () => {
@@ -269,6 +280,8 @@ describe('handleOpenAPIProxyRequest', () => {
     it('blocks redirects to non-allowed hosts or private IPs', async () => {
         for (const location of [
             'https://evil.com/steal-data',
+            // Hostname-suffix confusion: must not pass as a redirect under api.example.com.
+            'https://api.example.com.evil.com/steal-data',
             'http://169.254.169.254/latest/meta-data',
         ]) {
             globalThis.fetch = mock(() =>
@@ -303,6 +316,39 @@ describe('handleOpenAPIProxyRequest', () => {
         expect(res.status).toBe(200);
         expect(await res.text()).toBe('from cdn');
     });
+
+    it('serves inert responses (sandbox CSP + nosniff) on success and error', async () => {
+        const ok = await handleOpenAPIProxyRequest(
+            createRequest(signedProxyUrl('https://api.example.com/v1'))
+        );
+        expect(ok.headers.get('content-security-policy')).toBe('sandbox');
+        expect(ok.headers.get('x-content-type-options')).toBe('nosniff');
+
+        const forbidden = await handleOpenAPIProxyRequest(
+            createRequest('http://localhost/~scalar/proxy?scalar_url=https://api.example.com')
+        );
+        expect(forbidden.status).toBe(403);
+        expect(forbidden.headers.get('content-security-policy')).toBe('sandbox');
+        expect(forbidden.headers.get('x-content-type-options')).toBe('nosniff');
+    });
+
+    it('rejects proxy requests served on a non-GitBook (customer) host', async () => {
+        const res = await handleOpenAPIProxyRequest(
+            createRequest(signedProxyUrl('https://api.example.com/v1'), {
+                headers: { host: 'docs.customer.com' },
+            })
+        );
+        await expectJsonError(res, 404, 'Not found');
+    });
+
+    it('serves proxy requests on the GitBook open host', async () => {
+        const res = await handleOpenAPIProxyRequest(
+            createRequest(signedProxyUrl('https://api.example.com/v1'), {
+                headers: { host: 'open.gitbook.com' },
+            })
+        );
+        expect(res.status).toBe(200);
+    });
 });
 
 describe('handleOpenAPIProxyOptions', () => {
@@ -311,5 +357,7 @@ describe('handleOpenAPIProxyOptions', () => {
         expect(res.status).toBe(204);
         expect(res.headers.get('access-control-allow-origin')).toBe('*');
         expect(res.headers.get('access-control-max-age')).toBe('86400');
+        expect(res.headers.get('content-security-policy')).toBe('sandbox');
+        expect(res.headers.get('x-content-type-options')).toBe('nosniff');
     });
 });

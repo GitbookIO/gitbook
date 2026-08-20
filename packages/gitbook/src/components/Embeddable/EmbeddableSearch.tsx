@@ -1,5 +1,16 @@
 'use client';
 
+import React from 'react';
+
+import { useTrackEvent } from '../Insights';
+import { LinkContext } from '../primitives';
+import { useIsVisible } from '../VisibilityContext';
+import {
+    EmbeddableIframeButtons,
+    EmbeddableIframeCloseButton,
+    EmbeddableIframeTabs,
+    useEmbeddableLinkContext,
+} from './EmbeddableIframeAPI';
 import {
     type SearchBaseProps,
     SearchFrame,
@@ -8,15 +19,6 @@ import {
     SearchScopeControl,
     useSearchController,
 } from '@/components/Search';
-import React from 'react';
-import { useTrackEvent } from '../Insights';
-import { LinkContext } from '../primitives';
-import {
-    EmbeddableIframeButtons,
-    EmbeddableIframeCloseButton,
-    EmbeddableIframeTabs,
-    useEmbeddableLinkContext,
-} from './EmbeddableIframeAPI';
 
 type EmbeddableSearchProps = {
     baseURL: string;
@@ -29,19 +31,26 @@ export function EmbeddableSearch(props: EmbeddableSearchProps) {
     const { hasDocsTab, linkContext } = useEmbeddableLinkContext();
 
     const trackEvent = useTrackEvent();
+    const isVisible = useIsVisible();
     React.useEffect(() => {
+        if (!isVisible) {
+            return;
+        }
+
         trackEvent({
             type: 'search_open',
         });
-    }, [trackEvent]);
+    }, [trackEvent, isVisible]);
 
     const tabsRef = React.useRef<HTMLDivElement>(null);
     const {
         askQuery,
+        close,
         cursor,
         error,
         fetching,
         onInputKeyDown,
+        onResultSelect,
         query,
         results,
         resultsId,
@@ -51,7 +60,10 @@ export function EmbeddableSearch(props: EmbeddableSearchProps) {
         showAsk,
         withSearchAI,
         scopeControl,
-    } = useSearchController({ ...searchProps, asEmbeddable: hasDocsTab });
+    } = useSearchController(
+        { ...searchProps, asEmbeddable: hasDocsTab },
+        { restoreLastQueryOnMount: true }
+    );
 
     return (
         <LinkContext value={linkContext}>
@@ -66,6 +78,7 @@ export function EmbeddableSearch(props: EmbeddableSearchProps) {
                 results={results}
                 resultsId={resultsId}
                 resultsRef={resultsRef}
+                onResultSelect={onResultSelect}
                 showAsk={showAsk}
                 dataTestId="embed-search"
                 input={
@@ -97,9 +110,10 @@ export function EmbeddableSearch(props: EmbeddableSearchProps) {
                             active="search"
                             baseURL={baseURL}
                             siteTitle={siteTitle}
+                            onNavigate={close}
                         />
                         <EmbeddableIframeButtons />
-                        <EmbeddableIframeCloseButton />
+                        <EmbeddableIframeCloseButton onClose={close} />
                     </>
                 }
                 scopeControl={

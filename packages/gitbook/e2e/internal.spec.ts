@@ -1,3 +1,6 @@
+import { type Page, expect } from '@playwright/test';
+import jwt from 'jsonwebtoken';
+
 import {
     CustomizationAIMode,
     CustomizationBackground,
@@ -11,10 +14,6 @@ import {
     SiteSocialAccountPlatform,
 } from '@gitbook/api';
 import type { GitBookStandalone } from '@gitbook/embed';
-import { expect } from '@playwright/test';
-import jwt from 'jsonwebtoken';
-
-import { VISITOR_TOKEN_COOKIE } from '@/lib/visitors';
 
 import { getGitBookPreviewURL, getSiteAPIToken } from '../tests/utils';
 import {
@@ -35,8 +34,10 @@ import {
     waitForAdminToolbar,
     waitForCookiesDialog,
     waitForCoverImages,
+    waitForHydration,
     waitForNotFound,
 } from './util';
+import { VISITOR_TOKEN_COOKIE } from '@/lib/visitors';
 
 // Kept as deterministic as possible to reduce visual flakiness: no preamble, a
 // single fixed search, a concise answer, and a fixed number of follow-ups. The
@@ -50,6 +51,27 @@ const AI_PROMPT = [
     '3. Reply with only the first sentence of the first page you find, and nothing else.',
     '4. Always end by proposing exactly 3 follow-up suggestions.',
 ].join('\n');
+
+// `InsightsProvider` debounces its flushes by 1.5s.
+const INSIGHTS_FLUSH_TIMEOUT = 3000;
+
+/**
+ * Collect the insights events of a given type sent by the page and its frames.
+ */
+function trackInsightsEvents(page: Page, type: string) {
+    const collected: { type: string }[] = [];
+
+    page.on('request', (request) => {
+        if (request.method() !== 'POST' || !request.url().includes('/~gitbook/__evt')) {
+            return;
+        }
+
+        const body = request.postDataJSON() as { events?: { type: string }[] } | null;
+        collected.push(...(body?.events ?? []).filter((event) => event.type === type));
+    });
+
+    return collected;
+}
 
 const overrideAIInitialState = () => {
     const greeting = document.querySelector('[data-testid="ai-chat-greeting-title"]');
@@ -133,6 +155,23 @@ const searchTestCases: Test[] = [
             await waitForCookiesDialog(page);
             await page.keyboard.press('ControlOrMeta+K');
             await expect(page.getByTestId('search-input')).toBeFocused();
+        },
+    },
+    {
+        // `fill()` bypasses key events, so it can't catch a swallowed key. RND-12484.
+        name: 'Search - AI Mode: None - Typing multi-word queries',
+        url: getCustomizationURL({
+            ai: {
+                mode: CustomizationAIMode.None,
+            },
+        }),
+        screenshot: false,
+        run: async (page) => {
+            await waitForCookiesDialog(page);
+            const searchInput = page.getByTestId('search-input');
+            await searchInput.focus();
+            await searchInput.pressSequentially('getting started');
+            await expect(searchInput).toHaveValue('getting started');
         },
     },
     {
@@ -381,6 +420,7 @@ const testCases: TestsCase[] = [
                 name: 'Customized variant titles are displayed',
                 url: '',
                 run: async (page) => {
+                    await waitForHydration(page);
                     const spaceDropdown = page
                         .locator('[data-testid="space-dropdown-button"]')
                         .locator('visible=true');
@@ -408,6 +448,7 @@ const testCases: TestsCase[] = [
                 name: 'Switch variant with alternate link in metadata',
                 url: 'rfcs',
                 run: async (page) => {
+                    await waitForHydration(page);
                     const spaceDropdown = page
                         .locator('[data-testid="space-dropdown-button"]')
                         .locator('visible=true');
@@ -446,6 +487,7 @@ const testCases: TestsCase[] = [
                 url: 'api-multi-versions/reference/api-reference/pets',
                 screenshot: false,
                 run: async (page) => {
+                    await waitForHydration(page);
                     const spaceDropdown = await page
                         .locator('[data-testid="space-dropdown-button"]')
                         .locator('visible=true');
@@ -472,6 +514,7 @@ const testCases: TestsCase[] = [
                 url: 'api-multi-versions-share-links/8tNo6MeXg7CkFMzSSz81/reference/api-reference/pets',
                 screenshot: false,
                 run: async (page) => {
+                    await waitForHydration(page);
                     const spaceDropdown = await page
                         .locator('[data-testid="space-dropdown-button"]')
                         .locator('visible=true');
@@ -513,6 +556,7 @@ const testCases: TestsCase[] = [
                     return `api-multi-versions-va/reference/api-reference/pets?jwt_token=${token}`;
                 },
                 run: async (page) => {
+                    await waitForHydration(page);
                     const spaceDropdown = await page
                         .locator('[data-testid="space-dropdown-button"]')
                         .locator('visible=true');
@@ -548,6 +592,7 @@ const testCases: TestsCase[] = [
                 url: 'ecosystem/connection-provider',
                 screenshot: false,
                 run: async (page) => {
+                    await waitForHydration(page);
                     const spaceDropdown = page
                         .locator('[data-testid="space-dropdown-button"]')
                         .locator('visible=true');
@@ -578,6 +623,7 @@ const testCases: TestsCase[] = [
                 url: 'nl/ecosysteem/connection-provider',
                 screenshot: false,
                 run: async (page) => {
+                    await waitForHydration(page);
                     const spaceDropdown = page
                         .locator('[data-testid="space-dropdown-button"]')
                         .locator('visible=true');
@@ -618,14 +664,14 @@ const testCases: TestsCase[] = [
                 url: '',
                 screenshot: false,
                 run: async (page) => {
-                    const trigger = page.getByRole('button', { name: 'Test Section Group 1' });
-                    // Radix NavigationMenu opens the dropdown on a `pointermove`. A single
-                    // synthetic hover can land before hydration and be lost, so re-hover
-                    // until the dropdown content actually appears.
-                    await expect(async () => {
-                        await trigger.hover();
-                        await expect(page.getByText('Section B')).toBeVisible({ timeout: 1000 });
-                    }).toPass({ timeout: 15000 });
+                    // The menu only opens on `mouseenter`, which cannot fire again once the pointer
+                    // is inside: a hover landing before hydration is lost for good.
+                    await waitForHydration(page);
+                    const trigger = page
+                        .locator('[data-gb-sections]')
+                        .getByRole('button', { name: 'Test Section Group 1' });
+                    await trigger.hover();
+                    await expect(page.getByText('Section B')).toBeVisible();
                     await page.getByText('Section B').click();
                     await page.waitForURL((url) => url.pathname.includes('/sections/sections-4'));
                 },
@@ -1241,8 +1287,8 @@ const testCases: TestsCase[] = [
             },
             // New site themes
             ...allThemes.flatMap((theme) => [
-                ...allTintColors.flatMap((tint) => [
-                    ...allSidebarBackgroundStyles.flatMap((sidebarStyle) => ({
+                ...allTintColors.flatMap((tint) =>
+                    allSidebarBackgroundStyles.flatMap((sidebarStyle) => ({
                         name: `Theme ${theme} - Tint ${tint.label} - Sidebar ${sidebarStyle} - Mode ${themeMode}`,
                         url: getCustomizationURL({
                             styling: {
@@ -1262,8 +1308,8 @@ const testCases: TestsCase[] = [
                             },
                         }),
                         run: waitForCookiesDialog,
-                    })),
-                ]),
+                    }))
+                ),
                 ...allSearchStyles.flatMap((searchStyle) => ({
                     name: `Theme ${theme} – Search ${searchStyle} – Mode ${themeMode}`,
                     url: getCustomizationURL({
@@ -1283,8 +1329,8 @@ const testCases: TestsCase[] = [
                 })),
             ]),
             // Deprecated header themes
-            ...allDeprecatedThemePresets.flatMap((preset) => [
-                ...allSidebarBackgroundStyles.flatMap((sidebarStyle) => ({
+            ...allDeprecatedThemePresets.flatMap((preset) =>
+                allSidebarBackgroundStyles.flatMap((sidebarStyle) => ({
                     name: `With tint - Legacy header preset ${preset} - Sidebar ${sidebarStyle} - Theme mode ${themeMode}`,
                     url: getCustomizationURL({
                         styling: {
@@ -1310,8 +1356,8 @@ const testCases: TestsCase[] = [
                         },
                     }),
                     run: waitForCookiesDialog,
-                })),
-            ]),
+                }))
+            ),
             {
                 name: `With tint - Legacy background match - Theme mode ${themeMode}`,
                 url: getCustomizationURL({
@@ -2236,6 +2282,33 @@ const testCases: TestsCase[] = [
                     );
                 },
             },
+            {
+                name: 'Only tracks ask_view once the widget is opened',
+                // `trigger=custom` loads the frame but leaves the window closed.
+                url: '?trigger=custom',
+                screenshot: false,
+                run: async (page) => {
+                    const askViews = trackInsightsEvents(page, 'ask_view');
+                    const chat = page.frameLocator('#gitbook-widget-iframe').getByTestId('ai-chat');
+
+                    // The assistant renders inside the hidden frame, but nobody has seen it.
+                    await expect(chat).toBeAttached({ timeout: 20000 });
+                    await page.waitForTimeout(INSIGHTS_FLUSH_TIMEOUT);
+                    expect(askViews).toHaveLength(0);
+
+                    await page.getByRole('button', { name: 'Open' }).click();
+                    await expect(chat).toBeVisible();
+                    await expect.poll(() => askViews.length, { timeout: 20000 }).toBe(1);
+
+                    // Hiding and showing the same frame again is not a second view.
+                    await page.getByRole('button', { name: 'Close' }).click();
+                    await expect(chat).toBeHidden();
+                    await page.getByRole('button', { name: 'Open' }).click();
+                    await expect(chat).toBeVisible();
+                    await page.waitForTimeout(INSIGHTS_FLUSH_TIMEOUT);
+                    expect(askViews).toHaveLength(1);
+                },
+            },
         ],
     },
     {
@@ -2405,7 +2478,7 @@ const testCases: TestsCase[] = [
                         actions.nth(1).click(),
                     ]);
                     // Verify the new page would have opened with the expected URL
-                    expect(newPage.url()).toContain('gitbook.com');
+                    await expect(newPage).toHaveURL(/gitbook\.com/);
                     // Close it immediately to avoid navigation
                     await newPage.close();
 
@@ -2553,7 +2626,7 @@ const testCases: TestsCase[] = [
                         openInNewTabButton.click(),
                     ]);
                     // Verify the new page would have opened with the expected URL
-                    expect(newPage.url()).toContain('gitbook.gitbook.io');
+                    await expect(newPage).toHaveURL(/gitbook\.gitbook\.io/);
                     // Close it immediately to avoid navigation
                     await newPage.close();
                 },

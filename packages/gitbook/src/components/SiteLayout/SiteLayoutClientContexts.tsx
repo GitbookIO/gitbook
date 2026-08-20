@@ -1,14 +1,17 @@
 'use client';
 
-import type { CustomizationDefaultThemeMode, SiteExternalLinksTarget } from '@gitbook/api';
 import { MotionConfig, useReducedMotion } from 'motion/react';
 import { ThemeProvider } from 'next-themes';
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
 import type React from 'react';
 import { useMemo } from 'react';
-import { SearchContextProvider } from '../Search';
+
+import type { CustomizationDefaultThemeMode, SiteExternalLinksTarget } from '@gitbook/api';
+
 import { useClearRouterCache } from '../hooks/useClearRouterCache';
 import { LinkContext, type LinkContextType } from '../primitives';
+import { SearchContextProvider } from '../Search';
+import { SelectProvider } from '../Select';
 import { isExternalLink } from '../utils/link';
 
 /**
@@ -62,11 +65,13 @@ export function SiteLayoutClientContexts(props: {
             storageKey={themeStorageKey}
         >
             <NuqsAdapter>
-                <LinkContext.Provider value={linkContext}>
-                    <SearchContextProvider>
-                        <ReducedMotionProvider>{children}</ReducedMotionProvider>
-                    </SearchContextProvider>
-                </LinkContext.Provider>
+                <SelectProvider>
+                    <LinkContext.Provider value={linkContext}>
+                        <SearchContextProvider>
+                            <ReducedMotionProvider>{children}</ReducedMotionProvider>
+                        </SearchContextProvider>
+                    </LinkContext.Provider>
+                </SelectProvider>
             </NuqsAdapter>
         </ThemeProvider>
     );

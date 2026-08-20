@@ -1,17 +1,19 @@
 'use client';
 
+import assertNever from 'assert-never';
+import QuickLRU from 'quick-lru';
+import React from 'react';
+import { createStore, useStore } from 'zustand';
+
+import type { GitSyncState } from '@gitbook/api';
+import { Icon, type IconName, IconStyle } from '@gitbook/icons';
+
 import { useAIChatController, useAIChatState } from '@/components/AI';
 import type { Assistant } from '@/components/AI';
 import { Button } from '@/components/primitives/Button';
 import { DropdownMenuItem, useDropdownMenuClose } from '@/components/primitives/DropdownMenu';
 import { getURLForLLM } from '@/components/utils';
 import { tString, useLanguage } from '@/intl/client';
-import type { GitSyncState } from '@gitbook/api';
-import { Icon, type IconName, IconStyle } from '@gitbook/icons';
-import assertNever from 'assert-never';
-import QuickLRU from 'quick-lru';
-import React from 'react';
-import { createStore, useStore } from 'zustand';
 
 type PageActionType = 'button' | 'dropdown-menu-item';
 
@@ -475,7 +477,10 @@ function PageActionWrapper(props: {
                 variant="secondary"
                 label={label ?? shortLabel}
                 aria-label={shortLabel}
-                className="bg-tint-base"
+                // `relative z-20` keeps the button above the breadcrumbs, whose container can sit on
+                // top of it over a page cover. `disabled:bg-tint-base` preserves the background while
+                // busy — the `secondary` variant would otherwise reset it via `disabled:bg-transparent`.
+                className="relative z-20 bg-tint-base disabled:bg-tint-base"
                 onClick={onClick}
                 href={href}
                 target={href ? target : undefined}
@@ -512,12 +517,12 @@ function PageActionWrapper(props: {
 
             <div className="flex flex-1 flex-col gap-0.5">
                 <span className="flex items-center gap-1 text-tint-strong">
-                    <span className="truncate font-medium text-sm">{label}</span>
+                    <span className="truncate text-sm font-medium">{label}</span>
                     {href && target === '_blank' ? (
                         <Icon icon="arrow-up-right" className="size-3 shrink-0 text-tint-subtle" />
                     ) : null}
                 </span>
-                {description && <span className="text-tint text-xs">{description}</span>}
+                {description && <span className="text-xs text-tint">{description}</span>}
             </div>
         </DropdownMenuItem>
     );
