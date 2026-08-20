@@ -1,9 +1,33 @@
 import { describe, expect, it } from 'bun:test';
 
-import { type SelectedOptions, matchesText, recordMatches } from './searchMatch';
+import {
+    type SelectedOptions,
+    type TableSearchRecordData,
+    getVisibleTableRecordIds,
+    matchesText,
+    recordMatches,
+} from './searchMatch';
 
 const NO_OPTIONS: SelectedOptions = {};
 const NO_CHECKBOXES: ReadonlySet<string> = new Set();
+
+function visibleIds(
+    records: TableSearchRecordData[],
+    filters: {
+        query?: string;
+        selectedOptions?: SelectedOptions;
+        checkedColumns?: ReadonlySet<string>;
+    },
+    recordGroups: string[][] = []
+) {
+    return getVisibleTableRecordIds({
+        records,
+        recordGroups,
+        query: filters.query ?? '',
+        selectedOptions: filters.selectedOptions ?? NO_OPTIONS,
+        checkedColumns: filters.checkedColumns ?? NO_CHECKBOXES,
+    });
+}
 
 function match(
     record: {
@@ -147,5 +171,77 @@ describe('recordMatches', () => {
             match(record, { ...filters, selectedOptions: { status: new Set(['archived']) } })
         ).toBe(false);
         expect(match({ ...record, checkboxValues: { featured: false } }, filters)).toBe(false);
+    });
+});
+
+describe('getVisibleTableRecordIds', () => {
+    const records: TableSearchRecordData[] = [
+        {
+            id: 'first',
+            searchText: 'Anchor value',
+            selectValues: { status: ['active'] },
+            checkboxValues: { featured: false },
+        },
+        {
+            id: 'second',
+            searchText: 'Covered value',
+            selectValues: { status: ['archived'] },
+            checkboxValues: { featured: true },
+        },
+        {
+            id: 'third',
+            searchText: 'Connected value',
+            selectValues: { status: ['pending'] },
+            checkboxValues: { featured: false },
+        },
+        {
+            id: 'unrelated',
+            searchText: 'Unrelated value',
+            selectValues: { status: ['archived'] },
+            checkboxValues: { featured: false },
+        },
+    ];
+    const verticalGroup = [['first', 'second']];
+
+    it('returns null when no filter is active', () => {
+        expect(visibleIds(records, {}, verticalGroup)).toBeNull();
+    });
+
+    it('keeps a complete vertical group when text matches its anchor', () => {
+        expect(visibleIds(records, { query: 'anchor' }, verticalGroup)).toEqual(
+            new Set(['first', 'second'])
+        );
+    });
+
+    it('keeps a complete vertical group when select or checkbox filters match a grouped row', () => {
+        expect(
+            visibleIds(records, { selectedOptions: { status: new Set(['active']) } }, verticalGroup)
+        ).toEqual(new Set(['first', 'second']));
+        expect(
+            visibleIds(records, { checkedColumns: new Set(['featured']) }, verticalGroup)
+        ).toEqual(new Set(['second', 'first']));
+    });
+
+    it('excludes completely unmatched and disconnected groups', () => {
+        expect(visibleIds(records, { query: 'unrelated' }, verticalGroup)).toEqual(
+            new Set(['unrelated'])
+        );
+    });
+
+    it('expands transitively connected groups in reversed metadata order without mutation', () => {
+        const groups = [
+            ['second', 'third'],
+            ['first', 'second'],
+        ];
+        const originalGroups = groups.map((group) => [...group]);
+
+        expect(visibleIds(records, { query: 'anchor' }, groups)).toEqual(
+            new Set(['first', 'second', 'third'])
+        );
+        expect(groups).toEqual(originalGroups);
+    });
+
+    it('leaves cards independently filtered when no merge groups are provided', () => {
+        expect(visibleIds(records, { query: 'anchor' })).toEqual(new Set(['first']));
     });
 });
