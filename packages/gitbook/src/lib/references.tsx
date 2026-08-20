@@ -7,8 +7,10 @@ import type {
     RevisionFile,
     RevisionPageDocument,
     RevisionReusableContent,
+    SiteSection,
     SiteSpace,
     Space,
+    TranslationLanguage,
 } from '@gitbook/api';
 import type { Filesystem } from '@gitbook/openapi-parser';
 
@@ -262,12 +264,18 @@ export async function resolveContentRef(
         }
 
         case 'space': {
-            const targetSpace = !isContentRefInDifferentSpace(contentRef, context)
-                ? {
-                      space: context.space,
-                      siteSpace: 'siteSpace' in context ? context.siteSpace : null,
-                  }
-                : await getBestTargetSpace(context, contentRef.space);
+            let targetSpace:
+                | { space: Space; siteSpace: SiteSpace | null; siteSection: SiteSection | null }
+                | undefined;
+            if (isContentRefInDifferentSpace(contentRef, context)) {
+                targetSpace = await getBestTargetSpace(context, contentRef.space);
+            } else {
+                targetSpace = {
+                    space: context.space,
+                    siteSpace: 'siteSpace' in context ? context.siteSpace : null,
+                    siteSection: 'sections' in context ? (context.sections?.current ?? null) : null,
+                };
+            }
 
             if (!targetSpace) {
                 return null;
@@ -278,7 +286,7 @@ export async function resolveContentRef(
                     targetSpace.siteSpace?.urls.published ??
                     targetSpace.space.urls.published ??
                     targetSpace.space.urls.app,
-                text: targetSpace.siteSpace?.title ?? targetSpace.space.title,
+                text: getSpaceRefText(targetSpace, context.locale),
                 active: contentRef.space === space.id,
             };
         }
@@ -430,7 +438,9 @@ export function resolveContentRefFallback(contentRef: ContentRef): ResolvedConte
 async function getBestTargetSpace(
     context: GitBookAnyContext,
     spaceId: string
-): Promise<{ space: Space; siteSpace: SiteSpace | null } | undefined> {
+): Promise<
+    { space: Space; siteSpace: SiteSpace | null; siteSection: SiteSection | null } | undefined
+> {
     // In the context of sites, we try to find our target space in the site structure.
     // because the url of this space will be in the same site.
     const inSite = getBestTargetSpaceFromSite(context, spaceId);
@@ -448,7 +458,7 @@ async function getBestTargetSpace(
     );
 
     // Else we try return the fetched space from the API.
-    return fetchedSpace ? { space: fetchedSpace, siteSpace: null } : undefined;
+    return fetchedSpace ? { space: fetchedSpace, siteSpace: null, siteSection: null } : undefined;
 }
 
 /**
@@ -457,18 +467,40 @@ async function getBestTargetSpace(
 function getBestTargetSpaceFromSite(
     context: GitBookAnyContext,
     spaceId: string
-): { space: Space; siteSpace: SiteSpace | null } | undefined {
+): { space: Space; siteSpace: SiteSpace | null; siteSection: SiteSection | null } | undefined {
     if ('site' in context) {
         const found = findSiteSpaceBy(
             context.structure,
             (siteSpace) => siteSpace.space.id === spaceId
         );
         if (found) {
-            return { space: found.siteSpace.space, siteSpace: found.siteSpace };
+            return {
+                space: found.siteSpace.space,
+                siteSpace: found.siteSpace,
+                siteSection: found.siteSection,
+            };
         }
     }
 
     return undefined;
+}
+
+/**
+ * Resolve the text to show for a direct link to a space: the containing section's
+ * title takes precedence, since that's what organizes the site's navigation for the
+ * reader, then the site-space (variant) title, then the raw space title.
+ */
+function getSpaceRefText(
+    targetSpace: { space: Space; siteSpace: SiteSpace | null; siteSection: SiteSection | null },
+    currentLanguage: TranslationLanguage | undefined
+): string {
+    if (targetSpace.siteSection) {
+        return getLocalizedTitle(targetSpace.siteSection, currentLanguage);
+    }
+    if (targetSpace.siteSpace) {
+        return getLocalizedTitle(targetSpace.siteSpace, currentLanguage);
+    }
+    return targetSpace.space.title;
 }
 
 async function resolveContentRefInSpace(
