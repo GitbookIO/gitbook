@@ -4,6 +4,7 @@ import React from 'react';
 
 import { useTrackEvent } from '../Insights';
 import { LinkContext } from '../primitives';
+import { useIsVisible } from '../VisibilityContext';
 import {
     EmbeddableIframeButtons,
     EmbeddableIframeCloseButton,
@@ -30,11 +31,16 @@ export function EmbeddableSearch(props: EmbeddableSearchProps) {
     const { hasDocsTab, linkContext } = useEmbeddableLinkContext();
 
     const trackEvent = useTrackEvent();
+    const isVisible = useIsVisible();
     React.useEffect(() => {
+        if (!isVisible) {
+            return;
+        }
+
         trackEvent({
             type: 'search_open',
         });
-    }, [trackEvent]);
+    }, [trackEvent, isVisible]);
 
     const tabsRef = React.useRef<HTMLDivElement>(null);
     const {
