@@ -177,6 +177,8 @@ async function resizeImageWithFallback(
     }
 }
 
+const GITBOOK_HOSTED_DOMAINS = ['gitbook.com', 'gitbook.io'];
+
 /**
  * Check if a URL is hosted on a GitBook domain.
  */
@@ -186,7 +188,9 @@ function isGitBookHostedURL(url: string): boolean {
     }
 
     const { hostname } = new URL(url);
-    return hostname === 'gitbook.com' || hostname.endsWith('.gitbook.com');
+    return GITBOOK_HOSTED_DOMAINS.some(
+        (domain) => hostname === domain || hostname.endsWith(`.${domain}`)
+    );
 }
 
 /**
