@@ -2,9 +2,7 @@ import { diffLines } from 'diff';
 import postcss, { type Declaration } from 'postcss';
 import stylelint from 'stylelint';
 
-export const COMMENT_MARKER = '<!-- gitbook-css-browser-compatibility -->';
 const COMPATIBILITY_RULE = 'plugin/no-unsupported-browser-features';
-const MAX_COMMENT_DIAGNOSTICS = 50;
 
 export interface ChangedLines {
     added: Set<number>;
@@ -21,18 +19,6 @@ export interface CompatibilityDiagnostic extends AddedDeclaration {
     feature: string;
     file: string;
     unsupportedBrowsers: string;
-}
-
-interface Comment {
-    body: string;
-    id: number;
-    user: { login: string } | null;
-}
-
-export interface IssueCommentClient {
-    createIssueComment(issueNumber: number, body: string): Promise<void>;
-    listIssueComments(issueNumber: number): Promise<Comment[]>;
-    updateIssueComment(commentId: number, body: string): Promise<void>;
 }
 
 function lineCount(value: string): number {
@@ -204,71 +190,4 @@ export async function getCompatibilityDiagnostics({
             ])
         ).values()
     );
-}
-
-function escapeTableCell(value: string): string {
-    return value.replaceAll('\\', '\\\\').replaceAll('|', '\\|').replaceAll('\n', ' ');
-}
-
-function blobUrl(repository: string, headSha: string, file: string, line: number): string {
-    const encodedFile = file.split('/').map(encodeURIComponent).join('/');
-    return `https://github.com/${repository}/blob/${headSha}/${encodedFile}#L${line}`;
-}
-
-export function formatCompatibilityComment({
-    diagnostics,
-    headSha,
-    repository,
-}: {
-    diagnostics: CompatibilityDiagnostic[];
-    headSha: string;
-    repository: string;
-}): string {
-    if (diagnostics.length === 0) {
-        return `${COMMENT_MARKER}\n## CSS browser compatibility\n\n✅ No newly added CSS declarations have browser-compatibility issues.`;
-    }
-
-    const visibleDiagnostics = diagnostics.slice(0, MAX_COMMENT_DIAGNOSTICS);
-    const rows = visibleDiagnostics.map((diagnostic) => {
-        const location = `[${escapeTableCell(diagnostic.file)}:${diagnostic.line}](${blobUrl(repository, headSha, diagnostic.file, diagnostic.line)})`;
-        return `| ${location} | \`${escapeTableCell(diagnostic.property)}\` | ${escapeTableCell(diagnostic.unsupportedBrowsers)} |`;
-    });
-    const remaining = diagnostics.length - visibleDiagnostics.length;
-    const heading = diagnostics.length === 1 ? 'declaration is' : 'declarations are';
-
-    return [
-        COMMENT_MARKER,
-        '## CSS browser compatibility',
-        '',
-        `❌ ${diagnostics.length} newly added CSS ${heading} not fully supported by the configured Browserslist targets.`,
-        '',
-        '| Location | Property | Unsupported browsers |',
-        '| --- | --- | --- |',
-        ...rows,
-        ...(remaining > 0 ? ['', `_${remaining} additional finding(s) omitted._`] : []),
-    ].join('\n');
-}
-
-export async function upsertCompatibilityComment({
-    body,
-    createIfMissing = true,
-    client,
-    issueNumber,
-}: {
-    body: string;
-    createIfMissing?: boolean;
-    client: IssueCommentClient;
-    issueNumber: number;
-}): Promise<void> {
-    const comments = await client.listIssueComments(issueNumber);
-    const existingComment = comments.find(
-        (comment) =>
-            comment.user?.login === 'github-actions[bot]' && comment.body.includes(COMMENT_MARKER)
-    );
-
-    if (existingComment) {
-        await client.updateIssueComment(existingComment.id, body);
-    } else if (createIfMissing) {
-        await client.createIssueComment(issueNumber, body);
-    }
 }

@@ -127,7 +127,15 @@ export async function GET(
                 'Show me tips and tricks',
             ],
             tabs: ['assistant', 'search', 'docs'],
-            closeButton: useCustomTrigger
+            closeButton: useCustomTrigger,
+            // Host-page action: posts a message into the chat, like an embedding site would.
+            actions: [
+                {
+                    icon: 'rocket',
+                    label: 'Ask about pricing',
+                    onClick: () => window.GitBook('postUserMessage', 'How much does GitBook cost?'),
+                },
+            ],
         });
 
         if (useCustomTrigger) {

@@ -77,9 +77,9 @@ export function AIChatInput(props: {
         },
         {
             enableOnFormTags: true,
-            // Match the logical character so Dvorak ⌘-C (physical "I" key) copies
+            // Match the produced key so Dvorak ⌘-C (physical "I" key) copies
             // instead of focusing the Assistant input. RND-11340.
-            ignoreEventWhen: (e) => e.key.toLowerCase() !== 'i',
+            useKey: true,
         }
     );
 

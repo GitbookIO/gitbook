@@ -1,6 +1,7 @@
 import { CustomizationDefaultThemeMode, type SiteCustomizationSettings } from '@gitbook/api';
 
 import { getEmbeddableLinker } from './embeddable-linker';
+import { getLinkerForSiteSpace } from './sites';
 import { type RouteLayoutParams, getDynamicSiteContext, getStaticSiteContext } from '@/app/utils';
 import type { GitBookSiteContext } from '@/lib/context';
 
@@ -11,7 +12,11 @@ export async function getEmbeddableStaticContext(params: RouteLayoutParams) {
     const { context: baseContext, visitorAuthClaims } = await getStaticSiteContext(params);
     const context: GitBookSiteContext = {
         ...baseContext,
-        linker: getEmbeddableLinker(baseContext.linker),
+        linker: getLinkerForSiteSpace(
+            getEmbeddableLinker(baseContext.linker),
+            baseContext.siteSpace,
+            baseContext.revision.pages
+        ),
     };
 
     return {
@@ -27,7 +32,11 @@ export async function getEmbeddableDynamicContext(params: RouteLayoutParams) {
     const { context: baseContext, visitorAuthClaims } = await getDynamicSiteContext(params);
     const context: GitBookSiteContext = {
         ...baseContext,
-        linker: getEmbeddableLinker(baseContext.linker),
+        linker: getLinkerForSiteSpace(
+            getEmbeddableLinker(baseContext.linker),
+            baseContext.siteSpace,
+            baseContext.revision.pages
+        ),
     };
 
     return {

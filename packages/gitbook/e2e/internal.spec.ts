@@ -1,4 +1,4 @@
-import { expect } from '@playwright/test';
+import { type Page, expect } from '@playwright/test';
 import jwt from 'jsonwebtoken';
 
 import {
@@ -51,6 +51,27 @@ const AI_PROMPT = [
     '3. Reply with only the first sentence of the first page you find, and nothing else.',
     '4. Always end by proposing exactly 3 follow-up suggestions.',
 ].join('\n');
+
+// `InsightsProvider` debounces its flushes by 1.5s.
+const INSIGHTS_FLUSH_TIMEOUT = 3000;
+
+/**
+ * Collect the insights events of a given type sent by the page and its frames.
+ */
+function trackInsightsEvents(page: Page, type: string) {
+    const collected: { type: string }[] = [];
+
+    page.on('request', (request) => {
+        if (request.method() !== 'POST' || !request.url().includes('/~gitbook/__evt')) {
+            return;
+        }
+
+        const body = request.postDataJSON() as { events?: { type: string }[] } | null;
+        collected.push(...(body?.events ?? []).filter((event) => event.type === type));
+    });
+
+    return collected;
+}
 
 const overrideAIInitialState = () => {
     const greeting = document.querySelector('[data-testid="ai-chat-greeting-title"]');
@@ -2259,6 +2280,33 @@ const testCases: TestsCase[] = [
                         'data-icon',
                         'book'
                     );
+                },
+            },
+            {
+                name: 'Only tracks ask_view once the widget is opened',
+                // `trigger=custom` loads the frame but leaves the window closed.
+                url: '?trigger=custom',
+                screenshot: false,
+                run: async (page) => {
+                    const askViews = trackInsightsEvents(page, 'ask_view');
+                    const chat = page.frameLocator('#gitbook-widget-iframe').getByTestId('ai-chat');
+
+                    // The assistant renders inside the hidden frame, but nobody has seen it.
+                    await expect(chat).toBeAttached({ timeout: 20000 });
+                    await page.waitForTimeout(INSIGHTS_FLUSH_TIMEOUT);
+                    expect(askViews).toHaveLength(0);
+
+                    await page.getByRole('button', { name: 'Open' }).click();
+                    await expect(chat).toBeVisible();
+                    await expect.poll(() => askViews.length, { timeout: 20000 }).toBe(1);
+
+                    // Hiding and showing the same frame again is not a second view.
+                    await page.getByRole('button', { name: 'Close' }).click();
+                    await expect(chat).toBeHidden();
+                    await page.getByRole('button', { name: 'Open' }).click();
+                    await expect(chat).toBeVisible();
+                    await page.waitForTimeout(INSIGHTS_FLUSH_TIMEOUT);
+                    expect(askViews).toHaveLength(1);
                 },
             },
         ],

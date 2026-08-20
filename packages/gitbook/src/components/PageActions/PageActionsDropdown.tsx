@@ -24,13 +24,8 @@ import {
     type PageActionAssistantContext,
 } from './PageActions';
 import { Button, ButtonGroup } from '@/components/primitives/Button';
-import {
-    DropdownMenu,
-    DropdownMenuSeparator,
-    useDropdownMenuOpen,
-} from '@/components/primitives/DropdownMenu';
+import { DropdownMenu, DropdownMenuSeparator } from '@/components/primitives/DropdownMenu';
 import { tString, useLanguage } from '@/intl/client';
-import type { ClassValue } from '@/lib/tailwind';
 
 /**
  * Type of a built-in page action that can be displayed in the page actions menu.
@@ -142,7 +137,7 @@ export function PageActionsDropdown(props: PageActionsDropdownProps) {
                     className="!min-w-60 max-w-max"
                     button={
                         <Button
-                            icon={<MoreActionsChevron className="size-text-sm" />}
+                            icon={<ToggleChevron className="size-text-sm" />}
                             label={tString(language, defaultAction ? 'more' : 'actions')}
                             iconOnly={!!defaultAction}
                             size="xsmall"
@@ -156,15 +151,6 @@ export function PageActionsDropdown(props: PageActionsDropdownProps) {
             ) : null}
         </ButtonGroup>
     ) : null;
-}
-
-/**
- * Chevron for the "more" button, driven by the dropdown's real open state to avoid colliding
- * with the shared `data-popup-open` attribute set by the button's own Tooltip.
- */
-function MoreActionsChevron(props: { className?: ClassValue }) {
-    const open = useDropdownMenuOpen();
-    return <ToggleChevron open={open} className={props.className} />;
 }
 
 /**

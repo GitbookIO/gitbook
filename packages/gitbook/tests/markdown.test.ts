@@ -85,7 +85,9 @@ describe('search parameters for indexing crawlers', () => {
 describe('markdown pages', () => {
     it('should expose a markdown page with the .md extension', async () => {
         const response = await fetch(
-            getContentTestURL('https://gitbook.gitbook.io/test-gitbook-open/text-page.md')
+            getContentTestURL(
+                'https://gitbook.gitbook.io/test-gitbook-open/text-page.md?x-gitbook-search-indexation=1'
+            )
         );
         const text = await response.text();
 
@@ -97,7 +99,9 @@ describe('markdown pages', () => {
 
     it('should expose a markdown page with the accept header', async () => {
         const response = await fetch(
-            getContentTestURL('https://gitbook.gitbook.io/test-gitbook-open/text-page'),
+            getContentTestURL(
+                'https://gitbook.gitbook.io/test-gitbook-open/text-page?x-gitbook-search-indexation=1'
+            ),
             {
                 headers: {
                     Accept: 'text/markdown',
@@ -120,13 +124,15 @@ describe('markdown pages', () => {
 
         expect(response.status).toBe(200);
         expect(response.headers.get('content-type')).toContain('text/markdown');
-        expect(response.headers.get('x-robots-tag')).toBe('noindex');
+        expect(response.headers.get('x-robots-tag')).toBe('noindex, nofollow');
         expect(text).toContain('# Page Not Found');
     });
 
     it('should rewrite links to markdown URLs', async () => {
         const response = await fetch(
-            getContentTestURL('https://gitbook.gitbook.io/test-gitbook-open/blocks/links.md')
+            getContentTestURL(
+                'https://gitbook.gitbook.io/test-gitbook-open/blocks/links.md?x-gitbook-search-indexation=1'
+            )
         );
         const text = await response.text();
 
@@ -248,4 +254,66 @@ describe('markdown ask responses', () => {
         },
         { timeout: 30_000 }
     );
+});
+
+describe('markdown robots directives', () => {
+    // Preview deployments block indexation unless this param is set.
+    const INDEXATION_PARAM = 'x-gitbook-search-indexation=1';
+    // Share link sites are never indexable, whatever the visitor is.
+    const SHARE_LINK_PAGE_URL =
+        'https://gitbook-open-e2e-sites.gitbook.io/api-multi-versions-share-links/8tNo6MeXg7CkFMzSSz81/3.0/other-page';
+
+    it('should be indexable for an AI agent requesting a .md page', async () => {
+        const response = await fetch(getContentTestURL(`${TEST_PAGE_URL}.md?${INDEXATION_PARAM}`), {
+            headers: { 'User-Agent': 'ClaudeBot/1.0' },
+        });
+
+        expect(response.status).toBe(200);
+        expect(response.headers.get('content-type')).toContain('text/markdown');
+        expect(response.headers.get('x-robots-tag')).toBe('index, follow');
+    });
+
+    it('should be indexable for an AI agent served markdown on the page URL', async () => {
+        const response = await fetch(getContentTestURL(`${TEST_PAGE_URL}?${INDEXATION_PARAM}`), {
+            headers: { 'User-Agent': 'GPTBot/1.2' },
+        });
+
+        expect(response.status).toBe(200);
+        expect(response.headers.get('content-type')).toContain('text/markdown');
+        expect(response.headers.get('x-robots-tag')).toBe('index, follow');
+    });
+
+    it('should stay noindex for a non-agent requesting a .md page', async () => {
+        const response = await fetch(getContentTestURL(`${TEST_PAGE_URL}.md?${INDEXATION_PARAM}`), {
+            headers: { 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)' },
+        });
+
+        expect(response.status).toBe(200);
+        expect(response.headers.get('content-type')).toContain('text/markdown');
+        expect(response.headers.get('x-robots-tag')).toBe('noindex');
+    });
+
+    it('should be noindex, nofollow for an AI agent on a non-indexable site', async () => {
+        const response = await fetch(
+            getContentTestURL(`${SHARE_LINK_PAGE_URL}.md?${INDEXATION_PARAM}`),
+            { headers: { 'User-Agent': 'ClaudeBot/1.0' } }
+        );
+
+        expect(response.status).toBe(200);
+        expect(response.headers.get('content-type')).toContain('text/markdown');
+        expect(response.headers.get('x-robots-tag')).toBe('noindex, nofollow');
+    });
+
+    it('should be noindex, nofollow for an AI agent on a missing page', async () => {
+        const response = await fetch(
+            getContentTestURL(
+                `https://gitbook.gitbook.io/test-gitbook-open/missing-page.md?${INDEXATION_PARAM}`
+            ),
+            { headers: { 'User-Agent': 'ClaudeBot/1.0' } }
+        );
+
+        expect(response.status).toBe(200);
+        expect(response.headers.get('content-type')).toContain('text/markdown');
+        expect(response.headers.get('x-robots-tag')).toBe('noindex, nofollow');
+    });
 });

@@ -23,7 +23,7 @@ import {
     EmbeddableFrameSubtitle,
     EmbeddableFrameTitle,
 } from '../Embeddable/EmbeddableFrame';
-import { useNow } from '../hooks';
+import { useIsMounted, useNow } from '../hooks';
 import { useTrackEvent } from '../Insights';
 import { Button } from '../primitives';
 import { ScrollContainer } from '../primitives/ScrollContainer';
@@ -63,7 +63,9 @@ export function AIChat() {
         () => {
             chatController.close();
         },
-        []
+        {
+            useKey: true,
+        }
     );
 
     // Track the view of the AI chat
@@ -222,13 +224,17 @@ export function AIChatBody(props: {
 
     const isEmpty = !chat.messages.length;
 
+    const isMounted = useIsMounted();
     const timeGreeting = React.useMemo(() => {
+        // The server clock runs in another timezone than the visitor's, so computing the
+        // greeting during SSR mismatches on hydration and regenerates the whole chat tree.
+        if (!isMounted) return '';
         const hour = new Date(now).getHours();
         if (hour < 6) return tString(language, 'ai_chat_assistant_greeting_night');
         if (hour < 12) return tString(language, 'ai_chat_assistant_greeting_morning');
         if (hour < 18) return tString(language, 'ai_chat_assistant_greeting_afternoon');
         return tString(language, 'ai_chat_assistant_greeting_evening');
-    }, [now, language]);
+    }, [isMounted, now, language]);
 
     return (
         <>

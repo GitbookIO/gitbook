@@ -177,6 +177,14 @@ export function getNodeFragmentByName(
     return fragment ?? null;
 }
 
+/** Blocks that paint nothing of their own: only the nodes they hold. */
+const TEXT_ONLY_BLOCKS = new Set<DocumentBlock['type']>([
+    'paragraph',
+    'heading-1',
+    'heading-2',
+    'heading-3',
+]);
+
 /**
  * Test if a node is empty.
  */
@@ -187,11 +195,20 @@ export function isNodeEmpty(
         return false;
     }
 
-    if (node.object !== 'text' && 'nodes' in node) {
-        if (node.nodes.length > 1) {
-            return false;
+    if (node.object === 'block') {
+        // `if` blocks are resolved by the API, one reaching us is never rendered.
+        if (node.type === 'if') {
+            return true;
         }
 
+        // Any other block paints something of its own however blank its nodes are: a hint its box,
+        // a list its markers, a tabs-item the title and icon from its `data`.
+        if (!TEXT_ONLY_BLOCKS.has(node.type)) {
+            return false;
+        }
+    }
+
+    if (node.object !== 'text' && 'nodes' in node) {
         return node.nodes.every((child) => isNodeEmpty(child));
     }
 

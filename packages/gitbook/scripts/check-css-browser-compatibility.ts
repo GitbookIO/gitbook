@@ -1,11 +1,10 @@
+import { execFileSync } from 'node:child_process';
 import { readFile } from 'node:fs/promises';
+import { join } from 'node:path';
 
 import {
     type CompatibilityDiagnostic,
-    type IssueCommentClient,
-    formatCompatibilityComment,
     getCompatibilityDiagnostics,
-    upsertCompatibilityComment,
 } from '../src/lib/cssBrowserCompatibility';
 
 interface PullRequestEvent {
@@ -33,12 +32,6 @@ interface GitBlobResponse {
     encoding: string;
 }
 
-interface IssueComment {
-    body: string;
-    id: number;
-    user: { login: string } | null;
-}
-
 class GitHubRequestError extends Error {
     constructor(
         readonly status: number,
@@ -48,7 +41,7 @@ class GitHubRequestError extends Error {
     }
 }
 
-class GitHubApi implements IssueCommentClient {
+class GitHubApi {
     constructor(
         private readonly repository: string,
         private readonly token: string
@@ -114,34 +107,6 @@ class GitHubApi implements IssueCommentClient {
     async getFileAtRef(path: string, ref: string): Promise<string> {
         return this.getContent(path, ref);
     }
-
-    async listIssueComments(issueNumber: number): Promise<IssueComment[]> {
-        const comments: IssueComment[] = [];
-
-        for (let page = 1; ; page += 1) {
-            const result = await this.request<IssueComment[]>(
-                `/repos/${this.repository}/issues/${issueNumber}/comments?per_page=100&page=${page}`
-            );
-            comments.push(...result);
-            if (result.length < 100) {
-                return comments;
-            }
-        }
-    }
-
-    async createIssueComment(issueNumber: number, body: string): Promise<void> {
-        await this.request(`/repos/${this.repository}/issues/${issueNumber}/comments`, {
-            body: JSON.stringify({ body }),
-            method: 'POST',
-        });
-    }
-
-    async updateIssueComment(commentId: number, body: string): Promise<void> {
-        await this.request(`/repos/${this.repository}/issues/comments/${commentId}`, {
-            body: JSON.stringify({ body }),
-            method: 'PATCH',
-        });
-    }
 }
 
 async function getBrowserslist(api: GitHubApi, headSha: string): Promise<string[]> {
@@ -173,6 +138,83 @@ async function getBaseContent(
         }
         throw error;
     }
+}
+
+function report(diagnostics: CompatibilityDiagnostic[]): boolean {
+    if (diagnostics.length === 0) {
+        console.log('CSS browser compatibility check passed.');
+        return true;
+    }
+
+    console.error(
+        `${diagnostics.length} newly added CSS declaration(s) are not fully supported by the configured Browserslist targets:`
+    );
+    for (const diagnostic of diagnostics) {
+        // Workflow command so the failure is annotated on the PR diff.
+        console.error(
+            `::error file=${diagnostic.file},line=${diagnostic.line},col=${diagnostic.column}::${diagnostic.property} is not supported by ${diagnostic.unsupportedBrowsers}`
+        );
+    }
+    return false;
+}
+
+/** Same check as CI, but against a local `git diff` instead of the GitHub API. */
+async function runLocal(baseRef: string): Promise<boolean> {
+    const git = (...args: string[]) =>
+        execFileSync('git', args, { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
+    const root = git('rev-parse', '--show-toplevel').trim();
+    const mergeBase = git('merge-base', baseRef, 'HEAD').trim();
+    const browsers = (
+        JSON.parse(await readFile(join(root, 'packages/gitbook/package.json'), 'utf8')) as {
+            browserslist?: string[];
+        }
+    ).browserslist;
+
+    if (!browsers?.length) {
+        throw new Error('packages/gitbook/package.json must define a Browserslist configuration.');
+    }
+
+    // Working tree, so uncommitted changes are checked too.
+    const changes = git(
+        'diff',
+        '--name-status',
+        '--find-renames',
+        '--diff-filter=ACMR',
+        mergeBase,
+        '--',
+        '*.css'
+    )
+        .split('\n')
+        .filter(Boolean)
+        .map((line) => {
+            const [status, ...paths] = line.split('\t');
+            const previousPath = paths.length > 1 ? paths[0] : undefined;
+            const path = paths.at(-1) as string;
+            return { added: status?.startsWith('A'), path, previousPath };
+        });
+
+    const diagnostics: CompatibilityDiagnostic[] = [];
+    for (const change of changes) {
+        let base = '';
+        if (!change.added) {
+            try {
+                base = git('show', `${mergeBase}:${change.previousPath ?? change.path}`);
+            } catch {
+                base = '';
+            }
+        }
+        diagnostics.push(
+            ...(await getCompatibilityDiagnostics({
+                base,
+                browsers,
+                file: change.path,
+                head: await readFile(join(root, change.path), 'utf8'),
+            }))
+        );
+    }
+
+    console.log(`Checked ${changes.length} changed CSS file(s) against ${baseRef}.`);
+    return report(diagnostics);
 }
 
 async function run(): Promise<boolean> {
@@ -212,34 +254,19 @@ async function run(): Promise<boolean> {
         );
     }
 
-    const comment = formatCompatibilityComment({
-        diagnostics,
-        headSha: pullRequest.head.sha,
-        repository,
-    });
-    await upsertCompatibilityComment({
-        body: comment,
-        createIfMissing: diagnostics.length > 0,
-        client: api,
-        issueNumber: pullRequest.number,
-    });
-
-    if (diagnostics.length === 0) {
-        console.log('CSS browser compatibility check passed.');
-        return true;
-    }
-
-    console.error('Unsupported CSS declarations found:');
-    for (const diagnostic of diagnostics) {
-        console.error(
-            `${diagnostic.file}:${diagnostic.line} ${diagnostic.property} — ${diagnostic.unsupportedBrowsers}`
-        );
-    }
-    return false;
+    return report(diagnostics);
 }
 
+const localFlagIndex = process.argv.indexOf('--local');
+
 try {
-    process.exitCode = (await run()) ? 0 : 1;
+    let success: boolean;
+    if (localFlagIndex === -1) {
+        success = await run();
+    } else {
+        success = await runLocal(process.argv[localFlagIndex + 1] ?? 'origin/main');
+    }
+    process.exitCode = success ? 0 : 1;
 } catch (error) {
     console.error(error);
     process.exitCode = 1;

@@ -27,7 +27,11 @@ import { getResizedImageURL } from '@/lib/images';
 import { getPagePath } from '@/lib/pages';
 import { resolveContentRef } from '@/lib/references';
 import { isPageIndexable, isSiteIndexable } from '@/lib/seo';
-import { getSiteStructureTitle } from '@/lib/sites';
+import {
+    getSiteSpacePagePaths,
+    getSiteStructureTitle,
+    resolveSiteSpaceCustomHomePage,
+} from '@/lib/sites';
 import { tcls } from '@/lib/tailwind';
 import { getDocumentFilterableTags } from '@/lib/updates';
 import { getPageRSSURL } from '@/routes/rss';
@@ -265,13 +269,25 @@ export async function getSitePageData(props: SitePageProps) {
             }
             notFound();
         }
-    } else if (getPagePath(context.revision.pages, pageTarget.page) !== rawPathname) {
-        redirect(
-            context.linker.toPathForPage({
-                pages: context.revision.pages,
-                page: pageTarget.page,
-            })
+    } else {
+        const customHomePage = resolveSiteSpaceCustomHomePage(
+            context.siteSpace,
+            context.revision.pages
         );
+        // Without a custom home page, a page has a single canonical path. With one, the custom
+        // home page also gains the site space's root as a valid alias.
+        const expectedPagePaths = customHomePage
+            ? getSiteSpacePagePaths(context.siteSpace, context.revision.pages, pageTarget.page)
+            : [getPagePath(context.revision.pages, pageTarget.page)];
+
+        if (!expectedPagePaths.includes(rawPathname)) {
+            redirect(
+                context.linker.toPathForPage({
+                    pages: context.revision.pages,
+                    page: pageTarget.page,
+                })
+            );
+        }
     }
 
     const { customization, visibleSections } = context;

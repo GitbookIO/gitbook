@@ -1,5 +1,7 @@
 import type {
     LocalizedString,
+    Revision,
+    RevisionPageDocument,
     SiteSection,
     SiteSectionGroup,
     SiteSpace,
@@ -7,7 +9,14 @@ import type {
     TranslationLanguage,
 } from '@gitbook/api';
 
-import { extractPagePath } from './pages';
+import { type GitBookLinker, linkerWithDirectPagePaths } from './links';
+import {
+    extractPagePath,
+    getPagePaths,
+    resolvePageId,
+    resolvePagePath,
+    resolvePagePathDocumentOrGroup,
+} from './pages';
 import { joinPath } from './paths';
 import { flattenSectionsFromGroup } from './utils';
 import { languages } from '@/intl/translations';
@@ -72,6 +81,100 @@ export function filterSiteSpacesByLocale(
     return siteSpaces.filter(
         (siteSpace) => normalizeLanguage(siteSpace.space.language) === normalizedLocale
     );
+}
+
+/**
+ * Resolve the custom home page for a site space in the current revision.
+ * `pageId` isn't guaranteed to still resolve to a document (e.g. it can go stale once the target
+ * page is deleted), so we fall back to `undefined` rather than throwing.
+ */
+export function resolveSiteSpaceCustomHomePage({ pageId }: SiteSpace, pages: Revision['pages']) {
+    if (!pageId) {
+        return undefined;
+    }
+
+    const resolved = resolvePageId(pages, pageId);
+
+    // A group ID resolves to its first document, but only documents can be custom home pages.
+    if (resolved?.page.id !== pageId) {
+        return undefined;
+    }
+
+    return resolved;
+}
+
+/**
+ * Resolve a page within a site space from its path, taking the custom home page into account.
+ * `pagePath` is always relative to the site space (never a raw URL), so `''` is the only value
+ * that can refer to its root — share links and base paths are stripped before this is called.
+ */
+export function resolveSiteSpacePagePath(
+    siteSpace: SiteSpace,
+    pages: Revision['pages'],
+    pagePath: string
+) {
+    if (pagePath === '') {
+        const customHomePage = resolveSiteSpaceCustomHomePage(siteSpace, pages);
+        if (customHomePage) {
+            return customHomePage;
+        }
+    }
+
+    return resolvePagePath(pages, pagePath);
+}
+
+/**
+ * Same as {@link resolveSiteSpacePagePath}, but also matches group pages (e.g. for RSS/markdown
+ * routes that can render a listing page for a group).
+ */
+export function resolveSiteSpacePagePathDocumentOrGroup(
+    siteSpace: SiteSpace,
+    pages: Revision['pages'],
+    pagePath: string
+) {
+    if (pagePath === '') {
+        const customHomePage = resolveSiteSpaceCustomHomePage(siteSpace, pages);
+        if (customHomePage) {
+            return customHomePage;
+        }
+    }
+
+    return resolvePagePathDocumentOrGroup(pages, pagePath);
+}
+
+/**
+ * Return every URL path that can display a page in a site space.
+ */
+export function getSiteSpacePagePaths(
+    siteSpace: SiteSpace,
+    pages: Revision['pages'],
+    page: RevisionPageDocument
+): string[] {
+    const customHomePage = resolveSiteSpaceCustomHomePage(siteSpace, pages);
+    if (!customHomePage) {
+        return getPagePaths(pages, page);
+    }
+
+    if (customHomePage.page.id === page.id) {
+        return ['', page.path];
+    }
+
+    return [page.path];
+}
+
+/**
+ * Keep normal page paths when a site-space root renders a custom home page.
+ */
+export function getLinkerForSiteSpace(
+    linker: GitBookLinker,
+    siteSpace: SiteSpace,
+    pages: Revision['pages']
+): GitBookLinker {
+    if (!resolveSiteSpaceCustomHomePage(siteSpace, pages)) {
+        return linker;
+    }
+
+    return linkerWithDirectPagePaths(linker);
 }
 
 /*
