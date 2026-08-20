@@ -1,6 +1,14 @@
 import { describe, expect, it } from 'bun:test';
 
+import type { DocumentBlockParagraph } from '@gitbook/api';
+
 import { getBlockTitle, isNodeEmpty } from './document';
+
+const emptyParagraph: DocumentBlockParagraph = {
+    object: 'block',
+    type: 'paragraph',
+    nodes: [{ object: 'text', leaves: [{ object: 'leaf', text: '', marks: [] }] }],
+};
 
 describe('isNodeEmpty', () => {
     it('should return true for a document with an empty paragraph', () => {
@@ -25,6 +33,58 @@ describe('isNodeEmpty', () => {
                             },
                         ],
                     },
+                ],
+            })
+        ).toEqual(true);
+    });
+
+    it('should return true for a document with several empty paragraphs', () => {
+        expect(
+            isNodeEmpty({
+                object: 'document',
+                data: {},
+                nodes: [emptyParagraph, emptyParagraph],
+            })
+        ).toEqual(true);
+    });
+
+    it('should return false for a paragraph whose children are not all blank', () => {
+        expect(
+            isNodeEmpty({
+                object: 'block',
+                type: 'paragraph',
+                nodes: [
+                    { object: 'text', leaves: [{ object: 'leaf', text: '', marks: [] }] },
+                    { object: 'text', leaves: [{ object: 'leaf', text: 'Hello', marks: [] }] },
+                ],
+            })
+        ).toEqual(false);
+    });
+
+    it('should return true for a document with only an if block', () => {
+        expect(
+            isNodeEmpty({
+                object: 'document',
+                data: {},
+                nodes: [
+                    {
+                        object: 'block',
+                        type: 'if',
+                        data: { expression: 'visitor.claims.enabled' },
+                        nodes: [
+                            {
+                                object: 'block',
+                                type: 'paragraph',
+                                nodes: [
+                                    {
+                                        object: 'text',
+                                        leaves: [{ object: 'leaf', text: 'Hidden', marks: [] }],
+                                    },
+                                ],
+                            },
+                        ],
+                    },
+                    emptyParagraph,
                 ],
             })
         ).toEqual(true);

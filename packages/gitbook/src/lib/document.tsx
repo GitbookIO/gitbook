@@ -187,11 +187,12 @@ export function isNodeEmpty(
         return false;
     }
 
-    if (node.object !== 'text' && 'nodes' in node) {
-        if (node.nodes.length > 1) {
-            return false;
-        }
+    // `if` blocks are resolved by the API, one reaching us is never rendered.
+    if (node.object === 'block' && node.type === 'if') {
+        return true;
+    }
 
+    if (node.object !== 'text' && 'nodes' in node) {
         return node.nodes.every((child) => isNodeEmpty(child));
     }
 
