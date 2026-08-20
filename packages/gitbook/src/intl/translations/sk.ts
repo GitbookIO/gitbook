@@ -186,4 +186,22 @@ export const sk: TranslationLanguage = {
     form_other_field: 'Iné...',
     cancel: 'Zrušiť',
     direct_link_to_heading: 'Priamy odkaz na nadpis',
+    auth_consent_request: '${1} chce vo vašom mene získať prístup k ${2}.',
+    auth_client_website: 'Webová stránka',
+    auth_verified: 'Overené',
+    auth_unverified: 'Neoverené',
+    auth_unverified_title: 'GitBook tohto klienta neoveril',
+    auth_unverified_description:
+        'Schváľte iba vtedy, ak túto aplikáciu poznáte a dôverujete jej s prístupom k ${1}.',
+    auth_code_preamble: 'Po schválení bude autorizačný kód odoslaný na:',
+    auth_redirect_uri_label: 'URI presmerovania',
+    auth_trust_client: 'Tohto klienta poznám a dôverujem mu',
+    auth_approve: 'Schváliť',
+    auth_deny: 'Odmietnuť',
+    auth_error_title: 'Niečo sa pokazilo',
+    auth_expired_title: 'Tento autorizačný odkaz vypršal',
+    auth_expired_description: 'Začnite prihlásenie znova z aplikácie.',
+    auth_error_invalid_request: 'Neplatná požiadavka. Začnite znova z aplikácie.',
+    auth_error_failed:
+        'Autorizáciu sa nepodarilo dokončiť. Požiadavka mohla vypršať — začnite znova z aplikácie.',
 };

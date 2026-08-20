@@ -183,4 +183,22 @@ export const id: TranslationLanguage = {
     form_other_field: 'Lainnya...',
     cancel: 'Batal',
     direct_link_to_heading: 'Tautan langsung ke judul',
+    auth_consent_request: '${1} ingin mengakses ${2} atas nama Anda.',
+    auth_client_website: 'Situs web',
+    auth_verified: 'Terverifikasi',
+    auth_unverified: 'Belum terverifikasi',
+    auth_unverified_title: 'GitBook belum memverifikasi klien ini',
+    auth_unverified_description:
+        'Setujui hanya jika Anda mengenali aplikasi ini dan mempercayainya untuk mengakses ${1}.',
+    auth_code_preamble: 'Setelah disetujui, kode otorisasi akan dikirim ke:',
+    auth_redirect_uri_label: 'URI pengalihan',
+    auth_trust_client: 'Saya mengenali dan mempercayai klien ini',
+    auth_approve: 'Setujui',
+    auth_deny: 'Tolak',
+    auth_error_title: 'Terjadi kesalahan',
+    auth_expired_title: 'Tautan otorisasi ini telah kedaluwarsa',
+    auth_expired_description: 'Silakan mulai masuk lagi dari aplikasi.',
+    auth_error_invalid_request: 'Permintaan tidak valid. Silakan mulai lagi dari aplikasi.',
+    auth_error_failed:
+        'Kami tidak dapat menyelesaikan otorisasi. Permintaan mungkin telah kedaluwarsa — silakan mulai lagi dari aplikasi.',
 };

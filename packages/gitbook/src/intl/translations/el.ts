@@ -189,4 +189,22 @@ export const el: TranslationLanguage = {
     form_other_field: 'Άλλο...',
     cancel: 'Ακύρωση',
     direct_link_to_heading: 'Άμεσος σύνδεσμος προς την επικεφαλίδα',
+    auth_consent_request: 'Το ${1} θέλει να αποκτήσει πρόσβαση στο ${2} για λογαριασμό σας.',
+    auth_client_website: 'Ιστότοπος',
+    auth_verified: 'Επαληθευμένο',
+    auth_unverified: 'Μη επαληθευμένο',
+    auth_unverified_title: 'Το GitBook δεν έχει επαληθεύσει αυτόν τον client',
+    auth_unverified_description:
+        'Εγκρίνετε μόνο εάν αναγνωρίζετε αυτήν την εφαρμογή και την εμπιστεύεστε με πρόσβαση στο ${1}.',
+    auth_code_preamble: 'Μετά την έγκριση, ένας κωδικός εξουσιοδότησης θα σταλεί στο:',
+    auth_redirect_uri_label: 'URI ανακατεύθυνσης',
+    auth_trust_client: 'Αναγνωρίζω και εμπιστεύομαι αυτόν τον client',
+    auth_approve: 'Έγκριση',
+    auth_deny: 'Απόρριψη',
+    auth_error_title: 'Κάτι πήγε στραβά',
+    auth_expired_title: 'Αυτός ο σύνδεσμος εξουσιοδότησης έχει λήξει',
+    auth_expired_description: 'Ξεκινήστε ξανά τη σύνδεση από την εφαρμογή.',
+    auth_error_invalid_request: 'Μη έγκυρο αίτημα. Ξεκινήστε ξανά από την εφαρμογή.',
+    auth_error_failed:
+        'Δεν μπορέσαμε να ολοκληρώσουμε την εξουσιοδότηση. Το αίτημα μπορεί να έχει λήξει — ξεκινήστε ξανά από την εφαρμογή.',
 };

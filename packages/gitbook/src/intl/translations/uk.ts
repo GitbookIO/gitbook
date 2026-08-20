@@ -182,4 +182,22 @@ export const uk: TranslationLanguage = {
     form_other_field: 'Інше...',
     cancel: 'Скасувати',
     direct_link_to_heading: 'Пряме посилання на заголовок',
+    auth_consent_request: '${1} хоче отримати доступ до ${2} від вашого імені.',
+    auth_client_website: 'Вебсайт',
+    auth_verified: 'Перевірено',
+    auth_unverified: 'Не перевірено',
+    auth_unverified_title: 'GitBook не перевіряв цей клієнт',
+    auth_unverified_description:
+        'Схвалюйте лише якщо ви впізнаєте цей застосунок і довіряєте йому доступ до ${1}.',
+    auth_code_preamble: 'Після схвалення код авторизації буде надіслано на:',
+    auth_redirect_uri_label: 'URI перенаправлення',
+    auth_trust_client: 'Я впізнаю цей клієнт і довіряю йому',
+    auth_approve: 'Схвалити',
+    auth_deny: 'Відхилити',
+    auth_error_title: 'Щось пішло не так',
+    auth_expired_title: 'Термін дії цього посилання авторизації сплив',
+    auth_expired_description: 'Почніть вхід знову із застосунку.',
+    auth_error_invalid_request: 'Некоректний запит. Почніть знову із застосунку.',
+    auth_error_failed:
+        'Не вдалося завершити авторизацію. Можливо, термін дії запиту сплив — почніть знову із застосунку.',
 };

@@ -21,7 +21,8 @@ export function Checkbox({ className, size = 'medium', ...props }: CheckboxProps
             className={tcls(
                 'peer',
                 'shrink-0',
-                'rounded-xs',
+                'rounded-corners:rounded-sm',
+                'circular-corners:rounded-md',
                 'straight-corners:rounded-none',
                 'ring-1',
                 'ring-tint-12/4',

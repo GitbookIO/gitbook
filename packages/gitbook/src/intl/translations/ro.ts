@@ -187,4 +187,22 @@ export const ro: TranslationLanguage = {
     form_other_field: 'Altul...',
     cancel: 'Anulează',
     direct_link_to_heading: 'Link direct către titlu',
+    auth_consent_request: '${1} dorește să acceseze ${2} în numele tău.',
+    auth_client_website: 'Site web',
+    auth_verified: 'Verificat',
+    auth_unverified: 'Neverificat',
+    auth_unverified_title: 'GitBook nu a verificat acest client',
+    auth_unverified_description:
+        'Aprobă doar dacă recunoști această aplicație și îi acorzi încredere pentru acces la ${1}.',
+    auth_code_preamble: 'După aprobare, un cod de autorizare va fi trimis către:',
+    auth_redirect_uri_label: 'URI de redirecționare',
+    auth_trust_client: 'Recunosc acest client și am încredere în el',
+    auth_approve: 'Aprobă',
+    auth_deny: 'Respinge',
+    auth_error_title: 'Ceva nu a funcționat',
+    auth_expired_title: 'Acest link de autorizare a expirat',
+    auth_expired_description: 'Reia autentificarea din aplicație.',
+    auth_error_invalid_request: 'Cerere invalidă. Reia din aplicație.',
+    auth_error_failed:
+        'Nu am putut finaliza autorizarea. Cererea poate să fi expirat — reia din aplicație.',
 };

@@ -184,4 +184,22 @@ export const fr: TranslationLanguage = {
     form_other_field: 'Autre...',
     cancel: 'Annuler',
     direct_link_to_heading: 'Lien direct vers le titre',
+    auth_consent_request: '${1} souhaite accéder à ${2} en votre nom.',
+    auth_client_website: 'Site web',
+    auth_verified: 'Vérifié',
+    auth_unverified: 'Non vérifié',
+    auth_unverified_title: 'GitBook n’a pas vérifié ce client',
+    auth_unverified_description:
+        'N’approuvez que si vous reconnaissez cette application et lui faites confiance pour accéder à ${1}.',
+    auth_code_preamble: 'Après approbation, un code d’autorisation sera envoyé à :',
+    auth_redirect_uri_label: 'URI de redirection',
+    auth_trust_client: 'Je reconnais ce client et lui fais confiance',
+    auth_approve: 'Approuver',
+    auth_deny: 'Refuser',
+    auth_error_title: 'Une erreur s’est produite',
+    auth_expired_title: 'Ce lien d’autorisation a expiré',
+    auth_expired_description: 'Veuillez recommencer la connexion depuis l’application.',
+    auth_error_invalid_request: 'Requête invalide. Veuillez recommencer depuis l’application.',
+    auth_error_failed:
+        'Nous n’avons pas pu finaliser l’autorisation. La requête a peut-être expiré — veuillez recommencer depuis l’application.',
 };

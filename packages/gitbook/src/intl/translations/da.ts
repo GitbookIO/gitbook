@@ -183,4 +183,22 @@ export const da: TranslationLanguage = {
     form_other_field: 'Andet...',
     cancel: 'Annuller',
     direct_link_to_heading: 'Direkte link til overskriften',
+    auth_consent_request: '${1} vil have adgang til ${2} på dine vegne.',
+    auth_client_website: 'Websted',
+    auth_verified: 'Verificeret',
+    auth_unverified: 'Ikke verificeret',
+    auth_unverified_title: 'GitBook har ikke verificeret denne klient',
+    auth_unverified_description:
+        'Godkend kun, hvis du kender dette program og stoler på, at det får adgang til ${1}.',
+    auth_code_preamble: 'Når du har godkendt, sendes en autorisationskode til:',
+    auth_redirect_uri_label: 'Omdirigerings-URI',
+    auth_trust_client: 'Jeg kender og stoler på denne klient',
+    auth_approve: 'Godkend',
+    auth_deny: 'Afvis',
+    auth_error_title: 'Noget gik galt',
+    auth_expired_title: 'Dette autorisationslink er udløbet',
+    auth_expired_description: 'Start venligst login forfra fra programmet.',
+    auth_error_invalid_request: 'Ugyldig anmodning. Start venligst forfra fra programmet.',
+    auth_error_failed:
+        'Vi kunne ikke fuldføre autorisationen. Anmodningen kan være udløbet — start venligst forfra fra programmet.',
 };

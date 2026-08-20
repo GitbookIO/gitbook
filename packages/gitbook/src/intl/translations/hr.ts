@@ -184,4 +184,22 @@ export const hr: TranslationLanguage = {
     form_other_field: 'Ostalo...',
     cancel: 'Odustani',
     direct_link_to_heading: 'Izravna poveznica na naslov',
+    auth_consent_request: '${1} želi pristupiti ${2} u vaše ime.',
+    auth_client_website: 'Web-stranica',
+    auth_verified: 'Potvrđeno',
+    auth_unverified: 'Nepotvrđeno',
+    auth_unverified_title: 'GitBook nije potvrdio ovog klijenta',
+    auth_unverified_description:
+        'Odobrite samo ako prepoznajete ovu aplikaciju i vjerujete joj s pristupom ${1}.',
+    auth_code_preamble: 'Nakon odobrenja, autorizacijski kod bit će poslan na:',
+    auth_redirect_uri_label: 'URI za preusmjeravanje',
+    auth_trust_client: 'Prepoznajem ovog klijenta i vjerujem mu',
+    auth_approve: 'Odobri',
+    auth_deny: 'Odbij',
+    auth_error_title: 'Nešto je pošlo po zlu',
+    auth_expired_title: 'Ova autorizacijska veza je istekla',
+    auth_expired_description: 'Molimo ponovno započnite prijavu iz aplikacije.',
+    auth_error_invalid_request: 'Nevažeći zahtjev. Molimo ponovno započnite iz aplikacije.',
+    auth_error_failed:
+        'Nismo mogli dovršiti autorizaciju. Zahtjev je možda istekao — molimo ponovno započnite iz aplikacije.',
 };

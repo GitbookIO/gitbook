@@ -229,7 +229,7 @@ export const Input = React.forwardRef<InputElement, InputProps>((props, passedRe
             className={tcls(
                 'group/input relative flex min-h-min overflow-hidden border border-tint bg-tint-base align-middle shadow-tint/6 ring-primary-hover transition-all dark:shadow-tint-1',
                 disabled
-                    ? 'cursor-not-allowed border-tint-subtle bg-tint-subtle opacity-7'
+                    ? 'cursor-not-allowed border-tint-subtle bg-tint-subtle text-tint/8'
                     : [
                           'depth-subtle:focus-within:-translate-y-px depth-subtle:hover:not-has-[button:hover]:-translate-y-px depth-subtle:shadow-xs',
                           'focus-within:border-primary-hover focus-within:depth-subtle:shadow-lg focus-within:shadow-primary-subtle focus-within:ring-2 hover:not-has-[button:hover]:cursor-text hover:not-has-[button:hover]:border-tint-hover hover:not-has-[button:hover]:not-focus-within:bg-tint-subtle depth-subtle:hover:not-has-[button:hover]:not-focus-within:shadow-md focus-within:hover:not-has-[button:hover]:border-primary-hover',
@@ -266,7 +266,11 @@ export const Input = React.forwardRef<InputElement, InputProps>((props, passedRe
                         {typeof leading === 'string' ? (
                             <Icon
                                 icon={leading as IconName}
-                                className={tcls('shrink-0', sizes[sizing].leading)}
+                                className={tcls(
+                                    'shrink-0',
+                                    disabled ? 'opacity-80' : '',
+                                    sizes[sizing].leading
+                                )}
                             />
                         ) : (
                             leading
