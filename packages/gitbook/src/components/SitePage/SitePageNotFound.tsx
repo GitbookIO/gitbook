@@ -117,7 +117,13 @@ export function SitePageNotFound() {
 
                     <div className="flex w-full flex-col items-center gap-8">
                         <div className="flex w-full flex-col items-center gap-2 rounded-3xl">
-                            <h1 className={tcls('text-3xl', 'font-semibold', 'text-tint-strong')}>
+                            <h1
+                                className={tcls(
+                                    'text-3xl',
+                                    'font-semibold font-heading',
+                                    'text-tint-strong'
+                                )}
+                            >
                                 {t(
                                     language,
                                     adaptiveAuthLoginHref

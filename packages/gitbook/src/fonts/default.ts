@@ -2,21 +2,22 @@ import { CustomizationDefaultMonospaceFont } from '@gitbook/api';
 
 import { EMOJI_FONT, type FontName } from './definitions';
 import faces from './generated/faces.json';
-import type { FontFacesData, FontFamilyData } from './types';
+import type { FontFacesData, FontFamilyData, FontRole } from './types';
 import { getAssetURL } from '@/lib/assets';
 
 const fontFaces = faces as FontFacesData;
 
-// The rules only vary by font, and every page renders a few dozen of them.
-const cache = new Map<FontName, string>();
+// The rules only vary by font and the variable they bind, and every page renders a few dozen.
+const cache = new Map<string, string>();
 
 /** Used until the cache has warmed up for sites saved before the setting existed. */
 export const DEFAULT_MONOSPACE_FONT = CustomizationDefaultMonospaceFont.IBMPlexMono;
 
 // Emitted per picked family and inlined in the head, so a page never carries the other 20 families
 // the way a shared `next/font` stylesheet did.
-export function generateDefaultFontFacesCSS(font: FontName): string {
-    const cached = cache.get(font);
+export function generateDefaultFontFacesCSS(font: FontName, role?: FontRole): string {
+    const key = role ? `${font}:${role}` : font;
+    const cached = cache.get(key);
     if (cached !== undefined) {
         return cached;
     }
@@ -33,12 +34,12 @@ export function generateDefaultFontFacesCSS(font: FontName): string {
             )
         ),
         generateFallbackFace(family),
-        `:root { ${family.variable}: ${family.fontFamilyValue}; }`,
+        `:root { ${role ? `--font-${role}` : family.variable}: ${family.fontFamilyValue}; }`,
     ]
         .filter(Boolean)
         .join('\n');
 
-    cache.set(font, css);
+    cache.set(key, css);
     return css;
 }
 
