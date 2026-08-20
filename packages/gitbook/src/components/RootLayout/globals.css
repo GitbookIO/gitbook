@@ -552,3 +552,104 @@ html.dark .highlight-line.diff-deleted .highlight-line-content::before {
 .button-group > :is(button, a):not(:first-child):has(~ :is(button, a)) {
   @apply rounded-none!;
 }
+
+/* Zoomable images */
+html:has(.zoom-modal) {
+  overflow: hidden;
+}
+
+.zoom-img {
+  cursor: zoom-in;
+}
+
+.zoom-image-active {
+  view-transition-name: zoom-image;
+}
+
+.zoom-modal img {
+  view-transition-name: zoom-image;
+  cursor: zoom-out;
+}
+
+/* Header links collapse into the "more" dropdown one by one as the header narrows. Each breakpoint
+   hides one more link and reveals the ellipsis holding the ones that no longer fit. */
+@container header (width < 1280px) {
+  .header-links {
+    container-type: inline-size;
+    container-name: headerlinks;
+  }
+}
+
+.header-links-ellipsis {
+  display: none;
+  & div > a {
+    display: none;
+  }
+}
+
+@container headerlinks (width < 150px) {
+  .header-links > :nth-child(n + 1) {
+    display: none;
+  }
+  .header-links > :nth-child(n + 1) ~ .header-links-ellipsis {
+    display: flex;
+    & div > *:nth-child(n + 1) {
+      display: flex;
+    }
+  }
+}
+@container headerlinks (width < 300px) {
+  .header-links > :nth-child(n + 2) {
+    display: none;
+  }
+  .header-links > :nth-child(n + 2) ~ .header-links-ellipsis {
+    display: flex;
+    & div > *:nth-child(n + 2) {
+      display: flex;
+    }
+  }
+}
+@container headerlinks (width < 450px) {
+  .header-links > :nth-child(n + 3) {
+    display: none;
+  }
+  .header-links > :nth-child(n + 3) ~ .header-links-ellipsis {
+    display: flex;
+    & div > *:nth-child(n + 3) {
+      display: flex;
+    }
+  }
+}
+@container headerlinks (width < 550px) {
+  .header-links > :nth-child(n + 4) {
+    display: none;
+  }
+  .header-links > :nth-child(n + 4) ~ .header-links-ellipsis {
+    display: flex;
+    & div > *:nth-child(n + 4) {
+      display: flex;
+    }
+  }
+}
+@container headerlinks (width < 650px) {
+  .header-links > :nth-child(n + 5) {
+    display: none;
+  }
+  .header-links > :nth-child(n + 5) ~ .header-links-ellipsis {
+    display: flex;
+    & div > *:nth-child(n + 5) {
+      display: flex;
+    }
+  }
+}
+@container headerlinks (width < 750px) {
+  .header-links > :nth-child(n + 6) {
+    display: none;
+  }
+  .header-links > :nth-child(n + 6) ~ .header-links-ellipsis {
+    display: flex;
+    & div > *:nth-child(n + 6) {
+      display: flex;
+    }
+  }
+}
