@@ -1,4 +1,4 @@
-import { AdminToolbarClient } from './AdminToolbarClient';
+import { AdminToolbarLazy } from './AdminToolbarLazy';
 import { getToolbarChangedPages } from './changedPages';
 import type { AdminToolbarContext } from './types';
 import type { GitBookSiteContext } from '@/lib/context';
@@ -62,5 +62,5 @@ export async function AdminToolbar(props: AdminToolbarProps) {
         changedPages,
     };
 
-    return <AdminToolbarClient context={minimalContext} />;
+    return <AdminToolbarLazy context={minimalContext} />;
 }
