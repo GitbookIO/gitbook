@@ -185,4 +185,22 @@ export const nl: TranslationLanguage = {
     form_other_field: 'Anders...',
     cancel: 'Annuleren',
     direct_link_to_heading: 'Directe link naar kop',
+    auth_consent_request: '${1} wil namens jou toegang tot ${2}.',
+    auth_client_website: 'Website',
+    auth_verified: 'Geverifieerd',
+    auth_unverified: 'Niet geverifieerd',
+    auth_unverified_title: 'GitBook heeft deze client niet geverifieerd',
+    auth_unverified_description:
+        'Geef alleen toestemming als je deze applicatie kent en haar toegang tot ${1} toevertrouwt.',
+    auth_code_preamble: 'Na goedkeuring wordt een autorisatiecode verzonden naar:',
+    auth_redirect_uri_label: 'Redirect-URI',
+    auth_trust_client: 'Ik ken deze client en vertrouw hem',
+    auth_approve: 'Goedkeuren',
+    auth_deny: 'Weigeren',
+    auth_error_title: 'Er is iets misgegaan',
+    auth_expired_title: 'Deze autorisatielink is verlopen',
+    auth_expired_description: 'Start het inloggen opnieuw vanuit de applicatie.',
+    auth_error_invalid_request: 'Ongeldig verzoek. Begin opnieuw vanuit de applicatie.',
+    auth_error_failed:
+        'We konden de autorisatie niet voltooien. Het verzoek is mogelijk verlopen — begin opnieuw vanuit de applicatie.',
 };

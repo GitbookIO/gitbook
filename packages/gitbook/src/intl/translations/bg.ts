@@ -186,4 +186,22 @@ export const bg: TranslationLanguage = {
     form_other_field: 'Друго...',
     cancel: 'Отказ',
     direct_link_to_heading: 'Директна връзка към заглавието',
+    auth_consent_request: '${1} иска достъп до ${2} от ваше име.',
+    auth_client_website: 'Уебсайт',
+    auth_verified: 'Потвърден',
+    auth_unverified: 'Непотвърден',
+    auth_unverified_title: 'GitBook не е потвърдил този клиент',
+    auth_unverified_description:
+        'Одобрете само ако разпознавате това приложение и му се доверявате с достъп до ${1}.',
+    auth_code_preamble: 'След одобрение код за оторизация ще бъде изпратен до:',
+    auth_redirect_uri_label: 'URI за пренасочване',
+    auth_trust_client: 'Разпознавам и се доверявам на този клиент',
+    auth_approve: 'Одобряване',
+    auth_deny: 'Отказ',
+    auth_error_title: 'Нещо се обърка',
+    auth_expired_title: 'Тази връзка за оторизация е изтекла',
+    auth_expired_description: 'Моля, започнете входа отново от приложението.',
+    auth_error_invalid_request: 'Невалидна заявка. Моля, започнете отново от приложението.',
+    auth_error_failed:
+        'Не успяхме да завършим оторизацията. Заявката може да е изтекла — моля, започнете отново от приложението.',
 };

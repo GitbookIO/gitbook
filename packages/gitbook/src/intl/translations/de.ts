@@ -189,4 +189,23 @@ export const de: TranslationLanguage = {
     form_other_field: 'Sonstiges...',
     cancel: 'Abbrechen',
     direct_link_to_heading: 'Direkter Link zur Überschrift',
+    auth_consent_request: '${1} möchte in Ihrem Namen auf ${2} zugreifen.',
+    auth_client_website: 'Website',
+    auth_verified: 'Verifiziert',
+    auth_unverified: 'Nicht verifiziert',
+    auth_unverified_title: 'GitBook hat diesen Client nicht verifiziert',
+    auth_unverified_description:
+        'Genehmigen Sie nur, wenn Sie diese Anwendung kennen und ihr den Zugriff auf ${1} zutrauen.',
+    auth_code_preamble:
+        'Nach der Genehmigung wird ein Autorisierungscode an folgende Adresse gesendet:',
+    auth_redirect_uri_label: 'Weiterleitungs-URI',
+    auth_trust_client: 'Ich kenne diesen Client und vertraue ihm',
+    auth_approve: 'Genehmigen',
+    auth_deny: 'Ablehnen',
+    auth_error_title: 'Etwas ist schiefgelaufen',
+    auth_expired_title: 'Dieser Autorisierungslink ist abgelaufen',
+    auth_expired_description: 'Bitte starten Sie die Anmeldung erneut in der Anwendung.',
+    auth_error_invalid_request: 'Ungültige Anfrage. Bitte starten Sie erneut in der Anwendung.',
+    auth_error_failed:
+        'Die Autorisierung konnte nicht abgeschlossen werden. Die Anfrage ist möglicherweise abgelaufen — bitte starten Sie erneut in der Anwendung.',
 };

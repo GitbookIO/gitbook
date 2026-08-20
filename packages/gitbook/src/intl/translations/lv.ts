@@ -182,4 +182,22 @@ export const lv: TranslationLanguage = {
     form_other_field: 'Cits...',
     cancel: 'Atcelt',
     direct_link_to_heading: 'Tieša saite uz virsrakstu',
+    auth_consent_request: '${1} vēlas jūsu vārdā piekļūt ${2}.',
+    auth_client_website: 'Vietne',
+    auth_verified: 'Verificēts',
+    auth_unverified: 'Neverificēts',
+    auth_unverified_title: 'GitBook nav verificējis šo klientu',
+    auth_unverified_description:
+        'Apstipriniet tikai tad, ja atpazīstat šo lietotni un uzticaties tai piekļuvei ${1}.',
+    auth_code_preamble: 'Pēc apstiprināšanas autorizācijas kods tiks nosūtīts uz:',
+    auth_redirect_uri_label: 'Novirzīšanas URI',
+    auth_trust_client: 'Es atpazīstu šo klientu un uzticos tam',
+    auth_approve: 'Apstiprināt',
+    auth_deny: 'Atteikt',
+    auth_error_title: 'Kaut kas nogāja greizi',
+    auth_expired_title: 'Šīs autorizācijas saites derīgums ir beidzies',
+    auth_expired_description: 'Lūdzu, sāciet pieteikšanos no lietotnes vēlreiz.',
+    auth_error_invalid_request: 'Nederīgs pieprasījums. Lūdzu, sāciet no lietotnes vēlreiz.',
+    auth_error_failed:
+        'Neizdevās pabeigt autorizāciju. Pieprasījuma derīgums, iespējams, ir beidzies — lūdzu, sāciet no lietotnes vēlreiz.',
 };

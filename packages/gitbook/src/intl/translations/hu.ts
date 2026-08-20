@@ -186,4 +186,22 @@ export const hu: TranslationLanguage = {
     form_other_field: 'Egyéb...',
     cancel: 'Mégse',
     direct_link_to_heading: 'Közvetlen hivatkozás a címsorra',
+    auth_consent_request: 'A(z) ${1} hozzá szeretne férni a(z) ${2} szolgáltatáshoz az Ön nevében.',
+    auth_client_website: 'Weboldal',
+    auth_verified: 'Ellenőrzött',
+    auth_unverified: 'Nem ellenőrzött',
+    auth_unverified_title: 'A GitBook nem ellenőrizte ezt a klienst',
+    auth_unverified_description:
+        'Csak akkor engedélyezze, ha felismeri ezt az alkalmazást, és megbízik benne a(z) ${1} elérésével.',
+    auth_code_preamble: 'A jóváhagyás után az engedélyezési kódot a következő helyre küldjük:',
+    auth_redirect_uri_label: 'Átirányítási URI',
+    auth_trust_client: 'Felismerem ezt a klienst, és megbízom benne',
+    auth_approve: 'Jóváhagyás',
+    auth_deny: 'Elutasítás',
+    auth_error_title: 'Valami hiba történt',
+    auth_expired_title: 'Ez az engedélyezési hivatkozás lejárt',
+    auth_expired_description: 'Kérjük, indítsa újra a bejelentkezést az alkalmazásból.',
+    auth_error_invalid_request: 'Érvénytelen kérés. Kérjük, kezdje újra az alkalmazásból.',
+    auth_error_failed:
+        'Nem tudtuk befejezni az engedélyezést. A kérés lejárhatott — kérjük, kezdje újra az alkalmazásból.',
 };

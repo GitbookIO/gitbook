@@ -184,4 +184,22 @@ export const sl: TranslationLanguage = {
     form_other_field: 'Drugo...',
     cancel: 'Prekliči',
     direct_link_to_heading: 'Neposredna povezava do naslova',
+    auth_consent_request: '${1} želi v vašem imenu dostopati do ${2}.',
+    auth_client_website: 'Spletno mesto',
+    auth_verified: 'Preverjeno',
+    auth_unverified: 'Nepreverjeno',
+    auth_unverified_title: 'GitBook tega odjemalca ni preveril',
+    auth_unverified_description:
+        'Odobrite samo, če to aplikacijo prepoznate in ji zaupate dostop do ${1}.',
+    auth_code_preamble: 'Po odobritvi bo avtorizacijska koda poslana na:',
+    auth_redirect_uri_label: 'URI za preusmeritev',
+    auth_trust_client: 'Tega odjemalca prepoznam in mu zaupam',
+    auth_approve: 'Odobri',
+    auth_deny: 'Zavrni',
+    auth_error_title: 'Nekaj je šlo narobe',
+    auth_expired_title: 'Ta avtorizacijska povezava je potekla',
+    auth_expired_description: 'Prijavo znova začnite v aplikaciji.',
+    auth_error_invalid_request: 'Neveljavna zahteva. Znova začnite v aplikaciji.',
+    auth_error_failed:
+        'Avtorizacije nismo mogli dokončati. Zahteva je morda potekla — znova začnite v aplikaciji.',
 };

@@ -182,4 +182,22 @@ export const vi: TranslationLanguage = {
     form_other_field: 'Khác...',
     cancel: 'Hủy',
     direct_link_to_heading: 'Liên kết trực tiếp đến tiêu đề',
+    auth_consent_request: '${1} muốn truy cập ${2} thay cho bạn.',
+    auth_client_website: 'Trang web',
+    auth_verified: 'Đã xác minh',
+    auth_unverified: 'Chưa xác minh',
+    auth_unverified_title: 'GitBook chưa xác minh ứng dụng khách này',
+    auth_unverified_description:
+        'Chỉ phê duyệt nếu bạn nhận ra ứng dụng này và tin tưởng cho phép truy cập ${1}.',
+    auth_code_preamble: 'Sau khi phê duyệt, mã cấp quyền sẽ được gửi đến:',
+    auth_redirect_uri_label: 'URI chuyển hướng',
+    auth_trust_client: 'Tôi nhận ra và tin tưởng ứng dụng khách này',
+    auth_approve: 'Phê duyệt',
+    auth_deny: 'Từ chối',
+    auth_error_title: 'Đã xảy ra lỗi',
+    auth_expired_title: 'Liên kết cấp quyền này đã hết hạn',
+    auth_expired_description: 'Vui lòng bắt đầu đăng nhập lại từ ứng dụng.',
+    auth_error_invalid_request: 'Yêu cầu không hợp lệ. Vui lòng bắt đầu lại từ ứng dụng.',
+    auth_error_failed:
+        'Chúng tôi không thể hoàn tất việc cấp quyền. Yêu cầu có thể đã hết hạn — vui lòng bắt đầu lại từ ứng dụng.',
 };

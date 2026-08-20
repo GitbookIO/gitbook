@@ -184,4 +184,22 @@ export const lt: TranslationLanguage = {
     form_other_field: 'Kita...',
     cancel: 'Atšaukti',
     direct_link_to_heading: 'Tiesioginė nuoroda į antraštę',
+    auth_consent_request: '${1} nori jūsų vardu pasiekti ${2}.',
+    auth_client_website: 'Svetainė',
+    auth_verified: 'Patvirtinta',
+    auth_unverified: 'Nepatvirtinta',
+    auth_unverified_title: 'GitBook nepatvirtino šio kliento',
+    auth_unverified_description:
+        'Patvirtinkite tik tuo atveju, jei atpažįstate šią programą ir patikite jai prieigą prie ${1}.',
+    auth_code_preamble: 'Patvirtinus autorizacijos kodas bus išsiųstas adresu:',
+    auth_redirect_uri_label: 'Peradresavimo URI',
+    auth_trust_client: 'Atpažįstu šį klientą ir juo patikiu',
+    auth_approve: 'Patvirtinti',
+    auth_deny: 'Atmesti',
+    auth_error_title: 'Kažkas nutiko',
+    auth_expired_title: 'Šios autorizacijos nuorodos laikas pasibaigė',
+    auth_expired_description: 'Pradėkite prisijungimą iš programos iš naujo.',
+    auth_error_invalid_request: 'Neteisinga užklausa. Pradėkite iš programos iš naujo.',
+    auth_error_failed:
+        'Nepavyko užbaigti autorizacijos. Užklausos laikas galėjo pasibaigti — pradėkite iš programos iš naujo.',
 };

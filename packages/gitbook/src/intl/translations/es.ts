@@ -187,4 +187,22 @@ export const es: TranslationLanguage = {
     form_other_field: 'Otro...',
     cancel: 'Cancelar',
     direct_link_to_heading: 'Enlace directo al encabezado',
+    auth_consent_request: '${1} quiere acceder a ${2} en tu nombre.',
+    auth_client_website: 'Sitio web',
+    auth_verified: 'Verificado',
+    auth_unverified: 'No verificado',
+    auth_unverified_title: 'GitBook no ha verificado este cliente',
+    auth_unverified_description:
+        'Apruébalo solo si reconoces esta aplicación y confías en darle acceso a ${1}.',
+    auth_code_preamble: 'Tras aprobar, se enviará un código de autorización a:',
+    auth_redirect_uri_label: 'URI de redirección',
+    auth_trust_client: 'Reconozco este cliente y confío en él',
+    auth_approve: 'Aprobar',
+    auth_deny: 'Denegar',
+    auth_error_title: 'Algo ha ido mal',
+    auth_expired_title: 'Este enlace de autorización ha caducado',
+    auth_expired_description: 'Vuelve a iniciar sesión desde la aplicación.',
+    auth_error_invalid_request: 'Solicitud no válida. Vuelve a empezar desde la aplicación.',
+    auth_error_failed:
+        'No hemos podido completar la autorización. La solicitud puede haber caducado: vuelve a empezar desde la aplicación.',
 };
