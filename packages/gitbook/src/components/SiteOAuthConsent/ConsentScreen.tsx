@@ -27,8 +27,8 @@ export async function ConsentScreen(props: {
 
     return (
         <ConsentLayout>
-            <div className="my-auto flex flex-col items-start gap-8 lg:flex-row">
-                <div className="animate-blur-in-slow lg:w-sm flex max-w-lg shrink-0 grow-0 flex-col gap-6">
+            <div className="my-auto flex min-w-0 flex-col items-start gap-8 lg:flex-row">
+                <div className="animate-blur-in-slow lg:w-sm flex min-w-0 max-w-lg grow-0 flex-col gap-6">
                     <div className="lg:mt-8">
                         <HeaderLogo context={context} />
                     </div>
@@ -93,7 +93,7 @@ export async function ConsentScreen(props: {
                             <Input
                                 leading="link"
                                 label={tString(language, 'auth_redirect_uri_label')}
-                                disabled
+                                readOnly
                                 value={
                                     redirectParts
                                         ? `${redirectParts.prefix}${redirectParts.host}${redirectParts.rest}`
@@ -144,15 +144,16 @@ export function ConsentLayout(props: React.HTMLAttributes<HTMLDivElement>) {
     const { children, className, ...rest } = props;
 
     return (
-        <main
-            className={tcls(
-                'site-background flex min-h-screen items-center justify-center',
-                CONTAINER_STYLE,
-                className
-            )}
-            {...rest}
-        >
-            {children}
+        <main className="site-background flex min-h-screen flex-col" {...rest}>
+            <div
+                className={tcls(
+                    'flex w-full flex-1 items-center justify-center',
+                    CONTAINER_STYLE,
+                    className
+                )}
+            >
+                {children}
+            </div>
         </main>
     );
 }
@@ -166,7 +167,7 @@ export function ConsentCard(props: React.HTMLAttributes<HTMLDivElement>) {
     return (
         <div
             className={tcls(
-                'lg:basis-xl w-full shrink-0',
+                'lg:basis-xl w-full min-w-0',
                 'flex flex-col',
                 'rounded-corners:rounded-xl circular-corners:rounded-3xl',
                 'border border-tint-subtle bg-tint-base text-sm',
