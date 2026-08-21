@@ -7,6 +7,7 @@ import {
     type RevisionPage,
     type RevisionTag,
     type SiteCustomizationSettings,
+    type SiteExternalLink,
     type SiteSection,
     type SiteSectionGroup,
 } from '@gitbook/api';
@@ -175,7 +176,7 @@ export function getContentInlineIconSourceRequests(input: {
     pages?: RevisionPage[];
     document?: JSONDocument | null;
     tags?: RevisionTag[];
-    sections?: (SiteSection | SiteSectionGroup)[] | null;
+    sections?: (SiteSection | SiteSectionGroup | SiteExternalLink)[] | null;
 }): IconSourceRequest[] {
     const { iconStyle, pages = [], document = null, tags = [], sections = null } = input;
     const requests: IconSourceRequest[] = [];
@@ -342,7 +343,7 @@ function collectTagIconSourceRequests(
 }
 
 function collectSiteSectionIconSourceRequests(
-    sections: (SiteSection | SiteSectionGroup)[],
+    sections: (SiteSection | SiteSectionGroup | SiteExternalLink)[],
     iconStyle: IconStyle,
     requests: IconSourceRequest[]
 ) {

@@ -2,6 +2,7 @@ import type {
     LocalizedString,
     Revision,
     RevisionPageDocument,
+    SiteExternalLink,
     SiteSection,
     SiteSectionGroup,
     SiteSpace,
@@ -33,7 +34,7 @@ export function getSiteStructureSections(
 export function getSiteStructureSections(
     siteStructure: SiteStructure,
     options?: { ignoreGroups: false }
-): SiteSection[] | SiteSectionGroup[];
+): (SiteSection | SiteSectionGroup | SiteExternalLink)[];
 export function getSiteStructureSections(
     siteStructure: SiteStructure,
     options?: { ignoreGroups: boolean }
@@ -41,11 +42,17 @@ export function getSiteStructureSections(
     const { ignoreGroups } = options ?? { ignoreGroups: false };
     return siteStructure.type === 'sections'
         ? ignoreGroups
-            ? siteStructure.structure.flatMap((item) =>
-                  item.object === 'site-section-group'
-                      ? flattenSectionsFromGroup<SiteSection | SiteSectionGroup>(item.children)
-                      : item
-              )
+            ? siteStructure.structure.flatMap((item) => {
+                  if (item.object === 'site-section') {
+                      return item;
+                  }
+                  if (item.object === 'site-section-group') {
+                      return flattenSectionsFromGroup<
+                          SiteSection | SiteSectionGroup | SiteExternalLink
+                      >(item.children);
+                  }
+                  return [];
+              })
             : siteStructure.structure
         : [];
 }
@@ -190,7 +197,13 @@ export function listAllSiteSpaces(siteStructure: SiteStructure) {
             return section.siteSpaces;
         }
 
-        return flattenSectionsFromGroup<SiteSection | SiteSectionGroup>(section.children)
+        if (section.object !== 'site-section-group') {
+            return [];
+        }
+
+        return flattenSectionsFromGroup<SiteSection | SiteSectionGroup | SiteExternalLink>(
+            section.children
+        )
             .filter((subSection): subSection is SiteSection => subSection.object === 'site-section')
             .flatMap((subSection) => subSection.siteSpaces);
     });
@@ -259,7 +272,7 @@ export function findSiteSpaceBy(
                     siteSectionGroup: null,
                 };
             }
-        } else {
+        } else if (sectionOrGroup.object === 'site-section-group') {
             const found = findSiteSpaceByIdInGroupChildren(
                 sectionOrGroup.children,
                 predicate,
@@ -318,7 +331,7 @@ export function getFallbackSiteSpacePath(context: GitBookSiteContext, siteSpace:
 }
 
 function findSiteSpaceByIdInGroupChildren(
-    children: (SiteSection | SiteSectionGroup)[],
+    children: (SiteSection | SiteSectionGroup | SiteExternalLink)[],
     predicate: (siteSpace: SiteSpace) => boolean,
     parentGroup: SiteSectionGroup
 ): {

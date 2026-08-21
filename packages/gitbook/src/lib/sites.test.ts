@@ -1,6 +1,13 @@
 import { describe, expect, it } from 'bun:test';
 
-import type { RevisionPageDocument, SiteSection, SiteSpace, SiteStructure } from '@gitbook/api';
+import type {
+    RevisionPageDocument,
+    SiteExternalLink,
+    SiteSection,
+    SiteSectionGroup,
+    SiteSpace,
+    SiteStructure,
+} from '@gitbook/api';
 import { TranslationLanguage } from '@gitbook/api';
 
 import { createLinker } from './links';
@@ -8,7 +15,9 @@ import {
     filterSiteSpacesByLocale,
     getFallbackSiteSpacePath,
     getLinkerForSiteSpace,
+    getSiteStructureSections,
     getSiteSpacePagePaths,
+    listAllSiteSpaces,
     resolveSiteSpaceCustomHomePage,
 } from './sites';
 import type { GitBookSiteContext } from '@/lib/context';
@@ -16,6 +25,61 @@ import type { GitBookSiteContext } from '@/lib/context';
 function makeSiteSpace(language: TranslationLanguage | undefined): SiteSpace {
     return { space: { language } } as SiteSpace;
 }
+
+function makeExternalLink(id: string): SiteExternalLink {
+    return {
+        object: 'site-external-link',
+        id,
+        title: 'GitBook',
+        localizedTitle: { fr: 'GitBook FR' } as SiteExternalLink['localizedTitle'],
+        description: 'Visit GitBook',
+        localizedDescription: {
+            fr: 'Visiter GitBook',
+        } as SiteExternalLink['localizedDescription'],
+        draft: false,
+        url: 'https://www.gitbook.com',
+        icon: 'link',
+    };
+}
+
+describe('site structure traversal', () => {
+    const rootSpace = { id: 'root-space' } as SiteSpace;
+    const nestedSpace = { id: 'nested-space' } as SiteSpace;
+    const rootSection = {
+        object: 'site-section',
+        id: 'root-section',
+        siteSpaces: [rootSpace],
+    } as SiteSection;
+    const nestedSection = {
+        object: 'site-section',
+        id: 'nested-section',
+        siteSpaces: [nestedSpace],
+    } as SiteSection;
+    const nestedLink = makeExternalLink('nested-link');
+    const group = {
+        object: 'site-section-group',
+        id: 'group',
+        children: [nestedLink, nestedSection],
+    } as SiteSectionGroup;
+    const rootLink = makeExternalLink('root-link');
+    const structure = {
+        type: 'sections',
+        structure: [rootSection, rootLink, group],
+    } satisfies SiteStructure;
+
+    it('preserves external links in navigation order', () => {
+        expect(getSiteStructureSections(structure)).toEqual([rootSection, rootLink, group]);
+        expect(group.children).toEqual([nestedLink, nestedSection]);
+    });
+
+    it('excludes external links from section and space results', () => {
+        expect(getSiteStructureSections(structure, { ignoreGroups: true })).toEqual([
+            rootSection,
+            nestedSection,
+        ]);
+        expect(listAllSiteSpaces(structure)).toEqual([rootSpace, nestedSpace]);
+    });
+});
 
 describe('filterSiteSpacesByLocale', () => {
     it('returns all spaces on a single-language site', () => {

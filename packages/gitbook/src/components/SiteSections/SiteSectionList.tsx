@@ -9,6 +9,7 @@ import { useToggleAnimation } from '../hooks';
 import { Link, ToggleChevron } from '../primitives';
 import { ScrollContainer } from '../primitives/ScrollContainer';
 import type {
+    ClientSiteExternalLink,
     ClientSiteSection,
     ClientSiteSectionGroup,
     ClientSiteSections,
@@ -57,8 +58,11 @@ export function SiteSectionList(props: { sections: ClientSiteSections; className
 
                             return (
                                 <SiteSectionListItem
-                                    section={item}
-                                    isActive={item.id === currentSection.id}
+                                    item={item}
+                                    isActive={
+                                        item.object === 'site-section' &&
+                                        item.id === currentSection.id
+                                    }
                                     key={item.id}
                                 />
                             );
@@ -71,18 +75,18 @@ export function SiteSectionList(props: { sections: ClientSiteSections; className
 }
 
 export function SiteSectionListItem(props: {
-    section: ClientSiteSection;
+    item: ClientSiteSection | ClientSiteExternalLink;
     isActive: boolean;
     className?: string;
     style?: React.CSSProperties;
 }) {
-    const { section, isActive, className, style, ...otherProps } = props;
+    const { item, isActive, className, style, ...otherProps } = props;
 
     return (
         <Link
-            href={section.url}
-            aria-current={isActive && 'page'}
-            id={section.id}
+            href={item.url}
+            aria-current={isActive ? 'page' : undefined}
+            id={item.id}
             className={tcls(
                 'group/section-link',
                 'flex',
@@ -115,15 +119,15 @@ export function SiteSectionListItem(props: {
                         : null
                 )}
             >
-                {section.icon ? (
-                    <SectionIcon icon={section.icon as IconName} isActive={isActive} />
+                {item.icon ? (
+                    <SectionIcon icon={item.icon as IconName} isActive={isActive} />
                 ) : (
-                    <span className={`text-sm opacity-8 ${isActive && 'opacity-10'}`}>
-                        {section.title.substring(0, 2)}
+                    <span className={tcls('text-sm opacity-8', isActive && 'opacity-10')}>
+                        {item.title.substring(0, 2)}
                     </span>
                 )}
             </div>
-            {section.title}
+            {item.title}
         </Link>
     );
 }
@@ -219,11 +223,14 @@ export function SiteSectionGroupItem(props: {
             {hasDescendants ? (
                 <Descendants isVisible={isOpen}>
                     {group.children.map((child) => {
-                        if (child.object === 'site-section') {
+                        if (child.object !== 'site-section-group') {
                             return (
                                 <SiteSectionListItem
-                                    section={child}
-                                    isActive={child.id === currentSection.id}
+                                    item={child}
+                                    isActive={
+                                        child.object === 'site-section' &&
+                                        child.id === currentSection.id
+                                    }
                                     key={child.id}
                                 />
                             );

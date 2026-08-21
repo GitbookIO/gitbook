@@ -8,6 +8,7 @@ import type { IconName } from '@gitbook/icons';
 import { CONTAINER_STYLE } from '../layout';
 import { ScrollContainer } from '../primitives/ScrollContainer';
 import type {
+    ClientSiteExternalLink,
     ClientSiteSection,
     ClientSiteSectionGroup,
     ClientSiteSections,
@@ -92,7 +93,9 @@ export function SiteSectionTabs(props: {
                         const isActiveGroup =
                             isGroup &&
                             Boolean(findSectionInGroup(structureItem, currentSection.id));
-                        const isActive = isActiveGroup || id === currentSection.id;
+                        const isActive =
+                            isActiveGroup ||
+                            (structureItem.object === 'site-section' && id === currentSection.id);
                         return (
                             <NavigationMenu.Item key={id} value={id} id={id}>
                                 {isGroup && structureItem.children.length > 0 ? (
@@ -127,7 +130,7 @@ export function SiteSectionTabs(props: {
                                         render={
                                             <SectionTab
                                                 url={
-                                                    structureItem.object === 'site-section'
+                                                    structureItem.object !== 'site-section-group'
                                                         ? structureItem.url
                                                         : undefined
                                                 }
@@ -210,37 +213,37 @@ const SectionTab = React.forwardRef(function SectionTab(
  * A list of section tiles grouped in the dropdown for a section group
  */
 function SectionGroupTileList(props: {
-    items: (ClientSiteSection | ClientSiteSectionGroup)[];
+    items: (ClientSiteSection | ClientSiteSectionGroup | ClientSiteExternalLink)[];
     currentSection: ClientSiteSection;
 }) {
     const { items, currentSection } = props;
 
-    // Separate non-grouped sections from grouped sections
-    const sections = items.filter((item) => item.object === 'site-section');
+    // Separate navigable items from grouped items
+    const links = items.filter((item) => item.object !== 'site-section-group');
     const groups = items.filter((item) => item.object === 'site-section-group');
 
-    const hasSections = sections.length > 0;
+    const hasLinks = links.length > 0;
     const hasGroups = groups.length > 0;
     const isMasonryLayout = groups.length > GROUP_MASONRY_THRESHOLD;
     const masonryColumnCount = Math.min(Math.ceil(groups.length / 2), MAX_MASONRY_COLUMNS);
 
     return (
         <div className="flex w-full flex-col md:flex-row">
-            {/* Non-grouped sections */}
-            {hasSections && (
+            {/* Non-grouped navigation items */}
+            {hasLinks && (
                 <ul
                     className={tcls(
                         'flex w-full shrink-0 grid-flow-row flex-col gap-x-2 gap-y-0.5 self-stretch p-3 md:sticky md:top-0 md:grid md:w-max md:self-start',
                         hasGroups ? 'bg-tint-base' : ''
                     )}
                     style={{
-                        gridTemplateColumns: `repeat(${Math.ceil(sections.length / MAX_ITEMS_PER_COLUMN)}, minmax(0, 1fr))`,
+                        gridTemplateColumns: `repeat(${Math.ceil(links.length / MAX_ITEMS_PER_COLUMN)}, minmax(0, 1fr))`,
                     }}
                 >
-                    {sections.map((section) => (
+                    {links.map((link) => (
                         <SectionGroupTile
-                            key={section.id}
-                            child={section}
+                            key={link.id}
+                            child={link}
                             currentSection={currentSection}
                         />
                     ))}
@@ -252,7 +255,7 @@ function SectionGroupTileList(props: {
                 <div
                     className={tcls(
                         'w-full md:w-max md:min-w-0 md:max-w-full',
-                        hasSections
+                        hasLinks
                             ? 'border-tint-subtle bg-tint-subtle max-md:border-t md:border-l'
                             : ''
                     )}
@@ -290,15 +293,15 @@ function SectionGroupTileList(props: {
  * A section tile shown in the dropdown for a section group
  */
 function SectionGroupTile(props: {
-    child: ClientSiteSection | ClientSiteSectionGroup;
+    child: ClientSiteSection | ClientSiteSectionGroup | ClientSiteExternalLink;
     currentSection: ClientSiteSection;
     invertIcon?: boolean;
 }) {
     const { child, currentSection, invertIcon } = props;
 
-    if (child.object === 'site-section') {
+    if (child.object !== 'site-section-group') {
         const { url, icon, title, description } = child;
-        const isActive = child.id === currentSection.id;
+        const isActive = child.object === 'site-section' && child.id === currentSection.id;
         return (
             <li className="group/section-tile flex w-full min-w-0 shrink-0 grow md:max-w-[var(--site-section-column-width)]">
                 <Link

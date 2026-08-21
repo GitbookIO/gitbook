@@ -1,6 +1,6 @@
 import assertNever from 'assert-never';
 
-import type { SiteSection, SiteSectionGroup, SiteSpace } from '@gitbook/api';
+import type { SiteExternalLink, SiteSection, SiteSectionGroup, SiteSpace } from '@gitbook/api';
 
 import type { GitBookSiteContext, SiteSections } from '@/lib/context';
 import { toEmbeddableLinkForPublishedContent } from '@/lib/embeddable-linker';
@@ -12,7 +12,7 @@ import {
 } from '@/lib/sites';
 
 export type ClientSiteSections = {
-    list: (ClientSiteSection | ClientSiteSectionGroup)[];
+    list: (ClientSiteSection | ClientSiteSectionGroup | ClientSiteExternalLink)[];
     current: ClientSiteSection;
 };
 
@@ -24,8 +24,13 @@ export type ClientSiteSection = Pick<
 };
 
 export type ClientSiteSectionGroup = Pick<SiteSectionGroup, 'id' | 'title' | 'icon' | 'object'> & {
-    children: (ClientSiteSection | ClientSiteSectionGroup)[];
+    children: (ClientSiteSection | ClientSiteSectionGroup | ClientSiteExternalLink)[];
 };
+
+export type ClientSiteExternalLink = Pick<
+    SiteExternalLink,
+    'id' | 'title' | 'description' | 'icon' | 'object' | 'url'
+>;
 
 /**
  * Encode the list of site sections into the data to be rendered in the client.
@@ -39,7 +44,8 @@ export function encodeClientSiteSections(
     const currentLanguage = context.locale;
     const asEmbeddable = Boolean(options?.asEmbeddable);
 
-    const clientSections: (ClientSiteSection | ClientSiteSectionGroup)[] = [];
+    const clientSections: (ClientSiteSection | ClientSiteSectionGroup | ClientSiteExternalLink)[] =
+        [];
 
     for (const item of list) {
         switch (item.object) {
@@ -64,6 +70,10 @@ export function encodeClientSiteSections(
                 clientSections.push(encodeSection(context, item, asEmbeddable));
                 continue;
             }
+            case 'site-external-link': {
+                clientSections.push(encodeExternalLink(context, item));
+                continue;
+            }
             default:
                 assertNever(item, 'Unknown site section object type');
         }
@@ -77,10 +87,11 @@ export function encodeClientSiteSections(
 
 function encodeChildren(
     context: GitBookSiteContext,
-    children: (SiteSection | SiteSectionGroup)[],
+    children: (SiteSection | SiteSectionGroup | SiteExternalLink)[],
     asEmbeddable: boolean
-): (ClientSiteSection | ClientSiteSectionGroup)[] {
-    const clientChildren: (ClientSiteSection | ClientSiteSectionGroup)[] = [];
+): (ClientSiteSection | ClientSiteSectionGroup | ClientSiteExternalLink)[] {
+    const clientChildren: (ClientSiteSection | ClientSiteSectionGroup | ClientSiteExternalLink)[] =
+        [];
     const currentLanguage = context.locale;
 
     for (const child of children) {
@@ -106,12 +117,28 @@ function encodeChildren(
                 });
                 break;
             }
+            case 'site-external-link': {
+                clientChildren.push(encodeExternalLink(context, child));
+                break;
+            }
             default:
                 assertNever(child, 'Unknown site section object type');
         }
     }
 
     return clientChildren;
+}
+
+function encodeExternalLink(context: GitBookSiteContext, link: SiteExternalLink) {
+    const currentLanguage = context.locale;
+    return {
+        id: link.id,
+        title: getLocalizedTitle(link, currentLanguage),
+        description: getLocalizedDescription(link, currentLanguage),
+        icon: link.icon,
+        object: link.object,
+        url: link.url,
+    };
 }
 
 function encodeSection(context: GitBookSiteContext, section: SiteSection, asEmbeddable: boolean) {

@@ -4,6 +4,7 @@ import {
     CustomizationPageActionType,
     type RevisionPage,
     type RevisionPageDocument,
+    type SiteExternalLink,
     type SiteSection,
     type SiteSectionGroup,
     SiteVisibility,
@@ -53,7 +54,9 @@ export async function PageHeader(props: {
     // (mirroring the section tabs). A single-space site has one section named after the site, which
     // is not a meaningful breadcrumb.
     const hasMultipleSections = Boolean(
-        context.visibleSections && context.visibleSections.list.length > 1
+        context.visibleSections &&
+        context.visibleSections.list.filter((item) => item.object !== 'site-external-link').length >
+            1
     );
     const currentSection = hasMultipleSections ? (context.sections?.current ?? null) : null;
     // Variants to offer as a crumb: only the "generic" variants (versions, etc.). Language variants
@@ -82,6 +85,9 @@ export async function PageHeader(props: {
                 label: getLocalizedTitle(node, context.locale),
                 icon: node.icon,
                 siblings: siblings
+                    .filter(
+                        (sibling): sibling is SectionNode => sibling.object !== 'site-external-link'
+                    )
                     // Don't offer hidden sections/groups as switch targets.
                     .filter((sibling) => !visibleSectionIds || visibleSectionIds.has(sibling.id))
                     .map((sibling) => {
@@ -345,6 +351,7 @@ function ContextCrumb({ crumb }: { crumb: BreadcrumbContextCrumb }) {
 }
 
 type SectionNode = SiteSection | SiteSectionGroup;
+type SectionStructureNode = SectionNode | SiteExternalLink;
 
 /**
  * Walk the section tree from the root down to the section with the given id, returning one entry per
@@ -352,10 +359,14 @@ type SectionNode = SiteSection | SiteSectionGroup;
  * an empty array if the section isn't found.
  */
 function findSectionChain(
-    list: SectionNode[],
+    list: SectionStructureNode[],
     sectionId: string
-): { node: SectionNode; siblings: SectionNode[] }[] {
+): { node: SectionNode; siblings: SectionStructureNode[] }[] {
     for (const item of list) {
+        if (item.object === 'site-external-link') {
+            continue;
+        }
+
         if (item.object === 'site-section') {
             if (item.id === sectionId) {
                 return [{ node: item, siblings: list }];
@@ -379,6 +390,10 @@ function findFirstSection(node: SectionNode): SiteSection | null {
         return node;
     }
     for (const child of node.children) {
+        if (child.object === 'site-external-link') {
+            continue;
+        }
+
         const found = findFirstSection(child);
         if (found) {
             return found;
@@ -399,10 +414,14 @@ function getSectionNodeURL(context: GitBookSiteContext, node: SectionNode): stri
 }
 
 /** Collect the ids of every section and section group in a (visible) section tree. */
-function collectSectionNodeIds(list: SectionNode[]): Set<string> {
+function collectSectionNodeIds(list: SectionStructureNode[]): Set<string> {
     const ids = new Set<string>();
-    const walk = (nodes: SectionNode[]) => {
+    const walk = (nodes: SectionStructureNode[]) => {
         for (const node of nodes) {
+            if (node.object === 'site-external-link') {
+                continue;
+            }
+
             ids.add(node.id);
             if (node.object === 'site-section-group') {
                 walk(node.children);
