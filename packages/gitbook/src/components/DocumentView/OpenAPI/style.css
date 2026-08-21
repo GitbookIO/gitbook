@@ -13,6 +13,28 @@
     @apply gap-0;
 }
 
+/* A reference page can hold a hundred of these, each with its own sticky preview pane; skipping the
+   render work for the off-screen ones is what keeps such a page scrollable. The DOM is untouched,
+   so the server HTML, find-in-page and #anchors all still work. */
+.openapi-block {
+    content-visibility: auto;
+    /* Only the block axis: the inline size comes from the flex parent. Plain length first, as a
+       fallback for engines without the `auto` keyword, where a skipped block would collapse to 0. */
+    contain-intrinsic-height: 1200px;
+    contain-intrinsic-height: auto 1200px;
+}
+
+/* PDF export lays the whole space out off-screen, so nothing there may be skipped. */
+body:has(.print-mode) .openapi-block {
+    content-visibility: visible;
+}
+
+@media print {
+    .openapi-block {
+        content-visibility: visible;
+    }
+}
+
 .openapi-schemas-title {
     @apply tabular-nums text-[0.813rem] leading-4 font-mono shrink-0 font-medium text-tint-strong;
 }
