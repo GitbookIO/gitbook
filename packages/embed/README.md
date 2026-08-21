@@ -21,13 +21,25 @@ You can find the embed script from your docs site settings, or you can copy the 
 
 ```html
 <script src="https://docs.company.com/~gitbook/embed/script.js"></script>
+```
+
+The script initializes the widget itself, so there is nothing to call. To pin the embed to one color
+scheme, put it on the script URL — it has to be known before the widget renders:
+
+```html
+<script src="https://docs.company.com/~gitbook/embed/script.js?theme=light"></script>
+```
+
+To authenticate the visitor, call `init` with their token. Keep tokens out of the script URL: it is
+publicly cacheable and ends up in server logs.
+
+```html
+<script src="https://docs.company.com/~gitbook/embed/script.js"></script>
 <script>
-// Initialize with Authenticated Access (optional)
-window.GitBook('init', 
+window.GitBook('init',
     { siteURL: 'https://docs.company.com' },
     { visitor: { token: 'your-jwt-token' } }
 );
-window.GitBook('show');
 </script>
 ```
 
@@ -464,19 +476,24 @@ visitor: {
 
 Available in: Standalone script (via `init`), NPM package (via `getFrameURL()`), React components (as prop)
 
-Override the embed's color scheme. When omitted, the embed follows the iframe's CSS `color-scheme`, which lets it inherit the parent page or browser preference.
+Override the embed's color scheme.
+
+When omitted, the standalone widget follows the page it is embedded in — its `color-scheme`, falling back to the visitor's OS preference only when that page declares support for both. With the NPM package or the React components you own the iframe, so the embed follows the visitor's OS preference unless you pass this.
 
 **Note**: This is not a configuration option but rather a parameter when initializing the frame or creating the frame URL.
 
-**Standalone script**: Pass as the second argument to `GitBook('init', options, frameOptions)`
+**Standalone script**: `?theme=light` on the script URL
 **NPM package**: Pass to `getFrameURL({ colorScheme: 'dark' })`
 **React components**: Pass as the `colorScheme` prop on `<GitBookFrame>`
 
 - **Type**: `'light' | 'dark'`
 
-```javascript
-colorScheme: 'dark'
+```html
+<script src="https://docs.company.com/~gitbook/embed/script.js?theme=light"></script>
 ```
+
+Sites published with a single theme always render in that theme, so `colorScheme` has no effect on
+them — the widget follows the site instead, to keep its chrome and the docs inside it consistent.
 
 ### `button`
 
