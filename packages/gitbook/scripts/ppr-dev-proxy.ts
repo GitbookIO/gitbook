@@ -11,6 +11,7 @@
  * Never deploy this. It trusts its input and caches API tokens in memory.
  */
 import type { PublishedSiteContent, PublishedSiteContentLookup, Space } from '@gitbook/api';
+
 import { PPRRequestHeaders } from '../src/lib/ppr';
 
 const PORT = Number(process.env.PPR_PROXY_PORT || 3001);
