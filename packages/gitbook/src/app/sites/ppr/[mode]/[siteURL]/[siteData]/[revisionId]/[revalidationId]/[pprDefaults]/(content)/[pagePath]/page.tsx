@@ -1,11 +1,11 @@
+import type { Metadata, Viewport } from 'next';
+
 import { type PPRRouteParams, getPPRRouteParams, getPagePathFromParams } from '@/app/utils';
 import {
     PPRPageBody,
     cachedGenerateSitePageMetadata,
     cachedGenerateSitePageViewport,
 } from '@/components/SitePage/PPRSitePage';
-
-import type { Metadata, Viewport } from 'next';
 
 export const dynamic = 'force-static';
 

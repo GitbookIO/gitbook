@@ -3,10 +3,7 @@ import { getURLLookupAlternatives, stripURLSearch } from './urls';
 /**
  * Build the lookup candidates, using a trusted PPR lookup URL as the only candidate.
  */
-export function getPublishedContentLookupPlan(input: {
-    url: string;
-    urlLookup?: string;
-}) {
+export function getPublishedContentLookupPlan(input: { url: string; urlLookup?: string }) {
     if (input.urlLookup) {
         return {
             urls: [{ url: input.urlLookup, primary: true, extraPath: '' }],

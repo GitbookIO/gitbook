@@ -1,3 +1,7 @@
+import type { Metadata, Viewport } from 'next';
+import { cacheLife } from 'next/cache';
+
+import { SitePage, generateSitePageMetadata, generateSitePageViewport } from './SitePage';
 import {
     type RouteLayoutParams,
     type RouteParams,
@@ -5,11 +9,6 @@ import {
     getPagePathFromParams,
 } from '@/app/utils';
 import { SpaceHeader, SpaceTableOfContents } from '@/components/SpaceLayout';
-
-import { cacheLife } from 'next/cache';
-
-import type { Metadata, Viewport } from 'next';
-import { SitePage, generateSitePageMetadata, generateSitePageViewport } from './SitePage';
 
 // Each component below resolves its context under its own PPR cache scope. The scope is part of the
 // cache key of every data fetcher, so the tags they emit are scoped too and propagate up to the

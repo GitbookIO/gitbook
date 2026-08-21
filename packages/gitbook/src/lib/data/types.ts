@@ -1,5 +1,6 @@
-import type { PPRCacheScope } from '@/lib/cache-tags';
 import type * as api from '@gitbook/api';
+
+import type { PPRCacheScope } from '@/lib/cache-tags';
 
 export type DataFetcherErrorData = {
     code: number;
