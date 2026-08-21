@@ -10,7 +10,9 @@ export type CreateGitBookOptions = {
 export type GetFrameURLOptions = {
     /**
      * Override the color scheme used by the embedded docs.
-     * When omitted, the embed follows the iframe's CSS `color-scheme`.
+     * When omitted, the standalone widget follows the page it is embedded in, and only falls back
+     * to the visitor's OS preference when that page supports both schemes. Building the iframe
+     * yourself, the embed follows the visitor's OS preference unless you pass this.
      */
     colorScheme?: 'light' | 'dark';
 

@@ -55,6 +55,7 @@ let widgetIframe: HTMLIFrameElement | undefined;
 let _client: GitBookClient | undefined;
 let _frame: GitBookFrameClient | undefined;
 let frameOptions: GetFrameURLOptions | undefined;
+let frameConfigured = false;
 let frameConfiguration: GitBookEmbeddableConfiguration & StandaloneConfiguration = {
     button: {
         label: 'Ask',
@@ -85,6 +86,47 @@ widgetWindow.classList.add('hidden');
 document.body.appendChild(widgetButton);
 document.body.appendChild(widgetWindow);
 
+/**
+ * The one scheme everything follows: the widget's chrome, the frame's URL and the docs inside it.
+ * Either it was configured, or we match the page we are embedded in (RND-12558).
+ */
+function resolveColorScheme(): 'light' | 'dark' {
+    const configured = frameOptions?.colorScheme;
+    // Callers are plain JS, so anything else — a typo, a `system` — falls back to the page rather
+    // than reaching the CSS and the frame's URL, where the two would disagree.
+    return configured === 'light' || configured === 'dark' ? configured : hostColorScheme();
+}
+
+/**
+ * The scheme the embedding page renders in, which is not the visitor's OS preference: a page that
+ * never opted into dark stays light however the OS is set.
+ *
+ * Resolving a `light-dark()` is the only way to read it. A page's *used* color scheme isn't exposed
+ * anywhere — the CSSOM gives computed values, and a `<meta name="color-scheme">` (the common way to
+ * declare it) never even reaches those.
+ */
+function hostColorScheme(): 'light' | 'dark' {
+    const probe = document.createElement('div');
+    // The first `color` is the fallback where `light-dark()` is unsupported: without it the probe
+    // would inherit the page's own text colour and a white one would read as dark.
+    probe.style.cssText =
+        'display:none;color:rgb(0,0,0);color:light-dark(rgb(0,0,0), rgb(255,255,255))';
+    document.body.appendChild(probe);
+    const used = getComputedStyle(probe).color;
+    probe.remove();
+
+    return used === 'rgb(255, 255, 255)' ? 'dark' : 'light';
+}
+
+/** Mirror the resolved scheme onto the widget's own chrome, and hand it back for the frame's URL. */
+function applyColorScheme(): 'light' | 'dark' {
+    const colorScheme = resolveColorScheme();
+    for (const element of [widgetButton, widgetWindow]) {
+        element.dataset.colorScheme = colorScheme;
+    }
+    return colorScheme;
+}
+
 function getClient() {
     if (!_client) {
         throw new Error(
@@ -102,12 +144,8 @@ function getIframe() {
         widgetIframe = document.createElement('iframe');
         widgetIframe.id = 'gitbook-widget-iframe';
         widgetIframe.allow = 'clipboard-write';
-        if (frameOptions?.colorScheme) {
-            widgetIframe.style.colorScheme = frameOptions.colorScheme;
-        }
-        widgetIframe.src = client.getFrameURL({
-            ...frameOptions,
-        });
+        // One read for both, so the docs can't come back in a different scheme than the panel.
+        widgetIframe.src = client.getFrameURL({ ...frameOptions, colorScheme: applyColorScheme() });
         widgetWindow.appendChild(widgetIframe);
 
         _frame = client.createFrame(widgetIframe);
@@ -121,19 +159,47 @@ function getIframe() {
 
 const GitBook = (...args: StandaloneCalls) => {
     switch (args[0]) {
-        case 'init':
-            if (_client) {
-                throw new Error(
-                    'GitBook client already initialized. Call GitBook("unload") first.'
-                );
-            }
+        case 'init': {
+            // `~gitbook/embed/script.js` already calls `init`, so an integrator following the docs
+            // ends up calling it a second time. Merge instead of throwing: throwing here dropped
+            // every call queued after it (RND-12558).
             _client = createGitBook(args[1]);
-            frameOptions = args[2];
+            frameOptions = {
+                ...frameOptions,
+                ...args[2],
+                // First scheme wins: `script.js` passes the site's own theme when it has one, and
+                // that is not the integrator's to override.
+                colorScheme: frameOptions?.colorScheme ?? args[2]?.colorScheme,
+            };
+            const colorScheme = applyColorScheme();
+
+            // Rebuild the frame only if the new options change its URL — reloading it on the
+            // loader's `init` plus the integrator's would throw away a chat for nothing.
+            const frameURL = _client.getFrameURL({ ...frameOptions, colorScheme });
+            if (widgetIframe && widgetIframe.src !== frameURL) {
+                const wasOpen = !widgetWindow.classList.contains('hidden');
+                widgetIframe.remove();
+                widgetIframe = undefined;
+                _frame = undefined;
+                if (wasOpen) {
+                    // The new frame starts from the site's defaults, so anything the host
+                    // configured has to be sent again.
+                    const { frame } = getIframe();
+                    if (frameConfigured) {
+                        frame.configure(frameConfiguration);
+                    }
+                }
+            }
             break;
+        }
         case 'unload':
             _client = undefined;
             _frame = undefined;
             widgetIframe?.remove();
+            widgetIframe = undefined;
+            frameOptions = undefined;
+            frameConfigured = false;
+            applyColorScheme();
             widgetWindow.classList.add('hidden');
             break;
         case 'show':
@@ -192,6 +258,7 @@ const GitBook = (...args: StandaloneCalls) => {
                 }
             }
 
+            frameConfigured = true;
             getIframe().frame.configure({
                 ...frameConfiguration,
             });
@@ -214,4 +281,11 @@ const precalls = (window.GitBook as GitBookStandalone | undefined)?.q ?? [];
 
 // @ts-expect-error - GitBook is not defined in the global scope
 window.GitBook = GitBook;
-precalls.forEach((call) => GitBook(...call));
+// Replay each queued call on its own, so one that throws doesn't drop the rest.
+precalls.forEach((call) => {
+    try {
+        GitBook(...call);
+    } catch (error) {
+        console.error('[gitbook:embed]', error);
+    }
+});

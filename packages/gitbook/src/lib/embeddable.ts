@@ -48,9 +48,11 @@ export async function getEmbeddableDynamicContext(params: RouteLayoutParams) {
 export { getEmbeddableLinker } from './embeddable-linker';
 
 /**
- * Resolve theme behavior for docs embeds.
- * Embeds should follow the parent frame's color-scheme by default,
- * while still allowing an explicit override for multi-theme sites.
+ * Resolve the theme the embed renders in: the site's own when it publishes a single theme, an
+ * explicit `?theme=` override when it publishes both, and otherwise the visitor's OS.
+ *
+ * `forcedTheme` is also what the embed is pinned to whatever the embedder asks for, which is what
+ * the widget outside the iframe has to follow (RND-12558).
  */
 export function resolveEmbeddableTheme(
     customization: Pick<SiteCustomizationSettings, 'themes'>,
