@@ -1,5 +1,12 @@
 # @gitbook/react-contentkit
 
+## 0.7.17
+
+### Patch Changes
+
+- cb92754: Let integration block webframes navigate the reader to another page in the site by posting a `@webframe.navigate` action with a `path` (and optional `anchor`). Resolved client-side against the site base path, so navigation stays in-site and drives the standard navigation progress bar.
+- 6083a88: Expose the current page (`id`, `path`, `title`) to integration block webframes through the client-only webframe `state.page`, alongside adaptive visitor claims.
+
 ## 0.7.16
 
 ### Patch Changes
