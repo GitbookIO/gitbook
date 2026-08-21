@@ -1,5 +1,113 @@
 # gitbook
 
+## 0.28.0
+
+### Minor Changes
+
+- 3d37684: Add a carousel layout option to cards blocks, rendering them as a horizontally-scrolling, scroll-snapping row instead of a wrapping grid.
+- 89c4a0f: Add an `askQuestion` tool to the site MCP server. Alongside `searchDocumentation` and `getPage`, MCP clients can now ask a natural-language question and get a synthesized answer with links to the source pages, powered by the same AI search backend as the site's "ask a question" experience. The tool accepts an optional `goal` param so calling agents can attach the intent they're trying to accomplish, which tailors the answer and is tracked in analytics. The tool is only exposed on sites that have AI enabled.
+
+### Patch Changes
+
+- 048c4e4: Fix "View activity" disclosure in AI Chat not opening after the Base UI migration.
+- 996d7ec: Scroll to an in-page heading even when the URL hash is unchanged (e.g. clicking the same anchor again).
+- fa9c9b3: Force software rendering (SwiftShader) in Playwright Chromium to eliminate image downscaling drift between GPU-equipped local runs and headless CI runs in Argos screenshots.
+- 1ee1853: Add an assistant tool to rate its own previous response when the user reacts to it.
+- cef1870: Add an assistant tool to submit feedback about the current page on behalf of the user.
+- 49d35aa: Assistant: you can now send follow-up questions while an answer is still being written. Each one appears as your own message with a "Queued" badge (hover for when it will send, × to cancel), and they're sent automatically one at a time as each answer completes.
+- b3db1c5: Keep the breadcrumbs from covering the page actions' hit area.
+- ae9367d: Assistant: the "Explored briefly" activity heading no longer appears when there's nothing to show. It now renders only when the answer is preceded by a real preamble or one or more tool calls, so a simple answer with an empty reasoning step no longer surfaces an empty collapsible.
+- 1ef7160: Show the theme toggle in the footer whenever the outline column that hosts the other toggle isn't pinned open, so it stays reachable on laptop-sized screens in wide layouts and while the AI chat is open.
+- 177ef85: Fix host action buttons in the Docs Embed not reaching the assistant.
+- 4e9071d: Fix the docs embed `navigateToPage` API on multi-space sites. Deep-linking to a page in a different space/section (e.g. `navigateToPage('/help-center/integrations')`) previously 404'd because the section base was not placed before `~gitbook/embed/page`. The target is now resolved to its space server-side, so pages in any space resolve correctly. The input accepts the page path, an absolute path, or the full published URL.
+- 9002f65: Fix suggested question clicks in the embed search not opening the assistant.
+- 13059b8: Fix switching from the Search tab to the Docs or Assistant tab in the embed doing nothing.
+- b5f3c14: Add configurable default visibility to Prompt block
+- a69a307: A near-white tint color (e.g. a warm `#F5F3EF`) is now taken as the exact page background, mirroring the existing behavior for near-black tints. The tint's exact lightness, hue and chroma are preserved, and the color is anchored to whichever scale step the active theme renders as the background — so it matches exactly on `muted` (which uses the second step) as well as `clean`. This applies only to near-neutral tints that are light enough to read as a background; saturated or merely light-ish colors keep their normal accent scale. The `bold` theme is unaffected: it already uses the tint for the header and stays intentionally two-tone.
+- f9ad9b5: Introduce client-side content selection (`select`): a site-wide, recency-ordered list of selected slugs, persisted in localStorage and shareable via `?select=`, applied to `<html>` before first paint so the right variant renders with no flash. All variants stay server-rendered, so pages are byte-identical for every visitor (no cache impact).
+
+  Tabs now use it: switching a tab activates its slug, and every tab group offering that slug follows, across pages. Tabs no longer write to the URL fragment (`#` returns to anchors only); deep-links into a tab still activate and scroll to it.
+
+- 03bbacf: Add missing link reference to OpenAPI models
+- d0a63ba: Update the URL hash when a tab is selected, so a copied link scrolls back to that tab
+- 7bab574: Self-host default Google fonts and inline only the @font-face rules of the fonts a site uses, instead of shipping render-blocking stylesheets covering all 23 families on every page.
+- 6928a9b: Hide card fields that render no content, along with their title
+- c41cf9c: Add cover image background mode and masks
+- 56c2558: Upgrade react-hotkeys-hook to v5 and use its native `useKey` option so keyboard shortcuts match the produced key on non-QWERTY layouts.
+- 39156ee: Button blocks now respect the `size` option, so you can render small, medium, or large buttons.
+- bf674a4: Add an optional `context` property (string, up to 512 characters) to the `confirmation` of custom AI tools, shown above the confirmation dialog to help the user understand what they are approving or rejecting. The `confirmation` can now also be a function that receives the AI-provided input and returns the confirmation, so the context can be derived dynamically from the arguments the tool is about to run with. Available both to integrations (`GitBookIntegrationTool`) and to embed consumers (`GitBookToolDefinition`).
+- b13fd91: Fix a hydration mismatch on every page load caused by the AI chat time-based greeting being computed in the server timezone.
+- 2ccd43e: Lazy-load the Mermaid code block so pages that have code blocks but no diagram no longer ship its rendering dependencies.
+- 65f99ea: Lazy load the Scalar API client modal and stop preloading the Scalar runtime. The modal is now code-split into its own chunk, fetched in parallel with the runtime only when a reader clicks "Test it", and a spinner is shown on the button until the client opens.
+
+  Breaking: the package no longer ships the modal in its main entry — consumers must serve the emitted `ScalarApiModal` chunk and use a bundler that supports dynamic `import()`, and the Scalar runtime is no longer preloaded on page load. The internal `preloadScalarRuntime` helper is removed.
+
+- 810244e: Stop preloading the zoom-modal variant of every zoomable image at render time; it downloaded each image twice during the initial page load. The modal image still loads on hover or click.
+- 75bdff3: Serve an indexable `X-Robots-Tag` on markdown pages requested by AI agents
+- ccb9d7b: Submit `sendFeedback` MCP tool findings through the dedicated `submitSiteAgentFeedback` API endpoint. The `pageUrl` is now required and an optional `goal` can be provided.
+- 01c9b05: Mermaid diagrams no longer hijack page scrolling: zooming with the wheel now requires holding Ctrl/Cmd inline, while the fullscreen view keeps free wheel zoom.
+- b3db1c5: Migrate the headless UI primitives from Radix and react-aria to Base UI.
+- a664407: Persist content selection (tabs and other `select` blocks) in localStorage only, dropping the `?select=` query parameter from the URL. A tab click still writes the tab's hash, so a copied URL lands on that tab and reactivates it on load.
+- 14562e9: Serve `X-Robots-Tag: noindex` on internal search/assistant URLs (`?q=` / `?ask=`) and stop disallowing them in robots.txt, so Google can crawl the directive and drop them from the index instead of reporting "Indexed, though blocked by robots.txt".
+- 90b5468: Redesign the site OAuth consent screen for published sites MCP and translate its strings
+- 827e4f9: Fix the variant switcher linking to the wrong URL for non-default variants of the default section
+- db176ba: Add an "On this page" table of contents on OpenAPI models pages. Each model in a grouped/multi-model "Models" section is now listed as its own section, matching operations and webhooks.
+- 332089e: Improve cookie handling in the OpenAPI "Test it" request proxy.
+- a80d412: Serve the OpenAPI "Test it" request proxy from GitBook's own domain.
+- 1424c56: Keep the OpenAPI renderer out of the initial bundle of pages that have no OpenAPI block, by building its context on the client behind a dynamic boundary.
+- e4b214e: Fix OpenAPI webhook payload and schema example panels being clipped instead of scrollable.
+- 78c589f: Align the Previous page navigation button to the left edge and the Next button to the right edge, including when only one of them is present.
+- 634a24f: Fix text disappearing in Firefox and iOS Safari on pages with a background cover
+- 64ce9e1: Render a site-space custom home page at its placement root while preserving the full space and normal page URLs.
+- a9a52fe: Remove GBO's redundant re-selection of the best-scoring search section. The search API now returns a single highest-scoring section per page (and orders sections highest-score-first), so GBO no longer needs its own `getBestScoredResult` helper to pick the best section for the search and MCP previews. No user-visible change.
+- 195c9e6: Fix the docs embed not applying `?theme=light`/`?theme=dark`. The theme was dropped when the embed redirected to its default tab, and the embed tabs couldn't read it because they render statically (their request headers are empty). The middleware now threads a forced embed theme through the embed route context (scoped to the embed, not the main site), so the embed tabs honor it while staying statically rendered, and the redirect forwards it to the default tab. The forced theme is also persisted to the embed's own theme storage so it is remembered across tab navigation instead of only applying while the query string is present.
+- 597fe34: Sync the API reference responses selector with the "Responses" collapsibles, and keep the selected response in sync across every operation on the page (like the code sample language selector). Selecting a status code now expands the matching response section and applies to all operations at once.
+- e14609c: Fix a light/dark flash on published sites configured to respect the system default (no theme toggle). Such sites forced the `system` theme, but `next-themes`' pre-paint script applies a forced value verbatim without resolving `prefers-color-scheme`, so the page painted light and only switched to dark after hydration. We now leave the theme unforced when the default is `system` (only concrete light/dark themes are forced), letting `next-themes`' existing pre-paint script resolve the system preference before first paint.
+- 98b2df4: Add a `sendFeedback` MCP tool so AI agents can report documentation findings (outdated / incoherent / gap / other) as `agent_feedback` insights events. The tool only accepts finding categories, so it never records positive feedback.
+- 8e9a49d: Separate the prompt block actions into a primary "Open in" dropdown and a secondary "Copy prompt" button, instead of a single combined button group, and align the block's design with the expandable block (bordered frame, left disclosure chevron, and subtle elevation when expanded).
+- cf4efc7: Fix the search field losing focus if it was focused just before the page finished hydrating.
+- e73b182: Fix the docs embed widget shipping a stale script: declare the embed package's `standalone/` bundle as a Turbo build output. Because it wasn't declared, changes confined to the standalone widget (which compiles to `standalone/` but not `dist/`) didn't invalidate the downstream `generate` cache that copies it into the app, so the deployed widget could lag the source — e.g. the `clipboard-write` permission on the widget iframe never reached production, breaking the copy button in the Assistant embed.
+- 6d02b8a: Fix code block syntax highlighting so comment delimiters (e.g. `//`, `/*`) use the same color as the rest of the comment. Previously the delimiter fell through to the generic punctuation scope, making it a different color from the comment body (most visible in dark mode).
+- 484cc11: Fix ScrollContainer scroll buttons not reflecting content overflow immediately or after dynamic content changes (e.g. search results).
+- d33e570: Fix the spacebar being ignored in the search bar, which made multi-word queries impossible.
+- 5889642: Keep the last search query visible after closing search, and restore it when reopening, without breaking navigation when clicking a search result.
+- 3db14ad: Link page-level search matches to the top of the page while preserving section anchors for section matches.
+- 0dd2f4f: Show the containing section name when hovering a direct link to a space.
+- cd506e3: Keep Shiki out of the initial page bundle by splitting the highlighter from the plain-text token helpers, so client code no longer pulls the engine and language bundles in through a shared import.
+- ad3399b: Refine the per-paragraph AI ask button: shorten its tooltip to "Ask" (from "Ask <assistant> about this"), and hide it inside cards where it would otherwise be clipped by the card's overflow.
+- 703e654: Split the default-scope site search into two parallel API requests — one restricted to the current site space and one for the other site spaces — rendering each result set as soon as its response arrives. All results are ranked together by score, with the current site space scores boosted.
+- 57f3077: Keep the "On this page" and "Ask" buttons pinned below the header while scrolling on desktop API reference pages, so the page outline stays reachable throughout long operations.
+- 8676ad1: Hide unfocusable unlabelled button from screen readers
+- 6cf4278: Only show the "Back to [space]" shortcut for cross-space links in the table of contents, not for in-content text links or other ways of reaching another space.
+- 7594a33: Show image thumbnails, including SVG previews, for file attachments on published sites.
+- 5c74eef: Make the table search "no results" empty state more prominent with vertical spacing so it no longer blends into the content below.
+- 038008c: Fix heading anchor links being unreachable on touch devices by adding a tap-to-reveal state. The anchor icon now appears after the heading text without wrapping onto an orphan line while retaining its existing desktop placement. Use `pointerup` for the dismiss listener to fix unreliable dismissal on iOS Safari, and enlarge the anchor's touch tap target to a square 24px area (meeting the WCAG 2.5.8 minimum) so the icon stays centered instead of overflowing shorter headings' line height.
+- a9a1a60: Fix search results from a previous scope staying stuck on top of the new results when switching the search filter.
+- 8a6baab: Load the admin toolbar and its CSS lazily so published pages no longer ship a render-blocking stylesheet for admin-only UI.
+- ea19801: Support localized custom AI Assistant greeting subtitles.
+- 1dccf8f: Fix the first item of a table-of-contents page group appearing cut off (faded under the group header) after client-side navigation.
+- 48fba7c: Highlight a table-of-contents link entry as active when it points to the page — or the section of a page — you are currently viewing.
+- 048c4e4: Fix chevrons and open-state styling incorrectly reacting to a tooltip opening on the same trigger, by switching from the shared Base UI `data-popup-open` attribute to `aria-expanded`.
+- f3408ed: a11y screen reader fixes
+- cb92754: Let integration block webframes navigate the reader to another page in the site by posting a `@webframe.navigate` action with a `path` (and optional `anchor`). Resolved client-side against the site base path, so navigation stays in-site and drives the standard navigation progress bar.
+- 6083a88: Expose the current page (`id`, `path`, `title`) to integration block webframes through the client-only webframe `state.page`, alongside adaptive visitor claims.
+- 8a70022: Only track embed view events once the frame is actually shown to the reader
+- cf94386: Fix an issue where certain keywords could cause an exception when rendering emojis
+- 673f4b6: Add the `select` action to InlineButton. Clicking the button activates its slug, so any block containing that slug switches to it.
+- Updated dependencies [a69a307]
+- Updated dependencies [03bbacf]
+- Updated dependencies [bf674a4]
+- Updated dependencies [65f99ea]
+- Updated dependencies [1424c56]
+- Updated dependencies [cb92754]
+- Updated dependencies [6083a88]
+  - @gitbook/colors@0.4.4
+  - @gitbook/openapi-parser@3.0.13
+  - @gitbook/react-openapi@2.0.0
+  - @gitbook/browser-types@0.1.6
+  - @gitbook/embed@0.5.2
+  - @gitbook/react-contentkit@0.7.17
+
 ## 0.27.2
 
 ### Patch Changes
