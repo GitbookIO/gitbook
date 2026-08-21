@@ -33,7 +33,8 @@
  * iframe. `data-color-scheme` carries that one resolved scheme — see `resolveColorScheme()` — and
  * is always set, so the declaration below only shows before the widget initializes (RND-12558).
  * The colours are declared here rather than on `:root` because `light-dark()` resolves against the
- * color-scheme of the element that declares them. The plain values above stay as the fallback. */
+ * color-scheme of the element that declares them. The bundler lowers it to a variable toggle, so
+ * browsers without `light-dark()` still get both schemes. */
 #gitbook-widget-button,
 #gitbook-widget-window {
     color-scheme: light;

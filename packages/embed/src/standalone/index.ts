@@ -153,6 +153,10 @@ function getIframe() {
             widgetWindow.classList.add('hidden');
             widgetButton.classList.remove('open');
         });
+        // A new frame starts from the site's own defaults, so replay whatever the host configured.
+        if (frameConfigured) {
+            _frame.configure(frameConfiguration);
+        }
     }
     return { iframe: widgetIframe, frame: _frame };
 }
@@ -161,14 +165,15 @@ const GitBook = (...args: StandaloneCalls) => {
     switch (args[0]) {
         case 'init': {
             // `~gitbook/embed/script.js` already calls `init`, so an integrator following the docs
-            // ends up calling it a second time. Merge instead of throwing: throwing here dropped
-            // every call queued after it (RND-12558).
+            // ends up calling it a second time. Take the new options instead of throwing: throwing
+            // here dropped every call queued behind it (RND-12558).
             _client = createGitBook(args[1]);
             frameOptions = {
-                ...frameOptions,
+                // Replace rather than merge: a call that leaves out `visitor` — a logout, another
+                // site — must not keep the token from the last one.
                 ...args[2],
-                // First scheme wins: `script.js` passes the site's own theme when it has one, and
-                // that is not the integrator's to override.
+                // Except the scheme, where the first one wins: `script.js` passes the site's own
+                // theme when it pins one, and that is not the integrator's to override.
                 colorScheme: frameOptions?.colorScheme ?? args[2]?.colorScheme,
             };
             const colorScheme = applyColorScheme();
@@ -182,12 +187,7 @@ const GitBook = (...args: StandaloneCalls) => {
                 widgetIframe = undefined;
                 _frame = undefined;
                 if (wasOpen) {
-                    // The new frame starts from the site's defaults, so anything the host
-                    // configured has to be sent again.
-                    const { frame } = getIframe();
-                    if (frameConfigured) {
-                        frame.configure(frameConfiguration);
-                    }
+                    getIframe();
                 }
             }
             break;
