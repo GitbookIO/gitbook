@@ -185,4 +185,22 @@ export const fi: TranslationLanguage = {
     form_other_field: 'Muu...',
     cancel: 'Peruuta',
     direct_link_to_heading: 'Suora linkki otsikkoon',
+    auth_consent_request: '${1} haluaa käyttää kohdetta ${2} puolestasi.',
+    auth_client_website: 'Verkkosivusto',
+    auth_verified: 'Vahvistettu',
+    auth_unverified: 'Vahvistamaton',
+    auth_unverified_title: 'GitBook ei ole vahvistanut tätä asiakasta',
+    auth_unverified_description:
+        'Hyväksy vain, jos tunnistat tämän sovelluksen ja luotat siihen, että se saa käyttää kohdetta ${1}.',
+    auth_code_preamble: 'Hyväksymisen jälkeen valtuutuskoodi lähetetään osoitteeseen:',
+    auth_redirect_uri_label: 'Uudelleenohjaus-URI',
+    auth_trust_client: 'Tunnistan tämän asiakkaan ja luotan siihen',
+    auth_approve: 'Hyväksy',
+    auth_deny: 'Hylkää',
+    auth_error_title: 'Jotain meni vikaan',
+    auth_expired_title: 'Tämä valtuutuslinkki on vanhentunut',
+    auth_expired_description: 'Aloita kirjautuminen uudelleen sovelluksesta.',
+    auth_error_invalid_request: 'Virheellinen pyyntö. Aloita uudelleen sovelluksesta.',
+    auth_error_failed:
+        'Valtuutusta ei voitu viimeistellä. Pyyntö on saattanut vanhentua — aloita uudelleen sovelluksesta.',
 };

@@ -186,4 +186,22 @@ export const ru: TranslationLanguage = {
     form_other_field: 'Другое...',
     cancel: 'Отмена',
     direct_link_to_heading: 'Прямая ссылка на заголовок',
+    auth_consent_request: '${1} хочет получить доступ к ${2} от вашего имени.',
+    auth_client_website: 'Веб-сайт',
+    auth_verified: 'Проверено',
+    auth_unverified: 'Не проверено',
+    auth_unverified_title: 'GitBook не проверял этот клиент',
+    auth_unverified_description:
+        'Одобряйте только если вы узнаёте это приложение и доверяете ему доступ к ${1}.',
+    auth_code_preamble: 'После одобрения код авторизации будет отправлен на:',
+    auth_redirect_uri_label: 'URI перенаправления',
+    auth_trust_client: 'Я узнаю этот клиент и доверяю ему',
+    auth_approve: 'Одобрить',
+    auth_deny: 'Отклонить',
+    auth_error_title: 'Что-то пошло не так',
+    auth_expired_title: 'Срок действия этой ссылки авторизации истёк',
+    auth_expired_description: 'Начните вход заново из приложения.',
+    auth_error_invalid_request: 'Неверный запрос. Начните заново из приложения.',
+    auth_error_failed:
+        'Не удалось завершить авторизацию. Возможно, срок действия запроса истёк — начните заново из приложения.',
 };

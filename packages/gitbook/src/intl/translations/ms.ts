@@ -184,4 +184,22 @@ export const ms: TranslationLanguage = {
     form_other_field: 'Lain-lain...',
     cancel: 'Batal',
     direct_link_to_heading: 'Pautan terus ke tajuk',
+    auth_consent_request: '${1} mahu mengakses ${2} atas nama anda.',
+    auth_client_website: 'Laman web',
+    auth_verified: 'Disahkan',
+    auth_unverified: 'Tidak disahkan',
+    auth_unverified_title: 'GitBook belum mengesahkan klien ini',
+    auth_unverified_description:
+        'Luluskan hanya jika anda mengenali aplikasi ini dan mempercayainya untuk mengakses ${1}.',
+    auth_code_preamble: 'Selepas meluluskan, kod kebenaran akan dihantar ke:',
+    auth_redirect_uri_label: 'URI pengalihan',
+    auth_trust_client: 'Saya mengenali dan mempercayai klien ini',
+    auth_approve: 'Luluskan',
+    auth_deny: 'Tolak',
+    auth_error_title: 'Ada sesuatu yang tidak kena',
+    auth_expired_title: 'Pautan kebenaran ini telah tamat tempoh',
+    auth_expired_description: 'Sila mulakan semula proses masuk dari aplikasi.',
+    auth_error_invalid_request: 'Permintaan tidak sah. Sila mulakan semula dari aplikasi.',
+    auth_error_failed:
+        'Kami tidak dapat melengkapkan kebenaran. Permintaan mungkin telah tamat tempoh — sila mulakan semula dari aplikasi.',
 };

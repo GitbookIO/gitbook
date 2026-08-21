@@ -182,4 +182,22 @@ export const hi: TranslationLanguage = {
     form_other_field: 'अन्य...',
     cancel: 'रद्द करें',
     direct_link_to_heading: 'शीर्षक का सीधा लिंक',
+    auth_consent_request: '${1} आपकी ओर से ${2} तक पहुँच चाहता है।',
+    auth_client_website: 'वेबसाइट',
+    auth_verified: 'सत्यापित',
+    auth_unverified: 'असत्यापित',
+    auth_unverified_title: 'GitBook ने इस क्लाइंट को सत्यापित नहीं किया है',
+    auth_unverified_description:
+        'केवल तब स्वीकृत करें जब आप इस ऐप्लिकेशन को पहचानते हों और ${1} तक पहुँच के लिए उस पर भरोसा करते हों।',
+    auth_code_preamble: 'स्वीकृति के बाद, प्राधिकरण कोड यहाँ भेजा जाएगा:',
+    auth_redirect_uri_label: 'रीडायरेक्ट URI',
+    auth_trust_client: 'मैं इस क्लाइंट को पहचानता हूँ और उस पर भरोसा करता हूँ',
+    auth_approve: 'स्वीकृत करें',
+    auth_deny: 'अस्वीकार करें',
+    auth_error_title: 'कुछ गलत हो गया',
+    auth_expired_title: 'यह प्राधिकरण लिंक समाप्त हो गया है',
+    auth_expired_description: 'कृपया ऐप्लिकेशन से साइन-इन फिर से शुरू करें।',
+    auth_error_invalid_request: 'अमान्य अनुरोध। कृपया ऐप्लिकेशन से फिर से शुरू करें।',
+    auth_error_failed:
+        'हम प्राधिकरण पूरा नहीं कर सके। अनुरोध की अवधि समाप्त हो सकती है — कृपया ऐप्लिकेशन से फिर से शुरू करें।',
 };

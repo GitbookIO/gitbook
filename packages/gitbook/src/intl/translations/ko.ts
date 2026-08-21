@@ -182,4 +182,22 @@ export const ko: TranslationLanguage = {
     form_other_field: '기타...',
     cancel: '취소',
     direct_link_to_heading: '제목으로 가는 직접 링크',
+    auth_consent_request: '${1}이(가) 사용자를 대신하여 ${2}에 액세스하려고 합니다.',
+    auth_client_website: '웹사이트',
+    auth_verified: '확인됨',
+    auth_unverified: '확인되지 않음',
+    auth_unverified_title: 'GitBook이 이 클라이언트를 확인하지 않았습니다',
+    auth_unverified_description:
+        '이 애플리케이션을 알고 있고 ${1} 액세스를 신뢰할 수 있는 경우에만 승인하세요.',
+    auth_code_preamble: '승인하면 인증 코드가 다음으로 전송됩니다:',
+    auth_redirect_uri_label: '리디렉션 URI',
+    auth_trust_client: '이 클라이언트를 알고 있으며 신뢰합니다',
+    auth_approve: '승인',
+    auth_deny: '거부',
+    auth_error_title: '문제가 발생했습니다',
+    auth_expired_title: '이 인증 링크가 만료되었습니다',
+    auth_expired_description: '애플리케이션에서 로그인을 다시 시작하세요.',
+    auth_error_invalid_request: '잘못된 요청입니다. 애플리케이션에서 다시 시작하세요.',
+    auth_error_failed:
+        '인증을 완료할 수 없습니다. 요청이 만료되었을 수 있습니다 — 애플리케이션에서 다시 시작하세요.',
 };

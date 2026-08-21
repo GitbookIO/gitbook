@@ -184,4 +184,22 @@ export const no: TranslationLanguage = {
     form_other_field: 'Annet...',
     cancel: 'Avbryt',
     direct_link_to_heading: 'Direkte lenke til overskriften',
+    auth_consent_request: '${1} vil få tilgang til ${2} på dine vegne.',
+    auth_client_website: 'Nettsted',
+    auth_verified: 'Verifisert',
+    auth_unverified: 'Ikke verifisert',
+    auth_unverified_title: 'GitBook har ikke verifisert denne klienten',
+    auth_unverified_description:
+        'Godkjenn bare hvis du kjenner igjen dette programmet og stoler på at det får tilgang til ${1}.',
+    auth_code_preamble: 'Etter godkjenning sendes en autorisasjonskode til:',
+    auth_redirect_uri_label: 'Omdirigerings-URI',
+    auth_trust_client: 'Jeg kjenner igjen og stoler på denne klienten',
+    auth_approve: 'Godkjenn',
+    auth_deny: 'Avslå',
+    auth_error_title: 'Noe gikk galt',
+    auth_expired_title: 'Denne autorisasjonslenken er utløpt',
+    auth_expired_description: 'Start innloggingen på nytt fra programmet.',
+    auth_error_invalid_request: 'Ugyldig forespørsel. Start på nytt fra programmet.',
+    auth_error_failed:
+        'Vi kunne ikke fullføre autorisasjonen. Forespørselen kan ha utløpt — start på nytt fra programmet.',
 };

@@ -184,4 +184,22 @@ export const cs: TranslationLanguage = {
     form_other_field: 'Jiné...',
     cancel: 'Zrušit',
     direct_link_to_heading: 'Přímý odkaz na nadpis',
+    auth_consent_request: '${1} chce ve vašem zastoupení získat přístup k ${2}.',
+    auth_client_website: 'Web',
+    auth_verified: 'Ověřeno',
+    auth_unverified: 'Neověřeno',
+    auth_unverified_title: 'GitBook tohoto klienta neověřil',
+    auth_unverified_description:
+        'Schvalte pouze v případě, že tuto aplikaci znáte a věříte jí s přístupem k ${1}.',
+    auth_code_preamble: 'Po schválení bude autorizační kód odeslán na:',
+    auth_redirect_uri_label: 'URI přesměrování',
+    auth_trust_client: 'Tohoto klienta znám a věřím mu',
+    auth_approve: 'Schválit',
+    auth_deny: 'Odmítnout',
+    auth_error_title: 'Něco se pokazilo',
+    auth_expired_title: 'Tento autorizační odkaz vypršel',
+    auth_expired_description: 'Začněte prosím přihlášení znovu z aplikace.',
+    auth_error_invalid_request: 'Neplatný požadavek. Začněte prosím znovu z aplikace.',
+    auth_error_failed:
+        'Autorizaci se nepodařilo dokončit. Požadavek mohl vypršet — začněte prosím znovu z aplikace.',
 };

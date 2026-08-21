@@ -1,167 +1,229 @@
 import { Icon } from '@gitbook/icons';
 
+import { CONTAINER_STYLE } from '../layout';
+import { Input } from '../primitives';
 import { ConsentForm } from './ConsentForm';
+import { HeaderLogo } from '@/components/Header/HeaderLogo';
 import { StyledLink } from '@/components/primitives/StyledLink';
+import { getSpaceLanguage, t, tString } from '@/intl/server';
+import type { TranslationLanguage } from '@/intl/translations';
+import type { GitBookSiteContext } from '@/lib/context';
 import type { SiteOAuthConsentStart } from '@/lib/site-oauth';
 import { tcls } from '@/lib/tailwind';
 
 /**
  * Consent screen shown to a visitor when an MCP client requests authorization to a published site.
  */
-export function ConsentScreen(props: {
+export async function ConsentScreen(props: {
     siteId: string;
-    siteTitle: string;
+    context: GitBookSiteContext;
     consent: SiteOAuthConsentStart;
 }) {
-    const { siteId, siteTitle, consent } = props;
+    const { siteId, context, consent } = props;
+    const siteTitle = context.site.title;
     const { client, redirectUri, consentSessionId } = consent;
     const redirectParts = parseRedirectURI(redirectUri);
+    const redirectDisplayed = redirectParts
+        ? `${redirectParts.prefix}${redirectParts.host}${redirectParts.rest}`
+        : redirectUri;
+    const language = await getSpaceLanguage(context);
 
     return (
-        <ConsentCard>
-            <div className="flex flex-col gap-6 p-6 sm:p-8">
-                {/* Client identity */}
-                <div className="flex items-start gap-3">
-                    {client.logoUri ? (
-                        <img
-                            src={client.logoUri}
-                            alt=""
-                            className="size-10 shrink-0 object-contain straight-corners:rounded-none rounded-corners:rounded-lg"
-                            referrerPolicy="no-referrer"
-                        />
-                    ) : (
-                        <span className="flex size-10 shrink-0 items-center justify-center bg-tint-subtle text-tint straight-corners:rounded-none rounded-corners:rounded-lg">
-                            <Icon icon="key" className="size-5" />
-                        </span>
-                    )}
-
-                    <div className="flex min-w-0 flex-col gap-0.5">
-                        <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                            <h1 className="font-semibold text-tint-strong">{client.name}</h1>
-                            <ClientTrustBadge verified={client.verified} />
-                        </div>
-                        {client.uri ? (
-                            <StyledLink
-                                href={client.uri}
-                                className="inline-flex w-fit items-center gap-1 text-sm text-tint"
-                            >
-                                Website
-                                <Icon icon="arrow-up-right" className="size-3" />
-                            </StyledLink>
-                        ) : null}
+        <ConsentLayout>
+            <div className="my-auto flex min-w-0 flex-col items-start gap-8 lg:flex-row">
+                <div className="animate-blur-in-slow lg:w-sm flex min-w-0 max-w-lg grow-0 flex-col gap-6">
+                    <div className="lg:mt-8">
+                        <HeaderLogo context={context} />
                     </div>
-                </div>
 
-                {/* Request statement — toned down, with the client and site names emphasized. */}
-                <p className="text-base leading-snug text-tint">
-                    <span className="font-semibold text-tint-strong">{client.name}</span> wants to
-                    access <span className="font-semibold text-tint-strong">{siteTitle} MCP</span>{' '}
-                    on your behalf.
-                </p>
-
-                {/* Redirect URI, shown in full with the destination host emphasized. */}
-                <div className="flex flex-col gap-2">
-                    <span className="text-sm text-tint">
-                        After approving, an authorization code will be sent to:
-                    </span>
-                    <div
-                        className={tcls(
-                            'flex items-center gap-2.5',
-                            'rounded-corners:rounded-md straight-corners:rounded-none',
-                            'border border-tint-subtle bg-tint-subtle px-3 py-2'
+                    {/* Request statement — toned down, with the client and site names emphasized. */}
+                    <h1 className="text-xl leading-snug text-tint sm:text-2xl">
+                        {t(
+                            language,
+                            'auth_consent_request',
+                            <span className="font-semibold text-tint-strong">{client.name}</span>,
+                            <span className="font-semibold text-tint-strong">{siteTitle} MCP</span>
                         )}
-                    >
-                        <Icon icon="link" className="size-4 shrink-0 text-tint" />
-                        <code className="break-all font-mono text-sm">
-                            {redirectParts ? (
-                                <>
-                                    <span className="text-tint">{redirectParts.prefix}</span>
-                                    <span className="font-semibold text-tint-strong">
-                                        {redirectParts.host}
-                                    </span>
-                                    <span className="text-tint">{redirectParts.rest}</span>
-                                </>
+                    </h1>
+                </div>
+                <ConsentCard
+                    style={{
+                        animationDelay: '100ms',
+                    }}
+                >
+                    <div className="flex flex-col gap-4 p-6 sm:p-8">
+                        {/* Client identity */}
+                        <div className="flex items-center gap-3">
+                            {client.logoUri ? (
+                                <img
+                                    src={client.logoUri}
+                                    alt=""
+                                    className="size-12 shrink-0 border border-tint-subtle object-contain rounded-corners:rounded-xl circular-corners:rounded-3xl"
+                                    referrerPolicy="no-referrer"
+                                />
                             ) : (
-                                <span className="text-tint-strong">{redirectUri}</span>
+                                <span className="flex size-12 shrink-0 items-center justify-center bg-tint text-tint rounded-corners:rounded-xl circular-corners:rounded-3xl">
+                                    <Icon icon="key" className="size-5" />
+                                </span>
                             )}
-                        </code>
-                    </div>
-                </div>
 
-                {client.verified ? null : (
-                    <div
-                        className={tcls(
-                            'flex gap-3',
-                            'rounded-corners:rounded-md straight-corners:rounded-none',
-                            'bg-warning p-3 text-sm text-warning-strong'
-                        )}
-                    >
-                        <Icon icon="triangle-exclamation" className="mt-0.5 size-4 shrink-0" />
-                        <div className="flex flex-col gap-1">
-                            <span className="font-semibold">
-                                GitBook has not verified this client
-                            </span>
-                            <span>
-                                Only approve if you recognize this application and trust it with
-                                access to {siteTitle}.
-                            </span>
+                            <div className="flex min-w-0 flex-col gap-0.5">
+                                <div className="flex items-center gap-x-2 gap-y-1">
+                                    <h2 className="text-base font-semibold text-tint-strong">
+                                        {client.name}
+                                    </h2>
+                                    <ClientTrustBadge
+                                        language={language}
+                                        verified={client.verified}
+                                    />
+                                </div>
+                                {client.uri ? (
+                                    <StyledLink
+                                        href={client.uri}
+                                        className="inline-flex w-fit items-center gap-1 text-tint"
+                                    >
+                                        {t(language, 'auth_client_website')}
+                                        <Icon icon="arrow-up-right" className="size-3" />
+                                    </StyledLink>
+                                ) : null}
+                            </div>
                         </div>
-                    </div>
-                )}
-            </div>
 
-            {/* Footer: trust acknowledgement + decision */}
-            <div className="border-t border-tint-subtle p-4 sm:px-8">
-                <ConsentForm
-                    siteId={siteId}
-                    consentSessionId={consentSessionId}
-                    verified={client.verified}
-                />
+                        {/* Redirect URI, shown in full with the destination host emphasized. */}
+                        <div className="mt-2 flex flex-col gap-2">
+                            <span className="text-tint">{t(language, 'auth_code_preamble')}</span>
+
+                            <Input
+                                leading="link"
+                                label={tString(language, 'auth_redirect_uri_label')}
+                                readOnly
+                                multiline
+                                value={redirectDisplayed}
+                                displayValue={
+                                    redirectParts ? (
+                                        <>
+                                            <span className="text-tint">
+                                                {redirectParts.prefix}
+                                            </span>
+                                            <span className="font-semibold text-tint-strong">
+                                                {redirectParts.host}
+                                            </span>
+                                            <span className="text-tint">{redirectParts.rest}</span>
+                                        </>
+                                    ) : (
+                                        redirectUri
+                                    )
+                                }
+                            />
+                        </div>
+
+                        {client.verified ? null : (
+                            <div
+                                className={tcls(
+                                    'flex gap-3',
+                                    'rounded-corners:rounded-xl circular-corners:rounded-3xl',
+                                    'bg-warning p-4 text-warning'
+                                )}
+                            >
+                                <Icon
+                                    icon="circle-exclamation"
+                                    className="ml-1 mt-0.5 size-4 shrink-0 text-warning-strong"
+                                />
+                                <div className="flex flex-col gap-1">
+                                    <span className="font-semibold text-warning-strong">
+                                        {t(language, 'auth_unverified_title')}
+                                    </span>
+                                    <span>
+                                        {t(language, 'auth_unverified_description', siteTitle)}
+                                    </span>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Footer: trust acknowledgement + decision */}
+                    <div className="border-t border-tint-subtle p-6 sm:px-8">
+                        <ConsentForm
+                            siteId={siteId}
+                            consentSessionId={consentSessionId}
+                            verified={client.verified}
+                        />
+                    </div>
+                </ConsentCard>
             </div>
-        </ConsentCard>
+        </ConsentLayout>
     );
 }
 
-/**
- * Centered, branded card shell shared by the consent screen and its error state.
- */
-function ConsentCard(props: { children: React.ReactNode }) {
+export function ConsentLayout(props: React.HTMLAttributes<HTMLDivElement>) {
+    const { children, className, ...rest } = props;
+
     return (
-        <main className="flex min-h-screen items-center justify-center bg-tint-subtle p-4">
+        <main className="site-background flex min-h-screen flex-col" {...rest}>
             <div
                 className={tcls(
-                    'w-full max-w-lg',
-                    'flex flex-col',
-                    'rounded-corners:rounded-lg straight-corners:rounded-none',
-                    'border border-tint-subtle bg-tint-base',
-                    'shadow-lg'
+                    'flex w-full flex-1 items-center justify-center',
+                    CONTAINER_STYLE,
+                    className
                 )}
             >
-                {props.children}
+                {children}
             </div>
         </main>
     );
 }
 
 /**
+ * Centered, branded card shell shared by the consent screen and its error state.
+ */
+export function ConsentCard(props: React.HTMLAttributes<HTMLDivElement>) {
+    const { children, className, ...rest } = props;
+
+    return (
+        <div
+            className={tcls(
+                'lg:basis-xl w-full min-w-0',
+                'flex flex-col',
+                'rounded-corners:rounded-xl circular-corners:rounded-3xl',
+                'border border-tint-subtle bg-tint-base text-sm',
+                'depth-subtle:shadow-lg',
+                'animate-blur-in-slow',
+                className
+            )}
+            {...rest}
+        >
+            {children}
+        </div>
+    );
+}
+
+/**
  * Error state shown when the consent flow cannot be started (e.g. a refreshed or expired link).
  */
-export function ConsentError(props: { title?: string; message?: string }) {
+export async function ConsentError(props: {
+    context: GitBookSiteContext;
+    title?: string;
+    message?: string;
+}) {
+    const { context } = props;
+    const language = await getSpaceLanguage(context);
     const {
-        title = 'This authorization link has expired',
-        message = 'Please start the sign-in again from the application.',
+        title = tString(language, 'auth_expired_title'),
+        message = tString(language, 'auth_expired_description'),
     } = props;
 
     return (
-        <ConsentCard>
-            <div className="flex flex-col items-center gap-4 p-6 text-center sm:p-8">
-                <span className="flex size-12 items-center justify-center bg-danger text-danger-strong straight-corners:rounded-none rounded-corners:rounded-full">
+        <ConsentLayout>
+            <ConsentCard className="flex-row flex-wrap gap-4 p-6 sm:p-8">
+                <span className="flex size-12 items-center justify-center bg-danger text-danger rounded-corners:rounded-xl circular-corners:rounded-3xl">
                     <Icon icon="circle-exclamation" className="size-6" />
                 </span>
-                <h1 className="text-lg font-semibold text-tint-strong">{title}</h1>
-                <p className="text-tint">{message}</p>
-            </div>
-        </ConsentCard>
+                <div className="flex flex-col gap-1">
+                    <h1 className="text-lg font-semibold text-tint-strong">{title}</h1>
+                    <p className="text-tint">{message}</p>
+                </div>
+            </ConsentCard>
+        </ConsentLayout>
     );
 }
 
@@ -185,18 +247,18 @@ function parseRedirectURI(uri: string): { prefix: string; host: string; rest: st
 /**
  * Inline verified/unverified indicator shown next to the client name.
  */
-function ClientTrustBadge(props: { verified: boolean }) {
-    const { verified } = props;
+function ClientTrustBadge(props: { language: TranslationLanguage; verified: boolean }) {
+    const { language, verified } = props;
 
     return (
-        <span
+        <div
             className={tcls(
-                'inline-flex items-center gap-1 font-medium text-xs',
-                verified ? 'text-success-strong' : 'text-warning-strong'
+                'flex items-center gap-1 font-medium text-xs px-2 py-1 not-straight-corners:rounded-xl',
+                verified ? 'text-success bg-success' : 'text-warning bg-warning'
             )}
         >
-            <Icon icon={verified ? 'circle-check' : 'triangle-exclamation'} className="size-3" />
-            {verified ? 'Verified' : 'Unverified'}
-        </span>
+            <Icon icon={verified ? 'badge-check' : 'circle-exclamation'} className="size-3" />
+            {t(language, verified ? 'auth_verified' : 'auth_unverified')}
+        </div>
     );
 }

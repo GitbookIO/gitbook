@@ -187,4 +187,22 @@ export const it: TranslationLanguage = {
     form_other_field: 'Altro...',
     cancel: 'Annulla',
     direct_link_to_heading: 'Link diretto al titolo',
+    auth_consent_request: '${1} vuole accedere a ${2} a tuo nome.',
+    auth_client_website: 'Sito web',
+    auth_verified: 'Verificato',
+    auth_unverified: 'Non verificato',
+    auth_unverified_title: 'GitBook non ha verificato questo client',
+    auth_unverified_description:
+        'Approva solo se riconosci questa applicazione e le affidi l’accesso a ${1}.',
+    auth_code_preamble: 'Dopo l’approvazione, un codice di autorizzazione verrà inviato a:',
+    auth_redirect_uri_label: 'URI di reindirizzamento',
+    auth_trust_client: 'Riconosco questo client e mi fido',
+    auth_approve: 'Approva',
+    auth_deny: 'Rifiuta',
+    auth_error_title: 'Si è verificato un problema',
+    auth_expired_title: 'Questo link di autorizzazione è scaduto',
+    auth_expired_description: 'Riavvia l’accesso dall’applicazione.',
+    auth_error_invalid_request: 'Richiesta non valida. Ricomincia dall’applicazione.',
+    auth_error_failed:
+        'Non è stato possibile completare l’autorizzazione. La richiesta potrebbe essere scaduta: ricomincia dall’applicazione.',
 };

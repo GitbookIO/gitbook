@@ -183,4 +183,22 @@ export const ja: TranslationLanguage = {
     form_other_field: 'その他...',
     cancel: 'キャンセル',
     direct_link_to_heading: '見出しへの直接リンク',
+    auth_consent_request: '${1} があなたに代わって ${2} へのアクセスを求めています。',
+    auth_client_website: 'ウェブサイト',
+    auth_verified: '検証済み',
+    auth_unverified: '未検証',
+    auth_unverified_title: 'GitBook はこのクライアントを検証していません',
+    auth_unverified_description:
+        'このアプリケーションに心当たりがあり、${1} へのアクセスを任せられる場合にのみ承認してください。',
+    auth_code_preamble: '承認後、認証コードが次の宛先に送信されます:',
+    auth_redirect_uri_label: 'リダイレクト URI',
+    auth_trust_client: 'このクライアントを認識し、信頼します',
+    auth_approve: '承認',
+    auth_deny: '拒否',
+    auth_error_title: '問題が発生しました',
+    auth_expired_title: 'この認証リンクは有効期限が切れています',
+    auth_expired_description: 'アプリケーションからサインインをやり直してください。',
+    auth_error_invalid_request: '無効なリクエストです。アプリケーションからやり直してください。',
+    auth_error_failed:
+        '認証を完了できませんでした。リクエストの有効期限が切れた可能性があります — アプリケーションからやり直してください。',
 };

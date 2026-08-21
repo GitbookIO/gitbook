@@ -181,4 +181,22 @@ export const en = {
     form_other_field: 'Other...',
     cancel: 'Cancel',
     direct_link_to_heading: 'Direct link to heading',
+    auth_consent_request: '${1} wants to access ${2} on your behalf.',
+    auth_client_website: 'Website',
+    auth_verified: 'Verified',
+    auth_unverified: 'Unverified',
+    auth_unverified_title: 'GitBook has not verified this client',
+    auth_unverified_description:
+        'Only approve if you recognize this application and trust it with access to ${1}.',
+    auth_code_preamble: 'After approving, an authorization code will be sent to:',
+    auth_redirect_uri_label: 'Redirect URI',
+    auth_trust_client: 'I recognize and trust this client',
+    auth_approve: 'Approve',
+    auth_deny: 'Deny',
+    auth_error_title: 'Something went wrong',
+    auth_expired_title: 'This authorization link has expired',
+    auth_expired_description: 'Please start the sign-in again from the application.',
+    auth_error_invalid_request: 'Invalid request. Please start again from the application.',
+    auth_error_failed:
+        'We could not complete the authorization. The request may have expired — please start again from the application.',
 };

@@ -183,4 +183,22 @@ export const et: TranslationLanguage = {
     form_other_field: 'Muu...',
     cancel: 'Tühista',
     direct_link_to_heading: 'Otselink pealkirjale',
+    auth_consent_request: '${1} soovib teie nimel juurdepääsu teenusele ${2}.',
+    auth_client_website: 'Veebisait',
+    auth_verified: 'Kinnitatud',
+    auth_unverified: 'Kinnitamata',
+    auth_unverified_title: 'GitBook ei ole seda klienti kinnitanud',
+    auth_unverified_description:
+        'Kinnitage ainult siis, kui tunnete seda rakendust ja usaldate sellele juurdepääsu teenusele ${1}.',
+    auth_code_preamble: 'Pärast kinnitamist saadetakse autoriseerimiskood aadressile:',
+    auth_redirect_uri_label: 'Ümbersuunamise URI',
+    auth_trust_client: 'Tunnen seda klienti ja usaldan seda',
+    auth_approve: 'Kinnita',
+    auth_deny: 'Keeldu',
+    auth_error_title: 'Midagi läks valesti',
+    auth_expired_title: 'See autoriseerimislink on aegunud',
+    auth_expired_description: 'Palun alustage sisselogimist rakendusest uuesti.',
+    auth_error_invalid_request: 'Vigane päring. Palun alustage rakendusest uuesti.',
+    auth_error_failed:
+        'Autoriseerimist ei saanud lõpule viia. Päring võis aeguda — palun alustage rakendusest uuesti.',
 };

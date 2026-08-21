@@ -184,4 +184,22 @@ export const pl: TranslationLanguage = {
     form_other_field: 'Inne...',
     cancel: 'Anuluj',
     direct_link_to_heading: 'Bezpośredni link do nagłówka',
+    auth_consent_request: '${1} chce uzyskać dostęp do ${2} w Twoim imieniu.',
+    auth_client_website: 'Witryna',
+    auth_verified: 'Zweryfikowany',
+    auth_unverified: 'Niezweryfikowany',
+    auth_unverified_title: 'GitBook nie zweryfikował tego klienta',
+    auth_unverified_description:
+        'Zatwierdź tylko wtedy, gdy rozpoznajesz tę aplikację i powierzasz jej dostęp do ${1}.',
+    auth_code_preamble: 'Po zatwierdzeniu kod autoryzacji zostanie wysłany na:',
+    auth_redirect_uri_label: 'URI przekierowania',
+    auth_trust_client: 'Rozpoznaję tego klienta i mu ufam',
+    auth_approve: 'Zatwierdź',
+    auth_deny: 'Odrzuć',
+    auth_error_title: 'Coś poszło nie tak',
+    auth_expired_title: 'Ten link autoryzacyjny wygasł',
+    auth_expired_description: 'Rozpocznij logowanie ponownie z aplikacji.',
+    auth_error_invalid_request: 'Nieprawidłowe żądanie. Rozpocznij ponownie z aplikacji.',
+    auth_error_failed:
+        'Nie udało się zakończyć autoryzacji. Żądanie mogło wygasnąć — rozpocznij ponownie z aplikacji.',
 };

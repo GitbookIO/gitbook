@@ -185,4 +185,22 @@ export const sv: TranslationLanguage = {
     form_other_field: 'Annat...',
     cancel: 'Avbryt',
     direct_link_to_heading: 'Direktlänk till rubriken',
+    auth_consent_request: '${1} vill få åtkomst till ${2} för din räkning.',
+    auth_client_website: 'Webbplats',
+    auth_verified: 'Verifierad',
+    auth_unverified: 'Overifierad',
+    auth_unverified_title: 'GitBook har inte verifierat den här klienten',
+    auth_unverified_description:
+        'Godkänn bara om du känner igen det här programmet och litar på att det får åtkomst till ${1}.',
+    auth_code_preamble: 'Efter godkännande skickas en auktoriseringskod till:',
+    auth_redirect_uri_label: 'Omdirigerings-URI',
+    auth_trust_client: 'Jag känner igen och litar på den här klienten',
+    auth_approve: 'Godkänn',
+    auth_deny: 'Neka',
+    auth_error_title: 'Något gick fel',
+    auth_expired_title: 'Den här auktoriseringslänken har upphört att gälla',
+    auth_expired_description: 'Starta inloggningen igen från programmet.',
+    auth_error_invalid_request: 'Ogiltig förfrågan. Börja om från programmet.',
+    auth_error_failed:
+        'Vi kunde inte slutföra auktoriseringen. Förfrågan kan ha upphört att gälla — börja om från programmet.',
 };

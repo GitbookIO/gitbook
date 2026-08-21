@@ -182,4 +182,22 @@ export const tr: TranslationLanguage = {
     form_other_field: 'Diğer...',
     cancel: 'İptal',
     direct_link_to_heading: 'Başlığa doğrudan bağlantı',
+    auth_consent_request: '${1}, sizin adınıza ${2} erişimi istiyor.',
+    auth_client_website: 'Web sitesi',
+    auth_verified: 'Doğrulanmış',
+    auth_unverified: 'Doğrulanmamış',
+    auth_unverified_title: 'GitBook bu istemciyi doğrulamadı',
+    auth_unverified_description:
+        'Yalnızca bu uygulamayı tanıyorsanız ve ${1} erişimi için ona güveniyorsanız onaylayın.',
+    auth_code_preamble: 'Onayladıktan sonra bir yetkilendirme kodu şuraya gönderilecek:',
+    auth_redirect_uri_label: 'Yönlendirme URI’si',
+    auth_trust_client: 'Bu istemciyi tanıyorum ve ona güveniyorum',
+    auth_approve: 'Onayla',
+    auth_deny: 'Reddet',
+    auth_error_title: 'Bir şeyler ters gitti',
+    auth_expired_title: 'Bu yetkilendirme bağlantısının süresi doldu',
+    auth_expired_description: 'Lütfen oturum açmayı uygulamadan yeniden başlatın.',
+    auth_error_invalid_request: 'Geçersiz istek. Lütfen uygulamadan yeniden başlayın.',
+    auth_error_failed:
+        'Yetkilendirmeyi tamamlayamadık. İsteğin süresi dolmuş olabilir — lütfen uygulamadan yeniden başlayın.',
 };
