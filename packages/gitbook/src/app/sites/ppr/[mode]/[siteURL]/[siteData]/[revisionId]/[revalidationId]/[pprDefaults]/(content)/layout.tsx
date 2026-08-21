@@ -1,3 +1,5 @@
+import type React from 'react';
+
 import {
     type PPRRouteLayoutParams,
     getPPRHeaderRouteParams,
@@ -13,8 +15,6 @@ import {
 } from '@/components/SiteLayout';
 import { PPRHeader, PPRTableOfContents } from '@/components/SitePage/PPRSitePage';
 import { shouldTrackEvents } from '@/lib/tracking';
-
-import type React from 'react';
 
 interface SitePPRLayoutProps {
     params: Promise<PPRRouteLayoutParams>;
