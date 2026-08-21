@@ -34,7 +34,7 @@ export function SpacesDropdown(
         id: siteSp.id,
         title: getLocalizedTitle(siteSp, currentLanguage),
         url: getSiteSpaceURL(context, siteSp),
-        isActive: siteSp.id === siteSpace.id,
+        path: siteSp.path,
         spaceId: siteSp.space.id,
     }));
 
@@ -46,6 +46,7 @@ export function SpacesDropdown(
             className={className}
             dropdownClassName={dropdownClassName}
             slimSpaces={slimSpaces}
+            siteSpaceId={siteSpace.id}
             curPath={siteSpace.path}
         />
     );

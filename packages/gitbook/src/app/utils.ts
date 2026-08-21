@@ -4,7 +4,12 @@ import rison from 'rison';
 
 import type { SiteAPIToken } from '@gitbook/api';
 
-import { getVisitorAuthClaims, getVisitorAuthClaimsFromToken } from '@/lib/adaptive';
+import {
+    getPPRVisitorAuthClaimsFromToken,
+    getVisitorAuthClaims,
+    getVisitorAuthClaimsFromToken,
+} from '@/lib/adaptive';
+import type { PPRCacheScope } from '@/lib/cache-tags';
 import { type SiteURLData, fetchSiteContextByURLLookup, getBaseContext } from '@/lib/context';
 import { getDynamicCustomizationSettings } from '@/lib/customization';
 
@@ -24,10 +29,24 @@ export type RouteParams = RouteLayoutParams & {
     pagePath: string;
 };
 
+export type PPRRouteLayoutParams = RouteLayoutParams & {
+    revisionId: string;
+    revalidationId: string;
+    pprDefaults: string;
+};
+
+export type PPRRouteParams = PPRRouteLayoutParams & {
+    pagePath: string;
+};
+
 /**
  * Get the static context when rendering statically a site.
  */
-export async function getStaticSiteContext(params: RouteLayoutParams) {
+export async function getStaticSiteContext(
+    params: RouteLayoutParams,
+    getClaims = getVisitorAuthClaimsFromToken,
+    options?: { pprScope?: PPRCacheScope }
+) {
     const siteURL = getSiteURLFromParams(params);
     const siteURLData = getSiteURLDataFromParams(params);
 
@@ -43,13 +62,14 @@ export async function getStaticSiteContext(params: RouteLayoutParams) {
             siteURL,
             siteURLData,
             urlMode: getModeFromParams(params.mode),
+            ...(options?.pprScope ? { pprScope: options.pprScope } : {}),
         }),
         siteURLData
     );
 
     return {
         context,
-        visitorAuthClaims: getVisitorAuthClaimsFromToken(decoded),
+        visitorAuthClaims: getClaims(decoded),
     };
 }
 
@@ -129,6 +149,128 @@ export function getSiteURLDataFromParams(params: RouteLayoutParams): SiteURLData
         console.error(
             `Returning 404 after failing to decode site data ${params.siteData}: ${error}`
         );
+        notFound();
+    }
+}
+
+export function getPPRRouteParams(params: PPRRouteParams): RouteParams;
+export function getPPRRouteParams(params: PPRRouteLayoutParams): RouteLayoutParams;
+/**
+ * Project PPR route params for the current page, without PPR-only cache inputs.
+ */
+export function getPPRRouteParams(params: PPRRouteLayoutParams): RouteLayoutParams {
+    const { revisionId, revalidationId, pprDefaults: _, ...routeParams } = params;
+    const siteURLData = getSiteURLDataFromParams(params);
+
+    return {
+        ...routeParams,
+        siteData: encodeURIComponent(
+            rison.encode({
+                ...siteURLData,
+                revision: getPPRRouteParam(revisionId, 'revision ID'),
+            })
+        ),
+    };
+}
+
+/**
+ * Project PPR params for the shared header by replacing page-varying location data.
+ * TODO: We'll need to exchange the api token provided by the original PPR request for one that the API will understand
+ */
+export function getPPRHeaderRouteParams(params: PPRRouteLayoutParams): RouteLayoutParams {
+    const routeParams = getPPRRouteParams(params);
+    const { revision, ...siteURLData } = getSiteURLDataFromParams(routeParams);
+    const defaults = getPPRDefaults(params);
+
+    return {
+        ...routeParams,
+        siteData: encodeSiteData({
+            ...siteURLData,
+            // For the header, we don't want to vary the cache by page path, so we set it to the root.
+            pathname: '/',
+            // For the header, we keep site section and space data from the PPR defaults, so that the header can be cached across all pages in a site.
+            siteSection: defaults.siteSection ?? undefined,
+            siteSpace: defaults.siteSpace,
+            space: defaults.space,
+        }),
+    };
+}
+
+/** rison can't encode undefined values, so they are dropped like the middleware does. */
+function encodeSiteData(siteURLData: Record<string, unknown>): string {
+    return encodeURIComponent(
+        rison.encode(
+            Object.fromEntries(
+                Object.entries(siteURLData).filter(([_, value]) => typeof value !== 'undefined')
+            )
+        )
+    );
+}
+
+/**
+ * Project PPR params for the table of contents, keeping its current location data.
+ * For the table of contents, we don't want to vary the cache by page path, so we set it to the root.
+ * Table of content depends only on the space that you're in and the specific claims from that revision, not the actual path inside that space
+ * TODO: We'll need to exchange the api token provided by the original PPR request for one that the API will understand
+ */
+export function getPPRTableOfContentsRouteParams(params: PPRRouteLayoutParams): RouteLayoutParams {
+    const routeParams = getPPRRouteParams(params);
+    return {
+        ...routeParams,
+        siteData: encodeURIComponent(
+            rison.encode({
+                ...getSiteURLDataFromParams(routeParams),
+                pathname: '/',
+            })
+        ),
+    };
+}
+
+/**
+ * Get the static context for a PPR component. The scope partitions the cache entries and scopes
+ * the tags they emit, so the component and its data are revalidated as one unit.
+ */
+export async function getPPRStaticSiteContext(params: RouteLayoutParams, pprScope: PPRCacheScope) {
+    return getStaticSiteContext(params, getPPRVisitorAuthClaimsFromToken, { pprScope });
+}
+
+function getPPRRouteParam(encodedParam: string, name: string): string {
+    try {
+        return decodeURIComponent(encodedParam);
+    } catch (error) {
+        console.error(`Returning 404 after failing to decode PPR ${name}: ${error}`);
+        notFound();
+    }
+}
+
+type PPRDefaults = {
+    siteSection: string | null;
+    siteSpace: string;
+    space: string;
+};
+
+function getPPRDefaults(params: PPRRouteLayoutParams): PPRDefaults {
+    try {
+        const defaults: unknown = rison.decode(decodeURIComponent(params.pprDefaults));
+        if (
+            !defaults ||
+            typeof defaults !== 'object' ||
+            Array.isArray(defaults) ||
+            !('siteSection' in defaults) ||
+            !('siteSpace' in defaults) ||
+            !('space' in defaults) ||
+            (defaults.siteSection !== null && typeof defaults.siteSection !== 'string') ||
+            typeof defaults.siteSpace !== 'string' ||
+            !defaults.siteSpace ||
+            typeof defaults.space !== 'string' ||
+            !defaults.space
+        ) {
+            notFound();
+        }
+
+        return defaults as PPRDefaults;
+    } catch (error) {
+        console.error(`Returning 404 after failing to decode PPR defaults: ${error}`);
         notFound();
     }
 }

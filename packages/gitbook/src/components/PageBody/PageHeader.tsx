@@ -116,9 +116,12 @@ export async function PageHeader(props: {
                     id: siteSpace.id,
                     title: getLocalizedTitle(siteSpace, context.locale),
                     url: getSiteSpaceURL(context, siteSpace),
-                    isActive: siteSpace.id === currentSiteSpace.id,
+                    path: siteSpace.path,
                     spaceId: siteSpace.space.id,
                 })),
+                // The breadcrumbs are rendered with the page's own context, so the selection is
+                // accurate here and doesn't need the client-side patching the shared shell does.
+                selectedId: currentSiteSpace.id,
                 curPath: currentSiteSpace.path,
             },
         });
@@ -321,7 +324,7 @@ type BreadcrumbContextCrumb = {
      * Present only for the variant crumb: the header's variant switcher data, whose dropdown entries
      * resolve to the current page in each variant. Rendered instead of `siblings`.
      */
-    variantSwitcher?: { slimSpaces: VariantSpace[]; curPath: string };
+    variantSwitcher?: { slimSpaces: VariantSpace[]; selectedId: string; curPath: string };
 };
 
 /** Render a context crumb (section group / section / variant) with its sibling dropdown. */
@@ -337,6 +340,7 @@ function ContextCrumb({ crumb }: { crumb: BreadcrumbContextCrumb }) {
             {crumb.variantSwitcher ? (
                 <SpacesDropdownMenuItems
                     slimSpaces={crumb.variantSwitcher.slimSpaces}
+                    selectedId={crumb.variantSwitcher.selectedId}
                     curPath={crumb.variantSwitcher.curPath}
                 />
             ) : undefined}
