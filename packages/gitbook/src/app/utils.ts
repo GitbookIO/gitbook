@@ -239,27 +239,30 @@ type PPRDefaults = {
 };
 
 function getPPRDefaults(params: PPRRouteLayoutParams): PPRDefaults {
+    let defaults: unknown;
     try {
-        const defaults: unknown = rison.decode(decodeURIComponent(params.pprDefaults));
-        if (
-            !defaults ||
-            typeof defaults !== 'object' ||
-            Array.isArray(defaults) ||
-            !('siteSection' in defaults) ||
-            !('siteSpace' in defaults) ||
-            !('space' in defaults) ||
-            (defaults.siteSection !== null && typeof defaults.siteSection !== 'string') ||
-            typeof defaults.siteSpace !== 'string' ||
-            !defaults.siteSpace ||
-            typeof defaults.space !== 'string' ||
-            !defaults.space
-        ) {
-            notFound();
-        }
-
-        return defaults as PPRDefaults;
+        defaults = rison.decode(decodeURIComponent(params.pprDefaults));
     } catch (error) {
         console.error(`Returning 404 after failing to decode PPR defaults: ${error}`);
         notFound();
     }
+
+    if (
+        !defaults ||
+        typeof defaults !== 'object' ||
+        Array.isArray(defaults) ||
+        !('siteSection' in defaults) ||
+        !('siteSpace' in defaults) ||
+        !('space' in defaults) ||
+        (defaults.siteSection !== null && typeof defaults.siteSection !== 'string') ||
+        typeof defaults.siteSpace !== 'string' ||
+        !defaults.siteSpace ||
+        typeof defaults.space !== 'string' ||
+        !defaults.space
+    ) {
+        console.error(`Returning 404 after decoding invalid PPR defaults: ${params.pprDefaults}`);
+        notFound();
+    }
+
+    return defaults as PPRDefaults;
 }
