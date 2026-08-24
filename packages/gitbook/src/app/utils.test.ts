@@ -35,6 +35,8 @@ const routeParams: PPRRouteParams = {
             siteSpace: 'page-site-space-id',
             space: 'space-id',
             revision: 'resolved-revision-id',
+            siteBasePath: '/docs/',
+            basePath: '/docs/v/page-variant/',
             imagesContextId: 'images-context-id',
         })
     ),
@@ -67,7 +69,6 @@ describe('getPPRRouteParams', () => {
             site: 'site-id',
             space: 'space-id',
             revision: 'ppr-revision-id',
-            revalidationId: 'revalidation-id',
             imagesContextId: 'images-context-id',
         });
     });
@@ -84,6 +85,8 @@ describe('PPR cache region params', () => {
                 siteSpace: 'new-page-site-space-id',
                 space: 'new-space-id',
                 revision: 'resolved-revision-id',
+                siteBasePath: '/docs/',
+                basePath: '/docs/v/other-variant/',
                 imagesContextId: 'images-context-id',
             })
         ),
@@ -100,10 +103,33 @@ describe('PPR cache region params', () => {
             siteSection: 'default-site-section-id',
             siteSpace: 'default-site-space-id',
             space: 'default-space-id',
+            // The default variant is served at the site root, so its links can't keep the base
+            // path of the variant the visitor is on.
+            basePath: '/docs/',
         });
         expect({ ...headerData, apiToken: undefined }).toEqual({
             ...changedHeaderData,
             apiToken: undefined,
+        });
+    });
+
+    it('keeps the visited base path when the defaults point at the visited variant', () => {
+        const headerData = getSiteURLDataFromParams(
+            getPPRHeaderRouteParams({
+                ...routeParams,
+                pprDefaults: encodeURIComponent(
+                    rison.encode({
+                        siteSection: 'page-site-section-id',
+                        siteSpace: 'page-site-space-id',
+                        space: 'space-id',
+                    })
+                ),
+            })
+        );
+
+        expect(headerData).toMatchObject({
+            siteSpace: 'page-site-space-id',
+            basePath: '/docs/v/page-variant/',
         });
     });
 
@@ -118,6 +144,7 @@ describe('PPR cache region params', () => {
             siteSection: 'page-site-section-id',
             siteSpace: 'page-site-space-id',
             space: 'space-id',
+            basePath: '/docs/v/page-variant/',
         });
         expect({
             ...tocData,
@@ -125,12 +152,14 @@ describe('PPR cache region params', () => {
             siteSection: undefined,
             siteSpace: undefined,
             space: undefined,
+            basePath: undefined,
         }).toEqual({
             ...changedTOCData,
             apiToken: undefined,
             siteSection: undefined,
             siteSpace: undefined,
             space: undefined,
+            basePath: undefined,
         });
     });
 });
@@ -145,7 +174,6 @@ describe('getPPRStaticSiteContext', () => {
         expect(context).toMatchObject({
             apiToken: 'ppr-api-token',
             revision: 'ppr-revision-id',
-            revalidationId: 'revalidation-id',
         });
         expect(visitorAuthClaims).toEqual({ scope: 'site-structure' });
     });
