@@ -190,6 +190,14 @@ export function getPPRHeaderRouteParams(params: PPRRouteLayoutParams): RouteLayo
             siteSection: defaults.siteSection ?? undefined,
             siteSpace: defaults.siteSpace,
             space: defaults.space,
+            // The base path has to describe the same variant as the ids above, or the header
+            // prefixes one variant's page paths with another variant's base path. The site default
+            // variant is published at the site root; defaults pointing at the visited variant keep
+            // its own base path.
+            basePath:
+                defaults.siteSpace === siteURLData.siteSpace
+                    ? siteURLData.basePath
+                    : siteURLData.siteBasePath,
         }),
     };
 }
