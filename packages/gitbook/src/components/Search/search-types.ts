@@ -20,6 +20,8 @@ export type ComputedPageResult = BaseComputedResult & {
     type: 'page';
     pageId: string;
     spaceId: string;
+    /** Canonical one-based relevance position assigned by the search backend. */
+    rank?: number;
     /** Whether the page matched on its own fields or on one of its sections. */
     resultType?: 'page' | 'section';
     breadcrumbs?: { icon?: IconName; label: string }[];

@@ -9,6 +9,7 @@ import type {
 } from '@gitbook/api';
 import type { IconName } from '@gitbook/icons';
 
+import { orderSearchResultGroups } from './orderSearchResults';
 import type {
     ComputedPageResult,
     ComputedSectionResult,
@@ -51,8 +52,8 @@ export async function POST(request: NextRequest) {
         ),
     ]);
 
-    const results = searchResults
-        .flatMap((resultItem) => {
+    const results = orderSearchResultGroups(
+        searchResults.map((resultItem) => {
             if (resultItem.type === 'record') {
                 const result: OrderedComputedResult = {
                     type: 'record',
@@ -63,7 +64,7 @@ export async function POST(request: NextRequest) {
                     score: resultItem.score,
                 };
 
-                return [{ score: resultItem.score, items: [result] }];
+                return { type: 'context' as const, results: [result] };
             }
 
             const found = findSiteSpaceBy(
@@ -71,21 +72,23 @@ export async function POST(request: NextRequest) {
                 (siteSpace) => siteSpace.space.id === resultItem.id
             );
 
-            return resultItem.pages.map((pageItem) => ({
-                score: pageItem.score,
-                items: transformSitePageResult({
-                    asEmbeddable: Boolean(asEmbeddable),
-                    linker: context.linker,
-                    pageItem,
-                    spaceItem: resultItem,
-                    siteSpace: found?.siteSpace,
-                    siteSection: found?.siteSection ?? undefined,
-                    siteSectionGroup: found?.siteSectionGroup ?? undefined,
-                }),
-            }));
+            return {
+                type: 'pages' as const,
+                results: resultItem.pages.map((pageItem) => ({
+                    rank: getSearchPageRank(pageItem),
+                    result: transformSitePageResult({
+                        asEmbeddable: Boolean(asEmbeddable),
+                        linker: context.linker,
+                        pageItem,
+                        spaceItem: resultItem,
+                        siteSpace: found?.siteSpace,
+                        siteSection: found?.siteSection ?? undefined,
+                        siteSectionGroup: found?.siteSectionGroup ?? undefined,
+                    }),
+                })),
+            };
         })
-        .sort((a, b) => b.score - a.score)
-        .flatMap((group) => group.items);
+    );
 
     return NextResponse.json(results);
 }
@@ -98,7 +101,7 @@ function transformSitePageResult(args: {
     siteSpace?: SiteSpace;
     siteSection?: SiteSection;
     siteSectionGroup?: SiteSectionGroup | null;
-}): OrderedComputedResult[] {
+}): OrderedComputedResult {
     const { asEmbeddable, pageItem, spaceItem, siteSection, siteSectionGroup, siteSpace, linker } =
         args;
     const currentLanguage = siteSpace?.space.language;
@@ -160,6 +163,7 @@ function transformSitePageResult(args: {
         pageId: pageItem.id,
         spaceId: spaceItem.id,
         score: pageItem.score,
+        rank: getSearchPageRank(pageItem),
         resultType,
         breadcrumbs,
     };
@@ -208,5 +212,9 @@ function transformSitePageResult(args: {
         };
     }
 
-    return [page];
+    return page;
+}
+
+function getSearchPageRank(page: SearchPageResult): number | undefined {
+    return 'rank' in page && typeof page.rank === 'number' ? page.rank : undefined;
 }

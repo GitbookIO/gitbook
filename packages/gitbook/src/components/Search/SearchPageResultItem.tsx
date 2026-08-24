@@ -5,7 +5,7 @@ import { Icon, type IconName } from '@gitbook/icons';
 import { SkeletonParagraph } from '../primitives';
 import { Tooltip } from '../primitives';
 import { Emoji } from '../primitives/Emoji/Emoji';
-import { getPageResultHref } from './getPageResultHref';
+import { getPageResultPresentation } from './getPageResultHref';
 import { HighlightQuery } from './HighlightQuery';
 import type { MergedPageResult } from './reciprocalRankFusion';
 import type { ComputedPageResult } from './search-types';
@@ -28,8 +28,14 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
     const { query, item, active, style, ...rest } = props;
     const language = useLanguage();
 
-    const bestSection = item.type === 'page' ? item.bestSection : undefined;
-    const href = item.type === 'page' ? getPageResultHref(item) : item.pathname;
+    const { bestSection, href } = (() => {
+        if (item.type === 'page') {
+            const presentation = getPageResultPresentation(item);
+            return { bestSection: presentation.preview, href: presentation.href };
+        }
+
+        return { bestSection: undefined, href: item.pathname };
+    })();
 
     const emoji = 'emoji' in item ? item.emoji : undefined;
     const icon = 'icon' in item ? item.icon : undefined;
