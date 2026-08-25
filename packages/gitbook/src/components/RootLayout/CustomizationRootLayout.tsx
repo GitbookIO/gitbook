@@ -139,6 +139,7 @@ export async function CustomizationRootLayout(props: {
                 typeof customization.styling.font === 'string'
                     ? `font-${customization.styling.font}`
                     : null,
+                headingFont ? 'has-heading-font' : null,
                 typeof headingFont === 'string' ? `heading-font-${headingFont}` : null,
 
                 // Set the dark/light class statically to avoid flashing and make it work when JS is disabled
