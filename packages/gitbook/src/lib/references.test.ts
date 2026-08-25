@@ -332,7 +332,7 @@ describe('resolveContentRef for direct space links', () => {
         } as unknown as GitBookAnyContext;
     }
 
-    it('returns the containing section title, not the site-space title', async () => {
+    it('returns the site-space title with the section as a breadcrumb ancestor', async () => {
         const targetSpace = buildSpace('space-target', 'Target Space Title');
         const siteSpace = buildSiteSpace(targetSpace, 'Variant Title');
         const section = {
@@ -353,12 +353,13 @@ describe('resolveContentRef for direct space links', () => {
 
         const result = await resolveContentRef({ kind: 'space', space: 'space-current' }, context);
 
-        expect(result?.text).toBe('Reference');
+        expect(result?.text).toBe('Variant Title');
+        expect(result?.ancestors).toEqual([{ label: 'Reference' }]);
         expect(result?.href).toBe(siteSpace.urls.published!);
         expect(result?.active).toBe(true);
     });
 
-    it('returns the localized section title when available', async () => {
+    it('returns the localized site-space title with a localized section breadcrumb', async () => {
         const targetSpace = buildSpace('space-target', 'Target Space Title');
         const siteSpace = buildSiteSpace(targetSpace, 'Variant Title');
         const section = {
@@ -383,7 +384,8 @@ describe('resolveContentRef for direct space links', () => {
             { kind: 'space', space: 'space-current' },
             contextFr
         );
-        expect(resultFr?.text).toBe('Référence');
+        expect(resultFr?.text).toBe('Variant Title');
+        expect(resultFr?.ancestors).toEqual([{ label: 'Référence' }]);
 
         const contextEn = buildContext({
             siteSpace,
@@ -396,7 +398,8 @@ describe('resolveContentRef for direct space links', () => {
             { kind: 'space', space: 'space-current' },
             contextEn
         );
-        expect(resultEn?.text).toBe('Reference');
+        expect(resultEn?.text).toBe('Variant Title');
+        expect(resultEn?.ancestors).toEqual([{ label: 'Reference' }]);
     });
 
     it('falls back to the site-space title when the site has no sections', async () => {
@@ -443,6 +446,49 @@ describe('resolveContentRef for direct space links', () => {
 
         expect(result?.text).toBe('External Space Title');
         expect(result?.href).toBe(externalSpace.urls.published!);
+        expect(result?.active).toBe(false);
+    });
+
+    it('returns the target site-space title for a cross-space link within the same site section', async () => {
+        const currentSpace = buildSpace('space-current', 'Practical Guides Hub');
+        const guideSpace = buildSpace('space-guide', 'SNOMED CT EHR Requirements Guide');
+        const currentSiteSpace = buildSiteSpace(currentSpace, 'Practical Guides');
+        const guideSiteSpace = buildSiteSpace(guideSpace, 'SNOMED CT EHR Requirements Guide');
+        guideSiteSpace.urls = {
+            published: 'https://docs.example.com/guides/snomed-ct-ehr-requirements-guide/',
+        };
+
+        const section = {
+            object: 'site-section',
+            id: 'section-1',
+            title: 'Practical Guides',
+            draft: false,
+            path: '',
+            siteSpaces: [currentSiteSpace, guideSiteSpace],
+            urls: {},
+        };
+
+        const dataFetcher = {
+            getSpace: async () => ({ error: { code: 404, message: 'Not found' } }),
+            getRevision: async () => ({ error: { code: 404, message: 'Not found' } }),
+            getChangeRequest: async () => ({ error: { code: 404, message: 'Not found' } }),
+            withToken: function () {
+                return this;
+            },
+        } as unknown as GitBookDataFetcher;
+
+        const context = buildContext({
+            siteSpace: currentSiteSpace,
+            sections: { list: [section], current: section },
+            structure: { type: 'sections', structure: [section] },
+            dataFetcher,
+        });
+
+        const result = await resolveContentRef({ kind: 'space', space: 'space-guide' }, context);
+
+        expect(result?.text).toBe('SNOMED CT EHR Requirements Guide');
+        expect(result?.ancestors).toEqual([{ label: 'Practical Guides' }]);
+        expect(result?.href).toBe(guideSiteSpace.urls.published!);
         expect(result?.active).toBe(false);
     });
 });
