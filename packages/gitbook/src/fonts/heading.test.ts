@@ -12,9 +12,11 @@ const CUSTOM_FONT = {
     fontFaces: [{ weight: 400 as const, sources: [{ url: 'https://example.com/segoe.woff2' }] }],
 };
 
-function customization(styling: Record<string, unknown>): SiteCustomizationSettings {
+function customization(
+    styling: Partial<SiteCustomizationSettings['styling']>
+): SiteCustomizationSettings {
     const base = defaultCustomization();
-    return { ...base, styling: { ...base.styling, ...styling } } as SiteCustomizationSettings;
+    return { ...base, styling: { ...base.styling, ...styling } };
 }
 
 describe('getHeadingFont', () => {
