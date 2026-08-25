@@ -1,7 +1,7 @@
 {
-    "main": "do.js",
+    "main": "do.ts",
     "name": "gitbook-open-v2-do",
-    "compatibility_date": "2025-04-14",
+    "compatibility_date": "2026-06-14",
     "keep_names": false,
     "compatibility_flags": [
         "nodejs_compat",
@@ -11,10 +11,17 @@
     "observability": {
         "enabled": false,
     },
+    "cache": {
+        "enabled": true,
+    },
+    "placement": {
+        "region": "gcp:us-central1",
+    },
     "env": {
-        "preview": {
+        "dev": {
             "vars": {
-                "STAGE": "preview",
+                "STAGE": "dev",
+                "OPEN_NEXT_BUILD_ID": "local",
                 "NEXT_CACHE_DO_QUEUE_DISABLE_SQLITE": "true",
             },
             "r2_buckets": [
@@ -26,7 +33,7 @@
             "services": [
                 {
                     "binding": "WORKER_SELF_REFERENCE",
-                    "service": "gitbook-open-v2-preview",
+                    "service": "gitbook-open-v2-do-dev",
                 },
             ],
             "durable_objects": {
@@ -52,6 +59,56 @@
                 },
             ],
         },
+        "preview": {
+            "vars": {
+                "STAGE": "preview",
+                "NEXT_CACHE_DO_QUEUE_DISABLE_SQLITE": "true",
+            },
+            "r2_buckets": [
+                {
+                    "binding": "NEXT_INC_CACHE_R2_BUCKET",
+                    "bucket_name": "gitbook-open-v2-cache-preview",
+                },
+            ],
+            "services": [
+                {
+                    "binding": "WORKER_SELF_REFERENCE",
+                    "service": "gitbook-open-v2-do-preview",
+                },
+            ],
+            "durable_objects": {
+                "bindings": [
+                    {
+                        "name": "NEXT_CACHE_DO_QUEUE",
+                        "class_name": "DOQueueHandler",
+                    },
+                    {
+                        "name": "NEXT_TAG_CACHE_DO_SHARDED",
+                        "class_name": "DOShardedTagCache",
+                    },
+                    {
+                        "name": "WRITE_BUFFER",
+                        "class_name": "R2WriteBuffer",
+                    },
+                ],
+            },
+            "migrations": [
+                {
+                    "tag": "v1",
+                    "new_sqlite_classes": ["DOQueueHandler", "DOShardedTagCache", "R2WriteBuffer"],
+                },
+            ],
+            "observability": {
+                "traces": {
+                    "enabled": true,
+                    "head_sampling_rate": 1,
+                },
+                "logs": {
+                    "enabled": true,
+                    "head_sampling_rate": 1,
+                },
+            },
+        },
         "staging": {
             "vars": {
                 "STAGE": "staging",
@@ -71,7 +128,7 @@
             "services": [
                 {
                     "binding": "WORKER_SELF_REFERENCE",
-                    "service": "gitbook-open-v2-staging",
+                    "service": "gitbook-open-v2-do-staging",
                 },
             ],
             "durable_objects": {
@@ -120,7 +177,7 @@
             "services": [
                 {
                     "binding": "WORKER_SELF_REFERENCE",
-                    "service": "gitbook-open-v2-production",
+                    "service": "gitbook-open-v2-do-production",
                 },
             ],
             "durable_objects": {
