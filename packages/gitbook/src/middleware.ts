@@ -35,7 +35,7 @@ import {
     normalizeRequestURL,
     throwIfDataError,
 } from '@/lib/data';
-import { isGitBookAssetsHostURL, isGitBookHostURL } from '@/lib/env';
+import { GITBOOK_SECRET, isGitBookAssetsHostURL, isGitBookHostURL } from '@/lib/env';
 import { getImageResizingContextId } from '@/lib/images';
 import { isAITrainingOrIndexingRequest } from '@/lib/indexing-crawlers';
 import { MiddlewareHeaders } from '@/lib/middleware';
@@ -46,7 +46,7 @@ import {
     isOAuthProtectedResourceRequest,
 } from '@/lib/oauth-protected';
 import { removeLeadingSlash, removeTrailingSlash } from '@/lib/paths';
-import { type SiteRouteType, getPPRRequest, getPPRRouteType } from '@/lib/ppr';
+import { PPRRequestHeaders, type SiteRouteType, getPPRRequest, getPPRRouteType } from '@/lib/ppr';
 import {
     getPreviewCookieResponse,
     getPreviewRequestIdentifier,
@@ -216,7 +216,15 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
     //
     request.headers.delete('x-gitbook-disable-tracking');
 
-    const pprRequest = getPPRRequest(request.headers);
+    const pprRequest = await getPPRRequest(request.headers, GITBOOK_SECRET);
+
+    //
+    // Strip the PPR headers once consumed: nothing downstream reads them, and a client can send
+    // them itself.
+    //
+    for (const name of Object.values(PPRRequestHeaders)) {
+        request.headers.delete(name);
+    }
 
     const withAPIToken = async (
         apiToken: string | null,

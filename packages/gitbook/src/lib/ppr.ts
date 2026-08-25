@@ -33,12 +33,107 @@ export const PPRRequestHeaders = {
     DefaultSiteSection: 'x-gbo-default-site-section',
     DefaultSiteSpace: 'x-gbo-default-site-space',
     DefaultSpace: 'x-gbo-default-space',
+    Signature: 'x-gbo-signature',
 } as const;
 
 /**
- * GBO has already resolved PPR requests, so a complete header set can skip URL resolution.
+ * Header names covered by the signature, in an order both signer and verifier must agree on.
  */
-export function getPPRRequest(headers: Headers): PPRRequest | undefined {
+const SignedPPRRequestHeaders = Object.values(PPRRequestHeaders)
+    .filter((name) => name !== PPRRequestHeaders.Signature)
+    .sort();
+
+/**
+ * GBO has already resolved PPR requests, so a complete header set can skip URL resolution.
+ *
+ * That skips visitor-auth validation and lets the headers pick the cache key, so the set is only
+ * trusted once its GBO signature checks out. Without a secret to check against, PPR stays off.
+ */
+export async function getPPRRequest(
+    headers: Headers,
+    secret: string | null
+): Promise<PPRRequest | undefined> {
+    const pprRequest = parsePPRRequest(headers);
+    if (!pprRequest || !secret || !(await verifyPPRRequestHeaders(headers, secret))) {
+        return undefined;
+    }
+
+    return pprRequest;
+}
+
+/**
+ * Sign a PPR header set the way GBO does. Only used by the dev proxy and tests.
+ */
+export async function signPPRRequestHeaders(headers: Headers, secret: string): Promise<void> {
+    const signature = await crypto.subtle.sign(
+        'HMAC',
+        await importSigningKey(secret),
+        encodeUTF8(getSignedPayload(headers))
+    );
+    headers.set(PPRRequestHeaders.Signature, toHex(signature));
+}
+
+async function verifyPPRRequestHeaders(headers: Headers, secret: string): Promise<boolean> {
+    const signature = headers.get(PPRRequestHeaders.Signature);
+    const decoded = signature ? fromHex(signature) : null;
+    if (!decoded) {
+        return false;
+    }
+
+    // `crypto.subtle.verify` compares in constant time.
+    return crypto.subtle.verify(
+        'HMAC',
+        await importSigningKey(secret),
+        decoded,
+        encodeUTF8(getSignedPayload(headers))
+    );
+}
+
+/**
+ * Canonical string that gets signed. An absent header must not hash like an empty one, as dropping
+ * one changes how the set is read.
+ */
+function getSignedPayload(headers: Headers): string {
+    return SignedPPRRequestHeaders.map((name) => {
+        const value = headers.get(name);
+        return value === null ? name : `${name}=${encodeURIComponent(value)}`;
+    }).join('\n');
+}
+
+function importSigningKey(secret: string): Promise<CryptoKey> {
+    return crypto.subtle.importKey(
+        'raw',
+        encodeUTF8(secret),
+        { name: 'HMAC', hash: 'SHA-256' },
+        false,
+        ['sign', 'verify']
+    );
+}
+
+function encodeUTF8(value: string): Uint8Array<ArrayBuffer> {
+    return new Uint8Array(new TextEncoder().encode(value));
+}
+
+function toHex(buffer: ArrayBuffer): string {
+    return Array.from(new Uint8Array(buffer), (byte) => byte.toString(16).padStart(2, '0')).join(
+        ''
+    );
+}
+
+function fromHex(value: string): Uint8Array<ArrayBuffer> | null {
+    if (value.length === 0 || value.length % 2 !== 0 || !/^[0-9a-f]+$/i.test(value)) {
+        return null;
+    }
+
+    const bytes = new Uint8Array(value.length / 2);
+    for (let index = 0; index < bytes.length; index++) {
+        bytes[index] = Number.parseInt(value.slice(index * 2, index * 2 + 2), 16);
+    }
+
+    return bytes;
+}
+
+function parsePPRRequest(headers: Headers): PPRRequest | undefined {
     const site = getRequiredHeader(headers, PPRRequestHeaders.Site);
     const siteSpace = getRequiredHeader(headers, PPRRequestHeaders.SiteSpace);
     const space = getRequiredHeader(headers, PPRRequestHeaders.Space);
