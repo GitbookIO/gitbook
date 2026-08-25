@@ -71,15 +71,14 @@ const PINNED_REMOTE_RESULTS_COUNT = 3;
 
 /**
  * A page result that was present in both local and remote lists.
- * Local fields (description, icon, emoji, pathname) are carried over as a base,
- * and remote fields (href, pageId, spaceId, title) override them.
+ * Local fields (icon, emoji, pathname) are carried over as a base, and remote fields
+ * (description, href, pageId, spaceId, title) override them.
  * Breadcrumbs prefer local (has icon + emoji) and fall back to remote.
  */
 export type MergedPageResult = Omit<ComputedPageResult, 'breadcrumbs'> & {
     pathname?: string;
     icon?: string;
     emoji?: string;
-    description?: string;
     breadcrumbs?: LocalPageResult['breadcrumbs'] | ComputedPageResult['breadcrumbs'];
 };
 
@@ -140,8 +139,8 @@ function mergePinnedRemoteResult(
  *
  * The pinned remote results are excluded from fusion and returned first. Pages
  * present in both lists are deep-merged: local fields act as the base
- * (preserving description, icon, emoji, pathname) and remote fields override
- * (providing href, pageId, spaceId, title). Breadcrumbs prefer local (has icon
+ * (preserving icon, emoji, pathname) and remote fields override (providing the
+ * authoritative page description, href, pageId, spaceId, and title). Breadcrumbs prefer local (has icon
  * + emoji) and fall back to remote. In the fused tail, their rank contributions
  * from both lists are summed.
  *
@@ -195,8 +194,7 @@ export function reciprocalRankFusion(
         const existing = scoreMap.get(key);
         if (existing) {
             // Page found in both lists: sum rank contributions and deep-merge.
-            // Local is the base (description, icon, emoji, pathname), remote overrides
-            // (href, pageId, spaceId, breadcrumbs, title).
+            // Local is the base (icon, emoji, pathname), while remote provides page fields.
             existing.score += contribution;
             if (existing.result.type === 'local-page' && result.type === 'page') {
                 existing.result = mergeLocalPageWithRemotePage(existing.result, result);

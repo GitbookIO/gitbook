@@ -15,13 +15,14 @@ function localPage(id: string, title = id): LocalPageResult {
     };
 }
 
-function remotePage(id: string, title = id, score = 0, rank?: number): OrderedComputedResult {
+function remotePage(id: string, title = id, score = 0, rank = 1): OrderedComputedResult {
     return {
         type: 'page',
         id: `remote-${id}`,
         pageId: id,
         spaceId: 'space',
         title,
+        description: `Remote description for ${title}`,
         href: `/${id}`,
         score,
         rank,
@@ -113,7 +114,7 @@ describe('reciprocalRankFusion', () => {
         expect(pinnedResult.type).toBe('page');
         expect(pinnedResult.title).toBe('Remote title');
         expect(pinnedResult.pathname).toBe('/remote-1');
-        expect(pinnedResult.description).toBe('Local description for Local title');
+        expect(pinnedResult.description).toBe('Remote description for Remote title');
         expect(pinnedResult.rank).toBe(1);
         expect(pinnedResult.breadcrumbs).toEqual([{ label: 'Local', icon: 'book-open' }]);
         expect(results.map(getResultKey).filter((key) => key === 'page:remote-1')).toHaveLength(1);

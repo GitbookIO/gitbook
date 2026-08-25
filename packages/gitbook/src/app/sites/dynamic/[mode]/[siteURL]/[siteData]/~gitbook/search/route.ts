@@ -75,7 +75,7 @@ export async function POST(request: NextRequest) {
             return {
                 type: 'pages' as const,
                 results: resultItem.pages.map((pageItem) => ({
-                    rank: getSearchPageRank(pageItem),
+                    rank: pageItem.rank,
                     result: transformSitePageResult({
                         asEmbeddable: Boolean(asEmbeddable),
                         linker: context.linker,
@@ -148,23 +148,17 @@ function transformSitePageResult(args: {
           ? toEmbeddableLinkForPublishedContent(linker, spaceURL, pageItem.path)
           : linker.toLinkForContent(joinPathWithBaseURL(spaceURL, pageItem.path));
 
-    // The deployed API already returns this field, but older generated clients and responses do not.
-    const resultType =
-        'resultType' in pageItem &&
-        (pageItem.resultType === 'page' || pageItem.resultType === 'section')
-            ? pageItem.resultType
-            : undefined;
-
     const page: ComputedPageResult = {
         type: 'page',
         id: `${spaceItem.id}/${pageItem.id}`,
         title: pageItem.title,
+        description: pageItem.description,
         href: pageHref,
         pageId: pageItem.id,
         spaceId: spaceItem.id,
         score: pageItem.score,
-        rank: getSearchPageRank(pageItem),
-        resultType,
+        rank: pageItem.rank,
+        resultType: pageItem.resultType,
         breadcrumbs,
     };
 
@@ -200,8 +194,7 @@ function transformSitePageResult(args: {
                 };
             }) ?? [];
 
-    // The search API returns each page's sections ordered highest-score-first and caps them at one
-    // per page, so the first section is the best-scoring one to use as a body preview.
+    // The API returns at most one section per page, ordered for use as the section destination preview.
     const bestSection = pageSections[0];
     if (bestSection) {
         page.bestSection = {
@@ -213,8 +206,4 @@ function transformSitePageResult(args: {
     }
 
     return page;
-}
-
-function getSearchPageRank(page: SearchPageResult): number | undefined {
-    return 'rank' in page && typeof page.rank === 'number' ? page.rank : undefined;
 }

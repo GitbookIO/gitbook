@@ -28,14 +28,21 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
     const { query, item, active, style, ...rest } = props;
     const language = useLanguage();
 
-    const { bestSection, href } = (() => {
+    const { bestSection, description, href } = (() => {
         if (item.type === 'page') {
             const presentation = getPageResultPresentation(item);
-            return { bestSection: presentation.preview, href: presentation.href };
+            return {
+                bestSection: presentation.preview,
+                description: presentation.description,
+                href: presentation.href,
+            };
         }
 
-        return { bestSection: undefined, href: item.pathname };
+        return { bestSection: undefined, description: item.description, href: item.pathname };
     })();
+    const preview = bestSection
+        ? [bestSection.title, bestSection.body].filter(Boolean).join(' · ')
+        : undefined;
 
     const emoji = 'emoji' in item ? item.emoji : undefined;
     const icon = 'icon' in item ? item.icon : undefined;
@@ -84,33 +91,32 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
             <div
                 className={tcls(
                     'relative h-5 w-full transition-[height] duration-300',
-                    item.type === 'local-page' && !bestSection?.body && !item.description
+                    item.type === 'local-page' && !preview && !description
                         ? '[[aria-busy=false]_&]:h-0'
-                        : ''
+                        : !preview && !description
+                          ? 'h-0'
+                          : ''
                 )}
                 style={{ transitionDelay: style?.animationDelay }}
             >
-                {bestSection?.body ? (
+                {preview ? (
                     <p
                         className="animate-blur-in absolute inset-0 line-clamp-1 origin-left text-sm"
                         style={{ animationDelay: style?.animationDelay }}
                     >
-                        <HighlightQuery
-                            query={query}
-                            text={`${bestSection.title ? `${bestSection.title} · ` : ''}${bestSection.body}`}
-                        />
+                        <HighlightQuery query={query} text={preview} />
                     </p>
                 ) : null}
 
-                {'description' in item && item.description ? (
+                {description ? (
                     <p
                         className={tcls(
                             'absolute inset-0 line-clamp-1 origin-left text-sm',
-                            bestSection?.body ? 'hidden animate-blur-out' : ''
+                            preview ? 'hidden animate-blur-out' : ''
                         )}
                         style={{ animationDelay: style?.animationDelay }}
                     >
-                        <HighlightQuery query={query} text={item.description} />
+                        <HighlightQuery query={query} text={description} />
                     </p>
                 ) : null}
 
@@ -120,7 +126,7 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
                         lines={1}
                         className={tcls(
                             'absolute inset-0 origin-left',
-                            bestSection?.body || item.description
+                            preview || description
                                 ? 'hidden animate-blur-out'
                                 : '[[aria-busy=false]_&]:hidden [[aria-busy=false]_&]:animate-blur-out'
                         )}

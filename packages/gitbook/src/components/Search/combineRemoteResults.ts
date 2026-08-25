@@ -29,19 +29,15 @@ export function combineRemoteResults(
     return [...rankedPages.map(({ result }) => result), ...context];
 
     function addResults(results: OrderedComputedResult[], weight: number) {
-        let pageIndex = 0;
-
         for (const result of results) {
             if (result.type === 'record') {
                 context.push(result);
                 continue;
             }
 
-            pageIndex += 1;
-            const rank = result.rank ?? pageIndex;
             rankedPages.push({
                 result,
-                fusionScore: weight / (RRF_K + rank),
+                fusionScore: weight / (RRF_K + result.rank),
                 inputOrder: rankedPages.length,
             });
         }

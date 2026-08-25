@@ -1,5 +1,5 @@
 type RankedPageResult<TResult> = {
-    rank: number | undefined;
+    rank: number;
     result: TResult;
 };
 
@@ -27,16 +27,6 @@ export function orderSearchResultGroups<TResult>(groups: SearchResultGroup<TResu
     }
 
     pages.sort((left, right) => {
-        if (left.rank === undefined && right.rank === undefined) {
-            return left.inputOrder - right.inputOrder;
-        }
-        if (left.rank === undefined) {
-            return 1;
-        }
-        if (right.rank === undefined) {
-            return -1;
-        }
-
         return left.rank - right.rank || left.inputOrder - right.inputOrder;
     });
 

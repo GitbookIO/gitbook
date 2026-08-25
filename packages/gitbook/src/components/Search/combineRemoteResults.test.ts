@@ -10,6 +10,7 @@ function page(title: string, rank: number, score: number, spaceId: string): Comp
         pageId: title,
         spaceId,
         title,
+        description: `Description for ${title}`,
         href: `/${title}`,
         rank,
         score,

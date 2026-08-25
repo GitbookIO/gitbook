@@ -4,6 +4,7 @@ import { getPageResultHref, getPageResultPresentation } from './getPageResultHre
 
 const pageResult = {
     href: '/operations/analyst-guidance/understanding-vectra-ai-detections',
+    description: 'Learn how Vectra AI detections help analysts investigate threats.',
     bestSection: {
         href: '/operations/analyst-guidance/understanding-vectra-ai-detections#please-note',
         title: 'Please note',
@@ -16,7 +17,7 @@ describe('getPageResultHref', () => {
     it('links Vectra page matches to the page root without presenting a section destination', () => {
         expect(getPageResultPresentation({ ...pageResult, resultType: 'page' })).toEqual({
             href: '/operations/analyst-guidance/understanding-vectra-ai-detections',
-            preview: { body: 'Individual detections are no longer scored.' },
+            description: 'Learn how Vectra AI detections help analysts investigate threats.',
         });
     });
 
@@ -37,15 +38,24 @@ describe('getPageResultHref', () => {
     });
 
     it('links to the page when no section preview is available', () => {
-        expect(getPageResultHref({ href: '/getting-started', resultType: 'section' })).toBe(
-            '/getting-started'
-        );
+        expect(
+            getPageResultPresentation({
+                href: '/getting-started',
+                description: 'Start using the product.',
+                resultType: 'section',
+            })
+        ).toEqual({
+            href: '/getting-started',
+            description: 'Start using the product.',
+            preview: undefined,
+        });
     });
 
-    it('links a section match to its anchor when it only has a heading', () => {
+    it('links a section match to its anchor and presents its heading without the page description', () => {
         expect(
-            getPageResultHref({
+            getPageResultPresentation({
                 href: '/getting-started',
+                description: 'Start using the product.',
                 resultType: 'section',
                 bestSection: {
                     href: '/getting-started#requirements',
@@ -53,6 +63,22 @@ describe('getPageResultHref', () => {
                     score: 1,
                 },
             })
-        ).toBe('/getting-started#requirements');
+        ).toEqual({
+            href: '/getting-started#requirements',
+            description: undefined,
+            preview: {
+                title: 'Requirements',
+                body: undefined,
+            },
+        });
+    });
+
+    it('does not replace an empty page description with arbitrary section content', () => {
+        expect(
+            getPageResultPresentation({ ...pageResult, description: '', resultType: 'page' })
+        ).toEqual({
+            href: '/operations/analyst-guidance/understanding-vectra-ai-detections',
+            description: '',
+        });
     });
 });
