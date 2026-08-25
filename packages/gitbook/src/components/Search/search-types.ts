@@ -20,10 +20,14 @@ export type ComputedPageResult = BaseComputedResult & {
     type: 'page';
     pageId: string;
     spaceId: string;
+    /** Page-level description for a page-root search destination. */
+    description: string;
+    /** Canonical one-based relevance position assigned by the search backend. */
+    rank: number;
     /** Whether the page matched on its own fields or on one of its sections. */
     resultType?: 'page' | 'section';
     breadcrumbs?: { icon?: IconName; label: string }[];
-    /** The highest-scoring section for this page, used as a body snippet preview. */
+    /** The highest-scoring section for this page, used for a section destination preview. */
     bestSection?: {
         href: string;
         title?: string;

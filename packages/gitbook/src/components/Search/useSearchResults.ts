@@ -4,6 +4,7 @@ import React from 'react';
 import { assert } from 'ts-essentials';
 
 import { useTrackEvent } from '../Insights';
+import { combineRemoteResults } from './combineRemoteResults';
 import {
     type RecommendedQuestionResult,
     createRecommendedQuestionResult,
@@ -25,9 +26,6 @@ export type ResultType =
     | RecommendedQuestionResult;
 
 export type { LocalPageResult, MergedPageResult };
-
-// Score multiplier for current site space results when combined with those from other site spaces
-const CURRENT_SITE_SPACE_SCORE_MULTIPLIER = 2;
 
 // Small helper extracted for unit testing of scope → local filter mapping
 // computeFilterSiteSpaceIds is imported from './filter' for testability
@@ -422,17 +420,4 @@ async function fetchSearchResults(
     }
 
     return response.json() as Promise<OrderedComputedResult[]>;
-}
-
-function combineRemoteResults(
-    remoteResultsCurrentSpace: OrderedComputedResult[],
-    remoteResultsOtherSpaces: OrderedComputedResult[]
-): OrderedComputedResult[] {
-    return [
-        ...remoteResultsCurrentSpace.map((result) => ({
-            ...result,
-            score: result.score * CURRENT_SITE_SPACE_SCORE_MULTIPLIER,
-        })),
-        ...remoteResultsOtherSpaces,
-    ].sort((a, b) => b.score - a.score);
 }
