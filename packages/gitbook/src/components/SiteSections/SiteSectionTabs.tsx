@@ -21,6 +21,8 @@ const SCREEN_OFFSET = 16; // 1rem
 const POPUP_OFFSET = 4;
 const OPEN_DELAY_MS = 200;
 const MOTION = 'duration-300 ease-[cubic-bezier(0.83,0,0.17,1)]';
+// Bounds the scrolling content too: the popup settles at `height: auto`, so `h-full` doesn't.
+const MAX_POPUP_HEIGHT = 'max-h-[calc(100vh-8rem)]';
 const MAX_ITEMS_PER_COLUMN = 10; // number of items per column
 const GROUP_MASONRY_THRESHOLD = 3; // if a section group has more than this many child groups, it will be shown in a masonry grid
 const COLUMN_WIDTH = '18rem';
@@ -109,6 +111,7 @@ export function SiteSectionTabs(props: {
                                         <NavigationMenu.Content
                                             className={tcls(
                                                 'h-full w-[calc(100vw-2rem)] overflow-y-auto overflow-x-hidden md:w-max md:max-w-(--available-width)',
+                                                MAX_POPUP_HEIGHT,
                                                 `transition-[opacity,translate] ${MOTION}`,
                                                 'data-ending-style:opacity-0 data-starting-style:opacity-0',
                                                 'data-starting-style:data-[activation-direction=left]:-translate-x-1/2 data-ending-style:data-[activation-direction=left]:translate-x-1/2',
@@ -159,7 +162,8 @@ export function SiteSectionTabs(props: {
                 >
                     <NavigationMenu.Popup
                         className={tcls(
-                            'relative h-(--popup-height) max-h-[calc(100vh-8rem)] w-(--popup-width) origin-(--transform-origin) overflow-hidden circular-corners:rounded-3xl rounded-corners:rounded-xl border border-tint bg-tint-base shadow-lg outline-hidden',
+                            'relative h-(--popup-height) w-(--popup-width) origin-(--transform-origin) overflow-hidden circular-corners:rounded-3xl rounded-corners:rounded-xl border border-tint bg-tint-base shadow-lg outline-hidden',
+                            MAX_POPUP_HEIGHT,
                             // `scale` rather than `transform`: that is what `scale-95` sets.
                             `transition-[opacity,scale,width,height] ${MOTION}`,
                             // The size vars reset on close, so animating them out collapses the
@@ -222,7 +226,11 @@ function SectionGroupTileList(props: {
     const hasSections = sections.length > 0;
     const hasGroups = groups.length > 0;
     const isMasonryLayout = groups.length > GROUP_MASONRY_THRESHOLD;
-    const masonryColumnCount = Math.min(Math.ceil(groups.length / 2), MAX_MASONRY_COLUMNS);
+    const masonryRows = groups.reduce((total, group) => total + 1 + group.children.length, 0); // title + sections
+    const masonryColumnCount = Math.min(
+        Math.max(Math.ceil(groups.length / 2), Math.ceil(masonryRows / MAX_ITEMS_PER_COLUMN)),
+        MAX_MASONRY_COLUMNS
+    );
 
     return (
         <div className="flex w-full flex-col md:flex-row">
@@ -277,6 +285,8 @@ function SectionGroupTileList(props: {
                                 key={group.id}
                                 child={group}
                                 currentSection={currentSection}
+                                isMasonry={isMasonryLayout}
+                                invertIcon={hasSections}
                             />
                         ))}
                     </ul>
@@ -293,8 +303,10 @@ function SectionGroupTile(props: {
     child: ClientSiteSection | ClientSiteSectionGroup;
     currentSection: ClientSiteSection;
     invertIcon?: boolean;
+    /** Whether the tile is a top-level group of the dropdown's masonry layout. */
+    isMasonry?: boolean;
 }) {
-    const { child, currentSection, invertIcon } = props;
+    const { child, currentSection, invertIcon, isMasonry } = props;
 
     if (child.object === 'site-section') {
         const { url, icon, title, description } = child;
@@ -341,18 +353,32 @@ function SectionGroupTile(props: {
     // Handle nested section group
     const { title, icon, children } = child;
 
+    // Multi-column sizes every column to the widest, so a wide group spans instead of stretching them all.
+    const spansMasonry = Boolean(isMasonry) && children.length > MAX_ITEMS_PER_COLUMN;
+
     return (
-        <li className="flex w-full min-w-0 shrink-0 break-inside-avoid flex-col gap-1 md:w-auto">
-            <div className="mb-1 mt-2 flex min-w-0 gap-2 px-2.5 text-xs font-semibold text-tint-subtle">
+        <li
+            className={tcls(
+                'flex w-full min-w-0 shrink-0 break-inside-avoid flex-col gap-1 md:w-auto',
+                spansMasonry ? 'md:[column-span:all]' : ''
+            )}
+        >
+            <div className="mb-1 mt-2 flex min-w-0 gap-2 px-2.5 font-heading text-xs font-semibold text-tint-subtle">
                 {icon && (
                     <SectionIcon className="mt-0.5" isActive={false} icon={icon as IconName} />
                 )}
                 <span className="min-w-0 flex-1 whitespace-normal">{title}</span>
             </div>
             <ul
-                className="flex w-full grid-flow-row flex-col gap-x-2 gap-y-0.5 md:grid"
+                className={tcls(
+                    'flex w-full grid-flow-row flex-col gap-x-2 gap-y-0.5 md:grid',
+                    // Reuse the masonry's gap and columns, to stay aligned with the groups around it.
+                    spansMasonry ? 'md:gap-x-[var(--site-section-column-gap)]' : ''
+                )}
                 style={{
-                    gridTemplateColumns: `repeat(${Math.ceil(children.length / MAX_ITEMS_PER_COLUMN)}, minmax(0, auto))`,
+                    gridTemplateColumns: spansMasonry
+                        ? 'repeat(var(--masonry-columns), minmax(0, 1fr))'
+                        : `repeat(${Math.ceil(children.length / MAX_ITEMS_PER_COLUMN)}, minmax(0, auto))`,
                 }}
             >
                 {children.map((nestedChild) => (
@@ -360,7 +386,7 @@ function SectionGroupTile(props: {
                         key={nestedChild.id}
                         child={nestedChild}
                         currentSection={currentSection}
-                        invertIcon={true}
+                        invertIcon={invertIcon}
                     />
                 ))}
             </ul>
