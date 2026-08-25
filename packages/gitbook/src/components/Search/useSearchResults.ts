@@ -1,10 +1,8 @@
 import { readStreamableValue } from 'ai/rsc';
-import assertNever from 'assert-never';
 import React from 'react';
 import { assert } from 'ts-essentials';
 
 import { useTrackEvent } from '../Insights';
-import { combineRemoteResults } from './combineRemoteResults';
 import {
     type RecommendedQuestionResult,
     createRecommendedQuestionResult,
@@ -13,6 +11,7 @@ import {
 import { computeFilterSiteSpaceIds } from './filter';
 import { useRecentSearchQueries } from './recent-queries';
 import { type MergedPageResult, reciprocalRankFusion } from './reciprocalRankFusion';
+import { computeRemoteSearchScope } from './remote-scope';
 import type { OrderedComputedResult, SearchSiteContentScope } from './search-types';
 import { streamRecommendedQuestions } from './server-actions';
 import { type LocalPageResult, useLocalSearchResults } from './useLocalSearchResults';
@@ -90,10 +89,9 @@ export function useSearchResults(props: {
 
     const [remoteState, setRemoteState] = React.useState<{
         results: OrderedComputedResult[];
-        otherSpacesResults: OrderedComputedResult[];
         fetching: boolean;
         error: boolean;
-    }>({ results: [], otherSpacesResults: [], fetching: false, error: false });
+    }>({ results: [], fetching: false, error: false });
 
     // Track the current in-flight fetch so it can be aborted imperatively
     // when the user navigates away before the request completes.
@@ -111,7 +109,6 @@ export function useSearchResults(props: {
             if (!withAI) {
                 setRemoteState({
                     results: [],
-                    otherSpacesResults: [],
                     fetching: false,
                     error: false,
                 });
@@ -127,7 +124,6 @@ export function useSearchResults(props: {
                 // Recommended questions are stored as ResultType[] already
                 setRemoteState({
                     results: [],
-                    otherSpacesResults: [],
                     fetching: false,
                     error: false,
                 });
@@ -136,7 +132,6 @@ export function useSearchResults(props: {
 
             setRemoteState({
                 results: [],
-                otherSpacesResults: [],
                 fetching: false,
                 error: false,
             });
@@ -154,7 +149,6 @@ export function useSearchResults(props: {
                 });
                 setRemoteState({
                     results: [],
-                    otherSpacesResults: [],
                     fetching: false,
                     error: false,
                 });
@@ -185,7 +179,6 @@ export function useSearchResults(props: {
                         // Recommended questions are handled via a separate path below
                         setRemoteState({
                             results: [],
-                            otherSpacesResults: [],
                             fetching: false,
                             error: false,
                         });
@@ -200,7 +193,6 @@ export function useSearchResults(props: {
         }
         setRemoteState({
             results: [],
-            otherSpacesResults: [],
             fetching: true,
             error: false,
         });
@@ -213,81 +205,24 @@ export function useSearchResults(props: {
                 fetchSearchResults(searchURL, scope, query, abortController.signal, asEmbeddable);
 
             try {
-                // Each scope resolves to a primary search request and, for the default scope
-                // on a multi-section site, a secondary request for the other site spaces
-                const { resultsPromise, otherSpacesResultsPromise } = ((): {
-                    resultsPromise: Promise<OrderedComputedResult[]>;
-                    otherSpacesResultsPromise?: Promise<OrderedComputedResult[]>;
-                } => {
-                    switch (scope) {
-                        case 'all':
-                            // Search all content on the site
-                            return { resultsPromise: fetchSearch({ mode: 'all' }) };
-                        case 'default':
-                            // Search the current section's variant + matched/default variant for other sections.
-                            // Without sections, the scope resolves to the current site space alone, so a
-                            // second request restricted to the other site spaces would be redundant.
-                            if (!withSections) {
-                                return {
-                                    resultsPromise: fetchSearch({ mode: 'current', siteSpaceId }),
-                                };
-                            }
+                const resultsPromise = fetchSearch(
+                    computeRemoteSearchScope(scope, siteSpaceId, siteSpaceIds)
+                );
 
-                            // Split into two parallel requests so the (smaller, faster) current site
-                            // space results can be shown while the other site spaces are still being searched.
-                            return {
-                                resultsPromise: fetchSearch({
-                                    mode: 'current',
-                                    siteSpaceId,
-                                    restrictTo: 'currentSiteSpace',
-                                }),
-                                otherSpacesResultsPromise: fetchSearch({
-                                    mode: 'current',
-                                    siteSpaceId,
-                                    restrictTo: 'otherSiteSpaces',
-                                }),
-                            };
-                        case 'extended':
-                            // Search all variants of the current section
-                            return {
-                                resultsPromise: fetchSearch({ mode: 'specific', siteSpaceIds }),
-                            };
-                        case 'current':
-                            // Search only the current section's current variant
-                            return {
-                                resultsPromise: fetchSearch({
-                                    mode: 'specific',
-                                    siteSpaceIds: [siteSpaceId],
-                                }),
-                            };
-                        default:
-                            assertNever(scope);
+                const onResults = (results: OrderedComputedResult[]) => {
+                    if (cancelled) {
+                        return;
                     }
-                })();
 
-                // Render each result set as soon as its response arrives; a failed
-                // request reports an error without discarding the other result set.
-                let tracked = false;
-                const onResults =
-                    (key: 'results' | 'otherSpacesResults') =>
-                    (results: OrderedComputedResult[]) => {
-                        if (cancelled) {
-                            return;
-                        }
+                    if (!results) {
+                        // Can happen when the route cannot be found and returns the page's html.
+                        setRemoteState((prev) => ({ ...prev, error: true }));
+                        return;
+                    }
 
-                        if (!results) {
-                            // Can happen when the route cannot be found and returns the page's html.
-                            setRemoteState((prev) => ({ ...prev, error: true }));
-                            return;
-                        }
-
-                        setRemoteState((prev) => ({ ...prev, [key]: results }));
-
-                        if (!tracked) {
-                            tracked = true;
-                            trackEvent({ type: 'search_type_query', query });
-                        }
-                    };
+                    setRemoteState((prev) => ({ ...prev, results }));
+                    trackEvent({ type: 'search_type_query', query });
+                };
                 const onError = () => {
                     if (cancelled) {
                         return;
@@ -295,10 +230,7 @@ export function useSearchResults(props: {
                     setRemoteState((prev) => ({ ...prev, error: true }));
                 };
 
-                await Promise.all([
-                    resultsPromise.then(onResults('results'), onError),
-                    otherSpacesResultsPromise?.then(onResults('otherSpacesResults'), onError),
-                ]);
+                await resultsPromise.then(onResults, onError);
 
                 if (cancelled) {
                     return;
@@ -311,7 +243,6 @@ export function useSearchResults(props: {
                 }
                 setRemoteState({
                     results: [],
-                    otherSpacesResults: [],
                     fetching: false,
                     error: true,
                 });
@@ -341,7 +272,6 @@ export function useSearchResults(props: {
         suggestions,
         searchURL,
         asEmbeddable,
-        withSections,
     ]);
 
     const abort = React.useCallback(() => {
@@ -368,23 +298,8 @@ export function useSearchResults(props: {
             });
         }
 
-        return reciprocalRankFusion(
-            localResults,
-            remoteState.otherSpacesResults.length > 0
-                ? combineRemoteResults(remoteState.results, remoteState.otherSpacesResults)
-                : remoteState.results,
-            query
-        );
-    }, [
-        localResults,
-        remoteState.results,
-        remoteState.otherSpacesResults,
-        query,
-        withAI,
-        siteSpaceId,
-        suggestions,
-        recentQueries,
-    ]);
+        return reciprocalRankFusion(localResults, remoteState.results, query);
+    }, [localResults, remoteState.results, query, withAI, siteSpaceId, suggestions, recentQueries]);
 
     return {
         results,
