@@ -37,7 +37,7 @@ export async function ConsentScreen(props: {
                     </div>
 
                     {/* Request statement — toned down, with the client and site names emphasized. */}
-                    <h1 className="text-xl leading-snug text-tint sm:text-2xl">
+                    <h1 className="font-heading text-xl leading-snug text-tint sm:text-2xl">
                         {t(
                             language,
                             'auth_consent_request',
@@ -69,7 +69,7 @@ export async function ConsentScreen(props: {
 
                             <div className="flex min-w-0 flex-col gap-0.5">
                                 <div className="flex items-center gap-x-2 gap-y-1">
-                                    <h2 className="text-base font-semibold text-tint-strong">
+                                    <h2 className="font-heading text-base font-semibold text-tint-strong">
                                         {client.name}
                                     </h2>
                                     <ClientTrustBadge
@@ -219,7 +219,7 @@ export async function ConsentError(props: {
                     <Icon icon="circle-exclamation" className="size-6" />
                 </span>
                 <div className="flex flex-col gap-1">
-                    <h1 className="text-lg font-semibold text-tint-strong">{title}</h1>
+                    <h1 className="font-heading text-lg font-semibold text-tint-strong">{title}</h1>
                     <p className="text-tint">{message}</p>
                 </div>
             </ConsentCard>

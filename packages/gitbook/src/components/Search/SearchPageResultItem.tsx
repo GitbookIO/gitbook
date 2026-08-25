@@ -72,7 +72,7 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
             {...rest}
         >
             <Breadcrumbs breadcrumbs={item.breadcrumbs} />
-            <p className="line-clamp-1 text-base font-semibold leading-snug text-tint-strong">
+            <p className="line-clamp-1 font-heading text-base font-semibold leading-snug text-tint-strong">
                 <HighlightQuery query={query} text={item.title} />
             </p>
             <div

@@ -260,7 +260,7 @@ export function AIChatBody(props: {
                             </div>
                             <div className="flex flex-col items-start gap-1 [@container(min-height:400px)]:items-center">
                                 <h5
-                                    className="animate-blur-in-slow text-lg font-bold leading-tight text-tint-strong [@container(min-height:400px)]:text-center"
+                                    className="animate-blur-in-slow font-heading text-lg font-bold leading-tight text-tint-strong [@container(min-height:400px)]:text-center"
                                     style={{ animationDelay: '.5s' }}
                                     data-testid="ai-chat-greeting-title"
                                 >
