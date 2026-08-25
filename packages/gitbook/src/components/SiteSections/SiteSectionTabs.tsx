@@ -225,6 +225,8 @@ function SectionGroupTileList(props: {
 
     const hasSections = sections.length > 0;
     const hasGroups = groups.length > 0;
+    // Loose sections only lead when the structure opens with one, otherwise they read as secondary links and trail the groups.
+    const sectionsLead = items[0]?.object === 'site-section';
     const isMasonryLayout = groups.length > GROUP_MASONRY_THRESHOLD;
     const masonryRows = groups.reduce((total, group) => total + 1 + group.children.length, 0); // title + sections
     const masonryColumnCount = Math.min(
@@ -232,65 +234,85 @@ function SectionGroupTileList(props: {
         MAX_MASONRY_COLUMNS
     );
 
+    // Whichever panel comes second is recessed: it carries the divider, the background and inverted tile icons.
+    const sectionsRecessed = hasGroups && !sectionsLead;
+    const groupsRecessed = hasSections && sectionsLead;
+    const RECESSED_PANEL = 'border-tint-subtle bg-tint-subtle max-md:border-t md:border-l';
+
+    // Non-grouped sections. The wrapper spans the dropdown's height, so the list itself can stay content-sized.
+    const sectionsPanel = hasSections ? (
+        <div
+            className={tcls(
+                'w-full shrink-0 md:w-max',
+                hasGroups ? (sectionsRecessed ? RECESSED_PANEL : 'bg-tint-base') : ''
+            )}
+        >
+            <ul
+                className="flex w-full grid-flow-row flex-col gap-x-2 gap-y-0.5 p-3 md:grid md:w-max"
+                style={{
+                    gridTemplateColumns: `repeat(${Math.ceil(sections.length / MAX_ITEMS_PER_COLUMN)}, minmax(0, 1fr))`,
+                }}
+            >
+                {sections.map((section) => (
+                    <SectionGroupTile
+                        key={section.id}
+                        child={section}
+                        currentSection={currentSection}
+                        invertIcon={sectionsRecessed}
+                    />
+                ))}
+            </ul>
+        </div>
+    ) : null;
+
+    // Grouped sections
+    const groupsPanel = hasGroups ? (
+        <div
+            className={tcls(
+                'w-full md:w-max md:min-w-0 md:max-w-full',
+                groupsRecessed ? RECESSED_PANEL : ''
+            )}
+        >
+            <ul
+                className={tcls(
+                    'p-3',
+                    isMasonryLayout
+                        ? 'w-full max-md:space-y-8 md:w-max md:max-w-full md:gap-x-[var(--site-section-column-gap)] md:[column-count:var(--masonry-columns)] md:[&>li]:mb-4'
+                        : 'flex w-full flex-col justify-start space-y-8 md:w-max md:flex-row md:items-start md:gap-[var(--site-section-column-gap)] md:space-y-0'
+                )}
+                style={
+                    isMasonryLayout
+                        ? ({
+                              '--masonry-columns': String(masonryColumnCount),
+                          } as React.CSSProperties)
+                        : undefined
+                }
+            >
+                {groups.map((group) => (
+                    <SectionGroupTile
+                        key={group.id}
+                        child={group}
+                        currentSection={currentSection}
+                        isMasonry={isMasonryLayout}
+                        invertIcon={groupsRecessed}
+                    />
+                ))}
+            </ul>
+        </div>
+    ) : null;
+
     return (
         <div className="flex w-full flex-col md:flex-row">
-            {/* Non-grouped sections */}
-            {hasSections && (
-                <ul
-                    className={tcls(
-                        'flex w-full shrink-0 grid-flow-row flex-col gap-x-2 gap-y-0.5 self-stretch p-3 md:sticky md:top-0 md:grid md:w-max md:self-start',
-                        hasGroups ? 'bg-tint-base' : ''
-                    )}
-                    style={{
-                        gridTemplateColumns: `repeat(${Math.ceil(sections.length / MAX_ITEMS_PER_COLUMN)}, minmax(0, 1fr))`,
-                    }}
-                >
-                    {sections.map((section) => (
-                        <SectionGroupTile
-                            key={section.id}
-                            child={section}
-                            currentSection={currentSection}
-                        />
-                    ))}
-                </ul>
-            )}
-
-            {/* Grouped sections */}
-            {hasGroups && (
-                <div
-                    className={tcls(
-                        'w-full md:w-max md:min-w-0 md:max-w-full',
-                        hasSections
-                            ? 'border-tint-subtle bg-tint-subtle max-md:border-t md:border-l'
-                            : ''
-                    )}
-                >
-                    <ul
-                        className={tcls(
-                            'p-3',
-                            isMasonryLayout
-                                ? 'w-full max-md:space-y-8 md:w-max md:max-w-full md:gap-x-[var(--site-section-column-gap)] md:[column-count:var(--masonry-columns)] md:[&>li]:mb-4'
-                                : 'flex w-full flex-col justify-start space-y-8 md:w-max md:flex-row md:items-start md:gap-[var(--site-section-column-gap)] md:space-y-0'
-                        )}
-                        style={
-                            isMasonryLayout
-                                ? ({
-                                      '--masonry-columns': String(masonryColumnCount),
-                                  } as React.CSSProperties)
-                                : undefined
-                        }
-                    >
-                        {groups.map((group) => (
-                            <SectionGroupTile
-                                key={group.id}
-                                child={group}
-                                currentSection={currentSection}
-                                isMasonry={isMasonryLayout}
-                                invertIcon={hasSections}
-                            />
-                        ))}
-                    </ul>
-                </div>
+            {sectionsLead ? (
+                <>
+                    {sectionsPanel}
+                    {groupsPanel}
+                </>
+            ) : (
+                <>
+                    {groupsPanel}
+                    {sectionsPanel}
+                </>
             )}
         </div>
     );
