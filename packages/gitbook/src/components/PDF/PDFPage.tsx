@@ -180,7 +180,9 @@ async function PDFSpaceIntro(props: { space: Space; customization: SiteCustomiza
     return (
         <PrintPage isFirst>
             <div className="flex items-center justify-center py-12">
-                <h1 className="text-6xl font-bold">{customization.title ?? space.title}</h1>
+                <h1 className="font-heading text-6xl font-bold">
+                    {customization.title ?? space.title}
+                </h1>
             </div>
         </PrintPage>
     );
@@ -192,7 +194,7 @@ async function PDFPageGroup(props: { space: Space; page: RevisionPageGroup }) {
     return (
         <PrintPage id={getPagePDFContainerId(page)}>
             <div className="mt-10 flex break-before-page items-center justify-center py-12 print:mt-0">
-                <h1 className="text-5xl font-bold">{page.title}</h1>
+                <h1 className="font-heading text-5xl font-bold">{page.title}</h1>
             </div>
         </PrintPage>
     );
@@ -207,7 +209,7 @@ async function PDFPageDocument(props: {
 
     return (
         <PrintPage id={getPagePDFContainerId(page)}>
-            <h1 className="text-4xl font-bold">{page.title}</h1>
+            <h1 className="font-heading text-4xl font-bold">{page.title}</h1>
             {page.description ? (
                 <p className="mb-3 mt-2 decoration-primary/6">{page.description}</p>
             ) : null}

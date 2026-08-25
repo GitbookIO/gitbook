@@ -117,7 +117,13 @@ export function SitePageNotFound() {
 
                     <div className="flex w-full flex-col items-center gap-8">
                         <div className="flex w-full flex-col items-center gap-2 rounded-3xl">
-                            <h1 className={tcls('text-3xl', 'font-semibold', 'text-tint-strong')}>
+                            <h1
+                                className={tcls(
+                                    'text-3xl',
+                                    'font-semibold font-heading',
+                                    'text-tint-strong'
+                                )}
+                            >
                                 {t(
                                     language,
                                     adaptiveAuthLoginHref
@@ -197,7 +203,9 @@ function NotFoundSuggestions(props: { suggestions: RelatedPage[] | null }) {
 
     return loading || hasResults ? (
         <div className="-mt-4 flex w-full flex-col gap-2 border-tint-subtle bg-tint-subtle p-8 pt-10 theme-muted:bg-tint theme-gradient:border rounded-corners:rounded-b-xl circular-corners:rounded-b-3xl">
-            <h2 className="font-medium text-tint">{t(language, 'notfound_suggestions_title')}</h2>
+            <h2 className="font-heading font-medium text-tint">
+                {t(language, 'notfound_suggestions_title')}
+            </h2>
             <ul className="flex flex-col gap-2">
                 {loading ? (
                     <SkeletonList items={RELATED_PAGES_COUNT} className="my-0.75 max-w-md" />

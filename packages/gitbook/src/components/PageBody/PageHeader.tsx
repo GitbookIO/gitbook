@@ -242,6 +242,7 @@ export async function PageHeader(props: {
                         '@xs:text-3xl',
                         '@lg:text-4xl',
                         'leading-tight',
+                        'font-heading',
                         'font-bold',
                         'flex',
                         'items-center',
