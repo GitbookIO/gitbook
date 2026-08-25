@@ -79,9 +79,9 @@ export function SiteSectionTabs(props: {
             >
                 <NavigationMenu.List
                     className={tcls(
-                        '-mx-3 flex grow gap-2 bg-transparent',
-                        'pl-4 sm:pl-6 md:pl-8',
-                        !children ? 'pr-4 sm:pr-6 md:pr-8' : 'pr-4'
+                        'flex grow gap-2 bg-transparent',
+                        'pl-1 sm:pl-3 md:pl-5',
+                        !children ? 'pr-1 sm:pr-3 md:pr-5' : 'pr-1'
                     )}
                     aria-label="Sections"
                     data-gb-sections
