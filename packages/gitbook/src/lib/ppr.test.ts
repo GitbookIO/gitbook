@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test';
 
-import { getPPRRequest, getPPRRouteType } from './ppr';
+import { getPPRRequest, getPPRRouteType, signPPRRequestHeaders } from './ppr';
 
 const pprHeaders = new Headers({
     'x-gbo-site': 'site-id',
@@ -25,20 +25,39 @@ const pprHeaders = new Headers({
     'x-gbo-default-space': 'default-space-id',
 });
 
+const SECRET = 'ppr-signing-secret';
+
+/**
+ * Sign a header set the way GBO does, so the parsing assertions can't pass or fail on the signature.
+ */
+async function signHeaders(headers: Headers, secret = SECRET) {
+    const signed = new Headers(headers);
+    await signPPRRequestHeaders(signed, secret);
+    return signed;
+}
+
+function getSignedPPRRequest(headers: Headers) {
+    return signHeaders(headers).then((signed) => getPPRRequest(signed, SECRET));
+}
+
 describe('getPPRRouteType', () => {
-    it('routes static document pages through PPR when resolved content headers are present', () => {
-        expect(getPPRRouteType('static', true, getPPRRequest(pprHeaders))).toBe('ppr');
+    it('routes static document pages through PPR when resolved content headers are present', async () => {
+        expect(getPPRRouteType('static', true, await getSignedPPRRequest(pprHeaders))).toBe('ppr');
     });
 
-    it('keeps special static routes on their existing route', () => {
-        expect(getPPRRouteType('static', false, getPPRRequest(pprHeaders))).toBe('static');
+    it('keeps special static routes on their existing route', async () => {
+        expect(getPPRRouteType('static', false, await getSignedPPRRequest(pprHeaders))).toBe(
+            'static'
+        );
     });
 
-    it('keeps dynamic pages dynamic even when PPR is requested', () => {
-        expect(getPPRRouteType('dynamic', true, getPPRRequest(pprHeaders))).toBe('dynamic');
+    it('keeps dynamic pages dynamic even when PPR is requested', async () => {
+        expect(getPPRRouteType('dynamic', true, await getSignedPPRRequest(pprHeaders))).toBe(
+            'dynamic'
+        );
     });
 
-    it('does not opt in with a partial resolved-content header set', () => {
+    it('does not opt in with a partial resolved-content header set', async () => {
         for (const header of [
             'x-gbo-site',
             'x-gbo-site-space',
@@ -58,12 +77,14 @@ describe('getPPRRouteType', () => {
         ]) {
             const headers = new Headers(pprHeaders);
             headers.delete(header);
-            expect(getPPRRequest(headers)).toBeUndefined();
-            expect(getPPRRouteType('static', true, getPPRRequest(headers))).toBe('static');
+            expect(await getSignedPPRRequest(headers)).toBeUndefined();
+            expect(getPPRRouteType('static', true, await getSignedPPRRequest(headers))).toBe(
+                'static'
+            );
         }
     });
 
-    it('does not opt in when required headers are empty', () => {
+    it('does not opt in when required headers are empty', async () => {
         for (const header of [
             'x-gbo-site',
             'x-gbo-site-space',
@@ -82,20 +103,20 @@ describe('getPPRRouteType', () => {
         ]) {
             const headers = new Headers(pprHeaders);
             headers.set(header, '');
-            expect(getPPRRequest(headers)).toBeUndefined();
+            expect(await getSignedPPRRequest(headers)).toBeUndefined();
         }
     });
 
-    it('does not opt in when boolean headers are invalid', () => {
+    it('does not opt in when boolean headers are invalid', async () => {
         for (const header of ['x-gbo-complete', 'x-gbo-preview']) {
             const headers = new Headers(pprHeaders);
             headers.set(header, 'yes');
-            expect(getPPRRequest(headers)).toBeUndefined();
+            expect(await getSignedPPRRequest(headers)).toBeUndefined();
         }
     });
 
-    it('reads resolved content from the complete header set', () => {
-        expect(getPPRRequest(pprHeaders)).toEqual({
+    it('reads resolved content from the complete header set', async () => {
+        expect(await getSignedPPRRequest(pprHeaders)).toEqual({
             content: {
                 site: 'site-id',
                 siteSection: 'site-section-id',
@@ -123,7 +144,7 @@ describe('getPPRRouteType', () => {
         });
     });
 
-    it('treats empty optional headers as absent', () => {
+    it('treats empty optional headers as absent', async () => {
         const headers = new Headers(pprHeaders);
         for (const header of [
             'x-gbo-site-section',
@@ -135,7 +156,7 @@ describe('getPPRRouteType', () => {
             headers.set(header, '');
         }
 
-        expect(getPPRRequest(headers)?.content).toMatchObject({
+        expect((await getSignedPPRRequest(headers))?.content).toMatchObject({
             site: 'site-id',
             siteSection: undefined,
             shareKey: undefined,
@@ -146,18 +167,18 @@ describe('getPPRRouteType', () => {
         });
     });
 
-    it('accepts an explicitly empty default site section', () => {
+    it('accepts an explicitly empty default site section', async () => {
         const headers = new Headers(pprHeaders);
         headers.set('x-gbo-default-site-section', '');
 
-        expect(getPPRRequest(headers)?.defaults).toEqual({
+        expect((await getSignedPPRRequest(headers))?.defaults).toEqual({
             siteSection: undefined,
             siteSpace: 'default-site-space-id',
             space: 'default-space-id',
         });
     });
 
-    it('requires all default location headers before opting into PPR', () => {
+    it('requires all default location headers before opting into PPR', async () => {
         for (const header of [
             'x-gbo-default-site-section',
             'x-gbo-default-site-space',
@@ -165,19 +186,69 @@ describe('getPPRRouteType', () => {
         ]) {
             const headers = new Headers(pprHeaders);
             headers.delete(header);
-            expect(getPPRRequest(headers)).toBeUndefined();
-            expect(getPPRRouteType('static', true, getPPRRequest(headers))).toBe('static');
+            expect(await getSignedPPRRequest(headers)).toBeUndefined();
+            expect(getPPRRouteType('static', true, await getSignedPPRRequest(headers))).toBe(
+                'static'
+            );
         }
     });
 
-    it('parses false and true boolean header values', () => {
+    it('parses false and true boolean header values', async () => {
         const headers = new Headers(pprHeaders);
         headers.set('x-gbo-complete', 'false');
         headers.set('x-gbo-preview', 'true');
 
-        expect(getPPRRequest(headers)?.content).toMatchObject({
+        expect((await getSignedPPRRequest(headers))?.content).toMatchObject({
             complete: false,
             preview: true,
         });
+    });
+});
+
+describe('PPR request signature', () => {
+    it('accepts a header set signed with the configured secret', async () => {
+        expect(await getPPRRequest(await signHeaders(pprHeaders), SECRET)).toBeDefined();
+    });
+
+    it('ignores an unsigned header set', async () => {
+        expect(await getPPRRequest(pprHeaders, SECRET)).toBeUndefined();
+    });
+
+    it('ignores a header set signed with another secret', async () => {
+        const signed = await signHeaders(pprHeaders, 'another-secret');
+        expect(await getPPRRequest(signed, SECRET)).toBeUndefined();
+    });
+
+    it('ignores a malformed signature', async () => {
+        for (const signature of ['', 'not-hex', 'abc', 'ab'.repeat(31)]) {
+            const headers = new Headers(pprHeaders);
+            headers.set('x-gbo-signature', signature);
+            expect(await getPPRRequest(headers, SECRET)).toBeUndefined();
+        }
+    });
+
+    it('ignores a header set modified after signing', async () => {
+        for (const header of [
+            'x-gbo-revalidation-id',
+            'x-gbo-api-token',
+            'x-gbo-pathname',
+            'x-gbo-site',
+        ]) {
+            const signed = await signHeaders(pprHeaders);
+            signed.set(header, 'tampered');
+            expect(await getPPRRequest(signed, SECRET)).toBeUndefined();
+        }
+    });
+
+    it('ignores a header set with an optional header dropped after signing', async () => {
+        for (const header of ['x-gbo-share-key', 'x-gbo-context-id', 'x-gbo-change-request']) {
+            const signed = await signHeaders(pprHeaders);
+            signed.delete(header);
+            expect(await getPPRRequest(signed, SECRET)).toBeUndefined();
+        }
+    });
+
+    it('does not opt into PPR when no secret is configured', async () => {
+        expect(await getPPRRequest(await signHeaders(pprHeaders), null)).toBeUndefined();
     });
 });

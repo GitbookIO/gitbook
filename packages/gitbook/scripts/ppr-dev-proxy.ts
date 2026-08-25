@@ -12,7 +12,7 @@
  */
 import type { PublishedSiteContent, PublishedSiteContentLookup, Space } from '@gitbook/api';
 
-import { PPRRequestHeaders } from '../src/lib/ppr';
+import { PPRRequestHeaders, signPPRRequestHeaders } from '../src/lib/ppr';
 
 const PORT = Number(process.env.PPR_PROXY_PORT || 3001);
 const UPSTREAM = process.env.PPR_UPSTREAM || 'http://localhost:3000';
@@ -28,6 +28,20 @@ function log(message: string) {
     // biome-ignore lint/suspicious/noConsole: this is a CLI script
     console.log(`[ppr-proxy] ${message}`);
 }
+
+// The app rejects an unsigned header set, so `bun dev` must run with the same secret.
+function requireSecret(): string {
+    const secret = process.env.GITBOOK_SECRET;
+    if (!secret) {
+        log(
+            'GITBOOK_SECRET is not set: the app rejects unsigned PPR headers. Add it to .env.local.'
+        );
+        process.exit(1);
+    }
+    return secret;
+}
+
+const SECRET = requireSecret();
 
 const cache = new Map<string, { value: unknown; expiresAt: number }>();
 const inflight = new Map<string, Promise<unknown>>();
@@ -118,10 +132,11 @@ async function getDefaults(content: PublishedSiteContent) {
     }
 }
 
-function setPPRHeaders(
+async function setPPRHeaders(
     headers: Headers,
     content: PublishedSiteContent & { revision: string },
-    defaults: { siteSection: string | undefined; siteSpace: string; space: string }
+    defaults: { siteSection: string | undefined; siteSpace: string; space: string },
+    secret: string
 ) {
     headers.set(PPRRequestHeaders.Site, content.site);
     headers.set(PPRRequestHeaders.SiteSection, content.siteSection ?? '');
@@ -150,6 +165,8 @@ function setPPRHeaders(
     headers.set(PPRRequestHeaders.DefaultSiteSection, defaults.siteSection ?? '');
     headers.set(PPRRequestHeaders.DefaultSiteSpace, defaults.siteSpace);
     headers.set(PPRRequestHeaders.DefaultSpace, defaults.space);
+    // Signed last: the signature covers every other PPR header.
+    await signPPRRequestHeaders(headers, secret);
 }
 
 /**
@@ -243,7 +260,7 @@ async function handle(request: Request): Promise<Response> {
         return skip(`no revision: ${error instanceof Error ? error.message : String(error)}`);
     }
 
-    setPPRHeaders(headers, { ...content, revision }, defaults);
+    await setPPRHeaders(headers, { ...content, revision }, defaults, SECRET);
 
     log(
         `${request.method} ${url.pathname} → site=${content.site} space=${content.space} revision=${revision}`
