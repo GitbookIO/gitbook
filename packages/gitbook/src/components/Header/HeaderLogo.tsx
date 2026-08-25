@@ -91,6 +91,7 @@ function LogoFallback(props: HeaderLogoProps) {
                     'tracking-tight',
                     'max-w-[18ch]',
                     'lg:max-w-[24ch]',
+                    'font-heading',
                     'font-semibold',
                     'ms-3',
                     'text-base/tight',

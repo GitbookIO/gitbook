@@ -1,3 +1,6 @@
+/** Which of the document's font variables a picked family is bound to. */
+export type FontRole = 'content' | 'heading' | 'mono';
+
 export interface FontVariantData {
     weight: string;
     style: string;

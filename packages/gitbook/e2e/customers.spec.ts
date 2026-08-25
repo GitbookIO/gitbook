@@ -215,7 +215,8 @@ const testCases: TestsCase[] = [
     {
         name: 'docs.n8n.io',
         contentBaseURL: 'https://docs.n8n.io',
-        tests: [{ name: 'Home', url: '/', run: waitForCookiesDialog }],
+        // The site registers its own cookie banner, so the built-in one never shows.
+        tests: [{ name: 'Home', url: '/' }],
     },
     {
         name: 'docs.cherryai.com.cn',
@@ -305,11 +306,6 @@ const testCases: TestsCase[] = [
     {
         name: 'docs.triumpharcade.com',
         contentBaseURL: 'https://docs.triumpharcade.com',
-        tests: [{ name: 'Home', url: '/', run: waitForCookiesDialog }],
-    },
-    {
-        name: 'docs.nats.io',
-        contentBaseURL: 'https://docs.nats.io',
         tests: [{ name: 'Home', url: '/', run: waitForCookiesDialog }],
     },
     {

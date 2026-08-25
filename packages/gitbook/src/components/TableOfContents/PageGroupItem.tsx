@@ -58,7 +58,7 @@ export function PageGroupItem(props: { page: ClientTOCPageGroup; isFirst?: boole
                     className={tcls(
                         ToCButtonItemStyles,
                         'toc-group min-h-8 w-full border-0 text-left',
-                        'font-semibold text-xs uppercase tracking-wide',
+                        'font-heading font-semibold text-xs uppercase tracking-wide',
                         'appearance-none',
                         '[&_.toc-group-chevron]:transition-opacity',
                         'hover:[&_.toc-group-chevron]:opacity-11',

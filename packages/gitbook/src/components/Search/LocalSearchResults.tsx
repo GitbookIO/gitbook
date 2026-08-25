@@ -81,7 +81,7 @@ function LocalSearchResultCard({
                         <Icon icon={result.icon as IconName} className="size-4" />
                     </span>
                 ) : null}
-                <p className="grow truncate text-sm font-semibold leading-snug text-tint-strong">
+                <p className="grow truncate font-heading text-sm font-semibold leading-snug text-tint-strong">
                     {result.title}
                 </p>
                 <span className="ml-auto shrink-0 text-tint-subtle">
