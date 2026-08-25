@@ -309,11 +309,6 @@ const testCases: TestsCase[] = [
         tests: [{ name: 'Home', url: '/', run: waitForCookiesDialog }],
     },
     {
-        name: 'docs.nats.io',
-        contentBaseURL: 'https://docs.nats.io',
-        tests: [{ name: 'Home', url: '/', run: waitForCookiesDialog }],
-    },
-    {
         name: 'help.glpi-project.org',
         contentBaseURL: 'https://help.glpi-project.org',
         tests: [{ name: 'Home', url: '/', run: waitForCookiesDialog }],
