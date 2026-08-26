@@ -58,8 +58,6 @@ export async function TableOfContents(props: {
                     'lg:mr-12',
                     'lg:z-0',
 
-                    // Keep the fixed rail below the z-30 header, so it doesn't steal
-                    // pointer events from the section tabs dropdown rendered in the header.
                     'layout-wide:no-sidebar:lg:fixed',
                     'layout-wide:no-sidebar:lg:max-3xl:w-12',
                     'layout-wide:no-sidebar:lg:left-5',
