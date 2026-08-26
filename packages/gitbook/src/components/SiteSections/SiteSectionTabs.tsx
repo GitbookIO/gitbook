@@ -117,7 +117,7 @@ export function SiteSectionTabs(props: {
                                         />
                                         <NavigationMenu.Content
                                             className={tcls(
-                                                'h-full w-[calc(100vw-2rem)] overflow-y-auto overflow-x-hidden md:w-max md:max-w-(--available-width)',
+                                                'h-full w-full overflow-y-auto overflow-x-hidden md:w-max md:max-w-(--available-width)',
                                                 MAX_POPUP_HEIGHT,
                                                 `transition-[opacity,translate] ${MOTION}`,
                                                 'data-ending-style:opacity-0 data-starting-style:opacity-0',
@@ -170,6 +170,9 @@ export function SiteSectionTabs(props: {
                     <NavigationMenu.Popup
                         className={tcls(
                             'relative h-(--popup-height) w-(--popup-width) origin-(--transform-origin) overflow-hidden circular-corners:rounded-3xl rounded-corners:rounded-xl border border-tint bg-tint-base shadow-lg outline-hidden',
+                            // Sized here rather than on the content, so the border doesn't push the
+                            // content off-centre and eat the padding down one side.
+                            'max-md:w-[calc(100vw-2rem)]',
                             MAX_POPUP_HEIGHT,
                             // `scale` rather than `transform`: that is what `scale-95` sets.
                             `transition-[opacity,scale,width,height] ${MOTION}`,
