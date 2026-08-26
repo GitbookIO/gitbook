@@ -396,7 +396,7 @@ const testCases: TestsCase[] = [
     {
         name: 'faq.wanttopay.net/wanttopay-app',
         contentBaseURL: 'https://faq.wanttopay.net',
-        tests: [{ name: 'Home', url: '/wanttopay-app', run: waitForCookiesDialog }],
+        tests: [{ name: 'Home', url: '/wanttopay-app' }],
     },
     {
         name: 'guide.prismlive.com',

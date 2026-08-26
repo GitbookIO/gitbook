@@ -430,6 +430,7 @@ const getRevisionPageMarkdown = cache(
                         {
                             format: 'markdown',
                             'format.markdown.refs': 'stable',
+                            evaluated: 'deterministic-only',
                             metadata: false,
                         },
                         {
