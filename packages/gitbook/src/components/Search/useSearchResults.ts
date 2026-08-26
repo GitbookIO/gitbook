@@ -10,7 +10,7 @@ import {
 } from './empty-search-results';
 import { computeFilterSiteSpaceIds } from './filter';
 import { useRecentSearchQueries } from './recent-queries';
-import { type MergedPageResult, reciprocalRankFusion } from './reciprocalRankFusion';
+import { type MergedPageResult, fuseSearchResults } from './reciprocalRankFusion';
 import { computeRemoteSearchScope } from './remote-scope';
 import type { OrderedComputedResult, SearchSiteContentScope } from './search-types';
 import { streamRecommendedQuestions } from './server-actions';
@@ -298,8 +298,22 @@ export function useSearchResults(props: {
             });
         }
 
-        return reciprocalRankFusion(localResults, remoteState.results, query);
-    }, [localResults, remoteState.results, query, withAI, siteSpaceId, suggestions, recentQueries]);
+        return fuseSearchResults({
+            localResults,
+            remoteResults: remoteState.results,
+            query,
+            allowedSiteSpaceIds: filterSiteSpaceIds,
+        });
+    }, [
+        localResults,
+        remoteState.results,
+        query,
+        filterSiteSpaceIds,
+        withAI,
+        siteSpaceId,
+        suggestions,
+        recentQueries,
+    ]);
 
     return {
         results,

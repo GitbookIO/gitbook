@@ -24,6 +24,7 @@ interface IndexPage {
 export interface LocalPageResult {
     type: 'local-page';
     id: string;
+    siteSpaceId: string;
     title: string;
     pathname: string;
     icon?: string;
@@ -242,6 +243,7 @@ export function useLocalSearchResults(props: {
                     results.push({
                         type: 'local-page',
                         id: doc.id,
+                        siteSpaceId: doc.siteSpaceId,
                         title: doc.title,
                         pathname: extra?.pathname ?? '',
                         icon: extra?.icon,
