@@ -284,7 +284,7 @@ function SectionGroupTileList(props: {
                 className={tcls(
                     'p-3',
                     isMasonryLayout
-                        ? 'w-full max-md:space-y-8 md:w-max md:max-w-[min(100%,var(--masonry-max-width))] md:gap-x-[var(--site-section-column-gap)] md:[column-count:var(--masonry-columns)] md:[column-width:var(--site-section-column-min-width)] md:[&>li]:mb-4'
+                        ? 'w-full max-md:space-y-8 md:max-w-[var(--masonry-max-width)] md:gap-x-[var(--site-section-column-gap)] md:[column-count:var(--masonry-columns)] md:[column-width:var(--site-section-column-min-width)] md:[&>li]:mb-4'
                         : 'flex w-full flex-col justify-start space-y-8 md:w-max md:flex-row md:items-start md:gap-[var(--site-section-column-gap)] md:space-y-0'
                 )}
                 style={
@@ -292,7 +292,8 @@ function SectionGroupTileList(props: {
                         ? ({
                               '--masonry-columns': String(masonryColumnCount),
                               // Tiles fill their column here, so the list carries the width cap
-                              // they would otherwise have given it.
+                              // they would otherwise have given it. Kept free of percentages, or
+                              // it stops capping what the list asks the panel around it for.
                               '--masonry-max-width': `calc(${masonryColumnCount} * ${COLUMN_WIDTH} + ${masonryColumnCount - 1} * ${COLUMN_GAP} + ${COLUMN_PADDING})`,
                               '--site-section-tile-max-width': 'none',
                           } as React.CSSProperties)
