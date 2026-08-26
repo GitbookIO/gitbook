@@ -27,9 +27,10 @@ const MAX_ITEMS_PER_COLUMN = 10; // number of items per column
 const GROUP_MASONRY_THRESHOLD = 3; // if a section group has more than this many child groups, it will be shown in a masonry grid
 const COLUMN_WIDTH = '18rem';
 // Floor for a column, so a dropdown squeezed by the sections panel or the screen drops a column
-// instead of shrinking them all. Stays under COLUMN_WIDTH, or it would widen roomy dropdowns.
-const COLUMN_MIN_WIDTH = '14rem';
+// instead of shrinking them all.
+const COLUMN_MIN_WIDTH = '16rem';
 const COLUMN_GAP = '2rem';
+const COLUMN_PADDING = '1.5rem'; // the p-3 on the lists holding the columns
 const MAX_MASONRY_COLUMNS = 4;
 
 /**
@@ -63,6 +64,8 @@ export function SiteSectionTabs(props: {
                     '--site-section-column-width': COLUMN_WIDTH,
                     '--site-section-column-min-width': COLUMN_MIN_WIDTH,
                     '--site-section-column-gap': COLUMN_GAP,
+                    // Lifted so the masonry can drop it and let a tile fill a column instead.
+                    '--site-section-tile-max-width': COLUMN_WIDTH,
                 } as React.CSSProperties
             }
             delay={OPEN_DELAY_MS}
@@ -281,13 +284,17 @@ function SectionGroupTileList(props: {
                 className={tcls(
                     'p-3',
                     isMasonryLayout
-                        ? 'w-full max-md:space-y-8 md:w-max md:max-w-full md:gap-x-[var(--site-section-column-gap)] md:[column-count:var(--masonry-columns)] md:[column-width:var(--site-section-column-min-width)] md:[&>li]:mb-4'
+                        ? 'w-full max-md:space-y-8 md:w-max md:max-w-[min(100%,var(--masonry-max-width))] md:gap-x-[var(--site-section-column-gap)] md:[column-count:var(--masonry-columns)] md:[column-width:var(--site-section-column-min-width)] md:[&>li]:mb-4'
                         : 'flex w-full flex-col justify-start space-y-8 md:w-max md:flex-row md:items-start md:gap-[var(--site-section-column-gap)] md:space-y-0'
                 )}
                 style={
                     isMasonryLayout
                         ? ({
                               '--masonry-columns': String(masonryColumnCount),
+                              // Tiles fill their column here, so the list carries the width cap
+                              // they would otherwise have given it.
+                              '--masonry-max-width': `calc(${masonryColumnCount} * ${COLUMN_WIDTH} + ${masonryColumnCount - 1} * ${COLUMN_GAP} + ${COLUMN_PADDING})`,
+                              '--site-section-tile-max-width': 'none',
                           } as React.CSSProperties)
                         : undefined
                 }
@@ -338,7 +345,7 @@ function SectionGroupTile(props: {
         const { url, icon, title, description } = child;
         const isActive = child.id === currentSection.id;
         return (
-            <li className="group/section-tile flex w-full min-w-0 shrink-0 grow md:max-w-[var(--site-section-column-width)]">
+            <li className="group/section-tile flex w-full min-w-0 shrink-0 grow md:max-w-[var(--site-section-tile-max-width)]">
                 <Link
                     href={url}
                     className={tcls(
