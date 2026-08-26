@@ -26,6 +26,9 @@ const MAX_POPUP_HEIGHT = 'max-h-[calc(100vh-8rem)]';
 const MAX_ITEMS_PER_COLUMN = 10; // number of items per column
 const GROUP_MASONRY_THRESHOLD = 3; // if a section group has more than this many child groups, it will be shown in a masonry grid
 const COLUMN_WIDTH = '18rem';
+// Floor for a column, so a dropdown squeezed by the sections panel or the screen drops a column
+// instead of shrinking them all. Stays under COLUMN_WIDTH, or it would widen roomy dropdowns.
+const COLUMN_MIN_WIDTH = '14rem';
 const COLUMN_GAP = '2rem';
 const MAX_MASONRY_COLUMNS = 4;
 
@@ -58,6 +61,7 @@ export function SiteSectionTabs(props: {
             style={
                 {
                     '--site-section-column-width': COLUMN_WIDTH,
+                    '--site-section-column-min-width': COLUMN_MIN_WIDTH,
                     '--site-section-column-gap': COLUMN_GAP,
                 } as React.CSSProperties
             }
@@ -277,7 +281,7 @@ function SectionGroupTileList(props: {
                 className={tcls(
                     'p-3',
                     isMasonryLayout
-                        ? 'w-full max-md:space-y-8 md:w-max md:max-w-full md:gap-x-[var(--site-section-column-gap)] md:[column-count:var(--masonry-columns)] md:[&>li]:mb-4'
+                        ? 'w-full max-md:space-y-8 md:w-max md:max-w-full md:gap-x-[var(--site-section-column-gap)] md:[column-count:var(--masonry-columns)] md:[column-width:var(--site-section-column-min-width)] md:[&>li]:mb-4'
                         : 'flex w-full flex-col justify-start space-y-8 md:w-max md:flex-row md:items-start md:gap-[var(--site-section-column-gap)] md:space-y-0'
                 )}
                 style={
@@ -393,15 +397,20 @@ function SectionGroupTile(props: {
             </div>
             <ul
                 className={tcls(
-                    'flex w-full grid-flow-row flex-col gap-x-2 gap-y-0.5 md:grid',
-                    // Reuse the masonry's gap and columns, to stay aligned with the groups around it.
-                    spansMasonry ? 'md:gap-x-[var(--site-section-column-gap)]' : ''
+                    'flex w-full flex-col gap-x-2 gap-y-0.5',
+                    spansMasonry
+                        ? // Same track sizing as the masonry it spans, so its sections line up with the
+                          // groups around it however many columns the width allows.
+                          'md:block md:gap-x-[var(--site-section-column-gap)] md:[column-count:var(--masonry-columns)] md:[column-width:var(--site-section-column-min-width)] md:[&>li]:mb-0.5 md:[&>li]:break-inside-avoid'
+                        : 'grid-flow-row md:grid'
                 )}
-                style={{
-                    gridTemplateColumns: spansMasonry
-                        ? 'repeat(var(--masonry-columns), minmax(0, 1fr))'
-                        : `repeat(${Math.ceil(children.length / MAX_ITEMS_PER_COLUMN)}, minmax(0, auto))`,
-                }}
+                style={
+                    spansMasonry
+                        ? undefined
+                        : {
+                              gridTemplateColumns: `repeat(${Math.ceil(children.length / MAX_ITEMS_PER_COLUMN)}, minmax(0, auto))`,
+                          }
+                }
             >
                 {children.map((nestedChild) => (
                     <SectionGroupTile
