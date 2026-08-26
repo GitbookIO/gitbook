@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 
 import {
     CURRENT_SIGNATURE_VERSION,
-    type CloudflareImageOptions,
+    type CloudflareResizeImageOptions,
     type SignatureVersion,
     SizableImageAction,
     checkIsSizableImageURL,
@@ -10,21 +10,9 @@ import {
     parseImageAPIURL,
     resizeImage,
     verifyImageSignature,
+    IMAGE_REJECT_REASON_HEADER,
+    ImageRejectReason,
 } from '@/lib/images';
-import type { CloudflareResizeImageOptions } from '@/lib/images/resizer';
-
-const FORMATS = [
-    {
-        format: 'avif' as const,
-        regexp: /image\/avif/,
-        maxAllowedEdge: 1600,
-    },
-    {
-        format: 'webp' as const,
-        regexp: /image\/webp/,
-        maxAllowedEdge: 1920,
-    },
-];
 
 /**
  * Resize an image using the Cloudflare Image API.
@@ -87,12 +75,12 @@ export async function serveResizedImage(
 
     const defaultFormat = getOriginalFormatFromURL(url);
 
-    // Cloudflare-specific options are in the cf object.
-    const options: CloudflareImageOptions = {
+    const options: CloudflareResizeImageOptions = {
         fit: 'scale-down',
-        // For GIF, we will use webp as default format for resizing.
-        format: defaultFormat === 'gif' ? 'webp' : defaultFormat,
+        // Let the image service negotiate the output format from the accept header.
+        format: 'auto',
         quality: 100,
+        accept: request.headers.get('accept') ?? undefined,
     };
 
     const width = requestURL.searchParams.get('width');
@@ -105,8 +93,6 @@ export async function serveResizedImage(
         options.height = Number(height);
     }
 
-    const longestEdgeValue = Math.max(options.width || 0, options.height || 0);
-
     const dpr = requestURL.searchParams.get('dpr');
     if (dpr) {
         options.dpr = Number(dpr);
@@ -115,24 +101,6 @@ export async function serveResizedImage(
     const quality = requestURL.searchParams.get('quality');
     if (quality) {
         options.quality = Number(quality);
-    }
-
-    // Check the Accept header to handle content negotiation
-    const accept = request.headers.get('accept');
-
-    // We test if we can use AVIF based on the accept header and constraints from Cloudflare
-    // @see https://developers.cloudflare.com/images/transform-images/#limits-per-format
-    if (accept) {
-        for (const entry of FORMATS) {
-            if (entry.regexp.test(accept) && longestEdgeValue <= entry.maxAllowedEdge) {
-                const wantedDpr = options.dpr ?? 1;
-                const dpr = chooseDPR(longestEdgeValue, entry.maxAllowedEdge, wantedDpr);
-                if (dpr === wantedDpr) {
-                    options.format = entry.format;
-                    break;
-                }
-            }
-        }
     }
 
     return resizeImageWithFallback(
@@ -155,8 +123,37 @@ async function resizeImageWithFallback(
     try {
         const response = await resizeImage(url, options);
         if (!response.ok) {
+            const rejectReason = response.headers.get(IMAGE_REJECT_REASON_HEADER);
+            if (rejectReason) {
+                switch (rejectReason) {
+                    case ImageRejectReason.InvalidRequest:
+                        return new Response('Invalid request', { status: 400 });
+                    case ImageRejectReason.InvalidSignature:
+                        return new Response('Invalid signature', { status: 400 });
+                    case ImageRejectReason.UnsafeSourceURL:
+                        return new Response('Unsafe source URL', { status: 400 });
+                    case ImageRejectReason.UpstreamError:
+                        // this one can happen for a lot of reasons, so we fallback to a redirect to the original image
+                        // It sometimes happen when upstream block fetch from  our server
+                        throw new Error('Upstream error, falling back to a redirect');
+                    case ImageRejectReason.UnsupportedContentType:
+                        throw new Error('Unsupported content type, falling back to a redirect');
+                    case ImageRejectReason.InternalError:
+                        throw new Error('Internal error, falling back to a redirect');
+                    default:
+                        throw new Error(
+                            `Unknown reject reason "${rejectReason}", falling back to a redirect`
+                        );
+                }
+            }
             throw new Error(`Failed to resize image, received status code ${response.status}`);
         }
+
+        // The output format is negotiated from the accept header we forwarded.
+        if (!response.headers.get('vary')?.toLowerCase().includes('accept')) {
+            response.headers.append('vary', 'Accept');
+        }
+
         return response;
     } catch (error) {
         if (formatFallback && options.format !== formatFallback) {
@@ -167,10 +164,33 @@ async function resizeImageWithFallback(
             );
         }
 
+        // Never bounce the visitor to a GitBook-hosted URL: it would expose our internal
+        // asset URLs and hide a failure that is ours to fix.
+        if (isGitBookHostedURL(url)) {
+            console.warn('Error while resizing GitBook-hosted image', error);
+            return new Response('Failed to resize image', { status: 502 });
+        }
+
         // Redirect to the original image if resizing fails
         console.warn('Error while resizing image, redirecting to original', error);
         return NextResponse.redirect(url, 302);
     }
+}
+
+const GITBOOK_HOSTED_DOMAINS = ['gitbook.com', 'gitbook.io'];
+
+/**
+ * Check if a URL is hosted on a GitBook domain.
+ */
+function isGitBookHostedURL(url: string): boolean {
+    if (!URL.canParse(url)) {
+        return false;
+    }
+
+    const { hostname } = new URL(url);
+    return GITBOOK_HOSTED_DOMAINS.some(
+        (domain) => hostname === domain || hostname.endsWith(`.${domain}`)
+    );
 }
 
 /**
@@ -186,16 +206,6 @@ function getOriginalFormatFromURL(url: string) {
         return 'png';
     }
     return 'jpeg';
-}
-
-/**
- * Choose the DPR allowed to resize an image on Cloudflare.
- * @see https://developers.cloudflare.com/images/transform-images/#limits-per-format
- */
-function chooseDPR(longestEdgeValue: number, maxAllowedEdge: number, wantedDpr: number): number {
-    const maxDprBySize = Math.floor(maxAllowedEdge / longestEdgeValue);
-    // Ensure that the DPR is within the allowed range
-    return Math.max(1, Math.min(maxDprBySize, wantedDpr));
 }
 
 /**
