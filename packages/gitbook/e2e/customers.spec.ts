@@ -396,7 +396,8 @@ const testCases: TestsCase[] = [
     {
         name: 'faq.wanttopay.net/wanttopay-app',
         contentBaseURL: 'https://faq.wanttopay.net',
-        tests: [{ name: 'Home', url: '/wanttopay-app', run: waitForCookiesDialog }],
+        // The site no longer shows the cookies dialog (customer disabled cookie tracking).
+        tests: [{ name: 'Home', url: '/wanttopay-app' }],
     },
     {
         name: 'guide.prismlive.com',
