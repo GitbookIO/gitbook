@@ -156,6 +156,7 @@ function transformSitePageResult(args: {
         href: pageHref,
         pageId: pageItem.id,
         spaceId: spaceItem.id,
+        siteSpaceId: siteSpace?.id,
         score: pageItem.score,
         rank: pageItem.rank,
         resultType: pageItem.resultType,

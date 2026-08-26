@@ -1,13 +1,19 @@
 import { describe, expect, it } from 'bun:test';
 
-import { type MergedPageResult, getResultKey, reciprocalRankFusion } from './reciprocalRankFusion';
+import {
+    type MergedPageResult,
+    fuseSearchResults,
+    getResultKey,
+    reciprocalRankFusion,
+} from './reciprocalRankFusion';
 import type { OrderedComputedResult } from './search-types';
 import type { LocalPageResult } from './useLocalSearchResults';
 
-function localPage(id: string, title = id): LocalPageResult {
+function localPage(id: string, title = id, siteSpaceId = 'site-space-alpha'): LocalPageResult {
     return {
         type: 'local-page',
         id,
+        siteSpaceId,
         title,
         pathname: `/${id}`,
         description: `Local description for ${title}`,
@@ -15,12 +21,20 @@ function localPage(id: string, title = id): LocalPageResult {
     };
 }
 
-function remotePage(id: string, title = id, score = 0, rank = 1): OrderedComputedResult {
+function remotePage(
+    id: string,
+    title = id,
+    score = 0,
+    rank = 1,
+    spaceId = 'space-alpha',
+    siteSpaceId = 'site-space-alpha'
+): OrderedComputedResult {
     return {
         type: 'page',
         id: `remote-${id}`,
         pageId: id,
-        spaceId: 'space',
+        spaceId,
+        siteSpaceId,
         title,
         description: `Remote description for ${title}`,
         href: `/${id}`,
@@ -136,5 +150,90 @@ describe('reciprocalRankFusion', () => {
         expect(results.map(getResultKey).filter((key) => key === 'record:record-1')).toHaveLength(
             1
         );
+    });
+});
+
+describe('fuseSearchResults', () => {
+    it('filters every source to the current site space before fusion', () => {
+        const results = fuseSearchResults({
+            localResults: [
+                localPage('local-alpha', 'Alpha local result'),
+                localPage('remote-alpha-1', 'Beta local result', 'site-space-beta'),
+            ],
+            remoteResults: [
+                remotePage('remote-alpha-1', 'Alpha remote one', 10, 1),
+                remotePage(
+                    'local-alpha',
+                    'Beta remote result',
+                    9,
+                    2,
+                    'space-beta',
+                    'site-space-beta'
+                ),
+                remotePage('remote-alpha-2', 'Alpha remote two', 8, 3),
+            ],
+            query: 'result',
+            allowedSiteSpaceIds: ['site-space-alpha'],
+        });
+
+        expect(results.map(getResultKey)).toEqual([
+            'page:remote-alpha-1',
+            'page:remote-alpha-2',
+            'page:local-alpha',
+        ]);
+        expect(results[0]).not.toHaveProperty('pathname');
+        expect(results[2]?.type).toBe('local-page');
+    });
+
+    it('preserves cross-site-space results when the search is unrestricted', () => {
+        const results = fuseSearchResults({
+            localResults: [
+                localPage('local-alpha', 'Alpha local result'),
+                localPage('local-beta', 'Beta local result', 'site-space-beta'),
+            ],
+            remoteResults: [
+                remotePage('remote-alpha', 'Alpha remote result', 10, 1),
+                remotePage(
+                    'remote-beta',
+                    'Beta remote result',
+                    9,
+                    2,
+                    'space-beta',
+                    'site-space-beta'
+                ),
+            ],
+            query: 'result',
+        });
+
+        expect(results.map(getResultKey)).toEqual([
+            'page:remote-alpha',
+            'page:remote-beta',
+            'page:local-alpha',
+            'page:local-beta',
+        ]);
+    });
+
+    it('preserves every allowed site space in an intentionally multi-space search', () => {
+        const results = fuseSearchResults({
+            localResults: [
+                localPage('local-alpha'),
+                localPage('local-beta', 'local-beta', 'site-space-beta'),
+                localPage('local-gamma', 'local-gamma', 'site-space-gamma'),
+            ],
+            remoteResults: [
+                remotePage('remote-alpha'),
+                remotePage('remote-beta', 'remote-beta', 0, 2, 'space-beta', 'site-space-beta'),
+                remotePage('remote-gamma', 'remote-gamma', 0, 3, 'space-gamma', 'site-space-gamma'),
+            ],
+            query: 'page',
+            allowedSiteSpaceIds: ['site-space-alpha', 'site-space-beta'],
+        });
+
+        expect(results.map(getResultKey)).toEqual([
+            'page:remote-alpha',
+            'page:remote-beta',
+            'page:local-alpha',
+            'page:local-beta',
+        ]);
     });
 });
