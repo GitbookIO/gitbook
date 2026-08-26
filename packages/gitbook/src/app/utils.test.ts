@@ -1,18 +1,16 @@
 import { describe, expect, it, mock } from 'bun:test';
+import jwt from 'jsonwebtoken';
 import rison from 'rison';
 
+import * as realContext from '@/lib/context';
+
 mock.module('server-only', () => ({}));
-mock.module('@/lib/adaptive', () => ({
-    getVisitorAuthClaims: () => ({}),
-    getVisitorAuthClaimsFromToken: () => ({}),
-    getPPRVisitorAuthClaimsFromToken: () => ({ scope: 'site-structure' }),
-}));
+// Only the lookup is stubbed: mocking the whole module would leak into the other test files,
+// as `mock.module` replaces it for the entire test process.
 mock.module('@/lib/context', () => ({
+    ...realContext,
     getBaseContext: (input: unknown) => input,
     fetchSiteContextByURLLookup: async (_baseContext: unknown, data: unknown) => data,
-}));
-mock.module('jwt-decode', () => ({
-    jwtDecode: () => ({}),
 }));
 
 const {
@@ -24,12 +22,20 @@ const {
 } = await import('./utils');
 type PPRRouteParams = import('./utils').PPRRouteParams;
 
+const apiToken = jwt.sign(
+    {
+        exp: Math.floor(Date.now() / 1000) + 3600,
+        siteStructureClaims: { scope: 'site-structure' },
+    },
+    'secret'
+);
+
 const routeParams: PPRRouteParams = {
     mode: 'url',
     siteURL: 'docs.example.com',
     siteData: encodeURIComponent(
         rison.encode({
-            apiToken: 'ppr-api-token',
+            apiToken,
             site: 'site-id',
             siteSection: 'page-site-section-id',
             siteSpace: 'page-site-space-id',
@@ -65,7 +71,7 @@ describe('getPPRRouteParams', () => {
         expect(params).not.toHaveProperty('revalidationId');
         expect(params).not.toHaveProperty('pprDefaults');
         expect(getSiteURLDataFromParams(params)).toMatchObject({
-            apiToken: 'ppr-api-token',
+            apiToken,
             site: 'site-id',
             space: 'space-id',
             revision: 'ppr-revision-id',
@@ -79,7 +85,7 @@ describe('PPR cache region params', () => {
         ...routeParams,
         siteData: encodeURIComponent(
             rison.encode({
-                apiToken: 'new-ppr-api-token',
+                apiToken: jwt.sign({ siteStructureClaims: {} }, 'other-secret'),
                 site: 'site-id',
                 siteSection: 'new-page-site-section-id',
                 siteSpace: 'new-page-site-space-id',
@@ -99,7 +105,7 @@ describe('PPR cache region params', () => {
         );
 
         expect(headerData).toMatchObject({
-            apiToken: 'ppr-api-token',
+            apiToken,
             siteSection: 'default-site-section-id',
             siteSpace: 'default-site-space-id',
             space: 'default-space-id',
@@ -140,7 +146,7 @@ describe('PPR cache region params', () => {
         );
 
         expect(tocData).toMatchObject({
-            apiToken: 'ppr-api-token',
+            apiToken,
             siteSection: 'page-site-section-id',
             siteSpace: 'page-site-space-id',
             space: 'space-id',
@@ -172,7 +178,7 @@ describe('getPPRStaticSiteContext', () => {
         );
 
         expect(context).toMatchObject({
-            apiToken: 'ppr-api-token',
+            apiToken,
             revision: 'ppr-revision-id',
         });
         expect(visitorAuthClaims).toEqual({ scope: 'site-structure' });
