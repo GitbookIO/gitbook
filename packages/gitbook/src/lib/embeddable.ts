@@ -48,21 +48,27 @@ export async function getEmbeddableDynamicContext(params: RouteLayoutParams) {
 export { getEmbeddableLinker } from './embeddable-linker';
 
 /**
- * Resolve theme behavior for docs embeds.
- * Embeds should follow the parent frame's color-scheme by default,
- * while still allowing an explicit override for multi-theme sites.
+ * Resolve the theme the embed renders in: the site's own when it publishes a single theme, an
+ * explicit `?theme=` override when it publishes both, and otherwise the visitor's OS.
+ *
+ * `forcedTheme` is also what the embed is pinned to whatever the embedder asks for, which is what
+ * the widget outside the iframe has to follow (RND-12558).
  */
 export function resolveEmbeddableTheme(
     customization: Pick<SiteCustomizationSettings, 'themes'>,
     forcedTheme?: CustomizationDefaultThemeMode | null
 ) {
-    if (!customization.themes.toggeable) {
-        const mode = customization.themes.default;
+    const mode = customization.themes.default;
+    // A site published in one concrete theme renders in it whatever the embedder asks for: its
+    // content only exists for that theme. `System` pins nothing, so an override applies there —
+    // and it has to, or the widget outside would follow the page while the docs follow the OS
+    // (RND-12558). Unforced `System` also lets next-themes resolve prefers-color-scheme pre-paint,
+    // avoiding a flash (RND-11643).
+    if (!customization.themes.toggeable && mode !== CustomizationDefaultThemeMode.System) {
         return {
             htmlTheme: mode,
             defaultTheme: mode,
-            // Only force concrete light/dark; System stays unforced so next-themes resolves prefers-color-scheme pre-paint (avoids the flash). A theme saved while the toggle was previously on still wins — see the PR's "Known limitation". RND-11643
-            forcedTheme: mode === CustomizationDefaultThemeMode.System ? undefined : mode,
+            forcedTheme: mode,
         };
     }
 

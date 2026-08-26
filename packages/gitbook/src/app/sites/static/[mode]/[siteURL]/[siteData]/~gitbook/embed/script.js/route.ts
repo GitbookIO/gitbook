@@ -5,7 +5,7 @@ import type { CreateGitBookOptions } from '@gitbook/embed';
 import type { RouteLayoutParams } from '@/app/utils';
 import { getAssetURL } from '@/lib/assets';
 import { buildVersion } from '@/lib/build';
-import { getEmbeddableStaticContext } from '@/lib/embeddable';
+import { getEmbeddableStaticContext, resolveEmbeddableTheme } from '@/lib/embeddable';
 
 export const dynamic = 'force-static';
 
@@ -20,6 +20,10 @@ export async function GET(
     const initOptions: CreateGitBookOptions = {
         siteURL: context.linker.toAbsoluteURL(context.linker.toPathInSite('')),
     };
+
+    // The theme this site pins its embeds to, if it has one. The widget paints the panel around the
+    // iframe, so it has to render in the same scheme as the docs inside it (RND-12558).
+    const siteColorScheme = resolveEmbeddableTheme(context.customization).forcedTheme;
 
     return new Response(
         `
@@ -37,8 +41,18 @@ export async function GET(
 
   const searchParams = getScriptSearchParams()
   const token = searchParams.get('jwt_token');
-  const initOptions = window.gitbookSettings || ${JSON.stringify(initOptions)};
-  const initFrameOptions = token ? { visitor: { token } } : undefined;
+  const initOptions = { ...${JSON.stringify(initOptions)}, ...(window.gitbookSettings || {}) };
+  const initFrameOptions = {};
+  const theme = searchParams.get('theme');
+  // The site's own theme first: it renders in that one whatever the embedder asks for.
+  const colorScheme =
+    ${JSON.stringify(siteColorScheme ?? null)} || (theme === 'light' || theme === 'dark' ? theme : null);
+  if (colorScheme) {
+    initFrameOptions.colorScheme = colorScheme;
+  }
+  if (token) {
+    initFrameOptions.visitor = { token };
+  }
 
   if (typeof gb === "function") {
     gb('init', initOptions, initFrameOptions);

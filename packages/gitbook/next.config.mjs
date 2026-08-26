@@ -105,6 +105,9 @@ const nextConfig = {
     assetPrefix: process.env.GITBOOK_ASSETS_PREFIX,
     poweredByHeader: false,
 
+    // We maintain our own AGENTS.md/CLAUDE.md at the repo root.
+    agentRules: false,
+
     images: {
         remotePatterns: [
             {
