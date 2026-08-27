@@ -102,6 +102,32 @@ export function getResultKey(
 
 type RRFResult = LocalPageResult | OrderedComputedResult | MergedPageResult;
 
+/** Filter page candidates at the final assembly boundary, immediately before ranking and fusion. */
+export function fuseSearchResults(args: {
+    localResults: LocalPageResult[];
+    remoteResults: OrderedComputedResult[];
+    query: string;
+    allowedSiteSpaceIds?: string[];
+}): RRFResult[] {
+    const { localResults, remoteResults, query, allowedSiteSpaceIds } = args;
+
+    if (!allowedSiteSpaceIds) {
+        return reciprocalRankFusion(localResults, remoteResults, query);
+    }
+
+    const allowed = new Set(allowedSiteSpaceIds);
+
+    return reciprocalRankFusion(
+        localResults.filter((result) => allowed.has(result.siteSpaceId)),
+        remoteResults.filter(
+            (result) =>
+                result.type === 'record' ||
+                (result.siteSpaceId !== undefined && allowed.has(result.siteSpaceId))
+        ),
+        query
+    );
+}
+
 function mergeLocalPageWithRemotePage(
     localResult: LocalPageResult,
     remoteResult: ComputedPageResult
