@@ -470,6 +470,7 @@ describe('getURLLookupAlternatives', () => {
                 },
             ],
         });
+    });
 
     it('should not match site root files', () => {
         for (const file of ['llms.txt', 'llms-full.txt/100', 'robots.txt', 'sitemap.xml']) {
