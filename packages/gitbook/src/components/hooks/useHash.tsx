@@ -99,7 +99,7 @@ export const NavigationStatusProvider: React.FC<React.PropsWithChildren> = ({ ch
 /**
  * Hook to get the current hash from the URL. The hash is set on navigation clicks **NOT** on hashchange events or on navigation end.
  * @see https://github.com/vercel/next.js/discussions/49465
- * We use a different hack than this one, because for same page link it don't work
+ * We use a different hack than this one, because for same page link it doesn't work
  * We can't use the `hashChange` event because it doesn't fire for `replaceState` and `pushState` which are used by Next.js.
  * Since we have a single Link component that handles all links, we can use a context to share the hash.
  */

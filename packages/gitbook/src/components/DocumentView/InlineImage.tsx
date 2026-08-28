@@ -29,7 +29,7 @@ export async function InlineImage(props: InlineProps<DocumentInlineImage>) {
     const sizes = await getImageSizes(context.contentContext, size, src);
 
     return (
-        /* Ensure images dont expand to the size of the container where this Image may be nested in. Now it's always nested in a size-restricted container */
+        /* Ensure images don't expand to the size of the container where this Image may be nested in. Now it's always nested in a size-restricted container */
         <span
             className={tcls(
                 size !== 'line' ? ['inline-flex', 'max-w-[300px]', 'align-middle'] : null
