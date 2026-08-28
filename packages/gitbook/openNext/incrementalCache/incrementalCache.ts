@@ -15,6 +15,36 @@ export type KeyOptions = {
     cacheType?: CacheEntryType;
 };
 
+//TODO: This is a workaround to handle 404 responses in the cache.
+// It should be handled by OpenNext cache interception directly. This should be removed once OpenNext cache interception is fixed.
+// Cache interception serves entries with the rewrite status code (always 200), so a cached 404
+// would otherwise be replayed as a 200 (RND-12656).
+export function returnNullOn404<CacheType extends CacheEntryType = 'cache'>(
+    cacheEntry: WithLastModified<CacheValue<CacheType>> | null
+): WithLastModified<CacheValue<CacheType>> | null {
+    if (!cacheEntry?.value) return null;
+    if ('meta' in cacheEntry.value && cacheEntry.value.meta?.status === 404) {
+        return null;
+    }
+    return cacheEntry;
+}
+
+/**
+ * Apply `returnNullOn404` on top of a cache. Needed on top of the regional cache: its
+ * Cache API entries are written at `set` time and served without going through
+ * `GitbookIncrementalCache.get`, which would bypass the guard (RND-12656).
+ */
+export function with404Guard(cache: IncrementalCache): IncrementalCache {
+    return {
+        name: cache.name,
+        async get(key, cacheType) {
+            return returnNullOn404(await cache.get(key, cacheType));
+        },
+        set: cache.set.bind(cache),
+        delete: cache.delete.bind(cache),
+    };
+}
+
 /**
  *
  * It is very similar to the `R2IncrementalCache` in the `@opennextjs/cloudflare` package, but it has an additional
@@ -45,7 +75,7 @@ export class GitbookIncrementalCache implements IncrementalCache {
 
             if (!json) return null;
 
-            return this.returnNullOn404({
+            return returnNullOn404({
                 value: json,
                 lastModified,
             });
@@ -53,18 +83,6 @@ export class GitbookIncrementalCache implements IncrementalCache {
             console.error('Failed to get from cache', e);
             return null;
         }
-    }
-
-    //TODO: This is a workaround to handle 404 responses in the cache.
-    // It should be handled by OpenNext cache interception directly. This should be removed once OpenNext cache interception is fixed.
-    returnNullOn404<CacheType extends CacheEntryType = 'cache'>(
-        cacheEntry: WithLastModified<CacheValue<CacheType>> | null
-    ): WithLastModified<CacheValue<CacheType>> | null {
-        if (!cacheEntry?.value) return null;
-        if ('meta' in cacheEntry.value && cacheEntry.value.meta?.status === 404) {
-            return null;
-        }
-        return cacheEntry;
     }
 
     async set<CacheType extends CacheEntryType = 'cache'>(
