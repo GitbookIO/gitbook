@@ -11,7 +11,6 @@ const INTERNAL_PATHS = [
     // before the lookup, but are listed so this stays a complete registry.
     /^~gitbook\/(pdf|search|icon|site-index|image|__evt|visitor)$/,
     /^~gitbook\/ogimage\/[^/]+$/,
-    /^~gitbook\/mcp(\/auth)?$/,
     /^~gitbook\/auth\/(login|logout)$/,
     /^~gitbook\/oauth2\/v1\/[^/]+\/authorize$/,
     /^~gitbook\/embed(\/(assistant|search|demo|script\.js|page(\/.*)?))?$/,
