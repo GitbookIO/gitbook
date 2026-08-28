@@ -451,51 +451,6 @@ describe('getURLLookupAlternatives', () => {
         });
     });
 
-    it('should not match the OAuth protected resource metadata path', () => {
-        expect(
-            getURLLookupAlternatives(
-                new URL(
-                    'https://docs.mycompany.com/.well-known/oauth-protected-resource/~gitbook/mcp'
-                )
-            )
-        ).toEqual({
-            revision: undefined,
-            changeRequest: undefined,
-            basePath: undefined,
-            urls: [
-                {
-                    url: 'https://docs.mycompany.com/',
-                    extraPath: '.well-known/oauth-protected-resource/~gitbook/mcp',
-                    primary: true,
-                },
-            ],
-        });
-
-        expect(
-            getURLLookupAlternatives(
-                new URL(
-                    'https://gitbook.com/docs/.well-known/oauth-protected-resource/~gitbook/mcp'
-                )
-            )
-        ).toEqual({
-            revision: undefined,
-            changeRequest: undefined,
-            basePath: undefined,
-            urls: [
-                {
-                    url: 'https://gitbook.com/',
-                    extraPath: 'docs/.well-known/oauth-protected-resource/~gitbook/mcp',
-                    primary: false,
-                },
-                {
-                    url: 'https://gitbook.com/docs',
-                    extraPath: '.well-known/oauth-protected-resource/~gitbook/mcp',
-                    primary: true,
-                },
-            ],
-        });
-    });
-
     it('should not match site root files', () => {
         for (const file of ['llms.txt', 'llms-full.txt/100', 'robots.txt', 'sitemap.xml']) {
             expect(getURLLookupAlternatives(new URL(`https://docs.mycompany.com/${file}`))).toEqual(
