@@ -13,6 +13,7 @@ import { getCacheTag, getComputedContentSourceCacheTags } from '@gitbook/cache-t
 import { cache } from '../cache';
 import { DataFetcherError, wrapDataFetcherError } from './errors';
 import type { GitBookDataFetcher } from './types';
+import { type PPRCacheScope, scopeCacheTags } from '@/lib/cache-tags';
 import { GITBOOK_API_TOKEN, GITBOOK_API_URL, GITBOOK_USER_AGENT } from '@/lib/env';
 import { trace } from '@/lib/tracing';
 
@@ -21,6 +22,12 @@ interface DataFetcherInput {
      * API token.
      */
     apiToken: string | null;
+
+    /**
+     * Set when rendering a PPR component. It is part of the cache key, so each scope owns its own
+     * copy of the data and can carry its own `ppr:<scope>:` cache tags.
+     */
+    pprScope?: PPRCacheScope;
 }
 
 /**
@@ -37,15 +44,24 @@ export const noCacheFetchOptions: Partial<RequestInit> = {
  * The data are being cached by Next.js built-in cache.
  */
 export function createDataFetcher(
-    input: DataFetcherInput = { apiToken: null }
+    rawInput: DataFetcherInput = { apiToken: null }
 ): GitBookDataFetcher {
+    // The input is part of the cache key of every cached fetcher below, so we normalize its shape
+    // here: `pprScope` is omitted entirely when unset, keeping non-PPR cache keys unchanged.
+    const input: DataFetcherInput = rawInput.pprScope
+        ? { apiToken: rawInput.apiToken, pprScope: rawInput.pprScope }
+        : { apiToken: rawInput.apiToken };
+
     return {
+        pprScope: input.pprScope,
+
         async api() {
             return apiClient(input);
         },
 
         withToken({ apiToken }) {
             return createDataFetcher({
+                ...input,
                 apiToken,
             });
         },
@@ -246,7 +262,7 @@ const getUserById = cache(async (input: DataFetcherInput, params: { userId: stri
             const res = await api.users.getUserById(params.userId, {
                 ...noCacheFetchOptions,
             });
-            cacheTag(...getCacheTagsFromResponse(res));
+            cacheTagsFor(input, getCacheTagsFromResponse(res));
             cacheLife('days');
             return res.data;
         });
@@ -256,12 +272,12 @@ const getUserById = cache(async (input: DataFetcherInput, params: { userId: stri
 const getSpace = cache(
     async (input: DataFetcherInput, params: { spaceId: string; shareKey: string | undefined }) => {
         'use cache';
-        cacheTag(
+        cacheTagsFor(input, [
             getCacheTag({
                 tag: 'space',
                 space: params.spaceId,
-            })
-        );
+            }),
+        ]);
 
         return wrapDataFetcherError(async () => {
             return trace(`getSpace(${params.spaceId}, ${params.shareKey})`, async () => {
@@ -275,7 +291,7 @@ const getSpace = cache(
                         ...noCacheFetchOptions,
                     }
                 );
-                cacheTag(...getCacheTagsFromResponse(res));
+                cacheTagsFor(input, getCacheTagsFromResponse(res));
                 cacheLife('days');
                 return res.data;
             });
@@ -286,13 +302,13 @@ const getSpace = cache(
 const getChangeRequest = cache(
     async (input: DataFetcherInput, params: { spaceId: string; changeRequestId: string }) => {
         'use cache';
-        cacheTag(
+        cacheTagsFor(input, [
             getCacheTag({
                 tag: 'change-request',
                 space: params.spaceId,
                 changeRequest: params.changeRequestId,
-            })
-        );
+            }),
+        ]);
 
         return wrapDataFetcherError(async () => {
             return trace(
@@ -306,7 +322,7 @@ const getChangeRequest = cache(
                             ...noCacheFetchOptions,
                         }
                     );
-                    cacheTag(...getCacheTagsFromResponse(res));
+                    cacheTagsFor(input, getCacheTagsFromResponse(res));
                     cacheLife('minutes');
                     return res.data;
                 }
@@ -332,7 +348,7 @@ const getRevision = cache(
                         ...noCacheFetchOptions,
                     }
                 );
-                cacheTag(...getCacheTagsFromResponse(res));
+                cacheTagsFor(input, getCacheTagsFromResponse(res));
                 cacheLife('max');
                 return res.data;
             });
@@ -346,13 +362,13 @@ const getChangeRequestChanges = cache(
         params: { spaceId: string; changeRequestId: string; limit?: number }
     ) => {
         'use cache: remote';
-        cacheTag(
+        cacheTagsFor(input, [
             getCacheTag({
                 tag: 'change-request',
                 space: params.spaceId,
                 changeRequest: params.changeRequestId,
-            })
-        );
+            }),
+        ]);
 
         return wrapDataFetcherError(async () => {
             return trace(
@@ -369,7 +385,7 @@ const getChangeRequestChanges = cache(
                             ...noCacheFetchOptions,
                         }
                     );
-                    cacheTag(...getCacheTagsFromResponse(res));
+                    cacheTagsFor(input, getCacheTagsFromResponse(res));
                     cacheLife('minutes');
                     return res.data;
                 }
@@ -401,7 +417,7 @@ const getRevisionSemanticChanges = cache(
                             ...noCacheFetchOptions,
                         }
                     );
-                    cacheTag(...getCacheTagsFromResponse(res));
+                    cacheTagsFor(input, getCacheTagsFromResponse(res));
                     cacheLife('max');
                     return res.data;
                 }
@@ -438,7 +454,7 @@ const getRevisionPageMarkdown = cache(
                         }
                     );
 
-                    cacheTag(...getCacheTagsFromResponse(res));
+                    cacheTagsFor(input, getCacheTagsFromResponse(res));
                     cacheLife('max');
 
                     if (!('markdown' in res.data)) {
@@ -480,7 +496,7 @@ const getRevisionPageDocument = cache(
                         }
                     );
 
-                    cacheTag(...getCacheTagsFromResponse(res));
+                    cacheTagsFor(input, getCacheTagsFromResponse(res));
                     cacheLifeFromResponse(res, 'max');
 
                     return res.data;
@@ -513,7 +529,7 @@ const getRevisionReusableContentDocument = cache(
                         }
                     );
 
-                    cacheTag(...getCacheTagsFromResponse(res));
+                    cacheTagsFor(input, getCacheTagsFromResponse(res));
                     cacheLifeFromResponse(res, 'max');
 
                     return res.data;
@@ -546,7 +562,7 @@ const getRevisionPageByPath = cache(
                             ...noCacheFetchOptions,
                         }
                     );
-                    cacheTag(...getCacheTagsFromResponse(res));
+                    cacheTagsFor(input, getCacheTagsFromResponse(res));
                     cacheLife('max');
                     return res.data;
                 }
@@ -569,7 +585,7 @@ const getDocument = cache(
                         ...noCacheFetchOptions,
                     }
                 );
-                cacheTag(...getCacheTagsFromResponse(res));
+                cacheTagsFor(input, getCacheTagsFromResponse(res));
                 cacheLifeFromResponse(res, 'max');
                 return res.data;
             });
@@ -588,15 +604,15 @@ const getComputedDocument = cache(
         }
     ) => {
         'use cache';
-        cacheTag(
+        cacheTagsFor(input, [
             ...getComputedContentSourceCacheTags(
                 {
                     spaceId: params.spaceId,
                     organizationId: params.organizationId,
                 },
                 params.source
-            )
-        );
+            ),
+        ]);
 
         return wrapDataFetcherError(async () => {
             return trace(
@@ -614,7 +630,7 @@ const getComputedDocument = cache(
                             ...noCacheFetchOptions,
                         }
                     );
-                    cacheTag(...getCacheTagsFromResponse(res));
+                    cacheTagsFor(input, getCacheTagsFromResponse(res));
                     cacheLifeFromResponse(res, 'max');
                     return res.data;
                 }
@@ -627,13 +643,13 @@ const getComputedDocument = cache(
 const getLatestOpenAPISpecVersionContent = cache(
     async (input: DataFetcherInput, params: { organizationId: string; slug: string }) => {
         'use cache';
-        cacheTag(
+        cacheTagsFor(input, [
             getCacheTag({
                 tag: 'openapi',
                 organization: params.organizationId,
                 openAPISpec: params.slug,
-            })
-        );
+            }),
+        ]);
 
         return wrapDataFetcherError(async () => {
             return trace(
@@ -647,7 +663,7 @@ const getLatestOpenAPISpecVersionContent = cache(
                             ...noCacheFetchOptions,
                         }
                     );
-                    cacheTag(...getCacheTagsFromResponse(res));
+                    cacheTagsFor(input, getCacheTagsFromResponse(res));
                     cacheLife('max');
                     return res.data;
                 }
@@ -663,12 +679,12 @@ const getPublishedContentSite = cache(
         _apiVersion: string
     ) => {
         'use cache';
-        cacheTag(
+        cacheTagsFor(input, [
             getCacheTag({
                 tag: 'site',
                 site: params.siteId,
-            })
-        );
+            }),
+        ]);
 
         return wrapDataFetcherError(async () => {
             return trace(
@@ -685,7 +701,7 @@ const getPublishedContentSite = cache(
                             ...noCacheFetchOptions,
                         }
                     );
-                    cacheTag(...getCacheTagsFromResponse(res));
+                    cacheTagsFor(input, getCacheTagsFromResponse(res));
                     cacheLife('days');
                     return res.data;
                 }
@@ -705,12 +721,12 @@ const getSiteRedirectBySource = cache(
         }
     ) => {
         'use cache';
-        cacheTag(
+        cacheTagsFor(input, [
             getCacheTag({
                 tag: 'site',
                 site: params.siteId,
-            })
-        );
+            }),
+        ]);
 
         return wrapDataFetcherError(async () => {
             return trace(
@@ -728,7 +744,7 @@ const getSiteRedirectBySource = cache(
                             ...noCacheFetchOptions,
                         }
                     );
-                    cacheTag(...getCacheTagsFromResponse(res));
+                    cacheTagsFor(input, getCacheTagsFromResponse(res));
                     cacheLife('days');
                     return res.data;
                 }
@@ -740,12 +756,12 @@ const getSiteRedirectBySource = cache(
 const getEmbedByUrl = cache(
     async (input: DataFetcherInput, params: { spaceId: string; url: string }) => {
         'use cache';
-        cacheTag(
+        cacheTagsFor(input, [
             getCacheTag({
                 tag: 'space',
                 space: params.spaceId,
-            })
-        );
+            }),
+        ]);
 
         return wrapDataFetcherError(async () => {
             return trace(`getEmbedByUrl(${params.spaceId}, ${params.url})`, async () => {
@@ -759,7 +775,7 @@ const getEmbedByUrl = cache(
                         ...noCacheFetchOptions,
                     }
                 );
-                cacheTag(...getCacheTagsFromResponse(res));
+                cacheTagsFor(input, getCacheTagsFromResponse(res));
                 cacheLife('weeks');
                 return res.data;
             });
@@ -774,12 +790,12 @@ const searchSiteContent = cache(
         params: Parameters<GitBookDataFetcher['searchSiteContent']>[0]
     ) => {
         'use cache';
-        cacheTag(
+        cacheTagsFor(input, [
             getCacheTag({
                 tag: 'site',
                 site: params.siteId,
-            })
-        );
+            }),
+        ]);
 
         return wrapDataFetcherError(async () => {
             return trace(
@@ -809,7 +825,7 @@ const searchSiteContent = cache(
                             ...noCacheFetchOptions,
                         }
                     );
-                    cacheTag(...getCacheTagsFromResponse(res));
+                    cacheTagsFor(input, getCacheTagsFromResponse(res));
                     cacheLife('hours');
                     return res.data.items;
                 }
@@ -824,12 +840,12 @@ const renderIntegrationUi = cache(
         params: { integrationName: string; request: RenderIntegrationUI }
     ) => {
         'use cache';
-        cacheTag(
+        cacheTagsFor(input, [
             getCacheTag({
                 tag: 'integration',
                 integration: params.integrationName,
-            })
-        );
+            }),
+        ]);
 
         return wrapDataFetcherError(async () => {
             return trace(`renderIntegrationUi(${params.integrationName})`, async () => {
@@ -841,7 +857,7 @@ const renderIntegrationUi = cache(
                         ...noCacheFetchOptions,
                     }
                 );
-                cacheTag(...getCacheTagsFromResponse(res));
+                cacheTagsFor(input, getCacheTagsFromResponse(res));
                 cacheLife('days');
                 return res.data;
             });
@@ -871,7 +887,7 @@ const listRevisionPageMetaLinks = cache(
                             ...noCacheFetchOptions,
                         }
                     );
-                    cacheTag(...getCacheTagsFromResponse(res));
+                    cacheTagsFor(input, getCacheTagsFromResponse(res));
                     cacheLife('days');
                     return res.data;
                 }
@@ -902,4 +918,12 @@ function getCacheTagsFromResponse(response: HttpResponse<unknown, unknown>) {
     const cacheTagHeader = response.headers.get('x-gitbook-cache-tag');
     const tags = !cacheTagHeader ? [] : cacheTagHeader.split(',');
     return tags;
+}
+
+/**
+ * Tag the current cache entry. Always tag through this helper, never `cacheTag` directly,
+ * so that a PPR render never emits an unscoped tag.
+ */
+function cacheTagsFor(input: DataFetcherInput, tags: string[]) {
+    cacheTag(...scopeCacheTags(tags, input.pprScope));
 }

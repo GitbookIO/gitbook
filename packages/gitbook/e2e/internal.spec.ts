@@ -1,4 +1,4 @@
-import { type Page, expect } from '@playwright/test';
+import { type Page, expect, test } from '@playwright/test';
 import jwt from 'jsonwebtoken';
 
 import {
@@ -15,6 +15,7 @@ import {
 } from '@gitbook/api';
 import type { GitBookStandalone } from '@gitbook/embed';
 
+import { signPPRRequestHeaders } from '../src/lib/ppr';
 import { getGitBookPreviewURL, getSiteAPIToken } from '../tests/utils';
 import {
     type Test,
@@ -315,6 +316,49 @@ const searchTestCases: Test[] = [
     },
 ];
 
+const PPR_TEST_SITE_URL = 'https://gitbook-open-e2e-sites.gitbook.io/gitbook-doc/';
+
+/**
+ * The `x-gbo-*` set GBO resolves upstream. `sign` mirrors what GBO does with `GITBOOK_SECRET`;
+ * without it the app must fall back to resolving the URL itself.
+ */
+async function getPPRHeaders(options: { sign: string | undefined }) {
+    const data = await getSiteAPIToken(PPR_TEST_SITE_URL);
+
+    if (!data.revision) {
+        throw new Error('PPR test site did not resolve to content with a revision');
+    }
+
+    const headers = new Headers({
+        'x-gbo-site': data.site,
+        'x-gbo-site-section': data.siteSection ?? '',
+        'x-gbo-site-space': data.siteSpace,
+        'x-gbo-space': data.space,
+        'x-gbo-site-base-path': data.siteBasePath,
+        'x-gbo-base-path': data.basePath,
+        'x-gbo-pathname': data.pathname || '/',
+        'x-gbo-organization': data.organization,
+        'x-gbo-share-key': data.shareKey ?? '',
+        'x-gbo-complete': String(data.complete),
+        'x-gbo-context-id': data.contextId ?? '',
+        'x-gbo-canonical-url': data.canonicalUrl,
+        'x-gbo-preview': data.preview === undefined ? '' : String(data.preview),
+        'x-gbo-revision': data.revision ?? '',
+        'x-gbo-change-request': data.changeRequest ?? '',
+        'x-gbo-api-token': data.apiToken,
+        'x-gbo-revalidation-id': 'ppr-e2e-revalidation',
+        'x-gbo-default-site-section': data.siteSection ?? '',
+        'x-gbo-default-site-space': data.siteSpace,
+        'x-gbo-default-space': data.space,
+    });
+
+    if (options.sign) {
+        await signPPRRequestHeaders(headers, options.sign);
+    }
+
+    return Object.fromEntries(headers.entries());
+}
+
 const testCases: TestsCase[] = [
     {
         name: 'GitBook Site (Single Variant)',
@@ -324,6 +368,37 @@ const testCases: TestsCase[] = [
                 name: 'Home',
                 url: '',
                 run: waitForCookiesDialog,
+            },
+            {
+                name: 'PPR route renders the site shell',
+                url: '',
+                headers: () => getPPRHeaders({ sign: process.env.GITBOOK_SECRET }),
+                screenshot: false,
+                run: async (page, response) => {
+                    // The deployment signs with its own `GITBOOK_SECRET`; without it here the
+                    // headers can only be tested for rejection (see the test below).
+                    test.skip(
+                        !process.env.GITBOOK_SECRET,
+                        'GITBOOK_SECRET is required to sign PPR headers'
+                    );
+                    expect(response?.headers()['x-gitbook-route-type']).toBe('ppr');
+                    await expect(page.locator('header[data-gb-site-header]')).toBeVisible();
+                    await expect(page.getByTestId('table-of-contents')).toBeVisible();
+                    await expect(page.locator('main')).toBeVisible();
+                },
+            },
+            {
+                name: 'PPR route ignores an unsigned header set',
+                url: '',
+                headers: () => getPPRHeaders({ sign: undefined }),
+                screenshot: false,
+                run: async (page, response) => {
+                    // Anyone can send these headers, so an unsigned set must never take the PPR
+                    // path: it skips URL resolution and visitor-auth, and picks the cache key.
+                    expect(response?.headers()['x-gitbook-route-type']).not.toBe('ppr');
+                    await expect(page.locator('header[data-gb-site-header]')).toBeVisible();
+                    await expect(page.locator('main')).toBeVisible();
+                },
             },
             {
                 name: 'No variants dropdown',

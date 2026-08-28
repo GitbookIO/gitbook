@@ -24,6 +24,21 @@ Examples:
 - `http://localhost:3000/url/gitbook.com/docs`
 - `http://localhost:3000/url/open-source.gitbook.io/midjourney`
 
+### PPR routes
+
+PPR requests are normally resolved upstream and arrive with a large set of `x-gbo-*` headers, so they
+can't be reproduced by hitting the dev server directly. `bun run dev:ppr` (from `packages/gitbook`)
+starts a dev-only proxy on port 3001 that resolves the URL, injects those headers and signs them.
+The app rejects an unsigned set, so `GITBOOK_SECRET` must be set in `.env.local` (any value works
+locally, as long as both processes read the same one):
+
+```
+http://localhost:3001/url/<published-gitbook-url>
+```
+
+Responses carry `x-gitbook-route-type: ppr` when the PPR route was used. Hot reload doesn't work
+through the proxy (its websocket can't be forwarded), so keep using port 3000 while iterating.
+
 ## Architecture
 
 ```

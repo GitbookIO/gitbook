@@ -5,6 +5,7 @@ import React from 'react';
 
 import type { IconName } from '@gitbook/icons';
 
+import { useSelectedSiteSectionId } from '../hooks';
 import { CONTAINER_STYLE } from '../layout';
 import { ScrollContainer } from '../primitives/ScrollContainer';
 import type {
@@ -47,6 +48,8 @@ export function SiteSectionTabs(props: {
         children,
     } = props;
 
+    const currentSectionId = useSelectedSiteSectionId(currentSection.id);
+
     // Portalled into the tabs container rather than <body>, to keep inheriting the header's theming.
     const containerRef = React.useRef<HTMLElement>(null);
 
@@ -79,7 +82,7 @@ export function SiteSectionTabs(props: {
                         ? 'md:-mr-8 -mr-4 sm:-mr-6'
                         : 'after:contents[] after:absolute after:inset-y-2 after:right-0 after:border-transparent after:border-r after:transition-colors'
                 )}
-                active={`#${currentSection.id}`}
+                active={currentSectionId ? `#${currentSectionId}` : undefined}
                 trailing={{
                     fade: true,
                     button: true,
@@ -100,8 +103,9 @@ export function SiteSectionTabs(props: {
                         const isGroup = structureItem.object === 'site-section-group';
                         const isActiveGroup =
                             isGroup &&
-                            Boolean(findSectionInGroup(structureItem, currentSection.id));
-                        const isActive = isActiveGroup || id === currentSection.id;
+                            currentSectionId !== null &&
+                            Boolean(findSectionInGroup(structureItem, currentSectionId));
+                        const isActive = isActiveGroup || id === currentSectionId;
                         return (
                             <NavigationMenu.Item key={id} value={id} id={id}>
                                 {isGroup && structureItem.children.length > 0 ? (
@@ -127,7 +131,7 @@ export function SiteSectionTabs(props: {
                                         >
                                             <SectionGroupTileList
                                                 items={structureItem.children}
-                                                currentSection={currentSection}
+                                                currentSectionId={currentSectionId}
                                             />
                                         </NavigationMenu.Content>
                                     </>
@@ -225,9 +229,9 @@ const SectionTab = React.forwardRef(function SectionTab(
  */
 function SectionGroupTileList(props: {
     items: (ClientSiteSection | ClientSiteSectionGroup)[];
-    currentSection: ClientSiteSection;
+    currentSectionId: string | null;
 }) {
-    const { items, currentSection } = props;
+    const { items, currentSectionId } = props;
 
     // Separate non-grouped sections from grouped sections
     const sections = items.filter((item) => item.object === 'site-section');
@@ -267,7 +271,7 @@ function SectionGroupTileList(props: {
                     <SectionGroupTile
                         key={section.id}
                         child={section}
-                        currentSection={currentSection}
+                        currentSectionId={currentSectionId}
                         invertIcon={sectionsRecessed}
                     />
                 ))}
@@ -307,7 +311,7 @@ function SectionGroupTileList(props: {
                     <SectionGroupTile
                         key={group.id}
                         child={group}
-                        currentSection={currentSection}
+                        currentSectionId={currentSectionId}
                         isMasonry={isMasonryLayout}
                         invertIcon={groupsRecessed}
                     />
@@ -338,16 +342,16 @@ function SectionGroupTileList(props: {
  */
 function SectionGroupTile(props: {
     child: ClientSiteSection | ClientSiteSectionGroup;
-    currentSection: ClientSiteSection;
+    currentSectionId: string | null;
     invertIcon?: boolean;
     /** Whether the tile is a top-level group of the dropdown's masonry layout. */
     isMasonry?: boolean;
 }) {
-    const { child, currentSection, invertIcon, isMasonry } = props;
+    const { child, currentSectionId, invertIcon, isMasonry } = props;
 
     if (child.object === 'site-section') {
         const { url, icon, title, description } = child;
-        const isActive = child.id === currentSection.id;
+        const isActive = child.id === currentSectionId;
         return (
             <li className="group/section-tile flex w-full min-w-0 shrink-0 grow md:max-w-[var(--site-section-tile-max-width)]">
                 <Link
@@ -427,7 +431,7 @@ function SectionGroupTile(props: {
                     <SectionGroupTile
                         key={nestedChild.id}
                         child={nestedChild}
-                        currentSection={currentSection}
+                        currentSectionId={currentSectionId}
                         invertIcon={invertIcon}
                     />
                 ))}
