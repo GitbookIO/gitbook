@@ -1656,6 +1656,71 @@ const testCases: TestsCase[] = [
         ],
     },
     {
+        name: 'Visitor Auth - Space (oversized token)',
+        contentBaseURL: 'https://gitbook.gitbook.io/gbo-va-space/',
+        // Our Cloudflare stack still folds multiple Set-Cookie headers into one,
+        // breaking chunked cookies (variant of opennextjs-cloudflare#501).
+        skip: process.env.ARGOS_BUILD_NAME === 'v2-cloudflare',
+        tests: [
+            {
+                name: 'Oversized token is chunked into cookies and survives navigation',
+                url: () => {
+                    const privateKey = '70b844d0-c519-4532-8586-5970ce48c537';
+                    const token = jwt.sign(
+                        {
+                            name: 'gitbook-open-tests',
+                            // Inflate the token above the ~4KB browser cookie limit,
+                            // like an IdP issuing many group claims would.
+                            groups: Array.from(
+                                { length: 60 },
+                                (_, index) => `group-${index}-${'x'.repeat(80)}`
+                            ),
+                        },
+                        privateKey,
+                        {
+                            expiresIn: '24h',
+                        }
+                    );
+                    return `first?jwt_token=${token}`;
+                },
+                run: async (page) => {
+                    await expect(
+                        page.getByRole('heading', { level: 1, name: 'first' })
+                    ).toBeVisible();
+
+                    // The token must be persisted as a chunk-count marker plus chunk cookies.
+                    const cookies = await page.context().cookies();
+                    // Next.js percent-encodes cookie values, so the raw value is `chunks%3A2`.
+                    const marker = cookies.find(
+                        (cookie) =>
+                            cookie.name.startsWith(VISITOR_TOKEN_COOKIE) &&
+                            /^chunks(:|%3A)\d+$/.test(cookie.value)
+                    );
+                    expect(marker).toBeDefined();
+                    const chunks = cookies.filter((cookie) =>
+                        cookie.name.startsWith(`${marker?.name}-`)
+                    );
+                    expect(chunks.length).toBeGreaterThanOrEqual(2);
+
+                    // Navigating without the token must authenticate from the chunked cookie.
+                    // `first` is the space's default page, so the post-sign-in redirect
+                    // canonicalizes to the space root: derive `second` from that base.
+                    const secondURL = new URL(page.url());
+                    const basePathname = secondURL.pathname
+                        .replace(/\/first\/?$/, '')
+                        .replace(/\/$/, '');
+                    secondURL.pathname = `${basePathname}/second`;
+                    secondURL.search = '';
+                    await page.goto(secondURL.toString());
+                    await expect(
+                        page.getByRole('heading', { level: 1, name: 'second' })
+                    ).toBeVisible();
+                },
+                screenshot: false,
+            },
+        ],
+    },
+    {
         name: 'Visitor Auth - Collection',
         contentBaseURL: 'https://gitbook.gitbook.io/gbo-va-collection/',
         tests: [
