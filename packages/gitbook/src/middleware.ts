@@ -20,11 +20,8 @@ import {
     serveProxyAnalyticsEvent,
     trackServerInsightsEvents,
 } from './lib/tracking';
-import {
-    MAX_API_TOKEN_COOKIE_LENGTH,
-    getAPITokenFromCookies,
-    getAPITokenResponseCookies,
-} from '@/lib/api-token-cookie';
+import { getAPITokenFromCookies, getAPITokenResponseCookies } from '@/lib/api-token-cookie';
+import { MAX_CHUNKED_COOKIE_LENGTH } from '@/lib/chunked-cookies';
 import type { SiteURLData } from '@/lib/context';
 import { getContentSecurityPolicy } from '@/lib/csp';
 import { validateSerializedCustomization } from '@/lib/customization';
@@ -319,7 +316,8 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
             cookies.push(
                 ...getResponseCookiesForVisitorAuth(
                     getVisitorAuthBasePath(siteRequestURL, siteURLData),
-                    visitorToken
+                    visitorToken,
+                    request.cookies.getAll()
                 )
             );
         }
@@ -672,7 +670,7 @@ async function serveWithQueryAPIToken(input: {
     // If found, we redirect to the same URL but with the token in the cookie
     const queryAPIToken = requestURL.searchParams.get('token');
     if (queryAPIToken) {
-        if (queryAPIToken.length > MAX_API_TOKEN_COOKIE_LENGTH) {
+        if (queryAPIToken.length > MAX_CHUNKED_COOKIE_LENGTH) {
             return new Response('API token is too large', {
                 status: 400,
                 headers: { 'content-type': 'text/plain' },
