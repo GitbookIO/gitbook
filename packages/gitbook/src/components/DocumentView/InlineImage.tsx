@@ -9,7 +9,7 @@ import { type ResolvedContentRef, resolveContentRefInDocument } from '@/lib/refe
 import { tcls } from '@/lib/tailwind';
 
 export async function InlineImage(props: InlineProps<DocumentInlineImage>) {
-    const { document, inline, context } = props;
+    const { document, inline, context, ancestorInlines } = props;
     const { size = 'original' } = inline.data;
 
     const [src, darkSrc] = await Promise.all([
@@ -25,6 +25,7 @@ export async function InlineImage(props: InlineProps<DocumentInlineImage>) {
         return null;
     }
 
+    const isInLink = ancestorInlines.some((ancestor) => ancestor.type === 'link');
     const sizes = await getImageSizes(context.contentContext, size, src);
 
     return (
@@ -53,6 +54,7 @@ export async function InlineImage(props: InlineProps<DocumentInlineImage>) {
                 loading={context.mode === 'print' ? 'eager' : 'lazy'}
                 style={[size === 'line' ? ['max-h-lh', 'h-lh', 'w-auto'] : null]}
                 inline
+                zoom={size !== 'line' && !isInLink}
             />
         </span>
     );
