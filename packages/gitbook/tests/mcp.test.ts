@@ -10,7 +10,6 @@ import {
 } from './mcp-utils';
 import { getContentTestURL } from './utils';
 
-
 it(
     'should expose a MCP server',
     async () => {
