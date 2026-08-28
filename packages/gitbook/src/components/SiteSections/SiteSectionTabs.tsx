@@ -218,11 +218,11 @@ function SectionGroupTileList(props: {
 }) {
     const { items, currentSection } = props;
 
-    // Separate navigable items from grouped items
-    const links = items.filter((item) => item.object !== 'site-section-group');
+    // Separate leaf items (sections, external links) from grouped items
+    const leaves = items.filter((item) => item.object !== 'site-section-group');
     const groups = items.filter((item) => item.object === 'site-section-group');
 
-    const hasLinks = links.length > 0;
+    const hasLeaves = leaves.length > 0;
     const hasGroups = groups.length > 0;
     const isMasonryLayout = groups.length > GROUP_MASONRY_THRESHOLD;
     const masonryColumnCount = Math.min(Math.ceil(groups.length / 2), MAX_MASONRY_COLUMNS);
@@ -230,20 +230,20 @@ function SectionGroupTileList(props: {
     return (
         <div className="flex w-full flex-col md:flex-row">
             {/* Non-grouped navigation items */}
-            {hasLinks && (
+            {hasLeaves && (
                 <ul
                     className={tcls(
                         'flex w-full shrink-0 grid-flow-row flex-col gap-x-2 gap-y-0.5 self-stretch p-3 md:sticky md:top-0 md:grid md:w-max md:self-start',
                         hasGroups ? 'bg-tint-base' : ''
                     )}
                     style={{
-                        gridTemplateColumns: `repeat(${Math.ceil(links.length / MAX_ITEMS_PER_COLUMN)}, minmax(0, 1fr))`,
+                        gridTemplateColumns: `repeat(${Math.ceil(leaves.length / MAX_ITEMS_PER_COLUMN)}, minmax(0, 1fr))`,
                     }}
                 >
-                    {links.map((link) => (
+                    {leaves.map((leaf) => (
                         <SectionGroupTile
-                            key={link.id}
-                            child={link}
+                            key={leaf.id}
+                            child={leaf}
                             currentSection={currentSection}
                         />
                     ))}
@@ -255,7 +255,7 @@ function SectionGroupTileList(props: {
                 <div
                     className={tcls(
                         'w-full md:w-max md:min-w-0 md:max-w-full',
-                        hasLinks
+                        hasLeaves
                             ? 'border-tint-subtle bg-tint-subtle max-md:border-t md:border-l'
                             : ''
                     )}
