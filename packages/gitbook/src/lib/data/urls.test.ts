@@ -471,31 +471,6 @@ describe('getURLLookupAlternatives', () => {
             ],
         });
 
-        expect(
-            getURLLookupAlternatives(
-                new URL(
-                    'https://gitbook.com/docs/.well-known/oauth-protected-resource/~gitbook/mcp'
-                )
-            )
-        ).toEqual({
-            revision: undefined,
-            changeRequest: undefined,
-            basePath: undefined,
-            urls: [
-                {
-                    url: 'https://gitbook.com/',
-                    extraPath: 'docs/.well-known/oauth-protected-resource/~gitbook/mcp',
-                    primary: false,
-                },
-                {
-                    url: 'https://gitbook.com/docs',
-                    extraPath: '.well-known/oauth-protected-resource/~gitbook/mcp',
-                    primary: true,
-                },
-            ],
-        });
-    });
-
     it('should not match site root files', () => {
         for (const file of ['llms.txt', 'llms-full.txt/100', 'robots.txt', 'sitemap.xml']) {
             expect(getURLLookupAlternatives(new URL(`https://docs.mycompany.com/${file}`))).toEqual(

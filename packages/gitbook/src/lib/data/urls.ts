@@ -17,8 +17,6 @@ const INTERNAL_PATHS = [
     /^~gitbook\/markdown\/.+$/,
     /^~gitbook\/markdown-ask\/[^/]+(\/[^/]+)?$/,
     /^~gitbook\/rss\/.+$/,
-    // OAuth 2.0 Protected Resource Metadata (RFC 9728), see `lib/oauth-protected.ts`.
-    /^\.well-known\/oauth-protected-resource(\/.+)?$/,
     // Site root files, including the `llms.txt` aliases from `PATH_ALIASES`.
     /^llms\.txt$/,
     /^llms-full\.txt(\/\d+)?$/,
