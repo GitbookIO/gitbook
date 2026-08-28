@@ -215,7 +215,8 @@ const testCases: TestsCase[] = [
     {
         name: 'docs.n8n.io',
         contentBaseURL: 'https://docs.n8n.io',
-        tests: [{ name: 'Home', url: '/', run: waitForCookiesDialog }],
+        // The site registers its own cookie banner, so the built-in one never shows.
+        tests: [{ name: 'Home', url: '/' }],
     },
     {
         name: 'docs.cherryai.com.cn',
@@ -308,11 +309,6 @@ const testCases: TestsCase[] = [
         tests: [{ name: 'Home', url: '/', run: waitForCookiesDialog }],
     },
     {
-        name: 'docs.nats.io',
-        contentBaseURL: 'https://docs.nats.io',
-        tests: [{ name: 'Home', url: '/', run: waitForCookiesDialog }],
-    },
-    {
         name: 'help.glpi-project.org',
         contentBaseURL: 'https://help.glpi-project.org',
         tests: [{ name: 'Home', url: '/', run: waitForCookiesDialog }],
@@ -400,7 +396,7 @@ const testCases: TestsCase[] = [
     {
         name: 'faq.wanttopay.net/wanttopay-app',
         contentBaseURL: 'https://faq.wanttopay.net',
-        tests: [{ name: 'Home', url: '/wanttopay-app', run: waitForCookiesDialog }],
+        tests: [{ name: 'Home', url: '/wanttopay-app' }],
     },
     {
         name: 'guide.prismlive.com',

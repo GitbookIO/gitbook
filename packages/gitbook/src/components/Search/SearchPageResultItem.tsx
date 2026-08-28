@@ -5,7 +5,7 @@ import { Icon, type IconName } from '@gitbook/icons';
 import { SkeletonParagraph } from '../primitives';
 import { Tooltip } from '../primitives';
 import { Emoji } from '../primitives/Emoji/Emoji';
-import { getPageResultHref } from './getPageResultHref';
+import { getPageResultPresentation } from './getPageResultHref';
 import { HighlightQuery } from './HighlightQuery';
 import type { MergedPageResult } from './reciprocalRankFusion';
 import type { ComputedPageResult } from './search-types';
@@ -28,8 +28,21 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
     const { query, item, active, style, ...rest } = props;
     const language = useLanguage();
 
-    const bestSection = item.type === 'page' ? item.bestSection : undefined;
-    const href = item.type === 'page' ? getPageResultHref(item) : item.pathname;
+    const { bestSection, description, href } = (() => {
+        if (item.type === 'page') {
+            const presentation = getPageResultPresentation(item);
+            return {
+                bestSection: presentation.preview,
+                description: presentation.description,
+                href: presentation.href,
+            };
+        }
+
+        return { bestSection: undefined, description: item.description, href: item.pathname };
+    })();
+    const preview = bestSection
+        ? [bestSection.title, bestSection.body].filter(Boolean).join(' · ')
+        : undefined;
 
     const emoji = 'emoji' in item ? item.emoji : undefined;
     const icon = 'icon' in item ? item.icon : undefined;
@@ -72,39 +85,38 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
             {...rest}
         >
             <Breadcrumbs breadcrumbs={item.breadcrumbs} />
-            <p className="line-clamp-1 text-base font-semibold leading-snug text-tint-strong">
+            <p className="line-clamp-1 font-heading text-base font-semibold leading-snug text-tint-strong">
                 <HighlightQuery query={query} text={item.title} />
             </p>
             <div
                 className={tcls(
                     'relative h-5 w-full transition-[height] duration-300',
-                    item.type === 'local-page' && !bestSection?.body && !item.description
+                    item.type === 'local-page' && !preview && !description
                         ? '[[aria-busy=false]_&]:h-0'
-                        : ''
+                        : !preview && !description
+                          ? 'h-0'
+                          : ''
                 )}
                 style={{ transitionDelay: style?.animationDelay }}
             >
-                {bestSection?.body ? (
+                {preview ? (
                     <p
                         className="animate-blur-in absolute inset-0 line-clamp-1 origin-left text-sm"
                         style={{ animationDelay: style?.animationDelay }}
                     >
-                        <HighlightQuery
-                            query={query}
-                            text={`${bestSection.title ? `${bestSection.title} · ` : ''}${bestSection.body}`}
-                        />
+                        <HighlightQuery query={query} text={preview} />
                     </p>
                 ) : null}
 
-                {'description' in item && item.description ? (
+                {description ? (
                     <p
                         className={tcls(
                             'absolute inset-0 line-clamp-1 origin-left text-sm',
-                            bestSection?.body ? 'hidden animate-blur-out' : ''
+                            preview ? 'hidden animate-blur-out' : ''
                         )}
                         style={{ animationDelay: style?.animationDelay }}
                     >
-                        <HighlightQuery query={query} text={item.description} />
+                        <HighlightQuery query={query} text={description} />
                     </p>
                 ) : null}
 
@@ -114,7 +126,7 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
                         lines={1}
                         className={tcls(
                             'absolute inset-0 origin-left',
-                            bestSection?.body || item.description
+                            preview || description
                                 ? 'hidden animate-blur-out'
                                 : '[[aria-busy=false]_&]:hidden [[aria-busy=false]_&]:animate-blur-out'
                         )}

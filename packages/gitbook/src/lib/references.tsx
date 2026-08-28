@@ -277,12 +277,15 @@ export async function resolveContentRef(
                 return null;
             }
 
+            const sectionLabel = getSpaceRefSectionLabel(targetSpace, context.locale);
+
             return {
                 href:
                     targetSpace.siteSpace?.urls.published ??
                     targetSpace.space.urls.published ??
                     targetSpace.space.urls.app,
                 text: getSpaceRefText(targetSpace, context.locale),
+                ancestors: sectionLabel ? [{ label: sectionLabel }] : undefined,
                 active: contentRef.space === space.id,
             };
         }
@@ -482,21 +485,31 @@ function getBestTargetSpaceFromSite(
 }
 
 /**
- * Resolve the text to show for a direct link to a space: the containing section's
- * title takes precedence, since that's what organizes the site's navigation for the
- * reader, then the site-space (variant) title, then the raw space title.
+ * Resolve the text to show for a direct link to a space: the site-space (variant)
+ * title when available, otherwise the raw space title.
  */
 function getSpaceRefText(
     targetSpace: { space: Space; siteSpace: SiteSpace | null; siteSection: SiteSection | null },
     currentLanguage: TranslationLanguage | undefined
 ): string {
-    if (targetSpace.siteSection) {
-        return getLocalizedTitle(targetSpace.siteSection, currentLanguage);
-    }
     if (targetSpace.siteSpace) {
         return getLocalizedTitle(targetSpace.siteSpace, currentLanguage);
     }
     return targetSpace.space.title;
+}
+
+/**
+ * Section title for a space link breadcrumb (e.g. link preview tooltips), when the
+ * target space belongs to a site section.
+ */
+function getSpaceRefSectionLabel(
+    targetSpace: { space: Space; siteSpace: SiteSpace | null; siteSection: SiteSection | null },
+    currentLanguage: TranslationLanguage | undefined
+): string | null {
+    if (targetSpace.siteSection) {
+        return getLocalizedTitle(targetSpace.siteSection, currentLanguage);
+    }
+    return null;
 }
 
 async function resolveContentRefInSpace(

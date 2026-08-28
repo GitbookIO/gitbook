@@ -375,6 +375,17 @@ html.font-Lato {
   font-variant-ligatures: no-common-ligatures;
 }
 
+/* Headings with a font of their own opt out of the content font's ligature workaround. */
+html.has-heading-font .font-heading {
+  font-variant-ligatures: normal;
+}
+
+/* Lato needs the workaround wherever it is used, the heading font included. Declared after the
+   opt-out above so it wins at equal specificity. */
+html.heading-font-Lato .font-heading {
+  font-variant-ligatures: no-common-ligatures;
+}
+
 /* Code blocks */
 /* Shiki themes can define font styling (style, weight, decoration) via CSS variables.
  * These variables are prefixed with --shiki-{mode}-{property} and allow themes to customize
