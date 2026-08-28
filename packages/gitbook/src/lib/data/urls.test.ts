@@ -391,6 +391,258 @@ describe('getURLLookupAlternatives', () => {
             ],
         });
     });
+
+    it('should not match internal paths as part of the site URL', () => {
+        expect(
+            getURLLookupAlternatives(
+                new URL('https://docs.mycompany.com/section/variant/~gitbook/ogimage/pageId')
+            )
+        ).toEqual({
+            revision: undefined,
+            changeRequest: undefined,
+            basePath: undefined,
+            urls: [
+                {
+                    url: 'https://docs.mycompany.com/',
+                    extraPath: 'section/variant/~gitbook/ogimage/pageId',
+                    primary: false,
+                },
+                {
+                    url: 'https://docs.mycompany.com/section',
+                    extraPath: 'variant/~gitbook/ogimage/pageId',
+                    primary: false,
+                },
+                {
+                    url: 'https://docs.mycompany.com/section/variant',
+                    extraPath: '~gitbook/ogimage/pageId',
+                    primary: true,
+                },
+            ],
+        });
+    });
+
+    it('should match the root of a gitbook.io domain for an internal path', () => {
+        expect(getURLLookupAlternatives(new URL('https://org.gitbook.io/~gitbook/icon'))).toEqual({
+            revision: undefined,
+            changeRequest: undefined,
+            basePath: undefined,
+            urls: [
+                {
+                    url: 'https://org.gitbook.io/',
+                    extraPath: '~gitbook/icon',
+                    primary: true,
+                },
+            ],
+        });
+
+        expect(
+            getURLLookupAlternatives(new URL('https://org.gitbook.io/docs/~gitbook/search'))
+        ).toEqual({
+            revision: undefined,
+            changeRequest: undefined,
+            basePath: undefined,
+            urls: [
+                {
+                    url: 'https://org.gitbook.io/docs',
+                    extraPath: '~gitbook/search',
+                    primary: true,
+                },
+            ],
+        });
+    });
+
+    it('should not match the OAuth protected resource metadata path', () => {
+        expect(
+            getURLLookupAlternatives(
+                new URL(
+                    'https://docs.mycompany.com/.well-known/oauth-protected-resource/~gitbook/mcp'
+                )
+            )
+        ).toEqual({
+            revision: undefined,
+            changeRequest: undefined,
+            basePath: undefined,
+            urls: [
+                {
+                    url: 'https://docs.mycompany.com/',
+                    extraPath: '.well-known/oauth-protected-resource/~gitbook/mcp',
+                    primary: true,
+                },
+            ],
+        });
+
+        expect(
+            getURLLookupAlternatives(
+                new URL(
+                    'https://gitbook.com/docs/.well-known/oauth-protected-resource/~gitbook/mcp'
+                )
+            )
+        ).toEqual({
+            revision: undefined,
+            changeRequest: undefined,
+            basePath: undefined,
+            urls: [
+                {
+                    url: 'https://gitbook.com/',
+                    extraPath: 'docs/.well-known/oauth-protected-resource/~gitbook/mcp',
+                    primary: false,
+                },
+                {
+                    url: 'https://gitbook.com/docs',
+                    extraPath: '.well-known/oauth-protected-resource/~gitbook/mcp',
+                    primary: true,
+                },
+            ],
+        });
+    });
+
+    it('should not match site root files', () => {
+        for (const file of ['llms.txt', 'llms-full.txt/100', 'robots.txt', 'sitemap.xml']) {
+            expect(getURLLookupAlternatives(new URL(`https://docs.mycompany.com/${file}`))).toEqual(
+                {
+                    revision: undefined,
+                    changeRequest: undefined,
+                    basePath: undefined,
+                    urls: [
+                        {
+                            url: 'https://docs.mycompany.com/',
+                            extraPath: file,
+                            primary: true,
+                        },
+                    ],
+                }
+            );
+        }
+    });
+
+    it('should not match a RSS feed at the end of a page path', () => {
+        expect(
+            getURLLookupAlternatives(new URL('https://docs.mycompany.com/section/blog/rss.xml'))
+        ).toEqual({
+            revision: undefined,
+            changeRequest: undefined,
+            basePath: undefined,
+            urls: [
+                {
+                    url: 'https://docs.mycompany.com/',
+                    extraPath: 'section/blog/rss.xml',
+                    primary: false,
+                },
+                {
+                    url: 'https://docs.mycompany.com/section',
+                    extraPath: 'blog/rss.xml',
+                    primary: false,
+                },
+                {
+                    url: 'https://docs.mycompany.com/section/blog',
+                    extraPath: 'rss.xml',
+                    primary: true,
+                },
+            ],
+        });
+    });
+
+    it('should keep matching up to the variant for an internal path', () => {
+        expect(
+            getURLLookupAlternatives(
+                new URL('https://test.gitbook.io/sharelink/v/variant/~gitbook/search')
+            )
+        ).toEqual({
+            revision: undefined,
+            changeRequest: undefined,
+            basePath: undefined,
+            urls: [
+                {
+                    url: 'https://test.gitbook.io/sharelink/v/variant',
+                    extraPath: '~gitbook/search',
+                    primary: true,
+                },
+            ],
+        });
+    });
+
+    it('should keep the revision base path for an internal path', () => {
+        expect(
+            getURLLookupAlternatives(
+                new URL('https://docs.mycompany.com/~/revisions/id/a/~gitbook/ogimage/pageId')
+            )
+        ).toEqual({
+            revision: 'id',
+            changeRequest: undefined,
+            basePath: '~/revisions/id',
+            urls: [
+                {
+                    url: 'https://docs.mycompany.com/',
+                    extraPath: 'a/~gitbook/ogimage/pageId',
+                    primary: true,
+                },
+            ],
+        });
+    });
+
+    it('should only match internal paths at the end of the URL', () => {
+        expect(
+            getURLLookupAlternatives(new URL('https://docs.mycompany.com/a/llms.txt/b'))
+        ).toEqual({
+            revision: undefined,
+            changeRequest: undefined,
+            basePath: undefined,
+            urls: [
+                {
+                    url: 'https://docs.mycompany.com/',
+                    extraPath: 'a/llms.txt/b',
+                    primary: false,
+                },
+                {
+                    url: 'https://docs.mycompany.com/a',
+                    extraPath: 'llms.txt/b',
+                    primary: false,
+                },
+                {
+                    url: 'https://docs.mycompany.com/a/llms.txt',
+                    extraPath: 'b',
+                    primary: false,
+                },
+                {
+                    url: 'https://docs.mycompany.com/a/llms.txt/b',
+                    extraPath: '',
+                    primary: true,
+                },
+            ],
+        });
+    });
+
+    it('should not treat a markdown page path as internal', () => {
+        expect(
+            getURLLookupAlternatives(new URL('https://docs.mycompany.com/a/b/intro.md'))
+        ).toEqual({
+            revision: undefined,
+            changeRequest: undefined,
+            basePath: undefined,
+            urls: [
+                {
+                    url: 'https://docs.mycompany.com/',
+                    extraPath: 'a/b/intro.md',
+                    primary: false,
+                },
+                {
+                    url: 'https://docs.mycompany.com/a',
+                    extraPath: 'b/intro.md',
+                    primary: false,
+                },
+                {
+                    url: 'https://docs.mycompany.com/a/b',
+                    extraPath: 'intro.md',
+                    primary: false,
+                },
+                {
+                    url: 'https://docs.mycompany.com/a/b/intro.md',
+                    extraPath: '',
+                    primary: true,
+                },
+            ],
+        });
+    });
 });
 
 describe('normalizeURL', () => {
