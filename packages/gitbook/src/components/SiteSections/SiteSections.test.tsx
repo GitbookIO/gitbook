@@ -7,7 +7,10 @@ import { TranslationLanguage } from '@gitbook/api';
 
 import { LinkContext } from '../primitives';
 import { encodeClientSiteSections } from './encodeClientSiteSections';
-import { shouldRenderSiteSectionNavigation } from './shouldRenderSiteSectionNavigation';
+import {
+    hasMultipleSiteSections,
+    shouldRenderSiteSectionNavigation,
+} from './shouldRenderSiteSectionNavigation';
 import { SiteSectionListItem } from './SiteSectionList';
 import type { GitBookSiteContext } from '@/lib/context';
 import { createLinker } from '@/lib/links';
@@ -139,6 +142,31 @@ describe('shouldRenderSiteSectionNavigation', () => {
         } as SiteSectionGroup;
 
         expect(shouldRenderSiteSectionNavigation({ list: [group], current: section })).toBeTrue();
+    });
+});
+
+describe('hasMultipleSiteSections', () => {
+    const section = makeSection();
+
+    it('ignores external links when determining the search scope', () => {
+        expect(
+            hasMultipleSiteSections({
+                list: [section, makeExternalLink('external')],
+                current: section,
+            })
+        ).toBeFalse();
+    });
+
+    it('counts content sections nested inside groups', () => {
+        const secondSection = { ...makeSection(), id: 'guides' };
+        const group = {
+            object: 'site-section-group',
+            id: 'resources',
+            title: 'Resources',
+            children: [section, makeExternalLink('external'), secondSection],
+        } as SiteSectionGroup;
+
+        expect(hasMultipleSiteSections({ list: [group], current: section })).toBeTrue();
     });
 });
 

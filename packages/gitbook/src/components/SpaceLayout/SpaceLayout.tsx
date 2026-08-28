@@ -13,7 +13,11 @@ import { InsightsProvider, VisitorProvider } from '../Insights';
 import { CONTAINER_STYLE } from '../layout';
 import { NavigationLoader } from '../primitives/NavigationLoader';
 import { SearchContainer, getSearchBaseProps } from '../Search';
-import { SiteSectionList, encodeClientSiteSections } from '../SiteSections';
+import {
+    SiteSectionList,
+    encodeClientSiteSections,
+    shouldRenderSiteSectionNavigation,
+} from '../SiteSections';
 import { categorizeVariants } from './categorizeVariants';
 import { SpaceLayoutContextProvider } from './SpaceLayoutContext';
 import { Footer } from '@/components/Footer';
@@ -113,7 +117,7 @@ export function SpaceLayout(props: SpaceLayoutProps) {
 
     const withTopHeader = customization.header.preset !== CustomizationHeaderPreset.None;
 
-    const withSections = Boolean(visibleSections && visibleSections.list.length > 1);
+    const withSections = shouldRenderSiteSectionNavigation(visibleSections);
     const variants = categorizeVariants(context);
     const socialLinks = customization.socialAccounts.filter((account) => account.display?.footer);
 

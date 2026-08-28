@@ -1,4 +1,5 @@
 import 'server-only';
+import assertNever from 'assert-never';
 import pRetry from 'p-retry';
 
 import {
@@ -7,9 +8,6 @@ import {
     type RevisionPage,
     type RevisionTag,
     type SiteCustomizationSettings,
-    type SiteExternalLink,
-    type SiteSection,
-    type SiteSectionGroup,
 } from '@gitbook/api';
 import { getIconStyle } from '@gitbook/icons/getIconStyle';
 import { validateIconName } from '@gitbook/icons/icons';
@@ -18,6 +16,7 @@ import { type IconName, IconStyle } from '@gitbook/icons/types';
 import { GITBOOK_ICONS_ASSET_VERSION } from '@gitbook/icons/version';
 
 import { getAssetURL } from '@/lib/assets';
+import type { SiteStructureNode } from '@/lib/context';
 import { GITBOOK_ICONS_TOKEN, GITBOOK_ICONS_URL, GITBOOK_URL } from '@/lib/env';
 import { joinPath, joinPathWithBaseURL } from '@/lib/paths';
 
@@ -176,7 +175,7 @@ export function getContentInlineIconSourceRequests(input: {
     pages?: RevisionPage[];
     document?: JSONDocument | null;
     tags?: RevisionTag[];
-    sections?: (SiteSection | SiteSectionGroup | SiteExternalLink)[] | null;
+    sections?: SiteStructureNode[] | null;
 }): IconSourceRequest[] {
     const { iconStyle, pages = [], document = null, tags = [], sections = null } = input;
     const requests: IconSourceRequest[] = [];
@@ -343,15 +342,22 @@ function collectTagIconSourceRequests(
 }
 
 function collectSiteSectionIconSourceRequests(
-    sections: (SiteSection | SiteSectionGroup | SiteExternalLink)[],
+    sections: SiteStructureNode[],
     iconStyle: IconStyle,
     requests: IconSourceRequest[]
 ) {
     for (const section of sections) {
-        addIconSourceRequest(requests, section.icon, iconStyle);
-
-        if (section.object === 'site-section-group') {
-            collectSiteSectionIconSourceRequests(section.children, iconStyle, requests);
+        switch (section.object) {
+            case 'site-section':
+            case 'site-external-link':
+                addIconSourceRequest(requests, section.icon, iconStyle);
+                break;
+            case 'site-section-group':
+                addIconSourceRequest(requests, section.icon, iconStyle);
+                collectSiteSectionIconSourceRequests(section.children, iconStyle, requests);
+                break;
+            default:
+                assertNever(section, 'Unknown site structure node object type');
         }
     }
 }

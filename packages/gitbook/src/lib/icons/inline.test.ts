@@ -1,15 +1,9 @@
 import { describe, expect, it } from 'bun:test';
 
-import type {
-    JSONDocument,
-    RevisionPage,
-    RevisionTag,
-    SiteExternalLink,
-    SiteSection,
-    SiteSectionGroup,
-} from '@gitbook/api';
+import type { JSONDocument, RevisionPage, RevisionTag } from '@gitbook/api';
 import { IconStyle } from '@gitbook/icons/types';
 
+import type { SiteStructureNode } from '../context';
 import { getContentInlineIconSourceRequests, parseRawSVG } from './inline';
 
 describe('parseRawSVG', () => {
@@ -102,7 +96,7 @@ describe('getContentInlineIconSourceRequests', () => {
                     { object: 'site-external-link', icon: 'link' },
                 ],
             },
-        ] as unknown as (SiteSection | SiteSectionGroup | SiteExternalLink)[];
+        ] as unknown as SiteStructureNode[];
         const document = {
             object: 'document',
             nodes: [
@@ -148,7 +142,7 @@ describe('getContentInlineIconSourceRequests', () => {
         const sections = [
             { object: 'site-section', icon: undefined },
             { object: 'site-section', icon: 'also-not-real' },
-        ] as unknown as (SiteSection | SiteSectionGroup | SiteExternalLink)[];
+        ] as unknown as SiteStructureNode[];
         const document = {
             object: 'document',
             nodes: [

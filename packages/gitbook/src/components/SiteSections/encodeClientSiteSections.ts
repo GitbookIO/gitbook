@@ -2,7 +2,7 @@ import assertNever from 'assert-never';
 
 import type { SiteExternalLink, SiteSection, SiteSectionGroup, SiteSpace } from '@gitbook/api';
 
-import type { GitBookSiteContext, SiteSections } from '@/lib/context';
+import type { GitBookSiteContext, SiteSections, SiteStructureNode } from '@/lib/context';
 import { toEmbeddableLinkForPublishedContent } from '@/lib/embeddable-linker';
 import {
     getLocalizedDescription,
@@ -12,7 +12,7 @@ import {
 } from '@/lib/sites';
 
 export type ClientSiteSections = {
-    list: (ClientSiteSection | ClientSiteSectionGroup | ClientSiteExternalLink)[];
+    list: ClientSiteStructureNode[];
     current: ClientSiteSection;
 };
 
@@ -24,13 +24,16 @@ export type ClientSiteSection = Pick<
 };
 
 export type ClientSiteSectionGroup = Pick<SiteSectionGroup, 'id' | 'title' | 'icon' | 'object'> & {
-    children: (ClientSiteSection | ClientSiteSectionGroup | ClientSiteExternalLink)[];
+    children: ClientSiteStructureNode[];
 };
 
 export type ClientSiteExternalLink = Pick<
     SiteExternalLink,
     'id' | 'title' | 'description' | 'icon' | 'object' | 'url'
 >;
+
+export type ClientSiteNavigationItem = ClientSiteSection | ClientSiteExternalLink;
+export type ClientSiteStructureNode = ClientSiteNavigationItem | ClientSiteSectionGroup;
 
 /**
  * Encode the list of site sections into the data to be rendered in the client.
@@ -44,8 +47,7 @@ export function encodeClientSiteSections(
     const currentLanguage = context.locale;
     const asEmbeddable = Boolean(options?.asEmbeddable);
 
-    const clientSections: (ClientSiteSection | ClientSiteSectionGroup | ClientSiteExternalLink)[] =
-        [];
+    const clientSections: ClientSiteStructureNode[] = [];
 
     for (const item of list) {
         switch (item.object) {
@@ -87,11 +89,10 @@ export function encodeClientSiteSections(
 
 function encodeChildren(
     context: GitBookSiteContext,
-    children: (SiteSection | SiteSectionGroup | SiteExternalLink)[],
+    children: SiteStructureNode[],
     asEmbeddable: boolean
-): (ClientSiteSection | ClientSiteSectionGroup | ClientSiteExternalLink)[] {
-    const clientChildren: (ClientSiteSection | ClientSiteSectionGroup | ClientSiteExternalLink)[] =
-        [];
+): ClientSiteStructureNode[] {
+    const clientChildren: ClientSiteStructureNode[] = [];
     const currentLanguage = context.locale;
 
     for (const child of children) {

@@ -1,6 +1,6 @@
 import type { SiteSection, SiteSpace } from '@gitbook/api';
 
-import { encodeClientSiteSections } from '../SiteSections';
+import { encodeClientSiteSections, hasMultipleSiteSections } from '../SiteSections';
 import type { GitBookSiteContext } from '@/lib/context';
 
 export interface SearchBaseProps {
@@ -25,7 +25,7 @@ export function getSearchBaseProps(context: GitBookSiteContext): SearchBaseProps
             : undefined,
         siteSpace,
         siteSpaces: visibleSiteSpaces,
-        withSections: Boolean(visibleSections && visibleSections.list.length > 1),
+        withSections: hasMultipleSiteSections(visibleSections),
         withSiteVariants:
             visibleSections?.list.some(
                 (section) => section.object === 'site-section' && section.siteSpaces.length > 1

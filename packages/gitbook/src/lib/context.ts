@@ -152,12 +152,12 @@ export type GitBookSpaceContext = GitBookBaseContext & {
     shareKey: string | undefined;
 };
 
+export type SiteStructureNode = SiteSection | SiteSectionGroup | SiteExternalLink;
+
 export type SiteSections = {
-    list: (SiteSectionGroup | SiteSection | SiteExternalLink)[];
+    list: SiteStructureNode[];
     current: SiteSection;
 };
-
-type SectionStructureNode = SiteSection | SiteSectionGroup | SiteExternalLink;
 
 /**
  * Context when rendering a site.
@@ -586,30 +586,34 @@ export function checkIsRootSiteContext(context: GitBookSiteContext): boolean {
 
 /** Filter sections with hidden spaces while preserving external navigation links. */
 export function filterSectionsAndGroupsWithHiddenSiteSpaces(
-    sectionsOrGroups: SectionStructureNode[]
-): SectionStructureNode[] {
+    sectionsOrGroups: SiteStructureNode[]
+): SiteStructureNode[] {
     return sectionsOrGroups
         .map((entry) => {
-            if (entry.object === 'site-section') {
-                return sectionHasOnlyHiddenSiteSpaces(entry) ? null : entry;
+            switch (entry.object) {
+                case 'site-section':
+                    return sectionHasOnlyHiddenSiteSpaces(entry) ? null : entry;
+                case 'site-external-link':
+                    return entry;
+                case 'site-section-group': {
+                    const visibleChildren = filterSectionsAndGroupsWithHiddenSiteSpaces(
+                        entry.children
+                    );
+
+                    if (visibleChildren.length === 0) {
+                        return null;
+                    }
+
+                    return {
+                        ...entry,
+                        children: visibleChildren,
+                    };
+                }
+                default:
+                    return assertNever(entry, 'Unknown site structure node object type');
             }
-
-            if (entry.object === 'site-external-link') {
-                return entry;
-            }
-
-            const visibleChildren = filterSectionsAndGroupsWithHiddenSiteSpaces(entry.children);
-
-            if (visibleChildren.length === 0) {
-                return null;
-            }
-
-            return {
-                ...entry,
-                children: visibleChildren,
-            };
         })
-        .filter((entry): entry is SectionStructureNode => Boolean(entry));
+        .filter((entry): entry is SiteStructureNode => Boolean(entry));
 }
 
 /**

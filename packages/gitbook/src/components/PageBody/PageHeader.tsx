@@ -1,10 +1,10 @@
+import assertNever from 'assert-never';
 import urlJoin from 'url-join';
 
 import {
     CustomizationPageActionType,
     type RevisionPage,
     type RevisionPageDocument,
-    type SiteExternalLink,
     type SiteSection,
     type SiteSectionGroup,
     SiteVisibility,
@@ -24,7 +24,7 @@ import { findBestTargetURL } from '../SiteSections/encodeClientSiteSections';
 import { categorizeVariants } from '../SpaceLayout/categorizeVariants';
 import { BreadcrumbItemDropdown, type BreadcrumbSibling } from './BreadcrumbItemDropdown';
 import { PageTags } from './PageTags';
-import type { GitBookSiteContext } from '@/lib/context';
+import type { GitBookSiteContext, SiteStructureNode } from '@/lib/context';
 import { type AncestorRevisionPage, resolveFirstDocument } from '@/lib/pages';
 import { getLocalizedTitle, getSiteSpaceURL } from '@/lib/sites';
 import { tcls } from '@/lib/tailwind';
@@ -67,8 +67,9 @@ export async function PageHeader(props: {
     const contextCrumbs: BreadcrumbContextCrumb[] = [];
     if (currentSection) {
         // Walk the full section tree so the current section (and its enclosing groups) always shows
-        // as a crumb, even when it's hidden in the site structure. Only *visible* sections/groups
-        // are offered as siblings to switch to, though.
+        // as a crumb, even when it's hidden in the site structure. Siblings are the other nodes at
+        // the same level that the breadcrumb dropdown offers as section/group switch targets;
+        // external links are intentionally excluded from those section-only targets.
         const chain = context.sections
             ? findSectionChain(context.sections.list, currentSection.id)
             : [];
@@ -352,7 +353,6 @@ function ContextCrumb({ crumb }: { crumb: BreadcrumbContextCrumb }) {
 }
 
 type SectionNode = SiteSection | SiteSectionGroup;
-type SectionStructureNode = SectionNode | SiteExternalLink;
 
 /**
  * Walk the section tree from the root down to the section with the given id, returning one entry per
@@ -360,23 +360,27 @@ type SectionStructureNode = SectionNode | SiteExternalLink;
  * an empty array if the section isn't found.
  */
 function findSectionChain(
-    list: SectionStructureNode[],
+    list: SiteStructureNode[],
     sectionId: string
-): { node: SectionNode; siblings: SectionStructureNode[] }[] {
+): { node: SectionNode; siblings: SiteStructureNode[] }[] {
     for (const item of list) {
-        if (item.object === 'site-external-link') {
-            continue;
-        }
-
-        if (item.object === 'site-section') {
-            if (item.id === sectionId) {
-                return [{ node: item, siblings: list }];
+        switch (item.object) {
+            case 'site-section':
+                if (item.id === sectionId) {
+                    return [{ node: item, siblings: list }];
+                }
+                break;
+            case 'site-section-group': {
+                const nested = findSectionChain(item.children, sectionId);
+                if (nested.length > 0) {
+                    return [{ node: item, siblings: list }, ...nested];
+                }
+                break;
             }
-        } else {
-            const nested = findSectionChain(item.children, sectionId);
-            if (nested.length > 0) {
-                return [{ node: item, siblings: list }, ...nested];
-            }
+            case 'site-external-link':
+                break;
+            default:
+                return assertNever(item, 'Unknown site structure node object type');
         }
     }
     return [];
@@ -387,20 +391,55 @@ function findSectionChain(
  * section found in its (possibly nested) children.
  */
 function findFirstSection(node: SectionNode): SiteSection | null {
-    if (node.object === 'site-section') {
-        return node;
+    switch (node.object) {
+        case 'site-section':
+            return node;
+        case 'site-section-group':
+            for (const child of node.children) {
+                switch (child.object) {
+                    case 'site-section':
+                        return child;
+                    case 'site-section-group': {
+                        const found = findFirstSection(child);
+                        if (found) {
+                            return found;
+                        }
+                        break;
+                    }
+                    case 'site-external-link':
+                        break;
+                    default:
+                        return assertNever(child, 'Unknown site structure node object type');
+                }
+            }
+            return null;
+        default:
+            return assertNever(node, 'Unknown section node object type');
     }
-    for (const child of node.children) {
-        if (child.object === 'site-external-link') {
-            continue;
-        }
+}
 
-        const found = findFirstSection(child);
-        if (found) {
-            return found;
+/** Collect the ids of every section and section group in a (visible) section tree. */
+function collectSectionNodeIds(list: SiteStructureNode[]): Set<string> {
+    const ids = new Set<string>();
+    const walk = (nodes: SiteStructureNode[]) => {
+        for (const node of nodes) {
+            switch (node.object) {
+                case 'site-section':
+                    ids.add(node.id);
+                    break;
+                case 'site-section-group':
+                    ids.add(node.id);
+                    walk(node.children);
+                    break;
+                case 'site-external-link':
+                    break;
+                default:
+                    assertNever(node, 'Unknown site structure node object type');
+            }
         }
-    }
-    return null;
+    };
+    walk(list);
+    return ids;
 }
 
 /**
@@ -412,25 +451,6 @@ function findFirstSection(node: SectionNode): SiteSection | null {
 function getSectionNodeURL(context: GitBookSiteContext, node: SectionNode): string | undefined {
     const section = findFirstSection(node);
     return section ? findBestTargetURL(context, section) : undefined;
-}
-
-/** Collect the ids of every section and section group in a (visible) section tree. */
-function collectSectionNodeIds(list: SectionStructureNode[]): Set<string> {
-    const ids = new Set<string>();
-    const walk = (nodes: SectionStructureNode[]) => {
-        for (const node of nodes) {
-            if (node.object === 'site-external-link') {
-                continue;
-            }
-
-            ids.add(node.id);
-            if (node.object === 'site-section-group') {
-                walk(node.children);
-            }
-        }
-    };
-    walk(list);
-    return ids;
 }
 
 /**
