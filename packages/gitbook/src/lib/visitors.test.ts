@@ -2,6 +2,8 @@ import { describe, expect, it } from 'bun:test';
 import type { JwtPayload } from 'jwt-decode';
 
 import {
+    type ResponseCookies,
+    getResponseCookiesForVisitorAuth,
     getVisitorAuthCookieMaxAge,
     getVisitorAuthCookieName,
     getVisitorAuthCookieValue,
@@ -221,6 +223,78 @@ describe('getVisitorAuthToken', () => {
                 token: 'token-in-query',
             });
         });
+    });
+});
+
+// The chunking mechanics themselves are covered in api-token-cookie.test.ts;
+// these tests cover the wiring into the visitor auth cookie.
+describe('getResponseCookiesForVisitorAuth chunking', () => {
+    const base64url = (value: object) => Buffer.from(JSON.stringify(value)).toString('base64url');
+
+    // Build a decodable JWT of an arbitrary length by padding the signature part.
+    const makeJwt = (length = 200) => {
+        const jwt = `${base64url({ alg: 'none' })}.${base64url({ exp: 2_000_000_000 })}.`;
+        return jwt.padEnd(length, 's');
+    };
+
+    const write = (basePath: string, token: string, previous: ResponseCookies = []) =>
+        getResponseCookiesForVisitorAuth(basePath, { source: 'url', token }, previous);
+
+    const read = (cookies: ResponseCookies, urlPath = '/') =>
+        getVisitorToken({
+            cookies,
+            headers: new Headers(),
+            url: new URL(`https://example.com${urlPath}`),
+        });
+
+    it('keeps small tokens in a single cookie', () => {
+        const token = makeJwt();
+        const cookies = write('/', token);
+
+        expect(cookies).toHaveLength(1);
+        expect(cookies[0]?.value).toBe(getVisitorAuthCookieValue('/', token));
+        expect(read(cookies)).toEqual({ source: 'visitor-auth-cookie', basePath: '/', token });
+    });
+
+    it('round-trips an oversized token through chunked cookies', () => {
+        const token = makeJwt(9_000);
+        const cookies = write('/', token);
+
+        expect(cookies).toHaveLength(4); // chunk-count marker + 3 chunks
+        for (const cookie of cookies) {
+            expect(cookie.options).toMatchObject({ httpOnly: true });
+            expect(cookie.options?.maxAge).toBeGreaterThan(0);
+        }
+        expect(read(cookies)).toEqual({ source: 'visitor-auth-cookie', basePath: '/', token });
+    });
+
+    it('treats a missing chunk as no token', () => {
+        const cookies = write('/', makeJwt(9_000));
+        const chunkName = `${getVisitorAuthCookieName('/')}-1`;
+        expect(cookies.some(({ name }) => name === chunkName)).toBe(true);
+
+        expect(read(cookies.filter(({ name }) => name !== chunkName))).toBeUndefined();
+    });
+
+    it('expires stale chunks when a smaller token is written', () => {
+        const cookies = write('/', makeJwt(), write('/', makeJwt(9_000)));
+
+        const staleChunks = cookies.filter(({ options }) => options?.maxAge === 0);
+        expect(staleChunks.map(({ name }) => name)).toEqual(
+            [0, 1, 2].map((index) => `${getVisitorAuthCookieName('/')}-${index}`)
+        );
+    });
+
+    it('scopes chunked cookies to the base path', () => {
+        const token = makeJwt(9_000);
+        const cookies = write('/hello/', token);
+
+        expect(read(cookies, '/hello/world')).toEqual({
+            source: 'visitor-auth-cookie',
+            basePath: '/hello/',
+            token,
+        });
+        expect(read(cookies, '/other/page')).toBeUndefined();
     });
 });
 

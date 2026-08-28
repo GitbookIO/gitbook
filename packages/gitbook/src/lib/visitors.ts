@@ -5,6 +5,12 @@ import hash from 'object-hash';
 
 import type { SiteVisitorPayload } from '@gitbook/api';
 
+import {
+    MAX_CHUNKED_COOKIE_LENGTH,
+    getChunkedCookieValue,
+    getChunkedResponseCookies,
+} from './chunked-cookies';
+
 const VISITOR_AUTH_PARAM = 'jwt_token';
 const VISITOR_PARAM_PREFIX = 'visitor.';
 export const VISITOR_TOKEN_COOKIE = 'gitbook-visitor-token';
@@ -303,7 +309,8 @@ function getResponseCookieForVisitorParams(
  */
 export function getResponseCookiesForVisitorAuth(
     basePath: string,
-    visitorTokenLookup: VisitorTokenLookup
+    visitorTokenLookup: VisitorTokenLookup,
+    requestCookies: RequestCookies = []
 ): ResponseCookies {
     if (!visitorTokenLookup) {
         return [];
@@ -328,18 +335,29 @@ export function getResponseCookiesForVisitorAuth(
         (visitorTokenLookup?.source === 'visitor-auth-cookie' &&
             visitorTokenLookup.basePath === basePath)
     ) {
-        return [
-            {
-                name: getVisitorAuthCookieName(basePath),
-                value: getVisitorAuthCookieValue(basePath, visitorTokenLookup.token),
-                options: {
-                    httpOnly: true,
-                    sameSite: process.env.NODE_ENV === 'production' ? 'none' : undefined,
-                    secure: process.env.NODE_ENV === 'production',
-                    maxAge: getVisitorAuthCookieMaxAge(decoded),
-                },
-            },
-        ];
+        const name = getVisitorAuthCookieName(basePath);
+        const value = getVisitorAuthCookieValue(basePath, visitorTokenLookup.token);
+        const options = {
+            httpOnly: true,
+            sameSite: process.env.NODE_ENV === 'production' ? ('none' as const) : undefined,
+            secure: process.env.NODE_ENV === 'production',
+            maxAge: getVisitorAuthCookieMaxAge(decoded),
+        };
+
+        // Chunk the cookie when the value exceeds the single-cookie size limit,
+        // as browsers silently drop oversized Set-Cookie headers which causes
+        // an infinite auth redirect loop.
+        if (value.length > MAX_CHUNKED_COOKIE_LENGTH) {
+            // Too large even for chunking: fall back to a single cookie (best effort).
+            return [{ name, value, options }];
+        }
+
+        return getChunkedResponseCookies({
+            cookies: requestCookies,
+            cookieName: name,
+            value,
+            options,
+        });
     }
 
     return [];
@@ -469,15 +487,21 @@ function findVisitorAuthCookieForBasePath(
     cookies: RequestCookies,
     basePath: string
 ): VisitorAuthCookieValue | undefined {
-    return cookies.reduce<VisitorAuthCookieValue | undefined>((acc, cookie) => {
-        if (cookie.name === getVisitorAuthCookieName(basePath)) {
-            const value = JSON.parse(cookie.value) as VisitorAuthCookieValue;
-            if (value.basePath === basePath) {
-                acc = value;
-            }
+    const cookieValue = getChunkedCookieValue(cookies, getVisitorAuthCookieName(basePath));
+    if (cookieValue === undefined) {
+        return undefined;
+    }
+
+    try {
+        const value = JSON.parse(cookieValue) as VisitorAuthCookieValue;
+        if (value.basePath === basePath) {
+            return value;
         }
-        return acc;
-    }, undefined);
+    } catch {
+        // An unparsable cookie is treated as a missing token; the visitor re-authenticates.
+    }
+
+    return undefined;
 }
 
 /**
