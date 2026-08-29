@@ -10,6 +10,7 @@ import {
 import React from 'react';
 
 import type { LinkProps } from '../primitives';
+import { useSearchPrewarm } from './useSearchPrewarm';
 
 export type SearchScope =
     /** Search all content on the site */
@@ -91,6 +92,8 @@ export function SearchContextProvider(props: React.PropsWithChildren): React.Rea
             open,
         };
     }, [rawState, open]);
+
+    useSearchPrewarm(Boolean(state?.open));
 
     const stateRef = React.useRef(state);
     React.useLayoutEffect(() => {
