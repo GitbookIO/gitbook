@@ -57,6 +57,8 @@
         "preview": {
             "vars": {
                 "STAGE": "preview",
+                // TODO: temporary, traces incremental cache key resolution.
+                "DEBUG_CACHE_KEYS": "true",
                 "PREVIEW_HOSTNAME": "TO_REPLACE",
                 "WORKER_VERSION_ID": "TO_REPLACE",
                 "SERVER_TIER": "container",
@@ -119,6 +121,8 @@
         "staging": {
             "vars": {
                 "STAGE": "staging",
+                // TODO: temporary, traces incremental cache key resolution.
+                "DEBUG_CACHE_KEYS": "true",
                 "WORKER_VERSION_ID": "TO_REPLACE",
                 "OPEN_NEXT_REQUEST_ID_HEADER": "true",
                 "SERVER_TIER": "container",

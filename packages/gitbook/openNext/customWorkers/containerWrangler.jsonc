@@ -103,6 +103,8 @@
         "preview": {
             "vars": {
                 "STAGE": "preview",
+                // TODO: temporary, traces incremental cache key resolution.
+                "DEBUG_CACHE_KEYS": "true",
                 "CONTAINER_INSTANCES": "3",
                 "NEXT_CACHE_DO_QUEUE_DISABLE_SQLITE": "true",
                 "OPEN_NEXT_REQUEST_ID_HEADER": "true",
@@ -179,6 +181,8 @@
         "staging": {
             "vars": {
                 "STAGE": "staging",
+                // TODO: temporary, traces incremental cache key resolution.
+                "DEBUG_CACHE_KEYS": "true",
                 "CONTAINER_INSTANCES": "5",
                 "NEXT_CACHE_DO_QUEUE_DISABLE_SQLITE": "true",
                 "OPEN_NEXT_REQUEST_ID_HEADER": "true",

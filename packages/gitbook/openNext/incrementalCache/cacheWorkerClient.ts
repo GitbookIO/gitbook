@@ -6,7 +6,7 @@ import type {
 } from '@opennextjs/aws/types/overrides.js';
 import { getCloudflareContext } from '@opennextjs/cloudflare';
 
-import { CACHE_ORIGIN_SECURE, getBuildId, getReadUrl } from '../container/protocol';
+import { CACHE_ORIGIN_SECURE, getBuildId, getReadUrl, logCacheDebug } from '../container/protocol';
 
 export const BINDING_NAME = 'NEXT_INC_CACHE_WORKER';
 
@@ -30,8 +30,23 @@ export class GitbookIncrementalCache implements IncrementalCache {
     ): Promise<WithLastModified<CacheValue<CacheType>> | null> {
         try {
             const url = getReadUrl(key, cacheType, CACHE_ORIGIN_SECURE);
+            logCacheDebug('workerd.get', {
+                cacheType: cacheType ?? 'cache',
+                sentBuildId: url.searchParams.get('buildId'),
+                envOpenNextBuildId: process.env.OPEN_NEXT_BUILD_ID,
+                envDeploymentId: process.env.DEPLOYMENT_ID,
+                url: url.toString(),
+            });
 
             const response = await this.getWorker().fetch(new Request(url));
+            logCacheDebug('workerd.get.response', {
+                status: response.status,
+                // Set by the cache worker's response cache: a HIT here means the answer never
+                // reached R2, so the R2 key's build namespace was bypassed entirely.
+                cfCacheStatus: response.headers.get('cf-cache-status'),
+                age: response.headers.get('age'),
+                revalidated: response.headers.get('x-gitbook-cache-revalidated'),
+            });
             if (!response.ok) {
                 console.error('Failed to get from cache worker', response.status);
                 return null;
@@ -50,7 +65,13 @@ export class GitbookIncrementalCache implements IncrementalCache {
         cacheType?: CacheType
     ): Promise<void> {
         try {
-            await this.getWorker().set(key, value, cacheType, getBuildId(cacheType));
+            const buildId = getBuildId(cacheType);
+            logCacheDebug('workerd.set', {
+                cacheType: cacheType ?? 'cache',
+                sentBuildId: buildId,
+                envOpenNextBuildId: process.env.OPEN_NEXT_BUILD_ID,
+            });
+            await this.getWorker().set(key, value, cacheType, buildId);
         } catch (error) {
             console.error('Failed to set to cache worker', error);
         }

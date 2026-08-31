@@ -8,6 +8,8 @@ import type {
 import { getCloudflareContext } from '@opennextjs/cloudflare';
 import { createHash } from 'node:crypto';
 
+import { logCacheDebug } from '../container/protocol';
+
 export const BINDING_NAME = 'NEXT_INC_CACHE_R2_BUCKET';
 export const DEFAULT_PREFIX = 'incremental-cache';
 
@@ -135,9 +137,21 @@ export class GitbookIncrementalCache implements IncrementalCache {
 
         const hash = createHash('sha256').update(key).digest('hex');
         const buildId = this.buildId ?? process.env.OPEN_NEXT_BUILD_ID ?? process.env.DEPLOYMENT_ID;
-        return `${DEFAULT_PREFIX}/${cacheType === 'cache' ? buildId : 'dataCache'}/${hash}.${cacheType}`.replace(
-            /\/+/g,
-            '/'
-        );
+        const r2Key =
+            `${DEFAULT_PREFIX}/${cacheType === 'cache' ? buildId : 'dataCache'}/${hash}.${cacheType}`.replace(
+                /\/+/g,
+                '/'
+            );
+
+        logCacheDebug('worker.r2Key', {
+            cacheType,
+            callerBuildId: this.buildId,
+            workerEnvBuildId: process.env.OPEN_NEXT_BUILD_ID,
+            workerEnvDeploymentId: process.env.DEPLOYMENT_ID,
+            usedBuildId: buildId,
+            r2Key,
+        });
+
+        return r2Key;
     }
 }

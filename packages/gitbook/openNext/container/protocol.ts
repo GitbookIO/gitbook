@@ -70,6 +70,19 @@ export function getBuildId(cacheType?: CacheEntryType): string | undefined {
     return process.env.OPEN_NEXT_BUILD_ID ?? process.env.DEPLOYMENT_ID;
 }
 
+/**
+ * TODO: temporary. Set `DEBUG_CACHE_KEYS=true` on a worker to trace how a cache entry is
+ * addressed, end to end: what the caller sends, what the cache worker resolves, and whether the
+ * answer came from the cache worker's own response cache rather than R2.
+ */
+export function logCacheDebug(scope: string, fields: Record<string, unknown>): void {
+    if (process.env.DEBUG_CACHE_KEYS !== 'true') {
+        return;
+    }
+
+    console.log(`[cache-keys] ${scope} ${JSON.stringify(fields)}`);
+}
+
 export function getReadUrl(
     key: string,
     cacheType?: CacheEntryType,
