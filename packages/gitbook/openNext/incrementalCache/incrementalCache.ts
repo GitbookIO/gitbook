@@ -23,6 +23,12 @@ export type KeyOptions = {
 export class GitbookIncrementalCache implements IncrementalCache {
     name = 'GitbookIncrementalCache';
 
+    /**
+     * @param buildId Build ID of the tier the entry belongs to, when the caller sent one. Falls
+     * back to this worker's own build ID, which is the right one for callers deployed with it.
+     */
+    constructor(private readonly buildId?: string) {}
+
     async get<CacheType extends CacheEntryType = 'cache'>(
         key: string,
         cacheType?: CacheType
@@ -128,7 +134,7 @@ export class GitbookIncrementalCache implements IncrementalCache {
         }
 
         const hash = createHash('sha256').update(key).digest('hex');
-        const buildId = process.env.OPEN_NEXT_BUILD_ID ?? process.env.DEPLOYMENT_ID;
+        const buildId = this.buildId ?? process.env.OPEN_NEXT_BUILD_ID ?? process.env.DEPLOYMENT_ID;
         return `${DEFAULT_PREFIX}/${cacheType === 'cache' ? buildId : 'dataCache'}/${hash}.${cacheType}`.replace(
             /\/+/g,
             '/'

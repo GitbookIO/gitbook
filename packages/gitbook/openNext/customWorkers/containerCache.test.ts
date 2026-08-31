@@ -12,9 +12,13 @@ mock.module('cloudflare:workers', () => ({
     WorkerEntrypoint: class {},
 }));
 mock.module('../../.open-next/cloudflare/init.js', () => ({ runWithCloudflareRequestContext }));
+const cacheConstructor = mock();
 mock.module('../incrementalCache/incrementalCache', () => ({
     GitbookIncrementalCache: class {
         get = get;
+        constructor(buildId?: string) {
+            cacheConstructor(buildId);
+        }
     },
 }));
 mock.module('@opennextjs/aws/utils/cache.js', () => ({ getTagsFromValue }));
@@ -40,6 +44,7 @@ describe('IncrementalCacheWorker fetch', () => {
     beforeEach(() => {
         selfFetch.mockReset();
         get.mockReset();
+        cacheConstructor.mockReset();
         getTagsFromValue.mockReset();
         hasBeenRevalidated.mockReset();
         getTagsFromValue.mockReturnValue(['space:1']);
@@ -79,6 +84,18 @@ describe('IncrementalCacheWorker fetch', () => {
         expect(forwardedURL.pathname).toBe('/internal');
         expect(forwardedURL.searchParams.get('key')).toBe('entry');
         expect(forwardedURL.searchParams.get('cacheType')).toBe('cache');
+    });
+
+    it('reads the entry under the build ID sent by the caller', async () => {
+        get.mockResolvedValue(null);
+
+        await fetch(
+            new Request(
+                'https://incremental-cache.internal/internal?key=entry&cacheType=cache&buildId=caller-build-id'
+            )
+        );
+
+        expect(cacheConstructor).toHaveBeenCalledWith('caller-build-id');
     });
 
     it('reads and annotates a cache hit only on the internal endpoint', async () => {

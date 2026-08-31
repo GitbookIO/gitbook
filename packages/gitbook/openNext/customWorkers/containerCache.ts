@@ -136,12 +136,18 @@ export class IncrementalCacheWorker extends WorkerEntrypoint<CacheWorkerEnv> {
 
         const key = url.searchParams.get('key');
         const cacheType = url.searchParams.get('cacheType');
+        // Sent by the caller: this worker is deployed on its own, so its build ID is not the one
+        // the entry belongs to.
+        const buildId = url.searchParams.get('buildId') ?? undefined;
         if (!key || (cacheType !== null && !isCacheEntryType(cacheType))) {
             return new Response('Invalid cache request', { status: 400 });
         }
 
         return runWithCacheContext(request, this.env, this.ctx, async () => {
-            const value = await new GitbookIncrementalCache().get(key, cacheType ?? undefined);
+            const value = await new GitbookIncrementalCache(buildId).get(
+                key,
+                cacheType ?? undefined
+            );
             if (!value?.value) {
                 return nullCacheResponse();
             }
@@ -168,16 +174,17 @@ export class IncrementalCacheWorker extends WorkerEntrypoint<CacheWorkerEnv> {
     async set<CacheType extends CacheEntryType>(
         key: string,
         value: CacheValue<CacheType>,
-        cacheType?: CacheType
+        cacheType?: CacheType,
+        buildId?: string
     ): Promise<void> {
         await this.#runRpcOperation(async () => {
-            await new GitbookIncrementalCache().set(key, value, cacheType);
+            await new GitbookIncrementalCache(buildId).set(key, value, cacheType);
         });
     }
 
-    async delete(key: string): Promise<void> {
+    async delete(key: string, buildId?: string): Promise<void> {
         await this.#runRpcOperation(async () => {
-            await new GitbookIncrementalCache().delete(key);
+            await new GitbookIncrementalCache(buildId).delete(key);
         });
     }
 
