@@ -9,8 +9,8 @@ import { CONTAINER_STYLE } from '../layout';
 import { ScrollContainer } from '../primitives/ScrollContainer';
 import type {
     ClientSiteSection,
-    ClientSiteSectionGroup,
     ClientSiteSections,
+    ClientSiteStructureNode,
 } from './encodeClientSiteSections';
 import { SectionIcon } from './SectionIcon';
 import { Button, Link, ToggleChevron } from '@/components/primitives';
@@ -101,7 +101,9 @@ export function SiteSectionTabs(props: {
                         const isActiveGroup =
                             isGroup &&
                             Boolean(findSectionInGroup(structureItem, currentSection.id));
-                        const isActive = isActiveGroup || id === currentSection.id;
+                        const isActive =
+                            isActiveGroup ||
+                            (structureItem.object === 'site-section' && id === currentSection.id);
                         return (
                             <NavigationMenu.Item key={id} value={id} id={id}>
                                 {isGroup && structureItem.children.length > 0 ? (
@@ -137,7 +139,7 @@ export function SiteSectionTabs(props: {
                                         render={
                                             <SectionTab
                                                 url={
-                                                    structureItem.object === 'site-section'
+                                                    structureItem.object !== 'site-section-group'
                                                         ? structureItem.url
                                                         : undefined
                                                 }
@@ -224,58 +226,58 @@ const SectionTab = React.forwardRef(function SectionTab(
  * A list of section tiles grouped in the dropdown for a section group
  */
 function SectionGroupTileList(props: {
-    items: (ClientSiteSection | ClientSiteSectionGroup)[];
+    items: ClientSiteStructureNode[];
     currentSection: ClientSiteSection;
 }) {
     const { items, currentSection } = props;
 
-    // Separate non-grouped sections from grouped sections
-    const sections = items.filter((item) => item.object === 'site-section');
+    // Separate navigable items (sections, external links) from grouped items.
+    const navigableItems = items.filter((item) => item.object !== 'site-section-group');
     const groups = items.filter((item) => item.object === 'site-section-group');
 
-    const hasSections = sections.length > 0;
+    const hasNavigableItems = navigableItems.length > 0;
     const hasGroups = groups.length > 0;
-    // Loose sections only lead when the structure opens with one, otherwise they read as secondary links and trail the groups.
-    const sectionsLead = items[0]?.object === 'site-section';
+    // Navigable items lead when the structure opens with one; otherwise they read as secondary links and trail the groups.
+    const navigableItemsLead = items[0]?.object !== 'site-section-group';
     const isMasonryLayout = groups.length > GROUP_MASONRY_THRESHOLD;
-    const masonryRows = groups.reduce((total, group) => total + 1 + group.children.length, 0); // title + sections
+    const masonryRows = groups.reduce((total, group) => total + 1 + group.children.length, 0); // title + children
     const masonryColumnCount = Math.min(
         Math.max(Math.ceil(groups.length / 2), Math.ceil(masonryRows / MAX_ITEMS_PER_COLUMN)),
         MAX_MASONRY_COLUMNS
     );
 
     // Whichever panel comes second is recessed: it carries the divider, the background and inverted tile icons.
-    const sectionsRecessed = hasGroups && !sectionsLead;
-    const groupsRecessed = hasSections && sectionsLead;
+    const navigableItemsRecessed = hasGroups && !navigableItemsLead;
+    const groupsRecessed = hasNavigableItems && navigableItemsLead;
     const RECESSED_PANEL = 'border-tint-subtle bg-tint-subtle max-md:border-t md:border-l';
 
-    // Non-grouped sections. The wrapper spans the dropdown's height, so the list itself can stay content-sized.
-    const sectionsPanel = hasSections ? (
+    // Non-grouped navigation items. The wrapper spans the dropdown's height, so the list itself can stay content-sized.
+    const navigableItemsPanel = hasNavigableItems ? (
         <div
             className={tcls(
                 'w-full shrink-0 md:w-max',
-                hasGroups ? (sectionsRecessed ? RECESSED_PANEL : 'bg-tint-base') : ''
+                hasGroups ? (navigableItemsRecessed ? RECESSED_PANEL : 'bg-tint-base') : ''
             )}
         >
             <ul
                 className="flex w-full grid-flow-row flex-col gap-x-2 gap-y-0.5 p-3 md:grid md:w-max"
                 style={{
-                    gridTemplateColumns: `repeat(${Math.ceil(sections.length / MAX_ITEMS_PER_COLUMN)}, minmax(0, 1fr))`,
+                    gridTemplateColumns: `repeat(${Math.ceil(navigableItems.length / MAX_ITEMS_PER_COLUMN)}, minmax(0, 1fr))`,
                 }}
             >
-                {sections.map((section) => (
+                {navigableItems.map((item) => (
                     <SectionGroupTile
-                        key={section.id}
-                        child={section}
+                        key={item.id}
+                        child={item}
                         currentSection={currentSection}
-                        invertIcon={sectionsRecessed}
+                        invertIcon={navigableItemsRecessed}
                     />
                 ))}
             </ul>
         </div>
     ) : null;
 
-    // Grouped sections
+    // Grouped navigation items.
     const groupsPanel = hasGroups ? (
         <div
             className={tcls(
@@ -318,15 +320,15 @@ function SectionGroupTileList(props: {
 
     return (
         <div className="flex w-full flex-col md:flex-row">
-            {sectionsLead ? (
+            {navigableItemsLead ? (
                 <>
-                    {sectionsPanel}
+                    {navigableItemsPanel}
                     {groupsPanel}
                 </>
             ) : (
                 <>
                     {groupsPanel}
-                    {sectionsPanel}
+                    {navigableItemsPanel}
                 </>
             )}
         </div>
@@ -337,7 +339,7 @@ function SectionGroupTileList(props: {
  * A section tile shown in the dropdown for a section group
  */
 function SectionGroupTile(props: {
-    child: ClientSiteSection | ClientSiteSectionGroup;
+    child: ClientSiteStructureNode;
     currentSection: ClientSiteSection;
     invertIcon?: boolean;
     /** Whether the tile is a top-level group of the dropdown's masonry layout. */
@@ -345,9 +347,9 @@ function SectionGroupTile(props: {
 }) {
     const { child, currentSection, invertIcon, isMasonry } = props;
 
-    if (child.object === 'site-section') {
+    if (child.object !== 'site-section-group') {
         const { url, icon, title, description } = child;
-        const isActive = child.id === currentSection.id;
+        const isActive = child.object === 'site-section' && child.id === currentSection.id;
         return (
             <li className="group/section-tile flex w-full min-w-0 shrink-0 grow md:max-w-[var(--site-section-tile-max-width)]">
                 <Link

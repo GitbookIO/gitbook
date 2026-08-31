@@ -1,5 +1,6 @@
 'use client';
 
+import assertNever from 'assert-never';
 import { motion } from 'motion/react';
 import React from 'react';
 
@@ -9,6 +10,7 @@ import { useToggleAnimation } from '../hooks';
 import { Link, ToggleChevron } from '../primitives';
 import { ScrollContainer } from '../primitives/ScrollContainer';
 import type {
+    ClientSiteNavigationItem,
     ClientSiteSection,
     ClientSiteSectionGroup,
     ClientSiteSections,
@@ -45,23 +47,30 @@ export function SiteSectionList(props: { sections: ClientSiteSections; className
                 >
                     <div className="flex w-full flex-col px-2">
                         {sectionsAndGroups.map((item) => {
-                            if (item.object === 'site-section-group') {
-                                return (
-                                    <SiteSectionGroupItem
-                                        key={item.id}
-                                        group={item}
-                                        currentSection={currentSection}
-                                    />
-                                );
+                            switch (item.object) {
+                                case 'site-section-group':
+                                    return (
+                                        <SiteSectionGroupItem
+                                            key={item.id}
+                                            group={item}
+                                            currentSection={currentSection}
+                                        />
+                                    );
+                                case 'site-section':
+                                case 'site-external-link':
+                                    return (
+                                        <SiteSectionListItem
+                                            item={item}
+                                            isActive={
+                                                item.object === 'site-section' &&
+                                                item.id === currentSection.id
+                                            }
+                                            key={item.id}
+                                        />
+                                    );
+                                default:
+                                    return assertNever(item, 'Unknown client site structure node');
                             }
-
-                            return (
-                                <SiteSectionListItem
-                                    section={item}
-                                    isActive={item.id === currentSection.id}
-                                    key={item.id}
-                                />
-                            );
                         })}
                     </div>
                 </ScrollContainer>
@@ -71,18 +80,18 @@ export function SiteSectionList(props: { sections: ClientSiteSections; className
 }
 
 export function SiteSectionListItem(props: {
-    section: ClientSiteSection;
+    item: ClientSiteNavigationItem;
     isActive: boolean;
     className?: string;
     style?: React.CSSProperties;
 }) {
-    const { section, isActive, className, style, ...otherProps } = props;
+    const { item, isActive, className, style, ...otherProps } = props;
 
     return (
         <Link
-            href={section.url}
-            aria-current={isActive && 'page'}
-            id={section.id}
+            href={item.url}
+            aria-current={isActive ? 'page' : undefined}
+            id={item.id}
             className={tcls(
                 'group/section-link',
                 'flex',
@@ -115,15 +124,15 @@ export function SiteSectionListItem(props: {
                         : null
                 )}
             >
-                {section.icon ? (
-                    <SectionIcon icon={section.icon as IconName} isActive={isActive} />
+                {item.icon ? (
+                    <SectionIcon icon={item.icon as IconName} isActive={isActive} />
                 ) : (
-                    <span className={`text-sm opacity-8 ${isActive && 'opacity-10'}`}>
-                        {section.title.substring(0, 2)}
+                    <span className={tcls('text-sm opacity-8', isActive && 'opacity-10')}>
+                        {item.title.substring(0, 2)}
                     </span>
                 )}
             </div>
-            {section.title}
+            {item.title}
         </Link>
     );
 }
@@ -219,24 +228,31 @@ export function SiteSectionGroupItem(props: {
             {hasDescendants ? (
                 <Descendants isVisible={isOpen}>
                     {group.children.map((child) => {
-                        if (child.object === 'site-section') {
-                            return (
-                                <SiteSectionListItem
-                                    section={child}
-                                    isActive={child.id === currentSection.id}
-                                    key={child.id}
-                                />
-                            );
+                        switch (child.object) {
+                            case 'site-section':
+                            case 'site-external-link':
+                                return (
+                                    <SiteSectionListItem
+                                        item={child}
+                                        isActive={
+                                            child.object === 'site-section' &&
+                                            child.id === currentSection.id
+                                        }
+                                        key={child.id}
+                                    />
+                                );
+                            case 'site-section-group':
+                                return (
+                                    <SiteSectionGroupItem
+                                        group={child}
+                                        currentSection={currentSection}
+                                        key={child.id}
+                                        level={level + 1}
+                                    />
+                                );
+                            default:
+                                return assertNever(child, 'Unknown client site structure node');
                         }
-
-                        return (
-                            <SiteSectionGroupItem
-                                group={child}
-                                currentSection={currentSection}
-                                key={child.id}
-                                level={level + 1}
-                            />
-                        );
                     })}
                 </Descendants>
             ) : null}

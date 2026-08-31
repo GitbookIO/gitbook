@@ -1,3 +1,4 @@
+import assertNever from 'assert-never';
 import urlJoin from 'url-join';
 
 import {
@@ -23,7 +24,7 @@ import { findBestTargetURL } from '../SiteSections/encodeClientSiteSections';
 import { categorizeVariants } from '../SpaceLayout/categorizeVariants';
 import { BreadcrumbItemDropdown, type BreadcrumbSibling } from './BreadcrumbItemDropdown';
 import { PageTags } from './PageTags';
-import type { GitBookSiteContext } from '@/lib/context';
+import type { GitBookSiteContext, SiteStructureNode } from '@/lib/context';
 import { type AncestorRevisionPage, resolveFirstDocument } from '@/lib/pages';
 import { getLocalizedTitle, getSiteSpaceURL } from '@/lib/sites';
 import { tcls } from '@/lib/tailwind';
@@ -53,7 +54,9 @@ export async function PageHeader(props: {
     // (mirroring the section tabs). A single-space site has one section named after the site, which
     // is not a meaningful breadcrumb.
     const hasMultipleSections = Boolean(
-        context.visibleSections && context.visibleSections.list.length > 1
+        context.visibleSections &&
+        context.visibleSections.list.filter((item) => item.object !== 'site-external-link').length >
+            1
     );
     const currentSection = hasMultipleSections ? (context.sections?.current ?? null) : null;
     // Variants to offer as a crumb: only the "generic" variants (versions, etc.). Language variants
@@ -64,8 +67,9 @@ export async function PageHeader(props: {
     const contextCrumbs: BreadcrumbContextCrumb[] = [];
     if (currentSection) {
         // Walk the full section tree so the current section (and its enclosing groups) always shows
-        // as a crumb, even when it's hidden in the site structure. Only *visible* sections/groups
-        // are offered as siblings to switch to, though.
+        // as a crumb, even when it's hidden in the site structure. Siblings are the other nodes at
+        // the same level that the breadcrumb dropdown offers as section/group switch targets;
+        // external links are intentionally excluded from those section-only targets.
         const chain = context.sections
             ? findSectionChain(context.sections.list, currentSection.id)
             : [];
@@ -82,6 +86,9 @@ export async function PageHeader(props: {
                 label: getLocalizedTitle(node, context.locale),
                 icon: node.icon,
                 siblings: siblings
+                    .filter(
+                        (sibling): sibling is SectionNode => sibling.object !== 'site-external-link'
+                    )
                     // Don't offer hidden sections/groups as switch targets.
                     .filter((sibling) => !visibleSectionIds || visibleSectionIds.has(sibling.id))
                     .map((sibling) => {
@@ -353,19 +360,27 @@ type SectionNode = SiteSection | SiteSectionGroup;
  * an empty array if the section isn't found.
  */
 function findSectionChain(
-    list: SectionNode[],
+    list: SiteStructureNode[],
     sectionId: string
-): { node: SectionNode; siblings: SectionNode[] }[] {
+): { node: SectionNode; siblings: SiteStructureNode[] }[] {
     for (const item of list) {
-        if (item.object === 'site-section') {
-            if (item.id === sectionId) {
-                return [{ node: item, siblings: list }];
+        switch (item.object) {
+            case 'site-section':
+                if (item.id === sectionId) {
+                    return [{ node: item, siblings: list }];
+                }
+                break;
+            case 'site-section-group': {
+                const nested = findSectionChain(item.children, sectionId);
+                if (nested.length > 0) {
+                    return [{ node: item, siblings: list }, ...nested];
+                }
+                break;
             }
-        } else {
-            const nested = findSectionChain(item.children, sectionId);
-            if (nested.length > 0) {
-                return [{ node: item, siblings: list }, ...nested];
-            }
+            case 'site-external-link':
+                break;
+            default:
+                return assertNever(item, 'Unknown site structure node object type');
         }
     }
     return [];
@@ -376,16 +391,55 @@ function findSectionChain(
  * section found in its (possibly nested) children.
  */
 function findFirstSection(node: SectionNode): SiteSection | null {
-    if (node.object === 'site-section') {
-        return node;
+    switch (node.object) {
+        case 'site-section':
+            return node;
+        case 'site-section-group':
+            for (const child of node.children) {
+                switch (child.object) {
+                    case 'site-section':
+                        return child;
+                    case 'site-section-group': {
+                        const found = findFirstSection(child);
+                        if (found) {
+                            return found;
+                        }
+                        break;
+                    }
+                    case 'site-external-link':
+                        break;
+                    default:
+                        return assertNever(child, 'Unknown site structure node object type');
+                }
+            }
+            return null;
+        default:
+            return assertNever(node, 'Unknown section node object type');
     }
-    for (const child of node.children) {
-        const found = findFirstSection(child);
-        if (found) {
-            return found;
+}
+
+/** Collect the ids of every section and section group in a (visible) section tree. */
+function collectSectionNodeIds(list: SiteStructureNode[]): Set<string> {
+    const ids = new Set<string>();
+    const walk = (nodes: SiteStructureNode[]) => {
+        for (const node of nodes) {
+            switch (node.object) {
+                case 'site-section':
+                    ids.add(node.id);
+                    break;
+                case 'site-section-group':
+                    ids.add(node.id);
+                    walk(node.children);
+                    break;
+                case 'site-external-link':
+                    break;
+                default:
+                    assertNever(node, 'Unknown site structure node object type');
+            }
         }
-    }
-    return null;
+    };
+    walk(list);
+    return ids;
 }
 
 /**
@@ -397,21 +451,6 @@ function findFirstSection(node: SectionNode): SiteSection | null {
 function getSectionNodeURL(context: GitBookSiteContext, node: SectionNode): string | undefined {
     const section = findFirstSection(node);
     return section ? findBestTargetURL(context, section) : undefined;
-}
-
-/** Collect the ids of every section and section group in a (visible) section tree. */
-function collectSectionNodeIds(list: SectionNode[]): Set<string> {
-    const ids = new Set<string>();
-    const walk = (nodes: SectionNode[]) => {
-        for (const node of nodes) {
-            ids.add(node.id);
-            if (node.object === 'site-section-group') {
-                walk(node.children);
-            }
-        }
-    };
-    walk(list);
-    return ids;
 }
 
 /**

@@ -1,5 +1,6 @@
 import type { SiteExternalLink, SiteSection, SiteSectionGroup, SiteSpace } from '@gitbook/api';
 
+import { hasMultipleSiteSections } from '../SiteSections';
 import type { GitBookSiteContext } from '@/lib/context';
 import { getLocalizedTitle } from '@/lib/sites';
 
@@ -41,7 +42,7 @@ export function getSearchBaseProps(context: GitBookSiteContext): SearchBaseProps
         sections,
         siteSpace,
         siteSpaces: visibleSiteSpaces,
-        withSections: countSearchSections(sections) > 1,
+        withSections: hasMultipleSiteSections(visibleSections),
         withSiteVariants:
             visibleSections?.list.some(
                 (section) => section.object === 'site-section' && section.siteSpaces.length > 1
@@ -121,12 +122,4 @@ export function findSearchSection(
     }
 
     return undefined;
-}
-
-function countSearchSections(items: SearchSectionItem[]): number {
-    return items.reduce(
-        (count, item) =>
-            count + (item.object === 'site-section' ? 1 : countSearchSections(item.children)),
-        0
-    );
 }
