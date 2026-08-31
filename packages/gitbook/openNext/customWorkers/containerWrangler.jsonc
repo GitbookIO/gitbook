@@ -46,7 +46,7 @@
                     "image": "./Dockerfile",
                     // Relative to this config file, so the Dockerfile can COPY .open-next-container.
                     "image_build_context": "../..",
-                    "instance_type": "standard-1",
+                    "instance_type": "standard-2",
                     "max_instances": 1,
                 },
             ],
