@@ -1,0 +1,4 @@
+# The image only needs the `@opennextjs/aws` node bundle; without this the whole package
+# (.next, .open-next, public, node_modules) would be sent to the Docker daemon on every deploy.
+*
+!.open-next-container/server-functions/default

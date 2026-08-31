@@ -40,6 +40,14 @@ describe('GitbookIncrementalCache cache keys', () => {
         );
     });
 
+    it('prefers the build ID sent by the caller over the worker environment', () => {
+        process.env.OPEN_NEXT_BUILD_ID = 'cache-worker-build-id';
+
+        expect(new GitbookIncrementalCache('caller-build-id').getR2Key('entry')).toBe(
+            `${DEFAULT_PREFIX}/caller-build-id/${hash('entry')}.cache`
+        );
+    });
+
     it('normalizes composable cache keys before applying the deployment namespace', () => {
         process.env.OPEN_NEXT_BUILD_ID = 'deployment-id';
         const key = JSON.stringify(['next-build-id', 'cache-key']);

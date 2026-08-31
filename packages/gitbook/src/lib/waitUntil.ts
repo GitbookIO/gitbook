@@ -23,6 +23,13 @@ export async function waitUntil(promise: Promise<unknown>) {
             context.ctx.waitUntil(promise);
             return;
         }
+
+        // The container tier shares the Cloudflare build but runs as a long-lived Node server,
+        // where a detached promise keeps running after the response is sent.
+        promise.catch((error) => {
+            console.error('Ignored error in waitUntil', error);
+        });
+        return;
     }
 
     await promise.catch((error) => {

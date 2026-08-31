@@ -25,6 +25,8 @@
                 "NEXT_PRIVATE_DEBUG_CACHE": "true",
                 "OPEN_NEXT_REQUEST_ID_HEADER": "true",
                 "GITBOOK_URL": "http://localhost:8771",
+                // Unset (or any other value) routes to DEFAULT_WORKER instead.
+                "SERVER_TIER": "container",
             },
             "r2_buckets": [
                 {
@@ -43,15 +45,23 @@
                 },
                 {
                     "binding": "NEXT_INC_CACHE_WORKER",
-                    "service": "gitbook-open-v2-do-dev",
+                    "service": "gitbook-open-v2-container-dev",
+                    "entrypoint": "IncrementalCacheWorker",
+                },
+                {
+                    "binding": "CONTAINER_WORKER",
+                    "service": "gitbook-open-v2-container-dev",
                 },
             ],
         },
         "preview": {
             "vars": {
                 "STAGE": "preview",
+                // TODO: temporary, traces incremental cache key resolution.
+                "DEBUG_CACHE_KEYS": "true",
                 "PREVIEW_HOSTNAME": "TO_REPLACE",
                 "WORKER_VERSION_ID": "TO_REPLACE",
+                "SERVER_TIER": "container",
             },
             "r2_buckets": [
                 {
@@ -70,7 +80,12 @@
                 },
                 {
                     "binding": "NEXT_INC_CACHE_WORKER",
-                    "service": "gitbook-open-v2-do-preview",
+                    "service": "gitbook-open-v2-container-preview",
+                    "entrypoint": "IncrementalCacheWorker",
+                },
+                {
+                    "binding": "CONTAINER_WORKER",
+                    "service": "gitbook-open-v2-container-preview",
                 },
             ],
             "durable_objects": {
@@ -106,8 +121,11 @@
         "staging": {
             "vars": {
                 "STAGE": "staging",
+                // TODO: temporary, traces incremental cache key resolution.
+                "DEBUG_CACHE_KEYS": "true",
                 "WORKER_VERSION_ID": "TO_REPLACE",
                 "OPEN_NEXT_REQUEST_ID_HEADER": "true",
+                "SERVER_TIER": "container",
             },
             "routes": [
                 {
@@ -136,7 +154,12 @@
                 },
                 {
                     "binding": "NEXT_INC_CACHE_WORKER",
-                    "service": "gitbook-open-v2-do-staging",
+                    "service": "gitbook-open-v2-container-staging",
+                    "entrypoint": "IncrementalCacheWorker",
+                },
+                {
+                    "binding": "CONTAINER_WORKER",
+                    "service": "gitbook-open-v2-container-staging",
                 },
             ],
             "tail_consumers": [
@@ -209,7 +232,14 @@
                 },
                 {
                     "binding": "NEXT_INC_CACHE_WORKER",
-                    "service": "gitbook-open-v2-do-production",
+                    "service": "gitbook-open-v2-container-production",
+                    "entrypoint": "IncrementalCacheWorker",
+                },
+                // Bound but unused: production keeps `SERVER_TIER` unset so it serves from
+                // DEFAULT_WORKER. Setting the var here is all it takes to switch.
+                {
+                    "binding": "CONTAINER_WORKER",
+                    "service": "gitbook-open-v2-container-production",
                 },
             ],
             "tail_consumers": [

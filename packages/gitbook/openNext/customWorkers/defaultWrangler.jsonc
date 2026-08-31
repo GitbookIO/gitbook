@@ -35,7 +35,8 @@
                 },
                 {
                     "binding": "NEXT_INC_CACHE_WORKER",
-                    "service": "gitbook-open-v2-do-dev",
+                    "service": "gitbook-open-v2-container-dev",
+                    "entrypoint": "IncrementalCacheWorker",
                 },
             ],
             "durable_objects": {
@@ -60,6 +61,8 @@
         "preview": {
             "vars": {
                 "STAGE": "preview",
+                // TODO: temporary, traces incremental cache key resolution.
+                "DEBUG_CACHE_KEYS": "true",
                 // Just as a test for the preview environment to check that everything works
                 "NEXT_PRIVATE_DEBUG_CACHE": "true",
             },
@@ -76,7 +79,8 @@
                 },
                 {
                     "binding": "NEXT_INC_CACHE_WORKER",
-                    "service": "gitbook-open-v2-do-preview",
+                    "service": "gitbook-open-v2-container-preview",
+                    "entrypoint": "IncrementalCacheWorker",
                 },
             ],
             "durable_objects": {
@@ -102,6 +106,8 @@
         "staging": {
             "vars": {
                 "OPEN_NEXT_REQUEST_ID_HEADER": "true",
+                // TODO: temporary, traces incremental cache key resolution.
+                "DEBUG_CACHE_KEYS": "true",
             },
             "r2_buckets": [
                 {
@@ -116,7 +122,8 @@
                 },
                 {
                     "binding": "NEXT_INC_CACHE_WORKER",
-                    "service": "gitbook-open-v2-do-staging",
+                    "service": "gitbook-open-v2-container-staging",
+                    "entrypoint": "IncrementalCacheWorker",
                 },
             ],
             "durable_objects": {
@@ -164,7 +171,8 @@
                 },
                 {
                     "binding": "NEXT_INC_CACHE_WORKER",
-                    "service": "gitbook-open-v2-do-production",
+                    "service": "gitbook-open-v2-container-production",
+                    "entrypoint": "IncrementalCacheWorker",
                 },
             ],
             "durable_objects": {

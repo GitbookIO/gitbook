@@ -25,6 +25,22 @@
             "dependsOn": ["^build", "generate"],
             "outputs": [".next/**", "!.next/cache/**", "dist", ".open-next/**"]
         },
+        // Build the package for the Cloudflare container tier
+        "build:container": {
+            "dependsOn": ["^build", "generate"],
+            "outputs": [".next/**", "!.next/cache/**", "dist", ".open-next-container/**"]
+        },
+        // Build both the Cloudflare workers and the container, sharing a single `next build`
+        "build:all": {
+            "dependsOn": ["^build", "generate"],
+            "outputs": [
+                ".next/**",
+                "!.next/cache/**",
+                "dist",
+                ".open-next/**",
+                ".open-next-container/**"
+            ]
+        },
         // Check the package for type errors
         "typecheck": {
             "dependsOn": ["^typecheck", "build"]

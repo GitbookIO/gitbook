@@ -1,0 +1,356 @@
+{
+    "main": "container.ts",
+    "name": "gitbook-open-v2-container",
+    "compatibility_date": "2026-06-14",
+    "compatibility_flags": [
+        "nodejs_compat",
+        "allow_importable_env",
+        "global_fetch_strictly_public",
+    ],
+    "observability": {
+        "enabled": false,
+    },
+    // Same region as the DO worker: the cache tier reads R2 and drives the Durable Objects hosted
+    // there, and the container instances follow the Durable Object that owns them.
+    "placement": {
+        "region": "gcp:us-central1",
+    },
+    // Enables the response cache for the cache tier alone. The default entrypoint forwards to the
+    // container and serves rendered pages, which must never be cached here.
+    "exports": {
+        "IncrementalCacheWorker": {
+            "type": "worker",
+            "cache": {
+                "enabled": true,
+            },
+        },
+    },
+    "env": {
+        "dev": {
+            "vars": {
+                "STAGE": "dev",
+                "CONTAINER_INSTANCES": "1",
+                "OPEN_NEXT_BUILD_ID": "local",
+                "NEXT_CACHE_DO_QUEUE_DISABLE_SQLITE": "true",
+                "OPEN_NEXT_REQUEST_ID_HEADER": "true",
+                // Forwarded into the container by NextServerContainer.envVars. Note that the
+                // container cannot reach this host itself: anything the app fetches server-side
+                // (icons, assets) must resolve to a public URL, so build with the env loaded
+                // (`env-cmd -f ../../.env.local`) to get an absolute GITBOOK_ICONS_URL.
+                "GITBOOK_URL": "http://localhost:8771",
+            },
+            // `containers` is not inherited from the top-level config, it has to be repeated per env.
+            "containers": [
+                {
+                    "class_name": "NextServerContainer",
+                    "image": "./Dockerfile",
+                    // Relative to this config file, so the Dockerfile can COPY .open-next-container.
+                    "image_build_context": "../..",
+                    "instance_type": {
+                        // Vercel's "Performance" tier is 2 vCPU / 4 GiB, but Cloudflare requires at
+                        // least 3 GiB per vCPU, so 6 GiB is the floor at 2 vCPU.
+                        "vcpu": 2,
+                        "memory_mib": 6144,
+                        "disk_mb": 8192,
+                    },
+                    "max_instances": 1,
+                },
+            ],
+            "durable_objects": {
+                "bindings": [
+                    {
+                        "name": "NEXT_SERVER_CONTAINER",
+                        "class_name": "NextServerContainer",
+                    },
+                    // Hosted by the DO worker, which owns their stored state.
+                    {
+                        "name": "NEXT_CACHE_DO_QUEUE",
+                        "class_name": "DOQueueHandler",
+                        "script_name": "gitbook-open-v2-do-dev",
+                    },
+                    {
+                        "name": "NEXT_TAG_CACHE_DO_SHARDED",
+                        "class_name": "DOShardedTagCache",
+                        "script_name": "gitbook-open-v2-do-dev",
+                    },
+                    {
+                        "name": "WRITE_BUFFER",
+                        "class_name": "R2WriteBuffer",
+                        "script_name": "gitbook-open-v2-do-dev",
+                    },
+                ],
+            },
+            "migrations": [
+                {
+                    "tag": "v1",
+                    "new_sqlite_classes": ["NextServerContainer"],
+                },
+            ],
+            "services": [
+                {
+                    "binding": "NEXT_INC_CACHE_WORKER",
+                    "service": "gitbook-open-v2-container-dev",
+                    "entrypoint": "IncrementalCacheWorker",
+                },
+                // The cache tier re-enters itself so the read goes through the response cache.
+                {
+                    "binding": "WORKER_SELF_REFERENCE",
+                    "service": "gitbook-open-v2-container-dev",
+                    "entrypoint": "IncrementalCacheWorker",
+                },
+            ],
+            "r2_buckets": [
+                {
+                    "binding": "NEXT_INC_CACHE_R2_BUCKET",
+                    "bucket_name": "gitbook-open-v2-cache-preview",
+                },
+            ],
+        },
+        "preview": {
+            "vars": {
+                "STAGE": "preview",
+                // TODO: temporary, traces incremental cache key resolution.
+                "DEBUG_CACHE_KEYS": "true",
+                "CONTAINER_INSTANCES": "3",
+                "NEXT_CACHE_DO_QUEUE_DISABLE_SQLITE": "true",
+                "OPEN_NEXT_REQUEST_ID_HEADER": "true",
+            },
+            "containers": [
+                {
+                    "class_name": "NextServerContainer",
+                    "image": "./Dockerfile",
+                    "image_build_context": "../..",
+                    "instance_type": {
+                        // Vercel's "Performance" tier is 2 vCPU / 4 GiB, but Cloudflare requires at
+                        // least 3 GiB per vCPU, so 6 GiB is the floor at 2 vCPU.
+                        "vcpu": 2,
+                        "memory_mib": 6144,
+                        "disk_mb": 8192,
+                    },
+                    "max_instances": 3,
+                },
+            ],
+            "durable_objects": {
+                "bindings": [
+                    {
+                        "name": "NEXT_SERVER_CONTAINER",
+                        "class_name": "NextServerContainer",
+                    },
+                    // Hosted by the DO worker, which owns their stored state.
+                    {
+                        "name": "NEXT_CACHE_DO_QUEUE",
+                        "class_name": "DOQueueHandler",
+                        "script_name": "gitbook-open-v2-do-preview",
+                    },
+                    {
+                        "name": "NEXT_TAG_CACHE_DO_SHARDED",
+                        "class_name": "DOShardedTagCache",
+                        "script_name": "gitbook-open-v2-do-preview",
+                    },
+                    {
+                        "name": "WRITE_BUFFER",
+                        "class_name": "R2WriteBuffer",
+                        "script_name": "gitbook-open-v2-do-preview",
+                    },
+                ],
+            },
+            "migrations": [
+                {
+                    "tag": "v1",
+                    "new_sqlite_classes": ["NextServerContainer"],
+                },
+            ],
+            "services": [
+                {
+                    "binding": "NEXT_INC_CACHE_WORKER",
+                    "service": "gitbook-open-v2-container-preview",
+                    "entrypoint": "IncrementalCacheWorker",
+                },
+                // The cache tier re-enters itself so the read goes through the response cache.
+                {
+                    "binding": "WORKER_SELF_REFERENCE",
+                    "service": "gitbook-open-v2-container-preview",
+                    "entrypoint": "IncrementalCacheWorker",
+                },
+            ],
+            "r2_buckets": [
+                {
+                    "binding": "NEXT_INC_CACHE_R2_BUCKET",
+                    "bucket_name": "gitbook-open-v2-cache-preview",
+                },
+            ],
+            "observability": {
+                "traces": {
+                    "enabled": true,
+                    "head_sampling_rate": 1,
+                },
+                "logs": {
+                    "enabled": true,
+                    "head_sampling_rate": 1,
+                },
+            },
+        },
+        "staging": {
+            "vars": {
+                "STAGE": "staging",
+                // TODO: temporary, traces incremental cache key resolution.
+                "DEBUG_CACHE_KEYS": "true",
+                "CONTAINER_INSTANCES": "5",
+                "NEXT_CACHE_DO_QUEUE_DISABLE_SQLITE": "true",
+                "OPEN_NEXT_REQUEST_ID_HEADER": "true",
+            },
+            "containers": [
+                {
+                    "class_name": "NextServerContainer",
+                    "image": "./Dockerfile",
+                    "image_build_context": "../..",
+                    "instance_type": {
+                        // Vercel's "Performance" tier is 2 vCPU / 4 GiB, but Cloudflare requires at
+                        // least 3 GiB per vCPU, so 6 GiB is the floor at 2 vCPU.
+                        "vcpu": 2,
+                        "memory_mib": 6144,
+                        "disk_mb": 8192,
+                    },
+                    "max_instances": 5,
+                },
+            ],
+            "durable_objects": {
+                "bindings": [
+                    {
+                        "name": "NEXT_SERVER_CONTAINER",
+                        "class_name": "NextServerContainer",
+                    },
+                    // Hosted by the DO worker, which owns their stored state.
+                    {
+                        "name": "NEXT_CACHE_DO_QUEUE",
+                        "class_name": "DOQueueHandler",
+                        "script_name": "gitbook-open-v2-do-staging",
+                    },
+                    {
+                        "name": "NEXT_TAG_CACHE_DO_SHARDED",
+                        "class_name": "DOShardedTagCache",
+                        "script_name": "gitbook-open-v2-do-staging",
+                    },
+                    {
+                        "name": "WRITE_BUFFER",
+                        "class_name": "R2WriteBuffer",
+                        "script_name": "gitbook-open-v2-do-staging",
+                    },
+                ],
+            },
+            "migrations": [
+                {
+                    "tag": "v1",
+                    "new_sqlite_classes": ["NextServerContainer"],
+                },
+            ],
+            "services": [
+                {
+                    "binding": "NEXT_INC_CACHE_WORKER",
+                    "service": "gitbook-open-v2-container-staging",
+                    "entrypoint": "IncrementalCacheWorker",
+                },
+                // The cache tier re-enters itself so the read goes through the response cache.
+                {
+                    "binding": "WORKER_SELF_REFERENCE",
+                    "service": "gitbook-open-v2-container-staging",
+                    "entrypoint": "IncrementalCacheWorker",
+                },
+            ],
+            "r2_buckets": [
+                {
+                    "binding": "NEXT_INC_CACHE_R2_BUCKET",
+                    "bucket_name": "gitbook-open-v2-cache-staging",
+                },
+            ],
+            "tail_consumers": [
+                {
+                    "service": "gitbook-x-staging-tail",
+                },
+            ],
+        },
+        "production": {
+            "vars": {
+                "STAGE": "production",
+                "CONTAINER_INSTANCES": "10",
+                // R2 is strongly consistent, so we can disable SQLite
+                "NEXT_CACHE_DO_QUEUE_DISABLE_SQLITE": "true",
+                // We don't want to pollute the memory with broken cache entries
+                // Most of the time, those are fake requests.
+                "NEXT_CACHE_DO_QUEUE_MAX_RETRIES": "1",
+                "OPEN_NEXT_REQUEST_ID_HEADER": "true",
+            },
+            "containers": [
+                {
+                    "class_name": "NextServerContainer",
+                    "image": "./Dockerfile",
+                    "image_build_context": "../..",
+                    "instance_type": {
+                        // Vercel's "Performance" tier is 2 vCPU / 4 GiB, but Cloudflare requires at
+                        // least 3 GiB per vCPU, so 6 GiB is the floor at 2 vCPU.
+                        "vcpu": 2,
+                        "memory_mib": 6144,
+                        "disk_mb": 8192,
+                    },
+                    // The middleware does not route production traffic here yet (`SERVER_TIER` is
+                    // unset there), this is headroom for when it does.
+                    "max_instances": 10,
+                },
+            ],
+            "durable_objects": {
+                "bindings": [
+                    {
+                        "name": "NEXT_SERVER_CONTAINER",
+                        "class_name": "NextServerContainer",
+                    },
+                    // Hosted by the DO worker, which owns their stored state.
+                    {
+                        "name": "NEXT_CACHE_DO_QUEUE",
+                        "class_name": "DOQueueHandler",
+                        "script_name": "gitbook-open-v2-do-production",
+                    },
+                    {
+                        "name": "NEXT_TAG_CACHE_DO_SHARDED",
+                        "class_name": "DOShardedTagCache",
+                        "script_name": "gitbook-open-v2-do-production",
+                    },
+                    {
+                        "name": "WRITE_BUFFER",
+                        "class_name": "R2WriteBuffer",
+                        "script_name": "gitbook-open-v2-do-production",
+                    },
+                ],
+            },
+            "migrations": [
+                {
+                    "tag": "v1",
+                    "new_sqlite_classes": ["NextServerContainer"],
+                },
+            ],
+            "services": [
+                {
+                    "binding": "NEXT_INC_CACHE_WORKER",
+                    "service": "gitbook-open-v2-container-production",
+                    "entrypoint": "IncrementalCacheWorker",
+                },
+                // The cache tier re-enters itself so the read goes through the response cache.
+                {
+                    "binding": "WORKER_SELF_REFERENCE",
+                    "service": "gitbook-open-v2-container-production",
+                    "entrypoint": "IncrementalCacheWorker",
+                },
+            ],
+            "r2_buckets": [
+                {
+                    "binding": "NEXT_INC_CACHE_R2_BUCKET",
+                    "bucket_name": "gitbook-open-v2-cache-production",
+                },
+            ],
+            "tail_consumers": [
+                {
+                    "service": "gitbook-x-prod-tail",
+                },
+            ],
+        },
+    },
+}

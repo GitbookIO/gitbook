@@ -68,6 +68,7 @@ jobs:
                   opServiceAccount: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
                   commitTag: ${{ github.ref == 'refs/heads/main' && 'main' || format('pr{0}', github.event.pull_request.number) }}
                   commitMessage: ${{ github.sha }}
+                  headSha: ${{ github.event.pull_request.head.sha || github.sha }}
             - name: Extract Worker ID
               id: extract-worker-id
               if: ${{ !steps.deploy.outputs.deployment-url }}

@@ -43,13 +43,24 @@ export default class extends WorkerEntrypoint {
                 return reqOrResp;
             }
 
-            if (this.env.STAGE !== 'preview') {
-                // https://developers.cloudflare.com/workers/configuration/versions-and-deployments/gradual-deployments/#version-affinity
-                reqOrResp.headers.set(
-                    'Cloudflare-Workers-Version-Overrides',
-                    `gitbook-open-v2-${this.env.STAGE}="${this.env.WORKER_VERSION_ID}"`
-                );
-                const response = await this.env.DEFAULT_WORKER?.fetch(reqOrResp, {
+            // `container` routes to the Next server running inside a Cloudflare Container,
+            // `worker` (the default) to the workerd server.
+            const isContainerTier = this.env.SERVER_TIER === 'container';
+            const serverWorker = isContainerTier
+                ? this.env.CONTAINER_WORKER
+                : this.env.DEFAULT_WORKER;
+
+            // The container worker is deployed, not versioned, so it has no per-version preview
+            // URL and version affinity does not apply to it — always go through the binding.
+            if (isContainerTier || this.env.STAGE !== 'preview') {
+                if (!isContainerTier) {
+                    // https://developers.cloudflare.com/workers/configuration/versions-and-deployments/gradual-deployments/#version-affinity
+                    reqOrResp.headers.set(
+                        'Cloudflare-Workers-Version-Overrides',
+                        `gitbook-open-v2-${this.env.STAGE}="${this.env.WORKER_VERSION_ID}"`
+                    );
+                }
+                const response = await serverWorker?.fetch(reqOrResp, {
                     redirect: 'manual',
                     cf: {
                         cacheEverything: false,
