@@ -46,7 +46,12 @@
                     "image": "./Dockerfile",
                     // Relative to this config file, so the Dockerfile can COPY .open-next-container.
                     "image_build_context": "../..",
-                    "instance_type": "standard-2",
+                    "instance_type": {
+                        // Matches Vercel's "Performance" tier: 2 vCPU, 4 GiB memory.
+                        "vcpu": 2,
+                        "memory_mib": 4096,
+                        "disk_mb": 8192,
+                    },
                     "max_instances": 1,
                 },
             ],
@@ -114,7 +119,12 @@
                     "class_name": "NextServerContainer",
                     "image": "./Dockerfile",
                     "image_build_context": "../..",
-                    "instance_type": "standard-2",
+                    "instance_type": {
+                        // Matches Vercel's "Performance" tier: 2 vCPU, 4 GiB memory.
+                        "vcpu": 2,
+                        "memory_mib": 4096,
+                        "disk_mb": 8192,
+                    },
                     "max_instances": 3,
                 },
             ],
@@ -192,7 +202,12 @@
                     "class_name": "NextServerContainer",
                     "image": "./Dockerfile",
                     "image_build_context": "../..",
-                    "instance_type": "standard-1",
+                    "instance_type": {
+                        // Matches Vercel's "Performance" tier: 2 vCPU, 4 GiB memory.
+                        "vcpu": 2,
+                        "memory_mib": 4096,
+                        "disk_mb": 8192,
+                    },
                     "max_instances": 5,
                 },
             ],
@@ -267,7 +282,12 @@
                     "class_name": "NextServerContainer",
                     "image": "./Dockerfile",
                     "image_build_context": "../..",
-                    "instance_type": "standard-1",
+                    "instance_type": {
+                        // Matches Vercel's "Performance" tier: 2 vCPU, 4 GiB memory.
+                        "vcpu": 2,
+                        "memory_mib": 4096,
+                        "disk_mb": 8192,
+                    },
                     // The middleware does not route production traffic here yet (`SERVER_TIER` is
                     // unset there), this is headroom for when it does.
                     "max_instances": 10,
