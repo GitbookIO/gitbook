@@ -25,6 +25,9 @@ inputs:
     commitMessage:
         description: 'Commit message to associate with the deployment'
         required: true
+    headSha:
+        description: 'Git ref being deployed, used for the deploymentId. Falls back to GITHUB_SHA'
+        required: false
 outputs:
     deployment-url:
         description: 'Deployment URL'
@@ -69,6 +72,9 @@ runs:
           run: bun run turbo build:all
           env:
               GITBOOK_RUNTIME: cloudflare
+              # `pull_request_target` sets GITHUB_SHA to the base branch tip, identical for every
+              # commit of a PR, which would keep the deployment ID (and its cache) unchanged.
+              GITBOOK_HEAD_SHA: ${{ inputs.headSha }}
               VERCEL_TARGET_ENV: ${{ inputs.environment }}
               GITBOOK_BLOCK_SEARCH_INDEXATION: ${{ inputs.environment == 'preview' && 'true' || '' }}
               GITBOOK_ALLOW_CUSTOMIZATION_OVERRIDE: ${{ inputs.environment == 'preview' && 'true' || '' }}
