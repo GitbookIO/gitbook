@@ -112,7 +112,7 @@
                     "class_name": "NextServerContainer",
                     "image": "./Dockerfile",
                     "image_build_context": "../..",
-                    "instance_type": "standard-1",
+                    "instance_type": "standard-2",
                     "max_instances": 3,
                 },
             ],
