@@ -1,0 +1,58 @@
+{
+    "main": "container.ts",
+    "name": "gitbook-open-v2-container",
+    "compatibility_date": "2026-06-14",
+    "compatibility_flags": [
+        "nodejs_compat",
+        "allow_importable_env",
+        "global_fetch_strictly_public",
+    ],
+    "observability": {
+        "enabled": false,
+    },
+    "env": {
+        "dev": {
+            "vars": {
+                "STAGE": "dev",
+                "CONTAINER_INSTANCES": "1",
+                "OPEN_NEXT_REQUEST_ID_HEADER": "true",
+                // Forwarded into the container by NextServerContainer.envVars. Note that the
+                // container cannot reach this host itself: anything the app fetches server-side
+                // (icons, assets) must resolve to a public URL, so build with the env loaded
+                // (`env-cmd -f ../../.env.local`) to get an absolute GITBOOK_ICONS_URL.
+                "GITBOOK_URL": "http://localhost:8771",
+            },
+            // `containers` is not inherited from the top-level config, it has to be repeated per env.
+            "containers": [
+                {
+                    "class_name": "NextServerContainer",
+                    "image": "./Dockerfile",
+                    // Relative to this config file, so the Dockerfile can COPY .open-next-container.
+                    "image_build_context": "../..",
+                    "instance_type": "standard-1",
+                    "max_instances": 1,
+                },
+            ],
+            "durable_objects": {
+                "bindings": [
+                    {
+                        "name": "NEXT_SERVER_CONTAINER",
+                        "class_name": "NextServerContainer",
+                    },
+                ],
+            },
+            "migrations": [
+                {
+                    "tag": "v1",
+                    "new_sqlite_classes": ["NextServerContainer"],
+                },
+            ],
+            "services": [
+                {
+                    "binding": "NEXT_INC_CACHE_WORKER",
+                    "service": "gitbook-open-v2-do-dev",
+                },
+            ],
+        },
+    },
+}

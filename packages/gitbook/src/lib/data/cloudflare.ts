@@ -10,5 +10,10 @@ export function getCloudflareContext() {
         return null;
     }
 
-    return getCloudflareContextOpenNext();
+    try {
+        return getCloudflareContextOpenNext();
+    } catch {
+        // The container tier shares the Cloudflare build, but runs on plain Node with no bindings.
+        return null;
+    }
 }

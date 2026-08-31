@@ -43,13 +43,20 @@ export default class extends WorkerEntrypoint {
                 return reqOrResp;
             }
 
+            // `container` routes to the Next server running inside a Cloudflare Container,
+            // `worker` (the default) to the workerd server.
+            const serverWorker =
+                this.env.SERVER_TIER === 'container'
+                    ? this.env.CONTAINER_WORKER
+                    : this.env.DEFAULT_WORKER;
+
             if (this.env.STAGE !== 'preview') {
                 // https://developers.cloudflare.com/workers/configuration/versions-and-deployments/gradual-deployments/#version-affinity
                 reqOrResp.headers.set(
                     'Cloudflare-Workers-Version-Overrides',
                     `gitbook-open-v2-${this.env.STAGE}="${this.env.WORKER_VERSION_ID}"`
                 );
-                const response = await this.env.DEFAULT_WORKER?.fetch(reqOrResp, {
+                const response = await serverWorker?.fetch(reqOrResp, {
                     redirect: 'manual',
                     cf: {
                         cacheEverything: false,

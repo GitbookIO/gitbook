@@ -25,6 +25,8 @@
                 "NEXT_PRIVATE_DEBUG_CACHE": "true",
                 "OPEN_NEXT_REQUEST_ID_HEADER": "true",
                 "GITBOOK_URL": "http://localhost:8771",
+                // Set to "container" to route to gitbook-open-v2-container-dev instead.
+                "SERVER_TIER": "container",
             },
             "r2_buckets": [
                 {
@@ -44,6 +46,10 @@
                 {
                     "binding": "NEXT_INC_CACHE_WORKER",
                     "service": "gitbook-open-v2-do-dev",
+                },
+                {
+                    "binding": "CONTAINER_WORKER",
+                    "service": "gitbook-open-v2-container-dev",
                 },
             ],
         },
