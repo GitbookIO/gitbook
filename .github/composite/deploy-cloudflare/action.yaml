@@ -63,8 +63,10 @@ runs:
               GITBOOK_IMAGE_RESIZE_MODE: ${{ inputs.opItem }}/GITBOOK_IMAGE_RESIZE_MODE
               GITBOOK_ASSETS_PREFIX: ${{ inputs.opItem }}/GITBOOK_ASSETS_PREFIX
               GITBOOK_FONTS_URL: ${{ inputs.opItem }}/GITBOOK_FONTS_URL
+        # `build:all` shares a single `next build` between the workerd tier (.open-next) and the
+        # container tier (.open-next-container), so both are built from the same bundle.
         - name: Build worker
-          run: bun run turbo build:cloudflare
+          run: bun run turbo build:all
           env:
               GITBOOK_RUNTIME: cloudflare
               VERCEL_TARGET_ENV: ${{ inputs.environment }}
@@ -93,6 +95,19 @@ runs:
               wranglerVersion: '4.122.0'
               environment: ${{ inputs.environment }}
               command: ${{ format('deploy --var OPEN_NEXT_BUILD_ID:{0} --config ./packages/gitbook/openNext/customWorkers/doWrangler.jsonc', steps.extract_deployment_id.outputs.deployment_id) }}
+
+        # `versions upload` never builds or pushes the container image, so the container tier uses
+        # `deploy` like the DO worker. It runs after the DO worker (which it binds to) and before
+        # the middleware (which binds to it).
+        - name: Deploy the container worker
+          uses: cloudflare/wrangler-action@v3.14.0
+          with:
+              apiToken: ${{ inputs.apiToken }}
+              accountId: ${{ inputs.accountId }}
+              workingDirectory: ./
+              wranglerVersion: '4.122.0'
+              environment: ${{ inputs.environment }}
+              command: deploy --config ./packages/gitbook/openNext/customWorkers/containerWrangler.jsonc
 
         - id: upload_server
           name: Upload server to Cloudflare

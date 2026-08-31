@@ -25,7 +25,7 @@
                 "NEXT_PRIVATE_DEBUG_CACHE": "true",
                 "OPEN_NEXT_REQUEST_ID_HEADER": "true",
                 "GITBOOK_URL": "http://localhost:8771",
-                // Set to "container" to route to gitbook-open-v2-container-dev instead.
+                // Unset (or any other value) routes to DEFAULT_WORKER instead.
                 "SERVER_TIER": "container",
             },
             "r2_buckets": [
@@ -58,6 +58,7 @@
                 "STAGE": "preview",
                 "PREVIEW_HOSTNAME": "TO_REPLACE",
                 "WORKER_VERSION_ID": "TO_REPLACE",
+                "SERVER_TIER": "container",
             },
             "r2_buckets": [
                 {
@@ -77,6 +78,10 @@
                 {
                     "binding": "NEXT_INC_CACHE_WORKER",
                     "service": "gitbook-open-v2-do-preview",
+                },
+                {
+                    "binding": "CONTAINER_WORKER",
+                    "service": "gitbook-open-v2-container-preview",
                 },
             ],
             "durable_objects": {
@@ -114,6 +119,7 @@
                 "STAGE": "staging",
                 "WORKER_VERSION_ID": "TO_REPLACE",
                 "OPEN_NEXT_REQUEST_ID_HEADER": "true",
+                "SERVER_TIER": "container",
             },
             "routes": [
                 {
@@ -143,6 +149,10 @@
                 {
                     "binding": "NEXT_INC_CACHE_WORKER",
                     "service": "gitbook-open-v2-do-staging",
+                },
+                {
+                    "binding": "CONTAINER_WORKER",
+                    "service": "gitbook-open-v2-container-staging",
                 },
             ],
             "tail_consumers": [
@@ -216,6 +226,12 @@
                 {
                     "binding": "NEXT_INC_CACHE_WORKER",
                     "service": "gitbook-open-v2-do-production",
+                },
+                // Bound but unused: production keeps `SERVER_TIER` unset so it serves from
+                // DEFAULT_WORKER. Setting the var here is all it takes to switch.
+                {
+                    "binding": "CONTAINER_WORKER",
+                    "service": "gitbook-open-v2-container-production",
                 },
             ],
             "tail_consumers": [

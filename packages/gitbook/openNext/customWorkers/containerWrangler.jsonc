@@ -54,5 +54,135 @@
                 },
             ],
         },
+        "preview": {
+            "vars": {
+                "STAGE": "preview",
+                "CONTAINER_INSTANCES": "3",
+                "OPEN_NEXT_REQUEST_ID_HEADER": "true",
+            },
+            "containers": [
+                {
+                    "class_name": "NextServerContainer",
+                    "image": "./Dockerfile",
+                    "image_build_context": "../..",
+                    "instance_type": "standard-1",
+                    "max_instances": 3,
+                },
+            ],
+            "durable_objects": {
+                "bindings": [
+                    {
+                        "name": "NEXT_SERVER_CONTAINER",
+                        "class_name": "NextServerContainer",
+                    },
+                ],
+            },
+            "migrations": [
+                {
+                    "tag": "v1",
+                    "new_sqlite_classes": ["NextServerContainer"],
+                },
+            ],
+            "services": [
+                {
+                    "binding": "NEXT_INC_CACHE_WORKER",
+                    "service": "gitbook-open-v2-do-preview",
+                },
+            ],
+            "observability": {
+                "traces": {
+                    "enabled": true,
+                    "head_sampling_rate": 1,
+                },
+                "logs": {
+                    "enabled": true,
+                    "head_sampling_rate": 1,
+                },
+            },
+        },
+        "staging": {
+            "vars": {
+                "STAGE": "staging",
+                "CONTAINER_INSTANCES": "5",
+                "OPEN_NEXT_REQUEST_ID_HEADER": "true",
+            },
+            "containers": [
+                {
+                    "class_name": "NextServerContainer",
+                    "image": "./Dockerfile",
+                    "image_build_context": "../..",
+                    "instance_type": "standard-1",
+                    "max_instances": 5,
+                },
+            ],
+            "durable_objects": {
+                "bindings": [
+                    {
+                        "name": "NEXT_SERVER_CONTAINER",
+                        "class_name": "NextServerContainer",
+                    },
+                ],
+            },
+            "migrations": [
+                {
+                    "tag": "v1",
+                    "new_sqlite_classes": ["NextServerContainer"],
+                },
+            ],
+            "services": [
+                {
+                    "binding": "NEXT_INC_CACHE_WORKER",
+                    "service": "gitbook-open-v2-do-staging",
+                },
+            ],
+            "tail_consumers": [
+                {
+                    "service": "gitbook-x-staging-tail",
+                },
+            ],
+        },
+        "production": {
+            "vars": {
+                "STAGE": "production",
+                "CONTAINER_INSTANCES": "10",
+                "OPEN_NEXT_REQUEST_ID_HEADER": "true",
+            },
+            "containers": [
+                {
+                    "class_name": "NextServerContainer",
+                    "image": "./Dockerfile",
+                    "image_build_context": "../..",
+                    "instance_type": "standard-1",
+                    // The middleware does not route production traffic here yet (`SERVER_TIER` is
+                    // unset there), this is headroom for when it does.
+                    "max_instances": 10,
+                },
+            ],
+            "durable_objects": {
+                "bindings": [
+                    {
+                        "name": "NEXT_SERVER_CONTAINER",
+                        "class_name": "NextServerContainer",
+                    },
+                ],
+            },
+            "migrations": [
+                {
+                    "tag": "v1",
+                    "new_sqlite_classes": ["NextServerContainer"],
+                },
+            ],
+            "services": [
+                {
+                    "binding": "NEXT_INC_CACHE_WORKER",
+                    "service": "gitbook-open-v2-do-production",
+                },
+            ],
+            "tail_consumers": [
+                {
+                    "service": "gitbook-x-prod-tail",
+                },
+            ],
+        },
     },
 }
