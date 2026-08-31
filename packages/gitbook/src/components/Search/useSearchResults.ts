@@ -45,6 +45,7 @@ export function useSearchResults(props: {
     query: string;
     siteSpaceId: string;
     siteSpaceIds: string[];
+    selectedSectionSiteSpaceIds?: string[];
     scope: SearchScope;
     suggestions?: string[];
     /** URL for the search API route (e.g. from linker.toPathInSpace('~gitbook/search')). */
@@ -63,6 +64,7 @@ export function useSearchResults(props: {
         query,
         siteSpaceId,
         siteSpaceIds,
+        selectedSectionSiteSpaceIds,
         scope,
         suggestions,
         searchURL,
@@ -74,8 +76,15 @@ export function useSearchResults(props: {
     const trackEvent = useTrackEvent();
 
     const filterSiteSpaceIds = React.useMemo(
-        () => computeFilterSiteSpaceIds(scope, siteSpaceId, siteSpaceIds, withSections),
-        [scope, siteSpaceId, siteSpaceIds, withSections]
+        () =>
+            computeFilterSiteSpaceIds(
+                scope,
+                siteSpaceId,
+                siteSpaceIds,
+                withSections,
+                selectedSectionSiteSpaceIds
+            ),
+        [scope, siteSpaceId, siteSpaceIds, withSections, selectedSectionSiteSpaceIds]
     );
 
     const { results: localResults } = useLocalSearchResults({
@@ -206,7 +215,12 @@ export function useSearchResults(props: {
 
             try {
                 const resultsPromise = fetchSearch(
-                    computeRemoteSearchScope(scope, siteSpaceId, siteSpaceIds)
+                    computeRemoteSearchScope(
+                        scope,
+                        siteSpaceId,
+                        siteSpaceIds,
+                        selectedSectionSiteSpaceIds
+                    )
                 );
 
                 const onResults = (results: OrderedComputedResult[]) => {
@@ -268,6 +282,7 @@ export function useSearchResults(props: {
         withAI,
         siteSpaceId,
         siteSpaceIds,
+        selectedSectionSiteSpaceIds,
         disabled,
         suggestions,
         searchURL,
