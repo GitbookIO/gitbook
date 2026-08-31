@@ -62,13 +62,21 @@ describe('handleCacheOutbound', () => {
 
     it('maps write paths onto the service binding RPC methods', async () => {
         await handleCacheOutbound(
-            post('/set', { key: 'entry', value: cacheValue, cacheType: 'cache' }),
+            post('/set', {
+                key: 'entry',
+                value: cacheValue,
+                cacheType: 'cache',
+                buildId: 'caller-build-id',
+            }),
             env()
         );
-        expect(set).toHaveBeenCalledWith('entry', cacheValue, 'cache');
+        expect(set).toHaveBeenCalledWith('entry', cacheValue, 'cache', 'caller-build-id');
 
-        await handleCacheOutbound(post('/delete', { key: 'entry' }), env());
-        expect(remove).toHaveBeenCalledWith('entry');
+        await handleCacheOutbound(
+            post('/delete', { key: 'entry', buildId: 'caller-build-id' }),
+            env()
+        );
+        expect(remove).toHaveBeenCalledWith('entry', 'caller-build-id');
 
         await handleCacheOutbound(post('/write-tags', { tags: ['content'] }), env());
         expect(writeTags).toHaveBeenCalledWith(['content']);

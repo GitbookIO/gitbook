@@ -6,12 +6,15 @@ import type {
 } from '@opennextjs/aws/types/overrides.js';
 
 /**
- * Protocol spoken between the Next.js server running inside the container and the cache worker.
+ * Protocol spoken to the cache worker, by both server tiers.
  *
- * The container has no Cloudflare bindings, so it issues plain `fetch` calls to this virtual host.
- * They never reach the network: the container Durable Object registers an outbound handler for the
- * host, and that handler runs in the Workers runtime where the `NEXT_INC_CACHE_WORKER` service
- * binding is available.
+ * The workerd tier reaches it through the `NEXT_INC_CACHE_WORKER` service binding. The container
+ * has no Cloudflare bindings, so it issues plain `fetch` calls to this virtual host instead; they
+ * never reach the network, because the container Durable Object registers an outbound handler for
+ * the host that runs in the Workers runtime where the binding is available.
+ *
+ * Both tiers build their requests here so they address a cache entry identically — the read URL is
+ * the cache worker's edge cache key, so any divergence would split that entry in two.
  */
 export const CACHE_HOST = 'incremental-cache.internal';
 
@@ -19,10 +22,10 @@ export const CACHE_HOST = 'incremental-cache.internal';
 // per-instance CA inside the image. The handler restores the `https:` scheme before forwarding.
 export const CACHE_ORIGIN = `http://${CACHE_HOST}`;
 
-/**
- * `read` deliberately keeps the URL shape used by the workerd tier so both tiers hit the same
- * entry in the cache worker's edge cache.
- */
+// What the cache worker actually sees, and so what the workerd tier sends directly.
+export const CACHE_ORIGIN_SECURE = `https://${CACHE_HOST}`;
+
+/** `read` is built by `getReadUrl` on both tiers, so they share one edge cache entry. */
 export const CACHE_PATH = {
     read: '/',
     set: '/set',
@@ -35,10 +38,12 @@ export type SetPayload = {
     key: string;
     value: CacheValue<CacheEntryType>;
     cacheType?: CacheEntryType;
+    buildId?: string;
 };
 
 export type DeletePayload = {
     key: string;
+    buildId?: string;
 };
 
 export type WriteTagsPayload = {
@@ -49,11 +54,35 @@ export type QueuePayload = {
     msg: QueueMessage;
 };
 
-export function getReadUrl(key: string, cacheType?: CacheEntryType): URL {
-    const url = new URL(CACHE_PATH.read, CACHE_ORIGIN);
+/**
+ * Build ID the calling tier's entries belong to.
+ *
+ * The cache worker namespaces `cache` entries per build but ships with the container worker, so
+ * during a gradual rollout of the workerd tier its own build ID is not the one the entry belongs
+ * to — callers have to send theirs. `fetch` and `composable` entries live in the shared `dataCache`
+ * namespace, so they deliberately resolve to `undefined`.
+ */
+export function getBuildId(cacheType?: CacheEntryType): string | undefined {
+    if (cacheType && cacheType !== 'cache') {
+        return undefined;
+    }
+
+    return process.env.OPEN_NEXT_BUILD_ID ?? process.env.DEPLOYMENT_ID;
+}
+
+export function getReadUrl(
+    key: string,
+    cacheType?: CacheEntryType,
+    origin: string = CACHE_ORIGIN
+): URL {
+    const url = new URL(CACHE_PATH.read, origin);
     url.searchParams.set('key', key);
     if (cacheType) {
         url.searchParams.set('cacheType', cacheType);
+    }
+    const buildId = getBuildId(cacheType);
+    if (buildId) {
+        url.searchParams.set('buildId', buildId);
     }
     return url;
 }

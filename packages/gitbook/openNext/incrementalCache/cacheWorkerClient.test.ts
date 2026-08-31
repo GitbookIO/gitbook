@@ -6,6 +6,7 @@ const getCloudflareContext = mock();
 mock.module('@opennextjs/cloudflare', () => ({ getCloudflareContext }));
 
 const { GitbookIncrementalCache } = await import('./cacheWorkerClient');
+const { CACHE_ORIGIN_SECURE, getReadUrl } = await import('../container/protocol');
 
 const cacheValue = {
     type: 'page' as const,
@@ -76,6 +77,18 @@ describe('GitbookIncrementalCache cache worker client', () => {
 
         await new GitbookIncrementalCache().set('key', fetchCacheValue, 'fetch');
         expect(set).toHaveBeenCalledWith('key', fetchCacheValue, 'fetch', undefined);
+    });
+
+    // The read URL is the cache worker's edge cache key, so the container tier — which builds it
+    // through the same `getReadUrl` — has to land on the exact same string.
+    it('reads through the URL shared with the container tier', async () => {
+        fetch.mockResolvedValue(Response.json(null));
+
+        await new GitbookIncrementalCache().get('entry', 'cache');
+
+        expect((fetch.mock.calls[0]?.[0] as Request).url).toBe(
+            getReadUrl('entry', 'cache', CACHE_ORIGIN_SECURE).toString()
+        );
     });
 
     it('returns null for cache misses and failed reads', async () => {

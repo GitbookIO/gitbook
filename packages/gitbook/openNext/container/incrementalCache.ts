@@ -11,6 +11,7 @@ import {
     CACHE_PATH,
     type DeletePayload,
     type SetPayload,
+    getBuildId,
     getReadUrl,
 } from './protocol';
 
@@ -48,6 +49,7 @@ export class GitbookContainerIncrementalCache implements IncrementalCache {
             key,
             value: value as CacheValue<CacheEntryType>,
             cacheType,
+            buildId: getBuildId(cacheType),
         };
 
         try {
@@ -58,7 +60,7 @@ export class GitbookContainerIncrementalCache implements IncrementalCache {
     }
 
     async delete(key: string): Promise<void> {
-        const payload: DeletePayload = { key };
+        const payload: DeletePayload = { key, buildId: getBuildId() };
 
         try {
             await this.post(CACHE_PATH.delete, payload);

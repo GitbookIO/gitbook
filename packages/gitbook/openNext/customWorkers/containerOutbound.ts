@@ -18,9 +18,10 @@ export type CacheWorkerBinding = {
     set<CacheType extends CacheEntryType>(
         key: string,
         value: CacheValue<CacheType>,
-        cacheType?: CacheType
+        cacheType?: CacheType,
+        buildId?: string
     ): Promise<void>;
-    delete(key: string): Promise<void>;
+    delete(key: string, buildId?: string): Promise<void>;
     writeTags(tags: NextModeTagCacheWriteInput[]): Promise<void>;
     enqueueRevalidation(msg: QueueMessage): Promise<void>;
 };
@@ -56,13 +57,13 @@ export async function handleCacheOutbound(
                 return await worker.fetch(new Request(url));
             }
             case CACHE_PATH.set: {
-                const { key, value, cacheType } = (await request.json()) as SetPayload;
-                await worker.set(key, value, cacheType);
+                const { key, value, cacheType, buildId } = (await request.json()) as SetPayload;
+                await worker.set(key, value, cacheType, buildId);
                 return noContent();
             }
             case CACHE_PATH.delete: {
-                const { key } = (await request.json()) as DeletePayload;
-                await worker.delete(key);
+                const { key, buildId } = (await request.json()) as DeletePayload;
+                await worker.delete(key, buildId);
                 return noContent();
             }
             case CACHE_PATH.writeTags: {
