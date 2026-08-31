@@ -69,8 +69,10 @@ export function shouldKeepSearchState(
     return values.q !== null || values.ask !== null || values.scope !== 'default';
 }
 
-export function SearchContextProvider(props: React.PropsWithChildren): React.ReactElement {
-    const { children } = props;
+export function SearchContextProvider(
+    props: React.PropsWithChildren<{ prewarmURL: string }>
+): React.ReactElement {
+    const { children, prewarmURL } = props;
 
     // URL-backed state
     const [rawState, setRawState] = useQueryStates(keyMap, {
@@ -93,7 +95,7 @@ export function SearchContextProvider(props: React.PropsWithChildren): React.Rea
         };
     }, [rawState, open]);
 
-    useSearchPrewarm(Boolean(state?.open));
+    useSearchPrewarm(Boolean(state?.open), prewarmURL);
 
     const stateRef = React.useRef(state);
     React.useLayoutEffect(() => {

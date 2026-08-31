@@ -1,15 +1,12 @@
 export interface SearchPrewarmer {
-    update(open: boolean): void;
+    update(open: boolean, prewarmSiteSearch: () => Promise<unknown>): void;
 }
 
-export function createSearchPrewarmer(
-    initiallyOpen: boolean,
-    prewarmSiteSearch: () => Promise<unknown>
-): SearchPrewarmer {
+export function createSearchPrewarmer(initiallyOpen: boolean): SearchPrewarmer {
     let wasOpen = initiallyOpen;
 
     return {
-        update(open) {
+        update(open, prewarmSiteSearch) {
             const shouldPrewarm = !wasOpen && open;
             wasOpen = open;
 

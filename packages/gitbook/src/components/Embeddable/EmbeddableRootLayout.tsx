@@ -57,6 +57,7 @@ export async function EmbeddableRootLayout({
                 externalLinksTarget={context.customization.externalLinks.target}
                 contextId={context.contextId}
                 proxyOrigin={context.site.proxy?.origin}
+                searchPrewarmURL={context.linker.toPathInSite('~gitbook/search-prewarm')}
             >
                 {/* Persist an explicit ?theme= override so it survives tab navigation. RND-11571 */}
                 <EmbeddableThemeSync forcedTheme={rememberedTheme} />

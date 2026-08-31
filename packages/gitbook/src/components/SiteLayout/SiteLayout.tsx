@@ -99,6 +99,7 @@ export async function SiteLayout(props: {
             defaultTheme={customization.themes.default}
             externalLinksTarget={customization.externalLinks.target}
             proxyOrigin={context.site.proxy?.origin}
+            searchPrewarmURL={context.linker.toPathInSite('~gitbook/search-prewarm')}
         >
             <AIContextProvider
                 aiMode={customization.ai?.mode}
