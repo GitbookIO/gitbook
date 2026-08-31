@@ -17,10 +17,11 @@ import { getContentTestURL } from './utils';
 export const STUBBED_OAUTH_CLIENT_ID = 'gitbook-open-tests-client-id';
 
 /**
- * Redirect URI the test client registers. Nothing ever listens on it: the flow is asserted at the
- * point where a real client would open a browser, so the authorization code never comes back.
+ * Redirect URI the test client registers. It is a dummy address that nothing serves: the flow is
+ * asserted at the point where a real client would open a browser, so the authorization code never
+ * comes back and this is never called.
  */
-const TEST_REDIRECT_URI = 'http://localhost:9999/callback';
+const TEST_REDIRECT_URI = 'https://auth.acme.org/mcp/callback';
 
 /**
  * Everything an MCP client observes while discovering how to authenticate against a site, recorded
