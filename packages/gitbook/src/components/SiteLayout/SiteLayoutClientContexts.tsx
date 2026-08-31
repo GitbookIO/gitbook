@@ -24,6 +24,7 @@ export function SiteLayoutClientContexts(props: {
     externalLinksTarget: SiteExternalLinksTarget;
     contextId: string | undefined;
     proxyOrigin: string | undefined;
+    searchPrewarmURL: string;
     children: React.ReactNode;
 }) {
     const {
@@ -34,6 +35,7 @@ export function SiteLayoutClientContexts(props: {
         externalLinksTarget,
         contextId,
         proxyOrigin,
+        searchPrewarmURL,
     } = props;
 
     useClearRouterCache(contextId);
@@ -67,7 +69,7 @@ export function SiteLayoutClientContexts(props: {
             <NuqsAdapter>
                 <SelectProvider>
                     <LinkContext.Provider value={linkContext}>
-                        <SearchContextProvider>
+                        <SearchContextProvider prewarmURL={searchPrewarmURL}>
                             <ReducedMotionProvider>{children}</ReducedMotionProvider>
                         </SearchContextProvider>
                     </LinkContext.Provider>
