@@ -13,7 +13,7 @@ import {
     useLastSearchQuery,
 } from './last-query';
 import { addRecentSearchQuery } from './recent-queries';
-import type { SearchBaseProps } from './search-props';
+import { findSearchSection, type SearchBaseProps } from './search-props';
 import type { SearchResultsRef } from './SearchResults';
 import { useSearchState, useSetSearchState } from './useSearch';
 import { useSearchResults } from './useSearchResults';
@@ -124,6 +124,7 @@ export function useSearchController(
         asEmbeddable,
         siteSpace,
         section,
+        sections,
         withVariants,
         withSiteVariants,
         withSections,
@@ -241,6 +242,7 @@ export function useSearchController(
         siteSpaces,
         language: siteSpace.space.language,
     });
+    const selectedSection = state?.section ? findSearchSection(sections, state.section) : undefined;
 
     const { results, fetching, error, abort } = useSearchResults({
         asEmbeddable,
@@ -249,6 +251,7 @@ export function useSearchController(
         query: normalizedQuery,
         siteSpaceId: siteSpace.id,
         siteSpaceIds,
+        selectedSectionSiteSpaceIds: selectedSection?.siteSpaceIds,
         scope: state?.scope ?? 'default',
         suggestions: config.suggestions,
         searchURL,
@@ -329,6 +332,7 @@ export function useSearchController(
         withSearchAI,
         scopeControl: {
             section,
+            sections,
             spaceTitle: getLocalizedTitle(siteSpace, siteSpace.space.language),
             withVariants,
             withSiteVariants,

@@ -27,6 +27,8 @@ export interface SearchState {
     query: string | null;
     ask: string | null;
     scope: SearchScope;
+    /** A section selected independently from the page currently being viewed. */
+    section?: string | null;
 
     // Local UI state
     open: boolean;
@@ -37,6 +39,7 @@ const keyMap = {
     q: parseAsString,
     ask: parseAsString,
     scope: parseAsStringLiteral(['all', 'default', 'extended', 'current']).withDefault('default'),
+    section: parseAsString,
     global: parseAsBoolean, // Legacy support for global=true
 };
 
@@ -91,6 +94,7 @@ export function SearchContextProvider(
             query: normalized.q,
             ask: normalized.ask,
             scope: normalized.scope,
+            section: normalized.section,
             open,
         };
     }, [rawState, open]);
@@ -112,7 +116,7 @@ export function SearchContextProvider(
 
             if (update === null) {
                 setIsOpen(false);
-                return setRawState({ q: null, ask: null, scope: 'default' });
+                return setRawState({ q: null, ask: null, scope: 'default', section: null });
             }
 
             setIsOpen(update.open);
@@ -120,6 +124,10 @@ export function SearchContextProvider(
                 q: update.query,
                 ask: update.ask,
                 scope: update.scope,
+                section:
+                    update.section === undefined
+                        ? (stateRef.current?.section ?? null)
+                        : update.section,
             });
         },
         [setRawState]
@@ -165,6 +173,9 @@ export function useSearchLink(): (
             params.query ? searchParams.set('q', params.query) : searchParams.delete('q');
             params.ask ? searchParams.set('ask', params.ask) : searchParams.delete('ask');
             params.scope ? searchParams.set('scope', params.scope) : searchParams.delete('scope');
+            params.section
+                ? searchParams.set('section', params.section)
+                : searchParams.delete('section');
             return {
                 href: `?${searchParams.toString()}`,
                 prefetch: false,
@@ -175,6 +186,7 @@ export function useSearchLink(): (
                         query: params.query !== undefined ? params.query : null,
                         ask: params.ask !== undefined ? params.ask : null,
                         scope: params.scope !== undefined ? params.scope : 'default',
+                        section: params.section,
                         open: params.open !== undefined ? params.open : false,
                     }));
                     callback?.();
