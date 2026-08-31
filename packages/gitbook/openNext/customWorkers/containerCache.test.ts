@@ -22,7 +22,7 @@ mock.module('../tagCache/middleware', () => ({
     default: { hasBeenRevalidated },
 }));
 
-const { default: IncrementalCacheWorker } = await import('./do');
+const { IncrementalCacheWorker } = await import('./containerCache');
 
 const CACHE_CONTROL = 'public, s-maxage=3600, stale-while-revalidate=86400';
 const NO_STORE_CACHE_CONTROL = 'private, no-store, max-age=0, must-revalidate';
@@ -127,6 +127,23 @@ describe('IncrementalCacheWorker fetch', () => {
         expect(revalidatedResponse.headers.get('x-gitbook-cache-revalidated')).toBe('true');
         expect(staleResponse.headers.get('cache-control')).toBe(NO_STORE_CACHE_CONTROL);
         expect(staleResponse.headers.get('x-gitbook-cache-revalidated')).toBe('true');
+    });
+
+    it('restores the native Request after entering the OpenNext context', async () => {
+        const NativeRequest = globalThis.Request;
+        // The real `runWithCloudflareRequestContext` swaps the global for a subclass, which breaks
+        // the `instanceof Request` check in @cloudflare/containers on the container proxy path.
+        runWithCloudflareRequestContext.mockImplementationOnce(
+            async <T>(_: Request, __: unknown, ___: unknown, operation: () => Promise<T>) => {
+                globalThis.Request = class extends NativeRequest {} as typeof Request;
+                return operation();
+            }
+        );
+        get.mockResolvedValue(null);
+
+        await fetch(new Request('https://incremental-cache.internal/internal?key=entry'));
+
+        expect(globalThis.Request).toBe(NativeRequest);
     });
 
     it('rejects invalid internal requests and does not forward non-GET requests', async () => {

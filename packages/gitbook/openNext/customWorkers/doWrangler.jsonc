@@ -11,9 +11,6 @@
     "observability": {
         "enabled": false,
     },
-    "cache": {
-        "enabled": true,
-    },
     "placement": {
         "region": "gcp:us-central1",
     },

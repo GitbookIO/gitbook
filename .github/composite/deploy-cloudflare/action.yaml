@@ -97,8 +97,8 @@ runs:
               command: ${{ format('deploy --var OPEN_NEXT_BUILD_ID:{0} --config ./packages/gitbook/openNext/customWorkers/doWrangler.jsonc', steps.extract_deployment_id.outputs.deployment_id) }}
 
         # `versions upload` never builds or pushes the container image, so the container tier uses
-        # `deploy` like the DO worker. It runs after the DO worker (which it binds to) and before
-        # the middleware (which binds to it).
+        # `deploy` like the DO worker. It runs after the DO worker (whose Durable Objects it binds)
+        # and before the server and middleware (which read the cache tier it now hosts).
         - name: Deploy the container worker
           uses: cloudflare/wrangler-action@v3.14.0
           with:
@@ -107,7 +107,7 @@ runs:
               workingDirectory: ./
               wranglerVersion: '4.122.0'
               environment: ${{ inputs.environment }}
-              command: deploy --config ./packages/gitbook/openNext/customWorkers/containerWrangler.jsonc
+              command: ${{ format('deploy --var OPEN_NEXT_BUILD_ID:{0} --config ./packages/gitbook/openNext/customWorkers/containerWrangler.jsonc', steps.extract_deployment_id.outputs.deployment_id) }}
 
         - id: upload_server
           name: Upload server to Cloudflare

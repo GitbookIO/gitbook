@@ -7,6 +7,10 @@ import { type ContainerOutboundEnv, handleCacheOutbound } from './containerOutbo
 // Required by @cloudflare/containers: the outbound interception proxy is looked up on ctx.exports.
 export { ContainerProxy } from '@cloudflare/containers';
 
+// The cache tier for every server tier, served from this worker on a named entrypoint so its
+// responses are cached without the default entrypoint (rendered pages) being cached too.
+export { IncrementalCacheWorker } from './containerCache';
+
 type ContainerWorkerEnv = ContainerOutboundEnv & {
     NEXT_SERVER_CONTAINER: DurableObjectNamespace<NextServerContainer>;
     CONTAINER_INSTANCES?: string;

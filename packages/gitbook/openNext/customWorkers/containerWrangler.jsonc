@@ -10,11 +10,28 @@
     "observability": {
         "enabled": false,
     },
+    // Same region as the DO worker: the cache tier reads R2 and drives the Durable Objects hosted
+    // there, and the container instances follow the Durable Object that owns them.
+    "placement": {
+        "region": "gcp:us-central1",
+    },
+    // Enables the response cache for the cache tier alone. The default entrypoint forwards to the
+    // container and serves rendered pages, which must never be cached here.
+    "exports": {
+        "IncrementalCacheWorker": {
+            "type": "worker",
+            "cache": {
+                "enabled": true,
+            },
+        },
+    },
     "env": {
         "dev": {
             "vars": {
                 "STAGE": "dev",
                 "CONTAINER_INSTANCES": "1",
+                "OPEN_NEXT_BUILD_ID": "local",
+                "NEXT_CACHE_DO_QUEUE_DISABLE_SQLITE": "true",
                 "OPEN_NEXT_REQUEST_ID_HEADER": "true",
                 // Forwarded into the container by NextServerContainer.envVars. Note that the
                 // container cannot reach this host itself: anything the app fetches server-side
@@ -39,6 +56,22 @@
                         "name": "NEXT_SERVER_CONTAINER",
                         "class_name": "NextServerContainer",
                     },
+                    // Hosted by the DO worker, which owns their stored state.
+                    {
+                        "name": "NEXT_CACHE_DO_QUEUE",
+                        "class_name": "DOQueueHandler",
+                        "script_name": "gitbook-open-v2-do-dev",
+                    },
+                    {
+                        "name": "NEXT_TAG_CACHE_DO_SHARDED",
+                        "class_name": "DOShardedTagCache",
+                        "script_name": "gitbook-open-v2-do-dev",
+                    },
+                    {
+                        "name": "WRITE_BUFFER",
+                        "class_name": "R2WriteBuffer",
+                        "script_name": "gitbook-open-v2-do-dev",
+                    },
                 ],
             },
             "migrations": [
@@ -50,7 +83,20 @@
             "services": [
                 {
                     "binding": "NEXT_INC_CACHE_WORKER",
-                    "service": "gitbook-open-v2-do-dev",
+                    "service": "gitbook-open-v2-container-dev",
+                    "entrypoint": "IncrementalCacheWorker",
+                },
+                // The cache tier re-enters itself so the read goes through the response cache.
+                {
+                    "binding": "WORKER_SELF_REFERENCE",
+                    "service": "gitbook-open-v2-container-dev",
+                    "entrypoint": "IncrementalCacheWorker",
+                },
+            ],
+            "r2_buckets": [
+                {
+                    "binding": "NEXT_INC_CACHE_R2_BUCKET",
+                    "bucket_name": "gitbook-open-v2-cache-preview",
                 },
             ],
         },
@@ -58,6 +104,7 @@
             "vars": {
                 "STAGE": "preview",
                 "CONTAINER_INSTANCES": "3",
+                "NEXT_CACHE_DO_QUEUE_DISABLE_SQLITE": "true",
                 "OPEN_NEXT_REQUEST_ID_HEADER": "true",
             },
             "containers": [
@@ -75,6 +122,22 @@
                         "name": "NEXT_SERVER_CONTAINER",
                         "class_name": "NextServerContainer",
                     },
+                    // Hosted by the DO worker, which owns their stored state.
+                    {
+                        "name": "NEXT_CACHE_DO_QUEUE",
+                        "class_name": "DOQueueHandler",
+                        "script_name": "gitbook-open-v2-do-preview",
+                    },
+                    {
+                        "name": "NEXT_TAG_CACHE_DO_SHARDED",
+                        "class_name": "DOShardedTagCache",
+                        "script_name": "gitbook-open-v2-do-preview",
+                    },
+                    {
+                        "name": "WRITE_BUFFER",
+                        "class_name": "R2WriteBuffer",
+                        "script_name": "gitbook-open-v2-do-preview",
+                    },
                 ],
             },
             "migrations": [
@@ -86,7 +149,20 @@
             "services": [
                 {
                     "binding": "NEXT_INC_CACHE_WORKER",
-                    "service": "gitbook-open-v2-do-preview",
+                    "service": "gitbook-open-v2-container-preview",
+                    "entrypoint": "IncrementalCacheWorker",
+                },
+                // The cache tier re-enters itself so the read goes through the response cache.
+                {
+                    "binding": "WORKER_SELF_REFERENCE",
+                    "service": "gitbook-open-v2-container-preview",
+                    "entrypoint": "IncrementalCacheWorker",
+                },
+            ],
+            "r2_buckets": [
+                {
+                    "binding": "NEXT_INC_CACHE_R2_BUCKET",
+                    "bucket_name": "gitbook-open-v2-cache-preview",
                 },
             ],
             "observability": {
@@ -104,6 +180,7 @@
             "vars": {
                 "STAGE": "staging",
                 "CONTAINER_INSTANCES": "5",
+                "NEXT_CACHE_DO_QUEUE_DISABLE_SQLITE": "true",
                 "OPEN_NEXT_REQUEST_ID_HEADER": "true",
             },
             "containers": [
@@ -121,6 +198,22 @@
                         "name": "NEXT_SERVER_CONTAINER",
                         "class_name": "NextServerContainer",
                     },
+                    // Hosted by the DO worker, which owns their stored state.
+                    {
+                        "name": "NEXT_CACHE_DO_QUEUE",
+                        "class_name": "DOQueueHandler",
+                        "script_name": "gitbook-open-v2-do-staging",
+                    },
+                    {
+                        "name": "NEXT_TAG_CACHE_DO_SHARDED",
+                        "class_name": "DOShardedTagCache",
+                        "script_name": "gitbook-open-v2-do-staging",
+                    },
+                    {
+                        "name": "WRITE_BUFFER",
+                        "class_name": "R2WriteBuffer",
+                        "script_name": "gitbook-open-v2-do-staging",
+                    },
                 ],
             },
             "migrations": [
@@ -132,7 +225,20 @@
             "services": [
                 {
                     "binding": "NEXT_INC_CACHE_WORKER",
-                    "service": "gitbook-open-v2-do-staging",
+                    "service": "gitbook-open-v2-container-staging",
+                    "entrypoint": "IncrementalCacheWorker",
+                },
+                // The cache tier re-enters itself so the read goes through the response cache.
+                {
+                    "binding": "WORKER_SELF_REFERENCE",
+                    "service": "gitbook-open-v2-container-staging",
+                    "entrypoint": "IncrementalCacheWorker",
+                },
+            ],
+            "r2_buckets": [
+                {
+                    "binding": "NEXT_INC_CACHE_R2_BUCKET",
+                    "bucket_name": "gitbook-open-v2-cache-staging",
                 },
             ],
             "tail_consumers": [
@@ -145,6 +251,11 @@
             "vars": {
                 "STAGE": "production",
                 "CONTAINER_INSTANCES": "10",
+                // R2 is strongly consistent, so we can disable SQLite
+                "NEXT_CACHE_DO_QUEUE_DISABLE_SQLITE": "true",
+                // We don't want to pollute the memory with broken cache entries
+                // Most of the time, those are fake requests.
+                "NEXT_CACHE_DO_QUEUE_MAX_RETRIES": "1",
                 "OPEN_NEXT_REQUEST_ID_HEADER": "true",
             },
             "containers": [
@@ -164,6 +275,22 @@
                         "name": "NEXT_SERVER_CONTAINER",
                         "class_name": "NextServerContainer",
                     },
+                    // Hosted by the DO worker, which owns their stored state.
+                    {
+                        "name": "NEXT_CACHE_DO_QUEUE",
+                        "class_name": "DOQueueHandler",
+                        "script_name": "gitbook-open-v2-do-production",
+                    },
+                    {
+                        "name": "NEXT_TAG_CACHE_DO_SHARDED",
+                        "class_name": "DOShardedTagCache",
+                        "script_name": "gitbook-open-v2-do-production",
+                    },
+                    {
+                        "name": "WRITE_BUFFER",
+                        "class_name": "R2WriteBuffer",
+                        "script_name": "gitbook-open-v2-do-production",
+                    },
                 ],
             },
             "migrations": [
@@ -175,7 +302,20 @@
             "services": [
                 {
                     "binding": "NEXT_INC_CACHE_WORKER",
-                    "service": "gitbook-open-v2-do-production",
+                    "service": "gitbook-open-v2-container-production",
+                    "entrypoint": "IncrementalCacheWorker",
+                },
+                // The cache tier re-enters itself so the read goes through the response cache.
+                {
+                    "binding": "WORKER_SELF_REFERENCE",
+                    "service": "gitbook-open-v2-container-production",
+                    "entrypoint": "IncrementalCacheWorker",
+                },
+            ],
+            "r2_buckets": [
+                {
+                    "binding": "NEXT_INC_CACHE_R2_BUCKET",
+                    "bucket_name": "gitbook-open-v2-cache-production",
                 },
             ],
             "tail_consumers": [

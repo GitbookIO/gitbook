@@ -35,7 +35,8 @@
                 },
                 {
                     "binding": "NEXT_INC_CACHE_WORKER",
-                    "service": "gitbook-open-v2-do-dev",
+                    "service": "gitbook-open-v2-container-dev",
+                    "entrypoint": "IncrementalCacheWorker",
                 },
             ],
             "durable_objects": {
@@ -76,7 +77,8 @@
                 },
                 {
                     "binding": "NEXT_INC_CACHE_WORKER",
-                    "service": "gitbook-open-v2-do-preview",
+                    "service": "gitbook-open-v2-container-preview",
+                    "entrypoint": "IncrementalCacheWorker",
                 },
             ],
             "durable_objects": {
@@ -116,7 +118,8 @@
                 },
                 {
                     "binding": "NEXT_INC_CACHE_WORKER",
-                    "service": "gitbook-open-v2-do-staging",
+                    "service": "gitbook-open-v2-container-staging",
+                    "entrypoint": "IncrementalCacheWorker",
                 },
             ],
             "durable_objects": {
@@ -164,7 +167,8 @@
                 },
                 {
                     "binding": "NEXT_INC_CACHE_WORKER",
-                    "service": "gitbook-open-v2-do-production",
+                    "service": "gitbook-open-v2-container-production",
+                    "entrypoint": "IncrementalCacheWorker",
                 },
             ],
             "durable_objects": {

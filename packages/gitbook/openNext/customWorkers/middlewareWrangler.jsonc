@@ -45,7 +45,8 @@
                 },
                 {
                     "binding": "NEXT_INC_CACHE_WORKER",
-                    "service": "gitbook-open-v2-do-dev",
+                    "service": "gitbook-open-v2-container-dev",
+                    "entrypoint": "IncrementalCacheWorker",
                 },
                 {
                     "binding": "CONTAINER_WORKER",
@@ -77,7 +78,8 @@
                 },
                 {
                     "binding": "NEXT_INC_CACHE_WORKER",
-                    "service": "gitbook-open-v2-do-preview",
+                    "service": "gitbook-open-v2-container-preview",
+                    "entrypoint": "IncrementalCacheWorker",
                 },
                 {
                     "binding": "CONTAINER_WORKER",
@@ -148,7 +150,8 @@
                 },
                 {
                     "binding": "NEXT_INC_CACHE_WORKER",
-                    "service": "gitbook-open-v2-do-staging",
+                    "service": "gitbook-open-v2-container-staging",
+                    "entrypoint": "IncrementalCacheWorker",
                 },
                 {
                     "binding": "CONTAINER_WORKER",
@@ -225,7 +228,8 @@
                 },
                 {
                     "binding": "NEXT_INC_CACHE_WORKER",
-                    "service": "gitbook-open-v2-do-production",
+                    "service": "gitbook-open-v2-container-production",
+                    "entrypoint": "IncrementalCacheWorker",
                 },
                 // Bound but unused: production keeps `SERVER_TIER` unset so it serves from
                 // DEFAULT_WORKER. Setting the var here is all it takes to switch.
