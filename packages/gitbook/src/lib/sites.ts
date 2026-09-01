@@ -381,7 +381,7 @@ function findSiteSpaceByIdInGroupChildren(
                     return {
                         siteSpace,
                         siteSection: child,
-                        siteSectionGroup: rootGroup,
+                        siteSectionGroup: parentGroup,
                         siteSectionGroups: sectionGroups,
                     };
                 }

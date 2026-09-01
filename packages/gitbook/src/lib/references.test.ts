@@ -559,7 +559,7 @@ describe('resolveContentRef for direct space links', () => {
         });
     }
 
-    it('prepends a localized section group and section to cross-space page ancestors', async () => {
+    it('prepends every localized section group and section to cross-space page ancestors', async () => {
         const targetSpace = buildSpace('space-target', 'Target Space');
         const targetSiteSpace = buildSiteSpace(targetSpace, 'Target Variant');
         targetSiteSpace.urls = { published: 'https://docs.example.com/target/' };
@@ -596,8 +596,18 @@ describe('resolveContentRef for direct space links', () => {
                     id: 'section-group-nested',
                     title: 'API guides',
                     draft: false,
-                    sections: [section],
-                    children: [section],
+                    sections: [],
+                    children: [
+                        {
+                            object: 'site-section-group',
+                            id: 'section-group-child',
+                            title: 'Authentication',
+                            localizedTitle: { fr: 'Authentification' },
+                            draft: false,
+                            sections: [section],
+                            children: [section],
+                        },
+                    ],
                 },
             ],
         };
@@ -615,12 +625,14 @@ describe('resolveContentRef for direct space links', () => {
         expect(result?.ancestors).toEqual([
             { label: 'Documentation produit' },
             { label: 'API guides' },
+            { label: 'Authentification' },
             { label: 'Référence', href: targetSiteSpace.urls.published },
             { label: 'Getting started', icon: null, href: expect.any(String) },
         ]);
         expect(result?.ancestors?.[0]?.href).toBeUndefined();
         expect(result?.ancestors?.[1]?.href).toBeUndefined();
-        expect(result?.ancestors?.[3]?.href).toBeTruthy();
+        expect(result?.ancestors?.[2]?.href).toBeUndefined();
+        expect(result?.ancestors?.[4]?.href).toBeTruthy();
     });
 
     it('uses the first document as the target for a page-group reference', async () => {
