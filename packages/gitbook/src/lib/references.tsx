@@ -238,16 +238,9 @@ export async function resolveContentRef(
                     }
                 }
             } else {
-                const parentPage = (resolvePageResult?.ancestors || []).slice(-1).pop();
-                // When the looked up ref was a page group we use the page group to resolve title and icon.
-                // Otherwise use the resolved page title and icon.
-                const pageOrGroup =
-                    parentPage && contentRef.page === parentPage.id && parentPage.type === 'group'
-                        ? parentPage
-                        : page;
-                text = pageOrGroup.linkTitle || pageOrGroup.title;
+                text = page.linkTitle || page.title;
                 emoji = isCurrentPage ? undefined : page.emoji;
-                icon = <PageIcon page={pageOrGroup} style={iconStyle} />;
+                icon = <PageIcon page={page} style={iconStyle} />;
             }
 
             return {
@@ -512,6 +505,42 @@ function getSpaceRefSectionLabel(
     return null;
 }
 
+/**
+ * Ancestors to attach to a resolved content ref. Page/anchor links identify their
+ * containing section instead of repeating the target variant.
+ */
+function resolvePageAncestors(
+    context: GitBookAnyContext,
+    contentRef: ContentRef,
+    foundSiteSpace: ReturnType<typeof findSiteSpaceBy>,
+    ctx: { spaceContext: GitBookSpaceContext; baseURL: URL }
+): { label: string; href?: string }[] {
+    const isPageOrAnchorRef = contentRef.kind === 'page' || contentRef.kind === 'anchor';
+
+    if (isPageOrAnchorRef && foundSiteSpace?.siteSection) {
+        return [
+            ...(foundSiteSpace.siteSectionGroups ?? []).map((group) => ({
+                label: getLocalizedTitle(group, context.locale),
+            })),
+            {
+                label: getLocalizedTitle(foundSiteSpace.siteSection, context.locale),
+                href: ctx.baseURL.toString(),
+            },
+        ];
+    }
+
+    if (foundSiteSpace?.siteSpace) {
+        return [
+            {
+                label: getLocalizedTitle(foundSiteSpace.siteSpace, context.locale),
+                href: ctx.baseURL.toString(),
+            },
+        ];
+    }
+
+    return [{ label: ctx.spaceContext.space.title, href: ctx.baseURL.toString() }];
+}
+
 async function resolveContentRefInSpace(
     spaceId: string,
     context: GitBookAnyContext,
@@ -546,19 +575,21 @@ async function resolveContentRefInSpace(
             return null;
         }
 
-        // Prefer the variant title when available, then the section title, then fallback to the space title.
+        const foundSiteSpace =
+            'site' in context
+                ? findSiteSpaceBy(context.structure, (siteSpace) => siteSpace.space.id === spaceId)
+                : null;
+
+        const ancestors = resolvePageAncestors(context, contentRef, foundSiteSpace, ctx);
+
+        // Prefer the variant title when available, then the section title, then fallback to the space title for non-page refs.
         const ancestorLabel = (() => {
             if ('site' in context) {
-                const currentLanguage = context.locale;
-                const foundSiteSpace = findSiteSpaceBy(
-                    context.structure,
-                    (siteSpace) => siteSpace.space.id === spaceId
-                );
                 if (foundSiteSpace?.siteSpace) {
-                    return getLocalizedTitle(foundSiteSpace.siteSpace, currentLanguage);
+                    return getLocalizedTitle(foundSiteSpace.siteSpace, context.locale);
                 }
                 if (foundSiteSpace?.siteSection) {
-                    return getLocalizedTitle(foundSiteSpace.siteSection, currentLanguage);
+                    return getLocalizedTitle(foundSiteSpace.siteSection, context.locale);
                 }
                 return ctx.spaceContext.space.title;
             }
@@ -569,10 +600,9 @@ async function resolveContentRefInSpace(
         return {
             ...resolved,
             ancestors: [
-                {
-                    label: ancestorLabel,
-                    href: ctx.baseURL.toString(),
-                },
+                ...(contentRef.kind === 'page' || contentRef.kind === 'anchor'
+                    ? ancestors
+                    : [{ label: ancestorLabel, href: ctx.baseURL.toString() }]),
                 ...(resolved.ancestors ?? []),
             ].filter(filterOutNullable),
         };

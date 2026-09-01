@@ -264,6 +264,7 @@ export function findSiteSpaceBy(
     siteSpace: SiteSpace;
     siteSection: SiteSection | null;
     siteSectionGroup: SiteSectionGroup | null;
+    siteSectionGroups: SiteSectionGroup[];
 } | null {
     if (siteStructure.type === 'siteSpaces') {
         const siteSpace = siteStructure.structure.find(predicate) ?? null;
@@ -272,6 +273,7 @@ export function findSiteSpaceBy(
                 siteSpace,
                 siteSection: null,
                 siteSectionGroup: null,
+                siteSectionGroups: [],
             };
         }
 
@@ -290,6 +292,7 @@ export function findSiteSpaceBy(
                         siteSpace,
                         siteSection: sectionOrGroup,
                         siteSectionGroup: null,
+                        siteSectionGroups: [],
                     };
                 }
                 break;
@@ -361,11 +364,14 @@ export function getFallbackSiteSpacePath(context: GitBookSiteContext, siteSpace:
 function findSiteSpaceByIdInGroupChildren(
     children: SiteStructureNode[],
     predicate: (siteSpace: SiteSpace) => boolean,
-    parentGroup: SiteSectionGroup
+    parentGroup: SiteSectionGroup,
+    rootGroup: SiteSectionGroup = parentGroup,
+    sectionGroups: SiteSectionGroup[] = [parentGroup]
 ): {
     siteSpace: SiteSpace;
     siteSection: SiteSection;
     siteSectionGroup: SiteSectionGroup;
+    siteSectionGroups: SiteSectionGroup[];
 } | null {
     for (const child of children) {
         switch (child.object) {
@@ -375,13 +381,20 @@ function findSiteSpaceByIdInGroupChildren(
                     return {
                         siteSpace,
                         siteSection: child,
-                        siteSectionGroup: parentGroup,
+                        siteSectionGroup: rootGroup,
+                        siteSectionGroups: sectionGroups,
                     };
                 }
                 break;
             }
             case 'site-section-group': {
-                const found = findSiteSpaceByIdInGroupChildren(child.children, predicate, child);
+                const found = findSiteSpaceByIdInGroupChildren(
+                    child.children,
+                    predicate,
+                    child,
+                    rootGroup,
+                    [...sectionGroups, child]
+                );
                 if (found) {
                     return found;
                 }
