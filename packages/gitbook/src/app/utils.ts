@@ -5,13 +5,14 @@ import rison from 'rison';
 import type { SiteAPIToken } from '@gitbook/api';
 
 import {
-    getPPRVisitorAuthClaimsFromToken,
+    type VisitorAuthClaims,
     getVisitorAuthClaims,
     getVisitorAuthClaimsFromToken,
 } from '@/lib/adaptive';
 import type { PPRCacheScope } from '@/lib/cache-tags';
 import { type SiteURLData, fetchSiteContextByURLLookup, getBaseContext } from '@/lib/context';
 import { getDynamicCustomizationSettings } from '@/lib/customization';
+import { PPR_TOKEN_SCOPE, type PPRTokenScope, exchangePPRToken } from '@/lib/ppr-token';
 
 export type RouteParamMode = 'url-host' | 'url';
 
@@ -44,7 +45,6 @@ export type PPRRouteParams = PPRRouteLayoutParams & {
  */
 export async function getStaticSiteContext(
     params: RouteLayoutParams,
-    getClaims = getVisitorAuthClaimsFromToken,
     options?: { pprScope?: PPRCacheScope }
 ) {
     const siteURL = getSiteURLFromParams(params);
@@ -69,7 +69,7 @@ export async function getStaticSiteContext(
 
     return {
         context,
-        visitorAuthClaims: getClaims(decoded),
+        visitorAuthClaims: getVisitorAuthClaimsFromToken(decoded),
     };
 }
 
@@ -174,32 +174,45 @@ export function getPPRRouteParams(params: PPRRouteLayoutParams): RouteLayoutPara
 }
 
 /**
- * Project PPR params for the shared header by replacing page-varying location data.
- * TODO: We'll need to exchange the api token provided by the original PPR request for one that the API will understand
+ * Project PPR params for the current page, with a token scoped to the page claims.
  */
-export function getPPRHeaderRouteParams(params: PPRRouteLayoutParams): RouteLayoutParams {
+export function getPPRPageRouteParams(params: PPRRouteParams): Promise<RouteParams>;
+export function getPPRPageRouteParams(params: PPRRouteLayoutParams): Promise<RouteLayoutParams>;
+export function getPPRPageRouteParams(params: PPRRouteLayoutParams): Promise<RouteLayoutParams> {
+    return withExchangedPPRToken(getPPRRouteParams(params), PPR_TOKEN_SCOPE.body);
+}
+
+/**
+ * Project PPR params for the shared header by replacing page-varying location data.
+ */
+export async function getPPRHeaderRouteParams(
+    params: PPRRouteLayoutParams
+): Promise<RouteLayoutParams> {
     const routeParams = getPPRRouteParams(params);
     const { revision, ...siteURLData } = getSiteURLDataFromParams(routeParams);
     const defaults = getPPRDefaults(params);
 
-    return {
-        ...routeParams,
-        siteData: encodeSiteData({
-            ...siteURLData,
-            // For the header, we keep site section and space data from the PPR defaults, so that the header can be cached across all pages in a site.
-            siteSection: defaults.siteSection ?? undefined,
-            siteSpace: defaults.siteSpace,
-            space: defaults.space,
-            // The base path has to describe the same variant as the ids above, or the header
-            // prefixes one variant's page paths with another variant's base path. The site default
-            // variant is published at the site root; defaults pointing at the visited variant keep
-            // its own base path.
-            basePath:
-                defaults.siteSpace === siteURLData.siteSpace
-                    ? siteURLData.basePath
-                    : siteURLData.siteBasePath,
-        }),
-    };
+    return withExchangedPPRToken(
+        {
+            ...routeParams,
+            siteData: encodeSiteData({
+                ...siteURLData,
+                // For the header, we keep site section and space data from the PPR defaults, so that the header can be cached across all pages in a site.
+                siteSection: defaults.siteSection ?? undefined,
+                siteSpace: defaults.siteSpace,
+                space: defaults.space,
+                // The base path has to describe the same variant as the ids above, or the header
+                // prefixes one variant's page paths with another variant's base path. The site default
+                // variant is published at the site root; defaults pointing at the visited variant keep
+                // its own base path.
+                basePath:
+                    defaults.siteSpace === siteURLData.siteSpace
+                        ? siteURLData.basePath
+                        : siteURLData.siteBasePath,
+            }),
+        },
+        PPR_TOKEN_SCOPE.header
+    );
 }
 
 /** rison can't encode undefined values, so they are dropped like the middleware does. */
@@ -216,11 +229,44 @@ function encodeSiteData(siteURLData: Record<string, unknown>): string {
 /**
  * Project PPR params for the table of contents, keeping its current location data.
  * The table of contents depends only on the space you're in and the claims of that revision, not on the page,
- * and the layout params carry no page path, so the PPR params can be used as-is.
- * TODO: We'll need to exchange the api token provided by the original PPR request for one that the API will understand
+ * and the layout params carry no page path, so only the token has to be narrowed.
  */
-export function getPPRTableOfContentsRouteParams(params: PPRRouteLayoutParams): RouteLayoutParams {
-    return getPPRRouteParams(params);
+export function getPPRTableOfContentsRouteParams(
+    params: PPRRouteLayoutParams
+): Promise<RouteLayoutParams> {
+    return withExchangedPPRToken(getPPRRouteParams(params), PPR_TOKEN_SCOPE.toc);
+}
+
+/**
+ * Replace the revalidation token carried by the PPR params with a content API token narrowed to
+ * `scope`. Components sharing a scope then share a token, and with it a cache entry.
+ */
+async function withExchangedPPRToken<T extends RouteLayoutParams>(
+    params: T,
+    scope: PPRTokenScope
+): Promise<T> {
+    const siteURLData = getSiteURLDataFromParams(params);
+
+    return {
+        ...params,
+        siteData: encodeSiteData({
+            ...siteURLData,
+            apiToken: await exchangePPRToken(siteURLData.apiToken, scope),
+        }),
+    };
+}
+
+/**
+ * Get the claims the client should resolve adaptive content with. Each component holds a token
+ * narrowed to a single scope, so the union has to come from a `full` exchange.
+ */
+export async function getPPRVisitorAuthClaims(
+    params: PPRRouteLayoutParams
+): Promise<VisitorAuthClaims> {
+    const { apiToken } = getSiteURLDataFromParams(params);
+    const fullToken = await exchangePPRToken(apiToken, 'full');
+
+    return getVisitorAuthClaimsFromToken(jwtDecode<SiteAPIToken>(fullToken));
 }
 
 /**
@@ -228,7 +274,7 @@ export function getPPRTableOfContentsRouteParams(params: PPRRouteLayoutParams): 
  * the tags they emit, so the component and its data are revalidated as one unit.
  */
 export async function getPPRStaticSiteContext(params: RouteLayoutParams, pprScope: PPRCacheScope) {
-    return getStaticSiteContext(params, getPPRVisitorAuthClaimsFromToken, { pprScope });
+    return getStaticSiteContext(params, { pprScope });
 }
 
 function getPPRRouteParam(encodedParam: string, name: string): string {

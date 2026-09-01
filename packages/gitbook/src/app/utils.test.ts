@@ -1,4 +1,4 @@
-import { describe, expect, it, mock } from 'bun:test';
+import { afterAll, beforeAll, describe, expect, it, mock } from 'bun:test';
 import jwt from 'jsonwebtoken';
 import rison from 'rison';
 
@@ -12,12 +12,35 @@ mock.module('@/lib/context', () => ({
     getBaseContext: (input: unknown) => input,
     fetchSiteContextByURLLookup: async (_baseContext: unknown, data: unknown) => data,
 }));
+// Stand in for the exchange endpoint, which is the only thing that can narrow the claims. It is
+// stubbed at the network boundary rather than with `mock.module`, which would replace
+// `@/lib/ppr-token` for the entire test process and break its own test file.
+const realFetch = globalThis.fetch;
+
+beforeAll(() => {
+    globalThis.fetch = (async (_input: RequestInfo | URL, init?: RequestInit) => {
+        const { scope } = JSON.parse(String(init?.body));
+        // Deterministic per scope, so the assertions below can compare tokens across pages.
+        return Response.json({
+            token: jwt.sign(
+                { exp: Math.floor(Date.now() / 1000) + 3600, claims: { scope } },
+                'secret'
+            ),
+        });
+    }) as typeof fetch;
+});
+
+afterAll(() => {
+    globalThis.fetch = realFetch;
+});
 
 const {
     getPPRHeaderRouteParams,
+    getPPRPageRouteParams,
     getPPRRouteParams,
     getPPRStaticSiteContext,
     getPPRTableOfContentsRouteParams,
+    getPPRVisitorAuthClaims,
     getSiteURLDataFromParams,
 } = await import('./utils');
 type PPRRouteParams = import('./utils').PPRRouteParams;
@@ -25,7 +48,9 @@ type PPRRouteParams = import('./utils').PPRRouteParams;
 const apiToken = jwt.sign(
     {
         exp: Math.floor(Date.now() / 1000) + 3600,
-        siteStructureClaims: { scope: 'site-structure' },
+        siteClaims: { audience: 'external' },
+        revisionClaims: { account: { tier: 'pro' } },
+        pageClaims: { unsigned: { locale: 'fr' } },
     },
     'secret'
 );
@@ -85,7 +110,7 @@ describe('PPR cache region params', () => {
         ...routeParams,
         siteData: encodeURIComponent(
             rison.encode({
-                apiToken: jwt.sign({ siteStructureClaims: {} }, 'other-secret'),
+                apiToken: jwt.sign({ siteClaims: {} }, 'other-secret'),
                 site: 'site-id',
                 siteSection: 'new-page-site-section-id',
                 siteSpace: 'new-page-site-space-id',
@@ -98,14 +123,13 @@ describe('PPR cache region params', () => {
         ),
     };
 
-    it('keeps header params stable apart from the API token', () => {
-        const headerData = getSiteURLDataFromParams(getPPRHeaderRouteParams(routeParams));
+    it('keeps header params stable, API token included', async () => {
+        const headerData = getSiteURLDataFromParams(await getPPRHeaderRouteParams(routeParams));
         const changedHeaderData = getSiteURLDataFromParams(
-            getPPRHeaderRouteParams(changedRouteParams)
+            await getPPRHeaderRouteParams(changedRouteParams)
         );
 
         expect(headerData).toMatchObject({
-            apiToken,
             siteSection: 'default-site-section-id',
             siteSpace: 'default-site-space-id',
             space: 'default-space-id',
@@ -113,15 +137,23 @@ describe('PPR cache region params', () => {
             // path of the variant the visitor is on.
             basePath: '/docs/',
         });
-        expect({ ...headerData, apiToken: undefined }).toEqual({
-            ...changedHeaderData,
-            apiToken: undefined,
-        });
+        // The whole point of the exchange: the site-scoped token no longer varies per page, so the
+        // header can be cached once for the site instead of once per page.
+        expect(headerData).toEqual(changedHeaderData);
     });
 
-    it('keeps the visited base path when the defaults point at the visited variant', () => {
+    it('narrows the header token to the site scope', async () => {
+        const { apiToken: headerToken } = getSiteURLDataFromParams(
+            await getPPRHeaderRouteParams(routeParams)
+        );
+
+        expect(headerToken).not.toBe(apiToken);
+        expect(jwt.decode(headerToken)).toMatchObject({ claims: { scope: 'site' } });
+    });
+
+    it('keeps the visited base path when the defaults point at the visited variant', async () => {
         const headerData = getSiteURLDataFromParams(
-            getPPRHeaderRouteParams({
+            await getPPRHeaderRouteParams({
                 ...routeParams,
                 pprDefaults: encodeURIComponent(
                     rison.encode({
@@ -139,48 +171,64 @@ describe('PPR cache region params', () => {
         });
     });
 
-    it('keeps TOC params stable apart from its current location and API token', () => {
-        const tocData = getSiteURLDataFromParams(getPPRTableOfContentsRouteParams(routeParams));
+    it('keeps TOC params stable apart from its current location', async () => {
+        const tocData = getSiteURLDataFromParams(
+            await getPPRTableOfContentsRouteParams(routeParams)
+        );
         const changedTOCData = getSiteURLDataFromParams(
-            getPPRTableOfContentsRouteParams(changedRouteParams)
+            await getPPRTableOfContentsRouteParams(changedRouteParams)
         );
 
         expect(tocData).toMatchObject({
-            apiToken,
             siteSection: 'page-site-section-id',
             siteSpace: 'page-site-space-id',
             space: 'space-id',
             basePath: '/docs/v/page-variant/',
         });
+        // The revision-scoped token drops the page claims, so it is shared by every page of the
+        // space; only the location data still varies.
+        expect(tocData.apiToken).toBe(changedTOCData.apiToken);
         expect({
             ...tocData,
-            apiToken: undefined,
             siteSection: undefined,
             siteSpace: undefined,
             space: undefined,
             basePath: undefined,
         }).toEqual({
             ...changedTOCData,
-            apiToken: undefined,
             siteSection: undefined,
             siteSpace: undefined,
             space: undefined,
             basePath: undefined,
         });
     });
+
+    it('narrows the TOC and page tokens to their own scopes', async () => {
+        const tocData = getSiteURLDataFromParams(
+            await getPPRTableOfContentsRouteParams(routeParams)
+        );
+        const pageData = getSiteURLDataFromParams(await getPPRPageRouteParams(routeParams));
+
+        expect(jwt.decode(tocData.apiToken)).toMatchObject({ claims: { scope: 'revision' } });
+        expect(jwt.decode(pageData.apiToken)).toMatchObject({ claims: { scope: 'page' } });
+        expect(tocData.apiToken).not.toBe(pageData.apiToken);
+    });
+});
+
+describe('getPPRVisitorAuthClaims', () => {
+    it('resolves every scope at once through a full exchange', async () => {
+        // The scoped tokens each carry one bucket, so the client claims can only come from `full`.
+        expect(await getPPRVisitorAuthClaims(routeParams)).toEqual({ scope: 'full' });
+    });
 });
 
 describe('getPPRStaticSiteContext', () => {
     it('uses the supplied API token without resolving published content again', async () => {
-        const { context, visitorAuthClaims } = await getPPRStaticSiteContext(
-            getPPRRouteParams(routeParams),
-            'body'
-        );
+        const { context } = await getPPRStaticSiteContext(getPPRRouteParams(routeParams), 'body');
 
         expect(context).toMatchObject({
             apiToken,
             revision: 'ppr-revision-id',
         });
-        expect(visitorAuthClaims).toEqual({ scope: 'site-structure' });
     });
 });

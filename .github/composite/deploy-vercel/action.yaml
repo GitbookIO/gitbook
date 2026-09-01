@@ -50,6 +50,7 @@ runs:
               GITBOOK_ICONS_URL: ${{ inputs.opItem }}/GITBOOK_ICONS_URL
               GITBOOK_ICONS_TOKEN: ${{ inputs.opItem }}/GITBOOK_ICONS_TOKEN
               GITBOOK_SECRET: ${{ inputs.opItem }}/GITBOOK_SECRET
+              GITBOOK_EXCHANGE_TOKEN_URL: ${{ inputs.opItem }}/GITBOOK_EXCHANGE_TOKEN_URL
               GITBOOK_APP_URL: ${{ inputs.opItem }}/GITBOOK_APP_URL
               GITBOOK_API_URL: ${{ inputs.opItem }}/GITBOOK_API_URL
               GITBOOK_API_PUBLIC_URL: ${{ inputs.opItem }}/GITBOOK_API_PUBLIC_URL

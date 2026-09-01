@@ -133,6 +133,13 @@ export const GITBOOK_ICONS_TOKEN = process.env.GITBOOK_ICONS_TOKEN;
 export const GITBOOK_SECRET = process.env.GITBOOK_SECRET ?? null;
 
 /**
+ * Endpoint exchanging a PPR revalidation token for a content API token scoped to a single claims
+ * bucket. Signing one requires the API token secret, which GitBook Open does not have.
+ */
+export const GITBOOK_EXCHANGE_TOKEN_URL =
+    process.env.GITBOOK_EXCHANGE_TOKEN_URL || 'https://sites.gitbook.com/token';
+
+/**
  * Shared secret used to sign server-to-server requests to the sites OAuth server consent endpoints.
  * This must match the sites OAuth provider signing secret (`functionsConfig.sitesOAuth.signingSecret`
  * in gitbook-x); it is a dedicated secret and must not be confused with `GITBOOK_SECRET`.
