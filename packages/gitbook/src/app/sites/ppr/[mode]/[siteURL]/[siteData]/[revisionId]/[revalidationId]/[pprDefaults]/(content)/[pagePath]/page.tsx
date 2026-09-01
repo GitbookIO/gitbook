@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 
-import { type PPRRouteParams, getPPRRouteParams, getPagePathFromParams } from '@/app/utils';
+import { type PPRRouteParams, getPPRPageRouteParams, getPagePathFromParams } from '@/app/utils';
 import {
     PPRPageBody,
     cachedGenerateSitePageMetadata,
@@ -17,15 +17,15 @@ export default async function Page(props: PageProps) {
     const params = await props.params;
     const pathname = getPagePathFromParams(params);
 
-    return <PPRPageBody params={getPPRRouteParams(params)} pathname={pathname} />;
+    return <PPRPageBody params={await getPPRPageRouteParams(params)} pathname={pathname} />;
 }
 
 export async function generateViewport(props: PageProps): Promise<Viewport> {
     const params = await props.params;
-    return cachedGenerateSitePageViewport(getPPRRouteParams(params));
+    return cachedGenerateSitePageViewport(await getPPRPageRouteParams(params));
 }
 
 export async function generateMetadata(props: PageProps): Promise<Metadata> {
     const params = await props.params;
-    return cachedGenerateSitePageMetadata(getPPRRouteParams(params));
+    return cachedGenerateSitePageMetadata(await getPPRPageRouteParams(params));
 }

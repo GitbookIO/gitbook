@@ -9,12 +9,6 @@ import type { SiteURLData } from '@/lib/context';
  */
 export type VisitorAuthClaims = Record<string, any>;
 
-type PPRSiteAPIToken = SiteAPIToken & {
-    siteStructureClaims?: VisitorAuthClaims;
-    revisionClaims?: VisitorAuthClaims;
-    pageClaims?: VisitorAuthClaims;
-};
-
 /**
  * Get the visitor auth claims from the API response obtained from `resolvePublishedContentByUrl`.
  */
@@ -29,11 +23,4 @@ export function getVisitorAuthClaims(siteData: SiteURLData): VisitorAuthClaims {
  */
 export function getVisitorAuthClaimsFromToken(token: SiteAPIToken): VisitorAuthClaims {
     return token.claims ?? {};
-}
-
-/**
- * PPR shares its client contexts with the site structure, so it exposes the structure claims.
- */
-export function getPPRVisitorAuthClaimsFromToken(token: PPRSiteAPIToken): VisitorAuthClaims {
-    return token.siteStructureClaims ?? {};
 }

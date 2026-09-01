@@ -41,7 +41,28 @@ function requireSecret(): string {
     return secret;
 }
 
+// This proxy mints API tokens, so it must never be reachable outside a developer machine.
+if (process.env.NODE_ENV === 'production') {
+    log('This proxy mints API tokens and must never run in production.');
+    process.exit(1);
+}
+
 const SECRET = requireSecret();
+
+// The app always exchanges the PPR token, and the exchange endpoint only accepts a revalidation
+// token, which the published-URLs lookup never returns: we have to mint one ourselves.
+function requireAPITokenSecret(): string {
+    const secret = process.env.PPR_DEV_API_TOKEN_SECRET;
+    if (!secret) {
+        log(
+            'PPR_DEV_API_TOKEN_SECRET is not set: the token exchange rejects the lookup token. Add it to .env.local.'
+        );
+        process.exit(1);
+    }
+    return secret;
+}
+
+const API_TOKEN_SECRET = requireAPITokenSecret();
 
 const cache = new Map<string, { value: unknown; expiresAt: number }>();
 const inflight = new Map<string, Promise<unknown>>();
@@ -132,6 +153,57 @@ async function getDefaults(content: PublishedSiteContent) {
     }
 }
 
+/**
+ * Turn the lookup's content token into the revalidation token the cache worker would send: the same
+ * payload, with the claims split into the per-scope buckets the exchange endpoint narrows down.
+ * Reusing the payload keeps `spaces`, `iat` and `exp` valid.
+ */
+async function mintRevalidationToken(apiToken: string): Promise<string> {
+    const { claims: _claims, ...payload } = decodeJWTPayload(apiToken);
+
+    const result = signJWT(
+        {
+            ...payload,
+            target: 'content',
+            // Empty buckets: local dev has no revalidation run to compute adaptive claims from.
+            siteClaims: {},
+            revisionClaims: {},
+            pageClaims: {},
+        },
+        API_TOKEN_SECRET
+    );
+    console.log('minted revalidation token', await result);
+    return result;
+}
+
+function decodeJWTPayload(token: string): Record<string, unknown> {
+    const payload = token.split('.')[1];
+    if (!payload) {
+        throw new Error('API token is not a JWT');
+    }
+    return JSON.parse(Buffer.from(payload, 'base64url').toString('utf8'));
+}
+
+async function signJWT(payload: Record<string, unknown>, secret: string): Promise<string> {
+    const signingInput = `${base64url(JSON.stringify({ alg: 'HS256', typ: 'JWT' }))}.${base64url(
+        JSON.stringify(payload)
+    )}`;
+    const key = await crypto.subtle.importKey(
+        'raw',
+        new TextEncoder().encode(secret),
+        { name: 'HMAC', hash: 'SHA-256' },
+        false,
+        ['sign']
+    );
+    const signature = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(signingInput));
+
+    return `${signingInput}.${base64url(Buffer.from(signature))}`;
+}
+
+function base64url(value: string | Buffer): string {
+    return (typeof value === 'string' ? Buffer.from(value, 'utf8') : value).toString('base64url');
+}
+
 async function setPPRHeaders(
     headers: Headers,
     content: PublishedSiteContent & { revision: string },
@@ -158,7 +230,7 @@ async function setPPRHeaders(
     );
     headers.set(PPRRequestHeaders.Revision, content.revision);
     headers.set(PPRRequestHeaders.ChangeRequest, content.changeRequest ?? '');
-    headers.set(PPRRequestHeaders.APIToken, content.apiToken);
+    headers.set(PPRRequestHeaders.APIToken, await mintRevalidationToken(content.apiToken));
     headers.set(PPRRequestHeaders.RevalidationID, REVALIDATION_ID || content.revision);
     // Unlike the other optional headers this one is checked with `has()`, so it must be sent even
     // when the site has no sections.

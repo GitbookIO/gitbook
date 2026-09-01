@@ -30,7 +30,21 @@ PPR requests are normally resolved upstream and arrive with a large set of `x-gb
 can't be reproduced by hitting the dev server directly. `bun run dev:ppr` (from `packages/gitbook`)
 starts a dev-only proxy on port 3001 that resolves the URL, injects those headers and signs them.
 The app rejects an unsigned set, so `GITBOOK_SECRET` must be set in `.env.local` (any value works
-locally, as long as both processes read the same one):
+locally, as long as both processes read the same one).
+
+The app also exchanges the PPR token for one scoped to each component, against
+`GITBOOK_EXCHANGE_TOKEN_URL`. That endpoint only accepts a revalidation token, which the
+published-URLs lookup never returns, so the proxy mints one with `PPR_DEV_API_TOKEN_SECRET` — a
+local-only stand-in for the API token secret the cache worker holds in production. It must match the
+secret the target `/token` endpoint verifies with, so local PPR needs a local gitbook-x sites stack.
+The secret is read only by the proxy script: never add it to `src/lib/env`, `next.config.mjs` or a
+deploy workflow.
+
+```
+GITBOOK_SECRET=<any value>
+GITBOOK_EXCHANGE_TOKEN_URL=http://localhost:8788/token
+PPR_DEV_API_TOKEN_SECRET=<local gitbook-x functionsConfig.api.tokenSecret>
+```
 
 ```
 http://localhost:3001/url/<published-gitbook-url>
