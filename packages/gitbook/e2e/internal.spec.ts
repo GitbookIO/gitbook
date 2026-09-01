@@ -1658,6 +1658,9 @@ const testCases: TestsCase[] = [
     {
         name: 'Visitor Auth - Space (oversized token)',
         contentBaseURL: 'https://gitbook.gitbook.io/gbo-va-space/',
+        // Our Cloudflare stack still folds multiple Set-Cookie headers into one,
+        // breaking chunked cookies (variant of opennextjs-cloudflare#501).
+        skip: process.env.ARGOS_BUILD_NAME === 'v2-cloudflare',
         tests: [
             {
                 name: 'Oversized token is chunked into cookies and survives navigation',
