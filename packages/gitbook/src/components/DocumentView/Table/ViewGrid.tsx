@@ -1,17 +1,15 @@
-import type { DocumentTableViewGrid } from '@gitbook/api';
-
 import { getColumnWidth, getViewGridLayout } from './layout';
 import { RecordRow } from './RecordRow';
-import type { TableViewProps } from './Table';
+import type { TableGridViewProps } from './Table';
 import { getColumnAlignment } from './utils';
 import { tcls } from '@/lib/tailwind';
 
-interface ViewGridHeaderProps extends TableViewProps<DocumentTableViewGrid> {
+interface ViewGridHeaderProps extends TableGridViewProps {
     className?: string;
     tableClassName?: string;
 }
 
-interface ViewGridProps extends TableViewProps<DocumentTableViewGrid> {
+interface ViewGridProps extends TableGridViewProps {
     tableClassName?: string;
 }
 
