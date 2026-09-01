@@ -3,8 +3,8 @@ import { describe, expect, it } from 'bun:test';
 import type { SearchPageResult, SearchSpaceResult, SiteSpace } from '@gitbook/api';
 
 import { orderSearchResultGroups } from './orderSearchResults';
-import { transformSitePageResult } from './transformSitePageResult';
 import { createLinker } from '@/lib/links';
+import { transformSitePageResult } from '@/lib/search';
 
 const runwaySiteURL = 'https://docs.runway.team/';
 const runwayAPIURL = 'https://api-docs.runway.team';

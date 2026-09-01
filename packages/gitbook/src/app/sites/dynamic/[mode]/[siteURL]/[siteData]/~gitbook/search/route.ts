@@ -1,13 +1,13 @@
 import { type NextRequest, NextResponse } from 'next/server';
 
 import { orderSearchResultGroups } from './orderSearchResults';
-import { transformSitePageResult } from './transformSitePageResult';
 import type {
     OrderedComputedResult,
     SearchSiteContentRequest,
 } from '@/components/Search/search-types';
 import { throwIfDataError } from '@/lib/data';
 import { getSiteURLDataFromMiddleware } from '@/lib/middleware';
+import { transformSitePageResult } from '@/lib/search';
 import { getServerActionBaseContext } from '@/lib/server-actions';
 import { findSiteSpaceBy } from '@/lib/sites';
 
