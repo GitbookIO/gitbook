@@ -146,13 +146,31 @@ export function useCustomCookieBanner(): CustomCookieBannerStore {
  */
 export function LoadIntegrations() {
     React.useEffect(() => {
-        // Only dispatch 'load' event when there are scripts to load
-
-        dispatchGitBookIntegrationEvent('load');
-
-        integrationsStore.setState({ loaded: true });
+        return whenIntegrationsReady(() => {
+            dispatchGitBookIntegrationEvent('load');
+            integrationsStore.setState({ loaded: true });
+        });
     }, []);
     return null;
+}
+
+/**
+ * Run `callback` once the integrations have had their chance to register.
+ *
+ * Consent integrations register their cookie banner from a `load` listener, so treating
+ * integrations as loaded at hydration flashed our own cookie banner on sites that ship
+ * their own.
+ */
+function whenIntegrationsReady(callback: () => void): () => void {
+    if (document.readyState === 'complete') {
+        callback();
+        return () => {};
+    }
+
+    // Their listener is registered after ours when their script runs after hydration.
+    const onLoad = () => setTimeout(callback, 0);
+    window.addEventListener('load', onLoad, { once: true });
+    return () => window.removeEventListener('load', onLoad);
 }
 
 /**
