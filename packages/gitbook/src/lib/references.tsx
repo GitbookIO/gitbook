@@ -238,9 +238,16 @@ export async function resolveContentRef(
                     }
                 }
             } else {
-                text = page.linkTitle || page.title;
+                const parentPage = (resolvePageResult?.ancestors || []).slice(-1).pop();
+                // When the looked up ref was a page group we use the page group to resolve title and icon.
+                // Otherwise use the resolved page title and icon.
+                const pageOrGroup =
+                    parentPage && contentRef.page === parentPage.id && parentPage.type === 'group'
+                        ? parentPage
+                        : page;
+                text = pageOrGroup.linkTitle || pageOrGroup.title;
                 emoji = isCurrentPage ? undefined : page.emoji;
-                icon = <PageIcon page={page} style={iconStyle} />;
+                icon = <PageIcon page={pageOrGroup} style={iconStyle} />;
             }
 
             return {

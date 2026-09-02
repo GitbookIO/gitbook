@@ -660,7 +660,7 @@ describe('resolveContentRef for direct space links', () => {
         );
 
         expect(result?.page?.id).toBe('page-target');
-        expect(result?.text).toBe('Cortex Agentix docs');
+        expect(result?.text).toBe('Learn about Cortex Agentix');
         expect(result?.ancestors?.map((ancestor) => ancestor.label)).toEqual([
             'Target Variant',
             'Learn about Cortex Agentix',
