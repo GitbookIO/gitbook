@@ -2,6 +2,46 @@ import { isProxyRootRequest } from '../proxy';
 import { DataFetcherError, getExposableError } from './errors';
 
 /**
+ * Paths served by our own routes rather than by site content. They can never be part of a
+ * site URL, so we stop matching there instead of spending lookups on URLs that cannot resolve.
+ * Kept in sync with the site route handlers and `encodePathInSiteContent` in the middleware.
+ */
+const INTERNAL_PATHS = [
+    // Simple `~gitbook` endpoints. `image`, `__evt` and `visitor` are served by the middleware
+    // before the lookup, but are listed so this stays a complete registry.
+    /^~gitbook\/(pdf|search|icon|site-index|image|__evt|visitor)$/,
+    /^~gitbook\/ogimage\/[^/]+$/,
+    /^~gitbook\/auth\/(login|logout)$/,
+    /^~gitbook\/oauth2\/v1\/[^/]+\/authorize$/,
+    /^~gitbook\/embed(\/(assistant|search|demo|script\.js|page(\/.*)?))?$/,
+    /^~gitbook\/markdown\/.+$/,
+    /^~gitbook\/markdown-ask\/[^/]+(\/[^/]+)?$/,
+    /^~gitbook\/rss\/.+$/,
+    // Site root files, including the `llms.txt` aliases from `PATH_ALIASES`.
+    /^llms\.txt$/,
+    /^llms-full\.txt(\/\d+)?$/,
+    /^(\.well-known\/)?sitemap\.md$/,
+    /^robots\.txt$/,
+    /^sitemap(-pages)?\.xml$/,
+    /^rss\.xml$/,
+];
+
+/**
+ * Return the leading segments that can be part of the site URL, dropping the internal path
+ * (if any) that follows them.
+ */
+function getContentPathSegments(pathSegments: string[]): string[] {
+    for (let index = 0; index < pathSegments.length; index++) {
+        const remaining = pathSegments.slice(index).join('/');
+        if (INTERNAL_PATHS.some((regex) => regex.test(remaining))) {
+            return pathSegments.slice(0, index);
+        }
+    }
+
+    return pathSegments;
+}
+
+/**
  * For a given GitBook URL, return a list of alternative URLs that could be matched against to lookup the content.
  * The approach is optimized to aim at reusing cached lookup results as much as possible.
  *
@@ -55,43 +95,45 @@ export function getURLLookupAlternatives(input: URL) {
     };
 
     const pathSegments = url.pathname.slice(1).split('/');
-    const tildeIndex = pathSegments.indexOf('~');
+    // Only the content part of the path can be matched against a site URL, the rest goes in the extraPath.
+    const contentSegments = getContentPathSegments(pathSegments);
+    const tildeIndex = contentSegments.indexOf('~');
+    const vIndex = contentSegments.indexOf('v');
 
     // URL looks like a specific content url (with ~/revisions/ or ~/changes/ in the path)
     // We only start matching after the ~/revisions/ or ~/changes/ segment and we ignore everything before it
     if (
         tildeIndex >= 0 &&
-        (pathSegments[tildeIndex + 1] === 'revisions' || pathSegments[tildeIndex + 1] === 'changes')
+        (contentSegments[tildeIndex + 1] === 'revisions' ||
+            contentSegments[tildeIndex + 1] === 'changes')
     ) {
-        const tildeIndex = pathSegments.indexOf('~');
         const revisionOrChangeIdIndex = tildeIndex + 2;
 
-        basePath = pathSegments.slice(tildeIndex, revisionOrChangeIdIndex + 1).join('/');
-        if (pathSegments[tildeIndex + 1] === 'revisions') {
-            revision = pathSegments[revisionOrChangeIdIndex];
+        basePath = contentSegments.slice(tildeIndex, revisionOrChangeIdIndex + 1).join('/');
+        if (contentSegments[tildeIndex + 1] === 'revisions') {
+            revision = contentSegments[revisionOrChangeIdIndex];
         } else {
-            changeRequest = pathSegments[revisionOrChangeIdIndex];
+            changeRequest = contentSegments[revisionOrChangeIdIndex];
         }
 
         // Match up to the tilde
         const contentURL = new URL(url);
-        contentURL.pathname = pathSegments.slice(0, tildeIndex).join('/');
+        contentURL.pathname = contentSegments.slice(0, tildeIndex).join('/');
         pushAlternative(contentURL, pathSegments.slice(revisionOrChangeIdIndex + 1).join('/'));
     }
 
     // URL looks like a collection url (with /v/ in the path)
     // We only start matching after the /v/ segment and we ignore everything before it
     // to avoid potentially matching as a page not found under the default space in the collection
-    else if (pathSegments.includes('v')) {
+    else if (vIndex >= 0 && contentSegments.length >= vIndex + 2) {
         const collectionURL = new URL(url);
-        const vIndex = pathSegments.indexOf('v');
-        collectionURL.pathname = pathSegments.slice(0, vIndex + 2).join('/');
+        collectionURL.pathname = contentSegments.slice(0, vIndex + 2).join('/');
 
         pushAlternative(collectionURL, pathSegments.slice(vIndex + 2).join('/'));
     } else {
         // Match only with the host, if it can be a custom hostname
         // It should cover most cases of custom domains, and with caching, it should be fast.
-        if (!url.hostname.includes('.gitbook.io') || pathSegments.length === 0) {
+        if (!url.hostname.includes('.gitbook.io') || contentSegments.length === 0) {
             const noPathURL = new URL(url);
             noPathURL.pathname = '/';
 
@@ -100,9 +142,9 @@ export function getURLLookupAlternatives(input: URL) {
 
         // Otherwise match with the first four segments of the path
         for (let i = 1; i <= 4; i++) {
-            if (pathSegments.length >= i) {
+            if (contentSegments.length >= i) {
                 const shortURL = new URL(url);
-                shortURL.pathname = pathSegments.slice(0, i).join('/');
+                shortURL.pathname = contentSegments.slice(0, i).join('/');
 
                 pushAlternative(shortURL, pathSegments.slice(i).join('/'));
             }

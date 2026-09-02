@@ -12,22 +12,13 @@ export function Paragraph(props: BlockProps<DocumentBlockParagraph>) {
     const { block, style, ...contextProps } = props;
     const { context } = contextProps;
 
-    // InlineActionButtons use flex-grow to take the available width. This requires the parent to be a flex container.
-    const inlineButtonStyle =
-        'has-[.button,input]:flex has-[.button,input]:flex-wrap has-[.button,input]:gap-2 has-[.button,input]:items-center';
-
     const paragraph = (
         <p
+            // Cover-aware contrast text applies only to the page body, not to documents
+            // rendered in overlays (search answers, AI chat) on a background-cover page.
             data-cover-aware-text={context.isPageBody ? '' : undefined}
-            className={tcls(
-                // Cover-aware contrast text applies only to the page body, not to documents
-                // rendered in overlays (search answers, AI chat) on a background-cover page.
-                context.isPageBody &&
-                    'page-cover-background:[&:not(:has(.button,input))]:text-contrast-cover',
-                inlineButtonStyle,
-                style,
-                getTextAlignment(block.data?.align)
-            )}
+            // Paragraph styles live in globals.css (`.paragraph`) to keep the class attribute short.
+            className={tcls('paragraph', style, getTextAlignment(block.data?.align))}
         >
             <Inlines {...contextProps} nodes={block.nodes} ancestorInlines={[]} />
         </p>

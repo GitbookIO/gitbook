@@ -19,6 +19,15 @@ import { useSearchController } from './useSearchController';
 import { t, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
 
+const SEARCH_POPUP_FOCUSABLE_SELECTOR = [
+    'a[href]:not([aria-disabled="true"])',
+    'button:not([disabled])',
+    'input:not([disabled])',
+    'select:not([disabled])',
+    'textarea:not([disabled])',
+    '[tabindex]:not([tabindex="-1"])',
+].join(',');
+
 const SearchFrame = dynamic(() => import('./SearchFrame').then((mod) => mod.SearchFrame), {
     ssr: false,
 });
@@ -39,6 +48,7 @@ export function SearchContainer({
     ...searchProps
 }: SearchContainerProps) {
     const searchInputRef = useRef<HTMLDivElement>(null);
+    const [searchPopup, setSearchPopup] = React.useState<HTMLDivElement | null>(null);
     const language = useLanguage();
     const usesSideSheet = useIsMobile(768);
     const {
@@ -133,6 +143,56 @@ export function SearchContainer({
     const shouldShowSearchFrame = usesSideSheet
         ? Boolean(state?.open || state?.query || wasSearchOpened)
         : Boolean(state?.query || withAI);
+
+    React.useEffect(() => {
+        if (
+            usesSideSheet ||
+            !isSearchOpen ||
+            !shouldShowSearchFrame ||
+            !searchInputRef.current ||
+            !searchPopup
+        ) {
+            return;
+        }
+
+        const searchInput = searchInputRef.current.querySelector<HTMLElement>(
+            '[data-testid="search-input"]'
+        );
+        if (!searchInput) {
+            return;
+        }
+
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if (event.key !== 'Tab') {
+                return;
+            }
+
+            const popupControls = Array.from(
+                searchPopup.querySelectorAll<HTMLElement>(SEARCH_POPUP_FOCUSABLE_SELECTOR)
+            ).filter((element) => element.getClientRects().length > 0);
+            const focusableElements = [searchInput, ...popupControls];
+            const currentIndex = focusableElements.indexOf(document.activeElement as HTMLElement);
+            const nextIndex =
+                currentIndex === -1
+                    ? event.shiftKey
+                        ? focusableElements.length - 1
+                        : 0
+                    : event.shiftKey
+                      ? currentIndex - 1
+                      : currentIndex + 1;
+            const wrappedIndex = (nextIndex + focusableElements.length) % focusableElements.length;
+
+            event.preventDefault();
+            focusableElements[wrappedIndex]?.focus();
+        };
+
+        document.addEventListener('keydown', handleKeyDown, true);
+
+        return () => {
+            document.removeEventListener('keydown', handleKeyDown, true);
+        };
+    }, [isSearchOpen, searchPopup, shouldShowSearchFrame, usesSideSheet]);
+
     const scopeControlNode =
         searchProps.withVariants || searchProps.withSections ? (
             <SearchScopeControl {...scopeControl} />
@@ -228,6 +288,8 @@ export function SearchContainer({
                     <Popover
                         content={searchFrame}
                         anchor={searchInputRef}
+                        popupRef={setSearchPopup}
+                        popupTestId="search-popover"
                         rootProps={{
                             open: isSearchOpen,
                             onOpenChange: (nextOpen, eventDetails) => {

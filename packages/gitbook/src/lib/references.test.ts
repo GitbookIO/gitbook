@@ -332,7 +332,7 @@ describe('resolveContentRef for direct space links', () => {
         } as unknown as GitBookAnyContext;
     }
 
-    it('returns the containing section title, not the site-space title', async () => {
+    it('returns the site-space title with the section as a breadcrumb ancestor', async () => {
         const targetSpace = buildSpace('space-target', 'Target Space Title');
         const siteSpace = buildSiteSpace(targetSpace, 'Variant Title');
         const section = {
@@ -353,12 +353,13 @@ describe('resolveContentRef for direct space links', () => {
 
         const result = await resolveContentRef({ kind: 'space', space: 'space-current' }, context);
 
-        expect(result?.text).toBe('Reference');
+        expect(result?.text).toBe('Variant Title');
+        expect(result?.ancestors).toEqual([{ label: 'Reference' }]);
         expect(result?.href).toBe(siteSpace.urls.published!);
         expect(result?.active).toBe(true);
     });
 
-    it('returns the localized section title when available', async () => {
+    it('returns the localized site-space title with a localized section breadcrumb', async () => {
         const targetSpace = buildSpace('space-target', 'Target Space Title');
         const siteSpace = buildSiteSpace(targetSpace, 'Variant Title');
         const section = {
@@ -383,7 +384,8 @@ describe('resolveContentRef for direct space links', () => {
             { kind: 'space', space: 'space-current' },
             contextFr
         );
-        expect(resultFr?.text).toBe('Référence');
+        expect(resultFr?.text).toBe('Variant Title');
+        expect(resultFr?.ancestors).toEqual([{ label: 'Référence' }]);
 
         const contextEn = buildContext({
             siteSpace,
@@ -396,7 +398,8 @@ describe('resolveContentRef for direct space links', () => {
             { kind: 'space', space: 'space-current' },
             contextEn
         );
-        expect(resultEn?.text).toBe('Reference');
+        expect(resultEn?.text).toBe('Variant Title');
+        expect(resultEn?.ancestors).toEqual([{ label: 'Reference' }]);
     });
 
     it('falls back to the site-space title when the site has no sections', async () => {
@@ -444,5 +447,294 @@ describe('resolveContentRef for direct space links', () => {
         expect(result?.text).toBe('External Space Title');
         expect(result?.href).toBe(externalSpace.urls.published!);
         expect(result?.active).toBe(false);
+    });
+
+    it('returns the target site-space title for a cross-space link within the same site section', async () => {
+        const currentSpace = buildSpace('space-current', 'Practical Guides Hub');
+        const guideSpace = buildSpace('space-guide', 'SNOMED CT EHR Requirements Guide');
+        const currentSiteSpace = buildSiteSpace(currentSpace, 'Practical Guides');
+        const guideSiteSpace = buildSiteSpace(guideSpace, 'SNOMED CT EHR Requirements Guide');
+        guideSiteSpace.urls = {
+            published: 'https://docs.example.com/guides/snomed-ct-ehr-requirements-guide/',
+        };
+
+        const section = {
+            object: 'site-section',
+            id: 'section-1',
+            title: 'Practical Guides',
+            draft: false,
+            path: '',
+            siteSpaces: [currentSiteSpace, guideSiteSpace],
+            urls: {},
+        };
+
+        const dataFetcher = {
+            getSpace: async () => ({ error: { code: 404, message: 'Not found' } }),
+            getRevision: async () => ({ error: { code: 404, message: 'Not found' } }),
+            getChangeRequest: async () => ({ error: { code: 404, message: 'Not found' } }),
+            withToken: function () {
+                return this;
+            },
+        } as unknown as GitBookDataFetcher;
+
+        const context = buildContext({
+            siteSpace: currentSiteSpace,
+            sections: { list: [section], current: section },
+            structure: { type: 'sections', structure: [section] },
+            dataFetcher,
+        });
+
+        const result = await resolveContentRef({ kind: 'space', space: 'space-guide' }, context);
+
+        expect(result?.text).toBe('SNOMED CT EHR Requirements Guide');
+        expect(result?.ancestors).toEqual([{ label: 'Practical Guides' }]);
+        expect(result?.href).toBe(guideSiteSpace.urls.published!);
+        expect(result?.active).toBe(false);
+    });
+
+    function buildDocumentPage(
+        id: string,
+        title: string,
+        path: string,
+        pages: unknown[] = []
+    ): RevisionPageDocument {
+        return {
+            object: 'page',
+            id,
+            type: 'document',
+            kind: 'sheet',
+            title,
+            path,
+            slug: path.split('/').pop() ?? path,
+            pages,
+            tags: [],
+            layout: {},
+            urls: { app: `https://app.gitbook.com/page/${id}` },
+        } as unknown as RevisionPageDocument;
+    }
+
+    function buildRevision(pages: unknown[]): Revision {
+        return {
+            object: 'revision',
+            id: 'rev-space-target',
+            type: 'edits',
+            pages,
+            files: [],
+            reusableContents: [],
+            tags: [],
+            parents: [],
+            createdAt: '',
+            urls: { app: '' },
+        } as unknown as Revision;
+    }
+
+    function buildCrossSpaceContext(
+        targetSpace: Space,
+        targetRevision: Revision,
+        structure: unknown
+    ) {
+        const currentSiteSpace = buildSiteSpace(
+            buildSpace('space-current', 'Current Space'),
+            'Current Variant'
+        );
+        const dataFetcher = {
+            getSpace: async ({ spaceId }: { spaceId: string }) =>
+                spaceId === targetSpace.id
+                    ? { data: targetSpace }
+                    : { error: { code: 404, message: 'Not found' } },
+            getRevision: async ({ spaceId }: { spaceId: string }) =>
+                spaceId === targetSpace.id
+                    ? { data: targetRevision }
+                    : { error: { code: 404, message: 'Not found' } },
+            getChangeRequest: async () => ({ error: { code: 404, message: 'Not found' } }),
+            withToken: function () {
+                return this;
+            },
+        } as unknown as GitBookDataFetcher;
+
+        return buildContext({
+            siteSpace: currentSiteSpace,
+            structure,
+            dataFetcher,
+        });
+    }
+
+    it('prepends every localized section group and section to cross-space page ancestors', async () => {
+        const targetSpace = buildSpace('space-target', 'Target Space');
+        const targetSiteSpace = buildSiteSpace(targetSpace, 'Target Variant');
+        targetSiteSpace.urls = { published: 'https://docs.example.com/target/' };
+        const pageGroup = {
+            object: 'page',
+            id: 'page-group',
+            type: 'group',
+            kind: 'group',
+            title: 'Getting started',
+            path: 'getting-started',
+            slug: 'getting-started',
+            pages: [buildDocumentPage('page-target', 'Target page', 'getting-started/target')],
+        };
+        const section = {
+            object: 'site-section',
+            id: 'section-target',
+            title: 'Reference',
+            localizedTitle: { fr: 'Référence' },
+            draft: false,
+            path: 'reference',
+            siteSpaces: [targetSiteSpace],
+            urls: {},
+        };
+        const sectionGroup = {
+            object: 'site-section-group',
+            id: 'section-group-target',
+            title: 'Product documentation',
+            localizedTitle: { fr: 'Documentation produit' },
+            draft: false,
+            sections: [],
+            children: [
+                {
+                    object: 'site-section-group',
+                    id: 'section-group-nested',
+                    title: 'API guides',
+                    draft: false,
+                    sections: [],
+                    children: [
+                        {
+                            object: 'site-section-group',
+                            id: 'section-group-child',
+                            title: 'Authentication',
+                            localizedTitle: { fr: 'Authentification' },
+                            draft: false,
+                            sections: [section],
+                            children: [section],
+                        },
+                    ],
+                },
+            ],
+        };
+        const context = buildCrossSpaceContext(targetSpace, buildRevision([pageGroup]), {
+            type: 'sections',
+            structure: [sectionGroup],
+        });
+
+        const result = await resolveContentRef(
+            { kind: 'page', space: targetSpace.id, page: 'page-target' },
+            { ...context, locale: 'fr' } as GitBookAnyContext
+        );
+
+        expect(result?.text).toBe('Target page');
+        expect(result?.ancestors).toEqual([
+            { label: 'Documentation produit' },
+            { label: 'API guides' },
+            { label: 'Authentification' },
+            { label: 'Référence', href: targetSiteSpace.urls.published },
+            { label: 'Getting started', icon: null, href: expect.any(String) },
+        ]);
+        expect(result?.ancestors?.[0]?.href).toBeUndefined();
+        expect(result?.ancestors?.[1]?.href).toBeUndefined();
+        expect(result?.ancestors?.[2]?.href).toBeUndefined();
+        expect(result?.ancestors?.[4]?.href).toBeTruthy();
+    });
+
+    it('uses the first document as the target for a page-group reference', async () => {
+        const targetSpace = buildSpace('space-target', 'Target Space');
+        const targetSiteSpace = buildSiteSpace(targetSpace, 'Target Variant');
+        targetSiteSpace.urls = { published: 'https://docs.example.com/target/' };
+        const pageGroup = {
+            object: 'page',
+            id: 'page-group',
+            type: 'group',
+            kind: 'group',
+            title: 'Learn about Cortex Agentix',
+            path: 'cortex-agentix',
+            slug: 'cortex-agentix',
+            pages: [buildDocumentPage('page-target', 'Cortex Agentix docs', 'cortex-agentix/docs')],
+        };
+        const context = buildCrossSpaceContext(targetSpace, buildRevision([pageGroup]), {
+            type: 'siteSpaces',
+            structure: [targetSiteSpace],
+        });
+
+        const result = await resolveContentRef(
+            { kind: 'page', space: targetSpace.id, page: 'page-group' },
+            context
+        );
+
+        expect(result?.page?.id).toBe('page-target');
+        expect(result?.text).toBe('Learn about Cortex Agentix');
+        expect(result?.ancestors?.map((ancestor) => ancestor.label)).toEqual([
+            'Target Variant',
+            'Learn about Cortex Agentix',
+        ]);
+        expect(
+            result?.ancestors?.filter(({ label }) => label === 'Learn about Cortex Agentix')
+        ).toHaveLength(1);
+    });
+
+    it('uses the section instead of the variant for an ungrouped cross-space page', async () => {
+        const targetSpace = buildSpace('space-target', 'Target Space');
+        const targetSiteSpace = buildSiteSpace(targetSpace, 'Target Variant');
+        targetSiteSpace.urls = { published: 'https://docs.example.com/target/' };
+        const section = {
+            object: 'site-section',
+            id: 'section-target',
+            title: 'Reference',
+            draft: false,
+            path: 'reference',
+            siteSpaces: [targetSiteSpace],
+            urls: {},
+        };
+        const context = buildCrossSpaceContext(
+            targetSpace,
+            buildRevision([buildDocumentPage('page-target', 'Target page', 'target')]),
+            { type: 'sections', structure: [section] }
+        );
+
+        const result = await resolveContentRef(
+            { kind: 'page', space: targetSpace.id, page: 'page-target' },
+            context
+        );
+
+        expect(result?.ancestors).toEqual([
+            { label: 'Reference', href: targetSiteSpace.urls.published },
+        ]);
+    });
+
+    it('falls back to the target variant for a sectionless in-site page', async () => {
+        const targetSpace = buildSpace('space-target', 'Target Space');
+        const targetSiteSpace = buildSiteSpace(targetSpace, 'Target Variant');
+        targetSiteSpace.urls = { published: 'https://docs.example.com/target/' };
+        const context = buildCrossSpaceContext(
+            targetSpace,
+            buildRevision([buildDocumentPage('page-target', 'Target page', 'target')]),
+            { type: 'siteSpaces', structure: [targetSiteSpace] }
+        );
+
+        const result = await resolveContentRef(
+            { kind: 'page', space: targetSpace.id, page: 'page-target' },
+            context
+        );
+
+        expect(result?.ancestors).toEqual([
+            { label: 'Target Variant', href: targetSiteSpace.urls.published },
+        ]);
+    });
+
+    it('falls back to the raw space title for an external page', async () => {
+        const targetSpace = buildSpace('space-external', 'External Space');
+        const context = buildCrossSpaceContext(
+            targetSpace,
+            buildRevision([buildDocumentPage('page-target', 'External page', 'target')]),
+            { type: 'siteSpaces', structure: [] }
+        );
+
+        const result = await resolveContentRef(
+            { kind: 'page', space: targetSpace.id, page: 'page-target' },
+            context
+        );
+
+        expect(result?.text).toBe('External page');
+        expect(result?.ancestors).toEqual([
+            { label: 'External Space', href: targetSpace.urls.published },
+        ]);
     });
 });

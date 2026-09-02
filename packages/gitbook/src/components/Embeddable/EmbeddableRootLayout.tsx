@@ -38,10 +38,10 @@ export async function EmbeddableRootLayout({
 }: React.PropsWithChildren<EmbeddableRootLayoutProps>) {
     const theme = resolveEmbeddableTheme(context.customization, forcedTheme);
 
-    // Only remember a theme the visitor explicitly requested via `?theme=`, and only on
-    // multi-theme sites that actually honor the override. Single-theme sites ignore it (and would
-    // otherwise persist their own default on every plain visit — see PR #4380 review). RND-11571
-    const rememberedTheme = context.customization.themes.toggeable ? forcedTheme : null;
+    // Only remember a theme that was explicitly requested via `?theme=` *and* honored — a site
+    // pinned to one theme ignores the request, and would otherwise persist its own default on every
+    // plain visit (see PR #4380 review). RND-11571
+    const rememberedTheme = theme.forcedTheme === forcedTheme ? forcedTheme : null;
 
     return (
         <CustomizationRootLayout
@@ -57,6 +57,7 @@ export async function EmbeddableRootLayout({
                 externalLinksTarget={context.customization.externalLinks.target}
                 contextId={context.contextId}
                 proxyOrigin={context.site.proxy?.origin}
+                searchPrewarmURL={context.linker.toPathInSite('~gitbook/search-prewarm')}
             >
                 {/* Persist an explicit ?theme= override so it survives tab navigation. RND-11571 */}
                 <EmbeddableThemeSync forcedTheme={rememberedTheme} />

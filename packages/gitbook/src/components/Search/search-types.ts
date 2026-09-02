@@ -20,6 +20,8 @@ export type ComputedPageResult = BaseComputedResult & {
     type: 'page';
     pageId: string;
     spaceId: string;
+    /** Site-space owning this result, used to enforce the client-side search scope. */
+    siteSpaceId?: string;
     /** Page-level description for a page-root search destination. */
     description: string;
     /** Canonical one-based relevance position assigned by the search backend. */

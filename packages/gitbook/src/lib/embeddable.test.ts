@@ -182,3 +182,20 @@ describe('resolveEmbeddableTheme', () => {
         });
     });
 });
+
+describe('resolveEmbeddableTheme with a single system theme', () => {
+    it('accepts an explicit override, since the site pins no theme', () => {
+        // The widget outside the iframe follows the embedding page for these sites, so the docs
+        // have to honor the scheme it asks for or the two disagree (RND-12558).
+        expect(
+            resolveEmbeddableTheme(
+                { themes: { toggeable: false, default: CustomizationDefaultThemeMode.System } },
+                CustomizationDefaultThemeMode.Light
+            )
+        ).toEqual({
+            htmlTheme: CustomizationDefaultThemeMode.Light,
+            defaultTheme: CustomizationDefaultThemeMode.Light,
+            forcedTheme: CustomizationDefaultThemeMode.Light,
+        });
+    });
+});

@@ -277,12 +277,15 @@ export async function resolveContentRef(
                 return null;
             }
 
+            const sectionLabel = getSpaceRefSectionLabel(targetSpace, context.locale);
+
             return {
                 href:
                     targetSpace.siteSpace?.urls.published ??
                     targetSpace.space.urls.published ??
                     targetSpace.space.urls.app,
                 text: getSpaceRefText(targetSpace, context.locale),
+                ancestors: sectionLabel ? [{ label: sectionLabel }] : undefined,
                 active: contentRef.space === space.id,
             };
         }
@@ -482,21 +485,67 @@ function getBestTargetSpaceFromSite(
 }
 
 /**
- * Resolve the text to show for a direct link to a space: the containing section's
- * title takes precedence, since that's what organizes the site's navigation for the
- * reader, then the site-space (variant) title, then the raw space title.
+ * Resolve the text to show for a direct link to a space: the site-space (variant)
+ * title when available, otherwise the raw space title.
  */
 function getSpaceRefText(
     targetSpace: { space: Space; siteSpace: SiteSpace | null; siteSection: SiteSection | null },
     currentLanguage: TranslationLanguage | undefined
 ): string {
-    if (targetSpace.siteSection) {
-        return getLocalizedTitle(targetSpace.siteSection, currentLanguage);
-    }
     if (targetSpace.siteSpace) {
         return getLocalizedTitle(targetSpace.siteSpace, currentLanguage);
     }
     return targetSpace.space.title;
+}
+
+/**
+ * Section title for a space link breadcrumb (e.g. link preview tooltips), when the
+ * target space belongs to a site section.
+ */
+function getSpaceRefSectionLabel(
+    targetSpace: { space: Space; siteSpace: SiteSpace | null; siteSection: SiteSection | null },
+    currentLanguage: TranslationLanguage | undefined
+): string | null {
+    if (targetSpace.siteSection) {
+        return getLocalizedTitle(targetSpace.siteSection, currentLanguage);
+    }
+    return null;
+}
+
+/**
+ * Ancestors to attach to a resolved content ref. Page/anchor links identify their
+ * containing section instead of repeating the target variant.
+ */
+function resolvePageAncestors(
+    context: GitBookAnyContext,
+    contentRef: ContentRef,
+    foundSiteSpace: ReturnType<typeof findSiteSpaceBy>,
+    ctx: { spaceContext: GitBookSpaceContext; baseURL: URL }
+): { label: string; href?: string }[] {
+    const isPageOrAnchorRef = contentRef.kind === 'page' || contentRef.kind === 'anchor';
+
+    if (isPageOrAnchorRef && foundSiteSpace?.siteSection) {
+        return [
+            ...(foundSiteSpace.siteSectionGroups ?? []).map((group) => ({
+                label: getLocalizedTitle(group, context.locale),
+            })),
+            {
+                label: getLocalizedTitle(foundSiteSpace.siteSection, context.locale),
+                href: ctx.baseURL.toString(),
+            },
+        ];
+    }
+
+    if (foundSiteSpace?.siteSpace) {
+        return [
+            {
+                label: getLocalizedTitle(foundSiteSpace.siteSpace, context.locale),
+                href: ctx.baseURL.toString(),
+            },
+        ];
+    }
+
+    return [{ label: ctx.spaceContext.space.title, href: ctx.baseURL.toString() }];
 }
 
 async function resolveContentRefInSpace(
@@ -533,19 +582,21 @@ async function resolveContentRefInSpace(
             return null;
         }
 
-        // Prefer the variant title when available, then the section title, then fallback to the space title.
+        const foundSiteSpace =
+            'site' in context
+                ? findSiteSpaceBy(context.structure, (siteSpace) => siteSpace.space.id === spaceId)
+                : null;
+
+        const ancestors = resolvePageAncestors(context, contentRef, foundSiteSpace, ctx);
+
+        // Prefer the variant title when available, then the section title, then fallback to the space title for non-page refs.
         const ancestorLabel = (() => {
             if ('site' in context) {
-                const currentLanguage = context.locale;
-                const foundSiteSpace = findSiteSpaceBy(
-                    context.structure,
-                    (siteSpace) => siteSpace.space.id === spaceId
-                );
                 if (foundSiteSpace?.siteSpace) {
-                    return getLocalizedTitle(foundSiteSpace.siteSpace, currentLanguage);
+                    return getLocalizedTitle(foundSiteSpace.siteSpace, context.locale);
                 }
                 if (foundSiteSpace?.siteSection) {
-                    return getLocalizedTitle(foundSiteSpace.siteSection, currentLanguage);
+                    return getLocalizedTitle(foundSiteSpace.siteSection, context.locale);
                 }
                 return ctx.spaceContext.space.title;
             }
@@ -556,10 +607,9 @@ async function resolveContentRefInSpace(
         return {
             ...resolved,
             ancestors: [
-                {
-                    label: ancestorLabel,
-                    href: ctx.baseURL.toString(),
-                },
+                ...(contentRef.kind === 'page' || contentRef.kind === 'anchor'
+                    ? ancestors
+                    : [{ label: ancestorLabel, href: ctx.baseURL.toString() }]),
                 ...(resolved.ancestors ?? []),
             ].filter(filterOutNullable),
         };
