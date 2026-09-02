@@ -62,23 +62,8 @@ export const useIsAIChatMaxWidth = () =>
 
 // Hoisted so the synchronous persist rehydrate (during create() above) can call them before this point.
 function setWidthOnViewport(width: number) {
-    if (typeof document === 'undefined') {
-        return;
-    }
-    // Any change to the <html> style attribute re-styles the whole document, so only write when
-    // the value differs from what is already in effect (the stylesheet default is the min width).
-    const style = document.documentElement.style;
-    const current = style.getPropertyValue('--ai-chat-width');
-    const capped = capToViewport(width);
-    if (capped === AI_CHAT_MIN_WIDTH) {
-        if (current) {
-            style.removeProperty('--ai-chat-width');
-        }
-        return;
-    }
-    const value = `${capped}px`;
-    if (current !== value) {
-        style.setProperty('--ai-chat-width', value);
+    if (typeof document !== 'undefined') {
+        document.documentElement.style.setProperty('--ai-chat-width', `${capToViewport(width)}px`);
     }
 }
 
