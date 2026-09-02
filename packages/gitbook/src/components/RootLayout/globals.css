@@ -564,8 +564,6 @@ html.dark .highlight-line.diff-deleted .highlight-line-content::before {
   @apply rounded-none!;
 }
 
-/* A document can hold tens of thousands of paragraphs, so their styles live behind one class
-   rather than in every element's class attribute. */
 @layer components {
   .paragraph {
     /* Inline action buttons grow to the available width, which needs a flex parent. */
