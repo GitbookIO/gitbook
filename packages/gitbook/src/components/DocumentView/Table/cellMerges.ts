@@ -31,6 +31,7 @@ export interface TableCellMergeSlot {
 export interface TableCellMergeLayout {
     cells: ReadonlyMap<string, ReadonlyMap<string, TableCellMergeSlot>>;
     verticalRecordGroups: readonly (readonly string[])[];
+    recordGroups: readonly (readonly string[])[];
     hasVerticalMerges: boolean;
 }
 
@@ -45,7 +46,12 @@ export function createTableCellMergeLayout(
     recordOrder: readonly string[]
 ): TableCellMergeLayout {
     if (block.data.view.type !== 'grid') {
-        return { cells: new Map(), verticalRecordGroups: [], hasVerticalMerges: false };
+        return {
+            cells: new Map(),
+            verticalRecordGroups: [],
+            recordGroups: [],
+            hasVerticalMerges: false,
+        };
     }
 
     const columnOrder = block.data.view.columns;
@@ -97,6 +103,7 @@ export function createTableCellMergeLayout(
     return {
         cells,
         verticalRecordGroups,
+        recordGroups: groupConnectedRecords(recordOrder, verticalRecordGroups),
         hasVerticalMerges: verticalRecordGroups.length > 0,
     };
 }
@@ -184,4 +191,45 @@ function resolveTableCellMerge(
 
 function getCellKey(recordId: string, columnId: string): string {
     return `${recordId.length}:${recordId}${columnId}`;
+}
+
+/** Partition records into ordered groups connected by one or more vertical merges. */
+function groupConnectedRecords(
+    recordOrder: readonly string[],
+    connectedRecordGroups: readonly (readonly string[])[]
+): string[][] {
+    const parents = new Map(recordOrder.map((recordId) => [recordId, recordId]));
+
+    const findRoot = (recordId: string): string => {
+        const parent = parents.get(recordId);
+        if (!parent || parent === recordId) {
+            return recordId;
+        }
+
+        const root = findRoot(parent);
+        parents.set(recordId, root);
+        return root;
+    };
+
+    for (const group of connectedRecordGroups) {
+        const firstRecordId = group[0];
+        if (!firstRecordId) continue;
+
+        for (const recordId of group.slice(1)) {
+            parents.set(findRoot(recordId), findRoot(firstRecordId));
+        }
+    }
+
+    const groupedRecords = new Map<string, string[]>();
+    for (const recordId of recordOrder) {
+        const root = findRoot(recordId);
+        const group = groupedRecords.get(root);
+        if (group) {
+            group.push(recordId);
+        } else {
+            groupedRecords.set(root, [recordId]);
+        }
+    }
+
+    return [...groupedRecords.values()];
 }

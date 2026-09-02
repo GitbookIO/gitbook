@@ -12,10 +12,12 @@ function createBlock(
     options: {
         columns?: string[];
         definitions?: Record<string, DocumentTableDefinition>;
+        recordOrder?: string[];
         viewType?: 'grid' | 'cards';
     } = {}
 ) {
     const columns = options.columns ?? COLUMN_ORDER;
+    const recordOrder = options.recordOrder ?? RECORD_ORDER;
     const definitions =
         options.definitions ??
         Object.fromEntries(columns.map((column) => [column, createDefinition('text', column)]));
@@ -26,7 +28,7 @@ function createBlock(
                     ? { type: 'cards', columns }
                     : { type: 'grid', columns },
             records: Object.fromEntries(
-                RECORD_ORDER.map((recordId, index) => [
+                recordOrder.map((recordId, index) => [
                     recordId,
                     { orderIndex: `${index}`, values: {} },
                 ])
@@ -67,6 +69,7 @@ describe('createTableCellMergeLayout', () => {
             });
             expect(getTableCellMerge(layout, 'third', 'c')).toMatchObject({ isAnchor: false });
             expect(layout.verticalRecordGroups).toEqual([['second', 'third']]);
+            expect(layout.recordGroups).toEqual([['first'], ['second', 'third']]);
             expect(layout.hasVerticalMerges).toBe(true);
         }
     });
@@ -81,8 +84,10 @@ describe('createTableCellMergeLayout', () => {
         );
 
         expect(missing.cells.size).toBe(0);
+        expect(missing.recordGroups).toEqual([['first'], ['second'], ['third']]);
         expect(missing.hasVerticalMerges).toBe(false);
         expect(cards.cells.size).toBe(0);
+        expect(cards.recordGroups).toEqual([]);
     });
 
     it.each([
@@ -128,6 +133,35 @@ describe('createTableCellMergeLayout', () => {
             });
             expect(getTableCellMerge(layout, 'third', 'c')).toMatchObject({ isAnchor: false });
             expect(layout.verticalRecordGroups).toEqual([['second', 'third']]);
+            expect(layout.recordGroups).toEqual([['first'], ['second', 'third']]);
+        }
+    });
+
+    it('partitions disjoint vertical merges and singleton records in record order', () => {
+        const recordOrder = ['first', 'second', 'third', 'fourth', 'fifth', 'sixth'];
+        const layout = createTableCellMergeLayout(
+            createBlock([verticalMerge('fourth', 'b', 2), verticalMerge('first', 'a', 2)], {
+                recordOrder,
+            }),
+            recordOrder
+        );
+
+        expect(layout.recordGroups).toEqual([
+            ['first', 'second'],
+            ['third'],
+            ['fourth', 'fifth'],
+            ['sixth'],
+        ]);
+    });
+
+    it('combines transitively connected vertical merges regardless of metadata order', () => {
+        for (const cellMerges of [
+            [verticalMerge('first', 'a', 2), verticalMerge('second', 'b', 2)],
+            [verticalMerge('second', 'b', 2), verticalMerge('first', 'a', 2)],
+        ]) {
+            const layout = createTableCellMergeLayout(createBlock(cellMerges), RECORD_ORDER);
+
+            expect(layout.recordGroups).toEqual([['first', 'second', 'third']]);
         }
     });
 
