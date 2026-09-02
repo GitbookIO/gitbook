@@ -150,6 +150,7 @@ export const sl: TranslationLanguage = {
     ai_chat_tools_submit_feedback: 'Pošlji povratne informacije',
     ai_chat_tools_submit_assistant_feedback: 'Ocenite prejšnje sporočilo pomočnika kot ${1}',
     ai_chat_tools_submitted_feedback: 'Povratne informacije poslane',
+    ai_chat_tools_shared_feedback_with_team: 'Povratne informacije poslane ekipi za dokumentacijo',
     ai_chat_tools_mcp_tool: 'Poklicano ${1}',
     ai_chat_ask: 'Vprašaj ${1}',
     ai_chat_ask_about: 'Vprašaj ${1} o ${2}',

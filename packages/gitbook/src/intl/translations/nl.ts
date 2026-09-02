@@ -152,6 +152,7 @@ export const nl: TranslationLanguage = {
     ai_chat_tools_submit_feedback: 'Feedback verzenden',
     ai_chat_tools_submit_assistant_feedback: 'Vorig bericht van de assistent beoordelen als ${1}',
     ai_chat_tools_submitted_feedback: 'Feedback verzonden',
+    ai_chat_tools_shared_feedback_with_team: 'Feedback naar het documentatieteam gestuurd',
     ai_chat_tools_mcp_tool: '${1} aangeroepen',
     ai_chat_ask: 'Vraag het aan ${1}',
     ai_chat_ask_about: 'Stel ${1} een vraag over ${2}',

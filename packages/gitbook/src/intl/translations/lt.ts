@@ -150,6 +150,7 @@ export const lt: TranslationLanguage = {
     ai_chat_tools_submit_feedback: 'Siųsti atsiliepimą',
     ai_chat_tools_submit_assistant_feedback: 'Įvertinkite ankstesnę asistento žinutę kaip ${1}',
     ai_chat_tools_submitted_feedback: 'Atsiliepimas išsiųstas',
+    ai_chat_tools_shared_feedback_with_team: 'Atsiliepimas išsiųstas dokumentacijos komandai',
     ai_chat_tools_mcp_tool: 'Iškviesta ${1}',
     ai_chat_ask: 'Klausti ${1}',
     ai_chat_ask_about: 'Klausti ${1} apie ${2}',

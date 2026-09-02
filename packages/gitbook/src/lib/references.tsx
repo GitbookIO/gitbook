@@ -649,6 +649,16 @@ export function resolveStringContentRef(src: string): ContentRef | null {
     return null;
 }
 
+/** Strip the origin from an absolute URL, as content refs are resolved on the path only. */
+export function toContentRefPath(src: string): string {
+    if (!URL.canParse(src)) {
+        return src;
+    }
+
+    const parsed = new URL(src);
+    return `${parsed.pathname}${parsed.search}${parsed.hash}`;
+}
+
 const RESOLVERS: {
     [kind in ContentRef['kind']]: {
         resolve: (src: string) => Extract<ContentRef, { kind: kind }> | null;

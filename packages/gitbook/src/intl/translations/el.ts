@@ -155,6 +155,7 @@ export const el: TranslationLanguage = {
     ai_chat_tools_submit_assistant_feedback:
         'Αξιολόγηση του προηγούμενου μηνύματος του Βοηθού ως ${1}',
     ai_chat_tools_submitted_feedback: 'Τα σχόλια υποβλήθηκαν',
+    ai_chat_tools_shared_feedback_with_team: 'Τα σχόλια στάλθηκαν στην ομάδα τεκμηρίωσης',
     ai_chat_tools_mcp_tool: 'Κλήθηκε ${1}',
     ai_chat_ask: 'Ρωτήστε ${1}',
     ai_chat_ask_about: 'Ρωτήστε ${1} για ${2}',

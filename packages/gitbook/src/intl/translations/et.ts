@@ -149,6 +149,7 @@ export const et: TranslationLanguage = {
     ai_chat_tools_submit_feedback: 'Saada tagasiside',
     ai_chat_tools_submit_assistant_feedback: 'Hinda assistendi eelmist sõnumit kui ${1}',
     ai_chat_tools_submitted_feedback: 'Tagasiside saadetud',
+    ai_chat_tools_shared_feedback_with_team: 'Tagasiside saadetud dokumentatsioonimeeskonnale',
     ai_chat_tools_mcp_tool: 'Kutsus ${1}',
     ai_chat_ask: 'Küsi ${1}',
     ai_chat_ask_about: 'Küsi ${1}: ${2}',
