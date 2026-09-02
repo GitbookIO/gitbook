@@ -2,4 +2,4 @@
 "gitbook": patch
 ---
 
-Drop the `page-cover-background:` gate from the paragraph cover-contrast class. Combined with the per-paragraph `:not(:has(...))`, it made every DOM insertion re-style all paragraphs on the page, which froze very long pages.
+Move paragraph block styles behind a single `paragraph` class and drop the `page-cover-background:` gate from the cover-contrast text. The gate combined with the per-paragraph `:not(:has(...))` made every DOM insertion re-style all paragraphs, which froze very long pages.
