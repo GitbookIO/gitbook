@@ -22,8 +22,7 @@ export function Paragraph(props: BlockProps<DocumentBlockParagraph>) {
             className={tcls(
                 // Cover-aware contrast text applies only to the page body, not to documents
                 // rendered in overlays (search answers, AI chat) on a background-cover page.
-                context.isPageBody &&
-                    'page-cover-background:[&:not(:has(.button,input))]:text-contrast-cover',
+                context.isPageBody && '[&:not(:has(.button,input))]:text-contrast-cover',
                 inlineButtonStyle,
                 style,
                 getTextAlignment(block.data?.align)
