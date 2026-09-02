@@ -1,8 +1,8 @@
 import 'server-only';
-import { cache } from '@/lib/cache';
 import type { PPRCacheScope } from '@/lib/cache-tags';
 import { DataFetcherError } from '@/lib/data/errors';
 import { GITBOOK_EXCHANGE_TOKEN_URL } from '@/lib/env';
+import { serverCache } from '@/lib/server-context';
 import { trace } from '@/lib/tracing';
 
 /**
@@ -23,9 +23,10 @@ export const PPR_TOKEN_SCOPE: Record<PPRCacheScope, PPRTokenScope> = {
  * narrowed to `scope`. The API only understands the latter, and narrowing is what lets components
  * sharing a scope share a cache entry: the token is part of their cache key.
  *
- * Memoized per request, but never persisted — an exchanged token is a credential.
+ * Memoized on the server context, so the cache fills reuse the exchanges of the route entries, but
+ * never persisted — an exchanged token is a credential.
  */
-export const exchangePPRToken = cache(
+export const exchangePPRToken = serverCache(
     async (token: string, scope: PPRTokenScope): Promise<string> => {
         return trace(`exchangePPRToken(${scope})`, async () => {
             const response = await fetchExchangedToken(token, scope);

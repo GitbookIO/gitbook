@@ -1,4 +1,8 @@
 import { afterEach, describe, expect, it, mock } from 'bun:test';
+import {
+    type WorkStore,
+    workAsyncStorage,
+} from 'next/dist/server/app-render/work-async-storage.external';
 
 import { PPR_TOKEN_SCOPE, exchangePPRToken } from './ppr-token';
 import { DataFetcherError } from '@/lib/data/errors';
@@ -68,8 +72,6 @@ describe('exchangePPRToken', () => {
         expect((error as DataFetcherError).code).toBe(502);
     });
 
-    // Request-level memoization is `React.cache`, which is inert outside a render scope and so
-    // cannot be exercised here. What is asserted instead: each scope is a distinct exchange.
     it('exchanges each scope separately', async () => {
         const calls = mockFetch(() => Response.json({ token: 'exchanged' }));
 
@@ -82,5 +84,18 @@ describe('exchangePPRToken', () => {
             { token: 'shared-token', scope: 'site' },
             { token: 'shared-token', scope: 'revision' },
         ]);
+    });
+
+    // The memo lives on the server context, keyed on the work store of the request, so it is also
+    // what a cache fill sees.
+    it('reuses an exchange within a request', async () => {
+        const calls = mockFetch(() => Response.json({ token: 'exchanged' }));
+
+        await workAsyncStorage.run({} as WorkStore, async () => {
+            await exchangePPRToken('shared-token', 'site');
+            await exchangePPRToken('shared-token', 'site');
+        });
+
+        expect(calls).toHaveLength(1);
     });
 });

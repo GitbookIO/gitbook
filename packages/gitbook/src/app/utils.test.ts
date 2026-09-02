@@ -1,18 +1,58 @@
 import { afterAll, beforeAll, describe, expect, it, mock } from 'bun:test';
 import jwt from 'jsonwebtoken';
+import {
+    type WorkStore,
+    workAsyncStorage,
+} from 'next/dist/server/app-render/work-async-storage.external';
 import rison from 'rison';
 
 import * as realContext from '@/lib/context';
 
 mock.module('server-only', () => ({}));
-// Only the lookup is stubbed: mocking the whole module would leak into the other test files,
+// Only the lookups are stubbed: mocking the whole module would leak into the other test files,
 // as `mock.module` replaces it for the entire test process.
 mock.module('@/lib/context', () => ({
     ...realContext,
-    getBaseContext: (input: unknown) => input,
+    getBaseContext: (input: BaseContextInput) => ({
+        ...input,
+        dataFetcher: createFakeDataFetcher(input),
+    }),
     fetchSiteContextByURLLookup: async (_baseContext: unknown, data: unknown) => data,
-    fetchSiteScopeContextByURLLookup: async (_baseContext: unknown, data: unknown) => data,
+    // Just enough of a site scope for the real merge with a space context.
+    fetchSiteScopeContextByURLLookup: async (
+        _baseContext: unknown,
+        { revision, ...data }: { siteSpace: string | undefined; revision: string }
+    ) => ({
+        ...data,
+        revisionId: revision,
+        siteSpace: { id: data.siteSpace, space: {} },
+        linker: 'site-scope-linker',
+    }),
 }));
+
+type BaseContextInput = { siteURLData: { apiToken: string }; pprScope?: string };
+
+/** Records the token and scope it was created with, so the composed context can be asserted on. */
+function createFakeDataFetcher(input: BaseContextInput) {
+    const fetchedWith = {
+        pprScope: input.pprScope,
+        tokenScope: getTokenScope(input.siteURLData.apiToken),
+    };
+
+    return {
+        fetchedWith,
+        getSpace: async (params: { spaceId: string }) => ({
+            data: { id: params.spaceId, organization: 'org-id', revision: 'space-revision-id' },
+        }),
+        getRevision: async (params: { revisionId: string }) => ({
+            data: { id: params.revisionId, pages: [], fetchedWith },
+        }),
+    };
+}
+
+function getTokenScope(token: string): string | undefined {
+    return (jwt.decode(token) as { claims?: { scope?: string } } | null)?.claims?.scope;
+}
 // Stand in for the exchange endpoint, which is the only thing that can narrow the claims. It is
 // stubbed at the network boundary rather than with `mock.module`, which would replace
 // `@/lib/ppr-token` for the entire test process and break its own test file.
@@ -250,18 +290,67 @@ describe('getPPRStaticSiteScopeContext', () => {
 
         expect(context).toMatchObject({
             apiToken,
-            revision: 'ppr-revision-id',
+            revisionId: 'ppr-revision-id',
         });
     });
 });
 
 describe('getPPRStaticSiteContext', () => {
-    it('uses the supplied API token without resolving published content again', async () => {
-        const { context } = await getPPRStaticSiteContext(getPPRRouteParams(routeParams), 'body');
+    /** Run `fn` the way Next runs a request: under a work store of its own. */
+    function inRequest<T>(fn: () => Promise<T>): Promise<T> {
+        return workAsyncStorage.run({} as WorkStore, fn);
+    }
 
-        expect(context).toMatchObject({
-            apiToken,
-            revision: 'ppr-revision-id',
+    type FetchedWith = { pprScope: string; tokenScope: string };
+    /** Shape produced by the stubs above. */
+    type ComposedContext = {
+        apiToken: string;
+        siteSpace: { id: string };
+        revisionId: string;
+        revision: { fetchedWith: FetchedWith };
+        dataFetcher: { fetchedWith: FetchedWith };
+    };
+
+    it('resolves the header from its own params', async () => {
+        const { context } = await getPPRStaticSiteContext(
+            await getPPRHeaderRouteParams(routeParams),
+            'header'
+        );
+
+        expect(context).toMatchObject({ siteSpace: 'default-site-space-id' });
+        expect(getTokenScope((context as unknown as { apiToken: string }).apiToken)).toBe('site');
+    });
+
+    it('composes the site scope of the layout, the revision of the TOC and its own fetcher', async () => {
+        await inRequest(async () => {
+            const { context } = await getPPRStaticSiteContext(
+                await getPPRPageRouteParams(routeParams),
+                'body'
+            );
+            const composed = context as unknown as ComposedContext;
+
+            // Same call as the layout: site token, visited location rather than the defaults.
+            expect(getTokenScope(composed.apiToken)).toBe('site');
+            expect(composed.siteSpace.id).toBe('page-site-space-id');
+            // Same fetch as the table of contents.
+            expect(composed.revisionId).toBe('ppr-revision-id');
+            expect(composed.revision.fetchedWith).toEqual({
+                pprScope: 'toc',
+                tokenScope: 'revision',
+            });
+            // Anything else the body reads goes through its own token.
+            expect(composed.dataFetcher.fetchedWith).toEqual({
+                pprScope: 'body',
+                tokenScope: 'page',
+            });
         });
+    });
+
+    it('fails outside a PPR request', async () => {
+        const pageParams = await inRequest(() => getPPRPageRouteParams(routeParams));
+
+        await expect(getPPRStaticSiteContext(pageParams, 'body')).rejects.toThrow(
+            'outside a PPR request'
+        );
     });
 });

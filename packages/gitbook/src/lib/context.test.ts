@@ -11,7 +11,9 @@ import {
     type GitBookBaseContext,
     fetchSiteContextByIds,
     fetchSiteScopeContextByIds,
+    fetchSpaceContextByIds,
     filterSectionsAndGroupsWithHiddenSiteSpaces,
+    mergeSiteScopeAndSpaceContext,
 } from './context';
 import { createLinker } from './links';
 
@@ -148,5 +150,32 @@ describe('fetchSiteContextByIds', () => {
         });
 
         expect(context.revisionId).toBe('space-revision-id');
+    });
+});
+
+describe('mergeSiteScopeAndSpaceContext', () => {
+    it('keeps the supplied data fetcher over the ones of both contexts', async () => {
+        const siteBaseContext = getBaseContext();
+        const spaceBaseContext = getBaseContext();
+        const dataFetcher = getBaseContext().dataFetcher;
+        const [siteScope, spaceContext] = await Promise.all([
+            fetchSiteScopeContextByIds(siteBaseContext, { ...ids, revision: 'revision-id' }),
+            fetchSpaceContextByIds(spaceBaseContext, {
+                space: 'space-id',
+                shareKey: undefined,
+                changeRequest: undefined,
+                revision: 'revision-id',
+            }),
+        ]);
+
+        const context = mergeSiteScopeAndSpaceContext(siteScope, spaceContext, { dataFetcher });
+
+        expect(context.dataFetcher).toBe(dataFetcher);
+        expect(context.dataFetcher).not.toBe(siteBaseContext.dataFetcher);
+        expect(context.dataFetcher).not.toBe(spaceBaseContext.dataFetcher);
+        expect(context.site.id).toBe('site-id');
+        expect(context.revision).toBe(revision as unknown as typeof context.revision);
+        expect(context.revisionId).toBe('revision-id');
+        expect(context.locale).toBe(TranslationLanguage.Fr);
     });
 });

@@ -24,6 +24,11 @@ import {
 // cache key of every data fetcher, so the tags they emit are scoped too and propagate up to the
 // entry here — making the component and the data it read a single revalidatable unit. No explicit
 // `cacheTag` is needed, and adding one would only duplicate a propagated tag.
+//
+// Only the params of the component are in its cache key. The site scope of the layout and the
+// revision of the table of contents reach the fill through the server context, so a component of the
+// `toc` or `body` scope renders the same site and revision as the shell. The header is the exception:
+// it renders the default variant, so it resolves its own.
 
 /**
  * Render the header from cache without carrying a request-scoped data fetcher into the cache key.

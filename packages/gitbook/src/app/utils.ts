@@ -14,10 +14,13 @@ import {
     type SiteURLData,
     fetchSiteContextByURLLookup,
     fetchSiteScopeContextByURLLookup,
+    fetchSpaceContextByIds,
     getBaseContext,
+    mergeSiteScopeAndSpaceContext,
 } from '@/lib/context';
 import { getDynamicCustomizationSettings } from '@/lib/customization';
 import { PPR_TOKEN_SCOPE, type PPRTokenScope, exchangePPRToken } from '@/lib/ppr-token';
+import { createServerContextValue } from '@/lib/server-context';
 
 export type RouteParamMode = 'url-host' | 'url';
 
@@ -181,12 +184,32 @@ export function getSiteURLDataFromParams(params: RouteLayoutParams): SiteURLData
     }
 }
 
+/**
+ * Raw params of the PPR request, shared with the cached components. They read them from here rather
+ * than from their props, which would put the site and revision tokens in their cache key.
+ */
+const pprRequestParams = createServerContextValue<PPRRouteLayoutParams>('ppr-request-params');
+
+function getPPRRequestParams(): PPRRouteLayoutParams {
+    const params = pprRequestParams.read();
+    if (!params) {
+        throw new Error(
+            'PPR component rendered outside a PPR request: the route entry must project its params with getPPRRouteParams first'
+        );
+    }
+    return params;
+}
+
 export function getPPRRouteParams(params: PPRRouteParams): RouteParams;
 export function getPPRRouteParams(params: PPRRouteLayoutParams): RouteLayoutParams;
 /**
  * Project PPR route params for the current page, without PPR-only cache inputs.
+ * Every route entry goes through here before rendering a cached component, so this is also where
+ * the raw params are shared with them.
  */
 export function getPPRRouteParams(params: PPRRouteLayoutParams): RouteLayoutParams {
+    pprRequestParams.provide(params);
+
     const { revisionId, revalidationId, pprDefaults: _, ...routeParams } = params;
     const siteURLData = getSiteURLDataFromParams(params);
 
@@ -309,9 +332,43 @@ export async function getPPRVisitorAuthClaims(
 /**
  * Get the static context for a PPR component. The scope partitions the cache entries and scopes
  * the tags they emit, so the component and its data are revalidated as one unit.
+ *
+ * The context is composed the way the shell is: the site scope of the layout (site token, visited
+ * location) and the space and revision of the table of contents (revision token). Only the data
+ * fetcher is the component's own, so what it reads beyond that is narrowed to its scope. The nested
+ * fetches run inside the cache fill, so the entry is tagged with the data it renders.
  */
 export async function getPPRStaticSiteContext(params: RouteLayoutParams, pprScope: PPRCacheScope) {
-    return getStaticSiteContext(params, { pprScope });
+    if (pprScope === 'header') {
+        // The header renders the default variant, so its site scope is parsed for another location
+        // than the layout's. Its site fetch is still shared with it: same token, same scope.
+        return getStaticSiteContext(params, { pprScope });
+    }
+
+    const requestParams = getPPRRequestParams();
+    const [siteParams, tableOfContentsParams] = await Promise.all([
+        getPPRSiteRouteParams(requestParams),
+        getPPRTableOfContentsRouteParams(requestParams),
+    ]);
+    const { baseContext, decoded } = getStaticBaseContext(params, { pprScope });
+    const tableOfContents = getStaticBaseContext(tableOfContentsParams, { pprScope: 'toc' });
+
+    const [{ context: siteScope }, spaceContext] = await Promise.all([
+        getStaticSiteScopeContext(siteParams, { pprScope: 'header' }),
+        fetchSpaceContextByIds(tableOfContents.baseContext, {
+            space: tableOfContents.siteURLData.space,
+            shareKey: tableOfContents.siteURLData.shareKey,
+            changeRequest: tableOfContents.siteURLData.changeRequest,
+            revision: tableOfContents.siteURLData.revision,
+        }),
+    ]);
+
+    return {
+        context: mergeSiteScopeAndSpaceContext(siteScope, spaceContext, {
+            dataFetcher: baseContext.dataFetcher,
+        }),
+        visitorAuthClaims: getVisitorAuthClaimsFromToken(decoded),
+    };
 }
 
 /**
