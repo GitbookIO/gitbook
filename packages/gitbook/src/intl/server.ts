@@ -5,7 +5,7 @@ import {
     isAvailableLanguage,
     loadLanguage,
 } from './translations';
-import type { GitBookAnyContext } from '@/lib/context';
+import type { GitBookAnyContext, GitBookSiteScopeContext } from '@/lib/context';
 
 export * from './translate';
 
@@ -15,7 +15,7 @@ export const DEFAULT_LOCALE = 'en' satisfies TranslationLocale;
  * Get the locale to use for the HTML lang attribute.
  * This returns the actual content language even if we don't have UI translations for it.
  */
-export function getContentLocale(context: GitBookAnyContext): string {
+export function getContentLocale(context: GitBookAnyContext | GitBookSiteScopeContext): string {
     if (context.locale) {
         return context.locale;
     }
@@ -31,7 +31,9 @@ export function getContentLocale(context: GitBookAnyContext): string {
 /**
  * Get the locale to use for a space.
  */
-export function getSpaceLocale(context: GitBookAnyContext): TranslationLocale {
+export function getSpaceLocale(
+    context: GitBookAnyContext | GitBookSiteScopeContext
+): TranslationLocale {
     const customization = 'site' in context ? context.customization : null;
 
     // If the language is configured in the space, use it in priority
@@ -55,7 +57,9 @@ export function getSpaceLocale(context: GitBookAnyContext): TranslationLocale {
 /**
  * Create the translation context for a space to use in the server components.
  */
-export async function getSpaceLanguage(context: GitBookAnyContext): Promise<TranslationLanguage> {
+export async function getSpaceLanguage(
+    context: GitBookAnyContext | GitBookSiteScopeContext
+): Promise<TranslationLanguage> {
     const locale = getSpaceLocale(context);
     const language = locale === DEFAULT_LOCALE ? defaultLanguage : await loadLanguage(locale);
 

@@ -6,7 +6,6 @@ import { AdaptiveVisitorContextProvider } from '../Adaptive';
 import { AIChatProvider } from '../AI';
 import type { RenderAIMessageOptions } from '../AI';
 import { AIChat, AskAITextSelection } from '../AIChat';
-import { Announcement } from '../Announcement';
 import { SpacesDropdown, TranslationsDropdown } from '../Header/SpacesDropdown';
 import { ClientNavigationSelectionProvider, CurrentContentProvider } from '../hooks';
 import { InsightsProvider, VisitorProvider } from '../Insights';
@@ -20,17 +19,16 @@ import {
 } from '../SiteSections';
 import { categorizeVariants } from './categorizeVariants';
 import { SpaceLayoutContextProvider } from './SpaceLayoutContext';
-import { Footer } from '@/components/Footer';
 import { Header, HeaderLogo } from '@/components/Header';
 import { TableOfContents } from '@/components/TableOfContents';
 import { isAIChatEnabled } from '@/components/utils/isAIChatEnabled';
 import type { VisitorAuthClaims } from '@/lib/adaptive';
-import type { GitBookSiteContext } from '@/lib/context';
+import type { GitBookSiteContext, GitBookSiteScopeContext } from '@/lib/context';
 import { GITBOOK_APP_URL } from '@/lib/env';
 import { tcls } from '@/lib/tailwind';
 
 type SpaceLayoutProps = {
-    context: GitBookSiteContext;
+    context: GitBookSiteScopeContext;
 
     /** Whether to enable tracking of events into site insights. */
     withTracking: boolean;
@@ -44,11 +42,20 @@ type SpaceLayoutProps = {
     /** The children of the layout. */
     children: React.ReactNode;
 
-    /** Override the site header without changing the surrounding layout. */
+    // The slots below all read the revision, which a site scope context doesn't carry, so they are
+    // rendered by the caller rather than from `context`.
+
+    /** Announcement banner, rendered above the header. */
+    announcementSlot?: React.ReactNode;
+
+    /** Site header. */
     headerSlot?: React.ReactNode;
 
-    /** Override the table of contents without changing the surrounding layout. */
+    /** Table of contents. */
     tableOfContentsSlot?: React.ReactNode;
+
+    /** Site footer, rendered only when the customization asks for one. */
+    footerSlot?: React.ReactNode;
 
     /**
      * Resolve the selected section/space/page on the client instead of trusting the server render.
@@ -102,7 +109,7 @@ export function SpaceLayoutServerContext(props: SpaceLayoutProps) {
                     siteSectionId={context.sections?.current?.id ?? null}
                     siteSpaceId={context.siteSpace.id}
                     siteShareKey={context.shareKey ?? null}
-                    spaceId={context.space.id}
+                    spaceId={context.siteSpace.space.id}
                     revisionId={context.revisionId}
                     visitorAuthClaims={visitorAuthClaims}
                 >
@@ -235,7 +242,8 @@ export function SpaceTableOfContents(props: { context: GitBookSiteContext }) {
  * Render the entire layout of the space (header, table of contents, footer).
  */
 export function SpaceLayout(props: SpaceLayoutProps) {
-    const { context, children, headerSlot, tableOfContentsSlot } = props;
+    const { context, children, headerSlot, tableOfContentsSlot, announcementSlot, footerSlot } =
+        props;
     const { customization } = context;
 
     const withTopHeader = customization.header.preset !== CustomizationHeaderPreset.None;
@@ -258,8 +266,8 @@ export function SpaceLayout(props: SpaceLayoutProps) {
             aiChatRenderMessageOptions={props.aiChatRenderMessageOptions}
             clientNavigationSelection={props.clientNavigationSelection}
         >
-            <Announcement context={context} />
-            {headerSlot ?? <SpaceHeader context={context} />}
+            {announcementSlot}
+            {headerSlot}
             <NavigationLoader />
             {isAIChatEnabled(customization.ai?.mode) ? (
                 <>
@@ -292,12 +300,12 @@ export function SpaceLayout(props: SpaceLayoutProps) {
                             : 'lg:min-h-screen'
                     )}
                 >
-                    {tableOfContentsSlot ?? <SpaceTableOfContents context={context} />}
+                    {tableOfContentsSlot}
                     {children}
                 </div>
             </div>
 
-            {withFooter ? <Footer context={context} /> : null}
+            {withFooter ? footerSlot : null}
         </SpaceLayoutServerContext>
     );
 }

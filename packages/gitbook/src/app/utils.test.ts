@@ -11,6 +11,7 @@ mock.module('@/lib/context', () => ({
     ...realContext,
     getBaseContext: (input: unknown) => input,
     fetchSiteContextByURLLookup: async (_baseContext: unknown, data: unknown) => data,
+    fetchSiteScopeContextByURLLookup: async (_baseContext: unknown, data: unknown) => data,
 }));
 // Stand in for the exchange endpoint, which is the only thing that can narrow the claims. It is
 // stubbed at the network boundary rather than with `mock.module`, which would replace
@@ -38,7 +39,9 @@ const {
     getPPRHeaderRouteParams,
     getPPRPageRouteParams,
     getPPRRouteParams,
+    getPPRSiteRouteParams,
     getPPRStaticSiteContext,
+    getPPRStaticSiteScopeContext,
     getPPRTableOfContentsRouteParams,
     getPPRVisitorAuthClaims,
     getSiteURLDataFromParams,
@@ -142,6 +145,22 @@ describe('PPR cache region params', () => {
         expect(headerData).toEqual(changedHeaderData);
     });
 
+    it('keeps the visited location in the site params, with the header token', async () => {
+        const siteData = getSiteURLDataFromParams(await getPPRSiteRouteParams(routeParams));
+        const headerData = getSiteURLDataFromParams(await getPPRHeaderRouteParams(routeParams));
+
+        // The shell renders the variant the visitor is on, it just never reads below the site level.
+        expect(siteData).toMatchObject({
+            siteSection: 'page-site-section-id',
+            siteSpace: 'page-site-space-id',
+            space: 'space-id',
+            basePath: '/docs/v/page-variant/',
+            revision: 'ppr-revision-id',
+        });
+        // Same scope as the header, so they share their site fetch.
+        expect(siteData.apiToken).toBe(headerData.apiToken);
+    });
+
     it('narrows the header token to the site scope', async () => {
         const { apiToken: headerToken } = getSiteURLDataFromParams(
             await getPPRHeaderRouteParams(routeParams)
@@ -219,6 +238,20 @@ describe('getPPRVisitorAuthClaims', () => {
     it('resolves every scope at once through a full exchange', async () => {
         // The scoped tokens each carry one bucket, so the client claims can only come from `full`.
         expect(await getPPRVisitorAuthClaims(routeParams)).toEqual({ scope: 'full' });
+    });
+});
+
+describe('getPPRStaticSiteScopeContext', () => {
+    it('resolves the site scope from the supplied params', async () => {
+        const { context } = await getPPRStaticSiteScopeContext(
+            getPPRRouteParams(routeParams),
+            'header'
+        );
+
+        expect(context).toMatchObject({
+            apiToken,
+            revision: 'ppr-revision-id',
+        });
     });
 });
 

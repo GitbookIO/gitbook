@@ -8,10 +8,7 @@ import type { IconName } from '@gitbook/icons';
 import { useSelectedSiteSectionId } from '../hooks';
 import { CONTAINER_STYLE } from '../layout';
 import { ScrollContainer } from '../primitives/ScrollContainer';
-import type {
-    ClientSiteSections,
-    ClientSiteStructureNode,
-} from './encodeClientSiteSections';
+import type { ClientSiteSections, ClientSiteStructureNode } from './encodeClientSiteSections';
 import { SectionIcon } from './SectionIcon';
 import { Button, Link, ToggleChevron } from '@/components/primitives';
 import { tcls } from '@/lib/tailwind';
