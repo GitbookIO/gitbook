@@ -1,6 +1,6 @@
 import { type RevisionPageDocument, type RevisionPageGroup, SiteVisibility } from '@gitbook/api';
 
-import type { GitBookSiteContext } from '@/lib/context';
+import type { GitBookSiteContext, GitBookSiteScopeContext } from '@/lib/context';
 
 /**
  * Return true if a page is indexable in search.
@@ -24,13 +24,17 @@ export function isPageIndexable(
 /**
  * Return true if a space should be indexed by search engines.
  */
-export function isSiteIndexable(context: GitBookSiteContext) {
+export function isSiteIndexable(context: GitBookSiteContext | GitBookSiteScopeContext) {
     if (context.noIndexSearch) {
         return false;
     }
 
     // Prevent indexation of preview of revisions / change-requests
-    if (context.changeRequest || context.revisionId !== context.space.revision) {
+    // It cannot happen for Scoped kind of route
+    if (
+        ('changeRequest' in context && context.changeRequest) ||
+        ('space' in context && context.revisionId !== context.space.revision)
+    ) {
         return false;
     }
 
