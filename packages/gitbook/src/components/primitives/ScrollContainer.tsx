@@ -41,6 +41,9 @@ export type ScrollContainerProps = {
 
     /** The ID or ref of the active item to scroll to. */
     active?: string | React.RefObject<HTMLElement | null>;
+
+    /** Scroll by one page of fully visible direct children instead of one viewport. */
+    scrollByVisibleItems?: boolean;
 } & React.HTMLAttributes<HTMLDivElement>;
 
 export function ScrollContainer(props: ScrollContainerProps) {
@@ -50,6 +53,7 @@ export function ScrollContainer(props: ScrollContainerProps) {
         contentClassName,
         orientation,
         active,
+        scrollByVisibleItems = false,
         leading = { fade: true, button: true },
         trailing = { fade: true, button: true },
         ...rest
@@ -85,6 +89,11 @@ export function ScrollContainer(props: ScrollContainerProps) {
             return;
         }
 
+        if (scrollByVisibleItems) {
+            scrollByItemsInContainer(container, orientation, 'forward');
+            return;
+        }
+
         container.scrollTo({
             top: orientation === 'vertical' ? scrollPosition + container.clientHeight : undefined,
             left: orientation === 'horizontal' ? scrollPosition + container.clientWidth : undefined,
@@ -95,6 +104,11 @@ export function ScrollContainer(props: ScrollContainerProps) {
     const scrollBack = () => {
         const container = containerRef.current;
         if (!container) {
+            return;
+        }
+
+        if (scrollByVisibleItems) {
+            scrollByItemsInContainer(container, orientation, 'backward');
             return;
         }
 
@@ -189,6 +203,130 @@ export function ScrollContainer(props: ScrollContainerProps) {
             ) : null}
         </div>
     );
+}
+
+const EDGE_EPSILON = 1;
+
+/**
+ * Scroll a direct-child track by the number of items currently visible in the snapport.
+ * Scroll padding is excluded from the measurement because it is the carousel's peek area.
+ */
+export function scrollByItemsInContainer(
+    container: HTMLElement,
+    orientation: 'horizontal' | 'vertical',
+    direction: 'forward' | 'backward'
+) {
+    const children = Array.from(container.children).filter(
+        (child): child is HTMLElement => child instanceof HTMLElement
+    );
+    const bounds = getScrollBounds(container, orientation);
+    const items = children
+        .map((element, index) => ({ element, index, rect: element.getBoundingClientRect() }))
+        .filter(({ rect }) => {
+            const size = orientation === 'horizontal' ? rect.width : rect.height;
+            return size > 0;
+        })
+        .map((item, index) => ({ ...item, index }));
+    const visibleItems = items.filter(({ rect }) => {
+        const start = orientation === 'horizontal' ? rect.left : rect.top;
+        const end = orientation === 'horizontal' ? rect.right : rect.bottom;
+        return start >= bounds.start - EDGE_EPSILON && end <= bounds.end + EDGE_EPSILON;
+    });
+
+    // A track narrower than its viewport, or one whose children have not laid out yet, should
+    // retain the regular viewport behavior rather than getting stuck at its current position.
+    if (visibleItems.length === 0) {
+        scrollByViewport(container, orientation, direction);
+        return;
+    }
+
+    const pageSize = visibleItems.length;
+    const firstVisibleItem = visibleItems[0];
+    const lastVisibleItem = visibleItems[visibleItems.length - 1];
+    if (!firstVisibleItem || !lastVisibleItem) {
+        scrollByViewport(container, orientation, direction);
+        return;
+    }
+    const targetIndex =
+        direction === 'forward' ? lastVisibleItem.index + 1 : firstVisibleItem.index - pageSize;
+    const maxScroll = getMaxScroll(container, orientation);
+
+    if (targetIndex < 0) {
+        scrollToPosition(container, orientation, 0);
+        return;
+    }
+
+    const target = items.find((item) => item.index === targetIndex);
+    if (!target) {
+        scrollToPosition(container, orientation, maxScroll);
+        return;
+    }
+
+    const targetStart = orientation === 'horizontal' ? target.rect.left : target.rect.top;
+    const targetPosition =
+        (orientation === 'horizontal' ? container.scrollLeft : container.scrollTop) +
+        targetStart -
+        bounds.start;
+
+    scrollToPosition(container, orientation, Math.min(Math.max(targetPosition, 0), maxScroll));
+}
+
+function getScrollBounds(container: HTMLElement, orientation: 'horizontal' | 'vertical') {
+    const rect = container.getBoundingClientRect();
+    const computedStyle = typeof window !== 'undefined' ? window.getComputedStyle(container) : null;
+    const leadingPadding = Number.parseFloat(
+        computedStyle?.[orientation === 'horizontal' ? 'scrollPaddingLeft' : 'scrollPaddingTop'] ??
+            ''
+    );
+    const trailingPadding = Number.parseFloat(
+        computedStyle?.[
+            orientation === 'horizontal' ? 'scrollPaddingRight' : 'scrollPaddingBottom'
+        ] ?? ''
+    );
+    const start = orientation === 'horizontal' ? rect.left : rect.top;
+    const end = orientation === 'horizontal' ? rect.right : rect.bottom;
+
+    return {
+        start: start + (Number.isFinite(leadingPadding) ? leadingPadding : 0),
+        end: end - (Number.isFinite(trailingPadding) ? trailingPadding : 0),
+    };
+}
+
+function getMaxScroll(container: HTMLElement, orientation: 'horizontal' | 'vertical') {
+    return Math.max(
+        orientation === 'horizontal'
+            ? container.scrollWidth - container.clientWidth
+            : container.scrollHeight - container.clientHeight,
+        0
+    );
+}
+
+function scrollToPosition(
+    container: HTMLElement,
+    orientation: 'horizontal' | 'vertical',
+    position: number
+) {
+    container.scrollTo({
+        top: orientation === 'vertical' ? position : undefined,
+        left: orientation === 'horizontal' ? position : undefined,
+        behavior: 'smooth',
+    });
+}
+
+function scrollByViewport(
+    container: HTMLElement,
+    orientation: 'horizontal' | 'vertical',
+    direction: 'forward' | 'backward'
+) {
+    const position = orientation === 'horizontal' ? container.scrollLeft : container.scrollTop;
+    const distance = orientation === 'horizontal' ? container.clientWidth : container.clientHeight;
+    const maxScroll = getMaxScroll(container, orientation);
+    const target = Math.min(
+        Math.max(position + (direction === 'forward' ? distance : -distance), 0),
+        maxScroll
+    );
+
+    scrollToPosition(container, orientation, target);
 }
 
 /**
