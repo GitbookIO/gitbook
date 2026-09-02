@@ -3,7 +3,7 @@ import { getColumnWidth, getViewGridLayout, hasVisibleHeader } from './layout';
 import { RecordColumnValue } from './RecordColumnValue';
 import { StickyViewGrid } from './StickyViewGrid';
 import type { TableGridViewProps } from './Table';
-import { TableSearchTableRow } from './TableSearch';
+import { TableSearchTableBody } from './TableSearch';
 import { type VerticalAlignment, getColumnAlignment, getColumnVerticalAlignment } from './utils';
 import { tcls } from '@/lib/tailwind';
 
@@ -143,9 +143,17 @@ function NativeViewGridBody(
     const { block, view, records, withHeader, stickyFirstColumn, cellMergeLayout } = props;
     const firstVisibleColumn = view.columns[0];
     const lastVisibleColumn = view.columns.at(-1);
+    const recordsById = new Map(records.map((record) => [record[0], record] as const));
 
     return (
-        <table className="w-full table-fixed border-separate border-spacing-0">
+        <table
+            className={tcls(
+                'w-full table-fixed border-separate border-spacing-0',
+                '[&>tbody:hover>tr>td]:bg-tint-hover',
+                '[&>tbody>tr+tr>td]:border-t',
+                '[&>tbody+tbody>tr:first-child>td]:border-t'
+            )}
+        >
             <NativeViewGridColumns {...props} />
             {withHeader ? (
                 <thead className="sr-only">
@@ -161,66 +169,78 @@ function NativeViewGridBody(
                     </tr>
                 </thead>
             ) : null}
-            <tbody
-                className={tcls(
-                    '[&>tr+tr>td]:border-t',
-                    '[&>tr:hover:not(:has(>td[rowspan]:hover))>td:not([rowspan])]:bg-tint-hover'
-                )}
-            >
-                {records.map((record) => (
-                    <TableSearchTableRow key={record[0]} recordId={record[0]} className="group/row">
-                        {view.columns.map((column) => {
-                            const cellMerge = getTableCellMerge(cellMergeLayout, record[0], column);
-                            if (cellMerge && !cellMerge.isAnchor) {
-                                return null;
-                            }
+            {cellMergeLayout.recordGroups.map((recordGroup) => (
+                <TableSearchTableBody key={recordGroup[0]} recordIds={recordGroup}>
+                    {recordGroup.map((recordId) => {
+                        const record = recordsById.get(recordId);
+                        if (!record) {
+                            return null;
+                        }
 
-                            const definition = block.data.definition[column];
-                            if (!definition) {
-                                return null;
-                            }
+                        return (
+                            <tr key={recordId}>
+                                {view.columns.map((column) => {
+                                    const cellMerge = getTableCellMerge(
+                                        cellMergeLayout,
+                                        recordId,
+                                        column
+                                    );
+                                    if (cellMerge && !cellMerge.isAnchor) {
+                                        return null;
+                                    }
 
-                            const verticalAlignment = getColumnVerticalAlignment(definition);
-                            const renderedColumns = cellMerge?.merge.columns ?? [column];
-                            const isLastColumn = renderedColumns.at(-1) === lastVisibleColumn;
-                            const isStickyFirstColumn =
-                                stickyFirstColumn && column === firstVisibleColumn;
-                            const rowSpan =
-                                cellMerge && cellMerge.merge.rowSpan > 1
-                                    ? cellMerge.merge.rowSpan
-                                    : undefined;
-                            const colSpan =
-                                cellMerge && cellMerge.merge.colSpan > 1
-                                    ? cellMerge.merge.colSpan
-                                    : undefined;
-                            return (
-                                <td
-                                    key={column}
-                                    rowSpan={rowSpan}
-                                    colSpan={colSpan}
-                                    aria-rowspan={rowSpan}
-                                    aria-colspan={colSpan}
-                                    className={tcls(
-                                        'relative px-3 py-2 text-sm transition-colors',
-                                        !isLastColumn ? 'border-tint-subtle border-r' : undefined,
-                                        getNativeCellVerticalAlignment(verticalAlignment),
-                                        isStickyFirstColumn
-                                            ? 'sticky left-0 z-10 bg-tint-base'
-                                            : undefined
-                                    )}
-                                >
-                                    <RecordColumnValue
-                                        {...props}
-                                        record={record}
-                                        column={column}
-                                        verticalAlignment={verticalAlignment}
-                                    />
-                                </td>
-                            );
-                        })}
-                    </TableSearchTableRow>
-                ))}
-            </tbody>
+                                    const definition = block.data.definition[column];
+                                    if (!definition) {
+                                        return null;
+                                    }
+
+                                    const verticalAlignment =
+                                        getColumnVerticalAlignment(definition);
+                                    const renderedColumns = cellMerge?.merge.columns ?? [column];
+                                    const isLastColumn =
+                                        renderedColumns.at(-1) === lastVisibleColumn;
+                                    const isStickyFirstColumn =
+                                        stickyFirstColumn && column === firstVisibleColumn;
+                                    const rowSpan =
+                                        cellMerge && cellMerge.merge.rowSpan > 1
+                                            ? cellMerge.merge.rowSpan
+                                            : undefined;
+                                    const colSpan =
+                                        cellMerge && cellMerge.merge.colSpan > 1
+                                            ? cellMerge.merge.colSpan
+                                            : undefined;
+                                    return (
+                                        <td
+                                            key={column}
+                                            rowSpan={rowSpan}
+                                            colSpan={colSpan}
+                                            aria-rowspan={rowSpan}
+                                            aria-colspan={colSpan}
+                                            className={tcls(
+                                                'relative px-3 py-2 text-sm transition-colors',
+                                                !isLastColumn
+                                                    ? 'border-tint-subtle border-r'
+                                                    : undefined,
+                                                getNativeCellVerticalAlignment(verticalAlignment),
+                                                isStickyFirstColumn
+                                                    ? 'sticky left-0 z-10 bg-tint-base'
+                                                    : undefined
+                                            )}
+                                        >
+                                            <RecordColumnValue
+                                                {...props}
+                                                record={record}
+                                                column={column}
+                                                verticalAlignment={verticalAlignment}
+                                            />
+                                        </td>
+                                    );
+                                })}
+                            </tr>
+                        );
+                    })}
+                </TableSearchTableBody>
+            ))}
         </table>
     );
 }

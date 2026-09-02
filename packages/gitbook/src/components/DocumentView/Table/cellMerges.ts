@@ -30,7 +30,6 @@ export interface TableCellMergeSlot {
 
 export interface TableCellMergeLayout {
     cells: ReadonlyMap<string, ReadonlyMap<string, TableCellMergeSlot>>;
-    verticalRecordGroups: readonly (readonly string[])[];
     recordGroups: readonly (readonly string[])[];
     hasVerticalMerges: boolean;
 }
@@ -48,7 +47,6 @@ export function createTableCellMergeLayout(
     if (block.data.view.type !== 'grid') {
         return {
             cells: new Map(),
-            verticalRecordGroups: [],
             recordGroups: [],
             hasVerticalMerges: false,
         };
@@ -102,7 +100,6 @@ export function createTableCellMergeLayout(
 
     return {
         cells,
-        verticalRecordGroups,
         recordGroups: groupConnectedRecords(recordOrder, verticalRecordGroups),
         hasVerticalMerges: verticalRecordGroups.length > 0,
     };

@@ -293,12 +293,12 @@ export function TableSearchRecord(props: TableSearchRecordProps) {
     );
 }
 
-/** Semantic table row variant used by tables containing vertical spans. */
-export function TableSearchTableRow(
-    props: React.HTMLAttributes<HTMLTableRowElement> & { recordId: string }
+/** Keeps a complete native table row group visible when any of its records matches. */
+export function TableSearchTableBody(
+    props: React.HTMLAttributes<HTMLTableSectionElement> & { recordIds: readonly string[] }
 ) {
-    const { recordId, children, ...rest } = props;
+    const { recordIds, children, ...rest } = props;
     const { visibleIds } = useTableSearch();
-    const matches = visibleIds === null || visibleIds.has(recordId);
-    return matches ? <tr {...rest}>{children}</tr> : null;
+    const matches = visibleIds === null || recordIds.some((recordId) => visibleIds.has(recordId));
+    return matches ? <tbody {...rest}>{children}</tbody> : null;
 }

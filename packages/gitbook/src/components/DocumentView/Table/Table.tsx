@@ -60,7 +60,7 @@ export function Table(props: BlockProps<DocumentBlockTable>) {
         <TableSearchProvider
             records={searchRecords}
             recordGroups={
-                block.data.view.type === 'grid' ? cellMergeLayout.verticalRecordGroups : undefined
+                block.data.view.type === 'grid' ? cellMergeLayout.recordGroups : undefined
             }
         >
             <div className={tcls(style, 'flex flex-col gap-3')}>

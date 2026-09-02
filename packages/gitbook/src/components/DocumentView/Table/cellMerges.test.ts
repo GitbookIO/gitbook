@@ -68,7 +68,6 @@ describe('createTableCellMergeLayout', () => {
                 merge: { rowSpan: 2, colSpan: 1, records: ['second', 'third'] },
             });
             expect(getTableCellMerge(layout, 'third', 'c')).toMatchObject({ isAnchor: false });
-            expect(layout.verticalRecordGroups).toEqual([['second', 'third']]);
             expect(layout.recordGroups).toEqual([['first'], ['second', 'third']]);
             expect(layout.hasVerticalMerges).toBe(true);
         }
@@ -132,7 +131,6 @@ describe('createTableCellMergeLayout', () => {
                 merge: { records: ['second', 'third'], columns: ['c'] },
             });
             expect(getTableCellMerge(layout, 'third', 'c')).toMatchObject({ isAnchor: false });
-            expect(layout.verticalRecordGroups).toEqual([['second', 'third']]);
             expect(layout.recordGroups).toEqual([['first'], ['second', 'third']]);
         }
     });
