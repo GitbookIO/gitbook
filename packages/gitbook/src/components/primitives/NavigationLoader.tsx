@@ -1,6 +1,6 @@
 'use client';
 import { usePathname } from 'next/navigation';
-import { useEffect, useLayoutEffect } from 'react';
+import { useEffect, useLayoutEffect, useRef } from 'react';
 
 import { useIsNavigating } from '../hooks';
 import { tcls } from '@/lib/tailwind';
@@ -15,8 +15,14 @@ export const NavigationLoader = () => {
     }, []);
 
     // On route changes, add a transient class for the first paint of the new page.
+    // Skipped on the initial mount: toggling a class on <html> re-styles the whole document.
+    const isInitialMount = useRef(true);
     useLayoutEffect(() => {
         void pathname;
+        if (isInitialMount.current) {
+            isInitialMount.current = false;
+            return;
+        }
         const root = document.documentElement;
         root.classList.add('route-change');
         let raf2 = 0;

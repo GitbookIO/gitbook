@@ -24,22 +24,33 @@ export function PreservePageLayout(props: { wideLayout: boolean; pageHasToc: boo
             return;
         }
 
-        if (wideLayout) {
-            header.classList.add('layout-wide');
-            header.classList.remove('layout-default');
-        } else {
-            header.classList.remove('layout-wide');
-            header.classList.add('layout-default');
-        }
-
-        if (pageHasToc) {
-            header.classList.add('page-has-toc');
-            header.classList.remove('page-no-toc');
-        } else {
-            header.classList.add('page-no-toc');
-            header.classList.remove('page-has-toc');
-        }
+        // The header is a `body:has()` subject, so touching its classes re-styles the whole
+        // document. Only correct it when a previous page left it disagreeing with this one, and
+        // stamp this page's layout on it as the page leaves, which is when the next one needs it.
+        syncLayoutClasses(header, { wideLayout, pageHasToc }, false);
+        return () => {
+            syncLayoutClasses(header, { wideLayout, pageHasToc }, true);
+        };
     }, [wideLayout, pageHasToc]);
 
     return null;
+}
+
+function syncLayoutClasses(
+    header: Element,
+    layout: { wideLayout: boolean; pageHasToc: boolean },
+    force: boolean
+) {
+    const pairs: [wanted: string, other: string][] = [
+        layout.wideLayout ? ['layout-wide', 'layout-default'] : ['layout-default', 'layout-wide'],
+        layout.pageHasToc ? ['page-has-toc', 'page-no-toc'] : ['page-no-toc', 'page-has-toc'],
+    ];
+    for (const [wanted, other] of pairs) {
+        if (header.classList.contains(other)) {
+            header.classList.remove(other);
+            header.classList.add(wanted);
+        } else if (force && !header.classList.contains(wanted)) {
+            header.classList.add(wanted);
+        }
+    }
 }

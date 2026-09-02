@@ -8,6 +8,12 @@ import { useEffect } from 'react';
 export function TableOfContentsScript() {
     useEffect(() => {
         const root = document.documentElement;
+        // Writing the <html> style attribute re-styles the whole document, so skip unchanged values.
+        const setVar = (name: string, value: string) => {
+            if (root.style.getPropertyValue(name) !== value) {
+                root.style.setProperty(name, value);
+            }
+        };
 
         // Calculate and set TOC dimensions
         const updateTocLayout = () => {
@@ -42,8 +48,8 @@ export function TableOfContentsScript() {
             }
 
             // Update height
-            root.style.setProperty('--toc-height', `${Math.max(height, 0)}px`);
-            root.style.setProperty('--toc-top-offset', `${Math.max(offset, 0)}px`);
+            setVar('--toc-height', `${Math.max(height, 0)}px`);
+            setVar('--toc-top-offset', `${Math.max(offset, 0)}px`);
 
             // Subtract visible pageCover (if any)
             if (
@@ -64,8 +70,8 @@ export function TableOfContentsScript() {
                 }
             }
 
-            root.style.setProperty('--outline-height', `${Math.max(height, 0)}px`);
-            root.style.setProperty('--outline-top-offset', `${Math.max(offset, 0)}px`);
+            setVar('--outline-height', `${Math.max(height, 0)}px`);
+            setVar('--outline-top-offset', `${Math.max(offset, 0)}px`);
         };
 
         // Initial update
