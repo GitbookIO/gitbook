@@ -4,6 +4,11 @@ import * as React from 'react';
 
 import { useScrollOverflow } from '../hooks/useScrollOverflow';
 import { Button, type ButtonProps } from './Button';
+import {
+    getScrollOffsetToCenter,
+    isElementVisibleInContainer,
+    resolveActiveItem,
+} from './scrollIntoContainer';
 import { tString, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
 
@@ -11,7 +16,7 @@ import { tcls } from '@/lib/tailwind';
  * A container that encapsulates a scrollable area with usability features.
  * - Faded edges when there is more content than the container can display.
  * - Buttons to advance the scroll position.
- * - Auto-scroll to the active item when it's initially active.
+ * - Auto-scroll to the active item, when it becomes active and isn't already visible.
  */
 export type ScrollContainerProps = {
     children: React.ReactNode;
@@ -61,23 +66,54 @@ export function ScrollContainer(props: ScrollContainerProps) {
 
     const { scrollPosition, scrollSize } = useScrollOverflow(orientation, containerRef);
 
+    // The active item is resolved from the DOM, so the effect below cannot depend on the
+    // element itself. `active` is usually a static selector, and the item it matches moves
+    // as the visitor navigates (client-side navigations keep this container mounted), so we
+    // track the resolved element and re-scroll whenever it points at a different item.
+    const [activeItem, setActiveItem] = React.useState<Element | null>(null);
+
     React.useEffect(() => {
         const container = containerRef.current;
         if (!container) {
             return;
         }
         if (!active) {
+            setActiveItem(null);
             return;
         }
-        const activeItem =
-            typeof active === 'string'
-                ? containerRef.current?.querySelector(active)
-                : active.current;
-        if (!activeItem || !container.contains(activeItem)) {
-            return;
-        }
-        scrollToElementInContainer(activeItem, container);
+
+        const trackActiveItem = () => {
+            setActiveItem(resolveActiveItem(active, container));
+        };
+
+        trackActiveItem();
+
+        // The active item can change without this container re-rendering: on a client-side
+        // navigation the items update their own active state, and the group holding the new
+        // active item may only expand (and render it) afterwards.
+        const observer = new MutationObserver(trackActiveItem);
+        observer.observe(container, {
+            subtree: true,
+            childList: true,
+            attributes: true,
+            attributeFilter: ['data-active', 'id'],
+        });
+
+        return () => observer.disconnect();
     }, [active]);
+
+    // Bring the active item into view whenever a different item becomes the active one, so
+    // the current page stays visible after a client-side navigation. Storing the element in
+    // state means React bails out while it stays the same, so repeated observer callbacks
+    // don't re-scroll and the visitor's own scroll position is left alone.
+    React.useEffect(() => {
+        const container = containerRef.current;
+        if (!container || !activeItem) {
+            return;
+        }
+
+        scrollElementIntoContainer(activeItem, container);
+    }, [activeItem]);
 
     const scrollFurther = () => {
         const container = containerRef.current;
@@ -192,23 +228,29 @@ export function ScrollContainer(props: ScrollContainerProps) {
 }
 
 /**
- * Scroll to an element in a container.
+ * Scroll an element into view inside a container, unless it is already fully visible.
  */
-function scrollToElementInContainer(element: Element, container: HTMLElement) {
-    const containerRect = container.getBoundingClientRect();
+function scrollElementIntoContainer(element: Element, container: HTMLElement) {
+    const containerBox = {
+        rect: container.getBoundingClientRect(),
+        clientHeight: container.clientHeight,
+        clientWidth: container.clientWidth,
+        scrollTop: container.scrollTop,
+        scrollLeft: container.scrollLeft,
+    };
     const rect = element.getBoundingClientRect();
 
-    return container.scrollTo({
-        top:
-            container.scrollTop +
-            (rect.top - containerRect.top) -
-            container.clientHeight / 2 +
-            rect.height / 2,
-        left:
-            container.scrollLeft +
-            (rect.left - containerRect.left) -
-            container.clientWidth / 2 +
-            rect.width / 2,
+    // Don't move the container when the element is already in view, so navigating to a
+    // nearby page doesn't shift the list under the visitor for no reason.
+    if (isElementVisibleInContainer(rect, containerBox)) {
+        return;
+    }
+
+    const { top, left } = getScrollOffsetToCenter(rect, containerBox);
+
+    container.scrollTo({
+        top,
+        left,
         // Use 'auto' to avoid additional scroll animations when scrolling to an element
         // as this may be called during layout/initialization when the page is not fully loaded.
         behavior: 'auto',
