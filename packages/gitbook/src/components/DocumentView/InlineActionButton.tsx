@@ -1,5 +1,5 @@
 'use client';
-import { useAI, useAIChatController, useAIChatState } from '../AI';
+import { useAI, useAIChatState } from '../AI';
 import { Button, type ButtonProps, Input } from '../primitives';
 import { useSetSearchState } from '../Search';
 import { tString, useLanguage } from '@/intl/client';
@@ -18,17 +18,13 @@ export function InlineActionButton(
     const { action, query, buttonProps } = props;
 
     const { assistants } = useAI();
-    const chatController = useAIChatController();
     const chatState = useAIChatState();
     const setSearchState = useSetSearchState();
     const language = useLanguage();
 
     const handleSubmit = (value: string) => {
         if (action === 'ask') {
-            chatController.open();
-            if (value ?? query) {
-                chatController.postMessage({ message: value ?? query });
-            }
+            assistants[0]?.open(value || query);
         } else if (action === 'search') {
             setSearchState((prev) => ({
                 ...prev,
