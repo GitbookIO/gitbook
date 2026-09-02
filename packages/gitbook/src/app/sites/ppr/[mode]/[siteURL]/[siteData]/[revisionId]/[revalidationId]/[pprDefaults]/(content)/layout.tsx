@@ -80,7 +80,7 @@ export default async function SitePPRLayout({
 export async function generateViewport({ params }: SitePPRLayoutProps) {
     const { context } = await getPPRStaticSiteContext(
         await getPPRPageRouteParams(await params),
-        'body'
+        'header'
     );
     return generateSiteLayoutViewport(context);
 }
@@ -88,7 +88,7 @@ export async function generateViewport({ params }: SitePPRLayoutProps) {
 export async function generateMetadata({ params }: SitePPRLayoutProps) {
     const { context } = await getPPRStaticSiteContext(
         await getPPRPageRouteParams(await params),
-        'body'
+        'header'
     );
     return generateSiteLayoutMetadata(context);
 }

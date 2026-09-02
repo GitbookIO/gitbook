@@ -195,7 +195,9 @@ export async function SiteLayout(props: SiteLayoutProps) {
     );
 }
 
-export async function generateSiteLayoutViewport(context: GitBookSiteContext): Promise<Viewport> {
+export async function generateSiteLayoutViewport(
+    context: GitBookSiteContext | GitBookSiteScopeContext
+): Promise<Viewport> {
     const { customization } = context;
     return {
         colorScheme: customization.themes.toggeable
@@ -213,7 +215,9 @@ export async function generateSiteLayoutViewport(context: GitBookSiteContext): P
     };
 }
 
-export async function generateSiteLayoutMetadata(context: GitBookSiteContext): Promise<Metadata> {
+export async function generateSiteLayoutMetadata(
+    context: GitBookSiteContext | GitBookSiteScopeContext
+): Promise<Metadata> {
     const { site, customization, linker, imageResizer } = context;
     const customIcon = 'icon' in customization.favicon ? customization.favicon.icon : null;
 
