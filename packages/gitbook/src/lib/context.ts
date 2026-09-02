@@ -537,9 +537,26 @@ export async function fetchSiteContextByIds(
         fetchSpaceContextByIds(baseContext, ids),
     ]);
 
+    return mergeSiteScopeAndSpaceContext(siteScope, spaceContext, {
+        dataFetcher: baseContext.dataFetcher,
+    });
+}
+
+/**
+ * Merge a site scope with the space context it is rendered with. The data fetcher is explicit: the
+ * two may have been resolved with different tokens, and the merged context must fetch through
+ * neither of them by accident.
+ */
+export function mergeSiteScopeAndSpaceContext(
+    siteScope: Omit<GitBookSiteScopeContext, 'revisionId'>,
+    spaceContext: GitBookSpaceContext,
+    options: { dataFetcher: GitBookDataFetcher }
+): GitBookSiteContext {
     return {
         ...spaceContext,
         ...siteScope,
+        dataFetcher: options.dataFetcher,
+        revisionId: spaceContext.revisionId,
         locale: siteScope.siteSpace.space.language ?? spaceContext.locale,
         linker: getLinkerForSiteSpace(
             siteScope.linker,

@@ -29,3 +29,57 @@ index d9c2e5e801c91b2edbc0101c56af14c3dda6c42e..0b65253e39cecc67c76e5d69105c56c0
      }
      function getOutlinedModel(response, reference, parentObject, key, map) {
        var path = reference.split(":");
+diff --git a/dist/esm/server/app-render/work-async-storage-instance.js b/dist/esm/server/app-render/work-async-storage-instance.js
+index ff0edc4aa1a2674eb995361a6c3497d9dbe56ee4..b678b282dddfe00f2a6e9c4b0f3b7c92f80a4e25 100644
+--- a/dist/esm/server/app-render/work-async-storage-instance.js
++++ b/dist/esm/server/app-render/work-async-storage-instance.js
+@@ -1,4 +1,20 @@
+ import { createAsyncLocalStorage } from './async-local-storage';
+-export const workAsyncStorageInstance = createAsyncLocalStorage();
++// GitBook patch: share one instance per process. OpenNext inlines a copy of this module into its
++// handler while route chunks require another from node_modules. `'use cache'` fills restore the
++// work store through this storage, so app code reading it inside a fill needs every copy to agree.
++// Only a real storage is shared: a fake created before the global is set must not be pinned.
++const sharedInstanceKey = Symbol.for('next.workAsyncStorageInstance');
++function getWorkAsyncStorageInstance() {
++    const existing = globalThis[sharedInstanceKey];
++    if (existing) {
++        return existing;
++    }
++    const instance = createAsyncLocalStorage();
++    if (typeof globalThis.AsyncLocalStorage !== 'undefined') {
++        globalThis[sharedInstanceKey] = instance;
++    }
++    return instance;
++}
++export const workAsyncStorageInstance = getWorkAsyncStorageInstance();
+ 
+ //# sourceMappingURL=work-async-storage-instance.js.map
+diff --git a/dist/server/app-render/work-async-storage-instance.js b/dist/server/app-render/work-async-storage-instance.js
+index 1ea9c61d574f2ed2753b0ed94887adaa6c1ecb92..1edb9c339ea55b930a10c5a446f33ce8e541eb7b 100644
+--- a/dist/server/app-render/work-async-storage-instance.js
++++ b/dist/server/app-render/work-async-storage-instance.js
+@@ -9,6 +9,22 @@ Object.defineProperty(exports, "workAsyncStorageInstance", {
+     }
+ });
+ const _asynclocalstorage = require("./async-local-storage");
+-const workAsyncStorageInstance = (0, _asynclocalstorage.createAsyncLocalStorage)();
++// GitBook patch: share one instance per process. OpenNext inlines a copy of this module into its
++// handler while route chunks require another from node_modules. `'use cache'` fills restore the
++// work store through this storage, so app code reading it inside a fill needs every copy to agree.
++// Only a real storage is shared: a fake created before the global is set must not be pinned.
++const sharedInstanceKey = Symbol.for("next.workAsyncStorageInstance");
++function getWorkAsyncStorageInstance() {
++    const existing = globalThis[sharedInstanceKey];
++    if (existing) {
++        return existing;
++    }
++    const instance = (0, _asynclocalstorage.createAsyncLocalStorage)();
++    if (typeof globalThis.AsyncLocalStorage !== "undefined") {
++        globalThis[sharedInstanceKey] = instance;
++    }
++    return instance;
++}
++const workAsyncStorageInstance = getWorkAsyncStorageInstance();
+ 
+ //# sourceMappingURL=work-async-storage-instance.js.map
