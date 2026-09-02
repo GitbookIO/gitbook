@@ -205,7 +205,7 @@ export function ScrollContainer(props: ScrollContainerProps) {
     );
 }
 
-const EDGE_EPSILON = 1;
+const FULLY_VISIBLE_EDGE_TOLERANCE_PX = 1;
 
 /**
  * Scroll a direct-child track by the number of items currently visible in the snapport.
@@ -230,7 +230,10 @@ export function scrollByItemsInContainer(
     const visibleItems = items.filter(({ rect }) => {
         const start = orientation === 'horizontal' ? rect.left : rect.top;
         const end = orientation === 'horizontal' ? rect.right : rect.bottom;
-        return start >= bounds.start - EDGE_EPSILON && end <= bounds.end + EDGE_EPSILON;
+        return (
+            start >= bounds.start - FULLY_VISIBLE_EDGE_TOLERANCE_PX &&
+            end <= bounds.end + FULLY_VISIBLE_EDGE_TOLERANCE_PX
+        );
     });
 
     // A track narrower than its viewport, or one whose children have not laid out yet, should
