@@ -2,4 +2,4 @@
 "gitbook": patch
 ---
 
-Add a narrow, symmetric edge peek to desktop card carousels with conditional transparent edge masks. Carousel arrows now advance by one page of fully visible cards while other scroll containers retain viewport paging.
+Simplify carousel overflow with symmetric edge masks and visible-item paging. Replaces complex negative-margin bleed logic with transparent edge fades and page-by-visible-item scrolling.

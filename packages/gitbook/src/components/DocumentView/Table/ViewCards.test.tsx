@@ -46,8 +46,10 @@ describe('ViewCards', () => {
         expect(markup).toContain('-mx-12');
         expect(markup).toContain('px-12');
         expect(markup).toContain('scroll-px-12');
-        expect(markup).toContain('left-0 ml-2');
-        expect(markup).toContain('right-0 mr-2');
+        expect(markup).toContain('left-0');
+        expect(markup).toContain('ml-8');
+        expect(markup).toContain('right-0');
+        expect(markup).toContain('mr-8');
         expect(markup).not.toContain('before:bg-linear-to-r');
         expect(markup).not.toContain('after:bg-linear-to-l');
         expect(markup).toContain('snap-mandatory');

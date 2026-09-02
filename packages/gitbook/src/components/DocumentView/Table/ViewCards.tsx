@@ -87,11 +87,11 @@ function CardsCarousel(props: TableViewProps<DocumentTableViewCards>) {
             scrollByVisibleItems
             leading={{
                 fade: true,
-                button: { size: 'small' },
+                button: { size: 'small', className: 'ml-8' },
             }}
             trailing={{
                 fade: true,
-                button: { size: 'small' },
+                button: { size: 'small', className: 'mr-8' },
             }}
         >
             {records.map((record) => {
