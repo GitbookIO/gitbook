@@ -6,15 +6,17 @@ import * as ReactDOM from 'react-dom';
 import { CustomizationDefaultThemeMode } from '@gitbook/api';
 
 import { AIContextProvider } from '../AI';
+import { Announcement } from '../Announcement';
 import { RocketLoaderDetector } from './RocketLoaderDetector';
 import { SiteLayoutClientContexts } from './SiteLayoutClientContexts';
 import { AdminToolbar } from '@/components/AdminToolbar';
 import { CookiesToast } from '@/components/Cookies';
+import { Footer } from '@/components/Footer';
 import { LoadIntegrations } from '@/components/Integrations';
-import { SpaceLayout } from '@/components/SpaceLayout';
+import { SpaceHeader, SpaceLayout, SpaceTableOfContents } from '@/components/SpaceLayout';
 import type { VisitorAuthClaims } from '@/lib/adaptive';
 import { buildVersion } from '@/lib/build';
-import type { GitBookSiteContext } from '@/lib/context';
+import type { GitBookSiteContext, GitBookSiteScopeContext } from '@/lib/context';
 import { GITBOOK_API_PUBLIC_URL, GITBOOK_ASSETS_URL, GITBOOK_ICONS_URL } from '@/lib/env';
 import { getResizedImageURL } from '@/lib/images';
 import { isSiteIndexable } from '@/lib/seo';
@@ -45,28 +47,67 @@ function isDeferrableScript(script: string): boolean {
 }
 
 /**
- * Layout when rendering a site.
+ * Parts of the layout that can only be rendered from a full site context, as they read the
+ * revision. A site scope context has to provide them itself.
  */
-export async function SiteLayout(props: {
-    context: GitBookSiteContext;
+export type SiteLayoutSlots = {
+    announcement: React.ReactNode;
+    header: React.ReactNode;
+    tableOfContents: React.ReactNode;
+    footer: React.ReactNode;
+    adminToolbar: React.ReactNode;
+};
+
+/**
+ * Build the default slots of the layout from a full site context.
+ */
+export function getSiteLayoutSlots(context: GitBookSiteContext): SiteLayoutSlots {
+    return {
+        announcement: <Announcement context={context} />,
+        header: <SpaceHeader context={context} />,
+        tableOfContents: <SpaceTableOfContents context={context} />,
+        footer: <Footer context={context} />,
+        adminToolbar: <AdminToolbar context={context} />,
+    };
+}
+
+type SiteLayoutProps = {
     forcedTheme?: CustomizationDefaultThemeMode | null;
     withTracking: boolean;
     visitorAuthClaims: VisitorAuthClaims;
     children: React.ReactNode;
-    headerSlot?: React.ReactNode;
-    tableOfContentsSlot?: React.ReactNode;
     clientNavigationSelection?: boolean;
-}) {
+} & (
+    | {
+          context: GitBookSiteContext;
+          /** Overrides of the slots that would otherwise be rendered from the context. */
+          slots?: Partial<SiteLayoutSlots>;
+      }
+    | {
+          context: GitBookSiteScopeContext;
+          /** A site scope context can't render any of them, so they are all required. */
+          slots: SiteLayoutSlots;
+      }
+);
+
+/**
+ * Layout when rendering a site.
+ */
+export async function SiteLayout(props: SiteLayoutProps) {
     const {
         context,
         forcedTheme,
         withTracking,
         visitorAuthClaims,
         children,
-        headerSlot,
-        tableOfContentsSlot,
         clientNavigationSelection,
     } = props;
+
+    // The prop type guarantees `slots` is complete whenever the context can't build them itself.
+    const slots = {
+        ...('revision' in context ? getSiteLayoutSlots(context) : null),
+        ...props.slots,
+    } as SiteLayoutSlots;
 
     const { customization } = context;
     const { ai } = customization;
@@ -122,8 +163,10 @@ export async function SiteLayout(props: {
                     context={context}
                     withTracking={withTracking}
                     visitorAuthClaims={visitorAuthClaims}
-                    headerSlot={headerSlot}
-                    tableOfContentsSlot={tableOfContentsSlot}
+                    announcementSlot={slots.announcement}
+                    headerSlot={slots.header}
+                    tableOfContentsSlot={slots.tableOfContents}
+                    footerSlot={slots.footer}
                     clientNavigationSelection={clientNavigationSelection}
                 >
                     {children}
@@ -147,7 +190,7 @@ export async function SiteLayout(props: {
 
             <RocketLoaderDetector />
 
-            <AdminToolbar context={context} />
+            {slots.adminToolbar}
         </SiteLayoutClientContexts>
     );
 }

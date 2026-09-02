@@ -161,9 +161,23 @@ export type SiteSections = {
 };
 
 /**
- * Context when rendering a site.
+ * Site-level context: everything derived from the published site and the URL data, without the
+ * space, revision or change request. It is what the PPR shell renders with, so its data only
+ * depends on the site-scoped token.
+ *
+ * Its `linker` does not know about a custom home page (that needs the revision pages), so page
+ * links must be built from the full site context. Its `dataFetcher` may hold a site-scoped token,
+ * so revision data must never be fetched through it.
  */
-export type GitBookSiteContext = GitBookSpaceContext & {
+export type GitBookSiteScopeContext = GitBookBaseContext & {
+    organizationId: string;
+
+    /** Identifier of the revision, as resolved by the URL lookup. */
+    revisionId: string;
+
+    /** Share key of the space. */
+    shareKey: string | undefined;
+
     site: Site;
 
     /** Current site space. */
@@ -211,6 +225,11 @@ export type GitBookSiteContext = GitBookSpaceContext & {
     /** Opaque identifier that partitions PPR renders across revalidations. */
     revalidationId?: string;
 };
+
+/**
+ * Context when rendering a site.
+ */
+export type GitBookSiteContext = GitBookSpaceContext & GitBookSiteScopeContext;
 
 /**
  * Context when rendering a page.
@@ -301,41 +320,88 @@ export async function fetchSiteContextByURLLookup(
 }
 
 /**
- * Fetch a site context by IDs.
+ * Identifiers needed to resolve the site-level part of a context. They all come from the URL
+ * lookup, so no space or revision is involved.
  */
-export async function fetchSiteContextByIds(
+type SiteScopeIds = {
+    organization: string;
+    site: string;
+    siteSection: string | undefined;
+    siteSpace: string | undefined;
+    shareKey: string | undefined;
+    contextId?: string;
+    isFallback: boolean;
+    noIndexSearch: boolean;
+    isLoggedInVisitor: boolean;
+    displayAgentInstructions?: boolean;
+    isAiAgent?: boolean;
+    revalidationId?: string;
+};
+
+/**
+ * Fetch a site scope context by IDs.
+ */
+export async function fetchSiteScopeContextByIds(
     baseContext: GitBookBaseContext,
-    ids: {
-        organization: string;
-        site: string;
-        siteSection: string | undefined;
-        siteSpace: string | undefined;
-        space: string;
-        shareKey: string | undefined;
-        changeRequest: string | undefined;
-        revision: string | undefined;
-        contextId?: string;
-        isFallback: boolean;
-        noIndexSearch: boolean;
-        isLoggedInVisitor: boolean;
-        displayAgentInstructions?: boolean;
-        isAiAgent?: boolean;
-        revalidationId?: string;
-    }
-): Promise<GitBookSiteContext> {
+    ids: SiteScopeIds & { revision: string }
+): Promise<GitBookSiteScopeContext> {
+    return {
+        ...(await resolveSiteScope(baseContext, ids)),
+        revisionId: ids.revision,
+    };
+}
+
+/**
+ * Fetch the site scope context of a site using the resolution of a URL.
+ */
+export async function fetchSiteScopeContextByURLLookup(
+    baseContext: GitBookBaseContext,
+    data: SiteURLData
+): Promise<GitBookSiteScopeContext> {
+    // The revision is only resolved upstream for PPR requests, the only ones rendering a site scope.
+    assert(data.revision, 'cannot resolve a site scope context without a resolved revision');
+
+    return fetchSiteScopeContextByIds(baseContext, {
+        organization: data.organization,
+        site: data.site,
+        siteSection: data.siteSection,
+        siteSpace: data.siteSpace,
+        shareKey: data.shareKey,
+        revision: data.revision,
+        contextId: data.contextId,
+        isFallback: data.isFallback ?? false,
+        noIndexSearch: data.noIndexSearch ?? false,
+        isLoggedInVisitor: data.isLoggedInVisitor ?? false,
+        displayAgentInstructions: data.displayAgentInstructions,
+        isAiAgent: data.isAiAgent,
+        revalidationId: data.revalidationId,
+    });
+}
+
+/**
+ * Resolve everything a site context holds that doesn't depend on the space or the revision.
+ *
+ * It never sets `revisionId`: the caller knows whether it comes from the URL lookup (site scope) or
+ * from the resolved space context, and a key here would override the latter.
+ */
+async function resolveSiteScope(
+    baseContext: GitBookBaseContext,
+    ids: SiteScopeIds
+): Promise<Omit<GitBookSiteScopeContext, 'revisionId'>> {
     const { dataFetcher } = baseContext;
 
-    const [{ site: orgSite, structure: siteStructure, customizations, scripts }, spaceContext] =
-        await Promise.all([
-            throwIfDataError(
-                dataFetcher.getPublishedContentSite({
-                    organizationId: ids.organization,
-                    siteId: ids.site,
-                    siteShareKey: ids.shareKey,
-                })
-            ),
-            fetchSpaceContextByIds(baseContext, ids),
-        ]);
+    const {
+        site: orgSite,
+        structure: siteStructure,
+        customizations,
+        scripts,
+    } = await throwIfDataError(
+        dataFetcher.getPublishedContentSite({
+            organizationId: ids.organization,
+            siteId: ids.site,
+            siteShareKey: ids.shareKey,
+        })
+    );
 
     const sections = ids.siteSection
         ? parseSiteSectionsAndGroups(siteStructure, ids.siteSection)
@@ -399,7 +465,7 @@ export async function fetchSiteContextByIds(
                 return siteSpaceSettings;
             }
 
-            const logger = getLogger().subLogger('fetchSiteContextByIds', {});
+            const logger = getLogger().subLogger('resolveSiteScope', {});
             // We got the pointer from an API and customizations from another.
             // It's possible that the two are unsynced leading to not found customizations for the space.
             // It's better to fallback on customization of the site that displaying an error.
@@ -427,14 +493,15 @@ export async function fetchSiteContextByIds(
     };
 
     const siteLinker = site.urls.published
-        ? linkerForPublishedURL(spaceContext.linker, site.urls.published)
-        : spaceContext.linker;
+        ? linkerForPublishedURL(baseContext.linker, site.urls.published)
+        : baseContext.linker;
 
     return {
-        ...spaceContext,
-        locale: siteSpace.space.language ?? spaceContext.locale,
-        linker: getLinkerForSiteSpace(siteLinker, siteSpace, spaceContext.revision.pages),
+        ...baseContext,
+        locale: siteSpace.space.language,
+        linker: siteLinker,
         organizationId: ids.organization,
+        shareKey: ids.shareKey,
         site,
         siteSpaces,
         visibleSiteSpaces,
@@ -451,6 +518,34 @@ export async function fetchSiteContextByIds(
         displayAgentInstructions: ids.displayAgentInstructions,
         isAiAgent: ids.isAiAgent,
         revalidationId: ids.revalidationId,
+    };
+}
+
+/**
+ * Fetch a site context by IDs.
+ */
+export async function fetchSiteContextByIds(
+    baseContext: GitBookBaseContext,
+    ids: SiteScopeIds & {
+        space: string;
+        changeRequest: string | undefined;
+        revision: string | undefined;
+    }
+): Promise<GitBookSiteContext> {
+    const [siteScope, spaceContext] = await Promise.all([
+        resolveSiteScope(baseContext, ids),
+        fetchSpaceContextByIds(baseContext, ids),
+    ]);
+
+    return {
+        ...spaceContext,
+        ...siteScope,
+        locale: siteScope.siteSpace.space.language ?? spaceContext.locale,
+        linker: getLinkerForSiteSpace(
+            siteScope.linker,
+            siteScope.siteSpace,
+            spaceContext.revision.pages
+        ),
     };
 }
 

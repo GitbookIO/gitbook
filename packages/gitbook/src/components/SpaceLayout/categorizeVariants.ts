@@ -1,11 +1,11 @@
 import { languages } from '@/intl/translations';
-import type { GitBookSiteContext } from '@/lib/context';
+import type { GitBookSiteScopeContext } from '@/lib/context';
 import { getSiteSpaceLanguages, normalizeLanguage } from '@/lib/sites';
 
 /**
  * Categorize the variants of the space into generic and translation variants.
  */
-export function categorizeVariants(context: GitBookSiteContext) {
+export function categorizeVariants(context: GitBookSiteScopeContext) {
     const { siteSpace } = context;
 
     // By default, variants only include visible spaces.

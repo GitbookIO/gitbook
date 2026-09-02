@@ -10,7 +10,12 @@ import {
     getVisitorAuthClaimsFromToken,
 } from '@/lib/adaptive';
 import type { PPRCacheScope } from '@/lib/cache-tags';
-import { type SiteURLData, fetchSiteContextByURLLookup, getBaseContext } from '@/lib/context';
+import {
+    type SiteURLData,
+    fetchSiteContextByURLLookup,
+    fetchSiteScopeContextByURLLookup,
+    getBaseContext,
+} from '@/lib/context';
 import { getDynamicCustomizationSettings } from '@/lib/customization';
 import { PPR_TOKEN_SCOPE, type PPRTokenScope, exchangePPRToken } from '@/lib/ppr-token';
 
@@ -47,6 +52,33 @@ export async function getStaticSiteContext(
     params: RouteLayoutParams,
     options?: { pprScope?: PPRCacheScope }
 ) {
+    const { baseContext, siteURLData, decoded } = getStaticBaseContext(params, options);
+
+    return {
+        context: await fetchSiteContextByURLLookup(baseContext, siteURLData),
+        visitorAuthClaims: getVisitorAuthClaimsFromToken(decoded),
+    };
+}
+
+/**
+ * Get the site-level part of the static context, without resolving the space and its revision.
+ */
+export async function getStaticSiteScopeContext(
+    params: RouteLayoutParams,
+    options?: { pprScope?: PPRCacheScope }
+) {
+    const { baseContext, siteURLData, decoded } = getStaticBaseContext(params, options);
+
+    return {
+        context: await fetchSiteScopeContextByURLLookup(baseContext, siteURLData),
+        visitorAuthClaims: getVisitorAuthClaimsFromToken(decoded),
+    };
+}
+
+/**
+ * Decode the params of a static route and open a base context for them.
+ */
+function getStaticBaseContext(params: RouteLayoutParams, options?: { pprScope?: PPRCacheScope }) {
     const siteURL = getSiteURLFromParams(params);
     const siteURLData = getSiteURLDataFromParams(params);
 
@@ -57,19 +89,15 @@ export async function getStaticSiteContext(
         forbidden();
     }
 
-    const context = await fetchSiteContextByURLLookup(
-        getBaseContext({
+    return {
+        baseContext: getBaseContext({
             siteURL,
             siteURLData,
             urlMode: getModeFromParams(params.mode),
             ...(options?.pprScope ? { pprScope: options.pprScope } : {}),
         }),
-        siteURLData
-    );
-
-    return {
-        context,
-        visitorAuthClaims: getVisitorAuthClaimsFromToken(decoded),
+        siteURLData,
+        decoded,
     };
 }
 
@@ -183,6 +211,15 @@ export function getPPRPageRouteParams(params: PPRRouteLayoutParams): Promise<Rou
 }
 
 /**
+ * Project PPR params for the site-level shell, with a token scoped to the site claims.
+ * Unlike the header params, they keep the location data of the visited page: the shell renders the
+ * current variant, it just never reads anything below the site level.
+ */
+export function getPPRSiteRouteParams(params: PPRRouteLayoutParams): Promise<RouteLayoutParams> {
+    return withExchangedPPRToken(getPPRRouteParams(params), PPR_TOKEN_SCOPE.header);
+}
+
+/**
  * Project PPR params for the shared header by replacing page-varying location data.
  */
 export async function getPPRHeaderRouteParams(
@@ -275,6 +312,16 @@ export async function getPPRVisitorAuthClaims(
  */
 export async function getPPRStaticSiteContext(params: RouteLayoutParams, pprScope: PPRCacheScope) {
     return getStaticSiteContext(params, { pprScope });
+}
+
+/**
+ * Get the site-level context for a PPR component, without resolving the space and its revision.
+ */
+export async function getPPRStaticSiteScopeContext(
+    params: RouteLayoutParams,
+    pprScope: PPRCacheScope
+) {
+    return getStaticSiteScopeContext(params, { pprScope });
 }
 
 function getPPRRouteParam(encodedParam: string, name: string): string {
