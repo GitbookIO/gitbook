@@ -93,7 +93,11 @@ const createCopiedStateStore = () => {
                 clearTimeout(timeoutRef);
             }
 
-            await navigator.clipboard.writeText(data);
+            try {
+                await navigator.clipboard.writeText(data);
+            } catch {
+                return;
+            }
 
             set({ copied: true });
 
@@ -154,8 +158,6 @@ export function ActionCopyMarkdown(props: {
     };
 
     const onClick = async (e: React.MouseEvent) => {
-        // Prevent default behavior for non-default actions to avoid closing the dropdown.
-        // This allows showing transient UI (e.g., a "copied" state) inside the menu item.
         if (!isDefaultAction) {
             e.preventDefault();
         }
@@ -179,6 +181,7 @@ export function ActionCopyMarkdown(props: {
             description={tString(language, 'copy_page_markdown')}
             onClick={onClick}
             loading={loading}
+            closeOnClick={false}
         />
     );
 }
@@ -432,6 +435,7 @@ export function CopyToClipboard(props: {
                     },
                 });
             }}
+            closeOnClick={false}
         />
     );
 }
@@ -453,6 +457,7 @@ function PageActionWrapper(props: {
     target?: React.HTMLAttributeAnchorTarget;
     disabled?: boolean;
     loading?: boolean;
+    closeOnClick?: boolean;
 }) {
     const {
         type,
@@ -465,6 +470,7 @@ function PageActionWrapper(props: {
         description,
         disabled,
         loading,
+        closeOnClick,
     } = props;
 
     if (type === 'button') {
@@ -498,6 +504,7 @@ function PageActionWrapper(props: {
             target={target}
             onClick={onClick}
             disabled={disabled || loading}
+            closeOnClick={closeOnClick}
         >
             <div className="flex size-5 items-center justify-center text-tint">
                 {loading ? (
