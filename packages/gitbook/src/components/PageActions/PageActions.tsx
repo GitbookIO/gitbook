@@ -5,7 +5,7 @@ import QuickLRU from 'quick-lru';
 import React from 'react';
 import { createStore, useStore } from 'zustand';
 
-import type { GitSyncState } from '@gitbook/api';
+import { type GitSyncState, SiteInsightsMarkdownSource } from '@gitbook/api';
 import { Icon, type IconName, IconStyle } from '@gitbook/icons';
 
 import { useAIChatController, useAIChatState } from '@/components/AI';
@@ -126,6 +126,14 @@ function useCopiedStore(stateKey: string) {
 }
 
 /**
+ * The URL a reader gets when they ask for a page's markdown from this menu: without the agent
+ * instructions, and telling insights who asked rather than leaving it to be inferred.
+ */
+function getReaderMarkdownURL(markdownPageURL: string) {
+    return `${markdownPageURL}?displayAgentInstructions=false&markdownSource=${SiteInsightsMarkdownSource.PageAction}`;
+}
+
+/**
  * Cache for the markdown version of the page.
  */
 const markdownCache = new QuickLRU<string, string>({ maxSize: 10 });
@@ -149,7 +157,7 @@ export function ActionCopyMarkdown(props: {
     const fetchMarkdown = async () => {
         setLoading(true);
 
-        const humanURL = `${markdownPageURL}?displayAgentInstructions=false`;
+        const humanURL = getReaderMarkdownURL(markdownPageURL);
         const result = await fetch(humanURL).then((res) => res.text());
         markdownCache.set(markdownPageURL, result);
 
@@ -196,7 +204,7 @@ export function ActionViewAsMarkdown(props: { markdownPageURL: string; type: Pag
             icon="markdown"
             label={tString(language, 'view_page_markdown')}
             description={tString(language, 'view_page_plaintext')}
-            href={`${markdownPageURL}?displayAgentInstructions=false`}
+            href={getReaderMarkdownURL(markdownPageURL)}
         />
     );
 }
