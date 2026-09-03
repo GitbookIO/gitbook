@@ -93,18 +93,17 @@ const createCopiedStateStore = () => {
                 clearTimeout(timeoutRef);
             }
 
-            try {
-                await navigator.clipboard.writeText(data);
-            } catch {
-                return;
-            }
+            await navigator.clipboard.writeText(data);
 
             set({ copied: true });
 
             timeoutRef = setTimeout(() => {
-                set({ copied: false });
                 onSuccess?.();
                 timeoutRef = null;
+
+                // Delay resetting the label past the dropdown's closing animation (`scaleOut`,
+                // 200ms) so the "Copied" label doesn't flip back while still visible mid-fade.
+                setTimeout(() => set({ copied: false }), 200);
             }, 1500);
         },
     }));
@@ -157,11 +156,7 @@ export function ActionCopyMarkdown(props: {
         return result;
     };
 
-    const onClick = async (e: React.MouseEvent) => {
-        if (!isDefaultAction) {
-            e.preventDefault();
-        }
-
+    const onClick = async () => {
         copy(markdownCache.get(markdownPageURL) || (await fetchMarkdown()), {
             onSuccess: () => {
                 // We close the dropdown menu if the action is a dropdown menu item and not the default action.
@@ -424,9 +419,7 @@ export function CopyToClipboard(props: {
             icon={copied ? 'check' : icon}
             label={copied ? tString(language, 'code_copied') : label}
             description={description}
-            onClick={(e) => {
-                e.preventDefault();
-
+            onClick={() => {
                 copy(data, {
                     onSuccess: () => {
                         if (type === 'dropdown-menu-item') {
