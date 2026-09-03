@@ -125,10 +125,6 @@ function useCopiedStore(stateKey: string) {
     return useStore(getOrCreateCopiedStoreByKey(stateKey));
 }
 
-/**
- * The URL a reader gets when they ask for a page's markdown from this menu: without the agent
- * instructions, and telling insights who asked rather than leaving it to be inferred.
- */
 function getReaderMarkdownURL(markdownPageURL: string) {
     return `${markdownPageURL}?displayAgentInstructions=false&markdownSource=${SiteInsightsMarkdownSource.PageAction}`;
 }

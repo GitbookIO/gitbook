@@ -901,8 +901,7 @@ function encodePathInSiteContent(
                 // It is encoded as a second path segment (the route is statically rendered, so it can't
                 // read query params at runtime — the question is path-encoded for the same reason).
                 const goal = searchParams.get('goal');
-                // Matched against the API's own values, so a hand-written URL cannot record
-                // something insights does not know.
+                // Validated: this is user input going into insights.
                 const markdownSource = Object.values(SiteInsightsMarkdownSource).find(
                     (source) => source === searchParams.get('markdownSource')
                 );
