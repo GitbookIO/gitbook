@@ -3,6 +3,7 @@ import { getColumnWidth, getViewGridLayout, hasVisibleHeader } from './layout';
 import { RecordColumnValue } from './RecordColumnValue';
 import { StickyViewGrid } from './StickyViewGrid';
 import type { TableGridViewProps } from './Table';
+import { TableHoverTable } from './TableHoverTable';
 import { TableSearchTableBody } from './TableSearch';
 import { type VerticalAlignment, getColumnAlignment, getColumnVerticalAlignment } from './utils';
 import { tcls } from '@/lib/tailwind';
@@ -144,12 +145,13 @@ function NativeViewGridBody(
     const firstVisibleColumn = view.columns[0];
     const lastVisibleColumn = view.columns.at(-1);
     const recordsById = new Map(records.map((record) => [record[0], record] as const));
+    const recordIndexes = new Map(records.map((record, index) => [record[0], index] as const));
 
     return (
-        <table
+        <TableHoverTable
             className={tcls(
                 'w-full table-fixed border-separate border-spacing-0',
-                '[&>tbody:hover>tr>td]:bg-tint-hover',
+                '[&>tbody>tr>td[data-table-hovered]]:bg-tint-hover',
                 '[&>tbody>tr+tr>td]:border-t',
                 '[&>tbody+tbody>tr:first-child>td]:border-t'
             )}
@@ -173,7 +175,8 @@ function NativeViewGridBody(
                 <TableSearchTableBody key={recordGroup[0]} recordIds={recordGroup}>
                     {recordGroup.map((recordId) => {
                         const record = recordsById.get(recordId);
-                        if (!record) {
+                        const recordIndex = recordIndexes.get(recordId);
+                        if (!record || recordIndex === undefined) {
                             return null;
                         }
 
@@ -216,6 +219,10 @@ function NativeViewGridBody(
                                             colSpan={colSpan}
                                             aria-rowspan={rowSpan}
                                             aria-colspan={colSpan}
+                                            data-table-row-start={recordIndex}
+                                            data-table-row-end={
+                                                recordIndex + (cellMerge?.merge.rowSpan ?? 1) - 1
+                                            }
                                             className={tcls(
                                                 'relative px-3 py-2 text-sm transition-colors',
                                                 !isLastColumn
@@ -241,7 +248,7 @@ function NativeViewGridBody(
                     })}
                 </TableSearchTableBody>
             ))}
-        </table>
+        </TableHoverTable>
     );
 }
 
