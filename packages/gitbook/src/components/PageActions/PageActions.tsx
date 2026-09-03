@@ -99,11 +99,13 @@ const createCopiedStateStore = () => {
 
             timeoutRef = setTimeout(() => {
                 onSuccess?.();
-                timeoutRef = null;
 
                 // Delay resetting the label past the dropdown's closing animation (`scaleOut`,
                 // 200ms) so the "Copied" label doesn't flip back while still visible mid-fade.
-                setTimeout(() => set({ copied: false }), 200);
+                timeoutRef = setTimeout(() => {
+                    set({ copied: false });
+                    timeoutRef = null;
+                }, 200);
             }, 1500);
         },
     }));
