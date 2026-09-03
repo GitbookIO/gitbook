@@ -13,6 +13,7 @@ import {
     SiteInsightsDisplayContext,
     type SiteInsightsEventLocation,
     SiteInsightsLLMSVariant,
+    SiteInsightsMarkdownSource,
 } from '@gitbook/api';
 
 import {
@@ -897,6 +898,10 @@ function encodePathInSiteContent(
                 // It is encoded as a second path segment (the route is statically rendered, so it can't
                 // read query params at runtime — the question is path-encoded for the same reason).
                 const goal = searchParams.get('goal');
+                // The page-actions menu is the only caller that asks for markdown without the
+                // agent instructions, so it is what tells a reader apart from a client fetching
+                // the URL. Without it every one of those clicks counts as an agent request.
+                const fromPageAction = searchParams.get('displayAgentInstructions') === 'false';
                 return {
                     pathname:
                         typeof ask === 'string'
@@ -922,6 +927,11 @@ function encodePathInSiteContent(
                         : [
                               {
                                   type: 'page_markdown_request',
+                                  ...(fromPageAction
+                                      ? {
+                                            markdownSource: SiteInsightsMarkdownSource.PageAction,
+                                        }
+                                      : {}),
                                   location: {
                                       displayContext: SiteInsightsDisplayContext.Server,
                                   },
