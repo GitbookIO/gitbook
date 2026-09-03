@@ -158,6 +158,37 @@ const searchTestCases: Test[] = [
         },
     },
     {
+        name: 'Search - Keyboard focus stays within search',
+        url: getCustomizationURL({
+            ai: {
+                mode: CustomizationAIMode.Search,
+            },
+        }),
+        screenshot: false,
+        run: async (page) => {
+            await waitForCookiesDialog(page);
+            const searchInput = page.getByTestId('search-input');
+            await searchInput.focus();
+            await searchInput.fill('gitbook');
+
+            const searchPopup = page.getByTestId('search-popover');
+            await expect(searchPopup).toBeVisible({ timeout: 10_000 });
+            const finalPopupControl = searchPopup
+                .locator(
+                    'a[href], button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])'
+                )
+                .filter({ visible: true })
+                .last();
+            await expect(finalPopupControl).toBeVisible();
+            await finalPopupControl.focus();
+            await page.keyboard.press('Tab');
+            await expect(searchInput).toBeFocused();
+
+            await page.keyboard.press('Shift+Tab');
+            await expect(finalPopupControl).toBeFocused();
+        },
+    },
+    {
         // `fill()` bypasses key events, so it can't catch a swallowed key. RND-12484.
         name: 'Search - AI Mode: None - Typing multi-word queries',
         url: getCustomizationURL({

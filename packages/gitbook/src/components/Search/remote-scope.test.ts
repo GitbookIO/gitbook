@@ -14,4 +14,18 @@ describe('computeRemoteSearchScope', () => {
             siteSpaceId: 'snyk-discover',
         });
     });
+
+    it('requests only the site spaces belonging to an independently selected section', () => {
+        expect(
+            computeRemoteSearchScope(
+                'extended',
+                'snyk-discover',
+                ['snyk-discover', 'snyk-developer-tools'],
+                ['snyk-api-v1', 'snyk-api-v2']
+            )
+        ).toEqual({
+            mode: 'specific',
+            siteSpaceIds: ['snyk-api-v1', 'snyk-api-v2'],
+        });
+    });
 });

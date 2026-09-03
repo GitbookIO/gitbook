@@ -1,3 +1,5 @@
+import assertNever from 'assert-never';
+
 import type {
     LocalizedString,
     Revision,
@@ -20,7 +22,7 @@ import {
 import { joinPath } from './paths';
 import { flattenSectionsFromGroup } from './utils';
 import { languages } from '@/intl/translations';
-import type { GitBookSiteContext } from '@/lib/context';
+import type { GitBookSiteContext, SiteStructureNode } from '@/lib/context';
 
 /**
  * Get all sections from a site structure.
@@ -33,21 +35,37 @@ export function getSiteStructureSections(
 export function getSiteStructureSections(
     siteStructure: SiteStructure,
     options?: { ignoreGroups: false }
-): SiteSection[] | SiteSectionGroup[];
+): SiteStructureNode[];
 export function getSiteStructureSections(
     siteStructure: SiteStructure,
     options?: { ignoreGroups: boolean }
 ) {
     const { ignoreGroups } = options ?? { ignoreGroups: false };
-    return siteStructure.type === 'sections'
-        ? ignoreGroups
-            ? siteStructure.structure.flatMap((item) =>
-                  item.object === 'site-section-group'
-                      ? flattenSectionsFromGroup<SiteSection | SiteSectionGroup>(item.children)
-                      : item
-              )
-            : siteStructure.structure
-        : [];
+    switch (siteStructure.type) {
+        case 'siteSpaces':
+            return [];
+        case 'sections':
+            if (!ignoreGroups) {
+                return siteStructure.structure;
+            }
+
+            return siteStructure.structure.flatMap((item) => {
+                switch (item.object) {
+                    case 'site-section':
+                        return [item];
+                    case 'site-section-group':
+                        return flattenSectionsFromGroup<SiteStructureNode>(item.children).filter(
+                            (child): child is SiteSection => child.object === 'site-section'
+                        );
+                    case 'site-external-link':
+                        return [];
+                    default:
+                        return assertNever(item, 'Unknown site structure node object type');
+                }
+            });
+        default:
+            return assertNever(siteStructure, 'Unknown site structure type');
+    }
 }
 
 /**
@@ -180,20 +198,31 @@ export function getLinkerForSiteSpace(
 /*
  * Gets all site spaces, in a site structure and overrides the title
  */
-export function listAllSiteSpaces(siteStructure: SiteStructure) {
-    if (siteStructure.type === 'siteSpaces') {
-        return siteStructure.structure;
+export function listAllSiteSpaces(siteStructure: SiteStructure): SiteSpace[] {
+    switch (siteStructure.type) {
+        case 'siteSpaces':
+            return siteStructure.structure;
+        case 'sections':
+            return siteStructure.structure.flatMap((section) => {
+                switch (section.object) {
+                    case 'site-section':
+                        return section.siteSpaces;
+                    case 'site-section-group':
+                        return flattenSectionsFromGroup<SiteStructureNode>(section.children)
+                            .filter(
+                                (subSection): subSection is SiteSection =>
+                                    subSection.object === 'site-section'
+                            )
+                            .flatMap((subSection) => subSection.siteSpaces);
+                    case 'site-external-link':
+                        return [];
+                    default:
+                        return assertNever(section, 'Unknown site structure node object type');
+                }
+            });
+        default:
+            return assertNever(siteStructure, 'Unknown site structure type');
     }
-
-    return siteStructure.structure.flatMap((section) => {
-        if (section.object === 'site-section') {
-            return section.siteSpaces;
-        }
-
-        return flattenSectionsFromGroup<SiteSection | SiteSectionGroup>(section.children)
-            .filter((subSection): subSection is SiteSection => subSection.object === 'site-section')
-            .flatMap((subSection) => subSection.siteSpaces);
-    });
 }
 
 type SiteSpaceMatch = { siteSpace: SiteSpace; pagePath: string; baseLength: number };
@@ -235,6 +264,7 @@ export function findSiteSpaceBy(
     siteSpace: SiteSpace;
     siteSection: SiteSection | null;
     siteSectionGroup: SiteSectionGroup | null;
+    siteSectionGroups: SiteSectionGroup[];
 } | null {
     if (siteStructure.type === 'siteSpaces') {
         const siteSpace = siteStructure.structure.find(predicate) ?? null;
@@ -243,6 +273,7 @@ export function findSiteSpaceBy(
                 siteSpace,
                 siteSection: null,
                 siteSectionGroup: null,
+                siteSectionGroups: [],
             };
         }
 
@@ -250,24 +281,37 @@ export function findSiteSpaceBy(
     }
 
     for (const sectionOrGroup of siteStructure.structure) {
-        if (sectionOrGroup.object === 'site-section') {
-            const siteSpace = findSiteSpaceByIdInSiteSpaces(sectionOrGroup.siteSpaces, predicate);
-            if (siteSpace) {
-                return {
-                    siteSpace,
-                    siteSection: sectionOrGroup,
-                    siteSectionGroup: null,
-                };
+        switch (sectionOrGroup.object) {
+            case 'site-section': {
+                const siteSpace = findSiteSpaceByIdInSiteSpaces(
+                    sectionOrGroup.siteSpaces,
+                    predicate
+                );
+                if (siteSpace) {
+                    return {
+                        siteSpace,
+                        siteSection: sectionOrGroup,
+                        siteSectionGroup: null,
+                        siteSectionGroups: [],
+                    };
+                }
+                break;
             }
-        } else {
-            const found = findSiteSpaceByIdInGroupChildren(
-                sectionOrGroup.children,
-                predicate,
-                sectionOrGroup
-            );
-            if (found) {
-                return found;
+            case 'site-section-group': {
+                const found = findSiteSpaceByIdInGroupChildren(
+                    sectionOrGroup.children,
+                    predicate,
+                    sectionOrGroup
+                );
+                if (found) {
+                    return found;
+                }
+                break;
             }
+            case 'site-external-link':
+                break;
+            default:
+                return assertNever(sectionOrGroup, 'Unknown site structure node object type');
         }
     }
 
@@ -318,29 +362,48 @@ export function getFallbackSiteSpacePath(context: GitBookSiteContext, siteSpace:
 }
 
 function findSiteSpaceByIdInGroupChildren(
-    children: (SiteSection | SiteSectionGroup)[],
+    children: SiteStructureNode[],
     predicate: (siteSpace: SiteSpace) => boolean,
-    parentGroup: SiteSectionGroup
+    parentGroup: SiteSectionGroup,
+    rootGroup: SiteSectionGroup = parentGroup,
+    sectionGroups: SiteSectionGroup[] = [parentGroup]
 ): {
     siteSpace: SiteSpace;
     siteSection: SiteSection;
     siteSectionGroup: SiteSectionGroup;
+    siteSectionGroups: SiteSectionGroup[];
 } | null {
     for (const child of children) {
-        if (child.object === 'site-section') {
-            const siteSpace = child.siteSpaces.find(predicate) ?? null;
-            if (siteSpace) {
-                return {
-                    siteSpace,
-                    siteSection: child,
-                    siteSectionGroup: parentGroup,
-                };
+        switch (child.object) {
+            case 'site-section': {
+                const siteSpace = child.siteSpaces.find(predicate) ?? null;
+                if (siteSpace) {
+                    return {
+                        siteSpace,
+                        siteSection: child,
+                        siteSectionGroup: parentGroup,
+                        siteSectionGroups: sectionGroups,
+                    };
+                }
+                break;
             }
-        } else if (child.object === 'site-section-group') {
-            const found = findSiteSpaceByIdInGroupChildren(child.children, predicate, child);
-            if (found) {
-                return found;
+            case 'site-section-group': {
+                const found = findSiteSpaceByIdInGroupChildren(
+                    child.children,
+                    predicate,
+                    child,
+                    rootGroup,
+                    [...sectionGroups, child]
+                );
+                if (found) {
+                    return found;
+                }
+                break;
             }
+            case 'site-external-link':
+                break;
+            default:
+                return assertNever(child, 'Unknown site structure node object type');
         }
     }
 

@@ -1,14 +1,9 @@
 import { describe, expect, it } from 'bun:test';
 
-import type {
-    JSONDocument,
-    RevisionPage,
-    RevisionTag,
-    SiteSection,
-    SiteSectionGroup,
-} from '@gitbook/api';
+import type { JSONDocument, RevisionPage, RevisionTag } from '@gitbook/api';
 import { IconStyle } from '@gitbook/icons/types';
 
+import type { SiteStructureNode } from '../context';
 import { getContentInlineIconSourceRequests, parseRawSVG } from './inline';
 
 describe('parseRawSVG', () => {
@@ -96,9 +91,12 @@ describe('getContentInlineIconSourceRequests', () => {
             {
                 object: 'site-section-group',
                 icon: 'magnifying-glass',
-                children: [{ object: 'site-section', icon: 'xmark' }],
+                children: [
+                    { object: 'site-section', icon: 'xmark' },
+                    { object: 'site-external-link', icon: 'link' },
+                ],
             },
-        ] as unknown as (SiteSection | SiteSectionGroup)[];
+        ] as unknown as SiteStructureNode[];
         const document = {
             object: 'document',
             nodes: [
@@ -128,6 +126,7 @@ describe('getContentInlineIconSourceRequests', () => {
             { icon: 'gear', iconStyle: IconStyle.Solid },
             { icon: 'magnifying-glass', iconStyle: IconStyle.Solid },
             { icon: 'xmark', iconStyle: IconStyle.Solid },
+            { icon: 'link', iconStyle: IconStyle.Solid },
             { icon: 'copy', iconStyle: IconStyle.Solid },
             { icon: 'download', iconStyle: IconStyle.Solid },
         ]);
@@ -143,7 +142,7 @@ describe('getContentInlineIconSourceRequests', () => {
         const sections = [
             { object: 'site-section', icon: undefined },
             { object: 'site-section', icon: 'also-not-real' },
-        ] as unknown as (SiteSection | SiteSectionGroup)[];
+        ] as unknown as SiteStructureNode[];
         const document = {
             object: 'document',
             nodes: [

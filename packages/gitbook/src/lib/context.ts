@@ -10,6 +10,7 @@ import type {
     RevisionPageDocument,
     Site,
     SiteCustomizationSettings,
+    SiteExternalLink,
     SiteIntegrationScript,
     SiteSection,
     SiteSectionGroup,
@@ -151,8 +152,10 @@ export type GitBookSpaceContext = GitBookBaseContext & {
     shareKey: string | undefined;
 };
 
+export type SiteStructureNode = SiteSection | SiteSectionGroup | SiteExternalLink;
+
 export type SiteSections = {
-    list: (SiteSectionGroup | SiteSection)[];
+    list: SiteStructureNode[];
     current: SiteSection;
 };
 
@@ -581,6 +584,38 @@ export function checkIsRootSiteContext(context: GitBookSiteContext): boolean {
     }
 }
 
+/** Filter sections with hidden spaces while preserving external navigation links. */
+export function filterSectionsAndGroupsWithHiddenSiteSpaces(
+    sectionsOrGroups: SiteStructureNode[]
+): SiteStructureNode[] {
+    return sectionsOrGroups
+        .map((entry) => {
+            switch (entry.object) {
+                case 'site-section':
+                    return sectionHasOnlyHiddenSiteSpaces(entry) ? null : entry;
+                case 'site-external-link':
+                    return entry;
+                case 'site-section-group': {
+                    const visibleChildren = filterSectionsAndGroupsWithHiddenSiteSpaces(
+                        entry.children
+                    );
+
+                    if (visibleChildren.length === 0) {
+                        return null;
+                    }
+
+                    return {
+                        ...entry,
+                        children: visibleChildren,
+                    };
+                }
+                default:
+                    return assertNever(entry, 'Unknown site structure node object type');
+            }
+        })
+        .filter((entry): entry is SiteStructureNode => Boolean(entry));
+}
+
 /**
  * Filter out hidden site spaces from a list of site spaces.
  */
@@ -607,36 +642,6 @@ function parseVisibleSiteSectionsAndGroups(structure: SiteStructure, siteSection
 function parseCurrentSection(structure: SiteStructure, siteSectionId: string) {
     const sections = getSiteStructureSections(structure, { ignoreGroups: true });
     return sections.find((section) => section.id === siteSectionId);
-}
-
-type SectionOrGroup = SiteSection | SiteSectionGroup;
-
-/**
- * Filter out sections where all site spaces are hidden and groups that become empty after filtering.
- */
-function filterSectionsAndGroupsWithHiddenSiteSpaces(
-    sectionsOrGroups: SectionOrGroup[]
-): SectionOrGroup[] {
-    return sectionsOrGroups
-        .map((entry) => {
-            if (entry.object === 'site-section') {
-                return sectionHasOnlyHiddenSiteSpaces(entry) ? null : entry;
-            }
-
-            const visibleChildren: SectionOrGroup[] = filterSectionsAndGroupsWithHiddenSiteSpaces(
-                entry.children
-            );
-
-            if (visibleChildren.length === 0) {
-                return null;
-            }
-
-            return {
-                ...entry,
-                children: visibleChildren,
-            };
-        })
-        .filter((entry): entry is SiteSection | SiteSectionGroup => Boolean(entry));
 }
 
 function sectionHasOnlyHiddenSiteSpaces(section: SiteSection) {
