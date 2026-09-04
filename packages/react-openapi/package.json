@@ -7,7 +7,7 @@
             "default": "./dist/index.js"
         }
     },
-    "version": "1.5.15",
+    "version": "2.0.0",
     "sideEffects": false,
     "dependencies": {
         "@base-ui/react": "catalog:",

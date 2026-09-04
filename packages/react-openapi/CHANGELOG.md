@@ -1,5 +1,23 @@
 # @gitbook/react-openapi
 
+## 2.0.0
+
+### Major Changes
+
+- 65f99ea: Lazy load the Scalar API client modal and stop preloading the Scalar runtime. The modal is now code-split into its own chunk, fetched in parallel with the runtime only when a reader clicks "Test it", and a spinner is shown on the button until the client opens.
+
+  Breaking: the package no longer ships the modal in its main entry — consumers must serve the emitted `ScalarApiModal` chunk and use a bundler that supports dynamic `import()`, and the Scalar runtime is no longer preloaded on page load. The internal `preloadScalarRuntime` helper is removed.
+
+### Minor Changes
+
+- 1424c56: Keep the OpenAPI renderer out of the initial bundle of pages that have no OpenAPI block, by building its context on the client behind a dynamic boundary.
+
+### Patch Changes
+
+- 03bbacf: Add missing link reference to OpenAPI models
+- Updated dependencies [03bbacf]
+  - @gitbook/openapi-parser@3.0.13
+
 ## 1.5.15
 
 ### Patch Changes
