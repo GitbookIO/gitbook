@@ -5,7 +5,7 @@ import QuickLRU from 'quick-lru';
 import React from 'react';
 import { createStore, useStore } from 'zustand';
 
-import type { GitSyncState } from '@gitbook/api';
+import { type GitSyncState, SiteInsightsMarkdownSource } from '@gitbook/api';
 import { Icon, type IconName, IconStyle } from '@gitbook/icons';
 
 import { useAIChatController, useAIChatState } from '@/components/AI';
@@ -98,9 +98,14 @@ const createCopiedStateStore = () => {
             set({ copied: true });
 
             timeoutRef = setTimeout(() => {
-                set({ copied: false });
                 onSuccess?.();
-                timeoutRef = null;
+
+                // Delay resetting the label past the dropdown's closing animation (`scaleOut`,
+                // 200ms) so the "Copied" label doesn't flip back while still visible mid-fade.
+                timeoutRef = setTimeout(() => {
+                    set({ copied: false });
+                    timeoutRef = null;
+                }, 200);
             }, 1500);
         },
     }));
@@ -118,6 +123,10 @@ const getOrCreateCopiedStoreByKey = (storeKey: string) => {
 
 function useCopiedStore(stateKey: string) {
     return useStore(getOrCreateCopiedStoreByKey(stateKey));
+}
+
+function getReaderMarkdownURL(markdownPageURL: string) {
+    return `${markdownPageURL}?displayAgentInstructions=false&markdownSource=${SiteInsightsMarkdownSource.PageAction}`;
 }
 
 /**
@@ -144,7 +153,7 @@ export function ActionCopyMarkdown(props: {
     const fetchMarkdown = async () => {
         setLoading(true);
 
-        const humanURL = `${markdownPageURL}?displayAgentInstructions=false`;
+        const humanURL = getReaderMarkdownURL(markdownPageURL);
         const result = await fetch(humanURL).then((res) => res.text());
         markdownCache.set(markdownPageURL, result);
 
@@ -153,13 +162,7 @@ export function ActionCopyMarkdown(props: {
         return result;
     };
 
-    const onClick = async (e: React.MouseEvent) => {
-        // Prevent default behavior for non-default actions to avoid closing the dropdown.
-        // This allows showing transient UI (e.g., a "copied" state) inside the menu item.
-        if (!isDefaultAction) {
-            e.preventDefault();
-        }
-
+    const onClick = async () => {
         copy(markdownCache.get(markdownPageURL) || (await fetchMarkdown()), {
             onSuccess: () => {
                 // We close the dropdown menu if the action is a dropdown menu item and not the default action.
@@ -179,6 +182,7 @@ export function ActionCopyMarkdown(props: {
             description={tString(language, 'copy_page_markdown')}
             onClick={onClick}
             loading={loading}
+            closeOnClick={false}
         />
     );
 }
@@ -196,7 +200,7 @@ export function ActionViewAsMarkdown(props: { markdownPageURL: string; type: Pag
             icon="markdown"
             label={tString(language, 'view_page_markdown')}
             description={tString(language, 'view_page_plaintext')}
-            href={`${markdownPageURL}?displayAgentInstructions=false`}
+            href={getReaderMarkdownURL(markdownPageURL)}
         />
     );
 }
@@ -421,9 +425,7 @@ export function CopyToClipboard(props: {
             icon={copied ? 'check' : icon}
             label={copied ? tString(language, 'code_copied') : label}
             description={description}
-            onClick={(e) => {
-                e.preventDefault();
-
+            onClick={() => {
                 copy(data, {
                     onSuccess: () => {
                         if (type === 'dropdown-menu-item') {
@@ -432,6 +434,7 @@ export function CopyToClipboard(props: {
                     },
                 });
             }}
+            closeOnClick={false}
         />
     );
 }
@@ -453,6 +456,7 @@ function PageActionWrapper(props: {
     target?: React.HTMLAttributeAnchorTarget;
     disabled?: boolean;
     loading?: boolean;
+    closeOnClick?: boolean;
 }) {
     const {
         type,
@@ -465,6 +469,7 @@ function PageActionWrapper(props: {
         description,
         disabled,
         loading,
+        closeOnClick,
     } = props;
 
     if (type === 'button') {
@@ -498,6 +503,7 @@ function PageActionWrapper(props: {
             target={target}
             onClick={onClick}
             disabled={disabled || loading}
+            closeOnClick={closeOnClick}
         >
             <div className="flex size-5 items-center justify-center text-tint">
                 {loading ? (

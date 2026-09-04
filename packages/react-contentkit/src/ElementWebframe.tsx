@@ -138,6 +138,7 @@ export function ElementWebframe(props: ContentKitClientElementProps<ContentKitWe
                                     typeof message.action.anchor === 'string'
                                         ? message.action.anchor
                                         : undefined,
+                                query: message.action.query,
                             });
                         }
                         break;

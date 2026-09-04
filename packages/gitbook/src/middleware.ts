@@ -13,6 +13,7 @@ import {
     SiteInsightsDisplayContext,
     type SiteInsightsEventLocation,
     SiteInsightsLLMSVariant,
+    SiteInsightsMarkdownSource,
 } from '@gitbook/api';
 
 import {
@@ -533,6 +534,9 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         if (rewrittenURL.searchParams.has('displayAgentInstructions')) {
             rewrittenURL.searchParams.delete('displayAgentInstructions');
         }
+        if (rewrittenURL.searchParams.has('markdownSource')) {
+            rewrittenURL.searchParams.delete('markdownSource');
+        }
 
         const response = NextResponse.rewrite(rewrittenURL, {
             request: {
@@ -897,6 +901,10 @@ function encodePathInSiteContent(
                 // It is encoded as a second path segment (the route is statically rendered, so it can't
                 // read query params at runtime — the question is path-encoded for the same reason).
                 const goal = searchParams.get('goal');
+                // Validated: this is user input going into insights.
+                const markdownSource = Object.values(SiteInsightsMarkdownSource).find(
+                    (source) => source === searchParams.get('markdownSource')
+                );
                 return {
                     pathname:
                         typeof ask === 'string'
@@ -922,6 +930,7 @@ function encodePathInSiteContent(
                         : [
                               {
                                   type: 'page_markdown_request',
+                                  ...(markdownSource ? { markdownSource } : {}),
                                   location: {
                                       displayContext: SiteInsightsDisplayContext.Server,
                                   },

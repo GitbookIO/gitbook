@@ -117,7 +117,7 @@ export async function GET(
         <button type="button" class="control" onclick="window.GitBook('open')">Open</button>
         <button type="button" class="control" onclick="window.GitBook('close')">Close</button>
     </body>
-    <script src="${context.linker.toAbsoluteURL(context.linker.toPathInSite('~gitbook/embed/script.js'))}"></script>
+    <script src="${context.linker.toPathInSite('~gitbook/embed/script.js')}"></script>
     <script>
         const useCustomTrigger = new URLSearchParams(window.location.search).get('trigger') === 'custom';
         window.GitBook('configure', {

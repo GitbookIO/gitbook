@@ -18,7 +18,7 @@ export async function GET(
 ) {
     const { context } = await getEmbeddableStaticContext(await params);
     const initOptions: CreateGitBookOptions = {
-        siteURL: context.linker.toAbsoluteURL(context.linker.toPathInSite('')),
+        siteURL: context.linker.toPathInSite(''),
     };
 
     // The theme this site pins its embeds to, if it has one. The widget paints the panel around the
@@ -41,7 +41,12 @@ export async function GET(
 
   const searchParams = getScriptSearchParams()
   const token = searchParams.get('jwt_token');
-  const initOptions = { ...${JSON.stringify(initOptions)}, ...(window.gitbookSettings || {}) };
+  const initOptions = {
+    ...${JSON.stringify(initOptions)},
+    // Preview deployments must keep the iframe on the deployment that served this script.
+    siteURL: new URL(${JSON.stringify(initOptions.siteURL)}, window.location.origin).toString(),
+    ...(window.gitbookSettings || {}),
+  };
   const initFrameOptions = {};
   const theme = searchParams.get('theme');
   // The site's own theme first: it renders in that one whatever the embedder asks for.

@@ -198,14 +198,23 @@ export const SearchResults = React.forwardRef(function SearchResults(
                             const itemKey = getResultKey(item);
                             const shouldAnimateItem =
                                 shouldAnimateResults || !seenResultKeys.current.has(itemKey);
-                            const handleResultSelect = () => {
+                            const handleResultSelect = (
+                                event: React.MouseEvent<HTMLAnchorElement>
+                            ) => {
+                                const isPageResult =
+                                    item.type === 'local-page' ||
+                                    item.type === 'page' ||
+                                    item.type === 'record';
+
                                 if (
-                                    query &&
-                                    siteSpaceId &&
-                                    (item.type === 'local-page' ||
-                                        item.type === 'page' ||
-                                        item.type === 'record')
+                                    isPageResult &&
+                                    !event.currentTarget.hash &&
+                                    event.currentTarget.pathname === window.location.pathname
                                 ) {
+                                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                                }
+
+                                if (query && siteSpaceId && isPageResult) {
                                     addRecentSearchQuery(siteSpaceId, query, 'search');
                                 }
 
