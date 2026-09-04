@@ -49,3 +49,21 @@ export function slugifySelectValue(name: string): string {
     // trailing `-` the cut may have exposed.
     return [...slug].slice(0, SLUG_MAX_CODE_POINTS).join('').replace(/-+$/u, '');
 }
+
+/**
+ * Resolve the `select` slug for one option — a tab, a variant, a picker entry.
+ *
+ * An explicit slug wins but is still slugified, since it reaches generated CSS attribute selectors
+ * and is compared against stored state. Falling back to the title is what lets same-named options
+ * across a site select together with no authoring, so an absent slug is the normal case.
+ *
+ * DUPLICATED, ON PURPOSE, alongside {@link slugifySelectValue}: the editor owns the same function at
+ * `packages/doc-core/src/select/slug.ts` in the gitbook-x repo, and the two must agree or a tab
+ * resolves differently in the editor preview than on the published site.
+ */
+export function resolveSelectSlug(option: { slug?: string; title?: string }): string {
+    return (
+        (option.slug ? slugifySelectValue(option.slug) : '') ||
+        (option.title ? slugifySelectValue(option.title) : '')
+    );
+}
