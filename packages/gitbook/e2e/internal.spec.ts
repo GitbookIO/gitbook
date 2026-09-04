@@ -676,6 +676,150 @@ const testCases: TestsCase[] = [
                     await page.waitForURL((url) => url.pathname.includes('/sections/sections-4'));
                 },
             },
+            {
+                name: 'Root external link renders in the configured position',
+                url: '',
+                screenshot: false,
+                run: async (page) => {
+                    await waitForHydration(page);
+                    const rootSections = page.locator('[data-gb-sections]');
+                    const rootItems = rootSections.locator(':scope > li');
+
+                    await expect(rootItems).toHaveCount(4);
+                    await expect(rootItems.nth(0)).toContainText('Home');
+                    await expect(rootItems.nth(1)).toContainText('Test Section Group 1');
+                    await expect(rootItems.nth(2)).toContainText('Test Section Group 2');
+                    await expect(rootItems.last()).toContainText('Gitbook Docs');
+                    await expect(
+                        rootSections.getByRole('link', { name: 'Gitbook Docs' })
+                    ).toBeVisible();
+                },
+            },
+            {
+                name: 'Root external link has the configured contract',
+                url: '',
+                screenshot: false,
+                run: async (page) => {
+                    await waitForHydration(page);
+                    const rootLink = page
+                        .locator('[data-gb-sections]')
+                        .getByRole('link', { name: 'Gitbook Docs' });
+
+                    await expect(rootLink).toBeVisible();
+                    await expect(rootLink).toHaveAttribute('href', 'https://gitbook.com/docs');
+                    await expect(rootLink).not.toHaveAttribute('target');
+                    await expect(rootLink).not.toHaveAttribute('rel');
+                    await expect(rootLink).toHaveAttribute('data-active', 'false');
+                    await expect(rootLink).not.toHaveAttribute('aria-current');
+                },
+            },
+            {
+                name: 'Nested external link renders in the configured position',
+                url: '',
+                screenshot: false,
+                run: async (page) => {
+                    await waitForHydration(page);
+                    await page
+                        .locator('[data-gb-sections]')
+                        .getByRole('button', { name: 'Test Section Group 2' })
+                        .hover();
+
+                    const nestedLink = page.getByRole('link', { name: 'Gitbook Site' });
+                    await expect(nestedLink).toBeVisible();
+
+                    const nestedItems = nestedLink
+                        .locator('xpath=ancestor::ul[1]')
+                        .locator(':scope > li');
+                    await expect(nestedItems).toHaveCount(3);
+                    await expect(nestedItems.nth(0)).toContainText('Section C');
+                    await expect(nestedItems.nth(1)).toContainText('Section with longer title');
+                    await expect(nestedItems.last()).toContainText('Gitbook Site');
+                },
+            },
+            {
+                name: 'Nested external link has the configured contract',
+                url: '',
+                screenshot: false,
+                run: async (page) => {
+                    await waitForHydration(page);
+                    await page
+                        .locator('[data-gb-sections]')
+                        .getByRole('button', { name: 'Test Section Group 2' })
+                        .hover();
+
+                    const nestedLink = page.getByRole('link', { name: 'Gitbook Site' });
+                    await expect(nestedLink).toBeVisible();
+                    await expect(nestedLink).toHaveAttribute('href', 'https://gitbook.com');
+                    await expect(nestedLink).not.toHaveAttribute('target');
+                    await expect(nestedLink).not.toHaveAttribute('rel');
+                    await expect(nestedLink).not.toHaveAttribute('aria-current');
+                },
+            },
+            {
+                name: 'External links use the configured window open behavior',
+                url: '',
+                screenshot: false,
+                run: async (page) => {
+                    await waitForHydration(page);
+
+                    const windowOpenCalls: {
+                        url: string;
+                        target: string;
+                        features: string | undefined;
+                    }[] = [];
+                    await page.exposeFunction(
+                        'recordExternalWindowOpen',
+                        (url: string, target: string, features?: string) => {
+                            windowOpenCalls.push({ url, target, features });
+                        }
+                    );
+                    await page.evaluate(() => {
+                        const recordExternalWindowOpen = (
+                            window as unknown as {
+                                recordExternalWindowOpen: (
+                                    url: string,
+                                    target: string,
+                                    features?: string
+                                ) => void;
+                            }
+                        ).recordExternalWindowOpen;
+                        window.open = ((url, target, features) => {
+                            void recordExternalWindowOpen(
+                                url?.toString() ?? '',
+                                target ?? '',
+                                features
+                            );
+                            return null;
+                        }) as typeof window.open;
+                    });
+
+                    const initialURL = page.url();
+                    await page
+                        .locator('[data-gb-sections]')
+                        .getByRole('link', { name: 'Gitbook Docs' })
+                        .click();
+                    await expect.poll(() => windowOpenCalls.length).toBe(1);
+                    expect(windowOpenCalls[0]).toEqual({
+                        url: 'https://gitbook.com/docs',
+                        target: '_self',
+                        features: undefined,
+                    });
+                    await expect(page).toHaveURL(initialURL);
+
+                    await page
+                        .locator('[data-gb-sections]')
+                        .getByRole('button', { name: 'Test Section Group 2' })
+                        .hover();
+                    await page.getByRole('link', { name: 'Gitbook Site' }).click();
+                    await expect.poll(() => windowOpenCalls.length).toBe(2);
+                    expect(windowOpenCalls[1]).toEqual({
+                        url: 'https://gitbook.com',
+                        target: '_self',
+                        features: undefined,
+                    });
+                    await expect(page).toHaveURL(initialURL);
+                },
+            },
         ],
     },
     {
