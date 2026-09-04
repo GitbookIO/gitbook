@@ -146,6 +146,7 @@ export const zh: TranslationLanguage = {
     ai_chat_tools_submit_feedback: '提交反馈',
     ai_chat_tools_submit_assistant_feedback: '将助手的上一条消息评为 ${1}',
     ai_chat_tools_submitted_feedback: '已提交反馈',
+    ai_chat_tools_shared_feedback_with_team: '已将反馈发送给文档团队',
     ai_chat_tools_mcp_tool: '调用了 ${1}',
     ai_chat_ask: '向 ${1} 提问',
     ai_chat_ask_about: '向 ${1} 询问${2}',

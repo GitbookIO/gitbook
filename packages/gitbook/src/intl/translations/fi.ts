@@ -151,6 +151,7 @@ export const fi: TranslationLanguage = {
     ai_chat_tools_submit_feedback: 'Lähetä palaute',
     ai_chat_tools_submit_assistant_feedback: 'Arvioi avustajan edellinen viesti: ${1}',
     ai_chat_tools_submitted_feedback: 'Palaute lähetetty',
+    ai_chat_tools_shared_feedback_with_team: 'Palaute lähetetty dokumentaatiotiimille',
     ai_chat_tools_mcp_tool: 'Kutsuttiin ${1}',
     ai_chat_ask: 'Kysy ${1}',
     ai_chat_ask_about: 'Kysy ${1}: ${2}',

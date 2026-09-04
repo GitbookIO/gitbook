@@ -150,6 +150,7 @@ export const ms: TranslationLanguage = {
     ai_chat_tools_submit_assistant_feedback:
         'Nilai mesej sebelumnya daripada Pembantu sebagai ${1}',
     ai_chat_tools_submitted_feedback: 'Maklum balas dihantar',
+    ai_chat_tools_shared_feedback_with_team: 'Maklum balas dihantar kepada pasukan dokumentasi',
     ai_chat_tools_mcp_tool: 'Memanggil ${1}',
     ai_chat_ask: 'Tanya ${1}',
     ai_chat_ask_about: 'Tanya ${1} tentang ${2}',

@@ -2,10 +2,21 @@ import { createMcpHandler } from 'mcp-handler';
 import type { NextRequest } from 'next/server';
 import { z } from 'zod';
 
-import { CustomizationPageActionType, SiteInsightsDisplayContext } from '@gitbook/api';
+import {
+    AgentFeedbackSource,
+    CustomizationPageActionType,
+    SiteInsightsDisplayContext,
+} from '@gitbook/api';
 
 import { type RouteLayoutParams, getDynamicSiteContext } from '@/app/utils';
 import { isAIEnabled } from '@/components/utils/isAIChatEnabled';
+import {
+    AGENT_FEEDBACK_GOAL_MAX_LENGTH,
+    AGENT_FEEDBACK_MAX_LENGTH,
+    agentFeedbackDescriptions,
+    parseAgentFeedbackPageURL,
+} from '@/lib/agentFeedback';
+import { submitAgentFeedback } from '@/lib/agentFeedback/server';
 import { renderAskSourcesMarkdown, streamSiteAskAnswer } from '@/lib/ask';
 import { getExposableError, throwIfDataError } from '@/lib/data';
 import { fromPageMarkdown, getMarkdownForPageInSpace, toPageMarkdown } from '@/lib/markdownPage';
@@ -353,26 +364,14 @@ export async function handleMcpRequest(
                     content: z
                         .string()
                         .min(1)
-                        .max(2048)
-                        .describe(
-                            'Explain the issue in full, as if writing to a documentation maintainer who never saw this conversation. Describe what is wrong, where on the page it appears (quote the exact sentence or section title when possible), what the user was trying to do, and, when relevant, what the correct or expected information should be. Write a few clear, specific sentences in English. Never include personal or confidential information from the conversation. Up to 2048 characters.'
-                        ),
+                        .max(AGENT_FEEDBACK_MAX_LENGTH)
+                        .describe(agentFeedbackDescriptions.finding),
                     pageUrl: z
                         .string()
-                        .describe(
-                            `The full URL of the page the issue is about (e.g. ${siteUrl}/getting-started), so the finding is linked to the exact page.`
-                        )
+                        .describe(agentFeedbackDescriptions.pageURL(siteUrl))
                         .transform((value, ctx) => {
-                            const candidate = URL.canParse(value)
-                                ? new URL(value)
-                                : URL.canParse(value, siteUrl)
-                                  ? new URL(value, siteUrl)
-                                  : null;
-
-                            if (
-                                !candidate ||
-                                (candidate.protocol !== 'https:' && candidate.protocol !== 'http:')
-                            ) {
+                            const url = parseAgentFeedbackPageURL(value, siteUrl);
+                            if (!url) {
                                 ctx.addIssue({
                                     code: z.ZodIssueCode.custom,
                                     message: `"${value}" is not a valid URL on this site. Expected a full URL like ${siteUrl}/getting-started`,
@@ -380,14 +379,13 @@ export async function handleMcpRequest(
                                 return z.NEVER;
                             }
 
-                            return candidate.toString();
+                            return url;
                         }),
                     goal: z
                         .string()
+                        .max(AGENT_FEEDBACK_GOAL_MAX_LENGTH)
                         .optional()
-                        .describe(
-                            'The broader end goal you were ultimately trying to accomplish (as/on behalf of the user) when you hit this issue. Gives the team the context you were working towards. Optional.'
-                        ),
+                        .describe(agentFeedbackDescriptions.goal),
                 },
                 {
                     title: 'Send feedback',
@@ -398,66 +396,36 @@ export async function handleMcpRequest(
                 },
                 async ({ content, pageUrl, goal }) => {
                     try {
-                        const match = findSiteSpaceByUrl(context.structure, pageUrl);
-                        if (!match) {
+                        const result = await submitAgentFeedback(context, {
+                            feedback: content,
+                            goal,
+                            page: pageUrl,
+                            source: AgentFeedbackSource.Mcp,
+                        });
+
+                        if (!result.submitted) {
                             return {
-                                content: [{ type: 'text', text: `Page not found: "${pageUrl}"` }],
+                                content: [{ type: 'text', text: result.error }],
                                 isError: true,
                             };
                         }
 
-                        const revision = await throwIfDataError(
-                            dataFetcher.getRevision({
-                                spaceId: match.siteSpace.space.id,
-                                revisionId: match.siteSpace.space.revision,
-                            })
-                        );
-
-                        const resolved = resolveSiteSpacePagePath(
-                            match.siteSpace,
-                            revision.pages,
-                            match.pagePath
-                        );
-                        if (!resolved) {
-                            return {
-                                content: [{ type: 'text', text: `Page not found: "${pageUrl}"` }],
-                                isError: true,
-                            };
-                        }
-
-                        const trimmedGoal = goal?.trim() || undefined;
-
-                        //!! DISABLED FOR NOW: We'll add this back in when we have a way to track agent feedback.
-                        // trackMcpEvent({
-                        //     organizationId: context.organizationId,
-                        //     siteId: site.id,
-                        //     events: [
-                        //         {
-                        //             type: 'agent_feedback',
-                        //             feedback: { content, category },
-                        //             location: {
-                        //                 displayContext: SiteInsightsDisplayContext.Mcp,
-                        //                 page: resolved.page.id,
-                        //                 space: match.siteSpace.space.id,
-                        //                 revision: match.siteSpace.space.revision,
-                        //             },
-                        //         },
-                        //     ],
-                        //     request,
-                        // });
-
-                        const apiClient = await dataFetcher.api();
-                        await apiClient.orgs.submitSiteAgentFeedback(
-                            context.organizationId,
-                            site.id,
-                            {
-                                feedback: content,
-                                url: pageUrl,
-                                spaceId: match.siteSpace.space.id,
-                                pageId: resolved.page.id,
-                                ...(trimmedGoal ? { goal: trimmedGoal } : {}),
-                            }
-                        );
+                        trackMcpEvent({
+                            organizationId: context.organizationId,
+                            siteId: site.id,
+                            events: [
+                                {
+                                    type: 'agent_feedback',
+                                    location: {
+                                        displayContext: SiteInsightsDisplayContext.Mcp,
+                                        page: result.page.pageId,
+                                        space: result.page.spaceId,
+                                        revision: result.page.revisionId,
+                                    },
+                                },
+                            ],
+                            request,
+                        });
 
                         return {
                             content: [{ type: 'text', text: 'Feedback recorded. Thank you.' }],
