@@ -1,4 +1,6 @@
 import type {
+    Revision,
+    RevisionPageDocument,
     SearchPageResult,
     SearchSpaceResult,
     SiteSection,
@@ -10,6 +12,7 @@ import type { IconName } from '@gitbook/icons';
 import type { ComputedPageResult, ComputedSectionResult } from '@/components/Search/search-types';
 import { toEmbeddableLinkForPublishedContent } from '@/lib/embeddable-linker';
 import type { GitBookLinker } from '@/lib/links';
+import { resolvePageId } from '@/lib/pages';
 import { joinPathWithBaseURL } from '@/lib/paths';
 import { getLocalizedTitle } from '@/lib/sites';
 import { checkIsHttpURL } from '@/lib/urls';
@@ -22,12 +25,31 @@ export function transformSitePageResult(args: {
     siteSpace?: SiteSpace;
     siteSection?: SiteSection;
     siteSectionGroup?: SiteSectionGroup | null;
-}): ComputedPageResult {
-    const { asEmbeddable, pageItem, spaceItem, siteSection, siteSectionGroup, siteSpace, linker } =
-        args;
+    revisionPages?: Revision['pages'];
+}): ComputedPageResult | null {
+    const {
+        asEmbeddable,
+        pageItem,
+        spaceItem,
+        siteSection,
+        siteSectionGroup,
+        siteSpace,
+        linker,
+        revisionPages,
+    } = args;
     const currentLanguage = siteSpace?.space.language;
     const spaceURL = siteSpace?.urls.published;
     const breadcrumbs: NonNullable<ComputedPageResult['breadcrumbs']> = [];
+
+    let revisionTarget: { pages: Revision['pages']; page: RevisionPageDocument } | undefined;
+    if (revisionPages) {
+        const resolved = resolvePageId(revisionPages, pageItem.id);
+        if (!resolved || resolved.page.id !== pageItem.id) {
+            return null;
+        }
+
+        revisionTarget = { pages: revisionPages, page: resolved.page };
+    }
 
     if (siteSectionGroup) {
         breadcrumbs.push({
@@ -63,13 +85,9 @@ export function transformSitePageResult(args: {
         }))
     );
 
-    const pageHref = checkIsHttpURL(pageItem.path)
-        ? pageItem.path
-        : !spaceURL
-          ? linker.toPathInSpace(pageItem.path)
-          : asEmbeddable
-            ? toEmbeddableLinkForPublishedContent(linker, spaceURL, pageItem.path)
-            : linker.toLinkForContent(joinPathWithBaseURL(spaceURL, pageItem.path));
+    const pageHref = revisionTarget
+        ? linker.toPathForPage(revisionTarget)
+        : getPublishedPageHref({ asEmbeddable, linker, pagePath: pageItem.path, spaceURL });
 
     const page: ComputedPageResult = {
         type: 'page',
@@ -90,21 +108,20 @@ export function transformSitePageResult(args: {
         pageItem.sections
             ?.filter((section) => section.title || section.body)
             .map<ComputedSectionResult>((section) => {
-                let sectionHref = linker.toPathInSpace(section.path);
-
-                if (spaceURL) {
-                    if (asEmbeddable) {
-                        sectionHref = toEmbeddableLinkForPublishedContent(
-                            linker,
-                            spaceURL,
-                            section.path
-                        );
-                    } else {
-                        sectionHref = linker.toLinkForContent(
-                            joinPathWithBaseURL(spaceURL, section.path)
-                        );
-                    }
-                }
+                const anchor = revisionTarget
+                    ? getRetainableSectionAnchor(section.path, pageItem.path)
+                    : undefined;
+                const sectionHref = revisionTarget
+                    ? linker.toPathForPage({
+                          ...revisionTarget,
+                          anchor,
+                      })
+                    : getPublishedPageHref({
+                          asEmbeddable,
+                          linker,
+                          pagePath: section.path,
+                          spaceURL,
+                      });
 
                 return {
                     type: 'section',
@@ -130,4 +147,34 @@ export function transformSitePageResult(args: {
     }
 
     return page;
+}
+
+function getRetainableSectionAnchor(sectionPath: string, pagePath: string): string | undefined {
+    const hashIndex = sectionPath.indexOf('#');
+    if (hashIndex === -1 || sectionPath.slice(0, hashIndex) !== pagePath) {
+        return undefined;
+    }
+
+    return sectionPath.slice(hashIndex + 1) || undefined;
+}
+
+function getPublishedPageHref(input: {
+    asEmbeddable: boolean;
+    linker: GitBookLinker;
+    pagePath: string;
+    spaceURL: string | undefined;
+}) {
+    const { asEmbeddable, linker, pagePath, spaceURL } = input;
+
+    if (checkIsHttpURL(pagePath)) {
+        return pagePath;
+    }
+
+    if (!spaceURL) {
+        return linker.toPathInSpace(pagePath);
+    }
+
+    return asEmbeddable
+        ? toEmbeddableLinkForPublishedContent(linker, spaceURL, pagePath)
+        : linker.toLinkForContent(joinPathWithBaseURL(spaceURL, pagePath));
 }

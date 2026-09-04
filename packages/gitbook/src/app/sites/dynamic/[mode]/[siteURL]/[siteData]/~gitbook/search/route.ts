@@ -9,7 +9,7 @@ import { throwIfDataError } from '@/lib/data';
 import { getSiteURLDataFromMiddleware } from '@/lib/middleware';
 import { transformSitePageResult } from '@/lib/search';
 import { getServerActionBaseContext } from '@/lib/server-actions';
-import { findSiteSpaceBy } from '@/lib/sites';
+import { findSiteSpaceBy, getLinkerForSiteSpace } from '@/lib/sites';
 
 export async function POST(request: NextRequest) {
     const { asEmbeddable, query, scope } = (await request.json()) as SearchSiteContentRequest;
@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json([]);
     }
 
-    const [searchResults, { structure }] = await Promise.all([
+    const [searchResults, { structure }, revision] = await Promise.all([
         throwIfDataError(
             context.dataFetcher.searchSiteContent({
                 organizationId: siteURLData.organization,
@@ -38,7 +38,23 @@ export async function POST(request: NextRequest) {
                 siteShareKey: siteURLData.shareKey,
             })
         ),
+        siteURLData.revision
+            ? throwIfDataError(
+                  context.dataFetcher.getRevision({
+                      spaceId: siteURLData.space,
+                      revisionId: siteURLData.revision,
+                  })
+              )
+            : Promise.resolve(undefined),
     ]);
+
+    const currentSiteSpace = revision
+        ? findSiteSpaceBy(structure, (siteSpace) => siteSpace.id === siteURLData.siteSpace)
+        : null;
+    const revisionLinker =
+        revision && currentSiteSpace
+            ? getLinkerForSiteSpace(context.linker, currentSiteSpace.siteSpace, revision.pages)
+            : context.linker;
 
     const results = orderSearchResultGroups<OrderedComputedResult>(
         searchResults.map((resultItem) => {
@@ -55,25 +71,31 @@ export async function POST(request: NextRequest) {
                 return { type: 'context' as const, results: [result] };
             }
 
-            const found = findSiteSpaceBy(
-                structure,
-                (siteSpace) => siteSpace.space.id === resultItem.id
-            );
+            const isCurrentRevisionSpace = Boolean(revision && resultItem.id === siteURLData.space);
+            const found =
+                isCurrentRevisionSpace && currentSiteSpace
+                    ? currentSiteSpace
+                    : findSiteSpaceBy(
+                          structure,
+                          (siteSpace) => siteSpace.space.id === resultItem.id
+                      );
 
             return {
                 type: 'pages' as const,
-                results: resultItem.pages.map((pageItem) => ({
-                    rank: pageItem.rank,
-                    result: transformSitePageResult({
+                results: resultItem.pages.flatMap((pageItem) => {
+                    const result = transformSitePageResult({
                         asEmbeddable: Boolean(asEmbeddable),
-                        linker: context.linker,
+                        linker: isCurrentRevisionSpace ? revisionLinker : context.linker,
                         pageItem,
                         spaceItem: resultItem,
                         siteSpace: found?.siteSpace,
                         siteSection: found?.siteSection ?? undefined,
                         siteSectionGroup: found?.siteSectionGroup ?? undefined,
-                    }),
-                })),
+                        revisionPages: isCurrentRevisionSpace ? revision?.pages : undefined,
+                    });
+
+                    return result ? [{ rank: pageItem.rank, result }] : [];
+                }),
             };
         })
     );
