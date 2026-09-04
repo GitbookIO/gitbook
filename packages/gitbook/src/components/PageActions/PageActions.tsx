@@ -5,7 +5,7 @@ import QuickLRU from 'quick-lru';
 import React from 'react';
 import { createStore, useStore } from 'zustand';
 
-import type { GitSyncState } from '@gitbook/api';
+import { type GitSyncState, SiteInsightsMarkdownSource } from '@gitbook/api';
 import { Icon, type IconName, IconStyle } from '@gitbook/icons';
 
 import { useAIChatController, useAIChatState } from '@/components/AI';
@@ -125,6 +125,10 @@ function useCopiedStore(stateKey: string) {
     return useStore(getOrCreateCopiedStoreByKey(stateKey));
 }
 
+function getReaderMarkdownURL(markdownPageURL: string) {
+    return `${markdownPageURL}?displayAgentInstructions=false&markdownSource=${SiteInsightsMarkdownSource.PageAction}`;
+}
+
 /**
  * Cache for the markdown version of the page.
  */
@@ -149,7 +153,7 @@ export function ActionCopyMarkdown(props: {
     const fetchMarkdown = async () => {
         setLoading(true);
 
-        const humanURL = `${markdownPageURL}?displayAgentInstructions=false`;
+        const humanURL = getReaderMarkdownURL(markdownPageURL);
         const result = await fetch(humanURL).then((res) => res.text());
         markdownCache.set(markdownPageURL, result);
 
@@ -196,7 +200,7 @@ export function ActionViewAsMarkdown(props: { markdownPageURL: string; type: Pag
             icon="markdown"
             label={tString(language, 'view_page_markdown')}
             description={tString(language, 'view_page_plaintext')}
-            href={`${markdownPageURL}?displayAgentInstructions=false`}
+            href={getReaderMarkdownURL(markdownPageURL)}
         />
     );
 }
