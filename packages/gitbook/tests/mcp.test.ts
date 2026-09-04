@@ -55,6 +55,30 @@ it(
     { timeout: 15_000 }
 );
 
+it(
+    'should get a page through MCP from its markdown URL',
+    async () => {
+        const client = await connectMCPClient(
+            getContentTestURL(
+                'https://gitbook-open-e2e-sites.gitbook.io/api-multi-versions-share-links/8tNo6MeXg7CkFMzSSz81/~gitbook/mcp/auth'
+            )
+        );
+
+        // llms.txt and the "view as Markdown" action link to pages as `<page>.md`.
+        const response = await client.callTool({
+            name: 'getPage',
+            arguments: {
+                url: 'https://gitbook-open-e2e-sites.gitbook.io/api-multi-versions-share-links/8tNo6MeXg7CkFMzSSz81/3.0/other-page.md',
+            },
+        });
+
+        expect(response.isError).toBeFalsy();
+        // @ts-expect-error - response.content is of type unknown
+        expect(response.content[0]?.text).toContain('# Other Page');
+    },
+    { timeout: 15_000 }
+);
+
 describe('MCP on a site behind visitor authentication', () => {
     const VA_SITE_URL = 'https://gitbook-open-e2e-sites.gitbook.io/va-site-redirects-fallback';
 

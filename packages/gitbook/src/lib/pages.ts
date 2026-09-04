@@ -8,7 +8,7 @@ import {
     RevisionPageType,
 } from '@gitbook/api';
 
-import { removeLeadingSlash, removeTrailingSlash } from './paths';
+import { removeLeadingSlash, removeMarkdownExtension, removeTrailingSlash } from './paths';
 
 export type AncestorRevisionPage = RevisionPageDocument | RevisionPageGroup;
 
@@ -412,12 +412,15 @@ function flattenPages(
  * Returns the path segment after the base, or undefined if the URL doesn't match.
  */
 export function extractPagePath(url: string, baseURL: string): string | undefined {
-    const urlPath = getURLPathname(url);
+    const pathname = getURLPathname(url);
     const basePath = getURLPathname(baseURL);
 
-    if (urlPath === undefined || basePath === undefined) {
+    if (pathname === undefined || basePath === undefined) {
         return undefined;
     }
+
+    // Pages are also published at `<page>.md` (the Markdown version linked from llms.txt).
+    const urlPath = removeMarkdownExtension(pathname);
 
     // When basePath is empty, the site is at the root of the domain, so any path matches
     if (basePath === '' || urlPath.startsWith(`${basePath}/`) || urlPath === basePath) {
