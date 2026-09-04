@@ -236,3 +236,99 @@ test.describe('select syncing across groups (click-driven)', () => {
         await expectGroupShows(page, 'b', other, 'go');
     });
 });
+
+interface NestedSpec {
+    outer: string[];
+    inner: string[];
+    /** Which of the outer options hosts the nested group. */
+    host: string;
+    /**
+     * Emit the nested group's stylesheet before the outer one, as happens when a group with the
+     * same option set appears earlier on the page and its deduped sheet lands in `<head>` first.
+     */
+    innerStyleFirst?: boolean;
+}
+
+/**
+ * Render a group nested inside one of another group's panes, mirroring the DOM `DynamicTabs`
+ * produces: panes are direct children of the element carrying the set class, and a pane's body is
+ * wrapped in a padding div before the nested group.
+ */
+async function renderNestedGroups(page: Page, spec: NestedSpec) {
+    const { outer, inner, host, innerStyleFirst = false } = spec;
+    const outerScope = selectSetClassName(outer);
+    const innerScope = selectSetClassName(inner);
+
+    const innerPanes = inner
+        .map(
+            (slug, index) =>
+                `<div data-testid="inner-pane-${slug}" data-select-option="${slug}"${index === 0 ? ' data-select-default' : ''}>${slug}</div>`
+        )
+        .join('');
+    const innerGroup = `<div class="${innerScope}" data-select-group>${innerPanes}</div>`;
+
+    const outerPanes = outer
+        .map(
+            (slug, index) =>
+                `<div data-testid="outer-pane-${slug}" data-select-option="${slug}"${index === 0 ? ' data-select-default' : ''}><div>${slug}${slug === host ? innerGroup : ''}</div></div>`
+        )
+        .join('');
+
+    const styles = [generateSelectCSS(outer), generateSelectCSS(inner)];
+    if (innerStyleFirst) {
+        styles.reverse();
+    }
+
+    await page.setContent(
+        `<!doctype html><html><head>${styles.map((css) => `<style>${css}</style>`).join('')}</head><body><div class="${outerScope}" data-select-group>${outerPanes}</div></body></html>`
+    );
+}
+
+/**
+ * A group's stylesheet must resolve only its own panes. Because every pane of a nested group is also
+ * a descendant of the outer group, a sheet that reached descendants instead of children would hide
+ * the nested panes whenever an outer option was active, leaving the nested tab bar with an empty body.
+ */
+test.describe('select CSS visibility in nested groups', () => {
+    const outer = ['macos', 'windows'];
+    const inner = ['npm', 'yarn'];
+
+    test('shows both defaults when nothing is selected', async ({ page }) => {
+        await renderNestedGroups(page, { outer, inner, host: 'macos' });
+        await expect(page.getByTestId('outer-pane-macos')).toBeVisible();
+        await expect(page.getByTestId('inner-pane-npm')).toBeVisible();
+        await expect(page.getByTestId('inner-pane-yarn')).toBeHidden();
+    });
+
+    test('keeps the nested group resolved when an outer option is activated', async ({ page }) => {
+        await renderNestedGroups(page, { outer, inner, host: 'macos' });
+        await applySelection(page, ['macos']);
+        await expect(page.getByTestId('outer-pane-macos')).toBeVisible();
+        await expect(page.getByTestId('inner-pane-npm')).toBeVisible();
+        await expect(page.getByTestId('inner-pane-yarn')).toBeHidden();
+    });
+
+    test('resolves a nested group hosted by a non-default outer option', async ({ page }) => {
+        await renderNestedGroups(page, { outer, inner, host: 'windows' });
+        await applySelection(page, ['windows']);
+        await expect(page.getByTestId('outer-pane-windows')).toBeVisible();
+        await expect(page.getByTestId('inner-pane-npm')).toBeVisible();
+        await expect(page.getByTestId('inner-pane-yarn')).toBeHidden();
+    });
+
+    test('resolves each group against its own options', async ({ page }) => {
+        await renderNestedGroups(page, { outer, inner, host: 'macos' });
+        await applySelection(page, ['yarn', 'macos']);
+        await expect(page.getByTestId('outer-pane-macos')).toBeVisible();
+        await expect(page.getByTestId('inner-pane-yarn')).toBeVisible();
+        await expect(page.getByTestId('inner-pane-npm')).toBeHidden();
+    });
+
+    test('resolves the same way whichever stylesheet comes first', async ({ page }) => {
+        await renderNestedGroups(page, { outer, inner, host: 'macos', innerStyleFirst: true });
+        await applySelection(page, ['yarn', 'macos']);
+        await expect(page.getByTestId('outer-pane-macos')).toBeVisible();
+        await expect(page.getByTestId('inner-pane-yarn')).toBeVisible();
+        await expect(page.getByTestId('inner-pane-npm')).toBeHidden();
+    });
+});
