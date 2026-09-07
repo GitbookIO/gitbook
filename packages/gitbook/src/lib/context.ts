@@ -201,6 +201,9 @@ export type GitBookSiteContext = GitBookSpaceContext & {
     /** Whether the request included a visitor token. */
     isLoggedInVisitor: boolean;
 
+    /** Whether the site is rendered from a preview URL. */
+    preview: boolean;
+
     /** Whether to display agent instructions in the markdown output. Defaults to true when undefined. */
     displayAgentInstructions?: boolean;
 
@@ -287,6 +290,7 @@ export async function fetchSiteContextByURLLookup(
         isFallback: data.isFallback ?? false,
         noIndexSearch: data.noIndexSearch ?? false,
         isLoggedInVisitor: data.isLoggedInVisitor ?? false,
+        preview: data.preview ?? false,
         displayAgentInstructions: data.displayAgentInstructions,
         isAiAgent: data.isAiAgent,
     });
@@ -310,6 +314,7 @@ export async function fetchSiteContextByIds(
         isFallback: boolean;
         noIndexSearch: boolean;
         isLoggedInVisitor: boolean;
+        preview: boolean;
         displayAgentInstructions?: boolean;
         isAiAgent?: boolean;
     }
@@ -439,6 +444,7 @@ export async function fetchSiteContextByIds(
         isFallback: ids.isFallback,
         noIndexSearch: ids.noIndexSearch,
         isLoggedInVisitor: ids.isLoggedInVisitor,
+        preview: ids.preview,
         displayAgentInstructions: ids.displayAgentInstructions,
         isAiAgent: ids.isAiAgent,
     };
