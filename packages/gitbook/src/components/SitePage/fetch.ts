@@ -97,10 +97,8 @@ async function resolvePage(context: GitBookSiteContext, params: PagePathParams |
                     context.revisionId === context.space.revision &&
                     !context.isLoggedInVisitor;
                 if (
-                    resolvedSiteRedirect.redirect &&
+                    resolvedSiteRedirect.redirect?.permanent &&
                     !resolvedSiteRedirect.redirect.draft &&
-                    'permanent' in resolvedSiteRedirect.redirect &&
-                    resolvedSiteRedirect.redirect.permanent === true &&
                     isPublicLiveContext
                 ) {
                     return permanentRedirect(destination);
