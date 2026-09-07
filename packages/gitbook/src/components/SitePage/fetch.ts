@@ -1,4 +1,4 @@
-import { redirect } from 'next/navigation';
+import { permanentRedirect, redirect } from 'next/navigation';
 
 import {
     SITE_REDIRECT_SOURCE_PATH_MAX_LENGTH,
@@ -89,7 +89,21 @@ async function resolvePage(context: GitBookSiteContext, params: PagePathParams |
                     })
                 ));
             if (resolvedSiteRedirect) {
-                return redirect(linker.toLinkForContent(resolvedSiteRedirect.target));
+                const destination = linker.toLinkForContent(resolvedSiteRedirect.target);
+                const isPublicLiveContext =
+                    !shareKey &&
+                    !context.changeRequest &&
+                    context.revisionId === context.space.revision &&
+                    !context.ids.isLoggedInVisitor;
+                if (
+                    resolvedSiteRedirect.redirect &&
+                    'permanent' in resolvedSiteRedirect.redirect &&
+                    resolvedSiteRedirect.redirect.permanent === true &&
+                    isPublicLiveContext
+                ) {
+                    return permanentRedirect(destination);
+                }
+                return redirect(destination);
             }
         }
 
