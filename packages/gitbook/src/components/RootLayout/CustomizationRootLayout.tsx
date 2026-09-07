@@ -36,7 +36,7 @@ import {
 import './globals.css';
 import { getContentLocale, getSpaceLanguage } from '@/intl/server';
 import { getAssetURL } from '@/lib/assets';
-import type { GitBookAnyContext } from '@/lib/context';
+import type { GitBookAnyContext, GitBookSiteScopeContext } from '@/lib/context';
 import { GITBOOK_FONTS_URL, GITBOOK_ICONS_TOKEN, GITBOOK_ICONS_URL } from '@/lib/env';
 import {
     getContentInlineIconSourceRequests,
@@ -73,7 +73,7 @@ export async function CustomizationRootLayout(props: {
     /** The class name to apply to the body element. */
     bodyClassName?: string;
     forcedTheme?: CustomizationDefaultThemeMode | null;
-    context: GitBookAnyContext;
+    context: GitBookAnyContext | GitBookSiteScopeContext;
     children: React.ReactNode;
 }) {
     const { htmlClassName, bodyClassName, context, forcedTheme, children } = props;
@@ -111,12 +111,15 @@ export async function CustomizationRootLayout(props: {
         preloadFont(headingFontData);
     }
     const iconStyle = getCustomizationIconStyle(customization);
+    // A site scope context has no revision: its page and tag icons are provided further down the
+    // tree, by a component that resolves the revision under its own cache scope.
+    const revision = 'revision' in context ? context.revision : null;
     const iconSources = await getInlineIconSources([
         ...getDefaultInlineIconSourceRequests(iconStyle),
         ...getContentInlineIconSourceRequests({
             iconStyle,
-            pages: context.revision.pages,
-            tags: context.revision.tags,
+            pages: revision?.pages,
+            tags: revision?.tags,
             sections:
                 'sections' in context
                     ? [...(context.sections?.list ?? []), ...(context.visibleSections?.list ?? [])]

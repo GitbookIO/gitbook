@@ -1,5 +1,7 @@
 import type * as api from '@gitbook/api';
 
+import type { PPRCacheScope } from '@/lib/cache-tags';
+
 export type DataFetcherErrorData = {
     code: number;
     message: string;
@@ -24,6 +26,12 @@ export type DataFetcherResponse<T> =
  * It is used between v1 and v2.
  */
 export interface GitBookDataFetcher {
+    /**
+     * Set when rendering a PPR component: the cache entries are partitioned per scope and their
+     * cache tags are scoped, so a component and its data are invalidated as one unit.
+     */
+    readonly pprScope?: PPRCacheScope;
+
     /**
      * Get an API client for the current context.
      */

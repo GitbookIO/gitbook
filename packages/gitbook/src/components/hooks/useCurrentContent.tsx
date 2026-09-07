@@ -21,10 +21,18 @@ export type CurrentContentContext = {
 const ReactCurrentContentContext = React.createContext<CurrentContentContext | null>(null);
 
 /**
+ * Hook to get the current content, or null outside of a `CurrentContentProvider`.
+ * Some surfaces (embeddable docs, PDF) render navigation components without the provider.
+ */
+export function useOptionalCurrentContent(): CurrentContentContext | null {
+    return React.useContext(ReactCurrentContentContext);
+}
+
+/**
  * Hook to get the current content.
  */
 export function useCurrentContent(): CurrentContentContext {
-    const context = React.useContext(ReactCurrentContentContext);
+    const context = useOptionalCurrentContent();
     if (!context) {
         throw new Error('useCurrentContent must be used within a CurrentContentProvider');
     }

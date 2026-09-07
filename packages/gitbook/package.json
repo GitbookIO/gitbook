@@ -122,6 +122,7 @@
         "generate:fonts": "bun ./scripts/generate-font-faces.ts",
         "clean": "rm -rf ./.next && rm -rf ./public/~gitbook/static/icons && rm -rf ./public/~gitbook/static/math && rm -rf ./public/~gitbook/static/mermaid && rm -rf ./public/~gitbook/static/scalar && rm -rf ./public/~gitbook/static/fonts",
         "dev": "bun run generate:assets && env-cmd --silent -f ../../.env.local next --webpack",
+        "dev:ppr": "env-cmd --silent -f ../../.env.local bun scripts/ppr-dev-proxy.ts",
         "build": "bun run generate:assets && next build --webpack",
         "build:local": "bun run generate:assets && GITBOOK_URL=http://localhost:3000 next build --webpack",
         "check:css-browser-compatibility": "bun scripts/check-css-browser-compatibility.ts",
