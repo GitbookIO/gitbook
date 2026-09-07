@@ -5,7 +5,6 @@ import type { GitBookSiteContext } from '@/lib/context';
 import { getExposableError } from '@/lib/data';
 import { linkerWithMarkdownPages } from '@/lib/links';
 import { renderLLMsTxtMarkdownDirective } from '@/lib/llms-directive';
-import { getMarkdownContentType } from '@/lib/markdown-content-type';
 import { getMarkdownForPage } from '@/lib/markdownPage';
 import { type ResolvedPagePath, getSimilarPages } from '@/lib/pages';
 import { isPageIndexable, isSiteIndexable } from '@/lib/seo';
@@ -45,7 +44,7 @@ export async function servePageMarkdown(baseContext: GitBookSiteContext, pagePat
             markdown: `${renderLLMsTxtMarkdownDirective(context, pageLookup.page)}\n\n${markdownPage}${renderAskFooter(context, pageLookup)}`,
             robots,
         };
-    }, baseContext.isChatGPT);
+    });
 }
 
 /**
@@ -164,8 +163,7 @@ Use this mechanism when the answer is not explicitly present in the current page
  * Return a markdown content.
  */
 export async function serveMarkdown(
-    fn: () => Promise<string | { markdown: string; robots: string }>,
-    isChatGPT?: boolean
+    fn: () => Promise<string | { markdown: string; robots: string }>
 ) {
     try {
         const result = await fn();
@@ -173,7 +171,7 @@ export async function serveMarkdown(
             typeof result === 'string' ? { markdown: result, robots: 'noindex' } : result;
         return new Response(markdown, {
             headers: {
-                'Content-Type': getMarkdownContentType(isChatGPT),
+                'Content-Type': 'text/markdown; charset=utf-8',
                 'X-Robots-Tag': robots,
                 Vary: 'Accept',
             },

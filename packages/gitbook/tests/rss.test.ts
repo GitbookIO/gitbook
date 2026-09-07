@@ -14,6 +14,20 @@ it('should expose a RSS feed for a page with updates', async () => {
     expect(feed.items.length).toBe(4);
 });
 
+it('should not override non-Markdown content for ChatGPT', async () => {
+    const response = await fetch(
+        getContentTestURL('https://gitbook.gitbook.io/test-gitbook-open/blocks/updates/rss.xml'),
+        {
+            headers: {
+                'User-Agent': 'ChatGPT-User/1.0',
+            },
+        }
+    );
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get('content-type')).toContain('application/rss+xml');
+});
+
 it('should not expose a RSS feed for a page without updates', async () => {
     const feedURL = getContentTestURL(
         'https://gitbook.gitbook.io/test-gitbook-open/text-page/rss.xml'

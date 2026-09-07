@@ -101,9 +101,6 @@ export type SiteURLData = Pick<
      * the static cache of the other routes.
      */
     isAiAgent?: boolean;
-
-    /** Whether the request comes from ChatGPT. Only set for Markdown and LLM routes. */
-    isChatGPT?: boolean;
 };
 
 /**
@@ -209,9 +206,6 @@ export type GitBookSiteContext = GitBookSpaceContext & {
 
     /** Whether the request comes from a detected AI agent. Only set for markdown routes. */
     isAiAgent?: boolean;
-
-    /** Whether the request comes from ChatGPT. Only set for Markdown and LLM routes. */
-    isChatGPT?: boolean;
 };
 
 /**
@@ -295,7 +289,6 @@ export async function fetchSiteContextByURLLookup(
         isLoggedInVisitor: data.isLoggedInVisitor ?? false,
         displayAgentInstructions: data.displayAgentInstructions,
         isAiAgent: data.isAiAgent,
-        isChatGPT: data.isChatGPT,
     });
 }
 
@@ -319,7 +312,6 @@ export async function fetchSiteContextByIds(
         isLoggedInVisitor: boolean;
         displayAgentInstructions?: boolean;
         isAiAgent?: boolean;
-        isChatGPT?: boolean;
     }
 ): Promise<GitBookSiteContext> {
     const { dataFetcher } = baseContext;
@@ -449,7 +441,6 @@ export async function fetchSiteContextByIds(
         isLoggedInVisitor: ids.isLoggedInVisitor,
         displayAgentInstructions: ids.displayAgentInstructions,
         isAiAgent: ids.isAiAgent,
-        isChatGPT: ids.isChatGPT,
     };
 }
 

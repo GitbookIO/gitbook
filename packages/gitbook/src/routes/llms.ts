@@ -8,7 +8,6 @@ import { isAIEnabled } from '@/components/utils/isAIChatEnabled';
 import { type GitBookSiteContext, checkIsRootSiteContext } from '@/lib/context';
 import { throwIfDataError } from '@/lib/data';
 import { type GitBookLinker, linkerWithMarkdownPages } from '@/lib/links';
-import { getMarkdownContentType } from '@/lib/markdown-content-type';
 import { resolveFirstDocument } from '@/lib/pages';
 import { type FlatPageEntry, getIndexablePages } from '@/lib/sitemap';
 import {
@@ -53,7 +52,7 @@ export async function serveLLMsTxt(baseContext: GitBookSiteContext) {
 
     return new Response(output, {
         headers: {
-            'Content-Type': getMarkdownContentType(baseContext.isChatGPT),
+            'Content-Type': 'text/markdown; charset=utf-8',
         },
     });
 }
