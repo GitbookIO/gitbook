@@ -10,6 +10,7 @@ import {
     fetchSiteContextForSiteSpace,
 } from '@/lib/context';
 import { throwIfDataError } from '@/lib/data';
+import { getMarkdownContentType } from '@/lib/markdown-content-type';
 import { fromPageMarkdown, toPageMarkdown } from '@/lib/markdownPage';
 import { getIndexablePages } from '@/lib/sitemap';
 import { filterSiteSpacesByLocale, getSiteStructureSections } from '@/lib/sites';
@@ -48,7 +49,7 @@ export async function serveLLMsFullTxt(context: GitBookSiteContext, page = 0) {
         }),
         {
             headers: {
-                'Content-Type': 'text/markdown; charset=utf-8',
+                'Content-Type': getMarkdownContentType(context.isChatGPT),
             },
         }
     );
