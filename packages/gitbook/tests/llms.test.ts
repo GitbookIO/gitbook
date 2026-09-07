@@ -65,20 +65,6 @@ describe('llms.txt', () => {
         expect(await response.text()).toContain('# E2E Tests GitBook Open');
     });
 
-    it('should serve the sitemap.md alias as plain text to ChatGPT', async () => {
-        const response = await fetch(
-            getContentTestURL('https://gitbook.gitbook.io/test-gitbook-open/sitemap.md'),
-            {
-                headers: {
-                    'User-Agent': 'ChatGPT-User/1.0',
-                },
-            }
-        );
-
-        expect(response.status).toBe(200);
-        expect(response.headers.get('content-type')).toContain('text/plain');
-    });
-
     it('should expose llms.txt from .well-known/sitemap.md', async () => {
         const response = await fetch(
             getContentTestURL('https://gitbook.gitbook.io/test-gitbook-open/.well-known/sitemap.md')

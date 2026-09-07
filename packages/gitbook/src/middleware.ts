@@ -460,10 +460,12 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
             routeType: routeTypeFromPathname,
             events,
             isAiAgent,
+            isChatGPT,
         } = encodePathInSiteContent(siteURLData, request);
         routeType = routeTypeFromPathname ?? routeType;
-        // Only set for markdown routes, so it becomes part of their static cache key.
+        // Only set for Markdown and LLM routes, so these request-specific variants are cached separately.
         stableSiteURLData.isAiAgent = isAiAgent;
+        stableSiteURLData.isChatGPT = isChatGPT;
 
         // Apply a forced theme (`?theme=`/cookie). For the docs embed we thread it through the
         // route context (`embedTheme`) so those routes stay statically rendered — it becomes part
@@ -544,10 +546,6 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
                 headers: requestHeaders,
             },
         });
-
-        if (isChatGPTRequest(request) && isMarkdownOrLLMRoute(pathname)) {
-            response.headers.set('content-type', 'text/plain; charset=utf-8');
-        }
 
         // Add Content Security Policy header
         response.headers.set('content-security-policy', getContentSecurityPolicy());
@@ -771,16 +769,6 @@ const PATH_ALIASES: Record<string, string> = {
     '.well-known/sitemap.md': 'llms.txt',
 };
 
-function isMarkdownOrLLMRoute(pathname: string): boolean {
-    return (
-        pathname.startsWith('~gitbook/markdown/') ||
-        pathname.startsWith('~gitbook/markdown-ask/') ||
-        pathname === 'llms.txt' ||
-        pathname === 'llms-full.txt' ||
-        LLMS_FULL_PATH_REGEX.test(pathname)
-    );
-}
-
 /**
  * Encode path in a site content.
  * Special paths are not encoded and passed to be handled by the route handlers.
@@ -794,6 +782,8 @@ function encodePathInSiteContent(
     events?: ServerInsightsEventInput[] | undefined;
     /** Only set for markdown routes, where the output depends on the visitor being an agent. */
     isAiAgent?: boolean;
+    /** Only set for Markdown and LLM routes, where the output content type depends on ChatGPT. */
+    isChatGPT?: boolean;
 } {
     let pathname = removeLeadingSlash(removeTrailingSlash(siteURLData.pathname));
 
@@ -835,6 +825,7 @@ function encodePathInSiteContent(
         return {
             pathname,
             routeType: 'static',
+            isChatGPT: isChatGPTRequest(request) || undefined,
             events: [
                 {
                     type: 'llms_request',
@@ -870,6 +861,7 @@ function encodePathInSiteContent(
             return {
                 pathname,
                 routeType: 'static',
+                isChatGPT: isChatGPTRequest(request) || undefined,
                 events: [
                     {
                         type: 'llms_request',
@@ -930,6 +922,7 @@ function encodePathInSiteContent(
                     routeType: 'static',
                     // Left undefined for non-agents to avoid splitting the static cache for them.
                     isAiAgent: isAiAgent || undefined,
+                    isChatGPT: isChatGPTRequest(request) || undefined,
                     // TODO: track pageId / spaceId when possible
                     // We don't do it at the moment as we can't easily extract it from the URL.
                     events: ask
