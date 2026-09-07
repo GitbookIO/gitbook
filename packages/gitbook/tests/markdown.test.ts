@@ -13,7 +13,7 @@ describe('markdown serving based on user agent', () => {
         });
 
         expect(response.status).toBe(200);
-        expect(response.headers.get('content-type')).toContain('text/markdown');
+        expect(response.headers.get('content-type')).toContain('text/plain');
     });
 
     it('should serve markdown to ClaudeBot (ua-match AI agent)', async () => {
@@ -24,7 +24,7 @@ describe('markdown serving based on user agent', () => {
         });
 
         expect(response.status).toBe(200);
-        expect(response.headers.get('content-type')).toContain('text/markdown');
+        expect(response.headers.get('content-type')).toContain('text/plain');
     });
 
     it('should NOT serve markdown to Slackbot (heuristic detection only)', async () => {
@@ -92,7 +92,7 @@ describe('markdown pages', () => {
         const text = await response.text();
 
         expect(response.status).toBe(200);
-        expect(response.headers.get('content-type')).toContain('text/markdown');
+        expect(response.headers.get('content-type')).toContain('text/plain');
         expect(response.headers.get('x-robots-tag')).toBe('noindex');
         expect(text).toContain('# Text page');
     });
@@ -111,7 +111,7 @@ describe('markdown pages', () => {
         const text = await response.text();
 
         expect(response.status).toBe(200);
-        expect(response.headers.get('content-type')).toContain('text/markdown');
+        expect(response.headers.get('content-type')).toContain('text/plain');
         expect(response.headers.get('x-robots-tag')).toBe('noindex');
         expect(text).toContain('# Text page');
     });
@@ -123,7 +123,7 @@ describe('markdown pages', () => {
         const text = await response.text();
 
         expect(response.status).toBe(200);
-        expect(response.headers.get('content-type')).toContain('text/markdown');
+        expect(response.headers.get('content-type')).toContain('text/plain');
         expect(response.headers.get('x-robots-tag')).toBe('noindex, nofollow');
         expect(text).toContain('# Page Not Found');
     });
@@ -137,7 +137,7 @@ describe('markdown pages', () => {
         const text = await response.text();
 
         expect(response.status).toBe(200);
-        expect(response.headers.get('content-type')).toContain('text/markdown');
+        expect(response.headers.get('content-type')).toContain('text/plain');
         expect(response.headers.get('x-robots-tag')).toBe('noindex');
         expect(text).toContain('gitbook.gitbook.io/test-gitbook-open/text-page.md');
     });
@@ -179,7 +179,7 @@ describe('Accept header content negotiation', () => {
         });
 
         expect(response.status).toBe(200);
-        expect(response.headers.get('content-type')).toContain('text/markdown');
+        expect(response.headers.get('content-type')).toContain('text/plain');
     });
 
     it('should serve markdown when text/markdown has a higher q-value (Accept: text/html;q=0.9, text/markdown)', async () => {
@@ -188,7 +188,7 @@ describe('Accept header content negotiation', () => {
         });
 
         expect(response.status).toBe(200);
-        expect(response.headers.get('content-type')).toContain('text/markdown');
+        expect(response.headers.get('content-type')).toContain('text/plain');
     });
 
     it('should NOT serve markdown when text/markdown has a lower q-value (Accept: text/html, text/markdown;q=0.9)', async () => {
@@ -206,7 +206,7 @@ describe('Accept header content negotiation', () => {
         });
 
         expect(response.status).toBe(200);
-        expect(response.headers.get('content-type')).toContain('text/markdown');
+        expect(response.headers.get('content-type')).toContain('text/plain');
     });
 });
 
@@ -225,7 +225,7 @@ describe('markdown ask responses', () => {
             const text = await response.text();
 
             expect(response.status).toBe(200);
-            expect(response.headers.get('content-type')).toContain('text/markdown');
+            expect(response.headers.get('content-type')).toContain('text/plain');
             expect(response.headers.get('x-robots-tag')).toBe('noindex');
             expect(text).toContain(ASK_QUESTION_HEADING);
         },
@@ -248,7 +248,7 @@ describe('markdown ask responses', () => {
             const text = await response.text();
 
             expect(response.status).toBe(200);
-            expect(response.headers.get('content-type')).toContain('text/markdown');
+            expect(response.headers.get('content-type')).toContain('text/plain');
             expect(response.headers.get('x-robots-tag')).toBe('noindex');
             expect(text).toContain(ASK_QUESTION_HEADING);
         },
@@ -269,7 +269,7 @@ describe('markdown robots directives', () => {
         });
 
         expect(response.status).toBe(200);
-        expect(response.headers.get('content-type')).toContain('text/markdown');
+        expect(response.headers.get('content-type')).toContain('text/plain');
         expect(response.headers.get('x-robots-tag')).toBe('index, follow');
     });
 
@@ -279,7 +279,7 @@ describe('markdown robots directives', () => {
         });
 
         expect(response.status).toBe(200);
-        expect(response.headers.get('content-type')).toContain('text/markdown');
+        expect(response.headers.get('content-type')).toContain('text/plain');
         expect(response.headers.get('x-robots-tag')).toBe('index, follow');
     });
 
@@ -289,7 +289,7 @@ describe('markdown robots directives', () => {
         });
 
         expect(response.status).toBe(200);
-        expect(response.headers.get('content-type')).toContain('text/markdown');
+        expect(response.headers.get('content-type')).toContain('text/plain');
         expect(response.headers.get('x-robots-tag')).toBe('noindex');
     });
 
@@ -300,7 +300,7 @@ describe('markdown robots directives', () => {
         );
 
         expect(response.status).toBe(200);
-        expect(response.headers.get('content-type')).toContain('text/markdown');
+        expect(response.headers.get('content-type')).toContain('text/plain');
         expect(response.headers.get('x-robots-tag')).toBe('noindex, nofollow');
     });
 
@@ -313,7 +313,7 @@ describe('markdown robots directives', () => {
         );
 
         expect(response.status).toBe(200);
-        expect(response.headers.get('content-type')).toContain('text/markdown');
+        expect(response.headers.get('content-type')).toContain('text/plain');
         expect(response.headers.get('x-robots-tag')).toBe('noindex, nofollow');
     });
 });

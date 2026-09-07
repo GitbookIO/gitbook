@@ -9,7 +9,7 @@ describe('llms.txt', () => {
         );
 
         expect(response.status).toBe(200);
-        expect(response.headers.get('content-type')).toContain('text/markdown');
+        expect(response.headers.get('content-type')).toContain('text/plain');
         expect(await response.text()).toContain('# E2E Tests GitBook Open');
     });
 
@@ -19,7 +19,7 @@ describe('llms.txt', () => {
         );
 
         expect(response.status).toBe(200);
-        expect(response.headers.get('content-type')).toContain('text/markdown');
+        expect(response.headers.get('content-type')).toContain('text/plain');
         const content = await response.text();
         expect(content).toContain('/sections/sections-3/readme.md');
         expect(content).toContain('/sections/sections-4/getting-started/quickstart.md');
@@ -36,7 +36,7 @@ describe('llms.txt', () => {
         );
 
         expect(response.status).toBe(200);
-        expect(response.headers.get('content-type')).toContain('text/markdown');
+        expect(response.headers.get('content-type')).toContain('text/plain');
         expect(await response.text()).toContain('# E2E Tests GitBook Open');
     });
 
@@ -46,7 +46,7 @@ describe('llms.txt', () => {
         );
 
         expect(response.status).toBe(200);
-        expect(response.headers.get('content-type')).toContain('text/markdown');
+        expect(response.headers.get('content-type')).toContain('text/plain');
         expect(await response.text()).toContain('# E2E Tests GitBook Open');
     });
 
@@ -56,7 +56,7 @@ describe('llms.txt', () => {
         );
 
         expect(response.status).toBe(200);
-        expect(response.headers.get('content-type')).toContain('text/markdown');
+        expect(response.headers.get('content-type')).toContain('text/plain');
         expect(await response.text()).toContain('# E2E Tests GitBook Open');
     });
 });
@@ -70,7 +70,7 @@ describe('llms-full.txt', () => {
             );
 
             expect(response.status).toBe(200);
-            expect(response.headers.get('content-type')).toContain('text/markdown');
+            expect(response.headers.get('content-type')).toContain('text/plain');
             expect(await response.text()).toContain('# Welcome');
         },
         { timeout: 30_000 }
@@ -87,7 +87,7 @@ describe('llms-full.txt', () => {
             const text = await response.text();
 
             expect(response.status).toBe(200);
-            expect(response.headers.get('content-type')).toContain('text/markdown');
+            expect(response.headers.get('content-type')).toContain('text/plain');
             expect(text).toContain(
                 'gitbook-open-e2e-sites.gitbook.io/api-multi-versions-share-links/8tNo6MeXg7CkFMzSSz81/2.0/quick-start'
             );
@@ -112,7 +112,7 @@ describe('llms-full.txt', () => {
             );
 
             expect(response.status).toBe(200);
-            expect(response.headers.get('content-type')).toContain('text/markdown');
+            expect(response.headers.get('content-type')).toContain('text/plain');
             expect(await response.text()).toContain('# Welcome');
         },
         { timeout: 30_000 }
