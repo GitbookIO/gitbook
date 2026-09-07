@@ -13,6 +13,7 @@ import { TranslationLanguage } from '@gitbook/api';
 import { createLinker } from './links';
 import {
     filterSiteSpacesByLocale,
+    findSiteSpaceBy,
     getFallbackSiteSpacePath,
     getLinkerForSiteSpace,
     getSiteStructureSections,
@@ -78,6 +79,38 @@ describe('site structure traversal', () => {
             nestedSection,
         ]);
         expect(listAllSiteSpaces(structure)).toEqual([rootSpace, nestedSpace]);
+    });
+
+    it('returns every section group from the root to the immediate parent', () => {
+        const targetSpace = { id: 'target-space' } as SiteSpace;
+        const targetSection = {
+            object: 'site-section',
+            id: 'target-section',
+            siteSpaces: [targetSpace],
+        } as SiteSection;
+        const childGroup = {
+            object: 'site-section-group',
+            id: 'child-group',
+            children: [targetSection],
+        } as SiteSectionGroup;
+        const firstChildGroup = {
+            object: 'site-section-group',
+            id: 'first-child-group',
+            children: [childGroup],
+        } as SiteSectionGroup;
+        const rootGroup = {
+            object: 'site-section-group',
+            id: 'root-group',
+            children: [firstChildGroup],
+        } as SiteSectionGroup;
+
+        const found = findSiteSpaceBy(
+            { type: 'sections', structure: [rootGroup] },
+            (siteSpace) => siteSpace.id === targetSpace.id
+        );
+
+        expect(found?.siteSectionGroup).toBe(childGroup);
+        expect(found?.siteSectionGroups).toEqual([rootGroup, firstChildGroup, childGroup]);
     });
 });
 

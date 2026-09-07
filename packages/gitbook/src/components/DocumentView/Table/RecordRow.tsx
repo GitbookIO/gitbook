@@ -1,20 +1,19 @@
-import type { DocumentTableViewGrid } from '@gitbook/api';
-
+import { getMergedCellWidth, getTableCellMerge } from './cellMerges';
 import { getColumnWidth } from './layout';
 import { RecordColumnValue } from './RecordColumnValue';
-import type { TableRecordKV, TableViewProps } from './Table';
+import type { TableGridViewProps, TableRecordKV } from './Table';
 import { TableSearchRecord } from './TableSearch';
 import { getColumnVerticalAlignment } from './utils';
 import { tcls } from '@/lib/tailwind';
 
 export function RecordRow(
-    props: TableViewProps<DocumentTableViewGrid> & {
+    props: TableGridViewProps & {
         record: TableRecordKV;
         autoSizedColumns: string[];
         fixedColumns: string[];
     }
 ) {
-    const { view, record, autoSizedColumns, fixedColumns, block, context } = props;
+    const { view, record, autoSizedColumns, fixedColumns, block, context, cellMergeLayout } = props;
     const stickyFirstColumn = context.mode !== 'print' && view.stickyFirstColumn === true;
     const firstVisibleColumn = view.columns[0];
 
@@ -31,12 +30,22 @@ export function RecordRow(
             )}
         >
             {view.columns.map((column) => {
-                const columnWidth = getColumnWidth({
-                    column,
-                    columnWidths: context.mode === 'print' ? undefined : view.columnWidths,
-                    autoSizedColumns,
-                    fixedColumns,
-                });
+                const cellMerge = getTableCellMerge(cellMergeLayout, record[0], column);
+                if (cellMerge && !cellMerge.isAnchor) {
+                    return null;
+                }
+
+                const renderedColumns = cellMerge?.merge.columns ?? [column];
+                const columnWidth = getMergedCellWidth(
+                    renderedColumns.map((mergedColumn) =>
+                        getColumnWidth({
+                            column: mergedColumn,
+                            columnWidths: context.mode === 'print' ? undefined : view.columnWidths,
+                            autoSizedColumns,
+                            fixedColumns,
+                        })
+                    )
+                );
                 const isStickyFirstColumnCell = stickyFirstColumn && column === firstVisibleColumn;
                 // @ts-expect-error
                 const verticalAlignment = getColumnVerticalAlignment(block.data.definition[column]);
@@ -45,6 +54,7 @@ export function RecordRow(
                     <div
                         key={column}
                         role="cell"
+                        aria-colspan={cellMerge?.merge.colSpan}
                         className={tcls(
                             'relative flex flex-1 border-r px-3 py-2 align-middle text-sm last:border-r-0',
                             'border-tint-subtle',

@@ -73,6 +73,10 @@ function escapeCssString(value: string): string {
  * chains. `depth` must cover every rank the store can produce — visibility is CSS-only, so a winner
  * beyond `depth` would fall back to its default — hence it defaults to {@link SELECT_LIST_CAP}.
  *
+ * Every rule matches `& > …` rather than a descendant: a nested group's panes are also
+ * descendants of the outer group, so a descendant combinator would let the outer sheet hide them.
+ * The child combinator adds no specificity, leaving the source-order priority above intact.
+ *
  * Returns `''` for an empty/degenerate set.
  */
 export function generateSelectCSS(candidateSlugs: string[], depth = SELECT_LIST_CAP): string {
@@ -86,20 +90,20 @@ export function generateSelectCSS(candidateSlugs: string[], depth = SELECT_LIST_
     // All rules nest under the scope class; `&` stands in for it (see nesting note above).
     const rules: string[] = [
         // Hide every option, then reveal the default. Both are overridden below when a slug is active.
-        `${option}{display:none}`,
-        `[${SELECT_DEFAULT_ATTR}]{display:block}`,
+        `& > ${option}{display:none}`,
+        `& > [${SELECT_DEFAULT_ATTR}]{display:block}`,
     ];
 
     for (let rank = depth - 1; rank >= 0; rank--) {
         const attr = selectRankAttribute(rank);
         const anyAtRank = slugs.map((slug) => `[${attr}="${escapeCssString(slug)}"]`).join(',');
         // When any of the set's options sits at this rank, hide the group's panes...
-        rules.push(`html:is(${anyAtRank}) & ${option}{display:none}`);
+        rules.push(`html:is(${anyAtRank}) & > ${option}{display:none}`);
         // ...then reveal whichever one matches (correlated, so a per-option list).
         const show = slugs
             .map((slug) => {
                 const value = escapeCssString(slug);
-                return `html[${attr}="${value}"] & [${SELECT_OPTION_ATTR}="${value}"]`;
+                return `html[${attr}="${value}"] & > [${SELECT_OPTION_ATTR}="${value}"]`;
             })
             .join(',');
         rules.push(`${show}{display:block}`);
@@ -112,14 +116,14 @@ export function generateSelectCSS(candidateSlugs: string[], depth = SELECT_LIST_
     for (const slug of slugs) {
         const value = escapeCssString(slug);
         const pane = `[${SELECT_OPTION_ATTR}="${value}"]`;
-        rules.push(`html & ${pane} ~ ${pane}{display:none}`);
+        rules.push(`html & > ${pane} ~ ${pane}{display:none}`);
     }
 
     // A client click can override that first-match default: it pins the picked pane and unpins its
     // same-slug siblings so the visitor sees exactly the duplicate they clicked (reload reverts to
     // first-match since these attributes aren't persisted). Emitted last to win at equal specificity.
-    rules.push(`html & ${option}[${SELECT_PINNED_ATTR}]{display:block}`);
-    rules.push(`html & ${option}[${SELECT_UNPINNED_ATTR}]{display:none}`);
+    rules.push(`html & > ${option}[${SELECT_PINNED_ATTR}]{display:block}`);
+    rules.push(`html & > ${option}[${SELECT_UNPINNED_ATTR}]{display:none}`);
 
     return `.${selectSetClassName(slugs)}{${rules.join('')}}`;
 }

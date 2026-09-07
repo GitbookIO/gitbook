@@ -564,6 +564,19 @@ html.dark .highlight-line.diff-deleted .highlight-line-content::before {
   @apply rounded-none!;
 }
 
+@layer components {
+  .paragraph {
+    /* Inline action buttons grow to the available width, which needs a flex parent. */
+    &:has(.button, input) {
+      @apply flex flex-wrap items-center gap-2;
+    }
+
+    &[data-cover-aware-text]:not(:has(.button, input)) {
+      @apply text-contrast-cover;
+    }
+  }
+}
+
 /* Zoomable images */
 html:has(.zoom-modal) {
   /* stylelint-disable-next-line plugin/no-unsupported-browser-features -- single-value overflow is universal; doiuse flags the whole css-overflow feature */

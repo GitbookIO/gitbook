@@ -5,7 +5,11 @@ import React from 'react';
 import { Icon } from '@gitbook/icons';
 
 import type { TableCheckboxColumn, TableSelectColumn } from './search';
-import { type SelectedOptions, recordMatches } from './searchMatch';
+import {
+    type SelectedOptions,
+    type TableSearchRecordData,
+    getVisibleTableRecordIds,
+} from './searchMatch';
 import { Button, Checkbox, DropdownMenu, DropdownMenuItem, Input } from '@/components/primitives';
 import { tString, useLanguage } from '@/intl/client';
 import { type ClassValue, tcls } from '@/lib/tailwind';
@@ -17,15 +21,6 @@ import { type ClassValue, tcls } from '@/lib/tailwind';
  * on the client rather than round-tripping through the server. The provider matches every record
  * once and exposes the set of visible ids; each row/card just looks itself up by id.
  */
-
-/** Per-record matching data, computed on the server. */
-export interface TableSearchRecordData {
-    /** Record key, matching the `key` passed to `<TableSearchRecord>`. */
-    id: string;
-    searchText: string;
-    selectValues?: Record<string, string[]>;
-    checkboxValues?: Record<string, boolean>;
-}
 
 type TableSearchContextValue = {
     query: string;
@@ -51,9 +46,10 @@ const TableSearchContext = React.createContext<TableSearchContextValue | null>(n
  */
 export function TableSearchProvider(props: {
     records?: TableSearchRecordData[];
+    recordGroups?: readonly (readonly string[])[];
     children: React.ReactNode;
 }) {
-    const { records = [] } = props;
+    const { records = [], recordGroups = [] } = props;
     const [query, setQuery] = React.useState('');
     const [selectedOptions, setSelectedOptions] = React.useState<SelectedOptions>(() => ({}));
     const [checkedColumns, setCheckedColumns] = React.useState<ReadonlySet<string>>(
@@ -91,32 +87,18 @@ export function TableSearchProvider(props: {
         });
     }, []);
 
-    const hasActiveFilters =
-        query.trim() !== '' || Object.keys(selectedOptions).length > 0 || checkedColumns.size > 0;
-
     // Match every record once, here, rather than in each row — rows just look themselves up by id.
-    const visibleIds = React.useMemo(() => {
-        if (!hasActiveFilters) {
-            return null;
-        }
-
-        const ids = new Set<string>();
-        for (const record of records) {
-            if (
-                recordMatches(
-                    record.searchText,
-                    record.selectValues,
-                    record.checkboxValues,
-                    query,
-                    selectedOptions,
-                    checkedColumns
-                )
-            ) {
-                ids.add(record.id);
-            }
-        }
-        return ids;
-    }, [records, query, selectedOptions, checkedColumns, hasActiveFilters]);
+    const visibleIds = React.useMemo(
+        () =>
+            getVisibleTableRecordIds({
+                records,
+                recordGroups,
+                query,
+                selectedOptions,
+                checkedColumns,
+            }),
+        [records, recordGroups, query, selectedOptions, checkedColumns]
+    );
 
     const isEmpty = visibleIds !== null && records.length > 0 && visibleIds.size === 0;
 
@@ -309,4 +291,14 @@ export function TableSearchRecord(props: TableSearchRecordProps) {
             {children}
         </div>
     );
+}
+
+/** Keeps a complete native table row group visible when any of its records matches. */
+export function TableSearchTableBody(
+    props: React.HTMLAttributes<HTMLTableSectionElement> & { recordIds: readonly string[] }
+) {
+    const { recordIds, children, ...rest } = props;
+    const { visibleIds } = useTableSearch();
+    const matches = visibleIds === null || recordIds.some((recordId) => visibleIds.has(recordId));
+    return matches ? <tbody {...rest}>{children}</tbody> : null;
 }
