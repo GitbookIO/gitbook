@@ -93,10 +93,12 @@ async function resolvePage(context: GitBookSiteContext, params: PagePathParams |
                 const isPublicLiveContext =
                     !shareKey &&
                     !context.changeRequest &&
+                    !context.preview &&
                     context.revisionId === context.space.revision &&
                     !context.isLoggedInVisitor;
                 if (
                     resolvedSiteRedirect.redirect &&
+                    !resolvedSiteRedirect.redirect.draft &&
                     'permanent' in resolvedSiteRedirect.redirect &&
                     resolvedSiteRedirect.redirect.permanent === true &&
                     isPublicLiveContext
