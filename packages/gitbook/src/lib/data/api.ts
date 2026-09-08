@@ -87,6 +87,7 @@ export function createDataFetcher(
                 spaceId: params.spaceId,
                 revisionId: params.revisionId,
                 path: params.path,
+                metadata: params.metadata,
             });
         },
         getRevisionPageMarkdown(params) {
@@ -526,7 +527,7 @@ const getRevisionReusableContentDocument = cache(
 const getRevisionPageByPath = cache(
     async (
         input: DataFetcherInput,
-        params: { spaceId: string; revisionId: string; path: string }
+        params: { spaceId: string; revisionId: string; path: string; metadata?: boolean }
     ) => {
         'use cache';
         return wrapDataFetcherError(async () => {
@@ -540,7 +541,7 @@ const getRevisionPageByPath = cache(
                         params.revisionId,
                         encodedPath,
                         {
-                            metadata: false,
+                            metadata: params.metadata ?? false,
                         },
                         {
                             ...noCacheFetchOptions,
