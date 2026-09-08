@@ -1,4 +1,4 @@
-import type { Definition, Html, Image, Link, Root } from 'mdast';
+import type { Definition, Html, Image, Link, Paragraph, Root } from 'mdast';
 import { fromMarkdown } from 'mdast-util-from-markdown';
 import { frontmatterFromMarkdown } from 'mdast-util-frontmatter';
 import { gfmFromMarkdown, gfmToMarkdown } from 'mdast-util-gfm';
@@ -70,6 +70,7 @@ export async function getMarkdownForPage(
         markdown: rawMarkdown,
         pagePath: page.path,
     });
+    insertDescriptionAfterHeading(tree, page.description);
 
     // Handle empty document pages which have children
     if (isEmptyMarkdownPage(tree) && page.pages.length > 0) {
@@ -106,6 +107,7 @@ export async function getMarkdownForPageInSpace(
         markdown: rawMarkdown,
         pagePath: page.path,
     });
+    insertDescriptionAfterHeading(tree, page.description);
 
     // Handle empty document pages which have children (same as getMarkdownForPage)
     if (isEmptyMarkdownPage(tree) && page.pages.length > 0) {
@@ -144,6 +146,26 @@ export async function fromPageMarkdown(
  */
 export function toPageMarkdown(tree: Root): string {
     return toMarkdown(tree, { extensions: [gfmToMarkdown()] });
+}
+
+/** Keep page metadata immediately after the title for Markdown consumers. */
+function insertDescriptionAfterHeading(tree: Root, description?: string) {
+    if (!description) {
+        return;
+    }
+
+    const headingIndex = tree.children.findIndex(
+        (node) => node.type === 'heading' && node.depth === 1
+    );
+    if (headingIndex === -1) {
+        return;
+    }
+
+    const descriptionNode: Paragraph = {
+        type: 'paragraph',
+        children: [{ type: 'text', value: description }],
+    };
+    tree.children.splice(headingIndex + 1, 0, descriptionNode);
 }
 
 /**
@@ -212,6 +234,14 @@ async function renderGroupPageMarkdown(args: {
                 depth: 1,
                 children: [{ type: 'text', value: page.title }],
             },
+            ...(page.description
+                ? [
+                      {
+                          type: 'paragraph',
+                          children: [{ type: 'text', value: page.description }],
+                      } satisfies Paragraph,
+                  ]
+                : []),
             ...(await getMarkdownForPagesTree(indexablePages, linker)),
         ],
     };
