@@ -218,6 +218,12 @@ export const SearchResults = React.forwardRef(function SearchResults(
                                     addRecentSearchQuery(siteSpaceId, query, 'search');
                                 }
 
+                                // The popover's focus manager re-focuses the popup when the focused
+                                // result is torn down during close (base-ui `restoreFocus`), and that
+                                // focus() scrolls the popup — anchored at the top of the page — into
+                                // view, undoing the scroll to the section the result linked to.
+                                event.currentTarget.blur();
+
                                 onResultSelect?.();
                             };
                             const resultItemProps = {
