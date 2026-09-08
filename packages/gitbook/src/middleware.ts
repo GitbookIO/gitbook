@@ -56,6 +56,7 @@ import {
     getResponseCookiesForVisitorAuth,
     getVisitorData,
     getVisitorType,
+    isRevalidationRequest,
     normalizeVisitorURL,
     serveVisitorClaimsDataRequest,
 } from '@/lib/visitors';
@@ -339,7 +340,9 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         // Make sure the URL is clean of any va token after a successful lookup,
         // and of any visitor.* params that may have been passed to the URL.
         //
-        // We only redirect if the visitor token is not coming from a revalidation request, as we don't want to redirect in that case.
+        // We only redirect if the request is not coming from the revalidation worker, as we don't
+        // want to redirect in that case. It can carry unsigned claims without any token, so we rely
+        // on the request headers rather than on the visitor token source.
         //
         // The token and the visitor.* params value are stored in cookies that are set
         // on the redirect response.
@@ -347,7 +350,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         const normalizedVisitorURL = normalizeVisitorURL(incomingURL);
         if (
             normalizedVisitorURL.toString() !== incomingURL.toString() &&
-            visitorToken?.source !== 'revalidation'
+            !isRevalidationRequest(request.headers)
         ) {
             return writeResponseCookies(
                 NextResponse.redirect(normalizedVisitorURL.toString()),
