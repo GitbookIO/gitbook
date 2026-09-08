@@ -133,6 +133,14 @@ export function getVisitorData({
 }
 
 /**
+ * Check if the request is coming from our revalidation worker. Such requests carry the visitor
+ * data they want to revalidate in the URL, so we must not redirect them to a normalized URL.
+ */
+export function isRevalidationRequest(headers: Headers): boolean {
+    return headers.get('user-agent')?.toLowerCase() === 'gitbook-open-revalidation-worker';
+}
+
+/**
  * Get the visitor token for the request. This token can either be in the
  * query parameters or stored as a cookie.
  */
@@ -154,7 +162,7 @@ export function getVisitorToken({
 
     // Allow the empty string to come through
     if (fromUrl !== null && fromUrl !== undefined) {
-        if (headers.get('user-agent')?.toLowerCase() === 'gitbook-open-revalidation-worker') {
+        if (isRevalidationRequest(headers)) {
             return { source: 'revalidation', token: fromUrl };
         }
 
