@@ -225,6 +225,7 @@ async function renderGroupPageMarkdown(args: {
 }): Promise<string> {
     const { linker, page } = args;
     const indexablePages = getIndexablePages(page.pages);
+    const description = page.type === RevisionPageType.Document ? page.description : undefined;
 
     const markdownTree: Root = {
         type: 'root',
@@ -234,11 +235,11 @@ async function renderGroupPageMarkdown(args: {
                 depth: 1,
                 children: [{ type: 'text', value: page.title }],
             },
-            ...(page.description
+            ...(description
                 ? [
                       {
                           type: 'paragraph',
-                          children: [{ type: 'text', value: page.description }],
+                          children: [{ type: 'text', value: description }],
                       } satisfies Paragraph,
                   ]
                 : []),
