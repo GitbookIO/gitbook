@@ -1,3 +1,4 @@
+import { joinPath, removeTrailingSlash } from '../paths';
 import { isProxyRootRequest } from '../proxy';
 import { DataFetcherError, getExposableError } from './errors';
 
@@ -158,6 +159,23 @@ export function getURLLookupAlternatives(input: URL) {
     }
 
     return { urls: alternatives, basePath, changeRequest, revision };
+}
+
+/** Combine a resolved lookup with the remaining requested page path. */
+export function getURLLookupPathname(
+    alternative: { url: string; extraPath: string },
+    resolved: { basePath: string; pathname: string }
+) {
+    if (
+        alternative.extraPath &&
+        removeTrailingSlash(new URL(alternative.url).pathname) ===
+            removeTrailingSlash(resolved.basePath)
+    ) {
+        // A root lookup can resolve to a custom homepage, which is not a prefix for other pages.
+        return joinPath('/', alternative.extraPath);
+    }
+
+    return joinPath(resolved.pathname, alternative.extraPath);
 }
 
 /**
