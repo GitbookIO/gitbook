@@ -6,6 +6,7 @@ import * as ReactDOM from 'react-dom';
 import { CustomizationDefaultThemeMode } from '@gitbook/api';
 
 import { AIContextProvider } from '../AI';
+import { ModalHarnessTrigger } from './ModalHarnessTrigger';
 import { RocketLoaderDetector } from './RocketLoaderDetector';
 import { SiteLayoutClientContexts } from './SiteLayoutClientContexts';
 import { AdminToolbar } from '@/components/AdminToolbar';
@@ -134,6 +135,8 @@ export async function SiteLayout(props: {
             <RocketLoaderDetector />
 
             <AdminToolbar context={context} />
+
+            {process.env.NODE_ENV === 'development' ? <ModalHarnessTrigger /> : null}
         </SiteLayoutClientContexts>
     );
 }

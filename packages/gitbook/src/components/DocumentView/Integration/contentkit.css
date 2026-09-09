@@ -139,6 +139,13 @@
     @apply px-4 py-4;
 }
 
+.contentkit-modal-close {
+    @apply absolute top-3 right-3 z-10 flex size-8 items-center justify-center rounded-full text-tint hover:bg-tint-hover hover:text-tint-strong transition-colors;
+}
+.contentkit-modal-close-icon {
+    @apply size-4;
+}
+
 .contentkit-modal-header + .contentkit-modal-body {
     @apply pt-0;
 }

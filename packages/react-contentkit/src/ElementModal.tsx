@@ -4,6 +4,7 @@ import classNames from 'classnames';
 import React from 'react';
 
 import type { ContentKitModal } from '@gitbook/api';
+import { Icon } from '@gitbook/icons';
 
 import { useContentKitClientContext } from './context';
 import type { ContentKitClientElementProps } from './types';
@@ -18,7 +19,6 @@ export function ElementModal(
     const clientContext = useContentKitClientContext();
 
     // TODO:
-    // - close button
     // - invalid rendering on close?
     // - submit
 
@@ -45,6 +45,14 @@ export function ElementModal(
                     event.stopPropagation();
                 }}
             >
+                <button
+                    type="button"
+                    aria-label="Close"
+                    className="contentkit-modal-close"
+                    onClick={onClose}
+                >
+                    <Icon icon="xmark" className="contentkit-modal-close-icon" />
+                </button>
                 <div className={classNames('contentkit-modal-header')}>
                     {element.title ? (
                         <h1 className={classNames('contentkit-modal-title')}>{element.title}</h1>
