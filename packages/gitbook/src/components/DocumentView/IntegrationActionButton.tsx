@@ -46,7 +46,9 @@ export function IntegrationActionButton(props: {
             };
 
             const result = await renderIntegrationUi({ renderContext, request: input });
-            if (result.output?.type === 'element') {
+            // Anything but a modal has no place to go here: a `block` would render loose next to
+            // the button, and a `complete` means the integration handled the click on its own.
+            if (result.output?.type === 'element' && result.output.element.type === 'modal') {
                 setModal({ input, output: result.output, children: result.children });
             }
         } finally {
