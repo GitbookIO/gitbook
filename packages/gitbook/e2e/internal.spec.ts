@@ -514,6 +514,24 @@ const testCases: TestsCase[] = [
         contentBaseURL: 'https://gitbook-open-e2e-sites.gitbook.io/',
         tests: [
             {
+                name: 'Strip fallback after loading a page without adding history',
+                url: 'api-multi-versions/reference/api-reference/pets',
+                screenshot: false,
+                run: async (page) => {
+                    await waitForHydration(page);
+                    const previousURL = page.url();
+                    const targetURL = new URL(previousURL);
+                    targetURL.searchParams.set('fallback', 'true');
+                    targetURL.searchParams.set('ref', 'variant');
+                    targetURL.hash = 'pets';
+                    await page.goto(targetURL.toString());
+                    targetURL.searchParams.delete('fallback');
+                    await expect(page).toHaveURL(targetURL.toString());
+                    await page.goBack();
+                    await expect(page).toHaveURL(previousURL);
+                },
+            },
+            {
                 name: 'Keep navigation path/route when switching variant (Public)',
                 url: 'api-multi-versions/reference/api-reference/pets',
                 screenshot: false,
@@ -535,8 +553,11 @@ const testCases: TestsCase[] = [
                         .click();
 
                     // It should keep the current page path, i.e "reference/api-reference/pets" when navigating to the new variant
-                    await page.waitForURL((url) =>
-                        url.pathname.includes('api-multi-versions/2.0/reference/api-reference/pets')
+                    await page.waitForURL(
+                        (url) =>
+                            url.pathname.includes(
+                                'api-multi-versions/2.0/reference/api-reference/pets'
+                            ) && !url.searchParams.has('fallback')
                     );
                 },
             },
