@@ -151,6 +151,7 @@ export const fr: TranslationLanguage = {
     ai_chat_tools_submit_assistant_feedback:
         "Évaluer le message précédent de l'assistant comme ${1}",
     ai_chat_tools_submitted_feedback: 'Merci pour votre retour',
+    ai_chat_tools_shared_feedback_with_team: "Retour envoyé à l'équipe de documentation",
     ai_chat_tools_mcp_tool: 'A appelé ${1}',
     ai_chat_ask: 'Demander à ${1}',
     ai_chat_ask_about: 'Demander à ${1} à propos de ${2}',

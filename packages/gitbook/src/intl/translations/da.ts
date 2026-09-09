@@ -149,6 +149,7 @@ export const da: TranslationLanguage = {
     ai_chat_tools_submit_feedback: 'Send feedback',
     ai_chat_tools_submit_assistant_feedback: 'Bedøm assistentens forrige besked som ${1}',
     ai_chat_tools_submitted_feedback: 'Feedback sendt',
+    ai_chat_tools_shared_feedback_with_team: 'Feedback sendt til dokumentationsteamet',
     ai_chat_tools_mcp_tool: 'Kaldte ${1}',
     ai_chat_ask: 'Spørg ${1}',
     ai_chat_ask_about: 'Spørg ${1} om ${2}',

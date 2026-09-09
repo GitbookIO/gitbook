@@ -147,6 +147,7 @@ export const he: TranslationLanguage = {
     ai_chat_tools_submit_feedback: 'שליחת משוב',
     ai_chat_tools_submit_assistant_feedback: 'דרג את ההודעה הקודמת של העוזר בתור ${1}',
     ai_chat_tools_submitted_feedback: 'המשוב נשלח',
+    ai_chat_tools_shared_feedback_with_team: 'המשוב נשלח לצוות התיעוד',
     ai_chat_tools_mcp_tool: 'קרא ל-${1}',
     ai_chat_ask: 'שאל את ${1}',
     ai_chat_ask_about: 'שאל את ${1} על ${2}',

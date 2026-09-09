@@ -151,6 +151,7 @@ export const sv: TranslationLanguage = {
     ai_chat_tools_submit_assistant_feedback:
         'Betygsätt assistentens föregående meddelande som ${1}',
     ai_chat_tools_submitted_feedback: 'Feedback skickad',
+    ai_chat_tools_shared_feedback_with_team: 'Feedback skickad till dokumentationsteamet',
     ai_chat_tools_mcp_tool: 'Anropade ${1}',
     ai_chat_ask: 'Fråga ${1}',
     ai_chat_ask_about: 'Fråga ${1} om ${2}',

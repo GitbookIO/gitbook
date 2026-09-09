@@ -148,6 +148,7 @@ export const hi: TranslationLanguage = {
     ai_chat_tools_submit_feedback: 'प्रतिक्रिया सबमिट करें',
     ai_chat_tools_submit_assistant_feedback: 'सहायक के पिछले संदेश को ${1} के रूप में रेट करें',
     ai_chat_tools_submitted_feedback: 'आपकी प्रतिक्रिया सबमिट कर दी गई',
+    ai_chat_tools_shared_feedback_with_team: 'दस्तावेज़ीकरण टीम को प्रतिक्रिया भेजी गई',
     ai_chat_tools_mcp_tool: '${1} को कॉल किया',
     ai_chat_ask: '${1} से पूछें',
     ai_chat_ask_about: '${1} से ${2} के बारे में पूछें',

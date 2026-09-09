@@ -152,6 +152,7 @@ export const sk: TranslationLanguage = {
     ai_chat_tools_submit_feedback: 'Odoslať spätnú väzbu',
     ai_chat_tools_submit_assistant_feedback: 'Ohodnotiť predchádzajúcu správu asistenta ako ${1}',
     ai_chat_tools_submitted_feedback: 'Spätná väzba odoslaná',
+    ai_chat_tools_shared_feedback_with_team: 'Spätná väzba odoslaná tímu dokumentácie',
     ai_chat_tools_mcp_tool: 'Zavolal ${1}',
     ai_chat_ask: 'Opýtať sa ${1}',
     ai_chat_ask_about: 'Opýtať sa ${1} na ${2}',

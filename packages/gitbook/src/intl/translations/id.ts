@@ -149,6 +149,7 @@ export const id: TranslationLanguage = {
     ai_chat_tools_submit_feedback: 'Kirim masukan',
     ai_chat_tools_submit_assistant_feedback: 'Nilai pesan sebelumnya dari Asisten sebagai ${1}',
     ai_chat_tools_submitted_feedback: 'Masukan terkirim',
+    ai_chat_tools_shared_feedback_with_team: 'Masukan dikirim ke tim dokumentasi',
     ai_chat_tools_mcp_tool: 'Memanggil ${1}',
     ai_chat_ask: 'Tanya ${1}',
     ai_chat_ask_about: 'Tanya ${1} tentang ${2}',

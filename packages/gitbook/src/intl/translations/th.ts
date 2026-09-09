@@ -146,6 +146,7 @@ export const th: TranslationLanguage = {
     ai_chat_tools_submit_feedback: 'ส่งความคิดเห็น',
     ai_chat_tools_submit_assistant_feedback: 'ให้คะแนนข้อความก่อนหน้าของผู้ช่วยเป็น ${1}',
     ai_chat_tools_submitted_feedback: 'ส่งความคิดเห็นแล้ว',
+    ai_chat_tools_shared_feedback_with_team: 'ส่งความคิดเห็นให้ทีมเอกสารแล้ว',
     ai_chat_tools_mcp_tool: 'เรียกใช้ ${1}',
     ai_chat_ask: 'ถาม ${1}',
     ai_chat_ask_about: 'ถาม ${1} เกี่ยวกับ ${2}',
