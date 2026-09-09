@@ -45,21 +45,41 @@ export function ElementModal(
                     event.stopPropagation();
                 }}
             >
-                <button
-                    type="button"
-                    aria-label="Close"
-                    className="contentkit-modal-close"
-                    onClick={onClose}
+                <div
+                    className={classNames(
+                        'contentkit-modal-header',
+                        'contentkit-modal-header-with-close'
+                    )}
                 >
-                    <Icon icon="xmark" className="contentkit-modal-close-icon" />
-                </button>
-                <div className={classNames('contentkit-modal-header')}>
-                    {element.title ? (
-                        <h1 className={classNames('contentkit-modal-title')}>{element.title}</h1>
-                    ) : null}
-                    {subtitle ? <div className="contentkit-modal-subtitle">{subtitle}</div> : null}
+                    <div className="contentkit-modal-header-content">
+                        {element.title ? (
+                            <h1 className={classNames('contentkit-modal-title')}>
+                                {element.title}
+                            </h1>
+                        ) : null}
+                        {subtitle ? (
+                            <div className="contentkit-modal-subtitle">{subtitle}</div>
+                        ) : null}
+                    </div>
+                    <button
+                        type="button"
+                        aria-label="Close"
+                        className="contentkit-modal-close"
+                        onClick={onClose}
+                    >
+                        <Icon icon="xmark" className="contentkit-modal-close-icon" />
+                    </button>
                 </div>
                 <div className={classNames('contentkit-modal-body')}>{children}</div>
+                <div className="contentkit-modal-footer">
+                    <button
+                        type="button"
+                        className="contentkit-button contentkit-button-confirm contentkit-button-style-secondary"
+                        onClick={onClose}
+                    >
+                        Cancel
+                    </button>
+                </div>
             </div>
         </div>
     );
