@@ -37,11 +37,15 @@ function useStripFallbackQueryParam() {
     const searchParams = useSearchParams();
 
     React.useEffect(() => {
-        // Middleware strips fallback from the rewritten URL, so read the browser URL directly.
-        const url = new URL(window.location.href);
-        if (url.searchParams.has('fallback')) {
-            url.searchParams.delete('fallback');
-            window.history.replaceState(null, '', url);
+        if (searchParams?.has('fallback')) {
+            const params = new URLSearchParams(searchParams.toString());
+            params.delete('fallback');
+            const query = params.toString();
+            window.history.replaceState(
+                null,
+                '',
+                `${pathname}${query ? `?${query}` : ''}${window.location.hash}`
+            );
         }
     }, [pathname, searchParams]);
 }
