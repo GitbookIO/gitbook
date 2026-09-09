@@ -246,6 +246,43 @@ const searchTestCases: Test[] = [
         },
     },
     {
+        // RND-12844: the popover's focus manager re-focused the closing popup and
+        // scrolled the page back to the top right after landing on the section.
+        name: 'Search - Section result scrolls to the section',
+        url: getCustomizationURL({
+            ai: {
+                mode: CustomizationAIMode.None,
+            },
+        }),
+        screenshot: false,
+        run: async (page) => {
+            await waitForCookiesDialog(page);
+            const searchInput = page.getByTestId('search-input');
+            await searchInput.focus();
+            // Type like a visitor: `fill()` doesn't trigger the remote search.
+            await searchInput.pressSequentially('tasks');
+
+            const sectionResult = page.locator(
+                '[data-testid="search-page-result"][href$="/blocks/lists#tasks"]'
+            );
+            // Section results come from the remote index, which can be slow to answer.
+            await expect(sectionResult).toBeVisible({ timeout: 30_000 });
+            await sectionResult.click();
+            await page.waitForURL(/\/blocks\/lists#tasks$/);
+
+            // The regression scrolled back to the top shortly after landing, so let
+            // that happen before asserting.
+            await page.waitForTimeout(1000);
+
+            // The heading is parked under the header, within its scroll margin.
+            const top = await page
+                .locator('#tasks')
+                .evaluate((heading) => heading.getBoundingClientRect().top);
+            expect(top).toBeGreaterThanOrEqual(0);
+            expect(top).toBeLessThanOrEqual(150);
+        },
+    },
+    {
         name: 'Ask - AI Mode: Assistant - Complete flow',
         url: getCustomizationURL({
             ai: {
