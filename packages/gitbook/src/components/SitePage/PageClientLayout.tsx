@@ -1,6 +1,6 @@
 'use client';
 
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import React from 'react';
 
 import type { PageMetaLinks } from './SitePage';
@@ -33,17 +33,17 @@ export function PageClientLayout({ pageMetaLinks }: { pageMetaLinks: PageMetaLin
  * so we need to remove the fallback parameter.
  */
 function useStripFallbackQueryParam() {
-    const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
 
     React.useEffect(() => {
-        if (searchParams?.has('fallback')) {
-            const params = new URLSearchParams(searchParams.toString());
-            params.delete('fallback');
-            router.push(`${pathname}?${params.toString()}${window.location.hash ?? ''}`);
+        // Middleware strips fallback from the rewritten URL, so read the browser URL directly.
+        const url = new URL(window.location.href);
+        if (url.searchParams.has('fallback')) {
+            url.searchParams.delete('fallback');
+            window.history.replaceState(null, '', url);
         }
-    }, [router, pathname, searchParams]);
+    }, [pathname, searchParams]);
 }
 
 /**
