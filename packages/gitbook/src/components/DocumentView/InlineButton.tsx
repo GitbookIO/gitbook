@@ -7,10 +7,13 @@ import { Button, type ButtonProps } from '../primitives';
 import { SiteAuthLoginButton } from '../SiteAuth/SiteAuthLoginLink';
 import type { InlineProps } from './Inline';
 import { InlineActionButton } from './InlineActionButton';
+import { getIntegrationAction } from './integrationAction';
+import { IntegrationActionButton } from './IntegrationActionButton';
 import { NotFoundRefHoverCard } from './NotFoundRefHoverCard';
 import { getSelectAction } from './selectAction';
 import { SelectActionButton } from './SelectActionButton';
 import { isSiteAuthLoginHref } from '@/lib/auth-login-link';
+import { GITBOOK_INTEGRATIONS_CONTENT_HOST, GITBOOK_INTEGRATIONS_HOST } from '@/lib/env';
 import { resolveContentRefFallback, resolveContentRefInDocument } from '@/lib/references';
 
 // Editor button sizes render one step smaller here; the editor default (`large`) keeps the previous `medium`.
@@ -39,6 +42,29 @@ export function InlineButton(props: InlineProps<api.DocumentInlineButton>) {
         const selectAction = context.mode !== 'print' ? getSelectAction(inline.data) : null;
         if (selectAction) {
             return <SelectActionButton value={selectAction.value} buttonProps={buttonProps} />;
+        }
+
+        // Skip in print/PDF: the integration renders into a dialog, which a static render can't show.
+        const integrationAction =
+            context.mode !== 'print' ? getIntegrationAction(inline.data) : null;
+        const spaceId = context.contentContext?.space?.id;
+        if (integrationAction && spaceId) {
+            return (
+                <IntegrationActionButton
+                    integration={integrationAction.integration}
+                    block={integrationAction.block}
+                    spaceId={spaceId}
+                    security={{
+                        firstPartyDomains: [
+                            ...new Set([
+                                GITBOOK_INTEGRATIONS_HOST,
+                                GITBOOK_INTEGRATIONS_CONTENT_HOST,
+                            ]),
+                        ],
+                    }}
+                    buttonProps={buttonProps}
+                />
+            );
         }
 
         // In print/PDF mode, skip interactive action buttons (AI/search providers are not mounted).
