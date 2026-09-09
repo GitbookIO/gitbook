@@ -13,6 +13,7 @@ import {
     SiteInsightsDisplayContext,
     type SiteInsightsEventLocation,
     SiteInsightsLLMSVariant,
+    SiteInsightsMarkdownSource,
 } from '@gitbook/api';
 
 import {
@@ -21,6 +22,7 @@ import {
     trackServerInsightsEvents,
 } from './lib/tracking';
 import { getAPITokenFromCookies, getAPITokenResponseCookies } from '@/lib/api-token-cookie';
+import { isChatGPTRequest } from '@/lib/chatgpt';
 import { MAX_CHUNKED_COOKIE_LENGTH } from '@/lib/chunked-cookies';
 import type { SiteURLData } from '@/lib/context';
 import { getContentSecurityPolicy } from '@/lib/csp';
@@ -54,6 +56,7 @@ import {
     getResponseCookiesForVisitorAuth,
     getVisitorData,
     getVisitorType,
+    isRevalidationRequest,
     normalizeVisitorURL,
     serveVisitorClaimsDataRequest,
 } from '@/lib/visitors';
@@ -337,7 +340,9 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         // Make sure the URL is clean of any va token after a successful lookup,
         // and of any visitor.* params that may have been passed to the URL.
         //
-        // We only redirect if the visitor token is not coming from a revalidation request, as we don't want to redirect in that case.
+        // We only redirect if the request is not coming from the revalidation worker, as we don't
+        // want to redirect in that case. It can carry unsigned claims without any token, so we rely
+        // on the request headers rather than on the visitor token source.
         //
         // The token and the visitor.* params value are stored in cookies that are set
         // on the redirect response.
@@ -345,7 +350,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         const normalizedVisitorURL = normalizeVisitorURL(incomingURL);
         if (
             normalizedVisitorURL.toString() !== incomingURL.toString() &&
-            visitorToken?.source !== 'revalidation'
+            !isRevalidationRequest(request.headers)
         ) {
             return writeResponseCookies(
                 NextResponse.redirect(normalizedVisitorURL.toString()),
@@ -458,10 +463,12 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
             routeType: routeTypeFromPathname,
             events,
             isAiAgent,
+            isChatGPT,
         } = encodePathInSiteContent(siteURLData, request);
         routeType = routeTypeFromPathname ?? routeType;
-        // Only set for markdown routes, so it becomes part of their static cache key.
+        // Only set for Markdown and LLM routes, so these request-specific variants are cached separately.
         stableSiteURLData.isAiAgent = isAiAgent;
+        stableSiteURLData.isChatGPT = isChatGPT;
 
         // Apply a forced theme (`?theme=`/cookie). For the docs embed we thread it through the
         // route context (`embedTheme`) so those routes stay statically rendered — it becomes part
@@ -532,6 +539,9 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         }
         if (rewrittenURL.searchParams.has('displayAgentInstructions')) {
             rewrittenURL.searchParams.delete('displayAgentInstructions');
+        }
+        if (rewrittenURL.searchParams.has('markdownSource')) {
+            rewrittenURL.searchParams.delete('markdownSource');
         }
 
         const response = NextResponse.rewrite(rewrittenURL, {
@@ -775,6 +785,8 @@ function encodePathInSiteContent(
     events?: ServerInsightsEventInput[] | undefined;
     /** Only set for markdown routes, where the output depends on the visitor being an agent. */
     isAiAgent?: boolean;
+    /** Only set for Markdown and LLM routes, where the output content type depends on ChatGPT. */
+    isChatGPT?: boolean;
 } {
     let pathname = removeLeadingSlash(removeTrailingSlash(siteURLData.pathname));
 
@@ -816,6 +828,7 @@ function encodePathInSiteContent(
         return {
             pathname,
             routeType: 'static',
+            isChatGPT: isChatGPTRequest(request) || undefined,
             events: [
                 {
                     type: 'llms_request',
@@ -851,6 +864,7 @@ function encodePathInSiteContent(
             return {
                 pathname,
                 routeType: 'static',
+                isChatGPT: isChatGPTRequest(request) || undefined,
                 events: [
                     {
                         type: 'llms_request',
@@ -897,6 +911,10 @@ function encodePathInSiteContent(
                 // It is encoded as a second path segment (the route is statically rendered, so it can't
                 // read query params at runtime — the question is path-encoded for the same reason).
                 const goal = searchParams.get('goal');
+                // Validated: this is user input going into insights.
+                const markdownSource = Object.values(SiteInsightsMarkdownSource).find(
+                    (source) => source === searchParams.get('markdownSource')
+                );
                 return {
                     pathname:
                         typeof ask === 'string'
@@ -907,6 +925,7 @@ function encodePathInSiteContent(
                     routeType: 'static',
                     // Left undefined for non-agents to avoid splitting the static cache for them.
                     isAiAgent: isAiAgent || undefined,
+                    isChatGPT: isChatGPTRequest(request) || undefined,
                     // TODO: track pageId / spaceId when possible
                     // We don't do it at the moment as we can't easily extract it from the URL.
                     events: ask
@@ -922,6 +941,7 @@ function encodePathInSiteContent(
                         : [
                               {
                                   type: 'page_markdown_request',
+                                  ...(markdownSource ? { markdownSource } : {}),
                                   location: {
                                       displayContext: SiteInsightsDisplayContext.Server,
                                   },

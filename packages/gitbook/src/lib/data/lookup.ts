@@ -3,7 +3,7 @@ import type { GitBookAPI, PublishedSiteContentLookup, SiteVisitorPayload } from 
 import { apiClient } from './api';
 import { getExposableError } from './errors';
 import type { DataFetcherResponse } from './types';
-import { getURLLookupAlternatives, stripURLSearch } from './urls';
+import { getURLLookupAlternatives, getURLLookupPathname, stripURLSearch } from './urls';
 import { isAPITokenExpired } from '@/lib/api-token';
 import { race, tryCatch } from '@/lib/async';
 import { getLogger } from '@/lib/logger';
@@ -134,7 +134,7 @@ export async function lookupPublishedContentByUrl(
                 ...data,
                 canonicalUrl: joinPathWithBaseURL(data.canonicalUrl, alternative.extraPath),
                 basePath: joinPath(data.basePath, lookup.basePath ?? ''),
-                pathname: joinPath(data.pathname, alternative.extraPath),
+                pathname: getURLLookupPathname(alternative, data),
                 ...(changeRequest ? { changeRequest } : {}),
                 ...(revision ? { revision } : {}),
             };

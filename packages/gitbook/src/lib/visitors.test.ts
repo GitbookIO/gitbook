@@ -10,6 +10,7 @@ import {
     getVisitorToken,
     getVisitorType,
     getVisitorUnsignedClaims,
+    isRevalidationRequest,
     normalizeVisitorURL,
 } from './visitors';
 
@@ -562,5 +563,18 @@ describe('getVisitorType', () => {
     it('should default to "human" when the user-agent is missing or empty', () => {
         expect(getVisitorType(requestWith({}))).toBe('human');
         expect(getVisitorType(requestWith({ 'user-agent': '' }))).toBe('human');
+    });
+});
+
+describe('isRevalidationRequest', () => {
+    it('should detect the revalidation worker regardless of casing', () => {
+        expect(
+            isRevalidationRequest(new Headers({ 'User-Agent': 'GitBook-Open-Revalidation-Worker' }))
+        ).toBe(true);
+    });
+
+    it('should not detect a regular request', () => {
+        expect(isRevalidationRequest(new Headers({ 'User-Agent': 'Mozilla/5.0' }))).toBe(false);
+        expect(isRevalidationRequest(new Headers())).toBe(false);
     });
 });

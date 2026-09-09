@@ -22,6 +22,8 @@ export function selectRankAttribute(rank: number): string {
 }
 
 // DOM contract applied by consumer blocks (tabs, cards, …) and read by the generated CSS.
+// Option panes must be direct children of the element carrying the set class: the generated
+// selectors use a child combinator, so a group never resolves the panes of a group nested in it.
 
 /** Marks a group of mutually-exclusive options (e.g. a tab group). */
 export const SELECT_GROUP_ATTR = 'data-select-group';

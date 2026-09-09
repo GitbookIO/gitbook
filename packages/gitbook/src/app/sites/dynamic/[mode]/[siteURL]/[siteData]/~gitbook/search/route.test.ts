@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'bun:test';
 
-import type { SearchPageResult, SearchSpaceResult, SiteSpace } from '@gitbook/api';
+import type {
+    RevisionPage,
+    RevisionPageDocument,
+    SearchPageResult,
+    SearchSpaceResult,
+    SiteSpace,
+} from '@gitbook/api';
 
 import { orderSearchResultGroups } from './orderSearchResults';
 import { createLinker } from '@/lib/links';
@@ -14,6 +20,13 @@ const linker = createLinker({
     host: 'docs.runway.team',
     siteBasePath: '/',
     spaceBasePath: '/',
+});
+
+const revisionLinker = createLinker({
+    protocol: 'https:',
+    host: 'docs.runway.team',
+    siteBasePath: '/handbook/',
+    spaceBasePath: '/handbook/api/~/revisions/revision_preview/',
 });
 
 const spaceItem: SearchSpaceResult = {
@@ -63,6 +76,33 @@ function transformPage(pageItem: SearchPageResult, asEmbeddable = false) {
         pageItem,
         spaceItem,
         siteSpace,
+    })!;
+}
+
+function createRevisionPage(id: string, path: string): RevisionPageDocument {
+    return {
+        id,
+        type: 'document',
+        path,
+        pages: [],
+    } as RevisionPageDocument;
+}
+
+function createRevisionPages(pagePath: string): RevisionPage[] {
+    return [
+        createRevisionPage('page_home', 'home'),
+        createRevisionPage('page_api_reference', pagePath),
+    ];
+}
+
+function transformRevisionPage(pageItem: SearchPageResult, revisionPages: RevisionPage[]) {
+    return transformSitePageResult({
+        asEmbeddable: false,
+        linker: revisionLinker,
+        pageItem,
+        spaceItem,
+        siteSpace,
+        revisionPages,
     });
 }
 
@@ -83,10 +123,90 @@ describe('transformSitePageResult', () => {
         expect(transformPage(createPageResult({ path: destination }), true).href).toBe(destination);
     });
 
-    it('resolves a relative page path through the published site URL', () => {
+    it('keeps published search results on their published destination', () => {
         const result = transformPage(createPageResult({ path: 'guides/getting-started' }));
 
         expect(result.href).toBe('/guides/getting-started');
+    });
+
+    it('keeps a current-space page result inside the revision being previewed', () => {
+        const result = transformRevisionPage(
+            createPageResult({ path: 'guides/getting-started' }),
+            createRevisionPages('guides/getting-started')
+        );
+
+        expect(result?.href).toBe(
+            '/handbook/api/~/revisions/revision_preview/guides/getting-started'
+        );
+    });
+
+    it('uses the current revision path when a page moved after the indexed revision', () => {
+        const result = transformRevisionPage(
+            createPageResult({ path: 'guides/getting-started' }),
+            createRevisionPages('start/quickstart')
+        );
+
+        expect(result?.href).toBe('/handbook/api/~/revisions/revision_preview/start/quickstart');
+    });
+
+    it('keeps a section result and its anchor inside the current revision', () => {
+        const result = transformRevisionPage(
+            createPageResult({
+                path: 'guides/getting-started',
+                sections: [
+                    {
+                        id: 'section_authentication',
+                        title: 'Authentication',
+                        body: 'Synthetic section excerpt',
+                        path: 'guides/getting-started#authentication',
+                        score: 10,
+                        resultType: 'section',
+                        urls: {
+                            app: 'https://app.gitbook.com/o/example/s/example',
+                        },
+                    },
+                ],
+            }),
+            createRevisionPages('guides/getting-started')
+        );
+
+        expect(result?.bestSection?.href).toBe(
+            '/handbook/api/~/revisions/revision_preview/guides/getting-started#authentication'
+        );
+    });
+
+    it('falls back to the revision page root when a section anchor cannot be safely retained', () => {
+        const result = transformRevisionPage(
+            createPageResult({
+                path: 'guides/getting-started',
+                sections: [
+                    {
+                        id: 'section_authentication',
+                        title: 'Authentication',
+                        body: 'Synthetic section excerpt',
+                        path: 'another-page#authentication',
+                        score: 10,
+                        resultType: 'section',
+                        urls: {
+                            app: 'https://app.gitbook.com/o/example/s/example',
+                        },
+                    },
+                ],
+            }),
+            createRevisionPages('start/quickstart')
+        );
+
+        expect(result?.bestSection?.href).toBe(
+            '/handbook/api/~/revisions/revision_preview/start/quickstart'
+        );
+    });
+
+    it('excludes a main-index result that does not exist in the current revision', () => {
+        const result = transformRevisionPage(createPageResult({ path: 'guides/getting-started' }), [
+            createRevisionPage('page_home', 'home'),
+        ]);
+
+        expect(result).toBeNull();
     });
 
     it('keeps embeddable GitBook page links in the embeddable route', () => {
@@ -126,7 +246,33 @@ describe('transformSitePageResult', () => {
             spaceItem,
         });
 
-        expect(result.href).toBe('/guides/getting-started');
+        expect(result?.href).toBe('/guides/getting-started');
+    });
+
+    it('keeps cross-space results on their published destination during a revision preview', () => {
+        const otherSpaceItem = { ...spaceItem, id: 'space_sdk', title: 'SDK' };
+        const otherSiteSpace = {
+            ...siteSpace,
+            id: 'site_space_sdk',
+            path: 'sdk',
+            space: {
+                ...siteSpace.space,
+                id: otherSpaceItem.id,
+                title: otherSpaceItem.title,
+            },
+            urls: {
+                published: 'https://docs.runway.team/handbook/sdk/',
+            },
+        } as SiteSpace;
+        const result = transformSitePageResult({
+            asEmbeddable: false,
+            linker: revisionLinker,
+            pageItem: createPageResult({ path: 'guides/getting-started' }),
+            spaceItem: otherSpaceItem,
+            siteSpace: otherSiteSpace,
+        });
+
+        expect(result?.href).toBe('/handbook/sdk/guides/getting-started');
     });
 
     it('preserves ranks, scores, and result ordering', () => {
