@@ -21,10 +21,7 @@ export default async function SiteDynamicLayout({
     const resolvedParams = await params;
     const { context, visitorAuthClaims } = await getDynamicSiteContext(resolvedParams);
     const forcedTheme = await getThemeFromMiddleware();
-    const withTracking = shouldTrackEvents({
-        mode: resolvedParams.mode,
-        headers: await headers(),
-    });
+    const withTracking = shouldTrackEvents(resolvedParams.mode, await headers());
 
     return (
         <CustomizationRootLayout
