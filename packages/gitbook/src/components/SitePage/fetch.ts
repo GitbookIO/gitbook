@@ -41,6 +41,7 @@ export async function fetchPageData(context: GitBookSiteContext, params: PagePar
             revisionId: context.revisionId,
             path: pageTarget.page.path,
             metadata: true,
+            cachedMetadata: true,
         });
         const pageWithMetadata = response.data;
 

@@ -98,6 +98,7 @@ export interface GitBookDataFetcher {
         revisionId: string;
         path: string;
         metadata?: boolean;
+        cachedMetadata?: boolean;
     }): Promise<DataFetcherResponse<api.RevisionPageDocument | api.RevisionPageGroup>>;
 
     /**

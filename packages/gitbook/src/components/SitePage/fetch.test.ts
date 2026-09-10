@@ -65,6 +65,7 @@ describe('fetchPageData', () => {
             revisionId: 'revision-1',
             path: 'readme',
             metadata: true,
+            cachedMetadata: true,
         });
         expect(result.pageTarget?.page.git).toEqual(git);
         expect(result.context.page?.git).toEqual(git);
