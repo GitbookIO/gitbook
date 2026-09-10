@@ -10,6 +10,7 @@ import {
     CustomizationDepth,
     CustomizationHeaderPreset,
     CustomizationIconsStyle,
+    CustomizationPageActionType,
     CustomizationSidebarListStyle,
     SiteSocialAccountPlatform,
 } from '@gitbook/api';
@@ -1627,6 +1628,70 @@ const testCases: TestsCase[] = [
             {
                 name: 'All cases',
                 url: '',
+            },
+        ],
+    },
+    {
+        name: 'Edit on Git page actions',
+        contentBaseURL: 'https://gitbook-open-e2e-sites.gitbook.io/yjs/',
+        tests: [
+            {
+                name: 'With Edit on Git as the default action',
+                url: getCustomizationURL({
+                    pageActions: {
+                        items: [CustomizationPageActionType.Git],
+                    },
+                }),
+                run: async (page) => {
+                    await waitForHydration(page);
+                    await expect(
+                        page.getByRole('link', { name: 'Edit', exact: true })
+                    ).toHaveAttribute(
+                        'href',
+                        'https://github.com/taranvohra/yjs-docs/tree/main/README.md'
+                    );
+                },
+                screenshot: false,
+            },
+            {
+                name: 'With Edit on Git in the dropdown',
+                url: getCustomizationURL({
+                    pageActions: {
+                        items: [
+                            CustomizationPageActionType.Markdown,
+                            CustomizationPageActionType.Git,
+                        ],
+                    },
+                }),
+                run: async (page) => {
+                    await waitForHydration(page);
+                    await page.getByRole('button', { name: 'More' }).click();
+                    await expect(page.getByRole('menu')).toBeVisible();
+                    await expect(
+                        page.getByRole('menuitem', { name: 'Edit on GitHub' })
+                    ).toHaveAttribute(
+                        'href',
+                        'https://github.com/taranvohra/yjs-docs/tree/main/README.md'
+                    );
+                },
+                screenshot: false,
+            },
+            {
+                name: 'Without Edit on Git',
+                url: getCustomizationURL({
+                    pageActions: {
+                        items: [CustomizationPageActionType.Markdown],
+                    },
+                }),
+                run: async (page) => {
+                    await waitForHydration(page);
+                    await page.getByRole('button', { name: 'More' }).click();
+                    await expect(page.getByRole('menu')).toBeVisible();
+                    await expect(
+                        page.getByRole('menuitem', { name: 'Edit on GitHub' })
+                    ).toHaveCount(0);
+                },
+                screenshot: false,
             },
         ],
     },
