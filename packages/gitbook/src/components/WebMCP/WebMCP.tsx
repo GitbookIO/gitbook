@@ -49,6 +49,10 @@ export function WebMCP(props: { mcpURL: string }) {
             }
 
             for (const tool of tools) {
+                // Answer synthesis takes 20-30s and browser agents abort tool calls around 30s.
+                if (tool.name === 'askQuestion') {
+                    continue;
+                }
                 await modelContext.registerTool(
                     {
                         name: tool.name,
