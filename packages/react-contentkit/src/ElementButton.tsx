@@ -103,7 +103,7 @@ function ConfirmDialog({ open, onCancel, onConfirm, style, title, text, confirm 
                 <div className="contentkit-modal-footer">
                     <button
                         type="button"
-                        className="contentkit-button contentkit-button-confirm contentkit-button-style-secondary"
+                        className="contentkit-button contentkit-button-style-secondary"
                         onClick={onCancel}
                     >
                         Cancel
@@ -111,7 +111,7 @@ function ConfirmDialog({ open, onCancel, onConfirm, style, title, text, confirm 
                     <button
                         type="button"
                         className={classNames(
-                            'contentkit-button contentkit-button-confirm',
+                            'contentkit-button',
                             `contentkit-button-style-${style ?? 'primary'}`
                         )}
                         onClick={onConfirm}
