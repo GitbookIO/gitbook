@@ -95,7 +95,7 @@
 
 /** Buttons */
 .contentkit-button {
-    @apply text-sm px-3 h-8 text-center inline-block py-1.5 rounded-md straight-corners:rounded-none place-self-start ring-1 ring-tint hover:ring-tint-hover shadow-sm shadow-tint dark:shadow-tint-1 hover:shadow-md active:shadow-none contrast-more:ring-tint-12 contrast-more:hover:ring-2 contrast-more:hover:ring-tint-12 hover:scale-105 active:scale-100 transition-all grow-0 shrink-0 truncate w-full;
+    @apply text-sm px-3 h-8 text-center inline-block py-1.5 rounded-md straight-corners:rounded-none ring-1 ring-tint hover:ring-tint-hover shadow-sm shadow-tint dark:shadow-tint-1 hover:shadow-md active:shadow-none contrast-more:ring-tint-12 contrast-more:hover:ring-2 contrast-more:hover:ring-tint-12 hover:scale-105 active:scale-100 transition-all truncate;
 }
 
 .contentkit-button-style-primary {
@@ -207,9 +207,6 @@
 }
 .contentkit-modal-confirm .contentkit-modal-footer {
     @apply flex gap-2 justify-end;
-}
-.contentkit-button-confirm {
-    @apply w-auto flex-grow-0 flex-shrink-0;
 }
 .contentkit-button-style-danger {
     @apply bg-danger text-danger hover:bg-danger-hover hover:text-danger-strong contrast-more:bg-tint-subtle;
