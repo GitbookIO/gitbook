@@ -17,6 +17,15 @@ export type ResolvedPagePath<Page extends RevisionPageDocument | RevisionPageGro
     ancestors: AncestorRevisionPage[];
 };
 
+/** Return the page description when it is configured to be visible. */
+export function getPageDescription(
+    page: Pick<RevisionPageDocument, 'description'> & {
+        layout: Pick<RevisionPageDocument['layout'], 'description'>;
+    }
+): string | undefined {
+    return page.description && page.layout.description ? page.description : undefined;
+}
+
 /**
  * Resolve a page path to a page document.
  */

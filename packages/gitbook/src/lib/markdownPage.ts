@@ -26,6 +26,7 @@ import {
 } from '@/lib/context';
 import { DataFetcherError, throwIfDataError } from '@/lib/data';
 import type { ResolvedPagePath } from '@/lib/pages';
+import { getPageDescription } from '@/lib/pages';
 import { getIndexablePages } from '@/lib/sitemap';
 import { getMarkdownForPagesTree } from '@/routes/llms';
 
@@ -70,12 +71,13 @@ export async function getMarkdownForPage(
         markdown: rawMarkdown,
         pagePath: page.path,
     });
-    insertDescriptionAfterHeading(tree, page.description);
 
     // Handle empty document pages which have children
     if (isEmptyMarkdownPage(tree) && page.pages.length > 0) {
         return servePageGroup(context, page);
     }
+
+    insertDescriptionAfterHeading(tree, getPageDescription(page));
 
     return toPageMarkdown(tree);
 }
@@ -107,12 +109,13 @@ export async function getMarkdownForPageInSpace(
         markdown: rawMarkdown,
         pagePath: page.path,
     });
-    insertDescriptionAfterHeading(tree, page.description);
 
     // Handle empty document pages which have children (same as getMarkdownForPage)
     if (isEmptyMarkdownPage(tree) && page.pages.length > 0) {
         return renderGroupPageMarkdown({ linker: siteSpaceContext.linker, page });
     }
+
+    insertDescriptionAfterHeading(tree, getPageDescription(page));
 
     return toPageMarkdown(tree);
 }
@@ -225,7 +228,8 @@ async function renderGroupPageMarkdown(args: {
 }): Promise<string> {
     const { linker, page } = args;
     const indexablePages = getIndexablePages(page.pages);
-    const description = page.type === RevisionPageType.Document ? page.description : undefined;
+    const description =
+        page.type === RevisionPageType.Document ? getPageDescription(page) : undefined;
 
     const markdownTree: Root = {
         type: 'root',
