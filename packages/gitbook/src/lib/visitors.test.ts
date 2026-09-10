@@ -229,6 +229,27 @@ describe('getVisitorAuthToken', () => {
 
 // The chunking mechanics themselves are covered in api-token-cookie.test.ts;
 // these tests cover the wiring into the visitor auth cookie.
+describe('getResponseCookiesForVisitorAuth write policy', () => {
+    const base64url = (value: object) => Buffer.from(JSON.stringify(value)).toString('base64url');
+    const token = `${base64url({ alg: 'none' })}.${base64url({ exp: 2_000_000_000 })}.sig`;
+
+    it('persists a token that arrived in the URL', () => {
+        expect(getResponseCookiesForVisitorAuth('/', { source: 'url', token })).toHaveLength(1);
+    });
+
+    it('only accepts a token that arrived in the URL', () => {
+        const fromVACookie = { source: 'visitor-auth-cookie', basePath: '/', token } as const;
+        const fromCustomCookie = { source: 'gitbook-visitor-cookie', token } as const;
+
+        // @ts-expect-error a token read back from a VA cookie must never be persisted again
+        const buildFromVACookie = () => getResponseCookiesForVisitorAuth('/', fromVACookie);
+        // @ts-expect-error a custom visitor cookie is owned by the customer's backend
+        const buildFromCustom = () => getResponseCookiesForVisitorAuth('/', fromCustomCookie);
+
+        expect([buildFromVACookie, buildFromCustom]).toHaveLength(2);
+    });
+});
+
 describe('getResponseCookiesForVisitorAuth chunking', () => {
     const base64url = (value: object) => Buffer.from(JSON.stringify(value)).toString('base64url');
 
