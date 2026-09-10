@@ -38,10 +38,11 @@ export function WebMCP(props: { mcpURL: string }) {
                 import('@modelcontextprotocol/sdk/client/index.js'),
                 import('@modelcontextprotocol/sdk/client/streamableHttp.js'),
             ]);
+            // Tagged so WebMCP calls are distinguishable in insights (the request URL is tracked).
+            const url = new URL(mcpURL, window.location.href);
+            url.searchParams.set('client', 'webmcp');
             const client = new Client({ name: 'gitbook-webmcp', version: '1.0.0' });
-            await client.connect(
-                new StreamableHTTPClientTransport(new URL(mcpURL, window.location.href))
-            );
+            await client.connect(new StreamableHTTPClientTransport(url));
             const { tools } = await client.listTools();
             if (signal.aborted) {
                 return;
