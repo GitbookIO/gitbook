@@ -19,10 +19,7 @@ export default async function RootLayout({
 }: React.PropsWithChildren<SiteStaticLayoutProps>) {
     const resolvedParams = await params;
     const { context, visitorAuthClaims } = await getEmbeddableStaticContext(resolvedParams);
-    const withTracking = shouldTrackEvents({
-        mode: resolvedParams.mode,
-        headers: await headers(),
-    });
+    const withTracking = shouldTrackEvents(resolvedParams.mode, await headers());
     // The forced theme (`?theme=`) comes through the route context (set by the middleware), not a
     // request header, so the embed can honor it while staying statically rendered. RND-11571
     const forcedTheme = getSiteURLDataFromParams(resolvedParams).embedTheme ?? null;

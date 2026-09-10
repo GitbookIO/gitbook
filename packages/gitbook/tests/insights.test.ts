@@ -7,16 +7,15 @@ describe('Insights', () => {
     // reproducing the split (apex vs www, alias, CDN) that turns an absolute URL cross-origin.
     const TEST_URL = getContentTestURL('https://gitbook.gitbook.io/test-gitbook-open');
 
-    it.each(['__evt', 'visitor'])(
-        'should reference ~gitbook/%s relative to the served origin',
-        async (endpoint) => {
-            const response = await fetch(TEST_URL);
-            expect(response.status).toBe(200);
+    it('should reference the insights endpoints relative to the served origin', async () => {
+        const response = await fetch(TEST_URL);
+        expect(response.status).toBe(200);
 
-            const html = await response.text();
+        const html = await response.text();
 
+        for (const endpoint of ['__evt', 'visitor']) {
             expect(html).toContain(`~gitbook/${endpoint}`);
             expect(html).not.toMatch(new RegExp(`https?://[^"'\\\\\\s]*~gitbook/${endpoint}`));
         }
-    );
+    });
 });

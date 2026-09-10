@@ -13,24 +13,21 @@ import { getLogger } from './logger';
  * In the dynamic context, the request headers are checked too - this allows the middleware
  * to disable tracking for preview requests.
  */
-export function shouldTrackEvents(args: {
-    /** Serving mode, from the route params. */
-    mode: string;
-    headers?: Awaited<ReturnType<typeof nextHeaders>>;
-}): boolean {
+export function shouldTrackEvents(
+    mode: string,
+    headers?: Awaited<ReturnType<typeof nextHeaders>>
+): boolean {
     if (GITBOOK_DISABLE_TRACKING) {
         return false;
     }
 
     // `url` mode only serves `/url/:url` on GitBook's own host — local dev and preview
     // deployments. That traffic is not the site's, so it must stay out of its analytics.
-    if (args.mode === 'url') {
+    if (mode === 'url') {
         return false;
     }
 
-    const disableTrackingHeader = args.headers?.get('x-gitbook-disable-tracking');
-
-    if (disableTrackingHeader === 'true') {
+    if (headers?.get('x-gitbook-disable-tracking') === 'true') {
         return false;
     }
 
