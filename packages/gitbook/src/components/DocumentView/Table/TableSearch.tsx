@@ -226,11 +226,10 @@ function SelectFilterDropdown(props: { column: TableSelectColumn }) {
                         key={option.value}
                         active={selected}
                         leadingIcon={selected ? 'check' : undefined}
-                        onSelect={(event) => {
-                            // Keep the menu open so several options can be toggled at once.
-                            event.preventDefault();
-                            toggleOption(column.id, option.value);
-                        }}
+                        // `closeOnClick={false}` keeps the menu open so several options can be
+                        // toggled at once.
+                        closeOnClick={false}
+                        onClick={() => toggleOption(column.id, option.value)}
                     >
                         {option.label || option.value}
                     </DropdownMenuItem>

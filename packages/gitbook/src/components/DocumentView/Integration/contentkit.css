@@ -95,7 +95,7 @@
 
 /** Buttons */
 .contentkit-button {
-    @apply text-sm px-3 h-8 text-center inline-block py-1.5 rounded-md straight-corners:rounded-none place-self-start ring-1 ring-tint hover:ring-tint-hover shadow-sm shadow-tint dark:shadow-tint-1 hover:shadow-md active:shadow-none contrast-more:ring-tint-12 contrast-more:hover:ring-2 contrast-more:hover:ring-tint-12 hover:scale-105 active:scale-100 transition-all grow-0 shrink-0 truncate w-full;
+    @apply text-sm px-3 h-8 text-center inline-block py-1.5 rounded-md straight-corners:rounded-none ring-1 ring-tint hover:ring-tint-hover shadow-sm shadow-tint dark:shadow-tint-1 hover:shadow-md active:shadow-none contrast-more:ring-tint-12 contrast-more:hover:ring-2 contrast-more:hover:ring-tint-12 hover:scale-105 active:scale-100 transition-all truncate;
 }
 
 .contentkit-button-style-primary {
@@ -130,13 +130,36 @@
 .contentkit-modal-header {
     @apply flex flex-col gap-2 px-4 py-2;
 }
+.contentkit-modal-header-with-close {
+    @apply flex-row items-start gap-4 px-4 pb-0 pt-4;
+}
+.contentkit-modal-header-content {
+    @apply min-w-0 flex-1;
+}
 
 .contentkit-modal-title {
     @apply text-2xl font-medium text-tint-strong;
 }
+.contentkit-modal-header-with-close .contentkit-modal-subtitle {
+    @apply break-words text-sm text-tint;
+}
+.contentkit-modal-header-with-close .contentkit-modal-title {
+    @apply break-words;
+}
 
 .contentkit-modal-body {
     @apply px-4 py-4;
+}
+
+.contentkit-modal-footer {
+    @apply flex justify-end gap-2 px-4 pb-4;
+}
+
+.contentkit-modal-close {
+    @apply flex size-8 shrink-0 items-center justify-center rounded-full text-tint transition-colors hover:bg-tint-hover hover:text-tint-strong focus-visible:outline-2 focus-visible:outline-primary;
+}
+.contentkit-modal-close-icon {
+    @apply size-4;
 }
 
 .contentkit-modal-header + .contentkit-modal-body {
@@ -207,9 +230,6 @@
 }
 .contentkit-modal-confirm .contentkit-modal-footer {
     @apply flex gap-2 justify-end;
-}
-.contentkit-button-confirm {
-    @apply w-auto flex-grow-0 flex-shrink-0;
 }
 .contentkit-button-style-danger {
     @apply bg-danger text-danger hover:bg-danger-hover hover:text-danger-strong contrast-more:bg-tint-subtle;

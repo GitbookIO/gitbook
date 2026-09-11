@@ -1,6 +1,6 @@
 'use client';
 
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import React from 'react';
 
 import type { PageMetaLinks } from './SitePage';
@@ -33,7 +33,6 @@ export function PageClientLayout({ pageMetaLinks }: { pageMetaLinks: PageMetaLin
  * so we need to remove the fallback parameter.
  */
 function useStripFallbackQueryParam() {
-    const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
 
@@ -41,9 +40,14 @@ function useStripFallbackQueryParam() {
         if (searchParams?.has('fallback')) {
             const params = new URLSearchParams(searchParams.toString());
             params.delete('fallback');
-            router.push(`${pathname}?${params.toString()}${window.location.hash ?? ''}`);
+            const query = params.toString();
+            window.history.replaceState(
+                null,
+                '',
+                `${pathname}${query ? `?${query}` : ''}${window.location.hash}`
+            );
         }
-    }, [router, pathname, searchParams]);
+    }, [pathname, searchParams]);
 }
 
 /**

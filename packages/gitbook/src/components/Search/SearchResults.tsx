@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import React from 'react';
 
 import { Button, SkeletonParagraph, SkeletonSmall } from '../primitives';
+import { isExternalLink } from '../utils/link';
 import { addRecentSearchQuery } from './recent-queries';
 import { SearchPageResultItem } from './SearchPageResultItem';
 import { SearchQuestionResultItem } from './SearchQuestionResultItem';
@@ -218,6 +219,16 @@ export const SearchResults = React.forwardRef(function SearchResults(
                                     addRecentSearchQuery(siteSpaceId, query, 'search');
                                 }
 
+                                // The popover's focus manager re-focuses the popup when the focused
+                                // result is torn down during close (base-ui `restoreFocus`), and that
+                                // focus() scrolls the popup — anchored at the top of the page — into
+                                // view, undoing the scroll to the section the result linked to.
+                                // A click that opens elsewhere leaves the search open, and keyboard
+                                // users should keep their place in it.
+                                if (navigatesCurrentWindow(event)) {
+                                    event.currentTarget.blur();
+                                }
+
                                 onResultSelect?.();
                             };
                             const resultItemProps = {
@@ -385,3 +396,19 @@ const SearchResultsSkeleton = (props: { items: number }) => {
         </>
     );
 };
+
+/**
+ * Whether clicking a result navigates the current window, and so closes the search — as opposed
+ * to opening a new tab or window (modifier keys, `target="_blank"`, or an external destination,
+ * which an embed opens in a new tab).
+ */
+function navigatesCurrentWindow(event: React.MouseEvent<HTMLAnchorElement>) {
+    const link = event.currentTarget;
+    return (
+        !event.ctrlKey &&
+        !event.metaKey &&
+        !event.shiftKey &&
+        link.target !== '_blank' &&
+        !isExternalLink(link.href, window.location.origin)
+    );
+}

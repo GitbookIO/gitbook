@@ -10,6 +10,7 @@ import {
     CustomizationDepth,
     CustomizationHeaderPreset,
     CustomizationIconsStyle,
+    CustomizationPageActionType,
     CustomizationSidebarListStyle,
     SiteSocialAccountPlatform,
 } from '@gitbook/api';
@@ -243,6 +244,43 @@ const searchTestCases: Test[] = [
             await expect(page.getByTestId('search-input')).toBeFocused();
             await expect(page.getByTestId('search-input')).toHaveValue('gitbook');
             await expect(page.getByTestId('search-results')).toBeVisible();
+        },
+    },
+    {
+        // RND-12844: the popover's focus manager re-focused the closing popup and
+        // scrolled the page back to the top right after landing on the section.
+        name: 'Search - Section result scrolls to the section',
+        url: getCustomizationURL({
+            ai: {
+                mode: CustomizationAIMode.None,
+            },
+        }),
+        screenshot: false,
+        run: async (page) => {
+            await waitForCookiesDialog(page);
+            const searchInput = page.getByTestId('search-input');
+            await searchInput.focus();
+            // Type like a visitor: `fill()` doesn't trigger the remote search.
+            await searchInput.pressSequentially('tasks');
+
+            const sectionResult = page.locator(
+                '[data-testid="search-page-result"][href$="/blocks/lists#tasks"]'
+            );
+            // Section results come from the remote index, which can be slow to answer.
+            await expect(sectionResult).toBeVisible({ timeout: 30_000 });
+            await sectionResult.click();
+            await page.waitForURL(/\/blocks\/lists#tasks$/);
+
+            // The regression scrolled back to the top shortly after landing, so let
+            // that happen before asserting.
+            await page.waitForTimeout(1000);
+
+            // The heading is parked under the header, within its scroll margin.
+            const top = await page
+                .locator('#tasks')
+                .evaluate((heading) => heading.getBoundingClientRect().top);
+            expect(top).toBeGreaterThanOrEqual(0);
+            expect(top).toBeLessThanOrEqual(150);
         },
     },
     {
@@ -514,6 +552,24 @@ const testCases: TestsCase[] = [
         contentBaseURL: 'https://gitbook-open-e2e-sites.gitbook.io/',
         tests: [
             {
+                name: 'Strip fallback after loading a page without adding history',
+                url: 'api-multi-versions/reference/api-reference/pets',
+                screenshot: false,
+                run: async (page) => {
+                    await waitForHydration(page);
+                    const previousURL = page.url();
+                    const targetURL = new URL(previousURL);
+                    targetURL.searchParams.set('fallback', 'true');
+                    targetURL.searchParams.set('ref', 'variant');
+                    targetURL.hash = 'pets';
+                    await page.goto(targetURL.toString());
+                    targetURL.searchParams.delete('fallback');
+                    await expect(page).toHaveURL(targetURL.toString());
+                    await page.goBack();
+                    await expect(page).toHaveURL(previousURL);
+                },
+            },
+            {
                 name: 'Keep navigation path/route when switching variant (Public)',
                 url: 'api-multi-versions/reference/api-reference/pets',
                 screenshot: false,
@@ -535,8 +591,11 @@ const testCases: TestsCase[] = [
                         .click();
 
                     // It should keep the current page path, i.e "reference/api-reference/pets" when navigating to the new variant
-                    await page.waitForURL((url) =>
-                        url.pathname.includes('api-multi-versions/2.0/reference/api-reference/pets')
+                    await page.waitForURL(
+                        (url) =>
+                            url.pathname.includes(
+                                'api-multi-versions/2.0/reference/api-reference/pets'
+                            ) && !url.searchParams.has('fallback')
                     );
                 },
             },
@@ -1569,6 +1628,70 @@ const testCases: TestsCase[] = [
             {
                 name: 'All cases',
                 url: '',
+            },
+        ],
+    },
+    {
+        name: 'Edit on Git page actions',
+        contentBaseURL: 'https://gitbook-open-e2e-sites.gitbook.io/yjs/',
+        tests: [
+            {
+                name: 'With Edit on Git as the default action',
+                url: getCustomizationURL({
+                    pageActions: {
+                        items: [CustomizationPageActionType.Git],
+                    },
+                }),
+                run: async (page) => {
+                    await waitForHydration(page);
+                    await expect(
+                        page.getByRole('link', { name: 'Edit', exact: true })
+                    ).toHaveAttribute(
+                        'href',
+                        'https://github.com/taranvohra/yjs-docs/tree/main/README.md'
+                    );
+                },
+                screenshot: false,
+            },
+            {
+                name: 'With Edit on Git in the dropdown',
+                url: getCustomizationURL({
+                    pageActions: {
+                        items: [
+                            CustomizationPageActionType.Markdown,
+                            CustomizationPageActionType.Git,
+                        ],
+                    },
+                }),
+                run: async (page) => {
+                    await waitForHydration(page);
+                    await page.getByRole('button', { name: 'More' }).click();
+                    await expect(page.getByRole('menu')).toBeVisible();
+                    await expect(
+                        page.getByRole('menuitem', { name: 'Edit on GitHub' })
+                    ).toHaveAttribute(
+                        'href',
+                        'https://github.com/taranvohra/yjs-docs/tree/main/README.md'
+                    );
+                },
+                screenshot: false,
+            },
+            {
+                name: 'Without Edit on Git',
+                url: getCustomizationURL({
+                    pageActions: {
+                        items: [CustomizationPageActionType.Markdown],
+                    },
+                }),
+                run: async (page) => {
+                    await waitForHydration(page);
+                    await page.getByRole('button', { name: 'More' }).click();
+                    await expect(page.getByRole('menu')).toBeVisible();
+                    await expect(
+                        page.getByRole('menuitem', { name: 'Edit on GitHub' })
+                    ).toHaveCount(0);
+                },
+                screenshot: false,
             },
         ],
     },
