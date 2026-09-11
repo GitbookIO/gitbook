@@ -9,18 +9,25 @@ import { getLogger } from './logger';
 /**
  * Return true if events should be tracked on the site.
  * Can be called from the static context or the dynamic context.
- * In the static context, only an env variable is checked.
- * In the dynamic context, the request headers are checked - this allows the middleware
+ * In the static context, only the env variable and the serving mode are checked.
+ * In the dynamic context, the request headers are checked too - this allows the middleware
  * to disable tracking for preview requests.
  */
-export function shouldTrackEvents(headers?: Awaited<ReturnType<typeof nextHeaders>>): boolean {
+export function shouldTrackEvents(
+    mode: string,
+    headers?: Awaited<ReturnType<typeof nextHeaders>>
+): boolean {
     if (GITBOOK_DISABLE_TRACKING) {
         return false;
     }
 
-    const disableTrackingHeader = headers?.get('x-gitbook-disable-tracking');
+    // `url` mode only serves `/url/:url` on GitBook's own host — local dev and preview
+    // deployments. That traffic is not the site's, so it must stay out of its analytics.
+    if (mode === 'url') {
+        return false;
+    }
 
-    if (disableTrackingHeader === 'true') {
+    if (headers?.get('x-gitbook-disable-tracking') === 'true') {
         return false;
     }
 
