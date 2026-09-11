@@ -9,11 +9,28 @@ import {
 
 import {
     extractPagePath,
+    getPageDescription,
     getSimilarPages,
     resolveFirstDocument,
     resolvePagePath,
     resolvePagePathDocumentOrGroup,
 } from './pages';
+
+describe('getPageDescription', () => {
+    const page = {
+        description: 'A useful description',
+        layout: { description: true },
+    };
+
+    it('returns the description when it is visible', () => {
+        expect(getPageDescription(page)).toBe(page.description);
+    });
+
+    it('omits hidden and missing descriptions', () => {
+        expect(getPageDescription({ ...page, layout: { description: false } })).toBeUndefined();
+        expect(getPageDescription({ layout: { description: true } })).toBeUndefined();
+    });
+});
 
 describe('extractPagePath', () => {
     const baseURL = 'https://docs.example.com/api/';

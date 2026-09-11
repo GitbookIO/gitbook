@@ -25,7 +25,7 @@ import { categorizeVariants } from '../SpaceLayout/categorizeVariants';
 import { BreadcrumbItemDropdown, type BreadcrumbSibling } from './BreadcrumbItemDropdown';
 import { PageTags } from './PageTags';
 import type { GitBookSiteContext, SiteStructureNode } from '@/lib/context';
-import { type AncestorRevisionPage, resolveFirstDocument } from '@/lib/pages';
+import { getPageDescription, type AncestorRevisionPage, resolveFirstDocument } from '@/lib/pages';
 import { getLocalizedTitle, getSiteSpaceURL } from '@/lib/sites';
 import { tcls } from '@/lib/tailwind';
 import { getPageRSSURL } from '@/routes/rss';
@@ -132,6 +132,7 @@ export async function PageHeader(props: {
     }
     const hasContextCrumbs = contextCrumbs.length > 0;
     const showBreadcrumbs = hasAncestors || hasContextCrumbs;
+    const description = getPageDescription(page);
 
     const pageActionsEnabled = page.layout.actions !== false;
 
@@ -148,7 +149,7 @@ export async function PageHeader(props: {
     ].some((type) => isPageActionEnabled(context.customization, type));
     const hasPageActions = pageActionsEnabled && (hasConfiguredPageActions || withRSSFeed);
 
-    if (!page.layout.title && !page.layout.description && !hasPageActions) {
+    if (!page.layout.title && !description && !hasPageActions) {
         return null;
     }
 
@@ -265,7 +266,7 @@ export async function PageHeader(props: {
                     {page.title}
                 </h1>
             ) : null}
-            {page.description && page.layout.description ? (
+            {description ? (
                 <p
                     data-cover-aware-text
                     data-over-cover
@@ -277,7 +278,7 @@ export async function PageHeader(props: {
                         'clear-both'
                     )}
                 >
-                    {page.description}
+                    {description}
                 </p>
             ) : null}
         </>

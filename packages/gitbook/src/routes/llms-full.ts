@@ -12,6 +12,7 @@ import {
 import { throwIfDataError } from '@/lib/data';
 import { getMarkdownContentType } from '@/lib/markdown-content-type';
 import { fromPageMarkdown, toPageMarkdown } from '@/lib/markdownPage';
+import { getPageDescription } from '@/lib/pages';
 import { getIndexablePages } from '@/lib/sitemap';
 import { filterSiteSpacesByLocale, getSiteStructureSections } from '@/lib/sites';
 
@@ -199,12 +200,13 @@ async function getMarkdownForPage(
         pagePath: page.path,
     });
 
-    if (page.description) {
+    const description = getPageDescription(page);
+    if (description) {
         // The first node is the page title as a H1, we insert the description as a paragraph
         // after it.
         const descriptionNode: Paragraph = {
             type: 'paragraph',
-            children: [{ type: 'text', value: page.description }],
+            children: [{ type: 'text', value: description }],
         };
         tree.children.splice(1, 0, descriptionNode);
     }
