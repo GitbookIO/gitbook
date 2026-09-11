@@ -5,7 +5,12 @@ import { validateIconName } from '@gitbook/icons/icons';
 import type { BlockProps } from '../Block';
 import { Blocks } from '../Blocks';
 import { DynamicTabs } from './DynamicTabs';
-import { generateSelectCSS, selectSetClassName, slugifySelectValue } from '@/lib/select';
+import {
+    generateSelectCSS,
+    resolveSelectSlug,
+    selectSetClassName,
+    slugifySelectValue,
+} from '@/lib/select';
 import { tcls } from '@/lib/tailwind';
 
 export function Tabs(props: BlockProps<DocumentBlockTabs>) {
@@ -26,6 +31,9 @@ export function Tabs(props: BlockProps<DocumentBlockTabs>) {
         return {
             id: tab.meta?.id ?? tab.key,
             title: tab.data.title ?? '',
+            // Read structurally: `slug` is in the document schema but reaches these types only once
+            // a new @gitbook/api is published. Drop the cast then.
+            slug: (tab.data as { slug?: string }).slug,
             icon,
             body: (
                 <Blocks
@@ -94,19 +102,20 @@ function SelectGroupStyle({ slugs }: { slugs: string[] }) {
 }
 
 /**
- * Derive a `select` slug for each tab from its title. Untitled tabs fall back to their (stable) id
- * so they stay selectable.
+ * Resolve a `select` slug for each tab: its explicit slug when set, else one derived from its title.
+ * Untitled tabs fall back to their (stable) id so they stay selectable.
  *
  * Same-named tabs deliberately share a slug — selecting one syncs every tab of that name, here and
  * on other pages, which is the whole point of name-based selection. We don't disambiguate duplicates
  * with a positional suffix: that would desync the duplicate and make a stored selection retarget
- * whenever tabs are renamed or reordered.
+ * whenever tabs are renamed or reordered. An explicit slug is the way out for a tab that needs to
+ * keep its identity across a rename.
  */
-function withSelectSlugs<T extends { id: string; title: string }>(
+function withSelectSlugs<T extends { id: string; title: string; slug?: string }>(
     items: T[]
 ): (T & { slug: string })[] {
     return items.map((item) => ({
         ...item,
-        slug: slugifySelectValue(item.title) || slugifySelectValue(item.id) || item.id,
+        slug: resolveSelectSlug(item) || slugifySelectValue(item.id) || item.id,
     }));
 }
