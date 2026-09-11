@@ -1,5 +1,11 @@
 # @gitbook/openapi-parser
 
+## 3.0.13
+
+### Patch Changes
+
+- 03bbacf: Add missing link reference to OpenAPI models
+
 ## 3.0.12
 
 ### Patch Changes
