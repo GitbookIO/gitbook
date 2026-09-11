@@ -115,7 +115,6 @@ export function TableSearchProvider(props: {
         }),
         [query, selectedOptions, toggleOption, checkedColumns, toggleCheckbox, visibleIds, isEmpty]
     );
-    console.log('TEST ', { query, selectedOptions, checkedColumns, visibleIds, isEmpty });
 
     return (
         <TableSearchContext.Provider value={value}>{props.children}</TableSearchContext.Provider>
