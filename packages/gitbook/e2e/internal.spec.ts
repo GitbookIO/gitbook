@@ -1956,9 +1956,6 @@ const testCases: TestsCase[] = [
     {
         name: 'Visitor Auth - Space (oversized token)',
         contentBaseURL: 'https://gitbook.gitbook.io/gbo-va-space/',
-        // Our Cloudflare stack still folds multiple Set-Cookie headers into one,
-        // breaking chunked cookies (variant of opennextjs-cloudflare#501).
-        skip: process.env.ARGOS_BUILD_NAME === 'v2-cloudflare',
         tests: [
             {
                 name: 'Oversized token is chunked into cookies and survives navigation',
@@ -2009,7 +2006,9 @@ const testCases: TestsCase[] = [
                         .replace(/\/$/, '');
                     secondURL.pathname = `${basePathname}/second`;
                     secondURL.search = '';
-                    await page.goto(secondURL.toString());
+                    // Same reason as the harness navigation: third-party subresources on
+                    // this site can hang and never fire `load`.
+                    await page.goto(secondURL.toString(), { waitUntil: 'domcontentloaded' });
                     await expect(
                         page.getByRole('heading', { level: 1, name: 'second' })
                     ).toBeVisible();
