@@ -23,19 +23,17 @@ export function resolveDynamicBinding<T extends {}>(
     state: object,
     value: ContentKitDynamicBinding | T
 ): T {
-    if (
-        typeof value === 'string' ||
-        typeof value === 'number' ||
-        typeof value === 'boolean' ||
-        typeof value === 'undefined'
-    ) {
-        // Primitives
-        return value;
-    }
-
     if (Array.isArray(value)) {
         // @ts-ignore
         return value.map((v) => resolveDynamicBinding(state, v));
+    }
+
+    // Only plain objects can hold a binding. Primitives, `null` and class instances such as
+    // `Date` (which a webframe can post through a structured clone) must pass through untouched,
+    // as the `Object.entries` walk below would flatten them.
+    if (!isPlainObject(value)) {
+        // @ts-ignore
+        return value;
     }
 
     if ('$state' in value && typeof value.$state === 'string') {
@@ -52,4 +50,13 @@ export function resolveDynamicBinding<T extends {}>(
 
     // @ts-ignore
     return result;
+}
+
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+    if (typeof value !== 'object' || value === null) {
+        return false;
+    }
+
+    const prototype = Object.getPrototypeOf(value);
+    return prototype === Object.prototype || prototype === null;
 }
