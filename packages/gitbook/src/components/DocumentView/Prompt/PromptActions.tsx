@@ -2,6 +2,8 @@
 
 import React from 'react';
 
+import { Icon } from '@gitbook/icons';
+
 import { type PromptActionId, setPromptAction, usePromptAction } from './promptAction';
 import {
     Button,
@@ -12,6 +14,7 @@ import {
 } from '@/components/primitives';
 import { tString, useLanguage } from '@/intl/client';
 import { AI_AGENTS, getAIAgent } from '@/lib/ai-agents';
+import { tcls } from '@/lib/tailwind';
 
 /** How long the copy button shows its confirmation. */
 const COPIED_MESSAGE_DURATION = 1000;
@@ -84,13 +87,19 @@ export function PromptActions(props: { prompt: string; openInAIProviders: boolea
                         className="!min-w-48 max-w-max"
                         button={
                             <Button
-                                icon={<ToggleChevron className="size-text-sm" />}
-                                iconOnly
                                 label={tString(language, 'more')}
                                 size="xsmall"
-                                variant="primary"
+                                // Secondary against the primary main button, so the seam between
+                                // the two halves of the group is visible.
+                                variant="secondary"
+                                truncate={false}
                                 disabled={!prompt}
-                            />
+                            >
+                                <span className="flex items-center gap-1.5">
+                                    <AgentIconStack />
+                                    <ToggleChevron className="size-text-sm" />
+                                </span>
+                            </Button>
                         }
                     >
                         <DropdownMenuItem
@@ -121,5 +130,23 @@ export function PromptActions(props: { prompt: string; openInAIProviders: boolea
                 mainButton
             )}
         </div>
+    );
+}
+
+/**
+ * The agents on offer, overlapped into a stack, so the menu advertises what it holds without
+ * spelling out three names next to a button that already has one.
+ */
+function AgentIconStack() {
+    return (
+        <span className="flex items-center">
+            {AI_AGENTS.map((agent, index) => (
+                <Icon
+                    key={agent.id}
+                    icon={agent.icon}
+                    className={tcls('size-text-base shrink-0', index > 0 && '-ms-0.5')}
+                />
+            ))}
+        </span>
     );
 }
