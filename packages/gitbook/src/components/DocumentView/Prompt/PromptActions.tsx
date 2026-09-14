@@ -56,7 +56,7 @@ export function PromptActions(props: { prompt: string; openInAIProviders: boolea
 
     const mainButton = agent ? (
         <Button
-            variant="primary"
+            variant="secondary"
             size="xsmall"
             icon={agent.icon}
             label={tString(language, 'open_in', agent.label)}
@@ -67,7 +67,7 @@ export function PromptActions(props: { prompt: string; openInAIProviders: boolea
         />
     ) : (
         <Button
-            variant="primary"
+            variant="secondary"
             size="xsmall"
             icon={copied ? 'check' : 'copy'}
             label={copied ? tString(language, 'code_copied') : tString(language, 'prompt_copy')}
@@ -89,8 +89,6 @@ export function PromptActions(props: { prompt: string; openInAIProviders: boolea
                             <Button
                                 label={tString(language, 'more')}
                                 size="xsmall"
-                                // Secondary against the primary main button, so the seam between
-                                // the two halves of the group is visible.
                                 variant="secondary"
                                 truncate={false}
                                 disabled={!prompt}
@@ -141,11 +139,17 @@ function AgentIconStack() {
     return (
         <span className="flex items-center">
             {AI_AGENTS.map((agent, index) => (
-                <Icon
+                <span
                     key={agent.id}
-                    icon={agent.icon}
-                    className={tcls('size-text-base shrink-0', index > 0 && '-ms-0.5')}
-                />
+                    className={tcls(
+                        'flex size-4 shrink-0 items-center justify-center rounded-full border border-tint bg-tint-base',
+                        // Each chip's border cuts into the one behind it, so the marks stay legible
+                        // however tightly they are stacked.
+                        index > 0 && '-ms-1.5'
+                    )}
+                >
+                    <Icon icon={agent.icon} className="size-2.5" />
+                </span>
             ))}
         </span>
     );
