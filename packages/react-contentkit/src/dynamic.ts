@@ -28,10 +28,11 @@ export function resolveDynamicBinding<T extends {}>(
         return value.map((v) => resolveDynamicBinding(state, v));
     }
 
-    // Only plain objects can hold a binding. Primitives, `null` and class instances such as
-    // `Date` (which a webframe can post through a structured clone) must pass through untouched,
-    // as the `Object.entries` walk below would flatten them.
-    if (!isPlainObject(value)) {
+    // Only an object literal can hold a binding: `'$state' in value` throws on `null`, and the
+    // entries walk below would flatten a class instance (a webframe can post a `Date`) to `{}`.
+    const prototype =
+        typeof value === 'object' && value !== null ? Object.getPrototypeOf(value) : undefined;
+    if (prototype !== Object.prototype && prototype !== null) {
         // @ts-ignore
         return value;
     }
@@ -50,13 +51,4 @@ export function resolveDynamicBinding<T extends {}>(
 
     // @ts-ignore
     return result;
-}
-
-function isPlainObject(value: unknown): value is Record<string, unknown> {
-    if (typeof value !== 'object' || value === null) {
-        return false;
-    }
-
-    const prototype = Object.getPrototypeOf(value);
-    return prototype === Object.prototype || prototype === null;
 }
