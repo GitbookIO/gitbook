@@ -143,9 +143,9 @@ export function ElementWebframe(props: ContentKitClientElementProps<ContentKitWe
                         }
                         break;
                     default:
-                        renderer.update({
-                            action: message.action,
-                        });
+                        // Go through dispatchAction so webframes can trigger the built-in
+                        // `@ui.*` actions, like a ContentKit button does.
+                        renderer.dispatchAction(message.action);
                 }
             }
         };
