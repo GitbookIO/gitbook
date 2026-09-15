@@ -147,6 +147,7 @@ export const en = {
     ai_chat_tools_submit_feedback: 'Submit feedback',
     ai_chat_tools_submit_assistant_feedback: "Rate the Assistant's previous message as ${1}",
     ai_chat_tools_submitted_feedback: 'Submitted your feedback',
+    ai_chat_tools_shared_feedback_with_team: 'Shared feedback with the docs team',
     ai_chat_tools_mcp_tool: 'Called ${1}',
     ai_chat_ask: 'Ask ${1}',
     ai_chat_ask_about: 'Ask ${1} about ${2}',

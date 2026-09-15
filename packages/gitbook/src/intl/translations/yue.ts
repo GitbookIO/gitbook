@@ -145,6 +145,7 @@ export const yue: TranslationLanguage = {
     ai_chat_tools_submit_feedback: '提交反饋',
     ai_chat_tools_submit_assistant_feedback: '將助手嘅上一則訊息評為 ${1}',
     ai_chat_tools_submitted_feedback: '已提交反饋',
+    ai_chat_tools_shared_feedback_with_team: '已將意見發送給文件團隊',
     ai_chat_tools_mcp_tool: '已呼叫 ${1}',
     ai_chat_ask: '問 ${1}',
     ai_chat_ask_about: '問 ${1} 關於${2}',

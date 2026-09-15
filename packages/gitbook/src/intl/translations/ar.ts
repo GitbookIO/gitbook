@@ -148,6 +148,7 @@ export const ar: TranslationLanguage = {
     ai_chat_tools_submit_feedback: 'إرسال الملاحظات',
     ai_chat_tools_submit_assistant_feedback: 'قيّم رسالة المساعد السابقة بأنها ${1}',
     ai_chat_tools_submitted_feedback: 'تم إرسال ملاحظاتك',
+    ai_chat_tools_shared_feedback_with_team: 'تم إرسال الملاحظات إلى فريق التوثيق',
     ai_chat_tools_mcp_tool: 'تم استدعاء ${1}',
     ai_chat_ask: 'اسأل ${1}',
     ai_chat_ask_about: 'اسأل ${1} عن ${2}',

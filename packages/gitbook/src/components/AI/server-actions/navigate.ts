@@ -1,7 +1,7 @@
 'use server';
 
 import { toInSiteHref } from '../navigation';
-import { resolveContentRef, resolveStringContentRef } from '@/lib/references';
+import { resolveContentRef, resolveStringContentRef, toContentRefPath } from '@/lib/references';
 import { fetchServerActionSiteContext, getServerActionBaseContext } from '@/lib/server-actions';
 import { traceErrorOnly } from '@/lib/tracing';
 
@@ -21,15 +21,7 @@ export async function resolveAINavigationLink(
         const baseContext = await getServerActionBaseContext();
         const context = await fetchServerActionSiteContext(baseContext);
 
-        // The content-ref scheme operates on the path portion of the URL. Strip any origin so an
-        // absolute URL (e.g. `https://docs.example.com/spaces/.../pages/...`) is handled too.
-        let path = url;
-        if (URL.canParse(url)) {
-            const parsed = new URL(url);
-            path = `${parsed.pathname}${parsed.search}${parsed.hash}`;
-        }
-
-        const contentRef = resolveStringContentRef(path);
+        const contentRef = resolveStringContentRef(toContentRefPath(url));
         if (contentRef) {
             const resolved = await resolveContentRef(contentRef, context);
             if (!resolved) {
