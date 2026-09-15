@@ -3,6 +3,7 @@ import { Icon } from '@gitbook/icons';
 
 import type { BlockProps } from '../Block';
 import { Blocks } from '../Blocks';
+import { shouldShowHashLinks } from '../HashLinkButton';
 import { Inlines } from '../Inlines';
 import { Details } from './Details';
 import { ToggleChevron } from '@/components/primitives';
@@ -31,6 +32,8 @@ export async function Expandable(props: BlockProps<DocumentBlockExpandable>) {
         ? await getSpaceLanguage(context.contentContext)
         : defaultLanguage;
 
+    const showHashLink = shouldShowHashLinks(context);
+
     return (
         <Details
             id={id}
@@ -41,7 +44,8 @@ export async function Expandable(props: BlockProps<DocumentBlockExpandable>) {
                 className={tcls(
                     'cursor-pointer',
                     'px-4',
-                    'pr-10',
+                    // Reserve room for the anchor icon pinned to the right edge
+                    showHashLink && 'pr-10',
                     'py-4',
                     'relative',
                     'list-none',
@@ -71,32 +75,34 @@ export async function Expandable(props: BlockProps<DocumentBlockExpandable>) {
                     context={context}
                     ancestorInlines={[]}
                 />
-                <a
-                    href={`#${id}`}
-                    aria-label={tString(language, 'direct_link_to_heading')}
-                    className={tcls(
-                        'absolute',
-                        'top-2',
-                        'bottom-2',
-                        'right-4',
-                        'flex',
-                        'items-center',
-                        'dark:shadow-none',
-                        'dark:ring-0'
-                    )}
-                >
-                    <Icon
-                        icon="hashtag"
+                {showHashLink ? (
+                    <a
+                        href={`#${id}`}
+                        aria-label={tString(language, 'direct_link_to_heading')}
                         className={tcls(
-                            'inline-block',
-                            'size-3',
-                            'transition-colors',
-                            'text-transparent',
-                            'group-hover/expandable:text-tint-subtle',
-                            'contrast-more:group-hover/expandable:text-tint-strong'
+                            'absolute',
+                            'top-2',
+                            'bottom-2',
+                            'right-4',
+                            'flex',
+                            'items-center',
+                            'dark:shadow-none',
+                            'dark:ring-0'
                         )}
-                    />
-                </a>
+                    >
+                        <Icon
+                            icon="hashtag"
+                            className={tcls(
+                                'inline-block',
+                                'size-3',
+                                'transition-colors',
+                                'text-transparent',
+                                'group-hover/expandable:text-tint-subtle',
+                                'contrast-more:group-hover/expandable:text-tint-strong'
+                            )}
+                        />
+                    </a>
+                ) : null}
             </summary>
             <Blocks
                 nodes={body.nodes}
