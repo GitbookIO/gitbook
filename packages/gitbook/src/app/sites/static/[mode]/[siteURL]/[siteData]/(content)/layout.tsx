@@ -15,9 +15,8 @@ export default async function SiteStaticLayout({
     params,
     children,
 }: React.PropsWithChildren<SiteStaticLayoutProps>) {
-    const resolvedParams = await params;
-    const { context, visitorAuthClaims } = await getStaticSiteContext(resolvedParams);
-    const withTracking = shouldTrackEvents(resolvedParams.mode);
+    const { context, visitorAuthClaims } = await getStaticSiteContext(await params);
+    const withTracking = shouldTrackEvents();
 
     return (
         <CustomizationRootLayout

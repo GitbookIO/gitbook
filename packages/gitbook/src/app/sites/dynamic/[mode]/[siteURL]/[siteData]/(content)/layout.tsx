@@ -18,10 +18,9 @@ export default async function SiteDynamicLayout({
     params,
     children,
 }: React.PropsWithChildren<SiteDynamicLayoutProps>) {
-    const resolvedParams = await params;
-    const { context, visitorAuthClaims } = await getDynamicSiteContext(resolvedParams);
+    const { context, visitorAuthClaims } = await getDynamicSiteContext(await params);
     const forcedTheme = await getThemeFromMiddleware();
-    const withTracking = shouldTrackEvents(resolvedParams.mode, await headers());
+    const withTracking = shouldTrackEvents(await headers());
 
     return (
         <CustomizationRootLayout
