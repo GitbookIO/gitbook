@@ -31,9 +31,7 @@ export function Tabs(props: BlockProps<DocumentBlockTabs>) {
         return {
             id: tab.meta?.id ?? tab.key,
             title: tab.data.title ?? '',
-            // Read structurally: `slug` is in the document schema but reaches these types only once
-            // a new @gitbook/api is published. Drop the cast then.
-            slug: (tab.data as { slug?: string }).slug,
+            slug: tab.data.slug,
             icon,
             body: (
                 <Blocks
