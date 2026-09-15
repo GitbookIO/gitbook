@@ -3,7 +3,7 @@ import type { headers as nextHeaders } from 'next/headers';
 import type * as api from '@gitbook/api';
 
 import { apiClient } from './data/api';
-import { GITBOOK_DISABLE_TRACKING } from './env';
+import { GITBOOK_DISABLE_INSIGHTS, GITBOOK_DISABLE_TRACKING } from './env';
 import { getLogger } from './logger';
 
 /**
@@ -83,7 +83,7 @@ export async function trackServerInsightsEvents(args: {
         `Tracking ${args.events.length} events at ${request.url} for site ${args.siteId} (enabled=${!GITBOOK_DISABLE_TRACKING})`
     );
 
-    if (GITBOOK_DISABLE_TRACKING) {
+    if (GITBOOK_DISABLE_TRACKING || GITBOOK_DISABLE_INSIGHTS) {
         return;
     }
 

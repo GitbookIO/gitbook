@@ -75,6 +75,7 @@ runs:
               echo "GITBOOK_RUNTIME=vercel" >> .vercel/.env.${{ inputs.environment }}.local
               echo "GITBOOK_BLOCK_SEARCH_INDEXATION=true" >> .vercel/.env.${{ inputs.environment }}.local
               echo "GITBOOK_ALLOW_CUSTOMIZATION_OVERRIDE=true" >> .vercel/.env.${{ inputs.environment }}.local
+              echo "GITBOOK_DISABLE_INSIGHTS=true" >> .vercel/.env.${{ inputs.environment }}.local
               echo "--- .vercel/.env.${{ inputs.environment }}.local after inject ---"
               cat .vercel/.env.${{ inputs.environment }}.local
         - name: Build Project Artifacts
