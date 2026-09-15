@@ -1747,7 +1747,6 @@ const testCases: TestsCase[] = [
             {
                 name: 'Without previewed ads',
                 url: 'text-page?ads_preview=1',
-                run: waitForCookiesDialog,
             },
         ],
     },
