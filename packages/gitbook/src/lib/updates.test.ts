@@ -2,7 +2,11 @@ import { describe, expect, it } from 'bun:test';
 
 import type { JSONDocument, Revision } from '@gitbook/api';
 
-import { getDocumentFilterableTags } from './updates';
+import {
+    UPDATES_TAG_FILTER_CAP,
+    getDocumentFilterableTags,
+    normalizeUpdatesFilterTags,
+} from './updates';
 
 describe('getDocumentFilterableTags', () => {
     it('returns unique update tags in document order', () => {
@@ -24,6 +28,26 @@ describe('getDocumentFilterableTags', () => {
             'improvements',
             'fixes',
             'new-releases',
+        ]);
+    });
+});
+
+describe('normalizeUpdatesFilterTags', () => {
+    it('trims, validates, deduplicates, and caps tags', () => {
+        const availableTags = new Set([
+            'fixes',
+            ...Array.from({ length: UPDATES_TAG_FILTER_CAP }, (_, index) => `tag-${index}`),
+        ]);
+        const tags = [
+            ' fixes ',
+            'unknown',
+            'fixes',
+            ...Array.from({ length: UPDATES_TAG_FILTER_CAP }, (_, index) => `tag-${index}`),
+        ];
+
+        expect(normalizeUpdatesFilterTags(tags, availableTags)).toEqual([
+            'fixes',
+            ...Array.from({ length: UPDATES_TAG_FILTER_CAP - 1 }, (_, index) => `tag-${index}`),
         ]);
     });
 });
