@@ -37,6 +37,13 @@ export function removeLeadingSlash(path: string): string {
 }
 
 /**
+ * Remove the `.md` extension that identifies the Markdown version of a page.
+ */
+export function removeMarkdownExtension(path: string): string {
+    return path.replace(/\.md$/, '');
+}
+
+/**
  * Normalize a pathname to make it start with a slash
  */
 export function withLeadingSlash(pathname: string): string {
