@@ -313,17 +313,19 @@ function getResponseCookieForVisitorParams(
 }
 
 /**
- * Return the lookup result for content served with visitor auth.
+ * Build the cookies persisting a visitor auth token that arrived in the URL.
+ *
+ * Only a token from URL is ever persisted into the VA cookie: a token read back from a VA cookie is already
+ * stored and its expiry derives from the token itself, so rewriting it achieves nothing except
+ * letting an in-flight request resurrect a cookie `~gitbook/auth/logout` has just deleted. A
+ * custom `gitbook-visitor-token` cookie is owned by the customer's backend and is never copied,
+ * to keep a single source of truth.
  */
 export function getResponseCookiesForVisitorAuth(
     basePath: string,
-    visitorTokenLookup: VisitorTokenLookup,
+    visitorTokenLookup: Extract<VisitorTokenLookup, { source: 'url' }>,
     requestCookies: RequestCookies = []
 ): ResponseCookies {
-    if (!visitorTokenLookup) {
-        return [];
-    }
-
     let decoded: JwtPayload;
     try {
         decoded = jwtDecode(visitorTokenLookup.token);
@@ -332,43 +334,29 @@ export function getResponseCookiesForVisitorAuth(
         return [];
     }
 
-    /**
-     * If the visitor token has been retrieve from the URL, or if its a VA cookie and the basePath is the same, set it
-     * as a cookie on the response.
-     *
-     * Note that we do not re-store the gitbook-visitor-cookie in another cookie, to maintain a single source of truth.
-     */
-    if (
-        visitorTokenLookup?.source === 'url' ||
-        (visitorTokenLookup?.source === 'visitor-auth-cookie' &&
-            visitorTokenLookup.basePath === basePath)
-    ) {
-        const name = getVisitorAuthCookieName(basePath);
-        const value = getVisitorAuthCookieValue(basePath, visitorTokenLookup.token);
-        const options = {
-            httpOnly: true,
-            sameSite: process.env.NODE_ENV === 'production' ? ('none' as const) : undefined,
-            secure: process.env.NODE_ENV === 'production',
-            maxAge: getVisitorAuthCookieMaxAge(decoded),
-        };
+    const name = getVisitorAuthCookieName(basePath);
+    const value = getVisitorAuthCookieValue(basePath, visitorTokenLookup.token);
+    const options = {
+        httpOnly: true,
+        sameSite: process.env.NODE_ENV === 'production' ? ('none' as const) : undefined,
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: getVisitorAuthCookieMaxAge(decoded),
+    };
 
-        // Chunk the cookie when the value exceeds the single-cookie size limit,
-        // as browsers silently drop oversized Set-Cookie headers which causes
-        // an infinite auth redirect loop.
-        if (value.length > MAX_CHUNKED_COOKIE_LENGTH) {
-            // Too large even for chunking: fall back to a single cookie (best effort).
-            return [{ name, value, options }];
-        }
-
-        return getChunkedResponseCookies({
-            cookies: requestCookies,
-            cookieName: name,
-            value,
-            options,
-        });
+    // Chunk the cookie when the value exceeds the single-cookie size limit,
+    // as browsers silently drop oversized Set-Cookie headers which causes
+    // an infinite auth redirect loop.
+    if (value.length > MAX_CHUNKED_COOKIE_LENGTH) {
+        // Too large even for chunking: fall back to a single cookie (best effort).
+        return [{ name, value, options }];
     }
 
-    return [];
+    return getChunkedResponseCookies({
+        cookies: requestCookies,
+        cookieName: name,
+        value,
+        options,
+    });
 }
 
 /**
