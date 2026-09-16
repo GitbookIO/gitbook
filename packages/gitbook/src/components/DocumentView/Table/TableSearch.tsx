@@ -10,8 +10,10 @@ import {
     type TableSearchRecordData,
     getVisibleTableRecordIds,
 } from './searchMatch';
+import { resolveSlugFilter, slugFilterKey } from './slugFilter';
 import { Button, Checkbox, DropdownMenu, DropdownMenuItem, Input } from '@/components/primitives';
 import { tString, useLanguage } from '@/intl/client';
+import { selectStore } from '@/lib/select';
 import { type ClassValue, tcls } from '@/lib/tailwind';
 
 /**
@@ -47,9 +49,11 @@ const TableSearchContext = React.createContext<TableSearchContextValue | null>(n
 export function TableSearchProvider(props: {
     records?: TableSearchRecordData[];
     recordGroups?: readonly (readonly string[])[];
+    /** Select columns of this table, so the reader's content selection can narrow them. */
+    selectColumns?: TableSelectColumn[];
     children: React.ReactNode;
 }) {
-    const { records = [], recordGroups = [] } = props;
+    const { records = [], recordGroups = [], selectColumns = [] } = props;
     const [query, setQuery] = React.useState('');
     const [selectedOptions, setSelectedOptions] = React.useState<SelectedOptions>(() => ({}));
     const [checkedColumns, setCheckedColumns] = React.useState<ReadonlySet<string>>(
@@ -87,6 +91,26 @@ export function TableSearchProvider(props: {
         });
     }, []);
 
+    // The selection that drives this lives outside the table — a tab, a select button or a picker
+    // elsewhere on the page — so this synchronises with it rather than deriving from it. A reader
+    // can still change the filter afterwards; the next activation drives it again.
+    const filterKey = useSlugFilterKey(selectColumns);
+
+    React.useEffect(() => {
+        if (!filterKey) {
+            return;
+        }
+        setSelectedOptions((previous) => ({
+            ...previous,
+            ...Object.fromEntries(
+                filterKey.split(',').map((entry) => {
+                    const [column, value] = entry.split('=');
+                    return [column, new Set([value])];
+                })
+            ),
+        }));
+    }, [filterKey]);
+
     // Match every record once, here, rather than in each row — rows just look themselves up by id.
     const visibleIds = React.useMemo(
         () =>
@@ -119,6 +143,29 @@ export function TableSearchProvider(props: {
     return (
         <TableSearchContext.Provider value={value}>{props.children}</TableSearchContext.Provider>
     );
+}
+
+/**
+ * The reader's selection, reduced to the columns of *this* table.
+ *
+ * Subscribes once and returns a string rather than an object: `useSyncExternalStore` compares
+ * snapshots by identity, so a fresh object each call would loop. It also means a selection that
+ * changes nothing for this table re-renders nothing — the reason `useSelect` stopped exposing the
+ * recency list in the first place.
+ */
+function useSlugFilterKey(selectColumns: TableSelectColumn[]): string {
+    const columnsKey = selectColumns
+        .map((column) => `${column.id}:${column.options.map((option) => option.value).join('|')}`)
+        .join(';');
+
+    const getKey = React.useCallback(
+        () => slugFilterKey(resolveSlugFilter(selectColumns, selectStore.getState().slugs)),
+        // `selectColumns` is a fresh array each render; its contents are what matter.
+        // oxlint-disable-next-line react-hooks/exhaustive-deps
+        [columnsKey]
+    );
+
+    return React.useSyncExternalStore(selectStore.subscribe, getKey, getKey);
 }
 
 function useTableSearch(): TableSearchContextValue {
