@@ -1,0 +1,13 @@
+[    2603ms] [ERROR] Access to fetch at 'https://gitbook-open-v2-preview.gitbook.workers.dev/url/gitbook.gitbook.io/test-gitbook-open/~gitbook/__evt?o=d8f63b60-89ae-11e7-8574-5927d48c4877&s=site_IxAYj' from origin 'https://d23dcb9e-gitbook-open-v2-preview.gitbook.workers.dev' has been blocked by CORS policy: Response to preflight request doesn't pass access control check: No 'Access-Control-Allow-Origin' header is present on the requested resource. @ https://d23dcb9e-gitbook-open-v2-preview.gitbook.workers.dev/url/gitbook.gitbook.io/test-gitbook-open/text-page?ads_preview=1:0
+[    2603ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://gitbook-open-v2-preview.gitbook.workers.dev/url/gitbook.gitbook.io/test-gitbook-open/~gitbook/__evt?o=d8f63b60-89ae-11e7-8574-5927d48c4877&s=site_IxAYj:0
+[    2603ms] [ERROR] Error sending events TypeError: Failed to fetch
+    at https://d23dcb9e-gitbook-open-v2-preview.gitbook.workers.dev/_next/static/chunks/8925-9b8fc82cfec24a6f.js:1:111131
+    at Object.current (https://d23dcb9e-gitbook-open-v2-preview.gitbook.workers.dev/_next/static/chunks/8925-9b8fc82cfec24a6f.js:1:111297)
+    at https://d23dcb9e-gitbook-open-v2-preview.gitbook.workers.dev/_next/static/chunks/9246-e94ba41367672d6f.js:1:57920
+    at https://d23dcb9e-gitbook-open-v2-preview.gitbook.workers.dev/_next/static/chunks/8925-9b8fc82cfec24a6f.js:1:111384
+    at iE (https://d23dcb9e-gitbook-open-v2-preview.gitbook.workers.dev/_next/static/chunks/87c73c54-73ce2ea4103519fc.js:1:93235)
+    at ub (https://d23dcb9e-gitbook-open-v2-preview.gitbook.workers.dev/_next/static/chunks/87c73c54-73ce2ea4103519fc.js:1:117377)
+    at uy (https://d23dcb9e-gitbook-open-v2-preview.gitbook.workers.dev/_next/static/chunks/87c73c54-73ce2ea4103519fc.js:1:117039)
+    at ub (https://d23dcb9e-gitbook-open-v2-preview.gitbook.workers.dev/_next/static/chunks/87c73c54-73ce2ea4103519fc.js:1:117357)
+    at uy (https://d23dcb9e-gitbook-open-v2-preview.gitbook.workers.dev/_next/static/chunks/87c73c54-73ce2ea4103519fc.js:1:117039)
+    at ub (https://d23dcb9e-gitbook-open-v2-preview.gitbook.workers.dev/_next/static/chunks/87c73c54-73ce2ea4103519fc.js:1:117422) @ https://d23dcb9e-gitbook-open-v2-preview.gitbook.workers.dev/_next/static/chunks/8925-9b8fc82cfec24a6f.js:0
