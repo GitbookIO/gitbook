@@ -11,6 +11,7 @@ export const de: TranslationLanguage = {
     switch_to_system_theme: 'Zum Systemmodus wechseln',
     search: 'Suche',
     clear: 'Löschen',
+    table_filtered_by_selection: 'Gefiltert nach ${1}',
     tags: 'Tags',
     search_back: 'Zurück zu den Suchergebnissen',
     search_or_ask: 'Fragen oder Suchen',

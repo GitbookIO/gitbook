@@ -11,6 +11,7 @@ export const da: TranslationLanguage = {
     switch_to_system_theme: 'Skift til systemtema',
     search: 'Søg',
     clear: 'Ryd',
+    table_filtered_by_selection: 'Filtreret til ${1}',
     tags: 'Tags',
     search_back: 'Tilbage til søgeresultater',
     search_or_ask: 'Spørg eller søg',

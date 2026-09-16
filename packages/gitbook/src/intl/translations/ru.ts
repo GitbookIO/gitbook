@@ -11,6 +11,7 @@ export const ru: TranslationLanguage = {
     switch_to_system_theme: 'Переключиться на системную тему',
     search: 'Поиск',
     clear: 'Очистить',
+    table_filtered_by_selection: 'Отфильтровано по ${1}',
     tags: 'Теги',
     search_back: 'Вернуться к результатам поиска',
     search_or_ask: 'Найти или спросить',

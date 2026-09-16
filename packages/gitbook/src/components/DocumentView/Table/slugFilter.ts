@@ -1,8 +1,17 @@
 import type { TableSelectColumn } from './search';
 import { slugifySelectValue } from '@/lib/select';
 
-/** The option value each select column is pointed at by the reader's selection, keyed by column id. */
-export type SlugFilter = Record<string, string>;
+/** One select column narrowed by the reader's content selection. */
+export interface SlugFilterEntry {
+    /** Id of the select column being narrowed. */
+    column: string;
+    /** The option's opaque value, which the record matcher compares against. */
+    value: string;
+    /** The option's author-typed label, shown to the reader. */
+    label: string;
+    /** The active slug that narrowed the column, so the reader can clear it again. */
+    slug: string;
+}
 
 /**
  * The `select` slug an option answers to.
@@ -24,11 +33,14 @@ function getOptionSlug(option: { value: string; label: string }): string {
  * Status column alone. Where several of a column's options are active at once, the most recently
  * activated wins — the same rule tabs resolve with, so a table and the tabs beside it agree.
  */
-export function resolveSlugFilter(columns: TableSelectColumn[], slugs: string[]): SlugFilter {
-    const filter: SlugFilter = {};
+export function resolveSlugFilter(
+    columns: TableSelectColumn[],
+    slugs: string[]
+): SlugFilterEntry[] {
+    const entries: SlugFilterEntry[] = [];
 
     for (const column of columns) {
-        let best: string | undefined;
+        let best: SlugFilterEntry | undefined;
         let bestRank = Number.POSITIVE_INFINITY;
 
         for (const option of column.options) {
@@ -40,22 +52,27 @@ export function resolveSlugFilter(columns: TableSelectColumn[], slugs: string[])
             const rank = slugs.indexOf(slug);
             if (rank >= 0 && rank < bestRank) {
                 bestRank = rank;
-                best = option.value;
+                best = {
+                    column: column.id,
+                    value: option.value,
+                    label: option.label || option.value,
+                    slug,
+                };
             }
         }
 
         if (best) {
-            filter[column.id] = best;
+            entries.push(best);
         }
     }
 
-    return filter;
+    return entries;
 }
 
-/** Stable identity for a filter, so an effect only re-runs when the selection actually moves. */
-export function slugFilterKey(filter: SlugFilter): string {
-    return Object.entries(filter)
-        .sort(([a], [b]) => a.localeCompare(b))
-        .map(([column, value]) => `${column}=${value}`)
+/** Stable identity for a filter, so it is only rebuilt when the selection actually moves. */
+export function slugFilterKey(entries: SlugFilterEntry[]): string {
+    return entries
+        .map((entry) => `${entry.column}=${entry.value}`)
+        .sort()
         .join(',');
 }

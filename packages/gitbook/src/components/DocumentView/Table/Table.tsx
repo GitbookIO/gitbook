@@ -15,7 +15,12 @@ import {
 } from './search';
 import { shouldShowTableSearch } from './shouldShowSearch';
 import { StickyViewGrid } from './StickyViewGrid';
-import { TableSearchEmpty, TableSearchInput, TableSearchProvider } from './TableSearch';
+import {
+    TableSearchEmpty,
+    TableSearchInput,
+    TableSearchProvider,
+    TableSelectionFilter,
+} from './TableSearch';
 import { ViewCards } from './ViewCards';
 import { ViewGrid, ViewGridHeader } from './ViewGrid';
 import { tcls } from '@/lib/tailwind';
@@ -76,6 +81,7 @@ export function Table(props: BlockProps<DocumentBlockTable>) {
                         checkboxColumns={getTableCheckboxColumns(block)}
                     />
                 ) : null}
+                <TableSelectionFilter />
                 <TableView
                     {...props}
                     isOffscreen={isOffscreen}

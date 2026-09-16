@@ -11,6 +11,7 @@ export const hi: TranslationLanguage = {
     switch_to_system_theme: 'सिस्टम थीम पर जाएं',
     search: 'खोजें',
     clear: 'साफ करें',
+    table_filtered_by_selection: '${1} पर फ़िल्टर किया गया',
     tags: 'टैग',
     search_back: 'खोज परिणामों पर वापस जाएं',
     search_or_ask: 'पूछें या खोजें',

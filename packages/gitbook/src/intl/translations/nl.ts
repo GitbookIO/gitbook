@@ -11,6 +11,7 @@ export const nl: TranslationLanguage = {
     switch_to_system_theme: 'Schakel over naar systeemmodus',
     search: 'Zoeken',
     clear: 'Wissen',
+    table_filtered_by_selection: 'Gefilterd op ${1}',
     tags: 'Tags',
     search_back: 'Terug naar zoekresultaten',
     search_or_ask: 'Zoek of vraag',

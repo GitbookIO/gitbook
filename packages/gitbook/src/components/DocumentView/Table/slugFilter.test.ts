@@ -34,26 +34,32 @@ describe('resolveSlugFilter', () => {
     const status = column('status', ['Done', 'To do']);
 
     it('matches the option label, and resolves to its opaque value', () => {
-        expect(resolveSlugFilter([platform], ['macos'])).toEqual({
-            platform: valueOf(platform, 'macOS'),
-        });
+        expect(resolveSlugFilter([platform], ['macos'])).toEqual([
+            {
+                column: 'platform',
+                value: valueOf(platform, 'macOS'),
+                label: 'macOS',
+                slug: 'macos',
+            },
+        ]);
+    });
+
+    it('carries the label and slug needed to show and clear the filter', () => {
+        // The reader is told what narrowed the table, and the slug is what clearing deactivates.
+        const [entry] = resolveSlugFilter([platform], ['windows']);
+        expect(entry?.label).toBe('Windows');
+        expect(entry?.slug).toBe('windows');
     });
 
     it('never matches the opaque value itself', () => {
-        expect(resolveSlugFilter([platform], [valueOf(platform, 'macOS')])).toEqual({});
+        expect(resolveSlugFilter([platform], [valueOf(platform, 'macOS')])).toEqual([]);
     });
 
     it('slugifies the label the way every other select surface does', () => {
         const languages = column('language', ['Node.js', 'C++', 'Windows 10']);
-        expect(resolveSlugFilter([languages], ['node.js'])).toEqual({
-            language: valueOf(languages, 'Node.js'),
-        });
-        expect(resolveSlugFilter([languages], ['c++'])).toEqual({
-            language: valueOf(languages, 'C++'),
-        });
-        expect(resolveSlugFilter([languages], ['windows-10'])).toEqual({
-            language: valueOf(languages, 'Windows 10'),
-        });
+        expect(resolveSlugFilter([languages], ['node.js'])[0]?.label).toBe('Node.js');
+        expect(resolveSlugFilter([languages], ['c++'])[0]?.label).toBe('C++');
+        expect(resolveSlugFilter([languages], ['windows-10'])[0]?.label).toBe('Windows 10');
     });
 
     it('falls back to the value when an option has no label', () => {
@@ -62,51 +68,62 @@ describe('resolveSlugFilter', () => {
             label: 'legacy',
             options: [{ value: 'macos', label: '', color: 'blue' }],
         };
-        expect(resolveSlugFilter([legacy], ['macos'])).toEqual({ legacy: 'macos' });
+        expect(resolveSlugFilter([legacy], ['macos'])).toEqual([
+            { column: 'legacy', value: 'macos', label: 'macos', slug: 'macos' },
+        ]);
     });
 
     it('leaves a column the selection says nothing about', () => {
-        expect(resolveSlugFilter([platform, status], ['macos'])).toEqual({
-            platform: valueOf(platform, 'macOS'),
-        });
+        const entries = resolveSlugFilter([platform, status], ['macos']);
+        expect(entries.map((entry) => entry.column)).toEqual(['platform']);
     });
 
     it('narrows several columns at once when the selection covers both', () => {
-        expect(resolveSlugFilter([platform, status], ['macos', 'done'])).toEqual({
-            platform: valueOf(platform, 'macOS'),
-            status: valueOf(status, 'Done'),
-        });
+        const entries = resolveSlugFilter([platform, status], ['macos', 'done']);
+        expect(entries.map((entry) => entry.value)).toEqual([
+            valueOf(platform, 'macOS'),
+            valueOf(status, 'Done'),
+        ]);
     });
 
     it('takes the most recently activated when a column offers several active options', () => {
         // Most-recent-first, so `windows` wins over `macos` — the rule tabs resolve with.
-        expect(resolveSlugFilter([platform], ['windows', 'macos'])).toEqual({
-            platform: valueOf(platform, 'Windows'),
-        });
-        expect(resolveSlugFilter([platform], ['macos', 'windows'])).toEqual({
-            platform: valueOf(platform, 'macOS'),
-        });
+        expect(resolveSlugFilter([platform], ['windows', 'macos'])[0]?.value).toBe(
+            valueOf(platform, 'Windows')
+        );
+        expect(resolveSlugFilter([platform], ['macos', 'windows'])[0]?.value).toBe(
+            valueOf(platform, 'macOS')
+        );
     });
 
     it('filters nothing when the selection matches no column', () => {
-        expect(resolveSlugFilter([platform, status], ['python'])).toEqual({});
-        expect(resolveSlugFilter([platform], [])).toEqual({});
-        expect(resolveSlugFilter([], ['macos'])).toEqual({});
+        expect(resolveSlugFilter([platform, status], ['python'])).toEqual([]);
+        expect(resolveSlugFilter([platform], [])).toEqual([]);
+        expect(resolveSlugFilter([], ['macos'])).toEqual([]);
     });
 });
 
 describe('slugFilterKey', () => {
+    const entry = (column: string, value: string) => ({
+        column,
+        value,
+        label: value,
+        slug: value,
+    });
+
     it('is stable whatever order the columns resolve in', () => {
-        expect(slugFilterKey({ platform: 'macos', status: 'done' })).toBe(
-            slugFilterKey({ status: 'done', platform: 'macos' })
+        expect(slugFilterKey([entry('platform', 'macos'), entry('status', 'done')])).toBe(
+            slugFilterKey([entry('status', 'done'), entry('platform', 'macos')])
         );
     });
 
     it('changes when the selection moves', () => {
-        expect(slugFilterKey({ platform: 'macos' })).not.toBe(slugFilterKey({ platform: 'linux' }));
+        expect(slugFilterKey([entry('platform', 'macos')])).not.toBe(
+            slugFilterKey([entry('platform', 'linux')])
+        );
     });
 
     it('is empty when nothing is filtered', () => {
-        expect(slugFilterKey({})).toBe('');
+        expect(slugFilterKey([])).toBe('');
     });
 });

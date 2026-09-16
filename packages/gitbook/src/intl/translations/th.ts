@@ -11,6 +11,7 @@ export const th: TranslationLanguage = {
     switch_to_system_theme: 'เปลี่ยนเป็นธีมของระบบ',
     search: 'ค้นหา',
     clear: 'ล้าง',
+    table_filtered_by_selection: 'กรองเป็น ${1}',
     tags: 'แท็ก',
     search_back: 'กลับไปยังผลการค้นหา',
     search_or_ask: 'ถามหรือค้นหา',

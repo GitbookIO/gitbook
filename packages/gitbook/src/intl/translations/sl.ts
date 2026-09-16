@@ -11,6 +11,7 @@ export const sl: TranslationLanguage = {
     switch_to_system_theme: 'Preklopi na sistemsko temo',
     search: 'Išči',
     clear: 'Počisti',
+    table_filtered_by_selection: 'Filtrirano na ${1}',
     tags: 'Oznake',
     search_back: 'Nazaj na rezultate iskanja',
     search_or_ask: 'Vprašaj ali išči',

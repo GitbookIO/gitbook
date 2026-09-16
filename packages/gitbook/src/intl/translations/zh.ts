@@ -11,6 +11,7 @@ export const zh: TranslationLanguage = {
     switch_to_system_theme: '切换到系统主题',
     search: '搜索',
     clear: '清除',
+    table_filtered_by_selection: '已筛选为 ${1}',
     tags: '标签',
     search_back: '返回搜索结果',
     search_or_ask: '询问或搜索',

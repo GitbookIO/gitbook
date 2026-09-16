@@ -11,6 +11,7 @@ export const el: TranslationLanguage = {
     switch_to_system_theme: 'Αλλαγή στο θέμα συστήματος',
     search: 'Αναζήτηση',
     clear: 'Εκκαθάριση',
+    table_filtered_by_selection: 'Φιλτραρισμένο σε ${1}',
     tags: 'Ετικέτες',
     search_back: 'Επιστροφή στα αποτελέσματα αναζήτησης',
     search_or_ask: 'Ρωτήστε ή αναζητήστε',

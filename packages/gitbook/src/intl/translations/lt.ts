@@ -11,6 +11,7 @@ export const lt: TranslationLanguage = {
     switch_to_system_theme: 'Perjungti į sistemos temą',
     search: 'Ieškoti',
     clear: 'Išvalyti',
+    table_filtered_by_selection: 'Filtruota pagal ${1}',
     tags: 'Žymos',
     search_back: 'Grįžti į paieškos rezultatus',
     search_or_ask: 'Klausti arba ieškoti',

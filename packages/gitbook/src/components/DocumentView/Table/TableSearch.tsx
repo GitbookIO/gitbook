@@ -10,7 +10,7 @@ import {
     type TableSearchRecordData,
     getVisibleTableRecordIds,
 } from './searchMatch';
-import { type SlugFilter, resolveSlugFilter, slugFilterKey } from './slugFilter';
+import { type SlugFilterEntry, resolveSlugFilter, slugFilterKey } from './slugFilter';
 import { Button, Checkbox, DropdownMenu, DropdownMenuItem, Input } from '@/components/primitives';
 import { tString, useLanguage } from '@/intl/client';
 import { selectStore } from '@/lib/select';
@@ -39,6 +39,10 @@ type TableSearchContextValue = {
     visibleIds: ReadonlySet<string> | null;
     /** True when there are records but the active filters match none of them. */
     isEmpty: boolean;
+    /** Select columns currently narrowed by the reader's content selection. */
+    slugFilter: SlugFilterEntry[];
+    /** Drop the selection driving {@link slugFilter}, site-wide. */
+    clearSlugFilter: () => void;
 };
 
 const TableSearchContext = React.createContext<TableSearchContextValue | null>(null);
@@ -96,15 +100,36 @@ export function TableSearchProvider(props: {
     // can still change the filter afterwards; the next activation drives it again.
     const slugFilter = useSlugFilter(selectColumns);
 
+    // Columns the selection narrowed last time round. Kept so a new selection — or clearing it —
+    // undoes the previous one, rather than leaving a filter the reader can no longer account for.
+    const narrowedColumns = React.useRef<string[]>([]);
+
     React.useEffect(() => {
-        const entries = Object.entries(slugFilter);
-        if (entries.length === 0) {
-            return;
+        setSelectedOptions((previous) => {
+            if (narrowedColumns.current.length === 0 && slugFilter.length === 0) {
+                return previous;
+            }
+
+            const next = { ...previous };
+            for (const column of narrowedColumns.current) {
+                delete next[column];
+            }
+            for (const entry of slugFilter) {
+                next[entry.column] = new Set([entry.value]);
+            }
+
+            narrowedColumns.current = slugFilter.map((entry) => entry.column);
+            return next;
+        });
+    }, [slugFilter]);
+
+    // Clearing goes through the store rather than local state: the selection is what persists, so
+    // only dropping it there stops the filter coming back on the next load. It is site-wide, so a
+    // tab elsewhere on the page reverts to its default too.
+    const clearSlugFilter = React.useCallback(() => {
+        for (const entry of slugFilter) {
+            selectStore.deactivate(entry.slug);
         }
-        setSelectedOptions((previous) => ({
-            ...previous,
-            ...Object.fromEntries(entries.map(([column, value]) => [column, new Set([value])])),
-        }));
     }, [slugFilter]);
 
     // Match every record once, here, rather than in each row — rows just look themselves up by id.
@@ -132,8 +157,20 @@ export function TableSearchProvider(props: {
             toggleCheckbox,
             visibleIds,
             isEmpty,
+            slugFilter,
+            clearSlugFilter,
         }),
-        [query, selectedOptions, toggleOption, checkedColumns, toggleCheckbox, visibleIds, isEmpty]
+        [
+            query,
+            selectedOptions,
+            toggleOption,
+            checkedColumns,
+            toggleCheckbox,
+            visibleIds,
+            isEmpty,
+            slugFilter,
+            clearSlugFilter,
+        ]
     );
 
     return (
@@ -149,7 +186,7 @@ export function TableSearchProvider(props: {
  * changes nothing for this table re-renders nothing — the reason `useSelect` stopped exposing the
  * recency list in the first place.
  */
-function useSlugFilter(selectColumns: TableSelectColumn[]): SlugFilter {
+function useSlugFilter(selectColumns: TableSelectColumn[]): SlugFilterEntry[] {
     const columnsKey = selectColumns
         .map(
             (column) =>
@@ -243,6 +280,43 @@ export function TableSearchEmpty(props: { className?: ClassValue }) {
             {trimmed
                 ? tString(language, 'search_no_results_for', trimmed)
                 : tString(language, 'search_no_results')}
+        </div>
+    );
+}
+
+/**
+ * Tells the reader that their content selection has narrowed this table, and lets them undo it.
+ *
+ * Rendered independently of the search bar. `shouldShowTableSearch` leaves the filter controls off
+ * cards, off grids below the row threshold, and off any table whose author turned search off — and
+ * in every one of those a narrowed table would otherwise just read as missing rows.
+ */
+export function TableSelectionFilter(props: { className?: ClassValue }) {
+    const language = useLanguage();
+    const { slugFilter, clearSlugFilter } = useTableSearch();
+
+    if (slugFilter.length === 0) {
+        return null;
+    }
+
+    return (
+        <div
+            className={tcls('flex flex-wrap items-center gap-2 text-sm text-tint', props.className)}
+        >
+            <Icon icon="filter" className="size-3 shrink-0" />
+            <span>
+                {tString(
+                    language,
+                    'table_filtered_by_selection',
+                    slugFilter.map((entry) => entry.label).join(', ')
+                )}
+            </span>
+            <Button
+                variant="blank"
+                size="xsmall"
+                label={tString(language, 'clear')}
+                onClick={clearSlugFilter}
+            />
         </div>
     );
 }

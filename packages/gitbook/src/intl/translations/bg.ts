@@ -11,6 +11,7 @@ export const bg: TranslationLanguage = {
     switch_to_system_theme: 'Превключване към системната тема',
     search: 'Търсене',
     clear: 'Изчистване',
+    table_filtered_by_selection: 'Филтрирано по ${1}',
     tags: 'Етикети',
     search_back: 'Назад към резултатите от търсенето',
     search_or_ask: 'Попитайте или търсете',
