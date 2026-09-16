@@ -34,7 +34,7 @@ import {
     normalizeRequestURL,
     throwIfDataError,
 } from '@/lib/data';
-import { isGitBookAssetsHostURL, isGitBookHostURL } from '@/lib/env';
+import { GITBOOK_DISABLE_INSIGHTS, isGitBookAssetsHostURL, isGitBookHostURL } from '@/lib/env';
 import { getImageResizingContextId } from '@/lib/images';
 import { isAITrainingOrIndexingRequest } from '@/lib/indexing-crawlers';
 import { MiddlewareHeaders } from '@/lib/middleware';
@@ -185,6 +185,9 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
 
     //Forwards analytics events
     if (siteRequestURL.pathname.endsWith('/~gitbook/__evt')) {
+        if (GITBOOK_DISABLE_INSIGHTS) {
+            return new Response(null, { status: 204 });
+        }
         return await serveProxyAnalyticsEvent(request);
     }
 
