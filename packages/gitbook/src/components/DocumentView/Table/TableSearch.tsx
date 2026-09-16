@@ -10,7 +10,7 @@ import {
     type TableSearchRecordData,
     getVisibleTableRecordIds,
 } from './searchMatch';
-import { resolveSlugFilter, slugFilterKey } from './slugFilter';
+import { type SlugFilter, resolveSlugFilter, slugFilterKey } from './slugFilter';
 import { Button, Checkbox, DropdownMenu, DropdownMenuItem, Input } from '@/components/primitives';
 import { tString, useLanguage } from '@/intl/client';
 import { selectStore } from '@/lib/select';
@@ -94,22 +94,18 @@ export function TableSearchProvider(props: {
     // The selection that drives this lives outside the table — a tab, a select button or a picker
     // elsewhere on the page — so this synchronises with it rather than deriving from it. A reader
     // can still change the filter afterwards; the next activation drives it again.
-    const filterKey = useSlugFilterKey(selectColumns);
+    const slugFilter = useSlugFilter(selectColumns);
 
     React.useEffect(() => {
-        if (!filterKey) {
+        const entries = Object.entries(slugFilter);
+        if (entries.length === 0) {
             return;
         }
         setSelectedOptions((previous) => ({
             ...previous,
-            ...Object.fromEntries(
-                filterKey.split(',').map((entry) => {
-                    const [column, value] = entry.split('=');
-                    return [column, new Set([value])];
-                })
-            ),
+            ...Object.fromEntries(entries.map(([column, value]) => [column, new Set([value])])),
         }));
-    }, [filterKey]);
+    }, [slugFilter]);
 
     // Match every record once, here, rather than in each row — rows just look themselves up by id.
     const visibleIds = React.useMemo(
@@ -153,9 +149,12 @@ export function TableSearchProvider(props: {
  * changes nothing for this table re-renders nothing — the reason `useSelect` stopped exposing the
  * recency list in the first place.
  */
-function useSlugFilterKey(selectColumns: TableSelectColumn[]): string {
+function useSlugFilter(selectColumns: TableSelectColumn[]): SlugFilter {
     const columnsKey = selectColumns
-        .map((column) => `${column.id}:${column.options.map((option) => option.value).join('|')}`)
+        .map(
+            (column) =>
+                `${column.id}:${column.options.map((option) => `${option.value}=${option.label}`).join('|')}`
+        )
         .join(';');
 
     const getKey = React.useCallback(
@@ -165,7 +164,15 @@ function useSlugFilterKey(selectColumns: TableSelectColumn[]): string {
         [columnsKey]
     );
 
-    return React.useSyncExternalStore(selectStore.subscribe, getKey, getKey);
+    const filterKey = React.useSyncExternalStore(selectStore.subscribe, getKey, getKey);
+
+    // The key is only an identity: rebuild the filter itself when it moves, rather than parsing the
+    // key back apart, since an option value can be any string an import gave it.
+    return React.useMemo(
+        () => resolveSlugFilter(selectColumns, selectStore.getState().slugs),
+        // oxlint-disable-next-line react-hooks/exhaustive-deps
+        [filterKey]
+    );
 }
 
 function useTableSearch(): TableSearchContextValue {

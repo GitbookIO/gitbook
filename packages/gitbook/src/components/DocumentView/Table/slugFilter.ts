@@ -1,7 +1,20 @@
 import type { TableSelectColumn } from './search';
+import { slugifySelectValue } from '@/lib/select';
 
 /** The option value each select column is pointed at by the reader's selection, keyed by column id. */
 export type SlugFilter = Record<string, string>;
+
+/**
+ * The `select` slug an option answers to.
+ *
+ * A table option's `value` is an opaque generated key, so it is the author-typed `label` that names
+ * it — the same wording a tab title or select button would carry, put through the same slugifier so
+ * a "macOS" column option and a "macOS" tab resolve to the one slug. Options with no label fall back
+ * to the raw value, mirroring how a cell renders one.
+ */
+function getOptionSlug(option: { value: string; label: string }): string {
+    return slugifySelectValue(option.label || option.value);
+}
 
 /**
  * Work out which option of each select column the reader's current selection points at.
@@ -19,7 +32,12 @@ export function resolveSlugFilter(columns: TableSelectColumn[], slugs: string[])
         let bestRank = Number.POSITIVE_INFINITY;
 
         for (const option of column.options) {
-            const rank = slugs.indexOf(option.value);
+            const slug = getOptionSlug(option);
+            if (!slug) {
+                continue;
+            }
+
+            const rank = slugs.indexOf(slug);
             if (rank >= 0 && rank < bestRank) {
                 bestRank = rank;
                 best = option.value;
