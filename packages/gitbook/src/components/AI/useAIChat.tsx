@@ -13,12 +13,13 @@ import {
     SiteInsightsDisplayContext,
 } from '@gitbook/api';
 
+import { useAIChatWidthStore } from '../AIChat/useAIChatWidthStore';
 import { getInsightsSession, useTrackEvent } from '../Insights';
 import { type UpdateSearchState, useSetSearchState } from '../Search';
 import { addRecentSearchQuery } from '../Search/recent-queries';
 import type { AnyAIControl } from './controls';
 import { ConfirmControlDef, ConfirmControlOutputSchema } from './controls/ConfirmControl';
-import { setIntercomLauncherHidden } from './intercom';
+import { setIntercomLauncherPadding } from './intercom';
 import { type AIChatReference, serializeReferences } from './references';
 import { type RenderAIMessageOptions, streamAIChatResponse } from './server-actions';
 import { getTools } from './tools';
@@ -35,6 +36,18 @@ import { useLanguage } from '@/intl/client';
 import { tString } from '@/intl/translate';
 
 const noopSetSearchState: UpdateSearchState = () => Promise.resolve(new URLSearchParams());
+const AI_CHAT_DEFAULT_WIDTH = 384;
+
+function getAIChatWidth(): number {
+    if (typeof document === 'undefined') {
+        return AI_CHAT_DEFAULT_WIDTH;
+    }
+
+    const width = Number.parseFloat(
+        getComputedStyle(document.documentElement).getPropertyValue('--ai-chat-width')
+    );
+    return Number.isFinite(width) ? width : AI_CHAT_DEFAULT_WIDTH;
+}
 
 export type AIChatMessage = {
     role: AIMessageRole;
@@ -242,6 +255,8 @@ export function AIChatProvider(props: {
     const setSearchStateInURL = useSetSearchState();
     const { siteSpaceId } = useCurrentContent();
     const language = useLanguage();
+    const chatOpened = zustand.useStore(globalState, (state) => state.opened);
+    const chatWidth = useAIChatWidthStore((state) => state.width);
 
     const displayContext = renderMessageOptions?.asEmbeddable
         ? SiteInsightsDisplayContext.Embed
@@ -304,7 +319,7 @@ export function AIChatProvider(props: {
 
     // Open AI chat and sync with search state
     const onOpen = React.useCallback(() => {
-        setIntercomLauncherHidden(true);
+        setIntercomLauncherPadding(getAIChatWidth());
 
         const { initialQuery } = globalState.getState();
         globalState.setState((state) => ({ ...state, opened: true }));
@@ -322,7 +337,7 @@ export function AIChatProvider(props: {
 
     // Close AI chat and clear ask parameter
     const onClose = React.useCallback(() => {
-        setIntercomLauncherHidden(false);
+        setIntercomLauncherPadding(0);
 
         globalState.setState((state) => ({ ...state, opened: false }));
 
@@ -336,6 +351,36 @@ export function AIChatProvider(props: {
 
         notify(eventsRef.current.get('close'), {});
     }, [setSearchState]);
+
+    // Keep the launcher clear of the panel while its width changes.
+    React.useEffect(() => {
+        if (!chatOpened) {
+            return;
+        }
+
+        const updateLauncherPadding = () => {
+            setIntercomLauncherPadding(getAIChatWidth());
+        };
+        let frame: number | null = null;
+        const onViewportResize = () => {
+            if (frame !== null) {
+                window.cancelAnimationFrame(frame);
+            }
+            frame = window.requestAnimationFrame(() => {
+                frame = null;
+                updateLauncherPadding();
+            });
+        };
+
+        updateLauncherPadding();
+        window.addEventListener('resize', onViewportResize);
+        return () => {
+            window.removeEventListener('resize', onViewportResize);
+            if (frame !== null) {
+                window.cancelAnimationFrame(frame);
+            }
+        };
+    }, [chatOpened, chatWidth]);
 
     // Lets `streamResponse` flush a queued follow-up via `onPostMessage`, which is defined later.
     const postMessageRef = React.useRef<((input: { message: string }) => void) | null>(null);

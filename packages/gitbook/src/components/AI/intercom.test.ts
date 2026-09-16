@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from 'bun:test';
 
-import { setIntercomLauncherHidden } from './intercom';
+import { setIntercomLauncherPadding } from './intercom';
 
 const originalWindow = globalThis.window;
 
@@ -20,26 +20,17 @@ function installIntercom(intercom: Window['Intercom']): void {
     });
 }
 
-describe('setIntercomLauncherHidden', () => {
-    it('hides the Intercom launcher', () => {
+describe('setIntercomLauncherPadding', () => {
+    it('sets the Intercom launcher horizontal padding', () => {
         const calls: unknown[][] = [];
         installIntercom((...args) => calls.push(args));
 
-        setIntercomLauncherHidden(true);
+        setIntercomLauncherPadding(384);
 
-        expect(calls).toEqual([['update', { hide_default_launcher: true }]]);
-    });
-
-    it('shows the Intercom launcher', () => {
-        const calls: unknown[][] = [];
-        installIntercom((...args) => calls.push(args));
-
-        setIntercomLauncherHidden(false);
-
-        expect(calls).toEqual([['update', { hide_default_launcher: false }]]);
+        expect(calls).toEqual([['update', { horizontal_padding: 384 }]]);
     });
 
     it('does nothing when Intercom is unavailable', () => {
-        expect(() => setIntercomLauncherHidden(true)).not.toThrow();
+        expect(() => setIntercomLauncherPadding(384)).not.toThrow();
     });
 });
