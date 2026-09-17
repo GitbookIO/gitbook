@@ -16,17 +16,9 @@ import { SearchInput } from './SearchInput';
 import { SearchLiveResultsAnnouncer } from './SearchLiveResultsAnnouncer';
 import { SearchScopeControl } from './SearchScopeControl';
 import { useSearchController } from './useSearchController';
+import { useSearchPopupFocusTrap } from './useSearchPopupFocusTrap';
 import { t, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
-
-const SEARCH_POPUP_FOCUSABLE_SELECTOR = [
-    'a[href]:not([aria-disabled="true"])',
-    'button:not([disabled])',
-    'input:not([disabled])',
-    'select:not([disabled])',
-    'textarea:not([disabled])',
-    '[tabindex]:not([tabindex="-1"])',
-].join(',');
 
 const SearchFrame = dynamic(() => import('./SearchFrame').then((mod) => mod.SearchFrame), {
     ssr: false,
@@ -144,54 +136,7 @@ export function SearchContainer({
         ? Boolean(state?.open || state?.query || wasSearchOpened)
         : Boolean(state?.query || withAI);
 
-    React.useEffect(() => {
-        if (
-            usesSideSheet ||
-            !isSearchOpen ||
-            !shouldShowSearchFrame ||
-            !searchInputRef.current ||
-            !searchPopup
-        ) {
-            return;
-        }
-
-        const searchInput = searchInputRef.current.querySelector<HTMLElement>(
-            '[data-testid="search-input"]'
-        );
-        if (!searchInput) {
-            return;
-        }
-
-        const handleKeyDown = (event: KeyboardEvent) => {
-            if (event.key !== 'Tab') {
-                return;
-            }
-
-            const popupControls = Array.from(
-                searchPopup.querySelectorAll<HTMLElement>(SEARCH_POPUP_FOCUSABLE_SELECTOR)
-            ).filter((element) => element.getClientRects().length > 0);
-            const focusableElements = [searchInput, ...popupControls];
-            const currentIndex = focusableElements.indexOf(document.activeElement as HTMLElement);
-            const nextIndex =
-                currentIndex === -1
-                    ? event.shiftKey
-                        ? focusableElements.length - 1
-                        : 0
-                    : event.shiftKey
-                      ? currentIndex - 1
-                      : currentIndex + 1;
-            const wrappedIndex = (nextIndex + focusableElements.length) % focusableElements.length;
-
-            event.preventDefault();
-            focusableElements[wrappedIndex]?.focus();
-        };
-
-        document.addEventListener('keydown', handleKeyDown, true);
-
-        return () => {
-            document.removeEventListener('keydown', handleKeyDown, true);
-        };
-    }, [isSearchOpen, searchPopup, shouldShowSearchFrame, usesSideSheet]);
+    useSearchPopupFocusTrap({ close, searchInputRef, searchPopup, usesSideSheet });
 
     const scopeControlNode =
         searchProps.withVariants || searchProps.withSections ? (
