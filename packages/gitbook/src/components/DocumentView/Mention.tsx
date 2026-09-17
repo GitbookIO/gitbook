@@ -9,6 +9,7 @@ export async function Mention(props: InlineProps<DocumentInlineMention>) {
 
     const resolved = context.contentContext
         ? await resolveContentRefInDocument(document, inline.data.ref, context.contentContext, {
+              resolveGitPageURLs: true,
               resolveAnchorText: true,
           })
         : null;

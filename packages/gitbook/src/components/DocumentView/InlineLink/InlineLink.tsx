@@ -19,6 +19,7 @@ export async function InlineLink(props: InlineProps<DocumentInlineLink>) {
 
     const resolved = context.contentContext
         ? await resolveContentRefInDocument(document, inline.data.ref, context.contentContext, {
+              resolveGitPageURLs: true,
               // We don't want to resolve the anchor text here, as it can be very expensive and will block rendering if there is a lot of anchors link.
               resolveAnchorText: false,
           })
@@ -52,8 +53,8 @@ export async function InlineLink(props: InlineProps<DocumentInlineLink>) {
     const anchorElement = (
         <InlineLinkAnchor
             href={resolved.href}
-            contentRef={inline.data.ref}
-            isExternal={inline.data.ref.kind === 'url'}
+            contentRef={resolved.resolvedRef ?? inline.data.ref}
+            isExternal={(resolved.resolvedRef ?? inline.data.ref).kind === 'url'}
         >
             {inlinesElement}
         </InlineLinkAnchor>
@@ -121,7 +122,7 @@ function InlineLinkTooltipWrapper(props: {
 
     let breadcrumbs = resolved.ancestors ?? [];
     const isMailto = resolved.href.startsWith('mailto:');
-    const isExternal = inline.data.ref.kind === 'url';
+    const isExternal = (resolved.resolvedRef ?? inline.data.ref).kind === 'url';
     const isSamePage = inline.data.ref.kind === 'anchor' && inline.data.ref.page === undefined;
 
     if (isMailto) {

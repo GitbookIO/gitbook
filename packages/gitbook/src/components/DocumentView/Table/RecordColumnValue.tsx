@@ -253,6 +253,7 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
             const resolved =
                 value && context.contentContext
                     ? await resolveContentRefInDocument(document, value, context.contentContext, {
+                          resolveGitPageURLs: true,
                           resolveAnchorText: true,
                           iconStyle: ['mr-2', 'text-tint-subtle'],
                       })

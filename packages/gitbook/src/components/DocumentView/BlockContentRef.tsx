@@ -18,6 +18,7 @@ export async function BlockContentRef(props: BlockProps<DocumentBlockContentRef>
 
     const resolved = context.contentContext
         ? await resolveContentRefInDocument(document, block.data.ref, context.contentContext, {
+              resolveGitPageURLs: true,
               resolveAnchorText: true,
               iconStyle: ['text-xl', 'text-tint'],
           })

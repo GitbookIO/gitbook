@@ -16,12 +16,14 @@ import type { Filesystem } from '@gitbook/openapi-parser';
 
 import { getGitBookAppHref } from './app';
 import { getBlockById, getBlockTitle } from './document';
+import { findGitPageURLTarget, findPageByGitPath } from './gitPageURL';
 import { resolvePageId } from './pages';
 import {
     findSiteSpaceBy,
     getFallbackSiteSpacePath,
     getLinkerForSiteSpace,
     getLocalizedTitle,
+    listAllSiteSpaces,
 } from './sites';
 import { getRevisionTags, resolveTag } from './tags';
 import type { ClassValue } from './tailwind';
@@ -43,6 +45,8 @@ import {
 import { type GitBookLinker, createLinker, linkerWithAbsoluteURLs } from '@/lib/links';
 
 export interface ResolvedContentRef {
+    /** Effective destination when a repository URL resolves to a site page. */
+    resolvedRef?: ContentRef;
     /** Text to render in the content ref */
     text: string;
     /** Additional sub text to render in the content ref */
@@ -80,6 +84,8 @@ export interface ResolvedContentRef {
 }
 
 export interface ResolveContentRefOptions {
+    /** Enable repository-page lookup for navigational links. */
+    resolveGitPageURLs?: boolean;
     /**
      * Should the content ref be rendered as text.
      * @default false
@@ -143,6 +149,66 @@ export async function resolveContentRef(
 
     switch (contentRef.kind) {
         case 'url': {
+            if (options.resolveGitPageURLs && 'site' in context) {
+                const target = findGitPageURLTarget(
+                    contentRef.url,
+                    listAllSiteSpaces(context.structure)
+                        .filter((entry) => !entry.draft)
+                        .map((entry) => entry.space)
+                );
+                if (target) {
+                    try {
+                        // Site CRs must select the target member's revision here instead of main.
+                        const targetContext = await createContextForSpace(
+                            target.space,
+                            context,
+                            true
+                        );
+                        const page =
+                            targetContext &&
+                            findPageByGitPath(
+                                targetContext.spaceContext.revision.pages,
+                                target.path
+                            );
+                        if (page?.type === 'document' && targetContext) {
+                            const resolvedRef: ContentRef = target.anchor
+                                ? {
+                                      kind: 'anchor',
+                                      space: target.space,
+                                      page: page.id,
+                                      anchor: target.anchor,
+                                  }
+                                : { kind: 'page', space: target.space, page: page.id };
+                            const resolved = await resolveContentRef(
+                                resolvedRef,
+                                targetContext.spaceContext,
+                                options
+                            );
+                            if (resolved) {
+                                const foundSiteSpace = findSiteSpaceBy(
+                                    context.structure,
+                                    (entry) => entry.space.id === target.space
+                                );
+                                return {
+                                    ...resolved,
+                                    resolvedRef,
+                                    ancestors: [
+                                        ...resolvePageAncestors(
+                                            context,
+                                            resolvedRef,
+                                            foundSiteSpace,
+                                            targetContext
+                                        ),
+                                        ...(resolved.ancestors ?? []),
+                                    ],
+                                };
+                            }
+                        }
+                    } catch {
+                        // An unavailable or forbidden target must not prevent rendering the source page.
+                    }
+                }
+            }
             return {
                 href: contentRef.url,
                 text: contentRef.url,
@@ -627,7 +693,8 @@ async function resolveContentRefInSpace(
  */
 async function createContextForSpace(
     spaceId: string,
-    context: GitBookAnyContext
+    context: GitBookAnyContext,
+    revisionMetadata = false
 ): Promise<{
     spaceContext: GitBookSpaceContext;
     baseURL: URL;
@@ -639,6 +706,7 @@ async function createContextForSpace(
                 shareKey: context?.shareKey,
                 changeRequest: undefined,
                 revision: undefined,
+                revisionMetadata,
             })
         ),
         getBestTargetSpace(context, spaceId),
