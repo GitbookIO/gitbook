@@ -1,7 +1,12 @@
 import { describe, expect, it } from 'bun:test';
 
 import type { TableSelectColumn } from './search';
-import { getOptionSlug, resolveSlugFilter, slugFilterKey } from './slugFilter';
+import {
+    getOptionSlug,
+    reconcileSelectedOptions,
+    resolveSlugFilter,
+    slugFilterKey,
+} from './slugFilter';
 
 /**
  * A select column as the editor writes one: each option carries an opaque generated `value` and the
@@ -110,6 +115,53 @@ describe('getOptionSlug', () => {
         expect(getOptionSlug({ value: 'key-0', label: 'macOS' })).toBe('macos');
         expect(getOptionSlug({ value: 'key-1', label: 'Windows 10' })).toBe('windows-10');
         expect(getOptionSlug({ value: 'macos', label: '' })).toBe('macos');
+    });
+});
+
+describe('reconcileSelectedOptions', () => {
+    const entry = (column: string, value: string) => ({
+        column,
+        value,
+        label: value,
+        slug: value,
+    });
+
+    it('drops the column when the selection is cleared', () => {
+        const previous = { platform: new Set(['macos-value']) };
+        expect(reconcileSelectedOptions(previous, ['platform'], [])).toEqual({});
+    });
+
+    it('leaves filters the reader set themselves', () => {
+        const previous = {
+            platform: new Set(['macos-value']),
+            status: new Set(['done-value']),
+        };
+        expect(reconcileSelectedOptions(previous, ['platform'], [])).toEqual({
+            status: new Set(['done-value']),
+        });
+    });
+
+    it('replaces the previous selection rather than adding to it', () => {
+        const previous = { platform: new Set(['macos-value']) };
+        expect(
+            reconcileSelectedOptions(previous, ['platform'], [entry('platform', 'windows-value')])
+        ).toEqual({ platform: new Set(['windows-value']) });
+    });
+
+    it('gives the same answer however many times it is applied', () => {
+        // React may invoke a state updater more than once with the same input. An earlier version
+        // tracked the narrowed columns inside the updater, so the second pass saw them already
+        // cleared, took the early return and handed back the *unchanged* state — silently undoing
+        // a clear while leaving an apply working, which is exactly how it presented.
+        const previous = { platform: new Set(['macos-value']) };
+        const once = reconcileSelectedOptions(previous, ['platform'], []);
+        const twice = reconcileSelectedOptions(previous, ['platform'], []);
+        expect(twice).toEqual(once);
+    });
+
+    it('is a no-op when there is nothing to narrow and nothing to undo', () => {
+        const previous = { status: new Set(['done-value']) };
+        expect(reconcileSelectedOptions(previous, [], [])).toBe(previous);
     });
 });
 

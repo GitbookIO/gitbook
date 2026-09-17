@@ -13,6 +13,7 @@ import {
 import {
     type SlugFilterEntry,
     getOptionSlug,
+    reconcileSelectedOptions,
     resolveSlugFilter,
     slugFilterKey,
 } from './slugFilter';
@@ -146,22 +147,12 @@ export function TableSearchProvider(props: {
     }, []);
 
     React.useEffect(() => {
-        setSelectedOptions((previous) => {
-            if (narrowedColumns.current.length === 0 && slugFilter.length === 0) {
-                return previous;
-            }
+        const previouslyNarrowed = narrowedColumns.current;
+        narrowedColumns.current = slugFilter.map((entry) => entry.column);
 
-            const next = { ...previous };
-            for (const column of narrowedColumns.current) {
-                delete next[column];
-            }
-            for (const entry of slugFilter) {
-                next[entry.column] = new Set([entry.value]);
-            }
-
-            narrowedColumns.current = slugFilter.map((entry) => entry.column);
-            return next;
-        });
+        setSelectedOptions((previous) =>
+            reconcileSelectedOptions(previous, previouslyNarrowed, slugFilter)
+        );
     }, [slugFilter]);
 
     // Clearing goes through the store rather than local state: the selection is what persists, so

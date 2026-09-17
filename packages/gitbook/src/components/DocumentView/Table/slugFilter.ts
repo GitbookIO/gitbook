@@ -1,4 +1,5 @@
 import type { TableSelectColumn } from './search';
+import type { SelectedOptions } from './searchMatch';
 import { slugifySelectValue } from '@/lib/select';
 
 /** One select column narrowed by the reader's content selection. */
@@ -75,4 +76,34 @@ export function slugFilterKey(entries: SlugFilterEntry[]): string {
         .map((entry) => `${entry.column}=${entry.value}`)
         .sort()
         .join(',');
+}
+
+/**
+ * Fold the columns the selection narrows into the reader's own filters.
+ *
+ * Kept pure, and given the previously narrowed columns rather than reading them from a ref, so it
+ * can be applied more than once without changing the answer — React may invoke a state updater
+ * twice, and an earlier version tracked those columns inside the updater itself, which silently
+ * undid a clear on the second pass.
+ *
+ * Only columns the selection narrowed last time are dropped; anything the reader filtered by hand
+ * is left exactly as it was.
+ */
+export function reconcileSelectedOptions(
+    previous: SelectedOptions,
+    previouslyNarrowed: readonly string[],
+    slugFilter: readonly SlugFilterEntry[]
+): SelectedOptions {
+    if (previouslyNarrowed.length === 0 && slugFilter.length === 0) {
+        return previous;
+    }
+
+    const next = { ...previous };
+    for (const column of previouslyNarrowed) {
+        delete next[column];
+    }
+    for (const entry of slugFilter) {
+        next[entry.column] = new Set([entry.value]);
+    }
+    return next;
 }
