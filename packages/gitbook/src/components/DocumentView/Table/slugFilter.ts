@@ -21,7 +21,7 @@ export interface SlugFilterEntry {
  * a "macOS" column option and a "macOS" tab resolve to the one slug. Options with no label fall back
  * to the raw value, mirroring how a cell renders one.
  */
-function getOptionSlug(option: { value: string; label: string }): string {
+export function getOptionSlug(option: { value: string; label: string }): string {
     return slugifySelectValue(option.label || option.value);
 }
 

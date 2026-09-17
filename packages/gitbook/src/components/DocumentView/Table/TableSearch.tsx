@@ -10,7 +10,12 @@ import {
     type TableSearchRecordData,
     getVisibleTableRecordIds,
 } from './searchMatch';
-import { type SlugFilterEntry, resolveSlugFilter, slugFilterKey } from './slugFilter';
+import {
+    type SlugFilterEntry,
+    getOptionSlug,
+    resolveSlugFilter,
+    slugFilterKey,
+} from './slugFilter';
 import { Button, Checkbox, DropdownMenu, DropdownMenuItem, Input } from '@/components/primitives';
 import { tString, useLanguage } from '@/intl/client';
 import { selectStore } from '@/lib/select';
@@ -64,15 +69,32 @@ export function TableSearchProvider(props: {
         () => new Set()
     );
 
-    const toggleOption = React.useCallback((column: string, value: string) => {
-        setSelectedOptions((previous) => {
-            const values = new Set(previous[column]);
-            if (values.has(value)) {
-                values.delete(value);
-            } else {
-                values.add(value);
-            }
+    // The selection that drives this lives outside the table — a tab, a select button or a picker
+    // elsewhere on the page — so this synchronises with it rather than deriving from it.
+    const slugFilter = useSlugFilter(selectColumns);
 
+    // Columns the selection narrowed last time round. Kept so a new selection — or clearing it —
+    // undoes the previous one, rather than leaving a filter the reader can no longer account for.
+    const narrowedColumns = React.useRef<string[]>([]);
+
+    // This render's values, so the stable callbacks below can read them without taking them as
+    // dependencies — `selectColumns` and `slugFilter` are fresh arrays every render.
+    const latest = React.useRef({ selectedOptions, slugFilter, selectColumns });
+    React.useEffect(() => {
+        latest.current = { selectedOptions, slugFilter, selectColumns };
+    });
+
+    const toggleOption = React.useCallback((column: string, value: string) => {
+        const { selectedOptions, slugFilter, selectColumns } = latest.current;
+
+        const values = new Set(selectedOptions[column]);
+        if (values.has(value)) {
+            values.delete(value);
+        } else {
+            values.add(value);
+        }
+
+        setSelectedOptions((previous) => {
             const next = { ...previous };
             if (values.size === 0) {
                 delete next[column];
@@ -81,6 +103,34 @@ export function TableSearchProvider(props: {
             }
             return next;
         });
+
+        // Changing a column the selection is driving changes the selection itself, rather than
+        // leaving the two to disagree: otherwise the notice would go on claiming a match that has
+        // stopped being true, and the next page load would quietly restore the filter the reader
+        // just replaced. Narrowing to a single option moves the selection to it — so a tab
+        // elsewhere follows — while clearing it, or picking several at once, releases it, since
+        // the selection holds one choice and cannot express those.
+        const governing = slugFilter.find((entry) => entry.column === column);
+        if (!governing) {
+            return;
+        }
+
+        const only = values.size === 1 ? [...values][0] : undefined;
+        const option = only
+            ? selectColumns
+                  .find((candidate) => candidate.id === column)
+                  ?.options.find((candidate) => candidate.value === only)
+            : undefined;
+
+        if (option) {
+            selectStore.activate(getOptionSlug(option));
+            return;
+        }
+
+        // Hand the column back before releasing, so the reconciling effect below treats it as the
+        // reader's own and leaves their choice of options alone.
+        narrowedColumns.current = narrowedColumns.current.filter((narrowed) => narrowed !== column);
+        selectStore.deactivate(governing.slug);
     }, []);
 
     const toggleCheckbox = React.useCallback((column: string) => {
@@ -94,15 +144,6 @@ export function TableSearchProvider(props: {
             return next;
         });
     }, []);
-
-    // The selection that drives this lives outside the table — a tab, a select button or a picker
-    // elsewhere on the page — so this synchronises with it rather than deriving from it. A reader
-    // can still change the filter afterwards; the next activation drives it again.
-    const slugFilter = useSlugFilter(selectColumns);
-
-    // Columns the selection narrowed last time round. Kept so a new selection — or clearing it —
-    // undoes the previous one, rather than leaving a filter the reader can no longer account for.
-    const narrowedColumns = React.useRef<string[]>([]);
 
     React.useEffect(() => {
         setSelectedOptions((previous) => {

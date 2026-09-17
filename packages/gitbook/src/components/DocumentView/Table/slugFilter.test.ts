@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'bun:test';
 
 import type { TableSelectColumn } from './search';
-import { resolveSlugFilter, slugFilterKey } from './slugFilter';
+import { getOptionSlug, resolveSlugFilter, slugFilterKey } from './slugFilter';
 
 /**
  * A select column as the editor writes one: each option carries an opaque generated `value` and the
@@ -100,6 +100,16 @@ describe('resolveSlugFilter', () => {
         expect(resolveSlugFilter([platform, status], ['python'])).toEqual([]);
         expect(resolveSlugFilter([platform], [])).toEqual([]);
         expect(resolveSlugFilter([], ['macos'])).toEqual([]);
+    });
+});
+
+describe('getOptionSlug', () => {
+    // Shared by the matcher and by the write-back that moves the selection when a reader changes a
+    // governed column, so the two can never disagree about what an option answers to.
+    it('slugifies the label, and falls back to the value', () => {
+        expect(getOptionSlug({ value: 'key-0', label: 'macOS' })).toBe('macos');
+        expect(getOptionSlug({ value: 'key-1', label: 'Windows 10' })).toBe('windows-10');
+        expect(getOptionSlug({ value: 'macos', label: '' })).toBe('macos');
     });
 });
 
