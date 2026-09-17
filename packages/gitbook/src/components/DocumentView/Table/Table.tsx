@@ -81,9 +81,10 @@ export function Table(props: BlockProps<DocumentBlockTable>) {
                         checkboxColumns={getTableCheckboxColumns(block)}
                     />
                 ) : null}
-                {/* Tightened against the search bar so it reads as part of the filter controls
-                    rather than a caption on the table. */}
-                <TableSelectionFilter className={showSearch ? '-mt-1.5' : undefined} />
+                {/* Sits under the filter control it relates to, and tight against the search bar,
+                    so it reads as part of the filter controls rather than a caption on the table.
+                    Standalone — cards, short grids — there is no control to sit under. */}
+                <TableSelectionFilter className={showSearch ? '-mt-1.5 justify-end' : undefined} />
                 <TableView
                     {...props}
                     isOffscreen={isOffscreen}

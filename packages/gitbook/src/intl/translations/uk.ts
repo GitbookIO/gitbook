@@ -11,7 +11,7 @@ export const uk: TranslationLanguage = {
     switch_to_system_theme: 'Перемкнути на системну тему',
     search: 'Пошук',
     clear: 'Очистити',
-    table_filtered_by_selection: 'Відповідає вашому вибору: ${1}',
+    table_filtered_by_selection: 'Відповідає вибору: ${1}',
     table_clear_selection: 'Очистити вибір',
     tags: 'Теги',
     search_back: 'Назад до результатів пошуку',

@@ -11,7 +11,7 @@ export const id: TranslationLanguage = {
     switch_to_system_theme: 'Beralih ke tema sistem',
     search: 'Cari',
     clear: 'Bersihkan',
-    table_filtered_by_selection: 'Sesuai pilihan Anda: ${1}',
+    table_filtered_by_selection: 'Sesuai pilihan: ${1}',
     table_clear_selection: 'Hapus pilihan',
     tags: 'Tag',
     search_back: 'Kembali ke hasil pencarian',

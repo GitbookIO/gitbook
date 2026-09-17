@@ -11,7 +11,7 @@ export const hr: TranslationLanguage = {
     switch_to_system_theme: 'Prebaci na temu sustava',
     search: 'Pretraži',
     clear: 'Očisti',
-    table_filtered_by_selection: 'Odgovara vašem odabiru: ${1}',
+    table_filtered_by_selection: 'Odgovara odabiru: ${1}',
     table_clear_selection: 'Očisti odabir',
     tags: 'Oznake',
     search_back: 'Natrag na rezultate pretraživanja',

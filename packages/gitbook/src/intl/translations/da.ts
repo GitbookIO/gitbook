@@ -11,7 +11,7 @@ export const da: TranslationLanguage = {
     switch_to_system_theme: 'Skift til systemtema',
     search: 'Søg',
     clear: 'Ryd',
-    table_filtered_by_selection: 'Matcher dit valg: ${1}',
+    table_filtered_by_selection: 'Matcher valg: ${1}',
     table_clear_selection: 'Ryd valg',
     tags: 'Tags',
     search_back: 'Tilbage til søgeresultater',

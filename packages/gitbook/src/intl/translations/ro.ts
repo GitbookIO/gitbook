@@ -11,7 +11,7 @@ export const ro: TranslationLanguage = {
     switch_to_system_theme: 'Comută la tema sistemului',
     search: 'Caută',
     clear: 'Șterge',
-    table_filtered_by_selection: 'Se potrivește cu selecția ta: ${1}',
+    table_filtered_by_selection: 'Se potrivește cu selecția: ${1}',
     table_clear_selection: 'Șterge selecția',
     tags: 'Etichete',
     search_back: 'Înapoi la rezultatele căutării',

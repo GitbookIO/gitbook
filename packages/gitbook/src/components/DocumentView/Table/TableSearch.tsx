@@ -318,6 +318,8 @@ export function TableSelectionFilter(props: { className?: ClassValue }) {
             <Button
                 variant="blank"
                 size="xsmall"
+                icon="xmark"
+                iconOnly
                 label={tString(language, 'table_clear_selection')}
                 onClick={clearSlugFilter}
             />

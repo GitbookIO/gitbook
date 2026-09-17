@@ -11,7 +11,7 @@ export const tr: TranslationLanguage = {
     switch_to_system_theme: 'Sistem temasına geç',
     search: 'Ara',
     clear: 'Temizle',
-    table_filtered_by_selection: 'Seçiminizle eşleşiyor: ${1}',
+    table_filtered_by_selection: 'Seçimle eşleşiyor: ${1}',
     table_clear_selection: 'Seçimi temizle',
     tags: 'Etiketler',
     search_back: 'Arama sonuçlarına geri dön',

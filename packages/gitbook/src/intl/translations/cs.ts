@@ -11,7 +11,7 @@ export const cs: TranslationLanguage = {
     switch_to_system_theme: 'Přepnout na systémový motiv',
     search: 'Hledat',
     clear: 'Vymazat',
-    table_filtered_by_selection: 'Odpovídá vašemu výběru: ${1}',
+    table_filtered_by_selection: 'Odpovídá výběru: ${1}',
     table_clear_selection: 'Zrušit výběr',
     tags: 'Štítky',
     search_back: 'Zpět na výsledky hledání',
