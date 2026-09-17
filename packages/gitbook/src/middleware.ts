@@ -21,6 +21,7 @@ import {
     serveProxyAnalyticsEvent,
     trackServerInsightsEvents,
 } from './lib/tracking';
+import { AI_CATALOG_PATH, AI_CATALOG_WELL_KNOWN_PATH } from '@/lib/aiCatalog/paths';
 import { getAPITokenFromCookies, getAPITokenResponseCookies } from '@/lib/api-token-cookie';
 import { isChatGPTRequest } from '@/lib/chatgpt';
 import { MAX_CHUNKED_COOKIE_LENGTH } from '@/lib/chunked-cookies';
@@ -37,6 +38,7 @@ import {
 import { isGitBookAssetsHostURL, isGitBookHostURL } from '@/lib/env';
 import { getImageResizingContextId } from '@/lib/images';
 import { isAITrainingOrIndexingRequest } from '@/lib/indexing-crawlers';
+import { MCP_SERVER_CARD_PATH, MCP_SERVER_CARD_WELL_KNOWN_PATH } from '@/lib/mcp/paths';
 import { MiddlewareHeaders } from '@/lib/middleware';
 import {
     createOAuthProtectedResourceMetadataResponse,
@@ -767,6 +769,10 @@ const EMBED_PAGE_PATH_REGEX = /^~gitbook\/embed\/page(\/(\S*))?$/;
 const PATH_ALIASES: Record<string, string> = {
     'sitemap.md': 'llms.txt',
     '.well-known/sitemap.md': 'llms.txt',
+    // Scanners probe `.well-known` for a server card even though the MCP extension reserves
+    // `<streamable-http-url>/server-card`; both paths serve the same document.
+    [MCP_SERVER_CARD_WELL_KNOWN_PATH]: MCP_SERVER_CARD_PATH,
+    [AI_CATALOG_WELL_KNOWN_PATH]: AI_CATALOG_PATH,
 };
 
 /**
@@ -886,6 +892,8 @@ function encodePathInSiteContent(
             return { pathname, routeType: 'static' };
         case '~gitbook/mcp':
         case '~gitbook/mcp/auth':
+        case MCP_SERVER_CARD_PATH:
+        case AI_CATALOG_PATH:
         case '~gitbook/pdf':
         case '~gitbook/search':
         case '~gitbook/auth/login':
