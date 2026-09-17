@@ -107,3 +107,21 @@ export function reconcileSelectedOptions(
     }
     return next;
 }
+
+/**
+ * Narrow the filter to the columns the table is *still* showing.
+ *
+ * A reader can change any of these columns by hand, and that deliberately leaves the selection
+ * alone — the filter is this table's, for this visit, while the selection is site-wide and
+ * persists. So the notice has to stop speaking for a column that no longer matches, rather than
+ * describing a view the reader has since changed.
+ */
+export function getAppliedSlugFilter(
+    slugFilter: readonly SlugFilterEntry[],
+    selectedOptions: SelectedOptions
+): SlugFilterEntry[] {
+    return slugFilter.filter((entry) => {
+        const values = selectedOptions[entry.column];
+        return values?.size === 1 && values.has(entry.value);
+    });
+}

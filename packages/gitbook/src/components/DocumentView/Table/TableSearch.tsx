@@ -12,7 +12,7 @@ import {
 } from './searchMatch';
 import {
     type SlugFilterEntry,
-    getOptionSlug,
+    getAppliedSlugFilter,
     reconcileSelectedOptions,
     resolveSlugFilter,
     slugFilterKey,
@@ -45,9 +45,12 @@ type TableSearchContextValue = {
     visibleIds: ReadonlySet<string> | null;
     /** True when there are records but the active filters match none of them. */
     isEmpty: boolean;
-    /** Select columns currently narrowed by the reader's content selection. */
+    /**
+     * Select columns the reader's content selection narrowed and the reader has left alone.
+     * A column they have since filtered themselves drops out, since the table no longer shows it.
+     */
     slugFilter: SlugFilterEntry[];
-    /** Drop the selection driving {@link slugFilter}, site-wide. */
+    /** Drop the selection driving {@link slugFilter}, site-wide. The only thing that clears one. */
     clearSlugFilter: () => void;
 };
 
@@ -78,24 +81,21 @@ export function TableSearchProvider(props: {
     // undoes the previous one, rather than leaving a filter the reader can no longer account for.
     const narrowedColumns = React.useRef<string[]>([]);
 
-    // This render's values, so the stable callbacks below can read them without taking them as
-    // dependencies — `selectColumns` and `slugFilter` are fresh arrays every render.
-    const latest = React.useRef({ selectedOptions, slugFilter, selectColumns });
-    React.useEffect(() => {
-        latest.current = { selectedOptions, slugFilter, selectColumns };
-    });
-
     const toggleOption = React.useCallback((column: string, value: string) => {
-        const { selectedOptions, slugFilter, selectColumns } = latest.current;
-
-        const values = new Set(selectedOptions[column]);
-        if (values.has(value)) {
-            values.delete(value);
-        } else {
-            values.add(value);
-        }
+        // The reader is taking this column over, so the selection no longer owns it: a later clear
+        // must leave their choice of options alone. Their change stays local — the filter is this
+        // table's, for this visit, while the selection is site-wide and persists, so only the
+        // clear beside the notice touches it.
+        narrowedColumns.current = narrowedColumns.current.filter((narrowed) => narrowed !== column);
 
         setSelectedOptions((previous) => {
+            const values = new Set(previous[column]);
+            if (values.has(value)) {
+                values.delete(value);
+            } else {
+                values.add(value);
+            }
+
             const next = { ...previous };
             if (values.size === 0) {
                 delete next[column];
@@ -104,34 +104,6 @@ export function TableSearchProvider(props: {
             }
             return next;
         });
-
-        // Changing a column the selection is driving changes the selection itself, rather than
-        // leaving the two to disagree: otherwise the notice would go on claiming a match that has
-        // stopped being true, and the next page load would quietly restore the filter the reader
-        // just replaced. Narrowing to a single option moves the selection to it — so a tab
-        // elsewhere follows — while clearing it, or picking several at once, releases it, since
-        // the selection holds one choice and cannot express those.
-        const governing = slugFilter.find((entry) => entry.column === column);
-        if (!governing) {
-            return;
-        }
-
-        const only = values.size === 1 ? [...values][0] : undefined;
-        const option = only
-            ? selectColumns
-                  .find((candidate) => candidate.id === column)
-                  ?.options.find((candidate) => candidate.value === only)
-            : undefined;
-
-        if (option) {
-            selectStore.activate(getOptionSlug(option));
-            return;
-        }
-
-        // Hand the column back before releasing, so the reconciling effect below treats it as the
-        // reader's own and leaves their choice of options alone.
-        narrowedColumns.current = narrowedColumns.current.filter((narrowed) => narrowed !== column);
-        selectStore.deactivate(governing.slug);
     }, []);
 
     const toggleCheckbox = React.useCallback((column: string) => {
@@ -155,14 +127,23 @@ export function TableSearchProvider(props: {
         );
     }, [slugFilter]);
 
+    // What the notice may speak for: the columns the selection narrowed and the reader has left
+    // alone. A column they have since filtered themselves still has an active slug, but the table
+    // is no longer showing it, so the notice must not claim it.
+    const appliedSlugFilter = React.useMemo(
+        () => getAppliedSlugFilter(slugFilter, selectedOptions),
+        [slugFilter, selectedOptions]
+    );
+
     // Clearing goes through the store rather than local state: the selection is what persists, so
     // only dropping it there stops the filter coming back on the next load. It is site-wide, so a
-    // tab elsewhere on the page reverts to its default too.
+    // tab elsewhere on the page reverts to its default too. This is the only thing that clears a
+    // selection — changing the filter never does.
     const clearSlugFilter = React.useCallback(() => {
-        for (const entry of slugFilter) {
+        for (const entry of appliedSlugFilter) {
             selectStore.deactivate(entry.slug);
         }
-    }, [slugFilter]);
+    }, [appliedSlugFilter]);
 
     // Match every record once, here, rather than in each row — rows just look themselves up by id.
     const visibleIds = React.useMemo(
@@ -189,7 +170,7 @@ export function TableSearchProvider(props: {
             toggleCheckbox,
             visibleIds,
             isEmpty,
-            slugFilter,
+            slugFilter: appliedSlugFilter,
             clearSlugFilter,
         }),
         [
@@ -200,7 +181,7 @@ export function TableSearchProvider(props: {
             toggleCheckbox,
             visibleIds,
             isEmpty,
-            slugFilter,
+            appliedSlugFilter,
             clearSlugFilter,
         ]
     );

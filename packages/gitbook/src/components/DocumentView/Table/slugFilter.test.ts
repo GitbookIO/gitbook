@@ -2,6 +2,7 @@ import { describe, expect, it } from 'bun:test';
 
 import type { TableSelectColumn } from './search';
 import {
+    getAppliedSlugFilter,
     getOptionSlug,
     reconcileSelectedOptions,
     resolveSlugFilter,
@@ -162,6 +163,31 @@ describe('reconcileSelectedOptions', () => {
     it('is a no-op when there is nothing to narrow and nothing to undo', () => {
         const previous = { status: new Set(['done-value']) };
         expect(reconcileSelectedOptions(previous, [], [])).toBe(previous);
+    });
+});
+
+describe('getAppliedSlugFilter', () => {
+    const macos = { column: 'platform', value: 'macos-value', label: 'macOS', slug: 'macos' };
+
+    it('speaks for a column the reader has left alone', () => {
+        const selected = { platform: new Set(['macos-value']) };
+        expect(getAppliedSlugFilter([macos], selected)).toEqual([macos]);
+    });
+
+    it('drops a column the reader has filtered to something else', () => {
+        // Changing the filter deliberately leaves the selection active, so the slug is still there;
+        // the notice just must not claim a match the table is no longer showing.
+        const selected = { platform: new Set(['windows-value']) };
+        expect(getAppliedSlugFilter([macos], selected)).toEqual([]);
+    });
+
+    it('drops a column the reader has widened to several options', () => {
+        const selected = { platform: new Set(['macos-value', 'windows-value']) };
+        expect(getAppliedSlugFilter([macos], selected)).toEqual([]);
+    });
+
+    it('drops a column the reader has cleared', () => {
+        expect(getAppliedSlugFilter([macos], {})).toEqual([]);
     });
 });
 
