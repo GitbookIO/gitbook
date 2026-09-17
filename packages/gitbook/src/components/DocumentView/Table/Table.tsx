@@ -81,7 +81,9 @@ export function Table(props: BlockProps<DocumentBlockTable>) {
                         checkboxColumns={getTableCheckboxColumns(block)}
                     />
                 ) : null}
-                <TableSelectionFilter />
+                {/* Tightened against the search bar so it reads as part of the filter controls
+                    rather than a caption on the table. */}
+                <TableSelectionFilter className={showSearch ? '-mt-1.5' : undefined} />
                 <TableView
                     {...props}
                     isOffscreen={isOffscreen}

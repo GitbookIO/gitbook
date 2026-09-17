@@ -285,7 +285,11 @@ export function TableSearchEmpty(props: { className?: ClassValue }) {
 }
 
 /**
- * Tells the reader that their content selection has narrowed this table, and lets them undo it.
+ * Names the selection narrowing this table, and lets the reader drop it.
+ *
+ * Deliberately worded around the *selection* rather than the filter: the column dropdown beside it
+ * shows the same column as active, but clearing there only resets local state and the filter returns
+ * on the next load. This is the control that actually undoes it.
  *
  * Rendered independently of the search bar. `shouldShowTableSearch` leaves the filter controls off
  * cards, off grids below the row threshold, and off any table whose author turned search off — and
@@ -314,7 +318,7 @@ export function TableSelectionFilter(props: { className?: ClassValue }) {
             <Button
                 variant="blank"
                 size="xsmall"
-                label={tString(language, 'clear')}
+                label={tString(language, 'table_clear_selection')}
                 onClick={clearSlugFilter}
             />
         </div>
