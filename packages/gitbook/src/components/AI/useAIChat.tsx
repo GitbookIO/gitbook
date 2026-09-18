@@ -18,6 +18,7 @@ import { type UpdateSearchState, useSetSearchState } from '../Search';
 import { addRecentSearchQuery } from '../Search/recent-queries';
 import type { AnyAIControl } from './controls';
 import { ConfirmControlDef, ConfirmControlOutputSchema } from './controls/ConfirmControl';
+import { setIntercomLauncherHidden } from './intercom';
 import { type AIChatReference, serializeReferences } from './references';
 import { type RenderAIMessageOptions, streamAIChatResponse } from './server-actions';
 import { getTools } from './tools';
@@ -241,7 +242,6 @@ export function AIChatProvider(props: {
     const setSearchStateInURL = useSetSearchState();
     const { siteSpaceId } = useCurrentContent();
     const language = useLanguage();
-
     const displayContext = renderMessageOptions?.asEmbeddable
         ? SiteInsightsDisplayContext.Embed
         : SiteInsightsDisplayContext.Site;
@@ -303,6 +303,8 @@ export function AIChatProvider(props: {
 
     // Open AI chat and sync with search state
     const onOpen = React.useCallback(() => {
+        setIntercomLauncherHidden(true);
+
         const { initialQuery } = globalState.getState();
         globalState.setState((state) => ({ ...state, opened: true }));
 
@@ -319,6 +321,8 @@ export function AIChatProvider(props: {
 
     // Close AI chat and clear ask parameter
     const onClose = React.useCallback(() => {
+        setIntercomLauncherHidden(false);
+
         globalState.setState((state) => ({ ...state, opened: false }));
 
         // Clear ask parameter but keep other search state
