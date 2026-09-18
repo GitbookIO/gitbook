@@ -11,6 +11,8 @@ export const ar: TranslationLanguage = {
     switch_to_system_theme: 'التبديل إلى سمة النظام',
     search: 'بحث',
     clear: 'مسح',
+    table_filtered_by_selection: 'يطابق الاختيار: ${1}',
+    table_clear_selection: 'مسح الاختيار',
     tags: 'الوسوم',
     search_back: 'العودة إلى نتائج البحث',
     search_or_ask: 'اسأل أو ابحث',

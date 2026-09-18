@@ -11,6 +11,8 @@ export const yue: TranslationLanguage = {
     switch_to_system_theme: '切換到系統主題',
     search: '搜尋',
     clear: '清除',
+    table_filtered_by_selection: '符合選擇：${1}',
+    table_clear_selection: '清除選擇',
     tags: '標籤',
     search_back: '返回搜尋結果',
     search_or_ask: '發問或搜尋',

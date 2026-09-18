@@ -11,6 +11,8 @@ export const pt: TranslationLanguage = {
     switch_to_system_theme: 'Mudar para o tema do sistema',
     search: 'Pesquisar',
     clear: 'Limpar',
+    table_filtered_by_selection: 'Corresponde à seleção: ${1}',
+    table_clear_selection: 'Limpar seleção',
     tags: 'Etiquetas',
     search_back: 'Voltar aos resultados da pesquisa',
     search_or_ask: 'Perguntar ou pesquisar',

@@ -11,6 +11,8 @@ export const ko: TranslationLanguage = {
     switch_to_system_theme: '시스템 테마로 전환',
     search: '검색',
     clear: '지우기',
+    table_filtered_by_selection: '선택과 일치: ${1}',
+    table_clear_selection: '선택 지우기',
     tags: '태그',
     search_back: '검색 결과로 돌아가기',
     search_or_ask: '질문 또는 검색',

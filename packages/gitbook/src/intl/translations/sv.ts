@@ -11,6 +11,8 @@ export const sv: TranslationLanguage = {
     switch_to_system_theme: 'Byt till systemtema',
     search: 'Sök',
     clear: 'Rensa',
+    table_filtered_by_selection: 'Matchar val: ${1}',
+    table_clear_selection: 'Rensa val',
     tags: 'Taggar',
     search_back: 'Tillbaka till sökresultat',
     search_or_ask: 'Fråga eller sök',
