@@ -5,7 +5,7 @@ import { SiteInsightsDisplayContext } from '@gitbook/api';
 
 import { type RouteLayoutParams, getDynamicSiteContext } from '@/app/utils';
 import { isSiteMcpEnabled } from '@/lib/mcp/endpoints';
-import { MCP_SERVER_INFO } from '@/lib/mcp/serverCard';
+import { buildMcpServerInfo } from '@/lib/mcp/serverCard';
 import { createSiteMcpTools, registerSiteMcpTools, trackMcpEvent } from '@/lib/mcp/tools';
 
 export async function handleMcpRequest(
@@ -44,7 +44,7 @@ export async function handleMcpRequest(
         },
         {
             // The same identity the server card republishes, so the card and the handshake agree.
-            serverInfo: MCP_SERVER_INFO,
+            serverInfo: buildMcpServerInfo(context),
         },
         {
             streamableHttpEndpoint: context.linker.toPathInSite(endpoint),

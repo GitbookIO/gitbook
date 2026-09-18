@@ -5,10 +5,11 @@ import { CustomizationAIMode, CustomizationPageActionType, SiteVisibility } from
 
 import { hasAdaptiveMcpEndpoint, mcpEndpointRequiresAuth } from './endpoints';
 import {
-    MCP_SERVER_INFO,
+    MCP_SERVER_VERSION,
     SERVER_CARD_MEDIA_TYPE,
     SERVER_CARD_SCHEMA_URL,
     type SiteMcpServerCard,
+    buildMcpServerInfo,
     buildSiteMcpServerCard,
     serveSiteMcpServerCard,
 } from './serverCard';
@@ -62,9 +63,10 @@ function makeContext(
     } as unknown as GitBookSiteContext;
 }
 
+const request = new Request('https://docs.acme.org/~gitbook/mcp/server-card');
+
 function buildCard(options?: Parameters<typeof makeContext>[0]): SiteMcpServerCard {
     const context = makeContext(options);
-    const request = new Request('https://docs.acme.org/~gitbook/mcp/server-card');
     return buildSiteMcpServerCard(context, createSiteMcpTools(context, { request }));
 }
 
@@ -119,7 +121,7 @@ describe('buildSiteMcpServerCard', () => {
             const card = buildCard();
 
             expect(card.version).toMatch(/^\d+\.\d+\.\d+/);
-            expect(card.version).toBe(MCP_SERVER_INFO.version);
+            expect(card.version).toBe(MCP_SERVER_VERSION);
         });
 
         it('declares a transport type the extension allows on every remote', () => {
@@ -135,10 +137,47 @@ describe('buildSiteMcpServerCard', () => {
 
     describe('server identity', () => {
         it('reports the same identity the transport reports at initialize', () => {
+            const context = makeContext();
+            const card = buildSiteMcpServerCard(context, createSiteMcpTools(context, { request }));
+
+            expect(card.serverInfo).toEqual(buildMcpServerInfo(context));
+            expect(card.serverInfo.title).toBe(card.title);
+            expect(card.serverInfo.version).toBe(card.version);
+        });
+
+        it('names the running server after its endpoint', () => {
             const card = buildCard();
 
-            expect(card.serverInfo).toEqual({ ...MCP_SERVER_INFO });
-            expect(card.version).toBe(card.serverInfo.version);
+            expect(card.serverInfo.name).toBe('docs.acme.org/~gitbook/mcp');
+            expect(card.endpoint).toBe(`https://${card.serverInfo.name}`);
+        });
+
+        it('keeps the card name stable and schema-valid, unlike the endpoint', () => {
+            const card = buildCard();
+
+            expect(card.name).toBe('com.gitbook.sites.mcp/site_123');
+            expect(card.name).toMatch(SERVER_CARD_NAME_PATTERN);
+            // The endpoint cannot be the card name: two slashes and a `~`.
+            expect(card.serverInfo.name).not.toMatch(SERVER_CARD_NAME_PATTERN);
+        });
+
+        it('names the server after the site rather than the software', () => {
+            const acme = buildMcpServerInfo(makeContext({ host: 'docs.acme.com', title: 'Acme' }));
+            const other = buildMcpServerInfo(
+                makeContext({ host: 'gitbook.com', siteBasePath: '/other/', title: 'Other' })
+            );
+
+            expect(acme.name).toBe('docs.acme.com/~gitbook/mcp');
+            expect(other.name).toBe('gitbook.com/other/~gitbook/mcp');
+            expect(acme.title).toBe('Acme MCP Server');
+            expect(other.title).toBe('Other MCP Server');
+        });
+
+        it('declares the capabilities the SDK reports at initialize', () => {
+            const card = buildCard();
+
+            // Verified against a live server: `McpServer` declares listChanged for its tools.
+            expect(card.capabilities).toEqual({ tools: { listChanged: true } });
         });
 
         it('points `endpoint` at the same URL as the public remote', () => {

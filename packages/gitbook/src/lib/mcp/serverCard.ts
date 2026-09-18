@@ -1,3 +1,4 @@
+import type { Implementation, ServerCapabilities, Tool } from '@modelcontextprotocol/sdk/types.js';
 import { SUPPORTED_PROTOCOL_VERSIONS } from '@modelcontextprotocol/sdk/types.js';
 
 import packageJSON from '../../../package.json';
@@ -15,10 +16,10 @@ export const SERVER_CARD_SCHEMA_URL =
  */
 const SERVER_CARD_NAMESPACE = 'com.gitbook.sites.mcp';
 
-export const MCP_SERVER_INFO = {
-    name: 'gitbook-site',
-    version: packageJSON.version,
-};
+/**
+ * Version reported on the card and at `initialize` alike, so the two cannot drift.
+ */
+export const MCP_SERVER_VERSION = packageJSON.version;
 
 const MAX_TEXT_LENGTH = 100;
 
@@ -62,21 +63,25 @@ export interface SiteMcpServerCard {
         sizes?: string[];
     }[];
     remotes: SiteMcpServerCardRemote[];
-    // The members below are deliberately not standard: a card is static while most servers' tool
-    // surface varies per user. A site's does not, and crawlers read them, so we publish them.
-    serverInfo: {
-        name: string;
-        version: string;
-    };
+    serverInfo: SiteMcpServerInfo;
     /**
      * The Streamable HTTP endpoint, the same URL as `remotes[0].url`.
      */
     endpoint: string;
-    capabilities: {
-        tools: { listChanged: boolean };
-    };
+    capabilities: ServerCapabilities;
     tools: SiteMcpServerCardTool[];
 }
+
+/**
+ * Identity the server reports at `initialize`, republished on the card so a card.
+ */
+export type SiteMcpServerInfo = Implementation & {
+    /**
+     * Required here, though the SDK leaves it optional: a client with no card to read has nothing
+     * else to display, since `name` is the Streamable HTTP endpoint without its scheme.
+     */
+    title: string;
+};
 
 export interface SiteMcpServerCardRemote {
     type: 'streamable-http' | 'sse';
@@ -91,14 +96,10 @@ export interface SiteMcpServerCardRemote {
 }
 
 /**
- * One tool the server registers. Metadata only: a client that needs input schemas calls
- * `tools/list` over the transport, which is authoritative.
+ * One tool the server registers, as a client sees it from `tools/list` minus the input schema:
+ * `tools/list` stays authoritative for that.
  */
-export interface SiteMcpServerCardTool {
-    name: string;
-    description: string;
-    annotations: SiteMcpTool['annotations'];
-}
+export type SiteMcpServerCardTool = Pick<Tool, 'name' | 'description' | 'annotations'>;
 
 /**
  * Build the card for a site's MCP server: the metadata an agent can read before it connects.
@@ -109,14 +110,16 @@ export function buildSiteMcpServerCard(
 ): SiteMcpServerCard {
     const { linker, site } = context;
 
-    const endpoint = linker.toAbsoluteURL(linker.toPathInSite('~gitbook/mcp'));
+    const endpoint = getSiteMcpEndpoint(context);
+    const serverInfo = buildMcpServerInfo(context);
 
     return {
         $schema: SERVER_CARD_SCHEMA_URL,
+        // Not the endpoint: the schema allows exactly one slash and no `~`, and a registry keys on
+        // this, so it stays put when a customer moves the site to another domain.
         name: `${SERVER_CARD_NAMESPACE}/${site.id}`,
-        version: MCP_SERVER_INFO.version,
-        // `site.title` already carries the customization title (localized) when one is set.
-        title: buildTitle(site.title),
+        version: serverInfo.version,
+        title: serverInfo.title,
         description: buildDescription(site.title),
         websiteUrl: linker.toAbsoluteURL(linker.toPathInSite('')),
         icons: [
@@ -127,17 +130,34 @@ export function buildSiteMcpServerCard(
             },
         ],
         remotes: buildRemotes(context, endpoint),
-        serverInfo: { ...MCP_SERVER_INFO },
+        serverInfo,
         endpoint,
-        // The tool set is fixed for the life of a connection: it is derived from the site's
-        // customization, which is resolved once per request.
-        capabilities: { tools: { listChanged: false } },
+        // What the SDK declares at `initialize` for a server with registered tools. A card that
+        // said otherwise would contradict the live connection.
+        capabilities: { tools: { listChanged: true } },
         tools: tools.map((tool) => ({
             name: tool.name,
             description: tool.description,
             annotations: tool.annotations,
         })),
     };
+}
+
+/**
+ * Build the identity the server reports at `initialize`, which the card republishes verbatim.
+ */
+export function buildMcpServerInfo(context: GitBookSiteContext): SiteMcpServerInfo {
+    const endpoint = new URL(getSiteMcpEndpoint(context));
+
+    return {
+        name: `${endpoint.host}${endpoint.pathname}`,
+        title: buildTitle(context.site.title),
+        version: MCP_SERVER_VERSION,
+    };
+}
+
+export function getSiteMcpEndpoint(context: GitBookSiteContext): string {
+    return context.linker.toAbsoluteURL(context.linker.toPathInSite('~gitbook/mcp'));
 }
 
 /**
