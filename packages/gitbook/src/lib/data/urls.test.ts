@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'bun:test';
 
-import { getURLLookupAlternatives, getURLLookupPathname, normalizeURL } from './urls';
+import {
+    getURLLookupAlternatives,
+    getURLLookupPathname,
+    normalizeURL,
+    shouldBypassLookupAlternatives,
+} from './urls';
 
 describe('getURLLookupPathname', () => {
     const previewRoot = 'https://sites.gitbook.com/preview/site_example/section';
@@ -830,5 +835,56 @@ describe('normalizeURL with encoded paths', () => {
         expect(result.pathname).toBe('/some-page');
         // The rison param must survive normalizeURL intact.
         expect(result.searchParams.get('filter')).toBe(risonValue);
+    });
+});
+
+describe('getURLLookupAlternatives with bypass', () => {
+    it('only looks up the full URL', () => {
+        expect(
+            getURLLookupAlternatives(new URL('https://docs.mycompany.com/a/b/c'), { bypass: true })
+        ).toEqual({
+            revision: undefined,
+            changeRequest: undefined,
+            basePath: undefined,
+            urls: [{ url: 'https://docs.mycompany.com/a/b/c', extraPath: '', primary: true }],
+        });
+    });
+
+    it('only looks up the full URL for a variant', () => {
+        expect(
+            getURLLookupAlternatives(new URL('https://test.gitbook.io/v/variant/space'), {
+                bypass: true,
+            }).urls
+        ).toEqual([
+            { url: 'https://test.gitbook.io/v/variant/space', extraPath: '', primary: true },
+        ]);
+    });
+
+    it.each(['revisions', 'changes'])('keeps the alternatives for %s', (kind) => {
+        const url = new URL(`https://docs.mycompany.com/a/~/${kind}/id/page`);
+        expect(getURLLookupAlternatives(url, { bypass: true })).toEqual(
+            getURLLookupAlternatives(url, { bypass: false })
+        );
+    });
+});
+
+describe('shouldBypassLookupAlternatives', () => {
+    const bypassURLs = ['https://docs.mycompany.com/section', 'https://other.mycompany.com/'];
+
+    it.each([
+        'https://docs.mycompany.com/section',
+        'https://docs.mycompany.com/section/page',
+        'https://other.mycompany.com/',
+        'https://other.mycompany.com/page',
+    ])('matches %s', (url) => {
+        expect(shouldBypassLookupAlternatives(normalizeURL(new URL(url)), bypassURLs)).toBe(true);
+    });
+
+    it.each([
+        'https://docs.mycompany.com/sectionpage',
+        'https://docs.mycompany.com/',
+        'https://unknown.mycompany.com/section',
+    ])('does not match %s', (url) => {
+        expect(shouldBypassLookupAlternatives(normalizeURL(new URL(url)), bypassURLs)).toBe(false);
     });
 });

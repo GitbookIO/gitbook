@@ -9,8 +9,18 @@ import { Icon } from '@gitbook/icons';
 import { TagIcon } from '../Tag';
 import { Button } from '@/components/primitives';
 import { tcls } from '@/lib/tailwind';
-
-const UPDATES_FILTER_SEARCH_PARAM = 'tag';
+import {
+    UPDATES_FILTER_KEY_ATTR,
+    UPDATES_FILTER_SEARCH_PARAM,
+    UPDATES_TAG_ATTR,
+    UPDATES_TAG_CHIP_SELECTED_ATTR,
+    UPDATES_TAG_CHIP_UNSELECTED_DIMMED_ATTR,
+    UPDATES_TAG_CHIP_UNSELECTED_PLAIN_ATTR,
+    UPDATES_TAG_CLEAR_ATTR,
+    UPDATES_TAG_FILTER_ATTR,
+    normalizeUpdatesFilterTags,
+    updatesFilterStyleKey,
+} from '@/lib/updates';
 
 type UpdatesFilterContextValue = {
     selectedTags: string[];
@@ -36,21 +46,7 @@ export function UpdatesFilterProvider(props: { tagSlugs: string[]; children: Rea
     const availableTags = React.useMemo(() => new Set(tagSlugs), [tagSlugs]);
 
     const sanitizeTags = React.useCallback(
-        (tags: string[]) => {
-            const next: string[] = [];
-            const seen = new Set<string>();
-
-            for (const tag of tags) {
-                if (!availableTags.has(tag) || seen.has(tag)) {
-                    continue;
-                }
-
-                next.push(tag);
-                seen.add(tag);
-            }
-
-            return next;
-        },
+        (tags: string[]) => normalizeUpdatesFilterTags(tags, availableTags),
         [availableTags]
     );
 
@@ -63,8 +59,20 @@ export function UpdatesFilterProvider(props: { tagSlugs: string[]; children: Rea
         () => sanitizeTags(rawSelectedTags),
         [sanitizeTags, rawSelectedTags]
     );
-    const [selectedTags, setSelectedTags] = React.useState(urlSelectedTags);
+    const [selectedTags, setSelectedTags] = React.useState<string[]>([]);
     const selectedTagsRef = React.useRef(selectedTags);
+    const styleKey = React.useMemo(() => updatesFilterStyleKey(tagSlugs), [tagSlugs]);
+
+    // Clean up on unmount so a nav to a page with no filterable updates doesn't leave a stale
+    // stylesheet hiding everything (see UPDATES_FILTER_KEY_ATTR).
+    React.useLayoutEffect(() => {
+        document.documentElement.setAttribute(UPDATES_FILTER_KEY_ATTR, styleKey);
+
+        return () => {
+            document.documentElement.removeAttribute(UPDATES_FILTER_KEY_ATTR);
+            document.documentElement.removeAttribute(UPDATES_TAG_FILTER_ATTR);
+        };
+    }, [styleKey]);
 
     const replaceTags = React.useCallback(
         (nextTags: string[]) => {
@@ -88,7 +96,10 @@ export function UpdatesFilterProvider(props: { tagSlugs: string[]; children: Rea
         }
     }, [rawSelectedTags, replaceTags, urlSelectedTags]);
 
-    React.useEffect(() => {
+    // Layout effect so the filter attribute is applied before paint, avoiding a flash in the chip UI.
+    React.useLayoutEffect(() => {
+        applyTagFilterAttribute(urlSelectedTags);
+
         if (areTagsEqual(selectedTagsRef.current, urlSelectedTags)) {
             return;
         }
@@ -104,6 +115,7 @@ export function UpdatesFilterProvider(props: { tagSlugs: string[]; children: Rea
 
             selectedTagsRef.current = nextTags;
             setSelectedTags(nextTags);
+            applyTagFilterAttribute(nextTags);
             replaceTags(nextTags);
         },
         [replaceTags, sanitizeTags]
@@ -152,8 +164,7 @@ export function UpdatesTagFilters(props: {
     clearLabel: string;
 }) {
     const { tags, tagsLabel, clearLabel } = props;
-    const { selectedTagSet, selectedTags, toggleTag, clearTags } = useUpdatesFilter();
-    const isFiltering = selectedTags.length > 0;
+    const { toggleTag, clearTags } = useUpdatesFilter();
 
     if (tags.length === 0) {
         return null;
@@ -166,44 +177,75 @@ export function UpdatesTagFilters(props: {
                     <Icon icon="tags" className="size-3" />
                     {tagsLabel}
                 </div>
+                {/* Visible/clickable only while a filter is active — see generateUpdatesFilterCSS. */}
                 <Button
                     variant="blank"
                     size="xsmall"
                     icon="xmark"
                     label={clearLabel}
-                    onClick={isFiltering ? clearTags : undefined}
-                    aria-hidden={!isFiltering}
-                    tabIndex={isFiltering ? undefined : -1}
-                    className={tcls('text-xs', !isFiltering && 'pointer-events-none invisible')}
+                    onClick={clearTags}
+                    {...{ [UPDATES_TAG_CLEAR_ATTR]: '' }}
+                    className="pointer-events-none invisible text-xs"
                 />
             </div>
             <div className="flex flex-wrap gap-1.5 px-3">
-                {tags.map((tag) => {
-                    const selected = selectedTagSet.has(tag.slug);
-
-                    return (
-                        <button
-                            key={tag.slug}
-                            type="button"
-                            aria-pressed={selected}
-                            onClick={() => toggleTag(tag.slug)}
-                            className={tcls(
-                                'inline-flex max-w-full items-center gap-1 rounded-full px-2 py-1 font-medium text-xs leading-normal transition-colors',
-                                'circular-corners:rounded-2xl straight-corners:rounded-xs',
-                                'not-focus-visible:outline-0 focus-visible:ring-2 focus-visible:ring-primary',
-                                selected
-                                    ? 'bg-primary-original text-contrast-primary-original hover:bg-primary-solid-hover'
-                                    : 'bg-tint-5 text-tint-strong hover:bg-tint-hover',
-                                isFiltering && !selected && 'opacity-8 hover:opacity-11'
-                            )}
-                        >
-                            <TagIcon tag={tag} />
-                            <span className="truncate">{tag.label}</span>
-                        </button>
-                    );
-                })}
+                {tags.map((tag) => (
+                    <TagChip key={tag.slug} tag={tag} onToggle={toggleTag} />
+                ))}
             </div>
         </div>
+    );
+}
+
+const CHIP_CLASS =
+    'inline-flex max-w-full rounded-full circular-corners:rounded-2xl straight-corners:rounded-xs not-focus-visible:outline-0 focus-visible:ring-2 focus-visible:ring-primary';
+
+const CHIP_VARIANT_CLASS =
+    'max-w-full items-center gap-1 rounded-full px-2 py-1 font-medium text-xs leading-normal transition-colors circular-corners:rounded-2xl straight-corners:rounded-xs';
+
+function TagChip(props: { tag: RevisionTag; onToggle: (tag: string) => void }) {
+    const { tag, onToggle } = props;
+    const { selectedTagSet } = useUpdatesFilter();
+    const onClick = () => onToggle(tag.slug);
+
+    return (
+        <button
+            type="button"
+            aria-pressed={selectedTagSet.has(tag.slug)}
+            onClick={onClick}
+            className={CHIP_CLASS}
+        >
+            <span
+                {...{ [UPDATES_TAG_CHIP_SELECTED_ATTR]: tag.slug }}
+                className={tcls(
+                    CHIP_VARIANT_CLASS,
+                    'hidden bg-primary-original text-contrast-primary-original hover:bg-primary-solid-hover'
+                )}
+            >
+                <TagIcon tag={tag} />
+                <span className="truncate">{tag.label}</span>
+            </span>
+            <span
+                {...{ [UPDATES_TAG_CHIP_UNSELECTED_DIMMED_ATTR]: tag.slug }}
+                className={tcls(
+                    CHIP_VARIANT_CLASS,
+                    'hidden bg-tint-5 text-tint-strong opacity-8 hover:bg-tint-hover hover:opacity-11'
+                )}
+            >
+                <TagIcon tag={tag} />
+                <span className="truncate">{tag.label}</span>
+            </span>
+            <span
+                {...{ [UPDATES_TAG_CHIP_UNSELECTED_PLAIN_ATTR]: tag.slug }}
+                className={tcls(
+                    CHIP_VARIANT_CLASS,
+                    'flex bg-tint-5 text-tint-strong hover:bg-tint-hover'
+                )}
+            >
+                <TagIcon tag={tag} />
+                <span className="truncate">{tag.label}</span>
+            </span>
+        </button>
     );
 }
 
@@ -211,19 +253,29 @@ function areTagsEqual(left: string[], right: string[]): boolean {
     return left.length === right.length && left.every((tag, index) => tag === right[index]);
 }
 
+/** Mirrors the active filter onto `<html>`, matching what the pre-paint script does on first load. */
+function applyTagFilterAttribute(tags: string[]) {
+    if (typeof document === 'undefined') {
+        return;
+    }
+
+    if (tags.length > 0) {
+        document.documentElement.setAttribute(UPDATES_TAG_FILTER_ATTR, tags.join(' '));
+    } else {
+        document.documentElement.removeAttribute(UPDATES_TAG_FILTER_ATTR);
+    }
+}
+
+/** Visibility is driven purely by CSS against `data-update-tags` (see generateUpdatesFilterCSS). */
 export function FilteredUpdate(props: {
     tagSlugs: string[];
     className?: string;
     children: React.ReactNode;
 }) {
     const { tagSlugs, className, children } = props;
-    const { selectedTagSet } = useUpdatesFilter();
-
-    const isVisible =
-        selectedTagSet.size === 0 || tagSlugs.some((tagSlug) => selectedTagSet.has(tagSlug));
 
     return (
-        <div className={className} hidden={!isVisible}>
+        <div className={className} {...{ [UPDATES_TAG_ATTR]: tagSlugs.join(' ') }}>
             {children}
         </div>
     );

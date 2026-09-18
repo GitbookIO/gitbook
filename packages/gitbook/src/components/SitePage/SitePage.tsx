@@ -14,6 +14,7 @@ import { PageContextProvider } from '../PageContext';
 import { type PagePathParams, fetchPageData, getPathnameParam } from './fetch';
 import { PageClientLayout } from './PageClientLayout';
 import { UpdatesFilterProvider } from '@/components/DocumentView/UpdatesFilter';
+import { UpdatesFilterScript } from '@/components/DocumentView/UpdatesFilterScript';
 import { PageAside } from '@/components/PageAside';
 import { PageBody, PageCover } from '@/components/PageBody';
 import type { GitBookSiteContext } from '@/lib/context';
@@ -33,7 +34,11 @@ import {
     resolveSiteSpaceCustomHomePage,
 } from '@/lib/sites';
 import { tcls } from '@/lib/tailwind';
-import { getDocumentFilterableTags } from '@/lib/updates';
+import {
+    generateUpdatesFilterCSS,
+    getDocumentFilterableTags,
+    updatesFilterStyleHref,
+} from '@/lib/updates';
 import { getPageRSSURL } from '@/routes/rss';
 
 export type SitePageProps = {
@@ -81,6 +86,7 @@ export async function SitePage(props: SitePageProps & { staticRoute: boolean }) 
     } = await getSitePageData(props);
     const headerOffset = { sectionsHeader: withSections, topHeader: withTopHeader };
     const filterableTags = document ? getDocumentFilterableTags(document, context.revision) : [];
+    const filterableTagSlugs = filterableTags.map((tag) => tag.slug);
     const content = (
         <>
             {/* Using `contents` makes the children of this div according to its parent — which keeps them in a single flex row with the TOC by default.
@@ -134,8 +140,10 @@ export async function SitePage(props: SitePageProps & { staticRoute: boolean }) 
     return (
         <IconsProvider iconSources={iconSources}>
             <PageContextProvider pageId={page.id} spaceId={context.space.id} title={page.title}>
-                {filterableTags.length > 0 ? (
-                    <UpdatesFilterProvider tagSlugs={filterableTags.map((tag) => tag.slug)}>
+                {filterableTagSlugs.length > 0 ? (
+                    <UpdatesFilterProvider tagSlugs={filterableTagSlugs}>
+                        <UpdatesFilterScript tagSlugs={filterableTagSlugs} />
+                        <UpdatesFilterStyle tagSlugs={filterableTagSlugs} />
                         {content}
                     </UpdatesFilterProvider>
                 ) : (
@@ -143,6 +151,22 @@ export async function SitePage(props: SitePageProps & { staticRoute: boolean }) 
                 )}
             </PageContextProvider>
         </IconsProvider>
+    );
+}
+
+/**
+ * Stylesheet that resolves which `updates` entries the active `?tag=` filter shows, purely in CSS
+ * (see generateUpdatesFilterCSS). Byte-identical for every visitor, so it has no cache impact.
+ */
+function UpdatesFilterStyle({ tagSlugs }: { tagSlugs: string[] }) {
+    const css = generateUpdatesFilterCSS(tagSlugs);
+    if (!css) {
+        return null;
+    }
+    return (
+        <style href={updatesFilterStyleHref(tagSlugs)} precedence="high">
+            {css}
+        </style>
     );
 }
 

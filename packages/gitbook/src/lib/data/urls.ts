@@ -1,3 +1,4 @@
+import { GITBOOK_DISABLE_LOOKUP_ALTERNATIVES } from '../env';
 import { joinPath, removeTrailingSlash } from '../paths';
 import { isProxyRootRequest } from '../proxy';
 import { DataFetcherError, getExposableError } from './errors';
@@ -43,6 +44,34 @@ function getContentPathSegments(pathSegments: string[]): string[] {
 }
 
 /**
+ * Site URL prefixes resolved with the full URL only, for sites where a shorter alternative
+ * would resolve to the wrong content.
+ */
+const LOOKUP_ALTERNATIVES_BYPASS_URLS: string[] = ['https://proxy.gitbook.site/sites/site_p4Xo4'];
+
+/**
+ * Whether the lookup of this (normalized) URL should skip the shorter alternatives.
+ */
+export function shouldBypassLookupAlternatives(
+    url: URL,
+    bypassURLs: string[] = LOOKUP_ALTERNATIVES_BYPASS_URLS
+): boolean {
+    if (GITBOOK_DISABLE_LOOKUP_ALTERNATIVES) {
+        return true;
+    }
+
+    return bypassURLs.some((bypassURL) => {
+        const prefix = normalizeURL(new URL(bypassURL));
+        const prefixPath = removeTrailingSlash(prefix.pathname);
+        return (
+            prefix.origin === url.origin &&
+            (removeTrailingSlash(url.pathname) === prefixPath ||
+                url.pathname.startsWith(`${prefixPath}/`))
+        );
+    });
+}
+
+/**
  * For a given GitBook URL, return a list of alternative URLs that could be matched against to lookup the content.
  * The approach is optimized to aim at reusing cached lookup results as much as possible.
  *
@@ -62,8 +91,9 @@ function getContentPathSegments(pathSegments: string[]): string[] {
  *   - Public content has a custom hostname in the organization with a variant: docs.company.com/<space>/v/<variant>/<path>
  *   - Public content has a custom hostname in the organization with a variant and a share-link: docs.company.com/<space>/<link>/v/<variant>/<path>
  */
-export function getURLLookupAlternatives(input: URL) {
+export function getURLLookupAlternatives(input: URL, options: { bypass?: boolean } = {}) {
     const url = normalizeURL(input);
+    const bypass = options.bypass ?? shouldBypassLookupAlternatives(url);
 
     let basePath: string | undefined = undefined;
     let changeRequest: string | undefined = undefined;
@@ -121,6 +151,11 @@ export function getURLLookupAlternatives(input: URL) {
         const contentURL = new URL(url);
         contentURL.pathname = contentSegments.slice(0, tildeIndex).join('/');
         pushAlternative(contentURL, pathSegments.slice(revisionOrChangeIdIndex + 1).join('/'));
+    }
+
+    // Revisions and changes above still need their alternatives to extract the base path.
+    else if (bypass) {
+        pushAlternative(url, '');
     }
 
     // URL looks like a collection url (with /v/ in the path)
