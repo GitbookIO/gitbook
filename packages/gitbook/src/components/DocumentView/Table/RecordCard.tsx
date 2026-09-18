@@ -41,9 +41,7 @@ export async function RecordCard(
             ? resolveContentRefInDocument(document, dark.contentRef, context.contentContext)
             : null,
         targetRef && context.contentContext
-            ? resolveContentRefInDocument(document, targetRef, context.contentContext, {
-                  resolveGitPageURLs: true,
-              })
+            ? resolveContentRefInDocument(document, targetRef, context.contentContext)
             : null,
     ]);
 

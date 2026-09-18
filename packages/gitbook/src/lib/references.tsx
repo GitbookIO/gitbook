@@ -84,8 +84,6 @@ export interface ResolvedContentRef {
 }
 
 export interface ResolveContentRefOptions {
-    /** Enable repository-page lookup for navigational links. */
-    resolveGitPageURLs?: boolean;
     /**
      * Should the content ref be rendered as text.
      * @default false
@@ -149,7 +147,7 @@ export async function resolveContentRef(
 
     switch (contentRef.kind) {
         case 'url': {
-            if (options.resolveGitPageURLs && 'site' in context) {
+            if ('site' in context) {
                 const target = findGitPageURLTarget(
                     contentRef.url,
                     listAllSiteSpaces(context.structure)

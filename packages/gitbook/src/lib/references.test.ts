@@ -807,11 +807,10 @@ describe('repository page links', () => {
         kind: 'url' as const,
         url: 'https://github.com/acme/docs/tree/main/api/auth.md#tokens',
     };
-    const options = { resolveGitPageURLs: true };
 
     it('renders a matching repository URL as a site page link with its anchor', async () => {
         const { context, getRevision } = fixture();
-        const result = await resolveContentRef(ref, context, options);
+        const result = await resolveContentRef(ref, context);
         expect(result?.href).toBe('/api/authentication#tokens');
         expect(result?.text).toBe('Authentication');
         expect(result?.ancestors?.[0]?.label).toBe('API');
@@ -829,10 +828,13 @@ describe('repository page links', () => {
         expect(ref.kind).toBe('url');
     });
 
-    it('keeps media/resource URL resolution unchanged unless enabled', async () => {
-        const { context, getSpace } = fixture();
-        expect((await resolveContentRef(ref, context))?.href).toBe(ref.url);
-        expect(getSpace).not.toHaveBeenCalled();
+    it('preserves asset URLs that do not match a page', async () => {
+        const { context } = fixture();
+        const assetRef = {
+            kind: 'url' as const,
+            url: ref.url.replace('auth.md#tokens', 'diagram.png'),
+        };
+        expect((await resolveContentRef(assetRef, context))?.href).toBe(assetRef.url);
     });
 
     it('reads only the matching space in a 500-space site', async () => {
@@ -855,9 +857,7 @@ describe('repository page links', () => {
                 },
             }))
         );
-        expect((await resolveContentRef(ref, context, options))?.href).toBe(
-            '/api/authentication#tokens'
-        );
+        expect((await resolveContentRef(ref, context))?.href).toBe('/api/authentication#tokens');
         expect(getSpace).toHaveBeenCalledTimes(1);
         expect(getRevision).toHaveBeenCalledTimes(1);
     });
@@ -866,7 +866,7 @@ describe('repository page links', () => {
         'preserves the fallback for unavailable content: %j',
         async (state) => {
             const { context } = fixture(state);
-            const result = await resolveContentRef(ref, context, options);
+            const result = await resolveContentRef(ref, context);
             expect(result).toEqual({ href: ref.url, text: ref.url, active: false });
         }
     );
@@ -877,9 +877,7 @@ describe('repository page links', () => {
             ref.url.replace('/main/', '/preview/'),
             ref.url.replace('/acme/', '/other/'),
         ]) {
-            expect((await resolveContentRef({ kind: 'url', url }, context, options))?.href).toBe(
-                url
-            );
+            expect((await resolveContentRef({ kind: 'url', url }, context))?.href).toBe(url);
         }
         expect(getRevision).not.toHaveBeenCalled();
     });
@@ -887,10 +885,8 @@ describe('repository page links', () => {
     it('resolves the unchanged stored URL when the target becomes available', async () => {
         const state = { missing: true };
         const { context } = fixture(state);
-        expect((await resolveContentRef(ref, context, options))?.href).toBe(ref.url);
+        expect((await resolveContentRef(ref, context))?.href).toBe(ref.url);
         state.missing = false;
-        expect((await resolveContentRef(ref, context, options))?.href).toBe(
-            '/api/authentication#tokens'
-        );
+        expect((await resolveContentRef(ref, context))?.href).toBe('/api/authentication#tokens');
     });
 });

@@ -76,9 +76,7 @@ export async function InlineLinkButton(
 
     const resolved =
         context.contentContext && inline.data.ref
-            ? await resolveContentRefInDocument(document, inline.data.ref, context.contentContext, {
-                  resolveGitPageURLs: true,
-              })
+            ? await resolveContentRefInDocument(document, inline.data.ref, context.contentContext)
             : null;
 
     const href =
