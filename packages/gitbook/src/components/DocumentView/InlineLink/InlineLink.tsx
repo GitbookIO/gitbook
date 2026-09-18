@@ -52,8 +52,8 @@ export async function InlineLink(props: InlineProps<DocumentInlineLink>) {
     const anchorElement = (
         <InlineLinkAnchor
             href={resolved.href}
-            contentRef={inline.data.ref}
-            isExternal={inline.data.ref.kind === 'url'}
+            contentRef={resolved.resolvedRef ?? inline.data.ref}
+            isExternal={(resolved.resolvedRef ?? inline.data.ref).kind === 'url'}
         >
             {inlinesElement}
         </InlineLinkAnchor>
@@ -121,7 +121,7 @@ function InlineLinkTooltipWrapper(props: {
 
     let breadcrumbs = resolved.ancestors ?? [];
     const isMailto = resolved.href.startsWith('mailto:');
-    const isExternal = inline.data.ref.kind === 'url';
+    const isExternal = (resolved.resolvedRef ?? inline.data.ref).kind === 'url';
     const isSamePage = inline.data.ref.kind === 'anchor' && inline.data.ref.page === undefined;
 
     if (isMailto) {

@@ -80,6 +80,7 @@ export function createDataFetcher(
             return getRevision(input, {
                 spaceId: params.spaceId,
                 revisionId: params.revisionId,
+                metadata: params.metadata ?? false,
             });
         },
         getRevisionPageByPath(params) {
@@ -319,8 +320,15 @@ const getChangeRequest = cache(
 
 // We don't use remote cache on vercel because of the 2Mb limit on cache size that makes some route crash
 const getRevision = cache(
-    async (input: DataFetcherInput, params: { spaceId: string; revisionId: string }) => {
+    async (
+        input: DataFetcherInput,
+        params: { spaceId: string; revisionId: string; metadata: boolean }
+    ) => {
         'use cache';
+        if (params.metadata) {
+            // Git paths can change without changing the content revision.
+            cacheTag(getCacheTag({ tag: 'space', space: params.spaceId }));
+        }
         return wrapDataFetcherError(async () => {
             return trace(`getRevision(${params.spaceId}, ${params.revisionId})`, async () => {
                 const api = apiClient(input);
@@ -328,7 +336,7 @@ const getRevision = cache(
                     params.spaceId,
                     params.revisionId,
                     {
-                        metadata: false,
+                        metadata: params.metadata,
                     },
                     {
                         ...noCacheFetchOptions,
