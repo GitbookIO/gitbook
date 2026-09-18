@@ -151,6 +151,7 @@ export const hu: TranslationLanguage = {
     ai_chat_tools_submit_feedback: 'Visszajelzés küldése',
     ai_chat_tools_submit_assistant_feedback: 'Az asszisztens előző üzenetének értékelése: ${1}',
     ai_chat_tools_submitted_feedback: 'Visszajelzés elküldve',
+    ai_chat_tools_shared_feedback_with_team: 'Visszajelzés elküldve a dokumentációs csapatnak',
     ai_chat_tools_mcp_tool: '${1} meghívva',
     ai_chat_ask: '${1} kérdezése',
     ai_chat_ask_about: '${1} megkérdezése ${2} témában',

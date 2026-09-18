@@ -148,6 +148,7 @@ export const tr: TranslationLanguage = {
     ai_chat_tools_submit_feedback: 'Geri bildirim gönder',
     ai_chat_tools_submit_assistant_feedback: "Asistan'ın önceki mesajını ${1} olarak değerlendir",
     ai_chat_tools_submitted_feedback: 'Geri bildiriminiz gönderildi',
+    ai_chat_tools_shared_feedback_with_team: 'Geri bildirim dokümantasyon ekibine gönderildi',
     ai_chat_tools_mcp_tool: '${1} çağrıldı',
     ai_chat_ask: '${1} sor',
     ai_chat_ask_about: '${1} için ${2} hakkında sor',

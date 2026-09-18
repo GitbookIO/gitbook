@@ -21,6 +21,7 @@ import {
     serveProxyAnalyticsEvent,
     trackServerInsightsEvents,
 } from './lib/tracking';
+import { AI_CATALOG_PATH, AI_CATALOG_WELL_KNOWN_PATH } from '@/lib/aiCatalog/paths';
 import { getAPITokenFromCookies, getAPITokenResponseCookies } from '@/lib/api-token-cookie';
 import { isChatGPTRequest } from '@/lib/chatgpt';
 import { MAX_CHUNKED_COOKIE_LENGTH } from '@/lib/chunked-cookies';
@@ -34,9 +35,10 @@ import {
     normalizeRequestURL,
     throwIfDataError,
 } from '@/lib/data';
-import { isGitBookAssetsHostURL, isGitBookHostURL } from '@/lib/env';
+import { GITBOOK_DISABLE_INSIGHTS, isGitBookAssetsHostURL, isGitBookHostURL } from '@/lib/env';
 import { getImageResizingContextId } from '@/lib/images';
 import { isAITrainingOrIndexingRequest } from '@/lib/indexing-crawlers';
+import { MCP_SERVER_CARD_PATH, MCP_SERVER_CARD_WELL_KNOWN_PATH } from '@/lib/mcp/paths';
 import { MiddlewareHeaders } from '@/lib/middleware';
 import {
     createOAuthProtectedResourceMetadataResponse,
@@ -185,6 +187,9 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
 
     //Forwards analytics events
     if (siteRequestURL.pathname.endsWith('/~gitbook/__evt')) {
+        if (GITBOOK_DISABLE_INSIGHTS) {
+            return new Response(null, { status: 204 });
+        }
         return await serveProxyAnalyticsEvent(request);
     }
 
@@ -312,19 +317,6 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
             });
         }
 
-        const normalizedSitePathname = removeLeadingSlash(
-            removeTrailingSlash(siteURLData.pathname)
-        );
-        if (normalizedSitePathname !== '~gitbook/auth/logout') {
-            cookies.push(
-                ...getResponseCookiesForVisitorAuth(
-                    getVisitorAuthBasePath(siteRequestURL, siteURLData),
-                    visitorToken,
-                    request.cookies.getAll()
-                )
-            );
-        }
-
         // We use the host/origin from the canonical URL to ensure the links are
         // correctly generated when the site is proxied. e.g. https://proxy.gitbook.com/site/siteId/...
         const siteCanonicalURL = new URL(siteURLData.canonicalUrl);
@@ -352,6 +344,16 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
             normalizedVisitorURL.toString() !== incomingURL.toString() &&
             !isRevalidationRequest(request.headers)
         ) {
+            if (visitorToken?.source === 'url') {
+                cookies.push(
+                    ...getResponseCookiesForVisitorAuth(
+                        getVisitorAuthBasePath(siteRequestURL, siteURLData),
+                        visitorToken,
+                        request.cookies.getAll()
+                    )
+                );
+            }
+
             return writeResponseCookies(
                 NextResponse.redirect(normalizedVisitorURL.toString()),
                 cookies
@@ -770,6 +772,10 @@ const EMBED_PAGE_PATH_REGEX = /^~gitbook\/embed\/page(\/(\S*))?$/;
 const PATH_ALIASES: Record<string, string> = {
     'sitemap.md': 'llms.txt',
     '.well-known/sitemap.md': 'llms.txt',
+    // Scanners probe `.well-known` for a server card even though the MCP extension reserves
+    // `<streamable-http-url>/server-card`; both paths serve the same document.
+    [MCP_SERVER_CARD_WELL_KNOWN_PATH]: MCP_SERVER_CARD_PATH,
+    [AI_CATALOG_WELL_KNOWN_PATH]: AI_CATALOG_PATH,
 };
 
 /**
@@ -889,6 +895,8 @@ function encodePathInSiteContent(
             return { pathname, routeType: 'static' };
         case '~gitbook/mcp':
         case '~gitbook/mcp/auth':
+        case MCP_SERVER_CARD_PATH:
+        case AI_CATALOG_PATH:
         case '~gitbook/pdf':
         case '~gitbook/search':
         case '~gitbook/auth/login':

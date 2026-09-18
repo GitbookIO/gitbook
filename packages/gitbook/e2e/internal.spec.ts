@@ -159,7 +159,7 @@ const searchTestCases: Test[] = [
         },
     },
     {
-        name: 'Search - Keyboard focus stays within search',
+        name: 'Search - Keyboard focus exits to the next page control',
         url: getCustomizationURL({
             ai: {
                 mode: CustomizationAIMode.Search,
@@ -180,13 +180,16 @@ const searchTestCases: Test[] = [
                 )
                 .filter({ visible: true })
                 .last();
+            const nextPageControl = page.getByTestId('table-of-contents').getByRole('link').first();
             await expect(finalPopupControl).toBeVisible();
+            await expect(nextPageControl).toBeVisible();
             await finalPopupControl.focus();
             await page.keyboard.press('Tab');
-            await expect(searchInput).toBeFocused();
+            await expect(searchPopup).toBeHidden();
+            await expect(nextPageControl).toBeFocused();
 
             await page.keyboard.press('Shift+Tab');
-            await expect(finalPopupControl).toBeFocused();
+            await expect(searchInput).toBeFocused();
         },
     },
     {
@@ -1747,7 +1750,6 @@ const testCases: TestsCase[] = [
             {
                 name: 'Without previewed ads',
                 url: 'text-page?ads_preview=1',
-                run: waitForCookiesDialog,
             },
         ],
     },

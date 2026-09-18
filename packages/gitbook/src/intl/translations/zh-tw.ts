@@ -145,6 +145,7 @@ export const zh_tw: TranslationLanguage = {
     ai_chat_tools_submit_feedback: '提交意見回饋',
     ai_chat_tools_submit_assistant_feedback: '將助理的上一則訊息評為 ${1}',
     ai_chat_tools_submitted_feedback: '已提交意見回饋',
+    ai_chat_tools_shared_feedback_with_team: '已將意見回饋傳送給文件團隊',
     ai_chat_tools_mcp_tool: '已呼叫 ${1}',
     ai_chat_ask: '詢問 ${1}',
     ai_chat_ask_about: '詢問 ${1} 關於${2}',
