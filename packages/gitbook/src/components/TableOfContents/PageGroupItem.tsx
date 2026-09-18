@@ -34,9 +34,8 @@ export function PageGroupItem(props: { page: ClientTOCPageGroup; isFirst?: boole
         >
             <div
                 className={tcls(
-                    // Pinned below the sidebar's 16px top fade (ScrollContainer's `mask-t-from-*`),
-                    // so a stuck header is never rendered inside the band that fades it out.
-                    'top-4 sticky z-1',
+                    // Keep the group at the same vertical position as the original sidebar layout.
+                    '-top-4 sticky z-1',
                     'bg-tint-base',
                     'sidebar-filled:bg-tint-subtle',
                     'theme-muted:bg-tint-subtle',
@@ -92,7 +91,8 @@ export function PageGroupItem(props: { page: ClientTOCPageGroup; isFirst?: boole
                         isOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
                     )}
                 >
-                    <div className="overflow-hidden">
+                    {/* Clip only while closed so open descendant headers can stick to the main scrollport. */}
+                    <div className={tcls('min-h-0', isOpen ? 'overflow-visible' : 'overflow-clip')}>
                         <PagesList pages={descendants} />
                     </div>
                 </div>

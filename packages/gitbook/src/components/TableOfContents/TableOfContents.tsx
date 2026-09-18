@@ -132,7 +132,7 @@ export async function TableOfContents(props: {
                     <ScrollContainer
                         data-testid="toc-scroll-container"
                         orientation="vertical"
-                        // `pt-4` matches the page-group headers' sticky offset, so the first group rests on it.
+                        // Leave room for the first group below the scrollport's top fade.
                         contentClassName="flex flex-col p-2 pt-4 gutter-stable"
                         active="[data-active=true]"
                         leading={{
