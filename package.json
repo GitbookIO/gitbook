@@ -19,7 +19,8 @@
         "react": "catalog:",
         "react-dom": "catalog:",
         "esbuild": "0.27.3",
-        "axios": "1.8.4"
+        "axios": "1.8.4",
+        "@opennextjs/aws": "4.1.5"
     },
     "private": true,
     "scripts": {

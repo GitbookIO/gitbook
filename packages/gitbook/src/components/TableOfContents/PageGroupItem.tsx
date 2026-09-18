@@ -71,7 +71,7 @@ export function PageGroupItem(props: { page: ClientTOCPageGroup; isFirst?: boole
                     {hasDescendants ? (
                         <span
                             className={tcls(
-                                'toc-group-chevron ml-auto flex shrink-0 transition-opacity duration-150',
+                                'toc-group-chevron ml-auto mr-1 flex shrink-0 transition-opacity duration-150',
                                 isOpen
                                     ? 'pointer-events-none opacity-0 delay-75'
                                     : 'opacity-6 delay-0'
