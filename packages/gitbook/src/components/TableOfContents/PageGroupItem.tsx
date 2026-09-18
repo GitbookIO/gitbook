@@ -14,7 +14,6 @@ export function PageGroupItem(props: { page: ClientTOCPageGroup; isFirst?: boole
     const descendants = page.descendants ?? [];
     const hasDescendants = descendants.length > 0;
     const [isOpen, setIsOpen] = React.useState(true);
-    const { sentinelRef, isSticking } = useIsSticking();
 
     const handleToggle = () => {
         if (!hasDescendants) {
@@ -26,28 +25,24 @@ export function PageGroupItem(props: { page: ClientTOCPageGroup; isFirst?: boole
 
     return (
         <li className="page-group-item flex flex-col">
-            <div ref={sentinelRef} className="h-0" aria-hidden="true" />
             <div
                 className={tcls(
-                    '-top-4 sticky z-1 after:pointer-events-none after:absolute after:inset-x-0 after:top-full after:h-4 after:bg-linear-to-b after:from-tint-base after:to-transparent after:transition-opacity',
-                    isSticking ? '' : 'after:opacity-0',
-                    'mt-1 pt-2.5 pb-0',
+                    // Pinned below the sidebar's 16px top fade (ScrollContainer's `mask-t-from-*`),
+                    // so a stuck header is never rendered inside the band that fades it out.
+                    'top-4 sticky z-1',
+                    // Spacing lives in the margin, not padding, to keep the pinned box the size of
+                    // the button: padding would push the title further down the sidebar when stuck.
+                    'mt-3.5',
                     'bg-tint-base',
-                    'sidebar-filled:after:from-tint-subtle',
                     'sidebar-filled:bg-tint-subtle',
-                    'theme-muted:after:from-tint-subtle',
                     'theme-muted:bg-tint-subtle',
                     '[html.sidebar-filled.theme-bold.tint_&]:bg-tint-subtle',
-                    '[html.sidebar-filled.theme-bold.tint_&]:after:from-tint-subtle',
                     '[html.sidebar-filled.theme-muted_&]:bg-tint-base',
-                    '[html.sidebar-filled.theme-muted_&]:after:from-tint-base',
                     '[html.sidebar-filled.theme-bold.tint_&]:bg-tint-base',
-                    '[html.sidebar-filled.theme-bold.tint_&]:after:from-tint-base',
                     'lg:[html.sidebar-default.theme-gradient_&]:bg-gradient-primary',
-                    'lg:[html.sidebar-default.theme-gradient_&]:after:from-primary-2',
                     'lg:[html.sidebar-default.theme-gradient.tint_&]:bg-gradient-tint',
-                    'lg:[html.sidebar-default.theme-gradient.tint_&]:after:from-tint-subtle',
-                    isFirst ? '-mt-2 -top-2 circular-corners:rounded-t-2xl rounded-t-md pt-2' : ''
+                    // The first group rests exactly on its sticky offset, so it never shifts on scroll.
+                    isFirst ? 'mt-0 circular-corners:rounded-t-2xl rounded-t-md' : ''
                 )}
             >
                 <button
@@ -100,40 +95,4 @@ export function PageGroupItem(props: { page: ClientTOCPageGroup; isFirst?: boole
             ) : null}
         </li>
     );
-}
-
-/**
- * Detect when a sticky element becomes "stuck" using an IntersectionObserver on a sentinel.
- * Place the sentinel ref on a 0-height element right before the sticky element.
- */
-function useIsSticking() {
-    const sentinelRef = React.useRef<HTMLDivElement>(null);
-    const [isSticking, setIsSticking] = React.useState(false);
-
-    React.useEffect(() => {
-        const sentinel = sentinelRef.current;
-        if (!sentinel) return;
-
-        // Find the closest scrollable ancestor to use as IntersectionObserver root
-        let scrollParent: Element | null = sentinel.parentElement;
-        while (scrollParent) {
-            const { overflowY } = getComputedStyle(scrollParent);
-            if (overflowY === 'auto' || overflowY === 'scroll') break;
-            scrollParent = scrollParent.parentElement;
-        }
-
-        const observer = new IntersectionObserver(
-            ([entry]) => {
-                if (!entry) return;
-                const rootTop = entry.rootBounds?.top ?? 0;
-                setIsSticking(!entry.isIntersecting && entry.boundingClientRect.top < rootTop);
-            },
-            { root: scrollParent }
-        );
-
-        observer.observe(sentinel);
-        return () => observer.disconnect();
-    }, []);
-
-    return { sentinelRef, isSticking };
 }
