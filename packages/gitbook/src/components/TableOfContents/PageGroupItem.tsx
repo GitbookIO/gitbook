@@ -24,15 +24,19 @@ export function PageGroupItem(props: { page: ClientTOCPageGroup; isFirst?: boole
     };
 
     return (
-        <li className="page-group-item flex flex-col">
+        <li
+            className={tcls(
+                'page-group-item flex flex-col',
+                // Keep the separation in the flow, outside the sticky header, so it does not
+                // offset the header when it is pinned to the top of the scroll container.
+                !isFirst ? 'pt-3.5' : ''
+            )}
+        >
             <div
                 className={tcls(
                     // Pinned below the sidebar's 16px top fade (ScrollContainer's `mask-t-from-*`),
                     // so a stuck header is never rendered inside the band that fades it out.
                     'top-4 sticky z-1',
-                    // Spacing lives in the margin, not padding, to keep the pinned box the size of
-                    // the button: padding would push the title further down the sidebar when stuck.
-                    'mt-3.5',
                     'bg-tint-base',
                     'sidebar-filled:bg-tint-subtle',
                     'theme-muted:bg-tint-subtle',
