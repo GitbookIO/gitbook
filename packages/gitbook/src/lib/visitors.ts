@@ -1,7 +1,7 @@
 import { isAIAgent } from '@vercel/agent-readability';
 import { type JwtPayload, jwtDecode } from 'jwt-decode';
 import { type NextRequest, NextResponse } from 'next/server';
-import hash from 'object-hash';
+import { hash } from './utils';
 
 import type { SiteVisitorPayload } from '@gitbook/api';
 
