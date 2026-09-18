@@ -14,7 +14,6 @@ export function PageGroupItem(props: { page: ClientTOCPageGroup; isFirst?: boole
     const descendants = page.descendants ?? [];
     const hasDescendants = descendants.length > 0;
     const [isOpen, setIsOpen] = React.useState(true);
-    const { sentinelRef, isSticking } = useIsSticking();
 
     const handleToggle = () => {
         if (!hasDescendants) {
@@ -25,29 +24,28 @@ export function PageGroupItem(props: { page: ClientTOCPageGroup; isFirst?: boole
     };
 
     return (
-        <li className="page-group-item flex flex-col">
-            <div ref={sentinelRef} className="h-0" aria-hidden="true" />
+        <li
+            className={tcls(
+                'page-group-item flex flex-col',
+                // Keep the separation in the flow, outside the sticky header, so it does not
+                // offset the header when it is pinned to the top of the scroll container.
+                !isFirst ? 'pt-3.5' : ''
+            )}
+        >
             <div
                 className={tcls(
-                    '-top-4 sticky z-1 after:pointer-events-none after:absolute after:inset-x-0 after:top-full after:h-4 after:bg-linear-to-b after:from-tint-base after:to-transparent after:transition-opacity',
-                    isSticking ? '' : 'after:opacity-0',
-                    'mt-1 pt-2.5 pb-0',
+                    // Keep the group at the same vertical position as the original sidebar layout.
+                    '-top-4 sticky z-1',
                     'bg-tint-base',
-                    'sidebar-filled:after:from-tint-subtle',
                     'sidebar-filled:bg-tint-subtle',
-                    'theme-muted:after:from-tint-subtle',
                     'theme-muted:bg-tint-subtle',
                     '[html.sidebar-filled.theme-bold.tint_&]:bg-tint-subtle',
-                    '[html.sidebar-filled.theme-bold.tint_&]:after:from-tint-subtle',
                     '[html.sidebar-filled.theme-muted_&]:bg-tint-base',
-                    '[html.sidebar-filled.theme-muted_&]:after:from-tint-base',
                     '[html.sidebar-filled.theme-bold.tint_&]:bg-tint-base',
-                    '[html.sidebar-filled.theme-bold.tint_&]:after:from-tint-base',
                     'lg:[html.sidebar-default.theme-gradient_&]:bg-gradient-primary',
-                    'lg:[html.sidebar-default.theme-gradient_&]:after:from-primary-2',
                     'lg:[html.sidebar-default.theme-gradient.tint_&]:bg-gradient-tint',
-                    'lg:[html.sidebar-default.theme-gradient.tint_&]:after:from-tint-subtle',
-                    isFirst ? '-mt-2 -top-2 circular-corners:rounded-t-2xl rounded-t-md pt-2' : ''
+                    // The first group rests exactly on its sticky offset, so it never shifts on scroll.
+                    isFirst ? 'mt-0 circular-corners:rounded-t-2xl rounded-t-md' : ''
                 )}
             >
                 <button
@@ -93,47 +91,12 @@ export function PageGroupItem(props: { page: ClientTOCPageGroup; isFirst?: boole
                         isOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
                     )}
                 >
-                    <div className="overflow-hidden">
+                    {/* Clip only while closed so open descendant headers can stick to the main scrollport. */}
+                    <div className={tcls('min-h-0', isOpen ? 'overflow-visible' : 'overflow-clip')}>
                         <PagesList pages={descendants} />
                     </div>
                 </div>
             ) : null}
         </li>
     );
-}
-
-/**
- * Detect when a sticky element becomes "stuck" using an IntersectionObserver on a sentinel.
- * Place the sentinel ref on a 0-height element right before the sticky element.
- */
-function useIsSticking() {
-    const sentinelRef = React.useRef<HTMLDivElement>(null);
-    const [isSticking, setIsSticking] = React.useState(false);
-
-    React.useEffect(() => {
-        const sentinel = sentinelRef.current;
-        if (!sentinel) return;
-
-        // Find the closest scrollable ancestor to use as IntersectionObserver root
-        let scrollParent: Element | null = sentinel.parentElement;
-        while (scrollParent) {
-            const { overflowY } = getComputedStyle(scrollParent);
-            if (overflowY === 'auto' || overflowY === 'scroll') break;
-            scrollParent = scrollParent.parentElement;
-        }
-
-        const observer = new IntersectionObserver(
-            ([entry]) => {
-                if (!entry) return;
-                const rootTop = entry.rootBounds?.top ?? 0;
-                setIsSticking(!entry.isIntersecting && entry.boundingClientRect.top < rootTop);
-            },
-            { root: scrollParent }
-        );
-
-        observer.observe(sentinel);
-        return () => observer.disconnect();
-    }, []);
-
-    return { sentinelRef, isSticking };
 }
