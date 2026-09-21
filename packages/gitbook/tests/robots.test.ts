@@ -14,8 +14,6 @@ describe('robots.txt', () => {
         expect(response.headers.get('content-type')).toContain('text/plain');
         const content = await response.text();
         expect(content).toContain('Allow: /\n');
-        expect(content).toContain('Disallow: /rss.xml\n');
-        expect(content).toContain('Disallow: /*/rss.xml\n');
         expect(content).toContain('Content-Signal: ai-train=yes, search=yes, ai-input=yes');
     });
 

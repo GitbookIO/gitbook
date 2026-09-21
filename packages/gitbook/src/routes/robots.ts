@@ -34,8 +34,6 @@ export async function serveRobotsTxt(context: GitBookSiteContext) {
               'Allow: /~gitbook/icon?*',
               'Allow: /favicon.ico',
               'Allow: /',
-              'Disallow: /rss.xml',
-              'Disallow: /*/rss.xml',
               `Sitemap: ${sitemapUrl}`,
           ]
         : [
