@@ -39,7 +39,6 @@ import {
     getDocumentFilterableTags,
     updatesFilterStyleHref,
 } from '@/lib/updates';
-import { getPageRSSURL } from '@/routes/rss';
 
 export type SitePageProps = {
     context: GitBookSiteContext;
@@ -244,9 +243,6 @@ export async function generateSitePageMetadata(props: SitePageProps): Promise<Me
             languages: alternates?.languages,
             types: {
                 'text/markdown': `${linker.toAbsoluteURL(linker.toPathInSpace(page.path))}.md`,
-                // We always reference the RSS feed even if the page doesn't have updates blocks,
-                // It might result in 404, but we can't know here if the page has updates blocks.
-                'application/rss+xml': [{ url: getPageRSSURL(context, page), title: 'RSS Feed' }],
                 // Currently it will output with an empty "type" like <link rel="alternate" href="..." type />
                 // Team at Vercel is aware of this and will ensure it will be omitted when the value is empty in future versions of Next.js
                 // https://gitbook.slack.com/archives/C04K6MV5W1K/p1763034072958419?thread_ts=1762937203.511629&cid=C04K6MV5W1K
