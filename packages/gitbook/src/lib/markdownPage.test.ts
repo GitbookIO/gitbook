@@ -1,8 +1,11 @@
-import { describe, expect, it } from 'bun:test';
+import { describe, expect, it, mock } from 'bun:test';
+
+mock.module('server-only', () => ({}));
 
 import type { GitBookAnyContext } from './context';
 import { createLinker, linkerWithDirectPagePaths, linkerWithMarkdownPages } from './links';
-import { fromPageMarkdown, toPageMarkdown } from './markdownPage';
+
+const { fromPageMarkdown, toPageMarkdown } = await import('./markdownPage');
 
 const page = {
     id: 'designer',
@@ -55,4 +58,58 @@ describe('HTML links in page markdown', () => {
             `<table><tr><td><a href="${linker.toPathForPagePath({ path: page.path })}">${page.title}</a></td></tr></table>\n`
         );
     });
+});
+
+it('rewrites stable file references inside HTML images', async () => {
+    const fileId = 'WNXq6RcD2e4WTRcZEz4f';
+
+    const contextWithFile = {
+        ...context,
+        revision: {
+            pages: [page],
+            files: [
+                {
+                    id: fileId,
+                    name: 'options-menu.svg',
+                    downloadURL: 'https://cdn.example.com/options-menu.svg',
+                },
+            ],
+        },
+    } as unknown as GitBookAnyContext;
+
+    const markdown = `<img src="/files/${fileId}" alt="">\n`;
+
+    const tree = await fromPageMarkdown(contextWithFile, {
+        markdown,
+        pagePath: 'workflows',
+    });
+
+    expect(toPageMarkdown(tree)).toContain('src="https://cdn.example.com/options-menu.svg"');
+});
+
+it('rewrites stable file references inside HTML image srcsets', async () => {
+    const fileId = 'WNXq6RcD2e4WTRcZEz4f';
+
+    const contextWithFile = {
+        ...context,
+        revision: {
+            pages: [page],
+            files: [
+                {
+                    id: fileId,
+                    name: 'options-menu.svg',
+                    downloadURL: 'https://cdn.example.com/options-menu.svg',
+                },
+            ],
+        },
+    } as unknown as GitBookAnyContext;
+
+    const markdown = `<source srcset="/files/${fileId}" media="(prefers-color-scheme: dark)">\n`;
+
+    const tree = await fromPageMarkdown(contextWithFile, {
+        markdown,
+        pagePath: 'workflows',
+    });
+
+    expect(toPageMarkdown(tree)).toContain('srcset="https://cdn.example.com/options-menu.svg"');
 });
