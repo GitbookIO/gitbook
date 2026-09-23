@@ -7,7 +7,7 @@ import {
 } from '@gitbook/api';
 
 import type { GitBookSiteContext } from '@/lib/context';
-import { getDataOrNull } from '@/lib/data';
+import { encodeURLPathname, getDataOrNull } from '@/lib/data';
 import { resolvePageId } from '@/lib/pages';
 import { withLeadingSlash } from '@/lib/paths';
 import { resolveSiteSpacePagePath } from '@/lib/sites';
@@ -187,8 +187,8 @@ export function getPathnameParam(params: PagePathParams): string {
 
 /**
  * Get the lowercased pathname to redirect a missing page to, or `null` if there is none.
- * The pathname is percent-encoded, so lowercase its decoded form and re-encode it the way
- * `normalizeURL` does: any other encoding would make the middleware redirect again, or loop.
+ * The pathname is percent-encoded, so lowercase its decoded form and re-encode it canonically:
+ * any other encoding would make the middleware redirect again, or loop.
  */
 export function getLowercasePathnameRedirect(rawPathname: string): string | null {
     let changed = false;
@@ -211,7 +211,5 @@ export function getLowercasePathnameRedirect(rawPathname: string): string | null
         return null;
     }
 
-    const url = new URL('https://gitbook.invalid');
-    url.pathname = segments.join('/');
-    return url.pathname.slice(1);
+    return encodeURLPathname(segments.join('/')).slice(1);
 }

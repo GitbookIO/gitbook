@@ -233,7 +233,7 @@ export function normalizeRequestURL(url: URL): Response | null {
 
 /**
  * Normalize a URL to remove duplicate slashes and trailing slashes
- * and transform the pathname to lowercase.
+ * and decode the pathname to its canonical encoding.
  */
 export function normalizeURL(url: URL) {
     const result = new URL(url);
@@ -245,6 +245,15 @@ export function normalizeURL(url: URL) {
 
     result.pathname = url.pathname.replace(/\/{2,}/g, '/').replace(/\/$/, '');
     return decodeURLPath(result);
+}
+
+/**
+ * Percent-encode a decoded pathname the way the URL parser does, the canonical form `normalizeURL` produces.
+ */
+export function encodeURLPathname(pathname: string): string {
+    const url = new URL('https://gitbook.invalid');
+    url.pathname = pathname;
+    return url.pathname;
 }
 
 /**
