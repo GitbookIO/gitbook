@@ -1,4 +1,5 @@
 'use client';
+import { useTrackEvent } from '../Insights';
 import { Button, type ButtonProps } from './Button';
 
 /**
@@ -7,13 +8,17 @@ import { Button, type ButtonProps } from './Button';
 export function DownloadButton(
     props: Omit<ButtonProps, 'onClick' | 'href'> & { downloadUrl: string; filename: string }
 ) {
-    const { downloadUrl, filename, ...buttonProps } = props;
+    const { downloadUrl, filename, insights, ...buttonProps } = props;
+    const trackEvent = useTrackEvent();
 
     return (
         <Button
             {...buttonProps}
             onClick={(e) => {
                 e.preventDefault();
+                if (insights) {
+                    trackEvent(insights);
+                }
                 void forceDownload(downloadUrl, filename);
             }}
         />
