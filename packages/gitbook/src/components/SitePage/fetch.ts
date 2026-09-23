@@ -7,7 +7,7 @@ import {
 } from '@gitbook/api';
 
 import type { GitBookSiteContext } from '@/lib/context';
-import { encodeURLPathname, getDataOrNull } from '@/lib/data';
+import { getDataOrNull } from '@/lib/data';
 import { resolvePageId } from '@/lib/pages';
 import { withLeadingSlash } from '@/lib/paths';
 import { resolveSiteSpacePagePath } from '@/lib/sites';
@@ -212,4 +212,13 @@ export function getLowercasePathnameRedirect(rawPathname: string): string | null
     }
 
     return encodeURLPathname(segments.join('/')).slice(1);
+}
+
+/**
+ * Percent-encode a decoded pathname the way the URL parser does, the canonical form `normalizeURL` produces.
+ */
+function encodeURLPathname(pathname: string): string {
+    const url = new URL('https://gitbook.invalid');
+    url.pathname = pathname;
+    return url.pathname;
 }

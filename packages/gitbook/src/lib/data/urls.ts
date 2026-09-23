@@ -248,15 +248,6 @@ export function normalizeURL(url: URL) {
 }
 
 /**
- * Percent-encode a decoded pathname the way the URL parser does, the canonical form `normalizeURL` produces.
- */
-export function encodeURLPathname(pathname: string): string {
-    const url = new URL('https://gitbook.invalid');
-    url.pathname = pathname;
-    return url.pathname;
-}
-
-/**
  * Decode the url path component, we redirect URLs with encoded path components
  * so that we don't end up with multiple URLs for the same content (especially important because of caching).
  * If after decoding the path contains invalid characters, we throw an error.
