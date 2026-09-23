@@ -11,7 +11,12 @@ import {
 import { IconsProvider } from '@gitbook/icons';
 
 import { PageContextProvider } from '../PageContext';
-import { type PagePathParams, fetchPageData, getPathnameParam } from './fetch';
+import {
+    type PagePathParams,
+    fetchPageData,
+    getLowercasePathnameRedirect,
+    getPathnameParam,
+} from './fetch';
 import { PageClientLayout } from './PageClientLayout';
 import { UpdatesFilterProvider } from '@/components/DocumentView/UpdatesFilter';
 import { UpdatesFilterScript } from '@/components/DocumentView/UpdatesFilterScript';
@@ -277,8 +282,8 @@ export async function getSitePageData(props: SitePageProps) {
 
     const rawPathname = getPathnameParam(props.pageParams);
     if (!pageTarget) {
-        const pathname = rawPathname.toLowerCase();
-        if (pathname !== rawPathname) {
+        const pathname = getLowercasePathnameRedirect(rawPathname);
+        if (pathname !== null) {
             // If the pathname was not normalized, redirect to the normalized version
             // before trying to resolve the page again
             redirect(context.linker.toPathInSpace(pathname));

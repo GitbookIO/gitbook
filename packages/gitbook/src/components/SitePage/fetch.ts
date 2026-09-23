@@ -184,3 +184,41 @@ export function getPathnameParam(params: PagePathParams): string {
 
     return pathname.map((part) => decodeURIComponent(part)).join('/');
 }
+
+/**
+ * Get the lowercased pathname to redirect a missing page to, or `null` if there is none.
+ * The pathname is percent-encoded, so lowercase its decoded form and re-encode it canonically:
+ * any other encoding would make the middleware redirect again, or loop.
+ */
+export function getLowercasePathnameRedirect(rawPathname: string): string | null {
+    let changed = false;
+    const segments: string[] = [];
+
+    for (const segment of rawPathname.split('/')) {
+        let decoded: string;
+        try {
+            decoded = decodeURIComponent(segment);
+        } catch {
+            return null;
+        }
+
+        const lowercased = decoded.toLowerCase();
+        changed ||= lowercased !== decoded;
+        segments.push(lowercased);
+    }
+
+    if (!changed) {
+        return null;
+    }
+
+    return encodeURLPathname(segments.join('/')).slice(1);
+}
+
+/**
+ * Percent-encode a decoded pathname the way the URL parser does, the canonical form `normalizeURL` produces.
+ */
+function encodeURLPathname(pathname: string): string {
+    const url = new URL('https://gitbook.invalid');
+    url.pathname = pathname;
+    return url.pathname;
+}
