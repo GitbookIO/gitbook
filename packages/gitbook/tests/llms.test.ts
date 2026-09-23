@@ -153,6 +153,21 @@ describe('llms-full.txt', () => {
     );
 
     it(
+        'should not add a pagination header to a single-part llms-full.txt',
+        async () => {
+            const response = await fetch(
+                getContentTestURL('https://gitbook.gitbook.io/test-gitbook-open/llms-full.txt')
+            );
+            const text = await response.text();
+
+            expect(response.status).toBe(200);
+            expect(text).not.toContain('The content is paginated');
+            expect(text).not.toContain('[Next Page]');
+        },
+        { timeout: 30_000 }
+    );
+
+    it(
         'should return 404 when a llms-full.txt page has no content',
         async () => {
             const response = await fetch(

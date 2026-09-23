@@ -151,6 +151,26 @@ async function streamMarkdownPageEntries(
     const pagesToProcess = allPages.slice(offset, offset + DEFAULT_PAGE_LIMIT);
     let totalPagesProcessed = offset;
 
+    // Agents often grep the file or only read its start, so announce the other parts up front.
+    const part = Math.floor(offset / DEFAULT_PAGE_LIMIT);
+    const partCount = Math.ceil(allPages.length / DEFAULT_PAGE_LIMIT);
+    if (partCount > 1) {
+        const header = [
+            `> This is part ${part + 1} of ${partCount} of the full documentation (pages ${offset + 1}–${offset + pagesToProcess.length} of ${allPages.length}).`,
+            '> The content is paginated: fetch every part to see all of it.',
+        ];
+        if (part > 0) {
+            header.push(`> Previous part: ${getPartURL(context, part - 1)}`);
+        }
+        if (part < partCount - 1) {
+            header.push(`> Next part: ${getPartURL(context, part + 1)}`);
+        }
+        header.push(
+            `> Page index: ${context.linker.toAbsoluteURL(context.linker.toPathInSite('llms.txt'))}`
+        );
+        stream.enqueue(new TextEncoder().encode(`${header.join('\n')}\n\n`));
+    }
+
     // Process the pages
     for await (const markdown of pMapIterable(
         pagesToProcess,
@@ -168,13 +188,20 @@ async function streamMarkdownPageEntries(
     // Check if there are more pages and add next page link if needed
     const hasMorePages = allPages.length > offset + DEFAULT_PAGE_LIMIT;
     if (hasMorePages) {
-        const nextPage = Math.floor(offset / DEFAULT_PAGE_LIMIT) + 1;
-        const nextPageUrl = context.linker.toPathInSite(`llms-full.txt/${nextPage}`);
+        const nextPageUrl = getPartURL(context, part + 1);
         const nextPageLink = `\n\n---\n\n[Next Page](${nextPageUrl})\n\n`;
         stream.enqueue(new TextEncoder().encode(nextPageLink));
     }
 
     return { currentPageIndex: totalPagesProcessed, reachedLimit: hasMorePages };
+}
+
+/**
+ * Get the absolute URL of a part of llms-full.txt.
+ */
+function getPartURL(context: GitBookSiteContext, part: number) {
+    const path = part === 0 ? 'llms-full.txt' : `llms-full.txt/${part}`;
+    return context.linker.toAbsoluteURL(context.linker.toPathInSite(path));
 }
 
 /**
