@@ -105,3 +105,30 @@ describe('preview auth redirects', () => {
         }
     );
 });
+
+describe('visitor payload', () => {
+    it('forwards the visitor country to the API', async () => {
+        const calls: { visitor?: unknown }[] = [];
+        const apiClientSpy = spyOn(api, 'apiClient').mockReturnValue({
+            urls: {
+                async resolvePublishedContentByUrl(body: { visitor?: unknown }) {
+                    calls.push(body);
+                    return { data: { target: 'external', redirect: 'https://example.com' } };
+                },
+            },
+        } as unknown as ReturnType<typeof api.apiClient>);
+
+        try {
+            await lookupPublishedContentByUrl({
+                url: 'https://docs.example.com',
+                apiToken: null,
+                redirectOnError: false,
+                visitorPayload: { type: 'human', country: 'FR' },
+            });
+        } finally {
+            apiClientSpy.mockRestore();
+        }
+
+        expect(calls[0]?.visitor).toEqual({ type: 'human', country: 'FR' });
+    });
+});

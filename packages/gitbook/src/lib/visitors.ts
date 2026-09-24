@@ -10,6 +10,7 @@ import {
     getChunkedCookieValue,
     getChunkedResponseCookies,
 } from './chunked-cookies';
+import { GITBOOK_STAGE } from './env';
 
 const VISITOR_AUTH_PARAM = 'jwt_token';
 const VISITOR_PARAM_PREFIX = 'visitor.';
@@ -104,6 +105,42 @@ export function getVisitorType(request: {
 }): NonNullable<SiteVisitorPayload['type']> {
     const detection = isAIAgent(request);
     return detection.detected && detection.method !== 'heuristic' ? 'agent' : 'human';
+}
+
+// Production hostnames for which the visitor country is sent while the feature is rolled out.
+const VISITOR_COUNTRY_HOSTNAMES = new Set<string>([]);
+const VISITOR_COUNTRY_STAGES = new Set(['dev', 'preview', 'staging']);
+
+/**
+ * Whether the visitor country should be sent when resolving the site URL.
+ */
+export function shouldSendVisitorCountry(
+    hostname: string,
+    stage: string | undefined = GITBOOK_STAGE
+): boolean {
+    return (
+        (!!stage && VISITOR_COUNTRY_STAGES.has(stage)) || VISITOR_COUNTRY_HOSTNAMES.has(hostname)
+    );
+}
+
+/**
+ * Get the ISO 3166-1 alpha-2 country code of the visitor from the geolocation headers.
+ */
+export function getVisitorCountry(request: { headers: Headers }): string | undefined {
+    const country = (
+        request.headers.get('x-open-next-country') ||
+        request.headers.get('x-vercel-ip-country') ||
+        ''
+    )
+        .trim()
+        .toUpperCase();
+
+    // Cloudflare uses XX for unknown and T1 for Tor, which are not ISO codes.
+    if (!/^[A-Z]{2}$/.test(country) || country === 'XX' || country === 'T1') {
+        return undefined;
+    }
+
+    return country;
 }
 
 /**

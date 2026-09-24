@@ -56,11 +56,13 @@ import {
     type ResponseCookies,
     getPathScopedCookieName,
     getResponseCookiesForVisitorAuth,
+    getVisitorCountry,
     getVisitorData,
     getVisitorType,
     isRevalidationRequest,
     normalizeVisitorURL,
     serveVisitorClaimsDataRequest,
+    shouldSendVisitorCountry,
 } from '@/lib/visitors';
 import { waitUntil } from '@/lib/waitUntil';
 import { serveResizedImage } from '@/routes/image';
@@ -220,6 +222,10 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
     //
     request.headers.delete('x-gitbook-disable-tracking');
 
+    const visitorCountry = shouldSendVisitorCountry(siteRequestURL.hostname)
+        ? getVisitorCountry(request)
+        : undefined;
+
     const withAPIToken = async (apiToken: string | null) => {
         const siteURLData = await throwIfDataError(
             lookupPublishedContentByUrl({
@@ -228,6 +234,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
                     jwtToken: visitorToken?.token ?? undefined,
                     unsignedClaims,
                     type: getVisitorType(request),
+                    ...(visitorCountry ? { country: visitorCountry } : {}),
                 },
                 // When the visitor auth token is pulled from the cookie, set redirectOnError when calling resolvePublishedContentByUrl to allow
                 // redirecting when the token is invalid as we could be dealing with stale token stored in the cookie.

@@ -15,6 +15,12 @@ export const GITBOOK_RUNTIME = (process.env.GITBOOK_RUNTIME ?? 'unknown') as
     | 'unknown';
 
 /**
+ * Deployment stage (set by the Cloudflare wrangler configs), defaulting to `dev` locally.
+ */
+export const GITBOOK_STAGE =
+    process.env.STAGE ?? (process.env.NODE_ENV === 'development' ? 'dev' : undefined);
+
+/**
  * Main host on which GitBook is running.
  */
 export const GITBOOK_URL =
