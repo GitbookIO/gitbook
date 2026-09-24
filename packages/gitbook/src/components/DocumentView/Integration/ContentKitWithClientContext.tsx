@@ -6,7 +6,7 @@ import React from 'react';
 import { ContentKit, type ContentKitClientContextData } from '@gitbook/react-contentkit/client';
 
 import type { WebframePageContext } from './adaptive';
-import { useAdaptiveVisitor } from '@/components/Adaptive';
+import { useAdaptiveVisitorAsync } from '@/components/Adaptive';
 import { NavigationStatusContext } from '@/components/hooks';
 import { type GitBookLinker, createLinker } from '@/lib/links';
 
@@ -40,28 +40,12 @@ export function ContentKitWithClientContext<RenderContext>(
 
     const router = useRouter();
     const { onNavigationClick } = React.useContext(NavigationStatusContext);
-    const getAdaptiveVisitorClaims = useAdaptiveVisitor();
+    const loadAdaptiveVisitorClaims = useAdaptiveVisitorAsync();
 
     const getVisitorContext = React.useCallback(async () => {
-        let visitorClaims: ReturnType<typeof getAdaptiveVisitorClaims>;
-        try {
-            visitorClaims = getAdaptiveVisitorClaims();
-        } catch (suspender) {
-            if (
-                typeof suspender !== 'object' ||
-                suspender === null ||
-                !('then' in suspender) ||
-                typeof suspender.then !== 'function'
-            ) {
-                throw suspender;
-            }
-
-            await suspender;
-            visitorClaims = getAdaptiveVisitorClaims();
-        }
-
+        const visitorClaims = await loadAdaptiveVisitorClaims();
         return { visitor: visitorClaims?.visitor ?? null };
-    }, [getAdaptiveVisitorClaims]);
+    }, [loadAdaptiveVisitorClaims]);
 
     // Rebuild the (tested) linker on the client so navigation resolves paths exactly like the rest
     // of the app, instead of duplicating the join logic here.
