@@ -81,7 +81,9 @@ export async function InlineLinkButton(
 
     const href =
         resolved?.href ??
-        (inline.data.ref ? resolveContentRefFallback(inline.data.ref)?.href : undefined);
+        (inline.data.ref
+            ? resolveContentRefFallback(inline.data.ref, context.contentContext)?.href
+            : undefined);
     const sharedProps: React.ComponentProps<typeof Button> = {
         ...buttonProps,
         insights: {

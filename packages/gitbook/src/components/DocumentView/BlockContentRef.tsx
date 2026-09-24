@@ -24,7 +24,7 @@ export async function BlockContentRef(props: BlockProps<DocumentBlockContentRef>
         : null;
 
     if (!resolved) {
-        const fallback = resolveContentRefFallback(block.data.ref);
+        const fallback = resolveContentRefFallback(block.data.ref, context.contentContext);
         if (!fallback) {
             return null;
         }
