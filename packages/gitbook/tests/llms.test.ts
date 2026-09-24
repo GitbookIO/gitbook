@@ -55,6 +55,22 @@ describe('llms.txt', () => {
         expect(await response.text()).toContain('# E2E Tests GitBook Open');
     });
 
+    it('should serve plain text to ChatGPT Search', async () => {
+        const response = await fetch(
+            getContentTestURL('https://gitbook.gitbook.io/test-gitbook-open/llms.txt'),
+            {
+                headers: {
+                    'User-Agent':
+                        'Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko); compatible; OAI-SearchBot/1.4; +https://openai.com/searchbot',
+                },
+            }
+        );
+
+        expect(response.status).toBe(200);
+        expect(response.headers.get('content-type')).toContain('text/plain');
+        expect(await response.text()).toContain('# E2E Tests GitBook Open');
+    });
+
     it('should expose llms.txt from sitemap.md', async () => {
         const response = await fetch(
             getContentTestURL('https://gitbook.gitbook.io/test-gitbook-open/sitemap.md')
