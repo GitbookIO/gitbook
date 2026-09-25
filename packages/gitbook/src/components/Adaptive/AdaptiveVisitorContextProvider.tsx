@@ -19,20 +19,24 @@ const adaptiveVisitorReaderCache = new Map<
 function createResourceReader<T>(promise: Promise<T>) {
     let result: T | null | undefined;
 
-    const suspender = (async () => {
+    const settled = (async () => {
         try {
             result = await promise;
         } catch {
             result = null;
         }
+        return result;
     })();
 
     return {
         read() {
             if (result === undefined) {
-                throw suspender;
+                throw settled;
             }
             return result;
+        },
+        load() {
+            return settled;
         },
     };
 }
@@ -65,6 +69,12 @@ export type AdaptiveVisitorContextValue = () => AdaptiveVisitorClaims | null;
 
 const AdaptiveVisitorContext = createContext<AdaptiveVisitorContextValue>(() => null);
 
+export type AdaptiveVisitorAsyncContextValue = () => Promise<AdaptiveVisitorClaims | null>;
+
+const AdaptiveVisitorAsyncContext = createContext<AdaptiveVisitorAsyncContextValue>(
+    async () => null
+);
+
 /**
  * Provide context to adapt site based on visitor claims.
  */
@@ -83,11 +93,22 @@ export function AdaptiveVisitorContextProvider(
         return getAdaptiveVisitorClaimsReader(visitorClaimsURL, contextId).read();
     }, [visitorClaimsURL, contextId]);
 
+    const loadAdaptiveVisitorClaims = React.useCallback(async () => {
+        if (!contextId) {
+            return null;
+        }
+        return getAdaptiveVisitorClaimsReader(visitorClaimsURL, contextId).load();
+    }, [visitorClaimsURL, contextId]);
+
     return (
         <AdaptiveVisitorContext.Provider value={getAdaptiveVisitorClaims}>
-            <OpenAPIPrefillContextProvider getPrefillInputContextData={getAdaptiveVisitorClaims}>
-                {children}
-            </OpenAPIPrefillContextProvider>
+            <AdaptiveVisitorAsyncContext.Provider value={loadAdaptiveVisitorClaims}>
+                <OpenAPIPrefillContextProvider
+                    getPrefillInputContextData={getAdaptiveVisitorClaims}
+                >
+                    {children}
+                </OpenAPIPrefillContextProvider>
+            </AdaptiveVisitorAsyncContext.Provider>
         </AdaptiveVisitorContext.Provider>
     );
 }
@@ -97,4 +118,11 @@ export function AdaptiveVisitorContextProvider(
  */
 export function useAdaptiveVisitor(): AdaptiveVisitorContextValue {
     return useContext(AdaptiveVisitorContext);
+}
+
+/**
+ * Hook that returns an async getter for adaptive visitor claims data, for use outside of render.
+ */
+export function useAdaptiveVisitorAsync(): AdaptiveVisitorAsyncContextValue {
+    return useContext(AdaptiveVisitorAsyncContext);
 }

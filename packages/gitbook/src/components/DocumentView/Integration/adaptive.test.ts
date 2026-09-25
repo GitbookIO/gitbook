@@ -1,46 +1,8 @@
 import { describe, expect, it } from 'bun:test';
 
-import type { ContentKitRenderOutput, ContentKitWebFrame } from '@gitbook/api';
-
-import { getWebframePageContext, integrationBlockContainsWebframe } from './adaptive';
+import { getWebframePageContext } from './adaptive';
 import type { GitBookAnyContext } from '@/lib/context';
 import { createLinker } from '@/lib/links';
-
-const webframe: ContentKitWebFrame = {
-    type: 'webframe',
-    source: { url: 'https://integrations.gitbook.com/frame' },
-};
-
-function elementOutput(element: unknown): ContentKitRenderOutput {
-    return {
-        type: 'element',
-        element,
-        state: {},
-        props: {},
-    } as ContentKitRenderOutput;
-}
-
-describe('integrationBlockContainsWebframe', () => {
-    it('returns false for a completed output', () => {
-        expect(integrationBlockContainsWebframe({ type: 'complete' })).toBe(false);
-    });
-
-    it('returns false when there is no webframe in the tree', () => {
-        const output = elementOutput({
-            type: 'block',
-            children: [{ type: 'text', text: 'hello' }],
-        } as never);
-        expect(integrationBlockContainsWebframe(output)).toBe(false);
-    });
-
-    it('returns true when a webframe is nested in the tree', () => {
-        const output = elementOutput({
-            type: 'block',
-            children: [{ type: 'vstack', children: [webframe] }],
-        } as never);
-        expect(integrationBlockContainsWebframe(output)).toBe(true);
-    });
-});
 
 describe('getWebframePageContext', () => {
     it('returns null when the context has no page', () => {
