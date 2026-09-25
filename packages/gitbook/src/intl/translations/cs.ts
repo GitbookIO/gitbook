@@ -76,6 +76,7 @@ export const cs: TranslationLanguage = {
     edit: 'Upravit',
     notfound_title: 'Stránka nenalezena',
     notfound_link: 'Tento odkaz vede na stránku, která byla odstraněna nebo již neexistuje.',
+    notfound_link_opens: 'Místo toho se otevře: ${1}.',
     notfound: 'Stránka, kterou hledáte, neexistuje.',
     notfound_adaptive_title: 'Stránka není dostupná',
     notfound_adaptive:

@@ -77,6 +77,7 @@ export const fi: TranslationLanguage = {
     edit: 'Muokkaa',
     notfound_title: 'Sivua ei löytynyt',
     notfound_link: 'Tämä linkki osoittaa sivulle, joka on poistettu tai jota ei enää ole.',
+    notfound_link_opens: 'Sen sijaan avautuu: ${1}.',
     notfound: 'Etsimääsi sivua ei ole olemassa.',
     notfound_adaptive_title: 'Sivu ei ole saatavilla',
     notfound_adaptive:

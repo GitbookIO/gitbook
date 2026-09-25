@@ -78,6 +78,7 @@ export const ru: TranslationLanguage = {
     edit: 'Редактировать',
     notfound_title: 'Страница не найдена',
     notfound_link: 'Эта ссылка ведёт на страницу, которая была удалена или больше не существует.',
+    notfound_link_opens: 'Вместо этого откроется: ${1}.',
     notfound: 'Страница, которую вы ищете, не существует.',
     notfound_adaptive_title: 'Страница недоступна',
     notfound_adaptive:

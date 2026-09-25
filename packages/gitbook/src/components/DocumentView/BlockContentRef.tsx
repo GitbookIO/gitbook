@@ -29,7 +29,7 @@ export async function BlockContentRef(props: BlockProps<DocumentBlockContentRef>
             return null;
         }
         return (
-            <NotFoundRefHoverCard context={context}>
+            <NotFoundRefHoverCard context={context} fallback={fallback}>
                 <BlockContentRefCard
                     contentRef={block.data.ref}
                     resolved={fallback}

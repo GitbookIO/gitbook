@@ -76,6 +76,7 @@ export const sv: TranslationLanguage = {
     edit: 'Redigera',
     notfound_title: 'Sidan hittades inte',
     notfound_link: 'Den här länken pekar på en sida som har tagits bort eller inte längre finns.',
+    notfound_link_opens: 'Den öppnar ${1} i stället.',
     notfound: 'Sidan du letar efter finns inte.',
     notfound_adaptive_title: 'Sidan är inte tillgänglig',
     notfound_adaptive: 'Sidan kan finnas, men du kan behöva logga in för att få åtkomst.',

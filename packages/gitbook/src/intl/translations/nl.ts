@@ -78,6 +78,7 @@ export const nl: TranslationLanguage = {
     edit: 'Bewerken',
     notfound_title: 'Pagina niet gevonden',
     notfound_link: 'Deze link verwijst naar een pagina die is verwijderd of niet meer bestaat.',
+    notfound_link_opens: 'In plaats daarvan wordt ${1} geopend.',
     notfound: 'De pagina die je zoekt, bestaat niet.',
     notfound_adaptive_title: 'Pagina niet beschikbaar',
     notfound_adaptive:

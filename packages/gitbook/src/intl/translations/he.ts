@@ -76,6 +76,7 @@ export const he: TranslationLanguage = {
     edit: 'עריכה',
     notfound_title: 'הדף לא נמצא',
     notfound_link: 'קישור זה מפנה לדף שהוסר או אינו קיים עוד.',
+    notfound_link_opens: 'במקום זאת ייפתח: ${1}.',
     notfound: 'הדף שחיפשת אינו קיים.',
     notfound_adaptive_title: 'הדף אינו זמין',
     notfound_adaptive: 'ייתכן שהדף קיים, אך ייתכן שעליך להתחבר כדי לגשת אליו.',

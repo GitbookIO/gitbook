@@ -76,6 +76,7 @@ export const id: TranslationLanguage = {
     edit: 'Edit',
     notfound_title: 'Halaman tidak ditemukan',
     notfound_link: 'Tautan ini mengarah ke halaman yang telah dihapus atau sudah tidak ada.',
+    notfound_link_opens: 'Tautan ini akan membuka ${1} sebagai gantinya.',
     notfound: 'Halaman yang Anda cari tidak ada.',
     notfound_adaptive_title: 'Halaman tidak tersedia',
     notfound_adaptive:

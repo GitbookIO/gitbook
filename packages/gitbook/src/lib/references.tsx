@@ -434,9 +434,10 @@ export function resolveContentRefFallback(
 ): ResolvedContentRef | null {
     if ('space' in contentRef && contentRef.space) {
         const linker = context ? getLinkerForSpaceInSite(context, contentRef.space) : null;
+        const inSite = context ? getBestTargetSpaceFromSite(context, contentRef.space) : undefined;
         return {
             href: linker?.toPathInSpace('') ?? getGitBookAppHref(`/s/${contentRef.space}`),
-            text: 'space',
+            text: linker && inSite ? getSpaceRefText(inSite, context?.locale) : 'space',
             active: false,
         };
     }

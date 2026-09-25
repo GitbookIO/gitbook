@@ -76,6 +76,7 @@ export const lv: TranslationLanguage = {
     edit: 'Rediģēt',
     notfound_title: 'Lapa nav atrasta',
     notfound_link: 'Šī saite norāda uz lapu, kas ir noņemta vai vairs nepastāv.',
+    notfound_link_opens: 'Tā vietā tiek atvērts: ${1}.',
     notfound: 'Meklētā lapa nepastāv.',
     notfound_adaptive_title: 'Lapa nav pieejama',
     notfound_adaptive: 'Šī lapa var pastāvēt, bet, iespējams, jums jāpierakstās, lai tai piekļūtu.',

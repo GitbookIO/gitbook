@@ -805,5 +805,16 @@ describe('resolveContentRef for application URLs into the site', () => {
         );
 
         expect(fallback?.href).toBe('/analytics-alerts');
+        expect(fallback?.text).toBe('Alerts');
+    });
+
+    it('keeps the application fallback for a page ref into a space outside the site', () => {
+        const fallback = resolveContentRefFallback(
+            { kind: 'page', space: 'space-elsewhere', page: 'page-deleted' },
+            context
+        );
+
+        expect(fallback?.href).toBe('https://app.gitbook.com/s/space-elsewhere');
+        expect(fallback?.text).toBe('space');
     });
 });

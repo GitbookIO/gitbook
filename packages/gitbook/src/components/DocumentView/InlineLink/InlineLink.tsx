@@ -39,7 +39,7 @@ export async function InlineLink(props: InlineProps<DocumentInlineLink>) {
     if (!resolved) {
         const fallback = resolveContentRefFallback(inline.data.ref, contentContext);
         return (
-            <NotFoundRefHoverCard context={context}>
+            <NotFoundRefHoverCard context={context} fallback={fallback}>
                 {fallback ? (
                     <InlineLinkAnchor
                         href={fallback.href}

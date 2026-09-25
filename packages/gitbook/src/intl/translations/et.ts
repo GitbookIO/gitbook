@@ -76,6 +76,7 @@ export const et: TranslationLanguage = {
     edit: 'Muuda',
     notfound_title: 'Lehte ei leitud',
     notfound_link: 'See link viitab lehele, mis on eemaldatud või mida enam ei eksisteeri.',
+    notfound_link_opens: 'Selle asemel avaneb: ${1}.',
     notfound: 'Lehte, mida otsite, ei eksisteeri.',
     notfound_adaptive_title: 'Leht pole saadaval',
     notfound_adaptive: 'See leht võib olemas olla, kuid juurdepääsuks võib olla vaja sisse logida.',
