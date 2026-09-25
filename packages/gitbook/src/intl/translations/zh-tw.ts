@@ -74,7 +74,7 @@ export const zh_tw: TranslationLanguage = {
     edit: '編輯',
     notfound_title: '找不到頁面',
     notfound_link: '此連結指向的頁面已被移除或不再存在。',
-    notfound_link_opens: '將改為開啟 ${1}。',
+    notfound_link_opens: '開啟 ${1}',
     notfound: '您要尋找的頁面不存在。',
     notfound_adaptive_title: '頁面無法使用',
     notfound_adaptive: '此頁面可能存在，但您可能需要登入才能存取。',

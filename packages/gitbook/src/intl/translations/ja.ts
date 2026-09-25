@@ -77,7 +77,7 @@ export const ja: TranslationLanguage = {
     edit: '編集',
     notfound_title: 'ページが見つかりません',
     notfound_link: 'このリンクは、削除されたか、もはや存在しないページを指しています。',
-    notfound_link_opens: '代わりに ${1} が開きます。',
+    notfound_link_opens: '${1} を開きます',
     notfound: 'お探しのページは存在しません。',
     notfound_adaptive_title: 'ページにアクセスできません',
     notfound_adaptive:

@@ -76,7 +76,7 @@ export const ms: TranslationLanguage = {
     edit: 'Edit',
     notfound_title: 'Halaman tidak ditemui',
     notfound_link: 'Pautan ini menghala ke halaman yang telah dialih keluar atau tidak lagi wujud.',
-    notfound_link_opens: 'Pautan ini akan membuka ${1} sebagai gantinya.',
+    notfound_link_opens: 'Membuka ${1}',
     notfound: 'Halaman yang anda cari tidak wujud.',
     notfound_adaptive_title: 'Halaman tidak tersedia',
     notfound_adaptive:

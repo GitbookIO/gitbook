@@ -2,7 +2,7 @@ import { Icon } from '@gitbook/icons';
 
 import type { DocumentContextProps } from '../DocumentView';
 import { HoverCard, HoverCardRoot, HoverCardTrigger } from '../primitives';
-import { getSpaceLanguage, tString } from '@/intl/server';
+import { getSpaceLanguage, t, tString } from '@/intl/server';
 import { defaultLanguage } from '@/intl/translations';
 import type { ResolvedContentRef } from '@/lib/references';
 import { checkIsExternalURL } from '@/lib/urls';
@@ -32,12 +32,21 @@ export async function NotFoundRefHoverCard(
                     <Icon icon="ban" className="size-4 text-tint-subtle" />
                     <h5 className="font-semibold">{tString(language, 'notfound_title')}</h5>
                 </div>
-                <p className="text-sm text-tint">
-                    {tString(language, 'notfound_link')}
-                    {destination
-                        ? ` ${tString(language, 'notfound_link_opens', destination)}`
-                        : null}
-                </p>
+                <p className="text-sm text-tint">{tString(language, 'notfound_link')}</p>
+                {destination ? (
+                    <p className="mt-1 flex items-center gap-1.5 text-sm text-tint">
+                        <Icon icon="arrow-right" className="size-3 shrink-0 text-tint-subtle" />
+                        <span>
+                            {t(
+                                language,
+                                'notfound_link_opens',
+                                <span className="font-semibold text-tint-strong">
+                                    {destination}
+                                </span>
+                            )}
+                        </span>
+                    </p>
+                ) : null}
             </HoverCard>
         </HoverCardRoot>
     );

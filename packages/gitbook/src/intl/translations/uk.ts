@@ -76,7 +76,7 @@ export const uk: TranslationLanguage = {
     edit: 'Редагувати',
     notfound_title: 'Сторінку не знайдено',
     notfound_link: 'Це посилання веде на сторінку, яку видалено або якої більше не існує.',
-    notfound_link_opens: 'Натомість відкриється: ${1}.',
+    notfound_link_opens: 'Відкриється: ${1}',
     notfound: 'Сторінка, яку ви шукаєте, не існує.',
     notfound_adaptive_title: 'Сторінка недоступна',
     notfound_adaptive: 'Ця сторінка може існувати, але для доступу до неї може знадобитися вхід.',

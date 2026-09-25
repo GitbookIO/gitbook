@@ -77,7 +77,7 @@ export const ko: TranslationLanguage = {
     edit: '수정',
     notfound_title: '페이지를 찾을 수 없음',
     notfound_link: '이 링크는 삭제되었거나 더 이상 존재하지 않는 페이지를 가리킵니다.',
-    notfound_link_opens: '대신 ${1}(으)로 이동합니다.',
+    notfound_link_opens: '${1}(으)로 이동',
     notfound: '찾으시는 페이지가 존재하지 않습니다.',
     notfound_adaptive_title: '페이지에 접근할 수 없음',
     notfound_adaptive: '이 페이지는 존재할 수 있지만, 접근하려면 로그인해야 할 수 있습니다.',

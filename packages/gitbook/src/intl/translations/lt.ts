@@ -76,7 +76,7 @@ export const lt: TranslationLanguage = {
     edit: 'Redaguoti',
     notfound_title: 'Puslapis nerastas',
     notfound_link: 'Ši nuoroda veda į puslapį, kuris buvo pašalintas arba nebeegzistuoja.',
-    notfound_link_opens: 'Vietoj to atidaromas: ${1}.',
+    notfound_link_opens: 'Atidaro: ${1}',
     notfound: 'Puslapis, kurio ieškote, neegzistuoja.',
     notfound_adaptive_title: 'Puslapis nepasiekiamas',
     notfound_adaptive:

@@ -76,7 +76,7 @@ export const da: TranslationLanguage = {
     edit: 'Rediger',
     notfound_title: 'Siden blev ikke fundet',
     notfound_link: 'Dette link peger på en side, der er blevet fjernet eller ikke længere findes.',
-    notfound_link_opens: 'Den åbner ${1} i stedet.',
+    notfound_link_opens: 'Åbner ${1}',
     notfound: 'Siden, du leder efter, findes ikke.',
     notfound_adaptive_title: 'Siden er ikke tilgængelig',
     notfound_adaptive:

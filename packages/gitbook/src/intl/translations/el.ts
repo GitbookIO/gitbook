@@ -77,7 +77,7 @@ export const el: TranslationLanguage = {
     edit: 'Επεξεργασία',
     notfound_title: 'Η σελίδα δεν βρέθηκε',
     notfound_link: 'Αυτός ο σύνδεσμος οδηγεί σε μια σελίδα που έχει αφαιρεθεί ή δεν υπάρχει πλέον.',
-    notfound_link_opens: 'Αντί γι’ αυτό ανοίγει: ${1}.',
+    notfound_link_opens: 'Ανοίγει: ${1}',
     notfound: 'Η σελίδα που αναζητάτε δεν υπάρχει.',
     notfound_adaptive_title: 'Η σελίδα δεν είναι διαθέσιμη',
     notfound_adaptive:

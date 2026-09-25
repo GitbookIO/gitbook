@@ -76,7 +76,7 @@ export const hr: TranslationLanguage = {
     edit: 'Uredi',
     notfound_title: 'Stranica nije pronađena',
     notfound_link: 'Ova poveznica vodi na stranicu koja je uklonjena ili više ne postoji.',
-    notfound_link_opens: 'Umjesto toga otvara se: ${1}.',
+    notfound_link_opens: 'Otvara: ${1}',
     notfound: 'Stranica koju tražite ne postoji.',
     notfound_adaptive_title: 'Stranica nije dostupna',
     notfound_adaptive:

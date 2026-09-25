@@ -76,7 +76,7 @@ export const ar: TranslationLanguage = {
     edit: 'تحرير',
     notfound_title: 'الصفحة غير موجودة',
     notfound_link: 'يشير هذا الرابط إلى صفحة تمت إزالتها أو لم تعد موجودة.',
-    notfound_link_opens: 'بدلاً من ذلك، يفتح هذا الرابط: ${1}.',
+    notfound_link_opens: 'يفتح: ${1}',
     notfound: 'الصفحة التي تبحث عنها غير موجودة.',
     notfound_adaptive_title: 'الصفحة غير متاحة',
     notfound_adaptive: 'قد تكون هذه الصفحة موجودة، لكن قد تحتاج إلى تسجيل الدخول للوصول إليها.',

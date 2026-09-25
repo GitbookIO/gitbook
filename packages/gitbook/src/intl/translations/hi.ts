@@ -76,7 +76,7 @@ export const hi: TranslationLanguage = {
     edit: 'संपादित करें',
     notfound_title: 'पृष्ठ नहीं मिला',
     notfound_link: 'यह लिंक ऐसे पृष्ठ पर जाता है जिसे हटा दिया गया है या जो अब मौजूद नहीं है।',
-    notfound_link_opens: 'इसके बजाय ${1} खुलेगा।',
+    notfound_link_opens: '${1} खोलता है',
     notfound: 'आप जिस पृष्ठ को खोज रहे हैं वह मौजूद नहीं है।',
     notfound_adaptive_title: 'पृष्ठ उपलब्ध नहीं',
     notfound_adaptive: 'यह पृष्ठ मौजूद हो सकता है, लेकिन इसे देखने के लिए आपको लॉग इन करना पड़ सकता है।',

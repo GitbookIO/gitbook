@@ -78,7 +78,7 @@ export const pt_br: TranslationLanguage = {
     edit: 'Editar',
     notfound_title: 'Página não encontrada',
     notfound_link: 'Este link aponta para uma página que foi removida ou não existe mais.',
-    notfound_link_opens: 'Em vez disso, ele abre ${1}.',
+    notfound_link_opens: 'Abre ${1}',
     notfound: 'A página que você está procurando não existe.',
     notfound_adaptive_title: 'Página indisponível',
     notfound_adaptive:

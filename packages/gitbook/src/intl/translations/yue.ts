@@ -74,7 +74,7 @@ export const yue: TranslationLanguage = {
     edit: '編輯',
     notfound_title: '搵唔到頁面',
     notfound_link: '呢條連結指向嘅頁面已被移除或已經唔存在。',
-    notfound_link_opens: '會改為開啟 ${1}。',
+    notfound_link_opens: '開啟 ${1}',
     notfound: '你搵緊嘅頁面唔存在。',
     notfound_adaptive_title: '頁面無法使用',
     notfound_adaptive: '呢個頁面可能存在，但你可能需要登入先可以存取。',

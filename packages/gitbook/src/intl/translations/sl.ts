@@ -77,7 +77,7 @@ export const sl: TranslationLanguage = {
     edit: 'Uredi',
     notfound_title: 'Strani ni bilo mogoče najti',
     notfound_link: 'Ta povezava kaže na stran, ki je bila odstranjena ali ne obstaja več.',
-    notfound_link_opens: 'Namesto tega se odpre: ${1}.',
+    notfound_link_opens: 'Odpre: ${1}',
     notfound: 'Stran, ki jo iščete, ne obstaja.',
     notfound_adaptive_title: 'Stran ni na voljo',
     notfound_adaptive: 'Ta stran morda obstaja, vendar se boste za dostop morda morali prijaviti.',

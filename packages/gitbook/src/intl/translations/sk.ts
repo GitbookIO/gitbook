@@ -77,7 +77,7 @@ export const sk: TranslationLanguage = {
     edit: 'Upraviť',
     notfound_title: 'Stránka sa nenašla',
     notfound_link: 'Tento odkaz smeruje na stránku, ktorá bola odstránená alebo už neexistuje.',
-    notfound_link_opens: 'Namiesto toho sa otvorí: ${1}.',
+    notfound_link_opens: 'Otvorí: ${1}',
     notfound: 'Stránka, ktorú hľadáte, neexistuje.',
     notfound_adaptive_title: 'Stránka nie je dostupná',
     notfound_adaptive:
