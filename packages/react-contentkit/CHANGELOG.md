@@ -1,5 +1,18 @@
 # @gitbook/react-contentkit
 
+## 0.7.17
+
+### Patch Changes
+
+- 3ef1802: Show a close button on ContentKit modals rendered on published sites.
+- 1e8c34a: Let ContentKit webframes dispatch the built-in `@ui.*` actions. Actions posted from a webframe were forwarded to the integration as a plain re-render instead of being handled, so `@ui.modal.open`, `@ui.modal.close` and `@ui.url.open` did nothing — most visibly, an integration could not close a modal from inside its own webframe.
+
+  Keep `null` values and class instances such as `Date` intact when resolving dynamic bindings in an action, instead of throwing or flattening them to `{}`.
+
+- 3bf55ce: Support query params in the `@webframe.navigate` action.
+- cb92754: Let integration block webframes navigate the reader to another page in the site by posting a `@webframe.navigate` action with a `path` (and optional `anchor`). Resolved client-side against the site base path, so navigation stays in-site and drives the standard navigation progress bar.
+- 6083a88: Expose the current page (`id`, `path`, `title`) to integration block webframes through the client-only webframe `state.page`, alongside adaptive visitor claims.
+
 ## 0.7.16
 
 ### Patch Changes
