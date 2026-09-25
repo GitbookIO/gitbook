@@ -76,6 +76,7 @@ export const vi: TranslationLanguage = {
     edit: 'Chỉnh sửa',
     notfound_title: 'Không tìm thấy trang',
     notfound_link: 'Liên kết này trỏ đến một trang đã bị xóa hoặc không còn tồn tại.',
+    notfound_link_opens: 'Mở ${1}',
     notfound: 'Trang bạn đang tìm kiếm không tồn tại.',
     notfound_adaptive_title: 'Trang không khả dụng',
     notfound_adaptive: 'Trang này có thể tồn tại, nhưng bạn có thể cần đăng nhập để truy cập.',

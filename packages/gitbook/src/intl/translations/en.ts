@@ -74,6 +74,7 @@ export const en = {
     edit: 'Edit',
     notfound_title: 'Page not found',
     notfound_link: 'This link points to a page that has been removed or no longer exists.',
+    notfound_link_opens: 'Opens ${1}',
     notfound: "The page you're looking for doesn't exist.",
     notfound_adaptive_title: 'Page unavailable',
     notfound_adaptive: 'This page may exist, but you may need to log in to access it.',

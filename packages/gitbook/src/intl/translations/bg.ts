@@ -77,6 +77,7 @@ export const bg: TranslationLanguage = {
     edit: 'Редактиране',
     notfound_title: 'Страницата не е намерена',
     notfound_link: 'Тази връзка сочи към страница, която е премахната или вече не съществува.',
+    notfound_link_opens: 'Отваря: ${1}',
     notfound: 'Страницата, която търсите, не съществува.',
     notfound_adaptive_title: 'Страницата не е налична',
     notfound_adaptive:

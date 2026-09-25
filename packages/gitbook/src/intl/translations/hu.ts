@@ -77,6 +77,7 @@ export const hu: TranslationLanguage = {
     edit: 'Szerkesztés',
     notfound_title: 'Az oldal nem található',
     notfound_link: 'Ez a hivatkozás egy eltávolított vagy már nem létező oldalra mutat.',
+    notfound_link_opens: 'Megnyitja: ${1}',
     notfound: 'A keresett oldal nem létezik.',
     notfound_adaptive_title: 'Az oldal nem érhető el',
     notfound_adaptive: 'Ez az oldal létezhet, de a hozzáféréshez lehet, hogy be kell jelentkeznie.',

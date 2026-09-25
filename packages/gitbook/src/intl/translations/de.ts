@@ -79,6 +79,7 @@ export const de: TranslationLanguage = {
     notfound_title: 'Seite nicht gefunden',
     notfound_link:
         'Dieser Link verweist auf eine Seite, die entfernt wurde oder nicht mehr existiert.',
+    notfound_link_opens: 'Öffnet ${1}',
     notfound: 'Die gesuchte Seite existiert nicht.',
     notfound_adaptive_title: 'Seite nicht verfügbar',
     notfound_adaptive:

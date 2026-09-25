@@ -2,7 +2,11 @@ import { describe, expect, it } from 'bun:test';
 
 import type { Revision, RevisionPageDocument, SiteSpace, Space } from '@gitbook/api';
 
-import { resolveContentRef, resolveStringContentRef } from './references';
+import {
+    resolveContentRef,
+    resolveContentRefFallback,
+    resolveStringContentRef,
+} from './references';
 import type { GitBookAnyContext } from '@/lib/context';
 import type { GitBookDataFetcher } from '@/lib/data';
 import { createLinker } from '@/lib/links';
@@ -736,5 +740,81 @@ describe('resolveContentRef for direct space links', () => {
         expect(result?.ancestors).toEqual([
             { label: 'External Space', href: targetSpace.urls.published },
         ]);
+    });
+});
+
+describe('resolveContentRef for application URLs into the site', () => {
+    const alerts = {
+        object: 'space',
+        id: 'space-alerts',
+        title: 'Alerts',
+        urls: {
+            app: 'https://app.gitbook.com/o/org/s/space-alerts/',
+            published: 'https://docs.example.com/analytics-alerts/',
+        },
+    } as unknown as Space;
+    const alertsSiteSpace = {
+        object: 'site-space',
+        id: 'site-space-alerts',
+        path: 'analytics-alerts',
+        space: alerts,
+        title: 'Alerts',
+        urls: { published: 'https://docs.example.com/analytics-alerts/' },
+    } as unknown as SiteSpace;
+
+    const context = {
+        linker: createLinker({ host: 'docs.example.com', spaceBasePath: '/', siteBasePath: '/' }),
+        space: { id: 'space-notes' },
+        site: { object: 'site', id: 'site-1' },
+        sections: null,
+        structure: { type: 'siteSpaces', structure: [alertsSiteSpace] },
+    } as unknown as GitBookAnyContext;
+
+    it('keeps the page path and anchor of an application URL into a site space', async () => {
+        const result = await resolveContentRef(
+            {
+                kind: 'url',
+                url: 'https://app.gitbook.com/o/org/s/space-alerts/alerts-by-name/amsi-bypass#rules',
+            },
+            context
+        );
+
+        expect(result?.href).toBe('/analytics-alerts/alerts-by-name/amsi-bypass#rules');
+    });
+
+    it('leaves an application URL into a space outside the site untouched', async () => {
+        const url = 'https://app.gitbook.com/o/org/s/space-elsewhere/alerts-by-name/amsi-bypass';
+
+        const result = await resolveContentRef({ kind: 'url', url }, context);
+
+        expect(result?.href).toBe(url);
+    });
+
+    it('leaves an application URL into a change request untouched', async () => {
+        const url = 'https://app.gitbook.com/o/org/s/space-alerts/~/changes/1/alerts-by-name';
+
+        const result = await resolveContentRef({ kind: 'url', url }, context);
+
+        expect(result?.href).toBe(url);
+    });
+
+    it('falls back to the site space, not the application, for a page ref that no longer resolves', () => {
+        const fallback = resolveContentRefFallback(
+            { kind: 'page', space: 'space-alerts', page: 'page-deleted' },
+            context
+        );
+
+        expect(fallback?.href).toBe('/analytics-alerts');
+        expect(fallback?.text).toBe('Alerts');
+    });
+
+    it('keeps the application fallback for a page ref into a space outside the site', () => {
+        const fallback = resolveContentRefFallback(
+            { kind: 'page', space: 'space-elsewhere', page: 'page-deleted' },
+            context
+        );
+
+        expect(fallback?.href).toBe('https://app.gitbook.com/s/space-elsewhere');
+        expect(fallback?.text).toBe('space');
     });
 });

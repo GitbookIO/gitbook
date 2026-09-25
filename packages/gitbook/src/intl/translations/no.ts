@@ -78,6 +78,7 @@ export const no: TranslationLanguage = {
     notfound_title: 'Siden ble ikke funnet',
     notfound_link:
         'Denne lenken peker til en side som har blitt fjernet eller ikke lenger eksisterer.',
+    notfound_link_opens: 'Åpner ${1}',
     notfound: 'Siden du leter etter eksisterer ikke.',
     notfound_adaptive_title: 'Siden er ikke tilgjengelig',
     notfound_adaptive: 'Denne siden kan finnes, men du må kanskje logge inn for å få tilgang.',

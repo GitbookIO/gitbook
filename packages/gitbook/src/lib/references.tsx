@@ -40,7 +40,15 @@ import {
     getRevisionReusableContent,
     ignoreDataThrownError,
 } from '@/lib/data';
+import { GITBOOK_APP_URL } from '@/lib/env';
 import { type GitBookLinker, createLinker, linkerWithAbsoluteURLs } from '@/lib/links';
+
+/**
+ * Path of an application URL to a space's content: `/o/:org/s/:space/:pagePath`, optionally under
+ * `/sites/:site`. A path under `~/` (a change request or revision) is not published content.
+ */
+const APP_SPACE_CONTENT_PATH =
+    /^(?:\/o\/[^/]+)?(?:\/sites\/[^/]+)?\/s\/([^/]+)(?:\/(?!~)(.*?))?\/?$/;
 
 export interface ResolvedContentRef {
     /** Text to render in the content ref */
@@ -143,9 +151,10 @@ export async function resolveContentRef(
 
     switch (contentRef.kind) {
         case 'url': {
+            const href = resolveAppURLInSite(contentRef.url, context) ?? contentRef.url;
             return {
-                href: contentRef.url,
-                text: contentRef.url,
+                href,
+                text: href,
                 active: false,
             };
         }
@@ -419,11 +428,16 @@ export function isContentRefInDifferentSpace<Ref extends ContentRef>(
  * Called if we can't resolve the content ref to have a potential fallback to display to the
  * user instead of not found.
  */
-export function resolveContentRefFallback(contentRef: ContentRef): ResolvedContentRef | null {
+export function resolveContentRefFallback(
+    contentRef: ContentRef,
+    context: GitBookAnyContext | undefined
+): ResolvedContentRef | null {
     if ('space' in contentRef && contentRef.space) {
+        const linker = context ? getLinkerForSpaceInSite(context, contentRef.space) : null;
+        const inSite = context ? getBestTargetSpaceFromSite(context, contentRef.space) : undefined;
         return {
-            href: getGitBookAppHref(`/s/${contentRef.space}`),
-            text: 'space',
+            href: linker?.toPathInSpace('') ?? getGitBookAppHref(`/s/${contentRef.space}`),
+            text: linker && inSite ? getSpaceRefText(inSite, context?.locale) : 'space',
             active: false,
         };
     }
@@ -458,6 +472,46 @@ async function getBestTargetSpace(
 
     // Else we try return the fetched space from the API.
     return fetchedSpace ? { space: fetchedSpace, siteSpace: null, siteSection: null } : undefined;
+}
+
+/**
+ * Map an application URL into a space of the current site to the same page path on the site, so
+ * a link that was never resolved to a page doesn't send visitors to the app. The page isn't looked
+ * up: one that doesn't exist lands on the site's not-found page.
+ */
+function resolveAppURLInSite(url: string, context: GitBookAnyContext): string | null {
+    if (!URL.canParse(url)) {
+        return null;
+    }
+    const parsed = new URL(url);
+    if (parsed.origin !== new URL(GITBOOK_APP_URL).origin) {
+        return null;
+    }
+    const match = parsed.pathname.match(APP_SPACE_CONTENT_PATH);
+    const linker = match?.[1] ? getLinkerForSpaceInSite(context, match[1]) : null;
+    if (!linker) {
+        return null;
+    }
+    return linker.toPathForPagePath({
+        path: match?.[2] ?? '',
+        anchor: parsed.hash.slice(1) || undefined,
+    });
+}
+
+/**
+ * Linker for a space that is part of the current site, or null when it isn't.
+ */
+function getLinkerForSpaceInSite(
+    context: GitBookAnyContext,
+    spaceId: string
+): GitBookLinker | null {
+    const target = getBestTargetSpaceFromSite(context, spaceId);
+    if (!target?.siteSpace || !('site' in context)) {
+        return null;
+    }
+    return context.linker.withOtherSiteSpace({
+        spaceBasePath: getFallbackSiteSpacePath(context, target.siteSpace),
+    });
 }
 
 /**

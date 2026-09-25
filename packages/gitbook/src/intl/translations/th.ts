@@ -75,6 +75,7 @@ export const th: TranslationLanguage = {
     edit: 'แก้ไข',
     notfound_title: 'ไม่พบหน้า',
     notfound_link: 'ลิงก์นี้ชี้ไปยังหน้าที่ถูกลบหรือไม่มีอยู่อีกต่อไป',
+    notfound_link_opens: 'เปิด ${1}',
     notfound: 'หน้าที่คุณกำลังค้นหาไม่มีอยู่',
     notfound_adaptive_title: 'หน้าไม่พร้อมใช้งาน',
     notfound_adaptive: 'หน้านี้อาจมีอยู่ แต่คุณอาจต้องเข้าสู่ระบบเพื่อเข้าถึง',

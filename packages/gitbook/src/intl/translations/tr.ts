@@ -76,6 +76,7 @@ export const tr: TranslationLanguage = {
     edit: 'Düzenle',
     notfound_title: 'Sayfa bulunamadı',
     notfound_link: 'Bu bağlantı kaldırılmış veya artık mevcut olmayan bir sayfaya işaret ediyor.',
+    notfound_link_opens: '${1} açılır',
     notfound: 'Aradığınız sayfa mevcut değil.',
     notfound_adaptive_title: 'Sayfa kullanılamıyor',
     notfound_adaptive: 'Bu sayfa mevcut olabilir, ancak erişmek için oturum açmanız gerekebilir.',
