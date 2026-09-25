@@ -132,7 +132,8 @@ export async function TableOfContents(props: {
                     <ScrollContainer
                         data-testid="toc-scroll-container"
                         orientation="vertical"
-                        contentClassName="flex flex-col p-2 gutter-stable"
+                        // Leave room for the first group below the scrollport's top fade.
+                        contentClassName="flex flex-col p-2 pt-4 gutter-stable"
                         active="[data-active=true]"
                         leading={{
                             fade: true,

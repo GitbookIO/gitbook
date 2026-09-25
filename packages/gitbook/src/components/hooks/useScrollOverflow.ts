@@ -88,9 +88,15 @@ export function useScrollOverflow(
             }
             scheduleMeasure();
         });
-        // Also watch descendants (subtree/characterData) so text/content changes deeper in
-        // the tree that grow or shrink scrollHeight/scrollWidth still trigger a re-measure.
-        mo.observe(container, { childList: true, subtree: true, characterData: true });
+        // Also watch descendants (subtree/characterData/attributes) so text/content changes deeper
+        // in the tree that grow or shrink scrollHeight/scrollWidth still trigger a re-measure.
+        // Attributes matter because collapsing a section can be a class-only change.
+        mo.observe(container, {
+            childList: true,
+            subtree: true,
+            characterData: true,
+            attributes: true,
+        });
 
         return () => {
             if (frame !== null) {
