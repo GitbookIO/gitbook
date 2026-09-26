@@ -1,5 +1,7 @@
+import { createHash } from 'node:crypto';
 import * as api from '@gitbook/api';
 import { CustomizationPageActionType } from '@gitbook/api';
+import { identify } from 'object-identity';
 
 /**
  * Return the default customization settings for a site.
@@ -118,4 +120,11 @@ export function findSectionInGroup<T extends { id: string; object: string; child
     return (
         flattenSectionsFromGroup(group.children).find((section) => section.id === sectionId) ?? null
     );
+}
+
+/**
+ * Creates a stable hash of any value.
+ */
+export function hash(value: any): string {
+    return createHash('sha256').update(identify(value)).digest('base64url');
 }
