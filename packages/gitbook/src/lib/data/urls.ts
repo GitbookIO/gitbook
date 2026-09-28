@@ -233,7 +233,7 @@ export function normalizeRequestURL(url: URL): Response | null {
 
 /**
  * Normalize a URL to remove duplicate slashes and trailing slashes
- * and transform the pathname to lowercase.
+ * and decode the pathname to its canonical encoding.
  */
 export function normalizeURL(url: URL) {
     const result = new URL(url);

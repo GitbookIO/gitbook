@@ -25,6 +25,7 @@ import {
 import { getLLMsTxtURL, getPageMarkdownURL } from '@/lib/llms-directive';
 import type { AncestorRevisionPage } from '@/lib/pages';
 import { tcls } from '@/lib/tailwind';
+import { getPageRSSURL } from '@/routes/rss';
 
 const LINK_PREVIEW_MAX_COUNT = 500;
 
@@ -86,6 +87,14 @@ export async function PageBody(props: {
 
     return (
         <CurrentPageProvider page={{ spaceId: context.space.id, pageId: page.id }}>
+            {contentHasUpdates ? (
+                <link
+                    rel="alternate"
+                    type="application/rss+xml"
+                    href={getPageRSSURL(context, page)}
+                    title="RSS Feed"
+                />
+            ) : null}
             <main
                 className={tcls(
                     'relative min-w-0 flex-1',

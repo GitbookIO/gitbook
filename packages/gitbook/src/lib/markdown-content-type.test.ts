@@ -12,6 +12,14 @@ describe('ChatGPT Markdown compatibility', () => {
         expect(
             isChatGPTRequest(
                 requestWith({
+                    'user-agent':
+                        'Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko); compatible; OAI-SearchBot/1.4; +https://openai.com/searchbot',
+                })
+            )
+        ).toBe(true);
+        expect(
+            isChatGPTRequest(
+                requestWith({
                     'user-agent': 'SomeClient/1.0',
                     'signature-agent': '"https://chatgpt.com"',
                 })
