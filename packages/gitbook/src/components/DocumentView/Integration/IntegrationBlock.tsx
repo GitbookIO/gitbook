@@ -1,8 +1,8 @@
 import type { DocumentBlockIntegration, RenderIntegrationUI } from '@gitbook/api';
-import { ContentKit, ContentKitOutput } from '@gitbook/react-contentkit';
+import { ContentKitOutput } from '@gitbook/react-contentkit';
 
 import type { BlockProps } from '../Block';
-import { getWebframePageContext, integrationBlockContainsWebframe } from './adaptive';
+import { getWebframePageContext } from './adaptive';
 import { contentKitServerContext } from './contentkit';
 import './contentkit.css';
 import {
@@ -74,15 +74,10 @@ export async function IntegrationBlock(props: BlockProps<DocumentBlockIntegratio
         return null;
     }
 
-    const containsWebframe = integrationBlockContainsWebframe(initialOutput);
     const canAccessVisitorClaims = initialOutput.canAccessVisitorClaims === true;
 
     // The current page (path/id/title) is non-sensitive, so it is always exposed to webframes.
     const page = getWebframePageContext(context.contentContext);
-
-    // Any webframe uses the client-context wrapper: it enables navigation to other pages and
-    // exposes the current page, plus visitor claims when the integration is allowed them.
-    const useClientContext = containsWebframe;
 
     const contentKitProps = {
         renderContext: {
@@ -105,20 +100,14 @@ export async function IntegrationBlock(props: BlockProps<DocumentBlockIntegratio
 
     return (
         <div className={tcls(style)}>
-            {useClientContext ? (
-                <ContentKitWithClientContext
-                    {...contentKitProps}
-                    canAccessVisitorClaims={canAccessVisitorClaims}
-                    page={page}
-                    linkerData={getWebframeLinkerData(context.contentContext.linker)}
-                >
-                    <ContentKitOutput output={initialOutput} context={contentKitServerContext} />
-                </ContentKitWithClientContext>
-            ) : (
-                <ContentKit {...contentKitProps}>
-                    <ContentKitOutput output={initialOutput} context={contentKitServerContext} />
-                </ContentKit>
-            )}
+            <ContentKitWithClientContext
+                {...contentKitProps}
+                canAccessVisitorClaims={canAccessVisitorClaims}
+                page={page}
+                linkerData={getWebframeLinkerData(context.contentContext.linker)}
+            >
+                <ContentKitOutput output={initialOutput} context={contentKitServerContext} />
+            </ContentKitWithClientContext>
         </div>
     );
 }

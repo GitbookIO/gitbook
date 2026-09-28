@@ -69,3 +69,10 @@ export function getExtension(path: string): string {
     }
     return '';
 }
+
+/**
+ * Check if a path contains a `~gitbook` segment, i.e. targets an internal GitBook route.
+ */
+export function isGitBookInternalPath(path: string): boolean {
+    return /(^|\/)~gitbook(\/|$)/.test(path);
+}

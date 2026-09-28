@@ -13,23 +13,29 @@ Include relevant validation and screenshots when available. Do not claim checks 
 
 ## Template and changelog
 
-Read `.github/pull_request_template.md` immediately before writing. Preserve its section names and order. Always include `Proposed changes` and `Changelog`; omit `Demo` when there is nothing to show and `Context` when it adds no useful explanation.
+Read `.github/pull_request_template.md` immediately before writing. Preserve its required section names and order. Include `Proposed changes` and `Changelog`; omit `Demo` when there is nothing to show. Add optional `Context` before `Changelog` only when it meets the rule below.
 
-Write a short changelog entry describing what shipped. Use `[Feature]` for user-facing additions or improvements, `[Fix]` for user-facing bug fixes, and `[Chore]` for internal maintenance. Remove unused examples and placeholders. Usually one entry is enough; use more only for distinct changes. The PR changelog does not replace any changeset required by `AGENTS.md`.
+Write a short changelog entry describing what shipped. Use `[Feature]` for user-facing additions or improvements, `[Fix]` for user-facing bug fixes, and `[Chore]` for internal maintenance. For features and fixes, say what users can do or what no longer goes wrong in plain words. Keep chores useful to teammates without inventing user impact. Remove unused examples and placeholders. Usually one entry is enough; use more only for distinct changes. The PR changelog does not replace any changeset required by `AGENTS.md`.
 
 ## Optional context
 
-Add this section only when it helps someone outside the area understand why the change matters. Context explains why the change matters; the changelog says what shipped; proposed changes can explain implementation. Omit context if it repeats those sections, adds generic filler, or requires guessing the reason or impact.
+Write `Proposed changes` and `Changelog` first. Add `Context` only when it tells someone unfamiliar with the area something material that the changelog does not. `Problem` names a concrete failure or limitation supported by the PR or discussion. `Outcome` names what this PR delivers at its actual scope. Omit the section if either field would repeat the changelog, describe only implementation, or guess at an impact.
 
 ```markdown
 ## Context
 
-**Problem:** What wasn't working or what was missing?
+**Problem:** <concrete failure or limitation>
 
-**Outcome:** What becomes possible or works differently after this PR?
+**Outcome:** <result delivered by this PR>
 ```
 
-Keep each field to 1–2 short, non-technical sentences. Describe the problem and outcome, not the implementation. For infrastructure changes, explain the failure or limitation they caused. Do not invent an actor, customer segment, ownership, or impact, or force the change into a user story.
+Keep each field to 1–2 short, non-technical sentences. Prefer user or product impact when supported. For infrastructure changes, explain the failure or limitation they caused. Do not invent an actor, customer segment, ownership, or impact, or force the change into a user story. Do not turn a preparatory change into a claim that the whole workflow is fixed. Keep the roles distinct: `Context` explains why this matters, `Changelog` says what shipped, and `Proposed changes` can explain implementation.
+
+Examples:
+
+- A dependency bump with no demonstrated user effect needs no `Context`.
+- If creating the first change request leaves the user on an empty screen, say that it now opens after creation. Leave the animation-listener details in `Proposed changes`.
+- If a PR indexes links for later checks, describe the indexing result. Do not claim every link has already been checked.
 
 ## Writing pass
 
