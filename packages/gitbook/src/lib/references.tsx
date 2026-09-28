@@ -4,6 +4,7 @@ import type React from 'react';
 import type {
     ContentRef,
     JSONDocument,
+    Revision,
     RevisionFile,
     RevisionPageDocument,
     RevisionReusableContent,
@@ -16,7 +17,7 @@ import type { Filesystem } from '@gitbook/openapi-parser';
 
 import { getGitBookAppHref } from './app';
 import { getBlockById, getBlockTitle } from './document';
-import { resolvePageId } from './pages';
+import { resolvePageId, resolvePagePath } from './pages';
 import {
     findSiteSpaceBy,
     getFallbackSiteSpacePath,
@@ -192,7 +193,8 @@ export async function resolveContentRef(
                     ? activePage
                         ? { page: activePage, ancestors: [] }
                         : undefined
-                    : resolvePageId(revision.pages, contentRef.page);
+                    : (resolvePageId(revision.pages, contentRef.page) ??
+                      resolvePageAtRecordedPath(revision, contentRef));
 
             const page = resolvePageResult?.page;
             const ancestors =
@@ -428,6 +430,17 @@ export function resolveContentRefFallback(contentRef: ContentRef): ResolvedConte
         };
     }
     return null;
+}
+
+/**
+ * Find the page at the path recorded on a page or anchor ref, for when its page ID no longer
+ * exists (the page was deleted and re-created at the same path).
+ */
+function resolvePageAtRecordedPath(revision: Revision, contentRef: ContentRef) {
+    // TODO: read `contentRef.path` directly once @gitbook/api ships it on ContentRefPage and
+    // ContentRefAnchor; until then the field is untyped.
+    const { path } = contentRef as { path?: unknown };
+    return typeof path === 'string' && path ? resolvePagePath(revision.pages, path) : undefined;
 }
 
 /**

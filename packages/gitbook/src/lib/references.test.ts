@@ -738,3 +738,131 @@ describe('resolveContentRef for direct space links', () => {
         ]);
     });
 });
+
+describe('resolveContentRef for a page ref whose page was re-created', () => {
+    function buildPage(id: string, title: string, path: string): RevisionPageDocument {
+        return {
+            object: 'page',
+            id,
+            type: 'document',
+            kind: 'sheet',
+            title,
+            path,
+            slug: path.split('/').pop(),
+            pages: [],
+            tags: [],
+            layout: {},
+            urls: { app: 'https://app.gitbook.com/page' },
+        } as unknown as RevisionPageDocument;
+    }
+
+    function buildRevision(id: string, pages: RevisionPageDocument[]): Revision {
+        return {
+            object: 'revision',
+            id,
+            type: 'edits',
+            pages,
+            files: [],
+            reusableContents: [],
+            tags: [],
+            parents: [],
+            createdAt: '',
+            urls: { app: '' },
+        } as unknown as Revision;
+    }
+
+    function buildSpace(id: string): Space {
+        return {
+            object: 'space',
+            id,
+            title: id,
+            organization: 'org',
+            revision: `rev-${id}`,
+            urls: {
+                location: `https://api.gitbook.com/spaces/${id}`,
+                app: `https://app.gitbook.com/o/org/s/${id}/`,
+                published: `https://${id}.gitbook.io/`,
+            },
+        } as unknown as Space;
+    }
+
+    const recreated = buildPage('page-new', 'Detector', 'alerts-by-name/detector');
+    const other = buildPage('page-other', 'Other', 'alerts-by-name/other');
+    const alertsRevision = buildRevision('rev-alerts', [recreated, other]);
+    const alerts = buildSpace('alerts');
+    const notes = buildSpace('notes');
+
+    const dataFetcher = {
+        getSpace: async ({ spaceId }: { spaceId: string }) =>
+            spaceId === 'alerts'
+                ? { data: alerts }
+                : { error: { code: 404, message: 'Not found' } },
+        getRevision: async ({ spaceId }: { spaceId: string }) =>
+            spaceId === 'alerts'
+                ? { data: alertsRevision }
+                : { error: { code: 404, message: 'Not found' } },
+        getChangeRequest: async () => ({ error: { code: 404, message: 'Not found' } }),
+        withToken: function () {
+            return this;
+        },
+    } as unknown as GitBookDataFetcher;
+
+    function buildContext(space: Space, revision: Revision): GitBookAnyContext {
+        return {
+            dataFetcher,
+            linker: createLinker({
+                host: 'docs.example.com',
+                spaceBasePath: '/',
+                siteBasePath: '/',
+            }),
+            organizationId: 'org',
+            space,
+            revision,
+            revisionId: revision.id,
+            changeRequest: null,
+            shareKey: undefined,
+        } as unknown as GitBookAnyContext;
+    }
+
+    // Refs only get a typed `path` once @gitbook/api ships it, so the tests add it through a cast.
+    const withPath = (ref: object, path: string) => ({ ...ref, path }) as never;
+
+    it('finds the page at the recorded path when its ID no longer exists', async () => {
+        const result = await resolveContentRef(
+            withPath({ kind: 'page', page: 'page-deleted' }, 'alerts-by-name/detector'),
+            buildContext(alerts, alertsRevision)
+        );
+
+        expect(result?.text).toBe('Detector');
+    });
+
+    it('finds the page at the recorded path in another space', async () => {
+        const result = await resolveContentRef(
+            withPath(
+                { kind: 'page', space: 'alerts', page: 'page-deleted' },
+                'alerts-by-name/detector'
+            ),
+            buildContext(notes, buildRevision('rev-notes', []))
+        );
+
+        expect(result?.text).toBe('Detector');
+    });
+
+    it('keeps resolving by ID while the page still exists', async () => {
+        const result = await resolveContentRef(
+            withPath({ kind: 'page', page: 'page-other' }, 'alerts-by-name/detector'),
+            buildContext(alerts, alertsRevision)
+        );
+
+        expect(result?.text).toBe('Other');
+    });
+
+    it('does not resolve when neither the ID nor the recorded path exists', async () => {
+        const result = await resolveContentRef(
+            withPath({ kind: 'page', page: 'page-deleted' }, 'alerts-by-name/removed'),
+            buildContext(alerts, alertsRevision)
+        );
+
+        expect(result).toBeNull();
+    });
+});
