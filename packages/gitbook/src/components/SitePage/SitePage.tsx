@@ -4,7 +4,6 @@ import { notFound, redirect } from 'next/navigation';
 import {
     CustomizationDefaultThemeMode,
     CustomizationHeaderPreset,
-    type RevisionPageDocument,
     SiteInsightsDisplayContext,
     type TranslationLanguage,
 } from '@gitbook/api';
@@ -18,6 +17,7 @@ import {
     getPathnameParam,
 } from './fetch';
 import { PageClientLayout } from './PageClientLayout';
+import { getPageFullTitle } from './title';
 import { UpdatesFilterProvider } from '@/components/DocumentView/UpdatesFilter';
 import { UpdatesFilterScript } from '@/components/DocumentView/UpdatesFilterScript';
 import { PageAside } from '@/components/PageAside';
@@ -33,17 +33,15 @@ import { getResizedImageURL } from '@/lib/images';
 import { getPagePath } from '@/lib/pages';
 import { resolveContentRef } from '@/lib/references';
 import { isPageIndexable, isSiteIndexable } from '@/lib/seo';
-import {
-    getSiteSpacePagePaths,
-    getSiteStructureTitle,
-    resolveSiteSpaceCustomHomePage,
-} from '@/lib/sites';
+import { getSiteSpacePagePaths, resolveSiteSpaceCustomHomePage } from '@/lib/sites';
 import { tcls } from '@/lib/tailwind';
 import {
     generateUpdatesFilterCSS,
     getDocumentFilterableTags,
     updatesFilterStyleHref,
 } from '@/lib/updates';
+
+export { getPageFullTitle } from './title';
 
 export type SitePageProps = {
     context: GitBookSiteContext;
@@ -420,21 +418,4 @@ async function resolvePageMetaLinks(
         canonical: null,
         alternates: [],
     };
-}
-
-/**
- * Get the <title> for a page.
- */
-export function getPageFullTitle(context: GitBookSiteContext, page: RevisionPageDocument) {
-    const { site } = context;
-    const siteStructureTitle = getSiteStructureTitle(context);
-
-    return [
-        page.title,
-        // Prevent duplicate titles by comparing against the page title.
-        page.title !== siteStructureTitle ? siteStructureTitle : null, // The first page of a section is often the same as the section title, so we don't need to show it.
-        page.title !== site.title ? site.title : null, // The site title can also be the same as the site title on the site's landing page.
-    ]
-        .filter(Boolean)
-        .join(' | ');
 }
