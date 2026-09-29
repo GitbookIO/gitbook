@@ -29,18 +29,21 @@ interface PageCoverImageProps {
 
 export function PageCoverImage(props: PageCoverImageProps) {
     const { imgs, y, height, mask } = props;
-    const { containerRef, objectPositionY, isLoading } = useCoverPosition(imgs, y);
+    const { objectPositionY, isLoading } = useCoverPosition(imgs, y, {
+        height,
+        aspectRatio: PAGE_COVER_SIZE,
+    });
 
     if (isLoading) {
         return (
-            <div className="h-full w-full overflow-hidden" ref={containerRef}>
+            <div className="h-full w-full overflow-hidden">
                 <div className="h-full w-full animate-pulse bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900" />
             </div>
         );
     }
 
     return (
-        <div className="h-full w-full overflow-hidden" ref={containerRef} style={{ height }}>
+        <div className="h-full w-full overflow-hidden @container" style={{ height }}>
             <img
                 src={imgs.light.src}
                 srcSet={imgs.light.srcSet}
@@ -52,7 +55,7 @@ export function PageCoverImage(props: PageCoverImageProps) {
                     aspectRatio: height
                         ? undefined
                         : `${PAGE_COVER_SIZE.width}/${PAGE_COVER_SIZE.height}`,
-                    objectPosition: `50% ${objectPositionY}%`,
+                    objectPosition: `50% ${objectPositionY}`,
                     height, // if no height is passed, no height will be set.
                     maskComposite: 'intersect',
                     maskImage:
@@ -73,7 +76,7 @@ export function PageCoverImage(props: PageCoverImageProps) {
                         aspectRatio: height
                             ? undefined
                             : `${PAGE_COVER_SIZE.width}/${PAGE_COVER_SIZE.height}`,
-                        objectPosition: `50% ${objectPositionY}%`,
+                        objectPosition: `50% ${objectPositionY}`,
                         height, // if no height is passed, no height will be set.
                         maskComposite: 'intersect',
                         maskImage:

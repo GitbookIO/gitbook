@@ -19,7 +19,7 @@ export async function Trademark(
     const { space } = context;
     const language = await getSpaceLanguage(context);
 
-    const url = new URL('https://www.gitbook.com');
+    const url = new URL('https://www.gitbook.com/powered-by');
     url.searchParams.set('utm_source', 'content');
     url.searchParams.set('utm_medium', 'trademark');
     url.searchParams.set('utm_campaign', space.id);
