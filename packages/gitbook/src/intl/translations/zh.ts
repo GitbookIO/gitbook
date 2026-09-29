@@ -75,6 +75,7 @@ export const zh: TranslationLanguage = {
     edit: '编辑',
     notfound_title: '页面未找到',
     notfound_link: '此链接指向已被删除或不再存在的页面。',
+    notfound_link_opens: '打开 ${1}',
     notfound: '您要找的页面不存在。',
     notfound_adaptive_title: '页面无法访问',
     notfound_adaptive: '该页面可能存在，但您可能需要登录后才能访问。',

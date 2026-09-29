@@ -13,6 +13,7 @@ import {
     resolveContentRefFallback,
     resolveContentRefInDocument,
 } from '@/lib/references';
+import { checkIsExternalURL } from '@/lib/urls';
 
 export async function InlineLink(props: InlineProps<DocumentInlineLink>) {
     const { document, inline, context, ancestorInlines } = props;
@@ -36,11 +37,15 @@ export async function InlineLink(props: InlineProps<DocumentInlineLink>) {
     );
 
     if (!resolved) {
-        const fallback = resolveContentRefFallback(inline.data.ref);
+        const fallback = resolveContentRefFallback(inline.data.ref, contentContext);
         return (
-            <NotFoundRefHoverCard context={context}>
+            <NotFoundRefHoverCard context={context} fallback={fallback}>
                 {fallback ? (
-                    <InlineLinkAnchor href={fallback.href} contentRef={inline.data.ref} isExternal>
+                    <InlineLinkAnchor
+                        href={fallback.href}
+                        contentRef={inline.data.ref}
+                        isExternal={checkIsExternalURL(fallback.href)}
+                    >
                         {inlinesElement}
                     </InlineLinkAnchor>
                 ) : (
@@ -53,7 +58,7 @@ export async function InlineLink(props: InlineProps<DocumentInlineLink>) {
         <InlineLinkAnchor
             href={resolved.href}
             contentRef={inline.data.ref}
-            isExternal={inline.data.ref.kind === 'url'}
+            isExternal={isExternalLink(inline, resolved)}
         >
             {inlinesElement}
         </InlineLinkAnchor>
@@ -121,7 +126,7 @@ function InlineLinkTooltipWrapper(props: {
 
     let breadcrumbs = resolved.ancestors ?? [];
     const isMailto = resolved.href.startsWith('mailto:');
-    const isExternal = inline.data.ref.kind === 'url';
+    const isExternal = isExternalLink(inline, resolved);
     const isSamePage = inline.data.ref.kind === 'anchor' && inline.data.ref.page === undefined;
 
     if (isMailto) {
@@ -160,4 +165,11 @@ function InlineLinkTooltipWrapper(props: {
             {children}
         </InlineLinkTooltip>
     );
+}
+
+/**
+ * A URL link resolved to a path in the site is internal, even though its ref is a URL.
+ */
+function isExternalLink(inline: DocumentInlineLink, resolved: ResolvedContentRef): boolean {
+    return inline.data.ref.kind === 'url' && checkIsExternalURL(resolved.href);
 }

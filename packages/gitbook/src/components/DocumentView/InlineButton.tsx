@@ -79,9 +79,11 @@ export async function InlineLinkButton(
             ? await resolveContentRefInDocument(document, inline.data.ref, context.contentContext)
             : null;
 
-    const href =
-        resolved?.href ??
-        (inline.data.ref ? resolveContentRefFallback(inline.data.ref)?.href : undefined);
+    const fallback =
+        !resolved && inline.data.ref
+            ? resolveContentRefFallback(inline.data.ref, context.contentContext)
+            : null;
+    const href = resolved?.href ?? fallback?.href;
     const sharedProps: React.ComponentProps<typeof Button> = {
         ...buttonProps,
         insights: {
@@ -105,7 +107,11 @@ export async function InlineLinkButton(
         );
 
     if (inline.data.ref && !resolved) {
-        return <NotFoundRefHoverCard context={context}>{button}</NotFoundRefHoverCard>;
+        return (
+            <NotFoundRefHoverCard context={context} fallback={fallback}>
+                {button}
+            </NotFoundRefHoverCard>
+        );
     }
 
     return button;

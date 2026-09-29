@@ -77,6 +77,7 @@ export const ro: TranslationLanguage = {
     edit: 'Editează',
     notfound_title: 'Pagina nu a fost găsită',
     notfound_link: 'Acest link indică o pagină care a fost eliminată sau nu mai există.',
+    notfound_link_opens: 'Deschide ${1}',
     notfound: 'Pagina pe care o cauți nu există.',
     notfound_adaptive_title: 'Pagina nu este disponibilă',
     notfound_adaptive:
