@@ -4,7 +4,7 @@ import React from 'react';
 
 import * as api from '@gitbook/api';
 
-import { useTrackEvent } from '../Insights';
+import { trackAskView, useTrackEvent } from '../Insights';
 import { LinkContext } from '../primitives';
 import { useIsVisible } from '../VisibilityContext';
 import {
@@ -60,15 +60,10 @@ export function EmbeddableAIChat(props: EmbeddableAIChatProps) {
             return;
         }
 
-        trackEvent(
-            {
-                type: 'ask_view',
-            },
-            {
-                pageId: null,
-                displayContext: api.SiteInsightsDisplayContext.Embed,
-            }
-        );
+        trackAskView(trackEvent, 'embed', {
+            pageId: null,
+            displayContext: api.SiteInsightsDisplayContext.Embed,
+        });
     }, [trackEvent, isVisible]);
 
     const tabsRef = React.useRef<HTMLDivElement>(null);

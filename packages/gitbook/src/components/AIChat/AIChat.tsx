@@ -24,7 +24,6 @@ import {
     EmbeddableFrameTitle,
 } from '../Embeddable/EmbeddableFrame';
 import { useIsMounted, useNow } from '../hooks';
-import { useTrackEvent } from '../Insights';
 import { Button } from '../primitives';
 import { ScrollContainer } from '../primitives/ScrollContainer';
 import { SideSheet } from '../primitives/SideSheet';
@@ -67,16 +66,6 @@ export function AIChat() {
             useKey: true,
         }
     );
-
-    // Track the view of the AI chat
-    const trackEvent = useTrackEvent();
-    React.useEffect(() => {
-        if (chat.opened) {
-            trackEvent({
-                type: 'ask_view',
-            });
-        }
-    }, [chat.opened, trackEvent]);
 
     return (
         <SideSheet
