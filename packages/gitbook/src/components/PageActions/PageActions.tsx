@@ -67,7 +67,7 @@ export function ActionOpenAssistant(props: {
                         href: page.href,
                     });
                 }
-                assistant.open();
+                assistant.open(undefined, 'page');
             }}
         />
     );

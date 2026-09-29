@@ -7,7 +7,7 @@ import type { CustomizationAIMode } from '@gitbook/api';
 import type { GitBookAssistant } from '@gitbook/browser-types';
 import { Icon, type IconName } from '@gitbook/icons';
 
-import { useAIChatController, useAIChatState } from '.';
+import { type AskAITrigger, useAIChatController, useAIChatState } from '.';
 import { AIChatIcon, AISearchIcon, getAIChatName } from '../AIChat';
 import { useIntegrationAssistants } from '../Integrations';
 import { useSetSearchState } from '../Search/useSearch';
@@ -26,7 +26,8 @@ export type AIConfig = {
     };
 };
 
-export type Assistant = Omit<GitBookAssistant, 'icon'> & {
+export type Assistant = Omit<GitBookAssistant, 'icon' | 'open'> & {
+    open: (query?: string, trigger?: AskAITrigger) => void;
     /**
      * Unique identifier for the assistant. Generated automatically using Crypto.randomUUID().
      * @example '123e4567-e89b-12d3-a456-426614174000'
@@ -102,8 +103,8 @@ export function useAI(): AIContext {
                     className="size-text-lg"
                 />
             ),
-            open: (query?: string) => {
-                chatController.open();
+            open: (query?: string, trigger?: AskAITrigger) => {
+                chatController.open(trigger);
                 if (query) {
                     chatController.postMessage({ message: query });
                 }
