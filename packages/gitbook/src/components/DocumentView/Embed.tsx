@@ -38,7 +38,7 @@ export async function Embed(props: BlockProps<gitbookAPI.DocumentBlockEmbed>) {
                     <div
                         dangerouslySetInnerHTML={{
                             __html:
-                                context.mode !== 'print' && isLoomUrl(block.data.url)
+                                context.mode !== 'print' && shouldLazyLoad(block.data.url)
                                     ? lazyLoadIframes(embed.html)
                                     : embed.html,
                         }}
@@ -84,7 +84,7 @@ function lazyLoadIframes(html: string): string {
     return html.replace(/<iframe\b(?![^>]*\bloading=)/gi, '<iframe loading="lazy"');
 }
 
-function isLoomUrl(url: string): boolean {
+function shouldLazyLoad(url: string): boolean {
     try {
         const { hostname } = new URL(url);
         return hostname === 'loom.com' || hostname.endsWith('.loom.com');
