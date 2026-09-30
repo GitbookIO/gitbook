@@ -37,7 +37,10 @@ export async function Embed(props: BlockProps<gitbookAPI.DocumentBlockEmbed>) {
                 <>
                     <div
                         dangerouslySetInnerHTML={{
-                            __html: embed.html,
+                            __html:
+                                context.mode !== 'print' && isLoomUrl(block.data.url)
+                                    ? lazyLoadIframes(embed.html)
+                                    : embed.html,
                         }}
                         data-visual-test="blackout"
                     />
@@ -71,6 +74,23 @@ export async function Embed(props: BlockProps<gitbookAPI.DocumentBlockEmbed>) {
             )}
         </Caption>
     );
+}
+
+/**
+ * Pages with many Loom embeds exhaust the browser's request budget
+ * (ERR_INSUFFICIENT_RESOURCES) when every player loads at once, leaving some blank.
+ */
+function lazyLoadIframes(html: string): string {
+    return html.replace(/<iframe\b(?![^>]*\bloading=)/gi, '<iframe loading="lazy"');
+}
+
+function isLoomUrl(url: string): boolean {
+    try {
+        const { hostname } = new URL(url);
+        return hostname === 'loom.com' || hostname.endsWith('.loom.com');
+    } catch {
+        return false;
+    }
 }
 
 /**
