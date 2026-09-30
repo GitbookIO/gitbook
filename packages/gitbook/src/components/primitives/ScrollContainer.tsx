@@ -133,9 +133,7 @@ export function ScrollContainer(props: ScrollContainerProps) {
             {/* Scrollable content */}
             <div
                 className={tcls(
-                    // Scroll anchoring silently shifts scrollTop when content above collapses,
-                    // desyncing the measured scroll position from the edge masks.
-                    'flex flex-1 overflow-hidden [overflow-anchor:none]',
+                    'flex flex-1 overflow-hidden',
                     orientation === 'horizontal' ? 'min-w-0' : 'min-h-0',
                     orientation === 'horizontal' ? 'no-scrollbar' : 'hide-scrollbar',
                     orientation === 'horizontal' ? 'overflow-x-scroll' : 'flex-col overflow-y-auto',
