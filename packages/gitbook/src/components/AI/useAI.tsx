@@ -119,9 +119,13 @@ export function useAI(): AIContext {
             icon: <AISearchIcon />,
             open: (query?: string) => {
                 if (query) {
-                    setSearchState((prev) =>
-                        prev ? { ...prev, query: null, ask: query, open: true } : null
-                    );
+                    setSearchState((prev) => ({
+                        ...prev,
+                        query: null,
+                        ask: query,
+                        scope: prev?.scope ?? 'default',
+                        open: true,
+                    }));
                 }
             },
             pageAction: false,
