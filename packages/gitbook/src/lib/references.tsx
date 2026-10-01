@@ -9,6 +9,7 @@ import type {
     RevisionReusableContent,
     SiteSection,
     SiteSpace,
+    SiteStructure,
     Space,
     TranslationLanguage,
 } from '@gitbook/api';
@@ -16,7 +17,12 @@ import type { Filesystem } from '@gitbook/openapi-parser';
 
 import { getGitBookAppHref } from './app';
 import { getBlockById, getBlockTitle } from './document';
-import { findGitPageURLTarget, findPageByGitPath } from './gitPageURL';
+import {
+    type GitPageURLSpace,
+    type GitPageURLTarget,
+    findGitPageURLTarget,
+    findPageForGitPageURLTarget,
+} from './gitPageURL';
 import { resolvePageId } from './pages';
 import {
     findSiteSpaceBy,
@@ -43,6 +49,12 @@ import {
     ignoreDataThrownError,
 } from '@/lib/data';
 import { type GitBookLinker, createLinker, linkerWithAbsoluteURLs } from '@/lib/links';
+
+// The spaces of each site that can own a repository URL, and the hosts of their repositories.
+const siteGitSpaces = new WeakMap<
+    SiteStructure,
+    { spaces: GitPageURLSpace[]; hosts: Set<string> }
+>();
 
 export interface ResolvedContentRef {
     /** Effective destination when a repository URL resolves to a site page. */
@@ -148,12 +160,7 @@ export async function resolveContentRef(
     switch (contentRef.kind) {
         case 'url': {
             if ('site' in context) {
-                const target = findGitPageURLTarget(
-                    contentRef.url,
-                    listAllSiteSpaces(context.structure)
-                        .filter((entry) => !entry.draft)
-                        .map((entry) => entry.space)
-                );
+                const target = findSiteGitPageURLTarget(context.structure, contentRef.url);
                 if (target) {
                     try {
                         // Site CRs must select the target member's revision here instead of main.
@@ -164,9 +171,9 @@ export async function resolveContentRef(
                         );
                         const page =
                             targetContext &&
-                            findPageByGitPath(
+                            findPageForGitPageURLTarget(
                                 targetContext.spaceContext.revision.pages,
-                                target.path
+                                target
                             );
                         if (page?.type === 'document' && targetContext) {
                             const resolvedRef: ContentRef = target.anchor
@@ -679,6 +686,54 @@ async function resolveContentRefInSpace(
         };
     } catch (error) {
         console.warn(`Error resolving content ref in space ${spaceId}:`, error);
+        return null;
+    }
+}
+
+/**
+ * Locate the site space owning a repository URL. Links to other hosts, which most are, skip
+ * matching against every space of the site. Only paths that can be pages are returned, as finding
+ * the page reads the revision of its space.
+ */
+function findSiteGitPageURLTarget(structure: SiteStructure, href: string): GitPageURLTarget | null {
+    let site = siteGitSpaces.get(structure);
+    if (!site) {
+        const spaces: GitPageURLSpace[] = listAllSiteSpaces(structure)
+            .filter((siteSpace) => !siteSpace.draft)
+            .map((siteSpace) => siteSpace.space);
+        const hosts = new Set(
+            spaces.flatMap((space) => {
+                const host = getURLHost(space.gitSync?.url ?? space.previousGitSync?.url);
+                return host ? [host, `www.${host}`] : [];
+            })
+        );
+        site = { spaces, hosts };
+        siteGitSpaces.set(structure, site);
+    }
+
+    const host = getURLHost(href);
+    if (!host || !site.hosts.has(host)) {
+        return null;
+    }
+    const target = findGitPageURLTarget(href, site.spaces);
+    return target && isGitPagePath(target.path) ? target : null;
+}
+
+/**
+ * Whether a repository path can be a page: a Markdown file, or a directory for its README.
+ */
+function isGitPagePath(path: string): boolean {
+    const name = path.split('/').at(-1) ?? '';
+    return name === '' || name.endsWith('.md') || !name.includes('.');
+}
+
+function getURLHost(href: string | undefined): string | null {
+    if (!href) {
+        return null;
+    }
+    try {
+        return new URL(href).host;
+    } catch {
         return null;
     }
 }

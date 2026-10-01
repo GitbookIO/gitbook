@@ -740,7 +740,15 @@ describe('resolveContentRef for direct space links', () => {
 });
 
 describe('repository page links', () => {
-    function fixture(options: { denied?: boolean; missing?: boolean; draft?: boolean } = {}) {
+    function fixture(
+        options: {
+            denied?: boolean;
+            missing?: boolean;
+            draft?: boolean;
+            gitSync?: object | null;
+            previousGitSync?: object;
+        } = {}
+    ) {
         const page = {
             id: 'target-page',
             type: 'document',
@@ -755,10 +763,14 @@ describe('repository page links', () => {
             title: 'API',
             organization: 'org',
             revision: 'target-main',
-            gitSync: {
-                url: 'https://github.com/acme/docs/tree/main',
-                installationProjectDirectory: 'api',
-            },
+            gitSync:
+                options.gitSync === null
+                    ? undefined
+                    : (options.gitSync ?? {
+                          url: 'https://github.com/acme/docs/tree/main',
+                          installationProjectDirectory: 'api',
+                      }),
+            previousGitSync: options.previousGitSync,
             urls: {
                 app: 'https://app.gitbook.com/s/target',
                 published: 'https://docs.example.com/api/',
@@ -828,13 +840,43 @@ describe('repository page links', () => {
         expect(ref.kind).toBe('url');
     });
 
-    it('preserves asset URLs that do not match a page', async () => {
-        const { context } = fixture();
+    it('preserves asset URLs without reading a revision', async () => {
+        const { context, getRevision } = fixture();
         const assetRef = {
             kind: 'url' as const,
             url: ref.url.replace('auth.md#tokens', 'diagram.png'),
         };
         expect((await resolveContentRef(assetRef, context))?.href).toBe(assetRef.url);
+        expect(getRevision).not.toHaveBeenCalled();
+    });
+
+    it('resolves a space syncing from the repository root', async () => {
+        const { context } = fixture({
+            gitSync: { url: 'https://github.com/acme/docs/tree/main' },
+        });
+        expect((await resolveContentRef(ref, context))?.href).toBe('/api/authentication#tokens');
+    });
+
+    it('resolves a space whose Git Sync was removed from its remembered project URL', async () => {
+        const { context } = fixture({
+            gitSync: null,
+            previousGitSync: { url: 'https://github.com/acme/docs/tree/main/api' },
+        });
+        expect((await resolveContentRef(ref, context))?.href).toBe('/api/authentication#tokens');
+    });
+
+    it('decodes the anchor of the repository URL', async () => {
+        const { context } = fixture();
+        const result = await resolveContentRef(
+            { kind: 'url', url: ref.url.replace('#tokens', '#access%20tokens') },
+            context
+        );
+        expect(result?.resolvedRef).toEqual({
+            kind: 'anchor',
+            space: 'target',
+            page: 'target-page',
+            anchor: 'access tokens',
+        });
     });
 
     it('reads only the matching space in a 500-space site', async () => {
