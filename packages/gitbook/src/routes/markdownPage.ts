@@ -1,6 +1,7 @@
 import type { RevisionPageDocument, RevisionPageGroup } from '@gitbook/api';
 
 import { isAIEnabled } from '@/components/utils/isAIChatEnabled';
+import { renderAskParametersDescription } from '@/lib/ask-prompt';
 import type { GitBookSiteContext } from '@/lib/context';
 import { getExposableError } from '@/lib/data';
 import { linkerWithMarkdownPages } from '@/lib/links';
@@ -95,8 +96,7 @@ GET ${context.linker.toAbsoluteURL(
     )}?ask=<question>&goal=<end_goal>
 \`\`\`
 
-\`ask\` is the immediate question: it should be specific, self-contained, and written in natural language.
-\`goal\` is what the user is ultimately trying to achieve, the reason they need the answer. Sharing it helps GitBook give you a better, more relevant answer. A goal is most helpful when it describes the outcome the user wants rather than restating the question. For example, with \`ask=how do I create an API token\`, a goal like \`build a script that syncs our docs to a CMS\` lets GitBook tailor the answer to that use case.
+${renderAskParametersDescription()}
 
 The response will contain a direct answer to the question and relevant excerpts and sources from the documentation.
 
@@ -151,8 +151,7 @@ Perform an HTTP GET request on the current page URL with the \`ask\` and \`goal\
 GET ${pageUrl}?ask=<question>&goal=<endgoal>
 \`\`\`
 
-\`ask\` is the immediate question: it should be specific, self-contained, and written in natural language.
-\`goal\` is what the user is ultimately trying to achieve, the reason they need the answer. Sharing it helps GitBook give you a better, more relevant answer. A goal is most helpful when it describes the outcome the user wants rather than restating the question. For example, with \`ask=how do I create an API token\`, a goal like \`build a script that syncs our docs to a CMS\` lets GitBook tailor the answer to that use case.
+${renderAskParametersDescription()}
 
 The response will contain a direct answer to the question and relevant excerpts and sources from the documentation.
 
