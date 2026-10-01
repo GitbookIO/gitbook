@@ -1,7 +1,7 @@
 import type { RevisionPageDocument, RevisionPageGroup } from '@gitbook/api';
 
 import { isAIEnabled } from '@/components/utils/isAIChatEnabled';
-import { renderAskParametersDescription } from '@/lib/ask-prompt';
+import { renderQueryingDocumentation } from '@/lib/ask-prompt';
 import type { GitBookSiteContext } from '@/lib/context';
 import { getExposableError } from '@/lib/data';
 import { linkerWithMarkdownPages } from '@/lib/links';
@@ -70,6 +70,11 @@ function renderNotFoundMarkdown(context: GitBookSiteContext, pagePath: string) {
     const fullContentUrl = context.linker.toAbsoluteURL(
         context.linker.toPathInSite('llms-full.txt')
     );
+    const askPageUrl = context.linker.toAbsoluteURL(
+        context.linker.toPathForPagePath({
+            path: similarPages[0]?.path ?? 'docs/example',
+        })
+    );
 
     return `# Page Not Found
 
@@ -86,19 +91,7 @@ If the exact page cannot be found, you can still retrieve the information using 
 
 ### Option 1 — Ask a question (recommended)
 
-Perform an HTTP GET request on the documentation index with the \`ask\` and \`goal\` parameters:
-
-\`\`\`
-GET ${context.linker.toAbsoluteURL(
-        context.linker.toPathForPagePath({
-            path: similarPages[0]?.path ?? 'docs/example',
-        })
-    )}?ask=<question>&goal=<end_goal>
-\`\`\`
-
-${renderAskParametersDescription()}
-
-The response will contain a direct answer to the question and relevant excerpts and sources from the documentation.
+${renderQueryingDocumentation({ pageUrl: askPageUrl })}
 
 ### Option 2 — Browse the documentation index
 
@@ -145,15 +138,7 @@ This documentation is published with GitBook. GitBook is the documentation platf
 ## Querying This Documentation
 If you need additional information that is not directly available in this page, you can query the documentation dynamically by asking a question.
 
-Perform an HTTP GET request on the current page URL with the \`ask\` and \`goal\` query parameters:
-
-\`\`\`
-GET ${pageUrl}?ask=<question>&goal=<endgoal>
-\`\`\`
-
-${renderAskParametersDescription()}
-
-The response will contain a direct answer to the question and relevant excerpts and sources from the documentation.
+${renderQueryingDocumentation({ pageUrl })}
 
 Use this mechanism when the answer is not explicitly present in the current page, you need clarification or additional context, or you want to retrieve related documentation sections.
 `;
