@@ -11,7 +11,7 @@ import { tcls } from '@/lib/tailwind';
  * A container that encapsulates a scrollable area with usability features.
  * - Faded edges when there is more content than the container can display.
  * - Buttons to advance the scroll position.
- * - Auto-scroll to the active item when it's initially active.
+ * - Auto-scroll to the active item on mount and when it changes.
  */
 export type ScrollContainerProps = {
     children: React.ReactNode;
@@ -80,7 +80,42 @@ export function ScrollContainer(props: ScrollContainerProps) {
         if (!activeItem || !container.contains(activeItem)) {
             return;
         }
-        scrollToElementInContainer(activeItem, container);
+        if (!isElementFullyVisibleInContainer(activeItem, container)) {
+            scrollToElementInContainer(activeItem, container);
+        }
+    }, [active]);
+
+    React.useEffect(() => {
+        const container = containerRef.current;
+        if (!container || typeof active !== 'string') {
+            return;
+        }
+
+        let frame = 0;
+        // Active items can mount only after a collapsed group expands.
+        const observer = new MutationObserver(() => {
+            cancelAnimationFrame(frame);
+            frame = requestAnimationFrame(() => {
+                for (const activeItem of container.querySelectorAll(active)) {
+                    if (!isElementFullyVisibleInContainer(activeItem, container)) {
+                        scrollToElementInContainer(activeItem, container, 'smooth');
+                        return;
+                    }
+                }
+            });
+        });
+
+        observer.observe(container, {
+            attributes: true,
+            attributeFilter: ['data-active'],
+            childList: true,
+            subtree: true,
+        });
+
+        return () => {
+            observer.disconnect();
+            cancelAnimationFrame(frame);
+        };
     }, [active]);
 
     const scrollFurther = () => {
@@ -335,7 +370,11 @@ function scrollByViewport(
 /**
  * Scroll to an element in a container.
  */
-function scrollToElementInContainer(element: Element, container: HTMLElement) {
+export function scrollToElementInContainer(
+    element: Element,
+    container: HTMLElement,
+    behavior: ScrollBehavior = 'auto'
+) {
     const containerRect = container.getBoundingClientRect();
     const rect = element.getBoundingClientRect();
 
@@ -350,8 +389,26 @@ function scrollToElementInContainer(element: Element, container: HTMLElement) {
             (rect.left - containerRect.left) -
             container.clientWidth / 2 +
             rect.width / 2,
-        // Use 'auto' to avoid additional scroll animations when scrolling to an element
-        // as this may be called during layout/initialization when the page is not fully loaded.
-        behavior: 'auto',
+        behavior,
     });
+}
+
+function isElementFullyVisibleInContainer(element: Element, container: HTMLElement) {
+    if (
+        !element.getClientRects().length ||
+        container.clientHeight === 0 ||
+        container.clientWidth === 0
+    ) {
+        return true;
+    }
+
+    const containerRect = container.getBoundingClientRect();
+    const elementRect = element.getBoundingClientRect();
+
+    return (
+        elementRect.top >= containerRect.top &&
+        elementRect.bottom <= containerRect.bottom &&
+        elementRect.left >= containerRect.left &&
+        elementRect.right <= containerRect.right
+    );
 }
