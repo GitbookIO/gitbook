@@ -42,6 +42,12 @@ export type ScrollContainerProps = {
     /** The ID or ref of the active item to scroll to. */
     active?: string | React.RefObject<HTMLElement | null>;
 
+    /**
+     * Only scroll to the active item when it is not fully visible, and keep following it
+     * when it changes later (requires `active` to be a selector).
+     */
+    followActive?: boolean;
+
     /** Scroll by one page of fully visible direct children instead of one viewport. */
     scrollByVisibleItems?: boolean;
 } & React.HTMLAttributes<HTMLDivElement>;
@@ -53,6 +59,7 @@ export function ScrollContainer(props: ScrollContainerProps) {
         contentClassName,
         orientation,
         active,
+        followActive = false,
         scrollByVisibleItems = false,
         leading = { fade: true, button: true },
         trailing = { fade: true, button: true },
@@ -80,14 +87,15 @@ export function ScrollContainer(props: ScrollContainerProps) {
         if (!activeItem || !container.contains(activeItem)) {
             return;
         }
-        if (!isElementFullyVisibleInContainer(activeItem, container)) {
-            scrollToElementInContainer(activeItem, container);
+        if (followActive && isElementFullyVisibleInContainer(activeItem, container)) {
+            return;
         }
-    }, [active]);
+        scrollToElementInContainer(activeItem, container);
+    }, [active, followActive]);
 
     React.useEffect(() => {
         const container = containerRef.current;
-        if (!container || typeof active !== 'string') {
+        if (!followActive || !container || typeof active !== 'string') {
             return;
         }
 
@@ -116,7 +124,7 @@ export function ScrollContainer(props: ScrollContainerProps) {
             observer.disconnect();
             cancelAnimationFrame(frame);
         };
-    }, [active]);
+    }, [active, followActive]);
 
     const scrollFurther = () => {
         const container = containerRef.current;
