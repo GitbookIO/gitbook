@@ -10,8 +10,16 @@ import {
     type TableSearchRecordData,
     getVisibleTableRecordIds,
 } from './searchMatch';
+import {
+    type SlugFilterEntry,
+    getAppliedSlugFilter,
+    reconcileSelectedOptions,
+    resolveSlugFilter,
+    slugFilterKey,
+} from './slugFilter';
 import { Button, Checkbox, DropdownMenu, DropdownMenuItem, Input } from '@/components/primitives';
 import { tString, useLanguage } from '@/intl/client';
+import { selectStore } from '@/lib/select';
 import { type ClassValue, tcls } from '@/lib/tailwind';
 
 /**
@@ -37,6 +45,13 @@ type TableSearchContextValue = {
     visibleIds: ReadonlySet<string> | null;
     /** True when there are records but the active filters match none of them. */
     isEmpty: boolean;
+    /**
+     * Select columns the reader's content selection narrowed and the reader has left alone.
+     * A column they have since filtered themselves drops out, since the table no longer shows it.
+     */
+    slugFilter: SlugFilterEntry[];
+    /** Drop the selection driving {@link slugFilter}, site-wide. The only thing that clears one. */
+    clearSlugFilter: () => void;
 };
 
 const TableSearchContext = React.createContext<TableSearchContextValue | null>(null);
@@ -47,16 +62,32 @@ const TableSearchContext = React.createContext<TableSearchContextValue | null>(n
 export function TableSearchProvider(props: {
     records?: TableSearchRecordData[];
     recordGroups?: readonly (readonly string[])[];
+    /** Select columns of this table, so the reader's content selection can narrow them. */
+    selectColumns?: TableSelectColumn[];
     children: React.ReactNode;
 }) {
-    const { records = [], recordGroups = [] } = props;
+    const { records = [], recordGroups = [], selectColumns = [] } = props;
     const [query, setQuery] = React.useState('');
     const [selectedOptions, setSelectedOptions] = React.useState<SelectedOptions>(() => ({}));
     const [checkedColumns, setCheckedColumns] = React.useState<ReadonlySet<string>>(
         () => new Set()
     );
 
+    // The selection that drives this lives outside the table — a tab, a select button or a picker
+    // elsewhere on the page — so this synchronises with it rather than deriving from it.
+    const slugFilter = useSlugFilter(selectColumns);
+
+    // Columns the selection narrowed last time round. Kept so a new selection — or clearing it —
+    // undoes the previous one, rather than leaving a filter the reader can no longer account for.
+    const narrowedColumns = React.useRef<string[]>([]);
+
     const toggleOption = React.useCallback((column: string, value: string) => {
+        // The reader is taking this column over, so the selection no longer owns it: a later clear
+        // must leave their choice of options alone. Their change stays local — the filter is this
+        // table's, for this visit, while the selection is site-wide and persists, so only the
+        // clear beside the notice touches it.
+        narrowedColumns.current = narrowedColumns.current.filter((narrowed) => narrowed !== column);
+
         setSelectedOptions((previous) => {
             const values = new Set(previous[column]);
             if (values.has(value)) {
@@ -87,6 +118,33 @@ export function TableSearchProvider(props: {
         });
     }, []);
 
+    React.useEffect(() => {
+        const previouslyNarrowed = narrowedColumns.current;
+        narrowedColumns.current = slugFilter.map((entry) => entry.column);
+
+        setSelectedOptions((previous) =>
+            reconcileSelectedOptions(previous, previouslyNarrowed, slugFilter)
+        );
+    }, [slugFilter]);
+
+    // What the notice may speak for: the columns the selection narrowed and the reader has left
+    // alone. A column they have since filtered themselves still has an active slug, but the table
+    // is no longer showing it, so the notice must not claim it.
+    const appliedSlugFilter = React.useMemo(
+        () => getAppliedSlugFilter(slugFilter, selectedOptions),
+        [slugFilter, selectedOptions]
+    );
+
+    // Clearing goes through the store rather than local state: the selection is what persists, so
+    // only dropping it there stops the filter coming back on the next load. It is site-wide, so a
+    // tab elsewhere on the page reverts to its default too. This is the only thing that clears a
+    // selection — changing the filter never does.
+    const clearSlugFilter = React.useCallback(() => {
+        for (const entry of appliedSlugFilter) {
+            selectStore.deactivate(entry.slug);
+        }
+    }, [appliedSlugFilter]);
+
     // Match every record once, here, rather than in each row — rows just look themselves up by id.
     const visibleIds = React.useMemo(
         () =>
@@ -112,12 +170,58 @@ export function TableSearchProvider(props: {
             toggleCheckbox,
             visibleIds,
             isEmpty,
+            slugFilter: appliedSlugFilter,
+            clearSlugFilter,
         }),
-        [query, selectedOptions, toggleOption, checkedColumns, toggleCheckbox, visibleIds, isEmpty]
+        [
+            query,
+            selectedOptions,
+            toggleOption,
+            checkedColumns,
+            toggleCheckbox,
+            visibleIds,
+            isEmpty,
+            appliedSlugFilter,
+            clearSlugFilter,
+        ]
     );
 
     return (
         <TableSearchContext.Provider value={value}>{props.children}</TableSearchContext.Provider>
+    );
+}
+
+/**
+ * The reader's selection, reduced to the columns of *this* table.
+ *
+ * Subscribes once and returns a string rather than an object: `useSyncExternalStore` compares
+ * snapshots by identity, so a fresh object each call would loop. It also means a selection that
+ * changes nothing for this table re-renders nothing — the reason `useSelect` stopped exposing the
+ * recency list in the first place.
+ */
+function useSlugFilter(selectColumns: TableSelectColumn[]): SlugFilterEntry[] {
+    const columnsKey = selectColumns
+        .map(
+            (column) =>
+                `${column.id}:${column.options.map((option) => `${option.value}=${option.label}`).join('|')}`
+        )
+        .join(';');
+
+    const getKey = React.useCallback(
+        () => slugFilterKey(resolveSlugFilter(selectColumns, selectStore.getState().slugs)),
+        // `selectColumns` is a fresh array each render; its contents are what matter.
+        // oxlint-disable-next-line react-hooks/exhaustive-deps
+        [columnsKey]
+    );
+
+    const filterKey = React.useSyncExternalStore(selectStore.subscribe, getKey, getKey);
+
+    // The key is only an identity: rebuild the filter itself when it moves, rather than parsing the
+    // key back apart, since an option value can be any string an import gave it.
+    return React.useMemo(
+        () => resolveSlugFilter(selectColumns, selectStore.getState().slugs),
+        // oxlint-disable-next-line react-hooks/exhaustive-deps
+        [filterKey]
     );
 }
 
@@ -189,6 +293,49 @@ export function TableSearchEmpty(props: { className?: ClassValue }) {
             {trimmed
                 ? tString(language, 'search_no_results_for', trimmed)
                 : tString(language, 'search_no_results')}
+        </div>
+    );
+}
+
+/**
+ * Names the selection narrowing this table, and lets the reader drop it.
+ *
+ * Deliberately worded around the *selection* rather than the filter: the column dropdown beside it
+ * shows the same column as active, but clearing there only resets local state and the filter returns
+ * on the next load. This is the control that actually undoes it.
+ *
+ * Rendered independently of the search bar. `shouldShowTableSearch` leaves the filter controls off
+ * cards, off grids below the row threshold, and off any table whose author turned search off — and
+ * in every one of those a narrowed table would otherwise just read as missing rows.
+ */
+export function TableSelectionFilter(props: { className?: ClassValue }) {
+    const language = useLanguage();
+    const { slugFilter, clearSlugFilter } = useTableSearch();
+
+    if (slugFilter.length === 0) {
+        return null;
+    }
+
+    return (
+        <div
+            className={tcls('flex flex-wrap items-center gap-2 text-sm text-tint', props.className)}
+        >
+            <Icon icon="filter" className="size-3 shrink-0" />
+            <span>
+                {tString(
+                    language,
+                    'table_filtered_by_selection',
+                    slugFilter.map((entry) => entry.label).join(', ')
+                )}
+            </span>
+            <Button
+                variant="blank"
+                size="xsmall"
+                icon="xmark"
+                iconOnly
+                label={tString(language, 'table_clear_selection')}
+                onClick={clearSlugFilter}
+            />
         </div>
     );
 }

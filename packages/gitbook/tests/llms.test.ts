@@ -55,6 +55,22 @@ describe('llms.txt', () => {
         expect(await response.text()).toContain('# E2E Tests GitBook Open');
     });
 
+    it('should serve plain text to ChatGPT Search', async () => {
+        const response = await fetch(
+            getContentTestURL('https://gitbook.gitbook.io/test-gitbook-open/llms.txt'),
+            {
+                headers: {
+                    'User-Agent':
+                        'Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko); compatible; OAI-SearchBot/1.4; +https://openai.com/searchbot',
+                },
+            }
+        );
+
+        expect(response.status).toBe(200);
+        expect(response.headers.get('content-type')).toContain('text/plain');
+        expect(await response.text()).toContain('# E2E Tests GitBook Open');
+    });
+
     it('should expose llms.txt from sitemap.md', async () => {
         const response = await fetch(
             getContentTestURL('https://gitbook.gitbook.io/test-gitbook-open/sitemap.md')
@@ -148,6 +164,21 @@ describe('llms-full.txt', () => {
             expect(response.status).toBe(200);
             expect(response.headers.get('content-type')).toContain('text/plain');
             expect(await response.text()).toContain('# Welcome');
+        },
+        { timeout: 30_000 }
+    );
+
+    it(
+        'should not add a pagination header to a single-part llms-full.txt',
+        async () => {
+            const response = await fetch(
+                getContentTestURL('https://gitbook.gitbook.io/test-gitbook-open/llms-full.txt')
+            );
+            const text = await response.text();
+
+            expect(response.status).toBe(200);
+            expect(text).not.toContain('The content is paginated');
+            expect(text).not.toContain('[Next Page]');
         },
         { timeout: 30_000 }
     );

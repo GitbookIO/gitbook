@@ -11,6 +11,8 @@ export const hu: TranslationLanguage = {
     switch_to_system_theme: 'Váltás rendszer témára',
     search: 'Keresés',
     clear: 'Törlés',
+    table_filtered_by_selection: 'Megfelel a kijelölésnek: ${1}',
+    table_clear_selection: 'Kijelölés törlése',
     tags: 'Címkék',
     search_back: 'Vissza a keresési eredményekhez',
     search_or_ask: 'Kérdezés vagy keresés',

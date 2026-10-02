@@ -1,6 +1,5 @@
 'use client';
-import { useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { useResizeObserver } from 'usehooks-ts';
+import { useLayoutEffect, useState } from 'react';
 
 interface ImageSize {
     width: number;
@@ -22,18 +21,17 @@ interface Images {
 }
 
 /**
- * Hook to calculate the object position Y percentage for a cover image
- * based on the y offset, image dimensions, and container dimensions.
+ * Hook to compute the CSS object position Y for a cover image, from the y offset and the image
+ * dimensions. The container must set `container-type: inline-size` and be as wide as the image,
+ * since the position is computed against its width.
  */
-export function useCoverPosition(imgs: Images, y: number) {
-    const containerRef = useRef<HTMLDivElement>(null);
+export function useCoverPosition(
+    imgs: Images,
+    y: number,
+    container: { height: number | undefined; aspectRatio: ImageSize }
+) {
     const [loadedDimensions, setLoadedDimensions] = useState<ImageSize | null>(null);
     const [isLoading, setIsLoading] = useState(!imgs.light.size && !imgs.dark?.size);
-
-    const container = useResizeObserver({
-        // @ts-expect-error wrong types
-        ref: containerRef,
-    });
 
     // Load original image dimensions if not provided in `imgs`
     useLayoutEffect(() => {
@@ -68,42 +66,31 @@ export function useCoverPosition(imgs: Images, y: number) {
     // Check dark first, then light, then loaded dimensions
     const imageDimensions = imgs.dark?.size ?? imgs.light.size ?? loadedDimensions;
 
-    // Calculate ratio and dimensions similar to useCoverPosition hook
-    const ratio =
-        imageDimensions && container.height && container.width
-            ? Math.max(
-                  container.width / imageDimensions.width,
-                  container.height / imageDimensions.height
-              )
-            : 1;
-    const safeRatio = ratio || 1;
-
-    const scaledHeight =
-        imageDimensions && container.height ? imageDimensions.height * safeRatio : null;
-    const maxOffset =
-        scaledHeight && container.height
-            ? Math.max(0, (scaledHeight - container.height) / 2 / safeRatio)
-            : 0;
-
-    // Parse the position between the allowed min/max
-    const objectPositionY = useMemo(() => {
-        if (!container.height || !imageDimensions) {
-            return 50;
-        }
-
-        const scaled = imageDimensions.height * safeRatio;
-        if (scaled <= container.height || maxOffset === 0) {
-            return 50;
-        }
-
-        const clampedOffset = Math.max(-maxOffset, Math.min(maxOffset, y));
-        const relative = (maxOffset - clampedOffset) / (2 * maxOffset);
-        return relative * 100;
-    }, [container.height, imageDimensions, maxOffset, safeRatio, y]);
-
     return {
-        containerRef,
-        objectPositionY,
+        objectPositionY: imageDimensions
+            ? getCoverObjectPositionY(imageDimensions, y, container)
+            : '50%',
         isLoading: !imageDimensions || isLoading,
     };
+}
+
+/**
+ * Offset the image `y` natural pixels from centered, clamped so it keeps covering the container.
+ * Expressed in CSS against the container width (`cqw`), so it renders the same on the server as
+ * after hydration, without measuring the container.
+ */
+function getCoverObjectPositionY(
+    image: ImageSize,
+    y: number,
+    container: { height: number | undefined; aspectRatio: ImageSize }
+): string {
+    const containerHeight = container.height
+        ? `${container.height}px`
+        : `${(100 * container.aspectRatio.height) / container.aspectRatio.width}cqw`;
+    // Rendered height of the image under `object-fit: cover`.
+    const scaledHeight = `max(${(100 * image.height) / image.width}cqw, ${containerHeight})`;
+    const maxOffset = `(${scaledHeight} - ${containerHeight}) / 2`;
+    const offset = `${scaledHeight} * ${y / image.height}`;
+
+    return `calc(50% + clamp(-1 * ${maxOffset}, ${offset}, ${maxOffset}))`;
 }

@@ -247,11 +247,15 @@ async function renderMermaidDiagram(args: {
     const { source, id, darkMode, mermaidRuntimeURL } = args;
     const { mermaid } = await loadMermaid(mermaidRuntimeURL);
 
+    // Mermaid's default dark edge label pill only reaches 4.43:1 contrast, below WCAG AA.
+    const themeVariables = darkMode ? { edgeLabelBackground: '#3a3a3a' } : undefined;
+
     mermaid.initialize({
         startOnLoad: false,
         securityLevel: 'strict',
         darkMode,
         theme: darkMode ? 'dark' : undefined,
+        themeVariables,
     });
 
     const renderContainer = createMermaidRenderContainer();
