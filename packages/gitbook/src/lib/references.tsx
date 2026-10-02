@@ -50,6 +50,9 @@ import {
 } from '@/lib/data';
 import { type GitBookLinker, createLinker, linkerWithAbsoluteURLs } from '@/lib/links';
 
+// The extensions Git Sync imports as pages.
+const GIT_MARKDOWN_FILE = /\.(md|markdown|mdown|mkdn|mkd|mdwn|mkdown|ron)$/i;
+
 // The spaces of each site that can own a repository URL, and the hosts of their repositories.
 const siteGitSpaces = new WeakMap<
     SiteStructure,
@@ -724,7 +727,7 @@ function findSiteGitPageURLTarget(structure: SiteStructure, href: string): GitPa
  */
 function isGitPagePath(path: string): boolean {
     const name = path.split('/').at(-1) ?? '';
-    return name === '' || name.endsWith('.md') || !name.includes('.');
+    return name === '' || GIT_MARKDOWN_FILE.test(name) || !name.includes('.');
 }
 
 function getURLHost(href: string | undefined): string | null {

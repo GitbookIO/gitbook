@@ -747,6 +747,7 @@ describe('repository page links', () => {
             draft?: boolean;
             gitSync?: object | null;
             previousGitSync?: object;
+            pageGitPath?: string;
         } = {}
     ) {
         const page = {
@@ -756,7 +757,7 @@ describe('repository page links', () => {
             path: 'authentication',
             slug: 'authentication',
             pages: [],
-            git: { path: 'api/auth.md', oid: 'blob' },
+            git: { path: options.pageGitPath ?? 'api/auth.md', oid: 'blob' },
         } as unknown as RevisionPageDocument;
         const targetSpace = {
             id: 'target',
@@ -848,6 +849,18 @@ describe('repository page links', () => {
         };
         expect((await resolveContentRef(assetRef, context))?.href).toBe(assetRef.url);
         expect(getRevision).not.toHaveBeenCalled();
+    });
+
+    it('resolves pages stored with another Markdown extension', async () => {
+        const { context } = fixture({ pageGitPath: 'api/Auth.MARKDOWN' });
+        expect(
+            (
+                await resolveContentRef(
+                    { kind: 'url', url: ref.url.replace('auth.md', 'Auth.MARKDOWN') },
+                    context
+                )
+            )?.href
+        ).toBe('/api/authentication#tokens');
     });
 
     it('resolves a space syncing from the repository root', async () => {
