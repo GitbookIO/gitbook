@@ -29,7 +29,8 @@ export function PageGroupItem(props: { page: ClientTOCPageGroup; isFirst?: boole
             <div ref={sentinelRef} className="h-0" aria-hidden="true" />
             <div
                 className={tcls(
-                    '-top-4 sticky z-1 after:pointer-events-none after:absolute after:inset-x-0 after:top-full after:h-4 after:bg-linear-to-b after:from-tint-base after:to-transparent after:transition-opacity',
+                    // No opacity transition on ::after: in Chrome it leaves stale pixels over the first child after the list scrolls.
+                    '-top-4 sticky z-1 after:pointer-events-none after:absolute after:inset-x-0 after:top-full after:h-4 after:bg-linear-to-b after:from-tint-base after:to-transparent',
                     isSticking ? '' : 'after:opacity-0',
                     'mt-1 pt-2.5 pb-0',
                     'bg-tint-base',
