@@ -3,16 +3,13 @@ import type { RevisionPageDocument } from '@gitbook/api';
 import type { GitBookSiteContext } from '@/lib/context';
 import { getSiteStructureTitle } from '@/lib/sites';
 
-// TODO(RND-11994): drop once @gitbook/api ships RevisionPageDocument.tagTitle
-type PageWithTagTitle = RevisionPageDocument & { tagTitle?: string };
-
 /**
  * Get the <title> for a page.
  */
 export function getPageFullTitle(context: GitBookSiteContext, page: RevisionPageDocument) {
     const { site } = context;
     const siteStructureTitle = getSiteStructureTitle(context);
-    const tagTitle = (page as PageWithTagTitle).tagTitle || page.title;
+    const tagTitle = page.tagTitle || page.title;
 
     return [
         tagTitle,
