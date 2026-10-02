@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'bun:test';
+import { describe, expect, it, mock } from 'bun:test';
 
 import type { Revision, RevisionPageDocument, SiteSpace, Space } from '@gitbook/api';
 
@@ -736,5 +736,223 @@ describe('resolveContentRef for direct space links', () => {
         expect(result?.ancestors).toEqual([
             { label: 'External Space', href: targetSpace.urls.published },
         ]);
+    });
+});
+
+describe('repository page links', () => {
+    function fixture(
+        options: {
+            denied?: boolean;
+            missing?: boolean;
+            draft?: boolean;
+            gitSync?: object | null;
+            previousGitSync?: object;
+            pageGitPath?: string;
+        } = {}
+    ) {
+        const page = {
+            id: 'target-page',
+            type: 'document',
+            title: 'Authentication',
+            path: 'authentication',
+            slug: 'authentication',
+            pages: [],
+            git: { path: options.pageGitPath ?? 'api/auth.md', oid: 'blob' },
+        } as unknown as RevisionPageDocument;
+        const targetSpace = {
+            id: 'target',
+            title: 'API',
+            organization: 'org',
+            revision: 'target-main',
+            gitSync:
+                options.gitSync === null
+                    ? undefined
+                    : (options.gitSync ?? {
+                          url: 'https://github.com/acme/docs/tree/main',
+                          installationProjectDirectory: 'api',
+                      }),
+            previousGitSync: options.previousGitSync,
+            urls: {
+                app: 'https://app.gitbook.com/s/target',
+                published: 'https://docs.example.com/api/',
+            },
+        } as unknown as Space;
+        const targetSiteSpace = {
+            id: 'site-target',
+            title: 'API',
+            space: targetSpace,
+            path: 'api',
+            draft: options.draft ?? false,
+            urls: { published: 'https://docs.example.com/api/' },
+        } as unknown as SiteSpace;
+        const getSpace = mock(async () =>
+            options.denied ? { error: { code: 403, message: 'Forbidden' } } : { data: targetSpace }
+        );
+        const getRevision = mock(async () => ({
+            data: {
+                id: 'target-main',
+                pages: options.missing
+                    ? []
+                    : [{ ...page, id: 'home', path: '', slug: '', git: undefined }, page],
+                files: [],
+                reusableContents: [],
+            },
+        }));
+        const context = {
+            organizationId: 'org',
+            site: { id: 'site' },
+            space: { id: 'source', revision: 'source-main' },
+            revision: { pages: [] },
+            revisionId: 'source-main',
+            changeRequest: null,
+            structure: { type: 'siteSpaces', structure: [targetSiteSpace] },
+            linker: createLinker({
+                host: 'docs.example.com',
+                siteBasePath: '/',
+                spaceBasePath: '/source/',
+            }),
+            dataFetcher: { getSpace, getRevision },
+        } as unknown as GitBookAnyContext;
+        return { context, getSpace, getRevision };
+    }
+
+    const ref = {
+        kind: 'url' as const,
+        url: 'https://github.com/acme/docs/tree/main/api/auth.md#tokens',
+    };
+
+    it('renders a matching repository URL as a site page link with its anchor', async () => {
+        const { context, getRevision } = fixture();
+        const result = await resolveContentRef(ref, context);
+        expect(result?.href).toBe('/api/authentication#tokens');
+        expect(result?.text).toBe('Authentication');
+        expect(result?.ancestors?.[0]?.label).toBe('API');
+        expect(result?.resolvedRef).toEqual({
+            kind: 'anchor',
+            space: 'target',
+            page: 'target-page',
+            anchor: 'tokens',
+        });
+        expect(getRevision).toHaveBeenCalledWith({
+            spaceId: 'target',
+            revisionId: 'target-main',
+            metadata: true,
+        });
+        expect(ref.kind).toBe('url');
+    });
+
+    it('preserves asset URLs that do not match a page', async () => {
+        const { context } = fixture();
+        const assetRef = {
+            kind: 'url' as const,
+            url: ref.url.replace('auth.md#tokens', 'diagram.png'),
+        };
+        expect((await resolveContentRef(assetRef, context))?.href).toBe(assetRef.url);
+    });
+
+    it('resolves a link to a folder with a dot in its name to its README page', async () => {
+        const { context } = fixture({ pageGitPath: 'api/11.8/README.md' });
+        expect(
+            (
+                await resolveContentRef(
+                    { kind: 'url', url: ref.url.replace('auth.md', '11.8') },
+                    context
+                )
+            )?.href
+        ).toBe('/api/authentication#tokens');
+    });
+
+    it('resolves pages stored with another Markdown extension', async () => {
+        const { context } = fixture({ pageGitPath: 'api/Auth.MARKDOWN' });
+        expect(
+            (
+                await resolveContentRef(
+                    { kind: 'url', url: ref.url.replace('auth.md', 'Auth.MARKDOWN') },
+                    context
+                )
+            )?.href
+        ).toBe('/api/authentication#tokens');
+    });
+
+    it('resolves a space syncing from the repository root', async () => {
+        const { context } = fixture({
+            gitSync: { url: 'https://github.com/acme/docs/tree/main' },
+        });
+        expect((await resolveContentRef(ref, context))?.href).toBe('/api/authentication#tokens');
+    });
+
+    it('resolves a space whose Git Sync was removed from its remembered project URL', async () => {
+        const { context } = fixture({
+            gitSync: null,
+            previousGitSync: { url: 'https://github.com/acme/docs/tree/main/api' },
+        });
+        expect((await resolveContentRef(ref, context))?.href).toBe('/api/authentication#tokens');
+    });
+
+    it('decodes the anchor of the repository URL', async () => {
+        const { context } = fixture();
+        const result = await resolveContentRef(
+            { kind: 'url', url: ref.url.replace('#tokens', '#access%20tokens') },
+            context
+        );
+        expect(result?.resolvedRef).toEqual({
+            kind: 'anchor',
+            space: 'target',
+            page: 'target-page',
+            anchor: 'access tokens',
+        });
+    });
+
+    it('reads only the matching space in a 500-space site', async () => {
+        const { context, getSpace, getRevision } = fixture();
+        if (!('site' in context) || context.structure.type !== 'siteSpaces') {
+            throw new Error('Expected a site fixture');
+        }
+        const target = context.structure.structure[0]!;
+        context.structure.structure.push(
+            ...Array.from({ length: 499 }, (_, index) => ({
+                ...target,
+                id: `site-${index}`,
+                space: {
+                    ...target.space,
+                    id: `space-${index}`,
+                    gitSync: {
+                        ...target.space.gitSync!,
+                        installationProjectDirectory: `other-${index}`,
+                    },
+                },
+            }))
+        );
+        expect((await resolveContentRef(ref, context))?.href).toBe('/api/authentication#tokens');
+        expect(getSpace).toHaveBeenCalledTimes(1);
+        expect(getRevision).toHaveBeenCalledTimes(1);
+    });
+
+    it.each([{ denied: true }, { missing: true }, { draft: true }])(
+        'preserves the fallback for unavailable content: %j',
+        async (state) => {
+            const { context } = fixture(state);
+            const result = await resolveContentRef(ref, context);
+            expect(result).toEqual({ href: ref.url, text: ref.url, active: false });
+        }
+    );
+
+    it('does not fetch revisions for a different repository or branch', async () => {
+        const { context, getRevision } = fixture();
+        for (const url of [
+            ref.url.replace('/main/', '/preview/'),
+            ref.url.replace('/acme/', '/other/'),
+        ]) {
+            expect((await resolveContentRef({ kind: 'url', url }, context))?.href).toBe(url);
+        }
+        expect(getRevision).not.toHaveBeenCalled();
+    });
+
+    it('resolves the unchanged stored URL when the target becomes available', async () => {
+        const state = { missing: true };
+        const { context } = fixture(state);
+        expect((await resolveContentRef(ref, context))?.href).toBe(ref.url);
+        state.missing = false;
+        expect((await resolveContentRef(ref, context))?.href).toBe('/api/authentication#tokens');
     });
 });
