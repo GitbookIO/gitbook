@@ -11,6 +11,8 @@ export const ja: TranslationLanguage = {
     switch_to_system_theme: 'システムのテーマに切り替え',
     search: '検索',
     clear: 'クリア',
+    table_filtered_by_selection: '選択に一致: ${1}',
+    table_clear_selection: '選択をクリア',
     tags: 'タグ',
     search_back: '検索結果に戻る',
     search_or_ask: '質問または検索',

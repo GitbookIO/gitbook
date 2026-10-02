@@ -6,6 +6,7 @@ export function isChatGPTRequest(request: Pick<Request, 'headers'>): boolean {
     return (
         normalizedUserAgent.includes('chatgpt-user') ||
         normalizedUserAgent.includes('chatgpt agent') ||
+        normalizedUserAgent.includes('oai-searchbot') ||
         normalizedSignatureAgent.includes('chatgpt.com')
     );
 }

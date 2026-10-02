@@ -7,7 +7,6 @@ import {
     type RevisionPageDocument,
     type SiteSection,
     type SiteSectionGroup,
-    SiteVisibility,
 } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
 
@@ -25,6 +24,7 @@ import { categorizeVariants } from '../SpaceLayout/categorizeVariants';
 import { BreadcrumbItemDropdown, type BreadcrumbSibling } from './BreadcrumbItemDropdown';
 import { PageTags } from './PageTags';
 import type { GitBookSiteContext, SiteStructureNode } from '@/lib/context';
+import { hasAdaptiveMcpEndpoint } from '@/lib/mcp/endpoints';
 import { type AncestorRevisionPage, resolveFirstDocument } from '@/lib/pages';
 import { getLocalizedTitle, getSiteSpaceURL } from '@/lib/sites';
 import { tcls } from '@/lib/tailwind';
@@ -559,12 +559,7 @@ function isPageActionEnabled(
  * Return the MCP URL to be used in the page actions dropdown.
  */
 function getPageActionsMCPURL(context: GitBookSiteContext) {
-    const useAuthenticatedEndpoint = Boolean(
-        context.site.visibility !== SiteVisibility.VisitorAuth &&
-        context.site.adaptiveContent?.enabled &&
-        context.site.urls.login &&
-        context.isLoggedInVisitor
-    );
+    const useAuthenticatedEndpoint = hasAdaptiveMcpEndpoint(context) && context.isLoggedInVisitor;
     const endpoint = useAuthenticatedEndpoint ? '~gitbook/mcp/auth' : '~gitbook/mcp';
 
     return context.linker.toAbsoluteURL(context.linker.toPathInSite(endpoint));

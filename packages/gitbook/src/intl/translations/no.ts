@@ -11,6 +11,8 @@ export const no: TranslationLanguage = {
     switch_to_system_theme: 'Bytt til systemtema',
     search: 'Søk',
     clear: 'Tøm',
+    table_filtered_by_selection: 'Samsvarer med valg: ${1}',
+    table_clear_selection: 'Fjern valg',
     tags: 'Tagger',
     search_back: 'Tilbake til søkeresultater',
     search_or_ask: 'Spør eller søk',

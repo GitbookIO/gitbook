@@ -38,6 +38,18 @@ describe('markdown serving based on user agent', () => {
         expect(response.headers.get('content-type')).toContain('text/plain');
     });
 
+    it('should serve plain text to ChatGPT Search', async () => {
+        const response = await fetch(getContentTestURL(TEST_PAGE_URL), {
+            headers: {
+                'User-Agent':
+                    'Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko); compatible; OAI-SearchBot/1.4; +https://openai.com/searchbot',
+            },
+        });
+
+        expect(response.status).toBe(200);
+        expect(response.headers.get('content-type')).toContain('text/plain');
+    });
+
     it('should NOT serve markdown to Slackbot (heuristic detection only)', async () => {
         const response = await fetch(getContentTestURL(TEST_PAGE_URL), {
             headers: {

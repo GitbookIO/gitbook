@@ -6,7 +6,7 @@ import React from 'react';
 import { ContentKit, type ContentKitClientContextData } from '@gitbook/react-contentkit/client';
 
 import type { WebframePageContext } from './adaptive';
-import { useAdaptiveVisitor } from '@/components/Adaptive';
+import { useAdaptiveVisitorAsync } from '@/components/Adaptive';
 import { NavigationStatusContext } from '@/components/hooks';
 import { type GitBookLinker, createLinker } from '@/lib/links';
 
@@ -40,7 +40,12 @@ export function ContentKitWithClientContext<RenderContext>(
 
     const router = useRouter();
     const { onNavigationClick } = React.useContext(NavigationStatusContext);
-    const getAdaptiveVisitorClaims = useAdaptiveVisitor();
+    const loadAdaptiveVisitorClaims = useAdaptiveVisitorAsync();
+
+    const getVisitorContext = React.useCallback(async () => {
+        const visitorClaims = await loadAdaptiveVisitorClaims();
+        return { visitor: visitorClaims?.visitor ?? null };
+    }, [loadAdaptiveVisitorClaims]);
 
     // Rebuild the (tested) linker on the client so navigation resolves paths exactly like the rest
     // of the app, instead of duplicating the join logic here.
@@ -55,15 +60,9 @@ export function ContentKitWithClientContext<RenderContext>(
         },
         [onNavigationClick, router]
     );
-    // Read during render (Suspense) only when the integration is allowed visitor claims, so that
-    // webframes that don't use visitor claims don't suspend on the visitor-claims fetch.
-    const visitorClaims = canAccessVisitorClaims ? getAdaptiveVisitorClaims() : null;
-
     const clientContext = React.useMemo<ContentKitClientContextData>(
         () => ({
-            getVisitorContext: canAccessVisitorClaims
-                ? () => ({ visitor: visitorClaims?.visitor ?? null })
-                : undefined,
+            getVisitorContext: canAccessVisitorClaims ? getVisitorContext : undefined,
             getPageContext: page ? () => ({ page }) : undefined,
             navigate: ({ path, anchor, query }) => {
                 // Resolve the requested path relative to the site root so a webframe can navigate
@@ -78,7 +77,7 @@ export function ContentKitWithClientContext<RenderContext>(
                 navigateTo(linker.toPathInSite(path) + search + hash);
             },
         }),
-        [canAccessVisitorClaims, visitorClaims, page, linker, navigateTo]
+        [canAccessVisitorClaims, getVisitorContext, page, linker, navigateTo]
     );
 
     return <ContentKit {...contentKitProps} clientContext={clientContext} />;

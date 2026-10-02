@@ -82,7 +82,7 @@ type CoverOverlap =
  * `data-over-cover="split"` with the crossing point in `--cover-edge`.
  */
 function useMarkTextOverCover() {
-    React.useEffect(() => {
+    React.useLayoutEffect(() => {
         const root = document.documentElement;
         const pageCover = document.querySelector<HTMLElement>('[data-gb-page-cover]');
 
@@ -150,7 +150,7 @@ function useMarkTextOverCover() {
             });
         };
 
-        scheduleUpdate();
+        update();
 
         window.addEventListener('scroll', scheduleUpdate, { passive: true });
         window.addEventListener('resize', scheduleUpdate, { passive: true });

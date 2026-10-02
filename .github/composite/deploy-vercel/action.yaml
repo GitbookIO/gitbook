@@ -78,6 +78,11 @@ runs:
               echo "GITBOOK_DISABLE_INSIGHTS=true" >> .vercel/.env.${{ inputs.environment }}.local
               echo "--- .vercel/.env.${{ inputs.environment }}.local after inject ---"
               cat .vercel/.env.${{ inputs.environment }}.local
+        - name: Inject staging build env vars
+          if: ${{ inputs.environment == 'staging' }}
+          shell: bash
+          run: |
+              echo "GITBOOK_DISABLE_LOOKUP_ALTERNATIVES=true" >> .vercel/.env.${{ inputs.environment }}.local
         - name: Build Project Artifacts
           run: bun run vercel build --target=${{ inputs.environment }} --token=${{ inputs.vercelToken }}
           shell: bash

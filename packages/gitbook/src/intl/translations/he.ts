@@ -11,6 +11,8 @@ export const he: TranslationLanguage = {
     switch_to_system_theme: 'מעבר לערכת הנושא של המערכת',
     search: 'חיפוש',
     clear: 'ניקוי',
+    table_filtered_by_selection: 'תואם לבחירה: ${1}',
+    table_clear_selection: 'נקה בחירה',
     tags: 'תגיות',
     search_back: 'חזרה לתוצאות החיפוש',
     search_or_ask: 'שאלה או חיפוש',
