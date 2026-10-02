@@ -50,9 +50,6 @@ import {
 } from '@/lib/data';
 import { type GitBookLinker, createLinker, linkerWithAbsoluteURLs } from '@/lib/links';
 
-// The extensions Git Sync imports as pages.
-const GIT_MARKDOWN_FILE = /\.(md|markdown|mdown|mkdn|mkd|mdwn|mkdown|ron)$/i;
-
 // The spaces of each site that can own a repository URL, and the hosts of their repositories.
 const siteGitSpaces = new WeakMap<
     SiteStructure,
@@ -695,8 +692,7 @@ async function resolveContentRefInSpace(
 
 /**
  * Locate the site space owning a repository URL. Links to other hosts, which most are, skip
- * matching against every space of the site. Only paths that can be pages are returned, as finding
- * the page reads the revision of its space.
+ * matching against every space of the site.
  */
 function findSiteGitPageURLTarget(structure: SiteStructure, href: string): GitPageURLTarget | null {
     let site = siteGitSpaces.get(structure);
@@ -718,16 +714,7 @@ function findSiteGitPageURLTarget(structure: SiteStructure, href: string): GitPa
     if (!host || !site.hosts.has(host)) {
         return null;
     }
-    const target = findGitPageURLTarget(href, site.spaces);
-    return target && isGitPagePath(target.path) ? target : null;
-}
-
-/**
- * Whether a repository path can be a page: a Markdown file, or a directory for its README.
- */
-function isGitPagePath(path: string): boolean {
-    const name = path.split('/').at(-1) ?? '';
-    return name === '' || GIT_MARKDOWN_FILE.test(name) || !name.includes('.');
+    return findGitPageURLTarget(href, site.spaces);
 }
 
 function getURLHost(href: string | undefined): string | null {

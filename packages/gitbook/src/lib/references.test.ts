@@ -841,14 +841,25 @@ describe('repository page links', () => {
         expect(ref.kind).toBe('url');
     });
 
-    it('preserves asset URLs without reading a revision', async () => {
-        const { context, getRevision } = fixture();
+    it('preserves asset URLs that do not match a page', async () => {
+        const { context } = fixture();
         const assetRef = {
             kind: 'url' as const,
             url: ref.url.replace('auth.md#tokens', 'diagram.png'),
         };
         expect((await resolveContentRef(assetRef, context))?.href).toBe(assetRef.url);
-        expect(getRevision).not.toHaveBeenCalled();
+    });
+
+    it('resolves a link to a folder with a dot in its name to its README page', async () => {
+        const { context } = fixture({ pageGitPath: 'api/11.8/README.md' });
+        expect(
+            (
+                await resolveContentRef(
+                    { kind: 'url', url: ref.url.replace('auth.md', '11.8') },
+                    context
+                )
+            )?.href
+        ).toBe('/api/authentication#tokens');
     });
 
     it('resolves pages stored with another Markdown extension', async () => {
