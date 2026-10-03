@@ -13,7 +13,7 @@ import {
     SiteInsightsDisplayContext,
 } from '@gitbook/api';
 
-import { getInsightsSession, useTrackEvent } from '../Insights';
+import { getInsightsSession, trackAskView, useTrackEvent } from '../Insights';
 import { type UpdateSearchState, useSetSearchState } from '../Search';
 import { addRecentSearchQuery } from '../Search/recent-queries';
 import type { AnyAIControl } from './controls';
@@ -59,6 +59,8 @@ export type AIChatStatus =
     | 'done'
     | 'error'
     | 'confirm';
+
+export type AskAITrigger = 'hover' | 'selection' | 'site' | 'page' | 'embed';
 
 export type AIChatState = {
     /**
@@ -160,7 +162,7 @@ type AIChatEventListener = (input?: Omit<AIChatEvent, 'type'>) => void;
 
 export type AIChatController = {
     /** Open the dialog */
-    open: () => void;
+    open: (trigger?: AskAITrigger) => void;
     /** Close the dialog */
     close: () => void;
     /** Post a message to the session */
@@ -302,22 +304,28 @@ export function AIChatProvider(props: {
     const eventsRef = React.useRef<Map<AIChatEvent['type'], AIChatEventListener[]>>(new Map());
 
     // Open AI chat and sync with search state
-    const onOpen = React.useCallback(() => {
-        setIntercomLauncherHidden(true);
+    const onOpen = React.useCallback(
+        (trigger?: AskAITrigger) => {
+            setIntercomLauncherHidden(true);
+            if (!renderMessageOptions?.asEmbeddable) {
+                trackAskView(trackEvent, trigger);
+            }
 
-        const { initialQuery } = globalState.getState();
-        globalState.setState((state) => ({ ...state, opened: true }));
+            const { initialQuery } = globalState.getState();
+            globalState.setState((state) => ({ ...state, opened: true }));
 
-        // Update search state to show ask mode with first message or current ask value
-        setSearchState((prev) => ({
-            ask: prev?.ask ?? initialQuery ?? '',
-            query: prev?.query ?? null,
-            scope: prev?.scope ?? 'default',
-            open: false, // Close search popover when opening chat
-        }));
+            // Update search state to show ask mode with first message or current ask value
+            setSearchState((prev) => ({
+                ask: prev?.ask ?? initialQuery ?? '',
+                query: prev?.query ?? null,
+                scope: prev?.scope ?? 'default',
+                open: false, // Close search popover when opening chat
+            }));
 
-        notify(eventsRef.current.get('open'), {});
-    }, [setSearchState]);
+            notify(eventsRef.current.get('open'), {});
+        },
+        [setSearchState, trackEvent, renderMessageOptions?.asEmbeddable]
+    );
 
     // Close AI chat and clear ask parameter
     const onClose = React.useCallback(() => {
