@@ -81,6 +81,11 @@ describe('toMarkdownDestination', () => {
         expect(toMarkdownDestination('/docs/new-page/?a=1#b')).toBe('/docs/new-page.md?a=1#b');
     });
 
+    it('points the site root to its markdown route', () => {
+        expect(toMarkdownDestination('/')).toBe('/.md');
+        expect(toMarkdownDestination('/?a=1#b')).toBe('/.md?a=1#b');
+    });
+
     it('leaves markdown paths and external URLs untouched', () => {
         expect(toMarkdownDestination('/docs/new-page.md')).toBe('/docs/new-page.md');
         expect(toMarkdownDestination('https://example.com/page')).toBe('https://example.com/page');

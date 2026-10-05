@@ -99,11 +99,12 @@ export function toMarkdownDestination(destination: string): string {
 
     const url = new URL(destination, 'https://gitbook.invalid');
     const pathname = url.pathname.replace(/\/+$/, '');
-    if (!pathname || pathname.endsWith('.md')) {
+    if (pathname.endsWith('.md')) {
         return destination;
     }
 
-    return `${pathname}.md${url.search}${url.hash}`;
+    // A root destination trims to an empty pathname; its markdown route is `/.md`.
+    return `${pathname || '/'}.md${url.search}${url.hash}`;
 }
 
 function markdownRedirect(location: string, permanent: boolean) {
