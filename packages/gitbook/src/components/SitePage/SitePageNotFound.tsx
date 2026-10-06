@@ -130,7 +130,7 @@ export function SitePageNotFound() {
                             >
                                 {t(language, copy.title)}
                             </h1>
-                            <p className={tcls('text-base', 'text-tint')}>
+                            <p className={tcls('text-base', 'text-tint', 'text-center')}>
                                 {t(language, copy.message)}
                             </p>
                         </div>
