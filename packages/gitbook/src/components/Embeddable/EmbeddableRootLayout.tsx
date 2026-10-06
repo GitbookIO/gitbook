@@ -1,6 +1,7 @@
 import type { CustomizationDefaultThemeMode } from '@gitbook/api';
 import { SiteInsightsTrademarkPlacement } from '@gitbook/api';
 
+import { LoadIntegrations } from '../Integrations';
 import { NavigationLoader } from '../primitives/NavigationLoader';
 import { SpaceLayoutServerContext } from '../SpaceLayout';
 import { Trademark } from '../TableOfContents/Trademark';
@@ -93,6 +94,8 @@ export async function EmbeddableRootLayout({
                         />
                     </SpaceLayoutServerContext>
                 </EmbeddableAIContextProvider>
+                {/* Embeds load no integrations; this marks them loaded so search stops waiting. */}
+                <LoadIntegrations />
             </SiteLayoutClientContexts>
         </CustomizationRootLayout>
     );

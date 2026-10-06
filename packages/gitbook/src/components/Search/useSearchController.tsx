@@ -141,8 +141,7 @@ export function useSearchController(
     const trackEvent = useTrackEvent();
     const resultsRef = React.useRef<SearchResultsRef>(null);
     const isLoaded = useBodyLoaded();
-    // Embeds don't load integrations, so there's nothing to wait for.
-    const integrationsLoaded = useIntegrationsLoaded() || Boolean(asEmbeddable);
+    const integrationsLoaded = useIntegrationsLoaded();
 
     const restoredLastQueryForSiteSpaceRef = React.useRef<string | null>(null);
     React.useEffect(() => {
