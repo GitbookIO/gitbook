@@ -287,6 +287,10 @@ function isNullSchema(schema: OpenAPIV3.SchemaObject | OpenAPIV3.ReferenceObject
     return type === 'null';
 }
 
+// Circular-ref tracking compares schemas by identity: a fresh copy on every render lets a
+// self-referencing nullable property (`anyOf: [{ items: Self }, null]`) recurse forever when expanded.
+const normalizedNullableUnions = new WeakMap<OpenAPIV3.SchemaObject, OpenAPIV3.SchemaObject>();
+
 /**
  * Normalize the OpenAPI 3.1+ idiom of expressing nullability through `anyOf`/`oneOf`
  * (e.g. `anyOf: [{ type: 'string' }, { type: 'null' }]`) into a regular nullable schema,
@@ -301,7 +305,17 @@ export function normalizeNullableUnion(
     schema: OpenAPIV3.SchemaObject | OpenAPIV3_1.SchemaObject
 ): OpenAPIV3.SchemaObject {
     const typed = schema as OpenAPIV3.SchemaObject;
+    const cached = normalizedNullableUnions.get(typed);
+    if (cached) {
+        return cached;
+    }
 
+    const normalized = normalizeNullableUnionUncached(typed);
+    normalizedNullableUnions.set(typed, normalized);
+    return normalized;
+}
+
+function normalizeNullableUnionUncached(typed: OpenAPIV3.SchemaObject): OpenAPIV3.SchemaObject {
     const isAnyOf = Array.isArray(typed.anyOf);
     const isOneOf = !isAnyOf && Array.isArray(typed.oneOf);
     if (!isAnyOf && !isOneOf) {
