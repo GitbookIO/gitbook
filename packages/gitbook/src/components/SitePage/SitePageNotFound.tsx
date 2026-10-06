@@ -46,11 +46,7 @@ export function SitePageNotFound() {
     const { assistants } = useAI();
 
     const isAuthenticated = isVisitorAuthenticated(visitorAuthClaims);
-    const [titleKey, messageKey] = !adaptiveAuthLoginHref
-        ? (['notfound_title', 'notfound'] as const)
-        : isAuthenticated
-          ? (['notfound_adaptive_no_access_title', 'notfound_adaptive_no_access'] as const)
-          : (['notfound_adaptive_title', 'notfound_adaptive'] as const);
+    const copy = getNotFoundCopy({ hasAdaptiveLogin: !!adaptiveAuthLoginHref, isAuthenticated });
 
     // Show the assistant input when a non-search assistant is available (i.e. not just ask-AI).
     const assistant = assistants.find((candidate) => candidate.mode !== 'search') ?? null;
@@ -132,10 +128,10 @@ export function SitePageNotFound() {
                                     'text-tint-strong'
                                 )}
                             >
-                                {t(language, titleKey)}
+                                {t(language, copy.title)}
                             </h1>
                             <p className={tcls('text-base', 'text-tint')}>
-                                {t(language, messageKey)}
+                                {t(language, copy.message)}
                             </p>
                         </div>
                         {adaptiveAuthLoginHref && isAuthenticated ? (
@@ -195,6 +191,19 @@ export function SitePageNotFound() {
             </div>
         </CurrentPageProvider>
     );
+}
+
+function getNotFoundCopy(args: { hasAdaptiveLogin: boolean; isAuthenticated: boolean }) {
+    if (!args.hasAdaptiveLogin) {
+        return { title: 'notfound_title', message: 'notfound' } as const;
+    }
+    if (args.isAuthenticated) {
+        return {
+            title: 'notfound_adaptive_no_access_title',
+            message: 'notfound_adaptive_no_access',
+        } as const;
+    }
+    return { title: 'notfound_adaptive_title', message: 'notfound_adaptive' } as const;
 }
 
 /**
