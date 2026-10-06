@@ -97,9 +97,9 @@ export const cs: TranslationLanguage = {
     pdf_page_of: '${1} z ${2}',
     pdf_mode_only_page: 'Pouze tato stránka',
     pdf_mode_all: 'Všechny stránky',
-    pdf_limit_reached:
-        'Nepodařilo se vygenerovat PDF pro ${1} stránek, generování se zastavilo na ${2}.',
-    pdf_limit_reached_continue: 'Rozšířit o dalších ${1} stránek.',
+    pdf_batch_range: 'Zobrazeny stránky ${1}–${2} z ${3}.',
+    pdf_batch_previous: 'Předchozích ${1} stránek',
+    pdf_batch_next: 'Dalších ${1} stránek',
     more: 'Více',
     link_tooltip_external_link: 'Externí odkaz na',
     link_tooltip_email: 'Odeslat e-mail na',

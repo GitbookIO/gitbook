@@ -100,9 +100,9 @@ export const ro: TranslationLanguage = {
     pdf_page_of: '${1} din ${2}',
     pdf_mode_only_page: 'Doar această pagină',
     pdf_mode_all: 'Toate paginile',
-    pdf_limit_reached:
-        'Nu s-a putut genera PDF-ul pentru ${1} pagini, generarea s-a oprit la ${2}.',
-    pdf_limit_reached_continue: 'Extinde cu încă ${1} pagini.',
+    pdf_batch_range: 'Se afișează paginile ${1}–${2} din ${3}.',
+    pdf_batch_previous: '${1} pagini anterioare',
+    pdf_batch_next: 'Următoarele ${1} pagini',
     more: 'Mai multe',
     link_tooltip_external_link: 'Link extern către',
     link_tooltip_email: 'Trimite e-mail către',

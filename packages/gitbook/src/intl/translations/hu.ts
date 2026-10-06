@@ -97,9 +97,9 @@ export const hu: TranslationLanguage = {
     pdf_page_of: '${1} / ${2}',
     pdf_mode_only_page: 'Csak ez az oldal',
     pdf_mode_all: 'Minden oldal',
-    pdf_limit_reached:
-        'Nem sikerült PDF-et létrehozni ${1} oldalhoz, a létrehozás itt megállt: ${2}.',
-    pdf_limit_reached_continue: 'Bővítés további ${1} oldallal.',
+    pdf_batch_range: '${1}–${2}. oldal, összesen ${3}.',
+    pdf_batch_previous: 'Előző ${1} oldal',
+    pdf_batch_next: 'Következő ${1} oldal',
     more: 'Továbbiak',
     link_tooltip_external_link: 'Külső hivatkozás ide:',
     link_tooltip_email: 'E-mail küldése ide:',

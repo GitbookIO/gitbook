@@ -3,7 +3,6 @@ import { notFound } from 'next/navigation';
 import * as React from 'react';
 
 import {
-    type Revision,
     type RevisionPageDocument,
     type RevisionPageGroup,
     type SiteCustomizationSettings,
@@ -16,7 +15,8 @@ import { ImagesLoadingStatus } from './ImagesLoadingStatus';
 import { createPDFLinker, getPagePDFContainerId } from './linker';
 import { PageControlButtons } from './PageControlButtons';
 import { PDFPrintControls } from './PDFPrintControls';
-import { type PDFSearchParams, getPDFSearchParams } from './urls';
+import { selectPages } from './selectPages';
+import { getPDFSearchParams, getPDFURLSearchParams } from './urls';
 import { DocumentView } from '@/components/DocumentView';
 import { Trademark } from '@/components/TableOfContents/Trademark';
 import type { PolymorphicComponentProp } from '@/components/utils/types';
@@ -27,12 +27,9 @@ import type { GitBookSiteContext, GitBookSpaceContext } from '@/lib/context';
 import { getPageDocument } from '@/lib/data';
 import { type GitBookLinker, createLinker, linkerWithAbsoluteURLs } from '@/lib/links';
 import './pdf.css';
-import { resolvePageId } from '@/lib/pages';
 import { getLinkerForSiteSpace } from '@/lib/sites';
 import { tcls } from '@/lib/tailwind';
 import { defaultCustomization } from '@/lib/utils';
-
-const DEFAULT_LIMIT = 100;
 
 /**
  * Generate the metadata for the PDF page.
@@ -62,13 +59,37 @@ export async function PDFPage(props: {
     const language = await getSpaceLanguage(baseContext);
 
     // Compute the pages to render
-    const { pages, total } = selectPages(baseContext.revision.pages, pdfParams);
+    const selection = selectPages(baseContext.revision.pages, pdfParams);
+    if (!selection) {
+        notFound();
+    }
+    const { pages, allPages, offset, total } = selection;
+    const batchParams = { ...pdfParams, offset };
     const pageIds = pages.map(
         ({ page }) => [page.id, getPagePDFContainerId(page)] as [string, string]
     );
 
     // Build a linker that create anchor links for the pages rendered in the PDF page.
-    const linker = createPDFLinker(baseContext.linker, pages, getPublishedLinker(baseContext));
+    const pageIndexes = new Map(allPages.map(({ page }, index) => [page.id, index]));
+    const linker = createPDFLinker(baseContext.linker, pages, getPublishedLinker(baseContext), {
+        getBatchURL: (page) => {
+            const index = pageIndexes.get(page.id);
+            if (index === undefined) {
+                return undefined;
+            }
+
+            // Align on the current batch so these links match the previous/next controls.
+            const batchOffset = Math.max(
+                0,
+                offset + Math.floor((index - offset) / pdfParams.limit) * pdfParams.limit
+            );
+            return baseContext.linker.toAbsoluteURL(
+                baseContext.linker.toPathInSpace(
+                    `~gitbook/pdf?${getPDFURLSearchParams({ ...pdfParams, offset: batchOffset }).toString()}`
+                )
+            );
+        },
+    });
 
     const context: GitBookSpaceContext = {
         ...baseContext,
@@ -113,7 +134,7 @@ export async function PDFPage(props: {
             </div>
 
             <PageControlButtons
-                params={pdfParams}
+                params={batchParams}
                 pageIds={pageIds}
                 total={total}
                 trademark={
@@ -126,7 +147,7 @@ export async function PDFPage(props: {
                 }
             />
 
-            {pdfParams.only ? null : (
+            {pdfParams.only || offset > 0 ? null : (
                 <PDFSpaceIntro space={context.space} customization={customization} />
             )}
             {pages.map(({ page }) =>
@@ -272,68 +293,4 @@ function PrintPage(
             {children}
         </div>
     );
-}
-
-type FlatPageEntry = { page: RevisionPageDocument | RevisionPageGroup; depth: number };
-
-/**
- * Compute the ordered flat set of pages to render.
- */
-function selectPages(
-    rootPages: Revision['pages'],
-    params: PDFSearchParams
-): { pages: FlatPageEntry[]; total: number } {
-    const flattenPage = (
-        page: RevisionPageDocument | RevisionPageGroup,
-        depth: number
-    ): FlatPageEntry[] => {
-        return [
-            { page, depth },
-            ...page.pages.flatMap((child) => {
-                if (child.type !== 'document') {
-                    return [];
-                }
-
-                if (child.hidden) {
-                    return [];
-                }
-
-                return flattenPage(child, depth + 1);
-            }),
-        ];
-    };
-
-    const limitTo = (entries: FlatPageEntry[]) => {
-        return {
-            // Apply a soft-limit, the limit can be controlled by the URL to allow testing
-            pages: entries.slice(0, params.limit ?? DEFAULT_LIMIT),
-            total: entries.length,
-        };
-    };
-
-    if (params.page) {
-        const found = resolvePageId(rootPages, params.page);
-        if (!found) {
-            notFound();
-        }
-
-        if (!params.only) {
-            return limitTo([{ page: found.page, depth: 0 }]);
-        }
-
-        return limitTo(flattenPage(found.page, 0));
-    }
-
-    const allPages = rootPages.flatMap((page) => {
-        if (page.type !== 'document' && page.type !== 'group') {
-            return [];
-        }
-
-        if (page.hidden) {
-            return [];
-        }
-
-        return flattenPage(page, 0);
-    });
-    return limitTo(allPages);
 }

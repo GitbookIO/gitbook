@@ -99,9 +99,9 @@ export const bg: TranslationLanguage = {
     pdf_page_of: '${1} от ${2}',
     pdf_mode_only_page: 'Само тази страница',
     pdf_mode_all: 'Всички страници',
-    pdf_limit_reached:
-        'PDF файлът за ${1} страници не можа да бъде генериран, генерирането спря на ${2}.',
-    pdf_limit_reached_continue: 'Разширяване с още ${1} страници.',
+    pdf_batch_range: 'Показани са страници ${1}–${2} от ${3}.',
+    pdf_batch_previous: 'Предишни ${1} страници',
+    pdf_batch_next: 'Следващи ${1} страници',
     more: 'Още',
     link_tooltip_external_link: 'Външна връзка към',
     link_tooltip_email: 'Изпращане на имейл до',

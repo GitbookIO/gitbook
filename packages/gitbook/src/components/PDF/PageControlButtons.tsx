@@ -10,8 +10,6 @@ import { Button } from '@/components/primitives';
 import { t, tString, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
 
-const limitExtend = 50;
-
 /**
  * Dynamic controls to show active page and to let the user select between modes.
  */
@@ -19,7 +17,7 @@ export function PageControlButtons(props: {
     params: PDFSearchParams;
     /** Array of the [pageId, divId] */
     pageIds: [string, string][];
-    /** Total number of pages targetted by the generation */
+    /** Total number of pages targetted by the generation, across all batches */
     total: number;
     /** Trademark to display */
     trademark?: React.ReactNode;
@@ -37,6 +35,10 @@ export function PageControlButtons(props: {
     });
     const activeIndex = (activeDivId ? divIds.indexOf(activeDivId) : 0) + 1;
     const activePageId = pageIds[activeIndex - 1]?.[0];
+
+    const batchEnd = params.offset + pageIds.length;
+    const previousCount = Math.min(params.limit, params.offset);
+    const nextCount = Math.min(params.limit, total - batchEnd);
 
     return (
         <>
@@ -58,6 +60,8 @@ export function PageControlButtons(props: {
                             ...params,
                             page: activePageId,
                             only: true,
+                            limit: undefined,
+                            offset: undefined,
                         }).toString()}`}
                         variant="secondary"
                         label={tString(language, 'pdf_mode_only_page')}
@@ -68,6 +72,8 @@ export function PageControlButtons(props: {
                         ...params,
                         page: undefined,
                         only: false,
+                        limit: undefined,
+                        offset: undefined,
                     }).toString()}`}
                     variant="secondary"
                     label={tString(language, 'pdf_mode_all')}
@@ -89,7 +95,7 @@ export function PageControlButtons(props: {
                     'z-50'
                 )}
             >
-                {total !== pageIds.length ? (
+                {previousCount > 0 || nextCount > 0 ? (
                     <div
                         role="banner"
                         className={tcls(
@@ -112,19 +118,32 @@ export function PageControlButtons(props: {
                             className={tcls('size-6', 'mr-3', 'mt-1')}
                         />{' '}
                         <div>
-                            <div>{t(language, 'pdf_limit_reached', total, pageIds.length)}</div>
                             <div>
-                                <a
-                                    href={`?${getPDFURLSearchParams({
-                                        ...params,
-                                        page: undefined,
-                                        only: false,
-                                        limit: params.limit + limitExtend,
-                                    }).toString()}`}
-                                    className={tcls('underline')}
-                                >
-                                    {t(language, 'pdf_limit_reached_continue', limitExtend)}
-                                </a>
+                                {t(language, 'pdf_batch_range', params.offset + 1, batchEnd, total)}
+                            </div>
+                            <div className={tcls('flex', 'flex-row', 'flex-wrap', 'gap-x-3')}>
+                                {previousCount > 0 ? (
+                                    <a
+                                        href={`?${getPDFURLSearchParams({
+                                            ...params,
+                                            offset: params.offset - previousCount,
+                                        }).toString()}`}
+                                        className={tcls('underline')}
+                                    >
+                                        {t(language, 'pdf_batch_previous', previousCount)}
+                                    </a>
+                                ) : null}
+                                {nextCount > 0 ? (
+                                    <a
+                                        href={`?${getPDFURLSearchParams({
+                                            ...params,
+                                            offset: batchEnd,
+                                        }).toString()}`}
+                                        className={tcls('underline')}
+                                    >
+                                        {t(language, 'pdf_batch_next', nextCount)}
+                                    </a>
+                                ) : null}
                             </div>
                         </div>
                     </div>
@@ -146,7 +165,7 @@ export function PageControlButtons(props: {
                         'border'
                     )}
                 >
-                    {t(language, 'pdf_page_of', activeIndex, pageIds.length)}
+                    {t(language, 'pdf_page_of', params.offset + activeIndex, total)}
                 </div>
             </div>
         </>

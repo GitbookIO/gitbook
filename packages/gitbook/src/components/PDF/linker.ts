@@ -20,36 +20,39 @@ export function getPagePDFContainerId(
 /**
  * Create a custom linker for PDF exports.
  *
- * This linker generates in-document anchor links for pages that are included
- * in the current PDF export, using `getPagePDFContainerId` to build the
- * target element ID. For pages that are not part of the exported PDF, it
- * falls back to URLs pointing to the published site if `publishedLinker` is
- * provided, preserving navigability for external content. Otherwise, it uses
- * absolute URLs from the base linker.
- *
- * @param baseLinker - The base GitBook linker used to resolve standard paths and URLs.
- * @param pages - The list of pages that are included in the current PDF export.
- * @param publishedLinker - Optional linker for the published space for external page links.
- * @returns A `GitBookLinker` configured to generate PDF-friendly links.
+ * Pages rendered in the current batch get in-document anchors. Other pages link to the
+ * published site when possible; pages exported in another batch otherwise link to that batch.
  */
 export function createPDFLinker(
     baseLinker: GitBookLinker,
     pages: { page: Revision['pages'][number] }[],
-    publishedLinker?: GitBookLinker
+    publishedLinker?: GitBookLinker,
+    options: {
+        /** URL of the export batch rendering a page, for pages outside the current batch. */
+        getBatchURL?: (page: RevisionPageDocument | RevisionPageGroup) => string | undefined;
+    } = {}
 ): GitBookLinker {
+    const pageIds = new Set(pages.map((p) => p.page.id));
+
     return {
         ...baseLinker,
         toPathForPage(input) {
-            if (pages.some((p) => p.page.id === input.page.id)) {
+            if (pageIds.has(input.page.id)) {
                 return `#${getPagePDFContainerId(input.page, input.anchor)}`;
             }
-            if (input.page.type === RevisionPageType.Group) {
-                return '#';
+
+            // A published page outlives the export URL, so prefer it for documents.
+            if (input.page.type !== RevisionPageType.Group && publishedLinker) {
+                return publishedLinker.toPathForPage(input);
             }
 
-            // For pages that are not embedded in this PDF export, keep links on the published site.
-            if (publishedLinker) {
-                return publishedLinker.toPathForPage(input);
+            const batchURL = options.getBatchURL?.(input.page);
+            if (batchURL) {
+                return `${batchURL}#${getPagePDFContainerId(input.page, input.anchor)}`;
+            }
+
+            if (input.page.type === RevisionPageType.Group) {
+                return '#';
             }
 
             return baseLinker.toAbsoluteURL(baseLinker.toPathForPage(input));

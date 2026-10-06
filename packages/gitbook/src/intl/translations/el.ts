@@ -100,9 +100,9 @@ export const el: TranslationLanguage = {
     pdf_page_of: '${1} από ${2}',
     pdf_mode_only_page: 'Μόνο αυτή η σελίδα',
     pdf_mode_all: 'Όλες οι σελίδες',
-    pdf_limit_reached:
-        'Δεν ήταν δυνατή η δημιουργία PDF για ${1} σελίδες, η δημιουργία σταμάτησε στο ${2}.',
-    pdf_limit_reached_continue: 'Επέκταση με ${1} ακόμη σελίδες.',
+    pdf_batch_range: 'Εμφάνιση σελίδων ${1}–${2} από ${3}.',
+    pdf_batch_previous: 'Προηγούμενες ${1} σελίδες',
+    pdf_batch_next: 'Επόμενες ${1} σελίδες',
     more: 'Περισσότερα',
     link_tooltip_external_link: 'Εξωτερικός σύνδεσμος προς',
     link_tooltip_email: 'Αποστολή email σε',

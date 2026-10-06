@@ -533,7 +533,6 @@ function getPageActionsURLs({
                   `~gitbook/pdf?${getPDFURLSearchParams({
                       page: page.id,
                       only: true,
-                      limit: 100,
                   }).toString()}`
               )
             : undefined,

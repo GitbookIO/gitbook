@@ -97,9 +97,9 @@ export const sl: TranslationLanguage = {
     pdf_page_of: '${1} od ${2}',
     pdf_mode_only_page: 'Samo ta stran',
     pdf_mode_all: 'Vse strani',
-    pdf_limit_reached:
-        'PDF-ja ni bilo mogoče ustvariti za ${1} strani, ustvarjanje se je ustavilo pri ${2}.',
-    pdf_limit_reached_continue: 'Razširi še za ${1} strani.',
+    pdf_batch_range: 'Prikazane strani ${1}–${2} od ${3}.',
+    pdf_batch_previous: 'Prejšnjih ${1} strani',
+    pdf_batch_next: 'Naslednjih ${1} strani',
     more: 'Več',
     link_tooltip_external_link: 'Zunanja povezava do',
     link_tooltip_email: 'Pošlji e-pošto na',

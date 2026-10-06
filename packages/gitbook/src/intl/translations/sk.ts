@@ -99,9 +99,9 @@ export const sk: TranslationLanguage = {
     pdf_page_of: '${1} z ${2}',
     pdf_mode_only_page: 'Iba táto stránka',
     pdf_mode_all: 'Všetky stránky',
-    pdf_limit_reached:
-        'Nepodarilo sa vygenerovať PDF pre ${1} stránok, generovanie sa zastavilo na ${2}.',
-    pdf_limit_reached_continue: 'Rozšíriť o ďalších ${1} stránok.',
+    pdf_batch_range: 'Zobrazené stránky ${1}–${2} z ${3}.',
+    pdf_batch_previous: 'Predchádzajúcich ${1} stránok',
+    pdf_batch_next: 'Ďalších ${1} stránok',
     more: 'Viac',
     link_tooltip_external_link: 'Externý odkaz na',
     link_tooltip_email: 'Odoslať e-mail na',

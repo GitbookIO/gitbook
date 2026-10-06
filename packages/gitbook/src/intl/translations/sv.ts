@@ -97,9 +97,9 @@ export const sv: TranslationLanguage = {
     pdf_page_of: '${1} av ${2}',
     pdf_mode_only_page: 'Endast denna sida',
     pdf_mode_all: 'Alla sidor',
-    pdf_limit_reached:
-        'Det gick inte att generera PDF för ${1} sidor, genereringen stoppades vid ${2}.',
-    pdf_limit_reached_continue: 'Utöka med ytterligare ${1} sidor.',
+    pdf_batch_range: 'Visar sidorna ${1}–${2} av ${3}.',
+    pdf_batch_previous: 'Föregående ${1} sidor',
+    pdf_batch_next: 'Nästa ${1} sidor',
     more: 'Mer',
     link_tooltip_external_link: 'Extern länk till',
     link_tooltip_email: 'Skicka e-post till',

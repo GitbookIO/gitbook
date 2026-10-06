@@ -100,9 +100,9 @@ export const ru: TranslationLanguage = {
     pdf_page_of: '${1} из ${2}',
     pdf_mode_only_page: 'Только эта страница',
     pdf_mode_all: 'Все страницы',
-    pdf_limit_reached:
-        'Не удалось создать PDF-файл для ${1} страниц, генерация остановлена на ${2}.',
-    pdf_limit_reached_continue: 'Расширьте ещё на ${1} страниц.',
+    pdf_batch_range: 'Страницы ${1}–${2} из ${3}.',
+    pdf_batch_previous: 'Предыдущие ${1} страниц',
+    pdf_batch_next: 'Следующие ${1} страниц',
     more: 'Ещё',
     link_tooltip_external_link: 'Внешняя ссылка на',
     link_tooltip_email: 'Отправить письмо на',

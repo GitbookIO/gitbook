@@ -97,9 +97,9 @@ export const hr: TranslationLanguage = {
     pdf_page_of: '${1} od ${2}',
     pdf_mode_only_page: 'Samo ova stranica',
     pdf_mode_all: 'Sve stranice',
-    pdf_limit_reached:
-        'Nije moguće generirati PDF za ${1} stranica, generiranje je zaustavljeno na ${2}.',
-    pdf_limit_reached_continue: 'Proširi za još ${1} stranica.',
+    pdf_batch_range: 'Prikazane stranice ${1}–${2} od ${3}.',
+    pdf_batch_previous: 'Prethodnih ${1} stranica',
+    pdf_batch_next: 'Sljedećih ${1} stranica',
     more: 'Više',
     link_tooltip_external_link: 'Vanjska poveznica na',
     link_tooltip_email: 'Pošalji e-poštu na',

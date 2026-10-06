@@ -102,9 +102,9 @@ export const de: TranslationLanguage = {
     pdf_page_of: '${1} von ${2}',
     pdf_mode_only_page: 'Nur diese Seite',
     pdf_mode_all: 'Alle Seiten',
-    pdf_limit_reached:
-        'Das PDF konnte für ${1} Seiten nicht generiert werden, Generierung wurde bei ${2} gestoppt.',
-    pdf_limit_reached_continue: 'Mit ${1} weiteren Seiten erweitern.',
+    pdf_batch_range: 'Seiten ${1}–${2} von ${3}.',
+    pdf_batch_previous: 'Vorherige ${1} Seiten',
+    pdf_batch_next: 'Nächste ${1} Seiten',
     more: 'Mehr',
     link_tooltip_external_link: 'Externer Link zu',
     link_tooltip_email: 'E-Mail senden an',

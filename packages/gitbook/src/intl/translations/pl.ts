@@ -97,9 +97,9 @@ export const pl: TranslationLanguage = {
     pdf_page_of: '${1} z ${2}',
     pdf_mode_only_page: 'Tylko ta strona',
     pdf_mode_all: 'Wszystkie strony',
-    pdf_limit_reached:
-        'Nie udało się wygenerować PDF dla ${1} stron, generowanie zatrzymało się na ${2}.',
-    pdf_limit_reached_continue: 'Rozszerz o kolejne ${1} stron.',
+    pdf_batch_range: 'Strony ${1}–${2} z ${3}.',
+    pdf_batch_previous: 'Poprzednie ${1} stron',
+    pdf_batch_next: 'Następne ${1} stron',
     more: 'Więcej',
     link_tooltip_external_link: 'Link zewnętrzny do',
     link_tooltip_email: 'Wyślij e-mail do',
