@@ -1,5 +1,6 @@
 import type { RevisionPageDocument, RevisionPageGroup } from '@gitbook/api';
 
+import { resolveMissingPagePath } from '@/components/SitePage/fetch';
 import { isAIEnabled } from '@/components/utils/isAIChatEnabled';
 import { renderQueryingDocumentation } from '@/lib/ask-prompt';
 import type { GitBookSiteContext } from '@/lib/context';
@@ -23,12 +24,36 @@ export async function servePageMarkdown(baseContext: GitBookSiteContext, pagePat
             linker: linkerWithMarkdownPages(baseContext.linker),
         };
 
-        const pageLookup = resolveSiteSpacePagePathDocumentOrGroup(
-            context.siteSpace,
-            context.revision.pages,
-            pagePath
-        );
+        const pageLookup =
+            resolveSiteSpacePagePathDocumentOrGroup(
+                context.siteSpace,
+                context.revision.pages,
+                pagePath
+            ) ??
+            // Page paths are lowercase, match the case-insensitive lookup of HTML pages.
+            resolveSiteSpacePagePathDocumentOrGroup(
+                context.siteSpace,
+                context.revision.pages,
+                pagePath.toLowerCase()
+            );
         if (!pageLookup) {
+            const fallback = await resolveMissingPagePath(baseContext, pagePath);
+            if (fallback?.type === 'redirect') {
+                return markdownRedirect(
+                    toMarkdownDestination(fallback.destination),
+                    fallback.permanent
+                );
+            }
+            if (fallback?.type === 'page') {
+                return markdownRedirect(
+                    context.linker.toPathForPage({
+                        pages: context.revision.pages,
+                        page: fallback.page.page,
+                    }),
+                    false
+                );
+            }
+
             // Generates a markdown body for missing pages. Return this with a 200 status (not 404) because agents discard 404 response bodies.=
             return {
                 markdown: renderNotFoundMarkdown(context, pagePath),
@@ -62,6 +87,33 @@ function getMarkdownRobots(
     }
 
     return context.isAiAgent ? 'index, follow' : 'noindex';
+}
+
+/**
+ * Point a redirect destination to its markdown version, so agents keep receiving markdown.
+ * Destinations outside the site are returned as full URLs and left untouched.
+ */
+export function toMarkdownDestination(destination: string): string {
+    if (!destination.startsWith('/')) {
+        return destination;
+    }
+
+    const url = new URL(destination, 'https://gitbook.invalid');
+    const pathname = url.pathname.replace(/\/+$/, '');
+    if (pathname.endsWith('.md')) {
+        return destination;
+    }
+
+    // A root destination trims to an empty pathname; its markdown route is `/.md`.
+    return `${pathname || '/'}.md${url.search}${url.hash}`;
+}
+
+function markdownRedirect(location: string, permanent: boolean) {
+    // Same status codes as Next's `redirect` / `permanentRedirect`.
+    return new Response(null, {
+        status: permanent ? 308 : 307,
+        headers: { Location: location, Vary: 'Accept' },
+    });
 }
 
 function renderNotFoundMarkdown(context: GitBookSiteContext, pagePath: string) {
@@ -148,11 +200,14 @@ Use this mechanism when the answer is not explicitly present in the current page
  * Return a markdown content.
  */
 export async function serveMarkdown(
-    fn: () => Promise<string | { markdown: string; robots: string }>,
+    fn: () => Promise<string | { markdown: string; robots: string } | Response>,
     isChatGPT?: boolean
 ) {
     try {
         const result = await fn();
+        if (result instanceof Response) {
+            return result;
+        }
         const { markdown, robots } =
             typeof result === 'string' ? { markdown: result, robots: 'noindex' } : result;
         return new Response(markdown, {
