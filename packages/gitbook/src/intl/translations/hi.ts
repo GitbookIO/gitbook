@@ -77,10 +77,15 @@ export const hi: TranslationLanguage = {
     notfound_title: 'पृष्ठ नहीं मिला',
     notfound_link: 'यह लिंक ऐसे पृष्ठ पर जाता है जिसे हटा दिया गया है या जो अब मौजूद नहीं है।',
     notfound: 'आप जिस पृष्ठ को खोज रहे हैं वह मौजूद नहीं है।',
-    notfound_adaptive_title: 'पृष्ठ उपलब्ध नहीं',
-    notfound_adaptive: 'यह पृष्ठ मौजूद हो सकता है, लेकिन इसे देखने के लिए आपको लॉग इन करना पड़ सकता है।',
+    notfound_adaptive_title: 'यह पृष्ठ देखने के लिए लॉग इन करें',
+    notfound_adaptive:
+        'इस पृष्ठ के लिए लॉग इन करना आवश्यक हो सकता है। यदि आप किसी लिंक से आए हैं, तो जांच लें कि वह सही है।',
     notfound_adaptive_login: 'लॉग इन करें',
     notfound_adaptive_registration_hint: 'संगठन के आधार पर पंजीकरण उपलब्ध हो सकता है।',
+    notfound_adaptive_no_access_title: 'हो सकता है कि आपके पास इस पृष्ठ की पहुंच न हो',
+    notfound_adaptive_no_access:
+        'हो सकता है कि यह पृष्ठ मौजूद न हो, या आपके खाते के पास इसकी पहुंच न हो। यदि आप किसी लिंक से आए हैं, तो जांच लें कि वह सही है।',
+    notfound_adaptive_login_again: 'फिर से लॉग इन करें',
     notfound_goto_home: 'मुखपृष्ठ पर जाएं',
     notfound_suggestions_title: 'शायद आप यह ढूँढ रहे हैं',
     unexpected_error_title: 'त्रुटि हुई',

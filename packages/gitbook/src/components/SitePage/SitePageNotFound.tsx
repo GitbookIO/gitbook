@@ -16,6 +16,7 @@ import { useSetSearchState } from '../Search';
 import { fetchSiteIndex } from '../Search/site-index';
 import { SiteAuthLoginButton } from '../SiteAuth/SiteAuthLoginLink';
 import {
+    useIsLoggedInVisitor,
     useSiteAdaptiveAuthLoginHref,
     useSiteIndexURL,
     useSpaceBasePath,
@@ -43,6 +44,9 @@ export function SitePageNotFound() {
     const pathname = usePathname();
     const setSearchState = useSetSearchState();
     const { assistants } = useAI();
+
+    const isAuthenticated = useIsLoggedInVisitor();
+    const copy = getNotFoundCopy({ hasAdaptiveLogin: !!adaptiveAuthLoginHref, isAuthenticated });
 
     // Show the assistant input when a non-search assistant is available (i.e. not just ask-AI).
     const assistant = assistants.find((candidate) => candidate.mode !== 'search') ?? null;
@@ -124,21 +128,20 @@ export function SitePageNotFound() {
                                     'text-tint-strong'
                                 )}
                             >
-                                {t(
-                                    language,
-                                    adaptiveAuthLoginHref
-                                        ? 'notfound_adaptive_title'
-                                        : 'notfound_title'
-                                )}
+                                {t(language, copy.title)}
                             </h1>
-                            <p className={tcls('text-base', 'text-tint')}>
-                                {t(
-                                    language,
-                                    adaptiveAuthLoginHref ? 'notfound_adaptive' : 'notfound'
-                                )}
+                            <p className={tcls('text-base', 'text-tint', 'text-center')}>
+                                {t(language, copy.message)}
                             </p>
                         </div>
-                        {adaptiveAuthLoginHref ? (
+                        {adaptiveAuthLoginHref && isAuthenticated ? (
+                            // Re-running login refreshes the visitor's claims, e.g. after a role change.
+                            <SiteAuthLoginButton
+                                href={adaptiveAuthLoginHref}
+                                variant="secondary"
+                                label={t(language, 'notfound_adaptive_login_again')}
+                            />
+                        ) : adaptiveAuthLoginHref ? (
                             <div className="flex flex-col items-center gap-4">
                                 <SiteAuthLoginButton
                                     href={adaptiveAuthLoginHref}
@@ -188,6 +191,19 @@ export function SitePageNotFound() {
             </div>
         </CurrentPageProvider>
     );
+}
+
+function getNotFoundCopy(args: { hasAdaptiveLogin: boolean; isAuthenticated: boolean }) {
+    if (!args.hasAdaptiveLogin) {
+        return { title: 'notfound_title', message: 'notfound' } as const;
+    }
+    if (args.isAuthenticated) {
+        return {
+            title: 'notfound_adaptive_no_access_title',
+            message: 'notfound_adaptive_no_access',
+        } as const;
+    }
+    return { title: 'notfound_adaptive_title', message: 'notfound_adaptive' } as const;
 }
 
 /**

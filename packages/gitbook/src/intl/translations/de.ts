@@ -80,12 +80,16 @@ export const de: TranslationLanguage = {
     notfound_link:
         'Dieser Link verweist auf eine Seite, die entfernt wurde oder nicht mehr existiert.',
     notfound: 'Die gesuchte Seite existiert nicht.',
-    notfound_adaptive_title: 'Seite nicht verfügbar',
+    notfound_adaptive_title: 'Melden Sie sich an, um diese Seite anzuzeigen',
     notfound_adaptive:
-        'Diese Seite existiert möglicherweise, aber Sie müssen sich eventuell anmelden, um darauf zuzugreifen.',
+        'Für diese Seite ist möglicherweise eine Anmeldung erforderlich. Wenn Sie einem Link gefolgt sind, prüfen Sie, ob er korrekt ist.',
     notfound_adaptive_login: 'Anmelden',
     notfound_adaptive_registration_hint:
         'Die Registrierung ist je nach Organisation möglicherweise verfügbar.',
+    notfound_adaptive_no_access_title: 'Sie haben möglicherweise keinen Zugriff auf diese Seite',
+    notfound_adaptive_no_access:
+        'Diese Seite existiert möglicherweise nicht, oder Ihr Konto hat keinen Zugriff darauf. Wenn Sie einem Link gefolgt sind, prüfen Sie, ob er korrekt ist.',
+    notfound_adaptive_login_again: 'Erneut anmelden',
     notfound_goto_home: 'Zur Startseite',
     notfound_suggestions_title: 'Vielleicht suchen Sie nach',
     unexpected_error_title: 'Ein Fehler ist aufgetreten',

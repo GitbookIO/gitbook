@@ -77,11 +77,16 @@ export const et: TranslationLanguage = {
     notfound_title: 'Lehte ei leitud',
     notfound_link: 'See link viitab lehele, mis on eemaldatud või mida enam ei eksisteeri.',
     notfound: 'Lehte, mida otsite, ei eksisteeri.',
-    notfound_adaptive_title: 'Leht pole saadaval',
-    notfound_adaptive: 'See leht võib olemas olla, kuid juurdepääsuks võib olla vaja sisse logida.',
+    notfound_adaptive_title: 'Selle lehe vaatamiseks logi sisse',
+    notfound_adaptive:
+        'See leht võib nõuda sisselogimist. Kui järgisid linki, kontrolli, et see oleks õige.',
     notfound_adaptive_login: 'Logi sisse',
     notfound_adaptive_registration_hint:
         'Registreerimine võib olla saadaval olenevalt organisatsioonist.',
+    notfound_adaptive_no_access_title: 'Sul ei pruugi olla sellele lehele juurdepääsu',
+    notfound_adaptive_no_access:
+        'Seda lehte ei pruugi olla olemas või sinu kontol ei pruugi olla sellele juurdepääsu. Kui järgisid linki, kontrolli, et see oleks õige.',
+    notfound_adaptive_login_again: 'Logi uuesti sisse',
     notfound_goto_home: 'Mine avalehele',
     notfound_suggestions_title: 'Võib-olla otsite',
     unexpected_error_title: 'Ilmnes tõrge',

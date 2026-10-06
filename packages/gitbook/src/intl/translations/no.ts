@@ -79,11 +79,16 @@ export const no: TranslationLanguage = {
     notfound_link:
         'Denne lenken peker til en side som har blitt fjernet eller ikke lenger eksisterer.',
     notfound: 'Siden du leter etter eksisterer ikke.',
-    notfound_adaptive_title: 'Siden er ikke tilgjengelig',
-    notfound_adaptive: 'Denne siden kan finnes, men du må kanskje logge inn for å få tilgang.',
+    notfound_adaptive_title: 'Logg inn for å se denne siden',
+    notfound_adaptive:
+        'Denne siden kan kreve at du logger inn. Hvis du fulgte en lenke, sjekk at den er riktig.',
     notfound_adaptive_login: 'Logg inn',
     notfound_adaptive_registration_hint:
         'Registrering kan være tilgjengelig avhengig av organisasjonen.',
+    notfound_adaptive_no_access_title: 'Du har kanskje ikke tilgang til denne siden',
+    notfound_adaptive_no_access:
+        'Denne siden finnes kanskje ikke, eller kontoen din har kanskje ikke tilgang til den. Hvis du fulgte en lenke, sjekk at den er riktig.',
+    notfound_adaptive_login_again: 'Logg inn på nytt',
     notfound_goto_home: 'Gå til forsiden',
     notfound_suggestions_title: 'Kanskje du leter etter',
     unexpected_error_title: 'En feil oppstod',
