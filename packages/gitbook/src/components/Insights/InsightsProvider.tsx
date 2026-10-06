@@ -7,7 +7,6 @@ import type * as api from '@gitbook/api';
 import { SiteInsightsDisplayContext } from '@gitbook/api';
 import { OpenAPIOperationContextProvider } from '@gitbook/react-openapi';
 
-import type { AskAITrigger } from '../AI';
 import { type CurrentContentContext, useCurrentContent } from '../hooks';
 import { getSession } from './sessions';
 import { type VisitorResponse, useVisitor } from './visitorId';
@@ -44,7 +43,7 @@ export type TrackEventInput<EventName extends InsightsEventName = InsightsEventN
 /**
  * Callback to track an event.
  */
-export type TrackEventCallback = <EventName extends InsightsEventName>(
+type TrackEventCallback = <EventName extends InsightsEventName>(
     event: TrackEventInput<EventName>,
     ctx?: InsightsEventPageContext,
     options?: InsightsEventOptions
@@ -222,16 +221,6 @@ export function InsightsProvider(props: InsightsProviderProps) {
  */
 export function useTrackEvent(): TrackEventCallback {
     return React.useContext(InsightsContext);
-}
-
-/** Track an ask view while the frontend uses an API type that predates its trigger field. */
-export function trackAskView(
-    trackEvent: TrackEventCallback,
-    trigger: AskAITrigger | undefined,
-    ctx?: InsightsEventPageContext
-) {
-    // TODO: remove this cast once @gitbook/api includes SiteInsightsEventAskView.trigger.
-    trackEvent({ type: 'ask_view', trigger } as unknown as TrackEventInput<'ask_view'>, ctx);
 }
 
 /**

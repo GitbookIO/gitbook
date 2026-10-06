@@ -11,9 +11,10 @@ import {
     type AIStreamResponseToolCallPending,
     type AIToolCallResult,
     SiteInsightsDisplayContext,
+    type SiteInsightsEventAskView,
 } from '@gitbook/api';
 
-import { getInsightsSession, trackAskView, useTrackEvent } from '../Insights';
+import { getInsightsSession, useTrackEvent } from '../Insights';
 import { type UpdateSearchState, useSetSearchState } from '../Search';
 import { addRecentSearchQuery } from '../Search/recent-queries';
 import type { AnyAIControl } from './controls';
@@ -60,7 +61,7 @@ export type AIChatStatus =
     | 'error'
     | 'confirm';
 
-export type AskAITrigger = 'hover' | 'selection' | 'site' | 'page' | 'embed';
+export type AskAITrigger = NonNullable<SiteInsightsEventAskView['trigger']>;
 
 export type AIChatState = {
     /**
@@ -308,7 +309,7 @@ export function AIChatProvider(props: {
         (trigger?: AskAITrigger) => {
             setIntercomLauncherHidden(true);
             if (!renderMessageOptions?.asEmbeddable) {
-                trackAskView(trackEvent, trigger);
+                trackEvent({ type: 'ask_view', trigger });
             }
 
             const { initialQuery } = globalState.getState();
