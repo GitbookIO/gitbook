@@ -78,11 +78,15 @@ export const fr: TranslationLanguage = {
     notfound_title: 'Page introuvable',
     notfound_link: "Ce lien pointe vers une page qui a été supprimée ou n'existe plus.",
     notfound: 'La page que vous cherchez n’existe pas.',
-    notfound_adaptive_title: 'Page inaccessible',
+    notfound_adaptive_title: 'Connectez-vous pour afficher cette page',
     notfound_adaptive:
-        'Cette page existe peut-être, mais vous devez peut-être vous connecter pour y accéder.',
+        "Cette page peut nécessiter une connexion. Si vous avez suivi un lien, vérifiez qu'il est correct.",
     notfound_adaptive_login: 'Se connecter',
     notfound_adaptive_registration_hint: "L'inscription peut être disponible selon l'organisation.",
+    notfound_adaptive_no_access_title: "Vous n'avez peut-être pas accès à cette page",
+    notfound_adaptive_no_access:
+        "Cette page n'existe peut-être pas, ou votre compte n'y a peut-être pas accès. Si vous avez suivi un lien, vérifiez qu'il est correct.",
+    notfound_adaptive_login_again: 'Se reconnecter',
     notfound_goto_home: "Aller à l'accueil",
     notfound_suggestions_title: 'Vous cherchez peut-être',
     unexpected_error_title: 'Erreur inattendue',

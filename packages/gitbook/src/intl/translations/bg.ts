@@ -78,12 +78,16 @@ export const bg: TranslationLanguage = {
     notfound_title: 'Страницата не е намерена',
     notfound_link: 'Тази връзка сочи към страница, която е премахната или вече не съществува.',
     notfound: 'Страницата, която търсите, не съществува.',
-    notfound_adaptive_title: 'Страницата не е налична',
+    notfound_adaptive_title: 'Влезте, за да видите тази страница',
     notfound_adaptive:
-        'Тази страница може да съществува, но може да трябва да влезете, за да я достъпите.',
+        'Тази страница може да изисква вход. Ако сте последвали връзка, проверете дали е правилна.',
     notfound_adaptive_login: 'Вход',
     notfound_adaptive_registration_hint:
         'Регистрацията може да е възможна в зависимост от организацията.',
+    notfound_adaptive_no_access_title: 'Възможно е да нямате достъп до тази страница',
+    notfound_adaptive_no_access:
+        'Тази страница може да не съществува или профилът ви може да няма достъп до нея. Ако сте последвали връзка, проверете дали е правилна.',
+    notfound_adaptive_login_again: 'Повторен вход',
     notfound_goto_home: 'Към началната страница',
     notfound_suggestions_title: 'Може би търсите',
     unexpected_error_title: 'Възникна грешка',

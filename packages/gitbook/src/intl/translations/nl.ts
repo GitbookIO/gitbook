@@ -79,12 +79,16 @@ export const nl: TranslationLanguage = {
     notfound_title: 'Pagina niet gevonden',
     notfound_link: 'Deze link verwijst naar een pagina die is verwijderd of niet meer bestaat.',
     notfound: 'De pagina die je zoekt, bestaat niet.',
-    notfound_adaptive_title: 'Pagina niet beschikbaar',
+    notfound_adaptive_title: 'Log in om deze pagina te bekijken',
     notfound_adaptive:
-        'Deze pagina bestaat mogelijk, maar je moet mogelijk inloggen om toegang te krijgen.',
+        'Voor deze pagina moet je mogelijk inloggen. Als je een link hebt gevolgd, controleer dan of deze klopt.',
     notfound_adaptive_login: 'Inloggen',
     notfound_adaptive_registration_hint:
         'Registratie is mogelijk beschikbaar, afhankelijk van de organisatie.',
+    notfound_adaptive_no_access_title: 'Je hebt mogelijk geen toegang tot deze pagina',
+    notfound_adaptive_no_access:
+        'Deze pagina bestaat mogelijk niet, of je account heeft er geen toegang toe. Als je een link hebt gevolgd, controleer dan of deze klopt.',
+    notfound_adaptive_login_again: 'Opnieuw inloggen',
     notfound_goto_home: 'Naar startpagina',
     notfound_suggestions_title: 'Misschien zoek je',
     unexpected_error_title: 'Er is een fout opgetreden',

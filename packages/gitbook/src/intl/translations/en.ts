@@ -75,11 +75,16 @@ export const en = {
     notfound_title: 'Page not found',
     notfound_link: 'This link points to a page that has been removed or no longer exists.',
     notfound: "The page you're looking for doesn't exist.",
-    notfound_adaptive_title: 'Page unavailable',
-    notfound_adaptive: 'This page may exist, but you may need to log in to access it.',
+    notfound_adaptive_title: 'Log in to view this page',
+    notfound_adaptive:
+        "This page may require you to log in. If you followed a link, check that it's correct.",
     notfound_adaptive_login: 'Log in',
     notfound_adaptive_registration_hint:
         'Registration may be available depending on the organization.',
+    notfound_adaptive_no_access_title: 'You may not have access to this page',
+    notfound_adaptive_no_access:
+        "This page may not exist, or your account may not have access to it. If you followed a link, check that it's correct.",
+    notfound_adaptive_login_again: 'Log in again',
     notfound_goto_home: 'Go to homepage',
     notfound_suggestions_title: 'You might be looking for',
     unexpected_error_title: 'An error occurred',

@@ -77,10 +77,15 @@ export const lv: TranslationLanguage = {
     notfound_title: 'Lapa nav atrasta',
     notfound_link: 'Šī saite norāda uz lapu, kas ir noņemta vai vairs nepastāv.',
     notfound: 'Meklētā lapa nepastāv.',
-    notfound_adaptive_title: 'Lapa nav pieejama',
-    notfound_adaptive: 'Šī lapa var pastāvēt, bet, iespējams, jums jāpierakstās, lai tai piekļūtu.',
+    notfound_adaptive_title: 'Pierakstieties, lai skatītu šo lapu',
+    notfound_adaptive:
+        'Šai lapai, iespējams, nepieciešams pierakstīties. Ja sekojāt saitei, pārbaudiet, vai tā ir pareiza.',
     notfound_adaptive_login: 'Pierakstīties',
     notfound_adaptive_registration_hint: 'Reģistrācija var būt pieejama atkarībā no organizācijas.',
+    notfound_adaptive_no_access_title: 'Iespējams, jums nav piekļuves šai lapai',
+    notfound_adaptive_no_access:
+        'Šī lapa, iespējams, neeksistē, vai arī jūsu kontam nav piekļuves tai. Ja sekojāt saitei, pārbaudiet, vai tā ir pareiza.',
+    notfound_adaptive_login_again: 'Pierakstīties vēlreiz',
     notfound_goto_home: 'Doties uz sākumlapu',
     notfound_suggestions_title: 'Iespējams, meklējat',
     unexpected_error_title: 'Radās kļūda',

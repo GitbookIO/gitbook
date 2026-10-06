@@ -78,12 +78,16 @@ export const sk: TranslationLanguage = {
     notfound_title: 'Stránka sa nenašla',
     notfound_link: 'Tento odkaz smeruje na stránku, ktorá bola odstránená alebo už neexistuje.',
     notfound: 'Stránka, ktorú hľadáte, neexistuje.',
-    notfound_adaptive_title: 'Stránka nie je dostupná',
+    notfound_adaptive_title: 'Na zobrazenie tejto stránky sa prihláste',
     notfound_adaptive:
-        'Táto stránka môže existovať, ale na prístup sa možno budete musieť prihlásiť.',
+        'Táto stránka môže vyžadovať prihlásenie. Ak ste prešli z odkazu, skontrolujte, či je správny.',
     notfound_adaptive_login: 'Prihlásiť sa',
     notfound_adaptive_registration_hint:
         'Registrácia môže byť dostupná v závislosti od organizácie.',
+    notfound_adaptive_no_access_title: 'K tejto stránke možno nemáte prístup',
+    notfound_adaptive_no_access:
+        'Táto stránka možno neexistuje alebo k nej váš účet nemá prístup. Ak ste prešli z odkazu, skontrolujte, či je správny.',
+    notfound_adaptive_login_again: 'Prihlásiť sa znova',
     notfound_goto_home: 'Prejsť na domovskú stránku',
     notfound_suggestions_title: 'Možno hľadáte',
     unexpected_error_title: 'Vyskytla sa chyba',

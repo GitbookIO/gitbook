@@ -78,10 +78,15 @@ export const sl: TranslationLanguage = {
     notfound_title: 'Strani ni bilo mogoče najti',
     notfound_link: 'Ta povezava kaže na stran, ki je bila odstranjena ali ne obstaja več.',
     notfound: 'Stran, ki jo iščete, ne obstaja.',
-    notfound_adaptive_title: 'Stran ni na voljo',
-    notfound_adaptive: 'Ta stran morda obstaja, vendar se boste za dostop morda morali prijaviti.',
+    notfound_adaptive_title: 'Za ogled te strani se prijavite',
+    notfound_adaptive:
+        'Ta stran morda zahteva prijavo. Če ste sledili povezavi, preverite, ali je pravilna.',
     notfound_adaptive_login: 'Prijava',
     notfound_adaptive_registration_hint: 'Registracija je morda na voljo, odvisno od organizacije.',
+    notfound_adaptive_no_access_title: 'Morda nimate dostopa do te strani',
+    notfound_adaptive_no_access:
+        'Ta stran morda ne obstaja ali pa vaš račun nima dostopa do nje. Če ste sledili povezavi, preverite, ali je pravilna.',
+    notfound_adaptive_login_again: 'Ponovna prijava',
     notfound_goto_home: 'Pojdi na domačo stran',
     notfound_suggestions_title: 'Morda iščete',
     unexpected_error_title: 'Prišlo je do napake',

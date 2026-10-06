@@ -22,6 +22,7 @@ import {
 } from '../SpaceLayout/SpaceLayoutContext';
 import { TrackPageViewEvent } from '@/components/Insights';
 import { t, tString, useLanguage } from '@/intl/client';
+import { isVisitorAuthenticated } from '@/lib/adaptive';
 import { tcls } from '@/lib/tailwind';
 
 const RELATED_PAGES_COUNT = 5;
@@ -36,13 +37,20 @@ export function SitePageNotFound() {
     const basePath = useSpaceBasePath();
     const adaptiveAuthLoginHref = useSiteAdaptiveAuthLoginHref();
     const siteIndexURL = useSiteIndexURL();
-    const { siteSpaceId } = useCurrentContent();
+    const { siteSpaceId, visitorAuthClaims } = useCurrentContent();
     const language = useLanguage();
     const router = useRouter();
     const searchParams = useSearchParams();
     const pathname = usePathname();
     const setSearchState = useSetSearchState();
     const { assistants } = useAI();
+
+    const isAuthenticated = isVisitorAuthenticated(visitorAuthClaims);
+    const [titleKey, messageKey] = !adaptiveAuthLoginHref
+        ? (['notfound_title', 'notfound'] as const)
+        : isAuthenticated
+          ? (['notfound_adaptive_no_access_title', 'notfound_adaptive_no_access'] as const)
+          : (['notfound_adaptive_title', 'notfound_adaptive'] as const);
 
     // Show the assistant input when a non-search assistant is available (i.e. not just ask-AI).
     const assistant = assistants.find((candidate) => candidate.mode !== 'search') ?? null;
@@ -124,21 +132,20 @@ export function SitePageNotFound() {
                                     'text-tint-strong'
                                 )}
                             >
-                                {t(
-                                    language,
-                                    adaptiveAuthLoginHref
-                                        ? 'notfound_adaptive_title'
-                                        : 'notfound_title'
-                                )}
+                                {t(language, titleKey)}
                             </h1>
                             <p className={tcls('text-base', 'text-tint')}>
-                                {t(
-                                    language,
-                                    adaptiveAuthLoginHref ? 'notfound_adaptive' : 'notfound'
-                                )}
+                                {t(language, messageKey)}
                             </p>
                         </div>
-                        {adaptiveAuthLoginHref ? (
+                        {adaptiveAuthLoginHref && isAuthenticated ? (
+                            // Re-running login refreshes the visitor's claims, e.g. after a role change.
+                            <SiteAuthLoginButton
+                                href={adaptiveAuthLoginHref}
+                                variant="secondary"
+                                label={t(language, 'notfound_adaptive_login_again')}
+                            />
+                        ) : adaptiveAuthLoginHref ? (
                             <div className="flex flex-col items-center gap-4">
                                 <SiteAuthLoginButton
                                     href={adaptiveAuthLoginHref}

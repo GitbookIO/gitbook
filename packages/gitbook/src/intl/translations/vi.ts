@@ -77,10 +77,15 @@ export const vi: TranslationLanguage = {
     notfound_title: 'Không tìm thấy trang',
     notfound_link: 'Liên kết này trỏ đến một trang đã bị xóa hoặc không còn tồn tại.',
     notfound: 'Trang bạn đang tìm kiếm không tồn tại.',
-    notfound_adaptive_title: 'Trang không khả dụng',
-    notfound_adaptive: 'Trang này có thể tồn tại, nhưng bạn có thể cần đăng nhập để truy cập.',
+    notfound_adaptive_title: 'Đăng nhập để xem trang này',
+    notfound_adaptive:
+        'Trang này có thể yêu cầu bạn đăng nhập. Nếu bạn truy cập qua một liên kết, hãy kiểm tra xem liên kết đó có đúng không.',
     notfound_adaptive_login: 'Đăng nhập',
     notfound_adaptive_registration_hint: 'Việc đăng ký có thể khả dụng tùy theo tổ chức.',
+    notfound_adaptive_no_access_title: 'Có thể bạn không có quyền truy cập trang này',
+    notfound_adaptive_no_access:
+        'Trang này có thể không tồn tại hoặc tài khoản của bạn có thể không có quyền truy cập. Nếu bạn truy cập qua một liên kết, hãy kiểm tra xem liên kết đó có đúng không.',
+    notfound_adaptive_login_again: 'Đăng nhập lại',
     notfound_goto_home: 'Đi tới trang chủ',
     notfound_suggestions_title: 'Có thể bạn đang tìm',
     unexpected_error_title: 'Đã xảy ra lỗi',

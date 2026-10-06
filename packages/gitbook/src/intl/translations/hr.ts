@@ -77,11 +77,15 @@ export const hr: TranslationLanguage = {
     notfound_title: 'Stranica nije pronađena',
     notfound_link: 'Ova poveznica vodi na stranicu koja je uklonjena ili više ne postoji.',
     notfound: 'Stranica koju tražite ne postoji.',
-    notfound_adaptive_title: 'Stranica nije dostupna',
+    notfound_adaptive_title: 'Prijavite se za prikaz ove stranice',
     notfound_adaptive:
-        'Ova stranica možda postoji, ali možda se morate prijaviti da biste joj pristupili.',
+        'Ova stranica možda zahtijeva prijavu. Ako ste slijedili poveznicu, provjerite je li ispravna.',
     notfound_adaptive_login: 'Prijava',
     notfound_adaptive_registration_hint: 'Registracija može biti dostupna ovisno o organizaciji.',
+    notfound_adaptive_no_access_title: 'Možda nemate pristup ovoj stranici',
+    notfound_adaptive_no_access:
+        'Ova stranica možda ne postoji ili vaš račun nema pristup njoj. Ako ste slijedili poveznicu, provjerite je li ispravna.',
+    notfound_adaptive_login_again: 'Ponovna prijava',
     notfound_goto_home: 'Idi na početnu stranicu',
     notfound_suggestions_title: 'Možda tražite',
     unexpected_error_title: 'Došlo je do pogreške',

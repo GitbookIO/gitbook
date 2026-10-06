@@ -78,11 +78,15 @@ export const ja: TranslationLanguage = {
     notfound_title: 'ページが見つかりません',
     notfound_link: 'このリンクは、削除されたか、もはや存在しないページを指しています。',
     notfound: 'お探しのページは存在しません。',
-    notfound_adaptive_title: 'ページにアクセスできません',
+    notfound_adaptive_title: 'このページを表示するにはログインしてください',
     notfound_adaptive:
-        'このページは存在する可能性がありますが、アクセスするにはログインが必要な場合があります。',
+        'このページの閲覧にはログインが必要な場合があります。リンクからアクセスした場合は、リンクが正しいか確認してください。',
     notfound_adaptive_login: 'ログイン',
     notfound_adaptive_registration_hint: '組織によっては登録が可能な場合があります。',
+    notfound_adaptive_no_access_title: 'このページへのアクセス権がない可能性があります',
+    notfound_adaptive_no_access:
+        'このページが存在しないか、お使いのアカウントにアクセス権がない可能性があります。リンクからアクセスした場合は、リンクが正しいか確認してください。',
+    notfound_adaptive_login_again: '再ログイン',
     notfound_goto_home: 'ホームへ移動',
     notfound_suggestions_title: 'お探しのページはこちらですか',
     unexpected_error_title: 'エラーが発生しました',

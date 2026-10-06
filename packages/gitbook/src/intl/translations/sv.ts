@@ -77,11 +77,16 @@ export const sv: TranslationLanguage = {
     notfound_title: 'Sidan hittades inte',
     notfound_link: 'Den här länken pekar på en sida som har tagits bort eller inte längre finns.',
     notfound: 'Sidan du letar efter finns inte.',
-    notfound_adaptive_title: 'Sidan är inte tillgänglig',
-    notfound_adaptive: 'Sidan kan finnas, men du kan behöva logga in för att få åtkomst.',
+    notfound_adaptive_title: 'Logga in för att visa den här sidan',
+    notfound_adaptive:
+        'Den här sidan kan kräva att du loggar in. Om du följde en länk, kontrollera att den är korrekt.',
     notfound_adaptive_login: 'Logga in',
     notfound_adaptive_registration_hint:
         'Registrering kan vara tillgänglig beroende på organisationen.',
+    notfound_adaptive_no_access_title: 'Du kanske inte har åtkomst till den här sidan',
+    notfound_adaptive_no_access:
+        'Den här sidan kanske inte finns, eller så har ditt konto inte åtkomst till den. Om du följde en länk, kontrollera att den är korrekt.',
+    notfound_adaptive_login_again: 'Logga in igen',
     notfound_goto_home: 'Gå till startsidan',
     notfound_suggestions_title: 'Du kanske letar efter',
     unexpected_error_title: 'Ett fel uppstod',

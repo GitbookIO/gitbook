@@ -77,11 +77,15 @@ export const cs: TranslationLanguage = {
     notfound_title: 'Stránka nenalezena',
     notfound_link: 'Tento odkaz vede na stránku, která byla odstraněna nebo již neexistuje.',
     notfound: 'Stránka, kterou hledáte, neexistuje.',
-    notfound_adaptive_title: 'Stránka není dostupná',
+    notfound_adaptive_title: 'Pro zobrazení této stránky se přihlaste',
     notfound_adaptive:
-        'Tato stránka může existovat, ale pro přístup se možná budete muset přihlásit.',
+        'Tato stránka může vyžadovat přihlášení. Pokud jste přešli z odkazu, zkontrolujte, zda je správný.',
     notfound_adaptive_login: 'Přihlásit se',
     notfound_adaptive_registration_hint: 'Registrace může být dostupná v závislosti na organizaci.',
+    notfound_adaptive_no_access_title: 'K této stránce možná nemáte přístup',
+    notfound_adaptive_no_access:
+        'Tato stránka možná neexistuje nebo k ní váš účet nemá přístup. Pokud jste přešli z odkazu, zkontrolujte, zda je správný.',
+    notfound_adaptive_login_again: 'Přihlásit se znovu',
     notfound_goto_home: 'Přejít na domovskou stránku',
     notfound_suggestions_title: 'Možná hledáte',
     unexpected_error_title: 'Došlo k chybě',

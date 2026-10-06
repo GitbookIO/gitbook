@@ -78,12 +78,16 @@ export const fi: TranslationLanguage = {
     notfound_title: 'Sivua ei löytynyt',
     notfound_link: 'Tämä linkki osoittaa sivulle, joka on poistettu tai jota ei enää ole.',
     notfound: 'Etsimääsi sivua ei ole olemassa.',
-    notfound_adaptive_title: 'Sivu ei ole saatavilla',
+    notfound_adaptive_title: 'Kirjaudu sisään nähdäksesi tämän sivun',
     notfound_adaptive:
-        'Tämä sivu voi olla olemassa, mutta sen käyttö voi edellyttää kirjautumista.',
+        'Tämä sivu saattaa vaatia kirjautumisen. Jos seurasit linkkiä, tarkista, että se on oikein.',
     notfound_adaptive_login: 'Kirjaudu sisään',
     notfound_adaptive_registration_hint:
         'Rekisteröityminen voi olla mahdollista organisaatiosta riippuen.',
+    notfound_adaptive_no_access_title: 'Sinulla ei ehkä ole pääsyä tälle sivulle',
+    notfound_adaptive_no_access:
+        'Tätä sivua ei ehkä ole olemassa, tai tililläsi ei ehkä ole pääsyä siihen. Jos seurasit linkkiä, tarkista, että se on oikein.',
+    notfound_adaptive_login_again: 'Kirjaudu uudelleen',
     notfound_goto_home: 'Siirry etusivulle',
     notfound_suggestions_title: 'Saatat etsiä',
     unexpected_error_title: 'Tapahtui virhe',
