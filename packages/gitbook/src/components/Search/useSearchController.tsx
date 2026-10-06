@@ -172,9 +172,8 @@ export function useSearchController(
 
     const withAI = assistants.length > 0;
     const withSearchAI = assistants.filter((assistant) => assistant.mode === 'search').length > 0;
-    // Integration assistants register on window load, so until then one may still take the `ask`.
-    const mayHaveAI = withAI || !integrationsLoaded;
-    const askIsSearchQuery = withSearchAI || !mayHaveAI;
+    // Integration assistants register on window load, so wait for it before treating `ask` as a search query.
+    const askIsSearchQuery = withSearchAI || (!withAI && integrationsLoaded);
 
     // Handle initial ask state on page load, once assistants are ready.
     // `ask=` should still bootstrap the assistant on the docs site, so we must
@@ -213,7 +212,7 @@ export function useSearchController(
                 '';
 
             return {
-                ask: mayHaveAI ? (prev?.ask ?? null) : null,
+                ask: withAI ? (prev?.ask ?? null) : null,
                 scope: prev?.scope ?? 'default',
                 query,
                 open: true,
@@ -223,18 +222,18 @@ export function useSearchController(
         trackEvent({
             type: 'search_open',
         });
-    }, [state?.open, setSearchState, siteSpace.id, trackEvent, mayHaveAI, askIsSearchQuery]);
+    }, [state?.open, setSearchState, siteSpace.id, trackEvent, withAI, askIsSearchQuery]);
 
     const setQuery = React.useCallback(
         (value: string) => {
             setSearchState((prev) => ({
-                ask: mayHaveAI && !withSearchAI ? (prev?.ask ?? null) : null,
+                ask: withAI && !withSearchAI ? (prev?.ask ?? null) : null,
                 query: value,
                 scope: prev?.scope ?? 'default',
                 open: true,
             }));
         },
-        [setSearchState, mayHaveAI, withSearchAI]
+        [setSearchState, withAI, withSearchAI]
     );
 
     const lastSearchQuery = useLastSearchQuery(siteSpace.id);
