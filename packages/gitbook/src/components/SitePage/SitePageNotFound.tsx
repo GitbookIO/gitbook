@@ -16,13 +16,13 @@ import { useSetSearchState } from '../Search';
 import { fetchSiteIndex } from '../Search/site-index';
 import { SiteAuthLoginButton } from '../SiteAuth/SiteAuthLoginLink';
 import {
+    useIsLoggedInVisitor,
     useSiteAdaptiveAuthLoginHref,
     useSiteIndexURL,
     useSpaceBasePath,
 } from '../SpaceLayout/SpaceLayoutContext';
 import { TrackPageViewEvent } from '@/components/Insights';
 import { t, tString, useLanguage } from '@/intl/client';
-import { isVisitorAuthenticated } from '@/lib/adaptive';
 import { tcls } from '@/lib/tailwind';
 
 const RELATED_PAGES_COUNT = 5;
@@ -37,7 +37,7 @@ export function SitePageNotFound() {
     const basePath = useSpaceBasePath();
     const adaptiveAuthLoginHref = useSiteAdaptiveAuthLoginHref();
     const siteIndexURL = useSiteIndexURL();
-    const { siteSpaceId, visitorAuthClaims } = useCurrentContent();
+    const { siteSpaceId } = useCurrentContent();
     const language = useLanguage();
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -45,7 +45,7 @@ export function SitePageNotFound() {
     const setSearchState = useSetSearchState();
     const { assistants } = useAI();
 
-    const isAuthenticated = isVisitorAuthenticated(visitorAuthClaims);
+    const isAuthenticated = useIsLoggedInVisitor();
     const copy = getNotFoundCopy({ hasAdaptiveLogin: !!adaptiveAuthLoginHref, isAuthenticated });
 
     // Show the assistant input when a non-search assistant is available (i.e. not just ask-AI).

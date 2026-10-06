@@ -24,10 +24,3 @@ export function getVisitorAuthClaims(siteData: SiteURLData): VisitorAuthClaims {
 export function getVisitorAuthClaimsFromToken(token: SiteAPIToken): VisitorAuthClaims {
     return token.claims ?? {};
 }
-
-/**
- * Whether the visitor is authenticated, i.e. has claims beyond the unsigned ones anyone can set.
- */
-export function isVisitorAuthenticated(claims: VisitorAuthClaims): boolean {
-    return Object.keys(claims).some((key) => key !== 'unsigned');
-}
