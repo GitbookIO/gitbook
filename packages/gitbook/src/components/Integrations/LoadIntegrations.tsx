@@ -147,6 +147,10 @@ export function useCustomCookieBanner(): CustomCookieBannerStore {
 export function LoadIntegrations() {
     React.useEffect(() => {
         return whenIntegrationsReady(() => {
+            // Integrations must only receive `load` once, even if this is mounted twice.
+            if (integrationsStore.getState().loaded) {
+                return;
+            }
             dispatchGitBookIntegrationEvent('load');
             integrationsStore.setState({ loaded: true });
         });
