@@ -508,7 +508,8 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
                     siteId: siteURLData.site,
                     events,
                     request: {
-                        url: siteRequestURL.toString(),
+                        // A proxied site's request URL is the proxy's (`/sites/site_xxx/...`), not its public one.
+                        url: siteCanonicalURL.toString(),
                         headers: requestHeaders,
                     },
                 })
