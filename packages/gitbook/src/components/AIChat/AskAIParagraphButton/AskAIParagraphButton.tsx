@@ -33,7 +33,7 @@ export function AskAIParagraphButton(props: { content: string; className?: Class
             id: `text-${fnv1a(text, { size: 32 })}`,
             content: text,
         });
-        chatController.open();
+        chatController.open('hover');
         chatController.setDraft(tString(language, 'ai_chat_paragraph_draft'));
         chatController.focus();
     };

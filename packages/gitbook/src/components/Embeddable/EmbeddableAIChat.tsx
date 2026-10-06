@@ -61,9 +61,7 @@ export function EmbeddableAIChat(props: EmbeddableAIChatProps) {
         }
 
         trackEvent(
-            {
-                type: 'ask_view',
-            },
+            { type: 'ask_view', trigger: 'embed' },
             {
                 pageId: null,
                 displayContext: api.SiteInsightsDisplayContext.Embed,
