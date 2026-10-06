@@ -78,10 +78,15 @@ export const hu: TranslationLanguage = {
     notfound_title: 'Az oldal nem található',
     notfound_link: 'Ez a hivatkozás egy eltávolított vagy már nem létező oldalra mutat.',
     notfound: 'A keresett oldal nem létezik.',
-    notfound_adaptive_title: 'Az oldal nem érhető el',
-    notfound_adaptive: 'Ez az oldal létezhet, de a hozzáféréshez lehet, hogy be kell jelentkeznie.',
+    notfound_adaptive_title: 'Jelentkezzen be az oldal megtekintéséhez',
+    notfound_adaptive:
+        'Ehhez az oldalhoz bejelentkezés szükséges lehet. Ha egy hivatkozást követett, ellenőrizze, hogy helyes-e.',
     notfound_adaptive_login: 'Bejelentkezés',
     notfound_adaptive_registration_hint: 'A regisztráció a szervezettől függően elérhető lehet.',
+    notfound_adaptive_no_access_title: 'Lehet, hogy nincs hozzáférése ehhez az oldalhoz',
+    notfound_adaptive_no_access:
+        'Lehet, hogy ez az oldal nem létezik, vagy a fiókja nem fér hozzá. Ha egy hivatkozást követett, ellenőrizze, hogy helyes-e.',
+    notfound_adaptive_login_again: 'Újbóli bejelentkezés',
     notfound_goto_home: 'Ugrás a kezdőlapra',
     notfound_suggestions_title: 'Talán ezt keresi',
     unexpected_error_title: 'Hiba történt',

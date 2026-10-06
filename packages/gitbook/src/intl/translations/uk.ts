@@ -77,10 +77,15 @@ export const uk: TranslationLanguage = {
     notfound_title: 'Сторінку не знайдено',
     notfound_link: 'Це посилання веде на сторінку, яку видалено або якої більше не існує.',
     notfound: 'Сторінка, яку ви шукаєте, не існує.',
-    notfound_adaptive_title: 'Сторінка недоступна',
-    notfound_adaptive: 'Ця сторінка може існувати, але для доступу до неї може знадобитися вхід.',
+    notfound_adaptive_title: 'Увійдіть, щоб переглянути цю сторінку',
+    notfound_adaptive:
+        'Для перегляду цієї сторінки може знадобитися вхід. Якщо ви перейшли за посиланням, перевірте, чи воно правильне.',
     notfound_adaptive_login: 'Увійти',
     notfound_adaptive_registration_hint: 'Реєстрація може бути доступною залежно від організації.',
+    notfound_adaptive_no_access_title: 'Можливо, у вас немає доступу до цієї сторінки',
+    notfound_adaptive_no_access:
+        'Можливо, ця сторінка не існує або ваш обліковий запис не має до неї доступу. Якщо ви перейшли за посиланням, перевірте, чи воно правильне.',
+    notfound_adaptive_login_again: 'Увійти знову',
     notfound_goto_home: 'Перейти на головну',
     notfound_suggestions_title: 'Можливо, ви шукаєте',
     unexpected_error_title: 'Сталася помилка',

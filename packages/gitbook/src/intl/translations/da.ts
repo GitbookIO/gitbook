@@ -77,11 +77,15 @@ export const da: TranslationLanguage = {
     notfound_title: 'Siden blev ikke fundet',
     notfound_link: 'Dette link peger på en side, der er blevet fjernet eller ikke længere findes.',
     notfound: 'Siden, du leder efter, findes ikke.',
-    notfound_adaptive_title: 'Siden er ikke tilgængelig',
+    notfound_adaptive_title: 'Log ind for at se denne side',
     notfound_adaptive:
-        'Denne side findes muligvis, men du skal muligvis logge ind for at få adgang.',
+        'Denne side kræver muligvis, at du logger ind. Hvis du har fulgt et link, så tjek, at det er korrekt.',
     notfound_adaptive_login: 'Log ind',
     notfound_adaptive_registration_hint: 'Registrering kan være mulig afhængigt af organisationen.',
+    notfound_adaptive_no_access_title: 'Du har muligvis ikke adgang til denne side',
+    notfound_adaptive_no_access:
+        'Denne side findes muligvis ikke, eller din konto har muligvis ikke adgang til den. Hvis du har fulgt et link, så tjek, at det er korrekt.',
+    notfound_adaptive_login_again: 'Log ind igen',
     notfound_goto_home: 'Gå til forsiden',
     notfound_suggestions_title: 'Du leder måske efter',
     unexpected_error_title: 'Der opstod en fejl',

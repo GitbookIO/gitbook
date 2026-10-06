@@ -77,11 +77,15 @@ export const ms: TranslationLanguage = {
     notfound_title: 'Halaman tidak ditemui',
     notfound_link: 'Pautan ini menghala ke halaman yang telah dialih keluar atau tidak lagi wujud.',
     notfound: 'Halaman yang anda cari tidak wujud.',
-    notfound_adaptive_title: 'Halaman tidak tersedia',
+    notfound_adaptive_title: 'Log masuk untuk melihat halaman ini',
     notfound_adaptive:
-        'Halaman ini mungkin wujud, tetapi anda mungkin perlu log masuk untuk mengaksesnya.',
+        'Halaman ini mungkin memerlukan anda log masuk. Jika anda mengikuti pautan, semak sama ada pautan itu betul.',
     notfound_adaptive_login: 'Log masuk',
     notfound_adaptive_registration_hint: 'Pendaftaran mungkin tersedia bergantung pada organisasi.',
+    notfound_adaptive_no_access_title: 'Anda mungkin tidak mempunyai akses ke halaman ini',
+    notfound_adaptive_no_access:
+        'Halaman ini mungkin tidak wujud, atau akaun anda mungkin tidak mempunyai akses kepadanya. Jika anda mengikuti pautan, semak sama ada pautan itu betul.',
+    notfound_adaptive_login_again: 'Log masuk semula',
     notfound_goto_home: 'Pergi ke halaman utama',
     notfound_suggestions_title: 'Mungkin anda mencari',
     unexpected_error_title: 'Ralat berlaku',

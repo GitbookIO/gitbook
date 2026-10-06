@@ -77,10 +77,15 @@ export const tr: TranslationLanguage = {
     notfound_title: 'Sayfa bulunamadı',
     notfound_link: 'Bu bağlantı kaldırılmış veya artık mevcut olmayan bir sayfaya işaret ediyor.',
     notfound: 'Aradığınız sayfa mevcut değil.',
-    notfound_adaptive_title: 'Sayfa kullanılamıyor',
-    notfound_adaptive: 'Bu sayfa mevcut olabilir, ancak erişmek için oturum açmanız gerekebilir.',
+    notfound_adaptive_title: 'Bu sayfayı görüntülemek için oturum açın',
+    notfound_adaptive:
+        'Bu sayfa oturum açmanızı gerektirebilir. Bir bağlantıyı izlediyseniz doğru olduğunu kontrol edin.',
     notfound_adaptive_login: 'Oturum aç',
     notfound_adaptive_registration_hint: 'Kayıt, kuruluşa bağlı olarak mevcut olabilir.',
+    notfound_adaptive_no_access_title: 'Bu sayfaya erişiminiz olmayabilir',
+    notfound_adaptive_no_access:
+        'Bu sayfa mevcut olmayabilir veya hesabınızın bu sayfaya erişimi olmayabilir. Bir bağlantıyı izlediyseniz doğru olduğunu kontrol edin.',
+    notfound_adaptive_login_again: 'Tekrar oturum aç',
     notfound_goto_home: 'Ana sayfaya git',
     notfound_suggestions_title: 'Şunu arıyor olabilirsiniz',
     unexpected_error_title: 'Bir hata oluştu',

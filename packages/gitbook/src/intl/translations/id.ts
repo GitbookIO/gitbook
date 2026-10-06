@@ -77,11 +77,15 @@ export const id: TranslationLanguage = {
     notfound_title: 'Halaman tidak ditemukan',
     notfound_link: 'Tautan ini mengarah ke halaman yang telah dihapus atau sudah tidak ada.',
     notfound: 'Halaman yang Anda cari tidak ada.',
-    notfound_adaptive_title: 'Halaman tidak tersedia',
+    notfound_adaptive_title: 'Masuk untuk melihat halaman ini',
     notfound_adaptive:
-        'Halaman ini mungkin ada, tetapi Anda mungkin perlu masuk untuk mengaksesnya.',
+        'Halaman ini mungkin mengharuskan Anda masuk. Jika Anda mengikuti tautan, periksa apakah tautan tersebut benar.',
     notfound_adaptive_login: 'Masuk',
     notfound_adaptive_registration_hint: 'Pendaftaran mungkin tersedia tergantung pada organisasi.',
+    notfound_adaptive_no_access_title: 'Anda mungkin tidak memiliki akses ke halaman ini',
+    notfound_adaptive_no_access:
+        'Halaman ini mungkin tidak ada, atau akun Anda mungkin tidak memiliki akses ke halaman ini. Jika Anda mengikuti tautan, periksa apakah tautan tersebut benar.',
+    notfound_adaptive_login_again: 'Masuk lagi',
     notfound_goto_home: 'Buka beranda',
     notfound_suggestions_title: 'Mungkin Anda mencari',
     unexpected_error_title: 'Terjadi kesalahan',

@@ -79,12 +79,16 @@ export const ru: TranslationLanguage = {
     notfound_title: 'Страница не найдена',
     notfound_link: 'Эта ссылка ведёт на страницу, которая была удалена или больше не существует.',
     notfound: 'Страница, которую вы ищете, не существует.',
-    notfound_adaptive_title: 'Страница недоступна',
+    notfound_adaptive_title: 'Войдите, чтобы просмотреть эту страницу',
     notfound_adaptive:
-        'Эта страница может существовать, но для доступа к ней может потребоваться вход.',
+        'Для просмотра этой страницы может потребоваться вход. Если вы перешли по ссылке, проверьте, что она верна.',
     notfound_adaptive_login: 'Войти',
     notfound_adaptive_registration_hint:
         'Регистрация может быть доступна в зависимости от организации.',
+    notfound_adaptive_no_access_title: 'Возможно, у вас нет доступа к этой странице',
+    notfound_adaptive_no_access:
+        'Возможно, эта страница не существует или у вашей учётной записи нет к ней доступа. Если вы перешли по ссылке, проверьте, что она верна.',
+    notfound_adaptive_login_again: 'Войти снова',
     notfound_goto_home: 'Перейти на главную',
     notfound_suggestions_title: 'Возможно, вы ищете',
     unexpected_error_title: 'Произошла ошибка',

@@ -78,12 +78,16 @@ export const ro: TranslationLanguage = {
     notfound_title: 'Pagina nu a fost găsită',
     notfound_link: 'Acest link indică o pagină care a fost eliminată sau nu mai există.',
     notfound: 'Pagina pe care o cauți nu există.',
-    notfound_adaptive_title: 'Pagina nu este disponibilă',
+    notfound_adaptive_title: 'Autentifică-te pentru a vedea această pagină',
     notfound_adaptive:
-        'Această pagină poate exista, dar este posibil să trebuiască să te autentifici pentru a o accesa.',
+        'Această pagină poate necesita autentificare. Dacă ai urmat un link, verifică dacă este corect.',
     notfound_adaptive_login: 'Autentificare',
     notfound_adaptive_registration_hint:
         'Înregistrarea poate fi disponibilă în funcție de organizație.',
+    notfound_adaptive_no_access_title: 'Este posibil să nu ai acces la această pagină',
+    notfound_adaptive_no_access:
+        'Este posibil ca această pagină să nu existe sau contul tău să nu aibă acces la ea. Dacă ai urmat un link, verifică dacă este corect.',
+    notfound_adaptive_login_again: 'Reautentificare',
     notfound_goto_home: 'Mergi la pagina principală',
     notfound_suggestions_title: 'Poate cauți',
     unexpected_error_title: 'A apărut o eroare',

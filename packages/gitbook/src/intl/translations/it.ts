@@ -79,12 +79,16 @@ export const it: TranslationLanguage = {
     notfound_title: 'Pagina non trovata',
     notfound_link: 'Questo link punta a una pagina che è stata rimossa o non esiste più.',
     notfound: 'La pagina che cerchi non esiste.',
-    notfound_adaptive_title: 'Pagina non disponibile',
+    notfound_adaptive_title: 'Accedi per visualizzare questa pagina',
     notfound_adaptive:
-        "Questa pagina potrebbe esistere, ma potrebbe essere necessario effettuare l'accesso per visualizzarla.",
+        "Questa pagina potrebbe richiedere l'accesso. Se hai seguito un link, verifica che sia corretto.",
     notfound_adaptive_login: 'Accedi',
     notfound_adaptive_registration_hint:
         "La registrazione potrebbe essere disponibile a seconda dell'organizzazione.",
+    notfound_adaptive_no_access_title: 'Potresti non avere accesso a questa pagina',
+    notfound_adaptive_no_access:
+        'Questa pagina potrebbe non esistere, oppure il tuo account potrebbe non avervi accesso. Se hai seguito un link, verifica che sia corretto.',
+    notfound_adaptive_login_again: 'Accedi di nuovo',
     notfound_goto_home: 'Vai alla home',
     notfound_suggestions_title: 'Forse stai cercando',
     unexpected_error_title: 'Si è verificato un errore',

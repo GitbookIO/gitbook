@@ -78,10 +78,15 @@ export const ko: TranslationLanguage = {
     notfound_title: '페이지를 찾을 수 없음',
     notfound_link: '이 링크는 삭제되었거나 더 이상 존재하지 않는 페이지를 가리킵니다.',
     notfound: '찾으시는 페이지가 존재하지 않습니다.',
-    notfound_adaptive_title: '페이지에 접근할 수 없음',
-    notfound_adaptive: '이 페이지는 존재할 수 있지만, 접근하려면 로그인해야 할 수 있습니다.',
+    notfound_adaptive_title: '이 페이지를 보려면 로그인하세요',
+    notfound_adaptive:
+        '이 페이지는 로그인이 필요할 수 있습니다. 링크를 통해 접속했다면 링크가 올바른지 확인하세요.',
     notfound_adaptive_login: '로그인',
     notfound_adaptive_registration_hint: '조직에 따라 등록이 가능할 수 있습니다.',
+    notfound_adaptive_no_access_title: '이 페이지에 대한 접근 권한이 없을 수 있습니다',
+    notfound_adaptive_no_access:
+        '이 페이지가 존재하지 않거나 계정에 이 페이지에 대한 접근 권한이 없을 수 있습니다. 링크를 통해 접속했다면 링크가 올바른지 확인하세요.',
+    notfound_adaptive_login_again: '다시 로그인',
     notfound_goto_home: '홈으로 이동',
     notfound_suggestions_title: '찾고 계신 내용일 수 있어요',
     unexpected_error_title: '오류가 발생했습니다',

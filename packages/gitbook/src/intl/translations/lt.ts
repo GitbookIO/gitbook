@@ -77,12 +77,16 @@ export const lt: TranslationLanguage = {
     notfound_title: 'Puslapis nerastas',
     notfound_link: 'Ši nuoroda veda į puslapį, kuris buvo pašalintas arba nebeegzistuoja.',
     notfound: 'Puslapis, kurio ieškote, neegzistuoja.',
-    notfound_adaptive_title: 'Puslapis nepasiekiamas',
+    notfound_adaptive_title: 'Prisijunkite, kad peržiūrėtumėte šį puslapį',
     notfound_adaptive:
-        'Šis puslapis gali egzistuoti, bet norint jį pasiekti gali reikėti prisijungti.',
+        'Šiam puslapiui gali reikėti prisijungti. Jei sekėte nuoroda, patikrinkite, ar ji teisinga.',
     notfound_adaptive_login: 'Prisijungti',
     notfound_adaptive_registration_hint:
         'Registracija gali būti galima priklausomai nuo organizacijos.',
+    notfound_adaptive_no_access_title: 'Galbūt neturite prieigos prie šio puslapio',
+    notfound_adaptive_no_access:
+        'Šis puslapis gali neegzistuoti arba jūsų paskyra gali neturėti prieigos prie jo. Jei sekėte nuoroda, patikrinkite, ar ji teisinga.',
+    notfound_adaptive_login_again: 'Prisijungti iš naujo',
     notfound_goto_home: 'Eiti į pagrindinį puslapį',
     notfound_suggestions_title: 'Galbūt ieškote',
     unexpected_error_title: 'Įvyko klaida',

@@ -78,12 +78,16 @@ export const el: TranslationLanguage = {
     notfound_title: 'Η σελίδα δεν βρέθηκε',
     notfound_link: 'Αυτός ο σύνδεσμος οδηγεί σε μια σελίδα που έχει αφαιρεθεί ή δεν υπάρχει πλέον.',
     notfound: 'Η σελίδα που αναζητάτε δεν υπάρχει.',
-    notfound_adaptive_title: 'Η σελίδα δεν είναι διαθέσιμη',
+    notfound_adaptive_title: 'Συνδεθείτε για να δείτε αυτή τη σελίδα',
     notfound_adaptive:
-        'Αυτή η σελίδα μπορεί να υπάρχει, αλλά ίσως χρειαστεί να συνδεθείτε για πρόσβαση.',
+        'Αυτή η σελίδα ενδέχεται να απαιτεί σύνδεση. Αν ακολουθήσατε έναν σύνδεσμο, ελέγξτε ότι είναι σωστός.',
     notfound_adaptive_login: 'Σύνδεση',
     notfound_adaptive_registration_hint:
         'Η εγγραφή ενδέχεται να είναι διαθέσιμη ανάλογα με τον οργανισμό.',
+    notfound_adaptive_no_access_title: 'Ίσως δεν έχετε πρόσβαση σε αυτή τη σελίδα',
+    notfound_adaptive_no_access:
+        'Αυτή η σελίδα ενδέχεται να μην υπάρχει ή ο λογαριασμός σας ενδέχεται να μην έχει πρόσβαση σε αυτήν. Αν ακολουθήσατε έναν σύνδεσμο, ελέγξτε ότι είναι σωστός.',
+    notfound_adaptive_login_again: 'Επανασύνδεση',
     notfound_goto_home: 'Μετάβαση στην αρχική σελίδα',
     notfound_suggestions_title: 'Ίσως αναζητάτε',
     unexpected_error_title: 'Παρουσιάστηκε σφάλμα',
