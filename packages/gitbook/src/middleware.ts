@@ -35,7 +35,12 @@ import {
     normalizeRequestURL,
     throwIfDataError,
 } from '@/lib/data';
-import { GITBOOK_DISABLE_INSIGHTS, isGitBookAssetsHostURL, isGitBookHostURL } from '@/lib/env';
+import {
+    GITBOOK_DISABLE_INSIGHTS,
+    GITBOOK_STAGE,
+    isGitBookAssetsHostURL,
+    isGitBookHostURL,
+} from '@/lib/env';
 import { getImageResizingContextId } from '@/lib/images';
 import { isAITrainingOrIndexingRequest } from '@/lib/indexing-crawlers';
 import { MCP_SERVER_CARD_PATH, MCP_SERVER_CARD_WELL_KNOWN_PATH } from '@/lib/mcp/paths';
@@ -222,7 +227,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
     //
     request.headers.delete('x-gitbook-disable-tracking');
 
-    const visitorCountry = shouldSendVisitorCountry(siteRequestURL.hostname)
+    const visitorCountry = shouldSendVisitorCountry(siteRequestURL.hostname, GITBOOK_STAGE)
         ? getVisitorCountry(request)
         : undefined;
 

@@ -10,7 +10,6 @@ import {
     getChunkedCookieValue,
     getChunkedResponseCookies,
 } from './chunked-cookies';
-import { GITBOOK_STAGE } from './env';
 
 const VISITOR_AUTH_PARAM = 'jwt_token';
 const VISITOR_PARAM_PREFIX = 'visitor.';
@@ -114,10 +113,7 @@ const VISITOR_COUNTRY_STAGES = new Set(['dev', 'preview', 'staging']);
 /**
  * Whether the visitor country should be sent when resolving the site URL.
  */
-export function shouldSendVisitorCountry(
-    hostname: string,
-    stage: string | undefined = GITBOOK_STAGE
-): boolean {
+export function shouldSendVisitorCountry(hostname: string, stage: string | undefined): boolean {
     return (
         (!!stage && VISITOR_COUNTRY_STAGES.has(stage)) || VISITOR_COUNTRY_HOSTNAMES.has(hostname)
     );
