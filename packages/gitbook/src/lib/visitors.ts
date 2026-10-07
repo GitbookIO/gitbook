@@ -124,10 +124,13 @@ export function shouldSendVisitorCountry(
 }
 
 /**
- * Get the ISO 3166-1 alpha-2 country code of the visitor from the geolocation headers.
+ * Get the ISO 3166-1 alpha-2 country code of the visitor from the geolocation headers,
+ * or from `x-gitbook-country` when the request comes from the revalidation worker.
  */
 export function getVisitorCountry(request: { headers: Headers }): string | undefined {
+    // The revalidation worker forwards the original visitor country; only trust it from there.
     const country = (
+        (isRevalidationRequest(request.headers) && request.headers.get('x-gitbook-country')) ||
         request.headers.get('x-open-next-country') ||
         request.headers.get('x-vercel-ip-country') ||
         ''

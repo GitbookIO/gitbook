@@ -628,6 +628,38 @@ describe('getVisitorCountry', () => {
     it('should return undefined when no country header is present', () => {
         expect(getVisitorCountry(requestWith({}))).toBeUndefined();
     });
+
+    it('should prefer the forwarded country header on revalidation requests', () => {
+        expect(
+            getVisitorCountry(
+                requestWith({
+                    'user-agent': 'gitbook-open-revalidation-worker',
+                    'x-gitbook-country': 'DE',
+                    'x-open-next-country': 'FR',
+                })
+            )
+        ).toBe('DE');
+    });
+
+    it('should ignore the forwarded country header outside revalidation requests', () => {
+        expect(
+            getVisitorCountry(
+                requestWith({ 'x-gitbook-country': 'DE', 'x-open-next-country': 'FR' })
+            )
+        ).toBe('FR');
+        expect(getVisitorCountry(requestWith({ 'x-gitbook-country': 'DE' }))).toBeUndefined();
+    });
+
+    it('should fall back to geolocation headers on revalidation requests without a forwarded country', () => {
+        expect(
+            getVisitorCountry(
+                requestWith({
+                    'user-agent': 'gitbook-open-revalidation-worker',
+                    'x-open-next-country': 'FR',
+                })
+            )
+        ).toBe('FR');
+    });
 });
 
 describe('shouldSendVisitorCountry', () => {
