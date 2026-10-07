@@ -47,6 +47,7 @@ export function InlineButton(props: InlineProps<api.DocumentInlineButton>) {
                 <InlineActionButton
                     action={inline.data.action.action}
                     query={inline.data.action.query ?? ''}
+                    scope={inline.data.action.scope}
                     buttonProps={buttonProps}
                 />
             );

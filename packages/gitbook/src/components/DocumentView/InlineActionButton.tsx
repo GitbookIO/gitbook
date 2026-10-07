@@ -13,9 +13,14 @@ const INPUT_SIZE_MAP: Record<NonNullable<ButtonProps['size']>, 'small' | 'medium
 };
 
 export function InlineActionButton(
-    props: { action: 'ask' | 'search'; query?: string } & { buttonProps: ButtonProps } // TODO: Type this properly: Pick<api.DocumentInlineButton, 'action' | 'query'> & { buttonProps: ButtonProps }
+    props: {
+        action: 'ask' | 'search';
+        query?: string;
+        /** Where a search runs: the whole site, or only the space the visitor is reading. */
+        scope?: 'site' | 'space';
+    } & { buttonProps: ButtonProps } // TODO: Type this properly: Pick<api.DocumentInlineButton, 'action' | 'query'> & { buttonProps: ButtonProps }
 ) {
-    const { action, query, buttonProps } = props;
+    const { action, query, scope, buttonProps } = props;
 
     const { assistants } = useAI();
     const chatState = useAIChatState();
@@ -29,7 +34,7 @@ export function InlineActionButton(
             setSearchState((prev) => ({
                 ...prev,
                 ask: null,
-                scope: 'default',
+                scope: scope === 'space' ? 'current' : 'default',
                 query: value ?? query,
                 open: true,
             }));
