@@ -6,6 +6,7 @@ import * as api from '@gitbook/api';
 
 import { useTrackEvent } from '../Insights';
 import { LinkContext } from '../primitives';
+import { useIsVisible } from '../VisibilityContext';
 import {
     EmbeddableFrame,
     EmbeddableFrameBody,
@@ -51,19 +52,22 @@ export function EmbeddableAIChat(props: EmbeddableAIChatProps) {
         chatController.open();
     }, [chatController]);
 
-    // Track the view of the AI chat
+    // Track the view of the AI chat, once the reader is actually shown the frame
     const trackEvent = useTrackEvent();
+    const isVisible = useIsVisible();
     React.useEffect(() => {
+        if (!isVisible) {
+            return;
+        }
+
         trackEvent(
-            {
-                type: 'ask_view',
-            },
+            { type: 'ask_view', trigger: 'embed' },
             {
                 pageId: null,
                 displayContext: api.SiteInsightsDisplayContext.Embed,
             }
         );
-    }, [trackEvent]);
+    }, [trackEvent, isVisible]);
 
     const tabsRef = React.useRef<HTMLDivElement>(null);
     const trademark = siteConfig.trademark;

@@ -80,6 +80,7 @@ export function createDataFetcher(
             return getRevision(input, {
                 spaceId: params.spaceId,
                 revisionId: params.revisionId,
+                metadata: params.metadata ?? false,
             });
         },
         getRevisionPageByPath(params) {
@@ -87,6 +88,8 @@ export function createDataFetcher(
                 spaceId: params.spaceId,
                 revisionId: params.revisionId,
                 path: params.path,
+                metadata: params.metadata,
+                cachedMetadata: params.cachedMetadata,
             });
         },
         getRevisionPageMarkdown(params) {
@@ -317,8 +320,15 @@ const getChangeRequest = cache(
 
 // We don't use remote cache on vercel because of the 2Mb limit on cache size that makes some route crash
 const getRevision = cache(
-    async (input: DataFetcherInput, params: { spaceId: string; revisionId: string }) => {
+    async (
+        input: DataFetcherInput,
+        params: { spaceId: string; revisionId: string; metadata: boolean }
+    ) => {
         'use cache';
+        if (params.metadata) {
+            // Git paths can change without changing the content revision.
+            cacheTag(getCacheTag({ tag: 'space', space: params.spaceId }));
+        }
         return wrapDataFetcherError(async () => {
             return trace(`getRevision(${params.spaceId}, ${params.revisionId})`, async () => {
                 const api = apiClient(input);
@@ -326,7 +336,7 @@ const getRevision = cache(
                     params.spaceId,
                     params.revisionId,
                     {
-                        metadata: true,
+                        metadata: params.metadata,
                     },
                     {
                         ...noCacheFetchOptions,
@@ -430,6 +440,8 @@ const getRevisionPageMarkdown = cache(
                         {
                             format: 'markdown',
                             'format.markdown.refs': 'stable',
+                            evaluated: 'deterministic-only',
+                            metadata: false,
                         },
                         {
                             ...noCacheFetchOptions,
@@ -524,7 +536,13 @@ const getRevisionReusableContentDocument = cache(
 const getRevisionPageByPath = cache(
     async (
         input: DataFetcherInput,
-        params: { spaceId: string; revisionId: string; path: string }
+        params: {
+            spaceId: string;
+            revisionId: string;
+            path: string;
+            metadata?: boolean;
+            cachedMetadata?: boolean;
+        }
     ) => {
         'use cache';
         return wrapDataFetcherError(async () => {
@@ -533,11 +551,15 @@ const getRevisionPageByPath = cache(
                 async () => {
                     const encodedPath = encodeURIComponent(params.path);
                     const api = apiClient(input);
+                    const query = {
+                        metadata: params.metadata ?? false,
+                        cachedMetadata: params.cachedMetadata ?? false,
+                    };
                     const res = await api.spaces.getPageInRevisionByPath(
                         params.spaceId,
                         params.revisionId,
                         encodedPath,
-                        {},
+                        query,
                         {
                             ...noCacheFetchOptions,
                         }

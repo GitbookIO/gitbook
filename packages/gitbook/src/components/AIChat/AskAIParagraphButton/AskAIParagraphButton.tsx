@@ -33,7 +33,7 @@ export function AskAIParagraphButton(props: { content: string; className?: Class
             id: `text-${fnv1a(text, { size: 32 })}`,
             content: text,
         });
-        chatController.open();
+        chatController.open('hover');
         chatController.setDraft(tString(language, 'ai_chat_paragraph_draft'));
         chatController.focus();
     };
@@ -53,8 +53,10 @@ export function AskAIParagraphButton(props: { content: string; className?: Class
                 'hover:visible hover:opacity-100 group-hover/ask-ai:visible group-hover/ask-ai:opacity-100',
                 // Never shown on touch / hover-less contexts.
                 'not-pointer-fine:hidden',
-                // Hidden where an overflow-clipped ancestor would cut it off (tables, record cards).
+                // Hidden where an overflow-clipped ancestor would cut it off (ARIA and native
+                // tables, record cards).
                 'in-[[role=table]]:hidden',
+                'in-[table]:hidden',
                 'in-[[data-card]]:hidden',
                 className
             )}

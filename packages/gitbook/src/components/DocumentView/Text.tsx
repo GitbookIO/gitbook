@@ -117,8 +117,8 @@ function Color(props: MarkedLeafProps<DocumentMarkColor>) {
     return (
         <span
             className={tcls([
-                textColorToStyle[mark.data.text],
-                backgroundColorToStyle[mark.data.background],
+                textColorToStyle[mark.data.text ?? 'default'],
+                backgroundColorToStyle[mark.data.background ?? 'default'],
             ])}
         >
             {children}

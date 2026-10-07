@@ -13,6 +13,7 @@ import {
     SiteInsightsDisplayContext,
     type SiteInsightsEventLocation,
     SiteInsightsLLMSVariant,
+    SiteInsightsMarkdownSource,
 } from '@gitbook/api';
 
 import {
@@ -20,11 +21,10 @@ import {
     serveProxyAnalyticsEvent,
     trackServerInsightsEvents,
 } from './lib/tracking';
-import {
-    MAX_API_TOKEN_COOKIE_LENGTH,
-    getAPITokenFromCookies,
-    getAPITokenResponseCookies,
-} from '@/lib/api-token-cookie';
+import { AI_CATALOG_PATH, AI_CATALOG_WELL_KNOWN_PATH } from '@/lib/aiCatalog/paths';
+import { getAPITokenFromCookies, getAPITokenResponseCookies } from '@/lib/api-token-cookie';
+import { isChatGPTRequest } from '@/lib/chatgpt';
+import { MAX_CHUNKED_COOKIE_LENGTH } from '@/lib/chunked-cookies';
 import type { SiteURLData } from '@/lib/context';
 import { getContentSecurityPolicy } from '@/lib/csp';
 import { validateSerializedCustomization } from '@/lib/customization';
@@ -35,9 +35,10 @@ import {
     normalizeRequestURL,
     throwIfDataError,
 } from '@/lib/data';
-import { isGitBookAssetsHostURL, isGitBookHostURL } from '@/lib/env';
+import { GITBOOK_DISABLE_INSIGHTS, isGitBookAssetsHostURL, isGitBookHostURL } from '@/lib/env';
 import { getImageResizingContextId } from '@/lib/images';
 import { isAITrainingOrIndexingRequest } from '@/lib/indexing-crawlers';
+import { MCP_SERVER_CARD_PATH, MCP_SERVER_CARD_WELL_KNOWN_PATH } from '@/lib/mcp/paths';
 import { MiddlewareHeaders } from '@/lib/middleware';
 import {
     createOAuthProtectedResourceMetadataResponse,
@@ -57,6 +58,7 @@ import {
     getResponseCookiesForVisitorAuth,
     getVisitorData,
     getVisitorType,
+    isRevalidationRequest,
     normalizeVisitorURL,
     serveVisitorClaimsDataRequest,
 } from '@/lib/visitors';
@@ -185,6 +187,9 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
 
     //Forwards analytics events
     if (siteRequestURL.pathname.endsWith('/~gitbook/__evt')) {
+        if (GITBOOK_DISABLE_INSIGHTS) {
+            return new Response(null, { status: 204 });
+        }
         return await serveProxyAnalyticsEvent(request);
     }
 
@@ -312,18 +317,6 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
             });
         }
 
-        const normalizedSitePathname = removeLeadingSlash(
-            removeTrailingSlash(siteURLData.pathname)
-        );
-        if (normalizedSitePathname !== '~gitbook/auth/logout') {
-            cookies.push(
-                ...getResponseCookiesForVisitorAuth(
-                    getVisitorAuthBasePath(siteRequestURL, siteURLData),
-                    visitorToken
-                )
-            );
-        }
-
         // We use the host/origin from the canonical URL to ensure the links are
         // correctly generated when the site is proxied. e.g. https://proxy.gitbook.com/site/siteId/...
         const siteCanonicalURL = new URL(siteURLData.canonicalUrl);
@@ -339,7 +332,9 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         // Make sure the URL is clean of any va token after a successful lookup,
         // and of any visitor.* params that may have been passed to the URL.
         //
-        // We only redirect if the visitor token is not coming from a revalidation request, as we don't want to redirect in that case.
+        // We only redirect if the request is not coming from the revalidation worker, as we don't
+        // want to redirect in that case. It can carry unsigned claims without any token, so we rely
+        // on the request headers rather than on the visitor token source.
         //
         // The token and the visitor.* params value are stored in cookies that are set
         // on the redirect response.
@@ -347,8 +342,18 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         const normalizedVisitorURL = normalizeVisitorURL(incomingURL);
         if (
             normalizedVisitorURL.toString() !== incomingURL.toString() &&
-            visitorToken?.source !== 'revalidation'
+            !isRevalidationRequest(request.headers)
         ) {
+            if (visitorToken?.source === 'url') {
+                cookies.push(
+                    ...getResponseCookiesForVisitorAuth(
+                        getVisitorAuthBasePath(siteRequestURL, siteURLData),
+                        visitorToken,
+                        request.cookies.getAll()
+                    )
+                );
+            }
+
             return writeResponseCookies(
                 NextResponse.redirect(normalizedVisitorURL.toString()),
                 cookies
@@ -459,8 +464,13 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
             pathname,
             routeType: routeTypeFromPathname,
             events,
+            isAiAgent,
+            isChatGPT,
         } = encodePathInSiteContent(siteURLData, request);
         routeType = routeTypeFromPathname ?? routeType;
+        // Only set for Markdown and LLM routes, so these request-specific variants are cached separately.
+        stableSiteURLData.isAiAgent = isAiAgent;
+        stableSiteURLData.isChatGPT = isChatGPT;
 
         // Apply a forced theme (`?theme=`/cookie). For the docs embed we thread it through the
         // route context (`embedTheme`) so those routes stay statically rendered — it becomes part
@@ -531,6 +541,9 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         }
         if (rewrittenURL.searchParams.has('displayAgentInstructions')) {
             rewrittenURL.searchParams.delete('displayAgentInstructions');
+        }
+        if (rewrittenURL.searchParams.has('markdownSource')) {
+            rewrittenURL.searchParams.delete('markdownSource');
         }
 
         const response = NextResponse.rewrite(rewrittenURL, {
@@ -669,7 +682,7 @@ async function serveWithQueryAPIToken(input: {
     // If found, we redirect to the same URL but with the token in the cookie
     const queryAPIToken = requestURL.searchParams.get('token');
     if (queryAPIToken) {
-        if (queryAPIToken.length > MAX_API_TOKEN_COOKIE_LENGTH) {
+        if (queryAPIToken.length > MAX_CHUNKED_COOKIE_LENGTH) {
             return new Response('API token is too large', {
                 status: 400,
                 headers: { 'content-type': 'text/plain' },
@@ -759,6 +772,10 @@ const EMBED_PAGE_PATH_REGEX = /^~gitbook\/embed\/page(\/(\S*))?$/;
 const PATH_ALIASES: Record<string, string> = {
     'sitemap.md': 'llms.txt',
     '.well-known/sitemap.md': 'llms.txt',
+    // Scanners probe `.well-known` for a server card even though the MCP extension reserves
+    // `<streamable-http-url>/server-card`; both paths serve the same document.
+    [MCP_SERVER_CARD_WELL_KNOWN_PATH]: MCP_SERVER_CARD_PATH,
+    [AI_CATALOG_WELL_KNOWN_PATH]: AI_CATALOG_PATH,
 };
 
 /**
@@ -772,6 +789,10 @@ function encodePathInSiteContent(
     pathname: string;
     routeType?: 'static' | 'dynamic';
     events?: ServerInsightsEventInput[] | undefined;
+    /** Only set for markdown routes, where the output depends on the visitor being an agent. */
+    isAiAgent?: boolean;
+    /** Only set for Markdown and LLM routes, where the output content type depends on ChatGPT. */
+    isChatGPT?: boolean;
 } {
     let pathname = removeLeadingSlash(removeTrailingSlash(siteURLData.pathname));
 
@@ -813,6 +834,7 @@ function encodePathInSiteContent(
         return {
             pathname,
             routeType: 'static',
+            isChatGPT: isChatGPTRequest(request) || undefined,
             events: [
                 {
                     type: 'llms_request',
@@ -848,6 +870,7 @@ function encodePathInSiteContent(
             return {
                 pathname,
                 routeType: 'static',
+                isChatGPT: isChatGPTRequest(request) || undefined,
                 events: [
                     {
                         type: 'llms_request',
@@ -872,6 +895,8 @@ function encodePathInSiteContent(
             return { pathname, routeType: 'static' };
         case '~gitbook/mcp':
         case '~gitbook/mcp/auth':
+        case MCP_SERVER_CARD_PATH:
+        case AI_CATALOG_PATH:
         case '~gitbook/pdf':
         case '~gitbook/search':
         case '~gitbook/auth/login':
@@ -884,9 +909,8 @@ function encodePathInSiteContent(
             const aiAgentDetection = isAIAgent(request);
             // Using heuristic detection incorrectly detects some legitimate bot requests as AI agents (e.g. Slackbot)
             // We don't want to serve markdown for these requests as it can cause issues like breaking slack unfurling.
-            const shouldServeMarkdown =
-                (aiAgentDetection.detected && aiAgentDetection.method !== 'heuristic') ||
-                acceptsMarkdown(request);
+            const isAiAgent = aiAgentDetection.detected && aiAgentDetection.method !== 'heuristic';
+            const shouldServeMarkdown = isAiAgent || acceptsMarkdown(request);
             if (pathname.match(MARKDOWN_PATH_REGEX) || shouldServeMarkdown) {
                 const pagePathWithoutMD = pathname.replace(MARKDOWN_PATH_REGEX, '');
                 const searchParams = new URL(request.url).searchParams;
@@ -895,6 +919,10 @@ function encodePathInSiteContent(
                 // It is encoded as a second path segment (the route is statically rendered, so it can't
                 // read query params at runtime — the question is path-encoded for the same reason).
                 const goal = searchParams.get('goal');
+                // Validated: this is user input going into insights.
+                const markdownSource = Object.values(SiteInsightsMarkdownSource).find(
+                    (source) => source === searchParams.get('markdownSource')
+                );
                 return {
                     pathname:
                         typeof ask === 'string'
@@ -903,6 +931,9 @@ function encodePathInSiteContent(
                               }`
                             : `~gitbook/markdown/${encodePagePath(pagePathWithoutMD)}`,
                     routeType: 'static',
+                    // Left undefined for non-agents to avoid splitting the static cache for them.
+                    isAiAgent: isAiAgent || undefined,
+                    isChatGPT: isChatGPTRequest(request) || undefined,
                     // TODO: track pageId / spaceId when possible
                     // We don't do it at the moment as we can't easily extract it from the URL.
                     events: ask
@@ -918,6 +949,7 @@ function encodePathInSiteContent(
                         : [
                               {
                                   type: 'page_markdown_request',
+                                  ...(markdownSource ? { markdownSource } : {}),
                                   location: {
                                       displayContext: SiteInsightsDisplayContext.Server,
                                   },

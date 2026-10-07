@@ -71,6 +71,8 @@ const config: Config = {
             },
             fontFamily: {
                 sans: ['var(--font-content)'],
+                // Sites without a heading font of their own fall back to the content font.
+                heading: ['var(--font-heading, var(--font-content))'],
                 mono: ['var(--font-mono)'],
                 emoji: [
                     'Apple Color Emoji',

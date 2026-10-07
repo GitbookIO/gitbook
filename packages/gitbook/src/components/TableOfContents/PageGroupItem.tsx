@@ -29,7 +29,8 @@ export function PageGroupItem(props: { page: ClientTOCPageGroup; isFirst?: boole
             <div ref={sentinelRef} className="h-0" aria-hidden="true" />
             <div
                 className={tcls(
-                    '-top-4 sticky z-1 after:pointer-events-none after:absolute after:inset-x-0 after:top-full after:h-4 after:bg-linear-to-b after:from-tint-base after:to-transparent after:transition-opacity',
+                    // No opacity transition on ::after: in Chrome it leaves stale pixels over the first child after the list scrolls.
+                    '-top-4 sticky z-1 after:pointer-events-none after:absolute after:inset-x-0 after:top-full after:h-4 after:bg-linear-to-b after:from-tint-base after:to-transparent',
                     isSticking ? '' : 'after:opacity-0',
                     'mt-1 pt-2.5 pb-0',
                     'bg-tint-base',
@@ -58,7 +59,7 @@ export function PageGroupItem(props: { page: ClientTOCPageGroup; isFirst?: boole
                     className={tcls(
                         ToCButtonItemStyles,
                         'toc-group min-h-8 w-full border-0 text-left',
-                        'font-semibold text-xs uppercase tracking-wide',
+                        'font-heading font-semibold text-xs uppercase tracking-wide',
                         'appearance-none',
                         '[&_.toc-group-chevron]:transition-opacity',
                         'hover:[&_.toc-group-chevron]:opacity-11',
@@ -71,7 +72,7 @@ export function PageGroupItem(props: { page: ClientTOCPageGroup; isFirst?: boole
                     {hasDescendants ? (
                         <span
                             className={tcls(
-                                'toc-group-chevron ml-auto flex shrink-0 transition-opacity duration-150',
+                                'toc-group-chevron ml-auto mr-1 flex shrink-0 transition-opacity duration-150',
                                 isOpen
                                     ? 'pointer-events-none opacity-0 delay-75'
                                     : 'opacity-6 delay-0'
@@ -124,9 +125,9 @@ function useIsSticking() {
 
         const observer = new IntersectionObserver(
             ([entry]) => {
-                if (entry) {
-                    setIsSticking(!entry.isIntersecting);
-                }
+                if (!entry) return;
+                const rootTop = entry.rootBounds?.top ?? 0;
+                setIsSticking(!entry.isIntersecting && entry.boundingClientRect.top < rootTop);
             },
             { root: scrollParent }
         );

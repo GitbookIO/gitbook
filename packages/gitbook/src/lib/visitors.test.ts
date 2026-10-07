@@ -2,12 +2,15 @@ import { describe, expect, it } from 'bun:test';
 import type { JwtPayload } from 'jwt-decode';
 
 import {
+    type ResponseCookies,
+    getResponseCookiesForVisitorAuth,
     getVisitorAuthCookieMaxAge,
     getVisitorAuthCookieName,
     getVisitorAuthCookieValue,
     getVisitorToken,
     getVisitorType,
     getVisitorUnsignedClaims,
+    isRevalidationRequest,
     normalizeVisitorURL,
 } from './visitors';
 
@@ -221,6 +224,99 @@ describe('getVisitorAuthToken', () => {
                 token: 'token-in-query',
             });
         });
+    });
+});
+
+// The chunking mechanics themselves are covered in api-token-cookie.test.ts;
+// these tests cover the wiring into the visitor auth cookie.
+describe('getResponseCookiesForVisitorAuth write policy', () => {
+    const base64url = (value: object) => Buffer.from(JSON.stringify(value)).toString('base64url');
+    const token = `${base64url({ alg: 'none' })}.${base64url({ exp: 2_000_000_000 })}.sig`;
+
+    it('persists a token that arrived in the URL', () => {
+        expect(getResponseCookiesForVisitorAuth('/', { source: 'url', token })).toHaveLength(1);
+    });
+
+    it('only accepts a token that arrived in the URL', () => {
+        const fromVACookie = { source: 'visitor-auth-cookie', basePath: '/', token } as const;
+        const fromCustomCookie = { source: 'gitbook-visitor-cookie', token } as const;
+
+        // @ts-expect-error a token read back from a VA cookie must never be persisted again
+        const buildFromVACookie = () => getResponseCookiesForVisitorAuth('/', fromVACookie);
+        // @ts-expect-error a custom visitor cookie is owned by the customer's backend
+        const buildFromCustom = () => getResponseCookiesForVisitorAuth('/', fromCustomCookie);
+
+        expect([buildFromVACookie, buildFromCustom]).toHaveLength(2);
+    });
+});
+
+describe('getResponseCookiesForVisitorAuth chunking', () => {
+    const base64url = (value: object) => Buffer.from(JSON.stringify(value)).toString('base64url');
+
+    // Build a decodable JWT of an arbitrary length by padding the signature part.
+    const makeJwt = (length = 200) => {
+        const jwt = `${base64url({ alg: 'none' })}.${base64url({ exp: 2_000_000_000 })}.`;
+        return jwt.padEnd(length, 's');
+    };
+
+    const write = (basePath: string, token: string, previous: ResponseCookies = []) =>
+        getResponseCookiesForVisitorAuth(basePath, { source: 'url', token }, previous);
+
+    const read = (cookies: ResponseCookies, urlPath = '/') =>
+        getVisitorToken({
+            cookies,
+            headers: new Headers(),
+            url: new URL(`https://example.com${urlPath}`),
+        });
+
+    it('keeps small tokens in a single cookie', () => {
+        const token = makeJwt();
+        const cookies = write('/', token);
+
+        expect(cookies).toHaveLength(1);
+        expect(cookies[0]?.value).toBe(getVisitorAuthCookieValue('/', token));
+        expect(read(cookies)).toEqual({ source: 'visitor-auth-cookie', basePath: '/', token });
+    });
+
+    it('round-trips an oversized token through chunked cookies', () => {
+        const token = makeJwt(9_000);
+        const cookies = write('/', token);
+
+        expect(cookies).toHaveLength(4); // chunk-count marker + 3 chunks
+        for (const cookie of cookies) {
+            expect(cookie.options).toMatchObject({ httpOnly: true });
+            expect(cookie.options?.maxAge).toBeGreaterThan(0);
+        }
+        expect(read(cookies)).toEqual({ source: 'visitor-auth-cookie', basePath: '/', token });
+    });
+
+    it('treats a missing chunk as no token', () => {
+        const cookies = write('/', makeJwt(9_000));
+        const chunkName = `${getVisitorAuthCookieName('/')}-1`;
+        expect(cookies.some(({ name }) => name === chunkName)).toBe(true);
+
+        expect(read(cookies.filter(({ name }) => name !== chunkName))).toBeUndefined();
+    });
+
+    it('expires stale chunks when a smaller token is written', () => {
+        const cookies = write('/', makeJwt(), write('/', makeJwt(9_000)));
+
+        const staleChunks = cookies.filter(({ options }) => options?.maxAge === 0);
+        expect(staleChunks.map(({ name }) => name)).toEqual(
+            [0, 1, 2].map((index) => `${getVisitorAuthCookieName('/')}-${index}`)
+        );
+    });
+
+    it('scopes chunked cookies to the base path', () => {
+        const token = makeJwt(9_000);
+        const cookies = write('/hello/', token);
+
+        expect(read(cookies, '/hello/world')).toEqual({
+            source: 'visitor-auth-cookie',
+            basePath: '/hello/',
+            token,
+        });
+        expect(read(cookies, '/other/page')).toBeUndefined();
     });
 });
 
@@ -488,5 +584,18 @@ describe('getVisitorType', () => {
     it('should default to "human" when the user-agent is missing or empty', () => {
         expect(getVisitorType(requestWith({}))).toBe('human');
         expect(getVisitorType(requestWith({ 'user-agent': '' }))).toBe('human');
+    });
+});
+
+describe('isRevalidationRequest', () => {
+    it('should detect the revalidation worker regardless of casing', () => {
+        expect(
+            isRevalidationRequest(new Headers({ 'User-Agent': 'GitBook-Open-Revalidation-Worker' }))
+        ).toBe(true);
+    });
+
+    it('should not detect a regular request', () => {
+        expect(isRevalidationRequest(new Headers({ 'User-Agent': 'Mozilla/5.0' }))).toBe(false);
+        expect(isRevalidationRequest(new Headers())).toBe(false);
     });
 });

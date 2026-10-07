@@ -79,6 +79,18 @@ export const GITBOOK_DISABLE_TRACKING = Boolean(
 );
 
 /**
+ * Whether insights events must not reach the sites' analytics, while the pages otherwise behave
+ * like production. Set on the preview deployments, whose traffic is e2e runs, not the sites'.
+ */
+export const GITBOOK_DISABLE_INSIGHTS = process.env.GITBOOK_DISABLE_INSIGHTS === 'true';
+
+/**
+ * Whether to resolve site content with the full URL only, skipping the shorter lookup alternatives.
+ */
+export const GITBOOK_DISABLE_LOOKUP_ALTERNATIVES =
+    process.env.GITBOOK_DISABLE_LOOKUP_ALTERNATIVES === 'true';
+
+/**
  * Hostname serving the integrations.
  */
 export const GITBOOK_INTEGRATIONS_HOST =

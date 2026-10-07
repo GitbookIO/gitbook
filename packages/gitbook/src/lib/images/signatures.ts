@@ -10,12 +10,12 @@ import { getLogger } from '@/lib/logger';
  * GitBook has supported different version of image signing in the past. To maintain backwards
  * compatibility, we retain the ability to verify older signatures.
  */
-export type SignatureVersion = '0' | '1' | '2';
+export type SignatureVersion = '0' | '1' | '2' | '3';
 
 /**
  * The current version of the signature.
  */
-export const CURRENT_SIGNATURE_VERSION: SignatureVersion = '2';
+export const CURRENT_SIGNATURE_VERSION: SignatureVersion = '3';
 
 type SignFnInput = {
     url: string;
@@ -34,29 +34,56 @@ export async function verifyImageSignature(
     const generator = IMAGE_SIGNATURE_FUNCTIONS[version];
     const generated = await generator(input);
 
+    const matches = safeCompare(generated, signature);
+
     const logger = getLogger().subLogger('imageResizing');
-    if (generated !== signature) {
+    if (!matches) {
         // We only log if the signature does not match, to avoid logging useless information
         logger.log(
             `comparing image signature for "${input.url}" on identifier "${input.imagesContextId}": "${generated}" (expected) === "${signature}" (actual)`
         );
     }
-    return generated === signature;
+    return matches;
 }
 
 /**
  * Generate an image signature. Also returns the version of the image signing algorithm that was used.
- *
- * This function is sync. If you need to implement an async version of image signing, you'll need to change
- * ths signature of this fn and where it's used.
  */
 export async function generateImageSignature(input: SignFnInput): Promise<{
     signature: string;
     version: SignatureVersion;
 }> {
-    const result = await generateSignatureV2(input);
+    const result = await generateSignatureV3(input);
     return { signature: result, version: CURRENT_SIGNATURE_VERSION };
 }
+
+/**
+ * The signature is truncated to 128 bits: enough to make forgery infeasible, while keeping
+ * image URLs short as a page can contain many of them.
+ */
+const SIGNATURE_V3_BYTES = 16;
+
+/**
+ * Same inputs as the v2 algorithm, but hashed with SHA-256 instead of FNV-1a.
+ * FNV-1a is not a cryptographic hash, so a v2 signature is not a sound authentication token.
+ *
+ * We use the Web Crypto API rather than `node:crypto` because signatures are verified from the
+ * middleware, which is bundled for the Cloudflare edge runtime where `node:crypto` is external.
+ */
+const generateSignatureV3: SignFn = async (input) => {
+    assert(GITBOOK_IMAGE_RESIZE_SIGNING_KEY, 'GITBOOK_IMAGE_RESIZE_SIGNING_KEY is not set');
+    const all = [
+        input.url,
+        input.imagesContextId, // The hostname is used to avoid serving images from other sites on the same domain
+        // Kept last so a known prefix can never be length-extended into a valid signature.
+        GITBOOK_IMAGE_RESIZE_SIGNING_KEY,
+    ]
+        .filter(Boolean)
+        .join(':');
+
+    const hash = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(all));
+    return toHex(new Uint8Array(hash, 0, SIGNATURE_V3_BYTES));
+};
 
 // Reused buffer for FNV-1a hashing in the v2 algorithm
 const fnv1aUtf8Buffer = new Uint8Array(512);
@@ -102,12 +129,14 @@ const generateSignatureV0: SignFn = async (input) => {
     assert(GITBOOK_IMAGE_RESIZE_SIGNING_KEY, 'GITBOOK_IMAGE_RESIZE_SIGNING_KEY is not set');
     const all = [input.url, GITBOOK_IMAGE_RESIZE_SIGNING_KEY].filter(Boolean).join(':');
     const hash = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(all));
-
-    // Convert ArrayBuffer to hex string
-    const hashArray = Array.from(new Uint8Array(hash));
-    const hashHex = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
-    return hashHex;
+    return toHex(new Uint8Array(hash));
 };
+
+function toHex(bytes: Uint8Array): string {
+    return Array.from(bytes)
+        .map((b) => b.toString(16).padStart(2, '0'))
+        .join('');
+}
 
 /**
  * A mapping of signature versions to signature functions.
@@ -116,8 +145,25 @@ const IMAGE_SIGNATURE_FUNCTIONS: Record<SignatureVersion, SignFn> = {
     '0': generateSignatureV0,
     '1': generateSignatureV1,
     '2': generateSignatureV2,
+    '3': generateSignatureV3,
 };
 
 export function isSignatureVersion(input: string): input is SignatureVersion {
     return Object.keys(IMAGE_SIGNATURE_FUNCTIONS).includes(input);
+}
+
+/**
+ * Compare two signatures in constant time, to avoid leaking a valid signature byte by byte.
+ * We can't use `node:crypto`'s `timingSafeEqual` as this also runs on the edge runtime.
+ */
+function safeCompare(expected: string, actual: string): boolean {
+    if (expected.length !== actual.length) {
+        return false;
+    }
+
+    let diff = 0;
+    for (let i = 0; i < expected.length; i++) {
+        diff |= expected.charCodeAt(i) ^ actual.charCodeAt(i);
+    }
+    return diff === 0;
 }

@@ -26,8 +26,13 @@ import { AnnouncementDismissedScript } from '../Announcement';
 import { SelectStateScript } from '../Select';
 import { OperatingSystemClassScript } from './OperatingSystemClassScript';
 import { RootLayoutClientContexts } from './RootLayoutClientContexts';
-import { type FontData, getFontData } from '@/fonts';
-import { fontNotoColorEmoji, fonts } from '@/fonts/default';
+import {
+    DEFAULT_MONOSPACE_FONT,
+    type FontData,
+    generateEmojiFontFacesCSS,
+    getFontData,
+    getHeadingFont,
+} from '@/fonts';
 import './globals.css';
 import { getContentLocale, getSpaceLanguage } from '@/intl/server';
 import { getAssetURL } from '@/lib/assets';
@@ -91,16 +96,20 @@ export async function CustomizationRootLayout(props: {
     const fontData = getFontData(customization.styling.font, 'content');
     // Temporarily add a if here while the cache is being warmed up.
     // We can remove the condition after 14-07-2025.
-    const monospaceFontData = customization.styling.monospaceFont
-        ? getFontData(customization.styling.monospaceFont, 'mono')
-        : {
-              type: 'default' as const,
-              variable: fonts.IBMPlexMono.variable,
-          };
+    const monospaceFontData = getFontData(
+        customization.styling.monospaceFont ?? DEFAULT_MONOSPACE_FONT,
+        'mono'
+    );
+    // Only set when headings use a font of their own; otherwise they inherit `--font-content`.
+    const headingFont = getHeadingFont(customization);
+    const headingFontData = headingFont ? getFontData(headingFont, 'heading') : null;
 
     // Preconnect and preload custom fonts if needed
     preloadFont(fontData);
     preloadFont(monospaceFontData);
+    if (headingFontData) {
+        preloadFont(headingFontData);
+    }
     const iconStyle = getCustomizationIconStyle(customization);
     const iconSources = await getInlineIconSources([
         ...getDefaultInlineIconSourceRequests(iconStyle),
@@ -127,11 +136,11 @@ export async function CustomizationRootLayout(props: {
                 sidebarStyles.list && `sidebar-list-${sidebarStyles.list}`,
                 'links' in customization.styling && `links-${customization.styling.links}`,
                 'depth' in customization.styling && `depth-${customization.styling.depth}`,
-                fontNotoColorEmoji.variable,
-                monospaceFontData.type === 'default' ? monospaceFontData.variable : null,
-                fontData.type === 'default'
-                    ? [fontData.variable, `font-${customization.styling.font}`]
+                typeof customization.styling.font === 'string'
+                    ? `font-${customization.styling.font}`
                     : null,
+                headingFont ? 'has-heading-font' : null,
+                typeof headingFont === 'string' ? `heading-font-${headingFont}` : null,
 
                 // Set the dark/light class statically to avoid flashing and make it work when JS is disabled
                 (forcedTheme ?? customization.themes.default) === CustomizationDefaultThemeMode.Dark
@@ -150,11 +159,11 @@ export async function CustomizationRootLayout(props: {
                 {/* Apply the visitor's content selection to <html> before first paint (no flash) */}
                 <SelectStateScript />
 
-                {/* Inject custom font @font-face rules */}
-                {fontData.type === 'custom' ? <style>{fontData.fontFaceRules}</style> : null}
-                {monospaceFontData.type === 'custom' ? (
-                    <style>{monospaceFontData.fontFaceRules}</style>
-                ) : null}
+                {/* Only the picked families, so the head never carries every font we support */}
+                <style>{generateEmojiFontFacesCSS()}</style>
+                <style>{fontData.fontFaceRules}</style>
+                <style>{monospaceFontData.fontFaceRules}</style>
+                {headingFontData ? <style>{headingFontData.fontFaceRules}</style> : null}
 
                 {/* Inject a script to detect if the announcmeent banner has been dismissed */}
                 {'announcement' in customization && customization.announcement?.enabled ? (

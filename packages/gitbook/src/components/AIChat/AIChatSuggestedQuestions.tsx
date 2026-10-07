@@ -1,7 +1,5 @@
 import type { AIChatController } from '../AI';
 import { Button } from '../primitives';
-import { useRecentSearchQueries } from '../Search/recent-queries';
-import { useCurrentContent } from '@/components/hooks';
 import { tString, useLanguage } from '@/intl/client';
 
 export default function AIChatSuggestedQuestions(props: {
@@ -9,8 +7,6 @@ export default function AIChatSuggestedQuestions(props: {
     suggestions?: string[];
 }) {
     const language = useLanguage();
-    const { siteSpaceId } = useCurrentContent();
-    const recentQueries = useRecentSearchQueries(siteSpaceId ?? '');
     const { chatController, suggestions: configuredSuggestions } = props;
 
     const defaultSuggestions = [
@@ -18,22 +14,13 @@ export default function AIChatSuggestedQuestions(props: {
         tString(language, 'ai_chat_suggested_questions_read_next'),
         tString(language, 'ai_chat_suggested_questions_example'),
     ];
-    const baseSuggestions =
-        configuredSuggestions && configuredSuggestions.length > 0
-            ? configuredSuggestions
-            : defaultSuggestions;
-
-    const suggestions = [
-        ...recentQueries.filter((entry) => entry.action === 'ask').map((entry) => entry.query),
-        ...baseSuggestions,
-    ].reduce<string[]>((acc, suggestion) => {
-        if (acc.includes(suggestion)) {
-            return acc;
-        }
-
-        acc.push(suggestion);
-        return acc;
-    }, []);
+    const suggestions = Array.from(
+        new Set(
+            configuredSuggestions && configuredSuggestions.length > 0
+                ? configuredSuggestions
+                : defaultSuggestions
+        )
+    );
 
     return (
         <div

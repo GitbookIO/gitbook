@@ -1,0 +1,30 @@
+name: Slack PR reactions
+
+on:
+    pull_request_review:
+        types: [submitted]
+    pull_request:
+        types: [closed]
+
+permissions:
+    contents: read
+    pull-requests: read
+
+jobs:
+    run_slapr:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Update PR reactions in engineering
+              uses: DataDog/slapr@1c074e1dfd433f91a679d5113f7f8b956b65d973
+              with:
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
+                  slack-api-token: ${{ secrets.SLAPR_SLACK_BOT_TOKEN }}
+                  slack-channel-id: C01NXGWJELS
+                  bot-user-id: ${{ vars.SLAPR_BOT_USER_ID }}
+                  emoji-review-started: eyes
+                  emoji-partially-approved: next_track_button
+                  emoji-approved: pr-approved
+                  emoji-changes-requested: construction
+                  emoji-merged: merged
+                  emoji-closed: no_entry_sign
+                  emoji-commented: speech_balloon

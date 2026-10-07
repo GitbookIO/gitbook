@@ -11,6 +11,8 @@ export const de: TranslationLanguage = {
     switch_to_system_theme: 'Zum Systemmodus wechseln',
     search: 'Suche',
     clear: 'Löschen',
+    table_filtered_by_selection: 'Entspricht Auswahl: ${1}',
+    table_clear_selection: 'Auswahl zurücksetzen',
     tags: 'Tags',
     search_back: 'Zurück zu den Suchergebnissen',
     search_or_ask: 'Fragen oder Suchen',
@@ -78,12 +80,16 @@ export const de: TranslationLanguage = {
     notfound_link:
         'Dieser Link verweist auf eine Seite, die entfernt wurde oder nicht mehr existiert.',
     notfound: 'Die gesuchte Seite existiert nicht.',
-    notfound_adaptive_title: 'Seite nicht verfügbar',
+    notfound_adaptive_title: 'Melden Sie sich an, um diese Seite anzuzeigen',
     notfound_adaptive:
-        'Diese Seite existiert möglicherweise, aber Sie müssen sich eventuell anmelden, um darauf zuzugreifen.',
+        'Für diese Seite ist möglicherweise eine Anmeldung erforderlich. Wenn Sie einem Link gefolgt sind, prüfen Sie, ob er korrekt ist.',
     notfound_adaptive_login: 'Anmelden',
     notfound_adaptive_registration_hint:
         'Die Registrierung ist je nach Organisation möglicherweise verfügbar.',
+    notfound_adaptive_no_access_title: 'Sie haben möglicherweise keinen Zugriff auf diese Seite',
+    notfound_adaptive_no_access:
+        'Diese Seite existiert möglicherweise nicht, oder Ihr Konto hat keinen Zugriff darauf. Wenn Sie einem Link gefolgt sind, prüfen Sie, ob er korrekt ist.',
+    notfound_adaptive_login_again: 'Erneut anmelden',
     notfound_goto_home: 'Zur Startseite',
     notfound_suggestions_title: 'Vielleicht suchen Sie nach',
     unexpected_error_title: 'Ein Fehler ist aufgetreten',
@@ -156,6 +162,7 @@ export const de: TranslationLanguage = {
     ai_chat_tools_submit_feedback: 'Feedback senden',
     ai_chat_tools_submit_assistant_feedback: 'Vorherige Assistenten-Nachricht als ${1} bewerten',
     ai_chat_tools_submitted_feedback: 'Feedback gesendet',
+    ai_chat_tools_shared_feedback_with_team: 'Feedback an das Dokumentationsteam gesendet',
     ai_chat_tools_mcp_tool: '${1} aufgerufen',
     ai_chat_ask: '${1} fragen',
     ai_chat_ask_about: '${1} zu ${2} befragen',
@@ -189,4 +196,23 @@ export const de: TranslationLanguage = {
     form_other_field: 'Sonstiges...',
     cancel: 'Abbrechen',
     direct_link_to_heading: 'Direkter Link zur Überschrift',
+    auth_consent_request: '${1} möchte in Ihrem Namen auf ${2} zugreifen.',
+    auth_client_website: 'Website',
+    auth_verified: 'Verifiziert',
+    auth_unverified: 'Nicht verifiziert',
+    auth_unverified_title: 'GitBook hat diesen Client nicht verifiziert',
+    auth_unverified_description:
+        'Genehmigen Sie nur, wenn Sie diese Anwendung kennen und ihr den Zugriff auf ${1} zutrauen.',
+    auth_code_preamble:
+        'Nach der Genehmigung wird ein Autorisierungscode an folgende Adresse gesendet:',
+    auth_redirect_uri_label: 'Weiterleitungs-URI',
+    auth_trust_client: 'Ich kenne diesen Client und vertraue ihm',
+    auth_approve: 'Genehmigen',
+    auth_deny: 'Ablehnen',
+    auth_error_title: 'Etwas ist schiefgelaufen',
+    auth_expired_title: 'Dieser Autorisierungslink ist abgelaufen',
+    auth_expired_description: 'Bitte starten Sie die Anmeldung erneut in der Anwendung.',
+    auth_error_invalid_request: 'Ungültige Anfrage. Bitte starten Sie erneut in der Anwendung.',
+    auth_error_failed:
+        'Die Autorisierung konnte nicht abgeschlossen werden. Die Anfrage ist möglicherweise abgelaufen — bitte starten Sie erneut in der Anwendung.',
 };

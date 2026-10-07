@@ -1,6 +1,8 @@
 'use client';
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 
+import { resolveOverflowingItems } from './listOverflow';
+
 interface OverflowState {
     /**
      * Ref for the container element.
@@ -24,12 +26,23 @@ interface OverflowState {
  * Detects which items are overflowing in a horizontal list.
  * The items must have unique IDs set on their elements.
  *
- * In the measuring phase indicated by `isMeasuring`, all items must be rendered.
+ * In the measuring phase indicated by `isMeasuring`, all items must be rendered. Whatever the list
+ * shows *because* items overflow (a "more" menu, say) has to be rendered ahead of the items in that
+ * phase: the measurement discounts the space taken before the first item, so a list that fits on its
+ * own is not reported as overflowing merely because that menu was reserving room for itself.
  */
 export function useListOverflow(): OverflowState {
     const containerRef = useRef<HTMLDivElement>(null);
     const [overflowing, setOverflowing] = useState<Set<string>>(new Set());
-    const [isMeasuring, setIsMeasuring] = useState(false);
+    // Measuring is a request/completed pair of counters rather than a boolean, because a boolean
+    // reset can be swallowed: the observer re-arms measuring from a rAF, and when that lands in the
+    // same batch as the measure effect's reset the net value is unchanged, so React bails out and the
+    // effect — keyed on that value — never runs again, leaving the list stuck measuring with its
+    // "more" menu permanently on show. Counters only increase, so a request can't cancel a
+    // completion; it just queues another pass.
+    const [measureRequest, setMeasureRequest] = useState(0);
+    const [measureCompleted, setMeasureCompleted] = useState(0);
+    const isMeasuring = measureRequest !== measureCompleted;
     const itemRefs = useRef(new Map<string, HTMLElement>());
     const rafRef = useRef(0);
 
@@ -43,19 +56,19 @@ export function useListOverflow(): OverflowState {
         };
     }, []);
 
+    const requestMeasure = useCallback(() => setMeasureRequest((request) => request + 1), []);
+
     // Measure on mount and when container size changes
     useEffect(() => {
         if (!containerRef.current) {
             return;
         }
 
-        setIsMeasuring(true);
+        requestMeasure();
 
         const ro = new ResizeObserver(() => {
             cancelAnimationFrame(rafRef.current);
-            rafRef.current = requestAnimationFrame(() => {
-                setIsMeasuring(true);
-            });
+            rafRef.current = requestAnimationFrame(requestMeasure);
         });
 
         ro.observe(containerRef.current);
@@ -64,7 +77,7 @@ export function useListOverflow(): OverflowState {
             ro.disconnect();
             cancelAnimationFrame(rafRef.current);
         };
-    }, []);
+    }, [requestMeasure]);
 
     // Measure which items are overflowing
     useLayoutEffect(() => {
@@ -72,29 +85,32 @@ export function useListOverflow(): OverflowState {
             return;
         }
 
-        const containerRect = containerRef.current.getBoundingClientRect();
-        const newOverflowing = new Set<string>();
+        const newOverflowing = resolveOverflowingItems(
+            containerRef.current.getBoundingClientRect(),
+            Array.from(itemRefs.current, ([id, element]) => ({
+                id,
+                rect: element.getBoundingClientRect(),
+            }))
+        );
 
-        itemRefs.current.forEach((el, id) => {
-            const elRect = el.getBoundingClientRect();
-            if (elRect.right > containerRect.right + 1) {
-                newOverflowing.add(id);
-            }
-        });
-
-        setOverflowing((previous) => {
-            if (previous.size !== newOverflowing.size) {
-                return newOverflowing;
-            }
-            for (const id of previous) {
-                if (!newOverflowing.has(id)) {
+        // `null` means the measurement said nothing (hidden ancestor, or no items) — keep what we
+        // had and wait for the observer to fire once it is visible.
+        if (newOverflowing) {
+            setOverflowing((previous) => {
+                if (previous.size !== newOverflowing.size) {
                     return newOverflowing;
                 }
-            }
-            return previous;
-        });
-        setIsMeasuring(false);
-    }, [isMeasuring]);
+                for (const id of previous) {
+                    if (!newOverflowing.has(id)) {
+                        return newOverflowing;
+                    }
+                }
+                return previous;
+            });
+        }
+
+        setMeasureCompleted(measureRequest);
+    }, [isMeasuring, measureRequest]);
 
     return { containerRef, itemRef, overflowing, isMeasuring };
 }

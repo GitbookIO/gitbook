@@ -6,11 +6,14 @@ import React from 'react';
 import { ContentKit, type ContentKitClientContextData } from '@gitbook/react-contentkit/client';
 
 import type { WebframePageContext } from './adaptive';
-import { useAdaptiveVisitor } from '@/components/Adaptive';
+import { useAdaptiveVisitorAsync } from '@/components/Adaptive';
 import { NavigationStatusContext } from '@/components/hooks';
 import { type GitBookLinker, createLinker } from '@/lib/links';
 
 type ContentKitProps<RenderContext> = React.ComponentProps<typeof ContentKit<RenderContext>>;
+
+// Query params a webframe may set when navigating: the search/ask widget params (see `useSearch`).
+const ALLOWED_NAVIGATE_QUERY_PARAMS = ['q', 'ask', 'scope', 'section'];
 
 /** Serializable inputs to rebuild the tested linker on the client (functions can't cross the RSC boundary). */
 export type WebframeLinkerData = Pick<
@@ -37,7 +40,12 @@ export function ContentKitWithClientContext<RenderContext>(
 
     const router = useRouter();
     const { onNavigationClick } = React.useContext(NavigationStatusContext);
-    const getAdaptiveVisitorClaims = useAdaptiveVisitor();
+    const loadAdaptiveVisitorClaims = useAdaptiveVisitorAsync();
+
+    const getVisitorContext = React.useCallback(async () => {
+        const visitorClaims = await loadAdaptiveVisitorClaims();
+        return { visitor: visitorClaims?.visitor ?? null };
+    }, [loadAdaptiveVisitorClaims]);
 
     // Rebuild the (tested) linker on the client so navigation resolves paths exactly like the rest
     // of the app, instead of duplicating the join logic here.
@@ -52,24 +60,24 @@ export function ContentKitWithClientContext<RenderContext>(
         },
         [onNavigationClick, router]
     );
-    // Read during render (Suspense) only when the integration is allowed visitor claims, so that
-    // webframes that don't use visitor claims don't suspend on the visitor-claims fetch.
-    const visitorClaims = canAccessVisitorClaims ? getAdaptiveVisitorClaims() : null;
-
     const clientContext = React.useMemo<ContentKitClientContextData>(
         () => ({
-            getVisitorContext: canAccessVisitorClaims
-                ? () => ({ visitor: visitorClaims?.visitor ?? null })
-                : undefined,
+            getVisitorContext: canAccessVisitorClaims ? getVisitorContext : undefined,
             getPageContext: page ? () => ({ page }) : undefined,
-            navigate: ({ path, anchor }) => {
+            navigate: ({ path, anchor, query }) => {
                 // Resolve the requested path relative to the site root so a webframe can navigate
                 // to any section or space within the site (and nowhere outside it).
-                const suffix = anchor ? `#${anchor}` : '';
-                navigateTo(linker.toPathInSite(path) + suffix);
+                const params = new URLSearchParams(
+                    Object.entries(query ?? {}).filter(([key]) =>
+                        ALLOWED_NAVIGATE_QUERY_PARAMS.includes(key)
+                    )
+                ).toString();
+                const search = params ? `?${params}` : '';
+                const hash = anchor ? `#${anchor}` : '';
+                navigateTo(linker.toPathInSite(path) + search + hash);
             },
         }),
-        [canAccessVisitorClaims, visitorClaims, page, linker, navigateTo]
+        [canAccessVisitorClaims, getVisitorContext, page, linker, navigateTo]
     );
 
     return <ContentKit {...contentKitProps} clientContext={clientContext} />;

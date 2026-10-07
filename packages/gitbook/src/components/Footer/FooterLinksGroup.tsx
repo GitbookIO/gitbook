@@ -19,7 +19,7 @@ export function FooterLinksGroup(props: {
 
     return (
         <nav className="flex flex-col gap-4 text-sm">
-            <h4 className="font-semibold">{title}</h4>
+            <h4 className="font-heading font-semibold">{title}</h4>
             <ul className="flex flex-col items-start gap-4">
                 {group.links.map((link, index) => {
                     return (

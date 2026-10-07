@@ -49,15 +49,15 @@ export default async function Page(props: {
     const interactionId = searchParams.gb_oauth_state;
 
     if (!interactionId || !jwtToken) {
-        return <ConsentError />;
+        return <ConsentError context={context} />;
     }
 
     try {
         const consent = await startSiteOAuthConsent({ siteId, interactionId, jwtToken });
-        return <ConsentScreen siteId={siteId} siteTitle={context.site.title} consent={consent} />;
+        return <ConsentScreen siteId={siteId} context={context} consent={consent} />;
     } catch (error) {
         if (error instanceof SiteOAuthConsentError) {
-            return <ConsentError />;
+            return <ConsentError context={context} />;
         }
         throw error;
     }

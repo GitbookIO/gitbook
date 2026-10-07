@@ -11,6 +11,8 @@ export const no: TranslationLanguage = {
     switch_to_system_theme: 'Bytt til systemtema',
     search: 'Søk',
     clear: 'Tøm',
+    table_filtered_by_selection: 'Samsvarer med valg: ${1}',
+    table_clear_selection: 'Fjern valg',
     tags: 'Tagger',
     search_back: 'Tilbake til søkeresultater',
     search_or_ask: 'Spør eller søk',
@@ -77,11 +79,16 @@ export const no: TranslationLanguage = {
     notfound_link:
         'Denne lenken peker til en side som har blitt fjernet eller ikke lenger eksisterer.',
     notfound: 'Siden du leter etter eksisterer ikke.',
-    notfound_adaptive_title: 'Siden er ikke tilgjengelig',
-    notfound_adaptive: 'Denne siden kan finnes, men du må kanskje logge inn for å få tilgang.',
+    notfound_adaptive_title: 'Logg inn for å se denne siden',
+    notfound_adaptive:
+        'Denne siden kan kreve at du logger inn. Hvis du fulgte en lenke, sjekk at den er riktig.',
     notfound_adaptive_login: 'Logg inn',
     notfound_adaptive_registration_hint:
         'Registrering kan være tilgjengelig avhengig av organisasjonen.',
+    notfound_adaptive_no_access_title: 'Du har kanskje ikke tilgang til denne siden',
+    notfound_adaptive_no_access:
+        'Denne siden finnes kanskje ikke, eller kontoen din har kanskje ikke tilgang til den. Hvis du fulgte en lenke, sjekk at den er riktig.',
+    notfound_adaptive_login_again: 'Logg inn på nytt',
     notfound_goto_home: 'Gå til forsiden',
     notfound_suggestions_title: 'Kanskje du leter etter',
     unexpected_error_title: 'En feil oppstod',
@@ -151,6 +158,7 @@ export const no: TranslationLanguage = {
     ai_chat_tools_submit_feedback: 'Send tilbakemelding',
     ai_chat_tools_submit_assistant_feedback: 'Vurder assistentens forrige melding som ${1}',
     ai_chat_tools_submitted_feedback: 'Tilbakemelding sendt',
+    ai_chat_tools_shared_feedback_with_team: 'Tilbakemelding sendt til dokumentasjonsteamet',
     ai_chat_tools_mcp_tool: 'Kalte ${1}',
     ai_chat_ask: 'Spør ${1}',
     ai_chat_ask_about: 'Spør ${1} om ${2}',
@@ -184,4 +192,22 @@ export const no: TranslationLanguage = {
     form_other_field: 'Annet...',
     cancel: 'Avbryt',
     direct_link_to_heading: 'Direkte lenke til overskriften',
+    auth_consent_request: '${1} vil få tilgang til ${2} på dine vegne.',
+    auth_client_website: 'Nettsted',
+    auth_verified: 'Verifisert',
+    auth_unverified: 'Ikke verifisert',
+    auth_unverified_title: 'GitBook har ikke verifisert denne klienten',
+    auth_unverified_description:
+        'Godkjenn bare hvis du kjenner igjen dette programmet og stoler på at det får tilgang til ${1}.',
+    auth_code_preamble: 'Etter godkjenning sendes en autorisasjonskode til:',
+    auth_redirect_uri_label: 'Omdirigerings-URI',
+    auth_trust_client: 'Jeg kjenner igjen og stoler på denne klienten',
+    auth_approve: 'Godkjenn',
+    auth_deny: 'Avslå',
+    auth_error_title: 'Noe gikk galt',
+    auth_expired_title: 'Denne autorisasjonslenken er utløpt',
+    auth_expired_description: 'Start innloggingen på nytt fra programmet.',
+    auth_error_invalid_request: 'Ugyldig forespørsel. Start på nytt fra programmet.',
+    auth_error_failed:
+        'Vi kunne ikke fullføre autorisasjonen. Forespørselen kan ha utløpt — start på nytt fra programmet.',
 };

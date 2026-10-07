@@ -5,18 +5,13 @@ import { useCallback, useSyncExternalStore } from 'react';
 import { selectStore } from '@/lib/select';
 
 /**
- * Subscribe to the site-wide `select` state. Returns the current recency list plus the setters.
- * Consumers that only need "which of my options is active" should prefer {@link useResolvedSlug}.
+ * Setters for the site-wide `select` state. Deliberately does not subscribe: the store notifies on
+ * every activation anywhere on the page, so returning the recency list here would re-render every
+ * block that only ever wanted to *write* a selection. To read one, use {@link useResolvedSlug},
+ * which re-renders a block only when its own resolved option changes.
  */
 export function useSelect() {
-    const slugs = useSyncExternalStore(
-        selectStore.subscribe,
-        selectStore.getState,
-        selectStore.getState
-    ).slugs;
-
     return {
-        slugs,
         activate: selectStore.activate,
         deactivate: selectStore.deactivate,
     };

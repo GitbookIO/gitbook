@@ -1,0 +1,22 @@
+{
+    "display_information": {
+        "name": "PR Status",
+        "description": "Updates PR status reactions in engineering"
+    },
+    "features": {
+        "bot_user": {
+            "display_name": "PR Status",
+            "always_online": false
+        }
+    },
+    "oauth_config": {
+        "scopes": {
+            "bot": ["channels:history", "reactions:read", "reactions:write"]
+        }
+    },
+    "settings": {
+        "org_deploy_enabled": false,
+        "socket_mode_enabled": false,
+        "token_rotation_enabled": false
+    }
+}

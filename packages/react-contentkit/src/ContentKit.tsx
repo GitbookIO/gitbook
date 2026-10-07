@@ -192,18 +192,21 @@ export function ContentKit<RenderContext>(props: {
         };
     }, [update, security, clientContext, current.state, current.input.context, setCurrent, render]);
 
-    const onSubViewAction = React.useCallback(async (action: ContentKitAction) => {
-        switch (action.action) {
-            case '@ui.modal.close': {
-                update({
-                    action,
-                });
+    const onSubViewAction = React.useCallback(
+        async (action: ContentKitAction) => {
+            switch (action.action) {
+                case '@ui.modal.close': {
+                    update({
+                        action,
+                    });
 
-                setSubView(null);
-                break;
+                    setSubView(null);
+                    break;
+                }
             }
-        }
-    }, []);
+        },
+        [update]
+    );
 
     return (
         <>

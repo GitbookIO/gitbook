@@ -1,6 +1,3 @@
+// Only the server entrypoint: re-exporting the client modules would pull their CSS modules back
+// into the route's render-blocking stylesheets, defeating the lazy boundary.
 export * from './AdminToolbar';
-export * from './AdminToolbarClient';
-export * from './IframeWrapper';
-export * from './Toolbar';
-export * from './transitions';
-export * from './utils';

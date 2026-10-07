@@ -1,4 +1,4 @@
-import type { CloudflareImageOptions } from './types';
+import type { CloudflareImageOptions, CloudflareResizeImageOptions } from './types';
 import { copyImageResponse } from './utils';
 import { GITBOOK_IMAGE_RESIZE_SALT, GITBOOK_IMAGE_RESIZE_URL } from '@/lib/env';
 import { getLogger } from '@/lib/logger';
@@ -18,11 +18,10 @@ function sdbmHash(str: string): number {
  */
 export async function resizeImageWithGitbookServices(
     input: string,
-    options: CloudflareImageOptions & {
-        signal?: AbortSignal;
-    }
+    options: CloudflareResizeImageOptions
 ): Promise<Response> {
-    const { signal, ...resizeOptions } = options;
+    // Only the resize options are serialized in the URL, everything else is transport-level.
+    const { signal, accept, bypassSkipCheck, ...resizeOptions } = options;
 
     if (!GITBOOK_IMAGE_RESIZE_SALT) {
         throw new Error(
@@ -48,14 +47,31 @@ export async function resizeImageWithGitbookServices(
     return copyImageResponse(
         await fetch(resizeURL, {
             headers: {
-                Accept:
-                    resizeOptions.format === 'json'
-                        ? 'application/json'
-                        : `image/${resizeOptions.format || 'jpeg'}`,
+                Accept: getAcceptHeader(resizeOptions.format, accept),
             },
             signal,
         })
     );
+}
+
+/**
+ * Accept header to send to the image service.
+ * With the default "auto" format, the service negotiates the output itself from the
+ * accept header of the original request.
+ */
+function getAcceptHeader(
+    format: CloudflareImageOptions['format'],
+    accept: string | undefined
+): string {
+    if (format === 'json') {
+        return 'application/json';
+    }
+
+    if (format && format !== 'auto') {
+        return `image/${format}`;
+    }
+
+    return accept || 'image/*';
 }
 
 function stringifyOptions(options: CloudflareImageOptions & { signature: string }): string {

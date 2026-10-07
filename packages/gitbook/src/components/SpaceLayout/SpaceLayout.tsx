@@ -13,7 +13,11 @@ import { InsightsProvider, VisitorProvider } from '../Insights';
 import { CONTAINER_STYLE } from '../layout';
 import { NavigationLoader } from '../primitives/NavigationLoader';
 import { SearchContainer, getSearchBaseProps } from '../Search';
-import { SiteSectionList, encodeClientSiteSections } from '../SiteSections';
+import {
+    SiteSectionList,
+    encodeClientSiteSections,
+    shouldRenderSiteSectionNavigation,
+} from '../SiteSections';
 import { categorizeVariants } from './categorizeVariants';
 import { SpaceLayoutContextProvider } from './SpaceLayoutContext';
 import { Footer } from '@/components/Footer';
@@ -54,20 +58,21 @@ export function SpaceLayoutServerContext(props: SpaceLayoutProps) {
             ? context.linker.toPathInSite('~gitbook/auth/login')
             : null;
 
-    const eventUrl = new URL(
-        context.linker.toAbsoluteURL(context.linker.toPathInSite('/~gitbook/__evt'))
-    );
-    eventUrl.searchParams.set('o', context.organizationId);
-    eventUrl.searchParams.set('s', context.site.id);
+    // Kept relative: a prerendered page has no request to read the host from, so an absolute URL
+    // pins the configured host and turns these fetches cross-origin when it differs (apex vs www).
+    const eventParams = new URLSearchParams({
+        o: context.organizationId,
+        s: context.site.id,
+    });
+    const eventUrl = `${context.linker.toPathInSite('/~gitbook/__evt')}?${eventParams}`;
 
-    const getVisitorClaimsUrl = context.linker.toAbsoluteURL(
-        context.linker.toPathInSite('/~gitbook/visitor')
-    );
+    const getVisitorClaimsUrl = context.linker.toPathInSite('/~gitbook/visitor');
 
     return (
         <SpaceLayoutContextProvider
             basePath={context.linker.toPathInSpace('')}
             siteAdaptiveAuthLoginHref={siteAdaptiveAuthLoginHref}
+            isLoggedInVisitor={context.isLoggedInVisitor}
             siteIndexURL={context.linker.toPathInSite('~gitbook/site-index')}
         >
             <AdaptiveVisitorContextProvider
@@ -88,7 +93,7 @@ export function SpaceLayoutServerContext(props: SpaceLayoutProps) {
                         appURL={GITBOOK_APP_URL}
                         visitorCookieTrackingEnabled={customization.insights?.trackingCookie}
                     >
-                        <InsightsProvider enabled={withTracking} eventUrl={eventUrl.toString()}>
+                        <InsightsProvider enabled={withTracking} eventUrl={eventUrl}>
                             <AIChatProvider
                                 renderMessageOptions={aiChatRenderMessageOptions}
                                 withPageFeedback={customization.feedback.enabled}
@@ -113,7 +118,7 @@ export function SpaceLayout(props: SpaceLayoutProps) {
 
     const withTopHeader = customization.header.preset !== CustomizationHeaderPreset.None;
 
-    const withSections = Boolean(visibleSections && visibleSections.list.length > 1);
+    const withSections = shouldRenderSiteSectionNavigation(visibleSections);
     const variants = categorizeVariants(context);
     const socialLinks = customization.socialAccounts.filter((account) => account.display?.footer);
 

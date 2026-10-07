@@ -53,7 +53,7 @@ export type ContentKitClientContextData = {
      * action. The destination is addressed by `path` (resolved against the site base path); the
      * host restricts navigation to destinations within the current site.
      */
-    navigate?: (target: { path: string; anchor?: string }) => void;
+    navigate?: (target: { path: string; anchor?: string; query?: Record<string, string> }) => void;
 };
 
 export interface ContentKitClientContextType {

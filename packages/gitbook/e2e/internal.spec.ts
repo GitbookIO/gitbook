@@ -1,4 +1,4 @@
-import { expect } from '@playwright/test';
+import { type Page, expect } from '@playwright/test';
 import jwt from 'jsonwebtoken';
 
 import {
@@ -10,6 +10,7 @@ import {
     CustomizationDepth,
     CustomizationHeaderPreset,
     CustomizationIconsStyle,
+    CustomizationPageActionType,
     CustomizationSidebarListStyle,
     SiteSocialAccountPlatform,
 } from '@gitbook/api';
@@ -51,6 +52,27 @@ const AI_PROMPT = [
     '3. Reply with only the first sentence of the first page you find, and nothing else.',
     '4. Always end by proposing exactly 3 follow-up suggestions.',
 ].join('\n');
+
+// `InsightsProvider` debounces its flushes by 1.5s.
+const INSIGHTS_FLUSH_TIMEOUT = 3000;
+
+/**
+ * Collect the insights events of a given type sent by the page and its frames.
+ */
+function trackInsightsEvents(page: Page, type: string) {
+    const collected: { type: string }[] = [];
+
+    page.on('request', (request) => {
+        if (request.method() !== 'POST' || !request.url().includes('/~gitbook/__evt')) {
+            return;
+        }
+
+        const body = request.postDataJSON() as { events?: { type: string }[] } | null;
+        collected.push(...(body?.events ?? []).filter((event) => event.type === type));
+    });
+
+    return collected;
+}
 
 const overrideAIInitialState = () => {
     const greeting = document.querySelector('[data-testid="ai-chat-greeting-title"]');
@@ -137,6 +159,40 @@ const searchTestCases: Test[] = [
         },
     },
     {
+        name: 'Search - Keyboard focus exits to the next page control',
+        url: getCustomizationURL({
+            ai: {
+                mode: CustomizationAIMode.Search,
+            },
+        }),
+        screenshot: false,
+        run: async (page) => {
+            await waitForCookiesDialog(page);
+            const searchInput = page.getByTestId('search-input');
+            await searchInput.focus();
+            await searchInput.fill('gitbook');
+
+            const searchPopup = page.getByTestId('search-popover');
+            await expect(searchPopup).toBeVisible({ timeout: 10_000 });
+            const finalPopupControl = searchPopup
+                .locator(
+                    'a[href], button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])'
+                )
+                .filter({ visible: true })
+                .last();
+            const nextPageControl = page.getByTestId('table-of-contents').getByRole('link').first();
+            await expect(finalPopupControl).toBeVisible();
+            await expect(nextPageControl).toBeVisible();
+            await finalPopupControl.focus();
+            await page.keyboard.press('Tab');
+            await expect(searchPopup).toBeHidden();
+            await expect(nextPageControl).toBeFocused();
+
+            await page.keyboard.press('Shift+Tab');
+            await expect(searchInput).toBeFocused();
+        },
+    },
+    {
         // `fill()` bypasses key events, so it can't catch a swallowed key. RND-12484.
         name: 'Search - AI Mode: None - Typing multi-word queries',
         url: getCustomizationURL({
@@ -191,6 +247,43 @@ const searchTestCases: Test[] = [
             await expect(page.getByTestId('search-input')).toBeFocused();
             await expect(page.getByTestId('search-input')).toHaveValue('gitbook');
             await expect(page.getByTestId('search-results')).toBeVisible();
+        },
+    },
+    {
+        // RND-12844: the popover's focus manager re-focused the closing popup and
+        // scrolled the page back to the top right after landing on the section.
+        name: 'Search - Section result scrolls to the section',
+        url: getCustomizationURL({
+            ai: {
+                mode: CustomizationAIMode.None,
+            },
+        }),
+        screenshot: false,
+        run: async (page) => {
+            await waitForCookiesDialog(page);
+            const searchInput = page.getByTestId('search-input');
+            await searchInput.focus();
+            // Type like a visitor: `fill()` doesn't trigger the remote search.
+            await searchInput.pressSequentially('tasks');
+
+            const sectionResult = page.locator(
+                '[data-testid="search-page-result"][href$="/blocks/lists#tasks"]'
+            );
+            // Section results come from the remote index, which can be slow to answer.
+            await expect(sectionResult).toBeVisible({ timeout: 30_000 });
+            await sectionResult.click();
+            await page.waitForURL(/\/blocks\/lists#tasks$/);
+
+            // The regression scrolled back to the top shortly after landing, so let
+            // that happen before asserting.
+            await page.waitForTimeout(1000);
+
+            // The heading is parked under the header, within its scroll margin.
+            const top = await page
+                .locator('#tasks')
+                .evaluate((heading) => heading.getBoundingClientRect().top);
+            expect(top).toBeGreaterThanOrEqual(0);
+            expect(top).toBeLessThanOrEqual(150);
         },
     },
     {
@@ -462,6 +555,24 @@ const testCases: TestsCase[] = [
         contentBaseURL: 'https://gitbook-open-e2e-sites.gitbook.io/',
         tests: [
             {
+                name: 'Strip fallback after loading a page without adding history',
+                url: 'api-multi-versions/reference/api-reference/pets',
+                screenshot: false,
+                run: async (page) => {
+                    await waitForHydration(page);
+                    const previousURL = page.url();
+                    const targetURL = new URL(previousURL);
+                    targetURL.searchParams.set('fallback', 'true');
+                    targetURL.searchParams.set('ref', 'variant');
+                    targetURL.hash = 'pets';
+                    await page.goto(targetURL.toString());
+                    targetURL.searchParams.delete('fallback');
+                    await expect(page).toHaveURL(targetURL.toString());
+                    await page.goBack();
+                    await expect(page).toHaveURL(previousURL);
+                },
+            },
+            {
                 name: 'Keep navigation path/route when switching variant (Public)',
                 url: 'api-multi-versions/reference/api-reference/pets',
                 screenshot: false,
@@ -483,8 +594,11 @@ const testCases: TestsCase[] = [
                         .click();
 
                     // It should keep the current page path, i.e "reference/api-reference/pets" when navigating to the new variant
-                    await page.waitForURL((url) =>
-                        url.pathname.includes('api-multi-versions/2.0/reference/api-reference/pets')
+                    await page.waitForURL(
+                        (url) =>
+                            url.pathname.includes(
+                                'api-multi-versions/2.0/reference/api-reference/pets'
+                            ) && !url.searchParams.has('fallback')
                     );
                 },
             },
@@ -653,6 +767,150 @@ const testCases: TestsCase[] = [
                     await expect(page.getByText('Section B')).toBeVisible();
                     await page.getByText('Section B').click();
                     await page.waitForURL((url) => url.pathname.includes('/sections/sections-4'));
+                },
+            },
+            {
+                name: 'Root external link renders in the configured position',
+                url: '',
+                screenshot: false,
+                run: async (page) => {
+                    await waitForHydration(page);
+                    const rootSections = page.locator('[data-gb-sections]');
+                    const rootItems = rootSections.locator(':scope > li');
+
+                    await expect(rootItems).toHaveCount(4);
+                    await expect(rootItems.nth(0)).toContainText('Home');
+                    await expect(rootItems.nth(1)).toContainText('Test Section Group 1');
+                    await expect(rootItems.nth(2)).toContainText('Test Section Group 2');
+                    await expect(rootItems.last()).toContainText('Gitbook Docs');
+                    await expect(
+                        rootSections.getByRole('link', { name: 'Gitbook Docs' })
+                    ).toBeVisible();
+                },
+            },
+            {
+                name: 'Root external link has the configured contract',
+                url: '',
+                screenshot: false,
+                run: async (page) => {
+                    await waitForHydration(page);
+                    const rootLink = page
+                        .locator('[data-gb-sections]')
+                        .getByRole('link', { name: 'Gitbook Docs' });
+
+                    await expect(rootLink).toBeVisible();
+                    await expect(rootLink).toHaveAttribute('href', 'https://gitbook.com/docs');
+                    await expect(rootLink).not.toHaveAttribute('target');
+                    await expect(rootLink).not.toHaveAttribute('rel');
+                    await expect(rootLink).toHaveAttribute('data-active', 'false');
+                    await expect(rootLink).not.toHaveAttribute('aria-current');
+                },
+            },
+            {
+                name: 'Nested external link renders in the configured position',
+                url: '',
+                screenshot: false,
+                run: async (page) => {
+                    await waitForHydration(page);
+                    await page
+                        .locator('[data-gb-sections]')
+                        .getByRole('button', { name: 'Test Section Group 2' })
+                        .hover();
+
+                    const nestedLink = page.getByRole('link', { name: 'Gitbook Site' });
+                    await expect(nestedLink).toBeVisible();
+
+                    const nestedItems = nestedLink
+                        .locator('xpath=ancestor::ul[1]')
+                        .locator(':scope > li');
+                    await expect(nestedItems).toHaveCount(3);
+                    await expect(nestedItems.nth(0)).toContainText('Section C');
+                    await expect(nestedItems.nth(1)).toContainText('Section with longer title');
+                    await expect(nestedItems.last()).toContainText('Gitbook Site');
+                },
+            },
+            {
+                name: 'Nested external link has the configured contract',
+                url: '',
+                screenshot: false,
+                run: async (page) => {
+                    await waitForHydration(page);
+                    await page
+                        .locator('[data-gb-sections]')
+                        .getByRole('button', { name: 'Test Section Group 2' })
+                        .hover();
+
+                    const nestedLink = page.getByRole('link', { name: 'Gitbook Site' });
+                    await expect(nestedLink).toBeVisible();
+                    await expect(nestedLink).toHaveAttribute('href', 'https://gitbook.com');
+                    await expect(nestedLink).not.toHaveAttribute('target');
+                    await expect(nestedLink).not.toHaveAttribute('rel');
+                    await expect(nestedLink).not.toHaveAttribute('aria-current');
+                },
+            },
+            {
+                name: 'External links use the configured window open behavior',
+                url: '',
+                screenshot: false,
+                run: async (page) => {
+                    await waitForHydration(page);
+
+                    const windowOpenCalls: {
+                        url: string;
+                        target: string;
+                        features: string | undefined;
+                    }[] = [];
+                    await page.exposeFunction(
+                        'recordExternalWindowOpen',
+                        (url: string, target: string, features?: string) => {
+                            windowOpenCalls.push({ url, target, features });
+                        }
+                    );
+                    await page.evaluate(() => {
+                        const recordExternalWindowOpen = (
+                            window as unknown as {
+                                recordExternalWindowOpen: (
+                                    url: string,
+                                    target: string,
+                                    features?: string
+                                ) => void;
+                            }
+                        ).recordExternalWindowOpen;
+                        window.open = ((url, target, features) => {
+                            void recordExternalWindowOpen(
+                                url?.toString() ?? '',
+                                target ?? '',
+                                features
+                            );
+                            return null;
+                        }) as typeof window.open;
+                    });
+
+                    const initialURL = page.url();
+                    await page
+                        .locator('[data-gb-sections]')
+                        .getByRole('link', { name: 'Gitbook Docs' })
+                        .click();
+                    await expect.poll(() => windowOpenCalls.length).toBe(1);
+                    expect(windowOpenCalls[0]).toEqual({
+                        url: 'https://gitbook.com/docs',
+                        target: '_self',
+                        features: undefined,
+                    });
+                    await expect(page).toHaveURL(initialURL);
+
+                    await page
+                        .locator('[data-gb-sections]')
+                        .getByRole('button', { name: 'Test Section Group 2' })
+                        .hover();
+                    await page.getByRole('link', { name: 'Gitbook Site' }).click();
+                    await expect.poll(() => windowOpenCalls.length).toBe(2);
+                    expect(windowOpenCalls[1]).toEqual({
+                        url: 'https://gitbook.com',
+                        target: '_self',
+                        features: undefined,
+                    });
+                    await expect(page).toHaveURL(initialURL);
                 },
             },
         ],
@@ -1377,6 +1635,70 @@ const testCases: TestsCase[] = [
         ],
     },
     {
+        name: 'Edit on Git page actions',
+        contentBaseURL: 'https://gitbook-open-e2e-sites.gitbook.io/yjs/',
+        tests: [
+            {
+                name: 'With Edit on Git as the default action',
+                url: getCustomizationURL({
+                    pageActions: {
+                        items: [CustomizationPageActionType.Git],
+                    },
+                }),
+                run: async (page) => {
+                    await waitForHydration(page);
+                    await expect(
+                        page.getByRole('link', { name: 'Edit', exact: true })
+                    ).toHaveAttribute(
+                        'href',
+                        'https://github.com/taranvohra/yjs-docs/tree/main/README.md'
+                    );
+                },
+                screenshot: false,
+            },
+            {
+                name: 'With Edit on Git in the dropdown',
+                url: getCustomizationURL({
+                    pageActions: {
+                        items: [
+                            CustomizationPageActionType.Markdown,
+                            CustomizationPageActionType.Git,
+                        ],
+                    },
+                }),
+                run: async (page) => {
+                    await waitForHydration(page);
+                    await page.getByRole('button', { name: 'More' }).click();
+                    await expect(page.getByRole('menu')).toBeVisible();
+                    await expect(
+                        page.getByRole('menuitem', { name: 'Edit on GitHub' })
+                    ).toHaveAttribute(
+                        'href',
+                        'https://github.com/taranvohra/yjs-docs/tree/main/README.md'
+                    );
+                },
+                screenshot: false,
+            },
+            {
+                name: 'Without Edit on Git',
+                url: getCustomizationURL({
+                    pageActions: {
+                        items: [CustomizationPageActionType.Markdown],
+                    },
+                }),
+                run: async (page) => {
+                    await waitForHydration(page);
+                    await page.getByRole('button', { name: 'More' }).click();
+                    await expect(page.getByRole('menu')).toBeVisible();
+                    await expect(
+                        page.getByRole('menuitem', { name: 'Edit on GitHub' })
+                    ).toHaveCount(0);
+                },
+                screenshot: false,
+            },
+        ],
+    },
+    {
         name: 'Page actions',
         contentBaseURL: 'https://gitbook.gitbook.io/test-gitbook-open/',
         tests: [
@@ -1428,7 +1750,6 @@ const testCases: TestsCase[] = [
             {
                 name: 'Without previewed ads',
                 url: 'text-page?ads_preview=1',
-                run: waitForCookiesDialog,
             },
         ],
     },
@@ -1626,6 +1947,70 @@ const testCases: TestsCase[] = [
                     return `second?jwt_token=${token}`;
                 },
                 run: async (page) => {
+                    await expect(
+                        page.getByRole('heading', { level: 1, name: 'second' })
+                    ).toBeVisible();
+                },
+                screenshot: false,
+            },
+        ],
+    },
+    {
+        name: 'Visitor Auth - Space (oversized token)',
+        contentBaseURL: 'https://gitbook.gitbook.io/gbo-va-space/',
+        tests: [
+            {
+                name: 'Oversized token is chunked into cookies and survives navigation',
+                url: () => {
+                    const privateKey = '70b844d0-c519-4532-8586-5970ce48c537';
+                    const token = jwt.sign(
+                        {
+                            name: 'gitbook-open-tests',
+                            // Inflate the token above the ~4KB browser cookie limit,
+                            // like an IdP issuing many group claims would.
+                            groups: Array.from(
+                                { length: 60 },
+                                (_, index) => `group-${index}-${'x'.repeat(80)}`
+                            ),
+                        },
+                        privateKey,
+                        {
+                            expiresIn: '24h',
+                        }
+                    );
+                    return `first?jwt_token=${token}`;
+                },
+                run: async (page) => {
+                    await expect(
+                        page.getByRole('heading', { level: 1, name: 'first' })
+                    ).toBeVisible();
+
+                    // The token must be persisted as a chunk-count marker plus chunk cookies.
+                    const cookies = await page.context().cookies();
+                    // Next.js percent-encodes cookie values, so the raw value is `chunks%3A2`.
+                    const marker = cookies.find(
+                        (cookie) =>
+                            cookie.name.startsWith(VISITOR_TOKEN_COOKIE) &&
+                            /^chunks(:|%3A)\d+$/.test(cookie.value)
+                    );
+                    expect(marker).toBeDefined();
+                    const chunks = cookies.filter((cookie) =>
+                        cookie.name.startsWith(`${marker?.name}-`)
+                    );
+                    expect(chunks.length).toBeGreaterThanOrEqual(2);
+
+                    // Navigating without the token must authenticate from the chunked cookie.
+                    // `first` is the space's default page, so the post-sign-in redirect
+                    // canonicalizes to the space root: derive `second` from that base.
+                    const secondURL = new URL(page.url());
+                    const basePathname = secondURL.pathname
+                        .replace(/\/first\/?$/, '')
+                        .replace(/\/$/, '');
+                    secondURL.pathname = `${basePathname}/second`;
+                    secondURL.search = '';
+                    // Same reason as the harness navigation: third-party subresources on
+                    // this site can hang and never fire `load`.
+                    await page.goto(secondURL.toString(), { waitUntil: 'domcontentloaded' });
                     await expect(
                         page.getByRole('heading', { level: 1, name: 'second' })
                     ).toBeVisible();
@@ -2259,6 +2644,33 @@ const testCases: TestsCase[] = [
                         'data-icon',
                         'book'
                     );
+                },
+            },
+            {
+                name: 'Only tracks ask_view once the widget is opened',
+                // `trigger=custom` loads the frame but leaves the window closed.
+                url: '?trigger=custom',
+                screenshot: false,
+                run: async (page) => {
+                    const askViews = trackInsightsEvents(page, 'ask_view');
+                    const chat = page.frameLocator('#gitbook-widget-iframe').getByTestId('ai-chat');
+
+                    // The assistant renders inside the hidden frame, but nobody has seen it.
+                    await expect(chat).toBeAttached({ timeout: 20000 });
+                    await page.waitForTimeout(INSIGHTS_FLUSH_TIMEOUT);
+                    expect(askViews).toHaveLength(0);
+
+                    await page.getByRole('button', { name: 'Open' }).click();
+                    await expect(chat).toBeVisible();
+                    await expect.poll(() => askViews.length, { timeout: 20000 }).toBe(1);
+
+                    // Hiding and showing the same frame again is not a second view.
+                    await page.getByRole('button', { name: 'Close' }).click();
+                    await expect(chat).toBeHidden();
+                    await page.getByRole('button', { name: 'Open' }).click();
+                    await expect(chat).toBeVisible();
+                    await page.waitForTimeout(INSIGHTS_FLUSH_TIMEOUT);
+                    expect(askViews).toHaveLength(1);
                 },
             },
         ],

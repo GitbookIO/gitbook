@@ -11,6 +11,8 @@ export const sv: TranslationLanguage = {
     switch_to_system_theme: 'Byt till systemtema',
     search: 'Sök',
     clear: 'Rensa',
+    table_filtered_by_selection: 'Matchar val: ${1}',
+    table_clear_selection: 'Rensa val',
     tags: 'Taggar',
     search_back: 'Tillbaka till sökresultat',
     search_or_ask: 'Fråga eller sök',
@@ -75,11 +77,16 @@ export const sv: TranslationLanguage = {
     notfound_title: 'Sidan hittades inte',
     notfound_link: 'Den här länken pekar på en sida som har tagits bort eller inte längre finns.',
     notfound: 'Sidan du letar efter finns inte.',
-    notfound_adaptive_title: 'Sidan är inte tillgänglig',
-    notfound_adaptive: 'Sidan kan finnas, men du kan behöva logga in för att få åtkomst.',
+    notfound_adaptive_title: 'Logga in för att visa den här sidan',
+    notfound_adaptive:
+        'Den här sidan kan kräva att du loggar in. Om du följde en länk, kontrollera att den är korrekt.',
     notfound_adaptive_login: 'Logga in',
     notfound_adaptive_registration_hint:
         'Registrering kan vara tillgänglig beroende på organisationen.',
+    notfound_adaptive_no_access_title: 'Du kanske inte har åtkomst till den här sidan',
+    notfound_adaptive_no_access:
+        'Den här sidan kanske inte finns, eller så har ditt konto inte åtkomst till den. Om du följde en länk, kontrollera att den är korrekt.',
+    notfound_adaptive_login_again: 'Logga in igen',
     notfound_goto_home: 'Gå till startsidan',
     notfound_suggestions_title: 'Du kanske letar efter',
     unexpected_error_title: 'Ett fel uppstod',
@@ -151,6 +158,7 @@ export const sv: TranslationLanguage = {
     ai_chat_tools_submit_assistant_feedback:
         'Betygsätt assistentens föregående meddelande som ${1}',
     ai_chat_tools_submitted_feedback: 'Feedback skickad',
+    ai_chat_tools_shared_feedback_with_team: 'Feedback skickad till dokumentationsteamet',
     ai_chat_tools_mcp_tool: 'Anropade ${1}',
     ai_chat_ask: 'Fråga ${1}',
     ai_chat_ask_about: 'Fråga ${1} om ${2}',
@@ -185,4 +193,22 @@ export const sv: TranslationLanguage = {
     form_other_field: 'Annat...',
     cancel: 'Avbryt',
     direct_link_to_heading: 'Direktlänk till rubriken',
+    auth_consent_request: '${1} vill få åtkomst till ${2} för din räkning.',
+    auth_client_website: 'Webbplats',
+    auth_verified: 'Verifierad',
+    auth_unverified: 'Overifierad',
+    auth_unverified_title: 'GitBook har inte verifierat den här klienten',
+    auth_unverified_description:
+        'Godkänn bara om du känner igen det här programmet och litar på att det får åtkomst till ${1}.',
+    auth_code_preamble: 'Efter godkännande skickas en auktoriseringskod till:',
+    auth_redirect_uri_label: 'Omdirigerings-URI',
+    auth_trust_client: 'Jag känner igen och litar på den här klienten',
+    auth_approve: 'Godkänn',
+    auth_deny: 'Neka',
+    auth_error_title: 'Något gick fel',
+    auth_expired_title: 'Den här auktoriseringslänken har upphört att gälla',
+    auth_expired_description: 'Starta inloggningen igen från programmet.',
+    auth_error_invalid_request: 'Ogiltig förfrågan. Börja om från programmet.',
+    auth_error_failed:
+        'Vi kunde inte slutföra auktoriseringen. Förfrågan kan ha upphört att gälla — börja om från programmet.',
 };

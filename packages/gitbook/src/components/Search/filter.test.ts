@@ -25,4 +25,12 @@ describe('computeFilterSiteSpaceIds', () => {
         const r = computeFilterSiteSpaceIds('default', currentId, ids, false);
         expect(r).toEqual([currentId]);
     });
+
+    it('filters to an independently selected section', () => {
+        const r = computeFilterSiteSpaceIds('extended', currentId, ids, true, [
+            'space-other-a',
+            'space-other-b',
+        ]);
+        expect(r).toEqual(['space-other-a', 'space-other-b']);
+    });
 });

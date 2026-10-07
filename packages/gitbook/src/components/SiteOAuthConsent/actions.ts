@@ -9,7 +9,13 @@ export type SubmitConsentInput = {
     trusted: boolean;
 };
 
-export type SubmitConsentResult = { redirectURL: string } | { error: string };
+/**
+ * Failure reason, as a translation key. The action has no site context to resolve a language from,
+ * so the caller translates it.
+ */
+export type SubmitConsentErrorCode = 'auth_error_invalid_request' | 'auth_error_failed';
+
+export type SubmitConsentResult = { redirectURL: string } | { error: SubmitConsentErrorCode };
 
 /**
  * Server action to submit the consent decision to the sites OAuth server's `consent/decision` endpoint.
@@ -20,7 +26,7 @@ export async function submitSiteOAuthConsent(
     const { siteId, consentSessionId, decision, trusted } = input;
 
     if (!siteId || !consentSessionId || (decision !== 'approve' && decision !== 'deny')) {
-        return { error: 'Invalid request. Please start again from the application.' };
+        return { error: 'auth_error_invalid_request' };
     }
 
     try {
@@ -32,8 +38,6 @@ export async function submitSiteOAuthConsent(
         });
         return { redirectURL };
     } catch (_error) {
-        return {
-            error: 'We could not complete the authorization. The request may have expired — please start again from the application.',
-        };
+        return { error: 'auth_error_failed' };
     }
 }

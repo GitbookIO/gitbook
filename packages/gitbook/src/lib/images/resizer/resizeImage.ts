@@ -4,7 +4,11 @@ import assertNever from 'assert-never';
 import { GITBOOK_IMAGE_RESIZE_MODE } from '../../env';
 import { SizableImageAction, checkIsSizableImageURL } from '../checkIsSizableImageURL';
 import { resizeImageWithGitbookServices } from './gitbook-service';
-import type { CloudflareImageJsonFormat, CloudflareImageOptions } from './types';
+import type {
+    CloudflareImageJsonFormat,
+    CloudflareImageOptions,
+    CloudflareResizeImageOptions,
+} from './types';
 import { getLogger } from '@/lib/logger';
 
 /**
@@ -41,15 +45,6 @@ export async function getImageSize(
     }
 }
 
-export type CloudflareResizeImageOptions = CloudflareImageOptions & {
-    signal?: AbortSignal;
-    /**
-     * Bypass the check to see if the image can be resized.
-     * This is useful for some format that are not supported by @next/og and need to be transformed
-     */
-    bypassSkipCheck?: boolean;
-};
-
 /**
  * Execute a Cloudflare Image Resize operation on an image.
  */
@@ -62,12 +57,6 @@ export async function resizeImage(
         throw new Error(
             'Cannot resize this image, this function should have never been called on this url'
         );
-    }
-
-    if (action === SizableImageAction.Passthrough) {
-        return fetch(input, {
-            signal: options.signal,
-        });
     }
 
     switch (GITBOOK_IMAGE_RESIZE_MODE) {

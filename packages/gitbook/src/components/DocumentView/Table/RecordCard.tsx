@@ -5,6 +5,7 @@ import {
     SiteInsightsLinkPosition,
 } from '@gitbook/api';
 
+import { isRecordColumnEmpty } from './isRecordColumnEmpty';
 import { RecordColumnValue } from './RecordColumnValue';
 import { RecordCardStyles } from './styles';
 import type { TableRecordKV, TableViewProps } from './Table';
@@ -150,6 +151,12 @@ export async function RecordCard(
                     const definition = block.data.definition[column];
 
                     if (!definition) {
+                        return null;
+                    }
+
+                    // A field can hold nothing at all (an `if` block that didn't match, an
+                    // empty value); rendering it would leave a gap and a dangling title.
+                    if (isRecordColumnEmpty(block, record[1], column)) {
                         return null;
                     }
 

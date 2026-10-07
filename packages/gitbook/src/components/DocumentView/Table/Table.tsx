@@ -1,10 +1,12 @@
 import assertNever from 'assert-never';
 
-import type { DocumentBlockTable } from '@gitbook/api';
+import type { DocumentBlockTable, DocumentTableViewGrid } from '@gitbook/api';
 
 import type { BlockProps } from '../Block';
 import { isBlockOffscreen } from '../utils';
+import { type TableCellMergeLayout, createTableCellMergeLayout } from './cellMerges';
 import { getViewGridLayout, hasVisibleHeader } from './layout';
+import { NativeViewGrid } from './NativeViewGrid';
 import {
     type TableRecordKV,
     getTableCheckboxColumns,
@@ -13,7 +15,12 @@ import {
 } from './search';
 import { shouldShowTableSearch } from './shouldShowSearch';
 import { StickyViewGrid } from './StickyViewGrid';
-import { TableSearchEmpty, TableSearchInput, TableSearchProvider } from './TableSearch';
+import {
+    TableSearchEmpty,
+    TableSearchInput,
+    TableSearchProvider,
+    TableSelectionFilter,
+} from './TableSearch';
 import { ViewCards } from './ViewCards';
 import { ViewGrid, ViewGridHeader } from './ViewGrid';
 import { tcls } from '@/lib/tailwind';
@@ -24,6 +31,10 @@ export interface TableViewProps<View> extends BlockProps<DocumentBlockTable> {
     view: View;
     records: TableRecordKV[];
     isOffscreen: boolean;
+}
+
+export interface TableGridViewProps extends TableViewProps<DocumentTableViewGrid> {
+    cellMergeLayout: TableCellMergeLayout;
 }
 
 export function Table(props: BlockProps<DocumentBlockTable>) {
@@ -42,20 +53,44 @@ export function Table(props: BlockProps<DocumentBlockTable>) {
         searchOverride: block.data.search,
         isPrint: context.mode === 'print',
     });
-    const searchRecords = showSearch
-        ? records.map(([id, record]) => ({ id, ...getTableRecordSearchData(block, record) }))
-        : [];
+    const selectColumns = getTableSelectColumns(block);
+    // Also needed when the search bar is hidden: a reader's content selection can narrow a select
+    // column from a tab or picker elsewhere on the page, and without records there is nothing to
+    // match against. A table with no select column can never be narrowed that way, so it skips.
+    const searchRecords =
+        showSearch || selectColumns.length > 0
+            ? records.map(([id, record]) => ({ id, ...getTableRecordSearchData(block, record) }))
+            : [];
+    const cellMergeLayout = createTableCellMergeLayout(
+        block,
+        records.map(([recordId]) => recordId)
+    );
 
     return (
-        <TableSearchProvider records={searchRecords}>
+        <TableSearchProvider
+            records={searchRecords}
+            selectColumns={selectColumns}
+            recordGroups={
+                block.data.view.type === 'grid' ? cellMergeLayout.recordGroups : undefined
+            }
+        >
             <div className={tcls(style, 'flex flex-col gap-3')}>
                 {showSearch ? (
                     <TableSearchInput
-                        selectColumns={getTableSelectColumns(block)}
+                        selectColumns={selectColumns}
                         checkboxColumns={getTableCheckboxColumns(block)}
                     />
                 ) : null}
-                <TableView {...props} isOffscreen={isOffscreen} records={records} />
+                {/* Sits under the filter control it relates to, and tight against the search bar,
+                    so it reads as part of the filter controls rather than a caption on the table.
+                    Standalone — cards, short grids — there is no control to sit under. */}
+                <TableSelectionFilter className={showSearch ? '-mt-1.5 justify-end' : undefined} />
+                <TableView
+                    {...props}
+                    isOffscreen={isOffscreen}
+                    records={records}
+                    cellMergeLayout={cellMergeLayout}
+                />
                 <TableSearchEmpty />
             </div>
         </TableSearchProvider>
@@ -68,8 +103,13 @@ export function Table(props: BlockProps<DocumentBlockTable>) {
 function TableView({
     isOffscreen,
     records,
+    cellMergeLayout,
     ...props
-}: BlockProps<DocumentBlockTable> & { isOffscreen: boolean; records: TableRecordKV[] }) {
+}: BlockProps<DocumentBlockTable> & {
+    isOffscreen: boolean;
+    records: TableRecordKV[];
+    cellMergeLayout: TableCellMergeLayout;
+}) {
     const { block, context, style } = props;
 
     switch (block.data.view.type) {
@@ -88,6 +128,7 @@ function TableView({
                 view: block.data.view,
                 isOffscreen,
                 records,
+                cellMergeLayout,
             };
             const { tableWidth } = getViewGridLayout({
                 block,
@@ -101,6 +142,10 @@ function TableView({
                 withHeader && context.mode !== 'print' && block.data.view.stickyHeader === true;
             const withStickyFirstColumn =
                 context.mode !== 'print' && block.data.view.stickyFirstColumn === true;
+
+            if (cellMergeLayout.hasVerticalMerges) {
+                return <NativeViewGrid {...gridProps} />;
+            }
 
             if (withStickyHeader || withStickyFirstColumn) {
                 return (

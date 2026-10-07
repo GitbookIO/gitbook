@@ -1,4 +1,4 @@
-import type { Link, Root } from 'mdast';
+import type { Definition, Html, Image, Link, Paragraph, Root } from 'mdast';
 import { fromMarkdown } from 'mdast-util-from-markdown';
 import { frontmatterFromMarkdown } from 'mdast-util-frontmatter';
 import { gfmFromMarkdown, gfmToMarkdown } from 'mdast-util-gfm';
@@ -28,6 +28,10 @@ import { DataFetcherError, throwIfDataError } from '@/lib/data';
 import type { ResolvedPagePath } from '@/lib/pages';
 import { getIndexablePages } from '@/lib/sitemap';
 import { getMarkdownForPagesTree } from '@/routes/llms';
+
+const HTML_ANCHOR_RE = /<a\b([^>]*?)href="([^"]*)"([^>]*)>([\s\S]*?)<\/a>/g;
+const HTML_ANCHOR_OPEN_RE = /<a\b([^>]*?)href="([^"]*)"([^>]*)>/g;
+const HTML_SRC_RE = /\bsrc="([^"]*)"/g;
 
 /**
  * Generate a markdown version of a page.
@@ -66,6 +70,7 @@ export async function getMarkdownForPage(
         markdown: rawMarkdown,
         pagePath: page.path,
     });
+    insertDescriptionAfterHeading(tree, page.description);
 
     // Handle empty document pages which have children
     if (isEmptyMarkdownPage(tree) && page.pages.length > 0) {
@@ -102,6 +107,7 @@ export async function getMarkdownForPageInSpace(
         markdown: rawMarkdown,
         pagePath: page.path,
     });
+    insertDescriptionAfterHeading(tree, page.description);
 
     // Handle empty document pages which have children (same as getMarkdownForPage)
     if (isEmptyMarkdownPage(tree) && page.pages.length > 0) {
@@ -140,6 +146,26 @@ export async function fromPageMarkdown(
  */
 export function toPageMarkdown(tree: Root): string {
     return toMarkdown(tree, { extensions: [gfmToMarkdown()] });
+}
+
+/** Keep page metadata immediately after the title for Markdown consumers. */
+function insertDescriptionAfterHeading(tree: Root, description?: string) {
+    if (!description) {
+        return;
+    }
+
+    const headingIndex = tree.children.findIndex(
+        (node) => node.type === 'heading' && node.depth === 1
+    );
+    if (headingIndex === -1) {
+        return;
+    }
+
+    const descriptionNode: Paragraph = {
+        type: 'paragraph',
+        children: [{ type: 'text', value: description }],
+    };
+    tree.children.splice(headingIndex + 1, 0, descriptionNode);
 }
 
 /**
@@ -199,6 +225,7 @@ async function renderGroupPageMarkdown(args: {
 }): Promise<string> {
     const { linker, page } = args;
     const indexablePages = getIndexablePages(page.pages);
+    const description = page.type === RevisionPageType.Document ? page.description : undefined;
 
     const markdownTree: Root = {
         type: 'root',
@@ -208,6 +235,14 @@ async function renderGroupPageMarkdown(args: {
                 depth: 1,
                 children: [{ type: 'text', value: page.title }],
             },
+            ...(description
+                ? [
+                      {
+                          type: 'paragraph',
+                          children: [{ type: 'text', value: description }],
+                      } satisfies Paragraph,
+                  ]
+                : []),
             ...(await getMarkdownForPagesTree(indexablePages, linker)),
         ],
     };
@@ -219,7 +254,8 @@ async function renderGroupPageMarkdown(args: {
 
 /**
  * Re-writes URLs in a markdown content:
- * -
+ * - stable content refs (`/pages/:id`, `/spaces/:id/pages/:id`, `/files/:id`...) in links,
+ *   images, definitions and in the `href`/`src` of raw HTML blocks are resolved to site URLs.
  * - the URL of every relative <a> link so it is expressed from the site-root.
  */
 async function rewriteMarkdownLinks(
@@ -246,30 +282,13 @@ async function rewriteMarkdownLinks(
             pending.push(
                 (async () => {
                     const resolved = await resolveContentRef(contentRef, context);
-                    if (resolved?.href) {
-                        node.url = resolved.href;
-                    } else {
-                        // We use an absolute URL so that crawler don't follow it.
-                        node.url = `broken://${original.startsWith('/') ? original.slice(1) : original}`;
-                    }
+                    node.url = resolved?.href ?? toBrokenURL(original);
 
                     if (isMention) {
                         // Replace the text for mentions as otherwise it contains the raw ref
-                        if (resolved) {
-                            node.children = [
-                                {
-                                    type: 'text',
-                                    value: resolved.text,
-                                },
-                            ];
-                        } else {
-                            node.children = [
-                                {
-                                    type: 'text',
-                                    value: 'Broken mention',
-                                },
-                            ];
-                        }
+                        node.children = [
+                            { type: 'text', value: resolved?.text ?? 'Broken mention' },
+                        ];
                         node.title = undefined;
                     }
                 })()
@@ -288,11 +307,101 @@ async function rewriteMarkdownLinks(
         }
     });
 
+    visit(tree, 'image', (node: Image) => {
+        pending.push(rewriteNodeURL(context, node));
+    });
+
+    visit(tree, 'definition', (node: Definition) => {
+        pending.push(rewriteNodeURL(context, node));
+    });
+
+    // Blocks markdown cannot express (tables, cards, figures...) are emitted as raw HTML,
+    // with the same stable refs in their anchors and images.
+    visit(tree, 'html', (node: Html) => {
+        pending.push(rewriteHTMLRefs(context, node));
+    });
+
     if (pending.length > 0) {
         await Promise.all(pending);
     }
 
     return tree;
+}
+
+/**
+ * Resolve a URL if it is a stable content ref. Returns null for anything else
+ * (external URLs, anchors, plain paths) so the caller leaves it untouched.
+ */
+async function resolveRefURL(
+    context: GitBookAnyContext,
+    url: string
+): Promise<{ url: string; text: string | null } | null> {
+    if (checkIsExternalURL(url) || checkIsAnchor(url)) {
+        return null;
+    }
+    const contentRef = resolveStringContentRef(url);
+    if (!contentRef) {
+        return null;
+    }
+    const resolved = await resolveContentRef(contentRef, context);
+    return { url: resolved?.href ?? toBrokenURL(url), text: resolved?.text ?? null };
+}
+
+async function rewriteNodeURL(context: GitBookAnyContext, node: Image | Definition) {
+    const resolved = await resolveRefURL(context, node.url);
+    if (resolved) {
+        node.url = resolved.url;
+    }
+}
+
+async function rewriteHTMLRefs(context: GitBookAnyContext, node: Html): Promise<void> {
+    node.value = await replaceAsync(node.value, HTML_ANCHOR_RE, async (match) => {
+        const [full, before = '', href = '', after = '', text = ''] = match;
+        const resolved = await resolveRefURL(context, href);
+        if (!resolved) {
+            return full;
+        }
+        // The API emits the raw ref as the text; swap it for the resolved title.
+        const content = text === href ? escapeHTML(resolved.text ?? 'Broken link') : text;
+        return `<a${before}href="${escapeHTML(resolved.url)}"${after}>${content}</a>`;
+    });
+
+    node.value = await replaceAsync(node.value, HTML_ANCHOR_OPEN_RE, async (match) => {
+        const [full, before = '', href = '', after = ''] = match;
+        const resolved = await resolveRefURL(context, href);
+        return resolved ? `<a${before}href="${escapeHTML(resolved.url)}"${after}>` : full;
+    });
+
+    node.value = await replaceAsync(node.value, HTML_SRC_RE, async (match) => {
+        const [full, src = ''] = match;
+        const resolved = await resolveRefURL(context, src);
+        return resolved ? `src="${escapeHTML(resolved.url)}"` : full;
+    });
+}
+
+async function replaceAsync(
+    value: string,
+    re: RegExp,
+    replacer: (match: RegExpMatchArray) => Promise<string>
+): Promise<string> {
+    const replacements = await Promise.all(Array.from(value.matchAll(re), replacer));
+    let index = 0;
+    return value.replace(re, () => replacements[index++]!);
+}
+
+/**
+ * Use an absolute URL so that crawlers don't follow it.
+ */
+function toBrokenURL(original: string): string {
+    return `broken://${original.startsWith('/') ? original.slice(1) : original}`;
+}
+
+function escapeHTML(value: string): string {
+    return value
+        .replace(/&/g, '&amp;')
+        .replace(/"/g, '&quot;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
 }
 
 function isMentionLike(node: Link) {

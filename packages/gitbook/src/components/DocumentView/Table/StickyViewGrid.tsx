@@ -9,6 +9,7 @@ interface StickyViewGridProps {
     header?: ReactNode;
     stickyHeader?: boolean;
     tableClassName?: string;
+    withTableRole?: boolean;
     children: ReactNode;
 }
 
@@ -23,6 +24,7 @@ function DefaultHeaderScrollGrid({
     className,
     header,
     tableClassName,
+    withTableRole = true,
     children,
 }: StickyViewGridProps) {
     const resolvedTableClassName = tableClassName ?? 'w-fit';
@@ -30,7 +32,7 @@ function DefaultHeaderScrollGrid({
     return (
         <div className={className}>
             <div
-                role="table"
+                role={withTableRole ? 'table' : undefined}
                 className="group/table relative flex w-full min-w-0 max-w-full flex-col rounded-lg border-tint-subtle"
             >
                 <div className="w-full min-w-0 overflow-x-auto overflow-y-hidden overscroll-x-none border-tint-subtle">
@@ -48,6 +50,7 @@ function StickyHeaderOverlayScrollGrid({
     className,
     header,
     tableClassName,
+    withTableRole = true,
     children,
 }: StickyViewGridProps) {
     const rootRef = useRef<HTMLDivElement>(null);
@@ -141,7 +144,7 @@ function StickyHeaderOverlayScrollGrid({
                 ref={rootRef}
                 className="group/table relative flex w-full min-w-0 max-w-full flex-col rounded-lg border-tint-subtle data-[scrollable=true]:border"
                 data-scrollable="false"
-                role="table"
+                role={withTableRole ? 'table' : undefined}
             >
                 {header ? (
                     <div

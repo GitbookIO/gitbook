@@ -1,17 +1,19 @@
 import type { CustomizationFontDefinitionInput } from '@gitbook/api';
 
+import type { FontRole } from './types';
+
 /**
- * Define the custom font faces and set the --font-content or --font-mono variable
+ * Define the custom font faces and set the --font-content, --font-heading or --font-mono variable
  * to the custom font name.
  */
 export function generateFontFacesCSS(
     customFont: CustomizationFontDefinitionInput,
-    type: 'content' | 'mono'
+    type: FontRole
 ): string {
     const { fontFaces } = customFont;
     const fontFamilyName = `CustomFont_${type}`;
     const fontVariableName = `--font-${type}`;
-    const fallbackFont = type === 'content' ? 'sans-serif' : 'monospace';
+    const fallbackFont = type === 'mono' ? 'monospace' : 'sans-serif';
 
     // Generate font face declarations for all weights
     const fontFaceDeclarations = fontFaces

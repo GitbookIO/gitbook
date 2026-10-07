@@ -1,5 +1,75 @@
+import { GITBOOK_DISABLE_LOOKUP_ALTERNATIVES } from '../env';
+import { joinPath, removeTrailingSlash } from '../paths';
 import { isProxyRootRequest } from '../proxy';
 import { DataFetcherError, getExposableError } from './errors';
+
+/**
+ * Paths served by our own routes rather than by site content. They can never be part of a
+ * site URL, so we stop matching there instead of spending lookups on URLs that cannot resolve.
+ * Kept in sync with the site route handlers and `encodePathInSiteContent` in the middleware.
+ */
+const INTERNAL_PATHS = [
+    // Simple `~gitbook` endpoints. `image`, `__evt` and `visitor` are served by the middleware
+    // before the lookup, but are listed so this stays a complete registry.
+    /^~gitbook\/(pdf|search|icon|site-index|image|__evt|visitor)$/,
+    /^~gitbook\/ogimage\/[^/]+$/,
+    /^~gitbook\/auth\/(login|logout)$/,
+    /^~gitbook\/oauth2\/v1\/[^/]+\/authorize$/,
+    /^~gitbook\/embed(\/(assistant|search|demo|script\.js|page(\/.*)?))?$/,
+    /^~gitbook\/markdown\/.+$/,
+    /^~gitbook\/markdown-ask\/[^/]+(\/[^/]+)?$/,
+    /^~gitbook\/rss\/.+$/,
+    // Site root files, including the `llms.txt` aliases from `PATH_ALIASES`.
+    /^llms\.txt$/,
+    /^llms-full\.txt(\/\d+)?$/,
+    /^(\.well-known\/)?sitemap\.md$/,
+    /^robots\.txt$/,
+    /^sitemap(-pages)?\.xml$/,
+    /^rss\.xml$/,
+];
+
+/**
+ * Return the leading segments that can be part of the site URL, dropping the internal path
+ * (if any) that follows them.
+ */
+function getContentPathSegments(pathSegments: string[]): string[] {
+    for (let index = 0; index < pathSegments.length; index++) {
+        const remaining = pathSegments.slice(index).join('/');
+        if (INTERNAL_PATHS.some((regex) => regex.test(remaining))) {
+            return pathSegments.slice(0, index);
+        }
+    }
+
+    return pathSegments;
+}
+
+/**
+ * Site URL prefixes resolved with the full URL only, for sites where a shorter alternative
+ * would resolve to the wrong content.
+ */
+const LOOKUP_ALTERNATIVES_BYPASS_URLS: string[] = ['https://proxy.gitbook.site/sites/site_p4Xo4'];
+
+/**
+ * Whether the lookup of this (normalized) URL should skip the shorter alternatives.
+ */
+export function shouldBypassLookupAlternatives(
+    url: URL,
+    bypassURLs: string[] = LOOKUP_ALTERNATIVES_BYPASS_URLS
+): boolean {
+    if (GITBOOK_DISABLE_LOOKUP_ALTERNATIVES) {
+        return true;
+    }
+
+    return bypassURLs.some((bypassURL) => {
+        const prefix = normalizeURL(new URL(bypassURL));
+        const prefixPath = removeTrailingSlash(prefix.pathname);
+        return (
+            prefix.origin === url.origin &&
+            (removeTrailingSlash(url.pathname) === prefixPath ||
+                url.pathname.startsWith(`${prefixPath}/`))
+        );
+    });
+}
 
 /**
  * For a given GitBook URL, return a list of alternative URLs that could be matched against to lookup the content.
@@ -21,8 +91,9 @@ import { DataFetcherError, getExposableError } from './errors';
  *   - Public content has a custom hostname in the organization with a variant: docs.company.com/<space>/v/<variant>/<path>
  *   - Public content has a custom hostname in the organization with a variant and a share-link: docs.company.com/<space>/<link>/v/<variant>/<path>
  */
-export function getURLLookupAlternatives(input: URL) {
+export function getURLLookupAlternatives(input: URL, options: { bypass?: boolean } = {}) {
     const url = normalizeURL(input);
+    const bypass = options.bypass ?? shouldBypassLookupAlternatives(url);
 
     let basePath: string | undefined = undefined;
     let changeRequest: string | undefined = undefined;
@@ -55,43 +126,50 @@ export function getURLLookupAlternatives(input: URL) {
     };
 
     const pathSegments = url.pathname.slice(1).split('/');
-    const tildeIndex = pathSegments.indexOf('~');
+    // Only the content part of the path can be matched against a site URL, the rest goes in the extraPath.
+    const contentSegments = getContentPathSegments(pathSegments);
+    const tildeIndex = contentSegments.indexOf('~');
+    const vIndex = contentSegments.indexOf('v');
 
     // URL looks like a specific content url (with ~/revisions/ or ~/changes/ in the path)
     // We only start matching after the ~/revisions/ or ~/changes/ segment and we ignore everything before it
     if (
         tildeIndex >= 0 &&
-        (pathSegments[tildeIndex + 1] === 'revisions' || pathSegments[tildeIndex + 1] === 'changes')
+        (contentSegments[tildeIndex + 1] === 'revisions' ||
+            contentSegments[tildeIndex + 1] === 'changes')
     ) {
-        const tildeIndex = pathSegments.indexOf('~');
         const revisionOrChangeIdIndex = tildeIndex + 2;
 
-        basePath = pathSegments.slice(tildeIndex, revisionOrChangeIdIndex + 1).join('/');
-        if (pathSegments[tildeIndex + 1] === 'revisions') {
-            revision = pathSegments[revisionOrChangeIdIndex];
+        basePath = contentSegments.slice(tildeIndex, revisionOrChangeIdIndex + 1).join('/');
+        if (contentSegments[tildeIndex + 1] === 'revisions') {
+            revision = contentSegments[revisionOrChangeIdIndex];
         } else {
-            changeRequest = pathSegments[revisionOrChangeIdIndex];
+            changeRequest = contentSegments[revisionOrChangeIdIndex];
         }
 
         // Match up to the tilde
         const contentURL = new URL(url);
-        contentURL.pathname = pathSegments.slice(0, tildeIndex).join('/');
+        contentURL.pathname = contentSegments.slice(0, tildeIndex).join('/');
         pushAlternative(contentURL, pathSegments.slice(revisionOrChangeIdIndex + 1).join('/'));
+    }
+
+    // Revisions and changes above still need their alternatives to extract the base path.
+    else if (bypass) {
+        pushAlternative(url, '');
     }
 
     // URL looks like a collection url (with /v/ in the path)
     // We only start matching after the /v/ segment and we ignore everything before it
     // to avoid potentially matching as a page not found under the default space in the collection
-    else if (pathSegments.includes('v')) {
+    else if (vIndex >= 0 && contentSegments.length >= vIndex + 2) {
         const collectionURL = new URL(url);
-        const vIndex = pathSegments.indexOf('v');
-        collectionURL.pathname = pathSegments.slice(0, vIndex + 2).join('/');
+        collectionURL.pathname = contentSegments.slice(0, vIndex + 2).join('/');
 
         pushAlternative(collectionURL, pathSegments.slice(vIndex + 2).join('/'));
     } else {
         // Match only with the host, if it can be a custom hostname
         // It should cover most cases of custom domains, and with caching, it should be fast.
-        if (!url.hostname.includes('.gitbook.io') || pathSegments.length === 0) {
+        if (!url.hostname.includes('.gitbook.io') || contentSegments.length === 0) {
             const noPathURL = new URL(url);
             noPathURL.pathname = '/';
 
@@ -100,9 +178,9 @@ export function getURLLookupAlternatives(input: URL) {
 
         // Otherwise match with the first four segments of the path
         for (let i = 1; i <= 4; i++) {
-            if (pathSegments.length >= i) {
+            if (contentSegments.length >= i) {
                 const shortURL = new URL(url);
-                shortURL.pathname = pathSegments.slice(0, i).join('/');
+                shortURL.pathname = contentSegments.slice(0, i).join('/');
 
                 pushAlternative(shortURL, pathSegments.slice(i).join('/'));
             }
@@ -116,6 +194,23 @@ export function getURLLookupAlternatives(input: URL) {
     }
 
     return { urls: alternatives, basePath, changeRequest, revision };
+}
+
+/** Combine a resolved lookup with the remaining requested page path. */
+export function getURLLookupPathname(
+    alternative: { url: string; extraPath: string },
+    resolved: { basePath: string; pathname: string }
+) {
+    if (
+        alternative.extraPath &&
+        removeTrailingSlash(new URL(alternative.url).pathname) ===
+            removeTrailingSlash(resolved.basePath)
+    ) {
+        // A root lookup can resolve to a custom homepage, which is not a prefix for other pages.
+        return joinPath('/', alternative.extraPath);
+    }
+
+    return joinPath(resolved.pathname, alternative.extraPath);
 }
 
 /**
@@ -138,7 +233,7 @@ export function normalizeRequestURL(url: URL): Response | null {
 
 /**
  * Normalize a URL to remove duplicate slashes and trailing slashes
- * and transform the pathname to lowercase.
+ * and decode the pathname to its canonical encoding.
  */
 export function normalizeURL(url: URL) {
     const result = new URL(url);

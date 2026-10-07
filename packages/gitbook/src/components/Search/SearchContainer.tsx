@@ -16,6 +16,7 @@ import { SearchInput } from './SearchInput';
 import { SearchLiveResultsAnnouncer } from './SearchLiveResultsAnnouncer';
 import { SearchScopeControl } from './SearchScopeControl';
 import { useSearchController } from './useSearchController';
+import { useSearchPopupFocusTrap } from './useSearchPopupFocusTrap';
 import { t, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
 
@@ -39,6 +40,7 @@ export function SearchContainer({
     ...searchProps
 }: SearchContainerProps) {
     const searchInputRef = useRef<HTMLDivElement>(null);
+    const [searchPopup, setSearchPopup] = React.useState<HTMLDivElement | null>(null);
     const language = useLanguage();
     const usesSideSheet = useIsMobile(768);
     const {
@@ -75,10 +77,9 @@ export function SearchContainer({
         },
         {
             enableOnFormTags: true,
-            // Match the logical character typed, not the physical key position, so
-            // non-QWERTY layouts don't trigger the shortcut by position (e.g. on
-            // Dvorak the physical "K"/"I" keys produce other characters). RND-11340.
-            ignoreEventWhen: (e) => e.key.toLowerCase() !== 'k',
+            // Match the produced key, not the physical key position, so non-QWERTY
+            // layouts don't trigger the shortcut by position. RND-11340.
+            useKey: true,
         }
     );
 
@@ -94,9 +95,9 @@ export function SearchContainer({
         },
         {
             enableOnFormTags: true,
-            // Match the logical character so Dvorak ⌘-C (physical "I" key) copies
+            // Match the produced key so Dvorak ⌘-C (physical "I" key) copies
             // instead of opening the Assistant. RND-11340.
-            ignoreEventWhen: (e) => e.key.toLowerCase() !== 'i',
+            useKey: true,
         }
     );
 
@@ -134,6 +135,9 @@ export function SearchContainer({
     const shouldShowSearchFrame = usesSideSheet
         ? Boolean(state?.open || state?.query || wasSearchOpened)
         : Boolean(state?.query || withAI);
+
+    useSearchPopupFocusTrap({ close, searchInputRef, searchPopup, usesSideSheet });
+
     const scopeControlNode =
         searchProps.withVariants || searchProps.withSections ? (
             <SearchScopeControl {...scopeControl} />
@@ -229,6 +233,8 @@ export function SearchContainer({
                     <Popover
                         content={searchFrame}
                         anchor={searchInputRef}
+                        popupRef={setSearchPopup}
+                        popupTestId="search-popover"
                         rootProps={{
                             open: isSearchOpen,
                             onOpenChange: (nextOpen, eventDetails) => {

@@ -1,14 +1,21 @@
 'use client';
 
-import type { SiteSection } from '@gitbook/api';
-
-import { Button, DropdownMenu, DropdownMenuItem, ToggleChevron } from '../primitives';
+import {
+    Button,
+    DropdownMenu,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownSubMenu,
+    ToggleChevron,
+} from '../primitives';
+import { findSearchSection, type SearchSection, type SearchSectionItem } from './search-props';
 import { useSearchState, useSetSearchState } from './useSearch';
 import { t, tString, useLanguage } from '@/intl/client';
 
 interface SearchScopeControlProps {
     spaceTitle: string;
-    section?: Pick<SiteSection, 'title' | 'icon'>;
+    section?: SearchSection;
+    sections: SearchSectionItem[];
     withVariants: boolean;
     withSiteVariants: boolean;
     withSections: boolean;
@@ -19,7 +26,7 @@ interface SearchScopeControlProps {
  * Only visible when the space is in a collection.
  */
 export function SearchScopeControl(props: SearchScopeControlProps) {
-    const { withVariants, withSections } = props;
+    const { section, sections, withVariants, withSections } = props;
 
     const state = useSearchState();
 
@@ -30,6 +37,12 @@ export function SearchScopeControl(props: SearchScopeControlProps) {
     // Whether to include all variants in the search
     const sectionScopeIsExtended = ['default', 'all'].includes(state.scope);
     const variantScopeIsExtended = ['extended', 'all'].includes(state.scope);
+    const independentlySelectedSection = state.section
+        ? findSearchSection(sections, state.section)
+        : undefined;
+    const hasIndependentlySelectedSection = Boolean(
+        independentlySelectedSection && independentlySelectedSection.id !== section?.id
+    );
 
     return (
         <div className="flex items-center">
@@ -38,7 +51,9 @@ export function SearchScopeControl(props: SearchScopeControlProps) {
                 <SearchScopeSectionControl isExtended={sectionScopeIsExtended} {...props} />
             ) : null}
 
-            {withVariants && (!withSections || !sectionScopeIsExtended) ? (
+            {withVariants &&
+            !hasIndependentlySelectedSection &&
+            (!withSections || !sectionScopeIsExtended) ? (
                 <SearchScopeVariantControl isExtended={variantScopeIsExtended} {...props} />
             ) : null}
         </div>
@@ -51,10 +66,16 @@ function SearchScopeTitle() {
 }
 
 function SearchScopeSectionControl(props: SearchScopeControlProps & { isExtended: boolean }) {
-    const { isExtended, section } = props;
+    const { isExtended, section, sections } = props;
 
     const language = useLanguage();
     const setSearchState = useSetSearchState();
+    const state = useSearchState();
+    const independentlySelectedSection = state?.section
+        ? findSearchSection(sections, state.section)
+        : undefined;
+    const selectedSection = independentlySelectedSection ?? section;
+    const searchesAllSections = isExtended && !independentlySelectedSection;
 
     return (
         <DropdownMenu
@@ -63,11 +84,13 @@ function SearchScopeSectionControl(props: SearchScopeControlProps & { isExtended
                     variant="blank"
                     size="small"
                     className="text-tint-strong"
-                    icon={isExtended ? undefined : section?.icon}
+                    icon={searchesAllSections ? undefined : selectedSection?.icon}
                     label={tString(
                         language,
-                        isExtended ? 'search_scope_section_all' : 'search_scope_section_current',
-                        section?.title ?? ''
+                        searchesAllSections
+                            ? 'search_scope_section_all'
+                            : 'search_scope_section_current',
+                        selectedSection?.title ?? ''
                     )}
                     trailing={<ToggleChevron />}
                 />
@@ -76,9 +99,11 @@ function SearchScopeSectionControl(props: SearchScopeControlProps & { isExtended
             <DropdownMenuItem
                 leadingIcon="infinity"
                 className="gap-3"
-                active={isExtended}
+                active={searchesAllSections}
                 onClick={() =>
-                    setSearchState((prev) => (prev ? { ...prev, scope: 'default' } : null))
+                    setSearchState((prev) =>
+                        prev ? { ...prev, scope: 'default', section: null } : null
+                    )
                 }
             >
                 <div className="flex flex-col">
@@ -90,24 +115,60 @@ function SearchScopeSectionControl(props: SearchScopeControlProps & { isExtended
                     </span>
                 </div>
             </DropdownMenuItem>
-            <DropdownMenuItem
-                leadingIcon={section?.icon ?? 'crosshairs'}
-                className="gap-3"
-                active={!isExtended}
-                onClick={() =>
-                    setSearchState((prev) => (prev ? { ...prev, scope: 'current' } : null))
-                }
-            >
-                <div className="flex flex-col">
-                    <span className="text-tint-strong">
-                        {t(language, 'search_scope_section_current', section?.title ?? '')}
-                    </span>
-                    <span className="text-xs text-tint-subtle">
-                        {t(language, 'search_scope_section_current_description')}
-                    </span>
-                </div>
-            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            {sections.map((item) => (
+                <SearchSectionMenuItem
+                    key={item.id}
+                    item={item}
+                    currentSectionId={section?.id}
+                    selectedSectionId={searchesAllSections ? undefined : selectedSection?.id}
+                />
+            ))}
         </DropdownMenu>
+    );
+}
+
+function SearchSectionMenuItem(props: {
+    item: SearchSectionItem;
+    currentSectionId?: string;
+    selectedSectionId?: string;
+}) {
+    const { item, currentSectionId, selectedSectionId } = props;
+    const setSearchState = useSetSearchState();
+
+    if (item.object === 'site-section-group') {
+        return (
+            <DropdownSubMenu label={item.title}>
+                {item.children.map((child) => (
+                    <SearchSectionMenuItem
+                        key={child.id}
+                        item={child}
+                        currentSectionId={currentSectionId}
+                        selectedSectionId={selectedSectionId}
+                    />
+                ))}
+            </DropdownSubMenu>
+        );
+    }
+
+    return (
+        <DropdownMenuItem
+            leadingIcon={item.icon ?? 'crosshairs'}
+            active={item.id === selectedSectionId}
+            onClick={() =>
+                setSearchState((prev) =>
+                    prev
+                        ? {
+                              ...prev,
+                              scope: item.id === currentSectionId ? 'current' : 'extended',
+                              section: item.id === currentSectionId ? null : item.id,
+                          }
+                        : null
+                )
+            }
+        >
+            <span className="text-tint-strong">{item.title}</span>
+        </DropdownMenuItem>
     );
 }
 

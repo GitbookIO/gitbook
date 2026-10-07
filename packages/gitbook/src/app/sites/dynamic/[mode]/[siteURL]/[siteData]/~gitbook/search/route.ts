@@ -1,26 +1,15 @@
 import { type NextRequest, NextResponse } from 'next/server';
 
+import { orderSearchResultGroups } from './orderSearchResults';
 import type {
-    SearchPageResult,
-    SearchSpaceResult,
-    SiteSection,
-    SiteSectionGroup,
-    SiteSpace,
-} from '@gitbook/api';
-import type { IconName } from '@gitbook/icons';
-
-import type {
-    ComputedPageResult,
-    ComputedSectionResult,
     OrderedComputedResult,
     SearchSiteContentRequest,
 } from '@/components/Search/search-types';
 import { throwIfDataError } from '@/lib/data';
-import { toEmbeddableLinkForPublishedContent } from '@/lib/embeddable-linker';
 import { getSiteURLDataFromMiddleware } from '@/lib/middleware';
-import { joinPathWithBaseURL } from '@/lib/paths';
+import { transformSitePageResult } from '@/lib/search';
 import { getServerActionBaseContext } from '@/lib/server-actions';
-import { findSiteSpaceBy, getLocalizedTitle } from '@/lib/sites';
+import { findSiteSpaceBy, getLinkerForSiteSpace } from '@/lib/sites';
 
 export async function POST(request: NextRequest) {
     const { asEmbeddable, query, scope } = (await request.json()) as SearchSiteContentRequest;
@@ -33,7 +22,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json([]);
     }
 
-    const [searchResults, { structure }] = await Promise.all([
+    const [searchResults, { structure }, revision] = await Promise.all([
         throwIfDataError(
             context.dataFetcher.searchSiteContent({
                 organizationId: siteURLData.organization,
@@ -49,10 +38,26 @@ export async function POST(request: NextRequest) {
                 siteShareKey: siteURLData.shareKey,
             })
         ),
+        siteURLData.revision
+            ? throwIfDataError(
+                  context.dataFetcher.getRevision({
+                      spaceId: siteURLData.space,
+                      revisionId: siteURLData.revision,
+                  })
+              )
+            : Promise.resolve(undefined),
     ]);
 
-    const results = searchResults
-        .flatMap((resultItem) => {
+    const currentSiteSpace = revision
+        ? findSiteSpaceBy(structure, (siteSpace) => siteSpace.id === siteURLData.siteSpace)
+        : null;
+    const revisionLinker =
+        revision && currentSiteSpace
+            ? getLinkerForSiteSpace(context.linker, currentSiteSpace.siteSpace, revision.pages)
+            : context.linker;
+
+    const results = orderSearchResultGroups<OrderedComputedResult>(
+        searchResults.map((resultItem) => {
             if (resultItem.type === 'record') {
                 const result: OrderedComputedResult = {
                     type: 'record',
@@ -63,150 +68,37 @@ export async function POST(request: NextRequest) {
                     score: resultItem.score,
                 };
 
-                return [{ score: resultItem.score, items: [result] }];
+                return { type: 'context' as const, results: [result] };
             }
 
-            const found = findSiteSpaceBy(
-                structure,
-                (siteSpace) => siteSpace.space.id === resultItem.id
-            );
+            const isCurrentRevisionSpace = Boolean(revision && resultItem.id === siteURLData.space);
+            const found =
+                isCurrentRevisionSpace && currentSiteSpace
+                    ? currentSiteSpace
+                    : findSiteSpaceBy(
+                          structure,
+                          (siteSpace) => siteSpace.space.id === resultItem.id
+                      );
 
-            return resultItem.pages.map((pageItem) => ({
-                score: pageItem.score,
-                items: transformSitePageResult({
-                    asEmbeddable: Boolean(asEmbeddable),
-                    linker: context.linker,
-                    pageItem,
-                    spaceItem: resultItem,
-                    siteSpace: found?.siteSpace,
-                    siteSection: found?.siteSection ?? undefined,
-                    siteSectionGroup: found?.siteSectionGroup ?? undefined,
+            return {
+                type: 'pages' as const,
+                results: resultItem.pages.flatMap((pageItem) => {
+                    const result = transformSitePageResult({
+                        asEmbeddable: Boolean(asEmbeddable),
+                        linker: isCurrentRevisionSpace ? revisionLinker : context.linker,
+                        pageItem,
+                        spaceItem: resultItem,
+                        siteSpace: found?.siteSpace,
+                        siteSection: found?.siteSection ?? undefined,
+                        siteSectionGroup: found?.siteSectionGroup ?? undefined,
+                        revisionPages: isCurrentRevisionSpace ? revision?.pages : undefined,
+                    });
+
+                    return result ? [{ rank: pageItem.rank, result }] : [];
                 }),
-            }));
+            };
         })
-        .sort((a, b) => b.score - a.score)
-        .flatMap((group) => group.items);
-
-    return NextResponse.json(results);
-}
-
-function transformSitePageResult(args: {
-    asEmbeddable: boolean;
-    linker: Awaited<ReturnType<typeof getServerActionBaseContext>>['linker'];
-    pageItem: SearchPageResult;
-    spaceItem: SearchSpaceResult;
-    siteSpace?: SiteSpace;
-    siteSection?: SiteSection;
-    siteSectionGroup?: SiteSectionGroup | null;
-}): OrderedComputedResult[] {
-    const { asEmbeddable, pageItem, spaceItem, siteSection, siteSectionGroup, siteSpace, linker } =
-        args;
-    const currentLanguage = siteSpace?.space.language;
-    const spaceURL = siteSpace?.urls.published;
-    const breadcrumbs: NonNullable<ComputedPageResult['breadcrumbs']> = [];
-
-    if (siteSectionGroup) {
-        breadcrumbs.push({
-            icon: siteSectionGroup.icon as IconName,
-            label: getLocalizedTitle(siteSectionGroup, currentLanguage),
-        });
-    }
-
-    if (siteSection) {
-        breadcrumbs.push({
-            icon: siteSection.icon as IconName,
-            label: getLocalizedTitle(siteSection, currentLanguage),
-        });
-    }
-
-    if (
-        (siteSection?.siteSpaces?.filter(
-            (space) =>
-                siteSection.siteSpaces?.filter(
-                    (candidate) => candidate.space.language === space.space.language
-                ).length > 1
-        ).length ?? 0) > 1 &&
-        siteSpace
-    ) {
-        breadcrumbs.push({
-            label: getLocalizedTitle(siteSpace, currentLanguage),
-        });
-    }
-
-    breadcrumbs.push(
-        ...pageItem.ancestors.map((ancestor) => ({
-            label: ancestor.title,
-        }))
     );
 
-    const pageHref = !spaceURL
-        ? linker.toPathInSpace(pageItem.path)
-        : asEmbeddable
-          ? toEmbeddableLinkForPublishedContent(linker, spaceURL, pageItem.path)
-          : linker.toLinkForContent(joinPathWithBaseURL(spaceURL, pageItem.path));
-
-    // The deployed API already returns this field, but older generated clients and responses do not.
-    const resultType =
-        'resultType' in pageItem &&
-        (pageItem.resultType === 'page' || pageItem.resultType === 'section')
-            ? pageItem.resultType
-            : undefined;
-
-    const page: ComputedPageResult = {
-        type: 'page',
-        id: `${spaceItem.id}/${pageItem.id}`,
-        title: pageItem.title,
-        href: pageHref,
-        pageId: pageItem.id,
-        spaceId: spaceItem.id,
-        score: pageItem.score,
-        resultType,
-        breadcrumbs,
-    };
-
-    const pageSections =
-        pageItem.sections
-            ?.filter((section) => section.title || section.body)
-            .map<ComputedSectionResult>((section) => {
-                let sectionHref = linker.toPathInSpace(section.path);
-
-                if (spaceURL) {
-                    if (asEmbeddable) {
-                        sectionHref = toEmbeddableLinkForPublishedContent(
-                            linker,
-                            spaceURL,
-                            section.path
-                        );
-                    } else {
-                        sectionHref = linker.toLinkForContent(
-                            joinPathWithBaseURL(spaceURL, section.path)
-                        );
-                    }
-                }
-
-                return {
-                    type: 'section',
-                    id: `${page.id}/${section.id}`,
-                    title: section.title,
-                    href: sectionHref,
-                    body: section.body,
-                    pageId: pageItem.id,
-                    spaceId: spaceItem.id,
-                    score: section.score,
-                };
-            }) ?? [];
-
-    // The search API returns each page's sections ordered highest-score-first and caps them at one
-    // per page, so the first section is the best-scoring one to use as a body preview.
-    const bestSection = pageSections[0];
-    if (bestSection) {
-        page.bestSection = {
-            href: bestSection.href,
-            title: bestSection.title,
-            body: bestSection.body,
-            score: bestSection.score,
-        };
-    }
-
-    return [page];
+    return NextResponse.json(results);
 }

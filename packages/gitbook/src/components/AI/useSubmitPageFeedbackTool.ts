@@ -80,7 +80,7 @@ export function useSubmitPageFeedbackTool(options: {
         () => ({
             name: 'submitPageFeedback',
             description:
-                "Submit the feedback on behalf of the user about the documentation page they are currently viewing. Use this when the user is indicating a sentiment about the page, particularly a negative one, or pointing to incorrect or incoherent information on a page. Proactively suggest to submit feedback for the user to help alleviate frustration or indicate a content gap they've encountered. The user will be asked to confirm before the feedback is recorded. Provide a rating and, when the user gave one, a comment in their own words.",
+                "Submit the feedback on behalf of the user about the documentation page they are currently viewing. Use this when the user is indicating a sentiment about the page, particularly a negative one, or pointing to incorrect or incoherent information on a page. Proactively suggest to submit feedback for the user to help alleviate frustration or indicate a content gap they've encountered. The user will be asked to confirm before the feedback is recorded. Provide a rating and, when the user gave one, a comment in their own words. This records their rating of the page — use `leaveUserFeedback` to pass a report of their own about the content on to the documentation team.",
             confirmation: (input) => {
                 const parsed = SubmitPageFeedbackInputSchema.safeParse(input);
                 const comment = parsed.success ? parsed.data.comment?.trim() : undefined;

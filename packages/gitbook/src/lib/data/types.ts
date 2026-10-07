@@ -79,6 +79,7 @@ export interface GitBookDataFetcher {
     getRevision(params: {
         spaceId: string;
         revisionId: string;
+        metadata?: boolean;
     }): Promise<DataFetcherResponse<api.Revision>>;
 
     /**
@@ -97,6 +98,8 @@ export interface GitBookDataFetcher {
         spaceId: string;
         revisionId: string;
         path: string;
+        metadata?: boolean;
+        cachedMetadata?: boolean;
     }): Promise<DataFetcherResponse<api.RevisionPageDocument | api.RevisionPageGroup>>;
 
     /**

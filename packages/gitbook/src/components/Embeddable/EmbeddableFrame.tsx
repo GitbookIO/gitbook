@@ -87,7 +87,7 @@ export function EmbeddableFrameBody(props: { children: React.ReactNode; classNam
 export function EmbeddableFrameTitle(props: { children: React.ReactNode }) {
     const { children } = props;
 
-    return <div className="font-bold">{children}</div>;
+    return <div className="font-heading font-bold">{children}</div>;
 }
 
 export function EmbeddableFrameClose() {

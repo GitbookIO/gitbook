@@ -10,6 +10,7 @@ import type {
     RevisionPageDocument,
     Site,
     SiteCustomizationSettings,
+    SiteExternalLink,
     SiteIntegrationScript,
     SiteSection,
     SiteSectionGroup,
@@ -93,6 +94,16 @@ export type SiteURLData = Pick<
      * Should never be set for the main site. RND-11571.
      */
     embedTheme?: CustomizationDefaultThemeMode;
+
+    /**
+     * Whether the request comes from a detected AI agent. Used to serve an indexable
+     * `X-Robots-Tag` on markdown pages. Only set for markdown routes, to avoid splitting
+     * the static cache of the other routes.
+     */
+    isAiAgent?: boolean;
+
+    /** Whether the request comes from ChatGPT. Only set for Markdown and LLM routes. */
+    isChatGPT?: boolean;
 };
 
 /**
@@ -144,8 +155,10 @@ export type GitBookSpaceContext = GitBookBaseContext & {
     shareKey: string | undefined;
 };
 
+export type SiteStructureNode = SiteSection | SiteSectionGroup | SiteExternalLink;
+
 export type SiteSections = {
-    list: (SiteSectionGroup | SiteSection)[];
+    list: SiteStructureNode[];
     current: SiteSection;
 };
 
@@ -191,8 +204,17 @@ export type GitBookSiteContext = GitBookSpaceContext & {
     /** Whether the request included a visitor token. */
     isLoggedInVisitor: boolean;
 
+    /** Whether the site is rendered from a preview URL. */
+    preview: boolean;
+
     /** Whether to display agent instructions in the markdown output. Defaults to true when undefined. */
     displayAgentInstructions?: boolean;
+
+    /** Whether the request comes from a detected AI agent. Only set for markdown routes. */
+    isAiAgent?: boolean;
+
+    /** Whether the request comes from ChatGPT. Only set for Markdown and LLM routes. */
+    isChatGPT?: boolean;
 };
 
 /**
@@ -274,7 +296,10 @@ export async function fetchSiteContextByURLLookup(
         isFallback: data.isFallback ?? false,
         noIndexSearch: data.noIndexSearch ?? false,
         isLoggedInVisitor: data.isLoggedInVisitor ?? false,
+        preview: data.preview ?? false,
         displayAgentInstructions: data.displayAgentInstructions,
+        isAiAgent: data.isAiAgent,
+        isChatGPT: data.isChatGPT,
     });
 }
 
@@ -296,7 +321,10 @@ export async function fetchSiteContextByIds(
         isFallback: boolean;
         noIndexSearch: boolean;
         isLoggedInVisitor: boolean;
+        preview: boolean;
         displayAgentInstructions?: boolean;
+        isAiAgent?: boolean;
+        isChatGPT?: boolean;
     }
 ): Promise<GitBookSiteContext> {
     const { dataFetcher } = baseContext;
@@ -424,7 +452,10 @@ export async function fetchSiteContextByIds(
         isFallback: ids.isFallback,
         noIndexSearch: ids.noIndexSearch,
         isLoggedInVisitor: ids.isLoggedInVisitor,
+        preview: ids.preview,
         displayAgentInstructions: ids.displayAgentInstructions,
+        isAiAgent: ids.isAiAgent,
+        isChatGPT: ids.isChatGPT,
     };
 }
 
@@ -488,6 +519,7 @@ export async function fetchSpaceContextByIds(
         shareKey: string | undefined;
         changeRequest: string | undefined;
         revision: string | undefined;
+        revisionMetadata?: boolean;
     }
 ): Promise<GitBookSpaceContext> {
     const { dataFetcher } = baseContext;
@@ -521,6 +553,7 @@ export async function fetchSpaceContextByIds(
         dataFetcher.getRevision({
             spaceId: ids.space,
             revisionId,
+            ...(ids.revisionMetadata ? { metadata: true } : {}),
         }),
 
         // When trying to render a revision with an invalid / non-existing ID,
@@ -568,6 +601,38 @@ export function checkIsRootSiteContext(context: GitBookSiteContext): boolean {
     }
 }
 
+/** Filter sections with hidden spaces while preserving external navigation links. */
+export function filterSectionsAndGroupsWithHiddenSiteSpaces(
+    sectionsOrGroups: SiteStructureNode[]
+): SiteStructureNode[] {
+    return sectionsOrGroups
+        .map((entry) => {
+            switch (entry.object) {
+                case 'site-section':
+                    return sectionHasOnlyHiddenSiteSpaces(entry) ? null : entry;
+                case 'site-external-link':
+                    return entry;
+                case 'site-section-group': {
+                    const visibleChildren = filterSectionsAndGroupsWithHiddenSiteSpaces(
+                        entry.children
+                    );
+
+                    if (visibleChildren.length === 0) {
+                        return null;
+                    }
+
+                    return {
+                        ...entry,
+                        children: visibleChildren,
+                    };
+                }
+                default:
+                    return assertNever(entry, 'Unknown site structure node object type');
+            }
+        })
+        .filter((entry): entry is SiteStructureNode => Boolean(entry));
+}
+
 /**
  * Filter out hidden site spaces from a list of site spaces.
  */
@@ -594,36 +659,6 @@ function parseVisibleSiteSectionsAndGroups(structure: SiteStructure, siteSection
 function parseCurrentSection(structure: SiteStructure, siteSectionId: string) {
     const sections = getSiteStructureSections(structure, { ignoreGroups: true });
     return sections.find((section) => section.id === siteSectionId);
-}
-
-type SectionOrGroup = SiteSection | SiteSectionGroup;
-
-/**
- * Filter out sections where all site spaces are hidden and groups that become empty after filtering.
- */
-function filterSectionsAndGroupsWithHiddenSiteSpaces(
-    sectionsOrGroups: SectionOrGroup[]
-): SectionOrGroup[] {
-    return sectionsOrGroups
-        .map((entry) => {
-            if (entry.object === 'site-section') {
-                return sectionHasOnlyHiddenSiteSpaces(entry) ? null : entry;
-            }
-
-            const visibleChildren: SectionOrGroup[] = filterSectionsAndGroupsWithHiddenSiteSpaces(
-                entry.children
-            );
-
-            if (visibleChildren.length === 0) {
-                return null;
-            }
-
-            return {
-                ...entry,
-                children: visibleChildren,
-            };
-        })
-        .filter((entry): entry is SiteSection | SiteSectionGroup => Boolean(entry));
 }
 
 function sectionHasOnlyHiddenSiteSpaces(section: SiteSection) {

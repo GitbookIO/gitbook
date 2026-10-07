@@ -138,13 +138,14 @@ export function ElementWebframe(props: ContentKitClientElementProps<ContentKitWe
                                     typeof message.action.anchor === 'string'
                                         ? message.action.anchor
                                         : undefined,
+                                query: message.action.query,
                             });
                         }
                         break;
                     default:
-                        renderer.update({
-                            action: message.action,
-                        });
+                        // Go through dispatchAction so webframes can trigger the built-in
+                        // `@ui.*` actions, like a ContentKit button does.
+                        renderer.dispatchAction(message.action);
                 }
             }
         };

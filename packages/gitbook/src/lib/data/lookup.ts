@@ -1,12 +1,17 @@
-import type { PublishedSiteContentLookup, SiteVisitorPayload } from '@gitbook/api';
+import type { GitBookAPI, PublishedSiteContentLookup, SiteVisitorPayload } from '@gitbook/api';
 
 import { apiClient } from './api';
 import { getExposableError } from './errors';
 import type { DataFetcherResponse } from './types';
-import { getURLLookupAlternatives, stripURLSearch } from './urls';
+import { getURLLookupAlternatives, getURLLookupPathname, stripURLSearch } from './urls';
+import { isAPITokenExpired } from '@/lib/api-token';
 import { race, tryCatch } from '@/lib/async';
+import { getLogger } from '@/lib/logger';
 import { joinPath, joinPathWithBaseURL } from '@/lib/paths';
+import { isPreviewRequest } from '@/lib/preview';
 import { trace } from '@/lib/tracing';
+
+type ResolveBody = Parameters<GitBookAPI['urls']['resolvePublishedContentByUrl']>[0];
 
 interface LookupPublishedContentByUrlInput {
     url: string;
@@ -28,23 +33,49 @@ export async function lookupPublishedContentByUrl(
 
     const result = await race(lookup.urls, async (alternative, { signal }) => {
         const api = apiClient({ apiToken: input.apiToken });
-        const callResult = await trace(
+        const resolveURL = (cacheBust?: string) =>
+            tryCatch(
+                api.urls.resolvePublishedContentByUrl(
+                    {
+                        url: alternative.url,
+                        ...(input.visitorPayload ? { visitor: input.visitorPayload } : {}),
+                        redirectOnError: input.redirectOnError,
+                        // Temporary: the API caches this POST by request body, so an unknown
+                        // field is enough to miss the cache and get a freshly minted token.
+                        ...(cacheBust ? { cacheBust } : {}),
+                    } as ResolveBody, //TODO: remove cast when we are sure that everything is good
+                    { signal }
+                )
+            );
+
+        let callResult = await trace(
             {
                 operation: 'resolvePublishedContentByUrl',
                 name: alternative.url,
             },
-            () =>
-                tryCatch(
-                    api.urls.resolvePublishedContentByUrl(
-                        {
-                            url: alternative.url,
-                            ...(input.visitorPayload ? { visitor: input.visitorPayload } : {}),
-                            redirectOnError: input.redirectOnError,
-                        },
-                        { signal }
-                    )
-                )
+            () => resolveURL()
         );
+
+        const resolved = callResult.error ? null : callResult.data.data;
+        if (
+            resolved &&
+            !('redirect' in resolved) &&
+            // Only alternatives we'd actually accept are worth a second round-trip.
+            (alternative.primary || resolved.complete) &&
+            isAPITokenExpired(resolved.apiToken)
+        ) {
+            getLogger().warn(
+                'resolvePublishedContentByUrl returned an expired API token, retrying without cache'
+            );
+            callResult = await trace(
+                {
+                    operation: 'resolvePublishedContentByUrlUncached',
+                    name: alternative.url,
+                },
+                // The value only needs to differ between calls, so `Math.random` is enough.
+                () => resolveURL(Math.random().toString(36).slice(2))
+            );
+        }
 
         if (callResult.error) {
             if (alternative.primary) {
@@ -61,6 +92,13 @@ export async function lookupPublishedContentByUrl(
 
         if ('redirect' in data) {
             if (alternative.primary) {
+                if (data.target === 'application' && isPreviewRequest(lookupURL)) {
+                    // The cached lookup omits content selectors and query params needed after login.
+                    const redirect = new URL(data.redirect);
+                    redirect.searchParams.set('redirect', lookupURL.toString());
+                    return { data: { ...data, redirect: redirect.toString() } };
+                }
+
                 // Append the path to the redirect URL
                 // because we might have matched a shorter path and the redirect is relative to it
                 if (alternative.extraPath) {
@@ -104,7 +142,7 @@ export async function lookupPublishedContentByUrl(
                 ...data,
                 canonicalUrl: joinPathWithBaseURL(data.canonicalUrl, alternative.extraPath),
                 basePath: joinPath(data.basePath, lookup.basePath ?? ''),
-                pathname: joinPath(data.pathname, alternative.extraPath),
+                pathname: getURLLookupPathname(alternative, data),
                 ...(changeRequest ? { changeRequest } : {}),
                 ...(revision ? { revision } : {}),
             };

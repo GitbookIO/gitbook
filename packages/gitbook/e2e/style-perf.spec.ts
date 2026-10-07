@@ -111,6 +111,28 @@ function expectWithinBudgets(measurements: Measurement[], total: number) {
     }
 }
 
+const countElements = (page: Page) =>
+    page.evaluate(() => document.getElementsByTagName('*').length);
+
+// Not `networkidle`: third-party subresources on this customer site can hang, so it never settles.
+async function waitForStableElementCount(page: Page): Promise<number> {
+    let previous = await countElements(page);
+
+    await expect
+        .poll(
+            async () => {
+                const current = await countElements(page);
+                const stable = current === previous;
+                previous = current;
+                return stable;
+            },
+            { message: 'the tree never stopped changing', timeout: 15_000 }
+        )
+        .toBe(true);
+
+    return previous;
+}
+
 async function openLargePage(page: Page) {
     await page.goto(getContentTestURL(LARGE_PAGE_URL));
     await waitForCookiesDialog(page);
@@ -118,10 +140,9 @@ async function openLargePage(page: Page) {
     // Measure a settled page: before hydration the tree is smaller and no popup can open at all.
     await page.locator('html.hydrated').waitFor();
     await expect(page.getByLabel('OpenAPI Select').first()).toBeAttached();
-    await page.waitForLoadState('networkidle');
 
+    const totalElements = await waitForStableElementCount(page);
     const client = await page.context().newCDPSession(page);
-    const totalElements = await page.evaluate(() => document.getElementsByTagName('*').length);
 
     return { client, totalElements };
 }
@@ -135,6 +156,50 @@ async function expectIdle(page: Page, client: CDPSession) {
     const restyled = await countRestyledElements(page, client, async () => {});
     expect(restyled, 'an idle page should barely restyle').toBeLessThan(IDLE_RESTYLE_TOLERANCE);
 }
+
+// Both checks below probe a block's children, never the block itself: `content-visibility: auto`
+// skips an element's *contents*, so the element carrying it keeps reporting visible and every block
+// would look rendered. Same reason `toBeVisible()` is no use here — a skipped child still has a box.
+function countRenderedBlocks(page: Page): Promise<number> {
+    return page.evaluate(
+        () =>
+            [...document.querySelectorAll('.openapi-block')].filter((block) =>
+                [...block.children].some((child) =>
+                    child.checkVisibility({ contentVisibilityAuto: true })
+                )
+            ).length
+    );
+}
+
+test('off-screen OpenAPI blocks skip their rendering work', async ({ page }) => {
+    await openLargePage(page);
+
+    const blocks = page.locator('.openapi-block');
+    const total = await blocks.count();
+    expect(total, 'the fixture needs enough blocks for some to sit off-screen').toBeGreaterThan(4);
+
+    await page.evaluate(() => window.scrollTo(0, 0));
+    const rendered = await countRenderedBlocks(page);
+    expect(
+        rendered,
+        `${rendered} of ${total} blocks rendered from the top of the page`
+    ).toBeLessThan(total / 2);
+
+    // Un-skipping on approach is what keeps #anchors and find-in-page working.
+    const last = blocks.last();
+    await last.scrollIntoViewIfNeeded();
+    await expect
+        .poll(
+            () =>
+                last.evaluate((block) =>
+                    [...block.children].some((child) =>
+                        child.checkVisibility({ contentVisibilityAuto: true })
+                    )
+                ),
+            { message: 'the last block never rendered after being scrolled to' }
+        )
+        .toBe(true);
+});
 
 test('opening a popup restyles a bounded part of a large API reference', async ({ page }) => {
     const { client, totalElements } = await openLargePage(page);

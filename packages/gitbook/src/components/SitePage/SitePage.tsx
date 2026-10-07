@@ -4,16 +4,22 @@ import { notFound, redirect } from 'next/navigation';
 import {
     CustomizationDefaultThemeMode,
     CustomizationHeaderPreset,
-    type RevisionPageDocument,
     SiteInsightsDisplayContext,
     type TranslationLanguage,
 } from '@gitbook/api';
 import { IconsProvider } from '@gitbook/icons';
 
 import { PageContextProvider } from '../PageContext';
-import { type PagePathParams, fetchPageData, getPathnameParam } from './fetch';
+import {
+    type PagePathParams,
+    fetchPageData,
+    getLowercasePathnameRedirect,
+    getPathnameParam,
+} from './fetch';
 import { PageClientLayout } from './PageClientLayout';
+import { getPageFullTitle } from './title';
 import { UpdatesFilterProvider } from '@/components/DocumentView/UpdatesFilter';
+import { UpdatesFilterScript } from '@/components/DocumentView/UpdatesFilterScript';
 import { PageAside } from '@/components/PageAside';
 import { PageBody, PageCover } from '@/components/PageBody';
 import type { GitBookSiteContext } from '@/lib/context';
@@ -27,14 +33,15 @@ import { getResizedImageURL } from '@/lib/images';
 import { getPagePath } from '@/lib/pages';
 import { resolveContentRef } from '@/lib/references';
 import { isPageIndexable, isSiteIndexable } from '@/lib/seo';
-import {
-    getSiteSpacePagePaths,
-    getSiteStructureTitle,
-    resolveSiteSpaceCustomHomePage,
-} from '@/lib/sites';
+import { getSiteSpacePagePaths, resolveSiteSpaceCustomHomePage } from '@/lib/sites';
 import { tcls } from '@/lib/tailwind';
-import { getDocumentFilterableTags } from '@/lib/updates';
-import { getPageRSSURL } from '@/routes/rss';
+import {
+    generateUpdatesFilterCSS,
+    getDocumentFilterableTags,
+    updatesFilterStyleHref,
+} from '@/lib/updates';
+
+export { getPageFullTitle } from './title';
 
 export type SitePageProps = {
     context: GitBookSiteContext;
@@ -81,6 +88,7 @@ export async function SitePage(props: SitePageProps & { staticRoute: boolean }) 
     } = await getSitePageData(props);
     const headerOffset = { sectionsHeader: withSections, topHeader: withTopHeader };
     const filterableTags = document ? getDocumentFilterableTags(document, context.revision) : [];
+    const filterableTagSlugs = filterableTags.map((tag) => tag.slug);
     const content = (
         <>
             {/* Using `contents` makes the children of this div according to its parent — which keeps them in a single flex row with the TOC by default.
@@ -134,8 +142,10 @@ export async function SitePage(props: SitePageProps & { staticRoute: boolean }) 
     return (
         <IconsProvider iconSources={iconSources}>
             <PageContextProvider pageId={page.id} spaceId={context.space.id} title={page.title}>
-                {filterableTags.length > 0 ? (
-                    <UpdatesFilterProvider tagSlugs={filterableTags.map((tag) => tag.slug)}>
+                {filterableTagSlugs.length > 0 ? (
+                    <UpdatesFilterProvider tagSlugs={filterableTagSlugs}>
+                        <UpdatesFilterScript tagSlugs={filterableTagSlugs} />
+                        <UpdatesFilterStyle tagSlugs={filterableTagSlugs} />
                         {content}
                     </UpdatesFilterProvider>
                 ) : (
@@ -143,6 +153,22 @@ export async function SitePage(props: SitePageProps & { staticRoute: boolean }) 
                 )}
             </PageContextProvider>
         </IconsProvider>
+    );
+}
+
+/**
+ * Stylesheet that resolves which `updates` entries the active `?tag=` filter shows, purely in CSS
+ * (see generateUpdatesFilterCSS). Byte-identical for every visitor, so it has no cache impact.
+ */
+function UpdatesFilterStyle({ tagSlugs }: { tagSlugs: string[] }) {
+    const css = generateUpdatesFilterCSS(tagSlugs);
+    if (!css) {
+        return null;
+    }
+    return (
+        <style href={updatesFilterStyleHref(tagSlugs)} precedence="high">
+            {css}
+        </style>
     );
 }
 
@@ -220,9 +246,6 @@ export async function generateSitePageMetadata(props: SitePageProps): Promise<Me
             languages: alternates?.languages,
             types: {
                 'text/markdown': `${linker.toAbsoluteURL(linker.toPathInSpace(page.path))}.md`,
-                // We always reference the RSS feed even if the page doesn't have updates blocks,
-                // It might result in 404, but we can't know here if the page has updates blocks.
-                'application/rss+xml': [{ url: getPageRSSURL(context, page), title: 'RSS Feed' }],
                 // Currently it will output with an empty "type" like <link rel="alternate" href="..." type />
                 // Team at Vercel is aware of this and will ensure it will be omitted when the value is empty in future versions of Next.js
                 // https://gitbook.slack.com/archives/C04K6MV5W1K/p1763034072958419?thread_ts=1762937203.511629&cid=C04K6MV5W1K
@@ -257,8 +280,8 @@ export async function getSitePageData(props: SitePageProps) {
 
     const rawPathname = getPathnameParam(props.pageParams);
     if (!pageTarget) {
-        const pathname = rawPathname.toLowerCase();
-        if (pathname !== rawPathname) {
+        const pathname = getLowercasePathnameRedirect(rawPathname);
+        if (pathname !== null) {
             // If the pathname was not normalized, redirect to the normalized version
             // before trying to resolve the page again
             redirect(context.linker.toPathInSpace(pathname));
@@ -395,21 +418,4 @@ async function resolvePageMetaLinks(
         canonical: null,
         alternates: [],
     };
-}
-
-/**
- * Get the <title> for a page.
- */
-export function getPageFullTitle(context: GitBookSiteContext, page: RevisionPageDocument) {
-    const { site } = context;
-    const siteStructureTitle = getSiteStructureTitle(context);
-
-    return [
-        page.title,
-        // Prevent duplicate titles by comparing against the page title.
-        page.title !== siteStructureTitle ? siteStructureTitle : null, // The first page of a section is often the same as the section title, so we don't need to show it.
-        page.title !== site.title ? site.title : null, // The site title can also be the same as the site title on the site's landing page.
-    ]
-        .filter(Boolean)
-        .join(' | ');
 }

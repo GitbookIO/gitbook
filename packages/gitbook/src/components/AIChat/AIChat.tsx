@@ -23,8 +23,7 @@ import {
     EmbeddableFrameSubtitle,
     EmbeddableFrameTitle,
 } from '../Embeddable/EmbeddableFrame';
-import { useNow } from '../hooks';
-import { useTrackEvent } from '../Insights';
+import { useIsMounted, useNow } from '../hooks';
 import { Button } from '../primitives';
 import { ScrollContainer } from '../primitives/ScrollContainer';
 import { SideSheet } from '../primitives/SideSheet';
@@ -63,18 +62,10 @@ export function AIChat() {
         () => {
             chatController.close();
         },
-        []
-    );
-
-    // Track the view of the AI chat
-    const trackEvent = useTrackEvent();
-    React.useEffect(() => {
-        if (chat.opened) {
-            trackEvent({
-                type: 'ask_view',
-            });
+        {
+            useKey: true,
         }
-    }, [chat.opened, trackEvent]);
+    );
 
     return (
         <SideSheet
@@ -222,13 +213,17 @@ export function AIChatBody(props: {
 
     const isEmpty = !chat.messages.length;
 
+    const isMounted = useIsMounted();
     const timeGreeting = React.useMemo(() => {
+        // The server clock runs in another timezone than the visitor's, so computing the
+        // greeting during SSR mismatches on hydration and regenerates the whole chat tree.
+        if (!isMounted) return '';
         const hour = new Date(now).getHours();
         if (hour < 6) return tString(language, 'ai_chat_assistant_greeting_night');
         if (hour < 12) return tString(language, 'ai_chat_assistant_greeting_morning');
         if (hour < 18) return tString(language, 'ai_chat_assistant_greeting_afternoon');
         return tString(language, 'ai_chat_assistant_greeting_evening');
-    }, [now, language]);
+    }, [isMounted, now, language]);
 
     return (
         <>
@@ -254,7 +249,7 @@ export function AIChatBody(props: {
                             </div>
                             <div className="flex flex-col items-start gap-1 [@container(min-height:400px)]:items-center">
                                 <h5
-                                    className="animate-blur-in-slow text-lg font-bold leading-tight text-tint-strong [@container(min-height:400px)]:text-center"
+                                    className="animate-blur-in-slow font-heading text-lg font-bold leading-tight text-tint-strong [@container(min-height:400px)]:text-center"
                                     style={{ animationDelay: '.5s' }}
                                     data-testid="ai-chat-greeting-title"
                                 >

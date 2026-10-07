@@ -30,8 +30,11 @@ export function Footer(props: { context: GitBookSiteContext }) {
             data-gb-site-footer
             className={tcls(
                 'border-tint-subtle border-t',
-                // If the footer only contains a mode toggle, we only show it on smaller screens
-                mobileOnly ? 'xl:hidden' : null
+                // If the footer only contains a mode toggle, we only show it where the outline
+                // column — which carries its own toggle — isn't pinned open.
+                mobileOnly
+                    ? 'layout-default:xl:chat-closed:hidden layout-default:3xl:hidden layout-wide:3xl:chat-closed:hidden page-api-block:page-has-outline:min-[96rem]:hidden'
+                    : null
             )}
         >
             <div className="lg:chat-open:pr-(--ai-chat-width) transition-[padding] duration-300 motion-reduce:transition-none">
@@ -96,7 +99,9 @@ export function Footer(props: { context: GitBookSiteContext }) {
                         {
                             // Theme Toggle
                             customization.themes.toggeable ? (
-                                <div className="-col-start-2 row-start-1 flex items-start @xs:justify-end xl:hidden">
+                                // Hidden where the outline column is pinned open (see PageAside),
+                                // since that column carries its own toggle.
+                                <div className="page-api-block:page-has-outline:min-[96rem]:hidden -col-start-2 row-start-1 flex items-start @xs:justify-end layout-default:xl:chat-closed:hidden layout-default:3xl:hidden layout-wide:3xl:chat-closed:hidden">
                                     <React.Suspense fallback={null}>
                                         <ThemeToggler />
                                     </React.Suspense>

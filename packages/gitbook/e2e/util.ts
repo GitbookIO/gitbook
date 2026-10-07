@@ -465,7 +465,11 @@ export function getCustomizationURL(partial: DeepPartial<SiteCustomizationSettin
         socialAccounts: [],
     };
 
-    const encoded = rison.encode_object(deepMerge(DEFAULT_CUSTOMIZATION, partial));
+    const encoded = rison.encode_object(
+        deepMerge(DEFAULT_CUSTOMIZATION, partial, {
+            arrayMerge: (_target, source) => source,
+        })
+    );
 
     const searchParams = new URLSearchParams();
     searchParams.set('customization', encoded);

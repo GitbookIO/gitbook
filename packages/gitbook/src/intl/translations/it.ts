@@ -11,6 +11,8 @@ export const it: TranslationLanguage = {
     switch_to_system_theme: 'Passa al tema di sistema',
     search: 'Cerca',
     clear: 'Cancella',
+    table_filtered_by_selection: 'Corrisponde alla selezione: ${1}',
+    table_clear_selection: 'Cancella selezione',
     tags: 'Tag',
     search_back: 'Torna ai risultati di ricerca',
     search_or_ask: 'Chiedi o cerca',
@@ -77,12 +79,16 @@ export const it: TranslationLanguage = {
     notfound_title: 'Pagina non trovata',
     notfound_link: 'Questo link punta a una pagina che è stata rimossa o non esiste più.',
     notfound: 'La pagina che cerchi non esiste.',
-    notfound_adaptive_title: 'Pagina non disponibile',
+    notfound_adaptive_title: 'Accedi per visualizzare questa pagina',
     notfound_adaptive:
-        "Questa pagina potrebbe esistere, ma potrebbe essere necessario effettuare l'accesso per visualizzarla.",
+        "Questa pagina potrebbe richiedere l'accesso. Se hai seguito un link, verifica che sia corretto.",
     notfound_adaptive_login: 'Accedi',
     notfound_adaptive_registration_hint:
         "La registrazione potrebbe essere disponibile a seconda dell'organizzazione.",
+    notfound_adaptive_no_access_title: 'Potresti non avere accesso a questa pagina',
+    notfound_adaptive_no_access:
+        'Questa pagina potrebbe non esistere, oppure il tuo account potrebbe non avervi accesso. Se hai seguito un link, verifica che sia corretto.',
+    notfound_adaptive_login_again: 'Accedi di nuovo',
     notfound_goto_home: 'Vai alla home',
     notfound_suggestions_title: 'Forse stai cercando',
     unexpected_error_title: 'Si è verificato un errore',
@@ -154,6 +160,7 @@ export const it: TranslationLanguage = {
     ai_chat_tools_submit_assistant_feedback:
         "Valuta il messaggio precedente dell'assistente come ${1}",
     ai_chat_tools_submitted_feedback: 'Feedback inviato',
+    ai_chat_tools_shared_feedback_with_team: 'Feedback inviato al team di documentazione',
     ai_chat_tools_mcp_tool: 'Ha chiamato ${1}',
     ai_chat_ask: 'Chiedi a ${1}',
     ai_chat_ask_about: 'Chiedi a ${1} riguardo a ${2}',
@@ -187,4 +194,22 @@ export const it: TranslationLanguage = {
     form_other_field: 'Altro...',
     cancel: 'Annulla',
     direct_link_to_heading: 'Link diretto al titolo',
+    auth_consent_request: '${1} vuole accedere a ${2} a tuo nome.',
+    auth_client_website: 'Sito web',
+    auth_verified: 'Verificato',
+    auth_unverified: 'Non verificato',
+    auth_unverified_title: 'GitBook non ha verificato questo client',
+    auth_unverified_description:
+        'Approva solo se riconosci questa applicazione e le affidi l’accesso a ${1}.',
+    auth_code_preamble: 'Dopo l’approvazione, un codice di autorizzazione verrà inviato a:',
+    auth_redirect_uri_label: 'URI di reindirizzamento',
+    auth_trust_client: 'Riconosco questo client e mi fido',
+    auth_approve: 'Approva',
+    auth_deny: 'Rifiuta',
+    auth_error_title: 'Si è verificato un problema',
+    auth_expired_title: 'Questo link di autorizzazione è scaduto',
+    auth_expired_description: 'Riavvia l’accesso dall’applicazione.',
+    auth_error_invalid_request: 'Richiesta non valida. Ricomincia dall’applicazione.',
+    auth_error_failed:
+        'Non è stato possibile completare l’autorizzazione. La richiesta potrebbe essere scaduta: ricomincia dall’applicazione.',
 };

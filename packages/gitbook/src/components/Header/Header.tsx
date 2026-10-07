@@ -2,7 +2,11 @@ import type { SiteSpace } from '@gitbook/api';
 
 import { SocialAccountButton } from '../Footer/SocialAccounts';
 import { SearchContainer, getSearchBaseProps } from '../Search';
-import { SiteSectionTabs, encodeClientSiteSections } from '../SiteSections';
+import {
+    SiteSectionTabs,
+    encodeClientSiteSections,
+    shouldRenderSiteSectionNavigation,
+} from '../SiteSections';
 import { HeaderLink } from './HeaderLink';
 import { HeaderLinkMore } from './HeaderLinkMore';
 import { HeaderLinks } from './HeaderLinks';
@@ -30,11 +34,7 @@ export async function Header(props: {
     const searchProps = getSearchBaseProps(context);
     const language = await getSpaceLanguage(context);
 
-    const withSections = Boolean(
-        visibleSections &&
-        (visibleSections.list.length > 1 || // Show section tabs if there are at least 2 sections or at least 1 section group
-            visibleSections.list.some((s) => s.object === 'site-section-group'))
-    );
+    const withSections = shouldRenderSiteSectionNavigation(visibleSections);
 
     const headerSocialAccounts = customization.socialAccounts.filter(
         (account) => account.display.header === true

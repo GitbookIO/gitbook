@@ -2,9 +2,16 @@
 
 import { useState, useTransition } from 'react';
 
-import { type SubmitConsentInput, submitSiteOAuthConsent } from './actions';
+import { Icon } from '@gitbook/icons';
+
+import {
+    type SubmitConsentErrorCode,
+    type SubmitConsentInput,
+    submitSiteOAuthConsent,
+} from './actions';
 import { Button } from '@/components/primitives/Button';
 import { Checkbox } from '@/components/primitives/Checkbox';
+import { t, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
 
 /**
@@ -17,8 +24,9 @@ export function ConsentForm(props: {
     verified: boolean;
 }) {
     const { siteId, consentSessionId, verified } = props;
+    const language = useLanguage();
     const [isPending, startTransition] = useTransition();
-    const [error, setError] = useState<string>();
+    const [error, setError] = useState<SubmitConsentErrorCode>();
     const [trusted, setTrusted] = useState(false);
 
     // Unverified clients can only be approved once the visitor explicitly acknowledges they trust
@@ -44,49 +52,67 @@ export function ConsentForm(props: {
     };
 
     return (
-        <div className="flex flex-col gap-3">
-            {error ? (
-                <p role="alert" className="text-sm text-danger-strong">
-                    {error}
-                </p>
-            ) : null}
-
-            <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-3">
-                {verified ? (
-                    <span />
-                ) : (
+        <div className="flex flex-col gap-4">
+            <div className="flex flex-wrap justify-between gap-4">
+                {verified ? null : (
                     <label
                         htmlFor="site-oauth-trusted"
-                        className="flex items-center gap-2 text-sm text-tint"
+                        className="me-auto flex grow cursor-pointer items-center gap-2 text-sm text-tint"
                     >
                         <Checkbox
                             id="site-oauth-trusted"
                             checked={trusted}
                             onCheckedChange={setTrusted}
                         />
-                        <span>I recognize and trust this client</span>
+                        <span>{t(language, 'auth_trust_client')}</span>
                     </label>
                 )}
 
-                <div className={tcls('ms-auto flex gap-2')}>
+                <div className={tcls('flex grow gap-2 text-sm')}>
                     <Button
                         variant="secondary"
+                        size="medium"
                         icon="xmark"
                         disabled={isPending}
                         onClick={() => decide('deny')}
+                        className="grow justify-center"
                     >
-                        Deny
+                        {t(language, 'auth_deny')}
                     </Button>
                     <Button
                         variant="primary"
+                        size="medium"
                         icon="check"
                         disabled={isPending || !canApprove}
                         onClick={() => decide('approve')}
+                        className="grow justify-center"
                     >
-                        Approve
+                        {t(language, 'auth_approve')}
                     </Button>
                 </div>
             </div>
+
+            {error ? (
+                <div
+                    role="alert"
+                    className={tcls(
+                        'flex gap-3',
+                        'rounded-corners:rounded-xl circular-corners:rounded-3xl',
+                        'bg-danger p-4 text-danger animate-blur-in-slow'
+                    )}
+                >
+                    <Icon
+                        icon="triangle-exclamation"
+                        className="ml-1 mt-0.5 size-4 shrink-0 text-danger-strong"
+                    />
+                    <div className="flex flex-col gap-1">
+                        <span className="font-semibold text-danger-strong">
+                            {t(language, 'auth_error_title')}
+                        </span>
+                        <span>{t(language, error)}</span>
+                    </div>
+                </div>
+            ) : null}
         </div>
     );
 }

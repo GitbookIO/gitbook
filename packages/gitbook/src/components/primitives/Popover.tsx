@@ -5,13 +5,16 @@ import { tcls } from '@/lib/tailwind';
 export function Popover(props: {
     anchor: BasePopover.Positioner.Props['anchor'];
     content?: string | React.ReactNode;
+    popupRef?: React.Ref<HTMLDivElement>;
+    popupTestId?: string;
     rootProps?: Omit<BasePopover.Root.Props, 'children'>;
     positionerProps?: Omit<BasePopover.Positioner.Props, 'children' | 'className' | 'anchor'> & {
         className?: string;
     };
     popupProps?: Omit<BasePopover.Popup.Props, 'children' | 'className'> & { className?: string };
 }) {
-    const { anchor, content, rootProps, positionerProps, popupProps } = props;
+    const { anchor, content, popupRef, popupTestId, rootProps, positionerProps, popupProps } =
+        props;
 
     return (
         <BasePopover.Root {...rootProps}>
@@ -24,6 +27,8 @@ export function Popover(props: {
                     sideOffset={positionerProps?.sideOffset ?? 4}
                 >
                     <BasePopover.Popup
+                        ref={popupRef}
+                        data-testid={popupTestId}
                         {...popupProps}
                         className={tcls(
                             'max-h-(--available-height) max-w-xs animate-scale-in overflow-y-auto overflow-x-hidden circular-corners:rounded-3xl rounded-corners:rounded-xl bg-tint px-4 py-3 text-sm text-tint depth-subtle:shadow-xl shadow-tint-12/4 outline-hidden ring-1 ring-tint transition-all empty:hidden data-closed:animate-scale-out motion-reduce:transition-none dark:shadow-tint-1/6',

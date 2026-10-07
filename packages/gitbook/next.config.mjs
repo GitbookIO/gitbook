@@ -94,6 +94,7 @@ const nextConfig = {
         GITBOOK_RUNTIME: process.env.GITBOOK_RUNTIME,
         GITBOOK_BLOCK_SEARCH_INDEXATION: process.env.GITBOOK_BLOCK_SEARCH_INDEXATION,
         GITBOOK_ALLOW_CUSTOMIZATION_OVERRIDE: process.env.GITBOOK_ALLOW_CUSTOMIZATION_OVERRIDE,
+        GITBOOK_DISABLE_INSIGHTS: process.env.GITBOOK_DISABLE_INSIGHTS,
 
         // Next.js envs
         NEXT_SERVER_ACTIONS_ENCRYPTION_KEY: process.env.NEXT_SERVER_ACTIONS_ENCRYPTION_KEY,
@@ -104,6 +105,9 @@ const nextConfig = {
 
     assetPrefix: process.env.GITBOOK_ASSETS_PREFIX,
     poweredByHeader: false,
+
+    // We maintain our own AGENTS.md/CLAUDE.md at the repo root.
+    agentRules: false,
 
     images: {
         remotePatterns: [

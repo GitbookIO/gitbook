@@ -15,7 +15,6 @@ import {
 } from '../primitives/DropdownMenu';
 import { SiteAuthLoginDropdownMenuItem } from '../SiteAuth/SiteAuthLoginLink';
 import { HeaderLinkMoreDropdown } from './HeaderLinkMoreClient';
-import styles from './headerLinks.module.css';
 import { isSiteAuthLoginHref } from '@/lib/auth-login-link';
 import type { GitBookSiteContext } from '@/lib/context';
 import { resolveContentRef } from '@/lib/references';
@@ -34,7 +33,7 @@ export function HeaderLinkMore(props: {
     const { label, links, context, socialAccounts } = props;
 
     return (
-        <div className={`${styles.linkEllipsis} z-20 items-center`}>
+        <div className="header-links-ellipsis z-20 items-center">
             <HeaderLinkMoreDropdown
                 label={label}
                 dropdownClassName={tcls(

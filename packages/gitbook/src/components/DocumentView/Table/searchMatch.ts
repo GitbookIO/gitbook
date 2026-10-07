@@ -8,6 +8,72 @@
 /** Selected option values per select column, keyed by column id. */
 export type SelectedOptions = Readonly<Record<string, ReadonlySet<string>>>;
 
+/** Per-record data used by the client-side table search. */
+export interface TableSearchRecordData {
+    id: string;
+    searchText: string;
+    selectValues?: Record<string, string[]>;
+    checkboxValues?: Record<string, boolean>;
+}
+
+/**
+ * Match records and expand matching vertical merge groups to a fixed point.
+ */
+export function getVisibleTableRecordIds({
+    records,
+    recordGroups = [],
+    query,
+    selectedOptions,
+    checkedColumns,
+}: {
+    records: readonly TableSearchRecordData[];
+    recordGroups?: readonly (readonly string[])[];
+    query: string;
+    selectedOptions: SelectedOptions;
+    checkedColumns: ReadonlySet<string>;
+}): ReadonlySet<string> | null {
+    const hasActiveFilters =
+        query.trim() !== '' || Object.keys(selectedOptions).length > 0 || checkedColumns.size > 0;
+    if (!hasActiveFilters) {
+        return null;
+    }
+
+    const visibleIds = new Set<string>();
+    for (const record of records) {
+        if (
+            recordMatches(
+                record.searchText,
+                record.selectValues,
+                record.checkboxValues,
+                query,
+                selectedOptions,
+                checkedColumns
+            )
+        ) {
+            visibleIds.add(record.id);
+        }
+    }
+
+    let expanded = true;
+    while (expanded) {
+        expanded = false;
+        for (const group of recordGroups) {
+            if (!group.some((id) => visibleIds.has(id))) {
+                continue;
+            }
+
+            for (const id of group) {
+                if (!visibleIds.has(id)) {
+                    visibleIds.add(id);
+                    expanded = true;
+                }
+            }
+        }
+    }
+
+    return visibleIds;
+}
+
 /**
  * Whether a record passes the current filters.
  *
