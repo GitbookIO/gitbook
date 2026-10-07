@@ -17,8 +17,7 @@ interface LookupPublishedContentByUrlInput {
     url: string;
     redirectOnError: boolean;
     apiToken: string | null;
-    // TODO: remove the country extension once @gitbook/api exposes visitor.country
-    visitorPayload: SiteVisitorPayload & { country?: string };
+    visitorPayload: SiteVisitorPayload;
 }
 
 /**
