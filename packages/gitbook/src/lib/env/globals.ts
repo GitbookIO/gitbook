@@ -15,6 +15,15 @@ export const GITBOOK_RUNTIME = (process.env.GITBOOK_RUNTIME ?? 'unknown') as
     | 'unknown';
 
 /**
+ * Deployment stage (`STAGE` from the Cloudflare wrangler configs, the target env on Vercel),
+ * defaulting to `dev` locally.
+ */
+export const GITBOOK_STAGE =
+    process.env.STAGE ??
+    process.env.VERCEL_TARGET_ENV ??
+    (process.env.NODE_ENV === 'development' ? 'dev' : undefined);
+
+/**
  * Main host on which GitBook is running.
  */
 export const GITBOOK_URL =

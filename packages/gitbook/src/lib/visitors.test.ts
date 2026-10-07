@@ -7,11 +7,13 @@ import {
     getVisitorAuthCookieMaxAge,
     getVisitorAuthCookieName,
     getVisitorAuthCookieValue,
+    getVisitorCountry,
     getVisitorToken,
     getVisitorType,
     getVisitorUnsignedClaims,
     isRevalidationRequest,
     normalizeVisitorURL,
+    shouldSendVisitorCountry,
 } from './visitors';
 
 describe('getVisitorAuthToken', () => {
@@ -598,4 +600,77 @@ describe('isRevalidationRequest', () => {
         expect(isRevalidationRequest(new Headers({ 'User-Agent': 'Mozilla/5.0' }))).toBe(false);
         expect(isRevalidationRequest(new Headers())).toBe(false);
     });
+});
+
+describe('getVisitorCountry', () => {
+    const requestWith = (headers: Record<string, string>) => ({ headers: new Headers(headers) });
+
+    it('should prefer the OpenNext country header', () => {
+        expect(
+            getVisitorCountry(
+                requestWith({ 'x-open-next-country': 'FR', 'x-vercel-ip-country': 'US' })
+            )
+        ).toBe('FR');
+    });
+
+    it('should fall back to the Vercel country header', () => {
+        expect(getVisitorCountry(requestWith({ 'x-vercel-ip-country': 'US' }))).toBe('US');
+    });
+
+    it('should normalize the country code to uppercase', () => {
+        expect(getVisitorCountry(requestWith({ 'x-open-next-country': ' fr ' }))).toBe('FR');
+    });
+
+    it.each(['XX', 'T1', 'FRA', 'F', ''])('should ignore the invalid country code %p', (value) => {
+        expect(getVisitorCountry(requestWith({ 'x-open-next-country': value }))).toBeUndefined();
+    });
+
+    it('should return undefined when no country header is present', () => {
+        expect(getVisitorCountry(requestWith({}))).toBeUndefined();
+    });
+
+    it('should prefer the forwarded country header on revalidation requests', () => {
+        expect(
+            getVisitorCountry(
+                requestWith({
+                    'user-agent': 'gitbook-open-revalidation-worker',
+                    'x-gitbook-country': 'DE',
+                    'x-open-next-country': 'FR',
+                })
+            )
+        ).toBe('DE');
+    });
+
+    it('should ignore the forwarded country header outside revalidation requests', () => {
+        expect(
+            getVisitorCountry(
+                requestWith({ 'x-gitbook-country': 'DE', 'x-open-next-country': 'FR' })
+            )
+        ).toBe('FR');
+        expect(getVisitorCountry(requestWith({ 'x-gitbook-country': 'DE' }))).toBeUndefined();
+    });
+
+    it('should fall back to geolocation headers on revalidation requests without a forwarded country', () => {
+        expect(
+            getVisitorCountry(
+                requestWith({
+                    'user-agent': 'gitbook-open-revalidation-worker',
+                    'x-open-next-country': 'FR',
+                })
+            )
+        ).toBe('FR');
+    });
+});
+
+describe('shouldSendVisitorCountry', () => {
+    it.each(['dev', 'preview', 'staging'])('should be enabled on the %p stage', (stage) => {
+        expect(shouldSendVisitorCountry('docs.example.com', stage)).toBe(true);
+    });
+
+    it.each(['production', undefined])(
+        'should be disabled for other hostnames on the %p stage',
+        (stage) => {
+            expect(shouldSendVisitorCountry('docs.example.com', stage)).toBe(false);
+        }
+    );
 });
