@@ -19,14 +19,17 @@ import {
 import { PageAsideToggleButton } from '../PageAside/PageAsideButton';
 import { PageIcon } from '../PageIcon';
 import { getPDFURLSearchParams } from '../PDF';
-import { findBestTargetURL } from '../SiteSections/encodeClientSiteSections';
+import {
+    findBestTargetURL,
+    getTargetURLForSiteSpace,
+} from '../SiteSections/encodeClientSiteSections';
 import { categorizeVariants } from '../SpaceLayout/categorizeVariants';
 import { BreadcrumbItemDropdown, type BreadcrumbSibling } from './BreadcrumbItemDropdown';
 import { PageTags } from './PageTags';
 import type { GitBookSiteContext, SiteStructureNode } from '@/lib/context';
 import { hasAdaptiveMcpEndpoint } from '@/lib/mcp/endpoints';
 import { type AncestorRevisionPage, resolveFirstDocument } from '@/lib/pages';
-import { getLocalizedTitle, getSiteSpaceURL } from '@/lib/sites';
+import { getLocalizedTitle } from '@/lib/sites';
 import { tcls } from '@/lib/tailwind';
 import { getPageRSSURL } from '@/routes/rss';
 
@@ -41,8 +44,10 @@ export async function PageHeader(props: {
      * exactly as-is.
      */
     hasAPIBlocks: boolean;
+    /** Keep the context crumbs' links inside the embed rather than sending readers to the full site. */
+    asEmbeddable: boolean;
 }) {
-    const { context, page, ancestors, withRSSFeed, hasAPIBlocks } = props;
+    const { context, page, ancestors, withRSSFeed, hasAPIBlocks, asEmbeddable } = props;
     const { revision, linker } = context;
 
     const hasAncestors = ancestors.length > 0;
@@ -82,7 +87,10 @@ export async function PageHeader(props: {
                 // Section groups have no URL of their own; only sections are navigable. Resolve the
                 // section to the site space matching the current variant so switching sections keeps
                 // the reader on their current variant (same logic as the section tabs).
-                href: node.object === 'site-section' ? findBestTargetURL(context, node) : undefined,
+                href:
+                    node.object === 'site-section'
+                        ? findBestTargetURL(context, node, asEmbeddable)
+                        : undefined,
                 label: getLocalizedTitle(node, context.locale),
                 icon: node.icon,
                 siblings: siblings
@@ -92,7 +100,7 @@ export async function PageHeader(props: {
                     // Don't offer hidden sections/groups as switch targets.
                     .filter((sibling) => !visibleSectionIds || visibleSectionIds.has(sibling.id))
                     .map((sibling) => {
-                        const href = getSectionNodeURL(context, sibling);
+                        const href = getSectionNodeURL(context, sibling, asEmbeddable);
                         // Keep siblings whose URL is "" (the site's first page); only drop the ones
                         // with no resolvable URL at all.
                         return href !== undefined
@@ -112,7 +120,7 @@ export async function PageHeader(props: {
     if (currentSiteSpace) {
         contextCrumbs.push({
             key: `variant-${currentSiteSpace.id}`,
-            href: getSiteSpaceURL(context, currentSiteSpace),
+            href: getTargetURLForSiteSpace(context, currentSiteSpace, asEmbeddable),
             label: getLocalizedTitle(currentSiteSpace, context.locale),
             siblings: [],
             // Reuse the header's variant switcher rather than plain per-variant links, so each entry
@@ -122,7 +130,7 @@ export async function PageHeader(props: {
                 slimSpaces: variantSpaces.map((siteSpace) => ({
                     id: siteSpace.id,
                     title: getLocalizedTitle(siteSpace, context.locale),
-                    url: getSiteSpaceURL(context, siteSpace),
+                    url: getTargetURLForSiteSpace(context, siteSpace, asEmbeddable),
                     isActive: siteSpace.id === currentSiteSpace.id,
                     spaceId: siteSpace.space.id,
                 })),
@@ -448,9 +456,13 @@ function collectSectionNodeIds(list: SiteStructureNode[]): Set<string> {
  * The URL resolves to the site space matching the current variant (same logic as the section tabs),
  * so switching sections keeps the reader on their current variant.
  */
-function getSectionNodeURL(context: GitBookSiteContext, node: SectionNode): string | undefined {
+function getSectionNodeURL(
+    context: GitBookSiteContext,
+    node: SectionNode,
+    asEmbeddable: boolean
+): string | undefined {
     const section = findFirstSection(node);
-    return section ? findBestTargetURL(context, section) : undefined;
+    return section ? findBestTargetURL(context, section, asEmbeddable) : undefined;
 }
 
 /**

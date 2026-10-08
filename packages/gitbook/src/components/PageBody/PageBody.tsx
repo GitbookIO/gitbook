@@ -1,4 +1,8 @@
-import type { JSONDocument, RevisionPageDocument, SiteInsightsDisplayContext } from '@gitbook/api';
+import {
+    type JSONDocument,
+    type RevisionPageDocument,
+    SiteInsightsDisplayContext,
+} from '@gitbook/api';
 
 import { DocumentView, DocumentViewSkeleton } from '../DocumentView';
 import { CurrentPageProvider } from '../hooks/useCurrentPage';
@@ -127,6 +131,7 @@ export async function PageBody(props: {
                         ancestors={ancestors}
                         withRSSFeed={contentHasUpdates}
                         hasAPIBlocks={hasAPIBlocks}
+                        asEmbeddable={insightsDisplayContext === SiteInsightsDisplayContext.Embed}
                     />
                     {document && !isNodeEmpty(document) ? (
                         <OptionalSuspense
