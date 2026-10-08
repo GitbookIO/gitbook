@@ -13,6 +13,7 @@ import {
     getVisitorUnsignedClaims,
     isRevalidationRequest,
     normalizeVisitorURL,
+    parseHostnameList,
     shouldSendVisitorCountry,
 } from './visitors';
 
@@ -673,4 +674,16 @@ describe('shouldSendVisitorCountry', () => {
             expect(shouldSendVisitorCountry('docs.example.com', stage)).toBe(false);
         }
     );
+});
+
+describe('parseHostnameList', () => {
+    it.each([undefined, '', ' , '])('should return an empty set for %p', (value) => {
+        expect(parseHostnameList(value).size).toBe(0);
+    });
+
+    it('should trim, lowercase and drop empty entries', () => {
+        expect(parseHostnameList(' Docs.Foo.com , ,bar.io')).toEqual(
+            new Set(['docs.foo.com', 'bar.io'])
+        );
+    });
 });
