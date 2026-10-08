@@ -25,6 +25,10 @@ const languageDefinitions = {
         metadata: { locale: 'fr', language: 'Français', flag: '🇫🇷' },
         load: () => import('./fr').then((module) => module.fr),
     },
+    'fr-ca': {
+        metadata: { locale: 'fr-ca', language: 'Français (Canada)', flag: '🇨🇦' },
+        load: () => import('./fr').then((module) => withMetadata(module.fr, 'fr-ca')),
+    },
     de: {
         metadata: { locale: 'de', language: 'Deutsch', flag: '🇩🇪' },
         load: () => import('./de').then((module) => module.de),
@@ -32,6 +36,14 @@ const languageDefinitions = {
     es: {
         metadata: { locale: 'es', language: 'Español', flag: '🇪🇸' },
         load: () => import('./es').then((module) => module.es),
+    },
+    'es-mx': {
+        metadata: { locale: 'es-mx', language: 'Español (México)', flag: '🇲🇽' },
+        load: () => import('./es').then((module) => withMetadata(module.es, 'es-mx')),
+    },
+    'es-419': {
+        metadata: { locale: 'es-419', language: 'Español (Latinoamérica)', flag: '🌎' },
+        load: () => import('./es').then((module) => withMetadata(module.es, 'es-419')),
     },
     it: {
         metadata: { locale: 'it', language: 'Italiano', flag: '🇮🇹' },
@@ -176,6 +188,14 @@ const languageDefinitions = {
 } satisfies Record<string, LanguageDefinition>;
 
 export type TranslationLocale = keyof typeof languageDefinitions;
+
+// Regional variants reuse their base language's strings but keep their own locale, name and flag.
+function withMetadata(
+    base: TranslationLanguage,
+    locale: 'fr-ca' | 'es-mx' | 'es-419'
+): TranslationLanguage {
+    return { ...base, ...languageDefinitions[locale].metadata };
+}
 
 export const languages = Object.fromEntries(
     Object.entries(languageDefinitions).map(([locale, definition]) => [locale, definition.metadata])
