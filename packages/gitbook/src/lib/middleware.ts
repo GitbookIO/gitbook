@@ -2,6 +2,7 @@ import { headers } from 'next/headers';
 
 import { CustomizationDefaultThemeMode } from '@gitbook/api';
 
+import { decompressAPIToken } from './api-token-compression';
 import type { SiteURLData } from './context';
 
 export enum MiddlewareHeaders {
@@ -70,7 +71,8 @@ export async function getSiteURLDataFromMiddleware(): Promise<SiteURLData> {
         );
     }
 
-    return JSON.parse(siteURLData);
+    const data: SiteURLData = JSON.parse(siteURLData);
+    return { ...data, apiToken: decompressAPIToken(data.apiToken) };
 }
 
 /**
