@@ -681,6 +681,10 @@ describe('parseHostnameList', () => {
         expect(parseHostnameList(value).size).toBe(0);
     });
 
+    it('should parse a single entry', () => {
+        expect(parseHostnameList('docs.foo.com')).toEqual(new Set(['docs.foo.com']));
+    });
+
     it('should trim, lowercase and drop empty entries', () => {
         expect(parseHostnameList(' Docs.Foo.com , ,bar.io')).toEqual(
             new Set(['docs.foo.com', 'bar.io'])
