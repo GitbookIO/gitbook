@@ -186,9 +186,25 @@ export function ElementWebframe(props: ContentKitClientElementProps<ContentKitWe
             ? iframeRef.current.clientWidth / height
             : undefined);
 
-    if (!mounted) {
-        return <Icon icon="spinner" className="contentkit-button-loading" style={{ height }} />;
+if (!mounted) {
+    if (aspectRatio) {
+        return (
+            <div
+                style={{
+                    width: '100%',
+                    aspectRatio,
+                    maxHeight: height,
+                    display: 'grid',
+                    placeItems: 'center',
+                }}
+            >
+                <Icon icon="spinner" className="contentkit-button-loading" />
+            </div>
+        );
     }
+
+    return <Icon icon="spinner" className="contentkit-button-loading" style={{ height }} />;
+}
 
     // only use height measurement if no aspect ratio is defined
     const useHeightMeasurement = !aspectRatio && height;
