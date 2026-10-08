@@ -284,11 +284,11 @@ export async function getSitePageData(props: SitePageProps) {
         if (pathname !== null) {
             // If the pathname was not normalized, redirect to the normalized version
             // before trying to resolve the page again
-            redirect(context.linker.toPathInSpace(pathname));
+            redirect(context.linker.toPathForPagePath({ path: pathname }));
         } else {
             // If the page is not found and we are in fallback mode, return a redirect to the basepath
             if (context.isFallback) {
-                redirect(context.linker.toPathInSpace('/'));
+                redirect(context.linker.toPathForPagePath({ path: '/' }));
             }
             notFound();
         }
