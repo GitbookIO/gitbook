@@ -954,6 +954,7 @@ function encodePathInSiteContent(
                               {
                                   type: 'ask_question',
                                   query: ask,
+                                  goal: typeof goal === 'string' ? goal : undefined,
                                   location: {
                                       displayContext: SiteInsightsDisplayContext.Server,
                                   },
