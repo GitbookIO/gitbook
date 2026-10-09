@@ -4,6 +4,7 @@ import pMap, { pMapIterable } from 'p-map';
 
 import type { RevisionPageDocument, SiteSection, SiteSpace } from '@gitbook/api';
 
+import { renderSiteAgentInstructions } from '@/lib/ask-prompt';
 import {
     type GitBookSiteContext,
     checkIsRootSiteContext,
@@ -169,6 +170,12 @@ async function streamMarkdownPageEntries(
             `> Page index: ${context.linker.toAbsoluteURL(context.linker.toPathInSite('llms.txt'))}`
         );
         stream.enqueue(new TextEncoder().encode(`${header.join('\n')}\n\n`));
+    }
+
+    // Rendered up front, on every part, since agents may only read the start of the file.
+    const agentInstructions = renderSiteAgentInstructions(context);
+    if (agentInstructions) {
+        stream.enqueue(new TextEncoder().encode(`${agentInstructions}\n---\n\n`));
     }
 
     // Process the pages

@@ -2,7 +2,7 @@ import type { RevisionPageDocument, RevisionPageGroup } from '@gitbook/api';
 
 import { resolveMissingPagePath } from '@/components/SitePage/fetch';
 import { isAIEnabled } from '@/components/utils/isAIChatEnabled';
-import { renderQueryingDocumentation } from '@/lib/ask-prompt';
+import { renderPageAgentInstructions, renderQueryingDocumentation } from '@/lib/ask-prompt';
 import type { GitBookSiteContext } from '@/lib/context';
 import { getExposableError } from '@/lib/data';
 import { linkerWithMarkdownPages } from '@/lib/links';
@@ -184,16 +184,7 @@ function renderAskFooter(
         })
     );
 
-    return `\n\n---\n\n# Agent Instructions
-This documentation is published with GitBook. GitBook is the documentation platform designed so that both humans and AI agents can read, navigate, and reason over technical content effectively. Learn more at gitbook.com.
-
-## Querying This Documentation
-If you need additional information that is not directly available in this page, you can query the documentation dynamically by asking a question.
-
-${renderQueryingDocumentation({ pageUrl })}
-
-Use this mechanism when the answer is not explicitly present in the current page, you need clarification or additional context, or you want to retrieve related documentation sections.
-`;
+    return `\n\n---\n\n${renderPageAgentInstructions({ pageUrl })}`;
 }
 
 /**

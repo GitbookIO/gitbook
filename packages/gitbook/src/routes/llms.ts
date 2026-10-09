@@ -4,12 +4,11 @@ import { toMarkdown } from 'mdast-util-to-markdown';
 
 import type { SiteSection, SiteSpace } from '@gitbook/api';
 
-import { isAIEnabled } from '@/components/utils/isAIChatEnabled';
+import { renderSiteAgentInstructions } from '@/lib/ask-prompt';
 import { type GitBookSiteContext, checkIsRootSiteContext } from '@/lib/context';
 import { throwIfDataError } from '@/lib/data';
 import { type GitBookLinker, linkerWithMarkdownPages } from '@/lib/links';
 import { getMarkdownContentType } from '@/lib/markdown-content-type';
-import { resolveFirstDocument } from '@/lib/pages';
 import { type FlatPageEntry, getIndexablePages } from '@/lib/sitemap';
 import {
     filterSiteSpacesByLocale,
@@ -49,7 +48,10 @@ export async function serveLLMsTxt(baseContext: GitBookSiteContext) {
         bullet: '-',
     });
 
-    output += renderAskFooter(context);
+    const agentInstructions = renderSiteAgentInstructions(context);
+    if (agentInstructions) {
+        output += `\n\n---\n\n${agentInstructions}`;
+    }
 
     return new Response(output, {
         headers: {
@@ -204,28 +206,4 @@ export async function getMarkdownForPagesTree(
         children: listChildren,
     });
     return nodes;
-}
-
-function renderAskFooter(context: GitBookSiteContext) {
-    if (!isAIEnabled(context.customization.ai.mode)) {
-        return '';
-    }
-
-    return `\n\n---\n\n# Agent Instructions
-This documentation is published with GitBook. GitBook is the documentation platform designed so that both humans and AI agents can read, navigate, and reason over technical content effectively. Learn more at gitbook.com.
-
-## Querying This Documentation
-If you need additional information, you can query the documentation dynamically by asking a question.
-Perform an HTTP GET request on a page URL with the \`ask\` query parameter:
-\`\`\`
-GET ${context.linker.toAbsoluteURL(
-        context.linker.toPathForPagePath({
-            path: resolveFirstDocument(context.revision.pages, [])?.page.path ?? 'index',
-        })
-    )}?ask=<question>
-\`\`\`
-The question should be specific, self-contained, and written in natural language.
-The response will contain a direct answer to the question and relevant excerpts and sources from the documentation.
-Use this mechanism when the answer is not explicitly present in the current page, you need clarification or additional context, or you want to retrieve related documentation sections.
-`;
 }
