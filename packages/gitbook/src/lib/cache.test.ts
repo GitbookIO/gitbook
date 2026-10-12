@@ -67,6 +67,17 @@ describe('withStableRef', () => {
         expect(ref1).not.toBe(ref2);
     });
 
+    it('should preserve value types in object references', () => {
+        const toStableRef = withStableRef();
+        const numeric = { id: 1 };
+        const textual = { id: '1' };
+
+        expect(toStableRef(numeric)).toBe(numeric);
+        expect(toStableRef(textual)).toBe(textual);
+        expect(toStableRef({ id: 1 })).toBe(numeric);
+        expect(toStableRef({ id: '1' })).toBe(textual);
+    });
+
     it('should maintain reference stability across multiple calls', () => {
         const toStableRef = withStableRef();
 
