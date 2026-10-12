@@ -85,7 +85,7 @@ GitBook Open uses fontawesome. For self-hosting and local development, for licen
 
 ## Contributing
 
-GitBook's rendering engine is fully open source and built on top of [Next.js](https://nextjs.org/). Head to our [contributing guide](https://github.com/GitbookIO/gitbook/blob/main/.github/CONTRIBUTING.md) to learn more about the workflow on adding your first Pull Request.
+GitBook's rendering engine is fully open source and built on top of [Next.js](https://nextjs.org/). Head to our [contributing guide](https://github.com/GitbookIO/gitbook/blob/main/.github/CONTRIBUTING.md) to learn how to report bugs and suggest changes.
 
 ### Types of contributions
 
@@ -93,22 +93,22 @@ We encourage you to contribute to GitBook to help us build the best tool for doc
 
 #### Translations
 
-The GitBook UI is rendered using a set of translation files found in [`packages/gitbook/src/intl/translations`](/packages/gitbook/src/intl/translations/). We welcome all additional translations for the UI.
+The GitBook UI is rendered using a set of translation files found in [`packages/gitbook/src/intl/translations`](/packages/gitbook/src/intl/translations/). Spotted a wrong or missing translation? Open an issue and let us know.
 
 #### Bugs
 
-Encounter a bug or find an issue you'd like to fix? Helping us fix issues related to GitBook greatly improves the experience for everyone. Head to the issues section of this repository to learn more about the types of bugs you can already help out with.
+Encounter a bug? [Open an issue](https://github.com/GitbookIO/gitbook/issues/new/choose) with as much detail as you can. Clear reports help us fix things faster for everyone.
 
 ## Deployment
 
 > [!WARNING]  
 > While it is possible to self-host this project, we do not recommend this unless you are certain this option fits your need.
 >
-> _Looking to add a specific feature in GitBook? Head to our [contributing guide](https://github.com/GitbookIO/gitbook/blob/main/.github/CONTRIBUTING.md) to get started._
+> _Looking for a specific feature in GitBook? Head to our [contributing guide](https://github.com/GitbookIO/gitbook/blob/main/.github/CONTRIBUTING.md) to suggest it._
 >
 > Self-hosting this project puts the responsibility of maintaining and merging future updates on **you**. We cannot guarantee support, maintenance, or updates to forked and self-hosted instances of this project.
 >
-> We want to make it as easy as possible for our community to collaborate and push the future of GitBook, which is why we encourage you to contribute to our product directly instead of creating your own version.
+> We want to make it as easy as possible for our community to collaborate and push the future of GitBook, which is why we encourage you to share your ideas with us instead of creating your own version.
 
 This project allows you to self-host the rendering portion of your GitBook published content. Self-hosting has pros and cons.
 

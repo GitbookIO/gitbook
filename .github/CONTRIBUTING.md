@@ -1,113 +1,89 @@
-# Welcome to GitBook's contributing guide!
+# Contributing to GitBook
 
-> _For help, support, feature requests, and product questions - head to our [GitHub Community](https://github.com/orgs/GitbookIO/discussions) 🤖_
+> _For help, support and product questions, head to our [GitHub Community](https://github.com/orgs/GitbookIO/discussions)._
 
-Thank you for investing your time in contributing to GitBook. Any contribution you make will be reviewed by our team. In this guide, you'll learn the different ways you can contribute.
+Thanks for helping make GitBook better. This repository holds the open source renderer behind every published GitBook site, and the team reads everything that comes in here.
 
-## Types of Contributions
+## Ways to contribute
 
-This repository contains code related to the rendering engine of GitBook's published content. Depending on what you'd like to contribute to, head to the section below to find the necessary steps.
+-   **Open an issue.** Report a bug, suggest a feature, or tell us when something feels off. This is the most useful thing you can do.
+-   **Join the conversation.** Share ideas and help others in [GitHub Community](https://github.com/orgs/GitbookIO/discussions).
+-   **Build with GitBook.** Publish your docs, try new features early, and tell us what works and what doesn't.
 
-### Add a feature
+## Issues instead of pull requests
 
-Because this portion of GitBook is open source and available for you to use - if you think you can provide extra value through a new feature - you're welcome to add it! If you plan to distribute the code, keep the source code public to comply with GNU GPLv3. To clone in a private repository, you must first acquire a [commercial license](https://www.gitbook.com/pricing).
+Pull requests are limited to the GitBook team. If you've found a bug or want something to change, please [open an issue](https://github.com/GitbookIO/gitbook/issues/new/choose) instead.
 
-### Create a new issue
+This isn't because we don't want your help. Every change here ships to every published GitBook site, so we need to own each one from start to finish. A clear issue often helps us more than a pull request: it tells us what's wrong and why, and lets us fix it in a way that fits the rest of the codebase.
 
-If you spot a problem within a repository, [search if an issue already exists](https://docs.github.com/en/github/searching-for-information-on-github/searching-on-github/searching-issues-and-pull-requests#search-by-the-title-body-or-comments). If a related issue doesn't exist, you can open a new issue here!Please make sure any added issues are
+A good issue includes:
 
--   Descriptive
--   Thoughtful
--   Organized
+-   What you expected to happen, and what happened instead
+-   A link to a published GitBook site that shows the problem, if you have one
+-   Steps to reproduce it, plus screenshots or a recording for anything visual
+-   Your browser and OS, if it looks like it might matter
 
-We recommend adding as many relevant links, minimal reproductions of the issue, and other materials that will help our team solve the issue fast.
+Before opening one, [search existing issues](https://github.com/GitbookIO/gitbook/issues). If someone has already reported it, add a 👍 or any extra details you have.
 
-### Solve an issue
+Already fixed it in your fork? Link the branch or commit in your issue. We may open a pull request from it, and your commits keep your name.
 
-If you're interested in solving an issue in our repository, start by scanning through it's exisiting issues to find one that you're interested in working on. If you find an issue to work on, you are welcome to open a PR with a fix. See the following sections below for more information on contributing for specific sections.
+If you open a pull request anyway, we'll close it and point you here. Nothing personal, and we'd still love the issue.
 
-### Documentation
+## Reach out
 
-The official documentation on GitBook open can be found directly in this Readme. Any updates or changes you would like to make, you can make directly to the README of this repository.
+Not sure if it's a bug? Have a half-formed idea? Open an issue or start a [discussion](https://github.com/orgs/GitbookIO/discussions) anyway. We'd much rather hear from you than not, and no report is too small.
 
-## Contributing
+Spotted a wrong or missing translation? Open an issue with the string and the wording you'd suggest.
 
-### Make changes locally
+## Using AI
 
-Any contribution you make can be made to the code located in this repository. In order to contribute, you'll need to start off of a local version of this repository.
+You're welcome to use AI to help you write an issue. Please read and check what it produces before you post: reports that are long, vague or unverified take time away from fixing real problems, and we may close them without a reply.
 
-#### 1. Fork the repository
+## Running locally
 
-##### Using GitHub Desktop:
+You don't need a local setup to open an issue, but it can help you reproduce a problem or self-host the renderer.
 
--   [Getting started with GitHub Desktop](https://docs.github.com/en/desktop/installing-and-configuring-github-desktop/getting-started-with-github-desktop) will guide you through setting up Desktop.
--   Once Desktop is set up, you can use it to [fork the repo](https://docs.github.com/en/desktop/contributing-and-collaborating-using-github-desktop/cloning-and-forking-repositories-from-github-desktop)!
+### Prerequisites
 
-##### Using the command line:
+-   [Node.js](https://nodejs.org/en) (see "engines" in `package.json`)
+-   [Bun](https://bun.sh/) (see "packageManager" in `package.json`)
 
--   [Fork the repo](https://docs.github.com/en/github/getting-started-with-github/fork-a-repo#fork-an-example-repository) so that you can make your changes without affecting the original project until you're ready to merge them.
+### Setup
 
-#### 2. Create a working branch and start with your changes
+1. Use the project's version of Node:
 
-After forking this repository, you'll want to [create a branch](https://docs.github.com/en/issues/tracking-your-work-with-issues/creating-a-branch-for-an-issue) to work off of.
-
-#### 3. Install dependencies and run the project locally
-
-##### Prerequisites:
-
-- [Node.js](https://nodejs.org/en) (see "engines" in `package.json`)
-- [Bun](https://bun.sh/) (see "packageManager" in `package.json`)
-
-##### Setup steps:
-
-1. Ensure you are using the project's version of Node:
 ```bash
 nvm use
 ```
 
-2. Install dependencies using Bun:
+2. Install dependencies:
+
 ```bash
 bun install
 ```
 
 3. Start the development server:
+
 ```bash
 bun dev
 ```
 
-Additional development commands:
-- `bun lint`: Lint the code using Oxlint
-- `bun lint:fix`: Automatically fix lint issues using Oxlint
-- `bun format`: Format the code using Oxfmt
-- `bun format:check`: Check formatting without changing files
-- `bun typecheck`: Run TypeScript type checking
-- `bun unit`: Run unit tests
-- `bun e2e`: Run end-to-end tests
+Other commands:
 
-#### 4. Preview your changes
+-   `bun lint`: Lint the code using Oxlint
+-   `bun lint:fix`: Automatically fix lint issues using Oxlint
+-   `bun format`: Format the code using Oxfmt
+-   `bun format:check`: Check formatting without changing files
+-   `bun typecheck`: Run TypeScript type checking
+-   `bun unit`: Run unit tests
+-   `bun e2e`: Run end-to-end tests
 
-When running the development server, published GitBook sites can be rendered through your local version at `http://localhost:3000/url`.
+### Preview a site
 
-For example, our published docs can be viewed using the local version by visiting `http://localhost:3000/url/gitbook.com/docs` after running the development server.
+With the development server running, any published GitBook site can be rendered through your local version at `http://localhost:3000/url/<published-url>`. For example, visit `http://localhost:3000/url/gitbook.com/docs` to see our own docs.
 
-You can visit any published GitBook site behind your development server. Please make sure your site is [published publicly](https://gitbook.com/docs/published-documentation/publish-your-content-as-a-docs-site) to ensure you can view the site correctly in your development version.
+The site must be [published publicly](https://gitbook.com/docs/published-documentation/publish-your-content-as-a-docs-site) to render locally.
 
-### Commit your update
+## License
 
-[Commit your changes](https://github.com/git-guides/git-commit) once you are happy with them. See [Atom's contributing guide](https://github.com/atom/atom/blob/master/CONTRIBUTING.md#git-commit-messages) to know how to use emoji for commit messages!
-
-Once your changes are ready, don't forget to self-review your code to double check that your chagnes are ready to be added.
-
-### Pull Request
-
-When you're finished with the changes, [create a pull request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request), also known as a PR.
-
--   Don't forget to [link PR to issue](https://docs.github.com/en/issues/tracking-your-work-with-issues/linking-a-pull-request-to-an-issue) if you are solving one.
--   Enable the checkbox to [allow maintainer edits](https://docs.github.com/en/github/collaborating-with-issues-and-pull-requests/allowing-changes-to-a-pull-request-branch-created-from-a-fork) so the branch can be updated for a merge. Once you submit your PR, a GitBook team member will review your proposal. We may ask questions or request for additional information.
--   We may ask for changes to be made before a PR can be merged, either using [suggested changes](https://docs.github.com/en/github/collaborating-with-issues-and-pull-requests/incorporating-feedback-in-your-pull-request) or pull request comments. You can apply suggested changes directly through the UI. You can make any other changes in your fork, then commit them to your branch.
--   As you update your PR and apply changes, mark each conversation as [resolved](https://docs.github.com/en/github/collaborating-with-issues-and-pull-requests/commenting-on-a-pull-request#resolving-conversations).
--   If you run into any merge issues, checkout this [git tutorial](https://lab.github.com/githubtraining/managing-merge-conflicts) to help you resolve merge conflicts and other issues.
-
-### Your PR is merged
-
-Congratulations 🎉 Thank you for your contribution! Once your PR is merged, your contributions will be publicly visible on the relevant repository.
+The renderer is distributed under the [GNU GPLv3 License](https://github.com/GitbookIO/gitbook/blob/main/LICENSE). If you distribute the code, you must keep the source code public. To use it in a private repository, you need a [commercial license](https://www.gitbook.com/pricing).
