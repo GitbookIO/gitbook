@@ -91,7 +91,7 @@ export function hasMoreThan(
                 if (traverse(child)) return true;
             }
 
-            if (child.object === 'block' && 'fragments' in child) {
+            if (child.object === 'block' && 'fragments' in child && child.fragments) {
                 for (const fragment of child.fragments) {
                     if (traverse(fragment)) return true;
                 }
@@ -159,7 +159,7 @@ export function getNodeFragmentByType(
     if (!('fragments' in node)) {
         return null;
     }
-    const fragment = node.fragments.find((child: any) => child.type === type);
+    const fragment = node.fragments?.find((child: any) => child.type === type);
     return fragment ?? null;
 }
 
@@ -301,7 +301,7 @@ function findBlocks<Block extends DocumentBlock>(
             }
         }
 
-        if (block.object === 'block' && 'fragments' in block) {
+        if (block.object === 'block' && 'fragments' in block && block.fragments) {
             for (const fragment of block.fragments) {
                 const result = findBlocks<Block>(fragment, test);
                 if (result.length > 0) {
@@ -341,7 +341,7 @@ function findBlock(
             }
         }
 
-        if (block.object === 'block' && 'fragments' in block) {
+        if (block.object === 'block' && 'fragments' in block && block.fragments) {
             for (const fragment of block.fragments) {
                 const result = findBlock(fragment, test);
                 if (result) {
