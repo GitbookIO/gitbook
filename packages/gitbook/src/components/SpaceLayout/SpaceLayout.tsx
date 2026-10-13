@@ -5,7 +5,7 @@ import { CustomizationHeaderPreset, CustomizationSearchStyle } from '@gitbook/ap
 import { AdaptiveVisitorContextProvider } from '../Adaptive';
 import { AIChatProvider } from '../AI';
 import type { RenderAIMessageOptions } from '../AI';
-import { AIChat, AskAITextSelection } from '../AIChat';
+import { AIChat, AskAIParagraphButton, AskAITextSelection } from '../AIChat';
 import { Announcement } from '../Announcement';
 import { SpacesDropdown, TranslationsDropdown } from '../Header/SpacesDropdown';
 import { CurrentContentProvider } from '../hooks';
@@ -138,6 +138,7 @@ export function SpaceLayout(props: SpaceLayoutProps) {
                 <>
                     <AIChat />
                     <AskAITextSelection />
+                    <AskAIParagraphButton />
                 </>
             ) : null}
 

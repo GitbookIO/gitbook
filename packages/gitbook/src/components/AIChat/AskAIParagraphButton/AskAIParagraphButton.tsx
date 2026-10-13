@@ -1,29 +1,58 @@
 'use client';
 
 import fnv1a from '@sindresorhus/fnv1a';
+import * as React from 'react';
+import { createPortal } from 'react-dom';
 
 import { AIChatIcon } from '../AIChatIcon';
 import { useAIChatController, useAIConfig } from '@/components/AI';
 import { Button } from '@/components/primitives';
+import { isAIChatEnabled } from '@/components/utils/isAIChatEnabled';
 import { t, tString, useLanguage } from '@/intl/client';
-import { type ClassValue, tcls } from '@/lib/tailwind';
+import { tcls } from '@/lib/tailwind';
 
 /**
- * A small icon button revealed in the left margin of a top-level paragraph when it is hovered (on
- * devices with a fine pointer). Clicking it stages the paragraph's text as a reference and opens
- * the AI chat — a more discoverable variant of the text-selection "Ask" affordance.
+ * A small icon button revealed in the left margin of a paragraph when it is hovered (on devices
+ * with a fine pointer). Clicking it stages the paragraph's text as a reference and opens the AI
+ * chat — a more discoverable variant of the text-selection "Ask" affordance.
  *
- * The button is absolutely positioned so it never affects the document flow, and its visibility is
- * driven purely by the `group/ask-ai` hover state of its paragraph wrapper.
+ * A single instance is portaled into the last hovered paragraph wrapper, rather than rendering one
+ * per paragraph, so pages with many paragraphs don't pay for markup that is hidden until hovered.
+ * Its visibility is still driven purely by the `group/ask-ai` hover state of that wrapper.
  */
-export function AskAIParagraphButton(props: { content: string; className?: ClassValue }) {
-    const { content, className } = props;
+export function AskAIParagraphButton() {
     const config = useAIConfig();
     const language = useLanguage();
     const chatController = useAIChatController();
+    const [target, setTarget] = React.useState<HTMLElement | null>(null);
+
+    const enabled = isAIChatEnabled(config.aiMode);
+
+    React.useEffect(() => {
+        if (!enabled) {
+            return;
+        }
+
+        const onPointerOver = (event: PointerEvent) => {
+            if (!(event.target instanceof Element)) {
+                return;
+            }
+            const wrapper = event.target.closest<HTMLElement>('[data-ask-ai-paragraph]');
+            if (wrapper) {
+                setTarget(wrapper);
+            }
+        };
+
+        document.addEventListener('pointerover', onPointerOver);
+        return () => document.removeEventListener('pointerover', onPointerOver);
+    }, [enabled]);
+
+    if (!enabled || !target) {
+        return null;
+    }
 
     const onClick = () => {
-        const text = content.trim();
+        const text = getParagraphText(target).trim();
         if (!text) {
             return;
         }
@@ -38,7 +67,7 @@ export function AskAIParagraphButton(props: { content: string; className?: Class
         chatController.focus();
     };
 
-    return (
+    return createPortal(
         <div
             className={tcls(
                 // Sit in the left margin, flush against the paragraph so there is no hover gap.
@@ -52,13 +81,7 @@ export function AskAIParagraphButton(props: { content: string; className?: Class
                 'invisible opacity-0 transition-opacity duration-150',
                 'hover:visible hover:opacity-100 group-hover/ask-ai:visible group-hover/ask-ai:opacity-100',
                 // Never shown on touch / hover-less contexts.
-                'not-pointer-fine:hidden',
-                // Hidden where an overflow-clipped ancestor would cut it off (ARIA and native
-                // tables, record cards).
-                'in-[[role=table]]:hidden',
-                'in-[table]:hidden',
-                'in-[[data-card]]:hidden',
-                className
+                'not-pointer-fine:hidden'
             )}
         >
             <Button
@@ -75,6 +98,37 @@ export function AskAIParagraphButton(props: { content: string; className?: Class
                     'in-[.hint.bg-danger]:bg-danger in-[.hint.bg-info]:bg-info in-[.hint.bg-success]:bg-success in-[.hint.bg-warning]:bg-warning'
                 )}
             />
-        </div>
+        </div>,
+        target
     );
+}
+
+/**
+ * Read the paragraph's text, skipping rendered math like `getNodeText` does.
+ */
+function getParagraphText(wrapper: HTMLElement): string {
+    const paragraph = wrapper.querySelector(':scope > p');
+    if (!paragraph) {
+        return '';
+    }
+
+    const walker = document.createTreeWalker(
+        paragraph,
+        NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT,
+        {
+            acceptNode: (node) =>
+                node instanceof Element &&
+                node.matches('.katex, mjx-container, [aria-hidden="true"]')
+                    ? NodeFilter.FILTER_REJECT
+                    : NodeFilter.FILTER_ACCEPT,
+        }
+    );
+
+    let text = '';
+    while (walker.nextNode()) {
+        if (walker.currentNode.nodeType === Node.TEXT_NODE) {
+            text += walker.currentNode.textContent ?? '';
+        }
+    }
+    return text;
 }
