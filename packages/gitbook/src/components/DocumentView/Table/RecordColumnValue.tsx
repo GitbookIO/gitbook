@@ -50,6 +50,7 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
         tag: Tag = 'div',
         ariaLabelledBy,
         block,
+        ancestorBlocks,
         document,
         record,
         column,
@@ -151,7 +152,7 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                 <Blocks
                     tag={Tag}
                     document={document}
-                    ancestorBlocks={[]}
+                    ancestorBlocks={[...ancestorBlocks, block]}
                     nodes={fragment.nodes}
                     style={[
                         'blocks',

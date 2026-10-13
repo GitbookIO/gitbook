@@ -9,7 +9,7 @@ import { getNodeText } from '@/lib/document';
 import { tcls } from '@/lib/tailwind';
 
 export function Paragraph(props: BlockProps<DocumentBlockParagraph>) {
-    const { block, style, ...contextProps } = props;
+    const { block, style, ancestorBlocks, ...contextProps } = props;
     const { context } = contextProps;
 
     const paragraph = (
@@ -28,6 +28,8 @@ export function Paragraph(props: BlockProps<DocumentBlockParagraph>) {
     const contentContext = context.contentContext;
     const aiAssistantEnabled =
         context.mode !== 'print' &&
+        // The button is hidden in table cells, and big tables can hold thousands of paragraphs.
+        !ancestorBlocks.some((ancestor) => ancestor.type === 'table') &&
         contentContext != null &&
         'customization' in contentContext &&
         contentContext.customization.ai.mode === CustomizationAIMode.Assistant;
