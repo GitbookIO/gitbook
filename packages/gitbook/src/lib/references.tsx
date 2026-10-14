@@ -276,7 +276,11 @@ export async function resolveContentRef(
                                 style={iconStyle}
                             />
                         ) : null,
-                    href: linker.toPathForPage({ page: ancestor, pages: revision.pages }),
+                    // A group's own URL only redirects to its first page.
+                    href:
+                        ancestor.type === 'group'
+                            ? undefined
+                            : linker.toPathForPage({ page: ancestor, pages: revision.pages }),
                 })) ?? [];
             if (!page) {
                 return null;
