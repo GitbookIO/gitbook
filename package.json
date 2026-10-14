@@ -67,6 +67,7 @@
     "patchedDependencies": {
         "decode-named-character-reference@1.0.2": "patches/decode-named-character-reference@1.0.2.patch",
         "@vercel/next@4.4.2": "patches/@vercel%2Fnext@4.4.2.patch",
-        "next@16.3.8": "patches/next@16.3.8.patch"
+        "next@16.3.8": "patches/next@16.3.8.patch",
+        "mermaid@11.14.0": "patches/mermaid@11.14.0.patch"
     }
 }
