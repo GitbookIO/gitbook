@@ -496,7 +496,9 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
                     themeMode === CustomizationThemeMode.Dark
                         ? CustomizationDefaultThemeMode.Dark
                         : CustomizationDefaultThemeMode.Light;
-            } else {
+            } else if (routeTypeFromPathname !== 'static') {
+                // Markdown, llms.txt, RSS and sitemap routes only exist under `sites/static`, so
+                // forcing them dynamic 404s. They don't render a theme anyway. RND-12749.
                 routeType = 'dynamic';
                 requestHeaders.set(MiddlewareHeaders.Theme, themeMode);
             }
