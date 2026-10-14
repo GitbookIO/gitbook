@@ -3,7 +3,6 @@
 import React from 'react';
 
 import type { ContentKitWebFrame } from '@gitbook/api';
-import { Icon } from '@gitbook/icons';
 
 import { type ContentKitClientContextData, useContentKitClientContext } from './context';
 import { resolveDynamicBinding } from './dynamic';
@@ -152,7 +151,7 @@ export function ElementWebframe(props: ContentKitClientElementProps<ContentKitWe
 
         window.addEventListener('message', callback);
 
-        // We only render the iframe once we have added the event listener
+        // We only load the iframe once we have added the event listener
         // otherwise during SSR, we'll miss messages
         setMounted(true);
 
@@ -186,17 +185,14 @@ export function ElementWebframe(props: ContentKitClientElementProps<ContentKitWe
             ? iframeRef.current.clientWidth / height
             : undefined);
 
-    if (!mounted) {
-        return <Icon icon="spinner" className="contentkit-button-loading" style={{ height }} />;
-    }
-
     // only use height measurement if no aspect ratio is defined
     const useHeightMeasurement = !aspectRatio && height;
 
     return (
         <iframe
             ref={iframeRef}
-            src={element.source.url}
+            // Rendered without a source before mount so it reserves its size in the SSR layout.
+            src={mounted ? element.source.url : undefined}
             title={element.source.url}
             allowFullScreen
             allow="clipboard-write"
