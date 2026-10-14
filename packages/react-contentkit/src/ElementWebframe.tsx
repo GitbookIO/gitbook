@@ -15,7 +15,6 @@ export function ElementWebframe(props: ContentKitClientElementProps<ContentKitWe
     const { element } = props;
 
     const [mounted, setMounted] = React.useState(false);
-    const [loaded, setLoaded] = React.useState(false);
     const renderer = useContentKitClientContext();
     const iframeRef = React.useRef<HTMLIFrameElement>(null);
     const [size, setSize] = React.useState<{
@@ -205,13 +204,8 @@ export function ElementWebframe(props: ContentKitClientElementProps<ContentKitWe
                     height: useHeightMeasurement ? height : undefined,
                     maxHeight: height,
                 }}
-                onLoad={(event) => {
-                    if (event.currentTarget.getAttribute('src')) {
-                        setLoaded(true);
-                    }
-                }}
             />
-            {loaded ? null : <Icon icon="spinner" className="contentkit-webframe-loading" />}
+            {mounted ? null : <Icon icon="spinner" className="contentkit-webframe-loading" />}
         </div>
     );
 }
