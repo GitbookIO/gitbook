@@ -3,6 +3,7 @@
 import React from 'react';
 
 import type { ContentKitWebFrame } from '@gitbook/api';
+import { Icon } from '@gitbook/icons';
 
 import { type ContentKitClientContextData, useContentKitClientContext } from './context';
 import { resolveDynamicBinding } from './dynamic';
@@ -14,6 +15,7 @@ export function ElementWebframe(props: ContentKitClientElementProps<ContentKitWe
     const { element } = props;
 
     const [mounted, setMounted] = React.useState(false);
+    const [loaded, setLoaded] = React.useState(false);
     const renderer = useContentKitClientContext();
     const iframeRef = React.useRef<HTMLIFrameElement>(null);
     const [size, setSize] = React.useState<{
@@ -189,20 +191,28 @@ export function ElementWebframe(props: ContentKitClientElementProps<ContentKitWe
     const useHeightMeasurement = !aspectRatio && height;
 
     return (
-        <iframe
-            ref={iframeRef}
-            // Rendered without a source before mount so it reserves its size in the SSR layout.
-            src={mounted ? element.source.url : undefined}
-            title={element.source.url}
-            allowFullScreen
-            allow="clipboard-write"
-            className="contentkit-webframe h-full w-full max-w-full border-none"
-            style={{
-                aspectRatio,
-                height: useHeightMeasurement ? height : undefined,
-                maxHeight: height,
-            }}
-        />
+        <div className="contentkit-webframe-container h-full w-full max-w-full">
+            <iframe
+                ref={iframeRef}
+                // Rendered without a source before mount so it reserves its size in the SSR layout.
+                src={mounted ? element.source.url : undefined}
+                title={element.source.url}
+                allowFullScreen
+                allow="clipboard-write"
+                className="contentkit-webframe block h-full w-full max-w-full border-none"
+                style={{
+                    aspectRatio,
+                    height: useHeightMeasurement ? height : undefined,
+                    maxHeight: height,
+                }}
+                onLoad={(event) => {
+                    if (event.currentTarget.getAttribute('src')) {
+                        setLoaded(true);
+                    }
+                }}
+            />
+            {loaded ? null : <Icon icon="spinner" className="contentkit-webframe-loading" />}
+        </div>
     );
 }
 

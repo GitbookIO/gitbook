@@ -52,6 +52,14 @@
     @apply relative;
 }
 
+.contentkit-webframe-container {
+    @apply relative;
+}
+
+.contentkit-webframe-loading {
+    @apply absolute inset-0 m-auto size-5 animate-spin;
+}
+
 /** Card */
 .contentkit-card {
     @apply flex flex-col border rounded border-tint-subtle;
