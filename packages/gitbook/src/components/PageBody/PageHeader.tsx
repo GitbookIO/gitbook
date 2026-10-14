@@ -222,15 +222,11 @@ export async function PageHeader(props: {
                         ))}
                         {ancestors.map((breadcrumb, index) => {
                             const parentPages = ancestors[index - 1]?.pages ?? revision.pages;
-                            // A group's own URL only redirects to its first page, so render it as a
-                            // label like the table of contents and section groups do.
-                            const href =
-                                breadcrumb.type === 'group'
-                                    ? undefined
-                                    : linker.toPathForPage({
-                                          pages: revision.pages,
-                                          page: breadcrumb,
-                                      });
+                            // A group's own URL redirects to its first document, so link straight to it.
+                            const href = linker.toPathForPage({
+                                pages: revision.pages,
+                                page: resolveFirstDocument([breadcrumb], [])?.page ?? breadcrumb,
+                            });
                             return (
                                 <li key={breadcrumb.id} className="inline">
                                     <BreadcrumbItemDropdown
