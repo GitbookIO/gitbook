@@ -222,9 +222,14 @@ export async function PageHeader(props: {
                         ))}
                         {ancestors.map((breadcrumb, index) => {
                             const parentPages = ancestors[index - 1]?.pages ?? revision.pages;
+                            // A group's own URL redirects to its first document, so link straight to it.
+                            const target =
+                                breadcrumb.type === 'group'
+                                    ? (resolveFirstDocument([breadcrumb], [])?.page ?? breadcrumb)
+                                    : breadcrumb;
                             const href = linker.toPathForPage({
                                 pages: revision.pages,
-                                page: breadcrumb,
+                                page: target,
                             });
                             return (
                                 <li key={breadcrumb.id} className="inline">
@@ -483,15 +488,16 @@ function getPageSiblings(
         if (page.hidden && page.id !== activeId) {
             continue;
         }
-        // A group whose subtree has no document resolves to no page — the sidebar renders it as a
-        // non-clickable label, so don't offer it as a navigable sibling (its path would 404).
-        if (page.type === 'group' && page.id !== activeId && !resolveFirstDocument([page], [])) {
+        // A group's own URL redirects to its first document, so link straight to it. A group whose
+        // subtree has no document resolves to no page, so don't offer it (its path would 404).
+        const target = page.type === 'group' ? resolveFirstDocument([page], [])?.page : page;
+        if (!target) {
             continue;
         }
         result.push({
             id: page.id,
             title: page.linkTitle || page.title,
-            href: context.linker.toPathForPage({ pages: context.revision.pages, page }),
+            href: context.linker.toPathForPage({ pages: context.revision.pages, page: target }),
             emoji: page.emoji,
             icon: page.icon,
             isActive: page.id === activeId,
