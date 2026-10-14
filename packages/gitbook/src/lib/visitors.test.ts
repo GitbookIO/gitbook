@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'bun:test';
 import type { JwtPayload } from 'jwt-decode';
+import { NextRequest } from 'next/server';
 
 import {
     type ResponseCookies,
@@ -14,6 +15,7 @@ import {
     isRevalidationRequest,
     normalizeVisitorURL,
     parseHostnameList,
+    serveVisitorClaimsDataRequest,
     shouldSendVisitorCountry,
 } from './visitors';
 
@@ -689,5 +691,29 @@ describe('parseHostnameList', () => {
         expect(parseHostnameList(' Docs.Foo.com , ,bar.io')).toEqual(
             new Set(['docs.foo.com', 'bar.io'])
         );
+    });
+});
+
+describe('serveVisitorClaimsDataRequest', () => {
+    it('should expose the claims of the preview API token', async () => {
+        const siteRequestURL = new URL(
+            'https://sites.gitbook.com/preview/site_foo/~gitbook/visitor'
+        );
+        const claims = { apiUrl: 'https://client-123.example.com', isBeta: true };
+        const previewAPIToken = [
+            btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' })),
+            btoa(JSON.stringify({ kind: 'site', site: 'site_foo', claims })),
+            'signature',
+        ].join('.');
+
+        const response = serveVisitorClaimsDataRequest(
+            new NextRequest(siteRequestURL),
+            siteRequestURL,
+            previewAPIToken
+        );
+
+        expect(await response.json()).toEqual({
+            visitor: { claims: { unsigned: {}, ...claims } },
+        });
     });
 });

@@ -3,7 +3,7 @@ import { type JwtPayload, jwtDecode } from 'jwt-decode';
 import { type NextRequest, NextResponse } from 'next/server';
 import hash from 'object-hash';
 
-import type { SiteVisitorPayload } from '@gitbook/api';
+import type { SiteAPIToken, SiteVisitorPayload } from '@gitbook/api';
 
 import {
     MAX_CHUNKED_COOKIE_LENGTH,
@@ -571,7 +571,21 @@ export function getVisitorAuthCookieMaxAge(decoded: JwtPayload): number {
 /**
  * Handler for the /~gitbook/visitor middleware route to expose visitor data.
  */
-export function serveVisitorClaimsDataRequest(request: NextRequest, siteRequestURL: URL) {
+export function serveVisitorClaimsDataRequest(
+    request: NextRequest,
+    siteRequestURL: URL,
+    previewAPIToken?: string
+) {
+    // A site preview carries the visitor segment claims in its API token, not in a visitor token.
+    if (previewAPIToken) {
+        try {
+            const { claims } = jwtDecode<SiteAPIToken>(previewAPIToken);
+            return NextResponse.json({ visitor: { claims: { unsigned: {}, ...claims } } });
+        } catch (error) {
+            console.warn('Error decoding preview API token', error);
+        }
+    }
+
     const { visitorToken, unsignedClaims } = getVisitorData({
         cookies: request.cookies.getAll(),
         headers: request.headers,

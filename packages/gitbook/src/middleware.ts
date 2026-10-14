@@ -210,7 +210,13 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
 
     // Handler that returns visitor data for the app to consume.
     if (siteRequestURL.pathname.endsWith('/~gitbook/visitor')) {
-        return serveVisitorClaimsDataRequest(request, siteRequestURL);
+        const previewAPIToken = isPreviewRequest(siteRequestURL)
+            ? getAPITokenFromCookies(
+                  request.cookies.getAll(),
+                  getAPITokenCookieName(getPreviewScopePath(siteRequestURL))
+              )
+            : undefined;
+        return serveVisitorClaimsDataRequest(request, siteRequestURL, previewAPIToken);
     }
 
     //
@@ -625,7 +631,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         request.headers.set('x-gitbook-disable-tracking', 'true');
         return serveWithQueryAPIToken({
             // We scope the API token to the site ID.
-            scopePath: ['preview', getPreviewRequestIdentifier(siteRequestURL)].join('/'),
+            scopePath: getPreviewScopePath(siteRequestURL),
             // We keep the original request URL when using `url` mode
             requestURL: mode === 'url' ? requestURL : siteRequestURL,
             requestCookies: request.cookies,
@@ -677,6 +683,14 @@ function serveErrorResponse(error: Error) {
     throw error;
 }
 
+function getPreviewScopePath(siteRequestURL: URL) {
+    return ['preview', getPreviewRequestIdentifier(siteRequestURL)].join('/');
+}
+
+function getAPITokenCookieName(scopePath: string) {
+    return getPathScopedCookieName('gitbook-api-token', scopePath);
+}
+
 /**
  * Serve a response with an API token obtained from the query params.
  */
@@ -689,7 +703,7 @@ async function serveWithQueryAPIToken(input: {
     const { scopePath, requestURL, requestCookies, serve } = input;
     // We store the API token in a cookie that is scoped to the specific route
     // to avoid errors when multiple previews are opened in different tabs.
-    const cookieName = getPathScopedCookieName('gitbook-api-token', scopePath);
+    const cookieName = getAPITokenCookieName(scopePath);
 
     // Extract a potential GitBook API token passed in the request
     // If found, we redirect to the same URL but with the token in the cookie
