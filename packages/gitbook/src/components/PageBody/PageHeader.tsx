@@ -223,9 +223,13 @@ export async function PageHeader(props: {
                         {ancestors.map((breadcrumb, index) => {
                             const parentPages = ancestors[index - 1]?.pages ?? revision.pages;
                             // A group's own URL redirects to its first document, so link straight to it.
+                            const target =
+                                breadcrumb.type === 'group'
+                                    ? (resolveFirstDocument([breadcrumb], [])?.page ?? breadcrumb)
+                                    : breadcrumb;
                             const href = linker.toPathForPage({
                                 pages: revision.pages,
-                                page: resolveFirstDocument([breadcrumb], [])?.page ?? breadcrumb,
+                                page: target,
                             });
                             return (
                                 <li key={breadcrumb.id} className="inline">

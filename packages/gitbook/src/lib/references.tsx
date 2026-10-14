@@ -278,7 +278,10 @@ export async function resolveContentRef(
                         ) : null,
                     // A group's own URL redirects to its first document, so link straight to it.
                     href: linker.toPathForPage({
-                        page: resolveFirstDocument([ancestor], [])?.page ?? ancestor,
+                        page:
+                            ancestor.type === 'group'
+                                ? (resolveFirstDocument([ancestor], [])?.page ?? ancestor)
+                                : ancestor,
                         pages: revision.pages,
                     }),
                 })) ?? [];
