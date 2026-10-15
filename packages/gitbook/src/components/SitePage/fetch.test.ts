@@ -97,11 +97,11 @@ describe('fetchPageData', () => {
 
 describe('resolveMissingPagePath', () => {
     function createRedirectContext(options: {
-        siteRedirect?: { target: string; permanent?: boolean };
+        siteRedirect?: { source?: string; target: string; permanent?: boolean };
         spaceRedirectPageId?: string;
     }) {
         const getSiteRedirectBySource = mock(async ({ source }: { source: string }) =>
-            options.siteRedirect && source === '/old'
+            options.siteRedirect && source === (options.siteRedirect.source ?? '/old')
                 ? {
                       data: {
                           target: options.siteRedirect.target,
@@ -140,6 +140,24 @@ describe('resolveMissingPagePath', () => {
             type: 'redirect',
             destination: '/new',
             permanent: true,
+        });
+    });
+
+    it('resolves a site redirect whose source has non-ASCII characters', async () => {
+        const context = createRedirectContext({
+            siteRedirect: {
+                source: '/de/kategorien-hinzuf%C3%BCgen',
+                target: 'https://docs.example.com/new',
+            },
+        });
+        const pathname = normalizeURL(
+            new URL('https://docs.example.com/de/kategorien-hinzufügen')
+        ).pathname.slice(1);
+
+        expect(await resolveMissingPagePath(context, pathname)).toEqual({
+            type: 'redirect',
+            destination: '/new',
+            permanent: false,
         });
     });
 
