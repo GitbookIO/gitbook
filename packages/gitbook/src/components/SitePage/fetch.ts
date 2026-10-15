@@ -186,7 +186,8 @@ export async function resolveMissingPagePath(
 
 /**
  * Transform a pathname into a candidate source for site redirect matching.
- * We also encode each segment to handle special characters in redirects.
+ * The pathname is already percent-encoded, so each segment is decoded before being encoded
+ * again: redirect sources store special characters percent-encoded exactly once.
  */
 function toSiteRedirectSourceCandidate(pathname: string): string {
     const normalized = withLeadingSlash(pathname);
@@ -194,9 +195,17 @@ function toSiteRedirectSourceCandidate(pathname: string): string {
         normalized
             .slice(1)
             .split('/')
-            .map((segment) => encodeURIComponent(segment))
+            .map((segment) => encodeURIComponent(safeDecodeURIComponent(segment)))
             .join('/')
     );
+}
+
+function safeDecodeURIComponent(segment: string): string {
+    try {
+        return decodeURIComponent(segment);
+    } catch {
+        return segment;
+    }
 }
 
 /**
