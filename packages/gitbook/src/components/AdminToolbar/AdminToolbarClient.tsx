@@ -317,7 +317,7 @@ function AuthenticatedUserToolbar(props: ToolbarViewProps) {
                 <ToolbarButton
                     title="Open insights"
                     href={getToolbarHref({
-                        href: `${site.urls.app}/insights`,
+                        href: `${site.urls.app}/analytics`,
                         siteId: site.id,
                         buttonId: 'insights',
                     })}
