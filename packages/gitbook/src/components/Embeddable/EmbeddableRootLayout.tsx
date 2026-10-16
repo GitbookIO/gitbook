@@ -1,6 +1,7 @@
 import type { CustomizationDefaultThemeMode } from '@gitbook/api';
 import { SiteInsightsTrademarkPlacement } from '@gitbook/api';
 
+import { AskAIParagraphButton } from '../AIChat';
 import { LoadIntegrations } from '../Integrations';
 import { NavigationLoader } from '../primitives/NavigationLoader';
 import { SpaceLayoutServerContext } from '../SpaceLayout';
@@ -77,6 +78,7 @@ export async function EmbeddableRootLayout({
                         }}
                     >
                         <NavigationLoader />
+                        <AskAIParagraphButton />
                         <VisibilityProvider className="fixed inset-0 flex flex-col">
                             {children}
                             {context.customization.trademark.enabled ? (

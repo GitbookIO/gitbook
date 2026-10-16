@@ -4,12 +4,11 @@ import { CustomizationAIMode } from '@gitbook/api';
 import type { BlockProps } from './Block';
 import { Inlines } from './Inlines';
 import { getTextAlignment } from './utils';
-import { AskAIParagraphButton } from '@/components/AIChat/AskAIParagraphButton';
 import { getNodeText } from '@/lib/document';
 import { tcls } from '@/lib/tailwind';
 
 export function Paragraph(props: BlockProps<DocumentBlockParagraph>) {
-    const { block, style, ...contextProps } = props;
+    const { block, style, ancestorBlocks, ...contextProps } = props;
     const { context } = contextProps;
 
     const paragraph = (
@@ -28,6 +27,8 @@ export function Paragraph(props: BlockProps<DocumentBlockParagraph>) {
     const contentContext = context.contentContext;
     const aiAssistantEnabled =
         context.mode !== 'print' &&
+        // Table cells would clip the margin button, and big tables hold thousands of paragraphs.
+        !ancestorBlocks.some((ancestor) => ancestor.type === 'table') &&
         contentContext != null &&
         'customization' in contentContext &&
         contentContext.customization.ai.mode === CustomizationAIMode.Assistant;
@@ -38,6 +39,8 @@ export function Paragraph(props: BlockProps<DocumentBlockParagraph>) {
         // `self-center`/`self-end`) — otherwise centered paragraphs pin left on wide/no-TOC pages.
         return (
             <div
+                // The shared `AskAIParagraphButton` portals itself into the hovered wrapper.
+                data-ask-ai-paragraph=""
                 className={tcls(
                     'group/ask-ai relative',
                     style,
@@ -45,7 +48,6 @@ export function Paragraph(props: BlockProps<DocumentBlockParagraph>) {
                 )}
             >
                 {paragraph}
-                <AskAIParagraphButton content={text} />
             </div>
         );
     }

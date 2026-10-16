@@ -100,11 +100,19 @@ export function ScrollContainer(props: ScrollContainerProps) {
         }
 
         let frame = 0;
+        let previousActiveItems = new Set(container.querySelectorAll(active));
         // Active items can mount only after a collapsed group expands.
         const observer = new MutationObserver(() => {
             cancelAnimationFrame(frame);
             frame = requestAnimationFrame(() => {
-                for (const activeItem of container.querySelectorAll(active)) {
+                const activeItems = new Set(container.querySelectorAll(active));
+                const newActiveItems = [...activeItems].filter(
+                    (item) => !previousActiveItems.has(item)
+                );
+                previousActiveItems = activeItems;
+                // Only follow newly active items so unrelated changes (e.g. expanding another
+                // group) don't pull the user back to the current page.
+                for (const activeItem of newActiveItems) {
                     if (!isElementFullyVisibleInContainer(activeItem, container)) {
                         scrollToElementInContainer(activeItem, container, 'smooth');
                         return;

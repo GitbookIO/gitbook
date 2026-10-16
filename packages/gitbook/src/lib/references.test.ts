@@ -627,12 +627,11 @@ describe('resolveContentRef for direct space links', () => {
             { label: 'API guides' },
             { label: 'Authentification' },
             { label: 'Référence', href: targetSiteSpace.urls.published },
-            { label: 'Getting started', icon: null, href: expect.any(String) },
+            { label: 'Getting started', icon: null, href: result?.href },
         ]);
         expect(result?.ancestors?.[0]?.href).toBeUndefined();
         expect(result?.ancestors?.[1]?.href).toBeUndefined();
         expect(result?.ancestors?.[2]?.href).toBeUndefined();
-        expect(result?.ancestors?.[4]?.href).toBeTruthy();
     });
 
     it('uses the first document as the target for a page-group reference', async () => {

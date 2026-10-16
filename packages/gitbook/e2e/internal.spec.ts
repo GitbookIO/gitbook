@@ -1126,6 +1126,30 @@ const testCases: TestsCase[] = [
                 },
             },
             {
+                name: 'Markdown page with theme cookie',
+                url: async () => {
+                    const data = await getSiteAPIToken(
+                        'https://gitbook.gitbook.io/test-gitbook-open/'
+                    );
+
+                    const searchParams = new URLSearchParams();
+                    searchParams.set('token', data.apiToken);
+                    searchParams.set('theme', 'dark');
+
+                    return `url/${getGitBookPreviewURL(`${data.site}/blocks?${searchParams.toString()}`)}`;
+                },
+                screenshot: false,
+                run: async (page) => {
+                    // The app opens previews with `?theme=`, which the middleware persists in a cookie.
+                    const markdownURL = new URL(page.url());
+                    markdownURL.pathname = `${markdownURL.pathname.replace(/\/$/, '')}.md`;
+                    markdownURL.search = '';
+                    const response = await page.request.get(markdownURL.toString());
+                    expect(response.status()).toBe(200);
+                    expect(response.headers()['content-type']).toContain('text/markdown');
+                },
+            },
+            {
                 name: 'Redirect to app for authentication when missing token',
                 url: async () => {
                     const data = await getSiteAPIToken('https://gitbook.com/docs');

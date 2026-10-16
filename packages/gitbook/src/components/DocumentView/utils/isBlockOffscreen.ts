@@ -18,6 +18,11 @@ export function isBlockOffscreen(
     },
     screenHeight = 500
 ): boolean {
+    // Cell content lives in fragments, not table nodes, so its row position can't be estimated.
+    if (ancestorBlocks.some((ancestor) => ancestor.type === 'table')) {
+        return true;
+    }
+
     let current = block;
 
     const allAncestors = [document, ...ancestorBlocks];

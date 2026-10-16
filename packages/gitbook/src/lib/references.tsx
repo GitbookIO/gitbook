@@ -23,7 +23,7 @@ import {
     findGitPageURLTarget,
     findPageForGitPageURLTarget,
 } from './gitPageURL';
-import { resolvePageId } from './pages';
+import { resolveFirstDocument, resolvePageId } from './pages';
 import {
     findSiteSpaceBy,
     getFallbackSiteSpacePath,
@@ -276,7 +276,14 @@ export async function resolveContentRef(
                                 style={iconStyle}
                             />
                         ) : null,
-                    href: linker.toPathForPage({ page: ancestor, pages: revision.pages }),
+                    // A group's own URL redirects to its first document, so link straight to it.
+                    href: linker.toPathForPage({
+                        page:
+                            ancestor.type === 'group'
+                                ? (resolveFirstDocument([ancestor], [])?.page ?? ancestor)
+                                : ancestor,
+                        pages: revision.pages,
+                    }),
                 })) ?? [];
             if (!page) {
                 return null;
