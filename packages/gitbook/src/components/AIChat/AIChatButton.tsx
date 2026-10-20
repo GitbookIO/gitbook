@@ -1,6 +1,7 @@
 'use client';
 import type { Assistant } from '../AI';
 import { useIsMobile } from '../hooks/useIsMobile';
+import { useTrackEvent } from '../Insights';
 import { Button } from '../primitives';
 import { KeyboardShortcut } from '../primitives/KeyboardShortcut';
 import { useLanguage } from '@/intl/client';
@@ -18,6 +19,7 @@ export function AIChatButton(props: {
 }) {
     const { assistant, showLabel = true, withShortcut = true } = props;
     const language = useLanguage();
+    const trackEvent = useTrackEvent();
     const isMobile = useIsMobile(MOBILE_BREAKPOINT, '[data-gb-header-content]');
 
     return (
@@ -39,7 +41,12 @@ export function AIChatButton(props: {
                 </div>
             }
             aria-label={tString(language, 'ai_chat_ask', assistant.label)}
-            onClick={() => assistant.open(undefined, 'site')}
+            onClick={() => {
+                if (assistant.id === 'gitbook-assistant') {
+                    trackEvent({ type: 'ask_trigger_click', trigger: 'site' });
+                }
+                assistant.open(undefined, 'site');
+            }}
         >
             {showLabel ? t(language, 'ask') : null}
         </Button>

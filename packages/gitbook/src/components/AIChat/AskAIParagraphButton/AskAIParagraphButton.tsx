@@ -6,6 +6,7 @@ import { createPortal } from 'react-dom';
 
 import { AIChatIcon } from '../AIChatIcon';
 import { useAIChatController, useAIConfig } from '@/components/AI';
+import { useTrackEvent } from '@/components/Insights';
 import { Button } from '@/components/primitives';
 import { isAIChatEnabled } from '@/components/utils/isAIChatEnabled';
 import { t, tString, useLanguage } from '@/intl/client';
@@ -24,6 +25,7 @@ export function AskAIParagraphButton() {
     const config = useAIConfig();
     const language = useLanguage();
     const chatController = useAIChatController();
+    const trackEvent = useTrackEvent();
     const [target, setTarget] = React.useState<HTMLElement | null>(null);
 
     const enabled = isAIChatEnabled(config.aiMode);
@@ -52,6 +54,7 @@ export function AskAIParagraphButton() {
     }
 
     const onClick = () => {
+        trackEvent({ type: 'ask_trigger_click', trigger: 'hover' });
         const text = getParagraphText(target).trim();
         if (!text) {
             return;

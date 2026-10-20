@@ -10,6 +10,7 @@ import { Icon, type IconName, IconStyle } from '@gitbook/icons';
 
 import { useAIChatController, useAIChatState } from '@/components/AI';
 import type { Assistant } from '@/components/AI';
+import { useTrackEvent } from '@/components/Insights';
 import { Button } from '@/components/primitives/Button';
 import { DropdownMenuItem, useDropdownMenuClose } from '@/components/primitives/DropdownMenu';
 import { getURLForLLM } from '@/components/utils';
@@ -39,6 +40,7 @@ export function ActionOpenAssistant(props: {
     const { assistant, type, page } = props;
     const chat = useAIChatState();
     const chatController = useAIChatController();
+    const trackEvent = useTrackEvent();
     const language = useLanguage();
 
     return (
@@ -55,6 +57,7 @@ export function ActionOpenAssistant(props: {
             )}
             disabled={chat.responding}
             onClick={() => {
+                trackEvent({ type: 'ask_trigger_click', trigger: 'page' });
                 // Stage a reference to the current page so the assistant is informed about
                 // the context the user is asking from. Only the sidebar GitBook Assistant
                 // uses the chat reference system.
