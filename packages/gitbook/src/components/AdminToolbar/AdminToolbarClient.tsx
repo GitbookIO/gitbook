@@ -15,7 +15,6 @@ import {
     ToolbarBody,
     ToolbarButton,
     ToolbarButtonGroup,
-    type ToolbarButtonProps,
     ToolbarSubtitle,
     ToolbarTitle,
 } from './Toolbar';
@@ -137,14 +136,21 @@ function ChangeRequestToolbar(props: ToolbarViewProps) {
         <Toolbar minified={minified} onMinifiedChange={onMinifiedChange}>
             <ToolbarBody>
                 <ToolbarTitle
-                    prefix={`Change #${changeRequest.number}:`}
-                    suffix={`${changeRequest.subject || 'Untitled'}`}
+                    prefix={`#${changeRequest.number}`}
+                    prefixLabel={`Change request #${changeRequest.number}`}
+                    suffix={changeRequest.subject || 'Untitled'}
                 />
                 <ToolbarSubtitle
                     subtitle={
                         <>
                             <ToolbarDate value={changeRequest.updatedAt} />{' '}
-                            <motion.span layout="position">by {author}</motion.span>
+                            <motion.span
+                                layout="position"
+                                title={author}
+                                className="min-w-0 truncate"
+                            >
+                                by {author}
+                            </motion.span>
                         </>
                     }
                 />
@@ -339,12 +345,8 @@ function ToolbarActions(props: { children: React.ReactNode }) {
     );
 }
 
-function EditPageButton(props: {
-    href: string;
-    siteId: string;
-    motionValues?: ToolbarButtonProps['motionValues'];
-}) {
-    const { href, motionValues, siteId } = props;
+function EditPageButton(props: { href: string; siteId: string }) {
+    const { href, siteId } = props;
     const pagePath = useCurrentPagePath();
 
     return (
@@ -356,7 +358,6 @@ function EditPageButton(props: {
                 buttonId: 'edit',
             })}
             icon="pen-to-square"
-            motionValues={motionValues}
         />
     );
 }

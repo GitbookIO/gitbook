@@ -35,7 +35,8 @@ export function ToolbarDate(props: { value: string }) {
 
     return (
         <motion.div
-            className="inline-flex items-center gap-1"
+            // Never wraps: the longer formats push the author's name to truncate instead.
+            className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap"
             onMouseEnter={() => setHovered(true)}
             onMouseLeave={() => setHovered(false)}
         >
@@ -75,7 +76,7 @@ export function ToolbarDate(props: { value: string }) {
                     setFormatIndex((i) => (i + 1) % DATE_FORMATS.length);
                 }}
                 transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-                className="relative inline-flex cursor-pointer select-none overflow-hidden font-semibold transition-colors hover:text-white" // `text-white` is used insead of dark-mode adapting values because the date is always in a dark-tinted toolbar
+                className="relative inline-flex cursor-pointer select-none overflow-hidden whitespace-nowrap font-semibold transition-colors hover:text-white" // `text-white` is used insead of dark-mode adapting values because the date is always in a dark-tinted toolbar
             >
                 <AnimatePresence mode="popLayout" initial={false}>
                     <motion.span

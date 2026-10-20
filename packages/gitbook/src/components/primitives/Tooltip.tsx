@@ -10,6 +10,8 @@ export type TooltipProps = {
     side?: BaseTooltip.Positioner.Props['side'];
     align?: BaseTooltip.Positioner.Props['align'];
     sideOffset?: number;
+    /** Positions against this element instead of the trigger, e.g. when the trigger is transformed. */
+    anchor?: BaseTooltip.Positioner.Props['anchor'];
     delay?: number;
     disabled?: boolean;
     disableHoverablePopup?: boolean;
@@ -31,6 +33,7 @@ export function Tooltip(
         side,
         align,
         sideOffset = 4,
+        anchor,
         delay,
         disabled,
         disableHoverablePopup,
@@ -69,6 +72,7 @@ export function Tooltip(
                     side={side}
                     align={align}
                     sideOffset={sideOffset}
+                    anchor={anchor}
                     collisionPadding={8}
                 >
                     <BaseTooltip.Popup

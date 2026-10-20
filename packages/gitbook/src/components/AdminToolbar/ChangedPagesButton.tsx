@@ -6,8 +6,9 @@ import type { SVGProps } from 'react';
 import { Icon, type IconName, IconStyle } from '@gitbook/icons';
 
 import { DropdownMenu, DropdownMenuItem, DropdownMenuSeparator } from '../primitives';
-import type { ToolbarButtonProps } from './Toolbar';
+import { useToolbarSlot } from './Toolbar';
 import type { MinimalChangedPage, MinimalChangedPages } from './types';
+import { TOOLTIP_OFFSET } from './useMagnificationEffect';
 import { tcls } from '@/lib/tailwind';
 
 const STATUS_ICON_STYLES: Record<
@@ -42,12 +43,10 @@ const STATUS_ICON_CHIP_CLASS = 'flex size-5 shrink-0 items-center justify-center
 /**
  * A button that opens a popover with quick links to the _changed_ pages.
  */
-export function ChangedPagesButton(props: {
-    changedPages: MinimalChangedPages | null;
-    motionValues?: ToolbarButtonProps['motionValues'];
-}) {
-    const { changedPages, motionValues } = props;
+export function ChangedPagesButton(props: { changedPages: MinimalChangedPages | null }) {
+    const { changedPages } = props;
     const reduceMotion = useReducedMotion();
+    const slot = useToolbarSlot();
 
     if (!changedPages?.pages.length) {
         return null;
@@ -59,30 +58,19 @@ export function ChangedPagesButton(props: {
     }`;
 
     const trigger = (
-        <button
+        <motion.button
             type="button"
             aria-label="View changed pages"
+            style={
+                reduceMotion || !slot
+                    ? undefined
+                    : { scale: slot.scale, x: slot.x, transformOrigin: 'bottom center' }
+            }
             className="relative size-8 cursor-pointer border-0 bg-transparent p-0"
         >
-            <motion.span
+            <span
                 aria-hidden="true"
-                style={
-                    reduceMotion
-                        ? undefined
-                        : {
-                              scale: motionValues?.scale,
-                              x: motionValues?.x,
-                              transformOrigin: 'bottom center',
-                              zIndex: motionValues?.scale ? 10 : 'auto',
-                          }
-                }
-                transition={{
-                    type: 'spring',
-                    stiffness: 400,
-                    damping: 30,
-                }}
                 className={tcls(
-                    'toolbar-button',
                     'relative flex size-8 items-center justify-center gap-1 truncate rounded-full text-sm transition-colors',
                     'text-tint-7 hover:text-tint-1',
                     'dark:text-tint-12',
@@ -91,14 +79,18 @@ export function ChangedPagesButton(props: {
                 )}
             >
                 <DiffIcon className="size-4 shrink-0" />
-            </motion.span>
-        </button>
+            </span>
+        </motion.button>
     );
 
     return (
         <DropdownMenu
             button={trigger}
             buttonTooltip="View changed pages"
+            // Like the other toolbar buttons: against the unscaled slot, with room to magnify.
+            buttonTooltipProps={
+                slot ? { anchor: slot.anchorRef, sideOffset: TOOLTIP_OFFSET } : undefined
+            }
             side="top"
             align="end"
             sideOffset={12}

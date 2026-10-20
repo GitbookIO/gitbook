@@ -1,5 +1,6 @@
 .svgLogo {
-  --logo-fill: var(--color-neutral-100);
+  /* The toolbar is always dark, so the logo is always light. */
+  --logo-fill: rgb(255 255 255 / 0.92);
   --seg-A-color: #2782c4;
   --seg-B-color: #43b7f2;
   --seg-C-color: #8be2ff;
