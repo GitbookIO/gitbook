@@ -31,6 +31,7 @@ export async function BlockContentRef(props: BlockProps<DocumentBlockContentRef>
         return (
             <NotFoundRefHoverCard context={context}>
                 <BlockContentRefCard
+                    data-block-key={block.key}
                     contentRef={block.data.ref}
                     resolved={fallback}
                     style={style}
@@ -39,7 +40,14 @@ export async function BlockContentRef(props: BlockProps<DocumentBlockContentRef>
         );
     }
 
-    return <BlockContentRefCard contentRef={block.data.ref} resolved={resolved} style={style} />;
+    return (
+        <BlockContentRefCard
+            data-block-key={block.key}
+            contentRef={block.data.ref}
+            resolved={resolved}
+            style={style}
+        />
+    );
 }
 
 function BlockContentRefCard(

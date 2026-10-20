@@ -218,7 +218,12 @@ export function MermaidCodeBlock(
     return (
         <>
             {/* Inline slot: hosts the diagram in the document flow until it goes fullscreen. */}
-            <div ref={rootRef} className={tcls('relative', style)} contentEditable={false} />
+            <div
+                ref={rootRef}
+                data-block-key={block.key}
+                className={tcls('relative', style)}
+                contentEditable={false}
+            />
             {diagramHostRef.current ? createPortal(diagram, diagramHostRef.current) : null}
             <Dialog.Root
                 open={isFullscreen}

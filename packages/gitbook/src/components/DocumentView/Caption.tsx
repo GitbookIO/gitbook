@@ -34,6 +34,8 @@ export function Caption(
         block: DocumentBlockImage | DocumentBlockDrawing | DocumentBlockEmbed | DocumentBlockFile;
         withBorder?: boolean;
         withFrame?: boolean;
+        /** Expose the block key for commenting; off for images nested in an images block. */
+        withBlockKey?: boolean;
     } & DocumentContextProps
 ) {
     const {
@@ -59,7 +61,10 @@ export function Caption(
         ],
         style,
         align = 'center',
+        withBlockKey = false,
     } = props;
+
+    const blockKey = withBlockKey ? block.key : undefined;
 
     const caption = getNodeFragmentByName(block, 'caption');
     const captionParagraph = caption?.nodes[0];
@@ -69,11 +74,15 @@ export function Caption(
         captionParagraph.type !== 'paragraph' ||
         isNodeEmpty(captionParagraph)
     ) {
-        return <div className={tcls(style, wrapperStyle)}>{children}</div>;
+        return (
+            <div data-block-key={blockKey} className={tcls(style, wrapperStyle)}>
+                {children}
+            </div>
+        );
     }
 
     return (
-        <picture className={tcls('relative', style)}>
+        <picture data-block-key={blockKey} className={tcls('relative', style)}>
             <div className={tcls(wrapperStyle, captionAlignStyles[align])}>{children}</div>
             <figcaption
                 className={tcls(

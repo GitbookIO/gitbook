@@ -10,9 +10,12 @@ import { tcls } from '@/lib/tailwind';
 export function Paragraph(props: BlockProps<DocumentBlockParagraph>) {
     const { block, style, ancestorBlocks, ...contextProps } = props;
     const { context } = contextProps;
+    // Like the app, a list item owns the comments on its direct paragraph.
+    const isCommentTarget = ancestorBlocks.at(-1)?.type !== 'list-item';
 
     const paragraph = (
         <p
+            data-block-key={isCommentTarget ? block.key : undefined}
             // Cover-aware contrast text applies only to the page body, not to documents
             // rendered in overlays (search answers, AI chat) on a background-cover page.
             data-cover-aware-text={context.isPageBody ? '' : undefined}

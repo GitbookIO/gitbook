@@ -37,10 +37,12 @@ export async function Expandable(props: BlockProps<DocumentBlockExpandable>) {
     return (
         <Details
             id={id}
+            blockKey={block.key}
             open={context.mode === 'print' || isDefaultExpanded}
             className={tcls('scroll-mt-(--content-scroll-margin)', style)}
         >
             <summary
+                data-block-key={titleParagraph.key}
                 className={tcls(
                     'cursor-pointer',
                     'px-4',

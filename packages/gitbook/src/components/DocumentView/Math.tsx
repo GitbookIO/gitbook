@@ -11,13 +11,16 @@ const assetsUrl = getAssetURL('math');
 export async function BlockMath(props: BlockProps<DocumentBlockMath>) {
     const { block, style } = props;
 
+    // `MathFormula` only forwards `className`, so the comment anchor needs its own wrapper.
     return (
-        <MathFormula
-            formula={block.data.formula}
-            inline={false}
-            className={tcls(style, 'overflow-x-auto')}
-            assetsUrl={assetsUrl}
-        />
+        <div data-block-key={block.key} className={tcls(style)}>
+            <MathFormula
+                formula={block.data.formula}
+                inline={false}
+                className="overflow-x-auto"
+                assetsUrl={assetsUrl}
+            />
+        </div>
     );
 }
 

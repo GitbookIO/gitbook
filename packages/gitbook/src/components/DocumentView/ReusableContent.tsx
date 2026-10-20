@@ -50,6 +50,9 @@ export async function ReusableContent(props: BlockProps<DocumentBlockReusableCon
             nodes={reusableContentDocument.nodes}
             document={reusableContentDocument}
             ancestorBlocks={[...ancestorBlocks, block]}
+            // Its blocks carry keys of the reusable content's own document, which comments on the
+            // page can't anchor to. A class, not a wrapper, which would break the page's spacing.
+            blockStyle="comment-ignore"
             context={{
                 ...context,
                 contentContext: reusableContent.context,

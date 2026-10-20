@@ -32,7 +32,7 @@ export function StepperStep(props: BlockProps<DocumentBlockStepperStep>) {
     })();
 
     return (
-        <div className={tcls('flex flex-row gap-4 md:gap-8', style)}>
+        <div data-block-key={block.key} className={tcls('flex flex-row gap-4 md:gap-8', style)}>
             <div className="relative select-none">
                 <div
                     className={tcls(

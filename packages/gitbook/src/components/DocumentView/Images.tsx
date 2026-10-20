@@ -15,6 +15,7 @@ export function Images(props: BlockProps<DocumentBlockImages>) {
 
     return (
         <div
+            data-block-key={block.key}
             className={tcls(
                 style,
                 'flex',

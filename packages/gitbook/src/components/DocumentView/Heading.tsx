@@ -30,6 +30,7 @@ export async function Heading(props: BlockProps<DocumentBlockHeading>) {
         <HeadingRevealWrapper
             as={Tag}
             id={id}
+            data-block-key={block.key}
             className={tcls(
                 textStyle.textSize,
                 'heading',

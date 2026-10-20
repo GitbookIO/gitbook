@@ -9,9 +9,12 @@ import { tcls } from '@/lib/tailwind';
  * Render an openapi block or an openapi-operation block.
  */
 export async function OpenAPIOperation(props: BlockProps<AnyOpenAPIOperationsBlock>) {
-    const { style } = props;
+    const { style, block } = props;
     return (
-        <div className={tcls('flex w-full min-w-0', style, 'max-w-full')}>
+        <div
+            data-block-key={block.key}
+            className={tcls('flex w-full min-w-0', style, 'max-w-full')}
+        >
             <OpenAPIOperationBody {...props} />
         </div>
     );

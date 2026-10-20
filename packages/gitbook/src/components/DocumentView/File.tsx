@@ -40,7 +40,7 @@ export async function File(props: BlockProps<DocumentBlockFile>) {
     };
 
     return (
-        <Caption {...props} withBorder>
+        <Caption {...props} withBorder withBlockKey>
             <div className="flex flex-wrap items-center gap-5 px-5 py-3">
                 <div className="flex min-h-8 min-w-14 flex-col items-center justify-center gap-1 border-r border-tint-subtle pr-4">
                     {contentType === 'image' ? (

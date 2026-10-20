@@ -37,6 +37,8 @@ export function Columns(props: BlockProps<DocumentBlockColumns>) {
 
     return (
         <div
+            // The app doesn't allow comments inside columns.
+            data-comment-ignore=""
             className={tcls(
                 'grid w-full @2xl:grid-flow-col @2xl:grid-cols-[repeat(var(--grid-slices),minmax(0,1fr))] grid-cols-1 @2xl:grid-rows-1 gap-x-8 gap-y-4',
                 style

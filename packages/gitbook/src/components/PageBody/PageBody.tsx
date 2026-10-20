@@ -100,6 +100,8 @@ export async function PageBody(props: {
                 />
             ) : null}
             <main
+                // Comments on the whole page target anywhere in it that isn't a block.
+                data-comment-page=""
                 className={tcls(
                     'relative min-w-0 flex-1',
                     'break-anywhere', // Allow words to break if they are too long.

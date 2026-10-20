@@ -219,6 +219,8 @@ function NativeViewGridBody(
                                             colSpan={colSpan}
                                             aria-rowspan={rowSpan}
                                             aria-colspan={colSpan}
+                                            data-table-record={recordId}
+                                            data-table-column={column}
                                             data-table-row-start={recordIndex}
                                             data-table-row-end={
                                                 recordIndex + (cellMerge?.merge.rowSpan ?? 1) - 1

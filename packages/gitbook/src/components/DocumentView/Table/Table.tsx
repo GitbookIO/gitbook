@@ -74,7 +74,11 @@ export function Table(props: BlockProps<DocumentBlockTable>) {
                 block.data.view.type === 'grid' ? cellMergeLayout.recordGroups : undefined
             }
         >
-            <div className={tcls(style, 'flex flex-col gap-3')}>
+            <div
+                data-block-key={block.key}
+                data-comment-table=""
+                className={tcls(style, 'flex flex-col gap-3')}
+            >
                 {showSearch ? (
                     <TableSearchInput
                         selectColumns={selectColumns}

@@ -50,6 +50,7 @@ export const CodeBlockRenderer = forwardRef(function CodeBlockRenderer(
         <div
             ref={ref}
             id={codeId}
+            data-block-key={block.key}
             aria-busy={ariaBusy}
             className={tcls(
                 'group/codeblock shiki relative flex shrink flex-col overflow-hidden print:overflow-visible',

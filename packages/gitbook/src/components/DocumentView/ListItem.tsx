@@ -125,7 +125,14 @@ function getListItemDepth(input: {
 
 function ListItemLI(props: { block: DocumentBlockListItem; children: React.ReactNode }) {
     const textStyle = getBlockTextStyle(props.block);
-    return <li className={tcls(textStyle.lineHeight, 'flex items-start')}>{props.children}</li>;
+    return (
+        <li
+            data-block-key={props.block.key}
+            className={tcls(textStyle.lineHeight, 'flex items-start')}
+        >
+            {props.children}
+        </li>
+    );
 }
 
 function ListItemPrefix(props: { block: DocumentBlockListItem; children: React.ReactNode }) {

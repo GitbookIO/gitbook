@@ -9,9 +9,9 @@ import { tcls } from '@/lib/tailwind';
  * Render an openapi-schemas block.
  */
 export async function OpenAPISchemas(props: BlockProps<OpenAPISchemasBlock>) {
-    const { style } = props;
+    const { style, block } = props;
     return (
-        <div className={tcls('flex w-full', style, 'max-w-full')}>
+        <div data-block-key={block.key} className={tcls('flex w-full', style, 'max-w-full')}>
             <OpenAPISchemasBody {...props} />
         </div>
     );

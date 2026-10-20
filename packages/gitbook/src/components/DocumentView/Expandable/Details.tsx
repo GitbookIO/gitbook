@@ -14,6 +14,8 @@ export function Details(props: {
     contentIds?: string[];
     open?: boolean;
     className?: ClassValue;
+    /** Node key of the expandable, so comments can anchor to it. */
+    blockKey?: string;
 }) {
     const { children, id, className } = props;
 
@@ -46,6 +48,7 @@ export function Details(props: {
         <details
             ref={ref}
             id={id}
+            data-block-key={props.blockKey}
             open={props.open || openFromHash}
             className={tcls(
                 className,

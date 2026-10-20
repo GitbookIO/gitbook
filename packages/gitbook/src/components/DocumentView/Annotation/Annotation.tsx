@@ -21,13 +21,16 @@ export function Annotation(props: InlineProps<DocumentInlineAnnotation>) {
     return (
         <AnnotationPopover
             body={
-                <Blocks
-                    document={document}
-                    ancestorBlocks={[]}
-                    context={context}
-                    nodes={fragment.nodes}
-                    style={['contents']}
-                />
+                // The app doesn't allow comments inside annotation bodies.
+                <div data-comment-ignore="" className="contents">
+                    <Blocks
+                        document={document}
+                        ancestorBlocks={[]}
+                        context={context}
+                        nodes={fragment.nodes}
+                        style={['contents']}
+                    />
+                </div>
             }
         >
             {content}

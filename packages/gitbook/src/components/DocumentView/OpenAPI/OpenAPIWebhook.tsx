@@ -9,9 +9,12 @@ import { tcls } from '@/lib/tailwind';
  * Render an openapi block or an openapi-webhook block.
  */
 export async function OpenAPIWebhook(props: BlockProps<OpenAPIWebhookBlock>) {
-    const { style } = props;
+    const { style, block } = props;
     return (
-        <div className={tcls('flex w-full min-w-0', style, 'max-w-full')}>
+        <div
+            data-block-key={block.key}
+            className={tcls('flex w-full min-w-0', style, 'max-w-full')}
+        >
             <OpenAPIWebhookBody {...props} />
         </div>
     );

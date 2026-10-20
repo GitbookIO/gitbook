@@ -61,7 +61,7 @@ export async function IntegrationBlock(props: BlockProps<DocumentBlockIntegratio
         }
 
         return (
-            <div className={tcls(style)}>
+            <div data-block-key={block.key} className={tcls(style)}>
                 <pre>
                     Unexpected error with integration {block.data.integration}:{' '}
                     {initialResponse.error.message}
@@ -99,7 +99,7 @@ export async function IntegrationBlock(props: BlockProps<DocumentBlockIntegratio
     };
 
     return (
-        <div className={tcls(style)}>
+        <div data-block-key={block.key} className={tcls(style)}>
             <ContentKitWithClientContext
                 {...contentKitProps}
                 canAccessVisitorClaims={canAccessVisitorClaims}
