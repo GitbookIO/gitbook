@@ -7,10 +7,14 @@ import {
     getVisitorAuthCookieMaxAge,
     getVisitorAuthCookieName,
     getVisitorAuthCookieValue,
+    getVisitorCountry,
     getVisitorToken,
     getVisitorType,
     getVisitorUnsignedClaims,
+    isRevalidationRequest,
     normalizeVisitorURL,
+    parseHostnameList,
+    shouldSendVisitorCountry,
 } from './visitors';
 
 describe('getVisitorAuthToken', () => {
@@ -228,6 +232,27 @@ describe('getVisitorAuthToken', () => {
 
 // The chunking mechanics themselves are covered in api-token-cookie.test.ts;
 // these tests cover the wiring into the visitor auth cookie.
+describe('getResponseCookiesForVisitorAuth write policy', () => {
+    const base64url = (value: object) => Buffer.from(JSON.stringify(value)).toString('base64url');
+    const token = `${base64url({ alg: 'none' })}.${base64url({ exp: 2_000_000_000 })}.sig`;
+
+    it('persists a token that arrived in the URL', () => {
+        expect(getResponseCookiesForVisitorAuth('/', { source: 'url', token })).toHaveLength(1);
+    });
+
+    it('only accepts a token that arrived in the URL', () => {
+        const fromVACookie = { source: 'visitor-auth-cookie', basePath: '/', token } as const;
+        const fromCustomCookie = { source: 'gitbook-visitor-cookie', token } as const;
+
+        // @ts-expect-error a token read back from a VA cookie must never be persisted again
+        const buildFromVACookie = () => getResponseCookiesForVisitorAuth('/', fromVACookie);
+        // @ts-expect-error a custom visitor cookie is owned by the customer's backend
+        const buildFromCustom = () => getResponseCookiesForVisitorAuth('/', fromCustomCookie);
+
+        expect([buildFromVACookie, buildFromCustom]).toHaveLength(2);
+    });
+});
+
 describe('getResponseCookiesForVisitorAuth chunking', () => {
     const base64url = (value: object) => Buffer.from(JSON.stringify(value)).toString('base64url');
 
@@ -562,5 +587,107 @@ describe('getVisitorType', () => {
     it('should default to "human" when the user-agent is missing or empty', () => {
         expect(getVisitorType(requestWith({}))).toBe('human');
         expect(getVisitorType(requestWith({ 'user-agent': '' }))).toBe('human');
+    });
+});
+
+describe('isRevalidationRequest', () => {
+    it('should detect the revalidation worker regardless of casing', () => {
+        expect(
+            isRevalidationRequest(new Headers({ 'User-Agent': 'GitBook-Open-Revalidation-Worker' }))
+        ).toBe(true);
+    });
+
+    it('should not detect a regular request', () => {
+        expect(isRevalidationRequest(new Headers({ 'User-Agent': 'Mozilla/5.0' }))).toBe(false);
+        expect(isRevalidationRequest(new Headers())).toBe(false);
+    });
+});
+
+describe('getVisitorCountry', () => {
+    const requestWith = (headers: Record<string, string>) => ({ headers: new Headers(headers) });
+
+    it('should prefer the OpenNext country header', () => {
+        expect(
+            getVisitorCountry(
+                requestWith({ 'x-open-next-country': 'FR', 'x-vercel-ip-country': 'US' })
+            )
+        ).toBe('FR');
+    });
+
+    it('should fall back to the Vercel country header', () => {
+        expect(getVisitorCountry(requestWith({ 'x-vercel-ip-country': 'US' }))).toBe('US');
+    });
+
+    it('should normalize the country code to uppercase', () => {
+        expect(getVisitorCountry(requestWith({ 'x-open-next-country': ' fr ' }))).toBe('FR');
+    });
+
+    it.each(['XX', 'T1', 'FRA', 'F', ''])('should ignore the invalid country code %p', (value) => {
+        expect(getVisitorCountry(requestWith({ 'x-open-next-country': value }))).toBeUndefined();
+    });
+
+    it('should return undefined when no country header is present', () => {
+        expect(getVisitorCountry(requestWith({}))).toBeUndefined();
+    });
+
+    it('should prefer the forwarded country header on revalidation requests', () => {
+        expect(
+            getVisitorCountry(
+                requestWith({
+                    'user-agent': 'gitbook-open-revalidation-worker',
+                    'x-gitbook-country': 'DE',
+                    'x-open-next-country': 'FR',
+                })
+            )
+        ).toBe('DE');
+    });
+
+    it('should ignore the forwarded country header outside revalidation requests', () => {
+        expect(
+            getVisitorCountry(
+                requestWith({ 'x-gitbook-country': 'DE', 'x-open-next-country': 'FR' })
+            )
+        ).toBe('FR');
+        expect(getVisitorCountry(requestWith({ 'x-gitbook-country': 'DE' }))).toBeUndefined();
+    });
+
+    it('should fall back to geolocation headers on revalidation requests without a forwarded country', () => {
+        expect(
+            getVisitorCountry(
+                requestWith({
+                    'user-agent': 'gitbook-open-revalidation-worker',
+                    'x-open-next-country': 'FR',
+                })
+            )
+        ).toBe('FR');
+    });
+});
+
+describe('shouldSendVisitorCountry', () => {
+    it.each(['dev', 'preview', 'staging'])('should be enabled on the %p stage', (stage) => {
+        expect(shouldSendVisitorCountry('docs.example.com', stage)).toBe(true);
+    });
+
+    it.each(['production', undefined])(
+        'should be disabled for other hostnames on the %p stage',
+        (stage) => {
+            expect(shouldSendVisitorCountry('docs.example.com', stage)).toBe(false);
+        }
+    );
+});
+
+describe('parseHostnameList', () => {
+    it.each([undefined, '', ' , '])('should return an empty set for %p', (value) => {
+        expect(parseHostnameList(value).size).toBe(0);
+    });
+
+    it('should parse a single entry', () => {
+        expect(parseHostnameList('docs.foo.com')).toEqual(new Set(['docs.foo.com']));
+    });
+
+    it('should trim, lowercase and drop empty entries', () => {
+        expect(parseHostnameList(' Docs.Foo.com , ,bar.io')).toEqual(
+            new Set(['docs.foo.com', 'bar.io'])
+        );
     });
 });

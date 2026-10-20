@@ -97,6 +97,7 @@ export async function EmbeddableDocsPage(
                                         ) ?? context.siteSpace
                                     }
                                     siteSpaces={variants.translations}
+                                    asEmbeddable
                                     className="my-1.5 ml-2 self-start"
                                 />
                             ) : null}
@@ -125,6 +126,7 @@ export async function EmbeddableDocsPage(
                                             ) ?? context.siteSpace
                                         }
                                         siteSpaces={variants.translations}
+                                        asEmbeddable
                                         className="max-md:[&_.button-content]:block"
                                     />
                                 ) : null
@@ -137,6 +139,7 @@ export async function EmbeddableDocsPage(
                                                 context={context}
                                                 siteSpace={context.siteSpace}
                                                 siteSpaces={variants.generic}
+                                                asEmbeddable
                                                 className="w-full px-3"
                                             />
                                         ) : null}

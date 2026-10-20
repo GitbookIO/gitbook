@@ -190,6 +190,14 @@ describe('extractNonNullTypes', () => {
 });
 
 describe('normalizeNullableUnion', () => {
+    it('should return the same object for the same input', () => {
+        const schema: OpenAPIV3_1.SchemaObject = {
+            anyOf: [{ type: 'array', items: { type: 'string' } }, { type: 'null' }],
+        };
+
+        expect(normalizeNullableUnion(schema)).toBe(normalizeNullableUnion(schema));
+    });
+
     it('should collapse anyOf with a single non-null member into a nullable schema', () => {
         const schema: OpenAPIV3_1.SchemaObject = {
             anyOf: [{ type: 'string' }, { type: 'null' }],

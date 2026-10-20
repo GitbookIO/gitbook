@@ -4,6 +4,7 @@ import { usePathname, useSearchParams } from 'next/navigation';
 import { useMemo } from 'react';
 import type React from 'react';
 
+import { useIsMounted } from '../hooks/useIsMounted';
 import { Button, type ButtonProps } from '../primitives/Button';
 import { DropdownMenuItem } from '../primitives/DropdownMenu';
 import { Link, type LinkInsightsProps, type LinkProps } from '../primitives/Link';
@@ -16,9 +17,17 @@ function useSiteAuthLoginHrefWithLocation(href: string) {
     const rawPathname = usePathname();
     const searchParams = useSearchParams();
     const currentSearch = searchParams?.toString();
-    const pathname = rawPathname ?? '/';
+    // On the server, usePathname() returns the internal rewritten route (/sites/…, which includes
+    // the site API token), so the location is only added once mounted.
+    // https://nextjs.org/docs/app/api-reference/functions/use-pathname#avoid-hydration-mismatch-with-rewrites
+    const isMounted = useIsMounted();
+    const pathname = isMounted ? (rawPathname ?? '/') : null;
 
     return useMemo(() => {
+        if (pathname === null) {
+            return href;
+        }
+
         const baseURL = typeof window !== 'undefined' ? window.location.origin : 'http://localhost';
         const resolved = URL.canParse(href) ? new URL(href) : new URL(href, baseURL);
         const siteBasePath = removeTrailingSlash(

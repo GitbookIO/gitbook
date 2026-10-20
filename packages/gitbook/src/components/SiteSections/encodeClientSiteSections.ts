@@ -201,7 +201,7 @@ function getTargetURLForSection(
     return getSectionURL(context, section);
 }
 
-function getTargetURLForSiteSpace(
+export function getTargetURLForSiteSpace(
     context: GitBookSiteContext,
     siteSpace: SiteSpace,
     asEmbeddable: boolean

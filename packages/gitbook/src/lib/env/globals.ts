@@ -15,6 +15,15 @@ export const GITBOOK_RUNTIME = (process.env.GITBOOK_RUNTIME ?? 'unknown') as
     | 'unknown';
 
 /**
+ * Deployment stage (`STAGE` from the Cloudflare wrangler configs, the target env on Vercel),
+ * defaulting to `dev` locally.
+ */
+export const GITBOOK_STAGE =
+    process.env.STAGE ??
+    process.env.VERCEL_TARGET_ENV ??
+    (process.env.NODE_ENV === 'development' ? 'dev' : undefined);
+
+/**
  * Main host on which GitBook is running.
  */
 export const GITBOOK_URL =
@@ -77,6 +86,18 @@ export const GITBOOK_PREVIEW_BASE_URL =
 export const GITBOOK_DISABLE_TRACKING = Boolean(
     !!process.env.GITBOOK_DISABLE_TRACKING || process.env.NODE_ENV !== 'production'
 );
+
+/**
+ * Whether insights events must not reach the sites' analytics, while the pages otherwise behave
+ * like production. Set on the preview deployments, whose traffic is e2e runs, not the sites'.
+ */
+export const GITBOOK_DISABLE_INSIGHTS = process.env.GITBOOK_DISABLE_INSIGHTS === 'true';
+
+/**
+ * Whether to resolve site content with the full URL only, skipping the shorter lookup alternatives.
+ */
+export const GITBOOK_DISABLE_LOOKUP_ALTERNATIVES =
+    process.env.GITBOOK_DISABLE_LOOKUP_ALTERNATIVES === 'true';
 
 /**
  * Hostname serving the integrations.

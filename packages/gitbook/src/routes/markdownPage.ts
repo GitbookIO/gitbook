@@ -1,6 +1,8 @@
 import type { RevisionPageDocument, RevisionPageGroup } from '@gitbook/api';
 
+import { resolveMissingPagePath } from '@/components/SitePage/fetch';
 import { isAIEnabled } from '@/components/utils/isAIChatEnabled';
+import { renderPageAgentInstructions, renderQueryingDocumentation } from '@/lib/ask-prompt';
 import type { GitBookSiteContext } from '@/lib/context';
 import { getExposableError } from '@/lib/data';
 import { linkerWithMarkdownPages } from '@/lib/links';
@@ -22,12 +24,36 @@ export async function servePageMarkdown(baseContext: GitBookSiteContext, pagePat
             linker: linkerWithMarkdownPages(baseContext.linker),
         };
 
-        const pageLookup = resolveSiteSpacePagePathDocumentOrGroup(
-            context.siteSpace,
-            context.revision.pages,
-            pagePath
-        );
+        const pageLookup =
+            resolveSiteSpacePagePathDocumentOrGroup(
+                context.siteSpace,
+                context.revision.pages,
+                pagePath
+            ) ??
+            // Page paths are lowercase, match the case-insensitive lookup of HTML pages.
+            resolveSiteSpacePagePathDocumentOrGroup(
+                context.siteSpace,
+                context.revision.pages,
+                pagePath.toLowerCase()
+            );
         if (!pageLookup) {
+            const fallback = await resolveMissingPagePath(baseContext, pagePath);
+            if (fallback?.type === 'redirect') {
+                return markdownRedirect(
+                    toMarkdownDestination(fallback.destination),
+                    fallback.permanent
+                );
+            }
+            if (fallback?.type === 'page') {
+                return markdownRedirect(
+                    context.linker.toPathForPage({
+                        pages: context.revision.pages,
+                        page: fallback.page.page,
+                    }),
+                    false
+                );
+            }
+
             // Generates a markdown body for missing pages. Return this with a 200 status (not 404) because agents discard 404 response bodies.=
             return {
                 markdown: renderNotFoundMarkdown(context, pagePath),
@@ -63,11 +89,43 @@ function getMarkdownRobots(
     return context.isAiAgent ? 'index, follow' : 'noindex';
 }
 
+/**
+ * Point a redirect destination to its markdown version, so agents keep receiving markdown.
+ * Destinations outside the site are returned as full URLs and left untouched.
+ */
+export function toMarkdownDestination(destination: string): string {
+    if (!destination.startsWith('/')) {
+        return destination;
+    }
+
+    const url = new URL(destination, 'https://gitbook.invalid');
+    const pathname = url.pathname.replace(/\/+$/, '');
+    if (pathname.endsWith('.md')) {
+        return destination;
+    }
+
+    // A root destination trims to an empty pathname; its markdown route is `/.md`.
+    return `${pathname || '/'}.md${url.search}${url.hash}`;
+}
+
+function markdownRedirect(location: string, permanent: boolean) {
+    // Same status codes as Next's `redirect` / `permanentRedirect`.
+    return new Response(null, {
+        status: permanent ? 308 : 307,
+        headers: { Location: location, Vary: 'Accept' },
+    });
+}
+
 function renderNotFoundMarkdown(context: GitBookSiteContext, pagePath: string) {
     const similarPages = getSimilarPages(context.revision.pages, pagePath, 5);
     const sitemapUrl = context.linker.toAbsoluteURL(context.linker.toPathInSite('sitemap.md'));
     const fullContentUrl = context.linker.toAbsoluteURL(
         context.linker.toPathInSite('llms-full.txt')
+    );
+    const askPageUrl = context.linker.toAbsoluteURL(
+        context.linker.toPathForPagePath({
+            path: similarPages[0]?.path ?? 'docs/example',
+        })
     );
 
     return `# Page Not Found
@@ -85,20 +143,7 @@ If the exact page cannot be found, you can still retrieve the information using 
 
 ### Option 1 — Ask a question (recommended)
 
-Perform an HTTP GET request on the documentation index with the \`ask\` parameter, and the optional \`goal\` parameter:
-
-\`\`\`
-GET ${context.linker.toAbsoluteURL(
-        context.linker.toPathForPagePath({
-            path: similarPages[0]?.path ?? 'docs/example',
-        })
-    )}?ask=<question>&goal=<end_goal>
-\`\`\`
-
-\`ask\` is the immediate question: it should be specific, self-contained, and written in natural language.
-\`goal\` is optional and describes the broader end goal you are ultimately trying to accomplish on behalf of the user. GitBook uses it to tailor the answer towards what is most useful for that goal.
-
-The response will contain a direct answer to the question and relevant excerpts and sources from the documentation.
+${renderQueryingDocumentation({ pageUrl: askPageUrl })}
 
 ### Option 2 — Browse the documentation index
 
@@ -139,36 +184,21 @@ function renderAskFooter(
         })
     );
 
-    return `\n\n---\n\n# Agent Instructions
-This documentation is published with GitBook. GitBook is the documentation platform designed so that both humans and AI agents can read, navigate, and reason over technical content effectively. Learn more at gitbook.com.
-
-## Querying This Documentation
-If you need additional information that is not directly available in this page, you can query the documentation dynamically by asking a question.
-
-Perform an HTTP GET request on the current page URL with the \`ask\` query parameter, and the optional \`goal\` query parameter:
-
-\`\`\`
-GET ${pageUrl}?ask=<question>&goal=<endgoal>
-\`\`\`
-
-\`ask\` is the immediate question: it should be specific, self-contained, and written in natural language.
-\`goal\` is optional and describes the broader end goal you are ultimately trying to accomplish on behalf of the user. GitBook uses it to tailor the answer towards what is most useful for that goal.
-
-The response will contain a direct answer to the question and relevant excerpts and sources from the documentation.
-
-Use this mechanism when the answer is not explicitly present in the current page, you need clarification or additional context, or you want to retrieve related documentation sections.
-`;
+    return `\n\n---\n\n${renderPageAgentInstructions({ pageUrl })}`;
 }
 
 /**
  * Return a markdown content.
  */
 export async function serveMarkdown(
-    fn: () => Promise<string | { markdown: string; robots: string }>,
+    fn: () => Promise<string | { markdown: string; robots: string } | Response>,
     isChatGPT?: boolean
 ) {
     try {
         const result = await fn();
+        if (result instanceof Response) {
+            return result;
+        }
         const { markdown, robots } =
             typeof result === 'string' ? { markdown: result, robots: 'noindex' } : result;
         return new Response(markdown, {

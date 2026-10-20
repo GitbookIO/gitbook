@@ -1,3 +1,5 @@
+import { GITBOOK_DISABLE_LOOKUP_ALTERNATIVES } from '../env';
+import { joinPath, removeTrailingSlash } from '../paths';
 import { isProxyRootRequest } from '../proxy';
 import { DataFetcherError, getExposableError } from './errors';
 
@@ -42,6 +44,34 @@ function getContentPathSegments(pathSegments: string[]): string[] {
 }
 
 /**
+ * Site URL prefixes resolved with the full URL only, for sites where a shorter alternative
+ * would resolve to the wrong content.
+ */
+const LOOKUP_ALTERNATIVES_BYPASS_URLS: string[] = ['https://proxy.gitbook.site/sites/site_p4Xo4'];
+
+/**
+ * Whether the lookup of this (normalized) URL should skip the shorter alternatives.
+ */
+export function shouldBypassLookupAlternatives(
+    url: URL,
+    bypassURLs: string[] = LOOKUP_ALTERNATIVES_BYPASS_URLS
+): boolean {
+    if (GITBOOK_DISABLE_LOOKUP_ALTERNATIVES) {
+        return true;
+    }
+
+    return bypassURLs.some((bypassURL) => {
+        const prefix = normalizeURL(new URL(bypassURL));
+        const prefixPath = removeTrailingSlash(prefix.pathname);
+        return (
+            prefix.origin === url.origin &&
+            (removeTrailingSlash(url.pathname) === prefixPath ||
+                url.pathname.startsWith(`${prefixPath}/`))
+        );
+    });
+}
+
+/**
  * For a given GitBook URL, return a list of alternative URLs that could be matched against to lookup the content.
  * The approach is optimized to aim at reusing cached lookup results as much as possible.
  *
@@ -61,8 +91,9 @@ function getContentPathSegments(pathSegments: string[]): string[] {
  *   - Public content has a custom hostname in the organization with a variant: docs.company.com/<space>/v/<variant>/<path>
  *   - Public content has a custom hostname in the organization with a variant and a share-link: docs.company.com/<space>/<link>/v/<variant>/<path>
  */
-export function getURLLookupAlternatives(input: URL) {
+export function getURLLookupAlternatives(input: URL, options: { bypass?: boolean } = {}) {
     const url = normalizeURL(input);
+    const bypass = options.bypass ?? shouldBypassLookupAlternatives(url);
 
     let basePath: string | undefined = undefined;
     let changeRequest: string | undefined = undefined;
@@ -122,6 +153,11 @@ export function getURLLookupAlternatives(input: URL) {
         pushAlternative(contentURL, pathSegments.slice(revisionOrChangeIdIndex + 1).join('/'));
     }
 
+    // Revisions and changes above still need their alternatives to extract the base path.
+    else if (bypass) {
+        pushAlternative(url, '');
+    }
+
     // URL looks like a collection url (with /v/ in the path)
     // We only start matching after the /v/ segment and we ignore everything before it
     // to avoid potentially matching as a page not found under the default space in the collection
@@ -160,6 +196,23 @@ export function getURLLookupAlternatives(input: URL) {
     return { urls: alternatives, basePath, changeRequest, revision };
 }
 
+/** Combine a resolved lookup with the remaining requested page path. */
+export function getURLLookupPathname(
+    alternative: { url: string; extraPath: string },
+    resolved: { basePath: string; pathname: string }
+) {
+    if (
+        alternative.extraPath &&
+        removeTrailingSlash(new URL(alternative.url).pathname) ===
+            removeTrailingSlash(resolved.basePath)
+    ) {
+        // A root lookup can resolve to a custom homepage, which is not a prefix for other pages.
+        return joinPath('/', alternative.extraPath);
+    }
+
+    return joinPath(resolved.pathname, alternative.extraPath);
+}
+
 /**
  * Normalize the URL in a request and redirect if the normalized URL is different from the original one.
  */
@@ -180,7 +233,7 @@ export function normalizeRequestURL(url: URL): Response | null {
 
 /**
  * Normalize a URL to remove duplicate slashes and trailing slashes
- * and transform the pathname to lowercase.
+ * and decode the pathname to its canonical encoding.
  */
 export function normalizeURL(url: URL) {
     const result = new URL(url);

@@ -11,7 +11,7 @@ import { tcls } from '@/lib/tailwind';
  * A container that encapsulates a scrollable area with usability features.
  * - Faded edges when there is more content than the container can display.
  * - Buttons to advance the scroll position.
- * - Auto-scroll to the active item when it's initially active.
+ * - Auto-scroll to the active item on mount and when it changes.
  */
 export type ScrollContainerProps = {
     children: React.ReactNode;
@@ -42,6 +42,12 @@ export type ScrollContainerProps = {
     /** The ID or ref of the active item to scroll to. */
     active?: string | React.RefObject<HTMLElement | null>;
 
+    /**
+     * Only scroll to the active item when it is not fully visible, and keep following it
+     * when it changes later (requires `active` to be a selector).
+     */
+    followActive?: boolean;
+
     /** Scroll by one page of fully visible direct children instead of one viewport. */
     scrollByVisibleItems?: boolean;
 } & React.HTMLAttributes<HTMLDivElement>;
@@ -53,6 +59,7 @@ export function ScrollContainer(props: ScrollContainerProps) {
         contentClassName,
         orientation,
         active,
+        followActive = false,
         scrollByVisibleItems = false,
         leading = { fade: true, button: true },
         trailing = { fade: true, button: true },
@@ -80,8 +87,52 @@ export function ScrollContainer(props: ScrollContainerProps) {
         if (!activeItem || !container.contains(activeItem)) {
             return;
         }
+        if (followActive && isElementFullyVisibleInContainer(activeItem, container)) {
+            return;
+        }
         scrollToElementInContainer(activeItem, container);
-    }, [active]);
+    }, [active, followActive]);
+
+    React.useEffect(() => {
+        const container = containerRef.current;
+        if (!followActive || !container || typeof active !== 'string') {
+            return;
+        }
+
+        let frame = 0;
+        let previousActiveItems = new Set(container.querySelectorAll(active));
+        // Active items can mount only after a collapsed group expands.
+        const observer = new MutationObserver(() => {
+            cancelAnimationFrame(frame);
+            frame = requestAnimationFrame(() => {
+                const activeItems = new Set(container.querySelectorAll(active));
+                const newActiveItems = [...activeItems].filter(
+                    (item) => !previousActiveItems.has(item)
+                );
+                previousActiveItems = activeItems;
+                // Only follow newly active items so unrelated changes (e.g. expanding another
+                // group) don't pull the user back to the current page.
+                for (const activeItem of newActiveItems) {
+                    if (!isElementFullyVisibleInContainer(activeItem, container)) {
+                        scrollToElementInContainer(activeItem, container, 'smooth');
+                        return;
+                    }
+                }
+            });
+        });
+
+        observer.observe(container, {
+            attributes: true,
+            attributeFilter: ['data-active'],
+            childList: true,
+            subtree: true,
+        });
+
+        return () => {
+            observer.disconnect();
+            cancelAnimationFrame(frame);
+        };
+    }, [active, followActive]);
 
     const scrollFurther = () => {
         const container = containerRef.current;
@@ -335,7 +386,11 @@ function scrollByViewport(
 /**
  * Scroll to an element in a container.
  */
-function scrollToElementInContainer(element: Element, container: HTMLElement) {
+export function scrollToElementInContainer(
+    element: Element,
+    container: HTMLElement,
+    behavior: ScrollBehavior = 'auto'
+) {
     const containerRect = container.getBoundingClientRect();
     const rect = element.getBoundingClientRect();
 
@@ -350,8 +405,26 @@ function scrollToElementInContainer(element: Element, container: HTMLElement) {
             (rect.left - containerRect.left) -
             container.clientWidth / 2 +
             rect.width / 2,
-        // Use 'auto' to avoid additional scroll animations when scrolling to an element
-        // as this may be called during layout/initialization when the page is not fully loaded.
-        behavior: 'auto',
+        behavior,
     });
+}
+
+function isElementFullyVisibleInContainer(element: Element, container: HTMLElement) {
+    if (
+        !element.getClientRects().length ||
+        container.clientHeight === 0 ||
+        container.clientWidth === 0
+    ) {
+        return true;
+    }
+
+    const containerRect = container.getBoundingClientRect();
+    const elementRect = element.getBoundingClientRect();
+
+    return (
+        elementRect.top >= containerRect.top &&
+        elementRect.bottom <= containerRect.bottom &&
+        elementRect.left >= containerRect.left &&
+        elementRect.right <= containerRect.right
+    );
 }

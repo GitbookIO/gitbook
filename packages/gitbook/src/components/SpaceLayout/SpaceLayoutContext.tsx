@@ -5,6 +5,7 @@ import React from 'react';
 const SpaceLayoutContext = React.createContext({
     basePath: '',
     siteAdaptiveAuthLoginHref: null as string | null,
+    isLoggedInVisitor: false,
     siteIndexURL: '',
 });
 
@@ -15,14 +16,21 @@ export function SpaceLayoutContextProvider(
     props: React.PropsWithChildren<{
         basePath: string;
         siteAdaptiveAuthLoginHref?: string | null;
+        isLoggedInVisitor?: boolean;
         siteIndexURL: string;
     }>
 ) {
-    const { basePath, siteAdaptiveAuthLoginHref = null, siteIndexURL, children } = props;
+    const {
+        basePath,
+        siteAdaptiveAuthLoginHref = null,
+        isLoggedInVisitor = false,
+        siteIndexURL,
+        children,
+    } = props;
 
     const value = React.useMemo(
-        () => ({ basePath, siteAdaptiveAuthLoginHref, siteIndexURL }),
-        [basePath, siteAdaptiveAuthLoginHref, siteIndexURL]
+        () => ({ basePath, siteAdaptiveAuthLoginHref, isLoggedInVisitor, siteIndexURL }),
+        [basePath, siteAdaptiveAuthLoginHref, isLoggedInVisitor, siteIndexURL]
     );
 
     return <SpaceLayoutContext.Provider value={value}>{children}</SpaceLayoutContext.Provider>;
@@ -48,6 +56,17 @@ export function useSiteAdaptiveAuthLoginHref() {
         throw new Error('SpaceLayoutContext not found');
     }
     return context.siteAdaptiveAuthLoginHref;
+}
+
+/**
+ * Return whether the visitor has a visitor auth token, with or without claims.
+ */
+export function useIsLoggedInVisitor() {
+    const context = React.useContext(SpaceLayoutContext);
+    if (!context) {
+        throw new Error('SpaceLayoutContext not found');
+    }
+    return context.isLoggedInVisitor;
 }
 
 /**

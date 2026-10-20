@@ -54,6 +54,7 @@ GitBook('configure', {
         icon: 'assistant' // 'assistant' | 'sparkle' | 'help' | 'book'
     },
     tabs: ['assistant', 'search', 'docs'],
+    defaultPage: '/getting-started',
     actions: [
         {
             icon: 'circle-question',
@@ -107,6 +108,7 @@ frame.clearChat();
 // Configure the embed (see Configuration section for all options)
 frame.configure({
     tabs: ['assistant', 'search', 'docs'],
+    defaultPage: '/getting-started',
     actions: [
         {
             icon: 'circle-question',
@@ -142,6 +144,7 @@ import { GitBookProvider, GitBookFrame } from '@gitbook/embed/react';
             unsignedClaims: { userId: '123' } // Optional: custom claims for dynamic expressions
         }}
         tabs={['assistant', 'search', 'docs']}
+        defaultPage="/getting-started"
         greeting={{ title: 'Welcome!', subtitle: 'How can I help?' }}
         assistantName="Support Assistant"
         suggestions={['What is GitBook?', 'How do I get started?']}
@@ -247,6 +250,33 @@ Override which tabs are displayed. Defaults to your site's configuration.
 
 ```javascript
 tabs: ['assistant', 'search', 'docs']
+```
+
+### `defaultTab`
+
+Available in: Standalone script, NPM package, React components
+
+The tab the embed opens on. Without it, the embed opens on `defaultPage` if set, otherwise on the assistant (or the docs when the assistant isn't available). The tab must be one of the enabled `tabs`.
+
+- **Type**: `'assistant' | 'search' | 'docs'`
+
+```javascript
+tabs: ['assistant', 'search', 'docs'],
+defaultTab: 'search'
+```
+
+`defaultTab` and `defaultPage` apply when the embed first loads: the standalone widget keeps its place when it is closed and reopened. To move it later, use `navigateToPage` or `navigateToAssistant`.
+
+### `defaultPage`
+
+Available in: Standalone script, NPM package, React components
+
+The page the docs tab opens on, in place of your site's home page. Accepts the same references as `navigateToPage`: the page's path within the site, an absolute path, or its full published URL. Unless `defaultTab` says otherwise, the embed opens on this page.
+
+- **Type**: `string`
+
+```javascript
+defaultPage: '/getting-started/quickstart'
 ```
 
 ### `closeButton`

@@ -106,6 +106,56 @@ export function getVisitorType(request: {
     return detection.detected && detection.method !== 'heuristic' ? 'agent' : 'human';
 }
 
+// Production hostnames for which the visitor country is sent while the feature is rolled out.
+// Set at build time from a GitHub Actions variable to keep customer hostnames out of the code.
+const VISITOR_COUNTRY_HOSTNAMES = parseHostnameList(process.env.GITBOOK_VISITOR_COUNTRY_HOSTNAMES);
+const VISITOR_COUNTRY_STAGES = new Set(['dev', 'preview', 'staging']);
+
+/**
+ * Parse a comma-separated list of hostnames.
+ */
+export function parseHostnameList(value: string | undefined): Set<string> {
+    return new Set(
+        (value ?? '')
+            .split(',')
+            .map((hostname) => hostname.trim().toLowerCase())
+            .filter(Boolean)
+    );
+}
+
+/**
+ * Whether the visitor country should be sent when resolving the site URL.
+ */
+export function shouldSendVisitorCountry(hostname: string, stage: string | undefined): boolean {
+    return (
+        (!!stage && VISITOR_COUNTRY_STAGES.has(stage)) ||
+        VISITOR_COUNTRY_HOSTNAMES.has(hostname.toLowerCase())
+    );
+}
+
+/**
+ * Get the ISO 3166-1 alpha-2 country code of the visitor from the geolocation headers,
+ * or from `x-gitbook-country` when the request comes from the revalidation worker.
+ */
+export function getVisitorCountry(request: { headers: Headers }): string | undefined {
+    // The revalidation worker forwards the original visitor country; only trust it from there.
+    const country = (
+        (isRevalidationRequest(request.headers) && request.headers.get('x-gitbook-country')) ||
+        request.headers.get('x-open-next-country') ||
+        request.headers.get('x-vercel-ip-country') ||
+        ''
+    )
+        .trim()
+        .toUpperCase();
+
+    // Cloudflare uses XX for unknown and T1 for Tor, which are not ISO codes.
+    if (!/^[A-Z]{2}$/.test(country) || country === 'XX' || country === 'T1') {
+        return undefined;
+    }
+
+    return country;
+}
+
 /**
  * Get the visitor data for the request potentially including:
  *   - a JWT token that may contain signed claims or can be used for VA authentication.
@@ -133,6 +183,14 @@ export function getVisitorData({
 }
 
 /**
+ * Check if the request is coming from our revalidation worker. Such requests carry the visitor
+ * data they want to revalidate in the URL, so we must not redirect them to a normalized URL.
+ */
+export function isRevalidationRequest(headers: Headers): boolean {
+    return headers.get('user-agent')?.toLowerCase() === 'gitbook-open-revalidation-worker';
+}
+
+/**
  * Get the visitor token for the request. This token can either be in the
  * query parameters or stored as a cookie.
  */
@@ -154,7 +212,7 @@ export function getVisitorToken({
 
     // Allow the empty string to come through
     if (fromUrl !== null && fromUrl !== undefined) {
-        if (headers.get('user-agent')?.toLowerCase() === 'gitbook-open-revalidation-worker') {
+        if (isRevalidationRequest(headers)) {
             return { source: 'revalidation', token: fromUrl };
         }
 
@@ -305,17 +363,19 @@ function getResponseCookieForVisitorParams(
 }
 
 /**
- * Return the lookup result for content served with visitor auth.
+ * Build the cookies persisting a visitor auth token that arrived in the URL.
+ *
+ * Only a token from URL is ever persisted into the VA cookie: a token read back from a VA cookie is already
+ * stored and its expiry derives from the token itself, so rewriting it achieves nothing except
+ * letting an in-flight request resurrect a cookie `~gitbook/auth/logout` has just deleted. A
+ * custom `gitbook-visitor-token` cookie is owned by the customer's backend and is never copied,
+ * to keep a single source of truth.
  */
 export function getResponseCookiesForVisitorAuth(
     basePath: string,
-    visitorTokenLookup: VisitorTokenLookup,
+    visitorTokenLookup: Extract<VisitorTokenLookup, { source: 'url' }>,
     requestCookies: RequestCookies = []
 ): ResponseCookies {
-    if (!visitorTokenLookup) {
-        return [];
-    }
-
     let decoded: JwtPayload;
     try {
         decoded = jwtDecode(visitorTokenLookup.token);
@@ -324,43 +384,29 @@ export function getResponseCookiesForVisitorAuth(
         return [];
     }
 
-    /**
-     * If the visitor token has been retrieve from the URL, or if its a VA cookie and the basePath is the same, set it
-     * as a cookie on the response.
-     *
-     * Note that we do not re-store the gitbook-visitor-cookie in another cookie, to maintain a single source of truth.
-     */
-    if (
-        visitorTokenLookup?.source === 'url' ||
-        (visitorTokenLookup?.source === 'visitor-auth-cookie' &&
-            visitorTokenLookup.basePath === basePath)
-    ) {
-        const name = getVisitorAuthCookieName(basePath);
-        const value = getVisitorAuthCookieValue(basePath, visitorTokenLookup.token);
-        const options = {
-            httpOnly: true,
-            sameSite: process.env.NODE_ENV === 'production' ? ('none' as const) : undefined,
-            secure: process.env.NODE_ENV === 'production',
-            maxAge: getVisitorAuthCookieMaxAge(decoded),
-        };
+    const name = getVisitorAuthCookieName(basePath);
+    const value = getVisitorAuthCookieValue(basePath, visitorTokenLookup.token);
+    const options = {
+        httpOnly: true,
+        sameSite: process.env.NODE_ENV === 'production' ? ('none' as const) : undefined,
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: getVisitorAuthCookieMaxAge(decoded),
+    };
 
-        // Chunk the cookie when the value exceeds the single-cookie size limit,
-        // as browsers silently drop oversized Set-Cookie headers which causes
-        // an infinite auth redirect loop.
-        if (value.length > MAX_CHUNKED_COOKIE_LENGTH) {
-            // Too large even for chunking: fall back to a single cookie (best effort).
-            return [{ name, value, options }];
-        }
-
-        return getChunkedResponseCookies({
-            cookies: requestCookies,
-            cookieName: name,
-            value,
-            options,
-        });
+    // Chunk the cookie when the value exceeds the single-cookie size limit,
+    // as browsers silently drop oversized Set-Cookie headers which causes
+    // an infinite auth redirect loop.
+    if (value.length > MAX_CHUNKED_COOKIE_LENGTH) {
+        // Too large even for chunking: fall back to a single cookie (best effort).
+        return [{ name, value, options }];
     }
 
-    return [];
+    return getChunkedResponseCookies({
+        cookies: requestCookies,
+        cookieName: name,
+        value,
+        options,
+    });
 }
 
 /**

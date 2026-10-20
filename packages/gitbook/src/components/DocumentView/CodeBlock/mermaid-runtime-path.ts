@@ -1,1 +1,1 @@
-export const MERMAID_RUNTIME_PATH = 'mermaid/mermaid@11.14.0-zenuml@0.2.2.mjs';
+export const MERMAID_RUNTIME_PATH = 'mermaid/mermaid@11.16.1-patch.78ecb855-zenuml@0.2.2.mjs';

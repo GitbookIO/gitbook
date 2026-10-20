@@ -89,6 +89,7 @@ describe('resolveFirstDocument', () => {
                             metadata: true,
                             tags: true,
                             actions: true,
+                            anchors: true,
                         },
                     },
                 ],
@@ -143,6 +144,7 @@ describe('resolveFirstDocument', () => {
                     metadata: true,
                     tags: true,
                     actions: true,
+                    anchors: true,
                 },
             },
         ];
@@ -190,6 +192,7 @@ describe('resolvePagePath', () => {
                     metadata: true,
                     tags: true,
                     actions: true,
+                    anchors: true,
                 },
             },
         ];
@@ -267,6 +270,7 @@ describe('resolvePagePath', () => {
                             metadata: true,
                             tags: true,
                             actions: true,
+                            anchors: true,
                         },
                     },
                 ],
@@ -386,6 +390,7 @@ function createDocumentPage(id: string, path: string, hidden = false): RevisionP
             metadata: true,
             tags: true,
             actions: true,
+            anchors: true,
         },
     };
 }

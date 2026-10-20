@@ -10,6 +10,8 @@ jobs:
         environment:
             name: 2v-production
             url: ${{ steps.deploy.outputs.deployment-url }}
+        env:
+            GITBOOK_VISITOR_COUNTRY_HOSTNAMES: ${{ vars.GITBOOK_VISITOR_COUNTRY_HOSTNAMES }}
         outputs:
             deployment-url: ${{ steps.deploy.outputs.deployment-url }}
         steps:
@@ -31,6 +33,8 @@ jobs:
         environment:
             name: 2c-production
             url: ${{ steps.deploy.outputs.deployment-url }}
+        env:
+            GITBOOK_VISITOR_COUNTRY_HOSTNAMES: ${{ vars.GITBOOK_VISITOR_COUNTRY_HOSTNAMES }}
         outputs:
             deployment-url: ${{ steps.deploy.outputs.deployment-url }}
         steps:

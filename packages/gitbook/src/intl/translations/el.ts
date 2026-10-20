@@ -11,6 +11,8 @@ export const el: TranslationLanguage = {
     switch_to_system_theme: 'Αλλαγή στο θέμα συστήματος',
     search: 'Αναζήτηση',
     clear: 'Εκκαθάριση',
+    table_filtered_by_selection: 'Ταιριάζει με την επιλογή: ${1}',
+    table_clear_selection: 'Εκκαθάριση επιλογής',
     tags: 'Ετικέτες',
     search_back: 'Επιστροφή στα αποτελέσματα αναζήτησης',
     search_or_ask: 'Ρωτήστε ή αναζητήστε',
@@ -76,12 +78,16 @@ export const el: TranslationLanguage = {
     notfound_title: 'Η σελίδα δεν βρέθηκε',
     notfound_link: 'Αυτός ο σύνδεσμος οδηγεί σε μια σελίδα που έχει αφαιρεθεί ή δεν υπάρχει πλέον.',
     notfound: 'Η σελίδα που αναζητάτε δεν υπάρχει.',
-    notfound_adaptive_title: 'Η σελίδα δεν είναι διαθέσιμη',
+    notfound_adaptive_title: 'Συνδεθείτε για να δείτε αυτή τη σελίδα',
     notfound_adaptive:
-        'Αυτή η σελίδα μπορεί να υπάρχει, αλλά ίσως χρειαστεί να συνδεθείτε για πρόσβαση.',
+        'Αυτή η σελίδα ενδέχεται να απαιτεί σύνδεση. Αν ακολουθήσατε έναν σύνδεσμο, ελέγξτε ότι είναι σωστός.',
     notfound_adaptive_login: 'Σύνδεση',
     notfound_adaptive_registration_hint:
         'Η εγγραφή ενδέχεται να είναι διαθέσιμη ανάλογα με τον οργανισμό.',
+    notfound_adaptive_no_access_title: 'Ίσως δεν έχετε πρόσβαση σε αυτή τη σελίδα',
+    notfound_adaptive_no_access:
+        'Αυτή η σελίδα ενδέχεται να μην υπάρχει ή ο λογαριασμός σας ενδέχεται να μην έχει πρόσβαση σε αυτήν. Αν ακολουθήσατε έναν σύνδεσμο, ελέγξτε ότι είναι σωστός.',
+    notfound_adaptive_login_again: 'Επανασύνδεση',
     notfound_goto_home: 'Μετάβαση στην αρχική σελίδα',
     notfound_suggestions_title: 'Ίσως αναζητάτε',
     unexpected_error_title: 'Παρουσιάστηκε σφάλμα',
@@ -155,6 +161,7 @@ export const el: TranslationLanguage = {
     ai_chat_tools_submit_assistant_feedback:
         'Αξιολόγηση του προηγούμενου μηνύματος του Βοηθού ως ${1}',
     ai_chat_tools_submitted_feedback: 'Τα σχόλια υποβλήθηκαν',
+    ai_chat_tools_shared_feedback_with_team: 'Τα σχόλια στάλθηκαν στην ομάδα τεκμηρίωσης',
     ai_chat_tools_mcp_tool: 'Κλήθηκε ${1}',
     ai_chat_ask: 'Ρωτήστε ${1}',
     ai_chat_ask_about: 'Ρωτήστε ${1} για ${2}',

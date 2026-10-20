@@ -62,6 +62,12 @@ export type GitBookEmbeddableConfiguration = {
     /** Tabs to display in the embed (if enabled on the site). */
     tabs: ('assistant' | 'docs' | 'search')[];
 
+    /** Tab to open the embed on. */
+    defaultTab?: 'assistant' | 'docs' | 'search';
+
+    /** Page to open the docs tab on, instead of the site's home page. */
+    defaultPage?: string;
+
     /** Additional buttons to be displayed in the header of the GitBook embed. */
     actions: GitBookEmbeddableActionDefinition[];
 

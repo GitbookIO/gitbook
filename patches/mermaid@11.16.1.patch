@@ -1,0 +1,26 @@
+diff --git a/dist/chunks/mermaid.core/blockDiagram-VBNYF7ZC.mjs b/dist/chunks/mermaid.core/blockDiagram-VBNYF7ZC.mjs
+index 8960ddd..a5cf3b5 100644
+--- a/dist/chunks/mermaid.core/blockDiagram-VBNYF7ZC.mjs
++++ b/dist/chunks/mermaid.core/blockDiagram-VBNYF7ZC.mjs
+@@ -3693,7 +3693,7 @@ async function calculateBlockSize(elem, block, db2) {
+   const nodeEl = await insertNode(elem, node, { config });
+   const boundingBox = nodeEl.node().getBBox();
+   const obj = db2.getBlock(node.id);
+-  obj.size = { width: boundingBox.width, height: boundingBox.height, x: 0, y: 0, node: nodeEl };
++  obj.size = { width: boundingBox.width, height: boundingBox.height, x: 0, y: 0 };
+   db2.setBlock(obj);
+   nodeEl.remove();
+ }
+diff --git a/dist/chunks/mermaid.core/chunk-WRU74C26.mjs b/dist/chunks/mermaid.core/chunk-WRU74C26.mjs
+index 271fe5c..1bf17c7 100644
+--- a/dist/chunks/mermaid.core/chunk-WRU74C26.mjs
++++ b/dist/chunks/mermaid.core/chunk-WRU74C26.mjs
+@@ -233,7 +233,7 @@ async function addHtmlSpan(element, node, width, classes, addBackground = false,
+     div.attr("class", "labelBkg");
+   }
+   let bbox = div.node().getBoundingClientRect();
+-  if (bbox.width === width) {
++  if (Math.round(bbox.width) === width) {
+     div.style("display", "table");
+     div.style("white-space", "break-spaces");
+     div.style("width", width + "px");

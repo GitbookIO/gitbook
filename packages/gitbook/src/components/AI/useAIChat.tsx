@@ -11,6 +11,7 @@ import {
     type AIStreamResponseToolCallPending,
     type AIToolCallResult,
     SiteInsightsDisplayContext,
+    type SiteInsightsEventAskView,
 } from '@gitbook/api';
 
 import { getInsightsSession, useTrackEvent } from '../Insights';
@@ -18,10 +19,12 @@ import { type UpdateSearchState, useSetSearchState } from '../Search';
 import { addRecentSearchQuery } from '../Search/recent-queries';
 import type { AnyAIControl } from './controls';
 import { ConfirmControlDef, ConfirmControlOutputSchema } from './controls/ConfirmControl';
+import { setIntercomLauncherHidden } from './intercom';
 import { type AIChatReference, serializeReferences } from './references';
 import { type RenderAIMessageOptions, streamAIChatResponse } from './server-actions';
 import { getTools } from './tools';
 import { useAIMessageContextRef } from './useAIMessageContext';
+import { useLeaveAgentFeedbackTool, useLeaveUserFeedbackTool } from './useLeaveFeedbackTools';
 import { useNavigateToPageTool } from './useNavigateToPageTool';
 import {
     type ResponseToRate,
@@ -57,6 +60,8 @@ export type AIChatStatus =
     | 'done'
     | 'error'
     | 'confirm';
+
+export type AskAITrigger = NonNullable<SiteInsightsEventAskView['trigger']>;
 
 export type AIChatState = {
     /**
@@ -158,7 +163,7 @@ type AIChatEventListener = (input?: Omit<AIChatEvent, 'type'>) => void;
 
 export type AIChatController = {
     /** Open the dialog */
-    open: () => void;
+    open: (trigger?: AskAITrigger) => void;
     /** Close the dialog */
     close: () => void;
     /** Post a message to the session */
@@ -240,7 +245,6 @@ export function AIChatProvider(props: {
     const setSearchStateInURL = useSetSearchState();
     const { siteSpaceId } = useCurrentContent();
     const language = useLanguage();
-
     const displayContext = renderMessageOptions?.asEmbeddable
         ? SiteInsightsDisplayContext.Embed
         : SiteInsightsDisplayContext.Site;
@@ -256,6 +260,10 @@ export function AIChatProvider(props: {
     const responseToRateRef = React.useRef<ResponseToRate>({ responseId: null, query: null });
     const getResponseToRate = React.useCallback(() => responseToRateRef.current, []);
 
+    // Findings reported to the site's team are capped at one per conversation, so the assistant
+    // cannot flood the inbox over a long chat.
+    const reportedAgentFeedbackRef = React.useRef(false);
+
     // Built-in tools exposed to the assistant (e.g. navigating to a page, submitting page or
     // assistant feedback). Each tool has a stable identity, so it can be referenced directly from
     // the streaming callback.
@@ -265,38 +273,65 @@ export function AIChatProvider(props: {
         displayContext,
         getResponseToRate,
     });
+    const leaveAgentFeedbackTool = useLeaveAgentFeedbackTool({
+        asEmbeddable: renderMessageOptions?.asEmbeddable,
+        displayContext,
+        reportedRef: reportedAgentFeedbackRef,
+    });
+    const leaveUserFeedbackTool = useLeaveUserFeedbackTool({
+        asEmbeddable: renderMessageOptions?.asEmbeddable,
+        displayContext,
+    });
 
     // The assistant-feedback tool is always available (it mirrors the chat's own thumbs up/down
-    // rating), while the page-feedback tool is gated on the site's "Was this helpful?" setting.
+    // rating), while the tools carrying the reader's own feedback are gated on the site's
+    // "Was this helpful?" setting.
     const builtInTools = React.useMemo(() => {
-        const tools = [navigateToPageTool, submitAssistantFeedbackTool];
+        const tools = [navigateToPageTool, submitAssistantFeedbackTool, leaveAgentFeedbackTool];
         if (withPageFeedback) {
-            tools.push(submitPageFeedbackTool);
+            tools.push(submitPageFeedbackTool, leaveUserFeedbackTool);
         }
         return tools;
-    }, [navigateToPageTool, submitAssistantFeedbackTool, submitPageFeedbackTool, withPageFeedback]);
+    }, [
+        navigateToPageTool,
+        submitAssistantFeedbackTool,
+        leaveAgentFeedbackTool,
+        leaveUserFeedbackTool,
+        submitPageFeedbackTool,
+        withPageFeedback,
+    ]);
 
     // Event listeners storage
     const eventsRef = React.useRef<Map<AIChatEvent['type'], AIChatEventListener[]>>(new Map());
 
     // Open AI chat and sync with search state
-    const onOpen = React.useCallback(() => {
-        const { initialQuery } = globalState.getState();
-        globalState.setState((state) => ({ ...state, opened: true }));
+    const onOpen = React.useCallback(
+        (trigger?: AskAITrigger) => {
+            setIntercomLauncherHidden(true);
+            if (!renderMessageOptions?.asEmbeddable) {
+                trackEvent({ type: 'ask_view', trigger });
+            }
 
-        // Update search state to show ask mode with first message or current ask value
-        setSearchState((prev) => ({
-            ask: prev?.ask ?? initialQuery ?? '',
-            query: prev?.query ?? null,
-            scope: prev?.scope ?? 'default',
-            open: false, // Close search popover when opening chat
-        }));
+            const { initialQuery } = globalState.getState();
+            globalState.setState((state) => ({ ...state, opened: true }));
 
-        notify(eventsRef.current.get('open'), {});
-    }, [setSearchState]);
+            // Update search state to show ask mode with first message or current ask value
+            setSearchState((prev) => ({
+                ask: prev?.ask ?? initialQuery ?? '',
+                query: prev?.query ?? null,
+                scope: prev?.scope ?? 'default',
+                open: false, // Close search popover when opening chat
+            }));
+
+            notify(eventsRef.current.get('open'), {});
+        },
+        [setSearchState, trackEvent, renderMessageOptions?.asEmbeddable]
+    );
 
     // Close AI chat and clear ask parameter
     const onClose = React.useCallback(() => {
+        setIntercomLauncherHidden(false);
+
         globalState.setState((state) => ({ ...state, opened: false }));
 
         // Clear ask parameter but keep other search state
@@ -711,6 +746,7 @@ export function AIChatProvider(props: {
     // Clear the conversation and reset ask parameter
     const onClear = React.useCallback(() => {
         responseToRateRef.current = { responseId: null, query: null };
+        reportedAgentFeedbackRef.current = false;
         globalState.setState((state) => ({
             opened: state.opened,
             responding: false,

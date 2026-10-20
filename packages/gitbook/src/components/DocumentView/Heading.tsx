@@ -1,7 +1,7 @@
 import type { DocumentBlockHeading } from '@gitbook/api';
 
 import type { BlockProps } from './Block';
-import { HashLinkButton, hashLinkButtonWrapperStyles } from './HashLinkButton';
+import { HashLinkButton, hashLinkButtonWrapperStyles, shouldShowHashLinks } from './HashLinkButton';
 import { HeadingRevealWrapper } from './HeadingRevealWrapper';
 import { Inlines } from './Inlines';
 import { getBlockTextStyle } from './spacing';
@@ -24,6 +24,8 @@ export async function Heading(props: BlockProps<DocumentBlockHeading>) {
         ? await getSpaceLanguage(context.contentContext)
         : defaultLanguage;
 
+    const showHashLink = shouldShowHashLinks(context);
+
     return (
         <HeadingRevealWrapper
             as={Tag}
@@ -34,7 +36,8 @@ export async function Heading(props: BlockProps<DocumentBlockHeading>) {
                 'font-heading',
                 'pdf-heading',
                 'block',
-                'pr-6',
+                // Reserve room for the absolutely positioned anchor icon on coarse pointers
+                showHashLink && 'pr-6',
                 'pointer-fine:flex',
                 'pointer-fine:items-baseline',
                 'pointer-fine:pr-0',
@@ -63,20 +66,22 @@ export async function Heading(props: BlockProps<DocumentBlockHeading>) {
                 <Inlines {...rest} context={context} nodes={block.nodes} ancestorInlines={[]} />
             </span>
 
-            <HashLinkButton
-                id={id}
-                block={block}
-                className={tcls(
-                    'absolute',
-                    block.type === 'heading-1'
-                        ? '[transform:translateY(0.125em)]'
-                        : '[transform:translateY(0.17em)]',
-                    'pointer-fine:-ml-6 pointer-fine:relative pointer-fine:order-first pointer-fine:self-center pointer-fine:pr-2 pointer-fine:[transform:none]',
-                    'pointer-fine:[.flip-heading-hash_&]:order-last pointer-fine:[.flip-heading-hash_&]:ml-1 pointer-fine:[.flip-heading-hash_&]:pl-2'
-                )}
-                iconClassName={tcls('size-4')}
-                label={tString(language, 'direct_link_to_heading')}
-            />
+            {showHashLink ? (
+                <HashLinkButton
+                    id={id}
+                    block={block}
+                    className={tcls(
+                        'absolute',
+                        block.type === 'heading-1'
+                            ? '[transform:translateY(0.125em)]'
+                            : '[transform:translateY(0.17em)]',
+                        'pointer-fine:-ml-6 pointer-fine:relative pointer-fine:order-first pointer-fine:self-center pointer-fine:pr-2 pointer-fine:[transform:none]',
+                        'pointer-fine:[.flip-heading-hash_&]:order-last pointer-fine:[.flip-heading-hash_&]:ml-1 pointer-fine:[.flip-heading-hash_&]:pl-2'
+                    )}
+                    iconClassName={tcls('size-4')}
+                    label={tString(language, 'direct_link_to_heading')}
+                />
+            ) : null}
         </HeadingRevealWrapper>
     );
 }

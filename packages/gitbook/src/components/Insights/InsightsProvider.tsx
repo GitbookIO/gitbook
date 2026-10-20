@@ -4,6 +4,7 @@ import * as React from 'react';
 import { useDebounceCallback, useEventCallback } from 'usehooks-ts';
 
 import type * as api from '@gitbook/api';
+import { SiteInsightsDisplayContext } from '@gitbook/api';
 import { OpenAPIOperationContextProvider } from '@gitbook/react-openapi';
 
 import { type CurrentContentContext, useCurrentContent } from '../hooks';
@@ -75,12 +76,15 @@ export function InsightsProvider(props: InsightsProviderProps) {
         [pathname: string]:
             | {
                   url: string;
+                  previousUrl: string | null;
                   events: TrackEventInput<InsightsEventName>[];
                   context: CurrentContentContext;
                   pageContext?: InsightsEventPageContext;
               }
             | undefined;
     }>({});
+    // Href of the last page an event was tracked on; `undefined` until the first event.
+    const lastUrlRef = React.useRef<string | null | undefined>(undefined);
 
     /**
      * Synchronously flush all the pending events.
@@ -105,6 +109,7 @@ export function InsightsProvider(props: InsightsProviderProps) {
             allEvents.push(
                 ...transformEvents({
                     url: eventsForPathname.url,
+                    previousUrl: eventsForPathname.previousUrl,
                     events: eventsForPathname.events,
                     context: currentContent,
                     pageContext: eventsForPathname.pageContext,
@@ -154,6 +159,9 @@ export function InsightsProvider(props: InsightsProviderProps) {
         ) => {
             const pathname = window.location.pathname;
             const previous = eventsRef.current[pathname];
+            const lastUrl =
+                lastUrlRef.current === undefined ? getSameOriginReferrer() : lastUrlRef.current;
+            lastUrlRef.current = window.location.href;
             eventsRef.current[pathname] = {
                 // An explicitly-provided context wins so page-scoped events (e.g. feedback) can
                 // attribute to their page even when the pathname's ambient context has none — such
@@ -161,6 +169,7 @@ export function InsightsProvider(props: InsightsProviderProps) {
                 // context keep the stored one.
                 pageContext: ctx ?? previous?.pageContext,
                 url: previous?.url ?? window.location.href,
+                previousUrl: previous ? previous.previousUrl : lastUrl,
                 events: [
                     ...(previous?.events ?? []),
                     {
@@ -215,6 +224,18 @@ export function useTrackEvent(): TrackEventCallback {
 }
 
 /**
+ * The referrer when it's another page of this origin, so a full page load (e.g. an absolute link
+ * to a missing page) still records the page it came from.
+ */
+function getSameOriginReferrer(): string | null {
+    if (document.referrer === window.location.href || !URL.canParse(document.referrer)) {
+        return null;
+    }
+    const referrer = new URL(document.referrer);
+    return referrer.origin === window.location.origin ? referrer.href : null;
+}
+
+/**
  * Post the events to the server.
  */
 function sendEvents(args: { eventUrl: string; events: api.SiteInsightsEvent[] }) {
@@ -240,6 +261,7 @@ function sendEvents(args: { eventUrl: string; events: api.SiteInsightsEvent[] })
  */
 function transformEvents(input: {
     url: string;
+    previousUrl: string | null;
     events: TrackEventInput<InsightsEventName>[];
     context: CurrentContentContext;
     pageContext: InsightsEventPageContext;
@@ -258,6 +280,11 @@ function transformEvents(input: {
 
     const location: api.SiteInsightsEventLocation = {
         url: input.url,
+        // The embed's navigation is between its own tabs, not pages of the site.
+        previousUrl:
+            input.pageContext.displayContext === SiteInsightsDisplayContext.Embed
+                ? null
+                : input.previousUrl,
         siteSection: input.context.siteSectionId ?? null,
         siteSpace: input.context.siteSpaceId ?? null,
         space: input.context.spaceId,

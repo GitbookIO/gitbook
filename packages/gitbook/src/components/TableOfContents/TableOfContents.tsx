@@ -134,6 +134,7 @@ export async function TableOfContents(props: {
                         orientation="vertical"
                         contentClassName="flex flex-col p-2 gutter-stable"
                         active="[data-active=true]"
+                        followActive
                         leading={{
                             fade: true,
                             button: {

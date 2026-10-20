@@ -29,3 +29,6 @@ yarn-error.log*
 
 # Bun pack artifacts
 packages/*/*.tgz
+
+# Playwright MCP artifacts
+.playwright-mcp/

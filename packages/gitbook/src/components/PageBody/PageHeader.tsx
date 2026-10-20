@@ -7,7 +7,6 @@ import {
     type RevisionPageDocument,
     type SiteSection,
     type SiteSectionGroup,
-    SiteVisibility,
 } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
 
@@ -20,13 +19,17 @@ import {
 import { PageAsideToggleButton } from '../PageAside/PageAsideButton';
 import { PageIcon } from '../PageIcon';
 import { getPDFURLSearchParams } from '../PDF';
-import { findBestTargetURL } from '../SiteSections/encodeClientSiteSections';
+import {
+    findBestTargetURL,
+    getTargetURLForSiteSpace,
+} from '../SiteSections/encodeClientSiteSections';
 import { categorizeVariants } from '../SpaceLayout/categorizeVariants';
 import { BreadcrumbItemDropdown, type BreadcrumbSibling } from './BreadcrumbItemDropdown';
 import { PageTags } from './PageTags';
 import type { GitBookSiteContext, SiteStructureNode } from '@/lib/context';
+import { hasAdaptiveMcpEndpoint } from '@/lib/mcp/endpoints';
 import { type AncestorRevisionPage, resolveFirstDocument } from '@/lib/pages';
-import { getLocalizedTitle, getSiteSpaceURL } from '@/lib/sites';
+import { getLocalizedTitle } from '@/lib/sites';
 import { tcls } from '@/lib/tailwind';
 import { getPageRSSURL } from '@/routes/rss';
 
@@ -41,8 +44,10 @@ export async function PageHeader(props: {
      * exactly as-is.
      */
     hasAPIBlocks: boolean;
+    /** Keep the context crumbs' links inside the embed rather than sending readers to the full site. */
+    asEmbeddable: boolean;
 }) {
-    const { context, page, ancestors, withRSSFeed, hasAPIBlocks } = props;
+    const { context, page, ancestors, withRSSFeed, hasAPIBlocks, asEmbeddable } = props;
     const { revision, linker } = context;
 
     const hasAncestors = ancestors.length > 0;
@@ -82,7 +87,10 @@ export async function PageHeader(props: {
                 // Section groups have no URL of their own; only sections are navigable. Resolve the
                 // section to the site space matching the current variant so switching sections keeps
                 // the reader on their current variant (same logic as the section tabs).
-                href: node.object === 'site-section' ? findBestTargetURL(context, node) : undefined,
+                href:
+                    node.object === 'site-section'
+                        ? findBestTargetURL(context, node, asEmbeddable)
+                        : undefined,
                 label: getLocalizedTitle(node, context.locale),
                 icon: node.icon,
                 siblings: siblings
@@ -92,7 +100,7 @@ export async function PageHeader(props: {
                     // Don't offer hidden sections/groups as switch targets.
                     .filter((sibling) => !visibleSectionIds || visibleSectionIds.has(sibling.id))
                     .map((sibling) => {
-                        const href = getSectionNodeURL(context, sibling);
+                        const href = getSectionNodeURL(context, sibling, asEmbeddable);
                         // Keep siblings whose URL is "" (the site's first page); only drop the ones
                         // with no resolvable URL at all.
                         return href !== undefined
@@ -112,7 +120,7 @@ export async function PageHeader(props: {
     if (currentSiteSpace) {
         contextCrumbs.push({
             key: `variant-${currentSiteSpace.id}`,
-            href: getSiteSpaceURL(context, currentSiteSpace),
+            href: getTargetURLForSiteSpace(context, currentSiteSpace, asEmbeddable),
             label: getLocalizedTitle(currentSiteSpace, context.locale),
             siblings: [],
             // Reuse the header's variant switcher rather than plain per-variant links, so each entry
@@ -122,7 +130,7 @@ export async function PageHeader(props: {
                 slimSpaces: variantSpaces.map((siteSpace) => ({
                     id: siteSpace.id,
                     title: getLocalizedTitle(siteSpace, context.locale),
-                    url: getSiteSpaceURL(context, siteSpace),
+                    url: getTargetURLForSiteSpace(context, siteSpace, asEmbeddable),
                     isActive: siteSpace.id === currentSiteSpace.id,
                     spaceId: siteSpace.space.id,
                 })),
@@ -214,9 +222,14 @@ export async function PageHeader(props: {
                         ))}
                         {ancestors.map((breadcrumb, index) => {
                             const parentPages = ancestors[index - 1]?.pages ?? revision.pages;
+                            // A group's own URL redirects to its first document, so link straight to it.
+                            const target =
+                                breadcrumb.type === 'group'
+                                    ? (resolveFirstDocument([breadcrumb], [])?.page ?? breadcrumb)
+                                    : breadcrumb;
                             const href = linker.toPathForPage({
                                 pages: revision.pages,
-                                page: breadcrumb,
+                                page: target,
                             });
                             return (
                                 <li key={breadcrumb.id} className="inline">
@@ -448,9 +461,13 @@ function collectSectionNodeIds(list: SiteStructureNode[]): Set<string> {
  * The URL resolves to the site space matching the current variant (same logic as the section tabs),
  * so switching sections keeps the reader on their current variant.
  */
-function getSectionNodeURL(context: GitBookSiteContext, node: SectionNode): string | undefined {
+function getSectionNodeURL(
+    context: GitBookSiteContext,
+    node: SectionNode,
+    asEmbeddable: boolean
+): string | undefined {
     const section = findFirstSection(node);
-    return section ? findBestTargetURL(context, section) : undefined;
+    return section ? findBestTargetURL(context, section, asEmbeddable) : undefined;
 }
 
 /**
@@ -471,15 +488,16 @@ function getPageSiblings(
         if (page.hidden && page.id !== activeId) {
             continue;
         }
-        // A group whose subtree has no document resolves to no page — the sidebar renders it as a
-        // non-clickable label, so don't offer it as a navigable sibling (its path would 404).
-        if (page.type === 'group' && page.id !== activeId && !resolveFirstDocument([page], [])) {
+        // A group's own URL redirects to its first document, so link straight to it. A group whose
+        // subtree has no document resolves to no page, so don't offer it (its path would 404).
+        const target = page.type === 'group' ? resolveFirstDocument([page], [])?.page : page;
+        if (!target) {
             continue;
         }
         result.push({
             id: page.id,
             title: page.linkTitle || page.title,
-            href: context.linker.toPathForPage({ pages: context.revision.pages, page }),
+            href: context.linker.toPathForPage({ pages: context.revision.pages, page: target }),
             emoji: page.emoji,
             icon: page.icon,
             isActive: page.id === activeId,
@@ -559,12 +577,7 @@ function isPageActionEnabled(
  * Return the MCP URL to be used in the page actions dropdown.
  */
 function getPageActionsMCPURL(context: GitBookSiteContext) {
-    const useAuthenticatedEndpoint = Boolean(
-        context.site.visibility !== SiteVisibility.VisitorAuth &&
-        context.site.adaptiveContent?.enabled &&
-        context.site.urls.login &&
-        context.isLoggedInVisitor
-    );
+    const useAuthenticatedEndpoint = hasAdaptiveMcpEndpoint(context) && context.isLoggedInVisitor;
     const endpoint = useAuthenticatedEndpoint ? '~gitbook/mcp/auth' : '~gitbook/mcp';
 
     return context.linker.toAbsoluteURL(context.linker.toPathInSite(endpoint));

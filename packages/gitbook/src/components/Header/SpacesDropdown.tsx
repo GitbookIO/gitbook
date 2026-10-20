@@ -2,9 +2,10 @@ import type { SiteSpace } from '@gitbook/api';
 import type { IconName } from '@gitbook/icons';
 
 import type { ButtonProps } from '../primitives';
+import { getTargetURLForSiteSpace } from '../SiteSections/encodeClientSiteSections';
 import { SpacesDropdownClient } from './SpacesDropdownClient';
 import type { GitBookSiteContext } from '@/lib/context';
-import { getLocalizedTitle, getSiteSpaceURL } from '@/lib/sites';
+import { getLocalizedTitle } from '@/lib/sites';
 import { tcls } from '@/lib/tailwind';
 
 // Memoized regex for checking if a string starts with an emoji
@@ -20,9 +21,18 @@ export function SpacesDropdown(
         siteSpace: SiteSpace;
         siteSpaces: SiteSpace[];
         className?: string;
+        /** Keep the links inside the embed rather than sending readers to the full site. */
+        asEmbeddable?: boolean;
     } & ButtonProps
 ) {
-    const { context, siteSpace, siteSpaces, className, ...buttonProps } = props;
+    const {
+        context,
+        siteSpace,
+        siteSpaces,
+        className,
+        asEmbeddable = false,
+        ...buttonProps
+    } = props;
     const currentLanguage = context.locale;
 
     const dropdownClassName = tcls(
@@ -33,7 +43,7 @@ export function SpacesDropdown(
     const slimSpaces = siteSpaces.map((siteSp) => ({
         id: siteSp.id,
         title: getLocalizedTitle(siteSp, currentLanguage),
-        url: getSiteSpaceURL(context, siteSp),
+        url: getTargetURLForSiteSpace(context, siteSp, asEmbeddable),
         isActive: siteSp.id === siteSpace.id,
         spaceId: siteSp.space.id,
     }));
@@ -57,9 +67,10 @@ export function TranslationsDropdown(
         siteSpace: SiteSpace;
         siteSpaces: SiteSpace[];
         className?: string;
+        asEmbeddable?: boolean;
     } & ButtonProps
 ) {
-    const { context, siteSpace, siteSpaces, className, ...buttonProps } = props;
+    const { context, siteSpace, siteSpaces, className, asEmbeddable, ...buttonProps } = props;
 
     const title = getLocalizedTitle(siteSpace, context.locale);
     const hasEmojiPrefix = startsWithEmoji(title);
@@ -70,6 +81,7 @@ export function TranslationsDropdown(
             context={context}
             siteSpace={siteSpace}
             siteSpaces={siteSpaces}
+            asEmbeddable={asEmbeddable}
             variant="blank"
             className={tcls(
                 'bg-transparent lg:max-w-64 max-md:[&_.button-content]:hidden',

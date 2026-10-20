@@ -1,6 +1,108 @@
 import { describe, expect, it } from 'bun:test';
 
-import { getURLLookupAlternatives, normalizeURL } from './urls';
+import {
+    getURLLookupAlternatives,
+    getURLLookupPathname,
+    normalizeURL,
+    shouldBypassLookupAlternatives,
+} from './urls';
+
+describe('getURLLookupPathname', () => {
+    const previewRoot = 'https://sites.gitbook.com/preview/site_example/section';
+    const pagePath = 'guides/access/setup';
+    const homepagePath = '/welcome/overview';
+
+    it.each(['revisions', 'changes'])(
+        'resolves a page in a %s preview from the site-space root',
+        (kind) => {
+            const lookup = getURLLookupAlternatives(
+                new URL(`${previewRoot}/~/${kind}/revision-id/${pagePath}`)
+            );
+            const alternative = lookup.urls[0]!;
+
+            expect(
+                getURLLookupPathname(alternative, {
+                    basePath: '/preview/site_example/section/',
+                    pathname: homepagePath,
+                })
+            ).toBe(`/${pagePath}`);
+        }
+    );
+
+    it.each(['revisions', 'changes'])(
+        'preserves the custom homepage at a %s preview root',
+        (kind) => {
+            const lookup = getURLLookupAlternatives(
+                new URL(`${previewRoot}/~/${kind}/revision-id/`)
+            );
+
+            expect(
+                getURLLookupPathname(lookup.urls[0]!, {
+                    basePath: '/preview/site_example/section/',
+                    pathname: homepagePath,
+                })
+            ).toBe(`${homepagePath}/`);
+        }
+    );
+
+    it.each(['', '/section/variant'])('resolves a published page below the %s root', (basePath) => {
+        const rootURL = `https://docs.example.com${basePath}`;
+        const lookup = getURLLookupAlternatives(new URL(`${rootURL}/${pagePath}`));
+        const alternative = lookup.urls.find(({ url }) => url === new URL(rootURL).toString())!;
+
+        expect(alternative).toBeDefined();
+        expect(
+            getURLLookupPathname(alternative, {
+                basePath: `${basePath}/`,
+                pathname: homepagePath,
+            })
+        ).toBe(`/${pagePath}`);
+    });
+
+    it('preserves page resolution without a custom homepage', () => {
+        const lookup = getURLLookupAlternatives(
+            new URL(`${previewRoot}/~/revisions/revision-id/${pagePath}`)
+        );
+
+        expect(
+            getURLLookupPathname(lookup.urls[0]!, {
+                basePath: '/preview/site_example/section/',
+                pathname: '/',
+            })
+        ).toBe(`/${pagePath}`);
+    });
+
+    it.each(['/section/variant', '/section/variant/'])(
+        'recognizes a root lookup with base path %s',
+        (basePath) => {
+            expect(
+                getURLLookupPathname(
+                    {
+                        url: 'https://docs.example.com/section/variant/',
+                        extraPath: 'guide/page',
+                    },
+                    { basePath, pathname: homepagePath }
+                )
+            ).toBe('/guide/page');
+        }
+    );
+
+    it('preserves a legitimate page prefix for a non-root lookup', () => {
+        const lookup = getURLLookupAlternatives(
+            new URL('https://docs.example.com/section/guide/page')
+        );
+        const alternative = lookup.urls.find(
+            ({ url }) => url === 'https://docs.example.com/section/guide'
+        )!;
+
+        expect(
+            getURLLookupPathname(alternative, {
+                basePath: '/section/',
+                pathname: '/guide',
+            })
+        ).toBe('/guide/page');
+    });
+});
 
 describe('getURLLookupAlternatives', () => {
     it('should return all URLs up to the root', () => {
@@ -733,5 +835,56 @@ describe('normalizeURL with encoded paths', () => {
         expect(result.pathname).toBe('/some-page');
         // The rison param must survive normalizeURL intact.
         expect(result.searchParams.get('filter')).toBe(risonValue);
+    });
+});
+
+describe('getURLLookupAlternatives with bypass', () => {
+    it('only looks up the full URL', () => {
+        expect(
+            getURLLookupAlternatives(new URL('https://docs.mycompany.com/a/b/c'), { bypass: true })
+        ).toEqual({
+            revision: undefined,
+            changeRequest: undefined,
+            basePath: undefined,
+            urls: [{ url: 'https://docs.mycompany.com/a/b/c', extraPath: '', primary: true }],
+        });
+    });
+
+    it('only looks up the full URL for a variant', () => {
+        expect(
+            getURLLookupAlternatives(new URL('https://test.gitbook.io/v/variant/space'), {
+                bypass: true,
+            }).urls
+        ).toEqual([
+            { url: 'https://test.gitbook.io/v/variant/space', extraPath: '', primary: true },
+        ]);
+    });
+
+    it.each(['revisions', 'changes'])('keeps the alternatives for %s', (kind) => {
+        const url = new URL(`https://docs.mycompany.com/a/~/${kind}/id/page`);
+        expect(getURLLookupAlternatives(url, { bypass: true })).toEqual(
+            getURLLookupAlternatives(url, { bypass: false })
+        );
+    });
+});
+
+describe('shouldBypassLookupAlternatives', () => {
+    const bypassURLs = ['https://docs.mycompany.com/section', 'https://other.mycompany.com/'];
+
+    it.each([
+        'https://docs.mycompany.com/section',
+        'https://docs.mycompany.com/section/page',
+        'https://other.mycompany.com/',
+        'https://other.mycompany.com/page',
+    ])('matches %s', (url) => {
+        expect(shouldBypassLookupAlternatives(normalizeURL(new URL(url)), bypassURLs)).toBe(true);
+    });
+
+    it.each([
+        'https://docs.mycompany.com/sectionpage',
+        'https://docs.mycompany.com/',
+        'https://unknown.mycompany.com/section',
+    ])('does not match %s', (url) => {
+        expect(shouldBypassLookupAlternatives(normalizeURL(new URL(url)), bypassURLs)).toBe(false);
     });
 });

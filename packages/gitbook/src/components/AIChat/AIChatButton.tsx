@@ -39,7 +39,7 @@ export function AIChatButton(props: {
                 </div>
             }
             aria-label={tString(language, 'ai_chat_ask', assistant.label)}
-            onClick={() => assistant.open()}
+            onClick={() => assistant.open(undefined, 'site')}
         >
             {showLabel ? t(language, 'ask') : null}
         </Button>

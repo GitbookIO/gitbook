@@ -24,6 +24,7 @@
     },
     "devDependencies": {
         "@types/react": "catalog:",
+        "bun-types": "catalog:",
         "react": "catalog:",
         "tsdown": "catalog:",
         "typescript": "catalog:"
@@ -31,6 +32,7 @@
     "scripts": {
         "build": "tsdown",
         "typecheck": "tsc --noEmit",
+        "unit": "bun test",
         "dev": "bun run build -- --watch ./src",
         "clean": "rm -rf ./dist",
         "publish-to-npm": "../../scripts/publish-if-new.sh"

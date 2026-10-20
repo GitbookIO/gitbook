@@ -5,6 +5,7 @@ import React from 'react';
 
 import { useAI } from '../AI';
 import { useTrackEvent } from '../Insights';
+import { useIntegrationsLoaded } from '../Integrations';
 import { useBodyLoaded } from '../primitives';
 import {
     clearLastSearchQuery,
@@ -140,6 +141,7 @@ export function useSearchController(
     const trackEvent = useTrackEvent();
     const resultsRef = React.useRef<SearchResultsRef>(null);
     const isLoaded = useBodyLoaded();
+    const integrationsLoaded = useIntegrationsLoaded();
 
     const restoredLastQueryForSiteSpaceRef = React.useRef<string | null>(null);
     React.useEffect(() => {
@@ -169,6 +171,8 @@ export function useSearchController(
 
     const withAI = assistants.length > 0;
     const withSearchAI = assistants.filter((assistant) => assistant.mode === 'search').length > 0;
+    // Integration assistants register on window load, so wait for it before treating `ask` as a search query.
+    const askIsSearchQuery = withSearchAI || (!withAI && integrationsLoaded);
 
     // Handle initial ask state on page load, once assistants are ready.
     // `ask=` should still bootstrap the assistant on the docs site, so we must
@@ -203,7 +207,7 @@ export function useSearchController(
             const query =
                 prev?.query ??
                 getLastSearchQuery(siteSpace.id) ??
-                (withSearchAI || !withAI ? prev?.ask : null) ??
+                (askIsSearchQuery ? prev?.ask : null) ??
                 '';
 
             return {
@@ -217,7 +221,7 @@ export function useSearchController(
         trackEvent({
             type: 'search_open',
         });
-    }, [state?.open, setSearchState, siteSpace.id, trackEvent, withAI, withSearchAI]);
+    }, [state?.open, setSearchState, siteSpace.id, trackEvent, withAI, askIsSearchQuery]);
 
     const setQuery = React.useCallback(
         (value: string) => {
@@ -261,7 +265,7 @@ export function useSearchController(
     });
 
     const searchValue =
-        state?.query ?? (withSearchAI || !withAI ? state?.ask : null) ?? lastSearchQuery ?? '';
+        state?.query ?? (askIsSearchQuery ? state?.ask : null) ?? lastSearchQuery ?? '';
     const searchResultsId = `search-results-${React.useId()}`;
 
     // Only clears the remembered last query and stops any in-flight fetch — it must

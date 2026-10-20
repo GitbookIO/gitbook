@@ -21,6 +21,7 @@ import {
     serveProxyAnalyticsEvent,
     trackServerInsightsEvents,
 } from './lib/tracking';
+import { AI_CATALOG_PATH, AI_CATALOG_WELL_KNOWN_PATH } from '@/lib/aiCatalog/paths';
 import { getAPITokenFromCookies, getAPITokenResponseCookies } from '@/lib/api-token-cookie';
 import { isChatGPTRequest } from '@/lib/chatgpt';
 import { MAX_CHUNKED_COOKIE_LENGTH } from '@/lib/chunked-cookies';
@@ -34,9 +35,15 @@ import {
     normalizeRequestURL,
     throwIfDataError,
 } from '@/lib/data';
-import { isGitBookAssetsHostURL, isGitBookHostURL } from '@/lib/env';
+import {
+    GITBOOK_DISABLE_INSIGHTS,
+    GITBOOK_STAGE,
+    isGitBookAssetsHostURL,
+    isGitBookHostURL,
+} from '@/lib/env';
 import { getImageResizingContextId } from '@/lib/images';
 import { isAITrainingOrIndexingRequest } from '@/lib/indexing-crawlers';
+import { MCP_SERVER_CARD_PATH, MCP_SERVER_CARD_WELL_KNOWN_PATH } from '@/lib/mcp/paths';
 import { MiddlewareHeaders } from '@/lib/middleware';
 import {
     createOAuthProtectedResourceMetadataResponse,
@@ -54,10 +61,13 @@ import {
     type ResponseCookies,
     getPathScopedCookieName,
     getResponseCookiesForVisitorAuth,
+    getVisitorCountry,
     getVisitorData,
     getVisitorType,
+    isRevalidationRequest,
     normalizeVisitorURL,
     serveVisitorClaimsDataRequest,
+    shouldSendVisitorCountry,
 } from '@/lib/visitors';
 import { waitUntil } from '@/lib/waitUntil';
 import { serveResizedImage } from '@/routes/image';
@@ -184,6 +194,9 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
 
     //Forwards analytics events
     if (siteRequestURL.pathname.endsWith('/~gitbook/__evt')) {
+        if (GITBOOK_DISABLE_INSIGHTS) {
+            return new Response(null, { status: 204 });
+        }
         return await serveProxyAnalyticsEvent(request);
     }
 
@@ -214,6 +227,10 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
     //
     request.headers.delete('x-gitbook-disable-tracking');
 
+    const visitorCountry = shouldSendVisitorCountry(siteRequestURL.hostname, GITBOOK_STAGE)
+        ? getVisitorCountry(request)
+        : undefined;
+
     const withAPIToken = async (apiToken: string | null) => {
         const siteURLData = await throwIfDataError(
             lookupPublishedContentByUrl({
@@ -222,6 +239,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
                     jwtToken: visitorToken?.token ?? undefined,
                     unsignedClaims,
                     type: getVisitorType(request),
+                    ...(visitorCountry ? { country: visitorCountry } : {}),
                 },
                 // When the visitor auth token is pulled from the cookie, set redirectOnError when calling resolvePublishedContentByUrl to allow
                 // redirecting when the token is invalid as we could be dealing with stale token stored in the cookie.
@@ -311,19 +329,6 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
             });
         }
 
-        const normalizedSitePathname = removeLeadingSlash(
-            removeTrailingSlash(siteURLData.pathname)
-        );
-        if (normalizedSitePathname !== '~gitbook/auth/logout') {
-            cookies.push(
-                ...getResponseCookiesForVisitorAuth(
-                    getVisitorAuthBasePath(siteRequestURL, siteURLData),
-                    visitorToken,
-                    request.cookies.getAll()
-                )
-            );
-        }
-
         // We use the host/origin from the canonical URL to ensure the links are
         // correctly generated when the site is proxied. e.g. https://proxy.gitbook.com/site/siteId/...
         const siteCanonicalURL = new URL(siteURLData.canonicalUrl);
@@ -339,7 +344,9 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         // Make sure the URL is clean of any va token after a successful lookup,
         // and of any visitor.* params that may have been passed to the URL.
         //
-        // We only redirect if the visitor token is not coming from a revalidation request, as we don't want to redirect in that case.
+        // We only redirect if the request is not coming from the revalidation worker, as we don't
+        // want to redirect in that case. It can carry unsigned claims without any token, so we rely
+        // on the request headers rather than on the visitor token source.
         //
         // The token and the visitor.* params value are stored in cookies that are set
         // on the redirect response.
@@ -347,8 +354,18 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         const normalizedVisitorURL = normalizeVisitorURL(incomingURL);
         if (
             normalizedVisitorURL.toString() !== incomingURL.toString() &&
-            visitorToken?.source !== 'revalidation'
+            !isRevalidationRequest(request.headers)
         ) {
+            if (visitorToken?.source === 'url') {
+                cookies.push(
+                    ...getResponseCookiesForVisitorAuth(
+                        getVisitorAuthBasePath(siteRequestURL, siteURLData),
+                        visitorToken,
+                        request.cookies.getAll()
+                    )
+                );
+            }
+
             return writeResponseCookies(
                 NextResponse.redirect(normalizedVisitorURL.toString()),
                 cookies
@@ -479,7 +496,9 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
                     themeMode === CustomizationThemeMode.Dark
                         ? CustomizationDefaultThemeMode.Dark
                         : CustomizationDefaultThemeMode.Light;
-            } else {
+            } else if (routeTypeFromPathname !== 'static') {
+                // Markdown, llms.txt, RSS and sitemap routes only exist under `sites/static`, so
+                // forcing them dynamic 404s. They don't render a theme anyway. RND-12749.
                 routeType = 'dynamic';
                 requestHeaders.set(MiddlewareHeaders.Theme, themeMode);
             }
@@ -503,7 +522,8 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
                     siteId: siteURLData.site,
                     events,
                     request: {
-                        url: siteRequestURL.toString(),
+                        // A proxied site's request URL is the proxy's (`/sites/site_xxx/...`), not its public one.
+                        url: siteCanonicalURL.toString(),
                         headers: requestHeaders,
                     },
                 })
@@ -767,6 +787,10 @@ const EMBED_PAGE_PATH_REGEX = /^~gitbook\/embed\/page(\/(\S*))?$/;
 const PATH_ALIASES: Record<string, string> = {
     'sitemap.md': 'llms.txt',
     '.well-known/sitemap.md': 'llms.txt',
+    // Scanners probe `.well-known` for a server card even though the MCP extension reserves
+    // `<streamable-http-url>/server-card`; both paths serve the same document.
+    [MCP_SERVER_CARD_WELL_KNOWN_PATH]: MCP_SERVER_CARD_PATH,
+    [AI_CATALOG_WELL_KNOWN_PATH]: AI_CATALOG_PATH,
 };
 
 /**
@@ -886,6 +910,8 @@ function encodePathInSiteContent(
             return { pathname, routeType: 'static' };
         case '~gitbook/mcp':
         case '~gitbook/mcp/auth':
+        case MCP_SERVER_CARD_PATH:
+        case AI_CATALOG_PATH:
         case '~gitbook/pdf':
         case '~gitbook/search':
         case '~gitbook/auth/login':
@@ -930,6 +956,7 @@ function encodePathInSiteContent(
                               {
                                   type: 'ask_question',
                                   query: ask,
+                                  goal: typeof goal === 'string' ? goal : undefined,
                                   location: {
                                       displayContext: SiteInsightsDisplayContext.Server,
                                   },

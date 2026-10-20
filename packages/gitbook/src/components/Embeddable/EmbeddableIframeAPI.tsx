@@ -9,6 +9,7 @@ import type { GitBookEmbeddableConfiguration, ParentToFrameMessage } from '@gitb
 import { integrationsAssistantTools } from '../Integrations';
 import { Button, LinkContext, type LinkContextType } from '../primitives';
 import { getChannel } from './channel';
+import { DEFAULT_EMBEDDABLE_TABS, getEmbeddableLandingTab } from './getEmbeddableLandingTab';
 import { resolveEmbedPageLink } from './server-actions';
 import { useAI, useAIChatController } from '@/components/AI';
 import { isAIChatEnabled } from '@/components/utils/isAIChatEnabled';
@@ -22,6 +23,17 @@ const embeddableConfiguration = createStore<GitBookEmbeddableConfiguration>(() =
     tools: [],
     trademark: true,
 }));
+
+const docsHome = createStore<{ reference?: string; href?: string }>(() => ({}));
+
+// Module-level so it survives the layout remounting on a cross-space navigation.
+let landed = false;
+
+function resolvePageHref(pagePath: string, baseURL: string): Promise<string> {
+    return resolveEmbedPageLink(pagePath)
+        .then((resolved) => ('href' in resolved ? resolved.href : `${baseURL}/page/${pagePath}`))
+        .catch(() => `${baseURL}/page/${pagePath}`);
+}
 
 // oxlint-disable-next-line typescript/no-explicit-any
 function log(...data: any[]) {
@@ -66,6 +78,15 @@ export function EmbeddableIframeAPI(props: { baseURL: string }) {
             const { baseURL, router, chatController } = refs.current;
             const message = payload as ParentToFrameMessage;
 
+            const navigate = (href: Promise<string>) => {
+                const token = ++navToken.current;
+                href.then((href) => {
+                    if (navToken.current === token) {
+                        refs.current.router.push(href);
+                    }
+                });
+            };
+
             log('[gitbook] received message', message);
 
             switch (message.type) {
@@ -83,29 +104,43 @@ export function EmbeddableIframeAPI(props: { baseURL: string }) {
                     break;
                 }
                 case 'configure': {
-                    embeddableConfiguration.setState(message.settings);
+                    const { settings } = message;
+                    embeddableConfiguration.setState(settings);
                     integrationsAssistantTools.setState({
-                        tools: message.settings.tools,
+                        tools: settings.tools,
                     });
+
+                    const defaultPage =
+                        typeof settings.defaultPage === 'string' && settings.defaultPage
+                            ? settings.defaultPage
+                            : undefined;
+                    let docsHomeHref: Promise<string> | undefined;
+                    if (defaultPage !== docsHome.getState().reference) {
+                        docsHome.setState({ reference: defaultPage, href: undefined });
+                        if (defaultPage) {
+                            docsHomeHref = resolvePageHref(defaultPage, baseURL);
+                            docsHomeHref.then((href) => {
+                                if (docsHome.getState().reference === defaultPage) {
+                                    docsHome.setState({ href });
+                                }
+                            });
+                        }
+                    }
+
+                    if (!landed) {
+                        landed = true;
+                        const tab = getEmbeddableLandingTab(settings);
+                        if (tab === 'docs') {
+                            navigate(docsHomeHref ?? Promise.resolve(`${baseURL}/page/`));
+                        } else if (tab) {
+                            navToken.current++;
+                            router.push(`${baseURL}/${tab}`);
+                        }
+                    }
                     break;
                 }
                 case 'navigateToPage': {
-                    // Resolve the target server-side: on a multi-space site the page may
-                    // live in another space/section, whose base must go before
-                    // `~gitbook/embed/page`. Fall back to a same-space push on failure.
-                    const { pagePath } = message;
-                    const token = ++navToken.current;
-                    // Ignore the result if a later navigation has since superseded this one.
-                    const push = (href: string) => {
-                        if (navToken.current === token) {
-                            router.push(href);
-                        }
-                    };
-                    resolveEmbedPageLink(pagePath)
-                        .then((resolved) =>
-                            push('href' in resolved ? resolved.href : `${baseURL}/page/${pagePath}`)
-                        )
-                        .catch(() => push(`${baseURL}/page/${pagePath}`));
+                    navigate(resolvePageHref(message.pagePath, baseURL));
                     break;
                 }
                 case 'navigateToAssistant': {
@@ -132,7 +167,7 @@ export function useEmbeddableConfiguration<T = GitBookEmbeddableConfiguration>(
 
 export function useEmbeddableTabs() {
     const configuredTabs = useEmbeddableConfiguration((state) => state.tabs);
-    return configuredTabs.length > 0 ? configuredTabs : ['assistant', 'search', 'docs'];
+    return configuredTabs.length > 0 ? configuredTabs : DEFAULT_EMBEDDABLE_TABS;
 }
 
 export function useEmbeddableLinkContext() {
@@ -200,6 +235,7 @@ export function EmbeddableIframeTabs(props: {
     const { ref, active = 'assistant', baseURL, siteTitle, onNavigate } = props;
     const actions = useEmbeddableConfiguration((state) => state.actions);
     const tabs = useEmbeddableTabs();
+    const docsHomeHref = useStore(docsHome, (state) => state.href);
 
     const { assistants, config } = useAI();
     const language = useLanguage();
@@ -228,7 +264,7 @@ export function EmbeddableIframeTabs(props: {
                   key: 'docs',
                   label: siteTitle,
                   icon: 'book-open',
-                  href: `${baseURL}/page/`,
+                  href: docsHomeHref ?? `${baseURL}/page/`,
               }
             : null,
     ].filter((tab) => tab !== null);

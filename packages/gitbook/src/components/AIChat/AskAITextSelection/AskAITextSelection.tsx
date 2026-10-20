@@ -84,7 +84,7 @@ export function AskAITextSelection() {
             id: `text-${fnv1a(content, { size: 32 })}`,
             content,
         });
-        chatController.open();
+        chatController.open('selection');
         chatController.focus();
         clear();
     };

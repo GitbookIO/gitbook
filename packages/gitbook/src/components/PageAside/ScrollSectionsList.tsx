@@ -9,6 +9,7 @@ import { useScrollActiveId } from '@/components/hooks';
 import { useBodyLoaded } from '@/components/primitives';
 import type { DocumentSection } from '@/lib/document-sections';
 import { tcls } from '@/lib/tailwind';
+import { UPDATES_TAG_SECTION_ATTR } from '@/lib/updates';
 
 /**
  * The threshold at which we consider a section as intersecting the viewport.
@@ -22,20 +23,18 @@ const ACTIVE_ITEM_OFFSET = 100;
 
 export function ScrollSectionsList({ sections }: { sections: DocumentSection[] }) {
     const { selectedTagSet } = useUpdatesFilter();
-    const visibleSections = React.useMemo(() => {
-        if (selectedTagSet.size === 0) {
-            return sections;
-        }
-
-        return sections.filter((section) => {
-            if (section.tags === undefined) {
-                return true;
-            }
-
-            return section.tags.some((tagSlug) => selectedTagSet.has(tagSlug));
-        });
-    }, [sections, selectedTagSet]);
-    const ids = React.useMemo(() => visibleSections.map(({ id }) => id), [visibleSections]);
+    const ids = React.useMemo(
+        () =>
+            sections
+                .filter(
+                    (section) =>
+                        selectedTagSet.size === 0 ||
+                        section.tags === undefined ||
+                        section.tags.some((tagSlug) => selectedTagSet.has(tagSlug))
+                )
+                .map(({ id }) => id),
+        [sections, selectedTagSet]
+    );
 
     const enabled = useBodyLoaded();
 
@@ -62,7 +61,7 @@ export function ScrollSectionsList({ sections }: { sections: DocumentSection[] }
             className="relative flex flex-col border-tint-subtle pb-5 sidebar-list-line:border-l"
             ref={scrollContainerRef}
         >
-            {visibleSections.map((section) => (
+            {sections.map((section) => (
                 <li
                     key={section.id}
                     className={tcls(
@@ -76,6 +75,9 @@ export function ScrollSectionsList({ sections }: { sections: DocumentSection[] }
                         section.depth > 1 && ['ml-3', 'my-0', 'sidebar-list-line:ml-0']
                     )}
                     ref={activeId === section.id ? activeItemRef : null}
+                    {...(section.tags !== undefined
+                        ? { [UPDATES_TAG_SECTION_ATTR]: section.tags.join(' ') }
+                        : {})}
                 >
                     <a
                         href={`#${section.id}`}

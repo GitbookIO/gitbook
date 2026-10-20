@@ -11,6 +11,8 @@ export const bg: TranslationLanguage = {
     switch_to_system_theme: 'Превключване към системната тема',
     search: 'Търсене',
     clear: 'Изчистване',
+    table_filtered_by_selection: 'Съответства на избора: ${1}',
+    table_clear_selection: 'Изчисти избора',
     tags: 'Етикети',
     search_back: 'Назад към резултатите от търсенето',
     search_or_ask: 'Попитайте или търсете',
@@ -76,12 +78,16 @@ export const bg: TranslationLanguage = {
     notfound_title: 'Страницата не е намерена',
     notfound_link: 'Тази връзка сочи към страница, която е премахната или вече не съществува.',
     notfound: 'Страницата, която търсите, не съществува.',
-    notfound_adaptive_title: 'Страницата не е налична',
+    notfound_adaptive_title: 'Влезте, за да видите тази страница',
     notfound_adaptive:
-        'Тази страница може да съществува, но може да трябва да влезете, за да я достъпите.',
+        'Тази страница може да изисква вход. Ако сте последвали връзка, проверете дали е правилна.',
     notfound_adaptive_login: 'Вход',
     notfound_adaptive_registration_hint:
         'Регистрацията може да е възможна в зависимост от организацията.',
+    notfound_adaptive_no_access_title: 'Възможно е да нямате достъп до тази страница',
+    notfound_adaptive_no_access:
+        'Тази страница може да не съществува или профилът ви може да няма достъп до нея. Ако сте последвали връзка, проверете дали е правилна.',
+    notfound_adaptive_login_again: 'Повторен вход',
     notfound_goto_home: 'Към началната страница',
     notfound_suggestions_title: 'Може би търсите',
     unexpected_error_title: 'Възникна грешка',
@@ -152,6 +158,8 @@ export const bg: TranslationLanguage = {
     ai_chat_tools_submit_feedback: 'Изпращане на обратна връзка',
     ai_chat_tools_submit_assistant_feedback: 'Оценете предишното съобщение на асистента като ${1}',
     ai_chat_tools_submitted_feedback: 'Обратната връзка е изпратена',
+    ai_chat_tools_shared_feedback_with_team:
+        'Обратната връзка е изпратена на екипа по документацията',
     ai_chat_tools_mcp_tool: 'Извика ${1}',
     ai_chat_ask: 'Попитайте ${1}',
     ai_chat_ask_about: 'Попитайте ${1} за ${2}',

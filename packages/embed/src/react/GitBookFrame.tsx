@@ -27,6 +27,8 @@ export function GitBookFrame(props: GitBookFrameProps) {
         suggestions = [],
         tools = [],
         tabs = ['assistant', 'search', 'docs'],
+        defaultTab,
+        defaultPage,
         trademark = true,
         closeButton = false,
         assistantName,
@@ -50,6 +52,8 @@ export function GitBookFrame(props: GitBookFrameProps) {
     useEffect(() => {
         gitbookFrame?.configure({
             tabs,
+            defaultTab,
+            defaultPage,
             actions,
             greeting,
             suggestions,
@@ -65,6 +69,8 @@ export function GitBookFrame(props: GitBookFrameProps) {
         suggestions,
         tools,
         tabs,
+        defaultTab,
+        defaultPage,
         closeButton,
         trademark,
         assistantName,

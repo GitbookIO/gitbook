@@ -143,16 +143,16 @@ export function ElementWebframe(props: ContentKitClientElementProps<ContentKitWe
                         }
                         break;
                     default:
-                        renderer.update({
-                            action: message.action,
-                        });
+                        // Go through dispatchAction so webframes can trigger the built-in
+                        // `@ui.*` actions, like a ContentKit button does.
+                        renderer.dispatchAction(message.action);
                 }
             }
         };
 
         window.addEventListener('message', callback);
 
-        // We only render the iframe once we have added the event listener
+        // We only load the iframe once we have added the event listener
         // otherwise during SSR, we'll miss messages
         setMounted(true);
 
@@ -186,27 +186,27 @@ export function ElementWebframe(props: ContentKitClientElementProps<ContentKitWe
             ? iframeRef.current.clientWidth / height
             : undefined);
 
-    if (!mounted) {
-        return <Icon icon="spinner" className="contentkit-button-loading" style={{ height }} />;
-    }
-
     // only use height measurement if no aspect ratio is defined
     const useHeightMeasurement = !aspectRatio && height;
 
     return (
-        <iframe
-            ref={iframeRef}
-            src={element.source.url}
-            title={element.source.url}
-            allowFullScreen
-            allow="clipboard-write"
-            className="contentkit-webframe h-full w-full max-w-full border-none"
-            style={{
-                aspectRatio,
-                height: useHeightMeasurement ? height : undefined,
-                maxHeight: height,
-            }}
-        />
+        <div className="contentkit-webframe-container h-full w-full max-w-full">
+            <iframe
+                ref={iframeRef}
+                // Rendered without a source before mount so it reserves its size in the SSR layout.
+                src={mounted ? element.source.url : undefined}
+                title={element.source.url}
+                allowFullScreen
+                allow="clipboard-write"
+                className="contentkit-webframe block h-full w-full max-w-full border-none"
+                style={{
+                    aspectRatio,
+                    height: useHeightMeasurement ? height : undefined,
+                    maxHeight: height,
+                }}
+            />
+            {mounted ? null : <Icon icon="spinner" className="contentkit-webframe-loading" />}
+        </div>
     );
 }
 

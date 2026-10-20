@@ -15,7 +15,12 @@ import {
 } from './search';
 import { shouldShowTableSearch } from './shouldShowSearch';
 import { StickyViewGrid } from './StickyViewGrid';
-import { TableSearchEmpty, TableSearchInput, TableSearchProvider } from './TableSearch';
+import {
+    TableSearchEmpty,
+    TableSearchInput,
+    TableSearchProvider,
+    TableSelectionFilter,
+} from './TableSearch';
 import { ViewCards } from './ViewCards';
 import { ViewGrid, ViewGridHeader } from './ViewGrid';
 import { tcls } from '@/lib/tailwind';
@@ -48,9 +53,14 @@ export function Table(props: BlockProps<DocumentBlockTable>) {
         searchOverride: block.data.search,
         isPrint: context.mode === 'print',
     });
-    const searchRecords = showSearch
-        ? records.map(([id, record]) => ({ id, ...getTableRecordSearchData(block, record) }))
-        : [];
+    const selectColumns = getTableSelectColumns(block);
+    // Also needed when the search bar is hidden: a reader's content selection can narrow a select
+    // column from a tab or picker elsewhere on the page, and without records there is nothing to
+    // match against. A table with no select column can never be narrowed that way, so it skips.
+    const searchRecords =
+        showSearch || selectColumns.length > 0
+            ? records.map(([id, record]) => ({ id, ...getTableRecordSearchData(block, record) }))
+            : [];
     const cellMergeLayout = createTableCellMergeLayout(
         block,
         records.map(([recordId]) => recordId)
@@ -59,6 +69,7 @@ export function Table(props: BlockProps<DocumentBlockTable>) {
     return (
         <TableSearchProvider
             records={searchRecords}
+            selectColumns={selectColumns}
             recordGroups={
                 block.data.view.type === 'grid' ? cellMergeLayout.recordGroups : undefined
             }
@@ -66,10 +77,14 @@ export function Table(props: BlockProps<DocumentBlockTable>) {
             <div className={tcls(style, 'flex flex-col gap-3')}>
                 {showSearch ? (
                     <TableSearchInput
-                        selectColumns={getTableSelectColumns(block)}
+                        selectColumns={selectColumns}
                         checkboxColumns={getTableCheckboxColumns(block)}
                     />
                 ) : null}
+                {/* Sits under the filter control it relates to, and tight against the search bar,
+                    so it reads as part of the filter controls rather than a caption on the table.
+                    Standalone — cards, short grids — there is no control to sit under. */}
+                <TableSelectionFilter className={showSearch ? '-mt-1.5 justify-end' : undefined} />
                 <TableView
                     {...props}
                     isOffscreen={isOffscreen}

@@ -10,6 +10,7 @@ import {
     CustomizationDepth,
     CustomizationHeaderPreset,
     CustomizationIconsStyle,
+    CustomizationPageActionType,
     CustomizationSidebarListStyle,
     SiteSocialAccountPlatform,
 } from '@gitbook/api';
@@ -158,7 +159,7 @@ const searchTestCases: Test[] = [
         },
     },
     {
-        name: 'Search - Keyboard focus stays within search',
+        name: 'Search - Keyboard focus exits to the next page control',
         url: getCustomizationURL({
             ai: {
                 mode: CustomizationAIMode.Search,
@@ -179,13 +180,16 @@ const searchTestCases: Test[] = [
                 )
                 .filter({ visible: true })
                 .last();
+            const nextPageControl = page.getByTestId('table-of-contents').getByRole('link').first();
             await expect(finalPopupControl).toBeVisible();
+            await expect(nextPageControl).toBeVisible();
             await finalPopupControl.focus();
             await page.keyboard.press('Tab');
-            await expect(searchInput).toBeFocused();
+            await expect(searchPopup).toBeHidden();
+            await expect(nextPageControl).toBeFocused();
 
             await page.keyboard.press('Shift+Tab');
-            await expect(finalPopupControl).toBeFocused();
+            await expect(searchInput).toBeFocused();
         },
     },
     {
@@ -243,6 +247,43 @@ const searchTestCases: Test[] = [
             await expect(page.getByTestId('search-input')).toBeFocused();
             await expect(page.getByTestId('search-input')).toHaveValue('gitbook');
             await expect(page.getByTestId('search-results')).toBeVisible();
+        },
+    },
+    {
+        // RND-12844: the popover's focus manager re-focused the closing popup and
+        // scrolled the page back to the top right after landing on the section.
+        name: 'Search - Section result scrolls to the section',
+        url: getCustomizationURL({
+            ai: {
+                mode: CustomizationAIMode.None,
+            },
+        }),
+        screenshot: false,
+        run: async (page) => {
+            await waitForCookiesDialog(page);
+            const searchInput = page.getByTestId('search-input');
+            await searchInput.focus();
+            // Type like a visitor: `fill()` doesn't trigger the remote search.
+            await searchInput.pressSequentially('tasks');
+
+            const sectionResult = page.locator(
+                '[data-testid="search-page-result"][href$="/blocks/lists#tasks"]'
+            );
+            // Section results come from the remote index, which can be slow to answer.
+            await expect(sectionResult).toBeVisible({ timeout: 30_000 });
+            await sectionResult.click();
+            await page.waitForURL(/\/blocks\/lists#tasks$/);
+
+            // The regression scrolled back to the top shortly after landing, so let
+            // that happen before asserting.
+            await page.waitForTimeout(1000);
+
+            // The heading is parked under the header, within its scroll margin.
+            const top = await page
+                .locator('#tasks')
+                .evaluate((heading) => heading.getBoundingClientRect().top);
+            expect(top).toBeGreaterThanOrEqual(0);
+            expect(top).toBeLessThanOrEqual(150);
         },
     },
     {
@@ -514,6 +555,24 @@ const testCases: TestsCase[] = [
         contentBaseURL: 'https://gitbook-open-e2e-sites.gitbook.io/',
         tests: [
             {
+                name: 'Strip fallback after loading a page without adding history',
+                url: 'api-multi-versions/reference/api-reference/pets',
+                screenshot: false,
+                run: async (page) => {
+                    await waitForHydration(page);
+                    const previousURL = page.url();
+                    const targetURL = new URL(previousURL);
+                    targetURL.searchParams.set('fallback', 'true');
+                    targetURL.searchParams.set('ref', 'variant');
+                    targetURL.hash = 'pets';
+                    await page.goto(targetURL.toString());
+                    targetURL.searchParams.delete('fallback');
+                    await expect(page).toHaveURL(targetURL.toString());
+                    await page.goBack();
+                    await expect(page).toHaveURL(previousURL);
+                },
+            },
+            {
                 name: 'Keep navigation path/route when switching variant (Public)',
                 url: 'api-multi-versions/reference/api-reference/pets',
                 screenshot: false,
@@ -535,8 +594,11 @@ const testCases: TestsCase[] = [
                         .click();
 
                     // It should keep the current page path, i.e "reference/api-reference/pets" when navigating to the new variant
-                    await page.waitForURL((url) =>
-                        url.pathname.includes('api-multi-versions/2.0/reference/api-reference/pets')
+                    await page.waitForURL(
+                        (url) =>
+                            url.pathname.includes(
+                                'api-multi-versions/2.0/reference/api-reference/pets'
+                            ) && !url.searchParams.has('fallback')
                     );
                 },
             },
@@ -1064,6 +1126,30 @@ const testCases: TestsCase[] = [
                 },
             },
             {
+                name: 'Markdown page with theme cookie',
+                url: async () => {
+                    const data = await getSiteAPIToken(
+                        'https://gitbook.gitbook.io/test-gitbook-open/'
+                    );
+
+                    const searchParams = new URLSearchParams();
+                    searchParams.set('token', data.apiToken);
+                    searchParams.set('theme', 'dark');
+
+                    return `url/${getGitBookPreviewURL(`${data.site}/blocks?${searchParams.toString()}`)}`;
+                },
+                screenshot: false,
+                run: async (page) => {
+                    // The app opens previews with `?theme=`, which the middleware persists in a cookie.
+                    const markdownURL = new URL(page.url());
+                    markdownURL.pathname = `${markdownURL.pathname.replace(/\/$/, '')}.md`;
+                    markdownURL.search = '';
+                    const response = await page.request.get(markdownURL.toString());
+                    expect(response.status()).toBe(200);
+                    expect(response.headers()['content-type']).toContain('text/markdown');
+                },
+            },
+            {
                 name: 'Redirect to app for authentication when missing token',
                 url: async () => {
                     const data = await getSiteAPIToken('https://gitbook.com/docs');
@@ -1573,6 +1659,70 @@ const testCases: TestsCase[] = [
         ],
     },
     {
+        name: 'Edit on Git page actions',
+        contentBaseURL: 'https://gitbook-open-e2e-sites.gitbook.io/yjs/',
+        tests: [
+            {
+                name: 'With Edit on Git as the default action',
+                url: getCustomizationURL({
+                    pageActions: {
+                        items: [CustomizationPageActionType.Git],
+                    },
+                }),
+                run: async (page) => {
+                    await waitForHydration(page);
+                    await expect(
+                        page.getByRole('link', { name: 'Edit', exact: true })
+                    ).toHaveAttribute(
+                        'href',
+                        'https://github.com/taranvohra/yjs-docs/tree/main/README.md'
+                    );
+                },
+                screenshot: false,
+            },
+            {
+                name: 'With Edit on Git in the dropdown',
+                url: getCustomizationURL({
+                    pageActions: {
+                        items: [
+                            CustomizationPageActionType.Markdown,
+                            CustomizationPageActionType.Git,
+                        ],
+                    },
+                }),
+                run: async (page) => {
+                    await waitForHydration(page);
+                    await page.getByRole('button', { name: 'More' }).click();
+                    await expect(page.getByRole('menu')).toBeVisible();
+                    await expect(
+                        page.getByRole('menuitem', { name: 'Edit on GitHub' })
+                    ).toHaveAttribute(
+                        'href',
+                        'https://github.com/taranvohra/yjs-docs/tree/main/README.md'
+                    );
+                },
+                screenshot: false,
+            },
+            {
+                name: 'Without Edit on Git',
+                url: getCustomizationURL({
+                    pageActions: {
+                        items: [CustomizationPageActionType.Markdown],
+                    },
+                }),
+                run: async (page) => {
+                    await waitForHydration(page);
+                    await page.getByRole('button', { name: 'More' }).click();
+                    await expect(page.getByRole('menu')).toBeVisible();
+                    await expect(
+                        page.getByRole('menuitem', { name: 'Edit on GitHub' })
+                    ).toHaveCount(0);
+                },
+                screenshot: false,
+            },
+        ],
+    },
+    {
         name: 'Page actions',
         contentBaseURL: 'https://gitbook.gitbook.io/test-gitbook-open/',
         tests: [
@@ -1624,7 +1774,6 @@ const testCases: TestsCase[] = [
             {
                 name: 'Without previewed ads',
                 url: 'text-page?ads_preview=1',
-                run: waitForCookiesDialog,
             },
         ],
     },
@@ -1833,9 +1982,6 @@ const testCases: TestsCase[] = [
     {
         name: 'Visitor Auth - Space (oversized token)',
         contentBaseURL: 'https://gitbook.gitbook.io/gbo-va-space/',
-        // Our Cloudflare stack still folds multiple Set-Cookie headers into one,
-        // breaking chunked cookies (variant of opennextjs-cloudflare#501).
-        skip: process.env.ARGOS_BUILD_NAME === 'v2-cloudflare',
         tests: [
             {
                 name: 'Oversized token is chunked into cookies and survives navigation',
@@ -1886,7 +2032,9 @@ const testCases: TestsCase[] = [
                         .replace(/\/$/, '');
                     secondURL.pathname = `${basePathname}/second`;
                     secondURL.search = '';
-                    await page.goto(secondURL.toString());
+                    // Same reason as the harness navigation: third-party subresources on
+                    // this site can hang and never fire `load`.
+                    await page.goto(secondURL.toString(), { waitUntil: 'domcontentloaded' });
                     await expect(
                         page.getByRole('heading', { level: 1, name: 'second' })
                     ).toBeVisible();

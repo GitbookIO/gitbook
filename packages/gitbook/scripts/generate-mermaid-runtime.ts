@@ -1,5 +1,6 @@
 import { build } from 'bun';
-import { mkdir, rename, rm } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
+import { mkdir, readFile, rename, rm } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -12,14 +13,20 @@ const temporaryDir = join(outputDir, '.build');
 const require = createRequire(import.meta.url);
 const mermaidPackage = require('mermaid/package.json') as { version: string };
 const zenumlPackage = require('@mermaid-js/mermaid-zenuml/package.json') as { version: string };
+const mermaidPatch = await readFile(
+    join(scriptDir, `../../../patches/mermaid@${mermaidPackage.version}.patch`)
+).catch(() => null);
+const mermaidPatchSuffix = mermaidPatch
+    ? `-patch.${createHash('sha256').update(mermaidPatch).digest('hex').slice(0, 8)}`
+    : '';
 
-// The runtime URL is served as immutable, it has to change whenever the bundled versions change.
+// The runtime URL is served as immutable, it has to change whenever the bundled versions or patch change.
 if (
     MERMAID_RUNTIME_PATH !==
-    `mermaid/mermaid@${mermaidPackage.version}-zenuml@${zenumlPackage.version}.mjs`
+    `mermaid/mermaid@${mermaidPackage.version}${mermaidPatchSuffix}-zenuml@${zenumlPackage.version}.mjs`
 ) {
     throw new Error(
-        'Update MERMAID_RUNTIME_PATH for the installed mermaid and @mermaid-js/mermaid-zenuml versions'
+        'Update MERMAID_RUNTIME_PATH for the installed mermaid and @mermaid-js/mermaid-zenuml versions and the mermaid patch'
     );
 }
 

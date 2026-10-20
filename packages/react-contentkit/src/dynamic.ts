@@ -23,19 +23,18 @@ export function resolveDynamicBinding<T extends {}>(
     state: object,
     value: ContentKitDynamicBinding | T
 ): T {
-    if (
-        typeof value === 'string' ||
-        typeof value === 'number' ||
-        typeof value === 'boolean' ||
-        typeof value === 'undefined'
-    ) {
-        // Primitives
-        return value;
-    }
-
     if (Array.isArray(value)) {
         // @ts-ignore
         return value.map((v) => resolveDynamicBinding(state, v));
+    }
+
+    // Only an object literal can hold a binding: `'$state' in value` throws on `null`, and the
+    // entries walk below would flatten a class instance (a webframe can post a `Date`) to `{}`.
+    const prototype =
+        typeof value === 'object' && value !== null ? Object.getPrototypeOf(value) : undefined;
+    if (prototype !== Object.prototype && prototype !== null) {
+        // @ts-ignore
+        return value;
     }
 
     if ('$state' in value && typeof value.$state === 'string') {

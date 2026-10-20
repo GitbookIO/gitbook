@@ -15,11 +15,12 @@ export function useScrollActiveId(
         enabled: boolean;
     } = { enabled: true }
 ): string | undefined {
-    const [activeId, setActiveId] = React.useState<string | undefined>(ids[0]);
+    const [activeId, setActiveId] = React.useState<string | undefined>(undefined);
     const sectionsIntersectingMap = React.useRef<Map<string, boolean>>(new Map());
 
     React.useEffect(() => {
-        const defaultActiveId = ids[0];
+        const defaultActiveId =
+            ids.find((id) => document.getElementById(id)?.offsetParent !== null) ?? ids[0];
         sectionsIntersectingMap.current.clear();
         setActiveId((activeId) =>
             activeId !== undefined && ids.includes(activeId) ? activeId : defaultActiveId

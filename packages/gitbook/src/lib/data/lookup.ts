@@ -3,11 +3,12 @@ import type { GitBookAPI, PublishedSiteContentLookup, SiteVisitorPayload } from 
 import { apiClient } from './api';
 import { getExposableError } from './errors';
 import type { DataFetcherResponse } from './types';
-import { getURLLookupAlternatives, stripURLSearch } from './urls';
+import { getURLLookupAlternatives, getURLLookupPathname, stripURLSearch } from './urls';
 import { isAPITokenExpired } from '@/lib/api-token';
 import { race, tryCatch } from '@/lib/async';
 import { getLogger } from '@/lib/logger';
 import { joinPath, joinPathWithBaseURL } from '@/lib/paths';
+import { isPreviewRequest } from '@/lib/preview';
 import { trace } from '@/lib/tracing';
 
 type ResolveBody = Parameters<GitBookAPI['urls']['resolvePublishedContentByUrl']>[0];
@@ -91,6 +92,13 @@ export async function lookupPublishedContentByUrl(
 
         if ('redirect' in data) {
             if (alternative.primary) {
+                if (data.target === 'application' && isPreviewRequest(lookupURL)) {
+                    // The cached lookup omits content selectors and query params needed after login.
+                    const redirect = new URL(data.redirect);
+                    redirect.searchParams.set('redirect', lookupURL.toString());
+                    return { data: { ...data, redirect: redirect.toString() } };
+                }
+
                 // Append the path to the redirect URL
                 // because we might have matched a shorter path and the redirect is relative to it
                 if (alternative.extraPath) {
@@ -134,7 +142,7 @@ export async function lookupPublishedContentByUrl(
                 ...data,
                 canonicalUrl: joinPathWithBaseURL(data.canonicalUrl, alternative.extraPath),
                 basePath: joinPath(data.basePath, lookup.basePath ?? ''),
-                pathname: joinPath(data.pathname, alternative.extraPath),
+                pathname: getURLLookupPathname(alternative, data),
                 ...(changeRequest ? { changeRequest } : {}),
                 ...(revision ? { revision } : {}),
             };

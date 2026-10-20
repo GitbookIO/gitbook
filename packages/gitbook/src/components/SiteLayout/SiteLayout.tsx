@@ -3,7 +3,7 @@ import Script from 'next/script';
 import React from 'react';
 import * as ReactDOM from 'react-dom';
 
-import { CustomizationDefaultThemeMode } from '@gitbook/api';
+import { CustomizationDefaultThemeMode, CustomizationPageActionType } from '@gitbook/api';
 
 import { AIContextProvider } from '../AI';
 import { RocketLoaderDetector } from './RocketLoaderDetector';
@@ -12,6 +12,7 @@ import { AdminToolbar } from '@/components/AdminToolbar';
 import { CookiesToast } from '@/components/Cookies';
 import { LoadIntegrations } from '@/components/Integrations';
 import { SpaceLayout } from '@/components/SpaceLayout';
+import { WebMCP } from '@/components/WebMCP/WebMCP';
 import type { VisitorAuthClaims } from '@/lib/adaptive';
 import { buildVersion } from '@/lib/build';
 import type { GitBookSiteContext } from '@/lib/context';
@@ -117,6 +118,9 @@ export async function SiteLayout(props: {
             </AIContextProvider>
 
             <LoadIntegrations />
+            {customization.pageActions.items.includes(CustomizationPageActionType.Mcp) ? (
+                <WebMCP mcpURL={context.linker.toPathInSite('~gitbook/mcp')} />
+            ) : null}
             {scripts.map(({ script }) =>
                 isDeferrableScript(script) ? (
                     <Script key={script} src={script} strategy="lazyOnload" />

@@ -519,6 +519,7 @@ export async function fetchSpaceContextByIds(
         shareKey: string | undefined;
         changeRequest: string | undefined;
         revision: string | undefined;
+        revisionMetadata?: boolean;
     }
 ): Promise<GitBookSpaceContext> {
     const { dataFetcher } = baseContext;
@@ -552,6 +553,7 @@ export async function fetchSpaceContextByIds(
         dataFetcher.getRevision({
             spaceId: ids.space,
             revisionId,
+            ...(ids.revisionMetadata ? { metadata: true } : {}),
         }),
 
         // When trying to render a revision with an invalid / non-existing ID,
