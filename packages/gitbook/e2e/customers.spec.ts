@@ -473,11 +473,6 @@ const testCases: TestsCase[] = [
         contentBaseURL: 'https://manual.edgetx.org',
         tests: [{ name: 'Home', url: '/' }],
     },
-    {
-        name: 'docs.cortex.io',
-        contentBaseURL: 'https://docs.cortex.io',
-        tests: [{ name: 'Home', url: '/', run: waitForCookiesDialog }],
-    },
     // Flaky because of the GIF
     // {
     //     name: 'docs.mufy.ai',
