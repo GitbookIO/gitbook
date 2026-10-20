@@ -579,7 +579,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
 
         // noindex search/assistant deep links, kept crawlable so Google sees the directive.
         if (rewrittenURL.searchParams.has('ask') || rewrittenURL.searchParams.has('q')) {
-            response.headers.set('x-robots-tag', 'noindex');
+            response.headers.set('x-robots-tag', 'none');
         }
 
         // Allow cross-origin requests from the same parent domain as the site.
