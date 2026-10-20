@@ -1,16 +1,13 @@
 'use client';
 import React from 'react';
 
-import { ToolbarButton, type ToolbarButtonProps } from './Toolbar';
+import { ToolbarButton } from './Toolbar';
 
 /**
  * Button to refresh the page if the content has been updated.
  */
-export function RefreshContentButton(props: {
-    refreshForUpdates: () => Promise<void>;
-    motionValues?: ToolbarButtonProps['motionValues'];
-}) {
-    const { refreshForUpdates, motionValues } = props;
+export function RefreshContentButton(props: { refreshForUpdates: () => Promise<void> }) {
+    const { refreshForUpdates } = props;
 
     const [loading, setLoading] = React.useState(false);
 
@@ -34,7 +31,6 @@ export function RefreshContentButton(props: {
                 refresh();
             }}
             disabled={loading}
-            motionValues={motionValues}
             icon="rotate"
             iconClassName={loading ? 'animate-spin' : undefined}
         />

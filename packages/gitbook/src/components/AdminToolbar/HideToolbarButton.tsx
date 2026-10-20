@@ -5,7 +5,7 @@ import { useOnClickOutside } from 'usehooks-ts';
 
 import { Icon, type IconName, IconStyle } from '@gitbook/icons';
 
-import { ToolbarButton, type ToolbarButtonProps } from './Toolbar';
+import { ToolbarButton, useToolbarSlot } from './Toolbar';
 import styles from './Toolbar.module.css';
 import { useToolbarControls } from './ToolbarControlsContext';
 import { tcls } from '@/lib/tailwind';
@@ -26,15 +26,11 @@ const ARC_PARAMS = {
     offsetAnchorY: 40,
 } as const;
 
-interface HideToolbarButtonProps {
-    motionValues?: ToolbarButtonProps['motionValues'];
-}
-
 /**
  * Hide menu trigger. Expands a macOS Dock-like submenu with 3 labeled actions.
  */
-export function HideToolbarButton(props: HideToolbarButtonProps) {
-    const { motionValues } = props;
+export function HideToolbarButton() {
+    const slot = useToolbarSlot();
     const [open, setOpen] = React.useState(false);
     const [closing, setClosing] = React.useState(false);
     const controls = useToolbarControls();
@@ -114,11 +110,8 @@ export function HideToolbarButton(props: HideToolbarButtonProps) {
             : null,
     ].filter(Boolean) as ArcMenuItem[];
 
-    const sharedMotionStyle = motionValues
-        ? {
-              x: motionValues.x,
-          }
-        : undefined;
+    // The arc follows the button's push, but not its scale.
+    const sharedMotionStyle = slot ? { x: slot.x } : undefined;
 
     return (
         <ToolbarButton
@@ -136,7 +129,6 @@ export function HideToolbarButton(props: HideToolbarButtonProps) {
                     setOpen(true);
                 }
             }}
-            motionValues={motionValues}
             icon="gear"
         >
             {/* Expanding arc menu */}

@@ -9,7 +9,7 @@ import { Icon, type IconName } from '@gitbook/icons';
 
 import { Link, type LinkInsightsProps } from '.';
 import { ToggleChevron } from './ToggleChevron';
-import { Tooltip } from './Tooltip';
+import { Tooltip, type TooltipProps } from './Tooltip';
 import { type ClassValue, tcls } from '@/lib/tailwind';
 
 export type DropdownButtonProps<E extends HTMLElement = HTMLElement> = Omit<
@@ -41,6 +41,8 @@ export function DropdownMenu(props: {
     button: React.ReactElement<Record<string, unknown>>;
     /** Tooltip label for the button */
     buttonTooltip?: React.ReactNode;
+    /** Placement of the button's tooltip. */
+    buttonTooltipProps?: Pick<TooltipProps, 'side' | 'sideOffset' | 'anchor'>;
     /** Content of the dropdown */
     children: React.ReactNode;
     /** Custom styles */
@@ -72,6 +74,7 @@ export function DropdownMenu(props: {
     const {
         button,
         buttonTooltip,
+        buttonTooltipProps,
         children,
         className,
         openOnHover = false,
@@ -98,7 +101,7 @@ export function DropdownMenu(props: {
         <DropdownMenuContext.Provider value={{ open, setOpen }}>
             <Menu.Root modal={false} open={open} onOpenChange={setOpen}>
                 {buttonTooltip ? (
-                    <Tooltip label={buttonTooltip} disableHoverablePopup>
+                    <Tooltip label={buttonTooltip} disableHoverablePopup {...buttonTooltipProps}>
                         {trigger}
                     </Tooltip>
                 ) : (

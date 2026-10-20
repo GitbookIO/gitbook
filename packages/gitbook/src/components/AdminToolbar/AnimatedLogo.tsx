@@ -11,8 +11,14 @@ export const AnimatedLogo: React.FC<AnimatedLogoProps> = (props) => {
     const { shouldAnimate = true } = props;
 
     return (
+        // Light even without the CSS module, which loads with the lazy toolbar chunk and can be
+        // missing (e.g. after a hot reload): an SVG path without a fill renders black.
         <svg
-            className={tcls(styles.svgLogo, shouldAnimate ? undefined : styles.static)}
+            className={tcls(
+                'text-white/90',
+                styles.svgLogo,
+                shouldAnimate ? undefined : styles.static
+            )}
             width="28"
             height="28"
             viewBox="0 0 28 28"
@@ -22,6 +28,7 @@ export const AnimatedLogo: React.FC<AnimatedLogoProps> = (props) => {
             <path
                 d={dPath}
                 transform="translate(14,14) scale(0.4)"
+                fill="currentColor"
                 strokeWidth={3}
                 pathLength={1}
                 strokeLinecap="round"
