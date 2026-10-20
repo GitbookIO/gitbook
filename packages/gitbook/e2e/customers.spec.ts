@@ -476,7 +476,7 @@ const testCases: TestsCase[] = [
     {
         name: 'docs.cortex.io',
         contentBaseURL: 'https://docs.cortex.io',
-        tests: [{ name: 'Home', url: '/', run: waitForCookiesDialog }],
+        tests: [{ name: 'Home', url: '/' }],
     },
     // Flaky because of the GIF
     // {
