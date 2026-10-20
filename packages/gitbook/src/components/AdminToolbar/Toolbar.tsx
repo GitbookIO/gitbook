@@ -226,10 +226,6 @@ export function ToolbarButtonGroup(props: { children: React.ReactNode }) {
     );
 }
 
-/**
- * One button of a group: staggers in, and smooths its magnification for the button inside.
- * Collapses when the button renders nothing, so it leaves no gap.
- */
 function ToolbarSlot(props: {
     scale: MotionValue<number>;
     x: MotionValue<number>;
@@ -244,6 +240,7 @@ function ToolbarSlot(props: {
         <motion.div
             ref={anchorRef}
             variants={toolbarEasings.staggeringChild}
+            // Buttons can render null (e.g. no changed pages): don't leave a gap in the group.
             className="relative empty:hidden"
         >
             <ToolbarSlotContext.Provider value={slot}>{props.children}</ToolbarSlotContext.Provider>
