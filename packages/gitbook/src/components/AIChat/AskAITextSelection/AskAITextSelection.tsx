@@ -10,6 +10,7 @@ import { useStableTextSelection } from './useStableTextSelection';
 import { useAIChatController, useAIConfig } from '@/components/AI';
 import { useIsMobile } from '@/components/hooks/useIsMobile';
 import { useIsMounted } from '@/components/hooks/useIsMounted';
+import { useTrackEvent } from '@/components/Insights';
 import { Button } from '@/components/primitives';
 import { isAIChatEnabled } from '@/components/utils/isAIChatEnabled';
 import { t, useLanguage } from '@/intl/client';
@@ -27,6 +28,7 @@ export function AskAITextSelection() {
     const config = useAIConfig();
     const language = useLanguage();
     const chatController = useAIChatController();
+    const trackEvent = useTrackEvent();
     const isMobile = useIsMobile();
     const isMounted = useIsMounted();
 
@@ -71,6 +73,7 @@ export function AskAITextSelection() {
     }, [selection]);
 
     const onClick = () => {
+        trackEvent({ type: 'ask_trigger_click', trigger: 'selection' });
         if (!selection) {
             return;
         }

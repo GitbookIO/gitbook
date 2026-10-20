@@ -3,6 +3,7 @@
 import { getCodeTextFromId } from './utils';
 import { useAIChatController, useAIConfig } from '@/components/AI';
 import { AIChatIcon } from '@/components/AIChat';
+import { useTrackEvent } from '@/components/Insights';
 import { Button } from '@/components/primitives';
 import { isAIChatEnabled } from '@/components/utils/isAIChatEnabled';
 import { t, useLanguage } from '@/intl/client';
@@ -19,12 +20,14 @@ export function AskAICodeButton(props: {
     const language = useLanguage();
     const config = useAIConfig();
     const chatController = useAIChatController();
+    const trackEvent = useTrackEvent();
 
     if (!isAIChatEnabled(config.aiMode)) {
         return null;
     }
 
     const onClick = () => {
+        trackEvent({ type: 'ask_trigger_click', trigger: 'code' });
         const codeText = getCodeTextFromId(codeId);
         if (!codeText?.trim()) {
             return;
@@ -37,7 +40,7 @@ export function AskAICodeButton(props: {
             content: codeText,
             syntax,
         });
-        chatController.open();
+        chatController.open('code');
         chatController.focus();
     };
 
