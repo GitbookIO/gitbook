@@ -76,7 +76,8 @@ export function Table(props: BlockProps<DocumentBlockTable>) {
         >
             <div
                 data-block-key={block.key}
-                data-comment-table=""
+                // Owns clicks inside, e.g. on blocks of a record's own document; cells still win.
+                data-comment-block=""
                 className={tcls(style, 'flex flex-col gap-3')}
             >
                 {showSearch ? (

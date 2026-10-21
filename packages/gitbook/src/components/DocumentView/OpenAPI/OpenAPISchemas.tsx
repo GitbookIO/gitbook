@@ -11,7 +11,12 @@ import { tcls } from '@/lib/tailwind';
 export async function OpenAPISchemas(props: BlockProps<OpenAPISchemasBlock>) {
     const { style, block } = props;
     return (
-        <div data-block-key={block.key} className={tcls('flex w-full', style, 'max-w-full')}>
+        <div
+            data-block-key={block.key}
+            // Its generated headings and descriptions carry keys that aren't page nodes.
+            data-comment-block=""
+            className={tcls('flex w-full', style, 'max-w-full')}
+        >
             <OpenAPISchemasBody {...props} />
         </div>
     );

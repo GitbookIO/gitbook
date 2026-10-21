@@ -13,6 +13,8 @@ export async function OpenAPIOperation(props: BlockProps<AnyOpenAPIOperationsBlo
     return (
         <div
             data-block-key={block.key}
+            // Its generated headings and descriptions carry keys that aren't page nodes.
+            data-comment-block=""
             className={tcls('flex w-full min-w-0', style, 'max-w-full')}
         >
             <OpenAPIOperationBody {...props} />

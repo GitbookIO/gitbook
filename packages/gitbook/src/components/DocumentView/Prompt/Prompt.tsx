@@ -9,12 +9,14 @@ import { validateIconName } from '@gitbook/icons/icons';
 import type { BlockProps } from '../Block';
 import { CodeBlock } from '../CodeBlock';
 import { getPlainCodeBlock } from '../CodeBlock/highlight-tokens';
+import { COMMENT_IGNORE_CLASSNAME } from '../utils';
 import { PromptClient } from './PromptClient';
+import { tcls } from '@/lib/tailwind';
 
 const PROMPT_COLLAPSED_LINE_COUNT = 10;
 
 export function Prompt(props: BlockProps<DocumentBlockPrompt>) {
-    const { block, document, ancestorBlocks, context, isEstimatedOffscreen } = props;
+    const { block, document, ancestorBlocks, context, isEstimatedOffscreen, style } = props;
     const contentIcon =
         block.data.icon && validateIconName(block.data.icon) ? block.data.icon : null;
     const prompt = getPromptText(block);
@@ -39,6 +41,13 @@ export function Prompt(props: BlockProps<DocumentBlockPrompt>) {
             defaultExpanded={defaultExpanded}
             openInAIProviders={getOpenInAIProviders(props)}
             prompt={prompt}
+            blockKey={block.key}
+            // Only the comment marker: the prompt keeps its own width rather than the block styles.
+            className={
+                tcls(style).split(' ').includes(COMMENT_IGNORE_CLASSNAME)
+                    ? COMMENT_IGNORE_CLASSNAME
+                    : undefined
+            }
         >
             {promptContent}
         </PromptClient>

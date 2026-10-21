@@ -59,14 +59,16 @@ export async function CodeBlock(
                     return null;
                 }
                 return (
-                    <Blocks
-                        key={index}
-                        document={document}
-                        ancestorBlocks={[]}
-                        context={context}
-                        nodes={fragment.nodes}
-                        style="space-y-4"
-                    />
+                    // The app doesn't allow comments inside annotation bodies.
+                    <div key={index} data-comment-ignore="" className="contents">
+                        <Blocks
+                            document={document}
+                            ancestorBlocks={[]}
+                            context={context}
+                            nodes={fragment.nodes}
+                            style="space-y-4"
+                        />
+                    </div>
                 );
             })();
 

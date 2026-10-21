@@ -34,7 +34,10 @@ export function Caption(
         block: DocumentBlockImage | DocumentBlockDrawing | DocumentBlockEmbed | DocumentBlockFile;
         withBorder?: boolean;
         withFrame?: boolean;
-        /** Expose the block key for commenting; off for images nested in an images block. */
+        /**
+         * Expose the block key for commenting; off inside an `images` block, which carries the key
+         * itself since its images aren't comment targets.
+         */
         withBlockKey?: boolean;
     } & DocumentContextProps
 ) {
