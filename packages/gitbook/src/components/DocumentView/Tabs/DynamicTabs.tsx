@@ -130,7 +130,7 @@ const TabPanel = memo(function TabPanel(props: {
             aria-labelledby={getTabButtonId(tab.id)}
             className="scroll-mt-[calc(var(--content-scroll-margin)+var(--spacing)*20)]"
         >
-            <div className="p-4">{tab.body}</div>
+            <div className="px-8 py-6">{tab.body}</div>
         </div>
     );
 });
@@ -317,7 +317,7 @@ function TabButton(
                 {...rest}
                 type="button"
                 className={tcls(
-                    'relative inline-flex max-w-full items-center gap-1.5 px-3.5 py-2 font-medium text-sm transition-[color]',
+                    'relative inline-flex max-w-full items-center gap-1.5 px-4 py-2.5 font-medium text-sm transition-[color]',
                     props.className
                 )}
             />
