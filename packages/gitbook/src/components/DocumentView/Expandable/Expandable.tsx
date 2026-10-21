@@ -5,6 +5,7 @@ import type { BlockProps } from '../Block';
 import { Blocks } from '../Blocks';
 import { shouldShowHashLinks } from '../HashLinkButton';
 import { Inlines } from '../Inlines';
+import { getCommentAnchorProps, getCommentKeyProp } from '../utils';
 import { Details } from './Details';
 import { ToggleChevron } from '@/components/primitives';
 import { getSpaceLanguage, tString } from '@/intl/server';
@@ -37,12 +38,12 @@ export async function Expandable(props: BlockProps<DocumentBlockExpandable>) {
     return (
         <Details
             id={id}
-            blockKey={block.key}
+            {...getCommentKeyProp(context, block.key)}
             open={context.mode === 'print' || isDefaultExpanded}
             className={tcls('scroll-mt-(--content-scroll-margin)', style)}
         >
             <summary
-                data-block-key={titleParagraph.key}
+                {...getCommentAnchorProps(context, titleParagraph.key)}
                 className={tcls(
                     'cursor-pointer',
                     'px-4',

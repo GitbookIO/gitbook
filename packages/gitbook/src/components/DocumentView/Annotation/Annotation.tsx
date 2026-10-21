@@ -3,6 +3,7 @@ import type { DocumentInlineAnnotation } from '@gitbook/api';
 import { Blocks } from '../Blocks';
 import type { InlineProps } from '../Inline';
 import { Inlines } from '../Inlines';
+import { getCommentMarkerProps } from '../utils';
 import { AnnotationPopover } from './AnnotationPopover';
 import { getNodeFragmentByType } from '@/lib/document';
 
@@ -22,7 +23,10 @@ export function Annotation(props: InlineProps<DocumentInlineAnnotation>) {
         <AnnotationPopover
             body={
                 // The app doesn't allow comments inside annotation bodies.
-                <div data-comment-ignore="" className="contents">
+                <div
+                    {...getCommentMarkerProps(context, 'data-comment-ignore')}
+                    className="contents"
+                >
                     <Blocks
                         document={document}
                         ancestorBlocks={[]}

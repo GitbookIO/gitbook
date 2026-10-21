@@ -6,6 +6,7 @@ import {
 
 import type { BlockProps } from './Block';
 import { NotFoundRefHoverCard } from './NotFoundRefHoverCard';
+import { getCommentAnchorProps } from './utils';
 import { Card, type CardProps } from '@/components/primitives';
 import {
     type ResolvedContentRef,
@@ -31,7 +32,7 @@ export async function BlockContentRef(props: BlockProps<DocumentBlockContentRef>
         return (
             <NotFoundRefHoverCard context={context}>
                 <BlockContentRefCard
-                    data-block-key={block.key}
+                    {...getCommentAnchorProps(context, block.key)}
                     contentRef={block.data.ref}
                     resolved={fallback}
                     style={style}
@@ -42,7 +43,7 @@ export async function BlockContentRef(props: BlockProps<DocumentBlockContentRef>
 
     return (
         <BlockContentRefCard
-            data-block-key={block.key}
+            {...getCommentAnchorProps(context, block.key)}
             contentRef={block.data.ref}
             resolved={resolved}
             style={style}

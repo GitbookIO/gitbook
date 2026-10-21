@@ -14,7 +14,7 @@ type PromptClientProps = DocumentBlockPrompt['data'] & {
     contentIcon: IconName | null;
     prompt: string;
     /** Comment target: its code nodes aren't, so the prompt owns clicks inside it. */
-    blockKey?: string;
+    commentKey?: string;
     className?: string;
     children?: React.ReactNode;
 };
@@ -26,7 +26,7 @@ export function PromptClient(props: PromptClientProps) {
         openInAIProviders = false,
         defaultExpanded = 'hidden',
         prompt,
-        blockKey,
+        commentKey,
         className,
         children,
     } = props;
@@ -42,8 +42,8 @@ export function PromptClient(props: PromptClientProps) {
 
     return (
         <div
-            data-block-key={blockKey}
-            data-comment-block=""
+            data-block-key={commentKey}
+            data-comment-block={commentKey ? '' : undefined}
             className={tcls(
                 'relative flex w-full flex-col overflow-hidden circular-corners:rounded-2xl rounded-corners:rounded-xl straight-corners:rounded-xs text-tint-strong',
                 'border border-tint-subtle contrast-more:border-tint',

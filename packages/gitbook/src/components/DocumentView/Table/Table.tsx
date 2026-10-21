@@ -3,7 +3,7 @@ import assertNever from 'assert-never';
 import type { DocumentBlockTable, DocumentTableViewGrid } from '@gitbook/api';
 
 import type { BlockProps } from '../Block';
-import { isBlockOffscreen } from '../utils';
+import { getCommentAnchorProps, getCommentMarkerProps, isBlockOffscreen } from '../utils';
 import { type TableCellMergeLayout, createTableCellMergeLayout } from './cellMerges';
 import { getViewGridLayout, hasVisibleHeader } from './layout';
 import { NativeViewGrid } from './NativeViewGrid';
@@ -75,9 +75,9 @@ export function Table(props: BlockProps<DocumentBlockTable>) {
             }
         >
             <div
-                data-block-key={block.key}
+                {...getCommentAnchorProps(context, block.key)}
                 // Owns clicks inside, e.g. on blocks of a record's own document; cells still win.
-                data-comment-block=""
+                {...getCommentMarkerProps(context, 'data-comment-block')}
                 className={tcls(style, 'flex flex-col gap-3')}
             >
                 {showSearch ? (

@@ -2,9 +2,10 @@ import type { DocumentBlockIntegration, RenderIntegrationUI } from '@gitbook/api
 import { ContentKitOutput } from '@gitbook/react-contentkit';
 
 import type { BlockProps } from '../Block';
+import { getCommentAnchorProps, getCommentMarkerProps } from '../utils';
 import { getWebframePageContext } from './adaptive';
-import { contentKitServerContext } from './contentkit';
 import './contentkit.css';
+import { contentKitServerContext } from './contentkit';
 import {
     ContentKitWithClientContext,
     type WebframeLinkerData,
@@ -63,8 +64,8 @@ export async function IntegrationBlock(props: BlockProps<DocumentBlockIntegratio
         return (
             <div
                 // Integration output can render blocks with generated keys.
-                data-block-key={block.key}
-                data-comment-block=""
+                {...getCommentAnchorProps(context, block.key)}
+                {...getCommentMarkerProps(context, 'data-comment-block')}
                 className={tcls(style)}
             >
                 <pre>
@@ -106,8 +107,8 @@ export async function IntegrationBlock(props: BlockProps<DocumentBlockIntegratio
     return (
         <div
             // Integration output can render blocks with generated keys.
-            data-block-key={block.key}
-            data-comment-block=""
+            {...getCommentAnchorProps(context, block.key)}
+            {...getCommentMarkerProps(context, 'data-comment-block')}
             className={tcls(style)}
         >
             <ContentKitWithClientContext

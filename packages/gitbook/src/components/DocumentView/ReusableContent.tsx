@@ -53,7 +53,7 @@ export async function ReusableContent(props: BlockProps<DocumentBlockReusableCon
             ancestorBlocks={[...ancestorBlocks, block]}
             // Its blocks carry keys of the reusable content's own document, which comments on the
             // page can't anchor to. A class, not a wrapper, which would break the page's spacing.
-            blockStyle={COMMENT_IGNORE_CLASSNAME}
+            blockStyle={context.withCommentAnchors ? COMMENT_IGNORE_CLASSNAME : undefined}
             context={{
                 ...context,
                 contentContext: reusableContent.context,

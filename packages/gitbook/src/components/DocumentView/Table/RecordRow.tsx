@@ -1,3 +1,4 @@
+import { getCommentCellProps } from '../utils';
 import { getMergedCellWidth, getTableCellMerge } from './cellMerges';
 import { getColumnWidth } from './layout';
 import { RecordColumnValue } from './RecordColumnValue';
@@ -54,8 +55,7 @@ export function RecordRow(
                     <div
                         key={column}
                         role="cell"
-                        data-table-record={record[0]}
-                        data-table-column={column}
+                        {...getCommentCellProps(context, record[0], column)}
                         aria-colspan={cellMerge?.merge.colSpan}
                         className={tcls(
                             'relative flex flex-1 border-r px-3 py-2 align-middle text-sm last:border-r-0',

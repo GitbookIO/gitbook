@@ -3,6 +3,7 @@ import type { DocumentBlockImage, DocumentBlockImages, JSONDocument, Length } fr
 import type { BlockProps } from './Block';
 import { Caption, type CaptionAlign } from './Caption';
 import type { DocumentContext } from './DocumentView';
+import { getCommentAnchorProps } from './utils';
 import { Image, type ImageResponsiveSize } from '@/components/utils';
 import { resolveContentRefInDocument } from '@/lib/references';
 import { type ClassValue, tcls } from '@/lib/tailwind';
@@ -15,7 +16,7 @@ export function Images(props: BlockProps<DocumentBlockImages>) {
 
     return (
         <div
-            data-block-key={block.key}
+            {...getCommentAnchorProps(context, block.key)}
             className={tcls(
                 style,
                 'flex',

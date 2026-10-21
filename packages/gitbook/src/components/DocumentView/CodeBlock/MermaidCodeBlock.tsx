@@ -220,7 +220,7 @@ export function MermaidCodeBlock(
             {/* Inline slot: hosts the diagram in the document flow until it goes fullscreen. */}
             <div
                 ref={rootRef}
-                data-block-key={block.key}
+                data-block-key={props.commentKey}
                 className={tcls('relative', style)}
                 contentEditable={false}
             />

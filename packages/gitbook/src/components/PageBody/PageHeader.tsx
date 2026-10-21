@@ -256,7 +256,7 @@ export async function PageHeader(props: {
             {page.layout.title ? (
                 <h1
                     // Comments on the whole page get their pin next to the title.
-                    data-comment-page-title=""
+                    {...(context.changeRequest ? { 'data-comment-page-title': '' } : {})}
                     data-cover-aware-text
                     data-over-cover
                     className={tcls(

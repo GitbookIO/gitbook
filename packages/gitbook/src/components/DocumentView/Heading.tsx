@@ -5,7 +5,7 @@ import { HashLinkButton, hashLinkButtonWrapperStyles, shouldShowHashLinks } from
 import { HeadingRevealWrapper } from './HeadingRevealWrapper';
 import { Inlines } from './Inlines';
 import { getBlockTextStyle } from './spacing';
-import { getTextAlignment } from './utils';
+import { getCommentAnchorProps, getTextAlignment } from './utils';
 import { getSpaceLanguage, tString } from '@/intl/server';
 import { defaultLanguage } from '@/intl/translations';
 import { tcls } from '@/lib/tailwind';
@@ -30,7 +30,7 @@ export async function Heading(props: BlockProps<DocumentBlockHeading>) {
         <HeadingRevealWrapper
             as={Tag}
             id={id}
-            data-block-key={block.key}
+            {...getCommentAnchorProps(context, block.key)}
             className={tcls(
                 textStyle.textSize,
                 'heading',

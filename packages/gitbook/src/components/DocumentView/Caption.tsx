@@ -9,6 +9,7 @@ import type {
 
 import type { DocumentContextProps } from './DocumentView';
 import { Inlines } from './Inlines';
+import { getCommentAnchorProps } from './utils';
 import { getNodeFragmentByName, isNodeEmpty } from '@/lib/document';
 import { type ClassValue, tcls } from '@/lib/tailwind';
 
@@ -67,7 +68,7 @@ export function Caption(
         withBlockKey = false,
     } = props;
 
-    const blockKey = withBlockKey ? block.key : undefined;
+    const anchorProps = withBlockKey ? getCommentAnchorProps(context, block.key) : {};
 
     const caption = getNodeFragmentByName(block, 'caption');
     const captionParagraph = caption?.nodes[0];
@@ -78,14 +79,14 @@ export function Caption(
         isNodeEmpty(captionParagraph)
     ) {
         return (
-            <div data-block-key={blockKey} className={tcls(style, wrapperStyle)}>
+            <div {...anchorProps} className={tcls(style, wrapperStyle)}>
                 {children}
             </div>
         );
     }
 
     return (
-        <picture data-block-key={blockKey} className={tcls('relative', style)}>
+        <picture {...anchorProps} className={tcls('relative', style)}>
             <div className={tcls(wrapperStyle, captionAlignStyles[align])}>{children}</div>
             <figcaption
                 className={tcls(

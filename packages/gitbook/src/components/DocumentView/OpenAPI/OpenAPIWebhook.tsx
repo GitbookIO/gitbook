@@ -1,4 +1,5 @@
 import type { BlockProps } from '../Block';
+import { getCommentAnchorProps, getCommentMarkerProps } from '../utils';
 import { getOpenAPIBlockClientProps } from './context';
 import { OpenAPIBlockLazy } from './OpenAPIBlockLazy';
 import { resolveOpenAPIWebhookBlock } from '@/lib/openapi/resolveOpenAPIWebhookBlock';
@@ -9,12 +10,12 @@ import { tcls } from '@/lib/tailwind';
  * Render an openapi block or an openapi-webhook block.
  */
 export async function OpenAPIWebhook(props: BlockProps<OpenAPIWebhookBlock>) {
-    const { style, block } = props;
+    const { style, block, context } = props;
     return (
         <div
-            data-block-key={block.key}
+            {...getCommentAnchorProps(context, block.key)}
             // Its generated headings and descriptions carry keys that aren't page nodes.
-            data-comment-block=""
+            {...getCommentMarkerProps(context, 'data-comment-block')}
             className={tcls('flex w-full min-w-0', style, 'max-w-full')}
         >
             <OpenAPIWebhookBody {...props} />

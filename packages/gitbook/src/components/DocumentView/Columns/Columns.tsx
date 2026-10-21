@@ -4,6 +4,7 @@ import { type DocumentBlockColumns, type Length, VerticalAlignment } from '@gitb
 
 import type { BlockProps } from '../Block';
 import { Blocks } from '../Blocks';
+import { getCommentMarkerProps } from '../utils';
 import { tcls } from '@/lib/tailwind';
 
 export function Columns(props: BlockProps<DocumentBlockColumns>) {
@@ -38,7 +39,7 @@ export function Columns(props: BlockProps<DocumentBlockColumns>) {
     return (
         <div
             // The app doesn't allow comments inside columns.
-            data-comment-ignore=""
+            {...getCommentMarkerProps(context, 'data-comment-ignore')}
             className={tcls(
                 'grid w-full @2xl:grid-flow-col @2xl:grid-cols-[repeat(var(--grid-slices),minmax(0,1fr))] grid-cols-1 @2xl:grid-rows-1 gap-x-8 gap-y-4',
                 style
