@@ -5,6 +5,7 @@ import rison from 'rison';
 import type { SiteAPIToken } from '@gitbook/api';
 
 import { getVisitorAuthClaims, getVisitorAuthClaimsFromToken } from '@/lib/adaptive';
+import { decompressAPIToken } from '@/lib/api-token-compression';
 import { type SiteURLData, fetchSiteContextByURLLookup, getBaseContext } from '@/lib/context';
 import { getDynamicCustomizationSettings } from '@/lib/customization';
 
@@ -124,7 +125,8 @@ function getModeFromParams(mode: string): RouteParamMode {
 export function getSiteURLDataFromParams(params: RouteLayoutParams): SiteURLData {
     try {
         const decoded = decodeURIComponent(params.siteData);
-        return rison.decode(decoded);
+        const data = rison.decode<SiteURLData>(decoded);
+        return { ...data, apiToken: decompressAPIToken(data.apiToken) };
     } catch (error) {
         console.error(
             `Returning 404 after failing to decode site data ${params.siteData}: ${error}`

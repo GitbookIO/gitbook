@@ -22,6 +22,7 @@ import {
     trackServerInsightsEvents,
 } from './lib/tracking';
 import { AI_CATALOG_PATH, AI_CATALOG_WELL_KNOWN_PATH } from '@/lib/aiCatalog/paths';
+import { compressAPITokenIfNeeded } from '@/lib/api-token-compression';
 import { getAPITokenFromCookies, getAPITokenResponseCookies } from '@/lib/api-token-cookie';
 import { isChatGPTRequest } from '@/lib/chatgpt';
 import { MAX_CHUNKED_COOKIE_LENGTH } from '@/lib/chunked-cookies';
@@ -394,7 +395,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
             revision: siteURLData.revision,
             shareKey: siteURLData.shareKey,
             preview: siteURLData.preview,
-            apiToken: siteURLData.apiToken,
+            apiToken: compressAPITokenIfNeeded(siteURLData.apiToken),
             imagesContextId: imagesContextId,
             contextId: siteURLData.contextId,
             isFallback: requestURL.searchParams.get('fallback') === 'true' ? true : undefined,
