@@ -1,3 +1,4 @@
+import { joinPathWithBaseURL } from '../paths';
 import { checkIsHttpURL } from '../urls';
 
 /** Matches the `feedback` length accepted by `submitSiteAgentFeedback`. */
@@ -13,7 +14,7 @@ export const agentFeedbackDescriptions = {
     goal: 'The broader end goal you were ultimately trying to accomplish (as/on behalf of the user) when you hit this issue. Gives the team the context you were working towards. Optional.',
 
     pageURL: (siteURL: string | undefined) =>
-        `The full URL of the page the issue is about${siteURL ? ` (e.g. ${siteURL}/getting-started)` : ''}, so the finding is linked to the exact page.`,
+        `The full URL of the page the issue is about${siteURL ? ` (e.g. ${joinPathWithBaseURL(siteURL, 'getting-started')})` : ''}, so the finding is linked to the exact page.`,
 
     pageReference:
         'The URL of the page the issue is about, so the finding is linked to the exact page. Omit it to report about the page the user is currently viewing.',

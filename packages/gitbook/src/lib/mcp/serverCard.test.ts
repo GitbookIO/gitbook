@@ -1,5 +1,6 @@
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { describe, expect, it } from 'bun:test';
+import type { z } from 'zod';
 
 import { CustomizationAIMode, CustomizationPageActionType, SiteVisibility } from '@gitbook/api';
 
@@ -332,6 +333,19 @@ describe('buildSiteMcpServerCard', () => {
                 readOnlyHint: true,
             });
             expect(search).not.toHaveProperty('inputSchema');
+        });
+
+        it('gives example page URLs under the path of a subpath site', () => {
+            const context = makeContext({ host: 'docs.example.com', siteBasePath: '/product/' });
+            const tools = createSiteMcpTools(context, { request });
+            const getPage = tools.find((tool) => tool.name === 'getPage');
+            const pageUrl = tools.find((tool) => tool.name === 'sendFeedback')?.inputSchema
+                .pageUrl as z.ZodTypeAny;
+            const example = 'https://docs.example.com/product/getting-started';
+
+            expect(getPage?.description).toContain(`(e.g. ${example})`);
+            expect(pageUrl.description).toContain(`(e.g. ${example})`);
+            expect(pageUrl.parse('getting-started')).toBe(example);
         });
 
         it('omits askQuestion when the site has no AI mode', () => {
