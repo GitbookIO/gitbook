@@ -1,5 +1,16 @@
 # @gitbook/embed
 
+## 0.6.0
+
+### Minor Changes
+
+- f35be52: Add `defaultTab` and `defaultPage` options to the Docs Embed to choose where it opens. `defaultTab` opens the embed on the assistant, search or docs tab. `defaultPage` sets the page the docs tab opens on in place of the site's home page, and the embed opens on that page unless `defaultTab` says otherwise. Both work with the standalone script's `configure`, `frame.configure` and `<GitBookFrame>` props.
+
+### Patch Changes
+
+- 94a496c: Make the Docs Embed widget match the page it is embedded in rather than the visitor's OS: a widget on a light page stays light even when the visitor's system is in dark mode, and the widget's own chrome and the docs inside it always render in the same scheme. Sites published with a single theme impose it on the widget too, since they render in it regardless. The standalone script takes `?theme=light` on its URL, and calling `init` twice now updates the options instead of throwing.
+- bf674a4: Add an optional `context` property (string, up to 512 characters) to the `confirmation` of custom AI tools, shown above the confirmation dialog to help the user understand what they are approving or rejecting. The `confirmation` can now also be a function that receives the AI-provided input and returns the confirmation, so the context can be derived dynamically from the arguments the tool is about to run with. Available both to integrations (`GitBookIntegrationTool`) and to embed consumers (`GitBookToolDefinition`).
+
 ## 0.5.1
 
 ### Patch Changes
