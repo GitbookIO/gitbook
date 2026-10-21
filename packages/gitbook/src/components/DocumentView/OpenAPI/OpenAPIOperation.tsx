@@ -1,4 +1,5 @@
 import type { BlockProps } from '../Block';
+import { getCommentAnchorProps, getCommentMarkerProps } from '../utils';
 import { getOpenAPIBlockClientProps } from './context';
 import { OpenAPIBlockLazy } from './OpenAPIBlockLazy';
 import { resolveOpenAPIOperationBlock } from '@/lib/openapi/resolveOpenAPIOperationBlock';
@@ -9,9 +10,14 @@ import { tcls } from '@/lib/tailwind';
  * Render an openapi block or an openapi-operation block.
  */
 export async function OpenAPIOperation(props: BlockProps<AnyOpenAPIOperationsBlock>) {
-    const { style } = props;
+    const { style, block, context } = props;
     return (
-        <div className={tcls('flex w-full min-w-0', style, 'max-w-full')}>
+        <div
+            {...getCommentAnchorProps(context, block.key)}
+            // Its generated headings and descriptions carry keys that aren't page nodes.
+            {...getCommentMarkerProps(context, 'data-comment-block')}
+            className={tcls('flex w-full min-w-0', style, 'max-w-full')}
+        >
             <OpenAPIOperationBody {...props} />
         </div>
     );

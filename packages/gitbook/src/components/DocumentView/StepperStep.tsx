@@ -4,10 +4,12 @@ import type { DocumentBlockStepperStep } from '@gitbook/api';
 
 import type { BlockProps } from './Block';
 import { Blocks } from './Blocks';
+import { getCommentAnchorProps } from './utils';
 import { tcls } from '@/lib/tailwind';
 
 export function StepperStep(props: BlockProps<DocumentBlockStepperStep>) {
     const { block, style, ancestorBlocks, ...contextProps } = props;
+    const { context } = contextProps;
 
     const ancestor = ancestorBlocks[ancestorBlocks.length - 1];
     assert(ancestor?.type === 'stepper', 'Ancestor block must be a stepper');
@@ -32,7 +34,10 @@ export function StepperStep(props: BlockProps<DocumentBlockStepperStep>) {
     })();
 
     return (
-        <div className={tcls('flex flex-row gap-4 md:gap-8', style)}>
+        <div
+            {...getCommentAnchorProps(context, block.key)}
+            className={tcls('flex flex-row gap-4 md:gap-8', style)}
+        >
             <div className="relative select-none">
                 <div
                     className={tcls(

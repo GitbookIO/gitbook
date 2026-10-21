@@ -2,9 +2,10 @@ import type { DocumentBlockIntegration, RenderIntegrationUI } from '@gitbook/api
 import { ContentKitOutput } from '@gitbook/react-contentkit';
 
 import type { BlockProps } from '../Block';
+import { getCommentAnchorProps, getCommentMarkerProps } from '../utils';
 import { getWebframePageContext } from './adaptive';
-import { contentKitServerContext } from './contentkit';
 import './contentkit.css';
+import { contentKitServerContext } from './contentkit';
 import {
     ContentKitWithClientContext,
     type WebframeLinkerData,
@@ -61,7 +62,12 @@ export async function IntegrationBlock(props: BlockProps<DocumentBlockIntegratio
         }
 
         return (
-            <div className={tcls(style)}>
+            <div
+                // Integration output can render blocks with generated keys.
+                {...getCommentAnchorProps(context, block.key)}
+                {...getCommentMarkerProps(context, 'data-comment-block')}
+                className={tcls(style)}
+            >
                 <pre>
                     Unexpected error with integration {block.data.integration}:{' '}
                     {initialResponse.error.message}
@@ -99,7 +105,12 @@ export async function IntegrationBlock(props: BlockProps<DocumentBlockIntegratio
     };
 
     return (
-        <div className={tcls(style)}>
+        <div
+            // Integration output can render blocks with generated keys.
+            {...getCommentAnchorProps(context, block.key)}
+            {...getCommentMarkerProps(context, 'data-comment-block')}
+            className={tcls(style)}
+        >
             <ContentKitWithClientContext
                 {...contentKitProps}
                 canAccessVisitorClaims={canAccessVisitorClaims}

@@ -13,6 +13,9 @@ import { tcls } from '@/lib/tailwind';
 type PromptClientProps = DocumentBlockPrompt['data'] & {
     contentIcon: IconName | null;
     prompt: string;
+    /** Comment target: its code nodes aren't, so the prompt owns clicks inside it. */
+    commentKey?: string;
+    className?: string;
     children?: React.ReactNode;
 };
 
@@ -23,6 +26,8 @@ export function PromptClient(props: PromptClientProps) {
         openInAIProviders = false,
         defaultExpanded = 'hidden',
         prompt,
+        commentKey,
+        className,
         children,
     } = props;
     const language = useLanguage();
@@ -37,11 +42,14 @@ export function PromptClient(props: PromptClientProps) {
 
     return (
         <div
+            data-block-key={commentKey}
+            data-comment-block={commentKey ? '' : undefined}
             className={tcls(
                 'relative flex w-full flex-col overflow-hidden circular-corners:rounded-2xl rounded-corners:rounded-xl straight-corners:rounded-xs text-tint-strong',
                 'border border-tint-subtle contrast-more:border-tint',
                 'transition',
-                expanded ? 'bg-tint depth-subtle:shadow-xs' : 'bg-tint-base'
+                expanded ? 'bg-tint depth-subtle:shadow-xs' : 'bg-tint-base',
+                className
             )}
         >
             <div

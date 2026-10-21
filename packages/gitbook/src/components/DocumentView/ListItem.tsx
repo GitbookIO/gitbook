@@ -11,11 +11,13 @@ import type {
 import type { BlockProps } from './Block';
 import { Blocks } from './Blocks';
 import { getBlockTextStyle } from './spacing';
+import { getCommentAnchorProps } from './utils';
 import { Checkbox } from '@/components/primitives';
 import { tcls } from '@/lib/tailwind';
 
 export function ListItem(props: BlockProps<DocumentBlockListItem>) {
     const { block, ancestorBlocks, ...contextProps } = props;
+    const { context } = contextProps;
 
     const parent = ancestorBlocks[ancestorBlocks.length - 1];
     assert(
@@ -46,7 +48,7 @@ export function ListItem(props: BlockProps<DocumentBlockListItem>) {
     switch (parent.type) {
         case 'list-tasks':
             return (
-                <ListItemLI block={block}>
+                <ListItemLI block={block} anchorProps={getCommentAnchorProps(context, block.key)}>
                     <ListItemPrefix block={block}>
                         <Checkbox
                             id={block.key!}
@@ -64,7 +66,7 @@ export function ListItem(props: BlockProps<DocumentBlockListItem>) {
             );
         case 'list-ordered':
             return (
-                <ListItemLI block={block}>
+                <ListItemLI block={block} anchorProps={getCommentAnchorProps(context, block.key)}>
                     <ListItemPrefix block={block}>
                         <PseudoBefore
                             content={getOrderedListItemPrefixContent({
@@ -82,7 +84,7 @@ export function ListItem(props: BlockProps<DocumentBlockListItem>) {
             );
         case 'list-unordered':
             return (
-                <ListItemLI block={block}>
+                <ListItemLI block={block} anchorProps={getCommentAnchorProps(context, block.key)}>
                     <ListItemPrefix block={block}>
                         <PseudoBefore
                             content={getUnorderedListItemsPrefixContent({
@@ -123,9 +125,17 @@ function getListItemDepth(input: {
     return depth;
 }
 
-function ListItemLI(props: { block: DocumentBlockListItem; children: React.ReactNode }) {
+function ListItemLI(props: {
+    block: DocumentBlockListItem;
+    anchorProps: ReturnType<typeof getCommentAnchorProps>;
+    children: React.ReactNode;
+}) {
     const textStyle = getBlockTextStyle(props.block);
-    return <li className={tcls(textStyle.lineHeight, 'flex items-start')}>{props.children}</li>;
+    return (
+        <li {...props.anchorProps} className={tcls(textStyle.lineHeight, 'flex items-start')}>
+            {props.children}
+        </li>
+    );
 }
 
 function ListItemPrefix(props: { block: DocumentBlockListItem; children: React.ReactNode }) {

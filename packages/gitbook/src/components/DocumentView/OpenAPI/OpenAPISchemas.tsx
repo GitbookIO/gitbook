@@ -1,4 +1,5 @@
 import type { BlockProps } from '../Block';
+import { getCommentAnchorProps, getCommentMarkerProps } from '../utils';
 import { getOpenAPIBlockClientProps } from './context';
 import { OpenAPIBlockLazy } from './OpenAPIBlockLazy';
 import { resolveOpenAPISchemasBlock } from '@/lib/openapi/resolveOpenAPISchemasBlock';
@@ -9,9 +10,14 @@ import { tcls } from '@/lib/tailwind';
  * Render an openapi-schemas block.
  */
 export async function OpenAPISchemas(props: BlockProps<OpenAPISchemasBlock>) {
-    const { style } = props;
+    const { style, block, context } = props;
     return (
-        <div className={tcls('flex w-full', style, 'max-w-full')}>
+        <div
+            {...getCommentAnchorProps(context, block.key)}
+            // Its generated headings and descriptions carry keys that aren't page nodes.
+            {...getCommentMarkerProps(context, 'data-comment-block')}
+            className={tcls('flex w-full', style, 'max-w-full')}
+        >
             <OpenAPISchemasBody {...props} />
         </div>
     );

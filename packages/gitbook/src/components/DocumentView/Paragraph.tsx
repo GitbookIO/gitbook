@@ -4,15 +4,19 @@ import { CustomizationAIMode } from '@gitbook/api';
 import type { BlockProps } from './Block';
 import { Inlines } from './Inlines';
 import { getTextAlignment } from './utils';
+import { getCommentAnchorProps } from './utils';
 import { getNodeText } from '@/lib/document';
 import { tcls } from '@/lib/tailwind';
 
 export function Paragraph(props: BlockProps<DocumentBlockParagraph>) {
     const { block, style, ancestorBlocks, ...contextProps } = props;
     const { context } = contextProps;
+    // Like the app, a list item owns the comments on its direct paragraph.
+    const isCommentTarget = ancestorBlocks.at(-1)?.type !== 'list-item';
 
     const paragraph = (
         <p
+            {...(isCommentTarget ? getCommentAnchorProps(context, block.key) : {})}
             // Cover-aware contrast text applies only to the page body, not to documents
             // rendered in overlays (search answers, AI chat) on a background-cover page.
             data-cover-aware-text={context.isPageBody ? '' : undefined}

@@ -58,6 +58,9 @@ export async function PageBody(props: {
         ? hasTopLevelBlock(document, (block) => block.type === 'updates')
         : false;
 
+    // Comments can only be made on change request previews, so public pages skip their markers.
+    const withCommentAnchors = Boolean(context.changeRequest);
+
     // Render link previews only if there are less than LINK_PREVIEW_MAX_COUNT links in the document.
     const withLinkPreviews = document
         ? !hasMoreThan(
@@ -100,6 +103,8 @@ export async function PageBody(props: {
                 />
             ) : null}
             <main
+                // Comments on the whole page target anywhere in it that isn't a block.
+                {...(withCommentAnchors ? { 'data-comment-page': '' } : {})}
                 className={tcls(
                     'relative min-w-0 flex-1',
                     'break-anywhere', // Allow words to break if they are too long.
@@ -150,6 +155,7 @@ export async function PageBody(props: {
                                             page,
                                         },
                                         withLinkPreviews,
+                                        withCommentAnchors,
                                         isPageBody: true,
                                     }}
                                 />
