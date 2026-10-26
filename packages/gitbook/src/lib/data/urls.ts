@@ -1,11 +1,10 @@
-import { GITBOOK_DISABLE_LOOKUP_ALTERNATIVES } from '../env';
 import { joinPath, removeTrailingSlash } from '../paths';
 import { isProxyRootRequest } from '../proxy';
 import { DataFetcherError, getExposableError } from './errors';
 
 /**
  * Paths served by our own routes rather than by site content. They can never be part of a
- * site URL, so we stop matching there instead of spending lookups on URLs that cannot resolve.
+ * site URL, so a revision or change marker is never searched for inside them.
  * Kept in sync with the site route handlers and `encodePathInSiteContent` in the middleware.
  */
 const INTERNAL_PATHS = [
@@ -44,156 +43,48 @@ function getContentPathSegments(pathSegments: string[]): string[] {
 }
 
 /**
- * Site URL prefixes resolved with the full URL only, for sites where a shorter alternative
- * would resolve to the wrong content.
- */
-const LOOKUP_ALTERNATIVES_BYPASS_URLS: string[] = ['https://proxy.gitbook.site/sites/site_p4Xo4'];
-
-/**
- * Whether the lookup of this (normalized) URL should skip the shorter alternatives.
- */
-export function shouldBypassLookupAlternatives(
-    url: URL,
-    bypassURLs: string[] = LOOKUP_ALTERNATIVES_BYPASS_URLS
-): boolean {
-    if (GITBOOK_DISABLE_LOOKUP_ALTERNATIVES) {
-        return true;
-    }
-
-    return bypassURLs.some((bypassURL) => {
-        const prefix = normalizeURL(new URL(bypassURL));
-        const prefixPath = removeTrailingSlash(prefix.pathname);
-        return (
-            prefix.origin === url.origin &&
-            (removeTrailingSlash(url.pathname) === prefixPath ||
-                url.pathname.startsWith(`${prefixPath}/`))
-        );
-    });
-}
-
-/**
- * For a given GitBook URL, return a list of alternative URLs that could be matched against to lookup the content.
- * The approach is optimized to aim at reusing cached lookup results as much as possible.
+ * For a given GitBook URL, return the URL to resolve with the API.
  *
- * The cases can be:
+ * The full URL is resolved as-is, except for revisions and changes in the path
+ * (`~/revisions/<id>/` or `~/changes/<id>/`): these are resolved up to the tilde,
+ * and the rest of the path goes in the extraPath.
  *
- * Custom hostname
- *   - Public content has a custom hostname: docs.company.com/<path>
- *   - Public content has a custom hostname with a share-link: docs.company.com/<link>/<path>
- *   - Public content has a custom hostname with a variant: docs.company.com/v/<variant>/<path>
- *   - Public content has a custom hostname with a variant and a share-link: docs.company.com/<link>/v/<variant>/<path>
- *   - Revisions in a custom hostname: docs.company.com/~/revisions/<id>/<path>
- *   - Changes in a custom hostname: docs.company.com/~/changes/<id>/<path>
- *
- * Custom hostname in the organization or GitBook domain (company.gitbook.io)
- *   - Public content has a custom hostname in the organization: docs.company.com/<space>/<path>
- *   - Public content has a custom hostname in the organization with a share-link: docs.company.com/<space>/<link>/<path>
- *   - Public content has a custom hostname in the organization with a variant: docs.company.com/<space>/v/<variant>/<path>
- *   - Public content has a custom hostname in the organization with a variant and a share-link: docs.company.com/<space>/<link>/v/<variant>/<path>
+ * Returns `null` for the root proxy URLs, which can never resolve to a site.
  */
-export function getURLLookupAlternatives(input: URL, options: { bypass?: boolean } = {}) {
+export function getURLLookup(input: URL): {
+    url: string;
+    extraPath: string;
+    basePath?: string;
+    changeRequest?: string;
+    revision?: string;
+} | null {
     const url = normalizeURL(input);
-    const bypass = options.bypass ?? shouldBypassLookupAlternatives(url);
-
-    let basePath: string | undefined = undefined;
-    let changeRequest: string | undefined = undefined;
-    let revision: string | undefined = undefined;
-    const alternatives: { url: string; extraPath: string; primary: boolean }[] = [];
-
-    const pushAlternative = (adding: URL, extraPath: string) => {
-        const existing = alternatives.find((alt) => alt.url === adding.toString());
-        if (existing) {
-            if (existing.extraPath !== extraPath) {
-                throw new Error(
-                    `Invalid extraPath ${extraPath} for url ${adding.toString()}, already set to ${
-                        existing.extraPath
-                    }`
-                );
-            }
-            return;
-        }
-
-        // We don't want to push the url if it is the root proxy URL (either https://proxy.gitbook.site or https://proxy.gitbook.site/sites)
-        if (isProxyRootRequest(adding)) {
-            return;
-        }
-
-        alternatives.push({
-            url: adding.toString(),
-            extraPath,
-            primary: adding.toString() === url.toString(),
-        });
-    };
 
     const pathSegments = url.pathname.slice(1).split('/');
-    // Only the content part of the path can be matched against a site URL, the rest goes in the extraPath.
+    // A `~` in an internal path (like `~gitbook/...`) is not a revision or change marker.
     const contentSegments = getContentPathSegments(pathSegments);
     const tildeIndex = contentSegments.indexOf('~');
-    const vIndex = contentSegments.indexOf('v');
+    const kind = tildeIndex >= 0 ? contentSegments[tildeIndex + 1] : undefined;
 
-    // URL looks like a specific content url (with ~/revisions/ or ~/changes/ in the path)
-    // We only start matching after the ~/revisions/ or ~/changes/ segment and we ignore everything before it
-    if (
-        tildeIndex >= 0 &&
-        (contentSegments[tildeIndex + 1] === 'revisions' ||
-            contentSegments[tildeIndex + 1] === 'changes')
-    ) {
-        const revisionOrChangeIdIndex = tildeIndex + 2;
-
-        basePath = contentSegments.slice(tildeIndex, revisionOrChangeIdIndex + 1).join('/');
-        if (contentSegments[tildeIndex + 1] === 'revisions') {
-            revision = contentSegments[revisionOrChangeIdIndex];
-        } else {
-            changeRequest = contentSegments[revisionOrChangeIdIndex];
-        }
-
-        // Match up to the tilde
-        const contentURL = new URL(url);
-        contentURL.pathname = contentSegments.slice(0, tildeIndex).join('/');
-        pushAlternative(contentURL, pathSegments.slice(revisionOrChangeIdIndex + 1).join('/'));
+    if (kind !== 'revisions' && kind !== 'changes') {
+        return isProxyRootRequest(url) ? null : { url: url.toString(), extraPath: '' };
     }
 
-    // Revisions and changes above still need their alternatives to extract the base path.
-    else if (bypass) {
-        pushAlternative(url, '');
+    const idIndex = tildeIndex + 2;
+    const id = contentSegments[idIndex];
+    const contentURL = new URL(url);
+    contentURL.pathname = contentSegments.slice(0, tildeIndex).join('/');
+
+    if (isProxyRootRequest(contentURL)) {
+        return null;
     }
 
-    // URL looks like a collection url (with /v/ in the path)
-    // We only start matching after the /v/ segment and we ignore everything before it
-    // to avoid potentially matching as a page not found under the default space in the collection
-    else if (vIndex >= 0 && contentSegments.length >= vIndex + 2) {
-        const collectionURL = new URL(url);
-        collectionURL.pathname = contentSegments.slice(0, vIndex + 2).join('/');
-
-        pushAlternative(collectionURL, pathSegments.slice(vIndex + 2).join('/'));
-    } else {
-        // Match only with the host, if it can be a custom hostname
-        // It should cover most cases of custom domains, and with caching, it should be fast.
-        if (!url.hostname.includes('.gitbook.io') || contentSegments.length === 0) {
-            const noPathURL = new URL(url);
-            noPathURL.pathname = '/';
-
-            pushAlternative(noPathURL, url.pathname.slice(1));
-        }
-
-        // Otherwise match with the first four segments of the path
-        for (let i = 1; i <= 4; i++) {
-            if (contentSegments.length >= i) {
-                const shortURL = new URL(url);
-                shortURL.pathname = contentSegments.slice(0, i).join('/');
-
-                pushAlternative(shortURL, pathSegments.slice(i).join('/'));
-            }
-        }
-    }
-
-    // Mark the longuest entry to lookup as primary
-    alternatives.sort((a, b) => b.extraPath.length - a.extraPath.length);
-    if (alternatives.length > 0) {
-        alternatives[alternatives.length - 1]!.primary = true;
-    }
-
-    return { urls: alternatives, basePath, changeRequest, revision };
+    return {
+        url: contentURL.toString(),
+        extraPath: pathSegments.slice(idIndex + 1).join('/'),
+        basePath: contentSegments.slice(tildeIndex, idIndex + 1).join('/'),
+        ...(kind === 'revisions' ? { revision: id } : { changeRequest: id }),
+    };
 }
 
 /** Combine a resolved lookup with the remaining requested page path. */

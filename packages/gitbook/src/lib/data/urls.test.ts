@@ -1,11 +1,6 @@
 import { describe, expect, it } from 'bun:test';
 
-import {
-    getURLLookupAlternatives,
-    getURLLookupPathname,
-    normalizeURL,
-    shouldBypassLookupAlternatives,
-} from './urls';
+import { getURLLookup, getURLLookupPathname, normalizeURL } from './urls';
 
 describe('getURLLookupPathname', () => {
     const previewRoot = 'https://sites.gitbook.com/preview/site_example/section';
@@ -15,13 +10,12 @@ describe('getURLLookupPathname', () => {
     it.each(['revisions', 'changes'])(
         'resolves a page in a %s preview from the site-space root',
         (kind) => {
-            const lookup = getURLLookupAlternatives(
+            const lookup = getURLLookup(
                 new URL(`${previewRoot}/~/${kind}/revision-id/${pagePath}`)
-            );
-            const alternative = lookup.urls[0]!;
+            )!;
 
             expect(
-                getURLLookupPathname(alternative, {
+                getURLLookupPathname(lookup, {
                     basePath: '/preview/site_example/section/',
                     pathname: homepagePath,
                 })
@@ -32,12 +26,10 @@ describe('getURLLookupPathname', () => {
     it.each(['revisions', 'changes'])(
         'preserves the custom homepage at a %s preview root',
         (kind) => {
-            const lookup = getURLLookupAlternatives(
-                new URL(`${previewRoot}/~/${kind}/revision-id/`)
-            );
+            const lookup = getURLLookup(new URL(`${previewRoot}/~/${kind}/revision-id/`))!;
 
             expect(
-                getURLLookupPathname(lookup.urls[0]!, {
+                getURLLookupPathname(lookup, {
                     basePath: '/preview/site_example/section/',
                     pathname: homepagePath,
                 })
@@ -45,27 +37,22 @@ describe('getURLLookupPathname', () => {
         }
     );
 
-    it.each(['', '/section/variant'])('resolves a published page below the %s root', (basePath) => {
-        const rootURL = `https://docs.example.com${basePath}`;
-        const lookup = getURLLookupAlternatives(new URL(`${rootURL}/${pagePath}`));
-        const alternative = lookup.urls.find(({ url }) => url === new URL(rootURL).toString())!;
+    it('uses the resolved pathname for a full URL lookup', () => {
+        const lookup = getURLLookup(new URL(`https://docs.example.com/section/${pagePath}`))!;
 
-        expect(alternative).toBeDefined();
         expect(
-            getURLLookupPathname(alternative, {
-                basePath: `${basePath}/`,
-                pathname: homepagePath,
+            getURLLookupPathname(lookup, {
+                basePath: '/section/',
+                pathname: `/${pagePath}`,
             })
-        ).toBe(`/${pagePath}`);
+        ).toBe(`/${pagePath}/`);
     });
 
     it('preserves page resolution without a custom homepage', () => {
-        const lookup = getURLLookupAlternatives(
-            new URL(`${previewRoot}/~/revisions/revision-id/${pagePath}`)
-        );
+        const lookup = getURLLookup(new URL(`${previewRoot}/~/revisions/revision-id/${pagePath}`))!;
 
         expect(
-            getURLLookupPathname(lookup.urls[0]!, {
+            getURLLookupPathname(lookup, {
                 basePath: '/preview/site_example/section/',
                 pathname: '/',
             })
@@ -88,617 +75,90 @@ describe('getURLLookupPathname', () => {
     );
 
     it('preserves a legitimate page prefix for a non-root lookup', () => {
-        const lookup = getURLLookupAlternatives(
-            new URL('https://docs.example.com/section/guide/page')
-        );
-        const alternative = lookup.urls.find(
-            ({ url }) => url === 'https://docs.example.com/section/guide'
-        )!;
-
         expect(
-            getURLLookupPathname(alternative, {
-                basePath: '/section/',
-                pathname: '/guide',
-            })
+            getURLLookupPathname(
+                { url: 'https://docs.example.com/section/guide', extraPath: 'page' },
+                { basePath: '/section/', pathname: '/guide' }
+            )
         ).toBe('/guide/page');
     });
 });
 
-describe('getURLLookupAlternatives', () => {
-    it('should return all URLs up to the root', () => {
-        expect(getURLLookupAlternatives(new URL('https://docs.mycompany.com/a/b/c'))).toEqual({
-            revision: undefined,
-            changeRequest: undefined,
-            basePath: undefined,
-            urls: [
-                {
-                    extraPath: 'a/b/c',
-                    url: 'https://docs.mycompany.com/',
-                    primary: false,
-                },
-                {
-                    extraPath: 'b/c',
-                    url: 'https://docs.mycompany.com/a',
-                    primary: false,
-                },
-                {
-                    extraPath: 'c',
-                    url: 'https://docs.mycompany.com/a/b',
-                    primary: false,
-                },
-                {
-                    extraPath: '',
-                    url: 'https://docs.mycompany.com/a/b/c',
-                    primary: true,
-                },
-            ],
-        });
-
-        expect(getURLLookupAlternatives(new URL('https://docs.mycompany.com/a/b/c/d'))).toEqual({
-            revision: undefined,
-            changeRequest: undefined,
-            basePath: undefined,
-            urls: [
-                {
-                    extraPath: 'a/b/c/d',
-                    url: 'https://docs.mycompany.com/',
-                    primary: false,
-                },
-                {
-                    extraPath: 'b/c/d',
-                    url: 'https://docs.mycompany.com/a',
-                    primary: false,
-                },
-                {
-                    extraPath: 'c/d',
-                    url: 'https://docs.mycompany.com/a/b',
-                    primary: false,
-                },
-                {
-                    extraPath: 'd',
-                    url: 'https://docs.mycompany.com/a/b/c',
-                    primary: false,
-                },
-                {
-                    extraPath: '',
-                    url: 'https://docs.mycompany.com/a/b/c/d',
-                    primary: true,
-                },
-            ],
-        });
+describe('getURLLookup', () => {
+    it.each([
+        'https://docs.mycompany.com/',
+        'https://docs.mycompany.com/a/b/c/d/e',
+        'https://test.gitbook.io/space',
+        'https://test.gitbook.io/v/variant/space',
+        'https://test.gitbook.io/sharelink/v/variant/space',
+        'https://docs.mycompany.com/a/~/b/c/d',
+        'https://docs.mycompany.com/section/variant/~gitbook/ogimage/pageId',
+        'https://org.gitbook.io/~gitbook/icon',
+        'https://docs.mycompany.com/llms-full.txt/100',
+        'https://docs.mycompany.com/section/blog/rss.xml',
+        'https://docs.mycompany.com/a/b/intro.md',
+        'https://proxy.gitbook.site/sites/site_foo/hello/world',
+    ])('looks up the full URL %s', (url) => {
+        expect(getURLLookup(new URL(url))).toEqual({ url, extraPath: '' });
     });
 
-    it('should not match before the variant for a variant url', () => {
-        expect(
-            getURLLookupAlternatives(new URL('https://test.gitbook.io/v/variant/space'))
-        ).toEqual({
-            revision: undefined,
-            changeRequest: undefined,
-            basePath: undefined,
-            urls: [
-                {
-                    url: 'https://test.gitbook.io/v/variant',
-                    extraPath: 'space',
-                    primary: true,
-                },
-            ],
-        });
-    });
-
-    it('should not match before the variant for a variant in a share link', () => {
-        expect(
-            getURLLookupAlternatives(new URL('https://test.gitbook.io/sharelink/v/variant/space'))
-        ).toEqual({
-            revision: undefined,
-            changeRequest: undefined,
-            basePath: undefined,
-            urls: [
-                {
-                    url: 'https://test.gitbook.io/sharelink/v/variant',
-                    extraPath: 'space',
-                    primary: true,
-                },
-            ],
-        });
-    });
-
-    it('should not match before a revision in a variant', () => {
-        expect(
-            getURLLookupAlternatives(
-                new URL('https://test.gitbook.io/v/variant/~/revisions/id/rest')
-            )
-        ).toEqual({
-            revision: 'id',
-            changeRequest: undefined,
-            basePath: '~/revisions/id',
-            urls: [
-                {
-                    url: 'https://test.gitbook.io/v/variant',
-                    extraPath: 'rest',
-                    primary: true,
-                },
-            ],
+    it('looks up the normalized URL', () => {
+        expect(getURLLookup(new URL('https://docs.mycompany.com//hello/'))).toEqual({
+            url: 'https://docs.mycompany.com/hello',
+            extraPath: '',
         });
     });
 
     it('should not match before a revision ID', () => {
-        expect(
-            getURLLookupAlternatives(new URL('https://docs.mycompany.com/~/revisions/id/a/b/c'))
-        ).toEqual({
-            revision: 'id',
-            changeRequest: undefined,
+        expect(getURLLookup(new URL('https://docs.mycompany.com/~/revisions/id/a/b/c'))).toEqual({
+            url: 'https://docs.mycompany.com/',
+            extraPath: 'a/b/c',
             basePath: '~/revisions/id',
-            urls: [
-                {
-                    extraPath: 'a/b/c',
-                    url: 'https://docs.mycompany.com/',
-                    primary: true,
-                },
-            ],
+            revision: 'id',
         });
     });
 
     it('should not match before a change request ID', () => {
-        expect(
-            getURLLookupAlternatives(new URL('https://docs.mycompany.com/~/changes/id/hello'))
-        ).toEqual({
-            revision: undefined,
-            changeRequest: 'id',
+        expect(getURLLookup(new URL('https://docs.mycompany.com/~/changes/id/hello'))).toEqual({
+            url: 'https://docs.mycompany.com/',
+            extraPath: 'hello',
             basePath: '~/changes/id',
-            urls: [
-                {
-                    extraPath: 'hello',
-                    url: 'https://docs.mycompany.com/',
-                    primary: true,
-                },
-            ],
-        });
-    });
-
-    it('should normalize duplicated slashes', () => {
-        expect(getURLLookupAlternatives(new URL('https://docs.mycompany.com//hello'))).toEqual({
-            revision: undefined,
-            changeRequest: undefined,
-            basePath: undefined,
-            urls: [
-                {
-                    extraPath: 'hello',
-                    url: 'https://docs.mycompany.com/',
-                    primary: false,
-                },
-                {
-                    extraPath: '',
-                    url: 'https://docs.mycompany.com/hello',
-                    primary: true,
-                },
-            ],
-        });
-    });
-
-    it('should normalize trailing slash', () => {
-        expect(getURLLookupAlternatives(new URL('https://docs.mycompany.com/hello/'))).toEqual({
-            revision: undefined,
-            changeRequest: undefined,
-            basePath: undefined,
-            urls: [
-                {
-                    extraPath: 'hello',
-                    url: 'https://docs.mycompany.com/',
-                    primary: false,
-                },
-                {
-                    extraPath: '',
-                    url: 'https://docs.mycompany.com/hello',
-                    primary: true,
-                },
-            ],
-        });
-    });
-
-    it('should match a variant in a share-link', () => {
-        expect(
-            getURLLookupAlternatives(new URL('https://test.gitbook.io/sharelink/v/variant/space'))
-        ).toEqual({
-            revision: undefined,
-            changeRequest: undefined,
-            basePath: undefined,
-            urls: [
-                {
-                    url: 'https://test.gitbook.io/sharelink/v/variant',
-                    extraPath: 'space',
-                    primary: true,
-                },
-            ],
+            changeRequest: 'id',
         });
     });
 
     it('should match a revision in a variant in a share-link', () => {
         expect(
-            getURLLookupAlternatives(
+            getURLLookup(
                 new URL('https://test.gitbook.io/sharelink/v/variant/~/revisions/id/a/b/c')
             )
         ).toEqual({
-            revision: 'id',
-            changeRequest: undefined,
+            url: 'https://test.gitbook.io/sharelink/v/variant',
+            extraPath: 'a/b/c',
             basePath: '~/revisions/id',
-            urls: [
-                {
-                    url: 'https://test.gitbook.io/sharelink/v/variant',
-                    extraPath: 'a/b/c',
-                    primary: true,
-                },
-            ],
-        });
-    });
-
-    it('should match a change request in a variant in a share-link', () => {
-        expect(
-            getURLLookupAlternatives(
-                new URL('https://test.gitbook.io/sharelink/v/variant/~/changes/id/a/b/c')
-            )
-        ).toEqual({
-            revision: undefined,
-            changeRequest: 'id',
-            basePath: '~/changes/id',
-            urls: [
-                {
-                    url: 'https://test.gitbook.io/sharelink/v/variant',
-                    extraPath: 'a/b/c',
-                    primary: true,
-                },
-            ],
-        });
-    });
-
-    it('should limit depth', () => {
-        expect(getURLLookupAlternatives(new URL('https://docs.mycompany.com/a/b/c/d/e'))).toEqual({
-            revision: undefined,
-            changeRequest: undefined,
-            basePath: undefined,
-            urls: [
-                {
-                    extraPath: 'a/b/c/d/e',
-                    url: 'https://docs.mycompany.com/',
-                    primary: false,
-                },
-                {
-                    extraPath: 'b/c/d/e',
-                    url: 'https://docs.mycompany.com/a',
-                    primary: false,
-                },
-                {
-                    extraPath: 'c/d/e',
-                    url: 'https://docs.mycompany.com/a/b',
-                    primary: false,
-                },
-                {
-                    extraPath: 'd/e',
-                    url: 'https://docs.mycompany.com/a/b/c',
-                    primary: false,
-                },
-                {
-                    extraPath: 'e',
-                    url: 'https://docs.mycompany.com/a/b/c/d',
-                    primary: true,
-                },
-            ],
-        });
-    });
-
-    it('should ignore dummy ~', () => {
-        expect(getURLLookupAlternatives(new URL('https://docs.mycompany.com/a/~/b/c/d'))).toEqual({
-            revision: undefined,
-            changeRequest: undefined,
-            basePath: undefined,
-            urls: [
-                {
-                    extraPath: 'a/~/b/c/d',
-                    url: 'https://docs.mycompany.com/',
-                    primary: false,
-                },
-                {
-                    extraPath: '~/b/c/d',
-                    url: 'https://docs.mycompany.com/a',
-                    primary: false,
-                },
-                {
-                    extraPath: 'b/c/d',
-                    url: 'https://docs.mycompany.com/a/~',
-                    primary: false,
-                },
-                {
-                    extraPath: 'c/d',
-                    url: 'https://docs.mycompany.com/a/~/b',
-                    primary: false,
-                },
-                {
-                    extraPath: 'd',
-                    primary: true,
-                    url: 'https://docs.mycompany.com/a/~/b/c',
-                },
-            ],
-        });
-    });
-
-    it('should match a root gitbook.io domain', () => {
-        expect(getURLLookupAlternatives(new URL('https://test.gitbook.io/'))).toEqual({
-            revision: undefined,
-            changeRequest: undefined,
-            basePath: undefined,
-            urls: [
-                {
-                    url: 'https://test.gitbook.io/',
-                    extraPath: '',
-                    primary: true,
-                },
-            ],
-        });
-    });
-
-    it('should skip root gitbook.io domain if a path is present', () => {
-        expect(getURLLookupAlternatives(new URL('https://test.gitbook.io/space'))).toEqual({
-            revision: undefined,
-            changeRequest: undefined,
-            basePath: undefined,
-            urls: [
-                {
-                    url: 'https://test.gitbook.io/space',
-                    extraPath: '',
-                    primary: true,
-                },
-            ],
-        });
-    });
-
-    it('should match a root custom domain', () => {
-        expect(getURLLookupAlternatives(new URL('https://docs.mycompany.com/'))).toEqual({
-            revision: undefined,
-            changeRequest: undefined,
-            basePath: undefined,
-            urls: [
-                {
-                    url: 'https://docs.mycompany.com/',
-                    extraPath: '',
-                    primary: true,
-                },
-            ],
-        });
-    });
-
-    it('should skip proxy root URLs', () => {
-        expect(
-            getURLLookupAlternatives(
-                new URL('https://proxy.gitbook.site/sites/site_foo/hello/world')
-            )
-        ).toEqual({
-            revision: undefined,
-            changeRequest: undefined,
-            basePath: undefined,
-            urls: [
-                {
-                    url: 'https://proxy.gitbook.site/sites/site_foo',
-                    extraPath: 'hello/world',
-                    primary: false,
-                },
-                {
-                    url: 'https://proxy.gitbook.site/sites/site_foo/hello',
-                    extraPath: 'world',
-                    primary: false,
-                },
-                {
-                    url: 'https://proxy.gitbook.site/sites/site_foo/hello/world',
-                    extraPath: '',
-                    primary: true,
-                },
-            ],
-        });
-    });
-
-    it('should not match internal paths as part of the site URL', () => {
-        expect(
-            getURLLookupAlternatives(
-                new URL('https://docs.mycompany.com/section/variant/~gitbook/ogimage/pageId')
-            )
-        ).toEqual({
-            revision: undefined,
-            changeRequest: undefined,
-            basePath: undefined,
-            urls: [
-                {
-                    url: 'https://docs.mycompany.com/',
-                    extraPath: 'section/variant/~gitbook/ogimage/pageId',
-                    primary: false,
-                },
-                {
-                    url: 'https://docs.mycompany.com/section',
-                    extraPath: 'variant/~gitbook/ogimage/pageId',
-                    primary: false,
-                },
-                {
-                    url: 'https://docs.mycompany.com/section/variant',
-                    extraPath: '~gitbook/ogimage/pageId',
-                    primary: true,
-                },
-            ],
-        });
-    });
-
-    it('should match the root of a gitbook.io domain for an internal path', () => {
-        expect(getURLLookupAlternatives(new URL('https://org.gitbook.io/~gitbook/icon'))).toEqual({
-            revision: undefined,
-            changeRequest: undefined,
-            basePath: undefined,
-            urls: [
-                {
-                    url: 'https://org.gitbook.io/',
-                    extraPath: '~gitbook/icon',
-                    primary: true,
-                },
-            ],
-        });
-
-        expect(
-            getURLLookupAlternatives(new URL('https://org.gitbook.io/docs/~gitbook/search'))
-        ).toEqual({
-            revision: undefined,
-            changeRequest: undefined,
-            basePath: undefined,
-            urls: [
-                {
-                    url: 'https://org.gitbook.io/docs',
-                    extraPath: '~gitbook/search',
-                    primary: true,
-                },
-            ],
-        });
-    });
-
-    it('should not match site root files', () => {
-        for (const file of ['llms.txt', 'llms-full.txt/100', 'robots.txt', 'sitemap.xml']) {
-            expect(getURLLookupAlternatives(new URL(`https://docs.mycompany.com/${file}`))).toEqual(
-                {
-                    revision: undefined,
-                    changeRequest: undefined,
-                    basePath: undefined,
-                    urls: [
-                        {
-                            url: 'https://docs.mycompany.com/',
-                            extraPath: file,
-                            primary: true,
-                        },
-                    ],
-                }
-            );
-        }
-    });
-
-    it('should not match a RSS feed at the end of a page path', () => {
-        expect(
-            getURLLookupAlternatives(new URL('https://docs.mycompany.com/section/blog/rss.xml'))
-        ).toEqual({
-            revision: undefined,
-            changeRequest: undefined,
-            basePath: undefined,
-            urls: [
-                {
-                    url: 'https://docs.mycompany.com/',
-                    extraPath: 'section/blog/rss.xml',
-                    primary: false,
-                },
-                {
-                    url: 'https://docs.mycompany.com/section',
-                    extraPath: 'blog/rss.xml',
-                    primary: false,
-                },
-                {
-                    url: 'https://docs.mycompany.com/section/blog',
-                    extraPath: 'rss.xml',
-                    primary: true,
-                },
-            ],
-        });
-    });
-
-    it('should keep matching up to the variant for an internal path', () => {
-        expect(
-            getURLLookupAlternatives(
-                new URL('https://test.gitbook.io/sharelink/v/variant/~gitbook/search')
-            )
-        ).toEqual({
-            revision: undefined,
-            changeRequest: undefined,
-            basePath: undefined,
-            urls: [
-                {
-                    url: 'https://test.gitbook.io/sharelink/v/variant',
-                    extraPath: '~gitbook/search',
-                    primary: true,
-                },
-            ],
+            revision: 'id',
         });
     });
 
     it('should keep the revision base path for an internal path', () => {
         expect(
-            getURLLookupAlternatives(
+            getURLLookup(
                 new URL('https://docs.mycompany.com/~/revisions/id/a/~gitbook/ogimage/pageId')
             )
         ).toEqual({
-            revision: 'id',
-            changeRequest: undefined,
+            url: 'https://docs.mycompany.com/',
+            extraPath: 'a/~gitbook/ogimage/pageId',
             basePath: '~/revisions/id',
-            urls: [
-                {
-                    url: 'https://docs.mycompany.com/',
-                    extraPath: 'a/~gitbook/ogimage/pageId',
-                    primary: true,
-                },
-            ],
+            revision: 'id',
         });
     });
 
-    it('should only match internal paths at the end of the URL', () => {
-        expect(
-            getURLLookupAlternatives(new URL('https://docs.mycompany.com/a/llms.txt/b'))
-        ).toEqual({
-            revision: undefined,
-            changeRequest: undefined,
-            basePath: undefined,
-            urls: [
-                {
-                    url: 'https://docs.mycompany.com/',
-                    extraPath: 'a/llms.txt/b',
-                    primary: false,
-                },
-                {
-                    url: 'https://docs.mycompany.com/a',
-                    extraPath: 'llms.txt/b',
-                    primary: false,
-                },
-                {
-                    url: 'https://docs.mycompany.com/a/llms.txt',
-                    extraPath: 'b',
-                    primary: false,
-                },
-                {
-                    url: 'https://docs.mycompany.com/a/llms.txt/b',
-                    extraPath: '',
-                    primary: true,
-                },
-            ],
-        });
-    });
-
-    it('should not treat a markdown page path as internal', () => {
-        expect(
-            getURLLookupAlternatives(new URL('https://docs.mycompany.com/a/b/intro.md'))
-        ).toEqual({
-            revision: undefined,
-            changeRequest: undefined,
-            basePath: undefined,
-            urls: [
-                {
-                    url: 'https://docs.mycompany.com/',
-                    extraPath: 'a/b/intro.md',
-                    primary: false,
-                },
-                {
-                    url: 'https://docs.mycompany.com/a',
-                    extraPath: 'b/intro.md',
-                    primary: false,
-                },
-                {
-                    url: 'https://docs.mycompany.com/a/b',
-                    extraPath: 'intro.md',
-                    primary: false,
-                },
-                {
-                    url: 'https://docs.mycompany.com/a/b/intro.md',
-                    extraPath: '',
-                    primary: true,
-                },
-            ],
-        });
+    it.each([
+        'https://proxy.gitbook.site/',
+        'https://proxy.gitbook.site/sites',
+        'https://proxy.gitbook.site/sites/~/changes/id/hello',
+    ])('should skip the proxy root URL %s', (url) => {
+        expect(getURLLookup(new URL(url))).toBeNull();
     });
 });
 
@@ -835,56 +295,5 @@ describe('normalizeURL with encoded paths', () => {
         expect(result.pathname).toBe('/some-page');
         // The rison param must survive normalizeURL intact.
         expect(result.searchParams.get('filter')).toBe(risonValue);
-    });
-});
-
-describe('getURLLookupAlternatives with bypass', () => {
-    it('only looks up the full URL', () => {
-        expect(
-            getURLLookupAlternatives(new URL('https://docs.mycompany.com/a/b/c'), { bypass: true })
-        ).toEqual({
-            revision: undefined,
-            changeRequest: undefined,
-            basePath: undefined,
-            urls: [{ url: 'https://docs.mycompany.com/a/b/c', extraPath: '', primary: true }],
-        });
-    });
-
-    it('only looks up the full URL for a variant', () => {
-        expect(
-            getURLLookupAlternatives(new URL('https://test.gitbook.io/v/variant/space'), {
-                bypass: true,
-            }).urls
-        ).toEqual([
-            { url: 'https://test.gitbook.io/v/variant/space', extraPath: '', primary: true },
-        ]);
-    });
-
-    it.each(['revisions', 'changes'])('keeps the alternatives for %s', (kind) => {
-        const url = new URL(`https://docs.mycompany.com/a/~/${kind}/id/page`);
-        expect(getURLLookupAlternatives(url, { bypass: true })).toEqual(
-            getURLLookupAlternatives(url, { bypass: false })
-        );
-    });
-});
-
-describe('shouldBypassLookupAlternatives', () => {
-    const bypassURLs = ['https://docs.mycompany.com/section', 'https://other.mycompany.com/'];
-
-    it.each([
-        'https://docs.mycompany.com/section',
-        'https://docs.mycompany.com/section/page',
-        'https://other.mycompany.com/',
-        'https://other.mycompany.com/page',
-    ])('matches %s', (url) => {
-        expect(shouldBypassLookupAlternatives(normalizeURL(new URL(url)), bypassURLs)).toBe(true);
-    });
-
-    it.each([
-        'https://docs.mycompany.com/sectionpage',
-        'https://docs.mycompany.com/',
-        'https://unknown.mycompany.com/section',
-    ])('does not match %s', (url) => {
-        expect(shouldBypassLookupAlternatives(normalizeURL(new URL(url)), bypassURLs)).toBe(false);
     });
 });
