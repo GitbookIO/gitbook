@@ -5,6 +5,7 @@ import type { DocumentBlockCode } from '@gitbook/api';
 
 import { AnnotationPopover } from '../Annotation/AnnotationPopover';
 import type { BlockProps } from '../Block';
+import { getCommentKeyAttributes } from '../utils/commentAnchors';
 import { AskAICodeButton } from './AskAICodeButton';
 import { CopyCodeButton } from './CopyCodeButton';
 import type { HighlightLine, HighlightTheme, HighlightToken } from './highlight-tokens';
@@ -12,6 +13,8 @@ import { tcls } from '@/lib/tailwind';
 
 type CodeBlockRendererProps = Pick<BlockProps<DocumentBlockCode>, 'block' | 'style'> & {
     theme: HighlightTheme;
+    /** Node key for comments, set only where commenting is possible. */
+    commentKey?: string;
     'aria-busy'?: boolean;
     id?: string;
     /**
@@ -29,7 +32,7 @@ export const CodeBlockRenderer = forwardRef(function CodeBlockRenderer(
     props: CodeBlockRendererProps,
     ref: React.ForwardedRef<HTMLDivElement>
 ) {
-    const { block, style, theme, 'aria-busy': ariaBusy, isPrint, embedded } = props;
+    const { block, style, theme, 'aria-busy': ariaBusy, isPrint, embedded, commentKey } = props;
 
     const withLineNumbers = Boolean(block.data.lineNumbers) && block.nodes.length > 1;
     const withWrap = block.data.overflow === 'wrap';
@@ -50,6 +53,7 @@ export const CodeBlockRenderer = forwardRef(function CodeBlockRenderer(
         <div
             ref={ref}
             id={codeId}
+            {...getCommentKeyAttributes(commentKey)}
             aria-busy={ariaBusy}
             className={tcls(
                 'group/codeblock shiki relative flex shrink flex-col overflow-hidden print:overflow-visible',

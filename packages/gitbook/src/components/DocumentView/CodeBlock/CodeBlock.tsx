@@ -8,6 +8,7 @@ import type {
 
 import type { BlockProps } from '../Block';
 import { Blocks } from '../Blocks';
+import { getCommentKeyProp, getCommentMarkerProps } from '../utils';
 import { ClientCodeBlock } from './ClientCodeBlock';
 import { CodeBlockRenderer } from './CodeBlockRenderer';
 import { highlight } from './highlight';
@@ -59,14 +60,20 @@ export async function CodeBlock(
                     return null;
                 }
                 return (
-                    <Blocks
+                    // The app doesn't allow comments inside annotation bodies.
+                    <div
                         key={index}
-                        document={document}
-                        ancestorBlocks={[]}
-                        context={context}
-                        nodes={fragment.nodes}
-                        style="space-y-4"
-                    />
+                        {...getCommentMarkerProps(context, 'data-comment-ignore')}
+                        className="contents"
+                    >
+                        <Blocks
+                            document={document}
+                            ancestorBlocks={[]}
+                            context={context}
+                            nodes={fragment.nodes}
+                            style="space-y-4"
+                        />
+                    </div>
                 );
             })();
 
@@ -92,6 +99,7 @@ export async function CodeBlock(
                 theme={theme}
                 isPrint={context.mode === 'print'}
                 embedded={embedded}
+                {...getCommentKeyProp(context, block.key)}
             />
         );
     }
@@ -114,6 +122,7 @@ export async function CodeBlock(
         mode: context.mode,
         themes,
         embedded,
+        ...getCommentKeyProp(context, block.key),
     };
 
     return (

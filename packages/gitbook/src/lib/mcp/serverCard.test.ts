@@ -334,6 +334,18 @@ describe('buildSiteMcpServerCard', () => {
             expect(search).not.toHaveProperty('inputSchema');
         });
 
+        it('gives example page URLs under the path of a subpath site', () => {
+            const context = makeContext({ host: 'docs.example.com', siteBasePath: '/product/' });
+            const tools = createSiteMcpTools(context, { request });
+            const getPage = tools.find((tool) => tool.name === 'getPage');
+            const pageUrl = tools.find((tool) => tool.name === 'sendFeedback')?.inputSchema.pageUrl;
+            const example = 'https://docs.example.com/product/getting-started';
+
+            expect(getPage?.description).toContain(`(e.g. ${example})`);
+            expect(pageUrl?.description).toContain(`(e.g. ${example})`);
+            expect(pageUrl?.parse('getting-started')).toBe(example);
+        });
+
         it('omits askQuestion when the site has no AI mode', () => {
             const withAI = buildCard({ aiMode: CustomizationAIMode.Assistant });
             const withoutAI = buildCard({ aiMode: CustomizationAIMode.None });

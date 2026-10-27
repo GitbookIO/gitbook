@@ -1,3 +1,4 @@
+import { getCommentCellProps } from '../utils';
 import { getTableCellMerge } from './cellMerges';
 import { getColumnWidth, getViewGridLayout, hasVisibleHeader } from './layout';
 import { RecordColumnValue } from './RecordColumnValue';
@@ -5,7 +6,7 @@ import { StickyViewGrid } from './StickyViewGrid';
 import type { TableGridViewProps } from './Table';
 import { TableHoverTable } from './TableHoverTable';
 import { TableSearchTableBody } from './TableSearch';
-import { type VerticalAlignment, getColumnAlignment, getColumnVerticalAlignment } from './utils';
+import { getColumnAlignment, getColumnVerticalAlignment, type VerticalAlignment } from './utils';
 import { tcls } from '@/lib/tailwind';
 
 /** Semantic table renderer used when a cell spans multiple records. */
@@ -141,7 +142,7 @@ function NativeViewGridBody(
         stickyFirstColumn: boolean;
     }
 ) {
-    const { block, view, records, withHeader, stickyFirstColumn, cellMergeLayout } = props;
+    const { block, view, records, withHeader, stickyFirstColumn, cellMergeLayout, context } = props;
     const firstVisibleColumn = view.columns[0];
     const lastVisibleColumn = view.columns.at(-1);
     const recordsById = new Map(records.map((record) => [record[0], record] as const));
@@ -219,6 +220,7 @@ function NativeViewGridBody(
                                             colSpan={colSpan}
                                             aria-rowspan={rowSpan}
                                             aria-colspan={colSpan}
+                                            {...getCommentCellProps(context, recordId, column)}
                                             data-table-row-start={recordIndex}
                                             data-table-row-end={
                                                 recordIndex + (cellMerge?.merge.rowSpan ?? 1) - 1

@@ -27,6 +27,10 @@ declare module 'eval-estree-expression' {
          * Used with the variables method to return nested variables (e.g., variables with dot notation, like foo.bar.baz). Default: undefined
          */
         withMembers?: boolean;
+        /**
+         * Custom visitors by node type, taking precedence over the built-in ones. Called with the evaluator as `this`.
+         */
+        visitors?: Record<string, Function>;
     }
 
     /**

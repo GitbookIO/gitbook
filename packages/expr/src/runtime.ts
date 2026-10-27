@@ -11,10 +11,11 @@ import {
 import { parse as parseLoose } from 'acorn-loose';
 import escodegen from 'escodegen';
 import evalESTreeExpr from 'eval-estree-expression';
-const { evaluate, variables } = evalESTreeExpr;
+const { variables } = evalESTreeExpr;
 
 import { AutoComplete } from './autocomplete';
 import { ExpressionError } from './errors';
+import { UnsafeExpressionError, evaluateRestricted, validateExpression } from './restricted';
 import type { SymbolsTable } from './symbols';
 import type { TemplatePart } from './template';
 import { parseTemplate as parseTemplateParts } from './template';
@@ -39,6 +40,7 @@ export class ExpressionRuntime {
 
     /**
      * Evaluates an expression based on the given inputs/context.
+     * Throws an `ExpressionError` for invalid expressions, including those the restrictions don't allow.
      */
     public evaluate(expr: string, inputs: object): unknown {
         try {
@@ -48,12 +50,12 @@ export class ExpressionRuntime {
                 throw new ExpressionError('Invalid nodes found when parsing');
             }
 
-            return evaluate.sync<Expression>(parsed.result, inputs, {
-                functions: true,
-                withMembers: true,
-                generate: escodegen.generate,
-            });
+            return evaluateRestricted(parsed.result, inputs);
         } catch (error) {
+            // Keep the location, so that editors can point at the offending token.
+            if (error instanceof UnsafeExpressionError) {
+                throw error;
+            }
             throw error instanceof Error
                 ? new ExpressionError(error.message)
                 : new ExpressionError('Unexpected error');
@@ -213,6 +215,11 @@ export class ExpressionRuntime {
             // Return information on the other nodes as invalid nodes
             const invalidNodes = ast.body.filter(filterOutModuleDeclarationStatement);
 
+            // Loose parsing serves autocomplete on partial expressions, which are expected to be incomplete.
+            if (!options.loose) {
+                validateRestrictedExpression(expr, statement.expression);
+            }
+
             return {
                 result: statement.expression,
                 invalidNodes,
@@ -265,6 +272,25 @@ function createExpressionErrorFromSyntaxError(
 
     return new ExpressionError(errorMessage, loc, token);
 }
+
+/**
+ * Validate an expression against the restrictions, pointing the error at the offending token for editors.
+ */
+function validateRestrictedExpression(code: string, expression: Expression): void {
+    try {
+        validateExpression(expression);
+    } catch (error) {
+        if (error instanceof UnsafeExpressionError && error.location) {
+            throw new UnsafeExpressionError(
+                error.message,
+                error.location,
+                getTokenAtLoc(code, error.location)
+            );
+        }
+        throw error;
+    }
+}
+
 function getTokenAtLoc(code: string, errorLoc: Position): Token | undefined {
     const tokens = tokenizer(code, {
         ecmaVersion: 'latest',

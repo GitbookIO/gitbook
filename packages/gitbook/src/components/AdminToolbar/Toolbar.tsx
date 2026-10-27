@@ -1,12 +1,6 @@
 'use client';
-import {
-    AnimatePresence,
-    type MotionValue,
-    motion,
-    useReducedMotion,
-    useSpring,
-} from 'motion/react';
-import React, { isValidElement } from 'react';
+import { type MotionValue, motion, useReducedMotion, useSpring } from 'motion/react';
+import React from 'react';
 
 import { Icon, type IconName, IconStyle } from '@gitbook/icons';
 
@@ -15,7 +9,7 @@ import { AnimatedLogo } from './AnimatedLogo';
 import { useToolbarControls } from './ToolbarControlsContext';
 import { ToolbarVisibilityHint } from './ToolbarVisibilityHint';
 import { getCopyVariants, toolbarEasings } from './transitions';
-import { useMagnificationEffect } from './useMagnificationEffect';
+import { TOOLTIP_OFFSET, useMagnificationEffect } from './useMagnificationEffect';
 import { tcls } from '@/lib/tailwind';
 
 const DURATION_LOGO_APPEARANCE = 2000;
@@ -108,63 +102,93 @@ export function Toolbar(props: ToolbarProps) {
     return (
         <motion.div
             data-testid="admin-toolbar"
-            className="fixed bottom-5 left-1/2 z-40 w-auto max-w-xl -translate-x-1/2 transform px-4"
+            // Centered with `inset-x-0 mx-auto`: at `left-1/2` it could only grow to half the viewport,
+            // which pushed the logo out of the pill.
+            className="fixed inset-x-0 bottom-5 z-40 mx-auto w-fit max-w-xl px-4"
         >
             <ToolbarVisibilityHint show={showHint} />
 
-            <AnimatePresence mode="wait">
+            <motion.div
+                onClick={() => {
+                    if (minified) {
+                        setShouldAnimateLogo(false);
+                        onMinifiedChange(false);
+                    }
+                }}
+                // Only minifying and expanding animate: content width changes (e.g. the date
+                // format) would otherwise run a bouncy scale animation that stretches the content.
+                layout
+                layoutDependency={minified}
+                onLayoutAnimationComplete={() => {
+                    if (!minified) {
+                        setShowHint(true);
+                    }
+                }}
+                transition={toolbarEasings.spring}
+                className={tcls(
+                    minified ? 'cursor-pointer' : 'pr-2 pl-3.5',
+                    'relative',
+                    'flex',
+                    'items-center',
+                    'justify-center',
+                    'min-h-11',
+                    'min-w-12',
+                    'h-12',
+                    'py-2',
+                    'origin-center',
+                    'border-[0.5px] border-neutral-5 border-solid dark:border-neutral-8',
+                    'bg-[var(--toolbar-bg)]'
+                )}
+                style={PILL_STYLE}
+            >
+                {/* Logo — double-click to minimize */}
                 <motion.div
-                    onClick={() => {
-                        if (minified) {
-                            setShouldAnimateLogo(false);
-                            onMinifiedChange(false);
-                        }
-                    }}
                     layout
-                    onLayoutAnimationComplete={() => {
-                        if (!minified) {
-                            setShowHint(true);
-                        }
+                    layoutDependency={minified}
+                    onDoubleClick={(e) => {
+                        if (minified) return;
+                        e.stopPropagation();
+                        window.getSelection()?.removeAllRanges();
+                        onMinifiedChange(true);
                     }}
-                    transition={toolbarEasings.spring}
-                    className={tcls(
-                        minified ? 'cursor-pointer' : 'pr-2 pl-3.5',
-                        'relative',
-                        'flex',
-                        'items-center',
-                        'justify-center',
-                        'min-h-11',
-                        'min-w-12',
-                        'h-12',
-                        'py-2',
-                        'origin-center',
-                        'border-[0.5px] border-neutral-5 border-solid dark:border-neutral-8',
-                        'bg-[var(--toolbar-bg)]'
-                    )}
-                    style={PILL_STYLE}
                 >
-                    {/* Logo — double-click to minimize */}
+                    <AnimatedLogo shouldAnimate={shouldAnimateLogo} />
+                </motion.div>
+
+                {/* A layout child, so it's counter-scaled while the pill expands. */}
+                {!minified ? (
                     <motion.div
                         layout
-                        onDoubleClick={(e) => {
-                            if (minified) return;
-                            e.stopPropagation();
-                            window.getSelection()?.removeAllRanges();
-                            onMinifiedChange(true);
-                        }}
+                        layoutDependency={minified}
+                        className="flex min-w-0 items-center"
                     >
-                        <AnimatedLogo shouldAnimate={shouldAnimateLogo} />
+                        {children}
                     </motion.div>
-
-                    {!minified ? children : null}
-                </motion.div>
-            </AnimatePresence>
+                ) : null}
+            </motion.div>
         </motion.div>
     );
 }
 
 export function ToolbarBody(props: { children: React.ReactNode }) {
-    return <div className="flex flex-col items-start px-3">{props.children}</div>;
+    // Shrinks so a long title truncates, but keeps room for the longest date format.
+    return <div className="flex min-w-40 flex-col items-start px-3">{props.children}</div>;
+}
+
+const MAGNIFICATION_SPRING = { stiffness: 400, damping: 30 };
+
+/** A button's magnification, and the unscaled box to place its tooltip against. */
+type ToolbarSlot = {
+    scale: MotionValue<number>;
+    x: MotionValue<number>;
+    anchorRef: React.RefObject<HTMLDivElement | null>;
+};
+
+const ToolbarSlotContext = React.createContext<ToolbarSlot | null>(null);
+
+/** The magnification of the toolbar button group slot this is rendered in, if any. */
+export function useToolbarSlot() {
+    return React.useContext(ToolbarSlotContext);
 }
 
 export function ToolbarButtonGroup(props: { children: React.ReactNode }) {
@@ -172,8 +196,8 @@ export function ToolbarButtonGroup(props: { children: React.ReactNode }) {
     const containerRef = React.useRef<HTMLDivElement>(null);
 
     const buttonChildren = React.Children.toArray(children).filter((child) => !!child);
-    const { buttonMotionValues } = useMagnificationEffect({
-        childrenCount: buttonChildren.length,
+    const { motionValues } = useMagnificationEffect({
+        slotCount: buttonChildren.length,
         containerRef,
     });
 
@@ -183,28 +207,48 @@ export function ToolbarButtonGroup(props: { children: React.ReactNode }) {
             variants={toolbarEasings.parent}
             initial="hidden"
             animate="show"
-            className="flex items-center gap-1 overflow-visible pl-4 pr-2"
+            // `relative`: the magnification measures slots by their `offsetLeft` in here.
+            className="relative flex items-center gap-1 overflow-visible pl-4 pr-2"
         >
             {buttonChildren.map((child, index) => {
-                const childEl = child as React.ReactElement;
-                const childKey = childEl.key ?? `toolbar-button-${index}`;
-                return (
-                    <ToolbarButtonWrapper
-                        key={childKey}
-                        child={childEl}
-                        rawMotionValues={buttonMotionValues[index]}
-                    />
-                );
+                const values = motionValues[index];
+                return values ? (
+                    <ToolbarSlot
+                        key={React.isValidElement(child) && child.key ? child.key : index}
+                        scale={values.scale}
+                        x={values.x}
+                    >
+                        {child}
+                    </ToolbarSlot>
+                ) : null;
             })}
         </motion.div>
     );
 }
 
+function ToolbarSlot(props: {
+    scale: MotionValue<number>;
+    x: MotionValue<number>;
+    children: React.ReactNode;
+}) {
+    const anchorRef = React.useRef<HTMLDivElement>(null);
+    const scale = useSpring(props.scale, MAGNIFICATION_SPRING);
+    const x = useSpring(props.x, MAGNIFICATION_SPRING);
+    const slot = React.useMemo(() => ({ scale, x, anchorRef }), [scale, x]);
+
+    return (
+        <motion.div
+            ref={anchorRef}
+            variants={toolbarEasings.staggeringChild}
+            // Buttons can render null (e.g. no changed pages): don't leave a gap in the group.
+            className="relative empty:hidden"
+        >
+            <ToolbarSlotContext.Provider value={slot}>{props.children}</ToolbarSlotContext.Provider>
+        </motion.div>
+    );
+}
+
 export interface ToolbarButtonProps extends Omit<React.HTMLProps<HTMLAnchorElement>, 'title'> {
-    motionValues?: {
-        scale: MotionValue<number>;
-        x: MotionValue<number>;
-    };
     icon: IconName;
     iconClassName?: string;
     title?: React.ReactNode;
@@ -212,19 +256,10 @@ export interface ToolbarButtonProps extends Omit<React.HTMLProps<HTMLAnchorEleme
 }
 
 export const ToolbarButton = React.forwardRef<HTMLDivElement, ToolbarButtonProps>((props, ref) => {
-    const {
-        title,
-        disabled,
-        motionValues,
-        className,
-        style,
-        href,
-        onClick,
-        icon,
-        iconClassName,
-        children,
-    } = props;
+    const { title, disabled, className, style, href, onClick, icon, iconClassName, children } =
+        props;
     const reduceMotion = useReducedMotion();
+    const slot = useToolbarSlot();
 
     const anchor = (
         <motion.a
@@ -233,23 +268,11 @@ export const ToolbarButton = React.forwardRef<HTMLDivElement, ToolbarButtonProps
             target="_blank"
             rel="noopener noreferrer"
             style={
-                reduceMotion
-                    ? undefined
-                    : {
-                          scale: motionValues?.scale,
-                          x: motionValues?.x,
-                          transformOrigin: 'bottom center',
-                          zIndex: motionValues?.scale ? 10 : 'auto',
-                          ...style,
-                      }
+                reduceMotion || !slot
+                    ? style
+                    : { scale: slot.scale, x: slot.x, transformOrigin: 'bottom center', ...style }
             }
-            transition={{
-                type: 'spring',
-                stiffness: 400,
-                damping: 30,
-            }}
             className={tcls(
-                'toolbar-button',
                 className,
                 'relative flex size-8 cursor-pointer items-center justify-center gap-1 truncate rounded-full text-sm transition-colors',
                 'text-tint-7 hover:text-tint-1',
@@ -262,75 +285,68 @@ export const ToolbarButton = React.forwardRef<HTMLDivElement, ToolbarButtonProps
             <Icon
                 icon={icon}
                 iconStyle={IconStyle.Solid}
-                className={tcls('size-3.5 shrink-0 group-hover:scale-110', iconClassName)}
+                className={tcls('size-3.5 shrink-0', iconClassName)}
             />
         </motion.a>
     );
 
     return (
-        <motion.div variants={toolbarEasings.staggeringChild} className="relative" ref={ref}>
+        <div className="relative" ref={ref}>
             {children ? children : null}
-            {title ? <Tooltip label={title}>{anchor}</Tooltip> : anchor}
-        </motion.div>
+            {/* Anchored to the unscaled slot with room for full magnification, so the gap doesn't
+            depend on how far the spring has grown when the tooltip opens. */}
+            {title ? (
+                <Tooltip
+                    label={title}
+                    anchor={slot?.anchorRef}
+                    sideOffset={slot ? TOOLTIP_OFFSET : 4}
+                >
+                    {anchor}
+                </Tooltip>
+            ) : (
+                anchor
+            )}
+        </div>
     );
 });
 
 ToolbarButton.displayName = 'ToolbarButton';
 
-function ToolbarButtonWrapper(props: {
-    child: React.ReactElement;
-    rawMotionValues?: { scale: MotionValue<number>; x: MotionValue<number> };
+export function ToolbarTitle(props: {
+    prefix?: string;
+    /** What a short prefix stands for, e.g. "Change request #54" for "#54". */
+    prefixLabel?: string;
+    suffix: string;
 }) {
-    const { child, rawMotionValues } = props;
-
-    // Convert the raw motion values to smooth spring easings
-    const springScale = useSpring(rawMotionValues?.scale.get() ?? 1, {
-        stiffness: 400,
-        damping: 30,
-    });
-    const springX = useSpring(rawMotionValues?.x.get() ?? 0, { stiffness: 400, damping: 30 });
-
-    // Sync springs with raw motion values
-    React.useEffect(() => {
-        if (!rawMotionValues) return;
-
-        const unsubScale = rawMotionValues.scale.on('change', (v) => springScale.set(v));
-        const unsubX = rawMotionValues.x.on('change', (v) => springX.set(v));
-
-        return () => {
-            unsubScale();
-            unsubX();
-        };
-    }, [rawMotionValues, springScale, springX]);
-
-    const motionValues = {
-        scale: springScale,
-        x: springX,
-    };
-
-    if (!isValidElement<{ motionValues: typeof motionValues }>(child)) {
-        return null;
-    }
-
-    return React.cloneElement(child, {
-        motionValues,
-    });
-}
-
-export function ToolbarTitle(props: { prefix?: string; suffix: string }) {
+    const { prefix, prefixLabel, suffix } = props;
+    // One tooltip for the whole title: the short prefix spelled out, and the full, often
+    // truncated, subject.
+    const label = prefixLabel ? (
+        <span className="flex flex-col">
+            <span className="opacity-70 text-xxs">{prefixLabel}</span>
+            <span className="font-medium">{suffix}</span>
+        </span>
+    ) : prefix ? (
+        `${prefix}${suffix}`
+    ) : (
+        suffix
+    );
     return (
-        <div className="flex items-center gap-1 text-xs">
-            {props.prefix ? <ToolbarTitlePrefix title={props.prefix} /> : null}
-            <ToolbarTitleSuffix title={props.suffix} />
-        </div>
+        <Tooltip label={label}>
+            <div className="flex min-w-0 max-w-full items-center gap-1 text-xs">
+                {prefix ? <ToolbarTitlePrefix title={prefix} /> : null}
+                <ToolbarTitleSuffix title={suffix} />
+            </div>
+        </Tooltip>
     );
 }
 
 function ToolbarTitlePrefix(props: { title: string }) {
+    // Kept whole: prefixes are short, and the suffix is the one to truncate.
     return (
         <motion.span
             {...getCopyVariants(0)}
-            className="truncate font-medium text-neutral-1 dark:text-neutral-12"
+            className="shrink-0 whitespace-nowrap font-medium text-neutral-1 dark:text-neutral-12"
         >
             {props.title}
         </motion.span>
@@ -341,7 +357,7 @@ function ToolbarTitleSuffix(props: { title: string }) {
     return (
         <motion.span
             {...getCopyVariants(1)}
-            className="max-w-[20ch] truncate font-bold text-neutral-1 dark:text-neutral-12"
+            className="min-w-0 max-w-[28ch] truncate font-bold text-neutral-1 dark:text-neutral-12"
         >
             {props.title}
         </motion.span>
@@ -352,7 +368,7 @@ export function ToolbarSubtitle(props: { subtitle: React.ReactNode }) {
     return (
         <motion.span
             {...getCopyVariants(1)}
-            className="text-neutral-1/80 dark:text-neutral-12/80 inline-flex items-center gap-1 text-xxs"
+            className="text-neutral-1/80 dark:text-neutral-12/80 flex min-w-0 max-w-full items-center gap-1 whitespace-nowrap text-xxs"
         >
             {props.subtitle}
         </motion.span>

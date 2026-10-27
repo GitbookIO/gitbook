@@ -82,7 +82,7 @@
         "acorn-walk": "^8.3.4",
         "assert-never": "catalog:",
         "escodegen": "^2.1.0",
-        "eval-estree-expression": "^3.0.1",
+        "eval-estree-expression": "^4.0.0",
       },
       "devDependencies": {
         "@tsconfig/node20": "catalog:",
@@ -2045,7 +2045,7 @@
 
     "etag": ["etag@1.8.1", "", {}, "sha512-aIL5Fx7mawVa300al2BnEE4iNvo1qETxLrPI/o05L7z6go7fCw1J6EQmbK4FmJ2AS7kgVF/KEZWufBfdClMcPg=="],
 
-    "eval-estree-expression": ["eval-estree-expression@3.0.1", "", {}, "sha512-zTLKGbiVdQYp4rQkSoXPibrFf5ZoPn6jzExegRLEQ13F+FSxu5iLgaRH6hlDs2kWSUa6vp8yD20cdJi0me6pEw=="],
+    "eval-estree-expression": ["eval-estree-expression@4.0.0", "", { "dependencies": { "get-value": "^4.0.1" } }, "sha512-QWT9DtTs+LgiKycu8eP8F3gPMD95dR4tmGyvHfpliEhS38yZ4TrNZOVKVtAzyZSLw2PP9/JB1JlIWZBuy/AZ0w=="],
 
     "event-emitter": ["event-emitter@0.3.5", "", { "dependencies": { "d": "1", "es5-ext": "~0.10.14" } }, "sha512-D9rRn9y7kLPnJ+hMq7S/nhvoKwwvVJahBi2BPmx3bvbsEdK3W9ii8cBSGjP+72/LnM4n6fo3+dkCX5FeTQruXA=="],
 
@@ -2160,6 +2160,8 @@
     "get-tsconfig": ["get-tsconfig@4.10.1", "", { "dependencies": { "resolve-pkg-maps": "^1.0.0" } }, "sha512-auHyJ4AgMz7vgS8Hp3N6HXSmlMdUyhSUrfBF16w153rxtLIEOE+HGqaBppczZvnHLqQJfiHotCYpNhl0lUROFQ=="],
 
     "get-uri": ["get-uri@6.0.5", "", { "dependencies": { "basic-ftp": "^5.0.2", "data-uri-to-buffer": "^6.0.2", "debug": "^4.3.4" } }, "sha512-b1O07XYq8eRuVzBNgJLstU6FYc1tS6wnMtF1I1D9lE8LxZSOGZ7LhxN54yPP6mGw5f2CkXY2BQUL9Fx41qvcIg=="],
+
+    "get-value": ["get-value@4.1.0", "", {}, "sha512-mKjrL73VxCUixi0Qe9OuerDVkm+475FeNwM5zZpjK6TK/a7fqv/dGI7vkRgvWkyw1xQ9Fl+wKuOUgPkE6aYB3w=="],
 
     "gitbook": ["gitbook@workspace:packages/gitbook"],
 

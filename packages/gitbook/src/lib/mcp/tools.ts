@@ -51,6 +51,7 @@ export function createSiteMcpTools(
     const { request } = options;
     const { dataFetcher, linker, site } = context;
     const siteUrl = context.siteSpace.urls.published;
+    const examplePageURL = siteUrl ? joinPathWithBaseURL(siteUrl, 'getting-started') : undefined;
 
     const tools: SiteMcpTool[] = [
         defineTool({
@@ -146,7 +147,7 @@ export function createSiteMcpTools(
 
         defineTool({
             name: 'getPage',
-            description: `Fetch the full markdown content of a specific documentation page from ${site.title}. Use this when you have a page URL and want to read its content. Accepts full URLs (e.g. ${siteUrl}/getting-started). Since \`searchDocumentation\` returns partial content, use \`getPage\` to retrieve the complete page when you need more details. The content includes links you can follow to navigate to related pages.`,
+            description: `Fetch the full markdown content of a specific documentation page from ${site.title}. Use this when you have a page URL and want to read its content. Accepts full URLs (e.g. ${examplePageURL}). Since \`searchDocumentation\` returns partial content, use \`getPage\` to retrieve the complete page when you need more details. The content includes links you can follow to navigate to related pages.`,
             inputSchema: {
                 url: z
                     .string()
@@ -160,7 +161,7 @@ export function createSiteMcpTools(
                         }
                         ctx.addIssue({
                             code: z.ZodIssueCode.custom,
-                            message: `"${value}" is not a valid URL. Expected a full URL like ${siteUrl}/getting-started`,
+                            message: `"${value}" is not a valid URL. Expected a full URL like ${examplePageURL}`,
                         });
                         return z.NEVER;
                     }),
@@ -356,7 +357,7 @@ export function createSiteMcpTools(
                         if (!url) {
                             ctx.addIssue({
                                 code: z.ZodIssueCode.custom,
-                                message: `"${value}" is not a valid URL on this site. Expected a full URL like ${siteUrl}/getting-started`,
+                                message: `"${value}" is not a valid URL on this site. Expected a full URL like ${examplePageURL}`,
                             });
                             return z.NEVER;
                         }

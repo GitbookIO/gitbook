@@ -9,6 +9,7 @@ import type {
 
 import type { DocumentContextProps } from './DocumentView';
 import { Inlines } from './Inlines';
+import { getCommentAnchorProps } from './utils';
 import { getNodeFragmentByName, isNodeEmpty } from '@/lib/document';
 import { type ClassValue, tcls } from '@/lib/tailwind';
 
@@ -34,6 +35,11 @@ export function Caption(
         block: DocumentBlockImage | DocumentBlockDrawing | DocumentBlockEmbed | DocumentBlockFile;
         withBorder?: boolean;
         withFrame?: boolean;
+        /**
+         * Expose the block key for commenting; off inside an `images` block, which carries the key
+         * itself since its images aren't comment targets.
+         */
+        withBlockKey?: boolean;
     } & DocumentContextProps
 ) {
     const {
@@ -59,7 +65,10 @@ export function Caption(
         ],
         style,
         align = 'center',
+        withBlockKey = false,
     } = props;
+
+    const anchorProps = withBlockKey ? getCommentAnchorProps(context, block.key) : {};
 
     const caption = getNodeFragmentByName(block, 'caption');
     const captionParagraph = caption?.nodes[0];
@@ -69,11 +78,15 @@ export function Caption(
         captionParagraph.type !== 'paragraph' ||
         isNodeEmpty(captionParagraph)
     ) {
-        return <div className={tcls(style, wrapperStyle)}>{children}</div>;
+        return (
+            <div {...anchorProps} className={tcls(style, wrapperStyle)}>
+                {children}
+            </div>
+        );
     }
 
     return (
-        <picture className={tcls('relative', style)}>
+        <picture {...anchorProps} className={tcls('relative', style)}>
             <div className={tcls(wrapperStyle, captionAlignStyles[align])}>{children}</div>
             <figcaption
                 className={tcls(

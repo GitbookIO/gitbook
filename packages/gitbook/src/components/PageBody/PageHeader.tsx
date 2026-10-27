@@ -255,6 +255,8 @@ export async function PageHeader(props: {
             <PageTags page={page} revision={revision} />
             {page.layout.title ? (
                 <h1
+                    // Comments on the whole page get their pin next to the title.
+                    {...(context.changeRequest ? { 'data-comment-page-title': '' } : {})}
                     data-cover-aware-text
                     data-over-cover
                     className={tcls(

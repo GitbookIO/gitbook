@@ -18,7 +18,7 @@ export async function Drawing(props: BlockProps<DocumentBlockDrawing>) {
     }
 
     return (
-        <Caption {...props}>
+        <Caption {...props} withBlockKey>
             <Image
                 sources={{
                     light: {

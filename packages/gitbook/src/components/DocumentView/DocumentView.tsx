@@ -38,6 +38,12 @@ export interface DocumentContext {
     withLinkPreviews?: boolean;
 
     /**
+     * Render the markers comments anchor to (block keys, table cells). Only where commenting is
+     * possible, so public pages don't carry them.
+     */
+    withCommentAnchors?: boolean;
+
+    /**
      * True when this document is the main page body — the only place a background page cover is
      * shown behind the content. Cover-aware text styling (contrast over the cover) is scoped to it
      * so auxiliary documents (search answers, AI chat, PDF export) don't inherit the cover colors.
