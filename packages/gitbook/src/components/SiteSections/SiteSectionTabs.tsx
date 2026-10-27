@@ -178,6 +178,9 @@ export function SiteSectionTabs(props: {
                             MAX_POPUP_HEIGHT,
                             // `scale` rather than `transform`: that is what `scale-95` sets.
                             `transition-[opacity,scale,width,height] ${MOTION}`,
+                            // The global `allow-keywords` would animate Base UI's reset to `auto`, so
+                            // switching mid-animation would measure the in-flight size.
+                            '[interpolate-size:numeric-only]',
                             // The size vars reset on close, so animating them out collapses the
                             // panel and grows it back as it fades.
                             'data-ending-style:transition-[opacity,scale]',
