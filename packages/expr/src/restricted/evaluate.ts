@@ -70,6 +70,15 @@ const RESTRICTED_VISITORS = {
 
         const method = (callee.property as Identifier).name;
         const receiver = this.visit(callee.object, context, callee);
+
+        // Like reading a property of a missing claim, calling a method on one gives `undefined`.
+        if (
+            (receiver === null || receiver === undefined) &&
+            (ALLOWED_METHODS.string.has(method) || ALLOWED_METHODS.array.has(method))
+        ) {
+            return undefined;
+        }
+
         const fn = getAllowedMethod(receiver, method);
         if (!fn) {
             throw new UnsafeExpressionError(`Method "${method}" is not supported`);

@@ -178,6 +178,67 @@ describe('ExpressionRuntime', () => {
                 inputs: { user: { role: 'admin' } },
                 expectedResult: true,
             },
+            {
+                scenario: 'boolean claim',
+                condition: 'visitor.claims.flag === true',
+                inputs: { visitor: { claims: { flag: true } } },
+                expectedResult: true,
+            },
+            {
+                scenario: 'nested claims joined with ||',
+                condition: 'visitor.claims.group.a === true || visitor.claims.group.b === true',
+                inputs: { visitor: { claims: { group: { b: true } } } },
+                expectedResult: true,
+            },
+            {
+                scenario: 'negated guard',
+                condition: "!visitor.claims.unsigned || visitor.claims.unsigned.region !== 'eu'",
+                inputs: { visitor: { claims: { unsigned: { region: 'us' } } } },
+                expectedResult: true,
+            },
+            {
+                scenario: 'negated guard with a missing claim',
+                condition: "!visitor.claims.unsigned || visitor.claims.unsigned.region !== 'eu'",
+                inputs: { visitor: { claims: {} } },
+                expectedResult: true,
+            },
+            {
+                scenario: 'key with a colon',
+                condition: "visitor.claims['custom:tier'] !== 'gold'",
+                inputs: { visitor: { claims: { 'custom:tier': 'silver' } } },
+                expectedResult: true,
+            },
+            {
+                scenario: 'key with a colon and a missing claim',
+                condition: "visitor.claims['custom:tier'] !== 'gold'",
+                inputs: { visitor: { claims: {} } },
+                expectedResult: true,
+            },
+            {
+                scenario: 'URL-style key',
+                condition: "visitor.claims['https://example.com/flag'] === true",
+                inputs: { visitor: { claims: { 'https://example.com/flag': true } } },
+                expectedResult: true,
+            },
+            {
+                scenario: 'claim array includes',
+                condition: "visitor.claims.products.includes('a')",
+                inputs: { visitor: { claims: { products: ['a', 'b'] } } },
+                expectedResult: true,
+            },
+            {
+                scenario: 'array literal includes a claim',
+                condition: "['a', 'b'].includes(visitor.claims.org)",
+                inputs: { visitor: { claims: { org: 'a' } } },
+                expectedResult: true,
+            },
+            {
+                scenario: '&& guard with a dashed key',
+                condition:
+                    "visitor.claims.unsigned && visitor.claims.unsigned['early-access'] === true",
+                inputs: { visitor: { claims: { unsigned: { 'early-access': true } } } },
+                expectedResult: true,
+            },
         ])(
             'should properly evaluate/safeEvaluate a valid conditional expression: $scenario',
             ({ condition, inputs, expectedResult }) => {
@@ -217,6 +278,22 @@ describe('ExpressionRuntime', () => {
             'should throw an error when using evaluate with invalid expressions',
             ({ condition, inputs }) => {
                 expect(() => runtime.evaluate(condition, inputs)).toThrowError(ExpressionError);
+            }
+        );
+
+        it.each([
+            { scenario: 'string method', condition: 'visitor.claims.plan.startsWith("p")' },
+            { scenario: 'array method', condition: 'visitor.claims.products.includes("a")' },
+            { scenario: 'callback method', condition: 'visitor.claims.products.some(p => p)' },
+            { scenario: 'missing parent', condition: 'visitor.claims.org.name.toLowerCase()' },
+        ])(
+            'should give undefined when calling a method on a missing claim: $scenario',
+            ({ condition }) => {
+                const inputs = { visitor: { claims: {} } };
+
+                expect(runtime.evaluate(condition, inputs)).toBeUndefined();
+                expect(runtime.safeEvaluate(condition, inputs)).toEqual({ value: undefined });
+                expect(runtime.evaluateBoolean(condition, inputs)).toBe(false);
             }
         );
     });
