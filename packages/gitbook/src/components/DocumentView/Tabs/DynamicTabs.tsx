@@ -262,8 +262,10 @@ const TabItem = memo(function TabItem(props: {
                     : isMeasuring
                       ? // Measured after the active tab, at their narrowest, so the menu only takes
                         // the tabs that can't fit even truncated.
-                        'order-1 max-w-24'
-                      : 'min-w-0 shrink'
+                        'order-1 max-w-28'
+                      : // Equal shares capped at their own width, so no tab drops below that
+                        // narrowest size; the high grow leaves the strip's filler only the leftover.
+                        'min-w-0 max-w-max basis-0 grow-[1000]'
             }
         >
             {tab.icon && <Icon icon={tab.icon} className="size-4 shrink-0" />}
