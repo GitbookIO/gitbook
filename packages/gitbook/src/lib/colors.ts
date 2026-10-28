@@ -2,9 +2,6 @@ import type { DocumentTextColor } from '@gitbook/api';
 
 import type { ClassValue } from '@/lib/tailwind';
 
-// `$secondary` is not in the published @gitbook/api enum yet; drop this once it is.
-type TextColor = DocumentTextColor | '$secondary';
-
 export const textColorToStyle = {
     default: [],
     blue: ['text-[#0067d1] dark:text-[#7dbcff]'],
@@ -23,7 +20,7 @@ export const textColorToStyle = {
     $warning: ['text-warning-subtle contrast-more:text-warning'],
     $danger: ['text-danger-subtle contrast-more:text-danger'],
     $tint: ['text-tint-subtle contrast-more:text-tint'],
-} satisfies Record<TextColor, ClassValue>;
+} satisfies Record<DocumentTextColor, ClassValue>;
 
 export const backgroundColorToStyle = {
     default: [],
@@ -43,4 +40,4 @@ export const backgroundColorToStyle = {
     $warning: ['bg-warning'],
     $danger: ['bg-danger'],
     $tint: ['bg-tint'],
-} satisfies Record<TextColor, ClassValue>;
+} satisfies Record<DocumentTextColor, ClassValue>;

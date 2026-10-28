@@ -109,7 +109,7 @@ export async function CustomizationRootLayout(props: {
             },
         },
     };
-    const secondaryColor = getSecondaryColor(customization);
+    const secondaryColor = customization.styling.secondaryColor;
     const secondaryScale = secondaryColor
         ? {
               light: { color: secondaryColor.light, options: {} },
@@ -283,19 +283,6 @@ function getTintColor(
             dark: customization.styling.tint?.color.dark ?? DEFAULT_TINT_COLOR,
         };
     }
-}
-
-/**
- * Get the secondary color, if the site sets one.
- */
-function getSecondaryColor(
-    customization: SiteCustomizationSettings
-): CustomizationThemedColor | undefined {
-    // `secondaryColor` is not in the published @gitbook/api types yet; drop the annotation once it is.
-    const styling: SiteCustomizationSettings['styling'] & {
-        secondaryColor?: CustomizationThemedColor;
-    } = customization.styling;
-    return styling.secondaryColor;
 }
 
 function getTintMixColor(
