@@ -849,68 +849,34 @@ const testCases: TestsCase[] = [
                 },
             },
             {
-                name: 'External links use the configured window open behavior',
+                name: 'External links navigate natively in the current tab',
                 url: '',
                 screenshot: false,
                 run: async (page) => {
                     await waitForHydration(page);
 
-                    const windowOpenCalls: {
-                        url: string;
-                        target: string;
-                        features: string | undefined;
-                    }[] = [];
-                    await page.exposeFunction(
-                        'recordExternalWindowOpen',
-                        (url: string, target: string, features?: string) => {
-                            windowOpenCalls.push({ url, target, features });
-                        }
+                    await page.route('https://gitbook.com/**', (route) =>
+                        route.fulfill({ status: 200, contentType: 'text/html', body: '' })
                     );
-                    await page.evaluate(() => {
-                        const recordExternalWindowOpen = (
-                            window as unknown as {
-                                recordExternalWindowOpen: (
-                                    url: string,
-                                    target: string,
-                                    features?: string
-                                ) => void;
-                            }
-                        ).recordExternalWindowOpen;
-                        window.open = ((url, target, features) => {
-                            void recordExternalWindowOpen(
-                                url?.toString() ?? '',
-                                target ?? '',
-                                features
-                            );
-                            return null;
-                        }) as typeof window.open;
-                    });
+                    const popups: string[] = [];
+                    page.on('popup', (popup) => popups.push(popup.url()));
 
-                    const initialURL = page.url();
                     await page
                         .locator('[data-gb-sections]')
                         .getByRole('link', { name: 'Gitbook Docs' })
                         .click();
-                    await expect.poll(() => windowOpenCalls.length).toBe(1);
-                    expect(windowOpenCalls[0]).toEqual({
-                        url: 'https://gitbook.com/docs',
-                        target: '_self',
-                        features: undefined,
-                    });
-                    await expect(page).toHaveURL(initialURL);
+                    await expect(page).toHaveURL('https://gitbook.com/docs');
 
+                    await page.goBack();
+                    await waitForHydration(page);
                     await page
                         .locator('[data-gb-sections]')
                         .getByRole('button', { name: 'Test Section Group 2' })
                         .hover();
                     await page.getByRole('link', { name: 'Gitbook Site' }).click();
-                    await expect.poll(() => windowOpenCalls.length).toBe(2);
-                    expect(windowOpenCalls[1]).toEqual({
-                        url: 'https://gitbook.com',
-                        target: '_self',
-                        features: undefined,
-                    });
-                    await expect(page).toHaveURL(initialURL);
+                    await expect(page).toHaveURL('https://gitbook.com/');
+
+                    expect(popups).toEqual([]);
                 },
             },
         ],
