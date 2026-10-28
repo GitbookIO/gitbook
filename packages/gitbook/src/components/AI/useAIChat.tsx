@@ -1,7 +1,7 @@
 'use client';
 
-import * as React from 'react';
 import dynamic from 'next/dynamic';
+import * as React from 'react';
 import * as zustand from 'zustand';
 
 import {
@@ -276,7 +276,6 @@ export function AIChatProvider(props: {
         setEngineRequested(true);
     }, []);
 
-
     // Event listeners storage
     const eventsRef = React.useRef<Map<AIChatEvent['type'], AIChatEventListener[]>>(new Map());
 
@@ -324,7 +323,6 @@ export function AIChatProvider(props: {
 
     // Lets `streamResponse` flush a queued follow-up via `onPostMessage`, which is defined later.
     const postMessageRef = React.useRef<((input: { message: string }) => void) | null>(null);
-
 
     // Post a message to the AI chat
     const onPostMessage = React.useCallback(
