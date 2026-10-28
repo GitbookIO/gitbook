@@ -13,8 +13,6 @@ import {
     getVisitorUnsignedClaims,
     isRevalidationRequest,
     normalizeVisitorURL,
-    parseHostnameList,
-    shouldSendVisitorCountry,
 } from './visitors';
 
 describe('getVisitorAuthToken', () => {
@@ -660,34 +658,5 @@ describe('getVisitorCountry', () => {
                 })
             )
         ).toBe('FR');
-    });
-});
-
-describe('shouldSendVisitorCountry', () => {
-    it.each(['dev', 'preview', 'staging'])('should be enabled on the %p stage', (stage) => {
-        expect(shouldSendVisitorCountry('docs.example.com', stage)).toBe(true);
-    });
-
-    it.each(['production', undefined])(
-        'should be disabled for other hostnames on the %p stage',
-        (stage) => {
-            expect(shouldSendVisitorCountry('docs.example.com', stage)).toBe(false);
-        }
-    );
-});
-
-describe('parseHostnameList', () => {
-    it.each([undefined, '', ' , '])('should return an empty set for %p', (value) => {
-        expect(parseHostnameList(value).size).toBe(0);
-    });
-
-    it('should parse a single entry', () => {
-        expect(parseHostnameList('docs.foo.com')).toEqual(new Set(['docs.foo.com']));
-    });
-
-    it('should trim, lowercase and drop empty entries', () => {
-        expect(parseHostnameList(' Docs.Foo.com , ,bar.io')).toEqual(
-            new Set(['docs.foo.com', 'bar.io'])
-        );
     });
 });
