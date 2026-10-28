@@ -1,12 +1,18 @@
 import { Feed } from 'feed';
 
-import type { RevisionPageDocument } from '@gitbook/api';
+import type {
+    DocumentBlock,
+    DocumentInline,
+    DocumentText,
+    RevisionPageDocument,
+} from '@gitbook/api';
 import { RevisionPageType } from '@gitbook/api';
 
 import { getPageFullTitle } from '@/components/SitePage';
 import type { GitBookSiteContext } from '@/lib/context';
 import { getPageDocument } from '@/lib/data/pages';
 import { getBlocksByType, getNodeText, isHeadingBlock } from '@/lib/document';
+import { escapeHTML } from '@/lib/html';
 import { joinPath } from '@/lib/paths';
 import { resolveSiteSpacePagePathDocumentOrGroup } from '@/lib/sites';
 
@@ -82,7 +88,7 @@ export async function servePageRSS(
             const itemLink = anchorId ? `${pageURL}#${anchorId}` : pageURL;
 
             const contentNodes = update.nodes.slice(1);
-            const content = contentNodes.map((node) => getNodeText(node)).join('\n\n');
+            const content = contentNodes.map((node) => getNodeHTML(node)).join('');
 
             feed.addItem({
                 title: title,
@@ -99,6 +105,47 @@ export async function servePageRSS(
             'Content-Type': 'application/rss+xml; charset=utf-8',
         },
     });
+}
+
+/**
+ * Feed readers render `<content:encoded>` as HTML, so block structure must be kept as tags.
+ */
+function getNodeHTML(node: DocumentBlock | DocumentInline | DocumentText): string {
+    if (node.object === 'text') {
+        return escapeHTML(getNodeText(node));
+    }
+
+    const children = 'nodes' in node ? node.nodes.map((child) => getNodeHTML(child)).join('') : '';
+    if (node.object === 'inline') {
+        return children;
+    }
+
+    switch (node.type) {
+        case 'paragraph':
+            return `<p>${children}</p>`;
+        case 'heading-1':
+            return `<h2>${children}</h2>`;
+        case 'heading-2':
+            return `<h3>${children}</h3>`;
+        case 'heading-3':
+            return `<h4>${children}</h4>`;
+        case 'list-unordered':
+        case 'list-tasks':
+            return `<ul>${children}</ul>`;
+        case 'list-ordered':
+            return node.data.start !== undefined
+                ? `<ol start="${node.data.start}">${children}</ol>`
+                : `<ol>${children}</ol>`;
+        case 'list-item':
+            return `<li>${children}</li>`;
+        case 'blockquote':
+        case 'hint':
+            return `<blockquote>${children}</blockquote>`;
+        case 'code':
+            return `<pre><code>${node.nodes.map((line) => escapeHTML(getNodeText(line))).join('\n')}</code></pre>`;
+        default:
+            return children;
+    }
 }
 
 function notFoundResponse(message: string) {
