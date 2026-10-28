@@ -64,11 +64,12 @@ export async function SiteLayout(props: {
     // Scripts are disabled when tracking is disabled
     const scripts = withTracking ? context.scripts : [];
 
-    ReactDOM.preconnect(GITBOOK_API_PUBLIC_URL);
-    ReactDOM.preconnect(GITBOOK_ICONS_URL);
-    if (GITBOOK_ASSETS_URL) {
-        ReactDOM.preconnect(GITBOOK_ASSETS_URL);
-    }
+    // React dedupes preconnects by href, so reduce to the origin; relative URLs are same-origin.
+    [GITBOOK_API_PUBLIC_URL, GITBOOK_ICONS_URL, GITBOOK_ASSETS_URL].forEach((url) => {
+        if (url && URL.canParse(url)) {
+            ReactDOM.preconnect(new URL(url).origin);
+        }
+    });
 
     // Start the search-index download from the HTML itself. `crossOrigin` must match the
     // client `fetch()` (cors + same-origin credentials) or the preload is ignored and the
