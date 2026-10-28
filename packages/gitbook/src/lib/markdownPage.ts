@@ -16,6 +16,7 @@ import {
     type SiteSpace,
 } from '@gitbook/api';
 
+import { escapeHTML } from './html';
 import type { GitBookLinker } from './links';
 import { resolveContentRef, resolveStringContentRef } from './references';
 import { checkIsAnchor, checkIsExternalURL } from './urls';
@@ -394,14 +395,6 @@ async function replaceAsync(
  */
 function toBrokenURL(original: string): string {
     return `broken://${original.startsWith('/') ? original.slice(1) : original}`;
-}
-
-function escapeHTML(value: string): string {
-    return value
-        .replace(/&/g, '&amp;')
-        .replace(/"/g, '&quot;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;');
 }
 
 function isMentionLike(node: Link) {

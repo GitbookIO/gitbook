@@ -12,6 +12,17 @@ it('should expose a RSS feed for a page with updates', async () => {
 
     expect(feed.title).toBe('Updates | E2E Tests GitBook Open');
     expect(feed.items.length).toBe(4);
+    expect(feed.items[2]?.['content:encoded']).toStartWith('<p>Some text</p><pre><code>');
+});
+
+it('should keep list structure in RSS feed items', async () => {
+    const parser = new Parser();
+    const feed = await parser.parseURL(
+        getContentTestURL('https://gitbook.com/docs/changelog/rss.xml')
+    );
+
+    const withList = feed.items.find((item) => item['content:encoded']?.includes('<ul>'));
+    expect(withList?.['content:encoded']).toMatch(/<ul><li>.+?<\/li><li>.+?<\/li>/);
 });
 
 it('should not expose a RSS feed for a page without updates', async () => {
