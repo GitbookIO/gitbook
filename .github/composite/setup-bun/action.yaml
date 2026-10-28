@@ -1,9 +1,0 @@
-name: 'Setup Bun'
-description: 'Install Bun and cache dependencies'
-runs:
-    using: 'composite'
-    steps:
-        - name: Setup bun
-          uses: oven-sh/setup-bun@v2
-          with:
-              bun-version-file: 'package.json'
