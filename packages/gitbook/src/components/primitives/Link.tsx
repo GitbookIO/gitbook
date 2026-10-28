@@ -126,16 +126,6 @@ export function Link(props: LinkProps) {
                 event.preventDefault();
                 window.open(toNonEmbedLink(href), '_blank', 'noopener noreferrer');
             }
-        } else if (isExternal && !event.ctrlKey && !event.metaKey) {
-            // The external logic server-side is limited
-            // so we use the client-side logic to determine the real target
-            // by default the target is "_self".
-            const { target = '_self' } = getTargetProps(props, {
-                externalTarget,
-                isExternal: isExternalOnClient,
-            });
-            event.preventDefault();
-            window.open(target === '_blank' ? toNonEmbedLink(href) : href, target, rel);
         }
 
         domProps.onClick?.(event);
