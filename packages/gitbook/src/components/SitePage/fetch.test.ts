@@ -6,9 +6,14 @@ import type { GitBookSiteContext } from '@/lib/context';
 
 mock.module('server-only', () => ({}));
 
-const { fetchPageData, getLowercasePathnameRedirect, resolveMissingPagePath } =
-    await import('./fetch');
+const {
+    fetchPageData,
+    getLowercasePathnameRedirect,
+    resolveMissingPagePath,
+    resolveSitePageFromURL,
+} = await import('./fetch');
 const { normalizeURL } = await import('@/lib/data/urls');
+const { createLinker } = await import('@/lib/links');
 
 const page = {
     id: 'page-1',
@@ -174,6 +179,56 @@ describe('resolveMissingPagePath', () => {
         const context = createRedirectContext({});
 
         expect(await resolveMissingPagePath(context, 'old')).toBeUndefined();
+    });
+});
+
+describe('resolveSitePageFromURL', () => {
+    const newPage = { ...page, id: 'page-2', title: 'New', path: 'new', slug: 'new' };
+    const siteSpace = {
+        id: 'site-space-1',
+        default: true,
+        space: { id: 'space-1', revision: 'revision-1' },
+        urls: { published: 'https://docs.example.com/' },
+    };
+
+    function createURLContext(siteRedirectTarget: string) {
+        return {
+            organizationId: 'org-1',
+            site: { id: 'site-1' },
+            structure: { type: 'siteSpaces', structure: [siteSpace] },
+            siteSpaces: [siteSpace],
+            linker: createLinker({
+                host: 'docs.example.com',
+                siteBasePath: '/',
+                spaceBasePath: '/',
+            }),
+            dataFetcher: {
+                getSpace: async () => ({
+                    data: { id: 'space-1', revision: 'revision-1', organization: 'org-1' },
+                }),
+                getRevision: async () => ({ data: { pages: [page, newPage] } }),
+                getSiteRedirectBySource: async ({ source }: { source: string }) =>
+                    source === '/old'
+                        ? { data: { target: siteRedirectTarget, redirect: null } }
+                        : { error: { code: 404, message: 'Not found' } },
+                getRevisionPageByPath: async () => ({
+                    error: { code: 404, message: 'Not found' },
+                }),
+            },
+        } as unknown as GitBookSiteContext;
+    }
+
+    it('follows a site redirect to the target page', async () => {
+        const context = createURLContext('https://docs.example.com/new');
+
+        const resolved = await resolveSitePageFromURL(context, 'https://docs.example.com/old');
+        expect(resolved?.page.id).toBe('page-2');
+    });
+
+    it('does not follow a site redirect outside the site', async () => {
+        const context = createURLContext('https://elsewhere.example.com/new');
+
+        expect(await resolveSitePageFromURL(context, 'https://docs.example.com/old')).toBeNull();
     });
 });
 
