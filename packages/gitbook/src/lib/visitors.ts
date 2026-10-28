@@ -28,6 +28,7 @@ export type ResponseCookie = {
         secure: boolean;
         maxAge: number;
         path: string;
+        partitioned: boolean;
     }>;
 };
 
@@ -146,7 +147,10 @@ export function getVisitorData({
 }): VisitorDataLookup {
     const visitorToken = getVisitorToken({ cookies, headers, url });
     const unsignedClaims = getVisitorUnsignedClaims({ cookies, url });
-    const visitorParamsCookie = getResponseCookieForVisitorParams(unsignedClaims.fromVisitorParams);
+    const visitorParamsCookie = getResponseCookieForVisitorParams(
+        unsignedClaims.fromVisitorParams,
+        headers
+    );
 
     return {
         visitorToken,
@@ -319,7 +323,8 @@ function parseVisitorQueryParamValue(value: string): ClaimPrimitive {
  * Returns to cookie response to use in order to persist visitor params that were passed to the URL.
  */
 function getResponseCookieForVisitorParams(
-    visitorParamsClaims: Record<string, ClaimPrimitive>
+    visitorParamsClaims: Record<string, ClaimPrimitive>,
+    requestHeaders: Headers
 ): ResponseCookie | undefined {
     if (Object.keys(visitorParamsClaims).length === 0) {
         return undefined;
@@ -328,10 +333,21 @@ function getResponseCookieForVisitorParams(
     return {
         name: VISITOR_UNSIGNED_CLAIMS_PREFIX,
         value: JSON.stringify(visitorParamsClaims),
-        options: {
-            sameSite: process.env.NODE_ENV === 'production' ? 'none' : undefined,
-            secure: process.env.NODE_ENV === 'production',
-        },
+        options: getVisitorCookieCrossSiteOptions(requestHeaders),
+    };
+}
+
+/**
+ * Attributes letting visitor cookies be stored inside a cross-site iframe (authenticated embeds).
+ * `Partitioned` (CHIPS) is kept to iframes: Safari drops partitioned cookies after cross-site
+ * redirect chains (WebKit 306194), which top-level login flows go through.
+ */
+function getVisitorCookieCrossSiteOptions(requestHeaders?: Headers) {
+    const isProduction = process.env.NODE_ENV === 'production';
+    return {
+        sameSite: isProduction ? ('none' as const) : undefined,
+        secure: isProduction,
+        partitioned: isProduction && requestHeaders?.get('sec-fetch-dest') === 'iframe',
     };
 }
 
@@ -347,7 +363,8 @@ function getResponseCookieForVisitorParams(
 export function getResponseCookiesForVisitorAuth(
     basePath: string,
     visitorTokenLookup: Extract<VisitorTokenLookup, { source: 'url' }>,
-    requestCookies: RequestCookies = []
+    requestCookies: RequestCookies = [],
+    requestHeaders?: Headers
 ): ResponseCookies {
     let decoded: JwtPayload;
     try {
@@ -361,8 +378,7 @@ export function getResponseCookiesForVisitorAuth(
     const value = getVisitorAuthCookieValue(basePath, visitorTokenLookup.token);
     const options = {
         httpOnly: true,
-        sameSite: process.env.NODE_ENV === 'production' ? ('none' as const) : undefined,
-        secure: process.env.NODE_ENV === 'production',
+        ...getVisitorCookieCrossSiteOptions(requestHeaders),
         maxAge: getVisitorAuthCookieMaxAge(decoded),
     };
 
@@ -390,6 +406,16 @@ export function getResponseCookiesForVisitorAuth(
  */
 export function getVisitorAuthCookieName(basePath: string): string {
     return getPathScopedCookieName(VISITOR_TOKEN_COOKIE, basePath);
+}
+
+/**
+ * `Set-Cookie` values clearing the visitor authentication cookie. Browsers keep partitioned and
+ * unpartitioned cookies apart, so both are cleared whenever `Partitioned` can be set.
+ */
+export function getVisitorAuthClearCookieHeaders(basePath: string): string[] {
+    const { secure } = getVisitorCookieCrossSiteOptions();
+    const header = `${getVisitorAuthCookieName(basePath)}=; Path=/; Max-Age=0${secure ? '; Secure; SameSite=None' : ''}`;
+    return secure ? [`${header}; Partitioned`, header] : [header];
 }
 
 /**

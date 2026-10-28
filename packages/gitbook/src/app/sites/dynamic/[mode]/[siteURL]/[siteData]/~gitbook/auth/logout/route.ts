@@ -1,4 +1,3 @@
-import { cookies } from 'next/headers';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
@@ -9,7 +8,7 @@ import {
 } from '@/app/utils';
 import { getVisitorAuthBasePath } from '@/lib/data';
 import { resolveUpstreamAuthURL } from '@/lib/site-auth-urls';
-import { getVisitorAuthCookieName } from '@/lib/visitors';
+import { getVisitorAuthClearCookieHeaders } from '@/lib/visitors';
 
 /**
  * Clear the site-scoped auth session cookies and redirect to the upstream auth provider
@@ -20,17 +19,10 @@ export async function GET(
     { params }: { params: Promise<RouteLayoutParams> }
 ) {
     const resolvedParams = await params;
-    const [{ context }, siteURLData, cookieStore] = await Promise.all([
+    const [{ context }, siteURLData] = await Promise.all([
         getDynamicSiteContext(resolvedParams),
         getSiteURLDataFromParams(resolvedParams),
-        cookies(),
     ]);
-
-    cookieStore.delete(
-        getVisitorAuthCookieName(
-            getVisitorAuthBasePath(new URL(request.nextUrl.toString()), siteURLData)
-        )
-    );
 
     const noLogoutFallbackURL = context.linker.toAbsoluteURL(context.linker.toPathInSite(''));
     const logoutURL = resolveUpstreamAuthURL({
@@ -41,5 +33,12 @@ export async function GET(
         location: request.nextUrl.searchParams.get('location') ?? '/',
     });
 
-    return NextResponse.redirect(logoutURL ?? noLogoutFallbackURL);
+    const response = NextResponse.redirect(logoutURL ?? noLogoutFallbackURL);
+    // Appended as raw headers: `cookies()` keeps one cookie per name.
+    for (const header of getVisitorAuthClearCookieHeaders(
+        getVisitorAuthBasePath(new URL(request.nextUrl.toString()), siteURLData)
+    )) {
+        response.headers.append('set-cookie', header);
+    }
+    return response;
 }

@@ -1,9 +1,11 @@
 import { describe, expect, it } from 'bun:test';
 import type { JwtPayload } from 'jwt-decode';
+import { NextResponse } from 'next/server';
 
 import {
     type ResponseCookies,
     getResponseCookiesForVisitorAuth,
+    getVisitorAuthClearCookieHeaders,
     getVisitorAuthCookieMaxAge,
     getVisitorAuthCookieName,
     getVisitorAuthCookieValue,
@@ -248,6 +250,30 @@ describe('getResponseCookiesForVisitorAuth write policy', () => {
         const buildFromCustom = () => getResponseCookiesForVisitorAuth('/', fromCustomCookie);
 
         expect([buildFromVACookie, buildFromCustom]).toHaveLength(2);
+    });
+
+    it('partitions the cookie only inside an iframe, and clears both kinds', () => {
+        const env = process.env as Record<string, string | undefined>;
+        const previousEnv = env.NODE_ENV;
+        env.NODE_ENV = 'production';
+        try {
+            const setCookie = (secFetchDest: string) => {
+                const response = new NextResponse();
+                const headers = new Headers({ 'sec-fetch-dest': secFetchDest });
+                const lookup = { source: 'url', token } as const;
+                for (const cookie of getResponseCookiesForVisitorAuth('/', lookup, [], headers)) {
+                    response.cookies.set(cookie.name, cookie.value, cookie.options);
+                }
+                return response.headers.get('set-cookie');
+            };
+            expect(setCookie('iframe')).toContain('Partitioned');
+            expect(setCookie('document')).not.toContain('Partitioned');
+
+            const clear = `${getVisitorAuthCookieName('/')}=; Path=/; Max-Age=0; Secure; SameSite=None`;
+            expect(getVisitorAuthClearCookieHeaders('/')).toEqual([`${clear}; Partitioned`, clear]);
+        } finally {
+            env.NODE_ENV = previousEnv;
+        }
     });
 });
 

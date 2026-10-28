@@ -353,7 +353,8 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
                     ...getResponseCookiesForVisitorAuth(
                         getVisitorAuthBasePath(siteRequestURL, siteURLData),
                         visitorToken,
-                        request.cookies.getAll()
+                        request.cookies.getAll(),
+                        request.headers
                     )
                 );
             }
