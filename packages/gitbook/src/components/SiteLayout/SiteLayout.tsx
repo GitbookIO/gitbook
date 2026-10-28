@@ -18,6 +18,7 @@ import { buildVersion } from '@/lib/build';
 import type { GitBookSiteContext } from '@/lib/context';
 import { GITBOOK_API_PUBLIC_URL, GITBOOK_ASSETS_URL, GITBOOK_ICONS_URL } from '@/lib/env';
 import { getResizedImageURL } from '@/lib/images';
+import { removeTrailingSlash } from '@/lib/paths';
 import { isSiteIndexable } from '@/lib/seo';
 
 // Pure trackers with no visitor-facing UI, safe to load after `load` + idle. Anything not
@@ -100,6 +101,9 @@ export async function SiteLayout(props: {
             defaultTheme={customization.themes.default}
             externalLinksTarget={customization.externalLinks.target}
             proxyOrigin={context.site.proxy?.origin}
+            siteURL={removeTrailingSlash(
+                context.linker.toAbsoluteURL(context.linker.toPathInSite(''))
+            )}
             searchPrewarmURL={context.linker.toPathInSite('~gitbook/search-prewarm')}
         >
             <AIContextProvider
