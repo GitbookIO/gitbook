@@ -20,31 +20,46 @@ import { filterSiteSpacesByLocale, getSiteStructureSections } from '@/lib/sites'
 // or file descriptor limits.
 const MAX_CONCURRENCY = 100;
 
-// Default limit for pages per batch
-const DEFAULT_PAGE_LIMIT = 100;
+const MAX_PAGES_PER_PART = 100;
+
+// Vercel rejects responses over 4.5MB. Parts are sized from the raw markdown, so leave headroom
+// for the output growing when links are rewritten to absolute URLs.
+const MAX_BYTES_PER_PART = 3 * 1024 * 1024;
 
 type MarkdownPageEntry = { context: GitBookSiteContext; page: RevisionPageDocument };
+
+// A page, or one chunk of a page too large to fit in a single part.
+type MarkdownPartEntry = MarkdownPageEntry & {
+    pageNumber: number;
+    chunk: number;
+    chunkCount: number;
+    bytes: number;
+};
 
 /**
  * Generate a llms-full.txt file for the site.
  * As the result can be large, we stream it as we generate it.
  */
-export async function serveLLMsFullTxt(context: GitBookSiteContext, page = 0) {
+export async function serveLLMsFullTxt(context: GitBookSiteContext, part = 0) {
     if (!checkIsRootSiteContext(context)) {
         return new Response('llms.txt is only served from the root of the site', { status: 404 });
     }
 
-    const offset = page * DEFAULT_PAGE_LIMIT;
     const allPages = await getMarkdownPageEntriesFromSiteStructure(context);
+    const parts = await splitIntoParts(allPages);
 
-    if (allPages.length <= offset) {
+    if (part >= parts.length) {
         return new Response('No content found', { status: 404 });
     }
 
     return new Response(
         new ReadableStream<Uint8Array>({
             async pull(controller) {
-                await streamMarkdownPageEntries(context, controller, allPages, offset);
+                await streamMarkdownPart(context, controller, {
+                    parts,
+                    part,
+                    totalPages: allPages.length,
+                });
                 controller.close();
             },
         }),
@@ -140,24 +155,97 @@ async function getMarkdownPageEntriesFromFilteredSiteSpaces(
 }
 
 /**
- * Stream a single paginated window of markdown page entries.
+ * Group the pages into parts that each stay under the page and size limits.
  */
-async function streamMarkdownPageEntries(
+async function splitIntoParts(allPages: MarkdownPageEntry[]): Promise<MarkdownPartEntry[][]> {
+    const entries = await pMap(allPages, (entry, index) => splitPageIntoChunks(entry, index + 1), {
+        concurrency: MAX_CONCURRENCY,
+    });
+
+    const parts: MarkdownPartEntry[][] = [];
+    let currentPart: MarkdownPartEntry[] = [];
+    let currentBytes = 0;
+
+    for (const entry of entries.flat()) {
+        const isFull =
+            currentPart.length >= MAX_PAGES_PER_PART ||
+            currentBytes + entry.bytes > MAX_BYTES_PER_PART;
+
+        if (isFull && currentPart.length > 0) {
+            parts.push(currentPart);
+            currentPart = [];
+            currentBytes = 0;
+        }
+
+        currentPart.push(entry);
+        currentBytes += entry.bytes;
+    }
+
+    if (currentPart.length > 0) {
+        parts.push(currentPart);
+    }
+
+    return parts;
+}
+
+/**
+ * Split a page into as many chunks as needed for each to fit in a part.
+ */
+async function splitPageIntoChunks(
+    entry: MarkdownPageEntry,
+    pageNumber: number
+): Promise<MarkdownPartEntry[]> {
+    const markdown = await fetchPageMarkdown(entry.context, entry.page);
+    const bytes = Buffer.byteLength(markdown);
+    const chunkCount = Math.max(1, Math.ceil(bytes / MAX_BYTES_PER_PART));
+
+    return Array.from({ length: chunkCount }, (_, chunk) => ({
+        ...entry,
+        pageNumber,
+        chunk,
+        chunkCount,
+        bytes: bytes / chunkCount,
+    }));
+}
+
+/**
+ * Get one of `chunkCount` chunks of a page's markdown, splitting it between headings,
+ * or between paragraphs when a single heading's section is too large.
+ */
+function getMarkdownChunk(markdown: string, chunk: number, chunkCount: number): string {
+    if (chunkCount === 1) {
+        return markdown;
+    }
+
+    const headingSections = markdown.split(/(?<=\n)(?=#{1,6} )/);
+    const hasOversizedSection = headingSections.some(
+        (section) => Buffer.byteLength(section) > MAX_BYTES_PER_PART
+    );
+    const sections = hasOversizedSection ? markdown.split(/(?<=\n\n)/) : headingSections;
+    const sectionsPerChunk = Math.ceil(sections.length / chunkCount);
+
+    return sections.slice(chunk * sectionsPerChunk, (chunk + 1) * sectionsPerChunk).join('');
+}
+
+/**
+ * Stream a single part of llms-full.txt.
+ */
+async function streamMarkdownPart(
     context: GitBookSiteContext,
     stream: ReadableStreamDefaultController<Uint8Array>,
-    allPages: MarkdownPageEntry[],
-    offset: number
-): Promise<{ currentPageIndex: number; reachedLimit: boolean }> {
-    // Apply pagination - skip pages before offset
-    const pagesToProcess = allPages.slice(offset, offset + DEFAULT_PAGE_LIMIT);
-    let totalPagesProcessed = offset;
+    { parts, part, totalPages }: { parts: MarkdownPartEntry[][]; part: number; totalPages: number }
+): Promise<void> {
+    const entries = parts[part] ?? [];
+    const partCount = parts.length;
+    const firstPage = entries[0]?.pageNumber;
+    const lastPage = entries.at(-1)?.pageNumber;
 
     // Agents often grep the file or only read its start, so announce the other parts up front.
-    const part = Math.floor(offset / DEFAULT_PAGE_LIMIT);
-    const partCount = Math.ceil(allPages.length / DEFAULT_PAGE_LIMIT);
     if (partCount > 1) {
+        const pages =
+            firstPage === lastPage ? `page ${firstPage}` : `pages ${firstPage}–${lastPage}`;
         const header = [
-            `> This is part ${part + 1} of ${partCount} of the full documentation (pages ${offset + 1}–${offset + pagesToProcess.length} of ${allPages.length}).`,
+            `> This is part ${part + 1} of ${partCount} of the full documentation (${pages} of ${totalPages}).`,
             '> The content is paginated: fetch every part to see all of it.',
         ];
         if (part > 0) {
@@ -178,29 +266,24 @@ async function streamMarkdownPageEntries(
         stream.enqueue(new TextEncoder().encode(`${agentInstructions}\n---\n\n`));
     }
 
-    // Process the pages
     for await (const markdown of pMapIterable(
-        pagesToProcess,
-        async ({ context: siteSpaceContext, page }) => {
-            return getMarkdownForPage(siteSpaceContext, page);
+        entries,
+        async ({ context: siteSpaceContext, page, chunk, chunkCount }) => {
+            const pageMarkdown = await getMarkdownForPage(siteSpaceContext, page);
+            return getMarkdownChunk(pageMarkdown, chunk, chunkCount);
         },
         {
             concurrency: MAX_CONCURRENCY,
         }
     )) {
         stream.enqueue(new TextEncoder().encode(markdown));
-        totalPagesProcessed++;
     }
 
-    // Check if there are more pages and add next page link if needed
-    const hasMorePages = allPages.length > offset + DEFAULT_PAGE_LIMIT;
-    if (hasMorePages) {
+    if (part < partCount - 1) {
         const nextPageUrl = getPartURL(context, part + 1);
         const nextPageLink = `\n\n---\n\n[Next Page](${nextPageUrl})\n\n`;
         stream.enqueue(new TextEncoder().encode(nextPageLink));
     }
-
-    return { currentPageIndex: totalPagesProcessed, reachedLimit: hasMorePages };
 }
 
 /**
@@ -218,18 +301,8 @@ async function getMarkdownForPage(
     context: GitBookSiteContext,
     page: RevisionPageDocument
 ): Promise<string> {
-    const { dataFetcher } = context;
-
-    const pageMarkdown = await throwIfDataError(
-        dataFetcher.getRevisionPageMarkdown({
-            spaceId: context.space.id,
-            revisionId: context.revisionId,
-            pageId: page.id,
-        })
-    );
-
     const tree = await fromPageMarkdown(context, {
-        markdown: pageMarkdown,
+        markdown: await fetchPageMarkdown(context, page),
         pagePath: page.path,
     });
 
@@ -246,4 +319,17 @@ async function getMarkdownForPage(
     const markdown = toPageMarkdown(tree);
 
     return `${markdown}\n\n`;
+}
+
+/**
+ * Fetch the raw markdown of a page.
+ */
+function fetchPageMarkdown(context: GitBookSiteContext, page: RevisionPageDocument) {
+    return throwIfDataError(
+        context.dataFetcher.getRevisionPageMarkdown({
+            spaceId: context.space.id,
+            revisionId: context.revisionId,
+            pageId: page.id,
+        })
+    );
 }
