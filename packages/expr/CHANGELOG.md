@@ -1,5 +1,11 @@
 # @gitbook/expr
 
+## 1.4.0
+
+### Minor Changes
+
+- 02f4cbc: Restrict expressions to an allowlist of methods and syntax, and report unsupported expressions when parsing.
+
 ## 1.3.1
 
 ### Patch Changes
