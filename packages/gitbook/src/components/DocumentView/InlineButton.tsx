@@ -12,6 +12,7 @@ import { getSelectAction } from './selectAction';
 import { SelectActionButton } from './SelectActionButton';
 import { isSiteAuthLoginHref } from '@/lib/auth-login-link';
 import { resolveContentRefFallback, resolveContentRefInDocument } from '@/lib/references';
+import { tcls } from '@/lib/tailwind';
 
 // Editor button sizes render one step smaller here; the editor default (`large`) keeps the previous `medium`.
 const BUTTON_SIZE_MAP: Record<
@@ -23,6 +24,28 @@ const BUTTON_SIZE_MAP: Record<
     large: 'medium',
 };
 
+// Only content buttons take the site's secondary colour; the `secondary` variant also styles site chrome.
+const SECONDARY_COLOR_CLASSES = tcls(
+    'bg-secondary',
+    'depth-flat:bg-secondary-base',
+    'text-secondary',
+    'hover:bg-secondary-hover',
+    'hover:not-disabled:depth-flat:bg-secondary-hover',
+    'hover:not-disabled:text-secondary',
+    'contrast-more:bg-secondary-subtle',
+    'disabled:text-secondary/8',
+    'border-secondary',
+    'hover:border-secondary-hover',
+    'disabled:border-secondary',
+    'shadow-secondary/6',
+    'dark:shadow-secondary-1',
+    'contrast-more:border-secondary-12',
+    'contrast-more:hover:outline-secondary-12',
+    'contrast-more:hover:border-secondary-12',
+    'contrast-more:focus-visible:border-secondary-12',
+    'contrast-more:focus-visible:outline-secondary-12'
+);
+
 export function InlineButton(props: InlineProps<api.DocumentInlineButton>) {
     const { inline, context } = props;
 
@@ -31,6 +54,7 @@ export function InlineButton(props: InlineProps<api.DocumentInlineButton>) {
         variant: inline.data.kind,
         icon: inline.data.icon as IconName | undefined,
         size: BUTTON_SIZE_MAP[inline.data.size ?? 'large'],
+        className: inline.data.kind === 'secondary' ? SECONDARY_COLOR_CLASSES : undefined,
     };
 
     const ButtonImplementation = () => {

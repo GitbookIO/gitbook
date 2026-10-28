@@ -2,6 +2,9 @@ import type { DocumentTextColor } from '@gitbook/api';
 
 import type { ClassValue } from '@/lib/tailwind';
 
+// `$secondary` is not in the published @gitbook/api enum yet; drop this once it is.
+type TextColor = DocumentTextColor | '$secondary';
+
 export const textColorToStyle = {
     default: [],
     blue: ['text-[#0067d1] dark:text-[#7dbcff]'],
@@ -14,12 +17,13 @@ export const textColorToStyle = {
     cyan: ['text-[#007c7c] dark:text-[#6bcac9]'],
     orange: ['text-[#ae4300] dark:text-[#eea471]'],
     $primary: ['text-primary-subtle contrast-more:text-primary'],
+    $secondary: ['text-secondary-subtle contrast-more:text-secondary'],
     $info: ['text-info-subtle contrast-more:text-info'],
     $success: ['text-success-subtle contrast-more:text-success'],
     $warning: ['text-warning-subtle contrast-more:text-warning'],
     $danger: ['text-danger-subtle contrast-more:text-danger'],
     $tint: ['text-tint-subtle contrast-more:text-tint'],
-} satisfies Record<DocumentTextColor, ClassValue>;
+} satisfies Record<TextColor, ClassValue>;
 
 export const backgroundColorToStyle = {
     default: [],
@@ -33,9 +37,10 @@ export const backgroundColorToStyle = {
     cyan: ['bg-[#ddf8f8] dark:bg-[#093b3b]'],
     orange: ['bg-[#ffecdc] dark:bg-[#492a13]'],
     $primary: ['bg-primary'],
+    $secondary: ['bg-secondary'],
     $info: ['bg-info'],
     $success: ['bg-success'],
     $warning: ['bg-warning'],
     $danger: ['bg-danger'],
     $tint: ['bg-tint'],
-} satisfies Record<DocumentTextColor, ClassValue>;
+} satisfies Record<TextColor, ClassValue>;
