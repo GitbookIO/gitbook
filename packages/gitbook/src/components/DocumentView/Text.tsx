@@ -38,10 +38,19 @@ export function Text(props: { text: DocumentText }) {
                                 {children}
                             </Mark>
                         );
-                    }, leaf.text)}
+                    }, withSoftBreaks(leaf.text))}
             </React.Fragment>
         );
     });
+}
+
+// Paragraphs with buttons are flex containers, where a `\n` alone can't move the next items to a new line.
+function withSoftBreaks(text: string): React.ReactNode {
+    return text
+        .split('\n')
+        .flatMap((line, index) =>
+            index === 0 ? line : ['\n', <span key={index} className="basis-full" />, line]
+        );
 }
 
 const MARK_STYLES = {
