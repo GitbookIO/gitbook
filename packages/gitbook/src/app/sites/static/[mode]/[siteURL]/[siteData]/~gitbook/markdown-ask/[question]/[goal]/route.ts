@@ -1,6 +1,10 @@
 import type { NextRequest } from 'next/server';
 
-import { type RouteLayoutParams, getStaticSiteContext } from '@/app/utils';
+import {
+    type RouteLayoutParams,
+    getSiteURLDataFromParams,
+    getStaticSiteContext,
+} from '@/app/utils';
 import { serveAskMarkdown } from '@/routes/markdownAsk';
 
 export const dynamic = 'force-static';
@@ -18,8 +22,9 @@ export async function GET(
 ) {
     const { question: encodedQuestion, goal: encodedGoal } = await params;
     const { context } = await getStaticSiteContext(await params);
+    const { askVisitorAgent } = getSiteURLDataFromParams(await params);
     const question = decodeURIComponent(encodedQuestion);
     const goal = decodeURIComponent(encodedGoal);
 
-    return serveAskMarkdown(context, question, { goal });
+    return serveAskMarkdown(context, question, { goal, visitorAgent: askVisitorAgent });
 }

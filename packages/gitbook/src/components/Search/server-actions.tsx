@@ -1,6 +1,7 @@
 'use server';
 
 import { createStreamableValue } from 'ai/rsc';
+import { headers } from 'next/headers';
 import type * as React from 'react';
 
 import type {
@@ -13,6 +14,7 @@ import type {
 
 import { DocumentView } from '../DocumentView';
 import { isAIEnabled, isAISearchEnabled } from '@/components/utils/isAIChatEnabled';
+import { getAskForwardedHeaders, getAskVisitorAgent } from '@/lib/ask-visitor';
 import type { GitBookSiteContext } from '@/lib/context';
 import { throwIfDataError } from '@/lib/data';
 import { toEmbeddableLinkForPublishedContent } from '@/lib/embeddable-linker';
@@ -77,7 +79,8 @@ export async function streamAskQuestion({
                     },
                     session,
                 },
-                { format: 'document' }
+                { format: 'document' },
+                { headers: getAskForwardedHeaders(getAskVisitorAgent(await headers())) }
             );
 
             const spacePromises = new Map<string, Promise<Revision>>();
