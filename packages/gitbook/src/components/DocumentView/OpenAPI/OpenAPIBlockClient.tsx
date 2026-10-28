@@ -78,31 +78,29 @@ export function OpenAPIBlockClient(props: OpenAPIBlockClientProps) {
             );
         case 'webhook':
             return <BaseOpenAPIWebhook data={props.data} context={context} className={className} />;
-        case 'schemas':
+        case 'schemas': {
+            const SchemasComponent =
+                mode !== 'print' && props.data.schemas.length >= MIN_RECORDS_FOR_SEARCH
+                    ? OpenAPISchemasWithSearch
+                    : BaseOpenAPISchemas;
             return (
-                <OpenAPISchemasWithSearch
+                <SchemasComponent
                     data={props.data}
                     grouped={props.grouped}
                     context={context}
                     className={className}
-                    isPrint={mode === 'print'}
                 />
             );
+        }
     }
 }
 
-function OpenAPISchemasWithSearch(
-    props: React.ComponentProps<typeof BaseOpenAPISchemas> & { isPrint: boolean }
-) {
-    const { data, isPrint, ...rest } = props;
+function OpenAPISchemasWithSearch(props: React.ComponentProps<typeof BaseOpenAPISchemas>) {
+    const { data, ...rest } = props;
     const language = useLanguage();
     const [query, setQuery] = React.useState('');
     // A models page can hold hundreds of schemas; keep typing responsive while the list re-renders.
     const deferredQuery = React.useDeferredValue(query).trim();
-
-    if (isPrint || data.schemas.length < MIN_RECORDS_FOR_SEARCH) {
-        return <BaseOpenAPISchemas data={data} {...rest} />;
-    }
 
     const schemas = data.schemas.filter(({ name }) => matchesText(name, deferredQuery));
 
