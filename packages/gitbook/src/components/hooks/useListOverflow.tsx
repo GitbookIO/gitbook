@@ -30,8 +30,10 @@ interface OverflowState {
  * shows *because* items overflow (a "more" menu, say) has to be rendered ahead of the items in that
  * phase: the measurement discounts the space taken before the first item, so a list that fits on its
  * own is not reported as overflowing merely because that menu was reserving room for itself.
+ *
+ * The list is measured again whenever `remeasureKey` changes.
  */
-export function useListOverflow(): OverflowState {
+export function useListOverflow(remeasureKey?: unknown): OverflowState {
     const containerRef = useRef<HTMLDivElement>(null);
     const [overflowing, setOverflowing] = useState<Set<string>>(new Set());
     // Measuring is a request/completed pair of counters rather than a boolean, because a boolean
@@ -57,6 +59,12 @@ export function useListOverflow(): OverflowState {
     }, []);
 
     const requestMeasure = useCallback(() => setMeasureRequest((request) => request + 1), []);
+
+    const [measuredKey, setMeasuredKey] = useState(remeasureKey);
+    if (measuredKey !== remeasureKey) {
+        setMeasuredKey(remeasureKey);
+        setMeasureRequest((request) => request + 1);
+    }
 
     // Measure on mount and when container size changes
     useEffect(() => {
