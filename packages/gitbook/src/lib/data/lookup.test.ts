@@ -4,6 +4,7 @@ import type { PublishedSiteContentLookup } from '@gitbook/api';
 
 import { GITBOOK_PREVIEW_BASE_URL } from '../env';
 import * as api from './api';
+import { DataFetcherError } from './errors';
 import { lookupPublishedContentByUrl } from './lookup';
 
 describe('preview auth redirects', () => {
@@ -104,6 +105,55 @@ describe('preview auth redirects', () => {
             expect(result).toEqual({ data: { ...data, redirect: expectedRedirect } });
         }
     );
+});
+
+describe('lookup URL', () => {
+    it('resolves the full URL without search params in a single call', async () => {
+        const urls: string[] = [];
+        const apiClientSpy = spyOn(api, 'apiClient').mockReturnValue({
+            urls: {
+                async resolvePublishedContentByUrl({ url }: { url: string }) {
+                    urls.push(url);
+                    return { data: { target: 'external', redirect: 'https://example.com' } };
+                },
+            },
+        } as unknown as ReturnType<typeof api.apiClient>);
+
+        try {
+            await lookupPublishedContentByUrl({
+                url: 'https://docs.example.com/v/variant/a/b/c/d/e?theme=dark',
+                apiToken: null,
+                redirectOnError: false,
+                visitorPayload: {},
+            });
+        } finally {
+            apiClientSpy.mockRestore();
+        }
+
+        expect(urls).toEqual(['https://docs.example.com/v/variant/a/b/c/d/e']);
+    });
+
+    it('returns the API error', async () => {
+        const apiClientSpy = spyOn(api, 'apiClient').mockReturnValue({
+            urls: {
+                async resolvePublishedContentByUrl() {
+                    throw new DataFetcherError('Not found', 404);
+                },
+            },
+        } as unknown as ReturnType<typeof api.apiClient>);
+
+        try {
+            const result = await lookupPublishedContentByUrl({
+                url: 'https://docs.example.com/a',
+                apiToken: null,
+                redirectOnError: false,
+                visitorPayload: {},
+            });
+            expect(result.error?.code).toBe(404);
+        } finally {
+            apiClientSpy.mockRestore();
+        }
+    });
 });
 
 describe('visitor payload', () => {

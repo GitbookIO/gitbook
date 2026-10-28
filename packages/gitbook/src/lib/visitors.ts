@@ -106,33 +106,6 @@ export function getVisitorType(request: {
     return detection.detected && detection.method !== 'heuristic' ? 'agent' : 'human';
 }
 
-// Production hostnames for which the visitor country is sent while the feature is rolled out.
-// Set at build time from a GitHub Actions variable to keep customer hostnames out of the code.
-const VISITOR_COUNTRY_HOSTNAMES = parseHostnameList(process.env.GITBOOK_VISITOR_COUNTRY_HOSTNAMES);
-const VISITOR_COUNTRY_STAGES = new Set(['dev', 'preview', 'staging']);
-
-/**
- * Parse a comma-separated list of hostnames.
- */
-export function parseHostnameList(value: string | undefined): Set<string> {
-    return new Set(
-        (value ?? '')
-            .split(',')
-            .map((hostname) => hostname.trim().toLowerCase())
-            .filter(Boolean)
-    );
-}
-
-/**
- * Whether the visitor country should be sent when resolving the site URL.
- */
-export function shouldSendVisitorCountry(hostname: string, stage: string | undefined): boolean {
-    return (
-        (!!stage && VISITOR_COUNTRY_STAGES.has(stage)) ||
-        VISITOR_COUNTRY_HOSTNAMES.has(hostname.toLowerCase())
-    );
-}
-
 /**
  * Get the ISO 3166-1 alpha-2 country code of the visitor from the geolocation headers,
  * or from `x-gitbook-country` when the request comes from the revalidation worker.
