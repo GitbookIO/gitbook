@@ -1,0 +1,273 @@
+import { execFileSync } from 'node:child_process';
+import { readFile } from 'node:fs/promises';
+import { join } from 'node:path';
+
+import {
+    type CompatibilityDiagnostic,
+    getCompatibilityDiagnostics,
+} from '../src/lib/cssBrowserCompatibility';
+
+interface PullRequestEvent {
+    pull_request: {
+        base: { sha: string };
+        head: { sha: string };
+        number: number;
+    };
+}
+
+interface PullRequestFile {
+    filename: string;
+    previous_filename?: string;
+    status: 'added' | 'copied' | 'modified' | 'removed' | 'renamed' | 'unchanged';
+}
+
+interface ContentResponse {
+    content: string;
+    encoding: string;
+    sha: string;
+}
+
+interface GitBlobResponse {
+    content: string;
+    encoding: string;
+}
+
+class GitHubRequestError extends Error {
+    constructor(
+        readonly status: number,
+        message: string
+    ) {
+        super(message);
+    }
+}
+
+class GitHubApi {
+    constructor(
+        private readonly repository: string,
+        private readonly token: string
+    ) {}
+
+    private async request<T>(path: string, init?: RequestInit): Promise<T> {
+        const response = await fetch(`https://api.github.com${path}`, {
+            ...init,
+            headers: {
+                Accept: 'application/vnd.github+json',
+                Authorization: `Bearer ${this.token}`,
+                'Content-Type': 'application/json',
+                'X-GitHub-Api-Version': '2022-11-28',
+                ...init?.headers,
+            },
+        });
+        const responseText = await response.text();
+
+        if (!response.ok) {
+            throw new GitHubRequestError(
+                response.status,
+                `${init?.method ?? 'GET'} ${path} failed: ${responseText}`
+            );
+        }
+
+        return JSON.parse(responseText) as T;
+    }
+
+    async listPullRequestFiles(pullRequestNumber: number): Promise<PullRequestFile[]> {
+        const files: PullRequestFile[] = [];
+
+        for (let page = 1; ; page += 1) {
+            const result = await this.request<PullRequestFile[]>(
+                `/repos/${this.repository}/pulls/${pullRequestNumber}/files?per_page=100&page=${page}`
+            );
+            files.push(...result);
+            if (result.length < 100) {
+                return files;
+            }
+        }
+    }
+
+    private async getContent(path: string, ref: string): Promise<string> {
+        const encodedPath = path.split('/').map(encodeURIComponent).join('/');
+        const content = await this.request<ContentResponse>(
+            `/repos/${this.repository}/contents/${encodedPath}?ref=${encodeURIComponent(ref)}`
+        );
+        const response = content.content
+            ? content
+            : await this.request<GitBlobResponse>(
+                  `/repos/${this.repository}/git/blobs/${content.sha}`
+              );
+
+        if (response.encoding !== 'base64') {
+            throw new Error(
+                `Unsupported GitHub content encoding for ${path}: ${response.encoding}`
+            );
+        }
+
+        return Buffer.from(response.content.replaceAll('\n', ''), 'base64').toString('utf8');
+    }
+
+    async getFileAtRef(path: string, ref: string): Promise<string> {
+        return this.getContent(path, ref);
+    }
+}
+
+async function getBrowserslist(api: GitHubApi, headSha: string): Promise<string[]> {
+    const packageJson = JSON.parse(
+        await api.getFileAtRef('packages/gitbook/package.json', headSha)
+    ) as { browserslist?: string[] };
+
+    if (!packageJson.browserslist?.length) {
+        throw new Error('packages/gitbook/package.json must define a Browserslist configuration.');
+    }
+
+    return packageJson.browserslist;
+}
+
+async function getBaseContent(
+    api: GitHubApi,
+    file: PullRequestFile,
+    baseSha: string
+): Promise<string> {
+    if (file.status === 'added') {
+        return '';
+    }
+
+    try {
+        return await api.getFileAtRef(file.previous_filename ?? file.filename, baseSha);
+    } catch (error) {
+        if (error instanceof GitHubRequestError && error.status === 404) {
+            return '';
+        }
+        throw error;
+    }
+}
+
+function report(diagnostics: CompatibilityDiagnostic[]): boolean {
+    if (diagnostics.length === 0) {
+        console.log('CSS browser compatibility check passed.');
+        return true;
+    }
+
+    console.error(
+        `${diagnostics.length} newly added CSS declaration(s) are not fully supported by the configured Browserslist targets:`
+    );
+    for (const diagnostic of diagnostics) {
+        // Workflow command so the failure is annotated on the PR diff.
+        console.error(
+            `::error file=${diagnostic.file},line=${diagnostic.line},col=${diagnostic.column}::${diagnostic.property} is not supported by ${diagnostic.unsupportedBrowsers}`
+        );
+    }
+    return false;
+}
+
+/** Same check as CI, but against a local `git diff` instead of the GitHub API. */
+async function runLocal(baseRef: string): Promise<boolean> {
+    const git = (...args: string[]) =>
+        execFileSync('git', args, { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
+    const root = git('rev-parse', '--show-toplevel').trim();
+    const mergeBase = git('merge-base', baseRef, 'HEAD').trim();
+    const browsers = (
+        JSON.parse(await readFile(join(root, 'packages/gitbook/package.json'), 'utf8')) as {
+            browserslist?: string[];
+        }
+    ).browserslist;
+
+    if (!browsers?.length) {
+        throw new Error('packages/gitbook/package.json must define a Browserslist configuration.');
+    }
+
+    // Working tree, so uncommitted changes are checked too.
+    const changes = git(
+        'diff',
+        '--name-status',
+        '--find-renames',
+        '--diff-filter=ACMR',
+        mergeBase,
+        '--',
+        '*.css'
+    )
+        .split('\n')
+        .filter(Boolean)
+        .map((line) => {
+            const [status, ...paths] = line.split('\t');
+            const previousPath = paths.length > 1 ? paths[0] : undefined;
+            const path = paths.at(-1) as string;
+            return { added: status?.startsWith('A'), path, previousPath };
+        });
+
+    const diagnostics: CompatibilityDiagnostic[] = [];
+    for (const change of changes) {
+        let base = '';
+        if (!change.added) {
+            try {
+                base = git('show', `${mergeBase}:${change.previousPath ?? change.path}`);
+            } catch {
+                base = '';
+            }
+        }
+        diagnostics.push(
+            ...(await getCompatibilityDiagnostics({
+                base,
+                browsers,
+                file: change.path,
+                head: await readFile(join(root, change.path), 'utf8'),
+            }))
+        );
+    }
+
+    console.log(`Checked ${changes.length} changed CSS file(s) against ${baseRef}.`);
+    return report(diagnostics);
+}
+
+async function run(): Promise<boolean> {
+    const token = process.env.GITHUB_TOKEN;
+    const repository = process.env.GITHUB_REPOSITORY;
+    const eventPath = process.env.GITHUB_EVENT_PATH;
+
+    if (!token || !repository || !eventPath) {
+        throw new Error('GITHUB_TOKEN, GITHUB_REPOSITORY, and GITHUB_EVENT_PATH are required.');
+    }
+
+    const event = JSON.parse(await readFile(eventPath, 'utf8')) as PullRequestEvent;
+    const pullRequest = event.pull_request;
+    if (!pullRequest) {
+        throw new Error('This script must run from a pull request event.');
+    }
+
+    const api = new GitHubApi(repository, token);
+    const browsers = await getBrowserslist(api, pullRequest.head.sha);
+    const files = (await api.listPullRequestFiles(pullRequest.number)).filter(
+        (file) => file.status !== 'removed' && file.filename.endsWith('.css')
+    );
+    const diagnostics: CompatibilityDiagnostic[] = [];
+
+    for (const file of files) {
+        const [base, head] = await Promise.all([
+            getBaseContent(api, file, pullRequest.base.sha),
+            api.getFileAtRef(file.filename, pullRequest.head.sha),
+        ]);
+        diagnostics.push(
+            ...(await getCompatibilityDiagnostics({
+                base,
+                browsers,
+                file: file.filename,
+                head,
+            }))
+        );
+    }
+
+    return report(diagnostics);
+}
+
+const localFlagIndex = process.argv.indexOf('--local');
+
+try {
+    let success: boolean;
+    if (localFlagIndex === -1) {
+        success = await run();
+    } else {
+        success = await runLocal(process.argv[localFlagIndex + 1] ?? 'origin/main');
+    }
+    process.exitCode = success ? 0 : 1;
+} catch (error) {
+    console.error(error);
+    process.exitCode = 1;
+}

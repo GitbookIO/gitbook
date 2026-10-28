@@ -1,0 +1,67 @@
+# @gitbook/colors
+
+## 0.4.4
+
+### Patch Changes
+
+- a69a307: A near-white tint color (e.g. a warm `#F5F3EF`) is now taken as the exact page background, mirroring the existing behavior for near-black tints. The tint's exact lightness, hue and chroma are preserved, and the color is anchored to whichever scale step the active theme renders as the background — so it matches exactly on `muted` (which uses the second step) as well as `clean`. This applies only to near-neutral tints that are light enough to read as a background; saturated or merely light-ish colors keep their normal accent scale. The `bold` theme is unaffected: it already uses the tint for the header and stays intentionally two-tone.
+
+## 0.4.3
+
+### Patch Changes
+
+- 10995e0: Use NPM Trusted publishing for publishing the package.
+
+## 0.4.2
+
+### Patch Changes
+
+- 6142d6b: Mark as sideEffects, fix all package bundles
+
+## 0.4.1
+
+### Patch Changes
+
+- 295f03d: Republish packages
+
+## 0.4.0
+
+### Minor Changes
+
+- 17dd382: Add `original` background color step
+
+### Patch Changes
+
+- 193d591: Fix return type for `colorContrast`
+
+## 0.3.3
+
+### Patch Changes
+
+- c3f6b8c: Update chroma ratio per step
+- 5e975ab: Fix code highlighting for HTTP
+- f7a3470: Change lightness check for color step 9 to allow input colors with a higher-than-needed contrast
+
+## 0.3.2
+
+### Patch Changes
+
+- cdffd7c: Desaturate text colors by decreasing chroma for the last steps of the color scale
+
+## 0.3.1
+
+### Patch Changes
+
+- fb90eb0: Reduce chroma of first color scale step
+
+## 0.3.0
+
+### Minor Changes
+
+- 4f0a772: Override tint lightness if supplied color is out of bounds
+
+## 0.2.0
+
+### Minor Changes
+
+- 445baaa: Initial release

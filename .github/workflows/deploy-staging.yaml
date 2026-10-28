@@ -1,0 +1,53 @@
+name: Staging
+on:
+    push:
+        branches:
+            - main
+jobs:
+    deploy-v2-vercel:
+        name: Deploy v2 to Vercel (staging)
+        runs-on: ubuntu-latest
+        environment:
+            name: 2v-staging
+            url: ${{ steps.deploy.outputs.deployment-url }}
+        outputs:
+            deployment-url: ${{ steps.deploy.outputs.deployment-url }}
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+            - name: Deploy
+              id: deploy
+              uses: ./.github/composite/deploy-vercel
+              with:
+                  environment: staging
+                  vercelOrg: ${{ secrets.VERCEL_ORG_ID }}
+                  vercelProject: ${{ secrets.VERCEL_PROJECT_ID }}
+                  vercelToken: ${{ secrets.VERCEL_TOKEN }}
+                  opItem: op://gitbook-open/2v-staging
+                  opServiceAccount: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+    deploy-v2-cloudflare:
+        name: Deploy v2 to Cloudflare Worker (staging)
+        runs-on: ubuntu-latest
+        environment:
+            name: 2c-staging
+            url: ${{ steps.deploy.outputs.deployment-url }}
+        outputs:
+            deployment-url: ${{ steps.deploy.outputs.deployment-url }}
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+            - name: Deploy
+              id: deploy
+              uses: ./.github/composite/deploy-cloudflare
+              with:
+                  environment: staging
+                  deploy: true
+                  apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+                  accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+                  opItem: op://gitbook-open/2c-staging
+                  opServiceAccount: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+                  commitTag: main
+                  commitMessage: ${{ github.sha }}
+            - name: Outputs
+              run: |
+                  echo "URL: ${{ steps.deploy.outputs.deployment-url }}"

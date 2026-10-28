@@ -1,0 +1,300 @@
+import warnOnce from 'warn-once';
+
+import type { RevisionPage, RevisionPageDocument, RevisionPageGroup } from '@gitbook/api';
+
+import { getPagePath } from '@/lib/pages';
+import { withLeadingSlash, withTrailingSlash } from '@/lib/paths';
+
+/**
+ * Generic interface to generate links based on a given context.
+ *
+ * URL levels:
+ *
+ * https://docs.company.com/basename/section/variant/page
+ *
+ * toPathInSpace('some/path') => /basename/section/variant/some/path
+ * toPathInSite('some/path') => /basename/some/path
+ * toPathForPage({ pages, page }) => /basename/section/variant/some/path
+ * toAbsoluteURL('some/path') => https://docs.company.com/some/path
+ */
+export interface GitBookLinker {
+    /**
+     * Generate an absolute path for a relative path to the current content.
+     */
+    toPathInSpace(relativePath: string): string;
+
+    /**
+     * Generate an absolute path for a relative path to the current site.
+     */
+    toPathInSite(relativePath: string): string;
+
+    /**
+     * Transform an absolute path in a site, to a relative path from the root of the site.
+     */
+    toRelativePathInSite(absolutePath: string): string;
+
+    /**
+     * Generate an absolute path for a page in the current content.
+     * The result should NOT be passed to `toPathInSpace`.
+     */
+    toPathForPage(input: {
+        pages: RevisionPage[];
+        page: RevisionPageDocument | RevisionPageGroup;
+        anchor?: string;
+    }): string;
+
+    /**
+     * Generate an absolute path for a page path in the current content.
+     * The result should NOT be passed to `toPathInSpace`.
+     */
+    toPathForPagePath(input: { path: string; anchor?: string }): string;
+
+    /**
+     * Generate an absolute URL for a given path relative to the host of the current content.
+     */
+    toAbsoluteURL(absolutePath: string): string;
+
+    /**
+     * Generate a link (URL or path) for a GitBook content URL (url of another site)
+     */
+    toLinkForContent(url: string): string;
+
+    /**
+     * Create a new linker that overrides some options of the current one.
+     */
+    fork(override: { spaceBasePath: string }): GitBookLinker;
+
+    /**
+     * Create a new linker that resolves links relative to a new space in the current site.
+     */
+    withOtherSiteSpace(override: { spaceBasePath: string }): GitBookLinker;
+
+    /**
+     * Site base path used to create this linker.
+     */
+    siteBasePath: string;
+
+    /**
+     * Space base path used to create this linker.
+     */
+    spaceBasePath: string;
+}
+
+/**
+ * Create a linker to resolve links in a context being served on a specific URL.
+ */
+export function createLinker(
+    /** Where the top of the space is served on */
+    servedOn: {
+        protocol?: string;
+        host?: string;
+
+        /** The base path of the space */
+        spaceBasePath: string;
+
+        /** The base path of the site */
+        siteBasePath: string;
+    }
+): GitBookLinker {
+    warnOnce(!servedOn.host, 'No host provided to createLinker. It can lead to issues with links.');
+
+    const siteBasePath = withTrailingSlash(withLeadingSlash(servedOn.siteBasePath));
+    const spaceBasePath = withTrailingSlash(withLeadingSlash(servedOn.spaceBasePath));
+
+    const linker: GitBookLinker = {
+        get siteBasePath() {
+            return siteBasePath;
+        },
+
+        get spaceBasePath() {
+            return spaceBasePath;
+        },
+
+        fork(override: { spaceBasePath: string }) {
+            return createLinker({
+                ...servedOn,
+                spaceBasePath: override.spaceBasePath,
+            });
+        },
+
+        toPathInSpace(relativePath: string): string {
+            return joinPaths(spaceBasePath, relativePath);
+        },
+
+        toPathInSite(relativePath: string): string {
+            return joinPaths(siteBasePath, relativePath);
+        },
+
+        toRelativePathInSite(absolutePath: string): string {
+            const normalizedPath = withLeadingSlash(absolutePath);
+
+            if (!normalizedPath.startsWith(servedOn.siteBasePath)) {
+                return normalizedPath;
+            }
+
+            return normalizedPath.slice(servedOn.siteBasePath.length);
+        },
+
+        toPathForPage({ pages, page, anchor }) {
+            return linker.toPathForPagePath({
+                path: getPagePath(pages, page),
+                anchor,
+            });
+        },
+
+        toPathForPagePath({ path, anchor }) {
+            return linker.toPathInSpace(path) + (anchor ? `#${anchor}` : '');
+        },
+
+        toAbsoluteURL(absolutePath: string): string {
+            // If the path is already a full URL, we return it as is.
+            if (URL.canParse(absolutePath)) {
+                return absolutePath;
+            }
+
+            if (!servedOn.host) {
+                return absolutePath;
+            }
+
+            return `${servedOn.protocol ?? 'https:'}//${joinPaths(servedOn.host, absolutePath)}`;
+        },
+
+        toLinkForContent(rawURL: string): string {
+            const url = new URL(rawURL);
+
+            // If the link points to a content in the same site, we return an absolute path
+            // instead of a full URL; it makes it possible to use router navigation
+            if (url.hostname === servedOn.host && url.pathname.startsWith(servedOn.siteBasePath)) {
+                return url.pathname + url.search + url.hash;
+            }
+
+            return rawURL;
+        },
+
+        withOtherSiteSpace(override: { spaceBasePath: string }): GitBookLinker {
+            const newLinker: GitBookLinker = {
+                ...linker,
+                toPathInSpace(relativePath: string): string {
+                    return linker.toPathInSite(joinPaths(override.spaceBasePath, relativePath));
+                },
+                // implementation matches the base linker toPathForPage, but decouples from using `this` to
+                // ensure we always use the updates `toPathInSpace` method.
+                toPathForPage({ pages, page, anchor }) {
+                    return newLinker.toPathForPagePath({
+                        path: getPagePath(pages, page),
+                        anchor,
+                    });
+                },
+                toPathForPagePath({ path, anchor }) {
+                    return newLinker.toPathInSpace(path) + (anchor ? `#${anchor}` : '');
+                },
+            };
+
+            return newLinker;
+        },
+    };
+
+    return linker;
+}
+
+/**
+ * Create a new linker that intercepts links that belongs to the published site and rewrite them
+ * relative to the URL being served.
+ *
+ * It is needed for preview of site where the served URL (http://preview/site_abc)
+ * is different from the actual published site URL (https://docs.company.com).
+ */
+export function linkerForPublishedURL(linker: GitBookLinker, rawSitePublishedURL: string) {
+    const sitePublishedURL = new URL(rawSitePublishedURL);
+
+    return {
+        ...linker,
+        toLinkForContent(rawURL: string): string {
+            const url = new URL(rawURL);
+
+            // If the link is part of the published site, we rewrite it to be part of the preview site.
+            if (
+                url.hostname === sitePublishedURL.hostname &&
+                url.pathname.startsWith(sitePublishedURL.pathname)
+            ) {
+                // When detecting that the url has been computed as apart of the published site,
+                // we rewrite it to be part of the preview site.
+                const extractedPath = url.pathname.slice(sitePublishedURL.pathname.length);
+                return linker.toPathInSite(extractedPath) + url.search + url.hash;
+            }
+
+            return linker.toLinkForContent(rawURL);
+        },
+    };
+}
+
+/**
+ * Create a new linker that always returns absolute URLs.
+ */
+export function linkerWithAbsoluteURLs(linker: GitBookLinker): GitBookLinker {
+    const self: GitBookLinker = {
+        ...linker,
+        toPathInSpace: (path) => linker.toAbsoluteURL(linker.toPathInSpace(path)),
+        toPathInSite: (path) => linker.toAbsoluteURL(linker.toPathInSite(path)),
+        toPathForPage: (input) => linker.toAbsoluteURL(linker.toPathForPage(input)),
+        toPathForPagePath: (input) => linker.toAbsoluteURL(linker.toPathForPagePath(input)),
+    };
+
+    return self;
+}
+
+/**
+ * Create a linker for a space whose root is an additional landing URL.
+ *
+ * All pages keep their explicit paths because the root can render a different page.
+ */
+export function linkerWithDirectPagePaths(linker: GitBookLinker): GitBookLinker {
+    const self: GitBookLinker = {
+        ...linker,
+        fork: (override) => linkerWithDirectPagePaths(linker.fork(override)),
+        // The target site space decides independently whether it has a custom home page.
+        withOtherSiteSpace: (override) => linker.withOtherSiteSpace(override),
+        toPathForPage: (input) => {
+            return self.toPathForPagePath({
+                path: input.page.path,
+                anchor: input.anchor,
+            });
+        },
+    };
+
+    return self;
+}
+
+/**
+ * Create a new linker that resolves pages to their markdown version.
+ */
+export function linkerWithMarkdownPages(linker: GitBookLinker): GitBookLinker {
+    const self: GitBookLinker = {
+        ...linker,
+        fork: (override) => linkerWithMarkdownPages(linker.fork(override)),
+        withOtherSiteSpace: (override) =>
+            linkerWithMarkdownPages(linker.withOtherSiteSpace(override)),
+        toPathForPage: (input) => {
+            return self.toPathForPagePath({
+                path: input.page.path,
+                anchor: input.anchor,
+            });
+        },
+        toPathForPagePath: (input) => {
+            return `${linker.toPathInSpace(input.path)}.md${input.anchor ? `#${input.anchor}` : ''}`;
+        },
+    };
+
+    return self;
+}
+
+function joinPaths(prefix: string, path: string): string {
+    const prefixPath = prefix.endsWith('/') ? prefix : `${prefix}/`;
+    const suffixPath = path.startsWith('/') ? path.slice(1) : path;
+    const pathWithoutTrailingSlash = removeTrailingSlash(prefixPath + suffixPath);
+    return pathWithoutTrailingSlash === '' ? '/' : pathWithoutTrailingSlash;
+}
+
+function removeTrailingSlash(path: string): string {
+    return path.endsWith('/') ? path.slice(0, -1) : path;
+}

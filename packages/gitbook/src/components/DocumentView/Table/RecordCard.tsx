@@ -1,0 +1,240 @@
+import {
+    CardsImageObjectFit,
+    type ContentRef,
+    type DocumentTableViewCards,
+    SiteInsightsLinkPosition,
+} from '@gitbook/api';
+
+import { isRecordColumnEmpty } from './isRecordColumnEmpty';
+import { RecordColumnValue } from './RecordColumnValue';
+import { RecordCardStyles } from './styles';
+import type { TableRecordKV, TableViewProps } from './Table';
+import { getRecordCardCovers } from './utils';
+import { LinkBox, LinkOverlay } from '@/components/primitives';
+import { Image } from '@/components/utils';
+import { type ResolvedContentRef, resolveContentRefInDocument } from '@/lib/references';
+import { tcls } from '@/lib/tailwind';
+
+export async function RecordCard(
+    props: TableViewProps<DocumentTableViewCards> & {
+        record: TableRecordKV;
+    }
+) {
+    const { view, record, context, block, isOffscreen, document } = props;
+
+    // A card paints its own opaque background, so a background page cover is never behind its
+    // content. Cover-aware contrast text must not apply inside it: it leaves the glyphs transparent
+    // and relies on a viewport-fixed background clipped to text, which Firefox and iOS Safari fail
+    // to paint through the card's clipped stacking context — the text disappears entirely.
+    const cardProps = { ...props, context: { ...context, isPageBody: false } };
+
+    const { dark, light } = getRecordCardCovers(record[1], view);
+    const targetRef = view.targetDefinition
+        ? (record[1].values[view.targetDefinition] as ContentRef)
+        : null;
+
+    const [lightCover, darkCover, target] = await Promise.all([
+        light.contentRef && context.contentContext
+            ? resolveContentRefInDocument(document, light.contentRef, context.contentContext)
+            : null,
+        dark.contentRef && context.contentContext
+            ? resolveContentRefInDocument(document, dark.contentRef, context.contentContext)
+            : null,
+        targetRef && context.contentContext
+            ? resolveContentRefInDocument(document, targetRef, context.contentContext)
+            : null,
+    ]);
+
+    const darkCoverIsSquareOrPortrait = isSquareOrPortrait(darkCover);
+    const lightCoverIsSquareOrPortrait = isSquareOrPortrait(lightCover);
+
+    const darkObjectFit = `dark:${getObjectFitClass(dark.objectFit)}`;
+    const lightObjectFit = getObjectFitClass(light.objectFit);
+    const objectFits = `${lightObjectFit} ${darkObjectFit}`;
+
+    const body = (
+        <div
+            // Marks the card body so overflow-clipped affordances (e.g. the paragraph "Ask"
+            // button) can opt out of rendering inside it.
+            data-card=""
+            className={tcls(
+                'grid-area-1-1',
+                'relative',
+                'grid',
+                'bg-tint-base',
+                'w-[calc(100%+2px)]',
+                'h-[calc(100%+2px)]',
+                '-inset-px',
+                'rounded-sm',
+                'straight-corners:rounded-none',
+                'circular-corners:rounded-xl',
+                'overflow-hidden',
+                '[&_.heading>div:first-child]:hidden',
+                '[&_.heading>div]:text-[.8em]',
+                '@xl:[&_.heading>div]:text-[1em]',
+                '[&_.blocks:first-child_.heading]:pt-0', // Remove padding-top on first heading in card
+
+                // On mobile, check if we can display the cover responsively or not:
+                // - If the file has a landscape aspect ratio, we display it normally
+                // - If the file is square or portrait, we display it left with 40% of the card width
+                lightCoverIsSquareOrPortrait || darkCoverIsSquareOrPortrait
+                    ? [
+                          lightCoverIsSquareOrPortrait
+                              ? '@sm:grid-cols-none grid-cols-[40%__1fr] @sm:grid-rows-[auto_1fr]'
+                              : '',
+                          darkCoverIsSquareOrPortrait
+                              ? 'dark:@sm:grid-cols-none dark:grid-cols-[40%__1fr] dark:@sm:grid-rows-[auto_1fr]'
+                              : '',
+                      ].filter(Boolean)
+                    : 'grid-rows-[auto_1fr]'
+            )}
+        >
+            {lightCover ? (
+                <Image
+                    alt="Cover"
+                    sources={{
+                        light: {
+                            src: lightCover.href,
+                            size: lightCover.file?.dimensions,
+                            alt: light.alt,
+                        },
+                        dark: darkCover
+                            ? {
+                                  src: darkCover.href,
+                                  size: darkCover.file?.dimensions,
+                                  alt: dark.alt,
+                              }
+                            : null,
+                    }}
+                    sizes={[
+                        {
+                            media: '(max-width: 640px)',
+                            width: view.cardSize === 'medium' ? 245 : 376,
+                        },
+                        {
+                            width: view.cardSize === 'medium' ? 490 : 752,
+                        },
+                    ]}
+                    resize={context.contentContext?.imageResizer}
+                    className={tcls(
+                        'min-w-0',
+                        'w-full',
+                        'h-full',
+                        'bg-tint-subtle',
+                        lightCoverIsSquareOrPortrait || darkCoverIsSquareOrPortrait
+                            ? [
+                                  lightCoverIsSquareOrPortrait ? '@sm:aspect-video @sm:h-auto' : '',
+                                  darkCoverIsSquareOrPortrait
+                                      ? 'dark:@sm:aspect-video dark:@sm:h-auto'
+                                      : '',
+                              ].filter(Boolean)
+                            : ['h-auto', 'aspect-video'],
+                        objectFits
+                    )}
+                    loading={isOffscreen && context.mode !== 'print' ? 'lazy' : 'eager'}
+                />
+            ) : null}
+            <div
+                className={tcls(
+                    'min-w-0',
+                    'w-full',
+                    'flex',
+                    'flex-col',
+                    'place-self-start',
+                    'gap-3',
+                    'p-4',
+                    'text-sm',
+                    'text-tint-strong'
+                )}
+            >
+                {view.columns.map((column) => {
+                    const definition = block.data.definition[column];
+
+                    if (!definition) {
+                        return null;
+                    }
+
+                    // A field can hold nothing at all (an `if` block that didn't match, an
+                    // empty value); rendering it would leave a gap and a dangling title.
+                    if (isRecordColumnEmpty(block, record[1], column)) {
+                        return null;
+                    }
+
+                    if (!view.hideColumnTitle && definition.title) {
+                        const ariaLabelledBy = `${block.key}-${column}-title`;
+                        return (
+                            <div key={column} className="flex flex-col gap-1">
+                                <div id={ariaLabelledBy} className="text-sm text-tint">
+                                    {definition.title}
+                                </div>
+                                <RecordColumnValue
+                                    {...cardProps}
+                                    column={column}
+                                    ariaLabelledBy={ariaLabelledBy}
+                                />
+                            </div>
+                        );
+                    }
+
+                    return <RecordColumnValue key={column} {...cardProps} column={column} />;
+                })}
+            </div>
+        </div>
+    );
+
+    if (target && targetRef) {
+        return (
+            // We don't use `Link` directly here because we could end up in a situation where
+            // a link is rendered inside a link, which is not allowed in HTML.
+            // It causes an hydration error in React.
+            <LinkBox href={target.href} classNames={['RecordCardStyles', 'RecordCardLinkStyles']}>
+                <LinkOverlay
+                    href={target.href}
+                    insights={{
+                        type: 'link_click',
+                        link: {
+                            target: targetRef,
+                            position: SiteInsightsLinkPosition.Content,
+                        },
+                    }}
+                />
+                {body}
+            </LinkBox>
+        );
+    }
+
+    return <div className={tcls(RecordCardStyles)}>{body}</div>;
+}
+
+/**
+ * Check if a file is square or portrait.
+ */
+function isSquareOrPortrait(contentRef: ResolvedContentRef | null) {
+    const file = contentRef?.file;
+
+    if (!file || !file.dimensions) {
+        return false;
+    }
+
+    return file.dimensions?.width / file.dimensions?.height <= 1;
+}
+
+/**
+ * Get the CSS class for object-fit based on the objectFit value.
+ */
+function getObjectFitClass(objectFit: CardsImageObjectFit | undefined): string {
+    if (!objectFit) {
+        return 'object-cover';
+    }
+
+    switch (objectFit) {
+        case CardsImageObjectFit.Contain:
+            return 'object-contain';
+        case CardsImageObjectFit.Fill:
+            return 'object-fill';
+        case CardsImageObjectFit.Cover:
+            return 'object-cover';
+        default:
+            throw new Error(`Unsupported object fit: ${objectFit}`);
+    }
+}

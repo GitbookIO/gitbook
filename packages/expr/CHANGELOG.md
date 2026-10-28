@@ -1,0 +1,78 @@
+# @gitbook/expr
+
+## 1.4.0
+
+### Minor Changes
+
+- 02f4cbc: Restrict expressions to an allowlist of methods and syntax, and report unsupported expressions when parsing.
+
+## 1.3.1
+
+### Patch Changes
+
+- 3fedaaa: Depend on `eval-estree-expression` from the npm registry (`^3.0.1`) instead of a pinned GitHub commit. The published `3.0.1` release is built from the exact commit the package was pinned to, so the code is unchanged — this only removes the fragile git/tarball dependency so consumers install it from npm like any other package.
+
+## 1.3.0
+
+### Minor Changes
+
+- 6eabaec: Implement a getVariables function for ExpressionRuntime
+
+## 1.2.5
+
+### Patch Changes
+
+- 8242f18: Extend gitbook/expr std lib with some additional methods
+
+## 1.2.4
+
+### Patch Changes
+
+- 10995e0: Use NPM Trusted publishing for publishing the package.
+- 10995e0: Use NPM dependency for eval-estree-expression
+
+## 1.2.3
+
+### Patch Changes
+
+- 6142d6b: Mark as sideEffects, fix all package bundles
+
+## 1.2.2
+
+### Patch Changes
+
+- 295f03d: Republish packages
+
+## 1.2.1
+
+### Patch Changes
+
+- a629900: Add dev script for @gitbook/expr
+
+## 1.2.0
+
+### Minor Changes
+
+- 6da3655: Fix exports in gitbook/expr package.json
+
+## 1.1.1
+
+### Patch Changes
+
+- 3548fa6: Fix eval-estree-expr named import
+
+## 1.1.0
+
+### Minor Changes
+
+- e1ff17e: Fix bundling of gitbook/expr package
+
+### Patch Changes
+
+- 8ff1e3b: Add support for every/some array methods
+
+## 1.0.0
+
+### Major Changes
+
+- ada195d: Publish gitbook/expr package to help evaluate user defined expressions.

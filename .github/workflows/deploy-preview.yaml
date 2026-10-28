@@ -1,0 +1,300 @@
+name: Preview
+on:
+    pull_request_target:
+    push:
+        branches:
+            - main
+jobs:
+    approval:
+        # Ensure that external contributors' PRs are manually approved before deployment
+        name: Approve Preview Deployment
+        runs-on: ubuntu-latest
+        if: ${{ github.event_name == 'pull_request_target' && github.event.pull_request.head.repo.fork }}
+        environment:
+            name: preview-approval
+        steps:
+            - name: Approval gate
+              run: echo "Preview deployment approved."
+    deploy-v2-vercel:
+        name: Deploy v2 to Vercel (preview)
+        runs-on: ubuntu-latest
+        needs: approval
+        if: ${{ always() && (needs.approval.result == 'success' || needs.approval.result == 'skipped') }}
+        environment:
+            name: 2v-preview
+            url: ${{ steps.deploy.outputs.deployment-url }}
+        outputs:
+            deployment-url: ${{ steps.deploy.outputs.deployment-url }}
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+              with:
+                  ref: ${{ github.event.pull_request.head.sha || github.sha }}
+            - name: Deploy to Vercel
+              id: deploy
+              uses: ./.github/composite/deploy-vercel
+              with:
+                  environment: preview
+                  vercelOrg: ${{ secrets.VERCEL_ORG_ID }}
+                  vercelProject: ${{ secrets.VERCEL_PROJECT_ID }}
+                  vercelToken: ${{ secrets.VERCEL_TOKEN }}
+                  opItem: op://gitbook-open/2v-preview
+                  opServiceAccount: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+                  headSha: ${{ github.event.pull_request.head.sha || github.sha }}
+    deploy-v2-cloudflare:
+        name: Deploy v2 to Cloudflare Worker (preview)
+        runs-on: ubuntu-latest
+        needs: approval
+        if: ${{ always() && (needs.approval.result == 'success' || needs.approval.result == 'skipped') }}
+        environment:
+            name: 2c-preview
+            url: ${{ steps.deploy.outputs.deployment-url }}
+        outputs:
+            deployment-url: ${{ steps.deploy.outputs.deployment-url || steps.extract-worker-id.outputs.worker-url }}
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+              with:
+                  ref: ${{ github.event.pull_request.head.sha || github.sha }}
+            - name: Deploy to Cloudflare
+              id: deploy
+              uses: ./.github/composite/deploy-cloudflare
+              with:
+                  environment: preview
+                  deploy: ${{ github.ref == 'refs/heads/main' }}
+                  apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+                  accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+                  opItem: op://gitbook-open/2c-preview
+                  opServiceAccount: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+                  commitTag: ${{ github.ref == 'refs/heads/main' && 'main' || format('pr{0}', github.event.pull_request.number) }}
+                  commitMessage: ${{ github.sha }}
+            - name: Extract Worker ID
+              id: extract-worker-id
+              if: ${{ !steps.deploy.outputs.deployment-url }}
+              run: |
+                  if [[ "${{ steps.deploy.outputs.command-output }}" =~ Worker\ Version\ ID:\ ([0-9a-f]{8})-([0-9a-f-]+) ]]; then
+                    WORKER_ID_FIRST_PART="${BASH_REMATCH[1]}"
+                    echo "worker-url=https://${WORKER_ID_FIRST_PART}-gitbook-open-v2-preview.gitbook.workers.dev/" >> $GITHUB_OUTPUT
+                  fi
+            - name: Outputs
+              run: |
+                  echo "URL: ${{ steps.deploy.outputs.deployment-url || steps.extract-worker-id.outputs.worker-url }}"
+    comment-deployments:
+        runs-on: ubuntu-latest
+        name: Comment Deployments (preview)
+        if: always() && github.event_name != 'push'
+        needs:
+            - deploy-v2-vercel
+            - deploy-v2-cloudflare
+        steps:
+            - name: Find GitHub Comment
+              uses: peter-evans/find-comment@v3
+              id: fc
+              with:
+                  issue-number: ${{ github.event.pull_request.number }}
+                  comment-author: 'github-actions[bot]'
+                  body-includes: 'Summary of the deployments'
+
+            - name: Create or update GitHub comment
+              uses: peter-evans/create-or-update-comment@v4
+              with:
+                  comment-id: ${{ steps.fc.outputs.comment-id }}
+                  issue-number: ${{ github.event.pull_request.number }}
+                  body: |
+                      Summary of the deployments:
+
+                      | Version | URL | Status |
+                      | --- | --- | --- |
+                      | Vercel | [${{ needs.deploy-v2-vercel.outputs.deployment-url }}](${{ needs.deploy-v2-vercel.outputs.deployment-url }}) | ${{ needs.deploy-v2-vercel.result == 'success' && '✅' || '❌' }} |
+                      | Cloudflare | [${{ needs.deploy-v2-cloudflare.outputs.deployment-url }}](${{ needs.deploy-v2-cloudflare.outputs.deployment-url }}) | ${{ needs.deploy-v2-cloudflare.result == 'success' && '✅' || '❌' }} |
+
+                      ### Test content
+
+                      | Site | `2v` | `2c` |
+                      | --- | --- | --- |
+                      | GitBook | [${{ needs.deploy-v2-vercel.outputs.deployment-url }}/url/gitbook.com/docs](${{ needs.deploy-v2-vercel.outputs.deployment-url }}/url/gitbook.com/docs) | [${{ needs.deploy-v2-cloudflare.outputs.deployment-url }}/url/gitbook.com/docs](${{ needs.deploy-v2-cloudflare.outputs.deployment-url }}/url/gitbook.com/docs) |
+                      | E2E | [${{ needs.deploy-v2-vercel.outputs.deployment-url }}/url/gitbook.gitbook.io/test-gitbook-open](${{ needs.deploy-v2-vercel.outputs.deployment-url }}/url/gitbook.gitbook.io/test-gitbook-open) | [${{ needs.deploy-v2-cloudflare.outputs.deployment-url }}/url/gitbook.gitbook.io/test-gitbook-open](${{ needs.deploy-v2-cloudflare.outputs.deployment-url }}/url/gitbook.gitbook.io/test-gitbook-open) |
+                  edit-mode: replace
+    visual-testing-v2-vercel:
+        runs-on: ubuntu-latest
+        name: Visual Testing v2
+        needs: deploy-v2-vercel
+        if: ${{ always() && needs.deploy-v2-vercel.result == 'success' }}
+        timeout-minutes: 15
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+              with:
+                  ref: ${{ github.event.pull_request.head.sha || github.sha }}
+            - name: Setup Bun
+              uses: ./.github/composite/setup-bun
+            - name: Install dependencies
+              run: bun install --frozen-lockfile
+              env:
+                  PUPPETEER_SKIP_DOWNLOAD: 1
+            - name: Run Playwright tests
+              run: bun e2e
+              env:
+                  BASE_URL: ${{ needs.deploy-v2-vercel.outputs.deployment-url }}
+                  SITE_BASE_URL: ${{ needs.deploy-v2-vercel.outputs.deployment-url }}/url/
+                  ARGOS_TOKEN: ${{ secrets.ARGOS_TOKEN }}
+                  ARGOS_BUILD_NAME: v2-vercel
+    visual-testing-v2-cloudflare:
+        runs-on: ubuntu-latest
+        name: Visual Testing v2 (Cloudflare)
+        needs: deploy-v2-cloudflare
+        if: ${{ always() && needs.deploy-v2-cloudflare.result == 'success' }}
+        timeout-minutes: 15
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+              with:
+                  ref: ${{ github.event.pull_request.head.sha || github.sha }}
+            - name: Setup Bun
+              uses: ./.github/composite/setup-bun
+            - name: Install dependencies
+              run: bun install --frozen-lockfile
+              env:
+                  PUPPETEER_SKIP_DOWNLOAD: 1
+            - name: Run Playwright tests
+              run: bun e2e
+              env:
+                  BASE_URL: ${{ needs.deploy-v2-cloudflare.outputs.deployment-url }}
+                  SITE_BASE_URL: ${{ needs.deploy-v2-cloudflare.outputs.deployment-url }}/url/
+                  ARGOS_TOKEN: ${{ secrets.ARGOS_TOKEN }}
+                  ARGOS_BUILD_NAME: v2-cloudflare
+    visual-testing-customers-v2:
+        runs-on: ubuntu-latest
+        name: Visual Testing Customers v2
+        needs: deploy-v2-vercel
+        if: ${{ always() && needs.deploy-v2-vercel.result == 'success' }}
+        timeout-minutes: 30
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+              with:
+                  ref: ${{ github.event.pull_request.head.sha || github.sha }}
+            - name: Setup Bun
+              uses: ./.github/composite/setup-bun
+            - name: Install dependencies
+              run: bun install --frozen-lockfile
+              env:
+                  PUPPETEER_SKIP_DOWNLOAD: 1
+            - name: Run Playwright tests
+              run: bun e2e-customers
+              env:
+                  BASE_URL: ${{ needs.deploy-v2-vercel.outputs.deployment-url }}
+                  SITE_BASE_URL: ${{ needs.deploy-v2-vercel.outputs.deployment-url }}/url/
+                  ARGOS_TOKEN: ${{ secrets.ARGOS_TOKEN }}
+                  ARGOS_BUILD_NAME: customers-v2-vercel
+
+            # Style recalc depends on the client bundle, not the host, so this runs here only and
+            # not in the Cloudflare job. Kept out of `e2e-customers`, which is a visual suite.
+            - name: Run style invalidation tests
+              if: always()
+              working-directory: packages/gitbook
+              run: bun run e2e-style-perf
+              env:
+                  BASE_URL: ${{ needs.deploy-v2-vercel.outputs.deployment-url }}
+                  SITE_BASE_URL: ${{ needs.deploy-v2-vercel.outputs.deployment-url }}/url/
+
+            # Runs on failure too: a blown style budget is exactly when the numbers are worth seeing.
+            - name: Build style invalidation report
+              if: always() && github.event_name != 'push'
+              id: style-perf
+              working-directory: packages/gitbook
+              run: |
+                  rows=$(cat test-results/style-perf.md 2>/dev/null || true)
+                  if [ -z "$rows" ]; then exit 0; fi
+                  {
+                    echo 'body<<STYLE_PERF_EOF'
+                    echo '### Style invalidation on a large API reference'
+                    echo
+                    echo 'Elements restyled by opening one popup on [the Snyk API reference](https://docs.snyk.io/snyk-api/reference/apps). A share near or above 100% means the insertion restyles the whole document.'
+                    echo
+                    echo '| interaction | restyled | page | share | budget | |'
+                    echo '| --- | ---: | ---: | ---: | ---: | :-: |'
+                    echo "$rows"
+                    echo 'STYLE_PERF_EOF'
+                  } >> "$GITHUB_OUTPUT"
+
+            - name: Find style invalidation comment
+              if: always() && github.event_name != 'push' && steps.style-perf.outputs.body != ''
+              uses: peter-evans/find-comment@v3
+              id: fc-style-perf
+              with:
+                  issue-number: ${{ github.event.pull_request.number }}
+                  comment-author: 'github-actions[bot]'
+                  body-includes: 'Style invalidation on a large API reference'
+
+            - name: Create or update style invalidation comment
+              if: always() && github.event_name != 'push' && steps.style-perf.outputs.body != ''
+              uses: peter-evans/create-or-update-comment@v4
+              with:
+                  comment-id: ${{ steps.fc-style-perf.outputs.comment-id }}
+                  issue-number: ${{ github.event.pull_request.number }}
+                  body: ${{ steps.style-perf.outputs.body }}
+                  edit-mode: replace
+    visual-testing-customers-v2-cloudflare:
+        runs-on: ubuntu-latest
+        name: Visual Testing Customers v2 (Cloudflare)
+        needs: deploy-v2-cloudflare
+        if: ${{ always() && needs.deploy-v2-cloudflare.result == 'success' }}
+        timeout-minutes: 30
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+              with:
+                  ref: ${{ github.event.pull_request.head.sha || github.sha }}
+            - name: Setup Bun
+              uses: ./.github/composite/setup-bun
+            - name: Install dependencies
+              run: bun install --frozen-lockfile
+              env:
+                  PUPPETEER_SKIP_DOWNLOAD: 1
+            - name: Run Playwright tests
+              run: bun e2e-customers
+              env:
+                  BASE_URL: ${{ needs.deploy-v2-cloudflare.outputs.deployment-url }}
+                  SITE_BASE_URL: ${{ needs.deploy-v2-cloudflare.outputs.deployment-url }}/url/
+                  ARGOS_TOKEN: ${{ secrets.ARGOS_TOKEN }}
+                  ARGOS_BUILD_NAME: customers-v2-cloudflare
+    browserless-testing-v2-vercel:
+        runs-on: ubuntu-latest
+        name: Browserless Testing v2 (Vercel)
+        needs: deploy-v2-vercel
+        if: ${{ always() && needs.deploy-v2-vercel.result == 'success' }}
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+              with:
+                  ref: ${{ github.event.pull_request.head.sha || github.sha }}
+            - name: Setup Bun
+              uses: ./.github/composite/setup-bun
+            - name: Install dependencies
+              run: bun install --frozen-lockfile
+              env:
+                  PUPPETEER_SKIP_DOWNLOAD: 1
+            - name: Run tests
+              run: cd ./packages/gitbook && bun e2e-browserless
+              env:
+                  BASE_URL: ${{needs.deploy-v2-vercel.outputs.deployment-url}}
+                  SITE_BASE_URL: ${{ needs.deploy-v2-vercel.outputs.deployment-url }}/url/
+    # browserless-testing-v2-cloudflare:
+    #     runs-on: ubuntu-latest
+    #     name: Browserless Testing v2 (Cloudflare)
+    #     needs: deploy-v2-cloudflare
+    #     steps:
+    #         - name: Checkout
+    #           uses: actions/checkout@v4
+    #         - name: Setup Bun
+    #           uses: ./.github/composite/setup-bun
+    #         - name: Install dependencies
+    #           run: bun install --frozen-lockfile
+    #           env:
+    #               PUPPETEER_SKIP_DOWNLOAD: 1
+    #         - name: Run tests
+    #           run: cd ./packages/gitbook && bun e2e-browserless
+    #           env:
+    #               BASE_URL: ${{needs.deploy-v2-cloudflare.outputs.deployment-url}}
+    #               SITE_BASE_URL: ${{ needs.deploy-v2-cloudflare.outputs.deployment-url }}/url/

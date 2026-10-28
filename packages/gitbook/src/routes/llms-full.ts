@@ -1,0 +1,249 @@
+import assertNever from 'assert-never';
+import type { Paragraph } from 'mdast';
+import pMap, { pMapIterable } from 'p-map';
+
+import type { RevisionPageDocument, SiteSection, SiteSpace } from '@gitbook/api';
+
+import { renderSiteAgentInstructions } from '@/lib/ask-prompt';
+import {
+    type GitBookSiteContext,
+    checkIsRootSiteContext,
+    fetchSiteContextForSiteSpace,
+} from '@/lib/context';
+import { throwIfDataError } from '@/lib/data';
+import { getMarkdownContentType } from '@/lib/markdown-content-type';
+import { fromPageMarkdown, toPageMarkdown } from '@/lib/markdownPage';
+import { getIndexablePages } from '@/lib/sitemap';
+import { filterSiteSpacesByLocale, getSiteStructureSections } from '@/lib/sites';
+
+// We limit the concurrency to 100 to avoid reaching limit with concurrent requests
+// or file descriptor limits.
+const MAX_CONCURRENCY = 100;
+
+// Default limit for pages per batch
+const DEFAULT_PAGE_LIMIT = 100;
+
+type MarkdownPageEntry = { context: GitBookSiteContext; page: RevisionPageDocument };
+
+/**
+ * Generate a llms-full.txt file for the site.
+ * As the result can be large, we stream it as we generate it.
+ */
+export async function serveLLMsFullTxt(context: GitBookSiteContext, page = 0) {
+    if (!checkIsRootSiteContext(context)) {
+        return new Response('llms.txt is only served from the root of the site', { status: 404 });
+    }
+
+    const offset = page * DEFAULT_PAGE_LIMIT;
+    const allPages = await getMarkdownPageEntriesFromSiteStructure(context);
+
+    if (allPages.length <= offset) {
+        return new Response('No content found', { status: 404 });
+    }
+
+    return new Response(
+        new ReadableStream<Uint8Array>({
+            async pull(controller) {
+                await streamMarkdownPageEntries(context, controller, allPages, offset);
+                controller.close();
+            },
+        }),
+        {
+            headers: {
+                'Content-Type': getMarkdownContentType(context.isChatGPT),
+            },
+        }
+    );
+}
+
+/**
+ * Get the document pages that should be included in the full llms.txt output for a site structure.
+ */
+async function getMarkdownPageEntriesFromSiteStructure(
+    context: GitBookSiteContext
+): Promise<MarkdownPageEntry[]> {
+    switch (context.structure.type) {
+        case 'sections':
+            return getMarkdownPageEntriesFromSections(
+                context,
+                getSiteStructureSections(context.structure, { ignoreGroups: true })
+            );
+        case 'siteSpaces':
+            return getMarkdownPageEntriesFromSiteSpaces(context, context.structure.structure);
+        default:
+            assertNever(context.structure);
+    }
+}
+
+/**
+ * Get the document pages that should be included in the full llms.txt output for site sections.
+ */
+async function getMarkdownPageEntriesFromSections(
+    context: GitBookSiteContext,
+    siteSections: SiteSection[]
+): Promise<MarkdownPageEntry[]> {
+    return getMarkdownPageEntriesFromFilteredSiteSpaces(
+        siteSections.flatMap((siteSection) =>
+            filterSiteSpacesByLocale(siteSection.siteSpaces, context.locale)
+        ),
+        context
+    );
+}
+
+/**
+ * Get the document pages that should be included in the full llms.txt output for site spaces.
+ */
+async function getMarkdownPageEntriesFromSiteSpaces(
+    context: GitBookSiteContext,
+    siteSpaces: SiteSpace[]
+): Promise<MarkdownPageEntry[]> {
+    return getMarkdownPageEntriesFromFilteredSiteSpaces(
+        filterSiteSpacesByLocale(siteSpaces, context.locale),
+        context
+    );
+}
+
+/**
+ * Get markdown page entries from already locale-filtered site spaces.
+ */
+async function getMarkdownPageEntriesFromFilteredSiteSpaces(
+    siteSpaces: SiteSpace[],
+    context: GitBookSiteContext
+): Promise<MarkdownPageEntry[]> {
+    const publishedSiteSpaces = siteSpaces.filter((siteSpace) => siteSpace.urls.published);
+
+    const allPages = await pMap(
+        publishedSiteSpaces,
+        async (siteSpace): Promise<MarkdownPageEntry[]> => {
+            const siteSpaceContext = await fetchSiteContextForSiteSpace(context, siteSpace);
+            const pages = getIndexablePages(siteSpaceContext.revision.pages);
+
+            return pages.flatMap(({ page }) => {
+                if (page.type !== 'document') {
+                    return [];
+                }
+
+                return [
+                    {
+                        context: siteSpaceContext,
+                        page,
+                    },
+                ];
+            });
+        },
+        {
+            concurrency: MAX_CONCURRENCY,
+        }
+    );
+
+    return allPages.flat();
+}
+
+/**
+ * Stream a single paginated window of markdown page entries.
+ */
+async function streamMarkdownPageEntries(
+    context: GitBookSiteContext,
+    stream: ReadableStreamDefaultController<Uint8Array>,
+    allPages: MarkdownPageEntry[],
+    offset: number
+): Promise<{ currentPageIndex: number; reachedLimit: boolean }> {
+    // Apply pagination - skip pages before offset
+    const pagesToProcess = allPages.slice(offset, offset + DEFAULT_PAGE_LIMIT);
+    let totalPagesProcessed = offset;
+
+    // Agents often grep the file or only read its start, so announce the other parts up front.
+    const part = Math.floor(offset / DEFAULT_PAGE_LIMIT);
+    const partCount = Math.ceil(allPages.length / DEFAULT_PAGE_LIMIT);
+    if (partCount > 1) {
+        const header = [
+            `> This is part ${part + 1} of ${partCount} of the full documentation (pages ${offset + 1}–${offset + pagesToProcess.length} of ${allPages.length}).`,
+            '> The content is paginated: fetch every part to see all of it.',
+        ];
+        if (part > 0) {
+            header.push(`> Previous part: ${getPartURL(context, part - 1)}`);
+        }
+        if (part < partCount - 1) {
+            header.push(`> Next part: ${getPartURL(context, part + 1)}`);
+        }
+        header.push(
+            `> Page index: ${context.linker.toAbsoluteURL(context.linker.toPathInSite('llms.txt'))}`
+        );
+        stream.enqueue(new TextEncoder().encode(`${header.join('\n')}\n\n`));
+    }
+
+    // Rendered up front, on every part, since agents may only read the start of the file.
+    const agentInstructions = renderSiteAgentInstructions(context);
+    if (agentInstructions) {
+        stream.enqueue(new TextEncoder().encode(`${agentInstructions}\n---\n\n`));
+    }
+
+    // Process the pages
+    for await (const markdown of pMapIterable(
+        pagesToProcess,
+        async ({ context: siteSpaceContext, page }) => {
+            return getMarkdownForPage(siteSpaceContext, page);
+        },
+        {
+            concurrency: MAX_CONCURRENCY,
+        }
+    )) {
+        stream.enqueue(new TextEncoder().encode(markdown));
+        totalPagesProcessed++;
+    }
+
+    // Check if there are more pages and add next page link if needed
+    const hasMorePages = allPages.length > offset + DEFAULT_PAGE_LIMIT;
+    if (hasMorePages) {
+        const nextPageUrl = getPartURL(context, part + 1);
+        const nextPageLink = `\n\n---\n\n[Next Page](${nextPageUrl})\n\n`;
+        stream.enqueue(new TextEncoder().encode(nextPageLink));
+    }
+
+    return { currentPageIndex: totalPagesProcessed, reachedLimit: hasMorePages };
+}
+
+/**
+ * Get the absolute URL of a part of llms-full.txt.
+ */
+function getPartURL(context: GitBookSiteContext, part: number) {
+    const path = part === 0 ? 'llms-full.txt' : `llms-full.txt/${part}`;
+    return context.linker.toAbsoluteURL(context.linker.toPathInSite(path));
+}
+
+/**
+ * Get markdown from a page.
+ */
+async function getMarkdownForPage(
+    context: GitBookSiteContext,
+    page: RevisionPageDocument
+): Promise<string> {
+    const { dataFetcher } = context;
+
+    const pageMarkdown = await throwIfDataError(
+        dataFetcher.getRevisionPageMarkdown({
+            spaceId: context.space.id,
+            revisionId: context.revisionId,
+            pageId: page.id,
+        })
+    );
+
+    const tree = await fromPageMarkdown(context, {
+        markdown: pageMarkdown,
+        pagePath: page.path,
+    });
+
+    if (page.description) {
+        // The first node is the page title as a H1, we insert the description as a paragraph
+        // after it.
+        const descriptionNode: Paragraph = {
+            type: 'paragraph',
+            children: [{ type: 'text', value: page.description }],
+        };
+        tree.children.splice(1, 0, descriptionNode);
+    }
+
+    const markdown = toPageMarkdown(tree);
+
+    return `${markdown}\n\n`;
+}

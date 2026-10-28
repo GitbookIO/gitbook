@@ -1,0 +1,251 @@
+import type React from 'react';
+
+import { CustomizationHeaderPreset, CustomizationSearchStyle } from '@gitbook/api';
+
+import { AdaptiveVisitorContextProvider } from '../Adaptive';
+import { AIChatProvider } from '../AI';
+import type { RenderAIMessageOptions } from '../AI';
+import { AIChat, AskAIParagraphButton, AskAITextSelection } from '../AIChat';
+import { Announcement } from '../Announcement';
+import { SpacesDropdown, TranslationsDropdown } from '../Header/SpacesDropdown';
+import { CurrentContentProvider } from '../hooks';
+import { InsightsProvider, VisitorProvider } from '../Insights';
+import { CONTAINER_STYLE } from '../layout';
+import { NavigationLoader } from '../primitives/NavigationLoader';
+import { SearchContainer, getSearchBaseProps } from '../Search';
+import {
+    SiteSectionList,
+    encodeClientSiteSections,
+    shouldRenderSiteSectionNavigation,
+} from '../SiteSections';
+import { categorizeVariants } from './categorizeVariants';
+import { SpaceLayoutContextProvider } from './SpaceLayoutContext';
+import { Footer } from '@/components/Footer';
+import { Header, HeaderLogo } from '@/components/Header';
+import { TableOfContents } from '@/components/TableOfContents';
+import { isAIChatEnabled } from '@/components/utils/isAIChatEnabled';
+import type { VisitorAuthClaims } from '@/lib/adaptive';
+import type { GitBookSiteContext } from '@/lib/context';
+import { GITBOOK_APP_URL } from '@/lib/env';
+import { tcls } from '@/lib/tailwind';
+
+type SpaceLayoutProps = {
+    context: GitBookSiteContext;
+
+    /** Whether to enable tracking of events into site insights. */
+    withTracking: boolean;
+
+    /** The visitor auth claims. */
+    visitorAuthClaims: VisitorAuthClaims;
+
+    /** The options for rendering AI messages. */
+    aiChatRenderMessageOptions?: RenderAIMessageOptions;
+
+    /** The children of the layout. */
+    children: React.ReactNode;
+};
+
+/**
+ * Provide all contexts for a space.
+ */
+export function SpaceLayoutServerContext(props: SpaceLayoutProps) {
+    const { context, withTracking, visitorAuthClaims, aiChatRenderMessageOptions, children } =
+        props;
+
+    const { customization } = context;
+    const siteAdaptiveAuthLoginHref =
+        context.site.adaptiveContent?.enabled && context.site.urls.login
+            ? context.linker.toPathInSite('~gitbook/auth/login')
+            : null;
+
+    // Kept relative: a prerendered page has no request to read the host from, so an absolute URL
+    // pins the configured host and turns these fetches cross-origin when it differs (apex vs www).
+    const eventParams = new URLSearchParams({
+        o: context.organizationId,
+        s: context.site.id,
+    });
+    const eventUrl = `${context.linker.toPathInSite('/~gitbook/__evt')}?${eventParams}`;
+
+    const getVisitorClaimsUrl = context.linker.toPathInSite('/~gitbook/visitor');
+
+    return (
+        <SpaceLayoutContextProvider
+            basePath={context.linker.toPathInSpace('')}
+            siteAdaptiveAuthLoginHref={siteAdaptiveAuthLoginHref}
+            isLoggedInVisitor={context.isLoggedInVisitor}
+            siteIndexURL={context.linker.toPathInSite('~gitbook/site-index')}
+        >
+            <AdaptiveVisitorContextProvider
+                contextId={context.contextId}
+                visitorClaimsURL={getVisitorClaimsUrl}
+            >
+                <CurrentContentProvider
+                    organizationId={context.organizationId}
+                    siteId={context.site.id}
+                    siteSectionId={context.sections?.current?.id ?? null}
+                    siteSpaceId={context.siteSpace.id}
+                    siteShareKey={context.shareKey ?? null}
+                    spaceId={context.space.id}
+                    revisionId={context.revisionId}
+                    visitorAuthClaims={visitorAuthClaims}
+                >
+                    <VisitorProvider
+                        appURL={GITBOOK_APP_URL}
+                        visitorCookieTrackingEnabled={customization.insights?.trackingCookie}
+                    >
+                        <InsightsProvider enabled={withTracking} eventUrl={eventUrl}>
+                            <AIChatProvider
+                                renderMessageOptions={aiChatRenderMessageOptions}
+                                withPageFeedback={customization.feedback.enabled}
+                            >
+                                {children}
+                            </AIChatProvider>
+                        </InsightsProvider>
+                    </VisitorProvider>
+                </CurrentContentProvider>
+            </AdaptiveVisitorContextProvider>
+        </SpaceLayoutContextProvider>
+    );
+}
+
+/**
+ * Render the entire layout of the space (header, table of contents, footer).
+ */
+export function SpaceLayout(props: SpaceLayoutProps) {
+    const { context, children } = props;
+    const { siteSpace, customization, visibleSections } = context;
+    const searchProps = getSearchBaseProps(context);
+
+    const withTopHeader = customization.header.preset !== CustomizationHeaderPreset.None;
+
+    const withSections = shouldRenderSiteSectionNavigation(visibleSections);
+    const variants = categorizeVariants(context);
+    const socialLinks = customization.socialAccounts.filter((account) => account.display?.footer);
+
+    const withFooter =
+        customization.themes.toggeable ||
+        customization.footer.copyright ||
+        customization.footer.logo ||
+        socialLinks.length > 0 ||
+        customization.footer.groups?.length;
+
+    return (
+        <SpaceLayoutServerContext {...props}>
+            <Announcement context={context} />
+            <Header withTopHeader={withTopHeader} variants={variants} context={context} />
+            <NavigationLoader />
+            {isAIChatEnabled(customization.ai?.mode) ? (
+                <>
+                    <AIChat />
+                    <AskAITextSelection />
+                    <AskAIParagraphButton />
+                </>
+            ) : null}
+
+            {/* Chat panel shifts content left when open */}
+            <div className="lg:chat-open:mr-(--ai-chat-width) motion-safe:transition-all motion-safe:duration-300">
+                <div
+                    className={tcls(
+                        'flex',
+                        'flex-col',
+                        'lg:flex-row',
+                        'lg:justify-center',
+                        CONTAINER_STYLE,
+                        'transition-[max-width] duration-300 motion-reduce:transition-none',
+
+                        !withTopHeader || variants.generic.length > 1
+                            ? 'has-sidebar'
+                            : 'no-sidebar',
+
+                        // Ensure the footer is display below the viewport even if the content is not enough
+                        withTopHeader
+                            ? [
+                                  'site-header:min-h-[calc(100vh-65px)]',
+                                  'site-header-sections:min-h-[calc(100vh-109px)]',
+                              ]
+                            : 'lg:min-h-screen'
+                    )}
+                >
+                    <TableOfContents
+                        context={context}
+                        header={
+                            <div
+                                className={tcls(
+                                    'pr-4',
+                                    'flex',
+                                    withTopHeader ? 'lg:hidden' : '',
+                                    'grow-0',
+                                    'dark:shadow-light/1',
+                                    'text-base/tight',
+                                    'items-center',
+                                    // On bold themes also color the TOC header so the logo looks correct.
+                                    'site-header:theme-bold:bg-header-background',
+                                    'site-header:theme-bold:m-[-1.5rem_-1px_-0.5rem_-2rem]',
+                                    'site-header:theme-bold:p-[1rem_1rem_1rem_2rem]'
+                                )}
+                            >
+                                <HeaderLogo context={context} />
+                                {variants.translations.length > 1 ? (
+                                    <TranslationsDropdown
+                                        context={context}
+                                        siteSpace={
+                                            variants.translations.find(
+                                                (space) => space.id === siteSpace.id
+                                            ) ?? siteSpace
+                                        }
+                                        siteSpaces={variants.translations}
+                                        className="[&_.button-leading-icon]:block! ml-auto py-2 [&_.button-content]:hidden"
+                                        variant="header"
+                                    />
+                                ) : null}
+                            </div>
+                        }
+                        // Displays the search button and/or the space dropdown in the ToC
+                        // according to the header/variant settings.
+                        // E.g if there is no header, the search button will be displayed in the ToC.
+                        innerHeader={
+                            !withTopHeader || variants.generic.length > 1 ? (
+                                <div
+                                    className={tcls(
+                                        'my-5 sidebar-default:mt-2 flex flex-col gap-2 px-5 empty:hidden',
+                                        variants.generic.length > 1 ? '' : 'max-lg:hidden'
+                                    )}
+                                >
+                                    {!withTopHeader && (
+                                        <div className="flex gap-2 max-lg:hidden">
+                                            <SearchContainer
+                                                {...searchProps}
+                                                style={CustomizationSearchStyle.Subtle}
+                                                viewport="desktop"
+                                            />
+                                        </div>
+                                    )}
+                                    {!withTopHeader && withSections && visibleSections && (
+                                        <SiteSectionList
+                                            className="hidden lg:block"
+                                            sections={encodeClientSiteSections(
+                                                context,
+                                                visibleSections
+                                            )}
+                                        />
+                                    )}
+                                    {variants.generic.length > 1 ? (
+                                        <SpacesDropdown
+                                            context={context}
+                                            siteSpace={siteSpace}
+                                            siteSpaces={variants.generic}
+                                            className="w-full px-3"
+                                        />
+                                    ) : null}
+                                </div>
+                            ) : null
+                        }
+                    />
+                    {children}
+                </div>
+            </div>
+
+            {withFooter ? <Footer context={context} /> : null}
+        </SpaceLayoutServerContext>
+    );
+}

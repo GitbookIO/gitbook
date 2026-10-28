@@ -1,0 +1,27 @@
+'use client';
+import { RecordCardLinkStyles, RecordCardStyles } from '../DocumentView/Table/styles';
+import { ToCLinkItemActiveStyles, ToCLinkItemStyles } from '../TableOfContents/styles';
+import { ButtonStyles, CardStyles, LinkStyles } from './styles';
+import type { ClassValue } from '@/lib/tailwind';
+
+const styles = {
+    LinkStyles,
+    CardStyles,
+    ButtonStyles,
+    RecordCardStyles,
+    RecordCardLinkStyles,
+    ToCLinkItemStyles,
+    ToCLinkItemActiveStyles,
+};
+
+export type DesignTokenName = keyof typeof styles;
+
+/**
+ * Get the class names for the given design token names.
+ * TODO: remove this once we figure out a better solution. Likely with TW4.
+ * @param names The design token names to get class names for.
+ * @returns The class names for the given design token names.
+ */
+export function useClassnames(names: DesignTokenName[]): ClassValue[] {
+    return names.flatMap((name) => styles[name] || []);
+}

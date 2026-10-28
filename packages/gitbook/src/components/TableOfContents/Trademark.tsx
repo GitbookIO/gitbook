@@ -1,0 +1,60 @@
+import type { SiteInsightsTrademarkPlacement } from '@gitbook/api';
+
+import { Button, type ButtonProps } from '../primitives';
+import { getSpaceLanguage, tString } from '@/intl/server';
+import type { GitBookAnyContext } from '@/lib/context';
+import { tcls } from '@/lib/tailwind';
+
+/**
+ * Trademark link to the GitBook.
+ */
+export async function Trademark(
+    props: {
+        context: GitBookAnyContext;
+        placement: SiteInsightsTrademarkPlacement;
+        className?: string;
+    } & ButtonProps
+) {
+    const { context, placement, className, ...buttonProps } = props;
+    const { space } = context;
+    const language = await getSpaceLanguage(context);
+
+    const url = new URL('https://www.gitbook.com/powered-by');
+    url.searchParams.set('utm_source', 'content');
+    url.searchParams.set('utm_medium', 'trademark');
+    url.searchParams.set('utm_campaign', space.id);
+    if ('site' in context) {
+        url.searchParams.set('utm_content', context.site.id);
+    }
+
+    return (
+        <Button
+            data-testid="gb-trademark"
+            target="_blank"
+            variant="secondary"
+            size="large"
+            href={url.toString()}
+            className={tcls(
+                'text-sm',
+                'font-semibold',
+                'text-tint',
+
+                'items-center',
+                'gap-3',
+
+                'bg-transparent',
+                'depth-subtle:shadow-none',
+                'border-tint-subtle',
+
+                className
+            )}
+            icon="gitbook"
+            label={tString(language, 'powered_by_gitbook')}
+            insights={{
+                type: 'trademark_click',
+                placement,
+            }}
+            {...buttonProps}
+        />
+    );
+}

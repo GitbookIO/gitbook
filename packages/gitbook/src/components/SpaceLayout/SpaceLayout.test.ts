@@ -1,0 +1,219 @@
+import { describe, expect, it } from 'bun:test';
+
+import { type SiteSpace, TranslationLanguage } from '@gitbook/api';
+
+import { categorizeVariants } from './categorizeVariants';
+import { languages } from '@/intl/translations';
+
+type FakeSiteSpace = {
+    id: SiteSpace['id'];
+    title: SiteSpace['title'];
+    space: Pick<SiteSpace['space'], 'language'>;
+};
+
+function makeContext(current: FakeSiteSpace, all: FakeSiteSpace[]) {
+    return {
+        // Only the properties used by categorizeVariants are required for these tests
+        locale: current.space.language,
+        siteSpace: current,
+        siteSpaces: all,
+        visibleSiteSpaces: all,
+    } as unknown as Parameters<typeof categorizeVariants>[0];
+}
+
+const englishA = {
+    id: 'en-a',
+    title: 'Docs EN A',
+    space: { language: TranslationLanguage.En },
+};
+const englishB = {
+    id: 'en-b',
+    title: 'Docs EN B',
+    space: { language: TranslationLanguage.En },
+};
+const frenchA = {
+    id: 'fr-a',
+    title: 'Docs FR A',
+    space: { language: TranslationLanguage.Fr },
+};
+const frenchB = {
+    id: 'fr-b',
+    title: 'Docs FR B',
+    space: { language: TranslationLanguage.Fr },
+};
+const undefinedLanguage = {
+    id: 'undefined',
+    title: 'Docs in Undefined Language',
+    space: { language: undefined },
+};
+const unsupportedLanguage = {
+    id: 'unsupported',
+    title: 'Docs in Unsupported Language',
+    space: { language: 'xx' as TranslationLanguage },
+};
+const version20En = {
+    id: 'v20-en',
+    title: 'v20',
+    space: { language: TranslationLanguage.En },
+};
+const version20Fr = {
+    id: 'v20-fr',
+    title: 'v20',
+    space: { language: TranslationLanguage.Fr },
+};
+const version20It = {
+    id: 'v20-it',
+    title: 'v20',
+    space: { language: TranslationLanguage.It },
+};
+const version19En = {
+    id: 'v19-en',
+    title: 'v19',
+    space: { language: TranslationLanguage.En },
+};
+const version19Fr = {
+    id: 'v19-fr',
+    title: 'v19',
+    space: { language: TranslationLanguage.Fr },
+};
+const version19It = {
+    id: 'v19-it',
+    title: 'v19',
+    space: { language: TranslationLanguage.It },
+};
+const version15En = {
+    id: 'v15-en',
+    title: 'v15',
+    space: { language: TranslationLanguage.En },
+};
+const version15Fr = {
+    id: 'v15-fr',
+    title: 'v15',
+    space: { language: TranslationLanguage.Fr },
+};
+const version15It = {
+    id: 'v15-it',
+    title: 'v15',
+    space: { language: TranslationLanguage.It },
+};
+
+describe('categorizeVariants', () => {
+    it('returns all spaces as generic and no translations for single-language sites', () => {
+        const ctx = makeContext(englishA, [englishA, englishB]);
+
+        const result = categorizeVariants(ctx);
+
+        expect(result.generic.map((s) => s.id)).toEqual(['en-a', 'en-b']);
+        expect(result.translations).toEqual([]);
+    });
+
+    it('returns all spaces as generic and no translations for sites with 1 language and an undefined language', () => {
+        const ctx = makeContext(englishA, [englishA, englishB, undefinedLanguage]);
+
+        const result = categorizeVariants(ctx);
+
+        expect(result.generic.map((s) => s.id)).toEqual(['en-a', 'en-b', 'undefined']);
+        expect(result.translations).toEqual([]);
+    });
+
+    it('keeps one-per-language translations without remapping titles', () => {
+        const ctx = makeContext(englishA, [englishA, frenchA]);
+
+        const result = categorizeVariants(ctx);
+
+        // Generic should only include current language variants when multi-language
+        expect(result.generic.map((s) => s.id)).toEqual(['en-a']);
+
+        // With exactly 1 per language, translations length equals number of languages → no remap
+        expect(result.translations.map((s) => ({ id: s.id, title: s.title }))).toEqual([
+            { id: 'en-a', title: 'Docs EN A' },
+            { id: 'fr-a', title: 'Docs FR A' },
+        ]);
+    });
+
+    it('keeps one-per-language translations without remapping titles, including unsupported languages', () => {
+        const ctx = makeContext(englishA, [englishA, unsupportedLanguage]);
+
+        const result = categorizeVariants(ctx);
+
+        // Generic should only include current language variants when multi-language
+        expect(result.generic.map((s) => s.id)).toEqual(['en-a']);
+
+        // With exactly 1 per language, translations length equals number of languages → no remap
+        expect(result.translations.map((s) => ({ id: s.id, title: s.title }))).toEqual([
+            { id: 'en-a', title: 'Docs EN A' },
+            { id: 'unsupported', title: 'Docs in Unsupported Language' },
+        ]);
+    });
+
+    it('treats undefined language as English when mixed with translated spaces', () => {
+        const ctx = makeContext(englishA, [englishA, frenchA, undefinedLanguage]);
+
+        const result = categorizeVariants(ctx);
+
+        expect(result.generic.map((s) => s.id)).toEqual(['en-a', 'undefined']);
+        expect(result.translations.map((s) => ({ id: s.id, title: s.title }))).toEqual([
+            { id: 'en-a', title: 'Docs EN A' },
+            { id: 'fr-a', title: 'Docs FR A' },
+        ]);
+    });
+
+    it('deduplicates to first space per language and maps titles to language names', () => {
+        const ctx = makeContext(englishA, [englishA, englishB, frenchA, frenchB]);
+
+        const result = categorizeVariants(ctx);
+
+        // Generic includes all current-language variants when multi-language
+        expect(result.generic.map((s) => s.id)).toEqual(['en-a', 'en-b']);
+
+        // Distinct languages are ['en','fr'] but initial translations had 4 → remap
+        // After remap: first per language, with title set to language label
+        expect(result.translations.map((s) => ({ id: s.id, title: s.title }))).toEqual([
+            { id: 'en-a', title: languages.en.language },
+            { id: 'fr-a', title: languages.fr.language },
+        ]);
+    });
+
+    it('prefers the space with the same title when switching languages', () => {
+        const ctx = makeContext(version15It, [
+            version20En,
+            version20Fr,
+            version20It,
+            version19En,
+            version19Fr,
+            version19It,
+            version15En,
+            version15Fr,
+            version15It,
+        ]);
+
+        const result = categorizeVariants(ctx);
+
+        expect(result.generic.map((s) => s.id)).toEqual(['v20-it', 'v19-it', 'v15-it']);
+        expect(result.translations.map((s) => ({ id: s.id, title: s.title }))).toEqual([
+            { id: 'v15-en', title: languages.en.language },
+            { id: 'v15-fr', title: languages.fr.language },
+            { id: 'v15-it', title: languages.it.language },
+        ]);
+    });
+
+    it('deduplicates to first space per language and maps titles to language names, and falls back to original title if no language is found', () => {
+        const ctx = makeContext(englishA, [
+            englishA,
+            englishB,
+            frenchA,
+            frenchB,
+            undefinedLanguage,
+            unsupportedLanguage,
+        ]);
+
+        const result = categorizeVariants(ctx);
+
+        expect(result.generic.map((s) => s.id)).toEqual(['en-a', 'en-b', 'undefined']);
+        expect(result.translations.map((s) => ({ id: s.id, title: s.title }))).toEqual([
+            { id: 'en-a', title: languages.en.language },
+            { id: 'fr-a', title: languages.fr.language },
+            { id: 'unsupported', title: 'Docs in Unsupported Language' },
+        ]);
+    });
+});

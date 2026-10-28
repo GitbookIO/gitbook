@@ -1,0 +1,109 @@
+import Script from 'next/script';
+import ReactDOM from 'react-dom';
+
+import type * as gitbookAPI from '@gitbook/api';
+
+import { Image } from '../utils';
+import type { BlockProps } from './Block';
+import { Caption } from './Caption';
+import { IntegrationBlock } from './Integration';
+import { Card } from '@/components/primitives';
+import { getDataOrNull } from '@/lib/data';
+import { tcls } from '@/lib/tailwind';
+
+export async function Embed(props: BlockProps<gitbookAPI.DocumentBlockEmbed>) {
+    const { block, context, ...otherProps } = props;
+
+    if (!context.contentContext) {
+        return null;
+    }
+
+    ReactDOM.preload('https://iframely.net/embed.js', { as: 'script' });
+
+    const embed = await getDataOrNull(
+        context.contentContext.dataFetcher.getEmbedByUrl({
+            url: block.data.url,
+            spaceId: context.contentContext.space?.id,
+        })
+    );
+
+    if (!embed) {
+        return null;
+    }
+
+    return (
+        <Caption {...props} withBorder withBlockKey>
+            {embed.type === 'rich' ? (
+                <>
+                    <div
+                        dangerouslySetInnerHTML={{
+                            __html:
+                                context.mode !== 'print' ? lazyLoadIframes(embed.html) : embed.html,
+                        }}
+                        data-visual-test="blackout"
+                    />
+                    <Script strategy="lazyOnload" src="https://iframely.net/embed.js" />
+                </>
+            ) : embed.type === 'integration' ? (
+                <IntegrationBlock
+                    {...otherProps}
+                    context={context}
+                    block={createIntegrationBlock(block.data.url, embed.integration, embed.block)}
+                />
+            ) : (
+                <Card
+                    leadingIcon={
+                        embed.icon ? (
+                            <Image
+                                src={embed.icon}
+                                className={tcls('w-5', 'h-5')}
+                                alt="Logo"
+                                sources={{ light: { src: embed.icon } }}
+                                sizes={[{ width: 20 }]}
+                                resize={context.contentContext.imageResizer}
+                                loading={context.mode === 'print' ? 'eager' : 'lazy'}
+                            />
+                        ) : null
+                    }
+                    href={block.data.url}
+                    title={embed.title}
+                    postTitle={embed.site}
+                />
+            )}
+        </Caption>
+    );
+}
+
+/**
+ * Defer players until they are visible. Pages with many embeds exhaust the browser's request
+ * budget (ERR_INSUFFICIENT_RESOURCES) when every player loads at once, and players booted in a
+ * hidden tab size themselves at 0×0 (e.g. YouTube then keeps a blurry thumbnail).
+ */
+function lazyLoadIframes(html: string): string {
+    return html.replace(/<iframe\b(?![^>]*\bloading=)/gi, '<iframe loading="lazy"');
+}
+
+/**
+ * Create an integration block with an unfurl action from the GitBook Embed response.
+ */
+function createIntegrationBlock(
+    url: string,
+    integration: string,
+    block: gitbookAPI.IntegrationBlock
+): gitbookAPI.DocumentBlockIntegration {
+    return {
+        object: 'block',
+        type: 'integration',
+        isVoid: true,
+        data: {
+            integration,
+            block: block.id,
+            props: {},
+            action: {
+                action: '@link.unfurl',
+                url,
+            },
+            url,
+        },
+    };
+}

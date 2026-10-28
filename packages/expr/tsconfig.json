@@ -1,0 +1,18 @@
+{
+    "$schema": "https://json.schemastore.org/tsconfig",
+    "extends": ["@tsconfig/strictest/tsconfig.json", "@tsconfig/node20/tsconfig.json"],
+    "compilerOptions": {
+        "lib": ["ESNext", "DOM"],
+        "module": "ESNext",
+        "moduleResolution": "bundler",
+        "isolatedModules": true,
+        "incremental": true,
+        "noEmit": true,
+        "noPropertyAccessFromIndexSignature": false,
+        "exactOptionalPropertyTypes": false,
+        "types": [
+            "bun-types" // add Bun global
+        ]
+    },
+    "include": ["types/**/*.d.ts", "src/**/*.ts"]
+}

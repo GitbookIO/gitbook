@@ -1,0 +1,29 @@
+import { CONTENT_STYLE } from '../layout';
+import { SkeletonHeading, SkeletonParagraph } from '@/components/primitives';
+import { tcls } from '@/lib/tailwind';
+
+/**
+ * Placeholder when loading a page.
+ */
+export function SitePageSkeleton() {
+    return (
+        <div
+            className={tcls(
+                'flex',
+                'flex-row',
+                'flex-1',
+                'relative',
+                'py-8',
+                'lg:px-16',
+                'xl:mr-56',
+                'items-center',
+                'lg:items-start'
+            )}
+        >
+            <div className={tcls('flex-1', CONTENT_STYLE)}>
+                <SkeletonHeading style={tcls('mb-8')} />
+                <SkeletonParagraph className={tcls('mb-4')} />
+            </div>
+        </div>
+    );
+}

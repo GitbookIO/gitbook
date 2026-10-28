@@ -1,0 +1,33 @@
+name: Slack PR status
+
+on:
+    pull_request_review:
+        types: [submitted, dismissed]
+    pull_request:
+        types: [closed, reopened]
+
+permissions:
+    contents: read
+    pull-requests: read
+
+jobs:
+    slack-pr-status:
+        # Secrets aren't available to workflows triggered from forks.
+        if: github.event.pull_request.head.repo.full_name == github.repository
+        runs-on: ubuntu-latest
+        steps:
+            - uses: GitbookIO/slack-pr-status@main
+              with:
+                  slack-token: ${{ secrets.SLAPR_SLACK_BOT_TOKEN }}
+                  config: |
+                      channels: [C01NXGWJELS]
+                      approvalsRequired: 1
+                      multiPr: aggregate
+                      emojis:
+                          commented: false
+                          partiallyApproved: next_track_button
+                          approved: pr-approved
+                          changesRequested: construction
+                          merged: merged
+                          closed: no_entry_sign
+                          partiallyReviewed: hourglass_flowing_sand

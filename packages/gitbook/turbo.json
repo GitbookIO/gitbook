@@ -1,0 +1,20 @@
+{
+    "extends": ["//"],
+    "tasks": {
+        "generate": {
+            "outputs": [
+                "public/~gitbook/static/icons/**/*",
+                "public/~gitbook/static/math/**/*",
+                "public/~gitbook/static/embed/**/*",
+                "public/~gitbook/static/fonts/**/*"
+            ],
+            "dependsOn": ["^generate", "@gitbook/embed#build"]
+        },
+        "typecheck": {
+            "dependsOn": ["^typecheck", "generate"]
+        },
+        "publish-to-npm": {
+            "dependsOn": []
+        }
+    }
+}

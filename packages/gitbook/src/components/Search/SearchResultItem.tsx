@@ -1,0 +1,86 @@
+import * as React from 'react';
+
+import { Icon, type IconName } from '@gitbook/icons';
+
+import { Button } from '../primitives';
+import { Link, type LinkInsightsProps } from '../primitives/Link';
+import { tcls } from '@/lib/tailwind';
+
+export const SearchResultItem = React.forwardRef(function SearchResultItem(
+    props: {
+        children: React.ReactNode;
+        href: string;
+        action: string;
+        active: boolean;
+        className?: string;
+        size?: 'small' | 'medium';
+        leadingIcon?: React.ReactNode;
+        disabled?: boolean;
+    } & LinkInsightsProps &
+        Omit<React.ComponentProps<typeof Link>, keyof LinkInsightsProps>,
+    ref: React.Ref<HTMLAnchorElement>
+) {
+    const {
+        children,
+        href,
+        active,
+        className,
+        leadingIcon,
+        size = 'medium',
+        action,
+        disabled,
+        ...rest
+    } = props;
+
+    return (
+        <Link
+            ref={ref}
+            href={href ?? '#'}
+            aria-disabled={disabled}
+            className={tcls(
+                'flex',
+                'items-center',
+                'gap-3',
+                'group',
+                'pl-3',
+                'pr-2',
+                'py-2',
+                'text-tint',
+                disabled ? ['pointer-events-none'] : ['hover:bg-tint', 'hover:text-tint-strong'],
+                'group',
+                'transition-colors',
+                'rounded-corners:rounded-md',
+                'circular-corners:rounded-2xl',
+                active
+                    ? ['is-active', 'bg-primary', 'text-primary-strong', 'hover:bg-primary']
+                    : null,
+                className
+            )}
+            role="option"
+            {...rest}
+        >
+            <div className="size-4 shrink-0 text-tint-subtle">
+                {typeof leadingIcon === 'string' ? (
+                    <Icon icon={leadingIcon as IconName} className="size-4" />
+                ) : (
+                    leadingIcon
+                )}
+            </div>
+            <div className="grow">{children}</div>
+            {disabled ? null : active ? (
+                <Button
+                    label={action}
+                    iconOnly
+                    variant="primary"
+                    size="xsmall"
+                    icon="arrow-turn-down-left"
+                    className="size-7"
+                />
+            ) : (
+                <div className="flex size-7 shrink-0 items-center justify-center text-tint-subtle">
+                    <Icon icon="chevron-right" className="size-3" />
+                </div>
+            )}
+        </Link>
+    );
+});

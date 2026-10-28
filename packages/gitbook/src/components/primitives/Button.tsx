@@ -1,0 +1,249 @@
+'use client';
+
+import * as React from 'react';
+
+import { Icon, type IconName } from '@gitbook/icons';
+
+import { Link, type LinkInsightsProps } from './Link';
+import { useClassnames } from './StyleProvider';
+import { Tooltip, type TooltipProps } from './Tooltip';
+import { type ClassValue, tcls } from '@/lib/tailwind';
+
+export type ButtonProps = {
+    href?: string;
+    variant?: 'primary' | 'secondary' | 'blank' | 'header';
+    icon?: IconName | React.ReactNode;
+    iconOnly?: boolean;
+    size?: 'large' | 'medium' | 'small' | 'xsmall';
+    className?: ClassValue;
+    label?: string | React.ReactNode;
+    trailing?: React.ReactNode;
+    children?: React.ReactNode;
+    active?: boolean;
+    tooltipProps?: TooltipProps;
+    truncate?: boolean;
+} & LinkInsightsProps &
+    React.HTMLAttributes<HTMLElement>;
+
+export const variantClasses = {
+    primary: [
+        'bg-primary-original',
+        'text-contrast-primary-original',
+        'hover:not-disabled:bg-primary-solid-hover',
+        'hover:not-disabled:border-primary-solid-hover',
+        'hover:not-disabled:text-contrast-primary-solid-hover',
+        'border-primary-original',
+        'contrast-more:bg-primary-solid',
+        'contrast-more:text-contrast-primary-solid',
+        'disabled:border-primary-2',
+        'disabled:bg-primary-subtle',
+        'disabled:text-primary/8',
+    ],
+    blank: [
+        'bg-transparent',
+        'text-tint',
+        'border-0',
+        'contrast-more:border',
+        'shadow-none!',
+        'translate-y-0!',
+        'hover:not-disabled:bg-tint-hover',
+        'hover:not-disabled:text-tint-strong',
+        'focus-visible:bg-tint-hover',
+        'focus-visible:text-tint-strong',
+        'aria-expanded:bg-tint-hover',
+        'aria-expanded:text-tint-strong',
+        'contrast-more:bg-tint-subtle',
+        'disabled:text-tint/8',
+        'disabled:bg-transparent',
+    ],
+    secondary: [
+        'bg-tint',
+        'depth-flat:bg-tint-base',
+        'text-tint',
+        'hover:bg-tint-hover',
+        'hover:not-disabled:depth-flat:bg-tint-hover',
+        'hover:not-disabled:text-tint',
+        'contrast-more:bg-tint-subtle',
+        'disabled:bg-transparent',
+        'disabled:text-tint/8',
+    ],
+    header: [
+        'bg-tint-base text-tint',
+        'hover:theme-clean:bg-tint-subtle',
+
+        'theme-bold:bg-header-link/1',
+        'theme-bold:text-header-link',
+        'theme-bold:shadow-none!',
+        'theme-bold:border-header-link/4',
+
+        'hover:theme-bold:bg-header-link/2',
+        'hover:theme-bold:text-header-link',
+        'hover:theme-bold:shadow-none',
+        'hover:theme-bold:border-header-link/5',
+
+        'contrast-more:theme-bold:bg-header-background',
+        'contrast-more:theme-bold:text-header-link',
+        'contrast-more:theme-bold:border-header-link',
+        'contrast-more:hover:theme-bold:border-header-link',
+    ],
+};
+
+export const activeClasses = {
+    primary: 'bg-primary-solid-hover',
+    blank: 'bg-primary-active contrast-more:bg-primary-12 contrast-more:text-contrast-primary-12 disabled:bg-primary-active text-primary-strong font-medium hover:text-primary-strong disabled:text-primary-strong hover:bg-primary-active focus-visible:bg-primary-active focus-visible:text-primary-strong aria-expanded:bg-primary-active aria-expanded:text-primary-strong',
+    secondary: 'bg-tint-active disabled:bg-tint-active',
+    header: 'bg-header-link/3',
+};
+
+export const Button = React.forwardRef<
+    HTMLButtonElement | HTMLAnchorElement,
+    ButtonProps &
+        React.ButtonHTMLAttributes<HTMLButtonElement> & { target?: React.HTMLAttributeAnchorTarget }
+>(
+    (
+        {
+            href,
+            variant = 'primary',
+            size = 'medium',
+            className,
+            insights,
+            target,
+            label,
+            icon,
+            iconOnly = false,
+            children,
+            active,
+            trailing,
+            disabled,
+            tooltipProps,
+            truncate = true,
+            ...rest
+        },
+        ref
+    ) => {
+        const sizes = {
+            large: ['font-semibold p-3', iconOnly ? '' : 'px-5'],
+            medium: ['p-2', iconOnly ? '' : 'px-4'],
+            small: ['p-1.5 text-sm/normal', iconOnly ? '' : 'px-3'],
+            xsmall: ['p-1 text-sm/tight rounded-corners:rounded-lg', iconOnly ? '' : 'px-2'],
+        };
+
+        const sizeClasses = sizes[size] || sizes.large;
+
+        const domClassName = tcls(
+            variantClasses[variant],
+            sizeClasses,
+            active && activeClasses[variant],
+            className
+        );
+        const buttonOnlyClassNames = useClassnames(['ButtonStyles']);
+
+        const iconSizeClasses = {
+            large: ['size-text-2xl', iconOnly && ''],
+            medium: ['size-text-lg my-[.1875em]', iconOnly && 'mx-[.1875em]'],
+            small: ['my-text-1/4 size-text-base', iconOnly && 'mx-text-1/4'],
+            xsmall: ['my-text-1/8 size-text-base', iconOnly && 'mx-text-1/8'],
+        };
+        let iconElement = null;
+        if (icon) {
+            if (typeof icon === 'string') {
+                iconElement = (
+                    <Icon
+                        icon={icon as IconName}
+                        className={tcls('button-leading-icon shrink-0', iconSizeClasses[size])}
+                    />
+                );
+            } else if (React.isValidElement<React.SVGProps<SVGSVGElement>>(icon)) {
+                iconElement = React.cloneElement(icon, {
+                    className: tcls(
+                        'button-leading-icon shrink-0',
+                        iconSizeClasses[size],
+                        icon.props.className
+                    ),
+                });
+            }
+        }
+
+        const content = (
+            <>
+                {iconElement}
+                {iconOnly || (!children && !label) ? null : (
+                    <span
+                        className={tcls(
+                            'button-content',
+                            truncate ? 'truncate' : 'whitespace-normal text-start'
+                        )}
+                    >
+                        {children ?? label}
+                    </span>
+                )}
+            </>
+        );
+
+        const button = href ? (
+            <Link
+                ref={ref as React.Ref<HTMLAnchorElement>}
+                href={href}
+                className={domClassName}
+                classNames={['ButtonStyles']}
+                insights={insights}
+                aria-label={label?.toString()}
+                aria-pressed={active}
+                target={target}
+                data-active={active}
+                {...rest}
+            >
+                {content}
+            </Link>
+        ) : (
+            <button
+                ref={ref as React.Ref<HTMLButtonElement>}
+                type="button"
+                className={tcls(buttonOnlyClassNames, domClassName)}
+                aria-label={label?.toString()}
+                aria-pressed={active}
+                disabled={disabled}
+                data-active={active}
+                {...rest}
+            >
+                {content}
+                {trailing ? <span className="button-trailing-icon ms-auto">{trailing}</span> : null}
+            </button>
+        );
+
+        return (children || iconOnly) && label ? (
+            <Tooltip label={label} disabled={disabled} {...tooltipProps}>
+                {button}
+            </Tooltip>
+        ) : (
+            button
+        );
+    }
+);
+
+export const ButtonGroup = React.forwardRef<
+    HTMLDivElement,
+    ButtonProps & { combinedShape?: boolean }
+>(({ children, className, combinedShape = true, ...rest }, ref) => {
+    return (
+        <div
+            ref={ref}
+            className={tcls(
+                'flex h-fit items-stretch justify-start overflow-hidden',
+                combinedShape
+                    ? [
+                          // Per-segment rounding lives in `globals.css`: Tailwind cannot express
+                          // "last button" once focus guards are injected.
+                          'button-group',
+                          '*:translate-y-0! *:shadow-none!',
+                          '[&>*:not(:first-child)]:border-l-0',
+                      ]
+                    : '',
+                className
+            )}
+            {...rest}
+        >
+            {children}
+        </div>
+    );
+});

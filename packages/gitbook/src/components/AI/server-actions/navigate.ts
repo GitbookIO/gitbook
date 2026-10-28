@@ -1,0 +1,40 @@
+'use server';
+
+import { toInSiteHref } from '../navigation';
+import { resolveContentRef, resolveStringContentRef, toContentRefPath } from '@/lib/references';
+import { fetchServerActionSiteContext, getServerActionBaseContext } from '@/lib/server-actions';
+import { traceErrorOnly } from '@/lib/tracing';
+
+/**
+ * Resolve a link provided by the assistant into a path that can be navigated to within the site.
+ *
+ * The assistant references pages using the stable content-ref scheme (e.g.
+ * `/spaces/<spaceId>/pages/<pageId>`). Those URLs are not directly navigable in the published
+ * site, so we resolve them to the real site link using the site context. Any other URL is only
+ * accepted if it points within the current site, so the assistant cannot navigate the reader off
+ * the documentation site.
+ */
+export async function resolveAINavigationLink(
+    url: string
+): Promise<{ href: string } | { error: string }> {
+    return traceErrorOnly('AI.resolveAINavigationLink', async () => {
+        const baseContext = await getServerActionBaseContext();
+        const context = await fetchServerActionSiteContext(baseContext);
+
+        const contentRef = resolveStringContentRef(toContentRefPath(url));
+        if (contentRef) {
+            const resolved = await resolveContentRef(contentRef, context);
+            if (!resolved) {
+                return { error: `Could not resolve page for ${url}` };
+            }
+            return { href: resolved.href };
+        }
+
+        // Not a content reference: only navigate to it if it points within the current site.
+        const inSiteHref = toInSiteHref(url, context.linker);
+        if (!inSiteHref) {
+            return { error: 'Cannot navigate to a page outside of this documentation site.' };
+        }
+        return { href: inSiteHref };
+    });
+}

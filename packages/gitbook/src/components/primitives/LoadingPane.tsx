@@ -1,0 +1,90 @@
+import { type ClassValue, tcls } from '@/lib/tailwind';
+
+type TileSizes = 12 | 24 | 48 | 96;
+
+export const LoadingPane = (props: {
+    style?: ClassValue;
+    tile?: TileSizes;
+    pulse?: boolean;
+    delay?: 0 | 1 | 2 | 3 | 4;
+    gridStyle?: ClassValue;
+}) => {
+    const { style, tile, pulse, delay, gridStyle } = props;
+
+    const delayStyle = (() => {
+        switch (delay) {
+            case 0:
+                return 'delay-0';
+            case 1:
+                return '[animation-delay:200ms]';
+            case 2:
+                return '[animation-delay:400ms]';
+            case 3:
+                return '[animation-delay:600ms]';
+            case 4:
+                return '[animation-delay:800ms]';
+        }
+    })();
+
+    const tileStyle = (() => {
+        switch (tile) {
+            case 12:
+                return '[mask:conic-gradient(from_90deg_at_1px_1px,#0000_90deg,#0003_0)_calc(50%+1px)_calc(0%+47px)/12px_12px]';
+            case 24:
+                return '[mask:conic-gradient(from_90deg_at_1px_1px,#0000_90deg,#0003_0)_calc(50%+1px)_calc(0%+47px)/24px_24px]';
+            case 48:
+                return '[mask:conic-gradient(from_90deg_at_1px_1px,#0000_90deg,#0003_0)_calc(50%+1px)_calc(0%+47px)/48px_48px]';
+            case 96:
+                return '[mask:conic-gradient(from_90deg_at_1px_1px,#0000_90deg,#0003_0)_calc(50%+1px)_calc(0%+47px)/96px_96px]';
+            default:
+                return '[mask:conic-gradient(from_90deg_at_1px_1px,#0000_90deg,#0003_0)_calc(50%+1px)_calc(0%+47px)/48px_48px]';
+        }
+    })();
+
+    return (
+        <div
+            className={tcls(
+                'ring-1',
+                'ring-tint-subtle',
+                'overflow-hidden',
+                'relative',
+                'grid',
+                style
+            )}
+        >
+            <div
+                className={tcls(
+                    'w-full',
+                    'bg-tint',
+                    'grid',
+                    'grid-area-1-1',
+                    'overflow-hidden',
+                    tileStyle
+                )}
+            >
+                <div
+                    className={tcls(
+                        'aspect-square',
+                        'from-tint-solid',
+                        'to-transparent',
+                        'grid-area-1-1',
+                        'relative',
+                        'origin-[50%_50%]',
+                        'top-[50%]',
+                        'self-stretch',
+                        'bg-transparent',
+                        'will-change-transform',
+                        pulse
+                            ? 'animate-[pulseAlt_6s_cubic-bezier(.44,.12,.29,.94)_infinite]'
+                            : 'animate-[rotateLoop_2s_linear_infinite]',
+                        pulse
+                            ? 'bg-[radial-gradient(circle_closest-side,var(--tw-gradient-stops)_0,var(--tw-gradient-stops)_33%,var(--tw-gradient-stops)_66%)]'
+                            : 'bg-[conic-gradient(from_-90deg_at_50%_50%,var(--tw-gradient-stops)_0deg,var(--tw-gradient-stops)_90deg,var(--tw-gradient-stops)_280deg)]',
+                        delayStyle,
+                        gridStyle
+                    )}
+                />
+            </div>
+        </div>
+    );
+};

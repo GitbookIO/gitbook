@@ -1,0 +1,96 @@
+import type { SiteSpace } from '@gitbook/api';
+import type { IconName } from '@gitbook/icons';
+
+import type { ButtonProps } from '../primitives';
+import { getTargetURLForSiteSpace } from '../SiteSections/encodeClientSiteSections';
+import { SpacesDropdownClient } from './SpacesDropdownClient';
+import type { GitBookSiteContext } from '@/lib/context';
+import { getLocalizedTitle } from '@/lib/sites';
+import { tcls } from '@/lib/tailwind';
+
+// Memoized regex for checking if a string starts with an emoji
+const EMOJI_REGEX = /^\p{Emoji}/u;
+
+function startsWithEmoji(text: string): boolean {
+    return EMOJI_REGEX.test(text);
+}
+
+export function SpacesDropdown(
+    props: {
+        context: GitBookSiteContext;
+        siteSpace: SiteSpace;
+        siteSpaces: SiteSpace[];
+        className?: string;
+        /** Keep the links inside the embed rather than sending readers to the full site. */
+        asEmbeddable?: boolean;
+    } & ButtonProps
+) {
+    const {
+        context,
+        siteSpace,
+        siteSpaces,
+        className,
+        asEmbeddable = false,
+        ...buttonProps
+    } = props;
+    const currentLanguage = context.locale;
+
+    const dropdownClassName = tcls(
+        'group-hover/dropdown:invisible', // Prevent hover from opening the dropdown, as it's annoying in this context
+        'group-focus-within/dropdown:group-hover/dropdown:visible' // When the dropdown is already open, it should remain visible when hovered
+    );
+
+    const slimSpaces = siteSpaces.map((siteSp) => ({
+        id: siteSp.id,
+        title: getLocalizedTitle(siteSp, currentLanguage),
+        url: getTargetURLForSiteSpace(context, siteSp, asEmbeddable),
+        isActive: siteSp.id === siteSpace.id,
+        spaceId: siteSp.space.id,
+    }));
+
+    return (
+        <SpacesDropdownClient
+            title={getLocalizedTitle(siteSpace, currentLanguage)}
+            icon={buttonProps.icon as IconName}
+            variant={buttonProps.variant ?? 'secondary'}
+            className={className}
+            dropdownClassName={dropdownClassName}
+            slimSpaces={slimSpaces}
+            curPath={siteSpace.path}
+        />
+    );
+}
+
+export function TranslationsDropdown(
+    props: {
+        context: GitBookSiteContext;
+        siteSpace: SiteSpace;
+        siteSpaces: SiteSpace[];
+        className?: string;
+        asEmbeddable?: boolean;
+    } & ButtonProps
+) {
+    const { context, siteSpace, siteSpaces, className, asEmbeddable, ...buttonProps } = props;
+
+    const title = getLocalizedTitle(siteSpace, context.locale);
+    const hasEmojiPrefix = startsWithEmoji(title);
+
+    return (
+        <SpacesDropdown
+            icon="globe"
+            context={context}
+            siteSpace={siteSpace}
+            siteSpaces={siteSpaces}
+            asEmbeddable={asEmbeddable}
+            variant="blank"
+            className={tcls(
+                'bg-transparent lg:max-w-64 max-md:[&_.button-content]:hidden',
+                hasEmojiPrefix
+                    ? 'md:[&_.button-leading-icon]:hidden' // If the title starts with an emoji, don't show the icon (on desktop)
+                    : '',
+                className
+            )}
+            {...buttonProps}
+        />
+    );
+}

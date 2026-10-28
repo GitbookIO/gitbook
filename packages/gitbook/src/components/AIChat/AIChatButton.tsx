@@ -1,0 +1,54 @@
+'use client';
+import type { Assistant } from '../AI';
+import { useIsMobile } from '../hooks/useIsMobile';
+import { useTrackEvent } from '../Insights';
+import { Button } from '../primitives';
+import { KeyboardShortcut } from '../primitives/KeyboardShortcut';
+import { useLanguage } from '@/intl/client';
+import { t, tString } from '@/intl/translate';
+
+const MOBILE_BREAKPOINT = 688; // 43rem, equal to Tailwind's @max-2xl container breakpoint
+
+/**
+ * Button to open/close the AI chat.
+ */
+export function AIChatButton(props: {
+    assistant: Assistant;
+    showLabel?: boolean;
+    withShortcut?: boolean;
+}) {
+    const { assistant, showLabel = true, withShortcut = true } = props;
+    const language = useLanguage();
+    const trackEvent = useTrackEvent();
+    const isMobile = useIsMobile(MOBILE_BREAKPOINT, '[data-gb-header-content]');
+
+    return (
+        <Button
+            icon={assistant.icon}
+            data-testid="ai-chat-button"
+            iconOnly={!showLabel || isMobile}
+            size="medium"
+            variant="header"
+            label={
+                <div className="flex items-center gap-2">
+                    {t(language, 'ai_chat_ask', assistant.label)}
+                    {withShortcut ? (
+                        <KeyboardShortcut
+                            keys={['mod', 'i']}
+                            className="border-tint-11 text-tint-1"
+                        />
+                    ) : null}
+                </div>
+            }
+            aria-label={tString(language, 'ai_chat_ask', assistant.label)}
+            onClick={() => {
+                if (assistant.id === 'gitbook-assistant') {
+                    trackEvent({ type: 'ask_trigger_click', trigger: 'site' });
+                }
+                assistant.open(undefined, 'site');
+            }}
+        >
+            {showLabel ? t(language, 'ask') : null}
+        </Button>
+    );
+}

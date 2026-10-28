@@ -1,0 +1,161 @@
+'use client';
+
+import * as React from 'react';
+import type { ReactNode } from 'react';
+
+import type { CustomizationAIMode } from '@gitbook/api';
+import type { GitBookAssistant } from '@gitbook/browser-types';
+import { Icon, type IconName } from '@gitbook/icons';
+
+import { type AskAITrigger, useAIChatController, useAIChatState } from '.';
+import { AIChatIcon, AISearchIcon, getAIChatName } from '../AIChat';
+import { useIntegrationAssistants } from '../Integrations';
+import { useSetSearchState } from '../Search/useSearch';
+import { isAIChatEnabled, isAISearchEnabled } from '@/components/utils/isAIChatEnabled';
+import { tString, useLanguage } from '@/intl/client';
+
+// Unify assistants configuration context with the assistants hook in one place
+export type AIConfig = {
+    aiMode: CustomizationAIMode;
+    suggestions?: string[];
+    trademark: boolean;
+    assistantName?: string;
+    greeting?: {
+        title?: string;
+        subtitle: string;
+    };
+};
+
+export type Assistant = Omit<GitBookAssistant, 'icon' | 'open'> & {
+    open: (query?: string, trigger?: AskAITrigger) => void;
+    /**
+     * Unique identifier for the assistant. Generated automatically using Crypto.randomUUID().
+     * @example '123e4567-e89b-12d3-a456-426614174000'
+     */
+    id: string;
+
+    /**
+     * Display mode for the assistant. Currently, only `overlay` is supported for custom assistants.
+     * - `overlay`: Display the assistant in an overlay on top of the page.
+     * - `sidebar`: Display the assistant in a sidebar next to the page. Only supported for the GitBook Assistant.
+     * - `search`: Display the assistant inside the search container. Only supported for GitBook AI Search.
+     * @default 'overlay'
+     */
+    mode?: 'overlay' | 'sidebar' | 'search';
+
+    /**
+     * Whether the assistant is displayed in the page action menu.
+     * @default false
+     */
+    pageAction: boolean;
+
+    /**
+     * Icon of the assistant displayed in the UI.
+     */
+    icon: ReactNode;
+};
+
+const AIContext = React.createContext<AIConfig | null>(null);
+
+export function AIContextProvider(props: React.PropsWithChildren<AIConfig>): React.ReactElement {
+    const { aiMode, trademark, suggestions, greeting, assistantName, children } = props;
+    const value = React.useMemo(
+        () => ({ aiMode, trademark, suggestions, greeting, assistantName }),
+        [aiMode, trademark, suggestions, greeting, assistantName]
+    );
+    return <AIContext.Provider value={value}>{children}</AIContext.Provider>;
+}
+
+export function useAIConfig(): AIConfig {
+    const ctx = React.useContext(AIContext);
+    if (!ctx) {
+        throw new Error('useAI must be used within AIContextProvider');
+    }
+    return ctx;
+}
+
+type AIContext = {
+    config: AIConfig;
+    assistants: Assistant[];
+};
+
+/**
+ * Unified assistants list combining the built-in GitBook Assistant (when enabled)
+ * with any custom assistants registered at runtime.
+ */
+export function useAI(): AIContext {
+    const config = useAIConfig();
+    const chat = useAIChatState();
+    const chatController = useAIChatController();
+    const language = useLanguage();
+    const setSearchState = useSetSearchState();
+
+    const assistants: Assistant[] = [];
+
+    if (isAIChatEnabled(config.aiMode)) {
+        assistants.push({
+            id: 'gitbook-assistant',
+            label: config.assistantName ?? getAIChatName(language, config.trademark),
+            icon: (
+                <AIChatIcon
+                    state={chat.responding ? 'thinking' : 'default'}
+                    trademark={config.trademark}
+                    className="size-text-lg"
+                />
+            ),
+            open: (query?: string, trigger?: AskAITrigger) => {
+                chatController.open(trigger);
+                if (query) {
+                    chatController.postMessage({ message: query });
+                }
+            },
+            pageAction: true,
+            ui: true,
+            mode: 'sidebar',
+        });
+    } else if (isAISearchEnabled(config.aiMode)) {
+        assistants.push({
+            id: 'gitbook-ai-search',
+            label: tString(language, 'ai_chat_context_badge'),
+            icon: <AISearchIcon />,
+            open: (query?: string) => {
+                if (query) {
+                    setSearchState((prev) => ({
+                        ...prev,
+                        query: null,
+                        ask: query,
+                        scope: prev?.scope ?? 'default',
+                        open: true,
+                    }));
+                }
+            },
+            pageAction: false,
+            ui: false,
+            mode: 'search',
+        });
+    }
+
+    const integrationAssistants = useIntegrationAssistants();
+    if (integrationAssistants.length > 0) {
+        assistants.push(
+            ...integrationAssistants.map((assistant) => ({
+                ...assistant,
+                icon: <Icon icon={assistant.icon as IconName} className="size-4" />,
+                open: (query?: string) => {
+                    setSearchState((prev) => ({
+                        ask: null, // Reset ask as we assume the assistant will handle it
+                        query: prev?.query ?? null,
+                        scope: prev?.scope ?? 'default',
+                        open: false,
+                    }));
+                    assistant.open(query);
+                },
+            }))
+        );
+    }
+
+    return {
+        config,
+        assistants,
+    };
+}

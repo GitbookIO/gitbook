@@ -1,0 +1,421 @@
+import type { Metadata, Viewport } from 'next';
+import { notFound, redirect } from 'next/navigation';
+
+import {
+    CustomizationDefaultThemeMode,
+    CustomizationHeaderPreset,
+    SiteInsightsDisplayContext,
+    type TranslationLanguage,
+} from '@gitbook/api';
+import { IconsProvider } from '@gitbook/icons';
+
+import { PageContextProvider } from '../PageContext';
+import {
+    type PagePathParams,
+    fetchPageData,
+    getLowercasePathnameRedirect,
+    getPathnameParam,
+} from './fetch';
+import { PageClientLayout } from './PageClientLayout';
+import { getPageFullTitle } from './title';
+import { UpdatesFilterProvider } from '@/components/DocumentView/UpdatesFilter';
+import { UpdatesFilterScript } from '@/components/DocumentView/UpdatesFilterScript';
+import { PageAside } from '@/components/PageAside';
+import { PageBody, PageCover } from '@/components/PageBody';
+import type { GitBookSiteContext } from '@/lib/context';
+import { getDataOrNull, getPageDocument } from '@/lib/data';
+import {
+    getContentInlineIconSourceRequests,
+    getCustomizationIconStyle,
+    getInlineIconSources,
+} from '@/lib/icons/inline';
+import { getResizedImageURL } from '@/lib/images';
+import { getPagePath } from '@/lib/pages';
+import { resolveContentRef } from '@/lib/references';
+import { isPageIndexable, isSiteIndexable } from '@/lib/seo';
+import { getSiteSpacePagePaths, resolveSiteSpaceCustomHomePage } from '@/lib/sites';
+import { tcls } from '@/lib/tailwind';
+import {
+    generateUpdatesFilterCSS,
+    getDocumentFilterableTags,
+    updatesFilterStyleHref,
+} from '@/lib/updates';
+
+export { getPageFullTitle } from './title';
+
+export type SitePageProps = {
+    context: GitBookSiteContext;
+    pageParams: PagePathParams;
+};
+
+type AlternateLinkSpace = {
+    id: string;
+    language: TranslationLanguage | undefined;
+};
+
+export type PageMetaLinks = {
+    /**
+     * The canonical URL for the page, if any.
+     */
+    canonical: string | null;
+    /**
+     * The alternate URLs for the page, if any.
+     */
+    alternates: {
+        href: string;
+        /**
+         * Space the alternate link points to, if any.
+         */
+        space: AlternateLinkSpace | null;
+    }[];
+};
+
+/**
+ * Fetch and render a page.
+ */
+export async function SitePage(props: SitePageProps & { staticRoute: boolean }) {
+    const {
+        context,
+        page,
+        ancestors,
+        document,
+        withFullPageCover,
+        withPageFeedback,
+        withSections,
+        withTopHeader,
+        pageMetaLinks,
+        iconSources,
+    } = await getSitePageData(props);
+    const headerOffset = { sectionsHeader: withSections, topHeader: withTopHeader };
+    const filterableTags = document ? getDocumentFilterableTags(document, context.revision) : [];
+    const filterableTagSlugs = filterableTags.map((tag) => tag.slug);
+    const content = (
+        <>
+            {/* Using `contents` makes the children of this div according to its parent — which keeps them in a single flex row with the TOC by default.
+            If there's a page cover, we use `flex flex-col` to lay out the PageCover above the PageBody + PageAside instead. */}
+            <div
+                className={
+                    withFullPageCover && page.cover ? 'relative flex grow flex-col' : 'contents'
+                }
+            >
+                {withFullPageCover && page.cover ? (
+                    <PageCover
+                        as={page.layout.coverSize === 'background' ? 'background' : 'full'}
+                        page={page}
+                        cover={page.cover}
+                        context={context}
+                    />
+                ) : null}
+
+                <div
+                    className={tcls(
+                        withFullPageCover && page.cover ? 'flex grow flex-row' : 'contents',
+                        withSections
+                            ? '[--content-scroll-margin:calc(var(--spacing)*27)]'
+                            : '[--content-scroll-margin:calc(var(--spacing)*16)]'
+                    )}
+                >
+                    <PageAside
+                        page={page}
+                        document={document}
+                        filterableTags={filterableTags}
+                        withHeaderOffset={headerOffset}
+                        withFullPageCover={withFullPageCover}
+                        withPageFeedback={withPageFeedback}
+                        context={context}
+                    />
+                    <PageBody
+                        context={context}
+                        page={page}
+                        ancestors={ancestors}
+                        document={document}
+                        withPageFeedback={withPageFeedback}
+                        insightsDisplayContext={SiteInsightsDisplayContext.Site}
+                        staticRoute={props.staticRoute}
+                    />
+                </div>
+                <PageClientLayout pageMetaLinks={pageMetaLinks} />
+            </div>
+        </>
+    );
+
+    return (
+        <IconsProvider iconSources={iconSources}>
+            <PageContextProvider pageId={page.id} spaceId={context.space.id} title={page.title}>
+                {filterableTagSlugs.length > 0 ? (
+                    <UpdatesFilterProvider tagSlugs={filterableTagSlugs}>
+                        <UpdatesFilterScript tagSlugs={filterableTagSlugs} />
+                        <UpdatesFilterStyle tagSlugs={filterableTagSlugs} />
+                        {content}
+                    </UpdatesFilterProvider>
+                ) : (
+                    content
+                )}
+            </PageContextProvider>
+        </IconsProvider>
+    );
+}
+
+/**
+ * Stylesheet that resolves which `updates` entries the active `?tag=` filter shows, purely in CSS
+ * (see generateUpdatesFilterCSS). Byte-identical for every visitor, so it has no cache impact.
+ */
+function UpdatesFilterStyle({ tagSlugs }: { tagSlugs: string[] }) {
+    const css = generateUpdatesFilterCSS(tagSlugs);
+    if (!css) {
+        return null;
+    }
+    return (
+        <style href={updatesFilterStyleHref(tagSlugs)} precedence="high">
+            {css}
+        </style>
+    );
+}
+
+export async function generateSitePageViewport(context: GitBookSiteContext): Promise<Viewport> {
+    const { customization } = context;
+
+    return {
+        colorScheme: customization.themes.toggeable
+            ? customization.themes.default === CustomizationDefaultThemeMode.Dark
+                ? 'dark light'
+                : 'light dark'
+            : customization.themes.default === CustomizationDefaultThemeMode.Dark
+              ? 'dark'
+              : customization.themes.default === CustomizationDefaultThemeMode.Light
+                ? 'light'
+                : 'light dark', // 'system' → let browser decide based on OS preference
+    };
+}
+
+export async function generateSitePageMetadata(props: SitePageProps): Promise<Metadata> {
+    const { context, pageTarget, pageMetaLinks } = await getPageDataWithFallback({
+        context: props.context,
+        pagePathParams: props.pageParams,
+    });
+
+    if (!pageTarget) {
+        if (context.isFallback) {
+            redirect(context.linker.toPathInSpace('/'));
+        }
+        notFound();
+    }
+
+    const { page, ancestors } = pageTarget;
+    const { customization, revision, linker, imageResizer } = context;
+
+    const canonical = (
+        pageMetaLinks?.canonical
+            ? new URL(
+                  // If the canonical link is an absolute URL, use it as is.
+                  URL.canParse(pageMetaLinks.canonical)
+                      ? pageMetaLinks.canonical
+                      : linker.toAbsoluteURL(pageMetaLinks.canonical)
+              ).toString()
+            : // If no canonical is set, use the current page URL (default case)
+              linker.toAbsoluteURL(linker.toPathForPage({ pages: revision.pages, page }))
+    ).replace(/\/+$/, ''); // Trim trailing slashes in canonical URL to match the redirect behavior
+
+    const alternates = pageMetaLinks?.alternates.reduce<{
+        languages: Record<string, string>;
+        generic: {
+            title?: string;
+            url: string;
+        }[];
+    }>(
+        (acc, alt) => {
+            if (alt.space?.language) {
+                acc.languages[alt.space.language] = URL.canParse(alt.href)
+                    ? alt.href
+                    : linker.toAbsoluteURL(alt.href);
+            } else {
+                acc.generic.push({
+                    url: URL.canParse(alt.href) ? alt.href : linker.toAbsoluteURL(alt.href),
+                });
+            }
+            return acc;
+        },
+        { languages: {}, generic: [] }
+    );
+
+    return {
+        title: getPageFullTitle(context, page),
+        description: page.description ?? '',
+        alternates: {
+            canonical,
+            languages: alternates?.languages,
+            types: {
+                'text/markdown': `${linker.toAbsoluteURL(linker.toPathInSpace(page.path))}.md`,
+                // Currently it will output with an empty "type" like <link rel="alternate" href="..." type />
+                // Team at Vercel is aware of this and will ensure it will be omitted when the value is empty in future versions of Next.js
+                // https://gitbook.slack.com/archives/C04K6MV5W1K/p1763034072958419?thread_ts=1762937203.511629&cid=C04K6MV5W1K
+                ...(alternates?.generic ? { '': alternates?.generic } : {}),
+            },
+        },
+        openGraph: {
+            images: [
+                customization.socialPreview.url
+                    ? await getResizedImageURL(imageResizer, customization.socialPreview.url, {
+                          width: 1200,
+                          height: 630,
+                      })
+                    : linker.toAbsoluteURL(linker.toPathInSpace(`~gitbook/ogimage/${page.id}`)),
+            ],
+        },
+        robots:
+            isSiteIndexable(context) && isPageIndexable(ancestors, page)
+                ? 'index, follow'
+                : 'noindex, nofollow',
+    };
+}
+
+/**
+ * Fetches all the data required to render the site page.
+ */
+export async function getSitePageData(props: SitePageProps) {
+    const { context, pageTarget, pageMetaLinks } = await getPageDataWithFallback({
+        context: props.context,
+        pagePathParams: props.pageParams,
+    });
+
+    const rawPathname = getPathnameParam(props.pageParams);
+    if (!pageTarget) {
+        const pathname = getLowercasePathnameRedirect(rawPathname);
+        if (pathname !== null) {
+            // If the pathname was not normalized, redirect to the normalized version
+            // before trying to resolve the page again
+            redirect(context.linker.toPathForPagePath({ path: pathname }));
+        } else {
+            // If the page is not found and we are in fallback mode, return a redirect to the basepath
+            if (context.isFallback) {
+                redirect(context.linker.toPathForPagePath({ path: '/' }));
+            }
+            notFound();
+        }
+    } else {
+        const customHomePage = resolveSiteSpaceCustomHomePage(
+            context.siteSpace,
+            context.revision.pages
+        );
+        // Without a custom home page, a page has a single canonical path. With one, the custom
+        // home page also gains the site space's root as a valid alias.
+        const expectedPagePaths = customHomePage
+            ? getSiteSpacePagePaths(context.siteSpace, context.revision.pages, pageTarget.page)
+            : [getPagePath(context.revision.pages, pageTarget.page)];
+
+        if (!expectedPagePaths.includes(rawPathname)) {
+            redirect(
+                context.linker.toPathForPage({
+                    pages: context.revision.pages,
+                    page: pageTarget.page,
+                })
+            );
+        }
+    }
+
+    const { customization, visibleSections } = context;
+    const { page, ancestors } = pageTarget;
+
+    const withTopHeader = customization.header.preset !== CustomizationHeaderPreset.None;
+    const withFullPageCover = !!(
+        page.cover &&
+        page.layout.cover &&
+        (page.layout.coverSize === 'full' || page.layout.coverSize === 'background')
+    );
+    const withPageFeedback = customization.feedback.enabled;
+
+    const withSections = Boolean(visibleSections && visibleSections.list.length > 0);
+
+    const document = await getPageDocument(context, page);
+    const iconStyle = getCustomizationIconStyle(customization);
+    const iconSources = await getInlineIconSources(
+        getContentInlineIconSourceRequests({
+            iconStyle,
+            document,
+        })
+    );
+
+    return {
+        context,
+        page,
+        ancestors,
+        document,
+        withSections,
+        withPageFeedback,
+        withFullPageCover,
+        withTopHeader,
+        pageMetaLinks,
+        iconSources,
+    };
+}
+
+/**
+ * Fetches the page data matching the requested pathname and fallback to root page when page is not found.
+ */
+async function getPageDataWithFallback(args: {
+    context: GitBookSiteContext;
+    pagePathParams: PagePathParams;
+}) {
+    const { context: baseContext, pagePathParams } = args;
+    const { context, pageTarget } = await fetchPageData(baseContext, pagePathParams);
+    const pageMetaLinks = await (pageTarget?.page
+        ? resolvePageMetaLinks(context, pageTarget.page.id)
+        : null);
+
+    return {
+        context: {
+            ...context,
+            page: pageTarget?.page,
+        },
+        pageTarget,
+        pageMetaLinks,
+    };
+}
+
+/**
+ * Resolve the meta links (canonical and alternates) for a page.
+ */
+async function resolvePageMetaLinks(
+    context: GitBookSiteContext,
+    pageId: string
+): Promise<PageMetaLinks> {
+    const pageMetaLinks = await getDataOrNull(
+        context.dataFetcher.listRevisionPageMetaLinks({
+            spaceId: context.space.id,
+            revisionId: context.revisionId,
+            pageId,
+        })
+    );
+
+    if (pageMetaLinks) {
+        const canonicalResolution = pageMetaLinks.canonical
+            ? resolveContentRef(pageMetaLinks.canonical, context).then((resolved) => resolved?.href)
+            : null;
+
+        const alternatesResolutions = (pageMetaLinks.alternates || []).map((link) =>
+            resolveContentRef(link, context).then((resolved) => ({
+                href: resolved?.href ?? null,
+                space: resolved?.space
+                    ? { id: resolved.space.id, language: resolved.space.language }
+                    : null,
+            }))
+        );
+
+        const [resolvedCanonical, resolvedAlternates] = await Promise.all([
+            canonicalResolution,
+            Promise.all(alternatesResolutions),
+        ]);
+
+        return {
+            canonical: resolvedCanonical ?? null,
+            alternates: resolvedAlternates.filter(
+                (alt): alt is { href: string; space: AlternateLinkSpace | null } => !!alt.href
+            ),
+        };
+    }
+
+    return {
+        canonical: null,
+        alternates: [],
+    };
+}

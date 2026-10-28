@@ -1,0 +1,40 @@
+{
+    "name": "@gitbook/browser-types",
+    "description": "Typescript types for the global variables available in a GitBook website. These types can be used by integrations embedding scripts.",
+    "type": "module",
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "default": "./dist/index.js"
+        }
+    },
+    "sideEffects": false,
+    "version": "0.1.6",
+    "dependencies": {
+        "@gitbook/api": "catalog:",
+        "@gitbook/icons": "workspace:"
+    },
+    "devDependencies": {
+        "bun-types": "catalog:",
+        "tsdown": "catalog:",
+        "typescript": "catalog:"
+    },
+    "scripts": {
+        "build": "tsdown",
+        "typecheck": "tsc --noEmit",
+        "dev": "bun run build -- --watch ./src",
+        "publish-to-npm": "../../scripts/publish-if-new.sh"
+    },
+    "files": [
+        "dist",
+        "README.md",
+        "CHANGELOG.md"
+    ],
+    "publishConfig": {
+        "access": "public",
+        "registry": "https://registry.npmjs.org/"
+    },
+    "repository": {
+        "url": "https://github.com/GitbookIO/gitbook"
+    }
+}

@@ -1,0 +1,25 @@
+{
+    "compilerOptions": {
+        "lib": ["es2023"],
+        "module": "ESNext",
+        "target": "es2022",
+        "strict": true,
+        "noUncheckedIndexedAccess": true,
+        "esModuleInterop": true,
+        "skipLibCheck": true,
+        "moduleResolution": "bundler",
+        "allowJs": true,
+        "noEmit": false,
+        "declaration": true,
+        "outDir": "dist",
+        "resolveJsonModule": true,
+        "isolatedModules": true,
+        "jsx": "react-jsx",
+        "incremental": true,
+        "types": [
+            "bun-types" // add Bun global
+        ]
+    },
+    "include": ["src/**/*.ts"],
+    "exclude": ["node_modules"]
+}
