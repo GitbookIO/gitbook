@@ -24,6 +24,8 @@ export function SiteLayoutClientContexts(props: {
     externalLinksTarget: SiteExternalLinksTarget;
     contextId: string | undefined;
     proxyOrigin: string | undefined;
+    /** Absolute URL of the site, so same-site absolute links render as internal on the server. */
+    siteURL?: string;
     searchPrewarmURL: string;
     children: React.ReactNode;
 }) {
@@ -35,6 +37,7 @@ export function SiteLayoutClientContexts(props: {
         externalLinksTarget,
         contextId,
         proxyOrigin,
+        siteURL,
         searchPrewarmURL,
     } = props;
 
@@ -46,7 +49,7 @@ export function SiteLayoutClientContexts(props: {
                 externalLinksTarget
             ],
             isExternalServer: (href) =>
-                isExternalLink(href, proxyOrigin ? `https://${proxyOrigin}` : null),
+                isExternalLink(href, proxyOrigin ? `https://${proxyOrigin}` : (siteURL ?? null)),
             isExternalClient: (href) => {
                 if (proxyOrigin?.startsWith(window.location.origin)) {
                     return isExternalLink(href, `https://${proxyOrigin}`);
@@ -54,7 +57,7 @@ export function SiteLayoutClientContexts(props: {
                 return isExternalLink(href, window.location.origin);
             },
         }),
-        [externalLinksTarget, proxyOrigin]
+        [externalLinksTarget, proxyOrigin, siteURL]
     );
 
     return (
