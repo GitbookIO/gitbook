@@ -15,6 +15,7 @@ const VISITOR_AUTH_PARAM = 'jwt_token';
 const VISITOR_PARAM_PREFIX = 'visitor.';
 export const VISITOR_TOKEN_COOKIE = 'gitbook-visitor-token';
 const VISITOR_UNSIGNED_CLAIMS_PREFIX = 'gitbook-visitor-public';
+const IS_SECURE = process.env.NODE_ENV === 'production';
 
 /**
  * Typing for a cookie, matching the internal type of Next.js.
@@ -28,6 +29,7 @@ export type ResponseCookie = {
         secure: boolean;
         maxAge: number;
         path: string;
+        partitioned: boolean;
     }>;
 };
 
@@ -146,7 +148,10 @@ export function getVisitorData({
 }): VisitorDataLookup {
     const visitorToken = getVisitorToken({ cookies, headers, url });
     const unsignedClaims = getVisitorUnsignedClaims({ cookies, url });
-    const visitorParamsCookie = getResponseCookieForVisitorParams(unsignedClaims.fromVisitorParams);
+    const visitorParamsCookie = getResponseCookieForVisitorParams({
+        visitorParamsClaims: unsignedClaims.fromVisitorParams,
+        requestHeaders: headers,
+    });
 
     return {
         visitorToken,
@@ -318,9 +323,13 @@ function parseVisitorQueryParamValue(value: string): ClaimPrimitive {
 /**
  * Returns to cookie response to use in order to persist visitor params that were passed to the URL.
  */
-function getResponseCookieForVisitorParams(
-    visitorParamsClaims: Record<string, ClaimPrimitive>
-): ResponseCookie | undefined {
+function getResponseCookieForVisitorParams({
+    visitorParamsClaims,
+    requestHeaders,
+}: {
+    visitorParamsClaims: Record<string, ClaimPrimitive>;
+    requestHeaders: Headers;
+}): ResponseCookie | undefined {
     if (Object.keys(visitorParamsClaims).length === 0) {
         return undefined;
     }
@@ -328,10 +337,20 @@ function getResponseCookieForVisitorParams(
     return {
         name: VISITOR_UNSIGNED_CLAIMS_PREFIX,
         value: JSON.stringify(visitorParamsClaims),
-        options: {
-            sameSite: process.env.NODE_ENV === 'production' ? 'none' : undefined,
-            secure: process.env.NODE_ENV === 'production',
-        },
+        options: getVisitorCookieCrossSiteOptions(requestHeaders),
+    };
+}
+
+/**
+ * Attributes letting visitor cookies be stored inside a cross-site iframe (authenticated embeds).
+ * `Partitioned` (CHIPS) is kept to iframes: Safari drops partitioned cookies after cross-site
+ * redirect chains (WebKit 306194), which top-level login flows go through.
+ */
+function getVisitorCookieCrossSiteOptions(requestHeaders: Headers) {
+    return {
+        sameSite: IS_SECURE ? ('none' as const) : undefined,
+        secure: IS_SECURE,
+        partitioned: IS_SECURE && requestHeaders.get('sec-fetch-dest') === 'iframe',
     };
 }
 
@@ -344,11 +363,17 @@ function getResponseCookieForVisitorParams(
  * custom `gitbook-visitor-token` cookie is owned by the customer's backend and is never copied,
  * to keep a single source of truth.
  */
-export function getResponseCookiesForVisitorAuth(
-    basePath: string,
-    visitorTokenLookup: Extract<VisitorTokenLookup, { source: 'url' }>,
-    requestCookies: RequestCookies = []
-): ResponseCookies {
+export function getResponseCookiesForVisitorAuth({
+    basePath,
+    visitorTokenLookup,
+    requestCookies = [],
+    requestHeaders,
+}: {
+    basePath: string;
+    visitorTokenLookup: Extract<VisitorTokenLookup, { source: 'url' }>;
+    requestCookies?: RequestCookies;
+    requestHeaders: Headers;
+}): ResponseCookies {
     let decoded: JwtPayload;
     try {
         decoded = jwtDecode(visitorTokenLookup.token);
@@ -361,8 +386,7 @@ export function getResponseCookiesForVisitorAuth(
     const value = getVisitorAuthCookieValue(basePath, visitorTokenLookup.token);
     const options = {
         httpOnly: true,
-        sameSite: process.env.NODE_ENV === 'production' ? ('none' as const) : undefined,
-        secure: process.env.NODE_ENV === 'production',
+        ...getVisitorCookieCrossSiteOptions(requestHeaders),
         maxAge: getVisitorAuthCookieMaxAge(decoded),
     };
 
@@ -390,6 +414,15 @@ export function getResponseCookiesForVisitorAuth(
  */
 export function getVisitorAuthCookieName(basePath: string): string {
     return getPathScopedCookieName(VISITOR_TOKEN_COOKIE, basePath);
+}
+
+/**
+ * `Set-Cookie` values clearing the visitor authentication cookie. Browsers keep partitioned and
+ * unpartitioned cookies apart, so both are cleared whenever `Partitioned` can be set.
+ */
+export function getVisitorAuthClearCookieHeaders(basePath: string): string[] {
+    const header = `${getVisitorAuthCookieName(basePath)}=; Path=/; Max-Age=0${IS_SECURE ? '; Secure; SameSite=None' : ''}`;
+    return IS_SECURE ? [`${header}; Partitioned`, header] : [header];
 }
 
 /**

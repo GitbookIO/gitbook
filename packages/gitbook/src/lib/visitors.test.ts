@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'bun:test';
 import type { JwtPayload } from 'jwt-decode';
+import { NextResponse } from 'next/server';
 
 import {
     type ResponseCookies,
@@ -234,20 +235,65 @@ describe('getResponseCookiesForVisitorAuth write policy', () => {
     const base64url = (value: object) => Buffer.from(JSON.stringify(value)).toString('base64url');
     const token = `${base64url({ alg: 'none' })}.${base64url({ exp: 2_000_000_000 })}.sig`;
 
+    const requestHeaders = new Headers();
+
     it('persists a token that arrived in the URL', () => {
-        expect(getResponseCookiesForVisitorAuth('/', { source: 'url', token })).toHaveLength(1);
+        const visitorTokenLookup = { source: 'url', token } as const;
+        expect(
+            getResponseCookiesForVisitorAuth({ basePath: '/', visitorTokenLookup, requestHeaders })
+        ).toHaveLength(1);
     });
 
     it('only accepts a token that arrived in the URL', () => {
         const fromVACookie = { source: 'visitor-auth-cookie', basePath: '/', token } as const;
         const fromCustomCookie = { source: 'gitbook-visitor-cookie', token } as const;
 
-        // @ts-expect-error a token read back from a VA cookie must never be persisted again
-        const buildFromVACookie = () => getResponseCookiesForVisitorAuth('/', fromVACookie);
-        // @ts-expect-error a custom visitor cookie is owned by the customer's backend
-        const buildFromCustom = () => getResponseCookiesForVisitorAuth('/', fromCustomCookie);
+        const buildFromVACookie = () =>
+            getResponseCookiesForVisitorAuth({
+                basePath: '/',
+                // @ts-expect-error a token read back from a VA cookie must never be persisted again
+                visitorTokenLookup: fromVACookie,
+                requestHeaders,
+            });
+        const buildFromCustom = () =>
+            getResponseCookiesForVisitorAuth({
+                basePath: '/',
+                // @ts-expect-error a custom visitor cookie is owned by the customer's backend
+                visitorTokenLookup: fromCustomCookie,
+                requestHeaders,
+            });
 
         expect([buildFromVACookie, buildFromCustom]).toHaveLength(2);
+    });
+
+    it('partitions the cookie only inside an iframe, and clears both kinds', async () => {
+        const env = process.env as Record<string, string | undefined>;
+        const previousEnv = env.NODE_ENV;
+        env.NODE_ENV = 'production';
+        // A fresh module instance, as `NODE_ENV` is read once at import.
+        const visitors = (await import(`./visitors?${'production'}`).finally(() => {
+            env.NODE_ENV = previousEnv;
+        })) as typeof import('./visitors');
+
+        const setCookie = (secFetchDest: string) => {
+            const response = new NextResponse();
+            for (const cookie of visitors.getResponseCookiesForVisitorAuth({
+                basePath: '/',
+                visitorTokenLookup: { source: 'url', token },
+                requestHeaders: new Headers({ 'sec-fetch-dest': secFetchDest }),
+            })) {
+                response.cookies.set(cookie.name, cookie.value, cookie.options);
+            }
+            return response.headers.get('set-cookie');
+        };
+        expect(setCookie('iframe')).toContain('Partitioned');
+        expect(setCookie('document')).not.toContain('Partitioned');
+
+        const clear = `${getVisitorAuthCookieName('/')}=; Path=/; Max-Age=0; Secure; SameSite=None`;
+        expect(visitors.getVisitorAuthClearCookieHeaders('/')).toEqual([
+            `${clear}; Partitioned`,
+            clear,
+        ]);
     });
 });
 
@@ -261,7 +307,12 @@ describe('getResponseCookiesForVisitorAuth chunking', () => {
     };
 
     const write = (basePath: string, token: string, previous: ResponseCookies = []) =>
-        getResponseCookiesForVisitorAuth(basePath, { source: 'url', token }, previous);
+        getResponseCookiesForVisitorAuth({
+            basePath,
+            visitorTokenLookup: { source: 'url', token },
+            requestCookies: previous,
+            requestHeaders: new Headers(),
+        });
 
     const read = (cookies: ResponseCookies, urlPath = '/') =>
         getVisitorToken({
