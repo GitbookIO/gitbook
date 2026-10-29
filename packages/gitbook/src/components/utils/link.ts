@@ -49,3 +49,15 @@ export function isExternalLink(href: string, origin: string | null = null) {
 export function toNonEmbedLink(href: string) {
     return href.replace(/~gitbook\/embed(\/page)?\/?/, '');
 }
+
+/**
+ * Check if a link points to the site's `~gitbook/auth/login` or `~gitbook/auth/logout` route.
+ */
+export function isSiteAuthLink(href: string) {
+    const baseURL = typeof window !== 'undefined' ? window.location.origin : 'http://localhost';
+    if (!URL.canParse?.(href, baseURL)) {
+        return false;
+    }
+
+    return /\/~gitbook\/auth\/(login|logout)\/?$/.test(new URL(href, baseURL).pathname);
+}
