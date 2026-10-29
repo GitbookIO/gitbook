@@ -1,0 +1,25 @@
+@reference "../RootLayout/globals.css";
+
+/* A page carries one of these per heading, so the shared utilities live here instead of in a class
+   attribute repeated hundreds of times — on a large page that repetition is most of the HTML.
+   They sit in `components` so the utilities passed as props still override them. */
+@layer components {
+    .hash {
+        @apply relative inline-grid grid-area-1-1 border-0 rounded site-background;
+        @apply pointer-events-none opacity-0 transition-opacity;
+        @apply pointer-fine:h-[1em] pointer-fine:pointer-events-auto;
+        @apply pointer-fine:group-hover/hash:opacity-100 pointer-fine:group-focus-within/hash:opacity-100;
+        @apply [.hash-revealed_&]:pointer-events-auto [.hash-revealed_&]:opacity-100;
+    }
+
+    .hash-link {
+        @apply inline-flex items-center p-1 pointer-fine:h-full pointer-fine:p-0;
+    }
+
+    .hash-icon {
+        @apply size-3 self-center text-transparent transition-colors;
+        @apply pointer-fine:group-hover/hash:text-tint-subtle contrast-more:pointer-fine:group-hover/hash:text-tint-strong;
+        @apply pointer-fine:group-focus-within/hash:text-tint-subtle contrast-more:pointer-fine:group-focus-within/hash:text-tint-strong;
+        @apply [.hash-revealed_&]:text-tint-subtle contrast-more:[.hash-revealed_&]:text-tint-strong;
+    }
+}

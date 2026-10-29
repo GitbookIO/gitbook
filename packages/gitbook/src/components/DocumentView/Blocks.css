@@ -1,0 +1,13 @@
+@reference "../RootLayout/globals.css";
+
+/* Every block on every page carries these, so they live here rather than in each class attribute. */
+@layer components {
+    .gb-block {
+        @apply decoration-primary/6;
+    }
+
+    /* Lists opt out: a long list is expected to break across printed pages. */
+    .gb-block:not(.gb-block-list) {
+        @apply print:break-inside-avoid;
+    }
+}

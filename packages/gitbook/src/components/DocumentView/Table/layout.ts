@@ -39,6 +39,27 @@ export function getViewGridLayout({
     };
 }
 
+/** How many columns `columnWidths.css` carries a `.gb-tcol-*` class for. */
+export const MAX_COLUMN_WIDTH_VARS = 24;
+
+/**
+ * Custom properties holding each column's width, set once on the grid so the cells can point at
+ * them instead of repeating the width in a style attribute of their own.
+ */
+export function getColumnWidthVars(args: {
+    columns: string[];
+    columnWidths: Record<string, number> | undefined;
+    autoSizedColumns: string[];
+    fixedColumns: string[];
+}): Record<string, string> {
+    const { columns, ...widthArgs } = args;
+    const vars: Record<string, string> = {};
+    columns.slice(0, MAX_COLUMN_WIDTH_VARS).forEach((column, index) => {
+        vars[`--gb-tcol-${index}`] = getColumnWidth({ column, ...widthArgs });
+    });
+    return vars;
+}
+
 export const getColumnWidth = ({
     column,
     columnWidths,

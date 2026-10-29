@@ -1,0 +1,100 @@
+/* Column widths are a property of the column, not of the cell, yet a grid repeats them on every
+   cell it renders. The table sets one custom property per column and each cell points at it with
+   one of these classes, which keeps the width out of a per-cell style attribute.
+   Columns past this many, and cells merged across columns, fall back to an inline width. */
+.gb-tcol-0 {
+    width: var(--gb-tcol-0);
+    min-width: var(--gb-tcol-0);
+}
+.gb-tcol-1 {
+    width: var(--gb-tcol-1);
+    min-width: var(--gb-tcol-1);
+}
+.gb-tcol-2 {
+    width: var(--gb-tcol-2);
+    min-width: var(--gb-tcol-2);
+}
+.gb-tcol-3 {
+    width: var(--gb-tcol-3);
+    min-width: var(--gb-tcol-3);
+}
+.gb-tcol-4 {
+    width: var(--gb-tcol-4);
+    min-width: var(--gb-tcol-4);
+}
+.gb-tcol-5 {
+    width: var(--gb-tcol-5);
+    min-width: var(--gb-tcol-5);
+}
+.gb-tcol-6 {
+    width: var(--gb-tcol-6);
+    min-width: var(--gb-tcol-6);
+}
+.gb-tcol-7 {
+    width: var(--gb-tcol-7);
+    min-width: var(--gb-tcol-7);
+}
+.gb-tcol-8 {
+    width: var(--gb-tcol-8);
+    min-width: var(--gb-tcol-8);
+}
+.gb-tcol-9 {
+    width: var(--gb-tcol-9);
+    min-width: var(--gb-tcol-9);
+}
+.gb-tcol-10 {
+    width: var(--gb-tcol-10);
+    min-width: var(--gb-tcol-10);
+}
+.gb-tcol-11 {
+    width: var(--gb-tcol-11);
+    min-width: var(--gb-tcol-11);
+}
+.gb-tcol-12 {
+    width: var(--gb-tcol-12);
+    min-width: var(--gb-tcol-12);
+}
+.gb-tcol-13 {
+    width: var(--gb-tcol-13);
+    min-width: var(--gb-tcol-13);
+}
+.gb-tcol-14 {
+    width: var(--gb-tcol-14);
+    min-width: var(--gb-tcol-14);
+}
+.gb-tcol-15 {
+    width: var(--gb-tcol-15);
+    min-width: var(--gb-tcol-15);
+}
+.gb-tcol-16 {
+    width: var(--gb-tcol-16);
+    min-width: var(--gb-tcol-16);
+}
+.gb-tcol-17 {
+    width: var(--gb-tcol-17);
+    min-width: var(--gb-tcol-17);
+}
+.gb-tcol-18 {
+    width: var(--gb-tcol-18);
+    min-width: var(--gb-tcol-18);
+}
+.gb-tcol-19 {
+    width: var(--gb-tcol-19);
+    min-width: var(--gb-tcol-19);
+}
+.gb-tcol-20 {
+    width: var(--gb-tcol-20);
+    min-width: var(--gb-tcol-20);
+}
+.gb-tcol-21 {
+    width: var(--gb-tcol-21);
+    min-width: var(--gb-tcol-21);
+}
+.gb-tcol-22 {
+    width: var(--gb-tcol-22);
+    min-width: var(--gb-tcol-22);
+}
+.gb-tcol-23 {
+    width: var(--gb-tcol-23);
+    min-width: var(--gb-tcol-23);
+}
