@@ -8,6 +8,7 @@ import { useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useSta
 import { createPortal } from 'react-dom';
 
 import { type ClientBlockProps, ClientCodeBlock } from './ClientCodeBlock';
+import { ClientCodeBlockWithExpressions } from './ClientCodeBlockWithExpressions';
 import { getPlainCodeBlock } from './highlight-tokens';
 import { MermaidPanZoomControls } from './MermaidPanZoomControls';
 import { useHasBeenInViewport } from '@/components/hooks/useHasBeenInViewport';
@@ -20,6 +21,7 @@ import { tcls } from '@/lib/tailwind';
 export function MermaidCodeBlock(
     props: ClientBlockProps & {
         mermaidRuntimeURL: string;
+        hasInlineExpression: boolean;
     }
 ) {
     const { block, mode, style, mermaidRuntimeURL } = props;
@@ -169,7 +171,11 @@ export function MermaidCodeBlock(
     }, []);
 
     if (error) {
-        return <ClientCodeBlock {...props} />;
+        return props.hasInlineExpression ? (
+            <ClientCodeBlockWithExpressions {...props} />
+        ) : (
+            <ClientCodeBlock {...props} />
+        );
     }
 
     // The live diagram subtree. It is portaled into a stable host that moves between the
