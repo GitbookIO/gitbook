@@ -2,6 +2,7 @@
 
 import React from 'react';
 
+import './style.css';
 import { useHash } from '@/components/hooks';
 import { type ClassValue, tcls } from '@/lib/tailwind';
 
@@ -53,6 +54,7 @@ export function Details(props: {
             className={tcls(
                 className,
                 'group/expandable',
+                'expandable-block',
                 'bg-tint-base',
                 'border',
                 'border-b-0',

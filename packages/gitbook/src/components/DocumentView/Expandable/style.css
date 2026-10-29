@@ -1,0 +1,28 @@
+@reference "../../RootLayout/globals.css";
+
+/* A page can hold a hundred expandables, each hiding a table; skipping the render work for the
+   off-screen ones is what keeps opening one cheap. The DOM is untouched, so the server HTML,
+   find-in-page and #anchors all still work. */
+.expandable-block {
+    /* Below Safari 18 / Firefox 125 this is ignored and every expandable renders, as it does today. */
+    /* stylelint-disable-next-line plugin/no-unsupported-browser-features */
+    content-visibility: auto;
+    /* Only the block axis: the inline size comes from the parent. Plain length first, as a fallback
+       for engines without the `auto` keyword, where a skipped block would collapse to 0. The length
+       is a closed expandable with a one-line summary — `auto` swaps in the real size once rendered. */
+    contain-intrinsic-height: 58px;
+    contain-intrinsic-height: auto 58px;
+}
+
+/* PDF export lays the whole space out off-screen, so nothing there may be skipped. */
+body:has(.print-mode) .expandable-block {
+    /* stylelint-disable-next-line plugin/no-unsupported-browser-features */
+    content-visibility: visible;
+}
+
+@media print {
+    .expandable-block {
+        /* stylelint-disable-next-line plugin/no-unsupported-browser-features */
+        content-visibility: visible;
+    }
+}
