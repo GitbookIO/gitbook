@@ -31,6 +31,34 @@ export function getPreviewRequestIdentifier(requestURL: URL): string {
 }
 
 /**
+ * Serialize a customization override into the preview cookie value.
+ * The override holds the full settings of the site space it was created for,
+ * so it is bound to that site space to not leak into the other ones of the preview.
+ */
+export function serializePreviewCustomizationCookie(args: {
+    customization: string;
+    siteSpace: string;
+}): string {
+    return `${args.siteSpace}:${encodeURIComponent(args.customization)}`;
+}
+
+/**
+ * Get the customization override from the preview cookie value,
+ * only if it was created for the given site space.
+ */
+export function parsePreviewCustomizationCookie(
+    value: string,
+    siteSpace: string
+): string | undefined {
+    const prefix = `${siteSpace}:`;
+    if (!value.startsWith(prefix)) {
+        return undefined;
+    }
+
+    return decodeURIComponent(value.slice(prefix.length));
+}
+
+/**
  * Get a cookie for the preview request.
  */
 export function getPreviewCookieResponse(args: {
