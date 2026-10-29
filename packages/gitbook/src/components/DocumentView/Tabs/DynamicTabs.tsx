@@ -141,7 +141,8 @@ const TabItemList = memo(function TabItemList(props: {
     onSelect: (tabId: string) => void;
 }) {
     const { tabs, activeTabId, onSelect } = props;
-    const { containerRef, itemRef, overflowing, isMeasuring } = useListOverflow();
+    // The active tab's width decides how many others fit, so a new selection re-measures.
+    const { containerRef, itemRef, overflowing, isMeasuring } = useListOverflow(activeTabId);
     const overflowingTabs = useMemo(
         () =>
             Array.from(overflowing, (id) => {
@@ -181,6 +182,7 @@ const TabItemList = memo(function TabItemList(props: {
                         key={tab.id}
                         ref={itemRef}
                         isActive={tab.id === activeTabId}
+                        isMeasuring={isMeasuring}
                         tab={tab}
                         onSelect={onSelect}
                     />
@@ -239,10 +241,11 @@ function TabsDropdownMenu(props: {
 const TabItem = memo(function TabItem(props: {
     ref: React.Ref<HTMLButtonElement>;
     isActive: boolean;
+    isMeasuring: boolean;
     tab: TabsItem;
     onSelect: (tabId: string) => void;
 }) {
-    const { ref, tab, isActive, onSelect } = props;
+    const { ref, tab, isActive, isMeasuring, onSelect } = props;
     return (
         <TabButton
             ref={ref}
@@ -250,7 +253,20 @@ const TabItem = memo(function TabItem(props: {
             aria-selected={isActive}
             aria-controls={tab.id}
             id={getTabButtonId(tab.id)}
+            title={tab.title}
             onClick={() => onSelect(tab.id)}
+            wrapperClassName={
+                isActive
+                    ? // Keeps room for the overflow menu button.
+                      'max-w-[calc(100%-3rem)]'
+                    : isMeasuring
+                      ? // Measured after the active tab, at their narrowest, so the menu only takes
+                        // the tabs that can't fit even truncated.
+                        'order-1 max-w-28'
+                      : // Equal shares capped at their own width, so no tab drops below that
+                        // narrowest size; the high grow leaves the strip's filler only the leftover.
+                        'min-w-0 max-w-max basis-0 grow-[1000]'
+            }
         >
             {tab.icon && <Icon icon={tab.icon} className="size-4 shrink-0" />}
             <span className="min-w-0 truncate">{tab.title}</span>
@@ -264,9 +280,10 @@ const TabItem = memo(function TabItem(props: {
 function TabButton(
     props: Omit<ComponentPropsWithRef<'button'>, 'type'> & {
         isActive?: boolean;
+        wrapperClassName?: string;
     }
 ) {
-    const { isActive, ...rest } = props;
+    const { isActive, wrapperClassName, ...rest } = props;
     return (
         <div
             className={tcls(
@@ -310,14 +327,15 @@ function TabButton(
                           '[:has(+_&.active-tab)]:after:border-transparent',
                           '[:has(&_+)]:after:border-transparent',
                       ]
-                    : null
+                    : null,
+                wrapperClassName
             )}
         >
             <button
                 {...rest}
                 type="button"
                 className={tcls(
-                    'relative inline-flex max-w-full items-center gap-1.5 px-4 py-2.5 font-medium text-sm transition-[color]',
+                    'relative inline-flex min-w-0 max-w-full items-center gap-1.5 px-4 py-2.5 font-medium text-sm transition-[color]',
                     props.className
                 )}
             />
