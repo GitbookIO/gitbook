@@ -5,6 +5,7 @@ import { z } from 'zod';
 
 import { AgentFeedbackSource, SiteInsightsDisplayContext } from '@gitbook/api';
 
+import { resolveSitePageFromURL } from '@/components/SitePage/fetch';
 import { isAIEnabled } from '@/components/utils/isAIChatEnabled';
 import {
     AGENT_FEEDBACK_GOAL_MAX_LENGTH,
@@ -19,7 +20,7 @@ import type { GitBookSiteContext } from '@/lib/context';
 import { getExposableError, throwIfDataError } from '@/lib/data';
 import { fromPageMarkdown, getMarkdownForPageInSpace, toPageMarkdown } from '@/lib/markdownPage';
 import { joinPathWithBaseURL } from '@/lib/paths';
-import { findSiteSpaceBy, findSiteSpaceByUrl, resolveSiteSpacePagePath } from '@/lib/sites';
+import { findSiteSpaceBy } from '@/lib/sites';
 import { trackServerInsightsEvents } from '@/lib/tracking';
 import { waitUntil } from '@/lib/waitUntil';
 
@@ -176,26 +177,7 @@ export function createSiteMcpTools(
             },
             handler: async ({ url }) => {
                 try {
-                    const match = findSiteSpaceByUrl(context.structure, url);
-                    if (!match) {
-                        return {
-                            content: [{ type: 'text', text: `Page not found: "${url}"` }],
-                            isError: true,
-                        };
-                    }
-
-                    const revision = await throwIfDataError(
-                        dataFetcher.getRevision({
-                            spaceId: match.siteSpace.space.id,
-                            revisionId: match.siteSpace.space.revision,
-                        })
-                    );
-
-                    const resolved = resolveSiteSpacePagePath(
-                        match.siteSpace,
-                        revision.pages,
-                        match.pagePath
-                    );
+                    const resolved = await resolveSitePageFromURL(context, url);
                     if (!resolved) {
                         return {
                             content: [{ type: 'text', text: `Page not found: "${url}"` }],
@@ -205,7 +187,7 @@ export function createSiteMcpTools(
 
                     const markdown = await getMarkdownForPageInSpace(
                         context,
-                        match.siteSpace,
+                        resolved.siteSpace,
                         resolved.page
                     );
 
@@ -218,8 +200,8 @@ export function createSiteMcpTools(
                                 location: {
                                     displayContext: SiteInsightsDisplayContext.Mcp,
                                     page: resolved.page.id,
-                                    space: match.siteSpace.space.id,
-                                    revision: match.siteSpace.space.revision,
+                                    space: resolved.siteSpace.space.id,
+                                    revision: resolved.siteSpace.space.revision,
                                 },
                             },
                         ],

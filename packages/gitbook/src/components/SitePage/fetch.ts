@@ -7,11 +7,13 @@ import {
     SITE_REDIRECT_SOURCE_PATH_PATTERN,
 } from '@gitbook/api';
 
-import type { GitBookSiteContext } from '@/lib/context';
+import { type GitBookSiteContext, fetchSiteContextForSiteSpace } from '@/lib/context';
 import { getDataOrNull } from '@/lib/data';
 import { type ResolvedPagePath, resolvePageId } from '@/lib/pages';
 import { withLeadingSlash } from '@/lib/paths';
-import { resolveSiteSpacePagePath } from '@/lib/sites';
+import { findSiteSpaceByUrl, resolveSiteSpacePagePath } from '@/lib/sites';
+
+const MAX_PAGE_URL_REDIRECTS = 5;
 
 export interface PagePathParams {
     pathname?: string | string[];
@@ -182,6 +184,50 @@ export async function resolveMissingPagePath(
     );
     const page = resolved ? resolvePageId(revision.pages, resolved.id) : undefined;
     return page ? { type: 'page', page } : undefined;
+}
+
+/**
+ * Resolve a page of the site from its full URL, following site and space redirects like a browser would.
+ */
+export async function resolveSitePageFromURL(
+    context: GitBookSiteContext,
+    url: string,
+    redirectsLeft = MAX_PAGE_URL_REDIRECTS
+) {
+    const match = findSiteSpaceByUrl(context.structure, url);
+    if (!match) {
+        return null;
+    }
+
+    const siteSpaceContext = await fetchSiteContextForSiteSpace(context, match.siteSpace);
+    const page = resolveSiteSpacePagePath(
+        match.siteSpace,
+        siteSpaceContext.revision.pages,
+        match.pagePath
+    );
+    if (page) {
+        return { siteSpace: match.siteSpace, page: page.page };
+    }
+
+    const fallback = await resolveMissingPagePath(siteSpaceContext, match.pagePath);
+    if (fallback?.type === 'page') {
+        return { siteSpace: match.siteSpace, page: fallback.page.page };
+    }
+
+    // Destinations outside the site are full URLs and can't be one of its pages.
+    if (
+        fallback?.type === 'redirect' &&
+        fallback.destination.startsWith('/') &&
+        redirectsLeft > 0
+    ) {
+        return resolveSitePageFromURL(
+            context,
+            siteSpaceContext.linker.toAbsoluteURL(fallback.destination),
+            redirectsLeft - 1
+        );
+    }
+
+    return null;
 }
 
 /**

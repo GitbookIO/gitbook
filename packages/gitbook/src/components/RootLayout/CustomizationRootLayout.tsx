@@ -49,7 +49,7 @@ import { defaultCustomization } from '@/lib/utils';
 
 function preloadFont(fontData: FontData) {
     if (fontData.type === 'custom') {
-        ReactDOM.preconnect(GITBOOK_FONTS_URL);
+        ReactDOM.preconnect(GITBOOK_FONTS_URL, { crossOrigin: 'anonymous' });
         fontData.preloadSources
             .flatMap((face) => face.sources)
             .forEach(({ url, format }) => {

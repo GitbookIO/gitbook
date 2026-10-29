@@ -18,6 +18,7 @@ import { buildVersion } from '@/lib/build';
 import type { GitBookSiteContext } from '@/lib/context';
 import { GITBOOK_API_PUBLIC_URL, GITBOOK_ASSETS_URL, GITBOOK_ICONS_URL } from '@/lib/env';
 import { getResizedImageURL } from '@/lib/images';
+import { removeTrailingSlash } from '@/lib/paths';
 import { isSiteIndexable } from '@/lib/seo';
 
 // Pure trackers with no visitor-facing UI, safe to load after `load` + idle. Anything not
@@ -63,11 +64,12 @@ export async function SiteLayout(props: {
     // Scripts are disabled when tracking is disabled
     const scripts = withTracking ? context.scripts : [];
 
-    ReactDOM.preconnect(GITBOOK_API_PUBLIC_URL);
-    ReactDOM.preconnect(GITBOOK_ICONS_URL);
-    if (GITBOOK_ASSETS_URL) {
-        ReactDOM.preconnect(GITBOOK_ASSETS_URL);
-    }
+    // React dedupes preconnects by href, so reduce to the origin; relative URLs are same-origin.
+    [GITBOOK_API_PUBLIC_URL, GITBOOK_ICONS_URL, GITBOOK_ASSETS_URL].forEach((url) => {
+        if (url && URL.canParse(url)) {
+            ReactDOM.preconnect(new URL(url).origin);
+        }
+    });
 
     // Start the search-index download from the HTML itself. `crossOrigin` must match the
     // client `fetch()` (cors + same-origin credentials) or the preload is ignored and the
@@ -100,6 +102,9 @@ export async function SiteLayout(props: {
             defaultTheme={customization.themes.default}
             externalLinksTarget={customization.externalLinks.target}
             proxyOrigin={context.site.proxy?.origin}
+            siteURL={removeTrailingSlash(
+                context.linker.toAbsoluteURL(context.linker.toPathInSite(''))
+            )}
             searchPrewarmURL={context.linker.toPathInSite('~gitbook/search-prewarm')}
         >
             <AIContextProvider

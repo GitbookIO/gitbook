@@ -1,6 +1,6 @@
 'use client';
 
-import type React from 'react';
+import React from 'react';
 
 import type { CustomizationThemedCodeTheme } from '@gitbook/api';
 import {
@@ -12,6 +12,10 @@ import {
 
 import { ClientPlainCodeBlock } from '../CodeBlock/ClientPlainCodeBlock';
 import type { DocumentContext } from '../DocumentView';
+import { matchesText } from '../Table/searchMatch';
+import { MIN_RECORDS_FOR_SEARCH } from '../Table/shouldShowSearch';
+import { Input } from '@/components/primitives';
+import { tString, useLanguage } from '@/intl/client';
 
 // Only what survives the RSC boundary. Rebuilding the renderers on the client is what lets this
 // whole subtree sit behind a `next/dynamic` chunk instead of the route's eager entry.
@@ -74,14 +78,51 @@ export function OpenAPIBlockClient(props: OpenAPIBlockClientProps) {
             );
         case 'webhook':
             return <BaseOpenAPIWebhook data={props.data} context={context} className={className} />;
-        case 'schemas':
+        case 'schemas': {
+            const SchemasComponent =
+                mode !== 'print' && props.data.schemas.length >= MIN_RECORDS_FOR_SEARCH
+                    ? OpenAPISchemasWithSearch
+                    : BaseOpenAPISchemas;
             return (
-                <BaseOpenAPISchemas
+                <SchemasComponent
                     data={props.data}
                     grouped={props.grouped}
                     context={context}
                     className={className}
                 />
             );
+        }
     }
+}
+
+function OpenAPISchemasWithSearch(props: React.ComponentProps<typeof BaseOpenAPISchemas>) {
+    const { data, ...rest } = props;
+    const language = useLanguage();
+    const [query, setQuery] = React.useState('');
+    // A models page can hold hundreds of schemas; keep typing responsive while the list re-renders.
+    const deferredQuery = React.useDeferredValue(query).trim();
+
+    const schemas = data.schemas.filter(({ name }) => matchesText(name, deferredQuery));
+
+    return (
+        <div className="flex min-w-0 flex-1 flex-col gap-4">
+            <Input
+                label={tString(language, 'search')}
+                value={query}
+                onValueChange={setQuery}
+                leading="magnifying-glass"
+                clearButton
+                sizing="small"
+                keyboardShortcut={false}
+            />
+            {schemas.length > 0 ? (
+                // `grouped` keeps the list layout when the search narrows it down to one model.
+                <BaseOpenAPISchemas {...rest} data={{ ...data, schemas }} grouped />
+            ) : (
+                <div className="mb-14 py-8 text-center text-sm text-tint">
+                    {tString(language, 'search_no_results_for', deferredQuery)}
+                </div>
+            )}
+        </div>
+    );
 }
