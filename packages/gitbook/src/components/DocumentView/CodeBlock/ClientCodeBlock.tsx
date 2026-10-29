@@ -6,11 +6,10 @@ import { useDebounceCallback } from 'usehooks-ts';
 import type { CustomizationThemedCodeTheme, DocumentBlockCode } from '@gitbook/api';
 
 import type { BlockProps } from '../Block';
-import { type InlineExpressionVariables, useEvaluateInlineExpression } from '../InlineExpression';
+import type { InlineExpressionVariables } from '../InlineExpression/types';
 import { CodeBlockRenderer } from './CodeBlockRenderer';
 import type { HighlightTheme, RenderedInline } from './highlight-tokens';
 import { plainHighlight } from './plain-highlight';
-import { useAdaptiveVisitor } from '@/components/Adaptive';
 import { useInViewportListener } from '@/components/hooks/useInViewportListener';
 import { useScrollListener } from '@/components/hooks/useScrollListener';
 import { Button, ToggleChevron } from '@/components/primitives';
@@ -20,6 +19,8 @@ import { type ClassValue, tcls } from '@/lib/tailwind';
 export type ClientBlockProps = Pick<BlockProps<DocumentBlockCode>, 'block' | 'style'> & {
     inlines: RenderedInline[];
     inlineExprVariables: InlineExpressionVariables;
+    /** Only set for blocks with inline expressions, keeping `@gitbook/expr` out of the bundle. */
+    evaluateInlineExpression?: (expression: string) => string;
     mode: BlockProps<DocumentBlockCode>['context']['mode'];
     themes?: CustomizationThemedCodeTheme;
     embedded?: boolean;
@@ -34,18 +35,12 @@ export const CODE_BLOCK_DEFAULT_COLLAPSED_LINE_COUNT = 10;
  * It allows us to defer some load to avoid blocking the rendering of the whole page with block highlighting.
  */
 export function ClientCodeBlock(props: ClientBlockProps) {
-    const { block, mode, style, inlines, inlineExprVariables, themes, embedded, commentKey } =
+    const { block, mode, style, inlines, evaluateInlineExpression, themes, embedded, commentKey } =
         props;
     const blockRef = useRef<HTMLDivElement>(null);
     const isInViewportRef = useRef(false);
     const [isInViewport, setIsInViewport] = useState(false);
 
-    const getAdaptiveVisitorClaims = useAdaptiveVisitor();
-    const visitorClaims = getAdaptiveVisitorClaims();
-    const evaluateInlineExpression = useEvaluateInlineExpression({
-        visitorClaims,
-        variables: inlineExprVariables,
-    });
     const plainTheme = useMemo(
         () => plainHighlight(block, inlines, { evaluateInlineExpression, themes }),
         [block, inlines, evaluateInlineExpression, themes]
