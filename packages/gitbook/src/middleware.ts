@@ -350,12 +350,12 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         ) {
             if (visitorToken?.source === 'url') {
                 cookies.push(
-                    ...getResponseCookiesForVisitorAuth(
-                        getVisitorAuthBasePath(siteRequestURL, siteURLData),
-                        visitorToken,
-                        request.cookies.getAll(),
-                        request.headers
-                    )
+                    ...getResponseCookiesForVisitorAuth({
+                        basePath: getVisitorAuthBasePath(siteRequestURL, siteURLData),
+                        visitorTokenLookup: visitorToken,
+                        requestCookies: request.cookies.getAll(),
+                        requestHeaders: request.headers,
+                    })
                 );
             }
 

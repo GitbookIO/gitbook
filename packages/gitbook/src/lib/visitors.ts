@@ -15,6 +15,7 @@ const VISITOR_AUTH_PARAM = 'jwt_token';
 const VISITOR_PARAM_PREFIX = 'visitor.';
 export const VISITOR_TOKEN_COOKIE = 'gitbook-visitor-token';
 const VISITOR_UNSIGNED_CLAIMS_PREFIX = 'gitbook-visitor-public';
+const IS_SECURE = process.env.NODE_ENV === 'production';
 
 /**
  * Typing for a cookie, matching the internal type of Next.js.
@@ -147,10 +148,10 @@ export function getVisitorData({
 }): VisitorDataLookup {
     const visitorToken = getVisitorToken({ cookies, headers, url });
     const unsignedClaims = getVisitorUnsignedClaims({ cookies, url });
-    const visitorParamsCookie = getResponseCookieForVisitorParams(
-        unsignedClaims.fromVisitorParams,
-        headers
-    );
+    const visitorParamsCookie = getResponseCookieForVisitorParams({
+        visitorParamsClaims: unsignedClaims.fromVisitorParams,
+        requestHeaders: headers,
+    });
 
     return {
         visitorToken,
@@ -322,10 +323,13 @@ function parseVisitorQueryParamValue(value: string): ClaimPrimitive {
 /**
  * Returns to cookie response to use in order to persist visitor params that were passed to the URL.
  */
-function getResponseCookieForVisitorParams(
-    visitorParamsClaims: Record<string, ClaimPrimitive>,
-    requestHeaders: Headers
-): ResponseCookie | undefined {
+function getResponseCookieForVisitorParams({
+    visitorParamsClaims,
+    requestHeaders,
+}: {
+    visitorParamsClaims: Record<string, ClaimPrimitive>;
+    requestHeaders: Headers;
+}): ResponseCookie | undefined {
     if (Object.keys(visitorParamsClaims).length === 0) {
         return undefined;
     }
@@ -342,12 +346,11 @@ function getResponseCookieForVisitorParams(
  * `Partitioned` (CHIPS) is kept to iframes: Safari drops partitioned cookies after cross-site
  * redirect chains (WebKit 306194), which top-level login flows go through.
  */
-function getVisitorCookieCrossSiteOptions(requestHeaders?: Headers) {
-    const isProduction = process.env.NODE_ENV === 'production';
+function getVisitorCookieCrossSiteOptions(requestHeaders: Headers) {
     return {
-        sameSite: isProduction ? ('none' as const) : undefined,
-        secure: isProduction,
-        partitioned: isProduction && requestHeaders?.get('sec-fetch-dest') === 'iframe',
+        sameSite: IS_SECURE ? ('none' as const) : undefined,
+        secure: IS_SECURE,
+        partitioned: IS_SECURE && requestHeaders.get('sec-fetch-dest') === 'iframe',
     };
 }
 
@@ -360,12 +363,17 @@ function getVisitorCookieCrossSiteOptions(requestHeaders?: Headers) {
  * custom `gitbook-visitor-token` cookie is owned by the customer's backend and is never copied,
  * to keep a single source of truth.
  */
-export function getResponseCookiesForVisitorAuth(
-    basePath: string,
-    visitorTokenLookup: Extract<VisitorTokenLookup, { source: 'url' }>,
-    requestCookies: RequestCookies = [],
-    requestHeaders?: Headers
-): ResponseCookies {
+export function getResponseCookiesForVisitorAuth({
+    basePath,
+    visitorTokenLookup,
+    requestCookies = [],
+    requestHeaders,
+}: {
+    basePath: string;
+    visitorTokenLookup: Extract<VisitorTokenLookup, { source: 'url' }>;
+    requestCookies?: RequestCookies;
+    requestHeaders: Headers;
+}): ResponseCookies {
     let decoded: JwtPayload;
     try {
         decoded = jwtDecode(visitorTokenLookup.token);
@@ -413,9 +421,8 @@ export function getVisitorAuthCookieName(basePath: string): string {
  * unpartitioned cookies apart, so both are cleared whenever `Partitioned` can be set.
  */
 export function getVisitorAuthClearCookieHeaders(basePath: string): string[] {
-    const { secure } = getVisitorCookieCrossSiteOptions();
-    const header = `${getVisitorAuthCookieName(basePath)}=; Path=/; Max-Age=0${secure ? '; Secure; SameSite=None' : ''}`;
-    return secure ? [`${header}; Partitioned`, header] : [header];
+    const header = `${getVisitorAuthCookieName(basePath)}=; Path=/; Max-Age=0${IS_SECURE ? '; Secure; SameSite=None' : ''}`;
+    return IS_SECURE ? [`${header}; Partitioned`, header] : [header];
 }
 
 /**
