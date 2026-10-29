@@ -92,6 +92,30 @@ export async function CustomizationRootLayout(props: {
     // (undefined) and keeps a neutral page background.
     const tintBaseStep =
         theme === CustomizationTheme.Bold ? undefined : theme === CustomizationTheme.Muted ? 2 : 1;
+    const tintScale = {
+        light: {
+            color: tintColor ? tintColor.light : DEFAULT_TINT_COLOR,
+            options: {
+                baseStep: tintBaseStep,
+                mix: mixColor && { color: mixColor.color.light, ratio: mixColor.ratio.light },
+            },
+        },
+        dark: {
+            color: tintColor ? tintColor.dark : DEFAULT_TINT_COLOR,
+            options: {
+                darkMode: true,
+                baseStep: tintBaseStep,
+                mix: mixColor && { color: mixColor.color.dark, ratio: mixColor.ratio.dark },
+            },
+        },
+    };
+    const secondaryColor = customization.styling.secondaryColor;
+    const secondaryScale = secondaryColor
+        ? {
+              light: { color: secondaryColor.light, options: {} },
+              dark: { color: secondaryColor.dark, options: { darkMode: true } },
+          }
+        : tintScale;
     const { infoColor, successColor, warningColor, dangerColor } = getSemanticColors(customization);
     const fontData = getFontData(customization.styling.font, 'content');
     // Temporarily add a if here while the cache is being warmed up.
@@ -178,7 +202,8 @@ export async function CustomizationRootLayout(props: {
                 >{`
                     :root, .light, .dark [data-color-scheme$="light"], .dark [data-follow-color-scheme="true"]:has([data-color-scheme$="light"]) {
                         ${generateColorVariable('primary', customization.styling.primaryColor.light)}
-                        ${generateColorVariable('tint', tintColor ? tintColor.light : DEFAULT_TINT_COLOR, { baseStep: tintBaseStep, mix: mixColor && { color: mixColor.color.light, ratio: mixColor.ratio.light } })}
+                        ${generateColorVariable('tint', tintScale.light.color, tintScale.light.options)}
+                        ${generateColorVariable('secondary', secondaryScale.light.color, secondaryScale.light.options)}
                         ${generateColorVariable('neutral', DEFAULT_TINT_COLOR)}
 
                         --header-background: ${
@@ -205,7 +230,8 @@ export async function CustomizationRootLayout(props: {
 
                     .dark, :root:not(.dark) [data-color-scheme^="dark"], :root:not(.dark) [data-follow-color-scheme="true"]:has([data-color-scheme^="dark"]) {
                         ${generateColorVariable('primary', customization.styling.primaryColor.dark, { darkMode: true })}
-                        ${generateColorVariable('tint', tintColor ? tintColor.dark : DEFAULT_TINT_COLOR, { darkMode: true, baseStep: tintBaseStep, mix: mixColor && { color: mixColor?.color.dark, ratio: mixColor.ratio.dark } })}
+                        ${generateColorVariable('tint', tintScale.dark.color, tintScale.dark.options)}
+                        ${generateColorVariable('secondary', secondaryScale.dark.color, secondaryScale.dark.options)}
                         ${generateColorVariable('neutral', DEFAULT_TINT_COLOR, { darkMode: true })}
 
                         --header-background: ${hexToRgb(customization.header.backgroundColor?.dark ?? tintColor?.dark ?? customization.styling.primaryColor.dark)};
