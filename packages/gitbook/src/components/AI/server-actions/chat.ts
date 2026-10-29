@@ -1,4 +1,6 @@
 'use server';
+import { headers } from 'next/headers';
+
 import {
     type AIMessageContext,
     AIMessageRole,
@@ -12,6 +14,7 @@ import {
 import { streamRenderAIMessage } from './api';
 import type { RenderAIMessageOptions } from './types';
 import { isAIChatEnabled } from '@/components/utils/isAIChatEnabled';
+import { getAskForwardedHeaders, getAskVisitorAgent } from '@/lib/ask-visitor';
 import { getSiteURLDataFromMiddleware } from '@/lib/middleware';
 import { fetchServerActionSiteContext, getServerActionBaseContext } from '@/lib/server-actions';
 import { traceErrorOnly } from '@/lib/tracing';
@@ -72,7 +75,8 @@ export async function* streamAIChatResponse({
                         ? SiteCoreChannelType.Embed
                         : SiteCoreChannelType.Site,
                 },
-            }
+            },
+            { headers: getAskForwardedHeaders(getAskVisitorAgent(await headers())) }
         );
 
         return await streamRenderAIMessage(context, rawStream, options);

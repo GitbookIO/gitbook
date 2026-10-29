@@ -1,5 +1,6 @@
 import { isAIEnabled } from '@/components/utils/isAIChatEnabled';
 import { renderAskSourcesMarkdown, streamSiteAskAnswer } from '@/lib/ask';
+import type { AskVisitorAgent } from '@/lib/ask-visitor';
 import type { GitBookSiteContext } from '@/lib/context';
 import { linkerWithMarkdownPages } from '@/lib/links';
 import { fromPageMarkdown, toPageMarkdown } from '@/lib/markdownPage';
@@ -14,6 +15,11 @@ export interface ServeAskMarkdownOptions {
      * passed via the `?goal=` search parameter. Used by the backend to steer the answer.
      */
     goal?: string;
+
+    /**
+     * Headers of the visitor asking the question, forwarded to the backend to classify the asker.
+     */
+    visitorAgent?: AskVisitorAgent;
 }
 
 /**
@@ -41,7 +47,10 @@ export async function serveAskMarkdown(
             return 'You forgot to pass a question in the `?ask=` parameter. Append a question to the URL in the `?ask=<question>` search parameter to get a complete answer and associated sources.';
         }
 
-        const latestAnswer = await streamSiteAskAnswer(context, question, { goal });
+        const latestAnswer = await streamSiteAskAnswer(context, question, {
+            goal,
+            visitorAgent: options.visitorAgent,
+        });
 
         if (!latestAnswer || !latestAnswer.answer || !('markdown' in latestAnswer.answer)) {
             return `We couldn't answer this question.`;

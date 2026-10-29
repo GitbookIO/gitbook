@@ -15,6 +15,7 @@ import {
 } from '@/lib/agentFeedback';
 import { submitAgentFeedback } from '@/lib/agentFeedback/server';
 import { renderAskSourcesMarkdown, streamSiteAskAnswer } from '@/lib/ask';
+import { getAskVisitorAgent } from '@/lib/ask-visitor';
 import type { GitBookSiteContext } from '@/lib/context';
 import { getExposableError, throwIfDataError } from '@/lib/data';
 import { fromPageMarkdown, getMarkdownForPageInSpace, toPageMarkdown } from '@/lib/markdownPage';
@@ -261,8 +262,11 @@ export function createSiteMcpTools(
 
                         const trimmedGoal = goal?.trim() || undefined;
 
+                        // The MCP server is stateless, so the `clientInfo` from `initialize` isn't
+                        // available here: rely on the HTTP user agent, as the `ask_question` event does.
                         const answer = await streamSiteAskAnswer(context, trimmedQuestion, {
                             goal: trimmedGoal,
+                            visitorAgent: getAskVisitorAgent(request.headers),
                         });
 
                         trackMcpEvent({

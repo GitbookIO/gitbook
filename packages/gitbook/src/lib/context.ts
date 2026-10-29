@@ -23,6 +23,7 @@ import type {
 import { GITBOOK_URL } from './env';
 import { type ImageResizer, createImageResizer } from './images';
 import { type GitBookLinker, createLinker, linkerForPublishedURL } from './links';
+import type { AskVisitorAgent } from '@/lib/ask-visitor';
 import {
     type GitBookDataFetcher,
     createDataFetcher,
@@ -104,6 +105,12 @@ export type SiteURLData = Pick<
 
     /** Whether the request comes from ChatGPT. Only set for Markdown and LLM routes. */
     isChatGPT?: boolean;
+
+    /**
+     * Headers of the visitor asking through `?ask=`, forwarded to the API to classify the asker.
+     * Only set for the ask route, which is static and can't read the request headers.
+     */
+    askVisitorAgent?: AskVisitorAgent;
 };
 
 /**

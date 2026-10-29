@@ -1,5 +1,6 @@
 import type { SearchAIAnswer, SearchAIAnswerSource } from '@gitbook/api';
 
+import { type AskVisitorAgent, getAskForwardedHeaders } from '@/lib/ask-visitor';
 import type { GitBookSiteContext } from '@/lib/context';
 import { throwIfDataError } from '@/lib/data';
 import { resolvePageId } from '@/lib/pages';
@@ -15,6 +16,11 @@ export interface StreamSiteAskOptions {
      * Used by the backend to steer the answer.
      */
     goal?: string;
+
+    /**
+     * Headers of the visitor asking the question, used by the backend to classify the asker.
+     */
+    visitorAgent?: AskVisitorAgent;
 }
 
 /**
@@ -45,7 +51,8 @@ export async function streamSiteAskAnswer(
                 currentSiteSpace: context.siteSpace.id,
             },
         },
-        { format: 'markdown' }
+        { format: 'markdown' },
+        { headers: getAskForwardedHeaders(options.visitorAgent) }
     );
 
     let latestAnswer: SearchAIAnswer | null = null;
