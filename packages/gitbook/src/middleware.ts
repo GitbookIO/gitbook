@@ -52,6 +52,8 @@ import {
     getPreviewCookieResponse,
     getPreviewRequestIdentifier,
     isPreviewRequest,
+    parsePreviewCustomizationCookie,
+    serializePreviewCustomizationCookie,
 } from '@/lib/preview';
 import {
     type ResponseCookies,
@@ -423,7 +425,9 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         const customizationCookie = request.cookies.get(MiddlewareHeaders.Customization);
         const customization =
             siteRequestURL.searchParams.get('customization') ??
-            (customizationCookie ? decodeURIComponent(customizationCookie.value) : undefined);
+            (customizationCookie
+                ? parsePreviewCustomizationCookie(customizationCookie.value, siteURLData.siteSpace)
+                : undefined);
         if (
             allowCustomizationOverride &&
             customization &&
@@ -436,7 +440,10 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
                 cookies.push(
                     getPreviewCookieResponse({
                         name: MiddlewareHeaders.Customization,
-                        value: encodeURIComponent(customization),
+                        value: serializePreviewCustomizationCookie({
+                            customization,
+                            siteSpace: siteURLData.siteSpace,
+                        }),
                         mode,
                         siteRequestURL,
                         siteURLData,
