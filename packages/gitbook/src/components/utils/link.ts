@@ -52,6 +52,9 @@ export function toNonEmbedLink(href: string) {
 
 /**
  * Check if a link points to the site's `~gitbook/auth/login` or `~gitbook/auth/logout` route.
+ *
+ * Deliberately loose: these routes only exist at the site root, but the site's base path isn't
+ * known here, so any prefix matches. A false positive only costs the link its prefetch.
  */
 export function isSiteAuthLink(href: string) {
     const baseURL = typeof window !== 'undefined' ? window.location.origin : 'http://localhost';
