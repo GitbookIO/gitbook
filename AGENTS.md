@@ -80,3 +80,16 @@ Linting uses Oxlint and formatting uses Oxfmt. Always run `bun run format` befor
 ## Comments
 
 Comment to explain *why*, not *what* — the code already shows what it does. Keep comments short, ideally a single line. Avoid multi-line block comments that narrate mechanics a reader can follow from the code; they add noise and go stale. Reserve longer comments for genuinely non-obvious rationale: a subtle invariant, or a workaround and the reason it exists.
+
+## Security issues on Linear
+
+If you're working on a security vulnerability issue from Linear, it might need to be tracked for security compliance purposes.
+- Our auditors expect to see us track & deal with security vulnerability in our product & systems
+- Assigning a label like `security:tracked:P0` to an issue means that it will be tracked in Vanta, and a "fix by" SLA will apply
+- General security improvements tickets don't need to be tracked (eg. adding new security-minded feature)
+
+If the ticket corresponds to this description but does not have one of the labels below, suggest adding one to the user
+- security:tracked:P0 (highest priority)
+- security:tracked:P1
+- security:tracked:P2
+- security:tracked:P3 (lowest priority)
