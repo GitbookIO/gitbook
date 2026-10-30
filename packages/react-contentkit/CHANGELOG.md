@@ -1,5 +1,11 @@
 # @gitbook/react-contentkit
 
+## 0.7.18
+
+### Patch Changes
+
+- 04f39f1: Load a webframe only once it is near the viewport. A page can hold hundreds of them inside collapsed expandables, and loading every one on mount held up the first paint.
+
 ## 0.7.17
 
 ### Patch Changes

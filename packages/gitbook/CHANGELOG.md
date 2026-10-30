@@ -1,5 +1,35 @@
 # gitbook
 
+## 0.28.1
+
+### Patch Changes
+
+- 7e096d5: Bump Next.js to 16.4.3, keeping the dev-mode OOM patch.
+- f61578f: Preconnect each asset origin once, skip same-origin icon URLs, and open the fonts preconnect in CORS mode so font requests can reuse it.
+- 26ec43e: Stop caching failed searches, so a rate-limited or failing search is retried on the next query instead of being served from cache for 15 minutes.
+- 04f39f1: Declare the Tailwind layer order in each component stylesheet, so a route whose first stylesheet is one of them still puts `base` before `components` and preflight does not strip their padding and borders.
+- a512777: Forward the visitor's user agent on ask and Assistant calls so questions are classified by who asked.
+- 508f1bc: Load the inline expression runtime only on pages whose code blocks or text use expressions, so other pages ship less JavaScript.
+- 04f39f1: Pack the class lists that every block, heading anchor and table cell repeats into shared CSS classes, and carry a table cell's width once as a custom property instead of spelling it out as both width and min-width, so a large page carries far less markup.
+- bd431f1: Split llms-full.txt into parts by size so large sites no longer fail with "content too large"
+- a5d58bc: Follow site and space redirects when the MCP getPage tool resolves a page URL.
+- e745c88: Add a search input to filter models by name on OpenAPI models pages.
+- 96c5683: Let analytics tools like GA4 track outbound link clicks by using native link navigation.
+- 347a1cc: Set `Partitioned` on visitor cookies set inside an iframe so authenticated embeds work cross-site.
+- ea01850: Support a secondary brand colour for secondary buttons and `$secondary` text, background, icon and tag colours. Sites without one render as before.
+- c00a7b3: Resolve the published content with the full URL in a single lookup and always send the visitor country.
+- 063e685: Resolve dark-mode image URLs in published Markdown.
+- b7b8ae6: Keep lists, paragraphs and code blocks as HTML in Updates RSS feeds, instead of running all the text together
+- 4a72ead: Only apply a site preview customization override to the section or variant it was made for.
+- 38f60f2: Render soft line breaks in paragraphs that contain buttons.
+- 1383a79: Fix visitors being logged out right after signing in on sites with a logout link in the header.
+- be658e1: Truncate long tab titles one by one and show the selected tab's full title, instead of hiding tabs behind a "…" menu
+- Updated dependencies [04f39f1]
+- Updated dependencies [4dfe630]
+  - @gitbook/react-contentkit@0.7.18
+  - @gitbook/openapi-parser@3.0.14
+  - @gitbook/react-openapi@2.0.1
+
 ## 0.28.0
 
 ### Minor Changes

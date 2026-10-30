@@ -110,7 +110,7 @@
     },
     "packages/gitbook": {
       "name": "gitbook",
-      "version": "0.28.0",
+      "version": "0.28.1",
       "dependencies": {
         "@base-ui/react": "catalog:",
         "@cloudflare/workers-types": "^4.20251011.0",
@@ -249,7 +249,7 @@
     },
     "packages/openapi-parser": {
       "name": "@gitbook/openapi-parser",
-      "version": "3.0.13",
+      "version": "3.0.14",
       "dependencies": {
         "@scalar/json-magic": "^0.17.0",
         "@scalar/openapi-parser": "^0.29.19",
@@ -266,7 +266,7 @@
     },
     "packages/react-contentkit": {
       "name": "@gitbook/react-contentkit",
-      "version": "0.7.17",
+      "version": "0.7.18",
       "dependencies": {
         "@gitbook/api": "catalog:",
         "@gitbook/icons": "workspace:*",
@@ -309,7 +309,7 @@
     },
     "packages/react-openapi": {
       "name": "@gitbook/react-openapi",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@base-ui/react": "catalog:",
         "@gitbook/expr": "workspace:*",
