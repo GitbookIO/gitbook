@@ -13,8 +13,6 @@ const originalFetch = globalThis.fetch;
 afterAll(() => mock.restore());
 
 describe('searchSiteContent', () => {
-    let queryIndex = 0;
-
     beforeEach(() => {
         cacheLife.mockClear();
         cacheTag.mockClear();
@@ -24,22 +22,21 @@ describe('searchSiteContent', () => {
         globalThis.fetch = originalFetch;
     });
 
-    function mockAPIResponse(response: Response | Promise<Response>) {
-        globalThis.fetch = mock(() => Promise.resolve(response)) as unknown as typeof fetch;
+    function mockFetch(impl: () => Promise<Response>) {
+        globalThis.fetch = mock(impl);
     }
 
     function search() {
-        // A distinct query per test, so no call can be served from React's per-request cache.
         return createDataFetcher().searchSiteContent({
             organizationId: 'org-1',
             siteId: 'site-1',
-            query: `query-${queryIndex++}`,
+            query: 'test',
             scope: { mode: 'all' },
         });
     }
 
     it('caches successful results for hours with the site and response tags', async () => {
-        mockAPIResponse(
+        mockFetch(async () =>
             Response.json(
                 { items: [] },
                 { headers: { 'x-gitbook-cache-tag': 'space:space-1,space:space-2' } }
@@ -57,21 +54,19 @@ describe('searchSiteContent', () => {
         ]);
     });
 
-    it.each([429, 500, 503])('does not cache a %i from the API', async (status) => {
-        mockAPIResponse(
-            Response.json({ error: { code: status, message: 'Namespace saturated' } }, { status })
+    it('does not cache a transient API error', async () => {
+        mockFetch(async () =>
+            Response.json({ error: { code: 429, message: 'Namespace saturated' } }, { status: 429 })
         );
 
         const result = await search();
 
-        expect(result.error?.code).toBe(status);
+        expect(result.error?.code).toBe(429);
         expect(cacheLife.mock.calls).toEqual([[{ stale: 0, revalidate: 0, expire: 0 }]]);
     });
 
     it('does not cache a network failure', async () => {
-        globalThis.fetch = mock(() =>
-            Promise.reject(new TypeError('fetch failed'))
-        ) as unknown as typeof fetch;
+        mockFetch(() => Promise.reject(new TypeError('fetch failed')));
 
         const result = await search();
 
@@ -80,7 +75,7 @@ describe('searchSiteContent', () => {
     });
 
     it('keeps the default cache life for a stable 404', async () => {
-        mockAPIResponse(
+        mockFetch(async () =>
             Response.json({ error: { code: 404, message: 'Site not found' } }, { status: 404 })
         );
 

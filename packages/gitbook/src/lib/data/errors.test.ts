@@ -5,7 +5,7 @@ import { GitBookAPIError } from '@gitbook/api';
 import { extractCacheControl, isTransientDataFetcherError } from './errors';
 
 describe('isTransientDataFetcherError', () => {
-    it.each([429, 500, 502, 503, 504])('should treat %i as transient', (code) => {
+    it.each([408, 429, 500, 502, 503, 504])('should treat %i as transient', (code) => {
         expect(isTransientDataFetcherError({ code, message: 'Error' })).toBe(true);
     });
 

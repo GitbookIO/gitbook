@@ -834,8 +834,8 @@ const searchSiteContent = cache(
             );
         });
 
-        // Transient failures (e.g. a saturated search namespace) would otherwise be served for the 15 minutes of the default cache life.
-        // Unlike page fetchers, search only runs in request handlers, so no page cache inherits this.
+        // Don't serve transient errors for the default 15 minutes. Only safe because search runs in
+        // request handlers: a page cache calling it would inherit this short life during API incidents.
         if (result.error && isTransientDataFetcherError(result.error)) {
             cacheLife({ stale: 0, revalidate: 0, expire: 0 });
         }
