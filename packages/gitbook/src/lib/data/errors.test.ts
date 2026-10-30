@@ -2,7 +2,17 @@ import { describe, expect, it } from 'bun:test';
 
 import { GitBookAPIError } from '@gitbook/api';
 
-import { extractCacheControl } from './errors';
+import { extractCacheControl, isTransientDataFetcherError } from './errors';
+
+describe('isTransientDataFetcherError', () => {
+    it.each([429, 500, 502, 503, 504])('should treat %i as transient', (code) => {
+        expect(isTransientDataFetcherError({ code, message: 'Error' })).toBe(true);
+    });
+
+    it.each([400, 401, 403, 404, 410])('should treat %i as stable', (code) => {
+        expect(isTransientDataFetcherError({ code, message: 'Error' })).toBe(false);
+    });
+});
 
 describe('extractCacheControl', () => {
     it('should return undefined when error has no response', () => {

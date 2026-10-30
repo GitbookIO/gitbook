@@ -11,7 +11,7 @@ import {
 import { getCacheTag, getComputedContentSourceCacheTags } from '@gitbook/cache-tags';
 
 import { cache } from '../cache';
-import { DataFetcherError, wrapDataFetcherError } from './errors';
+import { DataFetcherError, isTransientDataFetcherError, wrapDataFetcherError } from './errors';
 import type { GitBookDataFetcher } from './types';
 import { GITBOOK_API_TOKEN, GITBOOK_API_URL, GITBOOK_USER_AGENT } from '@/lib/env';
 import { trace } from '@/lib/tracing';
@@ -799,7 +799,7 @@ const searchSiteContent = cache(
             })
         );
 
-        return wrapDataFetcherError(async () => {
+        const result = await wrapDataFetcherError(async () => {
             return trace(
                 `searchSiteContent(${params.organizationId}, ${params.siteId}, ${params.query})`,
                 async () => {
@@ -833,6 +833,14 @@ const searchSiteContent = cache(
                 }
             );
         });
+
+        // Transient failures (e.g. a saturated search namespace) would otherwise be served for the 15 minutes of the default cache life.
+        // Unlike page fetchers, search only runs in request handlers, so no page cache inherits this.
+        if (result.error && isTransientDataFetcherError(result.error)) {
+            cacheLife({ stale: 0, revalidate: 0, expire: 0 });
+        }
+
+        return result;
     }
 );
 
