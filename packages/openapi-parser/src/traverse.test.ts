@@ -3,6 +3,7 @@ import { describe, expect, it } from 'bun:test';
 
 import { createFileSystem } from './filesystem';
 import { traverse } from './traverse';
+import type { AnyObject } from './types';
 
 const recursiveSpec = await Bun.file(
     new URL('./fixtures/recursive-spec.json', import.meta.url)
@@ -22,7 +23,7 @@ describe('#traverse', () => {
             );
         }
 
-        const specification = await traverse(result.specification!, async (node) => {
+        const specification = await traverse(result.specification as AnyObject, async (node) => {
             if ('description' in node && node.description) {
                 node.description = 'Hello, world!';
                 return node;

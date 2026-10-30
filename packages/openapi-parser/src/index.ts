@@ -1,7 +1,6 @@
 export { parseOpenAPI } from './parse';
 
 export { dereference, isJson, isYaml } from '@scalar/openapi-parser';
-export type { AnyObject } from '@scalar/openapi-parser';
 export type * from '@scalar/openapi-types';
 export * from './error';
 export * from './helpers/shouldIgnoreEntity';
