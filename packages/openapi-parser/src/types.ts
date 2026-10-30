@@ -1,6 +1,5 @@
 import type { OpenAPIV3, OpenAPIV3_1 } from '@scalar/openapi-types';
 
-// oxlint-disable-next-line typescript/no-explicit-any
 export type AnyObject = Record<string, any>;
 
 /**

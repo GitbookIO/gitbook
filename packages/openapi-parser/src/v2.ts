@@ -10,14 +10,8 @@ import { parseOpenAPIV3 } from './v3';
 export async function convertOpenAPIV2ToOpenAPIV3(
     input: ParseOpenAPIInput
 ): Promise<ParseOpenAPIResult> {
-    const { specification } = upgradeFromInput(input);
-    if (!specification) {
-        throw new OpenAPIParseError('Failed to convert Swagger 2.0 to OpenAPI 3.1.1', {
-            code: 'v2-conversion',
-            rootURL: input.rootURL,
-        });
-    }
-    return parseOpenAPIV3({ ...input, rootURL: input.rootURL, value: specification });
+    const result = upgradeFromInput(input);
+    return parseOpenAPIV3({ ...input, rootURL: input.rootURL, value: result.specification! });
 }
 
 /**
