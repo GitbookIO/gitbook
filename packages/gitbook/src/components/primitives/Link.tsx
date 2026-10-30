@@ -5,7 +5,7 @@ import React from 'react';
 
 import { NavigationStatusContext, scrollToHash } from '../hooks';
 import { type TrackEventInput, useTrackEvent } from '../Insights';
-import { isExternalLink, toNonEmbedLink } from '../utils/link';
+import { isExternalLink, isSiteAuthLink, toNonEmbedLink } from '../utils/link';
 import { type DesignTokenName, useClassnames } from './StyleProvider';
 import { tcls } from '@/lib/tailwind';
 import { getSamePageAnchor, resolveAnchorURL } from '@/lib/urls';
@@ -93,6 +93,9 @@ export function Link(props: LinkProps) {
     const trackEvent = useTrackEvent();
     const forwardedClassNames = useClassnames(classNames || []);
     const isExternal = isExternalServer(href);
+    // Auth routes must not be prefetched (it would log the visitor out) and always leave the
+    // page for the upstream provider, so they get a plain anchor like external links.
+    const isAuthLink = isSiteAuthLink(href);
     const { target, rel } = getTargetProps(props, { externalTarget, isExternal });
 
     const onClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
@@ -114,7 +117,7 @@ export function Link(props: LinkProps) {
         const isExternalOnClient = isExternalClient(href);
 
         if (insights) {
-            trackEvent(insights, undefined, { immediate: isExternalOnClient });
+            trackEvent(insights, undefined, { immediate: isExternalOnClient || isAuthLink });
         }
 
         const isInIframe = window.self !== window.top;
@@ -133,7 +136,7 @@ export function Link(props: LinkProps) {
 
     // We test if the link is external, without comparing to the origin
     // as this will be rendered on the server and it could result in a mismatch.
-    if (isExternal) {
+    if (isExternal || isAuthLink) {
         return (
             <a
                 ref={ref}
