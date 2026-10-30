@@ -69,4 +69,69 @@ describe('#parseOpenAPI', () => {
         JSON.stringify(result.filesystem);
         expect(result.errors).toHaveLength(1);
     });
+
+    it('validates OpenAPI 3.2 schema objects as schemas', async () => {
+        const result = await parseOpenAPI({ value: specV32(), rootURL: null });
+        expect(result.errors).toEqual([]);
+    });
+
+    it('reports a 3.2 parameter missing `in`', async () => {
+        const result = await parseOpenAPI({
+            value: specV32({ name: 'id', required: true, schema: { type: 'string' } }),
+            rootURL: null,
+        });
+        expect(result.errors.map((error) => error.message)).toContain(
+            "must have required property 'in'"
+        );
+    });
 });
+
+function specV32(
+    idParameter: object = {
+        name: 'id',
+        in: 'path',
+        required: true,
+        schema: { type: 'string', minLength: 1 },
+    }
+) {
+    return {
+        openapi: '3.2.0',
+        info: { title: 'Users', version: '1.0.0' },
+        paths: {
+            '/users/{id}': {
+                get: {
+                    parameters: [
+                        idParameter,
+                        {
+                            name: 'role',
+                            in: 'query',
+                            schema: { $ref: '#/components/schemas/Role' },
+                        },
+                    ],
+                    responses: {
+                        '200': {
+                            description: 'OK',
+                            content: {
+                                'application/json': {
+                                    schema: { $ref: '#/components/schemas/User' },
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        components: {
+            schemas: {
+                Role: { type: 'string', minLength: 1 },
+                User: {
+                    type: 'object',
+                    properties: {
+                        id: { type: 'string', minLength: 1 },
+                        role: { $ref: '#/components/schemas/Role' },
+                    },
+                },
+            },
+        },
+    };
+}

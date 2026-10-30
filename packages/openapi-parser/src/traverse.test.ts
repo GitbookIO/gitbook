@@ -30,7 +30,7 @@ describe('#traverse', () => {
             return node;
         });
 
-        expect(specification.info?.description).toBe('Hello, world!');
+        expect(specification.info).toHaveProperty('description', 'Hello, world!');
     });
 
     it('traverses a complete filesystem', async () => {

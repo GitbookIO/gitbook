@@ -11,7 +11,7 @@ export async function convertOpenAPIV2ToOpenAPIV3(
     input: ParseOpenAPIInput
 ): Promise<ParseOpenAPIResult> {
     const result = upgradeFromInput(input);
-    return parseOpenAPIV3({ ...input, rootURL: input.rootURL, value: result.specification });
+    return parseOpenAPIV3({ ...input, rootURL: input.rootURL, value: result.specification! });
 }
 
 /**
