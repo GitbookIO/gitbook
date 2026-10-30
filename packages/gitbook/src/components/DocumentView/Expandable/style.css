@@ -1,15 +1,19 @@
 @reference "../../RootLayout/globals.css";
 
-/* A page can hold a hundred expandables, each hiding a table; skipping the render work for the
-   off-screen ones is what keeps opening one cheap. The DOM is untouched, so the server HTML,
-   find-in-page and #anchors all still work. */
-.expandable-block {
+/* A page can hold a hundred expandables, each hiding a table, and the whole document restyles when
+   one opens; skipping the off-screen ones keeps that cheap. The DOM is untouched, so the server
+   HTML, find-in-page and #anchors all still work.
+
+   Only while closed: a closed expandable is exactly one summary tall, so the placeholder height
+   below is right and the page keeps its true length. An open one is as tall as its content, which
+   no fixed estimate can stand in for, so it renders normally. */
+.expandable-block:not([open]) {
     /* Below Safari 18 / Firefox 125 this is ignored and every expandable renders, as it does today. */
     /* stylelint-disable-next-line plugin/no-unsupported-browser-features */
     content-visibility: auto;
-    /* Only the block axis: the inline size comes from the parent. Plain length first, as a fallback
-       for engines without the `auto` keyword, where a skipped block would collapse to 0. The length
-       is a closed expandable with a one-line summary — `auto` swaps in the real size once rendered. */
+    /* Required: a skipped element with no intrinsic size collapses to nothing. Only the block axis,
+       since the inline size comes from the parent. Plain length first, as a fallback for engines
+       without the `auto` keyword; `auto` swaps in the real size once the block has rendered. */
     contain-intrinsic-height: 58px;
     contain-intrinsic-height: auto 58px;
 }
