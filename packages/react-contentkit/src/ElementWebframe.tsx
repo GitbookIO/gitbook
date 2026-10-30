@@ -15,9 +15,6 @@ export function ElementWebframe(props: ContentKitClientElementProps<ContentKitWe
     const { element } = props;
 
     const [mounted, setMounted] = React.useState(false);
-    // Lazy loading can leave a long gap between attaching the source and the frame arriving, so the
-    // spinner stays until it does rather than until it is merely asked for.
-    const [settled, setSettled] = React.useState(false);
     const renderer = useContentKitClientContext();
     const iframeRef = React.useRef<HTMLIFrameElement>(null);
     const [size, setSize] = React.useState<{
@@ -27,11 +24,6 @@ export function ElementWebframe(props: ContentKitClientElementProps<ContentKitWe
 
     const readyRef = React.useRef(false);
     const messagesQueueRef = React.useRef<object[]>([]);
-
-    // A new source is a new load, so the spinner comes back for it.
-    React.useEffect(() => {
-        setSettled(false);
-    }, [element.source.url]);
 
     const sendMessage = React.useCallback(
         (message: object) => {
@@ -216,13 +208,8 @@ export function ElementWebframe(props: ContentKitClientElementProps<ContentKitWe
                     height: useHeightMeasurement ? height : undefined,
                     maxHeight: height,
                 }}
-                // Before mount the frame holds no source, and the blank document it starts on fires
-                // a load of its own; only the source's own load ends the wait. An error ends it too,
-                // so a frame that never arrives doesn't spin forever.
-                onLoad={() => setSettled(mounted)}
-                onError={() => setSettled(true)}
             />
-            {settled ? null : <Icon icon="spinner" className="contentkit-webframe-loading" />}
+            {mounted ? null : <Icon icon="spinner" className="contentkit-webframe-loading" />}
         </div>
     );
 }
