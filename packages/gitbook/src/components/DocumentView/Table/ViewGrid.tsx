@@ -1,4 +1,4 @@
-import { getColumnWidth, getColumnWidthVars, getViewGridLayout } from './layout';
+import { getColumnWidth, getViewGridLayout } from './layout';
 import { RecordRow } from './RecordRow';
 import type { TableGridViewProps } from './Table';
 import { getColumnAlignment } from './utils';
@@ -82,7 +82,7 @@ export function ViewGridHeader(props: ViewGridHeaderProps) {
 
 export function ViewGrid(props: ViewGridProps) {
     const { block, view, records, context, tableClassName } = props;
-    const { tableWidth, columnWidths, autoSizedColumns, fixedColumns } = getViewGridLayout({
+    const { tableWidth, autoSizedColumns, fixedColumns } = getViewGridLayout({
         block,
         view,
         mode: context.mode,
@@ -92,12 +92,6 @@ export function ViewGrid(props: ViewGridProps) {
         <div
             role="rowgroup"
             className={tcls('flex', 'flex-col', tableClassName ?? tableWidth, '[&>*+*]:border-t')}
-            style={getColumnWidthVars({
-                columns: view.columns,
-                columnWidths,
-                autoSizedColumns,
-                fixedColumns,
-            })}
         >
             {records.map((record) => (
                 <RecordRow

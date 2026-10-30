@@ -11,6 +11,10 @@
     .table-grid-cell {
         @apply relative flex flex-1 border-r border-tint-subtle px-3 py-2 align-middle text-sm;
         @apply last:border-r-0;
+
+        /* Set per cell by the row; the column's width serves as both the width and the floor. */
+        width: var(--table-column-width);
+        min-width: var(--table-column-width);
     }
 
     .table-grid-cell-sticky {
