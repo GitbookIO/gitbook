@@ -33,6 +33,8 @@ import { getMarkdownForPagesTree } from '@/routes/llms';
 const HTML_ANCHOR_RE = /<a\b([^>]*?)href="([^"]*)"([^>]*)>([\s\S]*?)<\/a>/g;
 const HTML_ANCHOR_OPEN_RE = /<a\b([^>]*?)href="([^"]*)"([^>]*)>/g;
 const HTML_SRC_RE = /\bsrc="([^"]*)"/g;
+const HTML_SRCSET_RE = /\bsrcset="([^"]*)"/g;
+const SRCSET_CANDIDATE_RE = /(\S*[^,\s])(?:\s+[^,]*)?(?:,|$)/g;
 
 /**
  * Generate a markdown version of a page.
@@ -377,6 +379,16 @@ async function rewriteHTMLRefs(context: GitBookAnyContext, node: Html): Promise<
         const [full, src = ''] = match;
         const resolved = await resolveRefURL(context, src);
         return resolved ? `src="${escapeHTML(resolved.url)}"` : full;
+    });
+
+    node.value = await replaceAsync(node.value, HTML_SRCSET_RE, async (match) => {
+        const [, srcset = ''] = match;
+        const rewritten = await replaceAsync(srcset, SRCSET_CANDIDATE_RE, async (candidate) => {
+            const [full, url = ''] = candidate;
+            const resolved = await resolveRefURL(context, url);
+            return resolved ? escapeHTML(resolved.url) + full.slice(url.length) : full;
+        });
+        return `srcset="${rewritten}"`;
     });
 }
 
