@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test';
 
-import { isExternalLink, toNonEmbedLink } from './link';
+import { isExternalLink, isSiteAuthLink, toNonEmbedLink } from './link';
 
 describe('isExternalLink', () => {
     it('treats anchor links as internal', () => {
@@ -72,5 +72,24 @@ describe('toNonEmbedLink', () => {
 
     it('keeps links unchanged when no embed prefix exists', () => {
         expect(toNonEmbedLink('/docs')).toBe('/docs');
+    });
+});
+
+describe('isSiteAuthLink', () => {
+    it('matches absolute links to the auth routes', () => {
+        expect(isSiteAuthLink('https://example.com/docs/~gitbook/auth/logout')).toBe(true);
+        expect(isSiteAuthLink('https://example.com/~gitbook/auth/login?location=%2F')).toBe(true);
+    });
+
+    it('matches relative links to the auth routes', () => {
+        expect(isSiteAuthLink('/docs/~gitbook/auth/logout/')).toBe(true);
+        expect(isSiteAuthLink('~gitbook/auth/login')).toBe(true);
+    });
+
+    it('does not match other links', () => {
+        expect(isSiteAuthLink('https://example.com/docs/~gitbook/pdf')).toBe(false);
+        expect(isSiteAuthLink('/docs/logout')).toBe(false);
+        expect(isSiteAuthLink('/docs/~gitbook/auth/logout-page')).toBe(false);
+        expect(isSiteAuthLink('#section')).toBe(false);
     });
 });
