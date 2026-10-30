@@ -196,6 +196,10 @@ export function ElementWebframe(props: ContentKitClientElementProps<ContentKitWe
                 // Rendered without a source before mount so it reserves its size in the SSR layout.
                 src={mounted ? element.source.url : undefined}
                 title={element.source.url}
+                // A page can hold hundreds of these, most of them inside collapsed expandables.
+                // Loading them all on mount delays the first paint by seconds, so each one waits
+                // until it is near the viewport.
+                loading="lazy"
                 allowFullScreen
                 allow="clipboard-write"
                 className="contentkit-webframe block h-full w-full max-w-full border-none"

@@ -1,0 +1,28 @@
+@reference "../../RootLayout/globals.css";
+
+/* This file can be the first stylesheet a route loads, and layer order follows first
+   appearance. Without this, `components` would be created here and Tailwind's `base`
+   only later, letting preflight's `padding: 0` and `border: 0` win over the rules below. */
+@layer theme, base, components, utilities;
+
+/* A grid view repeats these on every row and every cell, so a table of any size pays for the class
+   lists many times over in the HTML. They sit in `components` so the utilities passed alongside
+   them still override. */
+@layer components {
+    .table-grid-row {
+        @apply border-tint-subtle transition-colors hover:bg-tint-hover;
+    }
+
+    .table-grid-cell {
+        @apply relative flex flex-1 border-r border-tint-subtle px-3 py-2 align-middle text-sm;
+        @apply last:border-r-0;
+
+        /* Set per cell by the row; the column's width serves as both the width and the floor. */
+        width: var(--table-column-width);
+        min-width: var(--table-column-width);
+    }
+
+    .table-grid-cell-sticky {
+        @apply sticky left-0 z-10 bg-tint-base group-hover/row:bg-tint-hover;
+    }
+}

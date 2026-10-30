@@ -2,6 +2,7 @@ import type { DocumentBlock, JSONDocument } from '@gitbook/api';
 
 import { CONTENT_STYLE, CONTENT_STYLE_REDUCED } from '../layout';
 import { Block } from './Block';
+import './Blocks.css';
 import type { DocumentContextProps } from './DocumentView';
 import { isBlockOffscreen } from './utils';
 import { type ClassValue, tcls } from '@/lib/tailwind';
@@ -93,10 +94,10 @@ export function UnwrappedBlocks<TBlock extends DocumentBlock>(props: UnwrappedBl
                 key={node.key || `${node.type}-${index}`}
                 block={node}
                 style={[
-                    'decoration-primary/6',
+                    'gb-block',
                     FULL_WIDTH_BLOCKS.has(node.type) ? CONTENT_STYLE : CONTENT_STYLE_REDUCED,
 
-                    !LIST_BLOCKS.has(node.type) && 'print:break-inside-avoid',
+                    LIST_BLOCKS.has(node.type) && 'gb-block-list',
                     blockStyle,
                 ]}
                 isEstimatedOffscreen={isOffscreen}
