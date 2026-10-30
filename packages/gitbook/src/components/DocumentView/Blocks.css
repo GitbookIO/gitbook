@@ -1,5 +1,10 @@
 @reference "../RootLayout/globals.css";
 
+/* This file can be the first stylesheet a route loads, and layer order follows first
+   appearance. Without this, `components` would be created here and Tailwind's `base`
+   only later, letting preflight's `padding: 0` and `border: 0` win over the rules below. */
+@layer theme, base, components, utilities;
+
 /* Every block on every page carries these, so they live here rather than in each class attribute. */
 @layer components {
     .gb-block {

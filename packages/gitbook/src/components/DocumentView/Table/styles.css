@@ -1,5 +1,10 @@
 @reference "../../RootLayout/globals.css";
 
+/* This file can be the first stylesheet a route loads, and layer order follows first
+   appearance. Without this, `components` would be created here and Tailwind's `base`
+   only later, letting preflight's `padding: 0` and `border: 0` win over the rules below. */
+@layer theme, base, components, utilities;
+
 /* A grid view repeats these on every row and every cell, so a table of any size pays for the class
    lists many times over in the HTML. They sit in `components` so the utilities passed alongside
    them still override. */
