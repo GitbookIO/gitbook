@@ -50,7 +50,7 @@ describe('generateSchemaExample', () => {
                         last_name: {
                             type: 'string',
                             required: true,
-                        } as unknown as OpenAPIV3.SchemaObject,
+                        },
                         position: {
                             type: 'string',
                             examples: ['Developer'],
@@ -89,7 +89,7 @@ describe('generateSchemaExample', () => {
                         last_name: {
                             type: 'string',
                             required: true,
-                        } as unknown as OpenAPIV3.SchemaObject,
+                        },
                         position: {
                             type: 'string',
                             examples: ['Developer'],
@@ -716,7 +716,7 @@ describe('generateSchemaExample', () => {
                     },
                     {
                         type: 'null',
-                    } as unknown as OpenAPIV3.SchemaObject,
+                    },
                 ],
             })
         ).toBe('text');
@@ -1003,7 +1003,7 @@ describe('generateSchemaExample', () => {
                                     },
                                     {
                                         type: 'null',
-                                    } as unknown as OpenAPIV3.SchemaObject,
+                                    },
                                 ],
                             },
                         },
@@ -1040,7 +1040,7 @@ describe('generateSchemaExample', () => {
     });
 
     it('merges object properties from oneOf -> allOf', () => {
-        const schema: OpenAPIV3.SchemaObject = {
+        const schema = {
             type: 'object',
             properties: {
                 discriminator: {
@@ -1072,7 +1072,7 @@ describe('generateSchemaExample', () => {
                     ],
                 },
             ],
-        };
+        } satisfies OpenAPIV3.SchemaObject;
 
         const result = generateSchemaExample(schema);
 
@@ -1083,7 +1083,7 @@ describe('generateSchemaExample', () => {
     });
 
     it('merges object properties from anyOf -> allOf', () => {
-        const schema: OpenAPIV3.SchemaObject = {
+        const schema = {
             type: 'object',
             properties: {
                 discriminator: {
@@ -1115,7 +1115,7 @@ describe('generateSchemaExample', () => {
                     ],
                 },
             ],
-        };
+        } satisfies OpenAPIV3.SchemaObject;
 
         const result = generateSchemaExample(schema);
 
