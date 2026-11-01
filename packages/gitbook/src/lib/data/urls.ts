@@ -105,17 +105,11 @@ export function getURLLookupPathname(
 }
 
 /**
- * Normalize the URL in a request and redirect if the normalized URL is different from the original one.
+ * Normalize the URL in a request, or return an error response if it is invalid.
  */
-export function normalizeRequestURL(url: URL): Response | null {
+export function normalizeRequestURL(url: URL): URL | Response {
     try {
-        const normalizedURL = normalizeURL(url);
-
-        if (normalizedURL.toString() !== url.toString()) {
-            return Response.redirect(normalizedURL.toString(), 302);
-        }
-
-        return null;
+        return normalizeURL(url);
     } catch (error) {
         const sanitized = getExposableError(error);
         return new Response(sanitized.message, { status: sanitized.code });
