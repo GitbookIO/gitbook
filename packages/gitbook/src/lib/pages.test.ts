@@ -50,6 +50,16 @@ describe('extractPagePath', () => {
     it('returns empty string when URL equals root base URL', () => {
         expect(extractPagePath('https://docs.example.com/', 'https://docs.example.com/')).toBe('');
     });
+
+    it('extracts path from the markdown URL of a page', () => {
+        expect(
+            extractPagePath('https://docs.example.com/api/guides/installation.md', baseURL)
+        ).toBe('guides/installation');
+        expect(extractPagePath('https://docs.example.com/api/.md', baseURL)).toBe('');
+        expect(extractPagePath('https://docs.example.com/api/notes.md.html', baseURL)).toBe(
+            'notes.md.html'
+        );
+    });
 });
 
 describe('resolveFirstDocument', () => {
