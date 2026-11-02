@@ -412,7 +412,8 @@ function flattenPages(
  * Returns the path segment after the base, or undefined if the URL doesn't match.
  */
 export function extractPagePath(url: string, baseURL: string): string | undefined {
-    const urlPath = getURLPathname(url);
+    // Pages are also served as Markdown at `<page>.md`, the form llms.txt links to.
+    const urlPath = getURLPathname(url)?.replace(/\.md$/, '');
     const basePath = getURLPathname(baseURL);
 
     if (urlPath === undefined || basePath === undefined) {
