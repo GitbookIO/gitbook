@@ -55,7 +55,6 @@ import {
     parsePreviewCustomizationCookie,
     serializePreviewCustomizationCookie,
 } from '@/lib/preview';
-import { isProxyRequest } from '@/lib/proxy';
 import {
     type ResponseCookies,
     getPathScopedCookieName,
@@ -170,16 +169,11 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
     }
 
     // Normalize URL after extracting the URL from the request to make sure the client is redirected to the proper one
-    const normalizedURL = normalizeRequestURL(siteRequestURL);
-    if (normalizedURL instanceof Response) {
-        return normalizedURL;
+    const normalization = normalizeRequestURL(siteRequestURL, mode);
+    if (normalization instanceof Response) {
+        return normalization;
     }
-    const isNormalizedURL = normalizedURL.toString() === siteRequestURL.toString();
-    // A proxied site's public URL is only known after the lookup, which redirects to the canonical URL.
-    const isProxied = mode !== 'url' && isProxyRequest(siteRequestURL);
-    if (!isNormalizedURL && !isProxied) {
-        return Response.redirect(normalizedURL.toString(), 302);
-    }
+    const isNormalizedURL = normalization.isNormalized;
 
     const imagesContextId = getImageResizingContextId(siteRequestURL);
     /**

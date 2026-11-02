@@ -1,5 +1,5 @@
 import { joinPath, removeTrailingSlash } from '../paths';
-import { isProxyRootRequest } from '../proxy';
+import { isProxyRequest, isProxyRootRequest } from '../proxy';
 import { DataFetcherError, getExposableError } from './errors';
 
 /**
@@ -105,15 +105,28 @@ export function getURLLookupPathname(
 }
 
 /**
- * Normalize the URL in a request, or return an error response if it is invalid.
+ * Normalize the URL in a request before the lookup. Returns an error response if it is invalid,
+ * or a redirect to the normalized URL if it can be built from the request URL.
  */
-export function normalizeRequestURL(url: URL): URL | Response {
+export function normalizeRequestURL(
+    url: URL,
+    mode: 'url' | 'url-host'
+): Response | { isNormalized: boolean } {
+    let normalizedURL: URL;
     try {
-        return normalizeURL(url);
+        normalizedURL = normalizeURL(url);
     } catch (error) {
         const sanitized = getExposableError(error);
         return new Response(sanitized.message, { status: sanitized.code });
     }
+
+    const isNormalized = normalizedURL.toString() === url.toString();
+    // A proxied site's public URL is only known after the lookup, which redirects to the canonical URL.
+    if (!isNormalized && !(mode !== 'url' && isProxyRequest(url))) {
+        return Response.redirect(normalizedURL.toString(), 302);
+    }
+
+    return { isNormalized };
 }
 
 /**
