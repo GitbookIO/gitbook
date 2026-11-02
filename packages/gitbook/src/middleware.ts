@@ -169,10 +169,11 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
     }
 
     // Normalize URL after extracting the URL from the request to make sure the client is redirected to the proper one
-    const normalizationResponse = normalizeRequestURL(siteRequestURL);
-    if (normalizationResponse) {
-        return normalizationResponse;
+    const normalization = normalizeRequestURL(siteRequestURL, mode);
+    if (normalization instanceof Response) {
+        return normalization;
     }
+    const isNormalizedURL = normalization.isNormalized;
 
     const imagesContextId = getImageResizingContextId(siteRequestURL);
     /**
@@ -338,6 +339,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         //
         // Make sure the URL is clean of any va token after a successful lookup,
         // and of any visitor.* params that may have been passed to the URL.
+        // Proxied requests that were not normalized are also redirected here, to the canonical URL.
         //
         // We only redirect if the request is not coming from the revalidation worker, as we don't
         // want to redirect in that case. It can carry unsigned claims without any token, so we rely
@@ -348,7 +350,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         //
         const normalizedVisitorURL = normalizeVisitorURL(incomingURL);
         if (
-            normalizedVisitorURL.toString() !== incomingURL.toString() &&
+            (!isNormalizedURL || normalizedVisitorURL.toString() !== incomingURL.toString()) &&
             !isRevalidationRequest(request.headers)
         ) {
             if (visitorToken?.source === 'url') {
