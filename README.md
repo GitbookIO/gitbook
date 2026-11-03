@@ -162,4 +162,3 @@ GitBook wouldn't be possible without these projects:
 ## Legacy GitBook (Deprecated)
 
 Our previous version of GitBook and it's CLI tool are now deprecated. You can still view the old repository and it's commits on this [branch](https://github.com/GitbookIO/gitbook/tree/legacy).
-
