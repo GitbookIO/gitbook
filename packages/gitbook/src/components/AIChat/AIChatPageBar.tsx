@@ -72,8 +72,8 @@ export function AIChatPageBar() {
                 )}
             >
                 {expanded ? (
-                    // The input stays in flow on top of the card, so focusing it never moves it; pb-12 leaves its room.
-                    <div className="absolute -inset-x-1.5 -bottom-1.5 flex flex-col border border-tint bg-tint-base p-1.5 pb-12 shadow-lg rounded-corners:rounded-2xl circular-corners:rounded-3xl">
+                    // The input stays in flow on top of the card, so focusing it never moves it; pb-13 leaves its room.
+                    <div className="pb-13 absolute -inset-x-2 -bottom-2 flex flex-col border border-tint bg-tint-base p-2 shadow-lg rounded-corners:rounded-[1.25rem] circular-corners:rounded-[1.75rem]">
                         {suggestions.map((question, index) => (
                             <Button
                                 key={question}
