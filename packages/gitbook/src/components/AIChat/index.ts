@@ -5,3 +5,4 @@ export * from './AIResponseFeedback';
 export * from './AIChatControlButton';
 export * from './AskAITextSelection';
 export * from './AskAIParagraphButton';
+export * from './AIChatPageBar';
