@@ -120,7 +120,6 @@ export const Input = React.forwardRef<InputElement, InputProps>((props, passedRe
 
     const [value, setValue] = useControlledState(passedValue, passedValue ?? '', onValueChange);
     const [submitted, setSubmitted] = React.useState(false);
-    const [height, setHeight] = React.useState<number>();
     const inputRef = React.useRef<InputElement>(null);
     const ref = (passedRef as React.RefObject<HTMLInputElement | HTMLTextAreaElement>) ?? inputRef;
 
@@ -163,13 +162,19 @@ export const Input = React.forwardRef<InputElement, InputProps>((props, passedRe
         if (submitted) {
             setSubmitted(false);
         }
-
-        if (multiline && resize && ref.current) {
-            // TODO: replace with `field-sizing: content` when more broadly supported. https://caniuse.com/?search=field-sizing
-            // Reset the height to auto, then set it to the scroll height. If we don't reset, the height will only ever grow.
-            setHeight(ref.current.scrollHeight);
-        }
     };
+
+    // Runs on every value change, typed or set by the caller, so the height can shrink as well as grow.
+    React.useLayoutEffect(() => {
+        const field = ref.current;
+        if (!multiline || !resize || !field) {
+            return;
+        }
+        // TODO: replace with `field-sizing: content` when more broadly supported. https://caniuse.com/?search=field-sizing
+        // Reset the height to auto, then set it to the scroll height. If we don't reset, the height will only ever grow.
+        field.style.height = 'auto';
+        field.style.height = value.toString().trim() ? `${field.scrollHeight}px` : '';
+    }, [ref, value, multiline, resize]);
 
     const handleClear = () => {
         if (!ref.current) return;
@@ -229,9 +234,6 @@ export const Input = React.forwardRef<InputElement, InputProps>((props, passedRe
         readOnly: readOnly,
         maxLength: maxLength,
         minLength: minLength,
-        style: {
-            height: multiline && resize && hasValue && height ? `${height}px` : undefined,
-        },
     };
 
     // A rich display replaces the control, so it only makes sense when there is nothing to type into.
