@@ -14,6 +14,7 @@ import { createLinker } from './links';
 import {
     filterSiteSpacesByLocale,
     findSiteSpaceBy,
+    findSiteSpaceByUrl,
     getFallbackSiteSpacePath,
     getLinkerForSiteSpace,
     getSiteStructureSections,
@@ -111,6 +112,30 @@ describe('site structure traversal', () => {
 
         expect(found?.siteSectionGroup).toBe(childGroup);
         expect(found?.siteSectionGroups).toEqual([rootGroup, firstChildGroup, childGroup]);
+    });
+});
+
+describe('findSiteSpaceByUrl', () => {
+    const docsSpace = {
+        id: 'docs',
+        urls: { published: 'https://example.com/docs' },
+    } as SiteSpace;
+    const v2Space = {
+        id: 'v2',
+        urls: { published: 'https://example.com/docs/v2' },
+    } as SiteSpace;
+
+    it.each([
+        { order: 'broader space first', spaces: [docsSpace, v2Space] },
+        { order: 'nested space first', spaces: [v2Space, docsSpace] },
+    ])('chooses the longest matching published URL with $order', ({ spaces }) => {
+        const match = findSiteSpaceByUrl(
+            { type: 'siteSpaces', structure: spaces },
+            'https://example.com/docs/v2/install'
+        );
+
+        expect(match?.siteSpace).toBe(v2Space);
+        expect(match?.pagePath).toBe('install');
     });
 });
 
