@@ -26,6 +26,9 @@ export function AIChatPageBar() {
     const chatController = useAIChatController();
     const trackEvent = useTrackEvent();
     const [expanded, setExpanded] = React.useState(false);
+    const [hasText, setHasText] = React.useState(false);
+    // The card's height assumes a one-line input, so the suggestions give way once the visitor types.
+    const showSuggestions = expanded && !hasText;
 
     const configuredSuggestions = config.suggestions?.length ? config.suggestions : null;
     const [recommended, setRecommended] = React.useState<string[] | null>(null);
@@ -64,14 +67,15 @@ export function AIChatPageBar() {
     };
 
     return (
-        <div className="pointer-events-none sticky bottom-4 z-10 mt-8 flex justify-center chat-open:hidden print:hidden">
+        // z-30 sits above page content (cards, tables and code blocks go up to z-20) and below sheets and dialogs (z-40).
+        <div className="pointer-events-none sticky bottom-4 z-30 mt-8 flex justify-center chat-open:hidden print:hidden">
             <div
                 className={tcls(
                     'pointer-events-auto relative max-w-full transition-[width] duration-300 ease-out motion-reduce:transition-none',
                     expanded ? 'w-[42rem]' : 'w-[28rem]'
                 )}
             >
-                {expanded ? (
+                {showSuggestions ? (
                     // The input stays in flow on top of the card, so focusing it never moves it; pb-13 leaves its room.
                     <div className="pb-13 absolute -inset-x-2 -bottom-2 flex flex-col border border-tint bg-tint-base p-2 shadow-lg rounded-corners:rounded-[1.25rem] circular-corners:rounded-[1.75rem]">
                         {suggestions.map((question, index) => (
@@ -93,6 +97,9 @@ export function AIChatPageBar() {
                 ) : null}
                 <Input
                     name="ai-page-bar-input"
+                    multiline
+                    resize
+                    rows={1}
                     label={tString(
                         language,
                         'ai_chat_ask',
@@ -105,7 +112,29 @@ export function AIChatPageBar() {
                     }
                     maxLength={2048}
                     keyboardShortcut={false}
-                    submitButton={{ icon: 'arrow-up', label: tString(language, 'send') }}
+                    submitButton={{
+                        icon: 'arrow-up',
+                        label: tString(language, 'send'),
+                        iconOnly: true,
+                        className: 'ml-auto -my-1 -mr-1.5',
+                    }}
+                    onValueChange={(value) => setHasText(value.length > 0)}
+                    onKeyDown={(event) => {
+                        // Shift+Enter already adds a line in a textarea; Cmd/Ctrl+Enter would otherwise submit.
+                        if (event.key === 'Enter' && (event.metaKey || event.ctrlKey)) {
+                            event.preventDefault();
+                            const field = event.currentTarget;
+                            const end = field.value.length;
+                            field.setRangeText(
+                                '\n',
+                                field.selectionStart ?? end,
+                                field.selectionEnd ?? end,
+                                'end'
+                            );
+                            // Lets React's onChange see the edit, so the value and the height stay in sync.
+                            field.dispatchEvent(new Event('input', { bubbles: true }));
+                        }
+                    }}
                     onFocus={() => setExpanded(true)}
                     onBlur={(event) => {
                         if (!event.currentTarget.value) {
@@ -114,8 +143,9 @@ export function AIChatPageBar() {
                     }}
                     onSubmit={ask}
                     className={tcls(
-                        'bg-tint-base/9 text-sm circular-corners:rounded-full contrast-more:bg-tint-base',
-                        expanded ? null : 'shadow-lg backdrop-blur-lg'
+                        // Keeps the one-line pill layout: textarea and send button side by side.
+                        'flex-row items-end bg-tint-base/9 px-3 py-2 text-sm circular-corners:rounded-3xl contrast-more:bg-tint-base',
+                        showSuggestions ? null : 'shadow-lg backdrop-blur-lg'
                     )}
                 />
             </div>
