@@ -311,7 +311,8 @@ export function hexToRgbArray(hex: string): RGBColor {
     const originalHex = hex;
 
     let value = hex.replace('#', '');
-    if (hex.length === 3) value = value + value;
+    // Expand shorthand (`abc` to `aabbcc`).
+    if (value.length === 3) value = value.replace(/./g, '$&$&');
 
     const r = value.substring(0, 2);
     const g = value.substring(2, 4);
