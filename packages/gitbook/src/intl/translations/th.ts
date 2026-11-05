@@ -135,6 +135,7 @@ export const th: TranslationLanguage = {
     ai_chat_context_pages_youve_read: 'หน้าที่คุณอยู่ตอนนี้',
     ai_chat_context_info_provided_by_the_site: 'ข้อมูลเกี่ยวกับคุณที่เว็บไซต์ให้ไว้',
     ai_chat_context_previous_messages: 'ข้อความในการสนทนาของคุณ',
+    ai_chat_context_sensitive_info: 'โปรดอย่าแชร์ข้อมูลส่วนบุคคลที่ละเอียดอ่อน',
     ai_chat_context_disclaimer: 'คำตอบจาก AI อาจมีข้อผิดพลาด',
     ai_chat_input_placeholder: 'ถาม ค้นหา หรืออธิบาย...',
     ai_chat_queued_message: 'ข้อความนี้จะถูกส่งหลังจากที่ ${1} เสร็จสิ้น',

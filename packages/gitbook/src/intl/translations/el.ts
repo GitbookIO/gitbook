@@ -143,6 +143,7 @@ export const el: TranslationLanguage = {
     ai_chat_context_info_provided_by_the_site:
         'Πληροφορίες για εσάς που παρέχονται από τον ιστότοπο',
     ai_chat_context_previous_messages: 'Μηνύματα στη συνομιλία σας',
+    ai_chat_context_sensitive_info: 'Μην κοινοποιείτε ευαίσθητες προσωπικές πληροφορίες',
     ai_chat_context_disclaimer: 'Οι απαντήσεις AI μπορεί να περιέχουν λάθη.',
     ai_chat_input_placeholder: 'Ρωτήστε, αναζητήστε ή εξηγήστε...',
     ai_chat_queued_message: 'Αυτό το μήνυμα θα σταλεί μόλις ολοκληρώσει ${1}',

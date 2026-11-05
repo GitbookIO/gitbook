@@ -138,6 +138,7 @@ export const tr: TranslationLanguage = {
     ai_chat_context_pages_youve_read: 'Şu anda bulunduğunuz sayfa',
     ai_chat_context_info_provided_by_the_site: 'Site tarafından sağlanan sizinle ilgili bilgiler',
     ai_chat_context_previous_messages: 'Konuşmanızdaki mesajlar',
+    ai_chat_context_sensitive_info: 'Hassas kişisel bilgileri paylaşmayın',
     ai_chat_context_disclaimer: 'AI yanıtları hata içerebilir.',
     ai_chat_input_placeholder: 'Sor, ara veya açıkla...',
     ai_chat_queued_message: 'Bu mesaj, ${1} yanıtını tamamladıktan sonra gönderilecek',

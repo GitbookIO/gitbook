@@ -143,6 +143,7 @@ export const pt_br: TranslationLanguage = {
     ai_chat_context_pages_youve_read: 'A página em que você está agora',
     ai_chat_context_info_provided_by_the_site: 'Informações sobre você fornecidas pelo site',
     ai_chat_context_previous_messages: 'Mensagens na sua conversa',
+    ai_chat_context_sensitive_info: 'Não compartilhe informações pessoais sensíveis',
     ai_chat_context_disclaimer: 'Respostas de IA podem conter erros.',
     ai_chat_input_placeholder: 'Pergunte, pesquise ou explique...',
     ai_chat_queued_message: 'Esta mensagem será enviada quando ${1} terminar',

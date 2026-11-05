@@ -139,6 +139,7 @@ export const hr: TranslationLanguage = {
     ai_chat_context_pages_youve_read: 'Stranica na kojoj se trenutno nalazite',
     ai_chat_context_info_provided_by_the_site: 'Informacije o vama koje pruža web-mjesto',
     ai_chat_context_previous_messages: 'Poruke u vašem razgovoru',
+    ai_chat_context_sensitive_info: 'Ne dijelite osjetljive osobne podatke',
     ai_chat_context_disclaimer: 'AI odgovori mogu sadržavati pogreške.',
     ai_chat_input_placeholder: 'Pitajte, pretražite ili objasnite...',
     ai_chat_queued_message: 'Ova poruka bit će poslana kada ${1} završi',

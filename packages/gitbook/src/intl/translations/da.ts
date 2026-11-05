@@ -138,6 +138,7 @@ export const da: TranslationLanguage = {
     ai_chat_context_pages_youve_read: 'Siden du er på nu',
     ai_chat_context_info_provided_by_the_site: 'Oplysninger om dig fra webstedet',
     ai_chat_context_previous_messages: 'Beskeder i din samtale',
+    ai_chat_context_sensitive_info: 'Del ikke følsomme personoplysninger',
     ai_chat_context_disclaimer: 'AI-svar kan indeholde fejl.',
     ai_chat_input_placeholder: 'Spørg, søg eller forklar...',
     ai_chat_queued_message: 'Denne besked sendes, når ${1} er færdig',

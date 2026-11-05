@@ -141,6 +141,7 @@ export const bg: TranslationLanguage = {
     ai_chat_context_pages_youve_read: 'Страницата, на която сте в момента',
     ai_chat_context_info_provided_by_the_site: 'Информация за вас, предоставена от сайта',
     ai_chat_context_previous_messages: 'Съобщения във вашия разговор',
+    ai_chat_context_sensitive_info: 'Не споделяйте чувствителна лична информация',
     ai_chat_context_disclaimer: 'AI отговорите може да съдържат грешки.',
     ai_chat_input_placeholder: 'Попитайте, потърсете или обяснете...',
     ai_chat_queued_message: 'Това съобщение ще бъде изпратено, след като ${1} приключи',

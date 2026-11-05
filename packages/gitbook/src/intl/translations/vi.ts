@@ -138,6 +138,7 @@ export const vi: TranslationLanguage = {
     ai_chat_context_pages_youve_read: 'Trang bạn đang ở hiện tại',
     ai_chat_context_info_provided_by_the_site: 'Thông tin về bạn do trang web cung cấp',
     ai_chat_context_previous_messages: 'Tin nhắn trong cuộc trò chuyện của bạn',
+    ai_chat_context_sensitive_info: 'Không chia sẻ thông tin cá nhân nhạy cảm',
     ai_chat_context_disclaimer: 'Câu trả lời AI có thể chứa lỗi.',
     ai_chat_input_placeholder: 'Hỏi, tìm kiếm hoặc giải thích...',
     ai_chat_queued_message: 'Tin nhắn này sẽ được gửi sau khi ${1} hoàn tất',
