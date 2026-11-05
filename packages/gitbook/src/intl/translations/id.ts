@@ -138,6 +138,7 @@ export const id: TranslationLanguage = {
     ai_chat_context_pages_youve_read: 'Halaman tempat Anda berada sekarang',
     ai_chat_context_info_provided_by_the_site: 'Info tentang Anda yang disediakan oleh situs',
     ai_chat_context_previous_messages: 'Pesan dalam percakapan Anda',
+    ai_chat_context_sensitive_info: 'Jangan bagikan informasi pribadi yang sensitif',
     ai_chat_context_disclaimer: 'Jawaban AI dapat berisi kesalahan.',
     ai_chat_input_placeholder: 'Tanya, cari, atau jelaskan...',
     ai_chat_queued_message: 'Pesan ini akan dikirim setelah ${1} selesai',

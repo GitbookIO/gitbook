@@ -138,6 +138,7 @@ export const hi: TranslationLanguage = {
     ai_chat_context_pages_youve_read: 'वह पृष्ठ जिस पर आप अभी हैं',
     ai_chat_context_info_provided_by_the_site: 'साइट द्वारा प्रदान की गई आपके बारे में जानकारी',
     ai_chat_context_previous_messages: 'आपकी बातचीत के संदेश',
+    ai_chat_context_sensitive_info: 'संवेदनशील व्यक्तिगत जानकारी साझा न करें',
     ai_chat_context_disclaimer: 'AI उत्तरों में गलतियां हो सकती हैं।',
     ai_chat_input_placeholder: 'पूछें, खोजें या समझाएं...',
     ai_chat_queued_message: 'यह संदेश ${1} के समाप्त होने के बाद भेजा जाएगा',

@@ -140,6 +140,7 @@ export const fi: TranslationLanguage = {
     ai_chat_context_pages_youve_read: 'Sivu, jolla olet nyt',
     ai_chat_context_info_provided_by_the_site: 'Sivuston tarjoamat tiedot sinusta',
     ai_chat_context_previous_messages: 'Viestit keskustelussasi',
+    ai_chat_context_sensitive_info: 'Älä jaa arkaluonteisia henkilötietoja',
     ai_chat_context_disclaimer: 'AI-vastaukset voivat sisältää virheitä.',
     ai_chat_input_placeholder: 'Kysy, hae tai selitä...',
     ai_chat_queued_message: 'Tämä viesti lähetetään, kun ${1} on valmis',

@@ -142,6 +142,7 @@ export const ru: TranslationLanguage = {
     ai_chat_context_pages_youve_read: 'Страница, на которой вы сейчас находитесь',
     ai_chat_context_info_provided_by_the_site: 'Информация о вас, предоставленная сайтом',
     ai_chat_context_previous_messages: 'Сообщения в вашем разговоре',
+    ai_chat_context_sensitive_info: 'Не передавайте конфиденциальную личную информацию',
     ai_chat_context_disclaimer: 'Ответы ИИ могут содержать ошибки.',
     ai_chat_input_placeholder: 'Спросите, найдите или объясните...',
     ai_chat_queued_message: 'Это сообщение будет отправлено, когда ${1} закончит',

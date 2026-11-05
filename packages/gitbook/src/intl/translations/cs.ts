@@ -139,6 +139,7 @@ export const cs: TranslationLanguage = {
     ai_chat_context_pages_youve_read: 'Stránka, na které se právě nacházíte',
     ai_chat_context_info_provided_by_the_site: 'Informace o vás poskytnuté webem',
     ai_chat_context_previous_messages: 'Zprávy ve vaší konverzaci',
+    ai_chat_context_sensitive_info: 'Nesdílejte citlivé osobní údaje',
     ai_chat_context_disclaimer: 'Odpovědi AI mohou obsahovat chyby.',
     ai_chat_input_placeholder: 'Zeptejte se, hledejte nebo vysvětlete...',
     ai_chat_queued_message: 'Tato zpráva se odešle, až ${1} dokončí odpověď',

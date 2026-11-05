@@ -134,6 +134,7 @@ export const yue: TranslationLanguage = {
     ai_chat_context_pages_youve_read: '你而家喺嘅頁面',
     ai_chat_context_info_provided_by_the_site: '網站提供嘅關於你嘅資訊',
     ai_chat_context_previous_messages: '你對話入面嘅訊息',
+    ai_chat_context_sensitive_info: '唔好分享敏感個人資料',
     ai_chat_context_disclaimer: 'AI 回答可能有錯。',
     ai_chat_input_placeholder: '發問、搜尋或說明...',
     ai_chat_queued_message: '呢個訊息會喺 ${1} 完成後發送',

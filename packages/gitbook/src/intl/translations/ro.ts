@@ -142,6 +142,7 @@ export const ro: TranslationLanguage = {
     ai_chat_context_pages_youve_read: 'Pagina pe care te afli acum',
     ai_chat_context_info_provided_by_the_site: 'Informații despre tine furnizate de site',
     ai_chat_context_previous_messages: 'Mesaje din conversația ta',
+    ai_chat_context_sensitive_info: 'Nu partajați informații personale sensibile',
     ai_chat_context_disclaimer: 'Răspunsurile AI pot conține greșeli.',
     ai_chat_input_placeholder: 'Întreabă, caută sau explică...',
     ai_chat_queued_message: 'Acest mesaj va fi trimis după ce ${1} termină',

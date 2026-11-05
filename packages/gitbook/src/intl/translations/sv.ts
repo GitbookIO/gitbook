@@ -140,6 +140,7 @@ export const sv: TranslationLanguage = {
     ai_chat_context_pages_youve_read: 'Sidan du är på nu',
     ai_chat_context_info_provided_by_the_site: 'Information om dig från webbplatsen',
     ai_chat_context_previous_messages: 'Meddelanden i din konversation',
+    ai_chat_context_sensitive_info: 'Dela inte känsliga personuppgifter',
     ai_chat_context_disclaimer: 'AI-svar kan innehålla fel.',
     ai_chat_input_placeholder: 'Fråga, sök eller förklara...',
     ai_chat_queued_message: 'Det här meddelandet skickas när ${1} är klar',
