@@ -11,3 +11,10 @@ export interface InlineIconSource {
 export function getInlineIconSourceKey(style: string, icon: string): string {
     return `${style}/${icon}`;
 }
+
+/**
+ * Get the element id an icon's sprite entry is defined under, from its source key.
+ */
+export function getIconSpriteId(key: string): string {
+    return `gb-icon-${key.replace(/[^a-z0-9-]/gi, '-')}`;
+}

@@ -140,7 +140,7 @@ export async function SitePage(props: SitePageProps & { staticRoute: boolean }) 
     );
 
     return (
-        <IconsProvider iconSources={iconSources}>
+        <IconsProvider iconSources={iconSources} sprite>
             <PageContextProvider pageId={page.id} spaceId={context.space.id} title={page.title}>
                 {filterableTagSlugs.length > 0 ? (
                     <UpdatesFilterProvider tagSlugs={filterableTagSlugs}>

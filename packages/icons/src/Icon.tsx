@@ -3,7 +3,7 @@
 import * as React from 'react';
 
 import { getIconStyle } from './getIconStyle';
-import { getInlineIconSourceKey } from './IconSources';
+import { getIconSpriteId, getInlineIconSourceKey } from './IconSources';
 import { getIconAssetURL, useIcons } from './IconsProvider';
 import type { IconName, IconStyle } from './types';
 
@@ -51,25 +51,34 @@ export const Icon = React.forwardRef(function Icon(
     } = props;
 
     const [iconStyle, icon] = getIconStyle(propIconStyle, propIcon);
-    const source = context.iconSources?.[getInlineIconSourceKey(iconStyle, icon)];
+    const sourceKey = getInlineIconSourceKey(iconStyle, icon);
+    const source = context.iconSources?.[sourceKey];
     const maskId = React.useId();
 
     if (source) {
-        return (
-            <svg
-                ref={ref}
-                {...rest}
-                viewBox={source.viewBox}
-                fill="currentColor"
-                style={{
-                    overflow: 'visible',
-                    ...(size ? { width: size, height: size } : {}),
-                    ...rest.style,
-                }}
-                className={`gb-icon ${className}`}
-                dangerouslySetInnerHTML={{ __html: source.markup }}
-            />
-        );
+        const svgProps = {
+            ref,
+            ...rest,
+            viewBox: source.viewBox,
+            fill: 'currentColor',
+            style: {
+                overflow: 'visible',
+                ...(size ? { width: size, height: size } : {}),
+                ...rest.style,
+            },
+            className: `gb-icon ${className}`,
+        };
+
+        // A page can repeat one icon hundreds of times (heading anchors), so reference the sprite.
+        if (context.spriteKeys?.has(sourceKey)) {
+            return (
+                <svg {...svgProps}>
+                    <use href={`#${getIconSpriteId(sourceKey)}`} />
+                </svg>
+            );
+        }
+
+        return <svg {...svgProps} dangerouslySetInnerHTML={{ __html: source.markup }} />;
     }
 
     const url = getIconAssetURL(context, iconStyle, icon);

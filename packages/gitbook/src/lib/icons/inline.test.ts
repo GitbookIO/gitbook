@@ -132,6 +132,27 @@ describe('getContentInlineIconSourceRequests', () => {
         ]);
     });
 
+    it('collects the icons that blocks repeat once per instance', () => {
+        const document = {
+            object: 'document',
+            nodes: [
+                { object: 'block', type: 'heading-2', nodes: [] },
+                { object: 'block', type: 'expandable', nodes: [] },
+                { object: 'block', type: 'integration', nodes: [] },
+                { object: 'block', type: 'paragraph', nodes: [] },
+            ],
+        } as unknown as JSONDocument;
+
+        expect(
+            getContentInlineIconSourceRequests({ iconStyle: IconStyle.Regular, document })
+        ).toEqual([
+            { icon: 'hashtag', iconStyle: IconStyle.Regular },
+            { icon: 'hashtag', iconStyle: IconStyle.Regular },
+            { icon: 'chevron-right', iconStyle: IconStyle.Regular },
+            { icon: 'spinner', iconStyle: IconStyle.Regular },
+        ]);
+    });
+
     it('ignores invalid, missing, and non-string icon values', () => {
         const pages = [
             { icon: 'not-a-real-icon' },
