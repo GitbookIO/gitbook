@@ -25,6 +25,8 @@ jobs:
               with:
                   # This makes Actions fetch all Git history so that Changesets can generate changelogs with the correct commits
                   fetch-depth: 0
+                  # Otherwise git pushes with GITHUB_TOKEN instead of the PAT, and the release PR never triggers Preview
+                  persist-credentials: false
             - name: Setup Node
               uses: actions/setup-node@v4
               with:
