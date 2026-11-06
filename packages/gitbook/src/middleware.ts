@@ -56,6 +56,11 @@ import {
     serializePreviewCustomizationCookie,
 } from '@/lib/preview';
 import {
+    DISALLOW_ALL_ROBOTS_TXT_LINES,
+    createRobotsTxtResponse,
+    isRobotsTxtRequest,
+} from '@/lib/robots';
+import {
     type ResponseCookies,
     getPathScopedCookieName,
     getResponseCookiesForVisitorAuth,
@@ -272,6 +277,12 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
                     siteURLData,
                     urlMode: mode,
                 });
+            }
+
+            // Crawlers can't sign in: redirecting them to the login page makes search engines
+            // report a broken robots.txt and keep crawling, so tell them to stay away instead.
+            if (siteURLData.target === 'external' && isRobotsTxtRequest(siteRequestURL)) {
+                return createRobotsTxtResponse(DISALLOW_ALL_ROBOTS_TXT_LINES);
             }
 
             // When it is a server action, we cannot just return a redirect response as it may cause CORS issues on redirect.
