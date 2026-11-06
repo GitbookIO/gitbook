@@ -1,6 +1,7 @@
 import { SiteVisibility } from '@gitbook/api';
 
 import { type GitBookSiteContext, checkIsRootSiteContext } from '@/lib/context';
+import { DISALLOW_ALL_ROBOTS_TXT_LINES, createRobotsTxtResponse } from '@/lib/robots';
 import { isSiteIndexable } from '@/lib/seo';
 
 /**
@@ -49,10 +50,8 @@ export async function serveRobotsTxt(context: GitBookSiteContext) {
                         '',
                     ])
                   : []),
-              'User-agent: *',
-              'Content-Signal: ai-train=no, search=no, ai-input=no',
-              'Disallow: /',
+              ...DISALLOW_ALL_ROBOTS_TXT_LINES,
           ];
 
-    return new Response(`${lines.join('\n')}\n`, { headers: { 'Content-Type': 'text/plain' } });
+    return createRobotsTxtResponse(lines);
 }
