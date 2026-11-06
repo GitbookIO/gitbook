@@ -709,6 +709,19 @@ function joinLineContent(line: HighlightLine): string {
     return visit(line.tokens);
 }
 
+it('keeps the last letter of a bash word before `>` in the same token', async () => {
+    const tokenContents = async (code: string) => {
+        const lines = await highlightWithInlines(singleLineBlock('bash', code));
+        return lines[0]!.tokens.map((t) => (t.type === 'shiki' ? t.token.content : ''));
+    };
+
+    const placeholder = await tokenContents('cli create --name <resource name>');
+    expect(placeholder.find((c) => c.includes('nam'))).toContain('name');
+
+    const fdRedirect = await tokenContents('cmd 2>&1');
+    expect(fdRedirect.find((c) => c.includes('2'))).toContain('2>&1');
+});
+
 function singleLineBlock(syntax: string | undefined, text: string): DocumentBlockCode {
     return {
         object: 'block',

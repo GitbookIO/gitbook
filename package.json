@@ -68,6 +68,7 @@
         "decode-named-character-reference@1.0.2": "patches/decode-named-character-reference@1.0.2.patch",
         "@vercel/next@4.4.2": "patches/@vercel%2Fnext@4.4.2.patch",
         "mermaid@11.16.1": "patches/mermaid@11.16.1.patch",
-        "next@16.4.5": "patches/next@16.4.5.patch"
+        "next@16.4.5": "patches/next@16.4.5.patch",
+        "@shikijs/langs@3.21.0": "patches/@shikijs%2Flangs@3.21.0.patch"
     }
 }
