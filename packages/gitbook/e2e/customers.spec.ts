@@ -585,11 +585,6 @@ const testCases: TestsCase[] = [
         tests: [{ name: 'Home', url: '/', run: waitForCookiesDialog }],
     },
     {
-        name: 'docs.cartographer3d.com',
-        contentBaseURL: 'https://docs.cartographer3d.com',
-        tests: [{ name: 'Home', url: '/' }],
-    },
-    {
         name: 'docs.acestudio.ai',
         contentBaseURL: 'https://docs.acestudio.ai',
         tests: [{ name: 'Home', url: '/' }],
