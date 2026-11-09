@@ -1,0 +1,11 @@
+diff --git a/dist/shellscript.mjs b/dist/shellscript.mjs
+index ccf9c0f62f48a803f0640e758244a950f17ba53e..6956ab14623f71cf5bc88c5c6437502abba7ec0f 100644
+--- a/dist/shellscript.mjs
++++ b/dist/shellscript.mjs
+@@ -3,3 +3,6 @@ const lang = Object.freeze(JSON.parse("{\"displayName\":\"Shell\",\"name\":\"she
+ export default [
+ lang
+ ]
++
++// Upstream keeps the last letter of `name>` out of the word: https://github.com/jeff-hykin/better-shell-syntax/issues/111
++lang.repository.argument_context.patterns[0].match = '[\\t ]*+(?!\\d+>)([^\\t\\n "$\\&-);<>\\\\`|]+)';
