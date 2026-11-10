@@ -7,7 +7,7 @@
     "devDependencies": {
         "@changesets/cli": "^2.31.1",
         "oxfmt": "^0.62.0",
-        "oxlint": "^1.90.0",
+        "oxlint": "^1.93.0",
         "turbo": "^2.11.10",
         "vercel": "50.37.3"
     },
