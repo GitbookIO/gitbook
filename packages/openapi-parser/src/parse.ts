@@ -20,6 +20,10 @@ export interface ParseOpenAPIInput {
      */
     options?: {
         plugins?: Plugin[];
+        /**
+         * Fetch used to load external references. Defaults to the global `fetch`.
+         */
+        fetch?: (url: string) => Promise<Response>;
     };
 }
 

@@ -84,6 +84,35 @@ describe('#parseOpenAPI', () => {
             "must have required property 'in'"
         );
     });
+
+    it('loads external references with the provided fetch', async () => {
+        const urls: string[] = [];
+        await parseOpenAPI({
+            value: {
+                openapi: '3.0.3',
+                info: { title: 'Test', version: '1.0.0' },
+                paths: {},
+                components: {
+                    schemas: {
+                        Absolute: { $ref: 'https://example.com/absolute.json' },
+                        Relative: { $ref: './relative.json' },
+                    },
+                },
+            },
+            rootURL: 'https://example.com/openapi.json',
+            options: {
+                fetch: async (url) => {
+                    urls.push(url);
+                    return new Response('{"type":"object"}');
+                },
+            },
+        });
+
+        expect(urls.sort()).toEqual([
+            'https://example.com/absolute.json',
+            'https://example.com/relative.json',
+        ]);
+    });
 });
 
 function specV32(

@@ -5,14 +5,14 @@ export const fetchUrlsDefaultConfiguration = {
     limit: 40,
 };
 
-export const fetchURL = (): Plugin => ({
+export const fetchURL = (fetcher: (url: string) => Promise<Response> = fetch): Plugin => ({
     type: 'loader',
     validate(value) {
         return URL.canParse(value);
     },
     async exec(value) {
         try {
-            const response = await fetch(value);
+            const response = await fetcher(value);
             if (!response.ok) {
                 return { ok: false };
             }
