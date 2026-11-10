@@ -1,5 +1,15 @@
 # @gitbook/openapi-parser
 
+## 3.1.0
+
+### Minor Changes
+
+- 1b29a70: Add a `fetch` option to `parseOpenAPI` to customize how external references are loaded.
+
+### Patch Changes
+
+- 4dfe630: Bump @scalar/openapi-parser to 0.29 so valid OpenAPI 3.2 documents no longer report false validation errors.
+
 ## 3.0.13
 
 ### Patch Changes
