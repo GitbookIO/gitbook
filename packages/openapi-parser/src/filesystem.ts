@@ -14,14 +14,15 @@ export async function createFileSystem(
     input: Pick<ParseOpenAPIInput, 'value' | 'rootURL' | 'options'>
 ): Promise<Filesystem> {
     const { value, rootURL, options } = input;
+    const fetcher = options?.fetch ?? fetch;
 
     const result = await bundle(value, {
         treeShake: false,
         plugins: [
-            fetchURL(),
+            fetchURL(fetcher),
             parseYaml(),
             parseJson(),
-            fetchURLs({ rootURL }),
+            fetchURLs({ rootURL, fetch: fetcher }),
             ...(options?.plugins || []),
         ],
     });
