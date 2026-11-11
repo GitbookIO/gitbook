@@ -20,8 +20,12 @@ export async function parseOpenAPIV3(input: ParseOpenAPIInput): Promise<ParseOpe
         });
     });
 
+    // Ajv can't compile on Cloudflare Workers (no `new Function`), and Scalar then omits the version.
+    const version =
+        result.version ?? result.specification?.swagger ?? result.specification?.openapi;
+
     // If there is no version, we consider it invalid instantely.
-    if (!result.version) {
+    if (!version) {
         throw new OpenAPIParseError(
             'Can’t find supported Swagger/OpenAPI version in the provided document, version must be a string.',
             {
@@ -33,7 +37,7 @@ export async function parseOpenAPIV3(input: ParseOpenAPIInput): Promise<ParseOpe
     }
 
     // If the version is 2.0, we throw an error to trigger the upgrade.
-    if (result.version === '2.0') {
+    if (version === '2.0') {
         throw new OpenAPIParseError('Only OpenAPI v3 is supported', {
             code: 'parse-v2-in-v3',
             rootURL,

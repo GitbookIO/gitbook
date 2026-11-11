@@ -139,6 +139,7 @@ export const et: TranslationLanguage = {
     ai_chat_context_pages_youve_read: 'Leht, kus te praegu asute',
     ai_chat_context_info_provided_by_the_site: 'Saidi pakutud teave teie kohta',
     ai_chat_context_previous_messages: 'Teie vestluse sõnumid',
+    ai_chat_context_sensitive_info: 'Ärge jagage tundlikku isikuteavet',
     ai_chat_context_disclaimer: 'AI vastused võivad sisaldada vigu.',
     ai_chat_input_placeholder: 'Küsige, otsige või selgitage...',
     ai_chat_queued_message: 'See sõnum saadetakse, kui ${1} on lõpetanud',

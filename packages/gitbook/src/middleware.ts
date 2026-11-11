@@ -52,7 +52,14 @@ import {
     getPreviewCookieResponse,
     getPreviewRequestIdentifier,
     isPreviewRequest,
+    parsePreviewCustomizationCookie,
+    serializePreviewCustomizationCookie,
 } from '@/lib/preview';
+import {
+    DISALLOW_ALL_ROBOTS_TXT_LINES,
+    createRobotsTxtResponse,
+    isRobotsTxtRequest,
+} from '@/lib/robots';
 import {
     type ResponseCookies,
     getPathScopedCookieName,
@@ -167,10 +174,11 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
     }
 
     // Normalize URL after extracting the URL from the request to make sure the client is redirected to the proper one
-    const normalizationResponse = normalizeRequestURL(siteRequestURL);
-    if (normalizationResponse) {
-        return normalizationResponse;
+    const normalization = normalizeRequestURL(siteRequestURL, mode);
+    if (normalization instanceof Response) {
+        return normalization;
     }
+    const isNormalizedURL = normalization.isNormalized;
 
     const imagesContextId = getImageResizingContextId(siteRequestURL);
     /**
@@ -271,6 +279,12 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
                 });
             }
 
+            // Crawlers can't sign in: redirecting them to the login page makes search engines
+            // report a broken robots.txt and keep crawling, so tell them to stay away instead.
+            if (siteURLData.target === 'external' && isRobotsTxtRequest(siteRequestURL)) {
+                return createRobotsTxtResponse(DISALLOW_ALL_ROBOTS_TXT_LINES);
+            }
+
             // When it is a server action, we cannot just return a redirect response as it may cause CORS issues on redirect.
             // For these cases, we return a 303 response with an `X-Action-Redirect` header that the client can handle.
             // This is what server actions do when returning a redirect response.
@@ -336,6 +350,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         //
         // Make sure the URL is clean of any va token after a successful lookup,
         // and of any visitor.* params that may have been passed to the URL.
+        // Proxied requests that were not normalized are also redirected here, to the canonical URL.
         //
         // We only redirect if the request is not coming from the revalidation worker, as we don't
         // want to redirect in that case. It can carry unsigned claims without any token, so we rely
@@ -346,7 +361,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         //
         const normalizedVisitorURL = normalizeVisitorURL(incomingURL);
         if (
-            normalizedVisitorURL.toString() !== incomingURL.toString() &&
+            (!isNormalizedURL || normalizedVisitorURL.toString() !== incomingURL.toString()) &&
             !isRevalidationRequest(request.headers)
         ) {
             if (visitorToken?.source === 'url') {
@@ -423,7 +438,9 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         const customizationCookie = request.cookies.get(MiddlewareHeaders.Customization);
         const customization =
             siteRequestURL.searchParams.get('customization') ??
-            (customizationCookie ? decodeURIComponent(customizationCookie.value) : undefined);
+            (customizationCookie
+                ? parsePreviewCustomizationCookie(customizationCookie.value, siteURLData.siteSpace)
+                : undefined);
         if (
             allowCustomizationOverride &&
             customization &&
@@ -436,7 +453,10 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
                 cookies.push(
                     getPreviewCookieResponse({
                         name: MiddlewareHeaders.Customization,
-                        value: encodeURIComponent(customization),
+                        value: serializePreviewCustomizationCookie({
+                            customization,
+                            siteSpace: siteURLData.siteSpace,
+                        }),
                         mode,
                         siteRequestURL,
                         siteURLData,

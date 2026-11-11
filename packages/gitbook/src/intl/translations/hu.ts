@@ -141,6 +141,7 @@ export const hu: TranslationLanguage = {
     ai_chat_context_info_provided_by_the_site:
         'Az Önről szóló, a webhely által megadott információk',
     ai_chat_context_previous_messages: 'Üzenetek a beszélgetésében',
+    ai_chat_context_sensitive_info: 'Ne osszon meg érzékeny személyes adatokat',
     ai_chat_context_disclaimer: 'Az AI-válaszok hibákat tartalmazhatnak.',
     ai_chat_input_placeholder: 'Kérdezzen, keressen vagy magyarázzon...',
     ai_chat_queued_message: 'Ez az üzenet akkor lesz elküldve, amikor ${1} befejezi',

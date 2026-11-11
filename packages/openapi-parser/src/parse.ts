@@ -1,8 +1,8 @@
 import type { Plugin } from '@scalar/json-magic/bundle';
-import type { AnyObject, ErrorObject } from '@scalar/openapi-parser';
+import type { ErrorObject } from '@scalar/openapi-parser';
 
 import { OpenAPIParseError } from './error';
-import type { Filesystem, OpenAPIV3xDocument } from './types';
+import type { AnyObject, Filesystem, OpenAPIV3xDocument } from './types';
 import { convertOpenAPIV2ToOpenAPIV3 } from './v2';
 import { parseOpenAPIV3 } from './v3';
 
@@ -20,6 +20,10 @@ export interface ParseOpenAPIInput {
      */
     options?: {
         plugins?: Plugin[];
+        /**
+         * Fetch used to load external references. Defaults to the global `fetch`.
+         */
+        fetch?: (url: string) => Promise<Response>;
     };
 }
 

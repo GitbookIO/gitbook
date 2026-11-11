@@ -137,6 +137,7 @@ export const en = {
     ai_chat_context_pages_youve_read: "The page you're on now",
     ai_chat_context_info_provided_by_the_site: 'Info about you provided by the site',
     ai_chat_context_previous_messages: 'Messages in your conversation',
+    ai_chat_context_sensitive_info: "Don't share sensitive personal info",
     ai_chat_context_disclaimer: 'AI responses may contain mistakes.',
     ai_chat_input_placeholder: 'Ask, search, or explain...',
     ai_chat_queued_message: 'This message will be sent after ${1} finishes',

@@ -138,6 +138,7 @@ export const lv: TranslationLanguage = {
     ai_chat_context_pages_youve_read: 'Lapa, kurā pašlaik atrodaties',
     ai_chat_context_info_provided_by_the_site: 'Vietnes sniegtā informācija par jums',
     ai_chat_context_previous_messages: 'Ziņojumi jūsų sarunā',
+    ai_chat_context_sensitive_info: 'Nekopīgojiet sensitīvu personisko informāciju',
     ai_chat_context_disclaimer: 'AI atbildēs var būt kļūdas.',
     ai_chat_input_placeholder: 'Jautājiet, meklējiet vai skaidrojiet...',
     ai_chat_queued_message: 'Šī ziņa tiks nosūtīta, kad ${1} būs pabeidzis',

@@ -135,6 +135,7 @@ export const zh: TranslationLanguage = {
     ai_chat_context_pages_youve_read: '您当前所在的页面',
     ai_chat_context_info_provided_by_the_site: '网站提供的关于您的信息',
     ai_chat_context_previous_messages: '您对话中的消息',
+    ai_chat_context_sensitive_info: '请勿分享敏感个人信息',
     ai_chat_context_disclaimer: '人工智能的回答可能包含错误。',
     ai_chat_input_placeholder: '询问、搜索或解释...',
     ai_chat_queued_message: '此消息将在 ${1} 完成后发送',

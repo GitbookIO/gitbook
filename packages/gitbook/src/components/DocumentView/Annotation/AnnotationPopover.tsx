@@ -19,7 +19,7 @@ export function AnnotationPopover(props: { children: React.ReactNode; body: Reac
         >
             <dfn
                 data-annotation=""
-                className="cursor-help underline decoration-dotted decoration-1 underline-offset-2"
+                className="not-italic cursor-help underline decoration-dotted decoration-1 underline-offset-2"
                 // oxlint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- we want to be able to focus the definition to open the tooltip
                 tabIndex={0}
             >

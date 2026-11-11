@@ -136,6 +136,7 @@ export const he: TranslationLanguage = {
     ai_chat_context_pages_youve_read: 'הדף שאתה נמצא בו כעת',
     ai_chat_context_info_provided_by_the_site: 'מידע עליך שסופק על ידי האתר',
     ai_chat_context_previous_messages: 'הודעות בשיחה שלך',
+    ai_chat_context_sensitive_info: 'אל תשתפו מידע אישי רגיש',
     ai_chat_context_disclaimer: 'תשובות AI עשויות להכיל טעויות.',
     ai_chat_input_placeholder: 'שאל, חפש או הסבר...',
     ai_chat_queued_message: 'הודעה זו תישלח לאחר ש-${1} יסיים',

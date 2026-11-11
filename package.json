@@ -7,7 +7,7 @@
     "devDependencies": {
         "@changesets/cli": "^2.31.1",
         "oxfmt": "^0.62.0",
-        "oxlint": "^1.90.0",
+        "oxlint": "^1.93.0",
         "turbo": "^2.11.10",
         "vercel": "50.37.3"
     },
@@ -67,7 +67,8 @@
     "patchedDependencies": {
         "decode-named-character-reference@1.0.2": "patches/decode-named-character-reference@1.0.2.patch",
         "@vercel/next@4.4.2": "patches/@vercel%2Fnext@4.4.2.patch",
-        "next@16.4.3": "patches/next@16.4.3.patch",
-        "mermaid@11.16.1": "patches/mermaid@11.16.1.patch"
+        "mermaid@11.16.1": "patches/mermaid@11.16.1.patch",
+        "next@16.4.5": "patches/next@16.4.5.patch",
+        "@shikijs/langs@3.21.0": "patches/@shikijs%2Flangs@3.21.0.patch"
     }
 }

@@ -311,7 +311,9 @@ export function hexToRgbArray(hex: string): RGBColor {
     const originalHex = hex;
 
     let value = hex.replace('#', '');
-    if (hex.length === 3) value = value + value;
+    if (value.length === 3) {
+        value = [...value].map((digit) => digit + digit).join('');
+    }
 
     const r = value.substring(0, 2);
     const g = value.substring(2, 4);

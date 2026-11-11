@@ -140,6 +140,7 @@ export const sl: TranslationLanguage = {
     ai_chat_context_pages_youve_read: 'Stran, na kateri se trenutno nahajate',
     ai_chat_context_info_provided_by_the_site: 'Informacije o vas, ki jih zagotavlja spletno mesto',
     ai_chat_context_previous_messages: 'Sporočila v vašem pogovoru',
+    ai_chat_context_sensitive_info: 'Ne delite občutljivih osebnih podatkov',
     ai_chat_context_disclaimer: 'Odgovori AI lahko vsebujejo napake.',
     ai_chat_input_placeholder: 'Vprašajte, iščite ali razložite...',
     ai_chat_queued_message: 'To sporočilo bo poslano, ko ${1} zaključi',

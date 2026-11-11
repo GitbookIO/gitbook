@@ -18,6 +18,12 @@ export async function GET(
     request: NextRequest,
     { params }: { params: Promise<RouteLayoutParams> }
 ) {
+    // A router prefetch is not a visitor intent to log out, so it must not clear the session.
+    // Next.js sends different values depending on the prefetch kind, hence the presence check.
+    if (request.headers.has('next-router-prefetch')) {
+        return new NextResponse(null, { status: 204 });
+    }
+
     const resolvedParams = await params;
     const [{ context }, siteURLData] = await Promise.all([
         getDynamicSiteContext(resolvedParams),

@@ -134,6 +134,7 @@ export const zh_tw: TranslationLanguage = {
     ai_chat_context_pages_youve_read: '您目前所在的頁面',
     ai_chat_context_info_provided_by_the_site: '網站提供的關於您的資訊',
     ai_chat_context_previous_messages: '您對話中的訊息',
+    ai_chat_context_sensitive_info: '請勿分享敏感個人資料',
     ai_chat_context_disclaimer: 'AI 回答可能包含錯誤。',
     ai_chat_input_placeholder: '提問、搜尋或說明...',
     ai_chat_queued_message: '這則訊息將在 ${1} 完成後傳送',

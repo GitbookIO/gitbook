@@ -69,4 +69,98 @@ describe('#parseOpenAPI', () => {
         JSON.stringify(result.filesystem);
         expect(result.errors).toHaveLength(1);
     });
+
+    it('validates OpenAPI 3.2 schema objects as schemas', async () => {
+        const result = await parseOpenAPI({ value: specV32(), rootURL: null });
+        expect(result.errors).toEqual([]);
+    });
+
+    it('reports a 3.2 parameter missing `in`', async () => {
+        const result = await parseOpenAPI({
+            value: specV32({ name: 'id', required: true, schema: { type: 'string' } }),
+            rootURL: null,
+        });
+        expect(result.errors.map((error) => error.message)).toContain(
+            "must have required property 'in'"
+        );
+    });
+
+    it('loads external references with the provided fetch', async () => {
+        const urls: string[] = [];
+        await parseOpenAPI({
+            value: {
+                openapi: '3.0.3',
+                info: { title: 'Test', version: '1.0.0' },
+                paths: {},
+                components: {
+                    schemas: {
+                        Absolute: { $ref: 'https://example.com/absolute.json' },
+                        Relative: { $ref: './relative.json' },
+                    },
+                },
+            },
+            rootURL: 'https://example.com/openapi.json',
+            options: {
+                fetch: async (url) => {
+                    urls.push(url);
+                    return new Response('{"type":"object"}');
+                },
+            },
+        });
+
+        expect(urls.sort()).toEqual([
+            'https://example.com/absolute.json',
+            'https://example.com/relative.json',
+        ]);
+    });
 });
+
+function specV32(
+    idParameter: object = {
+        name: 'id',
+        in: 'path',
+        required: true,
+        schema: { type: 'string', minLength: 1 },
+    }
+) {
+    return {
+        openapi: '3.2.0',
+        info: { title: 'Users', version: '1.0.0' },
+        paths: {
+            '/users/{id}': {
+                get: {
+                    parameters: [
+                        idParameter,
+                        {
+                            name: 'role',
+                            in: 'query',
+                            schema: { $ref: '#/components/schemas/Role' },
+                        },
+                    ],
+                    responses: {
+                        '200': {
+                            description: 'OK',
+                            content: {
+                                'application/json': {
+                                    schema: { $ref: '#/components/schemas/User' },
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        components: {
+            schemas: {
+                Role: { type: 'string', minLength: 1 },
+                User: {
+                    type: 'object',
+                    properties: {
+                        id: { type: 'string', minLength: 1 },
+                        role: { $ref: '#/components/schemas/Role' },
+                    },
+                },
+            },
+        },
+    };
+}

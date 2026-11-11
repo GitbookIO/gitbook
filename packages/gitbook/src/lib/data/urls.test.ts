@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test';
 
-import { getURLLookup, getURLLookupPathname, normalizeURL } from './urls';
+import { getURLLookup, getURLLookupPathname, normalizeRequestURL, normalizeURL } from './urls';
 
 describe('getURLLookupPathname', () => {
     const previewRoot = 'https://sites.gitbook.com/preview/site_example/section';
@@ -159,6 +159,51 @@ describe('getURLLookup', () => {
         'https://proxy.gitbook.site/sites/~/changes/id/hello',
     ])('should skip the proxy root URL %s', (url) => {
         expect(getURLLookup(new URL(url))).toBeNull();
+    });
+});
+
+describe('normalizeRequestURL', () => {
+    it('does not redirect a normalized URL', () => {
+        const url = new URL('https://docs.mycompany.com/hello');
+        expect(normalizeRequestURL(url, 'url-host')).toEqual({ isNormalized: true });
+    });
+
+    it('redirects a non-normalized URL to the normalized one', () => {
+        const result = normalizeRequestURL(
+            new URL('https://docs.mycompany.com/hello/tes%74'),
+            'url-host'
+        );
+        expect(result).toBeInstanceOf(Response);
+        const response = result as Response;
+        expect(response.status).toBe(302);
+        expect(response.headers.get('location')).toBe('https://docs.mycompany.com/hello/test');
+    });
+
+    it('does not redirect a non-normalized proxied URL to the internal proxy URL', () => {
+        const url = new URL(
+            'https://proxy.gitbook.site/sites/site_abc/getting-started/quickstar%74'
+        );
+        expect(normalizeRequestURL(url, 'url-host')).toEqual({ isNormalized: false });
+    });
+
+    it('redirects a non-normalized proxied URL in url mode', () => {
+        const result = normalizeRequestURL(
+            new URL('https://proxy.gitbook.site/sites/site_abc/quickstar%74'),
+            'url'
+        );
+        expect(result).toBeInstanceOf(Response);
+        expect((result as Response).headers.get('location')).toBe(
+            'https://proxy.gitbook.site/sites/site_abc/quickstart'
+        );
+    });
+
+    it.each([
+        'https://docs.mycompany.com/hello/%ZZ',
+        'https://proxy.gitbook.site/sites/site_abc/%ZZ',
+    ])('returns a 400 for an invalid URL %s', (url) => {
+        const result = normalizeRequestURL(new URL(url), 'url-host');
+        expect(result).toBeInstanceOf(Response);
+        expect((result as Response).status).toBe(400);
     });
 });
 

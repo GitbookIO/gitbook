@@ -15,6 +15,11 @@ export const fetchURLs = (customConfiguration: {
      * Limit the number of requests. Set to `false` to disable the limit.
      */
     limit?: number | false;
+
+    /**
+     * Fetch used to load the URLs. Defaults to the global `fetch`.
+     */
+    fetch?: (url: string) => Promise<Response>;
 }): Plugin => {
     // State
     let numberOfRequests = 0;
@@ -53,7 +58,7 @@ export const fetchURLs = (customConfiguration: {
             try {
                 numberOfRequests++;
                 const url = getReferenceUrl({ value, rootURL: configuration.rootURL });
-                const response = await fetch(url);
+                const response = await (configuration.fetch ?? fetch)(url);
                 if (!response.ok) {
                     return { ok: false };
                 }

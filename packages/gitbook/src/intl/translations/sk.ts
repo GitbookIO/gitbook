@@ -141,6 +141,7 @@ export const sk: TranslationLanguage = {
     ai_chat_context_pages_youve_read: 'Stránka, na ktorej sa práve nachádzate',
     ai_chat_context_info_provided_by_the_site: 'Informácie o vás poskytnuté stránkou',
     ai_chat_context_previous_messages: 'Správy vo vašej konverzácii',
+    ai_chat_context_sensitive_info: 'Nezdieľajte citlivé osobné údaje',
     ai_chat_context_disclaimer: 'Odpovede AI môžu obsahovať chyby.',
     ai_chat_input_placeholder: 'Pýtajte sa, hľadajte alebo vysvetľujte...',
     ai_chat_queued_message: 'Táto správa sa odošle, keď ${1} skončí',

@@ -146,6 +146,10 @@ export function AIChatInput(props: {
                                     <Icon icon="message-question" className="size-3.5 opacity-7" />
                                     {t(language, 'ai_chat_context_previous_messages')}
                                 </li>
+                                <li className="flex items-center gap-2">
+                                    <Icon icon="lock" className="size-3.5 opacity-7" />
+                                    {t(language, 'ai_chat_context_sensitive_info')}
+                                </li>
                             </ul>
                             <p>{t(language, 'ai_chat_context_disclaimer')}</p>
                         </div>

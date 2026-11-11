@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test';
 
-import { colorScale } from './transformations';
+import { colorScale, hexToRgbArray } from './transformations';
 
 describe('colorScale exact base', () => {
     it('takes a very light tint as the exact background on step 1 (clean/bold)', () => {
@@ -65,5 +65,17 @@ describe('colorScale exact base', () => {
         const scale = colorScale('#F5F3EF', {});
         expect(scale[0]).toBe('#ffffff');
         expect(scale[0]).not.toBe('#F5F3EF');
+    });
+});
+
+describe('hexToRgbArray', () => {
+    it('parses a 6-digit hex color', () => {
+        expect(hexToRgbArray('#1a2b3c')).toEqual([26, 43, 60]);
+    });
+
+    it('expands a 3-digit hex color', () => {
+        expect(hexToRgbArray('#abc')).toEqual([170, 187, 204]);
+        expect(hexToRgbArray('abc')).toEqual([170, 187, 204]);
+        expect(hexToRgbArray('#fff')).toEqual([255, 255, 255]);
     });
 });

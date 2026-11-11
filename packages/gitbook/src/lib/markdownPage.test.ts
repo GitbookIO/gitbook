@@ -18,13 +18,18 @@ const linker = linkerWithMarkdownPages(
         createLinker({ host: 'docs.example.com', spaceBasePath: '/workflows/', siteBasePath: '/' })
     )
 );
+const file = {
+    id: 'dark-image',
+    name: 'dark.png',
+    downloadURL: 'https://example.com/dark.png?alt=media&token=test',
+};
 const context = {
     space: {
         id: 'workflows',
         title: 'Workflows',
         urls: { published: 'https://docs.example.com/workflows/' },
     },
-    revision: { pages: [page], files: [] },
+    revision: { pages: [page], files: [file] },
     linker,
 } as unknown as GitBookAnyContext;
 
@@ -53,6 +58,24 @@ describe('HTML links in page markdown', () => {
             '<table><tr><td><a href="/pages/designer">/pages/designer</a></td></tr></table>\n';
         expect(await rewrite(markdown)).toBe(
             `<table><tr><td><a href="${linker.toPathForPagePath({ path: page.path })}">${page.title}</a></td></tr></table>\n`
+        );
+    });
+});
+
+describe('HTML images in page markdown', () => {
+    it.each([
+        '/files/dark-image',
+        ' /files/dark-image ',
+        '/files/dark-image 1x, /files/dark-image 2x',
+        '/files/dark-image 1x,/files/dark-image 2x',
+        '/files/dark-image, https://example.com/external.png 2x',
+        '/files/dark-image 640w, https://example.com/external.png 1280w',
+        'https://example.com/external.png?crop=1,2 1x, /files/dark-image 2x',
+        'data:image/png;base64,AAAA 1x, /files/dark-image 2x',
+    ])('resolves srcset candidates and preserves descriptors in %s', async (srcset) => {
+        const markdown = `<picture><source srcset="${srcset}" media="(prefers-color-scheme: dark)"><img src="/files/dark-image" alt="Example"></picture>\n`;
+        expect(await rewrite(markdown)).toBe(
+            markdown.replaceAll('/files/dark-image', file.downloadURL.replaceAll('&', '&amp;'))
         );
     });
 });

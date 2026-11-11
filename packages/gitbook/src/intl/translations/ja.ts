@@ -139,6 +139,7 @@ export const ja: TranslationLanguage = {
     ai_chat_context_pages_youve_read: '現在表示中のページ',
     ai_chat_context_info_provided_by_the_site: 'サイトから提供されるあなたに関する情報',
     ai_chat_context_previous_messages: '会話内のメッセージ',
+    ai_chat_context_sensitive_info: '機密性の高い個人情報は共有しないでください',
     ai_chat_context_disclaimer: 'AIの回答には誤りが含まれる場合があります。',
     ai_chat_input_placeholder: '質問、検索、または説明...',
     ai_chat_queued_message: '${1}の応答が完了したら、このメッセージが送信されます',

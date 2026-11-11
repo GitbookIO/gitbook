@@ -139,6 +139,7 @@ export const ko: TranslationLanguage = {
     ai_chat_context_pages_youve_read: '현재 보고 있는 페이지',
     ai_chat_context_info_provided_by_the_site: '사이트에서 제공하는 회원님에 대한 정보',
     ai_chat_context_previous_messages: '대화의 메시지',
+    ai_chat_context_sensitive_info: '민감한 개인 정보를 공유하지 마세요',
     ai_chat_context_disclaimer: 'AI 응답에는 오류가 있을 수 있습니다.',
     ai_chat_input_placeholder: '질문, 검색 또는 설명...',
     ai_chat_queued_message: '${1}의 응답이 끝나면 이 메시지가 전송됩니다',

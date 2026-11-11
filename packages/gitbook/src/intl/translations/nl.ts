@@ -141,6 +141,7 @@ export const nl: TranslationLanguage = {
     ai_chat_context_pages_youve_read: 'De pagina waar je nu op bent',
     ai_chat_context_info_provided_by_the_site: 'Informatie over jou verstrekt door de site',
     ai_chat_context_previous_messages: 'Berichten in je gesprek',
+    ai_chat_context_sensitive_info: 'Deel geen gevoelige persoonlijke gegevens',
     ai_chat_context_disclaimer: 'AI-antwoorden kunnen fouten bevatten.',
     ai_chat_input_placeholder: 'Vraag, zoek of leg uit...',
     ai_chat_queued_message: 'Dit bericht wordt verzonden zodra ${1} klaar is',

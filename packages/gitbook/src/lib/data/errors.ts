@@ -94,6 +94,13 @@ export async function wrapDataFetcherError<T>(
 }
 
 /**
+ * Whether an error may go away on retry: timeouts, rate limits, server errors and network failures.
+ */
+export function isTransientDataFetcherError(error: DataFetcherErrorData): boolean {
+    return error.code === 408 || error.code === 429 || error.code >= 500;
+}
+
+/**
  * Ignore some data fetcher errors.
  */
 export function ignoreDataFetcherErrors<T>(

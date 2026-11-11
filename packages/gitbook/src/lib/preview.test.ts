@@ -2,7 +2,13 @@ import { describe, expect, it } from 'bun:test';
 
 import type { PublishedSiteContent } from '@gitbook/api';
 
-import { getPreviewCookieResponse, getPreviewRequestIdentifier, isPreviewRequest } from './preview';
+import {
+    getPreviewCookieResponse,
+    getPreviewRequestIdentifier,
+    isPreviewRequest,
+    parsePreviewCustomizationCookie,
+    serializePreviewCustomizationCookie,
+} from './preview';
 
 describe('isPreviewRequest', () => {
     it('should return true for preview requests', () => {
@@ -63,5 +69,25 @@ describe('getPreviewCookieResponse', () => {
             siteURLData,
         });
         expect(cookie.options?.path).toBe('/docs/');
+    });
+});
+
+describe('parsePreviewCustomizationCookie', () => {
+    const customization = "(styling:(primaryColor:(dark:'#ff0000',light:'#ff0000')))";
+    const value = serializePreviewCustomizationCookie({ customization, siteSpace: 'sitesp_a' });
+
+    it('returns the override for the site space it was created for', () => {
+        expect(parsePreviewCustomizationCookie(value, 'sitesp_a')).toBe(customization);
+    });
+
+    it('ignores the override for another site space', () => {
+        expect(parsePreviewCustomizationCookie(value, 'sitesp_b')).toBeUndefined();
+        expect(parsePreviewCustomizationCookie(value, 'sitesp')).toBeUndefined();
+    });
+
+    it('ignores a cookie not bound to a site space', () => {
+        expect(
+            parsePreviewCustomizationCookie(encodeURIComponent(customization), 'sitesp_a')
+        ).toBeUndefined();
     });
 });
