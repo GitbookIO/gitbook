@@ -6,6 +6,7 @@ import * as React from 'react';
 
 import { useAIChatController, useAIConfig } from '../AI';
 import { useCurrentContent } from '../hooks/useCurrentContent';
+import { useInViewportListener } from '../hooks/useInViewportListener';
 import { useTrackEvent } from '../Insights';
 import { Button } from '../primitives';
 import { Input } from '../primitives/Input';
@@ -29,6 +30,10 @@ export function AIChatPageBar() {
     const [expanded, setExpanded] = React.useState(false);
     const [value, setValue] = React.useState('');
     const inputRef = React.useRef<HTMLTextAreaElement>(null);
+    // The rest marks where the bar settles at the end of the page: until it scrolls into view, the bar is stuck.
+    const restRef = React.useRef<HTMLDivElement>(null);
+    const [stuck, setStuck] = React.useState(false);
+    useInViewportListener(restRef, (isIntersecting) => setStuck(!isIntersecting));
     // The card's height assumes a one-line input, so the suggestions give way once the visitor types.
     const showSuggestions = expanded && !value;
 
@@ -71,90 +76,100 @@ export function AIChatPageBar() {
     };
 
     return (
-        // z-30 sits above page content (cards, tables and code blocks go up to z-20) and below sheets and dialogs (z-40).
-        <div
-            className={tcls(
-                'sticky bottom-6 z-30 mx-auto mt-8 max-w-full transition-[width] duration-300 ease-out motion-reduce:transition-none chat-open:hidden print:hidden',
-                // Mobile browsers already inset the viewport's bottom edge for their own toolbar.
-                'max-lg:bottom-(--bar-bottom) max-lg:[--bar-bottom:max(env(safe-area-inset-bottom),0.75rem)]',
-                expanded ? 'w-[42rem]' : 'w-[28rem]'
-            )}
-        >
-            {/* On small screens the page would show all around the bar, so a strip of its background sits behind it. */}
-            <div className="site-background -bottom-(--bar-bottom) mask-t-from-[calc(100%-1.5rem)] absolute -top-8 left-1/2 -z-10 w-screen -translate-x-1/2 lg:hidden" />
-            {showSuggestions ? (
-                // The input stays in flow on top of the card, so focusing it never moves it; the bottom padding leaves its room.
-                <div className="pb-13 absolute -inset-x-2 -bottom-2 flex flex-col border border-tint bg-tint-base p-2 shadow-lg rounded-corners:rounded-[1.25rem] circular-corners:rounded-[1.75rem] max-lg:pb-16">
-                    {suggestions.map((question, index) => (
-                        <Button
-                            key={question}
-                            truncate={false}
-                            variant="blank"
-                            size="small"
-                            className="animate-blur-in-slow w-full"
-                            style={{ animationDelay: `${index * 50}ms` }}
-                            // Keep the input focused so the bar doesn't collapse before the click lands.
-                            onMouseDown={(event) => event.preventDefault()}
-                            onClick={() => ask(question)}
-                        >
-                            {question}
-                        </Button>
-                    ))}
-                </div>
-            ) : null}
-            <Input
-                name="ai-page-bar-input"
-                multiline
-                resize
-                rows={1}
-                label={tString(
-                    language,
-                    'ai_chat_ask',
-                    config.assistantName ?? getAIChatName(language, config.trademark)
-                )}
-                ref={inputRef}
-                // While typing, useTypewriter writes the placeholder itself.
-                placeholder={typing ? '' : tString(language, 'ai_chat_input_placeholder')}
-                maxLength={2048}
-                keyboardShortcut={false}
-                value={value}
-                onValueChange={setValue}
-                onKeyDown={(event) => {
-                    // Shift+Enter already adds a line in a textarea; Cmd/Ctrl+Enter would otherwise submit.
-                    if (event.key === 'Enter' && (event.metaKey || event.ctrlKey)) {
-                        event.preventDefault();
-                        const field = event.currentTarget;
-                        field.setRangeText('\n', field.selectionStart, field.selectionEnd, 'end');
-                        setValue(field.value);
-                    }
-                }}
-                onFocus={() => setExpanded(true)}
-                onBlur={(event) => {
-                    if (!event.currentTarget.value) {
-                        setExpanded(false);
-                    }
-                }}
-                onSubmit={ask}
+        <>
+            {/* z-30 sits above page content (cards, tables and code blocks go up to z-20) and below sheets and dialogs (z-40). */}
+            <div
                 className={tcls(
-                    // The send button is overlaid, so the textarea spans the full width and scrolls at the right edge.
-                    'bg-tint-base/9 pl-3 text-sm contrast-more:bg-tint-base [&_textarea]:max-h-32 [&_textarea]:pr-9',
-                    // A larger field on small screens; iOS also zooms the page when focusing text under 16px.
-                    'max-lg:p-3 max-lg:pl-4 max-lg:text-base max-lg:[&_textarea]:-m-3 max-lg:[&_textarea]:p-3 max-lg:[&_textarea]:pr-12',
-                    // The larger shadow would be cut off at the bottom edge of a small screen.
-                    showSuggestions ? null : 'shadow-lg backdrop-blur-lg max-lg:shadow-sm'
+                    'sticky bottom-6 z-30 mx-auto mt-8 max-w-full transition-[width] duration-300 ease-out motion-reduce:transition-none chat-open:hidden print:hidden',
+                    // Mobile browsers already inset the viewport's bottom edge for their own toolbar.
+                    'max-lg:bottom-(--bar-bottom) max-lg:[--bar-bottom:max(env(safe-area-inset-bottom),0.75rem)]',
+                    expanded ? 'w-[42rem]' : 'w-[28rem]'
                 )}
-            />
-            <Button
-                variant="primary"
-                size="xsmall"
-                iconOnly
-                icon="arrow-up"
-                label={tString(language, 'send')}
-                disabled={!value.trim()}
-                onClick={() => ask(value)}
-                className="max-lg:bottom-2.25 max-lg:right-2.25 absolute bottom-1.5 right-1.5 max-lg:p-1.5"
-            />
-        </div>
+            >
+                {/* On small screens the page would show all around a stuck bar, so a strip of its background sits behind it. */}
+                {stuck ? (
+                    <div className="site-background -bottom-(--bar-bottom) mask-t-from-[calc(100%-1.5rem)] animate-fade-in absolute -top-8 left-1/2 -z-10 w-screen -translate-x-1/2 lg:hidden" />
+                ) : null}
+                {showSuggestions ? (
+                    // The input stays in flow on top of the card, so focusing it never moves it; the bottom padding leaves its room.
+                    <div className="pb-13 absolute -inset-x-2 -bottom-2 flex flex-col border border-tint bg-tint-base p-2 shadow-lg rounded-corners:rounded-[1.25rem] circular-corners:rounded-[1.75rem] max-lg:pb-16">
+                        {suggestions.map((question, index) => (
+                            <Button
+                                key={question}
+                                truncate={false}
+                                variant="blank"
+                                size="small"
+                                className="animate-blur-in-slow w-full"
+                                style={{ animationDelay: `${index * 50}ms` }}
+                                // Keep the input focused so the bar doesn't collapse before the click lands.
+                                onMouseDown={(event) => event.preventDefault()}
+                                onClick={() => ask(question)}
+                            >
+                                {question}
+                            </Button>
+                        ))}
+                    </div>
+                ) : null}
+                <Input
+                    name="ai-page-bar-input"
+                    multiline
+                    resize
+                    rows={1}
+                    label={tString(
+                        language,
+                        'ai_chat_ask',
+                        config.assistantName ?? getAIChatName(language, config.trademark)
+                    )}
+                    ref={inputRef}
+                    // While typing, useTypewriter writes the placeholder itself.
+                    placeholder={typing ? '' : tString(language, 'ai_chat_input_placeholder')}
+                    maxLength={2048}
+                    keyboardShortcut={false}
+                    value={value}
+                    onValueChange={setValue}
+                    onKeyDown={(event) => {
+                        // Shift+Enter already adds a line in a textarea; Cmd/Ctrl+Enter would otherwise submit.
+                        if (event.key === 'Enter' && (event.metaKey || event.ctrlKey)) {
+                            event.preventDefault();
+                            const field = event.currentTarget;
+                            field.setRangeText(
+                                '\n',
+                                field.selectionStart,
+                                field.selectionEnd,
+                                'end'
+                            );
+                            setValue(field.value);
+                        }
+                    }}
+                    onFocus={() => setExpanded(true)}
+                    onBlur={(event) => {
+                        if (!event.currentTarget.value) {
+                            setExpanded(false);
+                        }
+                    }}
+                    onSubmit={ask}
+                    className={tcls(
+                        // The send button is overlaid, so the textarea spans the full width and scrolls at the right edge.
+                        'bg-tint-base/9 pl-3 text-sm contrast-more:bg-tint-base [&_textarea]:max-h-32 [&_textarea]:pr-9',
+                        // A larger field on small screens; iOS also zooms the page when focusing text under 16px.
+                        'max-lg:p-3 max-lg:pl-4 max-lg:text-base max-lg:[&_textarea]:-m-3 max-lg:[&_textarea]:p-3 max-lg:[&_textarea]:pr-12',
+                        // The larger shadow would be cut off at the bottom edge of a small screen.
+                        showSuggestions ? null : 'shadow-lg backdrop-blur-lg max-lg:shadow-sm'
+                    )}
+                />
+                <Button
+                    variant="primary"
+                    size="xsmall"
+                    iconOnly
+                    icon="arrow-up"
+                    label={tString(language, 'send')}
+                    disabled={!value.trim()}
+                    onClick={() => ask(value)}
+                    className="max-lg:bottom-2.25 max-lg:right-2.25 absolute bottom-1.5 right-1.5 max-lg:p-1.5"
+                />
+            </div>
+            <div ref={restRef} />
+        </>
     );
 }
 
