@@ -152,20 +152,20 @@ export function AIChatPageBar() {
                     className={tcls(
                         // The send button is overlaid, so the textarea spans the full width and scrolls at the right edge.
                         // text-base because iOS zooms the page when focusing a field with text under 16px.
-                        'bg-tint-base/9 pl-4 text-base contrast-more:bg-tint-base [&_textarea]:max-h-32 [&_textarea]:pr-12',
+                        'bg-tint-base/9 pl-4 text-base contrast-more:bg-tint-base [&_textarea]:max-h-32 [&_textarea]:pr-13',
                         // The larger shadow would be cut off at the bottom edge of a small screen.
                         showSuggestions ? null : 'shadow-lg backdrop-blur-lg max-lg:shadow-sm'
                     )}
                 />
                 <Button
                     variant="primary"
-                    size="xsmall"
+                    size="small"
                     iconOnly
                     icon="arrow-up"
                     label={tString(language, 'send')}
                     disabled={!value.trim()}
                     onClick={() => ask(value)}
-                    className="bottom-2.25 right-2.25 absolute p-1.5"
+                    className="absolute bottom-[7.5px] right-[7.5px]"
                 />
             </div>
             <div ref={restRef} />
