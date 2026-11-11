@@ -46,12 +46,9 @@ export function prefetchSiteIndex(indexURL: string): void {
  * Get the parsed index pages. Parses per call (cheap for the rare second
  * consumer) so the parsed object graph is never retained at module scope.
  */
-export async function fetchSiteIndex(indexURL: string): Promise<{
-    version: 1;
-    /** Space ID of each site space. Optional because cached copies of the index can lack it. */
-    spaceIds?: Record<string, string>;
-    pages: SiteIndexPage[];
-}> {
+export async function fetchSiteIndex(
+    indexURL: string
+): Promise<{ version: 1; pages: SiteIndexPage[] }> {
     return JSON.parse(await fetchSiteIndexText(indexURL));
 }
 
