@@ -933,6 +933,7 @@ function encodePathInSiteContent(
         case AI_CATALOG_PATH:
         case '~gitbook/pdf':
         case '~gitbook/search':
+        case '~gitbook/search-prewarm':
         case '~gitbook/auth/login':
         case '~gitbook/auth/logout':
             // PDF, search and auth routes are always dynamic as they depend on the request.
