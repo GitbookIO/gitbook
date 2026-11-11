@@ -41,6 +41,8 @@ type RemoteSearch =
 
 const NO_REMOTE_RESULTS: OrderedComputedResult[] = [];
 
+const SEARCH_TIMEOUT_MS = 10_000;
+
 function getSearchPhase(query: string, remote: RemoteSearch): SearchPhase {
     if (!query) {
         return 'idle';
@@ -194,6 +196,8 @@ export function useSearchResults(props: {
             ): Promise<OrderedComputedResult[]> =>
                 fetchSearchResults(searchURL, scope, query, abortController.signal, asEmbeddable);
 
+            // A request that never answers would leave the search loading for good.
+            const giveUp = setTimeout(() => abortController.abort(), SEARCH_TIMEOUT_MS);
             try {
                 const results = await fetchSearch(
                     computeRemoteSearchScope(
@@ -220,6 +224,8 @@ export function useSearchResults(props: {
                     return;
                 }
                 setRemote({ status: 'failed', query });
+            } finally {
+                clearTimeout(giveUp);
             }
         }, 200);
 
