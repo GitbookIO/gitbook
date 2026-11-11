@@ -173,17 +173,20 @@ function useTypewriter({
             return;
         }
         if (reduceMotion) {
-            field.placeholder = texts[0]!;
+            field.placeholder = fitPlaceholder(field, texts[0]!);
             return;
         }
 
         let index = 0;
         let length = 0;
         let erasing = false;
+        let current = '';
         let timeout: ReturnType<typeof setTimeout>;
 
         const tick = () => {
-            const current = texts[index % texts.length]!;
+            if (length === 0) {
+                current = fitPlaceholder(field, texts[index % texts.length]!);
+            }
             length += erasing ? -1 : 1;
             field.placeholder = current.slice(0, length);
 
@@ -203,6 +206,29 @@ function useTypewriter({
         timeout = setTimeout(tick, 600);
         return () => clearTimeout(timeout);
     }, [ref, texts, enabled, reduceMotion]);
+}
+
+// A placeholder wider than the field wraps onto a line the one-row field hides, so it is cut to fit.
+function fitPlaceholder(field: HTMLTextAreaElement, text: string): string {
+    const context = document.createElement('canvas').getContext('2d');
+    if (!context) {
+        return text;
+    }
+    const style = getComputedStyle(field);
+    context.font = `${style.fontStyle} ${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
+    // 1px of slack, since canvas and layout can round text widths differently.
+    const width =
+        field.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight) - 1;
+    const fits = (candidate: string) => context.measureText(candidate).width <= width;
+    if (fits(text)) {
+        return text;
+    }
+
+    let end = text.length - 1;
+    while (end > 0 && !fits(`${text.slice(0, end).trimEnd()}…`)) {
+        end -= 1;
+    }
+    return `${text.slice(0, end).trimEnd()}…`;
 }
 
 function fetchRecommendedQuestions(siteSpaceId: string): Promise<string[]> {
