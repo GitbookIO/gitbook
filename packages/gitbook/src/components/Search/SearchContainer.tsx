@@ -50,8 +50,8 @@ export function SearchContainer({
         askInAssistant,
         close,
         cursor,
-        error,
-        fetching,
+        phase,
+        enterWaiting,
         onInputKeyDown,
         onResultSelect,
         open,
@@ -67,6 +67,7 @@ export function SearchContainer({
         withSearchAI,
         scopeControl,
     } = useSearchController(searchProps);
+    const fetching = phase === 'loading';
     const uiAssistants = assistants.filter((assistant) => assistant.ui === true);
 
     useHotkeys(
@@ -168,8 +169,8 @@ export function SearchContainer({
         <SearchFrame
             askQuery={askQuery}
             cursor={cursor}
-            error={error}
-            fetching={fetching}
+            phase={phase}
+            enterWaiting={enterWaiting}
             input={usesSideSheet ? frameInput : undefined}
             query={query}
             results={results}

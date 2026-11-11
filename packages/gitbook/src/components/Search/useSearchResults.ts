@@ -1,6 +1,5 @@
 import { readStreamableValue } from 'ai/rsc';
 import React from 'react';
-import { assert } from 'ts-essentials';
 
 import { useTrackEvent } from '../Insights';
 import {
@@ -25,6 +24,33 @@ export type ResultType =
     | RecommendedQuestionResult;
 
 export type { LocalPageResult, MergedPageResult };
+
+/**
+ * Where a search stands. Results listed while `loading` are instant title matches only,
+ * so they are provisional; in every other phase the list is final.
+ */
+export type SearchPhase = 'idle' | 'loading' | 'loaded' | 'failed' | 'stopped';
+
+type RemoteSearch =
+    | { status: 'idle' }
+    | { status: 'loading'; query: string }
+    | { status: 'loaded'; query: string; results: OrderedComputedResult[] }
+    | { status: 'failed'; query: string }
+    // The visitor opened a result or asked an assistant before the server answered.
+    | { status: 'stopped'; query: string };
+
+const NO_REMOTE_RESULTS: OrderedComputedResult[] = [];
+
+function getSearchPhase(query: string, remote: RemoteSearch): SearchPhase {
+    if (!query) {
+        return 'idle';
+    }
+    // A new query renders once before its request starts.
+    if (remote.status === 'idle' || remote.query !== query) {
+        return 'loading';
+    }
+    return remote.status;
+}
 
 // Small helper extracted for unit testing of scope → local filter mapping
 // computeFilterSiteSpaceIds is imported from './filter' for testability
@@ -96,11 +122,7 @@ export function useSearchResults(props: {
         filterSiteSpaceIds,
     });
 
-    const [remoteState, setRemoteState] = React.useState<{
-        results: OrderedComputedResult[];
-        fetching: boolean;
-        error: boolean;
-    }>({ results: [], fetching: false, error: false });
+    const [remote, setRemote] = React.useState<RemoteSearch>({ status: 'idle' });
 
     // Track the current in-flight fetch so it can be aborted imperatively
     // when the user navigates away before the request completes.
@@ -115,35 +137,14 @@ export function useSearchResults(props: {
             return;
         }
         if (!query) {
-            if (!withAI) {
-                setRemoteState({
-                    results: [],
-                    fetching: false,
-                    error: false,
-                });
+            setRemote({ status: 'idle' });
+
+            const hasQuestions =
+                cachedRecommendedQuestions.has(siteSpaceId) ||
+                (suggestions !== undefined && suggestions.length > 0);
+            if (!withAI || hasQuestions) {
                 return;
             }
-
-            if (cachedRecommendedQuestions.has(siteSpaceId)) {
-                const results = cachedRecommendedQuestions.get(siteSpaceId);
-                assert(
-                    results,
-                    `Cached recommended questions should be set for site-space ${siteSpaceId}`
-                );
-                // Recommended questions are stored as ResultType[] already
-                setRemoteState({
-                    results: [],
-                    fetching: false,
-                    error: false,
-                });
-                return;
-            }
-
-            setRemoteState({
-                results: [],
-                fetching: false,
-                error: false,
-            });
 
             let cancelled = false;
 
@@ -151,18 +152,6 @@ export function useSearchResults(props: {
             // This is a workaround to avoid that.
             const questions = new Set<string>();
             const recommendedQuestions: RecommendedQuestionResult[] = [];
-
-            if (suggestions && suggestions.length > 0) {
-                suggestions.forEach((question) => {
-                    questions.add(question);
-                });
-                setRemoteState({
-                    results: [],
-                    fetching: false,
-                    error: false,
-                });
-                return;
-            }
 
             const timeout = setTimeout(async () => {
                 if (cancelled) {
@@ -185,12 +174,8 @@ export function useSearchResults(props: {
                     cachedRecommendedQuestions.set(siteSpaceId, recommendedQuestions);
 
                     if (!cancelled) {
-                        // Recommended questions are handled via a separate path below
-                        setRemoteState({
-                            results: [],
-                            fetching: false,
-                            error: false,
-                        });
+                        // A new object re-renders, so the list picks up the cached questions.
+                        setRemote({ status: 'idle' });
                     }
                 }
             }, 100);
@@ -200,11 +185,7 @@ export function useSearchResults(props: {
                 clearTimeout(timeout);
             };
         }
-        setRemoteState({
-            results: [],
-            fetching: true,
-            error: false,
-        });
+        setRemote({ status: 'loading', query });
         let cancelled = false;
         const abortController = new AbortController();
         const timeout = setTimeout(async () => {
@@ -214,7 +195,7 @@ export function useSearchResults(props: {
                 fetchSearchResults(searchURL, scope, query, abortController.signal, asEmbeddable);
 
             try {
-                const resultsPromise = fetchSearch(
+                const results = await fetchSearch(
                     computeRemoteSearchScope(
                         scope,
                         siteSpaceId,
@@ -222,44 +203,23 @@ export function useSearchResults(props: {
                         selectedSectionSiteSpaceIds
                     )
                 );
-
-                const onResults = (results: OrderedComputedResult[]) => {
-                    if (cancelled) {
-                        return;
-                    }
-
-                    if (!results) {
-                        // Can happen when the route cannot be found and returns the page's html.
-                        setRemoteState((prev) => ({ ...prev, error: true }));
-                        return;
-                    }
-
-                    setRemoteState((prev) => ({ ...prev, results }));
-                    trackEvent({ type: 'search_type_query', query });
-                };
-                const onError = () => {
-                    if (cancelled) {
-                        return;
-                    }
-                    setRemoteState((prev) => ({ ...prev, error: true }));
-                };
-
-                await resultsPromise.then(onResults, onError);
-
                 if (cancelled) {
                     return;
                 }
-                setRemoteState((prev) => ({ ...prev, fetching: false }));
+
+                if (!results) {
+                    // Can happen when the route cannot be found and returns the page's html.
+                    setRemote({ status: 'failed', query });
+                    return;
+                }
+
+                setRemote({ status: 'loaded', query, results });
+                trackEvent({ type: 'search_type_query', query });
             } catch {
-                // If there is an error, we need to catch it to avoid infinite loading state.
                 if (cancelled) {
                     return;
                 }
-                setRemoteState({
-                    results: [],
-                    fetching: false,
-                    error: true,
-                });
+                setRemote({ status: 'failed', query });
             }
         }, 200);
 
@@ -292,8 +252,14 @@ export function useSearchResults(props: {
     const abort = React.useCallback(() => {
         abortRef.current?.();
         abortRef.current = null;
-        setRemoteState((prev) => (prev.fetching ? { ...prev, fetching: false } : prev));
+        setRemote((prev) =>
+            prev.status === 'loading' ? { status: 'stopped', query: prev.query } : prev
+        );
     }, []);
+
+    const phase = getSearchPhase(query, remote);
+    const remoteResults =
+        phase === 'loaded' && remote.status === 'loaded' ? remote.results : NO_REMOTE_RESULTS;
 
     // Merge local and remote results.
     // Re-runs immediately whenever either result set changes.
@@ -315,13 +281,14 @@ export function useSearchResults(props: {
 
         return fuseSearchResults({
             localResults,
-            remoteResults: remoteState.results,
+            remoteResults,
             query,
             allowedSiteSpaceIds: filterSiteSpaceIds,
         });
     }, [
         localResults,
-        remoteState.results,
+        remote,
+        remoteResults,
         query,
         filterSiteSpaceIds,
         withAI,
@@ -330,12 +297,7 @@ export function useSearchResults(props: {
         recentQueries,
     ]);
 
-    return {
-        results,
-        fetching: remoteState.fetching,
-        error: remoteState.error,
-        abort,
-    };
+    return { results, phase, abort };
 }
 
 /**

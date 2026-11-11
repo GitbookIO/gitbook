@@ -109,10 +109,12 @@ export async function GET(
 
     const seen = new Set<string>();
     const pages: RawIndexPage[] = [];
+    const spaceIds: Record<string, string> = {};
 
     for (let i = 0; i < visibleSpaces.length; i++) {
         const siteSpace = visibleSpaces[i]!;
         const revision = revisions[i]!;
+        spaceIds[siteSpace.id] = siteSpace.space.id;
         const forkedLinker = getLinkerForSiteSpace(
             linker.withOtherSiteSpace({
                 spaceBasePath: getFallbackSiteSpacePath(context, siteSpace),
@@ -174,6 +176,7 @@ export async function GET(
         JSON.stringify({
             // We include a version number in the response to allow future changes to the format without breaking clients that might have cached the old format.
             version: 1,
+            spaceIds,
             pages,
         }),
         {

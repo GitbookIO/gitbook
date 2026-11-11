@@ -11,7 +11,7 @@ import { SearchPageResultItem } from './SearchPageResultItem';
 import { SearchQuestionResultItem } from './SearchQuestionResultItem';
 import { SearchRecordResultItem } from './SearchRecordResultItem';
 import { SearchResultItem } from './SearchResultItem';
-import type { ResultType } from './useSearchResults';
+import type { ResultType, SearchPhase } from './useSearchResults';
 import { useAI } from '@/components/AI';
 import { useCurrentContent } from '@/components/hooks';
 import { t, useLanguage } from '@/intl/client';
@@ -47,14 +47,15 @@ export const SearchResults = React.forwardRef(function SearchResults(
         id: string;
         query: string;
         results: ResultType[];
-        fetching: boolean;
+        phase: SearchPhase;
         cursor: number | null;
-        error: boolean;
         onResultSelect?: () => void;
     },
     ref: React.Ref<SearchResultsRef>
 ) {
-    const { children, id, query, results, fetching, cursor, error, onResultSelect } = props;
+    const { children, id, query, results, phase, cursor, onResultSelect } = props;
+    const fetching = phase === 'loading';
+    const error = phase === 'failed';
 
     const language = useLanguage();
     const { siteSpaceId } = useCurrentContent();

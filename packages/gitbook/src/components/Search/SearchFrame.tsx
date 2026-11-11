@@ -16,14 +16,15 @@ import { SearchAskAnswer } from './SearchAskAnswer';
 import { SearchAskBar } from './SearchAskBar';
 import { SearchAskProvider, useSearchAskState } from './SearchAskContext';
 import { SearchResults, type SearchResultsRef } from './SearchResults';
-import type { ResultType } from './useSearchResults';
+import type { ResultType, SearchPhase } from './useSearchResults';
 import { type ClassValue, tcls } from '@/lib/tailwind';
 export function SearchFrame(props: {
     asEmbeddable?: boolean;
     askQuery: string;
     cursor: number | null;
-    error: boolean;
-    fetching: boolean;
+    phase: SearchPhase;
+    /** Enter was pressed and will act once results have loaded. */
+    enterWaiting: boolean;
     fillHeight?: boolean;
     input?: React.ReactNode;
     query: string;
@@ -43,8 +44,8 @@ export function SearchFrame(props: {
         className,
         cursor,
         dataTestId,
-        error,
-        fetching,
+        phase,
+        enterWaiting,
         fillHeight = false,
         input,
         query,
@@ -56,6 +57,7 @@ export function SearchFrame(props: {
         showAsk,
         sidebar,
     } = props;
+    const fetching = phase === 'loading';
 
     const searchAsk = useSearchAskState();
     const { assistants } = useAI();
@@ -77,7 +79,7 @@ export function SearchFrame(props: {
                             fetching ? 'block animate-fade-in' : 'hidden animate-fade-out-slow'
                         )}
                         style={{
-                            animationDelay: fetching ? '2s' : undefined,
+                            animationDelay: fetching && !enterWaiting ? '2s' : undefined,
                         }}
                     >
                         <div
@@ -111,10 +113,9 @@ export function SearchFrame(props: {
                                         ref={resultsRef}
                                         query={query}
                                         id={resultsId}
-                                        fetching={fetching}
+                                        phase={phase}
                                         results={results}
                                         cursor={cursor}
-                                        error={error}
                                         onResultSelect={onResultSelect}
                                     />
                                 )}

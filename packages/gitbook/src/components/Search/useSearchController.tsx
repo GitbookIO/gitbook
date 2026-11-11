@@ -15,10 +15,9 @@ import {
 } from './last-query';
 import { addRecentSearchQuery } from './recent-queries';
 import { findSearchSection, type SearchBaseProps } from './search-props';
-import type { SearchResultsRef } from './SearchResults';
 import { useSearchState, useSetSearchState } from './useSearch';
+import { useSearchKeyboardNavigation } from './useSearchKeyboardNavigation';
 import { useSearchResults } from './useSearchResults';
-import { useSearchResultsCursor } from './useSearchResultsCursor';
 import { getLocalizedTitle } from '@/lib/sites';
 
 function useInitialAskBootstrap(props: {
@@ -72,51 +71,6 @@ function useFilteredSiteSpaceIds(props: {
     );
 }
 
-function useSearchKeyboardNavigation(props: {
-    query: string;
-    results: ReturnType<typeof useSearchResults>['results'];
-    resultsRef: React.RefObject<SearchResultsRef | null>;
-    abort: () => void;
-    askCount: number;
-    onAskSelect: (index: number) => void;
-}) {
-    const { query, results, resultsRef, abort, askCount, onAskSelect } = props;
-    const { cursor, moveBy: moveCursorBy } = useSearchResultsCursor({
-        query,
-        resultCount: results.length,
-        totalCount: results.length + askCount,
-    });
-
-    const onInputKeyDown = React.useCallback(
-        (event: React.KeyboardEvent<HTMLInputElement>) => {
-            if (event.key === 'ArrowUp') {
-                event.preventDefault();
-                moveCursorBy(-1);
-            } else if (event.key === 'ArrowDown') {
-                event.preventDefault();
-                moveCursorBy(1);
-            } else if (event.key === 'Enter' && !event.nativeEvent.isComposing) {
-                event.preventDefault();
-                if (cursor !== null && cursor >= results.length) {
-                    onAskSelect(cursor - results.length);
-                    return;
-                }
-
-                if (resultsRef.current?.select()) {
-                    // Stop any in-flight search request only when activating a result.
-                    abort();
-                }
-            }
-        },
-        [moveCursorBy, cursor, results.length, onAskSelect, resultsRef, abort]
-    );
-
-    return {
-        cursor,
-        onInputKeyDown,
-    };
-}
-
 export function useSearchController(
     props: SearchBaseProps,
     options: { restoreLastQueryOnMount?: boolean } = {}
@@ -139,7 +93,6 @@ export function useSearchController(
     const setSearchState = useSetSearchState();
     const router = useRouter();
     const trackEvent = useTrackEvent();
-    const resultsRef = React.useRef<SearchResultsRef>(null);
     const isLoaded = useBodyLoaded();
     const integrationsLoaded = useIntegrationsLoaded();
 
@@ -248,7 +201,7 @@ export function useSearchController(
     });
     const selectedSection = state?.section ? findSearchSection(sections, state.section) : undefined;
 
-    const { results, fetching, error, abort } = useSearchResults({
+    const { results, phase, abort } = useSearchResults({
         asEmbeddable,
         disabled: !(normalizedQuery || withAI),
         open: Boolean(state?.open),
@@ -302,11 +255,11 @@ export function useSearchController(
 
     const askCount = normalizedQuery && !showAsk ? assistants.length : 0;
 
-    const { cursor, onInputKeyDown } = useSearchKeyboardNavigation({
-        query: normalizedQuery,
+    const { cursor, onInputKeyDown, enterWaiting, resultsRef } = useSearchKeyboardNavigation({
+        searchKey: [searchValue, state?.scope, state?.section].join('\n'),
+        open: Boolean(state?.open),
+        phase,
         results,
-        resultsRef,
-        abort,
         askCount,
         onAskSelect: askInAssistant,
     });
@@ -317,8 +270,8 @@ export function useSearchController(
         askCount,
         askInAssistant,
         cursor,
-        error,
-        fetching,
+        phase,
+        enterWaiting,
         abort,
         open: onOpen,
         close: onClose,

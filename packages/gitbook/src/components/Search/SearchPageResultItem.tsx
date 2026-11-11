@@ -57,17 +57,15 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
         <Icon icon="file-lines" className="size-4" />
     );
 
-    const insights =
+    const openedPage =
         item.type === 'page'
-            ? {
-                  type: 'search_open_result' as const,
-                  query,
-                  result: {
-                      pageId: item.pageId,
-                      spaceId: item.spaceId,
-                  },
-              }
-            : undefined;
+            ? { pageId: item.pageId, spaceId: item.spaceId }
+            : item.spaceId
+              ? { pageId: item.id, spaceId: item.spaceId }
+              : undefined;
+    const insights = openedPage
+        ? { type: 'search_open_result' as const, query, result: openedPage }
+        : undefined;
 
     return (
         <SearchResultItem

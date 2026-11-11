@@ -47,8 +47,8 @@ export function EmbeddableSearch(props: EmbeddableSearchProps) {
         askQuery,
         close,
         cursor,
-        error,
-        fetching,
+        phase,
+        enterWaiting,
         onInputKeyDown,
         onResultSelect,
         query,
@@ -65,14 +65,16 @@ export function EmbeddableSearch(props: EmbeddableSearchProps) {
         { restoreLastQueryOnMount: true }
     );
 
+    const fetching = phase === 'loading';
+
     return (
         <LinkContext value={linkContext}>
             <SearchFrame
                 asEmbeddable={hasDocsTab}
                 askQuery={askQuery}
                 cursor={cursor}
-                error={error}
-                fetching={fetching}
+                phase={phase}
+                enterWaiting={enterWaiting}
                 fillHeight={true}
                 query={query}
                 results={results}

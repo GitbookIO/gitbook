@@ -25,6 +25,7 @@ export interface LocalPageResult {
     type: 'local-page';
     id: string;
     siteSpaceId: string;
+    spaceId?: string;
     title: string;
     pathname: string;
     icon?: string;
@@ -47,14 +48,21 @@ const cachedIndexes = new Map<string, Document<IndexPage>>();
 // Keyed by page id, shared across all language groups.
 const cachedPageData = new Map<
     string,
-    { pathname: string; icon?: string; emoji?: string; breadcrumbs?: SiteIndexBreadcrumb[] }
+    {
+        pathname: string;
+        spaceId?: string;
+        icon?: string;
+        emoji?: string;
+        breadcrumbs?: SiteIndexBreadcrumb[];
+    }
 >();
 
 let pendingFetch: Promise<Map<string, Document<IndexPage>>> | null = null;
 
 function buildLangIndex(
     DocumentCtor: typeof import('flexsearch').Document,
-    pages: SiteIndexPage[]
+    pages: SiteIndexPage[],
+    spaceIds: Record<string, string> | undefined
 ): Document<IndexPage> {
     const index = new DocumentCtor<IndexPage>({
         document: {
@@ -83,6 +91,7 @@ function buildLangIndex(
 
         cachedPageData.set(`${page.siteSpaceId}:${page.id}`, {
             pathname: page.pathname,
+            spaceId: spaceIds?.[page.siteSpaceId],
             icon: page.icon,
             emoji: page.emoji,
             breadcrumbs: page.breadcrumbs?.length ? page.breadcrumbs : undefined,
@@ -122,7 +131,7 @@ async function getOrBuildIndexes(indexURL: string): Promise<Map<string, Document
 
         // Build one FlexSearch Document per language group
         for (const [lang, pages] of pagesByLang) {
-            cachedIndexes.set(lang, buildLangIndex(Document, pages));
+            cachedIndexes.set(lang, buildLangIndex(Document, pages, data.spaceIds));
         }
 
         releaseSiteIndex();
@@ -244,6 +253,7 @@ export function useLocalSearchResults(props: {
                         type: 'local-page',
                         id: doc.id,
                         siteSpaceId: doc.siteSpaceId,
+                        spaceId: extra?.spaceId,
                         title: doc.title,
                         pathname: extra?.pathname ?? '',
                         icon: extra?.icon,
