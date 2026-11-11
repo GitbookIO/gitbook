@@ -92,7 +92,7 @@ export function AIChatPageBar() {
                 ) : null}
                 {showSuggestions ? (
                     // The input stays in flow on top of the card, so focusing it never moves it; the bottom padding leaves its room.
-                    <div className="pb-13 absolute -inset-x-2 -bottom-2 flex flex-col border border-tint bg-tint-base p-2 shadow-lg rounded-corners:rounded-[1.25rem] circular-corners:rounded-[1.75rem] max-lg:pb-16">
+                    <div className="absolute -inset-x-2 -bottom-2 flex flex-col border border-tint bg-tint-base p-2 pb-16 shadow-lg rounded-corners:rounded-[1.25rem] circular-corners:rounded-[1.75rem]">
                         {suggestions.map((question, index) => (
                             <Button
                                 key={question}
@@ -114,6 +114,7 @@ export function AIChatPageBar() {
                     name="ai-page-bar-input"
                     multiline
                     resize
+                    sizing="large"
                     rows={1}
                     label={tString(
                         language,
@@ -150,9 +151,8 @@ export function AIChatPageBar() {
                     onSubmit={ask}
                     className={tcls(
                         // The send button is overlaid, so the textarea spans the full width and scrolls at the right edge.
-                        'bg-tint-base/9 pl-3 text-sm contrast-more:bg-tint-base [&_textarea]:max-h-32 [&_textarea]:pr-9',
-                        // A larger field on small screens; iOS also zooms the page when focusing text under 16px.
-                        'max-lg:p-3 max-lg:pl-4 max-lg:text-base max-lg:[&_textarea]:-m-3 max-lg:[&_textarea]:p-3 max-lg:[&_textarea]:pr-12',
+                        // text-base because iOS zooms the page when focusing a field with text under 16px.
+                        'bg-tint-base/9 pl-4 text-base contrast-more:bg-tint-base [&_textarea]:max-h-32 [&_textarea]:pr-12',
                         // The larger shadow would be cut off at the bottom edge of a small screen.
                         showSuggestions ? null : 'shadow-lg backdrop-blur-lg max-lg:shadow-sm'
                     )}
@@ -165,7 +165,7 @@ export function AIChatPageBar() {
                     label={tString(language, 'send')}
                     disabled={!value.trim()}
                     onClick={() => ask(value)}
-                    className="max-lg:bottom-2.25 max-lg:right-2.25 absolute bottom-1.5 right-1.5 max-lg:p-1.5"
+                    className="bottom-2.25 right-2.25 absolute p-1.5"
                 />
             </div>
             <div ref={restRef} />
