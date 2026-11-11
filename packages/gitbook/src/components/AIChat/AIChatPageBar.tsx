@@ -75,12 +75,14 @@ export function AIChatPageBar() {
         <div
             className={tcls(
                 'sticky bottom-6 z-30 mx-auto mt-8 max-w-full transition-[width] duration-300 ease-out motion-reduce:transition-none chat-open:hidden print:hidden',
+                // Mobile browsers already inset the viewport's bottom edge for their own toolbar.
+                'max-md:bottom-[max(env(safe-area-inset-bottom),0.75rem)]',
                 expanded ? 'w-[42rem]' : 'w-[28rem]'
             )}
         >
             {showSuggestions ? (
-                // The input stays in flow on top of the card, so focusing it never moves it; pb-13 leaves its room.
-                <div className="pb-13 absolute -inset-x-2 -bottom-2 flex flex-col border border-tint bg-tint-base p-2 shadow-lg rounded-corners:rounded-[1.25rem] circular-corners:rounded-[1.75rem]">
+                // The input stays in flow on top of the card, so focusing it never moves it; the bottom padding leaves its room.
+                <div className="pb-13 pointer-coarse:pb-14 absolute -inset-x-2 -bottom-2 flex flex-col border border-tint bg-tint-base p-2 shadow-lg rounded-corners:rounded-[1.25rem] circular-corners:rounded-[1.75rem]">
                     {suggestions.map((question, index) => (
                         <Button
                             key={question}
@@ -134,6 +136,8 @@ export function AIChatPageBar() {
                 className={tcls(
                     // The send button is overlaid, so the textarea spans the full width and scrolls at the right edge.
                     'bg-tint-base/9 pl-3 text-sm contrast-more:bg-tint-base [&_textarea]:max-h-32 [&_textarea]:pr-9',
+                    // iOS zooms the page when focusing a field with text under 16px.
+                    'pointer-coarse:text-base',
                     showSuggestions ? null : 'shadow-lg backdrop-blur-lg'
                 )}
             />
@@ -145,7 +149,7 @@ export function AIChatPageBar() {
                 label={tString(language, 'send')}
                 disabled={!value.trim()}
                 onClick={() => ask(value)}
-                className="absolute bottom-1.5 right-1.5"
+                className="pointer-coarse:bottom-1.75 pointer-coarse:right-1.75 absolute bottom-1.5 right-1.5"
             />
         </div>
     );
