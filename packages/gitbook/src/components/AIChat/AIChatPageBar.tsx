@@ -140,7 +140,8 @@ export function AIChatPageBar() {
                     'bg-tint-base/9 pl-3 text-sm contrast-more:bg-tint-base [&_textarea]:max-h-32 [&_textarea]:pr-9',
                     // A larger field on small screens; iOS also zooms the page when focusing text under 16px.
                     'max-lg:p-3 max-lg:pl-4 max-lg:text-base max-lg:[&_textarea]:-m-3 max-lg:[&_textarea]:p-3 max-lg:[&_textarea]:pr-12',
-                    showSuggestions ? null : 'shadow-lg backdrop-blur-lg'
+                    // The larger shadow would be cut off at the bottom edge of a small screen.
+                    showSuggestions ? null : 'shadow-lg backdrop-blur-lg max-lg:shadow-sm'
                 )}
             />
             <Button
