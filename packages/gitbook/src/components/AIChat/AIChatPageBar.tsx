@@ -76,13 +76,15 @@ export function AIChatPageBar() {
             className={tcls(
                 'sticky bottom-6 z-30 mx-auto mt-8 max-w-full transition-[width] duration-300 ease-out motion-reduce:transition-none chat-open:hidden print:hidden',
                 // Mobile browsers already inset the viewport's bottom edge for their own toolbar.
-                'max-md:bottom-[max(env(safe-area-inset-bottom),0.75rem)]',
+                'max-lg:bottom-(--bar-bottom) max-lg:[--bar-bottom:max(env(safe-area-inset-bottom),0.75rem)]',
                 expanded ? 'w-[42rem]' : 'w-[28rem]'
             )}
         >
+            {/* On small screens the page would show all around the bar, so a strip of its background sits behind it. */}
+            <div className="site-background -bottom-(--bar-bottom) mask-t-from-[calc(100%-1.5rem)] absolute -top-8 left-1/2 -z-10 w-screen -translate-x-1/2 lg:hidden" />
             {showSuggestions ? (
                 // The input stays in flow on top of the card, so focusing it never moves it; the bottom padding leaves its room.
-                <div className="pb-13 pointer-coarse:pb-14 absolute -inset-x-2 -bottom-2 flex flex-col border border-tint bg-tint-base p-2 shadow-lg rounded-corners:rounded-[1.25rem] circular-corners:rounded-[1.75rem]">
+                <div className="pb-13 absolute -inset-x-2 -bottom-2 flex flex-col border border-tint bg-tint-base p-2 shadow-lg rounded-corners:rounded-[1.25rem] circular-corners:rounded-[1.75rem] max-lg:pb-16">
                     {suggestions.map((question, index) => (
                         <Button
                             key={question}
@@ -136,8 +138,8 @@ export function AIChatPageBar() {
                 className={tcls(
                     // The send button is overlaid, so the textarea spans the full width and scrolls at the right edge.
                     'bg-tint-base/9 pl-3 text-sm contrast-more:bg-tint-base [&_textarea]:max-h-32 [&_textarea]:pr-9',
-                    // iOS zooms the page when focusing a field with text under 16px.
-                    'pointer-coarse:text-base',
+                    // A larger field on small screens; iOS also zooms the page when focusing text under 16px.
+                    'max-lg:p-3 max-lg:pl-4 max-lg:text-base max-lg:[&_textarea]:-m-3 max-lg:[&_textarea]:p-3 max-lg:[&_textarea]:pr-12',
                     showSuggestions ? null : 'shadow-lg backdrop-blur-lg'
                 )}
             />
@@ -149,7 +151,7 @@ export function AIChatPageBar() {
                 label={tString(language, 'send')}
                 disabled={!value.trim()}
                 onClick={() => ask(value)}
-                className="pointer-coarse:bottom-1.75 pointer-coarse:right-1.75 absolute bottom-1.5 right-1.5"
+                className="max-lg:bottom-2.25 max-lg:right-2.25 absolute bottom-1.5 right-1.5 max-lg:p-1.5"
             />
         </div>
     );
