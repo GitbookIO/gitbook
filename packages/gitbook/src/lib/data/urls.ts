@@ -10,7 +10,7 @@ import { DataFetcherError, getExposableError } from './errors';
 const INTERNAL_PATHS = [
     // Simple `~gitbook` endpoints. `image`, `__evt` and `visitor` are served by the middleware
     // before the lookup, but are listed so this stays a complete registry.
-    /^~gitbook\/(pdf|search|icon|site-index|image|__evt|visitor)$/,
+    /^~gitbook\/(pdf|search|search-prewarm|icon|site-index|image|__evt|visitor)$/,
     /^~gitbook\/ogimage\/[^/]+$/,
     /^~gitbook\/auth\/(login|logout)$/,
     /^~gitbook\/oauth2\/v1\/[^/]+\/authorize$/,
