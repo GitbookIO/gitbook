@@ -814,103 +814,135 @@ html:has(.zoom-modal) {
 /*
  * Reduced motion keeps the fades and drops the movement. Redefining the keyframes rather than
  * disabling the animations keeps their duration, so code waiting on `animationend` is unaffected.
+ * Each variant keeps the identity transform and filter of the full animation's end state: with
+ * `fill-mode: both` they persist, and dropping them would change stacking and text rasterization.
  */
 @media (prefers-reduced-motion: reduce) {
   @keyframes present {
     from {
       opacity: 0;
+      transform: translateY(0) scale(1);
     }
     to {
       opacity: 1;
+      transform: translateY(0) scale(1);
     }
   }
   @keyframes scaleIn {
     from {
       opacity: 0;
+      transform: rotateX(0deg) scale(1);
     }
     to {
       opacity: 1;
+      transform: rotateX(0deg) scale(1);
     }
   }
   @keyframes scaleOut {
     from {
       opacity: 1;
+      transform: rotateX(0deg) scale(1);
     }
     to {
       opacity: 0;
+      transform: rotateX(0deg) scale(1);
     }
   }
   @keyframes blurIn {
     from {
+      filter: blur(0px);
       opacity: 0;
+      transform: scale(1);
     }
     to {
+      filter: blur(0px);
       opacity: 1;
+      transform: scale(1);
     }
   }
   @keyframes blurOut {
     from {
+      filter: blur(0px);
       opacity: 1;
+      transform: scale(1);
     }
     to {
+      filter: blur(0px);
       opacity: 0;
+      transform: scale(1);
     }
   }
   @keyframes blurInDisplay {
     from {
+      filter: blur(0px);
       opacity: 0;
+      transform: scale(1);
       display: none;
     }
     to {
+      filter: blur(0px);
       opacity: 1;
+      transform: scale(1);
     }
   }
   @keyframes blurOutDisplay {
     from {
+      filter: blur(0px);
       opacity: 1;
+      transform: scale(1);
     }
     to {
+      filter: blur(0px);
       opacity: 0;
+      transform: scale(1);
       display: none;
     }
   }
   @keyframes enterFromLeft {
     from {
       opacity: 0;
+      transform: translateX(0);
       display: none;
     }
     to {
       opacity: 1;
+      transform: translateX(0);
       display: flex;
     }
   }
   @keyframes enterFromRight {
     from {
       opacity: 0;
+      transform: translateX(0);
       display: none;
     }
     to {
       opacity: 1;
+      transform: translateX(0);
       display: flex;
     }
   }
   @keyframes exitToLeft {
     from {
       opacity: 1;
+      transform: translateX(0);
       display: flex;
     }
     to {
       opacity: 0;
+      transform: translateX(0);
       display: none;
     }
   }
   @keyframes exitToRight {
     from {
       opacity: 1;
+      transform: translateX(0);
       display: flex;
     }
     to {
       opacity: 0;
+      transform: translateX(0);
       display: none;
     }
   }
