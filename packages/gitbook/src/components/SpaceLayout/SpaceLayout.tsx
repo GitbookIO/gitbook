@@ -162,8 +162,8 @@ export function SpaceLayout(props: SpaceLayoutProps) {
                         // Ensure the footer is display below the viewport even if the content is not enough
                         withTopHeader
                             ? [
-                                  'site-header:min-h-[calc(100vh-65px)]',
-                                  'site-header-sections:min-h-[calc(100vh-109px)]',
+                                  'site-header:min-h-[calc(100dvh-65px)]',
+                                  'site-header-sections:min-h-[calc(100dvh-109px)]',
                               ]
                             : 'lg:min-h-screen'
                     )}

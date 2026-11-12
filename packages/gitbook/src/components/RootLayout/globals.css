@@ -34,7 +34,6 @@
 @utility hide-scrollbar {
   /* Hide scrollbar by default */
   scrollbar-color: transparent transparent;
-  transition: scrollbar-color 0.2s ease-in-out;
 
   &:hover {
     /* Show scrollbar on hover */
@@ -679,5 +678,277 @@ html:has(.zoom-modal) {
     & div > *:nth-child(n + 6) {
       display: flex;
     }
+  }
+}
+
+/* Enter and exit animations, referenced by the `animation` theme in tailwind.config.ts. */
+@keyframes present {
+  from {
+    opacity: 0;
+    transform: translateY(1rem) scale(90%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: rotateX(-10deg) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: rotateX(0deg) scale(1);
+  }
+}
+@keyframes scaleOut {
+  from {
+    opacity: 1;
+    transform: rotateX(0deg) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: rotateX(-10deg) scale(0.95);
+  }
+}
+@keyframes blurIn {
+  0% {
+    filter: blur(6px);
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  100% {
+    filter: blur(0px);
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@keyframes blurOut {
+  0% {
+    filter: blur(0px);
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    filter: blur(6px);
+    opacity: 0;
+    transform: scale(0.95);
+  }
+}
+@keyframes blurInDisplay {
+  0% {
+    filter: blur(6px);
+    opacity: 0;
+    transform: scale(0.95);
+    display: none;
+  }
+  100% {
+    filter: blur(0px);
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@keyframes blurOutDisplay {
+  0% {
+    filter: blur(0px);
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    filter: blur(6px);
+    opacity: 0;
+    transform: scale(0.95);
+    display: none;
+  }
+}
+@keyframes enterFromLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-50%);
+    display: none;
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+    display: flex;
+  }
+}
+@keyframes enterFromRight {
+  from {
+    opacity: 0;
+    transform: translateX(50%);
+    display: none;
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+    display: flex;
+  }
+}
+@keyframes exitToLeft {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+    display: flex;
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-50%);
+    display: none;
+  }
+}
+@keyframes exitToRight {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+    display: flex;
+  }
+  to {
+    opacity: 0;
+    transform: translateX(50%);
+    display: none;
+  }
+}
+
+/*
+ * Reduced motion keeps the fades and drops the movement. Redefining the keyframes rather than
+ * disabling the animations keeps their duration, so code waiting on `animationend` is unaffected.
+ * Each variant keeps the identity transform and filter of the full animation's end state: with
+ * `fill-mode: both` they persist, and dropping them would change stacking and text rasterization.
+ */
+@media (prefers-reduced-motion: reduce) {
+  @keyframes present {
+    from {
+      opacity: 0;
+      transform: translateY(0) scale(1);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+  @keyframes scaleIn {
+    from {
+      opacity: 0;
+      transform: rotateX(0deg) scale(1);
+    }
+    to {
+      opacity: 1;
+      transform: rotateX(0deg) scale(1);
+    }
+  }
+  @keyframes scaleOut {
+    from {
+      opacity: 1;
+      transform: rotateX(0deg) scale(1);
+    }
+    to {
+      opacity: 0;
+      transform: rotateX(0deg) scale(1);
+    }
+  }
+  @keyframes blurIn {
+    from {
+      filter: blur(0px);
+      opacity: 0;
+      transform: scale(1);
+    }
+    to {
+      filter: blur(0px);
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+  @keyframes blurOut {
+    from {
+      filter: blur(0px);
+      opacity: 1;
+      transform: scale(1);
+    }
+    to {
+      filter: blur(0px);
+      opacity: 0;
+      transform: scale(1);
+    }
+  }
+  @keyframes blurInDisplay {
+    from {
+      filter: blur(0px);
+      opacity: 0;
+      transform: scale(1);
+      display: none;
+    }
+    to {
+      filter: blur(0px);
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+  @keyframes blurOutDisplay {
+    from {
+      filter: blur(0px);
+      opacity: 1;
+      transform: scale(1);
+    }
+    to {
+      filter: blur(0px);
+      opacity: 0;
+      transform: scale(1);
+      display: none;
+    }
+  }
+  @keyframes enterFromLeft {
+    from {
+      opacity: 0;
+      transform: translateX(0);
+      display: none;
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+      display: flex;
+    }
+  }
+  @keyframes enterFromRight {
+    from {
+      opacity: 0;
+      transform: translateX(0);
+      display: none;
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+      display: flex;
+    }
+  }
+  @keyframes exitToLeft {
+    from {
+      opacity: 1;
+      transform: translateX(0);
+      display: flex;
+    }
+    to {
+      opacity: 0;
+      transform: translateX(0);
+      display: none;
+    }
+  }
+  @keyframes exitToRight {
+    from {
+      opacity: 1;
+      transform: translateX(0);
+      display: flex;
+    }
+    to {
+      opacity: 0;
+      transform: translateX(0);
+      display: none;
+    }
+  }
+
+  /* A loader must keep showing activity, so it slows down instead of stopping. */
+  .animate-spin {
+    animation-duration: 3s;
   }
 }
