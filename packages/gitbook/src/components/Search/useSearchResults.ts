@@ -8,26 +8,15 @@ import {
     createRecommendedQuestionResult,
     getEmptySearchResults,
 } from './empty-search-results';
-import { computeFilterSiteSpaceIds } from './filter';
+import { computeFilterSiteSpaceIds, filterResultsBySiteSpaces } from './filter';
 import { useRecentSearchQueries } from './recent-queries';
-import { type MergedPageResult, fuseSearchResults } from './reciprocalRankFusion';
 import { computeRemoteSearchScope } from './remote-scope';
 import type { OrderedComputedResult, SearchSiteContentScope } from './search-types';
 import { streamRecommendedQuestions } from './server-actions';
-import { type LocalPageResult, useLocalSearchResults } from './useLocalSearchResults';
 import type { SearchScope } from './useSearch';
 import { useAI } from '@/components/AI';
 
-export type ResultType =
-    | OrderedComputedResult
-    | LocalPageResult
-    | MergedPageResult
-    | RecommendedQuestionResult;
-
-export type { LocalPageResult, MergedPageResult };
-
-// Small helper extracted for unit testing of scope → local filter mapping
-// computeFilterSiteSpaceIds is imported from './filter' for testability
+export type ResultType = OrderedComputedResult | RecommendedQuestionResult;
 
 /**
  * We cache the recommended questions globally to avoid calling the API multiple times
@@ -40,8 +29,6 @@ const cachedRecommendedQuestions: Map<string, RecommendedQuestionResult[]> = new
 export function useSearchResults(props: {
     asEmbeddable?: boolean;
     disabled: boolean;
-    /** Whether the search surface is open. Gates building the local search index. */
-    open: boolean;
     query: string;
     siteSpaceId: string;
     siteSpaceIds: string[];
@@ -50,17 +37,12 @@ export function useSearchResults(props: {
     suggestions?: string[];
     /** URL for the search API route (e.g. from linker.toPathInSpace('~gitbook/search')). */
     searchURL: string;
-    /** URL for the local index JSON (e.g. from linker.toPathInSite('~gitbook/site-index')). */
-    indexURL: string;
-    /** BCP-47 language code of the current site space, used to filter local search results. */
-    lang?: string;
-    /** Whether the site has multiple sections. If false, treat default scope as current for local filtering. */
+    /** Whether the site has multiple sections. If false, the default scope only shows the current site space. */
     withSections?: boolean;
 }) {
     const {
         asEmbeddable,
         disabled,
-        open,
         query,
         siteSpaceId,
         siteSpaceIds,
@@ -68,8 +50,6 @@ export function useSearchResults(props: {
         scope,
         suggestions,
         searchURL,
-        indexURL,
-        lang,
         withSections,
     } = props;
 
@@ -86,15 +66,6 @@ export function useSearchResults(props: {
             ),
         [scope, siteSpaceId, siteSpaceIds, withSections, selectedSectionSiteSpaceIds]
     );
-
-    const { results: localResults } = useLocalSearchResults({
-        query,
-        indexURL,
-        lang,
-        disabled,
-        open,
-        filterSiteSpaceIds,
-    });
 
     const [remoteState, setRemoteState] = React.useState<{
         results: OrderedComputedResult[];
@@ -295,8 +266,6 @@ export function useSearchResults(props: {
         setRemoteState((prev) => (prev.fetching ? { ...prev, fetching: false } : prev));
     }, []);
 
-    // Merge local and remote results.
-    // Re-runs immediately whenever either result set changes.
     const results = React.useMemo<ResultType[]>(() => {
         if (!query) {
             const recommendedQuestions =
@@ -313,14 +282,8 @@ export function useSearchResults(props: {
             });
         }
 
-        return fuseSearchResults({
-            localResults,
-            remoteResults: remoteState.results,
-            query,
-            allowedSiteSpaceIds: filterSiteSpaceIds,
-        });
+        return filterResultsBySiteSpaces(remoteState.results, filterSiteSpaceIds);
     }, [
-        localResults,
         remoteState.results,
         query,
         filterSiteSpaceIds,

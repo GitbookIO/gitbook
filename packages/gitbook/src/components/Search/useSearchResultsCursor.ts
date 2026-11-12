@@ -2,11 +2,12 @@ import React from 'react';
 
 export function useSearchResultsCursor(props: {
     query: string;
+    fetching: boolean;
     resultCount: number;
     totalCount: number;
 }) {
     const [cursor, setCursor] = React.useState<number | null>(null);
-    const { query, resultCount, totalCount } = props;
+    const { query, fetching, resultCount, totalCount } = props;
 
     React.useEffect(() => {
         if (!query) {
@@ -16,6 +17,12 @@ export function useSearchResultsCursor(props: {
     }, [query]);
 
     React.useEffect(() => {
+        if (fetching && resultCount === 0) {
+            // Nothing is highlighted while results load, so Enter can't open the wrong row.
+            setCursor(null);
+            return;
+        }
+
         if (totalCount === 0) {
             return;
         }
@@ -27,7 +34,7 @@ export function useSearchResultsCursor(props: {
 
             return prev ?? 0;
         });
-    }, [resultCount, totalCount]);
+    }, [fetching, resultCount, totalCount]);
 
     React.useEffect(() => {
         setCursor((prev) => {

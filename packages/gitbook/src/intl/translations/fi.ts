@@ -42,8 +42,6 @@ export const fi: TranslationLanguage = {
     search_ask_no_answer:
         'Kysymykseesi ei löytynyt vastausta. Voit yrittää muotoilla sen uudelleen tai olla tarkempi.',
     search_ask_error: 'Jokin meni pieleen. Yritä myöhemmin uudelleen.',
-    search_partial_error:
-        'Joitakin tuloksia ei voitu ladata. Näytetään saatavilla olevat tulokset.',
     on_this_page: 'Tällä sivulla',
     next_page: 'Seuraava',
     previous_page: 'Edellinen',

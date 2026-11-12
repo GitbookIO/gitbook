@@ -75,14 +75,16 @@ function useFilteredSiteSpaceIds(props: {
 function useSearchKeyboardNavigation(props: {
     query: string;
     results: ReturnType<typeof useSearchResults>['results'];
+    fetching: boolean;
     resultsRef: React.RefObject<SearchResultsRef | null>;
     abort: () => void;
     askCount: number;
     onAskSelect: (index: number) => void;
 }) {
-    const { query, results, resultsRef, abort, askCount, onAskSelect } = props;
+    const { query, results, fetching, resultsRef, abort, askCount, onAskSelect } = props;
     const { cursor, moveBy: moveCursorBy } = useSearchResultsCursor({
         query,
+        fetching,
         resultCount: results.length,
         totalCount: results.length + askCount,
     });
@@ -131,7 +133,6 @@ export function useSearchController(
         withSections,
         siteSpaces,
         searchURL,
-        indexURL,
     } = props;
 
     const { assistants, config } = useAI();
@@ -251,7 +252,6 @@ export function useSearchController(
     const { results, fetching, error, abort } = useSearchResults({
         asEmbeddable,
         disabled: !(normalizedQuery || withAI),
-        open: Boolean(state?.open),
         query: normalizedQuery,
         siteSpaceId: siteSpace.id,
         siteSpaceIds,
@@ -259,8 +259,6 @@ export function useSearchController(
         scope: state?.scope ?? 'default',
         suggestions: config.suggestions,
         searchURL,
-        indexURL,
-        lang: siteSpace.space.language,
         withSections,
     });
 
@@ -305,6 +303,7 @@ export function useSearchController(
     const { cursor, onInputKeyDown } = useSearchKeyboardNavigation({
         query: normalizedQuery,
         results,
+        fetching,
         resultsRef,
         abort,
         askCount,
