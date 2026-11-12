@@ -22,7 +22,7 @@ const POPUP_OFFSET = 4;
 const OPEN_DELAY_MS = 200;
 const MOTION = 'duration-300 ease-[cubic-bezier(0.83,0,0.17,1)]';
 // Bounds the scrolling content too: the popup settles at `height: auto`, so `h-full` doesn't.
-const MAX_POPUP_HEIGHT = 'max-h-[calc(100vh-8rem)]';
+const MAX_POPUP_HEIGHT = 'max-h-[calc(100dvh-8rem)]';
 const MAX_ITEMS_PER_COLUMN = 10; // number of items per column
 const GROUP_MASONRY_THRESHOLD = 3; // if a section group has more than this many child groups, it will be shown in a masonry grid
 const COLUMN_WIDTH = '18rem';

@@ -129,7 +129,7 @@
 .contentkit-modal {
     @apply flex flex-col gap-6 relative z-50 bg-tint
         rounded shadow-lg opacity-0 transition-opacity duration-300 border border-tint
-        w-full max-w-[768px] max-h-[90vh] overflow-y-auto;
+        w-full max-w-[768px] max-h-[90dvh] overflow-y-auto;
 }
 .contentkit-modal.contentkit-modal-opened {
     @apply opacity-[1];

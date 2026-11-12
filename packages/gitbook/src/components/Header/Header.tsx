@@ -55,6 +55,8 @@ export async function Header(props: {
                 'flex-none',
                 'shadow-[0px_1px_0px]',
                 'shadow-tint-12/2',
+                // Box shadows are dropped in forced colors mode, the separator needs a real border.
+                'forced-colors:border-b',
 
                 'bg-tint-base/9',
                 'theme-muted:bg-tint-subtle/9',
