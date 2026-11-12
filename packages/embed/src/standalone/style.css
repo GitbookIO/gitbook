@@ -158,7 +158,7 @@
     z-index: 9998;
     width: calc(min(var(--gitbook-widget-window-width), calc(100vw - var(--gitbook-widget-right) - var(--gitbook-widget-left))));
     height: calc(min(var(--gitbook-widget-window-height), calc(100vh - var(--gitbook-widget-window-bottom) - var(--gitbook-widget-top))));
-    /* The host page can run on any browser: `vh` above stays as the fallback. */
+    /* stylelint-disable-next-line plugin/no-unsupported-browser-features -- the `vh` declaration above is the fallback on host pages whose browser lacks `dvh` */
     height: calc(min(var(--gitbook-widget-window-height), calc(100dvh - var(--gitbook-widget-window-bottom) - var(--gitbook-widget-top))));
     background-color: var(--gitbook-widget-background-translucent);
     backdrop-filter: blur(48px);
