@@ -31,6 +31,7 @@ interface PageCoverImageProps {
 
 export function PageCoverImage(props: PageCoverImageProps) {
     const { imgs, y, height, mask, priorityTheme = 'light' } = props;
+    // The light cover is never demoted to low: a visitor can still have switched to the light theme.
     const darkFirst = priorityTheme === 'dark' && Boolean(imgs.dark);
     const { objectPositionY, isLoading } = useCoverPosition(imgs, y, {
         height,
@@ -51,7 +52,7 @@ export function PageCoverImage(props: PageCoverImageProps) {
                 src={imgs.light.src}
                 srcSet={imgs.light.srcSet}
                 sizes={imgs.light.sizes}
-                fetchPriority={darkFirst ? 'low' : 'high'}
+                fetchPriority={darkFirst ? 'auto' : 'high'}
                 alt="Page cover"
                 className={tcls('w-full', 'object-cover', imgs.dark ? 'dark:hidden' : '')}
                 style={{

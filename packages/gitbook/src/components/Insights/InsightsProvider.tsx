@@ -252,7 +252,6 @@ function sendEvents(args: { eventUrl: string; events: api.SiteInsightsEvent[] })
             'Content-Type': 'application/json',
         },
         keepalive: true,
-        priority: 'low',
         body: JSON.stringify({
             events,
         }),

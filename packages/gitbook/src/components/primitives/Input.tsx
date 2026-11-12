@@ -167,9 +167,13 @@ export const Input = React.forwardRef<InputElement, InputProps>((props, passedRe
 
         if (multiline && resize && ref.current) {
             // TODO: replace with `field-sizing: content` when more broadly supported. https://caniuse.com/?search=field-sizing
-            // Measure with the height reset, otherwise scrollHeight never shrinks below the current height.
+            // scrollHeight never goes below the current height, so shrinking needs a measure with the
+            // height reset. Only done on deletion: collapsing the field can shift the page scroll.
             const previousHeight = ref.current.style.height;
-            ref.current.style.height = 'auto';
+            const isShrinking = newValue.length < value.length;
+            if (isShrinking) {
+                ref.current.style.height = 'auto';
+            }
             const nextHeight = ref.current.scrollHeight;
             ref.current.style.height = previousHeight;
             setHeight(nextHeight);
