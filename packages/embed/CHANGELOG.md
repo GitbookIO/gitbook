@@ -1,5 +1,11 @@
 # @gitbook/embed
 
+## 0.7.0
+
+### Minor Changes
+
+- 31e88d1: Relicense under Apache 2.0 and drop the dependency on `@gitbook/icons`.
+
 ## 0.6.0
 
 ### Minor Changes
