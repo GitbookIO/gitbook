@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import React, { useEffect, useRef } from 'react';
 import { createStore, useStore } from 'zustand';
 
+import type { GitBookIntegrationTool } from '@gitbook/browser-types';
 import type { GitBookEmbeddableConfiguration, ParentToFrameMessage } from '@gitbook/embed';
 
 import { integrationsAssistantTools } from '../Integrations';
@@ -107,7 +108,8 @@ export function EmbeddableIframeAPI(props: { baseURL: string }) {
                     const { settings } = message;
                     embeddableConfiguration.setState(settings);
                     integrationsAssistantTools.setState({
-                        tools: settings.tools,
+                        // The embed types icons as plain strings to avoid depending on @gitbook/icons.
+                        tools: settings.tools as GitBookIntegrationTool[],
                     });
 
                     const defaultPage =

@@ -1,5 +1,10 @@
 import type { AIToolCallResult, AIToolDefinition } from '@gitbook/api';
-import type { IconName } from '@gitbook/icons';
+
+/**
+ * Name of a Font Awesome icon (e.g. `bolt`), or a GitBook custom icon.
+ */
+// Kept as a plain string so the package doesn't depend on @gitbook/icons and its licence.
+type IconName = string;
 
 /**
  * Confirmation action to be displayed to the user before executing a tool.
