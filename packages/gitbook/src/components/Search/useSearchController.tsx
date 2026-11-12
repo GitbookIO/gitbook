@@ -131,6 +131,7 @@ export function useSearchController(
         withSections,
         siteSpaces,
         searchURL,
+        directSearch,
         indexURL,
     } = props;
 
@@ -259,6 +260,7 @@ export function useSearchController(
         scope: state?.scope ?? 'default',
         suggestions: config.suggestions,
         searchURL,
+        directSearch,
         indexURL,
         lang: siteSpace.space.language,
         withSections,

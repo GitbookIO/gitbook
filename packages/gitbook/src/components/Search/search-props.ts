@@ -2,6 +2,8 @@ import type { SiteExternalLink, SiteSection, SiteSectionGroup, SiteSpace } from 
 
 import { hasMultipleSiteSections } from '../SiteSections';
 import type { GitBookSiteContext } from '@/lib/context';
+import { getSearchSpaceLookup } from '@/lib/search';
+import type { DirectSearchProps } from '@/lib/search-results';
 import { getLocalizedTitle } from '@/lib/sites';
 
 export type SearchSection = Pick<SiteSection, 'id' | 'icon' | 'object'> & {
@@ -27,6 +29,7 @@ export interface SearchBaseProps {
     withSiteVariants: boolean;
     indexURL: string;
     searchURL: string;
+    directSearch?: DirectSearchProps;
 }
 
 export function getSearchBaseProps(context: GitBookSiteContext): SearchBaseProps {
@@ -38,6 +41,9 @@ export function getSearchBaseProps(context: GitBookSiteContext): SearchBaseProps
 
     return {
         searchURL: context.linker.toPathInSpace('~gitbook/search'),
+        directSearch: context.directSearch
+            ? { ...context.directSearch, spaces: getSearchSpaceLookup(context.structure) }
+            : undefined,
         section,
         sections,
         siteSpace,

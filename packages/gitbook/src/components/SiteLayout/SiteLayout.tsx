@@ -65,11 +65,16 @@ export async function SiteLayout(props: {
     const scripts = withTracking ? context.scripts : [];
 
     // React dedupes preconnects by href, so reduce to the origin; relative URLs are same-origin.
-    [GITBOOK_API_PUBLIC_URL, GITBOOK_ICONS_URL, GITBOOK_ASSETS_URL].forEach((url) => {
+    [GITBOOK_ICONS_URL, GITBOOK_ASSETS_URL].forEach((url) => {
         if (url && URL.canParse(url)) {
             ReactDOM.preconnect(new URL(url).origin);
         }
     });
+    // Search queries the API with a CORS fetch without credentials, which only reuses an
+    // anonymous connection.
+    if (URL.canParse(GITBOOK_API_PUBLIC_URL)) {
+        ReactDOM.preconnect(new URL(GITBOOK_API_PUBLIC_URL).origin, { crossOrigin: 'anonymous' });
+    }
 
     // Start the search-index download from the HTML itself. `crossOrigin` must match the
     // client `fetch()` (cors + same-origin credentials) or the preload is ignored and the

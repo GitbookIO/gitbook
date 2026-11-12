@@ -1,6 +1,9 @@
 import { readStreamableValue } from 'ai/rsc';
+import { jwtDecode } from 'jwt-decode';
 import React from 'react';
 import { assert } from 'ts-essentials';
+
+import type { SearchRecordResult, SearchSpaceResult } from '@gitbook/api';
 
 import { useTrackEvent } from '../Insights';
 import {
@@ -13,10 +16,19 @@ import { useRecentSearchQueries } from './recent-queries';
 import { type MergedPageResult, fuseSearchResults } from './reciprocalRankFusion';
 import { computeRemoteSearchScope } from './remote-scope';
 import type { OrderedComputedResult, SearchSiteContentScope } from './search-types';
+import { getSearchSpikeOverrides } from './searchSpikeOverrides';
 import { streamRecommendedQuestions } from './server-actions';
 import { type LocalPageResult, useLocalSearchResults } from './useLocalSearchResults';
 import type { SearchScope } from './useSearch';
 import { useAI } from '@/components/AI';
+import { getEmbeddableLinker } from '@/lib/embeddable-linker';
+import { createSiteLinker } from '@/lib/links';
+import { removeTrailingSlash } from '@/lib/paths';
+import {
+    type DirectSearchProps,
+    computePublishedSearchResults,
+    toSearchSiteContentBody,
+} from '@/lib/search-results';
 
 export type ResultType =
     | OrderedComputedResult
@@ -28,6 +40,9 @@ export type { LocalPageResult, MergedPageResult };
 
 // Small helper extracted for unit testing of scope → local filter mapping
 // computeFilterSiteSpaceIds is imported from './filter' for testability
+
+/** Delay between the last keystroke and the remote search request. */
+const SEARCH_DEBOUNCE_MS = 200;
 
 /**
  * We cache the recommended questions globally to avoid calling the API multiple times
@@ -50,6 +65,8 @@ export function useSearchResults(props: {
     suggestions?: string[];
     /** URL for the search API route (e.g. from linker.toPathInSpace('~gitbook/search')). */
     searchURL: string;
+    /** Target to query the search API directly from the browser, when the page allows it. */
+    directSearch?: DirectSearchProps;
     /** URL for the local index JSON (e.g. from linker.toPathInSite('~gitbook/site-index')). */
     indexURL: string;
     /** BCP-47 language code of the current site space, used to filter local search results. */
@@ -68,6 +85,7 @@ export function useSearchResults(props: {
         scope,
         suggestions,
         searchURL,
+        directSearch,
         indexURL,
         lang,
         withSections,
@@ -208,10 +226,15 @@ export function useSearchResults(props: {
         let cancelled = false;
         const abortController = new AbortController();
         const timeout = setTimeout(async () => {
-            const fetchSearch = (
-                scope: Parameters<typeof fetchSearchResults>[1]
-            ): Promise<OrderedComputedResult[]> =>
-                fetchSearchResults(searchURL, scope, query, abortController.signal, asEmbeddable);
+            const fetchSearch = (scope: SearchSiteContentScope): Promise<OrderedComputedResult[]> =>
+                fetchSearchResults({
+                    searchURL,
+                    directSearch,
+                    scope,
+                    query,
+                    signal: abortController.signal,
+                    asEmbeddable,
+                });
 
             try {
                 const resultsPromise = fetchSearch(
@@ -261,7 +284,7 @@ export function useSearchResults(props: {
                     error: true,
                 });
             }
-        }, 200);
+        }, getSearchSpikeOverrides().debounceMs ?? SEARCH_DEBOUNCE_MS);
 
         abortRef.current = () => {
             cancelled = true;
@@ -286,6 +309,7 @@ export function useSearchResults(props: {
         disabled,
         suggestions,
         searchURL,
+        directSearch,
         asEmbeddable,
     ]);
 
@@ -339,13 +363,106 @@ export function useSearchResults(props: {
 }
 
 /**
+ * Fetch search results from the search API, or from the search route when the page can't query it.
+ */
+async function fetchSearchResults(input: {
+    searchURL: string;
+    directSearch: DirectSearchProps | undefined;
+    scope: SearchSiteContentScope;
+    query: string;
+    signal: AbortSignal;
+    asEmbeddable: boolean | undefined;
+}): Promise<OrderedComputedResult[]> {
+    const { searchURL, directSearch, scope, query, signal, asEmbeddable } = input;
+
+    if (directSearch && canSearchDirectly(directSearch)) {
+        try {
+            return await fetchDirectSearchResults({
+                directSearch,
+                scope,
+                query,
+                signal,
+                asEmbeddable: Boolean(asEmbeddable),
+            });
+        } catch (error) {
+            if (signal.aborted) {
+                throw error;
+            }
+        }
+    }
+
+    return fetchRouteSearchResults(searchURL, scope, query, signal, asEmbeddable);
+}
+
+function canSearchDirectly(directSearch: DirectSearchProps): boolean {
+    if (getSearchSpikeOverrides().direct === false) {
+        return false;
+    }
+
+    try {
+        const { exp } = jwtDecode<{ exp?: number }>(directSearch.apiToken);
+        // Same margin as the static routes, which stop serving a token this close to expiry.
+        return typeof exp === 'number' && exp > Date.now() / 1000 + 120;
+    } catch {
+        return false;
+    }
+}
+
+async function fetchDirectSearchResults(input: {
+    directSearch: DirectSearchProps;
+    scope: SearchSiteContentScope;
+    query: string;
+    signal: AbortSignal;
+    asEmbeddable: boolean;
+}): Promise<OrderedComputedResult[]> {
+    const { directSearch, scope, query, signal, asEmbeddable } = input;
+    const { apiURL, apiToken, organizationId, siteId, spaces } = directSearch;
+
+    if (query.length <= 1) {
+        return [];
+    }
+
+    const response = await fetch(
+        `${removeTrailingSlash(apiURL)}/v1/orgs/${organizationId}/sites/${siteId}/search`,
+        {
+            method: 'POST',
+            headers: {
+                Authorization: `Bearer ${apiToken}`,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(toSearchSiteContentBody(query, scope)),
+            signal,
+        }
+    );
+
+    if (!response.ok) {
+        throw new Error(`Direct search request failed: ${response.status}`);
+    }
+
+    const data = (await response.json()) as {
+        items?: (SearchSpaceResult | SearchRecordResult)[];
+    };
+    if (!Array.isArray(data?.items)) {
+        throw new Error('Direct search response has no items');
+    }
+
+    const linker = createSiteLinker(directSearch.linker);
+    return computePublishedSearchResults({
+        asEmbeddable,
+        linker: asEmbeddable ? getEmbeddableLinker(linker) : linker,
+        searchResults: data.items,
+        spaces,
+    });
+}
+
+/**
  * Fetch search results from the search API route.
  */
-async function fetchSearchResults(
+async function fetchRouteSearchResults(
     searchURL: string,
     scope: SearchSiteContentScope,
     query: string,
-    signal?: AbortSignal,
+    signal: AbortSignal,
     asEmbeddable?: boolean
 ): Promise<OrderedComputedResult[]> {
     const response = await fetch(searchURL, {
