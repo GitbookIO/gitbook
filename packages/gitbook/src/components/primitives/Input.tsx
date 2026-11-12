@@ -8,6 +8,7 @@ import { useControlledState } from '../hooks/useControlledState';
 import { Button, type ButtonProps } from './Button';
 import { KeyboardShortcut, type KeyboardShortcutProps } from './KeyboardShortcut';
 import { tString, useLanguage } from '@/intl/client';
+import { isComposingKeyEvent } from '@/lib/keyboard';
 import { tcls } from '@/lib/tailwind';
 
 type CustomInputProps = {
@@ -166,8 +167,12 @@ export const Input = React.forwardRef<InputElement, InputProps>((props, passedRe
 
         if (multiline && resize && ref.current) {
             // TODO: replace with `field-sizing: content` when more broadly supported. https://caniuse.com/?search=field-sizing
-            // Reset the height to auto, then set it to the scroll height. If we don't reset, the height will only ever grow.
-            setHeight(ref.current.scrollHeight);
+            // Measure with the height reset, otherwise scrollHeight never shrinks below the current height.
+            const previousHeight = ref.current.style.height;
+            ref.current.style.height = 'auto';
+            const nextHeight = ref.current.scrollHeight;
+            ref.current.style.height = previousHeight;
+            setHeight(nextHeight);
         }
     };
 
@@ -193,12 +198,7 @@ export const Input = React.forwardRef<InputElement, InputProps>((props, passedRe
         // If the user wants to handle the keydown by itself, we let him do it.
         if (event.defaultPrevented) return;
 
-        if (
-            event.key === 'Enter' &&
-            !event.shiftKey &&
-            !event.nativeEvent.isComposing &&
-            hasValue
-        ) {
+        if (event.key === 'Enter' && !event.shiftKey && !isComposingKeyEvent(event) && hasValue) {
             event.preventDefault();
             handleSubmit();
         } else if (event.key === 'Escape') {

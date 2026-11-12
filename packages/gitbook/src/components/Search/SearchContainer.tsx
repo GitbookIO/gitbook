@@ -17,7 +17,7 @@ import { SearchLiveResultsAnnouncer } from './SearchLiveResultsAnnouncer';
 import { SearchScopeControl } from './SearchScopeControl';
 import { useSearchController } from './useSearchController';
 import { useSearchPopupFocusTrap } from './useSearchPopupFocusTrap';
-import { t, useLanguage } from '@/intl/client';
+import { t, tString, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
 
 const SearchFrame = dynamic(() => import('./SearchFrame').then((mod) => mod.SearchFrame), {
@@ -203,6 +203,7 @@ export function SearchContainer({
                     active={isSearchOpen}
                     onClick={open}
                     className={className}
+                    aria-label={tString(language, withSearchAI ? 'search_or_ask' : 'search')}
                     aria-expanded={isSearchOpen}
                     aria-controls={resultsId}
                 />

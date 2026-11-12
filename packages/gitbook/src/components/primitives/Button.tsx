@@ -187,7 +187,7 @@ export const Button = React.forwardRef<
                 className={domClassName}
                 classNames={['ButtonStyles']}
                 insights={insights}
-                aria-label={label?.toString()}
+                aria-label={typeof label === 'string' ? label : undefined}
                 aria-pressed={active}
                 target={target}
                 data-active={active}
@@ -200,7 +200,7 @@ export const Button = React.forwardRef<
                 ref={ref as React.Ref<HTMLButtonElement>}
                 type="button"
                 className={tcls(buttonOnlyClassNames, domClassName)}
-                aria-label={label?.toString()}
+                aria-label={typeof label === 'string' ? label : undefined}
                 aria-pressed={active}
                 disabled={disabled}
                 data-active={active}

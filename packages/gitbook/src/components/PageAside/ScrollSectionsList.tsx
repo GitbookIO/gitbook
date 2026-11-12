@@ -82,6 +82,7 @@ export function ScrollSectionsList({ sections }: { sections: DocumentSection[] }
                 >
                     <a
                         href={`#${section.id}`}
+                        aria-current={activeId === section.id ? 'true' : undefined}
                         data-cover-aware-text
                         className={tcls(
                             'relative',
