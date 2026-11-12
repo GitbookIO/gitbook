@@ -10,6 +10,7 @@ export const zh_tw: TranslationLanguage = {
     switch_to_light_theme: '切換至淺色主題',
     switch_to_system_theme: '切換至系統主題',
     search: '搜尋',
+    skip_to_content: '跳至內容',
     clear: '清除',
     table_filtered_by_selection: '符合選擇：${1}',
     table_clear_selection: '清除選擇',

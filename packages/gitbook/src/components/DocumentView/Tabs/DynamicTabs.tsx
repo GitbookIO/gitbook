@@ -151,10 +151,15 @@ const TabItemList = memo(function TabItemList(props: {
             }).filter((x) => x !== undefined),
         [overflowing, tabs]
     );
+    // Roving tabindex: one tab stop for the strip, the active tab when it isn't in the overflow menu.
+    const visibleTabs = tabs.filter((tab) => !overflowing.has(getTabButtonId(tab.id)));
+    const focusableTabId =
+        visibleTabs.find((tab) => tab.id === activeTabId)?.id ?? visibleTabs[0]?.id ?? null;
     return (
         <div
             ref={containerRef}
             role="tablist"
+            onKeyDown={moveFocusBetweenTabs}
             className={tcls(
                 'group/tabs',
                 'overflow-hidden',
@@ -182,6 +187,7 @@ const TabItemList = memo(function TabItemList(props: {
                         key={tab.id}
                         ref={itemRef}
                         isActive={tab.id === activeTabId}
+                        isFocusable={tab.id === focusableTabId}
                         isMeasuring={isMeasuring}
                         tab={tab}
                         onSelect={onSelect}
@@ -241,16 +247,18 @@ function TabsDropdownMenu(props: {
 const TabItem = memo(function TabItem(props: {
     ref: React.Ref<HTMLButtonElement>;
     isActive: boolean;
+    isFocusable: boolean;
     isMeasuring: boolean;
     tab: TabsItem;
     onSelect: (tabId: string) => void;
 }) {
-    const { ref, tab, isActive, isMeasuring, onSelect } = props;
+    const { ref, tab, isActive, isFocusable, isMeasuring, onSelect } = props;
     return (
         <TabButton
             ref={ref}
             role="tab"
             aria-selected={isActive}
+            tabIndex={isFocusable ? 0 : -1}
             aria-controls={tab.id}
             id={getTabButtonId(tab.id)}
             title={tab.title}
@@ -341,6 +349,55 @@ function TabButton(
             />
         </div>
     );
+}
+
+/**
+ * Arrow keys, Home and End move focus between the tabs of a tablist; Enter or Space then selects.
+ */
+function moveFocusBetweenTabs(event: React.KeyboardEvent<HTMLElement>) {
+    const current = event.target instanceof HTMLElement ? event.target : null;
+    if (current?.getAttribute('role') !== 'tab') {
+        return;
+    }
+    const tabs = Array.from(
+        event.currentTarget.querySelectorAll<HTMLElement>('[role="tab"]:not([disabled])')
+    );
+    const index = tabs.indexOf(current);
+    const isRTL = getComputedStyle(event.currentTarget).direction === 'rtl';
+    const next = getNextTabIndex(event.key, index, tabs.length, isRTL);
+    if (next === null) {
+        return;
+    }
+    event.preventDefault();
+    tabs[next]?.focus();
+}
+
+/**
+ * Index of the tab to focus for a key press, or null when the key doesn't move focus.
+ */
+export function getNextTabIndex(
+    key: string,
+    index: number,
+    count: number,
+    isRTL = false
+): number | null {
+    if (index < 0 || count === 0) {
+        return null;
+    }
+    const forward = isRTL ? 'ArrowLeft' : 'ArrowRight';
+    const backward = isRTL ? 'ArrowRight' : 'ArrowLeft';
+    switch (key) {
+        case forward:
+            return (index + 1) % count;
+        case backward:
+            return (index - 1 + count) % count;
+        case 'Home':
+            return 0;
+        case 'End':
+            return count - 1;
+        default:
+            return null;
+    }
 }
 
 /**

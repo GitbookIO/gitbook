@@ -10,6 +10,7 @@ export const ms: TranslationLanguage = {
     switch_to_light_theme: 'Tukar kepada tema cerah',
     switch_to_system_theme: 'Tukar kepada tema sistem',
     search: 'Cari',
+    skip_to_content: 'Langkau ke kandungan',
     clear: 'Kosongkan',
     table_filtered_by_selection: 'Sepadan dengan pilihan: ${1}',
     table_clear_selection: 'Kosongkan pilihan',

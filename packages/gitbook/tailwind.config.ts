@@ -341,6 +341,7 @@ const config: Config = {
                 heightOut: 'heightOut 500ms ease both',
                 crawl: 'crawl 2s ease-in-out infinite',
             },
+            // The enter/exit keyframes live in globals.css, next to their reduced-motion variants.
             keyframes: {
                 bounceSmall: {
                     '0%, 100%': {
@@ -374,16 +375,6 @@ const config: Config = {
                     },
                 },
 
-                present: {
-                    from: {
-                        opacity: '0',
-                        transform: 'translateY(1rem) scale(90%)',
-                    },
-                    to: {
-                        opacity: '1',
-                        transform: 'translateY(0) scale(1)',
-                    },
-                },
                 rotateLoop: {
                     '0%': {
                         transform: 'rotate(0deg) scaleY(2.5) scaleX(2.5)',
@@ -475,64 +466,6 @@ const config: Config = {
                     },
                     '50%': {
                         transform: 'translateY(-10%)',
-                    },
-                },
-                enterFromRight: {
-                    from: { opacity: '0', transform: 'translateX(50%)', display: 'none' },
-                    to: { opacity: '1', transform: 'translateX(0)', display: 'flex' },
-                },
-                enterFromLeft: {
-                    from: { opacity: '0', transform: 'translateX(-50%)', display: 'none' },
-                    to: { opacity: '1', transform: 'translateX(0)', display: 'flex' },
-                },
-                exitToRight: {
-                    from: { opacity: '1', transform: 'translateX(0)', display: 'flex' },
-                    to: { opacity: '0', transform: 'translateX(50%)', display: 'none' },
-                },
-                exitToLeft: {
-                    from: { opacity: '1', transform: 'translateX(0)', display: 'flex' },
-                    to: { opacity: '0', transform: 'translateX(-50%)', display: 'none' },
-                },
-                scaleIn: {
-                    from: { opacity: '0', transform: 'rotateX(-10deg) scale(0.9)' },
-                    to: { opacity: '1', transform: 'rotateX(0deg) scale(1)' },
-                },
-                scaleOut: {
-                    from: { opacity: '1', transform: 'rotateX(0deg) scale(1)' },
-                    to: { opacity: '0', transform: 'rotateX(-10deg) scale(0.95)' },
-                },
-                blurIn: {
-                    '0%': { filter: 'blur(6px)', opacity: '0', transform: 'scale(0.95)' },
-                    '100%': { filter: 'blur(0px)', opacity: '1', transform: 'scale(1)' },
-                },
-                blurOut: {
-                    '0%': { filter: 'blur(0px)', opacity: '1', transform: 'scale(1)' },
-                    '100%': { filter: 'blur(6px)', opacity: '0', transform: 'scale(0.95)' },
-                },
-                blurInDisplay: {
-                    '0%': {
-                        filter: 'blur(6px)',
-                        opacity: '0',
-                        transform: 'scale(0.95)',
-                        display: 'none',
-                    },
-                    '100%': {
-                        filter: 'blur(0px)',
-                        opacity: '1',
-                        transform: 'scale(1)',
-                    },
-                },
-                blurOutDisplay: {
-                    '0%': {
-                        filter: 'blur(0px)',
-                        opacity: '1',
-                        transform: 'scale(1)',
-                    },
-                    to: {
-                        filter: 'blur(6px)',
-                        opacity: '0',
-                        transform: 'scale(0.95)',
-                        display: 'none',
                     },
                 },
                 fadeOut: {

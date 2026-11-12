@@ -1,5 +1,13 @@
 # @gitbook/react-openapi
 
+## 2.0.1
+
+### Patch Changes
+
+- Updated dependencies [1b29a70]
+- Updated dependencies [4dfe630]
+  - @gitbook/openapi-parser@3.1.0
+
 ## 2.0.0
 
 ### Major Changes

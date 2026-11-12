@@ -1,5 +1,11 @@
 # @gitbook/colors
 
+## 0.4.5
+
+### Patch Changes
+
+- 6c12872: Expand 3-digit hex colors correctly in `hexToRgbArray`.
+
 ## 0.4.4
 
 ### Patch Changes

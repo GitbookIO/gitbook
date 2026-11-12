@@ -49,7 +49,8 @@ export function ScrollSectionsList({ sections }: { sections: DocumentSection[] }
 
     React.useEffect(() => {
         if (activeId && activeItemRef.current && scrollContainerRef.current) {
-            scrollContainerRef.current?.scrollTo({
+            // The list's wrapper is the element that scrolls, not the list itself.
+            scrollContainerRef.current.parentElement?.scrollTo({
                 top: activeItemRef.current.offsetTop - ACTIVE_ITEM_OFFSET,
                 behavior: 'smooth',
             });
@@ -81,6 +82,7 @@ export function ScrollSectionsList({ sections }: { sections: DocumentSection[] }
                 >
                     <a
                         href={`#${section.id}`}
+                        aria-current={activeId === section.id ? 'true' : undefined}
                         data-cover-aware-text
                         className={tcls(
                             'relative',

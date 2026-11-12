@@ -53,11 +53,14 @@ export const Icon = React.forwardRef(function Icon(
     const [iconStyle, icon] = getIconStyle(propIconStyle, propIcon);
     const source = context.iconSources?.[getInlineIconSourceKey(iconStyle, icon)];
     const maskId = React.useId();
+    // Icons are decorative unless the caller names them; the control they sit in carries the name.
+    const isDecorative = !rest['aria-label'] && !rest['aria-labelledby'] && !rest.role;
 
     if (source) {
         return (
             <svg
                 ref={ref}
+                aria-hidden={isDecorative ? true : undefined}
                 {...rest}
                 viewBox={source.viewBox}
                 fill="currentColor"
@@ -77,6 +80,7 @@ export const Icon = React.forwardRef(function Icon(
     return (
         <svg
             ref={ref}
+            aria-hidden={isDecorative ? true : undefined}
             {...rest}
             style={{
                 ...(size ? { width: size, height: size } : {}),
@@ -84,7 +88,6 @@ export const Icon = React.forwardRef(function Icon(
             }}
             className={`gb-icon ${className}`}
         >
-            <title>{icon}</title>
             <defs>
                 <mask
                     id={maskId}

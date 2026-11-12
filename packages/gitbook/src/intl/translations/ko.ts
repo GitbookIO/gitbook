@@ -10,6 +10,7 @@ export const ko: TranslationLanguage = {
     switch_to_light_theme: '라이트 테마로 전환',
     switch_to_system_theme: '시스템 테마로 전환',
     search: '검색',
+    skip_to_content: '본문으로 건너뛰기',
     clear: '지우기',
     table_filtered_by_selection: '선택과 일치: ${1}',
     table_clear_selection: '선택 지우기',

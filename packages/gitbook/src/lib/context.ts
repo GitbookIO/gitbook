@@ -103,9 +103,6 @@ export type SiteURLData = Pick<
      */
     isAiAgent?: boolean;
 
-    /** Whether the request comes from ChatGPT. Only set for Markdown and LLM routes. */
-    isChatGPT?: boolean;
-
     /**
      * Headers of the visitor asking through `?ask=`, forwarded to the API to classify the asker.
      * Only set for the ask route, which is static and can't read the request headers.
@@ -219,9 +216,6 @@ export type GitBookSiteContext = GitBookSpaceContext & {
 
     /** Whether the request comes from a detected AI agent. Only set for markdown routes. */
     isAiAgent?: boolean;
-
-    /** Whether the request comes from ChatGPT. Only set for Markdown and LLM routes. */
-    isChatGPT?: boolean;
 };
 
 /**
@@ -306,7 +300,6 @@ export async function fetchSiteContextByURLLookup(
         preview: data.preview ?? false,
         displayAgentInstructions: data.displayAgentInstructions,
         isAiAgent: data.isAiAgent,
-        isChatGPT: data.isChatGPT,
     });
 }
 
@@ -331,7 +324,6 @@ export async function fetchSiteContextByIds(
         preview: boolean;
         displayAgentInstructions?: boolean;
         isAiAgent?: boolean;
-        isChatGPT?: boolean;
     }
 ): Promise<GitBookSiteContext> {
     const { dataFetcher } = baseContext;
@@ -462,7 +454,6 @@ export async function fetchSiteContextByIds(
         preview: ids.preview,
         displayAgentInstructions: ids.displayAgentInstructions,
         isAiAgent: ids.isAiAgent,
-        isChatGPT: ids.isChatGPT,
     };
 }
 

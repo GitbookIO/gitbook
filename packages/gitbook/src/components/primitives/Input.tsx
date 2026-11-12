@@ -8,6 +8,7 @@ import { useControlledState } from '../hooks/useControlledState';
 import { Button, type ButtonProps } from './Button';
 import { KeyboardShortcut, type KeyboardShortcutProps } from './KeyboardShortcut';
 import { tString, useLanguage } from '@/intl/client';
+import { isComposingKeyEvent } from '@/lib/keyboard';
 import { tcls } from '@/lib/tailwind';
 
 type CustomInputProps = {
@@ -164,15 +165,22 @@ export const Input = React.forwardRef<InputElement, InputProps>((props, passedRe
         }
     };
 
-    // Runs on every value change, typed or set by the caller, so the height can shrink as well as grow.
+    // Runs on every value change, typed or set by the caller.
+    const previousLengthRef = React.useRef(value.toString().length);
     React.useLayoutEffect(() => {
+        const length = value.toString().length;
+        const isShrinking = length < previousLengthRef.current;
+        previousLengthRef.current = length;
         const field = ref.current;
         if (!multiline || !resize || !field) {
             return;
         }
         // TODO: replace with `field-sizing: content` when more broadly supported. https://caniuse.com/?search=field-sizing
-        // Reset the height to auto, then set it to the scroll height. If we don't reset, the height will only ever grow.
-        field.style.height = 'auto';
+        // scrollHeight never goes below the current height, so shrinking needs a measure with the
+        // height reset. Only done on deletion: collapsing the field can shift the page scroll.
+        if (isShrinking) {
+            field.style.height = 'auto';
+        }
         field.style.height = value.toString().trim() ? `${field.scrollHeight}px` : '';
     }, [ref, value, multiline, resize]);
 
@@ -198,12 +206,7 @@ export const Input = React.forwardRef<InputElement, InputProps>((props, passedRe
         // If the user wants to handle the keydown by itself, we let him do it.
         if (event.defaultPrevented) return;
 
-        if (
-            event.key === 'Enter' &&
-            !event.shiftKey &&
-            !event.nativeEvent.isComposing &&
-            hasValue
-        ) {
+        if (event.key === 'Enter' && !event.shiftKey && !isComposingKeyEvent(event) && hasValue) {
             event.preventDefault();
             handleSubmit();
         } else if (event.key === 'Escape') {
@@ -252,7 +255,7 @@ export const Input = React.forwardRef<InputElement, InputProps>((props, passedRe
                     ? 'cursor-not-allowed border-tint-subtle bg-tint-subtle text-tint/8'
                     : [
                           'depth-subtle:focus-within:-translate-y-px depth-subtle:hover:not-has-[button:hover]:-translate-y-px depth-subtle:shadow-xs',
-                          'focus-within:border-primary-hover focus-within:depth-subtle:shadow-lg focus-within:shadow-primary-subtle focus-within:ring-2 hover:not-has-[button:hover]:cursor-text hover:not-has-[button:hover]:border-tint-hover hover:not-has-[button:hover]:not-focus-within:bg-tint-subtle depth-subtle:hover:not-has-[button:hover]:not-focus-within:shadow-md focus-within:hover:not-has-[button:hover]:border-primary-hover',
+                          'focus-within:border-primary-hover focus-within:depth-subtle:shadow-lg focus-within:shadow-primary-subtle focus-within:ring-2 forced-colors:focus-within:outline-2 hover:not-has-[button:hover]:cursor-text hover:not-has-[button:hover]:border-tint-hover hover:not-has-[button:hover]:not-focus-within:bg-tint-subtle depth-subtle:hover:not-has-[button:hover]:not-focus-within:shadow-md focus-within:hover:not-has-[button:hover]:border-primary-hover',
                       ],
                 multiline ? 'flex-col' : 'flex-row',
                 sizes[sizing].container,

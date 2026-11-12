@@ -1,7 +1,11 @@
 import type { StaticImageData } from 'next/image';
 import { assert } from 'ts-essentials';
 
-import type { RevisionPageDocument, RevisionPageDocumentCover } from '@gitbook/api';
+import {
+    CustomizationDefaultThemeMode,
+    type RevisionPageDocument,
+    type RevisionPageDocumentCover,
+} from '@gitbook/api';
 
 import { CONTENT_STYLE } from '../layout';
 import { getCoverHeight } from './coverHeight';
@@ -144,6 +148,11 @@ export async function PageCover(props: {
                     y={cover.yPos}
                     height={height}
                     mask={mask}
+                    priorityTheme={
+                        context.customization.themes.default === CustomizationDefaultThemeMode.Dark
+                            ? 'dark'
+                            : 'light'
+                    }
                 />
             </div>
         </>

@@ -57,7 +57,6 @@ export function CookiesToast(props: { privacyPolicy?: string }) {
         <div
             role="dialog"
             data-testid="cookies-dialog"
-            aria-modal="true"
             aria-label={tString(language, 'cookies_title')}
             aria-describedby={describedById}
             className={tcls(

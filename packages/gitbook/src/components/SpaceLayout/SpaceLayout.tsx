@@ -12,6 +12,7 @@ import { CurrentContentProvider } from '../hooks';
 import { InsightsProvider, VisitorProvider } from '../Insights';
 import { CONTAINER_STYLE } from '../layout';
 import { NavigationLoader } from '../primitives/NavigationLoader';
+import { SkipToContent } from '../primitives/SkipToContent';
 import { SearchContainer, getSearchBaseProps } from '../Search';
 import {
     SiteSectionList,
@@ -131,6 +132,7 @@ export function SpaceLayout(props: SpaceLayoutProps) {
 
     return (
         <SpaceLayoutServerContext {...props}>
+            <SkipToContent />
             <Announcement context={context} />
             <Header withTopHeader={withTopHeader} variants={variants} context={context} />
             <NavigationLoader />
@@ -142,8 +144,8 @@ export function SpaceLayout(props: SpaceLayoutProps) {
                 </>
             ) : null}
 
-            {/* Chat panel shifts content left when open */}
-            <div className="lg:chat-open:mr-(--ai-chat-width) motion-safe:transition-all motion-safe:duration-300">
+            {/* Chat panel shifts content left when open. Clipped so blocks bleeding into the gutters (card carousels) can't widen the page. */}
+            <div className="overflow-x-clip lg:chat-open:mr-(--ai-chat-width) motion-safe:transition-all motion-safe:duration-300">
                 <div
                     className={tcls(
                         'flex',
@@ -160,8 +162,8 @@ export function SpaceLayout(props: SpaceLayoutProps) {
                         // Ensure the footer is display below the viewport even if the content is not enough
                         withTopHeader
                             ? [
-                                  'site-header:min-h-[calc(100vh-65px)]',
-                                  'site-header-sections:min-h-[calc(100vh-109px)]',
+                                  'site-header:min-h-[calc(100dvh-65px)]',
+                                  'site-header-sections:min-h-[calc(100dvh-109px)]',
                               ]
                             : 'lg:min-h-screen'
                     )}

@@ -24,13 +24,13 @@ import {
 import { AI_CATALOG_PATH, AI_CATALOG_WELL_KNOWN_PATH } from '@/lib/aiCatalog/paths';
 import { getAPITokenFromCookies, getAPITokenResponseCookies } from '@/lib/api-token-cookie';
 import { type AskVisitorAgent, getAskVisitorAgent } from '@/lib/ask-visitor';
-import { isChatGPTRequest } from '@/lib/chatgpt';
 import { MAX_CHUNKED_COOKIE_LENGTH } from '@/lib/chunked-cookies';
 import type { SiteURLData } from '@/lib/context';
 import { getContentSecurityPolicy } from '@/lib/csp';
 import { validateSerializedCustomization } from '@/lib/customization';
 import {
     DataFetcherError,
+    apiClient,
     getVisitorAuthBasePath,
     lookupPublishedContentByUrl,
     normalizeRequestURL,
@@ -381,6 +381,10 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
             );
         }
 
+        if (isSearchPrewarmRequest(siteURLData)) {
+            return await serveSearchPrewarm(request, siteURLData);
+        }
+
         //
         // Render and serve the content
         //
@@ -491,13 +495,11 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
             routeType: routeTypeFromPathname,
             events,
             isAiAgent,
-            isChatGPT,
             askVisitorAgent,
         } = encodePathInSiteContent(siteURLData, request);
         routeType = routeTypeFromPathname ?? routeType;
-        // Only set for Markdown and LLM routes, so these request-specific variants are cached separately.
+        // Only set for markdown routes, so it becomes part of their static cache key.
         stableSiteURLData.isAiAgent = isAiAgent;
-        stableSiteURLData.isChatGPT = isChatGPT;
         // Splits the cache of `?ask=` answers per user agent, so each asker is classified correctly.
         stableSiteURLData.askVisitorAgent = askVisitorAgent;
 
@@ -588,7 +590,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         response.headers.set('content-security-policy', getContentSecurityPolicy());
         // Basic security headers
         response.headers.set('strict-transport-security', 'max-age=31536000');
-        response.headers.set('referrer-policy', 'no-referrer-when-downgrade');
+        response.headers.set('referrer-policy', 'strict-origin-when-cross-origin');
         response.headers.set('x-content-type-options', 'nosniff');
         // Debug header
         response.headers.set('x-gitbook-route-type', routeType);
@@ -810,6 +812,26 @@ const PATH_ALIASES: Record<string, string> = {
     [AI_CATALOG_WELL_KNOWN_PATH]: AI_CATALOG_PATH,
 };
 
+function isSearchPrewarmRequest(siteURLData: PublishedSiteContent) {
+    return (
+        removeLeadingSlash(removeTrailingSlash(siteURLData.pathname)) === '~gitbook/search-prewarm'
+    );
+}
+
+/**
+ * Warm the site's search index before the visitor types, without rendering a route.
+ */
+async function serveSearchPrewarm(request: NextRequest, siteURLData: PublishedSiteContent) {
+    if (request.method !== 'POST') {
+        return new NextResponse(null, { status: 405, headers: { allow: 'POST' } });
+    }
+
+    const api = apiClient({ apiToken: siteURLData.apiToken ?? null });
+    await waitUntil(api.orgs.prewarmSiteSearch(siteURLData.organization, siteURLData.site));
+
+    return new NextResponse(null, { status: 204 });
+}
+
 /**
  * Encode path in a site content.
  * Special paths are not encoded and passed to be handled by the route handlers.
@@ -823,8 +845,6 @@ function encodePathInSiteContent(
     events?: ServerInsightsEventInput[] | undefined;
     /** Only set for markdown routes, where the output depends on the visitor being an agent. */
     isAiAgent?: boolean;
-    /** Only set for Markdown and LLM routes, where the output content type depends on ChatGPT. */
-    isChatGPT?: boolean;
     /** Only set for the ask route, where the API classifies the asker from these headers. */
     askVisitorAgent?: AskVisitorAgent;
 } {
@@ -868,7 +888,6 @@ function encodePathInSiteContent(
         return {
             pathname,
             routeType: 'static',
-            isChatGPT: isChatGPTRequest(request) || undefined,
             events: [
                 {
                     type: 'llms_request',
@@ -904,7 +923,6 @@ function encodePathInSiteContent(
             return {
                 pathname,
                 routeType: 'static',
-                isChatGPT: isChatGPTRequest(request) || undefined,
                 events: [
                     {
                         type: 'llms_request',
@@ -967,7 +985,6 @@ function encodePathInSiteContent(
                     routeType: 'static',
                     // Left undefined for non-agents to avoid splitting the static cache for them.
                     isAiAgent: isAiAgent || undefined,
-                    isChatGPT: isChatGPTRequest(request) || undefined,
                     askVisitorAgent:
                         typeof ask === 'string' ? getAskVisitorAgent(request.headers) : undefined,
                     // TODO: track pageId / spaceId when possible

@@ -19,6 +19,7 @@ import type { SearchResultsRef } from './SearchResults';
 import { useSearchState, useSetSearchState } from './useSearch';
 import { useSearchResults } from './useSearchResults';
 import { useSearchResultsCursor } from './useSearchResultsCursor';
+import { isComposingKeyEvent } from '@/lib/keyboard';
 import { getLocalizedTitle } from '@/lib/sites';
 
 function useInitialAskBootstrap(props: {
@@ -95,7 +96,7 @@ function useSearchKeyboardNavigation(props: {
             } else if (event.key === 'ArrowDown') {
                 event.preventDefault();
                 moveCursorBy(1);
-            } else if (event.key === 'Enter' && !event.nativeEvent.isComposing) {
+            } else if (event.key === 'Enter' && !isComposingKeyEvent(event)) {
                 event.preventDefault();
                 if (cursor !== null && cursor >= results.length) {
                     onAskSelect(cursor - results.length);

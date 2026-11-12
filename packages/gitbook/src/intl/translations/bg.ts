@@ -10,6 +10,7 @@ export const bg: TranslationLanguage = {
     switch_to_light_theme: 'Превключване към светла тема',
     switch_to_system_theme: 'Превключване към системната тема',
     search: 'Търсене',
+    skip_to_content: 'Към съдържанието',
     clear: 'Изчистване',
     table_filtered_by_selection: 'Съответства на избора: ${1}',
     table_clear_selection: 'Изчисти избора',

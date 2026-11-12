@@ -10,6 +10,7 @@ export const pt_br: TranslationLanguage = {
     switch_to_light_theme: 'Mudar para modo claro',
     switch_to_system_theme: 'Mudar para configuração do sistema',
     search: 'Buscar',
+    skip_to_content: 'Pular para o conteúdo',
     clear: 'Limpar',
     table_filtered_by_selection: 'Corresponde à seleção: ${1}',
     table_clear_selection: 'Limpar seleção',

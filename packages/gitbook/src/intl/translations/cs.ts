@@ -10,6 +10,7 @@ export const cs: TranslationLanguage = {
     switch_to_light_theme: 'Přepnout na světlý motiv',
     switch_to_system_theme: 'Přepnout na systémový motiv',
     search: 'Hledat',
+    skip_to_content: 'Přejít k obsahu',
     clear: 'Vymazat',
     table_filtered_by_selection: 'Odpovídá výběru: ${1}',
     table_clear_selection: 'Zrušit výběr',

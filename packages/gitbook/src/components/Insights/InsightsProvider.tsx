@@ -193,13 +193,18 @@ export function InsightsProvider(props: InsightsProviderProps) {
         }
     );
 
-    /**
-     * When the page is unloaded, flush all events.
-     */
+    // `beforeunload` doesn't fire reliably on mobile, hiding the page is the last dependable signal.
     React.useEffect(() => {
-        window.addEventListener('beforeunload', flushEventsSync);
+        const flushWhenHidden = () => {
+            if (document.visibilityState === 'hidden') {
+                flushEventsSync();
+            }
+        };
+        document.addEventListener('visibilitychange', flushWhenHidden);
+        window.addEventListener('pagehide', flushEventsSync);
         return () => {
-            window.removeEventListener('beforeunload', flushEventsSync);
+            document.removeEventListener('visibilitychange', flushWhenHidden);
+            window.removeEventListener('pagehide', flushEventsSync);
         };
     }, [flushEventsSync]);
 

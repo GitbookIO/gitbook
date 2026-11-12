@@ -13,10 +13,10 @@
         }
     },
     "sideEffects": false,
-    "version": "0.6.0",
+    "version": "0.7.0",
+    "license": "Apache-2.0",
     "dependencies": {
         "@gitbook/api": "catalog:",
-        "@gitbook/icons": "workspace:",
         "bidc": "catalog:"
     },
     "peerDependencies": {
@@ -42,7 +42,8 @@
     "files": [
         "dist",
         "README.md",
-        "CHANGELOG.md"
+        "CHANGELOG.md",
+        "LICENSE"
     ],
     "publishConfig": {
         "access": "public",

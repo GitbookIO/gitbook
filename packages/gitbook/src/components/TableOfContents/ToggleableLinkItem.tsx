@@ -26,6 +26,7 @@ export function ToggleableLinkItem(
         isActive || pathnames.some((pathname) => currentPagePath.startsWith(`${pathname}/`));
     const [isOpen, setIsOpen] = React.useState(defaultIsOpen);
     const hasBeenToggled = useRef(false);
+    const linkId = React.useId();
 
     // Update the visibility of the children if one of the descendants becomes active.
     React.useEffect(() => {
@@ -60,10 +61,16 @@ export function ToggleableLinkItem(
     }
 
     return (
-        <DescendantsRenderer descendants={descendants} isOpen={isOpen} setIsOpen={handleToggle}>
+        <DescendantsRenderer
+            descendants={descendants}
+            isOpen={isOpen}
+            setIsOpen={handleToggle}
+            labelledBy={linkId}
+        >
             {({ descendants, toggler }) => (
                 <>
                     <LinkItem
+                        id={linkId}
                         href={href}
                         insights={insights}
                         isActive={isActive}
@@ -88,12 +95,12 @@ export function ToggleableLinkItem(
 }
 
 function LinkItem(
-    props: Pick<LinkProps, 'href' | 'insights' | 'children'> & {
+    props: Pick<LinkProps, 'href' | 'insights' | 'children' | 'id'> & {
         isActive: boolean;
         onActiveClick?: () => void;
     }
 ) {
-    const { isActive, href, insights, children, onActiveClick } = props;
+    const { id, isActive, href, insights, children, onActiveClick } = props;
 
     const handleClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
         if (isActive && onActiveClick) {
@@ -104,6 +111,7 @@ function LinkItem(
 
     return (
         <Link
+            id={id}
             data-active={isActive}
             href={href}
             insights={insights}
@@ -123,18 +131,21 @@ function DescendantsRenderer(props: {
     descendants: React.ReactNode;
     isOpen: boolean;
     setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+    /** Id of the link the toggle belongs to, used as its accessible name. */
+    labelledBy: string;
     children: (renderProps: {
         descendants: React.ReactNode;
         toggler: React.ReactNode;
     }) => React.ReactNode;
 }) {
-    const { descendants, isOpen, setIsOpen } = props;
+    const { descendants, isOpen, setIsOpen, labelledBy } = props;
 
     return props.children({
         toggler: (
             <Toggler
                 isLinkActive={isOpen}
                 isOpen={isOpen}
+                labelledBy={labelledBy}
                 onToggle={() => {
                     setIsOpen((prev) => !prev);
                 }}
@@ -144,8 +155,13 @@ function DescendantsRenderer(props: {
     });
 }
 
-function Toggler(props: { isLinkActive: boolean; isOpen: boolean; onToggle: () => void }) {
-    const { isOpen, onToggle } = props;
+function Toggler(props: {
+    isLinkActive: boolean;
+    isOpen: boolean;
+    labelledBy: string;
+    onToggle: () => void;
+}) {
+    const { isOpen, labelledBy, onToggle } = props;
     return (
         <Button
             icon={
@@ -164,9 +180,12 @@ function Toggler(props: { isLinkActive: boolean; isOpen: boolean; onToggle: () =
             size="xsmall"
             iconOnly
             variant="blank"
-            aria-hidden="true" // The button has no label or focus so hiding it from screen readers.
-            className="-my-0.5 -mr-1 ml-auto min-h-6 min-w-6 text-current hover:bg-tint-base"
-            tabIndex={-1} // Prevent focus on the button since it's already inside a clickable link that performs the same toggle action.
+            // Named after its page and focusable: the link only toggles on the current page, so
+            // this is the only keyboard way to expand another page's children.
+            aria-labelledby={labelledBy}
+            aria-expanded={isOpen}
+            // Cancels the Button's expanded highlight: an open chevron must look like a closed one.
+            className="-my-0.5 -mr-1 ml-auto min-h-6 min-w-6 text-current hover:bg-tint-base aria-expanded:bg-transparent aria-expanded:text-current aria-expanded:hover:bg-tint-hover"
         />
     );
 }

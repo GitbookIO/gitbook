@@ -4,6 +4,11 @@ on:
     push:
         branches:
             - main
+# A newer run for the same PR supersedes the previous one. Each push to main gets a group of its
+# own, so main runs are never queued behind or cancelled by another run.
+concurrency:
+    group: ${{ github.event_name == 'pull_request_target' && format('preview-pr-{0}', github.event.pull_request.number) || format('preview-run-{0}', github.run_id) }}
+    cancel-in-progress: ${{ github.event_name == 'pull_request_target' }}
 jobs:
     approval:
         # Ensure that external contributors' PRs are manually approved before deployment
@@ -18,8 +23,9 @@ jobs:
     deploy-v2-vercel:
         name: Deploy v2 to Vercel (preview)
         runs-on: ubuntu-latest
+        timeout-minutes: 20
         needs: approval
-        if: ${{ always() && (needs.approval.result == 'success' || needs.approval.result == 'skipped') }}
+        if: ${{ !cancelled() && (needs.approval.result == 'success' || needs.approval.result == 'skipped') }}
         environment:
             name: 2v-preview
             url: ${{ steps.deploy.outputs.deployment-url }}
@@ -44,8 +50,9 @@ jobs:
     deploy-v2-cloudflare:
         name: Deploy v2 to Cloudflare Worker (preview)
         runs-on: ubuntu-latest
+        timeout-minutes: 20
         needs: approval
-        if: ${{ always() && (needs.approval.result == 'success' || needs.approval.result == 'skipped') }}
+        if: ${{ !cancelled() && (needs.approval.result == 'success' || needs.approval.result == 'skipped') }}
         environment:
             name: 2c-preview
             url: ${{ steps.deploy.outputs.deployment-url }}
@@ -82,7 +89,7 @@ jobs:
     comment-deployments:
         runs-on: ubuntu-latest
         name: Comment Deployments (preview)
-        if: always() && github.event_name != 'push'
+        if: ${{ !cancelled() && github.event_name != 'push' }}
         needs:
             - deploy-v2-vercel
             - deploy-v2-cloudflare
@@ -95,6 +102,25 @@ jobs:
                   comment-author: 'github-actions[bot]'
                   body-includes: 'Summary of the deployments'
 
+            # A deploy that didn't succeed has no URL (e.g. a re-run hitting Vercel's "deploymentId
+            # already exists"), so keep the URL the comment already shows instead of blanking it.
+            - name: Resolve deployment URLs
+              id: urls
+              env:
+                  PREVIOUS_COMMENT: ${{ steps.fc.outputs.comment-body }}
+                  VERCEL_RESULT: ${{ needs.deploy-v2-vercel.result }}
+                  VERCEL_URL: ${{ needs.deploy-v2-vercel.outputs.deployment-url }}
+                  CLOUDFLARE_RESULT: ${{ needs.deploy-v2-cloudflare.result }}
+                  CLOUDFLARE_URL: ${{ needs.deploy-v2-cloudflare.outputs.deployment-url }}
+              run: |
+                  previous_url() {
+                    sed -n "s/^| $1 | \[\([^]]*\)\].*/\1/p" <<<"$PREVIOUS_COMMENT" | head -n 1
+                  }
+                  if [ "$VERCEL_RESULT" != success ]; then VERCEL_URL=$(previous_url Vercel); fi
+                  if [ "$CLOUDFLARE_RESULT" != success ]; then CLOUDFLARE_URL=$(previous_url Cloudflare); fi
+                  echo "vercel=$VERCEL_URL" >> "$GITHUB_OUTPUT"
+                  echo "cloudflare=$CLOUDFLARE_URL" >> "$GITHUB_OUTPUT"
+
             - name: Create or update GitHub comment
               uses: peter-evans/create-or-update-comment@v4
               with:
@@ -105,21 +131,21 @@ jobs:
 
                       | Version | URL | Status |
                       | --- | --- | --- |
-                      | Vercel | [${{ needs.deploy-v2-vercel.outputs.deployment-url }}](${{ needs.deploy-v2-vercel.outputs.deployment-url }}) | ${{ needs.deploy-v2-vercel.result == 'success' && '✅' || '❌' }} |
-                      | Cloudflare | [${{ needs.deploy-v2-cloudflare.outputs.deployment-url }}](${{ needs.deploy-v2-cloudflare.outputs.deployment-url }}) | ${{ needs.deploy-v2-cloudflare.result == 'success' && '✅' || '❌' }} |
+                      | Vercel | [${{ steps.urls.outputs.vercel }}](${{ steps.urls.outputs.vercel }}) | ${{ needs.deploy-v2-vercel.result == 'success' && '✅' || '❌' }} |
+                      | Cloudflare | [${{ steps.urls.outputs.cloudflare }}](${{ steps.urls.outputs.cloudflare }}) | ${{ needs.deploy-v2-cloudflare.result == 'success' && '✅' || '❌' }} |
 
                       ### Test content
 
                       | Site | `2v` | `2c` |
                       | --- | --- | --- |
-                      | GitBook | [${{ needs.deploy-v2-vercel.outputs.deployment-url }}/url/gitbook.com/docs](${{ needs.deploy-v2-vercel.outputs.deployment-url }}/url/gitbook.com/docs) | [${{ needs.deploy-v2-cloudflare.outputs.deployment-url }}/url/gitbook.com/docs](${{ needs.deploy-v2-cloudflare.outputs.deployment-url }}/url/gitbook.com/docs) |
-                      | E2E | [${{ needs.deploy-v2-vercel.outputs.deployment-url }}/url/gitbook.gitbook.io/test-gitbook-open](${{ needs.deploy-v2-vercel.outputs.deployment-url }}/url/gitbook.gitbook.io/test-gitbook-open) | [${{ needs.deploy-v2-cloudflare.outputs.deployment-url }}/url/gitbook.gitbook.io/test-gitbook-open](${{ needs.deploy-v2-cloudflare.outputs.deployment-url }}/url/gitbook.gitbook.io/test-gitbook-open) |
+                      | GitBook | [${{ steps.urls.outputs.vercel }}/url/gitbook.com/docs](${{ steps.urls.outputs.vercel }}/url/gitbook.com/docs) | [${{ steps.urls.outputs.cloudflare }}/url/gitbook.com/docs](${{ steps.urls.outputs.cloudflare }}/url/gitbook.com/docs) |
+                      | E2E | [${{ steps.urls.outputs.vercel }}/url/gitbook.gitbook.io/test-gitbook-open](${{ steps.urls.outputs.vercel }}/url/gitbook.gitbook.io/test-gitbook-open) | [${{ steps.urls.outputs.cloudflare }}/url/gitbook.gitbook.io/test-gitbook-open](${{ steps.urls.outputs.cloudflare }}/url/gitbook.gitbook.io/test-gitbook-open) |
                   edit-mode: replace
     visual-testing-v2-vercel:
         runs-on: ubuntu-latest
         name: Visual Testing v2
         needs: deploy-v2-vercel
-        if: ${{ always() && needs.deploy-v2-vercel.result == 'success' }}
+        if: ${{ !cancelled() && needs.deploy-v2-vercel.result == 'success' }}
         timeout-minutes: 15
         steps:
             - name: Checkout
@@ -143,7 +169,7 @@ jobs:
         runs-on: ubuntu-latest
         name: Visual Testing v2 (Cloudflare)
         needs: deploy-v2-cloudflare
-        if: ${{ always() && needs.deploy-v2-cloudflare.result == 'success' }}
+        if: ${{ !cancelled() && needs.deploy-v2-cloudflare.result == 'success' }}
         timeout-minutes: 15
         steps:
             - name: Checkout
@@ -167,7 +193,7 @@ jobs:
         runs-on: ubuntu-latest
         name: Visual Testing Customers v2
         needs: deploy-v2-vercel
-        if: ${{ always() && needs.deploy-v2-vercel.result == 'success' }}
+        if: ${{ !cancelled() && needs.deploy-v2-vercel.result == 'success' }}
         timeout-minutes: 30
         steps:
             - name: Checkout
@@ -191,7 +217,7 @@ jobs:
             # Style recalc depends on the client bundle, not the host, so this runs here only and
             # not in the Cloudflare job. Kept out of `e2e-customers`, which is a visual suite.
             - name: Run style invalidation tests
-              if: always()
+              if: ${{ !cancelled() }}
               working-directory: packages/gitbook
               run: bun run e2e-style-perf
               env:
@@ -200,7 +226,7 @@ jobs:
 
             # Runs on failure too: a blown style budget is exactly when the numbers are worth seeing.
             - name: Build style invalidation report
-              if: always() && github.event_name != 'push'
+              if: ${{ !cancelled() && github.event_name != 'push' }}
               id: style-perf
               working-directory: packages/gitbook
               run: |
@@ -219,7 +245,7 @@ jobs:
                   } >> "$GITHUB_OUTPUT"
 
             - name: Find style invalidation comment
-              if: always() && github.event_name != 'push' && steps.style-perf.outputs.body != ''
+              if: ${{ !cancelled() && github.event_name != 'push' && steps.style-perf.outputs.body != '' }}
               uses: peter-evans/find-comment@v3
               id: fc-style-perf
               with:
@@ -228,7 +254,7 @@ jobs:
                   body-includes: 'Style invalidation on a large API reference'
 
             - name: Create or update style invalidation comment
-              if: always() && github.event_name != 'push' && steps.style-perf.outputs.body != ''
+              if: ${{ !cancelled() && github.event_name != 'push' && steps.style-perf.outputs.body != '' }}
               uses: peter-evans/create-or-update-comment@v4
               with:
                   comment-id: ${{ steps.fc-style-perf.outputs.comment-id }}
@@ -239,7 +265,7 @@ jobs:
         runs-on: ubuntu-latest
         name: Visual Testing Customers v2 (Cloudflare)
         needs: deploy-v2-cloudflare
-        if: ${{ always() && needs.deploy-v2-cloudflare.result == 'success' }}
+        if: ${{ !cancelled() && needs.deploy-v2-cloudflare.result == 'success' }}
         timeout-minutes: 30
         steps:
             - name: Checkout
@@ -263,7 +289,7 @@ jobs:
         runs-on: ubuntu-latest
         name: Browserless Testing v2 (Vercel)
         needs: deploy-v2-vercel
-        if: ${{ always() && needs.deploy-v2-vercel.result == 'success' }}
+        if: ${{ !cancelled() && needs.deploy-v2-vercel.result == 'success' }}
         steps:
             - name: Checkout
               uses: actions/checkout@v4

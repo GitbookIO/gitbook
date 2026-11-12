@@ -159,7 +159,7 @@ export function ConsentLayout(props: React.HTMLAttributes<HTMLDivElement>) {
     const { children, className, ...rest } = props;
 
     return (
-        <main className="site-background flex min-h-screen flex-col" {...rest}>
+        <main className="site-background flex min-h-dvh flex-col" {...rest}>
             <div
                 className={tcls(
                     'flex w-full flex-1 items-center justify-center',

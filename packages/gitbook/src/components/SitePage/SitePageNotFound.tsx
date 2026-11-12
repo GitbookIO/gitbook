@@ -22,6 +22,7 @@ import {
     useSpaceBasePath,
 } from '../SpaceLayout/SpaceLayoutContext';
 import { TrackPageViewEvent } from '@/components/Insights';
+import { MAIN_CONTENT_ID } from '@/components/layout';
 import { t, tString, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
 
@@ -102,6 +103,7 @@ export function SitePageNotFound() {
         <CurrentPageProvider page={null}>
             <div className="lg:has-sidebar:-ml-84 w-full">
                 <main
+                    id={MAIN_CONTENT_ID}
                     className={tcls(
                         // `page-no-toc` hides the TOC (like PageBody), and `layout-wide` takes the
                         // now-empty sidebar out of flow so the content stays centered on all layouts.

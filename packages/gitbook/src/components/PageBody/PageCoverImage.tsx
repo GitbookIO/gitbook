@@ -25,10 +25,14 @@ interface PageCoverImageProps {
     // Only if the `height` was customized by the user (and thus defined), we use it to set the cover's height and skip the default behaviour of fixed aspect-ratio.
     height: number | undefined;
     mask?: 'none' | 'radial';
+    /** Theme most visitors see first, its cover is the LCP candidate. */
+    priorityTheme?: 'light' | 'dark';
 }
 
 export function PageCoverImage(props: PageCoverImageProps) {
-    const { imgs, y, height, mask } = props;
+    const { imgs, y, height, mask, priorityTheme = 'light' } = props;
+    // The light cover is never demoted to low: a visitor can still have switched to the light theme.
+    const darkFirst = priorityTheme === 'dark' && Boolean(imgs.dark);
     const { objectPositionY, isLoading } = useCoverPosition(imgs, y, {
         height,
         aspectRatio: PAGE_COVER_SIZE,
@@ -48,7 +52,7 @@ export function PageCoverImage(props: PageCoverImageProps) {
                 src={imgs.light.src}
                 srcSet={imgs.light.srcSet}
                 sizes={imgs.light.sizes}
-                fetchPriority="high"
+                fetchPriority={darkFirst ? 'auto' : 'high'}
                 alt="Page cover"
                 className={tcls('w-full', 'object-cover', imgs.dark ? 'dark:hidden' : '')}
                 style={{
@@ -69,7 +73,7 @@ export function PageCoverImage(props: PageCoverImageProps) {
                     src={imgs.dark.src}
                     srcSet={imgs.dark.srcSet}
                     sizes={imgs.dark.sizes}
-                    fetchPriority="low"
+                    fetchPriority={darkFirst ? 'high' : 'low'}
                     alt="Page cover"
                     className={tcls('w-full', 'object-cover', 'dark:inline', 'hidden')}
                     style={{

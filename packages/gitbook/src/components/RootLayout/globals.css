@@ -3,6 +3,7 @@
 @config '../../../tailwind.config.ts';
 
 @import "./prose.css";
+@import "../DocumentView/OpenAPI/method-badge.css";
 
 /*
   The default border color has changed to `currentcolor` in Tailwind CSS v4,
@@ -33,7 +34,6 @@
 @utility hide-scrollbar {
   /* Hide scrollbar by default */
   scrollbar-color: transparent transparent;
-  transition: scrollbar-color 0.2s ease-in-out;
 
   &:hover {
     /* Show scrollbar on hover */
@@ -52,20 +52,13 @@
     rgba(0, 0, 0, 1) 96px,
     rgba(0, 0, 0, 0)
   );
-  mask-image: linear-gradient(
-    to bottom,
-    rgba(0, 0, 0, 1) 96px,
-    rgba(0, 0, 0, 0)
-  );
 }
 
 @utility linear-mask-util {
   mask-image: linear-gradient(to bottom, white, white);
-  mask-image: linear-gradient(to bottom, white, white);
 }
 
 @utility grid-area-1-1 {
-  grid-area: 1 / 1;
   grid-area: 1 / 1;
 }
 
@@ -109,49 +102,9 @@
   &:after {
     transform: rotate(135deg) skewY(-45deg) scale(0.707, 1.414) translate(50%);
   }
-  position: relative;
-  background-color: orange;
-  text-align: left;
-  transform: rotate(-60deg) skewX(-30deg) scale(1, 0.866);
-  &:before {
-    content: "";
-    position: absolute;
-    background-color: inherit;
-  }
-  &:after {
-    content: "";
-    position: absolute;
-    background-color: inherit;
-  }
-  width: inherit;
-  height: inherit;
-  border-top-right-radius: 30%;
-  &:before {
-    width: inherit;
-    height: inherit;
-    border-top-right-radius: 30%;
-  }
-  &:after {
-    width: inherit;
-    height: inherit;
-    border-top-right-radius: 30%;
-  }
-
-  &:before {
-    transform: rotate(-135deg) skewX(-45deg) scale(1.414, 0.707)
-      translate(0, -50%);
-  }
-  &:after {
-    transform: rotate(135deg) skewY(-45deg) scale(0.707, 1.414) translate(50%);
-  }
 }
 
 @utility break-anywhere {
-  word-break: break-word;
-  @supports (overflow-wrap: anywhere) {
-    word-break: break-word;
-    overflow-wrap: anywhere;
-  }
   word-break: break-word;
   @supports (overflow-wrap: anywhere) {
     word-break: break-word;
@@ -161,11 +114,9 @@
 
 @utility bg-gradient-primary {
   @apply bg-linear-to-bl from-primary-4 to-tint-base to-60% bg-fixed;
-  @apply bg-linear-to-bl from-primary-4 to-tint-base to-60% bg-fixed;
 }
 
 @utility bg-gradient-tint {
-  @apply bg-linear-to-bl from-tint-4 to-tint-base to-60% bg-fixed;
   @apply bg-linear-to-bl from-tint-4 to-tint-base to-60% bg-fixed;
 }
 
@@ -183,24 +134,6 @@
   & [data-annotation] {
     position: relative;
     z-index: 20;
-  }
-}
-
-/*
-  The default border color has changed to `currentcolor` in Tailwind CSS v4,
-  so we've added these compatibility styles to make sure everything still
-  looks the same as it did with Tailwind CSS v3.
-
-  If we ever want to remove these styles, we need to add an explicit border
-  color utility to any element that depends on these defaults.
-*/
-@layer base {
-  *,
-  ::after,
-  ::before,
-  ::backdrop,
-  ::file-selector-button {
-    border-color: var(--color-gray-200, currentcolor);
   }
 }
 
@@ -678,5 +611,277 @@ html:has(.zoom-modal) {
     & div > *:nth-child(n + 6) {
       display: flex;
     }
+  }
+}
+
+/* Enter and exit animations, referenced by the `animation` theme in tailwind.config.ts. */
+@keyframes present {
+  from {
+    opacity: 0;
+    transform: translateY(1rem) scale(90%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: rotateX(-10deg) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: rotateX(0deg) scale(1);
+  }
+}
+@keyframes scaleOut {
+  from {
+    opacity: 1;
+    transform: rotateX(0deg) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: rotateX(-10deg) scale(0.95);
+  }
+}
+@keyframes blurIn {
+  0% {
+    filter: blur(6px);
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  100% {
+    filter: blur(0px);
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@keyframes blurOut {
+  0% {
+    filter: blur(0px);
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    filter: blur(6px);
+    opacity: 0;
+    transform: scale(0.95);
+  }
+}
+@keyframes blurInDisplay {
+  0% {
+    filter: blur(6px);
+    opacity: 0;
+    transform: scale(0.95);
+    display: none;
+  }
+  100% {
+    filter: blur(0px);
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@keyframes blurOutDisplay {
+  0% {
+    filter: blur(0px);
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    filter: blur(6px);
+    opacity: 0;
+    transform: scale(0.95);
+    display: none;
+  }
+}
+@keyframes enterFromLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-50%);
+    display: none;
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+    display: flex;
+  }
+}
+@keyframes enterFromRight {
+  from {
+    opacity: 0;
+    transform: translateX(50%);
+    display: none;
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+    display: flex;
+  }
+}
+@keyframes exitToLeft {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+    display: flex;
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-50%);
+    display: none;
+  }
+}
+@keyframes exitToRight {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+    display: flex;
+  }
+  to {
+    opacity: 0;
+    transform: translateX(50%);
+    display: none;
+  }
+}
+
+/*
+ * Reduced motion keeps the fades and drops the movement. Redefining the keyframes rather than
+ * disabling the animations keeps their duration, so code waiting on `animationend` is unaffected.
+ * Each variant keeps the identity transform and filter of the full animation's end state: with
+ * `fill-mode: both` they persist, and dropping them would change stacking and text rasterization.
+ */
+@media (prefers-reduced-motion: reduce) {
+  @keyframes present {
+    from {
+      opacity: 0;
+      transform: translateY(0) scale(1);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+  @keyframes scaleIn {
+    from {
+      opacity: 0;
+      transform: rotateX(0deg) scale(1);
+    }
+    to {
+      opacity: 1;
+      transform: rotateX(0deg) scale(1);
+    }
+  }
+  @keyframes scaleOut {
+    from {
+      opacity: 1;
+      transform: rotateX(0deg) scale(1);
+    }
+    to {
+      opacity: 0;
+      transform: rotateX(0deg) scale(1);
+    }
+  }
+  @keyframes blurIn {
+    from {
+      filter: blur(0px);
+      opacity: 0;
+      transform: scale(1);
+    }
+    to {
+      filter: blur(0px);
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+  @keyframes blurOut {
+    from {
+      filter: blur(0px);
+      opacity: 1;
+      transform: scale(1);
+    }
+    to {
+      filter: blur(0px);
+      opacity: 0;
+      transform: scale(1);
+    }
+  }
+  @keyframes blurInDisplay {
+    from {
+      filter: blur(0px);
+      opacity: 0;
+      transform: scale(1);
+      display: none;
+    }
+    to {
+      filter: blur(0px);
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+  @keyframes blurOutDisplay {
+    from {
+      filter: blur(0px);
+      opacity: 1;
+      transform: scale(1);
+    }
+    to {
+      filter: blur(0px);
+      opacity: 0;
+      transform: scale(1);
+      display: none;
+    }
+  }
+  @keyframes enterFromLeft {
+    from {
+      opacity: 0;
+      transform: translateX(0);
+      display: none;
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+      display: flex;
+    }
+  }
+  @keyframes enterFromRight {
+    from {
+      opacity: 0;
+      transform: translateX(0);
+      display: none;
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+      display: flex;
+    }
+  }
+  @keyframes exitToLeft {
+    from {
+      opacity: 1;
+      transform: translateX(0);
+      display: flex;
+    }
+    to {
+      opacity: 0;
+      transform: translateX(0);
+      display: none;
+    }
+  }
+  @keyframes exitToRight {
+    from {
+      opacity: 1;
+      transform: translateX(0);
+      display: flex;
+    }
+    to {
+      opacity: 0;
+      transform: translateX(0);
+      display: none;
+    }
+  }
+
+  /* A loader must keep showing activity, so it slows down instead of stopping. */
+  .animate-spin {
+    animation-duration: 3s;
   }
 }

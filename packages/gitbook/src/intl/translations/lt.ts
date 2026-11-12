@@ -10,6 +10,7 @@ export const lt: TranslationLanguage = {
     switch_to_light_theme: 'Perjungti į šviesią temą',
     switch_to_system_theme: 'Perjungti į sistemos temą',
     search: 'Ieškoti',
+    skip_to_content: 'Pereiti prie turinio',
     clear: 'Išvalyti',
     table_filtered_by_selection: 'Atitinka pasirinkimą: ${1}',
     table_clear_selection: 'Išvalyti pasirinkimą',
