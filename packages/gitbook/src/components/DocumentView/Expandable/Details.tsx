@@ -50,27 +50,8 @@ export function Details(props: {
             id={id}
             data-block-key={props.commentKey}
             open={props.open || openFromHash}
-            className={tcls(
-                className,
-                'group/expandable',
-                'bg-tint-base',
-                'border',
-                'border-b-0',
-                'border-tint-subtle',
-                //all
-                'mt-0!',
-                'mb-0',
-                //select first child
-                'first:mt-5!',
-                'first:rounded-t-lg',
-                //select first in group
-                '[:not(&)_+_&]:mt-5!',
-                '[:not(&)_+_&]:rounded-t-lg',
-                //select last in group
-                '[&:not(:has(+_&))]:mb-5',
-                '[&:not(:has(+_&))]:rounded-b-lg',
-                '[&:not(:has(+_&))]:border-b'
-            )}
+            // Styles live on `.expandable` in `Expandable.css`; the group name is matched literally.
+            className={tcls(className, 'expandable', 'group/expandable')}
         >
             {children}
         </details>

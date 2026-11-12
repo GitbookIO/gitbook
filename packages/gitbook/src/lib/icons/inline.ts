@@ -138,6 +138,17 @@ const customIconSourceRequests = [
     'vscode',
 ] satisfies IconName[];
 
+/**
+ * Icons a block renders once per instance, so a document with many such blocks repeats them.
+ */
+const blockIconSourceRequests: Partial<Record<string, IconName[]>> = {
+    'heading-1': ['hashtag'],
+    'heading-2': ['hashtag'],
+    'heading-3': ['hashtag'],
+    expandable: ['hashtag', 'chevron-right'],
+    integration: ['spinner'],
+};
+
 const explicitStyleIconSourceRequests = [
     { icon: 'check', iconStyle: IconStyle.Solid },
     { icon: 'chevron-right', iconStyle: IconStyle.Solid },
@@ -377,6 +388,12 @@ function collectDocumentIconSourceRequests(
         const data = record.data;
         if (data && typeof data === 'object') {
             addIconSourceRequest(requests, (data as Record<string, unknown>).icon, iconStyle);
+        }
+    }
+
+    if (record.object === 'block' && typeof record.type === 'string') {
+        for (const icon of blockIconSourceRequests[record.type] ?? []) {
+            addIconSourceRequest(requests, icon, iconStyle);
         }
     }
 
