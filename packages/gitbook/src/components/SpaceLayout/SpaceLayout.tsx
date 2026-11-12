@@ -142,8 +142,8 @@ export function SpaceLayout(props: SpaceLayoutProps) {
                 </>
             ) : null}
 
-            {/* Chat panel shifts content left when open */}
-            <div className="lg:chat-open:mr-(--ai-chat-width) motion-safe:transition-all motion-safe:duration-300">
+            {/* Chat panel shifts content left when open. Clipped so blocks bleeding into the gutters (card carousels) can't widen the page. */}
+            <div className="overflow-x-clip lg:chat-open:mr-(--ai-chat-width) motion-safe:transition-all motion-safe:duration-300">
                 <div
                     className={tcls(
                         'flex',
