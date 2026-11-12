@@ -44,13 +44,13 @@ describe('ViewCards', () => {
         const markup = renderWithContext(<ViewCards {...makeProps(false)} />);
 
         // The peek follows the page gutter so it never bleeds past the viewport.
-        expect(markup).toContain('-mx-4 sm:-mx-6 md:-mx-8 2xl:-mx-12');
+        expect(markup).toContain('-mx-4 sm:-mx-6 md:-mx-8 3xl:-mx-12');
         expect(markup).toContain('scroll-px-4');
-        expect(markup).toContain('2xl:scroll-px-12');
+        expect(markup).toContain('3xl:scroll-px-12');
         expect(markup).toContain('left-0');
-        expect(markup).toContain('2xl:ml-8');
+        expect(markup).toContain('3xl:ml-8');
         expect(markup).toContain('right-0');
-        expect(markup).toContain('2xl:mr-8');
+        expect(markup).toContain('3xl:mr-8');
         expect(markup).not.toContain('before:bg-linear-to-r');
         expect(markup).not.toContain('after:bg-linear-to-l');
         expect(markup).toContain('snap-mandatory');

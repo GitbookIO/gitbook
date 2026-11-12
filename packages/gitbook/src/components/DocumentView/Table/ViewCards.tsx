@@ -49,13 +49,13 @@ function CardsGrid(props: TableViewProps<DocumentTableViewCards>) {
     );
 }
 
-// Each step matches the page gutter at that breakpoint; buttons sit 1rem inside the peek.
+// Each step fits the page gutter at that breakpoint (3rem only once the content column is capped); buttons sit 1rem inside the peek.
 const PEEK = {
-    margin: '-mx-4 sm:-mx-6 md:-mx-8 2xl:-mx-12',
+    margin: '-mx-4 sm:-mx-6 md:-mx-8 3xl:-mx-12',
     padding:
-        'px-4 scroll-px-4 sm:px-6 sm:scroll-px-6 md:px-8 md:scroll-px-8 2xl:px-12 2xl:scroll-px-12',
-    leadingButton: 'ml-0 sm:ml-2 md:ml-4 2xl:ml-8',
-    trailingButton: 'mr-0 sm:mr-2 md:mr-4 2xl:mr-8',
+        'px-4 scroll-px-4 sm:px-6 sm:scroll-px-6 md:px-8 md:scroll-px-8 3xl:px-12 3xl:scroll-px-12',
+    leadingButton: 'ml-0 sm:ml-2 md:ml-4 3xl:ml-8',
+    trailingButton: 'mr-0 sm:mr-2 md:mr-4 3xl:mr-8',
 };
 
 /**
