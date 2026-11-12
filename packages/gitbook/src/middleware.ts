@@ -590,7 +590,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         response.headers.set('content-security-policy', getContentSecurityPolicy());
         // Basic security headers
         response.headers.set('strict-transport-security', 'max-age=31536000');
-        response.headers.set('referrer-policy', 'no-referrer-when-downgrade');
+        response.headers.set('referrer-policy', 'strict-origin-when-cross-origin');
         response.headers.set('x-content-type-options', 'nosniff');
         // Debug header
         response.headers.set('x-gitbook-route-type', routeType);
