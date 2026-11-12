@@ -31,6 +31,7 @@ import { getContentSecurityPolicy } from '@/lib/csp';
 import { validateSerializedCustomization } from '@/lib/customization';
 import {
     DataFetcherError,
+    apiClient,
     getVisitorAuthBasePath,
     lookupPublishedContentByUrl,
     normalizeRequestURL,
@@ -379,6 +380,10 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
                 NextResponse.redirect(normalizedVisitorURL.toString()),
                 cookies
             );
+        }
+
+        if (isSearchPrewarmRequest(siteURLData)) {
+            return await serveSearchPrewarm(request, siteURLData);
         }
 
         //
@@ -809,6 +814,26 @@ const PATH_ALIASES: Record<string, string> = {
     [MCP_SERVER_CARD_WELL_KNOWN_PATH]: MCP_SERVER_CARD_PATH,
     [AI_CATALOG_WELL_KNOWN_PATH]: AI_CATALOG_PATH,
 };
+
+function isSearchPrewarmRequest(siteURLData: PublishedSiteContent) {
+    return (
+        removeLeadingSlash(removeTrailingSlash(siteURLData.pathname)) === '~gitbook/search-prewarm'
+    );
+}
+
+/**
+ * Warm the site's search index before the visitor types, without rendering a route.
+ */
+async function serveSearchPrewarm(request: NextRequest, siteURLData: PublishedSiteContent) {
+    if (request.method !== 'POST') {
+        return new NextResponse(null, { status: 405, headers: { allow: 'POST' } });
+    }
+
+    const api = apiClient({ apiToken: siteURLData.apiToken ?? null });
+    await waitUntil(api.orgs.prewarmSiteSearch(siteURLData.organization, siteURLData.site));
+
+    return new NextResponse(null, { status: 204 });
+}
 
 /**
  * Encode path in a site content.
