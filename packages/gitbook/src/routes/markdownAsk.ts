@@ -56,11 +56,12 @@ export async function serveAskMarkdown(
             return `We couldn't answer this question.`;
         }
 
+        const markdownLinker = linkerWithMarkdownPages(context.linker);
         const answerMarkdown = toPageMarkdown(
             await fromPageMarkdown(
                 {
                     ...context,
-                    linker: linkerWithMarkdownPages(context.linker),
+                    linker: markdownLinker,
                 },
                 {
                     markdown: latestAnswer.answer.markdown,
@@ -80,12 +81,15 @@ export async function serveAskMarkdown(
 
         const followupQuestions = latestAnswer.followupQuestions ?? [];
         if (followupQuestions.length > 0) {
+            const askURL = markdownLinker.toAbsoluteURL(
+                markdownLinker.toPathForPagePath({ path: 'index' })
+            );
             result += '# Suggested Follow-up Questions:\n\n';
             result +=
                 'If you need more information, consider asking one of these follow-up questions by performing an HTTP GET request on the URL:\n\n';
             result += followupQuestions
                 .map((q) => {
-                    const base = `${context.linker.toAbsoluteURL(context.linker.toPathInSite(''))}?ask=${encodeURIComponent(q)}`;
+                    const base = `${askURL}?ask=${encodeURIComponent(q)}`;
                     // Carry the goal forward so a multi-step agent keeps its end goal across asks.
                     const url = goal ? `${base}&goal=${encodeURIComponent(goal)}` : base;
                     return `- [${q}](${url})`;
