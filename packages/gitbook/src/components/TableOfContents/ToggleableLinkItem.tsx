@@ -185,7 +185,7 @@ function Toggler(props: {
             aria-labelledby={labelledBy}
             aria-expanded={isOpen}
             // Cancels the Button's expanded highlight: an open chevron must look like a closed one.
-            className="-my-0.5 -mr-1 ml-auto min-h-6 min-w-6 text-current hover:bg-tint-base aria-expanded:bg-transparent aria-expanded:text-current aria-expanded:hover:bg-tint-base"
+            className="-my-0.5 -mr-1 ml-auto min-h-6 min-w-6 text-current hover:bg-tint-base aria-expanded:bg-transparent aria-expanded:text-current aria-expanded:hover:bg-tint-hover"
         />
     );
 }
