@@ -63,7 +63,8 @@ export function releaseSiteIndex(): void {
 
 function fetchSiteIndexText(indexURL: string): Promise<string> {
     if (!siteIndexText) {
-        siteIndexText = fetch(indexURL).then((response) => {
+        // Same priority as the `SiteLayout` preload, so reusing it doesn't raise it.
+        siteIndexText = fetch(indexURL, { priority: 'low' }).then((response) => {
             if (!response.ok) {
                 throw new Error(`Failed to fetch search index: ${response.status}`);
             }

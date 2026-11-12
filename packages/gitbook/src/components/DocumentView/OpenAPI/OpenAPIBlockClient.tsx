@@ -16,6 +16,8 @@ import { matchesText } from '../Table/searchMatch';
 import { MIN_RECORDS_FOR_SEARCH } from '../Table/shouldShowSearch';
 import { Input } from '@/components/primitives';
 import { tString, useLanguage } from '@/intl/client';
+// Imported here, behind the `next/dynamic` boundary, so only pages with OpenAPI blocks load it.
+import './style.css';
 
 // Only what survives the RSC boundary. Rebuilding the renderers on the client is what lets this
 // whole subtree sit behind a `next/dynamic` chunk instead of the route's eager entry.

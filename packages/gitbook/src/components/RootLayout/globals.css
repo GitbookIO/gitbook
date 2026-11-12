@@ -3,6 +3,7 @@
 @config '../../../tailwind.config.ts';
 
 @import "./prose.css";
+@import "../DocumentView/OpenAPI/method-badge.css";
 
 /*
   The default border color has changed to `currentcolor` in Tailwind CSS v4,

@@ -78,6 +78,8 @@ export async function SiteLayout(props: {
         as: 'fetch',
         type: 'application/json',
         crossOrigin: 'anonymous',
+        // Multi-MB on large sites and only read once search opens: it must not compete with page load.
+        fetchPriority: 'low',
     });
 
     scripts.forEach(({ script }) => {
