@@ -10,6 +10,7 @@ export const hu: TranslationLanguage = {
     switch_to_light_theme: 'Váltás világos témára',
     switch_to_system_theme: 'Váltás rendszer témára',
     search: 'Keresés',
+    skip_to_content: 'Ugrás a tartalomra',
     clear: 'Törlés',
     table_filtered_by_selection: 'Megfelel a kijelölésnek: ${1}',
     table_clear_selection: 'Kijelölés törlése',

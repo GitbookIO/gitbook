@@ -10,6 +10,7 @@ export const he: TranslationLanguage = {
     switch_to_light_theme: 'מעבר לערכת נושא בהירה',
     switch_to_system_theme: 'מעבר לערכת הנושא של המערכת',
     search: 'חיפוש',
+    skip_to_content: 'דילוג לתוכן',
     clear: 'ניקוי',
     table_filtered_by_selection: 'תואם לבחירה: ${1}',
     table_clear_selection: 'נקה בחירה',

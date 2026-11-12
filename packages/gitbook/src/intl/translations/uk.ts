@@ -10,6 +10,7 @@ export const uk: TranslationLanguage = {
     switch_to_light_theme: 'Перемкнути на світлу тему',
     switch_to_system_theme: 'Перемкнути на системну тему',
     search: 'Пошук',
+    skip_to_content: 'Перейти до вмісту',
     clear: 'Очистити',
     table_filtered_by_selection: 'Відповідає вибору: ${1}',
     table_clear_selection: 'Очистити вибір',

@@ -10,6 +10,7 @@ export const lv: TranslationLanguage = {
     switch_to_light_theme: 'Pārslēgt uz gaišo motīvu',
     switch_to_system_theme: 'Pārslēgt uz sistēmas motīvu',
     search: 'Meklēt',
+    skip_to_content: 'Pāriet uz saturu',
     clear: 'Notīrīt',
     table_filtered_by_selection: 'Atbilst izvēlei: ${1}',
     table_clear_selection: 'Notīrīt izvēli',

@@ -10,6 +10,7 @@ export const nl: TranslationLanguage = {
     switch_to_light_theme: 'Schakel over naar lichte modus',
     switch_to_system_theme: 'Schakel over naar systeemmodus',
     search: 'Zoeken',
+    skip_to_content: 'Naar inhoud',
     clear: 'Wissen',
     table_filtered_by_selection: 'Komt overeen met selectie: ${1}',
     table_clear_selection: 'Selectie wissen',

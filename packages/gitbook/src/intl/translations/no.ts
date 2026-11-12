@@ -10,6 +10,7 @@ export const no: TranslationLanguage = {
     switch_to_light_theme: 'Bytt til lyst tema',
     switch_to_system_theme: 'Bytt til systemtema',
     search: 'Søk',
+    skip_to_content: 'Hopp til innhold',
     clear: 'Tøm',
     table_filtered_by_selection: 'Samsvarer med valg: ${1}',
     table_clear_selection: 'Fjern valg',

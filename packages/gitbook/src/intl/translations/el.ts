@@ -10,6 +10,7 @@ export const el: TranslationLanguage = {
     switch_to_light_theme: 'Αλλαγή σε φωτεινό θέμα',
     switch_to_system_theme: 'Αλλαγή στο θέμα συστήματος',
     search: 'Αναζήτηση',
+    skip_to_content: 'Μετάβαση στο περιεχόμενο',
     clear: 'Εκκαθάριση',
     table_filtered_by_selection: 'Ταιριάζει με την επιλογή: ${1}',
     table_clear_selection: 'Εκκαθάριση επιλογής',

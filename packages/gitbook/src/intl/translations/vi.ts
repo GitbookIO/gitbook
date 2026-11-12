@@ -10,6 +10,7 @@ export const vi: TranslationLanguage = {
     switch_to_light_theme: 'Chuyển sang giao diện sáng',
     switch_to_system_theme: 'Chuyển sang giao diện hệ thống',
     search: 'Tìm kiếm',
+    skip_to_content: 'Chuyển đến nội dung',
     clear: 'Xóa',
     table_filtered_by_selection: 'Khớp với lựa chọn: ${1}',
     table_clear_selection: 'Xóa lựa chọn',

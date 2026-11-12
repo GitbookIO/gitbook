@@ -10,6 +10,7 @@ export const et: TranslationLanguage = {
     switch_to_light_theme: 'Lülitu heledale teemale',
     switch_to_system_theme: 'Lülitu süsteemi teemale',
     search: 'Otsi',
+    skip_to_content: 'Liigu sisu juurde',
     clear: 'Tühjenda',
     table_filtered_by_selection: 'Vastab valikule: ${1}',
     table_clear_selection: 'Tühjenda valik',

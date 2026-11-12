@@ -50,3 +50,6 @@ export const SIDE_COLUMN_WITHOUT_HEADER_AND_COVER: ClassValue = [
     'top-[240px]',
     'h-[calc(100vh-240px)]',
 ];
+
+/** Id of the `<main>` landmark, target of the skip link. */
+export const MAIN_CONTENT_ID = 'gitbook-main-content';

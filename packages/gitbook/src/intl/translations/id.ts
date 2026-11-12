@@ -10,6 +10,7 @@ export const id: TranslationLanguage = {
     switch_to_light_theme: 'Beralih ke tema terang',
     switch_to_system_theme: 'Beralih ke tema sistem',
     search: 'Cari',
+    skip_to_content: 'Lewati ke konten',
     clear: 'Bersihkan',
     table_filtered_by_selection: 'Sesuai pilihan: ${1}',
     table_clear_selection: 'Hapus pilihan',

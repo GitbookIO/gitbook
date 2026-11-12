@@ -10,6 +10,7 @@ export const ja: TranslationLanguage = {
     switch_to_light_theme: 'ライトテーマに切り替え',
     switch_to_system_theme: 'システムのテーマに切り替え',
     search: '検索',
+    skip_to_content: 'コンテンツへスキップ',
     clear: 'クリア',
     table_filtered_by_selection: '選択に一致: ${1}',
     table_clear_selection: '選択をクリア',

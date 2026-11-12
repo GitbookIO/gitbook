@@ -10,6 +10,7 @@ export const de: TranslationLanguage = {
     switch_to_light_theme: 'Zum hellen Modus wechseln',
     switch_to_system_theme: 'Zum Systemmodus wechseln',
     search: 'Suche',
+    skip_to_content: 'Zum Inhalt springen',
     clear: 'Löschen',
     table_filtered_by_selection: 'Entspricht Auswahl: ${1}',
     table_clear_selection: 'Auswahl zurücksetzen',
