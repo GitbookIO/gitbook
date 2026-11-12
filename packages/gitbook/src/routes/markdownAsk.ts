@@ -105,5 +105,5 @@ export async function serveAskMarkdown(
         }
 
         return result;
-    }, context.isChatGPT);
+    });
 }
