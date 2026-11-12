@@ -87,3 +87,5 @@ The site must be [published publicly](https://gitbook.com/docs/published-documen
 ## License
 
 The renderer is distributed under the [GNU GPLv3 License](https://github.com/GitbookIO/gitbook/blob/main/LICENSE). If you distribute the code, you must keep the source code public. To use it in a private repository, you need a [commercial license](https://www.gitbook.com/pricing).
+
+The [`@gitbook/embed`](https://github.com/GitbookIO/gitbook/blob/main/packages/embed) package is distributed under the [Apache License 2.0](https://github.com/GitbookIO/gitbook/blob/main/packages/embed/LICENSE). Contributions to it are made under the same license.

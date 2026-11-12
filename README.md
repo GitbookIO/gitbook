@@ -124,6 +124,8 @@ If you plan to distribute the code, you must make the source code public to comp
 
 See `LICENSE` for more information.
 
+The [`@gitbook/embed`](packages/embed) package is an exception: it is distributed under the [Apache License 2.0](packages/embed/LICENSE), so it can be used in proprietary applications.
+
 ## Badges
 
 <p align="left">
