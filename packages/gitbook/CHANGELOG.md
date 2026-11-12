@@ -1,5 +1,15 @@
 # gitbook
 
+## 0.28.2
+
+### Patch Changes
+
+- b53e73c: Link suggested follow-up questions in markdown AI answers to the `.md` ask route so agents get markdown back.
+- 4a40547: Fix the page outline not scrolling to keep the active section visible on long pages.
+- 7ddd023: Fix search prewarming on public sites.
+- Updated dependencies [31e88d1]
+  - @gitbook/embed@0.7.0
+
 ## 0.28.1
 
 ### Patch Changes
