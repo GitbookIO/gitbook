@@ -56,7 +56,6 @@ function preloadFont(fontData: FontData) {
                 ReactDOM.preload(url, {
                     as: 'font',
                     crossOrigin: 'anonymous',
-                    fetchPriority: 'high',
                     type: format ? `font/${format}` : undefined,
                 });
             });

@@ -43,7 +43,7 @@ export function HoverCard(
             >
                 <PreviewCard.Popup
                     {...popupProps}
-                    className="animate-scale-in data-closed:animate-scale-out"
+                    className="pointer-events-auto animate-scale-in data-closed:animate-scale-out"
                 >
                     <div
                         className={tcls(
