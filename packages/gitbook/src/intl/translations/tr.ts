@@ -10,6 +10,7 @@ export const tr: TranslationLanguage = {
     switch_to_light_theme: 'Açık temaya geç',
     switch_to_system_theme: 'Sistem temasına geç',
     search: 'Ara',
+    skip_to_content: 'İçeriğe geç',
     clear: 'Temizle',
     table_filtered_by_selection: 'Seçimle eşleşiyor: ${1}',
     table_clear_selection: 'Seçimi temizle',

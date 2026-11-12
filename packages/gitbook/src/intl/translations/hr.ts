@@ -10,6 +10,7 @@ export const hr: TranslationLanguage = {
     switch_to_light_theme: 'Prebaci na svijetlu temu',
     switch_to_system_theme: 'Prebaci na temu sustava',
     search: 'Pretraži',
+    skip_to_content: 'Preskoči na sadržaj',
     clear: 'Očisti',
     table_filtered_by_selection: 'Odgovara odabiru: ${1}',
     table_clear_selection: 'Očisti odabir',

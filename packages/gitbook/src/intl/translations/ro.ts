@@ -10,6 +10,7 @@ export const ro: TranslationLanguage = {
     switch_to_light_theme: 'Comută la tema luminoasă',
     switch_to_system_theme: 'Comută la tema sistemului',
     search: 'Caută',
+    skip_to_content: 'Salt la conținut',
     clear: 'Șterge',
     table_filtered_by_selection: 'Se potrivește cu selecția: ${1}',
     table_clear_selection: 'Șterge selecția',

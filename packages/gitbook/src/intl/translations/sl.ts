@@ -10,6 +10,7 @@ export const sl: TranslationLanguage = {
     switch_to_light_theme: 'Preklopi na svetlo temo',
     switch_to_system_theme: 'Preklopi na sistemsko temo',
     search: 'Išči',
+    skip_to_content: 'Preskoči na vsebino',
     clear: 'Počisti',
     table_filtered_by_selection: 'Ustreza izbiri: ${1}',
     table_clear_selection: 'Počisti izbiro',

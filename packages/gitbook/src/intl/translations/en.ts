@@ -8,6 +8,7 @@ export const en = {
     switch_to_light_theme: 'Switch to light theme',
     switch_to_system_theme: 'Switch to system theme',
     search: 'Search',
+    skip_to_content: 'Skip to content',
     clear: 'Clear',
     table_filtered_by_selection: 'Matches selection: ${1}',
     table_clear_selection: 'Clear selection',

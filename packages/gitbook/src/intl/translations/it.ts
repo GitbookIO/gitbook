@@ -10,6 +10,7 @@ export const it: TranslationLanguage = {
     switch_to_light_theme: 'Passa al tema chiaro',
     switch_to_system_theme: 'Passa al tema di sistema',
     search: 'Cerca',
+    skip_to_content: 'Vai al contenuto',
     clear: 'Cancella',
     table_filtered_by_selection: 'Corrisponde alla selezione: ${1}',
     table_clear_selection: 'Cancella selezione',

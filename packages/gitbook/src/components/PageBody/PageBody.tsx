@@ -16,6 +16,7 @@ import { PageCover } from './PageCover';
 import { PageFooterNavigation } from './PageFooterNavigation';
 import { PageHeader } from './PageHeader';
 import { PreservePageLayout } from './PreservePageLayout';
+import { MAIN_CONTENT_ID } from '@/components/layout';
 import { getSpaceLanguage } from '@/intl/server';
 import { t } from '@/intl/translate';
 import type { GitBookSiteContext } from '@/lib/context';
@@ -103,6 +104,7 @@ export async function PageBody(props: {
                 />
             ) : null}
             <main
+                id={MAIN_CONTENT_ID}
                 // Comments on the whole page target anywhere in it that isn't a block.
                 {...(withCommentAnchors ? { 'data-comment-page': '' } : {})}
                 className={tcls(

@@ -10,6 +10,7 @@ export const da: TranslationLanguage = {
     switch_to_light_theme: 'Skift til lyst tema',
     switch_to_system_theme: 'Skift til systemtema',
     search: 'Søg',
+    skip_to_content: 'Spring til indhold',
     clear: 'Ryd',
     table_filtered_by_selection: 'Matcher valg: ${1}',
     table_clear_selection: 'Ryd valg',

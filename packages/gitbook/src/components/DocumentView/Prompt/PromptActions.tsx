@@ -5,6 +5,7 @@ import React from 'react';
 import { Icon } from '@gitbook/icons';
 
 import { type PromptActionId, setPromptAction, usePromptAction } from './promptAction';
+import { useCopyToClipboard } from '@/components/hooks';
 import {
     Button,
     ButtonGroup,
@@ -27,25 +28,10 @@ export function PromptActions(props: { prompt: string; openInAIProviders: boolea
     const { prompt, openInAIProviders } = props;
     const language = useLanguage();
     const selectedAction = usePromptAction();
-    const [copied, setCopied] = React.useState(false);
-
-    React.useEffect(() => {
-        if (!copied) {
-            return;
-        }
-
-        const timeout = setTimeout(() => {
-            setCopied(false);
-        }, COPIED_MESSAGE_DURATION);
-
-        return () => {
-            clearTimeout(timeout);
-        };
-    }, [copied]);
+    const { copied, copy } = useCopyToClipboard(COPIED_MESSAGE_DURATION);
 
     const copyPrompt = () => {
-        navigator.clipboard.writeText(prompt);
-        setCopied(true);
+        copy(prompt);
     };
 
     // The pick follows the visitor from site to site, so fall back to copying wherever the agent

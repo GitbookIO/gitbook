@@ -10,6 +10,7 @@ export const th: TranslationLanguage = {
     switch_to_light_theme: 'เปลี่ยนเป็นธีมสว่าง',
     switch_to_system_theme: 'เปลี่ยนเป็นธีมของระบบ',
     search: 'ค้นหา',
+    skip_to_content: 'ข้ามไปยังเนื้อหา',
     clear: 'ล้าง',
     table_filtered_by_selection: 'ตรงกับการเลือก: ${1}',
     table_clear_selection: 'ล้างการเลือก',

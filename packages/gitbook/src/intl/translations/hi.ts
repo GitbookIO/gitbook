@@ -10,6 +10,7 @@ export const hi: TranslationLanguage = {
     switch_to_light_theme: 'लाइट थीम पर जाएं',
     switch_to_system_theme: 'सिस्टम थीम पर जाएं',
     search: 'खोजें',
+    skip_to_content: 'सामग्री पर जाएं',
     clear: 'साफ करें',
     table_filtered_by_selection: 'चयन से मेल खाता है: ${1}',
     table_clear_selection: 'चयन साफ़ करें',

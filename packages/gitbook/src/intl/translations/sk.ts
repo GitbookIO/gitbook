@@ -10,6 +10,7 @@ export const sk: TranslationLanguage = {
     switch_to_light_theme: 'Prepnúť na svetlý motív',
     switch_to_system_theme: 'Prepnúť na systémový motív',
     search: 'Hľadať',
+    skip_to_content: 'Preskočiť na obsah',
     clear: 'Vymazať',
     table_filtered_by_selection: 'Zodpovedá výberu: ${1}',
     table_clear_selection: 'Zrušiť výber',

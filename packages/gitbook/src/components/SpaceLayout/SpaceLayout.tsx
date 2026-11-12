@@ -12,6 +12,7 @@ import { CurrentContentProvider } from '../hooks';
 import { InsightsProvider, VisitorProvider } from '../Insights';
 import { CONTAINER_STYLE } from '../layout';
 import { NavigationLoader } from '../primitives/NavigationLoader';
+import { SkipToContent } from '../primitives/SkipToContent';
 import { SearchContainer, getSearchBaseProps } from '../Search';
 import {
     SiteSectionList,
@@ -131,6 +132,7 @@ export function SpaceLayout(props: SpaceLayoutProps) {
 
     return (
         <SpaceLayoutServerContext {...props}>
+            <SkipToContent />
             <Announcement context={context} />
             <Header withTopHeader={withTopHeader} variants={variants} context={context} />
             <NavigationLoader />

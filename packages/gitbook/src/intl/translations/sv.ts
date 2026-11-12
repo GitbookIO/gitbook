@@ -10,6 +10,7 @@ export const sv: TranslationLanguage = {
     switch_to_light_theme: 'Byt till ljust tema',
     switch_to_system_theme: 'Byt till systemtema',
     search: 'Sök',
+    skip_to_content: 'Hoppa till innehåll',
     clear: 'Rensa',
     table_filtered_by_selection: 'Matchar val: ${1}',
     table_clear_selection: 'Rensa val',
