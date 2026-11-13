@@ -3,8 +3,14 @@ import type { ToolAnnotations } from '@modelcontextprotocol/sdk/types.js';
 import type { ZodRawShape } from 'zod';
 import { z } from 'zod';
 
-import { AgentFeedbackSource, SiteInsightsDisplayContext } from '@gitbook/api';
+import {
+    AgentFeedbackSource,
+    SiteInsightsDisplayContext,
+    type SiteSpace,
+    type SiteStructure,
+} from '@gitbook/api';
 
+import type { SearchSiteContentScope } from '@/components/Search/search-types';
 import { resolveSitePageFromURL } from '@/components/SitePage/fetch';
 import { isAIEnabled } from '@/components/utils/isAIChatEnabled';
 import {
@@ -18,9 +24,16 @@ import { renderAskSourcesMarkdown, streamSiteAskAnswer } from '@/lib/ask';
 import { getAskVisitorAgent } from '@/lib/ask-visitor';
 import type { GitBookSiteContext } from '@/lib/context';
 import { getExposableError, throwIfDataError } from '@/lib/data';
+import { getLogger } from '@/lib/logger';
 import { fromPageMarkdown, getMarkdownForPageInSpace, toPageMarkdown } from '@/lib/markdownPage';
 import { joinPathWithBaseURL } from '@/lib/paths';
-import { findSiteSpaceBy } from '@/lib/sites';
+import {
+    findSiteSpaceBy,
+    getSiteSpaceLanguages,
+    getSiteStructureSections,
+    listAllSiteSpaces,
+    normalizeLanguage,
+} from '@/lib/sites';
 import { trackServerInsightsEvents } from '@/lib/tracking';
 import { waitUntil } from '@/lib/waitUntil';
 
@@ -54,6 +67,8 @@ export function createSiteMcpTools(
     const { dataFetcher, linker, site } = context;
     const siteUrl = context.siteSpace.urls.published;
     const examplePageURL = siteUrl ? joinPathWithBaseURL(siteUrl, 'getting-started') : undefined;
+    const endpointLanguage = normalizeLanguage(context.siteSpace.space.language);
+    const siteLanguages = getSiteSpaceLanguages(listAllSiteSpaces(context.structure));
 
     const tools: SiteMcpTool[] = [
         defineTool({
@@ -61,6 +76,7 @@ export function createSiteMcpTools(
             description: `Search across the documentation to find relevant information, code examples, API references, and guides. Use this tool when you need to answer questions about ${site.title}, find specific documentation, understand how features work, or locate implementation details. The search returns contextual content with titles and direct links to the documentation pages.`,
             inputSchema: {
                 query: z.string(),
+                ...languageArgument(siteLanguages, endpointLanguage),
             },
             annotations: {
                 title: 'Search documentation',
@@ -69,15 +85,26 @@ export function createSiteMcpTools(
                 idempotentHint: true,
                 openWorldHint: true,
             },
-            handler: async ({ query }) => {
+            handler: async ({ query, language }) => {
+                // zod can't type `language`, since only multi-language sites declare it.
+                const searchLanguage = typeof language === 'string' ? language : endpointLanguage;
                 const results = await throwIfDataError(
                     dataFetcher.searchSiteContent({
                         organizationId: context.organizationId,
                         siteId: site.id,
                         query,
-                        scope: { mode: 'all' },
+                        scope: getLanguageSearchScope(context.structure, searchLanguage),
                     })
                 );
+
+                if (siteLanguages.length > 1) {
+                    const labels = {
+                        siteId: site.id,
+                        language: searchLanguage,
+                        languageSource: language ? 'argument' : 'endpoint',
+                    };
+                    getLogger().subLogger('mcp', { labels }).info('searchDocumentation language');
+                }
 
                 trackMcpEvent({
                     organizationId: context.organizationId,
@@ -411,6 +438,66 @@ export function createSiteMcpTools(
     );
 
     return tools;
+}
+
+/**
+ * The optional `language` argument of the search tool, only on sites with several languages.
+ */
+function languageArgument(languages: string[], defaultLanguage: string) {
+    const [first, ...rest] = languages;
+    if (!first || rest.length === 0) {
+        return undefined;
+    }
+
+    return {
+        language: z
+            .enum([first, ...rest])
+            .optional()
+            // A language the site doesn't have searches English rather than failing the call.
+            .catch('en')
+            .describe(
+                `The language the user is writing in. Pass it whenever you know it, so results come from the documentation in that language. Defaults to "${defaultLanguage}".`
+            ),
+    };
+}
+
+/**
+ * Search scope covering the site spaces in one language.
+ */
+function getLanguageSearchScope(
+    structure: SiteStructure,
+    language: string
+): SearchSiteContentScope {
+    const sections =
+        structure.type === 'sections'
+            ? getSiteStructureSections(structure, { ignoreGroups: true }).map(
+                  (section) => section.siteSpaces
+              )
+            : [structure.structure];
+    const siteSpaces = sections.flatMap((variants) => getVariantsInLanguage(variants, language));
+
+    if (siteSpaces.length === listAllSiteSpaces(structure).length) {
+        return { mode: 'all' };
+    }
+
+    return { mode: 'specific', siteSpaceIds: siteSpaces.map((siteSpace) => siteSpace.id) };
+}
+
+/**
+ * The variants of a section in the given language, or in its default variant's language if it has none.
+ */
+function getVariantsInLanguage(variants: SiteSpace[], language: string): SiteSpace[] {
+    const matching = variants.filter((variant) => getLanguage(variant) === language);
+    if (matching.length > 0) {
+        return matching;
+    }
+
+    const fallback = variants.find((variant) => variant.default) ?? variants[0];
+    return variants.filter((variant) => fallback && getLanguage(variant) === getLanguage(fallback));
+}
+
+function getLanguage(siteSpace: SiteSpace): string {
+    return normalizeLanguage(siteSpace.space.language);
 }
 
 /**

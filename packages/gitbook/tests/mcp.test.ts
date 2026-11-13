@@ -34,6 +34,40 @@ it(
 );
 
 it(
+    'should search the language of the MCP endpoint unless the client passes one',
+    async () => {
+        const client = await connectMCPClient(
+            getContentTestURL('https://gitbook.com/docs/~gitbook/mcp')
+        );
+        const translatedLink = /\/documentation\/(fr|ja|zh)(\/|$)/;
+
+        async function searchLinks(args: { query: string; language?: string }) {
+            const response = await client.callTool({
+                name: 'searchDocumentation',
+                arguments: args,
+            });
+            const content = response.content as { text: string }[];
+            return content.map((item) => item.text.match(/^Link: (.+)$/m)?.[1] ?? '');
+        }
+
+        const endpointLinks = await searchLinks({ query: 'table' });
+        expect(endpointLinks.length).toBeGreaterThan(0);
+        expect(endpointLinks.filter((link) => translatedLink.test(link))).toEqual([]);
+
+        const frenchLinks = await searchLinks({ query: 'table', language: 'fr' });
+        expect(frenchLinks.some((link) => link.includes('/documentation/fr/'))).toBe(true);
+        expect(frenchLinks.filter((link) => /\/documentation\/(ja|zh)(\/|$)/.test(link))).toEqual(
+            []
+        );
+
+        const unknownLanguageLinks = await searchLinks({ query: 'table', language: 'de' });
+        expect(unknownLanguageLinks.length).toBeGreaterThan(0);
+        expect(unknownLanguageLinks.filter((link) => translatedLink.test(link))).toEqual([]);
+    },
+    { timeout: 15_000 }
+);
+
+it(
     'should get a page from another site space through MCP',
     async () => {
         const client = await connectMCPClient(
