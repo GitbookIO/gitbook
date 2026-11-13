@@ -508,6 +508,18 @@ html.dark .highlight-line.diff-deleted .highlight-line-content::before {
       @apply text-contrast-cover;
     }
   }
+
+  /*
+    Inline code and highlights sit on their own background, not the cover, so they keep the regular
+    text color. Inherited, the transparent fill of a split element hides their text behind that
+    background. Kept out of the utilities layer so a highlight's own text color still applies.
+  */
+  @media not (prefers-contrast: more) {
+    [data-over-cover] :is(code, [data-highlight]) {
+      color: var(--cover-text-below);
+      -webkit-text-fill-color: currentcolor;
+    }
+  }
 }
 
 /* Zoomable images */
