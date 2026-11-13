@@ -43,6 +43,9 @@ export function SearchContainer({
     const [searchPopup, setSearchPopup] = React.useState<HTMLDivElement | null>(null);
     const language = useLanguage();
     const usesSideSheet = useIsMobile(768);
+    // The header and sidebar copies are shown and hidden by CSS at the `lg` breakpoint.
+    const belowLg = useIsMobile();
+    const visible = viewport === 'desktop' ? !belowLg : viewport === 'mobile' ? belowLg : true;
     const {
         assistants,
         askQuery,
@@ -67,7 +70,7 @@ export function SearchContainer({
         withAI,
         withSearchAI,
         scopeControl,
-    } = useSearchController(searchProps);
+    } = useSearchController(searchProps, { requestsEnabled: visible });
     const uiAssistants = assistants.filter((assistant) => assistant.ui === true);
 
     useHotkeys(
@@ -115,8 +118,6 @@ export function SearchContainer({
         };
     }, [close]);
 
-    const visible =
-        viewport === 'desktop' ? !usesSideSheet : viewport === 'mobile' ? usesSideSheet : true;
     const searchResultsActiveDescendant =
         cursor !== null && cursor < results.length ? `${resultsId}-${cursor}` : undefined;
     const isSearchOpen = Boolean(visible && (state?.open ?? false));
