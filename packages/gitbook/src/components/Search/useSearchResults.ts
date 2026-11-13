@@ -8,26 +8,21 @@ import {
     createRecommendedQuestionResult,
     getEmptySearchResults,
 } from './empty-search-results';
-import { computeFilterSiteSpaceIds } from './filter';
+import { computeFilterSiteSpaceIds, filterResultsBySiteSpaces } from './filter';
 import { useRecentSearchQueries } from './recent-queries';
-import { type MergedPageResult, fuseSearchResults } from './reciprocalRankFusion';
 import { computeRemoteSearchScope } from './remote-scope';
 import type { OrderedComputedResult, SearchSiteContentScope } from './search-types';
 import { streamRecommendedQuestions } from './server-actions';
-import { type LocalPageResult, useLocalSearchResults } from './useLocalSearchResults';
 import type { SearchScope } from './useSearch';
 import { useAI } from '@/components/AI';
 
-export type ResultType =
-    | OrderedComputedResult
-    | LocalPageResult
-    | MergedPageResult
-    | RecommendedQuestionResult;
+export type ResultType = OrderedComputedResult | RecommendedQuestionResult;
 
-export type { LocalPageResult, MergedPageResult };
-
-// Small helper extracted for unit testing of scope → local filter mapping
-// computeFilterSiteSpaceIds is imported from './filter' for testability
+type RemoteSearchState =
+    | { status: 'idle' }
+    | { status: 'loading' }
+    | { status: 'ready'; requestKey: string; results: OrderedComputedResult[] }
+    | { status: 'error' };
 
 /**
  * We cache the recommended questions globally to avoid calling the API multiple times
@@ -40,8 +35,6 @@ const cachedRecommendedQuestions: Map<string, RecommendedQuestionResult[]> = new
 export function useSearchResults(props: {
     asEmbeddable?: boolean;
     disabled: boolean;
-    /** Whether the search surface is open. Gates building the local search index. */
-    open: boolean;
     query: string;
     siteSpaceId: string;
     siteSpaceIds: string[];
@@ -50,17 +43,14 @@ export function useSearchResults(props: {
     suggestions?: string[];
     /** URL for the search API route (e.g. from linker.toPathInSpace('~gitbook/search')). */
     searchURL: string;
-    /** URL for the local index JSON (e.g. from linker.toPathInSite('~gitbook/site-index')). */
-    indexURL: string;
-    /** BCP-47 language code of the current site space, used to filter local search results. */
-    lang?: string;
-    /** Whether the site has multiple sections. If false, treat default scope as current for local filtering. */
+    /** Whether the site has multiple sections. If false, the default scope only shows the current site space. */
     withSections?: boolean;
+    /** Returns true when the latest edit completed the query (paste, IME commit), so it is sent without the idle delay. */
+    consumeImmediate?: (query: string) => boolean;
 }) {
     const {
         asEmbeddable,
         disabled,
-        open,
         query,
         siteSpaceId,
         siteSpaceIds,
@@ -68,9 +58,8 @@ export function useSearchResults(props: {
         scope,
         suggestions,
         searchURL,
-        indexURL,
-        lang,
         withSections,
+        consumeImmediate,
     } = props;
 
     const trackEvent = useTrackEvent();
@@ -87,24 +76,21 @@ export function useSearchResults(props: {
         [scope, siteSpaceId, siteSpaceIds, withSections, selectedSectionSiteSpaceIds]
     );
 
-    const { results: localResults } = useLocalSearchResults({
-        query,
-        indexURL,
-        lang,
-        disabled,
-        open,
-        filterSiteSpaceIds,
-    });
+    const remoteScope = React.useMemo(
+        () =>
+            computeRemoteSearchScope(scope, siteSpaceId, siteSpaceIds, selectedSectionSiteSpaceIds),
+        [scope, siteSpaceId, siteSpaceIds, selectedSectionSiteSpaceIds]
+    );
+    // Identifies the answer the UI needs now; an answer for any other key is never shown as current.
+    const requestKey = JSON.stringify([query, remoteScope]);
 
-    const [remoteState, setRemoteState] = React.useState<{
-        results: OrderedComputedResult[];
-        fetching: boolean;
-        error: boolean;
-    }>({ results: [], fetching: false, error: false });
+    const [remoteState, setRemoteState] = React.useState<RemoteSearchState>({ status: 'idle' });
 
     // Track the current in-flight fetch so it can be aborted imperatively
     // when the user navigates away before the request completes.
     const abortRef = React.useRef<(() => void) | null>(null);
+    // Sends the pending request now instead of waiting for the idle delay.
+    const flushRef = React.useRef<(() => void) | null>(null);
 
     const { assistants } = useAI();
     const withAI = assistants.length > 0;
@@ -116,11 +102,7 @@ export function useSearchResults(props: {
         }
         if (!query) {
             if (!withAI) {
-                setRemoteState({
-                    results: [],
-                    fetching: false,
-                    error: false,
-                });
+                setRemoteState({ status: 'idle' });
                 return;
             }
 
@@ -131,19 +113,11 @@ export function useSearchResults(props: {
                     `Cached recommended questions should be set for site-space ${siteSpaceId}`
                 );
                 // Recommended questions are stored as ResultType[] already
-                setRemoteState({
-                    results: [],
-                    fetching: false,
-                    error: false,
-                });
+                setRemoteState({ status: 'idle' });
                 return;
             }
 
-            setRemoteState({
-                results: [],
-                fetching: false,
-                error: false,
-            });
+            setRemoteState({ status: 'idle' });
 
             let cancelled = false;
 
@@ -156,11 +130,7 @@ export function useSearchResults(props: {
                 suggestions.forEach((question) => {
                     questions.add(question);
                 });
-                setRemoteState({
-                    results: [],
-                    fetching: false,
-                    error: false,
-                });
+                setRemoteState({ status: 'idle' });
                 return;
             }
 
@@ -186,11 +156,7 @@ export function useSearchResults(props: {
 
                     if (!cancelled) {
                         // Recommended questions are handled via a separate path below
-                        setRemoteState({
-                            results: [],
-                            fetching: false,
-                            error: false,
-                        });
+                        setRemoteState({ status: 'idle' });
                     }
                 }
             }, 100);
@@ -200,28 +166,18 @@ export function useSearchResults(props: {
                 clearTimeout(timeout);
             };
         }
-        setRemoteState({
-            results: [],
-            fetching: true,
-            error: false,
-        });
+        setRemoteState({ status: 'loading' });
         let cancelled = false;
         const abortController = new AbortController();
-        const timeout = setTimeout(async () => {
+        const send = async () => {
+            flushRef.current = null;
             const fetchSearch = (
                 scope: Parameters<typeof fetchSearchResults>[1]
             ): Promise<OrderedComputedResult[]> =>
                 fetchSearchResults(searchURL, scope, query, abortController.signal, asEmbeddable);
 
             try {
-                const resultsPromise = fetchSearch(
-                    computeRemoteSearchScope(
-                        scope,
-                        siteSpaceId,
-                        siteSpaceIds,
-                        selectedSectionSiteSpaceIds
-                    )
-                );
+                const resultsPromise = fetchSearch(remoteScope);
 
                 const onResults = (results: OrderedComputedResult[]) => {
                     if (cancelled) {
@@ -230,38 +186,34 @@ export function useSearchResults(props: {
 
                     if (!results) {
                         // Can happen when the route cannot be found and returns the page's html.
-                        setRemoteState((prev) => ({ ...prev, error: true }));
+                        setRemoteState({ status: 'error' });
                         return;
                     }
 
-                    setRemoteState((prev) => ({ ...prev, results }));
+                    setRemoteState({ status: 'ready', requestKey, results });
                     trackEvent({ type: 'search_type_query', query });
                 };
                 const onError = () => {
                     if (cancelled) {
                         return;
                     }
-                    setRemoteState((prev) => ({ ...prev, error: true }));
+                    setRemoteState({ status: 'error' });
                 };
 
                 await resultsPromise.then(onResults, onError);
-
-                if (cancelled) {
-                    return;
-                }
-                setRemoteState((prev) => ({ ...prev, fetching: false }));
             } catch {
                 // If there is an error, we need to catch it to avoid infinite loading state.
                 if (cancelled) {
                     return;
                 }
-                setRemoteState({
-                    results: [],
-                    fetching: false,
-                    error: true,
-                });
+                setRemoteState({ status: 'error' });
             }
-        }, 200);
+        };
+        const timeout = setTimeout(send, consumeImmediate?.(query) ? 0 : 150);
+        flushRef.current = () => {
+            clearTimeout(timeout);
+            void send();
+        };
 
         abortRef.current = () => {
             cancelled = true;
@@ -274,29 +226,32 @@ export function useSearchResults(props: {
             clearTimeout(timeout);
             abortController.abort();
             abortRef.current = null;
+            flushRef.current = null;
         };
     }, [
         query,
-        scope,
+        remoteScope,
+        requestKey,
         trackEvent,
         withAI,
         siteSpaceId,
-        siteSpaceIds,
-        selectedSectionSiteSpaceIds,
         disabled,
         suggestions,
         searchURL,
         asEmbeddable,
+        consumeImmediate,
     ]);
+
+    const flush = React.useCallback(() => {
+        flushRef.current?.();
+    }, []);
 
     const abort = React.useCallback(() => {
         abortRef.current?.();
         abortRef.current = null;
-        setRemoteState((prev) => (prev.fetching ? { ...prev, fetching: false } : prev));
+        setRemoteState((prev) => (prev.status === 'loading' ? { status: 'idle' } : prev));
     }, []);
 
-    // Merge local and remote results.
-    // Re-runs immediately whenever either result set changes.
     const results = React.useMemo<ResultType[]>(() => {
         if (!query) {
             const recommendedQuestions =
@@ -313,15 +268,12 @@ export function useSearchResults(props: {
             });
         }
 
-        return fuseSearchResults({
-            localResults,
-            remoteResults: remoteState.results,
-            query,
-            allowedSiteSpaceIds: filterSiteSpaceIds,
-        });
+        return remoteState.status === 'ready' && remoteState.requestKey === requestKey
+            ? filterResultsBySiteSpaces(remoteState.results, filterSiteSpaceIds)
+            : [];
     }, [
-        localResults,
-        remoteState.results,
+        remoteState,
+        requestKey,
         query,
         filterSiteSpaceIds,
         withAI,
@@ -330,10 +282,15 @@ export function useSearchResults(props: {
         recentQueries,
     ]);
 
+    // Between a query change and its loading state, the previous answer must still read as loading.
+    const isOutdated = remoteState.status === 'ready' && remoteState.requestKey !== requestKey;
+
     return {
         results,
-        fetching: remoteState.fetching,
-        error: remoteState.error,
+        fetching: remoteState.status === 'loading' || (Boolean(query) && isOutdated),
+        error: remoteState.status === 'error',
+        requestKey,
+        flush,
         abort,
     };
 }

@@ -44,8 +44,6 @@ export const de: TranslationLanguage = {
     search_ask_no_answer:
         'Es konnte keine Antwort auf Ihre Frage gefunden werden. Versuchen Sie, sie umzuformulieren oder genauer zu sein.',
     search_ask_error: 'Etwas ist schief gelaufen. Bitte versuchen Sie es später noch einmal.',
-    search_partial_error:
-        'Einige Ergebnisse konnten nicht geladen werden. Verfügbare Ergebnisse werden angezeigt.',
     on_this_page: 'Auf dieser Seite',
     next_page: 'Nächste',
     previous_page: 'Vorherige',
