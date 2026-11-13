@@ -4,18 +4,30 @@ import assertNever from 'assert-never';
 import { motion } from 'framer-motion';
 import React from 'react';
 
-import { Button, SkeletonParagraph, SkeletonSmall } from '../primitives';
+import { Button } from '../primitives';
 import { isExternalLink } from '../utils/link';
 import { addRecentSearchQuery } from './recent-queries';
 import { SearchPageResultItem } from './SearchPageResultItem';
 import { SearchQuestionResultItem } from './SearchQuestionResultItem';
 import { SearchRecordResultItem } from './SearchRecordResultItem';
-import { SearchResultItem } from './SearchResultItem';
 import type { ResultType } from './useSearchResults';
 import { useAI } from '@/components/AI';
 import { useCurrentContent } from '@/components/hooks';
 import { t, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
+
+/**
+ * Bar widths (breadcrumb, title, description, in %) of the loading placeholder rows. Six rows of
+ * this height fill the results area of the desktop popover; the count never depends on an answer.
+ */
+const PLACEHOLDER_ROWS: [crumb: number, title: number, description: number][] = [
+    [28, 64, 86],
+    [20, 48, 78],
+    [34, 58, 90],
+    [24, 70, 72],
+    [30, 52, 84],
+    [22, 60, 76],
+];
 
 export interface SearchResultsRef {
     select(): boolean;
@@ -336,46 +348,60 @@ export const SearchResults = React.forwardRef(function SearchResults(
             )}
             {fetching ? (
                 <div
+                    role="status"
+                    aria-busy="true"
                     className={tcls(
                         results.length > 0 ? 'mt-1' : '',
-                        'flex animate-blur-in flex-col gap-1'
+                        'flex flex-col gap-1',
+                        'animate-[fadeIn_150ms_ease-out_both,pulse_2.4s_ease-in-out_600ms_infinite] motion-reduce:animate-none'
                     )}
-                    style={{ animationDelay: `${results.length * 25}ms` }}
                 >
-                    <SearchResultsSkeleton items={Math.max(3, 5 - results.length)} />
+                    <SearchResultsPlaceholder />
                 </div>
             ) : null}
         </output>
     );
 });
 
-const SearchResultsSkeleton = (props: { items: number }) => {
-    const { items } = props;
-    const skeletonKeys = Array.from({ length: items }, (_, index) => `skeleton:${index}`);
+/**
+ * Loading rows shaped like a page result: breadcrumb, title and description lines in the real
+ * row's box, so the first result lands where the first placeholder was.
+ */
+const SearchResultsPlaceholder = () =>
+    PLACEHOLDER_ROWS.map(([crumb, title, description], index) => (
+        <div
+            key={index}
+            data-search-placeholder-row
+            aria-hidden
+            className="flex items-center gap-3 py-2 pl-3 pr-2"
+        >
+            <div className="size-4 shrink-0 rounded-sm bg-tint-solid/2" />
+            <div className="grow">
+                <PlaceholderLine className="text-xs" barClassName="h-2" width={crumb} />
+                <PlaceholderLine
+                    className="font-heading text-base font-semibold leading-snug"
+                    barClassName="h-3.5 bg-tint-solid/3"
+                    width={title}
+                />
+                <PlaceholderLine className="h-5 text-sm" barClassName="h-2.5" width={description} />
+            </div>
+            <div className="size-7 shrink-0" />
+        </div>
+    ));
 
-    return (
-        <>
-            {skeletonKeys.map((key, index) => (
-                <SearchResultItem
-                    key={key}
-                    active={false}
-                    href="#"
-                    action=""
-                    disabled
-                    data-testid="search-page-result"
-                    leadingIcon={
-                        <SkeletonSmall
-                            className="size-4"
-                            style={{ animationDelay: `${index * 0.3}s` }}
-                        />
-                    }
-                >
-                    <SkeletonParagraph size="small" start={index * 3} />
-                </SearchResultItem>
-            ))}
-        </>
-    );
-};
+/** One text line of a placeholder row: the line box of the real text, with a bar inside it. */
+const PlaceholderLine = (props: { className: string; barClassName: string; width: number }) => (
+    <div className={tcls('relative', props.className)}>
+        {'\u00a0'}
+        <div
+            className={tcls(
+                'absolute inset-y-0 left-0 my-auto rounded-full bg-tint-solid/2',
+                props.barClassName
+            )}
+            style={{ width: `${props.width}%` }}
+        />
+    </div>
+);
 
 /**
  * Whether clicking a result navigates the current window, and so closes the search — as opposed
