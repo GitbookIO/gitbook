@@ -45,8 +45,6 @@ export function useSearchResults(props: {
     searchURL: string;
     /** Whether the site has multiple sections. If false, the default scope only shows the current site space. */
     withSections?: boolean;
-    /** While an IME composition is in progress no request is sent; its intermediate text is not a query. */
-    composing?: boolean;
     /** Returns true when the latest edit completed the query (paste, IME commit), so it is sent without the idle delay. */
     consumeImmediate?: (query: string) => boolean;
 }) {
@@ -61,7 +59,6 @@ export function useSearchResults(props: {
         suggestions,
         searchURL,
         withSections,
-        composing = false,
         consumeImmediate,
     } = props;
 
@@ -170,9 +167,6 @@ export function useSearchResults(props: {
             };
         }
         setRemoteState({ status: 'loading' });
-        if (composing) {
-            return;
-        }
         let cancelled = false;
         const abortController = new AbortController();
         const send = async () => {
@@ -245,7 +239,6 @@ export function useSearchResults(props: {
         suggestions,
         searchURL,
         asEmbeddable,
-        composing,
         consumeImmediate,
     ]);
 

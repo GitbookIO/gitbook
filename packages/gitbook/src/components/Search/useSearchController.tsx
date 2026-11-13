@@ -84,10 +84,10 @@ const COMPLETING_INPUT_TYPES = new Set([
 
 /**
  * Read the intent of each edit from the native input event: completed edits are sent without the
- * idle delay, a typed word boundary sends the words so far, and IME composition text is not sent.
+ * idle delay and a typed word boundary sends the words so far. IME composition text is searched
+ * like typing; committing it sends at once.
  */
 function useSearchInputIntent() {
-    const [composing, setComposing] = React.useState(false);
     const immediateQueryRef = React.useRef<string | null>(null);
     const flushRef = React.useRef<() => void>(() => {});
 
@@ -116,20 +116,19 @@ function useSearchInputIntent() {
         }
     }, []);
 
-    const onCompositionStart = React.useCallback(() => setComposing(true), []);
     const onCompositionEnd = React.useCallback(
         (event: React.CompositionEvent<HTMLInputElement>) => {
+            // The committed text is usually already the query, so send its pending request now.
             immediateQueryRef.current = event.currentTarget.value.trim();
-            setComposing(false);
+            flushRef.current();
         },
         []
     );
 
     return {
-        composing,
         consumeImmediate,
         flushRef,
-        inputHandlers: { onInput, onCompositionStart, onCompositionEnd },
+        inputHandlers: { onInput, onCompositionEnd },
     };
 }
 
@@ -370,7 +369,7 @@ export function useSearchController(
     });
     const selectedSection = state?.section ? findSearchSection(sections, state.section) : undefined;
 
-    const { composing, consumeImmediate, flushRef, inputHandlers } = useSearchInputIntent();
+    const { consumeImmediate, flushRef, inputHandlers } = useSearchInputIntent();
     const { results, fetching, error, requestKey, flush, abort } = useSearchResults({
         asEmbeddable,
         disabled: !(normalizedQuery || withAI),
@@ -382,7 +381,6 @@ export function useSearchController(
         suggestions: config.suggestions,
         searchURL,
         withSections,
-        composing,
         consumeImmediate,
     });
     flushRef.current = flush;
