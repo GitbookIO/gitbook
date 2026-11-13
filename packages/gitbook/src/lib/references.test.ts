@@ -143,6 +143,30 @@ describe('resolveStringContentRef', () => {
 });
 
 describe('resolveContentRef', () => {
+    it('does not resolve category or missing assignments as tag links', async () => {
+        const normal = { slug: 'constructor', label: 'Constructor', color: 'default' };
+        const category = {
+            slug: 'products',
+            label: 'Products',
+            color: 'default',
+            kind: 'category',
+        };
+        const context = {
+            space: { id: 'local' },
+            revision: { tags: [normal, category] },
+            linker: createLinker({
+                host: 'docs.example.com',
+                spaceBasePath: '/',
+                siteBasePath: '/',
+            }),
+        } as unknown as GitBookAnyContext;
+        expect(await resolveContentRef({ kind: 'tag', tag: 'products' }, context)).toBeNull();
+        expect(await resolveContentRef({ kind: 'tag', tag: 'missing' }, context)).toBeNull();
+        expect(
+            await resolveContentRef({ kind: 'tag', tag: 'constructor', space: 'local' }, context)
+        ).toMatchObject({ text: 'Constructor' });
+    });
+
     it("resolves a page in a different space using that space's page data, not the current context page", async () => {
         const sharedPageId = 'page-shared';
 

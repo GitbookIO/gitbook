@@ -145,7 +145,11 @@ describe('getDocumentSections', () => {
                             type: 'update',
                             data: {
                                 date: '2026-04-08',
-                                tags: [{ kind: 'tag', tag: 'improvements' }],
+                                tags: [
+                                    { kind: 'tag', tag: 'improvements' },
+                                    { kind: 'tag', tag: 'category' },
+                                    { kind: 'tag', tag: 'missing' },
+                                ],
                             },
                             isVoid: false,
                             nodes: [
@@ -197,6 +201,7 @@ describe('getDocumentSections', () => {
                 ...context,
                 revision: {
                     tags: [
+                        { slug: 'category', label: 'Products', color: 'default', kind: 'category' },
                         {
                             slug: 'improvements',
                             label: 'Improvements',
