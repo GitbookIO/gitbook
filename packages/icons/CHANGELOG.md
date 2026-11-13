@@ -1,5 +1,11 @@
 # @gitbook/icons
 
+## 0.5.1
+
+### Patch Changes
+
+- 265ca4b: Add a skip link, keyboard navigation between content tabs, focusable table of contents toggles, and hide decorative icons from assistive technologies.
+
 ## 0.5.0
 
 ### Minor Changes
