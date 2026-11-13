@@ -1,5 +1,11 @@
 # @gitbook/embed
 
+## 0.7.1
+
+### Patch Changes
+
+- 65210b7: Respect reduced motion for enter and exit animations, keep the header separator and input focus visible in forced colors mode, and size mobile surfaces with dynamic viewport units.
+
 ## 0.7.0
 
 ### Minor Changes

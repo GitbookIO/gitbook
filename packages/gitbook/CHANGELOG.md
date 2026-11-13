@@ -1,5 +1,27 @@
 # gitbook
 
+## 0.28.3
+
+### Patch Changes
+
+- ddccd3d: Bump Next.js to 16.4.6 and OpenNext (Cloudflare 1.20.17, AWS 4.1.16), keeping the dev-mode OOM patch.
+- 0c3a51e: Fix horizontal page scroll caused by card carousels bleeding past the viewport.
+- 5997a66: Remove duplicated declarations from the global stylesheet.
+- c3df458: Keep inline code and highlighted text readable when a paragraph crosses the bottom edge of a background page cover.
+- 265ca4b: Add a skip link, keyboard navigation between content tabs, focusable table of contents toggles, and hide decorative icons from assistive technologies.
+- 9b5b8c8: Load the OpenAPI stylesheet only on pages with OpenAPI blocks.
+- adfd921: Limit the MCP `searchDocumentation` tool to one language: the one the client passes in the new optional `language` argument, or else the language of the site variant the MCP endpoint is served from.
+- 19660ed: Flush insights events when the page is hidden, preload the search index at low priority and prioritize the dark page cover on dark-default sites.
+- 19660ed: Fix the search button accessible name, hoverable link previews, IME-safe Enter on Safari, cookie banner semantics, active outline item announcement and textarea shrinking.
+- 65210b7: Respect reduced motion for enter and exit animations, keep the header separator and input focus visible in forced colors mode, and size mobile surfaces with dynamic viewport units.
+- 3e86382: Send only the site origin as referrer to third parties, and only let the embedding page open the embed messaging channel.
+- 7d1cd9f: Remove the ChatGPT-specific plain text response for Markdown and llms.txt routes; these now always serve `text/markdown`.
+- Updated dependencies [265ca4b]
+- Updated dependencies [65210b7]
+  - @gitbook/icons@0.5.1
+  - @gitbook/embed@0.7.1
+  - @gitbook/react-contentkit@0.7.19
+
 ## 0.28.2
 
 ### Patch Changes
