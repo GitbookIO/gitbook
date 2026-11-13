@@ -70,7 +70,7 @@ export function useIsLoggedInVisitor() {
 }
 
 /**
- * Return the URL of the site search index (`~gitbook/site-index`).
+ * Return the URL of the site page index (`~gitbook/site-index`).
  */
 export function useSiteIndexURL() {
     const context = React.useContext(SpaceLayoutContext);

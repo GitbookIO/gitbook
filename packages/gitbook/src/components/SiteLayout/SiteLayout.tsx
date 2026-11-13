@@ -71,17 +71,6 @@ export async function SiteLayout(props: {
         }
     });
 
-    // Start the search-index download from the HTML itself. `crossOrigin` must match the
-    // client `fetch()` (cors + same-origin credentials) or the preload is ignored and the
-    // index downloads twice — the omission was exactly that bug before.
-    // Low priority: it's only needed once search opens and must not compete with the LCP.
-    ReactDOM.preload(`${context.linker.siteBasePath}~gitbook/site-index`, {
-        as: 'fetch',
-        type: 'application/json',
-        crossOrigin: 'anonymous',
-        fetchPriority: 'low',
-    });
-
     scripts.forEach(({ script }) => {
         if (!isDeferrableScript(script)) {
             ReactDOM.preload(script, {

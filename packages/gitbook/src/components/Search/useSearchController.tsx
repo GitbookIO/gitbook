@@ -73,17 +73,98 @@ function useFilteredSiteSpaceIds(props: {
     );
 }
 
+/** Edits that complete a query rather than continue typing it. */
+const COMPLETING_INPUT_TYPES = new Set([
+    'insertFromPaste',
+    'insertFromDrop',
+    'insertReplacementText',
+    'insertFromYank',
+    'insertFromComposition',
+]);
+
+/**
+ * Read the intent of each edit from the native input event: completed edits are sent without the
+ * idle delay, a typed word boundary sends the words so far, and IME composition text is not sent.
+ */
+function useSearchInputIntent() {
+    const [composing, setComposing] = React.useState(false);
+    const immediateQueryRef = React.useRef<string | null>(null);
+    const flushRef = React.useRef<() => void>(() => {});
+
+    const consumeImmediate = React.useCallback((query: string) => {
+        const immediate = immediateQueryRef.current === query;
+        immediateQueryRef.current = null;
+        return immediate;
+    }, []);
+
+    const onInput = React.useCallback((event: React.FormEvent<HTMLInputElement>) => {
+        const native = event.nativeEvent as InputEvent;
+        if (native.isComposing) {
+            return;
+        }
+        const query = event.currentTarget.value.trim();
+        if (COMPLETING_INPUT_TYPES.has(native.inputType)) {
+            immediateQueryRef.current = query;
+        } else if (
+            native.inputType === 'insertText' &&
+            native.data &&
+            /^\s+$/.test(native.data) &&
+            query
+        ) {
+            // A typed space leaves the trimmed query unchanged, so send the pending words now.
+            flushRef.current();
+        }
+    }, []);
+
+    const onCompositionStart = React.useCallback(() => setComposing(true), []);
+    const onCompositionEnd = React.useCallback(
+        (event: React.CompositionEvent<HTMLInputElement>) => {
+            immediateQueryRef.current = event.currentTarget.value.trim();
+            setComposing(false);
+        },
+        []
+    );
+
+    return {
+        composing,
+        consumeImmediate,
+        flushRef,
+        inputHandlers: { onInput, onCompositionStart, onCompositionEnd },
+    };
+}
+
 function useSearchKeyboardNavigation(props: {
     query: string;
     results: ReturnType<typeof useSearchResults>['results'];
+    fetching: boolean;
+    error: boolean;
+    isOpen: boolean;
+    requestKey: string;
+    flush: () => void;
     resultsRef: React.RefObject<SearchResultsRef | null>;
     abort: () => void;
     askCount: number;
     onAskSelect: (index: number) => void;
 }) {
-    const { query, results, resultsRef, abort, askCount, onAskSelect } = props;
+    const {
+        query,
+        results,
+        fetching,
+        error,
+        isOpen,
+        requestKey,
+        flush,
+        resultsRef,
+        abort,
+        askCount,
+        onAskSelect,
+    } = props;
+    // Enter pressed before the answer arrived: open the top result of this exact query and scope,
+    // or Ask when that answer is empty. Closing the search cancels it.
+    const pendingOpenRef = React.useRef<string | null>(null);
     const { cursor, moveBy: moveCursorBy } = useSearchResultsCursor({
         query,
+        fetching,
         resultCount: results.length,
         totalCount: results.length + askCount,
     });
@@ -92,9 +173,11 @@ function useSearchKeyboardNavigation(props: {
         (event: React.KeyboardEvent<HTMLInputElement>) => {
             if (event.key === 'ArrowUp') {
                 event.preventDefault();
+                pendingOpenRef.current = null;
                 moveCursorBy(-1);
             } else if (event.key === 'ArrowDown') {
                 event.preventDefault();
+                pendingOpenRef.current = null;
                 moveCursorBy(1);
             } else if (event.key === 'Enter' && !isComposingKeyEvent(event)) {
                 event.preventDefault();
@@ -106,11 +189,50 @@ function useSearchKeyboardNavigation(props: {
                 if (resultsRef.current?.select()) {
                     // Stop any in-flight search request only when activating a result.
                     abort();
+                    return;
+                }
+
+                if (query && fetching) {
+                    pendingOpenRef.current = requestKey;
+                    flush();
                 }
             }
         },
-        [moveCursorBy, cursor, results.length, onAskSelect, resultsRef, abort]
+        [
+            moveCursorBy,
+            cursor,
+            results.length,
+            onAskSelect,
+            resultsRef,
+            abort,
+            query,
+            fetching,
+            requestKey,
+            flush,
+        ]
     );
+
+    React.useEffect(() => {
+        const pending = pendingOpenRef.current;
+        if (pending === null) {
+            return;
+        }
+        if (!isOpen || pending !== requestKey) {
+            pendingOpenRef.current = null;
+            return;
+        }
+        if (fetching) {
+            return;
+        }
+        pendingOpenRef.current = null;
+        if (results.length > 0) {
+            if (resultsRef.current?.selectFirst()) {
+                abort();
+            }
+        } else if (!error && askCount > 0) {
+            onAskSelect(0);
+        }
+    }, [isOpen, requestKey, fetching, error, results, resultsRef, abort, askCount, onAskSelect]);
 
     return {
         cursor,
@@ -132,7 +254,6 @@ export function useSearchController(
         withSections,
         siteSpaces,
         searchURL,
-        indexURL,
     } = props;
 
     const { assistants, config } = useAI();
@@ -249,10 +370,10 @@ export function useSearchController(
     });
     const selectedSection = state?.section ? findSearchSection(sections, state.section) : undefined;
 
-    const { results, fetching, error, abort } = useSearchResults({
+    const { composing, consumeImmediate, flushRef, inputHandlers } = useSearchInputIntent();
+    const { results, fetching, error, requestKey, flush, abort } = useSearchResults({
         asEmbeddable,
         disabled: !(normalizedQuery || withAI),
-        open: Boolean(state?.open),
         query: normalizedQuery,
         siteSpaceId: siteSpace.id,
         siteSpaceIds,
@@ -260,10 +381,11 @@ export function useSearchController(
         scope: state?.scope ?? 'default',
         suggestions: config.suggestions,
         searchURL,
-        indexURL,
-        lang: siteSpace.space.language,
         withSections,
+        composing,
+        consumeImmediate,
     });
+    flushRef.current = flush;
 
     const searchValue =
         state?.query ?? (askIsSearchQuery ? state?.ask : null) ?? lastSearchQuery ?? '';
@@ -306,6 +428,11 @@ export function useSearchController(
     const { cursor, onInputKeyDown } = useSearchKeyboardNavigation({
         query: normalizedQuery,
         results,
+        fetching,
+        error,
+        isOpen: Boolean(state?.open),
+        requestKey,
+        flush,
         resultsRef,
         abort,
         askCount,
@@ -332,6 +459,7 @@ export function useSearchController(
         setQuery,
         state,
         onInputKeyDown,
+        inputHandlers,
         showAsk,
         withAI,
         withSearchAI,

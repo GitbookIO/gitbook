@@ -70,8 +70,8 @@ export function SitePageNotFound() {
             return;
         }
 
-        // Otherwise, rank the site's pages against the path that 404'd. We reuse the search index
-        // (already preloaded and CDN-cached), so this adds no origin request — see getRelatedPages.
+        // Otherwise, rank the site's pages against the path that 404'd. The site index is
+        // CDN-cached, so this adds no origin request — see getRelatedPages.
         let active = true;
         getRelatedPages(siteIndexURL, pathname ?? '', siteSpaceId).then(
             (pages) => {
@@ -261,9 +261,8 @@ function NotFoundSuggestions(props: { suggestions: RelatedPage[] | null }) {
 /**
  * Return the pages whose path is closest to the one that 404'd.
  *
- * Rather than asking the server (which would mean an extra request per 404), this reuses the
- * search index served at `~gitbook/site-index` — preloaded on every page and shared with
- * instant search via the module cache in `site-index.ts`, so at most one request is made.
+ * Rather than asking the server (which would mean an extra origin request per 404), this reads
+ * the CDN-cached page index served at `~gitbook/site-index`.
  * The ranking is a lighter, client-side cousin of `getSimilarPages` (which the Markdown 404
  * runs server-side from the full page tree).
  */

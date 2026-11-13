@@ -13,6 +13,9 @@ interface SearchInputProps {
     onChange: (value: string) => void;
     onKeyDown: (event: React.KeyboardEvent<HTMLInputElement>) => void;
     onFocus?: () => void;
+    onInput?: (event: React.FormEvent<HTMLInputElement>) => void;
+    onCompositionStart?: () => void;
+    onCompositionEnd?: (event: React.CompositionEvent<HTMLInputElement>) => void;
     value: string;
     withAI: boolean;
     isOpen: boolean;
