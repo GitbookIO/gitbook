@@ -241,7 +241,11 @@ function useSearchKeyboardNavigation(props: {
 
 export function useSearchController(
     props: SearchBaseProps,
-    options: { restoreLastQueryOnMount?: boolean } = {}
+    options: {
+        restoreLastQueryOnMount?: boolean;
+        /** False for a container the current viewport hides, so only the shown one sends searches. */
+        requestsEnabled?: boolean;
+    } = {}
 ) {
     const {
         asEmbeddable,
@@ -372,7 +376,7 @@ export function useSearchController(
     const { consumeImmediate, flushRef, inputHandlers } = useSearchInputIntent();
     const { results, fetching, error, requestKey, flush, abort } = useSearchResults({
         asEmbeddable,
-        disabled: !(normalizedQuery || withAI),
+        disabled: options.requestsEnabled === false || !(normalizedQuery || withAI),
         query: normalizedQuery,
         siteSpaceId: siteSpace.id,
         siteSpaceIds,
@@ -428,7 +432,8 @@ export function useSearchController(
         results,
         fetching,
         error,
-        isOpen: Boolean(state?.open),
+        // A container that hides on this viewport drops its pending Enter.
+        isOpen: Boolean(state?.open) && options.requestsEnabled !== false,
         requestKey,
         flush,
         resultsRef,
