@@ -121,7 +121,6 @@ export const Input = React.forwardRef<InputElement, InputProps>((props, passedRe
 
     const [value, setValue] = useControlledState(passedValue, passedValue ?? '', onValueChange);
     const [submitted, setSubmitted] = React.useState(false);
-    const [height, setHeight] = React.useState<number>();
     const inputRef = React.useRef<InputElement>(null);
     const ref = (passedRef as React.RefObject<HTMLInputElement | HTMLTextAreaElement>) ?? inputRef;
 
@@ -164,21 +163,26 @@ export const Input = React.forwardRef<InputElement, InputProps>((props, passedRe
         if (submitted) {
             setSubmitted(false);
         }
-
-        if (multiline && resize && ref.current) {
-            // TODO: replace with `field-sizing: content` when more broadly supported. https://caniuse.com/?search=field-sizing
-            // scrollHeight never goes below the current height, so shrinking needs a measure with the
-            // height reset. Only done on deletion: collapsing the field can shift the page scroll.
-            const previousHeight = ref.current.style.height;
-            const isShrinking = newValue.length < value.length;
-            if (isShrinking) {
-                ref.current.style.height = 'auto';
-            }
-            const nextHeight = ref.current.scrollHeight;
-            ref.current.style.height = previousHeight;
-            setHeight(nextHeight);
-        }
     };
+
+    // Runs on every value change, typed or set by the caller.
+    const previousLengthRef = React.useRef(value.toString().length);
+    React.useLayoutEffect(() => {
+        const length = value.toString().length;
+        const isShrinking = length < previousLengthRef.current;
+        previousLengthRef.current = length;
+        const field = ref.current;
+        if (!multiline || !resize || !field) {
+            return;
+        }
+        // TODO: replace with `field-sizing: content` when more broadly supported. https://caniuse.com/?search=field-sizing
+        // scrollHeight never goes below the current height, so shrinking needs a measure with the
+        // height reset. Only done on deletion: collapsing the field can shift the page scroll.
+        if (isShrinking) {
+            field.style.height = 'auto';
+        }
+        field.style.height = value.toString().trim() ? `${field.scrollHeight}px` : '';
+    }, [ref, value, multiline, resize]);
 
     const handleClear = () => {
         if (!ref.current) return;
@@ -233,9 +237,6 @@ export const Input = React.forwardRef<InputElement, InputProps>((props, passedRe
         readOnly: readOnly,
         maxLength: maxLength,
         minLength: minLength,
-        style: {
-            height: multiline && resize && hasValue && height ? `${height}px` : undefined,
-        },
     };
 
     // A rich display replaces the control, so it only makes sense when there is nothing to type into.
