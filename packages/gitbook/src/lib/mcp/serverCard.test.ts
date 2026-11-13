@@ -54,7 +54,8 @@ function makeContext(
             adaptiveContent: { enabled: adaptiveContent },
             urls: { login: `https://${host}/~gitbook/auth/login` },
         },
-        siteSpace: { urls: { published: `https://${host}${siteBasePath}` } },
+        siteSpace: { space: {}, urls: { published: `https://${host}${siteBasePath}` } },
+        structure: { type: 'siteSpaces', structure: [] },
         customization: {
             ai: { mode: aiMode },
             pageActions: { items: pageActions },
