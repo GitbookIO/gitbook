@@ -135,7 +135,7 @@
         "e2e": "playwright test e2e/internal.spec.ts e2e/cookie-banner.spec.ts e2e/pdf.spec.ts e2e/select.spec.ts e2e/tabs-overflow.spec.ts --project=chromium",
         "e2e-customers": "playwright test e2e/customers.spec.ts --project=chromium",
         "e2e-style-perf": "playwright test e2e/style-perf.spec.ts --project=chromium --reporter=list",
-        "unit": "bun run generate:assets && bun test {src,packages} --preload ./tests/preload-bun.ts",
+        "unit": "bun run generate:assets && bun test {src,packages,openNext} --preload ./tests/preload-bun.ts",
         "e2e-browserless": "bun test ./tests/",
         "typecheck": "tsc --noEmit"
     },

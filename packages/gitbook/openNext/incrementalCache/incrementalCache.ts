@@ -118,15 +118,8 @@ export class GitbookIncrementalCache implements IncrementalCache {
         }
     }
 
-    // Utility function to generate keys for R2/Cache API
-    getR2Key(initialKey: string, cacheType: CacheEntryType = 'cache'): string {
-        let key = initialKey;
-        if (cacheType === 'composable') {
-            // For composable cache, we need to discard the build ID from the key
-            const [_buildId, ...restOfTheKey] = JSON.parse(initialKey);
-            key = JSON.stringify([...restOfTheKey]);
-        }
-
+    // OpenNext pre-hashes composable keys with the build ID in them: no reuse across deploys.
+    getR2Key(key: string, cacheType: CacheEntryType = 'cache'): string {
         const hash = createHash('sha256').update(key).digest('hex');
         return `${DEFAULT_PREFIX}/${cacheType === 'cache' ? process.env?.NEXT_BUILD_ID : 'dataCache'}/${hash}.${cacheType}`.replace(
             /\/+/g,
