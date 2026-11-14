@@ -10,7 +10,9 @@ import {
 import React from 'react';
 
 import type { LinkProps } from '../primitives';
+import { type SearchPassStore, createSearchPassStore } from './search-pass-store';
 import { useSearchPrewarm } from './useSearchPrewarm';
+import type { DirectSearchProps } from '@/lib/search-results';
 
 export type SearchScope =
     /** Search all content on the site */
@@ -49,6 +51,7 @@ export type UpdateSearchState = (
 
 const SetSearchStateContext = React.createContext<UpdateSearchState | undefined>(undefined);
 const SearchStateContext = React.createContext<SearchState | null | undefined>(undefined);
+const SearchPassContext = React.createContext<{ store: SearchPassStore; key: string } | null>(null);
 
 /**
  * Normalize the raw state to handle legacy formats.
@@ -73,9 +76,14 @@ export function shouldKeepSearchState(
 }
 
 export function SearchContextProvider(
-    props: React.PropsWithChildren<{ prewarmURL: string }>
+    props: React.PropsWithChildren<{
+        prewarmURL: string;
+        /** Identifies the site, variant and visitor context a search pass belongs to. */
+        searchPassKey: string;
+        directSearch?: DirectSearchProps;
+    }>
 ): React.ReactElement {
-    const { children, prewarmURL } = props;
+    const { children, prewarmURL, searchPassKey, directSearch } = props;
 
     // URL-backed state
     const [rawState, setRawState] = useQueryStates(keyMap, {
@@ -99,7 +107,11 @@ export function SearchContextProvider(
         };
     }, [rawState, open]);
 
-    useSearchPrewarm(Boolean(state?.open), prewarmURL);
+    const searchPass = React.useMemo(
+        () => ({ store: createSearchPassStore(prewarmURL, directSearch), key: searchPassKey }),
+        [prewarmURL, searchPassKey, directSearch]
+    );
+    useSearchPrewarm(Boolean(state?.open), searchPass.store);
 
     const stateRef = React.useRef(state);
     React.useLayoutEffect(() => {
@@ -136,10 +148,19 @@ export function SearchContextProvider(
     return (
         <SearchStateContext.Provider value={state}>
             <SetSearchStateContext.Provider value={setState}>
-                {children}
+                <SearchPassContext.Provider value={searchPass}>
+                    {children}
+                </SearchPassContext.Provider>
             </SetSearchStateContext.Provider>
         </SearchStateContext.Provider>
     );
+}
+
+/**
+ * The search pass store of the current site, variant and visitor context.
+ */
+export function useSearchPass() {
+    return React.useContext(SearchPassContext);
 }
 
 export function useSetSearchState() {

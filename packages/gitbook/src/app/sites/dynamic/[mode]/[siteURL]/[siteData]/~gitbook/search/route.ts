@@ -1,13 +1,12 @@
 import { type NextRequest, NextResponse } from 'next/server';
 
-import { orderSearchResultGroups } from './orderSearchResults';
-import type {
-    OrderedComputedResult,
-    SearchSiteContentRequest,
-} from '@/components/Search/search-types';
+import type { SearchSiteContentRequest } from '@/components/Search/search-types';
 import { throwIfDataError } from '@/lib/data';
+import { getLogger } from '@/lib/logger';
 import { getSiteURLDataFromMiddleware } from '@/lib/middleware';
 import { transformSitePageResult } from '@/lib/search';
+import { SEARCH_FALLBACK_HEADER, SEARCH_FALLBACK_REASONS } from '@/lib/search-pass';
+import { computeSearchResults } from '@/lib/search-results';
 import { getServerActionBaseContext } from '@/lib/server-actions';
 import { findSiteSpaceBy, getLinkerForSiteSpace } from '@/lib/sites';
 
@@ -17,6 +16,8 @@ export async function POST(request: NextRequest) {
         getServerActionBaseContext({ isEmbeddable: asEmbeddable }),
         getSiteURLDataFromMiddleware(),
     ]);
+
+    logSearchFallback(request, siteURLData);
 
     if (query.length <= 1) {
         return NextResponse.json([]);
@@ -56,49 +57,42 @@ export async function POST(request: NextRequest) {
             ? getLinkerForSiteSpace(context.linker, currentSiteSpace.siteSpace, revision.pages)
             : context.linker;
 
-    const results = orderSearchResultGroups<OrderedComputedResult>(
-        searchResults.map((resultItem) => {
-            if (resultItem.type === 'record') {
-                const result: OrderedComputedResult = {
-                    type: 'record',
-                    id: resultItem.id,
-                    title: resultItem.title,
-                    description: resultItem.description,
-                    href: resultItem.url,
-                    score: resultItem.score,
-                };
+    const results = computeSearchResults(searchResults, (spaceItem, pageItem) => {
+        const isCurrentRevisionSpace = Boolean(revision && spaceItem.id === siteURLData.space);
+        const found =
+            isCurrentRevisionSpace && currentSiteSpace
+                ? currentSiteSpace
+                : findSiteSpaceBy(structure, (siteSpace) => siteSpace.space.id === spaceItem.id);
 
-                return { type: 'context' as const, results: [result] };
-            }
-
-            const isCurrentRevisionSpace = Boolean(revision && resultItem.id === siteURLData.space);
-            const found =
-                isCurrentRevisionSpace && currentSiteSpace
-                    ? currentSiteSpace
-                    : findSiteSpaceBy(
-                          structure,
-                          (siteSpace) => siteSpace.space.id === resultItem.id
-                      );
-
-            return {
-                type: 'pages' as const,
-                results: resultItem.pages.flatMap((pageItem) => {
-                    const result = transformSitePageResult({
-                        asEmbeddable: Boolean(asEmbeddable),
-                        linker: isCurrentRevisionSpace ? revisionLinker : context.linker,
-                        pageItem,
-                        spaceItem: resultItem,
-                        siteSpace: found?.siteSpace,
-                        siteSection: found?.siteSection ?? undefined,
-                        siteSectionGroup: found?.siteSectionGroup ?? undefined,
-                        revisionPages: isCurrentRevisionSpace ? revision?.pages : undefined,
-                    });
-
-                    return result ? [{ rank: pageItem.rank, result }] : [];
-                }),
-            };
-        })
-    );
+        return transformSitePageResult({
+            asEmbeddable: Boolean(asEmbeddable),
+            linker: isCurrentRevisionSpace ? revisionLinker : context.linker,
+            pageItem,
+            spaceItem,
+            siteSpace: found?.siteSpace,
+            siteSection: found?.siteSection ?? undefined,
+            siteSectionGroup: found?.siteSectionGroup ?? undefined,
+            revisionPages: isCurrentRevisionSpace ? revision?.pages : undefined,
+        });
+    });
 
     return NextResponse.json(results);
+}
+
+/** Log the reason a search reached the route after the browser gave up its search pass. */
+function logSearchFallback(
+    request: NextRequest,
+    siteURLData: { organization: string; site: string }
+) {
+    const header = request.headers.get(SEARCH_FALLBACK_HEADER);
+    if (!header) {
+        return;
+    }
+
+    const reason = SEARCH_FALLBACK_REASONS.find((candidate) => candidate === header) ?? 'unknown';
+    getLogger()
+        .subLogger('search')
+        .info(
+            `Search pass fallback to the route (reason=${reason}, organization=${siteURLData.organization}, site=${siteURLData.site})`
+        );
 }

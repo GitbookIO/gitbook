@@ -60,6 +60,7 @@ import {
     createRobotsTxtResponse,
     isRobotsTxtRequest,
 } from '@/lib/robots';
+import { readSearchPassFromPrewarmReply } from '@/lib/search-pass';
 import {
     type ResponseCookies,
     getPathScopedCookieName,
@@ -812,6 +813,8 @@ const PATH_ALIASES: Record<string, string> = {
     [AI_CATALOG_WELL_KNOWN_PATH]: AI_CATALOG_PATH,
 };
 
+const SEARCH_PREWARM_TIMEOUT_MS = 1_500;
+
 function isSearchPrewarmRequest(siteURLData: PublishedSiteContent) {
     return (
         removeLeadingSlash(removeTrailingSlash(siteURLData.pathname)) === '~gitbook/search-prewarm'
@@ -827,9 +830,29 @@ async function serveSearchPrewarm(request: NextRequest, siteURLData: PublishedSi
     }
 
     const api = apiClient({ apiToken: siteURLData.apiToken ?? null });
-    await waitUntil(api.orgs.prewarmSiteSearch(siteURLData.organization, siteURLData.site));
+    const prewarm = api.orgs
+        .prewarmSiteSearch(siteURLData.organization, siteURLData.site)
+        .then((response) => response.json())
+        .then(readSearchPassFromPrewarmReply)
+        .catch(() => null);
+    void waitUntil(prewarm);
 
-    return new NextResponse(null, { status: 204 });
+    let timeout: ReturnType<typeof setTimeout> | undefined;
+    const searchPass = await Promise.race([
+        prewarm,
+        new Promise<null>((resolve) => {
+            timeout = setTimeout(() => resolve(null), SEARCH_PREWARM_TIMEOUT_MS);
+        }),
+    ]);
+    clearTimeout(timeout);
+
+    if (!searchPass) {
+        return new NextResponse(null, { status: 204 });
+    }
+
+    return NextResponse.json(searchPass, {
+        headers: { 'cache-control': 'private, no-store' },
+    });
 }
 
 /**
