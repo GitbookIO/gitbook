@@ -11,10 +11,19 @@ import {
 import { computeFilterSiteSpaceIds, filterResultsBySiteSpaces } from './filter';
 import { useRecentSearchQueries } from './recent-queries';
 import { computeRemoteSearchScope } from './remote-scope';
+import { type SearchPassStore, searchWithPass } from './search-pass-store';
 import type { OrderedComputedResult, SearchSiteContentScope } from './search-types';
 import { streamRecommendedQuestions } from './server-actions';
-import type { SearchScope } from './useSearch';
+import { type SearchScope, useSearchPass } from './useSearch';
 import { useAI } from '@/components/AI';
+import { getEmbeddableLinker } from '@/lib/embeddable-linker';
+import { createSiteLinker } from '@/lib/links';
+import { SEARCH_FALLBACK_HEADER, type SearchFallbackReason } from '@/lib/search-pass';
+import {
+    type DirectSearchProps,
+    computePublishedSearchResults,
+    toSearchSiteContentBody,
+} from '@/lib/search-results';
 
 export type ResultType = OrderedComputedResult | RecommendedQuestionResult;
 
@@ -81,8 +90,10 @@ export function useSearchResults(props: {
             computeRemoteSearchScope(scope, siteSpaceId, siteSpaceIds, selectedSectionSiteSpaceIds),
         [scope, siteSpaceId, siteSpaceIds, selectedSectionSiteSpaceIds]
     );
+    const searchPass = useSearchPass();
+    const passStore = searchPass?.store;
     // Identifies the answer the UI needs now; an answer for any other key is never shown as current.
-    const requestKey = JSON.stringify([query, remoteScope]);
+    const requestKey = JSON.stringify([query, remoteScope, searchPass?.key ?? null]);
 
     const [remoteState, setRemoteState] = React.useState<RemoteSearchState>({ status: 'idle' });
 
@@ -171,10 +182,15 @@ export function useSearchResults(props: {
         const abortController = new AbortController();
         const send = async () => {
             flushRef.current = null;
-            const fetchSearch = (
-                scope: Parameters<typeof fetchSearchResults>[1]
-            ): Promise<OrderedComputedResult[]> =>
-                fetchSearchResults(searchURL, scope, query, abortController.signal, asEmbeddable);
+            const fetchSearch = (scope: SearchSiteContentScope): Promise<OrderedComputedResult[]> =>
+                fetchSearchResults({
+                    searchURL,
+                    passStore,
+                    scope,
+                    query,
+                    signal: abortController.signal,
+                    asEmbeddable,
+                });
 
             try {
                 const resultsPromise = fetchSearch(remoteScope);
@@ -238,6 +254,7 @@ export function useSearchResults(props: {
         disabled,
         suggestions,
         searchURL,
+        passStore,
         asEmbeddable,
         consumeImmediate,
     ]);
@@ -296,18 +313,108 @@ export function useSearchResults(props: {
 }
 
 /**
+ * Fetch search results from the search API with a search pass, or else from the search route.
+ */
+async function fetchSearchResults(input: {
+    searchURL: string;
+    passStore: SearchPassStore | undefined;
+    scope: SearchSiteContentScope;
+    query: string;
+    signal: AbortSignal;
+    asEmbeddable: boolean | undefined;
+}): Promise<OrderedComputedResult[]> {
+    const { searchURL, passStore, scope, query, signal, asEmbeddable } = input;
+
+    if (passStore?.target) {
+        const results = await fetchDirectSearchResults({
+            directSearch: passStore.target,
+            passStore,
+            scope,
+            query,
+            signal,
+            asEmbeddable: Boolean(asEmbeddable),
+        });
+        if (results) {
+            return results;
+        }
+    }
+
+    return fetchRouteSearchResults(
+        searchURL,
+        scope,
+        query,
+        signal,
+        asEmbeddable,
+        passStore?.takeFallbackReport()
+    );
+}
+
+/**
+ * Fetch search results from the search API, or null when the search must use the route.
+ */
+async function fetchDirectSearchResults(input: {
+    directSearch: DirectSearchProps;
+    passStore: SearchPassStore;
+    scope: SearchSiteContentScope;
+    query: string;
+    signal: AbortSignal;
+    asEmbeddable: boolean;
+}): Promise<OrderedComputedResult[] | null> {
+    const { directSearch, passStore, scope, query, signal, asEmbeddable } = input;
+
+    if (!passStore.getPass()) {
+        return null;
+    }
+    if (query.length <= 1) {
+        return [];
+    }
+
+    const items = await searchWithPass({
+        store: passStore,
+        body: toSearchSiteContentBody(query, scope),
+        signal,
+    });
+    if (!items) {
+        return null;
+    }
+
+    let results: OrderedComputedResult[] | null;
+    try {
+        const linker = createSiteLinker(directSearch.linker);
+        results = computePublishedSearchResults({
+            asEmbeddable,
+            linker: asEmbeddable ? getEmbeddableLinker(linker) : linker,
+            searchResults: items,
+            spaces: directSearch.spaces,
+        });
+    } catch {
+        passStore.fallBack('invalid_response');
+        return null;
+    }
+
+    if (!results) {
+        passStore.rerouteUnknownSpace();
+    }
+    return results;
+}
+
+/**
  * Fetch search results from the search API route.
  */
-async function fetchSearchResults(
+async function fetchRouteSearchResults(
     searchURL: string,
     scope: SearchSiteContentScope,
     query: string,
-    signal?: AbortSignal,
-    asEmbeddable?: boolean
+    signal: AbortSignal,
+    asEmbeddable: boolean | undefined,
+    fallbackReason: SearchFallbackReason | undefined
 ): Promise<OrderedComputedResult[]> {
     const response = await fetch(searchURL, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+            'Content-Type': 'application/json',
+            ...(fallbackReason ? { [SEARCH_FALLBACK_HEADER]: fallbackReason } : {}),
+        },
         body: JSON.stringify({
             asEmbeddable,
             query,

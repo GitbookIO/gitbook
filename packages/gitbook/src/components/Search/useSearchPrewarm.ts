@@ -2,20 +2,21 @@
 
 import React from 'react';
 
+import type { SearchPassStore } from './search-pass-store';
 import { createSearchPrewarmer, type SearchPrewarmer } from './search-prewarm';
 
-export function useSearchPrewarm(open: boolean, prewarmURL: string) {
-    const prewarmerRef = React.useRef<SearchPrewarmer | null>(null);
-    if (prewarmerRef.current === null) {
-        prewarmerRef.current = createSearchPrewarmer(open);
-    }
+export function useSearchPrewarm(open: boolean, passStore: SearchPassStore) {
+    const prewarmer = React.useMemo<SearchPrewarmer>(
+        () => createSearchPrewarmer(false),
+        [passStore]
+    );
 
     React.useEffect(() => {
-        prewarmerRef.current?.update(open, async () => {
-            const response = await fetch(prewarmURL, { method: 'POST' });
-            if (!response.ok) {
-                throw new Error(`Search prewarm request failed: ${response.status}`);
-            }
-        });
-    }, [open, prewarmURL]);
+        prewarmer.update(open, () => passStore.warmUp());
+    }, [open, passStore, prewarmer]);
+
+    React.useEffect(() => {
+        passStore.setOpen(open);
+        return () => passStore.setOpen(false);
+    }, [open, passStore]);
 }

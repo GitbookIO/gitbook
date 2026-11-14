@@ -11,6 +11,7 @@ import { SiteLayoutClientContexts } from './SiteLayoutClientContexts';
 import { AdminToolbar } from '@/components/AdminToolbar';
 import { CookiesToast } from '@/components/Cookies';
 import { LoadIntegrations } from '@/components/Integrations';
+import { getDirectSearchProps, getSearchPassKey } from '@/components/Search/search-props';
 import { SpaceLayout } from '@/components/SpaceLayout';
 import { WebMCP } from '@/components/WebMCP/WebMCP';
 import type { VisitorAuthClaims } from '@/lib/adaptive';
@@ -97,6 +98,8 @@ export async function SiteLayout(props: {
                 context.linker.toAbsoluteURL(context.linker.toPathInSite(''))
             )}
             searchPrewarmURL={context.linker.toPathInSite('~gitbook/search-prewarm')}
+            searchPassKey={getSearchPassKey(context)}
+            directSearch={getDirectSearchProps(context)}
         >
             <AIContextProvider
                 aiMode={customization.ai?.mode}

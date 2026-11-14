@@ -12,6 +12,7 @@ import { EmbeddableIframeAPI } from './EmbeddableIframeAPI';
 import { EmbeddableThemeSync } from './EmbeddableThemeSync';
 import { IfEmbeddableTrademark } from './EmbeddableTrademark';
 import { CustomizationRootLayout } from '@/components/RootLayout';
+import { getDirectSearchProps, getSearchPassKey } from '@/components/Search/search-props';
 import {
     SiteLayoutClientContexts,
     generateSiteLayoutMetadata,
@@ -60,6 +61,8 @@ export async function EmbeddableRootLayout({
                 contextId={context.contextId}
                 proxyOrigin={context.site.proxy?.origin}
                 searchPrewarmURL={context.linker.toPathInSite('~gitbook/search-prewarm')}
+                searchPassKey={getSearchPassKey(context)}
+                directSearch={getDirectSearchProps(context)}
             >
                 {/* Persist an explicit ?theme= override so it survives tab navigation. RND-11571 */}
                 <EmbeddableThemeSync forcedTheme={rememberedTheme} />
