@@ -1,6 +1,6 @@
 import type { DocumentBlockHint } from '@gitbook/api';
 import { Icon, type IconName } from '@gitbook/icons';
-import { validateIconName } from '@gitbook/icons/icons';
+import { validateIconName } from '@gitbook/icons/validateIconName';
 
 import { Block, type BlockProps } from './Block';
 import { Blocks } from './Blocks';

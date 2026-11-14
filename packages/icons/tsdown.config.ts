@@ -5,6 +5,7 @@ export default defineConfig([
         entry: [
             'src/index.ts',
             'src/icons.ts',
+            'src/validateIconName.ts',
             'src/types.ts',
             'src/getIconStyle.ts',
             'src/IconSources.ts',

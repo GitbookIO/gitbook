@@ -1,6 +1,6 @@
 import type { DocumentBlockTabs } from '@gitbook/api';
 import type { IconName } from '@gitbook/icons';
-import { validateIconName } from '@gitbook/icons/icons';
+import { validateIconName } from '@gitbook/icons/validateIconName';
 
 import type { BlockProps } from '../Block';
 import { Blocks } from '../Blocks';

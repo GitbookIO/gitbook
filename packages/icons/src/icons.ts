@@ -18,15 +18,4 @@ export interface IconDefinition {
 // @ts-ignore
 export const icons: IconDefinition[] = rawIcons;
 
-let iconNamesSet: Set<string> | null = null;
-
-/**
- * Validate that the icon name is valid.
- */
-export function validateIconName(icon: IconName | string): icon is IconName {
-    if (!iconNamesSet) {
-        iconNamesSet = new Set(icons.map((icon) => icon.icon));
-    }
-
-    return iconNamesSet.has(icon);
-}
+export { validateIconName } from './validateIconName';
