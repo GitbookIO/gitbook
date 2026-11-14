@@ -57,6 +57,31 @@ export const GITBOOK_API_URL = process.env.GITBOOK_API_URL || 'https://api.gitbo
 export const GITBOOK_API_PUBLIC_URL = process.env.GITBOOK_API_PUBLIC_URL || GITBOOK_API_URL;
 
 /**
+ * Return the API URL without a final `cache/` path segment, or unchanged when it has none.
+ */
+export function removeAPIGatewayPath(apiURL: string) {
+    let url: URL;
+    try {
+        url = new URL(apiURL);
+    } catch {
+        return apiURL;
+    }
+
+    const pathname = url.pathname.replace(/\/$/, '');
+    if (!pathname.endsWith('/cache')) {
+        return apiURL;
+    }
+
+    url.pathname = pathname.slice(0, -'cache'.length);
+    return url.toString();
+}
+
+/**
+ * GitBook API URL without the `/cache/` API gateway in front of the API.
+ */
+export const GITBOOK_API_URL_WITHOUT_GATEWAY = removeAPIGatewayPath(GITBOOK_API_URL);
+
+/**
  * Default GitBook API token.
  * It can be use to avoid rate-limiting.
  */
