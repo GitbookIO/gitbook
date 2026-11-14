@@ -6,6 +6,15 @@ const cacheTag = mock((..._tags: string[]) => {});
 const realNextCache = await import('next/cache');
 mock.module('next/cache', () => ({ ...realNextCache, cacheLife, cacheTag }));
 
+const realGlobals = await import('@/lib/env/globals');
+mock.module('@/lib/env/globals', () => ({
+    ...realGlobals,
+    GITBOOK_API_URL: 'https://api.example.com/cache/',
+    GITBOOK_API_URL_WITHOUT_GATEWAY: realGlobals.removeAPIGatewayPath(
+        'https://api.example.com/cache/'
+    ),
+}));
+
 const { createDataFetcher } = await import('./api');
 
 const originalFetch = globalThis.fetch;
@@ -23,11 +32,15 @@ describe('searchSiteContent', () => {
     });
 
     function mockFetch(impl: () => Promise<Response>) {
-        globalThis.fetch = mock(impl);
+        const fetchMock = mock((_input: unknown, _init?: RequestInit) => impl());
+        globalThis.fetch = fetchMock as unknown as typeof fetch;
+        return fetchMock;
     }
 
+    const dataFetcher = createDataFetcher({ apiToken: 'site-token' });
+
     function search() {
-        return createDataFetcher().searchSiteContent({
+        return dataFetcher.searchSiteContent({
             organizationId: 'org-1',
             siteId: 'site-1',
             query: 'test',
@@ -35,26 +48,33 @@ describe('searchSiteContent', () => {
         });
     }
 
-    it('caches successful results for hours with the site and response tags', async () => {
-        mockFetch(async () =>
-            Response.json(
-                { items: [] },
-                { headers: { 'x-gitbook-cache-tag': 'space:space-1,space:space-2' } }
-            )
+    it('calls the API without the gateway, with the site token and a timeout', async () => {
+        const fetchMock = mockFetch(async () =>
+            Response.json({ items: [] }, { headers: { 'x-gitbook-cache-tag': 'space:space-1' } })
         );
 
         const result = await search();
 
         expect(result).toEqual({ data: [] });
-        expect(cacheLife.mock.calls).toEqual([['hours']]);
-        expect(cacheTag.mock.calls.flat()).toEqual([
-            'site:site-1',
-            'space:space-1',
-            'space:space-2',
-        ]);
+        const [input, init] = fetchMock.mock.calls[0]!;
+        expect(String(input)).toBe('https://api.example.com/v1/orgs/org-1/sites/site-1/search');
+        expect(new Headers(init?.headers).get('authorization')).toBe('Bearer site-token');
+        expect(init?.signal).toBeInstanceOf(AbortSignal);
+        expect(cacheLife).not.toHaveBeenCalled();
+        expect(cacheTag).not.toHaveBeenCalled();
     });
 
-    it('does not cache a transient API error', async () => {
+    it('leaves other API calls on the gateway', async () => {
+        const fetchMock = mockFetch(async () => Response.json({ id: 'user-1' }));
+
+        await dataFetcher.getUserById('user-1');
+
+        expect(String(fetchMock.mock.calls[0]![0])).toBe(
+            'https://api.example.com/cache/v1/users/user-1'
+        );
+    });
+
+    it('returns an API error as a value', async () => {
         mockFetch(async () =>
             Response.json({ error: { code: 429, message: 'Namespace saturated' } }, { status: 429 })
         );
@@ -62,26 +82,5 @@ describe('searchSiteContent', () => {
         const result = await search();
 
         expect(result.error?.code).toBe(429);
-        expect(cacheLife.mock.calls).toEqual([[{ stale: 0, revalidate: 0, expire: 0 }]]);
-    });
-
-    it('does not cache a network failure', async () => {
-        mockFetch(() => Promise.reject(new TypeError('fetch failed')));
-
-        const result = await search();
-
-        expect(result.error?.code).toBe(500);
-        expect(cacheLife.mock.calls).toEqual([[{ stale: 0, revalidate: 0, expire: 0 }]]);
-    });
-
-    it('keeps the default cache life for a stable 404', async () => {
-        mockFetch(async () =>
-            Response.json({ error: { code: 404, message: 'Site not found' } }, { status: 404 })
-        );
-
-        const result = await search();
-
-        expect(result.error?.code).toBe(404);
-        expect(cacheLife).not.toHaveBeenCalled();
     });
 });
