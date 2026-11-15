@@ -10,9 +10,7 @@ const realGlobals = await import('@/lib/env/globals');
 mock.module('@/lib/env/globals', () => ({
     ...realGlobals,
     GITBOOK_API_URL: 'https://api.example.com/cache/',
-    GITBOOK_API_URL_WITHOUT_GATEWAY: realGlobals.removeAPIGatewayPath(
-        'https://api.example.com/cache/'
-    ),
+    GITBOOK_API_DIRECT_URL: 'https://api.example.com/',
 }));
 
 const { createDataFetcher } = await import('./api');

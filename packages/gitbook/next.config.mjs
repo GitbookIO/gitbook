@@ -74,6 +74,7 @@ const nextConfig = {
 
         // GitBook envs
         GITBOOK_API_URL: process.env.GITBOOK_API_URL,
+        GITBOOK_API_DIRECT_URL: process.env.GITBOOK_API_DIRECT_URL,
         GITBOOK_APP_URL: process.env.GITBOOK_APP_URL,
         GITBOOK_OAUTH_SERVER_URL: process.env.GITBOOK_OAUTH_SERVER_URL,
         GITBOOK_SITE_OAUTH_SIGNING_SECRET: process.env.GITBOOK_SITE_OAUTH_SIGNING_SECRET,

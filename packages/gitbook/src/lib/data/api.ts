@@ -14,7 +14,7 @@ import { cache } from '../cache';
 import { DataFetcherError, wrapDataFetcherError } from './errors';
 import type { GitBookDataFetcher } from './types';
 import {
-    GITBOOK_API_URL_WITHOUT_GATEWAY,
+    GITBOOK_API_DIRECT_URL,
     GITBOOK_API_TOKEN,
     GITBOOK_API_URL,
     GITBOOK_USER_AGENT,
@@ -805,7 +805,10 @@ const searchSiteContent = cache(
                 `searchSiteContent(${params.organizationId}, ${params.siteId}, ${params.query})`,
                 async () => {
                     const { organizationId, siteId, query, scope } = params;
-                    const api = apiClient(input, GITBOOK_API_URL_WITHOUT_GATEWAY);
+                    if (!GITBOOK_API_DIRECT_URL) {
+                        throw new Error('GITBOOK_API_DIRECT_URL is not set');
+                    }
+                    const api = apiClient(input, GITBOOK_API_DIRECT_URL);
                     const res = await api.orgs.searchSiteContent(
                         organizationId,
                         siteId,
