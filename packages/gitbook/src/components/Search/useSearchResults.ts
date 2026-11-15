@@ -12,10 +12,11 @@ import { computeFilterSiteSpaceIds } from './filter';
 import { useRecentSearchQueries } from './recent-queries';
 import { type MergedPageResult, fuseSearchResults } from './reciprocalRankFusion';
 import { computeRemoteSearchScope } from './remote-scope';
+import { SEARCH_FALLBACK_HEADER, type SearchPassStore } from './search-pass-store';
 import type { OrderedComputedResult, SearchSiteContentScope } from './search-types';
 import { streamRecommendedQuestions } from './server-actions';
 import { type LocalPageResult, useLocalSearchResults } from './useLocalSearchResults';
-import type { SearchScope } from './useSearch';
+import { type SearchScope, useSearchPass } from './useSearch';
 import { useAI } from '@/components/AI';
 
 export type ResultType =
@@ -74,6 +75,7 @@ export function useSearchResults(props: {
     } = props;
 
     const trackEvent = useTrackEvent();
+    const searchPass = useSearchPass();
 
     const filterSiteSpaceIds = React.useMemo(
         () =>
@@ -211,7 +213,14 @@ export function useSearchResults(props: {
             const fetchSearch = (
                 scope: Parameters<typeof fetchSearchResults>[1]
             ): Promise<OrderedComputedResult[]> =>
-                fetchSearchResults(searchURL, scope, query, abortController.signal, asEmbeddable);
+                fetchSearchResults(
+                    searchURL,
+                    scope,
+                    query,
+                    abortController.signal,
+                    asEmbeddable,
+                    searchPass
+                );
 
             try {
                 const resultsPromise = fetchSearch(
@@ -287,6 +296,7 @@ export function useSearchResults(props: {
         suggestions,
         searchURL,
         asEmbeddable,
+        searchPass,
     ]);
 
     const abort = React.useCallback(() => {
@@ -339,18 +349,32 @@ export function useSearchResults(props: {
 }
 
 /**
- * Fetch search results from the search API route.
+ * Fetch search results from the search API with a search pass, or else from the search API route.
  */
 async function fetchSearchResults(
     searchURL: string,
     scope: SearchSiteContentScope,
     query: string,
-    signal?: AbortSignal,
-    asEmbeddable?: boolean
+    signal: AbortSignal,
+    asEmbeddable: boolean | undefined,
+    searchPass: SearchPassStore | null
 ): Promise<OrderedComputedResult[]> {
+    const direct = await searchPass?.search({
+        query,
+        scope,
+        signal,
+        asEmbeddable: Boolean(asEmbeddable),
+    });
+    if (direct?.type === 'results') {
+        return direct.results;
+    }
+
     const response = await fetch(searchURL, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+            'Content-Type': 'application/json',
+            ...(direct?.reason ? { [SEARCH_FALLBACK_HEADER]: direct.reason } : {}),
+        },
         body: JSON.stringify({
             asEmbeddable,
             query,

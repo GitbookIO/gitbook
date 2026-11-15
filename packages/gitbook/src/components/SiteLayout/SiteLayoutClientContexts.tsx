@@ -13,6 +13,7 @@ import { LinkContext, type LinkContextType } from '../primitives';
 import { SearchContextProvider } from '../Search';
 import { SelectProvider } from '../Select';
 import { isExternalLink } from '../utils/link';
+import type { DirectSearchProps } from '@/lib/search-results';
 
 /**
  * Client component context providers for the site layout.
@@ -27,6 +28,7 @@ export function SiteLayoutClientContexts(props: {
     /** Absolute URL of the site, so same-site absolute links render as internal on the server. */
     siteURL?: string;
     searchPrewarmURL: string;
+    directSearch: DirectSearchProps | undefined;
     children: React.ReactNode;
 }) {
     const {
@@ -39,6 +41,7 @@ export function SiteLayoutClientContexts(props: {
         proxyOrigin,
         siteURL,
         searchPrewarmURL,
+        directSearch,
     } = props;
 
     useClearRouterCache(contextId);
@@ -72,7 +75,10 @@ export function SiteLayoutClientContexts(props: {
             <NuqsAdapter>
                 <SelectProvider>
                     <LinkContext.Provider value={linkContext}>
-                        <SearchContextProvider prewarmURL={searchPrewarmURL}>
+                        <SearchContextProvider
+                            prewarmURL={searchPrewarmURL}
+                            directSearch={directSearch}
+                        >
                             <ReducedMotionProvider>{children}</ReducedMotionProvider>
                         </SearchContextProvider>
                     </LinkContext.Provider>
