@@ -1,4 +1,4 @@
-import { type Page, expect } from '@playwright/test';
+import { type Page, type Request, expect } from '@playwright/test';
 import jwt from 'jsonwebtoken';
 
 import {
@@ -384,6 +384,250 @@ const searchTestCases: Test[] = [
         },
         // Re-applied per viewport so the replacement survives resize-driven re-renders.
         normalizeBeforeScreenshot: (page) => page.evaluate(overrideAIResponse),
+    },
+];
+
+const SEARCH_API_URL = /\/v1\/orgs\/[^/]+\/sites\/[^/]+\/search$/;
+const SEARCH_PASS_RECORD = {
+    type: 'record',
+    id: 'search-pass-record',
+    title: 'Answered by the search API',
+    description: 'A search made with a search pass',
+    url: 'https://example.com/search-pass',
+    score: 1,
+};
+
+/**
+ * Answer the page's search pass requests as the API does when passes are switched on.
+ */
+async function giveSearchPasses(page: Page, lifetimesMs: number[] = []) {
+    let passes = 0;
+    await page.route('**/~gitbook/search-pass', async (route) => {
+        passes += 1;
+        await route.fulfill({
+            json: {
+                token: `test-search-pass-${passes}`,
+                expiresIn: lifetimesMs.shift() ?? 300_000,
+            },
+        });
+    });
+}
+
+/**
+ * Answer each search API call with the next status, and with a record when it succeeds.
+ */
+async function answerSearchAPI(page: Page, statuses: number[] = []) {
+    const calls: Request[] = [];
+    await page.route(SEARCH_API_URL, async (route) => {
+        calls.push(route.request());
+        const status = statuses.shift() ?? 200;
+        await route.fulfill({
+            status,
+            headers: { 'access-control-allow-origin': '*' },
+            json: status === 200 ? { items: [SEARCH_PASS_RECORD] } : { error: { code: status } },
+        });
+    });
+    return calls;
+}
+
+/**
+ * Collect the searches the page sends to the site's search route.
+ */
+function trackRouteSearches(page: Page) {
+    const searches: Request[] = [];
+    page.on('request', (request) => {
+        if (request.method() === 'POST' && request.url().endsWith('/~gitbook/search')) {
+            searches.push(request);
+        }
+    });
+    return searches;
+}
+
+/**
+ * Open search and wait for the page to receive its search pass.
+ */
+async function openSearchWithPass(page: Page) {
+    const passReply = page.waitForResponse('**/~gitbook/search-pass');
+    await page.getByTestId('search-input').focus();
+    await passReply;
+}
+
+async function typeSearch(page: Page, text: string) {
+    const searchInput = page.getByTestId('search-input');
+    await searchInput.focus();
+    await searchInput.pressSequentially(text);
+}
+
+const searchPassTestCases: Test[] = [
+    {
+        name: 'No pass: searches go through the site route',
+        url: '',
+        screenshot: false,
+        run: async (page) => {
+            const passReply = page.waitForResponse('**/~gitbook/search-pass');
+            const apiCalls: Request[] = [];
+            page.on('request', (request) => {
+                if (SEARCH_API_URL.test(request.url())) {
+                    apiCalls.push(request);
+                }
+            });
+            const routeSearches = trackRouteSearches(page);
+            await waitForCookiesDialog(page);
+
+            await typeSearch(page, 'gitbook');
+            expect((await passReply).status()).toBe(204);
+            await expect
+                .poll(() => routeSearches.length, { timeout: 30_000 })
+                .toBeGreaterThanOrEqual(1);
+            expect((await routeSearches[0]?.response())?.status()).toBe(200);
+            expect(apiCalls).toHaveLength(0);
+        },
+    },
+    {
+        name: 'With a pass: searches go straight to the API',
+        url: '',
+        screenshot: false,
+        run: async (page) => {
+            await giveSearchPasses(page);
+            const apiCalls = await answerSearchAPI(page);
+            const routeSearches = trackRouteSearches(page);
+            await waitForCookiesDialog(page);
+
+            await openSearchWithPass(page);
+            await typeSearch(page, 'gitbook');
+            await expect(
+                page
+                    .getByTestId('search-record-result')
+                    .filter({ hasText: SEARCH_PASS_RECORD.title })
+            ).toBeVisible({ timeout: 30_000 });
+            expect((await apiCalls[0]?.allHeaders())?.authorization).toBe(
+                'Bearer test-search-pass-1'
+            );
+            expect(routeSearches).toHaveLength(0);
+        },
+    },
+    {
+        name: 'Expired pass: the search uses the route, then the next pass searches the API',
+        url: '',
+        screenshot: false,
+        run: async (page) => {
+            await giveSearchPasses(page, [1_000]);
+            const apiCalls = await answerSearchAPI(page);
+            const routeSearches = trackRouteSearches(page);
+            await waitForCookiesDialog(page);
+
+            await openSearchWithPass(page);
+            await typeSearch(page, 'gitbook');
+            await expect.poll(() => routeSearches.length, { timeout: 30_000 }).toBe(1);
+            expect(routeSearches[0]?.headers()['x-gitbook-search-fallback']).toBe('expired');
+            expect(apiCalls).toHaveLength(0);
+
+            await typeSearch(page, ' editor');
+            await expect(
+                page
+                    .getByTestId('search-record-result')
+                    .filter({ hasText: SEARCH_PASS_RECORD.title })
+            ).toBeVisible({ timeout: 30_000 });
+            expect((await apiCalls[0]?.allHeaders())?.authorization).toBe(
+                'Bearer test-search-pass-2'
+            );
+        },
+    },
+    {
+        name: 'Refused pass: the page stays on the route',
+        url: '',
+        screenshot: false,
+        run: async (page) => {
+            await giveSearchPasses(page);
+            const apiCalls = await answerSearchAPI(page, [403]);
+            const routeSearches = trackRouteSearches(page);
+            await waitForCookiesDialog(page);
+
+            await openSearchWithPass(page);
+            await typeSearch(page, 'gitbook');
+            await expect.poll(() => routeSearches.length, { timeout: 30_000 }).toBe(1);
+            await typeSearch(page, ' editor');
+            await expect.poll(() => routeSearches.length, { timeout: 30_000 }).toBe(2);
+
+            expect(
+                routeSearches.map((request) => request.headers()['x-gitbook-search-fallback'])
+            ).toEqual(['403', '403']);
+            expect(apiCalls).toHaveLength(1);
+            expect((await routeSearches.at(-1)?.response())?.status()).toBe(200);
+        },
+    },
+    {
+        name: 'Cancelled search: a late API answer never replaces the newer query',
+        url: '',
+        screenshot: false,
+        run: async (page) => {
+            await giveSearchPasses(page);
+            const staleTitle = 'Late answer for an older query';
+            await page.route(SEARCH_API_URL, async (route) => {
+                const { query } = route.request().postDataJSON() as { query: string };
+                const stale = query === 'gitbook';
+                if (stale) {
+                    await page.waitForTimeout(3_000);
+                }
+                await route
+                    .fulfill({
+                        headers: { 'access-control-allow-origin': '*' },
+                        json: {
+                            items: [
+                                stale
+                                    ? { ...SEARCH_PASS_RECORD, title: staleTitle }
+                                    : SEARCH_PASS_RECORD,
+                            ],
+                        },
+                    })
+                    .catch(() => undefined);
+            });
+            const routeSearches = trackRouteSearches(page);
+            await waitForCookiesDialog(page);
+
+            const firstSearch = page.waitForRequest(
+                (request) =>
+                    SEARCH_API_URL.test(request.url()) &&
+                    (request.postDataJSON() as { query: string }).query === 'gitbook'
+            );
+            await openSearchWithPass(page);
+            await typeSearch(page, 'gitbook');
+            await firstSearch;
+            await typeSearch(page, ' editor');
+
+            await expect(
+                page
+                    .getByTestId('search-record-result')
+                    .filter({ hasText: SEARCH_PASS_RECORD.title })
+            ).toBeVisible({ timeout: 30_000 });
+            await page.waitForTimeout(4_000);
+            await expect(page.getByText(staleTitle)).toHaveCount(0);
+            expect(routeSearches).toHaveLength(0);
+        },
+    },
+    {
+        name: 'Embedded search goes straight to the API',
+        url: '~gitbook/embed/search',
+        screenshot: false,
+        run: async (page) => {
+            await giveSearchPasses(page);
+            await answerSearchAPI(page);
+            const routeSearches = trackRouteSearches(page);
+            // The embedded page keeps <html> hidden, so wait for hydration without visibility.
+            await page.locator('html.hydrated').waitFor({ state: 'attached' });
+
+            // The embedded search opens on the first key; a one-letter query is never sent.
+            const passReply = page.waitForResponse('**/~gitbook/search-pass');
+            await typeSearch(page, 'g');
+            await passReply;
+            await typeSearch(page, 'itbook');
+            await expect(
+                page
+                    .getByTestId('search-record-result')
+                    .filter({ hasText: SEARCH_PASS_RECORD.title })
+            ).toBeVisible({ timeout: 30_000 });
+            expect(routeSearches).toHaveLength(0);
+        },
     },
 ];
 
@@ -1176,6 +1420,11 @@ const testCases: TestsCase[] = [
         name: 'Search & AI',
         contentBaseURL: 'https://gitbook.gitbook.io/test-gitbook-open/',
         tests: searchTestCases,
+    },
+    {
+        name: 'Search pass',
+        contentBaseURL: 'https://gitbook.gitbook.io/test-gitbook-open/',
+        tests: searchPassTestCases,
     },
     {
         name: 'Content tests',
