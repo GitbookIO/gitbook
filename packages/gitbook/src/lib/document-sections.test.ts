@@ -232,6 +232,66 @@ describe('getDocumentSections', () => {
         ]);
     });
 
+    it('nests heading-3 under the heading before it', async () => {
+        const heading = (type: 'heading-1' | 'heading-2' | 'heading-3', id: string) => ({
+            object: 'block' as const,
+            type,
+            data: {},
+            meta: { id },
+            nodes: [
+                {
+                    object: 'text' as const,
+                    leaves: [{ object: 'leaf' as const, text: id, marks: [] }],
+                },
+            ],
+        });
+        const document: JSONDocument = {
+            object: 'document',
+            data: { schemaVersion: 2 },
+            nodes: [
+                heading('heading-3', 'h3-first'),
+                heading('heading-2', 'h2-no-h1'),
+                heading('heading-3', 'h3-under-h2'),
+                heading('heading-1', 'h1'),
+                heading('heading-3', 'h3-under-h1'),
+                heading('heading-2', 'h2'),
+                heading('heading-3', 'h3-under-h1-h2'),
+                {
+                    object: 'block',
+                    type: 'stepper',
+                    data: {},
+                    isVoid: false,
+                    nodes: [
+                        {
+                            object: 'block',
+                            type: 'stepper-step',
+                            data: {},
+                            isVoid: false,
+                            nodes: [heading('heading-3', 'h3-in-stepper')],
+                        },
+                    ],
+                },
+                heading('heading-1', 'h1-again'),
+                heading('heading-3', 'h3-after-reset'),
+            ],
+        };
+
+        const sections = await getDocumentSections(context, document);
+
+        expect(sections.map(({ id, depth }) => ({ id, depth }))).toEqual([
+            { id: 'h3-first', depth: 1 },
+            { id: 'h2-no-h1', depth: 1 },
+            { id: 'h3-under-h2', depth: 2 },
+            { id: 'h1', depth: 1 },
+            { id: 'h3-under-h1', depth: 2 },
+            { id: 'h2', depth: 2 },
+            { id: 'h3-under-h1-h2', depth: 3 },
+            { id: 'h3-in-stepper', depth: 3 },
+            { id: 'h1-again', depth: 1 },
+            { id: 'h3-after-reset', depth: 2 },
+        ]);
+    });
+
     it('extracts a single-schema openapi-schemas block as one section', async () => {
         const document: JSONDocument = {
             object: 'document',
