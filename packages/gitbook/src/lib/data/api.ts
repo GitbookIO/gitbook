@@ -704,7 +704,7 @@ const getPublishedContentSite = cache(
                         }
                     );
                     cacheTag(...getCacheTagsFromResponse(res));
-                    cacheLife('days');
+                    cacheLifeFromResponse(res, 'days');
                     return res.data;
                 }
             );
