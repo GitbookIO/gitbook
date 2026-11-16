@@ -2,4 +2,4 @@
 "gitbook": patch
 ---
 
-Call the search API directly from site search, without the API cache gateway or a framework cache.
+Stop caching site search results in the framework cache, so every search reaches the API.
