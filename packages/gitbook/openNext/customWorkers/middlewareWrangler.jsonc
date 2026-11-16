@@ -3,6 +3,7 @@
     "name": "gitbook-open-v2",
     "compatibility_date": "2026-04-02",
     "keep_names": false,
+    "minify": true,
     "compatibility_flags": [
         "nodejs_compat",
         "allow_importable_env",

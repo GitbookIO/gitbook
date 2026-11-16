@@ -10,7 +10,7 @@ export async function withVerifySignature<T>(
     request: Request,
     fn: (body: T) => Promise<NextResponse>
 ) {
-    // Fail closed when no secret is configured, consistent with force-revalidate.
+    // Fail closed when no secret is configured.
     if (!GITBOOK_SECRET) {
         return NextResponse.json({ error: 'Revalidation is disabled' }, { status: 403 });
     }

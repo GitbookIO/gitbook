@@ -4,7 +4,7 @@ import {
     type DocumentBlockPrompt,
     type SiteCustomizationSettings,
 } from '@gitbook/api';
-import { validateIconName } from '@gitbook/icons/icons';
+import { validateIconName } from '@gitbook/icons/validateIconName';
 
 import type { BlockProps } from '../Block';
 import { CodeBlock } from '../CodeBlock';
