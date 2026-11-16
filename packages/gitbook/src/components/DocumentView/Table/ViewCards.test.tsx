@@ -62,8 +62,10 @@ describe('ViewCards', () => {
         expect(markup).toContain('snap-mandatory');
     });
 
-    it('renders the wrapping grid by default', () => {
-        const markup = renderWithContext(<ViewCards {...makeProps(true)} />);
+    it.each([true, undefined])('renders the wrapping grid with wrap=%s', (wrap) => {
+        const props = makeProps(true);
+        props.view.wrap = wrap;
+        const markup = renderWithContext(<ViewCards {...props} />);
 
         expect(markup).toContain('inline-grid');
     });
