@@ -8,7 +8,6 @@
         "nodejs_compat",
         "allow_importable_env",
         "global_fetch_strictly_public",
-        "enable_request_signal",
     ],
     "observability": {
         "enabled": false,

@@ -191,7 +191,6 @@ export interface GitBookDataFetcher {
             | { mode: 'specific'; siteSpaceIds: string[] };
         /** Cache bust to ensure the search results are fresh when the space is updated. */
         cacheBust?: string;
-        signal?: AbortSignal;
     }): Promise<DataFetcherResponse<(api.SearchSpaceResult | api.SearchRecordResult)[]>>;
 
     /**

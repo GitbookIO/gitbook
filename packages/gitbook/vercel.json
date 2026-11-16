@@ -1,9 +1,4 @@
 {
     "$schema": "https://openapi.vercel.sh/vercel.json",
-    "regions": ["cle1"],
-    "functions": {
-        "src/app/sites/dynamic/**/~gitbook/search/route.ts": {
-            "supportsCancellation": true
-        }
-    }
+    "regions": ["cle1"]
 }

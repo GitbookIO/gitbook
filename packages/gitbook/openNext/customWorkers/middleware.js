@@ -51,7 +51,6 @@ export default class extends WorkerEntrypoint {
                 );
                 const response = await this.env.DEFAULT_WORKER?.fetch(reqOrResp, {
                     redirect: 'manual',
-                    signal: request.signal,
                     cf: {
                         cacheEverything: false,
                     },

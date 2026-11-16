@@ -6,7 +6,6 @@ import type {
     SearchSiteContentRequest,
 } from '@/components/Search/search-types';
 import { throwIfDataError } from '@/lib/data';
-import { getLogger } from '@/lib/logger';
 import { getSiteURLDataFromMiddleware } from '@/lib/middleware';
 import { transformSitePageResult } from '@/lib/search';
 import { getServerActionBaseContext } from '@/lib/server-actions';
@@ -23,14 +22,15 @@ export async function POST(request: NextRequest) {
         return NextResponse.json([]);
     }
 
-    const [searchResponse, { structure }, revision] = await Promise.all([
-        context.dataFetcher.searchSiteContent({
-            organizationId: siteURLData.organization,
-            siteId: siteURLData.site,
-            query,
-            scope,
-            signal: request.signal,
-        }),
+    const [searchResults, { structure }, revision] = await Promise.all([
+        throwIfDataError(
+            context.dataFetcher.searchSiteContent({
+                organizationId: siteURLData.organization,
+                siteId: siteURLData.site,
+                query,
+                scope,
+            })
+        ),
         throwIfDataError(
             context.dataFetcher.getPublishedContentSite({
                 organizationId: siteURLData.organization,
@@ -48,16 +48,6 @@ export async function POST(request: NextRequest) {
             : Promise.resolve(undefined),
     ]);
 
-    if (request.signal.aborted) {
-        getLogger()
-            .subLogger('search', {
-                labels: { organizationId: siteURLData.organization, siteId: siteURLData.site },
-            })
-            .info('search cancelled');
-        return new Response(null, { status: 499 });
-    }
-
-    const searchResults = throwIfDataError(searchResponse);
     const currentSiteSpace = revision
         ? findSiteSpaceBy(structure, (siteSpace) => siteSpace.id === siteURLData.siteSpace)
         : null;
