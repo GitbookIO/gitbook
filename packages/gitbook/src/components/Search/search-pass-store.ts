@@ -17,8 +17,11 @@ export const SEARCH_FALLBACK_HEADER = 'x-gitbook-search-fallback';
 const PASS_REQUEST_TIMEOUT_MS = 3_000;
 const EXPIRY_MARGIN_MS = 5_000;
 const RATE_LIMIT_WAIT_MS = 2_000;
-const RATE_LIMIT_MAX_WAIT_MS = 10_000;
+// The longest shared rate limit window of the search API.
+const RATE_LIMIT_MAX_WAIT_MS = 60_000;
 const DIRECT_SEARCH_TIMEOUT_MS = 5_000;
+// Which limit answered a 429: `caller` is the pass's own, `capacity` a saturated index.
+const RATE_LIMIT_SCOPE_HEADER = 'x-ratelimit-scope';
 
 type SearchPassState =
     | { status: 'none'; reason?: string }
@@ -41,6 +44,12 @@ export function createSearchPassStore(directSearch: DirectSearchProps | undefine
     const sendPassRequest = async () => {
         if (!directSearch || state.status === 'route') {
             return;
+        }
+        // The held pass may belong to a session that has since ended, so it waits for the reply.
+        if (state.status === 'ready') {
+            state = state.replacesRejectedPass
+                ? { status: 'none', reason: '401' }
+                : { status: 'none' };
         }
         const request = new AbortController();
         const timeout = setTimeout(() => request.abort(), PASS_REQUEST_TIMEOUT_MS);
@@ -101,6 +110,9 @@ export function createSearchPassStore(directSearch: DirectSearchProps | undefine
         if (state.status === 'ready' && state.token === token) {
             state = { status: 'none', reason };
             void requestPass().catch(() => undefined);
+        } else if (state.status === 'none' && reason === '401') {
+            // The pass was suspended for a pending request: its reply must still see the rejection.
+            state = { status: 'none', reason };
         }
         return { type: 'route', reason };
     };
@@ -205,13 +217,17 @@ export function createSearchPassStore(directSearch: DirectSearchProps | undefine
 }
 
 /**
- * Hold a search until the rate limit cooldown of the route state ends, then send it to the route.
+ * Hold a search until a short rate limit cooldown ends, then send it to the route.
+ * During a longer cooldown the search fails at once, as the route would.
  */
 async function waitForCooldown(
     route: Extract<SearchPassState, { status: 'route' }>,
     signal: AbortSignal
 ): Promise<DirectSearchOutcome> {
     const waitMs = route.cooldownUntil - Date.now();
+    if (waitMs > RATE_LIMIT_WAIT_MS) {
+        throw new Error('Search is rate limited');
+    }
     if (waitMs > 0) {
         await new Promise((resolve) => setTimeout(resolve, waitMs));
         if (signal.aborted) {
@@ -225,9 +241,18 @@ async function waitForCooldown(
  * How long to hold searches after a 429: until the API's rate limit resets, when it says so.
  */
 function getRateLimitWaitMs(response: Response): number {
-    const resetSeconds = Number(response.headers.get('x-ratelimit-reset'));
-    if (!resetSeconds) {
-        return RATE_LIMIT_WAIT_MS;
+    switch (response.headers.get(RATE_LIMIT_SCOPE_HEADER)) {
+        // The route does not use the pass, and an unnamed limit may come from an older API.
+        case null:
+        case 'caller':
+        case 'capacity':
+            return RATE_LIMIT_WAIT_MS;
+        default: {
+            const resetSeconds = Number(response.headers.get('x-ratelimit-reset'));
+            if (!resetSeconds) {
+                return RATE_LIMIT_WAIT_MS;
+            }
+            return Math.min(Math.max(resetSeconds * 1000 - Date.now(), 0), RATE_LIMIT_MAX_WAIT_MS);
+        }
     }
-    return Math.min(Math.max(resetSeconds * 1000 - Date.now(), 0), RATE_LIMIT_MAX_WAIT_MS);
 }

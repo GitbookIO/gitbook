@@ -669,6 +669,79 @@ const searchPassTestCases: Test[] = [
         },
     },
     {
+        name: 'Renewing pass: a search typed before the reply goes to the route',
+        url: '',
+        screenshot: false,
+        run: async (page) => {
+            let releaseRenewal = () => {};
+            const renewalHeld = new Promise<void>((resolve) => {
+                releaseRenewal = resolve;
+            });
+            let passReplies = 0;
+            await page.route('**/~gitbook/search-pass', async (route) => {
+                passReplies += 1;
+                if (passReplies === 1) {
+                    await route.fulfill({
+                        json: { token: 'test-search-pass-1', expiresIn: 300_000 },
+                    });
+                    return;
+                }
+                await renewalHeld;
+                await route.fulfill({ status: 204 }).catch(() => undefined);
+            });
+            const apiCalls = await answerSearchAPI(page);
+            const routeSearches = trackRouteSearches(page);
+            await waitForCookiesDialog(page);
+
+            await openSearchWithPass(page);
+            await typeSearch(page, 'gitbook');
+            await expect.poll(() => apiCalls.length, { timeout: 30_000 }).toBe(1);
+
+            await page.keyboard.press('Escape');
+            const renewal = page.waitForRequest('**/~gitbook/search-pass');
+            await typeSearch(page, ' editor');
+            await renewal;
+            await expect.poll(() => routeSearches.length, { timeout: 30_000 }).toBe(1);
+            expect(apiCalls).toHaveLength(1);
+            releaseRenewal();
+        },
+    },
+    {
+        name: 'Rate limited by a shared limit: searches fail at once until its reset',
+        url: '',
+        screenshot: false,
+        run: async (page) => {
+            await giveSearchPasses(page);
+            const apiCalls: Request[] = [];
+            await page.route(SEARCH_API_URL, async (route) => {
+                apiCalls.push(route.request());
+                await route.fulfill({
+                    status: 429,
+                    headers: {
+                        'access-control-allow-origin': '*',
+                        'access-control-expose-headers': 'x-ratelimit-reset, x-ratelimit-scope',
+                        'x-ratelimit-reset': String(Math.ceil(Date.now() / 1000) + 60),
+                        'x-ratelimit-scope': 'tenant-operation',
+                    },
+                    json: { error: { code: 429 } },
+                });
+            });
+            const routeSearches = trackRouteSearches(page);
+            await waitForCookiesDialog(page);
+
+            await openSearchWithPass(page);
+            await typeSearch(page, 'gitbook');
+            await expect.poll(() => apiCalls.length, { timeout: 30_000 }).toBe(1);
+            await typeSearch(page, ' editor');
+            await expect(page.getByRole('button', { name: 'Try again' })).toBeVisible({
+                timeout: 30_000,
+            });
+            await page.waitForTimeout(3_000);
+            expect(routeSearches).toHaveLength(0);
+            expect(apiCalls).toHaveLength(1);
+        },
+    },
+    {
         name: 'Cancelled search: a late API answer never replaces the newer query',
         url: '',
         screenshot: false,

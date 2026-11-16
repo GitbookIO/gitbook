@@ -90,6 +90,40 @@ describe('createSearchPassStore', () => {
         }
     );
 
+    it('keeps the one-refresh bound when a 401 arrives while a refresh is pending', async () => {
+        const replies = {
+            search: Promise.withResolvers<Response>(),
+            pass: Promise.withResolvers<Response>(),
+        };
+        let passRequests = 0;
+        const fetchSpy = spyOn(globalThis, 'fetch').mockImplementation((async (
+            input: RequestInfo | URL
+        ) => {
+            if (String(input) === '/~gitbook/search-pass') {
+                passRequests += 1;
+                return passRequests === 2
+                    ? replies.pass.promise
+                    : Response.json({ token: `pass-${passRequests}`, expiresIn: 300_000 });
+            }
+            return passRequests === 1
+                ? replies.search.promise
+                : new Response(null, { status: 401 });
+        }) as typeof fetch);
+        restore = () => fetchSpy.mockRestore();
+        const store = createSearchPassStore(directSearch);
+        await store.requestPass();
+
+        const inFlight = search(store);
+        const refresh = store.requestPass();
+        replies.search.resolve(new Response(null, { status: 401 }));
+        expect(await inFlight).toEqual({ type: 'route', reason: '401' });
+        replies.pass.resolve(Response.json({ token: 'pass-2', expiresIn: 300_000 }));
+        await refresh;
+
+        expect(await search(store)).toEqual({ type: 'route', reason: '401' });
+        expect(passRequests).toBe(2);
+    });
+
     it('neither retries nor falls back when the search is aborted', async () => {
         const { authorizations, fetchSpy } = mockFetch([]);
         restore = () => fetchSpy.mockRestore();
