@@ -59,6 +59,16 @@ Run a specific test file:
 cd packages/gitbook && bun test src/lib/cache.test.ts
 ```
 
+## Bumping Next.js or OpenNext
+
+Type checks and unit tests miss runtime regressions: OpenNext 4.1.15 changed the composable cache key format, and every `'use cache'` call silently missed for days. Before committing a bump of `next`, `@opennextjs/aws` or `@opennextjs/cloudflare`, run both runtimes locally from `packages/gitbook`:
+
+1. **Next**: `bun run build:local && bun run start`, then load several distinct pages under `http://localhost:3000/url/gitbook.com/docs`.
+2. **OpenNext**: `bun run build:cloudflare`, delete `openNext/customWorkers/.wrangler` (stale cache hits otherwise skip the server), then run `bun run dev:cf:server` and `bun run dev:cf:middleware` and load several distinct pages under `http://127.0.0.1:8771/url/gitbook.com/docs`.
+3. Diff the changed OpenNext versions' adapters that call our overrides in `openNext/` (incremental, composable and tag cache, queue), e.g. with `npm pack` of the old and new versions.
+
+The bump is safe when every page returns 200 on both runtimes and the server logs show no cache errors (grep `Failed to` and `regional cache`). Report the pages checked and the log result in the PR.
+
 ## Changesets
 
 After committing code changes, create a changeset for the affected package:
