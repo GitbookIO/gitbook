@@ -209,7 +209,7 @@ export function useSearchResults(props: {
                 setRemoteState({ status: 'error' });
             }
         };
-        const timeout = setTimeout(send, consumeImmediate?.(query) ? 0 : 150);
+        const timeout = setTimeout(send, consumeImmediate?.(query) ? 0 : 100);
         flushRef.current = () => {
             clearTimeout(timeout);
             void send();

@@ -1,60 +1,37 @@
-import { afterAll, afterEach, beforeEach, describe, expect, it, mock } from 'bun:test';
+import { afterEach, describe, expect, it, mock } from 'bun:test';
 
-const cacheLife = mock((_profile: unknown) => {});
-const cacheTag = mock((..._tags: string[]) => {});
-
-const realNextCache = await import('next/cache');
-mock.module('next/cache', () => ({ ...realNextCache, cacheLife, cacheTag }));
-
-const { createDataFetcher } = await import('./api');
+import { createDataFetcher } from './api';
 
 const originalFetch = globalThis.fetch;
 
-afterAll(() => mock.restore());
-
 describe('searchSiteContent', () => {
-    beforeEach(() => {
-        cacheLife.mockClear();
-        cacheTag.mockClear();
-    });
-
     afterEach(() => {
         globalThis.fetch = originalFetch;
     });
 
-    function mockFetch(impl: () => Promise<Response>) {
-        globalThis.fetch = mock(impl);
+    function mockFetch(impl: (input: unknown, init?: RequestInit) => Promise<Response>) {
+        globalThis.fetch = mock(impl) as unknown as typeof fetch;
     }
 
-    function search() {
+    function search(signal?: AbortSignal) {
         return createDataFetcher().searchSiteContent({
             organizationId: 'org-1',
             siteId: 'site-1',
             query: 'test',
             scope: { mode: 'all' },
+            signal,
         });
     }
 
-    it('caches successful results for hours with the site and response tags', async () => {
-        mockFetch(async () =>
-            Response.json(
-                { items: [] },
-                { headers: { 'x-gitbook-cache-tag': 'space:space-1,space:space-2' } }
-            )
-        );
+    it('returns the API results', async () => {
+        mockFetch(async () => Response.json({ items: [] }));
 
         const result = await search();
 
         expect(result).toEqual({ data: [] });
-        expect(cacheLife.mock.calls).toEqual([['hours']]);
-        expect(cacheTag.mock.calls.flat()).toEqual([
-            'site:site-1',
-            'space:space-1',
-            'space:space-2',
-        ]);
     });
 
-    it('does not cache a transient API error', async () => {
+    it('returns an API error as a value', async () => {
         mockFetch(async () =>
             Response.json({ error: { code: 429, message: 'Namespace saturated' } }, { status: 429 })
         );
@@ -62,26 +39,29 @@ describe('searchSiteContent', () => {
         const result = await search();
 
         expect(result.error?.code).toBe(429);
-        expect(cacheLife.mock.calls).toEqual([[{ stale: 0, revalidate: 0, expire: 0 }]]);
     });
 
-    it('does not cache a network failure', async () => {
-        mockFetch(() => Promise.reject(new TypeError('fetch failed')));
-
-        const result = await search();
-
-        expect(result.error?.code).toBe(500);
-        expect(cacheLife.mock.calls).toEqual([[{ stale: 0, revalidate: 0, expire: 0 }]]);
-    });
-
-    it('keeps the default cache life for a stable 404', async () => {
-        mockFetch(async () =>
-            Response.json({ error: { code: 404, message: 'Site not found' } }, { status: 404 })
+    it('aborts the API call when the search is cancelled', async () => {
+        let apiCallAborted = false;
+        const { promise: apiCalled, resolve: onApiCall } = Promise.withResolvers<void>();
+        mockFetch(
+            (_input, init) =>
+                new Promise((_resolve, reject) => {
+                    init?.signal?.addEventListener('abort', () => {
+                        apiCallAborted = true;
+                        reject(init.signal?.reason);
+                    });
+                    setTimeout(() => reject(new Error('API call was not aborted')), 1000);
+                    onApiCall();
+                })
         );
+        const controller = new AbortController();
 
-        const result = await search();
+        const result = search(controller.signal);
+        await apiCalled;
+        controller.abort();
 
-        expect(result.error?.code).toBe(404);
-        expect(cacheLife).not.toHaveBeenCalled();
+        expect((await result).error?.code).toBe(499);
+        expect(apiCallAborted).toBe(true);
     });
 });
