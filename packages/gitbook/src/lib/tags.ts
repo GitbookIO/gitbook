@@ -8,10 +8,12 @@ export function getRevisionTags(revision: Revision | undefined): RevisionTag[] {
 }
 
 /**
- * Resolve a tag slug to its full RevisionTag.
+ * Resolve an assignment to a normal tag, ignoring categories and missing definitions.
  */
 export function resolveTag(slug: string, revisionTags: RevisionTag[]): RevisionTag | undefined {
-    return revisionTags.find((t) => t.slug === slug);
+    return revisionTags.find(
+        (tag) => tag.slug === slug && !('kind' in tag && tag.kind === 'category')
+    );
 }
 
 /**

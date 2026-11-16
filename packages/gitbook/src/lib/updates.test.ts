@@ -1,7 +1,13 @@
 import { describe, expect, it } from 'bun:test';
 
-import type { JSONDocument, Revision } from '@gitbook/api';
+import {
+    DocumentTextColor,
+    type JSONDocument,
+    type Revision,
+    type RevisionTag,
+} from '@gitbook/api';
 
+import { getRevisionTags, resolveBlockTags, resolveTag } from './tags';
 import {
     UPDATES_TAG_FILTER_CAP,
     getDocumentFilterableTags,
@@ -9,6 +15,40 @@ import {
 } from './updates';
 
 describe('getDocumentFilterableTags', () => {
+    it('ignores category and deleted references without removing their stored assignments', () => {
+        const document = createUpdatesDocument([['category', 'constructor', 'missing']]);
+        const category = { ...createTag('category', 'Products'), kind: 'category' };
+        const normal = createTag('constructor', 'Constructor');
+        const revision = { tags: [category, normal] } as unknown as Revision;
+        const before = JSON.stringify(document);
+        expect(getDocumentFilterableTags(document, revision).map((tag) => tag.slug)).toEqual([
+            'constructor',
+        ]);
+        expect(resolveTag('category', revision.tags)).toBeUndefined();
+        expect(resolveTag('missing', revision.tags)).toBeUndefined();
+        expect(resolveTag('constructor', revision.tags)).toEqual(normal);
+        expect(getRevisionTags(revision)).toEqual([category, normal]);
+        expect(JSON.stringify(document)).toBe(before);
+    });
+
+    it('rejects category assignments even when definitions are passed directly to the resolver', () => {
+        const normal = createTag('beta', 'Beta');
+        const tags = [
+            { ...createTag('products', 'Products'), kind: 'category' },
+            normal,
+        ] satisfies (RevisionTag & { kind?: 'category' })[];
+        expect(
+            resolveBlockTags(
+                [
+                    { kind: 'tag', tag: 'products' },
+                    { kind: 'tag', tag: 'beta' },
+                    { kind: 'tag', tag: 'missing' },
+                ],
+                tags
+            )
+        ).toEqual([normal]);
+    });
+
     it('returns unique update tags in document order', () => {
         const document = createUpdatesDocument([
             ['improvements', 'fixes'],
@@ -77,11 +117,11 @@ function createUpdatesDocument(entryTags: string[][]): JSONDocument {
     };
 }
 
-function createTag(slug: string, label: string) {
+function createTag(slug: string, label: string): RevisionTag {
     return {
         slug,
         label,
-        color: 'default',
+        color: DocumentTextColor.Default,
         icon: undefined,
     };
 }
