@@ -127,8 +127,7 @@ export const CodeBlockRenderer = forwardRef(function CodeBlockRenderer(
                     <code
                         className={tcls(
                             'table max-h-full w-fit min-w-full [counter-reset:line] print:max-h-none print:whitespace-pre-wrap',
-                            withWrap && 'whitespace-pre-wrap',
-                            '[[aria-expanded=false]_&]:mask-b-from-50%'
+                            withWrap && 'whitespace-pre-wrap'
                         )}
                     >
                         {theme.lines.map((line, index) => (
