@@ -32,7 +32,7 @@ export default {
                 await import('../../.open-next/server-functions/default/handler.mjs');
 
             // - `Request`s are handled by the Next server
-            return handler(request, env, ctx);
+            return handler(request, env, ctx, request.signal);
         });
     },
 };
