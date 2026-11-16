@@ -32,6 +32,7 @@
         "bidc": "catalog:",
         "classnames": "catalog:",
         "direction": "^2.0.1",
+        "entities": "^6.0.0",
         "event-iterator": "^2.0.0",
         "feed": "^5.1.0",
         "flexsearch": "^0.8.212",

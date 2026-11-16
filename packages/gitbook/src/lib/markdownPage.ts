@@ -1,3 +1,4 @@
+import { decodeHTMLAttribute } from 'entities';
 import type { Definition, Html, Image, Link, Paragraph, Root } from 'mdast';
 import { fromMarkdown } from 'mdast-util-from-markdown';
 import { frontmatterFromMarkdown } from 'mdast-util-frontmatter';
@@ -274,7 +275,6 @@ async function rewriteMarkdownLinks(
         const isMention = isMentionLike(node);
         const original = node.url;
 
-        // Skip anchors, mailto:, http(s):, protocol-like
         if (checkIsExternalURL(original) || checkIsAnchor(original)) {
             return;
         }
@@ -285,7 +285,9 @@ async function rewriteMarkdownLinks(
             pending.push(
                 (async () => {
                     const resolved = await resolveContentRef(contentRef, context);
-                    node.url = resolved?.href ?? toBrokenURL(original);
+                    node.url = resolved
+                        ? context.linker.toAbsoluteURL(resolved.href)
+                        : toBrokenURL(original);
 
                     if (isMention) {
                         // Replace the text for mentions as otherwise it contains the raw ref
@@ -311,17 +313,17 @@ async function rewriteMarkdownLinks(
     });
 
     visit(tree, 'image', (node: Image) => {
-        pending.push(rewriteNodeURL(context, node));
+        pending.push(rewriteNodeURL(context, node, currentPagePath));
     });
 
     visit(tree, 'definition', (node: Definition) => {
-        pending.push(rewriteNodeURL(context, node));
+        pending.push(rewriteNodeURL(context, node, currentPagePath));
     });
 
     // Blocks markdown cannot express (tables, cards, figures...) are emitted as raw HTML,
     // with the same stable refs in their anchors and images.
     visit(tree, 'html', (node: Html) => {
-        pending.push(rewriteHTMLRefs(context, node));
+        pending.push(rewriteHTMLRefs(context, node, currentPagePath));
     });
 
     if (pending.length > 0) {
@@ -332,52 +334,72 @@ async function rewriteMarkdownLinks(
 }
 
 /**
- * Resolve a URL if it is a stable content ref. Returns null for anything else
- * (external URLs, anchors, plain paths) so the caller leaves it untouched.
+ * Resolve Markdown destinations independently of the source document origin.
  */
 async function resolveRefURL(
     context: GitBookAnyContext,
-    url: string
+    url: string,
+    currentPagePath: string
 ): Promise<{ url: string; text: string | null } | null> {
     if (checkIsExternalURL(url) || checkIsAnchor(url)) {
         return null;
     }
     const contentRef = resolveStringContentRef(url);
     if (!contentRef) {
-        return null;
+        const pageURL = context.linker.toAbsoluteURL(
+            context.linker.toPathForPagePath({ path: currentPagePath })
+        );
+        if (!URL.canParse(url, pageURL)) {
+            return null;
+        }
+        return { url: new URL(url, pageURL).toString(), text: url };
     }
     const resolved = await resolveContentRef(contentRef, context);
-    return { url: resolved?.href ?? toBrokenURL(url), text: resolved?.text ?? null };
+    return {
+        url: resolved ? context.linker.toAbsoluteURL(resolved.href) : toBrokenURL(url),
+        text: resolved?.text ?? null,
+    };
 }
 
-async function rewriteNodeURL(context: GitBookAnyContext, node: Image | Definition) {
-    const resolved = await resolveRefURL(context, node.url);
+async function rewriteNodeURL(
+    context: GitBookAnyContext,
+    node: Image | Definition,
+    currentPagePath: string
+) {
+    const resolved = await resolveRefURL(context, node.url, currentPagePath);
     if (resolved) {
         node.url = resolved.url;
     }
 }
 
-async function rewriteHTMLRefs(context: GitBookAnyContext, node: Html): Promise<void> {
+async function rewriteHTMLRefs(
+    context: GitBookAnyContext,
+    node: Html,
+    currentPagePath: string
+): Promise<void> {
     node.value = await replaceAsync(node.value, HTML_ANCHOR_RE, async (match) => {
         const [full, before = '', href = '', after = '', text = ''] = match;
-        const resolved = await resolveRefURL(context, href);
+        const resolved = await resolveRefURL(context, decodeHTMLAttribute(href), currentPagePath);
         if (!resolved) {
             return full;
         }
         // The API emits the raw ref as the text; swap it for the resolved title.
-        const content = text === href ? escapeHTML(resolved.text ?? 'Broken link') : text;
+        const content =
+            text === href && resolveStringContentRef(decodeHTMLAttribute(href))
+                ? escapeHTML(resolved.text ?? 'Broken link')
+                : text;
         return `<a${before}href="${escapeHTML(resolved.url)}"${after}>${content}</a>`;
     });
 
     node.value = await replaceAsync(node.value, HTML_ANCHOR_OPEN_RE, async (match) => {
         const [full, before = '', href = '', after = ''] = match;
-        const resolved = await resolveRefURL(context, href);
+        const resolved = await resolveRefURL(context, decodeHTMLAttribute(href), currentPagePath);
         return resolved ? `<a${before}href="${escapeHTML(resolved.url)}"${after}>` : full;
     });
 
     node.value = await replaceAsync(node.value, HTML_SRC_RE, async (match) => {
         const [full, src = ''] = match;
-        const resolved = await resolveRefURL(context, src);
+        const resolved = await resolveRefURL(context, decodeHTMLAttribute(src), currentPagePath);
         return resolved ? `src="${escapeHTML(resolved.url)}"` : full;
     });
 
@@ -385,7 +407,11 @@ async function rewriteHTMLRefs(context: GitBookAnyContext, node: Html): Promise<
         const [, srcset = ''] = match;
         const rewritten = await replaceAsync(srcset, SRCSET_CANDIDATE_RE, async (candidate) => {
             const [full, url = ''] = candidate;
-            const resolved = await resolveRefURL(context, url);
+            const resolved = await resolveRefURL(
+                context,
+                decodeHTMLAttribute(url),
+                currentPagePath
+            );
             return resolved ? escapeHTML(resolved.url) + full.slice(url.length) : full;
         });
         return `srcset="${rewritten}"`;

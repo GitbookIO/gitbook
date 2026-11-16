@@ -39,7 +39,7 @@ async function rewrite(markdown: string) {
 
 describe('HTML links in page markdown', () => {
     it.each([
-        ['/pages/designer', linker.toPathForPagePath({ path: page.path })],
+        ['/pages/designer', linker.toAbsoluteURL(linker.toPathForPagePath({ path: page.path }))],
         ['/spaces/workflows', context.space.urls.published],
         ['/pages/missing', 'broken://pages/missing'],
     ])(
@@ -57,7 +57,7 @@ describe('HTML links in page markdown', () => {
         const markdown =
             '<table><tr><td><a href="/pages/designer">/pages/designer</a></td></tr></table>\n';
         expect(await rewrite(markdown)).toBe(
-            `<table><tr><td><a href="${linker.toPathForPagePath({ path: page.path })}">${page.title}</a></td></tr></table>\n`
+            `<table><tr><td><a href="${linker.toAbsoluteURL(linker.toPathForPagePath({ path: page.path }))}">${page.title}</a></td></tr></table>\n`
         );
     });
 });
@@ -78,4 +78,58 @@ describe('HTML images in page markdown', () => {
             markdown.replaceAll('/files/dark-image', file.downloadURL.replaceAll('&', '&amp;'))
         );
     });
+});
+
+describe('Markdown URL context', () => {
+    it.each([
+        ['docs.example.com', '/docs/api/v2/', '/docs/', 'https://docs.example.com/docs/api/v2/'],
+        [
+            'preview.example.com',
+            '/s/site/section/v2/',
+            '/s/site/',
+            'https://preview.example.com/s/site/section/v2/',
+        ],
+    ])(
+        'preserves the served origin and section path on %s',
+        async (host, spaceBasePath, siteBasePath, base) => {
+            const scoped = {
+                ...context,
+                linker: linkerWithMarkdownPages(
+                    createLinker({ host, spaceBasePath, siteBasePath })
+                ),
+            };
+            const markdown =
+                '[Page](/pages/designer)\n\n[Anchor](/pages/designer#details)\n\n[Here](#details)\n\n[Missing](/pages/missing)\n\n[External](https://external.example/a?q=1#b)\n\n[Mail](mailto:test@example.com)\n\n[File](/files/dark-image)\n\n[Relative](../guide?q=1#b)\n\n[Stable][s]\n\n[s]: /pages/designer\n\n[Definition][d]\n\n[d]: ../guide?q=1#b\n\n[Fragment][f]\n\n[f]: #details\n\n![Image](./image.png)\n\n<a href="../guide?q=1&#x26;b=2#b">Guide</a>\n';
+            const result = toPageMarkdown(
+                await fromPageMarkdown(scoped, { markdown, pagePath: 'nested/current' })
+            );
+            expect(result).toContain(`${base}${page.path}.md`);
+            expect(result).toContain(`${base}${page.path}.md#details`);
+            expect(result).toContain('[Here](#details)');
+            expect(result).toContain('broken://pages/missing');
+            expect(result).toContain('https://external.example/a?q=1#b');
+            expect(result).toContain('mailto:test@example.com');
+            expect(result).toContain(file.downloadURL.replace('&', '\\&'));
+            expect(result).toContain(`[Relative](${base}guide?q=1#b)`);
+            expect(result).toContain(`[s]: ${base}${page.path}.md`);
+            expect(result).toContain(`[d]: ${base}guide?q=1#b`);
+            expect(result).toContain('[f]: #details');
+            expect(result).toContain(`![Image](${base}nested/image.png)`);
+            expect(result).toContain(`<a href="${base}guide?q=1&amp;b=2#b">Guide</a>`);
+        }
+    );
+});
+
+it('keeps malformed destinations from breaking the page export', async () => {
+    const markdown =
+        '<a href="http://">Broken</a>\n\n<img src="http://" alt="Broken">\n\n![Broken](http://)\n';
+    expect(await rewrite(markdown)).toBe(markdown);
+});
+
+it('preserves document fragments in generated answers without a page path', async () => {
+    const markdown =
+        '[Details](#details)\n\n[Details][d]\n\n[d]: #details\n\n<a href="#details">Details</a>\n';
+    expect(toPageMarkdown(await fromPageMarkdown(context, { markdown, pagePath: '' }))).toBe(
+        markdown
+    );
 });
