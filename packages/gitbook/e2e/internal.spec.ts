@@ -557,6 +557,33 @@ const searchPassTestCases: Test[] = [
         },
     },
     {
+        name: 'Dropped API request: the search falls back to the route after its time limit',
+        url: '',
+        screenshot: false,
+        run: async (page) => {
+            await page.clock.install();
+            await giveSearchPasses(page);
+            const apiCalls: Request[] = [];
+            await page.route(SEARCH_API_URL, (route) => {
+                apiCalls.push(route.request());
+            });
+            const routeSearches = trackRouteSearches(page);
+            await waitForCookiesDialog(page);
+
+            await openSearchWithPass(page);
+            await typeSearch(page, 'gitbook');
+            await expect.poll(() => apiCalls.length, { timeout: 30_000 }).toBe(1);
+            await page.clock.fastForward(5_000);
+            await expect.poll(() => routeSearches.length, { timeout: 30_000 }).toBe(1);
+            expect(routeSearches[0]?.headers()['x-gitbook-search-fallback']).toBe('timeout');
+            expect((await routeSearches[0]?.response())?.status()).toBe(200);
+
+            await typeSearch(page, ' editor');
+            await expect.poll(() => routeSearches.length, { timeout: 30_000 }).toBe(2);
+            expect(apiCalls).toHaveLength(1);
+        },
+    },
+    {
         name: 'Cancelled search: a late API answer never replaces the newer query',
         url: '',
         screenshot: false,

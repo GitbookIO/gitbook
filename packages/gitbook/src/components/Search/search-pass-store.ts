@@ -17,6 +17,7 @@ export const SEARCH_FALLBACK_HEADER = 'x-gitbook-search-fallback';
 const PASS_REQUEST_TIMEOUT_MS = 3_000;
 const EXPIRY_MARGIN_MS = 5_000;
 const RATE_LIMIT_WAIT_MS = 2_000;
+const DIRECT_SEARCH_TIMEOUT_MS = 5_000;
 
 type SearchPassState =
     | { status: 'none'; reason?: string }
@@ -114,6 +115,14 @@ export function createSearchPassStore(directSearch: DirectSearchProps | undefine
 
         const { token } = state;
         const { apiURL, organizationId, siteId } = directSearch;
+        // A request dropped on the way to the API never settles, so it gets its own time limit.
+        // The browser targets predate `AbortSignal.any`.
+        const request = new AbortController();
+        if (signal.aborted) {
+            request.abort();
+        }
+        signal.addEventListener('abort', () => request.abort(), { once: true });
+        const timeout = setTimeout(() => request.abort(), DIRECT_SEARCH_TIMEOUT_MS);
         let response: Response;
         try {
             response = await fetch(`${apiURL}/v1/orgs/${organizationId}/sites/${siteId}/search`, {
@@ -124,13 +133,13 @@ export function createSearchPassStore(directSearch: DirectSearchProps | undefine
                 },
                 body: JSON.stringify(toSearchSiteContentBody(query, scope)),
                 credentials: 'omit',
-                signal,
+                signal: request.signal,
             });
         } catch (error) {
             if (signal.aborted) {
                 throw error;
             }
-            return fallBack('network');
+            return fallBack(request.signal.aborted ? 'timeout' : 'network');
         }
 
         if (response.status === 401) {
@@ -162,7 +171,9 @@ export function createSearchPassStore(directSearch: DirectSearchProps | undefine
             if (signal.aborted) {
                 throw error;
             }
-            return fallBack('invalid');
+            return fallBack(request.signal.aborted ? 'timeout' : 'invalid');
+        } finally {
+            clearTimeout(timeout);
         }
 
         return results ? { type: 'results', results } : fallBack('unknown_space');

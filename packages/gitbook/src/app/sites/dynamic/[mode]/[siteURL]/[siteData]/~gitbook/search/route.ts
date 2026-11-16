@@ -10,7 +10,8 @@ import { computeSearchResults } from '@/lib/search-results';
 import { getServerActionBaseContext } from '@/lib/server-actions';
 import { findSiteSpaceBy, getLinkerForSiteSpace } from '@/lib/sites';
 
-const SEARCH_FALLBACK_REASON = /^(\d{3}|expired|pass_request|network|invalid|unknown_space)$/;
+const SEARCH_FALLBACK_REASON =
+    /^(\d{3}|expired|pass_request|network|timeout|invalid|unknown_space)$/;
 
 export async function POST(request: NextRequest) {
     const { asEmbeddable, query, scope } = (await request.json()) as SearchSiteContentRequest;
