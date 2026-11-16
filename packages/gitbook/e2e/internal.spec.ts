@@ -16,7 +16,7 @@ import {
 } from '@gitbook/api';
 import type { GitBookStandalone } from '@gitbook/embed';
 
-import { getGitBookPreviewURL, getSiteAPIToken } from '../tests/utils';
+import { getContentTestURL, getGitBookPreviewURL, getSiteAPIToken } from '../tests/utils';
 import {
     type Test,
     type TestsCase,
@@ -584,6 +584,91 @@ const searchPassTestCases: Test[] = [
         },
     },
     {
+        name: 'Withdrawn pass: a no-pass reply stops the page using the earlier pass',
+        url: '',
+        screenshot: false,
+        run: async (page) => {
+            let passReplies = 0;
+            await page.route('**/~gitbook/search-pass', async (route) => {
+                passReplies += 1;
+                await (passReplies === 1
+                    ? route.fulfill({ json: { token: 'test-search-pass-1', expiresIn: 300_000 } })
+                    : route.fulfill({ status: 204 }));
+            });
+            const apiCalls = await answerSearchAPI(page);
+            const routeSearches = trackRouteSearches(page);
+            await waitForCookiesDialog(page);
+
+            await openSearchWithPass(page);
+            await typeSearch(page, 'gitbook');
+            await expect(
+                page
+                    .getByTestId('search-record-result')
+                    .filter({ hasText: SEARCH_PASS_RECORD.title })
+            ).toBeVisible({ timeout: 30_000 });
+
+            await page.keyboard.press('Escape');
+            await openSearchWithPass(page);
+            await typeSearch(page, ' editor');
+            await expect.poll(() => routeSearches.length, { timeout: 30_000 }).toBe(1);
+            expect(apiCalls).toHaveLength(1);
+        },
+    },
+    {
+        name: 'Rejected replacement pass: the page stays on the route after one refresh',
+        url: '',
+        screenshot: false,
+        run: async (page) => {
+            await giveSearchPasses(page);
+            const passRequests: Request[] = [];
+            page.on('request', (request) => {
+                if (request.url().endsWith('/~gitbook/search-pass')) {
+                    passRequests.push(request);
+                }
+            });
+            const apiCalls = await answerSearchAPI(page, [401, 401, 401, 401]);
+            const routeSearches = trackRouteSearches(page);
+            await waitForCookiesDialog(page);
+
+            await openSearchWithPass(page);
+            for (const [index, text] of ['gitbook', ' editor', ' blocks', ' lists'].entries()) {
+                await typeSearch(page, text);
+                await expect.poll(() => routeSearches.length, { timeout: 30_000 }).toBe(index + 1);
+                await page.waitForTimeout(500);
+            }
+
+            expect(apiCalls).toHaveLength(2);
+            expect(passRequests).toHaveLength(2);
+        },
+    },
+    {
+        name: 'Rate limited: the next query waits for the cooldown before using the route',
+        url: '',
+        screenshot: false,
+        run: async (page) => {
+            await giveSearchPasses(page);
+            const apiCalls = await answerSearchAPI(page, [429]);
+            const routeSearchTimes: number[] = [];
+            page.on('request', (request) => {
+                if (request.method() === 'POST' && request.url().endsWith('/~gitbook/search')) {
+                    routeSearchTimes.push(Date.now());
+                }
+            });
+            await waitForCookiesDialog(page);
+
+            await openSearchWithPass(page);
+            const rateLimited = page.waitForResponse(SEARCH_API_URL);
+            await typeSearch(page, 'gitbook');
+            await rateLimited;
+            const rateLimitedAt = Date.now();
+            await typeSearch(page, ' editor');
+
+            await expect.poll(() => routeSearchTimes.length, { timeout: 30_000 }).toBe(1);
+            expect(routeSearchTimes[0]! - rateLimitedAt).toBeGreaterThanOrEqual(1_500);
+            expect(apiCalls).toHaveLength(1);
+        },
+    },
+    {
         name: 'Cancelled search: a late API answer never replaces the newer query',
         url: '',
         screenshot: false,
@@ -653,7 +738,115 @@ const searchPassTestCases: Test[] = [
                     .getByTestId('search-record-result')
                     .filter({ hasText: SEARCH_PASS_RECORD.title })
             ).toBeVisible({ timeout: 30_000 });
-            expect(routeSearches).toHaveLength(0);
+            // The one-letter query can reach the route when it is sent before the pass arrives.
+            const routeQueries = routeSearches.map((request) => request.postDataJSON().query);
+            expect(routeQueries).not.toContain('gitbook');
+        },
+    },
+];
+
+const VISITOR_AUTH_SITE = 'https://gitbook.gitbook.io/gbo-va-space/';
+
+function signVisitorToken(name: string) {
+    return jwt.sign({ name }, '70b844d0-c519-4532-8586-5970ce48c537', { expiresIn: '24h' });
+}
+
+/**
+ * Give the page one search pass, then answer later pass requests with `later` or the site's route.
+ */
+async function giveOneSearchPass(page: Page, later?: { token: string }) {
+    let passes = 0;
+    await page.route('**/~gitbook/search-pass', async (route) => {
+        passes += 1;
+        if (passes > 1 && !later) {
+            await route.continue();
+            return;
+        }
+        await route.fulfill({
+            json: {
+                token: passes === 1 ? 'test-search-pass-1' : later?.token,
+                expiresIn: 300_000,
+            },
+        });
+    });
+}
+
+/**
+ * Open a second tab of the site at `path`, keeping it from leaving for an upstream sign-in page.
+ */
+async function visitInOtherTab(page: Page, path: string) {
+    const other = await page.context().newPage();
+    await other.route(
+        (url) => url.hostname !== new URL(page.url()).hostname,
+        (route) => route.abort()
+    );
+    await other.goto(getContentTestURL(new URL(path, VISITOR_AUTH_SITE).href), {
+        waitUntil: 'commit',
+    });
+    await other.close();
+}
+
+/**
+ * Close search and open it again, waiting for the pass request that opening sends.
+ */
+async function reopenSearch(page: Page) {
+    await page.keyboard.press('Escape');
+    const passReply = page.waitForResponse('**/~gitbook/search-pass');
+    await page.getByTestId('search-input').focus();
+    return passReply;
+}
+
+const searchPassSessionTestCases: Test[] = [
+    {
+        name: 'Signed out in another tab: reopening search drops the pass',
+        url: () => `first?jwt_token=${signVisitorToken('gitbook-open-tests')}`,
+        screenshot: false,
+        run: async (page) => {
+            await giveOneSearchPass(page);
+            const apiCalls = await answerSearchAPI(page);
+            const routeSearches = trackRouteSearches(page);
+            await waitForHydration(page);
+            await openSearchWithPass(page);
+            await typeSearch(page, 'first');
+            await expect.poll(() => apiCalls.length, { timeout: 30_000 }).toBe(1);
+
+            await visitInOtherTab(page, '~gitbook/auth/logout');
+            await expect
+                .poll(async () =>
+                    (await page.context().cookies()).some((cookie) =>
+                        cookie.name.startsWith(VISITOR_TOKEN_COOKIE)
+                    )
+                )
+                .toBe(false);
+
+            expect((await reopenSearch(page)).status()).toBe(401);
+            await typeSearch(page, ' page');
+            await expect.poll(() => routeSearches.length, { timeout: 30_000 }).toBe(1);
+            expect(apiCalls).toHaveLength(1);
+        },
+    },
+    {
+        name: 'Signed in as another visitor in another tab: reopening search uses the new pass',
+        url: () => `first?jwt_token=${signVisitorToken('gitbook-open-tests')}`,
+        screenshot: false,
+        run: async (page) => {
+            await giveOneSearchPass(page, { token: 'test-search-pass-2' });
+            const apiCalls = await answerSearchAPI(page);
+            await waitForHydration(page);
+            await openSearchWithPass(page);
+            await typeSearch(page, 'first');
+            await expect.poll(() => apiCalls.length, { timeout: 30_000 }).toBe(1);
+
+            const otherVisitor = signVisitorToken('another-visitor');
+            await visitInOtherTab(page, `first?jwt_token=${otherVisitor}`);
+
+            const passReply = await reopenSearch(page);
+            expect((await passReply.request().allHeaders()).cookie).toContain(otherVisitor);
+            await typeSearch(page, ' page');
+            await expect.poll(() => apiCalls.length, { timeout: 30_000 }).toBe(2);
+            expect((await apiCalls[1]?.allHeaders())?.authorization).toBe(
+                'Bearer test-search-pass-2'
+            );
         },
     },
 ];
@@ -1452,6 +1645,11 @@ const testCases: TestsCase[] = [
         name: 'Search pass',
         contentBaseURL: 'https://gitbook.gitbook.io/test-gitbook-open/',
         tests: searchPassTestCases,
+    },
+    {
+        name: 'Search pass with visitor authentication',
+        contentBaseURL: VISITOR_AUTH_SITE,
+        tests: searchPassSessionTestCases,
     },
     {
         name: 'Content tests',

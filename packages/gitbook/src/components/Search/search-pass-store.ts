@@ -17,12 +17,13 @@ export const SEARCH_FALLBACK_HEADER = 'x-gitbook-search-fallback';
 const PASS_REQUEST_TIMEOUT_MS = 3_000;
 const EXPIRY_MARGIN_MS = 5_000;
 const RATE_LIMIT_WAIT_MS = 2_000;
+const RATE_LIMIT_MAX_WAIT_MS = 10_000;
 const DIRECT_SEARCH_TIMEOUT_MS = 5_000;
 
 type SearchPassState =
     | { status: 'none'; reason?: string }
-    | { status: 'ready'; token: string; expiresAt: number }
-    | { status: 'route'; reason: string };
+    | { status: 'ready'; token: string; expiresAt: number; replacesRejectedPass: boolean }
+    | { status: 'route'; reason: string; cooldownUntil: number };
 
 type DirectSearchOutcome =
     | { type: 'results'; results: OrderedComputedResult[] }
@@ -38,38 +39,54 @@ export function createSearchPassStore(directSearch: DirectSearchProps | undefine
     let pendingRequest: Promise<void> | null = null;
 
     const sendPassRequest = async () => {
-        if (!directSearch) {
+        if (!directSearch || state.status === 'route') {
             return;
         }
+        const request = new AbortController();
+        const timeout = setTimeout(() => request.abort(), PASS_REQUEST_TIMEOUT_MS);
         try {
             const response = await fetch(directSearch.passURL, {
                 method: 'POST',
-                signal: AbortSignal.timeout(PASS_REQUEST_TIMEOUT_MS),
+                signal: request.signal,
             });
-            if (!response.ok) {
-                throw new Error(`Search pass request failed: ${response.status}`);
-            }
-            if (response.status !== 200) {
-                return;
-            }
-
-            const { token, expiresIn } = (await response.json()) as {
-                token?: unknown;
-                expiresIn?: unknown;
-            };
+            const { token, expiresIn } =
+                response.status === 200
+                    ? ((await response.json()) as { token?: unknown; expiresIn?: unknown })
+                    : {};
+            // A search may have moved the page to the route while this request was in flight.
+            const current = state as SearchPassState;
             if (
-                state.status !== 'route' &&
+                current.status !== 'route' &&
                 typeof token === 'string' &&
                 typeof expiresIn === 'number'
             ) {
-                state = { status: 'ready', token, expiresAt: Date.now() + expiresIn };
+                state = {
+                    status: 'ready',
+                    token,
+                    expiresAt: Date.now() + expiresIn,
+                    replacesRejectedPass:
+                        (current.status === 'none' && current.reason === '401') ||
+                        (current.status === 'ready' && current.replacesRejectedPass),
+                };
                 ReactDOM.preconnect(directSearch.apiURL, { crossOrigin: 'anonymous' });
+            } else if (current.status === 'ready') {
+                state = { status: 'none' };
+            }
+            if (!response.ok) {
+                throw new Error(`Search pass request failed: ${response.status}`);
             }
         } catch (error) {
-            if (state.status === 'none') {
+            const current = state as SearchPassState;
+            // Keep the 401 so a later replacement pass is still refused only once.
+            if (
+                current.status === 'ready' ||
+                (current.status === 'none' && current.reason !== '401')
+            ) {
                 state = { status: 'none', reason: 'pass_request' };
             }
             throw error;
+        } finally {
+            clearTimeout(timeout);
         }
     };
 
@@ -89,7 +106,7 @@ export function createSearchPassStore(directSearch: DirectSearchProps | undefine
     };
 
     const fallBack = (reason: string): DirectSearchOutcome => {
-        state = { status: 'route', reason };
+        state = { status: 'route', reason, cooldownUntil: 0 };
         return { type: 'route', reason };
     };
 
@@ -106,6 +123,9 @@ export function createSearchPassStore(directSearch: DirectSearchProps | undefine
         if (state.status === 'ready' && state.expiresAt - Date.now() <= EXPIRY_MARGIN_MS) {
             return dropPass(state.token, 'expired');
         }
+        if (state.status === 'route') {
+            return waitForCooldown(state, signal);
+        }
         if (state.status !== 'ready') {
             return { type: 'route', reason: state.reason };
         }
@@ -113,7 +133,7 @@ export function createSearchPassStore(directSearch: DirectSearchProps | undefine
             return { type: 'results', results: [] };
         }
 
-        const { token } = state;
+        const { token, replacesRejectedPass } = state;
         const { apiURL, organizationId, siteId } = directSearch;
         // A request dropped on the way to the API never settles, so it gets its own time limit.
         // The browser targets predate `AbortSignal.any`.
@@ -143,13 +163,15 @@ export function createSearchPassStore(directSearch: DirectSearchProps | undefine
         }
 
         if (response.status === 401) {
-            return dropPass(token, '401');
+            return replacesRejectedPass ? fallBack('401') : dropPass(token, '401');
         }
         if (response.status === 429) {
-            fallBack('429');
-            await new Promise((resolve) => setTimeout(resolve, RATE_LIMIT_WAIT_MS));
-            signal.throwIfAborted();
-            return { type: 'route', reason: '429' };
+            state = {
+                status: 'route',
+                reason: '429',
+                cooldownUntil: Date.now() + getRateLimitWaitMs(response),
+            };
+            return waitForCooldown(state, signal);
         }
         if (!response.ok) {
             return fallBack(String(response.status));
@@ -180,4 +202,32 @@ export function createSearchPassStore(directSearch: DirectSearchProps | undefine
     };
 
     return { requestPass, search };
+}
+
+/**
+ * Hold a search until the rate limit cooldown of the route state ends, then send it to the route.
+ */
+async function waitForCooldown(
+    route: Extract<SearchPassState, { status: 'route' }>,
+    signal: AbortSignal
+): Promise<DirectSearchOutcome> {
+    const waitMs = route.cooldownUntil - Date.now();
+    if (waitMs > 0) {
+        await new Promise((resolve) => setTimeout(resolve, waitMs));
+        if (signal.aborted) {
+            throw new DOMException('Search aborted', 'AbortError');
+        }
+    }
+    return { type: 'route', reason: route.reason };
+}
+
+/**
+ * How long to hold searches after a 429: until the API's rate limit resets, when it says so.
+ */
+function getRateLimitWaitMs(response: Response): number {
+    const resetSeconds = Number(response.headers.get('x-ratelimit-reset'));
+    if (!resetSeconds) {
+        return RATE_LIMIT_WAIT_MS;
+    }
+    return Math.min(Math.max(resetSeconds * 1000 - Date.now(), 0), RATE_LIMIT_MAX_WAIT_MS);
 }
