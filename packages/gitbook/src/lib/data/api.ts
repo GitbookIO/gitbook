@@ -13,12 +13,7 @@ import { getCacheTag, getComputedContentSourceCacheTags } from '@gitbook/cache-t
 import { cache } from '../cache';
 import { DataFetcherError, wrapDataFetcherError } from './errors';
 import type { GitBookDataFetcher } from './types';
-import {
-    GITBOOK_API_DIRECT_URL,
-    GITBOOK_API_TOKEN,
-    GITBOOK_API_URL,
-    GITBOOK_USER_AGENT,
-} from '@/lib/env';
+import { GITBOOK_API_TOKEN, GITBOOK_API_URL, GITBOOK_USER_AGENT } from '@/lib/env';
 import { trace } from '@/lib/tracing';
 
 interface DataFetcherInput {
@@ -27,11 +22,6 @@ interface DataFetcherInput {
      */
     apiToken: string | null;
 }
-
-/**
- * Maximum time to wait for a site search.
- */
-const SEARCH_TIMEOUT_MS = 45_000;
 
 /**
  * Options to pass to the `fetch` call to disable the Next data-cache when wrapped in `use cache`.
@@ -795,49 +785,43 @@ const getEmbedByUrl = cache(
     }
 );
 
-const searchSiteContent = cache(
-    async (
-        input: DataFetcherInput,
-        params: Parameters<GitBookDataFetcher['searchSiteContent']>[0]
-    ) => {
-        return wrapDataFetcherError(async () => {
-            return trace(
-                `searchSiteContent(${params.organizationId}, ${params.siteId}, ${params.query})`,
-                async () => {
-                    const { organizationId, siteId, query, scope } = params;
-                    if (!GITBOOK_API_DIRECT_URL) {
-                        throw new Error('GITBOOK_API_DIRECT_URL is not set');
+async function searchSiteContent(
+    input: DataFetcherInput,
+    params: Parameters<GitBookDataFetcher['searchSiteContent']>[0]
+) {
+    return wrapDataFetcherError(async () => {
+        return trace(
+            `searchSiteContent(${params.organizationId}, ${params.siteId}, ${params.query})`,
+            async () => {
+                const { organizationId, siteId, query, scope } = params;
+                const api = apiClient(input);
+                const res = await api.orgs.searchSiteContent(
+                    organizationId,
+                    siteId,
+                    {
+                        query,
+                        ...(scope.mode === 'current' && scope.restrictTo
+                            ? {
+                                  // `restrictTo` only exists in the newer `scope` request shape,
+                                  // and the published @gitbook/api types don't include it yet.
+                                  scope: {
+                                      mode: 'default',
+                                      currentSiteSpace: scope.siteSpaceId,
+                                      restrictTo: scope.restrictTo,
+                                  } as SiteSearchScope,
+                              }
+                            : scope),
+                    },
+                    {},
+                    {
+                        ...noCacheFetchOptions,
                     }
-                    const api = apiClient(input, GITBOOK_API_DIRECT_URL);
-                    const res = await api.orgs.searchSiteContent(
-                        organizationId,
-                        siteId,
-                        {
-                            query,
-                            ...(scope.mode === 'current' && scope.restrictTo
-                                ? {
-                                      // `restrictTo` only exists in the newer `scope` request shape,
-                                      // and the published @gitbook/api types don't include it yet.
-                                      scope: {
-                                          mode: 'default',
-                                          currentSiteSpace: scope.siteSpaceId,
-                                          restrictTo: scope.restrictTo,
-                                      } as SiteSearchScope,
-                                  }
-                                : scope),
-                        },
-                        {},
-                        {
-                            ...noCacheFetchOptions,
-                            signal: AbortSignal.timeout(SEARCH_TIMEOUT_MS),
-                        }
-                    );
-                    return res.data.items;
-                }
-            );
-        });
-    }
-);
+                );
+                return res.data.items;
+            }
+        );
+    });
+}
 
 const renderIntegrationUi = cache(
     async (
@@ -904,15 +888,12 @@ const listRevisionPageMetaLinks = cache(
 /**
  * Create a new API client.
  */
-export function apiClient(
-    input: DataFetcherInput = { apiToken: null },
-    endpoint: string = GITBOOK_API_URL
-) {
+export function apiClient(input: DataFetcherInput = { apiToken: null }) {
     const { apiToken } = input;
 
     const api = new GitBookAPI({
         authToken: apiToken || GITBOOK_API_TOKEN || undefined,
-        endpoint,
+        endpoint: GITBOOK_API_URL,
         userAgent: GITBOOK_USER_AGENT,
     });
 

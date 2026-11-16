@@ -57,11 +57,6 @@ export const GITBOOK_API_URL = process.env.GITBOOK_API_URL || 'https://api.gitbo
 export const GITBOOK_API_PUBLIC_URL = process.env.GITBOOK_API_PUBLIC_URL || GITBOOK_API_URL;
 
 /**
- * GitBook API URL for calls that skip the API cache gateway.
- */
-export const GITBOOK_API_DIRECT_URL = process.env.GITBOOK_API_DIRECT_URL || null;
-
-/**
  * Default GitBook API token.
  * It can be use to avoid rate-limiting.
  */
