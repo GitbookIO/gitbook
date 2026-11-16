@@ -7,6 +7,7 @@ import rison from 'rison';
 import { getDomain } from 'tldts';
 
 import {
+    ContentType,
     CustomizationDefaultThemeMode,
     CustomizationThemeMode,
     type PublishedSiteContent,
@@ -386,7 +387,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         }
 
         if (isSearchPassRequest(siteURLData)) {
-            return await serveSearchPass(request, siteURLData);
+            return await serveSearchPass(request, siteURLData, visitorToken?.token);
         }
 
         //
@@ -845,7 +846,11 @@ function isSearchPassRequest(siteURLData: PublishedSiteContent) {
 /**
  * Give the visitor's browser a short-lived pass to search the site with the API directly.
  */
-async function serveSearchPass(request: NextRequest, siteURLData: PublishedSiteContent) {
+async function serveSearchPass(
+    request: NextRequest,
+    siteURLData: PublishedSiteContent,
+    visitorToken: string | undefined
+) {
     if (request.method !== 'POST') {
         return new NextResponse(null, { status: 405, headers: { allow: 'POST' } });
     }
@@ -857,6 +862,8 @@ async function serveSearchPass(request: NextRequest, siteURLData: PublishedSiteC
             path: `/orgs/${siteURLData.organization}/sites/${siteURLData.site}/search/pass`,
             method: 'POST',
             secure: true,
+            // The API caps the pass at the visitor token's expiry.
+            ...(visitorToken ? { body: { visitorToken }, type: ContentType.Json } : {}),
         })
         .then(
             (response) =>
