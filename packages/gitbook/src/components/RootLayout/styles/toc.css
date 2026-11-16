@@ -1,0 +1,115 @@
+@layer utilities {
+    /* Lists */
+    .toc-list {
+        @apply flex flex-col gap-y-0.5;
+    }
+    .toc-list-root {
+        @apply grow border-tint-subtle sidebar-list-line:border-l page-no-toc:hidden;
+    }
+    .toc-list-nested {
+        @apply my-2 ml-5 border-tint-subtle break-anywhere sidebar-list-default:border-l sidebar-list-line:border-l;
+    }
+
+    .page-document-item,
+    .page-link-item {
+        @apply flex flex-col [.page-group-item+&]:mt-4;
+    }
+
+    /* Sidebar links (design tokens `ToCLinkItemStyles` / `ToCLinkItemActiveStyles`) */
+    .toclink {
+        @apply relative flex flex-row items-center justify-start gap-3 text-balance rounded-md p-1.5 pl-3 font-normal text-sm text-tint-strong/7 transition-colors before:absolute before:inset-y-0 before:-left-px focus-visible:-outline-offset-2 circular-corners:rounded-2xl straight-corners:rounded-none sidebar-list-line:rounded-l-none! sidebar-list-line:before:w-px has-[.openapi-method]:pl-3 [&+div_a]:pl-5 [&+div_a]:sidebar-list-default:rounded-l-none [&+div_a]:sidebar-list-default:before:w-px hover:bg-tint-hover hover:text-tint-strong contrast-more-strong:text-tint-strong contrast-more-strong:hover:text-tint-strong contrast-more-strong:hover:ring-1 contrast-more-strong:hover:ring-tint-12;
+    }
+    /* Comes after `.toclink` so equal-specificity rules replace it, like twMerge did. */
+    .toclink-active {
+        @apply font-semibold text-primary-subtle before:bg-primary-solid sidebar-list-line:before:w-0.5 sidebar-list-pill:bg-primary [html.sidebar-list-pill.theme-muted_&]:bg-primary-hover [html.sidebar-list-pill.theme-bold.tint_&]:bg-primary-hover [html.sidebar-filled.sidebar-list-pill.theme-muted_&]:bg-primary [html.sidebar-filled.sidebar-list-pill.theme-bold.tint_&]:bg-primary hover:bg-primary-hover hover:text-primary hover:before:bg-primary-solid-hover hover:sidebar-list-pill:bg-primary-hover contrast-more-strong:bg-primary contrast-more-strong:text-primary contrast-more-strong:ring-1 contrast-more-strong:ring-primary contrast-more-strong:hover:text-primary-strong contrast-more-strong:hover:ring-primary-hover;
+    }
+
+    .toclink-label {
+        @apply flex min-w-0 flex-1 flex-wrap items-center gap-2;
+    }
+    .toclink-method {
+        @apply flex h-[1lh] w-9 shrink-0 self-baseline;
+    }
+    .toclink-children {
+        @apply flex flex-col overflow-hidden;
+    }
+    .toclink-external {
+        @apply mt-1 mr-1 ml-auto size-3 shrink-0 place-self-start text-current opacity-6 transition-all contrast-more-strong:opacity-11;
+        @media (hover: hover) {
+            .toclink:hover & {
+                @apply opacity-11;
+            }
+        }
+    }
+
+    /* Overrides on the Button primitive: an open chevron must look like a closed one. */
+    .toclink-toggle {
+        @apply -my-0.5 -mr-1 ml-auto min-h-6 min-w-6 text-current hover:bg-tint-base aria-expanded:bg-transparent aria-expanded:text-current aria-expanded:hover:bg-tint-hover;
+    }
+
+    .toc-chevron {
+        @apply m-0! size-3!;
+    }
+    .toclink-toggle .toc-chevron {
+        @apply opacity-6 group-hover:opacity-11;
+    }
+
+    .toc-icon {
+        @apply shrink-0 text-base in-[.toclink]:text-tint-strong/6 theme-bold-no-tint:text-primary-subtle theme-gradient-no-tint:text-primary-subtle theme-bold-tint:text-tint-subtle theme-gradient-tint:text-tint-subtle;
+        .toclink[aria-current="page"] & {
+            @apply text-inherit!;
+        }
+    }
+
+    /* Page groups */
+    .page-group-item {
+        @apply flex flex-col;
+    }
+    /* No opacity transition on ::after: in Chrome it leaves stale pixels over the first child after the list scrolls. */
+    .toc-group-header {
+        @apply sticky -top-4 z-1 mt-1 bg-tint-base pt-2.5 pb-0 after:pointer-events-none after:absolute after:inset-x-0 after:top-full after:h-4 after:bg-linear-to-b after:from-tint-base after:to-transparent after:opacity-0 sidebar-filled:bg-tint-subtle sidebar-filled:after:from-tint-subtle theme-muted:bg-tint-subtle theme-muted:after:from-tint-subtle [html.sidebar-filled.theme-muted_&]:bg-tint-base [html.sidebar-filled.theme-muted_&]:after:from-tint-base [html.sidebar-filled.theme-bold.tint_&]:bg-tint-base [html.sidebar-filled.theme-bold.tint_&]:after:from-tint-base lg:[html.sidebar-default.theme-gradient_&]:bg-gradient-primary lg:[html.sidebar-default.theme-gradient_&]:after:from-primary-2 lg:[html.sidebar-default.theme-gradient.tint_&]:bg-gradient-tint lg:[html.sidebar-default.theme-gradient.tint_&]:after:from-tint-subtle;
+    }
+    .toc-group-header-stuck {
+        @apply after:opacity-100;
+    }
+    .toc-group-header-first {
+        @apply -top-2 -mt-2 rounded-t-md pt-2 circular-corners:rounded-t-2xl;
+    }
+
+    .toc-group {
+        @apply relative flex min-h-8 w-full appearance-none flex-row items-center justify-start gap-3 text-balance rounded-md border-0 p-1.5 pl-3 text-left font-heading font-semibold text-tint-strong text-xs uppercase tracking-wide transition-colors before:absolute before:inset-y-0 before:-left-px focus-visible:-outline-offset-2 circular-corners:rounded-2xl straight-corners:rounded-none sidebar-list-line:rounded-l-none! sidebar-list-line:before:w-px has-[.openapi-method]:pl-3 [&+div_a]:pl-5 [&+div_a]:sidebar-list-default:rounded-l-none [&+div_a]:sidebar-list-default:before:w-px hover:bg-tint-hover hover:text-tint-strong contrast-more-strong:text-tint-strong contrast-more-strong:hover:text-tint-strong contrast-more-strong:hover:ring-1 contrast-more-strong:hover:ring-tint-12 [&_.toc-group-chevron]:transition-opacity hover:[&_.toc-group-chevron]:opacity-11 focus-visible:[&_.toc-group-chevron]:opacity-11;
+        &:enabled {
+            @apply cursor-pointer;
+        }
+    }
+    .toc-group-chevron {
+        @apply mr-1 ml-auto flex shrink-0 opacity-6 transition-opacity delay-0 duration-150;
+        /* Lower specificity than the `.toc-group:hover` reveal above, as before. */
+        [aria-expanded="true"] > & {
+            @apply pointer-events-none opacity-0 delay-75;
+        }
+    }
+
+    .toc-group-body {
+        @apply mt-px grid grid-rows-[1fr] opacity-100 transition-[grid-template-rows,opacity] duration-200 ease-in-out;
+    }
+    .toc-group-body-closed {
+        @apply grid-rows-[0fr] opacity-0;
+    }
+
+    /* Sidebar panel */
+    /* `-ms-5` compensates for the PagesList padding. */
+    .toc-sidebar {
+        @apply relative -ms-5 flex min-h-0 grow flex-col border-tint-subtle layout-wide:no-sidebar:ms-0 layout-default:no-sidebar:lg:max-xl:ms-0 sidebar-filled:rounded-2xl sidebar-filled:bg-tint-subtle theme-muted:bg-tint-subtle straight-corners:rounded-none [html.sidebar-filled.theme-muted_&]:bg-tint-base [html.sidebar-filled.theme-bold.tint_&]:bg-tint-base [html.sidebar-filled.theme-gradient_&]:border max-lg:sidebar-filled:border lg:page-no-toc:bg-transparent! lg:page-no-toc:border-none! [html.sidebar-filled.circular-corners_&]:layout-wide:rounded-4xl;
+    }
+
+    .tag {
+        @apply inline-flex max-w-full shrink-0 items-center gap-1 rounded-full px-2 py-1 font-medium text-xs leading-normal contrast-more-strong:ring-1 contrast-more-strong:ring-tint;
+    }
+    .tag-default {
+        @apply bg-tint-5 text-tint-strong;
+    }
+    .tag-icon {
+        @apply size-[1em] shrink-0;
+    }
+}

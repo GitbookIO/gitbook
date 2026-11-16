@@ -3,9 +3,7 @@ import { Icon } from '@gitbook/icons';
 
 import { Link } from '../primitives';
 import type { DocumentContext } from './DocumentView';
-import './HashLinkButton.css';
-import { getBlockTextStyle } from './spacing';
-import { type ClassValue, tcls } from '@/lib/tailwind';
+import { type ClassValue, cx } from '@/lib/classnames';
 
 /**
  * Whether blocks should render a visible anchor link icon.
@@ -21,10 +19,8 @@ export function shouldShowHashLinks(context: DocumentContext): boolean {
 
 /**
  * A hash icon which adds the block or active block item's ID in the URL hash.
- * The button needs to be wrapped in a container with `hashLinkButtonWrapperStyles`.
+ * Styled in `styles/blocks.css`, it is revealed when hovering its `.heading` parent.
  */
-export const hashLinkButtonWrapperStyles = tcls('relative', 'group/hash');
-
 export function HashLinkButton(props: {
     id: string;
     block: DocumentBlockTabs | DocumentBlockHeading;
@@ -32,17 +28,12 @@ export function HashLinkButton(props: {
     className?: ClassValue;
     iconClassName?: ClassValue;
 }) {
-    const { id, block, className, iconClassName, label } = props;
-    const textStyle = getBlockTextStyle(block);
+    const { id, className, iconClassName, label } = props;
 
     return (
-        <span className={tcls('hash', className)}>
-            <Link
-                href={`#${id}`}
-                aria-label={label}
-                className={tcls('hash-link', textStyle.lineHeight)}
-            >
-                <Icon icon="hashtag" className={tcls('hash-icon', iconClassName)} />
+        <span className={cx('hash', className)}>
+            <Link href={`#${id}`} aria-label={label} className="hash-link">
+                <Icon icon="hashtag" className={cx('hash-icon', iconClassName)} />
             </Link>
         </span>
     );

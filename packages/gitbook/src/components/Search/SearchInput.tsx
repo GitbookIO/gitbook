@@ -83,11 +83,7 @@ export const SearchInput = React.forwardRef<HTMLDivElement, SearchInputProps>(
         }, [isFrame, isOpen, value.length, onFocus]);
 
         return (
-            <div
-                className={
-                    isFrame ? 'relative flex w-full grow' : '@max-2xl:size-9.5 relative flex grow'
-                }
-            >
+            <div className={isFrame ? 'search-input-frame' : 'search-input-header'}>
                 <Input
                     data-testid="search-input"
                     name="search-input"
@@ -110,9 +106,7 @@ export const SearchInput = React.forwardRef<HTMLDivElement, SearchInputProps>(
                             <Icon
                                 icon="search"
                                 className={
-                                    isFrame
-                                        ? 'size-text-lg shrink-0 text-tint-subtle'
-                                        : 'size-text-lg shrink-0 text-tint site-header:theme-bold:text-header-link/8'
+                                    isFrame ? 'search-input-icon-frame' : 'search-input-icon'
                                 }
                             />
                         )
@@ -134,7 +128,7 @@ export const SearchInput = React.forwardRef<HTMLDivElement, SearchInputProps>(
                     }
                     trailing={
                         !showAsk && value && resultsCount > 0 ? (
-                            <div className="animate-blur-in mr-2 text-sm text-tint-subtle">
+                            <div className="search-input-count">
                                 {t(language, 'search_results_count', resultsCount.toString())}
                             </div>
                         ) : undefined

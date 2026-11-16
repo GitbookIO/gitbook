@@ -4,6 +4,7 @@ import type { IconName } from '@gitbook/icons';
 import type { ButtonProps } from '../primitives';
 import { getTargetURLForSiteSpace } from '../SiteSections/encodeClientSiteSections';
 import { SpacesDropdownClient } from './SpacesDropdownClient';
+import { cx } from '@/lib/classnames';
 import type { GitBookSiteContext } from '@/lib/context';
 import { getLocalizedTitle } from '@/lib/sites';
 import { tcls } from '@/lib/tailwind';
@@ -35,7 +36,7 @@ export function SpacesDropdown(
     } = props;
     const currentLanguage = context.locale;
 
-    const dropdownClassName = tcls(
+    const dropdownClassName = cx(
         'group-hover/dropdown:invisible', // Prevent hover from opening the dropdown, as it's annoying in this context
         'group-focus-within/dropdown:group-hover/dropdown:visible' // When the dropdown is already open, it should remain visible when hovered
     );
@@ -84,7 +85,7 @@ export function TranslationsDropdown(
             asEmbeddable={asEmbeddable}
             variant="blank"
             className={tcls(
-                'bg-transparent lg:max-w-64 max-md:[&_.button-content]:hidden',
+                'translations-dropdown max-md:[&_.button-content]:hidden',
                 hasEmojiPrefix
                     ? 'md:[&_.button-leading-icon]:hidden' // If the title starts with an emoji, don't show the icon (on desktop)
                     : '',

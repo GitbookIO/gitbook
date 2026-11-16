@@ -5,8 +5,8 @@ import type { BlockProps } from './Block';
 import { Inlines } from './Inlines';
 import { getTextAlignment } from './utils';
 import { getCommentAnchorProps } from './utils';
+import { cx } from '@/lib/classnames';
 import { getNodeText } from '@/lib/document';
-import { tcls } from '@/lib/tailwind';
 
 export function Paragraph(props: BlockProps<DocumentBlockParagraph>) {
     const { block, style, ancestorBlocks, ...contextProps } = props;
@@ -21,7 +21,7 @@ export function Paragraph(props: BlockProps<DocumentBlockParagraph>) {
             // rendered in overlays (search answers, AI chat) on a background-cover page.
             data-cover-aware-text={context.isPageBody ? '' : undefined}
             // Paragraph styles live in globals.css (`.paragraph`) to keep the class attribute short.
-            className={tcls('paragraph', style, getTextAlignment(block.data?.align))}
+            className={cx('paragraph', style, getTextAlignment(block.data?.align))}
         >
             <Inlines {...contextProps} nodes={block.nodes} ancestorInlines={[]} />
         </p>
@@ -45,11 +45,7 @@ export function Paragraph(props: BlockProps<DocumentBlockParagraph>) {
             <div
                 // The shared `AskAIParagraphButton` portals itself into the hovered wrapper.
                 data-ask-ai-paragraph=""
-                className={tcls(
-                    'group/ask-ai relative',
-                    style,
-                    getTextAlignment(block.data?.align)
-                )}
+                className={cx('group/ask-ai relative', style, getTextAlignment(block.data?.align))}
             >
                 {paragraph}
             </div>

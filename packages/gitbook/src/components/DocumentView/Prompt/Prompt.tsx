@@ -11,7 +11,7 @@ import { CodeBlock } from '../CodeBlock';
 import { getPlainCodeBlock } from '../CodeBlock/highlight-tokens';
 import { COMMENT_IGNORE_CLASSNAME, getCommentKeyProp } from '../utils';
 import { PromptClient } from './PromptClient';
-import { tcls } from '@/lib/tailwind';
+import { cx } from '@/lib/classnames';
 
 const PROMPT_COLLAPSED_LINE_COUNT = 10;
 
@@ -44,7 +44,7 @@ export function Prompt(props: BlockProps<DocumentBlockPrompt>) {
             {...getCommentKeyProp(context, block.key)}
             // Only the comment marker: the prompt keeps its own width rather than the block styles.
             className={
-                tcls(style).split(' ').includes(COMMENT_IGNORE_CLASSNAME)
+                cx(style).split(' ').includes(COMMENT_IGNORE_CLASSNAME)
                     ? COMMENT_IGNORE_CLASSNAME
                     : undefined
             }

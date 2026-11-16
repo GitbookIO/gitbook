@@ -47,9 +47,9 @@ describe('ViewCards', () => {
         expect(markup).toContain('-mx-4 sm:-mx-6 md:-mx-8 2xl:-mx-12');
         expect(markup).toContain('scroll-px-4');
         expect(markup).toContain('2xl:scroll-px-12');
-        expect(markup).toContain('left-0');
+        expect(markup).toContain('scroll-container-prev-x');
         expect(markup).toContain('2xl:ml-8');
-        expect(markup).toContain('right-0');
+        expect(markup).toContain('scroll-container-next-x');
         expect(markup).toContain('2xl:mr-8');
         expect(markup).not.toContain('before:bg-linear-to-r');
         expect(markup).not.toContain('after:bg-linear-to-l');
@@ -59,6 +59,6 @@ describe('ViewCards', () => {
     it('renders the wrapping grid by default', () => {
         const markup = renderWithContext(<ViewCards {...makeProps(true)} />);
 
-        expect(markup).toContain('inline-grid');
+        expect(markup).toContain('record-cards');
     });
 });

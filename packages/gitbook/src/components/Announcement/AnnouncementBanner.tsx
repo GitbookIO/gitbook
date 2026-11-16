@@ -13,6 +13,7 @@ import { LinkStyles } from '../primitives/styles';
 import { ANNOUNCEMENT_CSS_CLASS, ANNOUNCEMENT_STORAGE_KEY } from './constants';
 import { tString, useLanguage } from '@/intl/client';
 import { setLocalStorageItem } from '@/lib/browser';
+import { cx } from '@/lib/classnames';
 import type { ResolvedContentRef } from '@/lib/references';
 import { getLocalizedMessage, getLocalizedTitle } from '@/lib/sites';
 import { tcls } from '@/lib/tailwind';
@@ -38,20 +39,16 @@ export function AnnouncementBanner(props: {
     const style = BANNER_STYLES[announcement.style];
 
     return (
-        <div
-            data-gb-announcement-banner
-            className="pb-2 pt-4 theme-bold:bg-header-background"
-            data-nosnippet=""
-        >
-            <div className="lg:chat-open:pr-(--ai-chat-width) transition-all duration-300 motion-reduce:transition-none">
-                <div className={tcls('relative', CONTAINER_STYLE)}>
+        <div data-gb-announcement-banner className="announcement" data-nosnippet="">
+            <div className="chrome-shift">
+                <div className={cx(CONTAINER_STYLE, 'relative')}>
                     <Tag
                         href={contentRef?.href ?? ''}
-                        className={tcls(
-                            'flex w-full items-start justify-center overflow-hidden circular-corners:rounded-xl rounded-md straight-corners:rounded-none px-4 py-3 text-neutral-strong text-sm theme-bold:ring-1 theme-gradient:ring-1 ring-inset transition-colors',
-                            style.container,
-                            closeable && 'pr-12',
-                            hasLink && style.hover
+                        className={cx(
+                            'announcement-box',
+                            `announcement-${announcement.style}`,
+                            closeable && 'announcement-closeable',
+                            hasLink && 'announcement-linked'
                         )}
                         insights={
                             announcement.link
@@ -65,10 +62,7 @@ export function AnnouncementBanner(props: {
                                 : undefined
                         }
                     >
-                        <Icon
-                            icon={style.icon as IconName}
-                            className={`mr-3 mt-0.5 size-4 shrink-0 ${style.iconColor}`}
-                        />
+                        <Icon icon={style.icon as IconName} className="announcement-icon" />
                         <div>
                             {message}
                             {hasLink ? (
@@ -85,7 +79,7 @@ export function AnnouncementBanner(props: {
                                                 ? 'arrow-up-right'
                                                 : 'chevron-right'
                                         }
-                                        className={tcls('mb-0.5 inline size-3')}
+                                        className="mb-0.5 inline size-3"
                                     />
                                 </div>
                             ) : null}
@@ -123,35 +117,23 @@ function dismissAnnouncement() {
 
 const BANNER_STYLES = {
     info: {
-        container: 'bg-info ring-info-subtle',
-        hover: 'hover:bg-info-hover active:bg-info-active',
         icon: 'circle-info',
-        iconColor: 'text-info-subtle',
-        close: 'hover:bg-tint-base hover:ring-info-subtle',
+        close: 'hover:ring-info-subtle',
         link: '',
     },
     warning: {
-        container: 'bg-warning decoration-warning/6 ring-warning-subtle',
-        hover: 'hover:bg-warning-hover',
         icon: 'circle-exclamation',
-        iconColor: 'text-warning-subtle',
-        close: 'hover:bg-tint-base hover:ring-warning-subtle',
+        close: 'hover:ring-warning-subtle',
         link: 'links-default:text-warning hover:links-default:text-warning-strong links-default:decoration-warning/6 links-accent:decoration-warning',
     },
     danger: {
-        container: 'bg-danger decoration-danger/6 ring-danger-subtle',
-        hover: 'hover:bg-danger-hover',
         icon: 'triangle-exclamation',
-        iconColor: 'text-danger-subtle',
-        close: 'hover:bg-tint-base hover:ring-danger-subtle',
+        close: 'hover:ring-danger-subtle',
         link: 'links-default:text-danger hover:links-default:text-danger-strong links-default:decoration-danger/6 links-accent:decoration-danger',
     },
     success: {
-        container: 'bg-success decoration-success/6 ring-success-subtle',
-        hover: 'hover:bg-success-hover',
         icon: 'circle-check',
-        iconColor: 'text-success-subtle',
-        close: 'hover:bg-tint-base hover:ring-success-subtle',
+        close: 'hover:ring-success-subtle',
         link: 'links-default:text-success hover:links-default:text-success-strong links-default:decoration-success/6 links-accent:decoration-success',
     },
 };

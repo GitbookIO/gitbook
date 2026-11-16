@@ -2,7 +2,7 @@ import type { RevisionPage } from '@gitbook/api';
 import { Icon, type IconName } from '@gitbook/icons';
 
 import { Emoji } from '@/components/primitives';
-import { type ClassValue, tcls } from '@/lib/tailwind';
+import { type ClassValue, cx } from '@/lib/classnames';
 
 export function PageIcon(props: {
     page: Pick<RevisionPage, 'emoji' | 'icon'>;
@@ -25,7 +25,7 @@ export function PageIcon(props: {
     }
 
     if (page.icon) {
-        return <Icon icon={page.icon as IconName} className={tcls('size-[1em]', style)} />;
+        return <Icon icon={page.icon as IconName} className={cx('page-icon', style)} />;
     }
 
     return null;

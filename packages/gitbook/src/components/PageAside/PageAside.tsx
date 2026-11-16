@@ -18,9 +18,9 @@ import { PageAsideCloseButton } from './PageAsideButton';
 import { ScrollSectionsList } from './ScrollSectionsList';
 import { ScrollToTopButton } from './ScrollToTopButton';
 import { getSpaceLanguage, t, tString } from '@/intl/server';
+import { cx } from '@/lib/classnames';
 import type { GitBookSiteContext } from '@/lib/context';
 import { getDocumentSections } from '@/lib/document-sections';
-import { tcls } from '@/lib/tailwind';
 
 /**
  * Aside listing the headings in the document.
@@ -44,77 +44,13 @@ export async function PageAside(props: {
             toggleClass="outline-open"
             withOverlay
             withCloseButton
-            className={tcls(
-                'group/aside',
-                'order-last',
-
-                'xl:sticky',
-                'w-64',
-
-                // Without header
-                'lg:top-0',
-                'lg:max-h-screen',
-
-                // With header
-                'lg:site-header:top-16',
-                'lg:site-header:max-h-[calc(100vh-4rem)]',
-
-                // With header & sections
-                'lg:site-header-sections:top-27',
-                'lg:site-header-sections:max-h-[calc(100vh-6.75rem)]',
-
-                // Client-side dynamic positioning (CSS vars applied by script)
-                'lg:[html[style*="--outline-top-offset"]_&]:top-(--outline-top-offset)!',
-                'lg:[html[style*="--outline-height"]_&]:max-h-(--outline-height)!',
-
-                'layout-default:max-xl:border-l',
-                'layout-wide:max-3xl:border-l',
-                'border-tint-subtle',
-
-                'p-4',
-                'pt-8',
-                'ml-4',
-
-                'break-anywhere', // To prevent long words in headings from breaking the layout
-
-                'lg:z-10',
-                'lg:hover:z-12',
-                'layout-default:xl:chat-closed:pr-0',
-                'layout-default:xl:chat-closed:pl-8',
-                'layout-default:xl:chat-closed:flex!',
-                'layout-default:xl:chat-closed:animate-none!',
-                'layout-default:3xl:flex!',
-                'layout-default:3xl:animate-none!',
-
-                // In layout-wide mode, hide outline when viewport is too narrow
-                // or when chat is open and viewport is narrow, to prevent layout overflow
-                'layout-wide:xl:-mr-68',
-                'layout-wide:3xl:chat-closed:flex!',
-                'layout-wide:3xl:chat-closed:animate-none!',
-
-                // Show outline if page has OpenAPI block
-                // TODO: remove this in favour of a nicer, more immediately accessible solution in the future.
-                'page-api-block:page-has-outline:min-[96rem]:max-3xl:-mr-[max(calc((100vw-90rem)/2),0rem)]',
-                'page-api-block:page-has-outline:min-[96rem]:flex!',
-                'page-api-block:page-has-outline:min-[96rem]:animate-none!',
-                'page-api-block:page-has-outline:min-[96rem]:border-l-0',
-                'page-api-block:page-has-outline:min-[96rem]:pl-8',
-
-                // Only add a background once the element is positioned correctly, to prevent
-                // overlapping the page cover. Kept opaque wherever the outline is a toggleable
-                // overlay (below xl in any layout, and xl–3xl in wide layout, where it opens as
-                // a desktop SideSheet), but dropped for the permanent outline column so a bleeding
-                // cards carousel can scroll behind it.
-                'max-xl:hydrated:site-background',
-                'layout-wide:max-3xl:hydrated:site-background',
-                'text-tint',
-                'contrast-more:text-tint-strong'
-                // The cover-aware text color lives on the individual rows below, not here: the
-                // outline column is tall enough to always cross the cover's bottom edge, and a
-                // container can't carry a single correct color for text on both sides of it.
+            className={cx(
+                'page-aside',
+                // Kept as utilities so they win over SideSheet's own `fixed inset-y-0 z-41`.
+                'xl:sticky lg:top-0 lg:site-header:top-16 lg:site-header-sections:top-27 lg:z-10 lg:hover:z-12'
             )}
         >
-            <div className="flex h-full w-full shrink-0 flex-col overflow-hidden">
+            <div className="page-aside-inner">
                 {page.layout.outline ? (
                     <>
                         {filterableTags.length > 0 ? (
@@ -125,21 +61,18 @@ export async function PageAside(props: {
                             />
                         ) : null}
                         <div
-                            className={tcls(
-                                'mb-3 ml-3 flex page-no-outline:hidden items-center justify-between max-lg:hidden',
-                                filterableTags.length > 0 && 'mt-4'
+                            className={cx(
+                                'page-aside-header',
+                                filterableTags.length > 0 && 'page-aside-header-tags'
                             )}
                         >
-                            <ScrollToTopButton
-                                data-cover-aware-text
-                                className="leading-wider xl:page-cover-background:text-contrast-cover flex cursor-pointer items-center gap-1 text-xs font-semibold uppercase text-tint"
-                            >
+                            <ScrollToTopButton data-cover-aware-text className="page-aside-title">
                                 <Icon icon="block-quote" className="size-3" />{' '}
                                 {t(language, 'on_this_page')}
                             </ScrollToTopButton>
                             <PageAsideCloseButton className="page-api-block:min-[96rem]:hidden layout-default:xl:hidden layout-wide:3xl:hidden" />
                         </div>
-                        <div className="flex shrink flex-col overflow-hidden">
+                        <div className="page-aside-scroll">
                             {document ? (
                                 <React.Suspense fallback={null}>
                                     <PageAsideSections document={document} context={context} />
@@ -163,7 +96,7 @@ async function PageAsideSections(props: { document: JSONDocument; context: GitBo
     const sections = await getDocumentSections(context, document);
 
     return sections.length > 1 ? (
-        <div data-gb-page-outline className="overflow-y-auto">
+        <div data-gb-page-outline className="page-aside-outline">
             <ScrollSectionsList sections={sections} />
         </div>
     ) : null;
@@ -173,14 +106,7 @@ function PageAsideActions(props: { withPageFeedback: boolean; page: RevisionPage
     const { page, withPageFeedback } = props;
 
     return (
-        <div
-            className={tcls(
-                'flex flex-col gap-3',
-                'border-tint-subtle border-t first:border-none',
-                'sidebar-list-default:px-3 pt-5 first:pt-0',
-                'empty:hidden'
-            )}
-        >
+        <div className="page-aside-actions">
             {withPageFeedback ? (
                 <React.Suspense fallback={null}>
                     <PageFeedbackForm pageId={page.id} />
@@ -195,16 +121,10 @@ async function PageAsideFooter(props: { context: GitBookSiteContext }) {
     const { customization, site, space } = context;
 
     return (
-        <div
-            className={tcls(
-                'sticky bottom-0 z-10 mt-auto flex flex-col',
-                'border-tint-subtle',
-                'pt-4'
-            )}
-        >
+        <div className="page-aside-footer">
             {/* Mode Switcher */}
             {customization.themes.toggeable ? (
-                <div className="flex items-center justify-end">
+                <div className="page-aside-theme">
                     <React.Suspense fallback={null}>
                         <ThemeToggler />
                     </React.Suspense>

@@ -10,7 +10,6 @@ import { Announcement } from '../Announcement';
 import { SpacesDropdown, TranslationsDropdown } from '../Header/SpacesDropdown';
 import { CurrentContentProvider } from '../hooks';
 import { InsightsProvider, VisitorProvider } from '../Insights';
-import { CONTAINER_STYLE } from '../layout';
 import { NavigationLoader } from '../primitives/NavigationLoader';
 import { SkipToContent } from '../primitives/SkipToContent';
 import { SearchContainer, getSearchBaseProps } from '../Search';
@@ -26,9 +25,9 @@ import { Header, HeaderLogo } from '@/components/Header';
 import { TableOfContents } from '@/components/TableOfContents';
 import { isAIChatEnabled } from '@/components/utils/isAIChatEnabled';
 import type { VisitorAuthClaims } from '@/lib/adaptive';
+import { cx } from '@/lib/classnames';
 import type { GitBookSiteContext } from '@/lib/context';
 import { GITBOOK_APP_URL } from '@/lib/env';
-import { tcls } from '@/lib/tailwind';
 
 type SpaceLayoutProps = {
     context: GitBookSiteContext;
@@ -145,45 +144,24 @@ export function SpaceLayout(props: SpaceLayoutProps) {
             ) : null}
 
             {/* Chat panel shifts content left when open. Clipped so blocks bleeding into the gutters (card carousels) can't widen the page. */}
-            <div className="overflow-x-clip lg:chat-open:mr-(--ai-chat-width) motion-safe:transition-all motion-safe:duration-300">
+            <div className="space-layout">
                 <div
-                    className={tcls(
-                        'flex',
-                        'flex-col',
-                        'lg:flex-row',
-                        'lg:justify-center',
-                        CONTAINER_STYLE,
-                        'transition-[max-width] duration-300 motion-reduce:transition-none',
-
+                    className={cx(
+                        'space-layout-body',
                         !withTopHeader || variants.generic.length > 1
                             ? 'has-sidebar'
                             : 'no-sidebar',
-
                         // Ensure the footer is display below the viewport even if the content is not enough
-                        withTopHeader
-                            ? [
-                                  'site-header:min-h-[calc(100dvh-65px)]',
-                                  'site-header-sections:min-h-[calc(100dvh-109px)]',
-                              ]
-                            : 'lg:min-h-screen'
+                        withTopHeader ? 'space-layout-body-header' : 'space-layout-body-no-header'
                     )}
                 >
                     <TableOfContents
                         context={context}
                         header={
                             <div
-                                className={tcls(
-                                    'pr-4',
-                                    'flex',
-                                    withTopHeader ? 'lg:hidden' : '',
-                                    'grow-0',
-                                    'dark:shadow-light/1',
-                                    'text-base/tight',
-                                    'items-center',
-                                    // On bold themes also color the TOC header so the logo looks correct.
-                                    'site-header:theme-bold:bg-header-background',
-                                    'site-header:theme-bold:m-[-1.5rem_-1px_-0.5rem_-2rem]',
-                                    'site-header:theme-bold:p-[1rem_1rem_1rem_2rem]'
+                                className={cx(
+                                    'space-layout-toc-header',
+                                    withTopHeader && 'space-layout-toc-header-mobile'
                                 )}
                             >
                                 <HeaderLogo context={context} />
@@ -208,13 +186,15 @@ export function SpaceLayout(props: SpaceLayoutProps) {
                         innerHeader={
                             !withTopHeader || variants.generic.length > 1 ? (
                                 <div
-                                    className={tcls(
-                                        'my-5 sidebar-default:mt-2 flex flex-col gap-2 px-5 empty:hidden',
-                                        variants.generic.length > 1 ? '' : 'max-lg:hidden'
+                                    className={cx(
+                                        'space-layout-toc-inner',
+                                        variants.generic.length > 1
+                                            ? null
+                                            : 'space-layout-toc-inner-mobile'
                                     )}
                                 >
                                     {!withTopHeader && (
-                                        <div className="flex gap-2 max-lg:hidden">
+                                        <div className="space-layout-toc-search">
                                             <SearchContainer
                                                 {...searchProps}
                                                 style={CustomizationSearchStyle.Subtle}

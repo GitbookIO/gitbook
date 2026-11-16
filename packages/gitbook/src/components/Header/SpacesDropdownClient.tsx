@@ -5,7 +5,7 @@ import type { IconName } from '@gitbook/icons';
 import { Button, type ButtonProps, ToggleChevron } from '../primitives';
 import { DropdownMenu } from '../primitives/DropdownMenu';
 import { SpacesDropdownMenuItems } from './SpacesDropdownMenuItem';
-import { type ClassValue, tcls } from '@/lib/tailwind';
+import { type ClassValue, cx } from '@/lib/classnames';
 
 /**
  * Client component that creates the Button trigger and DropdownMenu internally, avoiding
@@ -38,7 +38,7 @@ export function SpacesDropdownClient(props: {
                     size="small"
                     variant={variant}
                     trailing={<ToggleChevron />}
-                    className={tcls('bg-tint-base', className)}
+                    className={cx('spaces-dropdown-button', className)}
                 >
                     <span className="button-content">{title}</span>
                 </Button>

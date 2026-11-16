@@ -15,7 +15,6 @@ import {
 } from '@/components/primitives';
 import { tString, useLanguage } from '@/intl/client';
 import { AI_AGENTS, getAIAgent } from '@/lib/ai-agents';
-import { tcls } from '@/lib/tailwind';
 
 /** How long the copy button shows its confirmation. */
 const COPIED_MESSAGE_DURATION = 1000;
@@ -64,7 +63,7 @@ export function PromptActions(props: { prompt: string; openInAIProviders: boolea
 
     return (
         // Lifted above the header's overlay button, which otherwise swallows the clicks.
-        <div className="relative z-20 flex shrink-0 items-center gap-2">
+        <div className="prompt-actions">
             {openInAIProviders ? (
                 <ButtonGroup>
                     {mainButton}
@@ -124,16 +123,8 @@ export function PromptActions(props: { prompt: string; openInAIProviders: boolea
 function AgentIconStack() {
     return (
         <span className="flex items-center">
-            {AI_AGENTS.map((agent, index) => (
-                <span
-                    key={agent.id}
-                    className={tcls(
-                        'flex size-4 shrink-0 items-center justify-center rounded-full border border-tint bg-tint-base',
-                        // Each chip's border cuts into the one behind it, so the marks stay legible
-                        // however tightly they are stacked.
-                        index > 0 && '-ms-1.5'
-                    )}
-                >
+            {AI_AGENTS.map((agent) => (
+                <span key={agent.id} className="prompt-agent">
                     <Icon icon={agent.icon} className="size-2.5" />
                 </span>
             ))}

@@ -7,7 +7,6 @@ import {
 import { DocumentView, DocumentViewSkeleton } from '../DocumentView';
 import { CurrentPageProvider } from '../hooks/useCurrentPage';
 import { TrackPageViewEvent } from '../Insights';
-import { CONTENT_STYLE } from '../layout';
 import { PageFeedbackForm } from '../PageFeedback';
 import { DateRelative, SuspenseLoadedHint } from '../primitives';
 import OptionalSuspense from './OptionalSuspense';
@@ -19,6 +18,7 @@ import { PreservePageLayout } from './PreservePageLayout';
 import { MAIN_CONTENT_ID } from '@/components/layout';
 import { getSpaceLanguage } from '@/intl/server';
 import { t } from '@/intl/translate';
+import { cx } from '@/lib/classnames';
 import type { GitBookSiteContext } from '@/lib/context';
 import {
     hasAPIBlock,
@@ -29,7 +29,6 @@ import {
 } from '@/lib/document';
 import { getLLMsTxtURL, getPageMarkdownURL } from '@/lib/llms-directive';
 import type { AncestorRevisionPage } from '@/lib/pages';
-import { tcls } from '@/lib/tailwind';
 import { getPageRSSURL } from '@/routes/rss';
 
 const LINK_PREVIEW_MAX_COUNT = 500;
@@ -107,16 +106,8 @@ export async function PageBody(props: {
                 id={MAIN_CONTENT_ID}
                 // Comments on the whole page target anywhere in it that isn't a block.
                 {...(withCommentAnchors ? { 'data-comment-page': '' } : {})}
-                className={tcls(
-                    'relative min-w-0 flex-1',
-                    'break-anywhere', // Allow words to break if they are too long.
-                    'py-8',
-                    'layout-wide:no-sidebar:lg:max-xl:pb-20', // Add padding to prevent overlap of minimised trademark
-                    '@container',
-                    // Flex column so the growing content wrapper below fills the page: the footer
-                    // navigation settles at the bottom, and a full-page cover shows behind the content.
-                    'flex flex-col',
-                    CONTENT_STYLE,
+                className={cx(
+                    'page-main',
                     pageHasToc ? 'page-has-toc' : 'page-no-toc',
                     wideLayout ? 'layout-wide' : 'layout-default'
                 )}
@@ -173,14 +164,9 @@ export async function PageBody(props: {
                 ) : null}
 
                 {page.layout.metadata ? (
-                    <div
-                        className={tcls(
-                            CONTENT_STYLE,
-                            'mt-6 flex flex-row flex-wrap items-center gap-4 text-tint contrast-more:text-tint-strong'
-                        )}
-                    >
+                    <div className="page-meta">
                         {updatedAt ? (
-                            <p className="mr-auto text-sm">
+                            <p className="page-meta-date">
                                 {t(
                                     language,
                                     'page_last_modified',

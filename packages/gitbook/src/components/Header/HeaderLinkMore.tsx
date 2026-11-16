@@ -16,10 +16,10 @@ import {
 import { SiteAuthLoginDropdownMenuItem } from '../SiteAuth/SiteAuthLoginLink';
 import { HeaderLinkMoreDropdown } from './HeaderLinkMoreClient';
 import { isSiteAuthLoginHref } from '@/lib/auth-login-link';
+import { cx } from '@/lib/classnames';
 import type { GitBookSiteContext } from '@/lib/context';
 import { resolveContentRef } from '@/lib/references';
 import { getLocalizedTitle } from '@/lib/sites';
-import { tcls } from '@/lib/tailwind';
 
 /**
  * Dropdown menu for header links hidden at small screen size.
@@ -33,10 +33,10 @@ export function HeaderLinkMore(props: {
     const { label, links, context, socialAccounts } = props;
 
     return (
-        <div className="header-links-ellipsis z-20 items-center">
+        <div className="header-links-ellipsis">
             <HeaderLinkMoreDropdown
                 label={label}
-                dropdownClassName={tcls(
+                dropdownClassName={cx(
                     'max-md:right-0 max-md:left-auto',
                     context.customization.styling.search === 'prominent' && 'right-0 left-auto'
                 )}

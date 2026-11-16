@@ -102,25 +102,7 @@ export async function TableOfContents(props: {
             >
                 {header}
                 <div // The actual sidebar, either shown with a filled bg or transparent.
-                    className={tcls(
-                        '-ms-5', // By default we shift the sidebar to the left to compensate for the PagesList padding.
-                        'layout-wide:no-sidebar:ms-0 layout-default:no-sidebar:lg:max-xl:ms-0',
-                        'relative flex min-h-0 grow flex-col border-tint-subtle',
-
-                        'sidebar-filled:bg-tint-subtle',
-                        'theme-muted:bg-tint-subtle',
-                        '[html.sidebar-filled.theme-bold.tint_&]:bg-tint-subtle',
-                        '[html.sidebar-filled.theme-muted_&]:bg-tint-base',
-                        '[html.sidebar-filled.theme-bold.tint_&]:bg-tint-base',
-                        '[html.sidebar-filled.theme-gradient_&]:border',
-                        'max-lg:sidebar-filled:border',
-                        'lg:page-no-toc:bg-transparent!',
-                        'lg:page-no-toc:border-none!',
-
-                        'sidebar-filled:rounded-2xl',
-                        'straight-corners:rounded-none',
-                        '[html.sidebar-filled.circular-corners_&]:layout-wide:rounded-4xl'
-                    )}
+                    className="toc-sidebar"
                 >
                     <BackToSpaceButton
                         spaceId={context.space.id}
@@ -142,11 +124,7 @@ export async function TableOfContents(props: {
                             },
                         }}
                     >
-                        <PagesList
-                            pages={pages}
-                            isRoot={true}
-                            style="grow border-tint-subtle sidebar-list-line:border-l page-no-toc:hidden"
-                        />
+                        <PagesList pages={pages} isRoot={true} style="toc-list-root" />
                     </ScrollContainer>
                     {withTrademark && customization.trademark.enabled ? (
                         <>

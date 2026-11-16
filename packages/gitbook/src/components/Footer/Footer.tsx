@@ -1,13 +1,13 @@
 import React from 'react';
 
-import { CONTAINER_STYLE, CONTENT_STYLE } from '../layout';
+import { CONTENT_STYLE } from '../layout';
 import { ThemeToggler } from '../ThemeToggler';
 import { FooterLinksGroup } from './FooterLinksGroup';
 import { SocialAccountButton } from './SocialAccounts';
 import { Image } from '@/components/utils';
 import { partition } from '@/lib/arrays';
+import { cx } from '@/lib/classnames';
 import type { GitBookSiteContext } from '@/lib/context';
-import { tcls } from '@/lib/tailwind';
 
 const FOOTER_COLUMNS = 4;
 
@@ -26,41 +26,14 @@ export function Footer(props: { context: GitBookSiteContext }) {
         !hasLogo && !hasGroups && !hasCopyright && !socialLinks.length && hasThemeToggle;
 
     return (
-        <footer
-            data-gb-site-footer
-            className={tcls(
-                'border-tint-subtle border-t',
-                // If the footer only contains a mode toggle, we only show it where the outline
-                // column — which carries its own toggle — isn't pinned open.
-                mobileOnly
-                    ? 'layout-default:xl:chat-closed:hidden layout-default:3xl:hidden layout-wide:3xl:chat-closed:hidden page-api-block:page-has-outline:min-[96rem]:hidden'
-                    : null
-            )}
-        >
-            <div className="lg:chat-open:pr-(--ai-chat-width) transition-[padding] duration-300 motion-reduce:transition-none">
-                <div
-                    className={tcls(
-                        CONTAINER_STYLE,
-                        'px-4',
-                        'py-8',
-                        '@4xl:py-12',
-                        'mx-auto',
-                        '@container/footer'
-                    )}
-                >
-                    <div
-                        className={tcls(
-                            CONTENT_STYLE,
-                            'flex @xs:grid @4xl:max-w-none! flex-col justify-between gap-12',
-                            'grid-cols-[auto_auto]',
-                            '@4xl:grid-cols-[18rem_minmax(auto,48rem)_auto]',
-                            '@7xl:grid-cols-[18rem_minmax(auto,48rem)_14rem]'
-                        )}
-                    >
+        <footer data-gb-site-footer className={cx('footer', mobileOnly && 'footer-toggle-only')}>
+            <div className="chrome-shift-padding">
+                <div className="footer-container">
+                    <div className={cx(CONTENT_STYLE, 'footer-grid')}>
                         {
                             // Footer Logo
                             customization.footer.logo ? (
-                                <div className="col-start-1 row-start-1">
+                                <div className="footer-logo">
                                     <Image
                                         alt="Logo"
                                         resize={context.imageResizer}
@@ -75,17 +48,7 @@ export function Footer(props: { context: GitBookSiteContext }) {
                                                 : null,
                                         }}
                                         loading="lazy"
-                                        style={[
-                                            'w-auto',
-                                            'max-w-40',
-                                            '@4xl:max-w-64',
-                                            'max-h-10',
-                                            '@4xl:max-h-12',
-                                            'object-contain',
-                                            'object-left',
-                                            'rounded-sm',
-                                            'straight-corners:rounded-xs',
-                                        ]}
+                                        style="footer-logo-img"
                                         sizes={[
                                             {
                                                 width: 320,
@@ -101,7 +64,7 @@ export function Footer(props: { context: GitBookSiteContext }) {
                             customization.themes.toggeable ? (
                                 // Hidden where the outline column is pinned open (see PageAside),
                                 // since that column carries its own toggle.
-                                <div className="page-api-block:page-has-outline:min-[96rem]:hidden -col-start-2 row-start-1 flex items-start @xs:justify-end layout-default:xl:chat-closed:hidden layout-default:3xl:hidden layout-wide:3xl:chat-closed:hidden">
+                                <div className="footer-toggle">
                                     <React.Suspense fallback={null}>
                                         <ThemeToggler />
                                     </React.Suspense>
@@ -112,14 +75,11 @@ export function Footer(props: { context: GitBookSiteContext }) {
                         {
                             // Navigation groups (split into equal columns)
                             customization.footer.groups?.length > 0 ? (
-                                <div className={tcls('col-span-2')}>
-                                    <div className="mx-auto flex flex-col gap-10 @xl:flex-row @xl:gap-6">
+                                <div className="footer-groups">
+                                    <div className="footer-columns">
                                         {partition(customization.footer.groups, FOOTER_COLUMNS).map(
                                             (column, columnIndex) => (
-                                                <div
-                                                    key={columnIndex}
-                                                    className="flex flex-1 grow flex-col gap-10"
-                                                >
+                                                <div key={columnIndex} className="footer-column">
                                                     {column.map((group, groupIndex) => (
                                                         <FooterLinksGroup
                                                             key={groupIndex}
@@ -138,7 +98,7 @@ export function Footer(props: { context: GitBookSiteContext }) {
                         {
                             // Social Links
                             socialLinks.length > 0 ? (
-                                <div className="col-span-full flex w-full grow items-center justify-center gap-2">
+                                <div className="footer-social">
                                     {socialLinks.map((account) => (
                                         <SocialAccountButton
                                             key={`${account.platform}-${account.handle}`}
@@ -153,7 +113,7 @@ export function Footer(props: { context: GitBookSiteContext }) {
                         {
                             // Legal
                             customization.footer.copyright ? (
-                                <div className="order-last col-span-full flex w-full grow flex-col items-center gap-2 text-center text-xs text-tint">
+                                <div className="footer-legal">
                                     <p>{customization.footer.copyright}</p>
                                 </div>
                             ) : null

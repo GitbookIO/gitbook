@@ -6,7 +6,7 @@ import type { TableGridViewProps, TableRecordKV } from './Table';
 import { TableSearchRecord } from './TableSearch';
 import './styles.css';
 import { getColumnVerticalAlignment } from './utils';
-import { tcls } from '@/lib/tailwind';
+import { cx } from '@/lib/classnames';
 
 export function RecordRow(
     props: TableGridViewProps & {
@@ -24,7 +24,7 @@ export function RecordRow(
             role="row"
             recordId={record[0]}
             visibleClassName="flex"
-            className={tcls('group/row', 'table-grid-row')}
+            className="table-grid-row"
         >
             {view.columns.map((column) => {
                 const cellMerge = getTableCellMerge(cellMergeLayout, record[0], column);
@@ -53,7 +53,7 @@ export function RecordRow(
                         role="cell"
                         {...getCommentCellProps(context, record[0], column)}
                         aria-colspan={cellMerge?.merge.colSpan}
-                        className={tcls(
+                        className={cx(
                             'table-grid-cell',
                             isStickyFirstColumnCell ? 'table-grid-cell-sticky' : undefined
                         )}

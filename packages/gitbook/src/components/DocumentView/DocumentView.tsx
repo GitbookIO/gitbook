@@ -2,8 +2,8 @@ import type { JSONDocument } from '@gitbook/api';
 
 import { BlockSkeleton } from './Block';
 import { Blocks } from './Blocks';
+import type { ClassValue } from '@/lib/classnames';
 import type { GitBookAnyContext } from '@/lib/context';
-import type { ClassValue } from '@/lib/tailwind';
 
 export interface DocumentContext {
     /**

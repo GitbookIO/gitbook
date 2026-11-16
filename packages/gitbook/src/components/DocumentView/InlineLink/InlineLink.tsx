@@ -93,15 +93,9 @@ function InlineLinkAnchor(props: {
         >
             {children}
             {isMailto ? (
-                <Icon
-                    icon="envelope"
-                    className="ml-1 inline size-3 links-accent:text-tint-subtle"
-                />
+                <Icon icon="envelope" className="inline-link-icon inline-link-mail" />
             ) : isExternal ? (
-                <Icon
-                    icon="arrow-up-right"
-                    className="ml-0.5 inline size-3 links-accent:text-tint-subtle"
-                />
+                <Icon icon="arrow-up-right" className="inline-link-icon" />
             ) : null}
         </StyledLink>
     );

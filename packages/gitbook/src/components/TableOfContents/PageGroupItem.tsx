@@ -5,9 +5,8 @@ import React from 'react';
 import { ToggleChevron } from '../primitives';
 import type { ClientTOCPageGroup } from './encodeClientTableOfContents';
 import { PagesList } from './PagesList';
-import { ToCButtonItemStyles } from './styles';
 import { TOCPageIcon } from './TOCPageIcon';
-import { tcls } from '@/lib/tailwind';
+import { cx } from '@/lib/classnames';
 
 export function PageGroupItem(props: { page: ClientTOCPageGroup; isFirst?: boolean }) {
     const { page, isFirst } = props;
@@ -25,30 +24,13 @@ export function PageGroupItem(props: { page: ClientTOCPageGroup; isFirst?: boole
     };
 
     return (
-        <li className="page-group-item flex flex-col">
+        <li className="page-group-item">
             <div ref={sentinelRef} className="h-0" aria-hidden="true" />
             <div
-                className={tcls(
-                    // No opacity transition on ::after: in Chrome it leaves stale pixels over the first child after the list scrolls.
-                    '-top-4 sticky z-1 after:pointer-events-none after:absolute after:inset-x-0 after:top-full after:h-4 after:bg-linear-to-b after:from-tint-base after:to-transparent',
-                    isSticking ? '' : 'after:opacity-0',
-                    'mt-1 pt-2.5 pb-0',
-                    'bg-tint-base',
-                    'sidebar-filled:after:from-tint-subtle',
-                    'sidebar-filled:bg-tint-subtle',
-                    'theme-muted:after:from-tint-subtle',
-                    'theme-muted:bg-tint-subtle',
-                    '[html.sidebar-filled.theme-bold.tint_&]:bg-tint-subtle',
-                    '[html.sidebar-filled.theme-bold.tint_&]:after:from-tint-subtle',
-                    '[html.sidebar-filled.theme-muted_&]:bg-tint-base',
-                    '[html.sidebar-filled.theme-muted_&]:after:from-tint-base',
-                    '[html.sidebar-filled.theme-bold.tint_&]:bg-tint-base',
-                    '[html.sidebar-filled.theme-bold.tint_&]:after:from-tint-base',
-                    'lg:[html.sidebar-default.theme-gradient_&]:bg-gradient-primary',
-                    'lg:[html.sidebar-default.theme-gradient_&]:after:from-primary-2',
-                    'lg:[html.sidebar-default.theme-gradient.tint_&]:bg-gradient-tint',
-                    'lg:[html.sidebar-default.theme-gradient.tint_&]:after:from-tint-subtle',
-                    isFirst ? '-mt-2 -top-2 circular-corners:rounded-t-2xl rounded-t-md pt-2' : ''
+                className={cx(
+                    'toc-group-header',
+                    isSticking && 'toc-group-header-stuck',
+                    isFirst && 'toc-group-header-first'
                 )}
             >
                 <button
@@ -56,44 +38,23 @@ export function PageGroupItem(props: { page: ClientTOCPageGroup; isFirst?: boole
                     disabled={!hasDescendants}
                     aria-expanded={hasDescendants ? isOpen : undefined}
                     onClick={handleToggle}
-                    className={tcls(
-                        ToCButtonItemStyles,
-                        'toc-group min-h-8 w-full border-0 text-left',
-                        'font-heading font-semibold text-xs uppercase tracking-wide',
-                        'appearance-none',
-                        '[&_.toc-group-chevron]:transition-opacity',
-                        'hover:[&_.toc-group-chevron]:opacity-11',
-                        'focus-visible:[&_.toc-group-chevron]:opacity-11',
-                        hasDescendants ? 'cursor-pointer' : ''
-                    )}
+                    className="toc-group"
                 >
                     <TOCPageIcon page={page} />
                     <span className="min-w-0 flex-1">{page.title}</span>
                     {hasDescendants ? (
-                        <span
-                            className={tcls(
-                                'toc-group-chevron ml-auto mr-1 flex shrink-0 transition-opacity duration-150',
-                                isOpen
-                                    ? 'pointer-events-none opacity-0 delay-75'
-                                    : 'opacity-6 delay-0'
-                            )}
-                        >
+                        <span className="toc-group-chevron">
                             <ToggleChevron
                                 open={isOpen}
                                 orientation="right-to-down"
-                                className="m-0! size-3!"
+                                className="toc-chevron"
                             />
                         </span>
                     ) : null}
                 </button>
             </div>
             {hasDescendants ? (
-                <div
-                    className={tcls(
-                        'mt-px grid transition-[grid-template-rows,opacity] duration-200 ease-in-out',
-                        isOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
-                    )}
-                >
+                <div className={cx('toc-group-body', !isOpen && 'toc-group-body-closed')}>
                     <div className="overflow-hidden">
                         <PagesList pages={descendants} />
                     </div>

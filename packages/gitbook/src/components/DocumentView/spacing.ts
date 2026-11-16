@@ -1,55 +1,35 @@
 import type { DocumentBlock } from '@gitbook/api';
 
 /**
- * Get the line height of a block
+ * Text style of a block's first line. Elements aligned on it (list prefixes, hint icons) pick
+ * their size and line height from it, via the matching modifier classes in `styles/blocks.css`.
  */
-export function getBlockTextStyle(block: DocumentBlock): {
-    /** Tailwind class for the text size */
-    textSize: string;
-    /** Tailwind class for the height (h-*) */
-    lineHeight: string;
-    /** Tailwind class for the margin top (mt-*) */
-    marginTop?: string;
-} {
+export type BlockTextKind = 'body' | 'heading-1' | 'heading-2' | 'heading-3' | 'divider';
+
+export function getBlockTextKind(block: DocumentBlock): BlockTextKind {
     switch (block.type) {
-        case 'paragraph':
-            return {
-                textSize: 'text-base',
-                lineHeight: 'leading-normal',
-            };
         case 'heading-1':
-            return {
-                textSize: 'text-xl @xs:text-2xl @lg:text-3xl font-semibold',
-                lineHeight: 'leading-tight',
-                marginTop: 'column-first-of-type:pt-0 pt-[1em]',
-            };
         case 'heading-2':
-            return {
-                textSize: 'text-lg @xs:text-xl @lg:text-2xl font-semibold',
-                lineHeight: 'leading-snug',
-                marginTop: 'column-first-of-type:pt-0 pt-[0.75em]',
-            };
         case 'heading-3':
-            return {
-                textSize: 'text-base @xs:text-lg @lg:text-xl font-semibold',
-                lineHeight: 'leading-snug',
-                marginTop: 'column-first-of-type:pt-0 pt-[0.5em]',
-            };
         case 'divider':
-            return {
-                textSize: '',
-                lineHeight: 'leading-none',
-            };
+            return block.type;
         case 'list-ordered':
         case 'list-tasks':
         case 'list-unordered':
-            return getBlockTextStyle(block.nodes[0]!);
         case 'list-item':
-            return getBlockTextStyle(block.nodes[0]!);
+            return getBlockTextKind(block.nodes[0]!);
         default:
-            return {
-                textSize: 'text-base',
-                lineHeight: 'leading-normal',
-            };
+            return 'body';
     }
 }
+
+/**
+ * Line height utility of each text kind.
+ */
+export const BLOCK_LINE_HEIGHT: Record<BlockTextKind, string> = {
+    body: 'leading-normal',
+    'heading-1': 'leading-tight',
+    'heading-2': 'leading-snug',
+    'heading-3': 'leading-snug',
+    divider: 'leading-none',
+};

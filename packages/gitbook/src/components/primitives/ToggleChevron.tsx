@@ -1,6 +1,6 @@
-import { Icon, type IconName } from '@gitbook/icons';
+import { Icon } from '@gitbook/icons';
 
-import { type ClassValue, tcls } from '@/lib/tailwind';
+import { type ClassValue, cx } from '@/lib/classnames';
 
 /**
  * Animated chevron to display in dropdowns and other toggleable elements. Picks up the open state
@@ -11,50 +11,21 @@ export function ToggleChevron(props: {
     orientation?: 'down-to-up' | 'right-to-down'; // The direction of the chevron when open.
     className?: ClassValue;
 }) {
-    const {
-        open,
-        orientation = 'down-to-up',
-        className = 'opacity-6 group-hover/dropdown:opacity-11',
-    } = props;
-
-    const classes = {
-        'down-to-up': {
-            icon: 'chevron-down',
-            animation: 'rotate-180',
-            autoAnimation:
-                'group-aria-expanded/dropdown:rotate-180 group-data-panel-open/dropdown:rotate-180 group-open:rotate-180',
-        },
-        'right-to-down': {
-            icon: 'chevron-right',
-            animation: 'rotate-90',
-            autoAnimation:
-                'group-aria-expanded/dropdown:rotate-90 group-data-panel-open/dropdown:rotate-90 group-open:rotate-90',
-        },
-    };
+    const { open, orientation = 'down-to-up', className = 'toggle-chevron-dim' } = props;
+    const isDown = orientation === 'down-to-up';
 
     return (
         <Icon
-            icon={classes[orientation].icon as IconName}
-            className={tcls(
-                'shrink-0',
-                getRotationClassName(open, classes[orientation]),
-                'size-3',
-                'transition-all',
+            icon={isDown ? 'chevron-down' : 'chevron-right'}
+            className={cx(
+                'toggle-chevron',
+                open === undefined
+                    ? isDown
+                        ? 'toggle-chevron-auto'
+                        : 'toggle-chevron-auto-90'
+                    : open && (isDown ? 'rotate-180' : 'rotate-90'),
                 className
             )}
         />
     );
-}
-
-function getRotationClassName(
-    open: boolean | undefined,
-    classes: { animation: string; autoAnimation: string }
-): string {
-    if (open === undefined) {
-        return classes.autoAnimation;
-    }
-    if (open) {
-        return classes.animation;
-    }
-    return '';
 }

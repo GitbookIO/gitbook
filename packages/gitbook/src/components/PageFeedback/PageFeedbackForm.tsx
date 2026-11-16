@@ -9,7 +9,7 @@ import { useTrackEvent } from '../Insights';
 import { Button, ButtonGroup, Input } from '../primitives';
 import { useLanguage } from '@/intl/client';
 import { t, tString } from '@/intl/translate';
-import { tcls } from '@/lib/tailwind';
+import { cx } from '@/lib/classnames';
 
 const MIN_COMMENT_LENGTH = 3;
 const MAX_COMMENT_LENGTH = 512;
@@ -56,8 +56,8 @@ export function PageFeedbackForm(props: { pageId: string; className?: string }) 
     }, [rating]);
 
     return (
-        <div className={tcls('flex flex-col gap-3 text-sm', className)}>
-            <div className="flex flex-wrap items-center gap-2">
+        <div className={cx('page-feedback', className)}>
+            <div className="page-feedback-row">
                 <p>{t(languages, 'was_this_helpful')}</p>
                 <ButtonGroup className="rounded-full border border-tint bg-tint-base">
                     <RatingButton
@@ -85,7 +85,7 @@ export function PageFeedbackForm(props: { pageId: string; className?: string }) 
             </div>
             {rating ? (
                 submitted ? (
-                    <div className="animate-blur-in-display-slow flex items-center gap-1 p-1.5 text-success-subtle">
+                    <div className="page-feedback-thanks">
                         <Icon icon="check-circle" className="size-4" />
                         {tString(languages, 'was_this_helpful_thank_you')}
                     </div>

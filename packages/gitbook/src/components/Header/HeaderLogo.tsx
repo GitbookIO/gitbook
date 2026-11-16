@@ -3,7 +3,6 @@ import { CurrentContentIcon } from './CurrentContentIcon';
 import { Image } from '@/components/utils';
 import type { GitBookSiteContext } from '@/lib/context';
 import { resolveContentRef } from '@/lib/references';
-import { tcls } from '@/lib/tailwind';
 
 interface HeaderLogoProps {
     context: GitBookSiteContext;
@@ -22,10 +21,7 @@ export async function HeaderLogo(props: HeaderLogoProps) {
         : null;
 
     return (
-        <Link
-            href={primaryLink?.href ?? linker.toPathInSite('')}
-            className={tcls('group/headerlogo', 'min-w-0', 'shrink', 'flex', 'items-center')}
-        >
+        <Link href={primaryLink?.href ?? linker.toPathInSite('')} className="header-logo">
             {customization.header.logo ? (
                 <Image
                     alt="Logo"
@@ -50,19 +46,7 @@ export async function HeaderLogo(props: HeaderLogoProps) {
                         },
                     ]}
                     preload
-                    style={tcls(
-                        'overflow-hidden',
-                        'shrink',
-                        'min-w-0',
-                        'max-w-40',
-                        'lg:max-w-64',
-                        'lg:site-header-none:page-no-toc:max-w-56',
-                        'max-h-8',
-                        'h-full',
-                        'w-full',
-                        'object-contain',
-                        'object-left'
-                    )}
+                    style="header-logo-img"
                 />
             ) : (
                 <LogoFallback {...props} />
@@ -81,27 +65,10 @@ function LogoFallback(props: HeaderLogoProps) {
                 context={context}
                 alt=""
                 sizes={[{ width: 32 }]}
-                style={['object-contain', 'size-8']}
+                style="header-logo-icon"
                 fetchPriority="high"
             />
-            <div
-                className={tcls(
-                    'text-pretty',
-                    'line-clamp-2',
-                    'tracking-tight',
-                    'max-w-[18ch]',
-                    'lg:max-w-[24ch]',
-                    'font-heading',
-                    'font-semibold',
-                    'ms-3',
-                    'text-base/tight',
-                    'lg:text-lg/tight',
-                    'text-tint-strong',
-                    'theme-bold:text-header-link'
-                )}
-            >
-                {site.title}
-            </div>
+            <div className="header-logo-text">{site.title}</div>
         </>
     );
 }

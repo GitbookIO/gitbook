@@ -7,6 +7,7 @@ import { useIsMobile } from '../hooks/useIsMobile';
 import { Button } from './Button';
 import { useLanguage } from '@/intl/client';
 import { tString } from '@/intl/translate';
+import { cx } from '@/lib/classnames';
 import { type ClassValue, tcls } from '@/lib/tailwind';
 
 const ANIMATION_DURATION = 300;
@@ -207,7 +208,9 @@ export function SideSheet(
         <>
             {withOverlay ? (
                 <SideSheetOverlay
-                    className={tcls(isModal && isOpen ? '' : 'hidden opacity-0 backdrop-blur-none')}
+                    className={
+                        isModal && isOpen ? undefined : 'hidden opacity-0 backdrop-blur-none'
+                    }
                     onClick={handleClose}
                 />
             ) : null}
@@ -270,10 +273,7 @@ export function SideSheetOverlay(props: { className?: ClassValue; onClick?: () =
             onClick={() => {
                 onClick?.();
             }}
-            className={tcls(
-                'fixed inset-0 z-40 items-start bg-tint-base/3 not-hydrated:opacity-0 starting:opacity-0 backdrop-blur-md starting:backdrop-blur-none transition-[opacity,display,backdrop-filter] transition-discrete duration-250 dark:bg-tint-base/6',
-                className
-            )}
+            className={cx('side-sheet-overlay', className)}
         />
     );
 }

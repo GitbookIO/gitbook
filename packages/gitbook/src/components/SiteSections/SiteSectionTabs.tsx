@@ -14,15 +14,12 @@ import type {
 } from './encodeClientSiteSections';
 import { SectionIcon } from './SectionIcon';
 import { Button, Link, ToggleChevron } from '@/components/primitives';
-import { tcls } from '@/lib/tailwind';
+import { cx } from '@/lib/classnames';
 import { findSectionInGroup } from '@/lib/utils';
 
 const SCREEN_OFFSET = 16; // 1rem
 const POPUP_OFFSET = 4;
 const OPEN_DELAY_MS = 200;
-const MOTION = 'duration-300 ease-[cubic-bezier(0.83,0,0.17,1)]';
-// Bounds the scrolling content too: the popup settles at `height: auto`, so `h-full` doesn't.
-const MAX_POPUP_HEIGHT = 'max-h-[calc(100dvh-8rem)]';
 const MAX_ITEMS_PER_COLUMN = 10; // number of items per column
 const GROUP_MASONRY_THRESHOLD = 3; // if a section group has more than this many child groups, it will be shown in a masonry grid
 const COLUMN_WIDTH = '18rem';
@@ -53,12 +50,7 @@ export function SiteSectionTabs(props: {
     return structure.length > 0 ? (
         <NavigationMenu.Root
             ref={containerRef}
-            className={tcls(
-                CONTAINER_STYLE,
-                'relative z-10 flex w-full flex-nowrap items-end',
-                'page-default-width:2xl:px-[calc((100%-1536px+4rem)/2)]',
-                className
-            )}
+            className={cx(CONTAINER_STYLE, 'section-tabs', className)}
             style={
                 {
                     '--site-section-column-width': COLUMN_WIDTH,
@@ -72,26 +64,19 @@ export function SiteSectionTabs(props: {
         >
             <ScrollContainer
                 orientation="horizontal"
-                className={tcls(
-                    'grow',
-                    'md:-ml-8 -ml-4 sm:-ml-6',
-                    !children
-                        ? 'md:-mr-8 -mr-4 sm:-mr-6'
-                        : 'after:contents[] after:absolute after:inset-y-2 after:right-0 after:border-transparent after:border-r after:transition-colors'
+                className={cx(
+                    'section-tabs-scroll',
+                    children ? 'section-tabs-scroll-divided' : 'section-tabs-scroll-full'
                 )}
                 active={`#${currentSection.id}`}
                 trailing={{
                     fade: true,
                     button: true,
-                    className: children ? 'after:border-tint' : '',
+                    className: children ? 'section-tabs-scroll-more' : '',
                 }}
             >
                 <NavigationMenu.List
-                    className={tcls(
-                        'flex grow gap-2 bg-transparent',
-                        'pl-1 sm:pl-3 md:pl-5',
-                        !children ? 'pr-1 sm:pr-3 md:pr-5' : 'pr-1'
-                    )}
+                    className={cx('section-tabs-list', !children && 'section-tabs-list-full')}
                     aria-label="Sections"
                     data-gb-sections
                 >
@@ -117,16 +102,7 @@ export function SiteSectionTabs(props: {
                                                 />
                                             }
                                         />
-                                        <NavigationMenu.Content
-                                            className={tcls(
-                                                'h-full w-full overflow-y-auto overflow-x-hidden md:w-max md:max-w-(--available-width)',
-                                                MAX_POPUP_HEIGHT,
-                                                `transition-[opacity,translate] ${MOTION}`,
-                                                'data-ending-style:opacity-0 data-starting-style:opacity-0',
-                                                'data-starting-style:data-[activation-direction=left]:-translate-x-1/2 data-ending-style:data-[activation-direction=left]:translate-x-1/2',
-                                                'data-ending-style:data-[activation-direction=right]:-translate-x-1/2 data-starting-style:data-[activation-direction=right]:translate-x-1/2'
-                                            )}
-                                        >
+                                        <NavigationMenu.Content className="section-tabs-content">
                                             <SectionGroupTileList
                                                 items={structureItem.children}
                                                 currentSection={currentSection}
@@ -160,34 +136,14 @@ export function SiteSectionTabs(props: {
 
             <NavigationMenu.Portal container={containerRef}>
                 <NavigationMenu.Positioner
-                    className={tcls(
-                        'z-20 h-(--positioner-height) w-(--positioner-width) max-w-(--available-width) outline-hidden',
-                        `transition-[top,left,right,bottom] ${MOTION} data-instant:transition-none`
-                    )}
+                    className="section-tabs-positioner"
                     sideOffset={POPUP_OFFSET}
                     collisionPadding={SCREEN_OFFSET}
                     // Flipping above the tabs would hide the popup behind the header.
                     collisionAvoidance={{ side: 'none' }}
                 >
-                    <NavigationMenu.Popup
-                        className={tcls(
-                            'relative h-(--popup-height) w-(--popup-width) origin-(--transform-origin) overflow-hidden circular-corners:rounded-3xl rounded-corners:rounded-xl border border-tint bg-tint-base shadow-lg outline-hidden',
-                            // Sized here rather than on the content, so the border doesn't push the
-                            // content off-centre and eat the padding down one side.
-                            'max-md:w-[calc(100vw-2rem)]',
-                            MAX_POPUP_HEIGHT,
-                            // `scale` rather than `transform`: that is what `scale-95` sets.
-                            `transition-[opacity,scale,width,height] ${MOTION}`,
-                            // The global `allow-keywords` would animate Base UI's reset to `auto`, so
-                            // switching mid-animation would measure the in-flight size.
-                            '[interpolate-size:numeric-only]',
-                            // The size vars reset on close, so animating them out collapses the
-                            // panel and grows it back as it fades.
-                            'data-ending-style:transition-[opacity,scale]',
-                            'data-ending-style:scale-95 data-starting-style:scale-95 data-ending-style:opacity-0 data-starting-style:opacity-0'
-                        )}
-                    >
-                        <NavigationMenu.Viewport className="relative h-full w-full overflow-hidden" />
+                    <NavigationMenu.Popup className="section-tabs-popup">
+                        <NavigationMenu.Viewport className="section-tabs-viewport" />
                     </NavigationMenu.Popup>
                 </NavigationMenu.Positioner>
             </NavigationMenu.Portal>
@@ -214,12 +170,7 @@ const SectionTab = React.forwardRef(function SectionTab(
             label={title}
             trailing={isGroup ? <ToggleChevron /> : null}
             active={isActive}
-            className={tcls(
-                'group/dropdown relative my-1.5 overflow-visible',
-                isActive
-                    ? 'after:contents-[] after:-bottom-1.5 bg-transparent text-primary-subtle after:absolute after:inset-x-3 after:h-0.5 after:bg-primary-9'
-                    : ''
-            )}
+            className={cx('group/dropdown section-tab', isActive && 'section-tab-active')}
             href={url}
         />
     );
@@ -252,18 +203,18 @@ function SectionGroupTileList(props: {
     // Whichever panel comes second is recessed: it carries the divider, the background and inverted tile icons.
     const navigableItemsRecessed = hasGroups && !navigableItemsLead;
     const groupsRecessed = hasNavigableItems && navigableItemsLead;
-    const RECESSED_PANEL = 'border-tint-subtle bg-tint-subtle max-md:border-t md:border-l';
 
     // Non-grouped navigation items. The wrapper spans the dropdown's height, so the list itself can stay content-sized.
     const navigableItemsPanel = hasNavigableItems ? (
         <div
-            className={tcls(
-                'w-full shrink-0 md:w-max',
-                hasGroups ? (navigableItemsRecessed ? RECESSED_PANEL : 'bg-tint-base') : ''
+            className={cx(
+                'section-panel',
+                hasGroups &&
+                    (navigableItemsRecessed ? 'section-panel-recessed' : 'section-panel-plain')
             )}
         >
             <ul
-                className="flex w-full grid-flow-row flex-col gap-x-2 gap-y-0.5 p-3 md:grid md:w-max"
+                className="section-links"
                 style={{
                     gridTemplateColumns: `repeat(${Math.ceil(navigableItems.length / MAX_ITEMS_PER_COLUMN)}, minmax(0, 1fr))`,
                 }}
@@ -282,19 +233,9 @@ function SectionGroupTileList(props: {
 
     // Grouped navigation items.
     const groupsPanel = hasGroups ? (
-        <div
-            className={tcls(
-                'w-full md:w-max md:min-w-0 md:max-w-full',
-                groupsRecessed ? RECESSED_PANEL : ''
-            )}
-        >
+        <div className={cx('section-groups-panel', groupsRecessed && 'section-panel-recessed')}>
             <ul
-                className={tcls(
-                    'p-3',
-                    isMasonryLayout
-                        ? 'w-full max-md:space-y-8 md:max-w-[var(--masonry-max-width)] md:gap-x-[var(--site-section-column-gap)] md:[column-count:var(--masonry-columns)] md:[column-width:var(--site-section-column-min-width)] md:[&>li]:mb-4'
-                        : 'flex w-full flex-col justify-start space-y-8 md:w-max md:flex-row md:items-start md:gap-[var(--site-section-column-gap)] md:space-y-0'
-                )}
+                className={isMasonryLayout ? 'section-groups-masonry' : 'section-groups'}
                 style={
                     isMasonryLayout
                         ? ({
@@ -322,7 +263,7 @@ function SectionGroupTileList(props: {
     ) : null;
 
     return (
-        <div className="flex w-full flex-col md:flex-row">
+        <div className="section-dropdown">
             {navigableItemsLead ? (
                 <>
                     {navigableItemsPanel}
@@ -354,32 +295,26 @@ function SectionGroupTile(props: {
         const { url, icon, title, description } = child;
         const isActive = child.object === 'site-section' && child.id === currentSection.id;
         return (
-            <li className="group/section-tile flex w-full min-w-0 shrink-0 grow md:max-w-[var(--site-section-tile-max-width)]">
+            <li className="section-tile">
                 <Link
                     href={url}
-                    className={tcls(
-                        'grow circular-corners:rounded-2xl rounded-corners:rounded-lg px-2.5 py-1.5 transition-colors',
-                        isActive
-                            ? 'bg-primary-active text-primary-strong'
-                            : 'text-tint-strong hover:bg-tint-hover'
-                    )}
+                    className={cx('section-tile-link', isActive && 'section-tile-link-active')}
                 >
-                    <div className="mb-auto flex min-w-0 grow items-center gap-2">
+                    <div className="section-tile-body">
                         {icon && (
                             <div
-                                className={tcls(
-                                    '-ml-1 self-start circular-corners:rounded-2xl rounded-corners:rounded-lg p-2 transition-colors',
-                                    isActive || invertIcon ? 'bg-primary-base' : 'bg-tint',
+                                className={cx(
+                                    'section-tile-icon',
                                     isActive
-                                        ? 'text-primary-subtle'
-                                        : 'text-tint-strong group-hover/section-tile:bg-tint-base'
+                                        ? 'section-tile-icon-active'
+                                        : invertIcon && 'section-tile-icon-inverted'
                                 )}
                             >
                                 <SectionIcon isActive={isActive} icon={icon as IconName} />
                             </div>
                         )}
-                        <div className="flex min-w-0 flex-col gap-0.5">
-                            <span className="block min-w-0 whitespace-normal">{title}</span>
+                        <div className="section-tile-text">
+                            <span className="section-tile-title">{title}</span>
                             {description && (
                                 <p className={isActive ? 'text-primary' : 'text-tint'}>
                                     {description}
@@ -399,27 +334,15 @@ function SectionGroupTile(props: {
     const spansMasonry = Boolean(isMasonry) && children.length > MAX_ITEMS_PER_COLUMN;
 
     return (
-        <li
-            className={tcls(
-                'flex w-full min-w-0 shrink-0 break-inside-avoid flex-col gap-1 md:w-auto',
-                spansMasonry ? 'md:[column-span:all]' : ''
-            )}
-        >
-            <div className="mb-1 mt-2 flex min-w-0 gap-2 px-2.5 font-heading text-xs font-semibold text-tint-subtle">
+        <li className={cx('section-group', spansMasonry && 'section-group-span')}>
+            <div className="section-group-title">
                 {icon && (
                     <SectionIcon className="mt-0.5" isActive={false} icon={icon as IconName} />
                 )}
-                <span className="min-w-0 flex-1 whitespace-normal">{title}</span>
+                <span className="section-group-label">{title}</span>
             </div>
             <ul
-                className={tcls(
-                    'flex w-full flex-col gap-x-2 gap-y-0.5',
-                    spansMasonry
-                        ? // Same track sizing as the masonry it spans, so its sections line up with the
-                          // groups around it however many columns the width allows.
-                          'md:block md:gap-x-[var(--site-section-column-gap)] md:[column-count:var(--masonry-columns)] md:[column-width:var(--site-section-column-min-width)] md:[&>li]:mb-0.5 md:[&>li]:break-inside-avoid'
-                        : 'grid-flow-row md:grid'
-                )}
+                className={spansMasonry ? 'section-group-list-masonry' : 'section-group-list'}
                 style={
                     spansMasonry
                         ? undefined

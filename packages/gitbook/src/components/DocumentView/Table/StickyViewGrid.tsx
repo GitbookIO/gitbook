@@ -2,7 +2,7 @@
 import { type ReactNode, useCallback, useEffect, useLayoutEffect, useRef } from 'react';
 
 import { useScrollListener } from '@/components/hooks/useScrollListener';
-import { tcls } from '@/lib/tailwind';
+import { cx } from '@/lib/classnames';
 
 interface StickyViewGridProps {
     className?: string;
@@ -31,12 +31,9 @@ function DefaultHeaderScrollGrid({
 
     return (
         <div className={className}>
-            <div
-                role={withTableRole ? 'table' : undefined}
-                className="group/table relative flex w-full min-w-0 max-w-full flex-col rounded-lg border-tint-subtle"
-            >
-                <div className="w-full min-w-0 overflow-x-auto overflow-y-hidden overscroll-x-none border-tint-subtle">
-                    <div className={tcls('flex', 'flex-col', resolvedTableClassName)}>
+            <div role={withTableRole ? 'table' : undefined} className="group/table table-sticky">
+                <div className="table-scroll">
+                    <div className={cx('table-stack', resolvedTableClassName)}>
                         {header}
                         {children}
                     </div>
@@ -142,27 +139,14 @@ function StickyHeaderOverlayScrollGrid({
         <div className={className}>
             <div
                 ref={rootRef}
-                className="group/table relative flex w-full min-w-0 max-w-full flex-col rounded-lg border-tint-subtle data-[scrollable=true]:border"
+                className="group/table table-sticky"
                 data-scrollable="false"
                 role={withTableRole ? 'table' : undefined}
             >
                 {header ? (
-                    <div
-                        ref={stickyHeaderRef}
-                        className={tcls(
-                            'sticky z-20 w-full min-w-0 max-w-full overflow-hidden rounded-t-[inherit]',
-                            '[top:var(--toc-top-offset,var(--outline-top-offset,0px))]'
-                        )}
-                    >
+                    <div ref={stickyHeaderRef} className="table-sticky-header">
                         <div
-                            className={tcls(
-                                'flex',
-                                'flex-col',
-                                resolvedTableClassName,
-                                // The sticky header is rendered outside the scroll container, so it
-                                // needs to mirror the body's horizontal scroll position.
-                                '[transform:translateX(var(--table-sticky-scroll-left,0px))]'
-                            )}
+                            className={cx('table-sticky-header-track', resolvedTableClassName)}
                             style={{ width: 'var(--table-sticky-table-width)' }}
                         >
                             {header}
@@ -170,14 +154,8 @@ function StickyHeaderOverlayScrollGrid({
                     </div>
                 ) : null}
 
-                <div
-                    ref={bodyScrollRef}
-                    className="w-full min-w-0 overflow-x-auto overflow-y-hidden overscroll-x-none border-tint-subtle group-data-[scrollable=true]/table:mx-px group-data-[scrollable=true]/table:rounded-none group-data-[scrollable=true]/table:border-0"
-                >
-                    <div
-                        ref={bodyTableRef}
-                        className={tcls('flex', 'flex-col', resolvedTableClassName)}
-                    >
+                <div ref={bodyScrollRef} className="table-scroll table-sticky-scroll">
+                    <div ref={bodyTableRef} className={cx('table-stack', resolvedTableClassName)}>
                         {children}
                     </div>
                 </div>

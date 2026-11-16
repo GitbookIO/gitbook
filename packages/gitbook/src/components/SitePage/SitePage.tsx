@@ -22,6 +22,7 @@ import { UpdatesFilterProvider } from '@/components/DocumentView/UpdatesFilter';
 import { UpdatesFilterScript } from '@/components/DocumentView/UpdatesFilterScript';
 import { PageAside } from '@/components/PageAside';
 import { PageBody, PageCover } from '@/components/PageBody';
+import { cx } from '@/lib/classnames';
 import type { GitBookSiteContext } from '@/lib/context';
 import { getDataOrNull, getPageDocument } from '@/lib/data';
 import {
@@ -34,7 +35,6 @@ import { getPagePath } from '@/lib/pages';
 import { resolveContentRef } from '@/lib/references';
 import { isPageIndexable, isSiteIndexable } from '@/lib/seo';
 import { getSiteSpacePagePaths, resolveSiteSpaceCustomHomePage } from '@/lib/sites';
-import { tcls } from '@/lib/tailwind';
 import {
     generateUpdatesFilterCSS,
     getDocumentFilterableTags,
@@ -93,11 +93,7 @@ export async function SitePage(props: SitePageProps & { staticRoute: boolean }) 
         <>
             {/* Using `contents` makes the children of this div according to its parent — which keeps them in a single flex row with the TOC by default.
             If there's a page cover, we use `flex flex-col` to lay out the PageCover above the PageBody + PageAside instead. */}
-            <div
-                className={
-                    withFullPageCover && page.cover ? 'relative flex grow flex-col' : 'contents'
-                }
-            >
+            <div className={withFullPageCover && page.cover ? 'site-page-cover' : 'contents'}>
                 {withFullPageCover && page.cover ? (
                     <PageCover
                         as={page.layout.coverSize === 'background' ? 'background' : 'full'}
@@ -108,11 +104,9 @@ export async function SitePage(props: SitePageProps & { staticRoute: boolean }) 
                 ) : null}
 
                 <div
-                    className={tcls(
-                        withFullPageCover && page.cover ? 'flex grow flex-row' : 'contents',
-                        withSections
-                            ? '[--content-scroll-margin:calc(var(--spacing)*27)]'
-                            : '[--content-scroll-margin:calc(var(--spacing)*16)]'
+                    className={cx(
+                        withFullPageCover && page.cover ? 'site-page-row' : 'contents',
+                        withSections ? 'site-page-scroll-sections' : 'site-page-scroll'
                     )}
                 >
                     <PageAside

@@ -22,10 +22,10 @@ import {
 import { Checkbox } from '@/components/primitives';
 import { StyledLink } from '@/components/primitives';
 import { Image } from '@/components/utils';
+import { cx } from '@/lib/classnames';
 import { getNodeFragmentByName } from '@/lib/document';
 import { getSimplifiedContentType } from '@/lib/files';
 import { resolveContentRefInDocument } from '@/lib/references';
-import { tcls } from '@/lib/tailwind';
 import { filterOutNullable } from '@/lib/typescript';
 
 const alignmentMap: Record<'text-left' | 'text-center' | 'text-right', string> = {
@@ -75,7 +75,7 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
             }
             return (
                 <Checkbox
-                    className={tcls('w-5', 'h-5')}
+                    className="h-5 w-5"
                     checked={value}
                     disabled={true}
                     aria-labelledby={ariaLabelledBy}
@@ -90,16 +90,12 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
             const max = definition.max;
 
             return (
-                <Tag className={tcls('inline-grid')}>
+                <Tag className="record-rating">
                     {value ? (
                         <>
-                            <span className={tcls('inline-flex', 'grid-area-1-1', 'gap-0.5')}>
+                            <span className="record-rating-stars">
                                 {Array.from({ length: max }).map((_, i) => (
-                                    <Icon
-                                        key={i}
-                                        icon="star"
-                                        className={tcls('size-[15px]', 'text-primary/5')}
-                                    />
+                                    <Icon key={i} icon="star" className="record-rating-star" />
                                 ))}
                             </span>
                             <span
@@ -109,14 +105,14 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                                 aria-valuenow={rating}
                                 aria-valuemin={1}
                                 aria-valuemax={definition.max}
-                                className={tcls('inline-flex', 'grid-area-1-1', 'gap-0.5')}
+                                className="record-rating-stars"
                             >
                                 {Array.from({ length: rating }).map((_, i) => (
                                     <Icon
                                         key={i}
                                         icon="star"
                                         iconStyle={IconStyle.SharpSolid}
-                                        className={tcls('size-[15px]', 'text-primary')}
+                                        className="record-rating-star-filled"
                                     />
                                 ))}
                             </span>
@@ -130,10 +126,7 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                 return null;
             }
             return (
-                <Tag
-                    className={tcls('text-base', 'tabular-nums', 'tracking-tighter')}
-                    aria-labelledby={ariaLabelledBy}
-                >{`${value}`}</Tag>
+                <Tag className="record-number" aria-labelledby={ariaLabelledBy}>{`${value}`}</Tag>
             );
         }
         case 'text': {
@@ -142,7 +135,7 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
             }
             const fragment = getNodeFragmentByName(block, value);
             if (!fragment) {
-                return <Tag className={tcls(['w-full', verticalAlignment])}>{''}</Tag>;
+                return <Tag className={cx('w-full', verticalAlignment)}>{''}</Tag>;
             }
 
             const horizontalAlignment = getColumnAlignment(definition);
@@ -154,15 +147,8 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                     document={document}
                     ancestorBlocks={[...ancestorBlocks, block]}
                     nodes={fragment.nodes}
-                    style={[
-                        'blocks',
-                        'w-full',
-                        'space-y-2',
-                        'lg:space-y-3',
-                        'leading-normal',
-                        verticalAlignment,
-                        horizontalClasses,
-                    ]}
+                    // Alignment stays as utilities: they must beat the alignment set by the blocks inside.
+                    style={['blocks record-text', verticalAlignment, horizontalClasses]}
                     context={context}
                     blockStyle={['w-full', 'max-w-[unset]']}
                     wrapperProps={{
@@ -191,7 +177,7 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
             );
 
             return (
-                <Tag className={tcls('text-base')} aria-labelledby={ariaLabelledBy}>
+                <Tag className="text-base" aria-labelledby={ariaLabelledBy}>
                     {files.filter(filterOutNullable).map((ref, index) => {
                         const contentType = ref.file
                             ? getSimplifiedContentType(ref.file.contentType)
@@ -201,7 +187,7 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                             <StyledLink
                                 key={index}
                                 href={ref.href}
-                                className="flex flex-row items-center gap-2"
+                                className="record-file-link"
                                 insights={
                                     ref.file
                                         ? {
@@ -235,10 +221,7 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                                         loading={context.mode === 'print' ? 'eager' : 'lazy'}
                                     />
                                 ) : (
-                                    <FileIcon
-                                        contentType={contentType}
-                                        className={tcls('size-4')}
-                                    />
+                                    <FileIcon contentType={contentType} className="size-4" />
                                 )}
                                 {ref.text}
                             </StyledLink>
@@ -259,10 +242,7 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                       })
                     : null;
             return (
-                <Tag
-                    className={tcls('text-base', 'text-balance', 'flex', 'items-center')}
-                    aria-labelledby={ariaLabelledBy}
-                >
+                <Tag className="record-ref" aria-labelledby={ariaLabelledBy}>
                     {resolved?.icon ?? null}
                     {resolved ? (
                         <StyledLink
@@ -311,7 +291,7 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
             );
 
             return (
-                <Tag className={tcls('text-base')} aria-labelledby={ariaLabelledBy}>
+                <Tag className="text-base" aria-labelledby={ariaLabelledBy}>
                     {resolved.filter(filterOutNullable).map(([contentRef, resolved], index) => (
                         <StyledLink
                             key={index}
@@ -336,7 +316,7 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
             }
             return (
                 <Tag aria-labelledby={ariaLabelledBy}>
-                    <span className={tcls('inline-flex', 'gap-2', 'flex-wrap')}>
+                    <span className="record-select">
                         {value.map((selectId) => {
                             const option = definition.options.find(
                                 (option) => option.value === selectId
@@ -347,18 +327,7 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                             }
 
                             return (
-                                <span
-                                    key={option.value}
-                                    className={tcls(
-                                        'text-sm',
-                                        'whitespace-pre',
-                                        'rounded-sm',
-                                        'py-1',
-                                        'px-2',
-                                        'bg-primary',
-                                        'text-primary-strong'
-                                    )}
-                                >
+                                <span key={option.value} className="record-select-option">
                                     {option.label}
                                 </span>
                             );
@@ -385,10 +354,10 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
             }
 
             return (
-                <Tag className={tcls('text-base')} aria-labelledby={ariaLabelledBy}>
+                <Tag className="text-base" aria-labelledby={ariaLabelledBy}>
                     <StyledLink
                         href={image.href}
-                        className="flex flex-row items-center gap-2"
+                        className="record-file-link"
                         insights={
                             image.file
                                 ? {

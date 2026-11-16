@@ -2,7 +2,7 @@ import { getColumnWidth, getViewGridLayout } from './layout';
 import { RecordRow } from './RecordRow';
 import type { TableGridViewProps } from './Table';
 import { getColumnAlignment } from './utils';
-import { tcls } from '@/lib/tailwind';
+import { cx } from '@/lib/classnames';
 
 interface ViewGridHeaderProps extends TableGridViewProps {
     className?: string;
@@ -27,14 +27,14 @@ export function ViewGridHeader(props: ViewGridHeaderProps) {
     return (
         <div
             role="rowgroup"
-            className={tcls(
+            className={cx(
                 tableClassName ?? tableWidth,
-                'mb-1 flex flex-col rounded-lg border border-tint-subtle bg-tint',
-                withStickyHeader || !stickyFirstColumn ? 'overflow-hidden' : undefined,
+                'table-grid-header',
+                (withStickyHeader || !stickyFirstColumn) && 'table-header-clip',
                 className
             )}
         >
-            <div role="row" className={tcls('flex', 'w-full')}>
+            <div role="row" className="table-grid-header-row">
                 {view.columns.map((column) => {
                     const definition = block.data.definition[column];
                     if (!definition) {
@@ -45,12 +45,12 @@ export function ViewGridHeader(props: ViewGridHeaderProps) {
                         <div
                             key={column}
                             role="columnheader"
-                            className={tcls(
-                                'relative px-3 py-2 font-medium text-sm text-tint-strong',
+                            className={cx(
+                                'table-header-cell',
                                 stickyFirstColumn && column === firstVisibleColumn
                                     ? withStickyHeader
-                                        ? 'z-20 bg-tint'
-                                        : 'sticky left-0 z-20 bg-tint'
+                                        ? 'table-header-cell-pinned'
+                                        : 'table-header-cell-sticky'
                                     : undefined,
                                 getColumnAlignment(definition)
                             )}
@@ -89,10 +89,7 @@ export function ViewGrid(props: ViewGridProps) {
     });
 
     const body = (
-        <div
-            role="rowgroup"
-            className={tcls('flex', 'flex-col', tableClassName ?? tableWidth, '[&>*+*]:border-t')}
-        >
+        <div role="rowgroup" className={cx('table-grid-body', tableClassName ?? tableWidth)}>
             {records.map((record) => (
                 <RecordRow
                     key={record[0]}
@@ -105,5 +102,5 @@ export function ViewGrid(props: ViewGridProps) {
         </div>
     );
 
-    return <div className={tcls('flex', 'flex-col', tableClassName ?? tableWidth)}>{body}</div>;
+    return <div className={cx('table-stack', tableClassName ?? tableWidth)}>{body}</div>;
 }

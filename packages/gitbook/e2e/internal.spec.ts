@@ -1751,7 +1751,7 @@ const testCases: TestsCase[] = [
                 name: 'Navigation to shared space',
                 url: '',
                 run: async (page) => {
-                    const sharedSpaceLink = page.locator('a.underline');
+                    const sharedSpaceLink = page.locator('a.link');
                     await sharedSpaceLink.click();
                     await expect(
                         page.getByRole('heading', { level: 1, name: 'shared' })
@@ -1772,7 +1772,7 @@ const testCases: TestsCase[] = [
                 name: 'Navigation to shared space',
                 url: '',
                 run: async (page) => {
-                    await page.locator('a.underline').click();
+                    await page.locator('a.link').click();
                     await expect(
                         page.getByRole('heading', { level: 1, name: 'shared' })
                     ).toBeVisible();
@@ -2308,10 +2308,10 @@ const testCases: TestsCase[] = [
                 },
                 run: async (page) => {
                     const alphaUserPage = page
-                        .locator('a[class*="group\\/toclink"]')
+                        .locator('a.toclink')
                         .filter({ hasText: 'Alpha users' });
                     const betaUserPage = page
-                        .locator('a[class*="group\\/toclink"]')
+                        .locator('a.toclink')
                         .filter({ hasText: 'Beta users' });
                     await expect(alphaUserPage).toBeVisible();
                     await expect(betaUserPage).toHaveCount(0);
@@ -2335,10 +2335,10 @@ const testCases: TestsCase[] = [
                 },
                 run: async (page) => {
                     const alphaUserPage = page
-                        .locator('a[class*="group\\/toclink"]')
+                        .locator('a.toclink')
                         .filter({ hasText: 'Alpha users' });
                     const betaUserPage = page
-                        .locator('a[class*="group\\/toclink"]')
+                        .locator('a.toclink')
                         .filter({ hasText: 'Beta users' });
                     await expect(betaUserPage).toBeVisible();
                     await expect(alphaUserPage).toHaveCount(0);
@@ -2363,10 +2363,10 @@ const testCases: TestsCase[] = [
                 },
                 run: async (page) => {
                     const alphaUserPage = page
-                        .locator('a[class*="group\\/toclink"]')
+                        .locator('a.toclink')
                         .filter({ hasText: 'Alpha users' });
                     const betaUserPage = page
-                        .locator('a[class*="group\\/toclink"]')
+                        .locator('a.toclink')
                         .filter({ hasText: 'Beta users' });
                     await expect(alphaUserPage).toBeVisible();
                     await expect(betaUserPage).toBeVisible();
@@ -2383,14 +2383,12 @@ const testCases: TestsCase[] = [
                 url: '',
                 run: async (page) => {
                     const welcomePage = page
-                        .locator('a[class*="group\\/toclink"]')
+                        .locator('a.toclink')
                         .filter({ hasText: 'Welcome Page' });
                     const alphaUserPage = page
-                        .locator('a[class*="group\\/toclink"]')
+                        .locator('a.toclink')
                         .filter({ hasText: 'Alpha User' });
-                    const betaUserPage = page
-                        .locator('a[class*="group\\/toclink"]')
-                        .filter({ hasText: 'Beta User' });
+                    const betaUserPage = page.locator('a.toclink').filter({ hasText: 'Beta User' });
 
                     await expect(welcomePage).toBeVisible();
                     await expect(alphaUserPage).toHaveCount(0);
@@ -2422,14 +2420,12 @@ const testCases: TestsCase[] = [
                 url: '',
                 run: async (page) => {
                     const welcomePage = page
-                        .locator('a[class*="group\\/toclink"]')
+                        .locator('a.toclink')
                         .filter({ hasText: 'Welcome Page' });
                     const alphaUserPage = page
-                        .locator('a[class*="group\\/toclink"]')
+                        .locator('a.toclink')
                         .filter({ hasText: 'Alpha User' });
-                    const betaUserPage = page
-                        .locator('a[class*="group\\/toclink"]')
-                        .filter({ hasText: 'Beta User' });
+                    const betaUserPage = page.locator('a.toclink').filter({ hasText: 'Beta User' });
 
                     await expect(welcomePage).toBeVisible();
                     await expect(alphaUserPage).toBeVisible();
@@ -2461,14 +2457,12 @@ const testCases: TestsCase[] = [
                 url: '',
                 run: async (page) => {
                     const welcomePage = page
-                        .locator('a[class*="group\\/toclink"]')
+                        .locator('a.toclink')
                         .filter({ hasText: 'Welcome Page' });
                     const alphaUserPage = page
-                        .locator('a[class*="group\\/toclink"]')
+                        .locator('a.toclink')
                         .filter({ hasText: 'Alpha User' });
-                    const betaUserPage = page
-                        .locator('a[class*="group\\/toclink"]')
-                        .filter({ hasText: 'Beta User' });
+                    const betaUserPage = page.locator('a.toclink').filter({ hasText: 'Beta User' });
 
                     await expect(welcomePage).toBeVisible();
                     await expect(betaUserPage).toBeVisible();
@@ -2501,14 +2495,12 @@ const testCases: TestsCase[] = [
                 url: '',
                 run: async (page) => {
                     const welcomePage = page
-                        .locator('a[class*="group\\/toclink"]')
+                        .locator('a.toclink')
                         .filter({ hasText: 'Welcome Page' });
                     const alphaUserPage = page
-                        .locator('a[class*="group\\/toclink"]')
+                        .locator('a.toclink')
                         .filter({ hasText: 'Alpha User' });
-                    const betaUserPage = page
-                        .locator('a[class*="group\\/toclink"]')
-                        .filter({ hasText: 'Beta User' });
+                    const betaUserPage = page.locator('a.toclink').filter({ hasText: 'Beta User' });
 
                     await expect(welcomePage).toBeVisible();
                     await expect(betaUserPage).toBeVisible();

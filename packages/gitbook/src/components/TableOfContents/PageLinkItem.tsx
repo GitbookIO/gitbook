@@ -7,7 +7,6 @@ import { useCurrentPagePath, useHash } from '../hooks';
 import type { ClientTOCPageLink } from './encodeClientTableOfContents';
 import { TOCPageIcon } from './TOCPageIcon';
 import { Link } from '@/components/primitives';
-import { tcls } from '@/lib/tailwind';
 
 export function PageLinkItem(props: { page: ClientTOCPageLink }) {
     const { page } = props;
@@ -23,7 +22,7 @@ export function PageLinkItem(props: { page: ClientTOCPageLink }) {
     const isActive = isOnTargetPage && (!page.anchor || page.anchor === hash);
 
     return (
-        <li className="page-link-item flex flex-col [.page-group-item+&]:mt-4">
+        <li className="page-link-item">
             <Link
                 href={page.href ?? '#'}
                 data-active={isActive}
@@ -42,24 +41,7 @@ export function PageLinkItem(props: { page: ClientTOCPageLink }) {
             >
                 <TOCPageIcon page={page} />
                 {page.title}
-                {isExternal ? (
-                    <Icon
-                        icon="arrow-up-right"
-                        className={tcls(
-                            'size-3',
-                            'ml-auto',
-                            'mr-1',
-                            'mt-1',
-                            'place-self-start',
-                            'shrink-0',
-                            'text-current',
-                            'transition-all',
-                            'opacity-6',
-                            'group-hover/toclink:opacity-11',
-                            'contrast-more:opacity-11'
-                        )}
-                    />
-                ) : null}
+                {isExternal ? <Icon icon="arrow-up-right" className="toclink-external" /> : null}
             </Link>
         </li>
     );

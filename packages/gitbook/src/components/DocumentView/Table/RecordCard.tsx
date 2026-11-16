@@ -7,13 +7,12 @@ import {
 
 import { isRecordColumnEmpty } from './isRecordColumnEmpty';
 import { RecordColumnValue } from './RecordColumnValue';
-import { RecordCardStyles } from './styles';
 import type { TableRecordKV, TableViewProps } from './Table';
 import { getRecordCardCovers } from './utils';
 import { LinkBox, LinkOverlay } from '@/components/primitives';
 import { Image } from '@/components/utils';
+import { cx } from '@/lib/classnames';
 import { type ResolvedContentRef, resolveContentRefInDocument } from '@/lib/references';
-import { tcls } from '@/lib/tailwind';
 
 export async function RecordCard(
     props: TableViewProps<DocumentTableViewCards> & {
@@ -57,36 +56,14 @@ export async function RecordCard(
             // Marks the card body so overflow-clipped affordances (e.g. the paragraph "Ask"
             // button) can opt out of rendering inside it.
             data-card=""
-            className={tcls(
-                'grid-area-1-1',
-                'relative',
-                'grid',
-                'bg-tint-base',
-                'w-[calc(100%+2px)]',
-                'h-[calc(100%+2px)]',
-                '-inset-px',
-                'rounded-sm',
-                'straight-corners:rounded-none',
-                'circular-corners:rounded-xl',
-                'overflow-hidden',
-                '[&_.heading>div:first-child]:hidden',
-                '[&_.heading>div]:text-[.8em]',
-                '@xl:[&_.heading>div]:text-[1em]',
-                '[&_.blocks:first-child_.heading]:pt-0', // Remove padding-top on first heading in card
-
-                // On mobile, check if we can display the cover responsively or not:
-                // - If the file has a landscape aspect ratio, we display it normally
-                // - If the file is square or portrait, we display it left with 40% of the card width
+            className={cx(
+                'record-card-body',
                 lightCoverIsSquareOrPortrait || darkCoverIsSquareOrPortrait
                     ? [
-                          lightCoverIsSquareOrPortrait
-                              ? '@sm:grid-cols-none grid-cols-[40%__1fr] @sm:grid-rows-[auto_1fr]'
-                              : '',
-                          darkCoverIsSquareOrPortrait
-                              ? 'dark:@sm:grid-cols-none dark:grid-cols-[40%__1fr] dark:@sm:grid-rows-[auto_1fr]'
-                              : '',
-                      ].filter(Boolean)
-                    : 'grid-rows-[auto_1fr]'
+                          lightCoverIsSquareOrPortrait && 'record-card-body-portrait',
+                          darkCoverIsSquareOrPortrait && 'record-card-body-portrait-dark',
+                      ]
+                    : 'record-card-body-landscape'
             )}
         >
             {lightCover ? (
@@ -116,37 +93,20 @@ export async function RecordCard(
                         },
                     ]}
                     resize={context.contentContext?.imageResizer}
-                    className={tcls(
-                        'min-w-0',
-                        'w-full',
-                        'h-full',
-                        'bg-tint-subtle',
+                    className={cx(
+                        'record-card-cover',
                         lightCoverIsSquareOrPortrait || darkCoverIsSquareOrPortrait
                             ? [
-                                  lightCoverIsSquareOrPortrait ? '@sm:aspect-video @sm:h-auto' : '',
-                                  darkCoverIsSquareOrPortrait
-                                      ? 'dark:@sm:aspect-video dark:@sm:h-auto'
-                                      : '',
-                              ].filter(Boolean)
-                            : ['h-auto', 'aspect-video'],
+                                  lightCoverIsSquareOrPortrait && 'record-card-cover-portrait',
+                                  darkCoverIsSquareOrPortrait && 'record-card-cover-portrait-dark',
+                              ]
+                            : 'record-card-cover-landscape',
                         objectFits
                     )}
                     loading={isOffscreen && context.mode !== 'print' ? 'lazy' : 'eager'}
                 />
             ) : null}
-            <div
-                className={tcls(
-                    'min-w-0',
-                    'w-full',
-                    'flex',
-                    'flex-col',
-                    'place-self-start',
-                    'gap-3',
-                    'p-4',
-                    'text-sm',
-                    'text-tint-strong'
-                )}
-            >
+            <div className="record-card-content">
                 {view.columns.map((column) => {
                     const definition = block.data.definition[column];
 
@@ -163,8 +123,8 @@ export async function RecordCard(
                     if (!view.hideColumnTitle && definition.title) {
                         const ariaLabelledBy = `${block.key}-${column}-title`;
                         return (
-                            <div key={column} className="flex flex-col gap-1">
-                                <div id={ariaLabelledBy} className="text-sm text-tint">
+                            <div key={column} className="record-card-field">
+                                <div id={ariaLabelledBy} className="record-card-field-title">
                                     {definition.title}
                                 </div>
                                 <RecordColumnValue
@@ -203,7 +163,7 @@ export async function RecordCard(
         );
     }
 
-    return <div className={tcls(RecordCardStyles)}>{body}</div>;
+    return <div className="record-card">{body}</div>;
 }
 
 /**

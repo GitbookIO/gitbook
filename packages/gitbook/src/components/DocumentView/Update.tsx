@@ -12,6 +12,7 @@ import {
     getNumericDateFormatter,
     getShortDateFormatter,
 } from '@/components/utils/dates';
+import { cx } from '@/lib/classnames';
 import { getRevisionTags, resolveBlockTags } from '@/lib/tags';
 import { tcls } from '@/lib/tailwind';
 
@@ -48,23 +49,18 @@ export function Update(props: BlockProps<DocumentBlockUpdate>) {
     return (
         <FilteredUpdate
             tagSlugs={resolvedTags.map((tag) => tag.slug)}
-            className={tcls('relative flex flex-col gap-2 md:flex-row md:gap-4 lg:gap-8', style)}
+            className={cx('update-block', tcls(style))}
         >
-            <div
-                className={tcls(
-                    // Date is only sticky on larger screens when we use flex-row layout, with 0px fallback to prevent flicker and flaky tests before JS sets the variable
-                    'h-fit w-40 min-w-40 shrink-0 md:sticky md:top-[calc(var(--toc-top-offset,0px)+8px)]!'
-                )}
-            >
+            <div className="update-block-aside">
                 <time
                     // Adding a dateTime attribute for accessibility (and SEO)
                     dateTime={date}
-                    className="inline-flex items-center text-sm font-medium tracking-wide text-neutral-10"
+                    className="update-block-date"
                 >
                     {dateFormatter.format(parsedDate)}
                 </time>
                 {resolvedTags.length > 0 ? (
-                    <div className="mt-2 flex flex-wrap gap-1.5">
+                    <div className="update-block-tags">
                         {resolvedTags.map((tag) => (
                             <Tag key={tag.slug} tag={tag} />
                         ))}
@@ -75,7 +71,7 @@ export function Update(props: BlockProps<DocumentBlockUpdate>) {
                 {...contextProps}
                 nodes={block.nodes}
                 ancestorBlocks={[...ancestorBlocks, block]}
-                style="flex flex-1 flex-col [&>*+*]:mt-5 [&>*:first-child]:!pt-0"
+                style="update-block-body"
             />
         </FilteredUpdate>
     );

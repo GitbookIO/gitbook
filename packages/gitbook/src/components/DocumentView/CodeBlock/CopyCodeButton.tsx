@@ -4,7 +4,7 @@ import { getCodeTextFromId } from './utils';
 import { useCopyToClipboard } from '@/components/hooks';
 import { Button } from '@/components/primitives';
 import { t, useLanguage } from '@/intl/client';
-import { type ClassValue, tcls } from '@/lib/tailwind';
+import { type ClassValue, cx } from '@/lib/classnames';
 
 /**
  * Client component to copy the code of a code block.
@@ -26,12 +26,7 @@ export function CopyCodeButton(props: { codeId: string; style: ClassValue }) {
 
     return (
         <>
-            <Button
-                size="xsmall"
-                variant="secondary"
-                onClick={onClick}
-                className={tcls(style, 'translate-y-0!', 'print:hidden')}
-            >
+            <Button size="xsmall" variant="secondary" onClick={onClick} className={cx(style)}>
                 {t(language, copied ? 'code_copied' : 'code_copy')}
             </Button>
             {/* A label swap on the focused button isn't announced, the live region is. */}

@@ -10,6 +10,7 @@ import { DropdownMenu, DropdownMenuItem } from '@/components/primitives';
 import { useResolvedSlug, useSelect } from '@/components/Select';
 import { useLanguage } from '@/intl/client';
 import { tString } from '@/intl/translate';
+import { cx } from '@/lib/classnames';
 import {
     SELECT_DEFAULT_ATTR,
     SELECT_GROUP_ATTR,
@@ -17,7 +18,6 @@ import {
     SELECT_PINNED_ATTR,
     SELECT_UNPINNED_ATTR,
 } from '@/lib/select';
-import { tcls } from '@/lib/tailwind';
 import { resolveAnchorURL } from '@/lib/urls';
 
 export interface TabsItem {
@@ -81,17 +81,7 @@ export function DynamicTabs(props: { tabs: TabsItem[]; setClassName: string; cla
     );
 
     return (
-        <div
-            {...{ [SELECT_GROUP_ATTR]: '' }}
-            className={tcls(
-                'rounded-lg',
-                'straight-corners:rounded-xs',
-                'ring-1 ring-tint-subtle ring-inset',
-                'flex min-w-0 flex-col',
-                setClassName,
-                className
-            )}
-        >
+        <div {...{ [SELECT_GROUP_ATTR]: '' }} className={cx('tabs-block', setClassName, className)}>
             <TabItemList tabs={tabs} activeTabId={activeTabId} onSelect={selectTab} />
             {tabs.map((tab, index) => (
                 <TabPanel
@@ -128,9 +118,9 @@ const TabPanel = memo(function TabPanel(props: {
             role="tabpanel"
             id={tab.id}
             aria-labelledby={getTabButtonId(tab.id)}
-            className="scroll-mt-[calc(var(--content-scroll-margin)+var(--spacing)*20)]"
+            className="tabs-panel"
         >
-            <div className="px-8 py-6">{tab.body}</div>
+            <div className="tabs-panel-body">{tab.body}</div>
         </div>
     );
 });
@@ -160,18 +150,7 @@ const TabItemList = memo(function TabItemList(props: {
             ref={containerRef}
             role="tablist"
             onKeyDown={moveFocusBetweenTabs}
-            className={tcls(
-                'group/tabs',
-                'overflow-hidden',
-                'rounded-t-lg',
-                'straight-corners:rounded-t-xs',
-                'inline-flex',
-                'self-stretch',
-                'after:flex-1',
-                'after:bg-tint-12/1',
-                // if last tab is selected, apply rounded to :after element
-                '[&:has(button.active-tab:last-of-type):after]:rounded-bl-md'
-            )}
+            className="tabs-list"
         >
             {/* When we measure, we add the menu at start to be sure everything's fit. */}
             {isMeasuring ? (
@@ -265,19 +244,18 @@ const TabItem = memo(function TabItem(props: {
             onClick={() => onSelect(tab.id)}
             wrapperClassName={
                 isActive
-                    ? // Keeps room for the overflow menu button.
-                      'max-w-[calc(100%-3rem)]'
+                    ? 'tabs-item-current'
                     : isMeasuring
                       ? // Measured after the active tab, at their narrowest, so the menu only takes
                         // the tabs that can't fit even truncated.
-                        'order-1 max-w-28'
+                        'tabs-item-measuring'
                       : // Equal shares capped at their own width, so no tab drops below that
                         // narrowest size; the high grow leaves the strip's filler only the leftover.
-                        'min-w-0 max-w-max basis-0 grow-[1000]'
+                        'tabs-item-fluid'
             }
         >
-            {tab.icon && <Icon icon={tab.icon} className="size-4 shrink-0" />}
-            <span className="min-w-0 truncate">{tab.title}</span>
+            {tab.icon && <Icon icon={tab.icon} className="tabs-button-icon" />}
+            <span className="tabs-button-label">{tab.title}</span>
         </TabButton>
     );
 });
@@ -294,59 +272,13 @@ function TabButton(
     const { isActive, wrapperClassName, ...rest } = props;
     return (
         <div
-            className={tcls(
-                'relative',
-                'flex items-center',
-
-                //prev from active-tab
-                '[&:has(+_.active-tab)]:rounded-br-md',
-
-                //next from active-tab
-                '[.active-tab+&]:rounded-bl-md',
-
-                //next from active-tab
-                '[.active-tab_+_:after]:rounded-br-md',
-
-                'after:transition-colors',
-                'after:border-r',
-                'after:absolute',
-                'after:left-[unset]',
-                'after:right-0',
-                'after:border-tint',
-                'after:top-[15%]',
-                'after:h-[70%]',
-                'after:w-px',
-
-                'last:after:border-transparent',
-
-                'text-tint',
-                'bg-tint-12/1',
-                'hover:text-tint-strong',
-                'max-w-full',
-                'shrink-0',
-                'truncate',
-
-                props['aria-selected'] || props['aria-expanded'] || isActive
-                    ? [
-                          'active-tab',
-                          'text-tint-strong',
-                          'bg-transparent',
-                          '[&.active-tab]:after:border-transparent',
-                          '[:has(+_&.active-tab)]:after:border-transparent',
-                          '[:has(&_+)]:after:border-transparent',
-                      ]
-                    : null,
+            className={cx(
+                'tabs-item',
+                (props['aria-selected'] || props['aria-expanded'] || isActive) && 'active-tab',
                 wrapperClassName
             )}
         >
-            <button
-                {...rest}
-                type="button"
-                className={tcls(
-                    'relative inline-flex min-w-0 max-w-full items-center gap-1.5 px-4 py-2.5 font-medium text-sm transition-[color]',
-                    props.className
-                )}
-            />
+            <button {...rest} type="button" className={cx('tabs-button', props.className)} />
         </div>
     );
 }

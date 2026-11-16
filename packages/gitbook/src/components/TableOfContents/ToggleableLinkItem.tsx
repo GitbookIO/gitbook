@@ -49,7 +49,7 @@ export function ToggleableLinkItem(
             <LinkItem href={href} insights={insights} isActive={isActive}>
                 {icon}
                 {tag ? (
-                    <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2">
+                    <div className="toclink-label">
                         {children}
                         {tag}
                     </div>
@@ -78,7 +78,7 @@ export function ToggleableLinkItem(
                     >
                         {icon}
                         {tag ? (
-                            <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2">
+                            <div className="toclink-label">
                                 {children}
                                 {tag}
                             </div>
@@ -165,11 +165,7 @@ function Toggler(props: {
     return (
         <Button
             icon={
-                <ToggleChevron
-                    open={isOpen}
-                    orientation="right-to-down"
-                    className="m-0! size-3! opacity-6 group-hover:opacity-11"
-                />
+                <ToggleChevron open={isOpen} orientation="right-to-down" className="toc-chevron" />
             }
             onClick={(event) => {
                 event.preventDefault();
@@ -185,7 +181,7 @@ function Toggler(props: {
             aria-labelledby={labelledBy}
             aria-expanded={isOpen}
             // Cancels the Button's expanded highlight: an open chevron must look like a closed one.
-            className="-my-0.5 -mr-1 ml-auto min-h-6 min-w-6 text-current hover:bg-tint-base aria-expanded:bg-transparent aria-expanded:text-current aria-expanded:hover:bg-tint-hover"
+            className="toclink-toggle"
         />
     );
 }
@@ -204,12 +200,7 @@ function Descendants(props: { isVisible: boolean; children: React.ReactNode }) {
     return (
         <AnimatePresence>
             {isVisible ? (
-                <motion.div
-                    initial={hide}
-                    animate={show}
-                    exit={hide}
-                    className="flex flex-col overflow-hidden"
-                >
+                <motion.div initial={hide} animate={show} exit={hide} className="toclink-children">
                     {children}
                 </motion.div>
             ) : null}

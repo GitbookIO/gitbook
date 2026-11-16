@@ -4,6 +4,7 @@ import { RecordCard } from './RecordCard';
 import type { TableViewProps } from './Table';
 import { TableSearchRecord } from './TableSearch';
 import { ScrollContainer } from '@/components/primitives/ScrollContainer';
+import { cx } from '@/lib/classnames';
 import { tcls } from '@/lib/tailwind';
 
 export function ViewCards(props: TableViewProps<DocumentTableViewCards>) {
@@ -25,12 +26,10 @@ function CardsGrid(props: TableViewProps<DocumentTableViewCards>) {
 
     return (
         <div
-            className={tcls(
-                style,
-                'inline-grid',
-                'gap-4',
-                'grid-cols-1',
-                view.cardSize === 'large' ? '@xl:grid-cols-2' : '@2xl:grid-cols-3 @sm:grid-cols-2', // Large cards break earlier to avoid becoming *too* big.
+            className={cx(
+                tcls(style),
+                'record-cards',
+                view.cardSize === 'large' ? 'record-cards-large' : 'record-cards-medium',
                 block.data.fullWidth ? 'large:flex-column' : null
             )}
         >
@@ -70,12 +69,10 @@ const PEEK = {
 function CardsCarousel(props: TableViewProps<DocumentTableViewCards>) {
     const { view, records } = props;
 
-    // Cards need a fixed width so the row overflows and scrolls; mirror the grid's
-    // medium/large sizing.
-    const cardWidth =
-        view.cardSize === 'large'
-            ? 'w-[90%] @sm:w-[calc(45%-0.5rem)] @5xl:w-[calc(50%-0.5rem)]'
-            : 'w-[90%] @sm:w-[calc(45%-0.5rem)] @xl:w-[calc(30%-0.66rem)] @5xl:w-[calc(33.33%-0.66rem)]';
+    const itemClassName = cx(
+        'record-carousel-item',
+        view.cardSize === 'large' ? 'record-carousel-item-large' : 'record-carousel-item-medium'
+    );
 
     return (
         <ScrollContainer
@@ -108,15 +105,7 @@ function CardsCarousel(props: TableViewProps<DocumentTableViewCards>) {
                     <TableSearchRecord
                         key={record[0]}
                         recordId={record[0]}
-                        // `grid grid-cols-1` stretches the card to fill the fixed-width,
-                        // equal-height track; `snap-start` aligns it to the left edge.
-                        visibleClassName={tcls(
-                            'grid',
-                            'grid-cols-1',
-                            'shrink-0',
-                            'snap-start',
-                            cardWidth
-                        )}
+                        visibleClassName={itemClassName}
                     >
                         <RecordCard {...props} record={record} />
                     </TableSearchRecord>

@@ -1,7 +1,7 @@
 'use client';
 import type { ImageSize } from '../utils';
 import { useCoverPosition } from './useCoverPosition';
-import { tcls } from '@/lib/tailwind';
+import { cx } from '@/lib/classnames';
 
 interface ImageAttributes {
     src: string;
@@ -40,21 +40,21 @@ export function PageCoverImage(props: PageCoverImageProps) {
 
     if (isLoading) {
         return (
-            <div className="h-full w-full overflow-hidden">
-                <div className="h-full w-full animate-pulse bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900" />
+            <div className="page-cover-loading">
+                <div className="page-cover-skeleton" />
             </div>
         );
     }
 
     return (
-        <div className="h-full w-full overflow-hidden @container" style={{ height }}>
+        <div className="page-cover-frame" style={{ height }}>
             <img
                 src={imgs.light.src}
                 srcSet={imgs.light.srcSet}
                 sizes={imgs.light.sizes}
                 fetchPriority={darkFirst ? 'auto' : 'high'}
                 alt="Page cover"
-                className={tcls('w-full', 'object-cover', imgs.dark ? 'dark:hidden' : '')}
+                className={cx('page-cover-img', imgs.dark && 'page-cover-img-light')}
                 style={{
                     aspectRatio: height
                         ? undefined
@@ -75,7 +75,7 @@ export function PageCoverImage(props: PageCoverImageProps) {
                     sizes={imgs.dark.sizes}
                     fetchPriority={darkFirst ? 'high' : 'low'}
                     alt="Page cover"
-                    className={tcls('w-full', 'object-cover', 'dark:inline', 'hidden')}
+                    className="page-cover-img page-cover-img-dark"
                     style={{
                         aspectRatio: height
                             ? undefined

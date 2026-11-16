@@ -1,6 +1,6 @@
 import { Icon, type IconName } from '@gitbook/icons';
 
-import { type ClassValue, tcls } from '@/lib/tailwind';
+import { type ClassValue, cx } from '@/lib/classnames';
 
 /**
  * Icon shown beside a section in the site section tabs.
@@ -11,11 +11,7 @@ export function SectionIcon(props: { icon: IconName; isActive: boolean; classNam
     return (
         <Icon
             icon={icon}
-            className={tcls(
-                'size-[1em] shrink-0 text-inherit opacity-8',
-                isActive && 'text-inherit opacity-10',
-                className
-            )}
+            className={cx('section-icon', isActive && 'section-icon-active', className)}
         />
     );
 }

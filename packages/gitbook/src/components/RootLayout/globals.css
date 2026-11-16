@@ -1,9 +1,30 @@
-@import "tailwindcss";
+/* Tailwind is split so the component stylesheets land in the utilities layer ahead of the
+   generated utilities: specificity then decides, as it did when they were utility classes. */
+@layer theme, base, components, utilities;
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/preflight.css" layer(base);
 
 @config '../../../tailwind.config.ts';
 
+/* For the component stylesheets: as utilities, `contrast-more:` sorted after a caller's plain utility
+   and won. Ahead of the utilities it needs one more point of specificity to keep winning. */
+@custom-variant contrast-more-strong {
+  @media (prefers-contrast: more) {
+    &:is(html *) {
+      @slot;
+    }
+  }
+}
+
 @import "./prose.css";
 @import "../DocumentView/OpenAPI/method-badge.css";
+@import "./styles/primitives.css";
+@import "./styles/chrome.css";
+@import "./styles/page.css";
+@import "./styles/toc.css";
+@import "./styles/blocks.css";
+@import "./styles/rich-blocks.css";
+@import "tailwindcss/utilities.css" layer(utilities);
 
 /*
   The default border color has changed to `currentcolor` in Tailwind CSS v4,

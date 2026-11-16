@@ -10,10 +10,10 @@ import type {
 
 import type { BlockProps } from './Block';
 import { Blocks } from './Blocks';
-import { getBlockTextStyle } from './spacing';
+import { getBlockTextKind } from './spacing';
 import { getCommentAnchorProps } from './utils';
 import { Checkbox } from '@/components/primitives';
-import { tcls } from '@/lib/tailwind';
+import { cx } from '@/lib/classnames';
 
 export function ListItem(props: BlockProps<DocumentBlockListItem>) {
     const { block, ancestorBlocks, ...contextProps } = props;
@@ -32,16 +32,8 @@ export function ListItem(props: BlockProps<DocumentBlockListItem>) {
             {...contextProps}
             nodes={block.nodes}
             ancestorBlocks={[...ancestorBlocks, block]}
-            blockStyle={tcls(
-                'min-h-lh',
-                // remove margin-top for the first heading in a list
-                '[h2]:pt-0',
-                '[h3]:pt-0',
-                '[h4]:pt-0',
-                // Override the "mx-auto" class from UnwrappedBlocks
-                'mx-0'
-            )}
-            style="flex min-w-0 flex-1 flex-col space-y-2"
+            blockStyle="gb-list-child"
+            style="gb-list-body"
         />
     );
 
@@ -59,7 +51,7 @@ export function ListItem(props: BlockProps<DocumentBlockListItem>) {
                         />
                     </ListItemPrefix>
 
-                    <label htmlFor={block.key} className={tcls('flex-1')}>
+                    <label htmlFor={block.key} className="flex-1">
                         {blocksElement}
                     </label>
                 </ListItemLI>
@@ -130,27 +122,20 @@ function ListItemLI(props: {
     anchorProps: ReturnType<typeof getCommentAnchorProps>;
     children: React.ReactNode;
 }) {
-    const textStyle = getBlockTextStyle(props.block);
+    const kind = getBlockTextKind(props.block);
     return (
-        <li {...props.anchorProps} className={tcls(textStyle.lineHeight, 'flex items-start')}>
+        <li
+            {...props.anchorProps}
+            className={cx('gb-list-item', kind !== 'body' && `gb-list-item-${kind}`)}
+        >
             {props.children}
         </li>
     );
 }
 
+// Sized after the item's first line through the `gb-list-item-*` modifier of its parent.
 function ListItemPrefix(props: { block: DocumentBlockListItem; children: React.ReactNode }) {
-    const textStyle = getBlockTextStyle(props.block);
-    return (
-        <div
-            className={tcls(
-                textStyle.textSize,
-                textStyle.lineHeight,
-                'mr-1 flex min-h-lh min-w-6 items-center justify-center text-tint'
-            )}
-        >
-            {props.children}
-        </div>
-    );
+    return <div className="gb-list-prefix">{props.children}</div>;
 }
 
 function getUnorderedListItemsPrefixContent(input: { depth: number }): string {
@@ -173,7 +158,7 @@ function PseudoBefore(props: {
 }) {
     return (
         <div
-            className="before:content-(--pseudoBefore--content) before:font-var"
+            className="gb-list-marker"
             style={
                 {
                     '--pseudoBefore--content': `'${props.content}'`,

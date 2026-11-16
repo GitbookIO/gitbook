@@ -16,7 +16,7 @@ import type {
     ClientSiteSections,
 } from './encodeClientSiteSections';
 import { SectionIcon } from './SectionIcon';
-import { type ClassValue, tcls } from '@/lib/tailwind';
+import { type ClassValue, cx } from '@/lib/classnames';
 import { findSectionInGroup } from '@/lib/utils';
 
 const MAX_ITEMS = 6; // If there are more sections than this, they'll be shown below the fold in a scrollview.
@@ -32,20 +32,14 @@ export function SiteSectionList(props: { sections: ClientSiteSections; className
 
     return (
         sectionsAndGroups.length > 0 && (
-            <nav
-                aria-label="Sections"
-                className={tcls(
-                    '-mx-5 before:contents[] relative border-tint-subtle border-b from-transparent sidebar-filled:to-tint-subtle theme-muted:to-tint-subtle to-tint-base text-sm text-tint before:pointer-events-none before:absolute before:right-2 before:bottom-0 before:left-0 before:h-12 before:bg-linear-to-b [html.sidebar-filled.theme-bold.tint_&]:to-tint-base [html.sidebar-filled.theme-bold.tint_&]:to-tint-subtle [html.sidebar-filled.theme-muted_&]:to-tint-base',
-                    className
-                )}
-            >
+            <nav aria-label="Sections" className={cx('section-list', className)}>
                 <ScrollContainer
                     orientation="vertical"
                     style={{ maxHeight: `${MAX_ITEMS * 3 + 2}rem` }}
                     className="pb-4"
                     active={`#${currentSection.id}`}
                 >
-                    <div className="flex w-full flex-col px-2">
+                    <div className="section-list-items">
                         {sectionsAndGroups.map((item) => {
                             switch (item.object) {
                                 case 'site-section-group':
@@ -92,44 +86,15 @@ export function SiteSectionListItem(props: {
             href={item.url}
             aria-current={isActive ? 'page' : undefined}
             id={item.id}
-            className={tcls(
-                'group/section-link',
-                'flex',
-                'flex-row',
-                'items-center',
-                'gap-3',
-                'rounded-md',
-                'straight-corners:rounded-none',
-                'circular-corners:rounded-xl',
-                'px-3',
-                'py-2',
-                'transition-all',
-                'hover:bg-tint-hover',
-                'hover:text-tint-strong',
-                'contrast-more:hover:ring-1',
-                'contrast-more:hover:ring-tint',
-                isActive
-                    ? 'font-semibold text-primary-subtle hover:bg-primary-hover hover:text-primary contrast-more:text-primary contrast-more:hover:text-primary-strong contrast-more:hover:ring-1 contrast-more:hover:ring-primary-hover'
-                    : null,
-                className
-            )}
+            className={cx('section-item', className)}
             style={style}
             {...otherProps}
         >
-            <div
-                className={tcls(
-                    'flex size-8 shrink-0 items-center justify-center rounded-md straight-corners:rounded-none bg-tint-subtle text-lg text-tint leading-none shadow-tint shadow-xs ring-1 ring-tint-subtle transition-transform group-hover/section-link:scale-110 group-hover/section-link:ring-tint-hover group-active/section-link:scale-90 group-active/section-link:shadow-none contrast-more:text-tint-strong dark:shadow-none',
-                    isActive
-                        ? 'bg-primary tint:bg-primary-original text-primary-subtle tint:text-contrast-primary-original shadow-md shadow-primary ring-primary group-hover/section-link:ring-primary-hover, contrast-more:text-primary contrast-more:ring-2 contrast-more:ring-primary'
-                        : null
-                )}
-            >
+            <div className="section-item-icon">
                 {item.icon ? (
                     <SectionIcon icon={item.icon as IconName} isActive={isActive} />
                 ) : (
-                    <span className={tcls('text-sm opacity-8', isActive && 'opacity-10')}>
-                        {item.title.substring(0, 2)}
-                    </span>
+                    <span className="section-item-abbr">{item.title.substring(0, 2)}</span>
                 )}
             </div>
             {item.title}
@@ -165,63 +130,21 @@ export function SiteSectionGroupItem(props: {
                     event.stopPropagation();
                     setIsOpen((prev) => !prev);
                 }}
-                className={`group/section-link flex w-full flex-row items-center gap-3 rounded-md px-3 py-2 text-left transition-all hover:bg-tint-hover hover:text-tint-strong straight-corners:rounded-none contrast-more:hover:ring-1 contrast-more:hover:ring-tint ${
-                    isActiveGroup
-                        ? 'font-semibold text-primary hover:bg-primary-hover hover:text-primary-strong contrast-more:text-primary-strong contrast-more:hover:ring-1 contrast-more:hover:ring-primary-hover'
-                        : null
-                }`}
+                className={cx('section-item-group', isActiveGroup && 'section-item-current')}
             >
-                <div
-                    className={tcls(
-                        'flex size-8 shrink-0 items-center justify-center rounded-md straight-corners:rounded-none bg-tint-subtle text-lg text-tint leading-none shadow-tint shadow-xs ring-1 ring-tint-subtle transition-transform group-hover/section-link:scale-110 group-hover/section-link:ring-tint-hover group-active/section-link:scale-90 group-active/section-link:shadow-none contrast-more:text-tint-strong dark:shadow-none',
-                        isActiveGroup
-                            ? 'bg-primary text-primary shadow-md shadow-primary ring-primary group-hover/section-link:ring-primary-hover, contrast-more:text-primary-strong contrast-more:ring-2 contrast-more:ring-primary'
-                            : null
-                    )}
-                >
+                <div className="section-item-icon">
                     {group.icon ? (
                         <SectionIcon icon={group.icon as IconName} isActive={isActiveGroup} />
                     ) : (
-                        <span className={`text-sm opacity-8 ${isActiveGroup && 'opacity-10'}`}>
-                            {group.title.substring(0, 2)}
-                        </span>
+                        <span className="section-item-abbr">{group.title.substring(0, 2)}</span>
                     )}
                 </div>
                 {group.title}
-                <span
-                    className={tcls(
-                        'ml-auto',
-                        'group',
-                        'relative',
-                        'rounded-full',
-                        'straight-corners:rounded-xs',
-                        'w-5',
-                        'h-5',
-                        'after:grid-area-1-1',
-                        'after:absolute',
-                        'after:-top-1',
-                        'after:grid',
-                        'after:-left-1',
-                        'after:w-7',
-                        'after:h-7',
-                        'hover:bg-tint-active',
-                        'hover:text-current',
-                        isActiveGroup && 'hover:bg-tint-hover'
-                    )}
-                >
+                <span className="section-item-toggle">
                     <ToggleChevron
                         open={isOpen}
                         orientation="right-to-down"
-                        className={tcls(
-                            'shrink-0',
-                            'size-3',
-                            'm-1',
-                            'transition-opacity',
-                            'text-current',
-                            'opacity-6',
-                            'group-hover:opacity-11',
-                            'contrast-more:opacity-11'
-                        )}
+                        className="section-item-chevron"
                     />
                 </span>
             </button>
@@ -266,7 +189,7 @@ function Descendants(props: { isVisible: boolean; children: React.ReactNode }) {
     return (
         <motion.div
             ref={scope}
-            className={isVisible ? 'pl-3' : 'pl-3 [&_ul>li]:opacity-1'}
+            className={cx('section-list-children', !isVisible && 'section-list-children-hidden')}
             initial={isVisible ? show : hide}
         >
             {children}

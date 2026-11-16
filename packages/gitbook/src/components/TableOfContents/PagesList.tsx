@@ -7,14 +7,14 @@ import type { ClientTOCPage } from './encodeClientTableOfContents';
 import { PageDocumentItem } from './PageDocumentItem';
 import { PageGroupItem } from './PageGroupItem';
 import { PageLinkItem } from './PageLinkItem';
-import { type ClassValue, tcls } from '@/lib/tailwind';
+import { type ClassValue, cx } from '@/lib/classnames';
 
 export function PagesList(props: { pages: ClientTOCPage[]; style?: ClassValue; isRoot?: boolean }) {
     const { pages, style, isRoot = false } = props;
 
     return (
         <ul
-            className={tcls('flex flex-col gap-y-0.5', style)}
+            className={cx('toc-list', style)}
             // Flag navigations that start from a ToC link so the destination can offer a
             // "Back to space" shortcut for cross-space links. Only needed on the root
             // list: capture catches clicks on nested items too.

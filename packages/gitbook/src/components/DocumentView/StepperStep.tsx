@@ -5,6 +5,7 @@ import type { DocumentBlockStepperStep } from '@gitbook/api';
 import type { BlockProps } from './Block';
 import { Blocks } from './Blocks';
 import { getCommentAnchorProps } from './utils';
+import { cx } from '@/lib/classnames';
 import { tcls } from '@/lib/tailwind';
 
 export function StepperStep(props: BlockProps<DocumentBlockStepperStep>) {
@@ -36,24 +37,19 @@ export function StepperStep(props: BlockProps<DocumentBlockStepperStep>) {
     return (
         <div
             {...getCommentAnchorProps(context, block.key)}
-            className={tcls('flex flex-row gap-4 md:gap-8', style)}
+            className={cx('stepper-item', tcls(style))}
         >
-            <div className="relative select-none">
-                <div
-                    className={tcls(
-                        'can-override-bg can-override-text flex size-[calc(1.75rem+1px)] items-center justify-center rounded-full bg-primary-solid theme-muted:bg-tint-base tabular-nums contrast-more:bg-primary-11',
-                        'font-medium text-contrast-primary-solid theme-muted:text-tint contrast-more:text-contrast-primary-11'
-                    )}
-                >
+            <div className="stepper-step-marker">
+                <div className="can-override-bg can-override-text stepper-step-number">
                     {index + 1}
                 </div>
-                <div className="can-override-bg absolute bottom-2 left-3.5 top-9 w-px bg-primary-7 theme-muted:bg-tint-6" />
+                <div className="can-override-bg stepper-step-line" />
             </div>
             <Blocks
                 {...contextProps}
                 nodes={block.nodes}
                 ancestorBlocks={[...ancestorBlocks, block]}
-                style={['min-w-0 flex-1 pb-6 [&>*+*]:mt-5', marginAdjustClassName]}
+                style={['stepper-step-body', marginAdjustClassName]}
             />
         </div>
     );

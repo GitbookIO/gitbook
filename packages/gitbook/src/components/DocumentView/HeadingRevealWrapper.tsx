@@ -2,7 +2,7 @@
 
 import { useSyncExternalStore } from 'react';
 
-import { type ClassValue, tcls } from '@/lib/tailwind';
+import { type ClassValue, cx } from '@/lib/classnames';
 
 const HEADING_ATTR = 'data-heading-reveal-wrapper';
 
@@ -87,7 +87,7 @@ export function HeadingRevealWrapper(props: {
     return (
         <Tag
             id={id}
-            className={tcls(className, revealed && 'hash-revealed')}
+            className={cx(className, revealed && 'hash-revealed')}
             onPointerUp={handlePointerUp}
             {...{ [HEADING_ATTR]: true }}
             {...rest}

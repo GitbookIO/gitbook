@@ -7,6 +7,7 @@ import type { TableGridViewProps } from './Table';
 import { TableHoverTable } from './TableHoverTable';
 import { TableSearchTableBody } from './TableSearch';
 import { getColumnAlignment, getColumnVerticalAlignment, type VerticalAlignment } from './utils';
+import { cx } from '@/lib/classnames';
 import { tcls } from '@/lib/tailwind';
 
 /** Semantic table renderer used when a cell spans multiple records. */
@@ -26,7 +27,7 @@ export function NativeViewGrid(props: TableGridViewProps) {
             {...props}
             stickyHeader={withStickyHeader}
             stickyFirstColumn={withStickyFirstColumn}
-            className={tcls(
+            className={cx(
                 withStickyHeader
                     ? [
                           'mb-0 border-t border-r border-l',
@@ -50,7 +51,7 @@ export function NativeViewGrid(props: TableGridViewProps) {
     if (withStickyHeader || withStickyFirstColumn) {
         return (
             <StickyViewGrid
-                className={tcls(style, 'relative mx-auto grid w-full min-w-0')}
+                className={cx(tcls(style), 'table-view')}
                 stickyHeader={withStickyHeader}
                 tableClassName={tableContainerClassName}
                 withTableRole={false}
@@ -62,9 +63,9 @@ export function NativeViewGrid(props: TableGridViewProps) {
     }
 
     return (
-        <div className={tcls(style, 'relative mx-auto grid w-full min-w-0')}>
-            <div className="w-full min-w-0 overflow-x-auto overflow-y-hidden overscroll-x-none border-tint-subtle">
-                <div className={tcls('flex flex-col', tableContainerClassName)}>
+        <div className={cx(tcls(style), 'table-view')}>
+            <div className="table-scroll">
+                <div className={cx('table-stack', tableContainerClassName)}>
                     {header}
                     {body}
                 </div>
@@ -86,13 +87,13 @@ function NativeViewGridHeader(
     return (
         <div
             aria-hidden="true"
-            className={tcls(
-                'mb-1 rounded-lg border border-tint-subtle bg-tint',
-                stickyHeader || !stickyFirstColumn ? 'overflow-hidden' : undefined,
+            className={cx(
+                'table-native-header',
+                (stickyHeader || !stickyFirstColumn) && 'table-header-clip',
                 className
             )}
         >
-            <table className="w-full table-fixed border-separate border-spacing-0">
+            <table className="table-native">
                 <NativeViewGridColumns {...props} />
                 <thead>
                     <tr>
@@ -108,12 +109,12 @@ function NativeViewGridHeader(
                                 <th
                                     key={column}
                                     scope="col"
-                                    className={tcls(
-                                        'relative px-3 py-2 font-medium text-sm text-tint-strong',
+                                    className={cx(
+                                        'table-header-cell',
                                         isStickyFirstColumn
                                             ? stickyHeader
-                                                ? 'z-20 bg-tint'
-                                                : 'sticky left-0 z-20 bg-tint'
+                                                ? 'table-header-cell-pinned'
+                                                : 'table-header-cell-sticky'
                                             : undefined,
                                         getColumnAlignment(definition)
                                     )}
@@ -149,14 +150,7 @@ function NativeViewGridBody(
     const recordIndexes = new Map(records.map((record, index) => [record[0], index] as const));
 
     return (
-        <TableHoverTable
-            className={tcls(
-                'w-full table-fixed border-separate border-spacing-0',
-                '[&>tbody>tr>td[data-table-hovered]]:bg-tint-hover',
-                '[&>tbody>tr+tr>td]:border-t',
-                '[&>tbody+tbody>tr:first-child>td]:border-t'
-            )}
-        >
+        <TableHoverTable className="table-native table-native-body">
             <NativeViewGridColumns {...props} />
             {withHeader ? (
                 <thead className="sr-only">
@@ -225,15 +219,11 @@ function NativeViewGridBody(
                                             data-table-row-end={
                                                 recordIndex + (cellMerge?.merge.rowSpan ?? 1) - 1
                                             }
-                                            className={tcls(
-                                                'relative px-3 py-2 text-sm transition-colors',
-                                                !isLastColumn
-                                                    ? 'border-tint-subtle border-r'
-                                                    : undefined,
+                                            className={cx(
+                                                'table-native-cell',
+                                                !isLastColumn && 'table-native-cell-divider',
                                                 getNativeCellVerticalAlignment(verticalAlignment),
-                                                isStickyFirstColumn
-                                                    ? 'sticky left-0 z-10 bg-tint-base'
-                                                    : undefined
+                                                isStickyFirstColumn && 'table-native-cell-sticky'
                                             )}
                                         >
                                             <RecordColumnValue

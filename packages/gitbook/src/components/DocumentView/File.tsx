@@ -41,12 +41,12 @@ export async function File(props: BlockProps<DocumentBlockFile>) {
 
     return (
         <Caption {...props} withBorder withBlockKey>
-            <div className="flex flex-wrap items-center gap-5 px-5 py-3">
-                <div className="flex min-h-8 min-w-14 flex-col items-center justify-center gap-1 border-r border-tint-subtle pr-4">
+            <div className="file-block">
+                <div className="file-block-preview">
                     {contentType === 'image' ? (
                         <Image
                             alt={file.name}
-                            className="h-auto max-h-10 w-auto max-w-10 rounded object-contain"
+                            className="file-block-image"
                             sizes={[{ width: 40 }]}
                             resize={context.contentContext?.imageResizer}
                             sources={{
@@ -58,11 +58,11 @@ export async function File(props: BlockProps<DocumentBlockFile>) {
                             loading="lazy"
                         />
                     ) : (
-                        <FileIcon contentType={contentType} className="size-5 text-primary" />
+                        <FileIcon contentType={contentType} className="file-block-icon" />
                     )}
                 </div>
-                <div className="min-w-24 flex-1">
-                    <div className="text-base">
+                <div className="file-block-info">
+                    <div className="file-block-name">
                         <Link
                             href={file.downloadURL}
                             target="_blank"
@@ -72,13 +72,13 @@ export async function File(props: BlockProps<DocumentBlockFile>) {
                             {file.name}
                         </Link>
                     </div>
-                    <div className="text-sm text-tint-subtle">
+                    <div className="file-block-meta">
                         {contentType
                             ? `${contentType} · ${getHumanFileSize(file.size)}`
                             : getHumanFileSize(file.size)}
                     </div>
                 </div>
-                <div className="flex shrink-0 flex-wrap gap-2">
+                <div className="file-block-actions">
                     <DownloadButton
                         icon="download"
                         size="xsmall"

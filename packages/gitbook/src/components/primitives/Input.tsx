@@ -8,6 +8,7 @@ import { useControlledState } from '../hooks/useControlledState';
 import { Button, type ButtonProps } from './Button';
 import { KeyboardShortcut, type KeyboardShortcutProps } from './KeyboardShortcut';
 import { tString, useLanguage } from '@/intl/client';
+import { cx } from '@/lib/classnames';
 import { isComposingKeyEvent } from '@/lib/keyboard';
 import { tcls } from '@/lib/tailwind';
 
@@ -134,21 +135,18 @@ export const Input = React.forwardRef<InputElement, InputProps>((props, passedRe
 
     const sizes = {
         small: {
-            container: `${multiline ? 'p-1.5' : 'px-2.5 py-1.5'} text-sm gap-1.5 circular-corners:rounded-3xl rounded-corners:rounded-xl`,
             input: '-m-1.5 p-1.5',
             gap: 'gap-2',
             leading: 'size-text-base',
             trailing: '-my-1 -mr-1.5',
         },
         medium: {
-            container: `${multiline ? 'p-2' : 'px-3 py-2'} gap-2 circular-corners:rounded-3xl rounded-corners:rounded-xl`,
             input: '-m-2 p-2',
             gap: 'gap-2',
             leading: 'size-text-lg',
             trailing: '-my-1 -mr-1.5',
         },
         large: {
-            container: `${multiline ? 'p-3' : 'px-3.5 py-3 '} gap-3 circular-corners:rounded-3xl rounded-corners:rounded-xl`,
             input: '-m-3 p-3',
             gap: 'gap-3',
             leading: 'size-text-2xl',
@@ -211,15 +209,7 @@ export const Input = React.forwardRef<InputElement, InputProps>((props, passedRe
         }
     };
 
-    const inputClassName = tcls(
-        // `aria-busy` must not change the cursor: a busy field can still be editable.
-        'peer -m-2 max-h-64 grow shrink resize-none leading-normal text-left outline-none placeholder-shown:text-ellipsis',
-        // Styling `::placeholder` from an ancestor variant costs a full-document restyle, so callers
-        // set this variable on the container instead. It must stay a `var()` fallback rather than a
-        // declaration here, or the input would shadow the inherited override.
-        'placeholder:text-[var(--input-placeholder,color-mix(in_oklab,rgb(var(--tint-11))_72%,transparent))]',
-        sizes[sizing].input
-    );
+    const inputClassName = cx('input-field', sizes[sizing].input);
 
     const inputProps = {
         className: inputClassName,
@@ -248,16 +238,11 @@ export const Input = React.forwardRef<InputElement, InputProps>((props, passedRe
 
     return (
         <Tag
-            className={tcls(
-                'group/input relative flex min-h-min overflow-hidden border border-tint bg-tint-base align-middle shadow-tint/6 ring-primary-hover transition-all dark:shadow-tint-1',
-                disabled
-                    ? 'cursor-not-allowed border-tint-subtle bg-tint-subtle text-tint/8'
-                    : [
-                          'depth-subtle:focus-within:-translate-y-px depth-subtle:hover:not-has-[button:hover]:-translate-y-px depth-subtle:shadow-xs',
-                          'focus-within:border-primary-hover focus-within:depth-subtle:shadow-lg focus-within:shadow-primary-subtle focus-within:ring-2 forced-colors:focus-within:outline-2 hover:not-has-[button:hover]:cursor-text hover:not-has-[button:hover]:border-tint-hover hover:not-has-[button:hover]:not-focus-within:bg-tint-subtle depth-subtle:hover:not-has-[button:hover]:not-focus-within:shadow-md focus-within:hover:not-has-[button:hover]:border-primary-hover',
-                      ],
-                multiline ? 'flex-col' : 'flex-row',
-                sizes[sizing].container,
+            className={cx(
+                'group/input input-box',
+                `input-box-${sizing}`,
+                disabled && 'input-box-disabled',
+                multiline && 'input-box-multiline',
                 className
             )}
             onClick={handleClick}
@@ -361,7 +346,13 @@ export const Input = React.forwardRef<InputElement, InputProps>((props, passedRe
                 {keyboardShortcut !== false ? (
                     <Tag
                         className={
-                            multiline ? `absolute right-0 top-0 ${sizes[sizing].container}` : ''
+                            multiline
+                                ? cx(
+                                      'input-box-shortcut',
+                                      `input-box-${sizing}`,
+                                      'input-box-multiline'
+                                  )
+                                : ''
                         }
                     >
                         {typeof keyboardShortcut === 'object' ? (

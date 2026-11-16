@@ -1,0 +1,399 @@
+@layer utilities {
+    /* Wrappers that make room for the AI chat panel. */
+    .chrome-shift {
+        @apply lg:chat-open:pr-(--ai-chat-width) transition-all duration-300 motion-reduce:transition-none;
+    }
+    .chrome-shift-padding {
+        @apply lg:chat-open:pr-(--ai-chat-width) transition-[padding] duration-300 motion-reduce:transition-none;
+    }
+
+    /* Header */
+    .header-bar {
+        @apply flex flex-col sticky top-0 pt-[env(safe-area-inset-top)] z-30 w-full flex-none shadow-[0px_1px_0px] shadow-tint-12/2 forced-colors:border-b bg-tint-base/9 theme-muted:bg-tint-subtle/9 [html.sidebar-filled.theme-bold.tint_&]:bg-tint-subtle/9 theme-gradient:bg-gradient-primary theme-gradient-tint:bg-gradient-tint contrast-more-strong:bg-tint-base text-sm backdrop-blur-lg;
+        &.mobile-only {
+            @apply lg:hidden;
+        }
+    }
+    .header-inner {
+        @apply site-header:theme-bold:bg-header-background site-header:theme-bold:shadow-[0px_1px_0px] site-header:theme-bold:shadow-tint-12/2;
+    }
+    .header-content {
+        @apply gap-4 lg:gap-6 flex items-center justify-between w-full py-3 min-h-16 sm:h-16 transition-[max-width] duration-300 motion-reduce:transition-none @container/header;
+    }
+    .header-start {
+        @apply flex max-w-full min-w-0 shrink items-center justify-start gap-2 lg:gap-4;
+    }
+    .header-start-prominent {
+        @apply lg:@2xl:basis-72;
+    }
+    .header-search {
+        @apply flex grow-0 shrink-0 md:@2xl:basis-56 justify-self-end items-center gap-2 transition-[margin] duration-300 motion-reduce:transition-none order-last;
+    }
+    .header-search-prominent {
+        /* Margins: container (100%) - sidebar (18rem) - content (48rem) [- outline (14rem) - margin (3rem)] */
+        @apply md:@2xl:grow-[0.8] md:@4xl:basis-40 md:@2xl:max-w-[50%] md:@4xl:max-w-lg lg:@2xl:ml-[max(calc((100%-18rem-48rem)/2),1.5rem)] chat-closed:xl:ml-[max(calc((100%-18rem-48rem-14rem-3rem)/2),1.5rem)] md:@2xl:mr-auto md:@2xl:order-[unset];
+    }
+    .header-social {
+        @apply flex items-center gap-1;
+    }
+    .header-links {
+        @apply @4xl:[&>.button+.button]:-ml-2 z-20 ml-auto flex min-w-9 shrink grow @7xl:grow-0 items-center justify-end @4xl:gap-x-6 gap-x-4;
+    }
+    .header-links-ellipsis {
+        @apply z-20 items-center;
+    }
+    .header-link {
+        @apply flex items-center gap-1 shrink contrast-more-strong:underline truncate text-tint links-default:hover:text-primary links-default:aria-expanded:text-primary links-default:tint:hover:text-tint-strong links-default:tint:aria-expanded:text-tint-strong underline-offset-2 links-accent:hover:underline links-accent:aria-expanded:underline links-accent:underline-offset-4 links-accent:decoration-primary-subtle links-accent:decoration-[3px] links-accent:py-0.5 theme-bold:text-header-link hover:theme-bold:text-header-link/7!;
+    }
+    .header-link-static {
+        @apply cursor-default;
+    }
+    .header-more {
+        @apply text-tint hover:text-primary dark:hover:text-primary theme-bold:text-header-link theme-bold:hover:text-header-link/8 flex gap-1 items-center;
+    }
+    /*
+     * Button overrides, in this layer so the button's hover/focus rules still win over them.
+     * `.translations-dropdown` comes last: its transparent background replaces the other one.
+     */
+    .spaces-dropdown-button {
+        @apply bg-tint-base;
+    }
+    .translations-dropdown {
+        @apply bg-transparent lg:max-w-64;
+    }
+    .header-logo {
+        @apply min-w-0 shrink flex items-center;
+    }
+    .header-logo-img {
+        @apply overflow-hidden shrink min-w-0 max-w-40 lg:max-w-64 lg:site-header-none:page-no-toc:max-w-56 max-h-8 h-full w-full object-contain object-left;
+    }
+    .header-logo-icon {
+        @apply object-contain size-8;
+    }
+    .header-logo-text {
+        @apply text-pretty line-clamp-2 tracking-tight max-w-[18ch] lg:max-w-[24ch] font-heading font-semibold ms-3 text-base/tight lg:text-lg/tight text-tint-strong theme-bold:text-header-link;
+    }
+
+    /* Announcement banner */
+    .announcement {
+        @apply pb-2 pt-4 theme-bold:bg-header-background;
+    }
+    .announcement-box {
+        @apply flex w-full items-start justify-center overflow-hidden circular-corners:rounded-xl rounded-md straight-corners:rounded-none px-4 py-3 text-neutral-strong text-sm theme-bold:ring-1 theme-gradient:ring-1 ring-inset transition-colors;
+    }
+    .announcement-closeable {
+        @apply pr-12;
+    }
+    .announcement-icon {
+        @apply mr-3 mt-0.5 size-4 shrink-0;
+    }
+    .announcement-info {
+        @apply bg-info ring-info-subtle;
+        &.announcement-linked {
+            @apply hover:bg-info-hover active:bg-info-active;
+        }
+        .announcement-icon {
+            @apply text-info-subtle;
+        }
+    }
+    .announcement-warning {
+        @apply bg-warning decoration-warning/6 ring-warning-subtle;
+        &.announcement-linked {
+            @apply hover:bg-warning-hover;
+        }
+        .announcement-icon {
+            @apply text-warning-subtle;
+        }
+    }
+    .announcement-danger {
+        @apply bg-danger decoration-danger/6 ring-danger-subtle;
+        &.announcement-linked {
+            @apply hover:bg-danger-hover;
+        }
+        .announcement-icon {
+            @apply text-danger-subtle;
+        }
+    }
+    .announcement-success {
+        @apply bg-success decoration-success/6 ring-success-subtle;
+        &.announcement-linked {
+            @apply hover:bg-success-hover;
+        }
+        .announcement-icon {
+            @apply text-success-subtle;
+        }
+    }
+
+    /* Footer */
+    .footer {
+        @apply border-tint-subtle border-t;
+    }
+    /* Only a theme toggle: hidden where the outline column, which carries its own, is pinned open. */
+    .footer-toggle-only {
+        @apply layout-default:xl:chat-closed:hidden layout-default:3xl:hidden layout-wide:3xl:chat-closed:hidden page-api-block:page-has-outline:min-[96rem]:hidden;
+    }
+    /* The site container, with its base padding overridden to a flat px-4. */
+    .footer-container {
+        @apply sm:px-6 sm:pl-[max(env(safe-area-inset-left),1.5rem)] sm:pr-[max(env(safe-area-inset-right),1.5rem)] md:px-8 md:pl-[max(env(safe-area-inset-left),2rem)] md:pr-[max(env(safe-area-inset-right),2rem)] max-w-screen-2xl px-4 py-8 @4xl:py-12 mx-auto @container/footer;
+    }
+    .footer-grid {
+        @apply flex @xs:grid @4xl:max-w-none! flex-col justify-between gap-12 grid-cols-[auto_auto] @4xl:grid-cols-[18rem_minmax(auto,48rem)_auto] @7xl:grid-cols-[18rem_minmax(auto,48rem)_14rem];
+    }
+    .footer-logo {
+        @apply col-start-1 row-start-1;
+    }
+    .footer-logo-img {
+        @apply w-auto max-w-40 @4xl:max-w-64 max-h-10 @4xl:max-h-12 object-contain object-left rounded-sm straight-corners:rounded-xs;
+    }
+    .footer-toggle {
+        @apply page-api-block:page-has-outline:min-[96rem]:hidden -col-start-2 row-start-1 flex items-start @xs:justify-end layout-default:xl:chat-closed:hidden layout-default:3xl:hidden layout-wide:3xl:chat-closed:hidden;
+    }
+    .footer-groups {
+        @apply col-span-2;
+    }
+    .footer-columns {
+        @apply mx-auto flex flex-col gap-10 @xl:flex-row @xl:gap-6;
+    }
+    .footer-column {
+        @apply flex flex-1 grow flex-col gap-10;
+    }
+    .footer-social {
+        @apply col-span-full flex w-full grow items-center justify-center gap-2;
+    }
+    .footer-legal {
+        @apply order-last col-span-full flex w-full grow flex-col items-center gap-2 text-center text-xs text-tint;
+    }
+    .footer-group {
+        @apply flex flex-col gap-4 text-sm;
+    }
+    .footer-group-title {
+        @apply font-heading font-semibold;
+    }
+    .footer-group-links {
+        @apply flex flex-col items-start gap-4;
+    }
+    .footer-link {
+        @apply font-normal text-tint links-default:hover:text-primary links-default:tint:hover:text-tint-strong contrast-more-strong:underline contrast-more-strong:text-tint-strong underline-offset-2 links-accent:hover:underline links-accent:underline-offset-4 links-accent:decoration-primary-subtle links-accent:decoration-[3px];
+    }
+
+    /* Search bar */
+    .search-input-header {
+        @apply @max-2xl:size-9.5 relative flex grow;
+    }
+    .search-input-frame {
+        @apply relative flex w-full grow;
+    }
+    .search-input-icon {
+        @apply size-text-lg shrink-0 text-tint site-header:theme-bold:text-header-link/8;
+    }
+    .search-input-icon-frame {
+        @apply size-text-lg shrink-0 text-tint-subtle;
+    }
+    .search-input-count {
+        @apply animate-blur-in mr-2 text-sm text-tint-subtle;
+    }
+
+    /* Site section tabs */
+    .section-tabs {
+        @apply relative z-10 flex w-full flex-nowrap items-end;
+    }
+    .section-tabs-scroll {
+        @apply grow md:-ml-8 -ml-4 sm:-ml-6;
+    }
+    .section-tabs-scroll-full {
+        @apply md:-mr-8 -mr-4 sm:-mr-6;
+    }
+    /* Divider before the trailing children, shown once the tabs overflow. */
+    .section-tabs-scroll-divided {
+        @apply after:absolute after:inset-y-2 after:right-0 after:border-transparent after:border-r after:transition-colors;
+    }
+    .section-tabs-scroll-more {
+        @apply after:border-tint;
+    }
+    .section-tabs-list {
+        @apply flex grow gap-2 bg-transparent pl-1 sm:pl-3 md:pl-5 pr-1;
+    }
+    .section-tabs-list-full {
+        @apply sm:pr-3 md:pr-5;
+    }
+    .section-tabs-content {
+        /* Bounds the scrolling content too: the popup settles at `height: auto`, so `h-full` doesn't. */
+        @apply h-full w-full overflow-y-auto overflow-x-hidden md:w-max md:max-w-(--available-width) max-h-[calc(100dvh-8rem)] transition-[opacity,translate] duration-300 ease-[cubic-bezier(0.83,0,0.17,1)] data-ending-style:opacity-0 data-starting-style:opacity-0 data-starting-style:data-[activation-direction=left]:-translate-x-1/2 data-ending-style:data-[activation-direction=left]:translate-x-1/2 data-ending-style:data-[activation-direction=right]:-translate-x-1/2 data-starting-style:data-[activation-direction=right]:translate-x-1/2;
+    }
+    .section-tabs-positioner {
+        @apply z-20 h-(--positioner-height) w-(--positioner-width) max-w-(--available-width) outline-hidden transition-[top,left,right,bottom] duration-300 ease-[cubic-bezier(0.83,0,0.17,1)] data-instant:transition-none;
+    }
+    .section-tabs-popup {
+        /*
+         * Sized here rather than on the content, so the border doesn't push the content off-centre.
+         * `[interpolate-size:numeric-only]`: the global `allow-keywords` would animate Base UI's reset to `auto`.
+         * The size vars reset on close, so closing only animates opacity and scale.
+         */
+        @apply relative h-(--popup-height) w-(--popup-width) origin-(--transform-origin) overflow-hidden circular-corners:rounded-3xl rounded-corners:rounded-xl border border-tint bg-tint-base shadow-lg outline-hidden max-md:w-[calc(100vw-2rem)] max-h-[calc(100dvh-8rem)] transition-[opacity,scale,width,height] duration-300 ease-[cubic-bezier(0.83,0,0.17,1)] [interpolate-size:numeric-only] data-ending-style:transition-[opacity,scale] data-ending-style:scale-95 data-starting-style:scale-95 data-ending-style:opacity-0 data-starting-style:opacity-0;
+    }
+    .section-tabs-viewport {
+        @apply relative h-full w-full overflow-hidden;
+    }
+    /* Button overrides: they beat the active blank button's resting colours but not its hover ones. */
+    .section-tab {
+        @apply relative my-1.5 overflow-visible;
+    }
+    .section-tab-active {
+        @apply after:-bottom-1.5 bg-transparent text-primary-subtle after:absolute after:inset-x-3 after:h-0.5 after:bg-primary-9 contrast-more-strong:bg-primary-12 contrast-more-strong:text-contrast-primary-12;
+    }
+    .section-icon {
+        @apply size-[1em] shrink-0 text-inherit opacity-8;
+    }
+    .section-icon-active {
+        @apply opacity-10;
+    }
+
+    /* Section group dropdown */
+    .section-dropdown {
+        @apply flex w-full flex-col md:flex-row;
+    }
+    .section-panel {
+        @apply w-full shrink-0 md:w-max;
+    }
+    .section-groups-panel {
+        @apply w-full md:w-max md:min-w-0 md:max-w-full;
+    }
+    .section-panel-plain {
+        @apply bg-tint-base;
+    }
+    .section-panel-recessed {
+        @apply border-tint-subtle bg-tint-subtle max-md:border-t md:border-l;
+    }
+    .section-links {
+        @apply flex w-full grid-flow-row flex-col gap-x-2 gap-y-0.5 p-3 md:grid md:w-max;
+    }
+    .section-groups {
+        @apply p-3 flex w-full flex-col justify-start space-y-8 md:w-max md:flex-row md:items-start md:gap-[var(--site-section-column-gap)] md:space-y-0;
+    }
+    .section-groups-masonry {
+        @apply p-3 w-full max-md:space-y-8 md:max-w-[var(--masonry-max-width)] md:gap-x-[var(--site-section-column-gap)] md:[column-count:var(--masonry-columns)] md:[column-width:var(--site-section-column-min-width)] md:[&>li]:mb-4;
+    }
+    .section-group {
+        @apply flex w-full min-w-0 shrink-0 break-inside-avoid flex-col gap-1 md:w-auto;
+    }
+    .section-group-span {
+        @apply md:[column-span:all];
+    }
+    .section-group-title {
+        @apply mb-1 mt-2 flex min-w-0 gap-2 px-2.5 font-heading text-xs font-semibold text-tint-subtle;
+    }
+    .section-group-label {
+        @apply min-w-0 flex-1 whitespace-normal;
+    }
+    .section-group-list {
+        @apply flex w-full flex-col gap-x-2 gap-y-0.5 grid-flow-row md:grid;
+    }
+    /* Same track sizing as the masonry it spans, so its sections line up with the groups around it. */
+    .section-group-list-masonry {
+        @apply flex w-full flex-col gap-x-2 gap-y-0.5 md:block md:gap-x-[var(--site-section-column-gap)] md:[column-count:var(--masonry-columns)] md:[column-width:var(--site-section-column-min-width)] md:[&>li]:mb-0.5 md:[&>li]:break-inside-avoid;
+    }
+    .section-tile {
+        @apply flex w-full min-w-0 shrink-0 grow md:max-w-[var(--site-section-tile-max-width)];
+    }
+    .section-tile-link {
+        @apply grow circular-corners:rounded-2xl rounded-corners:rounded-lg px-2.5 py-1.5 transition-colors;
+        &:not(.section-tile-link-active) {
+            @apply text-tint-strong hover:bg-tint-hover;
+        }
+    }
+    .section-tile-link-active {
+        @apply bg-primary-active text-primary-strong;
+    }
+    .section-tile-body {
+        @apply mb-auto flex min-w-0 grow items-center gap-2;
+    }
+    .section-tile-text {
+        @apply flex min-w-0 flex-col gap-0.5;
+    }
+    .section-tile-title {
+        @apply block min-w-0 whitespace-normal;
+    }
+    .section-tile-icon {
+        @apply -ml-1 self-start circular-corners:rounded-2xl rounded-corners:rounded-lg p-2 transition-colors bg-tint text-tint-strong;
+        &.section-tile-icon-inverted {
+            @apply bg-primary-base;
+        }
+        &.section-tile-icon-active {
+            @apply bg-primary-base text-primary-subtle;
+        }
+        @media (hover: hover) {
+            .section-tile:hover &:not(.section-tile-icon-active) {
+                @apply bg-tint-base;
+            }
+        }
+    }
+
+    /* Site section list (sidebar, when there is no header) */
+    .section-list {
+        @apply -mx-5 relative border-tint-subtle border-b from-transparent sidebar-filled:to-tint-subtle theme-muted:to-tint-subtle to-tint-base text-sm text-tint before:pointer-events-none before:absolute before:right-2 before:bottom-0 before:left-0 before:h-12 before:bg-linear-to-b [html.sidebar-filled.theme-bold.tint_&]:to-tint-subtle [html.sidebar-filled.theme-muted_&]:to-tint-base;
+    }
+    .section-list-items {
+        @apply flex w-full flex-col px-2;
+    }
+    .section-item {
+        @apply flex flex-row items-center gap-3 rounded-md straight-corners:rounded-none circular-corners:rounded-xl px-3 py-2 transition-all hover:bg-tint-hover hover:text-tint-strong contrast-more-strong:hover:ring-1 contrast-more-strong:hover:ring-tint;
+        &[aria-current="page"] {
+            @apply font-semibold text-primary-subtle hover:bg-primary-hover hover:text-primary contrast-more-strong:text-primary contrast-more-strong:hover:text-primary-strong contrast-more-strong:hover:ring-1 contrast-more-strong:hover:ring-primary-hover;
+        }
+    }
+    .section-item-group {
+        @apply flex w-full flex-row items-center gap-3 rounded-md px-3 py-2 text-left transition-all hover:bg-tint-hover hover:text-tint-strong straight-corners:rounded-none contrast-more-strong:hover:ring-1 contrast-more-strong:hover:ring-tint;
+        /* The active group's primary hover colours always lost to the tint ones, so they are left out. */
+        &.section-item-current {
+            @apply font-semibold text-primary hover:text-tint-strong contrast-more-strong:text-primary-strong;
+        }
+    }
+    .section-item-icon {
+        @apply flex size-8 shrink-0 items-center justify-center rounded-md straight-corners:rounded-none bg-tint-subtle text-lg text-tint leading-none shadow-tint shadow-xs ring-1 ring-tint-subtle transition-transform contrast-more-strong:text-tint-strong dark:shadow-none;
+        .section-item[aria-current="page"] & {
+            @apply bg-primary tint:bg-primary-original text-primary-subtle tint:text-contrast-primary-original shadow-md shadow-primary ring-primary contrast-more-strong:text-primary contrast-more-strong:ring-2 contrast-more-strong:ring-primary dark:shadow-none;
+        }
+        .section-item-current & {
+            @apply bg-primary text-primary shadow-md shadow-primary ring-primary contrast-more-strong:text-primary-strong contrast-more-strong:ring-2 contrast-more-strong:ring-primary dark:shadow-none;
+        }
+        @media (hover: hover) {
+            :is(.section-item, .section-item-group):hover & {
+                @apply scale-110;
+            }
+            :is(.section-item:not([aria-current="page"]), .section-item-group:not(.section-item-current)):hover & {
+                @apply ring-tint-hover;
+            }
+        }
+        /* After the active rules: pressing flattens the shadow of an active item too. */
+        :is(.section-item, .section-item-group):active & {
+            @apply scale-90 shadow-none;
+        }
+    }
+    .section-item-abbr {
+        @apply text-sm opacity-8;
+        .section-item[aria-current="page"] &,
+        .section-item-current & {
+            @apply opacity-10;
+        }
+    }
+    .section-item-toggle {
+        @apply ml-auto relative rounded-full straight-corners:rounded-xs w-5 h-5 after:grid-area-1-1 after:absolute after:-top-1 after:grid after:-left-1 after:w-7 after:h-7 hover:bg-tint-active hover:text-current;
+        .section-item-current & {
+            @apply hover:bg-tint-hover;
+        }
+    }
+    .section-item-chevron {
+        @apply shrink-0 size-3 m-1 transition-opacity text-current opacity-6 contrast-more-strong:opacity-11;
+        @media (hover: hover) {
+            .section-item-toggle:hover & {
+                @apply opacity-11;
+            }
+        }
+    }
+    .section-list-children {
+        @apply pl-3;
+    }
+    .section-list-children-hidden {
+        @apply [&_ul>li]:opacity-1;
+    }
+}

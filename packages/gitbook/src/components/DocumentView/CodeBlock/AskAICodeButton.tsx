@@ -7,7 +7,7 @@ import { useTrackEvent } from '@/components/Insights';
 import { Button } from '@/components/primitives';
 import { isAIChatEnabled } from '@/components/utils/isAIChatEnabled';
 import { t, useLanguage } from '@/intl/client';
-import { type ClassValue, tcls } from '@/lib/tailwind';
+import { type ClassValue, cx } from '@/lib/classnames';
 
 export function AskAICodeButton(props: {
     codeId: string;
@@ -50,7 +50,7 @@ export function AskAICodeButton(props: {
             variant="secondary"
             icon={<AIChatIcon state="default" trademark={config.trademark} className="" />}
             onClick={onClick}
-            className={tcls(style, 'translate-y-0!', 'print:hidden', '[[data-ai-chat]_&]:hidden')}
+            className={cx(style, 'codeblock-button-ask')}
         >
             {t(language, 'ask')}
         </Button>

@@ -1,7 +1,7 @@
 import { Icon } from '@gitbook/icons';
 
 import { Link, type LinkInsightsProps, type LinkProps } from './Link';
-import { type ClassValue, tcls } from '@/lib/tailwind';
+import { type ClassValue, cx } from '@/lib/classnames';
 
 export type CardProps = {
     href: string;
@@ -30,37 +30,20 @@ export function Card(
         <Link
             ref={ref}
             href={href}
-            className={tcls(style)}
+            className={cx(style)}
             classNames={['CardStyles']}
             insights={insights}
             {...rest}
         >
             {leadingIcon}
-            <span className={tcls('flex', 'flex-col', 'flex-1')}>
-                {preTitle ? (
-                    <span className={tcls('uppercase', 'text-xs', 'text-tint')}>{preTitle}</span>
-                ) : null}
+            <span className="card-body">
+                {preTitle ? <span className="card-pretitle">{preTitle}</span> : null}
 
-                <span
-                    className={tcls('text-base', 'transition-colors', 'group-hover:text-primary')}
-                >
-                    {title}
-                </span>
+                <span className="card-title">{title}</span>
 
-                {postTitle ? (
-                    <span className={tcls('text-xs', 'text-base')}>{postTitle}</span>
-                ) : null}
+                {postTitle ? <span className="card-posttitle">{postTitle}</span> : null}
             </span>
-            <Icon
-                icon="chevron-right"
-                className={tcls(
-                    'size-3',
-                    'text-tint',
-                    'transition-all',
-                    'group-hover:translate-x-0.5',
-                    'group-hover:text-primary'
-                )}
-            />
+            <Icon icon="chevron-right" className="card-chevron" />
         </Link>
     );
 }

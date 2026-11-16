@@ -10,15 +10,15 @@ import type {
 import type { DocumentContextProps } from './DocumentView';
 import { Inlines } from './Inlines';
 import { getCommentAnchorProps } from './utils';
+import { type ClassValue, cx } from '@/lib/classnames';
 import { getNodeFragmentByName, isNodeEmpty } from '@/lib/document';
-import { type ClassValue, tcls } from '@/lib/tailwind';
 
 export type CaptionAlign = NonNullable<DocumentBlockImages['data']['align']>;
 
 const captionAlignStyles = {
-    center: 'mx-auto',
-    left: 'mr-auto ml-0',
-    right: 'mr-0 ml-auto',
+    center: 'gb-caption-center',
+    left: 'gb-caption-left',
+    right: 'gb-caption-right',
 } satisfies Record<CaptionAlign, ClassValue>;
 
 /**
@@ -51,17 +51,10 @@ export function Caption(
         withBorder = false,
         withFrame = false,
         wrapperStyle = [
-            'relative',
-            'overflow-hidden',
-            'after:block',
-            'after:absolute',
-            'after:-inset-0',
-            'after:pointer-events-none',
-            fit ? 'w-fit' : null,
-            withBorder
-                ? 'rounded-corners:rounded-sm circular-corners:rounded-2xl after:border-tint-subtle after:border after:rounded circular-corners:after:rounded-2xl rounded-corners:after:rounded-sm dark:after:mix-blend-plus-lighter after:pointer-events-none'
-                : null,
-            withFrame && 'p-2',
+            'gb-caption-media',
+            fit && 'gb-caption-fit',
+            withBorder && 'gb-caption-bordered',
+            withFrame && 'gb-caption-framed',
         ],
         style,
         align = 'center',
@@ -79,23 +72,16 @@ export function Caption(
         isNodeEmpty(captionParagraph)
     ) {
         return (
-            <div {...anchorProps} className={tcls(style, wrapperStyle)}>
+            <div {...anchorProps} className={cx(style, wrapperStyle)}>
                 {children}
             </div>
         );
     }
 
     return (
-        <picture {...anchorProps} className={tcls('relative', style)}>
-            <div className={tcls(wrapperStyle, captionAlignStyles[align])}>{children}</div>
-            <figcaption
-                className={tcls(
-                    'text-xs',
-                    'text-center',
-                    'text-tint',
-                    withFrame ? 'mt-0.5 mb-2.5' : 'mt-2'
-                )}
-            >
+        <picture {...anchorProps} className={cx('gb-caption', style)}>
+            <div className={cx(wrapperStyle, captionAlignStyles[align])}>{children}</div>
+            <figcaption className={cx('gb-caption-text', withFrame && 'gb-caption-text-framed')}>
                 <Inlines
                     nodes={captionParagraph.nodes}
                     document={document}

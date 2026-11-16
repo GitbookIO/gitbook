@@ -8,13 +8,12 @@ import type { ClientTOCPageDocument } from './encodeClientTableOfContents';
 import { PagesList } from './PagesList';
 import { TOCPageIcon } from './TOCPageIcon';
 import { ToggleableLinkItem } from './ToggleableLinkItem';
-import { tcls } from '@/lib/tailwind';
 
 export function PageDocumentItem(props: { page: ClientTOCPageDocument }) {
     const { page } = props;
 
     return (
-        <li className="page-document-item flex flex-col [.page-group-item+&]:mt-4">
+        <li className="page-document-item">
             <ToggleableLinkItem
                 href={page.href ?? '#'}
                 pathnames={page.pathnames}
@@ -27,24 +26,14 @@ export function PageDocumentItem(props: { page: ClientTOCPageDocument }) {
                 }}
                 descendants={
                     page.descendants && page.descendants.length > 0 ? (
-                        <PagesList
-                            pages={page.descendants}
-                            style={tcls(
-                                'ml-5',
-                                'my-2',
-                                'border-tint-subtle',
-                                'sidebar-list-default:border-l',
-                                'sidebar-list-line:border-l',
-                                'break-anywhere'
-                            )}
-                        />
+                        <PagesList pages={page.descendants} style="toc-list-nested" />
                     ) : null
                 }
                 icon={<TOCPageIcon page={page} />}
                 tag={page.primaryTag ? <Tag tag={page.primaryTag} /> : null}
             >
                 {page.openAPIOperation ? (
-                    <span className="flex h-[1lh] w-9 shrink-0 self-baseline">
+                    <span className="toclink-method">
                         <OpenAPIMethodBadge
                             method={page.openAPIOperation.method}
                             short

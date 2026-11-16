@@ -3,7 +3,7 @@
 import { PageIcon } from '../PageIcon';
 import { StyledLink } from '../primitives';
 import { DropdownMenu, DropdownMenuItem } from '../primitives/DropdownMenu';
-import { type ClassValue, tcls } from '@/lib/tailwind';
+import { type ClassValue, cx } from '@/lib/classnames';
 
 export type BreadcrumbSibling = {
     id: string;
@@ -46,10 +46,7 @@ export function BreadcrumbItemDropdown(props: {
     const content = (
         <>
             {emoji || icon ? (
-                <PageIcon
-                    page={{ emoji, icon }}
-                    style="mb-0.5 mr-1 inline-block size-[1em] shrink-0"
-                />
+                <PageIcon page={{ emoji, icon }} style="page-breadcrumbs-icon" />
             ) : null}
             {label}
         </>
@@ -60,13 +57,11 @@ export function BreadcrumbItemDropdown(props: {
     // normalize "" to "/" the way the table of contents does.
     const trigger =
         href !== undefined ? (
-            <StyledLink href={href || '/'} role="link" className={tcls(linkClassName)}>
+            <StyledLink href={href || '/'} role="link" className={cx(linkClassName)}>
                 {content}
             </StyledLink>
         ) : (
-            <span className={tcls(linkClassName, 'cursor-default hover:no-underline')}>
-                {content}
-            </span>
+            <span className={cx(linkClassName, 'page-breadcrumbs-label')}>{content}</span>
         );
 
     // No dropdown when there is nowhere else to go at this level.
@@ -92,7 +87,7 @@ export function BreadcrumbItemDropdown(props: {
                             sibling.emoji || sibling.icon ? (
                                 <PageIcon
                                     page={{ emoji: sibling.emoji, icon: sibling.icon }}
-                                    style="size-3 shrink-0 text-tint-subtle"
+                                    style="page-breadcrumbs-menu-icon"
                                 />
                             ) : undefined
                         }

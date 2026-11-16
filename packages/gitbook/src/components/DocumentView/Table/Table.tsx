@@ -23,6 +23,7 @@ import {
 } from './TableSearch';
 import { ViewCards } from './ViewCards';
 import { ViewGrid, ViewGridHeader } from './ViewGrid';
+import { cx } from '@/lib/classnames';
 import { tcls } from '@/lib/tailwind';
 
 export type { TableRecordKV };
@@ -78,7 +79,7 @@ export function Table(props: BlockProps<DocumentBlockTable>) {
                 {...getCommentAnchorProps(context, block.key)}
                 // Owns clicks inside, e.g. on blocks of a record's own document; cells still win.
                 {...getCommentMarkerProps(context, 'data-comment-block')}
-                className={tcls(style, 'flex flex-col gap-3')}
+                className={cx(tcls(style), 'table-block')}
             >
                 {showSearch ? (
                     <TableSearchInput
@@ -155,7 +156,7 @@ function TableView({
             if (withStickyHeader || withStickyFirstColumn) {
                 return (
                     <StickyViewGrid
-                        className={tcls(style, 'relative mx-auto grid w-full min-w-0')}
+                        className={cx(tcls(style), 'table-view')}
                         stickyHeader={withStickyHeader}
                         tableClassName={tableContainerClassName}
                         header={
@@ -163,7 +164,7 @@ function TableView({
                                 <ViewGridHeader
                                     {...gridProps}
                                     tableClassName={tableContainerClassName}
-                                    className={tcls(
+                                    className={cx(
                                         withStickyHeader
                                             ? [
                                                   'mb-0 border-t border-r border-l',
@@ -184,21 +185,13 @@ function TableView({
             }
 
             return (
-                <div className={tcls(style, 'relative mx-auto grid w-full min-w-0')}>
-                    <div
-                        className={tcls(
-                            'w-full min-w-0 overflow-x-auto overflow-y-hidden overscroll-x-none border-tint-subtle '
-                        )}
-                    >
-                        <div
-                            className={tcls('flex', 'flex-col', tableContainerClassName)}
-                            role="table"
-                        >
+                <div className={cx(tcls(style), 'table-view')}>
+                    <div className="table-scroll">
+                        <div className={cx('table-stack', tableContainerClassName)} role="table">
                             {withHeader ? (
                                 <ViewGridHeader
                                     {...gridProps}
                                     tableClassName={tableContainerClassName}
-                                    className={tableContainerClassName}
                                 />
                             ) : null}
                             <ViewGrid {...gridProps} tableClassName={tableContainerClassName} />

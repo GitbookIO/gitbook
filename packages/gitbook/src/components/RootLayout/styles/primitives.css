@@ -1,0 +1,280 @@
+@layer utilities {
+  /* Button. Rule order mirrors the old `tcls(base, variant, size, active)` merge. */
+  .button {
+    @apply inline-flex items-center align-middle gap-2 rounded-xl straight-corners:rounded-none circular-corners:rounded-3xl border border-tint hover:border-tint-hover disabled:border-tint depth-subtle:shadow-xs hover:depth-subtle:shadow-md focus-visible:depth-subtle:shadow-md active:depth-subtle:shadow-xs shadow-tint/6 dark:shadow-tint-1 not-focus-visible:outline-0 contrast-more-strong:border-tint-12 contrast-more-strong:hover:outline-2 contrast-more-strong:hover:outline-tint-12 contrast-more-strong:hover:border-tint-12 contrast-more-strong:focus-visible:border-tint-12 contrast-more-strong:focus-visible:outline-tint-12 hover:depth-subtle:-translate-y-px focus-visible:depth-subtle:-translate-y-px aria-expanded:depth-subtle:-translate-y-px active:depth-subtle:translate-y-0 transition-all grow-0 shrink-0 truncate max-w-full disabled:cursor-not-allowed disabled:translate-y-0! disabled:shadow-none!;
+
+    /* Plain, not `leading-normal`: its `--tw-leading` would override a caller's `text-sm` line height, which twMerge used to drop. */
+    line-height: 1.5;
+  }
+
+  /* `contrast-more-strong:border-tint-12` is repeated: as a variant utility it used to sort after `border-primary-original`. */
+  .button-primary {
+    @apply bg-primary-original text-contrast-primary-original hover:not-disabled:bg-primary-solid-hover hover:not-disabled:border-primary-solid-hover hover:not-disabled:text-contrast-primary-solid-hover border-primary-original contrast-more-strong:border-tint-12 contrast-more-strong:bg-primary-solid contrast-more-strong:text-contrast-primary-solid disabled:border-primary-2 disabled:bg-primary-subtle disabled:text-primary/8;
+  }
+
+  .button-blank {
+    @apply bg-transparent text-tint border-0 contrast-more-strong:border shadow-none! translate-y-0! hover:not-disabled:bg-tint-hover hover:not-disabled:text-tint-strong focus-visible:bg-tint-hover focus-visible:text-tint-strong aria-expanded:bg-tint-hover aria-expanded:text-tint-strong contrast-more-strong:bg-tint-subtle disabled:text-tint/8 disabled:bg-transparent;
+  }
+
+  .button-secondary {
+    @apply bg-tint depth-flat:bg-tint-base text-tint hover:bg-tint-hover hover:not-disabled:depth-flat:bg-tint-hover hover:not-disabled:text-tint contrast-more-strong:bg-tint-subtle disabled:bg-transparent disabled:text-tint/8;
+  }
+
+  .button-header {
+    @apply bg-tint-base text-tint hover:theme-clean:bg-tint-subtle theme-bold:bg-header-link/1 theme-bold:text-header-link theme-bold:shadow-none! theme-bold:border-header-link/4 hover:theme-bold:bg-header-link/2 hover:theme-bold:text-header-link hover:theme-bold:shadow-none hover:theme-bold:border-header-link/5 contrast-more-strong:theme-bold:bg-header-background contrast-more-strong:theme-bold:text-header-link contrast-more-strong:theme-bold:border-header-link contrast-more-strong:hover:theme-bold:border-header-link;
+  }
+
+  /* `:where` keeps the old utility specificity for the horizontal padding dropped on icon-only buttons. */
+  .button-large {
+    @apply font-semibold p-3;
+    &:where(:not(.button-icon-only)) {
+      @apply px-5;
+    }
+  }
+
+  .button-medium {
+    @apply p-2;
+    &:where(:not(.button-icon-only)) {
+      @apply px-4;
+    }
+  }
+
+  .button-small {
+    @apply p-1.5 text-sm/normal;
+    &:where(:not(.button-icon-only)) {
+      @apply px-3;
+    }
+  }
+
+  .button-xsmall {
+    @apply p-1 text-sm/tight rounded-corners:rounded-lg;
+    &:where(:not(.button-icon-only)) {
+      @apply px-2;
+    }
+  }
+
+  /*
+   * Active state, after sizes so `font-medium` beats `font-semibold`. `:where` keeps the old
+   * specificity, so e.g. `hover:not-disabled:bg-tint-hover` still wins over the active hover.
+   * Variant `contrast-more-strong:` colors are repeated where they used to sort after the active color.
+   */
+  .button-primary:where([data-active="true"], [aria-pressed="true"]) {
+    @apply bg-primary-solid-hover contrast-more-strong:bg-primary-solid;
+  }
+
+  .button-blank:where([data-active="true"], [aria-pressed="true"]) {
+    @apply bg-primary-active contrast-more-strong:bg-primary-12 contrast-more-strong:text-contrast-primary-12 disabled:bg-primary-active text-primary-strong font-medium hover:text-primary-strong disabled:text-primary-strong hover:bg-primary-active focus-visible:bg-primary-active focus-visible:text-primary-strong aria-expanded:bg-primary-active aria-expanded:text-primary-strong;
+  }
+
+  .button-secondary:where([data-active="true"], [aria-pressed="true"]) {
+    @apply bg-tint-active contrast-more-strong:bg-tint-subtle disabled:bg-tint-active;
+  }
+
+  .button-header:where([data-active="true"], [aria-pressed="true"]) {
+    @apply bg-header-link/3;
+  }
+
+  .button-leading-icon {
+    @apply shrink-0;
+  }
+
+  .button-content-wrap {
+    @apply whitespace-normal text-start;
+  }
+
+  .button-trailing-icon {
+    @apply ms-auto;
+  }
+
+  .button-group {
+    @apply *:translate-y-0! *:shadow-none! [&>*:not(:first-child)]:border-l-0;
+  }
+
+  /* Link */
+  .link {
+    /* The underline is proportional to the font size, with a minimum: the default is too thin. */
+    @apply underline decoration-[max(0.07em,1px)] underline-offset-2 links-accent:underline-offset-4 links-default:decoration-primary/6 links-default:text-primary-subtle hover:links-default:text-primary-strong contrast-more-strong:links-default:text-primary contrast-more-strong:hover:links-default:text-primary-strong links-accent:decoration-primary-subtle hover:links-accent:decoration-[3px] hover:links-accent:[text-decoration-skip-ink:none] transition-all duration-100;
+  }
+
+  .link-overlay {
+    @apply absolute inset-0 z-10;
+  }
+
+  /* Card */
+  .card {
+    @apply flex flex-row justify-between items-center gap-4 ring-1 ring-tint-subtle rounded-sm straight-corners:rounded-none circular-corners:rounded-2xl px-5 py-3 transition-shadow hover:ring-primary-hover;
+  }
+
+  .card-body {
+    @apply flex flex-col flex-1;
+  }
+
+  .card-pretitle {
+    @apply uppercase text-xs text-tint;
+  }
+
+  .card-title {
+    @apply text-base transition-colors;
+  }
+
+  .card-posttitle {
+    @apply text-base;
+  }
+
+  .card-chevron {
+    @apply size-3 text-tint transition-all;
+  }
+
+  @media (hover: hover) {
+    .card:hover .card-title {
+      @apply text-primary;
+    }
+    .card:hover .card-chevron {
+      @apply translate-x-0.5 text-primary;
+    }
+  }
+
+  /* ToggleChevron */
+  .toggle-chevron {
+    @apply shrink-0 size-3 transition-all;
+  }
+
+  .toggle-chevron-auto {
+    @apply group-aria-expanded/dropdown:rotate-180 group-data-panel-open/dropdown:rotate-180 group-open:rotate-180;
+  }
+
+  .toggle-chevron-auto-90 {
+    @apply group-aria-expanded/dropdown:rotate-90 group-data-panel-open/dropdown:rotate-90 group-open:rotate-90;
+  }
+
+  .toggle-chevron-dim {
+    @apply opacity-6 group-hover/dropdown:opacity-11;
+  }
+
+  /* KeyboardShortcut */
+  .shortcut {
+    @apply flex not-pointer-fine:hidden justify-end gap-0.5 whitespace-nowrap text-tint text-xs [font-feature-settings:"calt","case"] contrast-more-strong:text-tint-strong;
+  }
+
+  .shortcut-key {
+    @apply flex h-5 min-w-5 items-center justify-center rounded-md border border-tint-subtle px-1;
+  }
+
+  .shortcut-key-mod {
+    @apply text-xs [html.os-mac_&]:text-sm;
+  }
+
+  .shortcut-mac {
+    @apply hidden [html.os-mac_&]:inline;
+  }
+
+  .shortcut-ctrl {
+    @apply inline [html.os-mac_&]:hidden;
+  }
+
+  .shortcut-icon {
+    @apply size-[.9em];
+  }
+
+  .tooltip {
+    @apply max-w-xs circular-corners:rounded-2xl rounded-corners:rounded-md bg-tint-12 px-2 py-1 text-contrast-tint-12 text-sm data-closed:animate-scale-out data-open:animate-scale-in;
+  }
+
+  .side-sheet-overlay {
+    @apply fixed inset-0 z-40 items-start bg-tint-base/3 not-hydrated:opacity-0 starting:opacity-0 backdrop-blur-md starting:backdrop-blur-none transition-[opacity,display,backdrop-filter] transition-discrete duration-250 dark:bg-tint-base/6;
+  }
+
+  /* ScrollContainer */
+  .scroll-container {
+    @apply relative flex shrink grow;
+  }
+
+  .scroll-container-x {
+    @apply min-w-0;
+  }
+
+  .scroll-container-y {
+    @apply min-h-0;
+  }
+
+  /* After the button rules: `hidden` and the transition used to replace `inline-flex` and `transition-all`. */
+  .scroll-container-button {
+    @apply bg-tint-base! absolute z-10 not-pointer-none:block hidden scale-0 transition-[scale,opacity];
+  }
+
+  .scroll-container-prev-x {
+    @apply -translate-y-1/2! top-1/2 left-0 ml-2 opacity-0;
+  }
+
+  .scroll-container-prev-y {
+    @apply -translate-x-1/2! top-0 left-1/2 mt-2 opacity-0;
+  }
+
+  .scroll-container-next-x {
+    @apply -translate-y-1/2! top-1/2 right-0 mr-2;
+  }
+
+  .scroll-container-next-y {
+    @apply -translate-x-1/2! bottom-0 left-1/2 mb-2;
+  }
+
+  @media not (pointer: none) {
+    @media (hover: hover) {
+      .scroll-container:hover .scroll-container-button-shown {
+        @apply scale-100 opacity-11;
+      }
+    }
+  }
+
+  /* Input. `:where` keeps the specificity the utilities had before. */
+  .input-box {
+    @apply relative flex min-h-min overflow-hidden border border-tint bg-tint-base align-middle shadow-tint/6 ring-primary-hover transition-all dark:shadow-tint-1 flex-row;
+    &:where(:not(.input-box-disabled)) {
+      @apply depth-subtle:focus-within:-translate-y-px depth-subtle:hover:not-has-[button:hover]:-translate-y-px depth-subtle:shadow-xs focus-within:border-primary-hover focus-within:depth-subtle:shadow-lg focus-within:shadow-primary-subtle focus-within:ring-2 forced-colors:focus-within:outline-2 hover:not-has-[button:hover]:cursor-text hover:not-has-[button:hover]:border-tint-hover hover:not-has-[button:hover]:not-focus-within:bg-tint-subtle depth-subtle:hover:not-has-[button:hover]:not-focus-within:shadow-md focus-within:hover:not-has-[button:hover]:border-primary-hover;
+    }
+    &:where(.input-box-multiline) {
+      @apply flex-col;
+    }
+  }
+
+  .input-box-disabled {
+    @apply cursor-not-allowed border-tint-subtle bg-tint-subtle text-tint/8;
+  }
+
+  /* Size classes are shared with the multiline shortcut slot, which mirrors the container padding. */
+  .input-box-small {
+    @apply px-2.5 py-1.5 text-sm gap-1.5 circular-corners:rounded-3xl rounded-corners:rounded-xl;
+    &:where(.input-box-multiline) {
+      @apply p-1.5;
+    }
+  }
+
+  .input-box-medium {
+    @apply px-3 py-2 gap-2 circular-corners:rounded-3xl rounded-corners:rounded-xl;
+    &:where(.input-box-multiline) {
+      @apply p-2;
+    }
+  }
+
+  .input-box-large {
+    @apply px-3.5 py-3 gap-3 circular-corners:rounded-3xl rounded-corners:rounded-xl;
+    &:where(.input-box-multiline) {
+      @apply p-3;
+    }
+  }
+
+  .input-box-shortcut {
+    @apply absolute right-0 top-0;
+  }
+
+  /* `aria-busy` must not change the cursor: a busy field can still be editable. */
+  .input-field {
+    @apply max-h-64 grow shrink resize-none leading-normal text-left outline-none placeholder-shown:text-ellipsis;
+    /*
+     * Styling `::placeholder` from an ancestor variant costs a full-document restyle, so callers
+     * set this variable on the container instead. It must stay a `var()` fallback rather than a
+     * declaration here, or the input would shadow the inherited override.
+     */
+    @apply placeholder:text-[var(--input-placeholder,color-mix(in_oklab,rgb(var(--tint-11))_72%,transparent))];
+  }
+}

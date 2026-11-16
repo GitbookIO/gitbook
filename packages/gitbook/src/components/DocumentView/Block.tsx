@@ -34,7 +34,7 @@ import {
     SkeletonParagraph,
     SkeletonUpdate,
 } from '@/components/primitives';
-import type { ClassValue } from '@/lib/tailwind';
+import type { ClassValue } from '@/lib/classnames';
 import { nullIfNever } from '@/lib/typescript';
 
 export interface BlockProps<Block extends DocumentBlock> extends DocumentContextProps {

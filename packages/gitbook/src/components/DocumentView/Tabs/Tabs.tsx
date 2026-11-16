@@ -41,7 +41,7 @@ export function Tabs(props: BlockProps<DocumentBlockTabs>) {
                     ancestorBlocks={[...ancestorBlocks, block, tab]}
                     context={context}
                     blockStyle="flip-heading-hash"
-                    style="w-full space-y-4"
+                    style="tabs-panel-blocks"
                 />
             ),
         };

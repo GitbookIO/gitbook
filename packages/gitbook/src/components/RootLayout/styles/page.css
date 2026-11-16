@@ -1,0 +1,296 @@
+@layer utilities {
+    /* Shared layout constants (`components/layout.ts`); grouped with the elements that combine them. */
+    .site-container,
+    .space-layout-body {
+        @apply px-4 pl-[max(env(safe-area-inset-left),1rem)] pr-[max(env(safe-area-inset-right),1rem)] sm:px-6 sm:pl-[max(env(safe-area-inset-left),1.5rem)] sm:pr-[max(env(safe-area-inset-right),1.5rem)] md:px-8 md:pl-[max(env(safe-area-inset-left),2rem)] md:pr-[max(env(safe-area-inset-right),2rem)] max-w-screen-2xl mx-auto;
+    }
+
+    .page-content-width,
+    .page-main,
+    .page-header,
+    .page-meta,
+    .page-nav,
+    .page-blankslate {
+        @apply max-w-3xl layout-wide:max-w-6xl mx-auto w-full;
+    }
+
+    .page-content-reduced,
+    .page-description {
+        @apply max-w-3xl w-full;
+    }
+
+    .page-cover-height {
+        height: 240px;
+    }
+
+    .side-column-header {
+        top: 64px;
+        height: calc(100vh - 64px);
+    }
+    .side-column-header-cover {
+        top: 304px;
+        height: calc(100vh - 304px);
+    }
+    .side-column {
+        @apply top-0 h-screen;
+    }
+    .side-column-cover {
+        top: 240px;
+        height: calc(100vh - 240px);
+    }
+
+    /* SpaceLayout */
+    .space-layout {
+        @apply overflow-x-clip lg:chat-open:mr-(--ai-chat-width) motion-safe:transition-all motion-safe:duration-300;
+    }
+    .space-layout-body {
+        @apply flex flex-col lg:flex-row lg:justify-center transition-[max-width] duration-300 motion-reduce:transition-none;
+    }
+    .space-layout-body-header {
+        @apply site-header:min-h-[calc(100dvh-65px)] site-header-sections:min-h-[calc(100dvh-109px)];
+    }
+    .space-layout-body-no-header {
+        @apply lg:min-h-screen;
+    }
+    /* On bold themes the TOC header takes the header color so the logo looks correct. */
+    .space-layout-toc-header {
+        @apply pr-4 flex grow-0 text-base/tight items-center site-header:theme-bold:bg-header-background site-header:theme-bold:m-[-1.5rem_-1px_-0.5rem_-2rem] site-header:theme-bold:p-[1rem_1rem_1rem_2rem];
+    }
+    .space-layout-toc-header-mobile {
+        @apply lg:hidden;
+    }
+    .space-layout-toc-inner {
+        @apply my-5 sidebar-default:mt-2 flex flex-col gap-2 px-5 empty:hidden;
+    }
+    .space-layout-toc-inner-mobile {
+        @apply max-lg:hidden;
+    }
+    .space-layout-toc-search {
+        @apply flex gap-2 max-lg:hidden;
+    }
+
+    /* SitePage */
+    .site-page-cover {
+        @apply relative flex grow flex-col;
+    }
+    .site-page-row {
+        @apply flex grow flex-row;
+    }
+    .site-page-scroll {
+        @apply [--content-scroll-margin:calc(var(--spacing)*16)];
+    }
+    .site-page-scroll-sections {
+        @apply [--content-scroll-margin:calc(var(--spacing)*27)];
+    }
+
+    /* PageBody. Flex column so the growing content wrapper fills the page; the bottom padding keeps the minimised trademark clear. */
+    .page-main {
+        @apply relative min-w-0 flex-1 break-anywhere py-8 layout-wide:no-sidebar:lg:max-xl:pb-20 @container flex flex-col;
+    }
+    .page-meta {
+        @apply mt-6 flex flex-row flex-wrap items-center gap-4 text-tint contrast-more-strong:text-tint-strong;
+    }
+    .page-meta-date {
+        @apply mr-auto text-sm;
+    }
+
+    /* PageHeader */
+    .page-header {
+        @apply mb-6 space-y-3 after:clear-both after:block;
+    }
+    .page-header-actions {
+        @apply float-right ml-4 flex gap-2;
+        &:where(:not(.page-header-actions-solo)) {
+            @apply -mb-1 -mt-1.5;
+        }
+        /* Without breadcrumbs the actions sit level with the title. */
+        &:where(.page-header-actions-solo) {
+            @apply -mt-3 xs:mt-2;
+        }
+        &.page-header-actions-api {
+            @apply page-api-block:lg:sticky page-api-block:lg:top-[calc(var(--toc-top-offset,4rem)+1rem)] page-api-block:lg:z-20 lg:max-[96rem]:[body.outline-open:has(.openapi-block)_&]:hidden;
+        }
+    }
+    .page-breadcrumbs {
+        @apply page-cover-background:text-contrast-cover flow-root text-xs leading-relaxed text-tint layout-wide:page-no-toc:hidden page-cover-background:opacity-9;
+        & > ol,
+        & > ol > li {
+            @apply inline;
+        }
+    }
+    /* Comes after `.link` (primitives.css) so `no-underline` replaces its underline, as twMerge did. */
+    .page-breadcrumbs-link {
+        @apply inline no-underline hover:underline text-xs font-normal items-center contrast-more-strong:underline contrast-more-strong:decoration-current;
+    }
+    /* Section groups have no URL. */
+    .page-breadcrumbs-label {
+        @apply cursor-default hover:no-underline;
+    }
+    .page-breadcrumbs-sep {
+        @apply mx-2 inline-flex size-2 text-tint-subtle;
+    }
+    .page-title {
+        @apply text-2xl @xs:text-3xl @lg:text-4xl leading-tight font-heading font-bold flex items-center gap-[.5em] grow text-pretty clear-right xs:clear-none page-cover-background:text-contrast-cover;
+    }
+    .page-description {
+        @apply text-lg page-cover-background:text-contrast-cover text-tint contrast-more-strong:text-tint-strong clear-both;
+    }
+
+    /* PageIcon: size first, so the more specific icon classes below override it. */
+    .page-icon {
+        @apply size-[1em];
+    }
+    .page-title-icon {
+        @apply text-tint-subtle shrink-0;
+    }
+    .page-breadcrumbs-icon {
+        @apply mb-0.5 mr-1 inline-block size-[1em] shrink-0;
+    }
+    .page-breadcrumbs-menu-icon {
+        @apply size-3 shrink-0 text-tint-subtle;
+    }
+
+    /* PageCover */
+    .page-cover {
+        @apply overflow-hidden;
+        /* Negative margins cancel the container padding; full covers also extend past the TOC and outline where possible. */
+        &[data-cover-type="full"],
+        &[data-cover-type="background"] {
+            @apply -mx-4 sm:-mx-6 md:-mx-8 lg:-ml-12 layout-default:page-no-toc:lg:-ml-92 layout-wide:2xl:-mr-[clamp(2rem,calc((100vw-90rem)/2+2rem),18rem)] layout-wide:page-no-toc:2xl:-mx-[max(calc((100vw-90rem)/2+2rem),2rem)] layout-wide:has-sidebar:page-no-toc:lg:-ml-[max(calc((100vw-90rem)/2+23rem),23rem)] layout-default:2xl:rounded-corners:rounded-b-xl layout-default:2xl:circular-corners:rounded-b-3xl layout-wide:3xl:circular-corners:rounded-b-3xl layout-wide:3xl:rounded-corners:rounded-b-xl has-sidebar:lg:rounded-corners:rounded-bl-xl has-sidebar:lg:circular-corners:rounded-bl-3xl;
+        }
+        &[data-cover-type="background"] {
+            @apply -z-1 absolute inset-x-0 contrast-more-strong:opacity-5 *:contrast-more-strong:blur-md;
+        }
+        /* The hero's `-mx-4` was dropped by twMerge in favour of the content `mx-auto`. */
+        &[data-cover-type="hero"] {
+            @apply max-w-3xl layout-wide:max-w-6xl mx-auto w-full max-sm:-mx-4 sm:rounded-corners:rounded-xl sm:circular-corners:rounded-3xl mb-8 max-sm:w-screen max-sm:-mt-8;
+        }
+    }
+    .page-cover-loading {
+        @apply h-full w-full overflow-hidden;
+    }
+    .page-cover-frame {
+        @apply h-full w-full overflow-hidden @container;
+    }
+    .page-cover-skeleton {
+        @apply h-full w-full animate-pulse bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900;
+    }
+    .page-cover-img {
+        @apply w-full object-cover;
+    }
+    .page-cover-img-light {
+        @apply dark:hidden;
+    }
+    .page-cover-img-dark {
+        @apply dark:inline hidden;
+    }
+
+    /* PageFooterNavigation */
+    .page-nav {
+        @apply mt-6 flex @xl:flex-row flex-col gap-3 text-tint;
+    }
+    .page-nav-card {
+        @apply flex flex-1 items-center @xl:gap-3 gap-2 text-pretty circular-corners:rounded-2xl rounded-corners:rounded-xl border border-tint-subtle @xl:p-4 p-3 @xl:text-base text-sm text-tint outline-tint-12 transition-colors hover:border-primary-hover contrast-more-strong:border-tint-12 contrast-more-strong:text-tint-strong contrast-more-strong:hover:border-primary-12 contrast-more-strong:hover:outline-2 text-start;
+        &.page-nav-next {
+            @apply flex-row-reverse text-end;
+        }
+    }
+    .page-nav-body {
+        @apply flex flex-col;
+    }
+    .page-nav-label {
+        @apply flex items-center gap-1 text-xs flex-row;
+        .page-nav-next & {
+            @apply flex-row-reverse;
+        }
+    }
+    .page-nav-title {
+        @apply line-clamp-2 leading-snug text-tint-strong transition-colors;
+        @media (hover: hover) {
+            .page-nav-card:hover & {
+                @apply text-primary contrast-more-strong:text-primary-strong;
+            }
+        }
+    }
+
+    /* PageBodyBlankslate */
+    .page-blankslate-icon {
+        @apply text-base text-tint;
+    }
+    .page-blankslate {
+        @apply grid gap-4 grid-cols-1 sm:grid-cols-2 md:layout-wide:grid-cols-3;
+    }
+
+    /* PageFeedback */
+    .page-feedback {
+        @apply flex flex-col gap-3 text-sm;
+    }
+    .page-feedback-row {
+        @apply flex flex-wrap items-center gap-2;
+    }
+    .page-feedback-thanks {
+        @apply animate-blur-in-display-slow flex items-center gap-1 p-1.5 text-success-subtle;
+    }
+
+    /* PageAside. Position, top and z-index stay as utilities in the TSX: they must beat SideSheet's `fixed inset-y-0 z-41`.
+       The background is only added where the outline is an overlay, so a bleeding cards carousel can scroll behind the permanent column. */
+    .page-aside {
+        @apply order-last w-64 lg:max-h-screen lg:site-header:max-h-[calc(100vh-4rem)] lg:site-header-sections:max-h-[calc(100vh-6.75rem)] lg:[html[style*="--outline-top-offset"]_&]:top-(--outline-top-offset)! lg:[html[style*="--outline-height"]_&]:max-h-(--outline-height)! layout-default:max-xl:border-l layout-wide:max-3xl:border-l border-tint-subtle p-4 pt-8 ml-4 break-anywhere layout-default:xl:chat-closed:pr-0 layout-default:xl:chat-closed:pl-8 layout-default:xl:chat-closed:flex! layout-default:xl:chat-closed:animate-none! layout-default:3xl:flex! layout-default:3xl:animate-none! layout-wide:xl:-mr-68 layout-wide:3xl:chat-closed:flex! layout-wide:3xl:chat-closed:animate-none! page-api-block:page-has-outline:min-[96rem]:max-3xl:-mr-[max(calc((100vw-90rem)/2),0rem)] page-api-block:page-has-outline:min-[96rem]:flex! page-api-block:page-has-outline:min-[96rem]:animate-none! page-api-block:page-has-outline:min-[96rem]:border-l-0 page-api-block:page-has-outline:min-[96rem]:pl-8 max-xl:hydrated:site-background layout-wide:max-3xl:hydrated:site-background text-tint contrast-more-strong:text-tint-strong;
+    }
+    .page-aside-inner {
+        @apply flex h-full w-full shrink-0 flex-col overflow-hidden;
+    }
+    .page-aside-header {
+        @apply mb-3 ml-3 flex page-no-outline:hidden items-center justify-between max-lg:hidden;
+    }
+    .page-aside-header-tags {
+        @apply mt-4;
+    }
+    .page-aside-title {
+        @apply xl:page-cover-background:text-contrast-cover flex cursor-pointer items-center gap-1 text-xs font-semibold uppercase text-tint;
+    }
+    .page-aside-scroll {
+        @apply flex shrink flex-col overflow-hidden;
+    }
+    .page-aside-outline {
+        @apply overflow-y-auto;
+    }
+    .page-aside-actions {
+        @apply flex flex-col gap-3 border-tint-subtle border-t first:border-none sidebar-list-default:px-3 pt-5 first:pt-0 empty:hidden;
+    }
+    .page-aside-footer {
+        @apply sticky bottom-0 z-10 mt-auto flex flex-col border-tint-subtle pt-4;
+    }
+    .page-aside-theme {
+        @apply flex items-center justify-end;
+    }
+
+    /* ScrollSectionsList (one item per heading) */
+    .page-outline {
+        @apply relative flex flex-col border-tint-subtle pb-5 sidebar-list-line:border-l;
+    }
+    .page-outline-item {
+        @apply flex flex-row relative h-fit mt-2 first:mt-0 mb-0.5;
+        /* twMerge let the sub-item `my-0` drop `mt-2 mb-0.5`. */
+        &:has(> .subitem) {
+            @apply ml-3 my-0 sidebar-list-line:ml-0;
+        }
+    }
+    .page-outline-link {
+        @apply relative z-10 text-sm w-full py-1 px-3 transition-all motion-reduce:transition-none duration-200 rounded-md straight-corners:rounded-none circular-corners:rounded-2xl sidebar-list-line:rounded-l-none! hover:bg-tint-hover theme-gradient:hover:bg-tint-12/1 hover:text-tint-strong contrast-more-strong:hover:ring-1 contrast-more-strong:hover:ring-inset contrast-more-strong:hover:ring-current sidebar-list-line:border-l-2 border-transparent sidebar-list-line:-left-px xl:page-cover-background:text-contrast-cover;
+        /* OpenAPI operations show a method badge before the title. */
+        &:has(> .openapi-method) {
+            @apply flex items-baseline gap-2;
+        }
+        &.subitem {
+            @apply sidebar-list-line:pl-6 opacity-8 contrast-more-strong:opacity-11 sidebar-list-default:rounded-l-none! sidebar-list-default:border-l sidebar-list-default:border-tint;
+        }
+        /* The extra attribute specificity reproduces twMerge dropping the base hover colors. */
+        &[aria-current="true"] {
+            @apply text-primary-subtle hover:text-primary contrast-more-strong:text-primary contrast-more-strong:hover:text-primary-strong hover:bg-primary-hover theme-muted:hover:bg-primary-active [html.sidebar-filled.theme-bold.tint_&]:hover:bg-primary-active theme-gradient:hover:bg-primary-active tint:font-semibold contrast-more-strong:font-semibold sidebar-list-line:border-primary-9 sidebar-list-default:border-tint sidebar-list-pill:bg-primary [html.theme-muted.sidebar-list-pill_&]:bg-primary-hover [html.theme-gradient.sidebar-list-pill_&]:bg-primary-active;
+        }
+    }
+    .page-outline-deprecated {
+        @apply line-through opacity-50 contrast-more-strong:opacity-60;
+    }
+}

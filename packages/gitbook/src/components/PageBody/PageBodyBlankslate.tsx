@@ -4,12 +4,10 @@ import {
     SiteInsightsLinkPosition,
 } from '@gitbook/api';
 
-import { CONTENT_STYLE } from '../layout';
 import { PageIcon } from '../PageIcon';
 import { Card } from '@/components/primitives';
 import type { GitBookAnyContext } from '@/lib/context';
 import { resolveContentRef } from '@/lib/references';
-import { tcls } from '@/lib/tailwind';
 
 /**
  * Blankslate when the page has no document or the document is empty.
@@ -29,7 +27,7 @@ export async function PageBodyBlankslate(props: {
 
     const pageElements = await Promise.all(
         pages.map(async (child) => {
-            const icon = <PageIcon page={child} style={['text-base', 'text-tint']} />;
+            const icon = <PageIcon page={child} style="page-blankslate-icon" />;
 
             if (child.type === RevisionPageType.Computed) {
                 throw new Error(
@@ -73,18 +71,5 @@ export async function PageBodyBlankslate(props: {
         })
     );
 
-    return (
-        <div
-            className={tcls(
-                CONTENT_STYLE,
-                'grid',
-                'gap-4',
-                'grid-cols-1',
-                'sm:grid-cols-2',
-                'md:layout-wide:grid-cols-3'
-            )}
-        >
-            {pageElements}
-        </div>
-    );
+    return <div className="page-blankslate">{pageElements}</div>;
 }

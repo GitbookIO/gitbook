@@ -4,11 +4,11 @@ import { validateIconName } from '@gitbook/icons/icons';
 
 import { Block, type BlockProps } from './Block';
 import { Blocks } from './Blocks';
-import { getBlockTextStyle } from './spacing';
+import { BLOCK_LINE_HEIGHT, getBlockTextKind } from './spacing';
 import { getSpaceLanguage, tString } from '@/intl/server';
 import { defaultLanguage } from '@/intl/translations';
+import { type ClassValue, cx } from '@/lib/classnames';
 import { isHeadingBlock } from '@/lib/document';
-import { type ClassValue, tcls } from '@/lib/tailwind';
 
 export async function Hint({
     block,
@@ -22,7 +22,7 @@ export async function Hint({
     const icon = customIcon && validateIconName(customIcon) ? customIcon : hintStyle.icon;
 
     const firstNode = block.nodes[0]!;
-    const firstLine = getBlockTextStyle(firstNode);
+    const firstLineHeight = BLOCK_LINE_HEIGHT[getBlockTextKind(firstNode)];
     const hasHeading = isHeadingBlock(firstNode);
 
     const language = contextProps.context.contentContext
@@ -33,42 +33,25 @@ export async function Hint({
 
     return (
         <div
-            className={tcls(
+            className={cx(
                 'hint',
-                'transition-colors',
-                'rounded-corners:rounded-md',
-                'circular-corners:rounded-xl',
-                hasHeading ? 'circular-corners:rounded-l-none rounded-corners:rounded-l-none' : '',
-                'overflow-hidden',
-                hasHeading ? ['border-l-2', hintStyle.containerWithHeader] : hintStyle.container,
-
-                'text-sm',
-
-                'grid',
-                'grid-cols-[auto_1fr]',
-                hasHeading ? 'grid-rows-[auto_auto]' : '',
-
+                hasHeading && 'hint-titled',
+                // Kept as utilities: `AskAIParagraphButton` matches `.hint.bg-*`.
+                hasHeading ? hintStyle.containerWithHeader : hintStyle.container,
                 style
             )}
             aria-label={label}
             role="note"
         >
-            <div
-                className={tcls(
-                    'py-4',
-                    'pl-4',
-                    hasHeading ? hintStyle.header : null,
-                    hintStyle.iconColor
-                )}
-            >
-                <Icon icon={icon} className={tcls('size-[1.2em]', 'mt-px', firstLine.lineHeight)} />
+            <div className={cx('hint-aside', hasHeading && hintStyle.header, hintStyle.iconColor)}>
+                <Icon icon={icon} className={cx('hint-icon', firstLineHeight)} />
             </div>
             {hasHeading ? (
                 <Block
-                    style={tcls(
-                        'w-full items-start py-4! pl-3 text-[1em]! *:flex-none',
-                        // Heading hash styles
-                        'flip-heading-hash pr-8 [&_.hash]:bg-transparent',
+                    style={cx(
+                        'hint-heading flip-heading-hash',
+                        // A utility, to beat the themed backgrounds of `.hash`.
+                        '[&_.hash]:bg-transparent',
                         hintStyle.header
                     )}
                     ancestorBlocks={[...ancestorBlocks, block]}
@@ -80,27 +63,13 @@ export async function Hint({
                 {...contextProps}
                 ancestorBlocks={[...ancestorBlocks, block]}
                 nodes={hasHeading ? block.nodes.slice(1) : block.nodes}
-                blockStyle={tcls(
+                blockStyle={cx(
                     hintStyle.body,
                     // render hash icon on the other side of the heading
                     'flip-heading-hash'
                 )}
-                style={[
-                    'p-4',
-                    'pl-3',
-                    'empty:p-0',
-                    '-row-end-1',
-                    '-col-end-1',
-                    // Allow the grid track to shrink below its content's min-content size so wide
-                    // nested blocks (e.g. code blocks, tables) scroll internally instead of
-                    // overflowing the hint. Without this, the `1fr` column keeps its default
-                    // `min-width: auto` and grows past the hint's width.
-                    'min-w-0',
-                    'space-y-3',
-                    '[&_.hint]:border',
-                    '[&_pre]:border',
-                    '[&_pre]:border-neutral',
-                ]}
+                // Descendant rules stay utilities so they keep beating the nested blocks' own classes.
+                style="hint-content [&_.hint]:border [&_pre]:border [&_pre]:border-neutral"
             />
         </div>
     );

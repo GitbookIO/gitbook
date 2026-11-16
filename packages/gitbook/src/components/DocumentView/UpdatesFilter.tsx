@@ -8,7 +8,6 @@ import { Icon } from '@gitbook/icons';
 
 import { TagIcon } from '../Tag';
 import { Button } from '@/components/primitives';
-import { tcls } from '@/lib/tailwind';
 import {
     UPDATES_FILTER_KEY_ATTR,
     UPDATES_FILTER_SEARCH_PARAM,
@@ -171,9 +170,9 @@ export function UpdatesTagFilters(props: {
     }
 
     return (
-        <div className="shrink-0 border-b border-tint-subtle pb-4 pt-px">
-            <div className="mb-3 ml-3 flex items-center justify-between gap-2">
-                <div className="leading-wider flex items-center gap-1 text-xs font-semibold uppercase text-tint">
+        <div className="updates-filter">
+            <div className="updates-filter-header">
+                <div className="updates-filter-label">
                     <Icon icon="tags" className="size-3" />
                     {tagsLabel}
                 </div>
@@ -188,7 +187,7 @@ export function UpdatesTagFilters(props: {
                     className="pointer-events-none invisible text-xs"
                 />
             </div>
-            <div className="flex flex-wrap gap-1.5 px-3">
+            <div className="updates-filter-tags">
                 {tags.map((tag) => (
                     <TagChip key={tag.slug} tag={tag} onToggle={toggleTag} />
                 ))}
@@ -196,12 +195,6 @@ export function UpdatesTagFilters(props: {
         </div>
     );
 }
-
-const CHIP_CLASS =
-    'inline-flex max-w-full rounded-full circular-corners:rounded-2xl straight-corners:rounded-xs not-focus-visible:outline-0 focus-visible:ring-2 focus-visible:ring-primary';
-
-const CHIP_VARIANT_CLASS =
-    'max-w-full items-center gap-1 rounded-full px-2 py-1 font-medium text-xs leading-normal transition-colors circular-corners:rounded-2xl straight-corners:rounded-xs';
 
 function TagChip(props: { tag: RevisionTag; onToggle: (tag: string) => void }) {
     const { tag, onToggle } = props;
@@ -213,34 +206,25 @@ function TagChip(props: { tag: RevisionTag; onToggle: (tag: string) => void }) {
             type="button"
             aria-pressed={selectedTagSet.has(tag.slug)}
             onClick={onClick}
-            className={CHIP_CLASS}
+            className="updates-chip"
         >
             <span
                 {...{ [UPDATES_TAG_CHIP_SELECTED_ATTR]: tag.slug }}
-                className={tcls(
-                    CHIP_VARIANT_CLASS,
-                    'hidden bg-primary-original text-contrast-primary-original hover:bg-primary-solid-hover'
-                )}
+                className="updates-chip-face updates-chip-selected"
             >
                 <TagIcon tag={tag} />
                 <span className="truncate">{tag.label}</span>
             </span>
             <span
                 {...{ [UPDATES_TAG_CHIP_UNSELECTED_DIMMED_ATTR]: tag.slug }}
-                className={tcls(
-                    CHIP_VARIANT_CLASS,
-                    'hidden bg-tint-5 text-tint-strong opacity-8 hover:bg-tint-hover hover:opacity-11'
-                )}
+                className="updates-chip-face updates-chip-dimmed"
             >
                 <TagIcon tag={tag} />
                 <span className="truncate">{tag.label}</span>
             </span>
             <span
                 {...{ [UPDATES_TAG_CHIP_UNSELECTED_PLAIN_ATTR]: tag.slug }}
-                className={tcls(
-                    CHIP_VARIANT_CLASS,
-                    'flex bg-tint-5 text-tint-strong hover:bg-tint-hover'
-                )}
+                className="updates-chip-face updates-chip-plain"
             >
                 <TagIcon tag={tag} />
                 <span className="truncate">{tag.label}</span>

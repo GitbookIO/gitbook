@@ -8,7 +8,6 @@ import { useUpdatesFilter } from '@/components/DocumentView/UpdatesFilter';
 import { useScrollActiveId } from '@/components/hooks';
 import { useBodyLoaded } from '@/components/primitives';
 import type { DocumentSection } from '@/lib/document-sections';
-import { tcls } from '@/lib/tailwind';
 import { UPDATES_TAG_SECTION_ATTR } from '@/lib/updates';
 
 /**
@@ -58,23 +57,11 @@ export function ScrollSectionsList({ sections }: { sections: DocumentSection[] }
     }, [activeId]);
 
     return (
-        <ul
-            className="relative flex flex-col border-tint-subtle pb-5 sidebar-list-line:border-l"
-            ref={scrollContainerRef}
-        >
+        <ul className="page-outline" ref={scrollContainerRef}>
             {sections.map((section) => (
                 <li
                     key={section.id}
-                    className={tcls(
-                        'flex',
-                        'flex-row',
-                        'relative',
-                        'h-fit',
-                        'mt-2',
-                        'first:mt-0',
-                        'mb-0.5',
-                        section.depth > 1 && ['ml-3', 'my-0', 'sidebar-list-line:ml-0']
-                    )}
+                    className="page-outline-item"
                     ref={activeId === section.id ? activeItemRef : null}
                     {...(section.tags !== undefined
                         ? { [UPDATES_TAG_SECTION_ATTR]: section.tags.join(' ') }
@@ -84,71 +71,9 @@ export function ScrollSectionsList({ sections }: { sections: DocumentSection[] }
                         href={`#${section.id}`}
                         aria-current={activeId === section.id ? 'true' : undefined}
                         data-cover-aware-text
-                        className={tcls(
-                            'relative',
-                            'z-10',
-                            'text-sm',
-
-                            'w-full',
-                            'py-1',
-                            'px-3',
-
-                            'transition-all',
-                            'motion-reduce:transition-none',
-                            'duration-200',
-
-                            'rounded-md',
-                            'straight-corners:rounded-none',
-                            'circular-corners:rounded-2xl',
-                            'sidebar-list-line:rounded-l-none!',
-
-                            'hover:bg-tint-hover',
-                            'theme-gradient:hover:bg-tint-12/1',
-                            'hover:text-tint-strong',
-                            'contrast-more:hover:ring-1',
-                            'contrast-more:hover:ring-inset',
-                            'contrast-more:hover:ring-current',
-
-                            'sidebar-list-line:border-l-2',
-                            'border-transparent',
-                            'sidebar-list-line:-left-px',
-                            'xl:page-cover-background:text-contrast-cover',
-
-                            // The method badge no longer has a right margin, so lay the row out with a gap
-                            section.tag && ['flex', 'items-baseline', 'gap-2'],
-
-                            section.depth > 1 && [
-                                'subitem',
-                                'sidebar-list-line:pl-6',
-                                'opacity-8',
-                                'contrast-more:opacity-11',
-
-                                'sidebar-list-default:rounded-l-none!',
-                                'sidebar-list-default:border-l',
-                                'sidebar-list-default:border-tint',
-                            ],
-
-                            activeId === section.id && [
-                                'text-primary-subtle',
-                                'hover:text-primary',
-                                'contrast-more:text-primary',
-                                'contrast-more:hover:text-primary-strong',
-                                'hover:bg-primary-hover',
-
-                                'theme-muted:hover:bg-primary-active',
-                                '[html.sidebar-filled.theme-bold.tint_&]:hover:bg-primary-active',
-                                'theme-gradient:hover:bg-primary-active',
-                                'tint:font-semibold',
-                                'contrast-more:font-semibold',
-
-                                'sidebar-list-line:border-primary-9',
-                                'sidebar-list-default:border-tint',
-
-                                'sidebar-list-pill:bg-primary',
-                                '[html.theme-muted.sidebar-list-pill_&]:bg-primary-hover',
-                                '[html.theme-gradient.sidebar-list-pill_&]:bg-primary-active',
-                            ]
-                        )}
+                        className={
+                            section.depth > 1 ? 'page-outline-link subitem' : 'page-outline-link'
+                        }
                     >
                         {section.tag ? (
                             <OpenAPIMethodBadge
@@ -160,13 +85,7 @@ export function ScrollSectionsList({ sections }: { sections: DocumentSection[] }
                         ) : null}
 
                         <span
-                            className={tcls(
-                                section.deprecated && [
-                                    'line-through',
-                                    'opacity-50',
-                                    'contrast-more:opacity-60',
-                                ]
-                            )}
+                            className={section.deprecated ? 'page-outline-deprecated' : undefined}
                         >
                             {section.title}
                         </span>

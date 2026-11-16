@@ -12,7 +12,7 @@ import {
 import { Button, Link, ToggleChevron } from '../primitives';
 import { type DropdownButtonProps, DropdownMenu } from '../primitives/DropdownMenu';
 import { SiteAuthLoginButton, SiteAuthLoginLink } from '../SiteAuth/SiteAuthLoginLink';
-import { tcls } from '@/lib/tailwind';
+import { cx } from '@/lib/classnames';
 
 /**
  * Client component wrapping the DropdownMenu for header links.
@@ -137,31 +137,6 @@ function HeaderItemButton(
     );
 }
 
-function getHeaderLinkClassName(_props: { headerPreset: CustomizationHeaderPreset }) {
-    return tcls(
-        'flex items-center gap-1',
-        'shrink',
-        'contrast-more:underline',
-        'truncate',
-
-        'text-tint',
-        'links-default:hover:text-primary',
-        'links-default:aria-expanded:text-primary',
-        'links-default:tint:hover:text-tint-strong',
-        'links-default:tint:aria-expanded:text-tint-strong',
-        'underline-offset-2',
-        'links-accent:hover:underline',
-        'links-accent:aria-expanded:underline',
-        'links-accent:underline-offset-4',
-        'links-accent:decoration-primary-subtle',
-        'links-accent:decoration-[3px]',
-        'links-accent:py-0.5', // Prevent underline from being cut off at the bottom
-
-        'theme-bold:text-header-link',
-        'hover:theme-bold:text-header-link/7!'
-    );
-}
-
 function HeaderItemLink(props: Omit<HeaderLinkNavItemProps, 'linkStyle'>) {
     const {
         linkTarget,
@@ -175,7 +150,7 @@ function HeaderItemLink(props: Omit<HeaderLinkNavItemProps, 'linkStyle'>) {
     } = props;
     const sharedProps = {
         href: href ?? '#',
-        className: tcls(getHeaderLinkClassName({ headerPreset }), className),
+        className: cx('header-link', className),
         insights: {
             type: 'link_click' as const,
             link: {
@@ -207,10 +182,7 @@ function HeaderItemDropdown(
 ) {
     const { headerPreset, title, className, ...rest } = props;
     return (
-        <span
-            className={tcls(getHeaderLinkClassName({ headerPreset }), 'cursor-default', className)}
-            {...rest}
-        >
+        <span className={cx('header-link header-link-static', className)} {...rest}>
             {title}
             <ToggleChevron />
         </span>

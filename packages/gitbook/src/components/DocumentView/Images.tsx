@@ -5,8 +5,8 @@ import { Caption, type CaptionAlign } from './Caption';
 import type { DocumentContext } from './DocumentView';
 import { getCommentAnchorProps } from './utils';
 import { Image, type ImageResponsiveSize } from '@/components/utils';
+import { type ClassValue, cx } from '@/lib/classnames';
 import { resolveContentRefInDocument } from '@/lib/references';
-import { type ClassValue, tcls } from '@/lib/tailwind';
 
 export function Images(props: BlockProps<DocumentBlockImages>) {
     const { document, block, style, context, isEstimatedOffscreen } = props;
@@ -17,30 +17,18 @@ export function Images(props: BlockProps<DocumentBlockImages>) {
     return (
         <div
             {...getCommentAnchorProps(context, block.key)}
-            className={tcls(
+            className={cx(
                 style,
-                'flex',
-                'w-full',
-                align === 'center' && 'justify-center',
-                align === 'right' && 'justify-end',
-                align === 'left' && 'justify-start'
+                'gb-images',
+                align === 'right' && 'gb-images-right',
+                align === 'left' && 'gb-images-left'
             )}
         >
             <div
-                className={tcls(
-                    'flex',
-                    'flex-row',
-                    'gap-3',
-                    hasMultipleImages && ['grid', 'grid-flow-col'],
-                    withFrame && [
-                        'rounded-2xl',
-                        'border',
-                        'border-[rgb(234,235,238)]',
-                        'dark:border-[rgb(45,50,58)]',
-                        'relative',
-                        'overflow-hidden',
-                        'w-fit',
-                    ]
+                className={cx(
+                    'gb-images-row',
+                    hasMultipleImages && 'gb-images-multi',
+                    withFrame && 'gb-images-framed'
                 )}
             >
                 {block.nodes.map((node: any, _i: number) => (
@@ -100,7 +88,7 @@ async function ImageBlock(props: {
     }
 
     return (
-        <div className={tcls('relative', 'overflow-hidden')}>
+        <div className="gb-image">
             <Caption {...props} fit align={align}>
                 <Image
                     alt={block.data.alt ?? ''}

@@ -11,7 +11,6 @@ import {
 import { Icon } from '@gitbook/icons';
 
 import { SpacesDropdownMenuItems, type VariantSpace } from '../Header/SpacesDropdownMenuItem';
-import { CONTENT_STYLE, CONTENT_STYLE_REDUCED } from '../layout';
 import {
     PageActionsDropdown,
     type PageActionsDropdownURLs,
@@ -26,11 +25,11 @@ import {
 import { categorizeVariants } from '../SpaceLayout/categorizeVariants';
 import { BreadcrumbItemDropdown, type BreadcrumbSibling } from './BreadcrumbItemDropdown';
 import { PageTags } from './PageTags';
+import { cx } from '@/lib/classnames';
 import type { GitBookSiteContext, SiteStructureNode } from '@/lib/context';
 import { hasAdaptiveMcpEndpoint } from '@/lib/mcp/endpoints';
 import { type AncestorRevisionPage, resolveFirstDocument } from '@/lib/pages';
 import { getLocalizedTitle } from '@/lib/sites';
-import { tcls } from '@/lib/tailwind';
 import { getPageRSSURL } from '@/routes/rss';
 
 export async function PageHeader(props: {
@@ -162,9 +161,9 @@ export async function PageHeader(props: {
 
     const pageActions = (
         <div
-            className={tcls(
-                'float-right ml-4 flex gap-2',
-                showBreadcrumbs ? '-mb-1 -mt-1.5' : '-mt-3 xs:mt-2',
+            className={cx(
+                'page-header-actions',
+                !showBreadcrumbs && 'page-header-actions-solo',
                 // On desktop API pages these actions are pulled out of <header> (rendered as its
                 // preceding sibling, see below) so their sticky containing block is the tall,
                 // growing content wrapper in <main> — a plain block — rather than the short header.
@@ -173,12 +172,7 @@ export async function PageHeader(props: {
                 // offset tracks the header height (banner, cover…) via the same --toc-top-offset the
                 // outline and code samples use. Hidden while the outline drawer is open (drawer
                 // widths only) so it doesn't overlap the sheet.
-                hasAPIBlocks && [
-                    'page-api-block:lg:sticky',
-                    'page-api-block:lg:top-[calc(var(--toc-top-offset,4rem)+1rem)]',
-                    'page-api-block:lg:z-20',
-                    'lg:max-[96rem]:[body.outline-open:has(.openapi-block)_&]:hidden',
-                ]
+                hasAPIBlocks && 'page-header-actions-api'
             )}
         >
             {hasPageActions ? (
@@ -209,11 +203,11 @@ export async function PageHeader(props: {
                     // overlaps it: mark it here so it is never briefly unstyled before hydration.
                     data-cover-aware-text
                     data-over-cover
-                    className="page-cover-background:text-contrast-cover flow-root text-xs leading-relaxed text-tint layout-wide:page-no-toc:hidden page-cover-background:opacity-9"
+                    className="page-breadcrumbs"
                 >
-                    <ol className="inline">
+                    <ol>
                         {contextCrumbs.map((crumb, index) => (
-                            <li key={crumb.key} className="inline">
+                            <li key={crumb.key}>
                                 <ContextCrumb crumb={crumb} />
                                 {(index !== contextCrumbs.length - 1 || hasAncestors) && (
                                     <BreadcrumbSeparator />
@@ -232,7 +226,7 @@ export async function PageHeader(props: {
                                 page: target,
                             });
                             return (
-                                <li key={breadcrumb.id} className="inline">
+                                <li key={breadcrumb.id}>
                                     <BreadcrumbItemDropdown
                                         href={href}
                                         label={breadcrumb.title}
@@ -259,46 +253,21 @@ export async function PageHeader(props: {
                     {...(context.changeRequest ? { 'data-comment-page-title': '' } : {})}
                     data-cover-aware-text
                     data-over-cover
-                    className={tcls(
-                        'text-2xl',
-                        '@xs:text-3xl',
-                        '@lg:text-4xl',
-                        'leading-tight',
-                        'font-heading',
-                        'font-bold',
-                        'flex',
-                        'items-center',
-                        'gap-[.5em]',
-                        'grow',
-                        'text-pretty',
-                        'clear-right',
-                        'xs:clear-none',
-                        'page-cover-background:text-contrast-cover'
-                    )}
+                    className="page-title"
                 >
-                    <PageIcon page={page} style={['text-tint-subtle', 'shrink-0']} />
+                    <PageIcon page={page} style="page-title-icon" />
                     {page.title}
                 </h1>
             ) : null}
             {page.description && page.layout.description ? (
-                <p
-                    data-cover-aware-text
-                    data-over-cover
-                    className={tcls(
-                        CONTENT_STYLE_REDUCED,
-                        'text-lg',
-                        'page-cover-background:text-contrast-cover',
-                        'text-tint contrast-more:text-tint-strong',
-                        'clear-both'
-                    )}
-                >
+                <p data-cover-aware-text data-over-cover className="page-description">
                     {page.description}
                 </p>
             ) : null}
         </>
     );
 
-    const headerClassName = tcls(CONTENT_STYLE, 'mb-6 space-y-3 after:clear-both after:block');
+    const headerClassName = 'page-header';
 
     // On API pages the actions are pulled out of <header> so their sticky containing block is the
     // full-height <main> rather than the short header (a sticky element can't outlive its containing
@@ -321,16 +290,7 @@ export async function PageHeader(props: {
  * Shared styling for the individual breadcrumb links. Uses normal casing/weight to match the way
  * breadcrumbs are rendered in search results.
  */
-const BREADCRUMB_LINK_CLASSES = [
-    'inline',
-    'no-underline',
-    'hover:underline',
-    'text-xs',
-    'font-normal',
-    'items-center',
-    'contrast-more:underline',
-    'contrast-more:decoration-current',
-];
+const BREADCRUMB_LINK_CLASSES = 'page-breadcrumbs-link';
 
 /** A section-group, section or variant crumb shown at the start of the breadcrumbs. */
 type BreadcrumbContextCrumb = {
@@ -512,13 +472,7 @@ function getPageSiblings(
  * Separator rendered between two breadcrumb items.
  */
 function BreadcrumbSeparator() {
-    return (
-        <Icon
-            aria-hidden
-            icon="chevron-right"
-            className="mx-2 inline-flex size-2 text-tint-subtle"
-        />
-    );
+    return <Icon aria-hidden icon="chevron-right" className="page-breadcrumbs-sep" />;
 }
 
 /**

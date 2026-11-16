@@ -22,7 +22,7 @@ export function List(
             tag={getListTag(block.type)}
             nodes={block.nodes}
             ancestorBlocks={[...ancestorBlocks, block]}
-            style={['min-w-0 space-y-2', style]}
+            style={['gb-list', style]}
         />
     );
 }

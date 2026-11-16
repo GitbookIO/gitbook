@@ -23,6 +23,12 @@
     }
 
     .table-grid-cell-sticky {
-        @apply sticky left-0 z-10 bg-tint-base group-hover/row:bg-tint-hover;
+        @apply sticky left-0 z-10 bg-tint-base;
+
+        @media (hover: hover) {
+            .table-grid-row:hover > & {
+                @apply bg-tint-hover;
+            }
+        }
     }
 }

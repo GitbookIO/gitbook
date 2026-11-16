@@ -6,7 +6,7 @@ import { Icon } from '@gitbook/icons';
 
 import { ToggleChevron } from '../primitives';
 import { DropdownMenu } from '../primitives/DropdownMenu';
-import { type ClassValue, tcls } from '@/lib/tailwind';
+import type { ClassValue } from '@/lib/classnames';
 
 /**
  * Client component for the "More" header link dropdown.
@@ -23,21 +23,9 @@ export function HeaderLinkMoreDropdown(props: {
     return (
         <DropdownMenu
             button={
-                <button
-                    type="button"
-                    className={tcls(
-                        'text-tint',
-                        'hover:text-primary',
-                        'dark:hover:text-primary',
-                        'theme-bold:text-header-link',
-                        'theme-bold:hover:text-header-link/8',
-                        'flex',
-                        'gap-1',
-                        'items-center'
-                    )}
-                >
+                <button type="button" className="header-more">
                     <span className="sr-only">{label}</span>
-                    <Icon icon="ellipsis" className={tcls('size-4')} />
+                    <Icon icon="ellipsis" className="size-4" />
                     <ToggleChevron />
                 </button>
             }

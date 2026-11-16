@@ -7,7 +7,7 @@ import { NavigationStatusContext, scrollToHash } from '../hooks';
 import { type TrackEventInput, useTrackEvent } from '../Insights';
 import { isExternalLink, isSiteAuthLink, toNonEmbedLink } from '../utils/link';
 import { type DesignTokenName, useClassnames } from './StyleProvider';
-import { tcls } from '@/lib/tailwind';
+import { cx } from '@/lib/classnames';
 import { getSamePageAnchor, resolveAnchorURL } from '@/lib/urls';
 
 // Props from Next, which includes NextLinkProps and all the things anchor elements support.
@@ -140,7 +140,7 @@ export function Link(props: LinkProps) {
         return (
             <a
                 ref={ref}
-                className={tcls(...forwardedClassNames, className)}
+                className={cx(forwardedClassNames, className)}
                 {...domProps}
                 href={href}
                 onClick={onClick}
@@ -166,7 +166,7 @@ export function Link(props: LinkProps) {
             ref={ref}
             href={href}
             prefetch={_prefetch}
-            className={tcls(...forwardedClassNames, className)}
+            className={cx(forwardedClassNames, className)}
             {...domProps}
             onClick={onClick}
         >
@@ -214,7 +214,7 @@ export const LinkBox = React.forwardRef(function LinkBox(
         <div
             ref={ref}
             {...domProps}
-            className={tcls('elevate-link relative', className, forwardedClassNames)}
+            className={cx('elevate-link relative', className, forwardedClassNames)}
         >
             {children}
         </div>
@@ -232,11 +232,7 @@ export const LinkOverlay = React.forwardRef(function LinkOverlay(
 ) {
     const { children, className, ...domProps } = props;
     return (
-        <Link
-            ref={ref}
-            {...domProps}
-            className={tcls('link-overlay absolute inset-0 z-10', className)}
-        >
+        <Link ref={ref} {...domProps} className={cx('link-overlay', className)}>
             {children}
         </Link>
     );

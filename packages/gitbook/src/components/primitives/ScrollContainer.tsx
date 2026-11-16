@@ -5,6 +5,7 @@ import * as React from 'react';
 import { useScrollOverflow } from '../hooks/useScrollOverflow';
 import { Button, type ButtonProps } from './Button';
 import { tString, useLanguage } from '@/intl/client';
+import { cx } from '@/lib/classnames';
 import { tcls } from '@/lib/tailwind';
 
 /**
@@ -172,9 +173,9 @@ export function ScrollContainer(props: ScrollContainerProps) {
 
     return (
         <div
-            className={tcls(
-                'group/scroll-container relative flex shrink grow',
-                orientation === 'horizontal' ? 'min-w-0' : 'min-h-0',
+            className={cx(
+                'scroll-container',
+                orientation === 'horizontal' ? 'scroll-container-x' : 'scroll-container-y',
                 className,
                 scrollPosition > 0 ? leading?.className : '',
                 scrollPosition < scrollSize ? trailing?.className : ''
@@ -216,14 +217,13 @@ export function ScrollContainer(props: ScrollContainerProps) {
                     onClick={scrollBack}
                     label={tString(language, 'scroll_back')}
                     {...(typeof leading.button === 'object' ? leading.button : {})}
-                    className={tcls(
-                        'bg-tint-base!',
+                    className={cx(
+                        'scroll-container-button',
                         orientation === 'horizontal'
-                            ? '-translate-y-1/2! top-1/2 left-0 ml-2'
-                            : '-translate-x-1/2! top-0 left-1/2 mt-2',
-                        'absolute z-10 not-pointer-none:block hidden scale-0 opacity-0 transition-[scale,opacity]',
+                            ? 'scroll-container-prev-x'
+                            : 'scroll-container-prev-y',
                         scrollPosition > 0
-                            ? 'not-pointer-none:group-hover/scroll-container:scale-100 not-pointer-none:group-hover/scroll-container:opacity-11'
+                            ? 'scroll-container-button-shown'
                             : 'pointer-events-none',
                         typeof leading.button === 'object' ? leading.button.className : ''
                     )}
@@ -239,14 +239,13 @@ export function ScrollContainer(props: ScrollContainerProps) {
                     onClick={scrollFurther}
                     label={tString(language, 'scroll_further')}
                     {...(typeof trailing.button === 'object' ? trailing.button : {})}
-                    className={tcls(
-                        'bg-tint-base!',
+                    className={cx(
+                        'scroll-container-button',
                         orientation === 'horizontal'
-                            ? '-translate-y-1/2! top-1/2 right-0 mr-2'
-                            : '-translate-x-1/2! bottom-0 left-1/2 mb-2',
-                        'absolute z-10 not-pointer-none:block hidden scale-0 transition-[scale,opacity]',
+                            ? 'scroll-container-next-x'
+                            : 'scroll-container-next-y',
                         scrollPosition < scrollSize
-                            ? 'not-pointer-none:group-hover/scroll-container:scale-100 not-pointer-none:group-hover/scroll-container:opacity-11'
+                            ? 'scroll-container-button-shown'
                             : 'pointer-events-none',
                         typeof trailing.button === 'object' ? trailing.button.className : ''
                     )}

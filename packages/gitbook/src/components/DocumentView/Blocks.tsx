@@ -1,11 +1,10 @@
 import type { DocumentBlock, JSONDocument } from '@gitbook/api';
 
-import { CONTENT_STYLE, CONTENT_STYLE_REDUCED } from '../layout';
+import { CONTENT_STYLE } from '../layout';
 import { Block } from './Block';
-import './Blocks.css';
 import type { DocumentContextProps } from './DocumentView';
 import { isBlockOffscreen } from './utils';
-import { type ClassValue, tcls } from '@/lib/tailwind';
+import { type ClassValue, cx } from '@/lib/classnames';
 
 /**
  * Renders a list of blocks with a wrapper element.
@@ -25,7 +24,7 @@ export function Blocks<TBlock extends DocumentBlock, Tag extends React.ElementTy
     const { tag: Tag = 'div', style, wrapperProps, ...blocksProps } = props;
 
     return (
-        <Tag {...wrapperProps} className={tcls(style)}>
+        <Tag {...wrapperProps} className={cx(style)}>
             <UnwrappedBlocks {...blocksProps} />
         </Tag>
     );
@@ -94,9 +93,9 @@ export function UnwrappedBlocks<TBlock extends DocumentBlock>(props: UnwrappedBl
                 key={node.key || `${node.type}-${index}`}
                 block={node}
                 style={[
+                    // `gb-block` carries the reduced content width.
                     'gb-block',
-                    FULL_WIDTH_BLOCKS.has(node.type) ? CONTENT_STYLE : CONTENT_STYLE_REDUCED,
-
+                    FULL_WIDTH_BLOCKS.has(node.type) && CONTENT_STYLE,
                     LIST_BLOCKS.has(node.type) && 'gb-block-list',
                     blockStyle,
                 ]}

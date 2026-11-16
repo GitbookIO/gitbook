@@ -8,7 +8,7 @@ import { Icon, type IconName } from '@gitbook/icons';
 import { PromptActions } from './PromptActions';
 import { ToggleChevron } from '@/components/primitives';
 import { tString, useLanguage } from '@/intl/client';
-import { tcls } from '@/lib/tailwind';
+import { cx } from '@/lib/classnames';
 
 type PromptClientProps = DocumentBlockPrompt['data'] & {
     contentIcon: IconName | null;
@@ -44,18 +44,13 @@ export function PromptClient(props: PromptClientProps) {
         <div
             data-block-key={commentKey}
             data-comment-block={commentKey ? '' : undefined}
-            className={tcls(
-                'relative flex w-full flex-col overflow-hidden circular-corners:rounded-2xl rounded-corners:rounded-xl straight-corners:rounded-xs text-tint-strong',
-                'border border-tint-subtle contrast-more:border-tint',
-                'transition',
-                expanded ? 'bg-tint depth-subtle:shadow-xs' : 'bg-tint-base',
-                className
-            )}
+            className={cx('prompt-block', expanded && 'prompt-block-expanded', className)}
         >
             <div
-                className={tcls(
-                    'group/prompt-header relative flex min-h-9 flex-row items-center justify-between gap-4 p-3 transition-colors',
-                    !isPartiallyExpanded && (open ? 'hover:bg-tint-hover' : 'hover:bg-tint-subtle')
+                className={cx(
+                    // The marker stays for the chevron's `group-hover/prompt-header`.
+                    'group/prompt-header prompt-header',
+                    !isPartiallyExpanded && (open ? 'prompt-header-open' : 'prompt-header-closed')
                 )}
             >
                 {!isPartiallyExpanded ? (
@@ -64,15 +59,12 @@ export function PromptClient(props: PromptClientProps) {
                         aria-controls={promptId}
                         aria-expanded={open}
                         aria-label={tString(language, 'view')}
-                        className={tcls(
-                            'absolute inset-0 z-10 cursor-pointer outline-hidden',
-                            'focus-visible:ring-2 focus-visible:ring-primary-hover'
-                        )}
+                        className="prompt-toggle"
                         disabled={!prompt}
                         onClick={() => setOpen((prev) => !prev)}
                     />
                 ) : null}
-                <div className="pointer-events-none relative z-0 flex min-w-0 flex-row items-center gap-2 text-tint-strong">
+                <div className="prompt-title">
                     {!isPartiallyExpanded ? (
                         <ToggleChevron
                             open={open}
@@ -86,7 +78,7 @@ export function PromptClient(props: PromptClientProps) {
                 <PromptActions prompt={prompt} openInAIProviders={openInAIProviders} />
             </div>
             {isPartiallyExpanded || open ? (
-                <div id={promptId} className="border-t border-tint-subtle bg-tint-base">
+                <div id={promptId} className="prompt-body">
                     {children}
                 </div>
             ) : null}

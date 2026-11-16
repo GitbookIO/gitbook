@@ -8,6 +8,7 @@ import { DropdownMenuItem } from '../primitives/DropdownMenu';
 import { SiteAuthLoginDropdownMenuItem } from '../SiteAuth/SiteAuthLoginLink';
 import { HeaderLinkDropdown, HeaderLinkNavItem } from './HeaderLinkDropdown';
 import { isSiteAuthLoginHref } from '@/lib/auth-login-link';
+import { cx } from '@/lib/classnames';
 import type { GitBookSiteContext } from '@/lib/context';
 import { resolveContentRef } from '@/lib/references';
 import { getLocalizedTitle } from '@/lib/sites';
@@ -36,7 +37,10 @@ export async function HeaderLink(props: {
                 isSiteAuthLoginHref={
                     target ? isSiteAuthLoginHref(context.linker, target.href) : false
                 }
-                dropdownClassName={`shrink ${customization.styling.search === 'prominent' ? 'right-0 left-auto' : null}`}
+                dropdownClassName={cx(
+                    'shrink',
+                    customization.styling.search === 'prominent' && 'right-0 left-auto'
+                )}
             >
                 {link.links.map((subLink, index) => (
                     <SubHeaderLink key={index} {...props} link={subLink} />

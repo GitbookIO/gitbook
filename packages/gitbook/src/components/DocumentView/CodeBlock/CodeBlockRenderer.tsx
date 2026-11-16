@@ -9,6 +9,7 @@ import { getCommentKeyAttributes } from '../utils/commentAnchors';
 import { AskAICodeButton } from './AskAICodeButton';
 import { CopyCodeButton } from './CopyCodeButton';
 import type { HighlightLine, HighlightTheme, HighlightToken } from './highlight-tokens';
+import { cx } from '@/lib/classnames';
 import { tcls } from '@/lib/tailwind';
 
 type CodeBlockRendererProps = Pick<BlockProps<DocumentBlockCode>, 'block' | 'style'> & {
@@ -55,28 +56,16 @@ export const CodeBlockRenderer = forwardRef(function CodeBlockRenderer(
             id={codeId}
             {...getCommentKeyAttributes(commentKey)}
             aria-busy={ariaBusy}
-            className={tcls(
-                'group/codeblock shiki relative flex shrink flex-col overflow-hidden print:overflow-visible',
-                !embedded &&
-                    'circular-corners:rounded-2xl rounded-corners:rounded-xl straight-corners:rounded-xs',
-                !embedded &&
-                    '[&:has([data-codeblock-focus]:focus)]:ring-2 [&:has([data-codeblock-focus]:focus)]:ring-primary-hover',
-                style
-            )}
+            className={cx('shiki codeblock', !embedded && 'codeblock-framed', tcls(style))}
             /* Sets the code theme's mode (light or dark) for the site's theme mode (light or dark).
              * Used to style UI elements (scrollbars, form controls) correctly and apply the right default to "plain" code blocks. */
             data-color-scheme={`${theme.themes.light.type} ${theme.themes.dark.type}`}
         >
-            <span
-                data-codeblock-focus
-                tabIndex={-1}
-                aria-hidden
-                className="pointer-events-none absolute size-0 outline-none"
-            />
-            <div className="flex items-center justify-start gap-2 text-sm">
+            <span data-codeblock-focus tabIndex={-1} aria-hidden className="codeblock-focus" />
+            <div className="codeblock-header">
                 {withTitle ? (
                     <div
-                        className="straight-corners:rounded-t-xs relative top-px z-20 inline-flex items-center justify-center border border-b-0 border-tint-subtle bg-tint-subtle px-3 py-2 text-xs leading-none tracking-wide text-tint theme-bold-tint:bg-tint-base theme-muted:bg-tint-base rounded-corners:rounded-t-lg circular-corners:rounded-t-xl contrast-more:border-tint contrast-more:bg-tint-base [html.theme-bold.sidebar-filled_&]:bg-tint-base"
+                        className="codeblock-title"
                         style={{
                             backgroundColor: bg?.color,
                             ...bg?.vars,
@@ -88,12 +77,12 @@ export const CodeBlockRenderer = forwardRef(function CodeBlockRenderer(
                     </div>
                 ) : null}
             </div>
-            <div className="relative flex min-h-0 flex-col">
+            <div className="codeblock-body">
                 {!embedded ? (
                     <div
-                        className={tcls(
-                            'absolute right-2 z-2 flex items-center gap-1.5 font-sans leading-none opacity-0 group-hover/codeblock:opacity-11 has-[button:focus-visible]:opacity-11',
-                            isSingleLine ? 'inset-y-0' : 'top-2'
+                        className={cx(
+                            'codeblock-actions',
+                            isSingleLine && 'codeblock-actions-centered'
                         )}
                     >
                         {!isPrint ? (
@@ -101,21 +90,17 @@ export const CodeBlockRenderer = forwardRef(function CodeBlockRenderer(
                                 codeId={codeId}
                                 title={title}
                                 syntax={block.data.syntax}
-                                style="backdrop-blur-md"
+                                style="codeblock-button"
                             />
                         ) : null}
-                        <CopyCodeButton codeId={codeId} style="backdrop-blur-md" />
+                        <CopyCodeButton codeId={codeId} style="codeblock-button" />
                     </div>
                 ) : null}
                 <pre
-                    className={tcls(
-                        'relative overflow-auto py-2.5 text-tint-strong print:overflow-visible',
-                        embedded
-                            ? 'bg-tint-base'
-                            : 'border border-tint-subtle bg-tint-subtle theme-bold-tint:bg-tint-base theme-muted:bg-tint-base contrast-more:border-tint contrast-more:bg-tint-base',
-                        !embedded &&
-                            'circular-corners:rounded-2xl rounded-corners:rounded-xl straight-corners:rounded-xs depth-subtle:shadow-xs',
-                        withTitle && 'rounded-ss-none!'
+                    className={cx(
+                        'codeblock-pre',
+                        embedded ? 'codeblock-pre-embedded' : 'codeblock-pre-framed',
+                        withTitle && 'codeblock-pre-titled'
                     )}
                     style={{
                         backgroundColor: codeBackground?.color,
@@ -124,13 +109,7 @@ export const CodeBlockRenderer = forwardRef(function CodeBlockRenderer(
                         ...fg?.vars,
                     }}
                 >
-                    <code
-                        className={tcls(
-                            'table max-h-full w-fit min-w-full [counter-reset:line] print:max-h-none print:whitespace-pre-wrap',
-                            withWrap && 'whitespace-pre-wrap',
-                            '[[aria-expanded=false]_&]:mask-b-from-50%'
-                        )}
-                    >
+                    <code className={cx('codeblock-code', withWrap && 'codeblock-code-wrap')}>
                         {theme.lines.map((line, index) => (
                             <CodeHighlightLine
                                 bg={codeBackground}
@@ -167,9 +146,9 @@ function CodeHighlightLine(props: {
     };
     return (
         <span
-            className={tcls(
+            className={cx(
                 'highlight-line',
-                embeddedPlainLine && 'bg-transparent! hover:bg-tint-subtle!',
+                embeddedPlainLine && 'highlight-line-plain',
                 line.diff === 'added' && 'diff-added',
                 line.diff === 'deleted' && 'diff-deleted',
                 line.highlighted && 'highlighted'

@@ -5,6 +5,7 @@ import { type DocumentBlockColumns, type Length, VerticalAlignment } from '@gitb
 import type { BlockProps } from '../Block';
 import { Blocks } from '../Blocks';
 import { getCommentMarkerProps } from '../utils';
+import { cx } from '@/lib/classnames';
 import { tcls } from '@/lib/tailwind';
 
 export function Columns(props: BlockProps<DocumentBlockColumns>) {
@@ -40,10 +41,7 @@ export function Columns(props: BlockProps<DocumentBlockColumns>) {
         <div
             // The app doesn't allow comments inside columns.
             {...getCommentMarkerProps(context, 'data-comment-ignore')}
-            className={tcls(
-                'grid w-full @2xl:grid-flow-col @2xl:grid-cols-[repeat(var(--grid-slices),minmax(0,1fr))] grid-cols-1 @2xl:grid-rows-1 gap-x-8 gap-y-4',
-                style
-            )}
+            className={cx('column-set', tcls(style))}
             style={{ '--grid-slices': COLUMN_DIVISIONS } as React.CSSProperties}
         >
             {block.nodes.map((columnBlock, index) => {
@@ -65,7 +63,8 @@ export function Columns(props: BlockProps<DocumentBlockColumns>) {
                             document={document}
                             ancestorBlocks={[...ancestorBlocks, block, columnBlock]}
                             context={context}
-                            style="group/column w-full space-y-4 *:max-w-full"
+                            // `*:max-w-full` stays a utility to beat the blocks' own `max-w-*`.
+                            style="group/column column-set-body *:max-w-full"
                         />
                     </Column>
                 );
@@ -83,13 +82,10 @@ export function Column(props: {
     const { className, style } = transformLengthToCSS(width) ?? {};
     return (
         <div
-            className={tcls(
-                'flex flex-col',
-                '@container/column',
-                (verticalAlignment === VerticalAlignment.Top || !verticalAlignment) &&
-                    'justify-start',
-                verticalAlignment === VerticalAlignment.Middle && 'justify-center',
-                verticalAlignment === VerticalAlignment.Bottom && 'justify-end',
+            className={cx(
+                'column-set-item',
+                verticalAlignment === VerticalAlignment.Middle && 'column-set-item-middle',
+                verticalAlignment === VerticalAlignment.Bottom && 'column-set-item-bottom',
                 className
             )}
             style={style}
@@ -107,7 +103,7 @@ export function transformLengthToCSS(length: Length) {
     }
     if (length.unit === '%') {
         return {
-            className: '@2xl:flex-shrink-0 @2xl:[grid-column:var(--grid-col)]',
+            className: 'column-set-item-sized',
             style: {
                 '--grid-col': `auto / span ${Math.round(length.value * 0.01 * COLUMN_DIVISIONS)}`,
             } as React.CSSProperties,

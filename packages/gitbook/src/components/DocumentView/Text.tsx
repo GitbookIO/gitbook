@@ -13,8 +13,8 @@ import type {
     DocumentTextMark,
 } from '@gitbook/api';
 
+import { cx } from '@/lib/classnames';
 import { backgroundColorToStyle, textColorToStyle } from '@/lib/colors';
-import { tcls } from '@/lib/tailwind';
 
 export function Text(props: { text: DocumentText }) {
     const { text } = props;
@@ -94,31 +94,7 @@ function Subscript(props: MarkedLeafProps<DocumentMarkSubscript>) {
 }
 
 function Code(props: MarkedLeafProps<DocumentMarkCode>) {
-    return (
-        <code
-            className={tcls(
-                'py-px',
-                'px-1.5',
-                'min-w-6.5',
-                'justify-center',
-                'items-center',
-                'leading-normal',
-                'ring-1',
-                'ring-inset',
-                'ring-tint',
-                'bg-tint',
-                'rounded-sm',
-                // Text size is proportional to the font-size of the parent element
-                'text-[.875em]',
-                // We ensure that the code is not making the parent bigger, especially in headings
-                'leading-[calc(max(1.20em,1.25rem))]',
-                'break-words',
-                'hyphens-none'
-            )}
-        >
-            {props.children}
-        </code>
-    );
+    return <code className="inline-code">{props.children}</code>;
 }
 
 function Color(props: MarkedLeafProps<DocumentMarkColor>) {
@@ -128,10 +104,10 @@ function Color(props: MarkedLeafProps<DocumentMarkColor>) {
             data-highlight={
                 mark.data.background && mark.data.background !== 'default' ? '' : undefined
             }
-            className={tcls([
+            className={cx(
                 textColorToStyle[mark.data.text ?? 'default'],
-                backgroundColorToStyle[mark.data.background ?? 'default'],
-            ])}
+                backgroundColorToStyle[mark.data.background ?? 'default']
+            )}
         >
             {children}
         </span>

@@ -10,6 +10,7 @@ import { Details } from './Details';
 import { ToggleChevron } from '@/components/primitives';
 import { getSpaceLanguage, tString } from '@/intl/server';
 import { defaultLanguage } from '@/intl/translations';
+import { cx } from '@/lib/classnames';
 import { getNodeFragmentByType } from '@/lib/document';
 import { tcls } from '@/lib/tailwind';
 
@@ -40,37 +41,16 @@ export async function Expandable(props: BlockProps<DocumentBlockExpandable>) {
             id={id}
             {...getCommentKeyProp(context, block.key)}
             open={context.mode === 'print' || isDefaultExpanded}
-            className={tcls('scroll-mt-(--content-scroll-margin)', style)}
+            className={tcls(style)}
         >
             <summary
                 {...getCommentAnchorProps(context, titleParagraph.key)}
-                className={tcls(
-                    'cursor-pointer',
-                    'px-4',
-                    // Reserve room for the anchor icon pinned to the right edge
-                    showHashLink && 'pr-10',
-                    'py-4',
-                    'relative',
-                    'list-none',
-                    'select-none',
-                    'transition-colors',
-                    'text-tint',
-                    'group-hover/expandable:text-tint-strong',
-                    'group-open/expandable:text-tint-strong',
-                    '[&::-webkit-details-marker]:hidden'
-                )}
+                className={cx('expandable-summary', showHashLink && 'expandable-summary-anchored')}
             >
                 <ToggleChevron
                     orientation="right-to-down"
                     open={context.mode === 'print'}
-                    className={tcls(
-                        'inline-block',
-                        'size-3',
-                        'mr-3',
-                        'mb-1',
-                        'shrink-0',
-                        'group-open/expandable:rotate-90'
-                    )}
+                    className="expandable-chevron"
                 />
                 <Inlines
                     nodes={titleParagraph.nodes}
@@ -82,28 +62,9 @@ export async function Expandable(props: BlockProps<DocumentBlockExpandable>) {
                     <a
                         href={`#${id}`}
                         aria-label={tString(language, 'direct_link_to_heading')}
-                        className={tcls(
-                            'absolute',
-                            'top-2',
-                            'bottom-2',
-                            'right-4',
-                            'flex',
-                            'items-center',
-                            'dark:shadow-none',
-                            'dark:ring-0'
-                        )}
+                        className="expandable-anchor"
                     >
-                        <Icon
-                            icon="hashtag"
-                            className={tcls(
-                                'inline-block',
-                                'size-3',
-                                'transition-colors',
-                                'text-transparent',
-                                'group-hover/expandable:text-tint-subtle',
-                                'contrast-more:group-hover/expandable:text-tint-strong'
-                            )}
-                        />
+                        <Icon icon="hashtag" className="expandable-anchor-icon" />
                     </a>
                 ) : null}
             </summary>
@@ -112,7 +73,7 @@ export async function Expandable(props: BlockProps<DocumentBlockExpandable>) {
                 document={document}
                 ancestorBlocks={[...ancestorBlocks, block]}
                 context={context}
-                style="space-y-4 px-10 pb-5"
+                style="expandable-body"
             />
         </Details>
     );

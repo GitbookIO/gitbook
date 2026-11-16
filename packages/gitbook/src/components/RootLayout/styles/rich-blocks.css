@@ -1,0 +1,609 @@
+@layer utilities {
+  /* Code blocks */
+
+  .codeblock {
+    @apply relative flex shrink flex-col overflow-hidden print:overflow-visible;
+  }
+
+  .codeblock-framed {
+    @apply circular-corners:rounded-2xl rounded-corners:rounded-xl straight-corners:rounded-xs;
+    @apply [&:has([data-codeblock-focus]:focus)]:ring-2 [&:has([data-codeblock-focus]:focus)]:ring-primary-hover;
+  }
+
+  .codeblock-focus {
+    @apply pointer-events-none absolute size-0 outline-none;
+  }
+
+  .codeblock-header {
+    @apply flex items-center justify-start gap-2 text-sm;
+  }
+
+  .codeblock-title {
+    @apply straight-corners:rounded-t-xs relative top-px z-20 inline-flex items-center justify-center border border-b-0 border-tint-subtle bg-tint-subtle px-3 py-2 text-xs leading-none tracking-wide text-tint theme-bold-tint:bg-tint-base theme-muted:bg-tint-base rounded-corners:rounded-t-lg circular-corners:rounded-t-xl contrast-more-strong:border-tint contrast-more-strong:bg-tint-base [html.theme-bold.sidebar-filled_&]:bg-tint-base;
+  }
+
+  .codeblock-body {
+    @apply relative flex min-h-0 flex-col;
+  }
+
+  .codeblock-actions {
+    @apply absolute top-2 right-2 z-2 flex items-center gap-1.5 font-sans leading-none opacity-0 has-[button:focus-visible]:opacity-11;
+
+    @media (hover: hover) {
+      .codeblock:hover & {
+        @apply opacity-11;
+      }
+    }
+  }
+
+  /* Single-line blocks center the buttons vertically instead of pinning them to the top. */
+  .codeblock-actions-centered {
+    @apply inset-y-0;
+  }
+
+  /* Declared after `.button` (primitives.css), so these win at equal specificity. */
+  .codeblock-button {
+    @apply translate-y-0! backdrop-blur-md print:hidden;
+  }
+
+  .codeblock-button-ask {
+    @apply [[data-ai-chat]_&]:hidden;
+  }
+
+  .codeblock-pre {
+    @apply relative overflow-auto py-2.5 text-tint-strong print:overflow-visible;
+  }
+
+  .codeblock-pre-embedded {
+    @apply bg-tint-base;
+  }
+
+  .codeblock-pre-framed {
+    @apply border border-tint-subtle bg-tint-subtle theme-bold-tint:bg-tint-base theme-muted:bg-tint-base contrast-more-strong:border-tint contrast-more-strong:bg-tint-base;
+    @apply circular-corners:rounded-2xl rounded-corners:rounded-xl straight-corners:rounded-xs depth-subtle:shadow-xs;
+  }
+
+  .codeblock-pre-titled {
+    @apply rounded-ss-none!;
+  }
+
+  .codeblock-code {
+    @apply table max-h-full w-fit min-w-full [counter-reset:line] print:max-h-none print:whitespace-pre-wrap;
+    @apply [[aria-expanded=false]_&]:mask-b-from-50%;
+  }
+
+  .codeblock-code-wrap {
+    @apply whitespace-pre-wrap;
+  }
+
+  /* Lines of an embedded block drop the theme background and only tint on hover. */
+  .highlight-line-plain {
+    @apply bg-transparent! hover:bg-tint-subtle!;
+  }
+
+  /* Tabs */
+
+  .tabs-block {
+    @apply flex min-w-0 flex-col rounded-lg ring-1 ring-tint-subtle ring-inset straight-corners:rounded-xs;
+  }
+
+  .tabs-list {
+    @apply inline-flex self-stretch overflow-hidden rounded-t-lg straight-corners:rounded-t-xs after:flex-1 after:bg-tint-12/1;
+    /* When the last tab is selected, round the filler after it. */
+    @apply [&:has(button.active-tab:last-of-type):after]:rounded-bl-md;
+  }
+
+  .tabs-item {
+    @apply relative flex max-w-full shrink-0 items-center truncate bg-tint-12/1 text-tint hover:text-tint-strong;
+    @apply [&:has(+_.active-tab)]:rounded-br-md [.active-tab+&]:rounded-bl-md [.active-tab_+_:after]:rounded-br-md;
+    @apply after:absolute after:top-[15%] after:right-0 after:left-[unset] after:h-[70%] after:w-px after:border-r after:border-tint after:transition-colors last:after:border-transparent;
+    @apply [&.active-tab]:after:border-transparent [:has(+_&.active-tab)]:after:border-transparent;
+
+    &.active-tab {
+      @apply bg-transparent text-tint-strong [:has(&_+)]:after:border-transparent;
+    }
+  }
+
+  /* Width of a tab in the strip; these replace the default `max-w-full`. */
+  .tabs-item-current {
+    /* Keeps room for the overflow menu button. */
+    @apply max-w-[calc(100%-3rem)];
+  }
+
+  .tabs-item-measuring {
+    @apply order-1 max-w-28;
+  }
+
+  .tabs-item-fluid {
+    @apply max-w-max min-w-0 grow-[1000] basis-0;
+  }
+
+  .tabs-button {
+    @apply relative inline-flex max-w-full min-w-0 items-center gap-1.5 px-4 py-2.5 text-sm font-medium transition-[color];
+  }
+
+  .tabs-button-icon {
+    @apply size-4 shrink-0;
+  }
+
+  .tabs-button-label {
+    @apply min-w-0 truncate;
+  }
+
+  .tabs-panel {
+    @apply scroll-mt-[calc(var(--content-scroll-margin)+var(--spacing)*20)];
+  }
+
+  .tabs-panel-body {
+    @apply px-8 py-6;
+  }
+
+  .tabs-panel-blocks {
+    @apply w-full space-y-4;
+  }
+
+  /* Tables */
+
+  .table-block {
+    @apply flex flex-col gap-3;
+  }
+
+  .table-view {
+    @apply relative mx-auto grid w-full min-w-0;
+  }
+
+  .table-scroll {
+    @apply w-full min-w-0 overflow-x-auto overflow-y-hidden overscroll-x-none border-tint-subtle;
+  }
+
+  .table-stack {
+    @apply flex flex-col;
+  }
+
+  .table-grid-header {
+    @apply mb-1 flex flex-col rounded-lg border border-tint-subtle bg-tint;
+  }
+
+  .table-native-header {
+    @apply mb-1 rounded-lg border border-tint-subtle bg-tint;
+  }
+
+  .table-header-clip {
+    @apply overflow-hidden;
+  }
+
+  .table-grid-header-row {
+    @apply flex w-full;
+  }
+
+  .table-header-cell {
+    @apply relative px-3 py-2 text-sm font-medium text-tint-strong;
+  }
+
+  /* First column header when the whole header is already sticky. */
+  .table-header-cell-pinned {
+    @apply z-20 bg-tint;
+  }
+
+  .table-header-cell-sticky {
+    @apply sticky left-0 z-20 bg-tint;
+  }
+
+  .table-grid-body {
+    @apply flex flex-col [&>*+*]:border-t;
+  }
+
+  .table-native {
+    @apply w-full table-fixed border-separate border-spacing-0;
+  }
+
+  .table-native-body {
+    @apply [&>tbody>tr>td[data-table-hovered]]:bg-tint-hover [&>tbody>tr+tr>td]:border-t [&>tbody+tbody>tr:first-child>td]:border-t;
+  }
+
+  .table-native-cell {
+    @apply relative px-3 py-2 text-sm transition-colors;
+  }
+
+  .table-native-cell-divider {
+    @apply border-r border-tint-subtle;
+  }
+
+  .table-native-cell-sticky {
+    @apply sticky left-0 z-10 bg-tint-base;
+  }
+
+  .table-sticky {
+    @apply relative flex w-full max-w-full min-w-0 flex-col rounded-lg border-tint-subtle data-[scrollable=true]:border;
+  }
+
+  .table-sticky-header {
+    @apply sticky z-20 w-full max-w-full min-w-0 overflow-hidden rounded-t-[inherit] [top:var(--toc-top-offset,var(--outline-top-offset,0px))];
+  }
+
+  .table-sticky-header-track {
+    /* The sticky header sits outside the scroll container, so it mirrors the body's scroll position. */
+    @apply flex flex-col [transform:translateX(var(--table-sticky-scroll-left,0px))];
+  }
+
+  .table-sticky-scroll {
+    @apply group-data-[scrollable=true]/table:mx-px group-data-[scrollable=true]/table:rounded-none group-data-[scrollable=true]/table:border-0;
+  }
+
+  .record-text {
+    @apply w-full space-y-2 leading-normal lg:space-y-3;
+  }
+
+  .record-number {
+    @apply text-base tracking-tighter tabular-nums;
+  }
+
+  .record-rating {
+    @apply inline-grid;
+  }
+
+  .record-rating-stars {
+    @apply grid-area-1-1 inline-flex gap-0.5;
+  }
+
+  .record-rating-star {
+    @apply size-[15px] text-primary/5;
+  }
+
+  .record-rating-star-filled {
+    @apply size-[15px] text-primary;
+  }
+
+  .record-ref {
+    @apply flex items-center text-base text-balance;
+  }
+
+  .record-file-link {
+    @apply flex flex-row items-center gap-2;
+  }
+
+  .record-select {
+    @apply inline-flex flex-wrap gap-2;
+  }
+
+  .record-select-option {
+    @apply rounded-sm bg-primary px-2 py-1 text-sm whitespace-pre text-primary-strong;
+  }
+
+  /* Cards view */
+
+  .record-cards {
+    @apply inline-grid grid-cols-1 gap-4;
+  }
+
+  /* Large cards break earlier to avoid becoming *too* big. */
+  .record-cards-large {
+    @apply @xl:grid-cols-2;
+  }
+
+  .record-cards-medium {
+    @apply @sm:grid-cols-2 @2xl:grid-cols-3;
+  }
+
+  /* A one-column grid stretches the card to fill the fixed-width, equal-height track. */
+  .record-carousel-item {
+    @apply grid shrink-0 snap-start grid-cols-1;
+  }
+
+  /* Fixed widths so the row overflows and scrolls, mirroring the grid's medium/large sizing. */
+  .record-carousel-item-medium {
+    @apply w-[90%] @sm:w-[calc(45%-0.5rem)] @xl:w-[calc(30%-0.66rem)] @5xl:w-[calc(33.33%-0.66rem)];
+  }
+
+  .record-carousel-item-large {
+    @apply w-[90%] @sm:w-[calc(45%-0.5rem)] @5xl:w-[calc(50%-0.5rem)];
+  }
+
+  /* Mirrors `RecordCardStyles` in Table/styles.ts, mapped from the `RecordCardStyles` design token. */
+  .record-card {
+    @apply grid rounded-sm shadow-1xs shadow-tint-9/1 straight-corners:rounded-none circular-corners:rounded-xl depth-flat:shadow-none dark:shadow-transparent;
+    @apply before:pointer-events-none before:relative before:z-10 before:grid-area-1-1 before:h-full before:w-full before:rounded-[inherit] before:ring-1 before:ring-tint-12/2 before:transition-shadow;
+  }
+
+  .record-card-link {
+    @apply hover:before:ring-primary-hover;
+  }
+
+  .record-card-body {
+    @apply grid-area-1-1 relative -inset-px grid h-[calc(100%+2px)] w-[calc(100%+2px)] overflow-hidden rounded-sm bg-tint-base straight-corners:rounded-none circular-corners:rounded-xl;
+    @apply [&_.heading>div:first-child]:hidden [&_.heading>div]:text-[.8em] @xl:[&_.heading>div]:text-[1em];
+    /* No padding-top on the first heading in a card. */
+    @apply [&_.blocks:first-child_.heading]:pt-0;
+  }
+
+  .record-card-body-landscape {
+    @apply grid-rows-[auto_1fr];
+  }
+
+  /* Square or portrait covers sit on the left with 40% of the card width on mobile. */
+  .record-card-body-portrait {
+    @apply grid-cols-[40%__1fr] @sm:grid-cols-none @sm:grid-rows-[auto_1fr];
+  }
+
+  .record-card-body-portrait-dark {
+    @apply dark:grid-cols-[40%__1fr] dark:@sm:grid-cols-none dark:@sm:grid-rows-[auto_1fr];
+  }
+
+  .record-card-cover {
+    @apply h-full w-full min-w-0 bg-tint-subtle;
+  }
+
+  .record-card-cover-landscape {
+    @apply aspect-video h-auto;
+  }
+
+  .record-card-cover-portrait {
+    @apply @sm:aspect-video @sm:h-auto;
+  }
+
+  .record-card-cover-portrait-dark {
+    @apply dark:@sm:aspect-video dark:@sm:h-auto;
+  }
+
+  .record-card-content {
+    @apply flex w-full min-w-0 flex-col gap-3 place-self-start p-4 text-sm text-tint-strong;
+  }
+
+  .record-card-field {
+    @apply flex flex-col gap-1;
+  }
+
+  .record-card-field-title {
+    @apply text-sm text-tint;
+  }
+
+  /* Columns */
+
+  .column-set {
+    @apply grid w-full grid-cols-1 gap-x-8 gap-y-4 @2xl:grid-flow-col @2xl:grid-cols-[repeat(var(--grid-slices),minmax(0,1fr))] @2xl:grid-rows-1;
+  }
+
+  .column-set-item {
+    @apply @container/column flex flex-col justify-start;
+  }
+
+  .column-set-item-middle {
+    @apply justify-center;
+  }
+
+  .column-set-item-bottom {
+    @apply justify-end;
+  }
+
+  .column-set-item-sized {
+    @apply @2xl:flex-shrink-0 @2xl:[grid-column:var(--grid-col)];
+  }
+
+  .column-set-body {
+    @apply w-full space-y-4;
+  }
+
+  /* Expandables */
+
+  .expandable {
+    @apply scroll-mt-(--content-scroll-margin) border border-b-0 border-tint-subtle bg-tint-base;
+    @apply mt-0! mb-0 first:mt-5! first:rounded-t-lg;
+    /* First and last of a run of adjacent expandables. */
+    @apply [:not(&)_+_&]:mt-5! [:not(&)_+_&]:rounded-t-lg;
+    @apply [&:not(:has(+_&))]:mb-5 [&:not(:has(+_&))]:rounded-b-lg [&:not(:has(+_&))]:border-b;
+  }
+
+  .expandable-summary {
+    @apply relative cursor-pointer list-none px-4 py-4 text-tint transition-colors select-none [&::-webkit-details-marker]:hidden;
+
+    .expandable[open] & {
+      @apply text-tint-strong;
+    }
+
+    @media (hover: hover) {
+      .expandable:hover & {
+        @apply text-tint-strong;
+      }
+    }
+  }
+
+  /* Reserves room for the anchor icon pinned to the right edge. */
+  .expandable-summary-anchored {
+    @apply pr-10;
+  }
+
+  .expandable-chevron {
+    @apply mr-3 mb-1 inline-block size-3 shrink-0;
+
+    .expandable[open] & {
+      @apply rotate-90;
+    }
+  }
+
+  .expandable-anchor {
+    @apply absolute top-2 right-4 bottom-2 flex items-center dark:shadow-none dark:ring-0;
+  }
+
+  .expandable-anchor-icon {
+    @apply inline-block size-3 text-transparent transition-colors;
+
+    @media (hover: hover) {
+      .expandable:hover & {
+        @apply text-tint-subtle contrast-more-strong:text-tint-strong;
+      }
+    }
+  }
+
+  .expandable-body {
+    @apply space-y-4 px-10 pb-5;
+  }
+
+  /* Stepper */
+
+  .stepper-item {
+    @apply flex flex-row gap-4 md:gap-8;
+  }
+
+  .stepper-step-marker {
+    @apply relative select-none;
+  }
+
+  .stepper-step-number {
+    @apply flex size-[calc(1.75rem+1px)] items-center justify-center rounded-full bg-primary-solid tabular-nums theme-muted:bg-tint-base contrast-more-strong:bg-primary-11;
+    @apply font-medium text-contrast-primary-solid theme-muted:text-tint contrast-more-strong:text-contrast-primary-11;
+  }
+
+  .stepper-step-line {
+    @apply absolute top-9 bottom-2 left-3.5 w-px bg-primary-7 theme-muted:bg-tint-6;
+  }
+
+  .stepper-step-body {
+    @apply min-w-0 flex-1 pb-6 [&>*+*]:mt-5;
+  }
+
+  /* File */
+
+  .file-block {
+    @apply flex flex-wrap items-center gap-5 px-5 py-3;
+  }
+
+  .file-block-preview {
+    @apply flex min-h-8 min-w-14 flex-col items-center justify-center gap-1 border-r border-tint-subtle pr-4;
+  }
+
+  .file-block-image {
+    @apply h-auto max-h-10 w-auto max-w-10 rounded object-contain;
+  }
+
+  .file-block-icon {
+    @apply size-5 text-primary;
+  }
+
+  .file-block-info {
+    @apply min-w-24 flex-1;
+  }
+
+  .file-block-name {
+    @apply text-base;
+  }
+
+  .file-block-meta {
+    @apply text-sm text-tint-subtle;
+  }
+
+  .file-block-actions {
+    @apply flex shrink-0 flex-wrap gap-2;
+  }
+
+  /* Updates */
+
+  .updates-block {
+    @apply flex flex-col gap-20;
+  }
+
+  .update-block {
+    @apply relative flex flex-col gap-2 md:flex-row md:gap-4 lg:gap-8;
+  }
+
+  .update-block-aside {
+    /* Sticky only in the row layout; the 0px fallback avoids a jump before JS sets the variable. */
+    @apply h-fit w-40 min-w-40 shrink-0 md:sticky md:top-[calc(var(--toc-top-offset,0px)+8px)]!;
+  }
+
+  .update-block-date {
+    @apply inline-flex items-center text-sm font-medium tracking-wide text-neutral-10;
+  }
+
+  .update-block-tags {
+    @apply mt-2 flex flex-wrap gap-1.5;
+  }
+
+  .update-block-body {
+    @apply flex flex-1 flex-col [&>*:first-child]:!pt-0 [&>*+*]:mt-5;
+  }
+
+  .updates-filter {
+    @apply shrink-0 border-b border-tint-subtle pt-px pb-4;
+  }
+
+  .updates-filter-header {
+    @apply mb-3 ml-3 flex items-center justify-between gap-2;
+  }
+
+  .updates-filter-label {
+    /* The original `leading-wider` was not a real utility and generated nothing. */
+    @apply flex items-center gap-1 text-xs font-semibold text-tint uppercase;
+  }
+
+  .updates-filter-tags {
+    @apply flex flex-wrap gap-1.5 px-3;
+  }
+
+  .updates-chip {
+    @apply inline-flex max-w-full rounded-full not-focus-visible:outline-0 focus-visible:ring-2 focus-visible:ring-primary straight-corners:rounded-xs circular-corners:rounded-2xl;
+  }
+
+  /* Which face shows is toggled by the generated filter stylesheet (see generateUpdatesFilterCSS). */
+  .updates-chip-face {
+    @apply max-w-full items-center gap-1 rounded-full px-2 py-1 text-xs leading-normal font-medium transition-colors straight-corners:rounded-xs circular-corners:rounded-2xl;
+  }
+
+  .updates-chip-selected {
+    @apply hidden bg-primary-original text-contrast-primary-original hover:bg-primary-solid-hover;
+  }
+
+  .updates-chip-dimmed {
+    @apply hidden bg-tint-5 text-tint-strong opacity-8 hover:bg-tint-hover hover:opacity-11;
+  }
+
+  .updates-chip-plain {
+    @apply flex bg-tint-5 text-tint-strong hover:bg-tint-hover;
+  }
+
+  /* Prompt */
+
+  .prompt-block {
+    @apply relative flex w-full flex-col overflow-hidden border border-tint-subtle bg-tint-base text-tint-strong transition contrast-more-strong:border-tint straight-corners:rounded-xs rounded-corners:rounded-xl circular-corners:rounded-2xl;
+  }
+
+  .prompt-block-expanded {
+    @apply bg-tint depth-subtle:shadow-xs;
+  }
+
+  .prompt-header {
+    @apply relative flex min-h-9 flex-row items-center justify-between gap-4 p-3 transition-colors;
+  }
+
+  .prompt-header-open {
+    @apply hover:bg-tint-hover;
+  }
+
+  .prompt-header-closed {
+    @apply hover:bg-tint-subtle;
+  }
+
+  .prompt-toggle {
+    @apply absolute inset-0 z-10 cursor-pointer outline-hidden focus-visible:ring-2 focus-visible:ring-primary-hover;
+  }
+
+  .prompt-title {
+    @apply pointer-events-none relative z-0 flex min-w-0 flex-row items-center gap-2 text-tint-strong;
+  }
+
+  .prompt-body {
+    @apply border-t border-tint-subtle bg-tint-base;
+  }
+
+  .prompt-actions {
+    @apply relative z-20 flex shrink-0 items-center gap-2;
+  }
+
+  .prompt-agent {
+    @apply flex size-4 shrink-0 items-center justify-center rounded-full border border-tint bg-tint-base;
+
+    /* Each chip's border cuts into the one behind it, so the marks stay legible however tightly they are stacked. */
+    & + & {
+      @apply -ms-1.5;
+    }
+  }
+}

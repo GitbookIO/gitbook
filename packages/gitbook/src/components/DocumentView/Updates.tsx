@@ -11,7 +11,7 @@ export function Updates(props: BlockProps<DocumentBlockUpdates>) {
             {...contextProps}
             nodes={block.nodes}
             ancestorBlocks={[...ancestorBlocks, block]}
-            style={[style, 'updates-block flex flex-col gap-20']}
+            style={[style, 'updates-block']}
         />
     );
 }

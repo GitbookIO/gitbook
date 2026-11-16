@@ -1,0 +1,292 @@
+@layer utilities {
+  /* Every block carries this; full-width blocks add `page-content-width`, whose `layout-wide` max-width is more specific. */
+  .gb-block {
+    @apply max-w-3xl w-full decoration-primary/6;
+  }
+
+  /* Lists opt out: a long list is expected to break across printed pages. */
+  .gb-block:not(.gb-block-list) {
+    @apply print:break-inside-avoid;
+  }
+
+  /* Headings */
+  .heading {
+    @apply relative block scroll-mt-(--content-scroll-margin) pointer-fine:flex pointer-fine:items-baseline pointer-fine:pr-0 column-first-of-type:pt-0;
+
+    /* Room for the absolutely positioned anchor icon on coarse pointers. */
+    &:where(:has(> .hash)) {
+      @apply pr-6 pointer-fine:pr-0;
+    }
+  }
+
+  .heading-1 {
+    @apply text-xl @xs:text-2xl @lg:text-3xl font-semibold pt-[1em];
+  }
+
+  .heading-2 {
+    @apply text-lg @xs:text-xl @lg:text-2xl font-semibold pt-[0.75em];
+  }
+
+  .heading-3 {
+    @apply text-base @xs:text-lg @lg:text-xl font-semibold pt-[0.5em];
+  }
+
+  .heading-text {
+    @apply z-1 justify-self-start max-w-full break-words pointer-fine:flex-1;
+
+    &[data-cover-aware-text] {
+      @apply page-cover-background:text-contrast-cover;
+    }
+  }
+
+  .heading-1 > .heading-text {
+    @apply leading-tight;
+  }
+
+  .heading-2 > .heading-text,
+  .heading-3 > .heading-text {
+    @apply leading-snug;
+  }
+
+  /* Heading anchor link */
+  .hash {
+    @apply absolute inline-grid grid-area-1-1 border-0 rounded site-background;
+    @apply pointer-events-none opacity-0 transition-opacity;
+    @apply [transform:translateY(0.17em)];
+  }
+
+  /* Before the `pointer-fine` reset below, which must win at equal specificity. */
+  :where(.heading-1) > .hash {
+    @apply [transform:translateY(0.125em)];
+  }
+
+  .hash {
+    @apply pointer-fine:h-[1em] pointer-fine:pointer-events-auto pointer-fine:relative pointer-fine:-ml-6 pointer-fine:order-first pointer-fine:self-center pointer-fine:pr-2 pointer-fine:[transform:none];
+    @apply pointer-fine:[.flip-heading-hash_&]:order-last pointer-fine:[.flip-heading-hash_&]:ml-1 pointer-fine:[.flip-heading-hash_&]:pl-2;
+
+    /* Same selectors and specificity as the former `group-hover/hash` and `group-focus-within/hash`. */
+    @media (pointer: fine) {
+      &:is(:where(.heading):hover *) {
+        @media (hover: hover) {
+          @apply opacity-100;
+        }
+      }
+      &:is(:where(.heading):focus-within *) {
+        @apply opacity-100;
+      }
+    }
+
+    @apply [.hash-revealed_&]:pointer-events-auto [.hash-revealed_&]:opacity-100;
+  }
+
+  .hash-link {
+    @apply inline-flex items-center p-1 leading-normal pointer-fine:h-full pointer-fine:p-0;
+  }
+
+  .heading-1 .hash-link {
+    @apply leading-tight;
+  }
+
+  .heading-2 .hash-link,
+  .heading-3 .hash-link {
+    @apply leading-snug;
+  }
+
+  .hash-icon {
+    @apply size-4 self-center text-transparent transition-colors;
+
+    @media (pointer: fine) {
+      &:is(:where(.heading):hover *) {
+        @media (hover: hover) {
+          @apply text-tint-subtle contrast-more-strong:text-tint-strong;
+        }
+      }
+      &:is(:where(.heading):focus-within *) {
+        @apply text-tint-subtle contrast-more-strong:text-tint-strong;
+      }
+    }
+
+    @apply [.hash-revealed_&]:text-tint-subtle contrast-more-strong:[.hash-revealed_&]:text-tint-strong;
+  }
+
+  /* Hints */
+  .hint {
+    @apply transition-colors rounded-corners:rounded-md circular-corners:rounded-xl overflow-hidden text-sm grid grid-cols-[auto_1fr];
+  }
+
+  .hint-titled {
+    @apply rounded-corners:rounded-l-none circular-corners:rounded-l-none border-l-2 grid-rows-[auto_auto];
+  }
+
+  .hint-aside {
+    @apply py-4 pl-4;
+  }
+
+  .hint-icon {
+    @apply size-[1.2em] mt-px;
+  }
+
+  /* After `.heading` so its paddings and alignment win. */
+  .hint-heading {
+    @apply w-full items-start pointer-fine:items-baseline py-4! pl-3 text-[1em]! pr-8 pointer-fine:pr-0;
+
+    /* Zero specificity so the heading text keeps its `pointer-fine:flex-1`. */
+    :where(&) > * {
+      @apply flex-none;
+    }
+  }
+
+  /* `min-w-0` lets the `1fr` track shrink, so wide nested blocks scroll instead of overflowing. */
+  .hint-content {
+    @apply p-4 pl-3 empty:p-0 -row-end-1 -col-end-1 min-w-0 space-y-3;
+  }
+
+  /* Lists */
+  .gb-list {
+    @apply min-w-0 space-y-2;
+  }
+
+  .gb-list-item {
+    @apply leading-normal flex items-start;
+  }
+
+  .gb-list-item-heading-1 {
+    @apply leading-tight;
+  }
+
+  .gb-list-item-heading-2,
+  .gb-list-item-heading-3 {
+    @apply leading-snug;
+  }
+
+  .gb-list-item-divider {
+    @apply leading-none;
+  }
+
+  .gb-list-prefix {
+    @apply text-base leading-normal mr-1 flex min-h-lh min-w-6 items-center justify-center text-tint;
+  }
+
+  .gb-list-item-heading-1 > .gb-list-prefix {
+    @apply text-xl @xs:text-2xl @lg:text-3xl font-semibold leading-tight;
+  }
+
+  .gb-list-item-heading-2 > .gb-list-prefix {
+    @apply text-lg @xs:text-xl @lg:text-2xl font-semibold leading-snug;
+  }
+
+  .gb-list-item-heading-3 > .gb-list-prefix {
+    @apply text-base @xs:text-lg @lg:text-xl font-semibold leading-snug;
+  }
+
+  /* A divider has no text size of its own. */
+  .gb-list-item-divider > .gb-list-prefix {
+    @apply leading-none;
+    font-size: inherit;
+  }
+
+  .gb-list-marker {
+    @apply before:content-(--pseudoBefore--content) before:font-var;
+  }
+
+  .gb-list-body {
+    @apply flex min-w-0 flex-1 flex-col space-y-2;
+  }
+
+  /* Blocks inside a list item; after `page-content-width` (page.css) so `mx-0` wins. */
+  .gb-list-child {
+    @apply min-h-lh mx-0;
+
+    /* The first heading in a list item has no top margin. */
+    &:is(h2, h3, h4) {
+      @apply pt-0;
+    }
+  }
+
+  /* Inline code */
+  .inline-code {
+    @apply py-px px-1.5 min-w-6.5 justify-center items-center ring-1 ring-inset ring-tint bg-tint rounded-sm text-[.875em] leading-[calc(max(1.20em,1.25rem))] break-words hyphens-none;
+  }
+
+  .inline-icon {
+    @apply inline size-[1em];
+  }
+
+  .inline-link-icon {
+    @apply ml-0.5 inline size-3 links-accent:text-tint-subtle;
+  }
+
+  .inline-link-mail {
+    @apply ml-1;
+  }
+
+  /* Images */
+  .gb-images {
+    @apply flex w-full justify-center;
+  }
+
+  .gb-images-left {
+    @apply justify-start;
+  }
+
+  .gb-images-right {
+    @apply justify-end;
+  }
+
+  .gb-images-row {
+    @apply flex flex-row gap-3;
+  }
+
+  .gb-images-multi {
+    @apply grid grid-flow-col;
+  }
+
+  .gb-images-framed {
+    @apply rounded-2xl border border-[rgb(234,235,238)] dark:border-[rgb(45,50,58)] relative overflow-hidden w-fit;
+  }
+
+  .gb-image {
+    @apply relative overflow-hidden;
+  }
+
+  /* Captions */
+  .gb-caption {
+    @apply relative;
+  }
+
+  .gb-caption-media {
+    @apply relative overflow-hidden after:block after:absolute after:-inset-0 after:pointer-events-none;
+  }
+
+  .gb-caption-fit {
+    @apply w-fit;
+  }
+
+  .gb-caption-bordered {
+    @apply rounded-corners:rounded-sm circular-corners:rounded-2xl after:border-tint-subtle after:border after:rounded circular-corners:after:rounded-2xl rounded-corners:after:rounded-sm dark:after:mix-blend-plus-lighter after:pointer-events-none;
+  }
+
+  .gb-caption-framed {
+    @apply p-2;
+  }
+
+  .gb-caption-center {
+    @apply mx-auto;
+  }
+
+  .gb-caption-left {
+    @apply mr-auto ml-0;
+  }
+
+  .gb-caption-right {
+    @apply mr-0 ml-auto;
+  }
+
+  .gb-caption-text {
+    @apply text-xs text-center text-tint mt-2;
+  }
+
+  .gb-caption-text-framed {
+    @apply mt-0.5 mb-2.5;
+  }
+}

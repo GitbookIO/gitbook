@@ -13,10 +13,10 @@ import { HeaderLinks } from './HeaderLinks';
 import { HeaderLogo } from './HeaderLogo';
 import { HeaderMobileMenu } from './HeaderMobileMenu';
 import { TranslationsDropdown } from './SpacesDropdown';
-import { CONTAINER_STYLE, HEADER_HEIGHT_DESKTOP } from '@/components/layout';
+import { CONTAINER_STYLE } from '@/components/layout';
 import { getSpaceLanguage, t } from '@/intl/server';
+import { cx } from '@/lib/classnames';
 import type { GitBookSiteContext } from '@/lib/context';
-import { tcls } from '@/lib/tailwind';
 
 /**
  * Render the header for the space.
@@ -35,6 +35,8 @@ export async function Header(props: {
     const language = await getSpaceLanguage(context);
 
     const withSections = shouldRenderSiteSectionNavigation(visibleSections);
+    const prominentSearch =
+        'search' in customization.styling && customization.styling.search === 'prominent';
 
     const headerSocialAccounts = customization.socialAccounts.filter(
         (account) => account.display.header === true
@@ -43,70 +45,19 @@ export async function Header(props: {
     return (
         <header
             data-gb-site-header
-            className={tcls(
-                'flex',
-                'flex-col',
-                `h-[${HEADER_HEIGHT_DESKTOP}px]`,
-                'sticky',
-                'top-0',
-                'pt-[env(safe-area-inset-top)]',
-                'z-30',
-                'w-full',
-                'flex-none',
-                'shadow-[0px_1px_0px]',
-                'shadow-tint-12/2',
-                // Box shadows are dropped in forced colors mode, the separator needs a real border.
-                'forced-colors:border-b',
-
-                'bg-tint-base/9',
-                'theme-muted:bg-tint-subtle/9',
-                '[html.sidebar-filled.theme-bold.tint_&]:bg-tint-subtle/9',
-                'theme-gradient:bg-gradient-primary',
-                'theme-gradient-tint:bg-gradient-tint',
-                'contrast-more:bg-tint-base',
-
-                withTopHeader ? null : 'mobile-only lg:hidden',
-                'text-sm',
-                'backdrop-blur-lg'
-            )}
+            className={cx('header-bar', withTopHeader ? null : 'mobile-only')}
         >
-            <div
-                className={tcls(
-                    'site-header:theme-bold:bg-header-background',
-                    'site-header:theme-bold:shadow-[0px_1px_0px]',
-                    'site-header:theme-bold:shadow-tint-12/2'
-                )}
-            >
-                <div className="lg:chat-open:pr-(--ai-chat-width) transition-all duration-300 motion-reduce:transition-none">
-                    <div
-                        data-gb-header-content
-                        className={tcls(
-                            'gap-4',
-                            'lg:gap-6',
-                            'flex',
-                            'items-center',
-                            'justify-between',
-                            'w-full',
-                            'py-3',
-                            'min-h-16',
-                            'sm:h-16',
-                            CONTAINER_STYLE,
-                            'transition-[max-width] duration-300 motion-reduce:transition-none',
-                            '@container/header'
-                        )}
-                    >
+            <div className="header-inner">
+                <div className="chrome-shift">
+                    <div data-gb-header-content className={cx(CONTAINER_STYLE, 'header-content')}>
                         <div
-                            className={tcls(
-                                'flex max-w-full',
-                                'min-w-0 shrink items-center justify-start gap-2 lg:gap-4',
-                                'search' in customization.styling &&
-                                    customization.styling.search === 'prominent'
-                                    ? 'lg:@2xl:basis-72'
-                                    : null
+                            className={cx(
+                                'header-start',
+                                prominentSearch && 'header-start-prominent'
                             )}
                         >
                             <HeaderMobileMenu
-                                className={tcls(
+                                className={cx(
                                     '-ml-2',
                                     'text-tint-strong',
                                     'site-header:theme-bold:text-header-link',
@@ -121,29 +72,9 @@ export async function Header(props: {
                         </div>
 
                         <div
-                            className={tcls(
-                                'flex',
-                                'grow-0',
-                                'shrink-0',
-                                'md:@2xl:basis-56',
-                                'justify-self-end',
-                                'items-center',
-                                'gap-2',
-                                'transition-[margin] duration-300 motion-reduce:transition-none',
-                                'search' in customization.styling &&
-                                    customization.styling.search === 'prominent'
-                                    ? [
-                                          'md:@2xl:grow-[0.8]',
-                                          'md:@4xl:basis-40',
-                                          'md:@2xl:max-w-[50%]',
-                                          'md:@4xl:max-w-lg',
-                                          'lg:@2xl:ml-[max(calc((100%-18rem-48rem)/2),1.5rem)]', // container (100%) - sidebar (18rem) - content (48rem)
-                                          'chat-closed:xl:ml-[max(calc((100%-18rem-48rem-14rem-3rem)/2),1.5rem)]', // container (100%) - sidebar (18rem) - content (48rem) - outline (14rem) - margin (3rem)
-                                          'md:@2xl:mr-auto',
-                                          'order-last',
-                                          'md:@2xl:order-[unset]',
-                                      ]
-                                    : ['order-last']
+                            className={cx(
+                                'header-search',
+                                prominentSearch && 'header-search-prominent'
                             )}
                         >
                             <SearchContainer
@@ -167,7 +98,7 @@ export async function Header(props: {
                                     );
                                 })}
                                 {headerSocialAccounts.length > 0 ? (
-                                    <div className="flex items-center gap-1">
+                                    <div className="header-social">
                                         {headerSocialAccounts.map((account) => {
                                             return (
                                                 <SocialAccountButton
@@ -208,7 +139,7 @@ export async function Header(props: {
             </div>
 
             {visibleSections && withSections ? (
-                <div className="lg:chat-open:pr-(--ai-chat-width) transition-[padding] duration-300 motion-reduce:transition-none">
+                <div className="chrome-shift-padding">
                     <SiteSectionTabs sections={encodeClientSiteSections(context, visibleSections)}>
                         {variants.translations.length > 1 ? (
                             <TranslationsDropdown

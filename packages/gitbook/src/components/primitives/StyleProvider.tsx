@@ -1,27 +1,25 @@
 'use client';
-import { RecordCardLinkStyles, RecordCardStyles } from '../DocumentView/Table/styles';
-import { ToCLinkItemActiveStyles, ToCLinkItemStyles } from '../TableOfContents/styles';
-import { ButtonStyles, CardStyles, LinkStyles } from './styles';
-import type { ClassValue } from '@/lib/tailwind';
+import type { ClassValue } from '@/lib/classnames';
 
+// Each design token is a single class, styled in `RootLayout/styles/*.css`, so the client
+// bundle and the HTML only carry a short name instead of the full utility list.
 const styles = {
-    LinkStyles,
-    CardStyles,
-    ButtonStyles,
-    RecordCardStyles,
-    RecordCardLinkStyles,
-    ToCLinkItemStyles,
-    ToCLinkItemActiveStyles,
-};
+    LinkStyles: 'link',
+    CardStyles: 'card',
+    ButtonStyles: 'button',
+    RecordCardStyles: 'record-card',
+    RecordCardLinkStyles: 'record-card-link',
+    ToCLinkItemStyles: 'toclink',
+    ToCLinkItemActiveStyles: 'toclink-active',
+} as const;
 
 export type DesignTokenName = keyof typeof styles;
 
 /**
  * Get the class names for the given design token names.
- * TODO: remove this once we figure out a better solution. Likely with TW4.
  * @param names The design token names to get class names for.
  * @returns The class names for the given design token names.
  */
 export function useClassnames(names: DesignTokenName[]): ClassValue[] {
-    return names.flatMap((name) => styles[name] || []);
+    return names.map((name) => styles[name]);
 }
