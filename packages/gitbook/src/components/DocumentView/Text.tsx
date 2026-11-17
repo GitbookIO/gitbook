@@ -125,6 +125,9 @@ function Color(props: MarkedLeafProps<DocumentMarkColor>) {
     const { mark, children } = props;
     return (
         <span
+            data-highlight={
+                mark.data.background && mark.data.background !== 'default' ? '' : undefined
+            }
             className={tcls([
                 textColorToStyle[mark.data.text ?? 'default'],
                 backgroundColorToStyle[mark.data.background ?? 'default'],

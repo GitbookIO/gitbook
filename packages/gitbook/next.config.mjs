@@ -1,6 +1,7 @@
 // @ts-check
 
 import { networkInterfaces } from 'node:os';
+import { fileURLToPath } from 'node:url';
 
 // Next blocks its dev client and HMR when a physical device opens the server over a LAN address.
 // Needed to hydrate the dev client on physical phones/tablets over the internal network
@@ -117,6 +118,17 @@ const nextConfig = {
                 hostname: '*.gitbook.io',
             },
         ],
+    },
+
+    webpack(config, { isServer }) {
+        if (isServer) {
+            // mcp-handler only needs redis for SSE, which we disable: keep the client out of the server bundle.
+            config.resolve.alias = {
+                ...config.resolve.alias,
+                redis$: fileURLToPath(new URL('./src/lib/mcp/redis-stub.ts', import.meta.url)),
+            };
+        }
+        return config;
     },
 
     async headers() {
