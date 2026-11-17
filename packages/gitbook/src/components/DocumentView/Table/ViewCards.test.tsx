@@ -75,7 +75,9 @@ describe('ViewCards', () => {
         expect(renderWithContext(<ViewCards {...props} />)).toContain('@3xl:grid-cols-4');
 
         props.view.wrap = false;
-        expect(renderWithContext(<ViewCards {...props} />)).toContain('@5xl:w-[calc(25%-0.75rem)]');
+        const carousel = renderWithContext(<ViewCards {...props} />);
+        expect(carousel).toContain('@3xl:w-[calc(22.5%-0.75rem)]');
+        expect(carousel).toContain('@5xl:w-[calc(25%-0.75rem)]');
 
         props.context.mode = 'print';
         const printed = renderWithContext(<ViewCards {...props} />);
