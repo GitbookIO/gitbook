@@ -299,6 +299,8 @@ const searchTestCases: Test[] = [
         screenshot: false,
         run: async (page) => {
             await waitForCookiesDialog(page);
+            // Keep the search on the failing route whether or not the site gives search passes.
+            await page.route('**/~gitbook/search-pass', (route) => route.fulfill({ status: 204 }));
             let failing = true;
             await page.route('**/~gitbook/search', (route) =>
                 failing ? route.fulfill({ status: 500 }) : route.continue()
