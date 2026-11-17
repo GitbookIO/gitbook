@@ -18,6 +18,23 @@ export function isPreviewRequest(requestURL: URL): boolean {
 }
 
 /**
+ * Whether a change request or revision URL can render, given the site's published preview setting.
+ * Previews inside GitBook are always allowed.
+ */
+export function isPublishedPreviewAllowed(input: {
+    publicChangeRequestPreviews?: boolean;
+    preview: boolean;
+    changeRequest?: string;
+    revision?: string;
+}): boolean {
+    return (
+        input.preview ||
+        (!input.changeRequest && !input.revision) ||
+        input.publicChangeRequestPreviews !== false
+    );
+}
+
+/**
  * Get the preview request site identifier from the request URL.
  */
 export function getPreviewRequestIdentifier(requestURL: URL): string {

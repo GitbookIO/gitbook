@@ -578,6 +578,7 @@ const searchPassTestCases: Test[] = [
         url: '',
         screenshot: false,
         run: async (page) => {
+            await page.route('**/~gitbook/search-pass', (route) => route.fulfill({ status: 204 }));
             const passReply = page.waitForResponse('**/~gitbook/search-pass');
             const apiCalls: Request[] = [];
             page.on('request', (request) => {

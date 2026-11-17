@@ -224,7 +224,7 @@ function NotFoundSuggestions(props: { suggestions: RelatedPage[] | null }) {
             <h2 className="font-heading font-medium text-tint">
                 {t(language, 'notfound_suggestions_title')}
             </h2>
-            <ul className="flex flex-col gap-2">
+            <ul className="flex flex-col gap-2" aria-busy={loading}>
                 {loading ? (
                     <SkeletonList items={RELATED_PAGES_COUNT} className="my-0.75 max-w-md" />
                 ) : (
