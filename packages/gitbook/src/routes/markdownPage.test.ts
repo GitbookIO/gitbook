@@ -24,6 +24,7 @@ function createContext(options: {
     spaceRedirectPageId?: string;
 }) {
     return {
+        displayAgentInstructions: false,
         organizationId: 'org-1',
         site: { id: 'site-1' },
         siteSpace: { id: 'site-space-1' },
@@ -36,6 +37,9 @@ function createContext(options: {
             spaceBasePath: '/docs/',
         }),
         dataFetcher: {
+            getRevisionPageMarkdown: async () => ({
+                data: '# New page\n\n[Read this page](/pages/page-1)\n',
+            }),
             getSiteRedirectBySource: async ({ source }: { source: string }) =>
                 options.siteRedirect && source === '/old-page'
                     ? {
@@ -54,6 +58,14 @@ function createContext(options: {
 }
 
 describe('servePageMarkdown', () => {
+    it('serves page links that can be opened without the source origin', async () => {
+        const response = await servePageMarkdown(createContext({}), 'new-page');
+        expect(response.status).toBe(200);
+        expect(await response.text()).toContain(
+            '[Read this page](https://docs.example.com/docs/new-page.md)'
+        );
+    });
+
     it('redirects to the markdown version of a site redirect target', async () => {
         const context = createContext({
             siteRedirect: { target: 'https://docs.example.com/docs/new-page', permanent: true },
