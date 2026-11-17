@@ -19,6 +19,7 @@ import {
 
 import { escapeHTML } from './html';
 import type { GitBookLinker } from './links';
+import { withTrailingSlash } from './paths';
 import { resolveContentRef, resolveStringContentRef } from './references';
 import { checkIsAnchor, checkIsExternalURL } from './urls';
 import {
@@ -346,9 +347,11 @@ async function resolveRefURL(
     }
     const contentRef = resolveStringContentRef(url);
     if (!contentRef) {
-        const pageURL = context.linker.toAbsoluteURL(
-            context.linker.toPathForPagePath({ path: currentPagePath })
-        );
+        const pageURL = currentPagePath
+            ? context.linker.toAbsoluteURL(
+                  context.linker.toPathForPagePath({ path: currentPagePath })
+              )
+            : withTrailingSlash(context.linker.toAbsoluteURL(context.linker.toPathInSpace('')));
         if (!URL.canParse(url, pageURL)) {
             return null;
         }

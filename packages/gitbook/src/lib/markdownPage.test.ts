@@ -133,3 +133,25 @@ it('preserves document fragments in generated answers without a page path', asyn
         markdown
     );
 });
+
+it.each(['/docs/', '/docs/api/v2/', '/guide/'])(
+    'resolves relative assets in answers from the space root %s',
+    async (basePath) => {
+        const scoped = {
+            ...context,
+            linker: linkerWithMarkdownPages(
+                createLinker({
+                    host: 'docs.example.com',
+                    siteBasePath: basePath,
+                    spaceBasePath: basePath,
+                })
+            ),
+        };
+        const markdown =
+            '![Image](./image.png)\n\n[Guide][d]\n\n[d]: ./guide\n\n<a href="./guide">Guide</a>\n';
+        const output = toPageMarkdown(await fromPageMarkdown(scoped, { markdown, pagePath: '' }));
+        expect(output).toContain(`![Image](https://docs.example.com${basePath}image.png)`);
+        expect(output).toContain(`[d]: https://docs.example.com${basePath}guide`);
+        expect(output).toContain(`<a href="https://docs.example.com${basePath}guide">Guide</a>`);
+    }
+);
