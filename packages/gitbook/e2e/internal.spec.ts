@@ -373,6 +373,8 @@ const searchTestCases: Test[] = [
         screenshot: false,
         run: async (page) => {
             await waitForCookiesDialog(page);
+            // Keep both searches on the held route whether or not the site gives search passes.
+            await page.route('**/~gitbook/search-pass', (route) => route.fulfill({ status: 204 }));
             const heldSearch = await holdSearchRequests(page);
             const startPath = new URL(page.url()).pathname;
             const searchInput = page.getByTestId('search-input');
