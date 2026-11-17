@@ -23,6 +23,7 @@ import type {
 import { GITBOOK_URL } from './env';
 import { type ImageResizer, createImageResizer } from './images';
 import { type GitBookLinker, createLinker, linkerForPublishedURL } from './links';
+import { isPublishedPreviewAllowed } from './preview';
 import type { AskVisitorAgent } from '@/lib/ask-visitor';
 import {
     type GitBookDataFetcher,
@@ -339,6 +340,24 @@ export async function fetchSiteContextByIds(
             ),
             fetchSpaceContextByIds(baseContext, ids),
         ]);
+
+    const { publicChangeRequestPreviews } = orgSite as Site & {
+        publicChangeRequestPreviews?: boolean;
+    };
+    if (
+        !isPublishedPreviewAllowed({
+            publicChangeRequestPreviews,
+            preview: ids.preview,
+            changeRequest: ids.changeRequest,
+            revision: ids.revision,
+        })
+    ) {
+        getLogger().info('Refused disabled published preview', {
+            site: ids.site,
+            selector: ids.changeRequest ? 'change-request' : 'revision',
+        });
+        notFound();
+    }
 
     const sections = ids.siteSection
         ? parseSiteSectionsAndGroups(siteStructure, ids.siteSection)
