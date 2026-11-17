@@ -1,4 +1,4 @@
-import { type Page, type Request, expect } from '@playwright/test';
+import { type Page, type Request, type Route, expect } from '@playwright/test';
 import jwt from 'jsonwebtoken';
 
 import {
@@ -72,6 +72,60 @@ function trackInsightsEvents(page: Page, type: string) {
     });
 
     return collected;
+}
+
+/**
+ * Hold the page's search requests until the test answers them, and find a held one by query.
+ */
+async function holdSearchRequests(page: Page) {
+    const held: Route[] = [];
+    await page.route('**/~gitbook/search', (route) => {
+        held.push(route);
+    });
+
+    return async (query: string) => {
+        await expect
+            .poll(() => held.some((route) => route.request().postDataJSON().query === query))
+            .toBe(true);
+        const index = held.findIndex((route) => route.request().postDataJSON().query === query);
+        const [route] = held.splice(index, 1);
+        if (!route) {
+            throw new Error(`No held search for "${query}"`);
+        }
+        return route;
+    };
+}
+
+/**
+ * Answer a held search request with the server's own answer, and return its top result.
+ */
+async function answerSearch(route: Route) {
+    const response = await route.fetch();
+    const [topResult]: { title: string; href: string }[] = await response.json();
+    await route.fulfill({ response });
+    if (!topResult) {
+        throw new Error('The search answer has no results');
+    }
+    return topResult;
+}
+
+/**
+ * Build a page result for a search answer given by the test.
+ */
+function searchPageResult(route: Route, siteSpaceId: string, title: string, path: string) {
+    const sitePath = new URL(route.request().url()).pathname.replace('~gitbook/search', '');
+    return {
+        type: 'page',
+        id: `space/${title}`,
+        pageId: title,
+        spaceId: 'space',
+        siteSpaceId,
+        title,
+        description: '',
+        href: `${sitePath}${path}`,
+        score: 1,
+        rank: 1,
+    };
 }
 
 const overrideAIInitialState = () => {
@@ -284,6 +338,43 @@ const searchTestCases: Test[] = [
                 .evaluate((heading) => heading.getBoundingClientRect().top);
             expect(top).toBeGreaterThanOrEqual(0);
             expect(top).toBeLessThanOrEqual(150);
+        },
+    },
+    {
+        name: 'Search - Enter while results load opens the top result of the last query',
+        url: `blocks/lists${getCustomizationURL({
+            ai: {
+                mode: CustomizationAIMode.None,
+            },
+        })}`,
+        screenshot: false,
+        run: async (page) => {
+            await waitForCookiesDialog(page);
+            // Keep both searches on the held route whether or not the site gives search passes.
+            await page.route('**/~gitbook/search-pass', (route) => route.fulfill({ status: 204 }));
+            const heldSearch = await holdSearchRequests(page);
+            const startPath = new URL(page.url()).pathname;
+            const searchInput = page.getByTestId('search-input');
+            await searchInput.focus();
+            await page.waitForURL(/[?&]q=/);
+            await searchInput.pressSequentially('gitbook');
+            const firstSearch = await heldSearch('gitbook');
+            await searchInput.selectText();
+            await searchInput.pressSequentially('files');
+            const lastSearch = await heldSearch('files');
+
+            await page.keyboard.press('Enter');
+            await answerSearch(firstSearch).catch(() => {});
+            await page.waitForTimeout(1000);
+            await expect(page.getByTestId('search-popover')).toBeVisible();
+            await expect(searchInput).toBeFocused();
+            expect(new URL(page.url()).pathname).toBe(startPath);
+
+            const topResult = await answerSearch(lastSearch);
+            await expect(
+                page.getByRole('heading', { level: 1, name: topResult.title, exact: true })
+            ).toBeVisible({ timeout: 20000 });
+            expect(new URL(page.url()).pathname).toBe(new URL(topResult.href, page.url()).pathname);
         },
     },
     {
@@ -1016,6 +1107,59 @@ const testCases: TestsCase[] = [
                         .locator('[data-testid="space-dropdown-button"]')
                         .locator('visible=true');
                     await spaceDrowpdown.waitFor();
+                },
+            },
+            {
+                name: 'Search scope change while loading shows the new answer in server order',
+                url: '',
+                screenshot: false,
+                run: async (page) => {
+                    await waitForHydration(page);
+                    const heldSearch = await holdSearchRequests(page);
+                    const searchInput = page.getByTestId('search-input');
+                    await searchInput.focus();
+                    await page.waitForURL(/[?&]q=/);
+                    await searchInput.pressSequentially('quick');
+                    const variantSearch = await heldSearch('quick');
+
+                    const searchPopup = page.getByTestId('search-popover');
+                    await searchPopup.getByRole('button', { name: 'Multi-Variants' }).click();
+                    await page.getByRole('menuitem', { name: /All content/ }).click();
+                    const allContentSearch = await heldSearch('quick');
+
+                    const variantScope = variantSearch.request().postDataJSON().scope;
+                    expect(allContentSearch.request().postDataJSON().scope).not.toEqual(
+                        variantScope
+                    );
+                    const { siteSpaceId } = variantScope;
+                    await allContentSearch.fulfill({
+                        json: [
+                            searchPageResult(allContentSearch, siteSpaceId, 'Welcome!', ''),
+                            searchPageResult(
+                                allContentSearch,
+                                siteSpaceId,
+                                'Quick Start',
+                                'quick-start'
+                            ),
+                        ],
+                    });
+                    await variantSearch
+                        .fulfill({
+                            json: [
+                                searchPageResult(
+                                    variantSearch,
+                                    siteSpaceId,
+                                    'Quick Start',
+                                    'quick-start'
+                                ),
+                            ],
+                        })
+                        .catch(() => {});
+
+                    const results = searchPopup.getByTestId('search-page-result');
+                    await expect(results).toHaveText([/Welcome!/, /Quick Start/]);
+                    await page.waitForTimeout(1000);
+                    await expect(results).toHaveText([/Welcome!/, /Quick Start/]);
                 },
             },
             {
@@ -3531,6 +3675,34 @@ const testCases: TestsCase[] = [
                     await expect(newPage).toHaveURL(/gitbook\.gitbook\.io/);
                     // Close it immediately to avoid navigation
                     await newPage.close();
+                },
+            },
+        ],
+    },
+    {
+        name: 'Docs Embed - Search',
+        contentBaseURL: 'https://gitbook.gitbook.io/test-gitbook-open/~gitbook/embed/',
+        tests: [
+            {
+                name: 'Enter while results load opens the top result',
+                url: 'search',
+                screenshot: false,
+                run: async (page) => {
+                    await page.waitForLoadState('load');
+                    const heldSearch = await holdSearchRequests(page);
+                    const searchInput = page.getByTestId('search-input');
+                    await searchInput.pressSequentially('files');
+                    const search = await heldSearch('files');
+
+                    await searchInput.press('Enter');
+                    await page.waitForTimeout(1000);
+                    await expect(searchInput).toBeFocused();
+                    await expect(page.getByTestId('embed-docs-page')).toHaveCount(0);
+
+                    const topResult = await answerSearch(search);
+                    await expect(
+                        page.getByRole('heading', { level: 1, name: topResult.title, exact: true })
+                    ).toBeVisible({ timeout: 20000 });
                 },
             },
         ],

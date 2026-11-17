@@ -53,6 +53,7 @@ export function SearchContainer({
         error,
         fetching,
         onInputKeyDown,
+        inputHandlers,
         onResultSelect,
         open,
         query,
@@ -149,6 +150,7 @@ export function SearchContainer({
             aria-controls={resultsId}
             onChange={setQuery}
             onKeyDown={onInputKeyDown}
+            {...inputHandlers}
             value={searchValue}
             withAI={withSearchAI}
             isOpen={isSearchOpen}
@@ -215,6 +217,7 @@ export function SearchContainer({
                         aria-controls={resultsId}
                         onChange={setQuery}
                         onKeyDown={onInputKeyDown}
+                        {...inputHandlers}
                         value={searchValue}
                         withAI={withSearchAI}
                         isOpen={isSearchOpen}

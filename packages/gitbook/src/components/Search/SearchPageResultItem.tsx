@@ -2,24 +2,18 @@ import React from 'react';
 
 import { Icon, type IconName } from '@gitbook/icons';
 
-import { SkeletonParagraph } from '../primitives';
 import { Tooltip } from '../primitives';
-import { Emoji } from '../primitives/Emoji/Emoji';
 import { getPageResultPresentation } from './getPageResultHref';
 import { HighlightQuery } from './HighlightQuery';
-import type { MergedPageResult } from './reciprocalRankFusion';
 import type { ComputedPageResult } from './search-types';
 import { SearchResultItem } from './SearchResultItem';
-import type { LocalPageResult } from './useLocalSearchResults';
 import { tString, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
-
-type PageItem = ComputedPageResult | LocalPageResult | MergedPageResult;
 
 export const SearchPageResultItem = React.forwardRef(function SearchPageResultItem(
     props: {
         query: string;
-        item: PageItem;
+        item: ComputedPageResult;
         active: boolean;
         style?: React.CSSProperties;
     },
@@ -28,46 +22,19 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
     const { query, item, active, style, ...rest } = props;
     const language = useLanguage();
 
-    const { bestSection, description, href } = (() => {
-        if (item.type === 'page') {
-            const presentation = getPageResultPresentation(item);
-            return {
-                bestSection: presentation.preview,
-                description: presentation.description,
-                href: presentation.href,
-            };
-        }
-
-        return { bestSection: undefined, description: item.description, href: item.pathname };
-    })();
+    const { preview: bestSection, description, href } = getPageResultPresentation(item);
     const preview = bestSection
         ? [bestSection.title, bestSection.body].filter(Boolean).join(' · ')
         : undefined;
 
-    const emoji = 'emoji' in item ? item.emoji : undefined;
-    const icon = 'icon' in item ? item.icon : undefined;
-
-    const leadingIcon = emoji ? (
-        <span className="flex size-4 shrink-0 items-center justify-center">
-            <Emoji code={emoji} style="text-base leading-none" />
-        </span>
-    ) : icon ? (
-        <Icon icon={icon as IconName} className="size-4" />
-    ) : (
-        <Icon icon="file-lines" className="size-4" />
-    );
-
-    const insights =
-        item.type === 'page'
-            ? {
-                  type: 'search_open_result' as const,
-                  query,
-                  result: {
-                      pageId: item.pageId,
-                      spaceId: item.spaceId,
-                  },
-              }
-            : undefined;
+    const insights = {
+        type: 'search_open_result' as const,
+        query,
+        result: {
+            pageId: item.pageId,
+            spaceId: item.spaceId,
+        },
+    };
 
     return (
         <SearchResultItem
@@ -76,7 +43,7 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
             active={active}
             data-testid="search-page-result"
             action={tString(language, 'view')}
-            leadingIcon={leadingIcon}
+            leadingIcon={<Icon icon="file-lines" className="size-4" />}
             insights={insights}
             aria-label={tString(language, 'search_page_result_title', item.title)}
             style={{
@@ -91,11 +58,7 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
             <div
                 className={tcls(
                     'relative h-5 w-full transition-[height] duration-300',
-                    item.type === 'local-page' && !preview && !description
-                        ? '[[aria-busy=false]_&]:h-0'
-                        : !preview && !description
-                          ? 'h-0'
-                          : ''
+                    !preview && !description ? 'h-0' : ''
                 )}
                 style={{ transitionDelay: style?.animationDelay }}
             >
@@ -119,26 +82,15 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
                         <HighlightQuery query={query} text={description} />
                     </p>
                 ) : null}
-
-                {item.type === 'local-page' ? (
-                    <SkeletonParagraph
-                        size="small"
-                        lines={1}
-                        className={tcls(
-                            'absolute inset-0 origin-left',
-                            preview || description
-                                ? 'hidden animate-blur-out'
-                                : '[[aria-busy=false]_&]:hidden [[aria-busy=false]_&]:animate-blur-out'
-                        )}
-                        style={{ animationDelay: style?.animationDelay }}
-                    />
-                ) : null}
             </div>
         </SearchResultItem>
     );
 });
 
-const Breadcrumbs = (props: { breadcrumbs: PageItem['breadcrumbs']; withOverflow?: boolean }) => {
+const Breadcrumbs = (props: {
+    breadcrumbs: ComputedPageResult['breadcrumbs'];
+    withOverflow?: boolean;
+}) => {
     const { breadcrumbs, withOverflow = (breadcrumbs?.length ?? 0) > 4 } = props;
 
     if (!breadcrumbs || breadcrumbs.length === 0) return null;

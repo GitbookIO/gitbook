@@ -19,12 +19,12 @@ import { tcls } from '@/lib/tailwind';
 
 export interface SearchResultsRef {
     select(): boolean;
+    /** Activate the first result, ignoring the cursor. */
+    selectFirst(): boolean;
 }
 
 function getResultKey(item: ResultType): string {
     switch (item.type) {
-        case 'local-page':
-            return `page:${item.id}`;
         case 'page':
             return `page:${item.pageId}`;
         case 'record':
@@ -107,6 +107,11 @@ export const SearchResults = React.forwardRef(function SearchResults(
         ref,
         () => ({
             select,
+            selectFirst: () => {
+                const first = refs.current[0];
+                first?.click();
+                return Boolean(first);
+            },
         }),
         [select]
     );
@@ -114,7 +119,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
     const { assistants } = useAI();
     const primaryAssistant = assistants[0];
 
-    if (error && results.length === 0) {
+    if (error) {
         return (
             <output
                 className={tcls(
@@ -157,26 +162,6 @@ export const SearchResults = React.forwardRef(function SearchResults(
         </output>
     );
 
-    const partialError = error ? (
-        <div
-            className={tcls(
-                'mt-3',
-                'rounded-corners:rounded-md',
-                'circular-corners:rounded-2xl',
-                'bg-tint-subtle',
-                'px-3',
-                'py-2',
-                'text-center',
-                'text-sm',
-                'text-tint-subtle',
-                'animate-blur-in-slow'
-            )}
-            role="status"
-        >
-            {t(language, 'search_partial_error')}
-        </div>
-    ) : null;
-
     return (
         <output className="flex grow flex-col" aria-busy={fetching}>
             {children}
@@ -202,10 +187,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
                             const handleResultSelect = (
                                 event: React.MouseEvent<HTMLAnchorElement>
                             ) => {
-                                const isPageResult =
-                                    item.type === 'local-page' ||
-                                    item.type === 'page' ||
-                                    item.type === 'record';
+                                const isPageResult = item.type === 'page' || item.type === 'record';
 
                                 if (
                                     isPageResult &&
@@ -238,7 +220,6 @@ export const SearchResults = React.forwardRef(function SearchResults(
                                 onClickCapture: handleResultSelect,
                             };
                             switch (item.type) {
-                                case 'local-page':
                                 case 'page': {
                                     return (
                                         <motion.div
@@ -353,7 +334,6 @@ export const SearchResults = React.forwardRef(function SearchResults(
                     {!fetching && results.length === 0 ? noResults : null}
                 </>
             )}
-            {partialError}
             {fetching ? (
                 <div
                     className={tcls(
