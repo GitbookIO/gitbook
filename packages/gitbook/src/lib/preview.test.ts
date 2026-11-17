@@ -6,6 +6,7 @@ import {
     getPreviewCookieResponse,
     getPreviewRequestIdentifier,
     isPreviewRequest,
+    isPublishedPreviewAllowed,
     parsePreviewCustomizationCookie,
     serializePreviewCustomizationCookie,
 } from './preview';
@@ -89,5 +90,26 @@ describe('parsePreviewCustomizationCookie', () => {
         expect(
             parsePreviewCustomizationCookie(encodeURIComponent(customization), 'sitesp_a')
         ).toBeUndefined();
+    });
+});
+
+describe('isPublishedPreviewAllowed', () => {
+    const disabled = { publicChangeRequestPreviews: false };
+
+    it('refuses change requests and revisions on the published site when disabled', () => {
+        expect(
+            isPublishedPreviewAllowed({ ...disabled, preview: false, changeRequest: '458' })
+        ).toBe(false);
+        expect(isPublishedPreviewAllowed({ ...disabled, preview: false, revision: 'rev' })).toBe(
+            false
+        );
+    });
+
+    it('allows previews inside GitBook, live pages and sites without the setting', () => {
+        expect(
+            isPublishedPreviewAllowed({ ...disabled, preview: true, changeRequest: '458' })
+        ).toBe(true);
+        expect(isPublishedPreviewAllowed({ ...disabled, preview: false })).toBe(true);
+        expect(isPublishedPreviewAllowed({ preview: false, changeRequest: '458' })).toBe(true);
     });
 });
