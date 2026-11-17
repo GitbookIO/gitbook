@@ -50,6 +50,7 @@ export async function handleMcpRequest(
             streamableHttpEndpoint: context.linker.toPathInSite(endpoint),
             maxDuration: 60,
             verboseLogs: true,
+            // SSE needs redis, which next.config.mjs stubs out of the server bundle.
             disableSse: true,
         }
     );

@@ -198,6 +198,50 @@ export function createLinker(
 }
 
 /**
+ * Serializable inputs of the linker of a site request.
+ */
+export type SiteLinkerInput = {
+    urlMode: 'url' | 'url-host';
+    siteHost: string;
+    siteBasePath: string;
+    spaceBasePath: string;
+    /** Main host GitBook runs on, used in `url` mode. */
+    gitbookURL: string | undefined;
+};
+
+/**
+ * Create the linker of a site request, for the URL mode it is served in.
+ */
+export function createSiteLinker(input: SiteLinkerInput): GitBookLinker {
+    const { urlMode, siteHost, siteBasePath, spaceBasePath } = input;
+    const gitbookURL = input.gitbookURL ? new URL(input.gitbookURL) : undefined;
+
+    const linker =
+        urlMode === 'url-host'
+            ? createLinker({
+                  host: siteHost,
+                  siteBasePath,
+                  spaceBasePath,
+              })
+            : createLinker({
+                  protocol: gitbookURL?.protocol,
+                  host: gitbookURL?.host,
+                  siteBasePath: `/url/${siteHost}${siteBasePath}`,
+                  spaceBasePath: `/url/${siteHost}${spaceBasePath}`,
+              });
+
+    if (urlMode === 'url') {
+        // Create link in the same format for links to other sites/sections.
+        linker.toLinkForContent = (rawURL: string) => {
+            const urlObject = new URL(rawURL);
+            return `/url/${urlObject.host}${urlObject.pathname}${urlObject.search}${urlObject.hash}`;
+        };
+    }
+
+    return linker;
+}
+
+/**
  * Create a new linker that intercepts links that belongs to the published site and rewrite them
  * relative to the URL being served.
  *

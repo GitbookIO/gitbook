@@ -1,5 +1,6 @@
 import { jwtDecode } from 'jwt-decode';
 import { forbidden, notFound } from 'next/navigation';
+import { cache } from 'react';
 import rison from 'rison';
 
 import type { SiteAPIToken } from '@gitbook/api';
@@ -27,7 +28,17 @@ export type RouteParams = RouteLayoutParams & {
 /**
  * Get the static context when rendering statically a site.
  */
-export async function getStaticSiteContext(params: RouteLayoutParams) {
+export function getStaticSiteContext(params: RouteLayoutParams) {
+    return getStaticSiteContextCached(params.mode, params.siteURL, params.siteData);
+}
+
+// Layouts, pages and their metadata functions each resolve the context: share it per request.
+// Keyed on the raw strings as `params` objects aren't guaranteed to be the same reference.
+const getStaticSiteContextCached = cache((mode: string, siteURL: string, siteData: string) =>
+    resolveStaticSiteContext({ mode, siteURL, siteData })
+);
+
+async function resolveStaticSiteContext(params: RouteLayoutParams) {
     const siteURL = getSiteURLFromParams(params);
     const siteURLData = getSiteURLDataFromParams(params);
 
@@ -57,7 +68,15 @@ export async function getStaticSiteContext(params: RouteLayoutParams) {
  * Get the site context when rendering dynamically.
  * The context will depend on the request.
  */
-export async function getDynamicSiteContext(params: RouteLayoutParams) {
+export function getDynamicSiteContext(params: RouteLayoutParams) {
+    return getDynamicSiteContextCached(params.mode, params.siteURL, params.siteData);
+}
+
+const getDynamicSiteContextCached = cache((mode: string, siteURL: string, siteData: string) =>
+    resolveDynamicSiteContext({ mode, siteURL, siteData })
+);
+
+async function resolveDynamicSiteContext(params: RouteLayoutParams) {
     const siteURL = getSiteURLFromParams(params);
     const siteURLData = getSiteURLDataFromParams(params);
 

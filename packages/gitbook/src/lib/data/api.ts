@@ -11,7 +11,7 @@ import {
 import { getCacheTag, getComputedContentSourceCacheTags } from '@gitbook/cache-tags';
 
 import { cache } from '../cache';
-import { DataFetcherError, isTransientDataFetcherError, wrapDataFetcherError } from './errors';
+import { DataFetcherError, wrapDataFetcherError } from './errors';
 import type { GitBookDataFetcher } from './types';
 import { GITBOOK_API_TOKEN, GITBOOK_API_URL, GITBOOK_USER_AGENT } from '@/lib/env';
 import { trace } from '@/lib/tracing';
@@ -704,7 +704,7 @@ const getPublishedContentSite = cache(
                         }
                     );
                     cacheTag(...getCacheTagsFromResponse(res));
-                    cacheLife('days');
+                    cacheLifeFromResponse(res, 'days');
                     return res.data;
                 }
             );
@@ -785,64 +785,43 @@ const getEmbedByUrl = cache(
     }
 );
 
-// We don't use remote cache for this one because of the number of potential cache entry causing 429 on vercel runtime cache when revalidating
-const searchSiteContent = cache(
-    async (
-        input: DataFetcherInput,
-        params: Parameters<GitBookDataFetcher['searchSiteContent']>[0]
-    ) => {
-        'use cache';
-        cacheTag(
-            getCacheTag({
-                tag: 'site',
-                site: params.siteId,
-            })
+async function searchSiteContent(
+    input: DataFetcherInput,
+    params: Parameters<GitBookDataFetcher['searchSiteContent']>[0]
+) {
+    return wrapDataFetcherError(async () => {
+        return trace(
+            `searchSiteContent(${params.organizationId}, ${params.siteId}, ${params.query})`,
+            async () => {
+                const { organizationId, siteId, query, scope } = params;
+                const api = apiClient(input);
+                const res = await api.orgs.searchSiteContent(
+                    organizationId,
+                    siteId,
+                    {
+                        query,
+                        ...(scope.mode === 'current' && scope.restrictTo
+                            ? {
+                                  // `restrictTo` only exists in the newer `scope` request shape,
+                                  // and the published @gitbook/api types don't include it yet.
+                                  scope: {
+                                      mode: 'default',
+                                      currentSiteSpace: scope.siteSpaceId,
+                                      restrictTo: scope.restrictTo,
+                                  } as SiteSearchScope,
+                              }
+                            : scope),
+                    },
+                    {},
+                    {
+                        ...noCacheFetchOptions,
+                    }
+                );
+                return res.data.items;
+            }
         );
-
-        const result = await wrapDataFetcherError(async () => {
-            return trace(
-                `searchSiteContent(${params.organizationId}, ${params.siteId}, ${params.query})`,
-                async () => {
-                    const { organizationId, siteId, query, scope } = params;
-                    const api = apiClient(input);
-                    const res = await api.orgs.searchSiteContent(
-                        organizationId,
-                        siteId,
-                        {
-                            query,
-                            ...(scope.mode === 'current' && scope.restrictTo
-                                ? {
-                                      // `restrictTo` only exists in the newer `scope` request shape,
-                                      // and the published @gitbook/api types don't include it yet.
-                                      scope: {
-                                          mode: 'default',
-                                          currentSiteSpace: scope.siteSpaceId,
-                                          restrictTo: scope.restrictTo,
-                                      } as SiteSearchScope,
-                                  }
-                                : scope),
-                        },
-                        {},
-                        {
-                            ...noCacheFetchOptions,
-                        }
-                    );
-                    cacheTag(...getCacheTagsFromResponse(res));
-                    cacheLife('hours');
-                    return res.data.items;
-                }
-            );
-        });
-
-        // Don't serve transient errors for the default 15 minutes. Only safe because search runs in
-        // request handlers: a page cache calling it would inherit this short life during API incidents.
-        if (result.error && isTransientDataFetcherError(result.error)) {
-            cacheLife({ stale: 0, revalidate: 0, expire: 0 });
-        }
-
-        return result;
-    }
-);
+    });
+}
 
 const renderIntegrationUi = cache(
     async (

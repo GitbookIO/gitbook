@@ -73,7 +73,11 @@ export function ScrollSectionsList({ sections }: { sections: DocumentSection[] }
                         'mt-2',
                         'first:mt-0',
                         'mb-0.5',
-                        section.depth > 1 && ['ml-3', 'my-0', 'sidebar-list-line:ml-0']
+                        section.depth > 1 && [
+                            section.depth > 2 ? 'ml-6' : 'ml-3',
+                            'my-0',
+                            'sidebar-list-line:ml-0',
+                        ]
                     )}
                     ref={activeId === section.id ? activeItemRef : null}
                     {...(section.tags !== undefined
@@ -119,7 +123,9 @@ export function ScrollSectionsList({ sections }: { sections: DocumentSection[] }
 
                             section.depth > 1 && [
                                 'subitem',
-                                'sidebar-list-line:pl-6',
+                                section.depth > 2
+                                    ? 'sidebar-list-line:pl-9'
+                                    : 'sidebar-list-line:pl-6',
                                 'opacity-8',
                                 'contrast-more:opacity-11',
 

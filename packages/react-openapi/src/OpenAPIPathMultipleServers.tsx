@@ -36,11 +36,14 @@ export function OpenAPIPathMultipleServers(
             };
         });
 
+    // The store outlives client-side navigation, so it can hold a server from another spec.
+    const selectedServer = items.find((item) => item.key === key)?.key ?? defaultServer;
+
     return (
         <OpenAPIPathItem
             copyType="button"
             {...props}
-            value={`${withServer ? key : ''}${path}`}
+            value={`${withServer ? selectedServer : ''}${path}`}
             context={context}
         >
             {withServer ? (
