@@ -180,7 +180,11 @@ function CodeBlockExpandable(props: {
             <div
                 className={tcls(
                     !isExpanded
-                        ? '[&_pre]:h-[calc(2rem+var(--line-count)*var(--line-height))] [&_pre]:overflow-y-hidden'
+                        ? [
+                              '[&_pre]:h-[calc(2rem+var(--line-count)*var(--line-height))] [&_pre]:overflow-y-hidden',
+                              // Mask the code rather than the pre to keep its border, with stops on the visible lines.
+                              '[&_code]:mask-b-from-[calc((var(--line-count)+1)*var(--line-height)*0.55)] [&_code]:mask-b-to-[calc((var(--line-count)+1)*var(--line-height))]',
+                          ]
                         : ''
                 )}
                 style={
