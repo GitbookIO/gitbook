@@ -1,4 +1,3 @@
-import { decodeHTMLAttribute } from 'entities';
 import type { Definition, Html, Image, Link, Paragraph, Root } from 'mdast';
 import { fromMarkdown } from 'mdast-util-from-markdown';
 import { frontmatterFromMarkdown } from 'mdast-util-frontmatter';
@@ -6,7 +5,7 @@ import { gfmFromMarkdown, gfmToMarkdown } from 'mdast-util-gfm';
 import { toMarkdown } from 'mdast-util-to-markdown';
 import { frontmatter } from 'micromark-extension-frontmatter';
 import { gfm } from 'micromark-extension-gfm';
-import path from 'node:path';
+import { type DefaultTreeAdapterMap, parseFragment } from 'parse5';
 import { remove } from 'unist-util-remove';
 import { visit } from 'unist-util-visit';
 
@@ -32,10 +31,6 @@ import type { ResolvedPagePath } from '@/lib/pages';
 import { getIndexablePages } from '@/lib/sitemap';
 import { getMarkdownForPagesTree } from '@/routes/llms';
 
-const HTML_ANCHOR_RE = /<a\b([^>]*?)href="([^"]*)"([^>]*)>([\s\S]*?)<\/a>/g;
-const HTML_ANCHOR_OPEN_RE = /<a\b([^>]*?)href="([^"]*)"([^>]*)>/g;
-const HTML_SRC_RE = /\bsrc="([^"]*)"/g;
-const HTML_SRCSET_RE = /\bsrcset="([^"]*)"/g;
 const SRCSET_CANDIDATE_RE = /(\S*[^,\s])(?:\s+[^,]*)?(?:,|$)/g;
 
 /**
@@ -257,60 +252,30 @@ async function renderGroupPageMarkdown(args: {
     });
 }
 
-/**
- * Re-writes URLs in a markdown content:
- * - stable content refs (`/pages/:id`, `/spaces/:id/pages/:id`, `/files/:id`...) in links,
- *   images, definitions and in the `href`/`src` of raw HTML blocks are resolved to site URLs.
- * - the URL of every relative <a> link so it is expressed from the site-root.
- */
+/** Resolve exported Markdown destinations in their source context. */
 async function rewriteMarkdownLinks(
     context: GitBookAnyContext,
     tree: Root,
     currentPagePath: string
 ): Promise<Root> {
-    const currentDir = path.posix.dirname(currentPagePath);
-
     const pending: Promise<void>[] = [];
 
     visit(tree, 'link', (node: Link) => {
         const isMention = isMentionLike(node);
         const original = node.url;
-
-        if (checkIsExternalURL(original) || checkIsAnchor(original)) {
-            return;
-        }
-
-        const contentRef = resolveStringContentRef(original);
-
-        if (contentRef) {
-            pending.push(
-                (async () => {
-                    const resolved = await resolveContentRef(contentRef, context);
-                    node.url = resolved
-                        ? context.linker.toAbsoluteURL(resolved.href)
-                        : toBrokenURL(original);
-
-                    if (isMention) {
-                        // Replace the text for mentions as otherwise it contains the raw ref
-                        node.children = [
-                            { type: 'text', value: resolved?.text ?? 'Broken mention' },
-                        ];
-                        node.title = undefined;
-                    }
-                })()
-            );
-        } else {
-            // DEPRECATED: to be removed once rollout for getRevisionPageMarkdown is done
-            //
-            // Resolve against the current page’s directory and strip any leading “/” or "../"
-            // Sometimes the path can be "../" if we are on the default section
-            // but it means we are just at the root of the site.
-            const pathInPage = path.posix
-                .normalize(path.posix.join(currentDir, original))
-                .replace(/^[/.]+/, '');
-
-            node.url = context.linker.toAbsoluteURL(context.linker.toPathInSpace(pathInPage));
-        }
+        pending.push(
+            (async () => {
+                const resolved = await resolveRefURL(context, original, currentPagePath);
+                if (!resolved) {
+                    return;
+                }
+                node.url = resolved.url;
+                if (isMention && resolveStringContentRef(original)) {
+                    node.children = [{ type: 'text', value: resolved.text ?? 'Broken mention' }];
+                    node.title = undefined;
+                }
+            })()
+        );
     });
 
     visit(tree, 'image', (node: Image) => {
@@ -380,45 +345,85 @@ async function rewriteHTMLRefs(
     node: Html,
     currentPagePath: string
 ): Promise<void> {
-    node.value = await replaceAsync(node.value, HTML_ANCHOR_RE, async (match) => {
-        const [full, before = '', href = '', after = '', text = ''] = match;
-        const resolved = await resolveRefURL(context, decodeHTMLAttribute(href), currentPagePath);
-        if (!resolved) {
-            return full;
+    const fragment = parseFragment(node.value, { sourceCodeLocationInfo: true });
+    const elements: DefaultTreeAdapterMap['element'][] = [];
+    function collect(element: DefaultTreeAdapterMap['node']) {
+        if ('tagName' in element) {
+            elements.push(element);
         }
-        // The API emits the raw ref as the text; swap it for the resolved title.
-        const content =
-            text === href && resolveStringContentRef(decodeHTMLAttribute(href))
-                ? escapeHTML(resolved.text ?? 'Broken link')
-                : text;
-        return `<a${before}href="${escapeHTML(resolved.url)}"${after}>${content}</a>`;
-    });
+        if ('childNodes' in element) {
+            element.childNodes.forEach(collect);
+        }
+        if ('content' in element) {
+            collect(element.content);
+        }
+    }
+    collect(fragment);
 
-    node.value = await replaceAsync(node.value, HTML_ANCHOR_OPEN_RE, async (match) => {
-        const [full, before = '', href = '', after = ''] = match;
-        const resolved = await resolveRefURL(context, decodeHTMLAttribute(href), currentPagePath);
-        return resolved ? `<a${before}href="${escapeHTML(resolved.url)}"${after}>` : full;
-    });
-
-    node.value = await replaceAsync(node.value, HTML_SRC_RE, async (match) => {
-        const [full, src = ''] = match;
-        const resolved = await resolveRefURL(context, decodeHTMLAttribute(src), currentPagePath);
-        return resolved ? `src="${escapeHTML(resolved.url)}"` : full;
-    });
-
-    node.value = await replaceAsync(node.value, HTML_SRCSET_RE, async (match) => {
-        const [, srcset = ''] = match;
-        const rewritten = await replaceAsync(srcset, SRCSET_CANDIDATE_RE, async (candidate) => {
-            const [full, url = ''] = candidate;
-            const resolved = await resolveRefURL(
-                context,
-                decodeHTMLAttribute(url),
-                currentPagePath
-            );
-            return resolved ? escapeHTML(resolved.url) + full.slice(url.length) : full;
-        });
-        return `srcset="${rewritten}"`;
-    });
+    const replacements = new Map<number, { start: number; end: number; value: string }>();
+    await Promise.all(
+        elements.map(async (element) => {
+            for (const attr of element.attrs) {
+                if (attr.name !== 'href' && attr.name !== 'src' && attr.name !== 'srcset') {
+                    continue;
+                }
+                const name = attr.prefix ? `${attr.prefix}:${attr.name}` : attr.name;
+                const location = element.sourceCodeLocation?.attrs?.[name];
+                if (!location) {
+                    continue;
+                }
+                let value: string;
+                if (attr.name === 'srcset') {
+                    value = await replaceAsync(
+                        attr.value,
+                        SRCSET_CANDIDATE_RE,
+                        async (candidate) => {
+                            const [full, url = ''] = candidate;
+                            const resolved = await resolveRefURL(context, url, currentPagePath);
+                            return resolved ? resolved.url + full.slice(url.length) : full;
+                        }
+                    );
+                    if (value === attr.value) {
+                        continue;
+                    }
+                } else {
+                    const resolved = await resolveRefURL(context, attr.value, currentPagePath);
+                    if (!resolved) {
+                        continue;
+                    }
+                    value = resolved.url;
+                    const text = element.childNodes[0];
+                    if (
+                        element.tagName === 'a' &&
+                        attr.name === 'href' &&
+                        resolveStringContentRef(attr.value) &&
+                        element.childNodes.length === 1 &&
+                        text &&
+                        'value' in text &&
+                        text.value === attr.value &&
+                        text.sourceCodeLocation
+                    ) {
+                        replacements.set(text.sourceCodeLocation.startOffset, {
+                            start: text.sourceCodeLocation.startOffset,
+                            end: text.sourceCodeLocation.endOffset,
+                            value: escapeHTML(resolved.text ?? 'Broken link'),
+                        });
+                    }
+                }
+                replacements.set(location.startOffset, {
+                    start: location.startOffset,
+                    end: location.endOffset,
+                    value: `${name}="${escapeHTML(value)}"`,
+                });
+            }
+        })
+    );
+    for (const replacement of [...replacements.values()].sort((a, b) => b.start - a.start)) {
+        node.value =
+            node.value.slice(0, replacement.start) +
+            replacement.value +
+            node.value.slice(replacement.end);
+    }
 }
 
 async function replaceAsync(
