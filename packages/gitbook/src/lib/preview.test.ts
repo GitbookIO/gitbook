@@ -110,8 +110,6 @@ describe('isPublishedPreviewAllowed', () => {
             isPublishedPreviewAllowed({ ...disabled, preview: true, changeRequest: '458' })
         ).toBe(true);
         expect(isPublishedPreviewAllowed({ ...disabled, preview: false })).toBe(true);
-        expect(isPublishedPreviewAllowed({ preview: false, changeRequest: '458' })).toBe(
-            true
-        );
+        expect(isPublishedPreviewAllowed({ preview: false, changeRequest: '458' })).toBe(true);
     });
 });
