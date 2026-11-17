@@ -287,6 +287,48 @@ const searchTestCases: Test[] = [
         },
     },
     {
+        name: 'Search - Retry after a failed search sends the query once',
+        url: getCustomizationURL({
+            ai: {
+                mode: CustomizationAIMode.None,
+            },
+            header: {
+                preset: CustomizationHeaderPreset.None,
+            },
+        }),
+        screenshot: false,
+        run: async (page) => {
+            await waitForCookiesDialog(page);
+            // Keep the search on the failing route whether or not the site gives search passes.
+            await page.route('**/~gitbook/search-pass', (route) => route.fulfill({ status: 204 }));
+            let failing = true;
+            await page.route('**/~gitbook/search', (route) =>
+                failing ? route.fulfill({ status: 500 }) : route.continue()
+            );
+            const sentQueries: string[] = [];
+            page.on('request', (request) => {
+                if (request.method() === 'POST' && request.url().endsWith('/~gitbook/search')) {
+                    sentQueries.push(request.postDataJSON().query);
+                }
+            });
+
+            const searchInput = page.getByTestId('search-input').locator('visible=true');
+            await searchInput.focus();
+            await page.waitForURL(/[?&]q=/);
+            await searchInput.pressSequentially('gitbook');
+            const retry = page.getByRole('button', { name: 'Try again' }).locator('visible=true');
+            await expect(retry).toBeVisible();
+
+            failing = false;
+            sentQueries.length = 0;
+            await retry.click();
+            await expect(searchInput).toHaveValue('gitbook');
+            await expect(page.getByTestId('search-results').locator('visible=true')).toBeVisible();
+            await page.waitForTimeout(1000);
+            expect(sentQueries).toEqual(['gitbook']);
+        },
+    },
+    {
         name: 'Search - AI Mode: None - URL query (Initial)',
         url: `${getCustomizationURL({
             ai: {
