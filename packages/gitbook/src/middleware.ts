@@ -7,6 +7,7 @@ import rison from 'rison';
 import { getDomain } from 'tldts';
 
 import {
+    ContentType,
     CustomizationDefaultThemeMode,
     CustomizationThemeMode,
     type PublishedSiteContent,
@@ -383,6 +384,10 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
 
         if (isSearchPrewarmRequest(siteURLData)) {
             return await serveSearchPrewarm(request, siteURLData);
+        }
+
+        if (isSearchPassRequest(siteURLData)) {
+            return await serveSearchPass(request, siteURLData, visitorToken?.token);
         }
 
         //
@@ -830,6 +835,68 @@ async function serveSearchPrewarm(request: NextRequest, siteURLData: PublishedSi
     await waitUntil(api.orgs.prewarmSiteSearch(siteURLData.organization, siteURLData.site));
 
     return new NextResponse(null, { status: 204 });
+}
+
+const SEARCH_PASS_TIMEOUT_MS = 1_500;
+
+function isSearchPassRequest(siteURLData: PublishedSiteContent) {
+    return removeLeadingSlash(removeTrailingSlash(siteURLData.pathname)) === '~gitbook/search-pass';
+}
+
+/**
+ * Give the visitor's browser a short-lived pass to search the site with the API directly.
+ */
+async function serveSearchPass(
+    request: NextRequest,
+    siteURLData: PublishedSiteContent,
+    visitorToken: string | undefined
+) {
+    if (request.method !== 'POST') {
+        return new NextResponse(null, { status: 405, headers: { allow: 'POST' } });
+    }
+
+    const api = apiClient({ apiToken: siteURLData.apiToken ?? null });
+    // The published API client has no method for this operation yet.
+    const pass = api
+        .request({
+            path: `/orgs/${siteURLData.organization}/sites/${siteURLData.site}/search/pass`,
+            method: 'POST',
+            secure: true,
+            // The API caps the pass at the visitor token's expiry.
+            ...(visitorToken ? { body: { visitorToken }, type: ContentType.Json } : {}),
+        })
+        .then(
+            (response) =>
+                response.json() as Promise<{
+                    searchPass?: { token?: unknown; expiresAt?: unknown };
+                }>
+        )
+        .catch(() => null);
+
+    let timeout: ReturnType<typeof setTimeout> | undefined;
+    const reply = await Promise.race([
+        pass,
+        new Promise<null>((resolve) => {
+            timeout = setTimeout(() => resolve(null), SEARCH_PASS_TIMEOUT_MS);
+        }),
+    ]);
+    clearTimeout(timeout);
+
+    const { token, expiresAt } = reply?.searchPass ?? {};
+    // The browser adds this lifetime to its own clock, so its clock skew does not matter.
+    const expiresIn =
+        typeof expiresAt === 'string' ? Date.parse(expiresAt) - Date.now() : Number.NaN;
+    if (typeof token !== 'string' || !token || !(expiresIn > 0)) {
+        return new NextResponse(null, {
+            status: 204,
+            headers: { 'cache-control': 'private, no-store' },
+        });
+    }
+
+    return NextResponse.json(
+        { token, expiresIn },
+        { headers: { 'cache-control': 'private, no-store' } }
+    );
 }
 
 /**
