@@ -12,6 +12,11 @@
             "development": "./src/icons.ts",
             "default": "./dist/icons.js"
         },
+        "./validateIconName": {
+            "types": "./dist/validateIconName.d.ts",
+            "development": "./src/validateIconName.ts",
+            "default": "./dist/validateIconName.js"
+        },
         "./types": {
             "types": "./dist/types.d.ts",
             "development": "./src/types.ts",

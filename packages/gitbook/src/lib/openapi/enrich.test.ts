@@ -17,4 +17,22 @@ describe('#enrichFilesystem', () => {
             '<p>Social platform<br>Hello</p>'
         );
     });
+
+    it('parses descriptions that collide with Object.prototype keys', async () => {
+        const { filesystem } = await parseOpenAPI({
+            value: JSON.stringify({
+                openapi: '3.0.0',
+                info: { title: 'Test', version: '1.0.0' },
+                paths: {
+                    '/a': { get: { description: 'constructor', responses: {} } },
+                    '/b': { get: { description: 'constructor', responses: {} } },
+                },
+            }),
+            rootURL: null,
+        });
+        const enriched = await enrichFilesystem(filesystem);
+        const paths = enriched[0]?.specification.paths;
+        expect(paths['/a'].get['x-gitbook-description-html']).toBe('<p>constructor</p>');
+        expect(paths['/b'].get['x-gitbook-description-html']).toBe('<p>constructor</p>');
+    });
 });

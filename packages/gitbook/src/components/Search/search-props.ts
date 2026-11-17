@@ -2,6 +2,8 @@ import type { SiteExternalLink, SiteSection, SiteSectionGroup, SiteSpace } from 
 
 import { hasMultipleSiteSections } from '../SiteSections';
 import type { GitBookSiteContext } from '@/lib/context';
+import { getSearchSpaceLookup } from '@/lib/search';
+import type { DirectSearchProps } from '@/lib/search-results';
 import { getLocalizedTitle } from '@/lib/sites';
 
 export type SearchSection = Pick<SiteSection, 'id' | 'icon' | 'object'> & {
@@ -120,4 +122,19 @@ export function findSearchSection(
     }
 
     return undefined;
+}
+
+/**
+ * What the browser needs to search the API directly, built from the site spaces visitors can see.
+ */
+export function getDirectSearchProps(context: GitBookSiteContext): DirectSearchProps | undefined {
+    if (!context.directSearch) {
+        return undefined;
+    }
+
+    return {
+        ...context.directSearch,
+        spaces: getSearchSpaceLookup(context.structure),
+        passURL: context.linker.toPathInSite('~gitbook/search-pass'),
+    };
 }

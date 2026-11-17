@@ -10,9 +10,9 @@ import {
     type SiteCustomizationSettings,
 } from '@gitbook/api';
 import { getIconStyle } from '@gitbook/icons/getIconStyle';
-import { validateIconName } from '@gitbook/icons/icons';
 import { type InlineIconSource, getInlineIconSourceKey } from '@gitbook/icons/IconSources';
 import { type IconName, IconStyle } from '@gitbook/icons/types';
+import { validateIconName } from '@gitbook/icons/validateIconName';
 import { GITBOOK_ICONS_ASSET_VERSION } from '@gitbook/icons/version';
 
 import { getAssetURL } from '@/lib/assets';
