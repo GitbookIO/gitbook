@@ -213,6 +213,29 @@ const searchTestCases: Test[] = [
         },
     },
     {
+        name: 'Search - Loading rows cannot be activated',
+        url: getCustomizationURL({
+            ai: {
+                mode: CustomizationAIMode.None,
+            },
+        }),
+        screenshot: false,
+        run: async (page) => {
+            await waitForCookiesDialog(page);
+            const heldSearch = await holdSearchRequests(page);
+            const searchInput = page.getByTestId('search-input');
+            await searchInput.focus();
+            await page.waitForURL(/[?&]q=/);
+            await searchInput.pressSequentially('gitbook');
+            await heldSearch('gitbook');
+
+            const searchPopup = page.getByTestId('search-popover');
+            await expect(searchPopup.locator('[aria-busy="true"]').first()).toBeVisible();
+            await expect(searchPopup.getByTestId('search-page-result')).toHaveCount(0);
+            await expect(searchPopup.getByRole('link')).toHaveCount(0);
+        },
+    },
+    {
         name: 'Search - Keyboard focus exits to the next page control',
         url: getCustomizationURL({
             ai: {
