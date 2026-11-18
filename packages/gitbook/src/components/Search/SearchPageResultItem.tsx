@@ -2,6 +2,7 @@ import React from 'react';
 
 import { Icon } from '@gitbook/icons';
 
+import { useResizeObserver } from '../hooks';
 import { Tooltip } from '../primitives';
 import { getPageResultPresentation } from './getPageResultHref';
 import { HighlightQuery } from './HighlightQuery';
@@ -100,30 +101,24 @@ const Breadcrumbs = (props: { breadcrumbs: ComputedPageResult['breadcrumbs'] }) 
     const containerRef = React.useRef<HTMLDivElement>(null);
     const measureRef = React.useRef<HTMLDivElement>(null);
     const [folded, setFolded] = React.useState(0);
-    const labelsKey = breadcrumbs.map((crumb) => crumb.label).join('\n');
 
-    React.useLayoutEffect(() => {
+    const measureFolding = () => {
         const container = containerRef.current;
         const measure = measureRef.current;
-        if (!container || !measure || !labelsKey) {
+        if (!container || !measure) {
             return;
         }
-        const update = () => {
-            const widths = Array.from(measure.children, (element) =>
-                Math.min(element.getBoundingClientRect().width, CRUMB_MAX_WIDTH)
-            );
-            const ellipsisWidth = widths.pop() ?? 0;
-            const separatorWidth =
-                (widths.pop() ?? 0) + 2 * Number.parseFloat(getComputedStyle(container).columnGap);
-            setFolded(
-                countFoldedCrumbs(widths, container.clientWidth, separatorWidth, ellipsisWidth)
-            );
-        };
-        update();
-        const observer = new ResizeObserver(update);
-        observer.observe(container);
-        return () => observer.disconnect();
-    }, [labelsKey]);
+        const widths = Array.from(measure.children, (element) =>
+            Math.min(element.getBoundingClientRect().width, CRUMB_MAX_WIDTH)
+        );
+        const ellipsisWidth = widths.pop() ?? 0;
+        const separatorWidth =
+            (widths.pop() ?? 0) + 2 * Number.parseFloat(getComputedStyle(container).columnGap);
+        setFolded(countFoldedCrumbs(widths, container.clientWidth, separatorWidth, ellipsisWidth));
+    };
+    // The measuring copy resizes when the labels change, the container when the row does.
+    useResizeObserver(containerRef, measureFolding);
+    useResizeObserver(measureRef, measureFolding);
 
     const first = breadcrumbs[0];
     if (!first) return null;
@@ -193,17 +188,12 @@ const CrumbLabel = (props: { label: string; className: string }) => {
     const ref = React.useRef<HTMLSpanElement>(null);
     const [truncated, setTruncated] = React.useState(false);
 
-    React.useLayoutEffect(() => {
+    useResizeObserver(ref, () => {
         const element = ref.current;
-        if (!element) {
-            return;
+        if (element) {
+            setTruncated(element.scrollWidth > element.clientWidth);
         }
-        const update = () => setTruncated(element.scrollWidth > element.clientWidth);
-        update();
-        const observer = new ResizeObserver(update);
-        observer.observe(element);
-        return () => observer.disconnect();
-    }, []);
+    });
 
     return (
         <span
