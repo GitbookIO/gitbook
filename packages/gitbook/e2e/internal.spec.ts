@@ -77,6 +77,8 @@ function trackInsightsEvents(page: Page, type: string) {
  * Hold the page's search requests until the test answers them, and find a held one by query.
  */
 async function holdSearchRequests(page: Page) {
+    // Without a pass every search goes through the route, whether or not the site's flag gives one.
+    await page.route('**/~gitbook/search-pass', (route) => route.fulfill({ status: 204 }));
     const held: Route[] = [];
     await page.route('**/~gitbook/search', (route) => {
         held.push(route);
@@ -414,8 +416,6 @@ const searchTestCases: Test[] = [
         screenshot: false,
         run: async (page) => {
             await waitForCookiesDialog(page);
-            // Keep both searches on the held route whether or not the site gives search passes.
-            await page.route('**/~gitbook/search-pass', (route) => route.fulfill({ status: 204 }));
             const heldSearch = await holdSearchRequests(page);
             const startPath = new URL(page.url()).pathname;
             const searchInput = page.getByTestId('search-input');
