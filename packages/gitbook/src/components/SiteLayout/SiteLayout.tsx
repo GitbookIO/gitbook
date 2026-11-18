@@ -22,6 +22,7 @@ import { GITBOOK_API_PUBLIC_URL, GITBOOK_ASSETS_URL, GITBOOK_ICONS_URL } from '@
 import { getResizedImageURL } from '@/lib/images';
 import { removeTrailingSlash } from '@/lib/paths';
 import { isSiteIndexable } from '@/lib/seo';
+import { getOpenSearchURL } from '@/routes/opensearch';
 
 // Pure trackers with no visitor-facing UI, safe to load after `load` + idle. Anything not
 // listed (consent managers, chats, assistants…) keeps loading eagerly.
@@ -85,6 +86,12 @@ export async function SiteLayout(props: {
         <>
             {/* First in <body> so agents reading the HTML find it before the navigation. */}
             <LLMsTxtDirective context={context} />
+            <link
+                rel="search"
+                type="application/opensearchdescription+xml"
+                href={getOpenSearchURL(context)}
+                title={context.site.title}
+            />
             <SiteLayoutClientContexts
                 contextId={context.contextId}
                 forcedTheme={
