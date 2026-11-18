@@ -78,6 +78,10 @@ export async function servePageRSS(
 
     updatesBlocks.forEach((updatesBlock) => {
         updatesBlock.nodes.forEach((update) => {
+            if (update.type !== 'update') {
+                return;
+            }
+
             const heading = update.nodes[0];
             if (!heading || !isHeadingBlock(heading)) {
                 return;

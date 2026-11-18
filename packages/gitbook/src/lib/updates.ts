@@ -75,6 +75,10 @@ export function getDocumentFilterableTags(
 
     for (const updatesBlock of getBlocksByType(document, 'updates')) {
         for (const updateBlock of updatesBlock.nodes) {
+            if (updateBlock.type !== 'update') {
+                continue;
+            }
+
             for (const tag of resolveBlockTags(updateBlock.data.tags, revisionTags)) {
                 if (seen.has(tag.slug)) {
                     continue;
