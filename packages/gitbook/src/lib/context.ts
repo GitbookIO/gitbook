@@ -20,9 +20,15 @@ import type {
     TranslationLanguage,
 } from '@gitbook/api';
 
-import { GITBOOK_URL } from './env';
+import { GITBOOK_API_PUBLIC_URL, GITBOOK_URL } from './env';
 import { type ImageResizer, createImageResizer } from './images';
-import { type GitBookLinker, createLinker, linkerForPublishedURL } from './links';
+import {
+    type GitBookLinker,
+    type SiteLinkerInput,
+    createSiteLinker,
+    linkerForPublishedURL,
+} from './links';
+import { isPublishedPreviewAllowed } from './preview';
 import type { AskVisitorAgent } from '@/lib/ask-visitor';
 import {
     type GitBookDataFetcher,
@@ -31,6 +37,7 @@ import {
     throwIfDataError,
 } from '@/lib/data';
 import { getLogger } from '@/lib/logger';
+import type { DirectSearchProps } from '@/lib/search-results';
 import {
     findSiteSpaceBy,
     getFallbackSiteSpacePath,
@@ -133,6 +140,11 @@ export type GitBookBaseContext = {
      * Translation language of the space.
      */
     locale?: TranslationLanguage;
+
+    /**
+     * Target for the browser to query the site search API directly with a search pass.
+     */
+    directSearch?: Omit<DirectSearchProps, 'spaces' | 'passURL'>;
 };
 
 /**
@@ -240,28 +252,14 @@ export function getBaseContext(input: {
         apiToken: siteURLData.apiToken ?? null,
     });
 
-    const gitbookURL = GITBOOK_URL ? new URL(GITBOOK_URL) : undefined;
-    const linker =
-        urlMode === 'url-host'
-            ? createLinker({
-                  host: siteURL.host,
-                  siteBasePath: siteURLData.siteBasePath,
-                  spaceBasePath: siteURLData.basePath,
-              })
-            : createLinker({
-                  protocol: gitbookURL?.protocol,
-                  host: gitbookURL?.host,
-                  siteBasePath: `/url/${siteURL.host}${siteURLData.siteBasePath}`,
-                  spaceBasePath: `/url/${siteURL.host}${siteURLData.basePath}`,
-              });
-
-    if (urlMode === 'url') {
-        // Create link in the same format for links to other sites/sections.
-        linker.toLinkForContent = (rawURL: string) => {
-            const urlObject = new URL(rawURL);
-            return `/url/${urlObject.host}${urlObject.pathname}${urlObject.search}${urlObject.hash}`;
-        };
-    }
+    const linkerInput: SiteLinkerInput = {
+        urlMode,
+        siteHost: siteURL.host,
+        siteBasePath: siteURLData.siteBasePath,
+        spaceBasePath: siteURLData.basePath,
+        gitbookURL: GITBOOK_URL || undefined,
+    };
+    const linker = createSiteLinker(linkerInput);
 
     const imageResizer = createImageResizer({
         imagesContextId: siteURLData.imagesContextId,
@@ -270,10 +268,21 @@ export function getBaseContext(input: {
         linker: linker,
     });
 
+    const directSearch: GitBookBaseContext['directSearch'] =
+        !siteURLData.revision && !siteURLData.changeRequest && !siteURLData.preview
+            ? {
+                  apiURL: GITBOOK_API_PUBLIC_URL,
+                  organizationId: siteURLData.organization,
+                  siteId: siteURLData.site,
+                  linker: linkerInput,
+              }
+            : undefined;
+
     return {
         dataFetcher,
         linker,
         imageResizer,
+        directSearch,
     };
 }
 
@@ -339,6 +348,24 @@ export async function fetchSiteContextByIds(
             ),
             fetchSpaceContextByIds(baseContext, ids),
         ]);
+
+    const { publicChangeRequestPreviews } = orgSite as Site & {
+        publicChangeRequestPreviews?: boolean;
+    };
+    if (
+        !isPublishedPreviewAllowed({
+            publicChangeRequestPreviews,
+            preview: ids.preview,
+            changeRequest: ids.changeRequest,
+            revision: ids.revision,
+        })
+    ) {
+        getLogger().info('Refused disabled published preview', {
+            site: ids.site,
+            selector: ids.changeRequest ? 'change-request' : 'revision',
+        });
+        notFound();
+    }
 
     const sections = ids.siteSection
         ? parseSiteSectionsAndGroups(siteStructure, ids.siteSection)

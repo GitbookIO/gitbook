@@ -50,6 +50,7 @@ export function EmbeddableSearch(props: EmbeddableSearchProps) {
         error,
         fetching,
         onInputKeyDown,
+        inputHandlers,
         onResultSelect,
         query,
         results,
@@ -89,6 +90,7 @@ export function EmbeddableSearch(props: EmbeddableSearchProps) {
                         aria-controls={resultsId}
                         onChange={setQuery}
                         onKeyDown={onInputKeyDown}
+                        {...inputHandlers}
                         value={searchValue}
                         withAI={withSearchAI}
                         isOpen={true}

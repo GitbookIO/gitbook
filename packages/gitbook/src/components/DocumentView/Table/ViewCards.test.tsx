@@ -12,7 +12,13 @@ mock.module('./RecordCard', () => ({
 }));
 
 mock.module('./TableSearch', () => ({
-    TableSearchRecord: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+    TableSearchRecord: ({
+        children,
+        visibleClassName,
+    }: {
+        children: React.ReactNode;
+        visibleClassName: string;
+    }) => <div className={visibleClassName}>{children}</div>,
 }));
 
 const { ViewCards } = await import('./ViewCards');
@@ -56,9 +62,38 @@ describe('ViewCards', () => {
         expect(markup).toContain('snap-mandatory');
     });
 
-    it('renders the wrapping grid by default', () => {
-        const markup = renderWithContext(<ViewCards {...makeProps(true)} />);
+    it.each([true, undefined])('renders the wrapping grid with wrap=%s', (wrap) => {
+        const props = makeProps(true);
+        props.view.wrap = wrap;
+        const markup = renderWithContext(<ViewCards {...props} />);
 
         expect(markup).toContain('inline-grid');
+    });
+    it('renders small cards in four columns and uses the grid for print', () => {
+        const props = makeProps(true);
+        props.view.cardSize = 'small';
+        expect(renderWithContext(<ViewCards {...props} />)).toContain('@3xl:grid-cols-4');
+
+        props.view.wrap = false;
+        const carousel = renderWithContext(<ViewCards {...props} />);
+        expect(carousel).toContain('@3xl:w-[calc(22.5%-0.75rem)]');
+        expect(carousel).toContain('@5xl:w-[calc(25%-0.75rem)]');
+
+        props.context.mode = 'print';
+        const printed = renderWithContext(<ViewCards {...props} />);
+        expect(printed).toContain('@3xl:grid-cols-4');
+        expect(printed).not.toContain('snap-mandatory');
+    });
+
+    it.each([
+        ['medium', '@2xl:grid-cols-3 @sm:grid-cols-2', '@5xl:w-[calc(33.33%-0.66rem)]'],
+        ['large', '@xl:grid-cols-2', '@5xl:w-[calc(50%-0.5rem)]'],
+        ['unknown', '@2xl:grid-cols-3 @sm:grid-cols-2', '@5xl:w-[calc(33.33%-0.66rem)]'],
+    ])('preserves %s card layouts', (cardSize, grid, carousel) => {
+        const props = makeProps(true);
+        props.view.cardSize = cardSize;
+        expect(renderWithContext(<ViewCards {...props} />)).toContain(grid);
+        props.view.wrap = false;
+        expect(renderWithContext(<ViewCards {...props} />)).toContain(carousel);
     });
 });

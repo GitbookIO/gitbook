@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'bun:test';
 
-import { computeFilterSiteSpaceIds } from './filter';
+import { computeFilterSiteSpaceIds, filterResultsBySiteSpaces } from './filter';
+import type { OrderedComputedResult } from './search-types';
 
 describe('computeFilterSiteSpaceIds', () => {
     const currentId = 'space-current';
@@ -32,5 +33,33 @@ describe('computeFilterSiteSpaceIds', () => {
             'space-other-b',
         ]);
         expect(r).toEqual(['space-other-a', 'space-other-b']);
+    });
+});
+
+describe('filterResultsBySiteSpaces', () => {
+    const page = (id: string, siteSpaceId?: string): OrderedComputedResult => ({
+        type: 'page',
+        id,
+        title: id,
+        href: `/${id}`,
+        score: 1,
+        pageId: id,
+        spaceId: 'space',
+        siteSpaceId,
+        description: '',
+        rank: 1,
+    });
+
+    it('keeps the server order and drops pages outside the scope', () => {
+        const results = [page('a', 'current'), page('b', 'other'), page('c', 'current'), page('d')];
+        expect(filterResultsBySiteSpaces(results, ['current']).map((result) => result.id)).toEqual([
+            'a',
+            'c',
+        ]);
+    });
+
+    it('returns every result when the scope is unrestricted', () => {
+        const results = [page('b', 'other'), page('a', 'current')];
+        expect(filterResultsBySiteSpaces(results, undefined)).toBe(results);
     });
 });
