@@ -1,7 +1,6 @@
 import { permanentRedirect, redirect } from 'next/navigation';
 
 import {
-    CustomizationPageActionType,
     type RevisionPageDocument,
     SITE_REDIRECT_SOURCE_PATH_MAX_LENGTH,
     SITE_REDIRECT_SOURCE_PATH_PATTERN,
@@ -30,34 +29,7 @@ export type PageParams = PagePathParams | PageIdParams;
  * Optimized to fetch in parallel as much as possible.
  */
 export async function fetchPageData(context: GitBookSiteContext, params: PageParams) {
-    let pageTarget = await resolvePage(context, params);
-
-    // Revision trees omit metadata for cache efficiency, so load it only when this action needs the Git path.
-    if (
-        pageTarget &&
-        !pageTarget.page.git &&
-        context.space.gitSync?.url &&
-        context.customization.pageActions.items.includes(CustomizationPageActionType.Git)
-    ) {
-        const response = await context.dataFetcher.getRevisionPageByPath({
-            spaceId: context.space.id,
-            revisionId: context.revisionId,
-            path: pageTarget.page.path,
-            metadata: true,
-            cachedMetadata: true,
-        });
-        const pageWithMetadata = response.data;
-
-        if (pageWithMetadata?.type === 'document' && pageWithMetadata.git) {
-            pageTarget = {
-                ...pageTarget,
-                page: {
-                    ...pageTarget.page,
-                    git: pageWithMetadata.git,
-                },
-            };
-        }
-    }
+    const pageTarget = await resolvePage(context, params);
 
     return {
         context: {
