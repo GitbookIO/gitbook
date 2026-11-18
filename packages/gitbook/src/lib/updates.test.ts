@@ -17,7 +17,7 @@ import {
 describe('getDocumentFilterableTags', () => {
     it('ignores category and deleted references without removing their stored assignments', () => {
         const document = createUpdatesDocument([['category', 'constructor', 'missing']]);
-        const category = { ...createTag('category', 'Products'), kind: 'category' };
+        const category = { ...createTag('category', 'Products'), kind: 'category' as const };
         const normal = createTag('constructor', 'Constructor');
         const revision = { tags: [category, normal] } as unknown as Revision;
         const before = JSON.stringify(document);

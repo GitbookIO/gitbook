@@ -99,12 +99,16 @@ async function getSectionsFromNodes(
                 const revisionTags = getRevisionTags(context.revision);
                 const updateNodes = await Promise.all(
                     block.nodes.map(async (update) =>
-                        getSectionsFromNodes(
-                            update.nodes as DocumentBlock[],
-                            context,
-                            { h1, h2 },
-                            resolveBlockTags(update.data.tags, revisionTags).map((tag) => tag.slug)
-                        )
+                        update.type === 'update'
+                            ? getSectionsFromNodes(
+                                  update.nodes as DocumentBlock[],
+                                  context,
+                                  { h1, h2 },
+                                  resolveBlockTags(update.data.tags, revisionTags).map(
+                                      (tag) => tag.slug
+                                  )
+                              )
+                            : []
                     )
                 );
                 for (const updateSections of updateNodes) {
