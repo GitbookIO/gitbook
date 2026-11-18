@@ -442,6 +442,33 @@ const searchTestCases: Test[] = [
         },
     },
     {
+        name: 'Search - Enter opens the result under the mouse',
+        url: `blocks/lists${getCustomizationURL({
+            ai: {
+                mode: CustomizationAIMode.None,
+            },
+        })}`,
+        screenshot: false,
+        run: async (page) => {
+            await waitForCookiesDialog(page);
+            const searchInput = page.getByTestId('search-input');
+            await searchInput.focus();
+            await searchInput.pressSequentially('gitbook');
+
+            const searchPopup = page.getByTestId('search-popover');
+            const hovered = searchPopup.getByTestId('search-page-result').nth(1);
+            await hovered.hover();
+            await expect(hovered).toHaveClass(/is-active/);
+            await expect(searchPopup.locator('[role="option"].is-active')).toHaveCount(1);
+
+            const href = await hovered.getAttribute('href');
+            await page.keyboard.press('Enter');
+            await expect
+                .poll(() => new URL(page.url()).pathname, { timeout: 20000 })
+                .toBe(new URL(href ?? '', page.url()).pathname);
+        },
+    },
+    {
         name: 'Ask - AI Mode: Assistant - Complete flow',
         url: getCustomizationURL({
             ai: {

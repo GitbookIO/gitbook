@@ -58,6 +58,7 @@ export function SearchContainer({
         onInputKeyDown,
         inputHandlers,
         onResultSelect,
+        onResultHover,
         open,
         query,
         results,
@@ -179,6 +180,7 @@ export function SearchContainer({
             resultsId={resultsId}
             resultsRef={resultsRef}
             onResultSelect={onResultSelect}
+            onResultHover={onResultHover}
             showAsk={showAsk}
             scopeControl={scopeControlNode}
             fillHeight={usesSideSheet || shouldFillHeight}

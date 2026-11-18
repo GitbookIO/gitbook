@@ -1,7 +1,8 @@
 import React from 'react';
 
-import { Icon, type IconName } from '@gitbook/icons';
+import { Icon } from '@gitbook/icons';
 
+import { useResizeObserver } from '../hooks';
 import { Tooltip } from '../primitives';
 import { getPageResultPresentation } from './getPageResultHref';
 import { HighlightQuery } from './HighlightQuery';
@@ -43,7 +44,6 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
             active={active}
             data-testid="search-page-result"
             action={tString(language, 'view')}
-            leadingIcon={<Icon icon="file-lines" className="size-4" />}
             insights={insights}
             aria-label={tString(language, 'search_page_result_title', item.title)}
             style={{
@@ -87,70 +87,147 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
     );
 });
 
-const Breadcrumbs = (props: {
-    breadcrumbs: ComputedPageResult['breadcrumbs'];
-    withOverflow?: boolean;
-}) => {
-    const { breadcrumbs, withOverflow = (breadcrumbs?.length ?? 0) > 4 } = props;
+/** Widest a single crumb gets, so one long title can't collapse the rest by itself. */
+const CRUMB_MAX_WIDTH = 200;
 
-    if (!breadcrumbs || breadcrumbs.length === 0) return null;
+/**
+ * One line of breadcrumbs that shows the whole path when it fits. When it doesn't, the levels next
+ * to the root fold into a "⋯" in second place, moving toward the result until the line fits; the
+ * last crumb is cut short only once everything between is folded. The folded levels show on a
+ * deliberate hover only, so moving the mouse across results doesn't pop them up.
+ */
+const Breadcrumbs = (props: { breadcrumbs: ComputedPageResult['breadcrumbs'] }) => {
+    const { breadcrumbs = [] } = props;
+    const containerRef = React.useRef<HTMLDivElement>(null);
+    const measureRef = React.useRef<HTMLDivElement>(null);
+    const [folded, setFolded] = React.useState(0);
 
-    const crumbs =
-        breadcrumbs?.map((crumb) => (
-            <span key={crumb.label} className="flex items-center gap-1">
-                {crumb.icon ? <Icon className="size-3" icon={crumb.icon as IconName} /> : null}
-                {crumb.label}
-            </span>
-        )) ?? [];
-
-    // Format breadcrumbs for display. Helper function to avoid code duplication across normal and in-tooltip display.
-    function formatCrumbs(crumbs: React.ReactElement[], className?: string) {
-        return (
-            <div
-                className={tcls(
-                    'transition-colors',
-                    'font-normal',
-                    'flex',
-                    'flex-wrap',
-                    'gap-x-2',
-                    'gap-y-0',
-                    'items-center',
-                    className
-                )}
-            >
-                {crumbs.map((crumb, index) => (
-                    <React.Fragment key={index}>
-                        {index !== 0 ? (
-                            <Icon
-                                key={`${crumb.key}-icon`}
-                                icon="chevron-right"
-                                className="size-2"
-                            />
-                        ) : null}
-                        <span className="line-clamp-1">{crumb}</span>
-                    </React.Fragment>
-                ))}
-            </div>
+    const measureFolding = () => {
+        const container = containerRef.current;
+        const measure = measureRef.current;
+        if (!container || !measure) {
+            return;
+        }
+        const widths = Array.from(measure.children, (element) =>
+            Math.min(element.getBoundingClientRect().width, CRUMB_MAX_WIDTH)
         );
-    }
+        const ellipsisWidth = widths.pop() ?? 0;
+        const separatorWidth =
+            (widths.pop() ?? 0) + 2 * Number.parseFloat(getComputedStyle(container).columnGap);
+        setFolded(countFoldedCrumbs(widths, container.clientWidth, separatorWidth, ellipsisWidth));
+    };
+    // The measuring copy resizes when the labels change, the container when the row does.
+    useResizeObserver(containerRef, measureFolding);
+    useResizeObserver(measureRef, measureFolding);
 
-    return formatCrumbs(
-        withOverflow
-            ? [
-                  ...crumbs.slice(0, 3),
-                  <Tooltip
-                      key="breadcrumbs-overflow"
-                      label={formatCrumbs(crumbs.slice(3, -1))}
-                      delay={0}
-                      arrow
-                  >
-                      <span>
-                          <Icon key="ellipsis" icon="ellipsis-h" className="size-3" />
-                      </span>
-                  </Tooltip>,
-                  ...crumbs.slice(-1),
-              ]
-            : crumbs,
-        'text-tint/7 contrast-more:text-tint group-[.is-active]:text-tint text-xs'
+    const first = breadcrumbs[0];
+    if (!first) return null;
+
+    const hidden = breadcrumbs.slice(1, 1 + folded);
+    const shown = breadcrumbs.slice(1 + folded);
+    const separator = <Icon icon="chevron-right" className="size-2 shrink-0" />;
+    const textClassName = 'text-xs font-normal whitespace-nowrap';
+
+    return (
+        <div
+            ref={containerRef}
+            className={tcls(
+                'relative flex min-w-0 items-center gap-x-2 overflow-hidden text-tint/7 transition-colors group-[.is-active]:text-tint contrast-more:text-tint',
+                textClassName
+            )}
+        >
+            <div
+                ref={measureRef}
+                aria-hidden
+                className="invisible absolute left-0 top-0 flex items-center"
+            >
+                {breadcrumbs.map((crumb, index) => (
+                    <span key={index}>{crumb.label}</span>
+                ))}
+                {separator}
+                <Icon icon="ellipsis" className="size-3" />
+            </div>
+            <CrumbLabel label={first.label} className="shrink-0" />
+            {hidden.length > 0 ? (
+                <>
+                    {separator}
+                    <Tooltip
+                        delay={1000}
+                        label={
+                            <span className="flex flex-col py-0.5">
+                                {hidden.map((crumb, index) => (
+                                    <span key={index}>{crumb.label}</span>
+                                ))}
+                            </span>
+                        }
+                    >
+                        <span className="flex shrink-0 items-center">
+                            <Icon icon="ellipsis" className="size-3" />
+                            <span className="sr-only">
+                                {hidden.map((crumb) => crumb.label).join(' › ')}
+                            </span>
+                        </span>
+                    </Tooltip>
+                </>
+            ) : null}
+            {shown.map((crumb, index) => (
+                <React.Fragment key={index}>
+                    {separator}
+                    <CrumbLabel
+                        label={crumb.label}
+                        className={index === shown.length - 1 ? 'min-w-[3ch] shrink' : 'shrink-0'}
+                    />
+                </React.Fragment>
+            ))}
+        </div>
     );
 };
+
+const CrumbLabel = (props: { label: string; className: string }) => {
+    const { label, className } = props;
+    const ref = React.useRef<HTMLSpanElement>(null);
+    const [truncated, setTruncated] = React.useState(false);
+
+    useResizeObserver(ref, () => {
+        const element = ref.current;
+        if (element) {
+            setTruncated(element.scrollWidth > element.clientWidth);
+        }
+    });
+
+    return (
+        <span
+            ref={ref}
+            className={tcls('max-w-[200px] truncate', className)}
+            title={truncated ? label : undefined}
+        >
+            {label}
+        </span>
+    );
+};
+
+/**
+ * How many crumbs after the first to fold into the "⋯" so the line fits `available` pixels. The
+ * first and last crumbs never fold; when even folding everything between doesn't fit, the last
+ * crumb is cut short instead.
+ */
+function countFoldedCrumbs(
+    widths: number[],
+    available: number,
+    separatorWidth: number,
+    ellipsisWidth: number
+): number {
+    const foldable = Math.max(widths.length - 2, 0);
+    for (let folded = 0; folded <= foldable; folded++) {
+        const visible = widths.filter((_, index) => index === 0 || index > folded);
+        const items = visible.length + (folded > 0 ? 1 : 0);
+        const total =
+            visible.reduce((sum, width) => sum + width, 0) +
+            (folded > 0 ? ellipsisWidth : 0) +
+            (items - 1) * separatorWidth;
+        if (total <= available + 0.5) {
+            return folded;
+        }
+    }
+    return foldable;
+}

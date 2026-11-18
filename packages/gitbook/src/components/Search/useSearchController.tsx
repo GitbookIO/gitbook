@@ -161,7 +161,11 @@ function useSearchKeyboardNavigation(props: {
     // Enter pressed before the answer arrived: open the top result of this exact query and scope,
     // or Ask when that answer is empty. Closing the search cancels it.
     const pendingOpenRef = React.useRef<string | null>(null);
-    const { cursor, moveBy: moveCursorBy } = useSearchResultsCursor({
+    const {
+        cursor,
+        setCursor,
+        moveBy: moveCursorBy,
+    } = useSearchResultsCursor({
         query,
         fetching,
         resultCount: results.length,
@@ -235,6 +239,7 @@ function useSearchKeyboardNavigation(props: {
 
     return {
         cursor,
+        setCursor,
         onInputKeyDown,
     };
 }
@@ -427,7 +432,7 @@ export function useSearchController(
 
     const askCount = normalizedQuery && !showAsk ? assistants.length : 0;
 
-    const { cursor, onInputKeyDown } = useSearchKeyboardNavigation({
+    const { cursor, setCursor, onInputKeyDown } = useSearchKeyboardNavigation({
         query: normalizedQuery,
         results,
         fetching,
@@ -454,6 +459,7 @@ export function useSearchController(
         open: onOpen,
         close: onClose,
         onResultSelect,
+        onResultHover: setCursor,
         query: normalizedQuery,
         results,
         resultsId: searchResultsId,
