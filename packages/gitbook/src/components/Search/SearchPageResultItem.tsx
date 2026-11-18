@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Icon, type IconName } from '@gitbook/icons';
+import { Icon } from '@gitbook/icons';
 
 import { Tooltip } from '../primitives';
 import { getPageResultPresentation } from './getPageResultHref';
@@ -43,7 +43,6 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
             active={active}
             data-testid="search-page-result"
             action={tString(language, 'view')}
-            leadingIcon={<Icon icon="file-lines" className="size-4" />}
             insights={insights}
             aria-label={tString(language, 'search_page_result_title', item.title)}
             style={{
@@ -87,70 +86,56 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
     );
 });
 
-const Breadcrumbs = (props: {
-    breadcrumbs: ComputedPageResult['breadcrumbs'];
-    withOverflow?: boolean;
-}) => {
-    const { breadcrumbs, withOverflow = (breadcrumbs?.length ?? 0) > 4 } = props;
+/**
+ * One line of at most three crumbs: the first, a "⋯" for the steps between, and the last, which is
+ * cut short when space runs out. The hidden steps show on a deliberate hover only, so moving the
+ * mouse across results doesn't pop them up.
+ */
+const Breadcrumbs = (props: { breadcrumbs: ComputedPageResult['breadcrumbs'] }) => {
+    const { breadcrumbs } = props;
+    const first = breadcrumbs?.[0];
+    if (!breadcrumbs || !first) return null;
 
-    if (!breadcrumbs || breadcrumbs.length === 0) return null;
+    const last = breadcrumbs.length > 1 ? breadcrumbs[breadcrumbs.length - 1] : undefined;
+    const middle = breadcrumbs.slice(1, -1);
+    const separator = <Icon icon="chevron-right" className="size-2 shrink-0" />;
 
-    const crumbs =
-        breadcrumbs?.map((crumb) => (
-            <span key={crumb.label} className="flex items-center gap-1">
-                {crumb.icon ? <Icon className="size-3" icon={crumb.icon as IconName} /> : null}
-                {crumb.label}
-            </span>
-        )) ?? [];
-
-    // Format breadcrumbs for display. Helper function to avoid code duplication across normal and in-tooltip display.
-    function formatCrumbs(crumbs: React.ReactElement[], className?: string) {
-        return (
-            <div
-                className={tcls(
-                    'transition-colors',
-                    'font-normal',
-                    'flex',
-                    'flex-wrap',
-                    'gap-x-2',
-                    'gap-y-0',
-                    'items-center',
-                    className
-                )}
-            >
-                {crumbs.map((crumb, index) => (
-                    <React.Fragment key={index}>
-                        {index !== 0 ? (
-                            <Icon
-                                key={`${crumb.key}-icon`}
-                                icon="chevron-right"
-                                className="size-2"
-                            />
-                        ) : null}
-                        <span className="line-clamp-1">{crumb}</span>
-                    </React.Fragment>
-                ))}
-            </div>
-        );
-    }
-
-    return formatCrumbs(
-        withOverflow
-            ? [
-                  ...crumbs.slice(0, 3),
-                  <Tooltip
-                      key="breadcrumbs-overflow"
-                      label={formatCrumbs(crumbs.slice(3, -1))}
-                      delay={0}
-                      arrow
-                  >
-                      <span>
-                          <Icon key="ellipsis" icon="ellipsis-h" className="size-3" />
-                      </span>
-                  </Tooltip>,
-                  ...crumbs.slice(-1),
-              ]
-            : crumbs,
-        'text-tint/7 contrast-more:text-tint group-[.is-active]:text-tint text-xs'
+    return (
+        <div className="flex min-w-0 items-center gap-x-2 whitespace-nowrap text-xs font-normal text-tint/7 transition-colors group-[.is-active]:text-tint contrast-more:text-tint">
+            <span className="shrink-0">{first.label}</span>
+            {middle.length === 1 ? (
+                <>
+                    {separator}
+                    <span className="min-w-[3ch] shrink truncate">{middle[0]?.label}</span>
+                </>
+            ) : middle.length > 1 ? (
+                <>
+                    {separator}
+                    <Tooltip
+                        delay={1000}
+                        label={
+                            <span className="flex flex-col py-0.5">
+                                {middle.map((crumb, index) => (
+                                    <span key={index}>{crumb.label}</span>
+                                ))}
+                            </span>
+                        }
+                    >
+                        <span className="flex shrink-0 items-center">
+                            <Icon icon="ellipsis" className="size-3" />
+                            <span className="sr-only">
+                                {middle.map((crumb) => crumb.label).join(' › ')}
+                            </span>
+                        </span>
+                    </Tooltip>
+                </>
+            ) : null}
+            {last ? (
+                <>
+                    {separator}
+                    <span className="min-w-[3ch] shrink truncate">{last.label}</span>
+                </>
+            ) : null}
+        </div>
     );
 };

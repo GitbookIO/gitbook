@@ -63,10 +63,12 @@ export const SearchResults = React.forwardRef(function SearchResults(
         cursor: number | null;
         error: boolean;
         onResultSelect?: () => void;
+        onResultHover?: (index: number) => void;
     },
     ref: React.Ref<SearchResultsRef>
 ) {
-    const { children, id, query, results, fetching, cursor, error, onResultSelect } = props;
+    const { children, id, query, results, fetching, cursor, error, onResultSelect, onResultHover } =
+        props;
 
     const language = useLanguage();
     const { siteSpaceId } = useCurrentContent();
@@ -81,6 +83,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
     }
 
     const refs = React.useRef<(null | HTMLAnchorElement)[]>([]);
+    const selectedByPointer = React.useRef(false);
 
     React.useEffect(() => {
         for (const item of results) {
@@ -88,8 +91,12 @@ export const SearchResults = React.forwardRef(function SearchResults(
         }
     }, [results]);
 
-    // Scroll to the active result.
+    // Scroll to the active result, unless the mouse picked it: it is already under the pointer.
     React.useEffect(() => {
+        if (selectedByPointer.current) {
+            selectedByPointer.current = false;
+            return;
+        }
         if (cursor === null || !refs.current[cursor]) {
             return;
         }
@@ -230,6 +237,12 @@ export const SearchResults = React.forwardRef(function SearchResults(
                                 'aria-setsize': results.length,
                                 id: `${id}-${index}`,
                                 onClickCapture: handleResultSelect,
+                                onHover: onResultHover
+                                    ? () => {
+                                          selectedByPointer.current = true;
+                                          onResultHover(index);
+                                      }
+                                    : undefined,
                             };
                             switch (item.type) {
                                 case 'page': {
@@ -375,7 +388,6 @@ const SearchResultsPlaceholder = () =>
             aria-hidden
             className="flex items-center gap-3 py-2 pl-3 pr-2"
         >
-            <div className="size-4 shrink-0 rounded-sm bg-tint-solid/2" />
             <div className="grow">
                 <PlaceholderLine className="text-xs" barClassName="h-2" width={crumb} />
                 <PlaceholderLine

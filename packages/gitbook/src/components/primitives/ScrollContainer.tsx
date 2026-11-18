@@ -22,19 +22,23 @@ export type ScrollContainerProps = {
     orientation: 'horizontal' | 'vertical';
 
     leading?: {
-        /** Whether to fade out the leading edge of the container. */
-        fade: boolean;
+        /** Whether to fade out the leading edge of the container, over 1rem or 3rem (`long`). */
+        fade: boolean | 'long';
         /** Whether to show a button to scroll back. */
         button: boolean | ButtonProps;
+        /** Show the button whenever the container can scroll back, not only on hover. */
+        buttonAlwaysVisible?: boolean;
         /** Optional class(es) to apply when there the container can be scrolled on the leading (left or top) edge */
         className?: string;
     };
 
     trailing?: {
-        /** Whether to fade out the trailing edge of the container. */
-        fade: boolean;
+        /** Whether to fade out the trailing edge of the container, over 1rem or 6rem (`long`). */
+        fade: boolean | 'long';
         /** Whether to show a button to scroll forward. */
         button: boolean | ButtonProps;
+        /** Show the button whenever the container can scroll forward, not only on hover. */
+        buttonAlwaysVisible?: boolean;
         /** Optional class(es) to apply when there the container can be scrolled on the trailing (right or bottom) edge */
         className?: string;
     };
@@ -190,13 +194,21 @@ export function ScrollContainer(props: ScrollContainerProps) {
                     orientation === 'horizontal' ? 'overflow-x-scroll' : 'flex-col overflow-y-auto',
                     leading.fade && scrollPosition > 0
                         ? orientation === 'horizontal'
-                            ? 'mask-l-from-[calc(100%-1rem)]'
-                            : 'mask-t-from-[calc(100%-1rem)]'
+                            ? leading.fade === 'long'
+                                ? 'mask-l-from-[calc(100%-3rem)]'
+                                : 'mask-l-from-[calc(100%-1rem)]'
+                            : leading.fade === 'long'
+                              ? 'mask-t-from-[calc(100%-3rem)]'
+                              : 'mask-t-from-[calc(100%-1rem)]'
                         : '',
                     trailing.fade && scrollPosition < scrollSize
                         ? orientation === 'horizontal'
-                            ? 'mask-r-from-[calc(100%-1rem)]'
-                            : 'mask-b-from-[calc(100%-1rem)]'
+                            ? trailing.fade === 'long'
+                                ? 'mask-r-from-[calc(100%-6rem)]'
+                                : 'mask-r-from-[calc(100%-1rem)]'
+                            : trailing.fade === 'long'
+                              ? 'mask-b-from-[calc(100%-6rem)]'
+                              : 'mask-b-from-[calc(100%-1rem)]'
                         : '',
                     contentClassName
                 )}
@@ -223,7 +235,9 @@ export function ScrollContainer(props: ScrollContainerProps) {
                             : '-translate-x-1/2! top-0 left-1/2 mt-2',
                         'absolute z-10 not-pointer-none:block hidden scale-0 opacity-0 transition-[scale,opacity]',
                         scrollPosition > 0
-                            ? 'not-pointer-none:group-hover/scroll-container:scale-100 not-pointer-none:group-hover/scroll-container:opacity-11'
+                            ? leading.buttonAlwaysVisible
+                                ? 'not-pointer-none:scale-100 not-pointer-none:opacity-11'
+                                : 'not-pointer-none:group-hover/scroll-container:scale-100 not-pointer-none:group-hover/scroll-container:opacity-11'
                             : 'pointer-events-none',
                         typeof leading.button === 'object' ? leading.button.className : ''
                     )}
@@ -246,7 +260,9 @@ export function ScrollContainer(props: ScrollContainerProps) {
                             : '-translate-x-1/2! bottom-0 left-1/2 mb-2',
                         'absolute z-10 not-pointer-none:block hidden scale-0 transition-[scale,opacity]',
                         scrollPosition < scrollSize
-                            ? 'not-pointer-none:group-hover/scroll-container:scale-100 not-pointer-none:group-hover/scroll-container:opacity-11'
+                            ? trailing.buttonAlwaysVisible
+                                ? 'not-pointer-none:scale-100 not-pointer-none:opacity-11'
+                                : 'not-pointer-none:group-hover/scroll-container:scale-100 not-pointer-none:group-hover/scroll-container:opacity-11'
                             : 'pointer-events-none',
                         typeof trailing.button === 'object' ? trailing.button.className : ''
                     )}
