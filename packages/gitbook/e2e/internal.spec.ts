@@ -41,16 +41,15 @@ import {
 import { VISITOR_TOKEN_COOKIE } from '@/lib/visitors';
 
 // Kept as deterministic as possible to reduce visual flakiness: no preamble, a
-// single fixed search, a concise answer, and a fixed number of follow-ups. The
-// model is never perfectly deterministic, so `overrideAIResponse` still
-// normalizes the rendered content below — this prompt just narrows the variance.
+// single fixed search, and a concise answer. The model is never perfectly
+// deterministic, so `overrideAIResponse` still normalizes the rendered content
+// below — this prompt just narrows the variance.
 const AI_PROMPT = [
     "You're being invoked by the GitBook CI/CD pipeline for automated visual testing.",
     'Follow these instructions exactly and do not deviate:',
     '1. Do not write any preamble, commentary, or reasoning before acting.',
     '2. Perform a single search for exactly "Lorem ipsum".',
     '3. Reply with only the first sentence of the first page you find, and nothing else.',
-    '4. Always end by proposing exactly 3 follow-up suggestions.',
 ].join('\n');
 
 // `InsightsProvider` debounces its flushes by 1.5s.
@@ -462,10 +461,9 @@ const searchTestCases: Test[] = [
             await expect(page.getByTestId('ai-chat')).toBeVisible();
             await expect(page.getByTestId('ai-chat-message-user').first()).toHaveText(AI_PROMPT);
             await expect(page.getByTestId('ai-chat-message-assistant').first()).toBeVisible();
-            // Wait for the full response (incl. follow-up suggestions) to settle before
-            // asserting/screenshotting, rather than racing a fixed suggestion count.
+            // Wait for the stream, follow-up phase included, to finish before screenshotting.
+            // Follow-ups aren't asserted: the API can return none for this prompt.
             await waitForAIChatResponse(page);
-            await expect(page.getByTestId('ai-chat-followup-suggestion').first()).toBeVisible();
         },
         // Re-applied per viewport so the replacement survives resize-driven re-renders.
         normalizeBeforeScreenshot: (page) => page.evaluate(overrideAIResponse),
@@ -533,10 +531,9 @@ const searchTestCases: Test[] = [
             await expect(page.getByTestId('ai-chat')).toBeVisible();
             await expect(page.getByTestId('ai-chat-message-user').first()).toHaveText(AI_PROMPT);
             await expect(page.getByTestId('ai-chat-message-assistant').first()).toBeVisible();
-            // Wait for the full response (incl. follow-up suggestions) to settle before
-            // asserting/screenshotting, rather than racing a fixed suggestion count.
+            // Wait for the stream, follow-up phase included, to finish before screenshotting.
+            // Follow-ups aren't asserted: the API can return none for this prompt.
             await waitForAIChatResponse(page);
-            await expect(page.getByTestId('ai-chat-followup-suggestion').first()).toBeVisible();
         },
         // Re-applied per viewport so the replacement survives resize-driven re-renders.
         normalizeBeforeScreenshot: (page) => page.evaluate(overrideAIResponse),
