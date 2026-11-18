@@ -176,6 +176,7 @@ function ZoomImageModal(props: {
     React.useEffect(() => {
         const handleKeyDown = (event: KeyboardEvent) => {
             if (event.key === 'Escape') {
+                event.preventDefault();
                 onClose();
             }
         };

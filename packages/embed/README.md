@@ -127,6 +127,11 @@ frame.configure({
 frame.on('close', () => {
     console.log('Frame closed');
 });
+
+// Escape was pressed inside the frame and nothing in it (a menu, a dialog) used it
+frame.on('escape', () => {
+    closeHelpPanel();
+});
 ```
 
 ## As React components
@@ -222,7 +227,7 @@ function MyComponent() {
 - `frame.postUserMessage(message: string)` → `void`
 - `frame.clearChat()` → `void`
 - `frame.configure(settings: Partial<GitBookEmbeddableConfiguration>)` → `void`
-- `frame.on(event: string, listener: Function)` → `() => void` (unsubscribe)
+- `frame.on(event: string, listener: Function)` → `() => void` (unsubscribe). Events: `close`, `escape`
 
 ### React Components
 

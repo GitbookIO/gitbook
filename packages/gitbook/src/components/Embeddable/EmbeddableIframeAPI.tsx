@@ -5,7 +5,11 @@ import React, { useEffect, useRef } from 'react';
 import { createStore, useStore } from 'zustand';
 
 import type { GitBookIntegrationTool } from '@gitbook/browser-types';
-import type { GitBookEmbeddableConfiguration, ParentToFrameMessage } from '@gitbook/embed';
+import type {
+    FrameToParentMessage,
+    GitBookEmbeddableConfiguration,
+    ParentToFrameMessage,
+} from '@gitbook/embed';
 
 import { integrationsAssistantTools } from '../Integrations';
 import { Button, LinkContext, type LinkContextType } from '../primitives';
@@ -68,6 +72,27 @@ export function EmbeddableIframeAPI(props: { baseURL: string }) {
             router.push(`${baseURL}/assistant`);
         });
     }, [chatController]);
+
+    React.useEffect(() => {
+        const channel = getChannel();
+        if (!channel) {
+            return;
+        }
+
+        // Menus, dialogs and the zoomed image call preventDefault when Escape closes them.
+        const onKeyDown = (event: KeyboardEvent) => {
+            if (
+                event.key === 'Escape' &&
+                !event.defaultPrevented &&
+                !event.isComposing &&
+                !event.repeat
+            ) {
+                channel.send({ type: 'escape' } satisfies FrameToParentMessage);
+            }
+        };
+        window.addEventListener('keydown', onKeyDown);
+        return () => window.removeEventListener('keydown', onKeyDown);
+    }, []);
 
     React.useEffect(() => {
         const channel = getChannel();
