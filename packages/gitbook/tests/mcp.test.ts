@@ -134,6 +134,25 @@ describe('MCP on a site behind visitor authentication', () => {
     );
 
     it.each(protectedEndpoints)(
+        'should challenge requests to %s with a rejected bearer token',
+        async (endpoint) => {
+            const response = await fetch(getContentTestURL(`${VA_SITE_URL}/${endpoint}`), {
+                headers: {
+                    Authorization: `Bearer ${jwt.sign({ name: 'visitor' }, 'not-the-site-key')}`,
+                },
+            });
+
+            expect(response.status).toBe(401);
+            expect(response.headers.get('WWW-Authenticate')).toMatch(
+                new RegExp(
+                    `^Bearer realm="mcp", resource_metadata="https?://.+/\\.well-known/oauth-protected-resource/${endpoint}"$`
+                )
+            );
+        },
+        15_000
+    );
+
+    it.each(protectedEndpoints)(
         'should serve protected resource metadata for %s',
         async (endpoint) => {
             const { status, body } = await fetchProtectedResourceMetadata(VA_SITE_URL, endpoint);
