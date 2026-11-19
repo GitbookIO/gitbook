@@ -44,7 +44,9 @@ import { MCP_SERVER_CARD_PATH, MCP_SERVER_CARD_WELL_KNOWN_PATH } from '@/lib/mcp
 import { MiddlewareHeaders } from '@/lib/middleware';
 import {
     createOAuthProtectedResourceMetadataResponse,
+    createOAuthProtectedResourceUnauthResponse,
     handleUnauthedOAuthProtectedResourceRequest,
+    isOAuthProtectedResourceMetadataRequest,
     isOAuthProtectedResourceMetadataRequestForAuthEndpoint,
     isOAuthProtectedResourceRequest,
 } from '@/lib/oauth-protected';
@@ -234,25 +236,36 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
     const visitorCountry = getVisitorCountry(request);
 
     const withAPIToken = async (apiToken: string | null) => {
-        const siteURLData = await throwIfDataError(
-            lookupPublishedContentByUrl({
-                url: siteRequestURL.toString(),
-                visitorPayload: {
-                    jwtToken: visitorToken?.token ?? undefined,
-                    unsignedClaims,
-                    type: getVisitorType(request),
-                    ...(visitorCountry ? { country: visitorCountry } : {}),
-                },
-                // When the visitor auth token is pulled from the cookie, set redirectOnError when calling resolvePublishedContentByUrl to allow
-                // redirecting when the token is invalid as we could be dealing with stale token stored in the cookie.
-                // For example when the VA backend signature has changed but the token stored in the cookie is not yet expired.
-                redirectOnError: visitorToken?.source === 'visitor-auth-cookie',
+        const lookup = await lookupPublishedContentByUrl({
+            url: siteRequestURL.toString(),
+            visitorPayload: {
+                jwtToken: visitorToken?.token ?? undefined,
+                unsignedClaims,
+                type: getVisitorType(request),
+                ...(visitorCountry ? { country: visitorCountry } : {}),
+            },
+            // When the visitor auth token is pulled from the cookie, set redirectOnError when calling resolvePublishedContentByUrl to allow
+            // redirecting when the token is invalid as we could be dealing with stale token stored in the cookie.
+            // For example when the VA backend signature has changed but the token stored in the cookie is not yet expired.
+            redirectOnError: visitorToken?.source === 'visitor-auth-cookie',
 
-                // Use the API token passed in the request, if any
-                // as it could be used for .preview hostnames
-                apiToken,
-            })
-        );
+            // Use the API token passed in the request, if any
+            // as it could be used for .preview hostnames
+            apiToken,
+        });
+
+        // A bearer token rejected on an OAuth protected resource (like MCP) gets the same challenge
+        // as a missing one, so the client knows to authorize again.
+        if (
+            lookup.error?.code === 401 &&
+            visitorToken?.source === 'visitor-oauth-protected' &&
+            isOAuthProtectedResourceRequest(siteRequestURL) &&
+            !isOAuthProtectedResourceMetadataRequest(siteRequestURL)
+        ) {
+            return createOAuthProtectedResourceUnauthResponse({ siteRequestURL, urlMode: mode });
+        }
+
+        const siteURLData = throwIfDataError(lookup);
 
         const cookies: ResponseCookies = visitorParamsCookie
             ? [
