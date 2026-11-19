@@ -1,4 +1,4 @@
-import { type Page, type Request, type Route, expect } from '@playwright/test';
+import { type Page, type Request, type Route, expect, test } from '@playwright/test';
 import jwt from 'jsonwebtoken';
 
 import {
@@ -12,6 +12,7 @@ import {
     CustomizationIconsStyle,
     CustomizationPageActionType,
     CustomizationSidebarListStyle,
+    GitBookAPI,
     SiteSocialAccountPlatform,
 } from '@gitbook/api';
 import type { GitBookStandalone } from '@gitbook/embed';
@@ -3799,3 +3800,47 @@ const testCases: TestsCase[] = [
 ];
 
 runTestCases(testCases);
+
+test('Docs Embed inherits the site questions unless the host supplies questions', async ({
+    page,
+}) => {
+    const docsURL = 'https://gitbook.com/docs/';
+    const { apiToken, organization, site, siteSpace } = await getSiteAPIToken(docsURL);
+    const api = new GitBookAPI({ endpoint: 'https://api.gitbook.com/cache', authToken: apiToken });
+    const { data } = await api.orgs.getPublishedContentSite(organization, site, {});
+    const customization = data.customizations.siteSpaces[siteSpace] ?? data.customizations.site;
+    const siteQuestions = [...new Set(customization.ai?.suggestions)];
+    expect(siteQuestions.length).toBeGreaterThan(0);
+
+    const hostURL = getContentTestURL(new URL('~gitbook/embed/demo/', docsURL).href);
+    const loaderURL = getContentTestURL(new URL('~gitbook/embed/script.js', docsURL).href);
+    const hostQuestions = ['Where should I start?'];
+    await page.route(hostURL, (route) =>
+        route.fulfill({
+            contentType: 'text/html',
+            body: `<!doctype html>
+                <button id="override">Use host questions</button>
+                <script src="${loaderURL}"></script>
+                <script>
+                    GitBook('configure', {
+                        tabs: ['assistant'],
+                        assistantName: 'Docs Assistant',
+                        suggestions: [],
+                    });
+                    GitBook('open');
+                    document.getElementById('override').onclick = () => {
+                        GitBook('configure', { suggestions: ${JSON.stringify(hostQuestions)} });
+                    };
+                </script>`,
+        })
+    );
+
+    await page.goto(hostURL, { waitUntil: 'domcontentloaded' });
+    const frame = page.frameLocator('#gitbook-widget-iframe');
+    await expect(frame.getByText('Docs Assistant', { exact: true })).toBeVisible();
+    const questions = frame.getByTestId('ai-chat-suggested-question');
+    await expect(questions).toHaveText(siteQuestions);
+
+    await page.getByRole('button', { name: 'Use host questions' }).click();
+    await expect(questions).toHaveText(hostQuestions);
+});

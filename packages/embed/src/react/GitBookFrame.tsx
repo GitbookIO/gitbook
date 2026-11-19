@@ -24,7 +24,7 @@ export function GitBookFrame(props: GitBookFrameProps) {
         visitor,
         actions = [],
         greeting,
-        suggestions = [],
+        suggestions,
         tools = [],
         tabs = ['assistant', 'search', 'docs'],
         defaultTab,

@@ -83,7 +83,7 @@ export function createGitBookFrame(iframe: HTMLIFrameElement): GitBookFrameClien
         tabs: ['assistant', 'search', 'docs'],
         actions: [],
         greeting: { title: '', subtitle: '' },
-        suggestions: [],
+        suggestions: undefined,
         tools: [],
         trademark: true,
     };

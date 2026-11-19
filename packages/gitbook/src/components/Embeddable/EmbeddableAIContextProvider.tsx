@@ -18,7 +18,7 @@ export function EmbeddableAIContextProvider(props: EmbeddableAIContextProviderPr
     return (
         <AIContextProvider
             aiMode={aiMode}
-            suggestions={embedConfig.suggestions ?? suggestions}
+            suggestions={embedConfig.suggestions?.length ? embedConfig.suggestions : suggestions}
             greeting={embedConfig.greeting ?? greeting}
             trademark={trademark && (embedConfig.trademark ?? true)}
             assistantName={embedConfig.assistantName?.substring(0, 32)} // Limit to 32 characters

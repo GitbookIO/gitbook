@@ -20,7 +20,6 @@ const embeddableConfiguration = createStore<GitBookEmbeddableConfiguration>(() =
     tabs: [],
     actions: [],
     greeting: { title: '', subtitle: '' },
-    suggestions: [],
     tools: [],
     trademark: true,
 }));
