@@ -40,6 +40,7 @@ import {
 import { GITBOOK_DISABLE_INSIGHTS, isGitBookAssetsHostURL, isGitBookHostURL } from '@/lib/env';
 import { getImageResizingContextId } from '@/lib/images';
 import { isAITrainingOrIndexingRequest } from '@/lib/indexing-crawlers';
+import { getLogger } from '@/lib/logger';
 import { MCP_SERVER_CARD_PATH, MCP_SERVER_CARD_WELL_KNOWN_PATH } from '@/lib/mcp/paths';
 import { MiddlewareHeaders } from '@/lib/middleware';
 import {
@@ -54,7 +55,9 @@ import { removeLeadingSlash, removeTrailingSlash } from '@/lib/paths';
 import {
     getPreviewCookieResponse,
     getPreviewRequestIdentifier,
+    getPublishedPreviewRedirectURL,
     isPreviewRequest,
+    isPublishedPreviewAllowed,
     parsePreviewCustomizationCookie,
     serializePreviewCustomizationCookie,
 } from '@/lib/preview';
@@ -348,6 +351,18 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
                 siteId: siteURLData.site,
                 urlMode: mode,
             });
+        }
+
+        const previewRedirect = getDisabledPublishedPreviewRedirect(siteURLData);
+        if (previewRedirect) {
+            const target =
+                mode === 'url'
+                    ? new URL(
+                          `/url/${previewRedirect.host}${previewRedirect.pathname}`,
+                          request.url
+                      )
+                    : previewRedirect;
+            return NextResponse.redirect(target.toString());
         }
 
         // We use the host/origin from the canonical URL to ensure the links are
@@ -829,6 +844,41 @@ const PATH_ALIASES: Record<string, string> = {
     [MCP_SERVER_CARD_WELL_KNOWN_PATH]: MCP_SERVER_CARD_PATH,
     [AI_CATALOG_WELL_KNOWN_PATH]: AI_CATALOG_PATH,
 };
+
+/**
+ * Preview URL to send a change request or revision URL to when the site keeps them off its
+ * published domain. Null when the request can render as is.
+ */
+function getDisabledPublishedPreviewRedirect(
+    siteURLData: PublishedSiteContent & { publicChangeRequestPreviews?: boolean }
+): URL | null {
+    if (
+        isPublishedPreviewAllowed({
+            publicChangeRequestPreviews: siteURLData.publicChangeRequestPreviews,
+            preview: siteURLData.preview ?? false,
+            changeRequest: siteURLData.changeRequest,
+            revision: siteURLData.revision,
+        })
+    ) {
+        return null;
+    }
+
+    const selector = siteURLData.changeRequest ? 'change-request' : 'revision';
+    const target = getPublishedPreviewRedirectURL(siteURLData);
+    if (!target) {
+        getLogger().warn('Refused disabled published preview without a preview URL', {
+            site: siteURLData.site,
+            selector,
+        });
+        throw new DataFetcherError('Not found', 404);
+    }
+
+    getLogger().info('Redirected disabled published preview to the preview domain', {
+        site: siteURLData.site,
+        selector,
+    });
+    return target;
+}
 
 function isSearchPrewarmRequest(siteURLData: PublishedSiteContent) {
     return (

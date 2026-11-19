@@ -4,6 +4,7 @@ import { assert } from 'ts-essentials';
 import type { PublishedSiteContent } from '@gitbook/api';
 
 import { GITBOOK_PREVIEW_BASE_URL } from './env';
+import { joinPath, removeTrailingSlash } from './paths';
 import type { ResponseCookie } from './visitors';
 
 /**
@@ -32,6 +33,29 @@ export function isPublishedPreviewAllowed(input: {
         (!input.changeRequest && !input.revision) ||
         input.publicChangeRequestPreviews !== false
     );
+}
+
+/**
+ * URL of the same content on the preview domain, where GitBook members sign in to see it.
+ * Returns null when the base path does not sit under the site base path.
+ */
+export function getPublishedPreviewRedirectURL(
+    siteURLData: Pick<PublishedSiteContent, 'site' | 'siteBasePath' | 'basePath' | 'pathname'>
+): URL | null {
+    const siteBasePath = removeTrailingSlash(siteURLData.siteBasePath);
+    const basePath = removeTrailingSlash(siteURLData.basePath);
+    if (basePath !== siteBasePath && !basePath.startsWith(`${siteBasePath}/`)) {
+        return null;
+    }
+
+    const previewBaseURL = new URL(GITBOOK_PREVIEW_BASE_URL);
+    const pathname = joinPath(
+        previewBaseURL.pathname,
+        siteURLData.site,
+        basePath.slice(siteBasePath.length),
+        siteURLData.pathname
+    );
+    return new URL(removeTrailingSlash(pathname), previewBaseURL);
 }
 
 /**
