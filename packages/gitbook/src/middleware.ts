@@ -1009,6 +1009,7 @@ function encodePathInSiteContent(
         case '~gitbook/embed/script.js':
         case '~gitbook/embed/demo':
         case '~gitbook/site-index':
+        case '~gitbook/opensearch.xml':
             // LLMs.txt, sitemap, sitemap-pages and robots.txt are always static
             // as they only depend on the site structure / pages.
             return { pathname, routeType: 'static' };
