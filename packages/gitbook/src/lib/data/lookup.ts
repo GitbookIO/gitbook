@@ -3,9 +3,8 @@ import type { GitBookAPI, PublishedSiteContentLookup, SiteVisitorPayload } from 
 import { apiClient } from './api';
 import { getExposableError } from './errors';
 import type { DataFetcherResponse } from './types';
-import { getURLLookup, getURLLookupPathname, stripURLSearch } from './urls';
+import { getURLLookup, stripURLSearch } from './urls';
 import { tryCatch } from '@/lib/async';
-import { joinPath, joinPathWithBaseURL } from '@/lib/paths';
 import { isPreviewRequest } from '@/lib/preview';
 import { trace } from '@/lib/tracing';
 
@@ -40,12 +39,12 @@ export async function lookupPublishedContentByUrl(
     const callResult = await trace(
         {
             operation: 'resolvePublishedContentByUrl',
-            name: lookup.url,
+            name: lookup,
         },
         () =>
             tryCatch(
                 api.urls.resolvePublishedContentByUrl({
-                    url: lookup.url,
+                    url: lookup,
                     ...(input.visitorPayload ? { visitor: input.visitorPayload } : {}),
                     redirectOnError: input.redirectOnError,
                 } as ResolveBody) //TODO: remove cast when we are sure that everything is good
@@ -62,47 +61,12 @@ export async function lookupPublishedContentByUrl(
         data: { data },
     } = callResult;
 
-    if ('redirect' in data) {
-        if (data.target === 'application' && isPreviewRequest(lookupURL)) {
-            // The cached lookup omits content selectors and query params needed after login.
-            const redirect = new URL(data.redirect);
-            redirect.searchParams.set('redirect', lookupURL.toString());
-            return { data: { ...data, redirect: redirect.toString() } };
-        }
-
-        // Append the path to the redirect URL
-        // because we resolved a shorter path and the redirect is relative to it
-        if (lookup.extraPath) {
-            if (data.target === 'content') {
-                const redirect = new URL(data.redirect);
-                redirect.pathname = joinPath(redirect.pathname, lookup.extraPath);
-                data.redirect = redirect.toString();
-            } else {
-                const redirect = new URL(data.redirect);
-                if (redirect.searchParams.has('location')) {
-                    redirect.searchParams.set(
-                        'location',
-                        joinPath(redirect.searchParams.get('location') ?? '', lookup.extraPath)
-                    );
-                    data.redirect = redirect.toString();
-                }
-            }
-        }
-
-        return { data };
+    if ('redirect' in data && data.target === 'application' && isPreviewRequest(lookupURL)) {
+        // The cached lookup omits the query params needed after login.
+        const redirect = new URL(data.redirect);
+        redirect.searchParams.set('redirect', lookupURL.toString());
+        return { data: { ...data, redirect: redirect.toString() } };
     }
 
-    const changeRequest = data.changeRequest ?? lookup.changeRequest;
-    const revision = data.revision ?? lookup.revision;
-
-    return {
-        data: {
-            ...data,
-            canonicalUrl: joinPathWithBaseURL(data.canonicalUrl, lookup.extraPath),
-            basePath: joinPath(data.basePath, lookup.basePath ?? ''),
-            pathname: getURLLookupPathname(lookup, data),
-            ...(changeRequest ? { changeRequest } : {}),
-            ...(revision ? { revision } : {}),
-        },
-    };
+    return { data };
 }

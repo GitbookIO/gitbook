@@ -1,7 +1,5 @@
 import { afterEach, describe, expect, it, spyOn } from 'bun:test';
 
-import type { PublishedSiteContentLookup } from '@gitbook/api';
-
 import { GITBOOK_PREVIEW_BASE_URL } from '../env';
 import * as api from './api';
 import { DataFetcherError } from './errors';
@@ -50,64 +48,39 @@ describe('preview auth redirects', () => {
         expect(redirect.origin + redirect.pathname).toBe(authURL.toString());
         expect(redirect.searchParams.get('redirect')).toBe(requestURL.toString());
     });
+});
 
-    it.each([
-        {
-            name: 'non-preview application redirects',
-            requestURL: 'https://docs.example.com/~/changes/66',
-            target: 'application',
-            redirect: 'https://app.gitbook.com/o/org_foo/sites/site_foo',
-            expectedRedirect: 'https://app.gitbook.com/o/org_foo/sites/site_foo',
-        },
-        {
-            name: 'preview content redirects with a remaining page path',
-            requestURL: new URL(
-                'site_foo/~/changes/66/hello%20world',
-                GITBOOK_PREVIEW_BASE_URL
-            ).toString(),
-            target: 'content',
-            redirect: 'https://docs.example.com/section?theme=dark',
-            expectedRedirect: 'https://docs.example.com/section/hello%20world?theme=dark',
-        },
-        {
-            name: 'preview external redirects with a remaining page path',
-            requestURL: new URL(
-                'site_foo/~/revisions/revision_123/hello%20world',
-                GITBOOK_PREVIEW_BASE_URL
-            ).toString(),
-            target: 'external',
-            redirect: 'https://auth.example.com/login?location=%2Fsection&state=keep',
-            expectedRedirect:
-                'https://auth.example.com/login?location=%2Fsection%2Fhello%2520world&state=keep',
-        },
-    ] as const)(
-        'preserves handling of $name',
-        async ({ requestURL, target, redirect, expectedRedirect }) => {
-            const data: PublishedSiteContentLookup =
-                target === 'external'
-                    ? { target, redirect, site: 'site_foo' }
-                    : { target, redirect };
-            apiClientSpy = spyOn(api, 'apiClient').mockReturnValue({
-                urls: {
-                    async resolvePublishedContentByUrl() {
-                        return { data };
-                    },
+describe('lookup URL', () => {
+    it('sends change request URLs in full and keeps the redirect of the API', async () => {
+        const urls: string[] = [];
+        const redirect = new URL(
+            'site_foo/section/~/changes/66/hello%20world',
+            GITBOOK_PREVIEW_BASE_URL
+        ).toString();
+        const apiClientSpy = spyOn(api, 'apiClient').mockReturnValue({
+            urls: {
+                async resolvePublishedContentByUrl({ url }: { url: string }) {
+                    urls.push(url);
+                    return { data: { target: 'content', redirect } };
                 },
-            } as unknown as ReturnType<typeof api.apiClient>);
+            },
+        } as unknown as ReturnType<typeof api.apiClient>);
 
+        try {
             const result = await lookupPublishedContentByUrl({
-                url: requestURL,
+                url: 'https://docs.example.com/section/~/changes/66/hello%20world?jwt_token=abc',
                 apiToken: null,
                 redirectOnError: false,
                 visitorPayload: {},
             });
-
-            expect(result).toEqual({ data: { ...data, redirect: expectedRedirect } });
+            expect(result).toEqual({ data: { target: 'content', redirect } });
+        } finally {
+            apiClientSpy.mockRestore();
         }
-    );
-});
 
-describe('lookup URL', () => {
+        expect(urls).toEqual(['https://docs.example.com/section/~/changes/66/hello%20world']);
+    });
+
     it('resolves the full URL without search params in a single call', async () => {
         const urls: string[] = [];
         const apiClientSpy = spyOn(api, 'apiClient').mockReturnValue({
