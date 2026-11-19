@@ -137,6 +137,11 @@ export type ParentToFrameMessage =
 /**
  * Messages sent from the frame to the parent.
  */
-export type FrameToParentMessage = {
-    type: 'close';
-};
+export type FrameToParentMessage =
+    | {
+          type: 'close';
+      }
+    | {
+          /** Escape was pressed inside the frame and nothing in the frame handled it. */
+          type: 'escape';
+      };
