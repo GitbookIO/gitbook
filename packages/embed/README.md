@@ -394,6 +394,8 @@ Available in: Standalone script, NPM package, React components
 
 Suggested questions displayed in the [Assistant](https://gitbook.com/docs/publishing-documentation/gitbook-ai-assistant) welcome screen.
 
+Omit `suggestions` when creating the embed or pass an empty array to use the site's suggested questions. If the site has no suggested questions, the Assistant shows generic questions. Later `configure` calls keep the current setting unless you pass `suggestions`. To restore the site's questions, remove the React prop or pass `{ suggestions: [] }` or `{ suggestions: undefined }` to `configure`.
+
 - **Type**: `string[]`
 
 ```javascript

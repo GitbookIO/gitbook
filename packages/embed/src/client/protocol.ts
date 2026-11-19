@@ -94,8 +94,8 @@ export type GitBookEmbeddableConfiguration = {
      */
     assistantName?: string;
 
-    /** Suggestions of questions to be displayed in the welcome page. */
-    suggestions: string[];
+    /** Welcome questions. Omit or pass [] to inherit the site's questions. */
+    suggestions?: string[] | undefined;
 
     /** Tools to be provided to the assistant. */
     tools: GitBookToolDefinition[];
