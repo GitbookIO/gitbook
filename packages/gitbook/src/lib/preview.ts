@@ -4,7 +4,6 @@ import { assert } from 'ts-essentials';
 import type { PublishedSiteContent } from '@gitbook/api';
 
 import { GITBOOK_PREVIEW_BASE_URL } from './env';
-import { joinPath, removeTrailingSlash } from './paths';
 import type { ResponseCookie } from './visitors';
 
 /**
@@ -33,28 +32,6 @@ export function isPublishedPreviewAllowed(input: {
         (!input.changeRequest && !input.revision) ||
         input.publicChangeRequestPreviews !== false
     );
-}
-
-/**
- * URL of the same content on the preview domain, where GitBook members sign in to see it.
- * Returns null when the site space has no preview URL.
- */
-export function getPublishedPreviewRedirectURL(input: {
-    siteSpacePreviewURL: string | undefined;
-    changeRequest?: string;
-    revision?: string;
-    pathname: string;
-}): URL | null {
-    if (!input.siteSpacePreviewURL) {
-        return null;
-    }
-
-    const selector = input.revision
-        ? `~/revisions/${input.revision}`
-        : `~/changes/${input.changeRequest}`;
-    const url = new URL(input.siteSpacePreviewURL);
-    url.pathname = removeTrailingSlash(joinPath(url.pathname, selector, input.pathname));
-    return url;
 }
 
 /**

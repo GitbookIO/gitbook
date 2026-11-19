@@ -5,7 +5,6 @@ import type { PublishedSiteContent } from '@gitbook/api';
 import {
     getPreviewCookieResponse,
     getPreviewRequestIdentifier,
-    getPublishedPreviewRedirectURL,
     isPreviewRequest,
     isPublishedPreviewAllowed,
     parsePreviewCustomizationCookie,
@@ -112,38 +111,5 @@ describe('isPublishedPreviewAllowed', () => {
         ).toBe(true);
         expect(isPublishedPreviewAllowed({ ...disabled, preview: false })).toBe(true);
         expect(isPublishedPreviewAllowed({ preview: false, changeRequest: '458' })).toBe(true);
-    });
-});
-
-describe('getPublishedPreviewRedirectURL', () => {
-    const siteSpacePreviewURL = 'https://sites.gitbook.com/preview/site_a/api/v2/';
-
-    it('adds the change request or revision and the page path to the site space preview URL', () => {
-        expect(
-            getPublishedPreviewRedirectURL({
-                siteSpacePreviewURL,
-                changeRequest: '458',
-                pathname: '/getting-started/install',
-            })?.toString()
-        ).toBe(
-            'https://sites.gitbook.com/preview/site_a/api/v2/~/changes/458/getting-started/install'
-        );
-        expect(
-            getPublishedPreviewRedirectURL({
-                siteSpacePreviewURL,
-                revision: 'rev_1',
-                pathname: '/',
-            })?.toString()
-        ).toBe('https://sites.gitbook.com/preview/site_a/api/v2/~/revisions/rev_1');
-    });
-
-    it('returns null without a site space preview URL', () => {
-        expect(
-            getPublishedPreviewRedirectURL({
-                siteSpacePreviewURL: undefined,
-                changeRequest: '458',
-                pathname: '/',
-            })
-        ).toBeNull();
     });
 });

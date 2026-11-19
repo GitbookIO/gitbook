@@ -36,7 +36,6 @@ import {
     lookupPublishedContentByUrl,
     normalizeRequestURL,
     throwIfDataError,
-    wrapDataFetcherError,
 } from '@/lib/data';
 import { GITBOOK_DISABLE_INSIGHTS, isGitBookAssetsHostURL, isGitBookHostURL } from '@/lib/env';
 import { getImageResizingContextId } from '@/lib/images';
@@ -56,9 +55,7 @@ import { removeLeadingSlash, removeTrailingSlash } from '@/lib/paths';
 import {
     getPreviewCookieResponse,
     getPreviewRequestIdentifier,
-    getPublishedPreviewRedirectURL,
     isPreviewRequest,
-    isPublishedPreviewAllowed,
     parsePreviewCustomizationCookie,
     serializePreviewCustomizationCookie,
 } from '@/lib/preview';
@@ -67,7 +64,6 @@ import {
     createRobotsTxtResponse,
     isRobotsTxtRequest,
 } from '@/lib/robots';
-import { listAllSiteSpaces } from '@/lib/sites';
 import {
     type ResponseCookies,
     getPathScopedCookieName,
@@ -333,9 +329,13 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
                     );
                 }
 
-                // Keep the same search params as the original request
-                // as it might contain a VA token
-                contentRedirect.search = request.nextUrl.search;
+                if (isPreviewRequest(new URL(siteURLData.redirect))) {
+                    getLogger().info('Redirected disabled published preview to the preview domain');
+                } else {
+                    // Keep the same search params as the original request
+                    // as it might contain a VA token
+                    contentRedirect.search = request.nextUrl.search;
+                }
 
                 return createRedirectResponse(contentRedirect.toString());
             }
@@ -353,18 +353,6 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
                 siteId: siteURLData.site,
                 urlMode: mode,
             });
-        }
-
-        const previewRedirect = await getDisabledPublishedPreviewRedirect(siteURLData);
-        if (previewRedirect) {
-            const target =
-                mode === 'url'
-                    ? new URL(
-                          `/url/${previewRedirect.host}${previewRedirect.pathname}`,
-                          request.url
-                      )
-                    : previewRedirect;
-            return NextResponse.redirect(target.toString());
         }
 
         // We use the host/origin from the canonical URL to ensure the links are
@@ -846,64 +834,6 @@ const PATH_ALIASES: Record<string, string> = {
     [MCP_SERVER_CARD_WELL_KNOWN_PATH]: MCP_SERVER_CARD_PATH,
     [AI_CATALOG_WELL_KNOWN_PATH]: AI_CATALOG_PATH,
 };
-
-/**
- * Preview URL to send a change request or revision URL to when the site keeps them off its
- * published domain. Null when the request can render as is.
- */
-async function getDisabledPublishedPreviewRedirect(
-    siteURLData: PublishedSiteContent
-): Promise<URL | null> {
-    const preview = siteURLData.preview ?? false;
-    if (preview || (!siteURLData.changeRequest && !siteURLData.revision)) {
-        return null;
-    }
-
-    const api = apiClient({ apiToken: siteURLData.apiToken });
-    const { site, structure } = await throwIfDataError(
-        wrapDataFetcherError(async () => {
-            const res = await api.orgs.getPublishedContentSite(
-                siteURLData.organization,
-                siteURLData.site,
-                { shareKey: siteURLData.shareKey }
-            );
-            return res.data;
-        })
-    );
-    if (
-        isPublishedPreviewAllowed({
-            publicChangeRequestPreviews: site.publicChangeRequestPreviews,
-            preview,
-            changeRequest: siteURLData.changeRequest,
-            revision: siteURLData.revision,
-        })
-    ) {
-        return null;
-    }
-
-    const selector = siteURLData.changeRequest ? 'change-request' : 'revision';
-    const siteSpace = listAllSiteSpaces(structure).find(({ id }) => id === siteURLData.siteSpace);
-    const target = getPublishedPreviewRedirectURL({
-        // TODO: drop the cast once @gitbook/api types `urls.preview` on site spaces.
-        siteSpacePreviewURL: (siteSpace?.urls as { preview?: string } | undefined)?.preview,
-        changeRequest: siteURLData.changeRequest,
-        revision: siteURLData.revision,
-        pathname: siteURLData.pathname,
-    });
-    if (!target) {
-        getLogger().warn('Refused disabled published preview without a preview URL', {
-            site: siteURLData.site,
-            selector,
-        });
-        throw new DataFetcherError('Not found', 404);
-    }
-
-    getLogger().info('Redirected disabled published preview to the preview domain', {
-        site: siteURLData.site,
-        selector,
-    });
-    return target;
-}
 
 function isSearchPrewarmRequest(siteURLData: PublishedSiteContent) {
     return (

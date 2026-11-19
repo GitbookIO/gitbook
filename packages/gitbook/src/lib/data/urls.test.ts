@@ -1,88 +1,6 @@
 import { describe, expect, it } from 'bun:test';
 
-import { getURLLookup, getURLLookupPathname, normalizeRequestURL, normalizeURL } from './urls';
-
-describe('getURLLookupPathname', () => {
-    const previewRoot = 'https://sites.gitbook.com/preview/site_example/section';
-    const pagePath = 'guides/access/setup';
-    const homepagePath = '/welcome/overview';
-
-    it.each(['revisions', 'changes'])(
-        'resolves a page in a %s preview from the site-space root',
-        (kind) => {
-            const lookup = getURLLookup(
-                new URL(`${previewRoot}/~/${kind}/revision-id/${pagePath}`)
-            )!;
-
-            expect(
-                getURLLookupPathname(lookup, {
-                    basePath: '/preview/site_example/section/',
-                    pathname: homepagePath,
-                })
-            ).toBe(`/${pagePath}`);
-        }
-    );
-
-    it.each(['revisions', 'changes'])(
-        'preserves the custom homepage at a %s preview root',
-        (kind) => {
-            const lookup = getURLLookup(new URL(`${previewRoot}/~/${kind}/revision-id/`))!;
-
-            expect(
-                getURLLookupPathname(lookup, {
-                    basePath: '/preview/site_example/section/',
-                    pathname: homepagePath,
-                })
-            ).toBe(`${homepagePath}/`);
-        }
-    );
-
-    it('uses the resolved pathname for a full URL lookup', () => {
-        const lookup = getURLLookup(new URL(`https://docs.example.com/section/${pagePath}`))!;
-
-        expect(
-            getURLLookupPathname(lookup, {
-                basePath: '/section/',
-                pathname: `/${pagePath}`,
-            })
-        ).toBe(`/${pagePath}/`);
-    });
-
-    it('preserves page resolution without a custom homepage', () => {
-        const lookup = getURLLookup(new URL(`${previewRoot}/~/revisions/revision-id/${pagePath}`))!;
-
-        expect(
-            getURLLookupPathname(lookup, {
-                basePath: '/preview/site_example/section/',
-                pathname: '/',
-            })
-        ).toBe(`/${pagePath}`);
-    });
-
-    it.each(['/section/variant', '/section/variant/'])(
-        'recognizes a root lookup with base path %s',
-        (basePath) => {
-            expect(
-                getURLLookupPathname(
-                    {
-                        url: 'https://docs.example.com/section/variant/',
-                        extraPath: 'guide/page',
-                    },
-                    { basePath, pathname: homepagePath }
-                )
-            ).toBe('/guide/page');
-        }
-    );
-
-    it('preserves a legitimate page prefix for a non-root lookup', () => {
-        expect(
-            getURLLookupPathname(
-                { url: 'https://docs.example.com/section/guide', extraPath: 'page' },
-                { basePath: '/section/', pathname: '/guide' }
-            )
-        ).toBe('/guide/page');
-    });
-});
+import { getURLLookup, normalizeRequestURL, normalizeURL } from './urls';
 
 describe('getURLLookup', () => {
     it.each([
@@ -98,68 +16,26 @@ describe('getURLLookup', () => {
         'https://docs.mycompany.com/section/blog/rss.xml',
         'https://docs.mycompany.com/a/b/intro.md',
         'https://proxy.gitbook.site/sites/site_foo/hello/world',
+        'https://docs.mycompany.com/~/revisions/id/a/b/c',
+        'https://docs.mycompany.com/~/changes/id/hello',
+        'https://test.gitbook.io/sharelink/v/variant/~/revisions/id/a/b/c',
+        'https://docs.mycompany.com/~/revisions/id/a/~gitbook/ogimage/pageId',
     ])('looks up the full URL %s', (url) => {
-        expect(getURLLookup(new URL(url))).toEqual({ url, extraPath: '' });
+        expect(getURLLookup(new URL(url))).toBe(url);
     });
 
     it('looks up the normalized URL', () => {
-        expect(getURLLookup(new URL('https://docs.mycompany.com//hello/'))).toEqual({
-            url: 'https://docs.mycompany.com/hello',
-            extraPath: '',
-        });
+        expect(getURLLookup(new URL('https://docs.mycompany.com//hello/'))).toBe(
+            'https://docs.mycompany.com/hello'
+        );
     });
 
-    it('should not match before a revision ID', () => {
-        expect(getURLLookup(new URL('https://docs.mycompany.com/~/revisions/id/a/b/c'))).toEqual({
-            url: 'https://docs.mycompany.com/',
-            extraPath: 'a/b/c',
-            basePath: '~/revisions/id',
-            revision: 'id',
-        });
-    });
-
-    it('should not match before a change request ID', () => {
-        expect(getURLLookup(new URL('https://docs.mycompany.com/~/changes/id/hello'))).toEqual({
-            url: 'https://docs.mycompany.com/',
-            extraPath: 'hello',
-            basePath: '~/changes/id',
-            changeRequest: 'id',
-        });
-    });
-
-    it('should match a revision in a variant in a share-link', () => {
-        expect(
-            getURLLookup(
-                new URL('https://test.gitbook.io/sharelink/v/variant/~/revisions/id/a/b/c')
-            )
-        ).toEqual({
-            url: 'https://test.gitbook.io/sharelink/v/variant',
-            extraPath: 'a/b/c',
-            basePath: '~/revisions/id',
-            revision: 'id',
-        });
-    });
-
-    it('should keep the revision base path for an internal path', () => {
-        expect(
-            getURLLookup(
-                new URL('https://docs.mycompany.com/~/revisions/id/a/~gitbook/ogimage/pageId')
-            )
-        ).toEqual({
-            url: 'https://docs.mycompany.com/',
-            extraPath: 'a/~gitbook/ogimage/pageId',
-            basePath: '~/revisions/id',
-            revision: 'id',
-        });
-    });
-
-    it.each([
-        'https://proxy.gitbook.site/',
-        'https://proxy.gitbook.site/sites',
-        'https://proxy.gitbook.site/sites/~/changes/id/hello',
-    ])('should skip the proxy root URL %s', (url) => {
-        expect(getURLLookup(new URL(url))).toBeNull();
-    });
+    it.each(['https://proxy.gitbook.site/', 'https://proxy.gitbook.site/sites'])(
+        'should skip the proxy root URL %s',
+        (url) => {
+            expect(getURLLookup(new URL(url))).toBeNull();
+        }
+    );
 });
 
 describe('normalizeRequestURL', () => {
