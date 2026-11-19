@@ -329,7 +329,10 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
                     );
                 }
 
-                if (isPreviewRequest(new URL(siteURLData.redirect))) {
+                if (
+                    !isPreviewRequest(siteRequestURL) &&
+                    isPreviewRequest(new URL(siteURLData.redirect))
+                ) {
                     getLogger().info('Redirected disabled published preview to the preview domain');
                 } else {
                     // Keep the same search params as the original request
