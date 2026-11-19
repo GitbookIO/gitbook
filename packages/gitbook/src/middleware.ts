@@ -36,6 +36,7 @@ import {
     lookupPublishedContentByUrl,
     normalizeRequestURL,
     throwIfDataError,
+    wrapDataFetcherError,
 } from '@/lib/data';
 import { GITBOOK_DISABLE_INSIGHTS, isGitBookAssetsHostURL, isGitBookHostURL } from '@/lib/env';
 import { getImageResizingContextId } from '@/lib/images';
@@ -353,7 +354,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
             });
         }
 
-        const previewRedirect = getDisabledPublishedPreviewRedirect(siteURLData);
+        const previewRedirect = await getDisabledPublishedPreviewRedirect(siteURLData);
         if (previewRedirect) {
             const target =
                 mode === 'url'
@@ -849,13 +850,29 @@ const PATH_ALIASES: Record<string, string> = {
  * Preview URL to send a change request or revision URL to when the site keeps them off its
  * published domain. Null when the request can render as is.
  */
-function getDisabledPublishedPreviewRedirect(
-    siteURLData: PublishedSiteContent & { publicChangeRequestPreviews?: boolean }
-): URL | null {
+async function getDisabledPublishedPreviewRedirect(
+    siteURLData: PublishedSiteContent
+): Promise<URL | null> {
+    const preview = siteURLData.preview ?? false;
+    if (preview || (!siteURLData.changeRequest && !siteURLData.revision)) {
+        return null;
+    }
+
+    const api = apiClient({ apiToken: siteURLData.apiToken });
+    const { site } = await throwIfDataError(
+        wrapDataFetcherError(async () => {
+            const res = await api.orgs.getPublishedContentSite(
+                siteURLData.organization,
+                siteURLData.site,
+                { shareKey: siteURLData.shareKey }
+            );
+            return res.data;
+        })
+    );
     if (
         isPublishedPreviewAllowed({
-            publicChangeRequestPreviews: siteURLData.publicChangeRequestPreviews,
-            preview: siteURLData.preview ?? false,
+            publicChangeRequestPreviews: site.publicChangeRequestPreviews,
+            preview,
             changeRequest: siteURLData.changeRequest,
             revision: siteURLData.revision,
         })
