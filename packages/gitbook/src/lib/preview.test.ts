@@ -116,46 +116,32 @@ describe('isPublishedPreviewAllowed', () => {
 });
 
 describe('getPublishedPreviewRedirectURL', () => {
-    it('keeps the path after the site base path, without the share key', () => {
-        const cases = [
-            {
-                siteURLData: {
-                    siteBasePath: '/',
-                    basePath: '/~/changes/458',
-                    pathname: '/getting-started/install',
-                },
-                expected: '/site_a/~/changes/458/getting-started/install',
-            },
-            {
-                siteURLData: {
-                    siteBasePath: '/docs/',
-                    basePath: '/docs/api/v2/~/revisions/rev_1',
-                    pathname: 'reference',
-                },
-                expected: '/site_a/api/v2/~/revisions/rev_1/reference',
-            },
-            {
-                siteURLData: {
-                    siteBasePath: '/docs/sharekey123/',
-                    basePath: '/docs/sharekey123/~/changes/458',
-                    pathname: '/',
-                },
-                expected: '/site_a/~/changes/458',
-            },
-        ];
+    const siteSpacePreviewURL = 'https://sites.gitbook.com/preview/site_a/api/v2/';
 
-        for (const { siteURLData, expected } of cases) {
-            const url = getPublishedPreviewRedirectURL({ site: 'site_a', ...siteURLData });
-            expect(url?.toString()).toBe(`https://sites.gitbook.com/preview${expected}`);
-        }
-    });
-
-    it('returns null when the base path is outside the site base path', () => {
+    it('adds the change request or revision and the page path to the site space preview URL', () => {
         expect(
             getPublishedPreviewRedirectURL({
-                site: 'site_a',
-                siteBasePath: '/docs/',
-                basePath: '/other/~/changes/458',
+                siteSpacePreviewURL,
+                changeRequest: '458',
+                pathname: '/getting-started/install',
+            })?.toString()
+        ).toBe(
+            'https://sites.gitbook.com/preview/site_a/api/v2/~/changes/458/getting-started/install'
+        );
+        expect(
+            getPublishedPreviewRedirectURL({
+                siteSpacePreviewURL,
+                revision: 'rev_1',
+                pathname: '/',
+            })?.toString()
+        ).toBe('https://sites.gitbook.com/preview/site_a/api/v2/~/revisions/rev_1');
+    });
+
+    it('returns null without a site space preview URL', () => {
+        expect(
+            getPublishedPreviewRedirectURL({
+                siteSpacePreviewURL: undefined,
+                changeRequest: '458',
                 pathname: '/',
             })
         ).toBeNull();

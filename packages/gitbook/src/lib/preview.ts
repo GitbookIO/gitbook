@@ -37,25 +37,24 @@ export function isPublishedPreviewAllowed(input: {
 
 /**
  * URL of the same content on the preview domain, where GitBook members sign in to see it.
- * Returns null when the base path does not sit under the site base path.
+ * Returns null when the site space has no preview URL.
  */
-export function getPublishedPreviewRedirectURL(
-    siteURLData: Pick<PublishedSiteContent, 'site' | 'siteBasePath' | 'basePath' | 'pathname'>
-): URL | null {
-    const siteBasePath = removeTrailingSlash(siteURLData.siteBasePath);
-    const basePath = removeTrailingSlash(siteURLData.basePath);
-    if (basePath !== siteBasePath && !basePath.startsWith(`${siteBasePath}/`)) {
+export function getPublishedPreviewRedirectURL(input: {
+    siteSpacePreviewURL: string | undefined;
+    changeRequest?: string;
+    revision?: string;
+    pathname: string;
+}): URL | null {
+    if (!input.siteSpacePreviewURL) {
         return null;
     }
 
-    const previewBaseURL = new URL(GITBOOK_PREVIEW_BASE_URL);
-    const pathname = joinPath(
-        previewBaseURL.pathname,
-        siteURLData.site,
-        basePath.slice(siteBasePath.length),
-        siteURLData.pathname
-    );
-    return new URL(removeTrailingSlash(pathname), previewBaseURL);
+    const selector = input.revision
+        ? `~/revisions/${input.revision}`
+        : `~/changes/${input.changeRequest}`;
+    const url = new URL(input.siteSpacePreviewURL);
+    url.pathname = removeTrailingSlash(joinPath(url.pathname, selector, input.pathname));
+    return url;
 }
 
 /**

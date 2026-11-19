@@ -67,6 +67,7 @@ import {
     createRobotsTxtResponse,
     isRobotsTxtRequest,
 } from '@/lib/robots';
+import { listAllSiteSpaces } from '@/lib/sites';
 import {
     type ResponseCookies,
     getPathScopedCookieName,
@@ -859,7 +860,7 @@ async function getDisabledPublishedPreviewRedirect(
     }
 
     const api = apiClient({ apiToken: siteURLData.apiToken });
-    const { site } = await throwIfDataError(
+    const { site, structure } = await throwIfDataError(
         wrapDataFetcherError(async () => {
             const res = await api.orgs.getPublishedContentSite(
                 siteURLData.organization,
@@ -881,7 +882,14 @@ async function getDisabledPublishedPreviewRedirect(
     }
 
     const selector = siteURLData.changeRequest ? 'change-request' : 'revision';
-    const target = getPublishedPreviewRedirectURL(siteURLData);
+    const siteSpace = listAllSiteSpaces(structure).find(({ id }) => id === siteURLData.siteSpace);
+    const target = getPublishedPreviewRedirectURL({
+        // TODO: drop the cast once @gitbook/api types `urls.preview` on site spaces.
+        siteSpacePreviewURL: (siteSpace?.urls as { preview?: string } | undefined)?.preview,
+        changeRequest: siteURLData.changeRequest,
+        revision: siteURLData.revision,
+        pathname: siteURLData.pathname,
+    });
     if (!target) {
         getLogger().warn('Refused disabled published preview without a preview URL', {
             site: siteURLData.site,
