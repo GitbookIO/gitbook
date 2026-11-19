@@ -317,22 +317,19 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
             // oxlint-disable-next-line no-console
             console.log('redirect', siteURLData.redirect);
             if (siteURLData.target === 'content') {
-                let contentRedirect = new URL(siteURLData.redirect, request.url);
+                const redirectURL = new URL(siteURLData.redirect, request.url);
+                let contentRedirect = new URL(redirectURL);
 
                 // For content redirects, we redirect using the /url/:url format
                 // during development and testing in 'url' mode.
                 if (mode === 'url') {
-                    const urlObject = new URL(siteURLData.redirect);
                     contentRedirect = new URL(
-                        `/url/${urlObject.host}${urlObject.pathname}${urlObject.search}`,
+                        `/url/${redirectURL.host}${redirectURL.pathname}${redirectURL.search}`,
                         request.url
                     );
                 }
 
-                if (
-                    !isPreviewRequest(siteRequestURL) &&
-                    isPreviewRequest(new URL(siteURLData.redirect))
-                ) {
+                if (!isPreviewRequest(siteRequestURL) && isPreviewRequest(redirectURL)) {
                     getLogger().info('Redirected disabled published preview to the preview domain');
                 } else {
                     // Keep the same search params as the original request
