@@ -39,95 +39,178 @@ export function renderLLMsIndex(
     limit: number = LLMS_TXT_MAX_CHARACTERS
 ): string {
     const collapsed = new Set<LLMsIndexNode>();
-    const candidates: LLMsIndexNode[] = [];
-    const visit = (node: LLMsIndexNode) => {
+    let output = renderFile(file, collapsed);
+    if (output.length <= limit) {
+        return output;
+    }
+
+    const parents = new Map<LLMsIndexNode, LLMsIndexNode>();
+    const sizes = new Map<LLMsIndexNode, number>();
+    const collapsedSizes = new Map<LLMsIndexNode, number>();
+    const versions = new Map<LLMsIndexNode, number>();
+    const orders = new Map<LLMsIndexNode, number>();
+    // Ties go to the node that comes first in the file.
+    const queue = new MaxHeap<QueueEntry>((a, b) => a.saving - b.saving || b.order - a.order);
+
+    const enqueue = (node: LLMsIndexNode) => {
+        if (!collapsedSizes.has(node)) {
+            return;
+        }
+        queue.push({
+            node,
+            order: orders.get(node)!,
+            version: versions.get(node) ?? 0,
+            saving: sizes.get(node)! - collapsedSizes.get(node)!,
+        });
+    };
+
+    const measure = (node: LLMsIndexNode, position: Position): number => {
+        const childPosition: Position =
+            node.kind === 'structure'
+                ? { headingDepth: position.headingDepth + 1, listDepth: 0 }
+                : { headingDepth: position.headingDepth, listDepth: position.listDepth + 1 };
+        orders.set(node, orders.size);
+        let size = measureNode(node, position, false);
+        for (const child of node.children) {
+            parents.set(child, node);
+            size += measure(child, childPosition);
+        }
+        sizes.set(node, size);
         // A node sharing this file's URL would collapse into a link to the file itself.
         if (node.indexURL && node.indexURL !== file.url && node.children.length > 0) {
-            candidates.push(node);
+            collapsedSizes.set(node, measureNode(node, position, true));
+            enqueue(node);
         }
-        node.children.forEach(visit);
+        return size;
     };
-    file.nodes.forEach(visit);
+    for (const node of file.nodes) {
+        measure(node, { headingDepth: 2, listDepth: 0 });
+    }
 
-    const ownSizes = new Map<LLMsIndexNode, number>();
-    const collapsedSizes = new Map<LLMsIndexNode, number>();
-    const ownSize = (node: LLMsIndexNode) =>
-        getCached(ownSizes, node, () => measureNode(node, false));
-    const collapsedSize = (node: LLMsIndexNode) =>
-        getCached(collapsedSizes, node, () => measureNode(node, true));
-    const baseSize = renderFile(file, collapsed, []).length;
-
-    // Sizes are estimated per node to stay linear in the number of pages; the exact render
-    // only runs once the estimate fits.
+    // Savings are estimates; the total starts from the exact render and is corrected by each
+    // render that turns out larger than estimated.
+    let total = output.length;
     while (true) {
-        const sizes = new Map<LLMsIndexNode, number>();
-        const sizeOf = (node: LLMsIndexNode): number => {
-            const size = collapsed.has(node)
-                ? collapsedSize(node)
-                : node.children.reduce((total, child) => total + sizeOf(child), ownSize(node));
-            sizes.set(node, size);
-            return size;
-        };
-        const estimated = file.nodes.reduce((total, node) => total + sizeOf(node), baseSize);
+        const entry = queue.pop();
+        if (!entry) {
+            // Nothing left to split out: serve the smallest index we can build.
+            return renderFile(file, collapsed);
+        }
+        const { node } = entry;
+        if (
+            entry.saving <= 0 ||
+            collapsed.has(node) ||
+            entry.version !== (versions.get(node) ?? 0) ||
+            hasCollapsedAncestor(node, parents, collapsed)
+        ) {
+            continue;
+        }
 
-        if (estimated <= limit) {
-            const output = renderFile(file, collapsed, file.nodes);
+        collapsed.add(node);
+        total -= entry.saving;
+        for (let parent = parents.get(node); parent; parent = parents.get(parent)) {
+            sizes.set(parent, sizes.get(parent)! - entry.saving);
+            versions.set(parent, (versions.get(parent) ?? 0) + 1);
+            enqueue(parent);
+        }
+
+        if (total <= limit) {
+            output = renderFile(file, collapsed);
             if (output.length <= limit) {
                 return output;
             }
+            total = output.length;
         }
-
-        let best: LLMsIndexNode | null = null;
-        let bestSaving = 0;
-        for (const node of candidates) {
-            const size = sizes.get(node);
-            // Nodes under a collapsed ancestor weren't measured in this pass.
-            if (size === undefined || collapsed.has(node)) {
-                continue;
-            }
-            const saving = size - collapsedSize(node);
-            if (saving > bestSaving) {
-                best = node;
-                bestSaving = saving;
-            }
-        }
-
-        if (!best) {
-            // Nothing left to split out: serve the smallest index we can build.
-            return renderFile(file, collapsed, file.nodes);
-        }
-        collapsed.add(best);
     }
 }
 
-function getCached<K, V>(cache: Map<K, V>, key: K, compute: () => V): V {
-    let value = cache.get(key);
-    if (value === undefined) {
-        value = compute();
-        cache.set(key, value);
+type Position = { headingDepth: number; listDepth: number };
+
+type QueueEntry = { node: LLMsIndexNode; order: number; version: number; saving: number };
+
+function hasCollapsedAncestor(
+    node: LLMsIndexNode,
+    parents: Map<LLMsIndexNode, LLMsIndexNode>,
+    collapsed: Set<LLMsIndexNode>
+): boolean {
+    for (let parent = parents.get(node); parent; parent = parents.get(parent)) {
+        if (collapsed.has(parent)) {
+            return true;
+        }
     }
-    return value;
+    return false;
 }
 
 /**
  * Approximate the characters a node adds on its own, excluding its children.
  */
-function measureNode(node: LLMsIndexNode, asCollapsed: boolean): number {
+function measureNode(node: LLMsIndexNode, position: Position, asCollapsed: boolean): number {
     const blocks =
         node.kind === 'structure'
             ? asCollapsed
-                ? toCollapsedStructureBlocks(node, 2)
-                : toStructureBlocks(node, 2, new Set(), false)
+                ? toCollapsedStructureBlocks(node, position.headingDepth)
+                : toStructureBlocks(node, position.headingDepth, new Set(), false)
             : [toList([asCollapsed ? toCollapsedItem(node) : toPageItem(node, new Set(), false)])];
-    // Nested list items are indented, which the standalone render doesn't account for.
-    return toMarkdown({ type: 'root', children: blocks }, { bullet: '-' }).length + 4;
+    const markdown = toMarkdown({ type: 'root', children: blocks }, { bullet: '-' });
+    // In the file, blocks are separated by a blank line and nested list items are indented.
+    const lines = markdown.split('\n').length - 1;
+    return (
+        markdown.length +
+        (node.kind === 'structure' ? blocks.length : lines * 2 * position.listDepth)
+    );
 }
 
-function renderFile(
-    file: LLMsIndexFile,
-    collapsed: Set<LLMsIndexNode>,
-    nodes: LLMsIndexNode[]
-): string {
+/**
+ * Binary heap returning the largest entry first.
+ */
+class MaxHeap<T> {
+    private items: T[] = [];
+
+    constructor(private compare: (a: T, b: T) => number) {}
+
+    push(item: T) {
+        const items = this.items;
+        items.push(item);
+        let index = items.length - 1;
+        while (index > 0) {
+            const parent = (index - 1) >> 1;
+            if (this.compare(items[index]!, items[parent]!) <= 0) {
+                break;
+            }
+            [items[index], items[parent]] = [items[parent]!, items[index]!];
+            index = parent;
+        }
+    }
+
+    pop(): T | undefined {
+        const items = this.items;
+        const top = items[0];
+        const last = items.pop();
+        if (items.length > 0 && last !== undefined) {
+            items[0] = last;
+            let index = 0;
+            while (true) {
+                const left = index * 2 + 1;
+                const right = left + 1;
+                let largest = index;
+                if (left < items.length && this.compare(items[left]!, items[largest]!) > 0) {
+                    largest = left;
+                }
+                if (right < items.length && this.compare(items[right]!, items[largest]!) > 0) {
+                    largest = right;
+                }
+                if (largest === index) {
+                    break;
+                }
+                [items[index], items[largest]] = [items[largest]!, items[index]!];
+                index = largest;
+            }
+        }
+        return top;
+    }
+}
+
+function renderFile(file: LLMsIndexFile, collapsed: Set<LLMsIndexNode>): string {
     const tree: Root = {
         type: 'root',
         children: [
@@ -140,7 +223,7 @@ function renderFile(
                       },
                   ]
                 : []),
-            ...toBlocks(nodes, 2, collapsed),
+            ...toBlocks(file.nodes, 2, collapsed),
         ],
     };
 
@@ -198,7 +281,6 @@ function toStructureBlocks(
             depth: Math.min(depth, 6) as Heading['depth'],
             children: [{ type: 'text', value: node.title }],
         },
-        ...(node.description ? [toParagraph(node.description)] : []),
         ...(withChildren ? toBlocks(node.children, depth + 1, collapsed) : []),
     ];
 }
@@ -222,7 +304,8 @@ function toPageItem(
     collapsed: Set<LLMsIndexNode>,
     withChildren: boolean
 ): ListItem {
-    const children: ListItem['children'] = [toLinkParagraph(node, node.url)];
+    // Parsers expect every list line to be a link, so groups link to their own index.
+    const children: ListItem['children'] = [toLinkParagraph(node, node.url ?? node.indexURL)];
     if (withChildren && node.children.length > 0) {
         children.push(
             toList(

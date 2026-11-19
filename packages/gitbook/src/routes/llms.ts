@@ -153,7 +153,6 @@ async function getNodeFromSection(
     context: GitBookSiteContext,
     section: SiteSection
 ): Promise<LLMsIndexNode | null> {
-    const defaultSiteSpace = section.siteSpaces.find((siteSpace) => siteSpace.default);
     const children = await getNodesFromSiteSpaces(context, section.siteSpaces);
     if (children.length === 0) {
         return null;
@@ -163,11 +162,23 @@ async function getNodeFromSection(
         kind: 'structure',
         title: getLocalizedTitle(section, context.locale),
         description: getLocalizedDescription(section, context.locale),
-        indexURL: defaultSiteSpace
-            ? getLLMsTxtURLForPath(context, getFallbackSiteSpacePath(context, defaultSiteSpace))
-            : undefined,
+        indexURL: getSectionLLMsTxtURL(context, section),
         children,
     };
+}
+
+/**
+ * The section's llms.txt lists its default variant's language, so it only stands in for the
+ * listed variants when they include the default one; otherwise link the single listed variant.
+ */
+function getSectionLLMsTxtURL(context: GitBookSiteContext, section: SiteSection) {
+    const listed = filterSiteSpacesByLocale(section.siteSpaces, context.locale);
+    const target =
+        listed.find((siteSpace) => siteSpace.default) ??
+        (listed.length === 1 ? listed[0] : undefined);
+    return target
+        ? getLLMsTxtURLForPath(context, getFallbackSiteSpacePath(context, target))
+        : undefined;
 }
 
 /**

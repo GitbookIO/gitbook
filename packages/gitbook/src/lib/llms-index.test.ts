@@ -112,4 +112,61 @@ describe('renderLLMsIndex', () => {
         const output = renderLLMsIndex(file(nodes));
         expect(output.length).toBeLessThanOrEqual(100_000);
     });
+
+    it('keeps an index that fits just under the limit whole', () => {
+        const nodes = [
+            section(
+                's',
+                Array.from({ length: 700 }, (_, index) =>
+                    page(`s/g${index}`, [page(`s/g${index}/a`)])
+                )
+            ),
+        ];
+        const full = renderLLMsIndex(file(nodes), Number.POSITIVE_INFINITY);
+
+        expect(full.length).toBeGreaterThan(95_000);
+        expect(full.length).toBeLessThanOrEqual(100_000);
+        expect(renderLLMsIndex(file(nodes))).toBe(full);
+    });
+
+    it('writes every list line as a link, as llms.txt parsers expect', () => {
+        const group: LLMsIndexNode = {
+            kind: 'page',
+            title: 'Get started',
+            indexURL: 'https://docs.example.com/get-started/llms.txt',
+            children: [page('get-started/install')],
+        };
+        const output = renderLLMsIndex(
+            file([
+                { ...section('guides', [group]), description: 'Guides for everyone' },
+                section('large', pages('large', 50)),
+            ]),
+            3_000
+        );
+
+        expect(output).toContain('- [Get started](https://docs.example.com/get-started/llms.txt)');
+        // Same rule as the reference parser: every non-empty line under a `##` heading is a link.
+        const sections = output.split(/^##\s*.*$/m).slice(1);
+        for (const line of sections.flatMap((text) => text.split('\n'))) {
+            if (line.trim() && !line.startsWith('#')) {
+                expect(line).toMatch(/-\s*\[[^\]]+\]\([^)]+\)/);
+            }
+        }
+    });
+
+    it('splits sites with many sibling groups in linear time', () => {
+        const nodes = Array.from({ length: 8_000 }, (_, index) =>
+            page(`g${index}`, [page(`g${index}/a`), page(`g${index}/b`)])
+        );
+
+        const started = performance.now();
+        const output = renderLLMsIndex(file(nodes));
+
+        // Too many groups to ever fit, so every group ends up split out.
+        expect(output).toContain(
+            '- [Pages under Page g7999](https://docs.example.com/g7999/llms.txt)'
+        );
+        // About 0.4s locally; the quadratic version took several seconds.
+        expect(performance.now() - started).toBeLessThan(3_000);
+    });
 });
