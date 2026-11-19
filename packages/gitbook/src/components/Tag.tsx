@@ -36,11 +36,11 @@ export function Tag(props: { tag: RevisionTag; className?: string }) {
 export function TagIcon(props: { tag: RevisionTag }) {
     const { tag } = props;
 
-    if ('emoji' in tag) {
+    if ('emoji' in tag && tag.emoji !== undefined) {
         return <Emoji code={tag.emoji} style="shrink-0" />;
     }
 
-    if (tag.icon) {
+    if ('icon' in tag && tag.icon) {
         return <Icon icon={tag.icon as IconName} className={tcls('size-[1em]', 'shrink-0')} />;
     }
 
