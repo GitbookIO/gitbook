@@ -32,6 +32,7 @@ import { validateSerializedCustomization } from '@/lib/customization';
 import {
     DataFetcherError,
     apiClient,
+    asPublishedSiteContentWithSiteRevision,
     getVisitorAuthBasePath,
     lookupPublishedContentByUrl,
     normalizeRequestURL,
@@ -426,9 +427,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
             basePath: siteURLData.basePath,
             space: siteURLData.space,
             organization: siteURLData.organization,
-            changeRequest: siteURLData.changeRequest,
-            revision: siteURLData.revision,
-            siteRevision: getSiteRevisionFromLookup(siteURLData),
+            ...getPreviewedContent(siteURLData),
             shareKey: siteURLData.shareKey,
             preview: siteURLData.preview,
             apiToken: siteURLData.apiToken,
@@ -1207,9 +1206,20 @@ function acceptsMarkdown(request: Request): boolean {
 }
 
 /**
- * Site revision a preview URL resolved to. The published API client doesn't type it yet.
+ * The revision, change request or site revision a URL previews: at most one of them.
  */
-function getSiteRevisionFromLookup(lookup: object): string | undefined {
-    const siteRevision = 'siteRevision' in lookup ? lookup.siteRevision : undefined;
-    return typeof siteRevision === 'string' ? siteRevision : undefined;
+function getPreviewedContent(
+    lookup: PublishedSiteContent
+): Pick<SiteURLData, 'revision' | 'changeRequest' | 'siteRevision'> {
+    const content = asPublishedSiteContentWithSiteRevision(lookup);
+    if ('revision' in content) {
+        return { revision: content.revision };
+    }
+    if ('changeRequest' in content) {
+        return { changeRequest: content.changeRequest };
+    }
+    if ('siteRevision' in content) {
+        return { siteRevision: content.siteRevision };
+    }
+    return {};
 }

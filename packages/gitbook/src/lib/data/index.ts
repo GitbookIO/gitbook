@@ -6,3 +6,4 @@ export * from './lookup';
 export * from './visitor';
 export * from './pages';
 export * from './revisions';
+export * from './siteRevisionTypes';
