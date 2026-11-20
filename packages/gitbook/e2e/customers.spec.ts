@@ -444,11 +444,6 @@ const testCases: TestsCase[] = [
         tests: [{ name: 'Home', url: '/', run: waitForCookiesDialog }],
     },
     {
-        name: 'retrozia.gitbook.io/retrozia',
-        contentBaseURL: 'https://retrozia.gitbook.io',
-        tests: [{ name: 'Home', url: '/retrozia' }],
-    },
-    {
         name: 'helpcenter.channable.com',
         contentBaseURL: 'https://helpcenter.channable.com',
         tests: [{ name: 'Home', url: '/', run: waitForCookiesDialog }],
