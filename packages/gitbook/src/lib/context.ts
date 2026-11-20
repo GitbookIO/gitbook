@@ -72,6 +72,11 @@ export type SiteURLData = Pick<
     imagesContextId: string;
 
     /**
+     * Site revision being previewed, when the URL previews one. Content is read as it pins it.
+     */
+    siteRevision?: string;
+
+    /**
      * Whether this request is a fallback rendering.
      * We use this when switching variant as we don't know if the page exists in the other variant.
      * By knowing it's a fallback, we can redirect to the space base path instead of returning a 404.
@@ -250,6 +255,13 @@ export function getBaseContext(input: {
 
     const dataFetcher = createDataFetcher({
         apiToken: siteURLData.apiToken ?? null,
+        siteRevision: siteURLData.siteRevision
+            ? {
+                  organizationId: siteURLData.organization,
+                  siteId: siteURLData.site,
+                  siteRevisionId: siteURLData.siteRevision,
+              }
+            : undefined,
     });
 
     const linkerInput: SiteLinkerInput = {

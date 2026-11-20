@@ -428,6 +428,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
             organization: siteURLData.organization,
             changeRequest: siteURLData.changeRequest,
             revision: siteURLData.revision,
+            siteRevision: getSiteRevisionFromLookup(siteURLData),
             shareKey: siteURLData.shareKey,
             preview: siteURLData.preview,
             apiToken: siteURLData.apiToken,
@@ -1203,4 +1204,12 @@ function acceptsMarkdown(request: Request): boolean {
 
     const htmlIndex = mediaTypes.findIndex((type) => type === 'text/html' || type === '*/*');
     return htmlIndex === -1 || markdownIndex < htmlIndex;
+}
+
+/**
+ * Site revision a preview URL resolved to. The published API client doesn't type it yet.
+ */
+function getSiteRevisionFromLookup(lookup: object): string | undefined {
+    const siteRevision = 'siteRevision' in lookup ? lookup.siteRevision : undefined;
+    return typeof siteRevision === 'string' ? siteRevision : undefined;
 }

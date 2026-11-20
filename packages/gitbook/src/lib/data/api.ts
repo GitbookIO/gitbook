@@ -12,7 +12,7 @@ import { getCacheTag, getComputedContentSourceCacheTags } from '@gitbook/cache-t
 
 import { cache } from '../cache';
 import { DataFetcherError, wrapDataFetcherError } from './errors';
-import type { GitBookDataFetcher } from './types';
+import type { DataFetcherResponse, GitBookDataFetcher } from './types';
 import { GITBOOK_API_TOKEN, GITBOOK_API_URL, GITBOOK_USER_AGENT } from '@/lib/env';
 import { trace } from '@/lib/tracing';
 
@@ -21,6 +21,21 @@ interface DataFetcherInput {
      * API token.
      */
     apiToken: string | null;
+
+    /**
+     * Site revision being previewed. Content is read as it pins it, and live for a space or an
+     * OpenAPI spec it doesn't record.
+     */
+    siteRevision?: DataFetcherSiteRevision;
+}
+
+/**
+ * A site revision, as a preview URL resolves it.
+ */
+export interface DataFetcherSiteRevision {
+    organizationId: string;
+    siteId: string;
+    siteRevisionId: string;
 }
 
 /**
@@ -46,6 +61,7 @@ export function createDataFetcher(
 
         withToken({ apiToken }) {
             return createDataFetcher({
+                ...input,
                 apiToken,
             });
         },
@@ -77,61 +93,101 @@ export function createDataFetcher(
             });
         },
         getRevision(params) {
-            return getRevision(input, {
-                spaceId: params.spaceId,
-                revisionId: params.revisionId,
-                metadata: params.metadata ?? false,
-            });
+            return readAtSiteRevision(
+                input,
+                `content/${params.spaceId}`,
+                { metadata: params.metadata ?? false },
+                () =>
+                    getRevision(input, {
+                        spaceId: params.spaceId,
+                        revisionId: params.revisionId,
+                        metadata: params.metadata ?? false,
+                    })
+            );
         },
         getRevisionPageByPath(params) {
-            return getRevisionPageByPath(input, {
-                spaceId: params.spaceId,
-                revisionId: params.revisionId,
-                path: params.path,
-                metadata: params.metadata,
-                cachedMetadata: params.cachedMetadata,
-            });
+            return readAtSiteRevision(
+                input,
+                `content/${params.spaceId}/path/${encodeURIComponent(params.path)}`,
+                {
+                    metadata: params.metadata ?? false,
+                    cachedMetadata: params.cachedMetadata ?? false,
+                },
+                () =>
+                    getRevisionPageByPath(input, {
+                        spaceId: params.spaceId,
+                        revisionId: params.revisionId,
+                        path: params.path,
+                        metadata: params.metadata,
+                        cachedMetadata: params.cachedMetadata,
+                    })
+            );
         },
         getRevisionPageMarkdown(params) {
-            return getRevisionPageMarkdown(
+            return readAtSiteRevision(
                 input,
+                `content/${params.spaceId}/page/${params.pageId}`,
                 {
-                    spaceId: params.spaceId,
-                    revisionId: params.revisionId,
-                    pageId: params.pageId,
+                    format: 'markdown',
+                    'format.markdown.refs': 'stable',
+                    evaluated: 'deterministic-only',
+                    metadata: false,
                 },
-                // We pass the name of the function to distinguish between cache entries
-                // By default Next only uses the arguments, the filename and the position of the function inside the file
-                // By adding a dummy argument with the function name, we can change the order without breaking anything
-                'getRevisionPageMarkdown'
+                () =>
+                    getRevisionPageMarkdown(
+                        input,
+                        {
+                            spaceId: params.spaceId,
+                            revisionId: params.revisionId,
+                            pageId: params.pageId,
+                        },
+                        // We pass the name of the function to distinguish between cache entries
+                        // By default Next only uses the arguments, the filename and the position of the function inside the file
+                        // By adding a dummy argument with the function name, we can change the order without breaking anything
+                        'getRevisionPageMarkdown'
+                    )
             );
         },
         getRevisionPageDocument(params) {
-            return getRevisionPageDocument(
+            return readAtSiteRevision(
                 input,
-                {
-                    spaceId: params.spaceId,
-                    revisionId: params.revisionId,
-                    pageId: params.pageId,
-                },
-                // We pass the name of the function to distinguish between cache entries
-                // By default Next only uses the arguments, the filename and the position of the function inside the file
-                // By adding a dummy argument with the function name, we can change the order without breaking anything
-                'getRevisionPageDocument'
+                `content/${params.spaceId}/page/${params.pageId}/document`,
+                { evaluated: 'deterministic-only', dereferenced: 'reusable-contents' },
+                () =>
+                    getRevisionPageDocument(
+                        input,
+                        {
+                            spaceId: params.spaceId,
+                            revisionId: params.revisionId,
+                            pageId: params.pageId,
+                        },
+                        // We pass the name of the function to distinguish between cache entries
+                        // By default Next only uses the arguments, the filename and the position of the function inside the file
+                        // By adding a dummy argument with the function name, we can change the order without breaking anything
+                        'getRevisionPageDocument'
+                    )
             );
         },
         getRevisionReusableContentDocument(params) {
-            return getRevisionReusableContentDocument(input, {
-                spaceId: params.spaceId,
-                revisionId: params.revisionId,
-                reusableContentId: params.reusableContentId,
-            });
+            return readAtSiteRevision(
+                input,
+                `content/${params.spaceId}/reusable-contents/${params.reusableContentId}/document`,
+                { evaluated: 'deterministic-only' },
+                () =>
+                    getRevisionReusableContentDocument(input, {
+                        spaceId: params.spaceId,
+                        revisionId: params.revisionId,
+                        reusableContentId: params.reusableContentId,
+                    })
+            );
         },
         getLatestOpenAPISpecVersionContent(params) {
-            return getLatestOpenAPISpecVersionContent(input, {
-                organizationId: params.organizationId,
-                slug: params.slug,
-            });
+            return readAtSiteRevision(input, `openapi/${params.slug}/content`, {}, () =>
+                getLatestOpenAPISpecVersionContent(input, {
+                    organizationId: params.organizationId,
+                    slug: params.slug,
+                })
+            );
         },
         getSpace(params) {
             return getSpace(input, {
@@ -195,14 +251,77 @@ export function createDataFetcher(
         },
 
         listRevisionPageMetaLinks(params) {
-            return listRevisionPageMetaLinks(input, {
-                spaceId: params.spaceId,
-                revisionId: params.revisionId,
-                pageId: params.pageId,
-            });
+            return readAtSiteRevision(
+                input,
+                `content/${params.spaceId}/page/${params.pageId}/meta-links`,
+                {},
+                () =>
+                    listRevisionPageMetaLinks(input, {
+                        spaceId: params.spaceId,
+                        revisionId: params.revisionId,
+                        pageId: params.pageId,
+                    })
+            );
         },
     };
 }
+
+/**
+ * Read content at the site revision of the input, with the same query as `live` reads it. Reads
+ * live when there is no site revision, or when the site revision doesn't record the space or spec.
+ */
+async function readAtSiteRevision<T>(
+    input: DataFetcherInput,
+    path: string,
+    query: Record<string, string | boolean>,
+    live: () => Promise<DataFetcherResponse<T>>
+): Promise<DataFetcherResponse<T>> {
+    if (!input.siteRevision) {
+        return live();
+    }
+
+    // Typed like the space endpoint it mirrors: the API client doesn't publish these endpoints yet.
+    const result = (await getAtSiteRevision(input, { path, query })) as DataFetcherResponse<T>;
+    if (result.error?.code === 404) {
+        return live();
+    }
+    return result;
+}
+
+/**
+ * Get content at a site revision. It never changes, so it is cached forever.
+ */
+const getAtSiteRevision = cache(
+    async (
+        input: DataFetcherInput,
+        params: { path: string; query: Record<string, string | boolean> }
+    ) => {
+        'use cache';
+        return wrapDataFetcherError(async () => {
+            const { siteRevision } = input;
+            if (!siteRevision) {
+                throw new Error('A site revision is required to read content at it');
+            }
+            const { organizationId, siteId, siteRevisionId } = siteRevision;
+            const path = `/orgs/${organizationId}/sites/${siteId}/revisions/${siteRevisionId}/${params.path}`;
+
+            return trace(`getAtSiteRevision(${path})`, async () => {
+                const api = apiClient(input);
+                const res = await api.request<unknown>({
+                    path,
+                    method: 'GET',
+                    query: params.query,
+                    secure: true,
+                    format: 'json',
+                    ...noCacheFetchOptions,
+                });
+                cacheTag(...getCacheTagsFromResponse(res));
+                cacheLife('max');
+                return res.data;
+            });
+        });
+    }
+);
 
 /**
  * Infer the cache life from the api response headers.
