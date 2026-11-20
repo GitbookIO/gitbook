@@ -44,6 +44,7 @@ import {
     getLinkerForSiteSpace,
     getLocalizedTitle,
     getSiteStructureSections,
+    listAllSiteSpaces,
 } from '@/lib/sites';
 
 /**
@@ -479,6 +480,12 @@ export async function fetchSiteContextByIds(
 
     return {
         ...spaceContext,
+        // Only the site's own spaces are read at the site revision it previews.
+        dataFetcher: ids.siteRevision
+            ? spaceContext.dataFetcher.withSiteRevisionSpaces(
+                  listAllSiteSpaces(siteStructure).map((entry) => entry.space.id)
+              )
+            : spaceContext.dataFetcher,
         locale: siteSpace.space.language ?? spaceContext.locale,
         linker: getLinkerForSiteSpace(siteLinker, siteSpace, spaceContext.revision.pages),
         organizationId: ids.organization,

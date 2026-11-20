@@ -23,8 +23,7 @@ interface DataFetcherInput {
     apiToken: string | null;
 
     /**
-     * Site revision being previewed. Content is read as it pins it, and live for a space or an
-     * OpenAPI spec it doesn't record.
+     * Site revision being previewed. The site's spaces and OpenAPI specs are read at it.
      */
     siteRevision?: DataFetcherSiteRevision;
 }
@@ -36,6 +35,11 @@ export interface DataFetcherSiteRevision {
     organizationId: string;
     siteId: string;
     siteRevisionId: string;
+    /**
+     * Spaces of the site, read at the site revision. Other spaces are read live. Until the site
+     * structure is known, every space is read at the site revision.
+     */
+    spaceIds?: string[];
 }
 
 /**
@@ -63,6 +67,13 @@ export function createDataFetcher(
             return createDataFetcher({
                 ...input,
                 apiToken,
+            });
+        },
+
+        withSiteRevisionSpaces(spaceIds) {
+            return createDataFetcher({
+                ...input,
+                siteRevision: input.siteRevision ? { ...input.siteRevision, spaceIds } : undefined,
             });
         },
 
@@ -95,6 +106,7 @@ export function createDataFetcher(
         getRevision(params) {
             return readAtSiteRevision(
                 input,
+                params.spaceId,
                 `content/${params.spaceId}`,
                 { metadata: params.metadata ?? false },
                 () =>
@@ -108,6 +120,7 @@ export function createDataFetcher(
         getRevisionPageByPath(params) {
             return readAtSiteRevision(
                 input,
+                params.spaceId,
                 `content/${params.spaceId}/path/${encodeURIComponent(params.path)}`,
                 {
                     metadata: params.metadata ?? false,
@@ -126,6 +139,7 @@ export function createDataFetcher(
         getRevisionPageMarkdown(params) {
             return readAtSiteRevision(
                 input,
+                params.spaceId,
                 `content/${params.spaceId}/page/${params.pageId}`,
                 {
                     format: 'markdown',
@@ -151,6 +165,7 @@ export function createDataFetcher(
         getRevisionPageDocument(params) {
             return readAtSiteRevision(
                 input,
+                params.spaceId,
                 `content/${params.spaceId}/page/${params.pageId}/document`,
                 { evaluated: 'deterministic-only', dereferenced: 'reusable-contents' },
                 () =>
@@ -171,6 +186,7 @@ export function createDataFetcher(
         getRevisionReusableContentDocument(params) {
             return readAtSiteRevision(
                 input,
+                params.spaceId,
                 `content/${params.spaceId}/reusable-contents/${params.reusableContentId}/document`,
                 { evaluated: 'deterministic-only' },
                 () =>
@@ -182,7 +198,7 @@ export function createDataFetcher(
             );
         },
         getLatestOpenAPISpecVersionContent(params) {
-            return readAtSiteRevision(input, `openapi/${params.slug}/content`, {}, () =>
+            return readAtSiteRevision(input, null, `openapi/${params.slug}/content`, {}, () =>
                 getLatestOpenAPISpecVersionContent(input, {
                     organizationId: params.organizationId,
                     slug: params.slug,
@@ -253,6 +269,7 @@ export function createDataFetcher(
         listRevisionPageMetaLinks(params) {
             return readAtSiteRevision(
                 input,
+                params.spaceId,
                 `content/${params.spaceId}/page/${params.pageId}/meta-links`,
                 {},
                 () =>
@@ -268,24 +285,27 @@ export function createDataFetcher(
 
 /**
  * Read content at the site revision of the input, with the same query as `live` reads it. Reads
- * live when there is no site revision, or when the site revision doesn't record the space or spec.
+ * live when there is no site revision, or for a space outside the site. An OpenAPI spec (no
+ * space) is always read at the site revision.
  */
 async function readAtSiteRevision<T>(
     input: DataFetcherInput,
+    spaceId: string | null,
     path: string,
     query: Record<string, string | boolean>,
     live: () => Promise<DataFetcherResponse<T>>
 ): Promise<DataFetcherResponse<T>> {
-    if (!input.siteRevision) {
+    const { siteRevision } = input;
+    if (!siteRevision || (spaceId && siteRevision.spaceIds?.includes(spaceId) === false)) {
         return live();
     }
 
+    const { spaceIds: _spaceIds, ...cacheableSiteRevision } = siteRevision;
     // Typed like the space endpoint it mirrors: the API client doesn't publish these endpoints yet.
-    const result = (await getAtSiteRevision(input, { path, query })) as DataFetcherResponse<T>;
-    if (result.error?.code === 404) {
-        return live();
-    }
-    return result;
+    return (await getAtSiteRevision(
+        { ...input, siteRevision: cacheableSiteRevision },
+        { path, query }
+    )) as DataFetcherResponse<T>;
 }
 
 /**
