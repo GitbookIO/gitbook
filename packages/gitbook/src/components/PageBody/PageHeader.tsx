@@ -1,24 +1,19 @@
 import assertNever from 'assert-never';
-import urlJoin from 'url-join';
 
-import {
-    CustomizationPageActionType,
-    type RevisionPage,
-    type RevisionPageDocument,
-    type SiteSection,
-    type SiteSectionGroup,
+import type {
+    RevisionPage,
+    RevisionPageDocument,
+    SiteSection,
+    SiteSectionGroup,
 } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
 
 import { SpacesDropdownMenuItems, type VariantSpace } from '../Header/SpacesDropdownMenuItem';
 import { CONTENT_STYLE, CONTENT_STYLE_REDUCED } from '../layout';
-import {
-    PageActionsDropdown,
-    type PageActionsDropdownURLs,
-} from '../PageActions/PageActionsDropdown';
+import { hasConfiguredPageActions } from '../PageActions/pageActionsData';
+import { PageActionsMenu } from '../PageActions/PageActionsMenu';
 import { PageAsideToggleButton } from '../PageAside/PageAsideButton';
 import { PageIcon } from '../PageIcon';
-import { getPDFURLSearchParams } from '../PDF';
 import {
     findBestTargetURL,
     getTargetURLForSiteSpace,
@@ -27,11 +22,9 @@ import { categorizeVariants } from '../SpaceLayout/categorizeVariants';
 import { BreadcrumbItemDropdown, type BreadcrumbSibling } from './BreadcrumbItemDropdown';
 import { PageTags } from './PageTags';
 import type { GitBookSiteContext, SiteStructureNode } from '@/lib/context';
-import { hasAdaptiveMcpEndpoint } from '@/lib/mcp/endpoints';
 import { type AncestorRevisionPage, resolveFirstDocument } from '@/lib/pages';
 import { getLocalizedTitle } from '@/lib/sites';
 import { tcls } from '@/lib/tailwind';
-import { getPageRSSURL } from '@/routes/rss';
 
 export async function PageHeader(props: {
     context: GitBookSiteContext;
@@ -146,15 +139,8 @@ export async function PageHeader(props: {
     // Show page actions if *any* of the configured actions are enabled, or if the RSS feed is
     // available. RSS is contextual (only on update/blog index pages) and is not part of the
     // configured `items` list, so it is checked separately.
-    const hasConfiguredPageActions = [
-        CustomizationPageActionType.Assistant,
-        CustomizationPageActionType.ExternalAi,
-        CustomizationPageActionType.Markdown,
-        CustomizationPageActionType.Mcp,
-        CustomizationPageActionType.Pdf,
-        CustomizationPageActionType.Git,
-    ].some((type) => isPageActionEnabled(context.customization, type));
-    const hasPageActions = pageActionsEnabled && (hasConfiguredPageActions || withRSSFeed);
+    const hasPageActions =
+        pageActionsEnabled && (hasConfiguredPageActions(context.customization) || withRSSFeed);
 
     if (!page.layout.title && !page.layout.description && !hasPageActions) {
         return null;
@@ -181,19 +167,7 @@ export async function PageHeader(props: {
                 ]
             )}
         >
-            {hasPageActions ? (
-                <PageActionsDropdown
-                    siteTitle={context.site.title}
-                    urls={getPageActionsURLs({ context, page, withRSSFeed })}
-                    actions={context.customization.pageActions}
-                    page={{
-                        id: page.id,
-                        title: page.title,
-                        path: page.path,
-                        href: linker.toPathForPage({ pages: revision.pages, page }),
-                    }}
-                />
-            ) : null}
+            {hasPageActions ? <PageActionsMenu context={context} page={page} /> : null}
             <PageAsideToggleButton />
         </div>
     );
@@ -519,68 +493,4 @@ function BreadcrumbSeparator() {
             className="mx-2 inline-flex size-2 text-tint-subtle"
         />
     );
-}
-
-/**
- * Return the URLs for the page actions.
- */
-function getPageActionsURLs({
-    context,
-    page,
-    withRSSFeed,
-}: {
-    context: GitBookSiteContext;
-    page: RevisionPageDocument;
-    withRSSFeed: boolean;
-}): PageActionsDropdownURLs {
-    const pagePath = context.linker.toPathForPage({ pages: context.revision.pages, page });
-    return {
-        html: context.linker.toAbsoluteURL(pagePath),
-        // For the markdown URL, we use the page.path to ensure it works for the default page.
-        markdown: `${context.linker.toAbsoluteURL(context.linker.toPathInSpace(page.path))}.md`,
-        rss: withRSSFeed ? getPageRSSURL(context, page) : undefined,
-        editOnGit:
-            isPageActionEnabled(context.customization, CustomizationPageActionType.Git) &&
-            context.space.gitSync?.url &&
-            page.git
-                ? {
-                      provider: context.space?.gitSync?.installationProvider,
-                      url: urlJoin(context.space.gitSync.url, page.git.path),
-                  }
-                : undefined,
-        pdf: isPageActionEnabled(context.customization, CustomizationPageActionType.Pdf)
-            ? context.linker.toPathInSpace(
-                  `~gitbook/pdf?${getPDFURLSearchParams({
-                      page: page.id,
-                      only: true,
-                      limit: 100,
-                  }).toString()}`
-              )
-            : undefined,
-        mcp: getPageActionsMCPURL(context),
-    };
-}
-
-/**
- * Whether a given built-in page action is enabled.
- */
-function isPageActionEnabled(
-    customization: GitBookSiteContext['customization'],
-    type: CustomizationPageActionType
-): boolean {
-    const { pageActions } = customization;
-    if (pageActions.items) {
-        return pageActions.items.includes(type);
-    }
-    return false;
-}
-
-/**
- * Return the MCP URL to be used in the page actions dropdown.
- */
-function getPageActionsMCPURL(context: GitBookSiteContext) {
-    const useAuthenticatedEndpoint = hasAdaptiveMcpEndpoint(context) && context.isLoggedInVisitor;
-    const endpoint = useAuthenticatedEndpoint ? '~gitbook/mcp/auth' : '~gitbook/mcp';
-
-    return context.linker.toAbsoluteURL(context.linker.toPathInSite(endpoint));
 }
