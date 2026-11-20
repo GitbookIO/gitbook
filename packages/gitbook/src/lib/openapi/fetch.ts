@@ -10,6 +10,7 @@ import {
 } from '@gitbook/openapi-parser';
 
 import { enrichFilesystem } from './enrich';
+import { resolveOpenAPIDescriptionLinks } from './resolveDescriptionLinks';
 import type {
     AnyOpenAPIOperationsBlock,
     OpenAPISchemasBlock,
@@ -41,7 +42,9 @@ export async function fetchOpenAPIFilesystem(
         // If the reference is a new OpenAPI reference, we return it.
         if (ref.kind === 'openapi') {
             assert(resolved.openapi?.filesystem);
-            return resolved.openapi.filesystem;
+            return resolveOpenAPIDescriptionLinks(resolved.openapi.filesystem, (contentRef) =>
+                resolveContentRef(contentRef, context)
+            );
         }
         // For legacy blocks ("swagger"), we need to fetch the file system.
         return fetchFilesystem(resolved.href, context.space.id);
