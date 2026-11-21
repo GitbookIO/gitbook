@@ -29,8 +29,12 @@ export function isSiteIndexable(context: GitBookSiteContext) {
         return false;
     }
 
-    // Prevent indexation of preview of revisions / change-requests
-    if (context.changeRequest || context.revisionId !== context.space.revision) {
+    // Prevent indexation of preview of revisions / change-requests / site revisions
+    if (
+        context.changeRequest ||
+        context.siteRevision ||
+        context.revisionId !== context.space.revision
+    ) {
         return false;
     }
 

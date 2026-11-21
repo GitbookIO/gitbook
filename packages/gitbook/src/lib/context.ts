@@ -44,6 +44,7 @@ import {
     getLinkerForSiteSpace,
     getLocalizedTitle,
     getSiteStructureSections,
+    listAllSiteSpaces,
 } from '@/lib/sites';
 
 /**
@@ -70,6 +71,11 @@ export type SiteURLData = Pick<
      * Identifier used for image resizing.
      */
     imagesContextId: string;
+
+    /**
+     * Site revision being previewed, when the URL previews one. Content is read as it pins it.
+     */
+    siteRevision?: string;
 
     /**
      * Whether this request is a fallback rendering.
@@ -217,6 +223,9 @@ export type GitBookSiteContext = GitBookSpaceContext & {
     /** Whether search indexation is blocked for this deployment. */
     noIndexSearch: boolean;
 
+    /** Site revision the URL previews. Content is read as it pins it. */
+    siteRevision?: string;
+
     /** Whether the request included a visitor token. */
     isLoggedInVisitor: boolean;
 
@@ -250,6 +259,13 @@ export function getBaseContext(input: {
 
     const dataFetcher = createDataFetcher({
         apiToken: siteURLData.apiToken ?? null,
+        siteRevision: siteURLData.siteRevision
+            ? {
+                  organizationId: siteURLData.organization,
+                  siteId: siteURLData.site,
+                  siteRevisionId: siteURLData.siteRevision,
+              }
+            : undefined,
     });
 
     const linkerInput: SiteLinkerInput = {
@@ -305,6 +321,7 @@ export async function fetchSiteContextByURLLookup(
         contextId: data.contextId,
         isFallback: data.isFallback ?? false,
         noIndexSearch: data.noIndexSearch ?? false,
+        siteRevision: data.siteRevision,
         isLoggedInVisitor: data.isLoggedInVisitor ?? false,
         preview: data.preview ?? false,
         displayAgentInstructions: data.displayAgentInstructions,
@@ -329,6 +346,7 @@ export async function fetchSiteContextByIds(
         contextId?: string;
         isFallback: boolean;
         noIndexSearch: boolean;
+        siteRevision?: string;
         isLoggedInVisitor: boolean;
         preview: boolean;
         displayAgentInstructions?: boolean;
@@ -462,6 +480,12 @@ export async function fetchSiteContextByIds(
 
     return {
         ...spaceContext,
+        // Only the site's own spaces are read at the site revision it previews.
+        dataFetcher: ids.siteRevision
+            ? spaceContext.dataFetcher.withSiteRevisionSpaces(
+                  listAllSiteSpaces(siteStructure).map((entry) => entry.space.id)
+              )
+            : spaceContext.dataFetcher,
         locale: siteSpace.space.language ?? spaceContext.locale,
         linker: getLinkerForSiteSpace(siteLinker, siteSpace, spaceContext.revision.pages),
         organizationId: ids.organization,
@@ -477,6 +501,7 @@ export async function fetchSiteContextByIds(
         contextId: ids.contextId,
         isFallback: ids.isFallback,
         noIndexSearch: ids.noIndexSearch,
+        siteRevision: ids.siteRevision,
         isLoggedInVisitor: ids.isLoggedInVisitor,
         preview: ids.preview,
         displayAgentInstructions: ids.displayAgentInstructions,
