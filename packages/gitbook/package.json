@@ -19,7 +19,7 @@
         "@gitbook/react-math": "workspace:*",
         "@gitbook/react-openapi": "workspace:*",
         "@mermaid-js/mermaid-zenuml": "^0.2.2",
-        "@modelcontextprotocol/sdk": "1.17.5",
+        "@modelcontextprotocol/sdk": "1.32.0",
         "@opennextjs/aws": "4.2.0",
         "@opennextjs/cloudflare": "1.20.18",
         "@panzoom/panzoom": "^4.6.1",
