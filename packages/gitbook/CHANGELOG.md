@@ -1,5 +1,64 @@
 # gitbook
 
+## 0.29.0
+
+### Minor Changes
+
+- 7ad3fff: Open a link in the same or a new tab when its author chose one, instead of the site-wide external links setting.
+
+### Patch Changes
+
+- 4eb32b1: Keep links in generated Markdown usable outside the source page.
+- 13c0ff0: Handle optional emoji and icon values when rendering tags.
+- 960d7ec: Fade the bottom of collapsed code blocks so readers can tell there is more code, matching the editor.
+- 818cbbe: Answer Assistant questions with medium reasoning instead of low, matching AI search.
+- ddccd3d: Bump Next.js to 16.4.6 and OpenNext (Cloudflare 1.20.17, AWS 4.1.16), keeping the dev-mode OOM patch.
+- b0f3822: Bump `@opennextjs/aws` to 4.2.0 and `@opennextjs/cloudflare` to 1.20.18.
+- 0c3a51e: Fix horizontal page scroll caused by card carousels bleeding past the viewport.
+- a9535cd: Emit an `escape` event from the Docs Embed when Escape is pressed inside it and nothing in the embed used it, so the host can close its own panel.
+- 6b2e806: Use the site's suggested questions when the embedded Assistant receives an empty or omitted list, including from older SDKs.
+- 7e2658a: Reduce the wait after typing in site search to 100 ms.
+- ae1e370: Fix the table of contents keeping published pages busy in older Chrome versions such as Chrome 130.
+- c85d84f: Fix `'use cache'` entries never being stored in or read from R2 and the regional cache on Cloudflare.
+- 5997a66: Remove duplicated declarations from the global stylesheet.
+- c3df458: Keep inline code and highlighted text readable when a paragraph crosses the bottom edge of a background page cover.
+- 1ecd2ca: Keep published pages available when an integration block needs its connection or settings checked.
+- 265ca4b: Add a skip link, keyboard navigation between content tabs, focusable table of contents toggles, and hide decorative icons from assistive technologies.
+- 9fcde5f: Reduce memory and CPU use of the OpenNext workers: minify the middleware, resolve the site context once per request, cache parsed OpenAPI descriptions across a spec, drop the redis client and the unused force-revalidate route from the server bundle.
+- 9b5b8c8: Load the OpenAPI stylesheet only on pages with OpenAPI blocks.
+- a3b5ce5: Render the llms.txt directive as the first element in the page body so agents find it before the navigation.
+- fa7d4a9: Challenge MCP clients to authorize again when a visitor-auth site rejects their bearer token.
+- adfd921: Limit the MCP `searchDocumentation` tool to one language: the one the client passes in the new optional `language` argument, or else the language of the site variant the MCP endpoint is served from.
+- 19660ed: Flush insights events when the page is hidden, preload the search index at low priority and prioritize the dark page cover on dark-default sites.
+- 506aa78: Publish an OpenSearch description on every site so browsers can offer its search from the address bar.
+- c09da2e: Show H3 headings in the page outline.
+- 6cdbafc: Respect disabled change request previews on published sites.
+- 19660ed: Fix the search button accessible name, hoverable link previews, IME-safe Enter on Safari, cookie banner semantics, active outline item announcement and textarea shrinking.
+- d2c56e5: Send change request and revision links to the site preview, where GitBook members can sign in, when a site turns off public change request previews.
+- 65210b7: Respect reduced motion for enter and exit animations, keep the header separator and input focus visible in forced colors mode, and size mobile surfaces with dynamic viewport units.
+- 3e86382: Send only the site origin as referrer to third parties, and only let the embedding page open the embed messaging channel.
+- 7d1cd9f: Remove the ChatGPT-specific plain text response for Markdown and llms.txt routes; these now always serve `text/markdown`.
+- cf8c3d5: Send site searches straight to the search API when the site hands out a search pass, and use the site's search route when it does not or when the API refuses a search.
+- adbec4c: Send each search once on sites without a top header, and make search work between 768 and 1023 px wide.
+- 8f5175e: Show loading rows shaped like search results while search waits for the server.
+- 386a5c1: Show search results with one-line breadcrumbs and no icons or shortcut hints, and select the result under the mouse.
+- b145bfc: Stop caching site search results in the framework cache, so every search reaches the API.
+- 7856e08: Show one server-ordered search list and open its top result on Enter.
+- a10eff9: Load the data of the page actions menu from the menu itself, so it can be cached apart from the page body.
+- 1c71849: Follow the API's cache lifetime for site data, so a site preview shows layout changes soon after they are saved.
+- b5f7e55: Render small cards in a responsive four-column grid and carousel.
+- 8dd308b: Ignore tag category references when displaying assigned tags and update filters.
+- Updated dependencies [a9535cd]
+- Updated dependencies [6b2e806]
+- Updated dependencies [9fcde5f]
+- Updated dependencies [265ca4b]
+- Updated dependencies [262749a]
+- Updated dependencies [65210b7]
+  - @gitbook/embed@0.8.0
+  - @gitbook/icons@0.6.0
+  - @gitbook/react-openapi@2.0.2
+  - @gitbook/react-contentkit@0.7.19
+
 ## 0.28.2
 
 ### Patch Changes

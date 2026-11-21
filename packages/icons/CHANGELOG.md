@@ -1,5 +1,15 @@
 # @gitbook/icons
 
+## 0.6.0
+
+### Minor Changes
+
+- 9fcde5f: Add a `@gitbook/icons/validateIconName` entry that validates icon names without loading the icon labels and search terms.
+
+### Patch Changes
+
+- 265ca4b: Add a skip link, keyboard navigation between content tabs, focusable table of contents toggles, and hide decorative icons from assistive technologies.
+
 ## 0.5.0
 
 ### Minor Changes
