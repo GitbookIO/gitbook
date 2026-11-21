@@ -1,4 +1,5 @@
 import type { DocumentBlockIntegration, RenderIntegrationUI } from '@gitbook/api';
+import { Icon } from '@gitbook/icons';
 import { ContentKitOutput } from '@gitbook/react-contentkit';
 
 import type { BlockProps } from '../Block';
@@ -53,6 +54,7 @@ export async function IntegrationBlock(props: BlockProps<DocumentBlockIntegratio
         {
             integrationName: block.data.integration,
             request: initialInput,
+            allowFailedDependency: true,
         }
     );
 
@@ -66,12 +68,29 @@ export async function IntegrationBlock(props: BlockProps<DocumentBlockIntegratio
                 // Integration output can render blocks with generated keys.
                 {...getCommentAnchorProps(context, block.key)}
                 {...getCommentMarkerProps(context, 'data-comment-block')}
-                className={tcls(style)}
+                role="note"
+                className={tcls(
+                    'flex items-start gap-3 p-4 text-sm',
+                    'rounded-corners:rounded-md circular-corners:rounded-xl',
+                    'bg-warning border-warning text-neutral-strong',
+                    style
+                )}
             >
-                <pre>
-                    Unexpected error with integration {block.data.integration}:{' '}
-                    {initialResponse.error.message}
-                </pre>
+                <Icon
+                    icon="circle-exclamation"
+                    className="mt-0.5 size-4 shrink-0 text-warning-subtle contrast-more:text-warning"
+                    aria-hidden="true"
+                />
+                <div className="wrap-anywhere min-w-0">
+                    <p className="font-medium">
+                        Could not load the {block.data.integration} integration
+                    </p>
+                    <p>
+                        {initialResponse.error.code === 424
+                            ? 'Ask an administrator to check its connection and settings.'
+                            : initialResponse.error.message}
+                    </p>
+                </div>
             </div>
         );
     }
