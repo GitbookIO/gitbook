@@ -1,5 +1,16 @@
 # @gitbook/embed
 
+## 0.8.0
+
+### Minor Changes
+
+- a9535cd: Emit an `escape` event from the Docs Embed when Escape is pressed inside it and nothing in the embed used it, so the host can close its own panel.
+- 6b2e806: Use the site's suggested questions when the embedded Assistant receives an empty or omitted list, including from older SDKs.
+
+### Patch Changes
+
+- 65210b7: Respect reduced motion for enter and exit animations, keep the header separator and input focus visible in forced colors mode, and size mobile surfaces with dynamic viewport units.
+
 ## 0.7.0
 
 ### Minor Changes
