@@ -1,0 +1,172 @@
+import { describe, expect, it } from 'bun:test';
+
+import { type LLMsIndexFile, type LLMsIndexNode, renderLLMsIndex } from './llms-index';
+
+const ROOT = 'https://docs.example.com/llms.txt';
+
+function page(path: string, children: LLMsIndexNode[] = []): LLMsIndexNode {
+    return {
+        kind: 'page',
+        title: `Page ${path}`,
+        description: `About ${path}`,
+        url: `https://docs.example.com/${path}.md`,
+        indexURL: `https://docs.example.com/${path}/llms.txt`,
+        children,
+    };
+}
+
+function section(path: string, children: LLMsIndexNode[], indexURL?: string): LLMsIndexNode {
+    return {
+        kind: 'structure',
+        title: `Section ${path}`,
+        indexURL: indexURL ?? `https://docs.example.com/${path}/llms.txt`,
+        children,
+    };
+}
+
+function pages(prefix: string, count: number): LLMsIndexNode[] {
+    return Array.from({ length: count }, (_, index) => page(`${prefix}/page-${index}`));
+}
+
+function file(nodes: LLMsIndexNode[], footer?: string): LLMsIndexFile {
+    return { title: 'Docs', url: ROOT, nodes, footer };
+}
+
+describe('renderLLMsIndex', () => {
+    it('renders everything inline when it fits', () => {
+        const output = renderLLMsIndex(
+            file([section('guides', [page('guides/start', [page('guides/start/install')])])])
+        );
+
+        expect(output).toBe(
+            [
+                '# Docs',
+                '',
+                '## Section guides',
+                '',
+                '- [Page guides/start](https://docs.example.com/guides/start.md): About guides/start',
+                '  - [Page guides/start/install](https://docs.example.com/guides/start/install.md): About guides/start/install',
+                '',
+            ].join('\n')
+        );
+    });
+
+    it('splits out the largest sections first', () => {
+        const output = renderLLMsIndex(
+            file([section('small', pages('small', 2)), section('large', pages('large', 50))]),
+            3_000
+        );
+
+        expect(output.length).toBeLessThanOrEqual(3_000);
+        expect(output).toContain('## Section small');
+        expect(output).toContain('Page small/page-1');
+        expect(output).toContain(
+            '## Section large\n\n- [Section large](https://docs.example.com/large/llms.txt)'
+        );
+        expect(output).not.toContain('Page large/page-1');
+    });
+
+    it('never links a node to the file it is rendered in', () => {
+        const output = renderLLMsIndex(
+            file([section('default', [page('a', pages('a', 30)), page('b', pages('b', 5))], ROOT)]),
+            2_000
+        );
+
+        expect(output.length).toBeLessThanOrEqual(2_000);
+        expect(output).toContain('## Section default');
+        expect(output).toContain('- [Page a](https://docs.example.com/a.md): About a');
+        expect(output).toContain('  - [Pages under Page a](https://docs.example.com/a/llms.txt)');
+        expect(output).not.toContain(ROOT);
+    });
+
+    it('serves an oversized index when nothing can be split out', () => {
+        const output = renderLLMsIndex(file(pages('flat', 50)), 1_000);
+
+        expect(output.length).toBeGreaterThan(1_000);
+        expect(output).toContain('Page flat/page-49');
+    });
+
+    it('counts the footer in the size', () => {
+        const nodes = [section('a', pages('a', 10)), section('b', pages('b', 10))];
+        const withoutFooter = renderLLMsIndex(file(nodes), 2_000);
+        const withFooter = renderLLMsIndex(file(nodes, 'x'.repeat(1_000)), 2_000);
+
+        expect(withoutFooter).toContain('Page a/page-1');
+        expect(withFooter.length).toBeLessThanOrEqual(2_000);
+        expect(withFooter).toContain('- [Section a](https://docs.example.com/a/llms.txt)');
+    });
+
+    it('fits large sites within the default limit', () => {
+        const nodes = Array.from({ length: 20 }, (_, sectionIndex) =>
+            section(
+                `s${sectionIndex}`,
+                Array.from({ length: 20 }, (_, groupIndex) =>
+                    page(
+                        `s${sectionIndex}/g${groupIndex}`,
+                        pages(`s${sectionIndex}/g${groupIndex}`, 10)
+                    )
+                )
+            )
+        );
+
+        const output = renderLLMsIndex(file(nodes));
+        expect(output.length).toBeLessThanOrEqual(100_000);
+    });
+
+    it('keeps an index that fits just under the limit whole', () => {
+        const nodes = [
+            section(
+                's',
+                Array.from({ length: 700 }, (_, index) =>
+                    page(`s/g${index}`, [page(`s/g${index}/a`)])
+                )
+            ),
+        ];
+        const full = renderLLMsIndex(file(nodes), Number.POSITIVE_INFINITY);
+
+        expect(full.length).toBeGreaterThan(95_000);
+        expect(full.length).toBeLessThanOrEqual(100_000);
+        expect(renderLLMsIndex(file(nodes))).toBe(full);
+    });
+
+    it('writes every list line as a link, as llms.txt parsers expect', () => {
+        const group: LLMsIndexNode = {
+            kind: 'page',
+            title: 'Get started',
+            indexURL: 'https://docs.example.com/get-started/llms.txt',
+            children: [page('get-started/install')],
+        };
+        const output = renderLLMsIndex(
+            file([
+                { ...section('guides', [group]), description: 'Guides for everyone' },
+                section('large', pages('large', 50)),
+            ]),
+            3_000
+        );
+
+        expect(output).toContain('- [Get started](https://docs.example.com/get-started/llms.txt)');
+        // Same rule as the reference parser: every non-empty line under a `##` heading is a link.
+        const sections = output.split(/^##\s*.*$/m).slice(1);
+        for (const line of sections.flatMap((text) => text.split('\n'))) {
+            if (line.trim() && !line.startsWith('#')) {
+                expect(line).toMatch(/-\s*\[[^\]]+\]\([^)]+\)/);
+            }
+        }
+    });
+
+    it('splits sites with many sibling groups in linear time', () => {
+        const nodes = Array.from({ length: 8_000 }, (_, index) =>
+            page(`g${index}`, [page(`g${index}/a`), page(`g${index}/b`)])
+        );
+
+        const started = performance.now();
+        const output = renderLLMsIndex(file(nodes));
+
+        // Too many groups to ever fit, so every group ends up split out.
+        expect(output).toContain(
+            '- [Pages under Page g7999](https://docs.example.com/g7999/llms.txt)'
+        );
+        // About 0.4s locally; the quadratic version took several seconds.
+        expect(performance.now() - started).toBeLessThan(3_000);
+    });
+});

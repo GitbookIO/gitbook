@@ -47,3 +47,30 @@ function flattenPages(
 export function getIndexablePages(rootPages: RevisionPage[]) {
     return flattenPages(rootPages, (page, ancestors) => isPageIndexable(ancestors, page));
 }
+
+export type PageTreeEntry = {
+    page: RevisionPageDocument | RevisionPageGroup;
+    children: PageTreeEntry[];
+};
+
+/**
+ * Get all indexable pages from a revision as a tree, keeping groups that contain indexable pages.
+ */
+export function getIndexablePageTree(
+    rootPages: RevisionPage[],
+    ancestors: (RevisionPageDocument | RevisionPageGroup)[] = []
+): PageTreeEntry[] {
+    return rootPages.flatMap((page): PageTreeEntry[] => {
+        if (page.type !== 'document' && page.type !== 'group') {
+            return [];
+        }
+        if (!isPageIndexable(ancestors, page)) {
+            return [];
+        }
+        const children = getIndexablePageTree(page.pages, [...ancestors, page]);
+        if (page.type === 'group' && children.length === 0) {
+            return [];
+        }
+        return [{ page, children }];
+    });
+}

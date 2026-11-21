@@ -51,7 +51,7 @@ import {
     isOAuthProtectedResourceMetadataRequestForAuthEndpoint,
     isOAuthProtectedResourceRequest,
 } from '@/lib/oauth-protected';
-import { removeLeadingSlash, removeTrailingSlash } from '@/lib/paths';
+import { removeLeadingSlash, removeTrailingSlash, withTrailingSlash } from '@/lib/paths';
 import {
     getPreviewCookieResponse,
     getPreviewRequestIdentifier,
@@ -519,6 +519,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
             events,
             isAiAgent,
             askVisitorAgent,
+            isPage,
         } = encodePathInSiteContent(siteURLData, request);
         routeType = routeTypeFromPathname ?? routeType;
         // Only set for markdown routes, so it becomes part of their static cache key.
@@ -632,6 +633,14 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         }
 
         // AI related headers
+        if (isPage) {
+            // Point agents to the most specific llms.txt that is always served for this page.
+            const llmsTxtURL = new URL(
+                'llms.txt',
+                `${siteCanonicalURL.origin}${withTrailingSlash(siteURLData.basePath)}`
+            );
+            response.headers.append('link', `<${llmsTxtURL.toString()}>; rel="describedby"`);
+        }
         // This one is technically useless, but is used by a bunch of scoring systems
         response.headers.set(
             'vary',
@@ -825,6 +834,7 @@ function getSiteURLFromRequest(request: NextRequest): URLWithMode | null {
 const RSS_PATH_REGEX = /^((\S+)\/)?rss\.xml$/;
 const MARKDOWN_PATH_REGEX = /\.md$/;
 const LLMS_FULL_PATH_REGEX = /^llms-full\.txt\/\d+$/;
+const PAGE_LLMS_PATH_REGEX = /^(\S+)\/llms\.txt$/;
 const EMBED_PAGE_PATH_REGEX = /^~gitbook\/embed\/page(\/(\S*))?$/;
 const PATH_ALIASES: Record<string, string> = {
     'sitemap.md': 'llms.txt',
@@ -932,6 +942,8 @@ function encodePathInSiteContent(
     isAiAgent?: boolean;
     /** Only set for the ask route, where the API classifies the asker from these headers. */
     askVisitorAgent?: AskVisitorAgent;
+    /** Set for pages, which are listed in the llms.txt of their site space. */
+    isPage?: boolean;
 } {
     let pathname = removeLeadingSlash(removeTrailingSlash(siteURLData.pathname));
 
@@ -981,6 +993,22 @@ function encodePathInSiteContent(
                         siteSection: siteURLData.siteSection,
                         displayContext: SiteInsightsDisplayContext.Server,
                     },
+                },
+            ],
+        };
+    }
+
+    // The llms.txt of a page lists the pages under it (llms.txt at the space root is handled below).
+    const pageLLMsMatch = pathname.match(PAGE_LLMS_PATH_REGEX);
+    if (pageLLMsMatch) {
+        return {
+            pathname: `~gitbook/llms/${encodePagePath(pageLLMsMatch[1])}`,
+            routeType: 'static',
+            events: [
+                {
+                    type: 'llms_request',
+                    llmsVariant: SiteInsightsLLMSVariant.Standard,
+                    location: eventLocation,
                 },
             ],
         };
@@ -1069,6 +1097,7 @@ function encodePathInSiteContent(
                               }`
                             : `~gitbook/markdown/${encodePagePath(pagePathWithoutMD)}`,
                     routeType: 'static',
+                    isPage: typeof ask !== 'string',
                     // Left undefined for non-agents to avoid splitting the static cache for them.
                     isAiAgent: isAiAgent || undefined,
                     askVisitorAgent:
@@ -1097,7 +1126,7 @@ function encodePathInSiteContent(
                           ],
                 };
             }
-            return { pathname: encodePagePath(pathname) };
+            return { pathname: encodePagePath(pathname), isPage: true };
         }
     }
 }
