@@ -53,6 +53,7 @@ export async function IntegrationBlock(props: BlockProps<DocumentBlockIntegratio
         {
             integrationName: block.data.integration,
             request: initialInput,
+            allowFailedDependency: true,
         }
     );
 
@@ -70,7 +71,9 @@ export async function IntegrationBlock(props: BlockProps<DocumentBlockIntegratio
             >
                 <pre>
                     Unexpected error with integration {block.data.integration}:{' '}
-                    {initialResponse.error.message}
+                    {initialResponse.error.code === 424
+                        ? 'This integration needs attention. Ask an administrator to check its connection and settings.'
+                        : initialResponse.error.message}
                 </pre>
             </div>
         );
