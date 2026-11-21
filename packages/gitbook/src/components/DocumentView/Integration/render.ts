@@ -11,9 +11,11 @@ export async function fetchSafeIntegrationUI(
     {
         integrationName,
         request,
+        allowFailedDependency = false,
     }: {
         integrationName: string;
         request: RenderIntegrationUI;
+        allowFailedDependency?: boolean;
     }
 ) {
     const output = await ignoreDataFetcherErrors(
@@ -27,6 +29,7 @@ export async function fetchSafeIntegrationUI(
             404, // Integration has been uninstalled
             400, // Integration is rejecting its own request
             422, // Integration is triggering an invalid request, failing at the validation step
+            ...(allowFailedDependency ? [424] : []),
             502, // Integration is failing in an unexpected way
         ]
     );
