@@ -19,11 +19,17 @@ import { useAI } from '@/components/AI';
 
 export type ResultType = OrderedComputedResult | RecommendedQuestionResult;
 
+type SearchAnswer = {
+    scopeKey: string;
+    query: string;
+    results: OrderedComputedResult[];
+};
+
 type RemoteSearchState =
     | { status: 'idle' }
-    | { status: 'loading' }
-    | { status: 'ready'; requestKey: string; results: OrderedComputedResult[] }
-    | { status: 'error' };
+    | { status: 'loading'; requestKey: string; answer?: SearchAnswer }
+    | { status: 'ready'; requestKey: string; answer: SearchAnswer }
+    | { status: 'error'; requestKey: string };
 
 /**
  * We cache the recommended questions globally to avoid calling the API multiple times
@@ -37,6 +43,7 @@ export function useSearchResults(props: {
     asEmbeddable?: boolean;
     disabled: boolean;
     query: string;
+    retainPreviousResults: boolean;
     siteSpaceId: string;
     siteSpaceIds: string[];
     selectedSectionSiteSpaceIds?: string[];
@@ -53,6 +60,7 @@ export function useSearchResults(props: {
         asEmbeddable,
         disabled,
         query,
+        retainPreviousResults,
         siteSpaceId,
         siteSpaceIds,
         selectedSectionSiteSpaceIds,
@@ -83,8 +91,15 @@ export function useSearchResults(props: {
             computeRemoteSearchScope(scope, siteSpaceId, siteSpaceIds, selectedSectionSiteSpaceIds),
         [scope, siteSpaceId, siteSpaceIds, selectedSectionSiteSpaceIds]
     );
-    // Identifies the answer the UI needs now; an answer for any other key is never shown as current.
-    const requestKey = JSON.stringify([query, remoteScope]);
+    const scopeKey = JSON.stringify([
+        searchURL,
+        asEmbeddable,
+        siteSpaceId,
+        scope,
+        remoteScope,
+        filterSiteSpaceIds,
+    ]);
+    const requestKey = JSON.stringify([scopeKey, query]);
 
     const [remoteState, setRemoteState] = React.useState<RemoteSearchState>({ status: 'idle' });
 
@@ -100,6 +115,7 @@ export function useSearchResults(props: {
 
     React.useEffect(() => {
         if (disabled) {
+            setRemoteState({ status: 'idle' });
             return;
         }
         if (!query) {
@@ -168,7 +184,12 @@ export function useSearchResults(props: {
                 clearTimeout(timeout);
             };
         }
-        setRemoteState({ status: 'loading' });
+        setRemoteState((state) => {
+            const answer = 'answer' in state ? state.answer : undefined;
+            return answer?.scopeKey === scopeKey
+                ? { status: 'loading', requestKey, answer }
+                : { status: 'loading', requestKey };
+        });
         let cancelled = false;
         const abortController = new AbortController();
         const send = async () => {
@@ -195,18 +216,22 @@ export function useSearchResults(props: {
 
                     if (!results) {
                         // Can happen when the route cannot be found and returns the page's html.
-                        setRemoteState({ status: 'error' });
+                        setRemoteState({ status: 'error', requestKey });
                         return;
                     }
 
-                    setRemoteState({ status: 'ready', requestKey, results });
+                    setRemoteState({
+                        status: 'ready',
+                        requestKey,
+                        answer: { scopeKey, query, results },
+                    });
                     trackEvent({ type: 'search_type_query', query });
                 };
                 const onError = () => {
                     if (cancelled) {
                         return;
                     }
-                    setRemoteState({ status: 'error' });
+                    setRemoteState({ status: 'error', requestKey });
                 };
 
                 await resultsPromise.then(onResults, onError);
@@ -215,7 +240,7 @@ export function useSearchResults(props: {
                 if (cancelled) {
                     return;
                 }
-                setRemoteState({ status: 'error' });
+                setRemoteState({ status: 'error', requestKey });
             }
         };
         const timeout = setTimeout(send, consumeImmediate?.(query) ? 0 : 100);
@@ -241,6 +266,7 @@ export function useSearchResults(props: {
         query,
         remoteScope,
         requestKey,
+        scopeKey,
         trackEvent,
         withAI,
         siteSpaceId,
@@ -252,6 +278,16 @@ export function useSearchResults(props: {
         searchPass,
     ]);
 
+    React.useEffect(() => {
+        if (!retainPreviousResults) {
+            setRemoteState((state) =>
+                state.status === 'loading' && state.answer
+                    ? { status: 'loading', requestKey: state.requestKey }
+                    : state
+            );
+        }
+    }, [retainPreviousResults, requestKey]);
+
     const flush = React.useCallback(() => {
         flushRef.current?.();
     }, []);
@@ -261,6 +297,15 @@ export function useSearchResults(props: {
         abortRef.current = null;
         setRemoteState((prev) => (prev.status === 'loading' ? { status: 'idle' } : prev));
     }, []);
+
+    const answer = 'answer' in remoteState ? remoteState.answer : undefined;
+    const visibleAnswer =
+        query &&
+        !disabled &&
+        answer?.scopeKey === scopeKey &&
+        (answer.query === query || retainPreviousResults)
+            ? answer
+            : undefined;
 
     const results = React.useMemo<ResultType[]>(() => {
         if (!query) {
@@ -278,27 +323,24 @@ export function useSearchResults(props: {
             });
         }
 
-        return remoteState.status === 'ready' && remoteState.requestKey === requestKey
-            ? filterResultsBySiteSpaces(remoteState.results, filterSiteSpaceIds)
+        return visibleAnswer
+            ? filterResultsBySiteSpaces(visibleAnswer.results, filterSiteSpaceIds)
             : [];
-    }, [
-        remoteState,
-        requestKey,
-        query,
-        filterSiteSpaceIds,
-        withAI,
-        siteSpaceId,
-        suggestions,
-        recentQueries,
-    ]);
-
-    // Between a query change and its loading state, the previous answer must still read as loading.
-    const isOutdated = remoteState.status === 'ready' && remoteState.requestKey !== requestKey;
+    }, [visibleAnswer, query, filterSiteSpaceIds, withAI, siteSpaceId, suggestions, recentQueries]);
 
     return {
         results,
-        fetching: remoteState.status === 'loading' || (Boolean(query) && isOutdated),
-        error: remoteState.status === 'error',
+        resultsQuery: visibleAnswer?.query ?? query,
+        fetching:
+            Boolean(query) &&
+            !disabled &&
+            (remoteState.status === 'loading' ||
+                (remoteState.status !== 'idle' && remoteState.requestKey !== requestKey)),
+        error:
+            Boolean(query) &&
+            !disabled &&
+            remoteState.status === 'error' &&
+            remoteState.requestKey === requestKey,
         requestKey,
         flush,
         abort,

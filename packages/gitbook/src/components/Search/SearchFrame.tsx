@@ -27,6 +27,7 @@ export function SearchFrame(props: {
     query: string;
     results: ResultType[];
     resultsId: string;
+    resultsQuery: string;
     resultsRef: React.Ref<SearchResultsRef>;
     onResultSelect?: () => void;
     /** Select the result under the mouse, so hover and keyboard share one highlight. */
@@ -50,6 +51,7 @@ export function SearchFrame(props: {
         query,
         results,
         resultsId,
+        resultsQuery,
         resultsRef,
         onResultSelect,
         onResultHover,
@@ -78,7 +80,7 @@ export function SearchFrame(props: {
                             fetching ? 'block animate-fade-in' : 'hidden animate-fade-out-slow'
                         )}
                         style={{
-                            animationDelay: fetching ? '2s' : undefined,
+                            animationDelay: fetching && results.length === 0 ? '2s' : undefined,
                         }}
                     >
                         <div
@@ -118,7 +120,7 @@ export function SearchFrame(props: {
                                 ) : (
                                     <SearchResults
                                         ref={resultsRef}
-                                        query={query}
+                                        query={resultsQuery}
                                         id={resultsId}
                                         fetching={fetching}
                                         results={results}
