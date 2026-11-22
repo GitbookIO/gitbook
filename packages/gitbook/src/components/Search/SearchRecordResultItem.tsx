@@ -13,6 +13,7 @@ export const SearchRecordResultItem = React.forwardRef(function SearchRecordResu
         query: string;
         item: ComputedRecordResult;
         active: boolean;
+        prefetch: boolean;
         style?: React.CSSProperties;
     },
     ref: React.Ref<HTMLAnchorElement>

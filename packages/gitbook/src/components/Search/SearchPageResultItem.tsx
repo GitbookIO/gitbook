@@ -16,6 +16,7 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
         query: string;
         item: ComputedPageResult;
         active: boolean;
+        prefetch: boolean;
         style?: React.CSSProperties;
     },
     ref: React.Ref<HTMLAnchorElement>
