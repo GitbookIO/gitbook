@@ -8,6 +8,7 @@ import { getPageResultPresentation } from './getPageResultHref';
 import { HighlightQuery } from './HighlightQuery';
 import type { ComputedPageResult } from './search-types';
 import { SearchResultItem } from './SearchResultItem';
+import { usePrefetchWhenActive } from './usePrefetchWhenActive';
 import { tString, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
 
@@ -16,7 +17,6 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
         query: string;
         item: ComputedPageResult;
         active: boolean;
-        prefetch: boolean;
         style?: React.CSSProperties;
     },
     ref: React.Ref<HTMLAnchorElement>
@@ -25,6 +25,7 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
     const language = useLanguage();
 
     const { preview: bestSection, description, href } = getPageResultPresentation(item);
+    usePrefetchWhenActive(href, active);
     const preview = bestSection
         ? [bestSection.title, bestSection.body].filter(Boolean).join(' · ')
         : undefined;
@@ -51,6 +52,7 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
                 ...style,
             }}
             {...rest}
+            prefetch={false}
         >
             <Breadcrumbs breadcrumbs={item.breadcrumbs} />
             <p className="line-clamp-1 font-heading text-base font-semibold leading-snug text-tint-strong">

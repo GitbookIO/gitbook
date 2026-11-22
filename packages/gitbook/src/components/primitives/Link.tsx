@@ -74,7 +74,7 @@ function getTargetProps(
 /**
  * Check if the link is external with the origin.
  */
-function defaultIsExternalClient(href: string) {
+export function defaultIsExternalClient(href: string) {
     return isExternalLink(href, window.location.origin);
 }
 
@@ -183,7 +183,7 @@ export function Link(props: LinkProps) {
  * NextLink automatically prefetches links (RSC requests) on hover/viewport, which would fire those
  * side effects without any user intent, so such links should not be prefetched.
  */
-function hasSideEffectQueryParams(href: string): boolean {
+export function hasSideEffectQueryParams(href: string): boolean {
     const baseURL = typeof window !== 'undefined' ? window.location.origin : 'http://localhost';
     const linkURL = URL.canParse(href) ? new URL(href) : new URL(href, baseURL);
 

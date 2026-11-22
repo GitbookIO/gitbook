@@ -6,6 +6,7 @@ import { Favicon } from '../utils';
 import { HighlightQuery } from './HighlightQuery';
 import type { ComputedRecordResult } from './search-types';
 import { SearchResultItem } from './SearchResultItem';
+import { usePrefetchWhenActive } from './usePrefetchWhenActive';
 import { tString, useLanguage } from '@/intl/client';
 
 export const SearchRecordResultItem = React.forwardRef(function SearchRecordResultItem(
@@ -13,7 +14,6 @@ export const SearchRecordResultItem = React.forwardRef(function SearchRecordResu
         query: string;
         item: ComputedRecordResult;
         active: boolean;
-        prefetch: boolean;
         style?: React.CSSProperties;
     },
     ref: React.Ref<HTMLAnchorElement>
@@ -21,6 +21,7 @@ export const SearchRecordResultItem = React.forwardRef(function SearchRecordResu
     const { query, item, active, style, ...rest } = props;
     const language = useLanguage();
 
+    usePrefetchWhenActive(item.href, active);
     const domain = getDomain(item.href);
 
     return (
@@ -47,6 +48,7 @@ export const SearchRecordResultItem = React.forwardRef(function SearchRecordResu
             aria-label={tString(language, 'search_page_result_title', item.title)}
             style={{ ...style }}
             {...rest}
+            prefetch={false}
         >
             <p className="line-clamp-2 text-base font-semibold leading-snug text-tint-strong">
                 <HighlightQuery query={query} text={item.title} />

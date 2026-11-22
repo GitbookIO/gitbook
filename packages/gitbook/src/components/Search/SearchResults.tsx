@@ -28,7 +28,6 @@ const PLACEHOLDER_ROWS: [crumb: number, title: number, description: number][] = 
     [30, 52, 84],
     [22, 60, 76],
 ];
-const RESULT_PREFETCH_DELAY_MS = 200;
 
 export interface SearchResultsRef {
     select(): boolean;
@@ -85,36 +84,6 @@ export const SearchResults = React.forwardRef(function SearchResults(
 
     const refs = React.useRef<(null | HTMLAnchorElement)[]>([]);
     const selectedByPointer = React.useRef(false);
-    const [pointerSelection, setPointerSelection] = React.useState<{
-        item: ResultType;
-        hovering: boolean;
-    } | null>(null);
-    const selectedResult = cursor === null || fetching || error ? undefined : results[cursor];
-    if (pointerSelection && pointerSelection.item !== selectedResult) {
-        setPointerSelection(null);
-    }
-    const pointerLeftSelection =
-        pointerSelection?.item === selectedResult && pointerSelection?.hovering === false;
-    // Each selection needs its own dwell, even when it returns to the same result.
-    const selection = React.useMemo(() => {
-        if (
-            !pointerLeftSelection &&
-            (selectedResult?.type === 'page' || selectedResult?.type === 'record')
-        ) {
-            return { item: selectedResult };
-        }
-        return null;
-    }, [pointerLeftSelection, selectedResult]);
-    const [prefetchSelection, setPrefetchSelection] = React.useState<typeof selection>(null);
-
-    React.useEffect(() => {
-        if (!selection) {
-            return;
-        }
-
-        const timeout = setTimeout(() => setPrefetchSelection(selection), RESULT_PREFETCH_DELAY_MS);
-        return () => clearTimeout(timeout);
-    }, [selection]);
 
     React.useEffect(() => {
         for (const item of results) {
@@ -271,29 +240,10 @@ export const SearchResults = React.forwardRef(function SearchResults(
                                 onHover: onResultHover
                                     ? () => {
                                           selectedByPointer.current = true;
-                                          setPointerSelection({ item, hovering: true });
                                           onResultHover(index);
                                       }
                                     : undefined,
-                                onPointerEnter: (event: React.PointerEvent) => {
-                                    if (
-                                        event.pointerType === 'mouse' &&
-                                        pointerSelection?.item === item
-                                    ) {
-                                        setPointerSelection({ item, hovering: true });
-                                    }
-                                },
-                                onPointerLeave: (event: React.PointerEvent) => {
-                                    if (
-                                        event.pointerType === 'mouse' &&
-                                        pointerSelection?.item === item
-                                    ) {
-                                        setPointerSelection({ item, hovering: false });
-                                    }
-                                },
                             };
-                            const prefetch =
-                                selection?.item === item && selection === prefetchSelection;
                             switch (item.type) {
                                 case 'page': {
                                     return (
@@ -323,7 +273,6 @@ export const SearchResults = React.forwardRef(function SearchResults(
                                                     query={query}
                                                     item={item}
                                                     active={index === cursor}
-                                                    prefetch={prefetch}
                                                     style={{
                                                         animationDelay: `${index * 25}ms,${100 + index * 25}ms`,
                                                     }}
@@ -393,7 +342,6 @@ export const SearchResults = React.forwardRef(function SearchResults(
                                                     query={query}
                                                     item={item}
                                                     active={index === cursor}
-                                                    prefetch={prefetch}
                                                     style={{
                                                         animationDelay: `${index * 25}ms,${100 + index * 25}ms`,
                                                     }}
