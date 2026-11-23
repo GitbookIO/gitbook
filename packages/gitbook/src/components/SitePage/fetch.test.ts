@@ -6,8 +6,12 @@ import type { GitBookSiteContext } from '@/lib/context';
 
 mock.module('server-only', () => ({}));
 
-const { getLowercasePathnameRedirect, resolveMissingPagePath, resolveSitePageFromURL } =
-    await import('./fetch');
+const {
+    getLowercasePathnameRedirect,
+    startSitePagePlan,
+    resolveMissingPagePath,
+    resolveSitePageFromURL,
+} = await import('./fetch');
 const { normalizeURL } = await import('@/lib/data/urls');
 const { createLinker } = await import('@/lib/links');
 
@@ -202,6 +206,48 @@ describe('getLowercasePathnameRedirect', () => {
             expect(target).not.toBeNull();
             expect(normalize(target!)).toBe(target!);
             expect(getLowercasePathnameRedirect(target!)).toBeNull();
+        }
+    });
+});
+
+describe('startSitePagePlan', () => {
+    function createContext(getRevisionPageDocument: (params: unknown) => Promise<unknown>) {
+        return {
+            space: { id: 'space-1' },
+            revisionId: 'revision-1',
+            revision: { pages: [page] },
+            siteSpace: { id: 'site-space-1', pageId: null },
+            dataFetcher: { getRevisionPageDocument: mock(getRevisionPageDocument) },
+        } as unknown as GitBookSiteContext;
+    }
+
+    it('requests the document of the page at the lowercased path', () => {
+        const context = createContext(async () => ({ data: {} }));
+        startSitePagePlan(context, { pathname: 'ReadMe' });
+        expect(context.dataFetcher.getRevisionPageDocument).toHaveBeenCalledWith({
+            spaceId: 'space-1',
+            revisionId: 'revision-1',
+            pageId: 'page-1',
+        });
+    });
+
+    it('does nothing when the path does not resolve to a page', () => {
+        const context = createContext(async () => ({ data: {} }));
+        startSitePagePlan(context, { pathname: 'missing' });
+        expect(context.dataFetcher.getRevisionPageDocument).not.toHaveBeenCalled();
+    });
+
+    it('does not leak a rejection when the request fails', async () => {
+        const unhandled: unknown[] = [];
+        const onUnhandled = (reason: unknown) => unhandled.push(reason);
+        process.on('unhandledRejection', onUnhandled);
+        try {
+            const context = createContext(async () => ({ error: { code: 500, message: 'boom' } }));
+            startSitePagePlan(context, { pathname: 'readme' });
+            await new Promise((resolve) => setTimeout(resolve, 10));
+            expect(unhandled).toEqual([]);
+        } finally {
+            process.off('unhandledRejection', onUnhandled);
         }
     });
 });
