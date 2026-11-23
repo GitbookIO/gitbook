@@ -58,8 +58,6 @@ export type SiteURLData = Pick<
     | 'site'
     | 'siteSpace'
     | 'space'
-    | 'revision'
-    | 'changeRequest'
     | 'shareKey'
     | 'siteSection'
     | 'siteBasePath'
@@ -73,8 +71,11 @@ export type SiteURLData = Pick<
     imagesContextId: string;
 
     /**
-     * Site revision being previewed, when the URL previews one. Content is read as it pins it.
+     * Space revision, change request or site revision the URL previews: at most one is set. The
+     * middleware reads them from the resolved content, which types them as exclusive.
      */
+    revision?: string;
+    changeRequest?: string;
     siteRevision?: string;
 
     /**

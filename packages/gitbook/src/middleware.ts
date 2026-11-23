@@ -32,7 +32,6 @@ import { validateSerializedCustomization } from '@/lib/customization';
 import {
     DataFetcherError,
     apiClient,
-    asPublishedSiteContentWithSiteRevision,
     getVisitorAuthBasePath,
     lookupPublishedContentByUrl,
     normalizeRequestURL,
@@ -965,7 +964,7 @@ function encodePathInSiteContent(
         siteSpace: siteURLData.siteSpace,
         siteShareKey: siteURLData.shareKey,
         space: siteURLData.space,
-        revision: siteURLData.revision,
+        revision: getPreviewedContent(siteURLData).revision,
         displayContext: SiteInsightsDisplayContext.Server,
     };
 
@@ -1234,9 +1233,8 @@ function acceptsMarkdown(request: Request): boolean {
  * The revision, change request or site revision a URL previews: at most one of them.
  */
 function getPreviewedContent(
-    lookup: PublishedSiteContent
+    content: PublishedSiteContent
 ): Pick<SiteURLData, 'revision' | 'changeRequest' | 'siteRevision'> {
-    const content = asPublishedSiteContentWithSiteRevision(lookup);
     if ('revision' in content) {
         return { revision: content.revision };
     }

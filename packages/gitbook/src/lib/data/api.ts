@@ -107,8 +107,11 @@ export function createDataFetcher(
             return readAtSiteRevision(
                 input,
                 params.spaceId,
-                `content/${params.spaceId}`,
-                { metadata: params.metadata ?? false },
+                (siteRevisionInput) =>
+                    getRevisionAtSiteRevision(siteRevisionInput, {
+                        spaceId: params.spaceId,
+                        metadata: params.metadata ?? false,
+                    }),
                 () =>
                     getRevision(input, {
                         spaceId: params.spaceId,
@@ -121,11 +124,13 @@ export function createDataFetcher(
             return readAtSiteRevision(
                 input,
                 params.spaceId,
-                `content/${params.spaceId}/path/${encodeURIComponent(params.path)}`,
-                {
-                    metadata: params.metadata ?? false,
-                    cachedMetadata: params.cachedMetadata ?? false,
-                },
+                (siteRevisionInput) =>
+                    getPageByPathAtSiteRevision(siteRevisionInput, {
+                        spaceId: params.spaceId,
+                        path: params.path,
+                        metadata: params.metadata ?? false,
+                        cachedMetadata: params.cachedMetadata ?? false,
+                    }),
                 () =>
                     getRevisionPageByPath(input, {
                         spaceId: params.spaceId,
@@ -140,13 +145,11 @@ export function createDataFetcher(
             return readAtSiteRevision(
                 input,
                 params.spaceId,
-                `content/${params.spaceId}/page/${params.pageId}`,
-                {
-                    format: 'markdown',
-                    'format.markdown.refs': 'stable',
-                    evaluated: 'deterministic-only',
-                    metadata: false,
-                },
+                (siteRevisionInput) =>
+                    getPageMarkdownAtSiteRevision(siteRevisionInput, {
+                        spaceId: params.spaceId,
+                        pageId: params.pageId,
+                    }),
                 () =>
                     getRevisionPageMarkdown(
                         input,
@@ -166,8 +169,11 @@ export function createDataFetcher(
             return readAtSiteRevision(
                 input,
                 params.spaceId,
-                `content/${params.spaceId}/page/${params.pageId}/document`,
-                { evaluated: 'deterministic-only', dereferenced: 'reusable-contents' },
+                (siteRevisionInput) =>
+                    getPageDocumentAtSiteRevision(siteRevisionInput, {
+                        spaceId: params.spaceId,
+                        pageId: params.pageId,
+                    }),
                 () =>
                     getRevisionPageDocument(
                         input,
@@ -187,8 +193,11 @@ export function createDataFetcher(
             return readAtSiteRevision(
                 input,
                 params.spaceId,
-                `content/${params.spaceId}/reusable-contents/${params.reusableContentId}/document`,
-                { evaluated: 'deterministic-only' },
+                (siteRevisionInput) =>
+                    getReusableContentDocumentAtSiteRevision(siteRevisionInput, {
+                        spaceId: params.spaceId,
+                        reusableContentId: params.reusableContentId,
+                    }),
                 () =>
                     getRevisionReusableContentDocument(input, {
                         spaceId: params.spaceId,
@@ -198,11 +207,16 @@ export function createDataFetcher(
             );
         },
         getLatestOpenAPISpecVersionContent(params) {
-            return readAtSiteRevision(input, null, `openapi/${params.slug}/content`, {}, () =>
-                getLatestOpenAPISpecVersionContent(input, {
-                    organizationId: params.organizationId,
-                    slug: params.slug,
-                })
+            return readAtSiteRevision(
+                input,
+                null,
+                (siteRevisionInput) =>
+                    getOpenAPISpecContentAtSiteRevision(siteRevisionInput, { slug: params.slug }),
+                () =>
+                    getLatestOpenAPISpecVersionContent(input, {
+                        organizationId: params.organizationId,
+                        slug: params.slug,
+                    })
             );
         },
         getSpace(params) {
@@ -270,8 +284,11 @@ export function createDataFetcher(
             return readAtSiteRevision(
                 input,
                 params.spaceId,
-                `content/${params.spaceId}/page/${params.pageId}/meta-links`,
-                {},
+                (siteRevisionInput) =>
+                    listPageMetaLinksAtSiteRevision(siteRevisionInput, {
+                        spaceId: params.spaceId,
+                        pageId: params.pageId,
+                    }),
                 () =>
                     listRevisionPageMetaLinks(input, {
                         spaceId: params.spaceId,
@@ -284,15 +301,21 @@ export function createDataFetcher(
 }
 
 /**
- * Read content at the site revision of the input, with the same query as `live` reads it. Reads
- * live when there is no site revision, or for a space outside the site. An OpenAPI spec (no
- * space) is always read at the site revision.
+ * Data fetcher input to read at a site revision. It leaves out the site's space IDs, which only
+ * choose what to read at the site revision, so they stay out of cache keys.
+ */
+type SiteRevisionDataFetcherInput = DataFetcherInput & {
+    siteRevision: Omit<DataFetcherSiteRevision, 'spaceIds'>;
+};
+
+/**
+ * Read content at the site revision of the input, or `live` when there is no site revision or
+ * for a space outside the site. An OpenAPI spec (no space) is always read at the site revision.
  */
 async function readAtSiteRevision<T>(
     input: DataFetcherInput,
     spaceId: string | null,
-    path: string,
-    query: Record<string, string | boolean>,
+    atSiteRevision: (input: SiteRevisionDataFetcherInput) => Promise<DataFetcherResponse<T>>,
     live: () => Promise<DataFetcherResponse<T>>
 ): Promise<DataFetcherResponse<T>> {
     const { siteRevision } = input;
@@ -301,47 +324,189 @@ async function readAtSiteRevision<T>(
     }
 
     const { spaceIds: _spaceIds, ...cacheableSiteRevision } = siteRevision;
-    // Typed like the space endpoint it mirrors: the API client doesn't publish these endpoints yet.
-    return (await getAtSiteRevision(
-        { ...input, siteRevision: cacheableSiteRevision },
-        { path, query }
-    )) as DataFetcherResponse<T>;
+    return atSiteRevision({ ...input, siteRevision: cacheableSiteRevision });
 }
 
-/**
- * Get content at a site revision. It never changes, so it is cached forever.
- */
-const getAtSiteRevision = cache(
+// Each read at a site revision sends the same query as its live counterpart.
+
+const getRevisionAtSiteRevision = cache(
+    async (input: SiteRevisionDataFetcherInput, params: { spaceId: string; metadata: boolean }) => {
+        'use cache';
+        return fetchAtSiteRevision(
+            input,
+            `getRevisionAtSiteRevision(${params.spaceId})`,
+            (api, { organizationId, siteId, siteRevisionId }) =>
+                api.orgs.getRevisionInSiteRevision(
+                    organizationId,
+                    siteId,
+                    siteRevisionId,
+                    params.spaceId,
+                    { metadata: params.metadata },
+                    { ...noCacheFetchOptions }
+                )
+        );
+    }
+);
+
+const getPageByPathAtSiteRevision = cache(
     async (
-        input: DataFetcherInput,
-        params: { path: string; query: Record<string, string | boolean> }
+        input: SiteRevisionDataFetcherInput,
+        params: { spaceId: string; path: string; metadata: boolean; cachedMetadata: boolean }
     ) => {
         'use cache';
-        return wrapDataFetcherError(async () => {
-            const { siteRevision } = input;
-            if (!siteRevision) {
-                throw new Error('A site revision is required to read content at it');
-            }
-            const { organizationId, siteId, siteRevisionId } = siteRevision;
-            const path = `/orgs/${organizationId}/sites/${siteId}/revisions/${siteRevisionId}/${params.path}`;
+        return fetchAtSiteRevision(
+            input,
+            `getPageByPathAtSiteRevision(${params.spaceId}, ${params.path})`,
+            (api, { organizationId, siteId, siteRevisionId }) =>
+                api.orgs.getPageByPathInSiteRevision(
+                    organizationId,
+                    siteId,
+                    siteRevisionId,
+                    params.spaceId,
+                    encodeURIComponent(params.path),
+                    { metadata: params.metadata, cachedMetadata: params.cachedMetadata },
+                    { ...noCacheFetchOptions }
+                )
+        );
+    }
+);
 
-            return trace(`getAtSiteRevision(${path})`, async () => {
-                const api = apiClient(input);
-                const res = await api.request<unknown>({
-                    path,
-                    method: 'GET',
-                    query: params.query,
-                    secure: true,
-                    format: 'json',
-                    ...noCacheFetchOptions,
-                });
-                cacheTag(...getCacheTagsFromResponse(res));
-                cacheLife('max');
-                return res.data;
-            });
+const getPageMarkdownAtSiteRevision = cache(
+    async (input: SiteRevisionDataFetcherInput, params: { spaceId: string; pageId: string }) => {
+        'use cache';
+        return wrapDataFetcherError(async () => {
+            return trace(
+                `getPageMarkdownAtSiteRevision(${params.spaceId}, ${params.pageId})`,
+                async () => {
+                    const { organizationId, siteId, siteRevisionId } = input.siteRevision;
+                    const res = await apiClient(input).orgs.getPageInSiteRevision(
+                        organizationId,
+                        siteId,
+                        siteRevisionId,
+                        params.spaceId,
+                        params.pageId,
+                        {
+                            format: 'markdown',
+                            'format.markdown.refs': 'stable',
+                            evaluated: 'deterministic-only',
+                            metadata: false,
+                        },
+                        { ...noCacheFetchOptions }
+                    );
+                    cacheTag(...getCacheTagsFromResponse(res));
+                    cacheLife('max');
+
+                    if (!('markdown' in res.data)) {
+                        throw new DataFetcherError('Page is not a document', 404);
+                    }
+                    return res.data.markdown;
+                }
+            );
         });
     }
 );
+
+const getPageDocumentAtSiteRevision = cache(
+    async (input: SiteRevisionDataFetcherInput, params: { spaceId: string; pageId: string }) => {
+        'use cache';
+        return fetchAtSiteRevision(
+            input,
+            `getPageDocumentAtSiteRevision(${params.spaceId}, ${params.pageId})`,
+            (api, { organizationId, siteId, siteRevisionId }) =>
+                api.orgs.getPageDocumentInSiteRevision(
+                    organizationId,
+                    siteId,
+                    siteRevisionId,
+                    params.spaceId,
+                    params.pageId,
+                    { evaluated: 'deterministic-only', dereferenced: 'reusable-contents' },
+                    { ...noCacheFetchOptions }
+                )
+        );
+    }
+);
+
+const getReusableContentDocumentAtSiteRevision = cache(
+    async (
+        input: SiteRevisionDataFetcherInput,
+        params: { spaceId: string; reusableContentId: string }
+    ) => {
+        'use cache';
+        return fetchAtSiteRevision(
+            input,
+            `getReusableContentDocumentAtSiteRevision(${params.spaceId}, ${params.reusableContentId})`,
+            (api, { organizationId, siteId, siteRevisionId }) =>
+                api.orgs.getReusableContentDocumentInSiteRevision(
+                    organizationId,
+                    siteId,
+                    siteRevisionId,
+                    params.spaceId,
+                    params.reusableContentId,
+                    { evaluated: 'deterministic-only' },
+                    { ...noCacheFetchOptions }
+                )
+        );
+    }
+);
+
+const listPageMetaLinksAtSiteRevision = cache(
+    async (input: SiteRevisionDataFetcherInput, params: { spaceId: string; pageId: string }) => {
+        'use cache';
+        return fetchAtSiteRevision(
+            input,
+            `listPageMetaLinksAtSiteRevision(${params.spaceId}, ${params.pageId})`,
+            (api, { organizationId, siteId, siteRevisionId }) =>
+                api.orgs.listPageMetaLinksInSiteRevision(
+                    organizationId,
+                    siteId,
+                    siteRevisionId,
+                    params.spaceId,
+                    params.pageId,
+                    { ...noCacheFetchOptions }
+                )
+        );
+    }
+);
+
+const getOpenAPISpecContentAtSiteRevision = cache(
+    async (input: SiteRevisionDataFetcherInput, params: { slug: string }) => {
+        'use cache';
+        return fetchAtSiteRevision(
+            input,
+            `getOpenAPISpecContentAtSiteRevision(${params.slug})`,
+            (api, { organizationId, siteId, siteRevisionId }) =>
+                api.orgs.getOpenApiSpecContentInSiteRevision(
+                    organizationId,
+                    siteId,
+                    siteRevisionId,
+                    params.slug,
+                    { ...noCacheFetchOptions }
+                )
+        );
+    }
+);
+
+/**
+ * Fetch from an endpoint at a site revision. What a site revision pins never changes, so the
+ * response is cached forever.
+ */
+function fetchAtSiteRevision<T>(
+    input: SiteRevisionDataFetcherInput,
+    name: string,
+    request: (
+        api: ReturnType<typeof apiClient>,
+        siteRevision: SiteRevisionDataFetcherInput['siteRevision']
+    ) => Promise<HttpResponse<T, unknown>>
+): Promise<DataFetcherResponse<T>> {
+    return wrapDataFetcherError(async () => {
+        return trace(name, async () => {
+            const res = await request(apiClient(input), input.siteRevision);
+            cacheTag(...getCacheTagsFromResponse(res));
+            cacheLife('max');
+            return res.data;
+        });
+    });
+}
 
 /**
  * Infer the cache life from the api response headers.
