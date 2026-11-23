@@ -141,7 +141,6 @@ function useSearchKeyboardNavigation(props: {
     requestKey: string;
     flush: () => void;
     resultsRef: React.RefObject<SearchResultsRef | null>;
-    abort: () => void;
     askCount: number;
     onAskSelect: (index: number) => void;
 }) {
@@ -154,7 +153,6 @@ function useSearchKeyboardNavigation(props: {
         requestKey,
         flush,
         resultsRef,
-        abort,
         askCount,
         onAskSelect,
     } = props;
@@ -190,8 +188,6 @@ function useSearchKeyboardNavigation(props: {
                 }
 
                 if (resultsRef.current?.select()) {
-                    // Stop any in-flight search request only when activating a result.
-                    abort();
                     return;
                 }
 
@@ -207,7 +203,6 @@ function useSearchKeyboardNavigation(props: {
             results.length,
             onAskSelect,
             resultsRef,
-            abort,
             query,
             fetching,
             requestKey,
@@ -229,13 +224,11 @@ function useSearchKeyboardNavigation(props: {
         }
         pendingOpenRef.current = null;
         if (results.length > 0) {
-            if (resultsRef.current?.selectFirst()) {
-                abort();
-            }
+            resultsRef.current?.selectFirst();
         } else if (!error && askCount > 0) {
             onAskSelect(0);
         }
-    }, [isOpen, requestKey, fetching, error, results, resultsRef, abort, askCount, onAskSelect]);
+    }, [isOpen, requestKey, fetching, error, results, resultsRef, askCount, onAskSelect]);
 
     return {
         cursor,
@@ -379,9 +372,10 @@ export function useSearchController(
     const selectedSection = state?.section ? findSearchSection(sections, state.section) : undefined;
 
     const { consumeImmediate, flushRef, inputHandlers } = useSearchInputIntent();
-    const { results, fetching, error, requestKey, flush, abort } = useSearchResults({
+    const { results, resultsQuery, fetching, error, requestKey, flush, abort } = useSearchResults({
         asEmbeddable,
-        disabled: options.requestsEnabled === false || !(normalizedQuery || withAI),
+        disabled: options.requestsEnabled === false || showAsk || !(normalizedQuery || withAI),
+        retainPreviousResults: Boolean(state?.open),
         query: normalizedQuery,
         siteSpaceId: siteSpace.id,
         siteSpaceIds,
@@ -442,7 +436,6 @@ export function useSearchController(
         requestKey,
         flush,
         resultsRef,
-        abort,
         askCount,
         onAskSelect: askInAssistant,
     });
@@ -463,6 +456,7 @@ export function useSearchController(
         query: normalizedQuery,
         results,
         resultsId: searchResultsId,
+        resultsQuery,
         resultsRef,
         searchValue,
         setQuery,

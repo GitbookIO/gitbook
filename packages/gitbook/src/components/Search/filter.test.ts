@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test';
 
-import { computeFilterSiteSpaceIds, filterResultsBySiteSpaces } from './filter';
+import { computeFilterSiteSpaceIds, getDisplayedSearchResults } from './filter';
 import type { OrderedComputedResult } from './search-types';
 
 describe('computeFilterSiteSpaceIds', () => {
@@ -36,7 +36,7 @@ describe('computeFilterSiteSpaceIds', () => {
     });
 });
 
-describe('filterResultsBySiteSpaces', () => {
+describe('getDisplayedSearchResults', () => {
     const page = (id: string, siteSpaceId?: string): OrderedComputedResult => ({
         type: 'page',
         id,
@@ -52,7 +52,7 @@ describe('filterResultsBySiteSpaces', () => {
 
     it('keeps the server order and drops pages outside the scope', () => {
         const results = [page('a', 'current'), page('b', 'other'), page('c', 'current'), page('d')];
-        expect(filterResultsBySiteSpaces(results, ['current']).map((result) => result.id)).toEqual([
+        expect(getDisplayedSearchResults(results, ['current']).map((result) => result.id)).toEqual([
             'a',
             'c',
         ]);
@@ -60,6 +60,24 @@ describe('filterResultsBySiteSpaces', () => {
 
     it('returns every result when the scope is unrestricted', () => {
         const results = [page('b', 'other'), page('a', 'current')];
-        expect(filterResultsBySiteSpaces(results, undefined)).toBe(results);
+        expect(getDisplayedSearchResults(results, undefined)).toBe(results);
+    });
+
+    it('caps the displayed list after applying the site space filter', () => {
+        const pages = Array.from({ length: 10 }, (_, index) => page(`page-${index}`, 'current'));
+        const records = Array.from({ length: 11 }, (_, index): OrderedComputedResult => ({
+            type: 'record',
+            id: `record-${index}`,
+            title: `Record ${index}`,
+            description: undefined,
+            href: `/record-${index}`,
+            score: 1,
+        }));
+        const results = [page('hidden', 'other'), ...pages, ...records];
+
+        expect(getDisplayedSearchResults(results, ['current'])).toEqual([
+            ...pages,
+            ...records.slice(0, 10),
+        ]);
     });
 });

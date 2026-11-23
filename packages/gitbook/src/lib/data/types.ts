@@ -180,6 +180,7 @@ export interface GitBookDataFetcher {
         organizationId: string;
         siteId: string;
         query: string;
+        searchId?: string;
         scope:
             | { mode: 'all' }
             | {

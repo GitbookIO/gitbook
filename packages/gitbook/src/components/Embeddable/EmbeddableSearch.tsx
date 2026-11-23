@@ -2,6 +2,8 @@
 
 import React from 'react';
 
+import { SiteInsightsDisplayContext } from '@gitbook/api';
+
 import { useTrackEvent } from '../Insights';
 import { LinkContext } from '../primitives';
 import { useIsVisible } from '../VisibilityContext';
@@ -37,9 +39,10 @@ export function EmbeddableSearch(props: EmbeddableSearchProps) {
             return;
         }
 
-        trackEvent({
-            type: 'search_open',
-        });
+        trackEvent(
+            { type: 'search_open' },
+            { pageId: null, displayContext: SiteInsightsDisplayContext.Embed }
+        );
     }, [trackEvent, isVisible]);
 
     const tabsRef = React.useRef<HTMLDivElement>(null);
@@ -56,6 +59,7 @@ export function EmbeddableSearch(props: EmbeddableSearchProps) {
         query,
         results,
         resultsId,
+        resultsQuery,
         resultsRef,
         searchValue,
         setQuery,
@@ -79,6 +83,7 @@ export function EmbeddableSearch(props: EmbeddableSearchProps) {
                 query={query}
                 results={results}
                 resultsId={resultsId}
+                resultsQuery={resultsQuery}
                 resultsRef={resultsRef}
                 onResultSelect={onResultSelect}
                 onResultHover={onResultHover}
