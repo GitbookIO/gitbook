@@ -140,7 +140,7 @@ export function createSearchPassStore(directSearch: DirectSearchProps | undefine
             return waitForCooldown(state, signal);
         }
         if (state.status !== 'ready') {
-            return { type: 'route', reason: state.reason };
+            return { type: 'route', reason: state.reason === '401' ? undefined : state.reason };
         }
         if (query.length <= 1) {
             return { type: 'results', results: [] };
