@@ -24,27 +24,26 @@ export async function handleMcpRequest(
     requestURL.search = rawRequest.nextUrl.search;
     const request = new Request(requestURL, rawRequest);
 
-    // Connecting, listing tools and notifications are protocol overhead, several requests per
-    // client session: only tool calls count as usage.
-    if (await isToolCallRequest(request)) {
-        trackMcpEvent({
-            organizationId: context.organizationId,
-            siteId: context.site.id,
-            events: [
-                {
-                    type: 'mcp_request',
-                    location: {
-                        displayContext: SiteInsightsDisplayContext.Server,
-                    },
-                },
-            ],
-            request,
-        });
-    }
-
     const mcpHandler = createMcpHandler(
         (server) => {
-            registerSiteMcpTools(server, createSiteMcpTools(context, { request }));
+            registerSiteMcpTools(server, createSiteMcpTools(context, { request }), {
+                // Connecting, listing tools and notifications are protocol overhead, several
+                // requests per client session: only tool calls count as usage.
+                onToolCall: () =>
+                    trackMcpEvent({
+                        organizationId: context.organizationId,
+                        siteId: context.site.id,
+                        events: [
+                            {
+                                type: 'mcp_request',
+                                location: {
+                                    displayContext: SiteInsightsDisplayContext.Server,
+                                },
+                            },
+                        ],
+                        request,
+                    }),
+            });
         },
         {
             // The same identity the server card republishes, so the card and the handshake agree.
@@ -60,30 +59,4 @@ export async function handleMcpRequest(
     );
 
     return mcpHandler(request);
-}
-
-/**
- * Whether the request carries a JSON-RPC `tools/call`. Reads a clone so the transport still gets
- * the body.
- */
-async function isToolCallRequest(request: Request): Promise<boolean> {
-    if (request.method !== 'POST') {
-        return false;
-    }
-
-    let body: unknown;
-    try {
-        body = await request.clone().json();
-    } catch {
-        return false;
-    }
-
-    const messages = Array.isArray(body) ? body : [body];
-    return messages.some(
-        (message) =>
-            typeof message === 'object' &&
-            message !== null &&
-            'method' in message &&
-            message.method === 'tools/call'
-    );
 }
