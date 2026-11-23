@@ -56,6 +56,7 @@ export function EmbeddableSearch(props: EmbeddableSearchProps) {
         query,
         results,
         resultsId,
+        resultsQuery,
         resultsRef,
         searchValue,
         setQuery,
@@ -79,6 +80,7 @@ export function EmbeddableSearch(props: EmbeddableSearchProps) {
                 query={query}
                 results={results}
                 resultsId={resultsId}
+                resultsQuery={resultsQuery}
                 resultsRef={resultsRef}
                 onResultSelect={onResultSelect}
                 onResultHover={onResultHover}

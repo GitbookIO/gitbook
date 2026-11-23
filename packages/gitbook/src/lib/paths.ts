@@ -76,3 +76,7 @@ export function getExtension(path: string): string {
 export function isGitBookInternalPath(path: string): boolean {
     return /(^|\/)~gitbook(\/|$)/.test(path);
 }
+
+export function hasRevisionSelector(path: string): boolean {
+    return /(?:^|\/)~\/revisions\/[^/]+/.test(path);
+}

@@ -17,9 +17,11 @@ export function useSearchResultsCursor(props: {
     }, [query]);
 
     React.useEffect(() => {
-        if (fetching && resultCount === 0) {
-            // Nothing is highlighted while results load, so Enter can't open the Ask row instead.
-            setCursor(null);
+        if (fetching) {
+            if (resultCount === 0) {
+                // Nothing is highlighted while results load, so Enter can't open the Ask row instead.
+                setCursor(null);
+            }
             return;
         }
 
