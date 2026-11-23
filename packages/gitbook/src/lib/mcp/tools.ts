@@ -93,6 +93,7 @@ export function createSiteMcpTools(
                         organizationId: context.organizationId,
                         siteId: site.id,
                         query,
+                        routeReason: 'mcp',
                         scope: getLanguageSearchScope(context.structure, searchLanguage),
                     })
                 );

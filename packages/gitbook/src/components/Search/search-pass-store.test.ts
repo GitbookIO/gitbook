@@ -87,6 +87,11 @@ describe('createSearchPassStore', () => {
             await new Promise((resolve) => setTimeout(resolve, 0));
             expect(await search(store)).toEqual({ type: 'results', results: [] });
             expect(authorizations).toEqual(sent);
+
+            const refresh = store.requestPass();
+            expect(await search(store)).toEqual({ type: 'route', reason: undefined });
+            await refresh;
+            expect(authorizations).toEqual(sent);
         }
     );
 
