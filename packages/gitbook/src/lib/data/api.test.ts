@@ -33,6 +33,7 @@ describe('searchSiteContent', () => {
             organizationId: 'org-1',
             siteId: 'site-1',
             query: 'test',
+            routeReason: 'fallback:403' as const,
             scope: { mode: 'all' as const },
         };
 
@@ -45,6 +46,9 @@ describe('searchSiteContent', () => {
             'https://api.example.com/cache/v1/orgs/org-1/sites/site-1/search'
         );
         expect(new Headers(init?.headers).get('authorization')).toBe('Bearer site-token');
+        expect(new Headers(init?.headers).get('x-gitbook-search-route-reason')).toBe(
+            'fallback:403'
+        );
         expect(cacheLife).not.toHaveBeenCalled();
         expect(cacheTag).not.toHaveBeenCalled();
     });
