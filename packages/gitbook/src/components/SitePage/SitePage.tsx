@@ -241,6 +241,7 @@ export async function generateSitePageMetadata(props: SitePageProps): Promise<Me
     return {
         title: getPageFullTitle(context, page),
         description: page.description ?? '',
+        keywords: page.keywords?.length ? page.keywords : undefined,
         alternates: {
             canonical,
             languages: alternates?.languages,
