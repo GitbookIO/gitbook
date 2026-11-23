@@ -10,6 +10,13 @@ export function isSiteMcpEnabled(context: GitBookSiteContext): boolean {
 }
 
 /**
+ * Absolute URL of the site's public MCP endpoint.
+ */
+export function getSiteMcpEndpoint(context: GitBookSiteContext): string {
+    return context.linker.toAbsoluteURL(context.linker.toPathInSite('~gitbook/mcp'));
+}
+
+/**
  * Whether `~gitbook/mcp` endpoint requires auth for the site (i.e VA site).
  */
 export function mcpEndpointRequiresAuth(context: GitBookSiteContext): boolean {

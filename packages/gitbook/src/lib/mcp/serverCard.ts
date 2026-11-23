@@ -2,7 +2,12 @@ import type { Implementation, ServerCapabilities, Tool } from '@modelcontextprot
 import { SUPPORTED_PROTOCOL_VERSIONS } from '@modelcontextprotocol/sdk/types.js';
 
 import packageJSON from '../../../package.json';
-import { hasAdaptiveMcpEndpoint, isSiteMcpEnabled, mcpEndpointRequiresAuth } from './endpoints';
+import {
+    getSiteMcpEndpoint,
+    hasAdaptiveMcpEndpoint,
+    isSiteMcpEnabled,
+    mcpEndpointRequiresAuth,
+} from './endpoints';
 import { type SiteMcpTool, createSiteMcpTools } from './tools';
 import type { GitBookSiteContext } from '@/lib/context';
 import { serveDiscoveryDocument } from '@/lib/discoveryDocument';
@@ -154,10 +159,6 @@ export function buildMcpServerInfo(context: GitBookSiteContext): SiteMcpServerIn
         title: buildTitle(context.site.title),
         version: MCP_SERVER_VERSION,
     };
-}
-
-export function getSiteMcpEndpoint(context: GitBookSiteContext): string {
-    return context.linker.toAbsoluteURL(context.linker.toPathInSite('~gitbook/mcp'));
 }
 
 /**
