@@ -793,7 +793,7 @@ async function searchSiteContent(
         return trace(
             `searchSiteContent(${params.organizationId}, ${params.siteId}, ${params.query})`,
             async () => {
-                const { organizationId, siteId, query, scope, searchId } = params;
+                const { organizationId, siteId, query, scope, searchId, routeReason } = params;
                 const api = apiClient(input);
                 const res = await api.orgs.searchSiteContent(
                     organizationId,
@@ -802,6 +802,7 @@ async function searchSiteContent(
                     {},
                     {
                         ...noCacheFetchOptions,
+                        headers: { 'x-gitbook-search-route-reason': routeReason },
                     }
                 );
                 return res.data.items;
