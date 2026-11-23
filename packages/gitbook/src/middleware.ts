@@ -10,7 +10,6 @@ import {
     ContentType,
     CustomizationDefaultThemeMode,
     CustomizationThemeMode,
-    type PublishedSiteContent,
     SiteInsightsDisplayContext,
     type SiteInsightsEventLocation,
     SiteInsightsLLMSVariant,
@@ -31,6 +30,7 @@ import { getContentSecurityPolicy } from '@/lib/csp';
 import { validateSerializedCustomization } from '@/lib/customization';
 import {
     DataFetcherError,
+    type PublishedSiteContent,
     apiClient,
     getVisitorAuthBasePath,
     lookupPublishedContentByUrl,
