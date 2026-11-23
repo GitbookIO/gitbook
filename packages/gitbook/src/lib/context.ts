@@ -57,8 +57,6 @@ export type SiteURLData = Pick<
     | 'site'
     | 'siteSpace'
     | 'space'
-    | 'revision'
-    | 'changeRequest'
     | 'shareKey'
     | 'siteSection'
     | 'siteBasePath'
@@ -66,6 +64,9 @@ export type SiteURLData = Pick<
     | 'contextId'
     | 'preview'
 > & {
+    revision?: string;
+    changeRequest?: string;
+
     /**
      * Identifier used for image resizing.
      */

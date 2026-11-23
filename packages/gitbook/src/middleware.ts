@@ -449,8 +449,14 @@ async function serveSiteRequest(requestURL: URL, request: NextRequest, match: UR
             basePath: siteURLData.basePath,
             space: siteURLData.space,
             organization: siteURLData.organization,
-            changeRequest: siteURLData.changeRequest,
-            revision: siteURLData.revision,
+            changeRequest:
+                'changeRequest' in siteURLData && typeof siteURLData.changeRequest === 'string'
+                    ? siteURLData.changeRequest
+                    : undefined,
+            revision:
+                'revision' in siteURLData && typeof siteURLData.revision === 'string'
+                    ? siteURLData.revision
+                    : undefined,
             shareKey: siteURLData.shareKey,
             preview: siteURLData.preview,
             apiToken: siteURLData.apiToken,
@@ -542,7 +548,7 @@ async function serveSiteRequest(requestURL: URL, request: NextRequest, match: UR
             events,
             isAiAgent,
             askVisitorAgent,
-        } = encodePathInSiteContent(siteURLData, request);
+        } = encodePathInSiteContent(siteURLData, request, stableSiteURLData.revision);
         routeType = routeTypeFromPathname ?? routeType;
         // Only set for markdown routes, so it becomes part of their static cache key.
         stableSiteURLData.isAiAgent = isAiAgent;
@@ -948,7 +954,8 @@ async function serveSearchPass(
  */
 function encodePathInSiteContent(
     siteURLData: PublishedSiteContent,
-    request: Request
+    request: Request,
+    revision: string | undefined
 ): {
     pathname: string;
     routeType?: 'static' | 'dynamic';
@@ -965,7 +972,7 @@ function encodePathInSiteContent(
         siteSpace: siteURLData.siteSpace,
         siteShareKey: siteURLData.shareKey,
         space: siteURLData.space,
-        revision: siteURLData.revision,
+        revision,
         displayContext: SiteInsightsDisplayContext.Server,
     };
 
