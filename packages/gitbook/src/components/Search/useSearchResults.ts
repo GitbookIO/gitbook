@@ -142,7 +142,7 @@ export function useSearchResults(props: {
             // We currently have a bug where the same question can be returned multiple times.
             // This is a workaround to avoid that.
             const questions = new Set<string>();
-            const recommendedQuestions: RecommendedQuestionResult[] = [];
+            let recommendedQuestions: RecommendedQuestionResult[] = [];
 
             if (suggestions && suggestions.length > 0) {
                 suggestions.forEach((question) => {
@@ -169,7 +169,10 @@ export function useSearchResults(props: {
                     }
 
                     questions.add(question);
-                    recommendedQuestions.push(createRecommendedQuestionResult(question, question));
+                    recommendedQuestions = [
+                        ...recommendedQuestions,
+                        createRecommendedQuestionResult(question, question),
+                    ];
                     cachedRecommendedQuestions.set(siteSpaceId, recommendedQuestions);
 
                     if (!cancelled) {
@@ -307,10 +310,11 @@ export function useSearchResults(props: {
             ? answer
             : undefined;
 
+    const streamedQuestions = cachedRecommendedQuestions.get(siteSpaceId);
     const results = React.useMemo<ResultType[]>(() => {
         if (!query) {
             const recommendedQuestions =
-                cachedRecommendedQuestions.get(siteSpaceId) ??
+                streamedQuestions ??
                 suggestions?.map((question, index) =>
                     createRecommendedQuestionResult(`recommended-question-${index}`, question)
                 ) ??
@@ -326,7 +330,15 @@ export function useSearchResults(props: {
         return visibleAnswer
             ? filterResultsBySiteSpaces(visibleAnswer.results, filterSiteSpaceIds)
             : [];
-    }, [visibleAnswer, query, filterSiteSpaceIds, withAI, siteSpaceId, suggestions, recentQueries]);
+    }, [
+        visibleAnswer,
+        query,
+        filterSiteSpaceIds,
+        withAI,
+        streamedQuestions,
+        suggestions,
+        recentQueries,
+    ]);
 
     return {
         results,
