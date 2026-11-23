@@ -10,7 +10,6 @@ import {
     ContentType,
     CustomizationDefaultThemeMode,
     CustomizationThemeMode,
-    type PublishedSiteContent,
     SiteInsightsDisplayContext,
     type SiteInsightsEventLocation,
     SiteInsightsLLMSVariant,
@@ -31,6 +30,7 @@ import { getContentSecurityPolicy } from '@/lib/csp';
 import { validateSerializedCustomization } from '@/lib/customization';
 import {
     DataFetcherError,
+    type PublishedSiteContent,
     apiClient,
     getVisitorAuthBasePath,
     lookupPublishedContentByUrl,
@@ -449,14 +449,8 @@ async function serveSiteRequest(requestURL: URL, request: NextRequest, match: UR
             basePath: siteURLData.basePath,
             space: siteURLData.space,
             organization: siteURLData.organization,
-            changeRequest:
-                'changeRequest' in siteURLData && typeof siteURLData.changeRequest === 'string'
-                    ? siteURLData.changeRequest
-                    : undefined,
-            revision:
-                'revision' in siteURLData && typeof siteURLData.revision === 'string'
-                    ? siteURLData.revision
-                    : undefined,
+            changeRequest: siteURLData.changeRequest,
+            revision: siteURLData.revision,
             shareKey: siteURLData.shareKey,
             preview: siteURLData.preview,
             apiToken: siteURLData.apiToken,
@@ -548,7 +542,7 @@ async function serveSiteRequest(requestURL: URL, request: NextRequest, match: UR
             events,
             isAiAgent,
             askVisitorAgent,
-        } = encodePathInSiteContent(siteURLData, request, stableSiteURLData.revision);
+        } = encodePathInSiteContent(siteURLData, request);
         routeType = routeTypeFromPathname ?? routeType;
         // Only set for markdown routes, so it becomes part of their static cache key.
         stableSiteURLData.isAiAgent = isAiAgent;
@@ -954,8 +948,7 @@ async function serveSearchPass(
  */
 function encodePathInSiteContent(
     siteURLData: PublishedSiteContent,
-    request: Request,
-    revision: string | undefined
+    request: Request
 ): {
     pathname: string;
     routeType?: 'static' | 'dynamic';
@@ -972,7 +965,7 @@ function encodePathInSiteContent(
         siteSpace: siteURLData.siteSpace,
         siteShareKey: siteURLData.shareKey,
         space: siteURLData.space,
-        revision,
+        revision: siteURLData.revision,
         displayContext: SiteInsightsDisplayContext.Server,
     };
 

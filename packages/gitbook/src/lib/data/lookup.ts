@@ -1,4 +1,4 @@
-import type { GitBookAPI, PublishedSiteContentLookup, SiteVisitorPayload } from '@gitbook/api';
+import type * as API from '@gitbook/api';
 
 import { apiClient } from './api';
 import { getExposableError } from './errors';
@@ -8,13 +8,16 @@ import { tryCatch } from '@/lib/async';
 import { isPreviewRequest } from '@/lib/preview';
 import { trace } from '@/lib/tracing';
 
-type ResolveBody = Parameters<GitBookAPI['urls']['resolvePublishedContentByUrl']>[0];
+type ResolveBody = Parameters<API.GitBookAPI['urls']['resolvePublishedContentByUrl']>[0];
+
+export type PublishedSiteContent = API.PublishedSiteContent &
+    Partial<API.PublishedSiteContentAtRevision & API.PublishedSiteContentInChangeRequest>;
 
 interface LookupPublishedContentByUrlInput {
     url: string;
     redirectOnError: boolean;
     apiToken: string | null;
-    visitorPayload: SiteVisitorPayload;
+    visitorPayload: API.SiteVisitorPayload;
 }
 
 /**
@@ -22,7 +25,7 @@ interface LookupPublishedContentByUrlInput {
  */
 export async function lookupPublishedContentByUrl(
     input: LookupPublishedContentByUrlInput
-): Promise<DataFetcherResponse<PublishedSiteContentLookup>> {
+): Promise<DataFetcherResponse<PublishedSiteContent | API.PublishedContentRedirect>> {
     const lookupURL = new URL(input.url);
     const lookup = getURLLookup(stripURLSearch(lookupURL));
 
@@ -61,7 +64,11 @@ export async function lookupPublishedContentByUrl(
         data: { data },
     } = callResult;
 
-    if ('redirect' in data && data.target === 'application' && isPreviewRequest(lookupURL)) {
+    if (!('redirect' in data)) {
+        return { data };
+    }
+
+    if (data.target === 'application' && isPreviewRequest(lookupURL)) {
         // The cached lookup omits the query params needed after login.
         const redirect = new URL(data.redirect);
         redirect.searchParams.set('redirect', lookupURL.toString());
