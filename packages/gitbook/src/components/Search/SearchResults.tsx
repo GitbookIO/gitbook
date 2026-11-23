@@ -72,7 +72,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
 
     const language = useLanguage();
     const { siteSpaceId } = useCurrentContent();
-    const shouldAnimateResults = !query || fetching;
+    const shouldAnimateResults = !query;
     const previousCursor = React.useRef<number | null>(cursor);
     const seenResultKeys = React.useRef(new Set<string>());
     const lastQuery = React.useRef(query);
@@ -228,9 +228,8 @@ export const SearchResults = React.forwardRef(function SearchResults(
                                 // users should keep their place in it.
                                 if (navigatesCurrentWindow(event)) {
                                     event.currentTarget.blur();
+                                    onResultSelect?.();
                                 }
-
-                                onResultSelect?.();
                             };
                             const resultItemProps = {
                                 'aria-posinset': index + 1,
@@ -359,15 +358,11 @@ export const SearchResults = React.forwardRef(function SearchResults(
                     {!fetching && results.length === 0 ? noResults : null}
                 </>
             )}
-            {fetching ? (
+            {fetching && results.length === 0 ? (
                 <div
                     role="status"
                     aria-busy="true"
-                    className={tcls(
-                        results.length > 0 ? 'mt-1' : '',
-                        'flex flex-col gap-1',
-                        'animate-[fadeIn_150ms_ease-out_both,pulse_2.4s_ease-in-out_600ms_infinite] motion-reduce:animate-none'
-                    )}
+                    className="flex animate-[fadeIn_150ms_ease-out_both,pulse_2.4s_ease-in-out_600ms_infinite] flex-col gap-1 motion-reduce:animate-none"
                 >
                     <SearchResultsPlaceholder />
                 </div>
