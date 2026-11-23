@@ -30,10 +30,10 @@ export function computeFilterSiteSpaceIds(
 }
 
 /** Keep the server's order, dropping pages owned by a site space outside the scope. */
-export function filterResultsBySiteSpaces(
-    results: OrderedComputedResult[],
+export function filterResultsBySiteSpaces<Result extends OrderedComputedResult>(
+    results: Result[],
     allowedSiteSpaceIds: string[] | undefined
-): OrderedComputedResult[] {
+): Result[] {
     if (!allowedSiteSpaceIds) {
         return results;
     }

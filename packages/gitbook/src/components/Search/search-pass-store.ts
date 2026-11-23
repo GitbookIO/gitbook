@@ -124,11 +124,12 @@ export function createSearchPassStore(directSearch: DirectSearchProps | undefine
 
     const search = async (input: {
         query: string;
+        searchId?: string;
         scope: SearchSiteContentScope;
         signal: AbortSignal;
         asEmbeddable: boolean;
     }): Promise<DirectSearchOutcome> => {
-        const { query, scope, signal, asEmbeddable } = input;
+        const { query, searchId, scope, signal, asEmbeddable } = input;
         if (!directSearch) {
             return { type: 'route' };
         }
@@ -163,7 +164,7 @@ export function createSearchPassStore(directSearch: DirectSearchProps | undefine
                     Authorization: `Bearer ${token}`,
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(toSearchSiteContentBody(query, scope)),
+                body: JSON.stringify(toSearchSiteContentBody(query, scope, searchId)),
                 credentials: 'omit',
                 signal: request.signal,
             });
