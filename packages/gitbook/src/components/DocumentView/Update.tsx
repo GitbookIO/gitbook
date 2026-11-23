@@ -75,7 +75,7 @@ export function Update(props: BlockProps<DocumentBlockUpdate>) {
                 {...contextProps}
                 nodes={block.nodes}
                 ancestorBlocks={[...ancestorBlocks, block]}
-                style="flex flex-1 flex-col [&>*+*]:mt-5 [&>*:first-child]:!pt-0"
+                style="flex min-w-0 flex-1 flex-col [&>*+*]:mt-5 [&>*:first-child]:!pt-0"
             />
         </FilteredUpdate>
     );
