@@ -51,7 +51,7 @@ import {
     isOAuthProtectedResourceMetadataRequestForAuthEndpoint,
     isOAuthProtectedResourceRequest,
 } from '@/lib/oauth-protected';
-import { removeLeadingSlash, removeTrailingSlash } from '@/lib/paths';
+import { hasRevisionSelector, removeLeadingSlash, removeTrailingSlash } from '@/lib/paths';
 import {
     getPreviewCookieResponse,
     getPreviewRequestIdentifier,
@@ -84,6 +84,8 @@ export const config = {
 };
 
 type URLWithMode = { url: URL; mode: 'url' | 'url-host' };
+
+const REVISION_ROBOTS_TAG = 'noindex, nofollow';
 
 export async function middleware(request: NextRequest) {
     try {
@@ -168,6 +170,20 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         return null;
     }
 
+    const response = await serveSiteRequest(requestURL, request, match);
+    if (
+        response &&
+        hasRevisionSelector(match.url.pathname) &&
+        !response.headers.has('x-robots-tag')
+    ) {
+        const revisionResponse = new Response(response.body, response);
+        revisionResponse.headers.set('x-robots-tag', REVISION_ROBOTS_TAG);
+        return revisionResponse;
+    }
+    return response;
+}
+
+async function serveSiteRequest(requestURL: URL, request: NextRequest, match: URLWithMode) {
     const { url: siteRequestURL, mode } = match;
 
     if (isAITrainingOrIndexingRequest(request)) {
@@ -180,6 +196,13 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
     // Normalize URL after extracting the URL from the request to make sure the client is redirected to the proper one
     const normalization = normalizeRequestURL(siteRequestURL, mode);
     if (normalization instanceof Response) {
+        const location = normalization.headers.get('location');
+        if (location && hasRevisionSelector(new URL(location).pathname)) {
+            return NextResponse.redirect(location, {
+                status: normalization.status,
+                headers: { 'x-robots-tag': REVISION_ROBOTS_TAG },
+            });
+        }
         return normalization;
     }
     const isNormalizedURL = normalization.isNormalized;
@@ -622,6 +645,8 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         // noindex search/assistant deep links, kept crawlable so Google sees the directive.
         if (rewrittenURL.searchParams.has('ask') || rewrittenURL.searchParams.has('q')) {
             response.headers.set('x-robots-tag', 'none');
+        } else if (hasRevisionSelector(siteURLData.basePath)) {
+            response.headers.set('x-robots-tag', REVISION_ROBOTS_TAG);
         }
 
         // Allow cross-origin requests from the same parent domain as the site.

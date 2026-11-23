@@ -1,6 +1,6 @@
 import { describe, expect, it, mock } from 'bun:test';
 
-import type { RevisionPageDocument } from '@gitbook/api';
+import { type RevisionPageDocument, SiteVisibility } from '@gitbook/api';
 
 import type { GitBookSiteContext } from '@/lib/context';
 import { createLinker } from '@/lib/links';
@@ -26,7 +26,7 @@ function createContext(options: {
     return {
         displayAgentInstructions: false,
         organizationId: 'org-1',
-        site: { id: 'site-1' },
+        site: { id: 'site-1', visibility: SiteVisibility.Public },
         siteSpace: { id: 'site-space-1' },
         space: { id: 'space-1', revision: 'revision-1' },
         revisionId: 'revision-1',
@@ -64,6 +64,23 @@ describe('servePageMarkdown', () => {
         expect(await response.text()).toContain(
             '[Read this page](https://docs.example.com/docs/new-page.md)'
         );
+    });
+
+    it('serves the current revision by selector with a noindex header for AI agents', async () => {
+        const context = createContext({});
+        const response = await servePageMarkdown(
+            {
+                ...context,
+                isAiAgent: true,
+                linker: context.linker.fork({
+                    spaceBasePath: `/docs/~/revisions/${context.revisionId}/`,
+                }),
+            },
+            'new-page'
+        );
+
+        expect(response.status).toBe(200);
+        expect(response.headers.get('X-Robots-Tag')).toBe('noindex, nofollow');
     });
 
     it('redirects to the markdown version of a site redirect target', async () => {
