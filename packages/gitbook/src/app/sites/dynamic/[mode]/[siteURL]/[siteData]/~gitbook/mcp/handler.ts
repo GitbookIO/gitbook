@@ -24,23 +24,26 @@ export async function handleMcpRequest(
     requestURL.search = rawRequest.nextUrl.search;
     const request = new Request(requestURL, rawRequest);
 
-    trackMcpEvent({
-        organizationId: context.organizationId,
-        siteId: context.site.id,
-        events: [
-            {
-                type: 'mcp_request',
-                location: {
-                    displayContext: SiteInsightsDisplayContext.Server,
-                },
-            },
-        ],
-        request,
-    });
-
     const mcpHandler = createMcpHandler(
         (server) => {
-            registerSiteMcpTools(server, createSiteMcpTools(context, { request }));
+            registerSiteMcpTools(server, createSiteMcpTools(context, { request }), {
+                // Connecting, listing tools and notifications are protocol overhead, several
+                // requests per client session: only tool calls count as usage.
+                onToolCall: () =>
+                    trackMcpEvent({
+                        organizationId: context.organizationId,
+                        siteId: context.site.id,
+                        events: [
+                            {
+                                type: 'mcp_request',
+                                location: {
+                                    displayContext: SiteInsightsDisplayContext.Server,
+                                },
+                            },
+                        ],
+                        request,
+                    }),
+            });
         },
         {
             // The same identity the server card republishes, so the card and the handshake agree.
