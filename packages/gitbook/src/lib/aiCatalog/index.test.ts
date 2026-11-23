@@ -24,6 +24,7 @@ function makeContext(
         siteId?: string;
         visibility?: SiteVisibility;
         pageActions?: CustomizationPageActionType[];
+        mcpEnabled?: boolean;
     } = {}
 ): GitBookSiteContext {
     const {
@@ -32,11 +33,16 @@ function makeContext(
         siteId = 'site_123',
         visibility = SiteVisibility.Public,
         pageActions = [CustomizationPageActionType.Mcp],
+        mcpEnabled,
     } = options;
 
     return {
         site: { id: siteId, title: 'Acme', visibility },
-        customization: { pageActions: { items: pageActions } },
+        customization: {
+            pageActions: { items: pageActions },
+            // DO NOT MERGE - mocking type for development
+            ...(mcpEnabled === undefined ? {} : { mcp: { enabled: mcpEnabled } }),
+        },
         linker: createLinker({ host, siteBasePath, spaceBasePath: siteBasePath }),
     } as unknown as GitBookSiteContext;
 }
@@ -159,6 +165,14 @@ describe('serveSiteAiCatalog', () => {
             expect(res.headers.get('cache-control')).toBe('no-store');
         }
     );
+
+    it('does not advertise the MCP server when the page action is off', () => {
+        expect(buildSiteAiCatalog(makeContext({ mcpEnabled: true, pageActions: [] }))).toBeNull();
+    });
+
+    it('does not advertise the MCP server when the endpoint is off', () => {
+        expect(buildSiteAiCatalog(makeContext({ mcpEnabled: false }))).toBeNull();
+    });
 
     it('does not serve a catalog when there is nothing to advertise', async () => {
         const res = await serveSiteAiCatalog(makeContext({ pageActions: [] }), catalogRequest());

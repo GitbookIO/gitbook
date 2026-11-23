@@ -1,6 +1,6 @@
 import type { GitBookSiteContext } from '@/lib/context';
 import { serveDiscoveryDocument } from '@/lib/discoveryDocument';
-import { isSiteMcpEnabled } from '@/lib/mcp/endpoints';
+import { isMcpPageActionEnabled } from '@/lib/mcp/endpoints';
 import { MCP_SERVER_CARD_PATH } from '@/lib/mcp/paths';
 import { SERVER_CARD_MEDIA_TYPE } from '@/lib/mcp/serverCard';
 
@@ -45,7 +45,7 @@ export function buildSiteAiCatalog(context: GitBookSiteContext): AiCatalog | nul
 
     const entries: AiCatalogEntry[] = [];
 
-    if (isSiteMcpEnabled(context)) {
+    if (isMcpPageActionEnabled(context)) {
         entries.push({
             identifier: buildCatalogIdentifier(context, 'mcp', site.id),
             type: SERVER_CARD_MEDIA_TYPE,
