@@ -8,6 +8,7 @@ import {
     isSiteMcpEnabled,
     mcpEndpointRequiresAuth,
 } from './endpoints';
+import { SITE_MCP_SERVER_NAME_MAX_ADDED_LENGTH, getSiteMcpServerName } from './naming';
 import { type SiteMcpTool, createSiteMcpTools } from './tools';
 import type { GitBookSiteContext } from '@/lib/context';
 import { serveDiscoveryDocument } from '@/lib/discoveryDocument';
@@ -224,7 +225,8 @@ function authorizationHeader(description: string): SiteMcpServerCardRemote['head
  * Name the server after the site it serves, within the 100 characters the schema allows a `title`.
  */
 function buildTitle(siteTitle: string): string {
-    return `${truncate(siteTitle, MAX_TEXT_LENGTH - TITLE_SUFFIX.length)}${TITLE_SUFFIX}`;
+    const budget = MAX_TEXT_LENGTH - TITLE_SUFFIX.length - SITE_MCP_SERVER_NAME_MAX_ADDED_LENGTH;
+    return `${getSiteMcpServerName(truncate(siteTitle, budget))}${TITLE_SUFFIX}`;
 }
 
 /**
