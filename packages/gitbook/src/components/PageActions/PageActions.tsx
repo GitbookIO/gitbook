@@ -15,6 +15,7 @@ import { Button } from '@/components/primitives/Button';
 import { DropdownMenuItem, useDropdownMenuClose } from '@/components/primitives/DropdownMenu';
 import { getURLForLLM } from '@/components/utils';
 import { tString, useLanguage } from '@/intl/client';
+import { getSiteMcpServerName } from '@/lib/mcp/naming';
 
 type PageActionType = 'button' | 'dropdown-menu-item';
 
@@ -296,7 +297,7 @@ export function ActionOpenMCP(props: {
     const providerInfo = React.useMemo<{ label: string; icon: IconName; url: string }>(() => {
         switch (provider) {
             case 'vscode': {
-                const vscodeConfig = { name: siteTitle, url: mcpURL };
+                const vscodeConfig = { name: getSiteMcpServerName(siteTitle), url: mcpURL };
                 return {
                     label: 'VSCode',
                     icon: 'vscode',
@@ -332,7 +333,7 @@ export function ActionCopyMCPCommand(props: {
     const language = useLanguage();
 
     const slug =
-        siteTitle
+        getSiteMcpServerName(siteTitle)
             .toLowerCase()
             .replace(/[^a-z0-9]+/g, '-')
             .replace(/^-|-$/g, '') || 'docs';
