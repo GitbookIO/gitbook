@@ -8,7 +8,7 @@ import {
     createRecommendedQuestionResult,
     getEmptySearchResults,
 } from './empty-search-results';
-import { computeFilterSiteSpaceIds, filterResultsBySiteSpaces } from './filter';
+import { computeFilterSiteSpaceIds, getDisplayedSearchResults } from './filter';
 import { useRecentSearchQueries } from './recent-queries';
 import { computeRemoteSearchScope } from './remote-scope';
 import { SEARCH_FALLBACK_HEADER, type SearchPassStore } from './search-pass-store';
@@ -287,7 +287,7 @@ export function useSearchResults(props: {
         }
 
         return remoteState.status === 'ready' && remoteState.requestKey === requestKey
-            ? filterResultsBySiteSpaces(remoteState.results, filterSiteSpaceIds)
+            ? getDisplayedSearchResults(remoteState.results, filterSiteSpaceIds)
             : [];
     }, [
         remoteState,
