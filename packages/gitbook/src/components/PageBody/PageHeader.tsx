@@ -139,8 +139,7 @@ export async function PageHeader(props: {
     // Show page actions if *any* of the configured actions are enabled, or if the RSS feed is
     // available. RSS is contextual (only on update/blog index pages) and is not part of the
     // configured `items` list, so it is checked separately.
-    const hasPageActions =
-        pageActionsEnabled && (hasConfiguredPageActions(context.customization) || withRSSFeed);
+    const hasPageActions = pageActionsEnabled && (hasConfiguredPageActions(context) || withRSSFeed);
 
     if (!page.layout.title && !page.layout.description && !hasPageActions) {
         return null;

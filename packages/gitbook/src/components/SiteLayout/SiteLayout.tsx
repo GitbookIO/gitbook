@@ -3,7 +3,7 @@ import Script from 'next/script';
 import React from 'react';
 import * as ReactDOM from 'react-dom';
 
-import { CustomizationDefaultThemeMode, CustomizationPageActionType } from '@gitbook/api';
+import { CustomizationDefaultThemeMode } from '@gitbook/api';
 
 import { AIContextProvider } from '../AI';
 import { LLMsTxtDirective } from './LLMsTxtDirective';
@@ -20,6 +20,7 @@ import { buildVersion } from '@/lib/build';
 import type { GitBookSiteContext } from '@/lib/context';
 import { GITBOOK_API_PUBLIC_URL, GITBOOK_ASSETS_URL, GITBOOK_ICONS_URL } from '@/lib/env';
 import { getResizedImageURL } from '@/lib/images';
+import { isMcpPageActionEnabled } from '@/lib/mcp/endpoints';
 import { removeTrailingSlash } from '@/lib/paths';
 import { isSiteIndexable } from '@/lib/seo';
 import { getOpenSearchURL } from '@/routes/opensearch';
@@ -127,7 +128,7 @@ export async function SiteLayout(props: {
                 </AIContextProvider>
 
                 <LoadIntegrations />
-                {customization.pageActions.items.includes(CustomizationPageActionType.Mcp) ? (
+                {isMcpPageActionEnabled(context) ? (
                     <WebMCP mcpURL={context.linker.toPathInSite('~gitbook/mcp')} />
                 ) : null}
                 {scripts.map(({ script }) =>

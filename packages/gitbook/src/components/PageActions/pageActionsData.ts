@@ -1,6 +1,7 @@
 import { CustomizationPageActionType, type RevisionPageDocument } from '@gitbook/api';
 
 import type { GitBookSiteContext } from '@/lib/context';
+import { isSiteMcpEnabled } from '@/lib/mcp/endpoints';
 
 const CONFIGURABLE_PAGE_ACTIONS = [
     CustomizationPageActionType.Assistant,
@@ -29,8 +30,14 @@ export function isPageActionEnabled(
  * Whether any of the configured page actions is enabled. The RSS feed is not part of them: it is
  * only offered on pages with an updates block.
  */
-export function hasConfiguredPageActions(customization: GitBookSiteContext['customization']) {
-    return CONFIGURABLE_PAGE_ACTIONS.some((type) => isPageActionEnabled(customization, type));
+export function hasConfiguredPageActions(context: Pick<GitBookSiteContext, 'customization'>) {
+    const { customization } = context;
+    return CONFIGURABLE_PAGE_ACTIONS.some((type) => {
+        if (type === CustomizationPageActionType.Mcp && !isSiteMcpEnabled(context)) {
+            return false;
+        }
+        return isPageActionEnabled(customization, type);
+    });
 }
 
 /**

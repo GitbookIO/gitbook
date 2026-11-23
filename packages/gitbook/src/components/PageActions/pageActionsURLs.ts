@@ -8,7 +8,7 @@ import type { PageActionsDropdownURLs } from './PageActionsDropdown';
 import type { GitBookSiteContext } from '@/lib/context';
 import { getPageDocument } from '@/lib/data';
 import { hasTopLevelBlock } from '@/lib/document';
-import { hasAdaptiveMcpEndpoint } from '@/lib/mcp/endpoints';
+import { hasAdaptiveMcpEndpoint, isMcpPageActionEnabled } from '@/lib/mcp/endpoints';
 import { getPageRSSURL } from '@/routes/rss';
 
 /**
@@ -51,7 +51,7 @@ export async function getPageActionsURLs(
                   }).toString()}`
               )
             : undefined,
-        mcp: getPageActionsMCPURL(context),
+        mcp: isMcpPageActionEnabled(context) ? getPageActionsMCPURL(context) : undefined,
     };
 }
 

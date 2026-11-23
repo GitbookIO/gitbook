@@ -31,6 +31,7 @@ function makeContext(
         adaptiveContent?: boolean;
         aiMode?: CustomizationAIMode;
         pageActions?: CustomizationPageActionType[];
+        mcpEnabled?: boolean;
     } = {}
 ): GitBookSiteContext {
     const {
@@ -43,6 +44,7 @@ function makeContext(
         adaptiveContent = true,
         aiMode = CustomizationAIMode.Search,
         pageActions = [CustomizationPageActionType.Mcp],
+        mcpEnabled,
     } = options;
 
     return {
@@ -59,6 +61,8 @@ function makeContext(
         customization: {
             ai: { mode: aiMode },
             pageActions: { items: pageActions },
+            // DO NOT MERGE - mocking type for development
+            ...(mcpEnabled === undefined ? {} : { mcp: { enabled: mcpEnabled } }),
         },
         linker: createLinker({ host, siteBasePath, spaceBasePath }),
     } as unknown as GitBookSiteContext;
@@ -382,6 +386,29 @@ describe('serveSiteMcpServerCard', () => {
 
         const card = (await res.json()) as SiteMcpServerCard;
         expect(card.$schema).toBe(SERVER_CARD_SCHEMA_URL);
+    });
+
+    it.each([
+        {
+            scenario: 'the endpoint is on and the page action is off',
+            options: { mcpEnabled: true, pageActions: [] },
+            status: 200,
+        },
+        {
+            scenario: 'the endpoint is off and the page action is on',
+            options: { mcpEnabled: false },
+            status: 404,
+        },
+        { scenario: 'the setting is missing and the page action is on', options: {}, status: 200 },
+        {
+            scenario: 'the setting is missing and the page action is off',
+            options: { pageActions: [] },
+            status: 404,
+        },
+    ])('answers $status when $scenario', async ({ options, status }) => {
+        const res = await serveSiteMcpServerCard(makeContext(options), cardRequest());
+
+        expect(res.status).toBe(status);
     });
 
     it('answers a preflight with a 204', async () => {
