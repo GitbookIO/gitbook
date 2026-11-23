@@ -67,6 +67,15 @@ it(
     { timeout: 15_000 }
 );
 
+it('should refuse to open a notification stream', async () => {
+    const response = await fetch(getContentTestURL('https://gitbook.com/docs/~gitbook/mcp'), {
+        headers: { accept: 'text/event-stream' },
+    });
+
+    expect(response.status).toBe(405);
+    expect(response.headers.get('allow')).toBe('POST');
+});
+
 it(
     'should get a page from another site space through MCP',
     async () => {
