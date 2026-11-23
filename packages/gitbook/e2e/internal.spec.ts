@@ -443,6 +443,48 @@ const searchTestCases: Test[] = [
         },
     },
     {
+        name: 'Search - Enter opens the visible result while a new query loads',
+        url: `blocks/lists${getCustomizationURL({
+            ai: {
+                mode: CustomizationAIMode.None,
+            },
+        })}`,
+        screenshot: false,
+        run: async (page) => {
+            await waitForHydration(page);
+            const heldSearch = await holdSearchRequests(page);
+            const searchInput = page.getByTestId('search-input');
+            const searchPopup = page.getByTestId('search-popover');
+            await searchInput.focus();
+            await page.waitForURL(/[?&]q=/);
+            await searchInput.pressSequentially('gitbook');
+            const initialSearch = await heldSearch('gitbook');
+            const { siteSpaceId } = initialSearch.request().postDataJSON().scope;
+            const topResult = searchPageResult(
+                initialSearch,
+                siteSpaceId,
+                'Headings',
+                'blocks/headings'
+            );
+            await initialSearch.fulfill({ json: [topResult] });
+            const firstResult = searchPopup.getByTestId('search-page-result').first();
+            await expect(firstResult).toHaveAttribute('href', topResult.href);
+
+            await searchInput.pressSequentially(' docs');
+            const pendingSearch = await heldSearch('gitbook docs');
+            await expect(searchPopup.locator('output[aria-busy="true"]')).toBeVisible();
+            await expect(firstResult).toHaveAttribute('href', topResult.href);
+            await expect(searchPopup.locator('[data-search-placeholder-row]')).toHaveCount(0);
+
+            await searchInput.press('Enter');
+            await expect(searchPopup).toBeHidden();
+            await expect
+                .poll(() => new URL(page.url()).pathname)
+                .toBe(new URL(topResult.href, page.url()).pathname);
+            await pendingSearch.abort().catch(() => {});
+        },
+    },
+    {
         name: 'Search - Enter opens the result under the mouse',
         url: `blocks/lists${getCustomizationURL({
             ai: {
