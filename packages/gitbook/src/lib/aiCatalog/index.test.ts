@@ -13,9 +13,9 @@ import type { GitBookSiteContext } from '@/lib/context';
 import { createLinker } from '@/lib/links';
 
 /**
- * `urn:air:{publisher}:{namespace}:{name}`, per the AI Catalog specification.
+ * `urn:air:{publisher}:{name}[:{kind}]`, per the AI Catalog specification.
  */
-const AIR_URN_PATTERN = /^urn:air:[^:]+:[^:]+:[^:]+$/;
+const AIR_URN_PATTERN = /^urn:air:[^:]+:[^:]+(:[^:]+)?$/;
 
 function makeContext(
     options: {
@@ -49,7 +49,7 @@ describe('buildSiteAiCatalog', () => {
             specVersion: AI_CATALOG_SPEC_VERSION,
             entries: [
                 {
-                    identifier: 'urn:air:docs.acme.org:mcp:site_123',
+                    identifier: 'urn:air:docs.acme.org:site_123:mcp',
                     type: 'application/mcp-server-card+json',
                     url: 'https://docs.acme.org/~gitbook/mcp/server-card',
                 },
@@ -75,19 +75,19 @@ describe('buildSiteAiCatalog', () => {
         {
             scenario: 'a custom domain',
             options: { host: 'docs.acme.org', siteBasePath: '/' },
-            identifier: 'urn:air:docs.acme.org:mcp:site_123',
+            identifier: 'urn:air:docs.acme.org:site_123:mcp',
             url: 'https://docs.acme.org/~gitbook/mcp/server-card',
         },
         {
             scenario: 'a gitbook.io subdomain',
             options: { host: 'acme.gitbook.io', siteBasePath: '/' },
-            identifier: 'urn:air:acme.gitbook.io:mcp:site_123',
+            identifier: 'urn:air:acme.gitbook.io:site_123:mcp',
             url: 'https://acme.gitbook.io/~gitbook/mcp/server-card',
         },
         {
             scenario: 'a subpath site',
             options: { host: 'gitbook.com', siteBasePath: '/docs/' },
-            identifier: 'urn:air:gitbook.com:mcp:site_123',
+            identifier: 'urn:air:gitbook.com:site_123:mcp',
             url: 'https://gitbook.com/docs/~gitbook/mcp/server-card',
         },
     ])('anchors the entry to $scenario', ({ options, identifier, url }) => {
@@ -106,7 +106,7 @@ describe('buildSiteAiCatalog', () => {
         });
         const entry = buildSiteAiCatalog({ ...context, linker })?.entries[0];
 
-        expect(entry?.identifier).toBe('urn:air:localhost:mcp:site_123');
+        expect(entry?.identifier).toBe('urn:air:localhost:site_123:mcp');
         expect(entry?.identifier).toMatch(AIR_URN_PATTERN);
     });
 
