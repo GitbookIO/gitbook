@@ -8,21 +8,29 @@ import {
     createRecommendedQuestionResult,
     getEmptySearchResults,
 } from './empty-search-results';
-import { computeFilterSiteSpaceIds, filterResultsBySiteSpaces } from './filter';
+import { computeFilterSiteSpaceIds, getDisplayedSearchResults } from './filter';
 import { useRecentSearchQueries } from './recent-queries';
 import { computeRemoteSearchScope } from './remote-scope';
 import { SEARCH_FALLBACK_HEADER, type SearchPassStore } from './search-pass-store';
-import type { OrderedComputedResult, SearchSiteContentScope } from './search-types';
+import type {
+    OrderedComputedResult,
+    SearchResultSource,
+    SearchSiteContentScope,
+} from './search-types';
 import { streamRecommendedQuestions } from './server-actions';
 import { type SearchScope, useSearchPass } from './useSearch';
 import { useAI } from '@/components/AI';
 
-export type ResultType = OrderedComputedResult | RecommendedQuestionResult;
+export type ResultType = RemoteSearchResult | RecommendedQuestionResult;
+
+const SEARCH_ID_BYTES = 16;
+
+type RemoteSearchResult = OrderedComputedResult & SearchResultSource;
 
 type SearchAnswer = {
     scopeKey: string;
     query: string;
-    results: OrderedComputedResult[];
+    results: RemoteSearchResult[];
 };
 
 type RemoteSearchState =
@@ -199,7 +207,7 @@ export function useSearchResults(props: {
             flushRef.current = null;
             const fetchSearch = (
                 scope: Parameters<typeof fetchSearchResults>[1]
-            ): Promise<OrderedComputedResult[]> =>
+            ): Promise<RemoteSearchResult[]> =>
                 fetchSearchResults(
                     searchURL,
                     scope,
@@ -212,7 +220,7 @@ export function useSearchResults(props: {
             try {
                 const resultsPromise = fetchSearch(remoteScope);
 
-                const onResults = (results: OrderedComputedResult[]) => {
+                const onResults = (results: RemoteSearchResult[]) => {
                     if (cancelled) {
                         return;
                     }
@@ -328,7 +336,7 @@ export function useSearchResults(props: {
         }
 
         return visibleAnswer
-            ? filterResultsBySiteSpaces(visibleAnswer.results, filterSiteSpaceIds)
+            ? getDisplayedSearchResults(visibleAnswer.results, filterSiteSpaceIds)
             : [];
     }, [
         visibleAnswer,
@@ -369,17 +377,21 @@ async function fetchSearchResults(
     signal: AbortSignal,
     asEmbeddable: boolean | undefined,
     searchPass: SearchPassStore | null
-): Promise<OrderedComputedResult[]> {
+): Promise<RemoteSearchResult[]> {
+    const directSearchId = generateSearchId();
     const direct = await searchPass?.search({
         query,
+        searchId: directSearchId,
         scope,
         signal,
         asEmbeddable: Boolean(asEmbeddable),
     });
     if (direct?.type === 'results') {
-        return direct.results;
+        const search = { query, searchId: directSearchId };
+        return direct.results.map((result) => ({ ...result, search }));
     }
 
+    const searchId = direct ? generateSearchId() : directSearchId;
     const response = await fetch(searchURL, {
         method: 'POST',
         headers: {
@@ -389,6 +401,7 @@ async function fetchSearchResults(
         body: JSON.stringify({
             asEmbeddable,
             query,
+            searchId,
             scope,
         }),
         signal,
@@ -398,5 +411,12 @@ async function fetchSearchResults(
         throw new Error(`Search request failed: ${response.status}`);
     }
 
-    return response.json() as Promise<OrderedComputedResult[]>;
+    const results: OrderedComputedResult[] = await response.json();
+    const search = { query, searchId };
+    return results.map((result) => ({ ...result, search }));
+}
+
+function generateSearchId() {
+    const bytes = globalThis.crypto?.getRandomValues(new Uint8Array(SEARCH_ID_BYTES));
+    return bytes && Array.from(bytes, (byte) => byte.toString(16).padStart(2, '0')).join('');
 }

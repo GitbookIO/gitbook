@@ -14,7 +14,8 @@ const SEARCH_FALLBACK_REASON =
     /^(\d{3}|expired|pass_request|network|timeout|invalid|unknown_space)$/;
 
 export async function POST(request: NextRequest) {
-    const { asEmbeddable, query, scope } = (await request.json()) as SearchSiteContentRequest;
+    const { asEmbeddable, query, scope, searchId } =
+        (await request.json()) as SearchSiteContentRequest;
     const [context, siteURLData] = await Promise.all([
         getServerActionBaseContext({ isEmbeddable: asEmbeddable }),
         getSiteURLDataFromMiddleware(),
@@ -40,6 +41,7 @@ export async function POST(request: NextRequest) {
                 siteId: siteURLData.site,
                 query,
                 scope,
+                searchId,
             })
         ),
         throwIfDataError(
