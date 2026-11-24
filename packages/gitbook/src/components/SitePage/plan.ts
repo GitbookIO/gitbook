@@ -12,6 +12,7 @@ import {
 } from '@/components/DocumentView/Table/utils';
 import type { GitBookSiteContext } from '@/lib/context';
 import { getDataOrNull, getPageDocument } from '@/lib/data';
+import { getSimplifiedContentType } from '@/lib/files';
 import {
     getContentInlineIconSourceRequests,
     getCustomizationIconStyle,
@@ -76,6 +77,19 @@ export function runSitePagePlan(
         pending.push(promise.catch(() => {}));
     };
 
+    const measure = (src: string | undefined, options: { dpr?: number }) => {
+        const resizer = context.imageResizer;
+        if (src && resizer) {
+            start(() => resizer.getImageSize(src, options));
+        }
+    };
+
+    const resolveFile = (document: JSONDocument | null, ref: ContentRef) =>
+        deps.resolveRef(document, ref, context, {}) as Promise<{
+            href: string;
+            file?: { dimensions?: unknown; contentType?: string; downloadURL?: string };
+        } | null>;
+
     const resolveRef = (document: JSONDocument | null, ref: ContentRef, anchorText: boolean) => {
         startSpaceRevisionFor(ref);
         start(() =>
@@ -121,12 +135,18 @@ export function runSitePagePlan(
         visit(document.nodes, (node) => {
             const data = node.data ?? {};
             if (node.type === 'embed' && typeof data.url === 'string') {
-                start(() =>
-                    context.dataFetcher.getEmbedByUrl({
-                        url: data.url as string,
-                        spaceId: context.space.id,
-                    })
-                );
+                start(async () => {
+                    const embed = await getDataOrNull(
+                        context.dataFetcher.getEmbedByUrl({
+                            url: data.url as string,
+                            spaceId: context.space.id,
+                        })
+                    );
+                    // Only link cards render the icon, without a size.
+                    if (embed && embed.type !== 'rich' && embed.type !== 'integration') {
+                        measure(embed.icon, { dpr: 2 });
+                    }
+                });
             }
             if (node.type === 'image') {
                 for (const ref of [data.ref, data.refDark]) {
@@ -134,6 +154,27 @@ export function runSitePagePlan(
                         planImage(document, ref as ContentRef);
                     }
                 }
+                return;
+            }
+            if (node.type === 'inline-image') {
+                // Line-sized inline images also measure the light image for their width.
+                const lineSize = data.size === 'line' ? [{ dpr: 2 }, { dpr: 3 }] : [{ dpr: 2 }];
+                if (data.ref) {
+                    planImage(document, data.ref as ContentRef, lineSize);
+                }
+                if (data.refDark) {
+                    planImage(document, data.refDark as ContentRef);
+                }
+                return;
+            }
+            if (node.type === 'drawing') {
+                if (data.ref) {
+                    planImage(document, data.ref as ContentRef);
+                }
+                return;
+            }
+            if (node.type === 'file' && data.ref) {
+                planFilePreview(document, data.ref as ContentRef);
                 return;
             }
             if (node.type === 'table') {
@@ -155,9 +196,36 @@ export function runSitePagePlan(
         }
     };
 
-    const planImage = (document: JSONDocument, ref: ContentRef) => {
+    const planImage = (
+        document: JSONDocument | null,
+        ref: ContentRef,
+        sizes: { dpr?: number }[] = [{ dpr: 2 }]
+    ) => {
         startSpaceRevisionFor(ref);
-        start(() => measureImage(document, ref));
+        start(async () => {
+            const resolved = await resolveFile(document, ref);
+            // Like `Image`, a file with known dimensions is never measured.
+            if (resolved && !resolved.file?.dimensions) {
+                for (const options of sizes) {
+                    measure(resolved.href, options);
+                }
+            }
+        });
+    };
+
+    // The file block previews images from their download URL.
+    const planFilePreview = (document: JSONDocument, ref: ContentRef) => {
+        startSpaceRevisionFor(ref);
+        start(async () => {
+            const file = (await resolveFile(document, ref))?.file;
+            if (
+                file &&
+                !file.dimensions &&
+                getSimplifiedContentType(file.contentType ?? '') === 'image'
+            ) {
+                measure(file.downloadURL, { dpr: 2 });
+            }
+        });
     };
 
     // Only what the table view renders: its columns, plus covers and target for cards.
@@ -205,16 +273,38 @@ export function runSitePagePlan(
         }
     };
 
-    // Same as the images block: a file without known dimensions is measured by the resizer.
-    const measureImage = async (document: JSONDocument, ref: ContentRef) => {
-        const resolved = (await deps.resolveRef(document, ref, context, {})) as {
-            href: string;
-            file?: { dimensions?: unknown };
-        } | null;
-        if (resolved && !resolved.file?.dimensions) {
-            await context.imageResizer?.getImageSize(resolved.href, { dpr: 2 });
+    const planSiteImages = () => {
+        // Logos and the custom icon carry no size, so the layout measures them on every page.
+        const { header, footer, favicon } = context.customization;
+        if (header.logo) {
+            measure(header.logo.light, { dpr: 2 });
+            measure(header.logo.dark, { dpr: 2 });
+        } else if ('icon' in favicon && favicon.icon) {
+            measure(favicon.icon.light, { dpr: 2 });
+            measure(favicon.icon.dark, { dpr: 2 });
+        }
+        if (footer.logo) {
+            measure(footer.logo.light, { dpr: 2 });
+            measure(footer.logo.dark, { dpr: 2 });
+        }
+
+        // Same conditions as SitePage (full/background) and PageBody (hero).
+        const coverSize = page.layout?.coverSize;
+        if (
+            page.cover &&
+            page.layout?.cover &&
+            (coverSize === 'hero' || coverSize === 'full' || coverSize === 'background')
+        ) {
+            for (const ref of [page.cover.ref, page.cover.refDark]) {
+                if (ref) {
+                    planImage(null, ref, [{}]);
+                }
+            }
         }
     };
+
+    // After every helper above is defined, and inside `start` so nothing throws out of the plan.
+    start(async () => planSiteImages());
 
     return settle(pending);
 }

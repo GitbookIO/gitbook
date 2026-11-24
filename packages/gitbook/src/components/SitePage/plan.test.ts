@@ -19,6 +19,8 @@ function deferred<T>() {
 }
 
 function setup(options: {
+    customization?: Record<string, unknown>;
+    embed?: unknown;
     document?: unknown;
     metaLinks?: unknown;
     documentPromise?: Promise<unknown>;
@@ -29,14 +31,20 @@ function setup(options: {
             () => options.documentPromise ?? Promise.resolve({ data: options.document ?? null })
         ),
         listRevisionPageMetaLinks: mock(async () => ({ data: options.metaLinks ?? null })),
-        getEmbedByUrl: mock(async () => ({ data: {} })),
+        getEmbedByUrl: mock(async () => ({ data: options.embed ?? {} })),
         getRevision: mock(async () => ({ data: {} })),
     };
     const imageResizer = { getImageSize: mock(async () => ({ width: 1, height: 1 })) };
     const context = {
         space: { id: 'space-1' },
         revisionId: 'revision-1',
-        customization: { styling: { icons: 'regular' } },
+        customization: {
+            styling: { icons: 'regular' },
+            header: {},
+            footer: {},
+            favicon: {},
+            ...options.customization,
+        },
         structure: {
             type: 'siteSpaces',
             structure: [
@@ -54,7 +62,14 @@ function setup(options: {
                 throw new Error('boom');
             }
             return ref.kind === 'file'
-                ? { href: 'https://files/image.png', file: { dimensions: undefined } }
+                ? {
+                      href: 'https://files/image.png',
+                      file: {
+                          dimensions: undefined,
+                          contentType: 'image/png',
+                          downloadURL: 'https://files/download.png',
+                      },
+                  }
                 : { href: '/x' };
         }
     );
@@ -295,6 +310,111 @@ describe('runSitePagePlan', () => {
         });
         expect(s.resolveRef).not.toHaveBeenCalled();
         expect(s.imageResizer.getImageSize).not.toHaveBeenCalled();
+    });
+
+    it('measures the site logos, and the custom icon only without a header logo', async () => {
+        const withLogo = setup({
+            customization: {
+                header: { logo: { light: 'https://l/h.png', dark: 'https://l/hd.png' } },
+                footer: { logo: { light: 'https://l/f.png' } },
+                favicon: { icon: { light: 'https://l/i.png', dark: 'https://l/id.png' } },
+            },
+        });
+        await runSitePagePlan(withLogo.context, page, withLogo);
+        const measured = withLogo.imageResizer.getImageSize.mock.calls as unknown[][];
+        expect(measured).toContainEqual(['https://l/h.png', { dpr: 2 }]);
+        expect(measured).toContainEqual(['https://l/hd.png', { dpr: 2 }]);
+        expect(measured).toContainEqual(['https://l/f.png', { dpr: 2 }]);
+        expect(measured).not.toContainEqual(['https://l/i.png', { dpr: 2 }]);
+
+        const iconOnly = setup({
+            customization: {
+                favicon: { icon: { light: 'https://l/i.png', dark: 'https://l/id.png' } },
+            },
+        });
+        await runSitePagePlan(iconOnly.context, page, iconOnly);
+        const iconCalls = iconOnly.imageResizer.getImageSize.mock.calls as unknown[][];
+        expect(iconCalls).toContainEqual(['https://l/i.png', { dpr: 2 }]);
+        expect(iconCalls).toContainEqual(['https://l/id.png', { dpr: 2 }]);
+    });
+
+    it('measures the page cover like PageCover, only when the layout shows it', async () => {
+        const cover = { ref: { kind: 'file', file: 'c1' }, refDark: { kind: 'file', file: 'c2' } };
+        const s = setup({});
+        await runSitePagePlan(
+            s.context,
+            {
+                ...page,
+                cover,
+                layout: { cover: true, coverSize: 'hero' },
+            } as unknown as RevisionPageDocument,
+            s
+        );
+        const refs = s.resolveRef.mock.calls.map(([d, ref]) => [d, ref]);
+        expect(refs).toContainEqual([null, cover.ref]);
+        expect(refs).toContainEqual([null, cover.refDark]);
+        expect(s.imageResizer.getImageSize).toHaveBeenCalledWith('https://files/image.png', {});
+
+        const hidden = setup({});
+        await runSitePagePlan(
+            hidden.context,
+            {
+                ...page,
+                cover,
+                layout: { cover: false, coverSize: 'hero' },
+            } as unknown as RevisionPageDocument,
+            hidden
+        );
+        expect(hidden.imageResizer.getImageSize).not.toHaveBeenCalled();
+    });
+
+    it('measures inline images, drawings and image files like their blocks', async () => {
+        const s = setup({
+            document: doc([
+                {
+                    object: 'block',
+                    type: 'paragraph',
+                    nodes: [
+                        {
+                            object: 'inline',
+                            type: 'inline-image',
+                            data: { ref: { kind: 'file', file: 'i1' }, size: 'line' },
+                            nodes: [],
+                        },
+                    ],
+                },
+                {
+                    object: 'block',
+                    type: 'drawing',
+                    data: { ref: { kind: 'file', file: 'd1' } },
+                    nodes: [],
+                },
+                { object: 'block', type: 'file', data: { ref: { kind: 'file', file: 'f1' } } },
+            ]),
+        });
+        await runSitePagePlan(s.context, page, s);
+        const measured = s.imageResizer.getImageSize.mock.calls as unknown[][];
+        expect(measured).toContainEqual(['https://files/image.png', { dpr: 2 }]);
+        expect(measured).toContainEqual(['https://files/image.png', { dpr: 3 }]);
+        expect(measured).toContainEqual(['https://files/download.png', { dpr: 2 }]);
+    });
+
+    it('measures the icon of link embeds once the embed arrives', async () => {
+        const s = setup({
+            embed: { type: 'link', icon: 'https://site/icon.png' },
+            document: doc([{ object: 'block', type: 'embed', data: { url: 'u' }, nodes: [] }]),
+        });
+        await runSitePagePlan(s.context, page, s);
+        expect(s.imageResizer.getImageSize).toHaveBeenCalledWith('https://site/icon.png', {
+            dpr: 2,
+        });
+
+        const rich = setup({
+            embed: { type: 'rich', icon: 'https://site/icon.png' },
+            document: doc([{ object: 'block', type: 'embed', data: { url: 'u' }, nodes: [] }]),
+        });
+        await runSitePagePlan(rich.context, page, rich);
+        expect(rich.imageResizer.getImageSize).not.toHaveBeenCalled();
     });
 
     it('starts the revision of meta-link alternates in the site alongside their space', async () => {
