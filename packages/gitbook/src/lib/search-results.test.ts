@@ -23,7 +23,7 @@ function siteSpace(id: string, title: string, published: string, extra: Partial<
         path: '',
         default: false,
         draft: false,
-        space: { id: `space_${id}`, title, language: 'en' },
+        space: { id: `space_${id}`, title, language: 'en', permissions: { view: true } },
         urls: { published },
         ...extra,
     } as SiteSpace;
@@ -102,6 +102,7 @@ const items: (SearchSpaceResult | SearchRecordResult)[] = [
         { id: 'status', path: 'https://status.example.com/', rank: 3 },
     ]),
     space('v1', 1, [{ id: 'legacy', path: 'legacy/authentication', rank: 4 }]),
+    space('v0', 1, [{ id: 'reference', path: 'reference', rank: 5 }]),
     {
         type: 'record',
         id: 'record_1',
@@ -164,14 +165,45 @@ describe('computePublishedSearchResults', () => {
             'space_v2/auth',
             'space_guides/status',
             'space_v1/legacy',
+            'space_v0/reference',
             'record_1',
         ]);
     });
 
-    it('leaves hidden variants out of the lookup, so their results go to the route', () => {
+    it('includes readable published hidden spaces and excludes draft, denied, or unpublished placements', () => {
+        const hidden = siteSpace('hidden', 'Older docs', 'https://docs.example.com/old/', {
+            hidden: true,
+        });
+        const denied = siteSpace('denied', 'Denied', 'https://docs.example.com/denied/');
+        denied.space.permissions.view = false;
+        const draft = siteSpace('draft', 'Draft', 'https://docs.example.com/draft/', {
+            draft: true,
+        });
+        const unpublished = siteSpace('unpublished', 'Unpublished', '', {
+            urls: {},
+        });
+
+        const spaces = getSearchSpaceLookup({
+            type: 'siteSpaces',
+            structure: [hidden, denied, draft, unpublished],
+        });
+        expect(spaces).toEqual({
+            space_hidden: {
+                siteSpaceId: 'ss_hidden',
+                spaceURL: 'https://docs.example.com/old/',
+                breadcrumbs: [],
+            },
+        });
+    });
+
+    it('falls back when a result belongs to an unknown space', () => {
         const spaces = getSearchSpaceLookup(structure);
-        expect(Object.keys(spaces).sort()).toEqual(['space_guides', 'space_v1', 'space_v2']);
-        expect(JSON.stringify(spaces)).not.toContain('/api/v0/');
+        expect(Object.keys(spaces).sort()).toEqual([
+            'space_guides',
+            'space_v0',
+            'space_v1',
+            'space_v2',
+        ]);
 
         const linker = createSiteLinker({
             urlMode: 'url-host',
@@ -180,7 +212,7 @@ describe('computePublishedSearchResults', () => {
             spaceBasePath: '/api/',
             gitbookURL: undefined,
         });
-        const searchResults = [...items, space('v0', 1, [{ id: 'draft', path: 'draft', rank: 5 }])];
+        const searchResults = [space('unknown', 1, [{ id: 'page', path: 'page', rank: 1 }])];
         expect(
             computePublishedSearchResults({ asEmbeddable: false, linker, searchResults, spaces })
         ).toBeNull();

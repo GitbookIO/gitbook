@@ -211,7 +211,8 @@ export function createSearchPassStore(directSearch: DirectSearchProps | undefine
             clearTimeout(timeout);
         }
 
-        return results ? { type: 'results', results } : fallBack('unknown_space');
+        // An unmapped space can come from a structure change after page load; fall back for this query only.
+        return results ? { type: 'results', results } : { type: 'route', reason: 'unknown_space' };
     };
 
     return { requestPass, search };

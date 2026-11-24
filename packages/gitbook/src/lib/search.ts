@@ -81,18 +81,25 @@ export function transformSitePageResult(args: {
 }
 
 /**
- * Index the visible site spaces by space, resolving each space as the search route does.
+ * Index readable published site spaces by space.
  */
 export function getSearchSpaceLookup(structure: SiteStructure): SearchSpaceLookup {
     const lookup: SearchSpaceLookup = {};
 
     for (const { space } of listAllSiteSpaces(structure)) {
-        if (lookup[space.id]) {
+        if (Object.hasOwn(lookup, space.id)) {
             continue;
         }
 
-        const found = findSiteSpaceBy(structure, (siteSpace) => siteSpace.space.id === space.id);
-        if (found && !found.siteSpace.hidden) {
+        const found = findSiteSpaceBy(
+            structure,
+            (siteSpace) =>
+                siteSpace.space.id === space.id &&
+                !siteSpace.draft &&
+                siteSpace.space.permissions.view &&
+                Boolean(siteSpace.urls.published)
+        );
+        if (found) {
             lookup[space.id] = getSearchSpaceEntry({
                 siteSpace: found.siteSpace,
                 siteSection: found.siteSection ?? undefined,

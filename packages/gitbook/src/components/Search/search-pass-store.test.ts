@@ -141,4 +141,47 @@ describe('createSearchPassStore', () => {
         expect(await search(store)).toEqual({ type: 'results', results: [] });
         expect(authorizations).toHaveLength(1);
     });
+
+    it('falls back for an unknown space without latching later searches to the route', async () => {
+        let searchCalls = 0;
+        const fetchSpy = spyOn(globalThis, 'fetch').mockImplementation((async (
+            input: RequestInfo | URL
+        ) => {
+            if (String(input) === '/~gitbook/search-pass') {
+                return Response.json({ token: 'pass-1', expiresIn: 300_000 });
+            }
+            searchCalls += 1;
+            if (searchCalls === 1) {
+                return Response.json({
+                    items: [
+                        {
+                            type: 'space',
+                            id: 'space_unknown',
+                            title: 'Unknown',
+                            score: 1,
+                            pages: [
+                                {
+                                    id: 'page_1',
+                                    title: 'Page 1',
+                                    path: 'page-1',
+                                    score: 1,
+                                    rank: 1,
+                                    ancestors: [],
+                                    urls: { app: 'https://app.gitbook.com/o/org/s/space' },
+                                },
+                            ],
+                        },
+                    ],
+                });
+            }
+            return Response.json({ items: [] });
+        }) as typeof fetch);
+        restore = () => fetchSpy.mockRestore();
+        const store = createSearchPassStore(directSearch);
+        await store.requestPass();
+
+        expect(await search(store)).toEqual({ type: 'route', reason: 'unknown_space' });
+        expect(await search(store)).toEqual({ type: 'results', results: [] });
+        expect(searchCalls).toBe(2);
+    });
 });

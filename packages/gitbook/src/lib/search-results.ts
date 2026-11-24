@@ -121,7 +121,7 @@ export function computePublishedSearchResults(input: {
     const { asEmbeddable, linker, searchResults, spaces } = input;
 
     const hasUnknownSpace = searchResults.some(
-        (item) => item.type === 'space' && item.pages.length > 0 && !spaces[item.id]
+        (item) => item.type === 'space' && item.pages.length > 0 && !Object.hasOwn(spaces, item.id)
     );
     if (hasUnknownSpace) {
         return null;
