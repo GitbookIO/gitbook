@@ -81,7 +81,7 @@ export function transformSitePageResult(args: {
 }
 
 /**
- * Index readable published site spaces by space, resolving each space as the search route does.
+ * Index readable published site spaces by space.
  */
 export function getSearchSpaceLookup(structure: SiteStructure): SearchSpaceLookup {
     const lookup: SearchSpaceLookup = {};
