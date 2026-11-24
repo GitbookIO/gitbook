@@ -1,12 +1,6 @@
 'use client';
 
-import {
-    type Values,
-    parseAsBoolean,
-    parseAsString,
-    parseAsStringLiteral,
-    useQueryStates,
-} from 'nuqs';
+import { type Values, parseAsString, parseAsStringLiteral, useQueryStates } from 'nuqs';
 import React from 'react';
 
 import type { LinkProps } from '../primitives';
@@ -16,8 +10,6 @@ import { useSearchPrewarm } from './useSearchPrewarm';
 import type { DirectSearchProps } from '@/lib/search-results';
 
 export type SearchScope =
-    /** Search all content on the site */
-    | 'all'
     /** Search the current section's variant + matched/default variant for other sections */
     | 'default'
     /** Search all variants of the current section */
@@ -41,9 +33,8 @@ export interface SearchState {
 const keyMap = {
     q: parseAsString,
     ask: parseAsString,
-    scope: parseAsStringLiteral(['all', 'default', 'extended', 'current']).withDefault('default'),
+    scope: parseAsStringLiteral(['default', 'extended', 'current']).withDefault('default'),
     section: parseAsString,
-    global: parseAsBoolean, // Legacy support for global=true
 };
 
 export type UpdateSearchState = (
@@ -62,11 +53,6 @@ function normalizeRawState(values: Values<typeof keyMap>) {
     if (values.ask === 'true' && values.q) {
         return { ...values, q: null, ask: values.q };
     }
-    // Handle legacy global=true
-    if (values.global === true) {
-        return { ...values, scope: 'all' as const, global: null };
-    }
-
     return values;
 }
 
