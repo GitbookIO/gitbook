@@ -12,6 +12,8 @@
     "observability": {
         "enabled": false,
     },
+    // Run the server next to the GitBook API so its request waterfall stays short; the middleware stays at the edge.
+    "placement": { "region": "gcp:us-central1" },
     "vars": {
         "NEXT_CACHE_DO_QUEUE_DISABLE_SQLITE": "true",
     },
