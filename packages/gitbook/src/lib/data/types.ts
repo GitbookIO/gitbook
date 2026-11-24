@@ -52,6 +52,12 @@ export interface GitBookDataFetcher {
     withToken(input: { apiToken: string }): GitBookDataFetcher;
 
     /**
+     * Create a data fetcher that reads only these spaces at the site revision it previews, and
+     * other spaces live.
+     */
+    withSiteRevisionSpaces(spaceIds: string[]): GitBookDataFetcher;
+
+    /**
      * Get a user by its ID.
      */
     getUserById(userId: string): Promise<DataFetcherResponse<api.User>>;

@@ -32,6 +32,7 @@ export function isSiteIndexable(context: GitBookSiteContext) {
 
     if (
         context.changeRequest ||
+        context.siteRevision ||
         context.revisionId !== context.space.revision ||
         hasRevisionSelector(context.linker.spaceBasePath)
     ) {
