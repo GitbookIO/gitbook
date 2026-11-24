@@ -35,6 +35,12 @@ export function getBlockTextStyle(block: DocumentBlock): {
                 lineHeight: 'leading-snug',
                 marginTop: 'column-first-of-type:pt-0 pt-[0.5em]',
             };
+        case 'heading-4':
+            return {
+                textSize: 'text-base @lg:text-lg font-semibold',
+                lineHeight: 'leading-snug',
+                marginTop: 'column-first-of-type:pt-0 pt-[0.5em]',
+            };
         case 'divider':
             return {
                 textSize: '',

@@ -69,6 +69,7 @@
         "@vercel/next@4.4.2": "patches/@vercel%2Fnext@4.4.2.patch",
         "mermaid@11.16.1": "patches/mermaid@11.16.1.patch",
         "next@16.4.6": "patches/next@16.4.6.patch",
-        "@shikijs/langs@3.21.0": "patches/@shikijs%2Flangs@3.21.0.patch"
+        "@shikijs/langs@3.21.0": "patches/@shikijs%2Flangs@3.21.0.patch",
+        "@gitbook/api@0.214.0": "patches/@gitbook%2Fapi@0.214.0.patch"
     }
 }
