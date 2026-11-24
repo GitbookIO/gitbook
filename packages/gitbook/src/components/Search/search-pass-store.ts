@@ -1,12 +1,13 @@
 import ReactDOM from 'react-dom';
 
-import type { SearchRecordResult, SearchSpaceResult } from '@gitbook/api';
+import type { SearchRecordResult } from '@gitbook/api';
 
 import type { OrderedComputedResult, SearchSiteContentScope } from './search-types';
 import { getEmbeddableLinker } from '@/lib/embeddable-linker';
 import { createSiteLinker } from '@/lib/links';
 import {
     type DirectSearchProps,
+    type PublishedSearchSpaceResult,
     computePublishedSearchResults,
     toSearchSiteContentBody,
 } from '@/lib/search-results';
@@ -193,7 +194,7 @@ export function createSearchPassStore(directSearch: DirectSearchProps | undefine
         let results: OrderedComputedResult[] | null;
         try {
             const { items } = (await response.json()) as {
-                items: (SearchSpaceResult | SearchRecordResult)[];
+                items: (PublishedSearchSpaceResult | SearchRecordResult)[];
             };
             const linker = createSiteLinker(directSearch.linker);
             results = computePublishedSearchResults({
@@ -201,6 +202,7 @@ export function createSearchPassStore(directSearch: DirectSearchProps | undefine
                 linker: asEmbeddable ? getEmbeddableLinker(linker) : linker,
                 searchResults: items,
                 spaces: directSearch.spaces,
+                shareKey: directSearch.shareKey,
             });
         } catch (error) {
             if (signal.aborted) {

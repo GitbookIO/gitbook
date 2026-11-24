@@ -135,6 +135,7 @@ export function getDirectSearchProps(context: GitBookSiteContext): DirectSearchP
     return {
         ...context.directSearch,
         spaces: getSearchSpaceLookup(context.structure),
+        shareKey: context.shareKey,
         passURL: context.linker.toPathInSite('~gitbook/search-pass'),
     };
 }

@@ -34,6 +34,14 @@ export type SearchSpaceEntry = {
  */
 export type SearchSpaceLookup = Record<string, SearchSpaceEntry>;
 
+export type PublishedSearchSpaceResult = SearchSpaceResult & {
+    sitePlacement?: SearchSpaceEntry & {
+        siteSpaceId: string;
+        spaceURL: string;
+        shareKeyPathIndex?: number;
+    };
+};
+
 /**
  * Everything the browser needs, besides a search pass, to query the search API of a site directly.
  */
@@ -43,6 +51,7 @@ export type DirectSearchProps = {
     siteId: string;
     linker: SiteLinkerInput;
     spaces: SearchSpaceLookup;
+    shareKey?: string;
     /** Site route that hands out a search pass. */
     passURL: string;
 };
@@ -109,26 +118,47 @@ export function computeSearchResults(
 }
 
 /**
- * Compute the results of the published content of a site, resolving spaces from a lookup.
+ * Compute published search results from hit metadata and the page's visible-space lookup.
  * Returns null when a page result belongs to a space missing from the lookup.
  */
 export function computePublishedSearchResults(input: {
     asEmbeddable: boolean;
     linker: GitBookLinker;
-    searchResults: (SearchSpaceResult | SearchRecordResult)[];
+    searchResults: (PublishedSearchSpaceResult | SearchRecordResult)[];
     spaces: SearchSpaceLookup;
+    shareKey?: string;
 }): OrderedComputedResult[] | null {
-    const { asEmbeddable, linker, searchResults, spaces } = input;
+    const { asEmbeddable, linker, searchResults, spaces, shareKey } = input;
+    const getEntry = (spaceItem: PublishedSearchSpaceResult): SearchSpaceEntry | undefined => {
+        const placement = spaceItem.sitePlacement;
+        const shareKeyPathIndex = placement?.shareKeyPathIndex;
+        if (shareKeyPathIndex === undefined) {
+            return placement ?? spaces[spaceItem.id];
+        }
+
+        if (!placement || !shareKey || !/^[A-Za-z0-9_-]+$/.test(shareKey)) {
+            return undefined;
+        }
+        const url = new URL(placement.spaceURL);
+        const path = url.pathname.split('/');
+        if (!path[shareKeyPathIndex]) {
+            return undefined;
+        }
+
+        path[shareKeyPathIndex] = shareKey;
+        url.pathname = path.join('/');
+        return { ...placement, spaceURL: url.href };
+    };
 
     const hasUnknownSpace = searchResults.some(
-        (item) => item.type === 'space' && item.pages.length > 0 && !spaces[item.id]
+        (item) => item.type === 'space' && item.pages.length > 0 && !getEntry(item)
     );
     if (hasUnknownSpace) {
         return null;
     }
 
     return computeSearchResults(searchResults, (spaceItem, pageItem) => {
-        const entry: SearchSpaceEntry | undefined = spaces[spaceItem.id];
+        const entry = getEntry(spaceItem);
         const toHref = (pagePath: string) =>
             getPublishedPageHref({ asEmbeddable, linker, pagePath, spaceURL: entry?.spaceURL });
 

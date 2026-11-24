@@ -12,7 +12,11 @@ import { getBaseContext } from './context';
 import { getEmbeddableLinker } from './embeddable-linker';
 import { createSiteLinker } from './links';
 import { getSearchSpaceLookup, transformSitePageResult } from './search';
-import { computePublishedSearchResults, computeSearchResults } from './search-results';
+import {
+    type PublishedSearchSpaceResult,
+    computePublishedSearchResults,
+    computeSearchResults,
+} from './search-results';
 import { findSiteSpaceBy } from './sites';
 
 function siteSpace(id: string, title: string, published: string, extra: Partial<SiteSpace> = {}) {
@@ -78,7 +82,7 @@ function space(id: string, score: number, pages: Partial<SearchPageResult>[]): S
     };
 }
 
-const items: (SearchSpaceResult | SearchRecordResult)[] = [
+const items: (PublishedSearchSpaceResult | SearchRecordResult)[] = [
     space('v2', 3, [
         {
             id: 'auth',
@@ -102,6 +106,18 @@ const items: (SearchSpaceResult | SearchRecordResult)[] = [
         { id: 'status', path: 'https://status.example.com/', rank: 3 },
     ]),
     space('v1', 1, [{ id: 'legacy', path: 'legacy/authentication', rank: 4 }]),
+    {
+        ...space('v0', 1, [{ id: 'reference', path: 'reference', rank: 5 }]),
+        sitePlacement: {
+            siteSpaceId: 'ss_v0',
+            spaceURL: 'https://docs.example.com/api/v0/',
+            breadcrumbs: [
+                { icon: 'box', label: 'Products' },
+                { icon: 'code', label: 'API' },
+                { label: 'v0' },
+            ],
+        },
+    },
     {
         type: 'record',
         id: 'record_1',
@@ -150,11 +166,13 @@ describe('computePublishedSearchResults', () => {
                 siteSectionGroup: found?.siteSectionGroup ?? undefined,
             });
         });
+        const spaces = getSearchSpaceLookup(structure);
+        expect(spaces.space_v0).toBeUndefined();
         const browser = computePublishedSearchResults({
             asEmbeddable,
             linker: embed(createSiteLinker(directSearch.linker)),
             searchResults: items,
-            spaces: getSearchSpaceLookup(structure),
+            spaces,
         });
 
         expect(JSON.stringify(directSearch)).not.toContain('page-token');
@@ -164,14 +182,13 @@ describe('computePublishedSearchResults', () => {
             'space_v2/auth',
             'space_guides/status',
             'space_v1/legacy',
+            'space_v0/reference',
             'record_1',
         ]);
     });
 
-    it('leaves hidden variants out of the lookup, so their results go to the route', () => {
+    it.each(['v0', 'unknown'])('falls back when a result has no placement (%s)', (spaceId) => {
         const spaces = getSearchSpaceLookup(structure);
-        expect(Object.keys(spaces).sort()).toEqual(['space_guides', 'space_v1', 'space_v2']);
-        expect(JSON.stringify(spaces)).not.toContain('/api/v0/');
 
         const linker = createSiteLinker({
             urlMode: 'url-host',
@@ -180,9 +197,58 @@ describe('computePublishedSearchResults', () => {
             spaceBasePath: '/api/',
             gitbookURL: undefined,
         });
-        const searchResults = [...items, space('v0', 1, [{ id: 'draft', path: 'draft', rank: 5 }])];
+        const searchResults = [
+            ...items,
+            space(spaceId, 1, [{ id: 'page', path: 'page', rank: 6 }]),
+        ];
         expect(
             computePublishedSearchResults({ asEmbeddable: false, linker, searchResults, spaces })
         ).toBeNull();
     });
+
+    it.each([
+        ['url-host', false],
+        ['url', true],
+    ] as const)(
+        'matches the route for a share-link hit (%s, embedded: %p)',
+        (urlMode, asEmbeddable) => {
+            const siteBasePath = '/ShareKeyPlaceholder/reader-key/';
+            const baseLinker = createSiteLinker({
+                urlMode,
+                siteHost: 'docs.example.com',
+                siteBasePath,
+                spaceBasePath: siteBasePath,
+                gitbookURL: undefined,
+            });
+            const linker = asEmbeddable ? getEmbeddableLinker(baseLinker) : baseLinker;
+            const spaceItem = {
+                ...space('v0', 1, [{ id: 'reference', path: 'reference', rank: 1 }]),
+                sitePlacement: {
+                    siteSpaceId: 'ss_v0',
+                    spaceURL:
+                        'https://docs.example.com/ShareKeyPlaceholder/ShareKeyPlaceholder/legacy/',
+                    shareKeyPathIndex: 2,
+                    breadcrumbs: [],
+                },
+            };
+            const route = computeSearchResults([spaceItem], (item, pageItem) =>
+                transformSitePageResult({
+                    asEmbeddable,
+                    linker,
+                    spaceItem: item,
+                    pageItem,
+                    siteSpace: siteSpace(
+                        'v0',
+                        'v0',
+                        'https://docs.example.com/ShareKeyPlaceholder/reader-key/legacy/'
+                    ),
+                })
+            );
+            const input = { asEmbeddable, linker, searchResults: [spaceItem], spaces: {} };
+            expect(computePublishedSearchResults({ ...input, shareKey: 'reader-key' })).toEqual(
+                route
+            );
+            expect(computePublishedSearchResults(input)).toBeNull();
+        }
+    );
 });
