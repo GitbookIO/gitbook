@@ -6,7 +6,7 @@ import { useResizeObserver } from '../hooks';
 import { Tooltip } from '../primitives';
 import { getPageResultPresentation } from './getPageResultHref';
 import { HighlightQuery } from './HighlightQuery';
-import type { ComputedPageResult } from './search-types';
+import type { ComputedPageResult, SearchResultSource } from './search-types';
 import { SearchResultItem } from './SearchResultItem';
 import { tString, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
@@ -14,13 +14,15 @@ import { tcls } from '@/lib/tailwind';
 export const SearchPageResultItem = React.forwardRef(function SearchPageResultItem(
     props: {
         query: string;
-        item: ComputedPageResult;
+        item: ComputedPageResult & SearchResultSource;
+        position: number;
+        resultsCount: number;
         active: boolean;
         style?: React.CSSProperties;
     },
     ref: React.Ref<HTMLAnchorElement>
 ) {
-    const { query, item, active, style, ...rest } = props;
+    const { query, item, active, position, resultsCount, style, ...rest } = props;
     const language = useLanguage();
 
     const { preview: bestSection, description, href } = getPageResultPresentation(item);
@@ -30,7 +32,9 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
 
     const insights = {
         type: 'search_open_result' as const,
-        query,
+        ...item.search,
+        position,
+        resultsCount,
         result: {
             pageId: item.pageId,
             spaceId: item.spaceId,

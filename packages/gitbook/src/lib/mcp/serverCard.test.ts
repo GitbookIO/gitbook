@@ -93,7 +93,7 @@ describe('buildSiteMcpServerCard', () => {
         it('keeps the description and title within 100 characters', () => {
             const card = buildCard({ title: 'Acme' });
 
-            expect(card.title).toBe('Acme MCP Server');
+            expect(card.title).toBe('Acme Docs MCP Server');
             expect(card.description).toBe('Search and read the Acme documentation over MCP.');
             expect(card.description.length).toBeLessThanOrEqual(MAX_TEXT_LENGTH);
             expect(card.title.length).toBeLessThanOrEqual(MAX_TEXT_LENGTH);
@@ -102,7 +102,7 @@ describe('buildSiteMcpServerCard', () => {
         it('does not repeat an article a customer title already carries', () => {
             const card = buildCard({ title: 'The Acme Handbook' });
 
-            expect(card.title).toBe('The Acme Handbook MCP Server');
+            expect(card.title).toBe('The Acme Handbook Docs MCP Server');
             expect(card.description).toBe(
                 'Search and read The Acme Handbook documentation over MCP.'
             );
@@ -112,7 +112,7 @@ describe('buildSiteMcpServerCard', () => {
             const card = buildCard({ title: 'A'.repeat(500) });
 
             expect(card.title.length).toBe(MAX_TEXT_LENGTH);
-            expect(card.title.endsWith('… MCP Server')).toBe(true);
+            expect(card.title.endsWith('… Docs MCP Server')).toBe(true);
             expect(card.description.length).toBe(MAX_TEXT_LENGTH);
             expect(card.description.startsWith('Search and read the ')).toBe(true);
             expect(card.description.endsWith('… documentation over MCP.')).toBe(true);
@@ -170,8 +170,18 @@ describe('buildSiteMcpServerCard', () => {
 
             expect(acme.name).toBe('docs.acme.com/~gitbook/mcp');
             expect(other.name).toBe('gitbook.com/other/~gitbook/mcp');
-            expect(acme.title).toBe('Acme MCP Server');
-            expect(other.title).toBe('Other MCP Server');
+            expect(acme.title).toBe('Acme Docs MCP Server');
+            expect(other.title).toBe('Other Docs MCP Server');
+        });
+
+        it('marks the server as docs only when the site title does not already say so', () => {
+            for (const [title, expected] of [
+                ['Acme Docs', 'Acme Docs MCP Server'],
+                ['Acme Documentation', 'Acme Documentation MCP Server'],
+                ['Docker', 'Docker Docs MCP Server'],
+            ] as const) {
+                expect(buildMcpServerInfo(makeContext({ title })).title).toBe(expected);
+            }
         });
 
         it('declares the capabilities the SDK reports at initialize', () => {

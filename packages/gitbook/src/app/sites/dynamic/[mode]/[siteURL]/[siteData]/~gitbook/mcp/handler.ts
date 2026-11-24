@@ -19,28 +19,37 @@ export async function handleMcpRequest(
         return new Response('Not Found', { status: 404 });
     }
 
+    // The server is stateless, so it has no notification stream for a GET to open. `Allow` tells
+    // clients to stop asking, as the Streamable HTTP transport expects.
+    if (rawRequest.method === 'GET') {
+        return new Response('Method Not Allowed', { status: 405, headers: { Allow: 'POST' } });
+    }
+
     // Next.js request.url is the original URL and not the rewritten one from the middleware
     const requestURL = new URL(context.linker.toAbsoluteURL(context.linker.toPathInSite(endpoint)));
     requestURL.search = rawRequest.nextUrl.search;
     const request = new Request(requestURL, rawRequest);
 
-    trackMcpEvent({
-        organizationId: context.organizationId,
-        siteId: context.site.id,
-        events: [
-            {
-                type: 'mcp_request',
-                location: {
-                    displayContext: SiteInsightsDisplayContext.Server,
-                },
-            },
-        ],
-        request,
-    });
-
     const mcpHandler = createMcpHandler(
         (server) => {
-            registerSiteMcpTools(server, createSiteMcpTools(context, { request }));
+            registerSiteMcpTools(server, createSiteMcpTools(context, { request }), {
+                // Connecting, listing tools and notifications are protocol overhead, several
+                // requests per client session: only tool calls count as usage.
+                onToolCall: () =>
+                    trackMcpEvent({
+                        organizationId: context.organizationId,
+                        siteId: context.site.id,
+                        events: [
+                            {
+                                type: 'mcp_request',
+                                location: {
+                                    displayContext: SiteInsightsDisplayContext.Server,
+                                },
+                            },
+                        ],
+                        request,
+                    }),
+            });
         },
         {
             // The same identity the server card republishes, so the card and the handshake agree.

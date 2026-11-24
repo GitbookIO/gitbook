@@ -93,6 +93,7 @@ export function createSiteMcpTools(
                         organizationId: context.organizationId,
                         siteId: site.id,
                         query,
+                        routeReason: 'mcp',
                         scope: getLanguageSearchScope(context.structure, searchLanguage),
                     })
                 );
@@ -523,8 +524,24 @@ export function trackMcpEvent(args: Parameters<typeof trackServerInsightsEvents>
  * Register tools on the MCP server. Only used by the transport: the server card reads the same
  * definitions without registering anything.
  */
-export function registerSiteMcpTools(server: McpServer, tools: SiteMcpTool[]) {
+export function registerSiteMcpTools(
+    server: McpServer,
+    tools: SiteMcpTool[],
+    options: {
+        /**
+         * Called when a tool runs, after the server has matched its name and validated its
+         * arguments.
+         */
+        onToolCall?: () => void;
+    } = {}
+) {
+    const { onToolCall } = options;
+
     for (const tool of tools) {
-        server.tool(tool.name, tool.description, tool.inputSchema, tool.annotations, tool.handler);
+        const handler: SiteMcpTool['handler'] = (...args) => {
+            onToolCall?.();
+            return tool.handler(...args);
+        };
+        server.tool(tool.name, tool.description, tool.inputSchema, tool.annotations, handler);
     }
 }

@@ -2,6 +2,10 @@ import type { IconName } from '@gitbook/icons';
 
 export type OrderedComputedResult = ComputedPageResult | ComputedRecordResult;
 
+export type SearchResultSource = {
+    search: { query: string; searchId: string | undefined };
+};
+
 export type BaseComputedResult = {
     id: string;
     title: string;
@@ -55,6 +59,7 @@ export type SearchSiteContentScope =
 
 export interface SearchSiteContentRequest {
     asEmbeddable?: boolean;
+    searchId?: string;
     query: string;
     scope: SearchSiteContentScope;
 }

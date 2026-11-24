@@ -5,7 +5,10 @@ import { MCP_SERVER_CARD_PATH } from '@/lib/mcp/paths';
 import { SERVER_CARD_MEDIA_TYPE } from '@/lib/mcp/serverCard';
 
 export const AI_CATALOG_MEDIA_TYPE = 'application/ai-catalog+json';
-export const AI_CATALOG_SPEC_VERSION = '1.0';
+/**
+ * The v1.0 release candidate. The final v1.0 is not published yet.
+ */
+export const AI_CATALOG_SPEC_VERSION = '0.9';
 
 /**
  * The AI Catalog a site publishes at `/.well-known/ai-catalog.json`, per the
@@ -24,7 +27,7 @@ export interface AiCatalog {
 
 export interface AiCatalogEntry {
     /**
-     * Required. Domain-anchored `urn:air:{publisher}:{namespace}:{name}`.
+     * Required. Domain-anchored `urn:air:{publisher}:{name}[:{kind}]`.
      */
     identifier: string;
     /**
@@ -47,7 +50,7 @@ export function buildSiteAiCatalog(context: GitBookSiteContext): AiCatalog | nul
 
     if (isSiteMcpEnabled(context)) {
         entries.push({
-            identifier: buildCatalogIdentifier(context, 'mcp', site.id),
+            identifier: buildCatalogIdentifier(context, site.id, 'mcp'),
             type: SERVER_CARD_MEDIA_TYPE,
             url: linker.toAbsoluteURL(linker.toPathInSite(MCP_SERVER_CARD_PATH)),
         });
@@ -78,13 +81,9 @@ export async function serveSiteAiCatalog(
     });
 }
 
-function buildCatalogIdentifier(
-    context: GitBookSiteContext,
-    namespace: string,
-    name: string
-): string {
+function buildCatalogIdentifier(context: GitBookSiteContext, name: string, kind: string): string {
     const publisher = new URL(context.linker.toAbsoluteURL(context.linker.toPathInSite('')))
         .hostname;
 
-    return `urn:air:${publisher}:${namespace}:${name}`;
+    return `urn:air:${publisher}:${name}:${kind}`;
 }
