@@ -6,13 +6,41 @@ import type { SiteURLData } from '@/lib/context';
 import { type SearchRouteReason, throwIfDataError } from '@/lib/data';
 import { getLogger } from '@/lib/logger';
 import { getSiteURLDataFromMiddleware } from '@/lib/middleware';
-import { transformSitePageResult } from '@/lib/search';
+import { getSearchSpaceLookup, transformSitePageResult } from '@/lib/search';
 import { computeSearchResults } from '@/lib/search-results';
 import { getServerActionBaseContext } from '@/lib/server-actions';
 import { findSiteSpaceBy, getLinkerForSiteSpace } from '@/lib/sites';
 
 const SEARCH_FALLBACK_REASON =
     /^(\d{3}|expired|pass_request|network|timeout|invalid|unknown_space)$/;
+
+export async function GET(request: NextRequest) {
+    const spaceIds = request.nextUrl.searchParams.getAll('space');
+    if (
+        spaceIds.length === 0 ||
+        spaceIds.length > 100 ||
+        spaceIds.some((id) => !/^[A-Za-z0-9_-]{1,128}$/.test(id))
+    ) {
+        return new NextResponse(null, { status: 400 });
+    }
+
+    const site = await getSiteURLDataFromMiddleware();
+    if (site.preview || site.revision || site.changeRequest) {
+        return new NextResponse(null, { status: 404 });
+    }
+
+    const { dataFetcher } = await getServerActionBaseContext();
+    const { structure } = await throwIfDataError(
+        dataFetcher.getPublishedContentSite({
+            organizationId: site.organization,
+            siteId: site.site,
+            siteShareKey: site.shareKey,
+        })
+    );
+    return NextResponse.json(getSearchSpaceLookup(structure, spaceIds), {
+        headers: { 'Cache-Control': 'private, no-store' },
+    });
+}
 
 export async function POST(request: NextRequest) {
     const { asEmbeddable, query, scope, searchId } =

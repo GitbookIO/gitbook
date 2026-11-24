@@ -1,14 +1,15 @@
 import ReactDOM from 'react-dom';
 
-import type { SearchRecordResult } from '@gitbook/api';
+import type { SearchRecordResult, SearchSpaceResult } from '@gitbook/api';
 
 import type { OrderedComputedResult, SearchSiteContentScope } from './search-types';
 import { getEmbeddableLinker } from '@/lib/embeddable-linker';
 import { createSiteLinker } from '@/lib/links';
 import {
     type DirectSearchProps,
-    type PublishedSearchSpaceResult,
+    type SearchSpaceLookup,
     computePublishedSearchResults,
+    getSearchResultSpaceIds,
     toSearchSiteContentBody,
 } from '@/lib/search-results';
 
@@ -194,15 +195,33 @@ export function createSearchPassStore(directSearch: DirectSearchProps | undefine
         let results: OrderedComputedResult[] | null;
         try {
             const { items } = (await response.json()) as {
-                items: (PublishedSearchSpaceResult | SearchRecordResult)[];
+                items: (SearchSpaceResult | SearchRecordResult)[];
             };
-            const linker = createSiteLinker(directSearch.linker);
+            let linker = createSiteLinker(directSearch.linker);
+            let spaces = directSearch.spaces;
+            const spaceIds = getSearchResultSpaceIds(items);
+            if (spaceIds.some((id) => !Object.hasOwn(spaces, id))) {
+                const params = new URLSearchParams();
+                for (const id of spaceIds) {
+                    params.append('space', id);
+                }
+                const searchURL = linker.toPathInSpace('~gitbook/search');
+                const placements = await fetch(`${searchURL}?${params}`, {
+                    signal: request.signal,
+                });
+                if (!placements.ok) {
+                    return fallBack('unknown_space');
+                }
+                spaces = (await placements.json()) as SearchSpaceLookup;
+            }
+            if (asEmbeddable) {
+                linker = getEmbeddableLinker(linker);
+            }
             results = computePublishedSearchResults({
                 asEmbeddable,
-                linker: asEmbeddable ? getEmbeddableLinker(linker) : linker,
+                linker,
                 searchResults: items,
-                spaces: directSearch.spaces,
-                shareKey: directSearch.shareKey,
+                spaces,
             });
         } catch (error) {
             if (signal.aborted) {

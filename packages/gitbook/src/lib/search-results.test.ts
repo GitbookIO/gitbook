@@ -12,11 +12,7 @@ import { getBaseContext } from './context';
 import { getEmbeddableLinker } from './embeddable-linker';
 import { createSiteLinker } from './links';
 import { getSearchSpaceLookup, transformSitePageResult } from './search';
-import {
-    type PublishedSearchSpaceResult,
-    computePublishedSearchResults,
-    computeSearchResults,
-} from './search-results';
+import { computePublishedSearchResults, computeSearchResults } from './search-results';
 import { findSiteSpaceBy } from './sites';
 
 function siteSpace(id: string, title: string, published: string, extra: Partial<SiteSpace> = {}) {
@@ -27,7 +23,7 @@ function siteSpace(id: string, title: string, published: string, extra: Partial<
         path: '',
         default: false,
         draft: false,
-        space: { id: `space_${id}`, title, language: 'en' },
+        space: { id: `space_${id}`, title, language: 'en', permissions: { view: true } },
         urls: { published },
         ...extra,
     } as SiteSpace;
@@ -82,7 +78,7 @@ function space(id: string, score: number, pages: Partial<SearchPageResult>[]): S
     };
 }
 
-const items: (PublishedSearchSpaceResult | SearchRecordResult)[] = [
+const items: (SearchSpaceResult | SearchRecordResult)[] = [
     space('v2', 3, [
         {
             id: 'auth',
@@ -106,18 +102,7 @@ const items: (PublishedSearchSpaceResult | SearchRecordResult)[] = [
         { id: 'status', path: 'https://status.example.com/', rank: 3 },
     ]),
     space('v1', 1, [{ id: 'legacy', path: 'legacy/authentication', rank: 4 }]),
-    {
-        ...space('v0', 1, [{ id: 'reference', path: 'reference', rank: 5 }]),
-        sitePlacement: {
-            siteSpaceId: 'ss_v0',
-            spaceURL: 'https://docs.example.com/api/v0/',
-            breadcrumbs: [
-                { icon: 'box', label: 'Products' },
-                { icon: 'code', label: 'API' },
-                { label: 'v0' },
-            ],
-        },
-    },
+    space('v0', 1, [{ id: 'reference', path: 'reference', rank: 5 }]),
     {
         type: 'record',
         id: 'record_1',
@@ -151,8 +136,12 @@ describe('computePublishedSearchResults', () => {
             urlMode,
         });
         const directSearch = context.directSearch!;
-        const embed = (linker: typeof context.linker) =>
-            asEmbeddable ? getEmbeddableLinker(linker) : linker;
+        const embed = (linker: typeof context.linker) => {
+            if (asEmbeddable) {
+                return getEmbeddableLinker(linker);
+            }
+            return linker;
+        };
 
         const route = computeSearchResults(items, (spaceItem, pageItem) => {
             const found = findSiteSpaceBy(structure, (s) => s.space.id === spaceItem.id);
@@ -172,7 +161,7 @@ describe('computePublishedSearchResults', () => {
             asEmbeddable,
             linker: embed(createSiteLinker(directSearch.linker)),
             searchResults: items,
-            spaces,
+            spaces: { ...spaces, ...getSearchSpaceLookup(structure, ['space_v0']) },
         });
 
         expect(JSON.stringify(directSearch)).not.toContain('page-token');
@@ -197,58 +186,32 @@ describe('computePublishedSearchResults', () => {
             spaceBasePath: '/api/',
             gitbookURL: undefined,
         });
-        const searchResults = [
-            ...items,
-            space(spaceId, 1, [{ id: 'page', path: 'page', rank: 6 }]),
-        ];
+        const searchResults = [space(spaceId, 1, [{ id: 'page', path: 'page', rank: 1 }])];
         expect(
             computePublishedSearchResults({ asEmbeddable: false, linker, searchResults, spaces })
         ).toBeNull();
     });
 
-    it.each([
-        ['url-host', false],
-        ['url', true],
-    ] as const)(
-        'matches the route for a share-link hit (%s, embedded: %p)',
-        (urlMode, asEmbeddable) => {
-            const siteBasePath = '/ShareKeyPlaceholder/reader-key/';
-            const baseLinker = createSiteLinker({
-                urlMode,
-                siteHost: 'docs.example.com',
-                siteBasePath,
-                spaceBasePath: siteBasePath,
-                gitbookURL: undefined,
-            });
-            const linker = asEmbeddable ? getEmbeddableLinker(baseLinker) : baseLinker;
-            const spaceItem = {
-                ...space('v0', 1, [{ id: 'reference', path: 'reference', rank: 1 }]),
-                sitePlacement: {
-                    siteSpaceId: 'ss_v0',
-                    spaceURL:
-                        'https://docs.example.com/ShareKeyPlaceholder/ShareKeyPlaceholder/legacy/',
-                    shareKeyPathIndex: 2,
-                    breadcrumbs: [],
-                },
-            };
-            const route = computeSearchResults([spaceItem], (item, pageItem) =>
-                transformSitePageResult({
-                    asEmbeddable,
-                    linker,
-                    spaceItem: item,
-                    pageItem,
-                    siteSpace: siteSpace(
-                        'v0',
-                        'v0',
-                        'https://docs.example.com/ShareKeyPlaceholder/reader-key/legacy/'
-                    ),
-                })
-            );
-            const input = { asEmbeddable, linker, searchResults: [spaceItem], spaces: {} };
-            expect(computePublishedSearchResults({ ...input, shareKey: 'reader-key' })).toEqual(
-                route
-            );
-            expect(computePublishedSearchResults(input)).toBeNull();
-        }
-    );
+    it('only resolves requested placements the visitor can read', () => {
+        const hidden = siteSpace('hidden', 'Older docs', 'https://docs.example.com/key/old/', {
+            hidden: true,
+        });
+        const denied = siteSpace('denied', 'Denied', 'https://docs.example.com/key/denied/');
+        denied.space.permissions.view = false;
+        const draft = siteSpace('draft', 'Draft', 'https://docs.example.com/key/draft/', {
+            draft: true,
+        });
+        const unrequested = siteSpace('other', 'Other', 'https://docs.example.com/key/other/');
+        const result = getSearchSpaceLookup(
+            { type: 'siteSpaces', structure: [hidden, denied, draft, unrequested] },
+            ['space_hidden', 'space_denied', 'space_draft', 'space_unknown']
+        );
+        expect(result).toEqual({
+            space_hidden: {
+                siteSpaceId: hidden.id,
+                spaceURL: hidden.urls.published,
+                breadcrumbs: [],
+            },
+        });
+    });
 });

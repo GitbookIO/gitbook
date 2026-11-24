@@ -649,11 +649,16 @@ async function serveSiteRequest(requestURL: URL, request: NextRequest, match: UR
             response.headers.set('x-robots-tag', REVISION_ROBOTS_TAG);
         }
 
-        // Allow cross-origin requests from the same parent domain as the site.
-        const allowedOrigin = getAllowedCORSOrigin(request, siteCanonicalURL);
-        if (allowedOrigin) {
-            response.headers.set('access-control-allow-origin', allowedOrigin);
-            response.headers.set('access-control-allow-credentials', 'true');
+        const isSearchPlacementLookup =
+            pathname === '~gitbook/search' &&
+            (request.method === 'GET' || request.method === 'HEAD');
+        if (!isSearchPlacementLookup) {
+            // Allow cross-origin requests from the same parent domain as the site.
+            const allowedOrigin = getAllowedCORSOrigin(request, siteCanonicalURL);
+            if (allowedOrigin) {
+                response.headers.set('access-control-allow-origin', allowedOrigin);
+                response.headers.set('access-control-allow-credentials', 'true');
+            }
         }
 
         // AI related headers
@@ -665,7 +670,12 @@ async function serveSiteRequest(requestURL: URL, request: NextRequest, match: UR
 
         // When we use adaptive content, we want to ensure that the cache is not used at all on the client side.
         // Vercel already set this header, this is needed in OpenNext.
-        if (siteURLData.contextId && !siteRequestURL.pathname.endsWith('~gitbook/site-index')) {
+        if (isSearchPlacementLookup) {
+            response.headers.set('cache-control', 'private, no-store');
+        } else if (
+            siteURLData.contextId &&
+            !siteRequestURL.pathname.endsWith('~gitbook/site-index')
+        ) {
             response.headers.set('cache-control', 'public, max-age=0, must-revalidate');
         }
 

@@ -80,25 +80,34 @@ export function transformSitePageResult(args: {
     });
 }
 
-/**
- * Index the visible site spaces by space, resolving each space as the search route does.
- */
-export function getSearchSpaceLookup(structure: SiteStructure): SearchSpaceLookup {
+/** Index visible spaces by default, or resolve specific readable published spaces. */
+export function getSearchSpaceLookup(
+    structure: SiteStructure,
+    requestedSpaceIds?: string[]
+): SearchSpaceLookup {
     const lookup: SearchSpaceLookup = {};
+    const ids = requestedSpaceIds ?? listAllSiteSpaces(structure).map(({ space }) => space.id);
 
-    for (const { space } of listAllSiteSpaces(structure)) {
-        if (lookup[space.id]) {
+    for (const id of new Set(ids)) {
+        const found = findSiteSpaceBy(structure, (siteSpace) => siteSpace.space.id === id);
+        if (!found) {
             continue;
         }
 
-        const found = findSiteSpaceBy(structure, (siteSpace) => siteSpace.space.id === space.id);
-        if (found && !found.siteSpace.hidden) {
-            lookup[space.id] = getSearchSpaceEntry({
-                siteSpace: found.siteSpace,
-                siteSection: found.siteSection ?? undefined,
-                siteSectionGroup: found.siteSectionGroup ?? undefined,
-            });
+        const { siteSpace, siteSection, siteSectionGroup } = found;
+        if (requestedSpaceIds) {
+            if (siteSpace.draft || !siteSpace.space.permissions.view || !siteSpace.urls.published) {
+                continue;
+            }
+        } else if (siteSpace.hidden) {
+            continue;
         }
+
+        lookup[id] = getSearchSpaceEntry({
+            siteSpace,
+            siteSection: siteSection ?? undefined,
+            siteSectionGroup: siteSectionGroup ?? undefined,
+        });
     }
 
     return lookup;

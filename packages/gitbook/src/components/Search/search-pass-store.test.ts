@@ -60,6 +60,62 @@ describe('createSearchPassStore', () => {
     let restore: (() => void) | undefined;
     afterEach(() => restore?.());
 
+    it('refreshes placements for mixed hits and reuses the search response', async () => {
+        const urls: string[] = [];
+        const visible = {
+            siteSpaceId: 'ss_visible',
+            spaceURL: 'https://docs.example.com/old/',
+            breadcrumbs: [],
+        };
+        const fetchSpy = spyOn(globalThis, 'fetch').mockImplementation((async (input) => {
+            const url = String(input);
+            urls.push(url);
+            if (url === directSearch.passURL) {
+                return Response.json({ token: 'pass', expiresIn: 300_000 });
+            }
+            if (url === endpoint) {
+                return Response.json({
+                    items: [
+                        {
+                            type: 'space',
+                            id: 'space_hidden',
+                            pages: [{ id: 'page', path: 'reference', rank: 1, ancestors: [] }],
+                        },
+                        {
+                            type: 'space',
+                            id: 'space_visible',
+                            pages: [{ id: 'intro', path: 'intro', rank: 2, ancestors: [] }],
+                        },
+                    ],
+                });
+            }
+            return Response.json({
+                space_hidden: {
+                    siteSpaceId: 'ss_hidden',
+                    spaceURL: 'https://docs.example.com/legacy/',
+                    breadcrumbs: [],
+                },
+                space_visible: { ...visible, spaceURL: 'https://docs.example.com/current/' },
+            });
+        }) as typeof fetch);
+        restore = () => fetchSpy.mockRestore();
+        const store = createSearchPassStore({
+            ...directSearch,
+            spaces: { space_visible: visible },
+        });
+        await store.requestPass();
+
+        expect(await search(store)).toMatchObject({
+            type: 'results',
+            results: [{ href: '/legacy/reference' }, { href: '/current/intro' }],
+        });
+        expect(urls).toEqual([
+            directSearch.passURL,
+            endpoint,
+            '/~gitbook/search?space=space_hidden&space=space_visible',
+        ]);
+    });
+
     it('stays on the route for the rest of the page after a 403', async () => {
         const { authorizations, fetchSpy } = mockFetch([403]);
         restore = () => fetchSpy.mockRestore();
