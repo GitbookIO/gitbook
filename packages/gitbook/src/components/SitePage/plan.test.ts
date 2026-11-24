@@ -179,6 +179,124 @@ describe('runSitePagePlan', () => {
         });
     });
 
+    it('measures card covers and resolves cross-space card targets', async () => {
+        const target = { kind: 'page', space: 'space-2', page: 'p2' };
+        const s = setup({
+            document: doc([
+                {
+                    object: 'block',
+                    type: 'table',
+                    data: {
+                        view: {
+                            type: 'cards',
+                            columns: [],
+                            coverDefinition: 'cover',
+                            coverDefinitionDark: 'coverDark',
+                            targetDefinition: 'target',
+                        },
+                        definition: {},
+                        records: {
+                            r1: {
+                                orderIndex: 'a',
+                                values: {
+                                    cover: { kind: 'file', file: 'f1' },
+                                    coverDark: { kind: 'file', file: 'f2' },
+                                    target,
+                                },
+                            },
+                        },
+                    },
+                    nodes: [],
+                },
+            ]),
+        });
+        await runSitePagePlan(s.context, page, s);
+        const refs = s.resolveRef.mock.calls.map(([, ref]) => ref);
+        expect(refs).toContainEqual({ kind: 'file', file: 'f1' });
+        expect(refs).toContainEqual({ kind: 'file', file: 'f2' });
+        expect(refs).toContainEqual(target);
+        expect(s.imageResizer.getImageSize).toHaveBeenCalledTimes(2);
+        expect(s.dataFetcher.getRevision).toHaveBeenCalledWith({
+            spaceId: 'space-2',
+            revisionId: 'revision-2',
+        });
+    });
+
+    it('starts the requests of visible table columns only', async () => {
+        const anchor = { kind: 'anchor', page: 'p3', anchor: 'a' };
+        const s = setup({
+            document: doc([
+                {
+                    object: 'block',
+                    type: 'table',
+                    data: {
+                        view: { type: 'grid', columns: ['people', 'link', 'picture'] },
+                        definition: {
+                            people: { type: 'users' },
+                            link: { type: 'content-ref' },
+                            picture: { type: 'image' },
+                            hidden: { type: 'users' },
+                        },
+                        records: {
+                            r1: {
+                                orderIndex: 'a',
+                                values: {
+                                    people: ['u1'],
+                                    link: anchor,
+                                    picture: { ref: { kind: 'file', file: 'f1' } },
+                                    hidden: ['u2'],
+                                },
+                            },
+                        },
+                    },
+                    nodes: [],
+                },
+            ]),
+        });
+        await runSitePagePlan(s.context, page, s);
+        const calls = s.resolveRef.mock.calls.map(([, ref, , opts]) => [ref, opts]);
+        expect(calls).toContainEqual([{ kind: 'user', user: 'u1' }, {}]);
+        expect(calls).toContainEqual([anchor, { resolveAnchorText: true }]);
+        expect(calls).toContainEqual([{ kind: 'file', file: 'f1' }, {}]);
+        expect(calls).not.toContainEqual([{ kind: 'user', user: 'u2' }, {}]);
+        expect(s.imageResizer.getImageSize).toHaveBeenCalledTimes(1);
+    });
+
+    it('keeps planning after a malformed table and skips values the render skips', async () => {
+        const table = (data: unknown) => ({ object: 'block', type: 'table', data, nodes: [] });
+        const s = setup({
+            document: doc([
+                table({ view: { type: 'grid', columns: ['a'] }, records: { r1: {} } }),
+                table({
+                    view: {
+                        type: 'cards',
+                        columns: ['img', 'people'],
+                        coverDefinitionDark: 'dark',
+                    },
+                    definition: { img: { type: 'image' }, people: { type: 'users' } },
+                    records: {
+                        r1: {
+                            orderIndex: 'a',
+                            values: {
+                                img: { ref: undefined },
+                                people: ['u1', 2],
+                                dark: { kind: 'file', file: 'f2' },
+                            },
+                        },
+                    },
+                }),
+                { object: 'block', type: 'embed', data: { url: 'https://after' }, nodes: [] },
+            ]),
+        });
+        await runSitePagePlan(s.context, page, s);
+        expect(s.dataFetcher.getEmbedByUrl).toHaveBeenCalledWith({
+            url: 'https://after',
+            spaceId: 'space-1',
+        });
+        expect(s.resolveRef).not.toHaveBeenCalled();
+        expect(s.imageResizer.getImageSize).not.toHaveBeenCalled();
+    });
+
     it('starts the revision of meta-link alternates in the site alongside their space', async () => {
         const alternate = { kind: 'page', space: 'space-2', page: 'p9' };
         const s = setup({ metaLinks: { canonical: null, alternates: [alternate] } });

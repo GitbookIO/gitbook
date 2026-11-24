@@ -1,5 +1,15 @@
-import type { ContentRef, JSONDocument, RevisionPageDocument } from '@gitbook/api';
+import type {
+    ContentRef,
+    DocumentBlockTable,
+    JSONDocument,
+    RevisionPageDocument,
+} from '@gitbook/api';
 
+import {
+    getRecordCardCovers,
+    isDocumentTableImageRecord,
+    isStringArray,
+} from '@/components/DocumentView/Table/utils';
 import type { GitBookSiteContext } from '@/lib/context';
 import { getDataOrNull, getPageDocument } from '@/lib/data';
 import {
@@ -121,18 +131,79 @@ export function runSitePagePlan(
             if (node.type === 'image') {
                 for (const ref of [data.ref, data.refDark]) {
                     if (ref) {
-                        startSpaceRevisionFor(ref as ContentRef);
-                        start(() => measureImage(document, ref as ContentRef));
+                        planImage(document, ref as ContentRef);
                     }
                 }
                 return;
             }
+            if (node.type === 'table') {
+                // Through `start` so a malformed table can't stop the rest of the walk.
+                start(async () =>
+                    planTable(document, node.data as unknown as DocumentBlockTable['data'])
+                );
+            }
             const ref = data.ref as ContentRef | undefined;
-            if (ref && needsRequest(ref, node, context)) {
-                resolveRef(document, ref, ANCHOR_TEXT_TYPES.has(node.type ?? ''));
+            if (ref) {
+                planRef(document, ref, ANCHOR_TEXT_TYPES.has(node.type ?? ''));
             }
         });
     });
+
+    const planRef = (document: JSONDocument, ref: ContentRef, anchorText: boolean) => {
+        if (needsRequest(ref, anchorText, context)) {
+            resolveRef(document, ref, anchorText);
+        }
+    };
+
+    const planImage = (document: JSONDocument, ref: ContentRef) => {
+        startSpaceRevisionFor(ref);
+        start(() => measureImage(document, ref));
+    };
+
+    // Only what the table view renders: its columns, plus covers and target for cards.
+    const planTable = (document: JSONDocument, table: DocumentBlockTable['data']) => {
+        const { view, definition } = table;
+        for (const record of Object.values(table.records ?? {})) {
+            for (const column of view.columns ?? []) {
+                const value = record.values[column];
+                switch (definition[column]?.type) {
+                    case 'content-ref':
+                        if (value && typeof value === 'object' && 'kind' in value) {
+                            planRef(document, value as ContentRef, true);
+                        }
+                        break;
+                    case 'users':
+                        if (isStringArray(value)) {
+                            for (const user of value) {
+                                resolveRef(document, { kind: 'user', user }, false);
+                            }
+                        }
+                        break;
+                    case 'image':
+                        if (isDocumentTableImageRecord(value)) {
+                            planImage(document, 'ref' in value ? value.ref : value);
+                        }
+                        break;
+                }
+            }
+            if (view.type === 'cards') {
+                const { light, dark } = getRecordCardCovers(record, view);
+                // The dark cover only renders alongside a light one.
+                if (light.contentRef) {
+                    planImage(document, light.contentRef);
+                    if (dark.contentRef) {
+                        planImage(document, dark.contentRef);
+                    }
+                }
+                const target = view.targetDefinition
+                    ? (record.values[view.targetDefinition] as ContentRef | undefined)
+                    : undefined;
+                if (target) {
+                    planRef(document, target, false);
+                }
+            }
+        }
+    };
 
     // Same as the images block: a file without known dimensions is measured by the resizer.
     const measureImage = async (document: JSONDocument, ref: ContentRef) => {
@@ -149,14 +220,14 @@ export function runSitePagePlan(
 }
 
 /** Whether resolving `ref` makes a request; same-space page and file refs resolve in memory. */
-function needsRequest(ref: ContentRef, node: Node, context: GitBookSiteContext) {
+function needsRequest(ref: ContentRef, anchorText: boolean, context: GitBookSiteContext) {
     if ('space' in ref && ref.space && ref.space !== context.space.id) {
         return true;
     }
     if (ref.kind === 'user' || ref.kind === 'openapi') {
         return true;
     }
-    return ref.kind === 'anchor' && ANCHOR_TEXT_TYPES.has(node.type ?? '');
+    return ref.kind === 'anchor' && anchorText;
 }
 
 function visit(nodes: unknown, fn: (node: Node) => void) {
