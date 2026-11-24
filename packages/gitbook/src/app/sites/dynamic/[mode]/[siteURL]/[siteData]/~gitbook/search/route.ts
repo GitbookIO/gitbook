@@ -2,7 +2,8 @@ import { type NextRequest, NextResponse } from 'next/server';
 
 import { SEARCH_FALLBACK_HEADER } from '@/components/Search/search-pass-store';
 import type { SearchSiteContentRequest } from '@/components/Search/search-types';
-import { throwIfDataError } from '@/lib/data';
+import type { SiteURLData } from '@/lib/context';
+import { type SearchRouteReason, throwIfDataError } from '@/lib/data';
 import { getLogger } from '@/lib/logger';
 import { getSiteURLDataFromMiddleware } from '@/lib/middleware';
 import { transformSitePageResult } from '@/lib/search';
@@ -14,7 +15,8 @@ const SEARCH_FALLBACK_REASON =
     /^(\d{3}|expired|pass_request|network|timeout|invalid|unknown_space)$/;
 
 export async function POST(request: NextRequest) {
-    const { asEmbeddable, query, scope } = (await request.json()) as SearchSiteContentRequest;
+    const { asEmbeddable, query, scope, searchId } =
+        (await request.json()) as SearchSiteContentRequest;
     const [context, siteURLData] = await Promise.all([
         getServerActionBaseContext({ isEmbeddable: asEmbeddable }),
         getSiteURLDataFromMiddleware(),
@@ -40,6 +42,8 @@ export async function POST(request: NextRequest) {
                 siteId: siteURLData.site,
                 query,
                 scope,
+                searchId,
+                routeReason: getSearchRouteReason(siteURLData, fallback),
             })
         ),
         throwIfDataError(
@@ -87,4 +91,39 @@ export async function POST(request: NextRequest) {
     });
 
     return NextResponse.json(results);
+}
+
+function getSearchRouteReason(
+    siteURLData: SiteURLData,
+    fallback: string | null
+): SearchRouteReason {
+    if (siteURLData.changeRequest) {
+        return 'change_request';
+    }
+    if (siteURLData.revision) {
+        return 'revision';
+    }
+    if (siteURLData.preview) {
+        return 'preview';
+    }
+
+    switch (fallback) {
+        case null:
+        case 'expired':
+        case 'pass_request':
+            return 'no_pass';
+        case '401':
+        case '403':
+        case '429':
+        case 'network':
+        case 'timeout':
+        case 'invalid':
+        case 'unknown_space':
+            return `fallback:${fallback}`;
+        default:
+            if (/^5\d{2}$/.test(fallback)) {
+                return 'fallback:5xx';
+            }
+            return /^\d{3}$/.test(fallback) ? 'fallback:http' : 'unknown';
+    }
 }

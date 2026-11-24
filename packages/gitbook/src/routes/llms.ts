@@ -8,6 +8,7 @@ import { renderSiteAgentInstructions } from '@/lib/ask-prompt';
 import { type GitBookSiteContext, checkIsRootSiteContext } from '@/lib/context';
 import { throwIfDataError } from '@/lib/data';
 import { type GitBookLinker, linkerWithMarkdownPages } from '@/lib/links';
+import { getAdvertisedMcpEndpoint } from '@/lib/llms-directive';
 import { type FlatPageEntry, getIndexablePages } from '@/lib/sitemap';
 import {
     filterSiteSpacesByLocale,
@@ -39,6 +40,7 @@ export async function serveLLMsTxt(baseContext: GitBookSiteContext) {
                 depth: 1,
                 children: [{ type: 'text', value: site.title }],
             },
+            ...getMcpServerNodes(context),
             ...(await getNodesFromSiteStructure(context)),
         ],
     };
@@ -57,6 +59,39 @@ export async function serveLLMsTxt(baseContext: GitBookSiteContext) {
             'Content-Type': 'text/markdown; charset=utf-8',
         },
     });
+}
+
+/**
+ * Point agents to the site's MCP server, right under the title where they read first.
+ */
+function getMcpServerNodes(context: GitBookSiteContext): RootContent[] {
+    const mcpEndpoint = getAdvertisedMcpEndpoint(context);
+    if (!mcpEndpoint) {
+        return [];
+    }
+
+    return [
+        {
+            type: 'blockquote',
+            children: [
+                {
+                    type: 'paragraph',
+                    children: [
+                        {
+                            type: 'text',
+                            value: 'Agents can also search and read this documentation through its ',
+                        },
+                        {
+                            type: 'link',
+                            url: mcpEndpoint,
+                            children: [{ type: 'text', value: 'MCP server' }],
+                        },
+                        { type: 'text', value: '.' },
+                    ],
+                },
+            ],
+        },
+    ];
 }
 
 /**

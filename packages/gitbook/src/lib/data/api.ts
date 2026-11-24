@@ -6,7 +6,6 @@ import {
     GitBookAPI,
     type HttpResponse,
     type RenderIntegrationUI,
-    type SiteSearchScope,
 } from '@gitbook/api';
 import { getCacheTag, getComputedContentSourceCacheTags } from '@gitbook/cache-tags';
 
@@ -14,6 +13,7 @@ import { cache } from '../cache';
 import { DataFetcherError, wrapDataFetcherError } from './errors';
 import type { DataFetcherResponse, GitBookDataFetcher } from './types';
 import { GITBOOK_API_TOKEN, GITBOOK_API_URL, GITBOOK_USER_AGENT } from '@/lib/env';
+import { toSearchSiteContentBody } from '@/lib/search-results';
 import { trace } from '@/lib/tracing';
 
 interface DataFetcherInput {
@@ -1097,28 +1097,16 @@ async function searchSiteContent(
         return trace(
             `searchSiteContent(${params.organizationId}, ${params.siteId}, ${params.query})`,
             async () => {
-                const { organizationId, siteId, query, scope } = params;
+                const { organizationId, siteId, query, scope, searchId, routeReason } = params;
                 const api = apiClient(input);
                 const res = await api.orgs.searchSiteContent(
                     organizationId,
                     siteId,
-                    {
-                        query,
-                        ...(scope.mode === 'current' && scope.restrictTo
-                            ? {
-                                  // `restrictTo` only exists in the newer `scope` request shape,
-                                  // and the published @gitbook/api types don't include it yet.
-                                  scope: {
-                                      mode: 'default',
-                                      currentSiteSpace: scope.siteSpaceId,
-                                      restrictTo: scope.restrictTo,
-                                  } as SiteSearchScope,
-                              }
-                            : scope),
-                    },
+                    toSearchSiteContentBody(query, scope, searchId),
                     {},
                     {
                         ...noCacheFetchOptions,
+                        headers: { 'x-gitbook-search-route-reason': routeReason },
                     }
                 );
                 return res.data.items;

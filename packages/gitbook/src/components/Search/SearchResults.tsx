@@ -271,6 +271,8 @@ export const SearchResults = React.forwardRef(function SearchResults(
                                                     }}
                                                     query={query}
                                                     item={item}
+                                                    position={index + 1}
+                                                    resultsCount={results.length}
                                                     active={index === cursor}
                                                     style={{
                                                         animationDelay: `${index * 25}ms,${100 + index * 25}ms`,
@@ -340,6 +342,8 @@ export const SearchResults = React.forwardRef(function SearchResults(
                                                     key={itemKey}
                                                     query={query}
                                                     item={item}
+                                                    position={index + 1}
+                                                    resultsCount={results.length}
                                                     active={index === cursor}
                                                     style={{
                                                         animationDelay: `${index * 25}ms,${100 + index * 25}ms`,

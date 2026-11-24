@@ -2,7 +2,13 @@ import type { Implementation, ServerCapabilities, Tool } from '@modelcontextprot
 import { SUPPORTED_PROTOCOL_VERSIONS } from '@modelcontextprotocol/sdk/types.js';
 
 import packageJSON from '../../../package.json';
-import { hasAdaptiveMcpEndpoint, isSiteMcpEnabled, mcpEndpointRequiresAuth } from './endpoints';
+import {
+    getSiteMcpEndpoint,
+    hasAdaptiveMcpEndpoint,
+    isSiteMcpEnabled,
+    mcpEndpointRequiresAuth,
+} from './endpoints';
+import { SITE_MCP_SERVER_NAME_MAX_ADDED_LENGTH, getSiteMcpServerName } from './naming';
 import { type SiteMcpTool, createSiteMcpTools } from './tools';
 import type { GitBookSiteContext } from '@/lib/context';
 import { serveDiscoveryDocument } from '@/lib/discoveryDocument';
@@ -156,10 +162,6 @@ export function buildMcpServerInfo(context: GitBookSiteContext): SiteMcpServerIn
     };
 }
 
-export function getSiteMcpEndpoint(context: GitBookSiteContext): string {
-    return context.linker.toAbsoluteURL(context.linker.toPathInSite('~gitbook/mcp'));
-}
-
 /**
  * Serve a site's MCP server card.
  *
@@ -223,7 +225,8 @@ function authorizationHeader(description: string): SiteMcpServerCardRemote['head
  * Name the server after the site it serves, within the 100 characters the schema allows a `title`.
  */
 function buildTitle(siteTitle: string): string {
-    return `${truncate(siteTitle, MAX_TEXT_LENGTH - TITLE_SUFFIX.length)}${TITLE_SUFFIX}`;
+    const budget = MAX_TEXT_LENGTH - TITLE_SUFFIX.length - SITE_MCP_SERVER_NAME_MAX_ADDED_LENGTH;
+    return `${getSiteMcpServerName(truncate(siteTitle, budget))}${TITLE_SUFFIX}`;
 }
 
 /**

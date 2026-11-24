@@ -5,7 +5,6 @@ import { assert } from 'ts-essentials';
 import type {
     ChangeRequest,
     CustomizationDefaultThemeMode,
-    PublishedSiteContent,
     Revision,
     RevisionPageDocument,
     Site,
@@ -32,6 +31,7 @@ import { isPublishedPreviewAllowed } from './preview';
 import type { AskVisitorAgent } from '@/lib/ask-visitor';
 import {
     type GitBookDataFetcher,
+    type PublishedSiteContent,
     createDataFetcher,
     getDataOrNull,
     throwIfDataError,

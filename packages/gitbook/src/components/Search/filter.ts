@@ -1,6 +1,9 @@
 import type { OrderedComputedResult } from './search-types';
 import type { SearchScope } from './useSearch';
 
+// Keep aligned with SiteInsightsSearchResultNumber in the GitBook API schema.
+const MAX_DISPLAYED_SEARCH_RESULTS = 20;
+
 /**
  * Site spaces whose pages may be shown for a UI search scope, or `undefined` for no restriction.
  *
@@ -29,20 +32,20 @@ export function computeFilterSiteSpaceIds(
     }
 }
 
-/** Keep the server's order, dropping pages owned by a site space outside the scope. */
-export function filterResultsBySiteSpaces(
-    results: OrderedComputedResult[],
+/** Keep the first results in server order within the selected site spaces. */
+export function getDisplayedSearchResults<Result extends OrderedComputedResult>(
+    results: Result[],
     allowedSiteSpaceIds: string[] | undefined
-): OrderedComputedResult[] {
-    if (!allowedSiteSpaceIds) {
-        return results;
-    }
-
-    const allowed = new Set(allowedSiteSpaceIds);
-
-    return results.filter(
-        (result) =>
-            result.type === 'record' ||
-            (result.siteSpaceId !== undefined && allowed.has(result.siteSpaceId))
-    );
+): Result[] {
+    const allowed = allowedSiteSpaceIds && new Set(allowedSiteSpaceIds);
+    const matching = allowed
+        ? results.filter(
+              (result) =>
+                  result.type === 'record' ||
+                  (result.siteSpaceId !== undefined && allowed.has(result.siteSpaceId))
+          )
+        : results;
+    return matching.length > MAX_DISPLAYED_SEARCH_RESULTS
+        ? matching.slice(0, MAX_DISPLAYED_SEARCH_RESULTS)
+        : matching;
 }

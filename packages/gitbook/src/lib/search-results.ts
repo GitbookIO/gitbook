@@ -52,10 +52,12 @@ export type DirectSearchProps = {
  */
 export function toSearchSiteContentBody(
     query: string,
-    scope: SearchSiteContentScope
-): Parameters<GitBookAPI['orgs']['searchSiteContent']>[2] {
+    scope: SearchSiteContentScope,
+    searchId?: string
+): Parameters<GitBookAPI['orgs']['searchSiteContent']>[2] & { searchId?: string } {
     return {
         query,
+        searchId,
         ...(scope.mode === 'current' && scope.restrictTo
             ? {
                   // `restrictTo` only exists in the newer `scope` request shape,
@@ -119,7 +121,7 @@ export function computePublishedSearchResults(input: {
     const { asEmbeddable, linker, searchResults, spaces } = input;
 
     const hasUnknownSpace = searchResults.some(
-        (item) => item.type === 'space' && item.pages.length > 0 && !spaces[item.id]
+        (item) => item.type === 'space' && item.pages.length > 0 && !Object.hasOwn(spaces, item.id)
     );
     if (hasUnknownSpace) {
         return null;
